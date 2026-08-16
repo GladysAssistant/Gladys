@@ -321,7 +321,7 @@
     "editDashboardAddSectionButton": "Ajouter une section",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bord",
-    "editDashboardExplanation": "Un tableau de bord est une pile de sections, chacune avec ses propres colonnes (4 maximum). Cliquez sur le bouton + pour ajouter un widget, une colonne ou une section. Vous pouvez déplacer un widget en l'attrapant et en le faisant glisser.",
+    "editDashboardExplanation": "Un tableau de bord est une pile de sections, chacune avec ses propres colonnes (6 maximum). Cliquez sur le bouton + pour ajouter un widget, une colonne ou une section. Vous pouvez déplacer un widget en l'attrapant et en le faisant glisser.",
     "reorderDashboardButton": "Re-ordonner",
     "stopReorderingDashboardButton": "Arrêter de réordonner",
     "addBoxButton": "Ajouter",
@@ -761,6 +761,11 @@
     "cardStyles": {
       "default": "Par défaut",
       "glass": "Verre dépoli (translucide)"
+    },
+    "editDashboardWidthLabel": "Largeur du tableau de bord",
+    "widths": {
+      "standard": "Standard (recommandé)",
+      "full": "Pleine largeur"
     }
   },
   "newDashboard": {

@@ -120,6 +120,7 @@ describe('GET /api/v1/dashboard/:dashboard_selector', () => {
           icon: null,
           background_image: null,
           card_style: null,
+          width: null,
           // stored with the legacy column-based shape, normalized to sections on read
           boxes: [
             {
@@ -159,6 +160,7 @@ describe('PATCH /api/v1/dashboard/:dashboard_selector', () => {
           icon: null,
           background_image: null,
           card_style: null,
+          width: null,
           user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           visibility: 'private',
           type: 'main',

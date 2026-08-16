@@ -23,6 +23,7 @@ async function getBySelector(userId, selector) {
       'icon',
       'background_image',
       'card_style',
+      'width',
       'created_at',
       'updated_at',
       'boxes',

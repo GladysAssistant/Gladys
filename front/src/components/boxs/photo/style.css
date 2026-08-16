@@ -3,6 +3,28 @@
   overflow: hidden;
 }
 
+/* Inside a stretched wrapper (the box absorbs the free height of its
+   column) the image area grows with the card instead of leaving a dead
+   white zone under the 400px cap. photo_fit keeps deciding cover/contain. */
+:global(.dashboard-stretched-media) .photoContainer {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+:global(.dashboard-stretched-media) .imageWrapper {
+  flex: 1 1 auto;
+  max-height: none;
+  min-height: 0;
+}
+
+:global(.dashboard-stretched-media) .photo {
+  max-height: none;
+  height: 100%;
+  min-height: 0;
+}
+
 .imageWrapper {
   position: relative;
   width: 100%;

@@ -321,7 +321,7 @@
     "editDashboardAddSectionButton": "Add a section",
     "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
-    "editDashboardExplanation": "A dashboard is a stack of sections, each with its own columns (up to 4). Click on the + button to add a widget, a column or a section. You can move a widget by grabbing it and dragging it around.",
+    "editDashboardExplanation": "A dashboard is a stack of sections, each with its own columns (up to 6). Click on the + button to add a widget, a column or a section. You can move a widget by grabbing it and dragging it around.",
     "reorderDashboardButton": "Re-order dashboards",
     "stopReorderingDashboardButton": "Stop re-ordering dashboards",
     "addBoxButton": "Add",
@@ -761,6 +761,11 @@
     "cardStyles": {
       "default": "Default",
       "glass": "Glass (translucent)"
+    },
+    "editDashboardWidthLabel": "Dashboard width",
+    "widths": {
+      "standard": "Standard (recommended)",
+      "full": "Full width"
     }
   },
   "newDashboard": {

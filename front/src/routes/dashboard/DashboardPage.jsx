@@ -16,6 +16,7 @@ const DashboardPage = ({ children, ...props }) => {
   // quotes and backslashes, the scheme check closes the rest)
   const backgroundImage = rawBackgroundImage && /^https?:\/\//.test(rawBackgroundImage) ? rawBackgroundImage : null;
   const glassCards = props.currentDashboard && props.currentDashboard.card_style === 'glass';
+  const fullWidth = props.currentDashboard && props.currentDashboard.width === 'full';
   return (
     <div class="page">
       <div
@@ -31,7 +32,7 @@ const DashboardPage = ({ children, ...props }) => {
           <div class="loader" />
           <div class="dimmer-content">
             <div class="my-3 my-md-5 dashboard">
-              <div class={cx('container')}>
+              <div class={cx('container', { [style.fullWidthContainer]: fullWidth })}>
                 <div class="page-header">
                   <div>
                     {!props.dashboardListEmpty && props.tabletMode && (

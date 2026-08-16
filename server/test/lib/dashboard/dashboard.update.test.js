@@ -80,10 +80,26 @@ describe('dashboard.update', () => {
       icon: 'home',
       background_image: 'https://example.com/background.jpg',
       card_style: 'glass',
+      width: 'full',
     });
     expect(updatedDashboard).to.have.property('icon', 'home');
     expect(updatedDashboard).to.have.property('background_image', 'https://example.com/background.jpg');
     expect(updatedDashboard).to.have.property('card_style', 'glass');
+    expect(updatedDashboard).to.have.property('width', 'full');
+  });
+
+  it('should reject an unknown dashboard width', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      width: 'ultra-wide',
+    });
+    return assert.isRejected(promise);
+  });
+
+  it('should save a section with 6 columns', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [{ columns: [[], [], [], [], [], []] }],
+    });
+    expect(updatedDashboard.boxes[0].columns).to.have.lengthOf(6);
   });
 
   it('should reject a non-http background image', async () => {
@@ -211,11 +227,11 @@ describe('dashboard.update', () => {
     return assert.isRejected(promise);
   });
 
-  it('should reject a section with more than 4 columns', async () => {
+  it('should reject a section with more than 6 columns', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [
         {
-          columns: [[], [], [], [], []],
+          columns: [[], [], [], [], [], [], []],
         },
       ],
     });

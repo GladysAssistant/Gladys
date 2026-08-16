@@ -11,7 +11,11 @@ import IconSelector from '../../../components/scene/IconSelector';
 import { getSectionOffsets, MAX_COLUMNS_PER_SECTION } from '../../../utils/dashboardSections';
 import style from './style.css';
 import stylePrimary from '../style.css';
-import { DASHBOARD_VISIBILITY_LIST, DASHBOARD_CARD_STYLE_LIST } from '../../../../../server/utils/constants';
+import {
+  DASHBOARD_VISIBILITY_LIST,
+  DASHBOARD_CARD_STYLE_LIST,
+  DASHBOARD_WIDTH_LIST
+} from '../../../../../server/utils/constants';
 
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 const getTotalColumns = props => {
@@ -123,6 +127,26 @@ const EditBoxColumns = ({ children, ...props }) => (
             {DASHBOARD_CARD_STYLE_LIST.map(cardStyle => (
               <option value={cardStyle}>
                 <Text id={`dashboard.cardStyles.${cardStyle}`} />
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="dashboard.editDashboardWidthLabel" />
+          </label>
+          <select
+            class="form-control"
+            value={props.homeDashboard.width || 'standard'}
+            onChange={e =>
+              props.updateCurrentDashboardProperty('width', e.target.value === 'standard' ? null : e.target.value)
+            }
+          >
+            {DASHBOARD_WIDTH_LIST.map(dashboardWidth => (
+              <option value={dashboardWidth}>
+                <Text id={`dashboard.widths.${dashboardWidth}`} />
               </option>
             ))}
           </select>

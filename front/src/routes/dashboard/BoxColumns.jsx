@@ -11,7 +11,8 @@ const BoxColumns = ({ children, ...props }) => {
         props.homeDashboard.boxes.map(section => {
           const sectionOffset = columnOffset;
           columnOffset += section.columns.length;
-          const columnClass = `col-lg-${12 / section.columns.length}`;
+          // 5 doesn't divide the 12-column grid: those columns get a 20% class instead
+          const columnClass = section.columns.length === 5 ? style.colFifth : `col-lg-${12 / section.columns.length}`;
           return (
             <div class="d-flex flex-row flex-wrap justify-content-center align-items-stretch">
               {section.columns.map((column, columnIndex) => {
@@ -29,7 +30,10 @@ const BoxColumns = ({ children, ...props }) => {
                           key={`${props.homeDashboard.id}-${x}-${y}`}
                           class={cx(style.stretchableBox, {
                             [style.stretchableTile]: isTileStretchBox(box),
-                            [style.adaptiveTile]: isValueTileBox(box)
+                            [style.adaptiveTile]: isValueTileBox(box),
+                            // global marker so media widgets can make their image
+                            // fill the stretched card from their own stylesheet
+                            'dashboard-stretched-media': !isTileStretchBox(box)
                           })}
                         >
                           <Box box={box} x={x} y={y} />

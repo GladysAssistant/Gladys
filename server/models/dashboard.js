@@ -6,9 +6,10 @@ const {
   DASHBOARD_TYPE_LIST,
   DASHBOARD_VISIBILITY_LIST,
   DASHBOARD_CARD_STYLE_LIST,
+  DASHBOARD_WIDTH_LIST,
 } = require('../utils/constants');
 
-const MAX_COLUMNS_PER_SECTION = 4;
+const MAX_COLUMNS_PER_SECTION = 6;
 
 const boxSchema = Joi.object().keys({
   type: Joi.string()
@@ -189,6 +190,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM(DASHBOARD_CARD_STYLE_LIST),
         validate: {
           isIn: [DASHBOARD_CARD_STYLE_LIST],
+        },
+      },
+      width: {
+        allowNull: true,
+        type: DataTypes.ENUM(DASHBOARD_WIDTH_LIST),
+        validate: {
+          isIn: [DASHBOARD_WIDTH_LIST],
         },
       },
       boxes: {

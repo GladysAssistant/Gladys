@@ -321,7 +321,7 @@
     "editDashboardAddSectionButton": "Einen Abschnitt hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
-    "editDashboardExplanation": "Ein Dashboard ist ein Stapel von Abschnitten, jeder mit eigenen Spalten (maximal 4). Klicke auf \"+\", um ein Widget, eine Spalte oder einen Abschnitt hinzuzufügen. Du kannst ein Widget bewegen, indem du es greifst und verschiebst.",
+    "editDashboardExplanation": "Ein Dashboard ist ein Stapel von Abschnitten, jeder mit eigenen Spalten (maximal 6). Klicke auf \"+\", um ein Widget, eine Spalte oder einen Abschnitt hinzuzufügen. Du kannst ein Widget bewegen, indem du es greifst und verschiebst.",
     "reorderDashboardButton": "Dashboards neu anordnen",
     "stopReorderingDashboardButton": "Anordnen der Dashboards beenden",
     "addBoxButton": "Hinzufügen",
@@ -761,6 +761,11 @@
     "cardStyles": {
       "default": "Standard",
       "glass": "Glas (durchscheinend)"
+    },
+    "editDashboardWidthLabel": "Dashboard-Breite",
+    "widths": {
+      "standard": "Standard (empfohlen)",
+      "full": "Volle Breite"
     }
   },
   "newDashboard": {

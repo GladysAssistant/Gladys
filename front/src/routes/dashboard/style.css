@@ -23,6 +23,28 @@
   margin-bottom: 150px;
 }
 
+/* Per-dashboard "full" width: lift the container cap, keep the side padding.
+   Chained with .container so it wins over the breakpoint max-widths. */
+.fullWidthContainer:global(.container) {
+  max-width: none;
+}
+
+/* 5 columns don't divide the 12-column grid: same behavior as a col-lg-*
+   (stacked full width below the breakpoint, fixed share above) at 20% */
+.colFifth {
+  position: relative;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+@media (min-width: 992px) {
+  .colFifth {
+    flex: 0 0 20%;
+    max-width: 20%;
+  }
+}
+
 @media (min-width: 992px) {
   .removePaddingFirstCol {
     padding-left: 0;
@@ -309,6 +331,17 @@
    extra height instead of leaving it under the card */
 .stretchableTile > div {
   justify-content: center;
+}
+
+/* Stretch is a shock absorber, not an elastic: a media box (camera, photo)
+   absorbs the free height of its column only up to this cap. Beyond it the
+   column simply ends earlier and the dashboard background breathes, instead
+   of a photo blown up to several times its natural size. Desktop only —
+   below the breakpoint columns stack and heights are natural. */
+@media (min-width: 992px) {
+  :global(.dashboard-stretched-media) {
+    max-height: 65vh;
+  }
 }
 
 /* On large screens a stretched value tile's height is imposed by its

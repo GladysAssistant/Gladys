@@ -46,12 +46,12 @@ Decided with the maintainer in forum topic 10553: instead of a per-row column co
 - **No SQL migration**: the column stays JSON. Legacy values are normalized in a `beforeValidate` hook (`server/utils/dashboardSections.js`), so validation only ever sees the section shape and any save — even one that doesn't touch `boxes` — lazily migrates the row.
 - **Lazy, lossless migration**: on read, a legacy value (array of arrays) is normalized to a single section `[{ columns: legacyValue }]`; on the first save, the new shape is written. `dashboard.getBySelector` returns the normalized shape so the frontend only ever sees sections.
 - **Editor implementation note**: the editor keeps working on a *flat* list of columns plus a `sectionSizes` array (`front/src/utils/dashboardSections.js`), so drag & drop coordinates stay global and none of the box-level editing code changed; sections are reassembled on save.
-- Column count per section: **1 to 4**. More than 4 columns is intentionally not supported — dense rows of small items are the job of the chips bar (section B), not of many narrow columns.
+- Column count per section: **1 to 6** (raised from 4 together with the per-dashboard width setting, section G — 6 columns only make sense on a wide dashboard). 5 columns don't divide the 12-column grid, so that case uses a dedicated 20% class (`BoxColumns.jsx`); beyond 6, dense rows of small items remain the job of the chips bar (section B), not of many narrow columns.
 - A section carries no name or title in phase 1 (`{ columns }` only); an optional `name` field may be added later without migration.
 
 ### A.3 Editor UX
 
-The edit mode keeps the current interaction model, per section: an "Add a section" button appends a one-column section, a per-section **+** button adds a column (up to 4) and a per-column trash removes an empty one (removing the last column removes the section); drag & drop moves boxes within and across sections/columns (the existing drag & drop and drop-zone components are reused per section). There is no separate column-count picker.
+The edit mode keeps the current interaction model, per section: an "Add a section" button appends a one-column section, a per-section **+** button adds a column (up to 6) and a per-column trash removes an empty one (removing the last column removes the section); drag & drop moves boxes within and across sections/columns (the existing drag & drop and drop-zone components are reused per section). There is no separate column-count picker.
 
 ### A.4 Heights: selective stretch, not masonry
 
@@ -61,6 +61,7 @@ Sections of different heights create blank space below short columns. Resolution
 - Each box type declares a static stretchable flag **in the frontend code** (not user-facing, `front/src/utils/dashboardSections.js`): stretchable boxes get `flex-grow` and absorb the remaining height of their column; fixed-content boxes (clock, chips, scenes…) keep their natural height.
 - This is a per-type constant, not a per-box user setting: zero configuration, and blank space disappears in the common layouts.
 - **As implemented**: two stretch behaviors. *Media* boxes (`camera`, `photo`) stretch by letting their image absorb the extra height; *tile* boxes (`temperature-in-room`, `humidity-in-room`, `house-view`) stretch by vertically centering their content in the taller card, so a column of small tiles lines up with its neighbors instead of leaving a ragged bottom edge. `chart` is deliberately excluded for now — its height is fixed by the charting library options — and joins the list once chart heights are responsive.
+- **Capped absorption**: stretch is a shock absorber, not an elastic. A media box absorbs the free height of its column only up to a cap (65vh, desktop only, `dashboard-stretched-media` in `routes/dashboard/style.css`) — beyond it the column simply ends earlier and the dashboard background shows, instead of a photo blown up to several times its natural size. The photo widget lifts its internal 400px image cap when stretched so the image actually fills the card (no dead zone under the image; `photo_fit` keeps deciding cover/contain).
 - **Adaptive value tiles**: a small row of content centered in a big card looks empty, so the temperature/humidity tiles adapt to their real rendered height through a CSS container query (`components/boxs/roomTile.css`): compact icon+value row when short, centered "big tile" with the value scaled to the height (`cqh` units) when stretched past the threshold. The container is the padding-less stretch wrapper (container queries evaluate the content box), declared only on large screens — on mobile, stacked columns keep natural heights. The `house-view` is *not* size-contained: its natural height (the illustration) is what drives the section height. Browsers without container-query support keep the compact layout.
 
 ### A.5 Mobile
@@ -154,7 +155,8 @@ Additive, optional (nullable) columns on `t_dashboard` (migration `2026081500000
   - **default scene**: when `glass` is selected and no `background_image` is set, a pure-CSS scene (radial glows over a diagonal gradient) is applied — the wow in one click, no wallpaper hunt; a configured image wins over it;
   - **dark mode by inversion**: the app darkens through the global inversion filter (`style/dark-mode.css`), so the theme deliberately authors NO dark colors — the light glass, scene, and pastels invert into coherent dark counterparts, and images (house illustration, backgrounds set inline) are double-inverted back by the existing rules;
   - **degradation**: browsers without `backdrop-filter` get more opaque surfaces via `@supports`, keeping text readable on old wall tablets;
-- `icon`: feather icon shown in the tablet tab bar (section H), picked with the existing `IconSelector`.
+- `icon`: feather icon shown in the tablet tab bar (section H), picked with the existing `IconSelector`;
+- `width`: `standard` (default, the capped container — opinionated readable default) | `full` (the container spans the whole screen, side padding kept — for large wall panels and 27"+ screens, where up to 6 columns per section become useful; migration `20260816120000`, `DASHBOARD_WIDTH` in `server/utils/constants.js`). The resolution of the "capped width vs. big screens" dilemma is *opinionated defaults, never walls*: beautiful without configuration, one click to opt out.
 
 A `theme` override (`auto`/`light`/`dark`) was considered and **deferred**: the app-level dark mode is a user preference and per-dashboard overrides need a clean way to scope it; revisit after phase 4. Appearance stays a dashboard-level decision so every widget remains consistent — no per-box styling.
 
@@ -184,7 +186,7 @@ Each phase is a separate PR (or PR series) that updates this spec in the same di
 - **Free-text prompt for AI generation**: rejected. A prompt field is configuration in disguise and produces inconsistent quality; the two prompt-free paths (photo, guided form) with a server-locked style are the Gladys way.
 - **Client-side style prompt**: rejected — the style must be a server-side guarantee (consistency across users and improvable without a release).
 - **Plus-only house-view widget**: rejected. The widget ships with a bundled gallery and upload; Plus personalizes it.
-- **Many narrow columns for chip rows**: rejected (capped at 4 columns) — compact rows are a widget concern (`chips`), not a layout concern.
+- **Many narrow columns for chip rows**: rejected (capped at 6 columns, and 5–6 are only comfortable on `width: full`) — compact rows are a widget concern (`chips`), not a layout concern.
 
 ## Out of scope
 

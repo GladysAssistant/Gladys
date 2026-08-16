@@ -1,7 +1,7 @@
 import { DASHBOARD_BOX_TYPE } from '../../../server/utils/constants';
 
 // Maximum number of columns a dashboard section can hold
-export const MAX_COLUMNS_PER_SECTION = 4;
+export const MAX_COLUMNS_PER_SECTION = 6;
 
 // Box types that absorb the remaining height of their column so sections
 // with columns of different heights don't leave blank space. This is a
