@@ -21,6 +21,36 @@ const PROGRESSIVE_WINDOWS_IN_MS = [
 ];
 
 /**
+ * @description Keep, among the given features, only those whose history holds at least two
+ * distinct values.
+ *
+ * A feature whose value never changed matches nothing in any bounded window, so it always reaches
+ * the unbounded one: without this filter, every sensor that has never flipped (a smoke or leak
+ * sensor reporting 0 for years, a door that has only ever been closed) would run a `LAG` over its
+ * whole history on each dashboard load. That window function has to sort the whole partition,
+ * while `MIN`/`MAX` only stream over it — and `duckDbReadConnectionAllAsync` is serialized on a
+ * single read queue shared with the charts, the history page and the aggregates.
+ * @param {Array} featureIds - The ids of the device features to look at.
+ * @returns {Promise<Array>} Resolve with the ids of the features whose value changed at least once.
+ * @example
+ * const changedFeatureIds = await keepFeaturesWhoseValueChanged([featureId]);
+ */
+async function keepFeaturesWhoseValueChanged(featureIds) {
+  const featureIdPlaceholders = featureIds.map(() => '?').join(',');
+  const rows = await db.duckDbReadConnectionAllAsync(
+    `
+      SELECT device_feature_id
+      FROM t_device_feature_state
+      WHERE device_feature_id IN (${featureIdPlaceholders})
+      GROUP BY device_feature_id
+      HAVING MIN(value) != MAX(value)
+    `,
+    ...featureIds,
+  );
+  return rows.map((row) => row.device_feature_id);
+}
+
+/**
  * @description Get the date at which the value of each given device feature last changed.
  *
  * `device_feature.last_value_changed` cannot be used for this: it is refreshed on every
@@ -69,6 +99,15 @@ async function getLastStateChanges(deviceFeatureSelectors) {
 
   for (let i = 0; i < PROGRESSIVE_WINDOWS_IN_MS.length && remainingFeatureIds.length > 0; i += 1) {
     const windowInMs = PROGRESSIVE_WINDOWS_IN_MS[i];
+    if (windowInMs === null) {
+      // Last resort: the window function is about to run over the whole history of the features
+      // still without an answer, so those which simply never changed are answered here instead.
+      // eslint-disable-next-line no-await-in-loop
+      remainingFeatureIds = await keepFeaturesWhoseValueChanged(remainingFeatureIds);
+      if (remainingFeatureIds.length === 0) {
+        break;
+      }
+    }
     const featureIdPlaceholders = remainingFeatureIds.map(() => '?').join(',');
     const queryParams = [...remainingFeatureIds];
     let lowerBoundClause = '';

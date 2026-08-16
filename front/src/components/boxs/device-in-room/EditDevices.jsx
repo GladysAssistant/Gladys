@@ -229,6 +229,8 @@ class EditDevices extends Component {
             )}
             <DisplayLastStateChangeOption
               box={props.box}
+              x={props.x}
+              y={props.y}
               updateDisplayLastStateChange={this.updateDisplayLastStateChange}
             />
           </div>

@@ -96,7 +96,16 @@ const SensorDeviceType = ({ children, ...props }) => {
 
   // Enabled per box in the box editor. A binary state alone does not tell when the door was
   // opened: the date of the last state change is displayed right under the state.
-  const showLastStateChange = displayLastStateChange === true && type === DEVICE_FEATURE_TYPES.SENSOR.BINARY;
+  // Restricted to read-only features: writable binary features (a switch, a child lock...) also
+  // reach this component through DeviceRow, and DevicesBox does not request any date for them.
+  // `lastStateChange` is undefined while the request is in flight, and stays undefined for a
+  // feature the server left out (unknown, or not keeping any history), so nothing is displayed
+  // until an answer is known: null then really means "no change found in the history".
+  const showLastStateChange =
+    displayLastStateChange === true &&
+    feature.read_only === true &&
+    type === DEVICE_FEATURE_TYPES.SENSOR.BINARY &&
+    lastStateChange !== undefined;
 
   let elementType = get(DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE, `${category}.${type}`);
 

@@ -44,6 +44,39 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
   });
 };
 
+// A new state is a state change only when the value actually differs from the one displayed,
+// so a sensor re-publishing the same value never resets the displayed date.
+const getUpdatedLastStateChanges = (
+  lastStateChanges,
+  deviceFeatures,
+  deviceFeatureSelector,
+  lastValue,
+  lastValueChange
+) => {
+  const feature = deviceFeatures.find(
+    f => f.selector === deviceFeatureSelector && isBinarySensorFeature(f) && f.last_value !== lastValue
+  );
+  if (!feature) {
+    return lastStateChanges;
+  }
+  return { ...lastStateChanges, [deviceFeatureSelector]: lastValueChange };
+};
+
+// A websocket state change can land while the history request is in flight: the fetched snapshot
+// was taken before it, so replacing the whole map would put back a date older than the one already
+// displayed. Each selector keeps the most recent of the two dates instead.
+const mergeLastStateChanges = (currentLastStateChanges, fetchedLastStateChanges) => {
+  const mergedLastStateChanges = { ...currentLastStateChanges };
+  Object.keys(fetchedLastStateChanges).forEach(selector => {
+    const currentDate = mergedLastStateChanges[selector];
+    const fetchedDate = fetchedLastStateChanges[selector];
+    if (!currentDate || (fetchedDate && new Date(fetchedDate) > new Date(currentDate))) {
+      mergedLastStateChanges[selector] = fetchedDate;
+    }
+  });
+  return mergedLastStateChanges;
+};
+
 const updateDeviceFeaturesString = (deviceFeatures, deviceFeatureSelector, lastValueString, lastValueChange) => {
   return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
@@ -131,46 +164,40 @@ class DevicesComponent extends Component {
       const lastStateChanges = await this.props.httpClient.get('/api/v1/device_feature/last_state_changes', {
         device_feature_selectors: binarySensorSelectors.join(',')
       });
-      this.setState({ lastStateChanges });
+      this.setState(previousState => ({
+        lastStateChanges: mergeLastStateChanges(previousState.lastStateChanges, lastStateChanges)
+      }));
     } catch (e) {
       console.error(e);
     }
   };
 
+  // Read through a functional update: the history request can resolve in between, and its merged
+  // result would be clobbered by a map computed from an older state.
   updateDeviceStateWebsocket = payload => {
-    let { deviceFeatures } = this.state;
-    if (deviceFeatures) {
-      const lastStateChanges = this.getUpdatedLastStateChanges(
-        deviceFeatures,
-        payload.device_feature_selector,
-        payload.last_value,
-        payload.last_value_changed
-      );
-      deviceFeatures = updateDeviceFeatures(
-        deviceFeatures,
-        payload.device_feature_selector,
-        payload.last_value,
-        payload.last_value_changed
-      );
-      this.setState({
-        deviceFeatures,
-        lastStateChanges
-      });
-    }
+    this.setState(previousState => {
+      const { deviceFeatures } = previousState;
+      if (!deviceFeatures) {
+        return null;
+      }
+      return {
+        deviceFeatures: updateDeviceFeatures(
+          deviceFeatures,
+          payload.device_feature_selector,
+          payload.last_value,
+          payload.last_value_changed
+        ),
+        lastStateChanges: getUpdatedLastStateChanges(
+          previousState.lastStateChanges,
+          deviceFeatures,
+          payload.device_feature_selector,
+          payload.last_value,
+          payload.last_value_changed
+        )
+      };
+    });
   };
 
-  // A new state is a state change only when the value actually differs from the one displayed,
-  // so a sensor re-publishing the same value never resets the displayed date.
-  getUpdatedLastStateChanges = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
-    const { lastStateChanges } = this.state;
-    const feature = deviceFeatures.find(
-      f => f.selector === deviceFeatureSelector && isBinarySensorFeature(f) && f.last_value !== lastValue
-    );
-    if (!feature) {
-      return lastStateChanges;
-    }
-    return { ...lastStateChanges, [deviceFeatureSelector]: lastValueChange };
-  };
   updateDeviceTextWebsocket = payload => {
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {

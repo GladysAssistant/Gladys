@@ -58,7 +58,9 @@ describe('Device.getLastStateChanges', function Describe() {
   });
 
   afterEach(() => {
-    sinon.reset();
+    // restore, not reset: one test spies on the DuckDB read connection, which must not stay
+    // wrapped for the next ones.
+    sinon.restore();
   });
 
   it('should return an empty object when no selector is given', async () => {
@@ -125,6 +127,23 @@ describe('Device.getLastStateChanges', function Describe() {
     ]);
     const lastStateChanges = await deviceInstance.getLastStateChanges(['door']);
     expect(lastStateChanges).to.deep.equal({ door: null });
+  });
+
+  it('should not run the unbounded window function when the value never changed', async () => {
+    await db.duckDbBatchInsertState(DOOR_FEATURE_ID, [
+      { value: 1, created_at: daysAgo(500) },
+      { value: 1, created_at: daysAgo(400) },
+    ]);
+    const readSpy = sinon.spy(db, 'duckDbReadConnectionAllAsync');
+
+    const lastStateChanges = await deviceInstance.getLastStateChanges(['door']);
+
+    expect(lastStateChanges).to.deep.equal({ door: null });
+    const unboundedWindowQueries = readSpy
+      .getCalls()
+      .map((call) => call.args[0])
+      .filter((query) => query.includes('LAG(') && !query.includes('created_at >='));
+    expect(unboundedWindowQueries).to.deep.equal([]);
   });
 
   it('should return null when the feature has no state at all', async () => {
