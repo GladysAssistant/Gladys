@@ -316,19 +316,27 @@ const actionsFunc = {
     const { abortSignal } = scope;
     // Abortable wait: resolves after the delay, or rejects immediately if the
     // scene is stopped while waiting (so a long "delay" can be interrupted).
-    // Note: an already-aborted scene is caught earlier by executeAction.
     await new Promise((resolve, reject) => {
       const timer = setTimeout(resolve, timeToWaitMilliseconds);
-      if (abortSignal) {
-        abortSignal.addEventListener(
-          'abort',
-          () => {
-            clearTimeout(timer);
-            reject(new AbortScene('SCENE_STOPPED'));
-          },
-          { once: true },
-        );
+      if (!abortSignal) {
+        return;
       }
+      // An already-aborted signal never fires its 'abort' listeners, so a stop
+      // landing between executeAction's check and this registration would leave
+      // the timer running for the whole delay: re-check before subscribing.
+      if (abortSignal.aborted) {
+        clearTimeout(timer);
+        reject(new AbortScene('SCENE_STOPPED'));
+        return;
+      }
+      abortSignal.addEventListener(
+        'abort',
+        () => {
+          clearTimeout(timer);
+          reject(new AbortScene('SCENE_STOPPED'));
+        },
+        { once: true },
+      );
     });
   },
 

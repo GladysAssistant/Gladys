@@ -23,16 +23,26 @@ export const computeRunningInfo = (runningScenes, sceneSelector, now) => {
  * already present in the state, deduplicating by executionId. This avoids a
  * late-resolving fetch overwriting updates already applied by websocket events
  * (scene.started / scene.stopped) received while the fetch was in flight.
+ *
+ * Websocket removals are authoritative: an execution the server still listed
+ * when the request was built may have finished before the response landed, so
+ * every id reported stopped while the fetch was in flight is dropped. Without
+ * it a stale response resurrects a finished execution and the UI stays stuck on
+ * "running" until the next event.
  * @param {Array} fetched - The list returned by GET /api/v1/scene/running.
  * @param {Array} current - The running scenes currently in the state.
+ * @param {Set} [stoppedDuringFetch] - Execution ids stopped while fetching.
  * @returns {Array} The merged list (fetched entries win on conflict).
  * @example
- * mergeRunningScenes(fetched, prevState.runningScenes);
+ * mergeRunningScenes(fetched, prevState.runningScenes, stoppedDuringFetch);
  */
-export const mergeRunningScenes = (fetched, current) => {
+export const mergeRunningScenes = (fetched, current, stoppedDuringFetch) => {
   const byExecutionId = new Map();
   (current || []).forEach(runningScene => byExecutionId.set(runningScene.executionId, runningScene));
   (fetched || []).forEach(runningScene => byExecutionId.set(runningScene.executionId, runningScene));
+  if (stoppedDuringFetch) {
+    stoppedDuringFetch.forEach(executionId => byExecutionId.delete(executionId));
+  }
   return Array.from(byExecutionId.values());
 };
 

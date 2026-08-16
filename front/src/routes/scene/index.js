@@ -51,12 +51,22 @@ class Scene extends Component {
     }
   };
   getRunningScenes = async () => {
+    // Collect the stops received while the request is in flight: the response
+    // was built before them and would otherwise resurrect those executions.
+    const stoppedDuringFetch = new Set();
+    this.stoppedDuringFetch = stoppedDuringFetch;
     try {
       const runningScenes = await this.props.httpClient.get('/api/v1/scene/running');
       // Merge with any websocket-driven updates received while fetching
-      this.setState(prevState => ({ runningScenes: mergeRunningScenes(runningScenes, prevState.runningScenes) }));
+      this.setState(prevState => ({
+        runningScenes: mergeRunningScenes(runningScenes, prevState.runningScenes, stoppedDuringFetch)
+      }));
     } catch (e) {
       console.error(e);
+    } finally {
+      if (this.stoppedDuringFetch === stoppedDuringFetch) {
+        this.stoppedDuringFetch = null;
+      }
     }
   };
   onSceneStarted = payload => {
@@ -69,6 +79,9 @@ class Scene extends Component {
     });
   };
   onSceneStopped = payload => {
+    if (this.stoppedDuringFetch) {
+      this.stoppedDuringFetch.add(payload.executionId);
+    }
     this.setState(prevState => ({
       runningScenes: prevState.runningScenes.filter(scene => scene.executionId !== payload.executionId)
     }));

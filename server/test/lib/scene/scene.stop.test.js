@@ -1,9 +1,10 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
-const { fake } = require('sinon');
+const { fake } = require('sinon').createSandbox();
 const { ACTIONS, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
+const actionsFunc = require('../../../lib/scene/scene.actions');
 
 describe('scene.stop', () => {
   const event = new EventEmitter();
@@ -184,6 +185,39 @@ describe('scene.stop', () => {
     const running = sceneManager.getRunning();
     expect(running).to.have.lengthOf(1);
     expect(running[0]).to.have.property('sceneSelector', 'other-scene');
+  });
+
+  it('should abort a delay whose signal was already aborted before it started waiting', async () => {
+    // An already-aborted AbortSignal never fires its 'abort' listeners, so a
+    // stop landing between executeAction's check and the delay's listener
+    // registration must still interrupt the wait instead of sleeping an hour.
+    const abortController = new AbortController();
+    abortController.abort();
+
+    const start = Date.now();
+    let caught;
+    try {
+      await actionsFunc[ACTIONS.TIME.DELAY](
+        sceneManager,
+        { type: ACTIONS.TIME.DELAY, value: 60, unit: 'minutes' },
+        { abortSignal: abortController.signal },
+      );
+    } catch (e) {
+      caught = e;
+    }
+
+    expect(caught).to.be.an('error');
+    expect(caught.message).to.equal('SCENE_STOPPED');
+    // It rejected immediately rather than waiting out the 60 minute timer.
+    expect(Date.now() - start).to.be.below(1000);
+  });
+
+  it('should wait normally when no abort signal is provided', async () => {
+    await actionsFunc[ACTIONS.TIME.DELAY](
+      sceneManager,
+      { type: ACTIONS.TIME.DELAY, value: 1, unit: 'milliseconds' },
+      {},
+    );
   });
 
   it('should return false when stopping an unknown execution', () => {
