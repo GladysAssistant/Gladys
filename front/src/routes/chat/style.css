@@ -608,10 +608,10 @@
   background: #e74c3c;
   color: #fff;
   box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
-  animation: voiceInputPulse 1.6s ease-in-out infinite;
+  animation: voice-input-pulse 1.6s ease-in-out infinite;
 }
 
-@keyframes voiceInputPulse {
+@keyframes voice-input-pulse {
   0%,
   100% {
     box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);

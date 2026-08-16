@@ -5729,7 +5729,7 @@
       "errorNoMicrophone": "No microphone detected. Plug one in or enable it in system settings.",
       "errorNetwork": "Speech recognition is unavailable, your browser could not reach its speech service.",
       "errorNotSupported": "Speech recognition is not available in this browser.",
-      "browserTranscriptionNotice": "If you dictate a message, your browser transcribes what you say: Gladys neither records nor uploads any audio. Depending on your browser, the audio can be sent to its own speech recognition service (Google for Chrome, on-device for Safari)."
+      "browserTranscriptionNotice": "If you dictate a message, your browser transcribes what you say: Gladys neither records nor uploads any audio. Depending on your browser, the audio may be processed on your device or sent to your browser's own speech recognition service."
     }
   },
   "history": {

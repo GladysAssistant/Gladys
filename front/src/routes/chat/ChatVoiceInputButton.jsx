@@ -4,6 +4,9 @@ import cx from 'classnames';
 import { createSpeechRecognition } from '../../utils/speechRecognition';
 import style from './style.css';
 
+/** How long the input stays locked when a stopped session never fires `onend`. */
+const STOPPING_TIMEOUT_MS = 5000;
+
 /**
  * Microphone button dictating what the user says in the chat message input.
  * Everything is handled by the browser with the Web Speech API: Gladys never
@@ -12,7 +15,11 @@ import style from './style.css';
  */
 class ChatVoiceInputButton extends Component {
   state = {
-    listening: false
+    listening: false,
+    // True between the moment the user asked to stop and the moment the browser
+    // says the session ended: `stop()` still delivers a final result before
+    // `onend`, so the input must stay locked until then.
+    stopping: false
   };
 
   /** Text already in the input when the user started to talk. */
@@ -32,9 +39,16 @@ class ChatVoiceInputButton extends Component {
   /** True when the browser refused to start while the previous session was still running. */
   startWhenPreviousEnded = false;
 
+  /** Last state reported to the parent, which locks the input while it is true. */
+  reportedListening = false;
+
+  /** Safety net, in case a browser never fires `onend` after a `stop()`. */
+  stoppingTimeout = null;
+
   componentWillUnmount() {
     this.recognitionGeneration += 1;
     this.startWhenPreviousEnded = false;
+    this.clearStoppingTimeout();
     if (this.recognition) {
       this.recognition.abort();
       this.recognition = null;
@@ -45,13 +59,34 @@ class ChatVoiceInputButton extends Component {
     }
   }
 
-  setListening = listening => {
-    if (this.state.listening === listening) {
+  clearStoppingTimeout = () => {
+    if (this.stoppingTimeout) {
+      clearTimeout(this.stoppingTimeout);
+      this.stoppingTimeout = null;
+    }
+  };
+
+  /**
+   * @description Update the button state, and tell the parent whether the input
+   * must stay locked. It stays locked while a session is stopping, because a
+   * final result can still arrive and rewrite what the user typed meanwhile.
+   * @param {boolean} listening - True while a session is running.
+   * @param {boolean} stopping - True while a stopped session has not ended yet.
+   */
+  setListening = (listening, stopping = false) => {
+    if (!stopping) {
+      this.clearStoppingTimeout();
+    }
+    if (this.state.listening !== listening || this.state.stopping !== stopping) {
+      this.setState({ listening, stopping });
+    }
+    const shouldLock = listening || stopping;
+    if (this.reportedListening === shouldLock) {
       return;
     }
-    this.setState({ listening });
+    this.reportedListening = shouldLock;
     if (this.props.onListeningChange) {
-      this.props.onListeningChange(listening);
+      this.props.onListeningChange(shouldLock);
     }
   };
 
@@ -149,12 +184,25 @@ class ChatVoiceInputButton extends Component {
    */
   stopListening = () => {
     this.startWhenPreviousEnded = false;
-    if (this.recognition) {
-      // The session is kept until the browser tells us it ended, so the next
-      // one is not started while this one is still running.
-      this.recognition.stop();
+    if (!this.recognition) {
+      this.setListening(false);
+      return;
     }
-    this.setListening(false);
+    // The session is kept until the browser tells us it ended, so the next
+    // one is not started while this one is still running.
+    this.recognition.stop();
+    // The button goes back to its idle look right away, but the input stays
+    // locked until `onend`: `stop()` still delivers the final result of what
+    // was said, which would otherwise overwrite an edit made in between.
+    this.setListening(false, true);
+    this.clearStoppingTimeout();
+    this.stoppingTimeout = setTimeout(() => {
+      this.stoppingTimeout = null;
+      if (this.state.stopping) {
+        // A browser which never fired `onend` must not leave a locked input.
+        this.setListening(false);
+      }
+    }, STOPPING_TIMEOUT_MS);
   };
 
   /**
