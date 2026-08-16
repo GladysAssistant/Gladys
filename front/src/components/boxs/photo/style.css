@@ -119,6 +119,25 @@
   background: #fff;
 }
 
+/* Horizon glass theme: the media block sits edge-to-edge in a rounded card
+   that deliberately has no overflow clipping, so its square corners would
+   cover the glass roundings. The container already clips (overflow: hidden
+   above): it takes the card radii itself — the top ones only when there is
+   no card header above — and the dots row trades its solid white band for
+   the glass surface. */
+:global(.glass-theme) .photoContainer {
+  border-radius: 0 0 var(--gl-radius-lg) var(--gl-radius-lg);
+}
+
+:global(.glass-theme) .photoContainer:first-child {
+  border-top-left-radius: var(--gl-radius-lg);
+  border-top-right-radius: var(--gl-radius-lg);
+}
+
+:global(.glass-theme) .indicators {
+  background: transparent;
+}
+
 .indicator {
   width: 0.5rem;
   height: 0.5rem;
