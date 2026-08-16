@@ -94,6 +94,13 @@
   background-color: rgba(32, 107, 196, 0.06);
 }
 
+.dropdownDivider {
+  height: 0;
+  margin: 0.25rem 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(101, 109, 119, 0.16);
+}
+
 .textGreen {
   color: #2fb344 !important;
 }

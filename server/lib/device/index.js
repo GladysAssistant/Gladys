@@ -22,6 +22,7 @@ const { getDeviceFeaturesAggregates } = require('./device.getDeviceFeaturesAggre
 const { getDeviceFeaturesAggregatesMulti } = require('./device.getDeviceFeaturesAggregatesMulti');
 const { getDeviceFeatureStates } = require('./device.getDeviceFeatureStates');
 const { getDeviceStatesHistory } = require('./device.getDeviceStatesHistory');
+const { exportStatesToCsv } = require('./device.exportStatesToCsv');
 const { onPurgeStatesEvent } = require('./device.onPurgeStatesEvent');
 const { purgeStates } = require('./device.purgeStates');
 const { purgeStatesByFeatureId } = require('./device.purgeStatesByFeatureId');
@@ -73,6 +74,9 @@ const DeviceManager = function DeviceManager(
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
   this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 200;
+  // A CSV export is built in memory before being sent, so a period containing more
+  // states than this is refused: the user is asked to export a shorter period instead.
+  this.MAX_STATES_TO_EXPORT_IN_CSV = 500000;
   // Also the target size of a purge slice: a single DELETE of a million states on a
   // multi-GB history holds the write connection for minutes and inflates the file.
   this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD = 200000;
@@ -164,6 +168,7 @@ DeviceManager.prototype.getDeviceFeaturesAggregates = getDeviceFeaturesAggregate
 DeviceManager.prototype.getDeviceFeaturesAggregatesMulti = getDeviceFeaturesAggregatesMulti;
 DeviceManager.prototype.getDeviceFeatureStates = getDeviceFeatureStates;
 DeviceManager.prototype.getDeviceStatesHistory = getDeviceStatesHistory;
+DeviceManager.prototype.exportStatesToCsv = exportStatesToCsv;
 DeviceManager.prototype.onPurgeStatesEvent = onPurgeStatesEvent;
 DeviceManager.prototype.purgeStates = purgeStates;
 DeviceManager.prototype.purgeStatesByFeatureId = purgeStatesByFeatureId;

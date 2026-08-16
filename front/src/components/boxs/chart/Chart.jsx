@@ -13,6 +13,7 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
 import { getDeviceName } from '../../../utils/device';
 import { formatHttpError } from '../../../utils/formatErrors';
+import slugify from '../../../utils/slugify';
 
 dayjs.extend(localizedFormat);
 
@@ -23,6 +24,9 @@ const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
 const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
 const THREE_MONTHS_IN_MINUTES = 3 * 30 * 24 * 60;
 const ONE_YEAR_IN_MINUTES = 365 * 24 * 60;
+
+// Byte order mark, added at the beginning of the exported CSV file
+const UTF8_BOM = '\uFEFF';
 
 const intervalByName = {
   'last-hour': ONE_HOUR_IN_MINUTES,
@@ -190,6 +194,52 @@ class Chartbox extends Component {
       dropdown: false
     });
     this.getData();
+  };
+  getDeviceFeatures = () => {
+    if (this.props.box.device_features) {
+      return this.props.box.device_features;
+    }
+    // Legacy boxes were saved with one single device feature
+    if (this.props.box.device_feature) {
+      return [this.props.box.device_feature];
+    }
+    return [];
+  };
+  exportCsv = async e => {
+    e.preventDefault();
+    const deviceFeatures = this.getDeviceFeatures();
+    if (deviceFeatures.length === 0) {
+      return;
+    }
+    await this.setState({ exportingCsv: true, exportError: null, exportErrorDetail: null, dropdown: false });
+    try {
+      // The exported period is exactly the period currently displayed on the chart,
+      // so the user can browse to a past period and export it.
+      const endDate = dayjs().subtract(this.state.offset, 'minute');
+      const startDate = endDate.subtract(this.state.interval, 'minute');
+      const csv = await this.props.httpClient.get('/api/v1/device_feature/states_csv', {
+        device_features: deviceFeatures.join(','),
+        start: startDate.toISOString(),
+        end: endDate.toISOString()
+      });
+      // The BOM makes spreadsheets (Excel in particular) open the file as UTF-8,
+      // so accented device names are not mangled.
+      const blob = new Blob([`${UTF8_BOM}${csv}`], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const titleSlug = slugify(this.props.box.title || '') || 'history';
+      link.download = `gladys-${titleSlug}-${startDate.format('YYYY-MM-DD')}-${endDate.format('YYYY-MM-DD')}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      const { errorDetailString } = formatHttpError(err);
+      this.setState({ exportError: true, exportErrorDetail: errorDetailString });
+    }
+    this.setState({ exportingCsv: false });
   };
   navigateToPreviousPeriod = async () => {
     await this.setState(prevState => ({
@@ -511,7 +561,10 @@ class Chartbox extends Component {
       unit,
       nbFeaturesDisplayed,
       error,
-      errorDetail
+      errorDetail,
+      exportingCsv,
+      exportError,
+      exportErrorDetail
     }
   ) {
     const { box } = this.props;
@@ -628,6 +681,16 @@ class Chartbox extends Component {
                         <Text id="dashboard.boxes.chart.lastYear" />
                       </a>
                     )}
+                    <div class={style.dropdownDivider} />
+                    <a class={style.dropdownItemChart} onClick={this.exportCsv}>
+                      <i
+                        class={cx('fe', 'mr-2', {
+                          'fe-download': !exportingCsv,
+                          'fe-loader': exportingCsv
+                        })}
+                      />
+                      <Text id="dashboard.boxes.chart.exportCsv" />
+                    </a>
                   </div>
                 </div>
 
@@ -644,6 +707,13 @@ class Chartbox extends Component {
               </div>
             )}
           </div>
+
+          {exportError && (
+            <div class="alert alert-danger mt-3 mb-0">
+              <Text id="dashboard.boxes.chart.exportCsvError" />
+              {exportErrorDetail && <div class="small">{exportErrorDetail}</div>}
+            </div>
+          )}
 
           {props.box.chart_type && (
             <div>

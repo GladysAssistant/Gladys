@@ -161,6 +161,46 @@ describe('GET /api/v1/device_feature/states_history', () => {
   });
 });
 
+describe('GET /api/v1/device_feature/states_csv', () => {
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 0, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:02:00.000Z') },
+    ]);
+  });
+  it('should export device feature states as CSV', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        device_features: 'test-device-feature',
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+      })
+      .expect('Content-Type', /csv/)
+      .expect('Content-Disposition', 'attachment; filename="gladys-history-2025-08-28-2025-08-29.csv"')
+      .expect(200)
+      .then((res) => {
+        const lines = res.text.split('\n');
+        expect(lines).to.have.lengthOf(3);
+        expect(lines[0]).to.equal('date,device,feature,unit,value');
+        expect(lines[1]).to.equal('2025-08-28T15:00:00.000Z,Test device,Test device feature,,0');
+        expect(lines[2]).to.equal('2025-08-28T15:02:00.000Z,Test device,Test device feature,,1');
+      });
+  });
+  it('should return 400 when no device feature is given', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+      })
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
+});
+
 describe('GET /api/v1/device_feature/energy_consumption', () => {
   beforeEach(async function BeforeEach() {
     this.timeout(10000);

@@ -544,7 +544,9 @@
         "previousPeriod": "Période précédente",
         "nextPeriod": "Période suivante",
         "currentPeriod": "En cours",
-        "backToNow": "Revenir à maintenant"
+        "backToNow": "Revenir à maintenant",
+        "exportCsv": "Exporter en CSV",
+        "exportCsvError": "L'export CSV a échoué. Merci de réessayer."
       },
       "sun": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour calculer la position du soleil.",

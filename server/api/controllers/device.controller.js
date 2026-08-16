@@ -123,6 +123,26 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/device_feature/states_csv exportStatesToCsv
+   * @apiName exportStatesToCsv
+   * @apiGroup Device
+   * @apiParam {String} device_features Comma separated list of device feature selectors.
+   * @apiParam {String} start Beginning of the exported period (ISO 8601 date).
+   * @apiParam {String} end End of the exported period (ISO 8601 date).
+   */
+  async function exportStatesToCsv(req, res) {
+    const deviceFeatures = req.query.device_features ? req.query.device_features.split(',') : [];
+    const csv = await gladys.device.exportStatesToCsv(deviceFeatures, req.query.start, req.query.end);
+    // The dates are already validated by the export itself, so they can safely be
+    // used to build a filename explaining what the file contains.
+    const startDay = new Date(req.query.start).toISOString().slice(0, 10);
+    const endDay = new Date(req.query.end).toISOString().slice(0, 10);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="gladys-history-${startDay}-${endDay}.csv"`);
+    res.send(csv);
+  }
+
+  /**
    * @api {get} /api/v1/device_feature/energy_consumption getConsumptionByDates
    * @apiName getConsumptionByDates
    * @apiGroup Device
@@ -198,6 +218,7 @@ module.exports = function DeviceController(gladys) {
     setValueFeature: asyncMiddleware(setValueFeature),
     getDeviceFeaturesAggregated: asyncMiddleware(getDeviceFeaturesAggregated),
     getDeviceStatesHistory: asyncMiddleware(getDeviceStatesHistory),
+    exportStatesToCsv: asyncMiddleware(exportStatesToCsv),
     getConsumptionByDates: asyncMiddleware(getConsumptionByDates),
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),

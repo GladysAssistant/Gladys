@@ -1091,6 +1091,13 @@ const data = {
       selector: 'kitchen'
     }
   ],
+  'get /api/v1/device_feature/states_csv': `date,device,feature,unit,value
+${dayjs()
+  .subtract(2, 'minute')
+  .toISOString()},Living room sensor,Temperature,celsius,20.5
+${dayjs()
+  .subtract(1, 'minute')
+  .toISOString()},Living room sensor,Temperature,celsius,20.7`,
   'get /api/v1/device_feature/states_history': [
     {
       value: 1,
