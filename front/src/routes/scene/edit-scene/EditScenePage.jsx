@@ -148,6 +148,7 @@ const EditScenePage = ({ children, ...props }) => (
                   moveCardGroup={props.moveCardGroup}
                   addAction={props.addAction}
                   deleteActionGroup={props.deleteActionGroup}
+                  duplicateActionGroup={props.duplicateActionGroup}
                   actions={parallelActions}
                   allActions={props.scene.actions}
                   deleteAction={props.deleteAction}

@@ -48,6 +48,65 @@ const deepMergeUpdates = (target, source) => {
   return result;
 };
 
+// Helper function to replace all references to a variable path by a new variable path
+// in a list of action groups, including the actions nested in if/then/else blocks.
+const replaceVariablePathInActions = (actions, prevPath, newPath) => {
+  if (!Array.isArray(actions)) {
+    return;
+  }
+
+  actions.forEach(actionGroup => {
+    if (!Array.isArray(actionGroup)) return;
+
+    actionGroup.forEach(action => {
+      if (!action) return;
+
+      // Process the current action
+      if (VARIABLES_ATTRIBUTES_IN_ACTION[action.type]) {
+        VARIABLES_ATTRIBUTES_IN_ACTION[action.type].forEach(attribute => {
+          // In case there are 2 parts in the attribute (e.g., conditions[0].variable)
+          if (attribute.includes('.')) {
+            // We split the attribute path
+            const attributePath = attribute.split('.');
+            // If the first part is an array (e.g., conditions[])
+            if (attributePath[0].endsWith('[]') && action[attributePath[0].slice(0, -2)]) {
+              // We loop through the array
+              action[attributePath[0].slice(0, -2)].forEach(subAction => {
+                if (subAction[attributePath[1]] && subAction[attributePath[1]].includes(prevPath)) {
+                  // And replace the second part if it is a variable
+                  // Here, we don't prefix prevPath by {{ because if it's a variable, it's not prefixed by {{
+                  subAction[attributePath[1]] = subAction[attributePath[1]].replace(prevPath, newPath);
+                }
+              });
+            }
+          } else if (action[attribute]) {
+            // In that case, we prefix prevPath by {{ because it's usually a text like "The temperature is {{variable}}°C".
+            action[attribute] = action[attribute].replace(`{{${prevPath}.`, `{{${newPath}.`);
+          }
+        });
+      }
+
+      // Check for nested actions in if/then/else blocks
+      if (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE) {
+        // Process 'if' branch if it exists
+        if (Array.isArray(action.if)) {
+          replaceVariablePathInActions([action.if], prevPath, newPath);
+        }
+
+        // Process 'then' branch if it exists
+        if (Array.isArray(action.then)) {
+          replaceVariablePathInActions(action.then, prevPath, newPath);
+        }
+
+        // Process 'else' branch if it exists
+        if (Array.isArray(action.else)) {
+          replaceVariablePathInActions(action.else, prevPath, newPath);
+        }
+      }
+    });
+  });
+};
+
 // Helper to initialize variables for a scene
 const initializeSceneVariables = (actions, parentPath = '') => {
   let variables = {};
@@ -313,64 +372,8 @@ class EditScene extends Component {
 
       // Update variable paths for all actions after the inserted group
       pathToUpdateInVariables.reverse().forEach(({ prevPath, newPath }) => {
-        // Recursive function to process all actions, including nested ones in if/then/else blocks
-        const processActions = actions => {
-          if (!Array.isArray(actions)) return;
-
-          actions.forEach(actionGroup => {
-            if (!Array.isArray(actionGroup)) return;
-
-            actionGroup.forEach(action => {
-              if (!action) return;
-
-              // Process the current action
-              if (VARIABLES_ATTRIBUTES_IN_ACTION[action.type]) {
-                VARIABLES_ATTRIBUTES_IN_ACTION[action.type].forEach(attribute => {
-                  // In case there are 2 parts in the attribute (e.g., conditions[0].variable)
-                  if (attribute.includes('.')) {
-                    // We split the attribute path
-                    const attributePath = attribute.split('.');
-                    // If the first part is an array (e.g., conditions[])
-                    if (attributePath[0].endsWith('[]') && action[attributePath[0].slice(0, -2)]) {
-                      // We loop through the array
-                      action[attributePath[0].slice(0, -2)].forEach(subAction => {
-                        if (subAction[attributePath[1]] && subAction[attributePath[1]].includes(prevPath)) {
-                          // And replace the second part if it is a variable
-                          // Here, we don't prefix prevPath by {{ because if it's a variable, it's not prefixed by {{
-                          subAction[attributePath[1]] = subAction[attributePath[1]].replace(prevPath, newPath);
-                        }
-                      });
-                    }
-                  } else if (action[attribute]) {
-                    // In that case, we prefix prevPath by {{ because it's usually a text like "The temperature is {{variable}}°C".
-                    action[attribute] = action[attribute].replace(`{{${prevPath}.`, `{{${newPath}.`);
-                  }
-                });
-              }
-
-              // Check for nested actions in if/then/else blocks
-              if (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE) {
-                // Process 'if' branch if it exists
-                if (Array.isArray(action.if)) {
-                  processActions([action.if]);
-                }
-
-                // Process 'then' branch if it exists
-                if (Array.isArray(action.then)) {
-                  processActions(action.then);
-                }
-
-                // Process 'else' branch if it exists
-                if (Array.isArray(action.else)) {
-                  processActions(action.else);
-                }
-              }
-            });
-          });
-        };
-
         // Start processing from the root actions
-        processActions(prevState.scene.actions);
+        replaceVariablePathInActions(prevState.scene.actions, prevPath, newPath);
       });
 
       return {
@@ -378,6 +381,96 @@ class EditScene extends Component {
         scene: newScene
       };
     });
+  };
+
+  duplicateActionGroup = async path => {
+    await this.setState(prevState => {
+      const pathSegments = path.split('.');
+      const groupIndex = parseInt(pathSegments[pathSegments.length - 1], 10);
+      const parentSegments = pathSegments.slice(0, -1);
+      const parentPath = parentSegments.join('.');
+
+      // The array containing the block to duplicate.
+      // It's the root actions array, or the actions of a "then"/"else" branch.
+      const container = parentPath ? get(prevState.scene.actions, parentPath) : prevState.scene.actions;
+
+      const newVariables = { ...prevState.variables };
+      // Variables of the blocks located after the duplicated block: their index is shifted by one
+      const variablePathsToShift = [];
+      // Variables of the duplicated block itself: they are copied to the new block
+      const variablePathsToDuplicate = [];
+
+      Object.keys(prevState.variables).forEach(variablePath => {
+        const variableSegments = variablePath.split('.');
+
+        // Only the variables contained in the same parent block are impacted
+        if (
+          variableSegments.length <= parentSegments.length ||
+          variableSegments.slice(0, parentSegments.length).join('.') !== parentPath
+        ) {
+          return;
+        }
+
+        const variableGroupIndex = parseInt(variableSegments[parentSegments.length], 10);
+
+        const buildVariablePath = newGroupIndex => {
+          const newSegments = [...variableSegments];
+          newSegments[parentSegments.length] = `${newGroupIndex}`;
+          return newSegments.join('.');
+        };
+
+        if (variableGroupIndex > groupIndex) {
+          variablePathsToShift.push({
+            groupIndex: variableGroupIndex,
+            prevPath: variablePath,
+            newPath: buildVariablePath(variableGroupIndex + 1)
+          });
+        } else if (variableGroupIndex === groupIndex) {
+          variablePathsToDuplicate.push({
+            prevPath: variablePath,
+            newPath: buildVariablePath(groupIndex + 1)
+          });
+        }
+      });
+
+      // Shift the variables of the blocks located after the duplicated block.
+      // We start with the highest index so a variable is never moved to a path still in use.
+      variablePathsToShift
+        .sort((firstVariable, secondVariable) => secondVariable.groupIndex - firstVariable.groupIndex)
+        .forEach(({ prevPath, newPath }) => {
+          newVariables[newPath] = newVariables[prevPath];
+          delete newVariables[prevPath];
+          replaceVariablePathInActions(prevState.scene.actions, prevPath, newPath);
+        });
+
+      // Deep copy of the block to duplicate
+      const duplicatedActionGroup = JSON.parse(JSON.stringify(container[groupIndex]));
+
+      // In the new block, the references to the variables of the duplicated block
+      // must point to the variables of the new block
+      variablePathsToDuplicate.forEach(({ prevPath, newPath }) => {
+        newVariables[newPath] = prevState.variables[prevPath];
+        replaceVariablePathInActions([duplicatedActionGroup], prevPath, newPath);
+      });
+
+      // Insert the new block right after the duplicated one
+      let updateObject = { scene: { actions: {} } };
+      let currentUpdate = updateObject.scene.actions;
+
+      parentSegments.forEach(segment => {
+        currentUpdate[segment] = {};
+        currentUpdate = currentUpdate[segment];
+      });
+
+      currentUpdate.$splice = [[groupIndex + 1, 0, duplicatedActionGroup]];
+
+      return update(prevState, {
+        ...updateObject,
+        variables: { $set: newVariables }
+      });
+    });
+
+    await this.addEmptyActionGroupIfNeeded();
   };
 
   addAction = async (path, options = {}) => {
@@ -1165,6 +1258,7 @@ class EditScene extends Component {
               updateTriggerProperty={this.updateTriggerProperty}
               addAction={this.addAction}
               deleteActionGroup={this.deleteActionGroup}
+              duplicateActionGroup={this.duplicateActionGroup}
               deleteAction={this.deleteAction}
               addTrigger={this.addTrigger}
               deleteTrigger={this.deleteTrigger}
