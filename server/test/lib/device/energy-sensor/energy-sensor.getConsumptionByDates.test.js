@@ -2128,6 +2128,116 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
           '2023-02-01T00:00:00.000Z',
         ]);
       });
+
+      describe('in a non-UTC timezone', () => {
+        // DuckDB truncates in the Gladys timezone, and the date range starts at the local midnight
+        // of the billing day: the subscription boundaries must stay on that local midnight instead
+        // of being re-anchored on the timezone of the Node process.
+        const TIMEZONE = 'Europe/Paris';
+        const originalTimezone = process.env.TZ;
+
+        const localMidnight = (date) => dayjs.tz(date, TIMEZONE).toDate();
+        const inLocalTimezone = (values) =>
+          values.map((value) =>
+            dayjs(value.created_at)
+              .tz(TIMEZONE)
+              .format('YYYY-MM-DD HH:mm'),
+          );
+
+        before(() => {
+          process.env.TZ = TIMEZONE;
+        });
+
+        after(() => {
+          process.env.TZ = originalTimezone;
+        });
+
+        it('should return exactly 12 monthly periods over a year, on the billing day', () => {
+          const result = calculateSubscriptionPrices(
+            subscriptionPrices,
+            localMidnight('2023-01-05'),
+            localMidnight('2024-01-05'),
+            'month',
+            5,
+          );
+
+          expect(inLocalTimezone(result)).to.deep.equal([
+            '2023-01-05 00:00',
+            '2023-02-05 00:00',
+            '2023-03-05 00:00',
+            '2023-04-05 00:00',
+            '2023-05-05 00:00',
+            '2023-06-05 00:00',
+            '2023-07-05 00:00',
+            '2023-08-05 00:00',
+            '2023-09-05 00:00',
+            '2023-10-05 00:00',
+            '2023-11-05 00:00',
+            '2023-12-05 00:00',
+          ]);
+        });
+
+        it('should not shift the following periods when a month is too short', () => {
+          const result = calculateSubscriptionPrices(
+            subscriptionPrices,
+            localMidnight('2023-01-31'),
+            localMidnight('2023-05-31'),
+            'month',
+            31,
+          );
+
+          expect(inLocalTimezone(result)).to.deep.equal([
+            '2023-01-31 00:00',
+            '2023-02-28 00:00',
+            '2023-03-31 00:00',
+            '2023-04-30 00:00',
+          ]);
+        });
+
+        it('should follow the offset yearly periods', () => {
+          const result = calculateSubscriptionPrices(
+            subscriptionPrices,
+            localMidnight('2023-01-05'),
+            localMidnight('2025-01-05'),
+            'year',
+            5,
+          );
+
+          expect(inLocalTimezone(result)).to.deep.equal(['2023-01-05 00:00', '2024-01-05 00:00']);
+        });
+
+        it('should keep calendar months when the start day is 1', () => {
+          const result = calculateSubscriptionPrices(
+            subscriptionPrices,
+            localMidnight('2023-01-01'),
+            localMidnight('2023-05-01'),
+            'month',
+          );
+
+          expect(inLocalTimezone(result)).to.deep.equal([
+            '2023-01-01 00:00',
+            '2023-02-01 00:00',
+            '2023-03-01 00:00',
+            '2023-04-01 00:00',
+          ]);
+        });
+
+        it('should still return 12 monthly periods when the range is not on the process midnight', () => {
+          // The Gladys timezone (the one DuckDB truncates in, and the one the date range is built
+          // in) is not always the timezone of the Node process: the boundaries must stay relative
+          // to the start of the range instead of being snapped to the midnight of the process.
+          const rangeStart = new Date('2023-01-05T00:00:00.000Z');
+          const rangeEnd = new Date('2024-01-05T00:00:00.000Z');
+
+          const result = calculateSubscriptionPrices(subscriptionPrices, rangeStart, rangeEnd, 'month', 5);
+
+          const timestamps = result.map((value) => new Date(value.created_at).getTime());
+          expect(timestamps).to.have.lengthOf(12);
+          expect(timestamps).to.deep.equal([...timestamps].sort((a, b) => a - b));
+          expect(timestamps[0]).to.equal(rangeStart.getTime());
+          expect(timestamps[timestamps.length - 1]).to.be.below(rangeEnd.getTime());
+        });
+      });
     });
   });
 });

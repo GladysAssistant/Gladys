@@ -9,11 +9,7 @@ const {
   DEVICE_FEATURE_UNITS,
   ENERGY_PRICE_TYPES,
 } = require('../../../utils/constants');
-const {
-  DEFAULT_ENERGY_PERIOD_START_DAY,
-  parseEnergyPeriodStartDay,
-  getNextEnergyPeriodStart,
-} = require('../../../utils/energyPeriod');
+const { DEFAULT_ENERGY_PERIOD_START_DAY, parseEnergyPeriodStartDay } = require('../../../utils/energyPeriod');
 
 /**
  * @description Build the query grouping device feature states by a date expression.
@@ -92,6 +88,25 @@ const shouldOffsetPeriods = (groupBy, periodStartDay) =>
   periodStartDay !== DEFAULT_ENERGY_PERIOD_START_DAY && (groupBy === 'month' || groupBy === 'year');
 
 /**
+ * @description Return the start of the nth offset billing period of a date range.
+ * Periods are always derived from the start of the range, never from the previous period, so that
+ * a month shorter than the configured start day (ex: the 31st in February) does not shift all the
+ * following periods: Day.js clamps to the last day of the target month exactly like the `LEAST()`
+ * of the SQL expression. Deriving from the range start also keeps the time of day of the range
+ * start on every boundary, which is what keeps these labels aligned with the buckets returned by
+ * DuckDB: the range start is the local midnight of the billing day, and DuckDB truncates in the
+ * Gladys timezone, so both sides move together instead of being re-anchored on the timezone of the
+ * Node process.
+ * @param {object} rangeStart - Start of the date range, as a Day.js object.
+ * @param {number} periodIndex - Index of the wanted period (0 being the start of the range).
+ * @param {string} groupBy - Grouping period: 'month' or 'year'.
+ * @returns {object} Start of the period, as a Day.js object.
+ * @example
+ * getOffsetPeriodStart(dayjs('2023-01-31'), 1, 'month'); // 2023-02-28
+ */
+const getOffsetPeriodStart = (rangeStart, periodIndex, groupBy) => rangeStart.add(periodIndex, groupBy);
+
+/**
  * @description Calculate subscription prices for each time period.
  * @param {Array} subscriptionPrices - Array of subscription price entries from DB.
  * @param {Date} fromDate - Start date of the range.
@@ -110,10 +125,12 @@ function calculateSubscriptionPrices(
   periodStartDay = DEFAULT_ENERGY_PERIOD_START_DAY,
 ) {
   const subscriptionValues = [];
-  let currentDate = dayjs(fromDate);
+  const rangeStart = dayjs(fromDate);
+  let currentDate = rangeStart;
   const endDate = dayjs(toDate);
   // Monthly/yearly periods must follow the same boundaries as the consumption buckets.
   const useOffsetPeriods = shouldOffsetPeriods(groupBy, periodStartDay);
+  let periodIndex = 0;
 
   while (currentDate.isBefore(endDate)) {
     let nextDate;
@@ -134,13 +151,13 @@ function calculateSubscriptionPrices(
         break;
       case 'month':
         nextDate = useOffsetPeriods
-          ? dayjs(getNextEnergyPeriodStart(currentDate.toDate(), 'month', periodStartDay))
+          ? getOffsetPeriodStart(rangeStart, periodIndex + 1, 'month')
           : currentDate.add(1, 'month');
         periodLabel = currentDate.toISOString();
         break;
       case 'year':
         nextDate = useOffsetPeriods
-          ? dayjs(getNextEnergyPeriodStart(currentDate.toDate(), 'year', periodStartDay))
+          ? getOffsetPeriodStart(rangeStart, periodIndex + 1, 'year')
           : currentDate.add(1, 'year');
         periodLabel = currentDate.toISOString();
         break;
@@ -203,6 +220,7 @@ function calculateSubscriptionPrices(
     }
 
     currentDate = nextDate;
+    periodIndex += 1;
   }
 
   return subscriptionValues;
