@@ -3282,6 +3282,11 @@
         "label": "Choisir une scène",
         "notice": "Les conditions de déclenchements de la scène appelée seront ignorées. Si une scène appelle une autre scène, et vice-versa, Gladys ne tombera pas dans une boucle infinie: chaque scène ne sera exécutée qu'une seule fois"
       },
+      "setSceneActive": {
+        "label": "Choisir une scène",
+        "enableNotice": "La scène sélectionnée sera activée : ses déclencheurs seront de nouveau écoutés. Une scène peut s'activer elle-même.",
+        "disableNotice": "La scène sélectionnée sera désactivée : ses déclencheurs ne seront plus écoutés jusqu'à sa réactivation. Une scène peut se désactiver elle-même, par exemple pour ne s'exécuter qu'une fois jusqu'à ce qu'une autre scène la réactive."
+      },
       "houseEmptyOrNot": {
         "houseIsEmptyDescription": "Si la maison est vide, cette scène continuera. Sinon, la scène s'arrêtera.",
         "houseIsNotEmptyDescription": "Si la maison n'est pas vide, cette scène continuera. Sinon, la scène s'arrêtera.",
@@ -3395,7 +3400,9 @@
         "toggle": "Inverser les prises"
       },
       "scene": {
-        "start": "Démarrer la scène"
+        "start": "Démarrer la scène",
+        "enable": "Activer une scène",
+        "disable": "Désactiver une scène"
       },
       "service": {
         "start": "Démarrer le service",

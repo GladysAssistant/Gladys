@@ -18,6 +18,7 @@ import TurnOnOffLightParams from './actions/TurnOnOffLightParams';
 import BlinkLightParams from './actions/BlinkLightParams';
 import TurnOnOffSwitchParams from './actions/TurnOnOffSwitchParams';
 import StartSceneParams from './actions/StartSceneParams';
+import EnableDisableSceneParams from './actions/EnableDisableSceneParams';
 import UserPresence from './actions/UserPresence';
 import HttpRequest from './actions/HttpRequest';
 import CheckUserPresence from './actions/CheckUserPresence';
@@ -60,6 +61,8 @@ const ACTION_ICON = {
   [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-home',
   [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch',
   [ACTIONS.SCENE.START]: 'fe fe-fast-forward',
+  [ACTIONS.SCENE.ENABLE]: 'fe fe-play-circle',
+  [ACTIONS.SCENE.DISABLE]: 'fe fe-pause-circle',
   [ACTIONS.HOUSE.IS_EMPTY]: 'fe fe-home',
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
   [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
@@ -97,6 +100,8 @@ const ACTION_COMPONENTS = {
   [ACTIONS.HTTP.REQUEST]: HttpRequest,
   [ACTIONS.CONDITION.CHECK_TIME]: CheckTime,
   [ACTIONS.SCENE.START]: StartSceneParams,
+  [ACTIONS.SCENE.ENABLE]: EnableDisableSceneParams,
+  [ACTIONS.SCENE.DISABLE]: EnableDisableSceneParams,
   [ACTIONS.HOUSE.IS_EMPTY]: HouseEmptyOrNotCondition,
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: HouseEmptyOrNotCondition,
   [ACTIONS.DEVICE.SET_VALUE]: DeviceSetValue,

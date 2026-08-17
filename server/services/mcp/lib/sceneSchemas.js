@@ -195,6 +195,16 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.SCENE.START, {
         scene: sceneSelectorSchema,
       }),
+      actionSchemaByType(ACTIONS.SCENE.ENABLE, {
+        scene: sceneSelectorSchema.describe(
+          'Selector of the scene to enable. Its triggers will start listening again. A scene can enable itself.',
+        ),
+      }),
+      actionSchemaByType(ACTIONS.SCENE.DISABLE, {
+        scene: sceneSelectorSchema.describe(
+          'Selector of the scene to disable. Its triggers stop listening until it is enabled again. A scene can disable itself.',
+        ),
+      }),
       actionSchemaByType(ACTIONS.MESSAGE.SEND, {
         user: userSelectorSchema,
         text: z.string(),

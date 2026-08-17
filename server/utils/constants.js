@@ -701,6 +701,8 @@ const ACTIONS = {
   },
   SCENE: {
     START: 'scene.start',
+    ENABLE: 'scene.enable',
+    DISABLE: 'scene.disable',
   },
   MESSAGE: {
     SEND: 'message.send',

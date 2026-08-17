@@ -3282,6 +3282,11 @@
         "label": "Wähle eine Szene aus",
         "notice": "Die Auslösebedingungen der aufgerufenen Szene werden ignoriert. Gladys gerät nicht in eine Endlosschleife, wenn eine Szene eine andere Szene aufruft oder umgekehrt: Jede Szene wird einmal ausgeführt."
       },
+      "setSceneActive": {
+        "label": "Wähle eine Szene aus",
+        "enableNotice": "Die ausgewählte Szene wird aktiviert: Ihre Auslöser werden wieder überwacht. Eine Szene kann sich selbst aktivieren.",
+        "disableNotice": "Die ausgewählte Szene wird deaktiviert: Ihre Auslöser werden nicht mehr überwacht, bis sie wieder aktiviert wird. Eine Szene kann sich selbst deaktivieren, zum Beispiel um nur einmal ausgeführt zu werden, bis eine andere Szene sie wieder aktiviert."
+      },
       "houseEmptyOrNot": {
         "houseIsEmptyDescription": "Wenn das Zuhause leer ist, wird die Szene fortgesetzt. Andernfalls wird die Szene gestoppt.",
         "houseIsNotEmptyDescription": "Wenn das Zuhause nicht leer ist, wird die Szene fortgesetzt. Andernfalls wird die Szene gestoppt.",
@@ -3395,7 +3400,9 @@
         "toggle": "Schalter umschalten"
       },
       "scene": {
-        "start": "Szene starten"
+        "start": "Szene starten",
+        "enable": "Eine Szene aktivieren",
+        "disable": "Eine Szene deaktivieren"
       },
       "service": {
         "start": "Dienst starten",

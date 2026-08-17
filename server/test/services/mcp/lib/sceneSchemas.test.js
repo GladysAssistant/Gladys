@@ -33,6 +33,20 @@ describe('sceneSchemas helpers', () => {
     expect(result.success).to.equal(false);
   });
 
+  it('should accept scene.enable and scene.disable actions', () => {
+    const schema = createSceneCreateInputSchema();
+    const result = schema.safeParse({
+      name: 'My scene',
+      icon: 'lightbulb',
+      triggers: [{ type: 'system.start' }],
+      actions: [
+        [{ type: ACTIONS.SCENE.ENABLE, scene: 'my-other-scene' }],
+        [{ type: ACTIONS.SCENE.DISABLE, scene: 'my-scene' }],
+      ],
+    });
+    expect(result.success).to.equal(true);
+  });
+
   it('should flatten nested scene actions and ignore invalid entries', () => {
     expect(flattenSceneActions(null)).to.deep.equal([]);
     expect(flattenSceneActions('invalid')).to.deep.equal([]);
