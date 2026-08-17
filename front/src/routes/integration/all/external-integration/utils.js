@@ -46,11 +46,14 @@ export const getGithubRepoUrl = storeSlug => (storeSlug ? `https://github.com/${
 
 // Changelog of an external integration version: the releases page of its
 // repository, filtered on the version so the release notes of that exact
-// version are the first thing displayed. Filtered rather than linked straight
-// to `/releases/tag/<version>`, because the tag name is the author's choice
+// version are displayed. Filtered rather than linked straight to
+// `/releases/tag/<version>`, because the tag name is the author's choice
 // (`1.2.0` and `v1.2.0` are both common, Gladys itself uses the second) and a
-// guessed tag that does not exist is a plain 404 — the filter matches either
-// form. Without a version (or with a repository that publishes no release) it
+// guessed tag that does not exist is a plain 404. Both forms are queried:
+// GitHub matches the search against whole tokens of the title / body / tag,
+// so a bare `1.2.0` never matches a `v1.2.0` tag (it returns "No releases
+// found") — `1.2.0 OR v1.2.0` matches whichever form the author tagged with.
+// Without a version (or with a repository that publishes no release) it
 // degrades to the releases page, and a dev install has no repository at all:
 // null, the version is then displayed as plain text.
 export const getChangelogUrl = (storeSlug, version) => {
@@ -58,7 +61,10 @@ export const getChangelogUrl = (storeSlug, version) => {
   if (!repoUrl) {
     return null;
   }
-  return version ? `${repoUrl}/releases?q=${encodeURIComponent(version)}&expanded=true` : `${repoUrl}/releases`;
+  if (!version) {
+    return `${repoUrl}/releases`;
+  }
+  return `${repoUrl}/releases?q=${encodeURIComponent(`${version} OR v${version}`)}&expanded=true`;
 };
 
 // Domain of an https URL, displayed next to section links (third-party
