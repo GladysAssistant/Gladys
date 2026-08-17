@@ -32,7 +32,7 @@ const DashboardPage = ({ children, ...props }) => {
           <div class="dimmer-content">
             <div class="my-3 my-md-5 dashboard">
               <div class={cx('container', { [style.fullWidthContainer]: fullWidth })}>
-                <div class="page-header">
+                <div class={cx('page-header', style.dashboardHeader)}>
                   <div>
                     {/* One-tap pills in every mode; pills that don't fit on one
                         row collapse behind a "…" button opening the full list */}

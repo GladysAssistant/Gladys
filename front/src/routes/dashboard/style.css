@@ -329,6 +329,54 @@
   margin-right: 0.5rem;
 }
 
+/* With many dashboards the bar takes the full width and the page options
+   wrap below it: keep air between the two rows */
+.dashboardHeader {
+  flex-wrap: wrap;
+  row-gap: 0.75rem;
+}
+
+/* Horizon glass theme: the overflow menu is a glass surface like the bar
+   it opens from, not a stock white dropdown */
+:global(.glass-theme) .dashboardTabsMenu {
+  background: var(--gl-surface-strong);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow);
+  padding: 6px;
+}
+
+:global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item) {
+  border-radius: 10px;
+  color: var(--gl-ink);
+  font-weight: 500;
+}
+
+:global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item):hover {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+:global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item.active) {
+  background: var(--gl-ink);
+  color: #fff;
+}
+
+:global(.glass-theme) .dashboardTabsMenuIcon {
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item.active) .dashboardTabsMenuIcon {
+  color: #fff;
+}
+
+/* dark-mode.css paints .dropdown-menu with a solid !important background:
+   restore the glass surface with the same weight (see the card rules above) */
+:global(.dark-mode .glass-theme) .dashboardTabsMenu {
+  background-color: var(--gl-surface-strong) !important;
+}
+
 /* Tablet mode keeps the compact icon dock */
 .dashboardTabsIconsOnly .dashboardTab {
   width: 2.375rem;
