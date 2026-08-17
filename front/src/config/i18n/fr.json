@@ -3450,6 +3450,12 @@
       "device": {
         "get-value": {
           "last_value": "Dernière valeur de l'appareil"
+        },
+        "newState": {
+          "deviceName": "Nom de l'appareil déclencheur",
+          "deviceFeatureName": "Nom de la fonctionnalité déclencheuse",
+          "lastValue": "Nouvelle valeur",
+          "previousValue": "Valeur précédente"
         }
       },
       "calendar": {

@@ -1,9 +1,11 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
+import get from 'get-value';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } from '../../../../../../server/utils/constants';
 
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
 import BinaryDeviceState from './device-states/BinaryDeviceState';
 import PresenceSensorDeviceState from './device-states/PresenceSensorDeviceState';
@@ -20,6 +22,53 @@ import WaterValveDeviceState from './device-states/WaterValveDeviceState';
 import WaterHeaterModeDeviceState from './device-states/WaterHeaterModeDeviceState';
 
 class TurnOnLight extends Component {
+  setVariables = () => {
+    const DEVICE_NAME_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.device.newState.deviceName');
+    const DEVICE_FEATURE_NAME_VARIABLE = get(
+      this.props.intl.dictionary,
+      'editScene.variables.device.newState.deviceFeatureName'
+    );
+    const LAST_VALUE_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.device.newState.lastValue');
+    const PREVIOUS_VALUE_VARIABLE = get(
+      this.props.intl.dictionary,
+      'editScene.variables.device.newState.previousValue'
+    );
+    this.props.setVariablesTrigger(this.props.index, [
+      {
+        name: 'device.name',
+        type: EVENTS.DEVICE.NEW_STATE,
+        ready: true,
+        label: DEVICE_NAME_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'deviceFeature.name',
+        type: EVENTS.DEVICE.NEW_STATE,
+        ready: true,
+        label: DEVICE_FEATURE_NAME_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'last_value',
+        type: EVENTS.DEVICE.NEW_STATE,
+        ready: true,
+        label: LAST_VALUE_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'previous_value',
+        type: EVENTS.DEVICE.NEW_STATE,
+        ready: true,
+        label: PREVIOUS_VALUE_VARIABLE,
+        data: {}
+      }
+    ]);
+  };
+
+  componentDidMount() {
+    this.setVariables();
+  }
+
   // The trigger stores its features in `device_features`; triggers saved before
   // multi-select stored a single selector in `device_feature`
   getSelectedSelectors = () => {
@@ -282,4 +331,4 @@ class TurnOnLight extends Component {
   }
 }
 
-export default connect('httpClient', {})(TurnOnLight);
+export default connect('httpClient', {})(withIntlAsProp(TurnOnLight));
