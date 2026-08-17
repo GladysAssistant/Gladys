@@ -19,6 +19,17 @@ class Devices extends Component {
     }
   };
 
+  getUsage = async () => {
+    try {
+      // One call returns the usage of every device, so the list never does
+      // one request per device
+      const usage = await this.props.httpClient.get('/api/v1/device/usage');
+      this.setState({ usage });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   getRooms = async () => {
     try {
       const rooms = await this.props.httpClient.get('/api/v1/room');
@@ -44,6 +55,10 @@ class Devices extends Component {
     this.setState({ selectedIntegration: e.target.value || null });
   };
 
+  selectUsage = e => {
+    this.setState({ selectedUsage: e.target.value || null });
+  };
+
   matchSearch = device => {
     const query = this.state.search.trim().toLowerCase();
     if (!query.length) {
@@ -52,6 +67,16 @@ class Devices extends Component {
     return [device.name, device.selector, device.external_id].some(
       value => value && value.toLowerCase().includes(query)
     );
+  };
+
+  matchUsageFilter = device => {
+    const { selectedUsage } = this.state;
+    if (!selectedUsage) {
+      return true;
+    }
+    const usage = this.state.usage[device.selector];
+    const used = usage !== undefined && (usage.dashboards.length > 0 || usage.scenes.length > 0);
+    return selectedUsage === 'used' ? used : !used;
   };
 
   matchRoomFilter = device => {
@@ -70,10 +95,12 @@ class Devices extends Component {
     this.state = {
       devices: null,
       rooms: [],
+      usage: {},
       search: '',
       orderDir: 'asc',
       selectedRoomId: null,
       selectedIntegration: null,
+      selectedUsage: null,
       loading: true,
       error: false
     };
@@ -82,12 +109,14 @@ class Devices extends Component {
   componentDidMount() {
     this.getDevices();
     this.getRooms();
+    this.getUsage();
   }
 
   render(props, state) {
     const devicesWithIntegration = (state.devices || []).map(device => ({
       device,
-      integration: getDeviceIntegration(device)
+      integration: getDeviceIntegration(device),
+      usage: state.usage[device.selector]
     }));
 
     // The integration filter options are built from the full device list, so
@@ -106,6 +135,7 @@ class Devices extends Component {
     const filteredDevices = devicesWithIntegration
       .filter(({ device }) => this.matchSearch(device))
       .filter(({ device }) => this.matchRoomFilter(device))
+      .filter(({ device }) => this.matchUsageFilter(device))
       .filter(
         ({ integration }) =>
           !state.selectedIntegration || (integration && integration.slug === state.selectedIntegration)
@@ -128,6 +158,7 @@ class Devices extends Component {
         changeOrderDir={this.changeOrderDir}
         selectRoom={this.selectRoom}
         selectIntegration={this.selectIntegration}
+        selectUsage={this.selectUsage}
       />
     );
   }

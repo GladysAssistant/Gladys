@@ -188,9 +188,20 @@ module.exports = function DeviceController(gladys) {
     res.json(migrationState);
   }
 
+  /**
+   * @api {get} /api/v1/device/usage getUsage
+   * @apiName getUsage
+   * @apiGroup Device
+   */
+  async function getUsage(req, res) {
+    const usage = await gladys.device.getUsage(req.user.id);
+    res.json(usage);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     get: asyncMiddleware(get),
+    getUsage: asyncMiddleware(getUsage),
     getDevicesByService: asyncMiddleware(getDevicesByService),
     getBySelector: asyncMiddleware(getBySelector),
     destroy: asyncMiddleware(destroy),

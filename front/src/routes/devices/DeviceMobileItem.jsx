@@ -1,12 +1,12 @@
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
-import { DeviceStamp, FeatureIcons, IntegrationName } from './helpers';
+import { DeviceStamp, DeviceUsage, FeatureIcons, IntegrationName } from './helpers';
 import style from './style.css';
 
 // One tappable list item: the whole row opens the device in its
 // integration, like a native mobile app list
-const DeviceMobileItem = ({ device, integration }) => {
+const DeviceMobileItem = ({ device, integration, usage }) => {
   const content = [
     <DeviceStamp device={device} integration={integration} />,
     <div class={style.mobileItemBody}>
@@ -16,6 +16,7 @@ const DeviceMobileItem = ({ device, integration }) => {
         <IntegrationName integration={integration} link={false} />
       </div>
       <FeatureIcons device={device} />
+      <DeviceUsage usage={usage} max={2} link={false} />
     </div>
   ];
 
