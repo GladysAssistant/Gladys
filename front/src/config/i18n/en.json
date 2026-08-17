@@ -3514,7 +3514,8 @@
       },
       "weather": {
         "alert-raised": "Weather alert raised",
-        "alert-ended": "Weather alert ended"
+        "alert-ended": "Weather alert ended",
+        "matched": "Weather"
       }
     },
     "triggersCard": {
@@ -3647,6 +3648,24 @@
           "severe": "Severe (orange)",
           "extreme": "Extreme (red)"
         }
+      },
+      "weather": {
+        "description": "This will trigger when the weather of the selected house starts matching the rule below. The weather is checked every 15 minutes: the scene runs on the transition only, so it does not run again for as long as the rule stays true.",
+        "houseLabel": "House",
+        "fieldLabel": "Weather property",
+        "fields": {
+          "temperature": "Temperature",
+          "wind_speed": "Wind speed",
+          "humidity": "Humidity",
+          "condition": "Weather condition"
+        },
+        "operatorLabel": "Operator",
+        "valueLabel": "Value",
+        "unitTemperature": "°C",
+        "unitTemperatureImperial": "°F",
+        "unitWindSpeed": "km/h",
+        "unitWindSpeedImperial": "mph",
+        "unitHumidity": "%"
       }
     }
   },

@@ -1,5 +1,11 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
-const { ACTION_LIST, ACTIONS, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
+const {
+  ACTION_LIST,
+  ACTIONS,
+  EVENT_LIST,
+  ALARM_MODES_LIST,
+  WEATHER_TRIGGER_FIELDS_LIST,
+} = require('../utils/constants');
 const { WEATHER_ALERT_TYPES, WEATHER_ALERT_SEVERITIES } = require('../lib/external-integration/constants');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
@@ -154,6 +160,9 @@ const triggersSchema = Joi.array().items(
     // weather-alert triggers (B.18): phenomenon type filter and minimal severity
     weather_alert_type: Joi.string().valid(...WEATHER_ALERT_TYPES, 'any'),
     weather_alert_severity: Joi.string().valid(...WEATHER_ALERT_SEVERITIES),
+    // weather trigger: the watched pivot property, compared with the shared
+    // `operator` / `value` couple of the threshold triggers
+    weather_field: Joi.string().valid(...WEATHER_TRIGGER_FIELDS_LIST),
   }),
 );
 

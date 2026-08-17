@@ -3514,7 +3514,8 @@
       },
       "weather": {
         "alert-raised": "Alerte météo déclenchée",
-        "alert-ended": "Alerte météo terminée"
+        "alert-ended": "Alerte météo terminée",
+        "matched": "Météo"
       }
     },
     "triggersCard": {
@@ -3647,6 +3648,24 @@
           "severe": "Sévère (orange)",
           "extreme": "Extrême (rouge)"
         }
+      },
+      "weather": {
+        "description": "Ce déclencheur se lance quand la météo de la maison sélectionnée commence à vérifier la règle ci-dessous. La météo est vérifiée toutes les 15 minutes : la scène se lance uniquement au changement, elle ne se relance donc pas tant que la règle reste vraie.",
+        "houseLabel": "Maison",
+        "fieldLabel": "Donnée météo",
+        "fields": {
+          "temperature": "Température",
+          "wind_speed": "Vitesse du vent",
+          "humidity": "Humidité",
+          "condition": "Condition météo"
+        },
+        "operatorLabel": "Opérateur",
+        "valueLabel": "Valeur",
+        "unitTemperature": "°C",
+        "unitTemperatureImperial": "°F",
+        "unitWindSpeed": "km/h",
+        "unitWindSpeedImperial": "mph",
+        "unitHumidity": "%"
       }
     }
   },

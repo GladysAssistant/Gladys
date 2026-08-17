@@ -51,12 +51,8 @@ async function runCheck() {
   await Promise.each(locatedHouses, async (house) => {
     let weather;
     try {
-      weather = await this.get({
-        latitude: house.latitude,
-        longitude: house.longitude,
-        language: 'en',
-        units: 'metric',
-      });
+      // shared with the weather-trigger check when both run at once
+      weather = await this.pullForChecks(house);
     } catch (e) {
       // no provider configured or provider down: nothing to diff, the
       // previous baseline is kept so recovery does not re-fire scenes
@@ -117,9 +113,11 @@ async function checkAlerts() {
     return;
   }
   this.checkAlertsRunning = true;
+  this.beginSharedPulls();
   try {
     await runCheck.call(this);
   } finally {
+    this.endSharedPulls();
     this.checkAlertsRunning = false;
   }
 }
