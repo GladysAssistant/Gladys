@@ -3,7 +3,7 @@ const multicastDns = require('multicast-dns');
 const logger = require('../../../utils/logger');
 
 /**
- * @description MDNS browse of the declared DNS-SD service type: send a PTR
+ * @description Browse mDNS for the declared DNS-SD service type: send a PTR
  * query and aggregate the announced instances (SRV/TXT/A/AAAA records)
  * during the scan window. Records are returned as-is (name, host,
  * addresses, port, txt): the integration interprets them itself.
