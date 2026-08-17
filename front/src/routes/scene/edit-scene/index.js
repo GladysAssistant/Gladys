@@ -184,6 +184,7 @@ class EditScene extends Component {
       });
       this.setState({
         scene,
+        savedSceneSnapshot: JSON.stringify(scene),
         variables,
         triggersVariables,
         SceneGetStatus: RequestStatus.Success
@@ -283,6 +284,16 @@ class EditScene extends Component {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, {
         active: this.state.scene.active
       });
+      // The active flag was persisted on its own: reflect it in the saved snapshot
+      // without marking the rest of the scene as saved
+      this.setState(prevState => {
+        if (!prevState.savedSceneSnapshot) {
+          return null;
+        }
+        const snapshot = JSON.parse(prevState.savedSceneSnapshot);
+        snapshot.active = prevState.scene.active;
+        return { savedSceneSnapshot: JSON.stringify(snapshot) };
+      });
       this.setState({ saving: false });
     } catch (e) {
       console.error(e);
@@ -308,6 +319,7 @@ class EditScene extends Component {
     this.setState({ saving: true, error: false, errorMessage: null });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
+      this.setState({ savedSceneSnapshot: JSON.stringify(this.state.scene) });
     } catch (e) {
       console.error(e);
       let errorMessage = null;
@@ -1291,11 +1303,24 @@ class EditScene extends Component {
 
   render(
     props,
-    { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene, runningScenes, now }
+    {
+      saving,
+      error,
+      errorMessage,
+      variables,
+      scene,
+      triggersVariables,
+      tags,
+      askDeleteScene,
+      runningScenes,
+      now,
+      savedSceneSnapshot
+    }
   ) {
     const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
     const { backend, options } = getDragAndDropBackend();
     const runningInfo = computeRunningInfo(runningScenes, props.scene_selector, now);
+    const hasUnsavedChanges = Boolean(scene && savedSceneSnapshot && JSON.stringify(scene) !== savedSceneSnapshot);
     return (
       scene && (
         <div>
@@ -1303,6 +1328,7 @@ class EditScene extends Component {
             <EditScenePage
               {...props}
               scene={scene}
+              hasUnsavedChanges={hasUnsavedChanges}
               runningInfo={runningInfo}
               stopScene={this.stopScene}
               tags={tags}

@@ -48,6 +48,125 @@
   padding: 1.5rem 1.5rem;
 }
 
+.pageTitle {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.backButton {
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.sceneIconTile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 10px;
+  background-color: #e2ecf9;
+  color: #3a6fb8;
+  font-size: 1.125rem;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.sceneName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stepCardHeader {
+  padding-right: 1rem;
+}
+
+.stepCardTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+  cursor: pointer;
+}
+
+.stepSummary {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #6e7687;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.parallelLink {
+  font-size: 0.8125rem;
+}
+
+.parallelLink:hover {
+  color: #467fcf !important;
+}
+
+.parallelBlock {
+  background-color: #f8fafd;
+}
+
+.addStepButton {
+  display: block;
+  width: 100%;
+  border-style: dashed;
+  padding: 0.75rem;
+}
+
+.stepConnector {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin: -0.75rem 0 0.75rem;
+  z-index: 2;
+}
+
+.stepInsertButton {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #e3e9f1;
+  background: #fff;
+  color: #9aa0ac;
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1;
+  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.stepInsertButton:hover,
+.stepInsertButton:focus {
+  color: #467fcf;
+  border-color: #467fcf;
+  transform: scale(1.15);
+  outline: none;
+}
+
+.saveIndicator {
+  font-size: 0.8125rem;
+}
+
+.saveIndicatorSaved {
+  color: #5eba00;
+}
+
+.saveIndicatorUnsaved {
+  color: #f1901c;
+}
+
 .sectionHeader {
   display: flex;
   align-items: baseline;

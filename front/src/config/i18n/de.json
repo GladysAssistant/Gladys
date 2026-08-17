@@ -3094,10 +3094,7 @@
     "newCondition": "Neue Bedingung",
     "selectActionType": "Wähle einen Aktionstyp aus",
     "selectConditionType": "Wähle eine Bedingungstyp aus",
-    "addActionButton": "Aktion hinzufügen",
-    "addActionGroupButton": "Neues Aktionengruppe",
     "noTriggersYet": "Du hast noch keine Auslöser hinzugefügt. Eine Szene muss nicht zwingend einen Auslöser haben.",
-    "noActionsYet": "Du hast noch keine Aktionen hinzugefügt. Klicke auf \"+\", um eine Aktion zu dieser Szene hinzuzufügen.",
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
@@ -3800,7 +3797,12 @@
     "whenSectionTitle": "Wenn",
     "whenSectionSubtitle": "die Szene startet, wenn einer dieser Auslöser eintritt",
     "thenSectionTitle": "Dann",
-    "thenSectionSubtitle": "diese Schritte werden der Reihe nach ausgeführt"
+    "thenSectionSubtitle": "diese Schritte werden der Reihe nach ausgeführt",
+    "addStepButton": "Schritt hinzufügen",
+    "parallelBlockTitle": "Gleichzeitig",
+    "addParallelActionButton": "Parallele Aktion hinzufügen",
+    "unsavedChanges": "Nicht gespeicherte Änderungen",
+    "savedLabel": "Gespeichert"
   },
   "profile": {
     "title": "Profil",

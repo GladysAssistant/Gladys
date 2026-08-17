@@ -3094,10 +3094,7 @@
     "newCondition": "Nouvelle condition",
     "selectActionType": "Sélectionnez un type d'action",
     "selectConditionType": "Sélectionner un type de condition",
-    "addActionButton": "Nouvelle action",
-    "addActionGroupButton": "Nouveau groupe d'action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
-    "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "actionsCard": {
@@ -3800,7 +3797,12 @@
     "whenSectionTitle": "Quand",
     "whenSectionSubtitle": "la scène démarre si l'un de ces déclencheurs se produit",
     "thenSectionTitle": "Alors",
-    "thenSectionSubtitle": "ces étapes s'exécutent dans l'ordre"
+    "thenSectionSubtitle": "ces étapes s'exécutent dans l'ordre",
+    "addStepButton": "Ajouter une étape",
+    "parallelBlockTitle": "En même temps",
+    "addParallelActionButton": "Ajouter une action en parallèle",
+    "unsavedChanges": "Modifications non enregistrées",
+    "savedLabel": "Enregistré"
   },
   "profile": {
     "title": "Profil",

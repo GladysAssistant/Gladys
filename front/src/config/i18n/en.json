@@ -3094,10 +3094,7 @@
     "newCondition": "New condition",
     "selectActionType": "Select an action type",
     "selectConditionType": "Select a condition type",
-    "addActionButton": "Add action",
-    "addActionGroupButton": "Add action group",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
-    "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
@@ -3800,7 +3797,12 @@
     "whenSectionTitle": "When",
     "whenSectionSubtitle": "the scene starts when one of these triggers occurs",
     "thenSectionTitle": "Then",
-    "thenSectionSubtitle": "these steps run in order"
+    "thenSectionSubtitle": "these steps run in order",
+    "addStepButton": "Add a step",
+    "parallelBlockTitle": "At the same time",
+    "addParallelActionButton": "Add a parallel action",
+    "unsavedChanges": "Unsaved changes",
+    "savedLabel": "Saved"
   },
   "profile": {
     "title": "Profile",

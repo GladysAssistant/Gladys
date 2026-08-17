@@ -6,7 +6,9 @@ import style from './style.css';
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
 
-const EmptyColumnDropZone = ({ children, ...props }) => {
+// An empty action group renders as a "add a step" button, which also accepts
+// action cards dropped from other steps
+const EmptyDropZone = ({ children, ...props }) => {
   const ref = useRef(null);
   const [{ isActive }, drop] = useDrop({
     accept: ACTION_CARD_TYPE,
@@ -22,17 +24,17 @@ const EmptyColumnDropZone = ({ children, ...props }) => {
   });
   drop(ref);
   return (
-    <div
+    <button
       ref={ref}
-      class={cx('d-flex justify-content-center text-center ', style.dropZone, {
+      type="button"
+      onClick={props.onAddStep}
+      class={cx('btn btn-outline-primary', style.addStepButton, {
         [style.dropZoneActive]: isActive
       })}
     >
-      <div class="align-self-center">
-        <Text id="editScene.noActionsYet" />
-      </div>
-    </div>
+      <i class="fe fe-plus" /> <Text id="editScene.addStepButton" />
+    </button>
   );
 };
 
-export default EmptyColumnDropZone;
+export default EmptyDropZone;

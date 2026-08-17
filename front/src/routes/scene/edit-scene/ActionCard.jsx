@@ -1,12 +1,14 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
-import { useRef, useCallback } from 'preact/hooks';
+import { useRef, useCallback, useState } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
 
 import style from './style.css';
 import { ACTIONS } from '../../../../../server/utils/constants';
 import { ACTION_ICON } from './typesCatalog';
+import { getActionSummary } from './actionSummary';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 // Actions cards
 import ChooseActionTypeParams from './actions/ChooseActionTypeCard';
@@ -94,12 +96,33 @@ const getDragAndDropType = (actionType, path) => {
 };
 
 const ActionCard = ({ children, ...props }) => {
-  const { path, deleteAction } = props;
+  const { path, deleteAction, addAction } = props;
   const ref = useRef(null);
+
+  // Structural conditions embed their own action groups: they cannot be collapsed
+  const isStructuralCondition =
+    props.action.type === ACTIONS.CONDITION.IF_THEN_ELSE || props.action.type === ACTIONS.CONDITION.WHILE;
+  // A new action starts expanded (the type picker is shown), an existing one starts
+  // collapsed so the scene can be read at a glance
+  const [expanded, setExpanded] = useState(props.action.type === null);
+  const isExpanded = expanded || isStructuralCondition;
+
+  const toggleExpanded = useCallback(() => {
+    setExpanded(previousExpanded => !previousExpanded);
+  }, []);
 
   const handleDelete = useCallback(() => {
     deleteAction(path);
   }, [path, deleteAction]);
+
+  const addParallelAction = useCallback(() => {
+    addAction(
+      path
+        .split('.')
+        .slice(0, -1)
+        .join('.')
+    );
+  }, [path, addAction]);
 
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: getDragAndDropType(props.action.type, props.path),
@@ -123,61 +146,46 @@ const ActionCard = ({ children, ...props }) => {
     }
   });
   preview(drop(ref));
+
+  const summary = !isExpanded ? getActionSummary(props.action, props.intl.dictionary) : null;
+  const isCondition = props.path.includes('if');
+
   return (
-    <div
-      class={cx({
-        'col-lg-12':
-          props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF ||
-          props.action.type === ACTIONS.CONDITION.IF_THEN_ELSE ||
-          props.action.type === ACTIONS.CONDITION.WHILE,
-        'col-lg-6':
-          props.action.type === null ||
-          props.action.type === ACTIONS.MESSAGE.SEND ||
-          props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
-          props.action.type === ACTIONS.CALENDAR.GET_EVENTS ||
-          props.action.type === ACTIONS.MQTT.SEND ||
-          props.action.type === ACTIONS.ZIGBEE2MQTT.SEND ||
-          props.action.type === ACTIONS.LIGHT.BLINK ||
-          props.action.type === ACTIONS.SMS.SEND,
-        'col-lg-4':
-          props.action.type !== null &&
-          props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
-          props.action.type !== ACTIONS.CONDITION.IF_THEN_ELSE &&
-          props.action.type !== ACTIONS.CONDITION.WHILE &&
-          props.action.type !== ACTIONS.MESSAGE.SEND &&
-          props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING &&
-          props.action.type !== ACTIONS.CALENDAR.GET_EVENTS &&
-          props.action.type !== ACTIONS.SMS.SEND
-      })}
-    >
+    <div class="col-12">
       <div
         ref={ref}
-        class={cx('card cursor-pointer user-select-none', {
+        class={cx('card user-select-none', {
           [style.dropZoneActive]: isActive,
           [style.dropZoneDragging]: isDragging
         })}
       >
-        <div ref={drag} class="card-header">
+        <div ref={drag} class={cx('card-header', style.stepCardHeader)}>
           {props.action.type !== null && <i class={cx(ACTION_ICON[props.action.type], 'dark-mode-fe-none-filter')} />}
           {props.action.type === null && <i class="fe fe-plus-circle" />}
-          <div class="card-title">
+          <div class={cx('card-title', style.stepCardTitle)} onClick={toggleExpanded}>
             <i class={cx(props.action.icon, 'mr-4')} /> <Text id={`editScene.actions.${props.action.type}`} />
             {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
             {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
+            {summary && <span class={style.stepSummary}>{summary}</span>}
           </div>
           {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
             <div class="card-status bg-blue" />
           )}
           <div class="card-options">
-            <a>
+            <a class="cursor-pointer">
               <i class="fe fe-move mr-4" />
             </a>
-            <a onClick={handleDelete} class="card-options-remove">
+            <a onClick={handleDelete} class="card-options-remove mr-4 cursor-pointer">
               <i class="fe fe-x" />
             </a>
+            {!isStructuralCondition && (
+              <a onClick={toggleExpanded} class="cursor-pointer">
+                <i class={cx('fe', isExpanded ? 'fe-chevron-up' : 'fe-chevron-down')} />
+              </a>
+            )}
           </div>
         </div>
-        <div class="card-body">
+        <div class={cx('card-body', { 'd-none': !isExpanded })}>
           {(() => {
             const Component = ACTION_COMPONENTS[props.action.type];
             if (!Component) return null;
@@ -201,10 +209,17 @@ const ActionCard = ({ children, ...props }) => {
 
             return <Component {...commonProps} />;
           })()}
+          {!isCondition && !isStructuralCondition && props.action.type !== null && props.showParallelLink && (
+            <div class="text-right mt-3">
+              <a class={cx('cursor-pointer text-muted', style.parallelLink)} onClick={addParallelAction}>
+                <i class="fe fe-git-merge" /> <Text id="editScene.addParallelActionButton" />
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default ActionCard;
+export default withIntlAsProp(ActionCard);

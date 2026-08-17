@@ -65,7 +65,7 @@ describe('Scene view', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
-    cy.contains('editScene.addActionButton')
+    cy.contains('editScene.addStepButton')
       .should('have.class', 'btn-outline-primary')
       .click();
 
@@ -132,7 +132,7 @@ describe('Scene view', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
-    cy.contains('editScene.addActionButton')
+    cy.contains('editScene.addStepButton')
       .should('have.class', 'btn-outline-primary')
       .click();
 

@@ -5,13 +5,32 @@ import { useDrag, useDrop } from 'react-dnd';
 import cx from 'classnames';
 
 import ActionCard from './ActionCard';
+import EmptyDropZone from './EmptyDropZone';
 import style from './style.css';
-import withIntlAsProp from '../../../utils/withIntlAsProp';
-import { convertPathToText } from '../../scene/edit-scene/sceneUtils';
 
 const ACTION_GROUP_TYPE_LEVEL = 'ACTION_GROUP_TYPE_LEVEL';
 
-import EmptyDropZone from './EmptyDropZone';
+const renderActionCard = (props, action, index) => (
+  <ActionCard
+    moveCard={props.moveCard}
+    moveCardGroup={props.moveCardGroup}
+    sceneParamsData={props.sceneParamsData}
+    action={action}
+    path={`${props.path}.${index}`}
+    updateActionProperty={props.updateActionProperty}
+    highLightedActions={props.highLightedActions}
+    deleteActionGroup={props.deleteActionGroup}
+    addAction={props.addAction}
+    deleteAction={props.deleteAction}
+    actionsGroupsBefore={props.actionsGroupsBefore}
+    variables={props.variables}
+    triggersVariables={props.triggersVariables}
+    setVariables={props.setVariables}
+    scene={props.scene}
+    allActions={props.allActions}
+    showParallelLink={props.actions.length === 1}
+  />
+);
 
 const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
   const pathLevel = props.path.split('.').length;
@@ -41,30 +60,52 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
     }
   });
   preview(drop(ref));
+
+  // An empty group is an insertion point: a "add a step" button which is
+  // also a drop zone for existing action cards
+  if (props.actions.length === 0) {
+    return (
+      <div class="col">
+        <EmptyDropZone moveCard={props.moveCard} path={props.path} onAddStep={props.addActionToColumn} />
+      </div>
+    );
+  }
+
+  // A group with a single action renders as a simple full-width step,
+  // without any group chrome around it
+  if (props.actions.length === 1) {
+    return (
+      <div class="col">
+        <div class="row">{renderActionCard(props, props.actions[0], 0)}</div>
+      </div>
+    );
+  }
+
+  // A group with several actions renders as an explicit "at the same time" block
   return (
     <div class="col">
       <div
         ref={ref}
-        class={cx('card cursor-pointer user-select-none', {
+        class={cx('card user-select-none', style.parallelBlock, {
           [style.dropZoneActive]: isActive,
           [style.dropZoneDragging]: isDragging
         })}
       >
-        <div class="card-status bg-green" />
-        <div ref={drag} class="card-header">
-          <h4 class="text-center card-title ">{convertPathToText(props.path, props.intl.dictionary)}</h4>
+        <div class="card-status card-status-left bg-blue" />
+        <div ref={drag} class="card-header cursor-pointer">
+          <i class="fe fe-git-merge mr-2" />
+          <h4 class="card-title">
+            <Text id="editScene.parallelBlockTitle" />
+          </h4>
 
           <div class="card-options">
-            <div class="mr-4 my-auto">
-              <i class="fe fe-move" />
-            </div>
-
-            {/* The last action group is the empty one always kept at the end of a list,
-                so this also hides the button when this group is the only one. */}
+            <a class="cursor-pointer">
+              <i class="fe fe-move mr-4" />
+            </a>
             {!props.lastActionGroup && (
-              <button onClick={props.deleteThisActionGroup} class="btn btn-outline-danger">
-                <i class="fe fe-trash-2" />
-              </button>
+              <a onClick={props.deleteThisActionGroup} class="card-options-remove cursor-pointer">
+                <i class="fe fe-x" />
+              </a>
             )}
           </div>
         </div>
@@ -76,38 +117,11 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              <div class="row">
-                {props.actions.map((action, index) => (
-                  <ActionCard
-                    moveCard={props.moveCard}
-                    moveCardGroup={props.moveCardGroup}
-                    sceneParamsData={props.sceneParamsData}
-                    action={action}
-                    path={`${props.path}.${index}`}
-                    updateActionProperty={props.updateActionProperty}
-                    highLightedActions={props.highLightedActions}
-                    deleteActionGroup={props.deleteActionGroup}
-                    addAction={props.addAction}
-                    deleteAction={props.deleteAction}
-                    actionsGroupsBefore={props.actionsGroupsBefore}
-                    variables={props.variables}
-                    triggersVariables={props.triggersVariables}
-                    setVariables={props.setVariables}
-                    scene={props.scene}
-                    allActions={props.allActions}
-                  />
-                ))}
-                {props.actions.length === 0 && (
-                  <div class="col">
-                    <EmptyDropZone moveCard={props.moveCard} path={props.path} />
-                  </div>
-                )}
-              </div>
+              <div class="row">{props.actions.map((action, index) => renderActionCard(props, action, index))}</div>
 
-              {/* Add Action Button */}
-              <div class="text-center mt-4">
-                <button onClick={props.addActionToColumn} class="btn btn-sm btn-outline-primary">
-                  <i class="fe fe-plus" /> <Text id="editScene.addActionButton">Add action</Text>
+              <div class="text-center">
+                <button onClick={props.addActionToColumn} class="btn btn-sm btn-outline-secondary">
+                  <i class="fe fe-plus" /> <Text id="editScene.addParallelActionButton" />
                 </button>
               </div>
             </div>
@@ -138,4 +152,4 @@ class ActionGroup extends Component {
   }
 }
 
-export default withIntlAsProp(ActionGroup);
+export default ActionGroup;
