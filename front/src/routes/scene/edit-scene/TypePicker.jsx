@@ -5,14 +5,8 @@ import get from 'get-value';
 
 import style from './style.css';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import normalizeSearchText from '../../../utils/normalizeSearchText';
 import { COLOR_CLASS } from './typesCatalog';
-
-// Case and accent insensitive comparison, so that "reveil" matches "Réveil"
-const normalize = text =>
-  String(text)
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
 
 class TypePicker extends Component {
   updateQuery = e => {
@@ -27,7 +21,7 @@ class TypePicker extends Component {
   getVisibleCategories = () => {
     const { categories, filter, labelPrefix, descriptionPrefix, intl } = this.props;
     const { query } = this.state;
-    const normalizedQuery = normalize(query.trim());
+    const normalizedQuery = normalizeSearchText(query.trim());
 
     return categories
       .map(category => {
@@ -41,8 +35,8 @@ class TypePicker extends Component {
           .filter(
             item =>
               normalizedQuery === '' ||
-              normalize(item.label).includes(normalizedQuery) ||
-              normalize(item.description).includes(normalizedQuery)
+              normalizeSearchText(item.label).includes(normalizedQuery) ||
+              normalizeSearchText(item.description).includes(normalizedQuery)
           );
         return { ...category, items };
       })
@@ -78,7 +72,7 @@ class TypePicker extends Component {
         </div>
         <div class={style.typePickerList}>
           {visibleCategories.map(category => (
-            <div class={style.typePickerCategory}>
+            <div class={style.typePickerCategory} key={category.key}>
               <div class={style.typePickerCategoryTitle}>
                 <Text id={`${categoryPrefix}.${category.key}`} />
               </div>
@@ -90,6 +84,7 @@ class TypePicker extends Component {
                     data-cy="type-picker-option"
                     data-value={item.type}
                     onClick={this.selectType}
+                    key={item.type}
                   >
                     <span class={cx(style.typePickerIcon, style[COLOR_CLASS[category.color]])}>
                       <i class={icons[item.type]} />
