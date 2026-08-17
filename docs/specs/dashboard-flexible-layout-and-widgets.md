@@ -205,7 +205,7 @@ A `theme` override (`auto`/`light`/`dark`) was considered and **deferred**: the 
   - **tablet mode** (the `tabletMode` store flag, fed by `session.tablet_mode`): compact icon-only dock (current dashboard highlighted, `home` as the fallback icon);
   - when the **current dashboard is one of the collapsed ones**, the "…" button shows its icon + name (active styling, chevron), so the context never disappears.
 - **Switching is a client-side swap, not a page reload**: tapping a pill only fetches the target dashboard (the list is already loaded) and the previous dashboard stays rendered until the new one arrives — no loading dimmer over the page. The dimmer is reserved for the first load.
-- **Header actions**: the wall-tablet configuration button is hidden on phones (configuring a wall tablet only makes sense on a tablet-sized screen), and on mobile all header actions are uniform icon pills (fullscreen, edit) so the row under the bar stays visually consistent.
+- **Header actions**: on phones only **edit** remains — wall-tablet configuration and fullscreen make no sense there and are hidden below tablet width — and it shares the **same row as the pill bar** (the bar is measured with the button's space reserved, so priority+ folds pills into the "…" instead of the action costing a whole line of scarce vertical space). From tablet width up, all actions are shown and may wrap below the bar as before.
 - Touch swipe between dashboards is a possible later complement to the pills (invisible affordance, needs a strict directional threshold to never steal vertical scroll or widget gestures); it does not replace them.
 
 ## Phases

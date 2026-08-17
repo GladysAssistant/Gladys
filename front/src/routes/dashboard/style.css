@@ -346,6 +346,26 @@
   row-gap: 0.75rem;
 }
 
+/* On phones vertical space is scarce: the only remaining action (edit)
+   shares the bar's row — the bar shrinks and priority+ folds pills into
+   the "…" instead of the actions costing a whole line. nowrap matters:
+   with wrapping allowed the bar is measured at full width (the action
+   already pushed below) and the trim never gives its space back */
+@media (max-width: 767px) {
+  .dashboardHeader {
+    flex-wrap: nowrap;
+  }
+
+  .dashboardHeaderTabs {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .dashboardHeader :global(.page-options) {
+    flex: 0 0 auto;
+  }
+}
+
 /* Horizon glass theme: the overflow menu is a glass surface like the bar
    it opens from, not a stock white dropdown */
 :global(.glass-theme) .dashboardTabsMenu {

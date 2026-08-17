@@ -31,7 +31,7 @@ const DashboardPage = ({ children, ...props }) => {
             <div class="my-3 my-md-5 dashboard">
               <div class={cx('container', { [style.fullWidthContainer]: fullWidth })}>
                 <div class={cx('page-header', style.dashboardHeader)}>
-                  <div>
+                  <div class={style.dashboardHeaderTabs}>
                     {/* One-tap pills in every mode; pills that don't fit on one
                         row collapse behind a "…" button opening the full list */}
                     {!props.dashboardListEmpty && (
@@ -62,10 +62,14 @@ const DashboardPage = ({ children, ...props }) => {
                         <i class="fe fe-tablet" />
                       </button>
                     )}
+                    {/* fullscreen is pointless on a phone: hidden below tablet width */}
                     {!props.dashboardNotConfigured &&
                       props.browserFullScreenCompatible &&
                       !props.hideExitFullScreenButton && (
-                        <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2')}>
+                        <button
+                          onClick={props.toggleFullScreen}
+                          class={cx('btn btn-outline-secondary ml-2 d-none d-md-inline-block')}
+                        >
                           <span class={style.editDashboardText}>
                             {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
                             {props.fullScreen && <Text id="dashboard.disableFullScreen" />}
