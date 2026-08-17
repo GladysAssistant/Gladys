@@ -5060,6 +5060,15 @@
           "4": "Critical"
         }
       },
+      "dishwasher": {
+        "state": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Stopped",
+          "1": "Running",
+          "2": "Paused",
+          "3": "Error"
+        }
+      },
       "vacuum-cleaner": {
         "state": {
           "unknown": "{{value}} (unknown)",
@@ -5163,6 +5172,16 @@
     "sismic-sensor": {
       "shortCategoryName": "Sismic sensor",
       "decimal": "Sismic (decimal)"
+    },
+    "dishwasher": {
+      "shortCategoryName": "Dishwasher",
+      "state": "Operational State",
+      "inflow-error": "Water inlet error",
+      "drain-error": "Drain error",
+      "door-error": "Door error",
+      "temperature-too-low": "Temperature too low",
+      "temperature-too-high": "Temperature too high",
+      "water-level-error": "Water level error"
     },
     "distance-sensor": {
       "shortCategoryName": "Distance",

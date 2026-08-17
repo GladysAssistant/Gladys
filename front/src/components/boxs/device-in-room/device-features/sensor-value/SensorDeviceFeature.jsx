@@ -22,6 +22,7 @@ import WaterValveDeviceValue from './WaterValveDeviceValue';
 import PressureSensorDeviceValue from './PressureSensorDeviceValue';
 import FanSensorDeviceValue from './FanSensorDeviceValue';
 import VacuumCleanerStateDeviceValue from './VacuumCleanerStateDeviceValue';
+import DishwasherStateDeviceValue from './DishwasherStateDeviceValue';
 import ThermostatOperatingStateDeviceValue from './ThermostatOperatingStateDeviceValue';
 import ChargingStationConnectorStatusDeviceValue from './ChargingStationConnectorStatusDeviceValue';
 import ChargingStationChargingStateDeviceValue from './ChargingStationChargingStateDeviceValue';
@@ -32,6 +33,18 @@ import ChargingStationChargingStateDeviceValue from './ChargingStationChargingSt
 const DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue
+  },
+  // Registered per category and type, not by type alone: 'state' is a type string several
+  // categories own (shutter, curtain, vacuum-cleaner...), so the type-keyed map below would
+  // let declaration order decide which renderer a dishwasher state gets.
+  [DEVICE_FEATURE_CATEGORIES.DISHWASHER]: {
+    [DEVICE_FEATURE_TYPES.DISHWASHER.STATE]: DishwasherStateDeviceValue,
+    [DEVICE_FEATURE_TYPES.DISHWASHER.INFLOW_ERROR]: BinaryDeviceValue,
+    [DEVICE_FEATURE_TYPES.DISHWASHER.DRAIN_ERROR]: BinaryDeviceValue,
+    [DEVICE_FEATURE_TYPES.DISHWASHER.DOOR_ERROR]: BinaryDeviceValue,
+    [DEVICE_FEATURE_TYPES.DISHWASHER.TEMPERATURE_TOO_LOW]: BinaryDeviceValue,
+    [DEVICE_FEATURE_TYPES.DISHWASHER.TEMPERATURE_TOO_HIGH]: BinaryDeviceValue,
+    [DEVICE_FEATURE_TYPES.DISHWASHER.WATER_LEVEL_ERROR]: BinaryDeviceValue
   }
 };
 

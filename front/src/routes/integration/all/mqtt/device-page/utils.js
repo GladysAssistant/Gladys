@@ -57,7 +57,10 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.INPUT ||
     category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE ||
     category === DEVICE_FEATURE_CATEGORIES.DOORBELL ||
-    category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION
+    category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION ||
+    // Every dishwasher type reports what the appliance is doing or a fault it raised: they are
+    // all read-only. Powering the appliance on or off is a switch feature, not a dishwasher one.
+    category === DEVICE_FEATURE_CATEGORIES.DISHWASHER
   ) {
     return true;
   }
@@ -561,6 +564,17 @@ export const getFeatureDefaultValues = (category, type) => {
     }
     // Cumulative production indexes and revenues
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
+
+  // Declared before the type-only blocks below: 'state' is a type string several categories own.
+  if (category === DEVICE_FEATURE_CATEGORIES.DISHWASHER) {
+    if (type === DEVICE_FEATURE_TYPES.DISHWASHER.STATE) {
+      // DISHWASHER_STATE goes from 0 to 3, the range is left open up to 255 because appliances
+      // may report a manufacturer-specific state.
+      return applyDefaultUnit({ ...defaults, min: 0, max: 255 }, category, type);
+    }
+    // Every other type is a fault flag
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1 }, category, type);
   }
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.BINARY && category === DEVICE_FEATURE_CATEGORIES.LIGHT) {

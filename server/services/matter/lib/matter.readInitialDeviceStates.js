@@ -23,6 +23,9 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  OperationalState,
+  DishwasherAlarm,
+  DishwasherMode,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -36,6 +39,11 @@ const {
   convertMatterRunModeToGladys,
   convertMatterCleanModeToGladys,
 } = require('../utils/vacuumCleanerStateMapping');
+const {
+  isDishwasherEndpoint,
+  convertMatterOperationalStateToDishwasherState,
+  DISHWASHER_ALARMS,
+} = require('../utils/dishwasherMatterMapping');
 
 /**
  * @description Read an attribute and ignore errors when the device does not expose it.
@@ -350,6 +358,34 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
         cleanModeExternalId,
         convertMatterCleanModeToGladys(value, this.supportedModesMap.get(cleanModeExternalId)),
       );
+    }
+  }
+
+  const dishwasherAlarm = device.getClusterClientById(DishwasherAlarm.Complete.id);
+  const dishwasherMode = device.getClusterClientById(DishwasherMode.Complete.id);
+  const isDishwasher = isDishwasherEndpoint(device, Boolean(dishwasherAlarm || dishwasherMode));
+
+  const operationalState = device.getClusterClientById(OperationalState.Complete.id);
+  if (isDishwasher && operationalState) {
+    const value = await safeReadAttribute(() => operationalState.getOperationalStateAttribute());
+    if (value !== undefined) {
+      emitState(
+        `matter:${nodeId}:${devicePath}:${OperationalState.Complete.id}:state`,
+        convertMatterOperationalStateToDishwasherState(value),
+      );
+    }
+  }
+
+  if (dishwasherAlarm) {
+    const value = await safeReadAttribute(() => dishwasherAlarm.getStateAttribute());
+    if (value !== undefined) {
+      const dishwasherAlarmBaseExternalId = `matter:${nodeId}:${devicePath}:${DishwasherAlarm.Complete.id}`;
+      DISHWASHER_ALARMS.forEach((alarm) => {
+        emitState(
+          `${dishwasherAlarmBaseExternalId}:${alarm.type}`,
+          value && value[alarm.matterField] ? STATE.ON : STATE.OFF,
+        );
+      });
     }
   }
 

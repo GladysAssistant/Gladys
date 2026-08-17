@@ -25,6 +25,9 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  OperationalState,
+  DishwasherAlarm,
+  DishwasherMode,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -40,6 +43,13 @@ const {
 const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
 const { getAcModeSupportedOptions } = require('./thermostatMatterMapping');
+const { isDishwasherEndpoint, getSupportedDishwasherAlarms } = require('./dishwasherMatterMapping');
+
+/**
+ * Clusters only a dishwasher exposes: seeing one of them is enough to know that the generic
+ * Operational State cluster of the same endpoint describes a dish program.
+ */
+const DISHWASHER_SPECIFIC_CLUSTER_IDS = [DishwasherAlarm.Complete.id, DishwasherMode.Complete.id];
 
 /**
  * @description Build a stable Gladys selector from a Matter external_id.
@@ -130,6 +140,10 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
 
   const allClusterClients = device.getAllClusterClients();
   if (allClusterClients && allClusterClients.length > 0) {
+    const isDishwasher = isDishwasherEndpoint(
+      device,
+      allClusterClients.some((clusterClient) => DISHWASHER_SPECIFIC_CLUSTER_IDS.includes(clusterClient.id)),
+    );
     await Promise.each(allClusterClients, async (clusterClient) => {
       const clusterIndex = clusterClient.id;
       const commonNewFeature = {
@@ -147,10 +161,15 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           max: 1,
         });
       } else if (clusterIndex === BooleanState.Complete.id) {
+        // On an appliance, the Boolean State cluster carries the door contact: it belongs to
+        // the opening-sensor category, not to a read-only switch. The values are unchanged
+        // (true = contact closed = OPENING_SENSOR_STATE.CLOSE), only the mapping is refined.
+        const isDoorContact = isDishwasher;
         gladysDevice.features.push({
           ...commonNewFeature,
-          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          name: isDoorContact ? `${clusterClient.name} - ${clusterClient.endpointId} (Door)` : commonNewFeature.name,
+          category: isDoorContact ? DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR : DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: isDoorContact ? DEVICE_FEATURE_TYPES.SENSOR.BINARY : DEVICE_FEATURE_TYPES.SWITCH.BINARY,
           read_only: true,
           has_feedback: true,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
@@ -640,6 +659,35 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
           max: 6,
+        });
+      } else if (clusterIndex === OperationalState.Complete.id && isDishwasher) {
+        // The Operational State cluster is shared by every Matter appliance, it is only mapped
+        // when the endpoint identified itself as a dishwasher.
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (State)`,
+          category: DEVICE_FEATURE_CATEGORIES.DISHWASHER,
+          type: DEVICE_FEATURE_TYPES.DISHWASHER.STATE,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:state`,
+          min: 0,
+          max: 255,
+        });
+      } else if (clusterIndex === DishwasherAlarm.Complete.id) {
+        // Only the alarms the appliance declares as supported get a feature: the others would
+        // stay stuck at zero forever.
+        const supported = clusterClient.getSupportedAttribute ? await clusterClient.getSupportedAttribute() : undefined;
+        getSupportedDishwasherAlarms(supported).forEach((alarm) => {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (${alarm.name})`,
+            category: DEVICE_FEATURE_CATEGORIES.DISHWASHER,
+            type: alarm.type,
+            read_only: true,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:${alarm.type}`,
+            min: 0,
+            max: 1,
+          });
         });
       } else if (clusterIndex === PowerSource.Complete.id) {
         if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.battery) {

@@ -10,6 +10,9 @@ const {
   PowerSource,
   Thermostat,
   CarbonDioxideConcentrationMeasurement,
+  OperationalState,
+  DishwasherAlarm,
+  DishwasherMode,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -17,7 +20,8 @@ const {
   convertToGladysDevice,
   matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
-const { AC_MODE } = require('../../../../utils/constants');
+const { AC_MODE, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { MATTER_DISHWASHER_DEVICE_TYPE } = require('../../../../services/matter/utils/dishwasherMatterMapping');
 
 describe('Matter.convertToGladysDevice', () => {
   const serviceId = 'service-1';
@@ -545,5 +549,155 @@ describe('Matter.convertToGladysDevice', () => {
 
     const modeFeatures = gladysDevice.features.filter((feature) => feature.type === 'mode');
     expect(modeFeatures).to.have.lengthOf(0);
+  });
+
+  describe('dishwasher', () => {
+    const operationalStateClusterClient = {
+      id: OperationalState.Complete.id,
+      name: 'OperationalState',
+      endpointId: 1,
+    };
+
+    const buildDishwasherAlarmClusterClient = (supported) => ({
+      id: DishwasherAlarm.Complete.id,
+      name: 'DishwasherAlarm',
+      endpointId: 1,
+      getSupportedAttribute: async () => supported,
+    });
+
+    it('should create a dishwasher state feature when the endpoint declares the Matter dishwasher device type', async () => {
+      const device = {
+        name: 'Dishwasher',
+        number: 1,
+        getDeviceTypes: () => [{ code: MATTER_DISHWASHER_DEVICE_TYPE, name: 'Dishwasher' }],
+        getAllClusterClients: () => [operationalStateClusterClient],
+        getChildEndpoints: () => [],
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+      expect(gladysDevice.features).to.have.lengthOf(1);
+      expect(gladysDevice.features[0]).to.deep.include({
+        name: 'OperationalState - 1 (State)',
+        category: DEVICE_FEATURE_CATEGORIES.DISHWASHER,
+        type: DEVICE_FEATURE_TYPES.DISHWASHER.STATE,
+        read_only: true,
+        has_feedback: true,
+        external_id: `matter:12345:1:${OperationalState.Complete.id}:state`,
+        min: 0,
+        max: 255,
+      });
+    });
+
+    it('should create a dishwasher state feature when the endpoint exposes the DishwasherMode cluster', async () => {
+      const dishwasherModeClusterClient = {
+        id: DishwasherMode.Complete.id,
+        name: 'DishwasherMode',
+        endpointId: 1,
+      };
+      const device = {
+        name: 'Dishwasher',
+        number: 1,
+        getAllClusterClients: () => [operationalStateClusterClient, dishwasherModeClusterClient],
+        getChildEndpoints: () => [],
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+      expect(gladysDevice.features.map((feature) => feature.type)).to.deep.equal([
+        DEVICE_FEATURE_TYPES.DISHWASHER.STATE,
+      ]);
+    });
+
+    it('should not map the OperationalState cluster of an appliance that is not a dishwasher', async () => {
+      const device = {
+        name: 'Laundry washer',
+        number: 1,
+        getDeviceTypes: () => [{ code: 0x0073, name: 'LaundryWasher' }],
+        getAllClusterClients: () => [operationalStateClusterClient],
+        getChildEndpoints: () => [],
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+      expect(gladysDevice.features).to.have.lengthOf(0);
+    });
+
+    it('should only create the alarm features the appliance supports', async () => {
+      const device = {
+        name: 'Dishwasher',
+        number: 1,
+        getAllClusterClients: () => [buildDishwasherAlarmClusterClient({ inflowError: true, doorError: true })],
+        getChildEndpoints: () => [],
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+      expect(gladysDevice.features).to.have.lengthOf(2);
+      expect(gladysDevice.features[0]).to.deep.include({
+        name: 'DishwasherAlarm - 1 (Inflow error)',
+        category: DEVICE_FEATURE_CATEGORIES.DISHWASHER,
+        type: DEVICE_FEATURE_TYPES.DISHWASHER.INFLOW_ERROR,
+        read_only: true,
+        has_feedback: true,
+        external_id: `matter:12345:1:${DishwasherAlarm.Complete.id}:inflow-error`,
+        min: 0,
+        max: 1,
+      });
+      expect(gladysDevice.features[1].type).to.equal(DEVICE_FEATURE_TYPES.DISHWASHER.DOOR_ERROR);
+    });
+
+    it('should create every alarm feature when the appliance does not expose the supported bitmap', async () => {
+      const device = {
+        name: 'Dishwasher',
+        number: 1,
+        getAllClusterClients: () => [
+          {
+            id: DishwasherAlarm.Complete.id,
+            name: 'DishwasherAlarm',
+            endpointId: 1,
+          },
+        ],
+        getChildEndpoints: () => [],
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+      expect(gladysDevice.features.map((feature) => feature.type)).to.deep.equal([
+        DEVICE_FEATURE_TYPES.DISHWASHER.INFLOW_ERROR,
+        DEVICE_FEATURE_TYPES.DISHWASHER.DRAIN_ERROR,
+        DEVICE_FEATURE_TYPES.DISHWASHER.DOOR_ERROR,
+        DEVICE_FEATURE_TYPES.DISHWASHER.TEMPERATURE_TOO_LOW,
+        DEVICE_FEATURE_TYPES.DISHWASHER.TEMPERATURE_TOO_HIGH,
+        DEVICE_FEATURE_TYPES.DISHWASHER.WATER_LEVEL_ERROR,
+      ]);
+    });
+
+    it('should map the BooleanState cluster of a dishwasher to an opening sensor door feature', async () => {
+      const device = {
+        name: 'Dishwasher',
+        number: 1,
+        getAllClusterClients: () => [
+          {
+            id: BooleanState.Complete.id,
+            name: 'BooleanState',
+            endpointId: 1,
+          },
+          buildDishwasherAlarmClusterClient({}),
+        ],
+        getChildEndpoints: () => [],
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+      expect(gladysDevice.features).to.have.lengthOf(1);
+      expect(gladysDevice.features[0]).to.deep.include({
+        name: 'BooleanState - 1 (Door)',
+        category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+        read_only: true,
+        external_id: `matter:12345:1:${BooleanState.Complete.id}`,
+      });
+    });
   });
 });
