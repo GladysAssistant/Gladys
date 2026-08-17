@@ -305,6 +305,7 @@
     },
     "duckDbMigrationInProgress": "Ihre Instanz Gladys ist dabei, ihre Datenbank auf DuckDB umzustellen, ein neues, leistungsfähigeres Datenbanksystem für Zeitseriendaten. Diese Aufgabe kann einige Zeit in Anspruch nehmen, und während dieser Zeit werden nicht alle Ihre Grafiken verfügbar sein. Fortschritt der Migration = {{progress}}%",
     "editDashboardSaveButton": "Sichern",
+    "editDashboardSavedButton": "Gesichert",
     "emptyDashboardSentenceTop": "Dein Dashboard wurde noch nicht konfiguriert.",
     "emptyDashboardSentenceBottom": "Klicke auf \"Bearbeiten\", um dein Dashboard zu gestalten.",
     "noDashboardSentenceBottom": "Klicke auf \"Hinzufügen\", um ein neues Dashboard zu erstellen.",

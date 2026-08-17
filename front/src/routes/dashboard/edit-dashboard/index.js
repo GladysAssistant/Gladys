@@ -338,9 +338,13 @@ class EditDashboard extends Component {
         currentDashboard: { ...currentDashboard, boxes: columns },
         sectionSizes: newSectionSizes,
         loading: false,
-        dashboards: updatedDashboards
+        dashboards: updatedDashboards,
+        justSaved: true
       });
-      route(`/dashboard/${currentDashboard.selector}`);
+      // stay in the editor so the user can chain edits: the save button
+      // briefly turns into a confirmation instead of routing away
+      clearTimeout(this.justSavedTimeout);
+      this.justSavedTimeout = setTimeout(() => this.setState({ justSaved: false }), 2500);
     } catch (e) {
       console.error(e);
       if (e.response && e.response.status === 422) {
@@ -491,12 +495,17 @@ class EditDashboard extends Component {
       isMobileReordering: false,
       editingBoxPosition: null,
       dashboardSettingsOpen: false,
-      newDashboardOpen: false
+      newDashboardOpen: false,
+      justSaved: false
     };
   }
 
   componentDidMount() {
     this.init();
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.justSavedTimeout);
   }
 
   componentDidUpdate(prevProps) {
@@ -522,7 +531,8 @@ class EditDashboard extends Component {
       isMobileReordering,
       editingBoxPosition,
       dashboardSettingsOpen,
-      newDashboardOpen
+      newDashboardOpen,
+      justSaved
     }
   ) {
     return (
@@ -555,6 +565,7 @@ class EditDashboard extends Component {
         removeBox={this.removeBox}
         updateNewSelectedBox={this.updateNewSelectedBox}
         saveDashboard={this.saveDashboard}
+        justSaved={justSaved}
         updateBoxConfig={this.updateBoxConfig}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
         updateCurrentDashboardVisibility={this.updateCurrentDashboardVisibility}

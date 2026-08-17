@@ -28,8 +28,14 @@ describe('Dashboard', () => {
     cy.contains('.btn-primary', 'dashboard.addBoxButton').click();
     cy.get('[data-cy="box-type-user-presence"]').click();
     cy.contains('.btn-outline-primary', 'dashboard.editDashboardSaveButton').click();
+
+    // saving keeps the user in the editor (chain editing) and the save
+    // button briefly becomes the confirmation
+    cy.contains('button', 'dashboard.editDashboardSavedButton').should('have.class', 'btn-success');
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/my-new-dashboard/edit`);
   });
   it('Should delete dashboard', () => {
+    cy.visit('/dashboard/my-new-dashboard');
     cy.contains('dashboard.editDashboardButton')
       .should('have.class', 'btn-outline-primary')
       .click();

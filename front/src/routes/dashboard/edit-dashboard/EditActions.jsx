@@ -1,4 +1,5 @@
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 
 const EditActions = props => (
   <div class="fixed-bottom footer">
@@ -12,8 +13,18 @@ const EditActions = props => (
             <button onClick={props.askDeleteCurrentDashboard} className="btn btn-outline-danger btn-sm ml-2">
               <Text id="dashboard.editDashboardDeleteButton" /> <i class="fe fe-trash" />
             </button>
-            <button onClick={props.saveDashboard} className="btn btn-outline-primary btn-sm ml-2">
-              <Text id="dashboard.editDashboardSaveButton" /> <i class="fe fe-check" />
+            {/* saving keeps the user in the editor (chain editing): the
+                button itself briefly becomes the confirmation */}
+            <button
+              onClick={props.saveDashboard}
+              className={cx('btn btn-sm ml-2', props.justSaved ? 'btn-success' : 'btn-outline-primary')}
+            >
+              {props.justSaved ? (
+                <Text id="dashboard.editDashboardSavedButton" />
+              ) : (
+                <Text id="dashboard.editDashboardSaveButton" />
+              )}{' '}
+              <i class="fe fe-check" />
             </button>
           </div>
         )}

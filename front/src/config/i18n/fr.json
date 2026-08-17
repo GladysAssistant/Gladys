@@ -290,6 +290,7 @@
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
+    "editDashboardSavedButton": "Enregistré",
     "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
     "toggleDefineTabletMode": "Mode tablette",
     "closeDefineTabletMode": "Fermer",

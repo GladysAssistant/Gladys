@@ -63,7 +63,8 @@ The edit mode keeps the current interaction model, per section: an "Add a sectio
 - **dashboard-level settings** (name, visibility, background, width, icon) move out of the canvas into the same panel behind a single "settings" button — the canvas shows the dashboard, chrome is minimal (small column labels, glass section frames);
 - **dashboard creation** also happens in the panel (`NewDashboardForm`, opened by the "+" of the dashboard list): the user never leaves the editor, and on success the editor routes to the new dashboard's edit page. The standalone `/dashboard/create/new` page remains only for the no-dashboard empty state, on the same Horizon glass scene;
 - the separate **mobile reorder mode** is removed: the ↑/↓ affordances and the panel cover reordering on mobile without drag & drop;
-- the canvas sits directly on the Horizon scene (no wrapping card), so editing looks like the dashboard being edited.
+- the canvas sits directly on the Horizon scene (no wrapping card), so editing looks like the dashboard being edited;
+- **saving keeps the user in the editor**: the save button briefly turns into a "saved" confirmation instead of routing back to the dashboard, so edits can be chained (save, keep tweaking, save again). Leaving is explicit — cancel, or any navigation.
 
 The container logic (flat columns + `sectionSizes`, `moveCard`, `addBox*`, `removeBox`, `updateBoxConfig`) is untouched — v2 is a rendering-layer rewrite, exactly what the A.2 data model was designed to allow. Cross-column moves on mobile use the drop zones' section stacking (columns stack vertically, ↑/↓ walk within a column); an explicit "move to column" control can be added to the panel later if real-world feedback asks for it.
 
