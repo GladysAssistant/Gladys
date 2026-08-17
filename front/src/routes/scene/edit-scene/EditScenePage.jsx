@@ -121,6 +121,18 @@ const EditScenePage = ({ children, ...props }) => (
             </div>
 
             <div class="row">
+              <div class="col-lg-12">
+                <div class={style.sectionHeader}>
+                  <span class={cx(style.sectionTitle, style.sectionTitleWhen)}>
+                    <Text id="editScene.whenSectionTitle" />
+                  </span>
+                  <span class={style.sectionSubtitle}>
+                    <Text id="editScene.whenSectionSubtitle" />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
               <TriggerGroup
                 triggers={props.scene.triggers}
                 addTrigger={props.addTrigger}
@@ -131,10 +143,15 @@ const EditScenePage = ({ children, ...props }) => (
                 setVariablesTrigger={props.setVariablesTrigger}
               />
             </div>
-            <div class={cx('row mb-4', style.arrowDown)}>
+            <div class="row">
               <div class="col-lg-12">
-                <div class="text-center">
-                  <i class="fe fe-arrow-down" />
+                <div class={style.sectionHeader}>
+                  <span class={cx(style.sectionTitle, style.sectionTitleThen)}>
+                    <Text id="editScene.thenSectionTitle" />
+                  </span>
+                  <span class={style.sectionSubtitle}>
+                    <Text id="editScene.thenSectionSubtitle" />
+                  </span>
                 </div>
               </div>
             </div>

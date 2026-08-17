@@ -3098,8 +3098,6 @@
     "addActionGroupButton": "Neues Aktionengruppe",
     "noTriggersYet": "Du hast noch keine Auslöser hinzugefügt. Eine Szene muss nicht zwingend einen Auslöser haben.",
     "noActionsYet": "Du hast noch keine Aktionen hinzugefügt. Klicke auf \"+\", um eine Aktion zu dieser Szene hinzuzufügen.",
-    "triggersDescription": "Auslöser sind unabhängig voneinander. Wenn du mehrere Auslöser festgelegt hast, reicht es, wenn einer ausgelöst wird, um die Szene auszuführen.",
-    "actionsDescription": "Alle Aktionen in diesem Block werden parallel ausgeführt. Um eine Abfolge von Aktionen zu erstellen, füge Aktionen zum næchsten Block hinzu.",
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
@@ -3457,6 +3455,89 @@
         "set": "Eine Variable definieren"
       }
     },
+    "actionsDescriptions": {
+      "light": {
+        "turn-on": "Eine oder mehrere Lampen einschalten",
+        "turn-off": "Eine oder mehrere Lampen ausschalten",
+        "toggle": "Den aktuellen Zustand der Lampen umkehren",
+        "blink": "Lampen blinken lassen, um Aufmerksamkeit zu erregen"
+      },
+      "switch": {
+        "turn-on": "Eine Steckdose oder einen Schalter einschalten",
+        "turn-off": "Eine Steckdose oder einen Schalter ausschalten",
+        "toggle": "Den aktuellen Zustand der Steckdosen umkehren"
+      },
+      "device": {
+        "set-value": "Einen Befehl an ein beliebiges Gerät senden",
+        "get-value": "Den letzten Wert eines Sensors abrufen, um ihn später zu verwenden"
+      },
+      "message": {
+        "send": "Eine Benachrichtigung senden (Telegram, App…)",
+        "send-camera": "Das letzte Bild einer Kamera senden"
+      },
+      "sms": {
+        "send": "Eine SMS an ein Telefon senden"
+      },
+      "music": {
+        "play-notification": "Einen Text über einen Lautsprecher vorlesen lassen"
+      },
+      "condition": {
+        "if-then-else": "Je nach Bedingung einem anderen Pfad folgen",
+        "only-continue-if": "Die Szene hier stoppen, wenn die Bedingung nicht erfüllt ist",
+        "while": "Aktionen wiederholen, solange eine Bedingung erfüllt ist",
+        "check-time": "Nur zu bestimmten Uhrzeiten oder Tagen fortfahren"
+      },
+      "user": {
+        "check-presence": "Einen Benutzer als abwesend markieren, wenn er länger nicht gesehen wurde",
+        "set-seen-at-home": "Gladys mitteilen, dass ein Benutzer zu Hause ist",
+        "set-out-of-home": "Gladys mitteilen, dass ein Benutzer das Haus verlassen hat"
+      },
+      "house": {
+        "is-empty": "Nur fortfahren, wenn niemand zu Hause ist",
+        "is-not-empty": "Nur fortfahren, wenn jemand zu Hause ist"
+      },
+      "alarm": {
+        "check-alarm-mode": "Nur fortfahren, wenn sich der Alarm in einem bestimmten Modus befindet",
+        "set-alarm-mode": "Die Alarmanlage eines Hauses scharf oder unscharf schalten"
+      },
+      "calendar": {
+        "is-event-running": "Fortfahren, je nachdem ob gerade ein Kalendertermin läuft",
+        "get-events": "Kalendertermine abrufen, um sie später zu verwenden"
+      },
+      "ecowatt": {
+        "condition": "Fortfahren je nach Ecowatt-Signal des französischen Stromnetzes"
+      },
+      "edf-tempo": {
+        "condition": "Fortfahren je nach EDF-Tempo-Tagesfarbe (Frankreich)"
+      },
+      "delay": "Vor dem nächsten Schritt eine Pause einlegen",
+      "scene": {
+        "start": "Eine andere Szene starten"
+      },
+      "http": {
+        "request": "Eine externe API oder einen Dienst aufrufen"
+      },
+      "mqtt": {
+        "send": "Eine Nachricht auf dem MQTT-Broker veröffentlichen"
+      },
+      "zigbee2mqtt": {
+        "send": "Eine Nachricht an ein Zigbee2MQTT-Gerät senden"
+      },
+      "ai": {
+        "ask": "Der KI eine Frage stellen und ihre Antwort verwenden"
+      },
+      "variable": {
+        "set": "Einen Wert speichern, um ihn in der Szene wiederzuverwenden"
+      }
+    },
+    "actionCategories": {
+      "devices": "Geräte & Lichter",
+      "messages": "Nachrichten & Benachrichtigungen",
+      "conditions": "Bedingungen",
+      "flow": "Ablauf",
+      "homeSecurity": "Zuhause & Sicherheit",
+      "advanced": "Erweitert"
+    },
     "variables": {
       "device": {
         "get-value": {
@@ -3527,6 +3608,57 @@
         "alert-raised": "Wetterwarnung ausgelöst",
         "alert-ended": "Wetterwarnung beendet"
       }
+    },
+    "triggersDescriptions": {
+      "device": {
+        "new-state": "Wenn ein Sensor oder Gerät seinen Zustand ändert"
+      },
+      "time": {
+        "changed": "Zu einer bestimmten Uhrzeit, einmalig oder wiederkehrend",
+        "sunrise": "Jeden Morgen bei Sonnenaufgang",
+        "sunset": "Jeden Abend bei Sonnenuntergang"
+      },
+      "calendar": {
+        "event-is-coming": "Kurz vor, zu Beginn oder am Ende eines Kalendertermins"
+      },
+      "user": {
+        "back-home": "Wenn jemand nach Hause kommt",
+        "left-home": "Wenn jemand das Haus verlässt"
+      },
+      "house": {
+        "empty": "Wenn die letzte Person das Haus verlässt",
+        "no-longer-empty": "Wenn jemand in ein leeres Haus kommt"
+      },
+      "area": {
+        "user-entered": "Wenn ein Benutzer einen Bereich der Karte betritt",
+        "user-left": "Wenn ein Benutzer einen Bereich der Karte verlässt"
+      },
+      "alarm": {
+        "arm": "Wenn die Alarmanlage gerade scharf geschaltet wurde",
+        "arming": "Während der Verzögerung vor dem Scharfschalten",
+        "partial-arm": "Wenn die Alarmanlage in den Teilmodus (Nacht) wechselt",
+        "disarm": "Wenn die Alarmanlage unscharf geschaltet wird",
+        "panic": "Wenn der Panikmodus ausgelöst wird",
+        "too-many-codes-tests": "Wenn zu oft ein ungültiger Code eingegeben wurde"
+      },
+      "system": {
+        "start": "Wenn Gladys startet oder neu startet"
+      },
+      "mqtt": {
+        "received": "Wenn eine Nachricht zu einem MQTT-Thema eintrifft"
+      },
+      "weather": {
+        "alert-raised": "Wenn eine Wetterwarnung beginnt (Wind, Regen…)",
+        "alert-ended": "Wenn eine Wetterwarnung endet"
+      }
+    },
+    "triggerCategories": {
+      "devices": "Geräte & Sensoren",
+      "time": "Zeit & Kalender",
+      "presence": "Anwesenheit",
+      "alarm": "Alarmanlage",
+      "weather": "Wetter",
+      "advanced": "Erweitert"
     },
     "triggersCard": {
       "newState": {
@@ -3661,7 +3793,14 @@
           "extreme": "Extrem (rot)"
         }
       }
-    }
+    },
+    "searchActionsPlaceholder": "Aktion suchen…",
+    "searchTriggersPlaceholder": "Auslöser suchen…",
+    "noResultsFound": "Keine Ergebnisse",
+    "whenSectionTitle": "Wenn",
+    "whenSectionSubtitle": "die Szene startet, wenn einer dieser Auslöser eintritt",
+    "thenSectionTitle": "Dann",
+    "thenSectionSubtitle": "diese Schritte werden der Reihe nach ausgeführt"
   },
   "profile": {
     "title": "Profil",

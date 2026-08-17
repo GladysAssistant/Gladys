@@ -3098,8 +3098,6 @@
     "addActionGroupButton": "Nouveau groupe d'action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
     "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
-    "triggersDescription": "Chaque déclencheur est indépendant. Lorsque les conditions de l'un ces déclencheurs sont respectées, la scène s'exécute.",
-    "actionsDescription": "Toutes les actions de ce bloc s'exécuteront en parallèle. Pour effectuer une séquence d'actions, ajoutez des actions au bloc suivant.",
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "actionsCard": {
@@ -3457,6 +3455,89 @@
         "set": "Définir une variable"
       }
     },
+    "actionsDescriptions": {
+      "light": {
+        "turn-on": "Allumer une ou plusieurs lumières",
+        "turn-off": "Éteindre une ou plusieurs lumières",
+        "toggle": "Inverser l'état actuel des lumières",
+        "blink": "Faire clignoter des lumières pour attirer l'attention"
+      },
+      "switch": {
+        "turn-on": "Allumer une prise ou un interrupteur",
+        "turn-off": "Éteindre une prise ou un interrupteur",
+        "toggle": "Inverser l'état actuel des prises"
+      },
+      "device": {
+        "set-value": "Envoyer une commande à n'importe quel appareil",
+        "get-value": "Relever la dernière valeur d'un capteur pour l'utiliser ensuite"
+      },
+      "message": {
+        "send": "Envoyer une notification (Telegram, application…)",
+        "send-camera": "Envoyer la dernière image d'une caméra"
+      },
+      "sms": {
+        "send": "Envoyer un SMS sur un téléphone"
+      },
+      "music": {
+        "play-notification": "Faire lire un texte à voix haute sur une enceinte"
+      },
+      "condition": {
+        "if-then-else": "Suivre un chemin différent selon une condition",
+        "only-continue-if": "Arrêter la scène ici si la condition n'est pas remplie",
+        "while": "Répéter des actions tant qu'une condition est vraie",
+        "check-time": "Continuer seulement à certaines heures ou certains jours"
+      },
+      "user": {
+        "check-presence": "Marquer un utilisateur absent s'il n'a pas été vu récemment",
+        "set-seen-at-home": "Indiquer à Gladys qu'un utilisateur est à la maison",
+        "set-out-of-home": "Indiquer à Gladys qu'un utilisateur a quitté la maison"
+      },
+      "house": {
+        "is-empty": "Continuer seulement si personne n'est à la maison",
+        "is-not-empty": "Continuer seulement si quelqu'un est à la maison"
+      },
+      "alarm": {
+        "check-alarm-mode": "Continuer seulement si l'alarme est dans un mode donné",
+        "set-alarm-mode": "Armer ou désarmer l'alarme d'une maison"
+      },
+      "calendar": {
+        "is-event-running": "Continuer selon qu'un évènement de calendrier est en cours",
+        "get-events": "Récupérer des évènements de calendrier pour les utiliser ensuite"
+      },
+      "ecowatt": {
+        "condition": "Continuer selon le signal Ecowatt du réseau électrique (France)"
+      },
+      "edf-tempo": {
+        "condition": "Continuer selon la couleur du jour EDF Tempo (France)"
+      },
+      "delay": "Faire une pause avant l'étape suivante",
+      "scene": {
+        "start": "Démarrer une autre scène"
+      },
+      "http": {
+        "request": "Appeler une API ou un service externe"
+      },
+      "mqtt": {
+        "send": "Publier un message sur le broker MQTT"
+      },
+      "zigbee2mqtt": {
+        "send": "Publier un message vers un appareil Zigbee2MQTT"
+      },
+      "ai": {
+        "ask": "Poser une question à l'IA et utiliser sa réponse"
+      },
+      "variable": {
+        "set": "Mémoriser une valeur pour la réutiliser dans la scène"
+      }
+    },
+    "actionCategories": {
+      "devices": "Appareils & lumières",
+      "messages": "Messages & notifications",
+      "conditions": "Conditions",
+      "flow": "Déroulement",
+      "homeSecurity": "Maison & sécurité",
+      "advanced": "Avancé"
+    },
     "variables": {
       "device": {
         "get-value": {
@@ -3527,6 +3608,57 @@
         "alert-raised": "Alerte météo déclenchée",
         "alert-ended": "Alerte météo terminée"
       }
+    },
+    "triggersDescriptions": {
+      "device": {
+        "new-state": "Quand un capteur ou un appareil change d'état"
+      },
+      "time": {
+        "changed": "À une heure précise, une fois ou de façon répétée",
+        "sunrise": "Chaque matin au lever du soleil",
+        "sunset": "Chaque soir au coucher du soleil"
+      },
+      "calendar": {
+        "event-is-coming": "Un peu avant, au début ou à la fin d'un évènement de calendrier"
+      },
+      "user": {
+        "back-home": "Quand un membre du foyer rentre à la maison",
+        "left-home": "Quand un membre du foyer quitte la maison"
+      },
+      "house": {
+        "empty": "Quand la dernière personne quitte la maison",
+        "no-longer-empty": "Quand quelqu'un arrive dans une maison vide"
+      },
+      "area": {
+        "user-entered": "Quand un utilisateur entre dans une zone de la carte",
+        "user-left": "Quand un utilisateur sort d'une zone de la carte"
+      },
+      "alarm": {
+        "arm": "Quand l'alarme vient d'être armée",
+        "arming": "Pendant le délai avant l'armement de l'alarme",
+        "partial-arm": "Quand l'alarme passe en mode partiel (nuit)",
+        "disarm": "Quand l'alarme est désarmée",
+        "panic": "Quand le mode panique est déclenché",
+        "too-many-codes-tests": "Quand trop de codes invalides ont été essayés"
+      },
+      "system": {
+        "start": "Quand Gladys démarre ou redémarre"
+      },
+      "mqtt": {
+        "received": "Quand un message arrive sur un sujet MQTT"
+      },
+      "weather": {
+        "alert-raised": "Quand une alerte météo commence (vent, pluie…)",
+        "alert-ended": "Quand une alerte météo se termine"
+      }
+    },
+    "triggerCategories": {
+      "devices": "Appareils & capteurs",
+      "time": "Temps & calendrier",
+      "presence": "Présence",
+      "alarm": "Alarme",
+      "weather": "Météo",
+      "advanced": "Avancé"
     },
     "triggersCard": {
       "newState": {
@@ -3661,7 +3793,14 @@
           "extreme": "Extrême (rouge)"
         }
       }
-    }
+    },
+    "searchActionsPlaceholder": "Rechercher une action…",
+    "searchTriggersPlaceholder": "Rechercher un déclencheur…",
+    "noResultsFound": "Aucun résultat",
+    "whenSectionTitle": "Quand",
+    "whenSectionSubtitle": "la scène démarre si l'un de ces déclencheurs se produit",
+    "thenSectionTitle": "Alors",
+    "thenSectionSubtitle": "ces étapes s'exécutent dans l'ordre"
   },
   "profile": {
     "title": "Profil",

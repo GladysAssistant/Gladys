@@ -69,19 +69,7 @@ describe('Scene view', () => {
       .should('have.class', 'btn-outline-primary')
       .click();
 
-    const i18n = Cypress.env('i18n');
-
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('houseControl');
-
-      cy.get('@houseControl').click(0, 0, { force: true });
-
-      cy.get('@houseControl')
-        .get('[class*="-menu"]')
-        .find('[class*="-option"]')
-        .filter(`:contains("${i18n.editScene.actions.house['is-empty']}")`)
-        .click(0, 0, { force: true });
-    });
+    cy.get('[data-cy="type-picker-option"][data-value="house.is-empty"]').click();
 
     cy.get('div[class*="-control"]').then(inputs => {
       cy.wrap(inputs[1]).as('houseControl');
@@ -148,18 +136,7 @@ describe('Scene view', () => {
       .should('have.class', 'btn-outline-primary')
       .click();
 
-    const i18n = Cypress.env('i18n');
-
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('deviceControl');
-      cy.get('@deviceControl').click(0, 0, { force: true });
-
-      cy.get('@deviceControl')
-        .get('[class*="-menu"]')
-        .find('[class*="-option"]')
-        .filter(`:contains("${i18n.editScene.actions.device['set-value']}")`)
-        .click(0, 0, { force: true });
-    });
+    cy.get('[data-cy="type-picker-option"][data-value="device.set-value"]').click();
 
     cy.wait('@loadDevices');
     cy.wait('@loadAllDevices');
@@ -187,18 +164,7 @@ describe('Scene view', () => {
       .should('have.class', 'btn-outline-primary')
       .click();
 
-    const i18n = Cypress.env('i18n');
-
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('calendarControl');
-      cy.get('@calendarControl').click(0, 0, { force: true });
-
-      cy.get('@calendarControl')
-        .get('[class*="-menu"]')
-        .find('[class*="-option"]')
-        .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
-        .click(0, 0, { force: true });
-    });
+    cy.get('[data-cy="type-picker-option"][data-value="calendar.event-is-coming"]').click();
 
     cy.get('select').then(selects => {
       cy.wrap(selects[0]).select('contains');

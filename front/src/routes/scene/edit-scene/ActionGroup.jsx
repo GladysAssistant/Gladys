@@ -76,11 +76,6 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {props.actions && props.actions.length > 0 && (
-                <div class="alert alert-info">
-                  <Text id="editScene.actionsDescription" />
-                </div>
-              )}
               <div class="row">
                 {props.actions.map((action, index) => (
                   <ActionCard

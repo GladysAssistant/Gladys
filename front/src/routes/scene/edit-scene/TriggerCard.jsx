@@ -14,30 +14,8 @@ import MQTTReceivedTrigger from './triggers/MQTTReceivedTrigger';
 import WeatherAlert from './triggers/WeatherAlert';
 
 import { EVENTS } from '../../../../../server/utils/constants';
+import { TRIGGER_ICON } from './typesCatalog';
 import GladysStartTrigger from './triggers/GladysStartTrigger';
-
-const TRIGGER_ICON = {
-  [EVENTS.DEVICE.NEW_STATE]: 'fe-activity',
-  [EVENTS.TIME.CHANGED]: 'fe-watch',
-  [EVENTS.TIME.SUNSET]: 'fe-sunset',
-  [EVENTS.TIME.SUNRISE]: 'fe-sunrise',
-  [EVENTS.USER_PRESENCE.BACK_HOME]: 'fe-home',
-  [EVENTS.USER_PRESENCE.LEFT_HOME]: 'fe-home',
-  [EVENTS.HOUSE.NO_LONGER_EMPTY]: 'fe-home',
-  [EVENTS.AREA.USER_ENTERED]: 'fe-compass',
-  [EVENTS.AREA.USER_LEFT]: 'fe-compass',
-  [EVENTS.CALENDAR.EVENT_IS_COMING]: 'fe-calendar',
-  [EVENTS.ALARM.ARM]: 'fe-bell',
-  [EVENTS.ALARM.ARMING]: 'fe-clock',
-  [EVENTS.ALARM.PARTIAL_ARM]: 'fe-bell',
-  [EVENTS.ALARM.DISARM]: 'fe-bell-off',
-  [EVENTS.ALARM.PANIC]: 'fe-alert-triangle',
-  [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: 'fe-alert-triangle',
-  [EVENTS.SYSTEM.START]: 'fe-activity',
-  [EVENTS.MQTT.RECEIVED]: 'fe-hash',
-  [EVENTS.WEATHER.ALERT_RAISED]: 'fe-alert-triangle',
-  [EVENTS.WEATHER.ALERT_ENDED]: 'fe-check-circle'
-};
 
 const WEATHER_ALERT_TRIGGERS = [EVENTS.WEATHER.ALERT_RAISED, EVENTS.WEATHER.ALERT_ENDED];
 
@@ -57,7 +35,7 @@ const deleteTriggerFromList = (deleteTrigger, index) => () => {
 const TriggerCard = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      {TRIGGER_ICON[props.trigger.type] && <i class={`fe ${TRIGGER_ICON[props.trigger.type]}`} />}
+      {TRIGGER_ICON[props.trigger.type] && <i class={TRIGGER_ICON[props.trigger.type]} />}
       {props.trigger.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
         <i class={cx('mr-3', props.trigger.icon)} />

@@ -47,3 +47,152 @@
   max-height: 1000px;
   padding: 1.5rem 1.5rem;
 }
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0.25rem 0.25rem 0.75rem;
+}
+
+.sectionTitle {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sectionTitleWhen {
+  color: #c77e1e;
+}
+
+.sectionTitleThen {
+  color: #3a6fb8;
+}
+
+.sectionSubtitle {
+  font-size: 0.8125rem;
+  color: #9aa0ac;
+}
+
+.typePickerList {
+  max-height: 24rem;
+  overflow-y: auto;
+  margin: 0 -0.5rem;
+  padding: 0 0.5rem;
+}
+
+.typePickerCategory {
+  margin-bottom: 0.75rem;
+}
+
+.typePickerCategoryTitle {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9aa0ac;
+  margin: 0.25rem 0 0.25rem 0.25rem;
+}
+
+.typePickerOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.125rem;
+}
+
+.typePickerOption {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.375rem 0.5rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.typePickerOption:hover,
+.typePickerOption:focus {
+  background-color: #f0f2f5;
+  outline: none;
+}
+
+.typePickerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.typePickerIconGreen {
+  background-color: #ddf2e5;
+  color: #2f8a54;
+}
+
+.typePickerIconPink {
+  background-color: #fce5ee;
+  color: #c94f7c;
+}
+
+.typePickerIconPurple {
+  background-color: #ece5fa;
+  color: #7554c0;
+}
+
+.typePickerIconBlue {
+  background-color: #e2ecf9;
+  color: #3a6fb8;
+}
+
+.typePickerIconOrange {
+  background-color: #fdecdc;
+  color: #cd6f24;
+}
+
+.typePickerIconRed {
+  background-color: #fbe3e3;
+  color: #c23434;
+}
+
+.typePickerIconYellow {
+  background-color: #faf0d3;
+  color: #a3821c;
+}
+
+.typePickerIconGray {
+  background-color: #eceef1;
+  color: #5f6877;
+}
+
+.typePickerOptionText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.typePickerOptionLabel {
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.typePickerOptionDescription {
+  font-size: 0.8125rem;
+  color: #6e7687;
+  line-height: 1.3;
+}
+
+.typePickerEmpty {
+  text-align: center;
+  color: #9aa0ac;
+  padding: 1.5rem 0;
+}

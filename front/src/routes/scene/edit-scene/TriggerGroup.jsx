@@ -28,11 +28,6 @@ const TriggerGroup = ({ children, ...props }) => (
         >
           <div class="loader" />
           <div class="dimmer-content">
-            {props.triggers && props.triggers.length > 0 && (
-              <div class="alert alert-info">
-                <Text id="editScene.triggersDescription" />
-              </div>
-            )}
             {props.triggers && props.triggers.length === 0 && (
               <div class="text-center">
                 <Text id="editScene.noTriggersYet" />
