@@ -29,11 +29,28 @@ export const EXTERNAL_INTEGRATION_STATUS_BADGES = {
   ERROR: 'badge-danger'
 };
 
+// Display order of the statuses in the "Installed" view summary: the nominal
+// states first, then the ones asking for attention, then the inactive ones.
+// A fixed order keeps the strip from reshuffling on every status change.
+export const EXTERNAL_INTEGRATION_STATUS_ORDER = [
+  'RUNNING',
+  'ENABLED',
+  'LOADING',
+  'DEGRADED',
+  'ERROR',
+  'STOPPED',
+  'DISABLED',
+  'UNKNOWN'
+];
+
 // Statuses that need no badge in the integration catalog: they are the
 // expected state of an installed integration, and repeating them on every
 // card only pushes the tags the user actually scans for (Local, Cloud,
 // Community) onto a second line. The status stays permanently displayed on
 // the integration page itself, where it is the information being looked for.
+// The "Installed" view is the exception: there the status *is* the reason
+// the user opened the view, so every card wears its badge (see the
+// `alwaysShowStatus` prop of the catalog cards).
 const EXTERNAL_INTEGRATION_NOMINAL_STATUSES = ['RUNNING', 'ENABLED'];
 
 // True when a status is worth a badge in the catalog: anything that is not

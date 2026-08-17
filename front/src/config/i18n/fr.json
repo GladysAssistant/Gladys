@@ -97,11 +97,12 @@
     "allRooms": "Toutes les pièces",
     "noRoom": "Aucune pièce",
     "allIntegrations": "Toutes les intégrations",
+    "nativeIntegrations": "Intégrations natives",
+    "communityIntegrations": "Intégrations communautaires",
     "device": "Appareil",
     "room": "Pièce",
     "integration": "Intégration",
     "features": "Fonctionnalités",
-    "openInIntegration": "Ouvrir dans l'intégration",
     "emptyState": "Aucun appareil trouvé. Ajoutez des appareils depuis la page des intégrations, ou modifiez votre recherche et vos filtres.",
     "emptyStateButton": "Parcourir les intégrations",
     "error": "Une erreur est survenue lors du chargement des appareils. Veuillez réessayer plus tard."
@@ -727,6 +728,13 @@
       "searchPlaceholder": "Chercher une intégration",
       "noIntegrations": "Aucune intégration trouvée",
       "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
+      "noInstalledIntegrations": "Aucune intégration de la communauté n'est encore installée sur cette instance.",
+      "installedSummary": {
+        "title": {
+          "one": "1 intégration de la communauté installée sur cette instance.",
+          "other": "{{count}} intégrations de la communauté installées sur cette instance."
+        }
+      },
       "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
       "noSearchResultsSuggestion": "Votre appareil est peut-être pris en charge par une <a href=\"https://gladysassistant.com/fr/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">intégration externe</a> de la communauté : c'est la façon recommandée d'ajouter de nouvelles compatibilités. Et si elle n'existe pas encore, vous pouvez <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">créer la vôtre très simplement</a> !",
       "refreshStore": {
@@ -746,6 +754,7 @@
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
+        "installed": "Installées",
         "updates": "À mettre à jour",
         "climate": "Chauffage & climatisation",
         "lighting": "Éclairage, prises & volets",
@@ -840,6 +849,7 @@
         "actionError": "Une erreur s'est produite lors de l'exécution de cette action.",
         "uninstallError": "Une erreur s'est produite lors de la désinstallation de cette intégration.",
         "updateAvailableText": "Une nouvelle version de cette intégration est disponible.",
+        "updateAvailableVersionText": "Une nouvelle version de cette intégration est disponible : v{{latestVersion}} (installée : v{{currentVersion}}).",
         "updateSuccessText": "Intégration mise à jour en version {{version}}.",
         "alreadyUpToDateText": "L'intégration est déjà à jour (version {{version}}) : l'image Docker a été re-téléchargée et le conteneur recréé.",
         "statusLabel": "Statut",
@@ -3532,6 +3542,8 @@
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
         "doorbellRang": "Si la sonnette sonne",
+        "anyStateChange": "Démarrer la scène à chaque changement d'état, quelle que soit la valeur",
+        "anyStateChangeNote": "La scène démarrera lorsque l'appareil enverra sa première valeur, ou une valeur différente de la précédente, y compris les petites variations d'un capteur.",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
         "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : ",
         "multipleFeaturesNote": "Vous pouvez sélectionner plusieurs fonctionnalités du même type : la scène démarrera dès que l'une d'elles remplit la condition."
@@ -4028,7 +4040,9 @@
     "startButton": "Démarrer",
     "searchPlaceholder": "Chercher une scène",
     "filterTagsName": "Filtrer par tags",
-    "unselectTags": "Désélectionner tous les tags"
+    "unselectTags": "Désélectionner tous les tags",
+    "running": "En cours",
+    "stopButton": "Arrêter"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",

@@ -24,6 +24,7 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -32,7 +33,7 @@ const { expect } = require('chai');
 
 const { fake, assert } = sinon;
 
-const { EVENTS, STATE, BUTTON_STATUS, FAN_MODE, AC_MODE } = require('../../../../utils/constants');
+const { EVENTS, STATE, BUTTON_STATUS, FAN_MODE, AC_MODE, LOCK } = require('../../../../utils/constants');
 
 const MatterHandler = require('../../../../services/matter/lib');
 
@@ -983,6 +984,65 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:2:85',
       state: 0,
+    });
+  });
+  it('should listen to state change (DoorLock locked)', async () => {
+    const clusterClient = {
+      id: DoorLock.Complete.id,
+      addLockStateAttributeListener: (callback) => {
+        callback(DoorLock.LockState.Locked);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:257:state',
+      state: LOCK.STATE.LOCKED,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:257:lock',
+      state: LOCK.ACTION.LOCK,
+    });
+  });
+  it('should listen to state change (DoorLock unlocked)', async () => {
+    const clusterClient = {
+      id: DoorLock.Complete.id,
+      addLockStateAttributeListener: (callback) => {
+        callback(DoorLock.LockState.Unlocked);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:257:state',
+      state: LOCK.STATE.UNLOCKED,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:257:lock',
+      state: LOCK.ACTION.UNLOCK,
+    });
+  });
+  it('should only emit the detailed state when the DoorLock state is not fully locked', async () => {
+    const clusterClient = {
+      id: DoorLock.Complete.id,
+      addLockStateAttributeListener: (callback) => {
+        callback(DoorLock.LockState.NotFullyLocked);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:257:state',
+      state: LOCK.STATE.ACTIVITY,
     });
   });
   it('should listen to state change (PowerSource battery)', async () => {

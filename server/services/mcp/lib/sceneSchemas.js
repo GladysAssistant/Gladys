@@ -1,10 +1,16 @@
 const z = require('zod/v4');
 const iconList = require('../../../config/icons.json');
-const { ACTIONS, EVENTS, ALARM_MODES_LIST } = require('../../../utils/constants');
+const {
+  ACTIONS,
+  EVENTS,
+  ALARM_MODES_LIST,
+  COMPARISON_OPERATORS,
+  ANY_CHANGE_OPERATOR,
+} = require('../../../utils/constants');
 
 const hhmmPattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const weekDaysSchema = z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
-const comparisonOperatorSchema = z.enum(['=', '!=', '>', '>=', '<', '<=']);
+const comparisonOperatorSchema = z.enum(COMPARISON_OPERATORS);
 const calendarComparatorSchema = z.enum(['is-exactly', 'contains', 'starts-with', 'ends-with', 'has-any-name']);
 const triggerCalendarEventAttributeSchema = z.enum(['start', 'end']);
 
@@ -386,6 +392,16 @@ function createSceneCreateInputSchema(
         'Delay in milliseconds after the condition becomes true before the trigger fires. Example: 45 minutes = 2700000.',
       ),
   };
+  // "any change" mode: the trigger fires on every state change of the feature, whatever the
+  // new value. There is no value to compare against, and neither `threshold_only` nor
+  // `for_duration` applies to an instantaneous change, so they are not part of this shape.
+  const deviceNewStateAnyChangeShape = {
+    operator: z
+      .literal(ANY_CHANGE_OPERATOR)
+      .describe(
+        'Fires on any state change of the device feature, whatever the new value. Use it instead of one trigger per possible value. No "value", "threshold_only" or "for_duration" is accepted with this operator.',
+      ),
+  };
   const sceneTriggerSchema = z.union([
     triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
       device_feature: deviceFeatureSelectorSchema,
@@ -399,6 +415,17 @@ function createSceneCreateInputSchema(
           'Several device features of the same type sharing one condition: the trigger fires as soon as any of them matches.',
         ),
       ...deviceNewStateConditionShape,
+    }),
+    triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
+      device_feature: deviceFeatureSelectorSchema,
+      ...deviceNewStateAnyChangeShape,
+    }),
+    triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
+      device_features: z
+        .array(deviceFeatureSelectorSchema)
+        .min(1)
+        .describe('Several device features: the trigger fires as soon as one of them changes state.'),
+      ...deviceNewStateAnyChangeShape,
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
       scheduler_type: z.literal('every-month'),
@@ -552,7 +579,7 @@ function createSceneCreateInputSchema(
       .array(sceneTriggerSchema)
       .min(1)
       .describe(
-        'Required. Top-level array of when the scene starts. Put device.new-state, time.changed, time.sunrise and all other trigger types here only. Example: [{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}]. Never put these types in actions.',
+        'Required. Top-level array of when the scene starts. Put device.new-state, time.changed, time.sunrise and all other trigger types here only. Example: [{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}]. To react to any state change of a feature, use the "changed" operator without value: [{"type":"device.new-state","device_feature":"mqtt-thermostat","operator":"changed"}]. Never put these types in actions.',
       ),
     actions: z
       .array(z.array(sceneActionSchema))

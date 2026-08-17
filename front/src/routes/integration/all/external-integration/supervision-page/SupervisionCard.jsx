@@ -116,7 +116,21 @@ const SupervisionCard = ({
             )}
             {integration.update_available && (
               <div class="alert alert-info">
-                <Text id="integration.externalIntegration.supervision.updateAvailableText" />
+                {/* the version number is what tells the user what the update actually brings; it is
+                    unknown only when the store index has not been read yet, hence the plain fallback */}
+                {integration.latest_version ? (
+                  // the offered version is the one "what changed?" is asked about, so it is the one
+                  // linked to its changelog here; the installed number repeated in the sentence stays
+                  // plain text, it is already a link in the details list below
+                  <VersionSentence
+                    id="integration.externalIntegration.supervision.updateAvailableVersionText"
+                    fields={{ latestVersion: integration.latest_version, currentVersion: integration.version }}
+                    storeSlug={integration.store_slug}
+                    version={integration.latest_version}
+                  />
+                ) : (
+                  <Text id="integration.externalIntegration.supervision.updateAvailableText" />
+                )}
               </div>
             )}
             <dl class="row">
