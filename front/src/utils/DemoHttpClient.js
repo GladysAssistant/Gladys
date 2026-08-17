@@ -62,10 +62,14 @@ export class DemoHttpClient {
   async delete(url) {
     await this.getDemoFile();
     const key = `delete ${url}`;
-    if (!this.responses[key]) {
+    // The query string is part of the URL on DELETE: fall back to the URL without
+    // it, the same way `get` falls back when the query is dynamic.
+    const keyWithoutQuery = `delete ${url.split('?')[0]}`;
+    const response = this.responses[key] || this.responses[keyWithoutQuery];
+    if (!response) {
       console.error(`${key} not found in demo.js`);
       throw new Error(`${key} not found in demo.js`);
     }
-    return Promise.resolve(this.responses[key]);
+    return Promise.resolve(response);
   }
 }

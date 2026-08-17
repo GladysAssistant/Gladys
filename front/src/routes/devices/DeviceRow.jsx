@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
 import { DeviceStamp, FeatureIcons, IntegrationName } from './helpers';
@@ -28,6 +28,15 @@ const DeviceRow = ({ device, integration }) => (
       <FeatureIcons device={device} />
     </td>
     <td class="text-right text-nowrap">
+      <Localizer>
+        <Link
+          href={`/dashboard/devices/${device.selector}/history`}
+          class="btn btn-sm btn-outline-secondary mr-1"
+          title={<Text id="devicesList.editHistory" />}
+        >
+          <i class="fe fe-list" />
+        </Link>
+      </Localizer>
       {integration && integration.deviceUrl && (
         <Link href={integration.deviceUrl} class="btn btn-sm btn-outline-primary">
           <i class="fe fe-external-link mr-1" />
