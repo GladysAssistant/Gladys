@@ -7,7 +7,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import style from './style.css';
 import { ACTIONS } from '../../../../../server/utils/constants';
 import { ACTION_ICON } from './typesCatalog';
-import { getActionSummary } from './actionSummary';
+import { getActionSummary } from './summary';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 // Actions cards

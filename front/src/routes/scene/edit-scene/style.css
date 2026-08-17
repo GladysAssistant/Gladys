@@ -198,6 +198,38 @@
   color: #9aa0ac;
 }
 
+.orSeparator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: -0.5rem 0 1rem;
+}
+
+.orSeparator::before,
+.orSeparator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #e3e9f1;
+}
+
+.orSeparatorLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c77e1e;
+  background-color: #faf0de;
+  border-radius: 999px;
+  padding: 0.125rem 0.75rem;
+}
+
+.triggersHint {
+  font-size: 0.8125rem;
+  color: #9aa0ac;
+  margin-top: 0.25rem;
+}
+
 .typePickerList {
   max-height: 24rem;
   overflow-y: auto;

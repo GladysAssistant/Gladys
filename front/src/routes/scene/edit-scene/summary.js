@@ -1,6 +1,6 @@
 import get from 'get-value';
 
-import { ACTIONS } from '../../../../../server/utils/constants';
+import { ACTIONS, EVENTS } from '../../../../../server/utils/constants';
 
 const truncate = (text, maxLength = 60) => {
   if (typeof text !== 'string') {
@@ -103,4 +103,62 @@ const getActionSummary = (action, dictionary) => {
   }
 };
 
-export { getActionSummary };
+// Builds a short human-readable summary of a configured trigger, displayed when
+// its card is collapsed
+const getTriggerSummary = (trigger, dictionary) => {
+  if (!trigger || !trigger.type) {
+    return null;
+  }
+  const translateDays = days =>
+    Array.isArray(days)
+      ? days
+          .map(day => get(dictionary, `editScene.triggersCard.scheduledTrigger.daysOfTheWeek.${day}`) || day)
+          .join(', ')
+      : null;
+  switch (trigger.type) {
+    case EVENTS.DEVICE.NEW_STATE:
+      return joinParts([
+        listSelectors(trigger.device_features) || truncate(trigger.device_feature),
+        trigger.operator && trigger.value !== undefined && trigger.value !== null
+          ? `${trigger.operator} ${trigger.value}`
+          : null
+      ]);
+    case EVENTS.TIME.CHANGED:
+      return joinParts([
+        trigger.time,
+        trigger.date,
+        translateDays(trigger.days_of_the_week),
+        trigger.interval && trigger.unit ? `${trigger.interval} ${trigger.unit}` : null
+      ]);
+    case EVENTS.TIME.SUNRISE:
+    case EVENTS.TIME.SUNSET:
+      return truncate(trigger.house);
+    case EVENTS.CALENDAR.EVENT_IS_COMING:
+      return joinParts([listSelectors(trigger.calendars), truncate(trigger.calendar_event_name)]);
+    case EVENTS.USER_PRESENCE.BACK_HOME:
+    case EVENTS.USER_PRESENCE.LEFT_HOME:
+      return joinParts([trigger.user, trigger.house]);
+    case EVENTS.HOUSE.EMPTY:
+    case EVENTS.HOUSE.NO_LONGER_EMPTY:
+      return truncate(trigger.house);
+    case EVENTS.AREA.USER_ENTERED:
+    case EVENTS.AREA.USER_LEFT:
+      return joinParts([trigger.user, trigger.area]);
+    case EVENTS.ALARM.ARM:
+    case EVENTS.ALARM.ARMING:
+    case EVENTS.ALARM.PARTIAL_ARM:
+    case EVENTS.ALARM.DISARM:
+    case EVENTS.ALARM.PANIC:
+    case EVENTS.ALARM.TOO_MANY_CODES_TESTS:
+      return truncate(trigger.house);
+    case EVENTS.MQTT.RECEIVED:
+      return truncate(trigger.topic);
+    case EVENTS.WEATHER.ALERT_RAISED:
+    case EVENTS.WEATHER.ALERT_ENDED:
+      return joinParts([trigger.house, trigger.weather_alert_type]);
+    default:
+      return null;
+  }
+};
+
+export { getActionSummary, getTriggerSummary };

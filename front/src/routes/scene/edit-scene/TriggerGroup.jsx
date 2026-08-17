@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import TriggerCard from './TriggerCard';
+import style from './style.css';
 
 const TriggerGroup = ({ children, ...props }) => (
   <div class="col">
@@ -33,21 +34,31 @@ const TriggerGroup = ({ children, ...props }) => (
                 <Text id="editScene.noTriggersYet" />
               </div>
             )}
-            <div class="row">
-              {props.triggers &&
-                props.triggers.map((trigger, index) => (
-                  <div class="col-lg-6">
-                    <TriggerCard
-                      trigger={trigger}
-                      deleteTrigger={props.deleteTrigger}
-                      index={index}
-                      updateTriggerProperty={props.updateTriggerProperty}
-                      variables={props.variables}
-                      setVariablesTrigger={props.setVariablesTrigger}
-                    />
-                  </div>
-                ))}
-            </div>
+            {props.triggers &&
+              props.triggers.map((trigger, index) => (
+                <div>
+                  {index > 0 && (
+                    <div class={style.orSeparator}>
+                      <span class={style.orSeparatorLabel}>
+                        <Text id="editScene.orSeparator" />
+                      </span>
+                    </div>
+                  )}
+                  <TriggerCard
+                    trigger={trigger}
+                    deleteTrigger={props.deleteTrigger}
+                    index={index}
+                    updateTriggerProperty={props.updateTriggerProperty}
+                    variables={props.variables}
+                    setVariablesTrigger={props.setVariablesTrigger}
+                  />
+                </div>
+              ))}
+            {props.triggers && props.triggers.length > 1 && (
+              <div class={style.triggersHint}>
+                <i class="fe fe-info" /> <Text id="editScene.triggersIndependentHint" />
+              </div>
+            )}
           </div>
         </div>
       </div>

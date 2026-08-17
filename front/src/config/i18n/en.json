@@ -3795,14 +3795,16 @@
     "searchTriggersPlaceholder": "Search for a trigger…",
     "noResultsFound": "No results",
     "whenSectionTitle": "When",
-    "whenSectionSubtitle": "the scene starts when one of these triggers occurs",
+    "whenSectionSubtitle": "the scene starts as soon as any one of these events occurs",
     "thenSectionTitle": "Then",
     "thenSectionSubtitle": "these steps run in order",
     "addStepButton": "Add a step",
     "parallelBlockTitle": "At the same time",
     "addParallelActionButton": "Add a parallel action",
     "unsavedChanges": "Unsaved changes",
-    "savedLabel": "Saved"
+    "savedLabel": "Saved",
+    "orSeparator": "OR",
+    "triggersIndependentHint": "Each trigger starts the scene on its own — any single one is enough. To require several conditions at the same time, add a condition step to the scene."
   },
   "profile": {
     "title": "Profile",

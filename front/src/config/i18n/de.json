@@ -3795,14 +3795,16 @@
     "searchTriggersPlaceholder": "Auslöser suchen…",
     "noResultsFound": "Keine Ergebnisse",
     "whenSectionTitle": "Wenn",
-    "whenSectionSubtitle": "die Szene startet, wenn einer dieser Auslöser eintritt",
+    "whenSectionSubtitle": "die Szene startet, sobald eines dieser Ereignisse eintritt",
     "thenSectionTitle": "Dann",
     "thenSectionSubtitle": "diese Schritte werden der Reihe nach ausgeführt",
     "addStepButton": "Schritt hinzufügen",
     "parallelBlockTitle": "Gleichzeitig",
     "addParallelActionButton": "Parallele Aktion hinzufügen",
     "unsavedChanges": "Nicht gespeicherte Änderungen",
-    "savedLabel": "Gespeichert"
+    "savedLabel": "Gespeichert",
+    "orSeparator": "ODER",
+    "triggersIndependentHint": "Jeder Auslöser startet die Szene unabhängig von den anderen — einer genügt. Um mehrere Bedingungen gleichzeitig zu verlangen, füge der Szene einen Bedingungsschritt hinzu."
   },
   "profile": {
     "title": "Profil",

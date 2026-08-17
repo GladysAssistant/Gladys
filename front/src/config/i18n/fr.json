@@ -3795,14 +3795,16 @@
     "searchTriggersPlaceholder": "Rechercher un déclencheur…",
     "noResultsFound": "Aucun résultat",
     "whenSectionTitle": "Quand",
-    "whenSectionSubtitle": "la scène démarre si l'un de ces déclencheurs se produit",
+    "whenSectionSubtitle": "la scène démarre dès qu'un seul de ces événements se produit",
     "thenSectionTitle": "Alors",
     "thenSectionSubtitle": "ces étapes s'exécutent dans l'ordre",
     "addStepButton": "Ajouter une étape",
     "parallelBlockTitle": "En même temps",
     "addParallelActionButton": "Ajouter une action en parallèle",
     "unsavedChanges": "Modifications non enregistrées",
-    "savedLabel": "Enregistré"
+    "savedLabel": "Enregistré",
+    "orSeparator": "OU",
+    "triggersIndependentHint": "Chaque déclencheur démarre la scène indépendamment des autres — un seul suffit. Pour exiger plusieurs conditions à la fois, ajoutez une étape « Condition » dans le déroulé de la scène."
   },
   "profile": {
     "title": "Profil",
