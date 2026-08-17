@@ -108,6 +108,59 @@ const replaceVariablePathsInActions = (actions, replacements) => {
   });
 };
 
+// Removes the empty action groups that older versions of the editor could leave
+// in a saved scene (they render as stray "add a step" buttons), and rewrites the
+// variable references of the following groups since their indexes shift down.
+// Every container (root level and if/then/else branches) is left ending with a
+// single empty group: the "add a step" insertion point.
+const removeLegacyEmptyActionGroups = (allActions, container, containerPath = '') => {
+  const buildPath = index => (containerPath ? `${containerPath}.${index}` : `${index}`);
+
+  const keptGroups = [];
+  const replacements = [];
+  let removedCount = 0;
+  container.forEach((group, originalIndex) => {
+    if (Array.isArray(group) && group.length === 0) {
+      removedCount += 1;
+      return;
+    }
+    if (removedCount > 0) {
+      replacements.push({
+        prevPath: buildPath(originalIndex),
+        newPath: buildPath(originalIndex - removedCount),
+        groupIndex: originalIndex
+      });
+    }
+    keptGroups.push(group);
+  });
+  container.splice(0, container.length, ...keptGroups);
+
+  // Indexes are decremented: apply from the smallest one first so that a path
+  // is never rewritten twice
+  replacements.sort((a, b) => a.groupIndex - b.groupIndex);
+  replaceVariablePathsInActions(allActions, replacements);
+
+  // Recurse into the branches of if/then/else and while blocks, with their new paths
+  container.forEach((group, groupIndex) => {
+    group.forEach((action, actionIndex) => {
+      if (action && (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE)) {
+        const actionPath = `${buildPath(groupIndex)}.${actionIndex}`;
+        if (Array.isArray(action.then)) {
+          removeLegacyEmptyActionGroups(allActions, action.then, `${actionPath}.then`);
+        }
+        if (Array.isArray(action.else)) {
+          removeLegacyEmptyActionGroups(allActions, action.else, `${actionPath}.else`);
+        }
+      }
+    });
+  });
+
+  // Keep a single trailing empty group as the insertion point
+  if (container.length === 0 || container[container.length - 1].length > 0) {
+    container.push([]);
+  }
+};
+
 // Helper function to merge update objects
 const deepMergeUpdates = (target, source) => {
   if (!source) return target;
@@ -171,9 +224,7 @@ class EditScene extends Component {
     });
     try {
       const scene = await this.props.httpClient.get(`/api/v1/scene/${this.props.scene_selector}`);
-      if (scene.actions[scene.actions.length - 1].length > 0) {
-        scene.actions.push([]);
-      }
+      removeLegacyEmptyActionGroups(scene.actions, scene.actions);
       if (!scene.triggers) {
         scene.triggers = [];
       }
