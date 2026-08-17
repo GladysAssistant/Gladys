@@ -25,7 +25,7 @@ const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
-const { AbortScene } = require('../../utils/coreErrors');
+const { AbortScene, NotFoundError } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
@@ -75,6 +75,40 @@ function warnIfInvalidJsonMessage(actionName, topic, message) {
       `${actionName}: the message sent on topic "${topic}" looks like JSON but is not valid JSON. ` +
         `It's usually the sign of a variable which could not be resolved. Message sent: ${message}`,
     );
+  }
+}
+
+/**
+ * @description Enable or disable another scene by turning its "active" flag on or off.
+ * A scene is allowed to target itself: it's how a scene can disarm itself after
+ * having done its job, and be re-armed later by another scene.
+ * @param {object} self - The scene manager.
+ * @param {object} action - The scene action.
+ * @param {boolean} active - New value of the "active" flag of the target scene.
+ * @returns {Promise} Resolve when the target scene was updated.
+ * @example await setSceneActive(self, { scene: 'my-scene' }, true);
+ */
+async function setSceneActive(self, action, active) {
+  if (!action.scene) {
+    throw new AbortScene('SCENE_NOT_FOUND');
+  }
+  // `scene.update` re-adds the scene to the live store, which cancels its triggers and
+  // schedules them again. That's wanted when the flag really changes, but an action which
+  // keeps a scene in the state it's already in (a scene re-arming itself on every run for
+  // example) would otherwise restart interval jobs and drop pending "for duration" timers
+  // on each execution, so an interval trigger could never reach its next tick.
+  const currentScene = self.scenes && self.scenes[action.scene];
+  if (currentScene && currentScene.active === active) {
+    return;
+  }
+  try {
+    await self.update(action.scene, { active });
+  } catch (e) {
+    if (e instanceof NotFoundError) {
+      logger.warn(`Scene "${action.scene}" was not found, it cannot be ${active ? 'enabled' : 'disabled'}.`);
+      throw new AbortScene('SCENE_NOT_FOUND');
+    }
+    throw e;
   }
 }
 
@@ -326,6 +360,12 @@ const actionsFunc = {
     // we clone the scope so that the new scene is not polluting
     // other scenes writing on the same scope: it needs to be a fresh object
     self.execute(action.scene, cloneDeep(scope));
+  },
+  [ACTIONS.SCENE.ENABLE]: async (self, action) => {
+    await setSceneActive(self, action, true);
+  },
+  [ACTIONS.SCENE.DISABLE]: async (self, action) => {
+    await setSceneActive(self, action, false);
   },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text, {

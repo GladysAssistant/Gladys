@@ -3282,6 +3282,12 @@
         "label": "Select a scene",
         "notice": "The trigger conditions of the called scene will be ignored. If a scene calls another scene, and vice versa, Gladys will not fall into an infinite loop: each scene will be executed once."
       },
+      "setSceneActive": {
+        "label": "Select a scene",
+        "disabledScene": "disabled",
+        "enableNotice": "The selected scene will be enabled: its triggers will start listening again. A scene can enable itself.",
+        "disableNotice": "The selected scene will be disabled: its triggers will stop listening until it is enabled again. A scene can disable itself, for example to run only once until another scene re-enables it."
+      },
       "houseEmptyOrNot": {
         "houseIsEmptyDescription": "If the house is empty, the scene will continue. Otherwise, the scene will stop.",
         "houseIsNotEmptyDescription": "If the house is not empty, the scene will continue. Otherwise, the scene will stop.",
@@ -3395,7 +3401,9 @@
         "toggle": "Toggle the Switches"
       },
       "scene": {
-        "start": "Start scene"
+        "start": "Start scene",
+        "enable": "Enable a scene",
+        "disable": "Disable a scene"
       },
       "service": {
         "start": "Start service",
