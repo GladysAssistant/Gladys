@@ -53,6 +53,10 @@ Decided with the maintainer in forum topic 10553: instead of a per-row column co
 
 The edit mode keeps the current interaction model, per section: an "Add a section" button appends a one-column section, a per-section **+** button adds a column (up to 6) and a per-column trash removes an empty one (removing the last column removes the section); drag & drop moves boxes within and across sections/columns (the existing drag & drop and drop-zone components are reused per section). There is no separate column-count picker.
 
+**Editor polish (implemented):** the editor lives on the same Horizon glass surface as the dashboard (section frames as quiet glass panels, frosted drop zones), and the widget-type picker is a **searchable tile grid** (icon + localized name per type, accent-insensitive search) instead of a raw `<select>` — picking a widget is see-and-tap, like the icon picker.
+
+**Editor v2 — in-place editing (design direction, next iteration):** the maintainer's goal is editing that is *simpler than Home Assistant*, especially on mobile. Direction: edit **on the real dashboard** rather than on an abstract mirror — an "edit" state where every widget shows small affordances (move handle, settings, remove), inline "+" targets between widgets, widget settings opening in a side panel (desktop) or bottom sheet (mobile), and coarse drag replaced on mobile by explicit up/down/move-to controls. The section/column data model (A.2) already supports this; it is an editor-only rewrite and must land as its own phase with its own spec section when scheduled.
+
 ### A.4 Heights: selective stretch, not masonry
 
 Sections of different heights create blank space below short columns. Resolution, decided over masonry (see Alternatives):

@@ -10,7 +10,8 @@ import get from 'get-value';
 
 const EditDashboard = ({ children, ...props }) => (
   <div class="page">
-    <div class="page-main">
+    {/* The editor lives on the same Horizon glass surface as the dashboard */}
+    <div class={cx('page-main', 'glass-theme', style.dashboardBackground, style.glassScene)}>
       <div class={props.loading ? 'dimmer active' : 'dimmer'}>
         <div class="loader" />
         <div class="dimmer-content">

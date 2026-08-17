@@ -13,6 +13,30 @@
   width: 100%;
 }
 
+/* Horizon: section frames become quiet glass panels, drop zones frosted */
+:global(.glass-theme) .section {
+  border: 1px solid var(--gl-border);
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: var(--gl-radius-lg);
+  padding: 12px;
+}
+
+:global(.glass-theme) .sectionHeader {
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .dropZone,
+:global(.glass-theme) .bottomDropZone {
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 1px dashed var(--gl-border);
+  border-radius: var(--gl-radius-md);
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .btnLinkDelete {
+  color: var(--gl-muted);
+}
+
 .sectionHeader {
   font-size: 0.75rem;
   font-weight: 600;

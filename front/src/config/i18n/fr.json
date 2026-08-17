@@ -327,6 +327,8 @@
     "addBoxButton": "Ajouter",
     "selectBoxType": "Sélectionner un type",
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
+    "selectBoxTypeSearchPlaceholder": "Rechercher un widget (horloge, caméra…)",
+    "selectBoxTypeNoResult": "Aucun widget ne correspond à « {{search}} »",
     "boxTitle": {
       "alarm": "Alarme",
       "weather": "Météo",

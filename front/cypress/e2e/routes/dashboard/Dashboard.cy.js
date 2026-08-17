@@ -26,7 +26,7 @@ describe('Dashboard', () => {
   });
   it('Should add new boxes', () => {
     cy.contains('.btn-primary', 'dashboard.addBoxButton').click();
-    cy.get('[data-cy="select-box-type"]').select('user-presence');
+    cy.get('[data-cy="box-type-user-presence"]').click();
     cy.contains('.btn-outline-primary', 'dashboard.editDashboardSaveButton').click();
   });
   it('Should delete dashboard', () => {

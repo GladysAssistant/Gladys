@@ -327,6 +327,8 @@
     "addBoxButton": "Hinzufügen",
     "selectBoxType": "Typ auswählen",
     "selectBoxTypeLabel": "Wähle aus, welches Widget hier angezeigt werden soll",
+    "selectBoxTypeSearchPlaceholder": "Widget suchen (Uhr, Kamera…)",
+    "selectBoxTypeNoResult": "Kein Widget entspricht \"{{search}}\"",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Wetter",
