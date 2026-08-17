@@ -3,6 +3,7 @@ import cx from 'classnames';
 import { DndProvider } from 'react-dnd';
 
 import EditableBoxPreview from './EditableBoxPreview';
+import EditorDragLayer from './EditorDragLayer';
 import EditPanel from './EditPanel';
 import EmptyColumnDropZone from './EmptyColumnDropZone';
 import BottomDropZone from './BottomDropZone';
@@ -185,6 +186,7 @@ const EditBoxColumns = ({ children, ...props }) => (
         </button>
       </div>
       <EditPanel {...props} />
+      <EditorDragLayer />
     </DndProvider>
   </div>
 );

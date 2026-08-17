@@ -1,12 +1,13 @@
-import { useRef } from 'preact/hooks';
+import { useRef, useEffect } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import Box from '../Box';
 import style from './style.css';
 
-const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
+export const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 // A widget on the edit canvas: the real rendered Box behind a transparent
 // overlay (a tap opens its settings), with a slim toolbar carrying the
@@ -17,13 +18,20 @@ const EditableBoxPreview = ({ children, ...props }) => {
   const [{ isDragging }, drag, preview] = useDrag(
     () => ({
       type: DASHBOARD_EDIT_BOX_TYPE,
-      item: () => ({ x, y }),
+      // the widget type rides along so the drag layer can label its ghost
+      item: () => ({ x, y, type: box.type }),
       collect: monitor => ({
         isDragging: !!monitor.isDragging()
       })
     }),
-    [x, y]
+    [x, y, box.type]
   );
+  // The native drag preview is suppressed: Safari draws a blank image for
+  // backdrop-filter cards and the touch backend has none — EditorDragLayer
+  // renders the same visible ghost on every browser and backend instead
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  }, [preview]);
   const [{ isActive }, drop] = useDrop(
     {
       accept: DASHBOARD_EDIT_BOX_TYPE,
@@ -36,7 +44,7 @@ const EditableBoxPreview = ({ children, ...props }) => {
     },
     [x, y]
   );
-  preview(drop(ref));
+  drop(ref);
   const isEditing = props.editingBoxPosition && props.editingBoxPosition.x === x && props.editingBoxPosition.y === y;
   return (
     <div

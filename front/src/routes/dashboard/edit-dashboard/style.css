@@ -310,6 +310,32 @@
   gap: 4px;
 }
 
+/* Custom drag ghost (see EditorDragLayer): above the edit panel, never
+   catching the pointer */
+.dragLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.dragLayerPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: #1c2334;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.35);
+  white-space: nowrap;
+  /* the pill hangs slightly under the cursor, like a held object */
+  margin-left: -14px;
+  margin-top: 10px;
+}
+
 .column {
   flex-grow: 1;
   flex-basis: 0;
