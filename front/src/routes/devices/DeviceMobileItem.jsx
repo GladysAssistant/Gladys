@@ -6,7 +6,7 @@ import style from './style.css';
 
 // One tappable list item: the whole row opens the device in its
 // integration, like a native mobile app list
-const DeviceMobileItem = ({ device, integration, usage }) => {
+const DeviceMobileItem = ({ device, integration, usage, usageLoaded }) => {
   const content = [
     <DeviceStamp device={device} integration={integration} />,
     <div class={style.mobileItemBody}>
@@ -16,7 +16,7 @@ const DeviceMobileItem = ({ device, integration, usage }) => {
         <IntegrationName integration={integration} link={false} />
       </div>
       <FeatureIcons device={device} />
-      <DeviceUsage usage={usage} max={2} link={false} />
+      <DeviceUsage usage={usage} loaded={usageLoaded} max={2} link={false} />
     </div>
   ];
 

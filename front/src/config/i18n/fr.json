@@ -109,7 +109,8 @@
     "openInIntegration": "Ouvrir dans l'intégration",
     "emptyState": "Aucun appareil trouvé. Ajoutez des appareils depuis la page des intégrations, ou modifiez votre recherche et vos filtres.",
     "emptyStateButton": "Parcourir les intégrations",
-    "error": "Une erreur est survenue lors du chargement des appareils. Veuillez réessayer plus tard."
+    "error": "Une erreur est survenue lors du chargement des appareils. Veuillez réessayer plus tard.",
+    "usageError": "Une erreur est survenue lors du chargement de l'utilisation des appareils. La colonne « Utilisé dans » n'est pas disponible."
   },
   "login": {
     "title": "Gladys Assistant",

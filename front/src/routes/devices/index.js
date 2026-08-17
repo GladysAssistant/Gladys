@@ -24,9 +24,12 @@ class Devices extends Component {
       // One call returns the usage of every device, so the list never does
       // one request per device
       const usage = await this.props.httpClient.get('/api/v1/device/usage');
-      this.setState({ usage });
+      this.setState({ usage, usageLoaded: true, usageError: false });
     } catch (e) {
       console.error(e);
+      // Without the usage, a device missing from `usage` is unknown, not
+      // unused: the list says so instead of claiming nothing is used
+      this.setState({ usageLoaded: false, usageError: true });
     }
   };
 
@@ -70,8 +73,10 @@ class Devices extends Component {
   };
 
   matchUsageFilter = device => {
-    const { selectedUsage } = this.state;
-    if (!selectedUsage) {
+    const { selectedUsage, usageLoaded } = this.state;
+    // While the usage is not loaded, a device missing from `usage` only means
+    // "not known yet", so filtering on it would hide (or show) every device
+    if (!selectedUsage || !usageLoaded) {
       return true;
     }
     const usage = this.state.usage[device.selector];
@@ -96,6 +101,8 @@ class Devices extends Component {
       devices: null,
       rooms: [],
       usage: {},
+      usageLoaded: false,
+      usageError: false,
       search: '',
       orderDir: 'asc',
       selectedRoomId: null,

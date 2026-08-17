@@ -3,7 +3,7 @@ import { Link } from 'preact-router/match';
 
 import { DeviceStamp, DeviceUsage, FeatureIcons, IntegrationName } from './helpers';
 
-const DeviceRow = ({ device, integration, usage }) => (
+const DeviceRow = ({ device, integration, usage, usageLoaded }) => (
   <tr>
     <td class="w-1">
       <DeviceStamp device={device} integration={integration} />
@@ -28,7 +28,7 @@ const DeviceRow = ({ device, integration, usage }) => (
       <FeatureIcons device={device} />
     </td>
     <td>
-      <DeviceUsage usage={usage} />
+      <DeviceUsage usage={usage} loaded={usageLoaded} />
     </td>
     <td class="text-right text-nowrap">
       {integration && integration.deviceUrl && (

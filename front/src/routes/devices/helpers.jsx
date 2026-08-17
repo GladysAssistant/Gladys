@@ -74,7 +74,13 @@ export const FeatureIcons = ({ device }) => {
 // Where a device is used: the dashboards and the scenes referencing the
 // device itself or any of its features. Useful to know what will break
 // before deleting a device, and to spot devices used nowhere.
-export const DeviceUsage = ({ usage, max = MAX_USAGE_LINKS, link = true }) => {
+export const DeviceUsage = ({ usage, loaded, max = MAX_USAGE_LINKS, link = true }) => {
+  // A device absent from the usage means "used nowhere" only once the usage
+  // request has answered. Until then its usage is simply unknown
+  if (!loaded) {
+    return <span class="text-muted">-</span>;
+  }
+
   const dashboards = usage ? usage.dashboards : [];
   const scenes = usage ? usage.scenes : [];
   const total = dashboards.length + scenes.length;

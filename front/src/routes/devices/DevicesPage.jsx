@@ -76,6 +76,11 @@ const DevicesPage = ({ children, ...props }) => (
               <Text id="devicesList.error" />
             </div>
           )}
+          {props.usageError && (
+            <div class="alert alert-warning">
+              <Text id="devicesList.usageError" />
+            </div>
+          )}
           <div
             class={cx('dimmer', {
               active: props.loading
@@ -87,7 +92,13 @@ const DevicesPage = ({ children, ...props }) => (
                 <div class="card d-lg-none">
                   <div class="list-group list-group-flush">
                     {props.filteredDevices.map(({ device, integration, usage }) => (
-                      <DeviceMobileItem key={device.id} device={device} integration={integration} usage={usage} />
+                      <DeviceMobileItem
+                        key={device.id}
+                        device={device}
+                        integration={integration}
+                        usage={usage}
+                        usageLoaded={props.usageLoaded}
+                      />
                     ))}
                   </div>
                 </div>
@@ -119,7 +130,13 @@ const DevicesPage = ({ children, ...props }) => (
                       </thead>
                       <tbody>
                         {props.filteredDevices.map(({ device, integration, usage }) => (
-                          <DeviceRow key={device.id} device={device} integration={integration} usage={usage} />
+                          <DeviceRow
+                            key={device.id}
+                            device={device}
+                            integration={integration}
+                            usage={usage}
+                            usageLoaded={props.usageLoaded}
+                          />
                         ))}
                       </tbody>
                     </table>

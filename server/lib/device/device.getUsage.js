@@ -1,11 +1,19 @@
 const { Op } = require('sequelize');
 const db = require('../../models');
+const {
+  FEATURE_STRING_FIELDS,
+  FEATURE_ARRAY_FIELDS,
+  DEVICE_STRING_FIELDS,
+  DEVICE_ARRAY_FIELDS,
+} = require('./device.selectorFields');
 
 // Keys, in dashboard boxes and in scene actions/triggers, whose value is a
-// device selector (or an array of device selectors)
-const DEVICE_SELECTOR_KEYS = ['device', 'devices', 'camera'];
+// device selector (or an array of device selectors). Shared with device.migrate
+// so that "where is this device used?" and "rewrite this device on migrate"
+// always look at the same fields.
+const DEVICE_SELECTOR_KEYS = [...DEVICE_STRING_FIELDS, ...DEVICE_ARRAY_FIELDS];
 // Keys whose value is a device feature selector (or an array of them)
-const DEVICE_FEATURE_SELECTOR_KEYS = ['device_feature', 'device_features'];
+const DEVICE_FEATURE_SELECTOR_KEYS = [...FEATURE_STRING_FIELDS, ...FEATURE_ARRAY_FIELDS];
 
 const DASHBOARD_FIELDS = ['id', 'name', 'selector', 'type'];
 const SCENE_FIELDS = ['id', 'name', 'selector', 'icon'];

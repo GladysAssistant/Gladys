@@ -109,7 +109,8 @@
     "openInIntegration": "Open in integration",
     "emptyState": "No device found. Add devices from the integrations page, or adjust your search and filters.",
     "emptyStateButton": "Browse integrations",
-    "error": "There was an error loading the devices. Please try again later."
+    "error": "There was an error loading the devices. Please try again later.",
+    "usageError": "There was an error loading where the devices are used. The \"Used in\" column is not available."
   },
   "login": {
     "title": "Gladys Assistant",
