@@ -4,7 +4,6 @@ import cx from 'classnames';
 import EditableBoxPreview from './EditableBoxPreview';
 import EditPanel from './EditPanel';
 import EmptyColumnDropZone from './EmptyColumnDropZone';
-import BottomDropZone from './BottomDropZone';
 import { getSectionOffsets, MAX_COLUMNS_PER_SECTION } from '../../../utils/dashboardSections';
 import style from './style.css';
 import stylePrimary from '../style.css';
@@ -56,7 +55,7 @@ const EditBoxColumns = ({ children, ...props }) => (
           const sectionSize = props.sectionSizes[sectionIndex];
           const sectionColumns = props.homeDashboard.boxes.slice(sectionOffset, sectionOffset + sectionSize);
           return (
-            <div class={style.section}>
+            <div class={style.section} data-widget-drop-section>
               <div class={style.sectionHeader}>
                 <Text id="dashboard.boxes.section" fields={{ index: sectionIndex + 1 }} />
                 {/* one-step reorder arrows: dragging a whole section would be hell */}
@@ -117,27 +116,23 @@ const EditBoxColumns = ({ children, ...props }) => (
                           <Text id="dashboard.editDashboardBoxNotEmpty" />
                         </div>
                       )}
-                      <div>
-                        {column.length > 0 && (
-                          <>
-                            {column.map((box, y) => (
-                              <div key={`box-container-${x}-${y}`}>
-                                <EditableBoxPreview {...props} box={box} x={x} y={y} columnLength={column.length} />
-                                <div class="d-flex justify-content-center mb-2">
-                                  <button
-                                    class={cx('btn btn-sm px-4 py-0', style.btnAddNewBoxAtPosition)}
-                                    onClick={() => props.addBoxAtPositionAndEdit(x, y)}
-                                  >
-                                    <i class="fe fe-plus" />
-                                  </button>
-                                </div>
+                      <div data-widget-drop data-drop-x={x} data-drop-active-class={style.columnDropActive}>
+                        {column.length > 0 &&
+                          column.map((box, y) => (
+                            <div key={`box-container-${x}-${y}`}>
+                              <EditableBoxPreview {...props} box={box} x={x} y={y} columnLength={column.length} />
+                              <div class="d-flex justify-content-center mb-2">
+                                <button
+                                  class={cx('btn btn-sm px-4 py-0', style.btnAddNewBoxAtPosition)}
+                                  onClick={() => props.addBoxAtPositionAndEdit(x, y)}
+                                >
+                                  <i class="fe fe-plus" />
+                                </button>
                               </div>
-                            ))}
-                            <BottomDropZone x={x} y={column.length} />
-                          </>
-                        )}
+                            </div>
+                          ))}
 
-                        {column.length === 0 && <EmptyColumnDropZone x={x} />}
+                        {column.length === 0 && <EmptyColumnDropZone />}
 
                         {column.length === 0 && (
                           <div class="d-flex justify-content-center mb-4">

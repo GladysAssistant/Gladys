@@ -61,7 +61,18 @@ const startPointerDrag = (event, options) => {
 
   const handle = event.currentTarget;
   const { pointerId } = event;
-  const { source, draggingClass, dropSelector, ghostClass, ghostIconClass, ghostLabel, bodyClass, onDrop } = options;
+  const {
+    source,
+    draggingClass,
+    dropSelector,
+    ghostClass,
+    ghostIconClass,
+    ghostLabel,
+    bodyClass,
+    onDrop,
+    resolveHover,
+    indicatorClass
+  } = options;
 
   const startX = event.clientX;
   const startY = event.clientY;
@@ -71,6 +82,9 @@ const startPointerDrag = (event, options) => {
   let ghost = null;
   let activeTarget = null;
   let activeTargetClass = null;
+  let activeArea = null;
+  let activeAreaClass = null;
+  let indicatorElement = null;
   let rafId = null;
   let scrollContainer = null;
 
@@ -108,11 +122,56 @@ const startPointerDrag = (event, options) => {
     clearTargetHighlight();
     if (target) {
       activeTarget = target;
-      activeTargetClass = target.getAttribute('data-drop-active-class');
-      if (activeTargetClass) {
-        target.classList.add(activeTargetClass);
+      // with resolveHover, feedback is the area + indicator pair instead of
+      // a per-target highlight
+      if (!resolveHover) {
+        activeTargetClass = target.getAttribute('data-drop-active-class');
+        if (activeTargetClass) {
+          target.classList.add(activeTargetClass);
+        }
       }
     }
+  };
+
+  const setActiveArea = area => {
+    if (area === activeArea) {
+      return;
+    }
+    if (activeArea && activeAreaClass) {
+      activeArea.classList.remove(activeAreaClass);
+    }
+    activeArea = area || null;
+    activeAreaClass = activeArea ? activeArea.getAttribute('data-drop-active-class') : null;
+    if (activeArea && activeAreaClass) {
+      activeArea.classList.add(activeAreaClass);
+    }
+  };
+
+  const setIndicator = rect => {
+    if (!indicatorElement) {
+      return;
+    }
+    if (!rect) {
+      indicatorElement.style.display = 'none';
+      return;
+    }
+    indicatorElement.style.display = 'block';
+    indicatorElement.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+    indicatorElement.style.width = `${rect.width}px`;
+    indicatorElement.style.height = `${rect.height}px`;
+  };
+
+  // Placement feedback, drag & drop best-practice style: an insertion
+  // indicator line at the exact spot the item would land, plus a tint on
+  // the hovered droppable area. Both are overlays (fixed-position element,
+  // class toggle), so showing them NEVER shifts the layout.
+  const updateHover = () => {
+    if (!resolveHover) {
+      return;
+    }
+    const hover = activeTarget ? resolveHover(activeTarget, { x: lastX, y: lastY }) : null;
+    setActiveArea(hover ? hover.area : null);
+    setIndicator(hover ? hover.indicator : null);
   };
 
   const autoScrollTick = () => {
@@ -134,6 +193,7 @@ const startPointerDrag = (event, options) => {
       scrollContainer.scrollTop += speed;
       // content moved under a still pointer: refresh the hit test
       updateTarget();
+      updateHover();
     }
     rafId = window.requestAnimationFrame(autoScrollTick);
   };
@@ -168,6 +228,19 @@ const startPointerDrag = (event, options) => {
     }
     ghost.appendChild(document.createTextNode(ghostLabel || ''));
     document.body.appendChild(ghost);
+    if (resolveHover) {
+      indicatorElement = document.createElement('div');
+      if (indicatorClass) {
+        indicatorElement.className = indicatorClass;
+      }
+      indicatorElement.style.position = 'fixed';
+      indicatorElement.style.top = '0';
+      indicatorElement.style.left = '0';
+      indicatorElement.style.zIndex = '1059';
+      indicatorElement.style.pointerEvents = 'none';
+      indicatorElement.style.display = 'none';
+      document.body.appendChild(indicatorElement);
+    }
     positionGhost();
     rafId = window.requestAnimationFrame(autoScrollTick);
   };
@@ -197,6 +270,10 @@ const startPointerDrag = (event, options) => {
       window.cancelAnimationFrame(rafId);
     }
     clearTargetHighlight();
+    setActiveArea(null);
+    if (indicatorElement && indicatorElement.parentNode) {
+      indicatorElement.parentNode.removeChild(indicatorElement);
+    }
     if (ghost && ghost.parentNode) {
       ghost.parentNode.removeChild(ghost);
     }
@@ -228,6 +305,7 @@ const startPointerDrag = (event, options) => {
     moveEvent.preventDefault();
     positionGhost();
     updateTarget();
+    updateHover();
   };
 
   const onPointerUp = upEvent => {
@@ -238,7 +316,7 @@ const startPointerDrag = (event, options) => {
       upEvent.preventDefault();
       suppressNextClick();
       if (activeTarget) {
-        onDrop(activeTarget);
+        onDrop(activeTarget, { x: lastX, y: lastY });
       }
     }
     cleanup();

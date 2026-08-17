@@ -1,17 +1,9 @@
 import cx from 'classnames';
 import style from './style.css';
 
-// Drop target filling an empty column, for the pointer-drag engine: the
-// data attributes say where a dropped widget lands (top of column x), the
-// engine highlights it via data-drop-active-class.
-const EmptyColumnDropZone = ({ x }) => (
-  <div
-    class={cx('text-center', style.dropZone)}
-    data-widget-drop
-    data-drop-x={x}
-    data-drop-y="0"
-    data-drop-active-class={style.dropZoneActive}
-  />
-);
+// Purely visual placeholder for an empty column: it gives the column a
+// permanent droppable surface (always rendered, so a drag never shifts the
+// layout). Drops resolve on the column container (widgetDropPlacement).
+const EmptyColumnDropZone = () => <div class={cx('text-center', style.dropZone)} />;
 
 export default EmptyColumnDropZone;

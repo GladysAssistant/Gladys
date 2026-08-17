@@ -4,6 +4,7 @@ import cx from 'classnames';
 
 import Box from '../Box';
 import { startPointerDrag } from '../../../utils/pointerDrag';
+import { resolveWidgetDropHover, resolveWidgetDropDestination } from './widgetDropPlacement';
 import style from './style.css';
 
 // A widget on the edit canvas: the real rendered Box behind a transparent
@@ -24,13 +25,21 @@ const EditableBoxPreview = ({ children, ...props }) => {
     startPointerDrag(event, {
       source: wrapper,
       draggingClass: style.previewWrapperDragging,
-      dropSelector: '[data-widget-drop]',
+      // droppable surfaces: the columns and, as a catch-all, the section
+      // rows (widgetDropPlacement resolves the nearest column from there)
+      dropSelector: '[data-widget-drop], [data-widget-drop-section]',
       ghostClass: style.dragLayerPill,
       ghostIconClass: 'fe fe-move',
       ghostLabel: titleNode ? titleNode.textContent : '',
       bodyClass: 'gladys-widget-dragging',
-      onDrop: target =>
-        props.moveCard(x, y, Number(target.getAttribute('data-drop-x')), Number(target.getAttribute('data-drop-y')))
+      indicatorClass: style.dropIndicator,
+      resolveHover: (target, point) => resolveWidgetDropHover(target, point, x, y),
+      onDrop: (target, point) => {
+        const destination = resolveWidgetDropDestination(target, point, x, y);
+        if (destination) {
+          props.moveCard(x, y, destination.x, destination.y);
+        }
+      }
     });
   };
 
@@ -38,10 +47,7 @@ const EditableBoxPreview = ({ children, ...props }) => {
   return (
     <div
       ref={ref}
-      data-widget-drop
-      data-drop-x={x}
-      data-drop-y={y}
-      data-drop-active-class={style.previewWrapperDropTarget}
+      data-widget-wrapper
       class={cx(style.previewWrapper, {
         [style.previewWrapperEditing]: isEditing
       })}

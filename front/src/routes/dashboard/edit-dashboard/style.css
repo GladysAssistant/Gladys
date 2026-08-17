@@ -25,8 +25,7 @@
   color: var(--gl-muted);
 }
 
-:global(.glass-theme) .dropZone,
-:global(.glass-theme) .bottomDropZone {
+:global(.glass-theme) .dropZone {
   background-color: rgba(255, 255, 255, 0.3);
   border: 1px dashed var(--gl-border);
   border-radius: var(--gl-radius-md);
@@ -82,17 +81,11 @@
   opacity: 0.4;
 }
 
-.previewWrapperDropTarget {
-  outline: 2px dashed #467fcf;
-  outline-offset: 4px;
-}
-
 .previewWrapperEditing {
   outline: 2px solid #467fcf;
   outline-offset: 4px;
 }
 
-:global(.glass-theme) .previewWrapperDropTarget,
 :global(.glass-theme) .previewWrapperEditing {
   outline-color: var(--gl-accent);
 }
@@ -401,31 +394,26 @@
   margin-bottom: 1.5rem;
 }
 
-.bottomDropZone {
-  /* only exists while a widget drag is live (body class set by the engine) */
-  display: none;
-  min-height: 20rem;
-  border-width: 1px;
-  border-radius: 2px;
-  padding: 1rem;
-  border-color: '#eeeeee';
-  border-style: dashed;
-  outline: none;
-  transition: border 0.24s ease-in-out;
-  background-color: #fafafa;
-  color: #bdbdbd;
-  margin-bottom: 1.5rem;
+/* Drop-placement feedback (pointer-drag engine, overlays only — starting a
+   drag never shifts the layout):
+   - .dropIndicator: the insertion line, a fixed-position element on <body>
+     placed in the gap where the widget would land;
+   - .columnDropActive: tint on the destination column while hovered. */
+.dropIndicator {
+  border-radius: 999px;
+  background: #467fcf;
+  box-shadow: 0 0 8px rgba(70, 127, 207, 0.6);
 }
 
-:global(body.gladys-widget-dragging) .bottomDropZone {
-  display: block;
+.columnDropActive {
+  background-color: rgba(70, 127, 207, 0.08);
+  border-radius: var(--gl-radius-md, 12px);
 }
 
-/* highlight applied by the pointer-drag engine on the hovered drop zone */
-.dropZone.dropZoneActive,
-.bottomDropZone.bottomDropZoneActive {
-  background-color: rgba(70, 127, 207, 0.18);
-  border-color: var(--gl-accent, #467fcf);
+/* while dragging, the in-between "+" buttons fade out of the way (opacity
+   only: no reflow) so the indicator line reads clearly in the gaps */
+:global(body.gladys-widget-dragging) .btnAddNewBoxAtPosition {
+  opacity: 0.15;
 }
 
 .btnAddNewBoxAtPosition {
@@ -465,11 +453,6 @@
 }
 
 @media (max-width: 1280px) {
-  .bottomDropZone {
-    min-height: 5rem;
-    height: 5rem;
-  }
-
   .columnsCard {
     flex-wrap: wrap;
     width: 100%;
