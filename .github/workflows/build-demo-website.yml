@@ -7,6 +7,18 @@ on:
   push:
     tags:
       - 'v*.*.*'
+    # The demo is a showcase: it follows master so it never lags behind the
+    # features presented on the website, instead of only being refreshed on
+    # release day.
+    branches:
+      - master
+
+# One deploy at a time: several pushes in a row must not race on Cloudflare
+# Pages. A running deploy is never cancelled, only the queued ones it made
+# obsolete.
+concurrency:
+  group: demo-website
+  cancel-in-progress: false
 
 jobs:
   deploy:
