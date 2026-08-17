@@ -189,9 +189,6 @@ function Gladys(params = {}) {
         // sequence, see below
         await service.load(gladys);
       }
-      if (!params.disableSceneLoading) {
-        await scene.init();
-      }
       if (!params.disableDeviceLoading) {
         await device.init(!params.disableDuckDbMigration);
       }
@@ -209,29 +206,40 @@ function Gladys(params = {}) {
       }
       gateway.init();
 
-      if (!params.disableGladysUpgradedCheck) {
-        // Voluntarily not awaited: the upgrade notification is forwarded to
-        // the outbound channels of the user, and an external integration
-        // container can only authenticate on the WebSocket once the HTTP
-        // server is listening — which happens after this boot sequence
-        // resolves. Blocking here would make the notification wait for a
-        // connection that cannot happen yet (and the server wait for the
-        // notification). checkIfGladysUpgraded catches its own errors and
-        // never rejects, so the promise can safely float.
-        system.checkIfGladysUpgraded(gateway);
-      }
-
       const startServicesAndEmitSystemStart = async () => {
-        if (!params.disableService) {
-          try {
+        try {
+          if (!params.disableService) {
             // service.start catches and persists per-service errors, so a
             // failing service cannot reject here — only a global failure
-            // (e.g. database error) can, and it is just logged
+            // (e.g. database error) can, and it is caught below
             await service.startAll();
-          } catch (e) {
-            logger.warn('Unable to start services at boot', e);
           }
+          // Scenes are only loaded in the trigger store once every service is
+          // started: while they start, integrations replay the state of their
+          // devices (MQTT retained messages, Zigbee/Matter state dumps, first
+          // poll result...), and those states must not trigger scenes while
+          // the other integrations are still down — exactly like when the
+          // boot was sequential. The scene API reads the database, so the
+          // front still lists and edits scenes during this window.
+          if (!params.disableSceneLoading) {
+            await scene.init();
+          }
+        } catch (e) {
+          // this function must never reject: it is voluntarily not awaited
+          logger.warn('Error while finishing the Gladys boot sequence', e);
         }
+
+        if (!params.disableGladysUpgradedCheck) {
+          // Runs here, after the services are started: the upgrade
+          // notification is forwarded to the outbound channels of the user
+          // (Telegram, an external integration container...), which are only
+          // usable once service.startAll has reached them. Voluntarily not
+          // awaited so it does not delay the SYSTEM.START trigger —
+          // checkIfGladysUpgraded catches its own errors and never rejects,
+          // so the promise can safely float.
+          system.checkIfGladysUpgraded(gateway);
+        }
+
         // the SYSTEM.START trigger is only emitted once all services are
         // started, so "on startup" scenes still find their integrations
         // ready, like when the boot was sequential
