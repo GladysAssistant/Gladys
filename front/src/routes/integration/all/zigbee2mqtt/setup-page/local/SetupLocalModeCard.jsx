@@ -4,7 +4,14 @@ import { SETUP_MODES } from '../constants';
 import InstallationCard from '../components/InstallationCard';
 import Requirement from '../components/Requirement';
 
-const SetupLocalModeCard = ({ dockerBased, networkModeValid, usbConfigured, disabled, selectSetupMode }) => (
+const SetupLocalModeCard = ({
+  dockerBased,
+  networkModeValid,
+  usbConfigured,
+  networkAdapterConfigured,
+  disabled,
+  selectSetupMode
+}) => (
   <InstallationCard
     title={<Text id="integration.zigbee2mqtt.setup.modes.local.title" />}
     disabled={!dockerBased || !networkModeValid || disabled}
@@ -29,8 +36,8 @@ const SetupLocalModeCard = ({ dockerBased, networkModeValid, usbConfigured, disa
           </Requirement>
         </li>
         <li>
-          <Requirement verified={usbConfigured}>
-            <Text id="integration.zigbee2mqtt.setup.modes.local.usbDongleRequirementLabel" />
+          <Requirement verified={usbConfigured || networkAdapterConfigured}>
+            <Text id="integration.zigbee2mqtt.setup.modes.local.coordinatorRequirementLabel" />
           </Requirement>
         </li>
       </ul>
