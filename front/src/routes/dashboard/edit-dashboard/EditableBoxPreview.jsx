@@ -28,9 +28,13 @@ const EditableBoxPreview = ({ children, ...props }) => {
   );
   // The native drag preview is suppressed: Safari draws a blank image for
   // backdrop-filter cards and the touch backend has none — EditorDragLayer
-  // renders the same visible ghost on every browser and backend instead
+  // renders the same visible ghost on every browser and backend instead.
+  // No captureDraggingState here: it would publish the dragging state
+  // synchronously inside dragstart, and the re-render this triggers makes
+  // Chrome cancel the drag on the spot (dragend right after dragstart —
+  // the exact reason react-dnd defers the publish by a tick by default).
   useEffect(() => {
-    preview(getEmptyImage(), { captureDraggingState: true });
+    preview(getEmptyImage());
   }, [preview]);
   const [{ isActive }, drop] = useDrop(
     {
