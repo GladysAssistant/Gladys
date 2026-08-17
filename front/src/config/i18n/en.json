@@ -4028,7 +4028,9 @@
     "startButton": "Start",
     "searchPlaceholder": "Search scenes",
     "filterTagsName": "Filter by tags",
-    "unselectTags": "Unselect all tags"
+    "unselectTags": "Unselect all tags",
+    "running": "Running",
+    "stopButton": "Stop"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
