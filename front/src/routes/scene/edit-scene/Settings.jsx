@@ -2,45 +2,26 @@ import cx from 'classnames';
 import { Localizer, Text } from 'preact-i18n';
 import CreatableSelect from 'react-select/creatable';
 import { Component } from 'preact';
-import styles from './style.css';
 import IconSelector from '../../../components/scene/IconSelector';
 
 class Settings extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      cardOpened: false
-    };
-  }
-
-  openCloseCard = () => {
-    this.setState({
-      cardOpened: !this.state.cardOpened
-    });
-  };
-
-  render(props, { cardOpened }) {
+  render(props) {
     return (
       <div class="col">
         <div class="card">
           <div class="card-status bg-green" />
-          <div class="card-header" onClick={this.openCloseCard}>
-            <i
-              class={cx('fe', 'mr-2', {
-                'fe-chevron-right': !cardOpened,
-                'fe-chevron-down': cardOpened
-              })}
-            />
+          <div class="card-header">
+            <i class="fe fe-settings mr-2" />
             <h4 class="text-center card-title ">
               <Text id="editScene.settings" />
             </h4>
-            <div class="card-options" />
+            <div class="card-options">
+              <a onClick={props.closeSettings} class="card-options-remove cursor-pointer">
+                <i class="fe fe-x" />
+              </a>
+            </div>
           </div>
-          <div
-            class={cx('card-body', styles.settings, {
-              [styles.settingsOpen]: cardOpened
-            })}
-          >
+          <div class="card-body">
             <div
               class={cx('dimmer', {
                 active: props.saving

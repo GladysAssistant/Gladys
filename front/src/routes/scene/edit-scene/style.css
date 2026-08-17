@@ -32,21 +32,6 @@
   }
 }
 
-.settings {
-  opacity: 0;
-  max-height: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, max-height 0.3s ease;
-  padding: 0rem;
-}
-
-.settingsOpen {
-  visibility: visible;
-  opacity: 1;
-  max-height: 1000px;
-  padding: 1.5rem 1.5rem;
-}
-
 /* Keeps the last step (the "add a step" button) clear of the sticky footer */
 .pageContainer {
   padding-bottom: 6rem;
@@ -85,6 +70,19 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* On small screens the header action buttons are icon-only: make them compact
+   so the three of them fit on a single line */
+@media (max-width: 767.98px) {
+  .headerActionBtn {
+    padding: 0.375rem 0.55rem;
+    margin-left: 0.375rem !important;
+  }
+
+  .headerActionBtn:first-child {
+    margin-left: 0 !important;
+  }
 }
 
 .stepCardHeader {

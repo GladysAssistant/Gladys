@@ -34,10 +34,7 @@ describe('Scene view', () => {
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
 
-    cy.get('div[class*="card-header"]')
-      .contains('editScene.settings')
-      .should('have.class', 'card-title')
-      .click();
+    cy.contains('editScene.settings').click();
 
     cy.get('div[class*="form-group"]').then(inputs => {
       cy.wrap(inputs[0])
@@ -72,7 +69,7 @@ describe('Scene view', () => {
     cy.get('[data-cy="type-picker-option"][data-value="house.is-empty"]').click();
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('houseControl');
+      cy.wrap(inputs[0]).as('houseControl');
       cy.get('@houseControl').click(0, 0, { force: true });
 
       cy.get('@houseControl')
@@ -144,7 +141,7 @@ describe('Scene view', () => {
     cy.wait(100);
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('deviceControl');
+      cy.wrap(inputs[0]).as('deviceControl');
       cy.get('@deviceControl').click(0, 0, { force: true });
 
       cy.get('@deviceControl')

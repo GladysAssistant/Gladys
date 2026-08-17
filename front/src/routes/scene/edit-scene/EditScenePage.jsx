@@ -1,5 +1,6 @@
 import update from 'immutability-helper';
 import cx from 'classnames';
+import { useState } from 'preact/hooks';
 
 import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
 import ActionGroup from './ActionGroup';
@@ -10,6 +11,12 @@ import EditActions from './EditActions';
 import { Text } from 'preact-i18n';
 
 const EditScenePage = ({ children, ...props }) => {
+  // The scene settings (name, description, icon, tags) are hidden by default
+  // and open on demand from the header, to keep the scene visible right away
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const openSettings = () => setSettingsOpen(true);
+  const closeSettings = () => setSettingsOpen(false);
+
   // Inserting a step between two existing steps = inserting a new action group,
   // then adding an empty action (the type picker) inside it
   const insertStepAfter = async index => {
@@ -25,7 +32,7 @@ const EditScenePage = ({ children, ...props }) => {
           <div class={cx('container', style.pageContainer)}>
             <div class="mb-4">
               <div class="row justify-content-between">
-                <div class="col-8">
+                <div class="col-7 col-md-8">
                   <h1 class={cx('page-title', style.pageTitle)}>
                     <button onClick={props.goBack} class={cx('btn btn-secondary btn-sm', style.backButton)}>
                       <i class="fe fe-arrow-left" />
@@ -51,7 +58,7 @@ const EditScenePage = ({ children, ...props }) => {
                   </h1>
                 </div>
 
-                <div class="col-4">
+                <div class="col-5 col-md-4">
                   {props.askDeleteScene && (
                     <div class="d-none d-md-flex flex-column flex-lg-row align-items-center text-right">
                       <div class="ml-auto mb-2">
@@ -72,8 +79,23 @@ const EditScenePage = ({ children, ...props }) => {
                   )}
 
                   {!props.askDeleteScene && (
-                    <div class="text-right">
-                      <button onClick={props.duplicateScene} className="btn btn-outline-primary mb-0 mb-sm-2 mb-lg-0">
+                    <div class={cx('text-right', style.headerActions)}>
+                      <button
+                        onClick={settingsOpen ? closeSettings : openSettings}
+                        className={cx('btn mb-0 mb-sm-2 mb-lg-0', style.headerActionBtn, {
+                          'btn-secondary': settingsOpen,
+                          'btn-outline-secondary': !settingsOpen
+                        })}
+                      >
+                        <span class="d-none d-md-inline-block">
+                          <Text id="editScene.settings" />
+                        </span>{' '}
+                        <i class="fe fe-settings" />
+                      </button>
+                      <button
+                        onClick={props.duplicateScene}
+                        className={cx('btn btn-outline-primary ml-2 mb-0 mb-sm-2 mb-lg-0', style.headerActionBtn)}
+                      >
                         <span class="d-none d-md-inline-block">
                           <Text id="editScene.duplicateButton" />
                         </span>{' '}
@@ -81,7 +103,7 @@ const EditScenePage = ({ children, ...props }) => {
                       </button>
                       <button
                         onClick={props.askDeleteCurrentScene}
-                        className="btn btn-outline-danger ml-2 mb-0 mb-sm-2 mb-lg-0"
+                        className={cx('btn btn-outline-danger ml-2 mb-0 mb-sm-2 mb-lg-0', style.headerActionBtn)}
                       >
                         <span class="d-none d-md-inline-block">
                           <Text id="editScene.deleteButton" />
@@ -127,17 +149,20 @@ const EditScenePage = ({ children, ...props }) => {
                   )}
                 </div>
               )}
-              <div class="row">
-                <Settings
-                  scene={props.scene}
-                  updateSceneName={props.updateSceneName}
-                  updateSceneDescription={props.updateSceneDescription}
-                  updateSceneIcon={props.updateSceneIcon}
-                  setTags={props.setTags}
-                  tags={props.tags}
-                  saving={props.saving}
-                />
-              </div>
+              {settingsOpen && (
+                <div class="row">
+                  <Settings
+                    scene={props.scene}
+                    updateSceneName={props.updateSceneName}
+                    updateSceneDescription={props.updateSceneDescription}
+                    updateSceneIcon={props.updateSceneIcon}
+                    setTags={props.setTags}
+                    tags={props.tags}
+                    saving={props.saving}
+                    closeSettings={closeSettings}
+                  />
+                </div>
+              )}
 
               <div class="row">
                 <div class="col-lg-12">
