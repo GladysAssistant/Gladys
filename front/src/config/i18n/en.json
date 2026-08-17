@@ -3298,7 +3298,7 @@
         "continueScene": "Continue the scene"
       },
       "calendarGetEvents": {
-        "description": "This action gets the list of events starting in the selected time range (an event which started before the beginning of the range is not returned), and makes them available as variables (a ready-to-use sentence, the number of events and the list of events) for the next actions of the scene. Only shared calendars are displayed here.",
+        "description": "This action gets the list of events starting in the selected time range (an event which started before the beginning of the range is not returned), and makes them available as variables (a ready-to-use sentence, a detailed list with one line per event, the number of events and the raw list of events) for the next actions of the scene. Only shared calendars are displayed here.",
         "calendarLabel": "Look in the following shared calendars",
         "timeRangeLabel": "Get events",
         "today": "Today",
@@ -3460,8 +3460,9 @@
       },
       "calendarEvents": {
         "text": "Events summary sentence",
+        "textDetailed": "Detailed list of events (one line per event)",
         "count": "Number of events",
-        "events": "List of events"
+        "events": "Raw list of events (advanced, not readable in a message)"
       },
       "askAi": {
         "answer": "AI answer"

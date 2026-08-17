@@ -3298,7 +3298,7 @@
         "continueScene": "Continuer la scène"
       },
       "calendarGetEvents": {
-        "description": "Cette action récupère la liste des évènements qui commencent sur la période sélectionnée (un évènement ayant commencé avant le début de la période n'est pas retourné), et les rend disponibles sous forme de variables (une phrase prête à l'emploi, le nombre d'évènements et la liste des évènements) pour les actions suivantes de la scène. Seuls les calendriers partagés sont affichés ici.",
+        "description": "Cette action récupère la liste des évènements qui commencent sur la période sélectionnée (un évènement ayant commencé avant le début de la période n'est pas retourné), et les rend disponibles sous forme de variables (une phrase prête à l'emploi, une liste détaillée avec une ligne par évènement, le nombre d'évènements et la liste brute des évènements) pour les actions suivantes de la scène. Seuls les calendriers partagés sont affichés ici.",
         "calendarLabel": "Dans les calendriers partagés suivants",
         "timeRangeLabel": "Récupérer les évènements",
         "today": "Aujourd'hui",
@@ -3460,8 +3460,9 @@
       },
       "calendarEvents": {
         "text": "Phrase résumant les évènements",
+        "textDetailed": "Liste détaillée des évènements (une ligne par évènement)",
         "count": "Nombre d'évènements",
-        "events": "Liste des évènements"
+        "events": "Liste brute des évènements (avancé, illisible dans un message)"
       },
       "askAi": {
         "answer": "Réponse de l'IA"

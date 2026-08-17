@@ -740,12 +740,20 @@ const actionsFunc = {
       };
     });
 
+    // The list of events is an array of objects, so injecting it directly in a message gives
+    // an unreadable result. A ready-to-use multi-line list, with one line per event, is
+    // exposed as well so the events can be sent to the user without iterating over the array.
+    const textDetailed = eventsFormatted
+      .map((event) => (event.location ? `- ${event.summary} (${event.location})` : `- ${event.summary}`))
+      .join('\n');
+
     set(
       scope,
       path,
       {
         calendarEvents: {
           text: eventsFormatted.map((event) => event.summary).join(', '),
+          textDetailed,
           count: eventsFormatted.length,
           events: eventsFormatted,
         },
