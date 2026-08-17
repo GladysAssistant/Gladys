@@ -76,4 +76,33 @@ describe('gladys.start', () => {
     await triggerEmitted;
     assert.calledOnceWithExactly(checkTriggerListener, { type: EVENTS.SYSTEM.START });
   });
+  it('should emit the system start trigger even when service.startAll fails globally', async function test() {
+    this.timeout(15000);
+    const gladys = Gladys({
+      jwtSecret: 'secret',
+      disableBrainLoading: true,
+      disableSceneLoading: true,
+      disableDeviceLoading: true,
+      disableUserLoading: true,
+      disableRoomLoading: true,
+      disableAreaLoading: true,
+      disableSchedulerLoading: true,
+      disableJobInit: true,
+      disableExternalIntegration: true,
+      disableDuckDbMigration: true,
+      disableGladysUpgradedCheck: true,
+    });
+    gladys.service.load = fake.resolves(null);
+    gladys.service.startAll = fake.rejects(new Error('database error'));
+    const checkTriggerListener = fake();
+    const triggerEmitted = new Promise((resolve) => {
+      gladys.event.on(EVENTS.TRIGGERS.CHECK, (payload) => {
+        checkTriggerListener(payload);
+        resolve();
+      });
+    });
+    await gladys.start();
+    await triggerEmitted;
+    assert.calledOnceWithExactly(checkTriggerListener, { type: EVENTS.SYSTEM.START });
+  });
 });
