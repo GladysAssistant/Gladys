@@ -82,6 +82,9 @@ describe('scene.action.getCalendarEvents', () => {
         {
           calendarEvents: {
             text: `Dentist at ${formatTime(dentistStart)}, Meeting at ${formatTime(meetingStart)}`,
+            textDetailed:
+              `- Dentist at ${formatTime(dentistStart)} (dental office)\n` +
+              `- Meeting at ${formatTime(meetingStart)} (office)`,
             count: 2,
             events: [
               {
@@ -138,6 +141,8 @@ describe('scene.action.getCalendarEvents', () => {
     const { calendarEvents } = scope['0'][0];
     expect(calendarEvents.count).to.equal(2);
     expect(calendarEvents.text).to.equal(`Spring holidays, Party at ${formatTime(partyStart)}`);
+    // Events without a location are listed without the location part
+    expect(calendarEvents.textDetailed).to.equal(`- Spring holidays\n- Party at ${formatTime(partyStart)}`);
     expect(calendarEvents.events[0]).to.have.property('summary', 'Spring holidays');
   });
   it('should get the full-day events of the day in a timezone west of UTC', async () => {
@@ -267,6 +272,7 @@ describe('scene.action.getCalendarEvents', () => {
         {
           calendarEvents: {
             text: '',
+            textDetailed: '',
             count: 0,
             events: [],
           },

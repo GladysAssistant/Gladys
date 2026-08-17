@@ -3298,7 +3298,7 @@
         "continueScene": "Szene fortsetzen"
       },
       "calendarGetEvents": {
-        "description": "Diese Aktion ruft die Liste der Ereignisse ab, die im ausgewählten Zeitraum beginnen (ein Ereignis, das vor dem Beginn des Zeitraums begonnen hat, wird nicht zurückgegeben), und stellt sie als Variablen (ein fertiger Satz, die Anzahl der Ereignisse und die Liste der Ereignisse) für die nächsten Aktionen der Szene bereit. Es werden nur freigegebene Kalender angezeigt.",
+        "description": "Diese Aktion ruft die Liste der Ereignisse ab, die im ausgewählten Zeitraum beginnen (ein Ereignis, das vor dem Beginn des Zeitraums begonnen hat, wird nicht zurückgegeben), und stellt sie als Variablen (ein fertiger Satz, eine detaillierte Liste mit einer Zeile pro Ereignis, die Anzahl der Ereignisse und die Rohliste der Ereignisse) für die nächsten Aktionen der Szene bereit. Es werden nur freigegebene Kalender angezeigt.",
         "calendarLabel": "Suche in den folgenden freigegebenen Kalendern",
         "timeRangeLabel": "Ereignisse abrufen",
         "today": "Heute",
@@ -3460,6 +3460,7 @@
       },
       "calendarEvents": {
         "text": "Satz mit der Zusammenfassung der Ereignisse",
+        "textDetailed": "Detaillierte Liste der Ereignisse (eine Zeile pro Ereignis)",
         "count": "Anzahl der Ereignisse",
         "events": "Liste der Ereignisse"
       },
