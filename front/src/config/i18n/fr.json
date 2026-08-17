@@ -321,6 +321,10 @@
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bord",
     "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
+    "moveBoxToDashboard": {
+      "title": "Déplacer vers un autre tableau de bord",
+      "pendingMoves": "Les widgets déplacés vers un autre tableau de bord seront ajoutés à la fin de la première colonne de ce tableau de bord lors de l'enregistrement de ce tableau de bord."
+    },
     "reorderDashboardButton": "Re-ordonner",
     "stopReorderingDashboardButton": "Arrêter de réordonner",
     "addBoxButton": "Ajouter",

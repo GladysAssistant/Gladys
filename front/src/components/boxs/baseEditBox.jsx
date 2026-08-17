@@ -1,12 +1,17 @@
-import { Text } from 'preact-i18n';
-import { useRef } from 'preact/hooks';
+import { Text, Localizer } from 'preact-i18n';
+import { useRef, useState } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
+import cx from 'classnames';
+import get from 'get-value';
+
+import { wrapEmojisJSX } from '../../utils/emojiWrapper';
 
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 const BaseEditBox = ({ children, ...props }) => {
   const { x, y } = props;
   const ref = useRef(null);
+  const [moveToDashboardOpened, setMoveToDashboardOpened] = useState(false);
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: DASHBOARD_EDIT_BOX_TYPE,
     item: () => {
@@ -32,6 +37,22 @@ const BaseEditBox = ({ children, ...props }) => {
   const removeBox = () => {
     props.removeBox(x, y);
   };
+  const currentDashboardSelector = get(props, 'homeDashboard.selector');
+  const otherDashboards = (props.dashboards || []).filter(dashboard => dashboard.selector !== currentDashboardSelector);
+  // A box can only be moved to another dashboard if it's configured, and if another dashboard exists
+  const displayMoveToDashboard =
+    !props.isMobileReordering &&
+    typeof props.moveBoxToDashboard === 'function' &&
+    get(props, 'box.type') !== undefined &&
+    otherDashboards.length > 0;
+  const toggleMoveToDashboard = () => {
+    setMoveToDashboardOpened(!moveToDashboardOpened);
+  };
+  const moveBoxToDashboard = dashboardSelector => {
+    setMoveToDashboardOpened(false);
+    props.moveBoxToDashboard(x, y, dashboardSelector);
+  };
+  const moveToDashboardMenuId = `move-box-to-dashboard-menu-${x}-${y}`;
   if (props.isMobileReordering) {
     return (
       <div
@@ -77,6 +98,54 @@ const BaseEditBox = ({ children, ...props }) => {
           <a class="card-options-remove">
             <i ref={drag} style={{ cursor: 'move' }} class="fe fe-move mr-2 d-none d-lg-inline" />
           </a>
+          {displayMoveToDashboard && (
+            <div class="dropdown">
+              <Localizer>
+                <button
+                  type="button"
+                  onClick={toggleMoveToDashboard}
+                  class="card-options-remove"
+                  aria-label={<Text id="dashboard.moveBoxToDashboard.title" />}
+                  aria-haspopup="true"
+                  aria-expanded={moveToDashboardOpened ? 'true' : 'false'}
+                  aria-controls={moveToDashboardMenuId}
+                  // .card-options only styles anchors, so a native button needs the same look
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    marginLeft: '0.5rem',
+                    minWidth: '1rem',
+                    fontSize: '1rem',
+                    color: '#9aa0ac',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <i style={{ verticalAlign: 'middle' }} class="fe fe-corner-up-right mr-2" />
+                </button>
+              </Localizer>
+              <div
+                id={moveToDashboardMenuId}
+                class={cx('dropdown-menu', 'dropdown-menu-right', {
+                  show: moveToDashboardOpened
+                })}
+              >
+                <span class="dropdown-header">
+                  <Text id="dashboard.moveBoxToDashboard.title" />
+                </span>
+                {otherDashboards.map(dashboard => (
+                  <button
+                    key={dashboard.selector}
+                    type="button"
+                    class="dropdown-item"
+                    onClick={() => moveBoxToDashboard(dashboard.selector)}
+                  >
+                    {wrapEmojisJSX(dashboard.name)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {!props.isMobileReordering && (
             <a onClick={removeBox} class="card-options-remove">
               <i class="fe fe-x" />
