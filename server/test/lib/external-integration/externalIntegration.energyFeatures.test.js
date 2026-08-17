@@ -209,6 +209,180 @@ describe('externalIntegration.getDiscoveredDevices energy features', () => {
     expect(costFeature.energy_parent_id).to.equal('consumption-in-db');
   });
 
+  it('should drop the derived features of a source feature that is no longer an index', async () => {
+    const publishedDevice = buildEnergyDevice(service.selector);
+    // a second feature, published as a cumulative index until now, becomes a
+    // plain instant power one: its 30-minutes features are obsolete
+    publishedDevice.features.push({
+      name: 'Puissance',
+      external_id: `ext:${service.selector}:altherma:secondary`,
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+      unit: DEVICE_FEATURE_UNITS.WATT,
+      min: 0,
+      max: 100000000000,
+      read_only: true,
+      has_feedback: false,
+      keep_history: true,
+    });
+    stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+      id: 'device-id',
+      features: [
+        { ...publishedDevice.features[0], id: 'index-in-db' },
+        {
+          ...publishedDevice.features[1],
+          id: 'secondary-in-db',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+        },
+        {
+          id: 'secondary-consumption-in-db',
+          name: 'Puissance (consumption)',
+          external_id: `ext:${service.selector}:altherma:secondary_consumption`,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          min: 0,
+          max: 100000000000,
+          energy_parent_id: 'secondary-in-db',
+        },
+      ],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    const externalIds = devices[0].features.map((feature) => feature.external_id);
+    expect(externalIds).to.not.include(`ext:${service.selector}:altherma:secondary_consumption`);
+    // only the still-published index keeps its derived features
+    expect(devices[0].features).to.have.lengthOf(4);
+  });
+
+  it('should not duplicate the derived features when the integration publishes them itself', async () => {
+    const publishedDevice = buildEnergyDevice(service.selector);
+    const indexExternalId = publishedDevice.features[0].external_id;
+    publishedDevice.features.push(
+      {
+        name: 'Consommation totale (consumption)',
+        external_id: `${indexExternalId}_consumption`,
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 100000000000,
+        read_only: true,
+        has_feedback: false,
+        keep_history: true,
+      },
+      {
+        name: 'Consommation totale (cost)',
+        external_id: `${indexExternalId}_cost`,
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+        unit: DEVICE_FEATURE_UNITS.EURO,
+        min: 0,
+        max: 100000000000,
+        read_only: true,
+        has_feedback: false,
+        keep_history: true,
+      },
+    );
+    stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+      id: 'device-id',
+      features: [
+        { ...publishedDevice.features[0], id: 'index-in-db' },
+        { ...publishedDevice.features[1], id: 'consumption-in-db', energy_parent_id: 'index-in-db' },
+        { ...publishedDevice.features[2], id: 'cost-in-db', energy_parent_id: 'consumption-in-db' },
+      ],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features).to.have.lengthOf(3);
+    // the published entries already carry the DB identity: nothing to update
+    expect(devices[0]).to.have.property('structure_changed', false);
+    expect(findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION).id).to.equal(
+      'consumption-in-db',
+    );
+    expect(findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST).id).to.equal(
+      'cost-in-db',
+    );
+  });
+
+  it('should keep the rows of derived features an integration named itself', async () => {
+    const publishedDevice = buildEnergyDevice(service.selector);
+    const indexExternalId = publishedDevice.features[0].external_id;
+    // an integration that derived the 30-minutes features on its own, before
+    // the core did it: they carry its own naming, and their history must
+    // survive the "Update" that adopts the deterministic one
+    stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+      id: 'device-id',
+      features: [
+        { ...publishedDevice.features[0], id: 'index-in-db' },
+        {
+          id: 'consumption-in-db',
+          name: 'Consommation 30 minutes',
+          external_id: `ext:${service.selector}:altherma:thirty-minutes`,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          min: 0,
+          max: 100000000000,
+          energy_parent_id: 'index-in-db',
+        },
+        {
+          id: 'cost-in-db',
+          name: 'Coût 30 minutes',
+          external_id: `ext:${service.selector}:altherma:thirty-minutes-price`,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          unit: DEVICE_FEATURE_UNITS.EURO,
+          min: 0,
+          max: 100000000000,
+          energy_parent_id: 'consumption-in-db',
+        },
+      ],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features).to.have.lengthOf(3);
+    const consumptionFeature = findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION);
+    const costFeature = findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST);
+    // the DB rows are kept (their states are not lost), renamed to the
+    // deterministic external_id the core derives
+    expect(consumptionFeature.id).to.equal('consumption-in-db');
+    expect(consumptionFeature.external_id).to.equal(`${indexExternalId}_consumption`);
+    expect(costFeature.id).to.equal('cost-in-db');
+    expect(costFeature.external_id).to.equal(`${indexExternalId}_cost`);
+    // the rename is a structure change: the user's "Update" applies it
+    expect(devices[0]).to.have.property('structure_changed', true);
+  });
+
+  it('should keep the energy pipeline cursors stored in the params of the created device', async () => {
+    const publishedDevice = buildEnergyDevice(service.selector);
+    publishedDevice.params = [{ name: 'IP_ADDRESS', value: '192.168.1.42' }];
+    stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+      id: 'device-id',
+      features: [{ ...publishedDevice.features[0], id: 'index-in-db' }],
+      params: [
+        { id: 'param-1', name: 'IP_ADDRESS', value: '192.168.1.1' },
+        { id: 'param-2', name: 'ENERGY_INDEX_LAST_PROCESSED_index-in-db', value: '2026-08-17T00:00:00.000Z' },
+        { id: 'param-3', name: 'ENERGY_PRODUCTION_INDEX_LAST_PROCESSED', value: '2026-08-16T00:00:00.000Z' },
+        { id: 'param-4', name: 'OTHER_PARAM', value: 'not-the-core-business' },
+      ],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    const paramNames = devices[0].params.map((param) => param.name);
+    // POST /api/v1/device deletes the params missing from the payload: the
+    // cursors of the 30-minutes pipeline must survive the "Update"
+    expect(paramNames).to.deep.equal([
+      'IP_ADDRESS',
+      'ENERGY_INDEX_LAST_PROCESSED_index-in-db',
+      'ENERGY_PRODUCTION_INDEX_LAST_PROCESSED',
+    ]);
+    // the integration keeps the last word on its own params
+    expect(devices[0].params[0].value).to.equal('192.168.1.42');
+    // the in-memory published list stays untouched
+    expect(externalIntegration.discoveredDevices.get(service.id)[0].params).to.have.lengthOf(1);
+  });
+
   it('should drop a derived feature whose index feature is gone from the publication', async () => {
     const publishedDevice = buildEnergyDevice(service.selector);
     stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
