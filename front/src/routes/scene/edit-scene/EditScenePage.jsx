@@ -32,7 +32,7 @@ const EditScenePage = ({ children, ...props }) => {
                     </button>
                     {props.scene.icon && (
                       <span class={style.sceneIconTile}>
-                        <i class={props.scene.icon} />
+                        <i class={`fe fe-${props.scene.icon}`} />
                       </span>
                     )}
                     <span class={style.sceneName}>{props.scene.name}</span>
