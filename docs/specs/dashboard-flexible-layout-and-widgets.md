@@ -55,7 +55,16 @@ The edit mode keeps the current interaction model, per section: an "Add a sectio
 
 **Editor polish (implemented):** the editor lives on the same Horizon glass surface as the dashboard (section frames as quiet glass panels, frosted drop zones), and the widget-type picker is a **searchable tile grid** (icon + localized name per type, accent-insensitive search) instead of a raw `<select>` — picking a widget is see-and-tap, like the icon picker.
 
-**Editor v2 — in-place editing (design direction, next iteration):** the maintainer's goal is editing that is *simpler than Home Assistant*, especially on mobile. Direction: edit **on the real dashboard** rather than on an abstract mirror — an "edit" state where every widget shows small affordances (move handle, settings, remove), inline "+" targets between widgets, widget settings opening in a side panel (desktop) or bottom sheet (mobile), and coarse drag replaced on mobile by explicit up/down/move-to controls. The section/column data model (A.2) already supports this; it is an editor-only rewrite and must land as its own phase with its own spec section when scheduled.
+**Editor v2 — in-place editing (implemented):** the goal is editing that is *simpler than Home Assistant*, especially on mobile. The editor shows **the real rendered dashboard** (the same `Box` widgets, live) instead of an abstract mirror of section/column frames with inline forms:
+
+- every widget is wrapped in an **edit frame** (`EditableBoxPreview`): a transparent overlay blocks the widget's own interactions and a tap anywhere on it opens its settings; a slim toolbar above it carries the widget name and the affordances — **drag handle** (desktop, same react-dnd type and `moveCard` contract as before), **↑/↓** (mobile, `moveCard` one step), **settings**, **remove**;
+- **inline "+" targets** stay between widgets and on empty columns; adding a widget opens the panel directly on the widget picker (an empty box renders as a "new widget" placeholder in place until a type is picked);
+- widget settings open in a **side panel** on desktop and a **bottom sheet** on mobile (`EditPanel`, glass surface). The panel simply hosts the existing `EditBox` switch — the widget picker for a typeless box, the widget's own form otherwise — so no per-widget form was rewritten. Panel position is `{x, y}`-based and every structural operation (move, remove, column/section changes) closes it, so it can never point at a stale box;
+- **dashboard-level settings** (name, visibility, background, width, icon) move out of the canvas into the same panel behind a single "settings" button — the canvas shows the dashboard, chrome is minimal (small column labels, glass section frames);
+- the separate **mobile reorder mode** is removed: the ↑/↓ affordances and the panel cover reordering on mobile without drag & drop;
+- the canvas sits directly on the Horizon scene (no wrapping card), so editing looks like the dashboard being edited.
+
+The container logic (flat columns + `sectionSizes`, `moveCard`, `addBox*`, `removeBox`, `updateBoxConfig`) is untouched — v2 is a rendering-layer rewrite, exactly what the A.2 data model was designed to allow. Cross-column moves on mobile use the drop zones' section stacking (columns stack vertically, ↑/↓ walk within a column); an explicit "move to column" control can be added to the panel later if real-world feedback asks for it.
 
 ### A.4 Heights: selective stretch, not masonry
 

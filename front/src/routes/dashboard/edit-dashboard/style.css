@@ -37,6 +37,256 @@
   color: var(--gl-muted);
 }
 
+/* ============================================================
+   Editor v2: the canvas is the real dashboard with edit chrome
+   ============================================================ */
+
+.editorTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.editorExplanation {
+  font-size: 0.8125rem;
+  color: #9aa0ac;
+}
+
+:global(.glass-theme) .editorExplanation {
+  color: var(--gl-muted);
+}
+
+.columnLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9aa0ac;
+}
+
+:global(.glass-theme) .columnLabel {
+  color: var(--gl-muted);
+}
+
+/* Widget preview frame */
+.previewWrapper {
+  position: relative;
+  margin-bottom: 0.25rem;
+  border-radius: 16px;
+}
+
+.previewWrapperDragging {
+  opacity: 0.4;
+}
+
+.previewWrapperDropTarget {
+  outline: 2px dashed #467fcf;
+  outline-offset: 4px;
+}
+
+.previewWrapperEditing {
+  outline: 2px solid #467fcf;
+  outline-offset: 4px;
+}
+
+:global(.glass-theme) .previewWrapperDropTarget,
+:global(.glass-theme) .previewWrapperEditing {
+  outline-color: var(--gl-accent);
+}
+
+.previewToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px 4px;
+}
+
+.previewTitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9aa0ac;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(.glass-theme) .previewTitle {
+  color: var(--gl-muted);
+}
+
+.previewActions {
+  display: inline-flex;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.previewButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  background-color: #fff;
+  color: #6e7687;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  padding: 0;
+}
+
+.previewButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.previewHandle {
+  cursor: move;
+}
+
+:global(.glass-theme) .previewButton {
+  background-color: var(--gl-surface-strong);
+  border-color: var(--gl-border);
+  color: var(--gl-ink);
+}
+
+.previewContent {
+  position: relative;
+}
+
+/* the widget keeps its own bottom margin for the real dashboard: the editor
+   spaces previews itself */
+.previewContent > * {
+  margin-bottom: 0 !important;
+}
+
+.previewOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  cursor: pointer;
+  border-radius: 16px;
+}
+
+.previewPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 6rem;
+  border: 1px dashed rgba(0, 40, 100, 0.2);
+  border-radius: 16px;
+  color: #9aa0ac;
+  background-color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.btnAddNewBoxAtPosition {
+  height: 24px;
+  border: 1px dashed rgba(0, 40, 100, 0.25);
+  color: #9aa0ac;
+  background-color: transparent;
+}
+
+.btnAddNewBoxAtPosition:hover {
+  color: #467fcf;
+  border-color: #467fcf;
+}
+
+/* Edit panel: side panel on desktop, bottom sheet on mobile */
+.editPanel {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  box-shadow: 0 12px 48px rgba(20, 30, 60, 0.25);
+}
+
+@media (min-width: 992px) {
+  .editPanel {
+    top: 5rem;
+    right: 1rem;
+    bottom: 4.5rem;
+    width: 420px;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 991px) {
+  .editPanel {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 78vh;
+    border-radius: 16px 16px 0 0;
+  }
+}
+
+.editPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 40, 100, 0.08);
+  flex: 0 0 auto;
+}
+
+.editPanelClose {
+  border: none;
+  background: transparent;
+  color: #6e7687;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+}
+
+.editPanelBody {
+  overflow-y: auto;
+  padding: 0.75rem 1rem 1rem;
+}
+
+/* The widget form arrives wrapped in its own BaseEditBox card: inside the
+   panel that chrome is redundant (the panel has its own header, remove
+   lives on the canvas toolbar) — flatten it */
+.editPanelBody > :global(.card) {
+  border: none;
+  background: transparent !important;
+  box-shadow: none;
+  margin: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.editPanelBody > :global(.card) > :global(.card-header) {
+  display: none;
+}
+
+.editPanelBody > :global(.card) > :global(.card-body) {
+  padding: 0;
+}
+
+:global(.glass-theme) .editPanel {
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+}
+
+:global(.glass-theme) .editPanelHeader {
+  border-bottom-color: var(--gl-row-border);
+  color: var(--gl-ink);
+}
+
 .sectionHeader {
   font-size: 0.75rem;
   font-weight: 600;

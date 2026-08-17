@@ -23,7 +23,8 @@ const EditDashboard = ({ children, ...props }) => (
               })}
             >
               <div class="row">
-                <div class="col-lg-3">
+                {/* on mobile the canvas comes first, the dashboard list after */}
+                <div class="col-lg-3 order-2 order-lg-1">
                   <div class="card">
                     <div class="card-header">
                       <h3 class="card-title">
@@ -47,42 +48,9 @@ const EditDashboard = ({ children, ...props }) => (
                     )}
                   </div>
                 </div>
-                <div class="col-lg-9">
-                  <div class="card">
-                    <div class="card-body">
-                      {props.currentDashboard && (
-                        <EditBoxColumns
-                          addBoxAtPosition={props.addBoxAtPosition}
-                          user={props.user}
-                          dashboards={props.dashboards}
-                          updateCurrentDashboardName={props.updateCurrentDashboardName}
-                          updateCurrentDashboardVisibility={props.updateCurrentDashboardVisibility}
-                          updateCurrentDashboardProperty={props.updateCurrentDashboardProperty}
-                          editDashboardDragEnable={props.editDashboardDragEnable}
-                          moveCard={props.moveCard}
-                          moveBoxUp={props.moveBoxUp}
-                          moveBoxDown={props.moveBoxDown}
-                          addBox={props.addBox}
-                          homeDashboard={props.currentDashboard}
-                          updateNewSelectedBox={props.updateNewSelectedBox}
-                          removeBox={props.removeBox}
-                          updateBoxConfig={props.updateBoxConfig}
-                          showReorderDashboard={props.showReorderDashboard}
-                          toggleReorderDashboard={props.toggleReorderDashboard}
-                          updateDashboardList={props.updateDashboardList}
-                          savingNewDashboardList={props.savingNewDashboardList}
-                          isMobileReordering={props.isMobileReordering}
-                          toggleMobileReorder={props.toggleMobileReorder}
-                          deleteCurrentColumn={props.deleteCurrentColumn}
-                          addColumn={props.addColumn}
-                          addSection={props.addSection}
-                          sectionSizes={props.sectionSizes}
-                          boxNotEmptyError={props.boxNotEmptyError}
-                          columnBoxNotEmptyError={props.columnBoxNotEmptyError}
-                        />
-                      )}
-                    </div>
-                  </div>
+                <div class="col-lg-9 order-1 order-lg-2">
+                  {/* v2: the canvas sits directly on the glass scene, no wrapping card */}
+                  {props.currentDashboard && <EditBoxColumns {...props} homeDashboard={props.currentDashboard} />}
                 </div>
               </div>
 

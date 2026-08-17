@@ -112,7 +112,41 @@ class EditDashboard extends Component {
         }
       }
     });
-    await this.setState({ ...newState, boxNotEmptyError: false });
+    // any structural change closes the edit panel so it never points at a stale position
+    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null });
+  };
+
+  moveBoxUp = (x, y) => {
+    return this.moveCard(x, y, x, y - 1);
+  };
+
+  moveBoxDown = (x, y) => {
+    return this.moveCard(x, y, x, y + 1);
+  };
+
+  openBoxSettings = (x, y) => {
+    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false });
+  };
+
+  openDashboardSettings = () => {
+    this.setState({ dashboardSettingsOpen: true, editingBoxPosition: null });
+  };
+
+  closeEditPanel = () => {
+    this.setState({ editingBoxPosition: null, dashboardSettingsOpen: false });
+  };
+
+  addBoxAndEdit = x => {
+    // the new box lands at the end of column x: open its settings right away
+    const y = this.state.currentDashboard.boxes[x].length;
+    this.addBox(x);
+    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false });
+  };
+
+  addBoxAtPositionAndEdit = (x, y) => {
+    // addBoxAtPosition inserts after the box at y
+    this.addBoxAtPosition(x, y);
+    this.setState({ editingBoxPosition: { x, y: y + 1 }, dashboardSettingsOpen: false });
   };
 
   addBox = x => {
@@ -151,7 +185,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    await this.setState({ ...newState, boxNotEmptyError: false });
+    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null });
   };
 
   updateCurrentDashboardName = e => {
@@ -354,7 +388,7 @@ class EditDashboard extends Component {
         $push: [1]
       }
     });
-    this.setState({ ...newState, boxNotEmptyError: false });
+    this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null });
   };
 
   deleteCurrentColumn = async x => {
@@ -378,7 +412,7 @@ class EditDashboard extends Component {
                 }
               }
       });
-      await this.setState({ ...newState, boxNotEmptyError: false });
+      await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null });
     } else {
       this.setState({
         boxNotEmptyError: true,
@@ -450,7 +484,9 @@ class EditDashboard extends Component {
       askDeleteDashboard: false,
       boxNotEmptyError: false,
       columnBoxNotEmptyError: null,
-      isMobileReordering: false
+      isMobileReordering: false,
+      editingBoxPosition: null,
+      dashboardSettingsOpen: false
     };
   }
 
@@ -478,7 +514,9 @@ class EditDashboard extends Component {
       boxNotEmptyError,
       columnBoxNotEmptyError,
       savingNewDashboardList,
-      isMobileReordering
+      isMobileReordering,
+      editingBoxPosition,
+      dashboardSettingsOpen
     }
   ) {
     return (
@@ -497,6 +535,13 @@ class EditDashboard extends Component {
         moveBoxDown={this.moveBoxDown}
         moveBoxUp={this.moveBoxUp}
         moveCard={this.moveCard}
+        openBoxSettings={this.openBoxSettings}
+        openDashboardSettings={this.openDashboardSettings}
+        closeEditPanel={this.closeEditPanel}
+        addBoxAndEdit={this.addBoxAndEdit}
+        addBoxAtPositionAndEdit={this.addBoxAtPositionAndEdit}
+        editingBoxPosition={editingBoxPosition}
+        dashboardSettingsOpen={dashboardSettingsOpen}
         addBox={this.addBox}
         addBoxAtPosition={this.addBoxAtPosition}
         removeBox={this.removeBox}
