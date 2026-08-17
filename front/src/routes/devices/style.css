@@ -43,6 +43,32 @@
   color: #9aa0ac;
 }
 
+.usageLinks {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  max-width: 260px;
+}
+
+.usageTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+}
+
+.usageIcon {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.usageName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .deviceStamp {
   display: inline-flex;
   align-items: center;
@@ -96,7 +122,7 @@
 
   /* the ordering select keeps its natural width so the search bar
      fits next to it on the same row */
-  .pageOptions > select:nth-of-type(3) {
+  .pageOptions > select:nth-of-type(4) {
     flex: 0 1 auto;
   }
 

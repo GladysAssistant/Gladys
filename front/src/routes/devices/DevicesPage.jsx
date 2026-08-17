@@ -49,6 +49,21 @@ const DevicesPage = ({ children, ...props }) => (
                   </option>
                 ))}
               </select>
+              <select
+                onChange={props.selectUsage}
+                class="form-control custom-select w-auto mr-2"
+                disabled={!props.usageLoaded}
+              >
+                <option value="">
+                  <Text id="devicesList.allUsages" />
+                </option>
+                <option value="used" selected={props.selectedUsage === 'used'}>
+                  <Text id="devicesList.usedSomewhere" />
+                </option>
+                <option value="not-used" selected={props.selectedUsage === 'not-used'}>
+                  <Text id="devicesList.usedNowhereFilter" />
+                </option>
+              </select>
               <Localizer>
                 <CardFilter
                   changeOrderDir={props.changeOrderDir}
@@ -65,6 +80,11 @@ const DevicesPage = ({ children, ...props }) => (
               <Text id="devicesList.error" />
             </div>
           )}
+          {props.usageError && (
+            <div class="alert alert-warning">
+              <Text id="devicesList.usageError" />
+            </div>
+          )}
           <div
             class={cx('dimmer', {
               active: props.loading
@@ -75,8 +95,14 @@ const DevicesPage = ({ children, ...props }) => (
               {props.initialized && props.filteredDevices.length > 0 && (
                 <div class="card d-lg-none">
                   <div class="list-group list-group-flush">
-                    {props.filteredDevices.map(({ device, integration }) => (
-                      <DeviceMobileItem key={device.id} device={device} integration={integration} />
+                    {props.filteredDevices.map(({ device, integration, usage }) => (
+                      <DeviceMobileItem
+                        key={device.id}
+                        device={device}
+                        integration={integration}
+                        usage={usage}
+                        usageLoaded={props.usageLoaded}
+                      />
                     ))}
                   </div>
                 </div>
@@ -100,12 +126,21 @@ const DevicesPage = ({ children, ...props }) => (
                           <th>
                             <Text id="devicesList.features" />
                           </th>
+                          <th>
+                            <Text id="devicesList.usedIn" />
+                          </th>
                           <th class="text-right" />
                         </tr>
                       </thead>
                       <tbody>
-                        {props.filteredDevices.map(({ device, integration }) => (
-                          <DeviceRow key={device.id} device={device} integration={integration} />
+                        {props.filteredDevices.map(({ device, integration, usage }) => (
+                          <DeviceRow
+                            key={device.id}
+                            device={device}
+                            integration={integration}
+                            usage={usage}
+                            usageLoaded={props.usageLoaded}
+                          />
                         ))}
                       </tbody>
                     </table>

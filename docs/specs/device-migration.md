@@ -83,6 +83,8 @@ Fields rewritten — this list is **exhaustive and must stay in sync with the Jo
 - **Scene triggers** (`t_scene.triggers`, flat array): `device_feature` (feature), `device_features[]` (features), `device` (device — schema-declared legacy field, rewritten for safety).
 - **Dashboard boxes** (`t_dashboard.boxes`, array of arrays): `device_feature` (feature), `device_features[]` (features), `device` (device), `camera` (device). Values are replaced **in place**; array length and order never change, keeping `device_feature_names` / `units` / `colors` index-aligned.
 
+Those field names live in a single module, `server/lib/device/device.selectorFields.js`, shared with `device.getUsage` (which reads the same fields to tell where a device is used), so both features are updated in one place when a new device-referencing field appears.
+
 Only scenes/dashboards that actually changed are saved. Rewritten scenes go through `SceneManager.addScene` so the RAM copy (`this.scenes`, the one `checkTrigger` iterates) and its scheduled triggers are replaced atomically with the DB copy — the same path as `scene.update`. Dashboards have no RAM cache. References to **unmapped** source features are intentionally left dangling (existing deletion semantics; the UI warned).
 
 ### B.4 Orchestration (`server/lib/device/device.migrate.js`)

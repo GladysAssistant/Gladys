@@ -101,10 +101,16 @@
     "room": "Raum",
     "integration": "Integration",
     "features": "Funktionen",
+    "usedIn": "Verwendet in",
+    "usedNowhere": "Nirgendwo",
+    "allUsages": "Alle Geräte",
+    "usedSomewhere": "In einem Dashboard oder einer Szene verwendet",
+    "usedNowhereFilter": "Nirgendwo verwendet",
     "openInIntegration": "In der Integration öffnen",
     "emptyState": "Keine Geräte gefunden. Füge Geräte über die Integrationsseite hinzu oder passe deine Suche und Filter an.",
     "emptyStateButton": "Integrationen durchsuchen",
-    "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut."
+    "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
+    "usageError": "Beim Laden der Geräteverwendung ist ein Fehler aufgetreten. Die Spalte „Verwendet in“ ist nicht verfügbar."
   },
   "login": {
     "title": "Gladys Assistant",

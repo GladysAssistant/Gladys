@@ -210,6 +210,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.get,
     },
+    'get /api/v1/device/usage': {
+      authenticated: true,
+      controller: deviceController.getUsage,
+    },
     'get /api/v1/device/duckdb_migration_state': {
       authenticated: true,
       controller: deviceController.getDuckDbMigrationState,

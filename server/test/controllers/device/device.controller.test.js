@@ -281,6 +281,28 @@ describe('GET /api/v1/device', () => {
   });
 });
 
+describe('GET /api/v1/device/usage', () => {
+  it('should get the dashboards and scenes using each device', async () => {
+    await db.Scene.create({
+      name: 'Scene using a device',
+      selector: 'scene-using-a-device',
+      icon: 'fe fe-bell',
+      actions: [[{ type: 'device.set-value', device_feature: 'test-device-feature', value: 1 }]],
+      triggers: [],
+    });
+    await authenticatedRequest
+      .get('/api/v1/device/usage')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('test-device');
+        expect(res.body['test-device']).to.have.property('dashboards');
+        expect(res.body['test-device'].scenes).to.have.lengthOf(1);
+        expect(res.body['test-device'].scenes[0]).to.have.property('selector', 'scene-using-a-device');
+      });
+  });
+});
+
 describe('GET /api/v1/device/duckdb_migration_state', () => {
   it('should get duck db migration state', async () => {
     await authenticatedRequest

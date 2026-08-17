@@ -1091,6 +1091,29 @@ const data = {
       selector: 'kitchen'
     }
   ],
+  // Where each device is used. Devices missing from this object are used
+  // nowhere: here, the main lamp is on the "Home" dashboard and triggers the
+  // "Wake Up" scene, while the unassigned sensor is used nowhere
+  'get /api/v1/device/usage': {
+    'main-lamp': {
+      dashboards: [
+        {
+          id: '329897d2-0620-458c-addf-4009ff5bc205',
+          name: 'Home',
+          selector: 'home',
+          type: 'main'
+        }
+      ],
+      scenes: [
+        {
+          id: '5f515235-2a00-45f7-993f-cb24b463feec',
+          name: 'Wake Up',
+          selector: 'wake-up',
+          icon: 'fe fe-bell'
+        }
+      ]
+    }
+  },
   'get /api/v1/device_feature/states_history': [
     {
       value: 1,
