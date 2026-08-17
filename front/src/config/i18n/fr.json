@@ -840,6 +840,7 @@
         "actionError": "Une erreur s'est produite lors de l'exécution de cette action.",
         "uninstallError": "Une erreur s'est produite lors de la désinstallation de cette intégration.",
         "updateAvailableText": "Une nouvelle version de cette intégration est disponible.",
+        "updateAvailableVersionText": "Une nouvelle version de cette intégration est disponible : v{{latestVersion}} (installée : v{{currentVersion}}).",
         "updateSuccessText": "Intégration mise à jour en version {{version}}.",
         "alreadyUpToDateText": "L'intégration est déjà à jour (version {{version}}) : l'image Docker a été re-téléchargée et le conteneur recréé.",
         "statusLabel": "Statut",
