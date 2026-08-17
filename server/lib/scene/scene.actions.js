@@ -25,7 +25,7 @@ const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
-const { AbortScene } = require('../../utils/coreErrors');
+const { AbortScene, SceneStopped } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
@@ -313,7 +313,30 @@ const actionsFunc = {
 
     logger.debug(`Delay: Wait ${timeToWaitMilliseconds} milliseconds.`);
 
-    await Promise.delay(timeToWaitMilliseconds);
+    const { abortSignal } = scope;
+    // Abortable wait: resolves after the delay, or rejects immediately if the
+    // scene is stopped while waiting (so a long "delay" can be interrupted).
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(resolve, timeToWaitMilliseconds);
+      if (!abortSignal) {
+        return;
+      }
+      // An already-aborted signal never fires its 'abort' listeners, so re-check
+      // before subscribing.
+      if (abortSignal.aborted) {
+        clearTimeout(timer);
+        reject(new SceneStopped('SCENE_STOPPED'));
+        return;
+      }
+      abortSignal.addEventListener(
+        'abort',
+        () => {
+          clearTimeout(timer);
+          reject(new SceneStopped('SCENE_STOPPED'));
+        },
+        { once: true },
+      );
+    });
   },
 
   [ACTIONS.SCENE.START]: async (self, action, scope) => {
@@ -324,8 +347,11 @@ const actionsFunc = {
       return;
     }
     // we clone the scope so that the new scene is not polluting
-    // other scenes writing on the same scope: it needs to be a fresh object
-    self.execute(action.scene, cloneDeep(scope));
+    // other scenes writing on the same scope: it needs to be a fresh object.
+    // The signal is dropped rather than deep-cloned, execute() gives the child
+    // its own.
+    const { abortSignal, ...scopeToClone } = scope;
+    self.execute(action.scene, cloneDeep(scopeToClone));
   },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text, {
@@ -740,12 +766,20 @@ const actionsFunc = {
       };
     });
 
+    // The list of events is an array of objects, so injecting it directly in a message gives
+    // an unreadable result. A ready-to-use multi-line list, with one line per event, is
+    // exposed as well so the events can be sent to the user without iterating over the array.
+    const textDetailed = eventsFormatted
+      .map((event) => (event.location ? `- ${event.summary} (${event.location})` : `- ${event.summary}`))
+      .join('\n');
+
     set(
       scope,
       path,
       {
         calendarEvents: {
           text: eventsFormatted.map((event) => event.summary).join(', '),
+          textDetailed,
           count: eventsFormatted.length,
           events: eventsFormatted,
         },
@@ -902,7 +936,7 @@ const actionsFunc = {
         );
         return true;
       } catch (e) {
-        if (e instanceof AbortScene) {
+        if (e instanceof AbortScene && !(e instanceof SceneStopped)) {
           return false;
         }
         throw e;
@@ -946,7 +980,7 @@ const actionsFunc = {
       );
       conditionsVerified = true;
     } catch (e) {
-      if (e instanceof AbortScene) {
+      if (e instanceof AbortScene && !(e instanceof SceneStopped)) {
         conditionsVerified = false;
       } else {
         throw e;

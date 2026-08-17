@@ -13,6 +13,7 @@ const {
   OperationalState,
   DishwasherAlarm,
   DishwasherMode,
+  DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -20,7 +21,7 @@ const {
   convertToGladysDevice,
   matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
-const { AC_MODE, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { AC_MODE, LOCK, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { MATTER_DISHWASHER_DEVICE_TYPE } = require('../../../../services/matter/utils/dishwasherMatterMapping');
 
 describe('Matter.convertToGladysDevice', () => {
@@ -31,19 +32,22 @@ describe('Matter.convertToGladysDevice', () => {
     productName: 'Test Product',
   };
 
-  it('should create a read-only binary feature for BooleanState cluster', async () => {
-    const clusterClient = {
-      id: BooleanState.Complete.id,
-      name: 'BooleanState',
-      endpointId: 1,
-    };
+  const buildBooleanStateDevice = (deviceTypes) => ({
+    name: 'Test Device',
+    number: 1,
+    getAllClusterClients: () => [
+      {
+        id: BooleanState.Complete.id,
+        name: 'BooleanState',
+        endpointId: 1,
+      },
+    ],
+    getChildEndpoints: () => [],
+    ...(deviceTypes ? { getDeviceTypes: () => deviceTypes } : {}),
+  });
 
-    const device = {
-      name: 'Test Device',
-      number: 1,
-      getAllClusterClients: () => [clusterClient],
-      getChildEndpoints: () => [],
-    };
+  it('should create a read-only binary feature for BooleanState cluster', async () => {
+    const device = buildBooleanStateDevice();
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
 
@@ -59,6 +63,56 @@ describe('Matter.convertToGladysDevice', () => {
       min: 0,
       max: 1,
     });
+  });
+
+  it('should create a leak sensor feature for a BooleanState cluster on a water leak detector', async () => {
+    const device = buildBooleanStateDevice([{ name: 'MA-waterleakdetector', code: 0x0043 }]);
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'BooleanState - 1',
+      selector: matterExternalIdToSelector('matter:12345:1:69'),
+      category: 'leak-sensor',
+      type: 'binary',
+      read_only: true,
+      has_feedback: true,
+      external_id: 'matter:12345:1:69',
+      min: 0,
+      max: 1,
+    });
+  });
+
+  it('should create an opening sensor feature for a BooleanState cluster on a contact sensor', async () => {
+    const device = buildBooleanStateDevice([{ name: 'MA-contactsensor', code: 0x0015 }]);
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0].category).to.eq('opening-sensor');
+    expect(gladysDevice.features[0].type).to.eq('binary');
+    expect(gladysDevice.features[0].read_only).to.eq(true);
+  });
+
+  it('should create a rain sensor feature for a BooleanState cluster on a rain sensor', async () => {
+    const device = buildBooleanStateDevice([{ name: 'MA-rainsensor', code: 0x0044 }]);
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0].category).to.eq('rain-sensor');
+    expect(gladysDevice.features[0].type).to.eq('binary');
+  });
+
+  it('should fallback to a generic switch feature for a BooleanState cluster on an unknown device type', async () => {
+    const device = buildBooleanStateDevice([{ name: 'MA-waterfreezedetector', code: 0x0041 }]);
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0].category).to.eq('switch');
+    expect(gladysDevice.features[0].type).to.eq('binary');
   });
 
   it('should build stable selectors from external_id', async () => {
@@ -727,6 +781,47 @@ describe('Matter.convertToGladysDevice', () => {
         read_only: true,
         external_id: `matter:12345:1:${BooleanState.Complete.id}`,
       });
+    });
+  });
+
+  it('should create lock features for DoorLock cluster', async () => {
+    const clusterClient = {
+      id: DoorLock.Complete.id,
+      name: 'DoorLock',
+      endpointId: 1,
+    };
+
+    const device = {
+      name: 'Door Lock',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(2);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'DoorLock - 1 (Lock)',
+      selector: matterExternalIdToSelector('matter:12345:1:257:lock'),
+      category: 'lock',
+      type: 'binary',
+      read_only: false,
+      has_feedback: true,
+      external_id: 'matter:12345:1:257:lock',
+      min: LOCK.ACTION.UNLOCK,
+      max: LOCK.ACTION.LOCK,
+    });
+    expect(gladysDevice.features[1]).to.deep.equal({
+      name: 'DoorLock - 1 (State)',
+      selector: matterExternalIdToSelector('matter:12345:1:257:state'),
+      category: 'lock',
+      type: 'state',
+      read_only: true,
+      has_feedback: true,
+      external_id: 'matter:12345:1:257:state',
+      min: LOCK.STATE.UNLOCKED,
+      max: LOCK.STATE.ERROR,
     });
   });
 });
