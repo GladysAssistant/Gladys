@@ -1,5 +1,4 @@
 import { Text } from 'preact-i18n';
-import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import EditActions from './EditActions';
@@ -31,12 +30,15 @@ const EditDashboard = ({ children, ...props }) => (
                         <Text id="dashboard.editDashboardMyDashboards" />
                       </h3>
                       <div class="page-options d-flex">
-                        <Link
-                          href={`/dashboard/create/new?prev=${get(props, 'currentDashboard.selector')}`}
+                        {/* creation happens in the edit panel: the user never leaves the editor */}
+                        <button
+                          type="button"
+                          onClick={props.openNewDashboard}
                           class={cx('btn btn-sm btn-secondary', style.smallButtonOnBigScreen)}
+                          data-cy="new-dashboard-button"
                         >
                           <span>+</span>
-                        </Link>
+                        </button>
                       </div>
                     </div>
                     {props.currentDashboard && (

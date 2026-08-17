@@ -125,28 +125,32 @@ class EditDashboard extends Component {
   };
 
   openBoxSettings = (x, y) => {
-    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false });
+    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false, newDashboardOpen: false });
   };
 
   openDashboardSettings = () => {
-    this.setState({ dashboardSettingsOpen: true, editingBoxPosition: null });
+    this.setState({ dashboardSettingsOpen: true, editingBoxPosition: null, newDashboardOpen: false });
+  };
+
+  openNewDashboard = () => {
+    this.setState({ newDashboardOpen: true, editingBoxPosition: null, dashboardSettingsOpen: false });
   };
 
   closeEditPanel = () => {
-    this.setState({ editingBoxPosition: null, dashboardSettingsOpen: false });
+    this.setState({ editingBoxPosition: null, dashboardSettingsOpen: false, newDashboardOpen: false });
   };
 
   addBoxAndEdit = x => {
     // the new box lands at the end of column x: open its settings right away
     const y = this.state.currentDashboard.boxes[x].length;
     this.addBox(x);
-    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false });
+    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false, newDashboardOpen: false });
   };
 
   addBoxAtPositionAndEdit = (x, y) => {
     // addBoxAtPosition inserts after the box at y
     this.addBoxAtPosition(x, y);
-    this.setState({ editingBoxPosition: { x, y: y + 1 }, dashboardSettingsOpen: false });
+    this.setState({ editingBoxPosition: { x, y: y + 1 }, dashboardSettingsOpen: false, newDashboardOpen: false });
   };
 
   addBox = x => {
@@ -486,7 +490,8 @@ class EditDashboard extends Component {
       columnBoxNotEmptyError: null,
       isMobileReordering: false,
       editingBoxPosition: null,
-      dashboardSettingsOpen: false
+      dashboardSettingsOpen: false,
+      newDashboardOpen: false
     };
   }
 
@@ -516,7 +521,8 @@ class EditDashboard extends Component {
       savingNewDashboardList,
       isMobileReordering,
       editingBoxPosition,
-      dashboardSettingsOpen
+      dashboardSettingsOpen,
+      newDashboardOpen
     }
   ) {
     return (
@@ -537,11 +543,13 @@ class EditDashboard extends Component {
         moveCard={this.moveCard}
         openBoxSettings={this.openBoxSettings}
         openDashboardSettings={this.openDashboardSettings}
+        openNewDashboard={this.openNewDashboard}
         closeEditPanel={this.closeEditPanel}
         addBoxAndEdit={this.addBoxAndEdit}
         addBoxAtPositionAndEdit={this.addBoxAtPositionAndEdit}
         editingBoxPosition={editingBoxPosition}
         dashboardSettingsOpen={dashboardSettingsOpen}
+        newDashboardOpen={newDashboardOpen}
         addBox={this.addBox}
         addBoxAtPosition={this.addBoxAtPosition}
         removeBox={this.removeBox}

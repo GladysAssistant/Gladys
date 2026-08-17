@@ -39,8 +39,9 @@ body.dark-mode {
   filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */
 }
 
-/** Should not invert icon on dashboard **/
-.dark-mode .dashboard .fe {
+/** Should not invert icons on the glass dashboard and its editor **/
+.dark-mode .dashboard .fe,
+.dark-mode .glass-theme .fe {
   filter: none;
 }
 

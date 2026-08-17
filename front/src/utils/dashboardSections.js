@@ -20,6 +20,17 @@ const TILE_STRETCH_BOX_TYPES = [
 export const canBoxStretch = box =>
   box && (MEDIA_STRETCH_BOX_TYPES.includes(box.type) || TILE_STRETCH_BOX_TYPES.includes(box.type));
 
+// The house illustration keeps its aspect ratio: growing its card in the
+// middle of a column only opens a hole of empty glass between two widgets,
+// so it absorbs leftover height only when it sits at the bottom of its
+// column. Media boxes are not concerned — their image visually fills the
+// extra height wherever they sit — and value tiles share the leftover
+// height by design in all-tile columns.
+const LAST_ONLY_STRETCH_BOX_TYPES = [DASHBOARD_BOX_TYPE.HOUSE_VIEW];
+
+export const canBoxStretchAt = (box, isLastInColumn) =>
+  canBoxStretch(box) && (isLastInColumn || !LAST_ONLY_STRETCH_BOX_TYPES.includes(box.type));
+
 export const isTileStretchBox = box => box && TILE_STRETCH_BOX_TYPES.includes(box.type);
 
 // Value tiles (a number + a label) additionally become a size container when

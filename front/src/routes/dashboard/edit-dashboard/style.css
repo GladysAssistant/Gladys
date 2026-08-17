@@ -225,7 +225,9 @@
   .editPanel {
     left: 0;
     right: 0;
-    bottom: 0;
+    /* clear the fixed save/cancel footer, like the desktop panel does —
+       at bottom: 0 the footer bar hides the form's last field or button */
+    bottom: 3.5rem;
     max-height: 78vh;
     border-radius: 16px 16px 0 0;
   }
