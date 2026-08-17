@@ -149,8 +149,14 @@ never fires a session, and a bare `/claude` with no instruction is refused.
 
 **Who may run it:** only the logins listed in `COMMAND_ALLOWED_LOGINS`, at the
 top of the workflow (space-separated, matched case-insensitively; currently
-`Pierre-Gilles`). A refused command gets a 👎 reaction. To let someone else in,
-add their login there — and read the paragraph below first.
+`Pierre-Gilles`). To let someone else in, add their login there — and read the
+paragraph below first.
+
+A command from an allow-listed-adjacent account (an org `MEMBER` who is not in
+the list) gets a 👎 reaction. A command from anyone *outside* the organisation
+gets no feedback at all: the job-level `if` filters those authors before a
+runner is even allocated, since on a public repository anyone can comment on
+any PR and each one would otherwise cost runner minutes.
 
 An `author_association` check alone would **not** be equivalent, which is the
 whole reason the allow-list exists: `MEMBER` is granted to every member of the
@@ -181,10 +187,33 @@ branches. When one of those blocks the request, the workflow says so in the
 thread rather than failing silently — an explicit command that does nothing
 visible is the failure mode this whole workflow exists to remove.
 
-The session acknowledges with 👀 when the command is accepted and 🚀 once it
-is started, then always answers in the thread — including when it declined
-part of the request or could not make it work. There is no retry: nothing
-re-fires a dropped request, which is why the reply is mandatory in the prompt.
+**Acknowledgements.** A command in the PR conversation or on a diff line gets
+👀 when it is accepted and 🚀 once the session is started. A command in a
+*review body* gets neither: GitHub has no reaction endpoint for reviews, so
+that path posts a short "on it" comment instead — the point is that no accepted
+command is ever silent.
+
+**Answers go back where the command was written.** A command typed on a diff
+line is answered in that review thread, keeping the file and line context; a
+review body falls back to the PR conversation, as does a thread reply GitHub
+refuses (outdated or collapsed threads). This holds for the workflow's own
+refusals and for the session's answer alike.
+
+The session always answers — including when it declined part of the request or
+could not make it work. There is no retry: nothing re-fires a dropped request,
+which is why the reply is mandatory in the prompt.
+
+**The reply marker is a loop guard, not bookkeeping.** Every on-demand answer,
+whether posted by the workflow or by the session, must carry
+`<!-- Autofix-Request: <comment id> -->`, and the workflow skips any comment
+whose *unquoted* text contains an `Autofix-` marker. This is what stops a
+session's own reply from re-firing the workflow: sessions post under the
+routine owner's identity — a `User`, and the very login that types `/claude` —
+so neither the bot-author check nor the allow-list can tell an answer from a
+new command. The prompt also forbids a session from starting a line of its
+reply with `/claude`. Quoted lines are excluded from the marker check on
+purpose, so GitHub's "Quote reply" cannot swallow a command written under a
+quoted answer.
 
 Commits made this way carry an `Autofix-Request: <comment id>` trailer, never
 `Autofix-Pass: <n>`, so asking Claude something by hand **never eats into the
@@ -227,6 +256,17 @@ in a pull request first, then copy it to the routine's page, and keep the two
 in sync. **A new `mode` cannot work until the prompt on the routine's page has
 been updated** — the workflows only send the payload, the prompt is what knows
 what to do with it.
+
+**The prompt must stay backward compatible with the payload already in
+production**, because the two are deployed separately and never atomically: the
+prompt lives in a web UI, the payload in a workflow file. That is why a payload
+with **no `mode` field is treated as `"scheduled"`** — the cron sent exactly
+that before the field existed. Without that fallback, copying the prompt before
+the workflow change merged would have made every scheduled session stop on an
+unknown mode, silently killing the 3-hour cron: a `/claude` command that fires a
+no-op session is recoverable and visible, a cron that quietly does nothing is
+neither. Keep this rule when adding a mode: teach the prompt the new payload
+first, deploy it, then ship the workflow that sends it.
 
 ## Decommissioning the event-driven mode (merge prerequisite)
 
@@ -289,3 +329,11 @@ On demand (`/claude`):
 - The command works only on `claude/`-prefixed branches of this repository,
   so it cannot help on a fork PR or on a human's own branch — same push
   constraint as the cron.
+- Answering inside a review thread can mark that thread handled **for the
+  cron**: it treats any in-thread reply by an `AUTOFIX_ACTOR_LOGINS` account
+  (`github-actions[bot]` included) as "handled", by author and not by marker.
+  So a `/claude` typed as an inline reply under a *review-bot* finding, then
+  refused by the workflow, leaves that finding out of the cron's selection. It
+  is self-correcting in practice — the refusal says what was wrong with the
+  command, and retyping it properly gets the finding fixed by a session — but
+  resolve or re-check such a thread by hand if you abandon the request.
