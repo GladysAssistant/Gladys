@@ -185,10 +185,20 @@ async function create(device) {
               id: matchedFeature.id,
             },
           });
+          // The purge below is a background JOB: a t_job row, several DuckDB &
+          // SQLite counts and their websocket broadcasts, per feature. It is only
+          // worth running when the feature JUST stopped keeping history. A feature
+          // already saved with keep_history = false has nothing left to purge
+          // (device.saveState / device.saveHistoricalState never write a state for
+          // it), so re-purging it on every save was pure background load: a user
+          // assigning a room to one device after another queued one such job per
+          // keep_history = false feature per save, and those jobs pile up behind the
+          // single DuckDB connection until the whole instance stops responding.
+          const keepHistoryBeforeUpdate = deviceFeature.keep_history;
           const featureToUpdate = { ...feature };
           delete featureToUpdate.selector;
           await deviceFeature.update(featureToUpdate, { transaction });
-          if (deviceFeature.keep_history === false) {
+          if (keepHistoryBeforeUpdate !== false && deviceFeature.keep_history === false) {
             deviceFeaturesIdsToPurge.push(deviceFeature.id);
           }
           return deviceFeature.get({ plain: true });
