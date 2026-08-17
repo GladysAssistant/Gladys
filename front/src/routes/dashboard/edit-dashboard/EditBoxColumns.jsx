@@ -62,6 +62,35 @@ const EditBoxColumns = ({ children, ...props }) => (
             <div class={style.section}>
               <div class={style.sectionHeader}>
                 <Text id="dashboard.boxes.section" fields={{ index: sectionIndex + 1 }} />
+                {/* one-step reorder arrows: dragging a whole section would be hell */}
+                {props.sectionSizes.length > 1 && (
+                  <span class={style.sectionActions}>
+                    <Localizer>
+                      <button
+                        type="button"
+                        class={style.previewButton}
+                        disabled={sectionIndex === 0}
+                        onClick={() => props.moveSection(sectionIndex, -1)}
+                        data-cy={`move-section-up-${sectionIndex}`}
+                        title={<Text id="dashboard.editorMoveSectionUp" />}
+                      >
+                        <i class="fe fe-arrow-up" />
+                      </button>
+                    </Localizer>
+                    <Localizer>
+                      <button
+                        type="button"
+                        class={style.previewButton}
+                        disabled={sectionIndex === props.sectionSizes.length - 1}
+                        onClick={() => props.moveSection(sectionIndex, 1)}
+                        data-cy={`move-section-down-${sectionIndex}`}
+                        title={<Text id="dashboard.editorMoveSectionDown" />}
+                      >
+                        <i class="fe fe-arrow-down" />
+                      </button>
+                    </Localizer>
+                  </span>
+                )}
               </div>
               <div class={cx('d-flex align-items-start', style.columnsCard)}>
                 {sectionColumns.map((column, columnIndex) => {

@@ -326,6 +326,8 @@
     "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer, utilisez les boutons + pour ajouter widgets, colonnes ou sections. Glissez les widgets pour les déplacer — sur mobile, utilisez les flèches.",
     "editorDashboardSettingsButton": "Réglages du tableau de bord",
     "editorDashboardSettings": "Réglages du tableau de bord",
+    "editorMoveSectionUp": "Monter la section",
+    "editorMoveSectionDown": "Descendre la section",
     "editorNewWidget": "Nouveau widget",
     "editorNewWidgetPlaceholder": "Choisissez un widget dans le panneau",
     "reorderDashboardButton": "Re-ordonner",

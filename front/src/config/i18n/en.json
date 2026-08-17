@@ -326,6 +326,8 @@
     "editDashboardExplanation": "This is your real dashboard: tap a widget to edit it, use the + buttons to add widgets, columns or sections. Drag widgets to move them — on mobile, use the arrows.",
     "editorDashboardSettingsButton": "Dashboard settings",
     "editorDashboardSettings": "Dashboard settings",
+    "editorMoveSectionUp": "Move the section up",
+    "editorMoveSectionDown": "Move the section down",
     "editorNewWidget": "New widget",
     "editorNewWidgetPlaceholder": "Choose a widget in the panel",
     "reorderDashboardButton": "Re-order dashboards",

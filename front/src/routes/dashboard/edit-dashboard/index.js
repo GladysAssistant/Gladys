@@ -387,6 +387,27 @@ class EditDashboard extends Component {
     this.setState({ ...newState, boxNotEmptyError: false, hasUnsavedChanges: true });
   };
 
+  // Sections reorder with one-step arrows — dragging a whole section
+  // across the canvas would be miserable, especially on mobile
+  moveSection = (sectionIndex, direction) => {
+    const { sectionSizes, currentDashboard } = this.state;
+    const target = sectionIndex + direction;
+    if (target < 0 || target >= sectionSizes.length) {
+      return;
+    }
+    const sections = buildSections(currentDashboard.boxes, sectionSizes);
+    [sections[sectionIndex], sections[target]] = [sections[target], sections[sectionIndex]];
+    const { columns, sectionSizes: newSectionSizes } = flattenSections(sections);
+    this.setState({
+      currentDashboard: { ...currentDashboard, boxes: columns },
+      sectionSizes: newSectionSizes,
+      boxNotEmptyError: false,
+      // global column coordinates shifted: never point the panel at a stale box
+      editingBoxPosition: null,
+      hasUnsavedChanges: true
+    });
+  };
+
   addSection = () => {
     const newState = update(this.state, {
       currentDashboard: {
@@ -585,6 +606,7 @@ class EditDashboard extends Component {
         isMobileReordering={isMobileReordering}
         addColumn={this.addColumn}
         addSection={this.addSection}
+        moveSection={this.moveSection}
         sectionSizes={sectionSizes}
         deleteCurrentColumn={this.deleteCurrentColumn}
         boxNotEmptyError={boxNotEmptyError}

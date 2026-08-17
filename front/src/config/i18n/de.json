@@ -326,6 +326,8 @@
     "editDashboardExplanation": "Das ist dein echtes Dashboard: Tippe auf ein Widget, um es zu bearbeiten, nutze die +-Buttons für Widgets, Spalten oder Abschnitte. Ziehe Widgets zum Verschieben — auf dem Handy nutze die Pfeile.",
     "editorDashboardSettingsButton": "Dashboard-Einstellungen",
     "editorDashboardSettings": "Dashboard-Einstellungen",
+    "editorMoveSectionUp": "Abschnitt nach oben verschieben",
+    "editorMoveSectionDown": "Abschnitt nach unten verschieben",
     "editorNewWidget": "Neues Widget",
     "editorNewWidgetPlaceholder": "Wähle ein Widget im Panel",
     "reorderDashboardButton": "Dashboards neu anordnen",

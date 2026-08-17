@@ -292,6 +292,10 @@
 }
 
 .sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -299,6 +303,11 @@
   color: #9aa0ac;
   margin-bottom: 0.5rem;
   padding-left: 8px;
+}
+
+.sectionActions {
+  display: inline-flex;
+  gap: 4px;
 }
 
 .column {
