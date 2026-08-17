@@ -110,6 +110,19 @@
   min-width: 0;
 }
 
+/* On small screens the summary moves to its own line below the title,
+   so the title keeps the full width and stays readable */
+@media (max-width: 767.98px) {
+  .stepCardTitle {
+    flex-wrap: wrap;
+    row-gap: 0.125rem;
+  }
+
+  .stepSummary {
+    flex-basis: 100%;
+  }
+}
+
 .parallelLink {
   font-size: 0.8125rem;
 }
