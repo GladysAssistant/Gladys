@@ -97,11 +97,12 @@
     "allRooms": "All rooms",
     "noRoom": "No room",
     "allIntegrations": "All integrations",
+    "nativeIntegrations": "Native integrations",
+    "communityIntegrations": "Community integrations",
     "device": "Device",
     "room": "Room",
     "integration": "Integration",
     "features": "Features",
-    "openInIntegration": "Open in integration",
     "emptyState": "No device found. Add devices from the integrations page, or adjust your search and filters.",
     "emptyStateButton": "Browse integrations",
     "error": "There was an error loading the devices. Please try again later."
