@@ -1,8 +1,10 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { useRef, useState } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
 import cx from 'classnames';
 import get from 'get-value';
+
+import { wrapEmojisJSX } from '../../utils/emojiWrapper';
 
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
@@ -97,9 +99,27 @@ const BaseEditBox = ({ children, ...props }) => {
           </a>
           {displayMoveToDashboard && (
             <div class="dropdown">
-              <a onClick={toggleMoveToDashboard} class="card-options-remove">
-                <i class="fe fe-corner-up-right mr-2" />
-              </a>
+              <Localizer>
+                <button
+                  type="button"
+                  onClick={toggleMoveToDashboard}
+                  class="card-options-remove"
+                  aria-label={<Text id="dashboard.moveBoxToDashboard.title" />}
+                  // .card-options only styles anchors, so a native button needs the same look
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    marginLeft: '0.5rem',
+                    minWidth: '1rem',
+                    fontSize: '1rem',
+                    color: '#9aa0ac',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <i style={{ verticalAlign: 'middle' }} class="fe fe-corner-up-right mr-2" />
+                </button>
+              </Localizer>
               <div
                 class={cx('dropdown-menu', 'dropdown-menu-right', {
                   show: moveToDashboardOpened
@@ -109,9 +129,14 @@ const BaseEditBox = ({ children, ...props }) => {
                   <Text id="dashboard.moveBoxToDashboard.title" />
                 </span>
                 {otherDashboards.map(dashboard => (
-                  <a class="dropdown-item" onClick={() => moveBoxToDashboard(dashboard.selector)}>
-                    {dashboard.name}
-                  </a>
+                  <button
+                    key={dashboard.selector}
+                    type="button"
+                    class="dropdown-item"
+                    onClick={() => moveBoxToDashboard(dashboard.selector)}
+                  >
+                    {wrapEmojisJSX(dashboard.name)}
+                  </button>
                 ))}
               </div>
             </div>

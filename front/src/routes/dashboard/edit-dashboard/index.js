@@ -62,6 +62,9 @@ class EditDashboard extends Component {
   };
 
   init = async () => {
+    // Pending moves belong to the dashboard being edited: switching to another
+    // dashboard discards them, like the other unsaved edits.
+    await this.setState({ boxesToMove: [] });
     await this.getDashboards();
     if (this.state.currentDashboardSelector) {
       await this.getCurrentDashboard();
