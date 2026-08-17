@@ -236,9 +236,31 @@ class Dashboard extends Component {
     this.checkIfFullScreenParameterIsHere();
   }
 
+  // Client-side dashboard switch: the dashboard list is already loaded, so
+  // only the current dashboard is fetched — and the page keeps showing the
+  // previous dashboard until the new one arrives, instead of blanking
+  // everything behind the loading dimmer (which felt like a full reload)
+  switchToDashboardFromUrl = async () => {
+    const { dashboards } = this.state;
+    if (!dashboards || dashboards.length === 0) {
+      return this.init();
+    }
+    const selector = this.props.dashboardSelector || dashboards[0].selector;
+    await this.setState({ currentDashboardSelector: selector });
+    try {
+      const currentDashboard = await this.props.httpClient.get(`/api/v1/dashboard/${selector}`);
+      // ignore a stale response if the user switched again in the meantime
+      if (this.state.currentDashboardSelector === selector) {
+        this.setState({ currentDashboard });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   componentDidUpdate(prevProps) {
     if (prevProps.currentUrl !== this.props.currentUrl) {
-      this.init();
+      this.switchToDashboardFromUrl();
     }
   }
 

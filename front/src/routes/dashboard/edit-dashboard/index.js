@@ -62,7 +62,8 @@ class EditDashboard extends Component {
       this.setState({
         currentDashboard: { ...currentDashboard, boxes: columns },
         sectionSizes,
-        loading: false
+        loading: false,
+        hasUnsavedChanges: false
       });
     } catch (e) {
       this.setState({
@@ -113,7 +114,7 @@ class EditDashboard extends Component {
       }
     });
     // any structural change closes the edit panel so it never points at a stale position
-    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null });
+    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
   };
 
   moveBoxUp = (x, y) => {
@@ -163,7 +164,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   addBoxAtPosition = (x, y) => {
@@ -176,7 +177,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   removeBox = async (x, y) => {
@@ -189,7 +190,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null });
+    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
   };
 
   updateCurrentDashboardName = e => {
@@ -200,7 +201,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   updateCurrentDashboardVisibility = e => {
@@ -211,7 +212,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   updateCurrentDashboardProperty = (property, value) => {
@@ -222,7 +223,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   updateBoxConfig = (x, y, data) => {
@@ -238,7 +239,7 @@ class EditDashboard extends Component {
           }
         }
       });
-      return { ...newState, boxNotEmptyError: false };
+      return { ...newState, boxNotEmptyError: false, hasUnsavedChanges: true };
     });
   };
 
@@ -261,7 +262,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   removeEmptyBoxes = async () => {
@@ -339,7 +340,8 @@ class EditDashboard extends Component {
         sectionSizes: newSectionSizes,
         loading: false,
         dashboards: updatedDashboards,
-        justSaved: true
+        justSaved: true,
+        hasUnsavedChanges: false
       });
       // stay in the editor so the user can chain edits: the save button
       // briefly turns into a confirmation instead of routing away
@@ -382,7 +384,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState({ ...newState, boxNotEmptyError: false });
+    this.setState({ ...newState, boxNotEmptyError: false, hasUnsavedChanges: true });
   };
 
   addSection = () => {
@@ -396,7 +398,7 @@ class EditDashboard extends Component {
         $push: [1]
       }
     });
-    this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null });
+    this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
   };
 
   deleteCurrentColumn = async x => {
@@ -420,7 +422,7 @@ class EditDashboard extends Component {
                 }
               }
       });
-      await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null });
+      await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
     } else {
       this.setState({
         boxNotEmptyError: true,
@@ -496,7 +498,8 @@ class EditDashboard extends Component {
       editingBoxPosition: null,
       dashboardSettingsOpen: false,
       newDashboardOpen: false,
-      justSaved: false
+      justSaved: false,
+      hasUnsavedChanges: false
     };
   }
 
@@ -532,7 +535,8 @@ class EditDashboard extends Component {
       editingBoxPosition,
       dashboardSettingsOpen,
       newDashboardOpen,
-      justSaved
+      justSaved,
+      hasUnsavedChanges
     }
   ) {
     return (
@@ -566,6 +570,7 @@ class EditDashboard extends Component {
         updateNewSelectedBox={this.updateNewSelectedBox}
         saveDashboard={this.saveDashboard}
         justSaved={justSaved}
+        hasUnsavedChanges={hasUnsavedChanges}
         updateBoxConfig={this.updateBoxConfig}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
         updateCurrentDashboardVisibility={this.updateCurrentDashboardVisibility}

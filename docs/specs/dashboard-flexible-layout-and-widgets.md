@@ -64,7 +64,8 @@ The edit mode keeps the current interaction model, per section: an "Add a sectio
 - **dashboard creation** also happens in the panel (`NewDashboardForm`, opened by the "+" of the dashboard list): the user never leaves the editor, and on success the editor routes to the new dashboard's edit page. The standalone `/dashboard/create/new` page remains only for the no-dashboard empty state, on the same Horizon glass scene;
 - the separate **mobile reorder mode** is removed: the ↑/↓ affordances and the panel cover reordering on mobile without drag & drop;
 - the canvas sits directly on the Horizon scene (no wrapping card), so editing looks like the dashboard being edited;
-- **saving keeps the user in the editor**: the save button briefly turns into a "saved" confirmation instead of routing back to the dashboard, so edits can be chained (save, keep tweaking, save again). Leaving is explicit — cancel, or any navigation.
+- **saving keeps the user in the editor**: the save button briefly turns into a "saved" confirmation instead of routing back to the dashboard, so edits can be chained (save, keep tweaking, save again);
+- **the footer adapts to the unsaved state** (`hasUnsavedChanges`): with nothing to save it shows **Done** (leaves the editor) next to Delete; as soon as something changes it becomes **Cancel** (discard & leave) / Delete / **Save**. Exiting never hides behind a "Cancel" label when there is nothing to cancel.
 
 The container logic (flat columns + `sectionSizes`, `moveCard`, `addBox*`, `removeBox`, `updateBoxConfig`) is untouched — v2 is a rendering-layer rewrite, exactly what the A.2 data model was designed to allow. Cross-column moves on mobile use the drop zones' section stacking (columns stack vertically, ↑/↓ walk within a column); an explicit "move to column" control can be added to the panel later if real-world feedback asks for it.
 
@@ -203,6 +204,8 @@ A `theme` override (`auto`/`light`/`dark`) was considered and **deferred**: the 
   - **mobile** (< 768px): only the active pill keeps its name, the others shrink to icon dots so more fit before the overflow kicks in;
   - **tablet mode** (the `tabletMode` store flag, fed by `session.tablet_mode`): compact icon-only dock (current dashboard highlighted, `home` as the fallback icon);
   - when the **current dashboard is one of the collapsed ones**, the "…" button shows its icon + name (active styling, chevron), so the context never disappears.
+- **Switching is a client-side swap, not a page reload**: tapping a pill only fetches the target dashboard (the list is already loaded) and the previous dashboard stays rendered until the new one arrives — no loading dimmer over the page. The dimmer is reserved for the first load.
+- **Header actions**: the wall-tablet configuration button is hidden on phones (configuring a wall tablet only makes sense on a tablet-sized screen), and on mobile all header actions are uniform icon pills (fullscreen, edit) so the row under the bar stays visually consistent.
 - Touch swipe between dashboards is a possible later complement to the pills (invisible affordance, needs a strict directional threshold to never steal vertical scroll or widget gestures); it does not replace them.
 
 ## Phases

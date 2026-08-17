@@ -45,8 +45,13 @@ const DashboardPage = ({ children, ...props }) => {
                   </div>
 
                   <div class="page-options d-flex align-content-between flex-wrap">
+                    {/* configuring a wall tablet only makes sense on a tablet-sized
+                        screen: hidden on phones */}
                     {!props.isGladysPlus && (
-                      <button onClick={props.toggleDefineTabletMode} class={cx('btn btn-outline-secondary ml-2')}>
+                      <button
+                        onClick={props.toggleDefineTabletMode}
+                        class={cx('btn btn-outline-secondary ml-2 d-none d-md-inline-block')}
+                      >
                         <span class={style.editDashboardText}>
                           {props.defineTabletModeOpened ? (
                             <Text id="dashboard.closeDefineTabletMode" />
@@ -60,13 +65,13 @@ const DashboardPage = ({ children, ...props }) => {
                     {!props.dashboardNotConfigured &&
                       props.browserFullScreenCompatible &&
                       !props.hideExitFullScreenButton && (
-                        <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2 btn-sm')}>
-                          <span>
+                        <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2')}>
+                          <span class={style.editDashboardText}>
                             {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
-                            {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
-                            {!props.fullScreen && <i class="fe fe-maximize-2" />}
-                            {props.fullScreen && <i class="fe fe-minimize-2" />}
-                          </span>
+                            {props.fullScreen && <Text id="dashboard.disableFullScreen" />}
+                          </span>{' '}
+                          {!props.fullScreen && <i class="fe fe-maximize-2" />}
+                          {props.fullScreen && <i class="fe fe-minimize-2" />}
                         </button>
                       )}
                     {props.currentDashboard && !props.hideExitFullScreenButton && (
