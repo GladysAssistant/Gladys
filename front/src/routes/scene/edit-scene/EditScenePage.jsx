@@ -22,7 +22,7 @@ const EditScenePage = ({ children, ...props }) => {
       <div class="page-main">
         <div class="my-3 my-md-5">
           <AutoScrollMobile position="top" box_type={props.actionsGroupTypes} />
-          <div class="container mb-8">
+          <div class={cx('container', style.pageContainer)}>
             <div class="mb-4">
               <div class="row justify-content-between">
                 <div class="col-8">

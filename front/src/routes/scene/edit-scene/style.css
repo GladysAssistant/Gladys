@@ -32,13 +32,12 @@
   }
 }
 
-
 .settings {
   opacity: 0;
   max-height: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, max-height 0.3s ease;
-  padding: 0rem
+  padding: 0rem;
 }
 
 .settingsOpen {
@@ -46,6 +45,11 @@
   opacity: 1;
   max-height: 1000px;
   padding: 1.5rem 1.5rem;
+}
+
+/* Keeps the last step (the "add a step" button) clear of the sticky footer */
+.pageContainer {
+  padding-bottom: 6rem;
 }
 
 .pageTitle {
