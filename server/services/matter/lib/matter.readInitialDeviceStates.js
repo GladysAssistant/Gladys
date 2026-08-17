@@ -18,6 +18,7 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  ActivatedCarbonFilterMonitoring,
   FanControl,
   RvcOperationalState,
   RvcRunMode,
@@ -268,6 +269,12 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
   if (hepaFilterMonitoring) {
     const value = await safeReadAttribute(() => hepaFilterMonitoring.getConditionAttribute());
     emitState(`matter:${nodeId}:${devicePath}:${HepaFilterMonitoring.Complete.id}`, value);
+  }
+
+  const activatedCarbonFilterMonitoring = device.getClusterClientById(ActivatedCarbonFilterMonitoring.Complete.id);
+  if (activatedCarbonFilterMonitoring) {
+    const value = await safeReadAttribute(() => activatedCarbonFilterMonitoring.getConditionAttribute());
+    emitState(`matter:${nodeId}:${devicePath}:${ActivatedCarbonFilterMonitoring.Complete.id}`, value);
   }
 
   const fanControl = device.getClusterClientById(FanControl.Complete.id);

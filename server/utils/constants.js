@@ -824,6 +824,14 @@ const DEVICE_FEATURE_CATEGORIES = {
   FAN: 'fan',
   GRID_SENSOR: 'grid-sensor',
   HEATER: 'heater',
+  // Air filter monitoring, holding the remaining life of the filters of an air treatment appliance
+  // in percent (100 = new, 0 = to be replaced), following the Matter Resource Monitoring model.
+  // One type per filter media (HEPA, activated carbon...) so an appliance carrying several physical
+  // filters publishes one feature per filter. Boundary with `maintenance`: every consumable or wear
+  // part that is not an air filter (vacuum brushes, dust bags, mop pads, resin...) goes to
+  // `maintenance`. The value stays kept here even for appliances whose HEPA and carbon media are
+  // combined in a single cartridge: they simply expose the single type their protocol reports.
+  // The `hepa-` prefix predates activated carbon support and is kept: renaming would be breaking.
   HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
   HOME_OUTPUT_SENSOR: 'home-output-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
@@ -1334,8 +1342,13 @@ const DEVICE_FEATURE_TYPES = {
     TIRE_PRESSURE: 'tire-pressure', // Tire pressure in bar (decimal - sensor)
     WINDOW_OPENED: 'window-opened', // Window open state (binary - sensor)
   },
+  // Air filter monitoring, one type per filter media so a purifier carrying several physical
+  // filters exposes one feature per filter instead of two indistinguishable ones. All types hold
+  // the same quantity: the remaining life of the filter in percent, 100 = new, 0 = to be replaced
+  // (Matter Resource Monitoring `Condition` attribute, whose degradation direction is "down").
   FILTER_MONITORING: {
     FILTER_LIFE_REMAINING: 'filter-life-remaining', // Remaining life of the HEPA filter in percent (integer - sensor)
+    ACTIVATED_CARBON_FILTER_LIFE_REMAINING: 'activated-carbon-filter-life-remaining', // Remaining life of the activated carbon filter in percent (integer - sensor)
   },
   MAINTENANCE: {
     LIFE_REMAINING: 'life-remaining', // Remaining life of a consumable/wear part in percent (integer - sensor)

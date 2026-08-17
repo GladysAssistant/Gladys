@@ -19,6 +19,7 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  ActivatedCarbonFilterMonitoring,
   FanControl,
   RvcOperationalState,
   RvcRunMode,
@@ -769,6 +770,23 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:113',
       state: 75,
+    });
+  });
+  it('should listen to state change (ActivatedCarbonFilterMonitoring)', async () => {
+    const clusterClient = {
+      id: ActivatedCarbonFilterMonitoring.Complete.id,
+      addConditionAttributeListener: (callback) => {
+        callback(73); // 73% activated carbon filter life remaining
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:114',
+      state: 73,
     });
   });
   it('should listen to state change (FanControl)', async () => {
