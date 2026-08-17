@@ -23,11 +23,13 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
+const { matterLockStateToGladys, matterLockStateToGladysBinary } = require('../utils/doorLockMatterMapping');
 const { matterSystemModeToGladysAcMode } = require('../utils/thermostatMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE } = require('../../../utils/constants');
@@ -350,6 +352,17 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
         cleanModeExternalId,
         convertMatterCleanModeToGladys(value, this.supportedModesMap.get(cleanModeExternalId)),
       );
+    }
+  }
+
+  const doorLock = device.getClusterClientById(DoorLock.Complete.id);
+  if (doorLock) {
+    const value = await safeReadAttribute(() => doorLock.getLockStateAttribute());
+    if (value !== undefined) {
+      const doorLockExternalId = `matter:${nodeId}:${devicePath}:${DoorLock.Complete.id}`;
+      emitState(`${doorLockExternalId}:state`, matterLockStateToGladys(value));
+      // A transient/unknown lock state resolves to null and is skipped by emitState
+      emitState(`${doorLockExternalId}:lock`, matterLockStateToGladysBinary(value));
     }
   }
 

@@ -24,11 +24,13 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
+const { matterLockStateToGladys, matterLockStateToGladysBinary } = require('../utils/doorLockMatterMapping');
 const { matterSystemModeToGladysAcMode } = require('../utils/thermostatMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
@@ -640,6 +642,29 @@ async function listenToStateChange(nodeId, devicePath, device) {
         device_feature_external_id: cleanModeExternalId,
         state: gladysMode,
       });
+    });
+  }
+
+  const doorLock = device.getClusterClientById(DoorLock.Complete.id);
+  if (doorLock && !this.stateChangeListeners.has(doorLock)) {
+    logger.debug(`Matter: Adding state change listener for DoorLock cluster ${doorLock.name}`);
+    this.stateChangeListeners.add(doorLock);
+    const doorLockExternalId = `matter:${nodeId}:${devicePath}:${DoorLock.Complete.id}`;
+    // Subscribe to the lock state attribute changes
+    doorLock.addLockStateAttributeListener((value) => {
+      logger.debug(`Matter: DoorLock lockState attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `${doorLockExternalId}:state`,
+        state: matterLockStateToGladys(value),
+      });
+      const binaryState = matterLockStateToGladysBinary(value);
+      // A transient/unknown lock state has no binary equivalent, so we keep the last known one
+      if (binaryState !== null) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${doorLockExternalId}:lock`,
+          state: binaryState,
+        });
+      }
     });
   }
 
