@@ -152,7 +152,10 @@ async function setValue(gladysDevice, gladysFeature, value) {
     if (!doorLock) {
       throw new Error('Device does not support DoorLock cluster');
     }
-    const lockValue = Number(value);
+    // Number(null), Number('') and Number(false) all return 0, which would unlock the door:
+    // only a real number or the exact "0"/"1" strings are accepted as a lock command
+    const isBinaryCommandString = typeof value === 'string' && /^[01]$/.test(value);
+    const lockValue = typeof value === 'number' || isBinaryCommandString ? Number(value) : Number.NaN;
     if (lockValue === LOCK.ACTION.LOCK) {
       await doorLock.lockDoor({});
     } else if (lockValue === LOCK.ACTION.UNLOCK) {

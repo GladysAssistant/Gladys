@@ -1314,6 +1314,40 @@ describe('Matter.setValue', () => {
     await chaiAssert.isRejected(promise, 'Unsupported lock command value: 2');
   });
 
+  it('should lock a door lock with a string command value', async () => {
+    const clusterClients = new Map();
+    const doorLock = {
+      lockDoor: fake.resolves(null),
+      unlockDoor: fake.resolves(null),
+    };
+    clusterClients.set(DoorLock.Complete.id, doorLock);
+    matterHandler.nodesMap.set(12345n, buildLockNode(clusterClients));
+
+    await matterHandler.setValue(lockGladysDevice, lockGladysFeature, '1');
+
+    assert.calledOnceWithExactly(doorLock.lockDoor, {});
+    assert.notCalled(doorLock.unlockDoor);
+  });
+
+  [null, '', false, 'unlock'].forEach((invalidValue) => {
+    it(`should throw an error and send no command for the lock command value ${JSON.stringify(
+      invalidValue,
+    )}`, async () => {
+      const clusterClients = new Map();
+      const doorLock = {
+        lockDoor: fake.resolves(null),
+        unlockDoor: fake.resolves(null),
+      };
+      clusterClients.set(DoorLock.Complete.id, doorLock);
+      matterHandler.nodesMap.set(12345n, buildLockNode(clusterClients));
+
+      const promise = matterHandler.setValue(lockGladysDevice, lockGladysFeature, invalidValue);
+      await chaiAssert.isRejected(promise, 'Unsupported lock command value');
+      assert.notCalled(doorLock.lockDoor);
+      assert.notCalled(doorLock.unlockDoor);
+    });
+  });
+
   it('should throw an error when the DoorLock cluster is not available', async () => {
     const clusterClients = new Map();
     matterHandler.nodesMap.set(12345n, buildLockNode(clusterClients));
