@@ -42,6 +42,7 @@ const {
 const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
 const { getAcModeSupportedOptions } = require('./thermostatMatterMapping');
+const { getBooleanStateFeatureCategoryAndType } = require('./booleanStateMatterMapping');
 
 /**
  * @description Build a stable Gladys selector from a Matter external_id.
@@ -149,10 +150,14 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           max: 1,
         });
       } else if (clusterIndex === BooleanState.Complete.id) {
+        // The BooleanState cluster only exposes a raw boolean: the device type of the endpoint
+        // tells us if it's a water leak detector, a contact sensor, a rain sensor...
+        // When the device type is unknown, we fallback on a generic read-only switch.
+        const { category, type } = getBooleanStateFeatureCategoryAndType(device);
         gladysDevice.features.push({
           ...commonNewFeature,
-          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          category,
+          type,
           read_only: true,
           has_feedback: true,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,

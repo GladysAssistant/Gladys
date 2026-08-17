@@ -81,6 +81,9 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
     }
   }
 
+  // Same polarity for every Matter device type mapped in `utils/booleanStateMatterMapping.js`:
+  // 1 (STATE.ON) means leak detected / rain detected / contact closed, which matches the Gladys
+  // semantics of `leak-sensor`, `rain-sensor` and `opening-sensor`.
   const booleanState = device.getClusterClientById(BooleanState.Complete.id);
   if (booleanState) {
     const value = await safeReadAttribute(() => booleanState.getStateValueAttribute());

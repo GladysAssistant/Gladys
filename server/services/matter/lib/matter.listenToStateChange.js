@@ -65,6 +65,11 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
+  // The Gladys category of this feature depends on the Matter device type of the endpoint, see
+  // `utils/booleanStateMatterMapping.js`. The polarity of the StateValue attribute is the same for
+  // every device type we map: 1 (STATE.ON) means leak detected / rain detected / contact closed,
+  // which matches the Gladys semantics of `leak-sensor`, `rain-sensor` and `opening-sensor`
+  // (OPENING_SENSOR_STATE.CLOSE = 1, OPENING_SENSOR_STATE.OPEN = 0).
   const booleanState = device.getClusterClientById(BooleanState.Complete.id);
   if (booleanState && !this.stateChangeListeners.has(booleanState)) {
     logger.debug(`Matter: Adding state change listener for BooleanState cluster ${booleanState.name}`);
