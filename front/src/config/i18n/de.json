@@ -3092,6 +3092,7 @@
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
       "formulaHelp": {
+        "toggle": "Verfügbare Funktionen und Syntax",
         "operators": "Verfügbare Operatoren:",
         "functions": "Verfügbare Funktionen:",
         "constants": "Verfügbare Konstanten:",

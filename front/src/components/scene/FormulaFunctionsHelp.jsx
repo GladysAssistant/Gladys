@@ -10,24 +10,31 @@ const FUNCTIONS =
   'sin, cos, tan, asin, acos, atan, atan2';
 const CONSTANTS = 'pi, e, tau';
 
+// A native <details> keeps the reference collapsed by default so it costs one line in the action
+// box, and opens on click without any state or JS. It also stays keyboard-reachable for free.
 const FormulaFunctionsHelp = () => (
-  <div class={style.formulaHelp}>
-    <div>
-      <Text id="editScene.actionsCard.formulaHelp.operators" /> <code>{OPERATORS}</code>
+  <details class={style.formulaHelp}>
+    <summary class={style.summary}>
+      <Text id="editScene.actionsCard.formulaHelp.toggle" />
+    </summary>
+    <div class={style.content}>
+      <div>
+        <Text id="editScene.actionsCard.formulaHelp.operators" /> <code>{OPERATORS}</code>
+      </div>
+      <div>
+        <Text id="editScene.actionsCard.formulaHelp.functions" /> <code>{FUNCTIONS}</code>
+      </div>
+      <div>
+        <Text id="editScene.actionsCard.formulaHelp.constants" /> <code>{CONSTANTS}</code>
+      </div>
+      <div>
+        <Text id="editScene.actionsCard.formulaHelp.example" />
+      </div>
+      <div>
+        <Text id="editScene.actionsCard.formulaHelp.caveats" />
+      </div>
     </div>
-    <div>
-      <Text id="editScene.actionsCard.formulaHelp.functions" /> <code>{FUNCTIONS}</code>
-    </div>
-    <div>
-      <Text id="editScene.actionsCard.formulaHelp.constants" /> <code>{CONSTANTS}</code>
-    </div>
-    <div>
-      <Text id="editScene.actionsCard.formulaHelp.example" />
-    </div>
-    <div>
-      <Text id="editScene.actionsCard.formulaHelp.caveats" />
-    </div>
-  </div>
+  </details>
 );
 
 export default FormulaFunctionsHelp;

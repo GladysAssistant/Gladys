@@ -3092,6 +3092,7 @@
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "actionsCard": {
       "formulaHelp": {
+        "toggle": "Fonctions disponibles et syntaxe",
         "operators": "Opérateurs disponibles :",
         "functions": "Fonctions disponibles :",
         "constants": "Constantes disponibles :",

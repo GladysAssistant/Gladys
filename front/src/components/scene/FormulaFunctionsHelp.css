@@ -7,7 +7,17 @@
   margin-bottom: .375rem;
 }
 
-.formulaHelp code {
+/* Collapsed, the whole block is just this one clickable line. */
+.summary {
+  cursor: pointer;
+  user-select: none;
+}
+
+.content {
+  margin-top: .25rem;
+}
+
+.content code {
   background: none;
   padding: 0;
   overflow-wrap: anywhere;

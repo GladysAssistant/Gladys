@@ -3092,6 +3092,7 @@
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
       "formulaHelp": {
+        "toggle": "Available functions and syntax",
         "operators": "Available operators:",
         "functions": "Available functions:",
         "constants": "Available constants:",
