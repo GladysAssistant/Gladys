@@ -10,6 +10,7 @@ const {
   PowerSource,
   Thermostat,
   CarbonDioxideConcentrationMeasurement,
+  DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -17,7 +18,7 @@ const {
   convertToGladysDevice,
   matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
-const { AC_MODE } = require('../../../../utils/constants');
+const { AC_MODE, LOCK } = require('../../../../utils/constants');
 
 describe('Matter.convertToGladysDevice', () => {
   const serviceId = 'service-1';
@@ -545,5 +546,46 @@ describe('Matter.convertToGladysDevice', () => {
 
     const modeFeatures = gladysDevice.features.filter((feature) => feature.type === 'mode');
     expect(modeFeatures).to.have.lengthOf(0);
+  });
+
+  it('should create lock features for DoorLock cluster', async () => {
+    const clusterClient = {
+      id: DoorLock.Complete.id,
+      name: 'DoorLock',
+      endpointId: 1,
+    };
+
+    const device = {
+      name: 'Door Lock',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(2);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'DoorLock - 1 (Lock)',
+      selector: matterExternalIdToSelector('matter:12345:1:257:lock'),
+      category: 'lock',
+      type: 'binary',
+      read_only: false,
+      has_feedback: true,
+      external_id: 'matter:12345:1:257:lock',
+      min: LOCK.ACTION.UNLOCK,
+      max: LOCK.ACTION.LOCK,
+    });
+    expect(gladysDevice.features[1]).to.deep.equal({
+      name: 'DoorLock - 1 (State)',
+      selector: matterExternalIdToSelector('matter:12345:1:257:state'),
+      category: 'lock',
+      type: 'state',
+      read_only: true,
+      has_feedback: true,
+      external_id: 'matter:12345:1:257:state',
+      min: LOCK.STATE.UNLOCKED,
+      max: LOCK.STATE.ERROR,
+    });
   });
 });
