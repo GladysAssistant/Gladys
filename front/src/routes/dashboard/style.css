@@ -70,11 +70,12 @@
 }
 
 /* ==================================================================
-   "Horizon" glass theme — applied to the whole dashboard page when the
-   dashboard's card_style is 'glass'. Everything is driven by the tokens
-   below. Component-specific variants (chips, pins, tiles, clock,
-   scenes) live next to their component and compose on the same global
-   .glass-theme class.
+   "Horizon" glass theme — THE dashboard style, applied unconditionally
+   to the whole dashboard page (imposed, not chosen — Gladys ships the
+   best default). Everything is driven by the tokens below. Component
+   variants (chips, actions, pins, tiles, clock, scenes) live next to
+   their component and compose on the same global .glass-theme class,
+   kept as the single gate so the theme stays one coherent layer.
    Dark mode: the app darkens through the global inversion filter
    (style/dark-mode.css), so this theme deliberately defines NO dark
    colors — the light glass and its scene invert into their dark

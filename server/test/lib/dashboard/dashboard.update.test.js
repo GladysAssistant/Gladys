@@ -79,12 +79,10 @@ describe('dashboard.update', () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       icon: 'home',
       background_image: 'https://example.com/background.jpg',
-      card_style: 'glass',
       width: 'full',
     });
     expect(updatedDashboard).to.have.property('icon', 'home');
     expect(updatedDashboard).to.have.property('background_image', 'https://example.com/background.jpg');
-    expect(updatedDashboard).to.have.property('card_style', 'glass');
     expect(updatedDashboard).to.have.property('width', 'full');
   });
 
@@ -105,13 +103,6 @@ describe('dashboard.update', () => {
   it('should reject a non-http background image', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       background_image: 'javascript:alert(1)',
-    });
-    return assert.isRejected(promise);
-  });
-
-  it('should reject an unknown card style', async () => {
-    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
-      card_style: 'neon',
     });
     return assert.isRejected(promise);
   });

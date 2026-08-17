@@ -8,10 +8,6 @@ module.exports = {
       type: Sequelize.TEXT,
       allowNull: true,
     });
-    await queryInterface.addColumn('t_dashboard', 'card_style', {
-      type: Sequelize.STRING,
-      allowNull: true,
-    });
   },
   down: async () => {},
 };

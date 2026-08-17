@@ -5,7 +5,6 @@ const {
   DASHBOARD_BOX_TYPE_LIST,
   DASHBOARD_TYPE_LIST,
   DASHBOARD_VISIBILITY_LIST,
-  DASHBOARD_CARD_STYLE_LIST,
   DASHBOARD_WIDTH_LIST,
 } = require('../utils/constants');
 
@@ -200,13 +199,6 @@ module.exports = (sequelize, DataTypes) => {
               throw new Error('background_image must be an http(s) URL');
             }
           },
-        },
-      },
-      card_style: {
-        allowNull: true,
-        type: DataTypes.ENUM(DASHBOARD_CARD_STYLE_LIST),
-        validate: {
-          isIn: [DASHBOARD_CARD_STYLE_LIST],
         },
       },
       width: {

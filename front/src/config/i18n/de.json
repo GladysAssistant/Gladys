@@ -778,13 +778,8 @@
     },
     "editDashboardBackgroundImageLabel": "Hintergrundbild (optional)",
     "editDashboardBackgroundImagePlaceholder": "https://... URL eines Bildes",
-    "editDashboardCardStyleLabel": "Kartenstil",
     "editDashboardIconLabel": "Symbol (optional)",
     "editDashboardIconDescription": "Wird im Tablet-Modus in der Dashboard-Tab-Leiste angezeigt.",
-    "cardStyles": {
-      "default": "Standard",
-      "glass": "Glas (durchscheinend)"
-    },
     "editDashboardWidthLabel": "Dashboard-Breite",
     "widths": {
       "standard": "Standard (empfohlen)",

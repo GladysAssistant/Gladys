@@ -14,16 +14,14 @@ const DashboardPage = ({ children, ...props }) => {
   // anything but an http(s) URL into the CSS url() (JSON quoting escapes
   // quotes and backslashes, the scheme check closes the rest)
   const backgroundImage = rawBackgroundImage && /^https?:\/\//.test(rawBackgroundImage) ? rawBackgroundImage : null;
-  const glassCards = props.currentDashboard && props.currentDashboard.card_style === 'glass';
   const fullWidth = props.currentDashboard && props.currentDashboard.width === 'full';
   return (
     <div class="page">
+      {/* The Horizon glass theme is THE dashboard style — imposed, not chosen */}
       <div
-        class={cx('page-main', {
-          [style.dashboardBackground]: backgroundImage || glassCards,
-          // default glass scene, only when no background image is configured
-          [style.glassScene]: glassCards && !backgroundImage,
-          'glass-theme': glassCards
+        class={cx('page-main', 'glass-theme', style.dashboardBackground, {
+          // built-in scene, only when no background image is configured
+          [style.glassScene]: !backgroundImage
         })}
         style={backgroundImage ? `background-image: url(${JSON.stringify(backgroundImage)})` : undefined}
       >
