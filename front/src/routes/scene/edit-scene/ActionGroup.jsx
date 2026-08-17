@@ -70,7 +70,9 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
               </button>
             )}
 
-            {!props.firstActionGroup && !props.lastActionGroup && (
+            {/* The last action group is the empty one always kept at the end of a list,
+                so this also hides the button when this group is the only one. */}
+            {!props.lastActionGroup && (
               <button onClick={props.deleteThisActionGroup} class="btn btn-outline-danger">
                 <i class="fe fe-trash-2" />
               </button>

@@ -170,7 +170,6 @@ class ConditionIfElseThen extends Component {
                   triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
                   scene={props.scene}
-                  firstActionGroup={index === 0}
                   lastActionGroup={index === props.action.then.length - 1}
                 />
               ))}
@@ -220,7 +219,6 @@ class ConditionIfElseThen extends Component {
                   triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
                   scene={props.scene}
-                  firstActionGroup={index === 0}
                   lastActionGroup={index === props.action.else.length - 1}
                 />
               ))}

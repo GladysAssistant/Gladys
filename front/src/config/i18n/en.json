@@ -97,11 +97,12 @@
     "allRooms": "All rooms",
     "noRoom": "No room",
     "allIntegrations": "All integrations",
+    "nativeIntegrations": "Native integrations",
+    "communityIntegrations": "Community integrations",
     "device": "Device",
     "room": "Room",
     "integration": "Integration",
     "features": "Features",
-    "openInIntegration": "Open in integration",
     "emptyState": "No device found. Add devices from the integrations page, or adjust your search and filters.",
     "emptyStateButton": "Browse integrations",
     "error": "There was an error loading the devices. Please try again later."
@@ -621,7 +622,9 @@
         "error": "Error loading energy consumption data",
         "noData": "No energy consumption data available for this period",
         "showSubscriptionPrices": "Show subscription prices",
-        "showSubscriptionPricesDescription": "Display the monthly subscription cost alongside consumption data in the chart."
+        "showSubscriptionPricesDescription": "Display the monthly subscription cost alongside consumption data in the chart.",
+        "periodStartDay": "Billing period start day",
+        "periodStartDayDescription": "Day of the month your energy bill period starts on. The monthly and yearly views then run from this day to the same day of the next period (ex: from the 5th to the 5th), so they can be compared with your bill. If a month is shorter than this day, the period starts on the last day of that month."
       },
       "scene": {
         "editNameLabel": "Widget Name (optional)",
@@ -727,6 +730,13 @@
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
+      "noInstalledIntegrations": "No community integration is installed on this instance yet.",
+      "installedSummary": {
+        "title": {
+          "one": "1 community integration installed on this instance.",
+          "other": "{{count}} community integrations installed on this instance."
+        }
+      },
       "noSearchResults": "No integration matching \"{{searchKeyword}}\" was found.",
       "noSearchResultsSuggestion": "Your device may be supported by a community <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">external integration</a> — the recommended way to add new compatibilities. And if it doesn't exist yet, you can <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">easily create your own</a>!",
       "refreshStore": {
@@ -746,6 +756,7 @@
       "menu": {
         "all": "All integrations",
         "favorites": "Favorites",
+        "installed": "Installed",
         "updates": "To update",
         "climate": "Heating & cooling",
         "lighting": "Lighting, plugs & covers",
@@ -840,6 +851,7 @@
         "actionError": "There was an error executing this action.",
         "uninstallError": "There was an error uninstalling this integration.",
         "updateAvailableText": "A new version of this integration is available.",
+        "updateAvailableVersionText": "A new version of this integration is available: v{{latestVersion}} (installed: v{{currentVersion}}).",
         "updateSuccessText": "Integration updated to version {{version}}.",
         "alreadyUpToDateText": "The integration is already up to date (version {{version}}): the Docker image was re-pulled and the container recreated.",
         "statusLabel": "Status",
@@ -3299,7 +3311,7 @@
         "continueScene": "Continue the scene"
       },
       "calendarGetEvents": {
-        "description": "This action gets the list of events starting in the selected time range (an event which started before the beginning of the range is not returned), and makes them available as variables (a ready-to-use sentence, the number of events and the list of events) for the next actions of the scene. Only shared calendars are displayed here.",
+        "description": "This action gets the list of events starting in the selected time range (an event which started before the beginning of the range is not returned), and makes them available as variables (a ready-to-use sentence, a detailed list with one line per event, the number of events and the raw list of events) for the next actions of the scene. Only shared calendars are displayed here.",
         "calendarLabel": "Look in the following shared calendars",
         "timeRangeLabel": "Get events",
         "today": "Today",
@@ -3461,8 +3473,9 @@
       },
       "calendarEvents": {
         "text": "Events summary sentence",
+        "textDetailed": "Detailed list of events (one line per event)",
         "count": "Number of events",
-        "events": "List of events"
+        "events": "Raw list of events (advanced, not readable in a message)"
       },
       "askAi": {
         "answer": "AI answer"
@@ -3531,6 +3544,8 @@
         "off": "Off",
         "deviceSeen": "If the device is detected",
         "doorbellRang": "If the doorbell rings",
+        "anyStateChange": "Start the scene on any state change, whatever the value",
+        "anyStateChangeNote": "The scene will start when the device reports its first value, or a value different from the previous one, including small variations of a sensor.",
         "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)",
         "activateOrDeactivateForDuration": "Run the scene after the condition has been valid for:",
         "multipleFeaturesNote": "You can select several features of the same type: the scene will start as soon as one of them matches the condition."
@@ -4027,7 +4042,9 @@
     "startButton": "Start",
     "searchPlaceholder": "Search scenes",
     "filterTagsName": "Filter by tags",
-    "unselectTags": "Unselect all tags"
+    "unselectTags": "Unselect all tags",
+    "running": "Running",
+    "stopButton": "Stop"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",

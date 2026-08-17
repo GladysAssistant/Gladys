@@ -777,4 +777,231 @@ describe('scene.triggers.deviceNewState', () => {
       });
     });
   });
+  it('should execute scene on any state change with the "changed" operator', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'thermostat-1',
+          operator: 'changed',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'thermostat-1',
+      previous_value: 18,
+      last_value: 21,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute scene with the "changed" operator when the feature had no previous value', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'thermostat-1',
+          operator: 'changed',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'thermostat-1',
+      previous_value: null,
+      last_value: 21,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should not execute scene with the "changed" operator when the device sends the same value', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'thermostat-1',
+          operator: 'changed',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'thermostat-1',
+      previous_value: 21,
+      last_value: 21,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should not execute scene with the "changed" operator when the event is on another feature', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['thermostat-1', 'thermostat-2'],
+          operator: 'changed',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'thermostat-3',
+      previous_value: 18,
+      last_value: 21,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute scene on any state change of one of the device_features', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['thermostat-1', 'thermostat-2'],
+          operator: 'changed',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'thermostat-2',
+      previous_value: 'heating',
+      last_value: 'idle',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should ignore threshold_only and for_duration with the "changed" operator', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'thermostat-1',
+          operator: 'changed',
+          // Both options are hidden by the UI in "any change" mode, but a trigger saved
+          // before, or written by hand, must not schedule a timer or swallow the change
+          threshold_only: true,
+          for_duration: 10 * 60 * 1000,
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'thermostat-1',
+      previous_value: 18,
+      last_value: 21,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
 });

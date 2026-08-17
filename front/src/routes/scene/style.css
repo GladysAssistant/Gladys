@@ -78,3 +78,80 @@
   right: -10px;
   top: 4px;
 }
+
+/* Both labels share the same grid cell so the button width stays constant
+   (sized on the widest label) and does not jump when swapping on hover. */
+.swap {
+  display: inline-grid;
+  align-items: center;
+}
+
+.swap > * {
+  grid-area: 1 / 1;
+}
+
+.runningContent,
+.stopContent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* Explicit colors (text + icon) so the surrounding context — e.g. the scene
+   list card `.card-footer` which sets a grey color — cannot leak in.
+   Darker than Tabler's #5eba00, which is only 2.5:1 on white (this one is 4.5:1). */
+.runningStopButton .runningContent {
+  color: #3f8600;
+}
+
+.runningStopButton .stopContent {
+  visibility: hidden;
+  color: #cd201f;
+}
+
+/* Outlined square (like the previous fe-square) but drawn with a currentColor
+   border, so it always matches the "Arrêter" text color exactly. */
+.stopIcon {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin-right: 0.4em;
+  border: 1.5px solid currentcolor;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+/* Doubled class to beat `.btn-outline-success:hover` (which would fill green) */
+@media (hover: hover) {
+  .runningStopButton.runningStopButton:hover,
+  .runningStopButton.runningStopButton:focus {
+    color: #cd201f;
+    background-color: transparent;
+    border-color: #cd201f;
+  }
+
+  .runningStopButton:hover .runningContent,
+  .runningStopButton:focus .runningContent {
+    visibility: hidden;
+  }
+
+  .runningStopButton:hover .stopContent,
+  .runningStopButton:focus .stopContent {
+    visibility: visible;
+  }
+}
+
+.runningStopButton.armed.armed {
+  color: #cd201f;
+  background-color: transparent;
+  border-color: #cd201f;
+}
+
+.runningStopButton.armed .runningContent {
+  visibility: hidden;
+}
+
+.runningStopButton.armed .stopContent {
+  visibility: visible;
+}
