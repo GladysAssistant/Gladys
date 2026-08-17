@@ -49,7 +49,11 @@ const DevicesPage = ({ children, ...props }) => (
                   </option>
                 ))}
               </select>
-              <select onChange={props.selectUsage} class="form-control custom-select w-auto mr-2">
+              <select
+                onChange={props.selectUsage}
+                class="form-control custom-select w-auto mr-2"
+                disabled={!props.usageLoaded}
+              >
                 <option value="">
                   <Text id="devicesList.allUsages" />
                 </option>
