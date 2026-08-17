@@ -3541,6 +3541,8 @@
         "off": "Off",
         "deviceSeen": "If the device is detected",
         "doorbellRang": "If the doorbell rings",
+        "anyStateChange": "Start the scene on any state change, whatever the value",
+        "anyStateChangeNote": "The scene will start when the device reports its first value, or a value different from the previous one, including small variations of a sensor.",
         "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)",
         "activateOrDeactivateForDuration": "Run the scene after the condition has been valid for:",
         "multipleFeaturesNote": "You can select several features of the same type: the scene will start as soon as one of them matches the condition."

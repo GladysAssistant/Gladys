@@ -167,6 +167,52 @@ describe('sceneSchemas device.new-state trigger', () => {
     expect(result.success).to.equal(false);
   });
 
+  it('should accept a "changed" trigger without value on a single device_feature', () => {
+    const result = schema.safeParse(
+      buildScene({ type: 'device.new-state', device_feature: 'mqtt-thermostat', operator: 'changed' }),
+    );
+    expect(result.success).to.equal(true);
+  });
+
+  it('should accept a "changed" trigger without value on several device_features', () => {
+    const result = schema.safeParse(
+      buildScene({
+        type: 'device.new-state',
+        device_features: ['mqtt-thermostat-1', 'mqtt-thermostat-2'],
+        operator: 'changed',
+      }),
+    );
+    expect(result.success).to.equal(true);
+  });
+
+  it('should reject a "changed" trigger with a value, a threshold or a duration', () => {
+    expect(
+      schema.safeParse(
+        buildScene({ type: 'device.new-state', device_feature: 'mqtt-thermostat', operator: 'changed', value: 1 }),
+      ).success,
+    ).to.equal(false);
+    expect(
+      schema.safeParse(
+        buildScene({
+          type: 'device.new-state',
+          device_feature: 'mqtt-thermostat',
+          operator: 'changed',
+          threshold_only: true,
+        }),
+      ).success,
+    ).to.equal(false);
+    expect(
+      schema.safeParse(
+        buildScene({
+          type: 'device.new-state',
+          device_feature: 'mqtt-thermostat',
+          operator: 'changed',
+          for_duration: 2700000,
+        }),
+      ).success,
+    ).to.equal(false);
+  });
+
   it('should reject a trigger mixing device_feature and device_features', () => {
     const result = schema.safeParse(
       buildScene({
