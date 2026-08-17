@@ -2,6 +2,7 @@ import { Text, MarkupText } from 'preact-i18n';
 import IntegrationMenu, { IntegrationMenuMobile } from './IntegrationMenu';
 import IntegrationCategory, { IntegrationListItem } from './IntegrationCategory';
 import IntegrationFacets from './IntegrationFacets';
+import IntegrationGatewayBanner from './IntegrationGatewayBanner';
 import IntegrationPageHeader from './IntegrationPageHeader';
 import StoreRefreshFooter from './all/external-integration/store-refresh/StoreRefreshFooter';
 import style from './style.css';
@@ -57,12 +58,7 @@ const IntegrationPage = ({
               setTransportFacet={setTransportFacet}
               toggleGladysPlusFacet={toggleGladysPlusFacet}
             />
-            <div class="alert alert-info mb-4">
-              <h4 class="alert-title">
-                <Text id="integration.root.gatewayBanner.title" />
-              </h4>
-              <MarkupText id="integration.root.gatewayBanner.description" />
-            </div>
+            <IntegrationGatewayBanner />
             <div class="row">
               <div class={`col-lg-3 ${style.desktopMenuCol}`}>
                 <IntegrationMenu
