@@ -59,83 +59,22 @@ const EditScenePage = ({ children, ...props }) => {
                 </div>
 
                 <div class="col-5 col-md-4">
-                  {props.askDeleteScene && (
-                    <div class="d-none d-md-flex flex-column flex-lg-row align-items-center text-right">
-                      <div class="ml-auto mb-2">
-                        <Text id="editScene.deleteText" />
-                      </div>
-                      <div>
-                        <button onClick={props.deleteScene} className="btn btn-outline-danger ml-2 mb-2">
-                          <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
-                        </button>
-                        <button
-                          onClick={props.cancelDeleteCurrentScene}
-                          className="btn btn-outline-secondary ml-2 mb-2"
-                        >
-                          <Text id="editScene.cancelButton" /> <i class="fe fe-slash" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {!props.askDeleteScene && (
-                    <div class={cx('text-right', style.headerActions)}>
-                      <button
-                        onClick={settingsOpen ? closeSettings : openSettings}
-                        className={cx('btn mb-0 mb-sm-2 mb-lg-0', style.headerActionBtn, {
-                          'btn-secondary': settingsOpen,
-                          'btn-outline-secondary': !settingsOpen
-                        })}
-                      >
-                        <span class="d-none d-md-inline-block">
-                          <Text id="editScene.settings" />
-                        </span>{' '}
-                        <i class="fe fe-settings" />
-                      </button>
-                      <button
-                        onClick={props.duplicateScene}
-                        className={cx('btn btn-outline-primary ml-2 mb-0 mb-sm-2 mb-lg-0', style.headerActionBtn)}
-                      >
-                        <span class="d-none d-md-inline-block">
-                          <Text id="editScene.duplicateButton" />
-                        </span>{' '}
-                        <i class="fe fe-copy" />
-                      </button>
-                      <button
-                        onClick={props.askDeleteCurrentScene}
-                        className={cx('btn btn-outline-danger ml-2 mb-0 mb-sm-2 mb-lg-0', style.headerActionBtn)}
-                      >
-                        <span class="d-none d-md-inline-block">
-                          <Text id="editScene.deleteButton" />
-                        </span>{' '}
-                        <i class="fe fe-trash" />
-                      </button>
-                    </div>
-                  )}
+                  <div class="text-right">
+                    <button
+                      onClick={settingsOpen ? closeSettings : openSettings}
+                      className={cx('btn mb-0', style.headerActionBtn, {
+                        'btn-secondary': settingsOpen,
+                        'btn-outline-secondary': !settingsOpen
+                      })}
+                    >
+                      <span class="d-none d-md-inline-block">
+                        <Text id="editScene.settings" />
+                      </span>{' '}
+                      <i class="fe fe-settings" />
+                    </button>
+                  </div>
                 </div>
                 <div class="col-12 text-muted">{props.scene.description && <span>{props.scene.description}</span>}</div>
-
-                {/* Mobile delete confirmation - only visible on small screens */}
-                {props.askDeleteScene && (
-                  <div class="col-12 d-md-none mt-3">
-                    <div class="d-flex flex-column align-items-center text-center">
-                      <div class="mb-2">
-                        <Text id="editScene.deleteText" />
-                      </div>
-                      <div>
-                        <button onClick={props.deleteScene} className="btn btn-outline-danger mx-1 mb-2">
-                          <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
-                        </button>
-                        <button
-                          onClick={props.cancelDeleteCurrentScene}
-                          className="btn btn-outline-secondary mx-1 mb-2"
-                        >
-                          <Text id="editScene.cancelButton" /> <i class="fe fe-slash" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
             <div>
