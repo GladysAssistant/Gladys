@@ -706,6 +706,11 @@ class EditChart extends Component {
                       <Text id="dashboard.boxes.chart.lastDay" />
                     </option>
                     {props.box.chart_type !== 'timeline' && (
+                      <option value="last-three-days">
+                        <Text id="dashboard.boxes.chart.lastThreeDays" />
+                      </option>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
                       <option value="last-week">
                         <Text id="dashboard.boxes.chart.lastSevenDays" />
                       </option>
