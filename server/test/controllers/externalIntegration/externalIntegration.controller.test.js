@@ -97,7 +97,23 @@ describe('External integration admin API', () => {
         .expect('Content-Type', /json/)
         .expect(200);
       expect(res.body).to.have.property('selector', service.selector);
+      expect(res.body).to.have.property('update_available', false);
+      expect(res.body).to.have.property('latest_version', null);
       expect(res.body.manifest).to.deep.equal(TEST_MANIFEST);
+    });
+
+    it('should expose the latest known version in the detail', async () => {
+      const service = await seedExternalService({ store_slug: 'john/demo', version: '1.0.0' });
+      gladys.externalIntegration.storeIndex = {
+        index_format: 1,
+        integrations: [{ store_slug: 'john/demo', manifest: { ...TEST_MANIFEST, version: '1.4.2' } }],
+      };
+      const res = await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}`)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(res.body).to.have.property('update_available', true);
+      expect(res.body).to.have.property('latest_version', '1.4.2');
     });
 
     it('should return 404 on unknown selector', async () => {
