@@ -4,9 +4,9 @@ This file documents Matter cluster compatibility in the Gladys Matter integratio
 
 - `matter.js` source: `@matter/main` / `@matter/types` `0.17.4`
 - Clusters exposed by `matter.js`: **132**
-- Clusters handled by Gladys today: **26**
-- Compatibility progress: **19.7%**
-- Clusters with an existing Gladys feature (easy to wire): **26** additional
+- Clusters handled by Gladys today: **27**
+- Compatibility progress: **20.5%**
+- Clusters with an existing Gladys feature (easy to wire): **25** additional
 
 A cluster is marked as handled when the current Gladys Matter integration contains explicit mapping logic for discovery, state reading/listening, and/or commands for that cluster.
 
@@ -149,7 +149,7 @@ The **Gladys feature** column lists matching `category/type` pairs from `server/
 
 ## How the percentage is calculated
 
-`26 / 132 = 19.7%`
+`27 / 132 = 20.5%`
 
 This percentage reflects the number of Matter cluster definitions exported by `matter.js` that have explicit support in the current Gladys integration. It is a cluster support coverage indicator, not a guarantee that every device implementing a supported cluster will be fully interoperable across all feature combinations.
 
