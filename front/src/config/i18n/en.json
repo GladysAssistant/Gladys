@@ -3804,7 +3804,7 @@
     "unsavedChanges": "Unsaved changes",
     "savedLabel": "Saved",
     "orSeparator": "OR",
-    "triggersIndependentHint": "Each trigger starts the scene on its own — any single one is enough. To require several conditions at the same time, add a condition step to the scene."
+    "triggersIndependentHint": "Each trigger starts the scene on its own, any single one is enough. To require several conditions at the same time, add a condition step to the scene."
   },
   "profile": {
     "title": "Profile",

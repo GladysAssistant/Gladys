@@ -3804,7 +3804,7 @@
     "unsavedChanges": "Modifications non enregistrées",
     "savedLabel": "Enregistré",
     "orSeparator": "OU",
-    "triggersIndependentHint": "Chaque déclencheur démarre la scène indépendamment des autres — un seul suffit. Pour exiger plusieurs conditions à la fois, ajoutez une étape « Condition » dans le déroulé de la scène."
+    "triggersIndependentHint": "Chaque déclencheur démarre la scène indépendamment des autres, un seul suffit. Pour exiger plusieurs conditions à la fois, ajoutez une étape « Condition » dans le déroulé de la scène."
   },
   "profile": {
     "title": "Profil",
