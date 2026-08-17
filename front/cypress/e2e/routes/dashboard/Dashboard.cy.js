@@ -22,7 +22,8 @@ describe('Dashboard', () => {
       .should('have.class', 'btn-primary')
       .click();
 
-    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/my-new-dashboard/edit`);
+    // The selector of a new dashboard ends with 4 random characters, like scenes
+    cy.url().should('match', new RegExp(`^${Cypress.config().baseUrl}/dashboard/my-new-dashboard-[a-z0-9]{4}/edit$`));
   });
   it('Should add new boxes', () => {
     cy.contains('.btn-primary', 'dashboard.addBoxButton').click();

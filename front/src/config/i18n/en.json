@@ -97,11 +97,12 @@
     "allRooms": "All rooms",
     "noRoom": "No room",
     "allIntegrations": "All integrations",
+    "nativeIntegrations": "Native integrations",
+    "communityIntegrations": "Community integrations",
     "device": "Device",
     "room": "Room",
     "integration": "Integration",
     "features": "Features",
-    "openInIntegration": "Open in integration",
     "emptyState": "No device found. Add devices from the integrations page, or adjust your search and filters.",
     "emptyStateButton": "Browse integrations",
     "error": "There was an error loading the devices. Please try again later."
@@ -848,6 +849,7 @@
         "actionError": "There was an error executing this action.",
         "uninstallError": "There was an error uninstalling this integration.",
         "updateAvailableText": "A new version of this integration is available.",
+        "updateAvailableVersionText": "A new version of this integration is available: v{{latestVersion}} (installed: v{{currentVersion}}).",
         "updateSuccessText": "Integration updated to version {{version}}.",
         "alreadyUpToDateText": "The integration is already up to date (version {{version}}): the Docker image was re-pulled and the container recreated.",
         "statusLabel": "Status",
@@ -3306,7 +3308,7 @@
         "continueScene": "Continue the scene"
       },
       "calendarGetEvents": {
-        "description": "This action gets the list of events starting in the selected time range (an event which started before the beginning of the range is not returned), and makes them available as variables (a ready-to-use sentence, the number of events and the list of events) for the next actions of the scene. Only shared calendars are displayed here.",
+        "description": "This action gets the list of events starting in the selected time range (an event which started before the beginning of the range is not returned), and makes them available as variables (a ready-to-use sentence, a detailed list with one line per event, the number of events and the raw list of events) for the next actions of the scene. Only shared calendars are displayed here.",
         "calendarLabel": "Look in the following shared calendars",
         "timeRangeLabel": "Get events",
         "today": "Today",
@@ -3468,8 +3470,9 @@
       },
       "calendarEvents": {
         "text": "Events summary sentence",
+        "textDetailed": "Detailed list of events (one line per event)",
         "count": "Number of events",
-        "events": "List of events"
+        "events": "Raw list of events (advanced, not readable in a message)"
       },
       "askAi": {
         "answer": "AI answer"
@@ -4034,7 +4037,9 @@
     "startButton": "Start",
     "searchPlaceholder": "Search scenes",
     "filterTagsName": "Filter by tags",
-    "unselectTags": "Unselect all tags"
+    "unselectTags": "Unselect all tags",
+    "running": "Running",
+    "stopButton": "Stop"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
