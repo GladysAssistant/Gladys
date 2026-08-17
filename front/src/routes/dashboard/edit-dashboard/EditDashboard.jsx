@@ -59,6 +59,8 @@ const EditDashboard = ({ children, ...props }) => (
                           homeDashboard={props.currentDashboard}
                           updateNewSelectedBox={props.updateNewSelectedBox}
                           removeBox={props.removeBox}
+                          moveBoxToDashboard={props.moveBoxToDashboard}
+                          boxesToMove={props.boxesToMove}
                           updateBoxConfig={props.updateBoxConfig}
                           showReorderDashboard={props.showReorderDashboard}
                           toggleReorderDashboard={props.toggleReorderDashboard}

@@ -321,6 +321,10 @@
     "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
     "editDashboardExplanation": "Each dashboard has 3 columns, which you can fill in according to your preferences. Click on the + button to add a new widget. You can move this widget by grabbing it and moving it around.",
+    "moveBoxToDashboard": {
+      "title": "Move to another dashboard",
+      "pendingMoves": "Widgets moved to another dashboard will be added at the end of the first column of that dashboard when you save this dashboard."
+    },
     "reorderDashboardButton": "Re-order dashboards",
     "stopReorderingDashboardButton": "Stop re-ordering dashboards",
     "addBoxButton": "Add",

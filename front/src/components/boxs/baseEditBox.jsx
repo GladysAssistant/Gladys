@@ -1,12 +1,15 @@
 import { Text } from 'preact-i18n';
-import { useRef } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
+import cx from 'classnames';
+import get from 'get-value';
 
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 const BaseEditBox = ({ children, ...props }) => {
   const { x, y } = props;
   const ref = useRef(null);
+  const [moveToDashboardOpened, setMoveToDashboardOpened] = useState(false);
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: DASHBOARD_EDIT_BOX_TYPE,
     item: () => {
@@ -31,6 +34,21 @@ const BaseEditBox = ({ children, ...props }) => {
   preview(drop(ref));
   const removeBox = () => {
     props.removeBox(x, y);
+  };
+  const currentDashboardSelector = get(props, 'homeDashboard.selector');
+  const otherDashboards = (props.dashboards || []).filter(dashboard => dashboard.selector !== currentDashboardSelector);
+  // A box can only be moved to another dashboard if it's configured, and if another dashboard exists
+  const displayMoveToDashboard =
+    !props.isMobileReordering &&
+    typeof props.moveBoxToDashboard === 'function' &&
+    get(props, 'box.type') !== undefined &&
+    otherDashboards.length > 0;
+  const toggleMoveToDashboard = () => {
+    setMoveToDashboardOpened(!moveToDashboardOpened);
+  };
+  const moveBoxToDashboard = dashboardSelector => {
+    setMoveToDashboardOpened(false);
+    props.moveBoxToDashboard(x, y, dashboardSelector);
   };
   if (props.isMobileReordering) {
     return (
@@ -77,6 +95,27 @@ const BaseEditBox = ({ children, ...props }) => {
           <a class="card-options-remove">
             <i ref={drag} style={{ cursor: 'move' }} class="fe fe-move mr-2 d-none d-lg-inline" />
           </a>
+          {displayMoveToDashboard && (
+            <div class="dropdown">
+              <a onClick={toggleMoveToDashboard} class="card-options-remove">
+                <i class="fe fe-corner-up-right mr-2" />
+              </a>
+              <div
+                class={cx('dropdown-menu', 'dropdown-menu-right', {
+                  show: moveToDashboardOpened
+                })}
+              >
+                <span class="dropdown-header">
+                  <Text id="dashboard.moveBoxToDashboard.title" />
+                </span>
+                {otherDashboards.map(dashboard => (
+                  <a class="dropdown-item" onClick={() => moveBoxToDashboard(dashboard.selector)}>
+                    {dashboard.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
           {!props.isMobileReordering && (
             <a onClick={removeBox} class="card-options-remove">
               <i class="fe fe-x" />

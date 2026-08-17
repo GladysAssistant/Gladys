@@ -39,6 +39,11 @@ const EditBoxColumns = ({ children, ...props }) => (
         <Text id="newDashboard.unknownError" />
       </div>
     )}
+    {props.boxesToMove && props.boxesToMove.length > 0 && (
+      <div class="alert alert-info">
+        <Text id="dashboard.moveBoxToDashboard.pendingMoves" />
+      </div>
+    )}
     <div class="row align-items-end">
       <div class="col-md-4">
         <div class="form-group">

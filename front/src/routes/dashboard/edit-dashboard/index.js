@@ -130,6 +130,64 @@ class EditDashboard extends Component {
     this.setState(newState);
   };
 
+  moveBoxToDashboard = async (x, y, dashboardSelector) => {
+    const box = get(this.state, `currentDashboard.boxes.${x}.${y}`);
+    // We don't move a box which is not configured yet
+    if (!box || box.type === undefined) {
+      return;
+    }
+    // The box is removed from the current dashboard, and saved in a list of boxes
+    // to move when the user will save the dashboard.
+    const newState = update(this.state, {
+      currentDashboard: {
+        boxes: {
+          [x]: {
+            $splice: [[y, 1]]
+          }
+        }
+      },
+      boxesToMove: {
+        $push: [{ dashboardSelector, box }]
+      }
+    });
+    await this.setState({ ...newState, boxNotEmptyError: false });
+  };
+
+  moveBoxesToOtherDashboards = async () => {
+    const { boxesToMove } = this.state;
+    if (boxesToMove.length === 0) {
+      return;
+    }
+    // Boxes are grouped by destination dashboard, so each dashboard is updated only once
+    const boxesByDashboard = {};
+    boxesToMove.forEach(boxToMove => {
+      boxesByDashboard[boxToMove.dashboardSelector] = (boxesByDashboard[boxToMove.dashboardSelector] || []).concat([
+        boxToMove.box
+      ]);
+    });
+    await Promise.all(
+      Object.keys(boxesByDashboard).map(async dashboardSelector => {
+        const dashboard = await this.props.httpClient.get(`/api/v1/dashboard/${dashboardSelector}`);
+        const columns = dashboard.boxes && dashboard.boxes.length > 0 ? dashboard.boxes : [[]];
+        // Boxes are added at the end of the first column of the destination dashboard
+        const newColumns = update(columns, {
+          0: {
+            $push: boxesByDashboard[dashboardSelector]
+          }
+        });
+        await this.props.httpClient.patch(`/api/v1/dashboard/${dashboardSelector}`, {
+          ...dashboard,
+          boxes: newColumns
+        });
+        // Boxes are removed from the pending list as soon as they are saved,
+        // so they are not moved twice if the user retries after an error.
+        this.setState(prevState => ({
+          boxesToMove: prevState.boxesToMove.filter(boxToMove => boxToMove.dashboardSelector !== dashboardSelector)
+        }));
+      })
+    );
+  };
+
   removeBox = async (x, y) => {
     const newState = update(this.state, {
       currentDashboard: {
@@ -241,6 +299,10 @@ class EditDashboard extends Component {
       // We purge all empty boxes
       await this.removeEmptyBoxes();
 
+      // Boxes moved to another dashboard are saved in those dashboards first,
+      // so a box is never lost if this dashboard fails to save.
+      await this.moveBoxesToOtherDashboards();
+
       const { currentDashboard: selectedDashboard, dashboards } = this.state;
       const { selector } = selectedDashboard;
 
@@ -264,6 +326,8 @@ class EditDashboard extends Component {
       route(`/dashboard/${currentDashboard.selector}`);
     } catch (e) {
       console.error(e);
+      // The save failed, we stop the loader so the user can fix the error and retry
+      this.setState({ loading: false });
       if (e.response && e.response.status === 422) {
         this.setState({
           dashboardValidationError: true
@@ -372,7 +436,8 @@ class EditDashboard extends Component {
       askDeleteDashboard: false,
       boxNotEmptyError: false,
       columnBoxNotEmptyError: null,
-      isMobileReordering: false
+      isMobileReordering: false,
+      boxesToMove: []
     };
   }
 
@@ -399,7 +464,8 @@ class EditDashboard extends Component {
       boxNotEmptyError,
       columnBoxNotEmptyError,
       savingNewDashboardList,
-      isMobileReordering
+      isMobileReordering,
+      boxesToMove
     }
   ) {
     return (
@@ -421,6 +487,8 @@ class EditDashboard extends Component {
         addBox={this.addBox}
         addBoxAtPosition={this.addBoxAtPosition}
         removeBox={this.removeBox}
+        moveBoxToDashboard={this.moveBoxToDashboard}
+        boxesToMove={boxesToMove}
         updateNewSelectedBox={this.updateNewSelectedBox}
         saveDashboard={this.saveDashboard}
         updateBoxConfig={this.updateBoxConfig}

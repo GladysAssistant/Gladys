@@ -321,6 +321,10 @@
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
     "editDashboardExplanation": "Jedes Dashboard hat 3 Spalten, die du nach Belieben füllen kannst. Klicke auf \"+\", um ein neues Widget hinzuzufügen. Du kannst dieses Widget bewegen, indem du es greifst und verschiebst.",
+    "moveBoxToDashboard": {
+      "title": "In ein anderes Dashboard verschieben",
+      "pendingMoves": "Widgets, die in ein anderes Dashboard verschoben wurden, werden am Ende der ersten Spalte dieses Dashboards hinzugefügt, sobald du dieses Dashboard speicherst."
+    },
     "reorderDashboardButton": "Dashboards neu anordnen",
     "stopReorderingDashboardButton": "Anordnen der Dashboards beenden",
     "addBoxButton": "Hinzufügen",
