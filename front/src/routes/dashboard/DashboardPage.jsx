@@ -35,8 +35,14 @@ const DashboardPage = ({ children, ...props }) => {
               <div class={cx('container', { [style.fullWidthContainer]: fullWidth })}>
                 <div class="page-header">
                   <div>
-                    {!props.dashboardListEmpty && props.tabletMode && (
-                      <div class={style.dashboardTabs}>
+                    {/* One-tap pills in every mode: icon + name normally, icon-only
+                        in tablet mode; on mobile only the active pill keeps its name */}
+                    {!props.dashboardListEmpty && (
+                      <div
+                        class={cx(style.dashboardTabs, {
+                          [style.dashboardTabsIconsOnly]: props.tabletMode
+                        })}
+                      >
                         {props.dashboards.map(dashboard => (
                           <Link
                             href={`/dashboard/${dashboard.selector}`}
@@ -48,30 +54,11 @@ const DashboardPage = ({ children, ...props }) => {
                             title={dashboard.name}
                           >
                             <i class={`fe fe-${dashboard.icon || 'home'}`} />
+                            {!props.tabletMode && (
+                              <span class={style.dashboardTabName}>{wrapEmojisJSX(dashboard.name)}</span>
+                            )}
                           </Link>
                         ))}
-                      </div>
-                    )}
-                    {!props.dashboardListEmpty && !props.tabletMode && (
-                      <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" onClick={props.toggleDashboardDropdown}>
-                          {props.currentDashboard && wrapEmojisJSX(props.currentDashboard.name)}
-                        </button>
-                        <div
-                          class={cx('dropdown-menu', {
-                            show: props.dashboardDropdownOpened
-                          })}
-                        >
-                          {props.dashboards.map(dashboard => (
-                            <Link
-                              class={cx('dropdown-item', style.dropdownItemBiggerLines)}
-                              href={`/dashboard/${dashboard.selector}`}
-                              onClick={props.redirectToDashboard}
-                            >
-                              {wrapEmojisJSX(dashboard.name)}
-                            </Link>
-                          ))}
-                        </div>
                       </div>
                     )}
                   </div>

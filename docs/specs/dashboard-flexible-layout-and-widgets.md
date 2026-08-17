@@ -179,10 +179,14 @@ Additive, optional (nullable) columns on `t_dashboard` (migration `2026081500000
 
 A `theme` override (`auto`/`light`/`dark`) was considered and **deferred**: the app-level dark mode is a user preference and per-dashboard overrides need a clean way to scope it; revisit after phase 4. Appearance stays a dashboard-level decision so every widget remains consistent — no per-box styling.
 
-## H. Tablet navigation: icon tab bar
+## H. Dashboard navigation: one-tap pill tab bar
 
 - Each dashboard gains an optional `icon` (picker from the existing icon set) next to its name; `GET /api/v1/dashboard` returns it in the list payload.
-- In tablet mode (the `tabletMode` store flag, fed by `session.tablet_mode`), the dashboard selector renders as a **horizontal icon tab bar** (current dashboard highlighted, `home` as the fallback icon) instead of the dropdown — matching touch usage on a wall panel. Outside tablet mode, the dropdown remains.
+- The dashboard selector is an **always-visible pill tab bar in every mode** — switching dashboards is one tap, never a menu to open first. The old two-click dropdown was removed (a dropdown is an overflow pattern, wrong as the primary entry for the 2–5 dashboards users typically have):
+  - **desktop**: icon + name pills, wrapping when needed;
+  - **mobile** (< 768px): the row scrolls horizontally instead of wrapping, and only the active pill keeps its name — the others shrink to icon dots, so the bar stays one line;
+  - **tablet mode** (the `tabletMode` store flag, fed by `session.tablet_mode`): compact icon-only dock, as before (current dashboard highlighted, `home` as the fallback icon).
+- Touch swipe between dashboards is a possible later complement to the pills (invisible affordance, needs a strict directional threshold to never steal vertical scroll or widget gestures); it does not replace them.
 
 ## Phases
 

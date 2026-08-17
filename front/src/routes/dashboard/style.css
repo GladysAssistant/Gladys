@@ -260,9 +260,14 @@
 :global(.glass-theme) .dashboardTab {
   border: none;
   background: transparent;
-  width: 2.6rem;
   height: 2.6rem;
+  padding: 0 0.9rem;
   color: var(--gl-muted);
+}
+
+:global(.glass-theme) .dashboardTabsIconsOnly .dashboardTab {
+  width: 2.6rem;
+  padding: 0;
 }
 
 :global(.glass-theme) .dashboardTabActive {
@@ -275,19 +280,54 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .dashboardTab {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.375rem;
+  gap: 6px;
   height: 2.375rem;
+  padding: 0 0.875rem;
   border-radius: 999px;
   border: 1px solid rgba(0, 40, 100, 0.12);
   background-color: #fff;
   color: #495057;
   font-size: 1rem;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.dashboardTabName {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Tablet mode keeps the compact icon dock */
+.dashboardTabsIconsOnly .dashboardTab {
+  width: 2.375rem;
+  padding: 0;
+}
+
+/* On small screens the row scrolls instead of wrapping, and only the
+   active pill keeps its name — the rest shrink to icon dots */
+@media (max-width: 767px) {
+  .dashboardTabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboardTab:not(.dashboardTabActive) {
+    width: 2.375rem;
+    padding: 0;
+  }
+
+  .dashboardTab:not(.dashboardTabActive) .dashboardTabName {
+    display: none;
+  }
 }
 
 .dashboardTab:hover {
@@ -378,10 +418,6 @@
   max-height: 500px;
   overflow: auto;
   transition: max-height 0.5s ease-in;
-}
-
-.dropdownItemBiggerLines {
-  line-height: 2.5rem;
 }
 
 .editDashboardText {
