@@ -965,6 +965,31 @@ class EditScene extends Component {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
   };
 
+  // After a card moved out of its group, remove the group if it became empty,
+  // unless it is the trailing empty group of its container, which is the
+  // "add a step" insertion point. Without this, dragging the only action of a
+  // step elsewhere leaves stray "add a step" buttons in the middle of the flow.
+  cleanUpEmptyGroupAfterMove = async sourceActionPath => {
+    const groupSegments = sourceActionPath.split('.').slice(0, -1);
+    // Conditions of if/while blocks are a flat list, not action groups
+    if (groupSegments.includes('if') || groupSegments.length === 0) {
+      return;
+    }
+    const containerSegments = groupSegments.slice(0, -1);
+    const groupIndex = parseInt(groupSegments[groupSegments.length - 1], 10);
+    let container = this.state.scene.actions;
+    for (const segment of containerSegments) {
+      container = segment === 'then' || segment === 'else' ? container[segment] : container[parseInt(segment, 10)];
+      if (!container) {
+        return;
+      }
+    }
+    const group = container[groupIndex];
+    if (Array.isArray(group) && group.length === 0 && groupIndex < container.length - 1) {
+      await this.deleteActionGroup(groupSegments.join('.'));
+    }
+  };
+
   moveCard = async (originalPath, destPath) => {
     // Helper function to get nested value using path
     const getNestedValue = (obj, path) => {
@@ -1089,6 +1114,7 @@ class EditScene extends Component {
 
     await this.setState(newState);
     await this.addEmptyActionGroupIfNeeded();
+    await this.cleanUpEmptyGroupAfterMove(originalPath);
   };
 
   moveCardGroup = async (sourcePath, destPath) => {
