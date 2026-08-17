@@ -1681,7 +1681,7 @@ describe('build schemas', () => {
     expect(tools.find((tool) => tool.intent === 'device.get-energy-consumption')).to.eq(undefined);
   });
 
-  const buildBatteryMcpHandler = () => {
+  const buildBatteryMcpHandler = (extraDevices = []) => {
     const rooms = [
       { id: 'room-1', name: 'Salon', selector: 'salon', house_id: 'house-1' },
       { id: 'room-2', name: 'Chambre', selector: 'chambre', house_id: 'house-1' },
@@ -1792,6 +1792,7 @@ describe('build schemas', () => {
           },
         ],
       },
+      ...extraDevices,
     ];
 
     return {
@@ -1990,6 +1991,65 @@ describe('build schemas', () => {
       { device: 'Détecteur de fumée', value: null, below: undefined },
       { device: 'Télécommande chambre', value: null, below: undefined },
     ]);
+  });
+
+  it('should not compare a device.get-battery-levels level published in another unit to the threshold', async () => {
+    const mcpHandler = buildBatteryMcpHandler([
+      {
+        selector: 'capteur-jardin',
+        name: 'Capteur jardin',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 'feature-battery-jardin',
+            selector: 'capteur-jardin-battery',
+            name: 'Batterie',
+            category: 'battery',
+            type: 'integer',
+            last_value: 3.1,
+            unit: 'volt',
+          },
+        ],
+      },
+      {
+        selector: 'capteur-cave',
+        name: 'Capteur cave',
+        features: [
+          {
+            id: 'feature-battery-cave',
+            selector: 'capteur-cave-battery',
+            name: 'Batterie',
+            category: 'battery',
+            type: 'integer',
+            last_value: 4,
+            unit: null,
+          },
+        ],
+      },
+    ]);
+    mcpHandler.gladys.variable.getValue = stub().resolves('20');
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    const allBatteriesResult = await batteryTool.cb({});
+    expect(allBatteriesResult.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.firstCall.args[0].warning_threshold).to.eq(20);
+    // The threshold is a percentage: a level published in volts, or without a unit at
+    // all, is reported with its unit but never flagged as low.
+    expect(
+      mcpHandler.toon.firstCall.args[0].batteries
+        .filter(({ device }) => ['Capteur jardin', 'Capteur cave'].includes(device))
+        .map(({ device, value, unit, below_warning_threshold: below }) => ({ device, value, unit, below })),
+    ).to.deep.equal([
+      { device: 'Capteur jardin', value: 3.1, unit: 'volt', below: undefined },
+      { device: 'Capteur cave', value: 4, unit: null, below: undefined },
+    ]);
+    // The percent levels are still compared to it.
+    expect(
+      mcpHandler.toon.firstCall.args[0].batteries.find(({ device }) => device === 'Capteur porte chambre')
+        .below_warning_threshold,
+    ).to.eq(true);
   });
 
   it('should tell device.get-battery-levels when the room or the device is unknown', async () => {

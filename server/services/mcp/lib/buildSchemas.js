@@ -3,6 +3,7 @@ const {
   SYSTEM_VARIABLE_NAMES,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
   COVER_STATE,
   AI_CHAT_TOOL_CATEGORIES,
   WEATHER_UNITS,
@@ -1361,6 +1362,8 @@ async function getAllTools(userId) {
           'When warning_threshold is present, it is the battery warning threshold configured in this Gladys, ' +
           'in percent, and below_warning_threshold tells which levels are under it: use it as the meaning of ' +
           '"low" and of "to be replaced" instead of deciding yourself. ' +
+          'An entry whose unit is not percent (a battery voltage) carries no below_warning_threshold, ' +
+          'because the threshold is a percentage: report its value with its unit, do not call it low. ' +
           'Devices that do not report a battery level are never part of the result: they are either mains ' +
           'powered, or their integration only publishes a low battery alert instead of a level, ' +
           'so do not report a level for them.',
@@ -1489,8 +1492,12 @@ async function getAllTools(userId) {
                 category: featureLastState.category,
                 ...formattedValue,
                 // Only a level that exists can be compared to the threshold: a device that
-                // never reported one is neither below nor above it.
-                ...(hasWarningThreshold && typeof formattedValue.value === 'number'
+                // never reported one is neither below nor above it. The threshold is a
+                // percentage, and the battery category accepts any unit at the model level:
+                // a level published in volts, or without a unit, must not be compared to it.
+                ...(hasWarningThreshold &&
+                typeof formattedValue.value === 'number' &&
+                featureLastState.unit === DEVICE_FEATURE_UNITS.PERCENT
                   ? { below_warning_threshold: formattedValue.value < warningThreshold }
                   : {}),
               });
