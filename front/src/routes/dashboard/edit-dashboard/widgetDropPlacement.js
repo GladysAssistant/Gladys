@@ -37,8 +37,40 @@ const resolveColumn = (target, point) => {
   return best;
 };
 
-// Insertion index: before the first widget whose vertical middle is below
-// the pointer, at the end otherwise (the standard list insertion rule).
+// Insertion index in a vertical stack of elements: before the first one
+// whose vertical middle is below the pointer, at the end otherwise (the
+// standard list insertion rule). Shared with the dashboard-list reorder.
+const computeInsertionIndex = (elements, pointerY) => {
+  let index = elements.length;
+  for (let i = 0; i < elements.length; i += 1) {
+    const rect = elements[i].getBoundingClientRect();
+    if (pointerY < rect.top + rect.height / 2) {
+      index = i;
+      break;
+    }
+  }
+  return index;
+};
+
+// Viewport rect of the indicator line for inserting at `index` in a vertical
+// stack: centered in the gap between neighbors, spanning the container width.
+const insertionLineRect = (containerRect, elements, index) => {
+  let top;
+  if (index === 0) {
+    top = elements[0].getBoundingClientRect().top - INDICATOR_GAP_OFFSET_PX;
+  } else if (index === elements.length) {
+    top = elements[elements.length - 1].getBoundingClientRect().bottom + INDICATOR_GAP_OFFSET_PX;
+  } else {
+    top = (elements[index - 1].getBoundingClientRect().bottom + elements[index].getBoundingClientRect().top) / 2;
+  }
+  return {
+    left: containerRect.left,
+    top: top - INDICATOR_THICKNESS_PX / 2,
+    width: containerRect.width,
+    height: INDICATOR_THICKNESS_PX
+  };
+};
+
 const computePlacement = (target, point) => {
   const columnElement = resolveColumn(target, point);
   if (!columnElement) {
@@ -46,37 +78,14 @@ const computePlacement = (target, point) => {
   }
   const x = Number(columnElement.getAttribute('data-drop-x'));
   const wrappers = Array.from(columnElement.querySelectorAll('[data-widget-wrapper]'));
-  let index = wrappers.length;
-  for (let i = 0; i < wrappers.length; i += 1) {
-    const rect = wrappers[i].getBoundingClientRect();
-    if (point.y < rect.top + rect.height / 2) {
-      index = i;
-      break;
-    }
-  }
-  return { columnElement, x, index, wrappers };
+  return { columnElement, x, index: computeInsertionIndex(wrappers, point.y), wrappers };
 };
 
 const isNoopPlacement = (placement, sourceX, sourceY) =>
   placement.x === sourceX && (placement.index === sourceY || placement.index === sourceY + 1);
 
-const indicatorRect = ({ columnElement, wrappers, index }) => {
-  const columnRect = columnElement.getBoundingClientRect();
-  let top;
-  if (index === 0) {
-    top = wrappers[0].getBoundingClientRect().top - INDICATOR_GAP_OFFSET_PX;
-  } else if (index === wrappers.length) {
-    top = wrappers[wrappers.length - 1].getBoundingClientRect().bottom + INDICATOR_GAP_OFFSET_PX;
-  } else {
-    top = (wrappers[index - 1].getBoundingClientRect().bottom + wrappers[index].getBoundingClientRect().top) / 2;
-  }
-  return {
-    left: columnRect.left,
-    top: top - INDICATOR_THICKNESS_PX / 2,
-    width: columnRect.width,
-    height: INDICATOR_THICKNESS_PX
-  };
-};
+const indicatorRect = ({ columnElement, wrappers, index }) =>
+  insertionLineRect(columnElement.getBoundingClientRect(), wrappers, index);
 
 // Hover feedback for the pointer-drag engine: destination column as the
 // tinted area, indicator line at the insertion gap. No line when the column
@@ -106,4 +115,4 @@ const resolveWidgetDropDestination = (target, point, sourceX, sourceY) => {
   return { x: placement.x, y: destinationY };
 };
 
-export { resolveWidgetDropHover, resolveWidgetDropDestination };
+export { computeInsertionIndex, insertionLineRect, resolveWidgetDropHover, resolveWidgetDropDestination };

@@ -15,20 +15,20 @@ const EditActions = props => (
             <button onClick={props.askDeleteCurrentDashboard} className="btn btn-outline-danger btn-sm ml-2">
               <Text id="dashboard.editDashboardDeleteButton" /> <i class="fe fe-trash" />
             </button>
-            {/* saving keeps the user in the editor (chain editing): the button
-                briefly becomes the confirmation, then — everything being saved —
-                the primary action becomes leaving the editor */}
+            {/* saving keeps the user in the editor (chain editing): the
+                confirmation is a transient label that never blocks anything —
+                the moment everything is saved, leaving is available */}
             {props.justSaved && (
-              <button className="btn btn-success btn-sm ml-2">
+              <span className="text-success ml-2" data-cy="dashboard-saved-label">
                 <Text id="dashboard.editDashboardSavedButton" /> <i class="fe fe-check" />
-              </button>
+              </span>
             )}
-            {!props.justSaved && props.hasUnsavedChanges && (
+            {props.hasUnsavedChanges && (
               <button onClick={props.saveDashboard} className="btn btn-outline-primary btn-sm ml-2">
                 <Text id="dashboard.editDashboardSaveButton" /> <i class="fe fe-check" />
               </button>
             )}
-            {!props.justSaved && !props.hasUnsavedChanges && (
+            {!props.hasUnsavedChanges && (
               <button onClick={props.cancelDashboardEdit} className="btn btn-outline-primary btn-sm ml-2">
                 <Text id="dashboard.editDashboardDoneButton" /> <i class="fe fe-check" />
               </button>

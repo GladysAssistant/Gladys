@@ -5,10 +5,25 @@ import update from 'immutability-helper';
 import { route } from 'preact-router';
 import { wrapEmojisJSX } from '../../../utils/emojiWrapper';
 import { startPointerDrag } from '../../../utils/pointerDrag';
+import { computeInsertionIndex, insertionLineRect } from './widgetDropPlacement';
 import style from './style.css';
 
-// Reordering runs on the pointer-events engine (utils/pointerDrag.js), like
-// the widget canvas: same feedback everywhere, no native drag, no react-dnd.
+// Horizon dashboard list: glass pill rows with an always-visible grab
+// handle. Reordering runs on the pointer-events engine with the same
+// placement model as the widget canvas — an insertion indicator line in the
+// exact gap where the row would land, computed from the pointer position
+// (no per-row drop targets, no layout shift).
+const resolveListPlacement = (target, point) => {
+  const list = target.hasAttribute('data-dashboard-list') ? target : target.closest('[data-dashboard-list]');
+  if (!list) {
+    return null;
+  }
+  const rows = Array.from(list.querySelectorAll('[data-dashboard-list-drop]'));
+  return { list, rows, index: computeInsertionIndex(rows, point.y) };
+};
+
+const isNoopListInsertion = (index, sourceIndex) => index === sourceIndex || index === sourceIndex + 1;
+
 const DashboardListItem = ({ children, ...props }) => {
   const { index } = props;
   const ref = useRef(null);
@@ -17,12 +32,34 @@ const DashboardListItem = ({ children, ...props }) => {
     startPointerDrag(event, {
       source: ref.current,
       draggingClass: 'gladys-drag-source-dim',
-      dropSelector: '[data-dashboard-list-drop]',
+      dropSelector: '[data-dashboard-list-drop], [data-dashboard-list]',
       ghostClass: style.dragLayerPill,
-      ghostIconClass: 'fe fe-list',
+      ghostIconClass: 'fe fe-menu',
       ghostLabel: props.name,
       bodyClass: 'gladys-list-dragging',
-      onDrop: target => props.insertAtPosition(index, Number(target.getAttribute('data-drop-index')))
+      indicatorClass: style.dropIndicator,
+      resolveHover: (target, point) => {
+        const placement = resolveListPlacement(target, point);
+        if (!placement) {
+          return null;
+        }
+        const showLine = !isNoopListInsertion(placement.index, index);
+        return {
+          area: null,
+          indicator: showLine
+            ? insertionLineRect(placement.list.getBoundingClientRect(), placement.rows, placement.index)
+            : null
+        };
+      },
+      onDrop: (target, point) => {
+        const placement = resolveListPlacement(target, point);
+        if (!placement || isNoopListInsertion(placement.index, index)) {
+          return;
+        }
+        // removal shifts the indices below the source before re-insertion
+        const destination = placement.index > index ? placement.index - 1 : placement.index;
+        props.insertAtPosition(index, destination);
+      }
     });
   };
 
@@ -36,18 +73,14 @@ const DashboardListItem = ({ children, ...props }) => {
       onClick={openEditPage}
       data-dashboard-list-drop
       data-drop-index={index}
-      data-drop-active-class="gladys-list-drop-active"
-      class={cx('list-group-item', {
-        active: props.isSelected
+      class={cx(style.dashboardListItem, {
+        [style.dashboardListItemActive]: props.isSelected
       })}
-      style={{ cursor: 'pointer' }}
     >
-      <i
-        class={cx('fe fe-list mr-2', style.listDragHandle)}
-        data-cy={`reorder-dashboard-${index}`}
-        onPointerDown={onHandlePointerDown}
-      />{' '}
-      {wrapEmojisJSX(props.name)}
+      <span class={style.listDragHandle} data-cy={`reorder-dashboard-${index}`} onPointerDown={onHandlePointerDown}>
+        <i class="fe fe-menu" />
+      </span>
+      <span class={style.dashboardListItemName}>{wrapEmojisJSX(props.name)}</span>
     </li>
   );
 };
@@ -67,7 +100,7 @@ class RedorderDashboardList extends Component {
 
   render({ dashboards, currentDashboard }, {}) {
     return (
-      <ul class="list-group">
+      <ul class={style.dashboardList} data-dashboard-list>
         {dashboards &&
           dashboards.map((dashboard, index) => (
             <DashboardListItem

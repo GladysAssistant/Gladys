@@ -1,10 +1,11 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import EditActions from './EditActions';
 import ReorderDashbordList from './ReorderDashbordList';
 import EditBoxColumns from './EditBoxColumns';
 import style from '../style.css';
+import editStyle from './style.css';
 import get from 'get-value';
 
 const EditDashboard = ({ children, ...props }) => (
@@ -24,22 +25,22 @@ const EditDashboard = ({ children, ...props }) => (
               <div class="row">
                 {/* on mobile the canvas comes first, the dashboard list after */}
                 <div class="col-lg-3 order-2 order-lg-1">
-                  <div class="card">
-                    <div class="card-header">
-                      <h3 class="card-title">
-                        <Text id="dashboard.editDashboardMyDashboards" />
-                      </h3>
-                      <div class="page-options d-flex">
-                        {/* creation happens in the edit panel: the user never leaves the editor */}
+                  {/* Horizon glass panel, like the section frames of the canvas */}
+                  <div class={editStyle.dashboardListPanel}>
+                    <div class={editStyle.dashboardListHeader}>
+                      <Text id="dashboard.editDashboardMyDashboards" />
+                      {/* creation happens in the edit panel: the user never leaves the editor */}
+                      <Localizer>
                         <button
                           type="button"
                           onClick={props.openNewDashboard}
-                          class={cx('btn btn-sm btn-secondary', style.smallButtonOnBigScreen)}
+                          class={editStyle.previewButton}
                           data-cy="new-dashboard-button"
+                          title={<Text id="newDashboard.cardTitle" />}
                         >
-                          <span>+</span>
+                          <i class="fe fe-plus" />
                         </button>
-                      </div>
+                      </Localizer>
                     </div>
                     {props.currentDashboard && (
                       <ReorderDashbordList

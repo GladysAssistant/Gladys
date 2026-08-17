@@ -29,9 +29,10 @@ describe('Dashboard', () => {
     cy.get('[data-cy="box-type-user-presence"]').click();
     cy.contains('.btn-outline-primary', 'dashboard.editDashboardSaveButton').click();
 
-    // saving keeps the user in the editor (chain editing) and the save
-    // button briefly becomes the confirmation
-    cy.contains('button', 'dashboard.editDashboardSavedButton').should('have.class', 'btn-success');
+    // saving keeps the user in the editor (chain editing): a transient
+    // confirmation shows, and leaving is available immediately
+    cy.get('[data-cy="dashboard-saved-label"]').should('be.visible');
+    cy.contains('button', 'dashboard.editDashboardDoneButton').should('be.visible');
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/my-new-dashboard/edit`);
   });
   it('Should delete dashboard', () => {
