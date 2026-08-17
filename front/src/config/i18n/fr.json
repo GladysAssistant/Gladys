@@ -3804,7 +3804,16 @@
     "unsavedChanges": "Modifications non enregistrées",
     "savedLabel": "Enregistré",
     "orSeparator": "OU",
-    "triggersIndependentHint": "Chaque déclencheur démarre la scène indépendamment des autres, un seul suffit. Pour exiger plusieurs conditions à la fois, ajoutez une étape « Condition » dans le déroulé de la scène."
+    "triggersIndependentHint": "Chaque déclencheur démarre la scène indépendamment des autres, un seul suffit. Pour exiger plusieurs conditions à la fois, ajoutez une étape « Condition » dans le déroulé de la scène.",
+    "backButton": "Retour à la liste des scènes",
+    "insertStepButton": "Insérer une étape ici",
+    "closeSettingsButton": "Fermer les paramètres",
+    "deleteActionButton": "Supprimer cette action",
+    "deleteConditionButton": "Supprimer cette condition",
+    "deleteStepButton": "Supprimer cette étape",
+    "deleteTriggerButton": "Supprimer ce déclencheur",
+    "expandStepButton": "Afficher le détail",
+    "collapseStepButton": "Masquer le détail"
   },
   "profile": {
     "title": "Profil",

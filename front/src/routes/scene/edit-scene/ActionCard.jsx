@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import cx from 'classnames';
 import { useRef, useCallback, useState } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
@@ -178,16 +178,34 @@ const ActionCard = ({ children, ...props }) => {
             <div class="card-status bg-blue" />
           )}
           <div class="card-options">
-            <a class="cursor-pointer">
-              <i class="fe fe-move mr-4" />
-            </a>
-            <a onClick={handleDelete} class="card-options-remove mr-4 cursor-pointer">
-              <i class="fe fe-x" />
-            </a>
+            {/* The whole card header is the drag handle: this icon only signals it */}
+            <span class="mr-4" aria-hidden="true">
+              <i class="fe fe-move" />
+            </span>
+            <Localizer>
+              <button
+                type="button"
+                onClick={handleDelete}
+                class={cx('card-options-remove mr-4', style.cardOptionButton)}
+                aria-label={
+                  <Text id={isCondition ? 'editScene.deleteConditionButton' : 'editScene.deleteActionButton'} />
+                }
+              >
+                <i class="fe fe-x" />
+              </button>
+            </Localizer>
             {!isStructuralCondition && (
-              <a onClick={toggleExpanded} class="cursor-pointer">
-                <i class={cx('fe', isExpanded ? 'fe-chevron-up' : 'fe-chevron-down')} />
-              </a>
+              <Localizer>
+                <button
+                  type="button"
+                  onClick={toggleExpanded}
+                  class={style.cardOptionButton}
+                  aria-expanded={isExpanded}
+                  aria-label={<Text id={isExpanded ? 'editScene.collapseStepButton' : 'editScene.expandStepButton'} />}
+                >
+                  <i class={cx('fe', isExpanded ? 'fe-chevron-up' : 'fe-chevron-down')} />
+                </button>
+              </Localizer>
             )}
           </div>
         </div>

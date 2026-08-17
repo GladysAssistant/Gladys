@@ -89,6 +89,18 @@
   padding-right: 1rem;
 }
 
+/* Icon-only controls of a card header: native buttons, styled like the surrounding text
+   so they stay keyboard-focusable without changing the look of the card */
+.cardOptionButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .stepIconTile {
   display: flex;
   align-items: center;

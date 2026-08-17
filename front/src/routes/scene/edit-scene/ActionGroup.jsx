@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import { useRef } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
 import cx from 'classnames';
@@ -28,6 +28,8 @@ const renderActionCard = (props, action, index) => (
     setVariables={props.setVariables}
     scene={props.scene}
     allActions={props.allActions}
+    columnIndex={props.index}
+    index={index}
     showParallelLink={props.actions.length === 1}
   />
 );
@@ -101,13 +103,20 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
           </h4>
 
           <div class="card-options">
-            <a class="cursor-pointer">
-              <i class="fe fe-move mr-4" />
-            </a>
+            <span class="mr-4" aria-hidden="true">
+              <i class="fe fe-move" />
+            </span>
             {!props.lastActionGroup && (
-              <a onClick={props.deleteThisActionGroup} class="card-options-remove cursor-pointer">
-                <i class="fe fe-x" />
-              </a>
+              <Localizer>
+                <button
+                  type="button"
+                  onClick={props.deleteThisActionGroup}
+                  class={cx('card-options-remove', style.cardOptionButton)}
+                  aria-label={<Text id="editScene.deleteStepButton" />}
+                >
+                  <i class="fe fe-x" />
+                </button>
+              </Localizer>
             )}
           </div>
         </div>

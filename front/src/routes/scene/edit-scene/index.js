@@ -367,10 +367,15 @@ class EditScene extends Component {
     if (e) {
       e.preventDefault();
     }
+    // Serialize the scene before the request: the local state can change while it is in
+    // flight (and the "active" switch patches the scene on its own), so snapshotting the
+    // state afterwards would display "saved" for data this request never sent
+    const savedSceneSnapshot = JSON.stringify(this.state.scene);
+    const sceneToSave = JSON.parse(savedSceneSnapshot);
     this.setState({ saving: true, error: false, errorMessage: null });
     try {
-      await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
-      this.setState({ savedSceneSnapshot: JSON.stringify(this.state.scene) });
+      await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
+      this.setState({ savedSceneSnapshot });
     } catch (e) {
       console.error(e);
       let errorMessage = null;
@@ -674,6 +679,9 @@ class EditScene extends Component {
   };
 
   deleteAction = path => {
+    // Deleting the only action of a step in the middle of the flow leaves an empty group
+    // behind, which renders as a stray "add a step" button: drop it, as a drag & drop does
+    const cleanUpEmptyGroup = () => this.cleanUpEmptyGroupAfterMove(path);
     this.setState(prevState => {
       // Remove the action
       const pathSegments = path.split('.');
@@ -807,7 +815,7 @@ class EditScene extends Component {
         ...updateObject,
         variables: { $set: newVariables }
       });
-    });
+    }, cleanUpEmptyGroup);
   };
 
   updatePathAfterDeletion = (currentPath, deletedPath) => {
@@ -1028,12 +1036,9 @@ class EditScene extends Component {
     }
     const containerSegments = groupSegments.slice(0, -1);
     const groupIndex = parseInt(groupSegments[groupSegments.length - 1], 10);
-    let container = this.state.scene.actions;
-    for (const segment of containerSegments) {
-      container = segment === 'then' || segment === 'else' ? container[segment] : container[parseInt(segment, 10)];
-      if (!container) {
-        return;
-      }
+    const container = this.getActionContainer(containerSegments);
+    if (!container) {
+      return;
     }
     const group = container[groupIndex];
     if (Array.isArray(group) && group.length === 0 && groupIndex < container.length - 1) {
@@ -1041,7 +1046,62 @@ class EditScene extends Component {
     }
   };
 
+  // Returns the list of action groups designated by a path (the root level, or the "then" /
+  // "else" branch of an if/while block), or null when the path does not designate one
+  getActionContainer = containerSegments => {
+    let container = this.state.scene.actions;
+    for (const segment of containerSegments) {
+      container = segment === 'then' || segment === 'else' ? container[segment] : container[parseInt(segment, 10)];
+      if (!Array.isArray(container)) {
+        return null;
+      }
+    }
+    return container;
+  };
+
+  // A group holding a single action renders as a plain step, without any group chrome: dropping
+  // such a step onto another one must reorder the flow, not merge them into an "at the same
+  // time" block. Parallelism stays opt-in, through the "add a parallel action" control.
+  isSequentialStepReorder = (originalPath, destPath) => {
+    const sourceGroupSegments = originalPath.split('.').slice(0, -1);
+    const destGroupSegments = destPath.split('.').slice(0, -1);
+    // Conditions of if/while blocks are a flat list, not action groups
+    if (sourceGroupSegments.includes('if') || destGroupSegments.includes('if')) {
+      return false;
+    }
+    const sourceContainerSegments = sourceGroupSegments.slice(0, -1);
+    const destContainerSegments = destGroupSegments.slice(0, -1);
+    // Only two steps of the same container are reordered: moving an action to another
+    // container (in or out of a branch) keeps inserting it in the destination group
+    if (
+      sourceGroupSegments.length === 0 ||
+      sourceGroupSegments.join('.') === destGroupSegments.join('.') ||
+      sourceContainerSegments.join('.') !== destContainerSegments.join('.')
+    ) {
+      return false;
+    }
+    const container = this.getActionContainer(sourceContainerSegments);
+    if (!container) {
+      return false;
+    }
+    const sourceGroup = container[parseInt(sourceGroupSegments[sourceGroupSegments.length - 1], 10)];
+    const destGroup = container[parseInt(destGroupSegments[destGroupSegments.length - 1], 10)];
+    return Array.isArray(sourceGroup) && Array.isArray(destGroup) && sourceGroup.length === 1 && destGroup.length === 1;
+  };
+
   moveCard = async (originalPath, destPath) => {
+    if (this.isSequentialStepReorder(originalPath, destPath)) {
+      return this.moveCardGroup(
+        originalPath
+          .split('.')
+          .slice(0, -1)
+          .join('.'),
+        destPath
+          .split('.')
+          .slice(0, -1)
+          .join('.')
+      );
+    }
     // Helper function to get nested value using path
     const getNestedValue = (obj, path) => {
       return path.split('.').reduce((acc, key) => acc && acc[key], obj);

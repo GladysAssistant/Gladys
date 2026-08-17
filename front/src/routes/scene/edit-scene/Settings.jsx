@@ -2,6 +2,7 @@ import cx from 'classnames';
 import { Localizer, Text } from 'preact-i18n';
 import CreatableSelect from 'react-select/creatable';
 import IconSelector from '../../../components/scene/IconSelector';
+import style from './style.css';
 
 const Settings = ({ children, ...props }) => {
   return (
@@ -14,9 +15,16 @@ const Settings = ({ children, ...props }) => {
             <Text id="editScene.settings" />
           </h4>
           <div class="card-options">
-            <a onClick={props.closeSettings} class="card-options-remove cursor-pointer">
-              <i class="fe fe-x" />
-            </a>
+            <Localizer>
+              <button
+                type="button"
+                onClick={props.closeSettings}
+                class={cx('card-options-remove', style.cardOptionButton)}
+                aria-label={<Text id="editScene.closeSettingsButton" />}
+              >
+                <i class="fe fe-x" />
+              </button>
+            </Localizer>
           </div>
         </div>
         <div class="card-body">

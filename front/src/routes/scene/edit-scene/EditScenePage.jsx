@@ -8,7 +8,7 @@ import TriggerGroup from './TriggerGroup';
 import style from './style.css';
 import Settings from './Settings';
 import EditActions from './EditActions';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 
 const EditScenePage = ({ children, ...props }) => {
   // The scene settings (name, description, icon, tags) are hidden by default
@@ -34,9 +34,15 @@ const EditScenePage = ({ children, ...props }) => {
               <div class="row justify-content-between">
                 <div class="col-7 col-md-8">
                   <h1 class={cx('page-title', style.pageTitle)}>
-                    <button onClick={props.goBack} class={cx('btn btn-secondary btn-sm', style.backButton)}>
-                      <i class="fe fe-arrow-left" />
-                    </button>
+                    <Localizer>
+                      <button
+                        onClick={props.goBack}
+                        class={cx('btn btn-secondary btn-sm', style.backButton)}
+                        aria-label={<Text id="editScene.backButton" />}
+                      >
+                        <i class="fe fe-arrow-left" />
+                      </button>
+                    </Localizer>
                     {props.scene.icon && (
                       <span class={style.sceneIconTile}>
                         <i class={`fe fe-${props.scene.icon}`} />
@@ -44,6 +50,7 @@ const EditScenePage = ({ children, ...props }) => {
                     )}
                     <span class={style.sceneName}>{props.scene.name}</span>
 
+                    {/* The active flag is patched on its own: keep it from racing a full save */}
                     <label className="custom-switch m-0 ml-4">
                       <input
                         type="checkbox"
@@ -52,6 +59,7 @@ const EditScenePage = ({ children, ...props }) => {
                         className="custom-switch-input"
                         checked={props.scene.active}
                         onClick={props.switchActiveScene}
+                        disabled={props.saving}
                       />
                       <span class="custom-switch-indicator" />
                     </label>
@@ -173,14 +181,16 @@ const EditScenePage = ({ children, ...props }) => {
                   index + 1 < props.scene.actions.length &&
                   props.scene.actions[index + 1].length > 0 && (
                     <div class={style.stepConnector}>
-                      <button
-                        onClick={() => insertStepAfter(index)}
-                        class={style.stepInsertButton}
-                        disabled={props.saving}
-                        title=""
-                      >
-                        <i class="fe fe-plus" />
-                      </button>
+                      <Localizer>
+                        <button
+                          onClick={() => insertStepAfter(index)}
+                          class={style.stepInsertButton}
+                          disabled={props.saving}
+                          aria-label={<Text id="editScene.insertStepButton" />}
+                        >
+                          <i class="fe fe-plus" />
+                        </button>
+                      </Localizer>
                     </div>
                   )}
               </div>

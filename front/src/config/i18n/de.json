@@ -3804,7 +3804,16 @@
     "unsavedChanges": "Nicht gespeicherte Änderungen",
     "savedLabel": "Gespeichert",
     "orSeparator": "ODER",
-    "triggersIndependentHint": "Jeder Auslöser startet die Szene unabhängig von den anderen, einer genügt. Um mehrere Bedingungen gleichzeitig zu verlangen, füge der Szene einen Bedingungsschritt hinzu."
+    "triggersIndependentHint": "Jeder Auslöser startet die Szene unabhängig von den anderen, einer genügt. Um mehrere Bedingungen gleichzeitig zu verlangen, füge der Szene einen Bedingungsschritt hinzu.",
+    "backButton": "Zurück zur Szenenliste",
+    "insertStepButton": "Hier einen Schritt einfügen",
+    "closeSettingsButton": "Einstellungen schließen",
+    "deleteActionButton": "Diese Aktion löschen",
+    "deleteConditionButton": "Diese Bedingung löschen",
+    "deleteStepButton": "Diesen Schritt löschen",
+    "deleteTriggerButton": "Diesen Auslöser löschen",
+    "expandStepButton": "Details anzeigen",
+    "collapseStepButton": "Details ausblenden"
   },
   "profile": {
     "title": "Profil",
