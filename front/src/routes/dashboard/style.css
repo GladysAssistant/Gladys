@@ -282,6 +282,11 @@
   gap: 6px;
   min-width: 0;
   max-width: 100%;
+  /* The glass variant's backdrop-filter makes this a stacking context, which
+     would trap the overflow menu below the dashboard cards: stack the whole
+     bar above the page content so the menu opens on top */
+  position: relative;
+  z-index: 10;
 }
 
 .dashboardTab {
@@ -303,6 +308,25 @@
 .dashboardTabName {
   font-size: 0.875rem;
   font-weight: 600;
+  /* one endless name must not eat the whole row */
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboardTabsOverflow {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.dashboardTabsMenu {
+  max-height: 60vh;
+  overflow-y: auto;
+  min-width: 13rem;
+}
+
+.dashboardTabsMenuIcon {
+  margin-right: 0.5rem;
 }
 
 /* Tablet mode keeps the compact icon dock */
@@ -311,15 +335,9 @@
   padding: 0;
 }
 
-/* On small screens the row scrolls instead of wrapping, and only the
-   active pill keeps its name — the rest shrink to icon dots */
+/* On small screens only the active pill keeps its name — the rest shrink
+   to icon dots so more of them fit before the overflow kicks in */
 @media (max-width: 767px) {
-  .dashboardTabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
   .dashboardTab:not(.dashboardTabActive) {
     width: 2.375rem;
     padding: 0;

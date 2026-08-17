@@ -182,10 +182,11 @@ A `theme` override (`auto`/`light`/`dark`) was considered and **deferred**: the 
 ## H. Dashboard navigation: one-tap pill tab bar
 
 - Each dashboard gains an optional `icon` (picker from the existing icon set) next to its name; `GET /api/v1/dashboard` returns it in the list payload.
-- The dashboard selector is an **always-visible pill tab bar in every mode** — switching dashboards is one tap, never a menu to open first. The old two-click dropdown was removed (a dropdown is an overflow pattern, wrong as the primary entry for the 2–5 dashboards users typically have):
-  - **desktop**: icon + name pills, wrapping when needed;
-  - **mobile** (< 768px): the row scrolls horizontally instead of wrapping, and only the active pill keeps its name — the others shrink to icon dots, so the bar stays one line;
-  - **tablet mode** (the `tabletMode` store flag, fed by `session.tablet_mode`): compact icon-only dock, as before (current dashboard highlighted, `home` as the fallback icon).
+- The dashboard selector is an **always-visible pill tab bar in every mode** — switching between the first dashboards is one tap, never a menu to open first. The old two-click dropdown was removed as the primary entry; it survives only as the overflow. Users commonly have 15–20 dashboards, so the bar is a **"priority+" row** (`DashboardTabs.jsx`): a single line of pills in dashboard order — the order the user already controls in the edit view, i.e. a user-chosen priority — and every pill that doesn't fit collapses behind a trailing **"…" button** opening the full scrollable list (icons + names). Fit is measured on render and resize (wrap detection on the rendered pills), so it adapts to any width and any name length (per-pill ellipsis past 11rem):
+  - **desktop**: icon + name pills;
+  - **mobile** (< 768px): only the active pill keeps its name, the others shrink to icon dots so more fit before the overflow kicks in;
+  - **tablet mode** (the `tabletMode` store flag, fed by `session.tablet_mode`): compact icon-only dock (current dashboard highlighted, `home` as the fallback icon);
+  - when the **current dashboard is one of the collapsed ones**, the "…" button shows its icon + name (active styling, chevron), so the context never disappears.
 - Touch swipe between dashboards is a possible later complement to the pills (invisible affordance, needs a strict directional threshold to never steal vertical scroll or widget gestures); it does not replace them.
 
 ## Phases

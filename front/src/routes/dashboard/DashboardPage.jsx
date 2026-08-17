@@ -1,11 +1,10 @@
 import { Text } from 'preact-i18n';
-import { Link } from 'preact-router/match';
+import DashboardTabs from './DashboardTabs';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
 import EmptyState from './EmptyState';
 import SetTabletMode from './SetTabletMode';
 import { JOB_STATUS } from '../../../../server/utils/constants';
-import { wrapEmojisJSX } from '../../utils/emojiWrapper';
 
 import style from './style.css';
 
@@ -35,31 +34,15 @@ const DashboardPage = ({ children, ...props }) => {
               <div class={cx('container', { [style.fullWidthContainer]: fullWidth })}>
                 <div class="page-header">
                   <div>
-                    {/* One-tap pills in every mode: icon + name normally, icon-only
-                        in tablet mode; on mobile only the active pill keeps its name */}
+                    {/* One-tap pills in every mode; pills that don't fit on one
+                        row collapse behind a "…" button opening the full list */}
                     {!props.dashboardListEmpty && (
-                      <div
-                        class={cx(style.dashboardTabs, {
-                          [style.dashboardTabsIconsOnly]: props.tabletMode
-                        })}
-                      >
-                        {props.dashboards.map(dashboard => (
-                          <Link
-                            href={`/dashboard/${dashboard.selector}`}
-                            onClick={props.redirectToDashboard}
-                            class={cx(style.dashboardTab, {
-                              [style.dashboardTabActive]:
-                                props.currentDashboard && dashboard.selector === props.currentDashboard.selector
-                            })}
-                            title={dashboard.name}
-                          >
-                            <i class={`fe fe-${dashboard.icon || 'home'}`} />
-                            {!props.tabletMode && (
-                              <span class={style.dashboardTabName}>{wrapEmojisJSX(dashboard.name)}</span>
-                            )}
-                          </Link>
-                        ))}
-                      </div>
+                      <DashboardTabs
+                        dashboards={props.dashboards}
+                        currentDashboard={props.currentDashboard}
+                        tabletMode={props.tabletMode}
+                        redirectToDashboard={props.redirectToDashboard}
+                      />
                     )}
                   </div>
 
