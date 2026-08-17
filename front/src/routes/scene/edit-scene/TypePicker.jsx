@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import style from './style.css';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import { COLOR_CLASS } from './typesCatalog';
 
 // Case and accent insensitive comparison, so that "reveil" matches "Réveil"
 const normalize = text =>
@@ -12,17 +13,6 @@ const normalize = text =>
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
-
-const ICON_COLOR_CLASS = {
-  green: 'typePickerIconGreen',
-  pink: 'typePickerIconPink',
-  purple: 'typePickerIconPurple',
-  blue: 'typePickerIconBlue',
-  orange: 'typePickerIconOrange',
-  red: 'typePickerIconRed',
-  yellow: 'typePickerIconYellow',
-  gray: 'typePickerIconGray'
-};
 
 class TypePicker extends Component {
   updateQuery = e => {
@@ -101,7 +91,7 @@ class TypePicker extends Component {
                     data-value={item.type}
                     onClick={this.selectType}
                   >
-                    <span class={cx(style.typePickerIcon, style[ICON_COLOR_CLASS[category.color]])}>
+                    <span class={cx(style.typePickerIcon, style[COLOR_CLASS[category.color]])}>
                       <i class={icons[item.type]} />
                     </span>
                     <span class={style.typePickerOptionText}>

@@ -93,7 +93,9 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
       >
         <div class="card-status card-status-left bg-blue" />
         <div ref={drag} class="card-header cursor-pointer">
-          <i class="fe fe-git-merge mr-2" />
+          <span class={cx(style.stepIconTile, style.typePickerIconBlue)}>
+            <i class="fe fe-git-merge" />
+          </span>
           <h4 class="card-title">
             <Text id="editScene.parallelBlockTitle" />
           </h4>

@@ -6,7 +6,7 @@ import { useDrag, useDrop } from 'react-dnd';
 
 import style from './style.css';
 import { ACTIONS } from '../../../../../server/utils/constants';
-import { ACTION_ICON } from './typesCatalog';
+import { ACTION_ICON, ACTION_COLOR, COLOR_CLASS } from './typesCatalog';
 import { getActionSummary } from './summary';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
@@ -160,12 +160,18 @@ const ActionCard = ({ children, ...props }) => {
         })}
       >
         <div ref={drag} class={cx('card-header', style.stepCardHeader)}>
-          {props.action.type !== null && <i class={cx(ACTION_ICON[props.action.type], 'dark-mode-fe-none-filter')} />}
-          {props.action.type === null && <i class="fe fe-plus-circle" />}
-          <div class={cx('card-title', style.stepCardTitle)} onClick={toggleExpanded}>
-            <i class={cx(props.action.icon, 'mr-4')} /> <Text id={`editScene.actions.${props.action.type}`} />
-            {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
-            {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
+          <span
+            class={cx(style.stepIconTile, style[COLOR_CLASS[ACTION_COLOR[props.action.type]] || 'typePickerIconGray'])}
+          >
+            {props.action.type !== null && <i class={cx(ACTION_ICON[props.action.type], 'dark-mode-fe-none-filter')} />}
+            {props.action.type === null && <i class="fe fe-plus-circle" />}
+          </span>
+          <div class={style.stepText} onClick={toggleExpanded}>
+            <span class={style.stepLabel}>
+              <Text id={`editScene.actions.${props.action.type}`} />
+              {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
+              {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
+            </span>
             {summary && <span class={style.stepSummary}>{summary}</span>}
           </div>
           {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (

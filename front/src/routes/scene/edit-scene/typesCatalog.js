@@ -128,6 +128,26 @@ export const ACTION_CATEGORIES = [
   }
 ];
 
+// Maps each category color to its CSS module class (defined in style.css)
+export const COLOR_CLASS = {
+  green: 'typePickerIconGreen',
+  pink: 'typePickerIconPink',
+  purple: 'typePickerIconPurple',
+  blue: 'typePickerIconBlue',
+  orange: 'typePickerIconOrange',
+  red: 'typePickerIconRed',
+  yellow: 'typePickerIconYellow',
+  gray: 'typePickerIconGray'
+};
+
+const buildColorMap = categories =>
+  categories.reduce((colors, category) => {
+    category.items.forEach(item => {
+      colors[item] = category.color;
+    });
+    return colors;
+  }, {});
+
 // Triggers grouped by category, in the order they are displayed in the picker
 export const TRIGGER_CATEGORIES = [
   {
@@ -175,3 +195,7 @@ export const TRIGGER_CATEGORIES = [
     items: [EVENTS.SYSTEM.START, EVENTS.MQTT.RECEIVED]
   }
 ];
+
+// Category color of each action / trigger type, for the card icon tiles
+export const ACTION_COLOR = buildColorMap(ACTION_CATEGORIES);
+export const TRIGGER_COLOR = buildColorMap(TRIGGER_CATEGORIES);

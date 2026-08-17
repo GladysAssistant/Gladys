@@ -15,7 +15,7 @@ import MQTTReceivedTrigger from './triggers/MQTTReceivedTrigger';
 import WeatherAlert from './triggers/WeatherAlert';
 
 import { EVENTS } from '../../../../../server/utils/constants';
-import { TRIGGER_ICON } from './typesCatalog';
+import { TRIGGER_ICON, TRIGGER_COLOR, COLOR_CLASS } from './typesCatalog';
 import { getTriggerSummary } from './summary';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -48,12 +48,17 @@ const TriggerCard = ({ children, ...props }) => {
   return (
     <div class="card user-select-none">
       <div class="card-header">
-        {TRIGGER_ICON[props.trigger.type] && <i class={TRIGGER_ICON[props.trigger.type]} />}
-        {props.trigger.type === null && <i class="fe fe-plus-circle" />}
-        <div class={cx('card-title', style.stepCardTitle)} onClick={toggleExpanded}>
-          <i class={cx('mr-3', props.trigger.icon)} />
-          <Text id={`editScene.triggers.${props.trigger.type}`} />
-          {props.trigger.type === null && <Text id="editScene.newTrigger" />}
+        <span
+          class={cx(style.stepIconTile, style[COLOR_CLASS[TRIGGER_COLOR[props.trigger.type]] || 'typePickerIconGray'])}
+        >
+          {TRIGGER_ICON[props.trigger.type] && <i class={TRIGGER_ICON[props.trigger.type]} />}
+          {props.trigger.type === null && <i class="fe fe-plus-circle" />}
+        </span>
+        <div class={style.stepText} onClick={toggleExpanded}>
+          <span class={style.stepLabel}>
+            <Text id={`editScene.triggers.${props.trigger.type}`} />
+            {props.trigger.type === null && <Text id="editScene.newTrigger" />}
+          </span>
           {summary && <span class={style.stepSummary}>{summary}</span>}
         </div>
         <div class="card-options">
