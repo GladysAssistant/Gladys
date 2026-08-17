@@ -5067,6 +5067,11 @@
           "1": "Läuft",
           "2": "Pausiert",
           "3": "Fehler"
+        },
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Nein",
+          "one": "Ja"
         }
       },
       "vacuum-cleaner": {

@@ -42,7 +42,7 @@ const {
 const {
   isDishwasherEndpoint,
   convertMatterOperationalStateToDishwasherState,
-  DISHWASHER_ALARMS,
+  getSupportedDishwasherAlarms,
 } = require('../utils/dishwasherMatterMapping');
 
 /**
@@ -379,8 +379,11 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
   if (dishwasherAlarm) {
     const value = await safeReadAttribute(() => dishwasherAlarm.getStateAttribute());
     if (value !== undefined) {
+      // Only the alarms the appliance declares as supported have a Gladys feature: emitting the
+      // others would target features that do not exist.
+      const supported = await safeReadAttribute(() => dishwasherAlarm.getSupportedAttribute());
       const dishwasherAlarmBaseExternalId = `matter:${nodeId}:${devicePath}:${DishwasherAlarm.Complete.id}`;
-      DISHWASHER_ALARMS.forEach((alarm) => {
+      getSupportedDishwasherAlarms(supported).forEach((alarm) => {
         emitState(
           `${dishwasherAlarmBaseExternalId}:${alarm.type}`,
           value && value[alarm.matterField] ? STATE.ON : STATE.OFF,

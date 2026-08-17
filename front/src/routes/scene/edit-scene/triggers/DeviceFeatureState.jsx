@@ -19,6 +19,12 @@ import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDevic
 import WaterValveDeviceState from './device-states/WaterValveDeviceState';
 import WaterHeaterModeDeviceState from './device-states/WaterHeaterModeDeviceState';
 
+// Every dishwasher type but `state` is a fault flag: a trigger on a fault deserves the
+// Active/Inactive widget rather than a numeric input.
+const DISHWASHER_ALARM_TYPES = Object.values(DEVICE_FEATURE_TYPES.DISHWASHER).filter(
+  type => type !== DEVICE_FEATURE_TYPES.DISHWASHER.STATE
+);
+
 class TurnOnLight extends Component {
   // The trigger stores its features in `device_features`; triggers saved before
   // multi-select stored a single selector in `device_feature`
@@ -141,7 +147,8 @@ class TurnOnLight extends Component {
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE ||
         (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
-          (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST || type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING));
+          (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST || type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING)) ||
+        (category === DEVICE_FEATURE_CATEGORIES.DISHWASHER && DISHWASHER_ALARM_TYPES.includes(type));
       // Scoped to `push`: the locked "device seen" widget only makes sense for a heartbeat
       // sensor. A binary presence sensor (a camera reporting a person) shares the 'binary'
       // string with SWITCH, so it is already served by BinaryDeviceState above, and both

@@ -43,7 +43,7 @@ const {
 const {
   isDishwasherEndpoint,
   convertMatterOperationalStateToDishwasherState,
-  DISHWASHER_ALARMS,
+  getSupportedDishwasherAlarms,
 } = require('../utils/dishwasherMatterMapping');
 
 /**
@@ -674,11 +674,20 @@ async function listenToStateChange(nodeId, devicePath, device) {
     logger.debug(`Matter: Adding state change listener for DishwasherAlarm cluster ${dishwasherAlarm.name}`);
     this.stateChangeListeners.add(dishwasherAlarm);
     const dishwasherAlarmBaseExternalId = `matter:${nodeId}:${devicePath}:${DishwasherAlarm.Complete.id}`;
+    // The supported bitmap is read once, before the listener is registered: only the alarms the
+    // appliance declares as supported have a Gladys feature. An unreadable bitmap falls back to
+    // every alarm, exactly like the discovery does when it creates the features.
+    let supported;
+    try {
+      supported = await dishwasherAlarm.getSupportedAttribute();
+    } catch (error) {
+      logger.debug(`Matter: Could not read the DishwasherAlarm Supported attribute: ${error.message}`);
+    }
+    const supportedAlarms = getSupportedDishwasherAlarms(supported);
     dishwasherAlarm.addStateAttributeListener((value) => {
       logger.debug(`Matter: DishwasherAlarm State attribute changed to ${JSON.stringify(value)}`);
-      // The attribute is a bitmap: each alarm is published as its own binary feature, and an
-      // alarm the appliance does not report is simply not created as a feature.
-      DISHWASHER_ALARMS.forEach((alarm) => {
+      // The attribute is a bitmap: each alarm is published as its own binary feature.
+      supportedAlarms.forEach((alarm) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `${dishwasherAlarmBaseExternalId}:${alarm.type}`,
           state: value && value[alarm.matterField] ? STATE.ON : STATE.OFF,

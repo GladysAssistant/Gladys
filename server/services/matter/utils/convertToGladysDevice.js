@@ -675,8 +675,14 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         });
       } else if (clusterIndex === DishwasherAlarm.Complete.id) {
         // Only the alarms the appliance declares as supported get a feature: the others would
-        // stay stuck at zero forever.
-        const supported = clusterClient.getSupportedAttribute ? await clusterClient.getSupportedAttribute() : undefined;
+        // stay stuck at zero forever. An unreadable bitmap must not abort the whole conversion
+        // and lose the features already collected, it falls back to exposing every alarm.
+        let supported;
+        try {
+          supported = await clusterClient.getSupportedAttribute();
+        } catch (error) {
+          // Supported attribute not available
+        }
         getSupportedDishwasherAlarms(supported).forEach((alarm) => {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (${alarm.name})`,

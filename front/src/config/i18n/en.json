@@ -5067,6 +5067,11 @@
           "1": "Running",
           "2": "Paused",
           "3": "Error"
+        },
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
         }
       },
       "vacuum-cleaner": {

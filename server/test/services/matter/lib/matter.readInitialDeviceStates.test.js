@@ -765,6 +765,28 @@ describe('Matter.readInitialDeviceStates', () => {
     expect(gladys.event.emit.callCount).to.equal(6);
   });
 
+  it('should only read the dishwasher alarms the appliance supports', async () => {
+    const dishwasherAlarm = {
+      getStateAttribute: fake.resolves({ drainError: true }),
+      getSupportedAttribute: fake.resolves({ drainError: true, doorError: true }),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === DishwasherAlarm.Complete.id ? dishwasherAlarm : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DishwasherAlarm.Complete.id}:drain-error`,
+      state: STATE.ON,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DishwasherAlarm.Complete.id}:door-error`,
+      state: STATE.OFF,
+    });
+    expect(gladys.event.emit.callCount).to.equal(2);
+  });
+
   it('should report every dishwasher alarm as inactive when the bitmap is empty', async () => {
     const dishwasherAlarm = {
       getStateAttribute: fake.resolves(null),

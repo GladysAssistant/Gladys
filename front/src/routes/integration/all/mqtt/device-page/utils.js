@@ -6,7 +6,8 @@ import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
-  WATER_HEATER_MODE
+  WATER_HEATER_MODE,
+  DISHWASHER_STATE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { CAMERA_MOVE_OPTIONS } from '../../../../../utils/cameraMove';
@@ -898,6 +899,11 @@ export const getCatalogPreviewLabelKey = (category, type) => {
 export const getFeaturePreviewValue = (category, type) => {
   // Category-specific blocks first: some of their types ('power', 'index', 'target-temperature',
   // 'mode') also exist in other categories matched below by type only.
+  if (category === DEVICE_FEATURE_CATEGORIES.DISHWASHER) {
+    // A running program for the state, no fault raised for the alarms.
+    return type === DEVICE_FEATURE_TYPES.DISHWASHER.STATE ? DISHWASHER_STATE.RUNNING : 0;
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
       return WATER_HEATER_MODE.ECO;

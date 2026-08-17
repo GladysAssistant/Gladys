@@ -673,6 +673,35 @@ describe('Matter.convertToGladysDevice', () => {
       ]);
     });
 
+    it('should create every alarm feature when the supported bitmap cannot be read', async () => {
+      const device = {
+        name: 'Dishwasher',
+        number: 1,
+        getAllClusterClients: () => [
+          {
+            id: DishwasherAlarm.Complete.id,
+            name: 'DishwasherAlarm',
+            endpointId: 1,
+            getSupportedAttribute: async () => {
+              throw new Error('unreadable Supported attribute');
+            },
+          },
+        ],
+        getChildEndpoints: () => [],
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+      expect(gladysDevice.features.map((feature) => feature.type)).to.deep.equal([
+        DEVICE_FEATURE_TYPES.DISHWASHER.INFLOW_ERROR,
+        DEVICE_FEATURE_TYPES.DISHWASHER.DRAIN_ERROR,
+        DEVICE_FEATURE_TYPES.DISHWASHER.DOOR_ERROR,
+        DEVICE_FEATURE_TYPES.DISHWASHER.TEMPERATURE_TOO_LOW,
+        DEVICE_FEATURE_TYPES.DISHWASHER.TEMPERATURE_TOO_HIGH,
+        DEVICE_FEATURE_TYPES.DISHWASHER.WATER_LEVEL_ERROR,
+      ]);
+    });
+
     it('should map the BooleanState cluster of a dishwasher to an opening sensor door feature', async () => {
       const device = {
         name: 'Dishwasher',

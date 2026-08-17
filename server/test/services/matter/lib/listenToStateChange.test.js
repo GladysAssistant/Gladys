@@ -1090,6 +1090,30 @@ describe('Matter.listenToStateChange', () => {
     expect(gladys.event.emit.callCount).to.equal(6);
   });
 
+  it('should only listen to the dishwasher alarms the appliance supports', async () => {
+    const clusterClient = {
+      id: DishwasherAlarm.Complete.id,
+      getSupportedAttribute: fake.resolves({ inflowError: true, doorError: true }),
+      addStateAttributeListener: (callback) => {
+        callback({ inflowError: true, doorError: false });
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:2:${DishwasherAlarm.Complete.id}:inflow-error`,
+      state: STATE.ON,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:2:${DishwasherAlarm.Complete.id}:door-error`,
+      state: STATE.OFF,
+    });
+    expect(gladys.event.emit.callCount).to.equal(2);
+  });
+
   it('should report every dishwasher alarm as inactive when the bitmap is empty', async () => {
     const clusterClient = {
       id: DishwasherAlarm.Complete.id,
