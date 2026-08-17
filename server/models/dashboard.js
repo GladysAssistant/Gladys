@@ -48,6 +48,10 @@ const boxesSchema = Joi.array().items(
       gauge_color_high: Joi.string(),
       colors: Joi.array().items(Joi.string()),
       show_subscription_prices: Joi.boolean(),
+      period_start_day: Joi.number()
+        .integer()
+        .min(1)
+        .max(31),
       url: Joi.string().uri({ scheme: ['http', 'https'] }),
       icon: Joi.string(),
       photos: Joi.array()
