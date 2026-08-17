@@ -52,6 +52,7 @@ const BaseEditBox = ({ children, ...props }) => {
     setMoveToDashboardOpened(false);
     props.moveBoxToDashboard(x, y, dashboardSelector);
   };
+  const moveToDashboardMenuId = `move-box-to-dashboard-menu-${x}-${y}`;
   if (props.isMobileReordering) {
     return (
       <div
@@ -105,6 +106,9 @@ const BaseEditBox = ({ children, ...props }) => {
                   onClick={toggleMoveToDashboard}
                   class="card-options-remove"
                   aria-label={<Text id="dashboard.moveBoxToDashboard.title" />}
+                  aria-haspopup="true"
+                  aria-expanded={moveToDashboardOpened ? 'true' : 'false'}
+                  aria-controls={moveToDashboardMenuId}
                   // .card-options only styles anchors, so a native button needs the same look
                   style={{
                     background: 'none',
@@ -121,6 +125,7 @@ const BaseEditBox = ({ children, ...props }) => {
                 </button>
               </Localizer>
               <div
+                id={moveToDashboardMenuId}
                 class={cx('dropdown-menu', 'dropdown-menu-right', {
                   show: moveToDashboardOpened
                 })}
