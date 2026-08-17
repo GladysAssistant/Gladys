@@ -147,11 +147,24 @@ characters is cut.
 The command must open its own line, so quoting somebody else (`> /claude …`)
 never fires a session, and a bare `/claude` with no instruction is refused.
 
-**Who may run it:** `OWNER`, `MEMBER` and `COLLABORATOR` only. This is
-deliberately stricter than `/cursor review`, which the PR author may also
-run: a session pushes commits and spends the maintainer's claude.ai
-allowance, so an outside contributor must not be able to start one on their
-own PR. A refused command gets a 👎 reaction.
+**Who may run it:** only the logins listed in `COMMAND_ALLOWED_LOGINS`, at the
+top of the workflow (space-separated, matched case-insensitively; currently
+`Pierre-Gilles`). A refused command gets a 👎 reaction. To let someone else in,
+add their login there — and read the paragraph below first.
+
+An `author_association` check alone would **not** be equivalent, which is the
+whole reason the allow-list exists: `MEMBER` is granted to every member of the
+GladysAssistant organisation, and 8 of this repository's 9 collaborators hold
+the **triage** role, which carries *no push access*. Letting them fire a
+session would hand them, indirectly, a write access GitHub deliberately
+withholds — plus the ability to spend the maintainer's claude.ai allowance.
+The association is still checked as a second barrier, so an allow-listed login
+that leaves the organisation stops working on its own.
+
+This is deliberately far stricter than `/cursor review`, which the PR author
+may also run: triggering Cursor costs a Cursor run, whereas triggering Claude
+pushes commits under the routine owner's identity and draws down their
+subscription. The two do not deserve the same bar.
 
 **What it will work on**, beyond the cron's rules:
 

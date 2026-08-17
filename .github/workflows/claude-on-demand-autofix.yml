@@ -36,10 +36,11 @@ run-name: 'Claude autofix on demand for PR #${{ github.event.issue.number || git
 # payload field and only ever transits through shell variables and files,
 # never interpolated into code.
 #
-# Only OWNER / MEMBER / COLLABORATOR may use the command — deliberately
-# stricter than "/cursor review", which the PR author may also run: a fired
-# session pushes commits and spends the maintainer's claude.ai allowance, so
-# an outside contributor must not be able to start one on their own PR.
+# Only the logins in COMMAND_ALLOWED_LOGINS below may use the command —
+# deliberately much stricter than "/cursor review", which the PR author may
+# also run. Triggering Cursor costs a Cursor run; triggering Claude pushes
+# commits and spends the maintainer's own claude.ai allowance, so the two do
+# not deserve the same bar.
 #
 # Required configuration (shared with claude-scheduled-autofix.yml):
 #   vars.CLAUDE_AUTOFIX_FIRE_URL         - the routine's API trigger URL
@@ -56,6 +57,19 @@ on:
     types: [submitted]
 
 env:
+  # WHO MAY RUN THE COMMAND. Space-separated GitHub logins, matched
+  # case-insensitively; this is the whole access control of this workflow, so
+  # keep it to people you accept spending your claude.ai allowance and pushing
+  # to claude/ branches under your GitHub identity.
+  #
+  # An author_association check alone would NOT do: "MEMBER" is granted to
+  # every member of the GladysAssistant organisation, including the eight
+  # collaborators whose repository role is "triage" — who cannot push to this
+  # repository at all. Letting them fire a session would hand them, indirectly,
+  # a write access GitHub deliberately withholds. The association is still
+  # checked below, as a second barrier in case a login here stops being a
+  # member.
+  COMMAND_ALLOWED_LOGINS: 'Pierre-Gilles'
   # Cloud sessions may only push to branches with this prefix (other branches
   # are rejected when they carry commits by someone else).
   HEAD_BRANCH_PREFIX: 'claude/'
@@ -189,12 +203,31 @@ jobs:
             exit 0
           fi
 
-          # Anyone able to influence this repository may spend a session;
-          # the PR author alone may not (see the header).
+          # Access control, in two independent barriers (see the header).
+          # 1. The author must be listed in COMMAND_ALLOWED_LOGINS. Logins are
+          #    alphanumerics and hyphens, so the unquoted expansion below can
+          #    neither glob nor split anywhere unintended.
+          AUTHOR_LC=$(printf '%s' "$COMMENT_AUTHOR" | tr '[:upper:]' '[:lower:]')
+          ALLOWED=false
+          for LOGIN in $COMMAND_ALLOWED_LOGINS; do
+            if [ "$(printf '%s' "$LOGIN" | tr '[:upper:]' '[:lower:]')" = "$AUTHOR_LC" ]; then
+              ALLOWED=true
+              break
+            fi
+          done
+          if [ "$ALLOWED" != true ]; then
+            echo "::warning::${COMMENT_AUTHOR} is not in COMMAND_ALLOWED_LOGINS: not running /claude on PR #${PR_NUMBER}."
+            react '-1'
+            echo 'run=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # 2. And still hold a write-ish relationship to the repository, so a
+          #    login that stays in the list after leaving the organisation
+          #    stops working on its own.
           case "$COMMENT_ASSOCIATION" in
             OWNER | MEMBER | COLLABORATOR) ;;
             *)
-              echo "::warning::${COMMENT_AUTHOR} (${COMMENT_ASSOCIATION}) is not allowed to run /claude on PR #${PR_NUMBER}."
+              echo "::warning::${COMMENT_AUTHOR} is allow-listed but their association is ${COMMENT_ASSOCIATION}: not running /claude on PR #${PR_NUMBER}."
               react '-1'
               echo 'run=false' >> "$GITHUB_OUTPUT"
               exit 0
