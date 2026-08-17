@@ -252,19 +252,21 @@
 
 .editPanelBody {
   overflow-y: auto;
-  padding: 0.75rem 1rem 1rem;
+  padding: 1.25rem 1.375rem 1.5rem;
 }
 
 /* The widget form arrives wrapped in its own BaseEditBox card: inside the
    panel that chrome is redundant (the panel has its own header, remove
-   lives on the canvas toolbar) — flatten it */
+   lives on the canvas toolbar) — flatten it. !important everywhere: the
+   glass card rules fight at the same specificity and bundle order between
+   the two stylesheets is not guaranteed. */
 .editPanelBody > :global(.card) {
-  border: none;
+  border: none !important;
   background: transparent !important;
-  box-shadow: none;
-  margin: 0;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  box-shadow: none !important;
+  margin: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .editPanelBody > :global(.card) > :global(.card-header) {
