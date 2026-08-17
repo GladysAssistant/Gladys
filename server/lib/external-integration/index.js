@@ -119,10 +119,11 @@ const { wakeOnLan } = require('./externalIntegration.wakeOnLan');
  * @param {object} stateManager - State manager.
  * @param {object} device - Device manager.
  * @param {object} variable - Variable manager.
+ * @param {object} energyPrice - Energy price manager (default electric meter).
  * @param {string} jwtSecret - Secret to sign integration JWTs.
  * @param {object} cache - In-memory cache (contact link codes).
  * @example
- * const externalIntegration = new ExternalIntegration(event, system, service, stateManager, device, variable, 's');
+ * const externalIntegration = new ExternalIntegration(event, system, service, state, device, variable, price, 's');
  */
 const ExternalIntegration = function ExternalIntegration(
   event,
@@ -131,6 +132,7 @@ const ExternalIntegration = function ExternalIntegration(
   stateManager,
   device,
   variable,
+  energyPrice,
   jwtSecret,
   cache,
 ) {
@@ -140,6 +142,7 @@ const ExternalIntegration = function ExternalIntegration(
   this.stateManager = stateManager;
   this.device = device;
   this.variable = variable;
+  this.energyPrice = energyPrice;
   this.jwtSecret = jwtSecret;
   this.cache = cache;
   this.available = false;
