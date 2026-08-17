@@ -339,31 +339,34 @@
   margin-right: 0.5rem;
 }
 
-/* With many dashboards the bar takes the full width and the page options
-   wrap below it: keep air between the two rows */
+/* The bar and the header actions share one row at every width — vertical
+   space is precious, actions never cost a line. nowrap matters: with
+   wrapping allowed the bar would be measured at full width (the actions
+   already pushed below) and the priority+ trim would never give their
+   space back */
 .dashboardHeader {
-  flex-wrap: wrap;
-  row-gap: 0.75rem;
+  flex-wrap: nowrap;
 }
 
-/* On phones vertical space is scarce: the only remaining action (edit)
-   shares the bar's row — the bar shrinks and priority+ folds pills into
-   the "…" instead of the actions costing a whole line. nowrap matters:
-   with wrapping allowed the bar is measured at full width (the action
-   already pushed below) and the trim never gives its space back */
-@media (max-width: 767px) {
-  .dashboardHeader {
-    flex-wrap: nowrap;
-  }
+.dashboardHeaderTabs {
+  flex: 1 1 auto;
+  min-width: 0;
+}
 
-  .dashboardHeaderTabs {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
+.dashboardHeader :global(.page-options) {
+  flex: 0 0 auto;
+}
 
-  .dashboardHeader :global(.page-options) {
-    flex: 0 0 auto;
-  }
+/* Actions are round icon pills with exactly the bar's outer height
+   (pill height + bar padding + border), so the row reads as one line */
+.dashboardHeader :global(.page-options .btn) {
+  align-items: center;
+  justify-content: center;
+  width: calc(2.6rem + 12px);
+  height: calc(2.6rem + 12px);
+  padding: 0;
+  border-radius: 999px;
+  font-size: 1.05rem;
 }
 
 /* Horizon glass theme: the overflow menu is a glass surface like the bar
@@ -515,16 +518,6 @@
   max-height: 500px;
   overflow: auto;
   transition: max-height 0.5s ease-in;
-}
-
-.editDashboardText {
-  display: inline;
-}
-
-@media (max-width: 992px) {
-  .editDashboardText {
-    display: none;
-  }
 }
 
 .tabletModeDiv {

@@ -36,7 +36,8 @@ describe('Dashboard', () => {
   });
   it('Should delete dashboard', () => {
     cy.visit('/dashboard/my-new-dashboard');
-    cy.contains('dashboard.editDashboardButton')
+    // the edit action is an icon pill (its label lives in the title attribute)
+    cy.get('[data-cy="edit-dashboard-button"]')
       .should('have.class', 'btn-outline-primary')
       .click();
     cy.contains('dashboard.editDashboardDeleteButton')

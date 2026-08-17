@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import DashboardTabs from './DashboardTabs';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
@@ -44,47 +44,60 @@ const DashboardPage = ({ children, ...props }) => {
                     )}
                   </div>
 
-                  <div class="page-options d-flex align-content-between flex-wrap">
+                  {/* Actions are icon pills matching the bar's height, on the
+                      bar's own row at every width — never a second line */}
+                  <div class="page-options d-flex">
                     {/* configuring a wall tablet only makes sense on a tablet-sized
                         screen: hidden on phones */}
                     {!props.isGladysPlus && (
-                      <button
-                        onClick={props.toggleDefineTabletMode}
-                        class={cx('btn btn-outline-secondary ml-2 d-none d-md-inline-block')}
-                      >
-                        <span class={style.editDashboardText}>
-                          {props.defineTabletModeOpened ? (
-                            <Text id="dashboard.closeDefineTabletMode" />
-                          ) : (
-                            <Text id="dashboard.toggleDefineTabletMode" />
-                          )}
-                        </span>{' '}
-                        <i class="fe fe-tablet" />
-                      </button>
+                      <Localizer>
+                        <button
+                          onClick={props.toggleDefineTabletMode}
+                          class={cx('btn btn-outline-secondary ml-2 d-none d-md-inline-flex')}
+                          title={
+                            props.defineTabletModeOpened ? (
+                              <Text id="dashboard.closeDefineTabletMode" />
+                            ) : (
+                              <Text id="dashboard.toggleDefineTabletMode" />
+                            )
+                          }
+                        >
+                          <i class={props.defineTabletModeOpened ? 'fe fe-x' : 'fe fe-tablet'} />
+                        </button>
+                      </Localizer>
                     )}
                     {/* fullscreen is pointless on a phone: hidden below tablet width */}
                     {!props.dashboardNotConfigured &&
                       props.browserFullScreenCompatible &&
                       !props.hideExitFullScreenButton && (
-                        <button
-                          onClick={props.toggleFullScreen}
-                          class={cx('btn btn-outline-secondary ml-2 d-none d-md-inline-block')}
-                        >
-                          <span class={style.editDashboardText}>
-                            {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
-                            {props.fullScreen && <Text id="dashboard.disableFullScreen" />}
-                          </span>{' '}
-                          {!props.fullScreen && <i class="fe fe-maximize-2" />}
-                          {props.fullScreen && <i class="fe fe-minimize-2" />}
-                        </button>
+                        <Localizer>
+                          <button
+                            onClick={props.toggleFullScreen}
+                            class={cx('btn btn-outline-secondary ml-2 d-none d-md-inline-flex')}
+                            title={
+                              props.fullScreen ? (
+                                <Text id="dashboard.disableFullScreen" />
+                              ) : (
+                                <Text id="dashboard.enableFullScreen" />
+                              )
+                            }
+                          >
+                            {!props.fullScreen && <i class="fe fe-maximize-2" />}
+                            {props.fullScreen && <i class="fe fe-minimize-2" />}
+                          </button>
+                        </Localizer>
                       )}
                     {props.currentDashboard && !props.hideExitFullScreenButton && (
-                      <button onClick={props.editDashboard} class={cx('btn btn-outline-primary ml-2')}>
-                        <span class={style.editDashboardText}>
-                          <Text id="dashboard.editDashboardButton" />
-                        </span>{' '}
-                        <i class="fe fe-edit" />
-                      </button>
+                      <Localizer>
+                        <button
+                          onClick={props.editDashboard}
+                          class={cx('btn btn-outline-primary ml-2 d-inline-flex')}
+                          data-cy="edit-dashboard-button"
+                          title={<Text id="dashboard.editDashboardButton" />}
+                        >
+                          <i class="fe fe-edit" />
+                        </button>
+                      </Localizer>
                     )}
                   </div>
                 </div>
