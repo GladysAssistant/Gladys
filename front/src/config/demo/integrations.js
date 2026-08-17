@@ -1,6 +1,5 @@
-import dayjs from 'dayjs';
-
 import { CAMERA_IMAGE } from './assets';
+import { minutesAgo } from './helpers';
 
 // Demo fixtures for the integration pages: every "/api/v1/service/*" route
 // and the devices those pages display.
@@ -892,7 +891,7 @@ const integrations = {
           max: 1,
           read_only: true,
           last_value: 0,
-          last_value_changed: dayjs().add(60, 'second')
+          last_value_changed: minutesAgo(6)
         }
       ],
       room: {
@@ -962,7 +961,7 @@ const integrations = {
           max: 1,
           read_only: true,
           last_value: 0,
-          last_value_changed: dayjs().add(60, 'second')
+          last_value_changed: minutesAgo(6)
         }
       ],
       params: [
@@ -1000,7 +999,7 @@ const integrations = {
           max: 1,
           read_only: true,
           last_value: 0,
-          last_value_changed: dayjs().add(60, 'second')
+          last_value_changed: minutesAgo(6)
         }
       ],
       params: [
@@ -1034,7 +1033,7 @@ const integrations = {
           max: 1,
           read_only: true,
           last_value: 0,
-          last_value_changed: dayjs().add(60, 'second')
+          last_value_changed: minutesAgo(6)
         }
       ],
       params: [
