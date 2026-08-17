@@ -8,7 +8,7 @@ const EditActions = props => (
   <div class="fixed-bottom footer">
     <div class="container">
       {props.askDeleteScene ? (
-        <div class="row align-items-center justify-content-end">
+        <div class="row align-items-center">
           <div class="col-auto d-none d-sm-block text-muted">
             <Text id="editScene.deleteText" />
           </div>
