@@ -10,6 +10,8 @@ const {
   PowerSource,
   Thermostat,
   CarbonDioxideConcentrationMeasurement,
+  HepaFilterMonitoring,
+  ActivatedCarbonFilterMonitoring,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -424,6 +426,101 @@ describe('Matter.convertToGladysDevice', () => {
       min: 0,
       max: 10000,
     });
+  });
+
+  it('should create a filter life feature for HepaFilterMonitoring cluster', async () => {
+    const clusterClient = {
+      id: HepaFilterMonitoring.Complete.id,
+      name: 'HepaFilterMonitoring',
+      endpointId: 1,
+    };
+
+    const device = {
+      name: 'Air Purifier',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'HepaFilterMonitoring - 1',
+      selector: gladysDevice.features[0].selector,
+      category: 'hepa-filter-monitoring',
+      type: 'filter-life-remaining',
+      read_only: true,
+      has_feedback: true,
+      unit: 'percent',
+      external_id: `matter:12345:1:${HepaFilterMonitoring.Complete.id}`,
+      min: 0,
+      max: 100,
+    });
+  });
+
+  it('should create a filter life feature for ActivatedCarbonFilterMonitoring cluster', async () => {
+    const clusterClient = {
+      id: ActivatedCarbonFilterMonitoring.Complete.id,
+      name: 'ActivatedCarbonFilterMonitoring',
+      endpointId: 1,
+    };
+
+    const device = {
+      name: 'Air Purifier',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'ActivatedCarbonFilterMonitoring - 1',
+      selector: gladysDevice.features[0].selector,
+      category: 'hepa-filter-monitoring',
+      type: 'activated-carbon-filter-life-remaining',
+      read_only: true,
+      has_feedback: true,
+      unit: 'percent',
+      external_id: `matter:12345:1:${ActivatedCarbonFilterMonitoring.Complete.id}`,
+      min: 0,
+      max: 100,
+    });
+  });
+
+  it('should create one distinct feature per filter media when both filter clusters are present', async () => {
+    const hepaClusterClient = {
+      id: HepaFilterMonitoring.Complete.id,
+      name: 'HepaFilterMonitoring',
+      endpointId: 1,
+    };
+    const activatedCarbonClusterClient = {
+      id: ActivatedCarbonFilterMonitoring.Complete.id,
+      name: 'ActivatedCarbonFilterMonitoring',
+      endpointId: 1,
+    };
+
+    const device = {
+      name: 'Air Purifier',
+      number: 1,
+      getAllClusterClients: () => [hepaClusterClient, activatedCarbonClusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(2);
+    expect(gladysDevice.features.map((feature) => feature.type)).to.deep.equal([
+      'filter-life-remaining',
+      'activated-carbon-filter-life-remaining',
+    ]);
+    expect(gladysDevice.features.map((feature) => feature.external_id)).to.deep.equal([
+      `matter:12345:1:${HepaFilterMonitoring.Complete.id}`,
+      `matter:12345:1:${ActivatedCarbonFilterMonitoring.Complete.id}`,
+    ]);
+    expect(gladysDevice.features[0].selector).to.not.eq(gladysDevice.features[1].selector);
   });
 
   it('should create thermostat local temperature and setpoint features for Thermostat cluster', async () => {

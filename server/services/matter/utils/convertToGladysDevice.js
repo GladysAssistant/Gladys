@@ -20,6 +20,7 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  ActivatedCarbonFilterMonitoring,
   FanControl,
   RvcOperationalState,
   RvcRunMode,
@@ -476,6 +477,18 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING,
           type: DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 100,
+        });
+      } else if (clusterIndex === ActivatedCarbonFilterMonitoring.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING,
+          type: DEVICE_FEATURE_TYPES.FILTER_MONITORING.ACTIVATED_CARBON_FILTER_LIFE_REMAINING,
           read_only: true,
           has_feedback: true,
           unit: DEVICE_FEATURE_UNITS.PERCENT,

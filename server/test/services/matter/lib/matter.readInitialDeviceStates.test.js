@@ -23,6 +23,7 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  ActivatedCarbonFilterMonitoring,
   FanControl,
   RvcOperationalState,
   RvcRunMode,
@@ -139,6 +140,9 @@ describe('Matter.readInitialDeviceStates', () => {
       [HepaFilterMonitoring.Complete.id]: {
         getConditionAttribute: fake.resolves(67),
       },
+      [ActivatedCarbonFilterMonitoring.Complete.id]: {
+        getConditionAttribute: fake.resolves(73),
+      },
       [FanControl.Complete.id]: {
         supportedFeatures: {
           multiSpeed: true,
@@ -218,6 +222,14 @@ describe('Matter.readInitialDeviceStates', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalEnergyMeasurement.Complete.id}:energy`,
       state: 3,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${HepaFilterMonitoring.Complete.id}`,
+      state: 67,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${ActivatedCarbonFilterMonitoring.Complete.id}`,
+      state: 73,
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${fanBaseExternalId}:mode`,

@@ -19,6 +19,7 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  ActivatedCarbonFilterMonitoring,
   FanControl,
   RvcOperationalState,
   RvcRunMode,
@@ -481,6 +482,22 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger.debug(`Matter: HepaFilterMonitoring Condition attribute changed to ${value}`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${HepaFilterMonitoring.Complete.id}`,
+        state: value,
+      });
+    });
+  }
+
+  const activatedCarbonFilterMonitoring = device.getClusterClientById(ActivatedCarbonFilterMonitoring.Complete.id);
+  if (activatedCarbonFilterMonitoring && !this.stateChangeListeners.has(activatedCarbonFilterMonitoring)) {
+    logger.debug(
+      `Matter: Adding state change listener for ActivatedCarbonFilterMonitoring cluster ${activatedCarbonFilterMonitoring.name}`,
+    );
+    this.stateChangeListeners.add(activatedCarbonFilterMonitoring);
+    // Subscribe to ActivatedCarbonFilterMonitoring attribute changes
+    activatedCarbonFilterMonitoring.addConditionAttributeListener((value) => {
+      logger.debug(`Matter: ActivatedCarbonFilterMonitoring Condition attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${ActivatedCarbonFilterMonitoring.Complete.id}`,
         state: value,
       });
     });

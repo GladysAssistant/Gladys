@@ -5567,8 +5567,9 @@
       "wind-setting": "Windmodus"
     },
     "hepa-filter-monitoring": {
-      "shortCategoryName": "HEPA-Filterüberwachung",
-      "filter-life-remaining": "Verbleibende Filterlebensdauer"
+      "shortCategoryName": "Filterüberwachung",
+      "filter-life-remaining": "Verbleibende Lebensdauer des HEPA-Filters",
+      "activated-carbon-filter-life-remaining": "Verbleibende Lebensdauer des Aktivkohlefilters"
     },
     "maintenance": {
       "shortCategoryName": "Wartung",
