@@ -221,11 +221,17 @@
   font-size: 1.25rem;
 }
 
-/* The collapsed banner title must read as a heading, not as a link: only the
-   chevron signals that it opens. */
+/* The toggle is a native button for its keyboard semantics, but it must look
+   like the banner heading it replaces: only the chevron signals that it opens. */
 .gatewayBannerToggle,
 .gatewayBannerToggle:hover,
 .gatewayBannerToggle:focus {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
   color: inherit;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
 }

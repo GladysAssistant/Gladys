@@ -15,8 +15,7 @@ const DESCRIPTION_ID = 'integration-gateway-banner-description';
 // `!important`) beats `.collapse:not(.show)`, and the chevron affordance is
 // hidden there, exactly like the collapsed header menu of the app.
 class IntegrationGatewayBanner extends Component {
-  toggle = e => {
-    e.preventDefault();
+  toggle = () => {
     this.setState(prevState => ({ expanded: !prevState.expanded }));
   };
 
@@ -27,8 +26,8 @@ class IntegrationGatewayBanner extends Component {
           <span class="d-none d-lg-inline">
             <Text id="integration.root.gatewayBanner.title" />
           </span>
-          <a
-            href="#"
+          <button
+            type="button"
             class={cx(
               'd-lg-none',
               'd-flex',
@@ -42,7 +41,7 @@ class IntegrationGatewayBanner extends Component {
           >
             <Text id="integration.root.gatewayBanner.title" />
             <i class={cx('fe', 'ml-2', expanded ? 'fe-chevron-up' : 'fe-chevron-down')} />
-          </a>
+          </button>
         </h4>
         <div id={DESCRIPTION_ID} class={cx('collapse', 'd-lg-block', 'mt-2', { show: expanded })}>
           <MarkupText id="integration.root.gatewayBanner.description" />
