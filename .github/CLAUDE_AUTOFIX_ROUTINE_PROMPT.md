@@ -30,6 +30,7 @@ Common rules, both modes:
 - Never force-push, never rewrite existing history on <branch>, never create another branch, never open or merge a pull request (the PR already exists), and never change repository settings, secrets or labels.
 - Never print, echo or copy a secret, token or credential anywhere, including in a commit, a comment or a log.
 - Work only inside the checked-out repository, on <branch>, for pull request <number>.
+- Do not watch the PR you fix: do not subscribe to its activity and do not keep monitoring it after your reply. Post your answer and end the run. Follow-ups are the next cron run's job, or a new "/claude" command.
 
 === MODE "scheduled" ===
 

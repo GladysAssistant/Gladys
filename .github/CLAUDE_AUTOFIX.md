@@ -257,6 +257,14 @@ in sync. **A new `mode` cannot work until the prompt on the routine's page has
 been updated** — the workflows only send the payload, the prompt is what knows
 what to do with it.
 
+**Before copying, diff the two — the routine's page is what actually runs.**
+Editing the prompt directly in the web UI is easy and leaves no trace in git,
+so the live routine can hold instructions this file has never seen (that is how
+`Do not watch the PR you fix` came to exist only on the routine's page). Copying
+this file over a drifted routine silently deletes those edits. Read the stored
+prompt first, back-port anything missing here, and only then push the merged
+version.
+
 **The prompt must stay backward compatible with the payload already in
 production**, because the two are deployed separately and never atomically: the
 prompt lives in a web UI, the payload in a workflow file. That is why a payload
