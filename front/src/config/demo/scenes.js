@@ -142,8 +142,8 @@ const scenes = [
       }
     ],
     actions: [
-      [{ type: 'condition.only-continue-if', conditions: [] }],
-      [{ type: 'device.set-value', device_feature: 'garage-wallbox-charge', value: 1 }]
+      [{ type: 'device.set-value', device_feature: 'garage-wallbox-charge', value: 1 }],
+      [{ type: 'message.send', user: 'tony', text: 'The car is now charging on solar production ☀️' }]
     ]
   })
 ];

@@ -9,13 +9,13 @@ import { uuid } from './helpers';
  * specific purpose (energy, comfort).
  */
 
-const dashboard = (name, selector, type, boxes) => ({
+const dashboard = (name, selector, type, position, boxes) => ({
   id: uuid(`dashboard-${selector}`),
   name,
   selector,
   type,
   visibility: 'private',
-  position: 0,
+  position,
   boxes,
   created_at: '2024-01-08T09:12:00.000Z',
   updated_at: '2024-01-08T09:12:00.000Z'
@@ -257,9 +257,9 @@ const COMFORT_BOXES = [
 ];
 
 const dashboards = [
-  dashboard('Home', 'home', 'main', HOME_BOXES),
-  dashboard('Energy', 'energy', 'main', ENERGY_BOXES),
-  dashboard('Comfort', 'comfort', 'main', COMFORT_BOXES)
+  dashboard('Home', 'home', 'main', 0, HOME_BOXES),
+  dashboard('Energy', 'energy', 'main', 1, ENERGY_BOXES),
+  dashboard('Comfort', 'comfort', 'main', 2, COMFORT_BOXES)
 ];
 
 export { dashboards };

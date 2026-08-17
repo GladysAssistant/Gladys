@@ -1,5 +1,8 @@
 import dayjs from 'dayjs';
 
+import { version as GLADYS_VERSION } from '../../../../package.json';
+import { uuid, daysAgo, minutesAgo } from './helpers';
+
 // Demo fixtures for the system, gateway, sessions and background jobs pages.
 const system = {
   'get /api/v1/gateway/status': {
@@ -17,32 +20,14 @@ const system = {
       { id: 'qwen3-235b-a22b-instruct-2507', priceLabel: '€0.75 / M tokens' }
     ]
   },
-  'get /api/v1/gateway/backup': [
-    {
-      id: '99fac564-0844-44f6-866b-2b8dcf0d76eb',
-      path: 'https://url-backup',
-      size: 2024000100,
-      created_at: dayjs().subtract(1, 'day'),
-      updated_at: dayjs().subtract(1, 'day'),
-      is_deleted: false
-    },
-    {
-      id: '99fac564-0844-44f6-866b-2b8dcf0d76eb',
-      path: 'https://url-backup',
-      size: 1127680,
-      created_at: dayjs().subtract(2, 'day'),
-      updated_at: dayjs().subtract(2, 'day'),
-      is_deleted: false
-    },
-    {
-      id: '210460b2-c9a8-4891-9cca-464c3e19bfbb',
-      path: 'https://url-backup',
-      size: 1013680,
-      created_at: dayjs().subtract(3, 'day'),
-      updated_at: dayjs().subtract(3, 'day'),
-      is_deleted: false
-    }
-  ],
+  'get /api/v1/gateway/backup': [1, 2, 3].map(daysOld => ({
+    id: uuid(`backup-${daysOld}`),
+    path: 'https://url-backup',
+    size: 2024000100 - daysOld * 8412000,
+    created_at: daysAgo(daysOld),
+    updated_at: daysAgo(daysOld),
+    is_deleted: false
+  })),
   'get /api/v1/variable/GLADYS_GATEWAY_BACKUP_KEY': {
     value: 'ad793dc660683701703409f97fd1d2f9j86610467839e12a0107c0409ec7240bb'
   },
@@ -85,8 +70,8 @@ const system = {
     freemem: 492482560,
     cpus: [
       {
-        model: 'Intel(R) Core(TM) i7-6567U CPU @ 3.30GHz',
-        speed: 3300,
+        model: 'ARM Cortex-A72',
+        speed: 1800,
         times: {
           user: 34606730,
           nice: 0,
@@ -96,8 +81,8 @@ const system = {
         }
       },
       {
-        model: 'Intel(R) Core(TM) i7-6567U CPU @ 3.30GHz',
-        speed: 3300,
+        model: 'ARM Cortex-A72',
+        speed: 1800,
         times: {
           user: 22568450,
           nice: 0,
@@ -107,8 +92,8 @@ const system = {
         }
       },
       {
-        model: 'Intel(R) Core(TM) i7-6567U CPU @ 3.30GHz',
-        speed: 3300,
+        model: 'ARM Cortex-A72',
+        speed: 1800,
         times: {
           user: 34765800,
           nice: 0,
@@ -118,8 +103,8 @@ const system = {
         }
       },
       {
-        model: 'Intel(R) Core(TM) i7-6567U CPU @ 3.30GHz',
-        speed: 3300,
+        model: 'ARM Cortex-A72',
+        speed: 1800,
         times: {
           user: 18691910,
           nice: 0,
@@ -130,9 +115,11 @@ const system = {
       }
     ],
     network_interfaces: {},
-    nodejs_version: 'v10.15.2',
-    gladys_version: 'v4.0.0',
-    is_docker: false,
+    nodejs_version: 'v24.4.1',
+    // The version of the branch the demo was built from, so the system page
+    // never announces a release from years ago
+    gladys_version: `v${GLADYS_VERSION}`,
+    is_docker: true,
     new_release_available: false
   },
   'get /api/v1/system/disk': {
@@ -153,52 +140,38 @@ const system = {
   ],
   'get /api/v1/session': [
     {
-      id: '4b249694-661b-4c48-afb5-924bbedcee63',
-      token_type: 'refresh_token',
-      scope: ['dashboard:write', 'dashboard:read'],
-      valid_until: '2019-07-26T01:00:50.137Z',
-      last_seen: null,
-      revoked: false,
       useragent:
-        'Mozilla/5.0 (Linux; Android 6.0.1; SHIELD Tablet K1 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/55.0.2883.91 Safari/537.36',
-      created_at: '2019-06-26T01:00:50.138Z',
-      updated_at: '2019-06-26T01:00:50.138Z'
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
+      minutesOld: 35
     },
     {
-      id: '2367a8cf-47a8-4db7-83b0-f89c2c6c34ac',
-      token_type: 'refresh_token',
-      scope: ['dashboard:write', 'dashboard:read'],
-      valid_until: '2019-07-26T00:29:00.783Z',
-      last_seen: null,
-      revoked: false,
       useragent:
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1',
-      created_at: '2019-06-26T00:29:00.783Z',
-      updated_at: '2019-06-26T00:29:00.783Z'
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1',
+      minutesOld: 220
     },
     {
-      id: '2367a8cf-47a8-4db7-83b0-f89c2c6c34ac',
-      token_type: 'refresh_token',
-      scope: ['dashboard:write', 'dashboard:read'],
-      valid_until: '2019-07-26T00:29:00.783Z',
-      last_seen: null,
-      revoked: false,
       useragent:
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246',
-      created_at: '2019-06-26T00:29:00.783Z',
-      updated_at: '2019-06-26T00:29:00.783Z'
+        'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+      minutesOld: 1500
     },
     {
-      id: '2367a8cf-47a8-4db7-83b0-f89c2c6c34ac',
-      token_type: 'refresh_token',
-      scope: ['dashboard:write', 'dashboard:read'],
-      valid_until: '2019-07-26T00:29:00.783Z',
-      last_seen: null,
-      revoked: false,
-      created_at: '2019-06-26T00:29:00.783Z',
-      updated_at: '2019-06-26T00:29:00.783Z'
+      useragent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      minutesOld: 4300
     }
-  ],
+  ].map(({ useragent, minutesOld }, index) => ({
+    id: uuid(`session-${index}`),
+    token_type: 'refresh_token',
+    scope: ['dashboard:write', 'dashboard:read'],
+    valid_until: dayjs()
+      .add(30, 'day')
+      .toISOString(),
+    last_seen: minutesAgo(minutesOld),
+    revoked: false,
+    useragent,
+    created_at: minutesAgo(minutesOld),
+    updated_at: minutesAgo(minutesOld)
+  })),
   'get /api/v1/setup': {
     account_configured: true
   },

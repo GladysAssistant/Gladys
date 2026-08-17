@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 
 import { findFeature } from './home';
-import { uuid } from './helpers';
+import { uuid, solarRatio } from './helpers';
 
 /**
  * Time series of the demo: chart data, activity history and energy
@@ -27,6 +27,10 @@ const intervalFromMinutes = minutes => {
   const found = Object.values(INTERVALS).find(interval => interval.minutes === Number(minutes));
   return found || INTERVALS['last-day'];
 };
+
+// Peak power of the demo solar installation, used to draw a past day when the
+// current production carries no scale (at night)
+const DEFAULT_SOLAR_PEAK_WATT = 3400;
 
 const noise = seed => {
   const value = Math.sin(seed * 78.233) * 43758.5453;
@@ -61,17 +65,6 @@ const shapeOf = feature => {
   }
 };
 
-// A production day: nothing at night, a bell curve between sunrise and sunset
-const SOLAR_DAY_START = 7;
-const SOLAR_DAY_END = 21;
-
-const solarRatio = hour => {
-  if (hour < SOLAR_DAY_START || hour > SOLAR_DAY_END) {
-    return 0;
-  }
-  return Math.sin((Math.PI * (hour - SOLAR_DAY_START)) / (SOLAR_DAY_END - SOLAR_DAY_START));
-};
-
 const valueAt = (feature, date, index) => {
   const shape = shapeOf(feature);
   const base = typeof feature.last_value === 'number' ? feature.last_value : 0;
@@ -83,7 +76,12 @@ const valueAt = (feature, date, index) => {
   const jitter = (noise(index + base) - 0.5) * 0.18;
   let value;
   if (shape.solar) {
-    const peak = base > 0 ? base / Math.max(0.2, solarRatio(dayjs().hour())) : 3000;
+    // The current value of the feature is already the production of this very
+    // hour, so the peak of the day is read back from it. At night it carries no
+    // information (it is zero), and a default peak draws the past days.
+    const now = dayjs();
+    const ratioNow = solarRatio(now.hour() + now.minute() / 60);
+    const peak = base > 0 && ratioNow > 0.2 ? base / ratioNow : DEFAULT_SOLAR_PEAK_WATT;
     value = peak * solarRatio(hour) * (1 + jitter + dayLevel * 0.5);
   } else {
     const dailyWave = shape.daily ? Math.sin(((hour - 9) / 24) * 2 * Math.PI) : 0;

@@ -38,6 +38,46 @@ const daysAgo = days =>
     .subtract(days, 'day')
     .toISOString();
 
+// A production day: nothing at night, a bell curve between sunrise and sunset.
+// Used both for the current value of the solar features and for their history,
+// so the gauge on the dashboard and the curve of the chart always agree.
+const SOLAR_DAY_START = 7;
+const SOLAR_DAY_END = 21;
+
+const solarRatio = hour => {
+  if (hour < SOLAR_DAY_START || hour > SOLAR_DAY_END) {
+    return 0;
+  }
+  return Math.sin((Math.PI * (hour - SOLAR_DAY_START)) / (SOLAR_DAY_END - SOLAR_DAY_START));
+};
+
+const currentHour = () => {
+  const now = dayjs();
+  return now.hour() + now.minute() / 60;
+};
+
+/** Instantaneous production at this very moment, from the peak of the day. */
+const solarPowerNow = peakWatt => Math.round(peakWatt * solarRatio(currentHour()));
+
+/**
+ * Energy already produced today, in kWh: the area under the production curve
+ * up to now, out of the area of a full day.
+ */
+const solarEnergyToday = dailyKwh => {
+  const steps = 96;
+  let produced = 0;
+  let total = 0;
+  for (let step = 0; step <= steps; step += 1) {
+    const hour = (step * 24) / steps;
+    const ratio = solarRatio(hour);
+    total += ratio;
+    if (hour <= currentHour()) {
+      produced += ratio;
+    }
+  }
+  return Math.round(((dailyKwh * produced) / total) * 10) / 10;
+};
+
 /**
  * Base builder of a device feature. Every builder below goes through it, so
  * all features carry the attributes the front expects (id, bounds, history
@@ -406,6 +446,9 @@ export {
   minutesAgo,
   hoursAgo,
   daysAgo,
+  solarRatio,
+  solarPowerNow,
+  solarEnergyToday,
   feature,
   lightBinary,
   lightBrightness,

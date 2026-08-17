@@ -62,7 +62,7 @@ export class DemoHttpClient {
   async post(url, body) {
     await this.getDemoFile();
     const key = `post ${url}`;
-    if (!this.responses[key]) {
+    if (this.responses[key] === undefined) {
       console.error(`${key} not found in the demo fixtures`);
       throw new Error(`${key} not found in the demo fixtures`);
     }
@@ -72,7 +72,7 @@ export class DemoHttpClient {
   async patch(url, body) {
     await this.getDemoFile();
     const key = `patch ${url}`;
-    if (!this.responses[key]) {
+    if (this.responses[key] === undefined) {
       console.error(`${key} not found in the demo fixtures`);
       throw new Error(`${key} not found in the demo fixtures`);
     }
@@ -82,7 +82,7 @@ export class DemoHttpClient {
   async delete(url) {
     await this.getDemoFile();
     const key = `delete ${url}`;
-    if (!this.responses[key]) {
+    if (this.responses[key] === undefined) {
       console.error(`${key} not found in the demo fixtures`);
       throw new Error(`${key} not found in the demo fixtures`);
     }

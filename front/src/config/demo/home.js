@@ -1,5 +1,7 @@
 import {
   uuid,
+  solarPowerNow,
+  solarEnergyToday,
   lightBinary,
   lightBrightness,
   lightColor,
@@ -629,7 +631,8 @@ const ROOMS = [
         model: 'Enphase IQ8',
         service: SOLAR,
         features: [
-          productionPower('Solar production', 'solar-power', 2380, { updated: 1 }),
+          // Follows the sun: zero at night, like the curve of the chart
+          productionPower('Solar production', 'solar-power', solarPowerNow(3400), { updated: 1 }),
           feature({
             name: 'Production today',
             selector: 'solar-daily-production',
@@ -639,7 +642,7 @@ const ROOMS = [
             min: 0,
             max: 100,
             read_only: true,
-            last_value: 14.6,
+            last_value: solarEnergyToday(18),
             updated: 20
           })
         ]
@@ -669,7 +672,8 @@ const ROOMS = [
             min: 0,
             max: 5000,
             read_only: true,
-            last_value: 1200,
+            // The battery charges on the solar surplus, so it also stops at night
+            last_value: Math.round(solarPowerNow(3400) * 0.4),
             updated: 2
           })
         ]
@@ -696,6 +700,7 @@ rooms.forEach(room => {
       id: uuid(`device-${device.selector}`),
       name: device.name,
       selector: device.selector,
+      external_id: `${device.service.name}:${device.selector}`,
       model: device.model,
       should_poll: false,
       room_id: room.id,
@@ -708,6 +713,16 @@ rooms.forEach(room => {
     devices.push(fullDevice);
     return fullDevice;
   });
+});
+
+// The integrations actually installed on the demo instance: the services of
+// the devices above, so the integration pages and the services page describe
+// the same house as the dashboard.
+const services = [];
+devices.forEach(device => {
+  if (!services.some(oneService => oneService.name === device.service.name)) {
+    services.push(device.service);
+  }
 });
 
 const house = {
@@ -754,4 +769,4 @@ const findFeature = selector => {
   return found;
 };
 
-export { HOUSE, house, rooms, devices, roomSummary, USERS, findFeature };
+export { HOUSE, house, rooms, devices, services, roomSummary, USERS, findFeature };

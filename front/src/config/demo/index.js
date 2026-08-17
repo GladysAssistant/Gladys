@@ -1,11 +1,12 @@
 import dayjs from 'dayjs';
 
 import { TONY_PICTURE, PEPPER_PICTURE, CAMERA_IMAGE, REFRESH_TOKEN, ACCESS_TOKEN } from './assets';
-import { house, rooms, devices, roomSummary, USERS } from './home';
+import { house, rooms, devices, services, roomSummary, USERS } from './home';
 import { dashboards } from './dashboards';
 import { getWeather, getSunState } from './weather';
 import { scenes, sceneTags, calendars, calendarEvents, messages } from './scenes';
 import { getAggregatedStates, getEnergyConsumption, getStatesHistory } from './history';
+import { uuid, hoursAgo, minutesAgo, solarPowerNow } from './helpers';
 import integrations from './integrations';
 import system from './system';
 
@@ -64,6 +65,116 @@ devices.forEach(device => {
   device.features.forEach(feature => {
     deviceFeatureValues[`post /api/v1/device_feature/${feature.selector}/value`] = { success: true };
   });
+});
+
+// Integration pages list the devices of their own service: derived from the
+// house too, so opening an integration shows the devices the dashboard and the
+// devices page display, and not another installation.
+const devicesByService = {};
+services.forEach(oneService => {
+  devicesByService[`get /api/v1/service/${oneService.name}/device`] = devices.filter(
+    device => device.service.name === oneService.name
+  );
+});
+
+// Services of the house, plus the ones that have no device but a page of their
+// own in the demo (messaging, weather, protocols...)
+const EXTRA_SERVICES = ['telegram', 'nextcloud-talk', 'caldav', 'openweather', 'usb'];
+
+const serviceList = [
+  ...services.map(oneService => ({
+    id: oneService.id,
+    pod_id: null,
+    name: oneService.name,
+    selector: oneService.selector,
+    version: '0.1.0',
+    has_message_feature: false,
+    status: 'RUNNING',
+    created_at: '2024-01-08T09:12:00.000Z',
+    updated_at: '2024-01-08T09:12:00.000Z'
+  })),
+  ...EXTRA_SERVICES.map(name => ({
+    id: uuid(`service-${name}`),
+    pod_id: null,
+    name,
+    selector: name,
+    version: '0.1.0',
+    has_message_feature: name === 'telegram' || name === 'nextcloud-talk',
+    status: 'RUNNING',
+    created_at: '2024-01-08T09:12:00.000Z',
+    updated_at: '2024-01-08T09:12:00.000Z'
+  }))
+];
+
+// The community integration installed on the demo instance, as the "Installed"
+// view of the catalog lists it, plus the routes of its own pages
+const externalIntegrations = services
+  .filter(oneService => oneService.type === 'external')
+  .map(oneService => ({
+    id: oneService.id,
+    name: oneService.name,
+    selector: oneService.selector,
+    store_slug: oneService.store_slug,
+    manifest: {
+      ...oneService.manifest,
+      type: 'device',
+      description: 'Reads the production of your solar inverter.'
+    },
+    status: 'RUNNING',
+    connection_status: 'connected',
+    docker_image: `ghcr.io/${oneService.store_slug}:1.2.0`,
+    version: '1.2.0',
+    latest_version: '1.2.0',
+    update_available: false,
+    started_at: hoursAgo(52),
+    containers: []
+  }));
+
+const externalIntegrationRoutes = {};
+externalIntegrations.forEach(integration => {
+  const base = `/api/v1/external_integration/${integration.selector}`;
+  externalIntegrationRoutes[`get ${base}`] = integration;
+  externalIntegrationRoutes[`get ${base}/config`] = { config: {}, configured_secrets: [] };
+  externalIntegrationRoutes[`get ${base}/contact`] = {};
+  externalIntegrationRoutes[`get ${base}/logs`] = {
+    logs: [
+      `${hoursAgo(52)} info: Solar Inverter integration started`,
+      `${hoursAgo(52)} info: Connected to inverter at 192.168.1.42`,
+      `${hoursAgo(2)} info: Published production power: 2380 W`,
+      `${minutesAgo(4)} info: Published production power: ${solarPowerNow(3400)} W`
+    ].join('\n')
+  };
+  externalIntegrationRoutes[`get ${base}/discover`] = [];
+  externalIntegrationRoutes[`get ${base}/discovered_device`] = [];
+});
+
+// Areas of the map, and the fixture each one needs when it is opened for edit
+const AREAS = [
+  {
+    id: uuid('area-home'),
+    name: 'Home',
+    selector: 'home-area',
+    radius: 300,
+    color: '#5f6ac4',
+    latitude: house.latitude,
+    longitude: house.longitude
+  },
+  {
+    id: uuid('area-office'),
+    name: 'Office',
+    selector: 'office-area',
+    radius: 500,
+    color: '#f1c40f',
+    latitude: 48.8698,
+    longitude: 2.3078
+  }
+];
+
+const areaBySelector = {};
+AREAS.forEach(area => {
+  areaBySelector[`get /api/v1/area/${area.selector}`] = area;
+  areaBySelector[`patch /api/v1/area/${area.selector}`] = area;
+  areaBySelector[`delete /api/v1/area/${area.selector}`] = { success: true };
 });
 
 const sceneBySelector = {};
@@ -153,6 +264,43 @@ const getEcowattSignals = () => {
   };
 };
 
+/**
+ * Credentials the integration pages read before showing their setup form. The
+ * demo has none - it talks to no third party - so they answer an empty value,
+ * which is what an instance that was never configured returns.
+ */
+const SERVICE_VARIABLES = {
+  telegram: ['TELEGRAM_API_KEY'],
+  openweather: ['OPENWEATHER_API_KEY'],
+  caldav: ['CALDAV_HOST', 'CALDAV_URL', 'CALDAV_USERNAME', 'CALDAV_PASSWORD', 'CALDAV_CHECK_SSL'],
+  'nextcloud-talk': ['NEXTCLOUD_URL', 'NEXTCLOUD_BOT_USERNAME', 'NEXTCLOUD_BOT_PASSWORD', 'NEXTCLOUD_TALK_TOKEN'],
+  callmebot: ['CALLMEBOT_API_KEY', 'CALLMEBOT_PHONE_NUMBER', 'CALLMEBOT_MESSAGING_SERVICE'],
+  'free-mobile': ['FREE_MOBILE_USERNAME', 'FREE_MOBILE_ACCESS_TOKEN'],
+  ewelink: ['EWELINK_EMAIL', 'EWELINK_PASSWORD'],
+  homekit: ['HOMEKIT_SETUP_URI', 'HOMEKIT_EXPOSED_DEVICES', 'HOMEKIT_EXPOSURE_MODE', 'HOMEKIT_MDNS_ADVERTISER'],
+  'node-red': ['NODE_RED_USERNAME', 'NODE_RED_PASSWORD', 'NODE_RED_PORT'],
+  melcloud: ['MELCLOUD_USERNAME', 'MELCLOUD_PASSWORD'],
+  matter: ['MATTER_ENABLED'],
+  tuya: [
+    'TUYA_ACCESS_KEY',
+    'TUYA_SECRET_KEY',
+    'TUYA_ENDPOINT',
+    'TUYA_APP_USERNAME',
+    'TUYA_APP_ACCOUNT_UID',
+    'TUYA_APP_PASSWORD'
+  ]
+};
+
+const serviceVariables = {};
+Object.entries(SERVICE_VARIABLES).forEach(([serviceName, names]) => {
+  names.forEach(name => {
+    serviceVariables[`get /api/v1/service/${serviceName}/variable/${name}`] = {
+      value: name === 'MATTER_ENABLED' ? 'true' : null
+    };
+    serviceVariables[`post /api/v1/service/${serviceName}/variable/${name}`] = { success: true };
+  });
+});
+
 // System variables read by the settings pages. Saving one from the demo
 // always succeeds and changes nothing.
 const VARIABLE_VALUES = {
@@ -182,9 +330,13 @@ const home = {
   'post /api/v1/access-token': {
     access_token: ACCESS_TOKEN
   },
+  // The locked screen checks the token through this route before unlocking
+  'post /api/v1/access_token': {
+    access_token: ACCESS_TOKEN
+  },
   'get /api/v1/me': {
     ...USERS[0],
-    language: navigator.language === 'fr' ? 'fr' : 'en',
+    language: (navigator.language || '').toLowerCase().startsWith('fr') ? 'fr' : 'en',
     refresh_token: REFRESH_TOKEN,
     access_token: ACCESS_TOKEN
   },
@@ -242,6 +394,12 @@ const home = {
   'get /api/v1/house/main-house/weather': getWeather,
   'get /api/v1/house/main-house/sun': getSunState,
   'get /api/v1/weather/provider': ['openweather'],
+  'get /api/v1/service': serviceList,
+  ...serviceVariables,
+  'post /api/v1/service/mqtt/debug_mode': { success: true },
+  ...devicesByService,
+  'get /api/v1/external_integration': externalIntegrations,
+  ...externalIntegrationRoutes,
   'get /api/v1/service/ecowatt/signals': getEcowattSignals,
   // Messaging channels a "send a message" scene action can target
   'get /api/v1/service/message': [
@@ -257,26 +415,9 @@ const home = {
   'post /api/v1/device': devices[0],
   'get /api/v1/camera': devices.filter(device => device.features.some(feature => feature.category === 'camera')),
   'get /api/v1/camera/garden-camera/image': CAMERA_IMAGE,
-  'get /api/v1/area': [
-    {
-      id: 'e1b1b1b1-0000-4000-a000-000000000001',
-      name: 'Home',
-      selector: 'home-area',
-      radius: 300,
-      color: '#5f6ac4',
-      latitude: house.latitude,
-      longitude: house.longitude
-    },
-    {
-      id: 'e1b1b1b1-0000-4000-a000-000000000002',
-      name: 'Office',
-      selector: 'office-area',
-      radius: 500,
-      color: '#f1c40f',
-      latitude: 48.8698,
-      longitude: 2.3078
-    }
-  ],
+  'get /api/v1/area': AREAS,
+  ...areaBySelector,
+  'post /api/v1/area': AREAS[0],
 
   // --- Device states -----------------------------------------------------
   'get /api/v1/device_feature/aggregated_states': getAggregatedStates,

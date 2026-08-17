@@ -1,7 +1,7 @@
 # Demo fixtures
 
 These files feed the public demo of Gladys ([demo.gladysassistant.com](https://demo.gladysassistant.com)),
-built from `master` by `.github/workflows/build-demo-website.yml`.
+published on every release by `.github/workflows/build-demo-website.yml`.
 
 In demo mode (`DEMO_MODE=true`), the front never talks to a server: every request goes
 through [`DemoHttpClient`](../../utils/DemoHttpClient.js), which looks the response up in
