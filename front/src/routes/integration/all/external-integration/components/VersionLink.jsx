@@ -33,18 +33,27 @@ const VersionLink = ({ storeSlug, version }) => {
 // the locale files: where the version sits in the sentence stays the
 // translator's business ("mise à jour en version 1.2.0", "auf Version 1.2.0
 // aktualisiert"), and the existing translations are left untouched.
+// Only the first occurrence is linked, never every match: a sentence can carry
+// two version numbers ("v1.0.0 (installed: v1.0.0-beta.1)" — a manifest version
+// is strict semver, so a prerelease is legal and updating from one to the
+// stable release is the documented beta-testing path), and one number can be a
+// prefix of the other ("1.2.1" inside "1.2.10"). Splitting on every match would
+// then link a fragment of the installed number too. The three locales all
+// interpolate the version this component is given before the other one, so the
+// first occurrence is that version.
 const VersionSentenceParts = ({ sentence, storeSlug, version }) => {
   if (typeof sentence !== 'string' || !version || !getChangelogUrl(storeSlug, version)) {
     return sentence;
   }
+  const versionIndex = sentence.indexOf(version);
+  if (versionIndex === -1) {
+    return sentence;
+  }
   return (
     <span>
-      {sentence.split(version).map((part, index) => (
-        <span>
-          {index > 0 && <VersionLink storeSlug={storeSlug} version={version} />}
-          {part}
-        </span>
-      ))}
+      {sentence.slice(0, versionIndex)}
+      <VersionLink storeSlug={storeSlug} version={version} />
+      {sentence.slice(versionIndex + version.length)}
     </span>
   );
 };
