@@ -728,6 +728,13 @@
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
+      "noInstalledIntegrations": "No community integration is installed on this instance yet.",
+      "installedSummary": {
+        "title": {
+          "one": "1 community integration installed on this instance.",
+          "other": "{{count}} community integrations installed on this instance."
+        }
+      },
       "noSearchResults": "No integration matching \"{{searchKeyword}}\" was found.",
       "noSearchResultsSuggestion": "Your device may be supported by a community <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">external integration</a> — the recommended way to add new compatibilities. And if it doesn't exist yet, you can <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">easily create your own</a>!",
       "refreshStore": {
@@ -747,6 +754,7 @@
       "menu": {
         "all": "All integrations",
         "favorites": "Favorites",
+        "installed": "Installed",
         "updates": "To update",
         "climate": "Heating & cooling",
         "lighting": "Lighting, plugs & covers",

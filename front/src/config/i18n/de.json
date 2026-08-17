@@ -728,6 +728,13 @@
       "searchPlaceholder": "Integration suchen",
       "noIntegrations": "Keine Integrationen gefunden",
       "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
+      "noInstalledIntegrations": "Auf dieser Instanz ist noch keine Community-Integration installiert.",
+      "installedSummary": {
+        "title": {
+          "one": "1 Community-Integration auf dieser Instanz installiert.",
+          "other": "{{count}} Community-Integrationen auf dieser Instanz installiert."
+        }
+      },
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Dein Gerät wird vielleicht von einer externen <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">Community-Integration</a> unterstützt – dem empfohlenen Weg, neue Kompatibilitäten hinzuzufügen. Und wenn es sie noch nicht gibt, kannst du ganz einfach <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">deine eigene erstellen</a>!",
       "refreshStore": {
@@ -747,6 +754,7 @@
       "menu": {
         "all": "Alle Integrationen",
         "favorites": "Favoriten",
+        "installed": "Installiert",
         "updates": "Zu aktualisieren",
         "climate": "Heizung & Klima",
         "lighting": "Beleuchtung, Steckdosen & Rollläden",

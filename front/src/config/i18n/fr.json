@@ -728,6 +728,13 @@
       "searchPlaceholder": "Chercher une intégration",
       "noIntegrations": "Aucune intégration trouvée",
       "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
+      "noInstalledIntegrations": "Aucune intégration de la communauté n'est encore installée sur cette instance.",
+      "installedSummary": {
+        "title": {
+          "one": "1 intégration de la communauté installée sur cette instance.",
+          "other": "{{count}} intégrations de la communauté installées sur cette instance."
+        }
+      },
       "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
       "noSearchResultsSuggestion": "Votre appareil est peut-être pris en charge par une <a href=\"https://gladysassistant.com/fr/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">intégration externe</a> de la communauté : c'est la façon recommandée d'ajouter de nouvelles compatibilités. Et si elle n'existe pas encore, vous pouvez <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">créer la vôtre très simplement</a> !",
       "refreshStore": {
@@ -747,6 +754,7 @@
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
+        "installed": "Installées",
         "updates": "À mettre à jour",
         "climate": "Chauffage & climatisation",
         "lighting": "Éclairage, prises & volets",
