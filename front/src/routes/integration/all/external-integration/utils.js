@@ -44,6 +44,23 @@ export const isNoteworthyExternalIntegrationStatus = status =>
 
 export const getGithubRepoUrl = storeSlug => (storeSlug ? `https://github.com/${storeSlug}` : null);
 
+// Changelog of an external integration version: the releases page of its
+// repository, filtered on the version so the release notes of that exact
+// version are the first thing displayed. Filtered rather than linked straight
+// to `/releases/tag/<version>`, because the tag name is the author's choice
+// (`1.2.0` and `v1.2.0` are both common, Gladys itself uses the second) and a
+// guessed tag that does not exist is a plain 404 — the filter matches either
+// form. Without a version (or with a repository that publishes no release) it
+// degrades to the releases page, and a dev install has no repository at all:
+// null, the version is then displayed as plain text.
+export const getChangelogUrl = (storeSlug, version) => {
+  const repoUrl = getGithubRepoUrl(storeSlug);
+  if (!repoUrl) {
+    return null;
+  }
+  return version ? `${repoUrl}/releases?q=${encodeURIComponent(version)}&expanded=true` : `${repoUrl}/releases`;
+};
+
 // Domain of an https URL, displayed next to section links (third-party
 // non-moderated content: the user sees where they click).
 export const getUrlDomain = url => (url || '').split('/')[2] || '';

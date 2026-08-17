@@ -844,6 +844,7 @@
         "alreadyUpToDateText": "L'intégration est déjà à jour (version {{version}}) : l'image Docker a été re-téléchargée et le conteneur recréé.",
         "statusLabel": "Statut",
         "versionLabel": "Version",
+        "changelogTitle": "Voir le changelog de cette version",
         "dockerImageLabel": "Image Docker",
         "repoLabel": "Dépôt",
         "startButton": "Démarrer",

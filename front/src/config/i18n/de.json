@@ -844,6 +844,7 @@
         "alreadyUpToDateText": "Die Integration ist bereits aktuell (Version {{version}}): Das Docker-Image wurde erneut heruntergeladen und der Container neu erstellt.",
         "statusLabel": "Status",
         "versionLabel": "Version",
+        "changelogTitle": "Changelog dieser Version anzeigen",
         "dockerImageLabel": "Docker-Image",
         "repoLabel": "Repository",
         "startButton": "Starten",

@@ -3,6 +3,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import StatusBadge from '../components/StatusBadge';
+import VersionLink, { VersionSentence } from '../components/VersionLink';
 import { getGithubRepoUrl, getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import integrationText from '../integrationText.css';
@@ -101,13 +102,15 @@ const SupervisionCard = ({
             )}
             {updateResult && (
               <div class={cx('alert', updateResult.upToDate ? 'alert-info' : 'alert-success')}>
-                <Text
+                <VersionSentence
                   id={
                     updateResult.upToDate
                       ? 'integration.externalIntegration.supervision.alreadyUpToDateText'
                       : 'integration.externalIntegration.supervision.updateSuccessText'
                   }
                   fields={{ version: updateResult.version }}
+                  storeSlug={integration.store_slug}
+                  version={updateResult.version}
                 />
               </div>
             )}
@@ -152,7 +155,9 @@ const SupervisionCard = ({
                 <dt class="col-5 col-sm-4">
                   <Text id="integration.externalIntegration.supervision.versionLabel" />
                 </dt>,
-                <dd class="col-7 col-sm-8">{integration.version}</dd>
+                <dd class="col-7 col-sm-8">
+                  <VersionLink storeSlug={integration.store_slug} version={integration.version} />
+                </dd>
               ]}
               {integration.docker_image && [
                 <dt class="col-5 col-sm-4">
