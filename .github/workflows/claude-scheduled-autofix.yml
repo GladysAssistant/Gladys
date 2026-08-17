@@ -403,11 +403,13 @@ jobs:
           # The payload reaches the routine wrapped in an untrusted
           # <routine-fire-payload> block; the routine's saved prompt
           # explicitly opts in to acting on it and treats every field as
-          # data, never as instructions.
+          # data, never as instructions. "mode" selects the procedure: the
+          # same routine also serves the on-demand "/claude" command of
+          # claude-on-demand-autofix.yml, which fires mode "on-demand".
           PAYLOAD=$(jq -cn --argjson number "$PR_NUMBER" --arg branch "$PR_BRANCH" \
             --argjson pass "$PR_PASS" --argjson max "$MAX_PASSES" \
             --arg rc "$RC_IDS" --arg ic "$IC_IDS" \
-            '{number: $number, branch: $branch, pass: $pass, max_passes: $max, rc_ids: $rc, ic_ids: $ic}')
+            '{mode: "scheduled", number: $number, branch: $branch, pass: $pass, max_passes: $max, rc_ids: $rc, ic_ids: $ic}')
           BODY=$(jq -cn --arg text "$PAYLOAD" '{text: $text}')
 
           HTTP_CODE=$(curl -sS -o /tmp/fire-response.json -w '%{http_code}' \
