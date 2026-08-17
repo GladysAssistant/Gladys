@@ -3284,6 +3284,7 @@
       },
       "setSceneActive": {
         "label": "Select a scene",
+        "disabledScene": "disabled",
         "enableNotice": "The selected scene will be enabled: its triggers will start listening again. A scene can enable itself.",
         "disableNotice": "The selected scene will be disabled: its triggers will stop listening until it is enabled again. A scene can disable itself, for example to run only once until another scene re-enables it."
       },

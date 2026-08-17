@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Text, withText } from 'preact-i18n';
 import Select from 'react-select';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
@@ -22,9 +22,11 @@ class EnableDisableSceneParams extends Component {
     // Contrary to the "start a scene" action, the current scene is part of the list:
     // a scene disabling itself is the way to build a "run once, then disarm" scene.
     if (scenes.length === 0 && nextProps.scenes) {
+      // Already disabled scenes are the most common target of an "enable a scene" action,
+      // so the current state of each scene is displayed next to its name.
       scenes = nextProps.scenes.map(scene => ({
         value: scene.selector,
-        label: scene.name
+        label: scene.active ? scene.name : `${scene.name} (${nextProps.disabledSceneLabel})`
       }));
     }
 
@@ -73,4 +75,6 @@ class EnableDisableSceneParams extends Component {
   }
 }
 
-export default connect('scenes', actions)(EnableDisableSceneParams);
+export default withText({
+  disabledSceneLabel: 'editScene.actionsCard.setSceneActive.disabledScene'
+})(connect('scenes', actions)(EnableDisableSceneParams));

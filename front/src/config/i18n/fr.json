@@ -3284,6 +3284,7 @@
       },
       "setSceneActive": {
         "label": "Choisir une scène",
+        "disabledScene": "désactivée",
         "enableNotice": "La scène sélectionnée sera activée : ses déclencheurs seront de nouveau écoutés. Une scène peut s'activer elle-même.",
         "disableNotice": "La scène sélectionnée sera désactivée : ses déclencheurs ne seront plus écoutés jusqu'à sa réactivation. Une scène peut se désactiver elle-même, par exemple pour ne s'exécuter qu'une fois jusqu'à ce qu'une autre scène la réactive."
       },

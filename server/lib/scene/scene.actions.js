@@ -92,6 +92,15 @@ async function setSceneActive(self, action, active) {
   if (!action.scene) {
     throw new AbortScene('SCENE_NOT_FOUND');
   }
+  // `scene.update` re-adds the scene to the live store, which cancels its triggers and
+  // schedules them again. That's wanted when the flag really changes, but an action which
+  // keeps a scene in the state it's already in (a scene re-arming itself on every run for
+  // example) would otherwise restart interval jobs and drop pending "for duration" timers
+  // on each execution, so an interval trigger could never reach its next tick.
+  const currentScene = self.scenes && self.scenes[action.scene];
+  if (currentScene && currentScene.active === active) {
+    return;
+  }
   try {
     await self.update(action.scene, { active });
   } catch (e) {

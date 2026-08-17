@@ -86,6 +86,44 @@ describe('scene.enable / scene.disable', () => {
     assert.calledOnceWithExactly(update, 'my-scene', { active: false });
   });
 
+  it('should not update the scene when it is already in the requested state', async () => {
+    // Updating a scene cancels and re-schedules all its triggers, so re-enabling an already
+    // enabled scene would restart its interval jobs on every run and it could never fire.
+    const update = fake.resolves(null);
+    const scenes = { 'my-other-scene': { selector: 'my-other-scene', active: true } };
+    await executeActions(
+      { stateManager, event, update, scenes },
+      [
+        [
+          {
+            type: ACTIONS.SCENE.ENABLE,
+            scene: 'my-other-scene',
+          },
+        ],
+      ],
+      {},
+    );
+    assert.notCalled(update);
+  });
+
+  it('should update the scene when the requested state is different', async () => {
+    const update = fake.resolves(null);
+    const scenes = { 'my-other-scene': { selector: 'my-other-scene', active: true } };
+    await executeActions(
+      { stateManager, event, update, scenes },
+      [
+        [
+          {
+            type: ACTIONS.SCENE.DISABLE,
+            scene: 'my-other-scene',
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledOnceWithExactly(update, 'my-other-scene', { active: false });
+  });
+
   it('should abort the scene when no scene is selected', async () => {
     const update = fake.resolves(null);
     const scope = {};

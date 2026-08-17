@@ -3284,6 +3284,7 @@
       },
       "setSceneActive": {
         "label": "Wähle eine Szene aus",
+        "disabledScene": "deaktiviert",
         "enableNotice": "Die ausgewählte Szene wird aktiviert: Ihre Auslöser werden wieder überwacht. Eine Szene kann sich selbst aktivieren.",
         "disableNotice": "Die ausgewählte Szene wird deaktiviert: Ihre Auslöser werden nicht mehr überwacht, bis sie wieder aktiviert wird. Eine Szene kann sich selbst deaktivieren, zum Beispiel um nur einmal ausgeführt zu werden, bis eine andere Szene sie wieder aktiviert."
       },
