@@ -5,6 +5,7 @@ const { addScene } = require('./scene.addScene');
 const { create } = require('./scene.create');
 const { checkTrigger } = require('./scene.checkTrigger');
 const { checkCalendarTriggers } = require('./scene.checkCalendarTriggers');
+const { checkSunPositionTriggers } = require('./scene.checkSunPositionTriggers');
 const { init } = require('./scene.init');
 const { cancelTriggers } = require('./scene.cancelTriggers');
 const { destroy } = require('./scene.destroy');
@@ -56,6 +57,8 @@ const SceneManager = function SceneManager(
   this.sunCalc = sunCalc;
   this.scheduler = scheduler;
   this.jobs = [];
+  // Last known sun position (in degrees) per house selector
+  this.sunPositions = new Map();
   this.checkTriggersDurationTimer = new Map();
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
   this.event.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));
@@ -66,6 +69,7 @@ const SceneManager = function SceneManager(
   this.event.on(EVENTS.HOUSE.UPDATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
   this.event.on(EVENTS.HOUSE.DELETED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
   this.event.on(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING, eventFunctionWrapper(this.checkCalendarTriggers.bind(this)));
+  this.event.on(EVENTS.TIME.CHECK_SUN_POSITION, eventFunctionWrapper(this.checkSunPositionTriggers.bind(this)));
 
   this.event.on(INTENTS.SCENE.START, this.command.bind(this));
 
@@ -76,6 +80,7 @@ SceneManager.prototype.addScene = addScene;
 SceneManager.prototype.cancelTriggers = cancelTriggers;
 SceneManager.prototype.create = create;
 SceneManager.prototype.checkCalendarTriggers = checkCalendarTriggers;
+SceneManager.prototype.checkSunPositionTriggers = checkSunPositionTriggers;
 SceneManager.prototype.checkTrigger = checkTrigger;
 SceneManager.prototype.destroy = destroy;
 SceneManager.prototype.get = get;

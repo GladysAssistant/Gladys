@@ -3481,7 +3481,8 @@
       "time": {
         "changed": "Zeitabhängiger Auslöser",
         "sunrise": "Jeder Sonnenaufgang",
-        "sunset": "Jeder Sonnenuntergang"
+        "sunset": "Jeder Sonnenuntergang",
+        "sun-position": "Sonnenstand"
       },
       "user": {
         "back-home": "Benutzer ist zurück zu Hause",
@@ -3576,6 +3577,15 @@
         "before": "Vor",
         "after": "Nach",
         "minutes": "Minuten"
+      },
+      "sunPosition": {
+        "description": "Dies wird ausgelöst, wenn die Sonne die konfigurierte Position erreicht, zum Beispiel um die Rollläden der von der Sonne beschienenen Fassade zu öffnen oder zu schließen. Die Position wird jede Minute geprüft, und die Szene wird einmal gestartet, wenn die Sonne den konfigurierten Bereich erreicht.",
+        "houseLabel": "Zuhause",
+        "noCondition": "Keine Bedingung",
+        "altitudeLabel": "Sonnenhöhe",
+        "altitudeHelp": "Höhenwinkel der Sonne über dem Horizont, in Grad: 0° bei Sonnenaufgang und Sonnenuntergang, 90° im Zenit, nachts negativ.",
+        "azimuthLabel": "Sonnenazimut",
+        "azimuthHelp": "Himmelsrichtung der Sonne, in Grad ab Norden: 0° = Norden, 90° = Osten, 180° = Süden, 270° = Westen. Um die wahre Mitternacht herum steht die Sonne genau im Norden, unter dem Horizont: Kombinieren Sie den Azimut mit einer Bedingung für die Sonnenhöhe (zum Beispiel Höhe > 0), wenn die Szene nur tagsüber starten soll. Eine einzelne Bedingung kann keinen Bereich beschreiben, der über Norden hinweggeht, zum Beispiel von 350° bis 10°."
       },
       "userPresence": {
         "backAtHomeDescription": "Dies wird ausgelöst, wenn der ausgewählte Benutzer wieder im ausgewählten Zuhause ist.",

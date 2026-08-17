@@ -3481,7 +3481,8 @@
       "time": {
         "changed": "Scheduled trigger",
         "sunrise": "Every sunrise",
-        "sunset": "Every sunset"
+        "sunset": "Every sunset",
+        "sun-position": "Sun position"
       },
       "user": {
         "back-home": "User back at home",
@@ -3576,6 +3577,15 @@
         "before": "Before",
         "after": "After",
         "minutes": "minutes"
+      },
+      "sunPosition": {
+        "description": "This will trigger when the sun reaches the position you configured, for example to open or close the shutters of the facade the sun is hitting. The position is checked every minute, and the scene is started once, when the sun enters the configured area.",
+        "houseLabel": "House",
+        "noCondition": "No condition",
+        "altitudeLabel": "Sun altitude",
+        "altitudeHelp": "Elevation angle of the sun above the horizon, in degrees: 0° at sunrise and sunset, 90° at the zenith, negative at night.",
+        "azimuthLabel": "Sun azimuth",
+        "azimuthHelp": "Compass direction of the sun, in degrees from North: 0° = North, 90° = East, 180° = South, 270° = West. Around solar midnight the sun is due North, below the horizon: combine the azimuth with an altitude condition (for example altitude > 0) if the scene must only start during the day. A single condition cannot describe an area crossing North, for example from 350° to 10°."
       },
       "userPresence": {
         "backAtHomeDescription": "This will trigger when the selected user is back at the selected home.",

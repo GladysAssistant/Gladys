@@ -7,6 +7,68 @@ const { compare } = require('../../utils/compare');
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
   event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
 
+// Tolerance used by the "=" operator of the sun position trigger: the sun position is
+// checked every minute, so it never matches an exact degree. "= 31" means
+// "the sun altitude rounds to 31°".
+const SUN_POSITION_EQUALITY_TOLERANCE_IN_DEGREE = 0.5;
+
+// A sun position trigger has an optional condition on the altitude and an optional
+// one on the azimuth. An axis without operator or without value is not checked.
+const getSunPositionCondition = (operator, value) => {
+  if (!operator || value === undefined || value === null || value === '') {
+    return null;
+  }
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? { operator, value: numericValue } : null;
+};
+
+// The azimuth is an angle on a compass: 359.9° and 0.1° are 0.2° apart, not 359.8°.
+const circularDistanceInDegree = (a, b) => {
+  const distance = Math.abs(a - b) % 360;
+  return Math.min(distance, 360 - distance);
+};
+
+// `circular` is true for the azimuth only: the altitude is a plain elevation angle.
+// It changes how "=" measures the distance to the configured value, so that "= 0"
+// also matches an azimuth of 359.8°. ">" and "<" stay plain comparisons on [0, 360[,
+// even for the azimuth: a half-plane has no wrap-aware meaning on a circle, so an
+// azimuth area crossing North (for example from 350° to 10°) cannot be described with
+// a single condition. The UI help text documents it.
+const sunPositionAxisVerified = (condition, currentValue, circular) => {
+  if (condition === null) {
+    return true;
+  }
+  if (condition.operator === '=') {
+    const distance = circular
+      ? circularDistanceInDegree(currentValue, condition.value)
+      : Math.abs(currentValue - condition.value);
+    return distance <= SUN_POSITION_EQUALITY_TOLERANCE_IN_DEGREE;
+  }
+  return compare(condition.operator, currentValue, condition.value);
+};
+
+// Same house, and the sun just entered the area described by the trigger: the position is
+// checked every minute, so the scene is executed when the conditions become verified, and
+// not again at every check while the sun stays in the area.
+const matchSunPosition = (self, sceneSelector, event, trigger) => {
+  if (event.house.selector !== trigger.house) {
+    return false;
+  }
+  const altitudeCondition = getSunPositionCondition(trigger.sun_altitude_operator, trigger.sun_altitude);
+  const azimuthCondition = getSunPositionCondition(trigger.sun_azimuth_operator, trigger.sun_azimuth);
+  // A trigger without any condition would match at every check: it never starts the scene.
+  if (altitudeCondition === null && azimuthCondition === null) {
+    return false;
+  }
+  const verified =
+    sunPositionAxisVerified(altitudeCondition, event.altitude, false) &&
+    sunPositionAxisVerified(azimuthCondition, event.azimuth, true);
+  const previouslyVerified =
+    sunPositionAxisVerified(altitudeCondition, event.previous_altitude, false) &&
+    sunPositionAxisVerified(azimuthCondition, event.previous_azimuth, true);
+  return verified && !previouslyVerified;
+};
+
 // severity scale of the generic weather alerts (B.18)
 const WEATHER_ALERT_SEVERITY_RANK = {
   minor: 1,
@@ -113,6 +175,7 @@ const triggersFunc = {
   [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => event.key === trigger.key,
   [EVENTS.TIME.SUNRISE]: matchSunEvent,
   [EVENTS.TIME.SUNSET]: matchSunEvent,
+  [EVENTS.TIME.SUN_POSITION]: matchSunPosition,
   [EVENTS.USER_PRESENCE.BACK_HOME]: (self, sceneSelector, event, trigger) =>
     event.house === trigger.house && event.user === trigger.user,
   [EVENTS.USER_PRESENCE.LEFT_HOME]: (self, sceneSelector, event, trigger) =>
