@@ -82,6 +82,7 @@ function Gladys(params = {}) {
     stateManager,
     device,
     variable,
+    energyPrice,
     params.jwtSecret,
     cache,
   );
