@@ -97,11 +97,12 @@
     "allRooms": "Alle Räume",
     "noRoom": "Kein Raum",
     "allIntegrations": "Alle Integrationen",
+    "nativeIntegrations": "Native Integrationen",
+    "communityIntegrations": "Community-Integrationen",
     "device": "Gerät",
     "room": "Raum",
     "integration": "Integration",
     "features": "Funktionen",
-    "openInIntegration": "In der Integration öffnen",
     "emptyState": "Keine Geräte gefunden. Füge Geräte über die Integrationsseite hinzu oder passe deine Suche und Filter an.",
     "emptyStateButton": "Integrationen durchsuchen",
     "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut."
@@ -727,6 +728,13 @@
       "searchPlaceholder": "Integration suchen",
       "noIntegrations": "Keine Integrationen gefunden",
       "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
+      "noInstalledIntegrations": "Auf dieser Instanz ist noch keine Community-Integration installiert.",
+      "installedSummary": {
+        "title": {
+          "one": "1 Community-Integration auf dieser Instanz installiert.",
+          "other": "{{count}} Community-Integrationen auf dieser Instanz installiert."
+        }
+      },
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Dein Gerät wird vielleicht von einer externen <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">Community-Integration</a> unterstützt – dem empfohlenen Weg, neue Kompatibilitäten hinzuzufügen. Und wenn es sie noch nicht gibt, kannst du ganz einfach <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">deine eigene erstellen</a>!",
       "refreshStore": {
@@ -746,6 +754,7 @@
       "menu": {
         "all": "Alle Integrationen",
         "favorites": "Favoriten",
+        "installed": "Installiert",
         "updates": "Zu aktualisieren",
         "climate": "Heizung & Klima",
         "lighting": "Beleuchtung, Steckdosen & Rollläden",
@@ -840,6 +849,7 @@
         "actionError": "Beim Ausführen dieser Aktion ist ein Fehler aufgetreten.",
         "uninstallError": "Beim Deinstallieren dieser Integration ist ein Fehler aufgetreten.",
         "updateAvailableText": "Eine neue Version dieser Integration ist verfügbar.",
+        "updateAvailableVersionText": "Eine neue Version dieser Integration ist verfügbar: v{{latestVersion}} (installiert: v{{currentVersion}}).",
         "updateSuccessText": "Integration auf Version {{version}} aktualisiert.",
         "alreadyUpToDateText": "Die Integration ist bereits aktuell (Version {{version}}): Das Docker-Image wurde erneut heruntergeladen und der Container neu erstellt.",
         "statusLabel": "Status",
@@ -3298,7 +3308,7 @@
         "continueScene": "Szene fortsetzen"
       },
       "calendarGetEvents": {
-        "description": "Diese Aktion ruft die Liste der Ereignisse ab, die im ausgewählten Zeitraum beginnen (ein Ereignis, das vor dem Beginn des Zeitraums begonnen hat, wird nicht zurückgegeben), und stellt sie als Variablen (ein fertiger Satz, die Anzahl der Ereignisse und die Liste der Ereignisse) für die nächsten Aktionen der Szene bereit. Es werden nur freigegebene Kalender angezeigt.",
+        "description": "Diese Aktion ruft die Liste der Ereignisse ab, die im ausgewählten Zeitraum beginnen (ein Ereignis, das vor dem Beginn des Zeitraums begonnen hat, wird nicht zurückgegeben), und stellt sie als Variablen (ein fertiger Satz, eine detaillierte Liste mit einer Zeile pro Ereignis, die Anzahl der Ereignisse und die Rohliste der Ereignisse) für die nächsten Aktionen der Szene bereit. Es werden nur freigegebene Kalender angezeigt.",
         "calendarLabel": "Suche in den folgenden freigegebenen Kalendern",
         "timeRangeLabel": "Ereignisse abrufen",
         "today": "Heute",
@@ -3460,8 +3470,9 @@
       },
       "calendarEvents": {
         "text": "Satz mit der Zusammenfassung der Ereignisse",
+        "textDetailed": "Detaillierte Liste der Ereignisse (eine Zeile pro Ereignis)",
         "count": "Anzahl der Ereignisse",
-        "events": "Liste der Ereignisse"
+        "events": "Rohe Liste der Ereignisse (fortgeschritten, in einer Nachricht nicht lesbar)"
       },
       "askAi": {
         "answer": "AI Antwort"
@@ -4028,7 +4039,9 @@
     "startButton": "Starten",
     "searchPlaceholder": "Szene suchen",
     "filterTagsName": "Nach Tags filtern",
-    "unselectTags": "Alle Tags abwählen"
+    "unselectTags": "Alle Tags abwählen",
+    "running": "Läuft",
+    "stopButton": "Stoppen"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
