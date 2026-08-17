@@ -74,7 +74,7 @@ export const FeatureIcons = ({ device }) => {
 // Where a device is used: the dashboards and the scenes referencing the
 // device itself or any of its features. Useful to know what will break
 // before deleting a device, and to spot devices used nowhere.
-export const DeviceUsage = ({ usage, loaded, max = MAX_USAGE_LINKS, link = true }) => {
+export const DeviceUsage = ({ usage, loaded }) => {
   // A device absent from the usage means "used nowhere" only once the usage
   // request has answered. Until then its usage is simply unknown
   if (!loaded) {
@@ -110,27 +110,13 @@ export const DeviceUsage = ({ usage, loaded, max = MAX_USAGE_LINKS, link = true 
 
   return (
     <div class={style.usageLinks}>
-      {links.slice(0, max).map(usageLink => {
-        const content = [
-          <i class={cx(`fe fe-${usageLink.icon}`, style.usageIcon)} />,
+      {links.slice(0, MAX_USAGE_LINKS).map(usageLink => (
+        <Link key={usageLink.key} href={usageLink.href} class={cx('tag', style.usageTag)} title={usageLink.name}>
+          <i class={cx(`fe fe-${usageLink.icon}`, style.usageIcon)} />
           <span class={style.usageName}>{usageLink.name}</span>
-        ];
-        // On the mobile list the whole item is already a link, so the usage
-        // tags are displayed as plain tags to avoid nesting links
-        if (!link) {
-          return (
-            <span key={usageLink.key} class={cx('tag', style.usageTag)} title={usageLink.name}>
-              {content}
-            </span>
-          );
-        }
-        return (
-          <Link key={usageLink.key} href={usageLink.href} class={cx('tag', style.usageTag)} title={usageLink.name}>
-            {content}
-          </Link>
-        );
-      })}
-      {total > max && <span class="small text-muted">+{total - max}</span>}
+        </Link>
+      ))}
+      {total > MAX_USAGE_LINKS && <span class="small text-muted">+{total - MAX_USAGE_LINKS}</span>}
     </div>
   );
 };

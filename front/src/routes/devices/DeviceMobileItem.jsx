@@ -1,12 +1,15 @@
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
-import { DeviceStamp, DeviceUsage, FeatureIcons, IntegrationName } from './helpers';
+import { DeviceStamp, FeatureIcons, IntegrationName } from './helpers';
 import style from './style.css';
 
 // One tappable list item: the whole row opens the device in its
-// integration, like a native mobile app list
-const DeviceMobileItem = ({ device, integration, usage, usageLoaded }) => {
+// integration, like a native mobile app list. The usage is not displayed
+// here: the whole row is already a link, so the usage entries could not
+// navigate. It stays on the desktop table, and the usage filter works on
+// mobile too
+const DeviceMobileItem = ({ device, integration }) => {
   const content = [
     <DeviceStamp device={device} integration={integration} />,
     <div class={style.mobileItemBody}>
@@ -16,7 +19,6 @@ const DeviceMobileItem = ({ device, integration, usage, usageLoaded }) => {
         <IntegrationName integration={integration} link={false} />
       </div>
       <FeatureIcons device={device} />
-      <DeviceUsage usage={usage} loaded={usageLoaded} max={2} link={false} />
     </div>
   ];
 

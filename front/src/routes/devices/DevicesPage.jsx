@@ -95,14 +95,8 @@ const DevicesPage = ({ children, ...props }) => (
               {props.initialized && props.filteredDevices.length > 0 && (
                 <div class="card d-lg-none">
                   <div class="list-group list-group-flush">
-                    {props.filteredDevices.map(({ device, integration, usage }) => (
-                      <DeviceMobileItem
-                        key={device.id}
-                        device={device}
-                        integration={integration}
-                        usage={usage}
-                        usageLoaded={props.usageLoaded}
-                      />
+                    {props.filteredDevices.map(({ device, integration }) => (
+                      <DeviceMobileItem key={device.id} device={device} integration={integration} />
                     ))}
                   </div>
                 </div>
