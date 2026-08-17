@@ -13,7 +13,7 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
 import { getDeviceName } from '../../../utils/device';
 import { formatHttpError } from '../../../utils/formatErrors';
-import slugify from '../../../utils/slugify';
+import downloadDeviceFeaturesCsv from '../../../utils/downloadDeviceFeaturesCsv';
 
 dayjs.extend(localizedFormat);
 
@@ -24,9 +24,6 @@ const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
 const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
 const THREE_MONTHS_IN_MINUTES = 3 * 30 * 24 * 60;
 const ONE_YEAR_IN_MINUTES = 365 * 24 * 60;
-
-// Byte order mark, added at the beginning of the exported CSV file
-const UTF8_BOM = '\uFEFF';
 
 const intervalByName = {
   'last-hour': ONE_HOUR_IN_MINUTES,
@@ -221,25 +218,14 @@ class Chartbox extends Component {
     try {
       // The exported period is exactly the period currently displayed on the chart,
       // so the user can browse to a past period and export it.
-      const endDate = dayjs().subtract(this.state.offset, 'minute');
-      const startDate = endDate.subtract(this.state.interval, 'minute');
-      const csv = await this.props.httpClient.get('/api/v1/device_feature/states_csv', {
-        device_features: deviceFeatures.join(','),
-        start: startDate.toISOString(),
-        end: endDate.toISOString()
+      const endAt = dayjs().subtract(this.state.offset, 'minute');
+      const startAt = endAt.subtract(this.state.interval, 'minute');
+      await downloadDeviceFeaturesCsv(this.props.httpClient, {
+        deviceFeatures,
+        startAt,
+        endAt,
+        filename: this.props.box.title
       });
-      // The BOM makes spreadsheets (Excel in particular) open the file as UTF-8,
-      // so accented device names are not mangled.
-      const blob = new Blob([`${UTF8_BOM}${csv}`], { type: 'text/csv;charset=utf-8;' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      const titleSlug = slugify(this.props.box.title || '') || 'history';
-      link.download = `gladys-${titleSlug}-${startDate.format('YYYY-MM-DD')}-${endDate.format('YYYY-MM-DD')}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error(err);
       const { errorDetailString } = formatHttpError(err);

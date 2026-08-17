@@ -33,6 +33,10 @@ const getStampColor = slug => {
   return STAMP_COLORS[hash % STAMP_COLORS.length];
 };
 
+// Only features whose history is kept have states to export: exporting the
+// others would always produce an empty file.
+export const getExportableFeatures = device => (device.features || []).filter(feature => feature.keep_history);
+
 export const getFeatureIcon = feature =>
   get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`) || 'sliders';
 

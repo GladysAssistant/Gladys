@@ -50,10 +50,34 @@
   flex-shrink: 0;
 }
 
+.rowActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
 .mobileItem {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+/* The row content is the tap target opening the device, the export button
+   sits next to it so it can be pressed without navigating away */
+.mobileItemTarget {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobileItemLink,
+.mobileItemLink:hover,
+.mobileItemLink:focus {
+  color: inherit;
+  text-decoration: none;
 }
 
 .mobileItemBody {
@@ -104,4 +128,29 @@
     flex: 1 1 0;
     min-width: 0;
   }
+}
+
+/* The devices table lives in a `.table-responsive` (overflow: auto), which
+   would clip a dropdown: the export options are shown in an overlay instead */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+.modalDialog {
+  width: 100%;
+  max-width: 640px;
+  margin: auto 0;
+  text-align: left;
+  white-space: normal;
 }
