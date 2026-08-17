@@ -1,4 +1,5 @@
 const { generateJwtSecret } = require('../utils/jwtSecret');
+const logger = require('../utils/logger');
 const { Cache } = require('../utils/cache');
 const getConfig = require('../utils/getConfig');
 const db = require('../models');
@@ -182,8 +183,11 @@ function Gladys(params = {}) {
         await externalIntegration.init();
       }
       if (!params.disableService) {
+        // only load services here (instantiate them and register them in the
+        // stateManager, so the API can serve them as soon as the server
+        // listens): starting them is deferred to the end of the boot
+        // sequence, see below
         await service.load(gladys);
-        await service.startAll();
       }
       if (!params.disableSceneLoading) {
         await scene.init();
@@ -217,9 +221,34 @@ function Gladys(params = {}) {
         system.checkIfGladysUpgraded(gateway);
       }
 
-      event.emit(EVENTS.TRIGGERS.CHECK, {
-        type: EVENTS.SYSTEM.START,
-      });
+      const startServicesAndEmitSystemStart = async () => {
+        if (!params.disableService) {
+          try {
+            // service.start catches and persists per-service errors, so a
+            // failing service cannot reject here — only a global failure
+            // (e.g. database error) can, and it is just logged
+            await service.startAll();
+          } catch (e) {
+            logger.warn('Unable to start services at boot', e);
+          }
+        }
+        // the SYSTEM.START trigger is only emitted once all services are
+        // started, so "on startup" scenes still find their integrations
+        // ready, like when the boot was sequential
+        event.emit(EVENTS.TRIGGERS.CHECK, {
+          type: EVENTS.SYSTEM.START,
+        });
+      };
+      // Voluntarily not awaited: starting the services (Zigbee, MQTT,
+      // external integration containers...) is by far the slowest part of
+      // the boot, and the HTTP server only starts listening once this boot
+      // sequence resolves — awaiting here would keep the API and the front
+      // unreachable until the last integration is up. External integration
+      // containers also authenticate on the WebSocket, which needs the HTTP
+      // server to be listening: deferring their start avoids a reconnection
+      // loop at boot. The function above never rejects, so the promise can
+      // safely float.
+      startServicesAndEmitSystemStart();
     },
   };
 
