@@ -3462,7 +3462,7 @@
         "text": "Phrase résumant les évènements",
         "textDetailed": "Liste détaillée des évènements (une ligne par évènement)",
         "count": "Nombre d'évènements",
-        "events": "Liste des évènements"
+        "events": "Liste brute des évènements (avancé, illisible dans un message)"
       },
       "askAi": {
         "answer": "Réponse de l'IA"

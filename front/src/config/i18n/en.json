@@ -3462,7 +3462,7 @@
         "text": "Events summary sentence",
         "textDetailed": "Detailed list of events (one line per event)",
         "count": "Number of events",
-        "events": "List of events"
+        "events": "Raw list of events (advanced, not readable in a message)"
       },
       "askAi": {
         "answer": "AI answer"

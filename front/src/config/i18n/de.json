@@ -3462,7 +3462,7 @@
         "text": "Satz mit der Zusammenfassung der Ereignisse",
         "textDetailed": "Detaillierte Liste der Ereignisse (eine Zeile pro Ereignis)",
         "count": "Anzahl der Ereignisse",
-        "events": "Liste der Ereignisse"
+        "events": "Rohe Liste der Ereignisse (fortgeschritten, in einer Nachricht nicht lesbar)"
       },
       "askAi": {
         "answer": "AI Antwort"
