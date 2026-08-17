@@ -148,6 +148,29 @@
 
 .previewHandle {
   cursor: move;
+  /* a touch on the handle must drag, never scroll the page */
+  touch-action: none;
+}
+
+.listDragHandle {
+  cursor: move;
+  touch-action: none;
+}
+
+/* Engine-wide drag state: the body carries these classes while a drag is
+   live, so drop zones can show up and text can't get selected mid-drag */
+:global(body.gladys-pointer-dragging),
+:global(body.gladys-pointer-dragging) * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+:global(.gladys-drag-source-dim) {
+  opacity: 0.4;
+}
+
+:global(.list-group-item.gladys-list-drop-active) {
+  background-color: rgba(70, 127, 207, 0.25);
 }
 
 :global(.glass-theme) .previewButton {
@@ -310,16 +333,14 @@
   gap: 4px;
 }
 
-/* Custom drag ghost (see EditorDragLayer): above the edit panel, never
-   catching the pointer */
-.dragLayer {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-}
-
+/* Drag ghost created by the pointer-drag engine (utils/pointerDrag.js):
+   above the edit panel, never catching the pointer */
 .dragLayerPill {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1060;
+  pointer-events: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -381,6 +402,8 @@
 }
 
 .bottomDropZone {
+  /* only exists while a widget drag is live (body class set by the engine) */
+  display: none;
   min-height: 20rem;
   border-width: 1px;
   border-radius: 2px;
@@ -392,6 +415,17 @@
   background-color: #fafafa;
   color: #bdbdbd;
   margin-bottom: 1.5rem;
+}
+
+:global(body.gladys-widget-dragging) .bottomDropZone {
+  display: block;
+}
+
+/* highlight applied by the pointer-drag engine on the hovered drop zone */
+.dropZone.dropZoneActive,
+.bottomDropZone.bottomDropZoneActive {
+  background-color: rgba(70, 127, 207, 0.18);
+  border-color: var(--gl-accent, #467fcf);
 }
 
 .btnAddNewBoxAtPosition {

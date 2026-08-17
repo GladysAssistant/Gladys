@@ -1,66 +1,53 @@
-import { useRef, useEffect } from 'preact/hooks';
-import { useDrag, useDrop } from 'react-dnd';
-import { getEmptyImage } from 'react-dnd-html5-backend';
+import { useRef } from 'preact/hooks';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import Box from '../Box';
+import { startPointerDrag } from '../../../utils/pointerDrag';
 import style from './style.css';
-
-export const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 // A widget on the edit canvas: the real rendered Box behind a transparent
 // overlay (a tap opens its settings), with a slim toolbar carrying the
 // affordances — drag handle on desktop, up/down on mobile, settings, remove.
+// Dragging runs on the pointer-events engine (see utils/pointerDrag.js):
+// no native HTML5 drag, no react-dnd — one reliable path for every input.
 const EditableBoxPreview = ({ children, ...props }) => {
   const { x, y, box } = props;
   const ref = useRef(null);
-  const [{ isDragging }, drag, preview] = useDrag(
-    () => ({
-      type: DASHBOARD_EDIT_BOX_TYPE,
-      // the widget type rides along so the drag layer can label its ghost
-      item: () => ({ x, y, type: box.type }),
-      collect: monitor => ({
-        isDragging: !!monitor.isDragging()
-      })
-    }),
-    [x, y, box.type]
-  );
-  // The native drag preview is suppressed: Safari draws a blank image for
-  // backdrop-filter cards and the touch backend has none — EditorDragLayer
-  // renders the same visible ghost on every browser and backend instead.
-  // No captureDraggingState here: it would publish the dragging state
-  // synchronously inside dragstart, and the re-render this triggers makes
-  // Chrome cancel the drag on the spot (dragend right after dragstart —
-  // the exact reason react-dnd defers the publish by a tick by default).
-  useEffect(() => {
-    preview(getEmptyImage());
-  }, [preview]);
-  const [{ isActive }, drop] = useDrop(
-    {
-      accept: DASHBOARD_EDIT_BOX_TYPE,
-      collect: monitor => ({
-        isActive: monitor.canDrop() && monitor.isOver()
-      }),
-      drop(item) {
-        props.moveCard(item.x, item.y, x, y);
-      }
-    },
-    [x, y]
-  );
-  drop(ref);
+
+  const onHandlePointerDown = event => {
+    const wrapper = ref.current;
+    if (!wrapper) {
+      return;
+    }
+    const titleNode = wrapper.querySelector('[data-preview-title]');
+    startPointerDrag(event, {
+      source: wrapper,
+      draggingClass: style.previewWrapperDragging,
+      dropSelector: '[data-widget-drop]',
+      ghostClass: style.dragLayerPill,
+      ghostIconClass: 'fe fe-move',
+      ghostLabel: titleNode ? titleNode.textContent : '',
+      bodyClass: 'gladys-widget-dragging',
+      onDrop: target =>
+        props.moveCard(x, y, Number(target.getAttribute('data-drop-x')), Number(target.getAttribute('data-drop-y')))
+    });
+  };
+
   const isEditing = props.editingBoxPosition && props.editingBoxPosition.x === x && props.editingBoxPosition.y === y;
   return (
     <div
       ref={ref}
+      data-widget-drop
+      data-drop-x={x}
+      data-drop-y={y}
+      data-drop-active-class={style.previewWrapperDropTarget}
       class={cx(style.previewWrapper, {
-        [style.previewWrapperDragging]: isDragging,
-        [style.previewWrapperDropTarget]: isActive,
         [style.previewWrapperEditing]: isEditing
       })}
     >
       <div class={style.previewToolbar}>
-        <span class={style.previewTitle}>
+        <span class={style.previewTitle} data-preview-title>
           {box.type ? <Text id={`dashboard.boxTitle.${box.type}`} /> : <Text id="dashboard.editorNewWidget" />}
         </span>
         <div class={style.previewActions}>
@@ -80,7 +67,11 @@ const EditableBoxPreview = ({ children, ...props }) => {
           >
             <i class="fe fe-arrow-down" />
           </button>
-          <span ref={drag} class={cx(style.previewButton, style.previewHandle, 'd-none d-lg-inline-flex')}>
+          <span
+            class={cx(style.previewButton, style.previewHandle, 'd-none d-lg-inline-flex')}
+            data-cy={`drag-box-${x}-${y}`}
+            onPointerDown={onHandlePointerDown}
+          >
             <i class="fe fe-move" />
           </span>
           <button

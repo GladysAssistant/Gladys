@@ -1,13 +1,10 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { DndProvider } from 'react-dnd';
 
 import EditableBoxPreview from './EditableBoxPreview';
-import EditorDragLayer from './EditorDragLayer';
 import EditPanel from './EditPanel';
 import EmptyColumnDropZone from './EmptyColumnDropZone';
 import BottomDropZone from './BottomDropZone';
-import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
 import { getSectionOffsets, MAX_COLUMNS_PER_SECTION } from '../../../utils/dashboardSections';
 import style from './style.css';
 import stylePrimary from '../style.css';
@@ -16,10 +13,9 @@ const getTotalColumns = props => {
   return props.homeDashboard.boxes.length;
 };
 
-const { backend: dragAndDropBackend, options: dragAndDropBackendOptions } = getDragAndDropBackend();
-
 // Editor v2: the canvas IS the dashboard — real widgets with edit
-// affordances, settings in a side panel / bottom sheet (EditPanel)
+// affordances, settings in a side panel / bottom sheet (EditPanel).
+// Widget reordering runs on the pointer-events engine (utils/pointerDrag.js).
 const EditBoxColumns = ({ children, ...props }) => (
   <div class="pb-6">
     <div class={style.editorTopBar}>
@@ -52,7 +48,7 @@ const EditBoxColumns = ({ children, ...props }) => (
     <p class={style.editorExplanation}>
       <Text id="dashboard.editDashboardExplanation" />
     </p>
-    <DndProvider backend={dragAndDropBackend} options={dragAndDropBackendOptions}>
+    <>
       {props.homeDashboard &&
         props.homeDashboard.boxes &&
         props.sectionSizes &&
@@ -137,16 +133,11 @@ const EditBoxColumns = ({ children, ...props }) => (
                                 </div>
                               </div>
                             ))}
-                            <BottomDropZone
-                              moveCard={props.moveCard}
-                              x={x}
-                              y={column.length}
-                              isMobileReordering={false}
-                            />
+                            <BottomDropZone x={x} y={column.length} />
                           </>
                         )}
 
-                        {column.length === 0 && <EmptyColumnDropZone moveCard={props.moveCard} x={x} />}
+                        {column.length === 0 && <EmptyColumnDropZone x={x} />}
 
                         {column.length === 0 && (
                           <div class="d-flex justify-content-center mb-4">
@@ -186,8 +177,7 @@ const EditBoxColumns = ({ children, ...props }) => (
         </button>
       </div>
       <EditPanel {...props} />
-      <EditorDragLayer />
-    </DndProvider>
+    </>
   </div>
 );
 

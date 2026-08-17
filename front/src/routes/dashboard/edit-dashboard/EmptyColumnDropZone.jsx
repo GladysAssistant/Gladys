@@ -1,36 +1,17 @@
-import { useRef } from 'preact/hooks';
-import { useDrop } from 'react-dnd';
 import cx from 'classnames';
 import style from './style.css';
 
-const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
-
-const EmptyColumnDropZone = ({ children, ...props }) => {
-  const ref = useRef(null);
-  const [{ isActive }, drop] = useDrop({
-    accept: DASHBOARD_EDIT_BOX_TYPE,
-    collect: monitor => ({
-      isActive: monitor.canDrop() && monitor.isOver()
-    }),
-    drop(item) {
-      if (!ref.current) {
-        return;
-      }
-      props.moveCard(item.x, item.y, props.x, 0);
-    }
-  });
-  drop(ref);
-  return (
-    <div
-      ref={ref}
-      class={cx('text-center', style.dropZone)}
-      style={{
-        padding: '2rem',
-        opacity: isActive ? 1 : 1,
-        backgroundColor: isActive ? '#ecf0f1' : undefined
-      }}
-    />
-  );
-};
+// Drop target filling an empty column, for the pointer-drag engine: the
+// data attributes say where a dropped widget lands (top of column x), the
+// engine highlights it via data-drop-active-class.
+const EmptyColumnDropZone = ({ x }) => (
+  <div
+    class={cx('text-center', style.dropZone)}
+    data-widget-drop
+    data-drop-x={x}
+    data-drop-y="0"
+    data-drop-active-class={style.dropZoneActive}
+  />
+);
 
 export default EmptyColumnDropZone;

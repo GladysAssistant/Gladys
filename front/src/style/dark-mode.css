@@ -39,9 +39,11 @@ body.dark-mode {
   filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */
 }
 
-/** Should not invert icons on the glass dashboard and its editor **/
+/** Should not invert icons on the glass dashboard and its editor,
+    nor inside the drag ghost (it lives on <body>, outside those containers) **/
 .dark-mode .dashboard .fe,
-.dark-mode .glass-theme .fe {
+.dark-mode .glass-theme .fe,
+.dark-mode .gladys-drag-ghost .fe {
   filter: none;
 }
 
