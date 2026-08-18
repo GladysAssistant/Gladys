@@ -290,6 +290,7 @@
     "newDashboardButton": "Nouveau",
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
+    "editDashboardDuplicateButton": "Dupliquer",
     "editDashboardSaveButton": "Sauvegarder",
     "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
     "toggleDefineTabletMode": "Mode tablette",
@@ -4032,6 +4033,17 @@
     "invalidName": "Le nom est requis",
     "invalidIcon": "L'icône est requise",
     "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
+  },
+  "duplicateDashboard": {
+    "cardTitle": "Dupliquer le tableau de bord \"{{name}}\"",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Entrez un nouveau nom",
+    "duplicateDashboardButton": "Dupliquer",
+    "invalidName": "Le nom est requis",
+    "dashboardAlreadyExist": "Un tableau de bord avec le même nom existe déjà.",
+    "unknownError": "Une erreur inconnue est survenue. Veuillez réessayer !",
+    "nameAfterCopy": "Copie de {{name}}",
+    "savedVersionInfo": "La copie est réalisée à partir de la dernière version enregistrée de ce tableau de bord. Les modifications non enregistrées ne seront pas copiées."
   },
   "duplicateScene": {
     "cardTitle": "Dupliquer la scène \"{{name}}\"",

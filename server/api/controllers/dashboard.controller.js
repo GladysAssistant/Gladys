@@ -52,6 +52,18 @@ module.exports = function DashboardController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/dashboard/:dashboard_selector/duplicate duplicate
+   * @apiName duplicate
+   * @apiGroup Dashboard
+   * @apiParam {String} name Name of the duplicated dashboard.
+   * @apiUse DashboardSuccess
+   */
+  async function duplicate(req, res) {
+    const dashboard = await gladys.dashboard.duplicate(req.user.id, req.params.dashboard_selector, req.body.name);
+    res.status(201).json(dashboard);
+  }
+
+  /**
    * @api {post} /api/v1/dashboard/order updateOrder
    * @apiName updateOrder
    * @apiGroup Dashboard
@@ -101,6 +113,7 @@ module.exports = function DashboardController(gladys) {
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
+    duplicate: asyncMiddleware(duplicate),
     get: asyncMiddleware(get),
     getBySelector: asyncMiddleware(getBySelector),
     update: asyncMiddleware(update),

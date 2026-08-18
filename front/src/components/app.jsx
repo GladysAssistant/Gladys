@@ -46,6 +46,7 @@ import SignupSuccess from '../routes/signup/5-success';
 import Dashboard from '../routes/dashboard';
 import NewDashboard from '../routes/dashboard/new-dashboard';
 import EditDashboard from '../routes/dashboard/edit-dashboard';
+import DuplicateDashboard from '../routes/dashboard/duplicate-dashboard';
 
 import IntegrationPage from '../routes/integration';
 import DevicesListPage from '../routes/devices';
@@ -266,6 +267,7 @@ const AppRouter = connect(
         <SafeAsyncRoute path="/dashboard" component={Dashboard} />
         <SafeAsyncRoute path="/dashboard/:dashboardSelector" component={Dashboard} />
         <EditDashboard path="/dashboard/:dashboardSelector/edit" />
+        <DuplicateDashboard path="/dashboard/:dashboardSelector/duplicate" />
         <NewDashboard path="/dashboard/create/new" />
         <SafeAsyncRoute path="/dashboard/integration" component={IntegrationPage} />
 

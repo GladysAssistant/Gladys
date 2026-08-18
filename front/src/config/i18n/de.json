@@ -292,6 +292,7 @@
     "disableFullScreen": "Vollbild beenden",
     "editDashboardTitle": "Dashboard bearbeiten",
     "editDashboardDeleteButton": "Löschen",
+    "editDashboardDuplicateButton": "Duplizieren",
     "editDashboardCancelButton": "Abbrechen",
     "editDashboardDeleteText": "Bist du sicher, dass du dieses Dashboard löschen möchtest?",
     "toggleDefineTabletMode": "Tablet-Modus",
@@ -4032,6 +4033,17 @@
     "invalidName": "Name ist erforderlich und kann nicht \"neu\" sein",
     "invalidIcon": "Symbol ist erforderlich",
     "sceneAlreadyExist": "Eine Szene mit diesem Namen existiert bereits."
+  },
+  "duplicateDashboard": {
+    "cardTitle": "Dashboard \"{{name}}\" duplizieren",
+    "nameLabel": "Name",
+    "namePlaceholder": "Gib einen neuen Namen ein",
+    "duplicateDashboardButton": "Duplizieren",
+    "invalidName": "Name ist erforderlich",
+    "dashboardAlreadyExist": "Ein Dashboard mit diesem Namen existiert bereits.",
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut!",
+    "nameAfterCopy": "Kopie von {{name}}",
+    "savedVersionInfo": "Die Kopie wird von der zuletzt gespeicherten Version dieses Dashboards erstellt. Nicht gespeicherte Änderungen werden nicht kopiert."
   },
   "duplicateScene": {
     "cardTitle": "Szene \"{{name}}\" duplizieren",

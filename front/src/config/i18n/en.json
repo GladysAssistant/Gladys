@@ -292,6 +292,7 @@
     "disableFullScreen": "Exit full screen",
     "editDashboardTitle": "Edit dashboard",
     "editDashboardDeleteButton": "Delete",
+    "editDashboardDuplicateButton": "Duplicate",
     "editDashboardCancelButton": "Cancel",
     "editDashboardDeleteText": "Are you sure you want to delete this dashboard?",
     "toggleDefineTabletMode": "Tablet Mode",
@@ -4032,6 +4033,17 @@
     "invalidName": "Name is required and cannot be 'new'",
     "invalidIcon": "Icon is required",
     "sceneAlreadyExist": "A scene with that name already exists."
+  },
+  "duplicateDashboard": {
+    "cardTitle": "Duplicate dashboard \"{{name}}\"",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter a new name",
+    "duplicateDashboardButton": "Duplicate",
+    "invalidName": "Name is required",
+    "dashboardAlreadyExist": "A dashboard with this name already exists.",
+    "unknownError": "An unknown error occurred. Please retry!",
+    "nameAfterCopy": "Copy of {{name}}",
+    "savedVersionInfo": "The copy is made from the last saved version of this dashboard. Any change not saved yet will not be copied."
   },
   "duplicateScene": {
     "cardTitle": "Duplicate scene \"{{name}}\"",
