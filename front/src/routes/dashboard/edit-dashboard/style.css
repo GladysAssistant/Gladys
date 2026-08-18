@@ -550,3 +550,39 @@
     text-wrap: wrap;
   }
 }
+
+/* Touch targets: fingers need ~44px (Apple HIG). pointer: coarse means the
+   PRIMARY pointer is a finger (tablets, phones) — hybrid laptops with a
+   touchscreen but a trackpad keep the compact mouse sizing. */
+@media (pointer: coarse) {
+  .previewButton {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+
+  .btnAddNewBoxAtPosition {
+    height: 2.25rem;
+  }
+
+  .editPanelClose {
+    font-size: 1.25rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .dashboardListItem {
+    padding: 11px 14px;
+  }
+
+  /* bigger hit area without growing the row */
+  .listDragHandle {
+    padding: 0.5rem;
+    margin: -0.5rem;
+  }
+
+  .editorTopBar :global(.btn),
+  .editActionsFooter :global(.btn) {
+    padding: 0.5rem 1rem;
+    font-size: 0.9375rem;
+  }
+}

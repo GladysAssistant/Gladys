@@ -1,7 +1,10 @@
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
+
+import style from './style.css';
 
 const EditActions = props => (
-  <div class="fixed-bottom footer">
+  <div class={cx('fixed-bottom footer', style.editActionsFooter)}>
     <div class="container">
       <div class="row align-items-center flex-row-reverse">
         {!props.askDeleteDashboard && (
