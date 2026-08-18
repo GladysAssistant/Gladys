@@ -629,7 +629,10 @@
       "scene": {
         "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Name displayed on the dashboard",
-        "editSceneLabel": "Select the scene you want to display here."
+        "editSceneLabel": "Select the scene you want to display here.",
+        "customOrderLabel": "Custom order",
+        "customOrderDescription": "By default, scenes are displayed in alphabetical order. Enable this option to sort them the way you want.",
+        "orderSceneLabel": "Drag and drop the scenes to change their order"
       },
       "link": {
         "editTitleLabel": "Title",

@@ -595,7 +595,10 @@
       "scene": {
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
-        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
+        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici.",
+        "customOrderLabel": "Ordre personnalisé",
+        "customOrderDescription": "Par défaut, les scènes sont affichées par ordre alphabétique. Activez cette option pour les trier comme vous le souhaitez.",
+        "orderSceneLabel": "Glissez-déposez les scènes pour modifier leur ordre"
       },
       "link": {
         "editTitleLabel": "Titre",

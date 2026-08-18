@@ -47,3 +47,23 @@
 .deviceListRemoveButton {
   z-index: 0;
 }
+
+.sceneListDragAndDrop {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sceneListDragAndDropDragging {
+  opacity: 0.5;
+}
+
+.sceneListDragAndDropActive {
+  background-color: #ecf0f1;
+}
+
+.sceneListDragAndDropLabel {
+  height: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

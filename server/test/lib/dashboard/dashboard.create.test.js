@@ -23,6 +23,28 @@ describe('dashboard.create', () => {
     // selector should be the slug of the name + a dash + 4 random characters
     expect(newDashboard.selector).to.match(/^my-new-dashboard-[a-z0-9]{4}$/);
   });
+  it('should create a dashboard with a scene box with a custom scene order', async () => {
+    const newDashboard = await dashboard.create('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      name: 'My dashboard with a scene box',
+      type: DASHBOARD_TYPE.MAIN,
+      position: 0,
+      visibility: DASHBOARD_VISIBILITY.PRIVATE,
+      boxes: [
+        [
+          {
+            type: DASHBOARD_BOX_TYPE.SCENE,
+            scenes: ['my-second-scene', 'my-first-scene'],
+            scene_custom_order: true,
+          },
+        ],
+      ],
+    });
+    expect(newDashboard.boxes[0][0]).to.deep.equal({
+      type: DASHBOARD_BOX_TYPE.SCENE,
+      scenes: ['my-second-scene', 'my-first-scene'],
+      scene_custom_order: true,
+    });
+  });
   it('should create a dashboard with the selector given', async () => {
     const newDashboard = await dashboard.create('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
       name: 'My dashboard with a custom selector',
