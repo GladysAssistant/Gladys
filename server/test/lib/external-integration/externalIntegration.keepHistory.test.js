@@ -108,4 +108,39 @@ describe('externalIntegration.getDiscoveredDevices keep_history', () => {
     const stored = externalIntegration.discoveredDevices.get(service.id);
     expect(stored[0].features[0]).to.have.property('keep_history', true);
   });
+
+  it('should not mutate the in-memory published list of a device not created yet', async () => {
+    const publishedDevice = buildDevice(service.selector);
+    await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    devices[0].features[0].keep_history = false;
+    const stored = externalIntegration.discoveredDevices.get(service.id);
+    expect(stored[0].features[0]).to.have.property('keep_history', true);
+  });
+
+  it('should not mutate the in-memory published list of a feature not created yet', async () => {
+    const publishedDevice = buildDevice(service.selector);
+    const newFeature = {
+      name: 'Humidite',
+      external_id: `ext:${service.selector}:thermometer:humidity`,
+      category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.PERCENT,
+      min: 0,
+      max: 100,
+      read_only: true,
+      has_feedback: false,
+      keep_history: true,
+    };
+    publishedDevice.features.push(newFeature);
+    stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+      id: 'device-id',
+      features: [{ ...publishedDevice.features[0], id: 'temperature-in-db', keep_history: false }],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    findFeature(devices[0], newFeature.external_id).keep_history = false;
+    const stored = externalIntegration.discoveredDevices.get(service.id);
+    expect(findFeature(stored[0], newFeature.external_id)).to.have.property('keep_history', true);
+  });
 });

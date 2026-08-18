@@ -9,20 +9,28 @@ export const isHistorizableFeature = feature => feature.category !== DEVICE_FEAT
 // The definition of a feature belongs to the integration (name, category,
 // unit, bounds...): only the "keep history" choice is the user's, so it is
 // the only thing this row makes editable.
-const KeepHistoryFeature = ({ deviceIndex, feature, featureIndex, updateFeatureKeepHistory }) => (
-  <div class="d-flex align-items-center justify-content-between mb-2">
-    <span class="mr-3">{feature.name}</span>
-    <label class="custom-switch mb-0">
-      <input
-        id={`keep_history_${deviceIndex}_${featureIndex}`}
-        type="checkbox"
-        checked={Boolean(feature.keep_history)}
-        onChange={e => updateFeatureKeepHistory(featureIndex, e.target.checked)}
-        class="custom-switch-input"
-      />
-      <span class="custom-switch-indicator" />
-    </label>
-  </div>
-);
+const KeepHistoryFeature = ({ deviceIndex, feature, featureIndex, updateFeatureKeepHistory }) => {
+  // the visible feature name is what names the switch: it is tied to the
+  // input so a screen reader announces which feature is toggled, and so a
+  // click on the name flips it, as on the MQTT device screen
+  const inputId = `keep_history_${deviceIndex}_${featureIndex}`;
+  return (
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <label htmlFor={inputId} class="mr-3 mb-0">
+        {feature.name}
+      </label>
+      <label class="custom-switch mb-0">
+        <input
+          id={inputId}
+          type="checkbox"
+          checked={Boolean(feature.keep_history)}
+          onChange={e => updateFeatureKeepHistory(featureIndex, e.target.checked)}
+          class="custom-switch-input"
+        />
+        <span class="custom-switch-indicator" />
+      </label>
+    </div>
+  );
+};
 
 export default KeepHistoryFeature;

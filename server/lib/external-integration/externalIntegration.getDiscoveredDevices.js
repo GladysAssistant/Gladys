@@ -253,18 +253,17 @@ function withEnergyParams(device, createdDevice) {
  */
 function withUserKeepHistory(device, createdDevice) {
   const createdFeatures = (createdDevice && createdDevice.features) || [];
-  if (createdFeatures.length === 0) {
-    return device;
-  }
   const keepHistoryByExternalId = new Map(
     createdFeatures.map((createdFeature) => [createdFeature.external_id, createdFeature.keep_history]),
   );
   return {
     ...device,
+    // every feature is copied, created or not, so the whole returned payload
+    // is detached from the in-memory published list
     features: device.features.map((feature) =>
       keepHistoryByExternalId.has(feature.external_id)
         ? { ...feature, keep_history: keepHistoryByExternalId.get(feature.external_id) }
-        : feature,
+        : { ...feature },
     ),
   };
 }
