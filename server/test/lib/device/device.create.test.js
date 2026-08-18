@@ -375,6 +375,21 @@ describe('Device', () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
     const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    // Every state column gets a distinct persisted value, so an overwrite of any one of
+    // them fails here instead of silently passing on a column that is null on both sides.
+    const persistedLastValueChanged = new Date('2019-02-12T07:49:07.556Z');
+    const persistedHourlyAggregate = new Date('2020-03-01T10:00:00.000Z');
+    const persistedDailyAggregate = new Date('2020-03-01T00:00:00.000Z');
+    const persistedMonthlyAggregate = new Date('2020-03-01T00:00:00.000Z');
+    await db.DeviceFeature.update(
+      {
+        last_value_string: 'persisted-string',
+        last_hourly_aggregate: persistedHourlyAggregate,
+        last_daily_aggregate: persistedDailyAggregate,
+        last_monthly_aggregate: persistedMonthlyAggregate,
+      },
+      { where: { id: 'ce9dc798-b09f-4e51-8c16-311cdebf97cd' } },
+    );
     // The MQTT device page posts the whole device back just to append one feature, and the
     // existing features it carries hold whatever the page had in hand when it was loaded:
     // stale, or null for a feature that had not received any value yet.
@@ -394,8 +409,11 @@ describe('Device', () => {
           min: 0,
           max: 100,
           last_value: null,
-          last_value_string: null,
+          last_value_string: 'stale-string',
           last_value_changed: null,
+          last_hourly_aggregate: new Date('2019-01-01T00:00:00.000Z'),
+          last_daily_aggregate: new Date('2019-01-01T00:00:00.000Z'),
+          last_monthly_aggregate: new Date('2019-01-01T00:00:00.000Z'),
         },
         {
           name: 'Brand new feature',
@@ -414,7 +432,11 @@ describe('Device', () => {
 
     const existingFeature = newDevice.features.find((feature) => feature.external_id === 'hue:brightness:1');
     expect(existingFeature).to.have.property('last_value', 20);
-    expect(existingFeature.last_value_changed).to.not.equal(null);
+    expect(existingFeature).to.have.property('last_value_string', 'persisted-string');
+    expect(existingFeature.last_value_changed).to.deep.equal(persistedLastValueChanged);
+    expect(existingFeature.last_hourly_aggregate).to.deep.equal(persistedHourlyAggregate);
+    expect(existingFeature.last_daily_aggregate).to.deep.equal(persistedDailyAggregate);
+    expect(existingFeature.last_monthly_aggregate).to.deep.equal(persistedMonthlyAggregate);
 
     const createdFeature = newDevice.features.find((feature) => feature.external_id === 'hue:brand-new-feature:1');
     expect(createdFeature).to.have.property('last_value', 1);
