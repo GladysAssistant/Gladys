@@ -60,6 +60,8 @@ describe('Camera.getLiveImage', () => {
       features: [{ category: 'camera', type: 'enabled', last_value: 0 }],
     });
     const promise = deviceManager.camera.getLiveImage('test-camera-disabled');
-    return assert.isRejected(promise, 'Camera is disabled');
+    await assert.isRejected(promise, 'Camera is disabled');
+    // A disabled camera must not even request a fresh image from its integration
+    expect(getImage.called).to.equal(false);
   });
 });

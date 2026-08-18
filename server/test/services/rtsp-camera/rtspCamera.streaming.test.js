@@ -141,6 +141,17 @@ describe('Camera.streaming', () => {
     await assert.isRejected(promise, 'CAMERA_IS_DISABLED');
     expect(rtspCameraManager.liveStreams.has('my-camera')).to.equal(false);
   });
+  it('should not start streaming if the camera is disabled while starting', async () => {
+    const spawn = fake.throws(new Error('ffmpeg should not have been spawned'));
+    rtspCameraManager = new RtspCameraManager(gladys, { spawn }, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    const promise = rtspCameraManager.startStreaming('my-camera', false, 1);
+    // The camera is disabled while the start is still in flight: rtsp-camera setValue calls
+    // stopStreaming, which must cancel the pending start instead of racing it.
+    await rtspCameraManager.stopStreaming('my-camera');
+    await assert.isRejected(promise, 'CAMERA_STREAM_STOPPED');
+    fakeAssert.notCalled(spawn);
+    expect(rtspCameraManager.liveStreams.has('my-camera')).to.equal(false);
+  });
   it('should start, ping & stop streaming', async () => {
     rtspCameraManager.onNewCameraFile = fake.resolves(null);
     const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', false, 1);

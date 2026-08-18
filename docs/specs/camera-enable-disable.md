@@ -48,8 +48,8 @@ the gate.
 
 ## C. Server behavior when a camera is disabled
 
-Everything is gated in the **core**, so the behavior is identical for every camera integration
-(`rtsp-camera`, MQTT-published cameras, external integrations):
+Polling, serving and RTSP live are gated in the **core**, so the behavior is identical for every
+camera integration (`rtsp-camera`, MQTT-published cameras, external integrations):
 
 | Path | Behavior |
 |---|---|
@@ -59,6 +59,23 @@ Everything is gated in the **core**, so the behavior is identical for every came
 | `camera.getImagesInRoom` (chat "show me the cameras in the living room", MCP tool) | Devices carrying a `camera`/`enabled` feature at `0` are excluded from the query. |
 | `rtsp-camera` `startStreaming` | Throws `NotFoundError('CAMERA_IS_DISABLED')`; the pending live-stream entry is cleaned up as for any start error. |
 | `rtsp-camera` `setValue` | RTSP has no control channel, so the only writable feature is `enabled`; any other feature is rejected. Setting it to `0` **stops the running live stream immediately**, so a dashboard already streaming stops right away instead of waiting for the inactivity check. |
+| `camera.setImage` (`POST /api/v1/camera/image`, external integrations through `saveCameraImage`, `rtsp-camera` polling) | Throws `NotFoundError('Camera is disabled')`: no new image is stored while the camera is off, so turning it back on cannot reveal what was captured during the private mode. |
+
+**Ingest is only gated on the `camera.setImage` path.** An integration that publishes its image
+through the generic state path — an MQTT camera sends `DEVICE.NEW_STATE`, handled by
+`device.newStateEvent` → `saveStringState` — keeps storing frames while the camera is disabled.
+Those frames are never served (`getImage` / `getLiveImage` / `getImagesInRoom` all refuse), but
+they are stored, and the newest one becomes visible again when the camera is turned back on.
+Gating them would mean gating the generic state path of every integration, which is out of the
+scope of this feature; an integration that wants a real private mode publishes through
+`camera.setImage`.
+
+**Starting a stream is cancellable.** Several `await`s separate the `enabled` check from the
+`ffmpeg` spawn in `rtsp-camera` `startStreaming`, so a camera disabled in between would otherwise
+leave a process nobody can stop. The pending entry put in the `liveStreams` Map identifies the
+start attempt: `stopStreaming` removes it (and tolerates a stream that has no process yet), and
+`startStreaming` refuses to spawn — `CAMERA_STREAM_STOPPED` — when the entry is no longer its
+own.
 
 The state itself is stored by the standard path: `device.setValue` calls the owning service's
 `setValue` and, since `has_feedback` is `false`, saves the new state.

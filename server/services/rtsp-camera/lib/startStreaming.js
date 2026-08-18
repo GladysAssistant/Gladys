@@ -36,10 +36,13 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       encryption_key: liveStream.encryptionKey,
     };
   }
-  // Init the stream object
-  this.liveStreams.set(cameraSelector, {
+  // Init the stream object. This object also identifies this start attempt: stopStreaming
+  // removes it from the Map, so a camera disabled while we are starting (there are several
+  // awaits before ffmpeg is spawned) cancels this start instead of racing it.
+  const pendingLiveStream = {
     isGladysGateway,
-  });
+  };
+  this.liveStreams.set(cameraSelector, pendingLiveStream);
 
   try {
     const device = await this.gladys.device.getBySelector(cameraSelector);
@@ -183,6 +186,15 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       timeout: 5 * 60 * 1000, // 5 minutes
     };
 
+    // The stream was stopped while we were starting it (the camera was disabled, typically):
+    // spawning ffmpeg now would leave a process streaming a camera nobody can stop anymore
+    // (spec docs/specs/camera-enable-disable.md).
+    if (this.liveStreams.get(cameraSelector) !== pendingLiveStream) {
+      watchAbortController.abort();
+      await fse.remove(folderPath);
+      throw new NotFoundError('CAMERA_STREAM_STOPPED');
+    }
+
     const liveStreamingProcess = this.childProcess.spawn('ffmpeg', args, options);
 
     this.liveStreams.set(cameraSelector, {
@@ -246,7 +258,11 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       });
     });
   } catch (e) {
-    this.liveStreams.delete(cameraSelector);
+    // Only clean up our own attempt: the entry may already have been removed by stopStreaming
+    // (or replaced by a newer start).
+    if (this.liveStreams.get(cameraSelector) === pendingLiveStream) {
+      this.liveStreams.delete(cameraSelector);
+    }
     throw e;
   }
 }

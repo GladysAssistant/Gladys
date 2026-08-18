@@ -43,6 +43,9 @@ class CameraBoxComponent extends Component {
     }
   };
 
+  // Returns whether the loaded camera is disabled. Callers must use that returned value and not
+  // this.state.cameraDisabled right after awaiting this method: setState is asynchronous, so the
+  // state still holds the previous value when this promise resolves.
   refreshDevice = async () => {
     const cameraSelector = this.props.box.camera;
     // Request generation guard: a camera change clears the controls immediately, and a slow
@@ -52,16 +55,19 @@ class CameraBoxComponent extends Component {
     const requestId = this.deviceRequestId;
     this.setState({ device: null, cameraDisabled: false });
     if (!cameraSelector) {
-      return;
+      return false;
     }
     try {
       const device = await this.props.httpClient.get(`/api/v1/device/${cameraSelector}`);
       if (requestId === this.deviceRequestId && this.props.box.camera === cameraSelector) {
-        this.setState({ device, cameraDisabled: this.isCameraDisabled(device) });
+        const cameraDisabled = this.isCameraDisabled(device);
+        this.setState({ device, cameraDisabled });
+        return cameraDisabled;
       }
     } catch (e) {
       console.error(e);
     }
+    return false;
   };
 
   // The "enabled" feature is the on/off gate of the camera. A camera without that feature is
@@ -87,8 +93,9 @@ class CameraBoxComponent extends Component {
     enabledFeature.last_value = payload.last_value;
     const cameraDisabled = payload.last_value === 0;
     if (cameraDisabled) {
-      // Stop showing anything of a camera that was just turned off
-      if (this.state.streaming) {
+      // Stop showing anything of a camera that was just turned off, including a live stream
+      // still being started
+      if (this.hasStreamingToStop()) {
         this.stopStreaming();
       }
       this.setState({ cameraDisabled, image: null, error: false });
@@ -152,11 +159,21 @@ class CameraBoxComponent extends Component {
     });
   };
 
+  // True as soon as a live stream is being started and until it is stopped. `state.streaming` is
+  // not enough: setState is asynchronous, so a stop asked for while the start request is in
+  // flight would not see it yet and would leave a hidden stream running.
+  hasStreamingToStop = () => this.state.streaming === true || Boolean(this.streamingToken);
+
   startStreaming = async () => {
     if (!Hls.isSupported()) {
       this.setState({ liveNotSupportedBrowser: true });
       return;
     }
+    // Start guard: this token identifies the current start attempt. stopStreaming clears it, so
+    // a stop (the camera being turned off, for example) that happens while the start request is
+    // in flight wins, and no HLS instance or ping interval is created behind its back.
+    const streamingToken = {};
+    this.streamingToken = streamingToken;
     await this.setState({
       streaming: true,
       loading: true,
@@ -178,6 +195,11 @@ class CameraBoxComponent extends Component {
         }),
         isGladysPlus ? this.props.session.gatewayClient.cameraStartStreaming() : null
       ]);
+      // The stream was stopped (or restarted) while we were starting it: the state was already
+      // reset by stopStreaming, so we only have to not build anything.
+      if (this.streamingToken !== streamingToken) {
+        return;
+      }
       const { localApiUrl } = config;
       const cameraComponent = this;
 
@@ -290,6 +312,8 @@ class CameraBoxComponent extends Component {
   };
 
   stopStreaming = async () => {
+    // Invalidate any start request still in flight (see startStreaming)
+    this.streamingToken = null;
     await this.setState({ loading: true });
 
     // We clear the live active interval
@@ -331,20 +355,23 @@ class CameraBoxComponent extends Component {
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
     // The device is loaded first: a disabled camera must show its placeholder instead of
     // requesting an image and auto-starting a live stream the server would refuse.
-    await this.refreshDevice();
-    this.refreshData();
-    if (this.props.box.camera_live_auto_start === true && !this.state.cameraDisabled) {
-      this.startStreaming();
+    const cameraDisabled = await this.refreshDevice();
+    if (!cameraDisabled) {
+      this.refreshData();
+      if (this.props.box.camera_live_auto_start === true) {
+        this.startStreaming();
+      }
     }
   }
 
   async componentDidUpdate(previousProps) {
     const cameraChanged = get(previousProps, 'box.camera') !== get(this.props, 'box.camera');
     const nameChanged = get(previousProps, 'box.name') !== get(this.props, 'box.name');
+    let { cameraDisabled } = this.state;
     if (cameraChanged) {
-      await this.refreshDevice();
+      cameraDisabled = await this.refreshDevice();
     }
-    if (cameraChanged || nameChanged) {
+    if ((cameraChanged || nameChanged) && !cameraDisabled) {
       this.refreshData();
     }
   }
@@ -358,7 +385,7 @@ class CameraBoxComponent extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceFeatureStateWebsocket
     );
-    if (this.state.streaming) {
+    if (this.hasStreamingToStop()) {
       this.stopStreaming();
     }
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
