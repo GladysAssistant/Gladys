@@ -224,6 +224,14 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.DEVICE.GET_VALUE, {
         device_feature: deviceFeatureSelectorSchema,
       }),
+      actionSchemaByType(ACTIONS.TIME.GET_DATE, {
+        precision: z
+          .enum(['second', 'minute', 'hour', 'day'])
+          .optional()
+          .describe(
+            'Precision the current date/time is truncated to. Defaults to "minute". The result is available in the next actions as {{<action coordinates>.datetime}}, {{<action coordinates>.date}}, {{<action coordinates>.time}} and {{<action coordinates>.timestamp}} (unix timestamp in seconds, usable in a formula).',
+          ),
+      }),
       actionSchemaByType(ACTIONS.VARIABLE.SET, {
         name: z
           .string()

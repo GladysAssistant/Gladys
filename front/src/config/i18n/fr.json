@@ -3204,6 +3204,14 @@
         "computedExplanationText": "Entrez ici un calcul, son résultat sera stocké dans la variable. Pour injecter une variable dans le calcul, tapez '{{'.",
         "computedPlaceholder": "Ex : 2 * 3"
       },
+      "getDate": {
+        "description": "Cette action récupère la date et l'heure actuelles, afin de pouvoir les utiliser dans les actions suivantes de la scène.",
+        "precisionLabel": "Précision",
+        "precisionSecond": "Seconde",
+        "precisionMinute": "Minute",
+        "precisionHour": "Heure",
+        "precisionDay": "Jour"
+      },
       "deviceSetValue": {
         "description": "Cette action vous permet de contrôler un appareil.",
         "deviceLabel": "Appareil",
@@ -3466,6 +3474,9 @@
       },
       "variable": {
         "set": "Définir une variable"
+      },
+      "time": {
+        "get-date": "Récupérer la date et l'heure"
       }
     },
     "variables": {
@@ -3494,6 +3505,12 @@
         "set": {
           "value": "Variable"
         }
+      },
+      "getDate": {
+        "datetime": "Date et heure actuelles",
+        "date": "Date actuelle",
+        "time": "Heure actuelle",
+        "timestamp": "Timestamp actuel (en secondes, utilisable dans un calcul)"
       }
     },
     "triggers": {

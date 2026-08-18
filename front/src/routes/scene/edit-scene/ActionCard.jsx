@@ -38,6 +38,7 @@ import SendSms from './actions/SendSms';
 import ConditionIfElseThen from './actions/ConditionIfElseThen';
 import ConditionWhile from './actions/ConditionWhile';
 import SetVariable from './actions/SetVariable';
+import GetDate from './actions/GetDate';
 
 const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
@@ -74,7 +75,8 @@ const ACTION_ICON = {
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.AI.ASK]: 'fe fe-cpu',
   [ACTIONS.SMS.SEND]: 'fe fe-message-circle',
-  [ACTIONS.VARIABLE.SET]: 'fe fe-hash'
+  [ACTIONS.VARIABLE.SET]: 'fe fe-hash',
+  [ACTIONS.TIME.GET_DATE]: 'fe fe-clock'
 };
 
 const ACTION_COMPONENTS = {
@@ -113,7 +115,8 @@ const ACTION_COMPONENTS = {
   [ACTIONS.SMS.SEND]: SendSms,
   [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
   [ACTIONS.CONDITION.WHILE]: ConditionWhile,
-  [ACTIONS.VARIABLE.SET]: SetVariable
+  [ACTIONS.VARIABLE.SET]: SetVariable,
+  [ACTIONS.TIME.GET_DATE]: GetDate
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';

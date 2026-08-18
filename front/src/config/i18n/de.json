@@ -3204,6 +3204,14 @@
         "computedExplanationText": "Gib hier eine Berechnung ein, ihr Ergebnis wird in der Variable gespeichert. Um eine Variable in die Berechnung einzufügen, drücke '{{'.",
         "computedPlaceholder": "Z.B.: 2 * 3"
       },
+      "getDate": {
+        "description": "Diese Aktion ruft das aktuelle Datum und die aktuelle Uhrzeit ab, damit du sie in den nächsten Aktionen der Szene verwenden kannst.",
+        "precisionLabel": "Genauigkeit",
+        "precisionSecond": "Sekunde",
+        "precisionMinute": "Minute",
+        "precisionHour": "Stunde",
+        "precisionDay": "Tag"
+      },
       "deviceSetValue": {
         "description": "Diese Aktion ermöglicht es, ein Gerät zu steuern.",
         "deviceLabel": "Gerät",
@@ -3466,6 +3474,9 @@
       },
       "variable": {
         "set": "Eine Variable definieren"
+      },
+      "time": {
+        "get-date": "Datum und Uhrzeit abrufen"
       }
     },
     "variables": {
@@ -3494,6 +3505,12 @@
         "set": {
           "value": "Variable"
         }
+      },
+      "getDate": {
+        "datetime": "Aktuelles Datum und Uhrzeit",
+        "date": "Aktuelles Datum",
+        "time": "Aktuelle Uhrzeit",
+        "timestamp": "Aktueller Zeitstempel (in Sekunden, in einer Berechnung verwendbar)"
       }
     },
     "triggers": {

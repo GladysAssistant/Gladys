@@ -54,6 +54,23 @@ const { evaluate } = create({
   randomDependencies,
 });
 
+// Formats of the "date" variable of the "get date" action, by precision.
+// The date/time is truncated to the chosen precision, so a scene displaying "it's 14:30"
+// doesn't end up saying "it's 14:30:27.412".
+const GET_DATE_FORMATS = {
+  second: 'YYYY-MM-DD HH:mm:ss',
+  minute: 'YYYY-MM-DD HH:mm',
+  hour: 'YYYY-MM-DD HH:00',
+  day: 'YYYY-MM-DD',
+};
+const GET_DATE_TIME_FORMATS = {
+  second: 'HH:mm:ss',
+  minute: 'HH:mm',
+  hour: 'HH:00',
+  day: 'HH:mm',
+};
+const GET_DATE_DEFAULT_PRECISION = 'minute';
+
 // Safety limits for the "while" loop action
 const WHILE_DEFAULT_MAX_ITERATIONS = 1000;
 const WHILE_ABSOLUTE_MAX_ITERATIONS = 10000;
@@ -398,6 +415,32 @@ const actionsFunc = {
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, path) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
     set(scope, path, cloneDeep(deviceFeature), { merge: true });
+  },
+  [ACTIONS.TIME.GET_DATE]: async (self, action, scope, path) => {
+    const precision = action.precision || GET_DATE_DEFAULT_PRECISION;
+    const dateFormat = GET_DATE_FORMATS[precision];
+    // An action written by hand (or coming from an older/newer version of Gladys) could
+    // contain a precision we don't know: we abort instead of storing an unusable date.
+    if (dateFormat === undefined) {
+      logger.warn(`Get date: Unknown precision "${precision}".`);
+      throw new AbortScene('INVALID_PRECISION');
+    }
+    // The date is returned in the timezone configured by the user, so a scene displays
+    // the local time and not the time of the server.
+    const now = dayjs.tz(dayjs(), self.timezone).startOf(precision);
+    set(
+      scope,
+      path,
+      {
+        datetime: now.format(dateFormat),
+        date: now.format('YYYY-MM-DD'),
+        time: now.format(GET_DATE_TIME_FORMATS[precision]),
+        // Unix timestamp in seconds, so it can be compared/subtracted in a formula
+        // to another date stored earlier (in a variable or in a device feature).
+        timestamp: now.unix(),
+      },
+      { merge: true },
+    );
   },
   [ACTIONS.VARIABLE.SET]: async (self, action, scope, path) => {
     let value;
