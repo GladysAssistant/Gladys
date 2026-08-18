@@ -139,6 +139,37 @@ describe('externalIntegration.runNetworkDiscoveryScan', () => {
     });
   });
 
+  it('should browse every mDNS service declared in the manifest', async () => {
+    const service = await seedDiscoveryService({
+      manifest: {
+        ...TEST_DISCOVERY_MANIFEST,
+        network_discovery: [
+          { type: 'mdns', service: '_airplay._tcp' },
+          { type: 'mdns', service: '_companion-link._tcp' },
+        ],
+      },
+    });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.scanMdns = stub();
+    externalIntegration.scanMdns
+      .withArgs({ service: '_airplay._tcp', timeoutMs: 3000 })
+      .resolves([{ name: 'Living Room._airplay._tcp.local' }]);
+    externalIntegration.scanMdns
+      .withArgs({ service: '_companion-link._tcp', timeoutMs: 3000 })
+      .resolves([{ name: 'Living Room._companion-link._tcp.local' }]);
+
+    const results = await externalIntegration.runNetworkDiscoveryScan(service, {
+      type: 'mdns',
+      timeout_seconds: 3,
+    });
+
+    expect(results).to.deep.equal([
+      { name: 'Living Room._airplay._tcp.local' },
+      { name: 'Living Room._companion-link._tcp.local' },
+    ]);
+    expect(externalIntegration.scanMdns.callCount).to.equal(2);
+  });
+
   it('should reject malformed active scan requests', async () => {
     const service = await seedDiscoveryService();
     const { externalIntegration } = buildSupervisor();

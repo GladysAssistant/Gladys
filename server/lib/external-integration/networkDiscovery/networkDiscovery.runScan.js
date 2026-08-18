@@ -53,10 +53,11 @@ async function runNetworkDiscoveryScan(
     );
   }
   const declaredCaptures = (service.manifest && service.manifest.network_discovery) || [];
-  const capture = declaredCaptures.find((entry) => entry.type === type);
-  if (!capture) {
+  const captures = declaredCaptures.filter((entry) => entry.type === type);
+  if (captures.length === 0) {
     throw new ForbiddenError(`network_discovery: capture type ${type} is not declared in the manifest`);
   }
+  const capture = captures[0];
   let payload = null;
   if (type === 'udp-active-broadcast') {
     if (!Number.isInteger(port)) {
@@ -96,7 +97,10 @@ async function runNetworkDiscoveryScan(
       return await this.scanUdpActiveBroadcast({ port, payload, timeoutMs });
     }
     if (type === 'mdns') {
-      return await this.scanMdns({ service: capture.service, timeoutMs });
+      const results = await Promise.all(
+        captures.map((declaredCapture) => this.scanMdns({ service: declaredCapture.service, timeoutMs })),
+      );
+      return results.flat();
     }
     return await this.scanSsdp({ st: capture.st, timeoutMs });
   } finally {
