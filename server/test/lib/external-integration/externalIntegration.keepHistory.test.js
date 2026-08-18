@@ -139,7 +139,9 @@ describe('externalIntegration.getDiscoveredDevices keep_history', () => {
     });
     await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
     const devices = await externalIntegration.getDiscoveredDevices(service.selector);
-    findFeature(devices[0], newFeature.external_id).keep_history = false;
+    const returnedFeature = findFeature(devices[0], newFeature.external_id);
+    expect(returnedFeature).to.have.property('keep_history', true);
+    returnedFeature.keep_history = false;
     const stored = externalIntegration.discoveredDevices.get(service.id);
     expect(findFeature(stored[0], newFeature.external_id)).to.have.property('keep_history', true);
   });
