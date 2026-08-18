@@ -73,7 +73,16 @@ async function start(port) {
       }
     };
     announce();
-    this.announceTimeout = setTimeout(announce, 1000);
+    // the delayed announcement runs outside of this try/catch, so it needs its own
+    // guard: an exception escaping a timer callback would take the whole process down
+    this.announceTimeout = setTimeout(() => {
+      try {
+        announce();
+      } catch (e) {
+        logger.warn('mDNS: unable to send the second announcement');
+        logger.warn(e);
+      }
+    }, 1000);
     logger.info(`mDNS: advertising Gladys as http://${this.fqdn}:${port}`);
   } catch (e) {
     logger.warn('mDNS: unable to advertise Gladys on the local network');

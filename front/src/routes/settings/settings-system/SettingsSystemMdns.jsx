@@ -12,7 +12,8 @@ class SettingsSystemMdns extends Component {
       const { value } = await this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME}`);
       if (value) {
         this.setState({
-          mdnsHostname: value
+          mdnsHostname: value,
+          advertisedHostname: value
         });
       }
     } catch (e) {
@@ -50,7 +51,9 @@ class SettingsSystemMdns extends Component {
       await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME}`, {
         value: mdnsHostname
       });
+      // only the saved value is actually advertised on the network
       this.setState({
+        advertisedHostname: mdnsHostname,
         saved: true
       });
     } catch (e) {
@@ -67,7 +70,8 @@ class SettingsSystemMdns extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      mdnsHostname: DEFAULT_MDNS_HOSTNAME
+      mdnsHostname: DEFAULT_MDNS_HOSTNAME,
+      advertisedHostname: DEFAULT_MDNS_HOSTNAME
     };
   }
 
@@ -75,10 +79,11 @@ class SettingsSystemMdns extends Component {
     this.getMdnsHostname();
   }
 
-  render({ systemInfos }, { mdnsHostname, saving, saved, error, invalidName }) {
+  render({ systemInfos }, { mdnsHostname, advertisedHostname, saving, saved, error, invalidName }) {
     const serverPort = systemInfos && systemInfos.server_port;
     const portSuffix = serverPort && serverPort !== 80 ? `:${serverPort}` : '';
-    const mdnsUrl = `http://${mdnsHostname}.local${portSuffix}`;
+    // the URL must reflect what Gladys advertises, not what is being typed
+    const mdnsUrl = `http://${advertisedHostname}.local${portSuffix}`;
     return (
       <div class="card">
         <h4 class="card-header">
@@ -104,7 +109,13 @@ class SettingsSystemMdns extends Component {
               <div class="input-group-prepend">
                 <span class="input-group-text">http://</span>
               </div>
-              <input class="form-control" type="text" value={mdnsHostname} onInput={this.updateMdnsHostname} />
+              <input
+                class="form-control"
+                type="text"
+                value={mdnsHostname}
+                onInput={this.updateMdnsHostname}
+                disabled={saving}
+              />
               <div class="input-group-append">
                 <span class="input-group-text">.local</span>
               </div>

@@ -4,10 +4,13 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
 const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const logger = require('../../../utils/logger');
 const Mdns = require('../../../lib/mdns');
 
 describe('mdns', () => {
   let clock;
+  let loggerWarnSpy;
+  let loggerDebugSpy;
   let state;
   let mdnsFake;
   let variable;
@@ -18,6 +21,8 @@ describe('mdns', () => {
 
   beforeEach(() => {
     clock = sinon.useFakeTimers();
+    loggerWarnSpy = sinon.spy(logger, 'warn');
+    loggerDebugSpy = sinon.spy(logger, 'debug');
     state = { localIp: '192.168.1.10' };
     mdnsFake = {
       on: fake.returns(null),
@@ -47,7 +52,7 @@ describe('mdns', () => {
 
   afterEach(() => {
     clock.restore();
-    sinon.reset();
+    sinon.restore();
   });
 
   it('should restart advertising when the mDNS hostname variable changes', () => {
@@ -226,14 +231,16 @@ describe('mdns', () => {
     expect(additionals).to.have.lengthOf(0);
   });
 
-  it('should answer an ANY query about the Gladys service instance', async () => {
+  it('should answer an ANY query about the Gladys service instance with SRV and TXT', async () => {
     await mdns.start(1443);
     const queryHandler = getQueryHandler();
     mdnsFake.respond.resetHistory();
     queryHandler({ questions: [{ name: 'Gladys Assistant._http._tcp.local', type: 'ANY' }] });
     assert.calledOnce(mdnsFake.respond);
-    const { answers } = mdnsFake.respond.firstCall.args[0];
-    expect(answers[0].type).to.equal('SRV');
+    const { answers, additionals } = mdnsFake.respond.firstCall.args[0];
+    // DNS-SD clients asking ANY expect TXT next to SRV
+    expect(answers.map((record) => record.type)).to.deep.equal(['SRV', 'TXT']);
+    expect(additionals.map((record) => record.type)).to.deep.equal(['A']);
   });
 
   it('should handle a query packet without any question', async () => {
@@ -274,8 +281,14 @@ describe('mdns', () => {
     await mdns.start(1443);
     const errorHandler = mdnsFake.on.getCalls().find((call) => call.args[0] === 'error').args[1];
     const warningHandler = mdnsFake.on.getCalls().find((call) => call.args[0] === 'warning').args[1];
-    expect(() => errorHandler(new Error('EADDRINUSE'))).to.not.throw();
-    expect(() => warningHandler(new Error('malformed packet'))).to.not.throw();
+    const networkError = new Error('EADDRINUSE');
+    const networkWarning = new Error('malformed packet');
+    errorHandler(networkError);
+    warningHandler(networkWarning);
+    assert.calledWith(loggerWarnSpy, 'mDNS: network error while advertising Gladys');
+    assert.calledWith(loggerWarnSpy, networkError);
+    assert.calledWith(loggerDebugSpy, 'mDNS: warning while advertising Gladys');
+    assert.calledWith(loggerDebugSpy, networkWarning);
   });
 
   it('should not crash when the mDNS socket cannot be created', async () => {
@@ -304,6 +317,67 @@ describe('mdns', () => {
     mdnsFake.respond.resetHistory();
     clock.tick(1000);
     assert.notCalled(mdnsFake.respond);
+  });
+
+  it('should destroy the mDNS socket even when the goodbye packets fail', async () => {
+    await mdns.start(1443);
+    mdnsFake.respond = fake.throws(new Error('socket already closed'));
+    await mdns.stop();
+    // the socket must be closed anyway, otherwise a restart leaves a second advertiser
+    assert.calledOnce(mdnsFake.destroy);
+    expect(mdns.mdns).to.equal(null);
+  });
+
+  it('should destroy the mDNS socket even when the records cannot be built', async () => {
+    await mdns.start(1443);
+    mdns.getRecords = fake.throws(new Error('unable to build records'));
+    await mdns.stop();
+    assert.calledOnce(mdnsFake.destroy);
+  });
+
+  it('should not crash when the mDNS socket cannot be destroyed', async () => {
+    await mdns.start(1443);
+    mdnsFake.destroy = fake.throws(new Error('socket already gone'));
+    await mdns.stop();
+    expect(mdns.mdns).to.equal(null);
+  });
+
+  it('should not send goodbye packets when no local IP is available', async () => {
+    await mdns.start(1443);
+    state.localIp = null;
+    mdnsFake.respond.resetHistory();
+    await mdns.stop();
+    assert.notCalled(mdnsFake.respond);
+    assert.calledOnce(mdnsFake.destroy);
+  });
+
+  it('should not crash when the delayed announcement fails', async () => {
+    await mdns.start(1443);
+    mdns.getRecords = fake.throws(new Error('network went down'));
+    // an exception escaping a timer callback would take the whole process down
+    expect(() => clock.tick(1000)).to.not.throw();
+    assert.calledWith(loggerWarnSpy, 'mDNS: unable to send the second announcement');
+  });
+
+  it('should serialize concurrent restarts', async () => {
+    await mdns.start(1443);
+    mdnsFake.destroy.resetHistory();
+    // hold the first stop() open so the second restart starts while it is still pending
+    let releaseDestroy;
+    mdnsFake.destroy = fake((cb) => {
+      releaseDestroy = () => cb();
+    });
+    const firstRestart = mdns.restart();
+    const secondRestart = mdns.restart();
+    // let stop() reach destroy() before releasing it
+    await Promise.resolve();
+    await Promise.resolve();
+    releaseDestroy();
+    await Promise.all([firstRestart, secondRestart]);
+    // both events must lead to a single advertiser, not two
+    assert.calledOnce(mdnsFake.destroy);
+    // one start() for the initial advertisement, one for the single coalesced restart
+    expect(variable.getValue.callCount).to.equal(2);
   });
 
   it('should do nothing on restart when advertising was never started', async () => {

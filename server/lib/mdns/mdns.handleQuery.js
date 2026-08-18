@@ -31,6 +31,10 @@ function handleQuery(query) {
       additionals.push(srvRecord, txtRecord, aRecord);
     } else if (name === instanceFqdn && (type === 'SRV' || type === 'ANY')) {
       answers.push(srvRecord);
+      // DNS-SD clients asking ANY expect the TXT record alongside the SRV one
+      if (type === 'ANY') {
+        answers.push(txtRecord);
+      }
       additionals.push(aRecord);
     } else if (name === instanceFqdn && type === 'TXT') {
       answers.push(txtRecord);

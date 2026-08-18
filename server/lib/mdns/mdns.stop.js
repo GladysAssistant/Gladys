@@ -23,12 +23,19 @@ async function stop() {
         instance.respond({ answers: goodbyes }, () => resolve(null));
       });
     }
-    await new Promise((resolve) => {
-      instance.destroy(() => resolve(null));
-    });
-    logger.info('mDNS: stopped advertising Gladys');
   } catch (e) {
     logger.warn(e);
+  } finally {
+    // the socket must be closed even if the goodbye packets could not be sent,
+    // otherwise a later restart would leave a second advertiser running
+    try {
+      await new Promise((resolve) => {
+        instance.destroy(() => resolve(null));
+      });
+      logger.info('mDNS: stopped advertising Gladys');
+    } catch (e) {
+      logger.warn(e);
+    }
   }
 }
 

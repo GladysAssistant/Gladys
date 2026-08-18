@@ -20,6 +20,8 @@ const Mdns = function Mdns(variable, event) {
   this.instanceFqdn = `${MDNS_SERVICE_NAME}.${HTTP_SERVICE_TYPE}`;
   /** @type {any} */
   this.announceTimeout = null;
+  /** @type {Promise|null} */
+  this.restartPromise = null;
   this.event.on(EVENTS.SYSTEM.MDNS_HOSTNAME_CHANGED, eventFunctionWrapper(this.restart.bind(this)));
 };
 

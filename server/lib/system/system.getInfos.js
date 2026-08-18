@@ -128,6 +128,39 @@ function readCpuTemperature() {
   return null;
 }
 
+// interfaces that never carry the LAN address Gladys should advertise
+const VIRTUAL_INTERFACE_PREFIXES = ['docker', 'veth', 'br-', 'virbr', 'cni', 'flannel', 'vmnet', 'vboxnet'];
+// VPN and overlay interfaces: reachable, but never on the local link mDNS is limited to
+const VPN_INTERFACE_PREFIXES = ['tun', 'tap', 'wg', 'tailscale', 'zt', 'utun', 'ppp'];
+
+/**
+ * @description Tell how usable an IPv4 address is as a LAN address.
+ * @param {string} address - The IPv4 address to classify.
+ * @returns {number} 0 for a private LAN address, 1 for a Docker bridge one, 2 for a routable one, 3 for CGNAT/APIPA.
+ * @example
+ * getAddressPriority('192.168.1.10');
+ */
+function getAddressPriority(address) {
+  const parts = address.split('.').map((part) => parseInt(part, 10));
+  const [first, second] = parts;
+  // link-local (APIPA): the interface has no usable address at all
+  if (first === 169 && second === 254) {
+    return 3;
+  }
+  // carrier-grade NAT, used by Tailscale and some ISPs: not a LAN address
+  if (first === 100 && second >= 64 && second <= 127) {
+    return 3;
+  }
+  // default Docker bridge pool: usable when Gladys runs in a bridged container and has
+  // nothing else, but a real LAN address must always win over it
+  if (first === 172 && second >= 16 && second <= 31) {
+    return 1;
+  }
+  // RFC 1918 private ranges, what a home network actually uses
+  const isPrivate = first === 10 || (first === 192 && second === 168);
+  return isPrivate ? 0 : 2;
+}
+
 /**
  * @description Extract the local IPv4 address from network interfaces, wired connection first.
  * @param {any} networkInterfaces - Result of os.networkInterfaces().
@@ -136,31 +169,42 @@ function readCpuTemperature() {
  * getLocalIp(os.networkInterfaces());
  */
 function getLocalIp(networkInterfaces) {
-  /** @type {Array<{ priority: number, address: string }>} */
+  /** @type {Array<{ addressPriority: number, interfacePriority: number, address: string }>} */
   const candidates = [];
   Object.keys(networkInterfaces).forEach((name) => {
     const lowerName = name.toLowerCase();
+    // "vEthernet (WSL)" and friends on Windows Docker Desktop
+    const isWindowsVirtualSwitch = lowerName.startsWith('vethernet');
     const isVirtualInterface =
-      lowerName.startsWith('docker') || lowerName.startsWith('veth') || lowerName.startsWith('br-');
+      isWindowsVirtualSwitch || VIRTUAL_INTERFACE_PREFIXES.some((prefix) => lowerName.startsWith(prefix));
     if (isVirtualInterface) {
       return;
     }
+    const isVpn = VPN_INTERFACE_PREFIXES.some((prefix) => lowerName.startsWith(prefix));
     const isWired = lowerName.startsWith('eth') || lowerName.startsWith('en');
     const isWireless = lowerName.startsWith('wl') || lowerName.startsWith('ww');
-    let priority = 1;
-    if (isWired) {
-      priority = 0;
+    // a VPN address is a last resort: it is never reachable through mDNS
+    let interfacePriority = 2;
+    if (isVpn) {
+      interfacePriority = 3;
+    } else if (isWired) {
+      interfacePriority = 0;
     } else if (isWireless) {
-      priority = 2;
+      interfacePriority = 1;
     }
     (networkInterfaces[name] || []).forEach((/** @type {any} */ networkInterface) => {
       const isIpV4 = networkInterface.family === 'IPv4' || networkInterface.family === 4;
       if (!networkInterface.internal && isIpV4) {
-        candidates.push({ priority, address: networkInterface.address });
+        candidates.push({
+          addressPriority: getAddressPriority(networkInterface.address),
+          interfacePriority,
+          address: networkInterface.address,
+        });
       }
     });
   });
-  candidates.sort((a, b) => a.priority - b.priority);
+  // a real LAN address always wins over a VPN or link-local one, whatever the interface
+  candidates.sort((a, b) => a.addressPriority - b.addressPriority || a.interfacePriority - b.interfacePriority);
   return candidates.length > 0 ? candidates[0].address : null;
 }
 

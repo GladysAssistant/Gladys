@@ -87,8 +87,9 @@ export default defineConfig(({ mode }) => {
       // behavior so the dev front stays reachable from another device (tablet,
       // phone) or through WSL2 port forwarding. Vite only binds localhost by default.
       host: true,
-      // The server advertises this name on the local network with mDNS.
-      allowedHosts: ['gladysassistant.local'],
+      // The server advertises a configurable name on the local network with mDNS,
+      // so any ".local" host must be allowed, not just the default one.
+      allowedHosts: ['.local'],
       fs: {
         allow: ['..']
       },

@@ -112,6 +112,48 @@ describe('system.getInfos', () => {
     expect(infos).to.not.have.property('docker_image_pinned');
     expect(infos).to.not.have.property('recommended_docker_image');
   });
+  it('should report the configured server port', async () => {
+    const previousPort = process.env.SERVER_PORT;
+    process.env.SERVER_PORT = '8080';
+    try {
+      const infos = await system.getInfos();
+      expect(infos.server_port).to.equal(8080);
+    } finally {
+      if (previousPort === undefined) {
+        delete process.env.SERVER_PORT;
+      } else {
+        process.env.SERVER_PORT = previousPort;
+      }
+    }
+  });
+
+  it('should fall back to port 1443 when the server port is not a number', async () => {
+    const previousPort = process.env.SERVER_PORT;
+    process.env.SERVER_PORT = 'not-a-port';
+    try {
+      const infos = await system.getInfos();
+      expect(infos.server_port).to.equal(1443);
+    } finally {
+      if (previousPort === undefined) {
+        delete process.env.SERVER_PORT;
+      } else {
+        process.env.SERVER_PORT = previousPort;
+      }
+    }
+  });
+
+  it('should fall back to port 1443 when the server port is not configured', async () => {
+    const previousPort = process.env.SERVER_PORT;
+    delete process.env.SERVER_PORT;
+    try {
+      const infos = await system.getInfos();
+      expect(infos.server_port).to.equal(1443);
+    } finally {
+      if (previousPort !== undefined) {
+        process.env.SERVER_PORT = previousPort;
+      }
+    }
+  });
 });
 
 describe('system.getLocalIp', () => {
@@ -145,6 +187,92 @@ describe('system.getLocalIp', () => {
       enp3s0: [{ address: '192.168.1.50', family: 'IPv4', internal: false }],
     };
     expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.50');
+  });
+
+  it('should prefer the LAN address over a VPN one', () => {
+    const networkInterfaces = {
+      wlan0: [{ address: '192.168.1.50', family: 'IPv4', internal: false }],
+      tailscale0: [{ address: '100.101.102.103', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.50');
+  });
+
+  it('should prefer the LAN address over a wireguard tunnel', () => {
+    const networkInterfaces = {
+      wg0: [{ address: '10.8.0.2', family: 'IPv4', internal: false }],
+      eth0: [{ address: '192.168.1.50', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.50');
+  });
+
+  it('should ignore the Windows Docker Desktop virtual switch', () => {
+    const networkInterfaces = {
+      'vEthernet (WSL)': [{ address: '172.28.0.1', family: 'IPv4', internal: false }],
+      'Wi-Fi': [{ address: '192.168.1.20', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.20');
+  });
+
+  it('should ignore libvirt and container bridges', () => {
+    const networkInterfaces = {
+      virbr0: [{ address: '192.168.122.1', family: 'IPv4', internal: false }],
+      cni0: [{ address: '10.244.0.1', family: 'IPv4', internal: false }],
+      'flannel.1': [{ address: '10.244.1.0', family: 'IPv4', internal: false }],
+      eth0: [{ address: '192.168.1.60', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.60');
+  });
+
+  it('should prefer a real LAN address over the Docker bridge one', () => {
+    const networkInterfaces = {
+      eth0: [{ address: '172.17.0.2', family: 'IPv4', internal: false }],
+      wlan0: [{ address: '192.168.1.30', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.30');
+  });
+
+  it('should still use the Docker bridge address when there is nothing else', () => {
+    const networkInterfaces = {
+      eth0: [{ address: '172.17.0.2', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('172.17.0.2');
+  });
+
+  it('should prefer a LAN address over a link-local one', () => {
+    const networkInterfaces = {
+      eth0: [{ address: '169.254.1.1', family: 'IPv4', internal: false }],
+      wlan0: [{ address: '192.168.1.40', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.40');
+  });
+
+  it('should use a VPN address when it is the only one available', () => {
+    const networkInterfaces = {
+      tun0: [{ address: '10.8.0.2', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('10.8.0.2');
+  });
+
+  it('should support the numeric IPv4 family returned by recent Node versions', () => {
+    const networkInterfaces = {
+      eth0: [{ address: '192.168.1.70', family: 4, internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.70');
+  });
+
+  it('should use a public address when no private one is available', () => {
+    const networkInterfaces = {
+      eth0: [{ address: '82.64.10.20', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('82.64.10.20');
+  });
+
+  it('should ignore an interface without any address', () => {
+    const networkInterfaces = {
+      eth0: undefined,
+      wlan0: [{ address: '192.168.1.80', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.80');
   });
 
   it('should return null when no external IPv4 exists', () => {
