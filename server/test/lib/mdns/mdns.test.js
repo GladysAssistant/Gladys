@@ -180,6 +180,132 @@ describe('mdns', () => {
     expect(answers.find((record) => record.type === 'A').name).to.equal('gladys2.local');
   });
 
+  it('should answer an ANY query about the Gladys hostname', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    queryHandler({ questions: [{ name: 'gladysassistant.local', type: 'ANY' }] });
+    assert.calledOnce(mdnsFake.respond);
+    const { answers } = mdnsFake.respond.firstCall.args[0];
+    expect(answers[0].type).to.equal('A');
+  });
+
+  it('should answer an ANY query for HTTP service discovery', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    queryHandler({ questions: [{ name: '_http._tcp.local', type: 'ANY' }] });
+    assert.calledOnce(mdnsFake.respond);
+    const { answers } = mdnsFake.respond.firstCall.args[0];
+    expect(answers[0].type).to.equal('PTR');
+  });
+
+  it('should answer a SRV query about the Gladys service instance', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    queryHandler({ questions: [{ name: 'Gladys Assistant._http._tcp.local', type: 'SRV' }] });
+    assert.calledOnce(mdnsFake.respond);
+    const { answers, additionals } = mdnsFake.respond.firstCall.args[0];
+    expect(answers).to.have.lengthOf(1);
+    expect(answers[0].type).to.equal('SRV');
+    expect(answers[0].data.port).to.equal(1443);
+    // the A record is sent along so the client does not need a second query
+    expect(additionals.map((record) => record.type)).to.deep.equal(['A']);
+  });
+
+  it('should answer a TXT query about the Gladys service instance', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    queryHandler({ questions: [{ name: 'Gladys Assistant._http._tcp.local', type: 'TXT' }] });
+    assert.calledOnce(mdnsFake.respond);
+    const { answers, additionals } = mdnsFake.respond.firstCall.args[0];
+    expect(answers).to.have.lengthOf(1);
+    expect(answers[0].data).to.deep.equal(['product=gladys', 'name=gladysassistant']);
+    expect(additionals).to.have.lengthOf(0);
+  });
+
+  it('should answer an ANY query about the Gladys service instance', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    queryHandler({ questions: [{ name: 'Gladys Assistant._http._tcp.local', type: 'ANY' }] });
+    assert.calledOnce(mdnsFake.respond);
+    const { answers } = mdnsFake.respond.firstCall.args[0];
+    expect(answers[0].type).to.equal('SRV');
+  });
+
+  it('should handle a query packet without any question', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    queryHandler({});
+    assert.notCalled(mdnsFake.respond);
+  });
+
+  it('should handle a question without any name', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    queryHandler({ questions: [{ type: 'A' }] });
+    assert.notCalled(mdnsFake.respond);
+  });
+
+  it('should not answer queries once advertising is stopped', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    await mdns.stop();
+    mdnsFake.respond.resetHistory();
+    queryHandler({ questions: [{ name: 'gladysassistant.local', type: 'A' }] });
+    assert.notCalled(mdnsFake.respond);
+  });
+
+  it('should not crash when a query cannot be handled', async () => {
+    await mdns.start(1443);
+    mdns.getRecords = fake.throws(new Error('unable to build records'));
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    expect(() => queryHandler({ questions: [{ name: 'gladysassistant.local', type: 'A' }] })).to.not.throw();
+    assert.notCalled(mdnsFake.respond);
+  });
+
+  it('should log network errors without crashing Gladys', async () => {
+    await mdns.start(1443);
+    const errorHandler = mdnsFake.on.getCalls().find((call) => call.args[0] === 'error').args[1];
+    const warningHandler = mdnsFake.on.getCalls().find((call) => call.args[0] === 'warning').args[1];
+    expect(() => errorHandler(new Error('EADDRINUSE'))).to.not.throw();
+    expect(() => warningHandler(new Error('malformed packet'))).to.not.throw();
+  });
+
+  it('should not crash when the mDNS socket cannot be created', async () => {
+    const { start: failingStart } = proxyquire('../../../lib/mdns/mdns.start', {
+      'multicast-dns': () => {
+        throw new Error('unable to bind the mDNS socket');
+      },
+    });
+    mdns.start = failingStart;
+    await mdns.start(1443);
+    expect(mdns.mdns).to.equal(null);
+    // Gladys stays up, only the advertisement is unavailable
+    await mdns.stop();
+  });
+
+  it('should not crash when the goodbye packets cannot be sent', async () => {
+    await mdns.start(1443);
+    mdnsFake.respond = fake.throws(new Error('socket already closed'));
+    await mdns.stop();
+    expect(mdns.mdns).to.equal(null);
+  });
+
+  it('should cancel the second announcement when stopped right away', async () => {
+    await mdns.start(1443);
+    await mdns.stop();
+    mdnsFake.respond.resetHistory();
+    clock.tick(1000);
+    assert.notCalled(mdnsFake.respond);
+  });
+
   it('should do nothing on restart when advertising was never started', async () => {
     await mdns.restart();
     assert.notCalled(variable.getValue);
