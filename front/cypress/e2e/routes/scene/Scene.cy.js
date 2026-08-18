@@ -34,7 +34,7 @@ describe('Scene view', () => {
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
 
-    cy.contains('editScene.settings').click();
+    cy.get('[data-cy="edit-scene-settings-button"]').click();
 
     cy.get('div[class*="form-group"]').then(inputs => {
       cy.wrap(inputs[0])

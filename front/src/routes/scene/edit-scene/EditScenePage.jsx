@@ -70,6 +70,7 @@ const EditScenePage = ({ children, ...props }) => {
                   <div class="text-right">
                     <button
                       onClick={settingsOpen ? closeSettings : openSettings}
+                      data-cy="edit-scene-settings-button"
                       className={cx('btn mb-0', style.headerActionBtn, {
                         'btn-secondary': settingsOpen,
                         'btn-outline-secondary': !settingsOpen
