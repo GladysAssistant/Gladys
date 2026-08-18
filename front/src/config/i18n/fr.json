@@ -3205,7 +3205,7 @@
         "computedPlaceholder": "Ex : 2 * 3"
       },
       "getDate": {
-        "description": "Cette action récupère la date et l'heure actuelles, afin de pouvoir les utiliser dans les actions suivantes de la scène.",
+        "description": "Cette action récupère la date et l'heure actuelles, afin de pouvoir les utiliser dans les actions suivantes de la scène. Les 4 variables, timestamp compris, sont tronquées à la précision choisie : choisissez « Seconde » si vous avez besoin d'un timestamp exact pour un calcul.",
         "precisionLabel": "Précision",
         "precisionSecond": "Seconde",
         "precisionMinute": "Minute",

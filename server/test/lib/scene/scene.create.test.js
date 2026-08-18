@@ -281,6 +281,42 @@ describe('SceneManager', () => {
     await assert.isRejected(promise);
   });
 
+  it('should create a scene with a time.get-date action', async () => {
+    const scene = await sceneManager.create({
+      name: 'What time is it',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.TIME.GET_DATE,
+            precision: 'minute',
+          },
+        ],
+      ],
+      tags: [],
+    });
+    expect(scene).to.have.property('selector');
+  });
+
+  it('should return validation error when time.get-date has an unknown precision', async () => {
+    const promise = sceneManager.create({
+      name: 'Invalid get date scene',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.TIME.GET_DATE,
+            precision: 'century',
+          },
+        ],
+      ],
+      tags: [],
+    });
+    await assert.isRejected(promise);
+  });
+
   it('should format joi error fallback when details are absent', () => {
     expect(sceneModel.formatJoiValidationError()).to.equal('Invalid schema');
     expect(sceneModel.formatJoiValidationError({ message: 'Validation failed' })).to.equal('Validation failed');

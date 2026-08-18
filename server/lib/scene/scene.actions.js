@@ -417,7 +417,9 @@ const actionsFunc = {
     set(scope, path, cloneDeep(deviceFeature), { merge: true });
   },
   [ACTIONS.TIME.GET_DATE]: async (self, action, scope, path) => {
-    const precision = action.precision || GET_DATE_DEFAULT_PRECISION;
+    // Only an absent precision falls back to the default: a precision explicitly set to
+    // an empty/falsy value is not a supported precision, so it must abort the scene below.
+    const precision = action.precision === undefined ? GET_DATE_DEFAULT_PRECISION : action.precision;
     const dateFormat = GET_DATE_FORMATS[precision];
     // An action written by hand (or coming from an older/newer version of Gladys) could
     // contain a precision we don't know: we abort instead of storing an unusable date.
@@ -437,6 +439,8 @@ const actionsFunc = {
         time: now.format(GET_DATE_TIME_FORMATS[precision]),
         // Unix timestamp in seconds, so it can be compared/subtracted in a formula
         // to another date stored earlier (in a variable or in a device feature).
+        // It is truncated like the other variables, so that the 4 of them always describe
+        // the same instant: a formula needing an exact date should use the "second" precision.
         timestamp: now.unix(),
       },
       { merge: true },

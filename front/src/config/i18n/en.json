@@ -3205,7 +3205,7 @@
         "computedPlaceholder": "Ex: 2 * 3"
       },
       "getDate": {
-        "description": "This action gets the current date and time, so you can use them in the next actions of the scene.",
+        "description": "This action gets the current date and time, so you can use them in the next actions of the scene. All 4 variables, including the timestamp, are truncated to the precision you choose: pick \"Second\" if you need an exact timestamp for a calculation.",
         "precisionLabel": "Precision",
         "precisionSecond": "Second",
         "precisionMinute": "Minute",

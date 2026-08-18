@@ -3205,7 +3205,7 @@
         "computedPlaceholder": "Z.B.: 2 * 3"
       },
       "getDate": {
-        "description": "Diese Aktion ruft das aktuelle Datum und die aktuelle Uhrzeit ab, damit du sie in den nächsten Aktionen der Szene verwenden kannst.",
+        "description": "Diese Aktion ruft das aktuelle Datum und die aktuelle Uhrzeit ab, damit du sie in den nächsten Aktionen der Szene verwenden kannst. Alle 4 Variablen, einschließlich des Zeitstempels, werden auf die gewählte Genauigkeit abgeschnitten: Wähle „Sekunde“, wenn du für eine Berechnung einen exakten Zeitstempel benötigst.",
         "precisionLabel": "Genauigkeit",
         "precisionSecond": "Sekunde",
         "precisionMinute": "Minute",

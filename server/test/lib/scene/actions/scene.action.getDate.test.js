@@ -145,4 +145,26 @@ describe('scene.action.getDate', () => {
     );
     await assert.isRejected(promise, AbortScene);
   });
+
+  it('should abort the scene when the precision is an empty string', async () => {
+    const stateManager = new StateManager(event);
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, timezone: 'Europe/Paris' },
+      [[{ type: ACTIONS.TIME.GET_DATE, precision: '' }]],
+      scope,
+    );
+    await assert.isRejected(promise, AbortScene);
+  });
+
+  it('should abort the scene when the precision is null', async () => {
+    const stateManager = new StateManager(event);
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, timezone: 'Europe/Paris' },
+      [[{ type: ACTIONS.TIME.GET_DATE, precision: null }]],
+      scope,
+    );
+    await assert.isRejected(promise, AbortScene);
+  });
 });

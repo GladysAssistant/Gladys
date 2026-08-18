@@ -229,7 +229,7 @@ function createSceneCreateInputSchema(
           .enum(['second', 'minute', 'hour', 'day'])
           .optional()
           .describe(
-            'Precision the current date/time is truncated to. Defaults to "minute". The result is available in the next actions as {{<action coordinates>.datetime}}, {{<action coordinates>.date}}, {{<action coordinates>.time}} and {{<action coordinates>.timestamp}} (unix timestamp in seconds, usable in a formula).',
+            'Precision the current date/time is truncated to. Defaults to "minute". The result is available in the next actions as {{<action coordinates>.datetime}}, {{<action coordinates>.date}}, {{<action coordinates>.time}} and {{<action coordinates>.timestamp}} (unix timestamp in seconds, usable in a formula). The timestamp is truncated to the same precision, so use "second" when a formula needs an exact date.',
           ),
       }),
       actionSchemaByType(ACTIONS.VARIABLE.SET, {
