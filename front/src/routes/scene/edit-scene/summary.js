@@ -90,6 +90,41 @@ const getActionSummary = (action, dictionary) => {
     case ACTIONS.SWITCH.TURN_OFF:
     case ACTIONS.SWITCH.TOGGLE:
       return listSelectors(action.devices || action.device_features);
+    case ACTIONS.CONDITION.ONLY_CONTINUE_IF: {
+      if (!Array.isArray(action.conditions) || action.conditions.length === 0) {
+        return null;
+      }
+      const [first] = action.conditions;
+      const value =
+        first.evaluate_value !== undefined && first.evaluate_value !== null && first.evaluate_value !== ''
+          ? first.evaluate_value
+          : first.value;
+      const firstText = [first.variable, first.operator, value]
+        .filter(part => part !== null && part !== undefined && part !== '')
+        .join(' ');
+      return joinParts([truncate(firstText), action.conditions.length > 1 ? `+${action.conditions.length - 1}` : null]);
+    }
+    case ACTIONS.CALENDAR.IS_EVENT_RUNNING:
+    case ACTIONS.CALENDAR.GET_EVENTS:
+      return joinParts([listSelectors(action.calendars), truncate(action.calendar_event_name)]);
+    case ACTIONS.ECOWATT.CONDITION:
+      if (!action.ecowatt_network_status) {
+        return null;
+      }
+      return (
+        get(dictionary, `editScene.actionsCard.ecowattCondition.${action.ecowatt_network_status}`) ||
+        action.ecowatt_network_status
+      );
+    case ACTIONS.EDF_TEMPO.CONDITION: {
+      const tempoLabel = key => get(dictionary, `editScene.actionsCard.edfTempoCondition.${key}`) || key;
+      const peakDayKeys = { blue: 'blueDay', white: 'whiteDay', red: 'redDay' };
+      const peakHourKeys = { 'peak-hour': 'peakHour', 'off-peak-hour': 'offPeakHour' };
+      return joinParts([
+        action.edf_tempo_day ? tempoLabel(action.edf_tempo_day) : null,
+        peakDayKeys[action.edf_tempo_peak_day_type] ? tempoLabel(peakDayKeys[action.edf_tempo_peak_day_type]) : null,
+        peakHourKeys[action.edf_tempo_peak_hour_type] ? tempoLabel(peakHourKeys[action.edf_tempo_peak_hour_type]) : null
+      ]);
+    }
     case ACTIONS.CONDITION.CHECK_TIME: {
       const days = Array.isArray(action.days_of_the_week)
         ? action.days_of_the_week
