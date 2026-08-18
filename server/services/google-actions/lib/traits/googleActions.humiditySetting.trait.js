@@ -29,11 +29,13 @@ const humiditySettingTrait = {
         const { last_value: lastValue } = feature;
 
         if (!isNumeric(lastValue)) {
-          return null;
+          // The state is typed as a number by Google: an unknown value is omitted from the
+          // payload (JSON.stringify drops undefined keys) rather than sent as null.
+          return undefined;
         }
 
-        // Google Home only accepts an integer percentage.
-        return Math.round(lastValue);
+        // Google Home only accepts an integer percentage, clamped to the published range.
+        return Math.min(100, Math.max(0, Math.round(lastValue)));
       },
     },
   ],

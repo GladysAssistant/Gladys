@@ -120,7 +120,7 @@ describe('GoogleActions Handler - temperatureControl - temperature sensor', () =
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should generate sensor device without temperature range - onSync', async () => {
+  it('should generate sensor device with the default temperature range - onSync', async () => {
     delete device.features[0].min;
     delete device.features[0].max;
     device.features[0].type = DEVICE_FEATURE_TYPES.SENSOR.INTEGER;
@@ -132,6 +132,10 @@ describe('GoogleActions Handler - temperatureControl - temperature sensor', () =
     expect(result.payload.devices[0].attributes).to.deep.eq({
       queryOnlyTemperatureControl: true,
       temperatureUnitForUX: 'C',
+      temperatureRange: {
+        minThresholdCelsius: -100,
+        maxThresholdCelsius: 100,
+      },
     });
   });
 
@@ -231,14 +235,14 @@ describe('GoogleActions Handler - temperatureControl - temperature sensor', () =
     });
   });
 
-  it('should return null value when the sensor has no value yet - onQuery', async () => {
+  it('should not send any temperature when the sensor has no value yet - onQuery', async () => {
     device.features[0].last_value = null;
 
     const result = await googleActionsHandler.onQuery(body);
 
-    expect(result.payload.devices['device-1']).to.deep.eq({
+    // The state is omitted from the JSON payload sent to Google, not sent as null.
+    expect(JSON.parse(JSON.stringify(result.payload.devices['device-1']))).to.deep.eq({
       online: true,
-      temperatureAmbientCelsius: null,
     });
   });
 });

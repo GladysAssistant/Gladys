@@ -8,6 +8,11 @@ const { fahrenheitToCelsius } = require('../../../../utils/units');
 
 const KELVIN_TO_CELSIUS_OFFSET = 273.15;
 
+// temperatureRange is required by the trait, so a feature without min/max still needs one:
+// this fallback is wide enough for any indoor or outdoor sensor.
+const DEFAULT_MIN_THRESHOLD_CELSIUS = -100;
+const DEFAULT_MAX_THRESHOLD_CELSIUS = 100;
+
 /**
  * @description Converts a temperature to Celsius, Google Home only works with Celsius values,
  * whatever the unit configured in Gladys.
@@ -67,12 +72,16 @@ const temperatureControlTrait = {
       temperatureUnitForUX: unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? 'F' : 'C',
     };
 
-    if (isNumeric(min) && isNumeric(max)) {
-      attributes.temperatureRange = {
-        minThresholdCelsius: roundTemperature(toCelsius(min, unit)),
-        maxThresholdCelsius: roundTemperature(toCelsius(max, unit)),
-      };
-    }
+    attributes.temperatureRange =
+      isNumeric(min) && isNumeric(max)
+        ? {
+            minThresholdCelsius: roundTemperature(toCelsius(min, unit)),
+            maxThresholdCelsius: roundTemperature(toCelsius(max, unit)),
+          }
+        : {
+            minThresholdCelsius: DEFAULT_MIN_THRESHOLD_CELSIUS,
+            maxThresholdCelsius: DEFAULT_MAX_THRESHOLD_CELSIUS,
+          };
 
     return attributes;
   },
@@ -83,7 +92,9 @@ const temperatureControlTrait = {
         const { last_value: lastValue, unit } = feature;
 
         if (!isNumeric(lastValue)) {
-          return null;
+          // The state is typed as a number by Google: an unknown value is omitted from the
+          // payload (JSON.stringify drops undefined keys) rather than sent as null.
+          return undefined;
         }
 
         return roundTemperature(toCelsius(lastValue, unit));

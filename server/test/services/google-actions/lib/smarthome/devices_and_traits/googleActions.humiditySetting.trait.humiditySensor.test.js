@@ -175,14 +175,34 @@ describe('GoogleActions Handler - humiditySetting - humidity sensor', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should return null value when the sensor has no value yet - onQuery', async () => {
-    device.features[0].last_value = null;
+  it('should clamp the humidity to the 0-100 range - onQuery', async () => {
+    device.features[0].last_value = 101.4;
 
     const result = await googleActionsHandler.onQuery(body);
 
     expect(result.payload.devices['device-1']).to.deep.eq({
       online: true,
-      humidityAmbientPercent: null,
+      humidityAmbientPercent: 100,
+    });
+
+    device.features[0].last_value = -2;
+
+    const negativeResult = await googleActionsHandler.onQuery(body);
+
+    expect(negativeResult.payload.devices['device-1']).to.deep.eq({
+      online: true,
+      humidityAmbientPercent: 0,
+    });
+  });
+
+  it('should not send any humidity when the sensor has no value yet - onQuery', async () => {
+    device.features[0].last_value = null;
+
+    const result = await googleActionsHandler.onQuery(body);
+
+    // The state is omitted from the JSON payload sent to Google, not sent as null.
+    expect(JSON.parse(JSON.stringify(result.payload.devices['device-1']))).to.deep.eq({
+      online: true,
     });
   });
 });
