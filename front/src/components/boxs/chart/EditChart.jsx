@@ -480,6 +480,7 @@ class EditChart extends Component {
                   <Text id="dashboard.boxes.devices.addADeviceLabel" />
                 </label>
                 <Select
+                  menuPlacement="auto"
                   onChange={this.addDeviceFeature}
                   value={[]}
                   options={deviceOptions}
@@ -530,6 +531,7 @@ class EditChart extends Component {
                     />
                   </label>
                   <Select
+                    menuPlacement="auto"
                     defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[i])}
                     value={
                       props.box.colors &&
@@ -552,6 +554,7 @@ class EditChart extends Component {
                     <Text id="dashboard.boxes.chart.on" />
                   </label>
                   <Select
+                    menuPlacement="auto"
                     defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[0])}
                     value={
                       props.box.colors &&
@@ -571,6 +574,7 @@ class EditChart extends Component {
                     <Text id="dashboard.boxes.chart.off" />
                   </label>
                   <Select
+                    menuPlacement="auto"
                     defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[1])}
                     value={
                       props.box.colors &&

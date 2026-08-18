@@ -102,6 +102,7 @@ class EditDeviceInRoom extends Component {
                   <Text id="dashboard.boxes.devicesInRoom.editDeviceFeaturesLabel" />
                 </label>
                 <Select
+                  menuPlacement="auto"
                   defaultValue={[]}
                   value={selectedDeviceFeaturesOptions}
                   isMulti

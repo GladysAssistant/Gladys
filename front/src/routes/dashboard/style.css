@@ -684,3 +684,62 @@
     width: 2.75rem;
   }
 }
+
+/* ============================================================
+   Horizon controls inside the device rows: the Tabler button
+   groups (AC modes, thermostat modes, shutters, fan speeds…)
+   become iOS-like segmented controls — a soft track with a white
+   active segment — and the setpoint steppers become capsules.
+   ============================================================ */
+
+:global(.glass-theme .device-list-table .btn-group) {
+  background-color: rgba(28, 35, 52, 0.07);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 3px;
+  align-items: center;
+  /* the control cells are py-0: the track brings its own breathing room */
+  margin: 4px 0;
+}
+
+:global(.glass-theme .device-list-table .btn-group .btn) {
+  background: transparent;
+  border: none;
+  border-radius: 999px !important;
+  color: var(--gl-muted);
+  font-weight: 600;
+  box-shadow: none;
+}
+
+/* inside a segmented track the whole track is the touch zone: segments
+   stay at the iOS segmented height instead of the 44px solo-button floor */
+@media (pointer: coarse) {
+  :global(.glass-theme .device-list-table .btn-group .btn) {
+    min-height: 2.25rem;
+  }
+}
+
+:global(.glass-theme .device-list-table .btn-group .btn:hover) {
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme .device-list-table .btn-group .btn:disabled) {
+  opacity: 0.45;
+}
+
+:global(.glass-theme .device-list-table .btn-group .btn.active),
+:global(.glass-theme .device-list-table .btn-group .btn.active:disabled) {
+  background-color: #fff;
+  color: var(--gl-ink);
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.18);
+  opacity: 1;
+}
+
+/* the dropdown fallback of narrow cards joins the family */
+:global(.glass-theme .device-list-table select.form-control) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: #fff;
+  font-weight: 600;
+  color: var(--gl-ink);
+}

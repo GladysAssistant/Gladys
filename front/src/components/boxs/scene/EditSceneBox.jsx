@@ -114,6 +114,7 @@ class EditSceneBox extends Component {
                   <Text id="dashboard.boxes.scene.editSceneLabel" />
                 </label>
                 <Select
+                  menuPlacement="auto"
                   defaultValue={[]}
                   value={selectedSceneOptions}
                   options={sceneOptions}
