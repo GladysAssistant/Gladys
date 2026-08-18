@@ -10,15 +10,20 @@ const SCENE_TYPE = 'SCENE_TYPE';
 // We do not recommend using them in other places in Gladys front
 const SceneRow = ({ selectedSceneOption, moveScene, index }) => {
   const ref = useRef(null);
-  const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: SCENE_TYPE,
-    item: () => {
-      return { index };
-    },
-    collect: monitor => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }));
+  const [{ isDragging }, drag, preview] = useDrag(
+    () => ({
+      type: SCENE_TYPE,
+      item: () => {
+        return { index };
+      },
+      collect: monitor => ({
+        isDragging: !!monitor.isDragging()
+      })
+    }),
+    // the rows have a stable key, so a row keeps its instance when the order changes:
+    // the drag spec must be re-created when the index of the row changes
+    [index]
+  );
   const [{ isActive }, drop] = useDrop({
     accept: SCENE_TYPE,
     collect: monitor => ({
@@ -61,7 +66,12 @@ const { backend: dragAndDropBackend, options: dragAndDropBackendOptions } = getD
 const SceneListWithDragAndDrop = ({ selectedSceneOptions, moveScene }) => (
   <DndProvider backend={dragAndDropBackend} options={dragAndDropBackendOptions}>
     {selectedSceneOptions.map((selectedSceneOption, index) => (
-      <SceneRow selectedSceneOption={selectedSceneOption} index={index} moveScene={moveScene} />
+      <SceneRow
+        key={selectedSceneOption.value}
+        selectedSceneOption={selectedSceneOption}
+        index={index}
+        moveScene={moveScene}
+      />
     ))}
   </DndProvider>
 );
