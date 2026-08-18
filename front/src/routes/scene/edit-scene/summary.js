@@ -105,8 +105,18 @@ const getActionSummary = (action, dictionary) => {
       return joinParts([truncate(firstText), action.conditions.length > 1 ? `+${action.conditions.length - 1}` : null]);
     }
     case ACTIONS.CALENDAR.IS_EVENT_RUNNING:
-    case ACTIONS.CALENDAR.GET_EVENTS:
       return joinParts([listSelectors(action.calendars), truncate(action.calendar_event_name)]);
+    case ACTIONS.CALENDAR.GET_EVENTS: {
+      let timeRange = null;
+      if (action.time_range === 'today' || action.time_range === 'tomorrow') {
+        timeRange =
+          get(dictionary, `editScene.actionsCard.calendarGetEvents.${action.time_range}`) || action.time_range;
+      } else if (action.time_range === 'next-x-hours') {
+        const label = get(dictionary, 'editScene.actionsCard.calendarGetEvents.nextXHours') || action.time_range;
+        timeRange = action.duration ? label.replace('X', String(action.duration)) : label;
+      }
+      return joinParts([listSelectors(action.calendars), truncate(action.calendar_event_name), timeRange]);
+    }
     case ACTIONS.ECOWATT.CONDITION:
       if (!action.ecowatt_network_status) {
         return null;
@@ -122,7 +132,11 @@ const getActionSummary = (action, dictionary) => {
       return joinParts([
         action.edf_tempo_day ? tempoLabel(action.edf_tempo_day) : null,
         peakDayKeys[action.edf_tempo_peak_day_type] ? tempoLabel(peakDayKeys[action.edf_tempo_peak_day_type]) : null,
-        peakHourKeys[action.edf_tempo_peak_hour_type] ? tempoLabel(peakHourKeys[action.edf_tempo_peak_hour_type]) : null
+        // The peak hour check only applies to the current day: the editor hides
+        // (but keeps) the field when the step targets tomorrow
+        action.edf_tempo_day === 'today' && peakHourKeys[action.edf_tempo_peak_hour_type]
+          ? tempoLabel(peakHourKeys[action.edf_tempo_peak_hour_type])
+          : null
       ]);
     }
     case ACTIONS.CONDITION.CHECK_TIME: {
