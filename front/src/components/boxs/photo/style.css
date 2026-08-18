@@ -99,6 +99,21 @@
   opacity: 1;
 }
 
+/* no hover on touch devices: the arrows must be visible outright, and at
+   the ~44px touch-target floor */
+@media (hover: none) {
+  .navButton {
+    opacity: 1;
+  }
+}
+
+@media (pointer: coarse) {
+  .navButton {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
 .navButton:hover {
   background: rgba(0, 0, 0, 0.6);
 }
@@ -114,8 +129,7 @@
 .indicators {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.5rem;
   background: #fff;
 }
 
@@ -138,22 +152,35 @@
   background: transparent;
 }
 
+/* The dot stays a small visual, but the button around it is 24px — the
+   WCAG 2.2 minimum target size, on every device (the 8px dots were nearly
+   impossible to hit on touch) */
 .indicator {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.indicator::before {
+  content: '';
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  border: none;
   background: #d1d5db;
-  cursor: pointer;
-  padding: 0;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.indicator:hover {
+.indicator:hover::before {
   background: #9ca3af;
 }
 
-.indicatorActive {
+.indicatorActive::before {
   background: #316cbe;
   transform: scale(1.25);
 }

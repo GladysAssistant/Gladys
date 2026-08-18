@@ -24,15 +24,20 @@ const BinaryDeviceType = ({ children, ...props }) => {
     disabled: lastValue === optionValue
   }));
 
+  // Plain on/off rows toggle from a tap anywhere on the row, not only on the
+  // 36px switch — on a phone the switch alone is far below the ~44px
+  // touch-target floor, and the whole row reads as one control anyway
+  // (HomeKit behaves the same). The label stops propagation so a tap
+  // landing on the switch itself doesn't toggle twice.
   return (
-    <tr>
+    <tr class={!customText ? 'device-row-tappable' : undefined} onClick={!customText ? updateValue : undefined}>
       <td>
         <i class="fe fe-toggle-right" />
       </td>
       <td>{props.rowName}</td>
       {!customText ? (
         <td class="text-right">
-          <label class="custom-switch">
+          <label class="custom-switch" onClick={event => event.stopPropagation()}>
             <input
               type="radio"
               name={`box-${props.x}-${props.y}-${props.deviceFeature.id}`}

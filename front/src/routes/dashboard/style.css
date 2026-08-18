@@ -563,3 +563,67 @@
     --gl-surface-strong: rgba(255, 255, 255, 0.95);
   }
 }
+
+/* ============================================================
+   Touch targets (viewer): on coarse-pointer devices every widget
+   control reaches the ~44px Apple HIG floor. pointer: coarse means
+   the PRIMARY pointer is a finger (phones, tablets) — hybrid laptops
+   keep the compact mouse sizing.
+   ============================================================ */
+
+:global(.device-row-tappable) {
+  cursor: pointer;
+}
+
+@media (pointer: coarse) {
+  /* generic floor for widget buttons (scene start, camera live, music
+     transport, energy nav, shutter groups, adaptive option pairs…) */
+  :global(.glass-theme .card .btn) {
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :global(.glass-theme .card .btn-group .btn) {
+    min-width: 2.75rem;
+  }
+
+  /* Tabler switches grow to a finger-sized toggle */
+  :global(.glass-theme .custom-switch-indicator) {
+    width: 3.25rem;
+    height: 1.75rem;
+  }
+
+  :global(.glass-theme .custom-switch-indicator)::before {
+    width: 1.5rem;
+    height: 1.5rem;
+    top: 2px;
+    left: 2px;
+  }
+
+  :global(.glass-theme .custom-switch-input:checked ~ .custom-switch-indicator)::before {
+    left: calc(100% - 1.5rem - 2px);
+  }
+
+  /* the selector pills round up from 2.6rem to the floor, and the header
+     action pills keep matching the bar height */
+  :global(.glass-theme) .dashboardTab {
+    height: 2.75rem;
+  }
+
+  :global(.glass-theme) .dashboardTabsIconsOnly .dashboardTab {
+    width: 2.75rem;
+  }
+
+  .dashboardHeader :global(.page-options .btn) {
+    width: calc(2.75rem + 12px);
+    height: calc(2.75rem + 12px);
+  }
+}
+
+@media (pointer: coarse) and (max-width: 767px) {
+  .dashboardTab:not(.dashboardTabActive) {
+    width: 2.75rem;
+  }
+}
