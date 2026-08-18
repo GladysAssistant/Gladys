@@ -12,3 +12,25 @@
     background-position-x: -200%;
   }
 }
+
+/* The card lays its features out in an automatically sized `table.card-table` inside a
+   `.table-responsive` wrapper. An auto table can never be narrower than the sum of its
+   columns' min-content widths: as soon as that sum exceeds the card, the wrapper starts
+   scrolling horizontally and the values on the right drop out of sight — which is the
+   #2917 symptom (the narrower the card, the sooner it happens). Wrapping a single value
+   is not enough; every column has to stay able to shrink.
+
+   The name cell is the main offender: a label such as
+   "Compteur électrique index - Consommation 30 minutes" holds its column open. `anywhere`
+   is deliberate rather than `break-word` — only `anywhere` also lowers the cell's
+   min-content width, which is what actually lets the column shrink back into the card. */
+.deviceFeaturesTable td:nth-child(2) {
+  overflow-wrap: anywhere;
+}
+
+/* Tabler renders every sensor value badge with `white-space: nowrap`, so a label like
+   "Pas de valeur récente" counts as one unbreakable word and sets a floor of its full
+   width on the value column. Letting it wrap drops that floor to its longest word. */
+.deviceFeaturesTable :global(.badge) {
+  white-space: normal;
+}
