@@ -3,5 +3,15 @@
   align-items: center;
   gap: 0.5rem;
   max-width: 400px;
+}
+
+.serviceNameLabel {
   overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* the community tag tells a community integration apart from a built-in one
+   with a similar name: a long name must be ellipsed, never the tag */
+.serviceNameTag {
+  flex-shrink: 0;
 }

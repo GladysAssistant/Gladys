@@ -26,7 +26,10 @@ function getServiceIntegration(service) {
       // the store slug (owner/repo) reads better than the selector built from
       // it; dev installs have none, their selector is the only identity
       discriminant: service.store_slug || service.selector,
-      url: null
+      // all community integrations share the same parameterized page; the
+      // communication and weather ones redirect from there to their config
+      // screen, so this single URL is right for every type
+      url: `/dashboard/integration/device/external/${service.selector}`
     };
   }
   const integrationPage = integrations.find(

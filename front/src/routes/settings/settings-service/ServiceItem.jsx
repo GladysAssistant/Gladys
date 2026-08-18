@@ -40,12 +40,14 @@ class ServiceItem extends Component {
       <tr>
         <td>
           <div class={style.serviceName}>
-            {integration.i18nKey ? <Text id={integration.i18nKey}>{integration.name}</Text> : integration.name}
+            <span class={style.serviceNameLabel}>
+              {integration.i18nKey ? <Text id={integration.i18nKey}>{integration.name}</Text> : integration.name}
+            </span>
             {integration.external && (
               // same tag as in the integration catalog: the list mixes both
               // families, and a community integration can be named like a
               // built-in one
-              <span class="badge badge-secondary">
+              <span class={`badge badge-secondary ${style.serviceNameTag}`}>
                 <Text id="integration.tags.external" />
               </span>
             )}

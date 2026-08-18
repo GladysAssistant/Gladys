@@ -3,7 +3,7 @@ import { Text } from 'preact-i18n';
 import SettingsLayout from '../SettingsLayout';
 import ServiceItem from './ServiceItem';
 
-const ServicesPage = ({ services, integrations, actionOnService }) => (
+const ServicesPage = ({ services, actionOnService }) => (
   <SettingsLayout>
     <div class="card">
       <div>
@@ -27,9 +27,9 @@ const ServicesPage = ({ services, integrations, actionOnService }) => (
               {services &&
                 services.map(({ service, integration }) => (
                   <ServiceItem
+                    key={service.selector}
                     service={service}
                     integration={integration}
-                    integrations={integrations}
                     actionOnService={actionOnService}
                   />
                 ))}
