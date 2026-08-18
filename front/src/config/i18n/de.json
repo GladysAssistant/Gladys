@@ -610,7 +610,10 @@
       "scene": {
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
-        "editSceneLabel": "Wähle die Szene aus, die hier angezeigt werden soll."
+        "editSceneLabel": "Wähle die Szene aus, die hier angezeigt werden soll.",
+        "customOrderLabel": "Benutzerdefinierte Reihenfolge",
+        "customOrderDescription": "Szenen werden standardmäßig in alphabetischer Reihenfolge angezeigt. Aktiviere diese Option, um sie nach deinen Wünschen zu sortieren.",
+        "orderSceneLabel": "Ziehe die Szenen per Drag & Drop, um ihre Reihenfolge zu ändern"
       },
       "link": {
         "editTitleLabel": "Titel",

@@ -34,6 +34,9 @@ const boxesSchema = Joi.array().items(
       camera_latency: Joi.string(),
       camera_live_auto_start: Joi.boolean(),
       scenes: Joi.array().items(Joi.string()),
+      // scene box: when true, the scenes are displayed in the order of the "scenes" array
+      // instead of the default alphabetical order
+      scene_custom_order: Joi.boolean(),
       humidity_use_custom_value: Joi.boolean(),
       humidity_min: Joi.number(),
       humidity_max: Joi.number(),

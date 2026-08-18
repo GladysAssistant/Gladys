@@ -111,9 +111,25 @@ class SceneBoxComponent extends Component {
     }
   }
 
+  // The API returns the scenes sorted alphabetically.
+  // If the user chose a custom order in the widget configuration,
+  // the scenes are displayed in the order of the box configuration.
+  getOrderedScenes = scenes => {
+    const { box } = this.props;
+    if (!scenes || !box.scene_custom_order || !box.scenes) {
+      return scenes;
+    }
+    const getScenePosition = selector => {
+      const position = box.scenes.indexOf(selector);
+      return position === -1 ? box.scenes.length : position;
+    };
+    return [...scenes].sort((a, b) => getScenePosition(a.selector) - getScenePosition(b.selector));
+  };
+
   render(props, { scenes, status, runningScenes, now }) {
     const boxTitle = props.box.name;
     const loading = status === RequestStatus.Getting && !status;
+    const orderedScenes = this.getOrderedScenes(scenes);
 
     return (
       <div class="card">
@@ -132,8 +148,8 @@ class SceneBoxComponent extends Component {
             <div class="table-responsive">
               <table className="table card-table table-vcenter">
                 <tbody>
-                  {scenes &&
-                    scenes.map(scene => (
+                  {orderedScenes &&
+                    orderedScenes.map(scene => (
                       <SceneRow
                         key={scene.selector}
                         boxStatus={status}
