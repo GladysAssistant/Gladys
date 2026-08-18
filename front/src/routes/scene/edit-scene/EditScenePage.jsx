@@ -68,19 +68,22 @@ const EditScenePage = ({ children, ...props }) => {
 
                 <div class="col-5 col-md-4">
                   <div class="text-right">
-                    <button
-                      onClick={settingsOpen ? closeSettings : openSettings}
-                      data-cy="edit-scene-settings-button"
-                      className={cx('btn mb-0', style.headerActionBtn, {
-                        'btn-secondary': settingsOpen,
-                        'btn-outline-secondary': !settingsOpen
-                      })}
-                    >
-                      <span class="d-none d-md-inline-block">
-                        <Text id="editScene.settings" />
-                      </span>{' '}
-                      <i class="fe fe-settings" />
-                    </button>
+                    <Localizer>
+                      <button
+                        onClick={settingsOpen ? closeSettings : openSettings}
+                        data-cy="edit-scene-settings-button"
+                        aria-label={<Text id="editScene.settings" />}
+                        className={cx('btn mb-0', style.headerActionBtn, {
+                          'btn-secondary': settingsOpen,
+                          'btn-outline-secondary': !settingsOpen
+                        })}
+                      >
+                        <span class="d-none d-md-inline-block" aria-hidden="true">
+                          <Text id="editScene.settings" />
+                        </span>{' '}
+                        <i class="fe fe-settings" />
+                      </button>
+                    </Localizer>
                   </div>
                 </div>
                 <div class="col-12 text-muted">{props.scene.description && <span>{props.scene.description}</span>}</div>

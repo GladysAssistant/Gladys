@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import cx from 'classnames';
 import TriggerCard from './TriggerCard';
 import style from './style.css';
@@ -13,12 +13,18 @@ const TriggerGroup = ({ children, ...props }) => (
           <Text id="editScene.triggersTitle" />
         </h4>
         <div class="card-options">
-          <button class="btn btn-outline-primary" onClick={props.addTrigger}>
-            <span class="d-none d-sm-inline-block">
-              <Text id="editScene.addNewTriggerButton" />
-            </span>{' '}
-            <i class="fe fe-plus" />
-          </button>
+          <Localizer>
+            <button
+              class="btn btn-outline-primary"
+              onClick={props.addTrigger}
+              aria-label={<Text id="editScene.addNewTriggerButton" />}
+            >
+              <span class="d-none d-sm-inline-block" aria-hidden="true">
+                <Text id="editScene.addNewTriggerButton" />
+              </span>{' '}
+              <i class="fe fe-plus" />
+            </button>
+          </Localizer>
         </div>
       </div>
       <div class="card-body">

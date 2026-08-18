@@ -234,9 +234,13 @@ const ActionCard = ({ children, ...props }) => {
           })()}
           {!isCondition && !isStructuralCondition && props.action.type !== null && props.showParallelLink && (
             <div class="text-right mt-3">
-              <a class={cx('cursor-pointer text-muted', style.parallelLink)} onClick={addParallelAction}>
+              <button
+                type="button"
+                class={cx('text-muted', style.parallelLink, style.cardOptionButton)}
+                onClick={addParallelAction}
+              >
                 <i class="fe fe-git-merge" /> <Text id="editScene.addParallelActionButton" />
-              </a>
+              </button>
             </div>
           )}
         </div>

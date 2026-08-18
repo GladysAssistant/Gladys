@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import RunningStopButton from '../RunningStopButton';
@@ -24,18 +24,30 @@ const EditActions = props => (
       ) : (
         <div class="row align-items-center">
           <div class="col-auto">
-            <button onClick={props.duplicateScene} className="btn btn-outline-primary">
-              <span class="d-none d-lg-inline-block">
-                <Text id="editScene.duplicateButton" />
-              </span>{' '}
-              <i class="fe fe-copy" />
-            </button>
-            <button onClick={props.askDeleteCurrentScene} className="btn btn-outline-danger ml-2">
-              <span class="d-none d-lg-inline-block">
-                <Text id="editScene.deleteButton" />
-              </span>{' '}
-              <i class="fe fe-trash" />
-            </button>
+            <Localizer>
+              <button
+                onClick={props.duplicateScene}
+                aria-label={<Text id="editScene.duplicateButton" />}
+                className="btn btn-outline-primary"
+              >
+                <span class="d-none d-lg-inline-block" aria-hidden="true">
+                  <Text id="editScene.duplicateButton" />
+                </span>{' '}
+                <i class="fe fe-copy" />
+              </button>
+            </Localizer>
+            <Localizer>
+              <button
+                onClick={props.askDeleteCurrentScene}
+                aria-label={<Text id="editScene.deleteButton" />}
+                className="btn btn-outline-danger ml-2"
+              >
+                <span class="d-none d-lg-inline-block" aria-hidden="true">
+                  <Text id="editScene.deleteButton" />
+                </span>{' '}
+                <i class="fe fe-trash" />
+              </button>
+            </Localizer>
           </div>
           <div class="col d-none d-sm-block">
             <span class={cx('text-muted', style.saveIndicator)}>
