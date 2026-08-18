@@ -565,6 +565,63 @@
 }
 
 /* ============================================================
+   Horizon device list: the Tabler table rows of the devices widgets
+   become soft pill rows of the scene/actions family — icon in a tinted
+   badge, one rounded surface per row. CSS-only: the 25+ feature
+   components keep their <tr> markup untouched.
+   ============================================================ */
+
+:global(.glass-theme .device-list-table) {
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  padding: 0 12px 8px;
+  width: 100%;
+}
+
+:global(.glass-theme .device-list-table tr td) {
+  background-color: var(--gl-card-nested-bg);
+  border-top: 1px solid var(--gl-border);
+  border-bottom: 1px solid var(--gl-border);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  color: var(--gl-ink);
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+:global(.glass-theme .device-list-table tr td:first-child) {
+  border-left: 1px solid var(--gl-border);
+  border-radius: 14px 0 0 14px;
+  padding-left: 0.625rem;
+  width: 1%;
+  white-space: nowrap;
+}
+
+:global(.glass-theme .device-list-table tr td:last-child) {
+  border-right: 1px solid var(--gl-border);
+  border-radius: 0 14px 14px 0;
+  padding-right: 0.75rem;
+}
+
+/* the feature icon sits in a tinted badge, like the scene rows */
+:global(.glass-theme .device-list-table tr td:first-child > .fe) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  background-color: var(--gl-icon-tint-bg);
+  color: var(--gl-accent);
+  font-size: 1rem;
+}
+
+/* pressing a tappable row gives immediate feedback */
+:global(.glass-theme .device-list-table .device-row-tappable:active td) {
+  background-color: var(--gl-icon-tint-bg);
+}
+
+/* ============================================================
    Touch targets (viewer): on coarse-pointer devices every widget
    control reaches the ~44px Apple HIG floor. pointer: coarse means
    the PRIMARY pointer is a finger (phones, tablets) — hybrid laptops
