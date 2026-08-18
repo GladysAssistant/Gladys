@@ -94,6 +94,30 @@
   color: #fff;
 }
 
+/* Placeholder shown instead of the image when the camera is disabled ("private mode") */
+.cameraDisabled {
+  background-color: #34495e;
+  color: white;
+  height: 244px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.cameraDisabledIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.cameraDisabledText {
+  margin-bottom: 0px;
+}
+
 .noImageToShowError {
   background-color: #34495e;
   color: white;

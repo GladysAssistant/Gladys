@@ -29,6 +29,11 @@ class CameraBoxComponent extends Component {
   };
 
   refreshData = async () => {
+    // A disabled camera serves no image at all (the server refuses, on purpose): asking for
+    // one would only display the generic "no image" error instead of the disabled placeholder.
+    if (this.state.cameraDisabled) {
+      return;
+    }
     try {
       const image = await this.props.httpClient.get(`/api/v1/camera/${this.props.box.camera}/image`);
       this.setState({ image, error: false });
@@ -38,24 +43,57 @@ class CameraBoxComponent extends Component {
     }
   };
 
-  refreshPtzDevice = async () => {
+  refreshDevice = async () => {
     const cameraSelector = this.props.box.camera;
     // Request generation guard: a camera change clears the controls immediately, and a slow
     // response for a previous camera can never overwrite the current one (a stale overlay
     // would send commands to the wrong camera).
-    this.ptzRequestId = (this.ptzRequestId || 0) + 1;
-    const requestId = this.ptzRequestId;
-    this.setState({ ptzDevice: null });
+    this.deviceRequestId = (this.deviceRequestId || 0) + 1;
+    const requestId = this.deviceRequestId;
+    this.setState({ device: null, cameraDisabled: false });
     if (!cameraSelector) {
       return;
     }
     try {
-      const ptzDevice = await this.props.httpClient.get(`/api/v1/device/${cameraSelector}`);
-      if (requestId === this.ptzRequestId && this.props.box.camera === cameraSelector) {
-        this.setState({ ptzDevice });
+      const device = await this.props.httpClient.get(`/api/v1/device/${cameraSelector}`);
+      if (requestId === this.deviceRequestId && this.props.box.camera === cameraSelector) {
+        this.setState({ device, cameraDisabled: this.isCameraDisabled(device) });
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  // The "enabled" feature is the on/off gate of the camera. A camera without that feature is
+  // always enabled (docs/specs/camera-enable-disable.md).
+  getEnabledFeature = device => {
+    const features = get(device, 'features') || [];
+    return features.find(
+      feature =>
+        feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.ENABLED
+    );
+  };
+
+  isCameraDisabled = device => {
+    const enabledFeature = this.getEnabledFeature(device);
+    return enabledFeature !== undefined && enabledFeature.last_value === 0;
+  };
+
+  updateDeviceFeatureStateWebsocket = payload => {
+    const enabledFeature = this.getEnabledFeature(this.state.device);
+    if (!enabledFeature || enabledFeature.selector !== payload.device_feature_selector) {
+      return;
+    }
+    enabledFeature.last_value = payload.last_value;
+    const cameraDisabled = payload.last_value === 0;
+    if (cameraDisabled) {
+      // Stop showing anything of a camera that was just turned off
+      if (this.state.streaming) {
+        this.stopStreaming();
+      }
+      this.setState({ cameraDisabled, image: null, error: false });
+    } else {
+      this.setState({ cameraDisabled }, this.refreshData);
     }
   };
 
@@ -63,10 +101,10 @@ class CameraBoxComponent extends Component {
     if (this.props.box.camera_ptz_controls === false) {
       return null;
     }
-    if (!this.state.ptzDevice || this.state.ptzDevice.selector !== this.props.box.camera) {
+    if (!this.state.device || this.state.device.selector !== this.props.box.camera) {
       return null;
     }
-    const features = get(this.state, 'ptzDevice.features') || [];
+    const features = get(this.state, 'device.features') || [];
     const moveFeature = features.find(
       feature =>
         feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.MOVE
@@ -96,7 +134,7 @@ class CameraBoxComponent extends Component {
   };
 
   updateDeviceStateWebsocket = payload => {
-    if (this.props.box.camera === payload.device) {
+    if (this.props.box.camera === payload.device && !this.state.cameraDisabled) {
       this.setState({
         image: payload.last_value_string,
         error: false
@@ -281,27 +319,33 @@ class CameraBoxComponent extends Component {
     }
   };
 
-  componentDidMount() {
-    this.refreshData();
-    this.refreshPtzDevice();
-    if (this.props.box.camera_live_auto_start === true) {
-      this.startStreaming();
-    }
+  async componentDidMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceFeatureStateWebsocket
+    );
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
+    // The device is loaded first: a disabled camera must show its placeholder instead of
+    // requesting an image and auto-starting a live stream the server would refuse.
+    await this.refreshDevice();
+    this.refreshData();
+    if (this.props.box.camera_live_auto_start === true && !this.state.cameraDisabled) {
+      this.startStreaming();
+    }
   }
 
-  componentDidUpdate(previousProps) {
+  async componentDidUpdate(previousProps) {
     const cameraChanged = get(previousProps, 'box.camera') !== get(this.props, 'box.camera');
     const nameChanged = get(previousProps, 'box.name') !== get(this.props, 'box.name');
+    if (cameraChanged) {
+      await this.refreshDevice();
+    }
     if (cameraChanged || nameChanged) {
       this.refreshData();
-    }
-    if (cameraChanged) {
-      this.refreshPtzDevice();
     }
   }
 
@@ -309,6 +353,10 @@ class CameraBoxComponent extends Component {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
       this.updateDeviceStateWebsocket
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceFeatureStateWebsocket
     );
     if (this.state.streaming) {
       this.stopStreaming();
@@ -326,9 +374,27 @@ class CameraBoxComponent extends Component {
       liveStartError,
       liveNotSupportedBrowser,
       liveTooManyRequestsError,
-      upgradeGladysPlusPlanRequired
+      upgradeGladysPlusPlanRequired,
+      cameraDisabled
     }
   ) {
+    // A disabled camera shows a clear placeholder: no image (not even the last one received
+    // before it was turned off) and no way to start a live stream.
+    if (cameraDisabled) {
+      return (
+        <div class="card">
+          <div class={style.cameraDisabled}>
+            <i class={cx('fe', 'fe-video-off', style.cameraDisabledIcon)} />
+            <p class={style.cameraDisabledText}>
+              <Text id="dashboard.boxes.camera.cameraDisabled" />
+            </p>
+          </div>
+          <div class="card-header">
+            <h3 class="card-title">{props.box && props.box.name}</h3>
+          </div>
+        </div>
+      );
+    }
     // PTZ controls only make sense on the live view: in snapshot mode movements are not
     // visible, and the overlay was covering the widget's other actions (field feedback).
     const ptzControls = streaming ? this.renderPtzControls() : null;

@@ -7,7 +7,7 @@ const sinon = require('sinon').createSandbox();
 const { fake, assert: fakeAssert } = sinon;
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const { NotFoundError } = require('../../../utils/coreErrors');
-const { DEVICE_ROTATION } = require('../../../utils/constants');
+const { DEVICE_ROTATION, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
 const device = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
@@ -106,6 +106,40 @@ describe('Camera.streaming', () => {
     });
     const promise2 = rtspCameraManager.startStreaming('my-camera', false, 1);
     await assert.isRejected(promise2, NotFoundError);
+  });
+  it('should not start streaming, camera is disabled', async () => {
+    const disabledCameraGladys = {
+      config: {
+        tempFolder: '/tmp/gladys',
+      },
+      device: {
+        getBySelector: fake.resolves({
+          id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+          selector: 'my-camera',
+          params: [
+            {
+              name: 'CAMERA_URL',
+              value: 'test',
+            },
+          ],
+          features: [
+            {
+              category: DEVICE_FEATURE_CATEGORIES.CAMERA,
+              type: DEVICE_FEATURE_TYPES.CAMERA.ENABLED,
+              last_value: 0,
+            },
+          ],
+        }),
+      },
+    };
+    rtspCameraManager = new RtspCameraManager(
+      disabledCameraGladys,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    const promise = rtspCameraManager.startStreaming('my-camera', false, 1);
+    await assert.isRejected(promise, 'CAMERA_IS_DISABLED');
+    expect(rtspCameraManager.liveStreams.has('my-camera')).to.equal(false);
   });
   it('should start, ping & stop streaming', async () => {
     rtspCameraManager.onNewCameraFile = fake.resolves(null);

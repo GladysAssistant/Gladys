@@ -9,6 +9,7 @@ const randomBytes = util.promisify(require('crypto').randomBytes);
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const { DEVICE_ROTATION } = require('../../../utils/constants');
+const { isCameraEnabled } = require('../../../utils/device');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
@@ -42,6 +43,10 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
 
   try {
     const device = await this.gladys.device.getBySelector(cameraSelector);
+    // A disabled camera never streams (spec docs/specs/camera-enable-disable.md)
+    if (!isCameraEnabled(device)) {
+      throw new NotFoundError('CAMERA_IS_DISABLED');
+    }
     // we find the camera url in the device
     const cameraUrlParam = device.params && device.params.find((param) => param.name === DEVICE_PARAM_CAMERA_URL);
     if (!cameraUrlParam) {

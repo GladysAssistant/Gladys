@@ -467,6 +467,7 @@
       "camera": {
         "editCameraLabel": "Select the camera you want to display here.",
         "noImageToShow": "No image to show. Are you sure you camera is connected and accessible to Gladys?",
+        "cameraDisabled": "This camera is disabled. Turn it back on from the camera device page, a dashboard control or a scene.",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
         "editBoxNamePlaceholder": "Name of the box",
         "latencyBoxName": "Latency",
@@ -5225,6 +5226,7 @@
     "camera": {
       "shortCategoryName": "Camera",
       "image": "Camera",
+      "enabled": "Camera enabled",
       "move": "Camera movement (PTZ)",
       "preset": "Camera preset",
       "pan-position": "Camera pan position",

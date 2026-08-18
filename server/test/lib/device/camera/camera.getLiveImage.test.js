@@ -50,4 +50,16 @@ describe('Camera.getLiveImage', () => {
     const promise = deviceManager.camera.getLiveImage('test-camera-2');
     return assert.isRejected(promise, 'Service is not found or not configured.');
   });
+  it('should not return the live image of a disabled camera', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const getImage = fake.resolves(RANDOM_IMAGE);
+    serviceManager.getServiceById = fake.returns({ device: { getImage } });
+    const deviceManager = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    stateManager.setState('device', 'test-camera-disabled', {
+      features: [{ category: 'camera', type: 'enabled', last_value: 0 }],
+    });
+    const promise = deviceManager.camera.getLiveImage('test-camera-disabled');
+    return assert.isRejected(promise, 'Camera is disabled');
+  });
 });
