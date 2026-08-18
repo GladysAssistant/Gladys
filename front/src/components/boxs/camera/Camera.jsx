@@ -43,9 +43,13 @@ class CameraBoxComponent extends Component {
     }
   };
 
-  // Returns whether the loaded camera is disabled. Callers must use that returned value and not
-  // this.state.cameraDisabled right after awaiting this method: setState is asynchronous, so the
-  // state still holds the previous value when this promise resolves.
+  // Returns whether the loaded camera is disabled, or null when that could not be resolved (no
+  // camera selected, request failed, or a newer request superseded this one). null is not
+  // "enabled": callers must only fetch an image or start a live stream on a strict false, so a
+  // failed or stale device request never polls a camera that is in fact disabled.
+  // Callers must use that returned value and not this.state.cameraDisabled right after awaiting
+  // this method: setState is asynchronous, so the state still holds the previous value when this
+  // promise resolves.
   refreshDevice = async () => {
     const cameraSelector = this.props.box.camera;
     // Request generation guard: a camera change clears the controls immediately, and a slow
@@ -53,9 +57,12 @@ class CameraBoxComponent extends Component {
     // would send commands to the wrong camera).
     this.deviceRequestId = (this.deviceRequestId || 0) + 1;
     const requestId = this.deviceRequestId;
-    this.setState({ device: null, cameraDisabled: false });
+    // Everything displayed belongs to the camera we are leaving, image included: it must not
+    // stay on screen while the new one loads, and a disabled new camera must show its
+    // placeholder rather than the last frame of the previous one.
+    this.setState({ device: null, cameraDisabled: false, image: null, error: false });
     if (!cameraSelector) {
-      return false;
+      return null;
     }
     try {
       const device = await this.props.httpClient.get(`/api/v1/device/${cameraSelector}`);
@@ -67,7 +74,7 @@ class CameraBoxComponent extends Component {
     } catch (e) {
       console.error(e);
     }
-    return false;
+    return null;
   };
 
   // The "enabled" feature is the on/off gate of the camera. A camera without that feature is
@@ -356,7 +363,7 @@ class CameraBoxComponent extends Component {
     // The device is loaded first: a disabled camera must show its placeholder instead of
     // requesting an image and auto-starting a live stream the server would refuse.
     const cameraDisabled = await this.refreshDevice();
-    if (!cameraDisabled) {
+    if (cameraDisabled === false) {
       this.refreshData();
       if (this.props.box.camera_live_auto_start === true) {
         this.startStreaming();
@@ -369,9 +376,15 @@ class CameraBoxComponent extends Component {
     const nameChanged = get(previousProps, 'box.name') !== get(this.props, 'box.name');
     let { cameraDisabled } = this.state;
     if (cameraChanged) {
+      // A live stream (or one still being started) belongs to the camera we are leaving: left
+      // running it would keep playing in the background and ping the new selector, and the
+      // placeholder of a disabled new camera would hide it. refreshDevice clears the image.
+      if (this.hasStreamingToStop()) {
+        await this.stopStreaming();
+      }
       cameraDisabled = await this.refreshDevice();
     }
-    if ((cameraChanged || nameChanged) && !cameraDisabled) {
+    if ((cameraChanged || nameChanged) && cameraDisabled === false) {
       this.refreshData();
     }
   }

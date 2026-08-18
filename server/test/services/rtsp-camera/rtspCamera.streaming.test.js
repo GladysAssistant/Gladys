@@ -152,6 +152,18 @@ describe('Camera.streaming', () => {
     fakeAssert.notCalled(spawn);
     expect(rtspCameraManager.liveStreams.has('my-camera')).to.equal(false);
   });
+  it('should use a different folder for each streaming attempt', async () => {
+    rtspCameraManager.onNewCameraFile = fake.resolves(null);
+    const firstStream = await rtspCameraManager.startStreaming('my-camera', false, 1);
+    // The camera is disabled then immediately re-enabled: both attempts happen within the same
+    // second, so a folder named after the time only would be shared. Cleaning up the first
+    // stream would then delete the files of the second one while ffmpeg is writing them.
+    await rtspCameraManager.stopStreaming('my-camera');
+    const secondStream = await rtspCameraManager.startStreaming('my-camera', false, 1);
+    expect(secondStream.camera_folder).to.not.equal(firstStream.camera_folder);
+    expect(fse.existsSync(path.join(gladys.config.tempFolder, secondStream.camera_folder))).to.equal(true);
+    await rtspCameraManager.stopStreaming('my-camera');
+  });
   it('should start, ping & stop streaming', async () => {
     rtspCameraManager.onNewCameraFile = fake.resolves(null);
     const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', false, 1);

@@ -64,9 +64,14 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
     if (!cameraRotationParam) {
       cameraRotationParam = '0';
     }
-    // we create a temp folder
+    // we create a temp folder. The random suffix makes the folder unique per start attempt:
+    // the timestamp alone has a one second resolution, so a quick disable/re-enable would give
+    // two attempts the same folder, and the cancelled one would delete the files of the
+    // running one when cleaning up (spec docs/specs/camera-enable-disable.md).
     const now = new Date();
-    const cameraFolder = `camera-${device.id}-${now.getSeconds()}-${now.getMinutes()}-${now.getHours()}`;
+    const folderUniqueId = (await randomBytes(4)).toString('hex');
+    const folderTime = `${now.getSeconds()}-${now.getMinutes()}-${now.getHours()}`;
+    const cameraFolder = `camera-${device.id}-${folderTime}-${folderUniqueId}`;
     const folderPath = path.join(this.gladys.config.tempFolder, cameraFolder);
     await fse.ensureDir(folderPath);
     const indexFilePath = path.join(folderPath, 'index.m3u8');
