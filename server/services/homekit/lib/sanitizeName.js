@@ -23,12 +23,11 @@ const FALLBACK_NAME = 'Gladys';
 /**
  * @description Rewrite a Gladys name into one HomeKit accepts.
  * @param {string} name - Name of the Gladys device, feature or house.
- * @param {string} [fallback] - Name to use when nothing usable is left.
  * @returns {string} Name HomeKit accepts.
  * @example
  * sanitizeName('Detecteur_Cave'); // 'Detecteur Cave'
  */
-function sanitizeName(name, fallback = FALLBACK_NAME) {
+function sanitizeName(name) {
   const sanitized = String(name || '')
     .replace(FORBIDDEN_CHARACTERS, ' ')
     .replace(/ +/g, ' ')
@@ -39,7 +38,7 @@ function sanitizeName(name, fallback = FALLBACK_NAME) {
     .substring(0, MAX_LENGTH)
     .replace(TRAILING_SEPARATORS, '');
 
-  return sanitized || fallback;
+  return sanitized || FALLBACK_NAME;
 }
 
 module.exports = {

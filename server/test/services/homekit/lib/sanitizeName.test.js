@@ -43,10 +43,6 @@ describe('Sanitize name', () => {
     expect(sanitizeName(undefined)).to.equal('Gladys');
   });
 
-  it('should use the given fallback rather than the default one', () => {
-    expect(sanitizeName('()', 'Capteur')).to.equal('Capteur');
-  });
-
   it('should cut a name at 64 characters, without leaving a separator at the end', () => {
     // 63 letters then a space and a letter: truncating lands on the space, which may not end a name
     const longName = `${'a'.repeat(63)} b`;

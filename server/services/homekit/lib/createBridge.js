@@ -41,30 +41,29 @@ async function createBridge() {
   // One accessory that cannot be built must not cost the user every other one: a bridge that fails
   // to publish leaves the whole Home app empty, with nothing on screen saying which device is at
   // fault. The device is dropped and named in the log instead.
-  const accessories = exposedDevices
+  // The device is kept next to the accessory it produced: a HAP accessory only carries a UUID, and
+  // the log below has to be able to name the devices it leaves out.
+  const builtDevices = exposedDevices
     .map((device) => {
       try {
-        return this.buildAccessory(device);
+        return { device, accessory: this.buildAccessory(device) };
       } catch (e) {
         logger.error(`HomeKit: device ${device.selector} could not be exposed: ${e.message}`);
 
-        return null;
+        return { device, accessory: null };
       }
     })
-    .filter((accessory) => accessory !== null);
+    .filter(({ accessory }) => accessory !== null);
 
   // The alarm is not a device: it lives on the house, so one accessory per house is built here
   // rather than from the device list. Several houses give several alarms in the Home app, each
   // named after its own. They go through the same exposure setting as the devices, so someone who
   // does not use the Gladys alarm can leave it out.
   const exposedAlarms = await this.getExposedAlarms();
-  const alarmAccessories = [];
-  this.alarmAccessories = new Map();
+  const builtAlarms = [];
   exposedAlarms.forEach(({ house }) => {
     try {
-      const alarmAccessory = this.buildAlarmAccessory(house);
-      this.alarmAccessories.set(house.selector, alarmAccessory);
-      alarmAccessories.push(alarmAccessory);
+      builtAlarms.push({ house, accessory: this.buildAlarmAccessory(house) });
     } catch (e) {
       logger.error(`HomeKit: alarm of house ${house.selector} could not be exposed: ${e.message}`);
     }
@@ -74,23 +73,31 @@ async function createBridge() {
   // growing instance with no bridge at all rather than with too many accessories. The extra devices
   // are left out instead, and the log says where to choose which ones are kept. Alarms are counted
   // first: there are one or two of them, and a house alarm is not what someone wants dropped.
-  const roomForDevices = Math.max(0, MAX_BRIDGED_ACCESSORIES - alarmAccessories.length);
+  const roomForDevices = Math.max(0, MAX_BRIDGED_ACCESSORIES - builtAlarms.length);
   // Sliced once more at the end rather than trusting the reservation above: a house count of its own
   // over the limit is absurd, but a guard whose whole purpose is that the bridge always publishes
   // may not have a case where it throws anyway.
-  const bridgedAccessories = [...accessories.slice(0, roomForDevices), ...alarmAccessories].slice(
-    0,
-    MAX_BRIDGED_ACCESSORIES,
-  );
-  const leftOut = accessories.length + alarmAccessories.length - bridgedAccessories.length;
+  const bridged = [...builtDevices.slice(0, roomForDevices), ...builtAlarms].slice(0, MAX_BRIDGED_ACCESSORIES);
+  const bridgedAccessories = bridged.map(({ accessory }) => accessory);
+  const leftOutDevices = builtDevices.slice(roomForDevices);
 
-  if (leftOut > 0) {
+  if (builtDevices.length + builtAlarms.length > bridgedAccessories.length) {
+    // Named, not just counted: `device.get` sorts by name, so the devices left out are the last ones
+    // alphabetically and nothing on screen says which tiles went missing.
+    const names = leftOutDevices.map(({ device }) => device.selector).join(', ');
+
     logger.warn(
-      `HomeKit: ${accessories.length + alarmAccessories.length} accessories to expose, HomeKit allows ` +
-        `${MAX_BRIDGED_ACCESSORIES} on a bridge. ${leftOut} are left out — choose the ones to expose in the ` +
-        `HomeKit settings.`,
+      `HomeKit: ${builtDevices.length + builtAlarms.length} accessories to expose, HomeKit allows ` +
+        `${MAX_BRIDGED_ACCESSORIES} on a bridge. Left out: ${names || 'house alarms'} — choose the ones to ` +
+        `expose in the HomeKit settings.`,
     );
   }
+
+  // Indexed after the capacity selection, so an alarm event never resolves an accessory the bridge
+  // does not carry.
+  this.alarmAccessories = new Map(
+    bridged.filter(({ house }) => house !== undefined).map(({ house, accessory }) => [house.selector, accessory]),
+  );
 
   if (this.bridge) {
     await this.stopBridge();

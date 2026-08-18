@@ -3,6 +3,7 @@ const sinon = require('sinon').createSandbox();
 
 const { stub } = sinon;
 const { createBridge } = require('../../../../services/homekit/lib/createBridge');
+const logger = require('../../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 const LAMP = {
@@ -120,13 +121,25 @@ describe('Create bridge', () => {
       }),
     });
 
-    await homekitHandler.createBridge();
+    const loggerWarn = stub(logger, 'warn');
+
+    try {
+      await homekitHandler.createBridge();
+    } finally {
+      loggerWarn.restore();
+    }
 
     // 149 is what HAP takes, and the house alarm is one of them rather than the one left out
     const bridged = homekitHandler.addBridgedAccessories.args[0][0];
     expect(bridged.length).to.equal(149);
     expect(bridged[bridged.length - 1]).to.eql({ UUID: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55' });
+    expect(homekitHandler.alarmAccessories.get('maison')).to.eql({ UUID: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55' });
     expect(homekitHandler.publish.callCount).to.equal(1);
+    // the devices left out are named, not just counted: a count alone does not say which tiles went
+    expect(loggerWarn.callCount).to.equal(1);
+    expect(loggerWarn.args[0][0]).to.contain('lampe-148');
+    expect(loggerWarn.args[0][0]).to.contain('lampe-199');
+    expect(loggerWarn.args[0][0]).to.not.contain('lampe-147,');
   });
 
   it('should expose the devices when the alarm of a house cannot be built', async () => {
