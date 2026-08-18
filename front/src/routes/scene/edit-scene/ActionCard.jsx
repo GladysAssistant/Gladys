@@ -7,6 +7,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import style from './style.css';
 import { ACTIONS } from '../../../../../server/utils/constants';
 import { ACTION_ICON, ACTION_COLOR, COLOR_CLASS } from './typesCatalog';
+import { getActionGroupType, getDragAndDropType, getGroupPath, getStepAcceptedTypes } from './dragAndDropTypes';
 import { getActionSummary } from './summary';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
@@ -81,23 +82,12 @@ const ACTION_COMPONENTS = {
   [ACTIONS.VARIABLE.SET]: SetVariable
 };
 
-const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
-const CONDITION_CARD_TYPE = 'CONDITION_CARD_TYPE';
-const ACTION_CARD_IF_THEN_ELSE_TYPE = 'ACTION_CARD_IF_THEN_ELSE_TYPE';
-
-const getDragAndDropType = (actionType, path) => {
-  if (path.includes('if')) {
-    return CONDITION_CARD_TYPE;
-  }
-  if (actionType === ACTIONS.CONDITION.IF_THEN_ELSE || actionType === ACTIONS.CONDITION.WHILE) {
-    return ACTION_CARD_IF_THEN_ELSE_TYPE;
-  }
-  return ACTION_CARD_TYPE;
-};
-
 const ActionCard = ({ children, ...props }) => {
   const { path, deleteAction, addAction } = props;
   const ref = useRef(null);
+  const groupPath = getGroupPath(path);
+  // The conditions of an if/while block are a flat list, not a group of actions
+  const isSequentialStep = props.isSequentialStep && !path.includes('if');
 
   // Structural conditions embed their own action groups: they cannot be collapsed
   const isStructuralCondition =
@@ -134,12 +124,21 @@ const ActionCard = ({ children, ...props }) => {
     })
   }));
   const [{ isActive }, drop] = useDrop({
-    accept: getDragAndDropType(props.action.type, props.path),
+    // A sequential step is the only drop target of its group: it accepts every element of the
+    // flow which can be reordered, so that a plain action, an if/then/else or while block and an
+    // "at the same time" group can all be moved before or after it. A card of an "at the same
+    // time" group keeps accepting its own type only: dropping onto it adds a parallel action.
+    accept: isSequentialStep ? getStepAcceptedTypes(groupPath) : getDragAndDropType(props.action.type, props.path),
     collect: monitor => ({
       isActive: monitor.canDrop() && monitor.isOver()
     }),
-    drop(item) {
+    drop(item, monitor) {
       if (!ref.current) {
+        return;
+      }
+      // A whole group was dropped: it is reordered with the group of this step
+      if (monitor.getItemType() === getActionGroupType(groupPath)) {
+        props.moveCardGroup(item.path, groupPath);
         return;
       }
       props.moveCard(item.path, path);

@@ -108,6 +108,93 @@ const replaceVariablePathsInActions = (actions, replacements) => {
   });
 };
 
+// Builds the exact old path -> new path map of the action groups whose path changes when the
+// group at `sourcePath` is moved to `destPath`. A group path ("1", "0.0.then.2") is the prefix of
+// the paths of the variables its actions declare ("1.0"), so it must always be matched on segment
+// boundaries: the group "1" is not the prefix of the variable "10.0".
+// A group can only be dragged onto a target of the same level, so the source and the destination
+// containers are either the same one, or two containers of the same depth which cannot be nested
+// into one another.
+const buildMovedGroupPaths = ({ sourcePath, sourceLength, destPath, destLength }) => {
+  const sourceSegments = sourcePath.split('.');
+  const destSegments = destPath.split('.');
+  const sourceContainer = sourceSegments.slice(0, -1).join('.');
+  const destContainer = destSegments.slice(0, -1).join('.');
+  const sourceIndex = parseInt(sourceSegments[sourceSegments.length - 1], 10);
+  const destIndex = parseInt(destSegments[destSegments.length - 1], 10);
+  const buildPath = (container, index) => (container ? `${container}.${index}` : `${index}`);
+  const replacements = [];
+
+  if (sourceContainer === destContainer) {
+    // The group is reordered among its siblings: it is spliced out of the container, then spliced
+    // back in at the destination index, which shifts every group in between
+    const indexes = [];
+    for (let index = 0; index < sourceLength; index += 1) {
+      indexes.push(index);
+    }
+    indexes.splice(sourceIndex, 1);
+    indexes.splice(destIndex, 0, sourceIndex);
+    indexes.forEach((previousIndex, newIndex) => {
+      if (previousIndex !== newIndex) {
+        replacements.push({
+          prevPath: buildPath(sourceContainer, previousIndex),
+          newPath: buildPath(sourceContainer, newIndex)
+        });
+      }
+    });
+    return replacements;
+  }
+
+  // The group is moved to another container: it takes the destination path, the groups which
+  // followed it in its previous container are shifted down, and the ones which are at or after
+  // the destination index are shifted up
+  replacements.push({ prevPath: sourcePath, newPath: destPath });
+  for (let index = sourceIndex + 1; index < sourceLength; index += 1) {
+    replacements.push({ prevPath: buildPath(sourceContainer, index), newPath: buildPath(sourceContainer, index - 1) });
+  }
+  for (let index = destIndex; index < destLength; index += 1) {
+    replacements.push({ prevPath: buildPath(destContainer, index), newPath: buildPath(destContainer, index + 1) });
+  }
+  return replacements;
+};
+
+// Renames the variables declared by the action groups whose path changed. The new paths are
+// written in a fresh map: renaming in place would drop a variable whose new path is the previous
+// path of another one (e.g. "1.0" renamed to "2.0", then "2.0" renamed to "3.0" and deleted).
+const renameVariablesOfMovedGroups = (variables, replacements) => {
+  const newVariables = {};
+  Object.entries(variables).forEach(([variablePath, value]) => {
+    const replacement = replacements.find(
+      ({ prevPath }) => variablePath === prevPath || variablePath.startsWith(`${prevPath}.`)
+    );
+    const newPath = replacement
+      ? `${replacement.newPath}${variablePath.slice(replacement.prevPath.length)}`
+      : variablePath;
+    newVariables[newPath] = value;
+  });
+  return newVariables;
+};
+
+// Rewrites, in the whole scene, the references to the variables declared by the action groups
+// whose path changed. Moving a group permutes the paths of its siblings, so the replacements
+// cannot be applied in a single pass: rewriting "1" to "0" and then "0" to "1" would rewrite the
+// same reference twice. Every path is first rewritten to a unique temporary marker, then to its
+// final value.
+const replaceMovedGroupPathsInActions = (actions, replacements) => {
+  if (replacements.length === 0) {
+    return;
+  }
+  const temporaryPaths = replacements.map((replacement, index) => `moved-group-${index}`);
+  replaceVariablePathsInActions(
+    actions,
+    replacements.map(({ prevPath }, index) => ({ prevPath, newPath: temporaryPaths[index] }))
+  );
+  replaceVariablePathsInActions(
+    actions,
+    replacements.map(({ newPath }, index) => ({ prevPath: temporaryPaths[index], newPath }))
+  );
+};
+
 // Removes the empty action groups that older versions of the editor could leave
 // in a saved scene (they render as stray "add a step" buttons), and rewrites the
 // variable references of the following groups since their indexes shift down.
@@ -1258,6 +1345,14 @@ class EditScene extends Component {
       // Get the element to move
       const element = source.array[source.index];
 
+      // The paths of the groups whose index changes, computed before the arrays are mutated
+      const movedGroupPaths = buildMovedGroupPaths({
+        sourcePath,
+        sourceLength: source.array.length,
+        destPath,
+        destLength: dest.array.length
+      });
+
       // Create new state by first removing from source
       let newState = { ...this.state };
       source.array.splice(source.index, 1);
@@ -1265,46 +1360,10 @@ class EditScene extends Component {
       // Then insert at destination
       dest.array.splice(dest.index, 0, element);
 
-      // Update variables - handle all affected variables
-      const newVariables = { ...this.state.variables };
-
-      // Iterate through all variables and update their paths
-      Object.entries(this.state.variables).forEach(([path, value]) => {
-        // If the path starts with sourcePath, it means this variable was under the moved group
-        if (path.startsWith(sourcePath)) {
-          // Delete the old path
-          delete newVariables[path];
-          // Create new path by replacing sourcePath with destPath
-          const newPath = path.replace(sourcePath, destPath);
-          newVariables[newPath] = value;
-        } else {
-          // For variables after the source/dest positions, we need to update their indices
-          const sourcePathParts = sourcePath.split('.');
-          const destPathParts = destPath.split('.');
-          const pathParts = path.split('.');
-
-          // Only process if we're in the same parent path
-          if (sourcePathParts.length === pathParts.length) {
-            const sourceIndex = parseInt(sourcePathParts[sourcePathParts.length - 1], 10);
-            const destIndex = parseInt(destPathParts[destPathParts.length - 1], 10);
-            const currentIndex = parseInt(pathParts[pathParts.length - 1], 10);
-
-            // If this path is after source and before dest, decrement index
-            if (currentIndex > sourceIndex && currentIndex <= destIndex) {
-              const newIndex = currentIndex - 1;
-              const newPath = [...pathParts.slice(0, -1), newIndex].join('.');
-              newVariables[newPath] = value;
-              delete newVariables[path];
-            } else if (currentIndex >= destIndex && currentIndex < sourceIndex) {
-              // If this path is before source and after dest, increment index
-              const newIndex = currentIndex + 1;
-              const newPath = [...pathParts.slice(0, -1), newIndex].join('.');
-              newVariables[newPath] = value;
-              delete newVariables[path];
-            }
-          }
-        }
-      });
+      // Rename the variables declared by the groups which moved, and update the references to
+      // those variables in the whole scene, so that it stays coherent
+      const newVariables = renameVariablesOfMovedGroups(this.state.variables, movedGroupPaths);
+      replaceMovedGroupPathsInActions(this.state.scene.actions, movedGroupPaths);
 
       // Set the new state
       await this.setState({

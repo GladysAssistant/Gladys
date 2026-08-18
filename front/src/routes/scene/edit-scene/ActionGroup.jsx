@@ -6,9 +6,8 @@ import cx from 'classnames';
 
 import ActionCard from './ActionCard';
 import EmptyDropZone from './EmptyDropZone';
+import { getActionGroupType } from './dragAndDropTypes';
 import style from './style.css';
-
-const ACTION_GROUP_TYPE_LEVEL = 'ACTION_GROUP_TYPE_LEVEL';
 
 const renderActionCard = (props, action, index) => (
   <ActionCard
@@ -30,17 +29,18 @@ const renderActionCard = (props, action, index) => (
     allActions={props.allActions}
     columnIndex={props.index}
     index={index}
+    isSequentialStep={props.actions.length === 1}
     showParallelLink={props.actions.length === 1}
   />
 );
 
 const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
-  const pathLevel = props.path.split('.').length;
   const { path } = props;
+  const actionGroupType = getActionGroupType(path);
   const ref = useRef(null);
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     // You can only drag & drop an action group of the same level
-    type: `${ACTION_GROUP_TYPE_LEVEL}_${pathLevel}`,
+    type: actionGroupType,
     item: () => {
       return { path };
     },
@@ -50,7 +50,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
   }));
   const [{ isActive }, drop] = useDrop({
     // You can only drag & drop an action group of the same level
-    accept: `${ACTION_GROUP_TYPE_LEVEL}_${pathLevel}`,
+    accept: actionGroupType,
     collect: monitor => ({
       isActive: monitor.canDrop() && monitor.isOver()
     }),
@@ -68,7 +68,12 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
   if (props.actions.length === 0) {
     return (
       <div class="col">
-        <EmptyDropZone moveCard={props.moveCard} path={props.path} onAddStep={props.addActionToColumn} />
+        <EmptyDropZone
+          moveCard={props.moveCard}
+          moveCardGroup={props.moveCardGroup}
+          path={props.path}
+          onAddStep={props.addActionToColumn}
+        />
       </div>
     );
   }
