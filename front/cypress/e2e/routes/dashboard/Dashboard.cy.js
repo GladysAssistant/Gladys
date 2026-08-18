@@ -35,10 +35,10 @@ describe('Dashboard', () => {
     cy.contains('dashboard.editDashboardButton')
       .should('have.class', 'btn-outline-primary')
       .click();
-    cy.contains('dashboard.editDashboardDeleteButton')
+    cy.contains('button', 'dashboard.editDashboardDeleteButton')
       .should('have.class', 'btn-outline-danger')
       .click();
-    cy.contains('dashboard.editDashboardDeleteButton')
+    cy.contains('button', 'dashboard.editDashboardDeleteButton')
       .should('have.class', 'btn-outline-danger')
       .click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
