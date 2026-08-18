@@ -297,6 +297,10 @@ describe('SceneManager', () => {
       tags: [],
     });
     expect(scene).to.have.property('selector');
+    expect(scene.actions[0][0]).to.include({
+      type: ACTIONS.TIME.GET_DATE,
+      precision: 'minute',
+    });
   });
 
   it('should return validation error when time.get-date has an unknown precision', async () => {
