@@ -107,10 +107,24 @@ describe('gladys.start', () => {
     });
     gladys.service.load = fake.resolves(null);
     gladys.service.startAll = fake.returns(pendingStartAll);
+    // scene.init is kept pending too, so the test also proves the
+    // SYSTEM.START trigger waits for the scenes to be loaded: an
+    // implementation emitting it before awaiting scene.init would fail here
+    let releaseSceneInit;
+    const pendingSceneInit = new Promise((resolve) => {
+      releaseSceneInit = resolve;
+    });
     const scenesLoaded = new Promise((resolve) => {
       gladys.scene.init = fake(() => {
         resolve();
-        return Promise.resolve([]);
+        return pendingSceneInit;
+      });
+    });
+    const checkTriggerListener = fake();
+    const triggerEmitted = new Promise((resolve) => {
+      gladys.event.on(EVENTS.TRIGGERS.CHECK, (payload) => {
+        checkTriggerListener(payload);
+        resolve();
       });
     });
     await gladys.start();
@@ -118,6 +132,45 @@ describe('gladys.start', () => {
     releaseStartAll();
     await scenesLoaded;
     assert.calledOnce(gladys.scene.init);
+    assert.notCalled(checkTriggerListener);
+    releaseSceneInit([]);
+    await triggerEmitted;
+    assert.calledOnceWithExactly(checkTriggerListener, { type: EVENTS.SYSTEM.START });
+  });
+  it('should start polling the devices only once the services are started', async function test() {
+    this.timeout(15000);
+    const gladys = Gladys({
+      jwtSecret: 'secret',
+      disableBrainLoading: true,
+      disableSceneLoading: true,
+      disableUserLoading: true,
+      disableRoomLoading: true,
+      disableAreaLoading: true,
+      disableSchedulerLoading: true,
+      disableJobInit: true,
+      disableExternalIntegration: true,
+      disableDuckDbMigration: true,
+      disableGladysUpgradedCheck: true,
+    });
+    // polling a device calls service.device.poll on its integration: the
+    // devices are loaded in RAM early so the API can serve them, but the
+    // polling intervals must only start once the services are started
+    let releaseStartAll;
+    const pendingStartAll = new Promise((resolve) => {
+      releaseStartAll = resolve;
+    });
+    gladys.service.load = fake.resolves(null);
+    gladys.service.startAll = fake.returns(pendingStartAll);
+    gladys.device.init = fake.resolves([]);
+    const pollStarted = new Promise((resolve) => {
+      gladys.device.setupPoll = fake(() => resolve());
+    });
+    await gladys.start();
+    assert.calledOnce(gladys.device.init);
+    assert.notCalled(gladys.device.setupPoll);
+    releaseStartAll();
+    await pollStarted;
+    assert.calledOnce(gladys.device.setupPoll);
   });
   it('should emit the system start trigger even when the scenes fail to load', async function test() {
     this.timeout(15000);

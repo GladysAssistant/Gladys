@@ -190,6 +190,9 @@ function Gladys(params = {}) {
         await service.load(gladys);
       }
       if (!params.disableDeviceLoading) {
+        // only load the devices in RAM here, so the API can serve them as
+        // soon as the server listens: polling is started at the end of the
+        // boot sequence, see below
         await device.init(!params.disableDuckDbMigration);
       }
       if (!params.disableUserLoading) {
@@ -227,6 +230,18 @@ function Gladys(params = {}) {
         } catch (e) {
           // this function must never reject: it is voluntarily not awaited
           logger.warn('Error while finishing the Gladys boot sequence', e);
+        }
+
+        if (!params.disableDeviceLoading) {
+          // Polling is only started once the services are started: polling a
+          // device calls service.device.poll on its integration, which cannot
+          // answer while service.startAll has not reached it — it would only
+          // log errors, or send a command to an external integration
+          // container which is not up yet. On master, device.init ran after
+          // service.startAll, so this keeps the same guarantee. Outside of
+          // the try on purpose: polling must be started even if a service or
+          // the scenes failed above.
+          device.setupPoll();
         }
 
         if (!params.disableGladysUpgradedCheck) {
