@@ -56,3 +56,16 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
 .rangeInput {
   flex: 1;
 }
+
+/* A text feature holds free-form content the device decides: a Zigbee integration can
+   publish a comma-separated list of device names, which offers no space to break on.
+   The card table is laid out automatically, so such a value keeps its column at its
+   full one-line width, the table grows past the card and the other feature values are
+   pushed out of the visible area — the narrower the card, the sooner it happens (a
+   3-column dashboard layout is enough). `anywhere` is the value that also lowers the
+   cell's min-content width, which is what lets the column shrink back into the card;
+   `break-word` wraps but leaves the intrinsic width untouched, so the table would
+   still overflow. Same idiom as the external integration texts and the chart tooltips. */
+.textValue {
+  overflow-wrap: anywhere;
+}

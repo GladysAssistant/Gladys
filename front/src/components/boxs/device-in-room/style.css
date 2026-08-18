@@ -12,3 +12,33 @@
     background-position-x: -200%;
   }
 }
+
+/* The card lays its features out in an automatically sized `table.card-table` inside a
+   `.table-responsive` wrapper. An auto table can never be narrower than the sum of its
+   columns' min-content widths: as soon as that sum exceeds the card, the wrapper starts
+   scrolling horizontally and the values on the right drop out of sight — which is the
+   #2917 symptom (the narrower the card, the sooner it happens). Wrapping a single value
+   is not enough; every column has to stay able to shrink.
+
+   The name cell is the main offender: a label such as
+   "Compteur électrique index - Consommation 30 minutes" holds its column open. `anywhere`
+   is deliberate rather than `break-word` — only `anywhere` also lowers the cell's
+   min-content width, which is what actually lets the column shrink back into the card.
+
+   The rule sits on the cells themselves rather than on the elements they hold: the value
+   column carries free-form text too — the #2917 case is a comma-separated list of Zigbee
+   device names, a single unbreakable token — and Firefox frequently leaves an auto
+   table's min-content width unchanged when `anywhere` is set on a descendant of the cell
+   rather than on the cell. Every column of this table may therefore shrink; the icon cell
+   holds a lone `<i>` and the colour picker row is a single `colspan` cell, so neither is
+   affected. Controls keep their own `min-width`, which this property does not touch. */
+.deviceFeaturesTable td {
+  overflow-wrap: anywhere;
+}
+
+/* Tabler renders every sensor value badge with `white-space: nowrap`, so a label like
+   "Pas de valeur récente" counts as one unbreakable word and sets a floor of its full
+   width on the value column. Letting it wrap drops that floor to its longest word. */
+.deviceFeaturesTable :global(.badge) {
+  white-space: normal;
+}

@@ -49,7 +49,7 @@ const DeviceCard = ({ children, ...props }) => {
       <div>
         <div class="loader py-3" />
         <div class="table-responsive">
-          <table class="table card-table table-vcenter">
+          <table class={`table card-table table-vcenter ${style.deviceFeaturesTable}`}>
             <tbody>
               {loading
                 ? placeholderRows.map((_, index) => (
