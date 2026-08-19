@@ -217,6 +217,17 @@ A `theme` override (`auto`/`light`/`dark`) was considered and **deferred**: the 
 - **Header actions**: round **icon pills with exactly the bar's height, on the bar's own row at every width** — the header never wraps to a second line, the bar is measured with the actions' space reserved and priority+ folds pills into the "…" instead. Labels live in `title` tooltips. On phones only **edit** remains: wall-tablet configuration and fullscreen make no sense there and are hidden below tablet width.
 - Touch swipe between dashboards is a possible later complement to the pills (invisible affordance, needs a strict directional threshold to never steal vertical scroll or widget gestures); it does not replace them.
 
+## H2. App navigation: left sidebar, top of the screen owned by the page
+
+The pill bar (H) and the old horizontal top menu both competed for the top of the screen. Resolution (maintainer's call): **app-level navigation moves into a fixed left sidebar** (`components/header`), and the top of the screen belongs to the current page — on dashboards, to the dashboard switcher pills, which become the de-facto top bar.
+
+- **Desktop (≥ 992px)**: an always-visible 15rem frosted rail — brand at the top, the nav entries (Accueil, Activité, Discussion, Appareils, Intégrations + update badge, Calendrier, Plans, Scènes for admins) as Horizon pill rows (active = white pill, accent icon), and a footer with the dark-mode toggle and the profile row opening a **dropup** menu (profile / settings / help / sign out). There is **no top bar at all**: the dashboard's pill row is the topmost chrome.
+- **Mobile (< 992px)**: a slim fixed frosted top bar (menu button ≥ 44px, brand, dark-mode toggle); the sidebar becomes an **off-canvas drawer** over a backdrop, closed by backdrop tap or automatically on navigation (`handleRoute` already resets the flag).
+- **Accueil is active on every dashboard view**, not only on `/dashboard`: a URL segment after `/dashboard/` that is none of the known app sections is a dashboard selector (`isDashboardView`).
+- **Layout mechanics**: the component toggles `body.gladys-sidebar-nav`; global CSS (`style/index.css`) pads the **outer** `#app > .page` only (the dashboard routes nest a `.page` of their own) and offsets `.fixed-bottom` bars (editor footer). On the three wallpaper pages, `.dashboardBackground` slides back under the rail/top bar (negative margin + equal padding — safe because the image is `background-attachment: fixed`), so the sidebar's backdrop blur frosts the actual scene, not a flat page background.
+- **Dark mode**: light colors only, inverted by the global filter like the glass theme; the only exception re-neutralizes the `.fe` re-inversion inside the sidebar so icons match their labels.
+- Auth pages and fullscreen (wall-panel) mode render no navigation and drop the body class, keeping the full viewport.
+
 ## Phases
 
 Ordering principle, decided with the maintainer: **plumbing first, showcase widgets last.** The layout engine, the density widgets, the asset storage, and the appearance layer are what unlock every future dashboard; the flashy visualizations come once that foundation is in place.

@@ -69,6 +69,25 @@
   min-height: 100vh;
 }
 
+/* With the left navigation rail, the outer .page is padded (style/index.css)
+   but the wallpaper slides back under the rail, so the rail's backdrop blur
+   frosts the actual scene instead of a flat page background. The image is
+   viewport-fixed, so the extension doesn't shift what's visible. */
+@media (min-width: 992px) {
+  :global(body.gladys-sidebar-nav) .dashboardBackground {
+    margin-left: -15rem;
+    padding-left: 15rem;
+  }
+}
+
+/* Same under the mobile top bar: the scene runs behind its frosted glass */
+@media (max-width: 991.98px) {
+  :global(body.gladys-sidebar-nav) .dashboardBackground {
+    margin-top: -3.25rem;
+    padding-top: 3.25rem;
+  }
+}
+
 /* ==================================================================
    "Horizon" glass theme — THE dashboard style, applied unconditionally
    to the whole dashboard page (imposed, not chosen — Gladys ships the

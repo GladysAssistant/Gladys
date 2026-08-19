@@ -6,6 +6,7 @@ import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
 import { USER_ROLE } from '../../../../server/utils/constants';
 import DarkModeToggle from '../darkmode/DarkModeToggle';
+import style from './style.css';
 
 const PAGES_WITHOUT_HEADER = [
   '/login',
@@ -27,6 +28,77 @@ const PAGES_WITHOUT_HEADER = [
   '/locked'
 ];
 
+// /dashboard/<selector> is a dashboard view, but the same position in the URL
+// also carries the app sections below: only a segment that is none of them
+// (nor an admin page) is a dashboard selector
+const NON_DASHBOARD_SECTIONS = [
+  'history',
+  'chat',
+  'devices',
+  'integration',
+  'calendar',
+  'maps',
+  'scene',
+  'profile',
+  'settings',
+  'create'
+];
+
+const isDashboardView = url => {
+  if (url === '/dashboard') {
+    return true;
+  }
+  if (!url.startsWith('/dashboard/')) {
+    return false;
+  }
+  return !NON_DASHBOARD_SECTIONS.includes(url.split('/')[2]);
+};
+
+// App-level navigation, in the left sidebar: the top of the screen stays
+// free for the current page — on dashboards, for the dashboard switcher
+const NAV_ITEMS = [
+  { href: '/dashboard', icon: 'home', labelKey: 'header.home', isActive: isDashboardView },
+  {
+    href: '/dashboard/history',
+    icon: 'clock',
+    labelKey: 'header.history',
+    isActive: url => url === '/dashboard/history'
+  },
+  {
+    href: '/dashboard/chat',
+    icon: 'message-square',
+    labelKey: 'header.chat',
+    isActive: url => url === '/dashboard/chat'
+  },
+  {
+    href: '/dashboard/devices',
+    icon: 'toggle-right',
+    labelKey: 'header.devices',
+    isActive: url => url === '/dashboard/devices'
+  },
+  {
+    href: '/dashboard/integration',
+    icon: 'grid',
+    labelKey: 'header.integrations',
+    isActive: url => url.startsWith('/dashboard/integration'),
+    withUpdatesBadge: true
+  },
+  {
+    href: '/dashboard/calendar',
+    icon: 'calendar',
+    labelKey: 'header.calendar',
+    isActive: url => url === '/dashboard/calendar'
+  },
+  { href: '/dashboard/maps', icon: 'map', labelKey: 'header.maps', isActive: url => url === '/dashboard/maps' },
+  {
+    href: '/dashboard/scene',
+    icon: 'play',
+    labelKey: 'header.scenes',
+    isActive: url => url.startsWith('/dashboard/scene'),
+    adminOnly: true
+  }
+];
+
 class Header extends Component {
   dropdownRef = createRef(null);
 
@@ -35,14 +107,31 @@ class Header extends Component {
       this.props.closeDropDown();
     }
   };
+
+  isHidden = () => isUrlInArray(this.props.currentUrl, PAGES_WITHOUT_HEADER) || this.props.fullScreen;
+
+  // Content offsets (style/index.css) key off this body class so they vanish
+  // together with the sidebar on auth pages and in fullscreen mode
+  syncBodyClass = () => {
+    document.body.classList.toggle('gladys-sidebar-nav', !this.isHidden());
+  };
+
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside);
+    this.syncBodyClass();
   }
+
+  componentDidUpdate() {
+    this.syncBodyClass();
+  }
+
   componentWillUnmount() {
     document.removeEventListener('mousedown', this.handleClickOutside);
+    document.body.classList.remove('gladys-sidebar-nav');
   }
+
   render(props) {
-    if (isUrlInArray(props.currentUrl, PAGES_WITHOUT_HEADER)) {
+    if (this.isHidden()) {
       return null;
     }
     // Adapt forum URL to user language
@@ -50,189 +139,103 @@ class Header extends Component {
     const forumUrl =
       userLanguage === 'fr' ? 'https://community.gladysassistant.com/' : 'https://community.gladysassistant.com/';
 
-    if (props.fullScreen) {
-      return null;
-    }
     return (
       <div>
-        <div class="header py-4">
-          <div class="container">
-            <div class="d-flex">
-              <a class="header-brand" href="/dashboard">
-                <Localizer>
-                  <img
-                    src="/assets/icons/favicon-96x96.png"
-                    class="header-brand-img"
-                    alt={<Text id="global.logoAlt" />}
-                  />
-                </Localizer>
-                <span id="header-title">
-                  <Text id="header.gladysAssistant" />
-                </span>
-              </a>
-              <div class="d-flex order-lg-2 ml-auto">
-                <DarkModeToggle />
-                <div class={cx('dropdown', { show: props.showDropDown })} ref={this.dropdownRef}>
-                  <a onClick={props.toggleDropDown} class="nav-link pr-0 leading-none" data-toggle="dropdown">
-                    <span class="avatar" style={`background-image: url(${props.profilePicture})`} />
-                    <span class="ml-2 d-none d-lg-block">
-                      <span class="text-default">{props.user.firstname}</span>
-                      <small class="text-muted d-block mt-1">
-                        {props.user.role === USER_ROLE.ADMIN && <Text id="profile.adminRole" />}
-                        {props.user.role !== USER_ROLE.ADMIN && <Text id="profile.userRole" />}
-                      </small>
-                    </span>
-                  </a>
-                  <div
-                    class={cx('dropdown-menu', 'dropdown-menu-right', 'dropdown-menu-arrow', {
-                      show: props.showDropDown
-                    })}
-                  >
-                    <a class="dropdown-item" href="/dashboard/profile">
-                      <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />
-                    </a>
-                    {props.user.role === USER_ROLE.ADMIN && (
-                      <a class="dropdown-item" href="/dashboard/settings/house">
-                        <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
-                      </a>
-                    )}
-                    <div class="dropdown-divider" />
-                    <a class="dropdown-item" href={forumUrl} target="_blank" rel="noopener noreferrer">
-                      <i class="dropdown-icon fe fe-help-circle" /> <Text id="header.needHelp" />
-                    </a>
-                    <a class="dropdown-item" href="" onClick={props.logout}>
-                      <i class="dropdown-icon fe fe-log-out" /> <Text id="header.signOut" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <a
-                class="header-toggler d-lg-none ml-3 ml-lg-0"
-                data-toggle="collapse"
-                data-target="#headerMenuCollapse"
-                onClick={props.toggleCollapsedMenu}
-              >
-                <span class="header-toggler-icon" />
-              </a>
-            </div>
-          </div>
+        <div class={cx(style.mobileTopBar, 'd-lg-none')}>
+          <a class={style.mobileToggler} onClick={props.toggleCollapsedMenu} data-cy="sidebar-toggler">
+            <i class="fe fe-menu" />
+          </a>
+          <a class={style.mobileBrand} href="/dashboard">
+            <Localizer>
+              <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt={<Text id="global.logoAlt" />} />
+            </Localizer>
+            <span>
+              <Text id="header.gladysAssistant" />
+            </span>
+          </a>
+          <DarkModeToggle />
         </div>
-        <div
-          class={cx('header', 'collapse', 'd-lg-flex', 'p-0', { show: props.showCollapsedMenu })}
-          id="headerMenuCollapse"
-        >
-          <div class="container">
-            <div class="row align-items-center">
-              <div class="col-lg order-lg-first">
-                <ul class="nav nav-tabs border-0 flex-column flex-lg-row">
-                  <li class="nav-item">
-                    <Link
-                      href="/dashboard"
-                      class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard'
-                      })}
-                    >
-                      <i class="fe fe-home" /> <Text id="header.home" />
-                    </Link>
-                  </li>
-                  <li class="nav-item">
-                    <Link
-                      href="/dashboard/history"
-                      class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard/history'
-                      })}
-                    >
-                      <i class="fe fe-clock" /> <Text id="header.history" />
-                    </Link>
-                  </li>
-                  <li class="nav-item">
-                    <Link
-                      href="/dashboard/chat"
-                      class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard/chat'
-                      })}
-                    >
-                      <i class="fe fe-message-square" /> <Text id="header.chat" />
-                    </Link>
-                  </li>
-                  <li class="nav-item">
-                    <Link
-                      href="/dashboard/devices"
-                      class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard/devices'
-                      })}
-                    >
-                      <i class="fe fe-toggle-right" /> <Text id="header.devices" />
-                    </Link>
-                  </li>
-                  <li class="nav-item">
-                    <Link
-                      href="/dashboard/integration"
-                      class={props.currentUrl.startsWith('/dashboard/integration') ? 'active nav-link' : 'nav-link'}
-                    >
-                      <i class="fe fe-grid" /> <Text id="header.integrations" />
-                      {/* the label carries the count: aria-label replaces the
-                          text content of the badge, so a label without it
-                          would hide the very number the badge exists for */}
-                      {props.externalIntegrationsToUpdate > 0 && (
-                        <Localizer>
-                          <span
-                            class="badge badge-danger ml-2"
-                            title={
-                              <Text
-                                id="header.integrationsToUpdate"
-                                fields={{ count: props.externalIntegrationsToUpdate }}
-                              />
-                            }
-                            aria-label={
-                              <Text
-                                id="header.integrationsToUpdate"
-                                fields={{ count: props.externalIntegrationsToUpdate }}
-                              />
-                            }
-                          >
-                            {props.externalIntegrationsToUpdate}
-                          </span>
-                        </Localizer>
-                      )}
-                    </Link>
-                  </li>
-                  <li class="nav-item">
-                    <Link
-                      href="/dashboard/calendar"
-                      class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard/calendar'
-                      })}
-                    >
-                      <i class="fe fe-calendar" /> <Text id="header.calendar" />
-                    </Link>
-                  </li>
-                  <li class="nav-item">
-                    <Link
-                      activeClassName="active"
-                      href="/dashboard/maps"
-                      class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard/maps'
-                      })}
-                    >
-                      <i class="fe fe-map" /> <Text id="header.maps" />
-                    </Link>
-                  </li>
-                  {props.user.role === USER_ROLE.ADMIN && (
-                    <li class="nav-item">
-                      <Link
-                        href="/dashboard/scene"
-                        class={props.currentUrl.startsWith('/dashboard/scene') ? 'active nav-link' : 'nav-link'}
+        {props.showCollapsedMenu && (
+          <div class={cx(style.sidebarBackdrop, 'd-lg-none')} onClick={props.toggleCollapsedMenu} />
+        )}
+        <nav class={cx(style.sidebar, { [style.sidebarOpen]: props.showCollapsedMenu })} data-cy="sidebar-nav">
+          <a class={style.sidebarBrand} href="/dashboard">
+            <Localizer>
+              <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt={<Text id="global.logoAlt" />} />
+            </Localizer>
+            <span id="header-title">
+              <Text id="header.gladysAssistant" />
+            </span>
+          </a>
+          <ul class={style.sidebarNav}>
+            {NAV_ITEMS.filter(item => !item.adminOnly || props.user.role === USER_ROLE.ADMIN).map(item => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  class={cx(style.navLink, {
+                    [style.navLinkActive]: item.isActive(props.currentUrl)
+                  })}
+                >
+                  <i class={cx(`fe fe-${item.icon}`, style.navIcon)} />
+                  <span>
+                    <Text id={item.labelKey} />
+                  </span>
+                  {item.withUpdatesBadge && props.externalIntegrationsToUpdate > 0 && (
+                    <Localizer>
+                      <span
+                        class={cx('badge badge-danger', style.navBadge)}
+                        title={
+                          <Text
+                            id="header.integrationsToUpdate"
+                            fields={{ count: props.externalIntegrationsToUpdate }}
+                          />
+                        }
+                        aria-label={
+                          <Text
+                            id="header.integrationsToUpdate"
+                            fields={{ count: props.externalIntegrationsToUpdate }}
+                          />
+                        }
                       >
-                        <i class="fe fe-play" /> <Text id="header.scenes" />
-                      </Link>
-                    </li>
+                        {props.externalIntegrationsToUpdate}
+                      </span>
+                    </Localizer>
                   )}
-                </ul>
-              </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div class={cx('dropdown', style.sidebarFooter, { show: props.showDropDown })} ref={this.dropdownRef}>
+            <a onClick={props.toggleDropDown} class={style.profileButton} data-toggle="dropdown">
+              <span class="avatar" style={`background-image: url(${props.profilePicture})`} />
+              <span class={style.profileName}>
+                <span>{props.user.firstname}</span>
+                <small>
+                  {props.user.role === USER_ROLE.ADMIN && <Text id="profile.adminRole" />}
+                  {props.user.role !== USER_ROLE.ADMIN && <Text id="profile.userRole" />}
+                </small>
+              </span>
+            </a>
+            <DarkModeToggle />
+            <div class={cx('dropdown-menu', style.profileMenu, { show: props.showDropDown })}>
+              <a class="dropdown-item" href="/dashboard/profile">
+                <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />
+              </a>
+              {props.user.role === USER_ROLE.ADMIN && (
+                <a class="dropdown-item" href="/dashboard/settings/house">
+                  <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
+                </a>
+              )}
+              <div class="dropdown-divider" />
+              <a class="dropdown-item" href={forumUrl} target="_blank" rel="noopener noreferrer">
+                <i class="dropdown-icon fe fe-help-circle" /> <Text id="header.needHelp" />
+              </a>
+              <a class="dropdown-item" href="" onClick={props.logout}>
+                <i class="dropdown-icon fe fe-log-out" /> <Text id="header.signOut" />
+              </a>
             </div>
           </div>
-        </div>
+        </nav>
       </div>
     );
   }
