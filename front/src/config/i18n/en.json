@@ -595,7 +595,8 @@
         "currentHourState": "Currently",
         "peakHour": "Peak Hour",
         "offPeakHour": "Off-Peak Hour",
-        "dayPeakTitle": "Tempo days"
+        "dayPeakTitle": "Tempo days",
+        "error": "Unable to load EDF Tempo data. Check that the EDF Tempo service is configured."
       },
       "clock": {
         "analog": "Analog",

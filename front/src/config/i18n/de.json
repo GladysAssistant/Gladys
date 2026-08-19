@@ -595,7 +595,8 @@
         "currentHourState": "Aktuell",
         "peakHour": "Hochtarifstunde",
         "offPeakHour": "Niedrigtarifstunde",
-        "dayPeakTitle": "Tempo-Tage"
+        "dayPeakTitle": "Tempo-Tage",
+        "error": "EDF-Tempo-Daten konnten nicht geladen werden. Prüfe, ob der EDF-Tempo-Dienst eingerichtet ist."
       },
       "clock": {
         "analog": "Analog",

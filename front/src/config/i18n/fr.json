@@ -595,7 +595,8 @@
         "currentHourState": "Actuellement",
         "peakHour": "Heure pleine",
         "offPeakHour": "Heure creuse",
-        "dayPeakTitle": "Jours tempo"
+        "dayPeakTitle": "Jours tempo",
+        "error": "Impossible de récupérer les données EDF Tempo. Vérifiez que le service EDF Tempo est bien configuré."
       },
       "clock": {
         "analog": "Analogique",
