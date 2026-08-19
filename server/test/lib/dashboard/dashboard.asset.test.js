@@ -1,6 +1,7 @@
 const { expect, assert } = require('chai');
 
 const Dashboard = require('../../../lib/dashboard');
+const db = require('../../../models');
 
 // 1x1 transparent PNG
 const PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
@@ -52,7 +53,6 @@ describe('dashboard.createAsset', () => {
       position: 0,
       boxes: [[]],
     });
-    const db = require('../../../models');
     const rows = [];
     for (let i = 0; i < 25; i += 1) {
       rows.push({
@@ -81,7 +81,6 @@ describe('dashboard.createAsset', () => {
       content_type: 'image/png',
       data: PNG_BASE64,
     });
-    const db = require('../../../models');
     await dashboard.destroy('0cd30aef-9c4e-4a23-88e3-3547971296e5', dashboardRow.selector);
     const remaining = await db.DashboardAsset.count({ where: { dashboard_id: dashboardRow.id } });
     expect(remaining).to.equal(0);

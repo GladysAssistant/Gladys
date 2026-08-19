@@ -31,7 +31,10 @@ const PEAK_STATE_LABEL_KEYS = {
 
 const PeakState = ({ state }) =>
   PEAK_STATE_STYLE_KEYS[state] ? (
-    <span class={cx(style.dayBadge, style[PEAK_STATE_STYLE_KEYS[state]])}>
+    // dark-mode-no-invert: a Tempo day is named by its color, and the white
+    // day's lightness IS its hue — inversion would turn it into a black pill.
+    // The double inversion keeps the literal blue/white/red, like the stamps.
+    <span class={cx(style.dayBadge, 'dark-mode-no-invert', style[PEAK_STATE_STYLE_KEYS[state]])}>
       <span class={style.dayDot} />
       <Text id={`dashboard.boxes.edfTempo.${PEAK_STATE_LABEL_KEYS[state]}`} />
     </span>

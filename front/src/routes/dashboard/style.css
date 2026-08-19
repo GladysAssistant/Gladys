@@ -429,12 +429,19 @@
   color: var(--gl-ink);
 }
 
-/* solid accent buttons (camera pause…) become ink pills */
+/* solid accent buttons (camera pause…) become ink pills; dark-mode.css puts
+   .btn-primary on the double-invert list, which would keep the authored ink
+   navy on the inverted (dark) card — drop the filter so the pill inverts
+   with the theme into a light pill, like the active dashboard tab */
 :global(.glass-theme .card .btn-primary) {
   background-color: var(--gl-ink);
   border: none;
   border-radius: 999px;
   font-weight: 600;
+}
+
+:global(.dark-mode .glass-theme .card .btn-primary) {
+  filter: none;
 }
 
 /* soft amber pill (alarm arming countdown cancel) */
