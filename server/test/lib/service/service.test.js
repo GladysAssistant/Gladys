@@ -1,7 +1,9 @@
 const { expect, assert } = require('chai');
 
+const db = require('../../../models');
 const Service = require('../../../lib/service');
 const StateManager = require('../../../lib/state');
+const { SERVICE_TYPES } = require('../../../utils/constants');
 
 const services = {
   example: () => ({
@@ -95,6 +97,59 @@ describe('service', () => {
     await service.load(gladys);
     const messageServices = await service.getMessageServices();
     expect(messageServices.map((s) => s.name)).to.not.include('broken-service');
+  });
+  it('should return an external messaging integration even when its isUsed hook fails', async () => {
+    await service.load(gladys);
+    // an installed external integration is configured by definition, and it is
+    // proxied: it must never be filtered out on an isUsed() hook, even when a
+    // proxy object happens to expose one that throws
+    const externalServiceInDb = await db.Service.create({
+      name: 'external-message-service',
+      selector: 'external-message-service',
+      version: '0.1.0',
+      has_message_feature: true,
+      type: SERVICE_TYPES.EXTERNAL,
+      manifest: { name: 'External Messenger' },
+    });
+    const externalService = {
+      isUsed: async () => {
+        throw new Error('an external integration exposes no usable isUsed hook');
+      },
+      message: {
+        sendToUser: async () => Promise.resolve(),
+      },
+    };
+    stateManager.setState('service', 'external-message-service', externalService);
+
+    const messageServices = await service.getMessageServices();
+    const external = messageServices.find((s) => s.name === 'external-message-service');
+    expect(external).to.not.equal(undefined);
+    // the front tells a native channel from an external one on `type`, and
+    // displays the manifest name of an external integration
+    expect(external).to.have.property('type', SERVICE_TYPES.EXTERNAL);
+    expect(external).to.have.property('manifest_name', 'External Messenger');
+    // a core service carries the other side of that contract
+    const coreService = messageServices.find((s) => s.name === 'test-service');
+    expect(coreService).to.have.property('type', SERVICE_TYPES.INTERNAL);
+
+    stateManager.setState('service', 'external-message-service', null);
+    await externalServiceInDb.destroy();
+  });
+  it('should not return a messaging service that is not loaded in the stateManager', async () => {
+    await service.load(gladys);
+    // flagged in database by a previous run, but the service is gone from the
+    // instance: it could not deliver anything
+    const orphanServiceInDb = await db.Service.create({
+      name: 'orphan-message-service',
+      selector: 'orphan-message-service',
+      version: '0.1.0',
+      has_message_feature: true,
+    });
+
+    const messageServices = await service.getMessageServices();
+    expect(messageServices.map((s) => s.name)).to.not.include('orphan-message-service');
+
+    await orphanServiceInDb.destroy();
   });
   it('should return service by name', async () => {
     const testService = await service.getByName('test-service');
