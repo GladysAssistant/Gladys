@@ -75,6 +75,10 @@
    viewport-fixed, so the extension doesn't shift what's visible. */
 @media (min-width: 992px) {
   :global(body.gladys-sidebar-nav) .dashboardBackground {
+    /* the box must GROW by the rail width, not merely shift: width stays
+       100% of the padded page, so without the calc the scene would stop
+       15rem short of the right edge of the viewport */
+    width: calc(100% + 15rem);
     margin-left: -15rem;
     padding-left: 15rem;
   }
@@ -371,6 +375,15 @@
   position: sticky;
   top: 0.75rem;
   z-index: 100;
+  /* only the capsules catch the pointer: the flex-grown gap between the
+     pill track and the action buttons is empty space, and widgets passing
+     under it must stay clickable/tappable */
+  pointer-events: none;
+}
+
+.dashboardHeader .dashboardTabs,
+.dashboardHeader :global(.page-options) {
+  pointer-events: auto;
 }
 
 /* Below the desktop breakpoint the switcher becomes a bottom dock, within
@@ -666,9 +679,24 @@
   font-size: 1rem;
 }
 
-/* pressing a tappable row gives immediate feedback */
-:global(.glass-theme .device-list-table .device-row-tappable:active td) {
-  background-color: var(--gl-icon-tint-bg);
+/* pressing a tappable row gives immediate feedback — the whole-row tap is a
+   coarse-pointer affordance only (the JS handler is gated the same way):
+   with a mouse, the switch itself is a comfortable target and a click on
+   the device name must not be a live write */
+@media (pointer: coarse) {
+  :global(.glass-theme .device-list-table .device-row-tappable:active td) {
+    background-color: var(--gl-icon-tint-bg);
+  }
+}
+
+/* Structural rows are not feature pills: ColorDeviceFeature always renders
+   a second tr with one colspan cell holding the (d-none while closed) color
+   picker — without this reset it paints as an empty ghost pill. */
+:global(.glass-theme .device-list-table tr td[colspan]) {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 /* ============================================================
@@ -678,8 +706,10 @@
    keep the compact mouse sizing.
    ============================================================ */
 
-:global(.device-row-tappable) {
-  cursor: pointer;
+@media (pointer: coarse) {
+  :global(.device-row-tappable) {
+    cursor: pointer;
+  }
 }
 
 @media (pointer: coarse) {

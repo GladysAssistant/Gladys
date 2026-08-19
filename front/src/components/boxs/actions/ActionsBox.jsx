@@ -6,6 +6,7 @@ import get from 'get-value';
 
 import { WEBSOCKET_MESSAGE_TYPES, COVER_STATE } from '../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../utils/consts';
+import { isCoverStateFeature, isToggleableBinaryFeature } from './actionableFeatures';
 import style from './style.css';
 
 const SCENE_START_FEEDBACK_MS = 1200;
@@ -76,9 +77,21 @@ class ActionsBox extends Component {
         await new Promise(resolve => setTimeout(resolve, SCENE_START_FEEDBACK_MS));
       } else if (action.action_type === 'device-feature' && action.device_feature) {
         const feature = get(this.state, `featuresBySelector.${action.device_feature}`);
-        const value = action.value !== undefined ? action.value : feature && feature.last_value === 1 ? 0 : 1;
-        await this.props.httpClient.post(`/api/v1/device_feature/${action.device_feature}/value`, { value });
-        if (feature) {
+        // The contract knows exactly two commands (actionableFeatures.js):
+        // a configured value goes only to a cover-state feature, and a
+        // toggle only flips a loaded, writable binary. Anything else —
+        // including a feature that has not loaded yet — is a no-op, never a
+        // blind write to whatever the box happens to reference.
+        let value = null;
+        if (action.value !== undefined) {
+          if (isCoverStateFeature(feature)) {
+            value = action.value;
+          }
+        } else if (isToggleableBinaryFeature(feature)) {
+          value = feature.last_value === 1 ? 0 : 1;
+        }
+        if (value !== null) {
+          await this.props.httpClient.post(`/api/v1/device_feature/${action.device_feature}/value`, { value });
           this.updateDeviceStateWebsocket({ device_feature_selector: action.device_feature, last_value: value });
         }
       }

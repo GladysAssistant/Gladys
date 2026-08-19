@@ -722,6 +722,7 @@
       "chips": {
         "editDescription": "A compact bar of status chips. Add chips and pick what each one shows.",
         "editChipLabel": "Chip {{index}}",
+        "removeChipButton": "Remove chip {{index}}",
         "editChipTypeLabel": "What does this chip show?",
         "chipTypes": {
           "device-feature": "A device state",
@@ -754,6 +755,7 @@
         "editNameLabel": "Widget name (optional)",
         "editNamePlaceholder": "Shutters, Lights…",
         "actionLabel": "Action {{index}}",
+        "removeActionButton": "Remove action {{index}}",
         "actionTypeLabel": "Action type",
         "actionTypes": {
           "scene": "Start a scene",

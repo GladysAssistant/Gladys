@@ -89,7 +89,13 @@ const NAV_ITEMS = [
     labelKey: 'header.calendar',
     isActive: url => url === '/dashboard/calendar'
   },
-  { href: '/dashboard/maps', icon: 'map', labelKey: 'header.maps', isActive: url => url === '/dashboard/maps' },
+  {
+    href: '/dashboard/maps',
+    icon: 'map',
+    labelKey: 'header.maps',
+    // nested area pages (/maps/area/new, /maps/area/edit/:selector) belong here
+    isActive: url => url.startsWith('/dashboard/maps')
+  },
   {
     href: '/dashboard/scene',
     icon: 'play',
@@ -115,6 +121,14 @@ class Header extends Component {
   syncBodyClass = () => {
     document.body.classList.toggle('gladys-sidebar-nav', !this.isHidden());
   };
+
+  constructor(props) {
+    super(props);
+    // before the first paint, not only in componentDidMount: the content
+    // offsets must be present on the very first frame, or the rail overlays
+    // the page for an instant and then everything jumps into place
+    this.syncBodyClass();
+  }
 
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside);
@@ -142,9 +156,16 @@ class Header extends Component {
     return (
       <div>
         <div class={cx(style.mobileTopBar, 'd-lg-none')}>
-          <a class={style.mobileToggler} onClick={props.toggleCollapsedMenu} data-cy="sidebar-toggler">
+          <button
+            type="button"
+            class={style.mobileToggler}
+            onClick={props.toggleCollapsedMenu}
+            data-cy="sidebar-toggler"
+            aria-expanded={props.showCollapsedMenu ? 'true' : 'false'}
+            aria-controls="sidebar-navigation"
+          >
             <i class="fe fe-menu" />
-          </a>
+          </button>
           <a class={style.mobileBrand} href="/dashboard">
             <Localizer>
               <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt={<Text id="global.logoAlt" />} />
@@ -158,7 +179,11 @@ class Header extends Component {
         {props.showCollapsedMenu && (
           <div class={cx(style.sidebarBackdrop, 'd-lg-none')} onClick={props.toggleCollapsedMenu} />
         )}
-        <nav class={cx(style.sidebar, { [style.sidebarOpen]: props.showCollapsedMenu })} data-cy="sidebar-nav">
+        <nav
+          id="sidebar-navigation"
+          class={cx(style.sidebar, { [style.sidebarOpen]: props.showCollapsedMenu })}
+          data-cy="sidebar-nav"
+        >
           <a class={style.sidebarBrand} href="/dashboard">
             <Localizer>
               <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt={<Text id="global.logoAlt" />} />

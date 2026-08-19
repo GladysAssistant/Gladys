@@ -191,9 +191,16 @@ const startPointerDrag = (event, options) => {
     }
     if (speed !== 0) {
       scrollContainer.scrollTop += speed;
-      // content moved under a still pointer: refresh the hit test
-      updateTarget();
-      updateHover();
+      // content moved under a still pointer: refresh the hit test. A hover
+      // resolver that throws must not leave a live gesture behind (ghost,
+      // listeners and the dragInProgress latch would survive the exception).
+      try {
+        updateTarget();
+        updateHover();
+      } catch (e) {
+        cleanup();
+        throw e;
+      }
     }
     rafId = window.requestAnimationFrame(autoScrollTick);
   };
@@ -304,8 +311,15 @@ const startPointerDrag = (event, options) => {
     }
     moveEvent.preventDefault();
     positionGhost();
-    updateTarget();
-    updateHover();
+    // same contract as the auto-scroll tick: a throwing hover resolver
+    // cancels the gesture instead of bricking every future pointerdown
+    try {
+      updateTarget();
+      updateHover();
+    } catch (e) {
+      cleanup();
+      throw e;
+    }
   };
 
   const onPointerUp = upEvent => {
@@ -315,9 +329,16 @@ const startPointerDrag = (event, options) => {
     if (started) {
       upEvent.preventDefault();
       suppressNextClick();
-      if (activeTarget) {
-        onDrop(activeTarget, { x: lastX, y: lastY });
+      // cleanup ALWAYS runs, even when the drop callback throws: otherwise
+      // dragInProgress stays latched and the editor ignores every later drag
+      try {
+        if (activeTarget) {
+          onDrop(activeTarget, { x: lastX, y: lastY });
+        }
+      } finally {
+        cleanup();
       }
+      return;
     }
     cleanup();
   };

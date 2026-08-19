@@ -176,6 +176,9 @@
   justify-content: center;
   width: 2.75rem;
   height: 2.75rem;
+  border: none;
+  background: transparent;
+  padding: 0;
   border-radius: 12px;
   color: #1c2334;
   font-size: 1.25rem;
@@ -216,7 +219,10 @@
   background-color: rgba(15, 20, 32, 0.42);
 }
 
-/* Below the desktop breakpoint the rail becomes a drawer above the backdrop */
+/* Below the desktop breakpoint the rail becomes a drawer above the backdrop.
+   While closed it is visibility: hidden — a translated-only drawer would stay
+   in the tab order and in the accessibility tree; the delayed visibility flip
+   keeps the slide-out animation visible. */
 @media (max-width: 991.98px) {
   .sidebar {
     width: 16.5rem;
@@ -224,12 +230,15 @@
     z-index: 1055;
     background-color: rgba(255, 255, 255, 0.92);
     transform: translateX(-105%);
-    transition: transform 0.22s ease;
+    visibility: hidden;
+    transition: transform 0.22s ease, visibility 0s linear 0.22s;
     box-shadow: 0 12px 48px rgba(20, 30, 60, 0.3);
   }
 
   .sidebarOpen {
     transform: none;
+    visibility: visible;
+    transition: transform 0.22s ease;
   }
 }
 

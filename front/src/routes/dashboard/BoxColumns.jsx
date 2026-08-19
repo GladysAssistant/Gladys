@@ -8,17 +8,24 @@ const BoxColumns = ({ children, ...props }) => {
   return (
     <div>
       {props.homeDashboard &&
-        props.homeDashboard.boxes.map(section => {
+        props.homeDashboard.boxes.map((section, sectionIndex) => {
           const sectionOffset = columnOffset;
           columnOffset += section.columns.length;
+          // the API accepts an empty columns array: never divide by zero
+          // (col-lg-Infinity) — an empty section just renders nothing
+          const columnCount = Math.max(section.columns.length, 1);
           // 5 doesn't divide the 12-column grid: those columns get a 20% class instead
-          const columnClass = section.columns.length === 5 ? style.colFifth : `col-lg-${12 / section.columns.length}`;
+          const columnClass = columnCount === 5 ? style.colFifth : `col-lg-${12 / columnCount}`;
           return (
-            <div class="d-flex flex-row flex-wrap justify-content-center align-items-stretch">
+            <div
+              key={`section-${sectionIndex}`}
+              class="d-flex flex-row flex-wrap justify-content-center align-items-stretch"
+            >
               {section.columns.map((column, columnIndex) => {
                 const x = sectionOffset + columnIndex;
                 return (
                   <div
+                    key={`column-${x}`}
                     class={cx('d-flex flex-column', columnClass, style.removePadding, {
                       [style.removePaddingFirstCol]: columnIndex === 0,
                       [style.removePaddingLastCol]: columnIndex === section.columns.length - 1

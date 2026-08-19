@@ -722,6 +722,7 @@
       "chips": {
         "editDescription": "Eine kompakte Leiste mit Status-Chips. Chips hinzufügen und auswählen, was jeder anzeigt.",
         "editChipLabel": "Chip {{index}}",
+        "removeChipButton": "Chip {{index}} entfernen",
         "editChipTypeLabel": "Was soll dieser Chip anzeigen?",
         "chipTypes": {
           "device-feature": "Ein Gerätestatus",
@@ -754,6 +755,7 @@
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "Rollläden, Lichter…",
         "actionLabel": "Aktion {{index}}",
+        "removeActionButton": "Aktion {{index}} entfernen",
         "actionTypeLabel": "Aktionstyp",
         "actionTypes": {
           "scene": "Szene starten",

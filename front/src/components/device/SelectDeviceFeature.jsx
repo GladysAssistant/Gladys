@@ -41,6 +41,13 @@ class SelectDeviceFeature extends Component {
               return;
             }
 
+            // optional caller-provided predicate: some pickers only accept a
+            // subset of features (e.g. the quick-actions box only commands
+            // writable binaries and shutter/curtain state)
+            if (typeof this.props.filterFeature === 'function' && !this.props.filterFeature(feature)) {
+              return;
+            }
+
             const label = getDeviceFeatureName(this.props.intl.dictionary, device, feature);
             targetFeatures.push({
               value: feature.selector,

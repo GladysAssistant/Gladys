@@ -30,7 +30,8 @@
 }
 
 .chipLabel {
-  color: #9aa0ac;
+  /* ≥ 4.5:1 on the white chip background (WCAG AA normal text) */
+  color: #667081;
 }
 
 .chipValue {
@@ -48,7 +49,9 @@
 }
 
 :global(.glass-theme) .chipLabel {
-  color: var(--gl-muted);
+  /* darker than --gl-muted: the label is normal-size text and must keep
+     AA contrast on the frosted chip */
+  color: #5b6373;
   font-weight: 500;
 }
 

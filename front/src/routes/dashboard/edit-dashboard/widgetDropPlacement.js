@@ -54,9 +54,14 @@ const computeInsertionIndex = (elements, pointerY) => {
 
 // Viewport rect of the indicator line for inserting at `index` in a vertical
 // stack: centered in the gap between neighbors, spanning the container width.
+// An empty stack anchors the line at the top of the container — callers may
+// reach this directly (dashboard-list reorder), not only through the
+// widget-hover path that filters empty columns out.
 const insertionLineRect = (containerRect, elements, index) => {
   let top;
-  if (index === 0) {
+  if (elements.length === 0) {
+    top = containerRect.top + INDICATOR_GAP_OFFSET_PX;
+  } else if (index === 0) {
     top = elements[0].getBoundingClientRect().top - INDICATOR_GAP_OFFSET_PX;
   } else if (index === elements.length) {
     top = elements[elements.length - 1].getBoundingClientRect().bottom + INDICATOR_GAP_OFFSET_PX;
@@ -77,6 +82,11 @@ const computePlacement = (target, point) => {
     return null;
   }
   const x = Number(columnElement.getAttribute('data-drop-x'));
+  // a missing or malformed attribute must read as "no destination", not as
+  // boxes[NaN] downstream (NaN passes every < / >= bound check)
+  if (!Number.isFinite(x)) {
+    return null;
+  }
   const wrappers = Array.from(columnElement.querySelectorAll('[data-widget-wrapper]'));
   return { columnElement, x, index: computeInsertionIndex(wrappers, point.y), wrappers };
 };

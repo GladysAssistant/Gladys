@@ -5,7 +5,8 @@ import update from 'immutability-helper';
 
 import BaseEditBox from '../baseEditBox';
 import SelectDeviceFeature from '../../device/SelectDeviceFeature';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } from '../../../../../server/utils/constants';
+import { COVER_STATE } from '../../../../../server/utils/constants';
+import { isCoverStateFeature, isActionableFeature } from './actionableFeatures';
 
 const ACTION_TYPES = ['scene', 'device-feature'];
 const COVER_COMMANDS = [COVER_STATE.OPEN, COVER_STATE.STOP, COVER_STATE.CLOSE];
@@ -14,11 +15,6 @@ const COVER_COMMAND_KEYS = {
   [COVER_STATE.STOP]: 'stop',
   [COVER_STATE.CLOSE]: 'close'
 };
-
-const isCoverStateFeature = feature =>
-  feature &&
-  (feature.category === DEVICE_FEATURE_CATEGORIES.SHUTTER || feature.category === DEVICE_FEATURE_CATEGORIES.CURTAIN) &&
-  feature.type === DEVICE_FEATURE_TYPES.SHUTTER.STATE;
 
 class EditActionsBox extends Component {
   updateActions = actions => {
@@ -118,9 +114,15 @@ class EditActionsBox extends Component {
                 <strong>
                   <Text id="dashboard.boxes.actions.actionLabel" fields={{ index: index + 1 }} />
                 </strong>
-                <button class="btn btn-sm btn-outline-danger" onClick={() => this.removeAction(index)}>
-                  <i class="fe fe-trash" />
-                </button>
+                <Localizer>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    onClick={() => this.removeAction(index)}
+                    aria-label={<Text id="dashboard.boxes.actions.removeActionButton" fields={{ index: index + 1 }} />}
+                  >
+                    <i class="fe fe-trash" aria-hidden="true" />
+                  </button>
+                </Localizer>
               </div>
               <div class="form-group">
                 <label class="form-label">
@@ -158,8 +160,12 @@ class EditActionsBox extends Component {
                   <label class="form-label">
                     <Text id="dashboard.boxes.actions.deviceFeatureLabel" />
                   </label>
+                  {/* only what runAction knows how to command: writable
+                      binaries (toggle) and shutter/curtain state (command) */}
                   <SelectDeviceFeature
                     value={action.device_feature}
+                    exclude_read_only_device_features
+                    filterFeature={isActionableFeature}
                     onDeviceFeatureChange={selectedFeature => this.updateActionFeature(index, selectedFeature)}
                   />
                 </div>

@@ -722,6 +722,7 @@
       "chips": {
         "editDescription": "Une barre compacte de pastilles d'état. Ajoutez des pastilles et choisissez ce que chacune affiche.",
         "editChipLabel": "Pastille {{index}}",
+        "removeChipButton": "Supprimer la pastille {{index}}",
         "editChipTypeLabel": "Que doit afficher cette pastille ?",
         "chipTypes": {
           "device-feature": "L'état d'un appareil",
@@ -754,6 +755,7 @@
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Volets, Lumières…",
         "actionLabel": "Action {{index}}",
+        "removeActionButton": "Supprimer l'action {{index}}",
         "actionTypeLabel": "Type d'action",
         "actionTypes": {
           "scene": "Démarrer une scène",

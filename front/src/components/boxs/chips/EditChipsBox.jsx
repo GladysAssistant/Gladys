@@ -64,9 +64,15 @@ class EditChipsBox extends Component {
               <strong>
                 <Text id="dashboard.boxes.chips.editChipLabel" fields={{ index: index + 1 }} />
               </strong>
-              <button class="btn btn-sm btn-outline-danger" onClick={() => this.removeChip(index)}>
-                <i class="fe fe-trash" />
-              </button>
+              <Localizer>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  onClick={() => this.removeChip(index)}
+                  aria-label={<Text id="dashboard.boxes.chips.removeChipButton" fields={{ index: index + 1 }} />}
+                >
+                  <i class="fe fe-trash" aria-hidden="true" />
+                </button>
+              </Localizer>
             </div>
             <div class="form-group">
               <label class="form-label">

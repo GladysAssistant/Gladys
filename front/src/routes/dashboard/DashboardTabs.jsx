@@ -71,6 +71,21 @@ class DashboardTabs extends Component {
     this.setState(prevState => ({ menuOpen: !prevState.menuOpen }));
   };
 
+  // The overflow menu closes like any menu: tap/click anywhere else, or
+  // Escape. Without this, a wall tablet keeps the list open until another
+  // dashboard is picked.
+  handleDocumentPointerDown = event => {
+    if (this.state.menuOpen && this.container && !this.container.contains(event.target)) {
+      this.setState({ menuOpen: false });
+    }
+  };
+
+  handleDocumentKeyDown = event => {
+    if (event.key === 'Escape' && this.state.menuOpen) {
+      this.setState({ menuOpen: false });
+    }
+  };
+
   selectDashboard = () => {
     this.setState({ menuOpen: false });
     if (this.props.redirectToDashboard) {
@@ -81,6 +96,8 @@ class DashboardTabs extends Component {
   componentDidMount() {
     this.measure();
     window.addEventListener('resize', this.scheduleMeasure);
+    document.addEventListener('pointerdown', this.handleDocumentPointerDown);
+    document.addEventListener('keydown', this.handleDocumentKeyDown);
   }
 
   componentDidUpdate(previousProps) {
@@ -99,6 +116,8 @@ class DashboardTabs extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.scheduleMeasure);
+    document.removeEventListener('pointerdown', this.handleDocumentPointerDown);
+    document.removeEventListener('keydown', this.handleDocumentKeyDown);
   }
 
   render({ dashboards, currentDashboard, tabletMode }, { visibleCount, menuOpen }) {
@@ -137,6 +156,8 @@ class DashboardTabs extends Component {
                 [style.dashboardTabActive]: activeCollapsed
               })}
               onClick={this.toggleMenu}
+              aria-haspopup="true"
+              aria-expanded={menuOpen ? 'true' : 'false'}
             >
               {activeCollapsed && activeDashboard ? (
                 <>

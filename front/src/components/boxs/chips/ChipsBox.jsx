@@ -27,9 +27,15 @@ const CHIP_TYPE_DEFAULT_ICONS = {
 
 class ChipsBox extends Component {
   refreshData = async () => {
+    // a refresh for an older chip configuration can resolve after a newer
+    // one: only the latest generation may write its result
+    const generation = (this.refreshGeneration || 0) + 1;
+    this.refreshGeneration = generation;
     const chips = this.props.box.chips || [];
     const chipsData = await Promise.all(chips.map(chip => this.loadChip(chip)));
-    this.setState({ chipsData });
+    if (generation === this.refreshGeneration) {
+      this.setState({ chipsData });
+    }
   };
 
   loadChip = async chip => {
