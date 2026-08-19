@@ -1787,6 +1787,11 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
 // when the category-level list mixes units of different dimensions.
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
+    // The whole BATTERY category is a percent (the charge level), but a charging flag is a
+    // binary and carries no unit: without this entry it would inherit the category percent.
+    [DEVICE_FEATURE_TYPES.BATTERY.CHARGING]: [],
+  },
   [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
     [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: [],
     [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: [],

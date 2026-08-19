@@ -12,6 +12,10 @@ const {
   STATE,
 } = require('../../../utils/constants');
 
+// Sirens naming their melodies "melody_1", "melody_2"… instead of publishing a plain number:
+// the number is the Gladys value, and the expose list says which melodies the siren really has.
+const MELODY_NAME = /^melody_(\d+)$/;
+
 const WRITE_VALUE_MAPPING = {};
 const READ_VALUE_MAPPING = {};
 
@@ -196,14 +200,13 @@ addMapping('alarm_mode', SIREN_MODE.SOUND, 'alarm_sound');
 addMapping('alarm_mode', SIREN_MODE.LIGHT, 'alarm_light');
 addMapping('alarm_mode', SIREN_MODE.SOUND_AND_LIGHT, 'alarm_sound_light');
 
+// A silent siren is published as "no_alarm" by the current zigbee-herdsman-converters and as
+// "normal" by the expose list and the older/external converters: both mean the siren is idle.
+addMapping('alarm_state', SIREN_MODE.IDLE, 'no_alarm');
 addMapping('alarm_state', SIREN_MODE.IDLE, 'normal');
 addMapping('alarm_state', SIREN_MODE.SOUND, 'alarm_sound');
 addMapping('alarm_state', SIREN_MODE.LIGHT, 'alarm_light');
 addMapping('alarm_state', SIREN_MODE.SOUND_AND_LIGHT, 'alarm_sound_light');
-
-addMapping('alarm_melody', 1, 'melody_1');
-addMapping('alarm_melody', 2, 'melody_2');
-addMapping('alarm_melody', 3, 'melody_3');
 
 // Heiman HS1SA-E Lover smoke detector
 // https://www.zigbee2mqtt.io/devices/HS1SA-E_Lover.html
@@ -218,6 +221,11 @@ module.exports = {
       return value;
     }
 
+    if (expose.name === 'alarm_melody') {
+      const melodyName = `melody_${value}`;
+      return (expose.values || []).includes(melodyName) ? melodyName : undefined;
+    }
+
     const relatedValue = (WRITE_VALUE_MAPPING[expose.name] || {})[value];
 
     if (relatedValue && expose.values.includes(relatedValue)) {
@@ -230,6 +238,11 @@ module.exports = {
     if (expose.name === 'melody') {
       const intValue = parseInt(value, 10);
       return intValue;
+    }
+
+    if (expose.name === 'alarm_melody') {
+      const melodyNumber = MELODY_NAME.exec(value);
+      return melodyNumber === null ? undefined : parseInt(melodyNumber[1], 10);
     }
 
     const subValue = value.replace(/^(\d+_)?/, '');
@@ -269,23 +282,23 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
       },
     },
-    // Sirens naming their melodies "melody_1", "melody_2"… instead of publishing plain numbers
+    // Melodies are numbered from 1, and the expose list gives their count: a siren with more
+    // than three melodies is mapped without touching this file.
     alarm_melody: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
         min: 1,
-        max: 3,
-        forceOverride: true,
       },
     },
+    // Sirens do not all offer the same effects, and most cannot be told to stay quiet: the
+    // values the expose advertises become the supported_options of the feature, so the
+    // dashboard and the scenes only offer effects this siren really accepts.
     alarm_mode: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE,
-        min: 0,
-        max: 3,
-        forceOverride: true,
+        buildSupportedOptions: true,
       },
     },
     alarm_state: {

@@ -46,6 +46,9 @@ describe('zigbee2mqtt NEO outdoor siren enumType', () => {
 
   it('should read alarm_state values', () => {
     assert.equal(enumType.readValue(alarmStateExpose, 'normal'), SIREN_MODE.IDLE);
+    // The current zigbee-herdsman-converters publishes the idle state as "no_alarm", while the
+    // expose list and the older converters advertise "normal"
+    assert.equal(enumType.readValue(alarmStateExpose, 'no_alarm'), SIREN_MODE.IDLE);
     assert.equal(enumType.readValue(alarmStateExpose, 'alarm_sound'), SIREN_MODE.SOUND);
     assert.equal(enumType.readValue(alarmStateExpose, 'alarm_light'), SIREN_MODE.LIGHT);
     assert.equal(enumType.readValue(alarmStateExpose, 'alarm_sound_light'), SIREN_MODE.SOUND_AND_LIGHT);
@@ -60,5 +63,20 @@ describe('zigbee2mqtt NEO outdoor siren enumType', () => {
   it('should read alarm_melody values', () => {
     assert.equal(enumType.readValue(alarmMelodyExpose, 'melody_1'), 1);
     assert.equal(enumType.readValue(alarmMelodyExpose, 'melody_3'), 3);
+  });
+
+  it('should not read an alarm_melody value which is not a melody number', () => {
+    assert.equal(enumType.readValue(alarmMelodyExpose, 'unknown'), undefined);
+  });
+
+  it('should not write a melody the siren does not expose', () => {
+    assert.equal(enumType.writeValue(alarmMelodyExpose, 4), undefined);
+  });
+
+  it('should write the melodies of a siren exposing more than three of them', () => {
+    const richMelodyExpose = { ...alarmMelodyExpose, values: [...alarmMelodyExpose.values, 'melody_4'] };
+
+    assert.equal(enumType.writeValue(richMelodyExpose, 4), 'melody_4');
+    assert.equal(enumType.readValue(richMelodyExpose, 'melody_4'), 4);
   });
 });

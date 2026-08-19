@@ -168,11 +168,16 @@
       {
         "read_only": false,
         "has_feedback": true,
-        "min": 0,
+        "min": 1,
         "max": 3,
         "category": "siren",
         "type": "alarm-mode",
         "unit": null,
+        "supported_options": [
+          { "value": 1, "label": "alarm_sound", "sort_order": 0 },
+          { "value": 2, "label": "alarm_light", "sort_order": 1 },
+          { "value": 3, "label": "alarm_sound_light", "sort_order": 2 }
+        ],
         "name": "Alarm mode",
         "external_id": "zigbee2mqtt:NEO siren:siren:alarm-mode:alarm_mode",
         "selector": "zigbee2mqtt-neo-siren-siren-alarm-mode-alarm-mode"
@@ -221,6 +226,11 @@
     {
       "internal": 0,
       "external": "normal",
+      "property": "alarm_state"
+    },
+    {
+      "internal": 0,
+      "external": "no_alarm",
       "property": "alarm_state"
     },
     {
