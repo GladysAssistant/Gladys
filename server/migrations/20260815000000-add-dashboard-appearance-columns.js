@@ -4,10 +4,6 @@ module.exports = {
       type: Sequelize.STRING,
       allowNull: true,
     });
-    await queryInterface.addColumn('t_dashboard', 'background_image', {
-      type: Sequelize.TEXT,
-      allowNull: true,
-    });
   },
   down: async () => {},
 };

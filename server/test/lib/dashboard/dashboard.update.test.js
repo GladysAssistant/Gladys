@@ -78,11 +78,9 @@ describe('dashboard.update', () => {
   it('should update the dashboard appearance', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       icon: 'home',
-      background_image: 'https://example.com/background.jpg',
       width: 'full',
     });
     expect(updatedDashboard).to.have.property('icon', 'home');
-    expect(updatedDashboard).to.have.property('background_image', 'https://example.com/background.jpg');
     expect(updatedDashboard).to.have.property('width', 'full');
   });
 
@@ -112,14 +110,6 @@ describe('dashboard.update', () => {
       boxes: [{ columns: [[], [], [], [], [], []] }],
     });
     expect(updatedDashboard.boxes[0].columns).to.have.lengthOf(6);
-  });
-
-  it('should reject a non-http background image', async () => {
-    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
-      // eslint-disable-next-line no-script-url
-      background_image: 'javascript:alert(1)',
-    });
-    return assert.isRejected(promise);
   });
 
   it('should save a chips box', async () => {

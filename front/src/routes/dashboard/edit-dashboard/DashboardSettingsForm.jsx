@@ -66,8 +66,7 @@ const DashboardSettingsForm = ({ children, ...props }) => (
       <div class={style.sceneGrid} role="radiogroup">
         {DASHBOARD_BACKGROUND_SCENE_LIST.map(scene => {
           const activeScene = props.homeDashboard.background_scene || DASHBOARD_BACKGROUND_SCENE.HORIZON;
-          // a legacy dashboard with a background image URL has no active scene
-          const isActive = !props.homeDashboard.background_image && activeScene === scene;
+          const isActive = activeScene === scene;
           return (
             <Localizer>
               <button
@@ -77,16 +76,12 @@ const DashboardSettingsForm = ({ children, ...props }) => (
                 class={cx(style.sceneThumb, getBackgroundSceneClass(scene), {
                   [style.sceneThumbActive]: isActive
                 })}
-                onClick={() => {
-                  // picking a scene retires the legacy background image URL
-                  if (props.homeDashboard.background_image) {
-                    props.updateCurrentDashboardProperty('background_image', null);
-                  }
+                onClick={() =>
                   props.updateCurrentDashboardProperty(
                     'background_scene',
                     scene === DASHBOARD_BACKGROUND_SCENE.HORIZON ? null : scene
-                  );
-                }}
+                  )
+                }
                 title={<Text id={`dashboard.scenes.${scene}`} />}
                 aria-label={<Text id={`dashboard.scenes.${scene}`} />}
                 data-cy={`scene-${scene}`}

@@ -10,24 +10,12 @@ import style from './style.css';
 import { getBackgroundSceneClass } from './backgroundScenes';
 
 const DashboardPage = ({ children, ...props }) => {
-  const rawBackgroundImage = props.currentDashboard && props.currentDashboard.background_image;
-  // Server-side validation enforces this too; the front never interpolates
-  // anything but an http(s) URL into the CSS url() (JSON quoting escapes
-  // quotes and backslashes, the scheme check closes the rest)
-  const backgroundImage = rawBackgroundImage && /^https?:\/\//.test(rawBackgroundImage) ? rawBackgroundImage : null;
   const backgroundScene = props.currentDashboard && props.currentDashboard.background_scene;
   const fullWidth = props.currentDashboard && props.currentDashboard.width === 'full';
   return (
     <div class="page">
       {/* The Horizon glass theme is THE dashboard style — imposed, not chosen */}
-      <div
-        class={cx('page-main', 'glass-theme', style.dashboardBackground, {
-          // built-in scene, only when no background image is configured
-          // (legacy URL dashboards keep their image)
-          [getBackgroundSceneClass(backgroundScene)]: !backgroundImage
-        })}
-        style={backgroundImage ? `background-image: url(${JSON.stringify(backgroundImage)})` : undefined}
-      >
+      <div class={cx('page-main', 'glass-theme', style.dashboardBackground, getBackgroundSceneClass(backgroundScene))}>
         <div class={props.loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">

@@ -195,17 +195,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.STRING,
       },
-      background_image: {
-        allowNull: true,
-        type: DataTypes.TEXT,
-        validate: {
-          isHttpUrl(value) {
-            if (value !== null && value !== undefined && !/^https?:\/\//.test(value)) {
-              throw new Error('background_image must be an http(s) URL');
-            }
-          },
-        },
-      },
       background_scene: {
         allowNull: true,
         type: DataTypes.STRING,
