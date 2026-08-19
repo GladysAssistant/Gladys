@@ -1,5 +1,21 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    // Per-dashboard appearance: tab-bar icon, built-in background scene,
+    // container width
+    await queryInterface.addColumn('t_dashboard', 'icon', {
+      type: Sequelize.STRING,
+      allowNull: true,
+    });
+    await queryInterface.addColumn('t_dashboard', 'background_scene', {
+      type: Sequelize.STRING,
+      allowNull: true,
+    });
+    await queryInterface.addColumn('t_dashboard', 'width', {
+      type: Sequelize.STRING,
+      allowNull: true,
+    });
+
+    // Per-dashboard uploaded assets (house-view custom illustrations)
     await queryInterface.createTable('t_dashboard_asset', {
       id: {
         allowNull: false,
@@ -36,5 +52,5 @@ module.exports = {
 
     await queryInterface.addIndex('t_dashboard_asset', ['dashboard_id']);
   },
-  down: async (queryInterface) => queryInterface.dropTable('t_dashboard_asset'),
+  down: async () => {},
 };
