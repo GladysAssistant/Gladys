@@ -15,6 +15,11 @@ const KEEP_ORIGINAL_MAX_BYTES = 2 * 1024 * 1024;
 // server-side bound on the base64 payload (dashboard.createAsset)
 const SERVER_MAX_BASE64_LENGTH = 4 * 1024 * 1024;
 
+// the server allowlist: any other source type (iOS HEIC, non-standard
+// image/jpg, empty type…) must go through the canvas re-encode — the
+// passthrough would 400 on upload
+const PASSTHROUGH_CONTENT_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+
 // 0.9 is visually transparent for both WebP and JPEG at these resolutions
 const ENCODE_QUALITY = 0.9;
 
@@ -98,8 +103,13 @@ export async function prepareImageUpload(file) {
   const sourceHeight = image.naturalHeight || image.height;
   const longEdge = Math.max(sourceWidth, sourceHeight);
 
-  // small enough already: the untouched original is the best quality
-  if (longEdge <= MAX_UPLOAD_DIMENSION && file.size <= KEEP_ORIGINAL_MAX_BYTES) {
+  // small enough already, in a type the server accepts: the untouched
+  // original is the best quality
+  if (
+    longEdge <= MAX_UPLOAD_DIMENSION &&
+    file.size <= KEEP_ORIGINAL_MAX_BYTES &&
+    PASSTHROUGH_CONTENT_TYPES.includes(file.type)
+  ) {
     return { contentType: file.type, data: await readFileAsBase64(file) };
   }
 
@@ -114,8 +124,10 @@ export async function prepareImageUpload(file) {
     const canvas = drawScaled(image, Math.round(sourceWidth * scale), Math.round(sourceHeight * scale));
     data = canvas.toDataURL(contentType, ENCODE_QUALITY).split(',')[1];
     if (data.length <= SERVER_MAX_BASE64_LENGTH) {
-      break;
+      return { contentType, data };
     }
   }
-  return { contentType, data };
+  // even the smallest step exceeds the server bound (pathological source):
+  // fail here so the upload error UI shows, instead of a doomed request
+  throw new Error('IMAGE_TOO_LARGE');
 }
