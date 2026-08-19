@@ -8,33 +8,8 @@ import BaseEditBox from '../baseEditBox';
 import SelectDeviceFeature from '../../device/SelectDeviceFeature';
 import { HOUSE_VIEW_GALLERY } from './gallery';
 import { resolveHouseViewImage } from './HouseViewBox';
+import { prepareImageUpload } from '../../../utils/downscaleImage';
 import style from './style.css';
-
-const MAX_UPLOAD_DIMENSION = 1600;
-
-// Downscale and re-encode the uploaded image in a canvas so the payload
-// stays well under the server bound whatever the source photo size
-const fileToResizedBase64 = file =>
-  new Promise((resolve, reject) => {
-    const objectUrl = URL.createObjectURL(file);
-    const image = new Image();
-    image.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      const scale = Math.min(1, MAX_UPLOAD_DIMENSION / Math.max(image.width, image.height));
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(image.width * scale);
-      canvas.height = Math.round(image.height * scale);
-      canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-      const contentType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-      const dataUrl = canvas.toDataURL(contentType, 0.85);
-      resolve({ contentType, data: dataUrl.split(',')[1] });
-    };
-    image.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error('INVALID_IMAGE'));
-    };
-    image.src = objectUrl;
-  });
 
 class EditHouseViewBox extends Component {
   updateName = e => {
@@ -52,7 +27,7 @@ class EditHouseViewBox extends Component {
     }
     this.setState({ uploading: true, uploadError: false });
     try {
-      const { contentType, data } = await fileToResizedBase64(file);
+      const { contentType, data } = await prepareImageUpload(file);
       const { id } = await this.props.httpClient.post(`/api/v1/dashboard_asset/${this.props.homeDashboard.selector}`, {
         content_type: contentType,
         data
