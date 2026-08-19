@@ -127,12 +127,76 @@
 /* Default scene when the dashboard has no background image of its own:
    soft radial glows over a diagonal gradient — pure CSS, one click.
    An inline background-image set from the dashboard config wins over this. */
+/* Scene glows are sized in % (not px) so a scene renders the same
+   composition at every element size: the full dashboard, a phone screen,
+   and the picker thumbnails that preview it in the settings panel. */
 .glassScene {
-  background-image: radial-gradient(1100px 700px at 12% -10%, rgba(126, 166, 233, 0.55), transparent 60%),
-    radial-gradient(900px 650px at 95% 8%, rgba(244, 190, 148, 0.5), transparent 55%),
-    radial-gradient(1000px 800px at 85% 100%, rgba(187, 160, 228, 0.42), transparent 60%),
-    radial-gradient(900px 700px at 10% 105%, rgba(150, 212, 195, 0.4), transparent 55%),
+  background-image: radial-gradient(76% 78% at 12% -10%, rgba(126, 166, 233, 0.55), transparent 60%),
+    radial-gradient(62% 72% at 95% 8%, rgba(244, 190, 148, 0.5), transparent 55%),
+    radial-gradient(69% 89% at 85% 100%, rgba(187, 160, 228, 0.42), transparent 60%),
+    radial-gradient(62% 78% at 10% 105%, rgba(150, 212, 195, 0.4), transparent 55%),
     linear-gradient(160deg, #eef3fb 0%, #eeeaf7 48%, #f7efe6 100%);
+}
+
+/* The scene catalog: hand-composed CSS variants of the default scene, picked
+   per dashboard (background_scene). No external images — they weigh nothing,
+   stay crisp at any resolution, work offline and invert cleanly in dark mode.
+   Authored light only, like the whole theme. */
+
+.sceneAurora {
+  background-image: radial-gradient(76% 78% at 8% -12%, rgba(112, 205, 178, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 92% 4%, rgba(124, 189, 233, 0.5), transparent 55%),
+    radial-gradient(69% 89% at 88% 102%, rgba(150, 160, 230, 0.38), transparent 60%),
+    radial-gradient(62% 78% at 6% 108%, rgba(140, 220, 210, 0.4), transparent 55%),
+    linear-gradient(160deg, #eafaf3 0%, #e9f2fb 52%, #eeecf9 100%);
+}
+
+.sceneDusk {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(246, 173, 128, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(240, 148, 150, 0.45), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(200, 140, 200, 0.35), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(248, 205, 150, 0.42), transparent 55%),
+    linear-gradient(160deg, #fdf2e6 0%, #fae9ec 50%, #f3e9f6 100%);
+}
+
+.sceneForest {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(150, 210, 150, 0.48), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(200, 224, 140, 0.42), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(120, 195, 170, 0.36), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(190, 220, 165, 0.4), transparent 55%),
+    linear-gradient(160deg, #edf7ec 0%, #f0f7e9 52%, #e9f4ef 100%);
+}
+
+.sceneLagoon {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(120, 214, 208, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(126, 186, 240, 0.46), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(110, 200, 220, 0.36), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(150, 220, 235, 0.4), transparent 55%),
+    linear-gradient(160deg, #e7f8f7 0%, #e9f1fb 52%, #eaf6f9 100%);
+}
+
+.sceneSand {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(236, 205, 156, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(232, 190, 160, 0.44), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(220, 190, 150, 0.34), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(240, 220, 180, 0.42), transparent 55%),
+    linear-gradient(160deg, #fbf5ea 0%, #f7efe3 52%, #f4ecdf 100%);
+}
+
+.sceneLavender {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(190, 165, 235, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(232, 165, 210, 0.44), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(160, 150, 230, 0.36), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(225, 185, 235, 0.4), transparent 55%),
+    linear-gradient(160deg, #f2eefb 0%, #f8ecf5 52%, #efeafa 100%);
+}
+
+/* the quiet one: near-neutral blue-grays for people who want calm */
+.sceneMist {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(170, 190, 215, 0.4), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(195, 205, 220, 0.36), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(175, 190, 205, 0.3), transparent 60%),
+    linear-gradient(160deg, #f0f3f7 0%, #eef1f5 52%, #ecf0f4 100%);
 }
 
 /* Cards become deep glass. No overflow: hidden — it would clip house-view

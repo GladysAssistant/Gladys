@@ -93,6 +93,20 @@ describe('dashboard.update', () => {
     return assert.isRejected(promise);
   });
 
+  it('should update the dashboard background scene', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      background_scene: 'dusk',
+    });
+    expect(updatedDashboard).to.have.property('background_scene', 'dusk');
+  });
+
+  it('should reject an unknown background scene', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      background_scene: 'vaporwave',
+    });
+    return assert.isRejected(promise);
+  });
+
   it('should save a section with 6 columns', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [{ columns: [[], [], [], [], [], []] }],
@@ -102,6 +116,7 @@ describe('dashboard.update', () => {
 
   it('should reject a non-http background image', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      // eslint-disable-next-line no-script-url
       background_image: 'javascript:alert(1)',
     });
     return assert.isRejected(promise);

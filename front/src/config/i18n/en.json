@@ -792,8 +792,18 @@
         "error": "The image could not be loaded."
       }
     },
-    "editDashboardBackgroundImageLabel": "Background image (optional)",
-    "editDashboardBackgroundImagePlaceholder": "https://... URL of an image",
+    "editDashboardBackgroundLabel": "Background mood",
+    "editDashboardBackgroundDescription": "Built-in scenes, lightweight and always available, even without internet.",
+    "scenes": {
+      "horizon": "Horizon",
+      "aurora": "Aurora",
+      "dusk": "Dusk",
+      "forest": "Forest",
+      "lagoon": "Lagoon",
+      "sand": "Sand",
+      "lavender": "Lavender",
+      "mist": "Mist"
+    },
     "editDashboardIconLabel": "Icon (optional)",
     "editDashboardIconDescription": "Shown in the dashboard tab bar in tablet mode.",
     "editDashboardWidthLabel": "Dashboard width",

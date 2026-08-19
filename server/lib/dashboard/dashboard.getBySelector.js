@@ -22,6 +22,7 @@ async function getBySelector(userId, selector) {
       'user_id',
       'icon',
       'background_image',
+      'background_scene',
       'width',
       'created_at',
       'updated_at',

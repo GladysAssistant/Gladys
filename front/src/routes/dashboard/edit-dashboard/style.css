@@ -630,6 +630,41 @@
   color: var(--gl-ink);
 }
 
+/* ============================================================
+   Background scene picker: each thumbnail previews its own CSS
+   scene (the buttons carry the scene classes directly), the
+   active one gets the accent ring — same grammar as the icon
+   picker below it.
+   ============================================================ */
+
+.sceneGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.sceneThumb {
+  aspect-ratio: 16 / 10;
+  /* browsers without aspect-ratio still get a clickable swatch */
+  min-height: 2.75rem;
+  border: 2px solid rgba(28, 35, 52, 0.12);
+  border-radius: 10px;
+  padding: 0;
+  cursor: pointer;
+  background-color: #fff;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.sceneThumb:hover {
+  transform: scale(1.04);
+  border-color: rgba(28, 35, 52, 0.3);
+}
+
+.sceneThumbActive {
+  border-color: var(--gl-accent, #3d6df0);
+  box-shadow: 0 0 0 2px rgba(61, 109, 240, 0.25);
+}
+
 /* Touch targets: fingers need ~44px (Apple HIG). pointer: coarse means the
    PRIMARY pointer is a finger (tablets, phones) — hybrid laptops with a
    touchscreen but a trackpad keep the compact mouse sizing. */

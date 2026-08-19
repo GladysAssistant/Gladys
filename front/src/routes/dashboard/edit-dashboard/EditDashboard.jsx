@@ -7,11 +7,20 @@ import EditBoxColumns from './EditBoxColumns';
 import style from '../style.css';
 import editStyle from './style.css';
 import get from 'get-value';
+import { getBackgroundSceneClass } from '../backgroundScenes';
 
 const EditDashboard = ({ children, ...props }) => (
   <div class="page">
-    {/* The editor lives on the same Horizon glass surface as the dashboard */}
-    <div class={cx('page-main', 'glass-theme', style.dashboardBackground, style.glassScene)}>
+    {/* The editor lives on the same Horizon glass surface as the dashboard,
+        with a live preview of the scene being edited */}
+    <div
+      class={cx(
+        'page-main',
+        'glass-theme',
+        style.dashboardBackground,
+        getBackgroundSceneClass(get(props, 'currentDashboard.background_scene'))
+      )}
+    >
       <div class={props.loading ? 'dimmer active' : 'dimmer'}>
         <div class="loader" />
         <div class="dimmer-content">

@@ -6,6 +6,7 @@ const {
   DASHBOARD_TYPE_LIST,
   DASHBOARD_VISIBILITY_LIST,
   DASHBOARD_WIDTH_LIST,
+  DASHBOARD_BACKGROUND_SCENE_LIST,
 } = require('../utils/constants');
 
 const MAX_COLUMNS_PER_SECTION = 6;
@@ -203,6 +204,13 @@ module.exports = (sequelize, DataTypes) => {
               throw new Error('background_image must be an http(s) URL');
             }
           },
+        },
+      },
+      background_scene: {
+        allowNull: true,
+        type: DataTypes.STRING,
+        validate: {
+          isIn: [DASHBOARD_BACKGROUND_SCENE_LIST],
         },
       },
       width: {

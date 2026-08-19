@@ -1,7 +1,15 @@
 import { Text, Localizer } from 'preact-i18n';
+import cx from 'classnames';
 
 import IconSelector from '../../../components/scene/IconSelector';
-import { DASHBOARD_VISIBILITY_LIST, DASHBOARD_WIDTH_LIST } from '../../../../../server/utils/constants';
+import {
+  DASHBOARD_VISIBILITY_LIST,
+  DASHBOARD_WIDTH_LIST,
+  DASHBOARD_BACKGROUND_SCENE,
+  DASHBOARD_BACKGROUND_SCENE_LIST
+} from '../../../../../server/utils/constants';
+import { getBackgroundSceneClass } from '../backgroundScenes';
+import style from './style.css';
 
 // Dashboard-level settings (name, visibility, background, width, icon),
 // hosted in the edit panel so the canvas stays free of forms
@@ -50,17 +58,43 @@ const DashboardSettingsForm = ({ children, ...props }) => (
     </div>
     <div class="form-group">
       <label class="form-label">
-        <Text id="dashboard.editDashboardBackgroundImageLabel" />
+        <Text id="dashboard.editDashboardBackgroundLabel" />
       </label>
-      <Localizer>
-        <input
-          type="text"
-          class="form-control"
-          placeholder={<Text id="dashboard.editDashboardBackgroundImagePlaceholder" />}
-          value={props.homeDashboard.background_image}
-          onInput={e => props.updateCurrentDashboardProperty('background_image', e.target.value || null)}
-        />
-      </Localizer>
+      <small class="d-block mb-2">
+        <Text id="dashboard.editDashboardBackgroundDescription" />
+      </small>
+      <div class={style.sceneGrid} role="radiogroup">
+        {DASHBOARD_BACKGROUND_SCENE_LIST.map(scene => {
+          const activeScene = props.homeDashboard.background_scene || DASHBOARD_BACKGROUND_SCENE.HORIZON;
+          // a legacy dashboard with a background image URL has no active scene
+          const isActive = !props.homeDashboard.background_image && activeScene === scene;
+          return (
+            <Localizer>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={isActive}
+                class={cx(style.sceneThumb, getBackgroundSceneClass(scene), {
+                  [style.sceneThumbActive]: isActive
+                })}
+                onClick={() => {
+                  // picking a scene retires the legacy background image URL
+                  if (props.homeDashboard.background_image) {
+                    props.updateCurrentDashboardProperty('background_image', null);
+                  }
+                  props.updateCurrentDashboardProperty(
+                    'background_scene',
+                    scene === DASHBOARD_BACKGROUND_SCENE.HORIZON ? null : scene
+                  );
+                }}
+                title={<Text id={`dashboard.scenes.${scene}`} />}
+                aria-label={<Text id={`dashboard.scenes.${scene}`} />}
+                data-cy={`scene-${scene}`}
+              />
+            </Localizer>
+          );
+        })}
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">

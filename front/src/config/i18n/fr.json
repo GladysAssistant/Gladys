@@ -792,8 +792,18 @@
         "error": "L'image n'a pas pu être chargée."
       }
     },
-    "editDashboardBackgroundImageLabel": "Image de fond (optionnel)",
-    "editDashboardBackgroundImagePlaceholder": "https://... URL d'une image",
+    "editDashboardBackgroundLabel": "Ambiance de fond",
+    "editDashboardBackgroundDescription": "Des scènes intégrées, légères et toujours disponibles, même sans internet.",
+    "scenes": {
+      "horizon": "Horizon",
+      "aurora": "Aurore",
+      "dusk": "Crépuscule",
+      "forest": "Forêt",
+      "lagoon": "Lagon",
+      "sand": "Sable",
+      "lavender": "Lavande",
+      "mist": "Brume"
+    },
     "editDashboardIconLabel": "Icône (optionnel)",
     "editDashboardIconDescription": "Affichée dans la barre d'onglets des tableaux de bord en mode tablette.",
     "editDashboardWidthLabel": "Largeur du tableau de bord",

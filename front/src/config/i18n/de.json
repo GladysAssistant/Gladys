@@ -792,8 +792,18 @@
         "error": "Das Bild konnte nicht geladen werden."
       }
     },
-    "editDashboardBackgroundImageLabel": "Hintergrundbild (optional)",
-    "editDashboardBackgroundImagePlaceholder": "https://... URL eines Bildes",
+    "editDashboardBackgroundLabel": "Hintergrundstimmung",
+    "editDashboardBackgroundDescription": "Integrierte Szenen, leichtgewichtig und immer verfügbar, auch ohne Internet.",
+    "scenes": {
+      "horizon": "Horizont",
+      "aurora": "Aurora",
+      "dusk": "Abenddämmerung",
+      "forest": "Wald",
+      "lagoon": "Lagune",
+      "sand": "Sand",
+      "lavender": "Lavendel",
+      "mist": "Nebel"
+    },
     "editDashboardIconLabel": "Symbol (optional)",
     "editDashboardIconDescription": "Wird im Tablet-Modus in der Dashboard-Tab-Leiste angezeigt.",
     "editDashboardWidthLabel": "Dashboard-Breite",
