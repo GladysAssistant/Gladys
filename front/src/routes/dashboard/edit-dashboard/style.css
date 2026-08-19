@@ -551,6 +551,85 @@
   }
 }
 
+/* ============================================================
+   Horizon chrome for the editor's own controls.
+   Colors are light-only: dark mode is the app-wide inversion filter
+   (the solid ink CTA inverts into the light pill of the dark theme,
+   exactly like the active dashboard tab).
+   ============================================================ */
+
+/* "Dashboard settings", top right: a quiet frosted capsule like the
+   viewer's header action pills — a utility, not a call to action */
+:global(.glass-theme) .editorTopBar :global(.btn-outline-primary) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--gl-ink);
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.glass-theme) .editorTopBar :global(.btn-outline-primary:hover) {
+  background-color: #fff;
+  color: var(--gl-ink);
+  border-color: var(--gl-border);
+}
+
+:global(.glass-theme) .editorTopBar :global(.btn-outline-primary .fe) {
+  color: var(--gl-accent);
+}
+
+/* The action footer becomes a frosted bar (same recipe as the nav rail)… */
+:global(.glass-theme) .editActionsFooter {
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+/* …and its buttons become pills. Hierarchy: solid ink CTA (Terminer /
+   Sauvegarder), soft red danger (the stamp family), quiet neutral cancel. */
+:global(.glass-theme) .editActionsFooter :global(.btn) {
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-primary) {
+  background-color: var(--gl-ink);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-primary:hover) {
+  background-color: #2a3550;
+  color: #fff;
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-danger) {
+  background-color: #fbe3de;
+  color: #d4593f;
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-danger:hover) {
+  background-color: #f6d2ca;
+  color: #c24a33;
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-secondary) {
+  background-color: rgba(28, 35, 52, 0.07);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-secondary:hover) {
+  background-color: rgba(28, 35, 52, 0.13);
+  color: var(--gl-ink);
+}
+
 /* Touch targets: fingers need ~44px (Apple HIG). pointer: coarse means the
    PRIMARY pointer is a finger (tablets, phones) — hybrid laptops with a
    touchscreen but a trackpad keep the compact mouse sizing. */
