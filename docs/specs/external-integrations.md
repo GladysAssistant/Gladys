@@ -326,11 +326,12 @@ Problem (established in B.2): bridge containers **never** receive the LAN's broa
 "network_discovery": [
   { "type": "udp-broadcast", "ports": [6666, 6667, 7000] },
   { "type": "udp-active-broadcast", "ports": [9999, 20002] },
-  { "type": "mdns", "service": "_hue._tcp" }
+  { "type": "mdns", "service": "_airplay._tcp" },
+  { "type": "mdns", "service": "_companion-link._tcp" }
 ]
 ```
 
-V1 types for the field (extensible by schema version): `udp-broadcast` (passive listening on the declared ports, max 5 ports), `udp-active-broadcast` (request/response: emission of an integration-provided payload as a broadcast on the declared ports, max 5 ports, then collection of the unicast responses — the TP-Link case), `mdns` (browse of a declared service type), `ssdp` (M-SEARCH on a declared `st`). Displayed on the install screen ("this integration will be able to listen to UDP network announcements on ports 6666–6667", "will be able to emit a discovery request as a UDP broadcast on port 9999"); never arbitrary capture (no pcap, no undeclared port).
+V1 types for the field (extensible by schema version): `udp-broadcast` (passive listening on the declared ports, max 5 ports), `udp-active-broadcast` (request/response: emission of an integration-provided payload as a broadcast on the declared ports, max 5 ports, then collection of the unicast responses — the TP-Link case), `mdns` (each entry declares one service type; a scan browses all declared mDNS service types), `ssdp` (M-SEARCH on a declared `st`). Displayed on the install screen ("this integration will be able to listen to UDP network announcements on ports 6666–6667", "will be able to emit a discovery request as a UDP broadcast on port 9999"); never arbitrary capture (no pcap, no undeclared port).
 
 **Host API (phase 2)** — on-demand scan, synchronous and bounded:
 - `POST /api/integration/v1/network_discovery/scan` `{ "type": "udp-broadcast", "timeout_seconds": 10 }` (1–30 s, `403` if the type/ports are not declared in the manifest) → `200` with the **raw** results: `udp-broadcast` → `[ { "source_ip", "source_port", "payload_base64" } ]`; `mdns` → `[ { "name", "host", "addresses", "port", "txt" } ]`; `ssdp` → raw headers per responder. An `mdns` request browses **all** mDNS services declared by the integration and merges their results, so multi-service protocols do not need a second API selector or SDK capability.
