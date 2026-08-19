@@ -373,11 +373,28 @@
   z-index: 100;
 }
 
-/* Below the desktop breakpoint the fixed mobile top bar owns the first
-   3.25rem of the viewport: stick right under it */
+/* Below the desktop breakpoint the switcher becomes a bottom dock, within
+   thumb reach (iOS style: the reachable edge is the bottom one). fixed, not
+   sticky: the header sits at the top of the flow, sticky-bottom would never
+   engage. Content gets bottom padding so the last row scrolls clear of it. */
 @media (max-width: 991.98px) {
-  :global(body.gladys-sidebar-nav) .dashboardHeader {
-    top: calc(3.25rem + 0.5rem);
+  .dashboardHeader {
+    position: fixed;
+    top: auto;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    margin: 0;
+  }
+
+  .dashboardBackground {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* the "…" menu opens upward from the dock */
+  .dashboardTabsMenu {
+    top: auto;
+    bottom: calc(100% + 8px);
   }
 }
 
@@ -775,4 +792,19 @@
   background-color: #fff;
   font-weight: 600;
   color: var(--gl-ink);
+}
+
+/* Mobile bottom dock (see .dashboardHeader above): the "…" menu opens from
+   inside the dock track's own backdrop root, where a nested backdrop-filter
+   makes Chrome misrender the panel (content bleeding through it). Solid
+   background, no blur — the inversion filter still derives the dark variant.
+   Kept at the END of the file: it must out-cascade the base glass menu rule
+   and the dark-mode !important one. */
+@media (max-width: 991.98px) {
+  :global(.glass-theme) .dashboardTabsMenu,
+  :global(.dark-mode .glass-theme) .dashboardTabsMenu {
+    background-color: #fff !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
