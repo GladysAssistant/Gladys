@@ -365,6 +365,20 @@
    space back */
 .dashboardHeader {
   flex-wrap: nowrap;
+  /* The switcher stays pinned while the dashboard scrolls under it — the
+     pill track's backdrop blur frosts the passing cards. Kept floating a
+     small gap from the edge so it reads as a hovering capsule, not a bar. */
+  position: sticky;
+  top: 0.75rem;
+  z-index: 100;
+}
+
+/* Below the desktop breakpoint the fixed mobile top bar owns the first
+   3.25rem of the viewport: stick right under it */
+@media (max-width: 991.98px) {
+  :global(body.gladys-sidebar-nav) .dashboardHeader {
+    top: calc(3.25rem + 0.5rem);
+  }
 }
 
 .dashboardHeaderTabs {
