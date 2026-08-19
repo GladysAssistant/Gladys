@@ -1,8 +1,10 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import get from 'get-value';
 
+import withIntlAsProp from '../../utils/withIntlAsProp';
 import DevicesPage from './DevicesPage';
-import { getDeviceIntegration } from './integrationLinks';
+import { getDeviceIntegration, disambiguateIntegrationNames } from './integrationLinks';
 
 class Devices extends Component {
   // The endpoint returns the whole list: load it once, then search, order
@@ -85,10 +87,17 @@ class Devices extends Component {
   }
 
   render(props, state) {
-    const devicesWithIntegration = (state.devices || []).map(device => ({
-      device,
-      integration: getDeviceIntegration(device)
-    }));
+    const integrations = (state.devices || []).map(device => getDeviceIntegration(device));
+    // names are resolved on the whole list: whether an integration needs its
+    // technical identity displayed depends on the other integrations present
+    const nameBySlug = disambiguateIntegrationNames(integrations);
+    const devicesWithIntegration = (state.devices || []).map((device, index) => {
+      const integration = integrations[index];
+      return {
+        device,
+        integration: integration ? { ...integration, name: nameBySlug.get(integration.slug) } : null
+      };
+    });
 
     // The integration filter options are built from the full device list, so
     // it only shows integrations the user actually has devices in, and a
@@ -101,7 +110,19 @@ class Devices extends Component {
         integrationOptions.push(integration);
       }
     });
-    integrationOptions.sort((a, b) => a.slug.localeCompare(b.slug));
+    // sorted on the label the option actually displays: a built-in integration
+    // is listed under its translated title, which its service name does not
+    // always match (in French, the "rtsp-camera" service reads "Caméras")
+    const getOptionLabel = integration =>
+      (integration.i18nKey && get(props.intl.dictionary, integration.i18nKey)) || integration.name;
+    integrationOptions.sort((a, b) =>
+      getOptionLabel(a).localeCompare(getOptionLabel(b), undefined, { sensitivity: 'base' })
+    );
+    // Built-in and community integrations live in the same list: the filter
+    // groups them so a community integration named like a built-in one (or
+    // like another community one) is still identifiable
+    const nativeIntegrationOptions = integrationOptions.filter(integration => !integration.external);
+    const communityIntegrationOptions = integrationOptions.filter(integration => integration.external);
 
     const filteredDevices = devicesWithIntegration
       .filter(({ device }) => this.matchSearch(device))
@@ -122,7 +143,8 @@ class Devices extends Component {
         {...state}
         initialized={state.devices !== null}
         filteredDevices={filteredDevices}
-        integrationOptions={integrationOptions}
+        nativeIntegrationOptions={nativeIntegrationOptions}
+        communityIntegrationOptions={communityIntegrationOptions}
         searchValue={state.search}
         search={this.search}
         changeOrderDir={this.changeOrderDir}
@@ -133,4 +155,4 @@ class Devices extends Component {
   }
 }
 
-export default connect('httpClient', {})(Devices);
+export default withIntlAsProp(connect('httpClient', {})(Devices));

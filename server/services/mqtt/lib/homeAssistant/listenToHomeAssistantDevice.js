@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { HOME_ASSISTANT, FEATURE_PROPERTIES, MQTT_WILDCARD_REGEX } = require('./constants');
+const { HOME_ASSISTANT, FEATURE_PROPERTIES } = require('./constants');
 const { convertEntityToFeatures } = require('./convertToGladysDevice');
 
 /**
@@ -33,6 +33,29 @@ function getStateTopic(component, property, config) {
       : config.temperature_state_topic;
   }
   return config.state_topic;
+}
+
+/**
+ * @description Check if a state topic advertised in a discovery payload can be subscribed to.
+ * A state topic is a subscription filter, so "+" is valid there: Theengs gateways advertise
+ * topics such as "+/+/BTtoMQTT/<id>" so that several gateways can publish the state of the
+ * same sensor. A discovery payload is untrusted input though, so filters that would pull in
+ * traffic far beyond the device they claim to describe are still refused: "#", which matches
+ * every remaining level, and filters without a single concrete level ("+", "+/+"...).
+ * A discovery payload can also hold anything in "state_topic" ({}, true, 1...), so this
+ * helper never assumes a string and never throws: it just refuses what it cannot subscribe to.
+ * @param {any} topic - The state topic advertised in the discovery payload.
+ * @returns {boolean} True when the topic can be subscribed to.
+ * @example
+ * isSubscribableStateTopic('+/+/BTtoMQTT/A4C138800021');
+ */
+function isSubscribableStateTopic(topic) {
+  if (typeof topic !== 'string' || topic.length === 0 || topic.includes('#')) {
+    return false;
+  }
+  const levels = topic.split('/');
+  // "+" is a wildcard only when it takes a whole level: "foo+bar" is not a valid filter
+  return levels.every((level) => level === '+' || !level.includes('+')) && levels.some((level) => level !== '+');
 }
 
 /**
@@ -101,15 +124,18 @@ function listenToHomeAssistantDeviceStateIfNeeded(device) {
         if (!topic) {
           return;
         }
-        // A discovery payload is whatever was published on the broker: a wildcard state topic
-        // would subscribe Gladys to traffic far beyond the device it claims to describe
-        if (MQTT_WILDCARD_REGEX.test(topic)) {
-          logger.warn(`MQTT Home Assistant: ignoring state topic ${topic}, wildcards are not allowed`);
+        if (!isSubscribableStateTopic(topic)) {
+          logger.warn(`MQTT Home Assistant: ignoring state topic ${topic}, this filter is invalid or too broad`);
           return;
         }
         if (!this.haStateBindings[topic]) {
           this.haStateBindings[topic] = [];
-          this.subscribe(topic, this.handleHomeAssistantStateMessage.bind(this));
+          // The callback is bound to the filter it was subscribed with: handleNewMessage
+          // dispatches a message to every matching filter, so each one must only handle
+          // the bindings it holds itself
+          this.subscribe(topic, (receivedTopic, receivedMessage) =>
+            this.handleHomeAssistantStateMessage(receivedTopic, receivedMessage, topic),
+          );
         }
         this.haStateBindings[topic].push({
           deviceExternalId: device.external_id,

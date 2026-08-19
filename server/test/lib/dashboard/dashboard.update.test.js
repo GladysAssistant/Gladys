@@ -270,6 +270,22 @@ describe('dashboard.update', () => {
     return assert.isRejected(promise);
   });
 
+  it('should save an energy consumption box carrying a billing period start day', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        [
+          {
+            type: DASHBOARD_BOX_TYPE.ENERGY_CONSUMPTION,
+            device_features: ['test-device-feature'],
+            period_start_day: 5,
+          },
+        ],
+      ],
+    });
+    // legacy column-based boxes are normalized to a single section on save
+    expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('period_start_day', 5);
+  });
+
   it('should return not found', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'not-found-dashboard', {
       name: 'new name',

@@ -5,6 +5,7 @@ import SceneRow from './SceneRow';
 import cx from 'classnames';
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import { computeRunningInfo, mergeRunningScenes } from '../../../routes/scene/runningInfo';
 
 class SceneBoxComponent extends Component {
   refreshData = () => {
@@ -70,12 +71,76 @@ class SceneBoxComponent extends Component {
     });
   };
 
+  getRunningScenes = async () => {
+    // stops received while the request is in flight would be undone by the response
+    const stoppedDuringFetch = new Set();
+    this.stoppedDuringFetch = stoppedDuringFetch;
+    try {
+      const runningScenes = await this.props.httpClient.get('/api/v1/scene/running');
+      // Merge with any websocket-driven updates received while fetching
+      this.setState(prevState => ({
+        runningScenes: mergeRunningScenes(runningScenes, prevState.runningScenes, stoppedDuringFetch)
+      }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (this.stoppedDuringFetch === stoppedDuringFetch) {
+        this.stoppedDuringFetch = null;
+      }
+    }
+  };
+  onSceneStarted = payload => {
+    this.setState(prevState => {
+      const alreadyKnown = (prevState.runningScenes || []).some(scene => scene.executionId === payload.executionId);
+      if (alreadyKnown) {
+        return null;
+      }
+      return { runningScenes: [...(prevState.runningScenes || []), payload] };
+    });
+  };
+  onSceneStopped = payload => {
+    if (this.stoppedDuringFetch) {
+      this.stoppedDuringFetch.add(payload.executionId);
+    }
+    this.setState(prevState => ({
+      runningScenes: (prevState.runningScenes || []).filter(scene => scene.executionId !== payload.executionId)
+    }));
+  };
+  // Keep a 1s ticker running only while at least one scene is executing,
+  // so running rows can display a live elapsed time.
+  refreshTicker = () => {
+    const hasRunning = (this.state.runningScenes || []).length > 0;
+    if (hasRunning && !this.ticker) {
+      this.ticker = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    } else if (!hasRunning && this.ticker) {
+      clearInterval(this.ticker);
+      this.ticker = null;
+    }
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      runningScenes: [],
+      now: Date.now()
+    };
+    this.ticker = null;
+  }
+
   componentDidMount() {
     this.refreshData();
+    this.getRunningScenes();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
+  }
+
+  componentDidUpdate() {
+    // Start/stop the ticker based on the applied state.
+    this.refreshTicker();
   }
 
   componentWillUnmount() {
@@ -83,6 +148,12 @@ class SceneBoxComponent extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
+    if (this.ticker) {
+      clearInterval(this.ticker);
+      this.ticker = null;
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -94,7 +165,7 @@ class SceneBoxComponent extends Component {
     }
   }
 
-  render(props, { scenes, status, featuresBySelector }) {
+  render(props, { scenes, status, featuresBySelector, runningScenes, now }) {
     const boxTitle = props.box.name;
     const loading = status === RequestStatus.Getting && !status;
 
@@ -116,11 +187,13 @@ class SceneBoxComponent extends Component {
               {scenes &&
                 scenes.map(scene => (
                   <SceneRow
+                    key={scene.selector}
                     boxStatus={status}
                     name={scene.name}
                     icon={scene.icon}
                     user={props.user}
                     sceneSelector={scene.selector}
+                    runningInfo={computeRunningInfo(runningScenes, scene.selector, now)}
                     statusFeature={
                       featuresBySelector &&
                       props.box.scene_status_features &&
