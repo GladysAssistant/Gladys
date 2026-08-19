@@ -3132,7 +3132,7 @@
         "serviceExplanation": "Wähle den Nachrichtendienst, der diese Nachricht sendet. Standardmäßig wird die Nachricht an alle vom Benutzer konfigurierten Dienste gesendet.",
         "serviceUnavailable": "nicht verfügbar",
         "serviceIntegrationExternal": "externe Integration",
-        "serviceIntegrationInternal": "integrierte Integration",
+        "serviceIntegrationInternal": "native Integration",
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."

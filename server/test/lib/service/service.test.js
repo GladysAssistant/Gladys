@@ -52,6 +52,11 @@ const gladys = {
 describe('service', () => {
   const stateManager = new StateManager();
   const service = new Service(services, stateManager);
+  afterEach(() => {
+    // the database is reset by the global beforeEach, the stateManager is not:
+    // drop the fixtures a test may have registered, even when it failed
+    stateManager.setState('service', 'external-message-service', null);
+  });
   it('should start a service', async () => {
     await service.load(gladys);
     await service.start('example');
@@ -75,6 +80,9 @@ describe('service', () => {
     expect(messagingService).to.not.equal(undefined);
     expect(messagingService).to.have.property('name', 'test-service');
     expect(messagingService).to.have.property('status');
+    // the selector suffixes a channel with its origin when two of them display
+    // the same name, so `type` is part of the contract
+    expect(messagingService).to.have.property('type', SERVICE_TYPES.INTERNAL);
     // a core service has no manifest: the front translates its technical name
     expect(messagingService).to.have.property('manifest_name', null);
     // `label` would only ever repeat manifest_name or name: the front derives it
@@ -103,7 +111,7 @@ describe('service', () => {
     // an installed external integration is configured by definition, and it is
     // proxied: it must never be filtered out on an isUsed() hook, even when a
     // proxy object happens to expose one that throws
-    const externalServiceInDb = await db.Service.create({
+    await db.Service.create({
       name: 'external-message-service',
       selector: 'external-message-service',
       version: '0.1.0',
@@ -111,15 +119,17 @@ describe('service', () => {
       type: SERVICE_TYPES.EXTERNAL,
       manifest: { name: 'External Messenger' },
     });
-    const externalService = {
+    // the global beforeEach resets the database between tests, but not the
+    // stateManager: the afterEach below takes that entry back out even when
+    // an assertion throws
+    stateManager.setState('service', 'external-message-service', {
       isUsed: async () => {
         throw new Error('an external integration exposes no usable isUsed hook');
       },
       message: {
         sendToUser: async () => Promise.resolve(),
       },
-    };
-    stateManager.setState('service', 'external-message-service', externalService);
+    });
 
     const messageServices = await service.getMessageServices();
     const external = messageServices.find((s) => s.name === 'external-message-service');
@@ -131,15 +141,12 @@ describe('service', () => {
     // a core service carries the other side of that contract
     const coreService = messageServices.find((s) => s.name === 'test-service');
     expect(coreService).to.have.property('type', SERVICE_TYPES.INTERNAL);
-
-    stateManager.setState('service', 'external-message-service', null);
-    await externalServiceInDb.destroy();
   });
   it('should not return a messaging service that is not loaded in the stateManager', async () => {
     await service.load(gladys);
     // flagged in database by a previous run, but the service is gone from the
     // instance: it could not deliver anything
-    const orphanServiceInDb = await db.Service.create({
+    await db.Service.create({
       name: 'orphan-message-service',
       selector: 'orphan-message-service',
       version: '0.1.0',
@@ -148,8 +155,6 @@ describe('service', () => {
 
     const messageServices = await service.getMessageServices();
     expect(messageServices.map((s) => s.name)).to.not.include('orphan-message-service');
-
-    await orphanServiceInDb.destroy();
   });
   it('should return service by name', async () => {
     const testService = await service.getByName('test-service');
