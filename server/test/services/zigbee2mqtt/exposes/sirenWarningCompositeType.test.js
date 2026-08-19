@@ -59,6 +59,20 @@ describe('zigbee2mqtt siren warning compositeType', () => {
     assert.deepEqual(result, { mode: 'stop', strobe: false, duration: 0 });
   });
 
+  it('should use the duration maximum declared by the device', () => {
+    // A device declaring a maximum for the warning duration is asked for that maximum, instead of
+    // the default one.
+    const expose = {
+      ...warningExpose,
+      features: warningExpose.features.map((feature) =>
+        feature.name === 'duration' ? { ...feature, value_min: 0, value_max: 1800 } : feature,
+      ),
+    };
+
+    assert.deepEqual(compositeType.writeValue(expose, 1), { mode: 'emergency', strobe: true, duration: 1800 });
+    assert.deepEqual(compositeType.writeValue(expose, 0), { mode: 'stop', strobe: false, duration: 0 });
+  });
+
   it('should keep the device supported modes only', () => {
     // A device not exposing the "emergency" mode falls back to another supported one
     const expose = {
