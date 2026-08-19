@@ -227,6 +227,7 @@ The pill bar (H) and the old horizontal top menu both competed for the top of th
 - **Layout mechanics**: the component toggles `body.gladys-sidebar-nav`; global CSS (`style/index.css`) pads the **outer** `#app > .page` only (the dashboard routes nest a `.page` of their own) and offsets `.fixed-bottom` bars (editor footer). On the three wallpaper pages, `.dashboardBackground` slides back under the rail/top bar (negative margin + equal padding — safe because the image is `background-attachment: fixed`), so the sidebar's backdrop blur frosts the actual scene, not a flat page background.
 - **Dark mode**: light colors only, inverted by the global filter like the glass theme; the only exception re-neutralizes the `.fe` re-inversion inside the sidebar so icons match their labels.
 - Auth pages and fullscreen (wall-panel) mode render no navigation and drop the body class, keeping the full viewport.
+- **Full-height pages follow the new chrome**: chat and map used to size themselves against the old top menu (`100dvh - 7rem`, hardcoded pixel offsets, the tabler `.map-header` negative margin). They now take `100dvh` on desktop and `100dvh - 3.25rem` (the mobile top bar) below — the chat composer and the map both reach the bottom of the screen.
 
 ## Phases
 

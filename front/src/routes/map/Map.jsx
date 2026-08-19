@@ -127,8 +127,10 @@ class MapComponent extends Component {
     this.map = map;
   };
   updateDimensions = () => {
-    const largeWindowOffset = 120;
-    const smallWindowOffset = 65;
+    // The map fills everything below the chrome: nothing on desktop (the nav
+    // is the left sidebar), the 3.25rem fixed top bar on mobile
+    const largeWindowOffset = 0;
+    const smallWindowOffset = 52;
     const height =
       window.innerWidth >= 992 ? window.innerHeight - largeWindowOffset : window.innerHeight - smallWindowOffset;
     this.setState({ height });
