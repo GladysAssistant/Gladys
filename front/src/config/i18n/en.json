@@ -3131,6 +3131,8 @@
         "allServicesLabel": "All configured services",
         "serviceExplanation": "Choose the messaging service which will send this message. By default, the message is sent to every service configured by the user.",
         "serviceUnavailable": "unavailable",
+        "serviceIntegrationExternal": "external integration",
+        "serviceIntegrationInternal": "built-in integration",
         "textLabel": "Message",
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
