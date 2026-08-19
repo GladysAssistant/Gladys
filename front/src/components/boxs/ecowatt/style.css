@@ -1,0 +1,127 @@
+/* Horizon variant of the Ecowatt widget: the signal level IS the information,
+   so hours become tinted tiles and days get color-dot pills — the same family
+   as the EDF Tempo widget. Light colors only — dark mode is the app-wide
+   inversion filter, hues survive it (invert + hue-rotate). */
+
+.sectionTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted, #7c8396);
+  margin-bottom: 0.5rem;
+}
+
+/* Next hours: one tinted mini-tile per hour, the color carries the signal */
+.hoursStrip {
+  display: flex;
+  gap: 4px;
+}
+
+.hourCell {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 1px;
+  padding: 0.45rem 0;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.hourUnit {
+  font-size: 0.625rem;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* Days: quiet rows, date in ink, the signal as a color-dot pill */
+.dayRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+}
+
+.dayRow + .dayRow {
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+.dayName {
+  color: var(--gl-ink, #1c2334);
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* the API dates start with a lowercase weekday */
+  text-transform: capitalize;
+}
+
+.dayBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dayDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+/* signal levels: 1 = ok (green), 2 = strained (amber), 3 = critical (red) */
+.levelOk {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+.levelOk .dayDot {
+  background-color: #38a169;
+}
+
+.levelWarning {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+.levelWarning .dayDot {
+  background-color: #c98a2c;
+}
+
+.levelCritical {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+.levelCritical .dayDot {
+  background-color: #d4593f;
+}
+
+/* Service unreachable: a quiet tinted notice, not a shouting alert */
+.errorState {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 14px;
+  background-color: #fbe3de;
+  color: #c24a33;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.errorState .fe {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}

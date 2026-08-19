@@ -175,10 +175,22 @@
   box-shadow: none;
 }
 
+/* The header hugs its title: Tabler's 3.5rem min-height centers the small
+   uppercase label in a tall band and opens a hole above the card content */
 :global(.glass-theme .card-header) {
   border-bottom: none;
   background: transparent;
-  padding-bottom: 0;
+  min-height: 0;
+  padding: 1.125rem 1.5rem 0;
+}
+
+/* a header below the media (camera) is the card's last row */
+:global(.glass-theme .card-header:last-child) {
+  padding-bottom: 1.125rem;
+}
+
+:global(.glass-theme .card-header + .card-body) {
+  padding-top: 0.75rem;
 }
 
 :global(.glass-theme .card-title) {
@@ -227,6 +239,147 @@
 :global(.glass-theme .stamp.bg-yellow) {
   background: #f9eeda !important;
   color: #c98a2c !important;
+}
+
+/* Bootstrap alerts inside cards become quiet tinted notices — same family
+   as the stamps: soft background, saturated ink, no border, no shouting */
+:global(.glass-theme .card .alert) {
+  border: none;
+  border-radius: 14px;
+  padding: 0.6rem 0.75rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+:global(.glass-theme .card .alert-danger) {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+:global(.glass-theme .card .alert-warning) {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+:global(.glass-theme .card .alert-info),
+:global(.glass-theme .card .alert-primary) {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+:global(.glass-theme .card .alert-success) {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+:global(.glass-theme .card .alert a) {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* Tabler's alert-icon variant absolutely positions its icon in a 3rem
+   gutter: keep a gutter matching the reduced notice padding */
+:global(.glass-theme .card .alert-icon) {
+  padding-left: 2.6rem;
+}
+
+:global(.glass-theme .card .alert-icon > i) {
+  top: 0.7rem;
+  left: 0.9rem;
+}
+
+/* Tabler's card-alert variant is a full-width square band glued to the card
+   edges: float it inside the rounded card instead */
+:global(.glass-theme .card .card-alert) {
+  margin: 0.75rem 1.5rem 0;
+}
+
+/* Bootstrap badges become the color-dot pill family's plain cousins */
+:global(.glass-theme .card .badge) {
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+:global(.glass-theme .card .badge-success) {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+:global(.glass-theme .card .badge-danger) {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+:global(.glass-theme .card .badge-warning) {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+:global(.glass-theme .card .badge-info) {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+:global(.glass-theme .card .badge-secondary) {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+/* Tabler's bg-* badge utilities join the family; dark-mode.css special-cases
+   .badge.bg-warning with a dark gold and no filter — restore the pastel and
+   the double inversion the other badges get */
+:global(.glass-theme .card .badge.bg-warning),
+:global(.dark-mode .glass-theme .card .badge.bg-warning) {
+  background-color: #f9eeda !important;
+  color: #a5701e !important;
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+:global(.glass-theme .card .badge.bg-warning) {
+  filter: none;
+}
+
+/* Neutral solid/outline buttons (music transport, camera live, energy nav)
+   become quiet ink-tinted pills; dark-mode.css paints btn-secondary with a
+   solid !important background, hence the counter-weight */
+:global(.glass-theme .card .btn-secondary),
+:global(.glass-theme .card .btn-outline-secondary),
+:global(.dark-mode .glass-theme .card .btn-secondary) {
+  background-color: rgba(28, 35, 52, 0.07) !important;
+  border: none;
+  color: var(--gl-ink);
+  border-radius: 999px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+:global(.glass-theme .card .btn-secondary:hover),
+:global(.glass-theme .card .btn-outline-secondary:hover),
+:global(.dark-mode .glass-theme .card .btn-secondary:hover) {
+  background-color: rgba(28, 35, 52, 0.13) !important;
+  color: var(--gl-ink);
+}
+
+/* solid accent buttons (camera pause…) become ink pills */
+:global(.glass-theme .card .btn-primary) {
+  background-color: var(--gl-ink);
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* soft amber pill (alarm arming countdown cancel) */
+:global(.glass-theme .card .btn-outline-warning) {
+  background-color: #f9eeda;
+  border: none;
+  color: #a5701e;
+  border-radius: 999px;
+  font-weight: 600;
 }
 
 /* Start/action buttons become soft pills */
@@ -529,6 +682,24 @@
   min-height: 0;
 }
 
+/* the media region of a camera card (live dimmer, error placeholder) absorbs
+   the stretch too — otherwise a camera without image stretches into a blank
+   white void under its header */
+.stretchableBox > div > :global(.dimmer) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchableBox > div > :global(.dimmer) > :global(.dimmer-content) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
 /* Tile boxes (room temperature/humidity) center their content in the
    extra height instead of leaving it under the card */
 .stretchableTile > div {
@@ -772,7 +943,10 @@
    active segment — and the setpoint steppers become capsules.
    ============================================================ */
 
-:global(.glass-theme .device-list-table .btn-group) {
+/* .hz-segmented is the opt-in marker for any widget button group
+   (energy consumption periods, cost/kWh toggle…) */
+:global(.glass-theme .device-list-table .btn-group),
+:global(.glass-theme .hz-segmented) {
   background-color: rgba(28, 35, 52, 0.07);
   border-radius: 999px;
   padding: 3px;
@@ -782,8 +956,9 @@
   margin: 4px 0;
 }
 
-:global(.glass-theme .device-list-table .btn-group .btn) {
-  background: transparent;
+:global(.glass-theme .device-list-table .btn-group .btn),
+:global(.glass-theme .hz-segmented .btn) {
+  background: transparent !important;
   border: none;
   border-radius: 999px !important;
   color: var(--gl-muted);
@@ -794,22 +969,26 @@
 /* inside a segmented track the whole track is the touch zone: segments
    stay at the iOS segmented height instead of the 44px solo-button floor */
 @media (pointer: coarse) {
-  :global(.glass-theme .device-list-table .btn-group .btn) {
+  :global(.glass-theme .device-list-table .btn-group .btn),
+  :global(.glass-theme .hz-segmented .btn) {
     min-height: 2.25rem;
   }
 }
 
-:global(.glass-theme .device-list-table .btn-group .btn:hover) {
+:global(.glass-theme .device-list-table .btn-group .btn:hover),
+:global(.glass-theme .hz-segmented .btn:hover) {
   color: var(--gl-ink);
 }
 
-:global(.glass-theme .device-list-table .btn-group .btn:disabled) {
+:global(.glass-theme .device-list-table .btn-group .btn:disabled),
+:global(.glass-theme .hz-segmented .btn:disabled) {
   opacity: 0.45;
 }
 
 :global(.glass-theme .device-list-table .btn-group .btn.active),
-:global(.glass-theme .device-list-table .btn-group .btn.active:disabled) {
-  background-color: #fff;
+:global(.glass-theme .device-list-table .btn-group .btn.active:disabled),
+:global(.glass-theme .hz-segmented .btn.active) {
+  background-color: #fff !important;
   color: var(--gl-ink);
   box-shadow: 0 2px 8px rgba(28, 35, 52, 0.18);
   opacity: 1;
@@ -820,6 +999,15 @@
   border-radius: 999px;
   border: 1px solid var(--gl-border);
   background-color: #fff;
+  font-weight: 600;
+  color: var(--gl-ink);
+}
+
+/* the energy widget's period date picker joins it */
+:global(.glass-theme .card .react-datepicker-wrapper .form-control) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: rgba(255, 255, 255, 0.7);
   font-weight: 600;
   color: var(--gl-ink);
 }
