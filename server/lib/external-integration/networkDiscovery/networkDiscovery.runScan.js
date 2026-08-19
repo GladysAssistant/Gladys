@@ -97,10 +97,10 @@ async function runNetworkDiscoveryScan(
       return await this.scanUdpActiveBroadcast({ port, payload, timeoutMs });
     }
     if (type === 'mdns') {
-      const results = await Promise.all(
-        captures.map((declaredCapture) => this.scanMdns({ service: declaredCapture.service, timeoutMs })),
-      );
-      return results.flat();
+      return await this.scanMdns({
+        services: captures.map((declaredCapture) => declaredCapture.service),
+        timeoutMs,
+      });
     }
     return await this.scanSsdp({ st: capture.st, timeoutMs });
   } finally {

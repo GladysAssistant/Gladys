@@ -127,7 +127,10 @@ describe('externalIntegration.runNetworkDiscoveryScan', () => {
       timeout_seconds: 2,
     });
     expect(mdnsResults).to.deep.equal([{ name: 'lamp' }]);
-    expect(externalIntegration.scanMdns.firstCall.args[0]).to.deep.equal({ service: '_hue._tcp', timeoutMs: 2000 });
+    expect(externalIntegration.scanMdns.firstCall.args[0]).to.deep.equal({
+      services: ['_hue._tcp'],
+      timeoutMs: 2000,
+    });
     const ssdpResults = await externalIntegration.runNetworkDiscoveryScan(service, {
       type: 'ssdp',
       timeout_seconds: 1,
@@ -150,13 +153,10 @@ describe('externalIntegration.runNetworkDiscoveryScan', () => {
       },
     });
     const { externalIntegration } = buildSupervisor();
-    externalIntegration.scanMdns = stub();
-    externalIntegration.scanMdns
-      .withArgs({ service: '_airplay._tcp', timeoutMs: 3000 })
-      .resolves([{ name: 'Living Room._airplay._tcp.local' }]);
-    externalIntegration.scanMdns
-      .withArgs({ service: '_companion-link._tcp', timeoutMs: 3000 })
-      .resolves([{ name: 'Living Room._companion-link._tcp.local' }]);
+    externalIntegration.scanMdns = fake.resolves([
+      { name: 'Living Room._airplay._tcp.local' },
+      { name: 'Living Room._companion-link._tcp.local' },
+    ]);
 
     const results = await externalIntegration.runNetworkDiscoveryScan(service, {
       type: 'mdns',
@@ -167,7 +167,11 @@ describe('externalIntegration.runNetworkDiscoveryScan', () => {
       { name: 'Living Room._airplay._tcp.local' },
       { name: 'Living Room._companion-link._tcp.local' },
     ]);
-    expect(externalIntegration.scanMdns.callCount).to.equal(2);
+    expect(externalIntegration.scanMdns.calledOnce).to.equal(true);
+    expect(externalIntegration.scanMdns.firstCall.args[0]).to.deep.equal({
+      services: ['_airplay._tcp', '_companion-link._tcp'],
+      timeoutMs: 3000,
+    });
   });
 
   it('should reject malformed active scan requests', async () => {
@@ -486,6 +490,79 @@ describe('externalIntegration.scanMdns', () => {
         host: null,
         addresses: [],
         port: null,
+        txt: [],
+      },
+    ]);
+  });
+
+  it('should browse multiple declared services through one mDNS session', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const mdnsPort = await getFreeUdpPort();
+    const responder = multicastDns({ port: mdnsPort, ip: '127.0.0.1', multicast: false });
+    const mdnsOptions = { port: mdnsPort, ip: '127.0.0.1', multicast: false, bind: false };
+    const queriedServices = new Set();
+    responder.on('query', (query, remoteInfo) => {
+      const serviceName = query.questions && query.questions[0] && query.questions[0].name;
+      queriedServices.add(serviceName);
+      if (serviceName === '_airplay._tcp.local') {
+        // Respond after the second service to ensure results still follow
+        // manifest order rather than network response order.
+        setTimeout(() => {
+          responder.respond(
+            {
+              answers: [{ name: serviceName, type: 'PTR', data: 'Living Room._airplay._tcp.local' }],
+              additionals: [
+                {
+                  name: 'Living Room._airplay._tcp.local',
+                  type: 'SRV',
+                  data: { target: 'airplay.local', port: 7000 },
+                },
+                { name: 'airplay.local', type: 'A', data: '192.168.1.50' },
+              ],
+            },
+            remoteInfo,
+          );
+        }, 25);
+      }
+      if (serviceName === '_companion-link._tcp.local') {
+        responder.respond(
+          {
+            answers: [{ name: serviceName, type: 'PTR', data: 'Living Room._companion-link._tcp.local' }],
+            additionals: [
+              {
+                name: 'Living Room._companion-link._tcp.local',
+                type: 'SRV',
+                data: { target: 'companion.local', port: 49152 },
+              },
+              { name: 'companion.local', type: 'A', data: '192.168.1.50' },
+            ],
+          },
+          remoteInfo,
+        );
+      }
+    });
+    const results = await externalIntegration.scanMdns({
+      services: ['_airplay._tcp', '_companion-link._tcp'],
+      timeoutMs: 700,
+      mdnsOptions,
+    });
+    await new Promise((resolve) => {
+      responder.destroy(resolve);
+    });
+    expect([...queriedServices]).to.have.members(['_airplay._tcp.local', '_companion-link._tcp.local']);
+    expect(results).to.deep.equal([
+      {
+        name: 'Living Room._airplay._tcp.local',
+        host: 'airplay.local',
+        addresses: ['192.168.1.50'],
+        port: 7000,
+        txt: [],
+      },
+      {
+        name: 'Living Room._companion-link._tcp.local',
+        host: 'companion.local',
+        addresses: ['192.168.1.50'],
+        port: 49152,
         txt: [],
       },
     ]);
