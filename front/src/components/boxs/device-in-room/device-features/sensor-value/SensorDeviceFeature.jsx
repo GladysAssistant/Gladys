@@ -25,6 +25,7 @@ import VacuumCleanerStateDeviceValue from './VacuumCleanerStateDeviceValue';
 import ThermostatOperatingStateDeviceValue from './ThermostatOperatingStateDeviceValue';
 import ChargingStationConnectorStatusDeviceValue from './ChargingStationConnectorStatusDeviceValue';
 import ChargingStationChargingStateDeviceValue from './ChargingStationChargingStateDeviceValue';
+import SirenAlarmStateDeviceValue from './SirenAlarmStateDeviceValue';
 
 // Checked before the category map: a category whose renderer only makes sense for one of its
 // types needs an escape hatch. presence-sensor is historically a "push" category rendered as a
@@ -60,6 +61,8 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.SIREN.TEST_IN_PROGRESS]: BinaryDeviceValue,
+  [DEVICE_FEATURE_TYPES.SIREN.ALARM_STATE]: SirenAlarmStateDeviceValue,
+  [DEVICE_FEATURE_TYPES.BATTERY.CHARGING]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.DOOR_OPENED]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPENED]: BinaryDeviceValue,

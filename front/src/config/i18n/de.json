@@ -4627,6 +4627,12 @@
           "low": "Niedrig",
           "medium": "Mittel",
           "high": "Hoch"
+        },
+        "alarm-mode": {
+          "idle": "Kein Alarm",
+          "sound": "Ton",
+          "light": "Licht",
+          "sound_and_light": "Ton und Licht"
         }
       },
       "vacuum-cleaner": {
@@ -4920,6 +4926,25 @@
         "test-in-progress": {
           "0": "Nein",
           "1": "Ja"
+        },
+        "alarm-mode": {
+          "0": "Kein Alarm",
+          "1": "Ton",
+          "2": "Licht",
+          "3": "Ton und Licht"
+        },
+        "alarm-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Inaktiv",
+          "1": "Ton",
+          "2": "Licht",
+          "3": "Ton und Licht"
+        }
+      },
+      "battery": {
+        "charging": {
+          "0": "Lädt nicht",
+          "1": "Lädt"
         }
       },
       "music": {
@@ -5152,7 +5177,8 @@
     },
     "battery": {
       "shortCategoryName": "Batterie",
-      "integer": "Batterie"
+      "integer": "Batterie",
+      "charging": "Lädt"
     },
     "battery-low": {
       "shortCategoryName": "Niedriger Batteriestand",
@@ -5278,7 +5304,9 @@
       "binary": "Sirene",
       "lmh_volume": "Lautstärke der Sirene",
       "melody": "Melodie",
-      "test-in-progress": "Test läuft"
+      "test-in-progress": "Test läuft",
+      "alarm-mode": "Alarmmodus",
+      "alarm-state": "Alarmzustand"
     },
     "cube": {
       "shortCategoryName": "Würfel",

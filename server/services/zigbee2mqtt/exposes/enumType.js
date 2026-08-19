@@ -5,6 +5,7 @@ const {
   BUTTON_PUSH,
   COVER_STATE,
   SIREN_LMH_VOLUME,
+  SIREN_MODE,
   PILOT_WIRE_MODE,
   LIQUID_STATE,
   WATER_VALVE_CURRENT_DEVICE_STATUS,
@@ -189,6 +190,21 @@ addMapping(
 addMapping('trigger_alarm', BUTTON_PUSH.PRESSED, 'trigger');
 addMapping('stop_alarm', BUTTON_PUSH.PRESSED, 'stop');
 
+// NEO NAS-AB06B2 outdoor solar siren
+// https://www.zigbee2mqtt.io/devices/NAS-AB06B2.html
+addMapping('alarm_mode', SIREN_MODE.SOUND, 'alarm_sound');
+addMapping('alarm_mode', SIREN_MODE.LIGHT, 'alarm_light');
+addMapping('alarm_mode', SIREN_MODE.SOUND_AND_LIGHT, 'alarm_sound_light');
+
+addMapping('alarm_state', SIREN_MODE.IDLE, 'normal');
+addMapping('alarm_state', SIREN_MODE.SOUND, 'alarm_sound');
+addMapping('alarm_state', SIREN_MODE.LIGHT, 'alarm_light');
+addMapping('alarm_state', SIREN_MODE.SOUND_AND_LIGHT, 'alarm_sound_light');
+
+addMapping('alarm_melody', 1, 'melody_1');
+addMapping('alarm_melody', 2, 'melody_2');
+addMapping('alarm_melody', 3, 'melody_3');
+
 // Heiman HS1SA-E Lover smoke detector
 // https://www.zigbee2mqtt.io/devices/HS1SA-E_Lover.html
 addMapping('trigger_selftest', BUTTON_PUSH.PRESSED, 'test');
@@ -251,6 +267,34 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
+      },
+    },
+    // Sirens naming their melodies "melody_1", "melody_2"… instead of publishing plain numbers
+    alarm_melody: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
+        min: 1,
+        max: 3,
+        forceOverride: true,
+      },
+    },
+    alarm_mode: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE,
+        min: 0,
+        max: 3,
+        forceOverride: true,
+      },
+    },
+    alarm_state: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.ALARM_STATE,
+        min: 0,
+        max: 3,
+        forceOverride: true,
       },
     },
     pilot_wire_mode: {

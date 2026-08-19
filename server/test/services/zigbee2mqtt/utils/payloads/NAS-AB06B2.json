@@ -1,0 +1,322 @@
+{
+  "name": "NEO siren",
+  "mqttDevice": {
+    "friendly_name": "NEO siren",
+    "definition": {
+      "description": "Outdoor solar alarm",
+      "model": "NAS-AB06B2",
+      "vendor": "NEO",
+      "exposes": [
+        {
+          "name": "alarm_state",
+          "label": "Alarm state",
+          "access": 1,
+          "type": "enum",
+          "property": "alarm_state",
+          "description": "Alarm status",
+          "values": ["alarm_sound", "alarm_light", "alarm_sound_light", "normal"]
+        },
+        {
+          "name": "alarm_switch",
+          "label": "Alarm switch",
+          "access": 3,
+          "type": "binary",
+          "property": "alarm_switch",
+          "description": "Enable alarm",
+          "value_on": "ON",
+          "value_off": "OFF"
+        },
+        {
+          "name": "tamper_alarm_switch",
+          "label": "Tamper alarm switch",
+          "access": 3,
+          "type": "binary",
+          "property": "tamper_alarm_switch",
+          "description": "Enable tamper alarm",
+          "value_on": "ON",
+          "value_off": "OFF"
+        },
+        {
+          "name": "tamper_alarm",
+          "label": "Tamper alarm",
+          "access": 1,
+          "type": "binary",
+          "property": "tamper_alarm",
+          "description": "Indicates whether the device is tampered",
+          "value_on": "ON",
+          "value_off": "OFF"
+        },
+        {
+          "name": "alarm_melody",
+          "label": "Alarm melody",
+          "access": 3,
+          "type": "enum",
+          "property": "alarm_melody",
+          "description": "Alarm sound effect",
+          "values": ["melody_1", "melody_2", "melody_3"]
+        },
+        {
+          "name": "alarm_mode",
+          "label": "Alarm mode",
+          "access": 3,
+          "type": "enum",
+          "property": "alarm_mode",
+          "description": "Alarm mode",
+          "values": ["alarm_sound", "alarm_light", "alarm_sound_light"]
+        },
+        {
+          "name": "alarm_time",
+          "label": "Alarm time",
+          "access": 3,
+          "type": "numeric",
+          "property": "alarm_time",
+          "description": "Alarm duration in minutes",
+          "unit": "min",
+          "value_min": 1,
+          "value_max": 60
+        },
+        {
+          "name": "charging",
+          "label": "Charging",
+          "access": 1,
+          "type": "binary",
+          "property": "charging",
+          "description": "Charging status",
+          "value_on": true,
+          "value_off": false
+        },
+        {
+          "name": "battery",
+          "label": "Battery",
+          "access": 1,
+          "type": "numeric",
+          "property": "battery",
+          "description": "Remaining battery in %, can take up to 24 hours before reported",
+          "category": "diagnostic",
+          "unit": "%",
+          "value_min": 0,
+          "value_max": 100
+        }
+      ]
+    }
+  },
+  "gladysDevice": {
+    "name": "NEO siren",
+    "model": "NAS-AB06B2",
+    "external_id": "zigbee2mqtt:NEO siren",
+    "features": [
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 3,
+        "category": "siren",
+        "type": "alarm-state",
+        "unit": null,
+        "name": "Alarm state",
+        "external_id": "zigbee2mqtt:NEO siren:siren:alarm-state:alarm_state",
+        "selector": "zigbee2mqtt-neo-siren-siren-alarm-state-alarm-state"
+      },
+      {
+        "read_only": false,
+        "has_feedback": true,
+        "category": "siren",
+        "type": "binary",
+        "min": 0,
+        "max": 1,
+        "unit": null,
+        "name": "Alarm switch",
+        "external_id": "zigbee2mqtt:NEO siren:siren:binary:alarm_switch",
+        "selector": "zigbee2mqtt-neo-siren-siren-binary-alarm-switch"
+      },
+      {
+        "read_only": false,
+        "has_feedback": true,
+        "category": "switch",
+        "type": "binary",
+        "min": 0,
+        "max": 1,
+        "unit": null,
+        "name": "Tamper alarm switch",
+        "external_id": "zigbee2mqtt:NEO siren:switch:binary:tamper_alarm_switch",
+        "selector": "zigbee2mqtt-neo-siren-switch-binary-tamper-alarm-switch"
+      },
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "category": "tamper",
+        "type": "binary",
+        "min": 0,
+        "max": 1,
+        "unit": null,
+        "name": "Tamper alarm",
+        "external_id": "zigbee2mqtt:NEO siren:tamper:binary:tamper_alarm",
+        "selector": "zigbee2mqtt-neo-siren-tamper-binary-tamper-alarm"
+      },
+      {
+        "read_only": false,
+        "has_feedback": true,
+        "min": 1,
+        "max": 3,
+        "category": "siren",
+        "type": "melody",
+        "unit": null,
+        "name": "Alarm melody",
+        "external_id": "zigbee2mqtt:NEO siren:siren:melody:alarm_melody",
+        "selector": "zigbee2mqtt-neo-siren-siren-melody-alarm-melody"
+      },
+      {
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 3,
+        "category": "siren",
+        "type": "alarm-mode",
+        "unit": null,
+        "name": "Alarm mode",
+        "external_id": "zigbee2mqtt:NEO siren:siren:alarm-mode:alarm_mode",
+        "selector": "zigbee2mqtt-neo-siren-siren-alarm-mode-alarm-mode"
+      },
+      {
+        "read_only": false,
+        "has_feedback": true,
+        "min": 1,
+        "max": 60,
+        "category": "duration",
+        "type": "decimal",
+        "unit": "minutes",
+        "name": "Alarm time",
+        "external_id": "zigbee2mqtt:NEO siren:duration:decimal:alarm_time",
+        "selector": "zigbee2mqtt-neo-siren-duration-decimal-alarm-time"
+      },
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "category": "battery",
+        "type": "charging",
+        "min": 0,
+        "max": 1,
+        "unit": null,
+        "name": "Charging",
+        "external_id": "zigbee2mqtt:NEO siren:battery:charging:charging",
+        "selector": "zigbee2mqtt-neo-siren-battery-charging-charging"
+      },
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "name": "Battery",
+        "external_id": "zigbee2mqtt:NEO siren:battery:integer:battery",
+        "selector": "zigbee2mqtt-neo-siren-battery-integer-battery"
+      }
+    ],
+    "should_poll": false,
+    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a"
+  },
+  "values": [
+    {
+      "internal": 0,
+      "external": "normal",
+      "property": "alarm_state"
+    },
+    {
+      "internal": 1,
+      "external": "alarm_sound",
+      "property": "alarm_state"
+    },
+    {
+      "internal": 2,
+      "external": "alarm_light",
+      "property": "alarm_state"
+    },
+    {
+      "internal": 3,
+      "external": "alarm_sound_light",
+      "property": "alarm_state"
+    },
+    {
+      "internal": 1,
+      "external": "ON",
+      "property": "alarm_switch"
+    },
+    {
+      "internal": 0,
+      "external": "OFF",
+      "property": "alarm_switch"
+    },
+    {
+      "internal": 1,
+      "external": "ON",
+      "property": "tamper_alarm_switch"
+    },
+    {
+      "internal": 0,
+      "external": "OFF",
+      "property": "tamper_alarm_switch"
+    },
+    {
+      "internal": 1,
+      "external": "ON",
+      "property": "tamper_alarm"
+    },
+    {
+      "internal": 0,
+      "external": "OFF",
+      "property": "tamper_alarm"
+    },
+    {
+      "internal": 1,
+      "external": "melody_1",
+      "property": "alarm_melody"
+    },
+    {
+      "internal": 2,
+      "external": "melody_2",
+      "property": "alarm_melody"
+    },
+    {
+      "internal": 3,
+      "external": "melody_3",
+      "property": "alarm_melody"
+    },
+    {
+      "internal": 1,
+      "external": "alarm_sound",
+      "property": "alarm_mode"
+    },
+    {
+      "internal": 2,
+      "external": "alarm_light",
+      "property": "alarm_mode"
+    },
+    {
+      "internal": 3,
+      "external": "alarm_sound_light",
+      "property": "alarm_mode"
+    },
+    {
+      "internal": 5,
+      "external": 5,
+      "property": "alarm_time"
+    },
+    {
+      "internal": 1,
+      "external": true,
+      "property": "charging"
+    },
+    {
+      "internal": 0,
+      "external": false,
+      "property": "charging"
+    },
+    {
+      "internal": 84,
+      "external": 84,
+      "property": "battery"
+    }
+  ]
+}
