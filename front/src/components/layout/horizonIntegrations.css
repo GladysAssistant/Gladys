@@ -14,12 +14,12 @@
    integration sub-page.
 
    EVERY furniture rule is scoped to `.glass-theme .page` — the Tabler
-   .page each integration route nests inside the themed wrapper. The
-   wrapper is the outer page-main, which also CONTAINS the navigation
-   rail (app.jsx renders Header inside Layout), and the rail is chrome
-   shared with every other page: unscoped rules here would restyle its
-   badges, buttons and labels on /dashboard/integration URLs only. The
-   nested .page is the node that means "the route's own content".
+   .page each integration route nests inside the themed wrapper — so the
+   theme only ever reaches the current route's own content. Shared
+   chrome must stay out of its way: the navigation rail (components/
+   header) is rendered as a sibling of this wrapper in app.jsx for that
+   reason, and this scope is the second line of defence, keeping the
+   rules off anything but a route's page even if the tree changes.
 
    Dark mode stays the app-wide inversion filter: light colors only,
    plus counter-weights where dark-mode.css paints solid !important
