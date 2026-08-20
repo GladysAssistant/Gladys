@@ -17,7 +17,9 @@ const logger = require('../../../utils/logger');
  * const results = await gladys.externalIntegration.scanMdns({ service: '_hue._tcp', timeoutMs: 5000 });
  */
 async function scanMdns({ service, services, timeoutMs, mdnsOptions }) {
-  const serviceNames = (services || [service]).map((declaredService) => `${declaredService}.local`);
+  // a manifest can declare the same service twice (nothing rejects it):
+  // dedupe, or the same bucket would be queried and returned N times
+  const serviceNames = [...new Set((services || [service]).map((declaredService) => `${declaredService}.local`))];
   // service name -> instance name -> { name, host, addresses, port, txt }
   const instancesByServiceName = new Map(serviceNames.map((serviceName) => [serviceName, new Map()]));
   const addressesByHost = new Map();
@@ -54,10 +56,13 @@ async function scanMdns({ service, services, timeoutMs, mdnsOptions }) {
         const entries = Array.isArray(record.data) ? record.data : [record.data];
         getInstance(matchingServiceName, record.name).txt = entries.map((entry) => entry.toString('utf8'));
       } else if (record.type === 'A' || record.type === 'AAAA') {
+        // one host answers every service it announces, so its A/AAAA record
+        // arrives once per declared service: dedupe, or a multi-service
+        // device would report the same address N times
         if (!addressesByHost.has(record.name)) {
-          addressesByHost.set(record.name, []);
+          addressesByHost.set(record.name, new Set());
         }
-        addressesByHost.get(record.name).push(record.data);
+        addressesByHost.get(record.name).add(record.data);
       }
     });
   });
@@ -78,7 +83,7 @@ async function scanMdns({ service, services, timeoutMs, mdnsOptions }) {
   return serviceNames.flatMap((serviceName) =>
     [...instancesByServiceName.get(serviceName).values()].map((instance) => ({
       ...instance,
-      addresses: instance.host ? addressesByHost.get(instance.host) || [] : [],
+      addresses: instance.host ? [...(addressesByHost.get(instance.host) || [])] : [],
     })),
   );
 }
