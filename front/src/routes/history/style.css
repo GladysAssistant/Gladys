@@ -1,3 +1,60 @@
+/* ==================================================================
+   Activity feed on the Horizon glass surface: the page composes on the
+   same global .glass-theme class (and default scene) as the dashboard,
+   so cards, inks and dark mode come from the theme layer — everything
+   here is the page's own grammar (filter capsule, timeline, pills).
+   Dark mode: like the theme, this file authors NO dark colors — the
+   light glass inverts through the global filter (style/dark-mode.css).
+   ================================================================== */
+
+/* Sticky metrics shared by the filter capsule, the day labels and the
+   "new events" pill. Below the desktop breakpoint the fixed mobile top
+   bar (3.25rem, components/header) is cleared; on coarse pointers the
+   chips grow to the ~44px touch floor like the dashboard selector pills. */
+.historyPage {
+  --hz-chip-h: 2.25rem;
+  /* capsule outer height: chip + 2 × 5px padding + 2 × 1px border */
+  --hz-capsule-h: calc(var(--hz-chip-h) + 12px);
+  --hz-sticky-top: 0.75rem;
+  --hz-scroll-btn: 2rem;
+
+  min-height: 100vh;
+  /* own stacking context so the fixed scene layer below can sit at z -1
+     behind the in-flow content but above the page's own background (the
+     dark-mode.css opaque .page-main background included) */
+  position: relative;
+  isolation: isolate;
+}
+
+/* The Horizon scene on its own fixed, full-viewport layer: composited
+   once and never repainted while the feed scrolls. background-attachment:
+   fixed (the dashboard's mechanism) is a Chromium main-thread scrolling
+   reason — the gradient is repainted every frame and visibly flickers on
+   fast scrolls of a long feed. Covering the viewport also slides the
+   scene under the nav rail / mobile top bar, so their backdrop blur
+   frosts the actual scene (no negative-margin trick needed here). */
+.sceneLayer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@media (max-width: 991.98px) {
+  .historyPage {
+    --hz-sticky-top: 3.75rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .historyPage {
+    --hz-chip-h: 2.75rem;
+    /* the overflow arrows are real tap targets (they render whenever the
+       track overflows, touch included): same floor as the chips */
+    --hz-scroll-btn: 2.75rem;
+  }
+}
+
 /* Discreet live indicator next to the page title */
 .liveIndicator {
   display: inline-flex;
@@ -7,7 +64,7 @@
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.03em;
-  color: #6c757d;
+  color: var(--gl-muted);
   vertical-align: middle;
 }
 
@@ -15,19 +72,19 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #5eba00;
+  background: #2e8f5b;
   animation: livePulse 1.6s ease-in-out infinite;
 }
 
 @keyframes livePulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(94, 186, 0, 0.5);
+    box-shadow: 0 0 0 0 rgba(46, 143, 91, 0.5);
   }
   70% {
-    box-shadow: 0 0 0 6px rgba(94, 186, 0, 0);
+    box-shadow: 0 0 0 6px rgba(46, 143, 91, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(94, 186, 0, 0);
+    box-shadow: 0 0 0 0 rgba(46, 143, 91, 0);
   }
 }
 
@@ -37,10 +94,14 @@
   flex-wrap: wrap;
 }
 
+.headerText :global(.page-title) {
+  color: var(--gl-ink);
+}
+
 .subtitle {
   margin-top: 0.25rem;
   font-size: 0.875rem;
-  color: #6e7687;
+  color: var(--gl-muted);
 }
 
 .headerControls {
@@ -49,6 +110,21 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-left: auto;
+}
+
+/* The header controls are frosted pills, like the dashboard's page
+   controls. In dark mode the global input treatment (dark-mode.css)
+   takes over the surfaces, as everywhere else in the app. */
+.headerControls :global(.form-control) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  color: var(--gl-ink);
+}
+
+.searchInput :global(.input-icon-addon) {
+  color: var(--gl-muted);
 }
 
 .dateInput {
@@ -82,35 +158,70 @@
   }
 }
 
-/* Banner shown when browsing a past date */
+/* Banner shown when browsing a past date: a tinted notice of the stamp
+   family, with a white pill to jump back to live */
 .pastBanner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.6rem 0.5rem 1rem;
   font-size: 0.85rem;
-  color: #495057;
-  background: rgba(70, 127, 207, 0.08);
-  border: 1px solid rgba(70, 127, 207, 0.2);
-  border-radius: 4px;
+  font-weight: 500;
+  color: #2f5bd7;
+  background: #dde9fb;
+  border-radius: 999px;
 }
 
-/* Category group filter chips, sticky while scrolling the feed */
+.pastBanner :global(.btn) {
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  color: #2f5bd7;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.12);
+}
+
+.pastBanner :global(.btn):hover {
+  background: #fff;
+  color: var(--gl-ink);
+}
+
+/* Category group filter chips: a frosted capsule pinned while the feed
+   scrolls under it — the same floating-capsule move as the dashboard's
+   pill bar. Inactive chips are quiet on the track, the active one takes
+   a white segment (the theme's segmented-control grammar) tinted with
+   its group color. */
 .groupChipsWrapper {
   position: sticky;
-  top: 0;
+  top: var(--hz-sticky-top);
   z-index: 20;
-  margin-bottom: 0.75rem;
-  background: #f5f7fb;
+  margin-bottom: 1rem;
+  /* the track is a stadium inside a rectangular sticky box: the four
+     corner bites are empty wrapper, and a timeline card tucked under the
+     capsule shows through them. Same treatment as the dashboard pill bar
+     (spec H) and the day labels below — events are restored on the real
+     surfaces only, so those corners stay tappable on the card beneath. */
+  pointer-events: none;
+}
+
+.groupChips,
+.groupChipsScrollBtn {
+  pointer-events: auto;
 }
 
 .groupChips {
   display: flex;
-  gap: 0.5rem;
+  gap: 4px;
   overflow-x: auto;
-  padding: 0.5rem 0;
+  padding: 5px;
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--gl-border);
+  border-radius: 999px;
+  box-shadow: var(--gl-shadow-soft);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -134,49 +245,50 @@
 
 .groupChips:hover::-webkit-scrollbar-thumb,
 .groupChips:focus-within::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(28, 35, 52, 0.2);
   border-radius: 4px;
 }
 
 .groupChipsScrollBtn {
   position: absolute;
   top: 50%;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: var(--hz-scroll-btn);
+  height: var(--hz-scroll-btn);
   padding: 0;
-  color: #495057;
-  background: #fff;
-  border: 1px solid rgba(0, 40, 100, 0.12);
+  color: var(--gl-ink);
+  background: var(--gl-surface-strong);
+  border: 1px solid var(--gl-border);
   border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0, 40, 100, 0.12);
+  box-shadow: var(--gl-shadow-soft);
   cursor: pointer;
   transform: translateY(-50%);
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .groupChipsScrollBtn:hover {
-  color: #467fcf;
-  border-color: #467fcf;
+  color: var(--gl-accent);
 }
 
 .groupChipsScrollBtnLeft {
-  left: 0;
+  left: 6px;
 }
 
 .groupChipsScrollBtnRight {
-  right: 0;
+  right: 6px;
 }
 
+/* keep the first/last chip clear of the overflow arrow (6px offset + its
+   width + a small gap), so the padding follows the coarse-pointer size */
 .groupChipsWrapper:has(.groupChipsScrollBtnLeft) .groupChips {
-  padding-left: 2rem;
+  padding-left: calc(var(--hz-scroll-btn) + 0.5rem);
 }
 
 .groupChipsWrapper:has(.groupChipsScrollBtnRight) .groupChips {
-  padding-right: 2rem;
+  padding-right: calc(var(--hz-scroll-btn) + 0.5rem);
 }
 
 .groupChip {
@@ -184,20 +296,21 @@
   align-items: center;
   gap: 0.45rem;
   flex-shrink: 0;
-  padding: 0.4rem 0.9rem;
+  height: var(--hz-chip-h);
+  padding: 0 0.9rem;
   font-size: 0.8125rem;
-  font-weight: 500;
-  color: #495057;
-  background: #fff;
-  border: 1px solid rgba(0, 40, 100, 0.12);
-  border-radius: 100px;
+  font-weight: 600;
+  color: var(--gl-muted);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  white-space: nowrap;
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
 
 .groupChip:hover {
-  border-color: #467fcf;
-  color: #467fcf;
+  color: var(--gl-ink);
 }
 
 .groupChip i {
@@ -206,55 +319,49 @@
 
 .groupChipActive,
 .groupChipActive:hover {
-  color: #fff;
-  background: #467fcf;
-  border-color: #467fcf;
+  color: var(--gl-ink);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.18);
 }
 
+/* The active segment keeps the group's color identity in its ink */
 .groupChip-azure.groupChipActive {
-  background: #45aaf2;
-  border-color: #45aaf2;
+  color: #1e88d2;
 }
 
 .groupChip-green.groupChipActive {
-  background: #5eba00;
-  border-color: #5eba00;
+  color: #4a9400;
 }
 
 .groupChip-purple.groupChipActive {
-  background: #a55eea;
-  border-color: #a55eea;
+  color: #8c3fd8;
 }
 
 .groupChip-yellow.groupChipActive {
-  background: #f1c40f;
-  border-color: #f1c40f;
+  color: #b08e0a;
 }
 
 .groupChip-blue.groupChipActive {
-  background: #467fcf;
-  border-color: #467fcf;
+  color: #3568b0;
 }
 
 .groupChip-red.groupChipActive {
-  background: #e74c3c;
-  border-color: #e74c3c;
+  color: #cc3625;
 }
 
 .groupChip-orange.groupChipActive {
-  background: #fd9644;
-  border-color: #fd9644;
+  color: #e97b22;
 }
 
 .groupChip-gray.groupChipActive {
-  background: #868e96;
-  border-color: #868e96;
+  color: #667081;
 }
 
-/* "N new events" floating pill */
+/* "N new events" floating pill: solid ink, like the active dashboard tab
+   (dark mode derives its variant through the app inversion) */
 .newEventsPill {
   position: fixed;
-  top: 70px;
+  top: calc(var(--hz-sticky-top) + var(--hz-capsule-h) + 0.75rem);
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
@@ -264,10 +371,10 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: #fff;
-  background: #467fcf;
+  background: var(--gl-ink);
   border: 0;
   border-radius: 100px;
-  box-shadow: 0 4px 12px rgba(70, 127, 207, 0.4);
+  box-shadow: 0 6px 20px rgba(28, 35, 52, 0.35);
   cursor: pointer;
   animation: pillAppear 0.25s ease;
 }
@@ -283,9 +390,10 @@
   }
 }
 
-/* Day sections */
+/* Day sections: the label is a small frosted capsule that sticks below
+   the filter capsule while its day scrolls by */
 .daySection {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .dayHeader {
@@ -294,29 +402,36 @@
   gap: 0.75rem;
   margin-bottom: 0.6rem;
   position: sticky;
-  top: 46px; /* below the sticky filter chips */
+  top: calc(var(--hz-sticky-top) + var(--hz-capsule-h) + 0.5rem);
   z-index: 10;
-  padding: 0.4rem 0;
-  background: #f5f7fb;
+  /* nothing interactive in here: cards scrolling under the stuck label
+     must stay clickable */
+  pointer-events: none;
 }
 
 .dayHeaderLabel {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #6c757d;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted);
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid var(--gl-border);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
   white-space: nowrap;
 }
 
 .dayHeaderLine {
   flex: 1;
   height: 1px;
-  background: rgba(0, 40, 100, 0.12);
+  background: rgba(28, 35, 52, 0.1);
 }
 
 .timelineCard {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.25rem;
 }
 
 /* One event line */
@@ -328,29 +443,39 @@
   padding: 0.55rem 0;
 }
 
-/* Vertical connector between event icons */
-.eventLine::before {
+/* Vertical connector between event icons: two segments that stop short of
+   the icon square. The icon tints are translucent on the glass card, so a
+   continuous line would show through them — the gap makes it pass "behind"
+   the icon, with a small breathing space (offsets = the row's 0.55rem
+   padding and the 36px icon below, ± a 3px gap). */
+.eventLine::before,
+.eventLine::after {
   content: '';
   position: absolute;
   left: 17px;
-  top: 0;
-  bottom: 0;
   width: 2px;
-  background: rgba(0, 40, 100, 0.06);
+  background: rgba(28, 35, 52, 0.07);
 }
 
-.eventLine:first-child::before {
-  top: 50%;
+/* above the icon */
+.eventLine::before {
+  top: 0;
+  height: calc(0.55rem - 3px);
 }
 
-.eventLine:last-child::before {
-  bottom: 50%;
+/* below the icon */
+.eventLine::after {
+  top: calc(0.55rem + 36px + 3px);
+  bottom: 0;
 }
 
-.eventLine:first-child:last-child::before {
+/* no segment above the first icon or below the last one */
+.eventLine:first-child::before,
+.eventLine:last-child::after {
   display: none;
 }
 
+/* Event icons are tinted rounded squares — the stamp family */
 .eventIcon {
   position: relative;
   z-index: 1;
@@ -360,49 +485,49 @@
   width: 36px;
   height: 36px;
   flex-shrink: 0;
-  border-radius: 50%;
+  border-radius: 12px;
   font-size: 1rem;
-  color: #868e96;
-  background: #f0f2f5;
+  color: #667081;
+  background: rgba(28, 35, 52, 0.06);
 }
 
 .eventIcon-azure {
-  color: #45aaf2;
+  color: #1e88d2;
   background: rgba(69, 170, 242, 0.14);
 }
 
 .eventIcon-green {
-  color: #5eba00;
+  color: #4a9400;
   background: rgba(94, 186, 0, 0.14);
 }
 
 .eventIcon-purple {
-  color: #a55eea;
+  color: #8c3fd8;
   background: rgba(165, 94, 234, 0.14);
 }
 
 .eventIcon-yellow {
-  color: #d4a70c;
+  color: #b08e0a;
   background: rgba(241, 196, 15, 0.16);
 }
 
 .eventIcon-blue {
-  color: #467fcf;
+  color: #3568b0;
   background: rgba(70, 127, 207, 0.14);
 }
 
 .eventIcon-red {
-  color: #e74c3c;
+  color: #cc3625;
   background: rgba(231, 76, 60, 0.14);
 }
 
 .eventIcon-orange {
-  color: #fd9644;
+  color: #e97b22;
   background: rgba(253, 150, 68, 0.16);
 }
 
 .eventIcon-gray {
-  color: #868e96;
+  color: #667081;
   background: rgba(134, 142, 150, 0.14);
 }
 
@@ -421,11 +546,11 @@
 
 .eventDeviceName {
   font-weight: 600;
-  color: #343a40;
+  color: var(--gl-ink);
 }
 
 .eventValue {
-  color: #6c757d;
+  color: var(--gl-muted);
 }
 
 .eventValue-azure {
@@ -457,7 +582,7 @@
 }
 
 .eventValue-gray {
-  color: #6c757d;
+  color: var(--gl-muted);
 }
 
 .signalQualityValue {
@@ -479,8 +604,8 @@
   height: 1.3rem;
   font-size: 0.7rem;
   font-weight: 700;
-  color: #467fcf;
-  background: rgba(70, 127, 207, 0.1);
+  color: var(--gl-accent);
+  background: var(--gl-icon-tint-bg);
   border: 0;
   border-radius: 100px;
   cursor: pointer;
@@ -488,13 +613,13 @@
 }
 
 .eventCountBadge:hover {
-  background: rgba(70, 127, 207, 0.2);
+  background: #d3e0f8;
 }
 
 .eventMeta {
   margin-top: 0.1rem;
   font-size: 0.75rem;
-  color: #9aa0a6;
+  color: var(--gl-muted);
 }
 
 .eventRoom {
@@ -502,13 +627,14 @@
   align-items: center;
 }
 
+/* Expanded burst occurrences sit on the nested-card surface */
 .eventOccurrences {
   margin-top: 0.4rem;
   padding: 0.4rem 0.75rem;
   font-size: 0.8125rem;
-  color: #6c757d;
-  background: rgba(0, 40, 100, 0.03);
-  border-radius: 4px;
+  color: var(--gl-muted);
+  background: var(--gl-card-nested-bg);
+  border-radius: 12px;
 }
 
 .eventOccurrence {
@@ -519,7 +645,7 @@
 
 .eventOccurrenceTime {
   font-variant-numeric: tabular-nums;
-  color: #9aa0a6;
+  color: var(--gl-muted);
 }
 
 .eventTime {
@@ -527,7 +653,7 @@
   padding-top: 0.35rem;
   font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
-  color: #9aa0a6;
+  color: var(--gl-muted);
 }
 
 /* Empty state */
@@ -544,15 +670,26 @@
   height: 64px;
   margin-bottom: 1rem;
   font-size: 1.75rem;
-  color: #467fcf;
-  background: rgba(70, 127, 207, 0.1);
-  border-radius: 50%;
+  color: var(--gl-accent);
+  background: var(--gl-icon-tint-bg);
+  border-radius: 18px;
 }
 
 .loadMoreContainer {
   display: flex;
   justify-content: center;
   padding: 0.5rem 0 1.5rem;
+}
+
+/* "Load more" is a quiet frosted pill, like the dashboard page controls */
+.loadMoreContainer :global(.btn) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--gl-accent);
+  font-weight: 600;
 }
 
 .sentinel {
@@ -565,7 +702,7 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 1rem 0 1.5rem;
-  color: #9aa0ac;
+  color: var(--gl-muted);
   font-size: 0.875rem;
 }
 
@@ -580,12 +717,6 @@
   }
 
   .timelineCard {
-    padding: 0.25rem 0.75rem;
+    padding: 0.5rem 1rem;
   }
-}
-
-/* Dark mode: sticky bands must use the same pre-invert bg as .page (see dark-mode.css) */
-:global(.dark-mode) .groupChipsWrapper,
-:global(.dark-mode) .dayHeader {
-  background: #e1e8f7 !important;
 }

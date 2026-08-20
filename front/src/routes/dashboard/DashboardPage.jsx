@@ -2,7 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import DashboardTabs from './DashboardTabs';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
-import EmptyState from './EmptyState';
+import GetStarted from './GetStarted';
 import SetTabletMode from './SetTabletMode';
 import { JOB_STATUS } from '../../../../server/utils/constants';
 
@@ -116,7 +116,9 @@ const DashboardPage = ({ children, ...props }) => {
                     <Text id="dashboard.duckDbMigrationInProgress" fields={props.duckDbMigrationJob} />
                   </div>
                 )}
-                {props.dashboardNotConfigured && <EmptyState dashboardListEmpty={props.dashboardListEmpty} />}
+                {props.dashboardNotConfigured && (
+                  <GetStarted dashboardListEmpty={props.dashboardListEmpty} editDashboard={props.editDashboard} />
+                )}
                 {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
               </div>
             </div>
