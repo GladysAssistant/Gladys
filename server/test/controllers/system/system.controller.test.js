@@ -42,6 +42,104 @@ describe('POST /api/v1/system/vacuum', () => {
   });
 });
 
+describe('POST /api/v1/system/reboot', () => {
+  let rebootHostStub;
+
+  beforeEach(() => {
+    rebootHostStub = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'rebootHost');
+  });
+
+  afterEach(() => {
+    rebootHostStub.restore();
+  });
+
+  it('should reboot the host', async () => {
+    rebootHostStub.resolves(null);
+    await authenticatedRequest
+      .post('/api/v1/system/reboot')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+        expect(res.body).to.have.property('message');
+      });
+    sinon.assert.calledOnce(rebootHostStub);
+  });
+
+  it('should return an error when the reboot command fails immediately', async () => {
+    // A destructive action must not report a success it did not get: an
+    // immediate failure (polkit refusal, helper error) is surfaced to the user.
+    rebootHostStub.rejects(new Error('dbus-send not found'));
+    await authenticatedRequest
+      .post('/api/v1/system/reboot')
+      .expect('Content-Type', /json/)
+      .expect(500);
+    sinon.assert.calledOnce(rebootHostStub);
+  });
+
+  it('should acknowledge (200) when the command does not fail quickly', async function Test() {
+    this.timeout(6000);
+    // The host goes down before the command resolves: acknowledge instead of
+    // keeping the request open until the connection drops.
+    rebootHostStub.returns(new Promise(() => {}));
+    await authenticatedRequest
+      .post('/api/v1/system/reboot')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+      });
+    sinon.assert.calledOnce(rebootHostStub);
+  });
+});
+
+describe('POST /api/v1/system/shutdown-host', () => {
+  let shutdownHostStub;
+
+  beforeEach(() => {
+    shutdownHostStub = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'shutdownHost');
+  });
+
+  afterEach(() => {
+    shutdownHostStub.restore();
+  });
+
+  it('should shutdown the host', async () => {
+    shutdownHostStub.resolves(null);
+    await authenticatedRequest
+      .post('/api/v1/system/shutdown-host')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+        expect(res.body).to.have.property('message');
+      });
+    sinon.assert.calledOnce(shutdownHostStub);
+  });
+
+  it('should return an error when the shutdown command fails immediately', async () => {
+    shutdownHostStub.rejects(new Error('dbus-send not found'));
+    await authenticatedRequest
+      .post('/api/v1/system/shutdown-host')
+      .expect('Content-Type', /json/)
+      .expect(500);
+    sinon.assert.calledOnce(shutdownHostStub);
+  });
+
+  it('should acknowledge (200) when the command does not fail quickly', async function Test() {
+    this.timeout(6000);
+    shutdownHostStub.returns(new Promise(() => {}));
+    await authenticatedRequest
+      .post('/api/v1/system/shutdown-host')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+      });
+    sinon.assert.calledOnce(shutdownHostStub);
+  });
+});
+
 describe('POST /api/v1/system/upgrade', () => {
   it('should upgrade', async () => {
     const res = await authenticatedRequest
