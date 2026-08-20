@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import leaflet from 'leaflet';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
+import cx from 'classnames';
 
 import 'leaflet/dist/leaflet.css';
 import style from './style.css';
@@ -175,14 +176,15 @@ class MapComponent extends Component {
     return (
       <div ref={this.setMapRef} style={{ height: `${height}px` }}>
         <div class="leaflet-top leaflet-right">
-          <button
-            href="/dashboard/maps/area/new"
-            class="btn btn-primary"
-            onClick={this.openNewAreaView}
-            style={{ marginTop: '10px', marginRight: '10px', pointerEvents: 'auto' }}
-          >
-            <Text id="newArea.createNewZoneButton" />
-          </button>
+          {/* .leaflet-control restores pointer events and the corner margins;
+              btn-primary stays for behavior and the e2e tests, the Horizon
+              frosted pill wins the styling */}
+          <div class="leaflet-control">
+            <button class={cx('btn', 'btn-primary', style.pillButton)} onClick={this.openNewAreaView}>
+              <i class="fe fe-plus" />
+              <Text id="newArea.createNewZoneButton" />
+            </button>
+          </div>
         </div>
       </div>
     );

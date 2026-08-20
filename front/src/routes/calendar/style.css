@@ -7,19 +7,8 @@
    filter (style/dark-mode.css), like the rest of the theme.
    ================================================================== */
 
-/* Below 992px .dashboardBackground reserves a band for the dashboard's fixed
-   switcher dock plus the home-indicator safe area; the calendar renders no
-   dock, so give the dock part back and keep the safe-area inset — same move
-   as the settings pages (routes/settings/style.css), and for the same reason
-   not done with :has(.dashboardHeader) on the shared rule: Safari < 15.4 (old
-   wall tablets) would drop it and let the dock overlap the real dashboard.
-   Doubled class so it out-specifies the shared single-class rule whatever the
-   import order. */
-@media (max-width: 991.98px) {
-  .calendarScene.calendarScene {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-}
+/* No mobile dock clearance to counter here: the scene's bottom-dock padding
+   is opt-in (.withBottomDock, set by the dashboard page alone). */
 
 /* The calendar fills the viewport below the chrome on desktop instead of
    the historical fixed 550px card; on mobile stacked heights stay natural */
