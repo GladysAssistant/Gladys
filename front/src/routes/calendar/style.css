@@ -8,12 +8,13 @@
    ================================================================== */
 
 /* The shared background class reserves bottom space on mobile for the
-   dashboard's fixed switcher dock; this page renders no dock, so give the
-   space back (doubled class to out-specify the shared single-class rule,
+   dashboard's fixed switcher dock plus the home-indicator safe area; this
+   page renders no dock, so give the dock part back and keep the safe-area
+   inset (doubled class to out-specify the shared single-class rule,
    whatever the import order) */
 @media (max-width: 991.98px) {
   .calendarScene.calendarScene {
-    padding-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 
