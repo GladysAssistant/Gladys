@@ -154,6 +154,14 @@
   color: var(--gl-muted);
 }
 
+/* The glass cards are stacking contexts (backdrop-filter), so an overlay
+   menu (react-select's timezone list…) would paint UNDER the next card:
+   the card owning the focused control rises above its siblings while the
+   menu is open (react-select keeps focus in its control) */
+:global(.settings-page .card:focus-within) {
+  z-index: 5;
+}
+
 /* react-select (timezone…) joins the input family */
 :global(.settings-page .react-select__control) {
   border-radius: 12px;
