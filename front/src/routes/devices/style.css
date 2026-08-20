@@ -50,6 +50,12 @@
   flex-shrink: 0;
 }
 
+.integrationName {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .rowActions {
   display: flex;
   align-items: center;

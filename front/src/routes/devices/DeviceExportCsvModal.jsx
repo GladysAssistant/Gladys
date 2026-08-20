@@ -76,9 +76,18 @@ class DeviceExportCsvModal extends Component {
     this.setState({ end: e.target.value });
   };
 
+  // Clearing an <input type="date"> gives an empty string, which dayjs turns
+  // into an invalid date: it must block the export like an inverted period
+  // does, otherwise toISOString() throws when building the request.
+  isPeriodInvalid = () => {
+    const startDate = dayjs(this.state.start);
+    const endDate = dayjs(this.state.end);
+    return !startDate.isValid() || !endDate.isValid() || endDate.isBefore(startDate, 'day');
+  };
+
   exportCsv = async () => {
     const { selectedFeatures, start, end } = this.state;
-    if (selectedFeatures.length === 0) {
+    if (selectedFeatures.length === 0 || this.isPeriodInvalid()) {
       return;
     }
     await this.setState({ exporting: true, error: false, errorDetail: null });
@@ -101,7 +110,7 @@ class DeviceExportCsvModal extends Component {
 
   render({ device }, { selectedFeatures, start, end, exporting, error, errorDetail }) {
     const exportableFeatures = getExportableFeatures(device);
-    const invalidPeriod = dayjs(end).isBefore(dayjs(start), 'day');
+    const invalidPeriod = this.isPeriodInvalid();
     const canExport = selectedFeatures.length > 0 && !invalidPeriod && !exporting;
     return (
       <div class={style.modalOverlay} onClick={this.handleOverlayClick}>

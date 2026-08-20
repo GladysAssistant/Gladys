@@ -46,8 +46,27 @@ describe('mqttHandler.listenToHomeAssistantDeviceStateIfNeeded', () => {
     expect(mqttHandler.haStateBindings).to.deep.equal({});
   });
 
-  it('should not subscribe to a wildcard state topic', () => {
-    ['#', 'my-device/+/state', 'my-device/#'].forEach((stateTopic) => {
+  it('should subscribe to a wildcard state topic', () => {
+    // Theengs gateways advertise wildcard state topics so that several
+    // gateways can publish the state of the same BLE sensor
+    mqttHandler.listenToHomeAssistantDeviceStateIfNeeded({
+      external_id: 'homeassistant:my-device',
+      params: [
+        {
+          name: 'ha_discovery_config:sensor:temperature',
+          value: JSON.stringify({ state_topic: '+/+/BTtoMQTT/A4C138800021', device_class: 'temperature' }),
+        },
+      ],
+      features: [{ external_id: 'homeassistant:my-device:sensor:temperature' }],
+    });
+    expect(mqttHandler.haStateBindings['+/+/BTtoMQTT/A4C138800021']).to.have.lengthOf(1);
+    sinon.assert.calledWith(mqttHandler.subscribe, '+/+/BTtoMQTT/A4C138800021');
+  });
+
+  it('should not subscribe to a state topic matching too many topics', () => {
+    // A discovery payload is untrusted input: "#" and filters without a concrete
+    // level would subscribe Gladys to traffic unrelated to the device
+    ['#', 'sensor/#', '+', '+/+'].forEach((stateTopic) => {
       mqttHandler.haStateBindings = {};
       mqttHandler.listenToHomeAssistantDeviceStateIfNeeded({
         external_id: 'homeassistant:my-device',
@@ -61,6 +80,60 @@ describe('mqttHandler.listenToHomeAssistantDeviceStateIfNeeded', () => {
       });
       expect(mqttHandler.haStateBindings).to.deep.equal({});
     });
+    sinon.assert.notCalled(mqttHandler.subscribe);
+  });
+
+  it('should not subscribe to a state topic with a wildcard inside a level', () => {
+    // "+" is a wildcard only when it takes a whole level, and "#" is refused wherever it appears
+    ['foo+bar', 'sensor/foo+/state', 'foo#bar'].forEach((stateTopic) => {
+      mqttHandler.haStateBindings = {};
+      mqttHandler.listenToHomeAssistantDeviceStateIfNeeded({
+        external_id: 'homeassistant:my-device',
+        params: [
+          {
+            name: 'ha_discovery_config:sensor:temperature',
+            value: JSON.stringify({ state_topic: stateTopic, device_class: 'temperature' }),
+          },
+        ],
+        features: [{ external_id: 'homeassistant:my-device:sensor:temperature' }],
+      });
+      expect(mqttHandler.haStateBindings).to.deep.equal({});
+    });
+    sinon.assert.notCalled(mqttHandler.subscribe);
+  });
+
+  it('should ignore a non-string state topic without throwing', () => {
+    // A discovery payload can hold anything in "state_topic". Throwing here would abort
+    // the device walk done at init, and the MQTT service would never connect
+    [{}, true, 1, ['a/b']].forEach((stateTopic) => {
+      mqttHandler.haStateBindings = {};
+      mqttHandler.listenToHomeAssistantDeviceStateIfNeeded({
+        external_id: 'homeassistant:my-device',
+        params: [
+          {
+            name: 'ha_discovery_config:sensor:temperature',
+            value: JSON.stringify({ state_topic: stateTopic, device_class: 'temperature' }),
+          },
+        ],
+        features: [{ external_id: 'homeassistant:my-device:sensor:temperature' }],
+      });
+      expect(mqttHandler.haStateBindings).to.deep.equal({});
+    });
+    sinon.assert.notCalled(mqttHandler.subscribe);
+
+    // A device handled after the invalid one still gets its subscription
+    mqttHandler.listenToHomeAssistantDeviceStateIfNeeded({
+      external_id: 'homeassistant:my-other-device',
+      params: [
+        {
+          name: 'ha_discovery_config:sensor:temperature',
+          value: JSON.stringify({ state_topic: 'my-other-device/temperature', device_class: 'temperature' }),
+        },
+      ],
+      features: [{ external_id: 'homeassistant:my-other-device:sensor:temperature' }],
+    });
+    expect(mqttHandler.haStateBindings['my-other-device/temperature']).to.have.lengthOf(1);
+    sinon.assert.calledWith(mqttHandler.subscribe, 'my-other-device/temperature');
   });
 
   it('should listen to the state topic of a sensor', () => {

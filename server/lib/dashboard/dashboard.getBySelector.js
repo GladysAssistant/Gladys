@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { normalizeDashboardBoxes } = require('../../utils/dashboardSections');
 
 /**
  * @description Get a dashboard by selector.
@@ -12,7 +13,20 @@ const { NotFoundError } = require('../../utils/coreErrors');
  */
 async function getBySelector(userId, selector) {
   const dashboard = await db.Dashboard.findOne({
-    attributes: ['id', 'name', 'selector', 'type', 'visibility', 'user_id', 'created_at', 'updated_at', 'boxes'],
+    attributes: [
+      'id',
+      'name',
+      'selector',
+      'type',
+      'visibility',
+      'user_id',
+      'icon',
+      'background_scene',
+      'width',
+      'created_at',
+      'updated_at',
+      'boxes',
+    ],
     where: {
       // I can see dashboard I created or public dashboard
       [Op.or]: [
@@ -31,7 +45,11 @@ async function getBySelector(userId, selector) {
     throw new NotFoundError('Dashboard not found');
   }
 
-  return dashboard.get({ plain: true });
+  const plainDashboard = dashboard.get({ plain: true });
+  // Dashboards created before the section-based layout store an array of columns
+  plainDashboard.boxes = normalizeDashboardBoxes(plainDashboard.boxes);
+
+  return plainDashboard;
 }
 
 module.exports = {

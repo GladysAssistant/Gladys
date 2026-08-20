@@ -113,6 +113,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: true,
@@ -144,6 +145,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: true,
@@ -181,6 +183,84 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
+  it('should create the z2m container without USB device in network mode', async () => {
+    // PREPARE
+    const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
+    const getContainersStub = stub();
+    getContainersStub
+      .onFirstCall()
+      .resolves([])
+      .onSecondCall()
+      .resolves([containerStopped]);
+    gladys.system.getContainers = getContainersStub;
+    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnce(gladys.system.createContainer);
+    const [createdDescriptor] = gladys.system.createContainer.firstCall.args;
+    expect(createdDescriptor.HostConfig.Devices).to.deep.equal([]);
+    expect(createdDescriptor.HostConfig.Binds).to.deep.equal([
+      `${path.join(__dirname, 'host')}/zigbee2mqtt/z2m:/app/data`,
+    ]);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+  });
+
+  it('should recreate the z2m container when switching from USB to a network coordinator', async () => {
+    // PREPARE
+    const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
+    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    // Existing container is bound to /dev/ttyUSB0, it must be removed and recreated without device
+    assert.calledOnce(gladys.system.stopContainer);
+    assert.calledOnce(gladys.system.removeContainer);
+    assert.calledOnce(gladys.system.createContainer);
+    const [createdDescriptor] = gladys.system.createContainer.firstCall.args;
+    expect(createdDescriptor.HostConfig.Devices).to.deep.equal([]);
+  });
+
+  it('should keep the z2m container of an already configured network coordinator', async () => {
+    // PREPARE
+    const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
+    gladys.system.getContainers = fake.resolves([container]);
+    gladys.system.inspectContainer = fake.resolves({
+      ...containerDescription,
+      HostConfig: {
+        ...containerDescription.HostConfig,
+        Devices: [],
+      },
+    });
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(gladys.system.createContainer);
+    assert.notCalled(gladys.system.restartContainer);
+  });
+
+  it('should handle an existing container without device list', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([container]);
+    gladys.system.inspectContainer = fake.resolves({
+      ...containerDescription,
+      HostConfig: {
+        ...containerDescription.HostConfig,
+        Devices: undefined,
+      },
+    });
+    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnce(gladys.system.removeContainer);
+    assert.calledOnce(gladys.system.createContainer);
+    const [createdDescriptor] = gladys.system.createContainer.firstCall.args;
+    expect(createdDescriptor.HostConfig.Devices[0].PathOnHost).to.equal('/dev/ttyUSB0');
+  });
+
   it('should do nothing', async () => {
     // PREPARE
     const config = {};
@@ -200,6 +280,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: true,
@@ -309,6 +390,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
@@ -344,6 +426,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
@@ -381,6 +464,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: true,
@@ -398,6 +482,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: true,

@@ -1,0 +1,260 @@
+/* Left-sidebar navigation (Horizon): app-level navigation lives in a fixed
+   frosted panel on the left, so the top of the screen belongs to the current
+   page — on dashboards, to the dashboard switcher pills.
+   Desktop (≥992px): always-visible rail. Below: off-canvas drawer opened by
+   the slim fixed top bar's menu button, closed by backdrop tap or navigation
+   (handleRoute resets showCollapsedMenu). Content offsets live in
+   style/index.css on body.gladys-sidebar-nav, toggled by the component. */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 15rem;
+  z-index: 1040;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0.75rem 0.75rem;
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  border-right: 1px solid rgba(28, 35, 52, 0.08);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sidebarBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1c2334;
+  white-space: nowrap;
+}
+
+.sidebarBrand:hover {
+  color: #1c2334;
+  text-decoration: none;
+}
+
+.sidebarBrand img {
+  width: 28px;
+  height: 28px;
+}
+
+.sidebarNav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  color: rgba(28, 35, 52, 0.62);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+}
+
+.navLink:hover {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #1c2334;
+  text-decoration: none;
+}
+
+.navLinkActive,
+.navLinkActive:hover {
+  background-color: #fff;
+  color: #1c2334;
+  box-shadow: 0 2px 10px rgba(28, 35, 52, 0.12);
+}
+
+.navIcon {
+  width: 1.25rem;
+  text-align: center;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.navLinkActive .navIcon {
+  color: #3d6df0;
+}
+
+.navBadge {
+  margin-left: auto;
+}
+
+/* Footer: profile row opening a dropup menu, dark-mode toggle beside it */
+.sidebarFooter {
+  position: relative;
+  margin-top: 0.5rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.profileButton {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.profileButton:hover {
+  background-color: rgba(28, 35, 52, 0.06);
+  text-decoration: none;
+}
+
+.profileName {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.profileName > span {
+  color: #1c2334;
+  font-weight: 600;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profileName > small {
+  color: rgba(28, 35, 52, 0.55);
+  font-size: 0.75rem;
+}
+
+/* Dropup: same tabler .dropdown-menu skin, anchored above the footer */
+.profileMenu {
+  top: auto;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: auto;
+  min-width: 12rem;
+}
+
+/* Mobile top bar: menu button + brand + dark toggle, frosted like the rail */
+.mobileTopBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.25rem;
+  z-index: 1030;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.5rem 0 0.25rem;
+  background-color: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  border-bottom: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+.mobileToggler {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  background: transparent;
+  padding: 0;
+  border-radius: 12px;
+  color: #1c2334;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.mobileToggler:hover {
+  color: #1c2334;
+  text-decoration: none;
+}
+
+.mobileBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #1c2334;
+  margin-right: auto;
+}
+
+.mobileBrand:hover {
+  color: #1c2334;
+  text-decoration: none;
+}
+
+.mobileBrand img {
+  width: 24px;
+  height: 24px;
+}
+
+.sidebarBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1050;
+  background-color: rgba(15, 20, 32, 0.42);
+}
+
+/* Below the desktop breakpoint the rail becomes a drawer above the backdrop.
+   While closed it is visibility: hidden — a translated-only drawer would stay
+   in the tab order and in the accessibility tree; the delayed visibility flip
+   keeps the slide-out animation visible. */
+@media (max-width: 991.98px) {
+  .sidebar {
+    width: 16.5rem;
+    max-width: 85vw;
+    z-index: 1055;
+    background-color: rgba(255, 255, 255, 0.92);
+    transform: translateX(-105%);
+    visibility: hidden;
+    transition: transform 0.22s ease, visibility 0s linear 0.22s;
+    box-shadow: 0 12px 48px rgba(20, 30, 60, 0.3);
+  }
+
+  .sidebarOpen {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.22s ease;
+  }
+}
+
+@media (pointer: coarse) {
+  .navLink,
+  .profileButton {
+    min-height: 2.75rem;
+  }
+}
+
+/* Dark mode is the app-wide inversion filter (style/dark-mode.css), so this
+   file defines light colors only — they invert into their dark counterparts.
+   Only the icons need an exception: the global `.dark-mode .fe` re-inversion
+   would push them back to dark-on-dark, so let them follow the inversion
+   like their labels (same exception the glass theme carries). */
+:global(.dark-mode) .sidebar :global(.fe),
+:global(.dark-mode) .mobileTopBar :global(.fe) {
+  filter: none;
+}

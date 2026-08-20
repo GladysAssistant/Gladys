@@ -16,6 +16,7 @@ const UserPresenceBox = ({ children, ...props }) => (
           </label>
 
           <Select
+            menuPlacement="auto"
             class="choose-dashboard-user-presence-users"
             defaultValue={[]}
             value={props.selectedUsers}

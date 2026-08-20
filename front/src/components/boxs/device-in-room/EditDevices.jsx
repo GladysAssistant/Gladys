@@ -211,6 +211,7 @@ class EditDevices extends Component {
                   <Text id="dashboard.boxes.devices.addADeviceLabel" />
                 </label>
                 <Select
+                  menuPlacement="auto"
                   onChange={this.addDeviceFeature}
                   value={[]}
                   options={deviceOptions}

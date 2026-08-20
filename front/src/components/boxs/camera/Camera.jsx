@@ -361,12 +361,13 @@ class CameraBoxComponent extends Component {
       <div class="card">
         {image && <img class="card-img-top" src={`data:${image}`} alt={props.roomName} />}
         {error && (
-          <div>
-            <p class={style.noImageToShowError}>
-              <span class="pl-2">
-                <Text id="dashboard.boxes.camera.noImageToShow" />
-              </span>
-            </p>
+          <div class={style.noImagePlaceholder}>
+            <span class={style.noImageIcon}>
+              <i class="fe fe-video-off" />
+            </span>
+            <span class={style.noImageText}>
+              <Text id="dashboard.boxes.camera.noImageToShow" />
+            </span>
           </div>
         )}
         {!image && loading && (

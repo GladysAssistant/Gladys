@@ -30,6 +30,7 @@ const deconzConfigFilePath = path.join(configBasePath, 'z2m_adapter-deconz_confi
 const emberConfigFilePath = path.join(configBasePath, 'z2m_adapter-ember_config.yaml');
 const ezspConfigFilePath = path.join(configBasePath, 'z2m_adapter-ezsp_config.yaml');
 const portConfigFilePath = path.join(configBasePath, 'z2m_port_config.yaml');
+const networkAdapterConfigFilePath = path.join(configBasePath, 'z2m_network-adapter_config.yaml');
 
 describe('zigbee2mqtt configureContainer', () => {
   // PREPARE
@@ -247,6 +248,79 @@ describe('zigbee2mqtt configureContainer', () => {
     const expectedContent = fs.readFileSync(deconzConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
+  it('it should configure a network coordinator', async () => {
+    // PREPARE
+    const config = {
+      z2mAdapterMode: 'network',
+      z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638',
+      z2mNetworkAdapterType: 'ember',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(networkAdapterConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
+  it('it should keep the network coordinator configuration', async () => {
+    // PREPARE
+    fs.copyFileSync(networkAdapterConfigFilePath, configFilePath);
+    const config = {
+      z2mAdapterMode: 'network',
+      z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638',
+      z2mNetworkAdapterType: 'ember',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(networkAdapterConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
+  });
+
+  it('it should use the default adapter for a network coordinator without type', async () => {
+    // PREPARE
+    const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    expect(resultContent).to.contain('serial:\n  port: tcp://192.168.1.20:6638\n  adapter: zstack\n');
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
+  it('it should restore the USB serial port when switching back from a network coordinator', async () => {
+    // PREPARE
+    fs.copyFileSync(networkAdapterConfigFilePath, configFilePath);
+    const config = { z2mAdapterMode: 'usb', z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.EMBER][0] };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(emberConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
+  ['socket://192.168.1.20:6638', 'MDNS://slzb-06', 'mdns://slzb-06'].forEach((networkSerialPort) => {
+    it(`it should restore the USB serial port when switching back from "${networkSerialPort}"`, async () => {
+      // PREPARE
+      const networkConfigContent = fs.readFileSync(networkAdapterConfigFilePath, 'utf8');
+      fs.writeFileSync(configFilePath, networkConfigContent.replace('tcp://192.168.1.20:6638', networkSerialPort));
+      const config = { z2mAdapterMode: 'usb', z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.EMBER][0] };
+      // EXECUTE
+      const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+      // ASSERT
+      const resultContent = fs.readFileSync(configFilePath, 'utf8');
+      const expectedContent = fs.readFileSync(emberConfigFilePath, 'utf8');
+      expect(resultContent).to.equal(expectedContent);
+      expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+    });
   });
 
   it('it should remove serial adapter (unknown adapter)', async () => {

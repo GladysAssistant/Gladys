@@ -289,3 +289,15 @@
   line-height: 1.2;
   transition: color 0.15s ease;
 }
+
+/* Touch targets: the slim toolbar controls reach the ~44px floor on
+   coarse-pointer devices (the interval label was 16px tall) */
+@media (pointer: coarse) {
+  .intervalButton {
+    min-height: 2.75rem;
+  }
+
+  .navButton {
+    width: 2.75rem;
+  }
+}

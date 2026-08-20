@@ -518,13 +518,24 @@ body .apexcharts-tooltip {
   margin-right: 6px;
 }
 
-/* The theme pins nav badges to the top-right corner of the nav item. That looks
-   right on the horizontal desktop tabs, where the item hugs its link, but the
-   collapsed mobile menu stacks full-width items, so the badge drifts to the
-   edge of the screen, away from the label it counts. Below the lg breakpoint,
-   let it flow inline after the text instead (spacing comes from its ml-2). */
+/* Left-sidebar navigation (components/header): content shifts right of the
+   fixed rail on desktop and below the slim fixed top bar on mobile. The body
+   class is toggled by the Header component, so auth pages and fullscreen
+   (wall-panel) mode keep the full viewport. Only the OUTER .page is padded:
+   the dashboard routes nest a .page of their own that must not double it. */
+@media (min-width: 992px) {
+  body.gladys-sidebar-nav #app > .page {
+    padding-left: 15rem;
+  }
+  /* fixed-bottom bars (dashboard editor footer) span the viewport: keep them
+     clear of the rail */
+  body.gladys-sidebar-nav .fixed-bottom {
+    left: 15rem;
+  }
+}
+
 @media (max-width: 991.98px) {
-  #headerMenuCollapse .nav-tabs .nav-link .badge {
-    position: static;
+  body.gladys-sidebar-nav #app > .page {
+    padding-top: 3.25rem;
   }
 }
