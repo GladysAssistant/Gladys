@@ -24,7 +24,7 @@
 
 .emptyStateIcon {
   font-size: 4rem;
-  color: #9aa0ac;
+  color: var(--gl-muted, #9aa0ac);
 }
 
 .emptyStateText {
@@ -40,7 +40,7 @@
 
 .featureIcon {
   font-size: 1rem;
-  color: #9aa0ac;
+  color: var(--gl-muted, #9aa0ac);
 }
 
 .deviceStamp {
@@ -88,6 +88,177 @@
   font-size: 1.25rem;
 }
 
+/* ==================================================================
+   Horizon: the page sits on the same glass scene as the dashboard
+   (.glass-theme + the dashboard's scene classes on the page root).
+   The glass cards, inks and table borders come from the global theme
+   layer; this file only adds the page-specific pieces. Light colors
+   only — dark mode is the app-wide inversion filter, like the whole
+   theme (style/dark-mode.css).
+   ================================================================== */
+
+.devicesPage :global(.page-title) {
+  color: var(--gl-ink);
+}
+
+.devicesPage :global(.page-subtitle) {
+  color: var(--gl-muted);
+}
+
+/* The room/integration filters and the search input become quiet frosted
+   pills, the same family as the dashboard's header action pills */
+.devicesPage .pageOptions :global(.form-control) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-card-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-weight: 600;
+  color: var(--gl-ink);
+}
+
+.devicesPage .pageOptions :global(.input-icon-addon) {
+  color: var(--gl-muted);
+}
+
+/* dark-mode.css paints selects and inputs with solid !important backgrounds
+   and double-inverts the inputs back to their light look: under glass they
+   are frosted pills that must invert WITH the theme, like every other glass
+   surface (same counter-weight as the dashboard's page controls) */
+:global(.dark-mode) .devicesPage .pageOptions :global(.form-control) {
+  background-color: var(--gl-card-bg) !important;
+  color: var(--gl-ink) !important;
+  border-color: var(--gl-border) !important;
+  filter: none;
+}
+
+/* The table header joins the theme's uppercase micro-label grammar */
+.devicesPage :global(.device-list-table thead th) {
+  border: none;
+  background: transparent;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gl-muted);
+  padding-top: 0.25rem;
+  padding-bottom: 0;
+}
+
+.devicesPage :global(.device-list-table) a {
+  color: var(--gl-accent);
+  font-weight: 600;
+}
+
+/* Room tags become soft neutral pills, the badges' plain cousins */
+.devicesPage :global(.tag) {
+  border-radius: 999px;
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+  font-weight: 600;
+}
+
+/* The integration stamp palette joins the pastel family: the global theme
+   only defines the four colors the dashboard widgets use, the devices list
+   hashes integrations over the full Tabler range */
+.devicesPage :global(.stamp.bg-azure) {
+  background: #ddeefb !important;
+  color: #2f8fd4 !important;
+}
+
+.devicesPage :global(.stamp.bg-indigo) {
+  background: #e3e6fa !important;
+  color: #5262c9 !important;
+}
+
+.devicesPage :global(.stamp.bg-purple) {
+  background: #ece2fa !important;
+  color: #8a55d4 !important;
+}
+
+.devicesPage :global(.stamp.bg-pink) {
+  background: #fae2ec !important;
+  color: #d4548c !important;
+}
+
+.devicesPage :global(.stamp.bg-orange) {
+  background: #fbe9dc !important;
+  color: #d4762f !important;
+}
+
+.devicesPage :global(.stamp.bg-lime) {
+  background: #e7f4dc !important;
+  color: #5f9e2f !important;
+}
+
+.devicesPage :global(.stamp.bg-teal) {
+  background: #dcf2ef !important;
+  color: #2b9d8f !important;
+}
+
+.devicesPage :global(.stamp.bg-cyan) {
+  background: #ddf0f4 !important;
+  color: #2a8ba0 !important;
+}
+
+/* Mobile list: the flush list-group becomes a stack of pill rows on the
+   nested-card surface, like the device rows of the dashboard widgets */
+.devicesPage :global(.list-group-flush) {
+  padding: 8px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.devicesPage :global(.list-group-flush .list-group-item) {
+  background-color: var(--gl-card-nested-bg);
+  border: 1px solid var(--gl-border);
+  border-radius: 14px;
+  color: var(--gl-ink);
+}
+
+/* dark-mode.css paints .list-group-item with a solid !important background:
+   restore the translucent pill with the same weight, the inversion filter
+   derives the dark variant (see the glass card rules) */
+:global(.dark-mode) .devicesPage :global(.list-group-flush .list-group-item) {
+  background-color: var(--gl-card-nested-bg) !important;
+}
+
+.devicesPage :global(.list-group-item-action):hover,
+.devicesPage :global(.list-group-item-action):focus {
+  background-color: var(--gl-surface-strong);
+  color: var(--gl-ink);
+}
+
+/* pressing a tappable row gives immediate feedback, like the widget rows */
+@media (pointer: coarse) {
+  .devicesPage :global(.list-group-item-action):active {
+    background-color: var(--gl-icon-tint-bg);
+  }
+}
+
+/* The load-error alert sits outside a card: same quiet tinted notice as
+   the in-card alerts of the theme */
+.devicesPage :global(.alert-danger) {
+  border: none;
+  border-radius: 14px;
+  font-weight: 500;
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+/* Empty-state button: frosted accent pill, like the dashboard's page
+   controls (the dark-mode filter exception is carried by the theme) */
+.devicesPage .emptyStateDivBox :global(.btn-outline-primary) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-weight: 600;
+  color: var(--gl-accent);
+}
+
 /* Below the desktop breakpoint (also on tablet, where the table is too
    cramped), the filters stack like a native app: the two selects share
    a row, the ordering select and the search bar share the next one */
@@ -106,8 +277,12 @@
     flex: 0 1 auto;
   }
 
+  /* the search bar needs real room to be usable: below a comfortable
+     minimum it takes its own full-width row instead of being squeezed
+     against the viewport edge (the Horizon pills' heavier weight makes
+     the selects a touch wider than the old controls) */
   .pageOptions > div {
-    flex: 1 1 0;
-    min-width: 0;
+    flex: 1 1 auto;
+    min-width: 10rem;
   }
 }
