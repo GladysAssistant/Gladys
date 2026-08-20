@@ -425,26 +425,35 @@
   padding: 0.55rem 0;
 }
 
-/* Vertical connector between event icons */
-.eventLine::before {
+/* Vertical connector between event icons: two segments that stop short of
+   the icon square. The icon tints are translucent on the glass card, so a
+   continuous line would show through them — the gap makes it pass "behind"
+   the icon, with a small breathing space (offsets = the row's 0.55rem
+   padding and the 36px icon below, ± a 3px gap). */
+.eventLine::before,
+.eventLine::after {
   content: '';
   position: absolute;
   left: 17px;
-  top: 0;
-  bottom: 0;
   width: 2px;
   background: rgba(28, 35, 52, 0.07);
 }
 
-.eventLine:first-child::before {
-  top: 50%;
+/* above the icon */
+.eventLine::before {
+  top: 0;
+  height: calc(0.55rem - 3px);
 }
 
-.eventLine:last-child::before {
-  bottom: 50%;
+/* below the icon */
+.eventLine::after {
+  top: calc(0.55rem + 36px + 3px);
+  bottom: 0;
 }
 
-.eventLine:first-child:last-child::before {
+/* no segment above the first icon or below the last one */
+.eventLine:first-child::before,
+.eventLine:last-child::after {
   display: none;
 }
 
