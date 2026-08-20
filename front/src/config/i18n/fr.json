@@ -291,6 +291,8 @@
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
+    "editDashboardSavedButton": "Enregistré",
+    "editDashboardDoneButton": "Terminer",
     "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
     "toggleDefineTabletMode": "Mode tablette",
     "closeDefineTabletMode": "Fermer",
@@ -319,14 +321,23 @@
       "public": "public"
     },
     "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
+    "editDashboardAddSectionButton": "Ajouter une section",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bord",
-    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
+    "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer, utilisez les boutons + pour ajouter widgets, colonnes ou sections. Glissez les widgets pour les déplacer — sur mobile, utilisez les flèches.",
+    "editorDashboardSettingsButton": "Réglages du tableau de bord",
+    "editorDashboardSettings": "Réglages du tableau de bord",
+    "editorMoveSectionUp": "Monter la section",
+    "editorMoveSectionDown": "Descendre la section",
+    "editorNewWidget": "Nouveau widget",
+    "editorNewWidgetPlaceholder": "Choisissez un widget dans le panneau",
     "reorderDashboardButton": "Re-ordonner",
     "stopReorderingDashboardButton": "Arrêter de réordonner",
     "addBoxButton": "Ajouter",
     "selectBoxType": "Sélectionner un type",
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
+    "selectBoxTypeSearchPlaceholder": "Rechercher un widget (horloge, caméra…)",
+    "selectBoxTypeNoResult": "Aucun widget ne correspond à « {{search}} »",
     "boxTitle": {
       "alarm": "Alarme",
       "weather": "Météo",
@@ -347,10 +358,14 @@
       "voice-assistant": "Assistant vocal",
       "link": "Lien",
       "photo": "Photo",
-      "sun": "Soleil"
+      "sun": "Soleil",
+      "chips": "Pastilles d'état",
+      "actions": "Actions rapides",
+      "house-view": "Vue de la maison"
     },
     "boxes": {
       "column": "Colonne {{index}}",
+      "section": "Section {{index}}",
       "deleteButton": "Supprimer",
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
@@ -580,7 +595,8 @@
         "currentHourState": "Actuellement",
         "peakHour": "Heure pleine",
         "offPeakHour": "Heure creuse",
-        "dayPeakTitle": "Jours tempo"
+        "dayPeakTitle": "Jours tempo",
+        "error": "Impossible de récupérer les données EDF Tempo. Vérifiez que le service EDF Tempo est bien configuré."
       },
       "clock": {
         "analog": "Analogique",
@@ -595,7 +611,9 @@
       "scene": {
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
-        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
+        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici.",
+        "editStatusFeatureLabel": "État en direct sous chaque bouton (optionnel)",
+        "editStatusFeatureDescription": "Choisissez une fonctionnalité d'appareil pour afficher son état sous le bouton de la scène, ex : position des volets ou état de l'aspirateur."
       },
       "link": {
         "editTitleLabel": "Titre",
@@ -701,7 +719,97 @@
         "errorNoTranscription": "Je n'ai pas compris votre message. Parlez plus près du micro et réessayez.",
         "configDescription": "Ce widget utilise Gladys Plus pour la reconnaissance vocale, l'IA et la synthèse vocale. Connectez votre instance à Gladys Plus pour l'utiliser.",
         "plusRequiredHint": "Connectez Gladys Plus pour activer le micro."
+      },
+      "chips": {
+        "editDescription": "Une barre compacte de pastilles d'état. Ajoutez des pastilles et choisissez ce que chacune affiche.",
+        "editChipLabel": "Pastille {{index}}",
+        "removeChipButton": "Supprimer la pastille {{index}}",
+        "editChipTypeLabel": "Que doit afficher cette pastille ?",
+        "chipTypes": {
+          "device-feature": "L'état d'un appareil",
+          "openings": "Résumé des ouvertures (portes/fenêtres)",
+          "alarm": "État de l'alarme",
+          "calendar-next-event": "Prochain événement d'agenda"
+        },
+        "editDeviceFeatureLabel": "Fonctionnalité de l'appareil",
+        "editHouseLabel": "Maison",
+        "editRoomLabel": "Pièce (optionnel, pour restreindre)",
+        "editCalendarLabel": "Agenda",
+        "allCalendars": "Tous les agendas",
+        "editEventNameFilterLabel": "Uniquement les événements contenant (optionnel)",
+        "editEventNameFilterPlaceholder": "ex : Poubelle",
+        "editLabelLabel": "Libellé (optionnel)",
+        "editLabelPlaceholder": "ex : Garage",
+        "addChipButton": "Ajouter une pastille",
+        "openings": "{{count}} ouvert(s)",
+        "allClosed": "Tout fermé",
+        "noEvent": "Aucun événement à venir",
+        "error": "Erreur",
+        "alarmModes": {
+          "disarmed": "Désactivée",
+          "armed": "Activée",
+          "partially-armed": "Partiellement activée",
+          "panic": "Panique"
+        }
+      },
+      "actions": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Volets, Lumières…",
+        "actionLabel": "Action {{index}}",
+        "removeActionButton": "Supprimer l'action {{index}}",
+        "actionTypeLabel": "Type d'action",
+        "actionTypes": {
+          "scene": "Démarrer une scène",
+          "device-feature": "Contrôler un appareil"
+        },
+        "sceneLabel": "Scène",
+        "deviceFeatureLabel": "Fonctionnalité de l'appareil",
+        "commandLabel": "Commande",
+        "commands": {
+          "open": "Ouvrir",
+          "stop": "Stop",
+          "close": "Fermer"
+        },
+        "labelLabel": "Libellé du bouton (optionnel)",
+        "labelPlaceholder": "Ouvrir RDC…",
+        "addActionButton": "Ajouter une action",
+        "noActions": "Aucune action configurée pour l'instant. Éditez le tableau de bord pour en ajouter."
+      },
+      "house-view": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "ex : Ma maison",
+        "editGalleryLabel": "Choisissez une illustration",
+        "editUploadLabel": "Ou envoyez votre propre image",
+        "uploading": "Envoi en cours...",
+        "uploadError": "L'image n'a pas pu être envoyée. Essayez une image plus légère.",
+        "editPinsLabel": "Valeurs en direct sur l'image",
+        "editPinsDescription": "Cliquez sur l'image pour poser une épingle, puis choisissez la fonctionnalité qu'elle affiche. Pour déplacer une épingle, supprimez-la et reposez-la.",
+        "editPinLabel": "Épingle {{index}}",
+        "editPinFeatureLabel": "Fonctionnalité de l'appareil",
+        "editPinLabelLabel": "Libellé (optionnel)",
+        "editPinLabelPlaceholder": "ex : Solaire",
+        "noImage": "Choisissez une illustration dans les réglages du widget.",
+        "error": "L'image n'a pas pu être chargée."
       }
+    },
+    "editDashboardBackgroundLabel": "Ambiance de fond",
+    "editDashboardBackgroundDescription": "Des scènes intégrées, légères et toujours disponibles, même sans internet.",
+    "scenes": {
+      "horizon": "Horizon",
+      "aurora": "Aurore",
+      "dusk": "Crépuscule",
+      "forest": "Forêt",
+      "lagoon": "Lagon",
+      "sand": "Sable",
+      "lavender": "Lavande",
+      "mist": "Brume"
+    },
+    "editDashboardIconLabel": "Icône (optionnel)",
+    "editDashboardIconDescription": "Affichée dans la barre d'onglets des tableaux de bord en mode tablette.",
+    "editDashboardWidthLabel": "Largeur du tableau de bord",
+    "widths": {
+      "standard": "Standard (recommandé)",
+      "full": "Pleine largeur"
     }
   },
   "newDashboard": {
@@ -6017,5 +6125,12 @@
     "cancelUpgradeToYearly": "Annuler",
     "upgradeYearlyError": "Une erreur est survenue lors de la mise à jour vers le plan annuel, merci de nous contacter par email ou sur le forum.",
     "upgradeYearlySuccess": "Merci d'être passé au plan annuel !"
+  },
+  "deviceFeatureValueText": {
+    "noValue": "Aucune valeur",
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "on": "Allumé",
+    "off": "Éteint"
   }
 }

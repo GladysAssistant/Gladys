@@ -207,6 +207,7 @@ class EditGaugeBoxComponent extends Component {
             <Text id="dashboard.boxes.gauge.selectDeviceLabel" />
           </label>
           <Select
+            menuPlacement="auto"
             defaultValue={selectedDeviceFeatureOptions}
             value={selectedDeviceFeatureOptions}
             onChange={this.updateDeviceFeature}
@@ -273,6 +274,7 @@ class EditGaugeBoxComponent extends Component {
                       <Text id="dashboard.boxes.gauge.colorLowLabel" />
                     </label>
                     <Select
+                      menuPlacement="auto"
                       value={colorOptionByValue(colorLow)}
                       onChange={this.updateColor('gauge_color_low')}
                       options={colorOptions}
@@ -288,6 +290,7 @@ class EditGaugeBoxComponent extends Component {
                       <Text id="dashboard.boxes.gauge.colorInRangeLabel" />
                     </label>
                     <Select
+                      menuPlacement="auto"
                       value={colorOptionByValue(colorInRange)}
                       onChange={this.updateColor('gauge_color_in_range')}
                       options={colorOptions}
@@ -303,6 +306,7 @@ class EditGaugeBoxComponent extends Component {
                       <Text id="dashboard.boxes.gauge.colorHighLabel" />
                     </label>
                     <Select
+                      menuPlacement="auto"
                       value={colorOptionByValue(colorHigh)}
                       onChange={this.updateColor('gauge_color_high')}
                       options={colorOptions}

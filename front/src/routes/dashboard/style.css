@@ -23,6 +23,28 @@
   margin-bottom: 150px;
 }
 
+/* Per-dashboard "full" width: lift the container cap, keep the side padding.
+   Chained with .container so it wins over the breakpoint max-widths. */
+.fullWidthContainer:global(.container) {
+  max-width: none;
+}
+
+/* 5 columns don't divide the 12-column grid: same behavior as a col-lg-*
+   (stacked full width below the breakpoint, fixed share above) at 20% */
+.colFifth {
+  position: relative;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+@media (min-width: 992px) {
+  .colFifth {
+    flex: 0 0 20%;
+    max-width: 20%;
+  }
+}
+
 @media (min-width: 992px) {
   .removePaddingFirstCol {
     padding-left: 0;
@@ -37,6 +59,747 @@
   .removePadding {
     padding-left: 0;
     padding-right: 0;
+  }
+}
+
+.dashboardBackground {
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* With the left navigation rail, the outer .page is padded (style/index.css)
+   but the wallpaper slides back under the rail, so the rail's backdrop blur
+   frosts the actual scene instead of a flat page background. The image is
+   viewport-fixed, so the extension doesn't shift what's visible. */
+@media (min-width: 992px) {
+  :global(body.gladys-sidebar-nav) .dashboardBackground {
+    /* the box must GROW by the rail width, not merely shift: width stays
+       100% of the padded page, so without the calc the scene would stop
+       15rem short of the right edge of the viewport */
+    width: calc(100% + 15rem);
+    margin-left: -15rem;
+    padding-left: 15rem;
+  }
+}
+
+/* Same under the mobile top bar: the scene runs behind its frosted glass */
+@media (max-width: 991.98px) {
+  :global(body.gladys-sidebar-nav) .dashboardBackground {
+    margin-top: -3.25rem;
+    padding-top: 3.25rem;
+  }
+}
+
+/* ==================================================================
+   "Horizon" glass theme — THE dashboard style, applied unconditionally
+   to the whole dashboard page (imposed, not chosen — Gladys ships the
+   best default). Everything is driven by the tokens below. Component
+   variants (chips, actions, pins, tiles, clock, scenes) live next to
+   their component and compose on the same global .glass-theme class,
+   kept as the single gate so the theme stays one coherent layer.
+   Dark mode: the app darkens through the global inversion filter
+   (style/dark-mode.css), so this theme deliberately defines NO dark
+   colors — the light glass and its scene invert into their dark
+   counterparts like the rest of the app.
+   ================================================================== */
+
+:global(.glass-theme) {
+  --gl-ink: #1c2334;
+  --gl-muted: #7c8396;
+  --gl-accent: #3d6df0;
+  --gl-radius-lg: 26px;
+  --gl-radius-md: 18px;
+  --gl-card-bg: rgba(255, 255, 255, 0.52);
+  --gl-card-nested-bg: rgba(255, 255, 255, 0.4);
+  --gl-surface-strong: rgba(255, 255, 255, 0.78);
+  --gl-border: rgba(255, 255, 255, 0.85);
+  --gl-shadow: 0 18px 50px rgba(44, 62, 118, 0.13), 0 2px 8px rgba(44, 62, 118, 0.05);
+  --gl-shadow-soft: 0 4px 16px rgba(44, 62, 118, 0.09);
+  --gl-icon-tint-bg: #e3ebfb;
+  --gl-success-bg: rgba(56, 158, 90, 0.12);
+  --gl-success-ink: #2e8f5b;
+  --gl-row-border: rgba(44, 62, 118, 0.07);
+  color: var(--gl-ink);
+}
+
+/* Default scene when the dashboard has no background image of its own:
+   soft radial glows over a diagonal gradient — pure CSS, one click.
+   An inline background-image set from the dashboard config wins over this. */
+/* Scene glows are sized in % (not px) so a scene renders the same
+   composition at every element size: the full dashboard, a phone screen,
+   and the picker thumbnails that preview it in the settings panel. */
+.glassScene {
+  background-image: radial-gradient(76% 78% at 12% -10%, rgba(126, 166, 233, 0.55), transparent 60%),
+    radial-gradient(62% 72% at 95% 8%, rgba(244, 190, 148, 0.5), transparent 55%),
+    radial-gradient(69% 89% at 85% 100%, rgba(187, 160, 228, 0.42), transparent 60%),
+    radial-gradient(62% 78% at 10% 105%, rgba(150, 212, 195, 0.4), transparent 55%),
+    linear-gradient(160deg, #eef3fb 0%, #eeeaf7 48%, #f7efe6 100%);
+}
+
+/* The scene catalog: hand-composed CSS variants of the default scene, picked
+   per dashboard (background_scene). No external images — they weigh nothing,
+   stay crisp at any resolution, work offline and invert cleanly in dark mode.
+   Authored light only, like the whole theme. */
+
+.sceneAurora {
+  background-image: radial-gradient(76% 78% at 8% -12%, rgba(112, 205, 178, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 92% 4%, rgba(124, 189, 233, 0.5), transparent 55%),
+    radial-gradient(69% 89% at 88% 102%, rgba(150, 160, 230, 0.38), transparent 60%),
+    radial-gradient(62% 78% at 6% 108%, rgba(140, 220, 210, 0.4), transparent 55%),
+    linear-gradient(160deg, #eafaf3 0%, #e9f2fb 52%, #eeecf9 100%);
+}
+
+.sceneDusk {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(246, 173, 128, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(240, 148, 150, 0.45), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(200, 140, 200, 0.35), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(248, 205, 150, 0.42), transparent 55%),
+    linear-gradient(160deg, #fdf2e6 0%, #fae9ec 50%, #f3e9f6 100%);
+}
+
+.sceneForest {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(150, 210, 150, 0.48), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(200, 224, 140, 0.42), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(120, 195, 170, 0.36), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(190, 220, 165, 0.4), transparent 55%),
+    linear-gradient(160deg, #edf7ec 0%, #f0f7e9 52%, #e9f4ef 100%);
+}
+
+.sceneLagoon {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(120, 214, 208, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(126, 186, 240, 0.46), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(110, 200, 220, 0.36), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(150, 220, 235, 0.4), transparent 55%),
+    linear-gradient(160deg, #e7f8f7 0%, #e9f1fb 52%, #eaf6f9 100%);
+}
+
+.sceneSand {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(236, 205, 156, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(232, 190, 160, 0.44), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(220, 190, 150, 0.34), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(240, 220, 180, 0.42), transparent 55%),
+    linear-gradient(160deg, #fbf5ea 0%, #f7efe3 52%, #f4ecdf 100%);
+}
+
+.sceneLavender {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(190, 165, 235, 0.5), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(232, 165, 210, 0.44), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(160, 150, 230, 0.36), transparent 60%),
+    radial-gradient(62% 78% at 8% 106%, rgba(225, 185, 235, 0.4), transparent 55%),
+    linear-gradient(160deg, #f2eefb 0%, #f8ecf5 52%, #efeafa 100%);
+}
+
+/* the quiet one: near-neutral blue-grays for people who want calm */
+.sceneMist {
+  background-image: radial-gradient(76% 78% at 10% -10%, rgba(170, 190, 215, 0.4), transparent 60%),
+    radial-gradient(66% 72% at 94% 6%, rgba(195, 205, 220, 0.36), transparent 55%),
+    radial-gradient(69% 89% at 86% 102%, rgba(175, 190, 205, 0.3), transparent 60%),
+    linear-gradient(160deg, #f0f3f7 0%, #eef1f5 52%, #ecf0f4 100%);
+}
+
+/* Cards become deep glass. No overflow: hidden — it would clip house-view
+   pins near the image edges and in-card dropdown menus; media corners are
+   rounded on the images themselves below. */
+:global(.glass-theme .card) {
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-lg);
+  box-shadow: var(--gl-shadow);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme .card .card-img-top) {
+  border-radius: var(--gl-radius-lg) var(--gl-radius-lg) 0 0;
+}
+
+/* dark-mode.css paints .card/.card-header/.card-body with a solid
+   !important background: restore the translucent glass with the same
+   weight — the inversion filter then derives the dark glass from these
+   light values, like the rest of the theme */
+:global(.dark-mode .glass-theme .card-header),
+:global(.dark-mode .glass-theme .card-body) {
+  background-color: transparent !important;
+}
+
+:global(.dark-mode .glass-theme .card) {
+  background-color: var(--gl-card-bg) !important;
+}
+
+:global(.dark-mode .glass-theme .card .card) {
+  background-color: var(--gl-card-nested-bg) !important;
+}
+
+:global(.glass-theme .card .card) {
+  background: var(--gl-card-nested-bg);
+  border-radius: var(--gl-radius-md);
+  box-shadow: none;
+}
+
+/* The header hugs its title: Tabler's 3.5rem min-height centers the small
+   uppercase label in a tall band and opens a hole above the card content */
+:global(.glass-theme .card-header) {
+  border-bottom: none;
+  background: transparent;
+  min-height: 0;
+  padding: 1.125rem 1.5rem 0;
+}
+
+/* a header below the media (camera) is the card's last row */
+:global(.glass-theme .card-header:last-child) {
+  padding-bottom: 1.125rem;
+}
+
+:global(.glass-theme .card-header + .card-body) {
+  padding-top: 0.75rem;
+}
+
+:global(.glass-theme .card-title) {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme h4),
+:global(.glass-theme .card p) {
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme .text-muted),
+:global(.glass-theme small) {
+  color: var(--gl-muted) !important;
+}
+
+/* Value stamps become soft tinted rounded squares */
+:global(.glass-theme .stamp) {
+  border-radius: 14px;
+  width: 46px;
+  height: 46px;
+  line-height: 46px;
+  font-size: 1.15rem;
+}
+
+:global(.glass-theme .stamp.bg-green) {
+  background: #def0e2 !important;
+  color: #2e8f5b !important;
+}
+
+:global(.glass-theme .stamp.bg-blue) {
+  background: #dde9fb !important;
+  color: #3d6df0 !important;
+}
+
+:global(.glass-theme .stamp.bg-red) {
+  background: #fbe3de !important;
+  color: #d4593f !important;
+}
+
+:global(.glass-theme .stamp.bg-warning),
+:global(.glass-theme .stamp.bg-yellow) {
+  background: #f9eeda !important;
+  color: #c98a2c !important;
+}
+
+/* Bootstrap alerts inside cards become quiet tinted notices — same family
+   as the stamps: soft background, saturated ink, no border, no shouting */
+:global(.glass-theme .card .alert) {
+  border: none;
+  border-radius: 14px;
+  padding: 0.6rem 0.75rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+:global(.glass-theme .card .alert-danger) {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+:global(.glass-theme .card .alert-warning) {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+:global(.glass-theme .card .alert-info),
+:global(.glass-theme .card .alert-primary) {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+:global(.glass-theme .card .alert-success) {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+:global(.glass-theme .card .alert a) {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* Tabler's alert-icon variant absolutely positions its icon in a 3rem
+   gutter: keep a gutter matching the reduced notice padding */
+:global(.glass-theme .card .alert-icon) {
+  padding-left: 2.6rem;
+}
+
+:global(.glass-theme .card .alert-icon > i) {
+  top: 0.7rem;
+  left: 0.9rem;
+}
+
+/* Tabler's card-alert variant is a full-width square band glued to the card
+   edges: float it inside the rounded card instead */
+:global(.glass-theme .card .card-alert) {
+  margin: 0.75rem 1.5rem 0;
+}
+
+/* Bootstrap badges become the color-dot pill family's plain cousins */
+:global(.glass-theme .card .badge) {
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+:global(.glass-theme .card .badge-success) {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+:global(.glass-theme .card .badge-danger) {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+:global(.glass-theme .card .badge-warning) {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+:global(.glass-theme .card .badge-info) {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+:global(.glass-theme .card .badge-secondary) {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+/* Tabler's bg-* badge utilities join the family; dark-mode.css special-cases
+   .badge.bg-warning with a dark gold and no filter — restore the pastel and
+   the double inversion the other badges get */
+:global(.glass-theme .card .badge.bg-warning),
+:global(.dark-mode .glass-theme .card .badge.bg-warning) {
+  background-color: #f9eeda !important;
+  color: #a5701e !important;
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+:global(.glass-theme .card .badge.bg-warning) {
+  filter: none;
+}
+
+/* Neutral solid/outline buttons (music transport, camera live, energy nav)
+   become quiet ink-tinted pills; dark-mode.css paints btn-secondary with a
+   solid !important background, hence the counter-weight */
+:global(.glass-theme .card .btn-secondary),
+:global(.glass-theme .card .btn-outline-secondary),
+:global(.dark-mode .glass-theme .card .btn-secondary) {
+  background-color: rgba(28, 35, 52, 0.07) !important;
+  border: none;
+  color: var(--gl-ink);
+  border-radius: 999px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+:global(.glass-theme .card .btn-secondary:hover),
+:global(.glass-theme .card .btn-outline-secondary:hover),
+:global(.dark-mode .glass-theme .card .btn-secondary:hover) {
+  background-color: rgba(28, 35, 52, 0.13) !important;
+  color: var(--gl-ink);
+}
+
+/* solid accent buttons (camera pause…) become ink pills; dark-mode.css puts
+   .btn-primary on the double-invert list, which would keep the authored ink
+   navy on the inverted (dark) card — drop the filter so the pill inverts
+   with the theme into a light pill, like the active dashboard tab */
+:global(.glass-theme .card .btn-primary) {
+  background-color: var(--gl-ink);
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+:global(.dark-mode .glass-theme .card .btn-primary) {
+  filter: none;
+}
+
+/* soft amber pill (alarm arming countdown cancel) */
+:global(.glass-theme .card .btn-outline-warning) {
+  background-color: #f9eeda;
+  border: none;
+  color: #a5701e;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Start/action buttons become soft pills */
+:global(.glass-theme .btn-outline-success) {
+  background: var(--gl-success-bg);
+  border: none;
+  color: var(--gl-success-ink);
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.35rem 1rem;
+}
+
+/* Remaining tables (device lists) lose their heavy borders */
+:global(.glass-theme .table td),
+:global(.glass-theme .table th) {
+  border-top: none;
+}
+
+:global(.glass-theme .table tbody tr + tr td) {
+  border-top: 1px solid var(--gl-row-border);
+}
+
+/* Page controls become quiet frosted pills */
+:global(.glass-theme .page-options .btn),
+:global(.glass-theme .dropdown > .btn) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-weight: 600;
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme .dropdown > .btn) {
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme .page-options .btn-outline-primary) {
+  color: var(--gl-accent);
+}
+
+/* dark-mode.css double-inverts outline buttons to preserve their light
+   look; under glass they are already frosted pills — they must invert
+   with the theme like every other glass surface, or they stay white
+   over the dark scene */
+:global(.dark-mode .glass-theme .btn-outline-primary),
+:global(.dark-mode .glass-theme .btn-outline-danger) {
+  filter: none;
+}
+
+/* Tablet dock: frosted pill, active tab inverted */
+:global(.glass-theme) .dashboardTabs {
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--gl-border);
+  border-radius: 999px;
+  padding: 5px;
+  box-shadow: var(--gl-shadow-soft);
+  gap: 4px;
+}
+
+:global(.glass-theme) .dashboardTab {
+  border: none;
+  background: transparent;
+  height: 2.6rem;
+  padding: 0 0.9rem;
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .dashboardTabsIconsOnly .dashboardTab {
+  width: 2.6rem;
+  padding: 0;
+}
+
+:global(.glass-theme) .dashboardTabActive {
+  background: var(--gl-ink);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+.dashboardTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  /* The glass variant's backdrop-filter makes this a stacking context, which
+     would trap the overflow menu below the dashboard cards: stack the whole
+     bar above the page content so the menu opens on top */
+  position: relative;
+  z-index: 10;
+}
+
+.dashboardTab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 2.375rem;
+  padding: 0 0.875rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  background-color: #fff;
+  color: #495057;
+  font-size: 1rem;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.dashboardTabName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  /* one endless name must not eat the whole row */
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboardTabsOverflow {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.dashboardTabsMenu {
+  max-height: 60vh;
+  overflow-y: auto;
+  min-width: 13rem;
+}
+
+.dashboardTabsMenuIcon {
+  margin-right: 0.5rem;
+}
+
+/* The bar and the header actions share one row at every width — vertical
+   space is precious, actions never cost a line. nowrap matters: with
+   wrapping allowed the bar would be measured at full width (the actions
+   already pushed below) and the priority+ trim would never give their
+   space back */
+.dashboardHeader {
+  flex-wrap: nowrap;
+  /* The switcher stays pinned while the dashboard scrolls under it — the
+     pill track's backdrop blur frosts the passing cards. Kept floating a
+     small gap from the edge so it reads as a hovering capsule, not a bar. */
+  position: sticky;
+  top: 0.75rem;
+  z-index: 100;
+  /* only the capsules catch the pointer: the flex-grown gap between the
+     pill track and the action buttons is empty space, and widgets passing
+     under it must stay clickable/tappable */
+  pointer-events: none;
+}
+
+.dashboardHeader .dashboardTabs,
+.dashboardHeader :global(.page-options) {
+  pointer-events: auto;
+}
+
+/* Below the desktop breakpoint the switcher becomes a bottom dock, within
+   thumb reach (iOS style: the reachable edge is the bottom one). fixed, not
+   sticky: the header sits at the top of the flow, sticky-bottom would never
+   engage. Content gets bottom padding so the last row scrolls clear of it. */
+@media (max-width: 991.98px) {
+  .dashboardHeader {
+    position: fixed;
+    top: auto;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    margin: 0;
+  }
+
+  .dashboardBackground {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* the "…" menu opens upward from the dock */
+  .dashboardTabsMenu {
+    top: auto;
+    bottom: calc(100% + 8px);
+  }
+}
+
+.dashboardHeaderTabs {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dashboardHeader :global(.page-options) {
+  flex: 0 0 auto;
+}
+
+/* Actions are round icon pills with exactly the bar's outer height
+   (pill height + bar padding + border), so the row reads as one line */
+.dashboardHeader :global(.page-options .btn) {
+  align-items: center;
+  justify-content: center;
+  width: calc(2.6rem + 12px);
+  height: calc(2.6rem + 12px);
+  padding: 0;
+  border-radius: 999px;
+  font-size: 1.05rem;
+}
+
+/* Horizon glass theme: the overflow menu is a glass surface like the bar
+   it opens from, not a stock white dropdown */
+:global(.glass-theme) .dashboardTabsMenu {
+  background: var(--gl-surface-strong);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow);
+  padding: 6px;
+}
+
+:global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item) {
+  border-radius: 10px;
+  color: var(--gl-ink);
+  font-weight: 500;
+}
+
+:global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item):hover {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+:global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item.active) {
+  background: var(--gl-ink);
+  color: #fff;
+}
+
+:global(.glass-theme) .dashboardTabsMenuIcon {
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item.active) .dashboardTabsMenuIcon {
+  color: #fff;
+}
+
+/* dark-mode.css paints .dropdown-menu with a solid !important background:
+   restore the glass surface with the same weight (see the card rules above) */
+:global(.dark-mode .glass-theme) .dashboardTabsMenu {
+  background-color: var(--gl-surface-strong) !important;
+}
+
+/* Tablet mode keeps the compact icon dock */
+.dashboardTabsIconsOnly .dashboardTab {
+  width: 2.375rem;
+  padding: 0;
+}
+
+/* On small screens only the active pill keeps its name — the rest shrink
+   to icon dots so more of them fit before the overflow kicks in */
+@media (max-width: 767px) {
+  .dashboardTab:not(.dashboardTabActive) {
+    width: 2.375rem;
+    padding: 0;
+  }
+
+  .dashboardTab:not(.dashboardTabActive) .dashboardTabName {
+    display: none;
+  }
+}
+
+.dashboardTab:hover {
+  color: #467fcf;
+  text-decoration: none;
+}
+
+.dashboardTabActive {
+  background-color: #467fcf;
+  border-color: #467fcf;
+  color: #fff;
+}
+
+.dashboardTabActive:hover {
+  color: #fff;
+}
+
+/* Boxes of a stretchable type absorb the remaining height of their column so
+   sections with columns of different heights don't leave blank space */
+.stretchableBox {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchableBox > div {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchableBox > div > img {
+  flex: 1 1 auto;
+  object-fit: cover;
+  min-height: 0;
+}
+
+/* the media region of a camera card (live dimmer, error placeholder) absorbs
+   the stretch too — otherwise a camera without image stretches into a blank
+   white void under its header */
+.stretchableBox > div > :global(.dimmer) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchableBox > div > :global(.dimmer) > :global(.dimmer-content) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* Tile boxes (room temperature/humidity) center their content in the
+   extra height instead of leaving it under the card */
+.stretchableTile > div {
+  justify-content: center;
+}
+
+/* Stretch is a shock absorber, not an elastic: a stretchable box absorbs
+   the free height of its column only up to this cap. Beyond it the column
+   simply ends earlier and the dashboard background breathes, instead of a
+   photo — or a house illustration card — blown up to several times its
+   natural size. Desktop only — below the breakpoint columns stack and
+   heights are natural. */
+@media (min-width: 992px) {
+  .stretchableBox {
+    max-height: 65vh;
+  }
+}
+
+/* On large screens a stretched value tile's height is imposed by its
+   column, so its wrapper can be a size container: the tile content adapts
+   to the real rendered height (see components/boxs/roomTile.css). The
+   container is the padding-less wrapper, not the card, because container
+   queries evaluate against the content box. The min-height keeps a
+   sensible tile when every box of a section is a value tile. Not applied
+   on mobile, where columns stack and heights are natural. */
+@media (min-width: 992px) {
+  .adaptiveTile {
+    container-type: size;
+    min-height: 6rem;
   }
 }
 
@@ -62,20 +825,6 @@
   transition: max-height 0.5s ease-in;
 }
 
-.dropdownItemBiggerLines {
-  line-height: 2.5rem;
-}
-
-.editDashboardText {
-  display: inline;
-}
-
-@media (max-width: 992px) {
-  .editDashboardText {
-    display: none;
-  }
-}
-
 .tabletModeDiv {
   display: grid;
   grid-template-rows: 0fr;
@@ -92,10 +841,259 @@
   overflow: hidden;
 }
 
+/* The collapse animation needs the overflow: hidden above, which would clip
+   the large glass shadow into a faint dark rectangle behind the card (square
+   corners, hard bottom edge). This panel card goes flat — the glass surface
+   and border carry it. */
+:global(.glass-theme) .tabletModeDivContent :global(.card) {
+  box-shadow: none;
+}
+
 .tabletModeDivOpen {
   visibility: visible;
   opacity: 1;
   grid-template-rows: 1fr;
   /* Opening stays immediate */
   transition-delay: 0s, 0s, 0s;
+}
+
+/* Old wall tablets without backdrop-filter support get a more opaque
+   glass so text stays readable over the scene */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :global(.glass-theme .card) {
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  :global(.glass-theme) {
+    --gl-surface-strong: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* ============================================================
+   Horizon device list: the Tabler table rows of the devices widgets
+   become soft pill rows of the scene/actions family — icon in a tinted
+   badge, one rounded surface per row. CSS-only: the 25+ feature
+   components keep their <tr> markup untouched.
+   ============================================================ */
+
+:global(.glass-theme .device-list-table) {
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  padding: 0 12px 8px;
+  width: 100%;
+}
+
+:global(.glass-theme .device-list-table tr td) {
+  background-color: var(--gl-card-nested-bg);
+  border-top: 1px solid var(--gl-border);
+  border-bottom: 1px solid var(--gl-border);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  color: var(--gl-ink);
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+:global(.glass-theme .device-list-table tr td:first-child) {
+  border-left: 1px solid var(--gl-border);
+  border-radius: 14px 0 0 14px;
+  padding-left: 0.625rem;
+  width: 1%;
+  white-space: nowrap;
+}
+
+:global(.glass-theme .device-list-table tr td:last-child) {
+  border-right: 1px solid var(--gl-border);
+  border-radius: 0 14px 14px 0;
+  padding-right: 0.75rem;
+}
+
+/* the feature icon sits in a tinted badge, like the scene rows */
+:global(.glass-theme .device-list-table tr td:first-child > .fe) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  background-color: var(--gl-icon-tint-bg);
+  color: var(--gl-accent);
+  font-size: 1rem;
+}
+
+/* pressing a tappable row gives immediate feedback — the whole-row tap is a
+   coarse-pointer affordance only (the JS handler is gated the same way):
+   with a mouse, the switch itself is a comfortable target and a click on
+   the device name must not be a live write */
+@media (pointer: coarse) {
+  :global(.glass-theme .device-list-table .device-row-tappable:active td) {
+    background-color: var(--gl-icon-tint-bg);
+  }
+}
+
+/* Structural rows are not feature pills: ColorDeviceFeature always renders
+   a second tr with one colspan cell holding the (d-none while closed) color
+   picker — without this reset it paints as an empty ghost pill. */
+:global(.glass-theme .device-list-table tr td[colspan]) {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* ============================================================
+   Touch targets (viewer): on coarse-pointer devices every widget
+   control reaches the ~44px Apple HIG floor. pointer: coarse means
+   the PRIMARY pointer is a finger (phones, tablets) — hybrid laptops
+   keep the compact mouse sizing.
+   ============================================================ */
+
+@media (pointer: coarse) {
+  :global(.device-row-tappable) {
+    cursor: pointer;
+  }
+}
+
+@media (pointer: coarse) {
+  /* generic floor for widget buttons (scene start, camera live, music
+     transport, energy nav, shutter groups, adaptive option pairs…) */
+  :global(.glass-theme .card .btn) {
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :global(.glass-theme .card .btn-group .btn) {
+    min-width: 2.75rem;
+  }
+
+  /* Tabler switches grow to a finger-sized toggle */
+  :global(.glass-theme .custom-switch-indicator) {
+    width: 3.25rem;
+    height: 1.75rem;
+  }
+
+  :global(.glass-theme .custom-switch-indicator)::before {
+    width: 1.5rem;
+    height: 1.5rem;
+    top: 2px;
+    left: 2px;
+  }
+
+  :global(.glass-theme .custom-switch-input:checked ~ .custom-switch-indicator)::before {
+    left: calc(100% - 1.5rem - 2px);
+  }
+
+  /* the selector pills round up from 2.6rem to the floor, and the header
+     action pills keep matching the bar height */
+  :global(.glass-theme) .dashboardTab {
+    height: 2.75rem;
+  }
+
+  :global(.glass-theme) .dashboardTabsIconsOnly .dashboardTab {
+    width: 2.75rem;
+  }
+
+  .dashboardHeader :global(.page-options .btn) {
+    width: calc(2.75rem + 12px);
+    height: calc(2.75rem + 12px);
+  }
+}
+
+@media (pointer: coarse) and (max-width: 767px) {
+  .dashboardTab:not(.dashboardTabActive) {
+    width: 2.75rem;
+  }
+}
+
+/* ============================================================
+   Horizon controls inside the device rows: the Tabler button
+   groups (AC modes, thermostat modes, shutters, fan speeds…)
+   become iOS-like segmented controls — a soft track with a white
+   active segment — and the setpoint steppers become capsules.
+   ============================================================ */
+
+/* .hz-segmented is the opt-in marker for any widget button group
+   (energy consumption periods, cost/kWh toggle…) */
+:global(.glass-theme .device-list-table .btn-group),
+:global(.glass-theme .hz-segmented) {
+  background-color: rgba(28, 35, 52, 0.07);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 3px;
+  align-items: center;
+  /* the control cells are py-0: the track brings its own breathing room */
+  margin: 4px 0;
+}
+
+:global(.glass-theme .device-list-table .btn-group .btn),
+:global(.glass-theme .hz-segmented .btn) {
+  background: transparent !important;
+  border: none;
+  border-radius: 999px !important;
+  color: var(--gl-muted);
+  font-weight: 600;
+  box-shadow: none;
+}
+
+/* inside a segmented track the whole track is the touch zone: segments
+   stay at the iOS segmented height instead of the 44px solo-button floor */
+@media (pointer: coarse) {
+  :global(.glass-theme .device-list-table .btn-group .btn),
+  :global(.glass-theme .hz-segmented .btn) {
+    min-height: 2.25rem;
+  }
+}
+
+:global(.glass-theme .device-list-table .btn-group .btn:hover),
+:global(.glass-theme .hz-segmented .btn:hover) {
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme .device-list-table .btn-group .btn:disabled),
+:global(.glass-theme .hz-segmented .btn:disabled) {
+  opacity: 0.45;
+}
+
+:global(.glass-theme .device-list-table .btn-group .btn.active),
+:global(.glass-theme .device-list-table .btn-group .btn.active:disabled),
+:global(.glass-theme .hz-segmented .btn.active) {
+  background-color: #fff !important;
+  color: var(--gl-ink);
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.18);
+  opacity: 1;
+}
+
+/* the dropdown fallback of narrow cards joins the family */
+:global(.glass-theme .device-list-table select.form-control) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: #fff;
+  font-weight: 600;
+  color: var(--gl-ink);
+}
+
+/* the energy widget's period date picker joins it */
+:global(.glass-theme .card .react-datepicker-wrapper .form-control) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  color: var(--gl-ink);
+}
+
+/* Mobile bottom dock (see .dashboardHeader above): the "…" menu opens from
+   inside the dock track's own backdrop root, where a nested backdrop-filter
+   makes Chrome misrender the panel (content bleeding through it). Solid
+   background, no blur — the inversion filter still derives the dark variant.
+   Kept at the END of the file: it must out-cascade the base glass menu rule
+   and the dark-mode !important one. */
+@media (max-width: 991.98px) {
+  :global(.glass-theme) .dashboardTabsMenu,
+  :global(.dark-mode .glass-theme) .dashboardTabsMenu {
+    background-color: #fff !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }

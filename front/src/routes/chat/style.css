@@ -34,7 +34,7 @@
 }
 
 .chat_img img {
-  width: 100%
+  width: 100%;
 }
 
 .chat_ib {
@@ -445,8 +445,10 @@
   margin: auto;
 }
 
+/* Full-height page: the only chrome above is the 3.25rem fixed mobile top
+   bar — on desktop the nav is the left sidebar, so the chat owns 100dvh */
 .chatPage {
-  height: calc(100dvh - 64px);
+  height: calc(100dvh - 3.25rem);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -594,7 +596,7 @@
 
 @media (min-width: 992px) {
   .chatPage {
-    height: calc(100dvh - 7rem);
+    height: 100dvh;
   }
 
   .chatPageContent {

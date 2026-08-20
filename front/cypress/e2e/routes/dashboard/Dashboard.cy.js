@@ -1,4 +1,7 @@
 describe('Dashboard', () => {
+  // The created dashboard's selector carries 4 random characters (#2906):
+  // captured once at creation, reused by the later tests of this spec
+  let dashboardSelector;
   beforeEach(() => {
     cy.login();
   });
@@ -23,17 +26,31 @@ describe('Dashboard', () => {
       .click();
 
     // The selector of a new dashboard ends with 4 random characters, like scenes
-    cy.url().should('match', new RegExp(`^${Cypress.config().baseUrl}/dashboard/my-new-dashboard-[a-z0-9]{4}/edit$`));
+    cy.url()
+      .should('match', new RegExp(`^${Cypress.config().baseUrl}/dashboard/my-new-dashboard-[a-z0-9]{4}/edit$`))
+      .then(url => {
+        dashboardSelector = url.match(/\/dashboard\/([^/]+)\/edit$/)[1];
+      });
   });
   it('Should add new boxes', () => {
     cy.contains('.btn-primary', 'dashboard.addBoxButton').click();
-    cy.get('select').then(inputs => {
-      cy.wrap(inputs[1]).select('user-presence');
-    });
+    cy.get('[data-cy="box-type-user-presence"]').click();
     cy.contains('.btn-outline-primary', 'dashboard.editDashboardSaveButton').click();
+
+    // saving keeps the user in the editor (chain editing): a transient
+    // confirmation shows, and leaving is available immediately
+    cy.get('[data-cy="dashboard-saved-label"]').should('be.visible');
+    cy.contains('button', 'dashboard.editDashboardDoneButton').should('be.visible');
+    cy.then(() => {
+      cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/${dashboardSelector}/edit`);
+    });
   });
   it('Should delete dashboard', () => {
-    cy.contains('dashboard.editDashboardButton')
+    cy.then(() => {
+      cy.visit(`/dashboard/${dashboardSelector}`);
+    });
+    // the edit action is an icon pill (its label lives in the title attribute)
+    cy.get('[data-cy="edit-dashboard-button"]')
       .should('have.class', 'btn-outline-primary')
       .click();
     cy.contains('dashboard.editDashboardDeleteButton')

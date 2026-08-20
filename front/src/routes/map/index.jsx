@@ -85,14 +85,13 @@ class MapPage extends Component {
   }
 
   render(props, { housesWithLocation, usersWithLocation, areas }) {
+    // No wrapper margins (the tabler .map-header helper carries a negative
+    // top margin meant for banner maps): the map fills everything below the
+    // chrome, sizing itself to the viewport minus that chrome
     return (
       <div class="page">
         <div class="page-main">
-          <div class="my-3 my-md-5">
-            <div class="map-header">
-              <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} />
-            </div>
-          </div>
+          <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} />
         </div>
       </div>
     );
