@@ -134,6 +134,12 @@ class EnedisWelcomePageComponent extends Component {
       await this.setState({ errored: true });
       return;
     }
+    if (this.props.autorisation_id && !this.props.state) {
+      // The state is required on the new Enedis DataConnect callback,
+      // a missing state means the callback is malformed
+      await this.setState({ errored: true });
+      return;
+    }
     if (this.props.code || this.props.autorisation_id) {
       try {
         await this.setState({ errored: false });
@@ -142,9 +148,7 @@ class EnedisWelcomePageComponent extends Component {
           // New Enedis DataConnect flow (2026): Enedis returns an autorisation_id
           // that the Gladys Gateway exchanges for the usage points ids (PRM)
           finalizeBody.autorisation_id = this.props.autorisation_id;
-          if (this.props.state) {
-            finalizeBody.state = this.props.state;
-          }
+          finalizeBody.state = this.props.state;
         } else {
           // Legacy Enedis DataConnect flow: Enedis returns an OAuth code
           // and the usage points ids are passed in the redirect URL
