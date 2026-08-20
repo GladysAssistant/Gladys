@@ -29,6 +29,10 @@ const MENU_ITEMS = [
 // global .glass-theme class gates the shared theme layer (cards, alerts,
 // badges, buttons), .settings-page scopes the settings-only pass (style.css
 // next to this file), and the wallpaper reuses the dashboard's default scene.
+// Navigation is a horizontal frosted pill row (the dashboard switcher's
+// grammar) — with the app nav in the left rail, a second vertical menu was
+// redundant and cost a quarter of the content width. Labels are kept at
+// every width (several entries share an icon), the row simply wraps.
 const DashboardSettings = ({ children, ...props }) => (
   <div class="page">
     <div
@@ -42,32 +46,27 @@ const DashboardSettings = ({ children, ...props }) => (
     >
       <div class="my-3 my-md-5">
         <div class="container">
-          <div class="row">
-            <div class="col-lg-3">
-              <h3 class={cx('page-title', 'mb-4', style.settingsTitle)}>
-                <Text id="settings.title" />
-              </h3>
-              <div class={cx(style.settingsMenu, 'mb-4')}>
-                {MENU_ITEMS.filter(item => !item.gatewayOnly || config.gatewayMode).map(item => (
-                  <Link
-                    href={item.href}
-                    activeClassName={style.menuLinkActive}
-                    class={cx(style.menuLink, {
-                      [style.menuLinkActive]:
-                        item.matchPrefix && props.currentUrl && props.currentUrl.startsWith(item.href)
-                    })}
-                  >
-                    <span class={style.menuIcon}>
-                      <i class={`fe fe-${item.icon}`} />
-                    </span>
-                    <Text id={item.textId} />
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div class="col-lg-9">{children}</div>
+          <h3 class={cx('page-title', 'mb-3', style.settingsTitle)}>
+            <Text id="settings.title" />
+          </h3>
+          <div class={style.settingsTabs}>
+            {MENU_ITEMS.filter(item => !item.gatewayOnly || config.gatewayMode).map(item => (
+              <Link
+                href={item.href}
+                activeClassName={style.tabLinkActive}
+                class={cx(style.tabLink, {
+                  [style.tabLinkActive]: item.matchPrefix && props.currentUrl && props.currentUrl.startsWith(item.href)
+                })}
+              >
+                <i class={`fe fe-${item.icon}`} />
+                <span>
+                  <Text id={item.textId} />
+                </span>
+              </Link>
+            ))}
           </div>
+
+          {children}
         </div>
       </div>
     </div>

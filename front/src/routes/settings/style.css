@@ -14,68 +14,63 @@
   font-weight: 700;
 }
 
-/* The section menu is a Horizon glass panel with pill rows — same grammar
-   as the app sidebar (components/header): active = white pill, accent icon */
-.settingsMenu {
+/* Section navigation: a horizontal row of frosted pills under the title —
+   the dashboard switcher's grammar (active = inverted ink pill). With the
+   app nav in the left rail, a second vertical menu was redundant. The row
+   wraps instead of collapsing to icons: several entries share an icon, so
+   labels stay at every width. */
+.settingsTabs {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 6px;
-  background: rgba(255, 255, 255, 0.52);
-  backdrop-filter: blur(28px) saturate(1.6);
-  -webkit-backdrop-filter: blur(28px) saturate(1.6);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  border-radius: 18px;
-  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.09);
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.5rem;
 }
 
-.menuLink {
-  display: flex;
+.tabLink {
+  display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.55rem 0.75rem;
-  border-radius: 12px;
-  color: rgba(28, 35, 52, 0.62);
+  gap: 0.45rem;
+  height: 2.6rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.09);
+  color: #7c8396;
   font-weight: 600;
-  font-size: 0.9375rem;
-  line-height: 1.2;
+  font-size: 0.875rem;
+  white-space: nowrap;
 }
 
-.menuLink:hover {
-  background-color: rgba(28, 35, 52, 0.06);
+.tabLink :global(.fe) {
+  font-size: 1rem;
+}
+
+.tabLink:hover {
+  background: rgba(255, 255, 255, 0.85);
   color: #1c2334;
   text-decoration: none;
 }
 
-.menuLinkActive,
-.menuLinkActive:hover {
-  background-color: #fff;
-  color: #1c2334;
-  box-shadow: 0 2px 10px rgba(28, 35, 52, 0.12);
-}
-
-.menuIcon {
-  width: 1.25rem;
-  text-align: center;
-  font-size: 1.05rem;
-  flex-shrink: 0;
-}
-
-.menuLinkActive .menuIcon {
-  color: #3d6df0;
+.tabLinkActive,
+.tabLinkActive:hover {
+  background: #1c2334;
+  border-color: #1c2334;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
 }
 
 @media (pointer: coarse) {
-  .menuLink {
-    min-height: 2.75rem;
+  .tabLink {
+    height: 2.75rem;
   }
 }
 
-/* dark-mode.css paints .list-group-item with a solid background; the menu
-   does not use those classes anymore, but old wall tablets without
-   backdrop-filter still need a readable panel */
+/* old wall tablets without backdrop-filter get opaque pills */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .settingsMenu {
+  .tabLink {
     background: rgba(255, 255, 255, 0.92);
   }
 }
@@ -123,19 +118,6 @@
 :global(.settings-page .card-footer) {
   background: transparent;
   border-top: 1px solid var(--gl-row-border);
-}
-
-/* Profile card: Tabler's decorative 9rem header band (with the avatar
-   pulled up over it) makes no sense on a glass card — drop the empty band
-   and let the avatar sit naturally in the body */
-:global(.settings-page .card-profile > .card-header:empty) {
-  display: none;
-}
-
-:global(.settings-page .card-profile-img) {
-  margin-top: 0;
-  border: none;
-  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.18);
 }
 
 /* ---------- forms ---------- */
