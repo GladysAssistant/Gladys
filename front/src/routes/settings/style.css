@@ -1,0 +1,452 @@
+/* Horizon pass for the settings pages: the pages live on the dashboard's
+   glass scene (.glass-theme gates the shared theme layer — cards, alerts,
+   badges, stamps) and this file declines the same grammar on the primitives
+   the settings screens lean on: the section menu, bare card-header titles,
+   forms, tables, buttons, tags and progress bars.
+   Dark mode: the app darkens through the global inversion filter
+   (style/dark-mode.css) — light colors only here, they invert into their
+   dark counterparts; the few counter-rules below only cancel dark-mode.css
+   specials (solid backgrounds, double inversions) that would fight the
+   glass, exactly like the dashboard theme does. */
+
+.settingsTitle {
+  color: #1c2334;
+  font-weight: 700;
+}
+
+/* The section menu is a Horizon glass panel with pill rows — same grammar
+   as the app sidebar (components/header): active = white pill, accent icon */
+.settingsMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.09);
+}
+
+.menuLink {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  color: rgba(28, 35, 52, 0.62);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+}
+
+.menuLink:hover {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #1c2334;
+  text-decoration: none;
+}
+
+.menuLinkActive,
+.menuLinkActive:hover {
+  background-color: #fff;
+  color: #1c2334;
+  box-shadow: 0 2px 10px rgba(28, 35, 52, 0.12);
+}
+
+.menuIcon {
+  width: 1.25rem;
+  text-align: center;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.menuLinkActive .menuIcon {
+  color: #3d6df0;
+}
+
+@media (pointer: coarse) {
+  .menuLink {
+    min-height: 2.75rem;
+  }
+}
+
+/* dark-mode.css paints .list-group-item with a solid background; the menu
+   does not use those classes anymore, but old wall tablets without
+   backdrop-filter still need a readable panel */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .settingsMenu {
+    background: rgba(255, 255, 255, 0.92);
+  }
+}
+
+/* ==================================================================
+   Global pass, scoped to .settings-page (set by SettingsLayout on the
+   same element as .glass-theme, so the --gl-* tokens are available)
+   ================================================================== */
+
+:global(.settings-page .page-title) {
+  color: var(--gl-ink);
+  font-weight: 700;
+}
+
+/* Bare heading card-headers (h2/h3/h4.card-header — house name, system
+   cards) join the theme's uppercase micro-label card titles */
+:global(.settings-page .card-header) {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted);
+}
+
+/* a heading nested in a card header (backups' page-title, operations' h4)
+   is that card's label: element font-sizes must not escape the micro-label */
+:global(.settings-page .card-header .page-title),
+:global(.settings-page .card-header h2),
+:global(.settings-page .card-header h3),
+:global(.settings-page .card-header h4) {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+/* controls living in a header (create backup, refresh) keep their type */
+:global(.settings-page .card-header .btn) {
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.8125rem;
+}
+
+:global(.settings-page .card-footer) {
+  background: transparent;
+  border-top: 1px solid var(--gl-row-border);
+}
+
+/* ---------- forms ---------- */
+
+:global(.settings-page .form-label) {
+  color: var(--gl-ink);
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+:global(.settings-page .form-control),
+:global(.settings-page .custom-select) {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.75);
+  color: var(--gl-ink);
+}
+
+:global(.settings-page .form-control:focus),
+:global(.settings-page .custom-select:focus) {
+  border-color: var(--gl-accent);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
+}
+
+:global(.settings-page .input-icon-addon) {
+  color: var(--gl-muted);
+}
+
+:global(.settings-page .input-group-text) {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(28, 35, 52, 0.05);
+  color: var(--gl-muted);
+}
+
+/* react-select (timezone…) joins the input family */
+:global(.settings-page .react-select__control) {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+:global(.settings-page .react-select__control--is-focused) {
+  border-color: var(--gl-accent);
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
+}
+
+:global(.settings-page .react-select__menu) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* the file input (profile picture) too */
+:global(.settings-page .custom-file-label) {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+:global(.settings-page .custom-file-label)::after {
+  border-radius: 0 12px 12px 0;
+}
+
+/* ---------- buttons: the Horizon pill hierarchy ----------
+   solid ink CTA (primary), soft pastel pills for the color-coded actions
+   (the stamp family), quiet neutral for secondary, frosted capsule for
+   the outline-primary utilities ("+ new house", edit) */
+
+:global(.settings-page .btn) {
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+:global(.settings-page .btn-primary),
+:global(.settings-page .card .btn-primary) {
+  background-color: var(--gl-ink);
+  border: none;
+  color: #fff;
+}
+
+:global(.settings-page .btn-primary:hover) {
+  background-color: #2a3550;
+  color: #fff;
+}
+
+/* the ink pill must invert with the theme into a light pill (same move as
+   the dashboard's card btn-primary) */
+:global(.dark-mode .settings-page .btn-primary) {
+  filter: none;
+}
+
+:global(.settings-page .btn-success) {
+  background-color: #def0e2;
+  border: none;
+  color: #2e8f5b;
+}
+
+:global(.settings-page .btn-success:hover) {
+  background-color: #cfe9d6;
+  color: #27794d;
+}
+
+:global(.settings-page .btn-danger),
+:global(.settings-page .btn-outline-danger) {
+  background-color: #fbe3de;
+  border: none;
+  color: #c24a33;
+}
+
+:global(.settings-page .btn-danger:hover),
+:global(.settings-page .btn-outline-danger:hover) {
+  background-color: #f6d2ca;
+  color: #a83e2a;
+}
+
+:global(.settings-page .btn-warning),
+:global(.settings-page .btn-outline-warning) {
+  background-color: #f9eeda;
+  border: none;
+  color: #a5701e;
+}
+
+:global(.settings-page .btn-info),
+:global(.settings-page .btn-outline-info) {
+  background-color: #dde9fb;
+  border: none;
+  color: #2f5bd7;
+}
+
+/* dark-mode.css double-inverts the colored buttons to preserve their stock
+   look; under glass the soft pills invert WITH the theme into dark tints,
+   like the editor footer's pills (the glass theme already cancels the
+   filter for btn-outline-primary/danger) */
+:global(.dark-mode .settings-page .btn-success),
+:global(.dark-mode .settings-page .btn-danger),
+:global(.dark-mode .settings-page .btn-warning),
+:global(.dark-mode .settings-page .btn-info),
+:global(.dark-mode .settings-page .btn-outline-warning),
+:global(.dark-mode .settings-page .btn-outline-info) {
+  filter: none;
+}
+
+:global(.settings-page .btn-secondary),
+:global(.settings-page .btn-outline-secondary),
+:global(.dark-mode .settings-page .btn-secondary) {
+  background-color: rgba(28, 35, 52, 0.07) !important;
+  border: none;
+  color: var(--gl-ink);
+  box-shadow: none;
+}
+
+:global(.settings-page .btn-secondary:hover),
+:global(.settings-page .btn-outline-secondary:hover),
+:global(.dark-mode .settings-page .btn-secondary:hover) {
+  background-color: rgba(28, 35, 52, 0.13) !important;
+  color: var(--gl-ink);
+}
+
+/* frosted capsule, accent icon: a utility, not a call to action — same
+   family as the dashboard header pills */
+:global(.settings-page .btn-outline-primary) {
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-surface-strong);
+  color: var(--gl-ink);
+}
+
+:global(.settings-page .btn-outline-primary:hover) {
+  background-color: #fff;
+  border-color: var(--gl-border);
+  color: var(--gl-ink);
+}
+
+:global(.settings-page .btn-outline-primary .fe) {
+  color: var(--gl-accent);
+}
+
+/* inside an input-group the attached button keeps flat inner corners */
+:global(.settings-page .input-group > .form-control:not(:last-child)) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+:global(.settings-page .input-group-append > .btn),
+:global(.settings-page .input-group-append > .input-group-text) {
+  border-radius: 0 12px 12px 0;
+}
+
+@media (pointer: coarse) {
+  :global(.settings-page .btn) {
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ---------- tables ---------- */
+
+:global(.settings-page .table thead th) {
+  border-top: none;
+  border-bottom: 1px solid var(--gl-row-border);
+  background: transparent;
+  color: var(--gl-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+:global(.settings-page .table-outline) {
+  border: none;
+}
+
+:global(.settings-page .table-hover tbody tr:hover) {
+  background-color: rgba(255, 255, 255, 0.45);
+}
+
+:global(.settings-page .table-striped tbody tr:nth-of-type(odd)) {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ---------- alerts outside cards join the quiet tinted notices ---------- */
+
+:global(.settings-page .alert) {
+  border: none;
+  border-radius: 14px;
+  padding: 0.6rem 0.75rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+:global(.settings-page .alert-danger) {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+:global(.settings-page .alert-warning) {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+:global(.settings-page .alert-info),
+:global(.settings-page .alert-primary) {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+:global(.settings-page .alert-success) {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+:global(.settings-page .alert a) {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+:global(.settings-page .alert-icon) {
+  padding-left: 2.6rem;
+}
+
+:global(.settings-page .alert-icon > i) {
+  top: 0.7rem;
+  left: 0.9rem;
+}
+
+/* ---------- tags, badges, stamps, progress ---------- */
+
+:global(.settings-page .tag) {
+  border-radius: 999px;
+  padding: 0 0.7rem;
+  font-weight: 600;
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+:global(.settings-page .tag-green) {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+:global(.settings-page .badge) {
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+:global(.settings-page .badge-success) {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+:global(.settings-page .badge-danger) {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+:global(.settings-page .badge-warning) {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+:global(.settings-page .badge-info) {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+:global(.settings-page .badge-secondary) {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+/* the system page's CPU-temperature stamp: orange is the one stamp color
+   the dashboard theme doesn't declare */
+:global(.settings-page .stamp.bg-orange) {
+  background: #fbeadd !important;
+  color: #d97e2f !important;
+}
+
+:global(.settings-page .progress) {
+  border-radius: 999px;
+  background-color: rgba(28, 35, 52, 0.08);
+}
