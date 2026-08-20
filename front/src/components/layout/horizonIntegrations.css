@@ -1,0 +1,345 @@
+/* ==================================================================
+   Horizon glass theme — integration catalog & sub-pages.
+   The scene and the .glass-theme gate are applied by the Layout
+   component on every /dashboard/integration URL; the tokens (--gl-*)
+   and the card/badge/alert/table variants come from
+   routes/dashboard/style.css. This file adds the variants of the
+   furniture the integration pages are made of (Tabler side menus, page
+   headers, forms, page-level buttons and alerts) — same convention as
+   the dashboard: component variants compose on the single global
+   .glass-theme gate.
+   It lives next to the Layout (and not in routes/integration) because
+   route entries under src/routes/ are code-split: the catalog's CSS
+   only loads on the catalog, while these rules must be there on every
+   integration sub-page.
+   Dark mode stays the app-wide inversion filter: light colors only,
+   plus counter-weights where dark-mode.css paints solid !important
+   backgrounds that would hide the scene or the glass.
+   ================================================================== */
+
+/* The scene lives on the outer Layout wrapper: the .page/.page-main that
+   every integration page nests inside it must stay transparent — in dark
+   mode dark-mode.css paints them with a solid !important background */
+.dark-mode .glass-theme .page,
+.dark-mode .glass-theme .page-main {
+  background-color: transparent !important;
+}
+
+/* Page headers sit directly on the scene: two-level ink discipline */
+.glass-theme .page-title {
+  color: var(--gl-ink);
+}
+
+.glass-theme .page-subtitle {
+  color: var(--gl-muted);
+}
+
+/* Side menus (catalog categories, integration tabs): the Tabler
+   list-group-transparent becomes the nav rail's pill row family —
+   quiet rows, white active pill with the accent icon */
+.glass-theme .list-group-transparent .list-group-item {
+  border-radius: 12px;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 2px;
+  color: rgba(28, 35, 52, 0.62);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border: 0;
+}
+
+.glass-theme .list-group-transparent .list-group-item:hover {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: var(--gl-ink);
+}
+
+.glass-theme .list-group-transparent .list-group-item.active {
+  background-color: #fff;
+  color: var(--gl-ink);
+  box-shadow: 0 2px 10px rgba(28, 35, 52, 0.12);
+}
+
+/* Tabler forces .list-group-item.active .icon to inherit: same weight to
+   put the accent on the active icon, like the nav rail */
+.glass-theme .list-group-transparent .list-group-item.active .icon {
+  color: var(--gl-accent) !important;
+}
+
+/* dark-mode.css paints .list-group-item with a solid !important background:
+   restore the quiet rows with the same weight — the inversion filter then
+   derives the dark pills from these light values */
+.dark-mode .glass-theme .list-group-transparent .list-group-item {
+  background-color: transparent !important;
+}
+
+.dark-mode .glass-theme .list-group-transparent .list-group-item:hover {
+  background-color: rgba(28, 35, 52, 0.06) !important;
+}
+
+.dark-mode .glass-theme .list-group-transparent .list-group-item.active {
+  background-color: #fff !important;
+}
+
+/* Every button under glass is a pill — the theme's one button shape */
+.glass-theme .btn {
+  border-radius: 999px;
+}
+
+/* Page-level neutral buttons sitting on the scene ("back to catalog", facet
+   chips): frosted pills like the dashboard's page controls. Inside cards the
+   stronger .card rules of the dashboard file keep the quiet ink tint. */
+.glass-theme .btn-secondary,
+.glass-theme .btn-outline-secondary {
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-card-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-weight: 600;
+  color: var(--gl-muted);
+  box-shadow: none;
+}
+
+.glass-theme .btn-secondary:hover,
+.glass-theme .btn-outline-secondary:hover {
+  background-color: var(--gl-surface-strong);
+  color: var(--gl-ink);
+}
+
+/* dark-mode.css paints .btn-secondary with a solid !important background:
+   restore the frosted glass with the same weight */
+.dark-mode .glass-theme .btn-secondary {
+  background-color: var(--gl-card-bg) !important;
+  color: var(--gl-muted);
+}
+
+.dark-mode .glass-theme .btn-secondary:hover {
+  background-color: var(--gl-surface-strong) !important;
+  color: var(--gl-ink);
+}
+
+/* Primary CTAs (save, connect, install…) join the solid ink pill family of
+   the dashboard editor; dark-mode.css double-inverts these buttons to
+   preserve their light look — drop the filter so the ink pill inverts with
+   the theme into a light pill, like the active dashboard tab */
+.glass-theme .btn-primary,
+.glass-theme .btn-success {
+  background-color: var(--gl-ink);
+  border: none;
+  font-weight: 600;
+  color: #fff;
+}
+
+.glass-theme .btn-primary:hover,
+.glass-theme .btn-success:hover {
+  background-color: #313b57;
+  color: #fff;
+}
+
+.dark-mode .glass-theme .btn-primary,
+.dark-mode .glass-theme .btn-success {
+  filter: none;
+}
+
+/* Destructive actions become the soft red pill of the stamp family */
+.glass-theme .btn-danger,
+.glass-theme .btn-outline-danger {
+  background-color: #fbe3de;
+  border: none;
+  color: #c24a33;
+  font-weight: 600;
+}
+
+.glass-theme .btn-danger:hover,
+.glass-theme .btn-outline-danger:hover {
+  background-color: #f7d0c7;
+  color: #c24a33;
+}
+
+.dark-mode .glass-theme .btn-danger,
+.dark-mode .glass-theme .btn-outline-danger {
+  filter: none;
+}
+
+.glass-theme .btn-warning,
+.glass-theme .btn-outline-warning {
+  background-color: #f9eeda;
+  border: none;
+  color: #a5701e;
+  font-weight: 600;
+}
+
+.dark-mode .glass-theme .btn-warning,
+.dark-mode .glass-theme .btn-outline-warning {
+  filter: none;
+}
+
+.glass-theme .btn-info,
+.glass-theme .btn-outline-primary,
+.glass-theme .btn-outline-info {
+  background-color: #dde9fb;
+  border: none;
+  color: #2f5bd7;
+  font-weight: 600;
+}
+
+.glass-theme .btn-info:hover,
+.glass-theme .btn-outline-primary:hover,
+.glass-theme .btn-outline-info:hover {
+  background-color: #cadffa;
+  color: #2f5bd7;
+}
+
+.dark-mode .glass-theme .btn-info,
+.dark-mode .glass-theme .btn-outline-info,
+.dark-mode .glass-theme .btn-outline-primary {
+  filter: none;
+}
+
+.glass-theme .btn-link {
+  color: var(--gl-accent);
+}
+
+/* Alerts anywhere on the integration pages (deprecation banner, gateway
+   banner, form errors…) join the quiet tinted notice family the dashboard
+   defines inside cards */
+.glass-theme .alert {
+  border: none;
+  border-radius: 14px;
+  font-weight: 500;
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+.glass-theme .alert-danger {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+.glass-theme .alert-warning {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+.glass-theme .alert-info,
+.glass-theme .alert-primary {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+.glass-theme .alert-success {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+.glass-theme .alert a,
+.glass-theme .alert .alert-link {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.glass-theme .alert .alert-title {
+  color: inherit;
+}
+
+/* Badges and tags outside cards join the color-dot pill family */
+.glass-theme .badge {
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-weight: 600;
+}
+
+/* the "New"/update badges keep their pop, tuned to the theme accent */
+.glass-theme .badge-primary {
+  background-color: var(--gl-accent);
+}
+
+.glass-theme .badge-success {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+.glass-theme .badge-danger {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+.glass-theme .badge-warning {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+.glass-theme .badge-info {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+.glass-theme .badge-secondary {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+.glass-theme .tag {
+  border-radius: 999px;
+}
+
+/* Form fields on the glass cards: soft rounded surfaces. Dark mode keeps
+   the app-wide solid dark fields of dark-mode.css (stronger rules). */
+.glass-theme .form-control,
+.glass-theme .custom-select {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.7);
+  color: var(--gl-ink);
+}
+
+.glass-theme .form-control:focus,
+.glass-theme .custom-select:focus {
+  border-color: var(--gl-accent);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
+}
+
+.glass-theme .form-label {
+  color: var(--gl-ink);
+}
+
+.glass-theme .custom-switch-description {
+  color: var(--gl-ink);
+}
+
+.glass-theme .input-group-text {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.55);
+  color: var(--gl-muted);
+}
+
+/* The search/sort controls of the page and card headers (CardFilter in
+   .page-options) become frosted pills matching the option buttons */
+.glass-theme .page-options .form-control {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-card-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-weight: 500;
+  color: var(--gl-ink);
+}
+
+/* Table headers on glass cards: micro-label family of the card titles */
+.glass-theme .table thead th {
+  color: var(--gl-muted);
+  border-bottom: 1px solid var(--gl-row-border);
+}
+
+/* Lists inside glass cards (accounts, shares, discovered devices…): quiet
+   rows on the glass, separated by the soft row border — with the same
+   counter-weight against dark-mode.css's solid list-group background */
+.glass-theme .card .list-group-item {
+  background-color: transparent;
+  border-color: var(--gl-row-border);
+}
+
+.dark-mode .glass-theme .card .list-group-item {
+  background-color: transparent !important;
+}
