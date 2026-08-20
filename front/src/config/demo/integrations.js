@@ -568,12 +568,14 @@ const integrations = {
   'get /api/v1/service/zigbee2mqtt/setup': {
     ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
     ZIGBEE_DONGLE_NAME: 'Electrolama zig-a-zig-ah! (zzh!)',
-    Z2M_TCP_PORT: '59801'
+    Z2M_TCP_PORT: '59801',
+    Z2M_ADAPTER_MODE: 'usb'
   },
   'post /api/v1/service/zigbee2mqtt/setup': {
     ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB1',
     ZIGBEE_DONGLE_NAME: 'RaspBee',
-    Z2M_TCP_PORT: '12000'
+    Z2M_TCP_PORT: '12000',
+    Z2M_ADAPTER_MODE: 'usb'
   },
   'get /api/v1/service/zigbee2mqtt/adapter': [
     { label: 'ConBee', configKey: 'deconz' },
@@ -603,6 +605,7 @@ const integrations = {
   ],
   'get /api/v1/service/zigbee2mqtt/status': {
     usbConfigured: true,
+    networkAdapterConfigured: false,
     mqttExist: true,
     mqttRunning: true,
     zigbee2mqttExist: true,

@@ -36,7 +36,7 @@ history and device filters answer the request that was actually made.
 | ------------------ | -------------------------------------------------------------------------- |
 | `home.js`          | The demo house: rooms, devices and their features. **Source of truth.**     |
 | `helpers.js`       | Builders for device features, stable ids, relative timestamps.              |
-| `dashboards.js`    | The three dashboards (Home, Energy, Comfort) and their widgets.             |
+| `dashboards.js`    | The three dashboards (Home, Energy, Comfort): sections, widgets, appearance. |
 | `weather.js`       | Weather forecast and sun position, computed from the current date.          |
 | `history.js`       | Chart series, energy consumption and the activity page, generated on the fly. |
 | `scenes.js`        | Scenes, calendar events and chat history.                                   |
@@ -44,6 +44,15 @@ history and device filters answer the request that was actually made.
 | `system.js`        | System, gateway, sessions and background jobs pages.                        |
 | `assets.js`        | Base64 avatars and camera snapshot.                                         |
 | `index.js`         | Assembles everything into the response map.                                 |
+
+## Dashboards
+
+A dashboard is a stack of **sections**, each owning its own columns (see
+`docs/specs/dashboard-flexible-layout-and-widgets.md`), plus its appearance: `icon` for the
+tablet tab bar, `background_scene` for the Horizon background, `width` for wall panels. The
+demo uses that model to show what the theme can do — a chips bar, quick actions, the house
+view with live pins, scene buttons with a state subtitle — so keep new widgets on a real
+device of `home.js` rather than inventing a selector.
 
 ## Adding a device
 

@@ -315,7 +315,7 @@ const ROOMS = [
       {
         name: 'Thermostat',
         selector: 'bedroom-thermostat',
-        model: 'Netatmo Smart Thermostat',
+        model: 'NATherm1',
         service: NETATMO,
         features: [
           thermostatTarget('Setpoint', 'bedroom-thermostat-target', 19.5, { updated: 150 }),
@@ -372,7 +372,7 @@ const ROOMS = [
       {
         name: 'Kids room sensor',
         selector: 'kids-room-sensor',
-        model: 'Netatmo Healthy Home Coach',
+        model: 'NAModule4',
         service: NETATMO,
         features: [
           temperature('Temperature', 'kids-room-temperature', 20.2, { updated: 7 }),
@@ -474,7 +474,7 @@ const ROOMS = [
       {
         name: 'Office sensor',
         selector: 'office-sensor',
-        model: 'Netatmo Healthy Home Coach',
+        model: 'NAModule4',
         service: NETATMO,
         features: [
           temperature('Temperature', 'office-temperature', 21.9, { updated: 5 }),
@@ -554,7 +554,7 @@ const ROOMS = [
       {
         name: 'Weather station',
         selector: 'garden-weather-station',
-        model: 'Netatmo Weather Station',
+        model: 'NAMain',
         service: NETATMO,
         features: [
           temperature('Outdoor temperature', 'outdoor-temperature', 24.3, { updated: 6 }),

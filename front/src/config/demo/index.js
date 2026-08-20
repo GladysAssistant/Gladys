@@ -371,14 +371,19 @@ const home = {
   },
 
   // --- Dashboards --------------------------------------------------------
-  'get /api/v1/dashboard': dashboards.map(({ id, name, type, selector, visibility, position }) => ({
-    id,
-    name,
-    type,
-    selector,
-    visibility,
-    position
-  })),
+  'get /api/v1/dashboard': dashboards.map(
+    ({ id, name, type, selector, visibility, position, icon, background_scene: backgroundScene, width }) => ({
+      id,
+      name,
+      type,
+      selector,
+      visibility,
+      position,
+      icon,
+      background_scene: backgroundScene,
+      width
+    })
+  ),
   'post /api/v1/dashboard': dashboards[0],
   ...dashboardBySelector,
 
