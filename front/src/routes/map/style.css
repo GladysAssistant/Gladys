@@ -1,7 +1,18 @@
+/* ==================================================================
+   The Plans page joins the Horizon family (tokens and grammar in
+   routes/dashboard/style.css): every piece of chrome floating over the
+   map tiles — the create-zone action, the Leaflet zoom control, the
+   attribution, the zone tooltips — becomes a frosted pill composed on
+   the .glass-theme tokens (--gl-*), and the zone create/edit form sits
+   on the same glass scene as the dashboard. Authored light only: dark
+   mode comes from the app-wide inversion filter (style/dark-mode.css).
+   ================================================================== */
+
 .userIconImage {
   border-radius: 50%;
-  border: solid;
-  border-color: #5eba00;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.35);
 }
 
 .houseIconImage {
@@ -9,4 +20,166 @@
 
 .containerWithMargin {
   margin-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+/* Quiet frosted capsule — the Horizon utility-pill family (same grammar
+   as the dashboard header pills), with the accent icon. The class is
+   doubled so it wins over Tabler's .btn-primary, which the create-zone
+   button keeps for behavior and e2e tests. */
+.pillButton.pillButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.75rem;
+  padding: 0 1.15rem;
+  border: 1px solid var(--gl-border);
+  border-radius: 999px;
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow: var(--gl-shadow-soft);
+  color: var(--gl-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pillButton.pillButton:hover {
+  background: var(--gl-surface-strong);
+  border-color: var(--gl-border);
+  color: var(--gl-ink);
+  text-decoration: none;
+}
+
+.pillButton.pillButton:focus {
+  box-shadow: 0 0 0 2px rgba(61, 109, 240, 0.35);
+}
+
+.pillButton.pillButton i {
+  color: var(--gl-accent);
+}
+
+/* the pill is a glass surface: it must invert with the theme in dark
+   mode, not be double-inverted back to a light pill by dark-mode.css's
+   .btn-primary rule */
+:global(.dark-mode) .pillButton.pillButton {
+  filter: none;
+}
+
+.backPill {
+  margin-bottom: 1.5rem;
+}
+
+/* Leaflet chrome under Horizon. The tiles keep their own light/dark sets
+   (swapped by the components); everything floating above them is glass. */
+.mapPage :global(.leaflet-container) {
+  font-family: inherit;
+  background: #eef3fb;
+}
+
+/* zoom control: a vertical frosted capsule (the .leaflet-touch variant is
+   repeated so this wins over Leaflet's own touch styles by specificity) */
+.mapPage :global(.leaflet-bar),
+.mapPage :global(.leaflet-touch .leaflet-bar) {
+  border: 1px solid var(--gl-border);
+  border-radius: 999px;
+  box-shadow: var(--gl-shadow-soft);
+  overflow: hidden;
+}
+
+.mapPage :global(.leaflet-bar a),
+.mapPage :global(.leaflet-touch .leaflet-bar a) {
+  width: 2.25rem;
+  height: 2.25rem;
+  line-height: 2.25rem;
+  border-bottom: 1px solid var(--gl-row-border);
+  border-radius: 0;
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  color: var(--gl-ink);
+  font-family: inherit;
+}
+
+.mapPage :global(.leaflet-bar a:last-child) {
+  border-bottom: none;
+}
+
+.mapPage :global(.leaflet-bar a:hover) {
+  background: var(--gl-surface-strong);
+  color: var(--gl-ink);
+}
+
+.mapPage :global(.leaflet-bar a.leaflet-disabled) {
+  background: var(--gl-card-bg);
+  color: var(--gl-muted);
+}
+
+/* touch targets: the ~44px floor on coarse pointers, like the dashboard */
+@media (pointer: coarse) {
+  .mapPage :global(.leaflet-bar a),
+  .mapPage :global(.leaflet-touch .leaflet-bar a) {
+    width: 2.75rem;
+    height: 2.75rem;
+    line-height: 2.75rem;
+  }
+}
+
+/* zone name tooltips: glass pills in the chips visual family */
+.mapPage :global(.leaflet-tooltip) {
+  padding: 0.3rem 0.8rem;
+  background: var(--gl-surface-strong);
+  border: 1px solid var(--gl-border);
+  border-radius: 999px;
+  box-shadow: var(--gl-shadow-soft);
+  color: var(--gl-ink);
+  font-weight: 600;
+}
+
+/* a pill has no speech-bubble arrow */
+.mapPage :global(.leaflet-tooltip::before) {
+  display: none;
+}
+
+.mapPage :global(.leaflet-bottom) :global(.leaflet-control-attribution) {
+  margin: 0 10px 10px 0;
+  padding: 0.15rem 0.75rem;
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--gl-border);
+  border-radius: 999px;
+  color: var(--gl-muted);
+}
+
+.mapPage :global(.leaflet-control-attribution a) {
+  color: var(--gl-ink);
+}
+
+/* the zone form's mini-map takes the card's nested-surface radius */
+.newAreaMap {
+  border-radius: var(--gl-radius-md, 18px);
+  overflow: hidden;
+  border: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+/* the danger action joins the stamp family (soft red pill, like the
+   dashboard editor's delete button); it keeps .btn-danger for the e2e
+   tests, and inverts with the theme instead of dark-mode.css's
+   double inversion */
+.mapPage :global(.card .btn-danger) {
+  border: none;
+  border-radius: 999px;
+  background: #fbe3de;
+  color: #d4593f;
+  font-weight: 600;
+}
+
+.mapPage :global(.card .btn-danger:hover) {
+  background: #f6d2ca;
+  color: #c24a33;
+}
+
+:global(.dark-mode) .mapPage :global(.card .btn-danger) {
+  filter: none;
 }

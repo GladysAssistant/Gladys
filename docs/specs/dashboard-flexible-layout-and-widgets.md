@@ -234,6 +234,7 @@ The pill bar (H) and the old horizontal top menu both competed for the top of th
 - **Dark mode**: light colors only, inverted by the global filter like the glass theme; the only exception re-neutralizes the `.fe` re-inversion inside the sidebar so icons match their labels.
 - Auth pages and fullscreen (wall-panel) mode render no navigation and drop the body class, keeping the full viewport.
 - **Full-height pages follow the new chrome**: chat and map used to size themselves against the old top menu (`100dvh - 7rem`, hardcoded pixel offsets, the tabler `.map-header` negative margin). They now take `100dvh` on desktop and `100dvh - 3.25rem` (the mobile top bar) below — the chat composer and the map both reach the bottom of the screen.
+- **The Plans (map) page joins the Horizon family** (`routes/map`): everything floating over the map tiles — the create-zone action, the Leaflet zoom control, the attribution, the zone name tooltips — is restyled as frosted pills composed on the `.glass-theme` tokens (CSS-only, scoped to the page wrapper; the zoom buttons keep the ~44px floor on coarse pointers), and the zone create/edit form sits on the same Horizon glass scene as the dashboard (glass card, ink-pill submit, soft-red delete pill from the stamp family, back button as a quiet frosted capsule, mini-map on the nested-surface radius). Authored light only, inverted by the global filter like the rest of the theme; the tile sets keep their own light/dark swap.
 
 ## Phases
 
