@@ -28,7 +28,10 @@ const DevicesPage = ({ children, ...props }) => (
         dashboardStyle.glassScene
       )}
     >
-      <div class="my-3 my-md-5">
+      {/* padding, not margin: the wallpaper wrappers space themselves with
+          padding so a top margin can never collapse through the glass
+          page-main and shift the scene down (same as SettingsLayout) */}
+      <div class="py-3 py-md-5">
         <div class="container">
           <div class={cx('page-header', style.pageHeaderResponsive)}>
             <h1 class="page-title">
