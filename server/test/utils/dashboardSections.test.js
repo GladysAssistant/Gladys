@@ -21,4 +21,21 @@ describe('normalizeDashboardBoxes', () => {
     expect(normalizeDashboardBoxes('invalid')).to.equal('invalid');
     expect(normalizeDashboardBoxes(undefined)).to.equal(undefined);
   });
+  it('should keep a section with valid widths untouched', () => {
+    const sectionBoxes = [{ columns: [[], []], widths: [2, 1] }];
+    expect(normalizeDashboardBoxes(sectionBoxes)).to.equal(sectionBoxes);
+  });
+  it('should drop widths when every column has the default weight', () => {
+    expect(normalizeDashboardBoxes([{ columns: [[], []], widths: [1, 1] }])).to.deep.equal([{ columns: [[], []] }]);
+  });
+  it('should pad missing widths with the default weight', () => {
+    expect(normalizeDashboardBoxes([{ columns: [[], [], []], widths: [2] }])).to.deep.equal([
+      { columns: [[], [], []], widths: [2, 1, 1] },
+    ]);
+  });
+  it('should truncate extra widths left by a deleted column', () => {
+    expect(normalizeDashboardBoxes([{ columns: [[], []], widths: [2, 1, 2] }])).to.deep.equal([
+      { columns: [[], []], widths: [2, 1] },
+    ]);
+  });
 });

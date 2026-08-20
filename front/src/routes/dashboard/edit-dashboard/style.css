@@ -461,6 +461,12 @@
   height: auto;
 }
 
+/* the width toggle shows its state: tinted primary while the column is wide */
+.btnColumnWidthActive,
+.btnColumnWidthActive:hover {
+  color: #467fcf;
+}
+
 .btnLinkDelete {
   text-decoration: none;
   border: none;

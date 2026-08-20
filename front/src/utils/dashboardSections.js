@@ -3,6 +3,18 @@ import { DASHBOARD_BOX_TYPE } from '../../../server/utils/constants';
 // Maximum number of columns a dashboard section can hold
 export const MAX_COLUMNS_PER_SECTION = 6;
 
+// A column width is a small integer weight, not a free ratio: the editor
+// only toggles a column between normal (1) and wide (2)
+export const DEFAULT_COLUMN_WIDTH = 1;
+export const WIDE_COLUMN_WIDTH = 2;
+
+// One weight per column, defaulting missing entries so callers can always
+// index it safely whatever the stored shape
+export const getSectionWidths = section =>
+  section.columns.map((column, i) =>
+    section.widths && typeof section.widths[i] === 'number' ? section.widths[i] : DEFAULT_COLUMN_WIDTH
+  );
+
 // Box types that absorb the remaining height of their column so sections
 // with columns of different heights don't leave blank space. This is a
 // per-type constant, not a user setting: charts are excluded for now
@@ -42,22 +54,31 @@ const VALUE_TILE_BOX_TYPES = [DASHBOARD_BOX_TYPE.TEMPERATURE_IN_ROOM, DASHBOARD_
 export const isValueTileBox = box => box && VALUE_TILE_BOX_TYPES.includes(box.type);
 
 // The editor works on a flat list of columns (so drag & drop coordinates stay
-// global) plus the number of columns of each section.
+// global) plus the number of columns of each section. Column widths flatten
+// the same way, into one weight per global column index.
 export const flattenSections = sections => {
   const columns = [];
   const sectionSizes = [];
+  const columnWidths = [];
   sections.forEach(section => {
     section.columns.forEach(column => columns.push(column));
     sectionSizes.push(section.columns.length);
+    columnWidths.push(...getSectionWidths(section));
   });
-  return { columns, sectionSizes };
+  return { columns, sectionSizes, columnWidths };
 };
 
-export const buildSections = (columns, sectionSizes) => {
+export const buildSections = (columns, sectionSizes, columnWidths = []) => {
   const sections = [];
   let offset = 0;
   sectionSizes.forEach(size => {
-    sections.push({ columns: columns.slice(offset, offset + size) });
+    const section = { columns: columns.slice(offset, offset + size) };
+    const widths = section.columns.map((column, i) => columnWidths[offset + i] || DEFAULT_COLUMN_WIDTH);
+    // all-default widths stay implicit, matching the server normalization
+    if (widths.some(width => width !== DEFAULT_COLUMN_WIDTH)) {
+      section.widths = widths;
+    }
+    sections.push(section);
     offset += size;
   });
   return sections;

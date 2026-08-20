@@ -4,7 +4,12 @@ import cx from 'classnames';
 import EditableBoxPreview from './EditableBoxPreview';
 import EditPanel from './EditPanel';
 import EmptyColumnDropZone from './EmptyColumnDropZone';
-import { getSectionOffsets, MAX_COLUMNS_PER_SECTION } from '../../../utils/dashboardSections';
+import {
+  DEFAULT_COLUMN_WIDTH,
+  WIDE_COLUMN_WIDTH,
+  getSectionOffsets,
+  MAX_COLUMNS_PER_SECTION
+} from '../../../utils/dashboardSections';
 import style from './style.css';
 import stylePrimary from '../style.css';
 
@@ -91,16 +96,41 @@ const EditBoxColumns = ({ children, ...props }) => (
               <div class={cx('d-flex align-items-start', style.columnsCard)}>
                 {sectionColumns.map((column, columnIndex) => {
                   const x = sectionOffset + columnIndex;
+                  // the canvas previews the weights: a wide column grows double
+                  const columnWidth = (props.columnWidths && props.columnWidths[x]) || DEFAULT_COLUMN_WIDTH;
+                  const isWide = columnWidth === WIDE_COLUMN_WIDTH;
                   return (
                     <div
                       class={cx('d-flex flex-column', style.column, stylePrimary.removePadding, {
                         [stylePrimary.removePaddingFirstCol]: columnIndex === 0,
                         [stylePrimary.removePaddingLastCol]: columnIndex === sectionSize - 1
                       })}
+                      style={{ flexGrow: columnWidth }}
                     >
                       <div class={style.columnBoxHeader}>
                         <span class={style.columnLabel}>
                           <Text id="dashboard.boxes.column" fields={{ index: columnIndex + 1 }} />
+                          {/* a width only means something next to other columns */}
+                          {sectionSize > 1 && (
+                            <Localizer>
+                              <button
+                                class={cx('btn p-0 ml-2', style.btnLinkDelete, {
+                                  [style.btnColumnWidthActive]: isWide
+                                })}
+                                onClick={() => props.toggleColumnWidth(x)}
+                                data-cy={`toggle-column-width-${x}`}
+                                title={
+                                  <Text
+                                    id={
+                                      isWide ? 'dashboard.editorColumnWidthNormal' : 'dashboard.editorColumnWidthWide'
+                                    }
+                                  />
+                                }
+                              >
+                                <i class={cx('fe', isWide ? 'fe-minimize-2' : 'fe-maximize-2')} />
+                              </button>
+                            </Localizer>
+                          )}
                           {getTotalColumns(props) > 1 && (
                             <button
                               class={cx('btn p-0 ml-2', style.btnLinkDelete)}
@@ -155,6 +185,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                       <button
                         class={cx('btn btn-outline-primary', style.btnAddColumn)}
                         onClick={() => props.addColumn(sectionIndex)}
+                        data-cy={`add-column-${sectionIndex}`}
                         data-title={<Text id="dashboard.editDashboardAddColumnButton" />}
                       >
                         <i class="fe fe-plus" />

@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
-const { normalizeDashboardBoxes } = require('../utils/dashboardSections');
+const { normalizeDashboardBoxes, MAX_COLUMN_WIDTH } = require('../utils/dashboardSections');
 const {
   DASHBOARD_BOX_TYPE_LIST,
   DASHBOARD_TYPE_LIST,
@@ -142,12 +142,23 @@ const boxSchema = Joi.object().keys({
 // A dashboard is a stack of sections, each section holding its own columns
 // (1 to MAX_COLUMNS_PER_SECTION). Legacy column-based values are normalized
 // to this shape in a beforeValidate hook, so validation only sees sections.
+// widths holds one integer weight per column (1 = normal, 2 = wide); the
+// beforeValidate hook aligns it to the columns and drops it when every
+// column has the default weight, so it is optional here.
 const boxesSchema = Joi.array().items(
   Joi.object().keys({
     columns: Joi.array()
       .items(Joi.array().items(boxSchema))
       .max(MAX_COLUMNS_PER_SECTION)
       .required(),
+    widths: Joi.array()
+      .items(
+        Joi.number()
+          .integer()
+          .min(1)
+          .max(MAX_COLUMN_WIDTH),
+      )
+      .max(MAX_COLUMNS_PER_SECTION),
   }),
 );
 
