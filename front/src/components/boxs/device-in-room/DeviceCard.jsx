@@ -49,7 +49,9 @@ const DeviceCard = ({ children, ...props }) => {
       <div>
         <div class="loader py-3" />
         <div class="table-responsive">
-          <table class="table card-table table-vcenter">
+          {/* device-list-table: Horizon restyle hook — the glass theme turns
+              these rows into soft pills (see routes/dashboard/style.css) */}
+          <table class="table card-table table-vcenter device-list-table">
             <tbody>
               {loading
                 ? placeholderRows.map((_, index) => (

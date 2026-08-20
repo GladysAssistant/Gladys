@@ -72,6 +72,7 @@ class RoomSelector extends Component {
   render({}, { selectedRoom, houseOptions }) {
     return (
       <Select
+        menuPlacement="auto"
         value={selectedRoom}
         options={houseOptions}
         onChange={this.updateSelection}

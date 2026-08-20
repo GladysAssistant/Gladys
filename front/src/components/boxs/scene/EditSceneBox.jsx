@@ -5,6 +5,7 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 import { RequestStatus } from '../../../utils/consts';
+import SelectDeviceFeature from '../../device/SelectDeviceFeature';
 
 class EditSceneBox extends Component {
   updateScenes = selectedSceneOptions => {
@@ -19,6 +20,18 @@ class EditSceneBox extends Component {
   updateName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       name: e.target.value
+    });
+  };
+
+  updateSceneStatusFeature = (sceneSelector, feature) => {
+    const sceneStatusFeatures = { ...(this.props.box.scene_status_features || {}) };
+    if (feature) {
+      sceneStatusFeatures[sceneSelector] = feature.selector;
+    } else {
+      delete sceneStatusFeatures[sceneSelector];
+    }
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      scene_status_features: sceneStatusFeatures
     });
   };
 
@@ -101,6 +114,7 @@ class EditSceneBox extends Component {
                   <Text id="dashboard.boxes.scene.editSceneLabel" />
                 </label>
                 <Select
+                  menuPlacement="auto"
                   defaultValue={[]}
                   value={selectedSceneOptions}
                   options={sceneOptions}
@@ -110,6 +124,25 @@ class EditSceneBox extends Component {
                   className="react-select-container"
                   classNamePrefix="react-select"
                 />
+              </div>
+            )}
+            {selectedSceneOptions && selectedSceneOptions.length > 0 && (
+              <div class="form-group">
+                <label>
+                  <Text id="dashboard.boxes.scene.editStatusFeatureLabel" />
+                </label>
+                <small class="d-block mb-2">
+                  <Text id="dashboard.boxes.scene.editStatusFeatureDescription" />
+                </small>
+                {selectedSceneOptions.map(sceneOption => (
+                  <div class="mb-2">
+                    <label class="form-label small mb-1">{sceneOption.label}</label>
+                    <SelectDeviceFeature
+                      value={(props.box.scene_status_features || {})[sceneOption.value]}
+                      onDeviceFeatureChange={feature => this.updateSceneStatusFeature(sceneOption.value, feature)}
+                    />
+                  </div>
+                ))}
               </div>
             )}
           </div>

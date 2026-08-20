@@ -97,11 +97,12 @@
     "allRooms": "All rooms",
     "noRoom": "No room",
     "allIntegrations": "All integrations",
+    "nativeIntegrations": "Native integrations",
+    "communityIntegrations": "Community integrations",
     "device": "Device",
     "room": "Room",
     "integration": "Integration",
     "features": "Features",
-    "openInIntegration": "Open in integration",
     "emptyState": "No device found. Add devices from the integrations page, or adjust your search and filters.",
     "emptyStateButton": "Browse integrations",
     "error": "There was an error loading the devices. Please try again later."
@@ -305,6 +306,8 @@
     },
     "duckDbMigrationInProgress": "Your Gladys instance is migrating its database to DuckDB, a new, more powerful database system for time-series data. This task may take some time, during which time not all your charts will be available. Migration progress = {{progress}}%.",
     "editDashboardSaveButton": "Save",
+    "editDashboardSavedButton": "Saved",
+    "editDashboardDoneButton": "Done",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
     "noDashboardSentenceBottom": "Click on the \"New\" button to create a new dashboard",
@@ -318,14 +321,23 @@
       "public": "public"
     },
     "editDashboardAddColumnButton": "Add a column on dashboard",
+    "editDashboardAddSectionButton": "Add a section",
     "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
-    "editDashboardExplanation": "Each dashboard has 3 columns, which you can fill in according to your preferences. Click on the + button to add a new widget. You can move this widget by grabbing it and moving it around.",
+    "editDashboardExplanation": "This is your real dashboard: tap a widget to edit it, use the + buttons to add widgets, columns or sections. Drag widgets to move them — on mobile, use the arrows.",
+    "editorDashboardSettingsButton": "Dashboard settings",
+    "editorDashboardSettings": "Dashboard settings",
+    "editorMoveSectionUp": "Move the section up",
+    "editorMoveSectionDown": "Move the section down",
+    "editorNewWidget": "New widget",
+    "editorNewWidgetPlaceholder": "Choose a widget in the panel",
     "reorderDashboardButton": "Re-order dashboards",
     "stopReorderingDashboardButton": "Stop re-ordering dashboards",
     "addBoxButton": "Add",
     "selectBoxType": "Select a type",
     "selectBoxTypeLabel": "Choose which widget to display here",
+    "selectBoxTypeSearchPlaceholder": "Search for a widget (clock, camera…)",
+    "selectBoxTypeNoResult": "No widget matches \"{{search}}\"",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Weather",
@@ -346,10 +358,14 @@
       "voice-assistant": "Voice assistant",
       "link": "Link",
       "photo": "Photo",
-      "sun": "Sun"
+      "sun": "Sun",
+      "chips": "Status chips",
+      "actions": "Quick actions",
+      "house-view": "House view"
     },
     "boxes": {
       "column": "Column {{index}}",
+      "section": "Section {{index}}",
       "deleteButton": "Delete",
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
@@ -582,7 +598,8 @@
         "currentHourState": "Currently",
         "peakHour": "Peak Hour",
         "offPeakHour": "Off-Peak Hour",
-        "dayPeakTitle": "Tempo days"
+        "dayPeakTitle": "Tempo days",
+        "error": "Unable to load EDF Tempo data. Check that the EDF Tempo service is configured."
       },
       "clock": {
         "analog": "Analog",
@@ -624,12 +641,16 @@
         "error": "Error loading energy consumption data",
         "noData": "No energy consumption data available for this period",
         "showSubscriptionPrices": "Show subscription prices",
-        "showSubscriptionPricesDescription": "Display the monthly subscription cost alongside consumption data in the chart."
+        "showSubscriptionPricesDescription": "Display the monthly subscription cost alongside consumption data in the chart.",
+        "periodStartDay": "Billing period start day",
+        "periodStartDayDescription": "Day of the month your energy bill period starts on. The monthly and yearly views then run from this day to the same day of the next period (ex: from the 5th to the 5th), so they can be compared with your bill. If a month is shorter than this day, the period starts on the last day of that month."
       },
       "scene": {
         "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Name displayed on the dashboard",
-        "editSceneLabel": "Select the scene you want to display here."
+        "editSceneLabel": "Select the scene you want to display here.",
+        "editStatusFeatureLabel": "Live status under each button (optional)",
+        "editStatusFeatureDescription": "Pick a device feature to display its state under the scene button, e.g. shutter position or vacuum status."
       },
       "link": {
         "editTitleLabel": "Title",
@@ -701,7 +722,97 @@
         "errorNoTranscription": "I could not understand your message. Speak closer to the microphone and try again.",
         "configDescription": "This widget uses Gladys Plus for speech recognition, AI and text-to-speech. Connect your instance to Gladys Plus to use it.",
         "plusRequiredHint": "Connect Gladys Plus to enable the microphone."
+      },
+      "chips": {
+        "editDescription": "A compact bar of status chips. Add chips and pick what each one shows.",
+        "editChipLabel": "Chip {{index}}",
+        "removeChipButton": "Remove chip {{index}}",
+        "editChipTypeLabel": "What does this chip show?",
+        "chipTypes": {
+          "device-feature": "A device state",
+          "openings": "Openings summary (doors/windows)",
+          "alarm": "Alarm status",
+          "calendar-next-event": "Next calendar event"
+        },
+        "editDeviceFeatureLabel": "Device feature",
+        "editHouseLabel": "House",
+        "editRoomLabel": "Room (optional, to narrow the scope)",
+        "editCalendarLabel": "Calendar",
+        "allCalendars": "All calendars",
+        "editEventNameFilterLabel": "Only events containing (optional)",
+        "editEventNameFilterPlaceholder": "e.g. Trash",
+        "editLabelLabel": "Label (optional)",
+        "editLabelPlaceholder": "e.g. Garage",
+        "addChipButton": "Add a chip",
+        "openings": "{{count}} open",
+        "allClosed": "All closed",
+        "noEvent": "No upcoming event",
+        "error": "Error",
+        "alarmModes": {
+          "disarmed": "Disarmed",
+          "armed": "Armed",
+          "partially-armed": "Partially armed",
+          "panic": "Panic"
+        }
+      },
+      "actions": {
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "Shutters, Lights…",
+        "actionLabel": "Action {{index}}",
+        "removeActionButton": "Remove action {{index}}",
+        "actionTypeLabel": "Action type",
+        "actionTypes": {
+          "scene": "Start a scene",
+          "device-feature": "Control a device"
+        },
+        "sceneLabel": "Scene",
+        "deviceFeatureLabel": "Device feature",
+        "commandLabel": "Command",
+        "commands": {
+          "open": "Open",
+          "stop": "Stop",
+          "close": "Close"
+        },
+        "labelLabel": "Button label (optional)",
+        "labelPlaceholder": "Open ground floor…",
+        "addActionButton": "Add an action",
+        "noActions": "No action configured yet. Edit the dashboard to add some."
+      },
+      "house-view": {
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "e.g. My house",
+        "editGalleryLabel": "Pick an illustration",
+        "editUploadLabel": "Or upload your own image",
+        "uploading": "Uploading...",
+        "uploadError": "The image could not be uploaded. Try a smaller image.",
+        "editPinsLabel": "Live values on the image",
+        "editPinsDescription": "Click on the image to place a pin, then pick the device feature it displays. To move a pin, remove it and place it again.",
+        "editPinLabel": "Pin {{index}}",
+        "editPinFeatureLabel": "Device feature",
+        "editPinLabelLabel": "Label (optional)",
+        "editPinLabelPlaceholder": "e.g. Solar",
+        "noImage": "Pick an illustration in the widget settings.",
+        "error": "The image could not be loaded."
       }
+    },
+    "editDashboardBackgroundLabel": "Background mood",
+    "editDashboardBackgroundDescription": "Built-in scenes, lightweight and always available, even without internet.",
+    "scenes": {
+      "horizon": "Horizon",
+      "aurora": "Aurora",
+      "dusk": "Dusk",
+      "forest": "Forest",
+      "lagoon": "Lagoon",
+      "sand": "Sand",
+      "lavender": "Lavender",
+      "mist": "Mist"
+    },
+    "editDashboardIconLabel": "Icon (optional)",
+    "editDashboardIconDescription": "Shown in the dashboard tab bar in tablet mode.",
+    "editDashboardWidthLabel": "Dashboard width",
+    "widths": {
+      "standard": "Standard (recommended)",
+      "full": "Full width"
     }
   },
   "newDashboard": {
@@ -730,6 +841,13 @@
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
+      "noInstalledIntegrations": "No community integration is installed on this instance yet.",
+      "installedSummary": {
+        "title": {
+          "one": "1 community integration installed on this instance.",
+          "other": "{{count}} community integrations installed on this instance."
+        }
+      },
       "noSearchResults": "No integration matching \"{{searchKeyword}}\" was found.",
       "noSearchResultsSuggestion": "Your device may be supported by a community <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">external integration</a> — the recommended way to add new compatibilities. And if it doesn't exist yet, you can <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">easily create your own</a>!",
       "refreshStore": {
@@ -749,6 +867,7 @@
       "menu": {
         "all": "All integrations",
         "favorites": "Favorites",
+        "installed": "Installed",
         "updates": "To update",
         "climate": "Heating & cooling",
         "lighting": "Lighting, plugs & covers",
@@ -843,6 +962,7 @@
         "actionError": "There was an error executing this action.",
         "uninstallError": "There was an error uninstalling this integration.",
         "updateAvailableText": "A new version of this integration is available.",
+        "updateAvailableVersionText": "A new version of this integration is available: v{{latestVersion}} (installed: v{{currentVersion}}).",
         "updateSuccessText": "Integration updated to version {{version}}.",
         "alreadyUpToDateText": "The integration is already up to date (version {{version}}): the Docker image was re-pulled and the container recreated.",
         "statusLabel": "Status",
@@ -1359,18 +1479,29 @@
             "description": "Gladys will configure two Docker containers: MQTT and Zigbee2mqtt.",
             "dockerInstallationRequirementLabel": "Gladys must run under Docker",
             "dockerNetworkHostRequirementLabel": "Gladys Docker container must be started with the option \"network=host\"",
-            "usbDongleRequirementLabel": "Zigbee USB dongle must be connected",
-            "detailsDescription": "To use Zigbee2mqtt with Gladys, a Zigbee USB dongle must be inserted.",
+            "coordinatorRequirementLabel": "A Zigbee coordinator must be connected (USB dongle or network gateway)",
+            "detailsDescription": "To use Zigbee2mqtt with Gladys, a Zigbee coordinator is required: either a USB dongle plugged into this machine, or a network coordinator (SMLIGHT SLZB-06/SLZB-07, ZigStar…) reachable on your local network.",
+            "adapterModeLabel": "How is the Zigbee coordinator connected?",
+            "adapterModeUsbLabel": "USB dongle",
+            "adapterModeNetworkLabel": "Network coordinator (Ethernet/Wi-Fi)",
             "usbDriverPathLabel": "Select the USB port where the Zigbee dongle is inserted",
             "usbDriverPathPlaceholder": "USB Port",
             "usbDongleNameLabel": "Select the model of the Zigbee dongle used",
             "usbDongleNamePlaceholder": "Zigbee Dongle Model",
+            "networkAdapterUrlLabel": "Enter the address of the network coordinator",
+            "networkAdapterUrlPlaceholder": "tcp://192.168.1.20:6638",
+            "networkAdapterUrlDescription": "IP address (or hostname) and TCP port of the coordinator, for example tcp://192.168.1.20:6638. The \"tcp://\" prefix is optional.",
+            "networkAdapterTypeLabel": "Select the Zigbee2mqtt adapter type of the coordinator",
+            "networkAdapterTypePlaceholder": "Adapter type",
+            "networkAdapterTypeDescription": "See the documentation of your coordinator: the SMLIGHT SLZB-06 uses \"zstack\", the SLZB-06M and SLZB-07 use \"ember\".",
             "z2mTcpPortLabel": "Enter the TCP port exposed by the Zigbee2Mqtt web application",
             "z2mTcpPortDescription": "If left empty, a random port will be used.",
             "summary": {
               "title": "Configuration",
               "usbPort": "USB Port",
+              "networkAdapterUrl": "Network coordinator",
               "dongleName": "Dongle",
+              "networkAdapterType": "Adapter type",
               "unknownDongle": "Not defined",
               "tcpPort": "TCP Port"
             },
@@ -3301,7 +3432,7 @@
         "continueScene": "Continue the scene"
       },
       "calendarGetEvents": {
-        "description": "This action gets the list of events starting in the selected time range (an event which started before the beginning of the range is not returned), and makes them available as variables (a ready-to-use sentence, the number of events and the list of events) for the next actions of the scene. Only shared calendars are displayed here.",
+        "description": "This action gets the list of events starting in the selected time range (an event which started before the beginning of the range is not returned), and makes them available as variables (a ready-to-use sentence, a detailed list with one line per event, the number of events and the raw list of events) for the next actions of the scene. Only shared calendars are displayed here.",
         "calendarLabel": "Look in the following shared calendars",
         "timeRangeLabel": "Get events",
         "today": "Today",
@@ -3463,8 +3594,9 @@
       },
       "calendarEvents": {
         "text": "Events summary sentence",
+        "textDetailed": "Detailed list of events (one line per event)",
         "count": "Number of events",
-        "events": "List of events"
+        "events": "Raw list of events (advanced, not readable in a message)"
       },
       "askAi": {
         "answer": "AI answer"
@@ -3533,6 +3665,8 @@
         "off": "Off",
         "deviceSeen": "If the device is detected",
         "doorbellRang": "If the doorbell rings",
+        "anyStateChange": "Start the scene on any state change, whatever the value",
+        "anyStateChangeNote": "The scene will start when the device reports its first value, or a value different from the previous one, including small variations of a sensor.",
         "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)",
         "activateOrDeactivateForDuration": "Run the scene after the condition has been valid for:",
         "multipleFeaturesNote": "You can select several features of the same type: the scene will start as soon as one of them matches the condition."
@@ -4029,7 +4163,9 @@
     "startButton": "Start",
     "searchPlaceholder": "Search scenes",
     "filterTagsName": "Filter by tags",
-    "unselectTags": "Unselect all tags"
+    "unselectTags": "Unselect all tags",
+    "running": "Running",
+    "stopButton": "Stop"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -5992,5 +6128,12 @@
     "cancelUpgradeToYearly": "Cancel",
     "upgradeYearlyError": "An error occurred while switching to the annual plan, please contact us by email.",
     "upgradeYearlySuccess": "Thanks for switching to the annual plan!"
+  },
+  "deviceFeatureValueText": {
+    "noValue": "No value",
+    "open": "Open",
+    "closed": "Closed",
+    "on": "On",
+    "off": "Off"
   }
 }

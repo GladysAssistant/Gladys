@@ -8,12 +8,14 @@ const ORDER_DIRS = ['asc', 'desc', 'newest'];
 const FACET_ORIGINS = ['native', 'community'];
 const FACET_TRANSPORTS = ['local', 'cloud'];
 
-// the catalog is displayed for every category, plus "all", "favorites" and
-// "updates": only those paths are accepted as a "back to the catalog" target
+// the catalog is displayed for every category, plus "all", "favorites",
+// "updates" and "installed": only those paths are accepted as a "back to the
+// catalog" target
 const CATALOG_PATHS = new Set([
   CATALOG_BASE_URL,
   `${CATALOG_BASE_URL}/favorites`,
   `${CATALOG_BASE_URL}/updates`,
+  `${CATALOG_BASE_URL}/installed`,
   ...catalogCategories.map(category => `${CATALOG_BASE_URL}/${category.key}`)
 ]);
 

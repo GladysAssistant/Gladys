@@ -94,15 +94,36 @@
   color: #fff;
 }
 
-.noImageToShowError {
-  background-color: #34495e;
-  color: white;
-  height: 244px;
-  padding: 12px;
-  padding-bottom: 0px;
-  margin-bottom: 0px;
-  display: table-cell;
-  vertical-align: middle;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+/* Snapshot unavailable: a quiet placeholder in the media slot. flex-grow lets
+   it absorb the stretch of a short column (the card is a flex column there)
+   instead of leaving a blank void under the header */
+.noImagePlaceholder {
+  flex: 1 1 auto;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.noImageIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 14px;
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.noImageText {
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.875rem;
+  max-width: 22rem;
 }

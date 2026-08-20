@@ -97,11 +97,12 @@
     "allRooms": "Toutes les pièces",
     "noRoom": "Aucune pièce",
     "allIntegrations": "Toutes les intégrations",
+    "nativeIntegrations": "Intégrations natives",
+    "communityIntegrations": "Intégrations communautaires",
     "device": "Appareil",
     "room": "Pièce",
     "integration": "Intégration",
     "features": "Fonctionnalités",
-    "openInIntegration": "Ouvrir dans l'intégration",
     "emptyState": "Aucun appareil trouvé. Ajoutez des appareils depuis la page des intégrations, ou modifiez votre recherche et vos filtres.",
     "emptyStateButton": "Parcourir les intégrations",
     "error": "Une erreur est survenue lors du chargement des appareils. Veuillez réessayer plus tard."
@@ -290,6 +291,8 @@
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
+    "editDashboardSavedButton": "Enregistré",
+    "editDashboardDoneButton": "Terminer",
     "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
     "toggleDefineTabletMode": "Mode tablette",
     "closeDefineTabletMode": "Fermer",
@@ -318,14 +321,23 @@
       "public": "public"
     },
     "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
+    "editDashboardAddSectionButton": "Ajouter une section",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bord",
-    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
+    "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer, utilisez les boutons + pour ajouter widgets, colonnes ou sections. Glissez les widgets pour les déplacer — sur mobile, utilisez les flèches.",
+    "editorDashboardSettingsButton": "Réglages du tableau de bord",
+    "editorDashboardSettings": "Réglages du tableau de bord",
+    "editorMoveSectionUp": "Monter la section",
+    "editorMoveSectionDown": "Descendre la section",
+    "editorNewWidget": "Nouveau widget",
+    "editorNewWidgetPlaceholder": "Choisissez un widget dans le panneau",
     "reorderDashboardButton": "Re-ordonner",
     "stopReorderingDashboardButton": "Arrêter de réordonner",
     "addBoxButton": "Ajouter",
     "selectBoxType": "Sélectionner un type",
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
+    "selectBoxTypeSearchPlaceholder": "Rechercher un widget (horloge, caméra…)",
+    "selectBoxTypeNoResult": "Aucun widget ne correspond à « {{search}} »",
     "boxTitle": {
       "alarm": "Alarme",
       "weather": "Météo",
@@ -346,10 +358,14 @@
       "voice-assistant": "Assistant vocal",
       "link": "Lien",
       "photo": "Photo",
-      "sun": "Soleil"
+      "sun": "Soleil",
+      "chips": "Pastilles d'état",
+      "actions": "Actions rapides",
+      "house-view": "Vue de la maison"
     },
     "boxes": {
       "column": "Colonne {{index}}",
+      "section": "Section {{index}}",
       "deleteButton": "Supprimer",
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
@@ -582,7 +598,8 @@
         "currentHourState": "Actuellement",
         "peakHour": "Heure pleine",
         "offPeakHour": "Heure creuse",
-        "dayPeakTitle": "Jours tempo"
+        "dayPeakTitle": "Jours tempo",
+        "error": "Impossible de récupérer les données EDF Tempo. Vérifiez que le service EDF Tempo est bien configuré."
       },
       "clock": {
         "analog": "Analogique",
@@ -597,7 +614,9 @@
       "scene": {
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
-        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
+        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici.",
+        "editStatusFeatureLabel": "État en direct sous chaque bouton (optionnel)",
+        "editStatusFeatureDescription": "Choisissez une fonctionnalité d'appareil pour afficher son état sous le bouton de la scène, ex : position des volets ou état de l'aspirateur."
       },
       "link": {
         "editTitleLabel": "Titre",
@@ -680,7 +699,9 @@
         "error": "Erreur lors du chargement des données de consommation énergétique",
         "noData": "Aucune donnée de consommation énergétique disponible pour cette période",
         "showSubscriptionPrices": "Afficher les prix d'abonnement",
-        "showSubscriptionPricesDescription": "Affiche le coût mensuel de l'abonnement en plus des données de consommation dans le graphique."
+        "showSubscriptionPricesDescription": "Affiche le coût mensuel de l'abonnement en plus des données de consommation dans le graphique.",
+        "periodStartDay": "Jour de départ de la période de facturation",
+        "periodStartDayDescription": "Jour du mois où commence la période de facturation de votre fournisseur d'énergie. Les vues mensuelle et annuelle iront alors de ce jour au même jour de la période suivante (ex : du 5 au 5), afin de pouvoir les comparer à votre facture. Si un mois est plus court que ce jour, la période démarre le dernier jour de ce mois."
       },
       "voice-assistant": {
         "speak": "Parler",
@@ -701,7 +722,97 @@
         "errorNoTranscription": "Je n'ai pas compris votre message. Parlez plus près du micro et réessayez.",
         "configDescription": "Ce widget utilise Gladys Plus pour la reconnaissance vocale, l'IA et la synthèse vocale. Connectez votre instance à Gladys Plus pour l'utiliser.",
         "plusRequiredHint": "Connectez Gladys Plus pour activer le micro."
+      },
+      "chips": {
+        "editDescription": "Une barre compacte de pastilles d'état. Ajoutez des pastilles et choisissez ce que chacune affiche.",
+        "editChipLabel": "Pastille {{index}}",
+        "removeChipButton": "Supprimer la pastille {{index}}",
+        "editChipTypeLabel": "Que doit afficher cette pastille ?",
+        "chipTypes": {
+          "device-feature": "L'état d'un appareil",
+          "openings": "Résumé des ouvertures (portes/fenêtres)",
+          "alarm": "État de l'alarme",
+          "calendar-next-event": "Prochain événement d'agenda"
+        },
+        "editDeviceFeatureLabel": "Fonctionnalité de l'appareil",
+        "editHouseLabel": "Maison",
+        "editRoomLabel": "Pièce (optionnel, pour restreindre)",
+        "editCalendarLabel": "Agenda",
+        "allCalendars": "Tous les agendas",
+        "editEventNameFilterLabel": "Uniquement les événements contenant (optionnel)",
+        "editEventNameFilterPlaceholder": "ex : Poubelle",
+        "editLabelLabel": "Libellé (optionnel)",
+        "editLabelPlaceholder": "ex : Garage",
+        "addChipButton": "Ajouter une pastille",
+        "openings": "{{count}} ouvert(s)",
+        "allClosed": "Tout fermé",
+        "noEvent": "Aucun événement à venir",
+        "error": "Erreur",
+        "alarmModes": {
+          "disarmed": "Désactivée",
+          "armed": "Activée",
+          "partially-armed": "Partiellement activée",
+          "panic": "Panique"
+        }
+      },
+      "actions": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Volets, Lumières…",
+        "actionLabel": "Action {{index}}",
+        "removeActionButton": "Supprimer l'action {{index}}",
+        "actionTypeLabel": "Type d'action",
+        "actionTypes": {
+          "scene": "Démarrer une scène",
+          "device-feature": "Contrôler un appareil"
+        },
+        "sceneLabel": "Scène",
+        "deviceFeatureLabel": "Fonctionnalité de l'appareil",
+        "commandLabel": "Commande",
+        "commands": {
+          "open": "Ouvrir",
+          "stop": "Stop",
+          "close": "Fermer"
+        },
+        "labelLabel": "Libellé du bouton (optionnel)",
+        "labelPlaceholder": "Ouvrir RDC…",
+        "addActionButton": "Ajouter une action",
+        "noActions": "Aucune action configurée pour l'instant. Éditez le tableau de bord pour en ajouter."
+      },
+      "house-view": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "ex : Ma maison",
+        "editGalleryLabel": "Choisissez une illustration",
+        "editUploadLabel": "Ou envoyez votre propre image",
+        "uploading": "Envoi en cours...",
+        "uploadError": "L'image n'a pas pu être envoyée. Essayez une image plus légère.",
+        "editPinsLabel": "Valeurs en direct sur l'image",
+        "editPinsDescription": "Cliquez sur l'image pour poser une épingle, puis choisissez la fonctionnalité qu'elle affiche. Pour déplacer une épingle, supprimez-la et reposez-la.",
+        "editPinLabel": "Épingle {{index}}",
+        "editPinFeatureLabel": "Fonctionnalité de l'appareil",
+        "editPinLabelLabel": "Libellé (optionnel)",
+        "editPinLabelPlaceholder": "ex : Solaire",
+        "noImage": "Choisissez une illustration dans les réglages du widget.",
+        "error": "L'image n'a pas pu être chargée."
       }
+    },
+    "editDashboardBackgroundLabel": "Ambiance de fond",
+    "editDashboardBackgroundDescription": "Des scènes intégrées, légères et toujours disponibles, même sans internet.",
+    "scenes": {
+      "horizon": "Horizon",
+      "aurora": "Aurore",
+      "dusk": "Crépuscule",
+      "forest": "Forêt",
+      "lagoon": "Lagon",
+      "sand": "Sable",
+      "lavender": "Lavande",
+      "mist": "Brume"
+    },
+    "editDashboardIconLabel": "Icône (optionnel)",
+    "editDashboardIconDescription": "Affichée dans la barre d'onglets des tableaux de bord en mode tablette.",
+    "editDashboardWidthLabel": "Largeur du tableau de bord",
+    "widths": {
+      "standard": "Standard (recommandé)",
+      "full": "Pleine largeur"
     }
   },
   "newDashboard": {
@@ -730,6 +841,13 @@
       "searchPlaceholder": "Chercher une intégration",
       "noIntegrations": "Aucune intégration trouvée",
       "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
+      "noInstalledIntegrations": "Aucune intégration de la communauté n'est encore installée sur cette instance.",
+      "installedSummary": {
+        "title": {
+          "one": "1 intégration de la communauté installée sur cette instance.",
+          "other": "{{count}} intégrations de la communauté installées sur cette instance."
+        }
+      },
       "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
       "noSearchResultsSuggestion": "Votre appareil est peut-être pris en charge par une <a href=\"https://gladysassistant.com/fr/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">intégration externe</a> de la communauté : c'est la façon recommandée d'ajouter de nouvelles compatibilités. Et si elle n'existe pas encore, vous pouvez <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">créer la vôtre très simplement</a> !",
       "refreshStore": {
@@ -749,6 +867,7 @@
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
+        "installed": "Installées",
         "updates": "À mettre à jour",
         "climate": "Chauffage & climatisation",
         "lighting": "Éclairage, prises & volets",
@@ -843,6 +962,7 @@
         "actionError": "Une erreur s'est produite lors de l'exécution de cette action.",
         "uninstallError": "Une erreur s'est produite lors de la désinstallation de cette intégration.",
         "updateAvailableText": "Une nouvelle version de cette intégration est disponible.",
+        "updateAvailableVersionText": "Une nouvelle version de cette intégration est disponible : v{{latestVersion}} (installée : v{{currentVersion}}).",
         "updateSuccessText": "Intégration mise à jour en version {{version}}.",
         "alreadyUpToDateText": "L'intégration est déjà à jour (version {{version}}) : l'image Docker a été re-téléchargée et le conteneur recréé.",
         "statusLabel": "Statut",
@@ -1597,18 +1717,29 @@
             "description": "Gladys va configurer deux containers Docker : MQTT et Zigbee2mqtt.",
             "dockerInstallationRequirementLabel": "Gladys doit s'exécuter sous Docker",
             "dockerNetworkHostRequirementLabel": "Le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"",
-            "usbDongleRequirementLabel": "Le dongle USB Zigbee doit être connecté",
-            "detailsDescription": "Pour utiliser Zigbee2mqtt avec Gladys, il faut insérer un dongle USB Zigbee.",
+            "coordinatorRequirementLabel": "Un coordinateur Zigbee doit être connecté (dongle USB ou passerelle réseau)",
+            "detailsDescription": "Pour utiliser Zigbee2mqtt avec Gladys, un coordinateur Zigbee est nécessaire : soit un dongle USB inséré sur cette machine, soit un coordinateur réseau (SMLIGHT SLZB-06/SLZB-07, ZigStar…) accessible sur votre réseau local.",
+            "adapterModeLabel": "Comment le coordinateur Zigbee est-il connecté ?",
+            "adapterModeUsbLabel": "Dongle USB",
+            "adapterModeNetworkLabel": "Coordinateur réseau (Ethernet/Wi-Fi)",
             "usbDriverPathLabel": "Sélectionner le port USB sur lequel le dongle Zigbee est inséré",
             "usbDriverPathPlaceholder": "Port USB",
             "usbDongleNameLabel": "Sélectionner le modèle du dongle Zigbee utilisé",
             "usbDongleNamePlaceholder": "Modèle du dongle Zigbee",
+            "networkAdapterUrlLabel": "Entrer l'adresse du coordinateur réseau",
+            "networkAdapterUrlPlaceholder": "tcp://192.168.1.20:6638",
+            "networkAdapterUrlDescription": "Adresse IP (ou nom d'hôte) et port TCP du coordinateur, par exemple tcp://192.168.1.20:6638. Le préfixe \"tcp://\" est facultatif.",
+            "networkAdapterTypeLabel": "Sélectionner le type d'adaptateur Zigbee2mqtt du coordinateur",
+            "networkAdapterTypePlaceholder": "Type d'adaptateur",
+            "networkAdapterTypeDescription": "Consulter la documentation de votre coordinateur : le SMLIGHT SLZB-06 utilise \"zstack\", les SLZB-06M et SLZB-07 utilisent \"ember\".",
             "z2mTcpPortLabel": "Entrer le port TCP exposé par l'application Web Zigbee2Mqtt",
             "z2mTcpPortDescription": "Si vous laissez vide, un port aléatoire sera utilisé.",
             "summary": {
               "title": "Configuration",
               "usbPort": "Port USB",
+              "networkAdapterUrl": "Coordinateur réseau",
               "dongleName": "Dongle",
+              "networkAdapterType": "Type d'adaptateur",
               "unknownDongle": "Non défini",
               "tcpPort": "Port TCP"
             },
@@ -3301,7 +3432,7 @@
         "continueScene": "Continuer la scène"
       },
       "calendarGetEvents": {
-        "description": "Cette action récupère la liste des évènements qui commencent sur la période sélectionnée (un évènement ayant commencé avant le début de la période n'est pas retourné), et les rend disponibles sous forme de variables (une phrase prête à l'emploi, le nombre d'évènements et la liste des évènements) pour les actions suivantes de la scène. Seuls les calendriers partagés sont affichés ici.",
+        "description": "Cette action récupère la liste des évènements qui commencent sur la période sélectionnée (un évènement ayant commencé avant le début de la période n'est pas retourné), et les rend disponibles sous forme de variables (une phrase prête à l'emploi, une liste détaillée avec une ligne par évènement, le nombre d'évènements et la liste brute des évènements) pour les actions suivantes de la scène. Seuls les calendriers partagés sont affichés ici.",
         "calendarLabel": "Dans les calendriers partagés suivants",
         "timeRangeLabel": "Récupérer les évènements",
         "today": "Aujourd'hui",
@@ -3463,8 +3594,9 @@
       },
       "calendarEvents": {
         "text": "Phrase résumant les évènements",
+        "textDetailed": "Liste détaillée des évènements (une ligne par évènement)",
         "count": "Nombre d'évènements",
-        "events": "Liste des évènements"
+        "events": "Liste brute des évènements (avancé, illisible dans un message)"
       },
       "askAi": {
         "answer": "Réponse de l'IA"
@@ -3533,6 +3665,8 @@
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
         "doorbellRang": "Si la sonnette sonne",
+        "anyStateChange": "Démarrer la scène à chaque changement d'état, quelle que soit la valeur",
+        "anyStateChangeNote": "La scène démarrera lorsque l'appareil enverra sa première valeur, ou une valeur différente de la précédente, y compris les petites variations d'un capteur.",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
         "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : ",
         "multipleFeaturesNote": "Vous pouvez sélectionner plusieurs fonctionnalités du même type : la scène démarrera dès que l'une d'elles remplit la condition."
@@ -4029,7 +4163,9 @@
     "startButton": "Démarrer",
     "searchPlaceholder": "Chercher une scène",
     "filterTagsName": "Filtrer par tags",
-    "unselectTags": "Désélectionner tous les tags"
+    "unselectTags": "Désélectionner tous les tags",
+    "running": "En cours",
+    "stopButton": "Arrêter"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -5992,5 +6128,12 @@
     "cancelUpgradeToYearly": "Annuler",
     "upgradeYearlyError": "Une erreur est survenue lors de la mise à jour vers le plan annuel, merci de nous contacter par email ou sur le forum.",
     "upgradeYearlySuccess": "Merci d'être passé au plan annuel !"
+  },
+  "deviceFeatureValueText": {
+    "noValue": "Aucune valeur",
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "on": "Allumé",
+    "off": "Éteint"
   }
 }

@@ -7,8 +7,18 @@ import BaseEditBox from '../baseEditBox';
 import EnergyConsumption from './EnergyConsumption';
 import { getDeviceFeatureName } from '../../../utils/device';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
+import {
+  DEFAULT_ENERGY_PERIOD_START_DAY,
+  MIN_ENERGY_PERIOD_START_DAY,
+  MAX_ENERGY_PERIOD_START_DAY
+} from '../../../../../server/utils/energyPeriod';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEFAULT_COLORS, DEFAULT_COLORS_NAME } from '../chart/ApexChartComponent';
+
+const PERIOD_START_DAY_OPTIONS = [];
+for (let day = MIN_ENERGY_PERIOD_START_DAY; day <= MAX_ENERGY_PERIOD_START_DAY; day += 1) {
+  PERIOD_START_DAY_OPTIONS.push(day);
+}
 
 const square = (color = 'transparent') => ({
   alignItems: 'center',
@@ -90,6 +100,12 @@ class EditEnergyConsumption extends Component {
         device_features: []
       });
     }
+  };
+
+  updatePeriodStartDay = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      period_start_day: parseInt(e.target.value, 10)
+    });
   };
 
   updateShowSubscriptionPrices = e => {
@@ -200,6 +216,7 @@ class EditEnergyConsumption extends Component {
             <Text id="dashboard.boxes.energyConsumption.editDeviceFeatures" />
           </label>
           <Select
+            menuPlacement="auto"
             defaultValue={[]}
             value={selectedDeviceFeatures}
             onChange={this.updateDeviceFeatures}
@@ -218,6 +235,7 @@ class EditEnergyConsumption extends Component {
                 />
               </label>
               <Select
+                menuPlacement="auto"
                 defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[i])}
                 value={
                   props.box.colors &&
@@ -232,6 +250,25 @@ class EditEnergyConsumption extends Component {
               />
             </div>
           ))}
+        <div class="form-group">
+          <label>
+            <Text id="dashboard.boxes.energyConsumption.periodStartDay" />
+          </label>
+          <select
+            class="form-control"
+            value={props.box.period_start_day || DEFAULT_ENERGY_PERIOD_START_DAY}
+            onChange={this.updatePeriodStartDay}
+          >
+            {PERIOD_START_DAY_OPTIONS.map(day => (
+              <option key={day} value={day}>
+                {day}
+              </option>
+            ))}
+          </select>
+          <small class="form-text text-muted">
+            <Text id="dashboard.boxes.energyConsumption.periodStartDayDescription" />
+          </small>
+        </div>
         <div class="form-group">
           <label class="custom-switch">
             <input
