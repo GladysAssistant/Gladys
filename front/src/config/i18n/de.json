@@ -277,17 +277,21 @@
       }
     },
     "success": {
-      "title": "Vielen Dank!",
-      "introduction": "Ich bin <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\">Pierre-Gilles Leymarie</a> und habe 2013 mit der Arbeit an Gladys Assistant begonnen.",
-      "thanksForChoosingOpenSource": "Ich möchte dir dafür danken, dass du dich für Gladys entschieden hast. Ich hoffe, du wirst genauso viel Freude beim Verwenden dieser Software haben, wie ich beim Entwickeln hatte.",
-      "ifYouWantToSupportThisSoftware": "Ich bin auf Unterstützungen angewiesen, um an diesem Projekt nachhaltig arbeiten zu können. Wenn du Gladys unterstützen und Zugang zu zusätzlichen Funktionen erhalten möchtest, dann kannst du dies mittels <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a> tun.",
+      "title": "Willkommen bei Gladys!",
+      "subtitle": "Dein Assistent ist bereit. Alles läuft bei dir zu Hause – und deine Daten bleiben dort.",
+      "integrationsTitle": "Verbinde dein ganzes Zuhause",
+      "integrationsText": "Zigbee, Matter, Z-Wave, MQTT, Philips Hue, Sonos … Gladys funktioniert mit Tausenden Geräten, und dank externer Integrationen kommen laufend neue dazu – ganz ohne neue Gladys-Version.",
+      "scenesTitle": "Automatisiere deinen Alltag",
+      "scenesText": "Erstelle Szenen, die auf dein Zuhause reagieren: Licht bei Sonnenuntergang, smarte Heizung, Benachrichtigungen, Morgenroutinen … Dein Zuhause arbeitet für dich, auch wenn du gerade nicht daran denkst.",
+      "openSourceTitle": "Ein völlig offenes Projekt",
+      "openSourceText": "Gladys ist 100 % <a href=\"https://github.com/GladysAssistant/Gladys\" target=\"_blank\" rel=\"noopener noreferrer\">Open Source</a> und offen für Entwicklungen: Baue eigene Integrationen, bring deine Ideen ein, werde Teil der <a href=\"https://community.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">Community</a>.",
+      "closing": "Wir sind gespannt, was du mit Gladys machen wirst!",
       "goToDashboardButton": "Zum Dashboard gehen"
     }
   },
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Bearbeiten",
-    "newDashboardButton": "Hinzufügen",
     "enableFullScreen": "Vollbild",
     "disableFullScreen": "Vollbild beenden",
     "editDashboardTitle": "Dashboard bearbeiten",
@@ -306,9 +310,8 @@
     },
     "duckDbMigrationInProgress": "Ihre Instanz Gladys ist dabei, ihre Datenbank auf DuckDB umzustellen, ein neues, leistungsfähigeres Datenbanksystem für Zeitseriendaten. Diese Aufgabe kann einige Zeit in Anspruch nehmen, und während dieser Zeit werden nicht alle Ihre Grafiken verfügbar sein. Fortschritt der Migration = {{progress}}%",
     "editDashboardSaveButton": "Sichern",
-    "emptyDashboardSentenceTop": "Dein Dashboard wurde noch nicht konfiguriert.",
-    "emptyDashboardSentenceBottom": "Klicke auf \"Bearbeiten\", um dein Dashboard zu gestalten.",
-    "noDashboardSentenceBottom": "Klicke auf \"Hinzufügen\", um ein neues Dashboard zu erstellen.",
+    "editDashboardSavedButton": "Gesichert",
+    "editDashboardDoneButton": "Fertig",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Sichtbarkeit",
@@ -319,14 +322,23 @@
       "public": "öffentlich"
     },
     "editDashboardAddColumnButton": "Eine Spalte zum Dashboard hinzufügen",
+    "editDashboardAddSectionButton": "Einen Abschnitt hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
-    "editDashboardExplanation": "Jedes Dashboard hat 3 Spalten, die du nach Belieben füllen kannst. Klicke auf \"+\", um ein neues Widget hinzuzufügen. Du kannst dieses Widget bewegen, indem du es greifst und verschiebst.",
+    "editDashboardExplanation": "Das ist dein echtes Dashboard: Tippe auf ein Widget, um es zu bearbeiten, nutze die +-Buttons für Widgets, Spalten oder Abschnitte. Ziehe Widgets zum Verschieben — auf dem Handy nutze die Pfeile.",
+    "editorDashboardSettingsButton": "Dashboard-Einstellungen",
+    "editorDashboardSettings": "Dashboard-Einstellungen",
+    "editorMoveSectionUp": "Abschnitt nach oben verschieben",
+    "editorMoveSectionDown": "Abschnitt nach unten verschieben",
+    "editorNewWidget": "Neues Widget",
+    "editorNewWidgetPlaceholder": "Wähle ein Widget im Panel",
     "reorderDashboardButton": "Dashboards neu anordnen",
     "stopReorderingDashboardButton": "Anordnen der Dashboards beenden",
     "addBoxButton": "Hinzufügen",
     "selectBoxType": "Typ auswählen",
     "selectBoxTypeLabel": "Wähle aus, welches Widget hier angezeigt werden soll",
+    "selectBoxTypeSearchPlaceholder": "Widget suchen (Uhr, Kamera…)",
+    "selectBoxTypeNoResult": "Kein Widget entspricht \"{{search}}\"",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Wetter",
@@ -347,10 +359,14 @@
       "voice-assistant": "Sprachassistent",
       "link": "Link",
       "photo": "Foto",
-      "sun": "Sonne"
+      "sun": "Sonne",
+      "chips": "Status-Chips",
+      "actions": "Schnellaktionen",
+      "house-view": "Hausansicht"
     },
     "boxes": {
       "column": "Spalte {{index}}",
+      "section": "Abschnitt {{index}}",
       "deleteButton": "Löschen",
       "weather": {
         "editHouseLabel": "Wähle ein Zuhause aus. Ich werde seine Breiten- und Längengrade verwenden, um das Wetter abzurufen.",
@@ -580,7 +596,8 @@
         "currentHourState": "Aktuell",
         "peakHour": "Hochtarifstunde",
         "offPeakHour": "Niedrigtarifstunde",
-        "dayPeakTitle": "Tempo-Tage"
+        "dayPeakTitle": "Tempo-Tage",
+        "error": "EDF-Tempo-Daten konnten nicht geladen werden. Prüfe, ob der EDF-Tempo-Dienst eingerichtet ist."
       },
       "clock": {
         "analog": "Analog",
@@ -610,7 +627,9 @@
       "scene": {
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
-        "editSceneLabel": "Wähle die Szene aus, die hier angezeigt werden soll."
+        "editSceneLabel": "Wähle die Szene aus, die hier angezeigt werden soll.",
+        "editStatusFeatureLabel": "Live-Status unter jeder Schaltfläche (optional)",
+        "editStatusFeatureDescription": "Wählen Sie eine Gerätefunktion, um ihren Status unter der Szenen-Schaltfläche anzuzeigen, z. B. Rollladenposition oder Staubsauger-Status."
       },
       "link": {
         "editTitleLabel": "Titel",
@@ -701,7 +720,112 @@
         "errorNoTranscription": "Ich habe Ihre Nachricht nicht verstanden. Sprechen Sie näher ans Mikrofon und versuchen Sie es erneut.",
         "configDescription": "Dieses Widget nutzt Gladys Plus für Spracherkennung, KI und Sprachausgabe. Verbinden Sie Ihre Instanz mit Gladys Plus, um es zu nutzen.",
         "plusRequiredHint": "Gladys Plus verbinden, um das Mikrofon zu aktivieren."
+      },
+      "chips": {
+        "editDescription": "Eine kompakte Leiste mit Status-Chips. Chips hinzufügen und auswählen, was jeder anzeigt.",
+        "editChipLabel": "Chip {{index}}",
+        "removeChipButton": "Chip {{index}} entfernen",
+        "editChipTypeLabel": "Was soll dieser Chip anzeigen?",
+        "chipTypes": {
+          "device-feature": "Ein Gerätestatus",
+          "openings": "Übersicht der Öffnungen (Türen/Fenster)",
+          "alarm": "Alarmstatus",
+          "calendar-next-event": "Nächster Kalendertermin"
+        },
+        "editDeviceFeatureLabel": "Gerätefunktion",
+        "editHouseLabel": "Haus",
+        "editRoomLabel": "Raum (optional, zur Eingrenzung)",
+        "editCalendarLabel": "Kalender",
+        "allCalendars": "Alle Kalender",
+        "editEventNameFilterLabel": "Nur Termine mit (optional)",
+        "editEventNameFilterPlaceholder": "z. B. Müll",
+        "editLabelLabel": "Beschriftung (optional)",
+        "editLabelPlaceholder": "z. B. Garage",
+        "addChipButton": "Chip hinzufügen",
+        "openings": "{{count}} offen",
+        "allClosed": "Alles geschlossen",
+        "noEvent": "Kein anstehender Termin",
+        "error": "Fehler",
+        "alarmModes": {
+          "disarmed": "Deaktiviert",
+          "armed": "Aktiviert",
+          "partially-armed": "Teilweise aktiviert",
+          "panic": "Panik"
+        }
+      },
+      "actions": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Rollläden, Lichter…",
+        "actionLabel": "Aktion {{index}}",
+        "removeActionButton": "Aktion {{index}} entfernen",
+        "actionTypeLabel": "Aktionstyp",
+        "actionTypes": {
+          "scene": "Szene starten",
+          "device-feature": "Gerät steuern"
+        },
+        "sceneLabel": "Szene",
+        "deviceFeatureLabel": "Gerätefunktion",
+        "commandLabel": "Befehl",
+        "commands": {
+          "open": "Öffnen",
+          "stop": "Stopp",
+          "close": "Schließen"
+        },
+        "labelLabel": "Button-Beschriftung (optional)",
+        "labelPlaceholder": "EG öffnen…",
+        "addActionButton": "Aktion hinzufügen",
+        "noActions": "Noch keine Aktion konfiguriert. Bearbeite das Dashboard, um welche hinzuzufügen."
+      },
+      "house-view": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "z. B. Mein Haus",
+        "editGalleryLabel": "Illustration auswählen",
+        "editUploadLabel": "Oder eigenes Bild hochladen",
+        "uploading": "Wird hochgeladen...",
+        "uploadError": "Das Bild konnte nicht hochgeladen werden. Versuchen Sie ein kleineres Bild.",
+        "editPinsLabel": "Live-Werte auf dem Bild",
+        "editPinsDescription": "Klicken Sie auf das Bild, um einen Pin zu setzen, und wählen Sie dann die Gerätefunktion aus. Zum Verschieben einen Pin entfernen und neu setzen.",
+        "editPinLabel": "Pin {{index}}",
+        "editPinFeatureLabel": "Gerätefunktion",
+        "editPinLabelLabel": "Beschriftung (optional)",
+        "editPinLabelPlaceholder": "z. B. Solar",
+        "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
+        "error": "Das Bild konnte nicht geladen werden."
       }
+    },
+    "editDashboardBackgroundLabel": "Hintergrundstimmung",
+    "editDashboardBackgroundDescription": "Integrierte Szenen, leichtgewichtig und immer verfügbar, auch ohne Internet.",
+    "scenes": {
+      "horizon": "Horizont",
+      "aurora": "Aurora",
+      "dusk": "Abenddämmerung",
+      "forest": "Wald",
+      "lagoon": "Lagune",
+      "sand": "Sand",
+      "lavender": "Lavendel",
+      "mist": "Nebel"
+    },
+    "editDashboardIconLabel": "Symbol (optional)",
+    "editDashboardIconDescription": "Wird im Tablet-Modus in der Dashboard-Tab-Leiste angezeigt.",
+    "editDashboardWidthLabel": "Dashboard-Breite",
+    "widths": {
+      "standard": "Standard (empfohlen)",
+      "full": "Volle Breite"
+    },
+    "getStarted": {
+      "title": "Willkommen zu Hause!",
+      "subtitle": "Noch ein paar Schritte und dein Zuhause erwacht zum Leben.",
+      "progress": "{{done}} von {{total}}",
+      "devicesTitle": "Verbinde deine Geräte",
+      "devicesText": "Entdecke die Integrationen: Zigbee, Matter, MQTT, Kameras … Tausende kompatible Geräte.",
+      "dashboardCreateTitle": "Erstelle dein Dashboard",
+      "dashboardCreateText": "Gestalte die Ansicht deines Zuhauses: Temperatur, Licht, Kameras, Wetter …",
+      "dashboardFillTitle": "Füge deine ersten Widgets hinzu",
+      "dashboardFillText": "Dieses Dashboard ist leer: Öffne den Editor und gestalte die Ansicht deines Zuhauses.",
+      "scenesTitle": "Automatisiere mit Szenen",
+      "scenesText": "Licht bei Sonnenuntergang, Morgenroutinen: Dein Zuhause handelt für dich.",
+      "usersTitle": "Lade deinen Haushalt ein",
+      "usersText": "Erstelle ein Konto für jedes Familienmitglied."
     }
   },
   "newDashboard": {
@@ -3131,6 +3255,8 @@
         "allServicesLabel": "Alle konfigurierten Dienste",
         "serviceExplanation": "Wähle den Nachrichtendienst, der diese Nachricht sendet. Standardmäßig wird die Nachricht an alle vom Benutzer konfigurierten Dienste gesendet.",
         "serviceUnavailable": "nicht verfügbar",
+        "serviceIntegrationExternal": "externe Integration",
+        "serviceIntegrationInternal": "native Integration",
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
@@ -4074,6 +4200,7 @@
     "backupKeyDescription": "Dein Backup-Schlüssel wird verwendet, um deine Gladys-Backups sicher zu verschlüsseln. Bitte bewahre diesen Schlüssel außerhalb von Gladys auf, um Gladys wiederherstellen zu können. Wir empfehlen dafür die Verwendung eines Passwortmanagers.",
     "backupKeyLabel": "Dein Backup-Schlüssel",
     "backupKeyPlaceholder": "Backup-Schlüssel eingeben/wiederherstellen",
+    "toggleBackupKeyVisibility": "Backup-Schlüssel anzeigen oder verbergen",
     "saveBackupKeyButton": "Speichern",
     "usersListTitle": "Remote-Benutzer",
     "userColumn": "Benutzer",
@@ -6024,5 +6151,12 @@
     "cancelUpgradeToYearly": "Abbrechen",
     "upgradeYearlyError": "Beim Wechsel in das jährliche Abomodell ist ein Fehler aufgetreten. Bitte kontaktiere uns per E-Mail.",
     "upgradeYearlySuccess": "Vielen Dank, dass du in das jährliche Abmodell gewechselt bist!"
+  },
+  "deviceFeatureValueText": {
+    "noValue": "Kein Wert",
+    "open": "Offen",
+    "closed": "Geschlossen",
+    "on": "An",
+    "off": "Aus"
   }
 }

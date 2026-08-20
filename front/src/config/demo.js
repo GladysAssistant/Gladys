@@ -112,85 +112,91 @@ const data = {
     name: 'Home',
     type: 'main',
     selector: 'home',
+    // dashboards are made of sections since the flexible-layout redesign:
+    // each section owns its columns
     boxes: [
-      [
-        {
-          type: 'temperature-in-room',
-          room: 'living-room'
-        },
-        {
-          type: 'weather',
-          house: 'main-house'
-        },
-        {
-          type: 'camera',
-          camera: 'living-room-camera',
-          name: 'Garden'
-        },
-        {
-          type: 'devices-in-room',
-          room: 'exterior',
-          device_features: ['aqi-city']
-        },
-        {
-          type: 'edf-tempo'
-        }
-      ],
-      [
-        {
-          type: 'devices-in-room',
-          room: 'living-room',
-          device_features: [
-            'main-lamp-binary',
-            'tv-lamp-binary',
-            'tv-lamp-color',
-            'tv-lamp-brightness',
-            'mqtt-living-room-switch',
-            'mqtt-living-room-dimmer',
-            'mqtt-living-room-temp',
-            'co-living-room'
+      {
+        columns: [
+          [
+            {
+              type: 'temperature-in-room',
+              room: 'living-room'
+            },
+            {
+              type: 'weather',
+              house: 'main-house'
+            },
+            {
+              type: 'camera',
+              camera: 'living-room-camera',
+              name: 'Garden'
+            },
+            {
+              type: 'devices-in-room',
+              room: 'exterior',
+              device_features: ['aqi-city']
+            },
+            {
+              type: 'edf-tempo'
+            }
+          ],
+          [
+            {
+              type: 'devices-in-room',
+              room: 'living-room',
+              device_features: [
+                'main-lamp-binary',
+                'tv-lamp-binary',
+                'tv-lamp-color',
+                'tv-lamp-brightness',
+                'mqtt-living-room-switch',
+                'mqtt-living-room-dimmer',
+                'mqtt-living-room-temp',
+                'co-living-room'
+              ]
+            },
+            {
+              type: 'devices-in-room',
+              room: 'living-room',
+              device_features: [
+                'main-tv-binary',
+                'main-tv-volume',
+                'main-tv-channel',
+                'main-presence-sensor',
+                'main-signal-sensor',
+                'air-conditioning',
+                'button-click'
+              ]
+            }
+          ],
+          [
+            {
+              type: 'chart',
+              device_features: ['temperature-sensor-1'],
+              interval: 'last-month',
+              unit: 'celsius',
+              title: 'Temperature',
+              display_variation: true
+            },
+            {
+              type: 'user-presence'
+            },
+            {
+              type: 'devices-in-room',
+              room: 'parental-room',
+              device_features: [
+                'curtain-actions',
+                'shutter-actions',
+                'shutter-position',
+                'thermostat',
+                'water-leak',
+                'smoke-sensor',
+                'light-sensor'
+              ]
+            }
           ]
-        },
-        {
-          type: 'devices-in-room',
-          room: 'living-room',
-          device_features: [
-            'main-tv-binary',
-            'main-tv-volume',
-            'main-tv-channel',
-            'main-presence-sensor',
-            'main-signal-sensor',
-            'air-conditioning',
-            'button-click'
-          ]
-        }
-      ],
-      [
-        {
-          type: 'chart',
-          device_features: ['temperature-sensor-1'],
-          interval: 'last-month',
-          unit: 'celsius',
-          title: 'Temperature',
-          display_variation: true
-        },
-        {
-          type: 'user-presence'
-        },
-        {
-          type: 'devices-in-room',
-          room: 'parental-room',
-          device_features: [
-            'curtain-actions',
-            'shutter-actions',
-            'shutter-position',
-            'thermostat',
-            'water-leak',
-            'smoke-sensor',
-            'light-sensor'
-          ]
-        }
-      ]
+        ]
+      }
     ],
     created_at: '2019-05-15T08:48:20.275Z',
     updated_at: '2019-05-16T06:29:44.767Z'
@@ -201,36 +207,40 @@ const data = {
     type: 'main',
     selector: 'home',
     boxes: [
-      [
-        {
-          type: 'weather',
-          house: 'main-house'
-        },
-        {
-          type: 'camera',
-          camera: 'living-room-camera',
-          name: 'Garden'
-        }
-      ],
-      [
-        {
-          type: 'temperature-in-room',
-          room: 'living-room'
-        },
-        {
-          type: 'user-presence'
-        },
-        {
-          type: 'devices-in-room',
-          room: 'living-room'
-        }
-      ],
-      [
-        {
-          type: 'devices-in-room',
-          room: 'kitchen'
-        }
-      ]
+      {
+        columns: [
+          [
+            {
+              type: 'weather',
+              house: 'main-house'
+            },
+            {
+              type: 'camera',
+              camera: 'living-room-camera',
+              name: 'Garden'
+            }
+          ],
+          [
+            {
+              type: 'temperature-in-room',
+              room: 'living-room'
+            },
+            {
+              type: 'user-presence'
+            },
+            {
+              type: 'devices-in-room',
+              room: 'living-room'
+            }
+          ],
+          [
+            {
+              type: 'devices-in-room',
+              room: 'kitchen'
+            }
+          ]
+        ]
+      }
     ],
     created_at: '2019-05-15T08:48:20.275Z',
     updated_at: '2019-05-16T06:29:44.767Z'

@@ -131,6 +131,10 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
     </div>
+    {/* Thematic columns: system & maintenance on the left (updates,
+        containers, logs, database upkeep), behavior preferences on the
+        right — and the containers list gets a full column width instead
+        of overflowing at the bottom of a crowded one. */}
     <div class="row">
       <div class="col-lg-6">
         <SettingsSystemOperations
@@ -144,17 +148,17 @@ const SystemPage = ({ children, ...props }) => (
           CheckForUpdatesStatus={props.CheckForUpdatesStatus}
           systemInfos={props.systemInfos}
         />
+        <SettingsSystemContainers />
+        <SettingsSystemDownloadLogs />
+        <SettingsSystemDatabaseCleaning />
         <SettingsSystemDuckDbMigration />
-        <SettingsSystemKeepDeviceHistory />
-        <SettingsSystemTimeExpiryState />
       </div>
       <div class="col-lg-6">
         <SettingsSystemTimezone />
         <SettingsSystemMdns systemInfos={props.systemInfos} />
         <SettingsSystemBatteryLevelWarning />
-        <SettingsSystemDownloadLogs />
-        <SettingsSystemDatabaseCleaning />
-        <SettingsSystemContainers />
+        <SettingsSystemKeepDeviceHistory />
+        <SettingsSystemTimeExpiryState />
       </div>
     </div>
   </SettingsLayout>

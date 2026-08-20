@@ -38,7 +38,9 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   display: none;
 }
 
-@media ((min-width: 992px) and (max-width: 1300px)) or (max-width: 400px) {
+/* Stacked +/value/− only where the CARD is narrow (3+ desktop columns);
+   phones keep the horizontal capsule — a full-width row fits it fine */
+@media (min-width: 992px) and (max-width: 1300px) {
   .setpointVerticalControls {
     display: block;
     min-width: 5rem;
@@ -46,6 +48,51 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   .setpointHorizontalControls {
     display: none;
   }
+}
+
+/* Horizon capsule stepper: − value + on a soft rounded track, white
+   round buttons (the row-pill family lives in routes/dashboard/style.css) */
+:global(.glass-theme) .setpointHorizontalControls {
+  background-color: rgba(28, 35, 52, 0.07);
+  border-radius: 999px;
+  padding: 3px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+:global(.glass-theme) .setpointHorizontalControls :global(.btn) {
+  border: none;
+  background-color: #fff;
+  color: var(--gl-ink, #1c2334);
+  border-radius: 999px !important;
+  font-weight: 700;
+  min-width: 2.25rem;
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.12);
+}
+
+:global(.glass-theme) .setpointHorizontalControls :global(.form-control) {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-weight: 600;
+  color: var(--gl-ink, #1c2334);
+}
+
+/* narrow-card stacked variant: quiet rounded buttons, no track */
+:global(.glass-theme) .setpointVerticalControls :global(.btn) {
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  background-color: #fff;
+  color: var(--gl-ink, #1c2334);
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+:global(.glass-theme) .setpointVerticalControls :global(.form-control) {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  font-weight: 600;
+  color: var(--gl-ink, #1c2334);
 }
 .btnLoading {
   &::after {

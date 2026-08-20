@@ -13,30 +13,32 @@ dayjs.extend(timezone);
 // Refresh EDF Tempo data every 1 hour
 const BOX_REFRESH_INTERVAL_MS = 1 * 60 * 60 * 1000;
 
-const PeakState = ({ state }) => (
-  <div>
-    {state === 'blue' && (
-      <span class="badge badge-primary">
-        <Text id="dashboard.boxes.edfTempo.blueDay" />
-      </span>
-    )}
-    {state === 'white' && (
-      <span class="badge badge-light text-dark">
-        <Text id="dashboard.boxes.edfTempo.whiteDay" />
-      </span>
-    )}
-    {state === 'red' && (
-      <span class="badge badge-danger">
-        <Text id="dashboard.boxes.edfTempo.redDay" />
-      </span>
-    )}
-    {state === 'not-defined' && (
-      <span class="badge badge-dark">
-        <Text id="dashboard.boxes.edfTempo.notDefinedDay" />
-      </span>
-    )}
-  </div>
-);
+// The Tempo color IS the information: a tinted pill with a color dot, from
+// the same family as the theme's stamps (soft background, saturated ink)
+const PEAK_STATE_STYLE_KEYS = {
+  blue: 'dayBlue',
+  white: 'dayWhite',
+  red: 'dayRed',
+  'not-defined': 'dayUnknown'
+};
+
+const PEAK_STATE_LABEL_KEYS = {
+  blue: 'blueDay',
+  white: 'whiteDay',
+  red: 'redDay',
+  'not-defined': 'notDefinedDay'
+};
+
+const PeakState = ({ state }) =>
+  PEAK_STATE_STYLE_KEYS[state] ? (
+    // dark-mode-no-invert: a Tempo day is named by its color, and the white
+    // day's lightness IS its hue — inversion would turn it into a black pill.
+    // The double inversion keeps the literal blue/white/red, like the stamps.
+    <span class={cx(style.dayBadge, 'dark-mode-no-invert', style[PEAK_STATE_STYLE_KEYS[state]])}>
+      <span class={style.dayDot} />
+      <Text id={`dashboard.boxes.edfTempo.${PEAK_STATE_LABEL_KEYS[state]}`} />
+    </span>
+  ) : null;
 
 const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, todayPeakState, tomorrowPeakState }) => (
   <div class="card">
@@ -52,58 +54,43 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
       <div class={`dimmer ${loading ? 'active' : ''}`}>
         <div class="loader" />
         {error && (
-          <p class="alert alert-danger">
+          <div class={style.errorState}>
             <i class="fe fe-bell" />
-            <span class="pl-2">
+            <span>
               <Text id="dashboard.boxes.edfTempo.error" />
             </span>
-          </p>
+          </div>
         )}
         {!error && (
           <div class="dimmer-content">
-            <div class="row mb-1">
-              <div class="col">
-                {currentHourPeakState === 'peak-hour' && (
-                  <div
-                    class={cx(
-                      style.hourDisplay,
-                      style.peakHour,
-                      'd-flex align-items-center justify-content-center dark-mode-no-invert'
-                    )}
-                  >
-                    <i class="fe fe-sun mr-4" />
-                    <Text id="dashboard.boxes.edfTempo.peakHour" />
-                  </div>
-                )}
-                {currentHourPeakState === 'off-peak-hour' && (
-                  <div
-                    class={cx(
-                      style.hourDisplay,
-                      style.offPeakHour,
-                      'd-flex align-items-center justify-content-center dark-mode-no-invert'
-                    )}
-                  >
-                    <i class="fe fe-moon mr-4" />
-                    <Text id="dashboard.boxes.edfTempo.offPeakHour" />
-                  </div>
-                )}
+            {/* current tariff window: sun = peak (amber), moon = off-peak (indigo) */}
+            {currentHourPeakState === 'peak-hour' && (
+              <div class={cx(style.hourPill, style.hourPeak)}>
+                <span class={style.hourIcon}>
+                  <i class="fe fe-sun" />
+                </span>
+                <Text id="dashboard.boxes.edfTempo.peakHour" />
               </div>
-            </div>
+            )}
+            {currentHourPeakState === 'off-peak-hour' && (
+              <div class={cx(style.hourPill, style.hourOffPeak)}>
+                <span class={style.hourIcon}>
+                  <i class="fe fe-moon" />
+                </span>
+                <Text id="dashboard.boxes.edfTempo.offPeakHour" />
+              </div>
+            )}
             <div class="mt-3">
               <h4 class={style.h4Title}>
                 <Text id="dashboard.boxes.edfTempo.dayPeakTitle" />
               </h4>
-              <div class="row mb-1">
-                <div class="col">{today}</div>
-                <div class="col-auto">
-                  <PeakState state={todayPeakState} />
-                </div>
+              <div class={style.dayRow}>
+                <span class={style.dayName}>{today}</span>
+                <PeakState state={todayPeakState} />
               </div>
-              <div class="row mb-1">
-                <div class="col">{tomorrow}</div>
-                <div class="col-auto">
-                  <PeakState state={tomorrowPeakState} />
-                </div>
+              <div class={style.dayRow}>
+                <span class={style.dayName}>{tomorrow}</span>
+                <PeakState state={tomorrowPeakState} />
               </div>
             </div>
           </div>

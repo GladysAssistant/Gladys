@@ -1,5 +1,63 @@
 .btnLoading {
   &::after {
-     border: 2px solid #5eba00;
+    border: 2px solid #5eba00;
   }
+}
+
+.sceneList {
+  padding: 0.75rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sceneRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #f8f9fa;
+  border: 1px solid rgba(0, 40, 100, 0.08);
+  border-radius: 16px;
+  padding: 10px 12px;
+}
+
+.sceneIcon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  background-color: #e3ebfb;
+  color: #467fcf;
+  font-size: 1.05rem;
+}
+
+.sceneInfo {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sceneName {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Horizon glass theme */
+:global(.glass-theme) .sceneRow {
+  background-color: var(--gl-card-nested-bg);
+  border-color: var(--gl-border);
+  box-shadow: 0 5px 16px rgba(44, 62, 118, 0.07);
+}
+
+:global(.glass-theme) .sceneIcon {
+  background-color: var(--gl-icon-tint-bg);
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .sceneName {
+  color: var(--gl-ink);
 }
