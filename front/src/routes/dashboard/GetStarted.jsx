@@ -26,12 +26,19 @@ class GetStarted extends Component {
 
   loadProgress = async () => {
     // each probe fails soft: an unreachable endpoint only leaves its step
-    // unchecked, it never breaks the dashboard
+    // unchecked, it never breaks the dashboard. Each one only asks "is there
+    // at least one?": the device list is feature-expanded server-side and is
+    // unbounded without `take`, and this panel shows on every widget-less
+    // dashboard — not only on first run — so an established house would pull
+    // its whole device graph just to tick a checkbox
     const [devices, scenes, users] = await Promise.all([
-      this.props.httpClient.get('/api/v1/device').catch(() => []),
+      this.props.httpClient.get('/api/v1/device', { take: 1, skip: 0 }).catch(() => []),
       this.props.httpClient.get('/api/v1/scene', { take: 1, skip: 0 }).catch(() => []),
       this.props.httpClient.get('/api/v1/user').catch(() => [])
     ]);
+    if (this.unmounted) {
+      return;
+    }
     this.setState({
       devicesDone: Array.isArray(devices) && devices.length > 0,
       scenesDone: Array.isArray(scenes) && scenes.length > 0,
@@ -41,6 +48,12 @@ class GetStarted extends Component {
 
   componentDidMount() {
     this.loadProgress();
+  }
+
+  componentWillUnmount() {
+    // the probes are in flight: navigating away before they land must not
+    // setState on a gone component
+    this.unmounted = true;
   }
 
   render({ dashboardListEmpty, editDashboard }, { devicesDone, scenesDone, usersDone }) {
@@ -61,6 +74,8 @@ class GetStarted extends Component {
             icon: 'fe-layout',
             done: false,
             href: '/dashboard/create/new',
+            // first-run entry point to dashboard creation (Cypress clicks it)
+            dataCy: 'get-started-create-dashboard',
             titleId: 'dashboard.getStarted.dashboardCreateTitle',
             textId: 'dashboard.getStarted.dashboardCreateText'
           }
@@ -69,6 +84,7 @@ class GetStarted extends Component {
             icon: 'fe-layout',
             done: false,
             onClick: editDashboard,
+            dataCy: 'get-started-fill-dashboard',
             titleId: 'dashboard.getStarted.dashboardFillTitle',
             textId: 'dashboard.getStarted.dashboardFillText'
           },
@@ -133,11 +149,11 @@ class GetStarted extends Component {
                 ];
                 const stepClass = cx(style.getStartedStep, { [style.getStartedStepDone]: step.done });
                 return step.href ? (
-                  <Link key={step.key} href={step.href} class={stepClass}>
+                  <Link key={step.key} href={step.href} class={stepClass} data-cy={step.dataCy}>
                     {content}
                   </Link>
                 ) : (
-                  <button key={step.key} type="button" onClick={step.onClick} class={stepClass}>
+                  <button key={step.key} type="button" onClick={step.onClick} class={stepClass} data-cy={step.dataCy}>
                     {content}
                   </button>
                 );

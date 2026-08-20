@@ -238,6 +238,12 @@
 }
 
 .dashboardListItemName {
+  /* the same cap as the viewer's tab pills (.dashboardTabName): in a
+     wrapping row a flex item's default min-width is its content, so without
+     both of these one endless name grows to full width, pushes the "+" onto
+     the next line and never ellipsizes */
+  min-width: 0;
+  max-width: 11rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
