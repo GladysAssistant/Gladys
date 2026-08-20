@@ -156,6 +156,37 @@
   .dark-mode .glass-theme .list-group-transparent .list-group-item.active {
     background-color: var(--gl-ink) !important;
   }
+
+  /* A row with chips past the right edge wears a small "more" arrow — the
+     partial chip alone does not say the menu continues. The Layout marks
+     overflowing rows with hz-chips-overflow (CSS cannot know); the arrow is
+     a sticky pseudo-element riding the right edge of the scrollport, always
+     in the layout (invisible) so appearing never shifts the row, fading out
+     once the row is fully scrolled. The chevron is an inline SVG in the
+     theme ink: the dark-mode inversion filter derives its light variant. */
+  .glass-theme .list-group-transparent::after,
+  .glass-theme .hz-chips-scroll::after {
+    content: '';
+    position: sticky;
+    right: 0;
+    flex: 0 0 auto;
+    align-self: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--gl-surface-strong)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c2334' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'/%3E%3C/svg%3E")
+      center / 14px 14px no-repeat;
+    border: 1px solid var(--gl-border);
+    box-shadow: var(--gl-shadow-soft);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .glass-theme .list-group-transparent.hz-chips-overflow::after,
+  .glass-theme .hz-chips-scroll.hz-chips-overflow::after {
+    opacity: 1;
+  }
 }
 
 /* Every button under glass is a pill — the theme's one button shape */
