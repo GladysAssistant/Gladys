@@ -1,21 +1,158 @@
-.emptyStateDivBox {
-  max-width: 450px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 80px;
+/* ==================================================================
+   First-run checklist (GetStarted.jsx) — shown while the current
+   dashboard has no widget. Steps are nested-glass rows with the theme's
+   pastel discs; completed steps turn into green checks.
+   ================================================================== */
+
+.getStarted {
+  max-width: 36rem;
+  margin: 6vh auto 0;
+}
+
+.getStartedBody {
+  padding: 1.75rem;
+}
+
+.getStartedHeader {
   text-align: center;
 }
 
-.emptyStateImage {
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-  width: 100%;
-  max-width: 300px;
+.getStartedTitle {
+  margin: 0 0 0.4rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--gl-ink);
 }
 
-.emptyStateText {
-  margin-top: 20px;
+.getStartedSubtitle {
+  margin: 0;
+  color: var(--gl-muted);
+}
+
+.getStartedProgressRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.getStartedProgressTrack {
+  flex: 1 1 auto;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(28, 35, 52, 0.08);
+  overflow: hidden;
+}
+
+.getStartedProgressFill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gl-accent);
+  transition: width 0.4s ease;
+}
+
+.getStartedProgressLabel {
+  flex: 0 0 auto;
+  color: var(--gl-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.getStartedSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* one selector serves both the Link and the button variant */
+.getStartedStep {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.getStartedStep:hover {
+  background: rgba(255, 255, 255, 0.72);
+  color: inherit;
+  text-decoration: none;
+}
+
+.getStartedStepDone {
+  background: rgba(222, 240, 226, 0.55);
+}
+
+.getStartedStepDone:hover {
+  background: rgba(222, 240, 226, 0.8);
+}
+
+.getStartedStepIcon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  font-size: 1.05rem;
+}
+
+.getStartedStepIconDone {
+  background: #def0e2;
+  color: #2e8f5b;
+}
+
+.getStartedTintBlue {
+  background: #dde9fb;
+  color: #2f5bd7;
+}
+
+.getStartedTintAmber {
+  background: #f9eeda;
+  color: #a5701e;
+}
+
+.getStartedTintGreen {
+  background: #def0e2;
+  color: #2e8f5b;
+}
+
+.getStartedTintPurple {
+  background: #eae2f8;
+  color: #7a4fd1;
+}
+
+.getStartedStepBody {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.getStartedStepTitle {
+  color: var(--gl-ink);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.getStartedStepText {
+  color: var(--gl-muted);
+  font-size: 0.8rem;
+}
+
+.getStartedChevron {
+  flex: 0 0 auto;
+  color: var(--gl-muted);
 }
 
 .largeContainer {
@@ -361,6 +498,39 @@
   margin: 0.75rem 1.5rem 0;
 }
 
+/* Page-level alerts (outside any card — dashboard gateway/migration notices,
+   activity feed errors) sit directly on the scene: same tinted notice family,
+   on an opaque pastel so they stay readable over the glows. The in-card rules
+   above are more specific and keep their tighter metrics. */
+:global(.glass-theme .alert) {
+  border: none;
+  border-radius: var(--gl-radius-md);
+  font-weight: 500;
+  background-color: rgba(255, 255, 255, 0.55);
+  color: #667081;
+}
+
+:global(.glass-theme .alert-danger) {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+:global(.glass-theme .alert-warning) {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+:global(.glass-theme .alert-info),
+:global(.glass-theme .alert-primary) {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+:global(.glass-theme .alert-success) {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
 /* Bootstrap badges become the color-dot pill family's plain cousins */
 :global(.glass-theme .card .badge) {
   border-radius: 999px;
@@ -626,18 +796,6 @@
 
   .dashboardBackground {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  /* That spacer belongs to the dock, not to the wallpaper: the class is also
-     the scene of the editor, the creation page and the integration pages,
-     none of which render the dock — there it was a blank band under the last
-     card. Reclaimed in the negative form on purpose: a browser without :has()
-     (old wall tablets) drops this rule and keeps the spacer everywhere, which
-     costs those pages a band but never lets the dock cover the last dashboard
-     row. Both other users of the class bring their own bottom clearance
-     (largeContainer's 150px, containerWithMargin's 3rem). */
-  .dashboardBackground:not(:has(.dashboardHeader)) {
-    padding-bottom: 0;
   }
 
   /* the "…" menu opens upward from the dock */

@@ -11,7 +11,6 @@ import dashboardStyle from '../../routes/dashboard/style.css';
 // loaded here (main bundle) because the code-split catalog CSS is not
 import './horizonIntegrations.css';
 
-const NOT_MAIN_PAGES = ['/login'];
 const INTEGRATION_URL_PREFIX = '/dashboard/integration';
 
 // The horizontally scrollable chips rows of the integration pages on phones:
@@ -25,16 +24,6 @@ const CHIPS_OVERFLOW_RIGHT_CLASS = 'hz-chips-overflow-right';
 const CHIPS_SCROLL_EPSILON = 2;
 
 const isIntegrationPage = (currentUrl = '') => currentUrl.startsWith(INTEGRATION_URL_PREFIX);
-
-const notMainPages = currentUrl => {
-  const found = NOT_MAIN_PAGES.find(page => {
-    return currentUrl.startsWith(page);
-  });
-  if (found) {
-    return true;
-  }
-  return false;
-};
 
 // CSS alone cannot know whether a chips row actually overflows, so the shared
 // Layout marks the rows that still have chips past an edge — each class shows
@@ -157,8 +146,10 @@ class Layout extends Component {
     return (
       <div class="page" ref={this.setPageElement}>
         <div
-          class={cx(notMainPages(currentUrl) ? 'page-single' : 'page-main', {
-            [`glass-theme ${dashboardStyle.dashboardBackground} ${dashboardStyle.glassScene}`]: integrationPage
+          class={cx('page-main', {
+            // integration-page is the plain marker the theme sheet scopes its
+            // page-level rules on, like .settings-page and .auth-page
+            [`glass-theme integration-page ${dashboardStyle.dashboardBackground} ${dashboardStyle.glassScene}`]: integrationPage
           })}
         >
           {children}
