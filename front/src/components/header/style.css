@@ -143,13 +143,47 @@
   font-size: 0.75rem;
 }
 
-/* Dropup: same tabler .dropdown-menu skin, anchored above the footer */
+/* Dropup: Horizon panel anchored above the footer. Solid background, no
+   blur — it lives inside the sidebar's own backdrop root, where a nested
+   backdrop-filter makes Chrome misrender the panel (same constraint as the
+   dashboard's mobile dock menu). */
 .profileMenu {
   top: auto;
   bottom: calc(100% + 6px);
   left: 0;
   right: auto;
   min-width: 12rem;
+  background-color: #fff;
+  border: 1px solid rgba(28, 35, 52, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 18px 50px rgba(44, 62, 118, 0.18), 0 2px 8px rgba(44, 62, 118, 0.08);
+  padding: 6px;
+}
+
+.profileMenu :global(.dropdown-item) {
+  border-radius: 10px;
+  color: #1c2334;
+  font-weight: 500;
+}
+
+.profileMenu :global(.dropdown-item):hover {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #1c2334;
+}
+
+.profileMenu :global(.dropdown-icon) {
+  color: #3d6df0;
+}
+
+.profileMenu :global(.dropdown-divider) {
+  margin: 6px 8px;
+  border-top-color: rgba(28, 35, 52, 0.08);
+}
+
+/* dark-mode.css paints .dropdown-menu with a solid gray !important:
+   restore the white so the panel inverts with the theme like the rail */
+:global(.dark-mode) .profileMenu {
+  background-color: #fff !important;
 }
 
 /* Mobile top bar: menu button + brand + dark toggle, frosted like the rail */

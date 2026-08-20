@@ -73,6 +73,7 @@ class RoomSelector extends Component {
     return (
       <Select
         menuPlacement="auto"
+        menuPortalTarget={document.body}
         value={selectedRoom}
         options={houseOptions}
         onChange={this.updateSelection}
