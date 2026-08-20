@@ -525,9 +525,20 @@ body .apexcharts-tooltip {
   stroke: #ffa000;
 }
 
+/* An integration wears up to five tags, so they wrap onto several lines on a
+   narrow card. A right margin only spaced them horizontally: once wrapped the
+   rows touched, with nothing but the line box between two pills. A wrapping
+   flex row with a gap spaces them in both directions at once — hence no
+   margin on the tags themselves. */
+.integration-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
 .integration-tag {
   font-size: 0.7rem;
-  margin-right: 6px;
 }
 
 /* Left-sidebar navigation (components/header): content shifts right of the
