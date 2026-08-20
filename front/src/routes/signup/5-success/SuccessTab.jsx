@@ -1,5 +1,6 @@
 import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import style from '../style.css';
 
 const ConfigureHouseTab = () => (
   <div class="card">
@@ -30,7 +31,7 @@ const ConfigureHouseTab = () => (
           </div>
         </div>
         <div class="col-lg-6 mt-4 mt-lg-0">
-          <img class="img-fluid" src="/assets/images/welcome.jpg" />
+          <img class={`img-fluid ${style.welcomeImage}`} src="/assets/images/welcome.jpg" alt="" />
         </div>
       </div>
     </div>
