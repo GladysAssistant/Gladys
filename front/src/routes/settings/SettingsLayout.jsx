@@ -44,7 +44,9 @@ const DashboardSettings = ({ children, ...props }) => (
         dashboardStyle.glassScene
       )}
     >
-      <div class="my-3 my-md-5">
+      {/* padding, not margin: a top margin collapses through the glass
+          page-main and shifts the scene down (same move as new-dashboard) */}
+      <div class="py-3 py-md-5">
         <div class="container">
           <h3 class={cx('page-title', 'mb-3', style.settingsTitle)}>
             <Text id="settings.title" />
@@ -52,6 +54,7 @@ const DashboardSettings = ({ children, ...props }) => (
           <div class={style.settingsTabs}>
             {MENU_ITEMS.filter(item => !item.gatewayOnly || config.gatewayMode).map(item => (
               <Link
+                key={item.href}
                 href={item.href}
                 activeClassName={style.tabLinkActive}
                 class={cx(style.tabLink, {

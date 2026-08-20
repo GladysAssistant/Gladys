@@ -80,39 +80,36 @@
    same element as .glass-theme, so the --gl-* tokens are available)
    ================================================================== */
 
+/* Below 992px .dashboardBackground pads its bottom to clear the dashboard
+   switcher dock; settings and profile render no dock, so reclaim the hole.
+   (Gating the dashboard rule on :has(.dashboardHeader) would be cleaner,
+   but Safari < 15.4 — old wall tablets — would drop it and let the dock
+   overlap the real dashboard.) */
+@media (max-width: 991.98px) {
+  :global(.page-main.settings-page) {
+    padding-bottom: 0;
+  }
+}
+
 :global(.settings-page .page-title) {
   color: var(--gl-ink);
   font-weight: 700;
 }
 
-/* Bare heading card-headers (h2/h3/h4.card-header — house name, system
-   cards) join the theme's uppercase micro-label card titles */
-:global(.settings-page .card-header) {
+/* Chrome card-header labels join the theme's uppercase micro-label family:
+   the system cards' h4.card-header and the titles nested in a
+   div.card-header (backups' page-title, operations' h4). Content headings
+   stay readable — h3.card-header carries the house NAME (user data) and
+   h2.card-header the restore-in-progress status message, not chrome. */
+:global(.settings-page h4.card-header),
+:global(.settings-page .card-header .page-title),
+:global(.settings-page .card-header h4) {
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--gl-muted);
-}
-
-/* a heading nested in a card header (backups' page-title, operations' h4)
-   is that card's label: element font-sizes must not escape the micro-label */
-:global(.settings-page .card-header .page-title),
-:global(.settings-page .card-header h2),
-:global(.settings-page .card-header h3),
-:global(.settings-page .card-header h4) {
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
-  color: inherit;
   margin: 0;
-}
-
-/* controls living in a header (create backup, refresh) keep their type */
-:global(.settings-page .card-header .btn) {
-  text-transform: none;
-  letter-spacing: normal;
-  font-size: 0.8125rem;
 }
 
 :global(.settings-page .card-footer) {
@@ -145,6 +142,14 @@
 
 :global(.settings-page .input-icon-addon) {
   color: var(--gl-muted);
+}
+
+/* the backup-key eye toggle is a real <button> for keyboard access:
+   strip the native chrome, keep the addon geometry */
+:global(.settings-page button.input-icon-addon) {
+  border: 0;
+  background: transparent;
+  padding: 0;
 }
 
 :global(.settings-page .input-group-text) {

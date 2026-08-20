@@ -17,7 +17,7 @@ const SettingsSystemContainers = ({ systemContainers }) => (
       <div class={style.containerList}>
         {systemContainers &&
           systemContainers.map(container => (
-            <div class={style.containerRow}>
+            <div key={container.id} class={style.containerRow}>
               <span class={style.containerIcon}>
                 <i class="fe fe-box" />
               </span>

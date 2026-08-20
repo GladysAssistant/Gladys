@@ -4175,6 +4175,7 @@
     "backupKeyDescription": "Votre clé de sauvegarde est utilisée pour chiffrer vos sauvegardes Gladys. Veuillez enregistrer cette clé quelque part en dehors de Gladys pour pouvoir restaurer Gladys. Nous vous recommandons d'utiliser un gestionnaire de mots de passe pour cela.",
     "backupKeyLabel": "Votre clé de sauvegarde",
     "backupKeyPlaceholder": "Entrez / restaurez une clé de sauvegarde",
+    "toggleBackupKeyVisibility": "Afficher ou masquer la clé de sauvegarde",
     "saveBackupKeyButton": "Sauvegarder",
     "usersListTitle": "Utilisateurs distants",
     "userColumn": "Utilisateur",

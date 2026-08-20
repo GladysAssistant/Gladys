@@ -21,7 +21,9 @@ const DashboardProfile = ({ children, ...props }) => (
         dashboardStyle.glassScene
       )}
     >
-      <div class="my-3 my-md-5">
+      {/* padding, not margin: a top margin collapses through the glass
+          page-main and shifts the scene down (same move as new-dashboard) */}
+      <div class="py-3 py-md-5">
         <div class="container">
           <div class={style.profileColumn}>
             <div class="page-header">
@@ -33,8 +35,10 @@ const DashboardProfile = ({ children, ...props }) => (
               <div class="card">
                 <div class="card-body">
                   <div class={style.profileHero}>
+                    {/* decorative: the adjacent name already identifies the user */}
                     <img
                       class={style.profileAvatar}
+                      alt=""
                       src={props.profilePicture || '/assets/images/undraw_profile_pic.svg'}
                     />
                     <div class={style.profileIdentity}>

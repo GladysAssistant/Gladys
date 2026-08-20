@@ -4175,6 +4175,7 @@
     "backupKeyDescription": "Dein Backup-Schlüssel wird verwendet, um deine Gladys-Backups sicher zu verschlüsseln. Bitte bewahre diesen Schlüssel außerhalb von Gladys auf, um Gladys wiederherstellen zu können. Wir empfehlen dafür die Verwendung eines Passwortmanagers.",
     "backupKeyLabel": "Dein Backup-Schlüssel",
     "backupKeyPlaceholder": "Backup-Schlüssel eingeben/wiederherstellen",
+    "toggleBackupKeyVisibility": "Backup-Schlüssel anzeigen oder verbergen",
     "saveBackupKeyButton": "Speichern",
     "usersListTitle": "Remote-Benutzer",
     "userColumn": "Benutzer",

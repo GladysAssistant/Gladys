@@ -6,7 +6,7 @@ import { RequestStatus } from '../../../utils/consts';
 
 class GatewayBackupKey extends Component {
   toggleShowBackupKey = () => {
-    this.setState({ showBackupKey: !this.state.showBackupKey });
+    this.setState(({ showBackupKey }) => ({ showBackupKey: !showBackupKey }));
   };
 
   render(props, { showBackupKey }) {
@@ -49,14 +49,22 @@ class GatewayBackupKey extends Component {
                       value={get(props, 'gatewayBackupKey')}
                     />
                   </Localizer>
-                  <span class="input-icon-addon cursor-pointer" onClick={this.toggleShowBackupKey}>
-                    <i
-                      class={cx('fe', {
-                        'fe-eye': !showBackupKey,
-                        'fe-eye-off': showBackupKey
-                      })}
-                    />
-                  </span>
+                  <Localizer>
+                    <button
+                      type="button"
+                      class="input-icon-addon cursor-pointer"
+                      onClick={this.toggleShowBackupKey}
+                      aria-pressed={showBackupKey}
+                      aria-label={<Text id="gateway.toggleBackupKeyVisibility" />}
+                    >
+                      <i
+                        class={cx('fe', {
+                          'fe-eye': !showBackupKey,
+                          'fe-eye-off': showBackupKey
+                        })}
+                      />
+                    </button>
+                  </Localizer>
                 </div>
               </div>
               <div class="form-group">
