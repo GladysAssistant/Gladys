@@ -194,4 +194,13 @@ describe('Build alarm accessory', () => {
     expect(current).to.equal(failure);
     expect(target).to.equal(failure);
   });
+  it('should name the accessory and its service with a name HomeKit accepts', () => {
+    const { hap } = buildAlarmHapStub();
+    const homekitHandler = { hap, gladys: { house: { getBySelector: stub().resolves({}) } }, buildAlarmAccessory };
+
+    homekitHandler.buildAlarmAccessory({ ...HOUSE, name: 'Maison_Principale ' });
+
+    expect(hap.Accessory.args[0][0]).to.equal('Maison Principale');
+    expect(hap.Service.SecuritySystem.args[0][0]).to.equal('Maison Principale');
+  });
 });

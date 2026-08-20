@@ -238,6 +238,7 @@ class SelectDeviceFeature extends Component {
     return (
       <Select
         menuPlacement="auto"
+        menuPortalTarget={document.body}
         class="select-device-feature"
         defaultValue={props.isMulti ? [] : ''}
         isMulti={props.isMulti}

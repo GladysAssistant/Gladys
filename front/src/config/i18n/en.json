@@ -277,17 +277,21 @@
       }
     },
     "success": {
-      "title": "Thank you!",
-      "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\">Pierre-Gilles Leymarie</a>, and I started working on Gladys Assistant in 2013.",
-      "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys. I hope you'll enjoy using this software as much as I enjoyed building it.",
-      "ifYouWantToSupportThisSoftware": "I rely on contributions to make this project sustainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
+      "title": "Welcome to Gladys!",
+      "subtitle": "Your assistant is ready. Everything runs in your home, and your data stays there.",
+      "integrationsTitle": "Connect your whole home",
+      "integrationsText": "Zigbee, Matter, Z-Wave, MQTT, Philips Hue, Sonos… Gladys works with thousands of devices, and thanks to external integrations, new ones arrive all the time — no need to wait for a new Gladys release.",
+      "scenesTitle": "Automate your daily life",
+      "scenesText": "Build scenes that react to your home: lights at sunset, smart heating, alerts, morning routines… Your home works for you, even when you're not thinking about it.",
+      "openSourceTitle": "A fully open project",
+      "openSourceText": "Gladys is 100% <a href=\"https://github.com/GladysAssistant/Gladys\" target=\"_blank\" rel=\"noopener noreferrer\">open-source</a> and open to development: build your own integrations, share your ideas, join the <a href=\"https://community.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">community</a>.",
+      "closing": "We can't wait to see what you'll build with Gladys!",
       "goToDashboardButton": "Go to the Dashboard"
     }
   },
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Edit",
-    "newDashboardButton": "New",
     "enableFullScreen": "Full screen",
     "disableFullScreen": "Exit full screen",
     "editDashboardTitle": "Edit dashboard",
@@ -308,9 +312,6 @@
     "editDashboardSaveButton": "Save",
     "editDashboardSavedButton": "Saved",
     "editDashboardDoneButton": "Done",
-    "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
-    "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
-    "noDashboardSentenceBottom": "Click on the \"New\" button to create a new dashboard",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Visibility",
@@ -810,6 +811,21 @@
     "widths": {
       "standard": "Standard (recommended)",
       "full": "Full width"
+    },
+    "getStarted": {
+      "title": "Welcome home!",
+      "subtitle": "A few steps and your home comes to life.",
+      "progress": "{{done}} of {{total}}",
+      "devicesTitle": "Connect your devices",
+      "devicesText": "Browse the integrations: Zigbee, Matter, MQTT, cameras… thousands of compatible devices.",
+      "dashboardCreateTitle": "Create your dashboard",
+      "dashboardCreateText": "Compose your home's view: temperature, lights, cameras, weather…",
+      "dashboardFillTitle": "Add your first widgets",
+      "dashboardFillText": "This dashboard is empty: open the editor and compose your home's view.",
+      "scenesTitle": "Automate with scenes",
+      "scenesText": "Lights at sunset, morning routines: your home acts for you.",
+      "usersTitle": "Invite your household",
+      "usersText": "Create an account for everyone in the family."
     }
   },
   "newDashboard": {
@@ -3239,6 +3255,8 @@
         "allServicesLabel": "All configured services",
         "serviceExplanation": "Choose the messaging service which will send this message. By default, the message is sent to every service configured by the user.",
         "serviceUnavailable": "unavailable",
+        "serviceIntegrationExternal": "external integration",
+        "serviceIntegrationInternal": "built-in integration",
         "textLabel": "Message",
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
@@ -4175,6 +4193,7 @@
     "backupKeyDescription": "Your backup key is used to securely encrypt your Gladys backups. Please save this key somewhere outside of Gladys to be able to restore Gladys. We recommend using a password manager for that.",
     "backupKeyLabel": "Your backup key",
     "backupKeyPlaceholder": "Enter/Restore a backup key",
+    "toggleBackupKeyVisibility": "Show or hide the backup key",
     "saveBackupKeyButton": "Save",
     "usersListTitle": "Remote users",
     "userColumn": "User",
