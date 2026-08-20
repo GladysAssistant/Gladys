@@ -277,17 +277,21 @@
       }
     },
     "success": {
-      "title": "Merci !",
-      "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\"> Pierre-Gilles Leymarie</a>, et j'ai commencé à travailler sur Gladys Assistant en 2013.",
-      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys. J'espère que vous apprécierez utiliser ce logiciel.",
-      "ifYouWantToSupportThisSoftware": "J'essaie de faire de Gladys mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
+      "title": "Bienvenue dans Gladys !",
+      "subtitle": "Votre assistant est prêt. Tout fonctionne chez vous, et vos données restent chez vous.",
+      "integrationsTitle": "Connectez toute votre maison",
+      "integrationsText": "Zigbee, Matter, Z-Wave, MQTT, Philips Hue, Sonos… Gladys est compatible avec des milliers d'appareils, et grâce aux intégrations externes, de nouvelles intégrations arrivent en continu, sans attendre une nouvelle version de Gladys.",
+      "scenesTitle": "Automatisez votre quotidien",
+      "scenesText": "Créez des scènes qui réagissent à votre maison : lumières au coucher du soleil, chauffage intelligent, alertes, routines du matin… Votre maison travaille pour vous, même quand vous n'y pensez pas.",
+      "openSourceTitle": "Un projet totalement ouvert",
+      "openSourceText": "Gladys est 100 % <a href=\"https://github.com/GladysAssistant/Gladys\" target=\"_blank\" rel=\"noopener noreferrer\">open-source</a> et ouvert aux développements : créez vos propres intégrations, proposez vos idées, rejoignez la <a href=\"https://community.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">communauté</a>.",
+      "closing": "On a hâte de voir ce que vous allez faire avec Gladys !",
       "goToDashboardButton": "Accéder au tableau de bord"
     }
   },
   "dashboard": {
     "title": "Tableau de bord",
     "editDashboardButton": "Éditer",
-    "newDashboardButton": "Nouveau",
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
@@ -308,9 +312,6 @@
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Éditer le tableau de bord",
-    "emptyDashboardSentenceTop": "Votre tableau de bord n'est pas encore configuré.",
-    "emptyDashboardSentenceBottom": "Cliquez sur le bouton \"Éditer\" pour le compléter.",
-    "noDashboardSentenceBottom": "Cliquez sur le bouton \"Nouveau\" pour créer un tableau de bord.",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
     "editDashboardVisibility": "Visibilité",
@@ -810,6 +811,21 @@
     "widths": {
       "standard": "Standard (recommandé)",
       "full": "Pleine largeur"
+    },
+    "getStarted": {
+      "title": "Bienvenue chez vous !",
+      "subtitle": "Encore quelques étapes et votre maison prend vie.",
+      "progress": "{{done}} sur {{total}}",
+      "devicesTitle": "Connectez vos appareils",
+      "devicesText": "Parcourez les intégrations : Zigbee, Matter, MQTT, caméras… des milliers d'appareils compatibles.",
+      "dashboardCreateTitle": "Créez votre tableau de bord",
+      "dashboardCreateText": "Composez la vue de votre maison : température, lumières, caméras, météo…",
+      "dashboardFillTitle": "Ajoutez vos premiers widgets",
+      "dashboardFillText": "Ce tableau de bord est vide : ouvrez l'éditeur et composez la vue de votre maison.",
+      "scenesTitle": "Automatisez avec les scènes",
+      "scenesText": "Lumières au coucher du soleil, routines du matin : votre maison agit pour vous.",
+      "usersTitle": "Invitez votre foyer",
+      "usersText": "Créez un compte pour chaque membre de la famille."
     }
   },
   "newDashboard": {
@@ -3234,6 +3250,8 @@
         "allServicesLabel": "Tous les services configurés",
         "serviceExplanation": "Choisissez le service de messagerie qui enverra ce message. Par défaut, le message est envoyé sur tous les services configurés par l'utilisateur.",
         "serviceUnavailable": "indisponible",
+        "serviceIntegrationExternal": "intégration externe",
+        "serviceIntegrationInternal": "intégration native",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
@@ -4327,6 +4345,7 @@
     "backupKeyDescription": "Votre clé de sauvegarde est utilisée pour chiffrer vos sauvegardes Gladys. Veuillez enregistrer cette clé quelque part en dehors de Gladys pour pouvoir restaurer Gladys. Nous vous recommandons d'utiliser un gestionnaire de mots de passe pour cela.",
     "backupKeyLabel": "Votre clé de sauvegarde",
     "backupKeyPlaceholder": "Entrez / restaurez une clé de sauvegarde",
+    "toggleBackupKeyVisibility": "Afficher ou masquer la clé de sauvegarde",
     "saveBackupKeyButton": "Sauvegarder",
     "usersListTitle": "Utilisateurs distants",
     "userColumn": "Utilisateur",

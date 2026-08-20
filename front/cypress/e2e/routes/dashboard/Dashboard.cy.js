@@ -8,11 +8,9 @@ describe('Dashboard', () => {
   it('Should create new dashboard', () => {
     cy.visit('/dashboard');
 
-    // cy.contains as root command: the subject is re-queried on retry, so the
-    // assertion survives the async route chunk rendering after the header.
-    cy.contains('a', 'dashboard.newDashboardButton')
-      .should('have.class', 'btn-success')
-      .click();
+    // With no dashboard yet, the page is the first-run checklist (GetStarted):
+    // its dashboard step is the create entry point.
+    cy.get('[data-cy="get-started-create-dashboard"]').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/create/new`);
 

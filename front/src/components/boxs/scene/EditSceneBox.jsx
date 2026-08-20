@@ -115,6 +115,7 @@ class EditSceneBox extends Component {
                 </label>
                 <Select
                   menuPlacement="auto"
+                  menuPortalTarget={document.body}
                   defaultValue={[]}
                   value={selectedSceneOptions}
                   options={sceneOptions}

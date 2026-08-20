@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import EditActions from './EditActions';
@@ -31,40 +31,26 @@ const EditDashboard = ({ children, ...props }) => (
                 [style.fullWidthContainer]: get(props, 'currentDashboard.width') === 'full'
               })}
             >
-              <div class="row">
-                {/* on mobile the canvas comes first, the dashboard list after */}
-                <div class="col-lg-3 order-2 order-lg-1">
-                  {/* Horizon glass panel, like the section frames of the canvas */}
-                  <div class={editStyle.dashboardListPanel}>
-                    <div class={editStyle.dashboardListHeader}>
-                      <Text id="dashboard.editDashboardMyDashboards" />
-                      {/* creation happens in the edit panel: the user never leaves the editor */}
-                      <Localizer>
-                        <button
-                          type="button"
-                          onClick={props.openNewDashboard}
-                          class={editStyle.previewButton}
-                          data-cy="new-dashboard-button"
-                          title={<Text id="newDashboard.cardTitle" />}
-                        >
-                          <i class="fe fe-plus" />
-                        </button>
-                      </Localizer>
-                    </div>
-                    {props.currentDashboard && (
-                      <ReorderDashbordList
-                        dashboards={props.dashboards}
-                        currentDashboard={props.currentDashboard}
-                        updateDashboardList={props.updateDashboardList}
-                      />
-                    )}
+              {/* The dashboard list is a wrapping row of pills above the canvas
+                  (the viewer's tab-bar grammar) — a sidebar column stole a
+                  quarter of the editor's width, painful on tablets. Creation
+                  happens in the edit panel via the "+" pill: the user never
+                  leaves the editor */}
+              {props.currentDashboard && (
+                <div class={editStyle.dashboardBar}>
+                  <div class={editStyle.dashboardListHeader}>
+                    <Text id="dashboard.editDashboardMyDashboards" />
                   </div>
+                  <ReorderDashbordList
+                    dashboards={props.dashboards}
+                    currentDashboard={props.currentDashboard}
+                    updateDashboardList={props.updateDashboardList}
+                    openNewDashboard={props.openNewDashboard}
+                  />
                 </div>
-                <div class="col-lg-9 order-1 order-lg-2">
-                  {/* v2: the canvas sits directly on the glass scene, no wrapping card */}
-                  {props.currentDashboard && <EditBoxColumns {...props} homeDashboard={props.currentDashboard} />}
-                </div>
-              </div>
+              )}
+              {/* v2: the canvas sits directly on the glass scene, no wrapping card */}
+              {props.currentDashboard && <EditBoxColumns {...props} homeDashboard={props.currentDashboard} />}
 
               <EditActions {...props} />
             </div>

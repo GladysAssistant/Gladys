@@ -76,6 +76,50 @@ const insertionLineRect = (containerRect, elements, index) => {
   };
 };
 
+// Insertion index in a wrapping row of pills (the editor's dashboard bar),
+// in reading order: before the first pill whose row is below the pointer,
+// or — within the pointed row — the first pill whose horizontal middle is
+// past the pointer. Past the end of a row, the next pill starts the next
+// row and its top is below the pointer, so "end of row N" and "start of
+// row N+1" resolve to the same index, as they should.
+const computeFlowInsertionIndex = (elements, point) => {
+  let index = elements.length;
+  for (let i = 0; i < elements.length; i += 1) {
+    const rect = elements[i].getBoundingClientRect();
+    if (point.y < rect.top || (point.y <= rect.bottom && point.x < rect.left + rect.width / 2)) {
+      index = i;
+      break;
+    }
+  }
+  return index;
+};
+
+// Viewport rect of the indicator for inserting at `index` in a wrapping
+// row: a short vertical line in the gap before the pill at `index` (after
+// the last one at the end), the height of its neighbor.
+const flowInsertionLineRect = (containerRect, elements, index) => {
+  if (elements.length === 0) {
+    return {
+      left: containerRect.left + INDICATOR_GAP_OFFSET_PX,
+      top: containerRect.top,
+      width: INDICATOR_THICKNESS_PX,
+      height: containerRect.height
+    };
+  }
+  const neighbor =
+    index === elements.length
+      ? elements[elements.length - 1].getBoundingClientRect()
+      : elements[index].getBoundingClientRect();
+  const left =
+    index === elements.length ? neighbor.right + INDICATOR_GAP_OFFSET_PX : neighbor.left - INDICATOR_GAP_OFFSET_PX;
+  return {
+    left: left - INDICATOR_THICKNESS_PX / 2,
+    top: neighbor.top,
+    width: INDICATOR_THICKNESS_PX,
+    height: neighbor.height
+  };
+};
+
 const computePlacement = (target, point) => {
   const columnElement = resolveColumn(target, point);
   if (!columnElement) {
@@ -125,4 +169,11 @@ const resolveWidgetDropDestination = (target, point, sourceX, sourceY) => {
   return { x: placement.x, y: destinationY };
 };
 
-export { computeInsertionIndex, insertionLineRect, resolveWidgetDropHover, resolveWidgetDropDestination };
+export {
+  computeInsertionIndex,
+  insertionLineRect,
+  computeFlowInsertionIndex,
+  flowInsertionLineRect,
+  resolveWidgetDropHover,
+  resolveWidgetDropDestination
+};

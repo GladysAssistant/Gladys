@@ -2,7 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import DashboardTabs from './DashboardTabs';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
-import EmptyState from './EmptyState';
+import GetStarted from './GetStarted';
 import SetTabletMode from './SetTabletMode';
 import { JOB_STATUS } from '../../../../server/utils/constants';
 
@@ -15,7 +15,17 @@ const DashboardPage = ({ children, ...props }) => {
   return (
     <div class="page">
       {/* The Horizon glass theme is THE dashboard style — imposed, not chosen */}
-      <div class={cx('page-main', 'glass-theme', style.dashboardBackground, getBackgroundSceneClass(backgroundScene))}>
+      {/* withBottomDock: this is the one wallpaper page carrying the mobile
+          switcher dock, so it is the one that pads its content clear of it */}
+      <div
+        class={cx(
+          'page-main',
+          'glass-theme',
+          style.dashboardBackground,
+          style.withBottomDock,
+          getBackgroundSceneClass(backgroundScene)
+        )}
+      >
         <div class={props.loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">
@@ -106,7 +116,9 @@ const DashboardPage = ({ children, ...props }) => {
                     <Text id="dashboard.duckDbMigrationInProgress" fields={props.duckDbMigrationJob} />
                   </div>
                 )}
-                {props.dashboardNotConfigured && <EmptyState dashboardListEmpty={props.dashboardListEmpty} />}
+                {props.dashboardNotConfigured && (
+                  <GetStarted dashboardListEmpty={props.dashboardListEmpty} editDashboard={props.editDashboard} />
+                )}
                 {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
               </div>
             </div>

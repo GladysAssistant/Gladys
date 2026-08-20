@@ -86,20 +86,23 @@
   width: 100%;
 }
 
+/* Gladys' bubbles are frosted white glass on the scene — the same surface
+   family as the dashboard cards (tokens from the global .glass-theme) */
 .received_withd_msg .msg_txt_wrap {
-  background: #f3f5f8;
-  border-radius: 16px 16px 16px 4px;
-  color: #202830;
+  background: var(--gl-surface-strong);
+  border: 1px solid var(--gl-border);
+  border-radius: 18px 18px 18px 6px;
+  color: var(--gl-ink);
   font-size: 15px;
   line-height: 1.55;
   margin: 0;
   padding: 10px 14px;
   max-width: 100%;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 3px rgba(44, 62, 118, 0.08);
 }
 
 .time_date {
-  color: #667085;
+  color: var(--gl-muted);
   display: block;
   font-size: 11px;
   margin-top: 6px;
@@ -120,16 +123,17 @@
   padding: 20px 20px 0;
 }
 
+/* the user's bubbles carry the Horizon accent */
 .sent_msg .msg_txt_wrap {
-  background: linear-gradient(135deg, #477fd2 0%, #3564be 100%);
-  border-radius: 16px 16px 4px 16px;
+  background: linear-gradient(135deg, #5b86f2 0%, #3d6df0 100%);
+  border-radius: 18px 18px 6px 18px;
   font-size: 15px;
   line-height: 1.55;
   margin: 0;
   color: #fff;
   padding: 10px 14px;
   width: 100%;
-  box-shadow: 0 1px 2px rgba(33, 51, 88, 0.2);
+  box-shadow: 0 2px 10px rgba(61, 109, 240, 0.28);
 }
 
 .outgoing_msg {
@@ -147,13 +151,14 @@
   margin: 0 auto 10px;
 }
 
+/* tool calls are quiet nested-glass rows, like the dashboard's pill rows */
 .toolCallCard {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f7faff;
-  border: 1px solid #d8e5ff;
-  border-radius: 10px;
+  background: var(--gl-card-nested-bg);
+  border: 1px solid var(--gl-border);
+  border-radius: 12px;
   padding: 6px 10px;
 }
 
@@ -171,8 +176,8 @@
 
 .toolCallToolName {
   font-size: 12px;
-  color: #2f4e8f;
-  font-weight: 500;
+  color: var(--gl-accent);
+  font-weight: 600;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -183,7 +188,7 @@
 
 .toolCallText {
   font-size: 12px;
-  color: #52627a;
+  color: var(--gl-muted);
   white-space: pre-wrap;
   word-break: break-word;
   margin-top: 4px;
@@ -206,7 +211,7 @@
   width: 20px;
   height: 20px;
   padding: 0;
-  color: #6a7da3;
+  color: var(--gl-muted);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -217,18 +222,19 @@
 
 .toolCallIconButton:hover,
 .toolCallIconButton:focus {
-  color: #4f6592;
-  background: rgba(106, 125, 163, 0.12);
+  color: var(--gl-ink);
+  background: rgba(28, 35, 52, 0.07);
 }
 
+/* same pastel family as the theme's stamps and badges */
 .toolCallStatusSuccess {
-  color: #1d5f35;
-  background: #d9f4e3;
+  color: #2e8f5b;
+  background: #def0e2;
 }
 
 .toolCallStatusError {
-  color: #8b1d28;
-  background: #fde2e5;
+  color: #c24a33;
+  background: #fbe3de;
 }
 
 .input_msg_write input {
@@ -331,7 +337,7 @@
 .markdown_content code {
   padding: 0.1rem 0.3rem;
   border-radius: 4px;
-  background: rgba(15, 23, 42, 0.07);
+  background: rgba(28, 35, 52, 0.07);
   color: inherit;
   font-size: 0.9em;
   word-break: break-word;
@@ -340,7 +346,7 @@
 .markdown_content pre {
   padding: 0.5rem 0.65rem;
   border-radius: 8px;
-  background: rgba(15, 23, 42, 0.07);
+  background: rgba(28, 35, 52, 0.07);
   overflow-x: auto;
 }
 
@@ -352,7 +358,7 @@
 .markdown_content blockquote {
   margin-left: 0;
   padding-left: 0.65rem;
-  border-left: 3px solid rgba(15, 23, 42, 0.15);
+  border-left: 3px solid rgba(28, 35, 52, 0.15);
   color: inherit;
 }
 
@@ -372,7 +378,7 @@
 }
 
 .received_withd_msg .msg_txt_wrap a {
-  color: #467fcf;
+  color: var(--gl-accent);
   text-decoration: underline;
 }
 
@@ -381,11 +387,13 @@
   text-decoration: underline;
 }
 
+/* The surface itself (glass background, border, radius, shadow) comes from
+   the global .glass-theme card rules (routes/dashboard/style.css) — this
+   class only keeps the chat's own layout. overflow: hidden is deliberate
+   here (unlike dashboard cards): the message history scrolls inside and
+   must clip at the rounded corners, and nothing overflows this card. */
 .chatCard {
-  border: none;
-  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
   flex: 1;
   min-height: 0;
   display: flex;
@@ -446,12 +454,37 @@
 }
 
 /* Full-height page: the only chrome above is the 3.25rem fixed mobile top
-   bar — on desktop the nav is the left sidebar, so the chat owns 100dvh */
+   bar — on desktop the nav is the left sidebar, so the chat owns 100dvh.
+   The page carries the Horizon glass scene (class from
+   routes/dashboard/style.css), fixed to the viewport like the dashboard. */
 .chatPage {
   height: calc(100dvh - 3.25rem);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* The scene slides back under the frosted nav chrome, so the rail's and the
+   top bar's backdrop blur frost the actual scene instead of a flat page
+   background (same trick as .dashboardBackground). The chat page keeps its
+   fixed height: the padding gives the pulled-back space to the chrome. */
+@media (min-width: 992px) {
+  :global(body.gladys-sidebar-nav) .chatPage {
+    width: calc(100% + 15rem);
+    margin-left: -15rem;
+    padding-left: 15rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  :global(body.gladys-sidebar-nav) .chatPage {
+    height: 100dvh;
+    margin-top: -3.25rem;
+    padding-top: 3.25rem;
+  }
 }
 
 .chatPageMain,
@@ -482,9 +515,10 @@
   width: 100%;
 }
 
+/* the composer sits on the glass card itself — no opaque band */
 .chatComposer {
-  background: #fff;
-  border-top: 1px solid #edf1f5;
+  background: transparent;
+  border-top: 1px solid var(--gl-row-border);
   padding: 12px;
   flex-shrink: 0;
 }
@@ -499,19 +533,25 @@
 .modelSelectorLabel {
   margin: 0;
   font-size: 13px;
-  color: #6c7a89;
+  color: var(--gl-muted);
   white-space: nowrap;
 }
 
+/* frosted pill, like the dashboard widgets' select controls */
 .modelSelector {
   max-width: 100%;
   font-size: 13px;
   flex: 1;
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: rgba(255, 255, 255, 0.62);
+  font-weight: 600;
+  color: var(--gl-ink);
 }
 
 .modelPriceLegend {
   font-size: 12px;
-  color: #9aa7b5;
+  color: var(--gl-muted);
   white-space: nowrap;
 }
 
@@ -524,17 +564,24 @@
   max-height: 264px;
   resize: none;
   box-sizing: border-box;
-  border-radius: 14px;
+  border-radius: 18px;
   padding: 12px 52px 12px 14px;
   font-size: 15px;
   line-height: 1.5;
-  border: 1px solid #d9e2ec;
+  border: 1px solid var(--gl-border);
+  background-color: rgba(255, 255, 255, 0.62);
+  color: var(--gl-ink);
   overflow-y: hidden;
 }
 
 .chatInput:focus {
-  border-color: #467fcf;
-  box-shadow: 0 0 0 0.2rem rgba(70, 127, 207, 0.18);
+  background-color: rgba(255, 255, 255, 0.8);
+  border-color: var(--gl-accent);
+  box-shadow: 0 0 0 0.2rem rgba(61, 109, 240, 0.15);
+}
+
+.chatInput::placeholder {
+  color: var(--gl-muted);
 }
 
 .sendButton {
@@ -552,28 +599,28 @@
 }
 
 .sendButtonActive {
-  background: #467fcf;
+  background: var(--gl-accent);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(70, 127, 207, 0.4);
+  box-shadow: 0 2px 8px rgba(61, 109, 240, 0.4);
 }
 
 .sendButtonActive:hover,
 .sendButtonActive:focus {
-  background: #3564be;
+  background: #2f5bd7;
   color: #fff;
 }
 
 .sendButtonIdle {
-  background: #eef2f6;
-  color: #9aa7b5;
+  background: rgba(28, 35, 52, 0.07);
+  color: var(--gl-muted);
   cursor: default;
   box-shadow: none;
 }
 
 .sendButtonIdle:hover,
 .sendButtonIdle:focus {
-  background: #eef2f6;
-  color: #9aa7b5;
+  background: rgba(28, 35, 52, 0.07);
+  color: var(--gl-muted);
 }
 
 .emptyChatState {
@@ -590,8 +637,19 @@
 
 .emptyChatText {
   margin-top: 20px;
-  color: #5f6c7b;
   font-size: 15px;
+}
+
+.typingIndicator {
+  font-size: 13px;
+}
+
+/* Both are <p> inside the chat card, so the theme's `.glass-theme .card p`
+   ink rule (0,2,1) outranks a bare module class and would flatten the
+   two-level hierarchy: the secondary copy must out-specify it to stay muted */
+:global(.glass-theme .card) p.emptyChatText,
+:global(.glass-theme .card) p.typingIndicator {
+  color: var(--gl-muted);
 }
 
 @media (min-width: 992px) {
@@ -607,12 +665,16 @@
 @media (max-width: 768px) {
   .chatPageContainer {
     max-width: 100%;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
-  .chatCard {
+  /* full-bleed glass on phones: the card fills the viewport and the scene
+     shows through its blur — the extra ancestor out-specifies the global
+     .glass-theme .card surface rules */
+  :global(.glass-theme) .chatMainColumn .chatCard {
     border-radius: 0;
+    border: none;
     box-shadow: none;
   }
 
@@ -645,4 +707,59 @@
     min-height: 50px;
     font-size: 16px;
   }
+}
+
+/* Coarse pointers: joining the theme also pulls in its touch-target floor
+   (`.glass-theme .card .btn { min-height: 2.75rem }`), which stretches the
+   36px send circle into an ellipse taller than the input it sits in. Grow the
+   whole control to that same 44px floor so it stays round, and give the input
+   the height and right gutter to hold it. Placed after the width-based block
+   above: on a phone both queries match and this one must win. */
+@media (pointer: coarse) {
+  .sendButton {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  /* 44px button + an 8px gap above and below it */
+  .chatInput {
+    min-height: 3.75rem;
+    padding-right: 3.75rem;
+  }
+}
+
+/* ==================================================================
+   Dark mode: the app darkens through the global inversion filter
+   (style/dark-mode.css) and this file is authored light-only, like the
+   whole Horizon theme. dark-mode.css double-inverts .form-control fields
+   (solid !important background + counter filter) to preserve their stock
+   look — under glass they are frosted surfaces that must invert WITH the
+   theme, so restore the authored glass with the same weight. The extra
+   ancestor class out-specifies dark-mode.css's selectors.
+   ================================================================== */
+
+/* dark-mode.css also paints .page-main with a solid !important background,
+   which would mask the scene: the chat carries its scene on the outer .page
+   (its fixed-height flex layout owns .page-main), so the layer above the
+   scene must stay transparent — the scene then inverts into its dark
+   counterpart and shows through, like on the dashboard */
+:global(.dark-mode .glass-theme) .chatPageMain {
+  background-color: transparent !important;
+}
+
+:global(.dark-mode .glass-theme) .composerInputWrap .chatInput,
+:global(.dark-mode .glass-theme) .modelSelectorWrap .modelSelector {
+  filter: none;
+  background-color: rgba(255, 255, 255, 0.62) !important;
+  color: var(--gl-ink) !important;
+  border-color: var(--gl-border) !important;
+}
+
+:global(.dark-mode .glass-theme) .composerInputWrap .chatInput:focus {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: var(--gl-accent) !important;
+}
+
+:global(.dark-mode .glass-theme) .composerInputWrap .chatInput::placeholder {
+  color: var(--gl-muted) !important;
 }
