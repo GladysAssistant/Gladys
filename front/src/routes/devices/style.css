@@ -257,16 +257,6 @@
   }
 }
 
-/* The load-error alert sits outside a card: same quiet tinted notice as
-   the in-card alerts of the theme */
-.devicesPage :global(.alert-danger) {
-  border: none;
-  border-radius: 14px;
-  font-weight: 500;
-  background-color: #fbe3de;
-  color: #c24a33;
-}
-
 /* Empty-state button: frosted accent pill, like the dashboard's page
    controls (the dark-mode filter exception is carried by the theme) */
 .devicesPage .emptyStateDivBox :global(.btn-outline-primary) {
