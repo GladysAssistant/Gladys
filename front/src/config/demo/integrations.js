@@ -552,8 +552,8 @@ const integrations = {
     },
     {
       name: 'Unsupported device',
-      external_id: 'zigbee2mqtt:0x00158d0005828ece',
-      selector: 'zigbee2mqtt-0x00158d0005828ece',
+      external_id: 'zigbee2mqtt:0x00158d0005828ecf',
+      selector: 'zigbee2mqtt-0x00158d0005828ecf',
       room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
       features: [
         {
