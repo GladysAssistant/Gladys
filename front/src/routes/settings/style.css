@@ -80,17 +80,6 @@
    same element as .glass-theme, so the --gl-* tokens are available)
    ================================================================== */
 
-/* Below 992px .dashboardBackground pads its bottom to clear the dashboard
-   switcher dock; settings and profile render no dock, so reclaim the hole.
-   (Gating the dashboard rule on :has(.dashboardHeader) would be cleaner,
-   but Safari < 15.4 — old wall tablets — would drop it and let the dock
-   overlap the real dashboard.) */
-@media (max-width: 991.98px) {
-  :global(.page-main.settings-page) {
-    padding-bottom: 0;
-  }
-}
-
 :global(.settings-page .page-title) {
   color: var(--gl-ink);
   font-weight: 700;

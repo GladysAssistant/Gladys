@@ -97,17 +97,6 @@
    theme (style/dark-mode.css).
    ================================================================== */
 
-/* Below 992px .dashboardBackground pads its bottom to clear the dashboard
-   switcher dock; this page renders no dock, so reclaim the hole — same
-   scoped counter-rule as .settings-page and the auth scene (the two-class
-   selector is what beats .dashboardBackground; :has() on the shared rule
-   would be cleaner but Safari < 15.4 — old wall tablets — drops it). */
-@media (max-width: 991.98px) {
-  :global(.page-main).devicesPage {
-    padding-bottom: 0;
-  }
-}
-
 .devicesPage :global(.page-title) {
   color: var(--gl-ink);
 }
