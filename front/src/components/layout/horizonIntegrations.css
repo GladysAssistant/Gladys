@@ -79,6 +79,85 @@
   background-color: #fff !important;
 }
 
+/* On phones the side menu must not cost half a screen of vertical space
+   before the content: the same list-group markup collapses into ONE
+   horizontally scrollable row of chips — the catalog's mobile category
+   grammar (frosted pills, solid ink active pill, partial overflow as the
+   scroll affordance). CSS-only, so the ~40 integration layouts convert at
+   once. On the catalog itself the desktop menu is display: none on mobile,
+   so these rules never double its own chips row. */
+@media (max-width: 991.98px) {
+  /* the integration titles carry mb-5 (sized for the desktop sidebar):
+     same 3rem it saves the chips row, it must not give back as a hole
+     between title and chips — !important to outweigh the utility */
+  .glass-theme .page-title {
+    margin-bottom: 1rem !important;
+  }
+
+  .glass-theme .list-group-transparent {
+    display: flex;
+    /* .list-group is a Bootstrap column flexbox: lay the chips on one row */
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 2px 0 8px;
+    margin-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .glass-theme .list-group-transparent::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass-theme .list-group-transparent .list-group-item {
+    flex: 0 0 auto;
+    /* the flex basis is the item's width: drop Tabler's full row width so
+       each chip hugs its label */
+    width: auto;
+    white-space: nowrap;
+    border-radius: 999px;
+    padding: 6px 14px;
+    margin-bottom: 0;
+    font-size: 0.8125rem;
+    color: var(--gl-muted);
+    background-color: var(--gl-card-bg);
+    border: 1px solid var(--gl-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  /* the icon hugs its label inside the chip (the markup carries mr-3) */
+  .glass-theme .list-group-transparent .list-group-item .icon {
+    margin-right: 0.375rem !important;
+    font-size: 0.875rem;
+  }
+
+  .glass-theme .list-group-transparent .list-group-item.active {
+    background-color: var(--gl-ink);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+  }
+
+  /* on the ink pill the icon goes white with its label (the desktop rule
+     puts the accent on it with the same weight, hence the !important) */
+  .glass-theme .list-group-transparent .list-group-item.active .icon {
+    color: #fff !important;
+  }
+
+  /* same counter-weights as above, with the mobile chip colors */
+  .dark-mode .glass-theme .list-group-transparent .list-group-item {
+    background-color: var(--gl-card-bg) !important;
+  }
+
+  .dark-mode .glass-theme .list-group-transparent .list-group-item.active {
+    background-color: var(--gl-ink) !important;
+  }
+}
+
 /* Every button under glass is a pill — the theme's one button shape */
 .glass-theme .btn {
   border-radius: 999px;
