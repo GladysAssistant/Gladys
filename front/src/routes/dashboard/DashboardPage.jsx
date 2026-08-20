@@ -15,7 +15,17 @@ const DashboardPage = ({ children, ...props }) => {
   return (
     <div class="page">
       {/* The Horizon glass theme is THE dashboard style — imposed, not chosen */}
-      <div class={cx('page-main', 'glass-theme', style.dashboardBackground, getBackgroundSceneClass(backgroundScene))}>
+      {/* withBottomDock: this is the one wallpaper page carrying the mobile
+          switcher dock, so it is the one that pads its content clear of it */}
+      <div
+        class={cx(
+          'page-main',
+          'glass-theme',
+          style.dashboardBackground,
+          style.withBottomDock,
+          getBackgroundSceneClass(backgroundScene)
+        )}
+      >
         <div class={props.loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">
