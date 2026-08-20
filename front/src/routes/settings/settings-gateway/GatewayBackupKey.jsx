@@ -5,6 +5,8 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../utils/consts';
 
 class GatewayBackupKey extends Component {
+  state = { showBackupKey: false };
+
   toggleShowBackupKey = () => {
     this.setState(({ showBackupKey }) => ({ showBackupKey: !showBackupKey }));
   };
