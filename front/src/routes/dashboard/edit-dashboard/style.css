@@ -631,6 +631,86 @@
 }
 
 /* ============================================================
+   Horizon "+" affordances: every way of adding something to the
+   canvas speaks the same pill language — a quiet dashed capsule
+   for the in-between widget slots, the solid ink CTA for an empty
+   column, frosted capsules for the structural adds (column,
+   section), same family as the viewer's header pills.
+   ============================================================ */
+
+:global(.glass-theme) .btnAddNewBoxAtPosition {
+  border: 1px dashed rgba(28, 35, 52, 0.22);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.35);
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .btnAddNewBoxAtPosition:hover {
+  border-color: var(--gl-accent);
+  color: var(--gl-accent);
+  background-color: rgba(255, 255, 255, 0.65);
+}
+
+:global(.glass-theme) .addWidgetButton {
+  border: none;
+  border-radius: 999px;
+  background-color: var(--gl-ink);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+:global(.glass-theme) .addWidgetButton:hover,
+:global(.glass-theme) .addWidgetButton:focus {
+  background-color: #2a3550;
+  color: #fff;
+}
+
+:global(.glass-theme) .btnAddColumn,
+:global(.glass-theme) .addSectionButton {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--gl-ink);
+  font-weight: 600;
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.glass-theme) .addSectionButton {
+  padding: 0.45rem 1.1rem;
+}
+
+:global(.glass-theme) .btnAddColumn:hover,
+:global(.glass-theme) .addSectionButton:hover {
+  background-color: #fff;
+  color: var(--gl-ink);
+  border-color: var(--gl-border);
+}
+
+:global(.glass-theme) .btnAddColumn :global(.fe),
+:global(.glass-theme) .addSectionButton :global(.fe) {
+  color: var(--gl-accent);
+}
+
+/* the add-column hover tooltip joins the drag-pill family */
+:global(.glass-theme) .btnAddColumn[data-title]:hover:after {
+  color: #fff;
+  background-color: var(--gl-ink);
+  border: none;
+  border-radius: 10px;
+  padding: 4px 10px;
+  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.35);
+}
+
+/* the mobile column separator drops the Tabler gray for the theme's ink */
+:global(.glass-theme) .columnBoxHeader {
+  border-top-color: rgba(28, 35, 52, 0.15);
+}
+
+/* ============================================================
    Background scene picker: each thumbnail previews its own CSS
    scene (the buttons carry the scene classes directly), the
    active one gets the accent ring — same grammar as the icon

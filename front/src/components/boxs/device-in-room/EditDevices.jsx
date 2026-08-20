@@ -212,6 +212,7 @@ class EditDevices extends Component {
                 </label>
                 <Select
                   menuPlacement="auto"
+                  menuPortalTarget={document.body}
                   onChange={this.addDeviceFeature}
                   value={[]}
                   options={deviceOptions}
