@@ -70,10 +70,12 @@
   color: var(--gl-muted);
 }
 
-/* Widget preview frame */
+/* Widget preview frame. The bottom margin matches the mb-2 under the
+   in-between "+" slot, so the slot floats centered in the gap instead of
+   hugging the widget above it */
 .previewWrapper {
   position: relative;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   border-radius: 16px;
 }
 
