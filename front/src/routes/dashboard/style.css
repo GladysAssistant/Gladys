@@ -498,6 +498,39 @@
   margin: 0.75rem 1.5rem 0;
 }
 
+/* Page-level alerts (outside any card — dashboard gateway/migration notices,
+   activity feed errors) sit directly on the scene: same tinted notice family,
+   on an opaque pastel so they stay readable over the glows. The in-card rules
+   above are more specific and keep their tighter metrics. */
+:global(.glass-theme .alert) {
+  border: none;
+  border-radius: var(--gl-radius-md);
+  font-weight: 500;
+  background-color: rgba(255, 255, 255, 0.55);
+  color: #667081;
+}
+
+:global(.glass-theme .alert-danger) {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+:global(.glass-theme .alert-warning) {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+:global(.glass-theme .alert-info),
+:global(.glass-theme .alert-primary) {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+:global(.glass-theme .alert-success) {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
 /* Bootstrap badges become the color-dot pill family's plain cousins */
 :global(.glass-theme .card .badge) {
   border-radius: 999px;
