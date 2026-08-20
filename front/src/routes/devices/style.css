@@ -132,6 +132,13 @@
   filter: none;
 }
 
+/* dark-mode.css authors the placeholder for double-inverted inputs; with
+   filter: none above it inverts with the theme, so it needs the theme's
+   muted ink to keep its contrast on the dark pill */
+:global(.dark-mode) .devicesPage .pageOptions :global(.form-control)::placeholder {
+  color: var(--gl-muted) !important;
+}
+
 /* The table header joins the theme's uppercase micro-label grammar */
 .devicesPage :global(.device-list-table thead th) {
   border: none;
@@ -234,6 +241,19 @@
 @media (pointer: coarse) {
   .devicesPage :global(.list-group-item-action):active {
     background-color: var(--gl-icon-tint-bg);
+  }
+}
+
+/* the dark-mode restorer above out-weighs the plain hover/press rules, so
+   the feedback needs its own heavier counterparts to stay alive in dark */
+:global(.dark-mode) .devicesPage :global(.list-group-flush .list-group-item-action):hover,
+:global(.dark-mode) .devicesPage :global(.list-group-flush .list-group-item-action):focus {
+  background-color: var(--gl-surface-strong) !important;
+}
+
+@media (pointer: coarse) {
+  :global(.dark-mode) .devicesPage :global(.list-group-flush .list-group-item-action):active {
+    background-color: var(--gl-icon-tint-bg) !important;
   }
 }
 
