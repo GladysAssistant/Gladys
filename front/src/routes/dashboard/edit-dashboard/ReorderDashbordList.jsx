@@ -1,25 +1,27 @@
 import { useRef } from 'preact/hooks';
 import { Component } from 'preact';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
 import { wrapEmojisJSX } from '../../../utils/emojiWrapper';
 import { startPointerDrag } from '../../../utils/pointerDrag';
-import { computeInsertionIndex, insertionLineRect } from './widgetDropPlacement';
+import { computeFlowInsertionIndex, flowInsertionLineRect } from './widgetDropPlacement';
 import style from './style.css';
 
-// Horizon dashboard list: glass pill rows with an always-visible grab
-// handle. Reordering runs on the pointer-events engine with the same
-// placement model as the widget canvas — an insertion indicator line in the
-// exact gap where the row would land, computed from the pointer position
-// (no per-row drop targets, no layout shift).
+// Horizon dashboard bar: a wrapping row of glass pills above the canvas
+// (the viewer's tab-bar grammar), instead of a sidebar column that stole a
+// quarter of the editor's width. Tap a pill to edit that dashboard, drag
+// its always-visible handle to reorder — the pointer-events engine with the
+// flow (reading-order) placement math, indicator as a short vertical line
+// in the exact gap. The "new dashboard" pill closes the row.
 const resolveListPlacement = (target, point) => {
   const list = target.hasAttribute('data-dashboard-list') ? target : target.closest('[data-dashboard-list]');
   if (!list) {
     return null;
   }
   const rows = Array.from(list.querySelectorAll('[data-dashboard-list-drop]'));
-  return { list, rows, index: computeInsertionIndex(rows, point.y) };
+  return { list, rows, index: computeFlowInsertionIndex(rows, point) };
 };
 
 const isNoopListInsertion = (index, sourceIndex) => index === sourceIndex || index === sourceIndex + 1;
@@ -47,7 +49,7 @@ const DashboardListItem = ({ children, ...props }) => {
         return {
           area: null,
           indicator: showLine
-            ? insertionLineRect(placement.list.getBoundingClientRect(), placement.rows, placement.index)
+            ? flowInsertionLineRect(placement.list.getBoundingClientRect(), placement.rows, placement.index)
             : null
         };
       },
@@ -98,7 +100,7 @@ class RedorderDashboardList extends Component {
     this.props.updateDashboardList(newDashboards);
   };
 
-  render({ dashboards, currentDashboard }, {}) {
+  render({ dashboards, currentDashboard, openNewDashboard }, {}) {
     return (
       <ul class={style.dashboardList} data-dashboard-list>
         {dashboards &&
@@ -112,6 +114,19 @@ class RedorderDashboardList extends Component {
               insertAtPosition={this.insertAtPosition}
             />
           ))}
+        <li class={style.newDashboardItem}>
+          <Localizer>
+            <button
+              type="button"
+              onClick={openNewDashboard}
+              class={style.newDashboardButton}
+              data-cy="new-dashboard-button"
+              title={<Text id="newDashboard.cardTitle" />}
+            >
+              <i class="fe fe-plus" />
+            </button>
+          </Localizer>
+        </li>
       </ul>
     );
   }

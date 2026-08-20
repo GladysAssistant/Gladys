@@ -160,26 +160,21 @@
   color: var(--gl-ink, #1c2334);
 }
 
-/* Horizon dashboard list (editor sidebar): glass panel + pill rows, same
-   family as the canvas section frames */
-.dashboardListPanel {
-  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
-  background: rgba(255, 255, 255, 0.22);
-  border-radius: var(--gl-radius-lg, 26px);
-  padding: 12px;
-  margin-bottom: 1.5rem;
+/* Horizon dashboard bar (editor): the list is a wrapping row of glass
+   pills above the canvas — the viewer's tab-bar grammar — so the canvas
+   keeps the full width (the old sidebar column ate a quarter of it,
+   painful on tablets) */
+.dashboardBar {
+  margin-bottom: 1.25rem;
 }
 
 .dashboardListHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   color: var(--gl-muted, #7c8396);
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 2px 6px 10px;
+  padding: 0 6px 8px;
 }
 
 .dashboardList {
@@ -187,12 +182,13 @@
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 .dashboardListItem {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 7px 12px;
@@ -204,6 +200,31 @@
   font-weight: 500;
   cursor: pointer;
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.newDashboardItem {
+  display: inline-flex;
+}
+
+/* the "new dashboard" pill closes the row, same height as its neighbors */
+.newDashboardButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--gl-surface-strong, rgba(255, 255, 255, 0.78));
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  color: var(--gl-ink, #1c2334);
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.newDashboardButton:hover {
+  border-color: var(--gl-accent, #3d6df0);
+  color: var(--gl-accent, #3d6df0);
 }
 
 .dashboardListItem:hover {
@@ -768,6 +789,12 @@
 
   .dashboardListItem {
     padding: 11px 14px;
+  }
+
+  .newDashboardButton {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.1rem;
   }
 
   /* bigger hit area without growing the row */
