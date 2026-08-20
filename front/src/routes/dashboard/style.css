@@ -624,7 +624,15 @@
     margin: 0;
   }
 
-  .dashboardBackground {
+  /* Opt-in, NOT on .dashboardBackground itself: the scene is shared by every
+     wallpaper page (dashboard, editor, new dashboard, the zone form of Plans)
+     but only the dashboard carries the switcher dock. On the others the
+     padding was pure dead space at the bottom of the page.
+     An explicit class rather than :has(.dashboardHeader): :has() is unknown to
+     Chromium < 105 / Safari < 15.4 / Firefox < 121, and an unknown pseudo-class
+     invalidates the whole rule — the dock clearance would silently disappear on
+     exactly the old wall tablets this dock is designed for. */
+  .withBottomDock {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
   }
 

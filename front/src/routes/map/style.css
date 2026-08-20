@@ -8,6 +8,9 @@
    mode comes from the app-wide inversion filter (style/dark-mode.css).
    ================================================================== */
 
+/* Map markers become Horizon pins: a white disc floating over the tiles with
+   a soft shadow. Both are <img>, so the dark-mode double inversion keeps them
+   light on the dark tiles too. */
 .userIconImage {
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.9);
@@ -16,10 +19,16 @@
 }
 
 .houseIconImage {
+  border-radius: 50%;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.28);
 }
 
 .containerWithMargin {
-  margin-top: 3rem;
+  /* padding, not margin: a margin would collapse through the glass page-main
+     and leave a white band above the scene (same trap as new-dashboard) */
+  padding-top: 3rem;
   padding-bottom: 3rem;
 }
 
