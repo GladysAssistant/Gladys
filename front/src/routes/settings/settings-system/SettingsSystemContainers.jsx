@@ -13,7 +13,7 @@ const SettingsSystemContainers = ({ systemContainers }) => (
     <h4 class="card-header">
       <Text id="systemSettings.containers" />
     </h4>
-    <div class="card-body pt-0">
+    <div class="card-body">
       <div class={style.containerList}>
         {systemContainers &&
           systemContainers.map(container => (

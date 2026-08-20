@@ -1,9 +1,23 @@
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 import EditProfile from './EditProfile';
 
+import dashboardStyle from '../dashboard/style.css';
+
+// The profile lives on the same Horizon glass scene as the settings pages:
+// glass-theme gates the shared theme layer and .settings-page carries the
+// settings grammar (routes/settings/style.css) for the form and cards.
 const DashboardProfile = ({ children, ...props }) => (
   <div class="page">
-    <div class="page-main">
+    <div
+      class={cx(
+        'page-main',
+        'glass-theme',
+        'settings-page',
+        dashboardStyle.dashboardBackground,
+        dashboardStyle.glassScene
+      )}
+    >
       <div class="my-3 my-md-5">
         <div class="container">
           <div class="page-header">

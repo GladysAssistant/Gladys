@@ -125,6 +125,19 @@
   border-top: 1px solid var(--gl-row-border);
 }
 
+/* Profile card: Tabler's decorative 9rem header band (with the avatar
+   pulled up over it) makes no sense on a glass card — drop the empty band
+   and let the avatar sit naturally in the body */
+:global(.settings-page .card-profile > .card-header:empty) {
+  display: none;
+}
+
+:global(.settings-page .card-profile-img) {
+  margin-top: 0;
+  border: none;
+  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.18);
+}
+
 /* ---------- forms ---------- */
 
 :global(.settings-page .form-label) {
