@@ -87,13 +87,15 @@
 }
 
 /* zoom control: a vertical frosted capsule (the .leaflet-touch variant is
-   repeated so this wins over Leaflet's own touch styles by specificity) */
+   repeated so this wins over Leaflet's own touch styles by specificity).
+   No overflow: hidden — it would clip the keyboard focus ring of the zoom
+   links; the end buttons round themselves instead (below), which keeps the
+   capsule without cropping anything painted outside the box. */
 .mapPage :global(.leaflet-bar),
 .mapPage :global(.leaflet-touch .leaflet-bar) {
   border: 1px solid var(--gl-border);
   border-radius: 999px;
   box-shadow: var(--gl-shadow-soft);
-  overflow: hidden;
 }
 
 .mapPage :global(.leaflet-bar a),
@@ -110,8 +112,19 @@
   font-family: inherit;
 }
 
+/* the ends carry the capsule's rounding, so the stack reads as one pill */
+.mapPage :global(.leaflet-bar a:first-child) {
+  border-radius: 999px 999px 0 0;
+}
+
 .mapPage :global(.leaflet-bar a:last-child) {
   border-bottom: none;
+  border-radius: 0 0 999px 999px;
+}
+
+/* a lone button (no sibling) is a full pill */
+.mapPage :global(.leaflet-bar a:only-child) {
+  border-radius: 999px;
 }
 
 .mapPage :global(.leaflet-bar a:hover) {
