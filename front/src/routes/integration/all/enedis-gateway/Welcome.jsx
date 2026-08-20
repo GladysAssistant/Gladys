@@ -129,12 +129,27 @@ class EnedisWelcomePageComponent extends Component {
     await this.props.httpClient.post('/api/v1/service/enedis/sync');
   };
   detectCode = async () => {
-    if (this.props.code) {
+    if (this.props.error) {
+      // Enedis redirects with an error query param when the consent was not granted
+      await this.setState({ errored: true });
+      return;
+    }
+    if (this.props.code || this.props.autorisation_id) {
       try {
         await this.setState({ errored: false });
-        const finalizeBody = {
-          code: this.props.code
-        };
+        const finalizeBody = {};
+        if (this.props.autorisation_id) {
+          // New Enedis DataConnect flow (2026): Enedis returns an autorisation_id
+          // that the Gladys Gateway exchanges for the usage points ids (PRM)
+          finalizeBody.autorisation_id = this.props.autorisation_id;
+          if (this.props.state) {
+            finalizeBody.state = this.props.state;
+          }
+        } else {
+          // Legacy Enedis DataConnect flow: Enedis returns an OAuth code
+          // and the usage points ids are passed in the redirect URL
+          finalizeBody.code = this.props.code;
+        }
         if (config.enedisForceUsagePoints) {
           finalizeBody.usage_points_id = config.enedisForceUsagePoints.split(',');
         }
