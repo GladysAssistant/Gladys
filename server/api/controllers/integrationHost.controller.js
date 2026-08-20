@@ -122,7 +122,8 @@ module.exports = function IntegrationHostController(gladys) {
    * broadcasts/mDNS/SSDP, and their own broadcasts never reach the LAN)
    * and returns the RAW results — the integration interprets them itself.
    * Bounded to the capture requests declared in the manifest (403
-   * otherwise), 1-30s, one scan at a time per integration; the active
+   * otherwise); an mDNS scan browses every declared mDNS service. Scans
+   * last 1-30s, one at a time per integration; the active
    * emission is broadcast-only, on a declared port, payload 512 bytes
    * max, 1 scan per 10 seconds per integration (429 otherwise).
    */

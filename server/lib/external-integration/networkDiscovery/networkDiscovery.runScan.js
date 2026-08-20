@@ -53,10 +53,13 @@ async function runNetworkDiscoveryScan(
     );
   }
   const declaredCaptures = (service.manifest && service.manifest.network_discovery) || [];
-  const capture = declaredCaptures.find((entry) => entry.type === type);
-  if (!capture) {
+  const captures = declaredCaptures.filter((entry) => entry.type === type);
+  if (captures.length === 0) {
     throw new ForbiddenError(`network_discovery: capture type ${type} is not declared in the manifest`);
   }
+  // mdns browses every declared entry (see below); the other types
+  // deliberately keep the first-match behaviour for now
+  const firstCapture = captures[0];
   let payload = null;
   if (type === 'udp-active-broadcast') {
     if (!Number.isInteger(port)) {
@@ -64,7 +67,7 @@ async function runNetworkDiscoveryScan(
     }
     // emitting is bounded by the same authorization contract as
     // capturing: never a port the user did not approve
-    if (!capture.ports.includes(port)) {
+    if (!firstCapture.ports.includes(port)) {
       throw new ForbiddenError(`network_discovery: port ${port} is not declared in the manifest`);
     }
     if (typeof payloadBase64 !== 'string' || payloadBase64.length === 0) {
@@ -89,16 +92,19 @@ async function runNetworkDiscoveryScan(
   const timeoutMs = effectiveTimeoutSeconds * 1000;
   try {
     if (type === 'udp-broadcast') {
-      return await this.scanUdpBroadcast({ ports: capture.ports, timeoutMs });
+      return await this.scanUdpBroadcast({ ports: firstCapture.ports, timeoutMs });
     }
     if (type === 'udp-active-broadcast') {
       this.networkDiscoveryActiveScanTimes.set(service.id, Date.now());
       return await this.scanUdpActiveBroadcast({ port, payload, timeoutMs });
     }
     if (type === 'mdns') {
-      return await this.scanMdns({ service: capture.service, timeoutMs });
+      return await this.scanMdns({
+        services: captures.map((declaredCapture) => declaredCapture.service),
+        timeoutMs,
+      });
     }
-    return await this.scanSsdp({ st: capture.st, timeoutMs });
+    return await this.scanSsdp({ st: firstCapture.st, timeoutMs });
   } finally {
     this.networkDiscoveryScans.delete(service.id);
   }

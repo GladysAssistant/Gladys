@@ -127,7 +127,10 @@ describe('externalIntegration.runNetworkDiscoveryScan', () => {
       timeout_seconds: 2,
     });
     expect(mdnsResults).to.deep.equal([{ name: 'lamp' }]);
-    expect(externalIntegration.scanMdns.firstCall.args[0]).to.deep.equal({ service: '_hue._tcp', timeoutMs: 2000 });
+    expect(externalIntegration.scanMdns.firstCall.args[0]).to.deep.equal({
+      services: ['_hue._tcp'],
+      timeoutMs: 2000,
+    });
     const ssdpResults = await externalIntegration.runNetworkDiscoveryScan(service, {
       type: 'ssdp',
       timeout_seconds: 1,
@@ -136,6 +139,38 @@ describe('externalIntegration.runNetworkDiscoveryScan', () => {
     expect(externalIntegration.scanSsdp.firstCall.args[0]).to.deep.equal({
       st: 'urn:dial-multiscreen-org:service:dial:1',
       timeoutMs: 1000,
+    });
+  });
+
+  it('should browse every mDNS service declared in the manifest', async () => {
+    const service = await seedDiscoveryService({
+      manifest: {
+        ...TEST_DISCOVERY_MANIFEST,
+        network_discovery: [
+          { type: 'mdns', service: '_airplay._tcp' },
+          { type: 'mdns', service: '_companion-link._tcp' },
+        ],
+      },
+    });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.scanMdns = fake.resolves([
+      { name: 'Living Room._airplay._tcp.local' },
+      { name: 'Living Room._companion-link._tcp.local' },
+    ]);
+
+    const results = await externalIntegration.runNetworkDiscoveryScan(service, {
+      type: 'mdns',
+      timeout_seconds: 3,
+    });
+
+    expect(results).to.deep.equal([
+      { name: 'Living Room._airplay._tcp.local' },
+      { name: 'Living Room._companion-link._tcp.local' },
+    ]);
+    expect(externalIntegration.scanMdns.calledOnce).to.equal(true);
+    expect(externalIntegration.scanMdns.firstCall.args[0]).to.deep.equal({
+      services: ['_airplay._tcp', '_companion-link._tcp'],
+      timeoutMs: 3000,
     });
   });
 
@@ -457,6 +492,117 @@ describe('externalIntegration.scanMdns', () => {
         port: null,
         txt: [],
       },
+    ]);
+  });
+
+  it('should browse multiple declared services through one mDNS session', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const mdnsPort = await getFreeUdpPort();
+    const responder = multicastDns({ port: mdnsPort, ip: '127.0.0.1', multicast: false });
+    const mdnsOptions = { port: mdnsPort, ip: '127.0.0.1', multicast: false, bind: false };
+    const queriedServices = new Set();
+    responder.on('query', (query, remoteInfo) => {
+      const serviceName = query.questions && query.questions[0] && query.questions[0].name;
+      queriedServices.add(serviceName);
+      if (serviceName === '_airplay._tcp.local') {
+        // Respond after the second service to ensure results still follow
+        // manifest order rather than network response order.
+        setTimeout(() => {
+          responder.respond(
+            {
+              answers: [{ name: serviceName, type: 'PTR', data: 'Living Room._airplay._tcp.local' }],
+              additionals: [
+                {
+                  name: 'Living Room._airplay._tcp.local',
+                  type: 'SRV',
+                  data: { target: 'Apple-TV.local', port: 7000 },
+                },
+                { name: 'Apple-TV.local', type: 'A', data: '192.168.1.50' },
+              ],
+            },
+            remoteInfo,
+          );
+        }, 25);
+      }
+      if (serviceName === '_companion-link._tcp.local') {
+        responder.respond(
+          {
+            answers: [{ name: serviceName, type: 'PTR', data: 'Living Room._companion-link._tcp.local' }],
+            additionals: [
+              {
+                name: 'Living Room._companion-link._tcp.local',
+                type: 'SRV',
+                data: { target: 'Apple-TV.local', port: 49152 },
+              },
+              { name: 'Apple-TV.local', type: 'A', data: '192.168.1.50' },
+            ],
+          },
+          remoteInfo,
+        );
+      }
+    });
+    const results = await externalIntegration.scanMdns({
+      services: ['_airplay._tcp', '_companion-link._tcp'],
+      timeoutMs: 700,
+      mdnsOptions,
+    });
+    await new Promise((resolve) => {
+      responder.destroy(resolve);
+    });
+    expect([...queriedServices]).to.have.members(['_airplay._tcp.local', '_companion-link._tcp.local']);
+    expect(results).to.deep.equal([
+      {
+        name: 'Living Room._airplay._tcp.local',
+        host: 'Apple-TV.local',
+        addresses: ['192.168.1.50'],
+        port: 7000,
+        txt: [],
+      },
+      {
+        name: 'Living Room._companion-link._tcp.local',
+        host: 'Apple-TV.local',
+        addresses: ['192.168.1.50'],
+        port: 49152,
+        txt: [],
+      },
+    ]);
+  });
+
+  it('should return one result per instance when a service is declared twice', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const mdnsPort = await getFreeUdpPort();
+    const responder = multicastDns({ port: mdnsPort, ip: '127.0.0.1', multicast: false });
+    const mdnsOptions = { port: mdnsPort, ip: '127.0.0.1', multicast: false, bind: false };
+    let queryCount = 0;
+    responder.on('query', (query, remoteInfo) => {
+      const serviceName = query.questions && query.questions[0] && query.questions[0].name;
+      if (serviceName !== '_hue._tcp.local') {
+        return;
+      }
+      queryCount += 1;
+      responder.respond(
+        {
+          answers: [{ name: serviceName, type: 'PTR', data: 'Bridge._hue._tcp.local' }],
+          additionals: [
+            { name: 'Bridge._hue._tcp.local', type: 'SRV', data: { target: 'hue.local', port: 443 } },
+            { name: 'hue.local', type: 'A', data: '192.168.1.10' },
+          ],
+        },
+        remoteInfo,
+      );
+    });
+    // nothing rejects a manifest declaring the same service twice
+    const results = await externalIntegration.scanMdns({
+      services: ['_hue._tcp', '_hue._tcp'],
+      timeoutMs: 700,
+      mdnsOptions,
+    });
+    await new Promise((resolve) => {
+      responder.destroy(resolve);
+    });
+    expect(queryCount).to.equal(1);
+    expect(results).to.deep.equal([
+      { name: 'Bridge._hue._tcp.local', host: 'hue.local', addresses: ['192.168.1.10'], port: 443, txt: [] },
     ]);
   });
 
