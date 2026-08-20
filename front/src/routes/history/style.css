@@ -16,6 +16,8 @@
   /* capsule outer height: chip + 2 × 5px padding + 2 × 1px border */
   --hz-capsule-h: calc(var(--hz-chip-h) + 12px);
   --hz-sticky-top: 0.75rem;
+  --hz-scroll-btn: 2rem;
+
   min-height: 100vh;
   /* own stacking context so the fixed scene layer below can sit at z -1
      behind the in-flow content but above the page's own background (the
@@ -47,6 +49,9 @@
 @media (pointer: coarse) {
   .historyPage {
     --hz-chip-h: 2.75rem;
+    /* the overflow arrows are real tap targets (they render whenever the
+       track overflows, touch included): same floor as the chips */
+    --hz-scroll-btn: 2.75rem;
   }
 }
 
@@ -193,6 +198,17 @@
   top: var(--hz-sticky-top);
   z-index: 20;
   margin-bottom: 1rem;
+  /* the track is a stadium inside a rectangular sticky box: the four
+     corner bites are empty wrapper, and a timeline card tucked under the
+     capsule shows through them. Same treatment as the dashboard pill bar
+     (spec H) and the day labels below — events are restored on the real
+     surfaces only, so those corners stay tappable on the card beneath. */
+  pointer-events: none;
+}
+
+.groupChips,
+.groupChipsScrollBtn {
+  pointer-events: auto;
 }
 
 .groupChips {
@@ -240,8 +256,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: var(--hz-scroll-btn);
+  height: var(--hz-scroll-btn);
   padding: 0;
   color: var(--gl-ink);
   background: var(--gl-surface-strong);
@@ -265,12 +281,14 @@
   right: 6px;
 }
 
+/* keep the first/last chip clear of the overflow arrow (6px offset + its
+   width + a small gap), so the padding follows the coarse-pointer size */
 .groupChipsWrapper:has(.groupChipsScrollBtnLeft) .groupChips {
-  padding-left: 2.5rem;
+  padding-left: calc(var(--hz-scroll-btn) + 0.5rem);
 }
 
 .groupChipsWrapper:has(.groupChipsScrollBtnRight) .groupChips {
-  padding-right: 2.5rem;
+  padding-right: calc(var(--hz-scroll-btn) + 0.5rem);
 }
 
 .groupChip {
