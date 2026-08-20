@@ -628,6 +628,16 @@
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
   }
 
+  /* The clearance above exists for the bottom dock: pages on the scene
+     that render no .dashboardHeader (devices, new-dashboard) reclaim it,
+     or their last row floats above 4.5rem of empty scene. Kept as a
+     refinement on top of the unconditional rule — old browsers without
+     :has() keep today's behavior (clearance everywhere) instead of the
+     dashboard losing the clearance under its own dock. */
+  .dashboardBackground:not(:has(.dashboardHeader)) {
+    padding-bottom: 0;
+  }
+
   /* the "…" menu opens upward from the dock */
   .dashboardTabsMenu {
     top: auto;
