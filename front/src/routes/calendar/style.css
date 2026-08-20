@@ -7,6 +7,16 @@
    filter (style/dark-mode.css), like the rest of the theme.
    ================================================================== */
 
+/* The shared background class reserves bottom space on mobile for the
+   dashboard's fixed switcher dock; this page renders no dock, so give the
+   space back (doubled class to out-specify the shared single-class rule,
+   whatever the import order) */
+@media (max-width: 991.98px) {
+  .calendarScene.calendarScene {
+    padding-bottom: 0;
+  }
+}
+
 /* The calendar fills the viewport below the chrome on desktop instead of
    the historical fixed 550px card; on mobile stacked heights stay natural */
 .horizonCalendar {

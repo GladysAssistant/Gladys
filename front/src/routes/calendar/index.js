@@ -88,7 +88,15 @@ class CalendarPage extends Component {
       <div class="page">
         {/* Same Horizon glass scene as the dashboard — the calendar lives in
             one deep glass card on the default scene */}
-        <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
+        <div
+          class={cx(
+            'page-main',
+            'glass-theme',
+            dashboardStyle.dashboardBackground,
+            dashboardStyle.glassScene,
+            style.calendarScene
+          )}
+        >
           <div class="my-3 my-md-5">
             <div class="container">
               <div class="row">
