@@ -18,7 +18,11 @@ const INTEGRATION_URL_PREFIX = '/dashboard/integration';
 // the side menus (list-group markup restyled by horizonIntegrations.css) and
 // any scroller wearing the opt-in hz-chips-scroll marker (catalog categories)
 const CHIPS_SCROLLERS_SELECTOR = '.list-group-transparent, .hz-chips-scroll';
-const CHIPS_OVERFLOW_CLASS = 'hz-chips-overflow';
+const CHIPS_OVERFLOW_LEFT_CLASS = 'hz-chips-overflow-left';
+const CHIPS_OVERFLOW_RIGHT_CLASS = 'hz-chips-overflow-right';
+// sub-pixel scroll positions (zoom, fractional widths) must not leave an
+// arrow lit on a side that is in fact reached
+const CHIPS_SCROLL_EPSILON = 2;
 
 const notMainPages = currentUrl => {
   const found = NOT_MAIN_PAGES.find(page => {
@@ -31,19 +35,22 @@ const notMainPages = currentUrl => {
 };
 
 // CSS alone cannot know whether a chips row actually overflows, so the shared
-// Layout marks the rows that still have chips past their right edge — the
-// class shows the "more to the right" arrow (horizonIntegrations.css), and
-// removing it once the row is fully scrolled fades the arrow out. Outside the
-// glass theme (settings menus, desktop vertical lists) the class either never
-// applies or styles nothing.
+// Layout marks the rows that still have chips past an edge — each class shows
+// the arrow on its side (horizonIntegrations.css), and removing it once that
+// side is reached fades the arrow out. Outside the glass theme (settings
+// menus, desktop vertical lists) the classes either never apply or style
+// nothing. LTR only, like the app's three locales: an RTL scroller reports
+// negative scrollLeft values this does not model.
 class Layout extends Component {
   setPageElement = element => {
     this.pageElement = element;
   };
 
   markChipsOverflow = scroller => {
-    const hasMoreRight = scroller.scrollWidth - scroller.clientWidth - scroller.scrollLeft > 2;
-    scroller.classList.toggle(CHIPS_OVERFLOW_CLASS, hasMoreRight);
+    const scrolled = scroller.scrollLeft;
+    const remaining = scroller.scrollWidth - scroller.clientWidth - scrolled;
+    scroller.classList.toggle(CHIPS_OVERFLOW_LEFT_CLASS, scrolled > CHIPS_SCROLL_EPSILON);
+    scroller.classList.toggle(CHIPS_OVERFLOW_RIGHT_CLASS, remaining > CHIPS_SCROLL_EPSILON);
   };
 
   updateChipsOverflow = () => {
@@ -74,6 +81,16 @@ class Layout extends Component {
     }
   };
 
+  // chip widths only settle once the webfont is in: a row measured with the
+  // fallback font can be judged as fitting when the real one overflows
+  updateChipsOverflowWhenFontsReady = async () => {
+    if (!document.fonts || !document.fonts.ready) {
+      return;
+    }
+    await document.fonts.ready;
+    this.updateChipsOverflow();
+  };
+
   componentDidMount() {
     this.pageElement.addEventListener('scroll', this.handleScroll, { capture: true, passive: true });
     window.addEventListener('resize', this.updateChipsOverflow);
@@ -84,10 +101,7 @@ class Layout extends Component {
       this.chipsObserver = new MutationObserver(this.scheduleChipsOverflowUpdate);
       this.chipsObserver.observe(this.pageElement, { childList: true, subtree: true });
     }
-    // chips widths settle once the webfont is in
-    if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
-      document.fonts.ready.then(this.updateChipsOverflow);
-    }
+    this.updateChipsOverflowWhenFontsReady();
     this.updateChipsOverflow();
   }
 

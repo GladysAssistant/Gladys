@@ -157,34 +157,69 @@
     background-color: var(--gl-ink) !important;
   }
 
-  /* A row with chips past the right edge wears a small "more" arrow — the
-     partial chip alone does not say the menu continues. The Layout marks
-     overflowing rows with hz-chips-overflow (CSS cannot know); the arrow is
-     a sticky pseudo-element riding the right edge of the scrollport, always
-     in the layout (invisible) so appearing never shifts the row, fading out
-     once the row is fully scrolled. The chevron is an inline SVG in the
-     theme ink: the dark-mode inversion filter derives its light variant. */
+  /* A row with chips beyond one of its edges wears a small arrow on that
+     side — the partial chip alone does not say the menu continues, and once
+     scrolled the user must also know they can come back. Each arrow is a
+     sticky pseudo-element riding its edge of the scrollport, shown by the
+     class the Layout puts on the row (CSS cannot know whether it overflows)
+     and fading out when that side is reached.
+     They cost NO layout width (negative margin cancels the flex slot and its
+     gap): the row must not be indented by an invisible arrow, so the first
+     chip stays aligned with the page title. They therefore ride OVER the
+     chip they hide — which is the cut one — hence pointer-events: none, so
+     the tap goes to the chip and not to the row underneath.
+     The chevrons are inline SVGs in the theme ink: the dark-mode inversion
+     filter derives their light variant. */
+  .glass-theme .list-group-transparent,
+  .glass-theme .hz-chips-scroll {
+    /* the gap these rows are laid out with, to cancel in the arrow margins */
+    --hz-chips-gap: 8px;
+    --hz-chips-arrow-size: 24px;
+  }
+
+  .glass-theme .list-group-transparent::before,
   .glass-theme .list-group-transparent::after,
+  .glass-theme .hz-chips-scroll::before,
   .glass-theme .hz-chips-scroll::after {
     content: '';
     position: sticky;
-    right: 0;
+    /* the ::before is painted before its siblings: lift both arrows above
+       the chips they ride over */
+    z-index: 1;
     flex: 0 0 auto;
     align-self: center;
-    width: 24px;
-    height: 24px;
+    width: var(--hz-chips-arrow-size);
+    height: var(--hz-chips-arrow-size);
     border-radius: 50%;
-    background: var(--gl-surface-strong)
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c2334' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'/%3E%3C/svg%3E")
-      center / 14px 14px no-repeat;
+    background-color: var(--gl-surface-strong);
+    background-position: center;
+    background-size: 14px 14px;
+    background-repeat: no-repeat;
     border: 1px solid var(--gl-border);
     box-shadow: var(--gl-shadow-soft);
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.15s ease;
   }
 
-  .glass-theme .list-group-transparent.hz-chips-overflow::after,
-  .glass-theme .hz-chips-scroll.hz-chips-overflow::after {
+  .glass-theme .list-group-transparent::before,
+  .glass-theme .hz-chips-scroll::before {
+    left: 0;
+    margin-right: calc(-1 * (var(--hz-chips-arrow-size) + var(--hz-chips-gap)));
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c2334' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'/%3E%3C/svg%3E");
+  }
+
+  .glass-theme .list-group-transparent::after,
+  .glass-theme .hz-chips-scroll::after {
+    right: 0;
+    margin-left: calc(-1 * (var(--hz-chips-arrow-size) + var(--hz-chips-gap)));
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c2334' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'/%3E%3C/svg%3E");
+  }
+
+  .glass-theme .list-group-transparent.hz-chips-overflow-left::before,
+  .glass-theme .hz-chips-scroll.hz-chips-overflow-left::before,
+  .glass-theme .list-group-transparent.hz-chips-overflow-right::after,
+  .glass-theme .hz-chips-scroll.hz-chips-overflow-right::after {
     opacity: 1;
   }
 }
