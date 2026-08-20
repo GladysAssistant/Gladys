@@ -90,16 +90,12 @@ const HistoryPage = ({ intl, user, ...props }) => {
   return (
     <div class="page">
       {/* The activity feed lives on the same Horizon glass surface as the
-          dashboard: same theme gate, same default scene */}
-      <div
-        class={cx(
-          'page-main',
-          'glass-theme',
-          style.historyPage,
-          dashboardStyle.dashboardBackground,
-          dashboardStyle.glassScene
-        )}
-      >
+          dashboard: same theme gate, same default scene. The scene is painted
+          on a dedicated fixed layer (not background-attachment: fixed, which
+          forces a main-thread repaint of the gradient on every scroll frame —
+          visible flicker when scrolling the feed fast). */}
+      <div class={cx('page-main', 'glass-theme', style.historyPage)}>
+        <div class={cx(style.sceneLayer, dashboardStyle.glassScene)} aria-hidden="true" />
         <div class="my-3 my-md-5">
           <div class="container">
             <div class={cx('page-header', style.pageHeader)}>
