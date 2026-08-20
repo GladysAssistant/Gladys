@@ -292,7 +292,6 @@
   "dashboard": {
     "title": "Tableau de bord",
     "editDashboardButton": "Éditer",
-    "newDashboardButton": "Nouveau",
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
@@ -313,9 +312,6 @@
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Éditer le tableau de bord",
-    "emptyDashboardSentenceTop": "Votre tableau de bord n'est pas encore configuré.",
-    "emptyDashboardSentenceBottom": "Cliquez sur le bouton \"Éditer\" pour le compléter.",
-    "noDashboardSentenceBottom": "Cliquez sur le bouton \"Nouveau\" pour créer un tableau de bord.",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
     "editDashboardVisibility": "Visibilité",
@@ -815,6 +811,21 @@
     "widths": {
       "standard": "Standard (recommandé)",
       "full": "Pleine largeur"
+    },
+    "getStarted": {
+      "title": "Bienvenue chez vous !",
+      "subtitle": "Encore quelques étapes et votre maison prend vie.",
+      "progress": "{{done}} sur {{total}}",
+      "devicesTitle": "Connectez vos appareils",
+      "devicesText": "Parcourez les intégrations : Zigbee, Matter, MQTT, caméras… des milliers d'appareils compatibles.",
+      "dashboardCreateTitle": "Créez votre tableau de bord",
+      "dashboardCreateText": "Composez la vue de votre maison : température, lumières, caméras, météo…",
+      "dashboardFillTitle": "Ajoutez vos premiers widgets",
+      "dashboardFillText": "Ce tableau de bord est vide : ouvrez l'éditeur et composez la vue de votre maison.",
+      "scenesTitle": "Automatisez avec les scènes",
+      "scenesText": "Lumières au coucher du soleil, routines du matin : votre maison agit pour vous.",
+      "usersTitle": "Invitez votre foyer",
+      "usersText": "Créez un compte pour chaque membre de la famille."
     }
   },
   "newDashboard": {

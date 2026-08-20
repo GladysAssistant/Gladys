@@ -292,7 +292,6 @@
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Bearbeiten",
-    "newDashboardButton": "Hinzufügen",
     "enableFullScreen": "Vollbild",
     "disableFullScreen": "Vollbild beenden",
     "editDashboardTitle": "Dashboard bearbeiten",
@@ -313,9 +312,6 @@
     "editDashboardSaveButton": "Sichern",
     "editDashboardSavedButton": "Gesichert",
     "editDashboardDoneButton": "Fertig",
-    "emptyDashboardSentenceTop": "Dein Dashboard wurde noch nicht konfiguriert.",
-    "emptyDashboardSentenceBottom": "Klicke auf \"Bearbeiten\", um dein Dashboard zu gestalten.",
-    "noDashboardSentenceBottom": "Klicke auf \"Hinzufügen\", um ein neues Dashboard zu erstellen.",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Sichtbarkeit",
@@ -815,6 +811,21 @@
     "widths": {
       "standard": "Standard (empfohlen)",
       "full": "Volle Breite"
+    },
+    "getStarted": {
+      "title": "Willkommen zu Hause!",
+      "subtitle": "Noch ein paar Schritte und dein Zuhause erwacht zum Leben.",
+      "progress": "{{done}} von {{total}}",
+      "devicesTitle": "Verbinde deine Geräte",
+      "devicesText": "Entdecke die Integrationen: Zigbee, Matter, MQTT, Kameras … Tausende kompatible Geräte.",
+      "dashboardCreateTitle": "Erstelle dein Dashboard",
+      "dashboardCreateText": "Gestalte die Ansicht deines Zuhauses: Temperatur, Licht, Kameras, Wetter …",
+      "dashboardFillTitle": "Füge deine ersten Widgets hinzu",
+      "dashboardFillText": "Dieses Dashboard ist leer: Öffne den Editor und gestalte die Ansicht deines Zuhauses.",
+      "scenesTitle": "Automatisiere mit Szenen",
+      "scenesText": "Licht bei Sonnenuntergang, Morgenroutinen: Dein Zuhause handelt für dich.",
+      "usersTitle": "Lade deinen Haushalt ein",
+      "usersText": "Erstelle ein Konto für jedes Familienmitglied."
     }
   },
   "newDashboard": {

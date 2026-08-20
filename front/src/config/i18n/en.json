@@ -292,7 +292,6 @@
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Edit",
-    "newDashboardButton": "New",
     "enableFullScreen": "Full screen",
     "disableFullScreen": "Exit full screen",
     "editDashboardTitle": "Edit dashboard",
@@ -313,9 +312,6 @@
     "editDashboardSaveButton": "Save",
     "editDashboardSavedButton": "Saved",
     "editDashboardDoneButton": "Done",
-    "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
-    "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
-    "noDashboardSentenceBottom": "Click on the \"New\" button to create a new dashboard",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Visibility",
@@ -815,6 +811,21 @@
     "widths": {
       "standard": "Standard (recommended)",
       "full": "Full width"
+    },
+    "getStarted": {
+      "title": "Welcome home!",
+      "subtitle": "A few steps and your home comes to life.",
+      "progress": "{{done}} of {{total}}",
+      "devicesTitle": "Connect your devices",
+      "devicesText": "Browse the integrations: Zigbee, Matter, MQTT, cameras… thousands of compatible devices.",
+      "dashboardCreateTitle": "Create your dashboard",
+      "dashboardCreateText": "Compose your home's view: temperature, lights, cameras, weather…",
+      "dashboardFillTitle": "Add your first widgets",
+      "dashboardFillText": "This dashboard is empty: open the editor and compose your home's view.",
+      "scenesTitle": "Automate with scenes",
+      "scenesText": "Lights at sunset, morning routines: your home acts for you.",
+      "usersTitle": "Invite your household",
+      "usersText": "Create an account for everyone in the family."
     }
   },
   "newDashboard": {
