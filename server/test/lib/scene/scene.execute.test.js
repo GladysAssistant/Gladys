@@ -2,6 +2,7 @@
 const { assert, fake, createSandbox, match } = require('sinon');
 const EventEmitter = require('events');
 const { expect } = require('chai');
+const db = require('../../../models');
 const { ACTIONS, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
@@ -19,6 +20,7 @@ describe('scene.execute', () => {
     brain.addNamedEntity = fake.returns(null);
     brain.removeNamedEntity = fake.returns(null);
     device.setValue = fake.resolves(null);
+    sandbox.stub(db.Scene, 'update').resolves([1]);
     stateManager = new StateManager(event);
     sceneManager = new SceneManager(stateManager, event, device, {}, {}, {}, {}, {}, {}, {}, brain);
   });
@@ -46,6 +48,41 @@ describe('scene.execute', () => {
       sceneManager.queue.start(() => {
         try {
           assert.calledOnce(device.setValue);
+          assert.calledOnceWithExactly(
+            db.Scene.update,
+            { last_executed: sceneManager.scenes['my-scene'].last_executed },
+            { where: { selector: 'my-scene' } },
+          );
+          expect(sceneManager.scenes['my-scene'].last_executed).to.be.an.instanceOf(Date);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute the scene when updating last_executed fails', async () => {
+    db.Scene.update.rejects(new Error('Database unavailable'));
+    const scene = {
+      selector: 'my-scene',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+    };
+    await sceneManager.addScene(scene);
+    sceneManager.execute('my-scene');
+
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          expect(sceneManager.scenes['my-scene'].last_executed).to.equal(undefined);
           resolve();
         } catch (e) {
           reject(e);

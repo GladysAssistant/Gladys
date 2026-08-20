@@ -1,4 +1,5 @@
 const uuid = require('uuid');
+const db = require('../../models');
 const executeActionsFactory = require('./scene.executeActions');
 const actionsFunc = require('./scene.actions');
 const logger = require('../../utils/logger');
@@ -36,6 +37,12 @@ function execute(sceneSelector, scope = {}) {
         icon: scene.icon,
         startedAt: new Date(),
       };
+      try {
+        await db.Scene.update({ last_executed: runningScene.startedAt }, { where: { selector: sceneSelector } });
+        scene.last_executed = runningScene.startedAt;
+      } catch (e) {
+        logger.warn(e);
+      }
       // Controller used to abort this execution (e.g. a manual "stop").
       // The signal is passed through the scope so abortable actions (like
       // the "delay" action) can react to it. The scope is not copied: callers
