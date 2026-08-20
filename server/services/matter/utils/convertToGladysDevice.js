@@ -472,23 +472,17 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: 1000000,
           });
         }
-      } else if (clusterIndex === HepaFilterMonitoring.Complete.id) {
+      } else if (
+        clusterIndex === HepaFilterMonitoring.Complete.id ||
+        clusterIndex === ActivatedCarbonFilterMonitoring.Complete.id
+      ) {
+        // Both filter monitoring clusters report the same quantity, so they share the same Gladys
+        // type. The cluster name in the feature name and the cluster id in the external id are what
+        // tell the HEPA cartridge apart from the activated carbon one.
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING,
           type: DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING,
-          read_only: true,
-          has_feedback: true,
-          unit: DEVICE_FEATURE_UNITS.PERCENT,
-          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
-          min: 0,
-          max: 100,
-        });
-      } else if (clusterIndex === ActivatedCarbonFilterMonitoring.Complete.id) {
-        gladysDevice.features.push({
-          ...commonNewFeature,
-          category: DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING,
-          type: DEVICE_FEATURE_TYPES.FILTER_MONITORING.ACTIVATED_CARBON_FILTER_LIFE_REMAINING,
           read_only: true,
           has_feedback: true,
           unit: DEVICE_FEATURE_UNITS.PERCENT,

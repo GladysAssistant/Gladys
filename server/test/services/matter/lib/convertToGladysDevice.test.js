@@ -480,7 +480,7 @@ describe('Matter.convertToGladysDevice', () => {
       name: 'ActivatedCarbonFilterMonitoring - 1',
       selector: gladysDevice.features[0].selector,
       category: 'hepa-filter-monitoring',
-      type: 'activated-carbon-filter-life-remaining',
+      type: 'filter-life-remaining',
       read_only: true,
       has_feedback: true,
       unit: 'percent',
@@ -490,7 +490,7 @@ describe('Matter.convertToGladysDevice', () => {
     });
   });
 
-  it('should create one distinct feature per filter media when both filter clusters are present', async () => {
+  it('should create one distinct feature per filter cluster when both filter clusters are present', async () => {
     const hepaClusterClient = {
       id: HepaFilterMonitoring.Complete.id,
       name: 'HepaFilterMonitoring',
@@ -514,7 +514,11 @@ describe('Matter.convertToGladysDevice', () => {
     expect(gladysDevice.features).to.have.lengthOf(2);
     expect(gladysDevice.features.map((feature) => feature.type)).to.deep.equal([
       'filter-life-remaining',
-      'activated-carbon-filter-life-remaining',
+      'filter-life-remaining',
+    ]);
+    expect(gladysDevice.features.map((feature) => feature.name)).to.deep.equal([
+      'HepaFilterMonitoring - 1',
+      'ActivatedCarbonFilterMonitoring - 1',
     ]);
     expect(gladysDevice.features.map((feature) => feature.external_id)).to.deep.equal([
       `matter:12345:1:${HepaFilterMonitoring.Complete.id}`,

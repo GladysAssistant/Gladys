@@ -5567,9 +5567,8 @@
       "wind-setting": "Mode vent"
     },
     "hepa-filter-monitoring": {
-      "shortCategoryName": "Surveillance des filtres",
-      "filter-life-remaining": "Durée de vie restante du filtre HEPA",
-      "activated-carbon-filter-life-remaining": "Durée de vie restante du filtre à charbon actif"
+      "shortCategoryName": "Surveillance filtre HEPA",
+      "filter-life-remaining": "Durée de vie restante du filtre"
     },
     "maintenance": {
       "shortCategoryName": "Maintenance",
