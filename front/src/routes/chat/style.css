@@ -709,6 +709,25 @@
   }
 }
 
+/* Coarse pointers: joining the theme also pulls in its touch-target floor
+   (`.glass-theme .card .btn { min-height: 2.75rem }`), which stretches the
+   36px send circle into an ellipse taller than the input it sits in. Grow the
+   whole control to that same 44px floor so it stays round, and give the input
+   the height and right gutter to hold it. Placed after the width-based block
+   above: on a phone both queries match and this one must win. */
+@media (pointer: coarse) {
+  .sendButton {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  /* 44px button + an 8px gap above and below it */
+  .chatInput {
+    min-height: 3.75rem;
+    padding-right: 3.75rem;
+  }
+}
+
 /* ==================================================================
    Dark mode: the app darkens through the global inversion filter
    (style/dark-mode.css) and this file is authored light-only, like the
