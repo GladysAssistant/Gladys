@@ -4,14 +4,79 @@
   }
 }
 
+/* Horizon: the sort select and search input join the frosted pill family
+   of the page controls (scoped to this header, the theme only pills .btn) */
+.pageHeaderResponsive :global(.form-control) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  background-color: var(--gl-card-bg, rgba(255, 255, 255, 0.52));
+}
+
+/* Horizon: the scene card's edit button matches the soft pill family of
+   its green start neighbour, in the accent tint */
+.sceneCardFooter :global(.btn-outline-primary) {
+  background-color: var(--gl-icon-tint-bg, #e3ebfb);
+  border: none;
+  color: var(--gl-accent, #3d6df0);
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.35rem 1rem;
+}
+
+.sceneCardFooter :global(.btn-outline-primary:hover) {
+  background-color: #d3e2f8;
+  color: var(--gl-accent, #3d6df0);
+}
+
 .disabledSceneRow {
   color: #868e96 !important;
 }
 
-.scene_icon {
-  font-size: 4rem !important;
-  margin: 0;
-  color: #9aa0ac !important;
+/* Horizon: the scene icon sits in a tinted rounded tile, like the icon
+   squares of the dashboard scene widget */
+.sceneCardIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 0.75rem;
+  border-radius: 14px;
+  background-color: var(--gl-icon-tint-bg, #e3ebfb);
+  color: var(--gl-accent, #3d6df0);
+  font-size: 1.35rem;
+}
+
+/* Horizon: on small screens each scene is its own translucent pill row */
+.sceneMobileList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sceneMobileRow {
+  background-color: var(--gl-card-nested-bg, rgba(255, 255, 255, 0.4));
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  border-radius: 16px;
+  box-shadow: var(--gl-shadow-soft, 0 4px 16px rgba(44, 62, 118, 0.09));
+  padding: 0.65rem 0.75rem;
+}
+
+/* Rows are links, but their text keeps the theme ink, not the link accent */
+.sceneMobileRow a {
+  color: inherit;
+}
+
+.sceneRowIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  background-color: var(--gl-icon-tint-bg, #e3ebfb);
+  color: var(--gl-accent, #3d6df0);
+  font-size: 1.05rem;
 }
 
 .sceneListContainer {

@@ -93,13 +93,12 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
     <div class="col">
       <div
         ref={ref}
-        class={cx('card user-select-none', style.parallelBlock, {
+        class={cx('card user-select-none', style.stepCard, style.parallelBlock, {
           [style.dropZoneActive]: isActive,
           [style.dropZoneDragging]: isDragging
         })}
       >
-        <div class="card-status card-status-left bg-blue" />
-        <div ref={drag} class="card-header cursor-pointer">
+        <div ref={drag} class={cx('card-header cursor-pointer', style.stepCardHeader)}>
           <span class={cx(style.stepIconTile, style.typePickerIconBlue)}>
             <i class="fe fe-git-merge" />
           </span>

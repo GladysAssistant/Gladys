@@ -384,3 +384,179 @@
   color: #9aa0ac;
   padding: 1.5rem 0;
 }
+
+/* ==================================================================
+   Horizon glass adjustments. The editor always renders on the glass
+   scene (page-level .glass-theme, like the dashboard), these rules
+   tune the editor chrome to the theme's grammar. Light colors only:
+   dark mode comes from the app-wide inversion filter.
+   ================================================================== */
+
+/* Steps are lighter than dashboard widget cards: medium radius, soft
+   shadow, so the vertical flow keeps its rhythm */
+:global(.glass-theme) .stepCard {
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow-soft);
+}
+
+/* The glass theme makes card headers hug their title (no bottom padding),
+   but a collapsed step is its header alone: restore balanced padding */
+:global(.glass-theme) :global(.card-header).stepCardHeader {
+  padding: 0.7rem 1rem;
+}
+
+/* Header controls become quiet frosted pills, like the dashboard's
+   page controls. dark-mode.css paints .btn-secondary with a solid
+   background, hence the counter-weight */
+:global(.glass-theme) .backButton,
+:global(.glass-theme) .headerActionBtn,
+:global(.dark-mode .glass-theme) .backButton {
+  border: 1px solid var(--gl-border) !important;
+  background: var(--gl-card-bg) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--gl-ink);
+  font-weight: 600;
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.glass-theme) .headerActionBtn {
+  border-radius: 999px;
+}
+
+:global(.glass-theme) .sceneIconTile {
+  background-color: var(--gl-icon-tint-bg);
+  color: var(--gl-accent);
+}
+
+/* The "add a trigger" button joins the soft accent pill family */
+:global(.glass-theme) :global(.btn-outline-primary).addTriggerButton {
+  background-color: var(--gl-icon-tint-bg);
+  border: none;
+  color: var(--gl-accent);
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+:global(.glass-theme) :global(.btn-outline-primary).addTriggerButton:hover {
+  background-color: #d3e2f8;
+  color: var(--gl-accent);
+}
+
+/* Section titles: "Then" follows the theme accent */
+:global(.glass-theme) .sectionTitleThen {
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .sectionSubtitle {
+  color: var(--gl-muted);
+}
+
+/* The "add a step" button is a dashed frosted pill on the scene */
+:global(.glass-theme) .addStepButton {
+  border: 1.5px dashed rgba(61, 109, 240, 0.45);
+  border-radius: var(--gl-radius-md);
+  background-color: rgba(255, 255, 255, 0.35);
+  color: var(--gl-accent);
+  font-weight: 600;
+}
+
+:global(.glass-theme) .addStepButton:hover,
+:global(.glass-theme) .addStepButton:focus {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-color: var(--gl-accent);
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .stepInsertButton {
+  background: var(--gl-surface-strong);
+  border-color: var(--gl-border);
+  color: var(--gl-muted);
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.glass-theme) .stepInsertButton:hover,
+:global(.glass-theme) .stepInsertButton:focus {
+  color: var(--gl-accent);
+  border-color: var(--gl-accent);
+}
+
+:global(.glass-theme) .orSeparator::before,
+:global(.glass-theme) .orSeparator::after {
+  background-color: rgba(28, 35, 52, 0.12);
+}
+
+:global(.glass-theme) .typePickerOption:hover,
+:global(.glass-theme) .typePickerOption:focus {
+  background-color: rgba(28, 35, 52, 0.06);
+}
+
+/* Sticky footer: frosted bar, pill buttons with a real hierarchy —
+   Save as the solid ink CTA, Start as a soft accent pill, Duplicate
+   and Cancel as quiet neutrals, Delete as the soft red of the stamp
+   family (same grammar as the dashboard editor footer) */
+:global(.glass-theme) .editFooter {
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+:global(.glass-theme) .editFooter :global(.btn) {
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+}
+
+:global(.glass-theme) .editFooter :global(.btn-success) {
+  background-color: var(--gl-ink);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-success:hover) {
+  background-color: #2a3550;
+  color: #fff;
+}
+
+:global(.glass-theme) .editFooter :global(.btn-primary) {
+  background-color: var(--gl-icon-tint-bg);
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-primary:hover) {
+  background-color: #d3e2f8;
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-outline-primary),
+:global(.glass-theme) .editFooter :global(.btn-outline-secondary) {
+  background-color: rgba(28, 35, 52, 0.07);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-outline-primary:hover),
+:global(.glass-theme) .editFooter :global(.btn-outline-secondary:hover) {
+  background-color: rgba(28, 35, 52, 0.13);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-outline-danger) {
+  background-color: #fbe3de;
+  color: #d4593f;
+}
+
+:global(.glass-theme) .editFooter :global(.btn-outline-danger:hover) {
+  background-color: #f6d2ca;
+  color: #c24a33;
+}
+
+/* These pills must invert with the theme in dark mode, not keep their
+   authored colors through the double-inversion list of dark-mode.css */
+:global(.dark-mode .glass-theme) .editFooter :global(.btn-success),
+:global(.dark-mode .glass-theme) .editFooter :global(.btn-primary),
+:global(.dark-mode .glass-theme) .editFooter :global(.btn-outline-primary),
+:global(.dark-mode .glass-theme) .editFooter :global(.btn-outline-danger) {
+  filter: none;
+}

@@ -5,7 +5,7 @@ import RunningStopButton from '../RunningStopButton';
 import style from './style.css';
 
 const EditActions = props => (
-  <div class="fixed-bottom footer">
+  <div class={cx('fixed-bottom footer', style.editFooter)}>
     <div class="container">
       {props.askDeleteScene ? (
         <div class="row align-items-center">

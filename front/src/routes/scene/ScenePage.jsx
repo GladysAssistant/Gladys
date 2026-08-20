@@ -6,11 +6,14 @@ import CardFilter from '../../components/layout/CardFilter';
 import SceneCards from './SceneCards';
 import EmptyState from './EmptyState';
 import style from './style.css';
+import dashboardStyle from '../dashboard/style.css';
+import { getBackgroundSceneClass } from '../dashboard/backgroundScenes';
 import SceneTagFilter from './SceneTagFilter';
 
 const ScenePage = ({ children, ...props }) => (
   <div class="page">
-    <div class="page-main">
+    {/* The scene pages live on the same Horizon glass scene as the dashboard */}
+    <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, getBackgroundSceneClass())}>
       <div class="my-3 my-md-5">
         <div class="container">
           <div class={cx('page-header', style.pageHeaderResponsive)}>

@@ -7,7 +7,6 @@ import style from './style.css';
 const TriggerGroup = ({ children, ...props }) => (
   <div class="col">
     <div class="card">
-      <div class="card-status bg-green" />
       <div class="card-header">
         <h4 class="text-center card-title ">
           <Text id="editScene.triggersTitle" />
@@ -15,7 +14,7 @@ const TriggerGroup = ({ children, ...props }) => (
         <div class="card-options">
           <Localizer>
             <button
-              class="btn btn-outline-primary"
+              class={cx('btn btn-outline-primary', style.addTriggerButton)}
               onClick={props.addTrigger}
               aria-label={<Text id="editScene.addNewTriggerButton" />}
             >

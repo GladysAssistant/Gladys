@@ -8,7 +8,6 @@ const Settings = ({ children, ...props }) => {
   return (
     <div class="col">
       <div class="card">
-        <div class="card-status bg-green" />
         <div class="card-header">
           <i class="fe fe-settings mr-2" />
           <h4 class="text-center card-title ">

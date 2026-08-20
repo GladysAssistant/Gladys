@@ -153,7 +153,7 @@ const ActionCard = ({ children, ...props }) => {
     <div class="col-12">
       <div
         ref={ref}
-        class={cx('card user-select-none', {
+        class={cx('card user-select-none', style.stepCard, {
           [style.dropZoneActive]: isActive,
           [style.dropZoneDragging]: isDragging
         })}

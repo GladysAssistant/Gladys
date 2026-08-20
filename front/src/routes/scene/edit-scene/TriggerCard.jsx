@@ -46,8 +46,8 @@ const TriggerCard = ({ children, ...props }) => {
   const summary = !expanded ? getTriggerSummary(props.trigger, props.intl.dictionary) : null;
 
   return (
-    <div class="card user-select-none">
-      <div class="card-header">
+    <div class={cx('card user-select-none', style.stepCard)}>
+      <div class={cx('card-header', style.stepCardHeader)}>
         <span
           class={cx(style.stepIconTile, style[COLOR_CLASS[TRIGGER_COLOR[props.trigger.type]] || 'typePickerIconGray'])}
         >

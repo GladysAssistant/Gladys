@@ -8,6 +8,8 @@ import TriggerGroup from './TriggerGroup';
 import style from './style.css';
 import Settings from './Settings';
 import EditActions from './EditActions';
+import dashboardStyle from '../../dashboard/style.css';
+import { getBackgroundSceneClass } from '../../dashboard/backgroundScenes';
 import { Localizer, Text } from 'preact-i18n';
 
 const EditScenePage = ({ children, ...props }) => {
@@ -26,7 +28,8 @@ const EditScenePage = ({ children, ...props }) => {
 
   return (
     <div class="page">
-      <div class="page-main">
+      {/* The scene editor lives on the same Horizon glass scene as the dashboard */}
+      <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, getBackgroundSceneClass())}>
         <div class="my-3 my-md-5">
           <AutoScrollMobile position="top" box_type={props.actionsGroupTypes} />
           <div class={cx('container', style.pageContainer)}>
