@@ -7,14 +7,17 @@ import SceneCards from './SceneCards';
 import EmptyState from './EmptyState';
 import style from './style.css';
 import dashboardStyle from '../dashboard/style.css';
-import { getBackgroundSceneClass } from '../dashboard/backgroundScenes';
 import SceneTagFilter from './SceneTagFilter';
 
 const ScenePage = ({ children, ...props }) => (
   <div class="page">
-    {/* The scene pages live on the same Horizon glass scene as the dashboard */}
-    <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, getBackgroundSceneClass())}>
-      <div class="my-3 my-md-5">
+    {/* The scene pages live on the same Horizon glass scene as the dashboard.
+        The scene list has no per-page appearance, so it takes the default
+        scene directly instead of going through getBackgroundSceneClass */}
+    <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
+      {/* padding, not margin: a top margin collapses through the glass
+          page-main and shifts the scene down */}
+      <div class="py-3 py-md-5">
         <div class="container">
           <div class={cx('page-header', style.pageHeaderResponsive)}>
             <h1 class="page-title">

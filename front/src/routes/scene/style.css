@@ -10,6 +10,22 @@
   border-radius: 999px;
   border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
   background-color: var(--gl-card-bg, rgba(255, 255, 255, 0.52));
+  color: var(--gl-ink);
+}
+
+/* dark-mode.css paints inputs and selects with solid !important backgrounds
+   and double-inverts them back to their light look: under glass they are
+   frosted pills that must invert WITH the theme, like every other glass
+   surface (same counter-weight as the devices page controls) */
+:global(.dark-mode) .pageHeaderResponsive :global(.form-control) {
+  background-color: var(--gl-card-bg) !important;
+  color: var(--gl-ink) !important;
+  border-color: var(--gl-border) !important;
+  filter: none;
+}
+
+:global(.dark-mode) .pageHeaderResponsive :global(.form-control)::placeholder {
+  color: var(--gl-muted) !important;
 }
 
 /* Horizon: the scene card's edit button matches the soft pill family of

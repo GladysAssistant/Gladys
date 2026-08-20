@@ -9,7 +9,6 @@ import style from './style.css';
 import Settings from './Settings';
 import EditActions from './EditActions';
 import dashboardStyle from '../../dashboard/style.css';
-import { getBackgroundSceneClass } from '../../dashboard/backgroundScenes';
 import { Localizer, Text } from 'preact-i18n';
 
 const EditScenePage = ({ children, ...props }) => {
@@ -28,9 +27,13 @@ const EditScenePage = ({ children, ...props }) => {
 
   return (
     <div class="page">
-      {/* The scene editor lives on the same Horizon glass scene as the dashboard */}
-      <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, getBackgroundSceneClass())}>
-        <div class="my-3 my-md-5">
+      {/* The scene editor lives on the same Horizon glass scene as the dashboard.
+          It has no per-page appearance, so it takes the default scene directly
+          instead of going through getBackgroundSceneClass */}
+      <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
+        {/* padding, not margin: a top margin collapses through the glass
+            page-main and shifts the scene down */}
+        <div class="py-3 py-md-5">
           <AutoScrollMobile position="top" box_type={props.actionsGroupTypes} />
           <div class={cx('container', style.pageContainer)}>
             <div class="mb-4">

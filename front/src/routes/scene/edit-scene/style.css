@@ -495,8 +495,11 @@
    Save as the solid ink CTA, Start as a soft accent pill, Duplicate
    and Cancel as quiet neutrals, Delete as the soft red of the stamp
    family (same grammar as the dashboard editor footer) */
-:global(.glass-theme) .editFooter {
-  background-color: rgba(255, 255, 255, 0.72);
+/* dark-mode.css paints .fixed-bottom with a solid !important background,
+   which would mask the frosted bar: the glass must invert WITH the theme */
+:global(.glass-theme) .editFooter,
+:global(.dark-mode .glass-theme) .editFooter {
+  background-color: rgba(255, 255, 255, 0.72) !important;
   backdrop-filter: blur(26px) saturate(1.5);
   -webkit-backdrop-filter: blur(26px) saturate(1.5);
   border-top: 1px solid rgba(28, 35, 52, 0.08);
@@ -559,4 +562,59 @@
 :global(.dark-mode .glass-theme) .editFooter :global(.btn-outline-primary),
 :global(.dark-mode .glass-theme) .editFooter :global(.btn-outline-danger) {
   filter: none;
+}
+
+/* The editor is full of forms (step and trigger parameters): they join the
+   theme's soft rounded field grammar instead of staying hard Tabler white
+   on the glass, scoped to the editor container. Same declension as the
+   settings pages, on the nested-card surface of an expanded step. */
+:global(.glass-theme) .pageContainer :global(.form-control),
+:global(.glass-theme) .pageContainer :global(.custom-select) {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.75);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .pageContainer :global(.form-control:focus),
+:global(.glass-theme) .pageContainer :global(.custom-select:focus) {
+  border-color: var(--gl-accent);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
+}
+
+/* react-select (devices, houses, users…) joins the same family */
+:global(.glass-theme) .pageContainer :global(.react-select__control) {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+:global(.glass-theme) .pageContainer :global(.react-select__control--is-focused) {
+  border-color: var(--gl-accent);
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
+}
+
+:global(.glass-theme) .pageContainer :global(.react-select__menu) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Same dark-mode counter-weight as the list controls: dark-mode.css paints
+   fields solid and double-inverts them, they must invert with the theme */
+:global(.dark-mode .glass-theme) .pageContainer :global(.form-control),
+:global(.dark-mode .glass-theme) .pageContainer :global(.custom-select) {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  color: var(--gl-ink) !important;
+  border-color: rgba(28, 35, 52, 0.12) !important;
+  filter: none;
+}
+
+:global(.dark-mode .glass-theme) .pageContainer :global(.form-control)::placeholder {
+  color: var(--gl-muted) !important;
+}
+
+:global(.dark-mode .glass-theme) .pageContainer :global(.react-select__control),
+:global(.dark-mode .glass-theme) .pageContainer :global(.react-select__menu) {
+  background-color: rgba(255, 255, 255, 0.75) !important;
 }
