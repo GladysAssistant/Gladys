@@ -44,8 +44,13 @@
   text-align: center;
 }
 
+/* react-clock inlines width/height (150px): neutralize BOTH and rebuild a
+   square from the container's width with the padding-top trick (all the
+   clock's internals are absolutely positioned, so a 0-height box works) —
+   overriding only the width left the inline height, hence a white oval */
 .reactClock {
-  width: inherit !important;
+  width: 100% !important;
+  height: 0 !important;
   padding-top: 100%;
 }
 
@@ -65,4 +70,25 @@
   font-size: 15px;
   letter-spacing: 0.02em;
   padding-top: 4px;
+}
+
+/* Horizon analog face: a soft frosted disc with ink hands, floating on the
+   card like the other tinted discs of the theme */
+:global(.glass-theme) .analogClock :global(.react-clock) {
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(28, 35, 52, 0.06), 0 6px 18px rgba(28, 35, 52, 0.1);
+}
+
+:global(.glass-theme) .analogClock :global(.react-clock__hand__body),
+:global(.glass-theme) .analogClock :global(.react-clock__mark__body) {
+  background-color: var(--gl-ink);
+}
+
+:global(.glass-theme) .analogSmallText {
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .analogBigText {
+  color: var(--gl-ink);
+  font-weight: 600;
 }

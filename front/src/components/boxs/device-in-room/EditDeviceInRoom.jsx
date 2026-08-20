@@ -103,12 +103,15 @@ class EditDeviceInRoom extends Component {
                 </label>
                 <Select
                   menuPlacement="auto"
+                  menuPortalTarget={document.body}
                   defaultValue={[]}
                   value={selectedDeviceFeaturesOptions}
                   isMulti
                   onChange={this.updateDeviceFeatures}
                   options={deviceOptions}
                   maxMenuHeight={220}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
                 />
               </div>
             )}

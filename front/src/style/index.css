@@ -309,6 +309,18 @@ body {
   opacity: 60%;
 }
 
+/* react-select menus are portaled to <body> (menuPortalTarget) so scroll
+   containers — the widget edit panel above all — can never clip them.
+   !important: react-select puts its own z-index inline on the portal. */
+.react-select__menu-portal {
+  z-index: 1100 !important;
+}
+
+.react-select__menu-portal .react-select__menu {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .humidity-slider {
   width: 100%;
   max-width: 500px;

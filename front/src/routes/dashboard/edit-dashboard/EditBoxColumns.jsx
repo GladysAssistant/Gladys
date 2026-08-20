@@ -136,7 +136,10 @@ const EditBoxColumns = ({ children, ...props }) => (
 
                         {column.length === 0 && (
                           <div class="d-flex justify-content-center mb-4">
-                            <button class="btn btn-primary" onClick={() => props.addBoxAndEdit(x)}>
+                            <button
+                              class={cx('btn btn-primary', style.addWidgetButton)}
+                              onClick={() => props.addBoxAndEdit(x)}
+                            >
                               <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
                             </button>
                           </div>
@@ -167,7 +170,7 @@ const EditBoxColumns = ({ children, ...props }) => (
           );
         })}
       <div class="d-flex justify-content-center mt-4">
-        <button class="btn btn-outline-primary" onClick={props.addSection}>
+        <button class={cx('btn btn-outline-primary', style.addSectionButton)} onClick={props.addSection}>
           <Text id="dashboard.editDashboardAddSectionButton" /> <i class="fe fe-plus" />
         </button>
       </div>

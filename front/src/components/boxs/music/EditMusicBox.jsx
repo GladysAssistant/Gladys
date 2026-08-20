@@ -56,6 +56,7 @@ class EditMusicBoxComponent extends Component {
           </label>
           <Select
             menuPlacement="auto"
+            menuPortalTarget={document.body}
             defaultValue={null}
             value={optionSelected}
             onChange={this.updateDevice}
