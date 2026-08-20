@@ -3,6 +3,7 @@ const {
   SYSTEM_VARIABLE_NAMES,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
   COVER_STATE,
   AI_CHAT_TOOL_CATEGORIES,
   WEATHER_UNITS,
@@ -428,6 +429,16 @@ async function getAllTools(userId) {
     .map((device) => ({
       ...device,
       features: device.features.filter((feature) => this.isWritableSensorFeature(feature, device)),
+    }));
+
+  const batteryDevices = allDevices
+    .filter((device) => {
+      return device.features.some((feature) => this.isBatteryFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      name: device.name,
+      features: device.features.filter((feature) => this.isBatteryFeature(feature)),
     }));
 
   const isEnergyMonitoringFeature = (feature) =>
@@ -1327,6 +1338,198 @@ async function getAllTools(userId) {
             {
               type: 'text',
               text: `sensor.set-state: set ${selectedDevice.name} / ${selectedFeature.name} to ${parsedValue}`,
+            },
+          ],
+        };
+      },
+    });
+  }
+
+  if (batteryDevices.length > 0) {
+    tools.push({
+      intent: 'device.get-battery-levels',
+      config: {
+        title: 'Get battery levels of devices',
+        description:
+          'Get the current battery level, in percent, of the battery powered devices of the home ' +
+          '(sensors, remotes, door sensors and the like, the ones whose batteries are replaced or recharged). ' +
+          'Use it for every question about their batteries: the level of one device, the levels of all of them, ' +
+          'which batteries are low or have to be replaced. ' +
+          'It does not cover the battery of an electric vehicle nor a home energy storage battery, ' +
+          'which are separate device categories. ' +
+          'Call it without any parameter to cover the whole home, or narrow it down with device or room. ' +
+          'Results are sorted from the lowest level to the highest, so the batteries to replace come first. ' +
+          'When warning_threshold is present, it is the battery warning threshold configured in this Gladys, ' +
+          'in percent, and below_warning_threshold tells which levels are under it: use it as the meaning of ' +
+          '"low" and of "to be replaced" instead of deciding yourself. ' +
+          'An entry whose unit is not percent (a battery voltage) carries no below_warning_threshold, ' +
+          'because the threshold is a percentage: report its value with its unit, do not call it low. ' +
+          'Devices that do not report a battery level are never part of the result: they are either mains ' +
+          'powered, or their integration only publishes a low battery alert instead of a level, ' +
+          'so do not report a level for them.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
+        inputSchema: {
+          device: z
+            .enum([...new Set(batteryDevices.map(({ name }) => name))])
+            .describe('Battery powered device name, to get the battery level of this device only.')
+            .optional(),
+          room: z
+            .enum(rooms.map(({ name }) => name))
+            .describe('Room name, to get the battery levels of this room only. Leave empty to cover the whole home.')
+            .optional(),
+        },
+      },
+      cb: async ({ device, room }) => {
+        let selectedDevices = batteryDevices;
+        let scopeLabel = '';
+
+        // Same reasoning as device.get-state: the chat gateway calls this callback with
+        // the raw arguments of the model, which is not bound by the enums above. "État
+        // des piles de la maison" makes it pass the house as a room, and the whole-home
+        // question is precisely the primary one for this tool.
+        if (room && room !== '') {
+          const selectedRoom = this.findBySimilarity(rooms, room);
+
+          if (selectedRoom?.selector) {
+            selectedDevices = selectedDevices.filter(
+              (d) => (d.room?.selector || noRoom.selector) === selectedRoom.selector,
+            );
+            scopeLabel = ` in room "${selectedRoom.name}"`;
+          } else {
+            const selectedHouse = this.findBySimilarity(houses, room);
+
+            if (selectedHouse?.id) {
+              // A house is the whole home, not a room: keep every battery device of its
+              // rooms, plus the devices that are not assigned to a room.
+              const houseRoomSelectors = rooms
+                .filter((r) => r.house_id === selectedHouse.id)
+                .map(({ selector }) => selector);
+              selectedDevices = selectedDevices.filter(
+                (d) => !d.room?.selector || houseRoomSelectors.includes(d.room.selector),
+              );
+              scopeLabel = ` in house "${selectedHouse.name}"`;
+            } else {
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text:
+                      `device.get-battery-levels: "${room}" is not a room of this home, no battery level was read. ` +
+                      // "No room" is the sentinel holding the devices that were never assigned
+                      // to a room, not a room the model should be invited to retry with.
+                      `Available rooms: ${rooms
+                        .filter(({ selector }) => selector !== noRoom.selector)
+                        .map(({ name }) => name)
+                        .join(', ')}. ` +
+                      'Call this tool again with one of them, or without the room parameter to cover the whole home.',
+                  },
+                ],
+              };
+            }
+          }
+        }
+
+        if (device && device !== '') {
+          const selectedDevice = this.findBySimilarity(selectedDevices, device);
+
+          // A device asked for by name and not found must not fall back to the whole
+          // home: the model would then answer with the battery of another device.
+          if (!selectedDevice?.name) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text:
+                    `device.get-battery-levels: no device reporting a battery level matches "${device}"${scopeLabel}. ` +
+                    `Devices reporting a battery level: ${[...new Set(batteryDevices.map(({ name }) => name))].join(
+                      ', ',
+                    )}. ` +
+                    'Do not report a battery level for a device that is absent from this list.',
+                },
+              ],
+            };
+          }
+
+          selectedDevices = [selectedDevice];
+        }
+
+        if (selectedDevices.length === 0) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `device.get-battery-levels: no device reporting a battery level is configured${scopeLabel}. ` +
+                  'No battery level exists for this query, do not report any value.',
+              },
+            ],
+          };
+        }
+
+        // "Which batteries are low" already has an answer in Gladys: the threshold of the
+        // battery warning of this instance, used by device.checkBatteries and the weekly
+        // digest. Surface it so the model does not invent its own meaning of "low".
+        const configuredThreshold = await this.gladys.variable.getValue(
+          SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD,
+        );
+        const warningThreshold = Number.parseFloat(configuredThreshold);
+        const hasWarningThreshold = Number.isFinite(warningThreshold);
+
+        const batteryLevels = [];
+
+        await Promise.all(
+          selectedDevices.map(async (d) => {
+            const deviceLastState = await this.gladys.device.getBySelector(d.selector);
+
+            d.features.forEach((feature) => {
+              const featureLastState = deviceLastState.features.find((feat) => feat.id === feature.id);
+              const formattedValue = this.formatValue(featureLastState);
+
+              batteryLevels.push({
+                room: d.room?.name || noRoom.name,
+                device: d.name,
+                feature: featureLastState.name,
+                category: featureLastState.category,
+                ...formattedValue,
+                // Only a level that exists can be compared to the threshold: a device that
+                // never reported one is neither below nor above it. The threshold is a
+                // percentage, and the battery category accepts any unit at the model level:
+                // a level published in volts, or without a unit, must not be compared to it.
+                ...(hasWarningThreshold &&
+                typeof formattedValue.value === 'number' &&
+                featureLastState.unit === DEVICE_FEATURE_UNITS.PERCENT
+                  ? { below_warning_threshold: formattedValue.value < warningThreshold }
+                  : {}),
+              });
+            });
+          }),
+        );
+
+        // Lowest battery first: what a user asking for the state of every battery of the
+        // home wants is the ones to replace, and a long list is answered from its head.
+        // A device that never reported a level cannot be compared, it goes last.
+        batteryLevels.sort((a, b) => {
+          if (typeof a.value !== 'number' && typeof b.value !== 'number') {
+            return 0;
+          }
+          if (typeof a.value !== 'number') {
+            return 1;
+          }
+          if (typeof b.value !== 'number') {
+            return -1;
+          }
+
+          return a.value - b.value;
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: this.toon({
+                ...(hasWarningThreshold ? { warning_threshold: warningThreshold } : {}),
+                batteries: batteryLevels,
+              }),
             },
           ],
         };

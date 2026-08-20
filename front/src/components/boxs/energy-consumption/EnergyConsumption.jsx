@@ -7,6 +7,14 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent, { DEFAULT_COLORS } from '../chart/ApexChartComponent';
 import { formatHttpError } from '../../../utils/formatErrors';
 import dayjs from 'dayjs';
+import {
+  DEFAULT_ENERGY_PERIOD_START_DAY,
+  parseEnergyPeriodStartDay,
+  getEnergyPeriodStart,
+  getEnergyPeriodStartInCalendarUnit,
+  getNextEnergyPeriodStart,
+  getPreviousEnergyPeriodStart
+} from '../../../../../server/utils/energyPeriod';
 
 import fr from 'date-fns/locale/fr';
 
@@ -16,6 +24,11 @@ const PERIODS = {
   YEAR: 'year',
   MONTH: 'month',
   DAY: 'day'
+};
+
+const getPeriodStartDay = box => {
+  const periodStartDay = parseEnergyPeriodStartDay(box && box.period_start_day);
+  return periodStartDay === null ? DEFAULT_ENERGY_PERIOD_START_DAY : periodStartDay;
 };
 
 const DISPLAY_MODES = {
@@ -104,6 +117,8 @@ class EnergyConsumption extends Component {
       seriesColors: [],
       emptySeries: true,
       selectedPeriod: PERIODS.MONTH,
+      // Any date inside the displayed period: the exact start of the period is
+      // always derived from it and from the billing period start day
       selectedDate: now,
       displayMode: DISPLAY_MODES.CURRENCY,
       currencyUnit: null
@@ -117,7 +132,8 @@ class EnergyConsumption extends Component {
   componentDidUpdate(prevProps) {
     if (
       prevProps.box.device_features !== this.props.box.device_features ||
-      prevProps.box.title !== this.props.box.title
+      prevProps.box.title !== this.props.box.title ||
+      prevProps.box.period_start_day !== this.props.box.period_start_day
     ) {
       this.refreshData();
     }
@@ -143,7 +159,8 @@ class EnergyConsumption extends Component {
         from: startDate.toISOString(),
         to: endDate.toISOString(),
         group_by: this.getGroupBy(),
-        display_mode: this.state.displayMode
+        display_mode: this.state.displayMode,
+        period_start_day: getPeriodStartDay(this.props.box)
       });
 
       let emptySeries = true;
@@ -252,27 +269,17 @@ class EnergyConsumption extends Component {
     }
   };
 
-  getDateRange = () => {
+  getPeriodStart = () => {
     const { selectedPeriod, selectedDate } = this.state;
-    let startDate, endDate;
+    return getEnergyPeriodStart(selectedDate, selectedPeriod, getPeriodStartDay(this.props.box));
+  };
 
-    switch (selectedPeriod) {
-      case PERIODS.YEAR:
-        startDate = new Date(selectedDate.getFullYear(), 0, 1, 0, 0, 0, 0);
-        endDate = new Date(selectedDate.getFullYear() + 1, 0, 1, 0, 0, 0, 0);
-        break;
-      case PERIODS.MONTH:
-        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1, 0, 0, 0, 0);
-        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1, 0, 0, 0, 0);
-        break;
-      case PERIODS.DAY:
-        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 0, 0, 0, 0);
-        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1, 0, 0, 0, 0);
-        break;
-      default:
-        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1, 0, 0, 0, 0);
-        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1, 0, 0, 0, 0);
-    }
+  getDateRange = () => {
+    const { selectedPeriod } = this.state;
+    const periodStartDay = getPeriodStartDay(this.props.box);
+
+    const startDate = this.getPeriodStart();
+    const endDate = getNextEnergyPeriodStart(startDate, selectedPeriod, periodStartDay);
 
     return { startDate, endDate };
   };
@@ -312,45 +319,28 @@ class EnergyConsumption extends Component {
   };
 
   navigatePrevious = () => {
-    const { selectedPeriod, selectedDate } = this.state;
-    let newDate = new Date(selectedDate);
-
-    switch (selectedPeriod) {
-      case PERIODS.YEAR:
-        newDate.setFullYear(selectedDate.getFullYear() - 1);
-        break;
-      case PERIODS.MONTH:
-        newDate.setMonth(selectedDate.getMonth() - 1);
-        break;
-      case PERIODS.DAY:
-        newDate.setDate(selectedDate.getDate() - 1);
-        break;
-    }
+    const { selectedPeriod } = this.state;
+    const periodStartDay = getPeriodStartDay(this.props.box);
+    const newDate = getPreviousEnergyPeriodStart(this.getPeriodStart(), selectedPeriod, periodStartDay);
 
     this.setState({ selectedDate: newDate }, this.refreshData);
   };
 
   navigateNext = () => {
-    const { selectedPeriod, selectedDate } = this.state;
-    let newDate = new Date(selectedDate);
-
-    switch (selectedPeriod) {
-      case PERIODS.YEAR:
-        newDate.setFullYear(selectedDate.getFullYear() + 1);
-        break;
-      case PERIODS.MONTH:
-        newDate.setMonth(selectedDate.getMonth() + 1);
-        break;
-      case PERIODS.DAY:
-        newDate.setDate(selectedDate.getDate() + 1);
-        break;
-    }
+    const { selectedPeriod } = this.state;
+    const periodStartDay = getPeriodStartDay(this.props.box);
+    const newDate = getNextEnergyPeriodStart(this.getPeriodStart(), selectedPeriod, periodStartDay);
 
     this.setState({ selectedDate: newDate }, this.refreshData);
   };
 
   onDateChange = date => {
-    this.setState({ selectedDate: date }, this.refreshData);
+    const periodStartDay = getPeriodStartDay(this.props.box);
+    // The date picker returns a month (or a year): display the billing period starting in it
+    this.setState(
+      { selectedDate: getEnergyPeriodStartInCalendarUnit(date, this.state.selectedPeriod, periodStartDay) },
+      this.refreshData
+    );
   };
 
   changeDisplayMode = mode => {
@@ -411,6 +401,20 @@ class EnergyConsumption extends Component {
     }
   };
 
+  getPeriodRangeLabel = () => {
+    const { startDate, endDate } = this.getDateRange();
+    const from = dayjs(startDate)
+      .locale(this.props.user.language)
+      .format('DD MMM YYYY');
+    // The end date is exclusive (the period stops at midnight on that day): display it as-is and
+    // separate it with an arrow, so the label reads like the bill it is compared with
+    // ("from the 5th to the 5th") instead of looking like a day is missing.
+    const to = dayjs(endDate)
+      .locale(this.props.user.language)
+      .format('DD MMM YYYY');
+    return `${from} → ${to}`;
+  };
+
   getDatePickerView = () => {
     const { selectedPeriod } = this.state;
 
@@ -463,25 +467,18 @@ class EnergyConsumption extends Component {
           </div>
         )}
         <div class="card-body">
-          {/* Period Selection Buttons */}
-          <div class="row mb-3">
-            <div class="col-12">
-              <div class="d-flex justify-content-between">
-                {Object.values(PERIODS).map(period => (
-                  <button
-                    key={period}
-                    type="button"
-                    class={cx('btn flex-fill mx-1', {
-                      'btn-primary': selectedPeriod === period,
-                      'btn-outline-primary': selectedPeriod !== period
-                    })}
-                    onClick={() => this.changePeriod(period)}
-                  >
-                    <Text id={PERIOD_LABELS[period]} />
-                  </button>
-                ))}
-              </div>
-            </div>
+          {/* Period Selection: an iOS-like segmented control */}
+          <div class="btn-group hz-segmented d-flex mb-3" role="group">
+            {Object.values(PERIODS).map(period => (
+              <button
+                key={period}
+                type="button"
+                class={cx('btn flex-fill', { active: selectedPeriod === period })}
+                onClick={() => this.changePeriod(period)}
+              >
+                <Text id={PERIOD_LABELS[period]} />
+              </button>
+            ))}
           </div>
 
           {/* Navigation Controls */}
@@ -495,7 +492,7 @@ class EnergyConsumption extends Component {
                 <div class="flex-fill mx-3">
                   <DatePicker
                     locale={localeSet}
-                    selected={this.state.selectedDate}
+                    selected={this.getPeriodStart()}
                     onChange={this.onDateChange}
                     dateFormat={this.getDateFormat()}
                     showMonthYearPicker={selectedPeriod === PERIODS.MONTH}
@@ -512,25 +509,28 @@ class EnergyConsumption extends Component {
             </div>
           </div>
 
+          {/* Billing period range, only displayed when the period does not start on the 1st */}
+          {getPeriodStartDay(props.box) !== DEFAULT_ENERGY_PERIOD_START_DAY && selectedPeriod !== PERIODS.DAY && (
+            <div class="row mb-2">
+              <div class="col-12 text-center">
+                <small class="text-muted">{this.getPeriodRangeLabel()}</small>
+              </div>
+            </div>
+          )}
+
           {/* Display Mode Toggle */}
-          <div class="row mb-3">
-            <div class="col-12 text-center">
+          <div class="text-center mb-3">
+            <div class="btn-group hz-segmented" role="group">
               <button
                 type="button"
-                class={cx('btn btn-sm mx-1', {
-                  'btn-outline-secondary': displayMode === DISPLAY_MODES.CURRENCY,
-                  'btn-secondary': displayMode !== DISPLAY_MODES.CURRENCY
-                })}
+                class={cx('btn btn-sm', { active: displayMode === DISPLAY_MODES.CURRENCY })}
                 onClick={() => this.changeDisplayMode(DISPLAY_MODES.CURRENCY)}
               >
                 <Text id="dashboard.boxes.energyConsumption.currency" />
               </button>
               <button
                 type="button"
-                class={cx('btn btn-sm mx-1', {
-                  'btn-outline-secondary': displayMode === DISPLAY_MODES.KWH,
-                  'btn-secondary': displayMode !== DISPLAY_MODES.KWH
-                })}
+                class={cx('btn btn-sm', { active: displayMode === DISPLAY_MODES.KWH })}
                 onClick={() => this.changeDisplayMode(DISPLAY_MODES.KWH)}
               >
                 <Text id="dashboard.boxes.energyConsumption.kwh" />
@@ -559,30 +559,20 @@ class EnergyConsumption extends Component {
 
                   {!error && !emptySeries && (
                     <>
-                      <div class="row mb-2">
-                        <div class="col-12">
-                          <div class="card border-0 mb-0">
-                            <div class="card-body text-center py-3">
-                              <div class="d-flex align-items-center justify-content-center">
-                                <div>
-                                  <h5 class="mb-1 text-muted small">
-                                    <Text
-                                      id={
-                                        displayMode === DISPLAY_MODES.CURRENCY
-                                          ? 'dashboard.boxes.energyConsumption.totalConsumptionCost'
-                                          : 'dashboard.boxes.energyConsumption.totalConsumptionKwh'
-                                      }
-                                    />
-                                  </h5>
-                                  <h3 class="mb-0 text-primary font-weight-bold">
-                                    {totalConsumption.toFixed(2)}{' '}
-                                    {displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : 'kWh'}
-                                  </h3>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                      <div class="text-center mb-2">
+                        <h5 class="mb-1 text-muted small">
+                          <Text
+                            id={
+                              displayMode === DISPLAY_MODES.CURRENCY
+                                ? 'dashboard.boxes.energyConsumption.totalConsumptionCost'
+                                : 'dashboard.boxes.energyConsumption.totalConsumptionKwh'
+                            }
+                          />
+                        </h5>
+                        <h3 class="mb-0 font-weight-bold">
+                          {totalConsumption.toFixed(2)}{' '}
+                          {displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : 'kWh'}
+                        </h3>
                       </div>
                       <ApexChartComponent
                         user={this.props.user}
