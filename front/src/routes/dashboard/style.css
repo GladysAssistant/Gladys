@@ -628,6 +628,18 @@
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
   }
 
+  /* That spacer belongs to the dock, not to the wallpaper: the class is also
+     the scene of the editor, the creation page and the integration pages,
+     none of which render the dock — there it was a blank band under the last
+     card. Reclaimed in the negative form on purpose: a browser without :has()
+     (old wall tablets) drops this rule and keeps the spacer everywhere, which
+     costs those pages a band but never lets the dock cover the last dashboard
+     row. Both other users of the class bring their own bottom clearance
+     (largeContainer's 150px, containerWithMargin's 3rem). */
+  .dashboardBackground:not(:has(.dashboardHeader)) {
+    padding-bottom: 0;
+  }
+
   /* the "…" menu opens upward from the dock */
   .dashboardTabsMenu {
     top: auto;

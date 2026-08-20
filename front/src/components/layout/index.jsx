@@ -24,6 +24,8 @@ const CHIPS_OVERFLOW_RIGHT_CLASS = 'hz-chips-overflow-right';
 // arrow lit on a side that is in fact reached
 const CHIPS_SCROLL_EPSILON = 2;
 
+const isIntegrationPage = (currentUrl = '') => currentUrl.startsWith(INTEGRATION_URL_PREFIX);
+
 const notMainPages = currentUrl => {
   const found = NOT_MAIN_PAGES.find(page => {
     return currentUrl.startsWith(page);
@@ -91,7 +93,15 @@ class Layout extends Component {
     this.updateChipsOverflow();
   };
 
-  componentDidMount() {
+  // Only the integration pages have chips rows, and this watches the whole
+  // app shell (the wrapper holds the nav rail and every route): left running
+  // everywhere it would re-scan the page on each dashboard-widget or
+  // scene-editor mutation, which a Raspberry Pi does not need to pay for.
+  startWatchingChips() {
+    if (this.watchingChips) {
+      return;
+    }
+    this.watchingChips = true;
     this.pageElement.addEventListener('scroll', this.handleScroll, { capture: true, passive: true });
     window.addEventListener('resize', this.updateChipsOverflow);
     // async route chunks (the catalog) mount without re-rendering the Layout:
@@ -105,21 +115,45 @@ class Layout extends Component {
     this.updateChipsOverflow();
   }
 
-  componentDidUpdate() {
-    this.updateChipsOverflow();
-  }
-
-  componentWillUnmount() {
+  stopWatchingChips() {
+    if (!this.watchingChips) {
+      return;
+    }
+    this.watchingChips = false;
     this.pageElement.removeEventListener('scroll', this.handleScroll, { capture: true });
     window.removeEventListener('resize', this.updateChipsOverflow);
     if (this.chipsObserver) {
       this.chipsObserver.disconnect();
+      this.chipsObserver = null;
     }
+  }
+
+  syncChipsWatcher() {
+    if (isIntegrationPage(this.props.currentUrl)) {
+      this.startWatchingChips();
+    } else {
+      this.stopWatchingChips();
+    }
+  }
+
+  componentDidMount() {
+    this.syncChipsWatcher();
+  }
+
+  componentDidUpdate() {
+    this.syncChipsWatcher();
+    if (this.watchingChips) {
+      this.updateChipsOverflow();
+    }
+  }
+
+  componentWillUnmount() {
+    this.stopWatchingChips();
   }
 
   render({ children, ...props }) {
     const currentUrl = props.currentUrl || '';
-    const integrationPage = currentUrl.startsWith(INTEGRATION_URL_PREFIX);
+    const integrationPage = isIntegrationPage(currentUrl);
     return (
       <div class="page" ref={this.setPageElement}>
         <div
