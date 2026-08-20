@@ -3,6 +3,8 @@ const path = require('path');
 const os = require('os');
 const semver = require('semver');
 
+const { getServerPort } = require('../../utils/getServerPort');
+
 const THERMAL_ZONE_DIR = '/sys/class/thermal';
 const HWMON_DIR = '/sys/class/hwmon';
 
@@ -132,15 +134,19 @@ function readCpuTemperature() {
 const VIRTUAL_INTERFACE_PREFIXES = ['docker', 'veth', 'br-', 'virbr', 'cni', 'flannel', 'vmnet', 'vboxnet'];
 // VPN and overlay interfaces: reachable, but never on the local link mDNS is limited to
 const VPN_INTERFACE_PREFIXES = ['tun', 'tap', 'wg', 'tailscale', 'zt', 'utun', 'ppp'];
+// Docker gives every interface it creates a locally-administered MAC in its own 02:42
+// range: that is how a bridged container "eth0" is told apart from a real network card
+const DOCKER_MAC_PREFIX = '02:42:';
 
 /**
  * @description Tell how usable an IPv4 address is as a LAN address.
  * @param {string} address - The IPv4 address to classify.
+ * @param {string} [mac] - The MAC address of the interface holding it.
  * @returns {number} 0 for a private LAN address, 1 for a Docker bridge one, 2 for a routable one, 3 for CGNAT/APIPA.
  * @example
- * getAddressPriority('192.168.1.10');
+ * getAddressPriority('192.168.1.10', 'dc:a6:32:00:11:22');
  */
-function getAddressPriority(address) {
+function getAddressPriority(address, mac) {
   const parts = address.split('.').map((part) => parseInt(part, 10));
   const [first, second] = parts;
   // link-local (APIPA): the interface has no usable address at all
@@ -151,13 +157,17 @@ function getAddressPriority(address) {
   if (first === 100 && second >= 64 && second <= 127) {
     return 3;
   }
-  // default Docker bridge pool: usable when Gladys runs in a bridged container and has
-  // nothing else, but a real LAN address must always win over it
-  if (first === 172 && second >= 16 && second <= 31) {
+  // an interface created by Docker, or Docker's default bridge subnet: usable when
+  // Gladys runs in a bridged container and has nothing else, but a real LAN address
+  // must always win over it. The rest of 172.16.0.0/12 is left alone: it is regular
+  // RFC 1918 space, and some networks really do use it
+  const isDockerInterface = (mac || '').toLowerCase().startsWith(DOCKER_MAC_PREFIX);
+  if (isDockerInterface || (first === 172 && second === 17)) {
     return 1;
   }
   // RFC 1918 private ranges, what a home network actually uses
-  const isPrivate = first === 10 || (first === 192 && second === 168);
+  const isPrivate =
+    first === 10 || (first === 192 && second === 168) || (first === 172 && second >= 16 && second <= 31);
   return isPrivate ? 0 : 2;
 }
 
@@ -196,7 +206,7 @@ function getLocalIp(networkInterfaces) {
       const isIpV4 = networkInterface.family === 'IPv4' || networkInterface.family === 4;
       if (!networkInterface.internal && isIpV4) {
         candidates.push({
-          addressPriority: getAddressPriority(networkInterface.address),
+          addressPriority: getAddressPriority(networkInterface.address, networkInterface.mac),
           interfacePriority,
           address: networkInterface.address,
         });
@@ -216,6 +226,9 @@ function getLocalIp(networkInterfaces) {
  */
 async function getInfos() {
   const networkInterfaces = os.networkInterfaces();
+  // in a bridged container, the address of the container is not reachable from the
+  // local network: there is no local IP to expose, and nothing is advertised with mDNS
+  const onHostNetwork = await this.isOnHostNetwork();
   const infos = {
     hostname: os.hostname(),
     type: os.type(),
@@ -228,8 +241,8 @@ async function getInfos() {
     freemem: os.freemem(),
     cpus: os.cpus(),
     network_interfaces: networkInterfaces,
-    local_ip: getLocalIp(networkInterfaces),
-    server_port: parseInt(process.env.SERVER_PORT, 10) || 1443,
+    local_ip: onHostNetwork ? getLocalIp(networkInterfaces) : null,
+    server_port: getServerPort(),
     nodejs_version: process.version,
     gladys_version: this.gladysVersion,
     latest_gladys_version: this.latestGladysVersion,

@@ -4092,6 +4092,7 @@
     "mdnsInvalidName": "Ungültiger Name: Verwende nur Kleinbuchstaben, Ziffern und Bindestriche.",
     "mdnsError": "Beim Speichern ist ein Fehler aufgetreten.",
     "mdnsCurrentUrl": "Gladys ist erreichbar unter:",
+    "mdnsNotAdvertised": "Gladys macht sich im lokalen Netzwerk nicht bekannt: Sie läuft in einem Docker-Container im Bridge-Modus oder es wurde keine lokale Netzwerkschnittstelle erkannt.",
     "deviceStateRetentionTime": "Gerätestatusverlauf behalten",
     "deviceStateRetentionTimeDescription": "Lege fest, wie lange Gladys die Status deiner Geräte in der Datenbank aufbewahren soll.",
     "deviceAggregatesStateRetentionTime": "Aggregierte Zustände behalten",

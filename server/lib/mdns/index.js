@@ -8,9 +8,10 @@ const { restart } = require('./mdns.restart');
 const { getRecords } = require('./mdns.getRecords');
 const { handleQuery } = require('./mdns.handleQuery');
 
-const Mdns = function Mdns(variable, event) {
+const Mdns = function Mdns(variable, event, system) {
   this.variable = variable;
   this.event = event;
+  this.system = system;
   /** @type {any} */
   this.mdns = null;
   /** @type {number|null} */
@@ -22,6 +23,8 @@ const Mdns = function Mdns(variable, event) {
   this.announceTimeout = null;
   /** @type {Promise|null} */
   this.restartPromise = null;
+  // a hostname change saved while a restart is already running
+  this.restartPending = false;
   this.event.on(EVENTS.SYSTEM.MDNS_HOSTNAME_CHANGED, eventFunctionWrapper(this.restart.bind(this)));
 };
 

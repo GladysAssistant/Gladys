@@ -15,6 +15,7 @@ describe('mdns', () => {
   let mdnsFake;
   let variable;
   let event;
+  let system;
   let mdns;
 
   const getQueryHandler = () => mdnsFake.on.getCalls().find((call) => call.args[0] === 'query').args[1];
@@ -39,7 +40,8 @@ describe('mdns', () => {
     };
     variable = { getValue: fake.resolves(null) };
     event = { on: fake.returns(null) };
-    mdns = new Mdns(variable, event);
+    system = { isOnHostNetwork: fake.resolves(true) };
+    mdns = new Mdns(variable, event, system);
     const { getRecords } = proxyquire('../../../lib/mdns/mdns.getRecords', {
       '../system/system.getInfos': { getLocalIp: () => state.localIp },
     });
@@ -359,25 +361,100 @@ describe('mdns', () => {
     assert.calledWith(loggerWarnSpy, 'mDNS: unable to send the second announcement');
   });
 
-  it('should serialize concurrent restarts', async () => {
+  it('should never leave two advertisers running when restarts overlap', async () => {
     await mdns.start(1443);
     mdnsFake.destroy.resetHistory();
-    // hold the first stop() open so the second restart starts while it is still pending
-    let releaseDestroy;
-    mdnsFake.destroy = fake((cb) => {
-      releaseDestroy = () => cb();
+    const boundStop = mdns.stop.bind(mdns);
+    const boundStart = mdns.start.bind(mdns);
+    let advertisers = 1;
+    let maxAdvertisers = 1;
+    mdns.stop = async () => {
+      await boundStop();
+      advertisers -= 1;
+    };
+    mdns.start = async (port) => {
+      await boundStart(port);
+      advertisers += 1;
+      maxAdvertisers = Math.max(maxAdvertisers, advertisers);
+    };
+    await Promise.all([mdns.restart(), mdns.restart(), mdns.restart()]);
+    // three hostname changes in a row must never put a second advertiser on the network
+    expect(maxAdvertisers).to.equal(1);
+    // the first restart, then the single coalesced one
+    assert.calledTwice(mdnsFake.destroy);
+  });
+
+  it('should not advertise anything when Gladys runs behind a Docker bridge', async () => {
+    system.isOnHostNetwork = fake.resolves(false);
+    await mdns.start(1443);
+    // the multicast packets would never reach the local network anyway
+    expect(mdns.mdns).to.equal(null);
+    assert.notCalled(variable.getValue);
+    assert.notCalled(mdnsFake.respond);
+  });
+
+  it('should answer the DNS-SD meta-query listing the service types of the network', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    queryHandler({ questions: [{ name: '_services._dns-sd._udp.local', type: 'PTR' }] });
+    queryHandler({ questions: [{ name: '_services._dns-sd._udp.local', type: 'ANY' }] });
+    assert.calledTwice(mdnsFake.respond);
+    mdnsFake.respond.getCalls().forEach((call) => {
+      expect(call.args[0].answers).to.deep.equal([
+        { name: '_services._dns-sd._udp.local', type: 'PTR', ttl: 120, data: '_http._tcp.local' },
+      ]);
     });
+  });
+
+  it('should not build any record for a query about another host', async () => {
+    await mdns.start(1443);
+    const getRecordsSpy = sinon.spy(mdns, 'getRecords');
+    const queryHandler = getQueryHandler();
+    // most mDNS packets of a network are not about Gladys: reading the network
+    // interfaces for each of them would be wasteful
+    queryHandler({ questions: [{ name: 'printer.local', type: 'ANY' }] });
+    assert.notCalled(getRecordsSpy);
+  });
+
+  it('should never send the same record as an answer and as an additional', async () => {
+    await mdns.start(1443);
+    const queryHandler = getQueryHandler();
+    mdnsFake.respond.resetHistory();
+    queryHandler({
+      questions: [
+        { name: '_http._tcp.local', type: 'PTR' },
+        { name: 'Gladys Assistant._http._tcp.local', type: 'SRV' },
+      ],
+    });
+    const { answers, additionals } = mdnsFake.respond.firstCall.args[0];
+    expect(answers.map((record) => record.type)).to.deep.equal(['PTR', 'SRV']);
+    expect(additionals.map((record) => record.type)).to.deep.equal(['TXT', 'A']);
+  });
+
+  it('should advertise the last hostname saved while a restart was running', async () => {
+    await mdns.start(1443);
+    // the first restart reads the hostname saved at that time...
+    variable.getValue = fake.resolves('gladys2');
     const firstRestart = mdns.restart();
+    // ...while a second one is saved right after, before the first restart ended
     const secondRestart = mdns.restart();
-    // let stop() reach destroy() before releasing it
-    await Promise.resolve();
-    await Promise.resolve();
-    releaseDestroy();
+    variable.getValue = fake.resolves('gladys3');
     await Promise.all([firstRestart, secondRestart]);
-    // both events must lead to a single advertiser, not two
-    assert.calledOnce(mdnsFake.destroy);
-    // one start() for the initial advertisement, one for the single coalesced restart
+    // the newest hostname must be the advertised one, not the one read too early
+    expect(mdns.fqdn).to.equal('gladys3.local');
+  });
+
+  it('should run a single extra restart whatever the number of changes saved meanwhile', async () => {
+    await mdns.start(1443);
+    variable.getValue = fake.resolves('gladys2');
+    const restarts = [mdns.restart(), mdns.restart(), mdns.restart()];
+    await Promise.all(restarts);
+    // one start() for the initial advertisement, one for the first restart and one
+    // for the single coalesced follow-up
     expect(variable.getValue.callCount).to.equal(2);
+    expect(mdns.restartPending).to.equal(false);
+    expect(mdns.restartPromise).to.equal(null);
   });
 
   it('should do nothing on restart when advertising was never started', async () => {

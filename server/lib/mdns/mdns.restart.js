@@ -12,10 +12,18 @@ async function restart() {
   // two hostname changes in a row must not race: without this, both calls could
   // reach start() and leave a second advertiser running on the network
   if (this.restartPromise !== null) {
+    // the running restart may have read the hostname before this change was saved,
+    // so ask for one more run instead of dropping the event: the last hostname saved
+    // is always the one advertised
+    this.restartPending = true;
     await this.restartPromise;
-    return;
+    // another waiter already took care of that pending run
+    if (!this.restartPending) {
+      return;
+    }
   }
   const { port } = this;
+  this.restartPending = false;
   this.restartPromise = (async () => {
     await this.stop();
     await this.start(port);

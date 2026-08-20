@@ -2,14 +2,8 @@
 const multicastDns = require('multicast-dns');
 
 const logger = require('../../utils/logger');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
-const {
-  DEFAULT_MDNS_HOSTNAME,
-  MDNS_SERVICE_NAME,
-  HTTP_SERVICE_TYPE,
-  MDNS_TTL,
-  MDNS_HOSTNAME_REGEX,
-} = require('./mdns.constants');
+const { SYSTEM_VARIABLE_NAMES, normalizeMdnsHostname } = require('../../utils/constants');
+const { DEFAULT_MDNS_HOSTNAME, MDNS_SERVICE_NAME, HTTP_SERVICE_TYPE, MDNS_TTL } = require('./mdns.constants');
 
 /**
  * @description Sanitize the mDNS hostname configured by the user.
@@ -22,11 +16,10 @@ function sanitizeHostname(rawValue) {
   if (!rawValue) {
     return DEFAULT_MDNS_HOSTNAME;
   }
-  let hostname = rawValue.trim().toLowerCase();
-  if (hostname.endsWith('.local')) {
-    hostname = hostname.slice(0, -'.local'.length);
-  }
-  if (!MDNS_HOSTNAME_REGEX.test(hostname)) {
+  // the variable is normalized when it is saved, but a value stored before that
+  // validation existed can still be invalid
+  const hostname = normalizeMdnsHostname(rawValue);
+  if (hostname === null) {
     logger.warn(`mDNS: invalid hostname "${rawValue}", falling back to "${DEFAULT_MDNS_HOSTNAME}"`);
     return DEFAULT_MDNS_HOSTNAME;
   }
@@ -42,6 +35,13 @@ function sanitizeHostname(rawValue) {
  */
 async function start(port) {
   this.port = port;
+  // behind a Docker bridge, the multicast packets never reach the local network and
+  // the address of the container is not reachable from it: advertising is pointless
+  const onHostNetwork = await this.system.isOnHostNetwork();
+  if (!onHostNetwork) {
+    logger.info('mDNS: Gladys is not on the host network, skipping the local network advertisement');
+    return;
+  }
   const rawHostname = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME);
   this.hostname = sanitizeHostname(rawHostname);
   this.fqdn = `${this.hostname}.local`;

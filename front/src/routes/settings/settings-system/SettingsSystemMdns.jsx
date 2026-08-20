@@ -1,10 +1,7 @@
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
-import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
-
-const DEFAULT_MDNS_HOSTNAME = 'gladysassistant';
-const MDNS_HOSTNAME_REGEX = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/;
+import { SYSTEM_VARIABLE_NAMES, MDNS, normalizeMdnsHostname } from '../../../../../server/utils/constants';
 
 class SettingsSystemMdns extends Component {
   getMdnsHostname = async () => {
@@ -33,8 +30,9 @@ class SettingsSystemMdns extends Component {
 
   saveMdnsHostname = async e => {
     e.preventDefault();
-    const { mdnsHostname } = this.state;
-    if (!MDNS_HOSTNAME_REGEX.test(mdnsHostname)) {
+    // the server stores the normalized hostname, the input must show the same value
+    const hostname = normalizeMdnsHostname(this.state.mdnsHostname);
+    if (hostname === null) {
       this.setState({
         invalidName: true,
         saved: false
@@ -42,6 +40,7 @@ class SettingsSystemMdns extends Component {
       return;
     }
     this.setState({
+      mdnsHostname: hostname,
       saving: true,
       invalidName: false,
       saved: false,
@@ -49,11 +48,11 @@ class SettingsSystemMdns extends Component {
     });
     try {
       await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME}`, {
-        value: mdnsHostname
+        value: hostname
       });
       // only the saved value is actually advertised on the network
       this.setState({
-        advertisedHostname: mdnsHostname,
+        advertisedHostname: hostname,
         saved: true
       });
     } catch (e) {
@@ -70,8 +69,8 @@ class SettingsSystemMdns extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      mdnsHostname: DEFAULT_MDNS_HOSTNAME,
-      advertisedHostname: DEFAULT_MDNS_HOSTNAME
+      mdnsHostname: MDNS.DEFAULT_HOSTNAME,
+      advertisedHostname: MDNS.DEFAULT_HOSTNAME
     };
   }
 
@@ -84,6 +83,9 @@ class SettingsSystemMdns extends Component {
     const portSuffix = serverPort && serverPort !== 80 ? `:${serverPort}` : '';
     // the URL must reflect what Gladys advertises, not what is being typed
     const mdnsUrl = `http://${advertisedHostname}.local${portSuffix}`;
+    // without a local IP the server has nothing to advertise: Gladys is either behind
+    // a Docker bridge or has no local network interface
+    const advertising = Boolean(systemInfos && systemInfos.local_ip);
     return (
       <div class="card">
         <h4 class="card-header">
@@ -130,12 +132,19 @@ class SettingsSystemMdns extends Component {
                 <Text id="systemSettings.mdnsSaved" />
               </div>
             )}
-            <p class="mt-2 mb-0">
-              <Text id="systemSettings.mdnsCurrentUrl" />{' '}
-              <a href={mdnsUrl} target="_blank" rel="noopener noreferrer">
-                {mdnsUrl}
-              </a>
-            </p>
+            {systemInfos &&
+              (advertising ? (
+                <p class="mt-2 mb-0">
+                  <Text id="systemSettings.mdnsCurrentUrl" />{' '}
+                  <a href={mdnsUrl} target="_blank" rel="noopener noreferrer">
+                    {mdnsUrl}
+                  </a>
+                </p>
+              ) : (
+                <p class="mt-2 mb-0 text-muted">
+                  <Text id="systemSettings.mdnsNotAdvertised" />
+                </p>
+              ))}
           </form>
         </div>
       </div>

@@ -453,6 +453,34 @@ const SYSTEM_VARIABLE_NAMES = {
   MDNS_HOSTNAME: 'MDNS_HOSTNAME',
 };
 
+const MDNS = {
+  DEFAULT_HOSTNAME: 'gladysassistant',
+  // a DNS label: lowercase letters, digits and hyphens, 63 characters max,
+  // and it can neither start nor end with a hyphen
+  HOSTNAME_REGEX: /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/,
+};
+
+/**
+ * @description Normalize the mDNS hostname configured by the user.
+ * @param {string} rawValue - The raw hostname, as typed by the user.
+ * @returns {string|null} The normalized hostname, without the ".local" suffix, or null if invalid.
+ * @example
+ * normalizeMdnsHostname('Gladys-Garage.local'); // 'gladys-garage'
+ */
+function normalizeMdnsHostname(rawValue) {
+  if (typeof rawValue !== 'string') {
+    return null;
+  }
+  let hostname = rawValue.trim().toLowerCase();
+  if (hostname.endsWith('.local')) {
+    hostname = hostname.slice(0, -'.local'.length);
+  }
+  if (!MDNS.HOSTNAME_REGEX.test(hostname)) {
+    return null;
+  }
+  return hostname;
+}
+
 const EVENTS = {
   ALARM: {
     ARM: 'alarm.arm',
@@ -2271,6 +2299,9 @@ module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
 module.exports.INTEGRATION_CATALOG_CATEGORIES = INTEGRATION_CATALOG_CATEGORIES;
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
+
+module.exports.MDNS = MDNS;
+module.exports.normalizeMdnsHostname = normalizeMdnsHostname;
 
 module.exports.DASHBOARD_TYPE = DASHBOARD_TYPE;
 module.exports.DASHBOARD_VISIBILITY = DASHBOARD_VISIBILITY;

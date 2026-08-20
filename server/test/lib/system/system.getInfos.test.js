@@ -154,6 +154,22 @@ describe('system.getInfos', () => {
       }
     }
   });
+  it('should not expose any local IP when Gladys is behind a Docker bridge', async () => {
+    // the address of a bridged container is not reachable from the local network
+    system.isOnHostNetwork = fake.resolves(false);
+
+    const infos = await system.getInfos();
+    expect(infos.local_ip).to.equal(null);
+    expect(infos.network_interfaces).to.be.an('object');
+  });
+
+  it('should expose the local IP when Gladys is on the host network', async () => {
+    system.isOnHostNetwork = fake.resolves(true);
+
+    const infos = await system.getInfos();
+    // the machine running the tests may have no external interface at all
+    expect(infos.local_ip === null || typeof infos.local_ip === 'string').to.equal(true);
+  });
 });
 
 describe('system.getLocalIp', () => {
@@ -225,15 +241,34 @@ describe('system.getLocalIp', () => {
 
   it('should prefer a real LAN address over the Docker bridge one', () => {
     const networkInterfaces = {
-      eth0: [{ address: '172.17.0.2', family: 'IPv4', internal: false }],
-      wlan0: [{ address: '192.168.1.30', family: 'IPv4', internal: false }],
+      eth0: [{ address: '172.17.0.2', family: 'IPv4', internal: false, mac: '02:42:ac:11:00:02' }],
+      wlan0: [{ address: '192.168.1.30', family: 'IPv4', internal: false, mac: 'dc:a6:32:00:11:22' }],
     };
     expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.30');
   });
 
+  it('should prefer a real LAN address over an interface created by Docker', () => {
+    const networkInterfaces = {
+      // a custom Docker address pool can hand out addresses outside of 172.17.0.0/16,
+      // the MAC address is what tells a container interface apart
+      eth0: [{ address: '10.5.0.2', family: 'IPv4', internal: false, mac: '02:42:0a:05:00:02' }],
+      wlan0: [{ address: '192.168.1.31', family: 'IPv4', internal: false, mac: 'dc:a6:32:00:11:22' }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.31');
+  });
+
+  it('should treat a 172.16.0.0/12 address of a real network card as a LAN address', () => {
+    const networkInterfaces = {
+      // some home and corporate networks really do use this RFC 1918 range
+      eth0: [{ address: '172.20.1.10', family: 'IPv4', internal: false, mac: 'dc:a6:32:00:11:22' }],
+      tailscale0: [{ address: '100.101.102.103', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('172.20.1.10');
+  });
+
   it('should still use the Docker bridge address when there is nothing else', () => {
     const networkInterfaces = {
-      eth0: [{ address: '172.17.0.2', family: 'IPv4', internal: false }],
+      eth0: [{ address: '172.17.0.2', family: 'IPv4', internal: false, mac: '02:42:ac:11:00:02' }],
     };
     expect(getLocalIp(networkInterfaces)).to.equal('172.17.0.2');
   });
