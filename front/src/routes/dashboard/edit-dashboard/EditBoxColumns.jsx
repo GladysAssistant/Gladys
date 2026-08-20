@@ -1,34 +1,39 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { DndProvider } from 'react-dnd';
 
-import EditBox from './EditBox';
+import EditableBoxPreview from './EditableBoxPreview';
+import EditPanel from './EditPanel';
 import EmptyColumnDropZone from './EmptyColumnDropZone';
-import BottomDropZone from './BottomDropZone';
-import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
-import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
+import { getSectionOffsets, MAX_COLUMNS_PER_SECTION } from '../../../utils/dashboardSections';
 import style from './style.css';
 import stylePrimary from '../style.css';
-import { DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
 
-const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
-const maxBoxes = 3;
-const getBoxesLength = props => {
+const getTotalColumns = props => {
   return props.homeDashboard.boxes.length;
 };
 
-const { backend: dragAndDropBackend, options: dragAndDropBackendOptions } = getDragAndDropBackend();
-
+// Editor v2: the canvas IS the dashboard — real widgets with edit
+// affordances, settings in a side panel / bottom sheet (EditPanel).
+// Widget reordering runs on the pointer-events engine (utils/pointerDrag.js).
 const EditBoxColumns = ({ children, ...props }) => (
   <div class="pb-6">
-    <h3>
-      <Text id="dashboard.editDashboardTitle" />
-    </h3>
+    <div class={style.editorTopBar}>
+      <h3 class="mb-0">{props.homeDashboard.name}</h3>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary"
+        data-cy="dashboard-settings-button"
+        onClick={props.openDashboardSettings}
+      >
+        <i class="fe fe-sliders mr-1" />
+        <Text id="dashboard.editorDashboardSettingsButton" />
+      </button>
+    </div>
     {props.dashboardAlreadyExistError && (
       <div class="alert alert-danger">
         <Text id="newDashboard.dashboardAlreadyExist" />
       </div>
-    )}{' '}
+    )}
     {props.dashboardValidationError && (
       <div class="alert alert-danger">
         <Text id="newDashboard.validationError" />
@@ -39,166 +44,135 @@ const EditBoxColumns = ({ children, ...props }) => (
         <Text id="newDashboard.unknownError" />
       </div>
     )}
-    <div class="row align-items-end">
-      <div class="col-md-4">
-        <div class="form-group">
-          <label class="form-label">
-            <Text id="dashboard.editDashboardNameLabel" />
-          </label>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control"
-              placeholder={<Text id="dashboard.editDashboardNameLabel" />}
-              value={props.homeDashboard.name}
-              onInput={props.updateCurrentDashboardName}
-            />
-          </Localizer>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-8">
-        <div class="form-group">
-          <label class="form-label">
-            <Text id="dashboard.editDashboardVisibility" />
-          </label>
-          <small>
-            <Text id="dashboard.editDashboardVisibilityDescription" />
-          </small>
-          {props.user.id !== props.homeDashboard.user_id && (
-            <div>
-              <small>
-                <Text id="dashboard.editDashboardVisibilityNotEditableNotCreator" />
-              </small>
-            </div>
-          )}
-          <Localizer>
-            <select
-              value={props.homeDashboard.visibility}
-              onChange={props.updateCurrentDashboardVisibility}
-              disabled={props.user.id !== props.homeDashboard.user_id}
-              class="form-control"
-            >
-              {DASHBOARD_VISIBILITY_LIST.map(dashboardVisibility => (
-                <option value={dashboardVisibility}>
-                  <Text id={`dashboard.visibilities.${dashboardVisibility}`} />
-                </option>
-              ))}
-            </select>
-          </Localizer>
-        </div>
-      </div>
-    </div>
-    <div class="row mb-4">
-      <div class="col-md-12">
-        <Text id="dashboard.editDashboardExplanation" />
-      </div>
-    </div>
-    <div class="row mb-4">
-      <div class="col-md-4 d-lg-none d-xl-none">
-        <button
-          class={cx('btn', {
-            'btn-secondary': !props.isMobileReordering,
-            'btn-warning': props.isMobileReordering
-          })}
-          onClick={props.toggleMobileReorder}
-        >
-          <i class="fe fe-list mr-2" />
-          {!props.isMobileReordering && <Text id="dashboard.reorderDashboardButton" />}
-          {props.isMobileReordering && <Text id="dashboard.stopReorderingDashboardButton" />}
-        </button>
-      </div>
-    </div>
-    <DndProvider backend={dragAndDropBackend} options={dragAndDropBackendOptions}>
-      {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-      <div class={cx('d-flex align-items-start', style.columnsCard)}>
-        {props.homeDashboard &&
-          props.homeDashboard.boxes &&
-          props.homeDashboard.boxes.map((column, x) => (
-            <div
-              class={cx('d-flex flex-column', style.column, stylePrimary.removePadding, {
-                [stylePrimary.removePaddingFirstCol]: x === 0,
-                [stylePrimary.removePaddingLastCol]: x === maxBoxes - 1
-              })}
-            >
-              <div class={cx('d-flex', 'justify-content-center', style.columnBoxHeader)}>
-                <h3 class="d-flex justify-content-center text-center">
-                  <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
-                  {getBoxesLength(props) > 1 && (
-                    <button
-                      class={cx('btn p-0 ml-2', style.btnLinkDelete)}
-                      onClick={() => props.deleteCurrentColumn(x)}
-                    >
-                      <i class="fe fe-trash" />
-                    </button>
-                  )}
-                </h3>
+    <p class={style.editorExplanation}>
+      <Text id="dashboard.editDashboardExplanation" />
+    </p>
+    <>
+      {props.homeDashboard &&
+        props.homeDashboard.boxes &&
+        props.sectionSizes &&
+        getSectionOffsets(props.sectionSizes).map((sectionOffset, sectionIndex) => {
+          const sectionSize = props.sectionSizes[sectionIndex];
+          const sectionColumns = props.homeDashboard.boxes.slice(sectionOffset, sectionOffset + sectionSize);
+          return (
+            <div class={style.section} data-widget-drop-section>
+              <div class={style.sectionHeader}>
+                <Text id="dashboard.boxes.section" fields={{ index: sectionIndex + 1 }} />
+                {/* one-step reorder arrows: dragging a whole section would be hell */}
+                {props.sectionSizes.length > 1 && (
+                  <span class={style.sectionActions}>
+                    <Localizer>
+                      <button
+                        type="button"
+                        class={style.previewButton}
+                        disabled={sectionIndex === 0}
+                        onClick={() => props.moveSection(sectionIndex, -1)}
+                        data-cy={`move-section-up-${sectionIndex}`}
+                        title={<Text id="dashboard.editorMoveSectionUp" />}
+                      >
+                        <i class="fe fe-arrow-up" />
+                      </button>
+                    </Localizer>
+                    <Localizer>
+                      <button
+                        type="button"
+                        class={style.previewButton}
+                        disabled={sectionIndex === props.sectionSizes.length - 1}
+                        onClick={() => props.moveSection(sectionIndex, 1)}
+                        data-cy={`move-section-down-${sectionIndex}`}
+                        title={<Text id="dashboard.editorMoveSectionDown" />}
+                      >
+                        <i class="fe fe-arrow-down" />
+                      </button>
+                    </Localizer>
+                  </span>
+                )}
               </div>
-              {props.boxNotEmptyError && props.columnBoxNotEmptyError === x && (
-                <div class="alert alert-danger d-flex justify-content-center mb-4">
-                  <Text id="dashboard.editDashboardBoxNotEmpty" />
-                </div>
-              )}
-              <div>
-                {column.length > 0 && (
-                  <>
-                    {column.map((box, y) => (
-                      <div key={`box-container-${x}-${y}`}>
-                        <EditBox {...props} box={box} x={x} y={y} isMobileReordering={props.isMobileReordering} />
-                        {y < column.length && (
-                          <div class="d-flex justify-content-center mb-2">
+              <div class={cx('d-flex align-items-start', style.columnsCard)}>
+                {sectionColumns.map((column, columnIndex) => {
+                  const x = sectionOffset + columnIndex;
+                  return (
+                    <div
+                      class={cx('d-flex flex-column', style.column, stylePrimary.removePadding, {
+                        [stylePrimary.removePaddingFirstCol]: columnIndex === 0,
+                        [stylePrimary.removePaddingLastCol]: columnIndex === sectionSize - 1
+                      })}
+                    >
+                      <div class={style.columnBoxHeader}>
+                        <span class={style.columnLabel}>
+                          <Text id="dashboard.boxes.column" fields={{ index: columnIndex + 1 }} />
+                          {getTotalColumns(props) > 1 && (
                             <button
-                              class={cx('btn btn-sm btn-outline-secondary px-4 py-0', style.btnAddNewBoxAtPosition)}
-                              onClick={() => props.addBoxAtPosition(x, y)}
+                              class={cx('btn p-0 ml-2', style.btnLinkDelete)}
+                              onClick={() => props.deleteCurrentColumn(x)}
                             >
-                              <i class="fe fe-plus" />
+                              <i class="fe fe-trash" />
+                            </button>
+                          )}
+                        </span>
+                      </div>
+                      {props.boxNotEmptyError && props.columnBoxNotEmptyError === x && (
+                        <div class="alert alert-danger d-flex justify-content-center mb-4">
+                          <Text id="dashboard.editDashboardBoxNotEmpty" />
+                        </div>
+                      )}
+                      <div data-widget-drop data-drop-x={x} data-drop-active-class={style.columnDropActive}>
+                        {column.length > 0 &&
+                          column.map((box, y) => (
+                            <div key={`box-container-${x}-${y}`}>
+                              <EditableBoxPreview {...props} box={box} x={x} y={y} columnLength={column.length} />
+                              <div class="d-flex justify-content-center mb-2">
+                                <button
+                                  class={cx('btn btn-sm px-4 py-0', style.btnAddNewBoxAtPosition)}
+                                  onClick={() => props.addBoxAtPositionAndEdit(x, y)}
+                                >
+                                  <i class="fe fe-plus" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+
+                        {column.length === 0 && <EmptyColumnDropZone />}
+
+                        {column.length === 0 && (
+                          <div class="d-flex justify-content-center mb-4">
+                            <button class="btn btn-primary" onClick={() => props.addBoxAndEdit(x)}>
+                              <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
                             </button>
                           </div>
                         )}
                       </div>
-                    ))}
-                    <BottomDropZone
-                      moveCard={props.moveCard}
-                      x={x}
-                      y={column.length}
-                      isMobileReordering={props.isMobileReordering}
-                    />
-                  </>
-                )}
-
-                {column.length === 0 && <EmptyColumnDropZone moveCard={props.moveCard} x={x} />}
-
-                {props.isMobileReordering && <AutoScrollMobile position="bottom" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-                {column.length === 0 && (
-                  <div class="d-flex justify-content-center mb-4">
-                    <button class="btn btn-primary" onClick={() => props.addBox(x)}>
-                      <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
-                    </button>
+                    </div>
+                  );
+                })}
+                {sectionSize < MAX_COLUMNS_PER_SECTION && (
+                  <div class={cx('d-flex flex-column', style.columnAddButton)}>
+                    <div class={cx(style.columnBoxHeader)} />
+                    <Localizer>
+                      <button
+                        class={cx('btn btn-outline-primary', style.btnAddColumn)}
+                        onClick={() => props.addColumn(sectionIndex)}
+                        data-title={<Text id="dashboard.editDashboardAddColumnButton" />}
+                      >
+                        <i class="fe fe-plus" />
+                        <div class={cx('d-none', style.displayTextMobile)}>
+                          <Text id="dashboard.editDashboardAddColumnButton" />
+                        </div>
+                      </button>
+                    </Localizer>
                   </div>
                 )}
               </div>
             </div>
-          ))}
-        {getBoxesLength(props) < maxBoxes && (
-          <div class={cx('d-flex flex-column', style.columnAddButton)}>
-            <div class={cx(style.columnBoxHeader)} />
-            <Localizer>
-              <button
-                class={cx('btn btn-outline-primary', style.btnAddColumn)}
-                onClick={() => props.addColumn(getBoxesLength(props))}
-                data-title={<Text id="dashboard.editDashboardAddColumnButton" />}
-              >
-                <i class="fe fe-plus" />
-                <div class={cx('d-none', style.displayTextMobile)}>
-                  <Text id="dashboard.editDashboardAddColumnButton" />
-                </div>
-              </button>
-            </Localizer>
-          </div>
-        )}
+          );
+        })}
+      <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-outline-primary" onClick={props.addSection}>
+          <Text id="dashboard.editDashboardAddSectionButton" /> <i class="fe fe-plus" />
+        </button>
       </div>
-    </DndProvider>
+      <EditPanel {...props} />
+    </>
   </div>
 );
 

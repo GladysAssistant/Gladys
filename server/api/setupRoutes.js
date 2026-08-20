@@ -11,7 +11,7 @@ const adminMiddleware = require('./middlewares/adminMiddleware');
 const ExternalIntegrationAuthMiddleware = require('./middlewares/externalIntegrationAuthMiddleware');
 const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
 const audioRawBodyMiddleware = require('./middlewares/audioRawBodyMiddleware');
-const { integrationHostJsonBodyMiddleware } = require('./middlewares/jsonBodyMiddleware');
+const { integrationHostJsonBodyMiddleware, largeJsonBodyMiddleware } = require('./middlewares/jsonBodyMiddleware');
 
 // routes
 const getRoutes = require('./routes');
@@ -88,6 +88,11 @@ function setupRoutes(gladys) {
     }
     if (routes[routeKey].audioRawBody) {
       routerParams.push(audioRawBodyMiddleware);
+    }
+    // routes carrying one base64 image (dashboard asset uploads): the bigger
+    // JSON bound is mounted here, after authentication, not globally
+    if (routes[routeKey].largeJsonBody) {
+      routerParams.push(largeJsonBodyMiddleware);
     }
     // add the controller at the end of the array
     routerParams.push(routes[routeKey].controller);

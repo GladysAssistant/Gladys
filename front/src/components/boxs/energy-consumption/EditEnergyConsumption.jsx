@@ -216,6 +216,7 @@ class EditEnergyConsumption extends Component {
             <Text id="dashboard.boxes.energyConsumption.editDeviceFeatures" />
           </label>
           <Select
+            menuPlacement="auto"
             defaultValue={[]}
             value={selectedDeviceFeatures}
             onChange={this.updateDeviceFeatures}
@@ -234,6 +235,7 @@ class EditEnergyConsumption extends Component {
                 />
               </label>
               <Select
+                menuPlacement="auto"
                 defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[i])}
                 value={
                   props.box.colors &&

@@ -2003,6 +2003,27 @@ const DASHBOARD_BOX_TYPE = {
   LINK: 'link',
   PHOTO: 'photo',
   SUN: 'sun',
+  CHIPS: 'chips',
+  HOUSE_VIEW: 'house-view',
+  ACTIONS: 'actions',
+};
+
+const DASHBOARD_WIDTH = {
+  STANDARD: 'standard',
+  FULL: 'full',
+};
+
+// Built-in CSS background scenes of the Horizon theme (no external images:
+// they weigh nothing, stay crisp at any resolution and work offline)
+const DASHBOARD_BACKGROUND_SCENE = {
+  HORIZON: 'horizon',
+  AURORA: 'aurora',
+  DUSK: 'dusk',
+  FOREST: 'forest',
+  LAGOON: 'lagoon',
+  SAND: 'sand',
+  LAVENDER: 'lavender',
+  MIST: 'mist',
 };
 
 const ERROR_MESSAGES = {
@@ -2159,6 +2180,8 @@ const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_VISIBILITY_LIST = createList(DASHBOARD_VISIBILITY);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
+const DASHBOARD_WIDTH_LIST = createList(DASHBOARD_WIDTH);
+const DASHBOARD_BACKGROUND_SCENE_LIST = createList(DASHBOARD_BACKGROUND_SCENE);
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
 const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
@@ -2253,6 +2276,10 @@ module.exports.DASHBOARD_VISIBILITY_LIST = DASHBOARD_VISIBILITY_LIST;
 module.exports.DASHBOARD_TYPE_LIST = DASHBOARD_TYPE_LIST;
 module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
+module.exports.DASHBOARD_WIDTH = DASHBOARD_WIDTH;
+module.exports.DASHBOARD_WIDTH_LIST = DASHBOARD_WIDTH_LIST;
+module.exports.DASHBOARD_BACKGROUND_SCENE = DASHBOARD_BACKGROUND_SCENE;
+module.exports.DASHBOARD_BACKGROUND_SCENE_LIST = DASHBOARD_BACKGROUND_SCENE_LIST;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
 

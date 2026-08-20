@@ -22,6 +22,10 @@ describe('dashboard.create', () => {
     expect(newDashboard).to.have.property('name', 'My new dashboard');
     // selector should be the slug of the name + a dash + 4 random characters
     expect(newDashboard.selector).to.match(/^my-new-dashboard-[a-z0-9]{4}$/);
+    // legacy column-based boxes are normalized to a single section on save
+    expect(newDashboard.get({ plain: true }).boxes).to.deep.equal([
+      { columns: [[{ type: DASHBOARD_BOX_TYPE.USER_PRESENCE }]] },
+    ]);
   });
   it('should create a dashboard with the selector given', async () => {
     const newDashboard = await dashboard.create('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
