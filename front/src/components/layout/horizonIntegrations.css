@@ -533,14 +533,3 @@
 .dark-mode .glass-theme .page .card .list-group-item {
   background-color: transparent !important;
 }
-
-/* The Horizon wallpaper class carries a mobile bottom padding that only exists
-   to clear the dashboard switcher dock. These pages render no dock, so they
-   counter it in their own scope — the convention the settings and auth scenes
-   already follow (a central `:has()` reclaim would be neater but Safari < 15.4
-   drops the selector, and it would tie with .auth-page's deliberate 3rem). */
-@media (max-width: 991.98px) {
-  .page-main.integration-page {
-    padding-bottom: 0;
-  }
-}

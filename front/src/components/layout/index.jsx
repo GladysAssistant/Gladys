@@ -147,9 +147,7 @@ class Layout extends Component {
       <div class="page" ref={this.setPageElement}>
         <div
           class={cx('page-main', {
-            // integration-page is the plain marker the theme sheet scopes its
-            // page-level rules on, like .settings-page and .auth-page
-            [`glass-theme integration-page ${dashboardStyle.dashboardBackground} ${dashboardStyle.glassScene}`]: integrationPage
+            [`glass-theme ${dashboardStyle.dashboardBackground} ${dashboardStyle.glassScene}`]: integrationPage
           })}
         >
           {children}

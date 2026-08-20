@@ -13,6 +13,9 @@ const ALL_SERVICES_VALUE = '__all__';
 // that failed to start is STOPPED
 const RUNNING_STATUS = 'RUNNING';
 
+// SERVICE_TYPES.EXTERNAL server side
+const EXTERNAL_SERVICE_TYPE = 'external';
+
 /**
  * A core service has no manifest, so the server falls back to its technical
  * name ("nextcloud-talk"). The human readable name lives in the front i18n
@@ -29,29 +32,56 @@ const toI18nKey = name => name.replace(/-([a-z])/g, (match, letter) => letter.to
  * in the editor shows "All configured services" without being rewritten.
  */
 class MessageServiceSelector extends Component {
-  buildLabel = service => {
+  buildName = service => {
     // an external integration ships its own name in its manifest; a core
     // service is translated from the front dictionary, falling back to the
     // technical name when no translation exists
     const translated = get(this.props.intl.dictionary, `integration.${toI18nKey(service.name)}.title`);
-    const name = service.manifest_name || translated || service.name;
-    if (service.status === RUNNING_STATUS) {
-      return name;
+    return service.manifest_name || translated || service.name;
+  };
+  buildLabel = (service, suffixes = []) => {
+    const parts = [...suffixes];
+    if (service.status !== RUNNING_STATUS) {
+      // a stopped or degraded channel stays selectable — a scene can legitimately
+      // target a service that is temporarily down — but the user must see it
+      parts.push(
+        get(this.props.intl.dictionary, 'editScene.actionsCard.messageSend.serviceUnavailable', {
+          default: 'unavailable'
+        })
+      );
     }
-    // a stopped or degraded channel stays selectable — a scene can legitimately
-    // target a service that is temporarily down — but the user must see it
-    const unavailable = get(this.props.intl.dictionary, 'editScene.actionsCard.messageSend.serviceUnavailable', {
-      default: 'unavailable'
-    });
-    return `${name} (${unavailable})`;
+    const name = this.buildName(service);
+    return parts.length === 0 ? name : `${name} (${parts.join(', ')})`;
   };
   getOptions = async () => {
     try {
       const services = await this.props.httpClient.get('/api/v1/service/message');
-      const serviceOptions = services.map(service => ({
-        label: this.buildLabel(service),
-        value: service.name
-      }));
+      // a core service and an external integration can display the exact same
+      // name (a native Telegram alongside a Telegram integration from the
+      // store): tell them apart, but only when the ambiguity is real
+      const countByName = {};
+      services.forEach(service => {
+        const name = this.buildName(service);
+        countByName[name] = (countByName[name] || 0) + 1;
+      });
+      const serviceOptions = services.map(service => {
+        const ambiguous = countByName[this.buildName(service)] > 1;
+        const suffixes = ambiguous
+          ? [
+              get(
+                this.props.intl.dictionary,
+                service.type === EXTERNAL_SERVICE_TYPE
+                  ? 'editScene.actionsCard.messageSend.serviceIntegrationExternal'
+                  : 'editScene.actionsCard.messageSend.serviceIntegrationInternal',
+                { default: service.type === EXTERNAL_SERVICE_TYPE ? 'external integration' : 'built-in integration' }
+              )
+            ]
+          : [];
+        return {
+          label: this.buildLabel(service, suffixes),
+          value: service.name
+        };
+      });
       this.setState({ serviceOptions });
     } catch (e) {
       console.error(e);

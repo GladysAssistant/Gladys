@@ -46,15 +46,6 @@
   padding: 3rem 0;
 }
 
-/* Below 992px .dashboardBackground pads its bottom to clear the dashboard
-   switcher dock; no dock here, so reclaim the hole (same scoped counter-rule
-   as .settings-page — :has() would be cleaner but Safari < 15.4 drops it) */
-@media (max-width: 991.98px) {
-  :global(.page-single.auth-page) {
-    padding-bottom: 3rem;
-  }
-}
-
 /* Muted helper texts sit directly on the wallpaper here (not in a card) */
 :global(.auth-page .text-muted) {
   color: var(--gl-muted) !important;
