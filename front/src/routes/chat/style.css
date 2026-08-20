@@ -637,13 +637,19 @@
 
 .emptyChatText {
   margin-top: 20px;
-  color: var(--gl-muted);
   font-size: 15px;
 }
 
 .typingIndicator {
-  color: var(--gl-muted);
   font-size: 13px;
+}
+
+/* Both are <p> inside the chat card, so the theme's `.glass-theme .card p`
+   ink rule (0,2,1) outranks a bare module class and would flatten the
+   two-level hierarchy: the secondary copy must out-specify it to stay muted */
+:global(.glass-theme .card) p.emptyChatText,
+:global(.glass-theme .card) p.typingIndicator {
+  color: var(--gl-muted);
 }
 
 @media (min-width: 992px) {
