@@ -983,6 +983,7 @@
         "alreadyUpToDateText": "The integration is already up to date (version {{version}}): the Docker image was re-pulled and the container recreated.",
         "statusLabel": "Status",
         "versionLabel": "Version",
+        "changelogTitle": "See the changelog of this version",
         "dockerImageLabel": "Docker image",
         "repoLabel": "Repository",
         "startButton": "Start",
