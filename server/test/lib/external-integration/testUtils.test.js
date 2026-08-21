@@ -117,6 +117,34 @@ const TEST_WEATHER_MANIFEST = {
   gladys_version: '>=4.62.0',
 };
 
+// TTS-provider fixture (B.21): a text-to-speech engine — Configuration
+// screen only, the core relays synthesize commands over WebSocket and
+// serves the returned audio to speakers.
+const TEST_TTS_MANIFEST = {
+  manifest_version: 1,
+  type: 'tts',
+  name: 'Piper TTS Demo',
+  description: {
+    en: 'Local text-to-speech provider demo.',
+    fr: 'Intégration démo : synthèse vocale locale.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-piper-tts:1.0.0',
+  gladys_version: '>=4.62.0',
+  config_schema: [
+    {
+      key: 'voice',
+      type: 'select',
+      label: { en: 'Voice' },
+      default: 'fr_FR-siwis-medium',
+      options: [
+        { value: 'fr_FR-siwis-medium', label: { en: 'Siwis (French)' } },
+        { value: 'en_US-amy-medium', label: { en: 'Amy (English)' } },
+      ],
+    },
+  ],
+};
+
 // Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
 // gateway — one fire-and-forget event stream (default mode) and one sync
 // challenge/response registration callback.
@@ -286,6 +314,7 @@ module.exports = {
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
   TEST_WEATHER_MANIFEST,
+  TEST_TTS_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,

@@ -162,6 +162,24 @@ const ACTIVE_BROADCAST_MIN_INTERVAL_MS = 10 * 1000;
 // namespace. 2 seconds still allows the usual "send a few packets until
 // the device wakes up" retry loop.
 const NETWORK_WAKE_MIN_INTERVAL_MS = 2 * 1000;
+
+// TTS providers (B.21): the synthesize command is a documented exception
+// to the 5s ack rule, alongside camera.get-image and action.run (local
+// synthesis on a Pi is slow). The audio
+// comes back in command-result.data as a data-URI; the core validates the
+// content type (what Sonos/Cast/browsers actually play — the served URL
+// extension is derived from it) and the decoded size before serving a byte.
+// The text is capped by the core BEFORE the relay (truncation, not an
+// error: a long AI answer must speak its beginning rather than fail).
+const TTS_SYNTHESIZE_TIMEOUT_MS = 30 * 1000;
+const MAX_TTS_AUDIO_SIZE_BYTES = 5 * 1024 * 1024;
+const MAX_TTS_TEXT_LENGTH = 2000;
+const TTS_AUDIO_CONTENT_TYPES = {
+  'audio/mpeg': 'mp3',
+  'audio/wav': 'wav',
+  'audio/ogg': 'ogg',
+  'audio/aac': 'aac',
+};
 // Camera images: pushed through POST /camera/image (core's 150 KB bound),
 // never through POST /state (dedicated saveStringState path, no state
 // history). Continuous video streaming is out of the v1 scope.
@@ -357,6 +375,10 @@ module.exports = {
   NETWORK_DISCOVERY_MIN_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_MAX_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS,
+  TTS_SYNTHESIZE_TIMEOUT_MS,
+  MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_TEXT_LENGTH,
+  TTS_AUDIO_CONTENT_TYPES,
   MAX_CAMERA_IMAGES_PER_MINUTE,
   MAX_CAMERA_IMAGE_SIZE,
   CAMERA_GET_IMAGE_TIMEOUT_MS,

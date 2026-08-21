@@ -1102,7 +1102,8 @@
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
-        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent)."
+        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "ttsInfoText": "Diese Integration ist ein Sprachsynthese-Anbieter: Wählen Sie sie nach der Installation als Stimme Ihrer Instanz in der Integration Künstliche Intelligenz aus. Ansagen werden über Ihr lokales Netzwerk bereitgestellt — Lautsprecher und Browser im selben Netzwerk können sie abspielen."
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
@@ -3068,7 +3069,9 @@
       },
       "rateLimit": "Da die KI-API nicht kostenlos ist, ist diese Integration auf 3.000 Textanfragen und 500 Bildanfragen pro Monat und Konto begrenzt.",
       "notOnGladysPlus": "Da die KI-API nicht kostenlos ist, ist diese Integration nur für Gladys-Plus-Benutzer verfügbar.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren.",
+      "ttsProvider": "Stimme (Sprachsynthese-Anbieter)",
+      "ttsProviderText": "Der Anbieter, der zum Sprechen verwendet wird: Szenen-Ansagen auf Ihren Lautsprechern und die Antworten des Sprachassistenten. Gladys Plus funktioniert überall (auch beim Fernzugriff); eine TTS-Anbieter-Integration erzeugt die Stimme lokal und stellt sie über Ihr lokales Netzwerk bereit."
     },
     "callmebot": {
       "title": "CallMeBot",

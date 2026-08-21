@@ -291,6 +291,7 @@ const AppRouter = connect(
         <Redirect path="/dashboard/integration/communication" to="/dashboard/integration" />
         <Redirect path="/dashboard/integration/calendar" to="/dashboard/integration/services" />
         <Redirect path="/dashboard/integration/weather" to="/dashboard/integration/environment" />
+        <Redirect path="/dashboard/integration/tts" to="/dashboard/integration/assistants" />
         <Redirect path="/dashboard/integration/music" to="/dashboard/integration" />
         <Redirect path="/dashboard/integration/health" to="/dashboard/integration" />
         <Redirect path="/dashboard/integration/navigation" to="/dashboard/integration" />

@@ -28,15 +28,15 @@ describe('scene.play-notification', () => {
     const message = {
       sendToUser: fake.resolves(null),
     };
-    const gateway = {
-      getTTSApiUrl: fake.resolves({ url: 'http://test.com' }),
+    const tts = {
+      getSpeechUrl: fake.resolves({ url: 'http://test.com', provider: 'gladys-plus' }),
     };
     const device = {
       setValue: fake.resolves(null),
     };
     const scope = {};
     await executeActions(
-      { stateManager, event, message, gateway, device },
+      { stateManager, event, message, tts, device },
       [
         [
           {
@@ -54,7 +54,7 @@ describe('scene.play-notification', () => {
       ],
       scope,
     );
-    assert.calledWith(gateway.getTTSApiUrl, { text: 'Temperature in the living room is 15 °C.' });
+    assert.calledWith(tts.getSpeechUrl, { text: 'Temperature in the living room is 15 °C.' });
     assert.calledWith(device.setValue, oneDevice, deviceFeature, 'http://test.com');
   });
 });

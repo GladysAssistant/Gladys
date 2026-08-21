@@ -19,6 +19,7 @@ const ExternalIntegrationController = require('./controllers/externalIntegration
 const IntegrationHostController = require('./controllers/integrationHost.controller');
 const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
+const TtsController = require('./controllers/tts.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
 const EnergyPriceController = require('./controllers/energy-price.controller');
@@ -46,6 +47,7 @@ function getRoutes(gladys) {
   const pingController = PingController();
   const gatewayController = GatewayController(gladys);
   const roomController = RoomController(gladys);
+  const ttsController = TtsController(gladys);
   const variableController = VariableController(gladys);
   const sessionController = SessionController(gladys);
   const serviceController = ServiceController(gladys);
@@ -451,6 +453,25 @@ function getRoutes(gladys) {
     'post /api/v1/gateway/tts': {
       authenticated: true,
       controller: gatewayController.getTtsUrl,
+    },
+    // tts (see docs/specs/external-integrations.md, B.21)
+    'get /api/v1/tts/provider': {
+      // non-admin read: the scene editor uses it to stop showing the
+      // Gladys Plus upsell when another provider is active
+      authenticated: true,
+      controller: ttsController.getProviderConfiguration,
+    },
+    'post /api/v1/tts/provider': {
+      authenticated: true,
+      admin: true,
+      controller: ttsController.setActiveProvider,
+    },
+    'get /api/v1/tts/audio/:token': {
+      // unauthenticated by design: fetched by LAN speakers (Sonos
+      // trackUri...) that cannot send a JWT — the high-entropy token
+      // minted by gladys.tts.getSpeechUrl is the secret
+      authenticated: false,
+      controller: ttsController.getAudio,
     },
     'post /api/v1/gateway/refresh-latest-gladys-version': {
       authenticated: true,

@@ -28,6 +28,7 @@ const Weather = require('./weather');
 const { EVENTS } = require('../utils/constants');
 const EnergyPrice = require('./energy-price');
 const ExternalIntegration = require('./external-integration');
+const Tts = require('./tts');
 
 /**
  * @description Start a new Gladys instance.
@@ -101,6 +102,7 @@ function Gladys(params = {}) {
     brain,
     device,
   );
+  const tts = new Tts(variable, service, stateManager, gateway);
   const scene = new Scene(
     stateManager,
     event,
@@ -114,9 +116,13 @@ function Gladys(params = {}) {
     scheduler,
     brain,
     service,
+    tts,
   );
   gateway.scene = scene;
   gateway.energyPrice = energyPrice;
+  // the voice assistant reply (gateway.processVoiceMessage) speaks through
+  // the active TTS provider; attached post-construction like gateway.scene
+  gateway.tts = tts;
   // The device migration (device.migrate) rewrites scenes: the scene manager
   // is created after the device manager, so it is attached post-construction
   // (same pattern as gateway.scene above). Dashboards have no RAM cache and
@@ -151,6 +157,7 @@ function Gladys(params = {}) {
     weather,
     energyPrice,
     externalIntegration,
+    tts,
     start: async () => {
       // set wal mode
       await db.sequelize.query('PRAGMA journal_mode=WAL;');

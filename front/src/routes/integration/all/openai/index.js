@@ -1,11 +1,14 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
+import { USER_ROLE } from '../../../../../../server/utils/constants';
 import Layout from './Layout';
 import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsellCard';
 import WeeklyDigestSettings from './WeeklyDigestSettings';
 import AiChatDebugDownload from './AiChatDebugDownload';
 import AiQuotaDisplay from './AiQuotaDisplay';
+import TtsProviderSettings from './TtsProviderSettings';
 
 class OpenAIGateway extends Component {
   isGladysPlusConnected = async () => {
@@ -35,6 +38,7 @@ class OpenAIGateway extends Component {
   }
 
   render(props, { gladysPlusConnected }) {
+    const isAdmin = get(props, 'user.role') === USER_ROLE.ADMIN;
     return (
       <Layout user={props.user}>
         <div class="card">
@@ -122,6 +126,10 @@ class OpenAIGateway extends Component {
             )}
           </div>
         </div>
+        {/* the voice does not need Gladys Plus (an installed TTS provider
+            integration works locally) but it is an instance-wide, admin-only
+            setting — same gating as the AI provider card */}
+        {isAdmin && <TtsProviderSettings />}
         {gladysPlusConnected === true && <AiQuotaDisplay />}
         {gladysPlusConnected === true && <WeeklyDigestSettings />}
         {gladysPlusConnected === true && <AiChatDebugDownload />}

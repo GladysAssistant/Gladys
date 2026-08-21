@@ -892,8 +892,9 @@ const actionsFunc = {
     );
     // replace variable in text
     const messageWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
-    // Get TTS URL
-    const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
+    // Get TTS URL from the active provider (Gladys Plus by default, or any
+    // TTS provider integration — see gladys.tts)
+    const { url } = await self.tts.getSpeechUrl({ text: messageWithVariables });
     // Play TTS Notification on device
     await self.device.setValue(device, deviceFeature, url, { volume: action.volume });
   },
