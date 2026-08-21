@@ -138,6 +138,7 @@ const HOME_SECTIONS = [
         device_features: [
           'living-room-ceiling-light-binary',
           'living-room-ceiling-light-brightness',
+          'living-room-ceiling-light-color',
           'living-room-tv-lamp-binary',
           'living-room-tv-lamp-color',
           'living-room-shutter-state',
@@ -147,6 +148,7 @@ const HOME_SECTIONS = [
         device_feature_names: [
           'Ceiling light',
           'Brightness',
+          'Color',
           'TV backlight',
           'Color',
           'Shutter',
@@ -166,12 +168,21 @@ const HOME_SECTIONS = [
         device_features: [
           'kitchen-spots-binary',
           'kitchen-spots-brightness',
+          'kitchen-spots-temperature',
           'kitchen-coffee-binary',
           'kitchen-window-opening',
           'kitchen-leak',
           'kitchen-temperature'
         ],
-        device_feature_names: ['Kitchen spots', 'Brightness', 'Coffee machine', 'Window', 'Water leak', 'Temperature']
+        device_feature_names: [
+          'Kitchen spots',
+          'Brightness',
+          'Color temperature',
+          'Coffee machine',
+          'Window',
+          'Water leak',
+          'Temperature'
+        ]
       }
     ],
     [
