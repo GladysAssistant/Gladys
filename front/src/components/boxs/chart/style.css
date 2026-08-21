@@ -80,22 +80,6 @@
   text-decoration: none;
 }
 
-/* The loader icon is a static glyph: it only looks like a loader when it turns. */
-.spinning {
-  display: inline-block;
-  animation: dropdownItemChartSpin 1s linear infinite;
-}
-
-@keyframes dropdownItemChartSpin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .dropdownItemChart:focus,
 .dropdownItemChart:hover {
   color: inherit;
@@ -108,13 +92,6 @@
   color: #206bc4;
   text-decoration: none;
   background-color: rgba(32, 107, 196, 0.06);
-}
-
-.dropdownDivider {
-  height: 0;
-  margin: 0.25rem 0;
-  overflow: hidden;
-  border-top: 1px solid rgba(101, 109, 119, 0.16);
 }
 
 .textGreen {

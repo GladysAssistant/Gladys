@@ -8,9 +8,8 @@ import slugify from './slugify';
 const UTF8_BOM = '\uFEFF';
 
 /**
- * Download the history of the given device features as a CSV file.
- * Shared by every place offering a CSV export (chart widget, device list), so
- * they all produce the same file and the same filename convention.
+ * Download the history of the given device features as a CSV file: request the
+ * server export, then hand the file to the browser.
  *
  * @param {object} httpClient - The Gladys HTTP client.
  * @param {object} options - The export options.

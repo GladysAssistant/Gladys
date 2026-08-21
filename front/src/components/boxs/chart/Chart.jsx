@@ -13,7 +13,6 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
 import { getDeviceName } from '../../../utils/device';
 import { formatHttpError } from '../../../utils/formatErrors';
-import downloadDeviceFeaturesCsv from '../../../utils/downloadDeviceFeaturesCsv';
 
 dayjs.extend(localizedFormat);
 
@@ -125,10 +124,6 @@ class Chartbox extends Component {
   dropdownRef = createRef();
 
   handleClickOutside = event => {
-    // The export spinner lives in the dropdown, so the menu stays open until the export is done
-    if (this.state.exportingCsv) {
-      return;
-    }
     if (this.dropdownRef.current && !this.dropdownRef.current.contains(event.target)) {
       this.setState({ dropdown: false });
     }
@@ -208,43 +203,6 @@ class Chartbox extends Component {
     });
     this.getData();
   };
-  getDeviceFeatures = () => {
-    if (this.props.box.device_features) {
-      return this.props.box.device_features;
-    }
-    // Legacy boxes were saved with one single device feature
-    if (this.props.box.device_feature) {
-      return [this.props.box.device_feature];
-    }
-    return [];
-  };
-  exportCsv = async e => {
-    e.preventDefault();
-    const deviceFeatures = this.getDeviceFeatures();
-    if (deviceFeatures.length === 0) {
-      return;
-    }
-    // The dropdown is kept open while the export runs: it holds the only progress indicator.
-    // It is closed once the export is done, see the end of this function.
-    await this.setState({ exportingCsv: true, exportError: null, exportErrorDetail: null });
-    try {
-      // The exported period is exactly the period currently displayed on the chart,
-      // so the user can browse to a past period and export it.
-      const endAt = dayjs().subtract(this.state.offset, 'minute');
-      const startAt = endAt.subtract(this.state.interval, 'minute');
-      await downloadDeviceFeaturesCsv(this.props.httpClient, {
-        deviceFeatures,
-        startAt,
-        endAt,
-        filename: this.props.box.title
-      });
-    } catch (err) {
-      console.error(err);
-      const { errorDetailString } = formatHttpError(err);
-      this.setState({ exportError: true, exportErrorDetail: errorDetailString });
-    }
-    this.setState({ exportingCsv: false, dropdown: false });
-  };
   navigateToPreviousPeriod = async () => {
     await this.setState(prevState => ({
       offset: prevState.offset + prevState.interval
@@ -297,9 +255,7 @@ class Chartbox extends Component {
       });
       return;
     }
-    // A failed export is about the period the user was looking at: it is cleared
-    // as soon as the chart displays something else.
-    await this.setState({ loading: true, error: null, errorDetail: null, exportError: null, exportErrorDetail: null });
+    await this.setState({ loading: true, error: null, errorDetail: null });
     try {
       const maxStates = 300;
 
@@ -567,10 +523,7 @@ class Chartbox extends Component {
       unit,
       nbFeaturesDisplayed,
       error,
-      errorDetail,
-      exportingCsv,
-      exportError,
-      exportErrorDetail
+      errorDetail
     }
   ) {
     const { box } = this.props;
@@ -697,22 +650,6 @@ class Chartbox extends Component {
                         <Text id="dashboard.boxes.chart.lastYear" />
                       </a>
                     )}
-                    <div class={style.dropdownDivider} />
-                    <button
-                      type="button"
-                      class={style.dropdownItemChart}
-                      onClick={this.exportCsv}
-                      disabled={exportingCsv}
-                    >
-                      <i
-                        class={cx('fe', 'mr-2', {
-                          'fe-download': !exportingCsv,
-                          'fe-loader': exportingCsv,
-                          [style.spinning]: exportingCsv
-                        })}
-                      />
-                      <Text id="dashboard.boxes.chart.exportCsv" />
-                    </button>
                   </div>
                 </div>
 
@@ -729,13 +666,6 @@ class Chartbox extends Component {
               </div>
             )}
           </div>
-
-          {exportError && (
-            <div class="alert alert-danger mt-3 mb-0">
-              <Text id="dashboard.boxes.chart.exportCsvError" />
-              {exportErrorDetail && <div class="small">{exportErrorDetail}</div>}
-            </div>
-          )}
 
           {props.box.chart_type && (
             <div>
