@@ -4334,6 +4334,14 @@
       "feature2": "Proactive AI in scenes: run home automation questions on a schedule (read a licence plate, check CO₂ levels, monitor a camera…)",
       "feature3": "Open-weight AI models · no data resold"
     },
+    "chat": {
+      "title": "Chat with your home using Gladys Plus AI",
+      "description": "Gladys Plus unlocks the chat: ask questions in plain language, control your devices and know what is happening at home. Open-weight AI models hosted in France.",
+      "feature1": "\"Turn off the living room light\", \"Is the garage door closed?\" — just send a message",
+      "feature2": "In your scenes, the AI analyses what your cameras see and answers you",
+      "feature3": "Get a weekly summary of your home: temperatures, consumption, devices left on",
+      "feature4": "Open-weight AI models · no data resold"
+    },
     "enedis": {
       "title": "Track your electric consumption with Enedis",
       "description": "Gladys Plus includes the official Enedis integration to fetch your electric consumption, show it on your dashboards and trigger scenes based on it.",
@@ -5858,23 +5866,10 @@
   },
   "chat": {
     "emptyStateMessage": "Send me a message!",
-    "emptyStateMessageNoPlus": "Gladys chat uses Gladys Plus AI. Connect your instance to Gladys Plus to chat with your home.",
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
     "gladysAlt": "Gladys",
-    "sidebar": {
-      "title": "How does the chat work?",
-      "intro": "Gladys chat uses Gladys Plus artificial intelligence so you can communicate naturally with your connected home.",
-      "plusNotConfigured": "Connect Gladys Plus to use AI chat.",
-      "plusActive": "Gladys Plus AI is active in this chat.",
-      "upsellTitle": "Unlock advanced AI",
-      "upsellCompactDescription": "Gladys Plus gives you access to open-weight AI models in this chat: open questions, camera analysis, and more.",
-      "upsellDescription": "Chat naturally with your connected home using Gladys Plus artificial intelligence.",
-      "upsellFeature1": "Ask open-ended questions to your home",
-      "upsellFeature2": "Analyse what your cameras see",
-      "upsellFeature3": "Open-weight AI models · no data resold"
-    },
     "toolCall": {
       "statusUsed": "Used",
       "statusError": "Error",
