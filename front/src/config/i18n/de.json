@@ -4278,6 +4278,7 @@
     "duckDbMigrationProgressTitle": "Migrationsfortschritt",
     "duckDbMigrationMigrationDone": "Migration abgeschlossen:",
     "duckDbNumberOfStatesinSQlite": "Anzahl der Zustände in SQLite",
+    "duckDbNumberOfAggregatesinSQlite": "Anzahl der Aggregate in SQLite",
     "duckDbNumberOfStatesinDuckDb": "Anzahl der Zustände in DuckDB",
     "restartMigrationTitle": "Migration neu starten",
     "confirm": "Bestätigen",
