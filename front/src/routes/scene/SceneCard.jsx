@@ -68,7 +68,7 @@ class SceneCard extends Component {
   getMobileView = (props, { saving }) => {
     const runningInfo = this.getRunningInfo(props);
     return (
-      <div class="list-group-item">
+      <div class={style.sceneMobileRow}>
         <div class="row align-items-center">
           <a
             href={`/dashboard/scene/${props.scene.selector}`}
@@ -76,7 +76,9 @@ class SceneCard extends Component {
               [style.disabledSceneRow]: !props.scene.active
             })}
           >
-            <i class={`fe fe-${props.scene.icon}`} />
+            <span class={style.sceneRowIcon}>
+              <i class={`fe fe-${props.scene.icon}`} />
+            </span>
           </a>
           <a
             href={this.getSceneUrl()}
@@ -128,7 +130,7 @@ class SceneCard extends Component {
           <div class="dimmer-content h-100">
             <div class="card h-100 d-flex flex-column justify-content-between">
               <div class="card-body p-3 text-center h-100 d-flex flex-column">
-                <div class={style.scene_icon}>
+                <div class={style.sceneCardIcon}>
                   <i class={`fe fe-${props.scene.icon}`} />
                 </div>
                 <div class={style.disableSceneButton}>
@@ -158,7 +160,7 @@ class SceneCard extends Component {
                 </div>
               </div>
               <div class="mt-auto">
-                <div class="card-footer">
+                <div class={cx('card-footer', style.sceneCardFooter)}>
                   <div class="btn-list text-center">
                     <Link href={this.getSceneUrl()} class="btn btn-outline-primary btn-sm">
                       <i class="fe fe-edit" />

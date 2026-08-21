@@ -1,23 +1,29 @@
 import { h } from 'preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import cx from 'classnames';
 import TriggerCard from './TriggerCard';
+import style from './style.css';
 
 const TriggerGroup = ({ children, ...props }) => (
   <div class="col">
     <div class="card">
-      <div class="card-status bg-green" />
       <div class="card-header">
         <h4 class="text-center card-title ">
           <Text id="editScene.triggersTitle" />
         </h4>
         <div class="card-options">
-          <button class="btn btn-outline-primary" onClick={props.addTrigger}>
-            <span class="d-none d-sm-inline-block">
-              <Text id="editScene.addNewTriggerButton" />
-            </span>{' '}
-            <i class="fe fe-plus" />
-          </button>
+          <Localizer>
+            <button
+              class={cx('btn btn-outline-primary', style.addTriggerButton)}
+              onClick={props.addTrigger}
+              aria-label={<Text id="editScene.addNewTriggerButton" />}
+            >
+              <span class="d-none d-sm-inline-block" aria-hidden="true">
+                <Text id="editScene.addNewTriggerButton" />
+              </span>{' '}
+              <i class="fe fe-plus" />
+            </button>
+          </Localizer>
         </div>
       </div>
       <div class="card-body">
@@ -28,31 +34,36 @@ const TriggerGroup = ({ children, ...props }) => (
         >
           <div class="loader" />
           <div class="dimmer-content">
-            {props.triggers && props.triggers.length > 0 && (
-              <div class="alert alert-info">
-                <Text id="editScene.triggersDescription" />
-              </div>
-            )}
             {props.triggers && props.triggers.length === 0 && (
               <div class="text-center">
                 <Text id="editScene.noTriggersYet" />
               </div>
             )}
-            <div class="row">
-              {props.triggers &&
-                props.triggers.map((trigger, index) => (
-                  <div class="col-lg-6">
-                    <TriggerCard
-                      trigger={trigger}
-                      deleteTrigger={props.deleteTrigger}
-                      index={index}
-                      updateTriggerProperty={props.updateTriggerProperty}
-                      variables={props.variables}
-                      setVariablesTrigger={props.setVariablesTrigger}
-                    />
-                  </div>
-                ))}
-            </div>
+            {props.triggers &&
+              props.triggers.map((trigger, index) => (
+                <div>
+                  {index > 0 && (
+                    <div class={style.orSeparator}>
+                      <span class={style.orSeparatorLabel}>
+                        <Text id="editScene.orSeparator" />
+                      </span>
+                    </div>
+                  )}
+                  <TriggerCard
+                    trigger={trigger}
+                    deleteTrigger={props.deleteTrigger}
+                    index={index}
+                    updateTriggerProperty={props.updateTriggerProperty}
+                    variables={props.variables}
+                    setVariablesTrigger={props.setVariablesTrigger}
+                  />
+                </div>
+              ))}
+            {props.triggers && props.triggers.length > 1 && (
+              <div class={style.triggersHint}>
+                <i class="fe fe-info" /> <Text id="editScene.triggersIndependentHint" />
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -3233,12 +3233,7 @@
     "newCondition": "New condition",
     "selectActionType": "Select an action type",
     "selectConditionType": "Select a condition type",
-    "addActionButton": "Add action",
-    "addActionGroupButton": "Add action group",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
-    "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
-    "triggersDescription": "Every trigger is independent. When any of those triggers are triggered, the scene will run.",
-    "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
@@ -3598,6 +3593,89 @@
         "set": "Set a variable"
       }
     },
+    "actionsDescriptions": {
+      "light": {
+        "turn-on": "Turn on one or more lights",
+        "turn-off": "Turn off one or more lights",
+        "toggle": "Invert the current state of the lights",
+        "blink": "Blink lights to get attention"
+      },
+      "switch": {
+        "turn-on": "Turn on a plug or a switch",
+        "turn-off": "Turn off a plug or a switch",
+        "toggle": "Invert the current state of the plugs"
+      },
+      "device": {
+        "set-value": "Send a command to any device",
+        "get-value": "Get the latest value of a sensor to use it later"
+      },
+      "message": {
+        "send": "Send a notification (Telegram, app…)",
+        "send-camera": "Send the latest image of a camera"
+      },
+      "sms": {
+        "send": "Send a text message to a phone"
+      },
+      "music": {
+        "play-notification": "Read a text out loud on a speaker"
+      },
+      "condition": {
+        "if-then-else": "Follow a different path depending on a condition",
+        "only-continue-if": "Stop the scene here if the condition is not met",
+        "while": "Repeat actions as long as a condition is true",
+        "check-time": "Only continue at certain times or on certain days"
+      },
+      "user": {
+        "check-presence": "Mark a user as away if they haven't been seen recently",
+        "set-seen-at-home": "Tell Gladys a user is at home",
+        "set-out-of-home": "Tell Gladys a user has left home"
+      },
+      "house": {
+        "is-empty": "Only continue if nobody is home",
+        "is-not-empty": "Only continue if someone is home"
+      },
+      "alarm": {
+        "check-alarm-mode": "Only continue if the alarm is in a given mode",
+        "set-alarm-mode": "Arm or disarm the alarm of a house"
+      },
+      "calendar": {
+        "is-event-running": "Continue depending on whether a calendar event is running",
+        "get-events": "Fetch calendar events to use them later"
+      },
+      "ecowatt": {
+        "condition": "Continue depending on the Ecowatt signal of the French power grid"
+      },
+      "edf-tempo": {
+        "condition": "Continue depending on the EDF Tempo day color (France)"
+      },
+      "delay": "Pause before the next step",
+      "scene": {
+        "start": "Start another scene"
+      },
+      "http": {
+        "request": "Call an external API or service"
+      },
+      "mqtt": {
+        "send": "Publish a message on the MQTT broker"
+      },
+      "zigbee2mqtt": {
+        "send": "Publish a message to a Zigbee2MQTT device"
+      },
+      "ai": {
+        "ask": "Ask the AI a question and use its answer"
+      },
+      "variable": {
+        "set": "Store a value to reuse it later in the scene"
+      }
+    },
+    "actionCategories": {
+      "devices": "Devices & lights",
+      "messages": "Messages & notifications",
+      "conditions": "Conditions",
+      "flow": "Flow",
+      "homeSecurity": "Home & security",
+      "advanced": "Advanced"
+    },
     "variables": {
       "device": {
         "get-value": {
@@ -3668,6 +3746,57 @@
         "alert-raised": "Weather alert raised",
         "alert-ended": "Weather alert ended"
       }
+    },
+    "triggersDescriptions": {
+      "device": {
+        "new-state": "When a sensor or a device changes state"
+      },
+      "time": {
+        "changed": "At a specific time, once or on a recurring basis",
+        "sunrise": "Every morning at sunrise",
+        "sunset": "Every evening at sunset"
+      },
+      "calendar": {
+        "event-is-coming": "Shortly before, at the start or at the end of a calendar event"
+      },
+      "user": {
+        "back-home": "When someone comes back home",
+        "left-home": "When someone leaves home"
+      },
+      "house": {
+        "empty": "When the last person leaves the house",
+        "no-longer-empty": "When someone arrives in an empty house"
+      },
+      "area": {
+        "user-entered": "When a user enters an area of the map",
+        "user-left": "When a user leaves an area of the map"
+      },
+      "alarm": {
+        "arm": "When the alarm has just been armed",
+        "arming": "During the delay before the alarm arms",
+        "partial-arm": "When the alarm switches to partial mode (night)",
+        "disarm": "When the alarm is disarmed",
+        "panic": "When panic mode is triggered",
+        "too-many-codes-tests": "When too many invalid codes have been tried"
+      },
+      "system": {
+        "start": "When Gladys starts or restarts"
+      },
+      "mqtt": {
+        "received": "When a message arrives on an MQTT topic"
+      },
+      "weather": {
+        "alert-raised": "When a weather alert starts (wind, rain…)",
+        "alert-ended": "When a weather alert ends"
+      }
+    },
+    "triggerCategories": {
+      "devices": "Devices & sensors",
+      "time": "Time & calendar",
+      "presence": "Presence",
+      "alarm": "Alarm",
+      "weather": "Weather",
+      "advanced": "Advanced"
     },
     "triggersCard": {
       "newState": {
@@ -3802,7 +3931,31 @@
           "extreme": "Extreme (red)"
         }
       }
-    }
+    },
+    "searchActionsPlaceholder": "Search for an action…",
+    "searchTriggersPlaceholder": "Search for a trigger…",
+    "noResultsFound": "No results",
+    "whenSectionTitle": "When",
+    "whenSectionSubtitle": "the scene starts as soon as any one of these events occurs",
+    "thenSectionTitle": "Then",
+    "thenSectionSubtitle": "these steps run in order",
+    "addStepButton": "Add a step",
+    "parallelBlockTitle": "At the same time",
+    "addParallelActionButton": "Add a parallel action",
+    "unsavedChanges": "Unsaved changes",
+    "savedLabel": "Saved",
+    "orSeparator": "OR",
+    "triggersIndependentHint": "Each trigger starts the scene on its own, any single one is enough. To require several conditions at the same time, add a condition step to the scene.",
+    "backButton": "Back to the scene list",
+    "insertStepButton": "Insert a step here",
+    "closeSettingsButton": "Close the settings",
+    "deleteActionButton": "Delete this action",
+    "deleteConditionButton": "Delete this condition",
+    "deleteStepButton": "Delete this step",
+    "moveHandleLabel": "Reorder (drag, or use the up and down arrow keys)",
+    "deleteTriggerButton": "Delete this trigger",
+    "expandStepButton": "Show the details",
+    "collapseStepButton": "Hide the details"
   },
   "profile": {
     "title": "Profile",
@@ -4162,6 +4315,7 @@
     "noResult": "No icon matches \"{{search}}\"."
   },
   "newScene": {
+    "backButton": "Back to the scene list",
     "cardTitle": "New scene",
     "nameLabel": "Name",
     "namePlaceholder": "Enter the name of your scene",
@@ -4172,6 +4326,7 @@
     "sceneAlreadyExist": "A scene with that name already exists."
   },
   "duplicateScene": {
+    "backButton": "Back to the scene",
     "cardTitle": "Duplicate scene \"{{name}}\"",
     "nameLabel": "Name",
     "namePlaceholder": "Enter a new name",
@@ -4184,7 +4339,14 @@
   },
   "scene": {
     "title": "Scenes",
-    "emptySceneSentenceTop": "Can't find any scenes.",
+    "emptyState": {
+      "missionChip": "First mission",
+      "title": "Create your first scene",
+      "text": "Your home is just waiting for a signal: turn on the lights at sunset, lower the heating at night, play music when you wake up... Your turn!",
+      "createButton": "Create my first scene",
+      "noResultsTitle": "No scene matches",
+      "noResultsText": "Try another keyword or clear the filters to find your scenes again."
+    },
     "newButton": "New",
     "editButton": "Edit",
     "startButton": "Start",

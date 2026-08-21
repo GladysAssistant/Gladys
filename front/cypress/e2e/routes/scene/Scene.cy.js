@@ -34,10 +34,7 @@ describe('Scene view', () => {
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
 
-    cy.get('div[class*="card-header"]')
-      .contains('editScene.settings')
-      .should('have.class', 'card-title')
-      .click();
+    cy.get('[data-cy="edit-scene-settings-button"]').click();
 
     cy.get('div[class*="form-group"]').then(inputs => {
       cy.wrap(inputs[0])
@@ -65,26 +62,14 @@ describe('Scene view', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
-    cy.contains('editScene.addActionButton')
+    cy.contains('editScene.addStepButton')
       .should('have.class', 'btn-outline-primary')
       .click();
 
-    const i18n = Cypress.env('i18n');
+    cy.get('[data-cy="type-picker-option"][data-value="house.is-empty"]').click();
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('houseControl');
-
-      cy.get('@houseControl').click(0, 0, { force: true });
-
-      cy.get('@houseControl')
-        .get('[class*="-menu"]')
-        .find('[class*="-option"]')
-        .filter(`:contains("${i18n.editScene.actions.house['is-empty']}")`)
-        .click(0, 0, { force: true });
-    });
-
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('houseControl');
+      cy.wrap(inputs[0]).as('houseControl');
       cy.get('@houseControl').click(0, 0, { force: true });
 
       cy.get('@houseControl')
@@ -144,22 +129,11 @@ describe('Scene view', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
-    cy.contains('editScene.addActionButton')
+    cy.contains('editScene.addStepButton')
       .should('have.class', 'btn-outline-primary')
       .click();
 
-    const i18n = Cypress.env('i18n');
-
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('deviceControl');
-      cy.get('@deviceControl').click(0, 0, { force: true });
-
-      cy.get('@deviceControl')
-        .get('[class*="-menu"]')
-        .find('[class*="-option"]')
-        .filter(`:contains("${i18n.editScene.actions.device['set-value']}")`)
-        .click(0, 0, { force: true });
-    });
+    cy.get('[data-cy="type-picker-option"][data-value="device.set-value"]').click();
 
     cy.wait('@loadDevices');
     cy.wait('@loadAllDevices');
@@ -167,7 +141,7 @@ describe('Scene view', () => {
     cy.wait(100);
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('deviceControl');
+      cy.wrap(inputs[0]).as('deviceControl');
       cy.get('@deviceControl').click(0, 0, { force: true });
 
       cy.get('@deviceControl')
@@ -187,18 +161,7 @@ describe('Scene view', () => {
       .should('have.class', 'btn-outline-primary')
       .click();
 
-    const i18n = Cypress.env('i18n');
-
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('calendarControl');
-      cy.get('@calendarControl').click(0, 0, { force: true });
-
-      cy.get('@calendarControl')
-        .get('[class*="-menu"]')
-        .find('[class*="-option"]')
-        .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
-        .click(0, 0, { force: true });
-    });
+    cy.get('[data-cy="type-picker-option"][data-value="calendar.event-is-coming"]').click();
 
     cy.get('select').then(selects => {
       cy.wrap(selects[0]).select('contains');
