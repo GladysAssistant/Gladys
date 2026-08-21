@@ -9,6 +9,14 @@ import { RequestStatus } from '../../../utils/consts';
 import CardFilter from '../../../components/layout/CardFilter';
 import style from './style.css';
 
+// zero rooms is its own wording, not the singular one
+const roomCountTextId = count => {
+  if (count === 0) {
+    return 'housesSettings.summary.noRoom';
+  }
+  return count > 1 ? 'housesSettings.summary.rooms' : 'housesSettings.summary.oneRoom';
+};
+
 const countRooms = houses =>
   (houses || []).reduce((total, house) => total + (house.rooms || []).filter(room => !room.to_delete).length, 0);
 
@@ -40,12 +48,18 @@ const HousePage = ({ children, ...props }) => {
               />
             </Localizer>
           </div>
-          <button onClick={props.addHouse} class="btn btn-outline-primary ml-2 flex-shrink-0">
-            <span class="d-none d-lg-inline-block mr-2">
-              <Text id="housesSettings.newButton" />
-            </span>
-            <i class="fe fe-plus" />
-          </button>
+          <Localizer>
+            <button
+              onClick={props.addHouse}
+              class="btn btn-outline-primary ml-2 flex-shrink-0"
+              aria-label={<Text id="housesSettings.newButtonLabel" />}
+            >
+              <span class="d-none d-lg-inline-block mr-2">
+                <Text id="housesSettings.newButton" />
+              </span>
+              <i class="fe fe-plus" />
+            </button>
+          </Localizer>
         </div>
       </div>
       <div class={cx('dimmer', style.houseList, { active: loading })}>
@@ -58,10 +72,7 @@ const HousePage = ({ children, ...props }) => {
                 fields={{ count: houses.length }}
               />
               {' · '}
-              <Text
-                id={roomCount > 1 ? 'housesSettings.summary.rooms' : 'housesSettings.summary.oneRoom'}
-                fields={{ count: roomCount }}
-              />
+              <Text id={roomCountTextId(roomCount)} fields={{ count: roomCount }} />
             </p>
           )}
           {houses.map((house, index) => (

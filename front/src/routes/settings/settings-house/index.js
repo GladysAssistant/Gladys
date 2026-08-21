@@ -6,6 +6,12 @@ import HousePage from './HousePage';
 import actions from '../../../actions/house';
 import { RequestStatus } from '../../../utils/consts';
 
+const omitKeys = (object, keys) => {
+  const copy = { ...object };
+  keys.forEach(key => delete copy[key]);
+  return copy;
+};
+
 // The page is an accordion: one house open at a time. Editing a house means
 // a name, a map, a room list and the alarm settings — rendering that for
 // every house at once made the page unreadable as soon as a second house
@@ -78,19 +84,14 @@ class SettingsHouses extends Component {
     await this.props.saveHouse(houseIndex);
   };
 
+  // a delete that fails leaves the house in the list with its error alert
+  // inside the open panel, so the row is only closed once the house is gone
   deleteHouse = async houseIndex => {
     const house = this.props.houses && this.props.houses[houseIndex];
-    await this.props.deleteHouse(houseIndex);
     if (house) {
-      this.setState(prevState => {
-        const dirtyHouses = { ...prevState.dirtyHouses };
-        delete dirtyHouses[house.id];
-        return {
-          dirtyHouses,
-          expandedHouseId: prevState.expandedHouseId === house.id ? null : prevState.expandedHouseId
-        };
-      });
+      this.pendingDeletes[house.id] = true;
     }
+    await this.props.deleteHouse(houseIndex);
   };
 
   addHouse = () => {
@@ -102,22 +103,12 @@ class SettingsHouses extends Component {
     this.props.addHouse();
   };
 
-  // a refetch replaces the local houses with the server ones, so pending
-  // edits (and the "unsaved" badges announcing them) are gone
-  search = e => {
-    this.setState({ dirtyHouses: {} });
-    this.props.debouncedSearch(e);
-  };
-
-  changeOrderDir = e => {
-    this.setState({ dirtyHouses: {} });
-    this.props.changeOrderDir(e);
-  };
-
   constructor(props) {
     super(props);
     // ids of the houses whose save is in flight, waiting for their status
     this.pendingSaves = {};
+    // ids of the houses whose deletion is in flight, waiting for their status
+    this.pendingDeletes = {};
     // set when the "+" button was pressed, until the new house shows up
     this.expectNewHouse = false;
     const houses = props.houses || [];
@@ -139,6 +130,31 @@ class SettingsHouses extends Component {
   componentWillReceiveProps(nextProps) {
     const houses = nextProps.houses || [];
 
+    // A house that saved successfully is in sync with the server again; one
+    // that failed keeps its badge, and the panel says why. The pending map is
+    // what makes the status readable: the store sets it to Getting when the
+    // request starts, so anything else is the outcome of that request.
+    const savedHouseIds = this.resolvePending(this.pendingSaves, nextProps);
+    if (savedHouseIds.length) {
+      this.setState(prevState => ({ dirtyHouses: omitKeys(prevState.dirtyHouses, savedHouseIds) }));
+    }
+
+    // same for deletions: the row closes only once the house is really gone
+    const deletedHouseIds = this.resolvePending(this.pendingDeletes, nextProps);
+    if (deletedHouseIds.length) {
+      this.setState(prevState => ({
+        dirtyHouses: omitKeys(prevState.dirtyHouses, deletedHouseIds),
+        expandedHouseId: deletedHouseIds.includes(prevState.expandedHouseId) ? null : prevState.expandedHouseId
+      }));
+    }
+
+    // a completed fetch replaces the whole collection with the server one, so
+    // the local edits it dropped have no badge to leave behind (a failed one
+    // keeps the houses, and their badges, in place)
+    if (this.props.housesGetStatus === RequestStatus.Getting && nextProps.housesGetStatus === RequestStatus.Success) {
+      this.setState({ dirtyHouses: {} });
+    }
+
     // open the house just created by the "+" button
     if (this.expectNewHouse && houses.length && !houses[0].created_at) {
       this.expectNewHouse = false;
@@ -146,30 +162,23 @@ class SettingsHouses extends Component {
         autoExpandDone: true,
         expandedHouseId: houses[0].id
       });
-      return;
-    }
-
-    // with a single house there is nothing to choose between: open it
-    if (!this.state.autoExpandDone && houses.length === 1) {
+    } else if (!this.state.autoExpandDone && houses.length === 1) {
+      // with a single house there is nothing to choose between: open it
       this.setState({ autoExpandDone: true, expandedHouseId: houses[0].id });
-      return;
     }
+  }
 
-    // a house that saved successfully is in sync with the server again
-    const savedHouseIds = Object.keys(this.pendingSaves).filter(houseId => {
+  // Removes from `pending` every house whose request is over, and returns the
+  // ids of those that succeeded.
+  resolvePending = (pending, nextProps) =>
+    Object.keys(pending).filter(houseId => {
       const status = get(nextProps.houseUpdateStatus, houseId);
       if (status === RequestStatus.Getting) {
         return false;
       }
-      delete this.pendingSaves[houseId];
+      delete pending[houseId];
       return status === RequestStatus.Success;
     });
-    if (savedHouseIds.length) {
-      const dirtyHouses = { ...this.state.dirtyHouses };
-      savedHouseIds.forEach(houseId => delete dirtyHouses[houseId]);
-      this.setState({ dirtyHouses });
-    }
-  }
 
   render(props, { expandedHouseId, dirtyHouses }) {
     return (
@@ -179,8 +188,6 @@ class SettingsHouses extends Component {
         dirtyHouses={dirtyHouses}
         toggleHouse={this.toggleHouse}
         addHouse={this.addHouse}
-        debouncedSearch={this.search}
-        changeOrderDir={this.changeOrderDir}
         updateHouseName={this.updateHouseName}
         updateHouseAlarmCode={this.updateHouseAlarmCode}
         updateHouseDelayBeforeArming={this.updateHouseDelayBeforeArming}

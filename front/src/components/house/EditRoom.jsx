@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
+import cx from 'classnames';
 
 import style from './style.css';
 
@@ -34,19 +35,19 @@ class EditRoom extends Component {
             value={room.name}
             onInput={this.editRoomLocal}
           />
-          <Localizer>
-            <div
-              class="input-group-append cursor-pointer"
-              onClick={this.removeRoomLocal}
-              role="button"
-              title={<Text id="housesSettings.removeRoom" />}
-              aria-label={<Text id="housesSettings.removeRoom" />}
-            >
-              <div class="input-group-text">
+          <div class="input-group-append">
+            <Localizer>
+              <button
+                type="button"
+                class={cx('input-group-text', 'cursor-pointer', style.roomRemoveButton)}
+                onClick={this.removeRoomLocal}
+                title={<Text id="housesSettings.removeRoom" />}
+                aria-label={<Text id="housesSettings.removeRoom" />}
+              >
                 <i class="fe fe-x" />
-              </div>
-            </div>
-          </Localizer>
+              </button>
+            </Localizer>
+          </div>
         </div>
       </div>
     );

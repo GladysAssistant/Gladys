@@ -24,7 +24,9 @@ function sortRoomsInHouses(houses) {
  * @example getDefaultHouseName(state);
  */
 function getDefaultHouseName(state) {
-  const dictionary = translations[state.language] || translations.en;
+  // the current locale lives in the user, not at the root of the state
+  const language = get(state, 'user.language');
+  const dictionary = (language && translations[language]) || translations.en;
   const baseName = get(dictionary, 'housesSettings.defaultNewHouseName') || 'New House';
   const existingNames = (state.houses || []).map(house => house.name);
   if (!existingNames.includes(baseName)) {
@@ -245,9 +247,25 @@ function createActions(store) {
         const rooms = await Promise.all(promises);
         const roomsWithoutDeleted = rooms.filter(room => room.selector !== undefined);
 
-        const newState = update(state, {
+        // the state may have moved while the request was in flight (another
+        // house added, deleted or saved): apply the result to the current
+        // state, on the row holding this house id
+        const currentState = store.getState();
+        const currentIndex = currentState.houses.findIndex(currentHouse => currentHouse.id === house.id);
+        const houseUpdateStatus = {
+          ...currentState.houseUpdateStatus,
+          [house.id]: RequestStatus.Success,
+          // should the server ever answer with another id, the row reads its
+          // status under that new id
+          [houseCreatedOrUpdated.id]: RequestStatus.Success
+        };
+        if (currentIndex === -1) {
+          store.setState({ houseUpdateStatus });
+          return;
+        }
+        const newState = update(currentState, {
           houses: {
-            [houseIndex]: {
+            [currentIndex]: {
               id: {
                 $set: houseCreatedOrUpdated.id
               },
@@ -263,11 +281,7 @@ function createActions(store) {
             }
           },
           houseUpdateStatus: {
-            $auto: {
-              [house.id]: {
-                $set: RequestStatus.Success
-              }
-            }
+            $set: houseUpdateStatus
           }
         });
         store.setState(newState);
@@ -298,16 +312,19 @@ function createActions(store) {
         if (house.created_at && house.selector) {
           await state.httpClient.delete(`/api/v1/house/${house.selector}`);
         }
-        const newState = update(state, {
+        const currentState = store.getState();
+        const currentIndex = currentState.houses.findIndex(currentHouse => currentHouse.id === house.id);
+        const houseUpdateStatus = { ...currentState.houseUpdateStatus, [house.id]: RequestStatus.Success };
+        if (currentIndex === -1) {
+          store.setState({ houseUpdateStatus });
+          return;
+        }
+        const newState = update(currentState, {
           houses: {
-            $splice: [[houseIndex, 1]]
+            $splice: [[currentIndex, 1]]
           },
           houseUpdateStatus: {
-            $auto: {
-              [house.id]: {
-                $set: RequestStatus.Success
-              }
-            }
+            $set: houseUpdateStatus
           }
         });
         store.setState(newState);

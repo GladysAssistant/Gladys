@@ -51,6 +51,17 @@
   max-width: 16rem;
 }
 
+/* the remove control is a real button for keyboard access: strip the native
+   chrome, keep the input-group addon geometry */
+.roomRemoveButton {
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  line-height: 1;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .noRoomYet {
   font-size: 0.8125rem;
   color: var(--gl-muted, #7c8396);

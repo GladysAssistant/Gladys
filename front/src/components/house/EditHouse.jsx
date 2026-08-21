@@ -148,14 +148,22 @@ const EditHouse = ({ children, ...props }) => {
                   onInput={props.updateHouseAlarmCode}
                 />
               </Localizer>
-              <span class="input-icon-addon cursor-pointer" onClick={props.toggleAlarmCodePassword}>
-                <i
-                  class={cx('fe', {
-                    'fe-eye': !props.showAlarmCode,
-                    'fe-eye-off': props.showAlarmCode
-                  })}
-                />
-              </span>
+              <Localizer>
+                <button
+                  type="button"
+                  class="input-icon-addon cursor-pointer"
+                  onClick={props.toggleAlarmCodePassword}
+                  aria-pressed={props.showAlarmCode}
+                  aria-label={<Text id="housesSettings.toggleAlarmCodeVisibility" />}
+                >
+                  <i
+                    class={cx('fe', {
+                      'fe-eye': !props.showAlarmCode,
+                      'fe-eye-off': props.showAlarmCode
+                    })}
+                  />
+                </button>
+              </Localizer>
             </div>
             <div
               class={cx('invalid-feedback', {
