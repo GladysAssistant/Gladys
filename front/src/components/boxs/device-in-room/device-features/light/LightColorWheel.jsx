@@ -4,13 +4,11 @@ import iro from '@jaames/iro';
 import { intToHex, hexToInt } from '../../../../../../../server/utils/colors';
 import style from './style.css';
 
-// The wheel is the main target of the panel: it takes the width it is given, between a comfortable
-// floor on a phone and a size that stays reachable with one thumb on a tablet. It is also the
-// tallest block under the brightness bar, so it gives way on a short viewport (a phone in
-// landscape, a browser with both toolbars out) rather than pushing the sheet into a long scroll —
-// which is why the viewport cap wins over the comfort floor: a smaller wheel on a short screen
-// beats a sheet that scrolls.
-const MIN_WHEEL_WIDTH = 180;
+// The wheel is the main target of the panel: it takes the width it is given, up to a size that
+// stays reachable with one thumb on a tablet. It is also the tallest block under the brightness
+// bar, so it gives way on a short viewport (a phone in landscape, a browser with both toolbars
+// out) rather than pushing the sheet into a long scroll. Both bounds are hard caps — a width or
+// height floor would make the wheel overflow the very container or viewport it must fit.
 const MAX_WHEEL_WIDTH = 260;
 const MAX_WHEEL_SHARE_OF_VIEWPORT_HEIGHT = 0.32;
 
@@ -67,10 +65,7 @@ class LightColorWheel extends Component {
     const container = this.containerRef.current;
     const availableWidth = container ? container.getBoundingClientRect().width : MAX_WHEEL_WIDTH;
     const availableHeight = window.innerHeight * MAX_WHEEL_SHARE_OF_VIEWPORT_HEIGHT;
-    // The comfort floor only applies against the container width: the viewport-height cap is the
-    // final bound, so a very short viewport gets a smaller wheel instead of a scrolling sheet.
-    const comfortableWidth = Math.max(MIN_WHEEL_WIDTH, Math.min(MAX_WHEEL_WIDTH, availableWidth));
-    return Math.round(Math.min(comfortableWidth, availableHeight));
+    return Math.round(Math.min(MAX_WHEEL_WIDTH, availableWidth, availableHeight));
   };
 
   handleResize = () => {
