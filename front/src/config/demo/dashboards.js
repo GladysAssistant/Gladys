@@ -272,7 +272,6 @@ const ENERGY_SECTIONS = [
         name: 'Car',
         actions: [
           { action_type: 'scene', scene: 'solar-car-charge' },
-          { action_type: 'device-feature', device_feature: 'garage-wallbox-charge', label: 'Charging' },
           { action_type: 'device-feature', device_feature: 'garage-door-lock', label: 'Garage door' }
         ]
       },
