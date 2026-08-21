@@ -24,6 +24,9 @@ class SettingsSystemDuckDbMigration extends Component {
       migrationState.sqlite_db_device_state_count = new Intl.NumberFormat(this.props.user.language).format(
         migrationState.sqlite_db_device_state_count
       );
+      migrationState.sqlite_db_device_state_aggregate_count = new Intl.NumberFormat(this.props.user.language).format(
+        migrationState.sqlite_db_device_state_aggregate_count
+      );
       migrationState.duck_db_device_count = new Intl.NumberFormat(this.props.user.language).format(
         migrationState.duck_db_device_count
       );
@@ -133,6 +136,12 @@ class SettingsSystemDuckDbMigration extends Component {
                       <Text id="systemSettings.duckDbNumberOfStatesinSQlite" />
                     </b>{' '}
                     : {migrationState.sqlite_db_device_state_count}
+                  </li>
+                  <li>
+                    <b>
+                      <Text id="systemSettings.duckDbNumberOfAggregatesinSQlite" />
+                    </b>{' '}
+                    : {migrationState.sqlite_db_device_state_aggregate_count}
                   </li>
                   <li>
                     <b>

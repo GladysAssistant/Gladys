@@ -24,6 +24,15 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.SECONDS,
       },
     },
+    // Maximum duration of a siren alarm, e.g. Heiman HS2WD-E
+    // https://www.zigbee2mqtt.io/devices/HS2WD-E.html
+    max_duration: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.DURATION,
+        type: DEVICE_FEATURE_TYPES.DURATION.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.SECONDS,
+      },
+    },
     battery: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.BATTERY,

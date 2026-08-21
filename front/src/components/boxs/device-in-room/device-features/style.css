@@ -2,6 +2,8 @@
   top: auto;
 }
 
+/* The light-temperature gradient of a range input — used by LightTemperatureDeviceFeature and by
+   the scene editor (DeviceSetValue) */
 /* Chrome */
 input[type='range'][class~='light-temperature']::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(178, 212, 251), rgb(243, 166, 60));

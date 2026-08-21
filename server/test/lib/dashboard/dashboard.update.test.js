@@ -75,6 +75,36 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[1].columns).to.have.lengthOf(4);
   });
 
+  it('should save per-column widths and drop all-default ones', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [[{ type: DASHBOARD_BOX_TYPE.CLOCK }], []],
+          widths: [2, 1],
+        },
+        {
+          columns: [[], [{ type: DASHBOARD_BOX_TYPE.USER_PRESENCE }]],
+          widths: [1, 1],
+        },
+      ],
+    });
+    expect(updatedDashboard.boxes[0].widths).to.deep.equal([2, 1]);
+    // all-default widths are normalized away
+    expect(updatedDashboard.boxes[1]).to.not.have.property('widths');
+  });
+
+  it('should reject a width above the maximum weight', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [[], []],
+          widths: [3, 1],
+        },
+      ],
+    });
+    await assert.isRejected(promise);
+  });
+
   it('should update the dashboard appearance', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       icon: 'home',

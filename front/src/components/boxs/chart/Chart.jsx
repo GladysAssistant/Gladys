@@ -20,6 +20,7 @@ dayjs.extend(localizedFormat);
 const ONE_HOUR_IN_MINUTES = 60;
 const TWELVE_HOURS_IN_MINUTES = 12 * 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
+const THREE_DAYS_IN_MINUTES = 3 * 24 * 60;
 const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
 const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
 const THREE_MONTHS_IN_MINUTES = 3 * 30 * 24 * 60;
@@ -29,6 +30,7 @@ const intervalByName = {
   'last-hour': ONE_HOUR_IN_MINUTES,
   'last-twelve-hours': TWELVE_HOURS_IN_MINUTES,
   'last-day': ONE_DAY_IN_MINUTES,
+  'last-three-days': THREE_DAYS_IN_MINUTES,
   'last-week': SEVEN_DAYS_IN_MINUTES,
   'last-month': THIRTY_DAYS_IN_MINUTES,
   'last-three-months': THREE_MONTHS_IN_MINUTES,
@@ -112,6 +114,7 @@ const INTERVAL_LABELS = {
   [ONE_HOUR_IN_MINUTES]: 'dashboard.boxes.chart.lastHour',
   [TWELVE_HOURS_IN_MINUTES]: 'dashboard.boxes.chart.lastTwelveHours',
   [ONE_DAY_IN_MINUTES]: 'dashboard.boxes.chart.lastDay',
+  [THREE_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastThreeDays',
   [SEVEN_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastSevenDays',
   [THIRTY_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastThirtyDays',
   [THREE_MONTHS_IN_MINUTES]: 'dashboard.boxes.chart.lastThreeMonths',
@@ -158,6 +161,15 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: ONE_DAY_IN_MINUTES,
+      offset: 0,
+      dropdown: false
+    });
+    this.getData();
+  };
+  switchTo3DaysView = async e => {
+    e.preventDefault();
+    await this.setState({
+      interval: THREE_DAYS_IN_MINUTES,
       offset: 0,
       dropdown: false
     });
@@ -635,6 +647,16 @@ class Chartbox extends Component {
                     >
                       <Text id="dashboard.boxes.chart.lastDay" />
                     </a>
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === THREE_DAYS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo3DaysView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastThreeDays" />
+                      </a>
+                    )}
                     {props.box.chart_type !== 'timeline' && (
                       <a
                         className={cx(style.dropdownItemChart, {

@@ -219,20 +219,26 @@ const AppRouter = connect(
   actions
 )(props => (
   <div id="app">
+    {/* The navigation rail lives OUTSIDE the Layout wrapper: it is chrome
+        shared by every page, while that wrapper carries the current page's
+        theme (the Horizon glass gate on integration URLs). Nested inside, the
+        rail inherited the theme's furniture rules on those URLs only. It is
+        fixed-positioned, so being a sibling of .page changes nothing to its
+        layout. */}
+    <Header
+      currentUrl={props.currentUrl}
+      user={props.user}
+      externalIntegrationsToUpdate={props.externalIntegrationsToUpdate}
+      fullScreen={props.fullScreen}
+      profilePicture={props.profilePicture}
+      toggleDropDown={props.toggleDropDown}
+      showDropDown={props.showDropDown}
+      closeDropDown={props.closeDropDown}
+      toggleCollapsedMenu={props.toggleCollapsedMenu}
+      showCollapsedMenu={props.showCollapsedMenu}
+      logout={props.logout}
+    />
     <Layout currentUrl={props.currentUrl}>
-      <Header
-        currentUrl={props.currentUrl}
-        user={props.user}
-        externalIntegrationsToUpdate={props.externalIntegrationsToUpdate}
-        fullScreen={props.fullScreen}
-        profilePicture={props.profilePicture}
-        toggleDropDown={props.toggleDropDown}
-        showDropDown={props.showDropDown}
-        closeDropDown={props.closeDropDown}
-        toggleCollapsedMenu={props.toggleCollapsedMenu}
-        showCollapsedMenu={props.showCollapsedMenu}
-        logout={props.logout}
-      />
       <Router onChange={props.handleRoute}>
         <Redirect path="/" to="/dashboard" />
         {/** ROUTE WHICH ARE DIFFERENT IN GATEWAY MODE */}

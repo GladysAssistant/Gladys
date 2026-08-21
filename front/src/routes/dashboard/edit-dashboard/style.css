@@ -70,10 +70,12 @@
   color: var(--gl-muted);
 }
 
-/* Widget preview frame */
+/* Widget preview frame. The bottom margin matches the mb-2 under the
+   in-between "+" slot, so the slot floats centered in the gap instead of
+   hugging the widget above it */
 .previewWrapper {
   position: relative;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   border-radius: 16px;
 }
 
@@ -158,26 +160,21 @@
   color: var(--gl-ink, #1c2334);
 }
 
-/* Horizon dashboard list (editor sidebar): glass panel + pill rows, same
-   family as the canvas section frames */
-.dashboardListPanel {
-  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
-  background: rgba(255, 255, 255, 0.22);
-  border-radius: var(--gl-radius-lg, 26px);
-  padding: 12px;
-  margin-bottom: 1.5rem;
+/* Horizon dashboard bar (editor): the list is a wrapping row of glass
+   pills above the canvas — the viewer's tab-bar grammar — so the canvas
+   keeps the full width (the old sidebar column ate a quarter of it,
+   painful on tablets) */
+.dashboardBar {
+  margin-bottom: 1.25rem;
 }
 
 .dashboardListHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   color: var(--gl-muted, #7c8396);
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 2px 6px 10px;
+  padding: 0 6px 8px;
 }
 
 .dashboardList {
@@ -185,12 +182,13 @@
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 .dashboardListItem {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 7px 12px;
@@ -204,6 +202,31 @@
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
+.newDashboardItem {
+  display: inline-flex;
+}
+
+/* the "new dashboard" pill closes the row, same height as its neighbors */
+.newDashboardButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--gl-surface-strong, rgba(255, 255, 255, 0.78));
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  color: var(--gl-ink, #1c2334);
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.newDashboardButton:hover {
+  border-color: var(--gl-accent, #3d6df0);
+  color: var(--gl-accent, #3d6df0);
+}
+
 .dashboardListItem:hover {
   border-color: var(--gl-accent, #3d6df0);
 }
@@ -215,6 +238,12 @@
 }
 
 .dashboardListItemName {
+  /* the same cap as the viewer's tab pills (.dashboardTabName): in a
+     wrapping row a flex item's default min-width is its content, so without
+     both of these one endless name grows to full width, pushes the "+" onto
+     the next line and never ellipsizes */
+  min-width: 0;
+  max-width: 11rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -432,6 +461,17 @@
   height: auto;
 }
 
+/* the width toggle shows its state: tinted primary while the column is wide */
+.btnColumnWidthActive,
+.btnColumnWidthActive:hover {
+  color: #467fcf;
+}
+
+:global(.glass-theme) .btnColumnWidthActive,
+:global(.glass-theme) .btnColumnWidthActive:hover {
+  color: var(--gl-accent);
+}
+
 .btnLinkDelete {
   text-decoration: none;
   border: none;
@@ -631,6 +671,86 @@
 }
 
 /* ============================================================
+   Horizon "+" affordances: every way of adding something to the
+   canvas speaks the same pill language — a quiet dashed capsule
+   for the in-between widget slots, the solid ink CTA for an empty
+   column, frosted capsules for the structural adds (column,
+   section), same family as the viewer's header pills.
+   ============================================================ */
+
+:global(.glass-theme) .btnAddNewBoxAtPosition {
+  border: 1px dashed rgba(28, 35, 52, 0.22);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.35);
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .btnAddNewBoxAtPosition:hover {
+  border-color: var(--gl-accent);
+  color: var(--gl-accent);
+  background-color: rgba(255, 255, 255, 0.65);
+}
+
+:global(.glass-theme) .addWidgetButton {
+  border: none;
+  border-radius: 999px;
+  background-color: var(--gl-ink);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+:global(.glass-theme) .addWidgetButton:hover,
+:global(.glass-theme) .addWidgetButton:focus {
+  background-color: #2a3550;
+  color: #fff;
+}
+
+:global(.glass-theme) .btnAddColumn,
+:global(.glass-theme) .addSectionButton {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--gl-ink);
+  font-weight: 600;
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.glass-theme) .addSectionButton {
+  padding: 0.45rem 1.1rem;
+}
+
+:global(.glass-theme) .btnAddColumn:hover,
+:global(.glass-theme) .addSectionButton:hover {
+  background-color: #fff;
+  color: var(--gl-ink);
+  border-color: var(--gl-border);
+}
+
+:global(.glass-theme) .btnAddColumn :global(.fe),
+:global(.glass-theme) .addSectionButton :global(.fe) {
+  color: var(--gl-accent);
+}
+
+/* the add-column hover tooltip joins the drag-pill family */
+:global(.glass-theme) .btnAddColumn[data-title]:hover:after {
+  color: #fff;
+  background-color: var(--gl-ink);
+  border: none;
+  border-radius: 10px;
+  padding: 4px 10px;
+  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.35);
+}
+
+/* the mobile column separator drops the Tabler gray for the theme's ink */
+:global(.glass-theme) .columnBoxHeader {
+  border-top-color: rgba(28, 35, 52, 0.15);
+}
+
+/* ============================================================
    Background scene picker: each thumbnail previews its own CSS
    scene (the buttons carry the scene classes directly), the
    active one gets the accent ring — same grammar as the icon
@@ -688,10 +808,39 @@
     padding: 11px 14px;
   }
 
+  .newDashboardButton {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.1rem;
+  }
+
   /* bigger hit area without growing the row */
   .listDragHandle {
     padding: 0.5rem;
     margin: -0.5rem;
+  }
+
+  /* the column header controls (trash, width toggle) are real tap targets on
+     a wall tablet. Sized like .previewButton rather than padded: these
+     buttons carry Bootstrap's p-0, whose !important would win over padding.
+     The header already reserves 48px, so the row doesn't grow. */
+  .btnLinkDelete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+
+  /* columns shrink to nothing (flex-basis 0, min-width 0), so on a narrow
+     screen the grown buttons wrap under the label instead of overflowing */
+  .columnLabel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
   }
 
   .editorTopBar :global(.btn),
