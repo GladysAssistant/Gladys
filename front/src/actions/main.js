@@ -6,6 +6,11 @@ import { route } from 'preact-router';
 import get from 'get-value';
 import { isUrlInArray } from '../utils/url';
 
+const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
+// Self-hosted gateways without Stripe get a ~100-year "trial": past this
+// horizon a countdown is meaningless, so the indicator stays hidden.
+const MAX_TRIAL_DAYS_DISPLAYED = 92;
+
 const OPEN_PAGES = [
   '/signup',
   '/signup/create-account-gladys-gateway',
@@ -90,6 +95,8 @@ function createActions(store) {
             store.setState({
               gatewayAccountExpired: true
             });
+          } else if (gatewayUser.status === 'trialing') {
+            await actions.refreshGatewayTrialState(state, gatewayUser);
           }
         }
       } catch (e) {
@@ -112,6 +119,34 @@ function createActions(store) {
           console.error(e);
         }
       }
+    },
+    async refreshGatewayTrialState(state, gatewayUser) {
+      // The gateway API adds a 24-hour grace period to current_period_end:
+      // subtract it back so the countdown matches the real end of the trial.
+      const trialEnd = new Date(gatewayUser.current_period_end).getTime() - ONE_DAY_IN_MILLISECONDS;
+      const daysLeft = Math.max(0, Math.ceil((trialEnd - Date.now()) / ONE_DAY_IN_MILLISECONDS));
+      if (daysLeft > MAX_TRIAL_DAYS_DISPLAYED) {
+        return;
+      }
+      // The "add a payment method" call-to-action must not show up when the
+      // card check fails: better no reminder than a wrong one.
+      let hasPaymentMethod = true;
+      let stripePortalKey = null;
+      try {
+        const [card, setupState] = await Promise.all([
+          state.session.gatewayClient.getCard(),
+          state.session.gatewayClient.getSetupState()
+        ]);
+        hasPaymentMethod = card !== null;
+        stripePortalKey = setupState.stripe_portal_key || null;
+      } catch (e) {
+        console.error(e);
+      }
+      store.setState({
+        gatewayTrialDaysLeft: daysLeft,
+        gatewayTrialHasPaymentMethod: hasPaymentMethod,
+        gatewayTrialStripePortalKey: stripePortalKey
+      });
     },
     async logout(state, e) {
       e.preventDefault();

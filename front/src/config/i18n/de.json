@@ -6173,6 +6173,12 @@
     "scenes": "Szenen",
     "profile": "Profil",
     "settings": "Einstellungen",
+    "trialDaysLeft": {
+      "zero": "Gladys-Plus-Testphase endet heute",
+      "one": "Gladys-Plus-Testphase: noch 1 Tag",
+      "other": "Gladys-Plus-Testphase: noch {{count}} Tage"
+    },
+    "trialAddPaymentMethod": "Zahlungsmethode hinzufügen",
     "needHelp": "Hilfe benötigt",
     "signOut": "Abmelden"
   },
