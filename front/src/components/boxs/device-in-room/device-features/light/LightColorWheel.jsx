@@ -102,6 +102,8 @@ class LightColorWheel extends Component {
     this.userIsInteracting = false;
     if (this.interactionCancelled) {
       this.interactionCancelled = false;
+      // The handle may have been dragged further before the interaction was torn down.
+      this.restoreColorFromProps();
       return;
     }
     this.props.onChange(hexToInt(color.hexString));
@@ -113,13 +115,29 @@ class LightColorWheel extends Component {
     }
     this.userIsInteracting = false;
     this.interactionCancelled = true;
+    this.detachIroDocumentListeners();
     // Prop sync was suppressed during the drag: put the wheel back on the color the lamp has.
-    const { value } = this.props;
-    if (Number.isFinite(value)) {
-      this.colorPicker.color.hexString = `#${intToHex(value)}`;
-    }
+    this.restoreColorFromProps();
     if (this.props.onCancel) {
       this.props.onCancel();
+    }
+  };
+
+  // iro attaches mousemove/touchmove/mouseup/touchend on `document` when a drag starts and only
+  // detaches them from its own mouseup/touchend branch — a branch that also `preventDefault()`s
+  // every event it sees. Leaving them attached after a cancelled touch would swallow the next tap
+  // anywhere on the page (its click is never synthesized) and let a stray touchmove keep moving the
+  // handle. Ending the interaction the way iro expects is what detaches them; its End branch emits
+  // `input:end` without reading the coordinates, so a bare synthetic mouseup is enough, and the
+  // `input:end` it triggers is swallowed by the cancelled flag set just above.
+  detachIroDocumentListeners = () => {
+    document.dispatchEvent(new MouseEvent('mouseup', { bubbles: false, cancelable: true }));
+  };
+
+  restoreColorFromProps = () => {
+    const { value } = this.props;
+    if (this.colorPicker && Number.isFinite(value)) {
+      this.colorPicker.color.hexString = `#${intToHex(value)}`;
     }
   };
 
