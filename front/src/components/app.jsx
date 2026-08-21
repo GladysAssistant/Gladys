@@ -242,6 +242,7 @@ const AppRouter = connect(
       gatewayTrialDaysLeft={props.gatewayTrialDaysLeft}
       gatewayTrialHasPaymentMethod={props.gatewayTrialHasPaymentMethod}
       gatewayTrialStripePortalKey={props.gatewayTrialStripePortalKey}
+      refreshGatewayTrialState={props.refreshGatewayTrialState}
     />
     <Layout currentUrl={props.currentUrl}>
       <Router onChange={props.handleRoute}>

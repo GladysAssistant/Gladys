@@ -231,12 +231,15 @@ class Header extends Component {
               </li>
             ))}
           </ul>
-          <GatewayTrialIndicator
-            daysLeft={props.gatewayTrialDaysLeft}
-            hasPaymentMethod={props.gatewayTrialHasPaymentMethod}
-            stripePortalKey={props.gatewayTrialStripePortalKey}
-            session={props.session}
-          />
+          {Number.isInteger(props.gatewayTrialDaysLeft) && (
+            <GatewayTrialIndicator
+              daysLeft={props.gatewayTrialDaysLeft}
+              hasPaymentMethod={props.gatewayTrialHasPaymentMethod}
+              stripePortalKey={props.gatewayTrialStripePortalKey}
+              session={props.session}
+              refreshGatewayTrialState={props.refreshGatewayTrialState}
+            />
+          )}
           <div class={cx('dropdown', style.sidebarFooter, { show: props.showDropDown })} ref={this.dropdownRef}>
             <a onClick={props.toggleDropDown} class={style.profileButton} data-toggle="dropdown">
               <span class="avatar" style={`background-image: url(${props.profilePicture})`} />

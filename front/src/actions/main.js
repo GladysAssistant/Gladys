@@ -10,6 +10,11 @@ const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 // Self-hosted gateways without Stripe get a ~100-year "trial": past this
 // horizon a countdown is meaningless, so the indicator stays hidden.
 const MAX_TRIAL_DAYS_DISPLAYED = 92;
+// Every focus-triggered refresh costs the gateway two Stripe calls: a user
+// hopping between tabs must not pay for them over and over.
+const GATEWAY_TRIAL_REFRESH_INTERVAL_MS = 30 * 1000;
+
+let lastGatewayTrialRefresh = 0;
 
 const OPEN_PAGES = [
   '/signup',
@@ -95,7 +100,7 @@ function createActions(store) {
             store.setState({
               gatewayAccountExpired: true
             });
-          } else if (gatewayUser.status === 'trialing') {
+          } else {
             await actions.refreshGatewayTrialState(state, gatewayUser);
           }
         }
@@ -120,12 +125,43 @@ function createActions(store) {
         }
       }
     },
-    async refreshGatewayTrialState(state, gatewayUser) {
-      // The gateway API adds a 24-hour grace period to current_period_end:
-      // subtract it back so the countdown matches the real end of the trial.
+    // Called at session check with the gateway user already in hand, and again
+    // with no argument when the tab regains focus: the user comes back from the
+    // Stripe portal, where they may just have entered the card this card asks
+    // for — or ended the trial altogether.
+    async refreshGatewayTrialState(state, gatewayUserFromSessionCheck) {
+      let gatewayUser = gatewayUserFromSessionCheck;
+      if (!gatewayUser) {
+        if (Date.now() - lastGatewayTrialRefresh < GATEWAY_TRIAL_REFRESH_INTERVAL_MS) {
+          return;
+        }
+        try {
+          gatewayUser = await state.session.getGatewayUser();
+        } catch (e) {
+          console.error(e);
+          return;
+        }
+      }
+      lastGatewayTrialRefresh = Date.now();
+      // The gateway API returns current_period_end padded with a 24-hour grace
+      // period (see getMySelf in the gateway: `current_period_end + interval
+      // '24 hour'`). The account indeed stays usable during that day — which is
+      // why the expiry check above compares against the padded value — but what
+      // this card counts down to is the end of the free trial, when the card on
+      // file gets charged, so the pad is taken back out here.
       const trialEnd = new Date(gatewayUser.current_period_end).getTime() - ONE_DAY_IN_MILLISECONDS;
-      const daysLeft = Math.max(0, Math.ceil((trialEnd - Date.now()) / ONE_DAY_IN_MILLISECONDS));
-      if (daysLeft > MAX_TRIAL_DAYS_DISPLAYED) {
+      // floor, not ceil: with 12 hours to go the trial ends today, it does not
+      // have "1 day left". Only a full remaining day counts as one.
+      const daysLeft = Math.max(0, Math.floor((trialEnd - Date.now()) / ONE_DAY_IN_MILLISECONDS));
+      // Billing belongs to the admin of the Gladys Plus account: the other
+      // members of the household get neither the countdown nor a one-click link
+      // into the Stripe portal of a subscription that is not theirs.
+      if (gatewayUser.status !== 'trialing' || gatewayUser.role !== 'admin' || daysLeft > MAX_TRIAL_DAYS_DISPLAYED) {
+        store.setState({
+          gatewayTrialDaysLeft: null,
+          gatewayTrialHasPaymentMethod: true,
+          gatewayTrialStripePortalKey: null
+        });
         return;
       }
       // The "add a payment method" call-to-action must not show up when the
