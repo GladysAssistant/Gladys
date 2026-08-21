@@ -155,9 +155,10 @@
   color: var(--gl-muted);
 }
 
+/* Standard dashboard width, shared by the viewer and the editor canvas so
+   switching between the two modes never shifts the layout */
 .largeContainer {
   max-width: 1600px;
-  margin-bottom: 150px;
 }
 
 /* Per-dashboard "full" width: lift the container cap, keep the side padding.
@@ -995,6 +996,12 @@
   .adaptiveTile {
     container-type: size;
     min-height: 6rem;
+    /* A value tile is a number and a label: its own stretch cap is far below
+       the generic 65vh one (which fits media boxes, whose image fills the
+       card). 16rem is where the big-tile layout reaches its full type scale
+       (20cqh = the 3.2rem clamp cap) — any taller is only empty glass, e.g.
+       a lone tile next to a very tall column. */
+    max-height: 16rem;
   }
 }
 

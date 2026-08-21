@@ -30,7 +30,8 @@ const DashboardPage = ({ children, ...props }) => {
           <div class="loader" />
           <div class="dimmer-content">
             <div class="my-3 my-md-5 dashboard">
-              <div class={cx('container', { [style.fullWidthContainer]: fullWidth })}>
+              {/* same width cap as the editor canvas: edit/view must not shift */}
+              <div class={cx('container', style.largeContainer, { [style.fullWidthContainer]: fullWidth })}>
                 <div class={cx('page-header', style.dashboardHeader)}>
                   <div class={style.dashboardHeaderTabs}>
                     {/* One-tap pills in every mode; pills that don't fit on one
