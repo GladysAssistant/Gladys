@@ -254,6 +254,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "vincentBesseau",
+      "name": "vincentBesseau",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33568805?v=4",
+      "profile": "https://github.com/vincentBesseau",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
