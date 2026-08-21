@@ -26,7 +26,7 @@ const device = {
 
 const gladys = {
   config: {
-    tempFolder: '/tmp/gladys',
+    tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
   },
   gateway: {
     gladysGatewayClient: {
@@ -110,7 +110,7 @@ describe('Camera.streaming', () => {
   it('should not start streaming, camera is disabled', async () => {
     const disabledCameraGladys = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -185,7 +185,7 @@ describe('Camera.streaming', () => {
   it('should star with 90 rotation & stop streaming', async () => {
     const gladysDeviceWithRotation = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -220,7 +220,7 @@ describe('Camera.streaming', () => {
   it('should star with 180 rotation & stop streaming', async () => {
     const gladysDeviceWithRotation = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -255,7 +255,7 @@ describe('Camera.streaming', () => {
   it('should star with 270 rotation & stop streaming', async () => {
     const gladysDeviceWithRotation = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -290,7 +290,7 @@ describe('Camera.streaming', () => {
   it('should star with not rotation params & stop streaming after', async () => {
     const gladysDeviceWithRotation = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -338,7 +338,7 @@ describe('Camera.streaming', () => {
     };
     const gladysWithHlsCamera = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -518,7 +518,7 @@ describe('Camera.streaming', () => {
   it('should stop streaming, but kill + clean is not working', async () => {
     const gladysWithFailClean = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       gateway: {
         gladysGatewayClient: {
