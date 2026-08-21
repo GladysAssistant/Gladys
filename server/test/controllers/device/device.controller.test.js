@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const db = require('../../../models');
 
 const { authenticatedRequest } = require('../request.test');
+const { EVENTS } = require('../../../utils/constants');
 
 const insertStates = async (intervalInMinutes) => {
   const deviceFeatureStateToInsert = [];
@@ -158,6 +159,74 @@ describe('GET /api/v1/device_feature/states_history', () => {
       .then((res) => {
         expect(res.body).to.have.lengthOf(0);
       });
+  });
+});
+
+describe('GET /api/v1/device_feature/states_csv', () => {
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 0, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:02:00.000Z') },
+    ]);
+  });
+  it('should export device feature states as CSV', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        device_features: 'test-device-feature',
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+      })
+      .expect('Content-Type', /csv/)
+      .expect('Content-Disposition', 'attachment; filename="gladys-history-2025-08-28-2025-08-29.csv"')
+      .expect(200)
+      .then((res) => {
+        const lines = res.text.split('\n');
+        expect(lines).to.have.lengthOf(3);
+        expect(lines[0]).to.equal('date,device,feature,unit,value');
+        expect(lines[1]).to.equal('2025-08-28T15:00:00.000Z,Test device,Test device feature,,0');
+        expect(lines[2]).to.equal('2025-08-28T15:02:00.000Z,Test device,Test device feature,,1');
+      });
+  });
+  it('should return 400 when no device feature is given', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+      })
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
+  it('should export device feature states as CSV through the Gladys Gateway', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+    };
+    // The gateway response object has no setHeader: the export must answer the CSV
+    // instead of crashing on the missing method.
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/device_feature/states_csv?device_features=test-device-feature&start=2025-08-28T00:00:00.000Z&end=2025-08-29T00:00:00.000Z',
+      {},
+      {},
+      (data) => {
+        expect(data).to.be.a('string');
+        const lines = data.split('\n');
+        expect(lines).to.have.lengthOf(3);
+        expect(lines[0]).to.equal('date,device,feature,unit,value');
+        done();
+      },
+    );
   });
 });
 

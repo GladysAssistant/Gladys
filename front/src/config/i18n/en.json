@@ -105,7 +105,22 @@
     "features": "Features",
     "emptyState": "No device found. Add devices from the integrations page, or adjust your search and filters.",
     "emptyStateButton": "Browse integrations",
-    "error": "There was an error loading the devices. Please try again later."
+    "error": "There was an error loading the devices. Please try again later.",
+    "exportCsv": "Export as CSV",
+    "export": {
+      "modalTitle": "Export the history of {{name}}",
+      "description": "Download the history of this device as a CSV file, to analyse it in a spreadsheet.",
+      "featuresLabel": "Features to export",
+      "periodLabel": "Period",
+      "startLabel": "From",
+      "endLabel": "To",
+      "invalidPeriod": "The end date must be after the start date.",
+      "noFeatureSelected": "Select at least one feature to export.",
+      "error": "The CSV export failed. Please retry.",
+      "cancelButton": "Cancel",
+      "exportButton": "Export",
+      "closeButton": "Close"
+    }
   },
   "login": {
     "title": "Gladys Assistant",

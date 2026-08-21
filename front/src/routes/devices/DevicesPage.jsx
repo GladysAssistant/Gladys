@@ -138,6 +138,7 @@ const DevicesPage = ({ children, ...props }) => (
                           <th>
                             <Text id="devicesList.features" />
                           </th>
+                          <th class="text-right" />
                         </tr>
                       </thead>
                       <tbody>

@@ -179,6 +179,71 @@ const getEnergyConsumption = (query = {}) => {
 };
 
 /**
+ * `GET /device_feature/states_csv`: the CSV export offered by the chart widget
+ * and the device list. The demo has no database, so the file is drawn from the
+ * same generated curves as the charts, on one point every ten minutes over the
+ * exported period.
+ */
+const CSV_SEPARATOR = ',';
+const CSV_HEADER = ['date', 'device', 'feature', 'unit', 'value'].join(CSV_SEPARATOR);
+const CSV_POINT_EVERY_MINUTES = 10;
+// The demo file is built in the browser: a year exported minute by minute would
+// freeze the tab, so the period is sampled to at most this many points.
+const CSV_MAX_POINTS_PER_FEATURE = 2000;
+
+const escapeCsvValue = value => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  const stringValue = String(value);
+  if (/[",\n\r]/.test(stringValue)) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+  return stringValue;
+};
+
+const getStatesCsv = (query = {}) => {
+  const selectors = [...new Set((query.device_features || '').split(',').filter(selector => selector.length > 0))];
+  const end = query.end ? dayjs(query.end) : dayjs();
+  const start = query.start ? dayjs(query.start) : end.subtract(1, 'day');
+  const totalMinutes = Math.max(end.diff(start, 'minute'), 0);
+  const points = Math.min(Math.floor(totalMinutes / CSV_POINT_EVERY_MINUTES), CSV_MAX_POINTS_PER_FEATURE);
+  const step = points > 0 ? totalMinutes / points : 0;
+
+  const rows = [];
+  selectors.forEach(selector => {
+    const found = findFeature(selector);
+    if (!found) {
+      return;
+    }
+    for (let index = 0; index <= points; index += 1) {
+      const createdAt = start.add(index * step, 'minute');
+      rows.push({
+        createdAt,
+        deviceName: found.device.name,
+        featureName: found.feature.name,
+        unit: found.feature.unit,
+        value: valueAt(found.feature, createdAt, index)
+      });
+    }
+  });
+
+  rows.sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf());
+
+  const lines = rows.map(row =>
+    [
+      row.createdAt.toISOString(),
+      escapeCsvValue(row.deviceName),
+      escapeCsvValue(row.featureName),
+      escapeCsvValue(row.unit),
+      escapeCsvValue(row.value)
+    ].join(CSV_SEPARATOR)
+  );
+
+  return [CSV_HEADER, ...lines].join('\n');
+};
+
+/**
  * `GET /device_feature/states_history`: the activity page. States are spread
  * over the last days, newest first, and the window asked by the page
  * ([since, before)) is honoured so its progressive search terminates.
@@ -255,4 +320,4 @@ const getStatesHistory = (query = {}) => {
     .slice(0, take);
 };
 
-export { getAggregatedStates, getEnergyConsumption, getStatesHistory };
+export { getAggregatedStates, getEnergyConsumption, getStatesCsv, getStatesHistory };
