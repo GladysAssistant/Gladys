@@ -120,6 +120,7 @@ Thanks goes to these wonderful people 👏
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/GziAzman"><img src="https://avatars.githubusercontent.com/u/14886739?v=4?s=100" width="100px;" alt="Alex"/><br /><sub><b>Alex</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=GziAzman" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Nagromdark"><img src="https://avatars.githubusercontent.com/u/214889285?v=4?s=100" width="100px;" alt="Nagromdark"/><br /><sub><b>Nagromdark</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=Nagromdark" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vincentBesseau"><img src="https://avatars.githubusercontent.com/u/33568805?v=4?s=100" width="100px;" alt="vincentBesseau"/><br /><sub><b>vincentBesseau</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=vincentBesseau" title="Code">💻</a> <a href="#ideas-vincentBesseau" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/William-De71"><img src="https://avatars.githubusercontent.com/u/11477113?v=4?s=100" width="100px;" alt="William Deren"/><br /><sub><b>William Deren</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=William-De71" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
