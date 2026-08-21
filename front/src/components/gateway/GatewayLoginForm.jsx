@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus, LoginStatus } from '../../utils/consts';
 
@@ -144,16 +144,19 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 <a href="#" onClick={props.showRecoveryCodeLogin}>
                   <Text id="gatewayLogin.useRecoveryCodeLink" />
                 </a>
+                <br />
+                <MarkupText id="gatewayLogin.noRecoveryCode" />
               </p>
             </div>
           )}
           {props.gatewayLoginStep2 && props.gatewayLoginUseRecoveryCode && (
             <div class="form-group">
-              <label class="form-label">
+              <label class="form-label" htmlFor="gateway-login-recovery-code">
                 <Text id="gatewayLogin.recoveryCodeLabel" />
               </label>
               <Localizer>
                 <input
+                  id="gateway-login-recovery-code"
                   type="text"
                   class="form-control"
                   placeholder={<Text id="gatewayLogin.recoveryCodePlaceholder" />}
@@ -167,6 +170,8 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 <a href="#" onClick={props.showTwoFactorCodeLogin}>
                   <Text id="gatewayLogin.useTwoFactorCodeLink" />
                 </a>
+                <br />
+                <MarkupText id="gatewayLogin.noRecoveryCode" />
               </p>
             </div>
           )}

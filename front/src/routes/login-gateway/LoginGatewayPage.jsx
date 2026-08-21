@@ -5,9 +5,11 @@ import AuthLayout from '../../components/auth/AuthLayout';
 
 const LoginGatewayPage = ({ children, ...props }) => (
   <AuthLayout>
-    {props.gatewayLoginRecoveryCodes ? (
+    {props.gatewayLoginRecoveryCodesStatus ? (
       <GatewayRecoveryCodes
         recoveryCodes={props.gatewayLoginRecoveryCodes}
+        status={props.gatewayLoginRecoveryCodesStatus}
+        onRetry={props.generateRecoveryCodes}
         onContinue={props.continueAfterRecoveryCodes}
       />
     ) : (

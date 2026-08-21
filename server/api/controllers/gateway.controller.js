@@ -40,24 +40,16 @@ module.exports = function GatewayController(gladys) {
    * @apiGroup Gateway
    */
   async function loginTwoFactor(req, res) {
-    await gladys.gateway.loginTwoFactor(
+    const { recovery_codes: recoveryCodes } = await gladys.gateway.loginTwoFactor(
       req.body.two_factor_token,
       req.body.two_factor_code,
       req.body.two_factor_recovery_code,
+      req.body.generate_recovery_codes,
     );
     res.json({
       success: true,
+      recovery_codes: recoveryCodes,
     });
-  }
-
-  /**
-   * @api {post} /api/v1/gateway/generate-recovery-codes
-   * @apiName GenerateTwoFactorRecoveryCodes
-   * @apiGroup Gateway
-   */
-  async function generateTwoFactorRecoveryCodes(req, res) {
-    const result = await gladys.gateway.generateTwoFactorRecoveryCodes();
-    res.json(result);
   }
 
   /**
@@ -289,7 +281,6 @@ module.exports = function GatewayController(gladys) {
     login: asyncMiddleware(login),
     logout: asyncMiddleware(logout),
     loginTwoFactor: asyncMiddleware(loginTwoFactor),
-    generateTwoFactorRecoveryCodes: asyncMiddleware(generateTwoFactorRecoveryCodes),
     configureTwoFactor: asyncMiddleware(configureTwoFactor),
     enableTwoFactor: asyncMiddleware(enableTwoFactor),
     getUsersKeys: asyncMiddleware(getUsersKeys),

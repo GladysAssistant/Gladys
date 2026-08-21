@@ -14,6 +14,6 @@ class Login extends Component {
 }
 
 export default connect(
-  'gatewayLoginStep2,gatewayLoginStatus,gatewayLoginError,gatewayTwoFactorJustEnabled,gatewayLoginUseRecoveryCode,gatewayLoginRecoveryCode,gatewayLoginRecoveryCodes',
+  'gatewayLoginStep2,gatewayLoginStatus,gatewayLoginError,gatewayTwoFactorJustEnabled,gatewayLoginUseRecoveryCode,gatewayLoginRecoveryCode,gatewayLoginRecoveryCodes,gatewayLoginRecoveryCodesStatus',
   actions
 )(Login);

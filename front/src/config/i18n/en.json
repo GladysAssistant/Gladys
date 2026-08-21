@@ -4397,6 +4397,7 @@
     "invalidRecoveryCode": "This recovery code is invalid or has already been used.",
     "lostTwoFactor": "Lost access to your two-factor app?",
     "useRecoveryCodeLink": "Use a recovery code",
+    "noRecoveryCode": "No recovery code? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> and we will reset it.",
     "useTwoFactorCodeLink": "Use a code from your two-factor app instead",
     "recoveryCodeLabel": "Recovery code",
     "recoveryCodePlaceholder": "Enter one of your recovery codes",
@@ -4409,6 +4410,8 @@
     "downloadButton": "Download",
     "copyButton": "Copy",
     "copiedButton": "Copied!",
+    "generationError": "We could not generate your recovery codes. Without them, you will not be able to log in if you lose your two-factor app.",
+    "retryButton": "Try again",
     "continueButton": "Continue"
   },
   "gatewayConfigureTwoFactor": {

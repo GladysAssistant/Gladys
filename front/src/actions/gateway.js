@@ -158,29 +158,23 @@ function createActions(store) {
         gatewayLoginStatus: RequestStatus.Getting
       });
       try {
-        await state.httpClient.post('/api/v1/gateway/login-two-factor', {
-          two_factor_token: state.gatewayLoginResults.two_factor_token,
-          two_factor_code: state.gatewayLoginUseRecoveryCode ? undefined : state.gatewayLoginTwoFactorCode,
-          two_factor_recovery_code: state.gatewayLoginUseRecoveryCode ? state.gatewayLoginRecoveryCode : undefined
-        });
+        // The user just enabled two-factor: the Gateway generates their recovery codes
+        // during this call and returns them once (it only stores hashes). It has to be
+        // done there: right after, Gladys connects to the Gateway as the instance and
+        // loses the Gladys Plus user token needed to generate them.
+        const { recovery_codes: gatewayLoginRecoveryCodes } = await state.httpClient.post(
+          '/api/v1/gateway/login-two-factor',
+          {
+            two_factor_token: state.gatewayLoginResults.two_factor_token,
+            two_factor_code: state.gatewayLoginUseRecoveryCode ? undefined : state.gatewayLoginTwoFactorCode,
+            two_factor_recovery_code: state.gatewayLoginUseRecoveryCode ? state.gatewayLoginRecoveryCode : undefined,
+            generate_recovery_codes: state.gatewayTwoFactorJustEnabled === true && !state.gatewayLoginUseRecoveryCode
+          }
+        );
         await actions.getStatus(store.getState());
         await actions.getKeys(store.getState());
         await actions.getInstanceKeys(store.getState());
         await actions.getBackupKey(store.getState());
-        // The user just enabled two-factor: we generate their recovery codes and
-        // display them once (only hashes are stored on the Gateway).
-        let gatewayLoginRecoveryCodes = null;
-        if (state.gatewayTwoFactorJustEnabled && !state.gatewayLoginUseRecoveryCode) {
-          try {
-            const { recovery_codes: recoveryCodes } = await state.httpClient.post(
-              '/api/v1/gateway/generate-recovery-codes'
-            );
-            gatewayLoginRecoveryCodes = recoveryCodes;
-          } catch (recoveryCodesError) {
-            // the codes can be generated again later, we don't block the setup
-            console.error(recoveryCodesError);
-          }
-        }
         store.setState({
           gatewayLoginStatus: RequestStatus.Success,
           displayGatewayLogin: false,
@@ -188,7 +182,7 @@ function createActions(store) {
           gatewayTwoFactorJustEnabled: false,
           gatewayLoginUseRecoveryCode: false,
           gatewayLoginRecoveryCode: null,
-          gatewayLoginRecoveryCodes,
+          gatewayLoginRecoveryCodes: gatewayLoginRecoveryCodes || null,
           displayConnectedSuccess: true
         });
       } catch (e) {

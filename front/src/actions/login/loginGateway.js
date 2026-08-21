@@ -31,7 +31,8 @@ function createActions(store) {
         gatewayTwoFactorJustEnabled: false,
         gatewayLoginUseRecoveryCode: false,
         gatewayLoginRecoveryCode: null,
-        gatewayLoginRecoveryCodes: null
+        gatewayLoginRecoveryCodes: null,
+        gatewayLoginRecoveryCodesStatus: null
       };
       // If there is a return URL and the URL is relative to this domain
       // (we want to avoid redirecting to another domain for security issues)
@@ -132,20 +133,35 @@ function createActions(store) {
       // display them once (only hashes are stored server side) before finishing
       // the login.
       if (state.gatewayTwoFactorJustEnabled) {
-        try {
-          const { recovery_codes: recoveryCodes } = await state.session.gatewayClient.generateTwoFactorRecoveryCodes();
-          store.setState({
-            gatewayLoginRecoveryCodes: recoveryCodes,
-            gatewayLoginRecoveryCodesNextUrl: nextUrl,
-            gatewayLoginStatus: RequestStatus.Success
-          });
-          return;
-        } catch (e) {
-          // the codes can be generated again later, we don't block the login
-          console.error(e);
-        }
+        store.setState({
+          gatewayLoginRecoveryCodesNextUrl: nextUrl,
+          gatewayLoginStatus: RequestStatus.Success
+        });
+        await actions.generateRecoveryCodes(store.getState());
+        return;
       }
       route(nextUrl);
+    },
+    async generateRecoveryCodes(state) {
+      // The login itself already succeeded here, so a failure must not send the user
+      // back to the login form: we display it on the recovery codes screen instead,
+      // where they can retry, because there is no other way to get a set of codes.
+      store.setState({
+        gatewayLoginRecoveryCodesStatus: RequestStatus.Getting,
+        gatewayLoginRecoveryCodes: null
+      });
+      try {
+        const { recovery_codes: recoveryCodes } = await state.session.gatewayClient.generateTwoFactorRecoveryCodes();
+        store.setState({
+          gatewayLoginRecoveryCodes: recoveryCodes,
+          gatewayLoginRecoveryCodesStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        console.error(e);
+        store.setState({
+          gatewayLoginRecoveryCodesStatus: RequestStatus.Error
+        });
+      }
     },
     async handleLoginError(state, e, wrongCodeStatus) {
       console.error(e);
@@ -218,7 +234,8 @@ function createActions(store) {
       const nextUrl = state.gatewayLoginRecoveryCodesNextUrl || '/dashboard';
       store.setState({
         gatewayLoginRecoveryCodes: null,
-        gatewayLoginRecoveryCodesNextUrl: null
+        gatewayLoginRecoveryCodesNextUrl: null,
+        gatewayLoginRecoveryCodesStatus: null
       });
       route(nextUrl);
     },

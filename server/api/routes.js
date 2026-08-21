@@ -380,11 +380,6 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.enableTwoFactor,
     },
-    'post /api/v1/gateway/generate-recovery-codes': {
-      authenticated: true,
-      admin: true,
-      controller: gatewayController.generateTwoFactorRecoveryCodes,
-    },
     'get /api/v1/gateway/key': {
       authenticated: true,
       admin: true,

@@ -4397,6 +4397,7 @@
     "invalidRecoveryCode": "Dieser Wiederherstellungscode ist ungültig oder wurde bereits verwendet.",
     "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren?",
     "useRecoveryCodeLink": "Einen Wiederherstellungscode verwenden",
+    "noRecoveryCode": "Keinen Wiederherstellungscode? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> und wir setzen sie zurück.",
     "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
     "recoveryCodeLabel": "Wiederherstellungscode",
     "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",
@@ -4409,6 +4410,8 @@
     "downloadButton": "Herunterladen",
     "copyButton": "Kopieren",
     "copiedButton": "Kopiert!",
+    "generationError": "Wir konnten deine Wiederherstellungscodes nicht erzeugen. Ohne sie kannst du dich nicht anmelden, wenn du deine Zwei-Faktor-App verlierst.",
+    "retryButton": "Erneut versuchen",
     "continueButton": "Weiter"
   },
   "gatewayConfigureTwoFactor": {
