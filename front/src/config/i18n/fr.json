@@ -3859,6 +3859,7 @@
     "housesTab": "Maisons",
     "usersTab": "Utilisateurs",
     "sessionsTab": "Sessions",
+    "securityTab": "Sécurité",
     "systemTab": "Système",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Sauvegardes",
@@ -4412,6 +4413,9 @@
     "copiedButton": "Copié !",
     "generationError": "Nous n'avons pas pu générer vos codes de récupération. Sans eux, vous ne pourrez pas vous connecter si vous perdez votre application 2FA.",
     "retryButton": "Réessayer",
+    "generateButton": "Générer des codes de récupération",
+    "confirmGenerateButton": "Générer de nouveaux codes",
+    "rotationWarning": "Générer un nouveau jeu invalide immédiatement les codes de récupération que vous possédez peut-être déjà. Seuls les nouveaux fonctionneront.",
     "continueButton": "Continuer"
   },
   "gatewayConfigureTwoFactor": {

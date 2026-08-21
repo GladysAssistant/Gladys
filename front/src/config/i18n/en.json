@@ -3859,6 +3859,7 @@
     "housesTab": "Houses",
     "usersTab": "Users",
     "sessionsTab": "Sessions",
+    "securityTab": "Security",
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
@@ -4412,6 +4413,9 @@
     "copiedButton": "Copied!",
     "generationError": "We could not generate your recovery codes. Without them, you will not be able to log in if you lose your two-factor app.",
     "retryButton": "Try again",
+    "generateButton": "Generate recovery codes",
+    "confirmGenerateButton": "Generate new codes",
+    "rotationWarning": "Generating a new set immediately invalidates the recovery codes you may already have. Only the new ones will work.",
     "continueButton": "Continue"
   },
   "gatewayConfigureTwoFactor": {

@@ -60,6 +60,7 @@ import DuplicateScenePage from '../routes/scene/duplicate-scene';
 import EditScenePage from '../routes/scene/edit-scene';
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
+import SettingsSecurityPage from '../routes/settings/settings-security';
 import SettingsHousePage from '../routes/settings/settings-house';
 import SettingsUserPage from '../routes/settings/settings-users';
 import SettingsEditUserPage from '../routes/settings/settings-users/edit-user';
@@ -259,6 +260,7 @@ const AppRouter = connect(
         {config.gatewayMode && <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />}
         {config.gatewayMode && <GatewayConfirmEmail path="/confirm-email" />}
         {config.gatewayMode && <SettingsBilling path="/dashboard/settings/billing" />}
+        {config.gatewayMode && <SettingsSecurityPage path="/dashboard/settings/security" />}
         {config.gatewayMode && <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />}
         {config.gatewayMode && <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />}
 

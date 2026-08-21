@@ -3859,6 +3859,7 @@
     "housesTab": "Zuhause",
     "usersTab": "Benutzer",
     "sessionsTab": "Sitzungen",
+    "securityTab": "Sicherheit",
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
@@ -4412,6 +4413,9 @@
     "copiedButton": "Kopiert!",
     "generationError": "Wir konnten deine Wiederherstellungscodes nicht erzeugen. Ohne sie kannst du dich nicht anmelden, wenn du deine Zwei-Faktor-App verlierst.",
     "retryButton": "Erneut versuchen",
+    "generateButton": "Wiederherstellungscodes erzeugen",
+    "confirmGenerateButton": "Neue Codes erzeugen",
+    "rotationWarning": "Ein neuer Satz macht die Wiederherstellungscodes, die du eventuell schon hast, sofort ungültig. Nur die neuen funktionieren.",
     "continueButton": "Weiter"
   },
   "gatewayConfigureTwoFactor": {
