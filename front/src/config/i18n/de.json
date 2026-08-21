@@ -329,6 +329,8 @@
     "editorDashboardSettingsButton": "Dashboard-Einstellungen",
     "editorDashboardSettings": "Dashboard-Einstellungen",
     "editorMoveSectionUp": "Abschnitt nach oben verschieben",
+    "editorColumnWidthWide": "Spalte verbreitern (doppelte Breite)",
+    "editorColumnWidthNormal": "Zurück zur normalen Spaltenbreite",
     "editorMoveSectionDown": "Abschnitt nach unten verschieben",
     "editorNewWidget": "Neues Widget",
     "editorNewWidgetPlaceholder": "Wähle ein Widget im Panel",

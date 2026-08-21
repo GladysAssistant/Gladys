@@ -1,7 +1,13 @@
 import Box from './Box';
 import cx from 'classnames';
 import style from './style.css';
-import { canBoxStretchAt, isTileStretchBox, isValueTileBox } from '../../utils/dashboardSections';
+import {
+  DEFAULT_COLUMN_WIDTH,
+  canBoxStretchAt,
+  getSectionWidths,
+  isTileStretchBox,
+  isValueTileBox
+} from '../../utils/dashboardSections';
 
 const BoxColumns = ({ children, ...props }) => {
   let columnOffset = 0;
@@ -16,6 +22,11 @@ const BoxColumns = ({ children, ...props }) => {
           const columnCount = Math.max(section.columns.length, 1);
           // 5 doesn't divide the 12-column grid: those columns get a 20% class instead
           const columnClass = columnCount === 5 ? style.colFifth : `col-lg-${12 / columnCount}`;
+          // per-column weights (e.g. 2|1): widths become percentage shares
+          // instead of grid classes, mobile stacking stays identical
+          const widths = getSectionWidths(section);
+          const isWeighted = widths.some(width => width !== DEFAULT_COLUMN_WIDTH);
+          const totalWeight = widths.reduce((sum, width) => sum + width, 0);
           return (
             <div
               key={`section-${sectionIndex}`}
@@ -26,10 +37,20 @@ const BoxColumns = ({ children, ...props }) => {
                 return (
                   <div
                     key={`column-${x}`}
-                    class={cx('d-flex flex-column', columnClass, style.removePadding, {
-                      [style.removePaddingFirstCol]: columnIndex === 0,
-                      [style.removePaddingLastCol]: columnIndex === section.columns.length - 1
-                    })}
+                    class={cx(
+                      'd-flex flex-column',
+                      isWeighted ? style.weightedColumn : columnClass,
+                      style.removePadding,
+                      {
+                        [style.removePaddingFirstCol]: columnIndex === 0,
+                        [style.removePaddingLastCol]: columnIndex === section.columns.length - 1
+                      }
+                    )}
+                    style={
+                      isWeighted
+                        ? `--column-width: ${((widths[columnIndex] / totalWeight) * 100).toFixed(4)}%`
+                        : undefined
+                    }
                   >
                     {column.map((box, y) =>
                       canBoxStretchAt(box, y === column.length - 1) ? (

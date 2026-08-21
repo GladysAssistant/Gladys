@@ -330,6 +330,8 @@
     "editorDashboardSettings": "Réglages du tableau de bord",
     "editorMoveSectionUp": "Monter la section",
     "editorMoveSectionDown": "Descendre la section",
+    "editorColumnWidthWide": "Élargir la colonne (largeur double)",
+    "editorColumnWidthNormal": "Revenir à la largeur normale",
     "editorNewWidget": "Nouveau widget",
     "editorNewWidgetPlaceholder": "Choisissez un widget dans le panneau",
     "reorderDashboardButton": "Re-ordonner",

@@ -43,6 +43,17 @@ describe('Dashboard', () => {
       cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/${dashboardSelector}/edit`);
     });
   });
+  it('Should widen a column', () => {
+    // a new dashboard starts with 3 columns: widen the first one
+    cy.get('[data-cy="toggle-column-width-0"]').click();
+    cy.intercept('PATCH', '**/api/v1/dashboard/*').as('saveDashboard');
+    cy.contains('.btn-outline-primary', 'dashboard.editDashboardSaveButton').click();
+    // the section is saved with one weight per column, wide first
+    cy.wait('@saveDashboard')
+      .its('request.body.boxes.0.widths')
+      .should('deep.equal', [2, 1, 1]);
+    cy.get('[data-cy="dashboard-saved-label"]').should('be.visible');
+  });
   it('Should delete dashboard', () => {
     cy.then(() => {
       cy.visit(`/dashboard/${dashboardSelector}`);

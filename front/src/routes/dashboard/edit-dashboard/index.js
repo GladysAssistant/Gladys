@@ -5,7 +5,9 @@ import update from 'immutability-helper';
 import EditDashboardPage from './EditDashboard';
 import get from 'get-value';
 import {
+  DEFAULT_COLUMN_WIDTH,
   MAX_COLUMNS_PER_SECTION,
+  WIDE_COLUMN_WIDTH,
   flattenSections,
   buildSections,
   getSectionOffsets,
@@ -57,11 +59,13 @@ class EditDashboard extends Component {
         `/api/v1/dashboard/${this.state.currentDashboardSelector}`
       );
       // The editor works on a flat list of columns so drag & drop coordinates
-      // stay global, the section sizes are kept aside and reassembled on save
-      const { columns, sectionSizes } = flattenSections(currentDashboard.boxes);
+      // stay global, the section sizes and column widths are kept aside and
+      // reassembled on save
+      const { columns, sectionSizes, columnWidths } = flattenSections(currentDashboard.boxes);
       this.setState({
         currentDashboard: { ...currentDashboard, boxes: columns },
         sectionSizes,
+        columnWidths,
         loading: false,
         hasUnsavedChanges: false
       });
@@ -319,12 +323,12 @@ class EditDashboard extends Component {
       // We purge all empty boxes
       await this.removeEmptyBoxes();
 
-      const { currentDashboard: selectedDashboard, dashboards, sectionSizes } = this.state;
+      const { currentDashboard: selectedDashboard, dashboards, sectionSizes, columnWidths } = this.state;
       const { selector } = selectedDashboard;
 
       const currentDashboard = await this.props.httpClient.patch(`/api/v1/dashboard/${selector}`, {
         ...selectedDashboard,
-        boxes: buildSections(selectedDashboard.boxes, sectionSizes)
+        boxes: buildSections(selectedDashboard.boxes, sectionSizes, columnWidths)
       });
 
       const currentDashboardIndex = dashboards.findIndex(d => d.selector === selector);
@@ -334,10 +338,13 @@ class EditDashboard extends Component {
         }
       });
 
-      const { columns, sectionSizes: newSectionSizes } = flattenSections(currentDashboard.boxes);
+      const { columns, sectionSizes: newSectionSizes, columnWidths: newColumnWidths } = flattenSections(
+        currentDashboard.boxes
+      );
       await this.setState({
         currentDashboard: { ...currentDashboard, boxes: columns },
         sectionSizes: newSectionSizes,
+        columnWidths: newColumnWidths,
         loading: false,
         dashboards: updatedDashboards,
         justSaved: true,
@@ -382,25 +389,42 @@ class EditDashboard extends Component {
         [sectionIndex]: {
           $set: sectionSizes[sectionIndex] + 1
         }
+      },
+      columnWidths: {
+        $splice: [[insertAt, 0, DEFAULT_COLUMN_WIDTH]]
       }
     });
     this.setState({ ...newState, boxNotEmptyError: false, hasUnsavedChanges: true });
   };
 
+  // A column is either normal (1) or wide (2): one toggle, no free resize
+  toggleColumnWidth = x => {
+    const isWide = this.state.columnWidths[x] === WIDE_COLUMN_WIDTH;
+    const newState = update(this.state, {
+      columnWidths: {
+        [x]: {
+          $set: isWide ? DEFAULT_COLUMN_WIDTH : WIDE_COLUMN_WIDTH
+        }
+      }
+    });
+    this.setState({ ...newState, hasUnsavedChanges: true });
+  };
+
   // Sections reorder with one-step arrows — dragging a whole section
   // across the canvas would be miserable, especially on mobile
   moveSection = (sectionIndex, direction) => {
-    const { sectionSizes, currentDashboard } = this.state;
+    const { sectionSizes, columnWidths, currentDashboard } = this.state;
     const target = sectionIndex + direction;
     if (target < 0 || target >= sectionSizes.length) {
       return;
     }
-    const sections = buildSections(currentDashboard.boxes, sectionSizes);
+    const sections = buildSections(currentDashboard.boxes, sectionSizes, columnWidths);
     [sections[sectionIndex], sections[target]] = [sections[target], sections[sectionIndex]];
-    const { columns, sectionSizes: newSectionSizes } = flattenSections(sections);
+    const { columns, sectionSizes: newSectionSizes, columnWidths: newColumnWidths } = flattenSections(sections);
     this.setState({
       currentDashboard: { ...currentDashboard, boxes: columns },
       sectionSizes: newSectionSizes,
+      columnWidths: newColumnWidths,
       boxNotEmptyError: false,
       // global column coordinates shifted: never point the panel at a stale box
       editingBoxPosition: null,
@@ -417,6 +441,9 @@ class EditDashboard extends Component {
       },
       sectionSizes: {
         $push: [1]
+      },
+      columnWidths: {
+        $push: [DEFAULT_COLUMN_WIDTH]
       }
     });
     this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
@@ -441,7 +468,10 @@ class EditDashboard extends Component {
                 [sectionIndex]: {
                   $set: newSectionSize
                 }
-              }
+              },
+        columnWidths: {
+          $splice: [[x, 1]]
+        }
       });
       await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
     } else {
@@ -511,6 +541,7 @@ class EditDashboard extends Component {
     this.state = {
       dashboards: [],
       sectionSizes: [],
+      columnWidths: [],
       newSelectedBoxType: {},
       askDeleteDashboard: false,
       boxNotEmptyError: false,
@@ -544,6 +575,7 @@ class EditDashboard extends Component {
       dashboards,
       currentDashboard,
       sectionSizes,
+      columnWidths,
       loading,
       dashboardValidationError,
       dashboardAlreadyExistError,
@@ -608,6 +640,8 @@ class EditDashboard extends Component {
         addSection={this.addSection}
         moveSection={this.moveSection}
         sectionSizes={sectionSizes}
+        columnWidths={columnWidths}
+        toggleColumnWidth={this.toggleColumnWidth}
         deleteCurrentColumn={this.deleteCurrentColumn}
         boxNotEmptyError={boxNotEmptyError}
         columnBoxNotEmptyError={columnBoxNotEmptyError}

@@ -182,6 +182,23 @@
   }
 }
 
+/* A section with per-column weights (e.g. 2|1) shares its width in
+   percentages (--column-width, set inline) instead of grid classes.
+   Same stacking behavior as a col-lg-* below the breakpoint. */
+.weightedColumn {
+  position: relative;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+@media (min-width: 992px) {
+  .weightedColumn {
+    flex: 0 0 var(--column-width);
+    max-width: var(--column-width);
+  }
+}
+
 @media (min-width: 992px) {
   .removePaddingFirstCol {
     padding-left: 0;

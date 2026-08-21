@@ -330,6 +330,8 @@
     "editorDashboardSettings": "Dashboard settings",
     "editorMoveSectionUp": "Move the section up",
     "editorMoveSectionDown": "Move the section down",
+    "editorColumnWidthWide": "Widen the column (double width)",
+    "editorColumnWidthNormal": "Back to normal column width",
     "editorNewWidget": "New widget",
     "editorNewWidgetPlaceholder": "Choose a widget in the panel",
     "reorderDashboardButton": "Re-order dashboards",
