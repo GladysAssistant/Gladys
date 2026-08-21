@@ -5874,6 +5874,17 @@
       "label": "AI model",
       "auto": "Auto",
       "priceLegend": "€ cheap · €€ mid · €€€ premium"
+    },
+    "voiceInput": {
+      "startListening": "Dictate a message",
+      "stopListening": "Stop dictation",
+      "error": "Speech recognition failed. Please try again.",
+      "errorNoSpeech": "No voice detected. Check that your microphone is enabled, then try again.",
+      "errorPermissionDenied": "Microphone access was denied. Allow it in your browser settings to dictate a message.",
+      "errorNoMicrophone": "No microphone detected. Plug one in or enable it in system settings.",
+      "errorNetwork": "Speech recognition is unavailable, your browser could not reach its speech service.",
+      "errorNotSupported": "Speech recognition is not available in this browser.",
+      "browserTranscriptionNotice": "If you dictate a message, your browser transcribes what you say: Gladys neither records nor uploads any audio. Depending on your browser, the audio may be processed on your device or sent to your browser's own speech recognition service."
     }
   },
   "history": {

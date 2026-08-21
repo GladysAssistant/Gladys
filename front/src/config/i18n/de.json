@@ -5863,6 +5863,17 @@
       "auto": "Auto",
       "priceLegend": "€ günstig · €€ mittel · €€€ premium"
     },
+    "voiceInput": {
+      "startListening": "Nachricht diktieren",
+      "stopListening": "Diktat beenden",
+      "error": "Die Spracherkennung ist fehlgeschlagen. Bitte versuche es erneut.",
+      "errorNoSpeech": "Keine Stimme erkannt. Prüfe, ob dein Mikrofon aktiviert ist, und versuche es erneut.",
+      "errorPermissionDenied": "Der Mikrofonzugriff wurde verweigert. Erlaube ihn in den Einstellungen deines Browsers, um eine Nachricht zu diktieren.",
+      "errorNoMicrophone": "Kein Mikrofon erkannt. Schließe eines an oder aktiviere es in den Systemeinstellungen.",
+      "errorNetwork": "Die Spracherkennung ist nicht verfügbar, dein Browser konnte seinen Sprachdienst nicht erreichen.",
+      "errorNotSupported": "Spracherkennung ist in diesem Browser nicht verfügbar.",
+      "browserTranscriptionNotice": "Wenn du eine Nachricht diktierst, transkribiert dein Browser, was du sagst: Gladys nimmt kein Audio auf und lädt keines hoch. Je nach Browser kann das Audio auf deinem Gerät verarbeitet oder an den eigenen Spracherkennungsdienst des Browsers gesendet werden."
+    },
     "sidebar": {
       "title": "Wie funktioniert der Chat?",
       "intro": "Der Gladys-Chat nutzt die Gladys-Plus-Künstliche Intelligenz, damit du natürlich mit deinem vernetzten Zuhause kommunizieren kannst.",
