@@ -1,4 +1,7 @@
 import { Component } from 'preact';
+import { Text, Localizer } from 'preact-i18n';
+
+import style from './style.css';
 
 class EditRoom extends Component {
   removeRoomLocal = () => {
@@ -22,8 +25,8 @@ class EditRoom extends Component {
     }
 
     return (
-      <div class="col-md-3 mb-2">
-        <div class="input-group ">
+      <div class={style.roomItem}>
+        <div class="input-group">
           <input
             type="text"
             class="form-control form-control-sm"
@@ -31,11 +34,19 @@ class EditRoom extends Component {
             value={room.name}
             onInput={this.editRoomLocal}
           />
-          <div class="input-group-append cursor-pointer" onClick={this.removeRoomLocal}>
-            <div class="input-group-text">
-              <i class="fe fe-x" />
+          <Localizer>
+            <div
+              class="input-group-append cursor-pointer"
+              onClick={this.removeRoomLocal}
+              role="button"
+              title={<Text id="housesSettings.removeRoom" />}
+              aria-label={<Text id="housesSettings.removeRoom" />}
+            >
+              <div class="input-group-text">
+                <i class="fe fe-x" />
+              </div>
             </div>
-          </div>
+          </Localizer>
         </div>
       </div>
     );

@@ -1,0 +1,97 @@
+/* The house edit form, split into labelled sections (identity, location,
+   rooms, alarm) with the actions gathered in a footer — it used to be one
+   flat run of form-groups where the save/delete buttons sat in the middle
+   of the alarm block. Light colors only: the app darkens through the
+   global inversion filter (style/dark-mode.css). */
+
+.section {
+  padding-top: 1.25rem;
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+.sectionFirst {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
+}
+
+.sectionTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted, #7c8396);
+  margin: 0 0 0.35rem;
+}
+
+.sectionHelp {
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+  margin-bottom: 0.75rem;
+}
+
+.mapWrapper {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+/* rooms: a wrapping row of editable chips instead of a 4-column grid that
+   left holes as soon as a room was removed */
+.roomsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.roomItem {
+  flex: 1 1 11rem;
+  max-width: 16rem;
+}
+
+.noRoomYet {
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+  margin-bottom: 0.75rem;
+}
+
+/* the actions live together at the bottom: the save CTA on the left, the
+   destructive action pushed away on the right */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 1.25rem;
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+.footerMain {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.savedNotice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gl-success-ink, #2e8f5b);
+}
+
+/* the confirmation sits on the warning tint so the danger button keeps its
+   own color and stays readable as a button */
+.deleteConfirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
