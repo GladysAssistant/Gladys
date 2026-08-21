@@ -42,13 +42,13 @@ class LightSlider extends Component {
   startListening = () => {
     window.addEventListener('pointermove', this.handlePointerMove);
     window.addEventListener('pointerup', this.handlePointerUp);
-    window.addEventListener('pointercancel', this.handlePointerUp);
+    window.addEventListener('pointercancel', this.handlePointerCancel);
   };
 
   stopListening = () => {
     window.removeEventListener('pointermove', this.handlePointerMove);
     window.removeEventListener('pointerup', this.handlePointerUp);
-    window.removeEventListener('pointercancel', this.handlePointerUp);
+    window.removeEventListener('pointercancel', this.handlePointerCancel);
   };
 
   getValueFromPointer = event => {
@@ -91,6 +91,19 @@ class LightSlider extends Component {
     this.isDragging = false;
     this.setState({ dragging: false });
     this.emitChange(this.getValueFromPointer(event));
+  };
+
+  // A cancelled pointer (browser scroll takeover, OS gesture, palmed tablet) is not a release:
+  // its coordinates are often unusable, and committing them would write a clamped range bound —
+  // 0% or 100% on the vertical bar — that the user never chose. The optimistic values already
+  // emitted during the drag stay as they are; nothing new is written.
+  handlePointerCancel = () => {
+    this.stopListening();
+    if (!this.isDragging) {
+      return;
+    }
+    this.isDragging = false;
+    this.setState({ dragging: false });
   };
 
   handleKeyDown = event => {

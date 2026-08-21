@@ -83,13 +83,30 @@ const getDeviceKey = feature => get(feature, 'device.id') || get(feature, 'devic
  * @example buildDeviceRows(deviceFeatures);
  */
 export const buildDeviceRows = (deviceFeatures = []) => {
+  // The panel binds each feature type once (one brightness bar, one wheel...), but nothing stops
+  // an integration from putting two bulbs on one Gladys device — the MQTT catalog adds
+  // `brightness` or `color` as many times as you want. Grouping such a device would silently drop
+  // every duplicate, so it keeps its per-feature rows instead.
+  const panelTypeCountsByDevice = {};
+  deviceFeatures.forEach(feature => {
+    const deviceId = getDeviceKey(feature);
+    if (!deviceId || !isLightPanelFeature(feature)) {
+      return;
+    }
+    const counts = panelTypeCountsByDevice[deviceId] || (panelTypeCountsByDevice[deviceId] = {});
+    counts[feature.type] = (counts[feature.type] || 0) + 1;
+  });
+  const hasDuplicatePanelType = deviceId =>
+    Object.values(panelTypeCountsByDevice[deviceId] || {}).some(count => count > 1);
+
   // Only lights with something to dose are grouped: a device holding just an on/off light feature
   // keeps the switch row it has always had.
   const groupedDeviceIds = deviceFeatures
     .filter(
       feature => getDeviceKey(feature) && isLightPanelFeature(feature) && DOSABLE_LIGHT_TYPES.includes(feature.type)
     )
-    .map(getDeviceKey);
+    .map(getDeviceKey)
+    .filter(deviceId => !hasDuplicatePanelType(deviceId));
 
   const rows = [];
   const lightRowByDeviceId = {};
