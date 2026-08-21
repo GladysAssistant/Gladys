@@ -26,7 +26,7 @@ const EditDashboard = ({ children, ...props }) => (
         <div class="dimmer-content">
           <div class="my-3 my-md-5">
             <div
-              class={cx('container', style.largeContainer, {
+              class={cx('container', style.largeContainer, editStyle.editorContainer, {
                 // live preview of the "full" width while editing
                 [style.fullWidthContainer]: get(props, 'currentDashboard.width') === 'full'
               })}
