@@ -114,11 +114,20 @@ const EditBoxColumns = ({ children, ...props }) => (
                           {sectionSize > 1 && (
                             <Localizer>
                               <button
+                                type="button"
                                 class={cx('btn p-0 ml-2', style.btnLinkDelete, {
                                   [style.btnColumnWidthActive]: isWide
                                 })}
                                 onClick={() => props.toggleColumnWidth(x)}
                                 data-cy={`toggle-column-width-${x}`}
+                                aria-pressed={isWide}
+                                aria-label={
+                                  <Text
+                                    id={
+                                      isWide ? 'dashboard.editorColumnWidthNormal' : 'dashboard.editorColumnWidthWide'
+                                    }
+                                  />
+                                }
                                 title={
                                   <Text
                                     id={
@@ -127,7 +136,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                                   />
                                 }
                               >
-                                <i class={cx('fe', isWide ? 'fe-minimize-2' : 'fe-maximize-2')} />
+                                <i class={cx('fe', isWide ? 'fe-minimize-2' : 'fe-maximize-2')} aria-hidden="true" />
                               </button>
                             </Localizer>
                           )}

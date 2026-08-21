@@ -38,4 +38,19 @@ describe('normalizeDashboardBoxes', () => {
       { columns: [[], []], widths: [2, 1] },
     ]);
   });
+  it('should pad a hole in the middle of widths, which keeps the same length', () => {
+    expect(normalizeDashboardBoxes([{ columns: [[], []], widths: [2, null] }])).to.deep.equal([
+      { columns: [[], []], widths: [2, 1] },
+    ]);
+    expect(normalizeDashboardBoxes([{ columns: [[], []], widths: [2, undefined] }])).to.deep.equal([
+      { columns: [[], []], widths: [2, 1] },
+    ]);
+    expect(normalizeDashboardBoxes([{ columns: [[], []], widths: [2, 'wide'] }])).to.deep.equal([
+      { columns: [[], []], widths: [2, 1] },
+    ]);
+  });
+  it('should keep a section with widths but non-array columns untouched', () => {
+    const sectionBoxes = [{ columns: 'invalid', widths: [2, 1] }];
+    expect(normalizeDashboardBoxes(sectionBoxes)).to.equal(sectionBoxes);
+  });
 });

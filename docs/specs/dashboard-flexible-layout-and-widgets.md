@@ -45,13 +45,17 @@ Decided with the maintainer in forum topic 10553: instead of a per-row column co
 
 - **No SQL migration**: the column stays JSON. Legacy values are normalized in a `beforeValidate` hook (`server/utils/dashboardSections.js`), so validation only ever sees the section shape and any save — even one that doesn't touch `boxes` — lazily migrates the row.
 - **Lazy, lossless migration**: on read, a legacy value (array of arrays) is normalized to a single section `[{ columns: legacyValue }]`; on the first save, the new shape is written. `dashboard.getBySelector` returns the normalized shape so the frontend only ever sees sections.
-- **Editor implementation note**: the editor keeps working on a *flat* list of columns plus a `sectionSizes` array (`front/src/utils/dashboardSections.js`), so drag & drop coordinates stay global and none of the box-level editing code changed; sections are reassembled on save.
+- **Optional per-column widths**: a section may carry a `widths` array — **one small integer weight per column, `1` = normal, `2` = wide** — so a `2 | 1` section puts a large house view on the left with a stack of tiles on the right. Weights are shares, not pixels: a column renders at `weight / totalWeight` of the section width. **Absent `widths` means an equal split**, which is the shape every dashboard had before, so there is again **no SQL migration** and existing rows are untouched.
+- **One canonical form**: the same `beforeValidate` hook aligns `widths` to the columns — it pads a missing or malformed weight with the default and truncates the extras a deleted column leaves behind — and **drops the field entirely when every column has the default weight**, so an equal-width section has exactly one representation whatever the client sent. Joi then validates what survives: integers `1..2`, at most `MAX_COLUMNS_PER_SECTION` entries. An out-of-range weight on a real column is rejected (422), not silently clamped.
+- **Editor implementation note**: the editor keeps working on a *flat* list of columns plus a `sectionSizes` array (`front/src/utils/dashboardSections.js`), so drag & drop coordinates stay global and none of the box-level editing code changed; sections are reassembled on save. **Column widths flatten and rebuild alongside `sectionSizes`**, as a `columnWidths` array holding one weight per *global* column index (`flattenSections`/`buildSections`), so they follow every structural operation — add/delete a column, add/move a section — without a second coordinate system. The front-end clamps to the two supported weights on both the flatten and the rebuild path, so malformed stored data degrades to an equal split instead of a `NaN%` width.
 - Column count per section: **1 to 6** (raised from 4 together with the per-dashboard width setting, section G — 6 columns only make sense on a wide dashboard). 5 columns don't divide the 12-column grid, so that case uses a dedicated 20% class (`BoxColumns.jsx`); beyond 6, dense rows of small items remain the job of the chips bar (section B), not of many narrow columns.
 - A section carries no name or title in phase 1 (`{ columns }` only); an optional `name` field may be added later without migration.
 
 ### A.3 Editor UX
 
 The edit mode keeps the current interaction model, per section: an "Add a section" button appends a one-column section, a per-section **+** button adds a column (up to 6) and a per-column trash removes an empty one (removing the last column removes the section); drag & drop moves boxes within and across sections/columns (the existing drag & drop and drop-zone components are reused per section). There is no separate column-count picker.
+
+**Column width toggle (implemented):** the column header carries a second control next to the trash — a two-state button that switches that column between **normal** and **wide** (the `1`/`2` weights of A.2). It is shown **only when the section has more than one column** (a width means nothing next to no neighbour), it exposes its state to assistive tech (`aria-pressed`, localized `aria-label`), and it sits in the same coarse-pointer touch-target floor as the rest of the editor chrome. The editor canvas previews the result live with `flex-grow`, so the proportion is visible before saving. This is still not a picker: two clicks, two values, no free ratio.
 
 **Editor polish (implemented):** the editor lives on the same Horizon glass surface as the dashboard (section frames as quiet glass panels, frosted drop zones), and the widget-type picker is a **searchable tile grid** (icon + localized name per type, accent-insensitive search) instead of a raw `<select>` — picking a widget is see-and-tap, like the icon picker.
 
@@ -93,7 +97,7 @@ Sections of different heights create blank space below short columns. Resolution
 
 ### A.5 Mobile
 
-On small screens sections keep today's behavior: columns collapse to a single column, sections stack in order. Nothing to configure.
+On small screens sections keep today's behavior: columns collapse to a single column, sections stack in order. Nothing to configure. **Weighted columns are no exception**: below the desktop breakpoint (992px) a `2 | 1` section stacks full-width exactly like a grid section — the percentage shares only apply above it, so a wide column never becomes a cramped one on a phone.
 
 ## B. New box type: `chips`
 
@@ -269,7 +273,8 @@ Each phase is a separate PR (or PR series) that updates this spec in the same di
 
 ## Out of scope
 
-- Per-box user-facing sizing controls (S/M/L pickers): sections + `canStretch` + compact widgets cover the target layouts without adding a sizing concept for users to manage.
+- Per-box user-facing sizing controls (S/M/L pickers): sections + `canStretch` + compact widgets cover the target layouts without adding a sizing concept for users to manage. **Per-column** widths are a different thing and are *in scope* (A.2/A.3): they are a two-value toggle on a column the user already created, not a size property to manage on every widget.
+- Free column ratios and drag-to-resize handles: a discrete `1|2` weight is one tap and always renders sensibly at every dashboard width, while a free ratio is a value to tune, to get wrong on another screen size, and to drag precisely — on a wall tablet, with a finger. The two weights cover the layout people actually ask for (a big view next to a stack of tiles); a third weight can be added later without a migration if real-world feedback asks for it.
 - Interactive chips (tap-to-act) and chip-level scene triggers: display-only in phase 2.
 - AI-assisted pin placement (vision model guessing coordinates on the illustration): manual drag placement is reliable and takes seconds; may be revisited later.
 - Floor-plan editors, 3D rendering, or camera-based live overlays.

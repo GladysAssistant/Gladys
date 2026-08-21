@@ -467,6 +467,11 @@
   color: #467fcf;
 }
 
+:global(.glass-theme) .btnColumnWidthActive,
+:global(.glass-theme) .btnColumnWidthActive:hover {
+  color: var(--gl-accent);
+}
+
 .btnLinkDelete {
   text-decoration: none;
   border: none;
@@ -813,6 +818,29 @@
   .listDragHandle {
     padding: 0.5rem;
     margin: -0.5rem;
+  }
+
+  /* the column header controls (trash, width toggle) are real tap targets on
+     a wall tablet. Sized like .previewButton rather than padded: these
+     buttons carry Bootstrap's p-0, whose !important would win over padding.
+     The header already reserves 48px, so the row doesn't grow. */
+  .btnLinkDelete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+
+  /* columns shrink to nothing (flex-basis 0, min-width 0), so on a narrow
+     screen the grown buttons wrap under the label instead of overflowing */
+  .columnLabel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
   }
 
   .editorTopBar :global(.btn),

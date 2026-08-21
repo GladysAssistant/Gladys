@@ -24,7 +24,11 @@ function normalizeSectionWidths(section) {
     const { widths: droppedWidths, ...rest } = section;
     return rest;
   }
-  if (aligned.length === widths.length) {
+  // keep the original reference only when nothing actually changed: a hole in
+  // the middle ([2, null]) keeps the length but still has to be padded, so
+  // comparing lengths alone would let a malformed value reach validation
+  const isUnchanged = aligned.length === widths.length && aligned.every((width, i) => width === widths[i]);
+  if (isUnchanged) {
     return section;
   }
   return { ...section, widths: aligned };

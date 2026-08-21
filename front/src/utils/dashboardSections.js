@@ -8,11 +8,17 @@ export const MAX_COLUMNS_PER_SECTION = 6;
 export const DEFAULT_COLUMN_WIDTH = 1;
 export const WIDE_COLUMN_WIDTH = 2;
 
+// Only the two supported weights survive: anything else (0, 3, NaN, a hole
+// left by a malformed value) falls back to normal, so the renderer never
+// divides by a zero total weight and never emits a NaN% share
+const normalizeColumnWidth = width =>
+  width === DEFAULT_COLUMN_WIDTH || width === WIDE_COLUMN_WIDTH ? width : DEFAULT_COLUMN_WIDTH;
+
 // One weight per column, defaulting missing entries so callers can always
 // index it safely whatever the stored shape
 export const getSectionWidths = section =>
   section.columns.map((column, i) =>
-    section.widths && typeof section.widths[i] === 'number' ? section.widths[i] : DEFAULT_COLUMN_WIDTH
+    normalizeColumnWidth(Array.isArray(section.widths) ? section.widths[i] : undefined)
   );
 
 // Box types that absorb the remaining height of their column so sections
@@ -73,7 +79,7 @@ export const buildSections = (columns, sectionSizes, columnWidths = []) => {
   let offset = 0;
   sectionSizes.forEach(size => {
     const section = { columns: columns.slice(offset, offset + size) };
-    const widths = section.columns.map((column, i) => columnWidths[offset + i] || DEFAULT_COLUMN_WIDTH);
+    const widths = section.columns.map((column, i) => normalizeColumnWidth(columnWidths[offset + i]));
     // all-default widths stay implicit, matching the server normalization
     if (widths.some(width => width !== DEFAULT_COLUMN_WIDTH)) {
       section.widths = widths;
