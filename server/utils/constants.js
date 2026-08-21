@@ -971,6 +971,15 @@ const DEVICE_FEATURE_TYPES = {
   },
   CAMERA: {
     IMAGE: 'image',
+    // ENABLED (spec docs/specs/camera-enable-disable.md): binary read/write gate telling Gladys
+    // whether it may use this camera. 1 = enabled (default), 0 = disabled: Gladys stops polling
+    // the camera, refuses to start a live stream and stops serving its image (dashboard, chat,
+    // scenes) — a "private mode" that does not delete the camera. A camera without this feature
+    // is always considered enabled, so cameras created before it existed keep working.
+    // Boundary: this is a Gladys-side gate, not the camera's power supply (that stays a `switch`
+    // feature on the plug feeding it); integrations able to mute the sensor itself (Matter soft
+    // privacy mode, vendor "privacy mode" APIs) map their control onto this feature.
+    ENABLED: 'enabled',
     // PTZ control (spec docs/specs/camera-ptz-control.md). MOVE: one command feature for all
     // movements, values from CAMERA_MOVE, per-camera subset declared via supported_options.
     // PRESET: recall a saved position; the labeled list lives in supported_options, the value

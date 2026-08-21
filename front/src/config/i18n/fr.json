@@ -485,6 +485,7 @@
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
         "noImageToShow": "Aucune image à afficher. Êtes-vous sûr que votre caméra est connectée et accessible par Gladys ?",
+        "cameraDisabled": "Cette caméra est désactivée. Vous pouvez la réactiver depuis la page de l'appareil, un contrôle du dashboard ou une scène.",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box",
         "latencyBoxName": "Latence",
@@ -5550,6 +5551,7 @@
     "camera": {
       "shortCategoryName": "Caméra",
       "image": "Caméra (Image)",
+      "enabled": "Caméra activée",
       "move": "Mouvement de la caméra (PTZ)",
       "preset": "Position mémorisée de la caméra (preset)",
       "pan-position": "Position panoramique de la caméra",
