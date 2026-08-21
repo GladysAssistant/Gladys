@@ -12,6 +12,7 @@ const Gateway = require('./gateway');
 const Http = require('./http');
 const Job = require('./job');
 const Location = require('./location');
+const Mdns = require('./mdns');
 const MessageHandler = require('./message');
 const Service = require('./service');
 const Session = require('./session');
@@ -70,6 +71,7 @@ function Gladys(params = {}) {
   const system = new System(db.sequelize, event, config, job, variable, user, message, brain);
   const http = new Http(system);
   const location = new Location(user, event);
+  const mdns = new Mdns(variable, event, system);
   const device = new Device(event, message, stateManager, service, room, variable, job, brain, user);
   const calendar = new Calendar(service);
   const scheduler = new Scheduler(event);
@@ -136,6 +138,7 @@ function Gladys(params = {}) {
     job,
     gateway,
     location,
+    mdns,
     message,
     user,
     service,

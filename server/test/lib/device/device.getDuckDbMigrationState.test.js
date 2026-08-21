@@ -54,6 +54,7 @@ describe('Device.getDuckDbMigrationState', () => {
       .to.have.property('duck_db_device_count')
       .that.is.a('number');
     expect(migrationState).to.have.property('sqlite_db_device_state_count', 0);
+    expect(migrationState).to.have.property('sqlite_db_device_state_aggregate_count', 0);
     expect(migrationState).to.have.property('is_migration_needed', false);
   });
   it('should return migration done', async () => {
@@ -68,6 +69,7 @@ describe('Device.getDuckDbMigrationState', () => {
       .to.have.property('duck_db_device_count')
       .that.is.a('number');
     expect(migrationState).to.have.property('sqlite_db_device_state_count', 0);
+    expect(migrationState).to.have.property('sqlite_db_device_state_aggregate_count', 0);
     expect(migrationState).to.have.property('is_migration_needed', false);
   });
   it('should return that a migration is needed when states remain in SQLite', async () => {
@@ -80,6 +82,7 @@ describe('Device.getDuckDbMigrationState', () => {
     const migrationState = await device.getDuckDbMigrationState();
     expect(migrationState).to.have.property('is_duck_db_migrated', true);
     expect(migrationState).to.have.property('sqlite_db_device_state_count', 1);
+    expect(migrationState).to.have.property('sqlite_db_device_state_aggregate_count', 0);
     expect(migrationState).to.have.property('is_migration_needed', true);
   });
   it('should return that a migration is needed when only aggregates remain in SQLite', async () => {
@@ -92,6 +95,7 @@ describe('Device.getDuckDbMigrationState', () => {
     const migrationState = await device.getDuckDbMigrationState();
     expect(migrationState).to.have.property('is_duck_db_migrated', true);
     expect(migrationState).to.have.property('sqlite_db_device_state_count', 0);
+    expect(migrationState).to.have.property('sqlite_db_device_state_aggregate_count', 1);
     expect(migrationState).to.have.property('is_migration_needed', true);
   });
 });

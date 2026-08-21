@@ -1,15 +1,3 @@
-.lockedContainer {
-  margin-top: 3rem;
-}
-
-.lockedMainCol {
-  max-width: 30rem;
-}
-
-.lockedContainer .cardTitle {
-  font-weight: 700;
-}
-
 .lockedButton {
   height: 4rem;
 }

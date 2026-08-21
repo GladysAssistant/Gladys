@@ -56,7 +56,9 @@ export const IntegrationMenuMobile = ({
   category
 }) => (
   <nav class={style.mobileCategoryNav} aria-label="Integration categories">
-    <div class={style.mobileCategoryScroll}>
+    {/* hz-chips-scroll: the Layout watches this scroller and shows the
+        "more to the right" arrow while chips overflow (horizonIntegrations.css) */}
+    <div class={`${style.mobileCategoryScroll} hz-chips-scroll`}>
       {getMenuItems(integrationCategories, { integrationsToUpdate, installedIntegrationsCount, category }).map(item => (
         <Link
           key={item.href}

@@ -475,4 +475,120 @@ describe('Build accessory', () => {
     expect(homekitHandler.buildService.callCount).to.equal(1);
     expect(homekitHandler.buildService.args[0][2].service).to.equal('TemperatureSensor');
   });
+
+  it('should give a subtype to every Gladys category landing on one HomeKit service', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    // a Zigbee2mqtt detector carrying its own siren: two Gladys categories, one HomeKit Switch
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Detecteur cave',
+      features: [
+        { selector: 'relais', name: 'Relais', category: 'switch', type: 'binary' },
+        { selector: 'sirene', name: 'Sirène', category: 'siren', type: 'binary' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.callCount).to.equal(2);
+    // both are a Switch, so HAP needs to tell them apart — and neither keeps the bare service, which
+    // would otherwise hand one of them the identity the other had before
+    expect(homekitHandler.buildService.args[0][2].service).to.equal('Switch');
+    expect(homekitHandler.buildService.args[1][2].service).to.equal('Switch');
+    expect(homekitHandler.buildService.args[0][3]).to.equal('switch');
+    expect(homekitHandler.buildService.args[1][3]).to.equal('siren');
+  });
+
+  it('should give each category the same subtype whatever order the features come in', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    // the same device, its features read the other way round: the subtype takes part in the
+    // identifiers HAP persists, so it may not depend on the order features happen to arrive in
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Detecteur cave',
+      features: [
+        { selector: 'sirene', name: 'Sirène', category: 'siren', type: 'binary' },
+        { selector: 'relais', name: 'Relais', category: 'switch', type: 'binary' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.args[0][3]).to.equal('siren');
+    expect(homekitHandler.buildService.args[1][3]).to.equal('switch');
+  });
+
+  it('should leave the bare service to a category that shares it with nobody', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    // no siren here, so the switch keeps the subtype it has always had and a paired home does not
+    // see its service change identity
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Prise salon',
+      features: [
+        { selector: 'relais', name: 'Relais', category: 'switch', type: 'binary' },
+        { selector: 'temperature', name: 'Température', category: 'temperature-sensor', type: 'decimal' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.args[0][3]).to.equal(undefined);
+    expect(homekitHandler.buildService.args[1][3]).to.equal(undefined);
+  });
+
+  it('should still number several services built from a single category', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Volets salon',
+      features: [
+        { selector: 'volet-1', name: 'Volet 1', category: 'shutter', type: 'position' },
+        { selector: 'volet-2', name: 'Volet 2', category: 'shutter', type: 'position' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.args[0][3]).to.equal('shutter 1');
+    expect(homekitHandler.buildService.args[1][3]).to.equal('shutter 2');
+  });
+
+  it('should name the accessory with a name HomeKit accepts', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Detecteur_Cave ',
+      features: [{ selector: 'sirene', name: 'Sirène', category: 'siren', type: 'binary' }],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.hap.Accessory.args[0][0]).to.equal('Detecteur Cave');
+  });
 });

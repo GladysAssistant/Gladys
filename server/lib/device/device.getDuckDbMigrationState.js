@@ -26,6 +26,10 @@ async function getDuckDbMigrationState() {
     is_duck_db_migrated: isDuckDbMigrated === 'true',
     duck_db_device_count: Number(duckDbDeviceStateCount),
     sqlite_db_device_state_count: sqliteDeviceStateCount,
+    // Served next to the states count: an install can have no state left and still carry
+    // millions of aggregates, and the card then announced "0 state in SQLite" while it was
+    // displayed precisely because of those aggregates.
+    sqlite_db_device_state_aggregate_count: sqliteDeviceStateAggregateCount,
     // Migrating/purging states is only useful while rows remain in the legacy SQLite tables.
     // Aggregates are counted too: the purge empties the states first, then the aggregates,
     // so a crash in between must not hide the card that is the only way to finish the purge.
