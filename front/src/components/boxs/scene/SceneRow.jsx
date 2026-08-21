@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import cx from 'classnames';
 import style from './style.css';
+import DeviceFeatureValueText from '../../device/DeviceFeatureValueText';
 import RunningStopButton from '../../../routes/scene/RunningStopButton';
 
 class SceneRow extends Component {
@@ -30,29 +31,34 @@ class SceneRow extends Component {
 
   render({ children, ...props }, { loading }) {
     return (
-      <tr>
-        <td>
+      <div class={style.sceneRow}>
+        <span class={style.sceneIcon}>
           <i className={`fe fe-${props.icon}`} />
-        </td>
-        <td>{props.name}</td>
-        <td className="text-right">
-          {props.runningInfo ? (
-            <RunningStopButton runningInfo={props.runningInfo} onStop={this.stopScene} small />
-          ) : (
-            <button
-              onClick={this.startScene}
-              type="button"
-              class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
-                'btn-loading': loading
-              })}
-              disabled={loading}
-            >
-              <i class="fe fe-play" />
-              <Text id="scene.startButton" />
-            </button>
+        </span>
+        <div class={style.sceneInfo}>
+          <div class={style.sceneName}>{props.name}</div>
+          {props.statusFeature && (
+            <div class="text-muted small">
+              <DeviceFeatureValueText feature={props.statusFeature} />
+            </div>
           )}
-        </td>
-      </tr>
+        </div>
+        {props.runningInfo ? (
+          <RunningStopButton runningInfo={props.runningInfo} onStop={this.stopScene} small />
+        ) : (
+          <button
+            onClick={this.startScene}
+            type="button"
+            class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
+              'btn-loading': loading
+            })}
+            disabled={loading}
+          >
+            <i class="fe fe-play" />
+            <Text id="scene.startButton" />
+          </button>
+        )}
+      </div>
     );
   }
 }

@@ -7,6 +7,7 @@ const SetupModePanel = ({
   dockerBased,
   networkModeValid,
   usbConfigured,
+  networkAdapterConfigured,
   setupMode,
   selectSetupMode,
   resetSetupMode,
@@ -33,6 +34,7 @@ const SetupModePanel = ({
         dockerBased={dockerBased}
         networkModeValid={networkModeValid}
         usbConfigured={usbConfigured}
+        networkAdapterConfigured={networkAdapterConfigured}
         disabled={disabled}
         selectSetupMode={selectSetupMode}
       />

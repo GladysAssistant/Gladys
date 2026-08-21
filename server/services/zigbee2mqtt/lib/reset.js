@@ -10,6 +10,9 @@ const ALL_CONFIGURATION_KEYS = [
   CONFIGURATION.ZIGBEE_DONGLE_NAME,
   CONFIGURATION.Z2M_MQTT_MODE,
   CONFIGURATION.Z2M_TCP_PORT,
+  CONFIGURATION.Z2M_ADAPTER_MODE,
+  CONFIGURATION.Z2M_NETWORK_ADAPTER_URL,
+  CONFIGURATION.Z2M_NETWORK_ADAPTER_TYPE,
   CONFIGURATION.MQTT_URL_KEY,
   CONFIGURATION.Z2M_MQTT_USERNAME_KEY,
   CONFIGURATION.Z2M_MQTT_PASSWORD_KEY,
@@ -43,6 +46,7 @@ async function reset() {
   this.discoveredDevices = {};
   this.topicBinds = {};
   this.usbConfigured = false;
+  this.networkAdapterConfigured = false;
   this.mqttExist = false;
   this.mqttRunning = false;
   this.mqttContainerRunning = false;

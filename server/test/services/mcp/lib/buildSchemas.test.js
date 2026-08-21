@@ -18,6 +18,7 @@ const {
   isLightControlFeature,
   isShutterFeature,
   isHistoryFeature,
+  isBatteryFeature,
   isWritableSensorFeature,
 } = require('../../../../services/mcp/lib/selectFeature');
 const { findBySimilarity } = require('../../../../services/mcp/lib/findBySimilarity');
@@ -125,6 +126,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       gladys: {
         room: {
@@ -267,6 +269,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       gladys: {
         room: { getAll: stub().resolves(rooms) },
@@ -376,6 +379,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       gladys: {
         room: {
@@ -491,6 +495,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
@@ -989,6 +994,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
@@ -1126,6 +1132,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
@@ -1619,6 +1626,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -1673,6 +1681,432 @@ describe('build schemas', () => {
     expect(tools.find((tool) => tool.intent === 'device.get-energy-consumption')).to.eq(undefined);
   });
 
+  const buildBatteryMcpHandler = (extraDevices = []) => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon', house_id: 'house-1' },
+      { id: 'room-2', name: 'Chambre', selector: 'chambre', house_id: 'house-1' },
+      { id: 'room-3', name: 'Cuisine', selector: 'cuisine', house_id: 'house-1' },
+    ];
+
+    const devices = [
+      {
+        selector: 'capteur-temperature-salon',
+        name: 'Capteur température salon',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 'feature-temperature-salon',
+            selector: 'capteur-temperature-salon-temperature',
+            name: 'Température',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            last_value: 22.5,
+            unit: 'celsius',
+          },
+          {
+            id: 'feature-battery-temperature-salon',
+            selector: 'capteur-temperature-salon-battery',
+            name: 'Batterie',
+            category: 'battery',
+            type: 'integer',
+            last_value: 87,
+            unit: 'percent',
+          },
+        ],
+      },
+      {
+        selector: 'capteur-porte-chambre',
+        name: 'Capteur porte chambre',
+        room: { selector: 'chambre', name: 'Chambre' },
+        features: [
+          {
+            id: 'feature-battery-porte-chambre',
+            selector: 'capteur-porte-chambre-battery',
+            name: 'Batterie',
+            category: 'battery',
+            type: 'integer',
+            last_value: 12,
+            unit: 'percent',
+          },
+        ],
+      },
+      {
+        selector: 'detecteur-fumee',
+        name: 'Détecteur de fumée',
+        features: [
+          {
+            id: 'feature-battery-detecteur-fumee',
+            selector: 'detecteur-fumee-battery',
+            name: 'Batterie',
+            category: 'battery',
+            type: 'integer',
+            last_value: null,
+            unit: 'percent',
+          },
+        ],
+      },
+      {
+        selector: 'telecommande-chambre',
+        name: 'Télécommande chambre',
+        room: { selector: 'chambre', name: 'Chambre' },
+        features: [
+          {
+            id: 'feature-battery-telecommande',
+            selector: 'telecommande-chambre-battery',
+            name: 'Batterie',
+            category: 'battery',
+            type: 'integer',
+            last_value: null,
+            unit: 'percent',
+          },
+        ],
+      },
+      {
+        selector: 'capteur-humidite-salon',
+        name: 'Capteur humidité salon',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 'feature-battery-humidite-salon',
+            selector: 'capteur-humidite-salon-battery',
+            name: 'Batterie',
+            category: 'battery',
+            type: 'integer',
+            last_value: 50,
+            unit: 'percent',
+          },
+        ],
+      },
+      {
+        selector: 'lampe-cuisine',
+        name: 'Lampe cuisine',
+        room: { selector: 'cuisine', name: 'Cuisine' },
+        features: [
+          {
+            id: 'feature-lampe-cuisine',
+            selector: 'lampe-cuisine-binary',
+            name: 'On/Off',
+            category: 'light',
+            type: 'binary',
+            last_value: 1,
+          },
+        ],
+      },
+      ...extraDevices,
+    ];
+
+    return {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isBatteryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+        age: '5min',
+      })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub() },
+        variable: { getValue: stub().resolves(null) },
+        device: {
+          get: stub().resolves(devices),
+          getBySelector: stub().callsFake((selector) => Promise.resolve(devices.find((d) => d.selector === selector))),
+          setValue: stub().resolves(),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      // A distance above the similarity threshold: only exact names match.
+      levenshtein: { distance: stub().returns(4) },
+      toon: stub().returns('toonmockdata'),
+    };
+  };
+
+  it('should expose device.get-battery-levels sorted from the lowest battery level', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    expect(batteryTool).to.not.eq(undefined);
+    expect(batteryTool.config.title).to.eq('Get battery levels of devices');
+    expect(batteryTool.config.categories).to.deep.equal([
+      AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
+      AI_CHAT_TOOL_CATEGORIES.OTHER,
+    ]);
+
+    const batteryApiTool = mcpToolsToChatApiFormat(tools).find(
+      (tool) => tool.function.name === 'device_get_battery_levels',
+    );
+    expect(batteryApiTool.function.parameters.required).to.eq(undefined);
+    expect(batteryApiTool.function.parameters.properties.device.enum).to.deep.equal([
+      'Capteur température salon',
+      'Capteur porte chambre',
+      'Détecteur de fumée',
+      'Télécommande chambre',
+      'Capteur humidité salon',
+    ]);
+
+    // "donne moi l'état en % de toutes les piles": the whole home, lowest battery first,
+    // and the devices that never reported a level at the end.
+    const allBatteriesResult = await batteryTool.cb({});
+    expect(allBatteriesResult.content[0].text).to.eq('toonmockdata');
+    // No battery warning threshold configured in this instance: no threshold is
+    // exposed, and no level is flagged as below it.
+    expect(Object.keys(mcpHandler.toon.firstCall.args[0])).to.deep.equal(['batteries']);
+    expect(mcpHandler.toon.firstCall.args[0].batteries).to.deep.equal([
+      {
+        room: 'Chambre',
+        device: 'Capteur porte chambre',
+        feature: 'Batterie',
+        category: 'battery',
+        value: 12,
+        unit: 'percent',
+        age: '5min',
+      },
+      {
+        room: 'Salon',
+        device: 'Capteur humidité salon',
+        feature: 'Batterie',
+        category: 'battery',
+        value: 50,
+        unit: 'percent',
+        age: '5min',
+      },
+      {
+        room: 'Salon',
+        device: 'Capteur température salon',
+        feature: 'Batterie',
+        category: 'battery',
+        value: 87,
+        unit: 'percent',
+        age: '5min',
+      },
+      {
+        room: 'No room',
+        device: 'Détecteur de fumée',
+        feature: 'Batterie',
+        category: 'battery',
+        value: null,
+        unit: 'percent',
+        age: '5min',
+      },
+      {
+        room: 'Chambre',
+        device: 'Télécommande chambre',
+        feature: 'Batterie',
+        category: 'battery',
+        value: null,
+        unit: 'percent',
+        age: '5min',
+      },
+    ]);
+  });
+
+  it('should filter device.get-battery-levels by device and by room', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    // "quel est l'état de la pile du capteur température salon"
+    const singleDeviceResult = await batteryTool.cb({ device: 'Capteur température salon' });
+    expect(singleDeviceResult.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.firstCall.args[0].batteries).to.deep.equal([
+      {
+        room: 'Salon',
+        device: 'Capteur température salon',
+        feature: 'Batterie',
+        category: 'battery',
+        value: 87,
+        unit: 'percent',
+        age: '5min',
+      },
+    ]);
+
+    mcpHandler.toon.resetHistory();
+
+    const roomResult = await batteryTool.cb({ room: 'Chambre' });
+    expect(roomResult.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.firstCall.args[0].batteries.map(({ device, value }) => ({ device, value }))).to.deep.equal([
+      { device: 'Capteur porte chambre', value: 12 },
+      { device: 'Télécommande chambre', value: null },
+    ]);
+  });
+
+  it('should read device.get-battery-levels of a whole house passed as a room', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+    // The chat gateway calls the tool with the raw arguments of the model, which is not
+    // bound by the room enum: "l'état des piles de la maison" passes the house name.
+    mcpHandler.gladys.house.get = stub().resolves([{ id: 'house-1', name: 'Maison', selector: 'maison' }]);
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    const houseResult = await batteryTool.cb({ room: 'Maison' });
+    expect(houseResult.content[0].text).to.eq('toonmockdata');
+    // Every battery of the rooms of that house, plus the device without a room.
+    expect(mcpHandler.toon.firstCall.args[0].batteries.map(({ device }) => device)).to.deep.equal([
+      'Capteur porte chambre',
+      'Capteur humidité salon',
+      'Capteur température salon',
+      'Détecteur de fumée',
+      'Télécommande chambre',
+    ]);
+  });
+
+  it('should flag device.get-battery-levels levels below the battery warning threshold', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+    mcpHandler.gladys.variable.getValue = stub().resolves('20');
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    const allBatteriesResult = await batteryTool.cb({});
+    expect(allBatteriesResult.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.gladys.variable.getValue.firstCall.args[0]).to.eq('DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD');
+    expect(mcpHandler.toon.firstCall.args[0].warning_threshold).to.eq(20);
+    // A device that never reported a level is neither below nor above the threshold.
+    expect(
+      mcpHandler.toon.firstCall.args[0].batteries.map(({ device, value, below_warning_threshold: below }) => ({
+        device,
+        value,
+        below,
+      })),
+    ).to.deep.equal([
+      { device: 'Capteur porte chambre', value: 12, below: true },
+      { device: 'Capteur humidité salon', value: 50, below: false },
+      { device: 'Capteur température salon', value: 87, below: false },
+      { device: 'Détecteur de fumée', value: null, below: undefined },
+      { device: 'Télécommande chambre', value: null, below: undefined },
+    ]);
+  });
+
+  it('should not compare a device.get-battery-levels level published in another unit to the threshold', async () => {
+    const mcpHandler = buildBatteryMcpHandler([
+      {
+        selector: 'capteur-jardin',
+        name: 'Capteur jardin',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 'feature-battery-jardin',
+            selector: 'capteur-jardin-battery',
+            name: 'Batterie',
+            category: 'battery',
+            type: 'integer',
+            last_value: 3.1,
+            unit: 'volt',
+          },
+        ],
+      },
+      {
+        selector: 'capteur-cave',
+        name: 'Capteur cave',
+        features: [
+          {
+            id: 'feature-battery-cave',
+            selector: 'capteur-cave-battery',
+            name: 'Batterie',
+            category: 'battery',
+            type: 'integer',
+            last_value: 4,
+            unit: null,
+          },
+        ],
+      },
+    ]);
+    mcpHandler.gladys.variable.getValue = stub().resolves('20');
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    const allBatteriesResult = await batteryTool.cb({});
+    expect(allBatteriesResult.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.firstCall.args[0].warning_threshold).to.eq(20);
+    // The threshold is a percentage: a level published in volts, or without a unit at
+    // all, is reported with its unit but never flagged as low.
+    expect(
+      mcpHandler.toon.firstCall.args[0].batteries
+        .filter(({ device }) => ['Capteur jardin', 'Capteur cave'].includes(device))
+        .map(({ device, value, unit, below_warning_threshold: below }) => ({ device, value, unit, below })),
+    ).to.deep.equal([
+      { device: 'Capteur jardin', value: 3.1, unit: 'volt', below: undefined },
+      { device: 'Capteur cave', value: 4, unit: null, below: undefined },
+    ]);
+    // The percent levels are still compared to it.
+    expect(
+      mcpHandler.toon.firstCall.args[0].batteries.find(({ device }) => device === 'Capteur porte chambre')
+        .below_warning_threshold,
+    ).to.eq(true);
+  });
+
+  it('should tell device.get-battery-levels when the room or the device is unknown', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    const unknownRoomResult = await batteryTool.cb({ room: 'Garage' });
+    expect(mcpHandler.gladys.device.getBySelector.callCount).to.eq(0);
+    expect(unknownRoomResult.content[0].text).to.eq(
+      'device.get-battery-levels: "Garage" is not a room of this home, no battery level was read. ' +
+        'Available rooms: Salon, Chambre, Cuisine. ' +
+        'Call this tool again with one of them, or without the room parameter to cover the whole home.',
+    );
+
+    const unknownDeviceResult = await batteryTool.cb({ room: 'Salon', device: 'Capteur inconnu' });
+    expect(mcpHandler.gladys.device.getBySelector.callCount).to.eq(0);
+    expect(unknownDeviceResult.content[0].text).to.eq(
+      'device.get-battery-levels: no device reporting a battery level matches "Capteur inconnu" in room "Salon". ' +
+        'Devices reporting a battery level: Capteur température salon, Capteur porte chambre, Détecteur de fumée, ' +
+        'Télécommande chambre, Capteur humidité salon. ' +
+        'Do not report a battery level for a device that is absent from this list.',
+    );
+
+    const emptyRoomResult = await batteryTool.cb({ room: 'Cuisine' });
+    expect(mcpHandler.gladys.device.getBySelector.callCount).to.eq(0);
+    expect(emptyRoomResult.content[0].text).to.eq(
+      'device.get-battery-levels: no device reporting a battery level is configured in room "Cuisine". ' +
+        'No battery level exists for this query, do not report any value.',
+    );
+  });
+
+  it('should not expose device.get-battery-levels without battery powered devices', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+    mcpHandler.gladys.device.get = stub().resolves([
+      {
+        selector: 'lampe-cuisine',
+        name: 'Lampe cuisine',
+        room: { selector: 'cuisine', name: 'Cuisine' },
+        features: [
+          {
+            id: 'feature-lampe-cuisine',
+            selector: 'lampe-cuisine-binary',
+            name: 'On/Off',
+            category: 'light',
+            type: 'binary',
+            last_value: 1,
+          },
+        ],
+      },
+    ]);
+
+    const tools = await mcpHandler.getAllTools();
+    expect(tools.find((tool) => tool.intent === 'device.get-battery-levels')).to.eq(undefined);
+  });
+
   it('should return detailed scene.create errors for SequelizeValidationError and unknown errors', async () => {
     const mcpHandler = {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
@@ -1682,6 +2116,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
@@ -1796,6 +2231,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
@@ -1895,6 +2331,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().returns({ value: 1 }),
       findBySimilarity,
@@ -1955,6 +2392,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({ value: feature.last_value })),
       findBySimilarity,
@@ -1999,6 +2437,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().returns({ value: 1 }),
       findBySimilarity,
@@ -2110,6 +2549,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -2183,6 +2623,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -2248,6 +2689,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -2348,6 +2790,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -2421,6 +2864,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -2501,6 +2945,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -2553,6 +2998,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -2621,6 +3067,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -2673,6 +3120,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       gladys: {
@@ -2744,6 +3192,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
@@ -2852,6 +3301,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       gladys: {
         room: { getAll: stub().resolves(rooms) },
@@ -2914,6 +3364,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().returns({ value: 0 }),
       findBySimilarity,
@@ -3009,6 +3460,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().returns({ value: 0 }),
       findBySimilarity,
@@ -3156,6 +3608,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
@@ -3371,6 +3824,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().returns({ value: 0 }),
       findBySimilarity,
@@ -3475,6 +3929,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().returns({ value: 0 }),
       findBySimilarity,
@@ -3559,6 +4014,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
@@ -3645,6 +4101,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({ value: feature.last_value, unit: feature.unit, age: '2min' })),
       findBySimilarity,
@@ -3734,6 +4191,7 @@ describe('build schemas', () => {
       isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
+      isBatteryFeature,
       isWritableSensorFeature,
       findBySimilarity,
       formatValue: stub().returns({ value: 1 }),
