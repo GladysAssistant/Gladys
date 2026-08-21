@@ -3238,6 +3238,14 @@
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "actionsCard": {
+      "formulaHelp": {
+        "toggle": "Fonctions disponibles et syntaxe",
+        "operators": "Opérateurs disponibles :",
+        "functions": "Fonctions disponibles :",
+        "constants": "Constantes disponibles :",
+        "example": "Une fonction prend ses arguments entre parenthèses, séparés par des virgules. Ex : round(min(100, 3 * 45) / 2)",
+        "caveats": "Attention : les fonctions trigonométriques travaillent en radians (sin(pi/2), et non sin(90)), log est le logarithme népérien (utilisez log10 pour la base 10), randomInt(min, max) ne renvoie jamais max, et les constantes doivent être multipliées explicitement (2*pi, et non 2 pi)."
+      },
       "delay": {
         "label": " Ce bloc attendra la durée spécifiée.",
         "inputPlaceholder": "Durée",

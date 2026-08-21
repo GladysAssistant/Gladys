@@ -3238,6 +3238,14 @@
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
+      "formulaHelp": {
+        "toggle": "Available functions and syntax",
+        "operators": "Available operators:",
+        "functions": "Available functions:",
+        "constants": "Available constants:",
+        "example": "A function takes its arguments between parenthesis, separated by commas. Ex: round(min(100, 3 * 45) / 2)",
+        "caveats": "Watch out: trigonometric functions work in radians (sin(pi/2), not sin(90)), log is the natural logarithm (use log10 for base 10), randomInt(min, max) never returns max, and constants must be multiplied explicitly (2*pi, not 2 pi)."
+      },
       "delay": {
         "label": " This block will wait the specified duration.",
         "inputPlaceholder": "Duration",

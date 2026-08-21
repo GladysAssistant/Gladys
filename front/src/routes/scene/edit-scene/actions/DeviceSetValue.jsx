@@ -11,6 +11,7 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
+import FormulaFunctionsHelp from '../../../../components/scene/FormulaFunctionsHelp';
 
 import '../../../../components/boxs/device-in-room/device-features/style.css';
 import style from './DeviceSetValue.css';
@@ -159,6 +160,7 @@ class DeviceSetValue extends Component {
           <div className={style.explanationText}>
             <Text id="editScene.actionsCard.deviceSetValue.computedExplanationText" />
           </div>
+          <FormulaFunctionsHelp />
           <div class="input-group">
             <Localizer>
               <TextWithVariablesInjected
