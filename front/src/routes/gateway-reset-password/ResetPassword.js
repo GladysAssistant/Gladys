@@ -11,6 +11,11 @@ const ResetPassword = ({ children, ...props }) => (
         twoFactorEnabled={props.twoFactorEnabled}
         twoFactorCode={props.twoFactorCode}
         updateTwoFactorCode={props.updateTwoFactorCode}
+        useRecoveryCode={props.useRecoveryCode}
+        twoFactorRecoveryCode={props.twoFactorRecoveryCode}
+        updateTwoFactorRecoveryCode={props.updateTwoFactorRecoveryCode}
+        showRecoveryCode={props.showRecoveryCode}
+        showTwoFactorCode={props.showTwoFactorCode}
         password={props.password}
         updatePassword={props.updatePassword}
         resetPassword={props.resetPassword}
@@ -18,6 +23,7 @@ const ResetPassword = ({ children, ...props }) => (
         updatePasswordRepeat={props.updatePasswordRepeat}
         success={props.success}
         errorLink={props.errorLink}
+        invalidRecoveryCode={props.invalidRecoveryCode}
         resetInProgress={props.resetInProgress}
       />
     )}
