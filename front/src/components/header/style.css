@@ -95,6 +95,55 @@
   margin-left: auto;
 }
 
+/* Gladys Plus trial countdown: a discreet card between the nav and the
+   footer, only rendered while the account is in its trial period */
+.trialCard {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+  background-color: rgba(61, 109, 240, 0.09);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.trialCardWarning {
+  background-color: rgba(245, 166, 35, 0.16);
+}
+
+.trialDaysLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  color: #1c2334;
+}
+
+.trialDaysLeft:hover {
+  color: #1c2334;
+  text-decoration: none;
+}
+
+.trialIcon {
+  color: #3d6df0;
+  margin-top: 1px;
+}
+
+.trialCardWarning .trialIcon {
+  color: #c4762a;
+}
+
+.trialCta {
+  margin-left: 1.35rem;
+  font-weight: 600;
+  color: #3d6df0;
+}
+
+.trialCta:hover {
+  color: #3d6df0;
+}
+
 /* Footer: profile row opening a dropup menu, dark-mode toggle beside it */
 .sidebarFooter {
   position: relative;
