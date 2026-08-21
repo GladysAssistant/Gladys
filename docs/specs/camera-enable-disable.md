@@ -60,15 +60,17 @@ camera integration (`rtsp-camera`, MQTT-published cameras, external integrations
 | `rtsp-camera` `startStreaming` | Throws `NotFoundError('CAMERA_IS_DISABLED')`; the pending live-stream entry is cleaned up as for any start error. |
 | `rtsp-camera` `setValue` | RTSP has no control channel, so the only writable feature is `enabled`; any other feature is rejected. Setting it to `0` **stops the running live stream immediately**, so a dashboard already streaming stops right away instead of waiting for the inactivity check. |
 | `camera.setImage` (`POST /api/v1/camera/image`, external integrations through `saveCameraImage`, `rtsp-camera` polling) | Throws `NotFoundError('Camera is disabled')`: no new image is stored while the camera is off, so turning it back on cannot reveal what was captured during the private mode. |
+| `device.newStateEvent` (`camera`/`image` states reported through `DEVICE.NEW_STATE` — MQTT and every other event-driven integration) | The image is dropped before being saved and the previous one is left untouched. Same guarantee as `camera.setImage`, on the path that does not go through it. |
 
-**Ingest is only gated on the `camera.setImage` path.** An integration that publishes its image
-through the generic state path — an MQTT camera sends `DEVICE.NEW_STATE`, handled by
-`device.newStateEvent` → `saveStringState` — keeps storing frames while the camera is disabled.
-Those frames are never served (`getImage` / `getLiveImage` / `getImagesInRoom` all refuse), but
-they are stored, and the newest one becomes visible again when the camera is turned back on.
-Gating them would mean gating the generic state path of every integration, which is out of the
-scope of this feature; an integration that wants a real private mode publishes through
-`camera.setImage`.
+**Ingest is gated on both paths.** Integrations reach the stored image in two ways: those calling
+`camera.setImage` directly (`rtsp-camera` polling, the REST controller, external integrations
+through `saveCameraImage`), and those reporting a `camera`/`image` state through
+`DEVICE.NEW_STATE` — an MQTT camera, handled by `device.newStateEvent` → `saveStringState`. Both
+refuse to store a frame while the camera is disabled, so no integration can keep filling the
+image state during the private mode and reveal the newest frame when the camera is turned back
+on. The gate in `device.newStateEvent` is narrow on purpose: it matches `camera`/`image` only, so
+every other feature of every other integration keeps its generic state path untouched — including
+the camera's own `enabled` feature, which must stay writable to turn it back on.
 
 **Starting a stream is cancellable.** Several `await`s separate the `enabled` check from the
 `ffmpeg` spawn in `rtsp-camera` `startStreaming`, so a camera disabled in between would otherwise
