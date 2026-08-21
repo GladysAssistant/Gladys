@@ -6,9 +6,7 @@ import { getDeviceName } from '../../../utils/device';
 import { TelevisionPushButtonFeatureTypes } from '../../../utils/consts';
 
 import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
-import ColorDeviceFeature from './device-features/ColorDeviceFeature';
 import SensorDeviceFeature from './device-features/sensor-value/SensorDeviceFeature';
-import LightTemperatureDeviceFeature from './device-features/LightTemperatureDeviceFeature';
 import MultiLevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
 import NumberDeviceFeature from './device-features/NumberDeviceFeature';
 import CoverDeviceFeature from './device-features/CoverDeviceFeature';
@@ -30,14 +28,12 @@ import VacuumCleanerCleanModeDeviceFeature from './device-features/VacuumCleaner
 import WaterHeaterModeDeviceFeature from './device-features/WaterHeaterModeDeviceFeature';
 import TextSelectDeviceFeature from './device-features/TextSelectDeviceFeature';
 
+// Light features (on/off, brightness, color, color temperature, hue, saturation) are NOT routed
+// here: DeviceCard groups them per device into one LightDeviceFeature row opening the light panel.
+// The on/off entry stays, because a light exposing only that feature keeps its plain switch row.
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
-  [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: ColorDeviceFeature,
   [DEVICE_FEATURE_TYPES.SWITCH.DIMMER]: MultiLevelDeviceFeature,
-  [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: MultiLevelDeviceFeature,
-  [DEVICE_FEATURE_TYPES.LIGHT.HUE]: MultiLevelDeviceFeature,
-  [DEVICE_FEATURE_TYPES.LIGHT.SATURATION]: MultiLevelDeviceFeature,
-  [DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE]: LightTemperatureDeviceFeature,
   [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL]: NumberDeviceFeature,
   [DEVICE_FEATURE_TYPES.TELEVISION.VOLUME]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.SHUTTER.STATE]: CoverDeviceFeature,

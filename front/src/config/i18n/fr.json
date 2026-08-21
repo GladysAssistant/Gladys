@@ -4632,6 +4632,21 @@
     "square-kilometer": "km²",
     "decibel": "dB"
   },
+  "lightControl": {
+    "openPanel": "Ouvrir les réglages de la lumière",
+    "brightness": "Luminosité",
+    "color": "Couleur",
+    "temperature": "Température de couleur",
+    "hue": "Teinte",
+    "saturation": "Saturation",
+    "warm": "Chaud",
+    "cold": "Froid",
+    "on": "Allumée",
+    "off": "Éteinte",
+    "turnOn": "Allumer",
+    "turnOff": "Éteindre",
+    "close": "Fermer"
+  },
   "deviceFeatureAction": {
     "category": {
       "camera": {
