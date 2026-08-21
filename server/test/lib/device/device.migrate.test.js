@@ -41,7 +41,10 @@ const countDuckDbStates = async (featureId) => {
   return Number(count);
 };
 
-describe('Device.migrate', () => {
+describe('Device.migrate', function Describe() {
+  // Every DuckDB-backed suite in this folder raises the mocha timeout: the slicing
+  // tests below drive dozens of write statements and do not fit in the 2s default.
+  this.timeout(15000);
   let deviceManager;
   let sceneManagerFake;
   let destinationService;
