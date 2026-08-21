@@ -160,6 +160,7 @@ class ConditionIfElseThen extends Component {
                   addAction={props.addAction}
                   deleteAction={props.deleteAction}
                   deleteActionGroup={props.deleteActionGroup}
+                  duplicateActionGroup={props.duplicateActionGroup}
                   updateActionProperty={props.updateActionProperty}
                   moveCard={props.moveCard}
                   moveCardGroup={props.moveCardGroup}
@@ -208,6 +209,7 @@ class ConditionIfElseThen extends Component {
                   addAction={props.addAction}
                   deleteAction={props.deleteAction}
                   deleteActionGroup={props.deleteActionGroup}
+                  duplicateActionGroup={props.duplicateActionGroup}
                   updateActionProperty={props.updateActionProperty}
                   moveCard={props.moveCard}
                   moveCardGroup={props.moveCardGroup}

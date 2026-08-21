@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import { useRef } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
 import cx from 'classnames';
+import get from 'get-value';
 
 import ActionCard from './ActionCard';
 import style from './style.css';
@@ -59,6 +60,16 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
               <i class="fe fe-move" />
             </div>
 
+            {props.actions.length > 0 && (
+              <button
+                onClick={props.duplicateThisActionGroup}
+                class="btn btn-outline-primary mr-2"
+                title={get(props.intl.dictionary, 'editScene.duplicateActionGroupButton')}
+              >
+                <i class="fe fe-copy" />
+              </button>
+            )}
+
             {/* The last action group is the empty one always kept at the end of a list,
                 so this also hides the button when this group is the only one. */}
             {!props.lastActionGroup && (
@@ -92,6 +103,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
                     updateActionProperty={props.updateActionProperty}
                     highLightedActions={props.highLightedActions}
                     deleteActionGroup={props.deleteActionGroup}
+                    duplicateActionGroup={props.duplicateActionGroup}
                     addAction={props.addAction}
                     deleteAction={props.deleteAction}
                     actionsGroupsBefore={props.actionsGroupsBefore}
@@ -130,14 +142,19 @@ class ActionGroup extends Component {
   deleteThisActionGroup = () => {
     this.props.deleteActionGroup(this.props.path);
   };
+  duplicateThisActionGroup = () => {
+    this.props.duplicateActionGroup(this.props.path);
+  };
 
   render(props, {}) {
     return (
       <ActionGroupWithDragAndDrop
         {...props}
         deleteActionGroup={props.deleteActionGroup}
+        duplicateActionGroup={props.duplicateActionGroup}
         addActionToColumn={this.addActionToColumn}
         deleteThisActionGroup={this.deleteThisActionGroup}
+        duplicateThisActionGroup={this.duplicateThisActionGroup}
       />
     );
   }

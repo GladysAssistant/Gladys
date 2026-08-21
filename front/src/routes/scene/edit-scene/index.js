@@ -475,6 +475,97 @@ class EditScene extends Component {
     });
   };
 
+  duplicateActionGroup = async path => {
+    await this.setState(prevState => {
+      const pathSegments = path.split('.');
+      const groupIndex = parseInt(pathSegments[pathSegments.length - 1], 10);
+      const parentSegments = pathSegments.slice(0, -1);
+      const parentPath = parentSegments.join('.');
+
+      // The array containing the block to duplicate.
+      // It's the root actions array, or the actions of a "then"/"else" branch.
+      const container = parentPath ? get(prevState.scene.actions, parentPath) : prevState.scene.actions;
+
+      const newVariables = { ...prevState.variables };
+      // Variables of the blocks located after the duplicated block: their index is shifted by one
+      const variablePathsToShift = [];
+      // Variables of the duplicated block itself: they are copied to the new block
+      const variablePathsToDuplicate = [];
+
+      Object.keys(prevState.variables).forEach(variablePath => {
+        const variableSegments = variablePath.split('.');
+
+        // Only the variables contained in the same parent block are impacted
+        if (
+          variableSegments.length <= parentSegments.length ||
+          variableSegments.slice(0, parentSegments.length).join('.') !== parentPath
+        ) {
+          return;
+        }
+
+        const variableGroupIndex = parseInt(variableSegments[parentSegments.length], 10);
+
+        const buildVariablePath = newGroupIndex => {
+          const newSegments = [...variableSegments];
+          newSegments[parentSegments.length] = `${newGroupIndex}`;
+          return newSegments.join('.');
+        };
+
+        if (variableGroupIndex > groupIndex) {
+          variablePathsToShift.push({
+            groupIndex: variableGroupIndex,
+            prevPath: variablePath,
+            newPath: buildVariablePath(variableGroupIndex + 1)
+          });
+        } else if (variableGroupIndex === groupIndex) {
+          variablePathsToDuplicate.push({
+            prevPath: variablePath,
+            newPath: buildVariablePath(groupIndex + 1)
+          });
+        }
+      });
+
+      // Shift the variables of the blocks located after the duplicated block.
+      // We start with the highest index so a variable is never moved to a path still in use.
+      variablePathsToShift.sort(
+        (firstVariable, secondVariable) => secondVariable.groupIndex - firstVariable.groupIndex
+      );
+      variablePathsToShift.forEach(({ prevPath, newPath }) => {
+        newVariables[newPath] = newVariables[prevPath];
+        delete newVariables[prevPath];
+      });
+      replaceVariablePathsInActions(prevState.scene.actions, variablePathsToShift);
+
+      // Deep copy of the block to duplicate
+      const duplicatedActionGroup = JSON.parse(JSON.stringify(container[groupIndex]));
+
+      // In the new block, the references to the variables of the duplicated block
+      // must point to the variables of the new block
+      variablePathsToDuplicate.forEach(({ prevPath, newPath }) => {
+        newVariables[newPath] = prevState.variables[prevPath];
+      });
+      replaceVariablePathsInActions([duplicatedActionGroup], variablePathsToDuplicate);
+
+      // Insert the new block right after the duplicated one
+      let updateObject = { scene: { actions: {} } };
+      let currentUpdate = updateObject.scene.actions;
+
+      parentSegments.forEach(segment => {
+        currentUpdate[segment] = {};
+        currentUpdate = currentUpdate[segment];
+      });
+
+      currentUpdate.$splice = [[groupIndex + 1, 0, duplicatedActionGroup]];
+
+      return update(prevState, {
+        ...updateObject,
+        variables: { $set: newVariables }
+      });
+    });
+
+    await this.addEmptyActionGroupIfNeeded();
+  };
+
   addAction = async (path, options = {}) => {
     await this.setState(prevState => {
       // Build the nested update object for actions
@@ -1311,6 +1402,7 @@ class EditScene extends Component {
               updateTriggerProperty={this.updateTriggerProperty}
               addAction={this.addAction}
               deleteActionGroup={this.deleteActionGroup}
+              duplicateActionGroup={this.duplicateActionGroup}
               deleteAction={this.deleteAction}
               addTrigger={this.addTrigger}
               deleteTrigger={this.deleteTrigger}
