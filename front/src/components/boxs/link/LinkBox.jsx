@@ -20,15 +20,15 @@ const LinkBox = ({ box }) => {
   }
 
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" class={style.linkCard}>
-      <div class="card mb-0">
+    <div class="card">
+      <a href={url} target="_blank" rel="noopener noreferrer" class={style.linkCard}>
         <div class={style.linkContent}>
           <i class={`fe fe-${icon} ${style.linkIcon}`} />
           <span class={style.linkTitle}>{title || url}</span>
           <i class={`fe fe-external-link ${style.linkArrow}`} />
         </div>
-      </div>
-    </a>
+      </a>
+    </div>
   );
 };
 
