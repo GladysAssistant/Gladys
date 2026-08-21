@@ -28,10 +28,12 @@ class CameraBoxComponent extends Component {
     cameraStreamingErrorCount: 0
   };
 
-  refreshData = async () => {
+  // `cameraDisabled` overrides the state for a caller that just resolved it: setState is
+  // asynchronous, so a caller awaiting refreshDevice still reads the previous value here.
+  refreshData = async ({ cameraDisabled = this.state.cameraDisabled } = {}) => {
     // A disabled camera serves no image at all (the server refuses, on purpose): asking for
     // one would only display the generic "no image" error instead of the disabled placeholder.
-    if (this.state.cameraDisabled) {
+    if (cameraDisabled) {
       return;
     }
     try {
@@ -112,7 +114,10 @@ class CameraBoxComponent extends Component {
       }
       this.setState({ cameraDisabled, image: null, error: false });
     } else {
-      this.setState({ cameraDisabled }, this.refreshData);
+      // Explicit value rather than a bare `this.refreshData` reference: the state is committed
+      // by the time a setState callback runs, but refreshData now takes options and Preact
+      // invokes render callbacks with no arguments.
+      this.setState({ cameraDisabled }, () => this.refreshData({ cameraDisabled: false }));
     }
   };
 
@@ -152,12 +157,17 @@ class CameraBoxComponent extends Component {
       // event: reload the device first, as on mount. Refreshing the image alone would leave the
       // frame received before the disconnect on screen (docs/specs/camera-enable-disable.md).
       const cameraDisabled = await this.refreshDevice({ keepCurrentView: true });
-      // null means the reload did not resolve (the device request failed — likely right after a
-      // reconnect — or a newer one superseded it). Skipping the image then would drop the very
-      // refresh the reconnect exists for, so fall back to the last known state: refreshData is
-      // already a no-op on a camera known to be disabled, and the server refuses a disabled
-      // camera's image anyway. Only a resolved `true` stops the refresh.
-      if (cameraDisabled !== true) {
+      if (cameraDisabled === false) {
+        // The confirmed value is passed on: this reload keeps the current view, so its only
+        // setState is the one it just scheduled, and this.state still holds the pre-reconnect
+        // value — a camera enabled while the socket was down would otherwise skip its refresh.
+        this.refreshData({ cameraDisabled: false });
+      } else if (cameraDisabled === null) {
+        // The reload did not resolve (the device request failed — likely right after a
+        // reconnect — or a newer one superseded it). Skipping the image then would drop the
+        // very refresh the reconnect exists for, so fall back to the last known state:
+        // refreshData is already a no-op on a camera known to be disabled, and the server
+        // refuses a disabled camera's image anyway.
         this.refreshData();
       }
     }

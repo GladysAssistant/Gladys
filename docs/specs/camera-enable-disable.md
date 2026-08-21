@@ -114,7 +114,11 @@ The state itself is stored by the standard path: `device.setValue` calls the own
   resolved "disabled" stops the image refresh: when the device reload does not resolve (its
   request failed, or a newer one superseded it) the widget still refreshes the image, since
   skipping it would drop the refresh the reconnect exists for — the last known state and the
-  server's own gate already prevent a disabled camera from showing anything.
+  server's own gate already prevent a disabled camera from showing anything. A resolved reload
+  passes its value to the image refresh instead of letting it re-read the state: `setState` is
+  asynchronous and that reload keeps the current view, so the state still holds the
+  pre-reconnect value — a camera **enabled** while the socket was down would otherwise skip the
+  refresh and stay blank.
 - **Device rows** (`device-in-room`): `camera`/`enabled` joins the supported-types allowlist and
   routes to `BinaryDeviceFeature` — a plain on/off toggle.
 - **MQTT device page**: the type appears in the feature catalog with `min`/`max` 0/1, `read_only`
