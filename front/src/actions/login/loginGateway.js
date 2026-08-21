@@ -28,7 +28,10 @@ function createActions(store) {
         gatewayLoginEmail: null,
         gatewayLoginPassword: null,
         gatewayLoginTwoFactorCode: null,
-        gatewayTwoFactorJustEnabled: false
+        gatewayTwoFactorJustEnabled: false,
+        gatewayLoginUseRecoveryCode: false,
+        gatewayLoginRecoveryCode: null,
+        gatewayLoginRecoveryCodes: null
       };
       // If there is a return URL and the URL is relative to this domain
       // (we want to avoid redirecting to another domain for security issues)
@@ -104,6 +107,73 @@ function createActions(store) {
       });
       route('/login');
     },
+    async finishLogin(state, data) {
+      // save informations in localstorage
+      state.session.saveLoginInformations(data);
+      // connect
+      await state.session.connect();
+      let nextUrl;
+      if (data.gladysUserId) {
+        // get user
+        const user = await state.httpClient.get('/api/v1/me');
+        store.setState({
+          user
+        });
+        // save user
+        state.session.saveUser(user);
+        // get profile picture
+        await actionsProfilePicture.loadProfilePicture(store.getState());
+        // verify if we need to redirect to the previous page
+        nextUrl = state.gatewayLoginReturnUrl || '/dashboard';
+      } else {
+        nextUrl = '/link-gateway-user';
+      }
+      // The user just enabled two-factor: we generate their recovery codes and
+      // display them once (only hashes are stored server side) before finishing
+      // the login.
+      if (state.gatewayTwoFactorJustEnabled) {
+        try {
+          const { recovery_codes: recoveryCodes } = await state.session.gatewayClient.generateTwoFactorRecoveryCodes();
+          store.setState({
+            gatewayLoginRecoveryCodes: recoveryCodes,
+            gatewayLoginRecoveryCodesNextUrl: nextUrl,
+            gatewayLoginStatus: RequestStatus.Success
+          });
+          return;
+        } catch (e) {
+          // the codes can be generated again later, we don't block the login
+          console.error(e);
+        }
+      }
+      route(nextUrl);
+    },
+    async handleLoginError(state, e, wrongCodeStatus) {
+      console.error(e);
+      const error = get(e, 'response.data.error');
+      const errorMessage = get(e, 'response.data.error_message');
+      const status = get(e, 'response.status');
+      // if user was previously linked to another instance, we reset the user id
+      if (error === 'LINKED_USER_NOT_FOUND') {
+        await state.session.gatewayClient.updateUserIdInGladys(null);
+        route('/link-gateway-user');
+      } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
+        store.setState({
+          gatewayLoginStatus: RequestStatus.UserNotAcceptedLocally
+        });
+      } else if (errorMessage === 'NO_INSTANCE_FOUND') {
+        store.setState({
+          gatewayLoginStatus: RequestStatus.GatewayNoInstanceFound
+        });
+      } else if (status >= 400 && status < 500) {
+        store.setState({
+          gatewayLoginStatus: wrongCodeStatus
+        });
+      } else {
+        store.setState({
+          gatewayLoginStatus: RequestStatus.Error
+        });
+      }
+    },
     async loginTwoFactor(state, e) {
       if (e) {
         e.preventDefault();
@@ -119,56 +189,61 @@ function createActions(store) {
           state.gatewayLoginTwoFactorCode,
           window.navigator.userAgent
         );
-        // save informations in localstorage
-        state.session.saveLoginInformations(data);
-        // connect
-        await state.session.connect();
-        if (data.gladysUserId) {
-          // get user
-          const user = await state.httpClient.get('/api/v1/me');
-          store.setState({
-            user
-          });
-          // save user
-          state.session.saveUser(user);
-          // get profile picture
-          await actionsProfilePicture.loadProfilePicture(store.getState());
-          // verify if we need to redirect to the previous page
-          if (state.gatewayLoginReturnUrl) {
-            route(state.gatewayLoginReturnUrl);
-          } else {
-            route('/dashboard');
-          }
-        } else {
-          route('/link-gateway-user');
-        }
+        await actions.finishLogin(state, data);
       } catch (e) {
-        console.error(e);
-        const error = get(e, 'response.data.error');
-        const errorMessage = get(e, 'response.data.error_message');
-        const status = get(e, 'response.status');
-        // if user was previously linked to another instance, we reset the user id
-        if (error === 'LINKED_USER_NOT_FOUND') {
-          await state.session.gatewayClient.updateUserIdInGladys(null);
-          route('/link-gateway-user');
-        } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
-          store.setState({
-            gatewayLoginStatus: RequestStatus.UserNotAcceptedLocally
-          });
-        } else if (errorMessage === 'NO_INSTANCE_FOUND') {
-          store.setState({
-            gatewayLoginStatus: RequestStatus.GatewayNoInstanceFound
-          });
-        } else if (status >= 400 && status < 500) {
-          store.setState({
-            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError
-          });
-        } else {
-          store.setState({
-            gatewayLoginStatus: RequestStatus.Error
-          });
-        }
+        await actions.handleLoginError(state, e, LoginStatus.WrongTwoFactorCodeError);
       }
+    },
+    async loginTwoFactorRecoveryCode(state, e) {
+      if (e) {
+        e.preventDefault();
+      }
+      store.setState({
+        gatewayLoginStatus: RequestStatus.Getting
+      });
+      try {
+        // login with a single-use recovery code instead of a two factor code
+        const data = await state.session.gatewayClient.loginTwoFactorRecoveryCode(
+          state.gatewayLoginResults.two_factor_token,
+          state.gatewayLoginPassword,
+          state.gatewayLoginRecoveryCode,
+          window.navigator.userAgent
+        );
+        await actions.finishLogin(state, data);
+      } catch (e) {
+        await actions.handleLoginError(state, e, LoginStatus.WrongRecoveryCodeError);
+      }
+    },
+    continueAfterRecoveryCodes(state) {
+      const nextUrl = state.gatewayLoginRecoveryCodesNextUrl || '/dashboard';
+      store.setState({
+        gatewayLoginRecoveryCodes: null,
+        gatewayLoginRecoveryCodesNextUrl: null
+      });
+      route(nextUrl);
+    },
+    showRecoveryCodeLogin(state, e) {
+      if (e) {
+        e.preventDefault();
+      }
+      store.setState({
+        gatewayLoginUseRecoveryCode: true,
+        gatewayLoginStatus: null
+      });
+    },
+    showTwoFactorCodeLogin(state, e) {
+      if (e) {
+        e.preventDefault();
+      }
+      store.setState({
+        gatewayLoginUseRecoveryCode: false,
+        gatewayLoginStatus: null
+      });
+    },
+    updateLoginRecoveryCode(state, e) {
+      store.setState({
+        gatewayLoginRecoveryCode: e.target.value
+      });
     },
     updateLoginEmail(state, e) {
       store.setState({

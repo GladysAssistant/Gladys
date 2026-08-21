@@ -4,12 +4,18 @@ const { generateBackupKey } = require('../../utils/backupKey');
  * @description Login step 2 to the Gateway.
  * @param {string} twoFactorToken - Two Factor Access token.
  * @param {string} twoFactorCode - The two Factor code.
+ * @param {string} [twoFactorRecoveryCode] - A single-use recovery code, used instead of the two factor code.
  * @example
  * loginTwoFactor('xxxxxx', '123456');
  */
-async function loginTwoFactor(twoFactorToken, twoFactorCode) {
-  // We login with two factor code
-  await this.gladysGatewayClient.loginInstance(twoFactorToken, twoFactorCode);
+async function loginTwoFactor(twoFactorToken, twoFactorCode, twoFactorRecoveryCode) {
+  if (twoFactorRecoveryCode) {
+    // The user lost their two factor app: we login with a single-use recovery code
+    await this.gladysGatewayClient.loginInstanceWithRecoveryCode(twoFactorToken, twoFactorRecoveryCode);
+  } else {
+    // We login with two factor code
+    await this.gladysGatewayClient.loginInstance(twoFactorToken, twoFactorCode);
+  }
   // we get all variables
   const gladysGatewayRefreshToken = await this.variable.getValue('GLADYS_GATEWAY_REFRESH_TOKEN');
   const gladysGatewayRsaPrivateKey = await this.variable.getValue('GLADYS_GATEWAY_RSA_PRIVATE_KEY');

@@ -4394,8 +4394,22 @@
     "twoFactorCodePlaceholder": "Code à 6 chiffres",
     "loginTwoFactorButtonText": "Finaliser la connexion",
     "invalidTwoFactorCode": "Le code 2FA n'est pas valide. Réessayez avec un nouveau code généré par votre application.",
-    "lostTwoFactor": "Vous avez perdu votre 2FA ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> et nous la réinitialiserons.",
+    "invalidRecoveryCode": "Ce code de récupération est invalide ou a déjà été utilisé.",
+    "lostTwoFactor": "Vous avez perdu l'accès à votre application 2FA ?",
+    "useRecoveryCodeLink": "Utiliser un code de récupération",
+    "useTwoFactorCodeLink": "Utiliser plutôt un code de votre application 2FA",
+    "recoveryCodeLabel": "Code de récupération",
+    "recoveryCodePlaceholder": "Entrez l'un de vos codes de récupération",
     "twoFactorEnabledSuccess": "La 2FA a bien été activée ! Entrez un nouveau code généré par votre application pour finaliser la connexion."
+  },
+  "gatewayRecoveryCodes": {
+    "cardTitle": "Vos codes de récupération",
+    "description": "Si vous perdez l'accès à votre application 2FA, vous pourrez vous connecter à votre compte Gladys Plus avec l'un de ces codes de récupération à usage unique.",
+    "saveThemNow": "Enregistrez ces codes dès maintenant dans un endroit sûr : ils ne seront plus jamais affichés.",
+    "downloadButton": "Télécharger",
+    "copyButton": "Copier",
+    "copiedButton": "Copié !",
+    "continueButton": "Continuer"
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Configurer l'authentification à deux facteurs (2FA)",
@@ -6071,6 +6085,11 @@
     "repeatPasswordLabel": "Répéter le mot de passe",
     "twoFactorCodeLabel": "Code à deux facteurs (\"2FA\")",
     "twoFactorCodePlaceholder": "Code 2FA à 6 chiffres",
+    "lostTwoFactor": "Vous avez perdu l'accès à votre application 2FA ?",
+    "useRecoveryCodeLink": "Utiliser un code de récupération",
+    "useTwoFactorCodeLink": "Utiliser plutôt un code de votre application 2FA",
+    "recoveryCodeLabel": "Code de récupération",
+    "recoveryCodePlaceholder": "Entrez l'un de vos codes de récupération",
     "resetPasswordButton": "Réinitialiser le mot de passe"
   },
   "gatewayOpenApi": {

@@ -8,8 +8,19 @@ class ResetPasswordPage extends Component {
     password: '',
     passwordRepeat: '',
     twoFactorEnabled: null,
+    useRecoveryCode: false,
     success: false,
     resetInProgress: false
+  };
+
+  showRecoveryCode = e => {
+    e.preventDefault();
+    this.setState({ useRecoveryCode: true });
+  };
+
+  showTwoFactorCode = e => {
+    e.preventDefault();
+    this.setState({ useRecoveryCode: false });
   };
 
   resetPassword = async e => {
@@ -34,7 +45,8 @@ class ResetPasswordPage extends Component {
           user.email,
           this.state.password,
           this.props.token,
-          this.state.twoFactorCode
+          this.state.useRecoveryCode ? undefined : this.state.twoFactorCode,
+          this.state.useRecoveryCode ? this.state.twoFactorRecoveryCode : undefined
         );
         this.setState({ success: true, resetInProgress: false });
       }
@@ -52,6 +64,8 @@ class ResetPasswordPage extends Component {
       twoFactorEnabled,
       passwordRepeat,
       twoFactorCode,
+      useRecoveryCode,
+      twoFactorRecoveryCode,
       passwordError,
       passwordNotMatching,
       resetInProgress
@@ -69,6 +83,11 @@ class ResetPasswordPage extends Component {
         twoFactorEnabled={twoFactorEnabled}
         twoFactorCode={twoFactorCode}
         updateTwoFactorCode={linkState(this, 'twoFactorCode')}
+        useRecoveryCode={useRecoveryCode}
+        twoFactorRecoveryCode={twoFactorRecoveryCode}
+        updateTwoFactorRecoveryCode={linkState(this, 'twoFactorRecoveryCode')}
+        showRecoveryCode={this.showRecoveryCode}
+        showTwoFactorCode={this.showTwoFactorCode}
         passwordRepeat={passwordRepeat}
         updatePasswordRepeat={linkState(this, 'passwordRepeat')}
         resetInProgress={resetInProgress}

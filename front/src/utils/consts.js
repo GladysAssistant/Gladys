@@ -5,6 +5,7 @@ export const LoginStatus = {
   WrongCredentialsError: 'WrongCredentialsError',
   WrongEmailError: 'WrongEmailError',
   WrongTwoFactorCodeError: 'WrongTwoFactorCodeError',
+  WrongRecoveryCodeError: 'WrongRecoveryCodeError',
   LoginSuccess: 'LoginSuccess',
   UnknownError: 'UnknownError'
 };

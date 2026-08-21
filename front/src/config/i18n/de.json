@@ -4394,8 +4394,22 @@
     "twoFactorCodePlaceholder": "6-stelliger Code",
     "loginTwoFactorButtonText": "Login abschließen",
     "invalidTwoFactorCode": "Der Zwei-Faktor-Code ist ungültig. Versuche es erneut mit einem neuen Code aus deiner App.",
-    "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> und wir setzen sie zurück.",
+    "invalidRecoveryCode": "Dieser Wiederherstellungscode ist ungültig oder wurde bereits verwendet.",
+    "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren?",
+    "useRecoveryCodeLink": "Einen Wiederherstellungscode verwenden",
+    "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
+    "recoveryCodeLabel": "Wiederherstellungscode",
+    "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",
     "twoFactorEnabledSuccess": "Die Zwei-Faktor-Authentifizierung ist jetzt aktiviert! Gib einen neuen Code aus deiner App ein, um den Login abzuschließen."
+  },
+  "gatewayRecoveryCodes": {
+    "cardTitle": "Deine Wiederherstellungscodes",
+    "description": "Wenn du den Zugriff auf deine Zwei-Faktor-App verlierst, kannst du dich mit einem dieser Einmal-Codes bei deinem Gladys Plus Konto anmelden.",
+    "saveThemNow": "Speichere diese Codes jetzt an einem sicheren Ort: Sie werden nie wieder angezeigt.",
+    "downloadButton": "Herunterladen",
+    "copyButton": "Kopieren",
+    "copiedButton": "Kopiert!",
+    "continueButton": "Weiter"
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Zwei-Faktor-Authentifizierung (2FA) konfigurieren",
@@ -6071,6 +6085,11 @@
     "repeatPasswordLabel": "Passwort wiederholen",
     "twoFactorCodeLabel": "Zwei-Faktor-Code",
     "twoFactorCodePlaceholder": "6-stelliger Zwei-Faktor-Code",
+    "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren?",
+    "useRecoveryCodeLink": "Einen Wiederherstellungscode verwenden",
+    "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
+    "recoveryCodeLabel": "Wiederherstellungscode",
+    "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",
     "resetPasswordButton": "Passwort zurücksetzen"
   },
   "gatewayOpenApi": {

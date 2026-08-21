@@ -56,7 +56,7 @@ const ResetPassworFrom = ({ children, ...props }) => (
           <Text id="gatewayResetPassword.passwordInvalid" />
         </div>
       </div>
-      {props.twoFactorEnabled && (
+      {props.twoFactorEnabled && !props.useRecoveryCode && (
         <div className="form-group">
           <label className="form-label">
             <Text id="gatewayResetPassword.twoFactorCodeLabel" />
@@ -70,6 +70,34 @@ const ResetPassworFrom = ({ children, ...props }) => (
               onInput={props.updateTwoFactorCode}
             />
           </Localizer>
+          <p class="text-muted small mt-2 mb-0">
+            <Text id="gatewayResetPassword.lostTwoFactor" />{' '}
+            <a href="#" onClick={props.showRecoveryCode}>
+              <Text id="gatewayResetPassword.useRecoveryCodeLink" />
+            </a>
+          </p>
+        </div>
+      )}
+      {props.twoFactorEnabled && props.useRecoveryCode && (
+        <div className="form-group">
+          <label className="form-label">
+            <Text id="gatewayResetPassword.recoveryCodeLabel" />
+          </label>
+          <Localizer>
+            <input
+              type="text"
+              class="form-control"
+              placeholder={<Text id="gatewayResetPassword.recoveryCodePlaceholder" />}
+              value={props.twoFactorRecoveryCode}
+              onInput={props.updateTwoFactorRecoveryCode}
+              autocomplete="off"
+            />
+          </Localizer>
+          <p class="text-muted small mt-2 mb-0">
+            <a href="#" onClick={props.showTwoFactorCode}>
+              <Text id="gatewayResetPassword.useTwoFactorCodeLink" />
+            </a>
+          </p>
         </div>
       )}
       <div className="form-footer">

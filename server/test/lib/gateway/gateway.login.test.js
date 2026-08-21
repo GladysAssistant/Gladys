@@ -90,4 +90,17 @@ describe('gateway.login', () => {
     // Plus is now linked: external integration webhooks recompute
     assert.calledWith(gateway.event.emit, EVENTS.GATEWAY.LINK_STATUS_CHANGED);
   });
+
+  it('should login two factor with a recovery code to gladys gateway', async () => {
+    await gateway.loginTwoFactor('token', undefined, '1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d');
+    assert.notCalled(gateway.gladysGatewayClient.loginInstance);
+    assert.calledWith(
+      gateway.gladysGatewayClient.loginInstanceWithRecoveryCode,
+      'token',
+      '1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d',
+    );
+    assert.calledOnce(gateway.gladysGatewayClient.createInstance);
+    // Plus is now linked: external integration webhooks recompute
+    assert.calledWith(gateway.event.emit, EVENTS.GATEWAY.LINK_STATUS_CHANGED);
+  });
 });
