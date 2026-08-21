@@ -4046,10 +4046,42 @@
     "gatewayOpenApiTab": "Open API"
   },
   "housesSettings": {
+    "title": "Maisons",
+    "subtitle": "Une maison contient des pièces, et chaque appareil est rangé dans une pièce. Ouvrez une maison pour la modifier.",
     "searchPlaceholder": "Chercher une maison",
     "newButton": "Nouveau",
+    "newButtonLabel": "Créer une maison",
     "defaultNewHouseName": "Nouvelle Maison",
-    "noHouseFound": "Aucune maison trouvée"
+    "noHouseFound": "Aucune maison trouvée",
+    "houseCount": "{{count}} maisons",
+    "oneHouseCount": "1 maison",
+    "saved": "Enregistré",
+    "removeRoom": "Supprimer la pièce",
+    "toggleAlarmCodeVisibility": "Afficher ou masquer le code de l'alarme",
+    "deleteConfirmTitle": "Supprimer « {{name}} » ?",
+    "deleteConfirmDescription": "La maison et toutes ses pièces seront supprimées. Cette action est irréversible.",
+    "summary": {
+      "rooms": "{{count}} pièces",
+      "oneRoom": "1 pièce",
+      "noRoom": "Aucune pièce",
+      "located": "Localisée",
+      "notLocated": "Non localisée",
+      "alarmSet": "Code d'alarme défini",
+      "alarmNotSet": "Pas de code d'alarme",
+      "neverSaved": "Non enregistrée",
+      "unsavedChanges": "Modifications non enregistrées"
+    },
+    "sections": {
+      "identity": "Identité",
+      "location": "Localisation",
+      "rooms": "Pièces",
+      "noRoomYet": "Aucune pièce pour l'instant. Ajoutez-en une ci-dessous."
+    },
+    "empty": {
+      "title": "Aucune maison",
+      "description": "Créez votre première maison pour y ajouter des pièces et y ranger vos appareils.",
+      "button": "Créer une maison"
+    }
   },
   "usersSettings": {
     "title": "Utilisateurs",

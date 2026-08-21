@@ -4046,10 +4046,42 @@
     "jobsTab": "Aufgaben"
   },
   "housesSettings": {
+    "title": "Zuhause",
+    "subtitle": "Ein Zuhause enthält Räume, und jedes Gerät gehört zu einem Raum. Öffne ein Zuhause, um es zu bearbeiten.",
     "searchPlaceholder": "Zuhause durchsuchen",
     "newButton": "Neu",
+    "newButtonLabel": "Zuhause erstellen",
     "defaultNewHouseName": "Neues Zuhause",
-    "noHouseFound": "Keine Zuhause gefunden."
+    "noHouseFound": "Keine Zuhause gefunden.",
+    "houseCount": "{{count}} Zuhause",
+    "oneHouseCount": "1 Zuhause",
+    "saved": "Gespeichert",
+    "removeRoom": "Raum entfernen",
+    "toggleAlarmCodeVisibility": "Alarmcode anzeigen oder ausblenden",
+    "deleteConfirmTitle": "„{{name}}“ löschen?",
+    "deleteConfirmDescription": "Das Zuhause und alle seine Räume werden gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "summary": {
+      "rooms": "{{count}} Räume",
+      "oneRoom": "1 Raum",
+      "noRoom": "Kein Raum",
+      "located": "Verortet",
+      "notLocated": "Nicht verortet",
+      "alarmSet": "Alarmcode festgelegt",
+      "alarmNotSet": "Kein Alarmcode",
+      "neverSaved": "Noch nicht gespeichert",
+      "unsavedChanges": "Nicht gespeicherte Änderungen"
+    },
+    "sections": {
+      "identity": "Identität",
+      "location": "Standort",
+      "rooms": "Räume",
+      "noRoomYet": "Noch kein Raum. Füge unten einen hinzu."
+    },
+    "empty": {
+      "title": "Noch kein Zuhause",
+      "description": "Erstelle dein erstes Zuhause, um Räume hinzuzufügen und deine Geräte zu organisieren.",
+      "button": "Zuhause erstellen"
+    }
   },
   "usersSettings": {
     "title": "Benutzer",
