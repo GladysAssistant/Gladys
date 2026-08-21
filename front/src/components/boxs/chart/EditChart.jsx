@@ -480,6 +480,8 @@ class EditChart extends Component {
                   <Text id="dashboard.boxes.devices.addADeviceLabel" />
                 </label>
                 <Select
+                  menuPlacement="auto"
+                  menuPortalTarget={document.body}
                   onChange={this.addDeviceFeature}
                   value={[]}
                   options={deviceOptions}
@@ -530,6 +532,8 @@ class EditChart extends Component {
                     />
                   </label>
                   <Select
+                    menuPlacement="auto"
+                    menuPortalTarget={document.body}
                     defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[i])}
                     value={
                       props.box.colors &&
@@ -552,6 +556,8 @@ class EditChart extends Component {
                     <Text id="dashboard.boxes.chart.on" />
                   </label>
                   <Select
+                    menuPlacement="auto"
+                    menuPortalTarget={document.body}
                     defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[0])}
                     value={
                       props.box.colors &&
@@ -571,6 +577,8 @@ class EditChart extends Component {
                     <Text id="dashboard.boxes.chart.off" />
                   </label>
                   <Select
+                    menuPlacement="auto"
+                    menuPortalTarget={document.body}
                     defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[1])}
                     value={
                       props.box.colors &&
@@ -705,6 +713,11 @@ class EditChart extends Component {
                     <option value="last-day">
                       <Text id="dashboard.boxes.chart.lastDay" />
                     </option>
+                    {props.box.chart_type !== 'timeline' && (
+                      <option value="last-three-days">
+                        <Text id="dashboard.boxes.chart.lastThreeDays" />
+                      </option>
+                    )}
                     {props.box.chart_type !== 'timeline' && (
                       <option value="last-week">
                         <Text id="dashboard.boxes.chart.lastSevenDays" />

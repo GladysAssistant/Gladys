@@ -309,6 +309,18 @@ body {
   opacity: 60%;
 }
 
+/* react-select menus are portaled to <body> (menuPortalTarget) so scroll
+   containers — the widget edit panel above all — can never clip them.
+   !important: react-select puts its own z-index inline on the portal. */
+.react-select__menu-portal {
+  z-index: 1100 !important;
+}
+
+.react-select__menu-portal .react-select__menu {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .humidity-slider {
   width: 100%;
   max-width: 500px;
@@ -513,18 +525,40 @@ body .apexcharts-tooltip {
   stroke: #ffa000;
 }
 
-.integration-tag {
-  font-size: 0.7rem;
-  margin-right: 6px;
+/* An integration wears up to five tags, so they wrap onto several lines on a
+   narrow card. A right margin only spaced them horizontally: once wrapped the
+   rows touched, with nothing but the line box between two pills. A wrapping
+   flex row with a gap spaces them in both directions at once — hence no
+   margin on the tags themselves. */
+.integration-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
 }
 
-/* The theme pins nav badges to the top-right corner of the nav item. That looks
-   right on the horizontal desktop tabs, where the item hugs its link, but the
-   collapsed mobile menu stacks full-width items, so the badge drifts to the
-   edge of the screen, away from the label it counts. Below the lg breakpoint,
-   let it flow inline after the text instead (spacing comes from its ml-2). */
+.integration-tag {
+  font-size: 0.7rem;
+}
+
+/* Left-sidebar navigation (components/header): content shifts right of the
+   fixed rail on desktop and below the slim fixed top bar on mobile. The body
+   class is toggled by the Header component, so auth pages and fullscreen
+   (wall-panel) mode keep the full viewport. Only the OUTER .page is padded:
+   the dashboard routes nest a .page of their own that must not double it. */
+@media (min-width: 992px) {
+  body.gladys-sidebar-nav #app > .page {
+    padding-left: 15rem;
+  }
+  /* fixed-bottom bars (dashboard editor footer) span the viewport: keep them
+     clear of the rail */
+  body.gladys-sidebar-nav .fixed-bottom {
+    left: 15rem;
+  }
+}
+
 @media (max-width: 991.98px) {
-  #headerMenuCollapse .nav-tabs .nav-link .badge {
-    position: static;
+  body.gladys-sidebar-nav #app > .page {
+    padding-top: 3.25rem;
   }
 }

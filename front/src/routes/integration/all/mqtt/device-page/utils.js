@@ -629,6 +629,11 @@ export const getFeatureDefaultValues = (category, type) => {
     return { ...defaults, min: 1, max: 1, read_only: false, keep_history: false };
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.ENABLED) {
+    // On/off gate: Gladys stops polling, streaming and displaying the camera when it is 0
+    return { ...defaults, min: 0, max: 1, read_only: false, keep_history: false };
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.MOVE) {
     // min/max cover the CAMERA_MOVE canonical values (STOP=0 .. ZOOM_OUT=6)
     return { ...defaults, min: 0, max: 6, read_only: false, keep_history: false };
@@ -884,6 +889,11 @@ export const getCatalogPreviewLabelKey = (category, type) => {
 export const getFeaturePreviewValue = (category, type) => {
   // Category-specific blocks first: some of their types ('power', 'index', 'target-temperature',
   // 'mode') also exist in other categories matched below by type only.
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.ENABLED) {
+    // A camera is enabled by default, the preview shows the toggle in that position
+    return 1;
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
       return WATER_HEATER_MODE.ECO;

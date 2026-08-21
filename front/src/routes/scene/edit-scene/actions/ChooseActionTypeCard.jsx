@@ -1,90 +1,32 @@
 import { Component } from 'preact';
-import { connect } from 'unistore/preact';
-import Select from 'react-select';
-import { Text, withText } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 
-import { ACTIONS } from '../../../../../../server/utils/constants';
-
-const ACTION_LIST = [
-  ACTIONS.LIGHT.TURN_ON,
-  ACTIONS.LIGHT.TURN_OFF,
-  ACTIONS.LIGHT.TOGGLE,
-  ACTIONS.LIGHT.BLINK,
-  ACTIONS.SWITCH.TURN_ON,
-  ACTIONS.SWITCH.TURN_OFF,
-  ACTIONS.SWITCH.TOGGLE,
-  ACTIONS.TIME.DELAY,
-  ACTIONS.MESSAGE.SEND,
-  ACTIONS.MESSAGE.SEND_CAMERA,
-  ACTIONS.DEVICE.GET_VALUE,
-  ACTIONS.CONDITION.IF_THEN_ELSE,
-  ACTIONS.CONDITION.WHILE,
-  ACTIONS.CONDITION.ONLY_CONTINUE_IF,
-  ACTIONS.USER.SET_SEEN_AT_HOME,
-  ACTIONS.USER.SET_OUT_OF_HOME,
-  ACTIONS.USER.CHECK_PRESENCE,
-  ACTIONS.HTTP.REQUEST,
-  ACTIONS.CONDITION.CHECK_TIME,
-  ACTIONS.SCENE.START,
-  ACTIONS.HOUSE.IS_EMPTY,
-  ACTIONS.HOUSE.IS_NOT_EMPTY,
-  ACTIONS.DEVICE.SET_VALUE,
-  ACTIONS.CALENDAR.IS_EVENT_RUNNING,
-  ACTIONS.CALENDAR.GET_EVENTS,
-  ACTIONS.ECOWATT.CONDITION,
-  ACTIONS.EDF_TEMPO.CONDITION,
-  ACTIONS.ALARM.CHECK_ALARM_MODE,
-  ACTIONS.ALARM.SET_ALARM_MODE,
-  ACTIONS.MQTT.SEND,
-  ACTIONS.ZIGBEE2MQTT.SEND,
-  ACTIONS.MUSIC.PLAY_NOTIFICATION,
-  ACTIONS.AI.ASK,
-  ACTIONS.SMS.SEND,
-  ACTIONS.VARIABLE.SET,
-  ACTIONS.TIME.GET_DATE
-];
-
-const TRANSLATIONS = ACTION_LIST.reduce((acc, action) => {
-  acc[`editScene.actions.${action}`] = `editScene.actions.${action}`;
-  return acc;
-}, {});
+import TypePicker from '../TypePicker';
+import { ACTION_CATEGORIES, ACTION_ICON } from '../typesCatalog';
 
 class ChooseActionType extends Component {
-  state = {
-    currentAction: null
+  selectActionType = actionType => {
+    this.props.updateActionProperty(this.props.path, 'type', actionType);
+    this.props.updateActionProperty(this.props.path, 'filter', undefined);
   };
-  handleChange = selectedOption => {
-    this.setState({
-      currentAction: selectedOption
-    });
-    if (selectedOption) {
-      this.props.updateActionProperty(this.props.path, 'type', selectedOption.value);
-      this.props.updateActionProperty(this.props.path, 'filter', undefined);
-    }
-  };
-  render(props, { currentAction }) {
-    const actionListFiltered = props.action && props.action.filter ? props.action.filter : ACTION_LIST;
-    const options = actionListFiltered
-      .map(action => ({
-        value: action,
-        label: props[`editScene.actions.${action}`] || action
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label));
 
+  render(props) {
     return (
       <div>
-        <div class="form-group">
+        <div class="form-group mb-0">
           <label class="form-label">
             {props.path.includes('if') && <Text id="editScene.selectConditionType" />}
             {!props.path.includes('if') && <Text id="editScene.selectActionType" />}
           </label>
-          <Select
-            class="choose-scene-action-type"
-            onChange={this.handleChange}
-            value={currentAction}
-            options={options}
-            className="react-select-container"
-            classNamePrefix="react-select"
+          <TypePicker
+            categories={ACTION_CATEGORIES}
+            icons={ACTION_ICON}
+            filter={props.action && props.action.filter}
+            labelPrefix="editScene.actions"
+            descriptionPrefix="editScene.actionsDescriptions"
+            categoryPrefix="editScene.actionCategories"
+            searchPlaceholderId="editScene.searchActionsPlaceholder"
+            onSelect={this.selectActionType}
           />
         </div>
       </div>
@@ -92,4 +34,4 @@ class ChooseActionType extends Component {
   }
 }
 
-export default withText(TRANSLATIONS)(connect('httpClient', {})(ChooseActionType));
+export default ChooseActionType;

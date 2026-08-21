@@ -8,6 +8,7 @@ import ChatItems from './ChatItems';
 import EmptyChat from './EmptyChat';
 import AiModelSelector from './AiModelSelector';
 import style from './style.css';
+import dashboardStyle from '../dashboard/style.css';
 
 const IntegrationPage = connect(
   'user,messages,currentMessageTextInput,gladysIsTyping,MessageGetStatus,httpClient',
@@ -80,7 +81,9 @@ const IntegrationPage = connect(
     }, [currentMessageTextInput]);
 
     return (
-      <div class={cx('page', style.chatPage)}>
+      // Same Horizon glass theme and scene as the dashboard — the chat
+      // composes on the global .glass-theme class (see routes/dashboard/style.css)
+      <div class={cx('page', 'glass-theme', style.chatPage, dashboardStyle.glassScene)}>
         <div class={cx('page-main', style.chatPageMain)}>
           <div class={style.chatPageContent}>
             <div class={cx('container', style.chatPageContainer)}>

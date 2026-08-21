@@ -77,9 +77,14 @@ function getMoonPhaseIndex() {
 
 const ErrorCard = ({ messageId, children }) => (
   <div class="card">
-    <h4 class="card-header">
-      <Text id="dashboard.boxTitle.weather" />
-    </h4>
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fe fe-cloud" />
+        <span class="m-1">
+          <Text id="dashboard.boxTitle.weather" />
+        </span>
+      </h3>
+    </div>
     <div class="card-body">
       <p class="alert alert-danger mb-0">
         <i class="fe fe-bell" />

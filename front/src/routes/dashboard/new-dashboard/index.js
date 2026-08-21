@@ -6,91 +6,99 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import { DASHBOARD_TYPE, DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
 import style from './style.css';
+import dashboardStyle from '../style.css';
 
+// Same Horizon glass scene as the dashboard and its editor — this page is
+// only reached from the empty state, creation from the editor happens in
+// the edit panel.
 const NewDashboardPage = ({ children, ...props }) => (
-  <div class={cx('container', style.containerWithMargin)}>
-    <div class="row">
-      <div class={cx('col', 'mx-auto', style.backButtonDiv)}>
-        {props.prev && (
-          <Link href={`/dashboard/${props.prev}/edit`} class="btn btn-secondary btn-sm">
-            <Text id="global.backButton" />
-          </Link>
-        )}
-        {!props.prev && (
-          <Link href="/dashboard" class="btn btn-secondary btn-sm">
-            <Text id="global.backButton" />
-          </Link>
-        )}
-      </div>
-    </div>
-    <div class="row">
-      <div class="col col-login mx-auto">
-        <form onSubmit={props.createScene} class="card">
-          <div class={props.loading ? 'dimmer active' : 'dimmer'}>
-            <div class="loader" />
-            <div class="dimmer-content">
-              <div class="card-body p-6">
-                <div class="card-title">
-                  <h3>
-                    <Text id="newDashboard.cardTitle" />
-                  </h3>
-                </div>
-                <p>
-                  <Text id="newDashboard.description" />
-                </p>
-                {props.dashboardAlreadyExistError && (
-                  <div class="alert alert-danger">
-                    <Text id="newDashboard.dashboardAlreadyExist" />
-                  </div>
-                )}
-                {props.unknownError && (
-                  <div class="alert alert-danger">
-                    <Text id="newDashboard.unknownError" />
-                  </div>
-                )}
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="newDashboard.nameLabel" />
-                  </label>
-                  <Localizer>
-                    <input
-                      type="text"
-                      class={cx('form-control', {
-                        'is-invalid': props.dashboardAlreadyExistError || props.unknownError
-                      })}
-                      placeholder={<Text id="newDashboard.nameLabel" />}
-                      value={props.name}
-                      onInput={props.updateName}
-                    />
-                  </Localizer>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="dashboard.editDashboardVisibility" />
-                  </label>
-                  <small>
-                    <Text id="dashboard.editDashboardVisibilityDescription" />
-                  </small>
-                  <Localizer>
-                    <select value={props.visibility} onChange={props.updateVisibility} class="form-control">
-                      {DASHBOARD_VISIBILITY_LIST.map(dashboardVisibility => (
-                        <option value={dashboardVisibility}>
-                          <Text id={`dashboard.visibilities.${dashboardVisibility}`} />
-                        </option>
-                      ))}
-                    </select>
-                  </Localizer>
-                </div>
+  <div class="page">
+    <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
+      <div class={cx('container', style.containerWithMargin)}>
+        <div class="row">
+          <div class={cx('col', 'mx-auto', style.backButtonDiv)}>
+            {props.prev && (
+              <Link href={`/dashboard/${props.prev}/edit`} class="btn btn-secondary btn-sm">
+                <Text id="global.backButton" />
+              </Link>
+            )}
+            {!props.prev && (
+              <Link href="/dashboard" class="btn btn-secondary btn-sm">
+                <Text id="global.backButton" />
+              </Link>
+            )}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-login mx-auto">
+            <form onSubmit={props.createScene} class="card">
+              <div class={props.loading ? 'dimmer active' : 'dimmer'}>
+                <div class="loader" />
+                <div class="dimmer-content">
+                  <div class="card-body p-6">
+                    <div class="card-title">
+                      <h3>
+                        <Text id="newDashboard.cardTitle" />
+                      </h3>
+                    </div>
+                    <p>
+                      <Text id="newDashboard.description" />
+                    </p>
+                    {props.dashboardAlreadyExistError && (
+                      <div class="alert alert-danger">
+                        <Text id="newDashboard.dashboardAlreadyExist" />
+                      </div>
+                    )}
+                    {props.unknownError && (
+                      <div class="alert alert-danger">
+                        <Text id="newDashboard.unknownError" />
+                      </div>
+                    )}
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="newDashboard.nameLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          type="text"
+                          class={cx('form-control', {
+                            'is-invalid': props.dashboardAlreadyExistError || props.unknownError
+                          })}
+                          placeholder={<Text id="newDashboard.nameLabel" />}
+                          value={props.name}
+                          onInput={props.updateName}
+                        />
+                      </Localizer>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="dashboard.editDashboardVisibility" />
+                      </label>
+                      <small>
+                        <Text id="dashboard.editDashboardVisibilityDescription" />
+                      </small>
+                      <Localizer>
+                        <select value={props.visibility} onChange={props.updateVisibility} class="form-control">
+                          {DASHBOARD_VISIBILITY_LIST.map(dashboardVisibility => (
+                            <option value={dashboardVisibility}>
+                              <Text id={`dashboard.visibilities.${dashboardVisibility}`} />
+                            </option>
+                          ))}
+                        </select>
+                      </Localizer>
+                    </div>
 
-                <div class="form-footer">
-                  <button onClick={props.createDashboard} class="btn btn-primary btn-block">
-                    <Text id="newDashboard.createDashboardButton" />
-                  </button>
+                    <div class="form-footer">
+                      <button onClick={props.createDashboard} class="btn btn-primary btn-block">
+                        <Text id="newDashboard.createDashboardButton" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>
@@ -118,7 +126,7 @@ class Dashboard extends Component {
         name: this.state.name,
         visibility: this.state.visibility,
         type: DASHBOARD_TYPE.MAIN,
-        boxes: [[], [], []]
+        boxes: [{ columns: [[], [], []] }]
       };
       const createDashboard = await this.props.httpClient.post('/api/v1/dashboard', newDashboard);
       this.setState({ loading: false, dashboardAlreadyExistError: false, unknownError: false });

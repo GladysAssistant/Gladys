@@ -3061,4 +3061,52 @@ describe('Build service', () => {
       device_feature: features[0].selector,
     });
   });
+  it('should name a service HomeKit accepts, after its feature when it carries a subtype', async () => {
+    const Switch = stub().returns({ getCharacteristic: stub().returns({ on: stub(), props: { perms: [] } }) });
+
+    homekitHandler.hap = {
+      Characteristic: { On: 'ON' },
+      CharacteristicEventTypes: stub(),
+      Perms: { PAIRED_READ: 'PAIRED_READ', PAIRED_WRITE: 'PAIRED_WRITE' },
+      Service: { Switch },
+    };
+    const device = { name: 'Detecteur_Cave', selector: 'detecteur-cave' };
+    const features = [
+      {
+        name: 'Sirene_1 ',
+        selector: 'sirene',
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      },
+    ];
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.SIREN], 'siren');
+
+    expect(Switch.args[0][0]).to.equal('Sirene 1');
+    expect(Switch.args[0][1]).to.equal('siren');
+  });
+
+  it('should fall back on the device name when the feature carrying the subtype has none', async () => {
+    const Switch = stub().returns({ getCharacteristic: stub().returns({ on: stub(), props: { perms: [] } }) });
+
+    homekitHandler.hap = {
+      Characteristic: { On: 'ON' },
+      CharacteristicEventTypes: stub(),
+      Perms: { PAIRED_READ: 'PAIRED_READ', PAIRED_WRITE: 'PAIRED_WRITE' },
+      Service: { Switch },
+    };
+    const device = { name: 'Detecteur_Cave', selector: 'detecteur-cave' };
+    const features = [
+      {
+        name: '',
+        selector: 'sirene',
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      },
+    ];
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.SIREN], 'siren');
+
+    expect(Switch.args[0][0]).to.equal('Detecteur Cave');
+  });
 });

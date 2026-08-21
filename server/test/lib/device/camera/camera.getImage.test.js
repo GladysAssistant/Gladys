@@ -115,4 +115,29 @@ describe('Camera.getImage', () => {
     const promise = deviceManager.camera.getImage('test-camera-2');
     return assert.isRejected(promise, 'Camera image feature not found');
   });
+  it('should not return the image of a disabled camera', async () => {
+    const stateManager = new StateManager(event);
+    const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('device', 'test-camera-disabled', {
+      features: [
+        {
+          id: '565d05fc-1736-4b76-99ca-581232901d96',
+          selector: 'test-camera-disabled-image',
+          category: 'camera',
+          type: 'image',
+          last_value_changed: new Date().toISOString(),
+          last_value_string: RANDOM_IMAGE,
+        },
+        {
+          id: '2ac6bbcb-1d1a-4b1f-9a97-5a2b56d3e2ff',
+          selector: 'test-camera-disabled-enabled',
+          category: 'camera',
+          type: 'enabled',
+          last_value: 0,
+        },
+      ],
+    });
+    const promise = deviceManager.camera.getImage('test-camera-disabled');
+    return assert.isRejected(promise, 'Camera is disabled');
+  });
 });

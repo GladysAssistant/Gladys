@@ -216,12 +216,16 @@ class EditEnergyConsumption extends Component {
             <Text id="dashboard.boxes.energyConsumption.editDeviceFeatures" />
           </label>
           <Select
+            menuPlacement="auto"
+            menuPortalTarget={document.body}
             defaultValue={[]}
             value={selectedDeviceFeatures}
             onChange={this.updateDeviceFeatures}
             options={deviceFeatureOptions.length > 0 ? deviceFeatureOptions : null}
             maxMenuHeight={220}
             isMulti
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         {selectedDeviceFeatures &&
@@ -234,6 +238,8 @@ class EditEnergyConsumption extends Component {
                 />
               </label>
               <Select
+                menuPlacement="auto"
+                menuPortalTarget={document.body}
                 defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[i])}
                 value={
                   props.box.colors &&
