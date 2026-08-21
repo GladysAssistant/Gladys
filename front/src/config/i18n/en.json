@@ -3330,6 +3330,14 @@
         "computedExplanationText": "Enter here a calculation, its result will be stored in the variable. To inject a variable in the calculation, press '{{'.",
         "computedPlaceholder": "Ex: 2 * 3"
       },
+      "getDate": {
+        "description": "This action gets the current date and time, so you can use them in the next actions of the scene. All 4 variables, including the timestamp, are truncated to the precision you choose: pick \"Second\" if you need an exact timestamp for a calculation.",
+        "precisionLabel": "Precision",
+        "precisionSecond": "Second",
+        "precisionMinute": "Minute",
+        "precisionHour": "Hour",
+        "precisionDay": "Day"
+      },
       "deviceSetValue": {
         "description": "This action let you control a device.",
         "deviceLabel": "Device",
@@ -3592,6 +3600,9 @@
       },
       "variable": {
         "set": "Set a variable"
+      },
+      "time": {
+        "get-date": "Get the current date and time"
       }
     },
     "actionsDescriptions": {
@@ -3667,6 +3678,9 @@
       },
       "variable": {
         "set": "Store a value to reuse it later in the scene"
+      },
+      "time": {
+        "get-date": "Get the current date and time to reuse it later in the scene"
       }
     },
     "actionCategories": {
@@ -3703,6 +3717,12 @@
         "set": {
           "value": "Variable"
         }
+      },
+      "getDate": {
+        "datetime": "Current date and time",
+        "date": "Current date",
+        "time": "Current time",
+        "timestamp": "Current timestamp (in seconds, usable in a calculation)"
       }
     },
     "triggers": {

@@ -49,6 +49,7 @@ import SendSms from './actions/SendSms';
 import ConditionIfElseThen from './actions/ConditionIfElseThen';
 import ConditionWhile from './actions/ConditionWhile';
 import SetVariable from './actions/SetVariable';
+import GetDate from './actions/GetDate';
 
 const ACTION_COMPONENTS = {
   [null]: ChooseActionTypeParams,
@@ -86,7 +87,8 @@ const ACTION_COMPONENTS = {
   [ACTIONS.SMS.SEND]: SendSms,
   [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
   [ACTIONS.CONDITION.WHILE]: ConditionWhile,
-  [ACTIONS.VARIABLE.SET]: SetVariable
+  [ACTIONS.VARIABLE.SET]: SetVariable,
+  [ACTIONS.TIME.GET_DATE]: GetDate
 };
 
 const ActionCard = ({ children, ...props }) => {

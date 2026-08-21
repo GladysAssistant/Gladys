@@ -36,7 +36,8 @@ export const ACTION_ICON = {
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.AI.ASK]: 'fe fe-cpu',
   [ACTIONS.SMS.SEND]: 'fe fe-message-circle',
-  [ACTIONS.VARIABLE.SET]: 'fe fe-hash'
+  [ACTIONS.VARIABLE.SET]: 'fe fe-hash',
+  [ACTIONS.TIME.GET_DATE]: 'fe fe-clock'
 };
 
 // Icons used for each trigger type, in the picker and in the trigger card headers
@@ -123,7 +124,8 @@ export const ACTION_CATEGORIES = [
       ACTIONS.MQTT.SEND,
       ACTIONS.ZIGBEE2MQTT.SEND,
       ACTIONS.AI.ASK,
-      ACTIONS.VARIABLE.SET
+      ACTIONS.VARIABLE.SET,
+      ACTIONS.TIME.GET_DATE
     ]
   }
 ];

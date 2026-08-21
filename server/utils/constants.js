@@ -734,6 +734,7 @@ const ACTIONS = {
   },
   TIME: {
     DELAY: 'delay',
+    GET_DATE: 'time.get-date',
   },
   SCENE: {
     START: 'scene.start',
