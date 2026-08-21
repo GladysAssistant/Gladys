@@ -453,6 +453,21 @@
   margin: auto;
 }
 
+/* The Gladys Plus upsell is taller than the illustrated empty state: give it
+   its own scroll area so it stays fully readable on small screens. */
+.chatMessagesArea .emptyChatUpsellScroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.emptyChatUpsell {
+  margin: auto;
+  width: min(100%, 620px);
+}
+
 /* Full-height page: the only chrome above is the 3.25rem fixed mobile top
    bar — on desktop the nav is the left sidebar, so the chat owns 100dvh.
    The page carries the Horizon glass scene (class from

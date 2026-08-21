@@ -4325,6 +4325,14 @@
       "feature2": "IA proactive dans les scènes : exécute des questions domotiques à intervalle régulier (lire une plaque d'immatriculation, vérifier le niveau de CO₂, surveiller une caméra…)",
       "feature3": "Modèles IA open-weight hébergés en France · pas de données revendues"
     },
+    "chat": {
+      "title": "Discute avec ta maison grâce à l'IA Gladys Plus",
+      "description": "Gladys Plus débloque le chat : pose tes questions en langage naturel, pilote tes appareils et sache ce qui se passe chez toi. Modèles d'IA open-weight hébergés en France.",
+      "feature1": "« Éteins la lumière du salon », « Est-ce que le garage est fermé ? » : il suffit d'envoyer un message",
+      "feature2": "Demande ce que voient tes caméras : l'IA analyse l'image et te répond",
+      "feature3": "Obtiens un résumé de ta maison : températures, consommation, appareils restés allumés",
+      "feature4": "Modèles d'IA open-weight · aucune donnée revendue"
+    },
     "enedis": {
       "title": "Suis ta consommation électrique avec Enedis",
       "description": "Gladys Plus inclut l'intégration officielle Enedis pour récupérer ta consommation électrique, l'afficher sur tes dashboards et déclencher des scènes selon ta conso.",
@@ -5849,23 +5857,10 @@
   },
   "chat": {
     "emptyStateMessage": "Envoie-moi un message !",
-    "emptyStateMessageNoPlus": "Le chat Gladys utilise l'IA Gladys Plus. Connecte ton instance à Gladys Plus pour discuter avec ta maison.",
     "messagePlaceholder": "Ecrivez votre message...",
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
-    "sidebar": {
-      "title": "Comment fonctionne le chat ?",
-      "intro": "Le chat Gladys utilise l'intelligence artificielle Gladys Plus pour te permettre de communiquer naturellement avec ta maison connectée.",
-      "plusNotConfigured": "Connecte Gladys Plus pour utiliser le chat IA.",
-      "plusActive": "L'IA Gladys Plus est active dans ce chat.",
-      "upsellTitle": "Débloque l'IA avancée",
-      "upsellCompactDescription": "Gladys Plus donne accès à des modèles IA open-weight dans ce chat : questions ouvertes, analyse de caméras, et bien plus.",
-      "upsellDescription": "Discute naturellement avec ta maison connectée grâce à l'intelligence artificielle Gladys Plus.",
-      "upsellFeature1": "Pose des questions ouvertes à ta maison",
-      "upsellFeature2": "Analyse ce que voient tes caméras",
-      "upsellFeature3": "Modèles IA open-weight hébergés en France"
-    },
     "toolCall": {
       "statusUsed": "Utilisé",
       "statusError": "Erreur",

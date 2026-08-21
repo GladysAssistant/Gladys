@@ -4325,6 +4325,14 @@
       "feature2": "Proaktive KI in Szenen: führt regelmäßig Smart-Home-Abfragen aus (Kennzeichen lesen, CO₂-Wert prüfen, eine Kamera überwachen…)",
       "feature3": "Open-Weight-KI-Modelle · keine weiterverkauften Daten"
     },
+    "chat": {
+      "title": "Chatte mit deinem Zuhause dank Gladys-Plus-KI",
+      "description": "Gladys Plus schaltet den Chat frei: Stelle Fragen in natürlicher Sprache, steuere deine Geräte und erfahre, was bei dir zu Hause los ist. Open-Weight-KI-Modelle, in Frankreich gehostet.",
+      "feature1": "„Mach das Licht im Wohnzimmer aus“, „Ist das Garagentor zu?“ – einfach eine Nachricht senden",
+      "feature2": "Frag, was deine Kameras sehen: Die KI analysiert das Bild und antwortet dir",
+      "feature3": "Erhalte eine Übersicht deines Zuhauses: Temperaturen, Verbrauch, eingeschaltete Geräte",
+      "feature4": "Open-Weight-KI-Modelle · keine weiterverkauften Daten"
+    },
     "enedis": {
       "title": "Verfolge deinen Stromverbrauch mit Enedis",
       "description": "Gladys Plus enthält die offizielle Enedis-Integration, um deinen Stromverbrauch abzurufen, in Dashboards anzuzeigen und Szenen darauf basierend auszulösen.",
@@ -5849,7 +5857,6 @@
   },
   "chat": {
     "emptyStateMessage": "Schick mir eine Nachricht!",
-    "emptyStateMessageNoPlus": "Der Gladys-Chat nutzt Gladys-Plus-KI. Verbinde deine Instanz mit Gladys Plus, um mit deinem Zuhause zu chatten.",
     "messagePlaceholder": "Tippe deine Nachricht …",
     "sendingInProgress": "Senden …",
     "typingInProgress": "Tippt …",
@@ -5864,18 +5871,6 @@
       "label": "KI-Modell",
       "auto": "Auto",
       "priceLegend": "€ günstig · €€ mittel · €€€ premium"
-    },
-    "sidebar": {
-      "title": "Wie funktioniert der Chat?",
-      "intro": "Der Gladys-Chat nutzt die Gladys-Plus-Künstliche Intelligenz, damit du natürlich mit deinem vernetzten Zuhause kommunizieren kannst.",
-      "plusNotConfigured": "Verbinde Gladys Plus, um den KI-Chat zu nutzen.",
-      "plusActive": "Gladys-Plus-KI ist in diesem Chat aktiv.",
-      "upsellTitle": "Erweiterte KI freischalten",
-      "upsellCompactDescription": "Gladys Plus gibt dir Zugang zu Open-Weight-KI-Modellen in diesem Chat: offene Fragen, Kameranalyse und mehr.",
-      "upsellDescription": "Chatte natürlich mit deinem vernetzten Zuhause dank Gladys-Plus-Künstlicher Intelligenz.",
-      "upsellFeature1": "Stelle deinem Zuhause offene Fragen",
-      "upsellFeature2": "Analysiere, was deine Kameras sehen",
-      "upsellFeature3": "Open-Weight-KI-Modelle in Frankreich gehostet"
     }
   },
   "history": {
