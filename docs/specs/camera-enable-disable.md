@@ -106,7 +106,11 @@ The state itself is stored by the standard path: `device.setValue` calls the own
   disabled camera and an unavailable snapshot look consistent on a dashboard. It listens to
   `device.new-state` on the `enabled` feature's selector: turning the camera off from anywhere
   (scene, another dashboard, the devices page) clears the displayed image and stops an ongoing
-  live view without a page reload; turning it back on refreshes the image.
+  live view without a page reload; turning it back on refreshes the image. A websocket
+  reconnection reloads the **device** before the image, since the state event of a camera
+  disabled while the socket was down was missed — refreshing the image alone would leave the
+  frame received before the disconnect on screen. That reload keeps what is displayed until the
+  fresh device answers (`keepCurrentView`), so a reconnect does not blink the widget.
 - **Device rows** (`device-in-room`): `camera`/`enabled` joins the supported-types allowlist and
   routes to `BinaryDeviceFeature` — a plain on/off toggle.
 - **MQTT device page**: the type appears in the feature catalog with `min`/`max` 0/1, `read_only`

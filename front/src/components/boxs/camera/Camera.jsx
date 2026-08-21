@@ -50,7 +50,10 @@ class CameraBoxComponent extends Component {
   // Callers must use that returned value and not this.state.cameraDisabled right after awaiting
   // this method: setState is asynchronous, so the state still holds the previous value when this
   // promise resolves.
-  refreshDevice = async () => {
+  // `keepCurrentView` is for a refresh where the camera has not changed (a websocket reconnect):
+  // what is on screen still belongs to this camera, so it stays until the fresh device says
+  // otherwise, instead of blinking on every reconnect.
+  refreshDevice = async ({ keepCurrentView = false } = {}) => {
     const cameraSelector = this.props.box.camera;
     // Request generation guard: a camera change clears the controls immediately, and a slow
     // response for a previous camera can never overwrite the current one (a stale overlay
@@ -60,7 +63,9 @@ class CameraBoxComponent extends Component {
     // Everything displayed belongs to the camera we are leaving, image included: it must not
     // stay on screen while the new one loads, and a disabled new camera must show its
     // placeholder rather than the last frame of the previous one.
-    this.setState({ device: null, cameraDisabled: false, image: null, error: false });
+    if (!keepCurrentView) {
+      this.setState({ device: null, cameraDisabled: false, image: null, error: false });
+    }
     if (!cameraSelector) {
       return null;
     }
@@ -137,13 +142,19 @@ class CameraBoxComponent extends Component {
     );
   };
 
-  handleWebsocketConnected = ({ connected }) => {
+  handleWebsocketConnected = async ({ connected }) => {
     // When the websocket is disconnected, we refresh the data when the websocket is reconnected
     if (!connected) {
       this.wasDisconnected = true;
     } else if (this.wasDisconnected) {
-      this.refreshData();
       this.wasDisconnected = false;
+      // The camera may have been disabled while the websocket was down, so we missed its state
+      // event: reload the device first, as on mount. Refreshing the image alone would leave the
+      // frame received before the disconnect on screen (docs/specs/camera-enable-disable.md).
+      const cameraDisabled = await this.refreshDevice({ keepCurrentView: true });
+      if (cameraDisabled === false) {
+        this.refreshData();
+      }
     }
   };
 
