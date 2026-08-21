@@ -52,7 +52,13 @@ const ScenePage = ({ children, ...props }) => (
               <div class="row mt-2">
                 <div class="col-lg-12">
                   {props.scenes && <SceneCards {...props} />}
-                  {props.scenes && props.scenes.length === 0 && <EmptyState />}
+                  {props.scenes && props.scenes.length === 0 && (
+                    <EmptyState
+                      hasActiveFilters={Boolean(
+                        props.sceneSearch || (props.sceneTagSearch && props.sceneTagSearch.length > 0)
+                      )}
+                    />
+                  )}
                 </div>
               </div>
             </div>

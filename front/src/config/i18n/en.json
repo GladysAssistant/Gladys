@@ -3948,6 +3948,7 @@
     "deleteActionButton": "Delete this action",
     "deleteConditionButton": "Delete this condition",
     "deleteStepButton": "Delete this step",
+    "moveHandleLabel": "Reorder (drag, or use the up and down arrow keys)",
     "deleteTriggerButton": "Delete this trigger",
     "expandStepButton": "Show the details",
     "collapseStepButton": "Hide the details"
@@ -4324,7 +4325,14 @@
   },
   "scene": {
     "title": "Scenes",
-    "emptySceneSentenceTop": "Can't find any scenes.",
+    "emptyState": {
+      "missionChip": "First mission",
+      "title": "Create your first scene",
+      "text": "Your home is just waiting for a signal: turn on the lights at sunset, lower the heating at night, play music when you wake up... Your turn!",
+      "createButton": "Create my first scene",
+      "noResultsTitle": "No scene matches",
+      "noResultsText": "Try another keyword or clear the filters to find your scenes again."
+    },
     "newButton": "New",
     "editButton": "Edit",
     "startButton": "Start",

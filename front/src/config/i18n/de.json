@@ -3948,6 +3948,7 @@
     "deleteActionButton": "Diese Aktion löschen",
     "deleteConditionButton": "Diese Bedingung löschen",
     "deleteStepButton": "Diesen Schritt löschen",
+    "moveHandleLabel": "Neu anordnen (ziehen, oder Pfeiltasten hoch und runter)",
     "deleteTriggerButton": "Diesen Auslöser löschen",
     "expandStepButton": "Details anzeigen",
     "collapseStepButton": "Details ausblenden"
@@ -4324,7 +4325,14 @@
   },
   "scene": {
     "title": "Szenen",
-    "emptySceneSentenceTop": "Es wurden keine Szenen gefunden.",
+    "emptyState": {
+      "missionChip": "Erste Mission",
+      "title": "Erstellen Sie Ihre erste Szene",
+      "text": "Ihr Zuhause wartet nur auf ein Signal: das Licht bei Sonnenuntergang einschalten, die Heizung nachts herunterdrehen, Musik beim Aufwachen abspielen... Sie sind dran!",
+      "createButton": "Meine erste Szene erstellen",
+      "noResultsTitle": "Keine Szene stimmt überein",
+      "noResultsText": "Versuchen Sie ein anderes Stichwort oder löschen Sie die Filter, um Ihre Szenen wiederzufinden."
+    },
     "newButton": "Neu",
     "editButton": "Bearbeiten",
     "startButton": "Starten",

@@ -99,24 +99,86 @@
   min-height: 200px;
 }
 
-.emptyStateDivBox {
-  width: 60%;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 80px;
+/* Empty states of the scene list: a frosted card in the middle of the
+   glass scene, holding either the "first mission" invite or the
+   no-search-result message */
+.emptyStateCard {
+  max-width: 430px;
+  margin: 48px auto 0;
+  padding: 2rem 1.75rem 2.25rem;
   text-align: center;
+  background-color: var(--gl-card-bg, rgba(255, 255, 255, 0.52));
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  border-radius: var(--gl-radius-lg, 26px);
+  box-shadow: var(--gl-shadow-soft, 0 4px 16px rgba(44, 62, 118, 0.09));
 }
 
-.emptyStateImage {
-  margin-left: auto;
-  margin-right: auto;
+.emptyStateIllustration {
   display: block;
-  max-width: 300px;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto 0.75rem;
+}
+
+.missionChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.25rem 0.8rem;
+  margin-bottom: 0.9rem;
+  border-radius: 999px;
+  background-color: var(--gl-icon-tint-bg, #e3ebfb);
+  color: var(--gl-accent, #3d6df0);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.emptyStateTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--gl-ink, #1c2334);
+  margin-bottom: 0.5rem;
 }
 
 .emptyStateText {
-  margin-top: 20px;
+  color: var(--gl-muted, #7c8396);
+  margin-bottom: 1.4rem;
+}
+
+/* not a Tabler .btn-* on purpose: the CTA keeps the Horizon solid-accent
+   pill look without fighting the theme's button repaints */
+.emptyStateButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--gl-accent, #3d6df0);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(61, 109, 240, 0.35);
+}
+
+.emptyStateButton:hover,
+.emptyStateButton:focus {
+  background-color: #2f5cd8;
+  color: #fff;
+}
+
+.emptySearchIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  border-radius: 18px;
+  background-color: var(--gl-icon-tint-bg, #e3ebfb);
+  color: var(--gl-accent, #3d6df0);
+  font-size: 1.5rem;
 }
 
 .disableSceneButton {

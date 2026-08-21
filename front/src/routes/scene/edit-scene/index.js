@@ -2,11 +2,9 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
-import { DndProvider } from 'react-dnd';
 import get from 'get-value'; // Import get-value package
 
 import { RequestStatus } from '../../../utils/consts';
-import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
 import EditScenePage from './EditScenePage';
 import { computeRunningInfo, mergeRunningScenes } from '../runningInfo';
 
@@ -1218,38 +1216,20 @@ class EditScene extends Component {
 
     if (!element) return null;
 
-    // Build update object for removing from original location
-    let removeUpdateObject = { scene: { actions: {} } };
-    let removeActionsPath = removeUpdateObject.scene.actions;
-
-    originalPath.split('.').forEach((segment, index, array) => {
-      if (index === array.length - 2) {
-        removeActionsPath[segment] = {
-          $splice: [[parseInt(array[array.length - 1], 10), 1]]
-        };
-      } else if (index < array.length - 2) {
-        removeActionsPath[segment] = {};
-        removeActionsPath = removeActionsPath[segment];
-      }
-    });
-
-    // Remove element from original location
-    const newStateWithoutElement = update(this.state, removeUpdateObject);
-
-    // Build update object for adding to destination
-    let addUpdateObject = { scene: { actions: {} }, variables: {} };
-    let addActionsPath = addUpdateObject.scene.actions;
-
-    destPath.split('.').forEach((segment, index, array) => {
-      if (index === array.length - 2) {
-        addActionsPath[segment] = {
-          $splice: [[parseInt(array[array.length - 1], 10), 0, element]]
-        };
-      } else if (index < array.length - 2) {
-        addActionsPath[segment] = {};
-        addActionsPath = addActionsPath[segment];
-      }
-    });
+    // Move the action with in-place splices, like moveCardGroup: the group
+    // arrays keep their identity, so the keyed cards and steps keep their DOM
+    // (and their local state: expanded/collapsed, keyboard focus) when moved
+    const getContainingArray = path => {
+      const segments = path.split('.').slice(0, -1);
+      return segments.length ? getNestedValue(this.state.scene.actions, segments.join('.')) : this.state.scene.actions;
+    };
+    const sourceArray = getContainingArray(originalPath);
+    const destArray = getContainingArray(destPath);
+    if (!Array.isArray(sourceArray) || !Array.isArray(destArray)) {
+      return null;
+    }
+    sourceArray.splice(parseInt(originalPath.split('.').pop(), 10), 1);
+    destArray.splice(parseInt(destPath.split('.').pop(), 10), 0, element);
 
     // Update variables - handle all affected variables
     const updatedVariables = {};
@@ -1304,13 +1284,10 @@ class EditScene extends Component {
       }
     });
 
-    // Add variables to the update object
-    addUpdateObject.variables = updatedVariables;
+    // Rename the variables which moved with the action
+    const newVariables = update(this.state.variables, updatedVariables);
 
-    // Add element to new location and update variables
-    const newState = update(newStateWithoutElement, addUpdateObject);
-
-    await this.setState(newState);
+    await this.setState({ ...this.state, variables: newVariables });
     await this.addEmptyActionGroupIfNeeded();
     await this.cleanUpEmptyGroupAfterMove(originalPath);
   };
@@ -1402,60 +1379,6 @@ class EditScene extends Component {
     }
   };
 
-  // Recursively generate all possible action group types based on nesting level
-  generateActionGroupTypes = (actions, parentPath = '') => {
-    if (!actions || !Array.isArray(actions)) {
-      return [];
-    }
-
-    // Start with the current level
-    let types = [];
-    const currentLevel = parentPath.split('.').length;
-
-    // Add the current level if not already in the list
-    if (!parentPath.endsWith('then') && !parentPath.endsWith('else')) {
-      const groupType = `ACTION_GROUP_TYPE_LEVEL_${currentLevel}`;
-      if (!types.includes(groupType)) {
-        types.push(groupType);
-      }
-    }
-
-    // Recursively process each action group and its actions
-    actions.forEach((actionGroup, groupIndex) => {
-      const groupPath = parentPath ? `${parentPath}.${groupIndex}` : `${groupIndex}`;
-
-      const groupType = `ACTION_GROUP_TYPE_LEVEL_${groupPath.split('.').length}`;
-      if (!types.includes(groupType)) {
-        types.push(groupType);
-      }
-
-      // Process each action in the group
-      if (Array.isArray(actionGroup)) {
-        actionGroup.forEach((action, actionIndex) => {
-          const actionPath = `${groupPath}.${actionIndex}`;
-
-          // Check if this is a conditional action with nested actions
-          if (action && (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE)) {
-            // Process 'then' branch
-            if (Array.isArray(action.then)) {
-              const thenTypes = this.generateActionGroupTypes(action.then, `${actionPath}.then`);
-              types = [...types, ...thenTypes];
-            }
-
-            // Process 'else' branch
-            if (Array.isArray(action.else)) {
-              const elseTypes = this.generateActionGroupTypes(action.else, `${actionPath}.else`);
-              types = [...types, ...elseTypes];
-            }
-          }
-        });
-      }
-    });
-
-    // Remove duplicates
-    return [...new Set(types)];
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -1513,54 +1436,49 @@ class EditScene extends Component {
       savedSceneSnapshot
     }
   ) {
-    const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
-    const { backend, options } = getDragAndDropBackend();
     const runningInfo = computeRunningInfo(runningScenes, props.scene_selector, now);
     const hasUnsavedChanges = Boolean(scene && savedSceneSnapshot && JSON.stringify(scene) !== savedSceneSnapshot);
     return (
       scene && (
         <div>
-          <DndProvider backend={backend} options={options}>
-            <EditScenePage
-              {...props}
-              scene={scene}
-              hasUnsavedChanges={hasUnsavedChanges}
-              runningInfo={runningInfo}
-              stopScene={this.stopScene}
-              tags={tags}
-              actionsGroupTypes={actionsGroupTypes}
-              updateActionProperty={this.updateActionProperty}
-              updateTriggerProperty={this.updateTriggerProperty}
-              addAction={this.addAction}
-              deleteActionGroup={this.deleteActionGroup}
-              deleteAction={this.deleteAction}
-              addTrigger={this.addTrigger}
-              deleteTrigger={this.deleteTrigger}
-              saving={saving}
-              error={error}
-              errorMessage={errorMessage}
-              variables={variables}
-              triggersVariables={triggersVariables}
-              setVariables={this.setVariables}
-              setVariablesTrigger={this.setVariablesTrigger}
-              switchActiveScene={this.switchActiveScene}
-              updateSceneName={this.updateSceneName}
-              moveCard={this.moveCard}
-              moveCardGroup={this.moveCardGroup}
-              updateSceneDescription={this.updateSceneDescription}
-              startScene={this.startScene}
-              deleteScene={this.deleteScene}
-              saveScene={this.saveScene}
-              duplicateScene={this.duplicateScene}
-              setTags={this.setTags}
-              updateSceneIcon={this.updateSceneIcon}
-              addActionGroupAfter={this.addActionGroupAfter}
-              askDeleteScene={askDeleteScene}
-              askDeleteCurrentScene={this.askDeleteCurrentScene}
-              cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}
-              goBack={this.goBack}
-            />
-          </DndProvider>
+          <EditScenePage
+            {...props}
+            scene={scene}
+            hasUnsavedChanges={hasUnsavedChanges}
+            runningInfo={runningInfo}
+            stopScene={this.stopScene}
+            tags={tags}
+            updateActionProperty={this.updateActionProperty}
+            updateTriggerProperty={this.updateTriggerProperty}
+            addAction={this.addAction}
+            deleteActionGroup={this.deleteActionGroup}
+            deleteAction={this.deleteAction}
+            addTrigger={this.addTrigger}
+            deleteTrigger={this.deleteTrigger}
+            saving={saving}
+            error={error}
+            errorMessage={errorMessage}
+            variables={variables}
+            triggersVariables={triggersVariables}
+            setVariables={this.setVariables}
+            setVariablesTrigger={this.setVariablesTrigger}
+            switchActiveScene={this.switchActiveScene}
+            updateSceneName={this.updateSceneName}
+            moveCard={this.moveCard}
+            moveCardGroup={this.moveCardGroup}
+            updateSceneDescription={this.updateSceneDescription}
+            startScene={this.startScene}
+            deleteScene={this.deleteScene}
+            saveScene={this.saveScene}
+            duplicateScene={this.duplicateScene}
+            setTags={this.setTags}
+            updateSceneIcon={this.updateSceneIcon}
+            addActionGroupAfter={this.addActionGroupAfter}
+            askDeleteScene={askDeleteScene}
+            askDeleteCurrentScene={this.askDeleteCurrentScene}
+            cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}
+            goBack={this.goBack}
+          />
         </div>
       )
     );

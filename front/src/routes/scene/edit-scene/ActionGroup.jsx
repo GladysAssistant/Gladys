@@ -1,16 +1,15 @@
 import { Component } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
-import { useRef } from 'preact/hooks';
-import { useDrag, useDrop } from 'react-dnd';
 import cx from 'classnames';
 
 import ActionCard from './ActionCard';
 import EmptyDropZone from './EmptyDropZone';
-import { getActionGroupType } from './dragAndDropTypes';
+import { startStepDrag, moveStepWithKeyboard } from './stepDrag';
 import style from './style.css';
 
 const renderActionCard = (props, action, index) => (
   <ActionCard
+    key={action}
     moveCard={props.moveCard}
     moveCardGroup={props.moveCardGroup}
     sceneParamsData={props.sceneParamsData}
@@ -34,46 +33,16 @@ const renderActionCard = (props, action, index) => (
   />
 );
 
-const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
+const ActionGroupContent = ({ children, ...props }) => {
   const { path } = props;
-  const actionGroupType = getActionGroupType(path);
-  const ref = useRef(null);
-  const [{ isDragging }, drag, preview] = useDrag(() => ({
-    // You can only drag & drop an action group of the same level
-    type: actionGroupType,
-    item: () => {
-      return { path };
-    },
-    collect: monitor => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }));
-  const [{ isActive }, drop] = useDrop({
-    // You can only drag & drop an action group of the same level
-    accept: actionGroupType,
-    collect: monitor => ({
-      isActive: monitor.canDrop() && monitor.isOver()
-    }),
-    drop(item) {
-      if (!ref.current) {
-        return;
-      }
-      props.moveCardGroup(item.path, path);
-    }
-  });
-  preview(drop(ref));
+  const groupIndex = parseInt(path.split('.').pop(), 10);
 
-  // An empty group is an insertion point: a "add a step" button which is
-  // also a drop zone for existing action cards
+  // An empty group is an insertion point: a "add a step" button which also
+  // adopts a parallel card dropped on it (the card becomes its own step)
   if (props.actions.length === 0) {
     return (
       <div class="col">
-        <EmptyDropZone
-          moveCard={props.moveCard}
-          moveCardGroup={props.moveCardGroup}
-          path={props.path}
-          onAddStep={props.addActionToColumn}
-        />
+        <EmptyDropZone path={props.path} onAddStep={props.addActionToColumn} />
       </div>
     );
   }
@@ -82,36 +51,42 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
   // without any group chrome around it
   if (props.actions.length === 1) {
     return (
-      <div class="col">
+      <div class="col" data-step-slot data-group-index={groupIndex}>
         <div class="row">{renderActionCard(props, props.actions[0], 0)}</div>
       </div>
     );
   }
 
+  const onHandlePointerDown = event => startStepDrag(event, { groupPath: path, moveCardGroup: props.moveCardGroup });
+  const onHandleKeyDown = event => moveStepWithKeyboard(event, { groupPath: path, moveCardGroup: props.moveCardGroup });
+
   // A group with several actions renders as an explicit "at the same time" block
   return (
-    <div class="col">
-      <div
-        ref={ref}
-        class={cx('card user-select-none', style.stepCard, style.parallelBlock, {
-          [style.dropZoneActive]: isActive,
-          [style.dropZoneDragging]: isDragging
-        })}
-      >
-        <div ref={drag} class={cx('card-header cursor-pointer', style.stepCardHeader)}>
+    <div class="col" data-step-slot data-group-index={groupIndex}>
+      <div class={cx('card user-select-none', style.stepCard, style.parallelBlock)}>
+        <div class={cx('card-header', style.stepCardHeader)}>
           <span class={cx(style.stepIconTile, style.typePickerIconBlue)}>
             <i class="fe fe-git-merge" />
           </span>
           {/* a step heading, not a widget label: the theme shrinks .card-title
               to a 12px uppercase micro-label, which is the dashboard grammar */}
-          <span class={style.stepLabel}>
+          <span class={style.stepLabel} data-step-label>
             <Text id="editScene.parallelBlockTitle" />
           </span>
 
           <div class="card-options">
-            <span class="mr-4" aria-hidden="true">
-              <i class="fe fe-move" />
-            </span>
+            <Localizer>
+              <button
+                type="button"
+                class={cx('mr-4', style.cardOptionButton, style.dragHandle)}
+                data-cy={`drag-step-${path}`}
+                onPointerDown={onHandlePointerDown}
+                onKeyDown={onHandleKeyDown}
+                aria-label={<Text id="editScene.moveHandleLabel" />}
+              >
+                <i class="fe fe-move" />
+              </button>
+            </Localizer>
             {!props.lastActionGroup && (
               <Localizer>
                 <button
@@ -134,7 +109,14 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              <div class="row">{props.actions.map((action, index) => renderActionCard(props, action, index))}</div>
+              <div
+                class="row"
+                data-parallel-drop
+                data-group-path={path}
+                data-drop-active-class={style.parallelDropActive}
+              >
+                {props.actions.map((action, index) => renderActionCard(props, action, index))}
+              </div>
 
               <div class="text-center">
                 <button onClick={props.addActionToColumn} class="btn btn-sm btn-outline-secondary">
@@ -159,7 +141,7 @@ class ActionGroup extends Component {
 
   render(props, {}) {
     return (
-      <ActionGroupWithDragAndDrop
+      <ActionGroupContent
         {...props}
         deleteActionGroup={props.deleteActionGroup}
         addActionToColumn={this.addActionToColumn}

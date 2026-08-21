@@ -3948,6 +3948,7 @@
     "deleteActionButton": "Supprimer cette action",
     "deleteConditionButton": "Supprimer cette condition",
     "deleteStepButton": "Supprimer cette étape",
+    "moveHandleLabel": "Réorganiser (glisser, ou flèches haut et bas)",
     "deleteTriggerButton": "Supprimer ce déclencheur",
     "expandStepButton": "Afficher le détail",
     "collapseStepButton": "Masquer le détail"
@@ -4324,7 +4325,14 @@
   },
   "scene": {
     "title": "Scènes",
-    "emptySceneSentenceTop": "Impossible de trouver des scènes.",
+    "emptyState": {
+      "missionChip": "Première mission",
+      "title": "Créez votre première scène",
+      "text": "Votre maison n'attend qu'un signal : allumer la lumière au coucher du soleil, baisser le chauffage la nuit, lancer la musique au réveil... À vous de jouer !",
+      "createButton": "Créer ma première scène",
+      "noResultsTitle": "Aucune scène ne correspond",
+      "noResultsText": "Essayez un autre mot-clé ou effacez les filtres pour retrouver vos scènes."
+    },
     "newButton": "Nouveau",
     "editButton": "Éditer",
     "startButton": "Démarrer",

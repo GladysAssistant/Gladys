@@ -1,13 +1,20 @@
 import { h } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
 import cx from 'classnames';
-import { useRef, useCallback, useState } from 'preact/hooks';
-import { useDrag, useDrop } from 'react-dnd';
+import { useCallback, useState } from 'preact/hooks';
 
 import style from './style.css';
 import { ACTIONS } from '../../../../../server/utils/constants';
 import { ACTION_ICON, ACTION_COLOR, COLOR_CLASS } from './typesCatalog';
-import { getActionGroupType, getDragAndDropType, getGroupPath, getStepAcceptedTypes } from './dragAndDropTypes';
+import {
+  getGroupPath,
+  startStepDrag,
+  startParallelCardDrag,
+  startConditionDrag,
+  moveStepWithKeyboard,
+  moveParallelCardWithKeyboard,
+  moveConditionWithKeyboard
+} from './stepDrag';
 import { getActionSummary } from './summary';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
@@ -83,11 +90,15 @@ const ACTION_COMPONENTS = {
 };
 
 const ActionCard = ({ children, ...props }) => {
-  const { path, deleteAction, addAction } = props;
-  const ref = useRef(null);
+  const { path, deleteAction, addAction, moveCard, moveCardGroup } = props;
   const groupPath = getGroupPath(path);
+  const cardIndex = parseInt(path.split('.').pop(), 10);
   // The conditions of an if/while block are a flat list, not a group of actions
-  const isSequentialStep = props.isSequentialStep && !path.includes('if');
+  const isCondition = path.includes('if');
+  const isSequentialStep = props.isSequentialStep && !isCondition;
+  // A card of an "at the same time" block: it moves on its own, while a
+  // sequential step moves as a whole group
+  const isParallelMember = !isCondition && !isSequentialStep;
 
   // Structural conditions embed their own action groups: they cannot be collapsed
   const isStructuralCondition =
@@ -114,51 +125,57 @@ const ActionCard = ({ children, ...props }) => {
     );
   }, [path, addAction]);
 
-  const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: getDragAndDropType(props.action.type, props.path),
-    item: () => {
-      return { path };
+  // The drag handle drives the pointer-events engine; the arrow keys move
+  // the card one position at a time, so dragging is never the only way
+  const onHandlePointerDown = useCallback(
+    event => {
+      if (isCondition) {
+        startConditionDrag(event, { actionPath: path, moveCard });
+      } else if (isSequentialStep) {
+        startStepDrag(event, { groupPath, moveCardGroup });
+      } else {
+        startParallelCardDrag(event, { actionPath: path, moveCard });
+      }
     },
-    collect: monitor => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }));
-  const [{ isActive }, drop] = useDrop({
-    // A sequential step is the only drop target of its group: it accepts every element of the
-    // flow which can be reordered, so that a plain action, an if/then/else or while block and an
-    // "at the same time" group can all be moved before or after it. A card of an "at the same
-    // time" group keeps accepting its own type only: dropping onto it adds a parallel action.
-    accept: isSequentialStep ? getStepAcceptedTypes(groupPath) : getDragAndDropType(props.action.type, props.path),
-    collect: monitor => ({
-      isActive: monitor.canDrop() && monitor.isOver()
-    }),
-    drop(item, monitor) {
-      if (!ref.current) {
-        return;
+    [isCondition, isSequentialStep, path, groupPath, moveCard, moveCardGroup]
+  );
+  const onHandleKeyDown = useCallback(
+    event => {
+      if (isCondition) {
+        moveConditionWithKeyboard(event, { actionPath: path, moveCard });
+      } else if (isSequentialStep) {
+        moveStepWithKeyboard(event, { groupPath, moveCardGroup });
+      } else {
+        moveParallelCardWithKeyboard(event, { actionPath: path, moveCard });
       }
-      // A whole group was dropped: it is reordered with the group of this step
-      if (monitor.getItemType() === getActionGroupType(groupPath)) {
-        props.moveCardGroup(item.path, groupPath);
-        return;
-      }
-      props.moveCard(item.path, path);
-    }
-  });
-  preview(drop(ref));
+    },
+    [isCondition, isSequentialStep, path, groupPath, moveCard, moveCardGroup]
+  );
 
   const summary = !isExpanded ? getActionSummary(props.action, props.intl.dictionary) : null;
-  const isCondition = props.path.includes('if');
+
+  // A card of a parallel block and a condition are slots of their list, so
+  // the drop placement can be computed from the pointer position alone
+  const slotAttributes = isCondition
+    ? { 'data-condition-slot': true, 'data-card-index': cardIndex }
+    : isParallelMember
+    ? { 'data-card-slot': true, 'data-card-index': cardIndex }
+    : {};
+  // A plain step welcomes a dropped parallel card: it joins the step as an
+  // "at the same time" action (structural blocks and the type picker do not)
+  const mergeAttributes =
+    isSequentialStep && !isStructuralCondition && props.action.type !== null
+      ? {
+          'data-step-merge': true,
+          'data-group-path': groupPath,
+          'data-drop-active-class': style.mergeTargetActive
+        }
+      : {};
 
   return (
-    <div class="col-12">
-      <div
-        ref={ref}
-        class={cx('card user-select-none', style.stepCard, {
-          [style.dropZoneActive]: isActive,
-          [style.dropZoneDragging]: isDragging
-        })}
-      >
-        <div ref={drag} class={cx('card-header', style.stepCardHeader)}>
+    <div class="col-12" {...slotAttributes}>
+      <div class={cx('card user-select-none', style.stepCard)} {...mergeAttributes}>
+        <div class={cx('card-header', style.stepCardHeader)}>
           <span
             class={cx(style.stepIconTile, style[COLOR_CLASS[ACTION_COLOR[props.action.type]] || 'typePickerIconGray'])}
           >
@@ -166,7 +183,7 @@ const ActionCard = ({ children, ...props }) => {
             {props.action.type === null && <i class="fe fe-plus-circle" />}
           </span>
           <div class={style.stepText} onClick={toggleExpanded}>
-            <span class={style.stepLabel}>
+            <span class={style.stepLabel} data-step-label>
               <Text id={`editScene.actions.${props.action.type}`} />
               {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
               {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
@@ -177,10 +194,18 @@ const ActionCard = ({ children, ...props }) => {
             <div class="card-status bg-blue" />
           )}
           <div class="card-options">
-            {/* The whole card header is the drag handle: this icon only signals it */}
-            <span class="mr-4" aria-hidden="true">
-              <i class="fe fe-move" />
-            </span>
+            <Localizer>
+              <button
+                type="button"
+                class={cx('mr-4', style.cardOptionButton, style.dragHandle)}
+                data-cy={`drag-step-${path}`}
+                onPointerDown={onHandlePointerDown}
+                onKeyDown={onHandleKeyDown}
+                aria-label={<Text id="editScene.moveHandleLabel" />}
+              >
+                <i class="fe fe-move" />
+              </button>
+            </Localizer>
             <Localizer>
               <button
                 type="button"

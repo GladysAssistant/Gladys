@@ -2,7 +2,6 @@ import update from 'immutability-helper';
 import cx from 'classnames';
 import { useState } from 'preact/hooks';
 
-import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
 import ActionGroup from './ActionGroup';
 import TriggerGroup from './TriggerGroup';
 import style from './style.css';
@@ -34,7 +33,6 @@ const EditScenePage = ({ children, ...props }) => {
         {/* padding, not margin: a top margin collapses through the glass
             page-main and shifts the scene down */}
         <div class="py-3 py-md-5">
-          <AutoScrollMobile position="top" box_type={props.actionsGroupTypes} />
           <div class={cx('container', style.pageContainer)}>
             <div class="mb-4">
               <div class="row justify-content-between">
@@ -158,56 +156,62 @@ const EditScenePage = ({ children, ...props }) => {
               </div>
             </div>
 
-            {props.scene.actions.map((parallelActions, index) => (
-              <div>
-                <div class="row">
-                  <ActionGroup
-                    moveCard={props.moveCard}
-                    moveCardGroup={props.moveCardGroup}
-                    addAction={props.addAction}
-                    deleteActionGroup={props.deleteActionGroup}
-                    actions={parallelActions}
-                    allActions={props.scene.actions}
-                    deleteAction={props.deleteAction}
-                    updateSelectedNewAction={props.updateSelectedNewAction}
-                    updateActionProperty={props.updateActionProperty}
-                    highLightedActions={props.highLightedActions}
-                    sceneParamsData={props.sceneParamsData}
-                    scene={props.scene}
-                    index={index}
-                    path={`${index}`}
-                    saving={props.saving}
-                    actionsGroupsBefore={update(props.scene.actions, {
-                      $splice: [[index, props.scene.actions.length - index]]
-                    })}
-                    lastActionGroup={index === props.scene.actions.length - 1}
-                    variables={props.variables}
-                    triggersVariables={props.triggersVariables}
-                    setVariables={props.setVariables}
-                  />
-                </div>
+            {/* The root step flow: the droppable surface of the whole "then"
+                sequence (stepDrag.js computes the insertion point inside it) */}
+            <div data-step-flow data-flow-path="" data-flow-level="1">
+              {/* keyed by the group array itself (splices keep the reference):
+                  the DOM node follows a moved step, so keyboard focus stays on
+                  the handle of the step being moved */}
+              {props.scene.actions.map((parallelActions, index) => (
+                <div key={parallelActions}>
+                  <div class="row">
+                    <ActionGroup
+                      moveCard={props.moveCard}
+                      moveCardGroup={props.moveCardGroup}
+                      addAction={props.addAction}
+                      deleteActionGroup={props.deleteActionGroup}
+                      actions={parallelActions}
+                      allActions={props.scene.actions}
+                      deleteAction={props.deleteAction}
+                      updateSelectedNewAction={props.updateSelectedNewAction}
+                      updateActionProperty={props.updateActionProperty}
+                      highLightedActions={props.highLightedActions}
+                      sceneParamsData={props.sceneParamsData}
+                      scene={props.scene}
+                      index={index}
+                      path={`${index}`}
+                      saving={props.saving}
+                      actionsGroupsBefore={update(props.scene.actions, {
+                        $splice: [[index, props.scene.actions.length - index]]
+                      })}
+                      lastActionGroup={index === props.scene.actions.length - 1}
+                      variables={props.variables}
+                      triggersVariables={props.triggersVariables}
+                      setVariables={props.setVariables}
+                    />
+                  </div>
 
-                {parallelActions.length > 0 &&
-                  index + 1 < props.scene.actions.length &&
-                  props.scene.actions[index + 1].length > 0 && (
-                    <div class={style.stepConnector}>
-                      <Localizer>
-                        <button
-                          onClick={() => insertStepAfter(index)}
-                          class={style.stepInsertButton}
-                          disabled={props.saving}
-                          aria-label={<Text id="editScene.insertStepButton" />}
-                        >
-                          <i class="fe fe-plus" />
-                        </button>
-                      </Localizer>
-                    </div>
-                  )}
-              </div>
-            ))}
+                  {parallelActions.length > 0 &&
+                    index + 1 < props.scene.actions.length &&
+                    props.scene.actions[index + 1].length > 0 && (
+                      <div class={style.stepConnector}>
+                        <Localizer>
+                          <button
+                            onClick={() => insertStepAfter(index)}
+                            class={style.stepInsertButton}
+                            disabled={props.saving}
+                            aria-label={<Text id="editScene.insertStepButton" />}
+                          >
+                            <i class="fe fe-plus" />
+                          </button>
+                        </Localizer>
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
             <EditActions {...props} />
           </div>
-          <AutoScrollMobile position="bottom" box_type={props.actionsGroupTypes} />
         </div>
       </div>
     </div>

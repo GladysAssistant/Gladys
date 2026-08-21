@@ -17,14 +17,6 @@
   margin-bottom: 1.5rem;
 }
 
-.dropZoneActive {
-  background-color: #ecf0f1;
-}
-
-.dropZoneDragging {
-  opacity: 0.5;
-}
-
 @media (min-width: 768px) {
   .plusButton {
     right: 0;
@@ -397,11 +389,6 @@
 :global(.glass-theme) .stepCard {
   border-radius: var(--gl-radius-md);
   box-shadow: var(--gl-shadow-soft);
-  /* No blur on a draggable card: the HTML5 drag backend uses the card itself
-     as the drag preview, and Safari rasterizes a blank ghost for a
-     backdrop-filter surface. The translucent background carries the frost. */
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 /* The glass card rule wins over the plain .parallelBlock background, so the
@@ -630,4 +617,84 @@
 :global(.dark-mode .glass-theme) .pageContainer :global(.react-select__control),
 :global(.dark-mode .glass-theme) .pageContainer :global(.react-select__menu) {
   background-color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* ==================================================================
+   Drag & drop (pointer-events engine, utils/pointerDrag.js + stepDrag.js).
+   The ghost pill, the insertion line and the tints are overlays or class
+   toggles: a drag never shifts the layout.
+   ================================================================== */
+
+.dragHandle {
+  cursor: grab;
+  /* a touch on the handle must drag, never scroll the page */
+  touch-action: none;
+}
+
+/* the dragged element stays in place, dimmed, until the drop lands */
+.dragSourceDimmed {
+  opacity: 0.4;
+}
+
+/* the ghost pill following the pointer: same grammar as the dashboard
+   editor's (icon + label, hanging slightly under the cursor) */
+.dragGhostPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: #1c2334;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.35);
+  white-space: nowrap;
+  margin-left: -14px;
+  margin-top: 10px;
+}
+
+/* the insertion line, in the exact gap where the element would land */
+.dropIndicatorLine {
+  border-radius: 999px;
+  background: var(--gl-accent, #3d6df0);
+  box-shadow: 0 0 8px rgba(61, 109, 240, 0.6);
+}
+
+/* tint on the hovered droppable surface (parallel block body, nested flow
+   of an if/while block, condition list) */
+.parallelDropActive,
+.nestedFlowDropActive {
+  background-color: rgba(61, 109, 240, 0.08);
+  border-radius: var(--gl-radius-md, 12px);
+}
+
+/* a parallel card hovering a plain step: dropping it joins the step as an
+   "at the same time" action, so the whole card reads as the target */
+.mergeTargetActive {
+  outline: 2px solid var(--gl-accent, #3d6df0);
+  outline-offset: 2px;
+}
+
+/* a parallel card hovering an "add a step" button: the empty group adopts
+   it (doubled class to out-specify the themed button background) */
+.extractTargetActive.extractTargetActive {
+  border-style: solid;
+  border-color: var(--gl-accent, #3d6df0);
+  background-color: rgba(61, 109, 240, 0.1);
+  color: var(--gl-accent, #3d6df0);
+}
+
+/* Engine-wide drag state, duplicated from the dashboard editor styles:
+   route CSS can be code-split, so the scene chunk carries its own copy */
+:global(body.gladys-pointer-dragging),
+:global(body.gladys-pointer-dragging) * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* while a step drag is live, the in-between "+" buttons fade out of the
+   way (opacity only: no reflow) so the indicator line reads clearly */
+:global(body.gladys-scene-step-dragging) .stepInsertButton {
+  opacity: 0.15;
 }
