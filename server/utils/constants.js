@@ -139,6 +139,20 @@ const SIREN_LMH_VOLUME = {
   HIGH: 2,
 };
 
+// Which effect a siren produces while it is alarming. Shared by the two siren enum feature types:
+// SIREN.ALARM_MODE (command: the effect the siren must produce the next time it is triggered) and
+// SIREN.ALARM_STATE (read-only: the effect it is producing right now, IDLE when it is silent).
+// Zigbee's IAS WD cluster splits the same information over two fields (warning mode + strobe), but
+// the sirens exposing it publish a single combined value, which this enum mirrors so the mapping
+// stays lossless. A siren supporting only part of the list declares its subset with
+// supported_options; IDLE stays meaningful on ALARM_MODE for sirens that can be set to stay quiet.
+const SIREN_MODE = {
+  IDLE: 0,
+  SOUND: 1,
+  LIGHT: 2,
+  SOUND_AND_LIGHT: 3,
+};
+
 const AC_MODE = {
   AUTO: 0,
   COOLING: 1,
@@ -965,6 +979,8 @@ const DEVICE_FEATURE_TYPES = {
     LMH_VOLUME: 'lmh_volume',
     MELODY: 'melody',
     TEST_IN_PROGRESS: 'test-in-progress', // Alarm testing status (binary - sensor)
+    ALARM_MODE: 'alarm-mode', // Effect played when the siren is triggered (SIREN_MODE - command)
+    ALARM_STATE: 'alarm-state', // Effect the siren is currently playing (SIREN_MODE - sensor)
   },
   CHILD_LOCK: {
     BINARY: 'binary',
@@ -975,6 +991,10 @@ const DEVICE_FEATURE_TYPES = {
   },
   BATTERY: {
     INTEGER: 'integer',
+    // Whether the device battery is currently being recharged (binary - sensor). Intrinsic to the
+    // battery of the device itself: a charging station's session state belongs to
+    // CHARGING_STATION.CHARGING_STATE, and the charge level stays on BATTERY.INTEGER.
+    CHARGING: 'charging',
   },
   BATTERY_LOW: {
     BINARY: 'binary',
@@ -1767,6 +1787,11 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
 // when the category-level list mixes units of different dimensions.
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
+    // The whole BATTERY category is a percent (the charge level), but a charging flag is a
+    // binary and carries no unit: without this entry it would inherit the category percent.
+    [DEVICE_FEATURE_TYPES.BATTERY.CHARGING]: [],
+  },
   [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
     [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: [],
     [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: [],
@@ -2198,6 +2223,7 @@ module.exports.BUTTON_PUSH = BUTTON_PUSH;
 module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
+module.exports.SIREN_MODE = SIREN_MODE;
 module.exports.AC_MODE = AC_MODE;
 module.exports.CAMERA_MOVE = CAMERA_MOVE;
 module.exports.THERMOSTAT_MODE = THERMOSTAT_MODE;
