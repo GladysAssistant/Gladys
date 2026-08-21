@@ -498,6 +498,7 @@
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
         "noImageToShow": "Aucune image à afficher. Êtes-vous sûr que votre caméra est connectée et accessible par Gladys ?",
+        "cameraDisabled": "Cette caméra est désactivée. Vous pouvez la réactiver depuis la page de l'appareil, un contrôle du dashboard ou une scène.",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box",
         "latencyBoxName": "Latence",
@@ -4029,6 +4030,7 @@
     "housesTab": "Maisons",
     "usersTab": "Utilisateurs",
     "sessionsTab": "Sessions",
+    "securityTab": "Sécurité",
     "systemTab": "Système",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Sauvegardes",
@@ -4590,8 +4592,28 @@
     "twoFactorCodePlaceholder": "Code à 6 chiffres",
     "loginTwoFactorButtonText": "Finaliser la connexion",
     "invalidTwoFactorCode": "Le code 2FA n'est pas valide. Réessayez avec un nouveau code généré par votre application.",
-    "lostTwoFactor": "Vous avez perdu votre 2FA ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> et nous la réinitialiserons.",
+    "invalidRecoveryCode": "Ce code de récupération est invalide ou a déjà été utilisé.",
+    "lostTwoFactor": "Vous avez perdu l'accès à votre application 2FA ?",
+    "useRecoveryCodeLink": "Utiliser un code de récupération",
+    "noRecoveryCode": "Pas de code de récupération ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> et nous la réinitialiserons.",
+    "useTwoFactorCodeLink": "Utiliser plutôt un code de votre application 2FA",
+    "recoveryCodeLabel": "Code de récupération",
+    "recoveryCodePlaceholder": "Entrez l'un de vos codes de récupération",
     "twoFactorEnabledSuccess": "La 2FA a bien été activée ! Entrez un nouveau code généré par votre application pour finaliser la connexion."
+  },
+  "gatewayRecoveryCodes": {
+    "cardTitle": "Vos codes de récupération",
+    "description": "Si vous perdez l'accès à votre application 2FA, vous pourrez vous connecter à votre compte Gladys Plus avec l'un de ces codes de récupération à usage unique.",
+    "saveThemNow": "Enregistrez ces codes dès maintenant dans un endroit sûr : ils ne seront plus jamais affichés.",
+    "downloadButton": "Télécharger",
+    "copyButton": "Copier",
+    "copiedButton": "Copié !",
+    "generationError": "Nous n'avons pas pu générer vos codes de récupération. Sans eux, vous ne pourrez pas vous connecter si vous perdez votre application 2FA.",
+    "retryButton": "Réessayer",
+    "generateButton": "Générer des codes de récupération",
+    "confirmGenerateButton": "Générer de nouveaux codes",
+    "rotationWarning": "Générer un nouveau jeu invalide immédiatement les codes de récupération que vous possédez peut-être déjà. Seuls les nouveaux fonctionneront.",
+    "continueButton": "Continuer"
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Configurer l'authentification à deux facteurs (2FA)",
@@ -5565,6 +5587,7 @@
     "camera": {
       "shortCategoryName": "Caméra",
       "image": "Caméra (Image)",
+      "enabled": "Caméra activée",
       "move": "Mouvement de la caméra (PTZ)",
       "preset": "Position mémorisée de la caméra (preset)",
       "pan-position": "Position panoramique de la caméra",
@@ -6262,6 +6285,7 @@
     "formTitle": "Gladys Plus - Réinitialiser le mot de passe",
     "incompatibleBrowserLabel": "Désolé, votre navigateur n'est pas compatible avec la passerelle Gladys. Votre navigateur doit prendre en charge l'API WebCrypto ainsi que la base de données IndexedDB.",
     "errorLinkLabel": "Nous ne pouvons pas récupérer votre lien pour la réinitialisation de votre mot de passe. Peut-être qu'il a déjà été utilisé ou a expiré !",
+    "invalidRecoveryCodeLabel": "Ce code de récupération est invalide ou a déjà été utilisé. Votre lien de réinitialisation est toujours valide, réessayez avec un autre code de récupération.",
     "passwordNotMatchingLabel": "Le mot de passe ne correspond pas.",
     "passwordLabel": "Mot de passe (min 8 caractères)",
     "passwordPlaceholder": "Mot de passe",
@@ -6269,6 +6293,11 @@
     "repeatPasswordLabel": "Répéter le mot de passe",
     "twoFactorCodeLabel": "Code à deux facteurs (\"2FA\")",
     "twoFactorCodePlaceholder": "Code 2FA à 6 chiffres",
+    "lostTwoFactor": "Vous avez perdu l'accès à votre application 2FA ?",
+    "useRecoveryCodeLink": "Utiliser un code de récupération",
+    "useTwoFactorCodeLink": "Utiliser plutôt un code de votre application 2FA",
+    "recoveryCodeLabel": "Code de récupération",
+    "recoveryCodePlaceholder": "Entrez l'un de vos codes de récupération",
     "resetPasswordButton": "Réinitialiser le mot de passe"
   },
   "gatewayOpenApi": {

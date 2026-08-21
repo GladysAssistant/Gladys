@@ -94,9 +94,9 @@
   color: #fff;
 }
 
-/* Snapshot unavailable: a quiet placeholder in the media slot. flex-grow lets
-   it absorb the stretch of a short column (the card is a flex column there)
-   instead of leaving a blank void under the header */
+/* Snapshot unavailable, or camera disabled ("private mode"): a quiet placeholder in the
+   media slot. flex-grow lets it absorb the stretch of a short column (the card is a flex
+   column there) instead of leaving a blank void under the header */
 .noImagePlaceholder {
   flex: 1 1 auto;
   min-height: 240px;

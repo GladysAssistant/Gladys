@@ -1,3 +1,9 @@
+/* the canvas scrolls clear of the fixed save/cancel footer (editor only:
+   the viewer shares .largeContainer but has no footer) */
+.editorContainer {
+  margin-bottom: 150px;
+}
+
 .columnsCard {
   display: flex;
   flex-wrap: nowrap;

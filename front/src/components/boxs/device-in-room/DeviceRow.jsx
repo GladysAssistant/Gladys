@@ -95,6 +95,8 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
   },
   [DEVICE_FEATURE_CATEGORIES.CAMERA]: {
+    // The "enabled" gate is a plain on/off control (docs/specs/camera-enable-disable.md)
+    [DEVICE_FEATURE_TYPES.CAMERA.ENABLED]: BinaryDeviceFeature,
     [DEVICE_FEATURE_TYPES.CAMERA.MOVE]: CameraMoveDeviceFeature,
     [DEVICE_FEATURE_TYPES.CAMERA.PRESET]: CameraPresetDeviceFeature
   },

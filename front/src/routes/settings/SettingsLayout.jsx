@@ -10,6 +10,7 @@ const MENU_ITEMS = [
   { href: '/dashboard/settings/house', icon: 'home', textId: 'settings.housesTab' },
   { href: '/dashboard/settings/user', icon: 'user', textId: 'settings.usersTab', matchPrefix: true },
   { href: '/dashboard/settings/session', icon: 'smartphone', textId: 'settings.sessionsTab' },
+  { href: '/dashboard/settings/security', icon: 'shield', textId: 'settings.securityTab', gatewayOnly: true },
   { href: '/dashboard/settings/gateway', icon: 'globe', textId: 'settings.gatewayTab' },
   { href: '/dashboard/settings/gateway-users', icon: 'user', textId: 'settings.gatewayUsersTab', gatewayOnly: true },
   {
