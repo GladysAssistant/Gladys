@@ -123,6 +123,19 @@ function createActions(store) {
                 has_feedback: false,
                 min: 0,
                 max: 0
+              },
+              {
+                name: null,
+                selector: null,
+                external_id: `${uniqueId}:enabled`,
+                category: DEVICE_FEATURE_CATEGORIES.CAMERA,
+                type: DEVICE_FEATURE_TYPES.CAMERA.ENABLED,
+                read_only: false,
+                keep_history: false,
+                has_feedback: false,
+                min: 0,
+                max: 1,
+                last_value: 1
               }
             ],
             params: [
@@ -203,8 +216,13 @@ function createActions(store) {
     },
     async saveCamera(state, index) {
       const camera = state.rtspCameras[index];
-      camera.features[0].name = camera.name;
-      delete camera.features[0].last_value_string;
+      // Features are matched by type, never by index: a camera also carries the "enabled"
+      // feature, and the order the API returns them in is not guaranteed.
+      const imageFeature = camera.features.find(feature => feature.type === DEVICE_FEATURE_TYPES.CAMERA.IMAGE);
+      camera.features.forEach(feature => {
+        feature.name = camera.name;
+      });
+      delete imageFeature.last_value_string;
       let newCamera = await state.httpClient.post(`/api/v1/device`, camera);
       newCamera = await actions.complete(newCamera);
       const rtspCameras = update(state.rtspCameras, {

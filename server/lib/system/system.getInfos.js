@@ -3,6 +3,8 @@ const path = require('path');
 const os = require('os');
 const semver = require('semver');
 
+const { getServerPort } = require('../../utils/getServerPort');
+
 const THERMAL_ZONE_DIR = '/sys/class/thermal';
 const HWMON_DIR = '/sys/class/hwmon';
 
@@ -128,6 +130,102 @@ function readCpuTemperature() {
   return null;
 }
 
+// interfaces that never carry the LAN address Gladys should advertise
+const VIRTUAL_INTERFACE_PREFIXES = ['docker', 'veth', 'br-', 'virbr', 'cni', 'flannel', 'vmnet', 'vboxnet'];
+// VPN and overlay interfaces: reachable, but never on the local link mDNS is limited to
+const VPN_INTERFACE_PREFIXES = ['tun', 'tap', 'wg', 'tailscale', 'zt', 'utun', 'ppp'];
+// Docker gives every interface it creates a locally-administered MAC in its own 02:42
+// range: that is how a bridged container "eth0" is told apart from a real network card
+const DOCKER_MAC_PREFIX = '02:42:';
+
+/**
+ * @description Tell how usable an IPv4 address is as a LAN address.
+ * @param {string} address - The IPv4 address to classify.
+ * @param {string} [mac] - The MAC address of the interface holding it.
+ * @returns {number} 0 for a private LAN address, 1 for a Docker bridge one, 2 for a routable one, 3 for CGNAT/APIPA.
+ * @example
+ * getAddressPriority('192.168.1.10', 'dc:a6:32:00:11:22');
+ */
+function getAddressPriority(address, mac) {
+  const parts = address.split('.').map((part) => parseInt(part, 10));
+  const [first, second] = parts;
+  // link-local (APIPA): the interface has no usable address at all
+  if (first === 169 && second === 254) {
+    return 3;
+  }
+  // carrier-grade NAT, used by Tailscale and some ISPs: not a LAN address
+  if (first === 100 && second >= 64 && second <= 127) {
+    return 3;
+  }
+  // an interface created by Docker, or Docker's default bridge subnet: usable when
+  // Gladys runs in a bridged container and has nothing else, but a real LAN address
+  // must always win over it. The rest of 172.16.0.0/12 is left alone: it is regular
+  // RFC 1918 space, and some networks really do use it
+  const isDockerInterface = (mac || '').toLowerCase().startsWith(DOCKER_MAC_PREFIX);
+  if (isDockerInterface || (first === 172 && second === 17)) {
+    return 1;
+  }
+  // RFC 1918 private ranges, what a home network actually uses
+  const isPrivate =
+    first === 10 || (first === 192 && second === 168) || (first === 172 && second >= 16 && second <= 31);
+  return isPrivate ? 0 : 2;
+}
+
+/**
+ * @description Extract the local IPv4 address from network interfaces, wired connection first.
+ * @param {any} networkInterfaces - Result of os.networkInterfaces().
+ * @returns {string|null} The local IPv4 address, or null if unavailable.
+ * @example
+ * getLocalIp(os.networkInterfaces());
+ */
+function getLocalIp(networkInterfaces) {
+  /** @type {Array<{ isVpn: boolean, addressPriority: number, interfacePriority: number, address: string }>} */
+  const candidates = [];
+  Object.keys(networkInterfaces).forEach((name) => {
+    const lowerName = name.toLowerCase();
+    // "vEthernet (WSL)" and friends on Windows Docker Desktop
+    const isWindowsVirtualSwitch = lowerName.startsWith('vethernet');
+    const isVirtualInterface =
+      isWindowsVirtualSwitch || VIRTUAL_INTERFACE_PREFIXES.some((prefix) => lowerName.startsWith(prefix));
+    if (isVirtualInterface) {
+      return;
+    }
+    const isVpn = VPN_INTERFACE_PREFIXES.some((prefix) => lowerName.startsWith(prefix));
+    const isWired = lowerName.startsWith('eth') || lowerName.startsWith('en');
+    const isWireless = lowerName.startsWith('wl') || lowerName.startsWith('ww');
+    // a VPN address is a last resort: it is never reachable through mDNS
+    let interfacePriority = 2;
+    if (isVpn) {
+      interfacePriority = 3;
+    } else if (isWired) {
+      interfacePriority = 0;
+    } else if (isWireless) {
+      interfacePriority = 1;
+    }
+    (networkInterfaces[name] || []).forEach((/** @type {any} */ networkInterface) => {
+      const isIpV4 = networkInterface.family === 'IPv4' || networkInterface.family === 4;
+      if (!networkInterface.internal && isIpV4) {
+        candidates.push({
+          isVpn,
+          addressPriority: getAddressPriority(networkInterface.address, networkInterface.mac),
+          interfacePriority,
+          address: networkInterface.address,
+        });
+      }
+    });
+  });
+  // a VPN address is never on the local link mDNS is limited to: it stays a last
+  // resort even when its address looks more private than the one of a real card.
+  // Below that, a real LAN address always wins over a link-local one, whatever the interface
+  candidates.sort(
+    (a, b) =>
+      Number(a.isVpn) - Number(b.isVpn) ||
+      a.addressPriority - b.addressPriority ||
+      a.interfacePriority - b.interfacePriority,
+  );
+  return candidates.length > 0 ? candidates[0].address : null;
+}
+
 /**
  * @description Return system informations.
  * @returns {Promise} Resolve with all system metrics.
@@ -135,6 +233,10 @@ function readCpuTemperature() {
  * system.getInfos();
  */
 async function getInfos() {
+  const networkInterfaces = os.networkInterfaces();
+  // in a bridged container, the address of the container is not reachable from the
+  // local network: there is no local IP to expose, and nothing is advertised with mDNS
+  const onHostNetwork = await this.isOnHostNetwork();
   const infos = {
     hostname: os.hostname(),
     type: os.type(),
@@ -146,7 +248,9 @@ async function getInfos() {
     totalmem: os.totalmem(),
     freemem: os.freemem(),
     cpus: os.cpus(),
-    network_interfaces: os.networkInterfaces(),
+    network_interfaces: networkInterfaces,
+    local_ip: onHostNetwork ? getLocalIp(networkInterfaces) : null,
+    server_port: getServerPort(),
     nodejs_version: process.version,
     gladys_version: this.gladysVersion,
     latest_gladys_version: this.latestGladysVersion,
@@ -175,6 +279,7 @@ async function getInfos() {
 
 module.exports = {
   getInfos,
+  getLocalIp,
   readCpuTemperature,
   parseThermalValue,
 };

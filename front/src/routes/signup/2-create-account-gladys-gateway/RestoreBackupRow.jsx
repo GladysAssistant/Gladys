@@ -4,10 +4,11 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { bytesFormatter } from '../../../utils/bytesFormat';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import style from '../style.css';
 
 dayjs.extend(relativeTime);
 
-class GatewayBackupRow extends Component {
+class RestoreBackupRow extends Component {
   restoreBackup = () => {
     this.props.restoreBackup(this.props.backup.path);
   };
@@ -26,33 +27,40 @@ class GatewayBackupRow extends Component {
 
   render(props, { confirmBackup }) {
     return (
-      <tr>
-        <td>
-          {dayjs(props.backup.created_at)
-            .locale(props.user.language)
-            .fromNow()}
-        </td>
-        <td>{bytesFormatter(props.backup.size, props.user.language, this.props.intl.dictionary)}</td>
-        <td class="text-right">
+      <div class={style.backupRow}>
+        <span class={style.backupIcon}>
+          <i class="fe fe-archive" />
+        </span>
+        <div class={style.backupInfo}>
+          <div class={style.backupDate}>
+            {dayjs(props.backup.created_at)
+              .locale(props.user.language)
+              .fromNow()}
+          </div>
+          <div class={style.backupSize}>
+            {bytesFormatter(props.backup.size, props.user.language, this.props.intl.dictionary)}
+          </div>
+        </div>
+        <div class={style.backupActions}>
           {!confirmBackup && (
-            <button class="btn btn-success" onClick={this.askForConfirmation}>
+            <button class="btn btn-success btn-sm" onClick={this.askForConfirmation}>
               <Text id="gatewayBackup.restoreButton" />
             </button>
           )}
           {confirmBackup && (
-            <span>
-              <button class="btn btn-success" onClick={this.restoreBackup}>
-                <Text id="gatewayBackup.confirmRestore" />
-              </button>{' '}
-              <button class="btn btn-danger" onClick={this.cancelConfirmation}>
-                <Text id="gatewayBackup.cancelRestore" />
-              </button>
-            </span>
+            <button class="btn btn-success btn-sm" onClick={this.restoreBackup}>
+              <Text id="gatewayBackup.confirmRestore" />
+            </button>
           )}
-        </td>
-      </tr>
+          {confirmBackup && (
+            <button class="btn btn-danger btn-sm" onClick={this.cancelConfirmation}>
+              <Text id="gatewayBackup.cancelRestore" />
+            </button>
+          )}
+        </div>
+      </div>
     );
   }
 }
 
-export default withIntlAsProp(GatewayBackupRow);
+export default withIntlAsProp(RestoreBackupRow);

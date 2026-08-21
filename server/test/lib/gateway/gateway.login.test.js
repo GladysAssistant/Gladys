@@ -90,4 +90,39 @@ describe('gateway.login', () => {
     // Plus is now linked: external integration webhooks recompute
     assert.calledWith(gateway.event.emit, EVENTS.GATEWAY.LINK_STATUS_CHANGED);
   });
+
+  it('should generate recovery codes while the user token is still valid', async () => {
+    const result = await gateway.loginTwoFactor('token', '123456', undefined, true);
+    // the codes must be generated before init() connects as the instance and
+    // replaces the user access token, so before the instance is even created
+    assert.callOrder(
+      gateway.gladysGatewayClient.loginInstance,
+      gateway.gladysGatewayClient.generateTwoFactorRecoveryCodes,
+      gateway.gladysGatewayClient.createInstance,
+    );
+    expect(result).to.deep.equal({
+      recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'],
+    });
+  });
+
+  it('should not generate recovery codes when they were not asked for', async () => {
+    const result = await gateway.loginTwoFactor('token', '123456');
+    assert.notCalled(gateway.gladysGatewayClient.generateTwoFactorRecoveryCodes);
+    expect(result).to.deep.equal({
+      recovery_codes: null,
+    });
+  });
+
+  it('should login two factor with a recovery code to gladys gateway', async () => {
+    await gateway.loginTwoFactor('token', undefined, '1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d');
+    assert.notCalled(gateway.gladysGatewayClient.loginInstance);
+    assert.calledWith(
+      gateway.gladysGatewayClient.loginInstanceWithRecoveryCode,
+      'token',
+      '1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d',
+    );
+    assert.calledOnce(gateway.gladysGatewayClient.createInstance);
+    // Plus is now linked: external integration webhooks recompute
+    assert.calledWith(gateway.event.emit, EVENTS.GATEWAY.LINK_STATUS_CHANGED);
+  });
 });
