@@ -1,5 +1,8 @@
 .containerWithMargin {
-  margin-top: 3rem;
+  /* padding, not margin: a margin would collapse through the glass
+     page-main and leave a white band above the scene */
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 
 /* The scene form borrowed Tabler's .col-login (24rem), which is too narrow for

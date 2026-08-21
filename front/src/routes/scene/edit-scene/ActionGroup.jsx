@@ -102,9 +102,11 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
           <span class={cx(style.stepIconTile, style.typePickerIconBlue)}>
             <i class="fe fe-git-merge" />
           </span>
-          <h4 class="card-title">
+          {/* a step heading, not a widget label: the theme shrinks .card-title
+              to a 12px uppercase micro-label, which is the dashboard grammar */}
+          <span class={style.stepLabel}>
             <Text id="editScene.parallelBlockTitle" />
-          </h4>
+          </span>
 
           <div class="card-options">
             <span class="mr-4" aria-hidden="true">

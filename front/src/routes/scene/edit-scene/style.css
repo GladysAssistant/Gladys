@@ -397,6 +397,18 @@
 :global(.glass-theme) .stepCard {
   border-radius: var(--gl-radius-md);
   box-shadow: var(--gl-shadow-soft);
+  /* No blur on a draggable card: the HTML5 drag backend uses the card itself
+     as the drag preview, and Safari rasterizes a blank ghost for a
+     backdrop-filter surface. The translucent background carries the frost. */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* The glass card rule wins over the plain .parallelBlock background, so the
+   "at the same time" block would read as just another step: give it back a
+   group identity with the accent edge its blue card-status carried before */
+:global(.glass-theme) .parallelBlock {
+  border-left: 3px solid var(--gl-accent);
 }
 
 /* The glass theme makes card headers hug their title (no bottom padding),
@@ -410,7 +422,8 @@
    background, hence the counter-weight */
 :global(.glass-theme) .backButton,
 :global(.glass-theme) .headerActionBtn,
-:global(.dark-mode .glass-theme) .backButton {
+:global(.dark-mode .glass-theme) .backButton,
+:global(.dark-mode .glass-theme) .headerActionBtn {
   border: 1px solid var(--gl-border) !important;
   background: var(--gl-card-bg) !important;
   backdrop-filter: blur(18px);
