@@ -20,6 +20,12 @@ const MAX_WHEEL_SHARE_OF_VIEWPORT_HEIGHT = 0.32;
  * writing the color there would send one order per move (~5/s through a debounce) to a lamp whose
  * color writes are expensive (xy conversion, Zigbee/Hue queues). `onChange` fires when the finger
  * leaves the wheel, and is the only one that reaches the device.
+ *
+ * iro@5 does not listen to `touchcancel` (its document listeners are touchmove/touchend only), so
+ * a cancelled touch — browser scroll takeover, OS gesture — leaves it mid-drag until the next
+ * touchend anywhere on the page, whose `input:end` would commit the cancelled color. A window
+ * `touchcancel` listener marks the interaction as cancelled: the events iro keeps emitting for it
+ * are swallowed, nothing is written, and the wheel snaps back to the value of the lamp.
  */
 class LightColorWheel extends Component {
   containerRef = createRef();
@@ -29,6 +35,10 @@ class LightColorWheel extends Component {
   // While the finger is on the wheel, the value coming back from the parent state is our own echo:
   // writing it back into the picker would fight the drag.
   userIsInteracting = false;
+
+  // Set by a touchcancel during a drag: the interaction is dead, its remaining iro events must not
+  // preview nor commit anything.
+  interactionCancelled = false;
 
   componentDidMount() {
     const { value } = this.props;
@@ -44,6 +54,7 @@ class LightColorWheel extends Component {
     this.colorPicker.on('input:end', this.handleInputEnd);
 
     window.addEventListener('resize', this.handleResize);
+    window.addEventListener('touchcancel', this.handleTouchCancel);
   }
 
   componentDidUpdate(previousProps) {
@@ -55,6 +66,7 @@ class LightColorWheel extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('touchcancel', this.handleTouchCancel);
     this.colorPicker.off('input:start', this.handleInputStart);
     this.colorPicker.off('input:change', this.handleInputChange);
     this.colorPicker.off('input:end', this.handleInputEnd);
@@ -76,15 +88,57 @@ class LightColorWheel extends Component {
 
   handleInputStart = () => {
     this.userIsInteracting = true;
+    this.interactionCancelled = false;
   };
 
   handleInputChange = color => {
+    if (this.interactionCancelled) {
+      return;
+    }
     this.props.onPreview(hexToInt(color.hexString));
   };
 
   handleInputEnd = color => {
     this.userIsInteracting = false;
+    if (this.interactionCancelled) {
+      this.interactionCancelled = false;
+      // The handle may have been dragged further before the interaction was torn down.
+      this.restoreColorFromProps();
+      return;
+    }
     this.props.onChange(hexToInt(color.hexString));
+  };
+
+  handleTouchCancel = () => {
+    if (!this.userIsInteracting) {
+      return;
+    }
+    this.userIsInteracting = false;
+    this.interactionCancelled = true;
+    this.detachIroDocumentListeners();
+    // Prop sync was suppressed during the drag: put the wheel back on the color the lamp has.
+    this.restoreColorFromProps();
+    if (this.props.onCancel) {
+      this.props.onCancel();
+    }
+  };
+
+  // iro attaches mousemove/touchmove/mouseup/touchend on `document` when a drag starts and only
+  // detaches them from its own mouseup/touchend branch — a branch that also `preventDefault()`s
+  // every event it sees. Leaving them attached after a cancelled touch would swallow the next tap
+  // anywhere on the page (its click is never synthesized) and let a stray touchmove keep moving the
+  // handle. Ending the interaction the way iro expects is what detaches them; its End branch emits
+  // `input:end` without reading the coordinates, so a bare synthetic mouseup is enough, and the
+  // `input:end` it triggers is swallowed by the cancelled flag set just above.
+  detachIroDocumentListeners = () => {
+    document.dispatchEvent(new MouseEvent('mouseup', { bubbles: false, cancelable: true }));
+  };
+
+  restoreColorFromProps = () => {
+    const { value } = this.props;
+    if (this.colorPicker && Number.isFinite(value)) {
+      this.colorPicker.color.hexString = `#${intToHex(value)}`;
+    }
   };
 
   render() {

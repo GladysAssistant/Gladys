@@ -102,6 +102,9 @@ class LightControlPanel extends Component {
   // The wheel paints the panel on every move but only writes to the lamp when the finger leaves it.
   previewColor = color => this.setState({ previewColor: color });
 
+  // A cancelled wheel touch writes nothing: the panel goes back to the color the lamp really has.
+  cancelColorPreview = () => this.setState({ previewColor: undefined });
+
   setColor = colorFeature => color => {
     this.setState({ previewColor: undefined });
     this.props.updateValue(colorFeature, color);
@@ -213,6 +216,7 @@ class LightControlPanel extends Component {
               value={colorFeature.last_value}
               onPreview={this.previewColor}
               onChange={this.setColor(colorFeature)}
+              onCancel={this.cancelColorPreview}
             />
             <div class={style.presets}>
               {COLOR_PRESETS.map(preset => (
