@@ -152,7 +152,12 @@ class CameraBoxComponent extends Component {
       // event: reload the device first, as on mount. Refreshing the image alone would leave the
       // frame received before the disconnect on screen (docs/specs/camera-enable-disable.md).
       const cameraDisabled = await this.refreshDevice({ keepCurrentView: true });
-      if (cameraDisabled === false) {
+      // null means the reload did not resolve (the device request failed — likely right after a
+      // reconnect — or a newer one superseded it). Skipping the image then would drop the very
+      // refresh the reconnect exists for, so fall back to the last known state: refreshData is
+      // already a no-op on a camera known to be disabled, and the server refuses a disabled
+      // camera's image anyway. Only a resolved `true` stops the refresh.
+      if (cameraDisabled !== true) {
         this.refreshData();
       }
     }
