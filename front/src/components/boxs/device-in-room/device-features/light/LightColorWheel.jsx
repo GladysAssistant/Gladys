@@ -5,13 +5,21 @@ import { intToHex, hexToInt } from '../../../../../../../server/utils/colors';
 import style from './style.css';
 
 // The wheel is the main target of the panel: it takes the width it is given, between a comfortable
-// floor on a phone and a size that stays reachable with one thumb on a tablet.
+// floor on a phone and a size that stays reachable with one thumb on a tablet. It is also the
+// tallest block under the brightness bar, so it gives way on a short viewport (a phone in
+// landscape, a browser with both toolbars out) rather than pushing the sheet into a long scroll.
 const MIN_WHEEL_WIDTH = 180;
 const MAX_WHEEL_WIDTH = 260;
+const MAX_WHEEL_SHARE_OF_VIEWPORT_HEIGHT = 0.32;
 
 /**
  * The color wheel of the light panel: a full-width iro wheel that resizes with its container,
  * instead of the fixed 150px one squeezed in a table cell.
+ *
+ * A drag emits two different things. `onPreview` fires on every move and only paints the panel —
+ * writing the color there would send one order per move (~5/s through a debounce) to a lamp whose
+ * color writes are expensive (xy conversion, Zigbee/Hue queues). `onChange` fires when the finger
+ * leaves the wheel, and is the only one that reaches the device.
  */
 class LightColorWheel extends Component {
   containerRef = createRef();
@@ -47,12 +55,17 @@ class LightColorWheel extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
+    this.colorPicker.off('input:start', this.handleInputStart);
+    this.colorPicker.off('input:change', this.handleInputChange);
+    this.colorPicker.off('input:end', this.handleInputEnd);
+    this.colorPicker = null;
   }
 
   getWidth = () => {
     const container = this.containerRef.current;
     const availableWidth = container ? container.getBoundingClientRect().width : MAX_WHEEL_WIDTH;
-    return Math.round(Math.max(MIN_WHEEL_WIDTH, Math.min(MAX_WHEEL_WIDTH, availableWidth)));
+    const availableHeight = window.innerHeight * MAX_WHEEL_SHARE_OF_VIEWPORT_HEIGHT;
+    return Math.round(Math.max(MIN_WHEEL_WIDTH, Math.min(MAX_WHEEL_WIDTH, availableWidth, availableHeight)));
   };
 
   handleResize = () => {
@@ -66,7 +79,7 @@ class LightColorWheel extends Component {
   };
 
   handleInputChange = color => {
-    this.props.onChange(hexToInt(color.hexString));
+    this.props.onPreview(hexToInt(color.hexString));
   };
 
   handleInputEnd = color => {

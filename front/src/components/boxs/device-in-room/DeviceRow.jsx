@@ -6,7 +6,9 @@ import { getDeviceName } from '../../../utils/device';
 import { TelevisionPushButtonFeatureTypes } from '../../../utils/consts';
 
 import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
+import ColorDeviceFeature from './device-features/ColorDeviceFeature';
 import SensorDeviceFeature from './device-features/sensor-value/SensorDeviceFeature';
+import LightTemperatureDeviceFeature from './device-features/LightTemperatureDeviceFeature';
 import MultiLevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
 import NumberDeviceFeature from './device-features/NumberDeviceFeature';
 import CoverDeviceFeature from './device-features/CoverDeviceFeature';
@@ -28,12 +30,19 @@ import VacuumCleanerCleanModeDeviceFeature from './device-features/VacuumCleaner
 import WaterHeaterModeDeviceFeature from './device-features/WaterHeaterModeDeviceFeature';
 import TextSelectDeviceFeature from './device-features/TextSelectDeviceFeature';
 
-// Light features (on/off, brightness, color, color temperature, hue, saturation) are NOT routed
-// here: DeviceCard groups them per device into one LightDeviceFeature row opening the light panel.
-// The on/off entry stays, because a light exposing only that feature keeps its plain switch row.
+// DeviceRow is the per-FEATURE registry, and it is not only used by the dashboard widgets: the
+// MQTT catalog preview renders one mock feature through it. The light entries therefore stay,
+// even though the widgets no longer reach most of them — DeviceCard groups the light features of
+// a same device into one LightDeviceFeature row before this map is consulted, and only what it
+// leaves ungrouped (a light with no device attached) falls back here.
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: ColorDeviceFeature,
   [DEVICE_FEATURE_TYPES.SWITCH.DIMMER]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.HUE]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.SATURATION]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE]: LightTemperatureDeviceFeature,
   [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL]: NumberDeviceFeature,
   [DEVICE_FEATURE_TYPES.TELEVISION.VOLUME]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.SHUTTER.STATE]: CoverDeviceFeature,

@@ -7,7 +7,9 @@ import get from 'get-value';
 import { DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 import { intToHex } from '../../../../../../../server/utils/colors';
 import {
+  getCustomFeatureName,
   getLightFeature,
+  getLightName,
   getLightCssColor,
   temperatureGradient,
   temperatureValueToKelvin,
@@ -50,7 +52,7 @@ const hasColorFeature = features =>
 class LightControlPanel extends Component {
   constructor(props) {
     super(props);
-    this.state = { tab: hasColorFeature(props.features) ? TABS.COLOR : TABS.TEMPERATURE };
+    this.state = { tab: hasColorFeature(props.features) ? TABS.COLOR : TABS.TEMPERATURE, previewColor: undefined };
   }
 
   componentDidMount() {
@@ -97,8 +99,22 @@ class LightControlPanel extends Component {
 
   updateFeature = feature => value => this.props.updateValueWithDebounce(feature, value);
 
+  // The wheel paints the panel on every move but only writes to the lamp when the finger leaves it.
+  previewColor = color => this.setState({ previewColor: color });
+
+  setColor = colorFeature => color => {
+    this.setState({ previewColor: undefined });
+    this.props.updateValue(colorFeature, color);
+  };
+
+  // A feature the user renamed in the widget editor is labelled with the name they typed, in the
+  // panel too — not only on the row.
+  featureLabel = (feature, i18nKey) => {
+    const customName = getCustomFeatureName(this.props.intl.dictionary, this.props.device, feature);
+    return customName || get(this.props.intl.dictionary, i18nKey);
+  };
+
   renderBrightness(brightnessFeature, lightColor, isOff) {
-    const { dictionary } = this.props.intl;
     const percent = valueToPercent(brightnessFeature, brightnessFeature.last_value);
     // The bar is painted with the color the lamp is actually showing, so the panel reads at a
     // glance even before looking at the wheel. A light that is off drops it for the neutral bar
@@ -116,7 +132,7 @@ class LightControlPanel extends Component {
           max={Number.isFinite(brightnessFeature.max) ? brightnessFeature.max : 100}
           value={brightnessFeature.last_value}
           onChange={this.updateFeature(brightnessFeature)}
-          label={get(dictionary, 'lightControl.brightness')}
+          label={this.featureLabel(brightnessFeature, 'lightControl.brightness')}
           valueText={`${percent}%`}
           fillBackground={fillBackground}
           neutralFill={isOff}
@@ -128,7 +144,6 @@ class LightControlPanel extends Component {
   }
 
   renderTemperature(temperatureFeature) {
-    const { dictionary } = this.props.intl;
     const min = Number.isFinite(temperatureFeature.min) ? temperatureFeature.min : 0;
     const max = Number.isFinite(temperatureFeature.max) ? temperatureFeature.max : 100;
     const value = Number.isFinite(temperatureFeature.last_value) ? temperatureFeature.last_value : min;
@@ -141,9 +156,7 @@ class LightControlPanel extends Component {
     return (
       <div class={style.tabPanel}>
         <div class={style.controlHeader}>
-          <span class={style.controlLabel}>
-            <Text id="lightControl.temperature" />
-          </span>
+          <span class={style.controlLabel}>{this.featureLabel(temperatureFeature, 'lightControl.temperature')}</span>
           <span class={style.controlValue}>{`${kelvin} K`}</span>
         </div>
         <LightSlider
@@ -151,7 +164,7 @@ class LightControlPanel extends Component {
           max={max}
           value={value}
           onChange={this.updateFeature(temperatureFeature)}
-          label={get(dictionary, 'lightControl.temperature')}
+          label={this.featureLabel(temperatureFeature, 'lightControl.temperature')}
           valueText={`${kelvin} K`}
           trackBackground={temperatureGradient(temperatureFeature)}
         />
@@ -168,7 +181,6 @@ class LightControlPanel extends Component {
   }
 
   renderPercentSlider(feature, labelKey, trackBackground) {
-    const { dictionary } = this.props.intl;
     const min = Number.isFinite(feature.min) ? feature.min : 0;
     const max = Number.isFinite(feature.max) ? feature.max : 100;
     const value = Number.isFinite(feature.last_value) ? feature.last_value : min;
@@ -176,9 +188,7 @@ class LightControlPanel extends Component {
     return (
       <div class={style.tabPanel} key={feature.selector}>
         <div class={style.controlHeader}>
-          <span class={style.controlLabel}>
-            <Text id={labelKey} />
-          </span>
+          <span class={style.controlLabel}>{this.featureLabel(feature, labelKey)}</span>
           <span class={style.controlValue}>{value}</span>
         </div>
         <LightSlider
@@ -186,7 +196,7 @@ class LightControlPanel extends Component {
           max={max}
           value={value}
           onChange={this.updateFeature(feature)}
-          label={get(dictionary, labelKey)}
+          label={this.featureLabel(feature, labelKey)}
           valueText={`${value}`}
           trackBackground={trackBackground}
         />
@@ -199,7 +209,11 @@ class LightControlPanel extends Component {
       <Fragment>
         {colorFeature && (
           <Fragment>
-            <LightColorWheel value={colorFeature.last_value} onChange={this.updateFeature(colorFeature)} />
+            <LightColorWheel
+              value={colorFeature.last_value}
+              onPreview={this.previewColor}
+              onChange={this.setColor(colorFeature)}
+            />
             <div class={style.presets}>
               {COLOR_PRESETS.map(preset => (
                 <button
@@ -208,7 +222,7 @@ class LightControlPanel extends Component {
                   class={style.presetSwatch}
                   style={{ backgroundColor: `#${intToHex(preset)}` }}
                   aria-label={`#${intToHex(preset)}`}
-                  onClick={() => this.props.updateValue(colorFeature, preset)}
+                  onClick={() => this.setColor(colorFeature)(preset)}
                 />
               ))}
             </div>
@@ -225,7 +239,7 @@ class LightControlPanel extends Component {
     );
   }
 
-  render({ device, features, onClose, intl }, { tab }) {
+  render({ device, features, onClose, intl }, { tab, previewColor }) {
     const { dictionary } = intl;
     const binaryFeature = getLightFeature(features, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
     const brightnessFeature = getLightFeature(features, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS);
@@ -235,7 +249,9 @@ class LightControlPanel extends Component {
     const saturationFeature = getLightFeature(features, DEVICE_FEATURE_TYPES.LIGHT.SATURATION);
 
     const isOff = binaryFeature ? binaryFeature.last_value !== 1 : false;
-    const lightColor = getLightCssColor(features);
+    // While a finger drags the wheel the lamp has not been written yet: the panel still shows the
+    // color under the finger, so the brightness bar follows the drag.
+    const lightColor = Number.isFinite(previewColor) ? `#${intToHex(previewColor)}` : getLightCssColor(features);
     const hasColorTab = hasColorFeature(features);
     const hasTemperatureTab = Boolean(temperatureFeature);
     const currentTab = tab === TABS.COLOR && !hasColorTab ? TABS.TEMPERATURE : tab;
@@ -248,14 +264,14 @@ class LightControlPanel extends Component {
           class={style.sheet}
           role="dialog"
           aria-modal="true"
-          aria-label={device.name}
+          aria-label={getLightName(dictionary, device, features)}
           tabIndex="-1"
           ref={this.setSheetRef}
         >
           <div class={style.sheetHandle} />
           <div class={style.header}>
             <div class={style.headerTitles}>
-              <span class={style.title}>{device.name}</span>
+              <span class={style.title}>{getLightName(dictionary, device, features)}</span>
               {binaryFeature && (
                 <span class={style.subtitle}>
                   <Text id={isOff ? 'lightControl.off' : 'lightControl.on'} />

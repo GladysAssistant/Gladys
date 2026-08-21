@@ -4,7 +4,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import { DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
-import { getLightFeature, getLightCssColor, valueToPercent } from './lightFeatures';
+import { getLightFeature, getLightCssColor, getLightName, valueToPercent } from './lightFeatures';
 import LightControlPanel from './LightControlPanel';
 import style from './style.css';
 
@@ -54,7 +54,7 @@ class LightDeviceFeature extends Component {
             />
           </td>
           <td>
-            <div>{device.name}</div>
+            <div>{getLightName(dictionary, device, features)}</div>
             <div class={style.rowSummary}>
               {binaryFeature && <Text id={isOn ? 'lightControl.on' : 'lightControl.off'} />}
               {binaryFeature && brightnessFeature && isOn && ' · '}

@@ -1126,8 +1126,9 @@
   }
 }
 
-/* Structural rows are not feature pills: a feature component rendering a second tr with one
-   colspan cell would otherwise paint it as an empty ghost pill. */
+/* Structural rows are not feature pills: ColorDeviceFeature always renders
+   a second tr with one colspan cell holding the (d-none while closed) color
+   picker — without this reset it paints as an empty ghost pill. */
 :global(.glass-theme .device-list-table tr td[colspan]) {
   background-color: transparent;
   border: none;

@@ -27,6 +27,12 @@ const roundToStep = (value, min, step) => min + Math.round((value - min) / step)
 class LightSlider extends Component {
   trackRef = createRef();
 
+  // The drag is tracked on an instance field, not on the state: setState is asynchronous, so a
+  // pointerup landing before the flush would read `dragging === false`, return early and leave the
+  // window listeners attached — every later pointer move on the page would then write to the lamp.
+  // The state only carries the CSS class.
+  isDragging = false;
+
   state = { dragging: false };
 
   componentWillUnmount() {
@@ -64,23 +70,25 @@ class LightSlider extends Component {
     if (this.trackRef.current) {
       this.trackRef.current.focus();
     }
+    this.isDragging = true;
     this.setState({ dragging: true });
     this.startListening();
     this.emitChange(this.getValueFromPointer(event));
   };
 
   handlePointerMove = event => {
-    if (!this.state.dragging) {
+    if (!this.isDragging) {
       return;
     }
     this.emitChange(this.getValueFromPointer(event));
   };
 
   handlePointerUp = event => {
-    if (!this.state.dragging) {
+    this.stopListening();
+    if (!this.isDragging) {
       return;
     }
-    this.stopListening();
+    this.isDragging = false;
     this.setState({ dragging: false });
     this.emitChange(this.getValueFromPointer(event));
   };
