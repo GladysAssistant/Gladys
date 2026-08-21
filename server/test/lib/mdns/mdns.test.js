@@ -450,8 +450,8 @@ describe('mdns', () => {
     variable.getValue = fake.resolves('gladys2');
     const restarts = [mdns.restart(), mdns.restart(), mdns.restart()];
     await Promise.all(restarts);
-    // one start() for the initial advertisement, one for the first restart and one
-    // for the single coalesced follow-up
+    // the fake is new since the initial advertisement: one start() for the first
+    // restart and one for the single coalesced follow-up
     expect(variable.getValue.callCount).to.equal(2);
     expect(mdns.restartPending).to.equal(false);
     expect(mdns.restartPromise).to.equal(null);

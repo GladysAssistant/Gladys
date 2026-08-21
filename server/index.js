@@ -48,6 +48,18 @@ const closeDuckDB = async () => {
   }
 };
 
+// Stop advertising Gladys on the local network. A rejection here would skip the
+// process.exit() of the shutdown and make it wait for the forced exit
+const stopMdns = async () => {
+  try {
+    if (gladysInstance) {
+      await gladysInstance.mdns.stop();
+    }
+  } catch (e) {
+    logger.warn(e);
+  }
+};
+
 const shutdown = async (signal) => {
   logger.info(`${signal} received.`);
   // We give Gladys 10 seconds to properly shutdown, otherwise we do it
@@ -56,8 +68,7 @@ const shutdown = async (signal) => {
     process.exit();
   }, 10 * 1000);
   logger.info('Closing database connections.');
-  const stopMdns = gladysInstance ? gladysInstance.mdns.stop() : Promise.resolve();
-  await Promise.all([closeSQLite(), closeDuckDB(), stopMdns]);
+  await Promise.all([closeSQLite(), closeDuckDB(), stopMdns()]);
   process.exit();
 };
 

@@ -288,6 +288,15 @@ describe('system.getLocalIp', () => {
     expect(getLocalIp(networkInterfaces)).to.equal('10.8.0.2');
   });
 
+  it('should prefer the address of a real card over a VPN one, even a public address', () => {
+    const networkInterfaces = {
+      // mDNS only reaches the local link: a private address behind a tunnel is not on it
+      tun0: [{ address: '10.8.0.2', family: 'IPv4', internal: false }],
+      eth0: [{ address: '82.64.10.20', family: 'IPv4', internal: false, mac: 'dc:a6:32:00:11:22' }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('82.64.10.20');
+  });
+
   it('should support the numeric IPv4 family returned by recent Node versions', () => {
     const networkInterfaces = {
       eth0: [{ address: '192.168.1.70', family: 4, internal: false }],

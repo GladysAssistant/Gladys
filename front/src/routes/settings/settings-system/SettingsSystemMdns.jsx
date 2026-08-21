@@ -4,10 +4,14 @@ import { Text } from 'preact-i18n';
 import { SYSTEM_VARIABLE_NAMES, MDNS, normalizeMdnsHostname } from '../../../../../server/utils/constants';
 
 class SettingsSystemMdns extends Component {
+  // the initial read can come back after the user saved a new name: what was read
+  // before the save must never overwrite what the server now stores
+  saveStarted = false;
+
   getMdnsHostname = async () => {
     try {
       const { value } = await this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME}`);
-      if (value) {
+      if (value && !this.saveStarted) {
         this.setState({
           mdnsHostname: value,
           advertisedHostname: value
@@ -39,6 +43,7 @@ class SettingsSystemMdns extends Component {
       });
       return;
     }
+    this.saveStarted = true;
     this.setState({
       mdnsHostname: hostname,
       saving: true,

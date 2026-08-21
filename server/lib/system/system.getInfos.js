@@ -179,7 +179,7 @@ function getAddressPriority(address, mac) {
  * getLocalIp(os.networkInterfaces());
  */
 function getLocalIp(networkInterfaces) {
-  /** @type {Array<{ addressPriority: number, interfacePriority: number, address: string }>} */
+  /** @type {Array<{ isVpn: boolean, addressPriority: number, interfacePriority: number, address: string }>} */
   const candidates = [];
   Object.keys(networkInterfaces).forEach((name) => {
     const lowerName = name.toLowerCase();
@@ -206,6 +206,7 @@ function getLocalIp(networkInterfaces) {
       const isIpV4 = networkInterface.family === 'IPv4' || networkInterface.family === 4;
       if (!networkInterface.internal && isIpV4) {
         candidates.push({
+          isVpn,
           addressPriority: getAddressPriority(networkInterface.address, networkInterface.mac),
           interfacePriority,
           address: networkInterface.address,
@@ -213,8 +214,15 @@ function getLocalIp(networkInterfaces) {
       }
     });
   });
-  // a real LAN address always wins over a VPN or link-local one, whatever the interface
-  candidates.sort((a, b) => a.addressPriority - b.addressPriority || a.interfacePriority - b.interfacePriority);
+  // a VPN address is never on the local link mDNS is limited to: it stays a last
+  // resort even when its address looks more private than the one of a real card.
+  // Below that, a real LAN address always wins over a link-local one, whatever the interface
+  candidates.sort(
+    (a, b) =>
+      Number(a.isVpn) - Number(b.isVpn) ||
+      a.addressPriority - b.addressPriority ||
+      a.interfacePriority - b.interfacePriority,
+  );
   return candidates.length > 0 ? candidates[0].address : null;
 }
 

@@ -4089,7 +4089,7 @@
     "mdns": "Adresse locale (mDNS)",
     "mdnsText": "Gladys s'annonce sur le réseau local et est accessible à l'adresse ci-dessous. Modifiez le nom si plusieurs instances de Gladys tournent sur votre réseau. Le changement est appliqué immédiatement, sans redémarrage.",
     "mdnsSaved": "Enregistré !",
-    "mdnsInvalidName": "Nom invalide : utilisez uniquement des lettres minuscules, des chiffres et des tirets.",
+    "mdnsInvalidName": "Nom invalide : utilisez uniquement des lettres minuscules, des chiffres et des tirets, ne commencez ni ne terminez par un tiret, et restez sous les 64 caractères.",
     "mdnsError": "Une erreur s'est produite lors de la sauvegarde.",
     "mdnsCurrentUrl": "Gladys est accessible sur :",
     "mdnsNotAdvertised": "Gladys ne s'annonce pas sur le réseau local : elle tourne dans un conteneur Docker en mode bridge, ou aucune interface réseau locale n'a été détectée.",
