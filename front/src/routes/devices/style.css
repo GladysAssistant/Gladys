@@ -321,27 +321,365 @@
   }
 }
 
-/* The devices table lives in a `.table-responsive` (overflow: auto), which
-   would clip a dropdown: the export options are shown in an overlay instead */
-.modalOverlay {
+/* ==================================================================
+   The CSV export dialog: a bottom sheet on a phone, a centered dialog
+   above, like the dashboard's light control panel. It is rendered on
+   <body> (the page cards carry backdrop filters, which would clip a
+   fixed overlay nested inside them), so these classes live outside
+   .devicesPage and carry their own glass tokens through .glass-theme.
+   Light colors only — dark mode is the app-wide inversion filter.
+   ================================================================== */
+
+/* Anchored at the BOTTOM and sized in dvh: on iOS the viewport of a fixed element is the tall one
+   (toolbars retracted), so a sheet measured in vh spills past the bottom of the screen. */
+.exportOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1050;
+  left: 0;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 1060;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: center;
-  padding: 2rem 1rem;
-  overflow-y: auto;
+  background-color: rgba(16, 22, 36, 0.45);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
-.modalDialog {
+@media (min-width: 576px) {
+  .exportOverlay {
+    align-items: center;
+    padding: 1.5rem;
+  }
+}
+
+.exportSheet {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
   width: 100%;
-  max-width: 640px;
-  margin: auto 0;
+  max-height: 92vh;
+  max-height: 92dvh;
+  padding: 0.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  color: var(--gl-ink, #1c2334);
+  background-color: #fff;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -18px 50px rgba(16, 22, 36, 0.28);
+  outline: none;
+}
+
+@media (min-width: 576px) {
+  .exportSheet {
+    max-width: 32rem;
+    max-height: 88vh;
+    max-height: 88dvh;
+    padding: 1.25rem 1.5rem 1.5rem;
+    border-radius: 28px;
+  }
+}
+
+/* The sheet is a white surface, which the global inversion turns into pure black — harsher than
+   the rest of the app. Same counter-weight the cards use in dark-mode.css: a light gray that
+   inverts into the dark surface of the other cards. */
+:global(.dark-mode) .exportSheet {
+  background-color: #ced8e6;
+}
+
+/* the grab bar that tells a phone user the sheet is a sheet */
+.exportSheetHandle {
+  width: 2.5rem;
+  height: 0.25rem;
+  margin: 0.25rem auto -0.5rem;
+  background-color: rgba(28, 35, 52, 0.18);
+  border-radius: 999px;
+}
+
+@media (min-width: 576px) {
+  .exportSheetHandle {
+    display: none;
+  }
+}
+
+.exportHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+@media (min-width: 576px) {
+  .exportHeader {
+    padding-top: 0;
+  }
+}
+
+.exportHeaderTitles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.exportTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.exportSubtitle {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--gl-muted, #7c8396);
+}
+
+.exportCloseButton {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  color: var(--gl-ink, #1c2334);
+  background-color: rgba(28, 35, 52, 0.07);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.exportCloseButton:hover {
+  background-color: rgba(28, 35, 52, 0.12);
+}
+
+.exportSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* the theme's uppercase micro-label grammar, like the table header of the list */
+.exportSectionLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gl-muted, #7c8396);
+}
+
+.exportFeatureList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* A feature is a tappable row, not a hairline checkbox: the whole pill is the target */
+.exportFeature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
   text-align: left;
-  white-space: normal;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--gl-ink, #1c2334);
+  background-color: rgba(28, 35, 52, 0.04);
+  border: 1px solid transparent;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.exportFeature:hover {
+  background-color: rgba(28, 35, 52, 0.07);
+}
+
+.exportFeatureSelected {
+  background-color: rgba(61, 109, 240, 0.12);
+  border-color: rgba(61, 109, 240, 0.38);
+}
+
+.exportFeatureCheck {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  font-size: 0.8rem;
+  color: transparent;
+  background-color: #fff;
+  border: 1.5px solid rgba(28, 35, 52, 0.22);
+  border-radius: 8px;
+}
+
+.exportFeatureSelected .exportFeatureCheck {
+  color: #fff;
+  background-color: var(--gl-accent, #3d6df0);
+  border-color: var(--gl-accent, #3d6df0);
+}
+
+.exportFeatureName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.exportFeatureUnit {
+  margin-left: 0.35rem;
+  font-weight: 500;
+  color: var(--gl-muted, #7c8396);
+}
+
+.exportDates {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.exportDateField {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.exportDateLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--gl-muted, #7c8396);
+}
+
+/* Authored here rather than with .form-control: Tabler's input is a square-cornered box, and
+   dark-mode.css double-inverts .form-control, which would keep a white field on the dark sheet */
+.exportDateInput {
+  width: 100%;
+  min-width: 0;
+  height: 2.75rem;
+  padding: 0 0.9rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--gl-ink, #1c2334);
+  background-color: rgba(28, 35, 52, 0.04);
+  border: 1px solid rgba(28, 35, 52, 0.1);
+  border-radius: 14px;
+  outline: none;
+}
+
+.exportDateInput:focus {
+  border-color: rgba(61, 109, 240, 0.55);
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.18);
+}
+
+/* dark-mode.css paints every input with a solid !important background and double-inverts it back
+   to its light look: on the sheet the field must invert WITH the surface, like the buttons */
+:global(.dark-mode) .exportDateInput {
+  background-color: rgba(28, 35, 52, 0.04) !important;
+  color: var(--gl-ink, #1c2334) !important;
+  border-color: rgba(28, 35, 52, 0.1) !important;
+  filter: none;
+}
+
+.exportNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.875rem;
+  color: #8a6320;
+  background-color: rgba(245, 178, 55, 0.13);
+  border-radius: 16px;
+}
+
+.exportNoticeError {
+  color: #a5343f;
+  background-color: rgba(214, 68, 84, 0.11);
+}
+
+.exportNoticeIcon {
+  flex: none;
+  margin-top: 0.1rem;
+}
+
+.exportNoticeDetail {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.8125rem;
+  opacity: 0.85;
+  overflow-wrap: anywhere;
+}
+
+.exportActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* The theme's two action pills: a quiet ink-tinted one, and the solid ink one for the action */
+.exportCancelButton,
+.exportSubmitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.exportCancelButton {
+  color: var(--gl-ink, #1c2334);
+  background-color: rgba(28, 35, 52, 0.07);
+}
+
+.exportCancelButton:hover {
+  background-color: rgba(28, 35, 52, 0.13);
+}
+
+.exportSubmitButton {
+  color: #fff;
+  background-color: var(--gl-ink, #1c2334);
+}
+
+.exportSubmitButton:hover {
+  background-color: #2b3450;
+}
+
+.exportCancelButton:disabled,
+.exportSubmitButton:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.exportSpinning {
+  animation: exportSpin 1s linear infinite;
+}
+
+@keyframes exportSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .exportActions {
+    flex-direction: column-reverse;
+  }
+
+  .exportCancelButton,
+  .exportSubmitButton {
+    width: 100%;
+    padding: 0.8rem 1.25rem;
+  }
 }

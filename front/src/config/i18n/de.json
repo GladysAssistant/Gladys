@@ -111,13 +111,15 @@
       "modalTitle": "Verlauf von {{name}} exportieren",
       "description": "Lade den Verlauf dieses Geräts als CSV-Datei herunter, um ihn in einer Tabellenkalkulation auszuwerten.",
       "featuresLabel": "Zu exportierende Funktionen",
+      "periodLabel": "Zeitraum",
       "startLabel": "Von",
       "endLabel": "Bis",
       "invalidPeriod": "Das Enddatum muss nach dem Startdatum liegen.",
       "noFeatureSelected": "Wähle mindestens eine Funktion zum Exportieren aus.",
       "error": "Der CSV-Export ist fehlgeschlagen. Bitte versuche es erneut.",
       "cancelButton": "Abbrechen",
-      "exportButton": "Exportieren"
+      "exportButton": "Exportieren",
+      "closeButton": "Schließen"
     }
   },
   "login": {

@@ -111,13 +111,15 @@
       "modalTitle": "Export the history of {{name}}",
       "description": "Download the history of this device as a CSV file, to analyse it in a spreadsheet.",
       "featuresLabel": "Features to export",
+      "periodLabel": "Period",
       "startLabel": "From",
       "endLabel": "To",
       "invalidPeriod": "The end date must be after the start date.",
       "noFeatureSelected": "Select at least one feature to export.",
       "error": "The CSV export failed. Please retry.",
       "cancelButton": "Cancel",
-      "exportButton": "Export"
+      "exportButton": "Export",
+      "closeButton": "Close"
     }
   },
   "login": {

@@ -1,6 +1,7 @@
 import { Component } from 'preact';
+import { createPortal } from 'preact/compat';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import dayjs from 'dayjs';
 
@@ -12,6 +13,10 @@ import style from './style.css';
 const DATE_FORMAT = 'YYYY-MM-DD';
 const DEFAULT_PERIOD_IN_DAYS = 30;
 
+/**
+ * The CSV export dialog: a bottom sheet on a phone, a centered dialog on a tablet or a desktop,
+ * like the light control panel of the dashboard.
+ */
 class DeviceExportCsvModal extends Component {
   constructor(props) {
     super(props);
@@ -32,11 +37,23 @@ class DeviceExportCsvModal extends Component {
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown);
+    // The sheet covers the screen on a phone: scrolling inside it must not scroll the devices
+    // list underneath.
+    this.previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    if (this.sheetRef) {
+      this.sheetRef.focus();
+    }
   }
 
   componentWillUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown);
+    document.body.style.overflow = this.previousBodyOverflow;
   }
+
+  setSheetRef = element => {
+    this.sheetRef = element;
+  };
 
   handleKeyDown = e => {
     if (e.key === 'Escape') {
@@ -111,105 +128,133 @@ class DeviceExportCsvModal extends Component {
   render({ device }, { selectedFeatures, start, end, exporting, error, errorDetail }) {
     const exportableFeatures = getExportableFeatures(device);
     const invalidPeriod = this.isPeriodInvalid();
-    const canExport = selectedFeatures.length > 0 && !invalidPeriod && !exporting;
-    return (
-      <div class={style.modalOverlay} onClick={this.handleOverlayClick}>
-        <div class={style.modalDialog}>
-          <div class="card mb-0">
-            <div class="card-header">
-              <h3 class="card-title">
-                <Text id="devicesList.export.modalTitle" fields={{ name: device.name }} />
-              </h3>
-              <div class="card-options">
-                <button type="button" class="btn btn-secondary btn-sm" onClick={this.close}>
+    const noFeatureSelected = selectedFeatures.length === 0;
+    const canExport = !noFeatureSelected && !invalidPeriod && !exporting;
+    // One notice at a time: what blocks the export comes first, the failure of the last attempt
+    // is only worth reading once the form can be submitted again.
+    const blockingNotice = invalidPeriod || noFeatureSelected;
+    const showError = error && !blockingNotice;
+    // The dialog is rendered on <body>: the page and its cards carry backdrop filters, which
+    // would turn a fixed overlay nested inside them into a box clipped to the card.
+    return createPortal(
+      <div class={cx('glass-theme', style.exportOverlay)} onClick={this.handleOverlayClick}>
+        <Localizer>
+          <div
+            class={style.exportSheet}
+            role="dialog"
+            aria-modal="true"
+            aria-label={<Text id="devicesList.export.modalTitle" fields={{ name: device.name }} />}
+            tabIndex="-1"
+            ref={this.setSheetRef}
+          >
+            <div class={style.exportSheetHandle} />
+            <div class={style.exportHeader}>
+              <div class={style.exportHeaderTitles}>
+                <span class={style.exportTitle}>{device.name}</span>
+                <span class={style.exportSubtitle}>
+                  <Text id="devicesList.export.description" />
+                </span>
+              </div>
+              <Localizer>
+                <button
+                  type="button"
+                  class={style.exportCloseButton}
+                  onClick={this.close}
+                  aria-label={<Text id="devicesList.export.closeButton" />}
+                >
                   <i class="fe fe-x" />
                 </button>
+              </Localizer>
+            </div>
+
+            <div class={style.exportSection}>
+              <span class={style.exportSectionLabel}>
+                <Text id="devicesList.export.featuresLabel" />
+              </span>
+              <div class={style.exportFeatureList}>
+                {exportableFeatures.map(feature => {
+                  const selected = selectedFeatures.includes(feature.selector);
+                  return (
+                    <button
+                      key={feature.selector}
+                      type="button"
+                      class={cx(style.exportFeature, { [style.exportFeatureSelected]: selected })}
+                      data-selector={feature.selector}
+                      aria-pressed={selected}
+                      onClick={this.toggleFeature}
+                    >
+                      <span class={style.exportFeatureCheck}>
+                        <i class="fe fe-check" />
+                      </span>
+                      <span class={style.exportFeatureName}>
+                        {feature.name}
+                        {feature.unit && (
+                          <span class={style.exportFeatureUnit}>
+                            <Text id={`deviceFeatureUnitShort.${feature.unit}`} />
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
-            <div
-              class={cx('dimmer', {
-                active: exporting
-              })}
-            >
-              <div class="loader" />
-              <div class="dimmer-content">
-                <div class="card-body">
-                  <p class="text-muted">
-                    <Text id="devicesList.export.description" />
-                  </p>
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="devicesList.export.featuresLabel" />
-                    </label>
-                    {exportableFeatures.map(feature => (
-                      <label key={feature.selector} class="custom-control custom-checkbox">
-                        <input
-                          type="checkbox"
-                          class="custom-control-input"
-                          checked={selectedFeatures.includes(feature.selector)}
-                          data-selector={feature.selector}
-                          onChange={this.toggleFeature}
-                        />
-                        <span class="custom-control-label">
-                          {feature.name}
-                          {feature.unit && (
-                            <span class="text-muted ml-1">
-                              (<Text id={`deviceFeatureUnitShort.${feature.unit}`} />)
-                            </span>
-                          )}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                  <div class="row">
-                    <div class="col-6">
-                      <div class="form-group">
-                        <label class="form-label">
-                          <Text id="devicesList.export.startLabel" />
-                        </label>
-                        <input type="date" class="form-control" value={start} onChange={this.updateStart} />
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div class="form-group">
-                        <label class="form-label">
-                          <Text id="devicesList.export.endLabel" />
-                        </label>
-                        <input type="date" class="form-control" value={end} onChange={this.updateEnd} />
-                      </div>
-                    </div>
-                  </div>
-                  {invalidPeriod && (
-                    <div class="alert alert-warning">
-                      <Text id="devicesList.export.invalidPeriod" />
-                    </div>
-                  )}
-                  {selectedFeatures.length === 0 && (
-                    <div class="alert alert-warning">
-                      <Text id="devicesList.export.noFeatureSelected" />
-                    </div>
-                  )}
-                  {error && (
-                    <div class="alert alert-danger">
-                      <Text id="devicesList.export.error" />
-                      {errorDetail && <div class="small">{errorDetail}</div>}
-                    </div>
-                  )}
-                  <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-secondary mr-2" onClick={this.close} disabled={exporting}>
-                      <Text id="devicesList.export.cancelButton" />
-                    </button>
-                    <button type="button" class="btn btn-primary" onClick={this.exportCsv} disabled={!canExport}>
-                      <i class="fe fe-download mr-1" />
-                      <Text id="devicesList.export.exportButton" />
-                    </button>
-                  </div>
-                </div>
+
+            <div class={style.exportSection}>
+              <span class={style.exportSectionLabel}>
+                <Text id="devicesList.export.periodLabel" />
+              </span>
+              <div class={style.exportDates}>
+                <label class={style.exportDateField}>
+                  <span class={style.exportDateLabel}>
+                    <Text id="devicesList.export.startLabel" />
+                  </span>
+                  <input type="date" class={style.exportDateInput} value={start} onChange={this.updateStart} />
+                </label>
+                <label class={style.exportDateField}>
+                  <span class={style.exportDateLabel}>
+                    <Text id="devicesList.export.endLabel" />
+                  </span>
+                  <input type="date" class={style.exportDateInput} value={end} onChange={this.updateEnd} />
+                </label>
               </div>
+            </div>
+
+            {(blockingNotice || showError) && (
+              <div class={cx(style.exportNotice, { [style.exportNoticeError]: showError })}>
+                <i class={cx('fe', showError ? 'fe-alert-triangle' : 'fe-info', style.exportNoticeIcon)} />
+                <span>
+                  {invalidPeriod && <Text id="devicesList.export.invalidPeriod" />}
+                  {!invalidPeriod && noFeatureSelected && <Text id="devicesList.export.noFeatureSelected" />}
+                  {showError && (
+                    <span>
+                      <Text id="devicesList.export.error" />
+                      {errorDetail && <span class={style.exportNoticeDetail}>{errorDetail}</span>}
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
+
+            <div class={style.exportActions}>
+              <button type="button" class={style.exportCancelButton} onClick={this.close} disabled={exporting}>
+                <Text id="devicesList.export.cancelButton" />
+              </button>
+              <button type="button" class={style.exportSubmitButton} onClick={this.exportCsv} disabled={!canExport}>
+                <i
+                  class={cx('fe', {
+                    'fe-download': !exporting,
+                    'fe-loader': exporting,
+                    [style.exportSpinning]: exporting
+                  })}
+                />
+                <Text id="devicesList.export.exportButton" />
+              </button>
             </div>
           </div>
-        </div>
-      </div>
+        </Localizer>
+      </div>,
+      document.body
     );
   }
 }

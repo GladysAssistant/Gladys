@@ -111,13 +111,15 @@
       "modalTitle": "Exporter l'historique de {{name}}",
       "description": "Téléchargez l'historique de cet appareil au format CSV, pour l'analyser dans un tableur.",
       "featuresLabel": "Fonctionnalités à exporter",
+      "periodLabel": "Période",
       "startLabel": "Du",
       "endLabel": "Au",
       "invalidPeriod": "La date de fin doit être postérieure à la date de début.",
       "noFeatureSelected": "Sélectionnez au moins une fonctionnalité à exporter.",
       "error": "L'export CSV a échoué. Veuillez réessayer.",
       "cancelButton": "Annuler",
-      "exportButton": "Exporter"
+      "exportButton": "Exporter",
+      "closeButton": "Fermer"
     }
   },
   "login": {
