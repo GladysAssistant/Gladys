@@ -28,12 +28,16 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  OperationalState,
+  DishwasherAlarm,
+  DishwasherMode,
   DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const MatterHandler = require('../../../../services/matter/lib');
-const { EVENTS, STATE, FAN_MODE, AC_MODE, LOCK } = require('../../../../utils/constants');
+const { EVENTS, STATE, FAN_MODE, AC_MODE, LOCK, DISHWASHER_STATE } = require('../../../../utils/constants');
+const { MATTER_DISHWASHER_DEVICE_TYPE } = require('../../../../services/matter/utils/dishwasherMatterMapping');
 
 describe('Matter.readInitialDeviceStates', () => {
   let matterHandler;
@@ -717,6 +721,144 @@ describe('Matter.readInitialDeviceStates', () => {
     };
     const device = {
       getClusterClientById: (id) => (id === OccupancySensing.Complete.id ? occupancy : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should read the initial dishwasher operational state', async () => {
+    const operationalState = {
+      getOperationalStateAttribute: fake.resolves(1),
+    };
+    const device = {
+      getDeviceTypes: () => [{ code: MATTER_DISHWASHER_DEVICE_TYPE, name: 'Dishwasher' }],
+      getClusterClientById: (id) => (id === OperationalState.Complete.id ? operationalState : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${OperationalState.Complete.id}:state`,
+      state: DISHWASHER_STATE.RUNNING,
+    });
+  });
+
+  it('should read the initial operational state of an endpoint exposing the DishwasherMode cluster', async () => {
+    const operationalState = {
+      getOperationalStateAttribute: fake.resolves(0),
+    };
+    const dishwasherMode = {};
+    const device = {
+      getClusterClientById: (id) => {
+        if (id === OperationalState.Complete.id) {
+          return operationalState;
+        }
+        return id === DishwasherMode.Complete.id ? dishwasherMode : null;
+      },
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${OperationalState.Complete.id}:state`,
+      state: DISHWASHER_STATE.STOPPED,
+    });
+  });
+
+  it('should skip the operational state of an appliance that is not a dishwasher', async () => {
+    const operationalState = {
+      getOperationalStateAttribute: fake.resolves(1),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === OperationalState.Complete.id ? operationalState : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should skip the operational state when the attribute cannot be read', async () => {
+    const operationalState = {
+      getOperationalStateAttribute: fake.rejects(new Error('read failed')),
+    };
+    const device = {
+      getDeviceTypes: () => [{ code: MATTER_DISHWASHER_DEVICE_TYPE, name: 'Dishwasher' }],
+      getClusterClientById: (id) => (id === OperationalState.Complete.id ? operationalState : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should read the initial dishwasher alarms', async () => {
+    const dishwasherAlarm = {
+      getStateAttribute: fake.resolves({ drainError: true }),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === DishwasherAlarm.Complete.id ? dishwasherAlarm : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DishwasherAlarm.Complete.id}:drain-error`,
+      state: STATE.ON,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DishwasherAlarm.Complete.id}:inflow-error`,
+      state: STATE.OFF,
+    });
+    expect(gladys.event.emit.callCount).to.equal(6);
+  });
+
+  it('should only read the dishwasher alarms the appliance supports', async () => {
+    const dishwasherAlarm = {
+      getStateAttribute: fake.resolves({ drainError: true }),
+      getSupportedAttribute: fake.resolves({ drainError: true, doorError: true }),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === DishwasherAlarm.Complete.id ? dishwasherAlarm : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DishwasherAlarm.Complete.id}:drain-error`,
+      state: STATE.ON,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DishwasherAlarm.Complete.id}:door-error`,
+      state: STATE.OFF,
+    });
+    expect(gladys.event.emit.callCount).to.equal(2);
+  });
+
+  it('should report every dishwasher alarm as inactive when the bitmap is empty', async () => {
+    const dishwasherAlarm = {
+      getStateAttribute: fake.resolves(null),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === DishwasherAlarm.Complete.id ? dishwasherAlarm : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DishwasherAlarm.Complete.id}:temperature-too-high`,
+      state: STATE.OFF,
+    });
+  });
+
+  it('should skip the dishwasher alarms when the attribute cannot be read', async () => {
+    const dishwasherAlarm = {
+      getStateAttribute: fake.rejects(new Error('read failed')),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === DishwasherAlarm.Complete.id ? dishwasherAlarm : null),
     };
 
     await matterHandler.readInitialDeviceStates(1234n, '1', device);

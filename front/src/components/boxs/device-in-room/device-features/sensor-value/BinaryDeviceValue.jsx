@@ -15,7 +15,12 @@ const DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES = {
     DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.DOOR_OPENED,
     DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPENED
   ],
-  [DEVICE_FEATURE_CATEGORIES.SIREN]: [DEVICE_FEATURE_TYPES.SIREN.TEST_IN_PROGRESS]
+  [DEVICE_FEATURE_CATEGORIES.SIREN]: [DEVICE_FEATURE_TYPES.SIREN.TEST_IN_PROGRESS],
+  // Every dishwasher type but `state` is a fault flag, and an active fault must render red.
+  // `state` is rendered by DishwasherStateDeviceValue, never by this component.
+  [DEVICE_FEATURE_CATEGORIES.DISHWASHER]: Object.values(DEVICE_FEATURE_TYPES.DISHWASHER).filter(
+    type => type !== DEVICE_FEATURE_TYPES.DISHWASHER.STATE
+  )
 };
 
 const BinaryDeviceValue = ({ deviceFeature }) => {

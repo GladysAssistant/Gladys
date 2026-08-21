@@ -24,6 +24,9 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  OperationalState,
+  DishwasherAlarm,
+  DishwasherMode,
   DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
@@ -39,6 +42,11 @@ const {
   convertMatterRunModeToGladys,
   convertMatterCleanModeToGladys,
 } = require('../utils/vacuumCleanerStateMapping');
+const {
+  isDishwasherEndpoint,
+  convertMatterOperationalStateToDishwasherState,
+  getSupportedDishwasherAlarms,
+} = require('../utils/dishwasherMatterMapping');
 
 /**
  * @description Listen to state changes of a device.
@@ -646,6 +654,51 @@ async function listenToStateChange(nodeId, devicePath, device) {
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: cleanModeExternalId,
         state: gladysMode,
+      });
+    });
+  }
+
+  const dishwasherAlarm = device.getClusterClientById(DishwasherAlarm.Complete.id);
+  const dishwasherMode = device.getClusterClientById(DishwasherMode.Complete.id);
+  const isDishwasher = isDishwasherEndpoint(device, Boolean(dishwasherAlarm || dishwasherMode));
+
+  const operationalState = device.getClusterClientById(OperationalState.Complete.id);
+  // The Operational State cluster is shared by every Matter appliance, we only publish it as a
+  // dishwasher state when the endpoint identified itself as a dishwasher.
+  if (isDishwasher && operationalState && !this.stateChangeListeners.has(operationalState)) {
+    logger.debug(`Matter: Adding state change listener for OperationalState cluster ${operationalState.name}`);
+    this.stateChangeListeners.add(operationalState);
+    operationalState.addOperationalStateAttributeListener((value) => {
+      logger.debug(`Matter: OperationalState attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${OperationalState.Complete.id}:state`,
+        state: convertMatterOperationalStateToDishwasherState(value),
+      });
+    });
+  }
+
+  if (dishwasherAlarm && !this.stateChangeListeners.has(dishwasherAlarm)) {
+    logger.debug(`Matter: Adding state change listener for DishwasherAlarm cluster ${dishwasherAlarm.name}`);
+    this.stateChangeListeners.add(dishwasherAlarm);
+    const dishwasherAlarmBaseExternalId = `matter:${nodeId}:${devicePath}:${DishwasherAlarm.Complete.id}`;
+    // The supported bitmap is read once, before the listener is registered: only the alarms the
+    // appliance declares as supported have a Gladys feature. An unreadable bitmap falls back to
+    // every alarm, exactly like the discovery does when it creates the features.
+    let supported;
+    try {
+      supported = await dishwasherAlarm.getSupportedAttribute();
+    } catch (error) {
+      logger.debug(`Matter: Could not read the DishwasherAlarm Supported attribute: ${error.message}`);
+    }
+    const supportedAlarms = getSupportedDishwasherAlarms(supported);
+    dishwasherAlarm.addStateAttributeListener((value) => {
+      logger.debug(`Matter: DishwasherAlarm State attribute changed to ${JSON.stringify(value)}`);
+      // The attribute is a bitmap: each alarm is published as its own binary feature.
+      supportedAlarms.forEach((alarm) => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${dishwasherAlarmBaseExternalId}:${alarm.type}`,
+          state: value && value[alarm.matterField] ? STATE.ON : STATE.OFF,
+        });
       });
     });
   }

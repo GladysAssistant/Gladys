@@ -5215,6 +5215,20 @@
           "4": "Critique"
         }
       },
+      "dishwasher": {
+        "state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Arrêté",
+          "1": "En cours",
+          "2": "En pause",
+          "3": "Erreur"
+        },
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Non",
+          "one": "Oui"
+        }
+      },
       "vacuum-cleaner": {
         "state": {
           "unknown": "{{value}} (inconnu)",
@@ -5318,6 +5332,16 @@
     "sismic-sensor": {
       "shortCategoryName": "Capteur sismique",
       "decimal": "Valeur sismique décimale"
+    },
+    "dishwasher": {
+      "shortCategoryName": "Lave-vaisselle",
+      "state": "État opérationnel",
+      "inflow-error": "Erreur d'arrivée d'eau",
+      "drain-error": "Erreur de vidange",
+      "door-error": "Erreur de porte",
+      "temperature-too-low": "Température trop basse",
+      "temperature-too-high": "Température trop élevée",
+      "water-level-error": "Erreur de niveau d'eau"
     },
     "distance-sensor": {
       "shortCategoryName": "Distance",

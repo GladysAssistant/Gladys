@@ -5215,6 +5215,20 @@
           "4": "Netz kritisch"
         }
       },
+      "dishwasher": {
+        "state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Gestoppt",
+          "1": "Läuft",
+          "2": "Pausiert",
+          "3": "Fehler"
+        },
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Nein",
+          "one": "Ja"
+        }
+      },
       "vacuum-cleaner": {
         "state": {
           "unknown": "{{value}} (unbekannt)",
@@ -5318,6 +5332,16 @@
     "sismic-sensor": {
       "shortCategoryName": "Erschütterungssensor",
       "decimal": "Erschütterung (dezimal)"
+    },
+    "dishwasher": {
+      "shortCategoryName": "Geschirrspüler",
+      "state": "Betriebszustand",
+      "inflow-error": "Fehler beim Wasserzulauf",
+      "drain-error": "Fehler beim Wasserablauf",
+      "door-error": "Türfehler",
+      "temperature-too-low": "Temperatur zu niedrig",
+      "temperature-too-high": "Temperatur zu hoch",
+      "water-level-error": "Fehler beim Wasserstand"
     },
     "distance-sensor": {
       "shortCategoryName": "Abstand",

@@ -24,6 +24,9 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  OperationalState,
+  DishwasherAlarm,
+  DishwasherMode,
   DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
@@ -33,7 +36,16 @@ const { expect } = require('chai');
 
 const { fake, assert } = sinon;
 
-const { EVENTS, STATE, BUTTON_STATUS, FAN_MODE, AC_MODE, LOCK } = require('../../../../utils/constants');
+const {
+  EVENTS,
+  STATE,
+  BUTTON_STATUS,
+  FAN_MODE,
+  AC_MODE,
+  LOCK,
+  DISHWASHER_STATE,
+} = require('../../../../utils/constants');
+const { MATTER_DISHWASHER_DEVICE_TYPE } = require('../../../../services/matter/utils/dishwasherMatterMapping');
 
 const MatterHandler = require('../../../../services/matter/lib');
 
@@ -1060,6 +1072,131 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:2:47:battery',
       state: 75,
+    });
+  });
+
+  it('should listen to the dishwasher operational state of an endpoint declaring the dishwasher device type', async () => {
+    const clusterClient = {
+      id: OperationalState.Complete.id,
+      addOperationalStateAttributeListener: (callback) => {
+        callback(1);
+      },
+    };
+    const device = {
+      number: 2,
+      getDeviceTypes: () => [{ code: MATTER_DISHWASHER_DEVICE_TYPE, name: 'Dishwasher' }],
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:2:${OperationalState.Complete.id}:state`,
+      state: DISHWASHER_STATE.RUNNING,
+    });
+  });
+
+  it('should listen to the dishwasher operational state of an endpoint exposing the DishwasherMode cluster', async () => {
+    const operationalState = {
+      id: OperationalState.Complete.id,
+      addOperationalStateAttributeListener: (callback) => {
+        callback(2);
+      },
+    };
+    const dishwasherMode = {
+      id: DishwasherMode.Complete.id,
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => {
+        if (id === OperationalState.Complete.id) {
+          return operationalState;
+        }
+        return id === DishwasherMode.Complete.id ? dishwasherMode : null;
+      },
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:2:${OperationalState.Complete.id}:state`,
+      state: DISHWASHER_STATE.PAUSED,
+    });
+  });
+
+  it('should not listen to the operational state of an appliance that is not a dishwasher', async () => {
+    const clusterClient = {
+      id: OperationalState.Complete.id,
+      addOperationalStateAttributeListener: (callback) => {
+        callback(1);
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should listen to the dishwasher alarms', async () => {
+    const clusterClient = {
+      id: DishwasherAlarm.Complete.id,
+      addStateAttributeListener: (callback) => {
+        callback({ inflowError: true, doorError: false });
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:2:${DishwasherAlarm.Complete.id}:inflow-error`,
+      state: STATE.ON,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:2:${DishwasherAlarm.Complete.id}:door-error`,
+      state: STATE.OFF,
+    });
+    expect(gladys.event.emit.callCount).to.equal(6);
+  });
+
+  it('should only listen to the dishwasher alarms the appliance supports', async () => {
+    const clusterClient = {
+      id: DishwasherAlarm.Complete.id,
+      getSupportedAttribute: fake.resolves({ inflowError: true, doorError: true }),
+      addStateAttributeListener: (callback) => {
+        callback({ inflowError: true, doorError: false });
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:2:${DishwasherAlarm.Complete.id}:inflow-error`,
+      state: STATE.ON,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:2:${DishwasherAlarm.Complete.id}:door-error`,
+      state: STATE.OFF,
+    });
+    expect(gladys.event.emit.callCount).to.equal(2);
+  });
+
+  it('should report every dishwasher alarm as inactive when the bitmap is empty', async () => {
+    const clusterClient = {
+      id: DishwasherAlarm.Complete.id,
+      addStateAttributeListener: (callback) => {
+        callback(null);
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:2:${DishwasherAlarm.Complete.id}:water-level-error`,
+      state: STATE.OFF,
     });
   });
 });

@@ -25,6 +25,9 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  OperationalState,
+  DishwasherAlarm,
+  DishwasherMode,
   DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
@@ -42,7 +45,14 @@ const {
 const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
 const { getAcModeSupportedOptions } = require('./thermostatMatterMapping');
-const { getBooleanStateFeatureCategoryAndType } = require('./booleanStateMatterMapping');
+const { isDishwasherEndpoint, getSupportedDishwasherAlarms } = require('./dishwasherMatterMapping');
+const { getBooleanStateFeatureCategoryAndType, DEFAULT_BOOLEAN_STATE_FEATURE } = require('./booleanStateMatterMapping');
+
+/**
+ * Clusters only a dishwasher exposes: seeing one of them is enough to know that the generic
+ * Operational State cluster of the same endpoint describes a dish program.
+ */
+const DISHWASHER_SPECIFIC_CLUSTER_IDS = [DishwasherAlarm.Complete.id, DishwasherMode.Complete.id];
 
 /**
  * @description Build a stable Gladys selector from a Matter external_id.
@@ -133,6 +143,10 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
 
   const allClusterClients = device.getAllClusterClients();
   if (allClusterClients && allClusterClients.length > 0) {
+    const isDishwasher = isDishwasherEndpoint(
+      device,
+      allClusterClients.some((clusterClient) => DISHWASHER_SPECIFIC_CLUSTER_IDS.includes(clusterClient.id)),
+    );
     await Promise.each(allClusterClients, async (clusterClient) => {
       const clusterIndex = clusterClient.id;
       const commonNewFeature = {
@@ -154,10 +168,16 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         // tells us if it's a water leak detector, a contact sensor, a rain sensor...
         // When the device type is unknown, we fallback on a generic read-only switch.
         const { category, type } = getBooleanStateFeatureCategoryAndType(device);
+        // On a dishwasher that fallback is wrong: the cluster carries the door contact, so it
+        // belongs to the opening-sensor category. The values are unchanged (true = contact
+        // closed = OPENING_SENSOR_STATE.CLOSE), only the category and the name are refined.
+        // An endpoint declaring a device type we do know about keeps that mapping.
+        const isDoorContact = isDishwasher && category === DEFAULT_BOOLEAN_STATE_FEATURE.category;
         gladysDevice.features.push({
           ...commonNewFeature,
-          category,
-          type,
+          name: isDoorContact ? `${clusterClient.name} - ${clusterClient.endpointId} (Door)` : commonNewFeature.name,
+          category: isDoorContact ? DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR : category,
+          type: isDoorContact ? DEVICE_FEATURE_TYPES.SENSOR.BINARY : type,
           read_only: true,
           has_feedback: true,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
@@ -647,6 +667,41 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
           max: 6,
+        });
+      } else if (clusterIndex === OperationalState.Complete.id && isDishwasher) {
+        // The Operational State cluster is shared by every Matter appliance, it is only mapped
+        // when the endpoint identified itself as a dishwasher.
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (State)`,
+          category: DEVICE_FEATURE_CATEGORIES.DISHWASHER,
+          type: DEVICE_FEATURE_TYPES.DISHWASHER.STATE,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:state`,
+          min: 0,
+          max: 255,
+        });
+      } else if (clusterIndex === DishwasherAlarm.Complete.id) {
+        // Only the alarms the appliance declares as supported get a feature: the others would
+        // stay stuck at zero forever. An unreadable bitmap must not abort the whole conversion
+        // and lose the features already collected, it falls back to exposing every alarm.
+        let supported;
+        try {
+          supported = await clusterClient.getSupportedAttribute();
+        } catch (error) {
+          // Supported attribute not available
+        }
+        getSupportedDishwasherAlarms(supported).forEach((alarm) => {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (${alarm.name})`,
+            category: DEVICE_FEATURE_CATEGORIES.DISHWASHER,
+            type: alarm.type,
+            read_only: true,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:${alarm.type}`,
+            min: 0,
+            max: 1,
+          });
         });
       } else if (clusterIndex === DoorLock.Complete.id) {
         // The lock/unlock command feature, and the detailed lock state reported by the lock

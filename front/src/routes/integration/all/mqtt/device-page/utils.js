@@ -6,7 +6,8 @@ import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
-  WATER_HEATER_MODE
+  WATER_HEATER_MODE,
+  DISHWASHER_STATE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { CAMERA_MOVE_OPTIONS } from '../../../../../utils/cameraMove';
@@ -57,7 +58,10 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.INPUT ||
     category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE ||
     category === DEVICE_FEATURE_CATEGORIES.DOORBELL ||
-    category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION
+    category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION ||
+    // Every dishwasher type reports what the appliance is doing or a fault it raised: they are
+    // all read-only. Powering the appliance on or off is a switch feature, not a dishwasher one.
+    category === DEVICE_FEATURE_CATEGORIES.DISHWASHER
   ) {
     return true;
   }
@@ -563,6 +567,17 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
   }
 
+  // Declared before the type-only blocks below: 'state' is a type string several categories own.
+  if (category === DEVICE_FEATURE_CATEGORIES.DISHWASHER) {
+    if (type === DEVICE_FEATURE_TYPES.DISHWASHER.STATE) {
+      // DISHWASHER_STATE goes from 0 to 3, the range is left open up to 255 because appliances
+      // may report a manufacturer-specific state.
+      return applyDefaultUnit({ ...defaults, min: 0, max: 255 }, category, type);
+    }
+    // Every other type is a fault flag
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1 }, category, type);
+  }
+
   if (type === DEVICE_FEATURE_TYPES.LIGHT.BINARY && category === DEVICE_FEATURE_CATEGORIES.LIGHT) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: false }, category, type);
   }
@@ -884,6 +899,11 @@ export const getCatalogPreviewLabelKey = (category, type) => {
 export const getFeaturePreviewValue = (category, type) => {
   // Category-specific blocks first: some of their types ('power', 'index', 'target-temperature',
   // 'mode') also exist in other categories matched below by type only.
+  if (category === DEVICE_FEATURE_CATEGORIES.DISHWASHER) {
+    // A running program for the state, no fault raised for the alarms.
+    return type === DEVICE_FEATURE_TYPES.DISHWASHER.STATE ? DISHWASHER_STATE.RUNNING : 0;
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
       return WATER_HEATER_MODE.ECO;

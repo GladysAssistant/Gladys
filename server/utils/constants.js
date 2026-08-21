@@ -305,6 +305,21 @@ const VACUUM_CLEANER_STATE = {
   DOCKED: 6,
 };
 
+// Operational state of a dishwashing appliance. Values are aligned one to one with the
+// OperationalStateEnum of the Matter Operational State cluster (Stopped/Running/Paused/
+// Error), so an integration never has to renumber what its appliance reports. Appliances
+// exposing a manufacturer-specific state (Matter reserves 0x80-0xBF for those) publish
+// the raw value, which the UI displays as unknown rather than mistaking it for a
+// standard state.
+// Values are append-only: an existing integer never changes meaning, because it is
+// stored in device states and hard-coded in users' scenes.
+const DISHWASHER_STATE = {
+  STOPPED: 0, // powered on, no program running
+  RUNNING: 1, // a program is in progress
+  PAUSED: 2, // a program is started but temporarily interrupted
+  ERROR: 3, // the appliance stopped on an error, the alarm features tell which one
+};
+
 const VACUUM_CLEANER_MODE = {
   IDLE: 0,
   CLEANING: 1,
@@ -815,6 +830,17 @@ const DEVICE_FEATURE_CATEGORIES = {
   DATA: 'data',
   DATARATE: 'datarate',
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
+  // Dishwashing appliances, whatever the protocol they speak (Matter Dishwasher device type,
+  // vendor bridges exposing the same capability). Scope is limited to what running a dish
+  // program means: the operational state of the appliance and the faults it reports.
+  // Boundary with neighboring categories: powering the appliance on/off is a switch feature,
+  // the door open/closed contact is an opening-sensor feature, its water temperature is a
+  // temperature-sensor feature and its consumption an energy-sensor feature — a dishwasher
+  // device simply carries those features alongside its dishwasher ones.
+  // Value conventions: `state` is an index into DISHWASHER_STATE, every other type is a fault
+  // flag reported as 0 (inactive) / 1 (active). A fault is exposed as its own binary feature
+  // rather than as one packed bitmap, so scenes can trigger on a single fault.
+  DISHWASHER: 'dishwasher',
   DISTANCE_SENSOR: 'distance-sensor',
   DOORBELL: 'doorbell',
   DURATION: 'duration',
@@ -1351,6 +1377,17 @@ const DEVICE_FEATURE_TYPES = {
     RUN_MODE: 'run-mode', // Run mode of the vacuum (integer - command)
     CLEAN_MODE: 'clean-mode', // Clean mode of the vacuum (integer - command)
     DOCK: 'dock', // Send vacuum to dock (binary - command)
+  },
+  // Faults mirror the six alarms of the Matter Dishwasher Alarm cluster: an appliance
+  // reporting only some of them exposes only those features, the others are simply absent.
+  DISHWASHER: {
+    STATE: 'state', // Operational state of the appliance, DISHWASHER_STATE (integer - sensor)
+    INFLOW_ERROR: 'inflow-error', // Water cannot flow into the appliance (binary - sensor)
+    DRAIN_ERROR: 'drain-error', // Water cannot be drained out of the appliance (binary - sensor)
+    DOOR_ERROR: 'door-error', // The door is not closed properly (binary - sensor)
+    TEMPERATURE_TOO_LOW: 'temperature-too-low', // Water temperature below the working range (binary - sensor)
+    TEMPERATURE_TOO_HIGH: 'temperature-too-high', // Water temperature above the working range (binary - sensor)
+    WATER_LEVEL_ERROR: 'water-level-error', // Water level out of the working range (binary - sensor)
   },
 };
 
@@ -2214,6 +2251,7 @@ module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
+module.exports.DISHWASHER_STATE = DISHWASHER_STATE;
 module.exports.CHARGING_STATION_CONNECTOR_STATUS = CHARGING_STATION_CONNECTOR_STATUS;
 module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
