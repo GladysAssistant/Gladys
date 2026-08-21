@@ -99,10 +99,12 @@ The state itself is stored by the standard path: `device.setValue` calls the own
   camera device on mount and on camera change, and derives the disabled state from the `enabled`
   feature. When disabled it renders a **placeholder** (video-off icon +
   `dashboard.boxes.camera.cameraDisabled`) instead of the image, does not request an image, and
-  offers no live-stream button. It listens to `device.new-state` on the `enabled` feature's
-  selector: turning the camera off from anywhere (scene, another dashboard, the devices page)
-  clears the displayed image and stops an ongoing live view without a page reload; turning it back
-  on refreshes the image.
+  offers no live-stream button. That placeholder reuses the widget's shared
+  "no image" placeholder styling (`noImagePlaceholder` / `noImageIcon` / `noImageText`), so a
+  disabled camera and an unavailable snapshot look consistent on a dashboard. It listens to
+  `device.new-state` on the `enabled` feature's selector: turning the camera off from anywhere
+  (scene, another dashboard, the devices page) clears the displayed image and stops an ongoing
+  live view without a page reload; turning it back on refreshes the image.
 - **Device rows** (`device-in-room`): `camera`/`enabled` joins the supported-types allowlist and
   routes to `BinaryDeviceFeature` — a plain on/off toggle.
 - **MQTT device page**: the type appears in the feature catalog with `min`/`max` 0/1, `read_only`

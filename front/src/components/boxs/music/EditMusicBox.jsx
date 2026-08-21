@@ -55,6 +55,8 @@ class EditMusicBoxComponent extends Component {
             <Text id="dashboard.boxes.music.selectDeviceLabel" />
           </label>
           <Select
+            menuPlacement="auto"
+            menuPortalTarget={document.body}
             defaultValue={null}
             value={optionSelected}
             onChange={this.updateDevice}

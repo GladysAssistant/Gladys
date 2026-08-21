@@ -17,14 +17,6 @@
   margin-bottom: 1.5rem;
 }
 
-.dropZoneActive {
-  background-color: #ecf0f1;
-}
-
-.dropZoneDragging {
-  opacity: 0.5;
-}
-
 @media (min-width: 768px) {
   .plusButton {
     right: 0;
@@ -32,18 +24,677 @@
   }
 }
 
-
-.settings {
-  opacity: 0;
-  max-height: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, max-height 0.3s ease;
-  padding: 0rem
+/* Keeps the last step (the "add a step" button) clear of the sticky footer */
+.pageContainer {
+  padding-bottom: 6rem;
 }
 
-.settingsOpen {
-  visibility: visible;
-  opacity: 1;
-  max-height: 1000px;
-  padding: 1.5rem 1.5rem;
+.pageTitle {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.backButton {
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.sceneIconTile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 10px;
+  background-color: #e2ecf9;
+  color: #3a6fb8;
+  font-size: 1.125rem;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.sceneName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* On small screens the header action buttons are icon-only: make them compact
+   so the three of them fit on a single line */
+@media (max-width: 767.98px) {
+  .headerActionBtn {
+    padding: 0.375rem 0.55rem;
+    margin-left: 0.375rem !important;
+  }
+
+  .headerActionBtn:first-child {
+    margin-left: 0 !important;
+  }
+}
+
+.stepCardHeader {
+  padding-right: 1rem;
+}
+
+/* Icon-only controls of a card header: native buttons, styled like the surrounding text
+   so they stay keyboard-focusable without changing the look of the card */
+.cardOptionButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.stepIconTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  margin-right: 0.75rem;
+}
+
+.stepText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  flex: 1;
+  cursor: pointer;
+  text-align: left;
+}
+
+.stepLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stepSummary {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #6e7687;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.parallelLink {
+  font-size: 0.8125rem;
+}
+
+.parallelLink:hover {
+  color: #467fcf !important;
+}
+
+.parallelBlock {
+  background-color: #f8fafd;
+}
+
+.addStepButton {
+  display: block;
+  width: 100%;
+  border-style: dashed;
+  padding: 0.75rem;
+}
+
+.stepConnector {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin: -0.75rem 0 0.75rem;
+  z-index: 2;
+}
+
+.stepInsertButton {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #e3e9f1;
+  background: #fff;
+  color: #9aa0ac;
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1;
+  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.stepInsertButton:hover,
+.stepInsertButton:focus {
+  color: #467fcf;
+  border-color: #467fcf;
+  transform: scale(1.15);
+  outline: none;
+}
+
+.saveIndicator {
+  font-size: 0.8125rem;
+}
+
+.saveIndicatorSaved {
+  color: #5eba00;
+}
+
+.saveIndicatorUnsaved {
+  color: #f1901c;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0.25rem 0.25rem 0.75rem;
+}
+
+.sectionTitle {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sectionTitleWhen {
+  color: #c77e1e;
+}
+
+.sectionTitleThen {
+  color: #3a6fb8;
+}
+
+.sectionSubtitle {
+  font-size: 0.8125rem;
+  color: #9aa0ac;
+}
+
+.orSeparator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: -0.5rem 0 1rem;
+}
+
+.orSeparator::before,
+.orSeparator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #e3e9f1;
+}
+
+.orSeparatorLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c77e1e;
+  background-color: #faf0de;
+  border-radius: 999px;
+  padding: 0.125rem 0.75rem;
+}
+
+.triggersHint {
+  font-size: 0.8125rem;
+  color: #9aa0ac;
+  margin-top: 0.25rem;
+}
+
+.typePickerList {
+  max-height: 24rem;
+  overflow-y: auto;
+  margin: 0 -0.5rem;
+  padding: 0 0.5rem;
+}
+
+.typePickerCategory {
+  margin-bottom: 0.75rem;
+}
+
+.typePickerCategoryTitle {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9aa0ac;
+  margin: 0.25rem 0 0.25rem 0.25rem;
+}
+
+.typePickerOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.125rem;
+}
+
+.typePickerOption {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.375rem 0.5rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.typePickerOption:hover,
+.typePickerOption:focus {
+  background-color: #f0f2f5;
+  outline: none;
+}
+
+.typePickerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.typePickerIconGreen {
+  background-color: #ddf2e5;
+  color: #2f8a54;
+}
+
+.typePickerIconPink {
+  background-color: #fce5ee;
+  color: #c94f7c;
+}
+
+.typePickerIconPurple {
+  background-color: #ece5fa;
+  color: #7554c0;
+}
+
+.typePickerIconBlue {
+  background-color: #e2ecf9;
+  color: #3a6fb8;
+}
+
+.typePickerIconOrange {
+  background-color: #fdecdc;
+  color: #cd6f24;
+}
+
+.typePickerIconRed {
+  background-color: #fbe3e3;
+  color: #c23434;
+}
+
+.typePickerIconYellow {
+  background-color: #faf0d3;
+  color: #a3821c;
+}
+
+.typePickerIconGray {
+  background-color: #eceef1;
+  color: #5f6877;
+}
+
+.typePickerOptionText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.typePickerOptionLabel {
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.typePickerOptionDescription {
+  font-size: 0.8125rem;
+  color: #6e7687;
+  line-height: 1.3;
+}
+
+.typePickerEmpty {
+  text-align: center;
+  color: #9aa0ac;
+  padding: 1.5rem 0;
+}
+
+/* ==================================================================
+   Horizon glass adjustments. The editor always renders on the glass
+   scene (page-level .glass-theme, like the dashboard), these rules
+   tune the editor chrome to the theme's grammar. Light colors only:
+   dark mode comes from the app-wide inversion filter.
+   ================================================================== */
+
+/* Steps are lighter than dashboard widget cards: medium radius, soft
+   shadow, so the vertical flow keeps its rhythm */
+:global(.glass-theme) .stepCard {
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow-soft);
+}
+
+/* The glass card rule wins over the plain .parallelBlock background, so the
+   "at the same time" block would read as just another step: give it back a
+   group identity with the accent edge its blue card-status carried before */
+:global(.glass-theme) .parallelBlock {
+  border-left: 3px solid var(--gl-accent);
+}
+
+/* The glass theme makes card headers hug their title (no bottom padding),
+   but a collapsed step is its header alone: restore balanced padding */
+:global(.glass-theme) :global(.card-header).stepCardHeader {
+  padding: 0.7rem 1rem;
+}
+
+/* Header controls become quiet frosted pills, like the dashboard's
+   page controls. dark-mode.css paints .btn-secondary with a solid
+   background, hence the counter-weight */
+:global(.glass-theme) .backButton,
+:global(.glass-theme) .headerActionBtn,
+:global(.dark-mode .glass-theme) .backButton,
+:global(.dark-mode .glass-theme) .headerActionBtn {
+  border: 1px solid var(--gl-border) !important;
+  background: var(--gl-card-bg) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--gl-ink);
+  font-weight: 600;
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.glass-theme) .headerActionBtn {
+  border-radius: 999px;
+}
+
+:global(.glass-theme) .sceneIconTile {
+  background-color: var(--gl-icon-tint-bg);
+  color: var(--gl-accent);
+}
+
+/* The "add a trigger" button joins the soft accent pill family */
+:global(.glass-theme) :global(.btn-outline-primary).addTriggerButton {
+  background-color: var(--gl-icon-tint-bg);
+  border: none;
+  color: var(--gl-accent);
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+:global(.glass-theme) :global(.btn-outline-primary).addTriggerButton:hover {
+  background-color: #d3e2f8;
+  color: var(--gl-accent);
+}
+
+/* Section titles: "Then" follows the theme accent */
+:global(.glass-theme) .sectionTitleThen {
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .sectionSubtitle {
+  color: var(--gl-muted);
+}
+
+/* The "add a step" button is a dashed frosted pill on the scene */
+:global(.glass-theme) .addStepButton {
+  border: 1.5px dashed rgba(61, 109, 240, 0.45);
+  border-radius: var(--gl-radius-md);
+  background-color: rgba(255, 255, 255, 0.35);
+  color: var(--gl-accent);
+  font-weight: 600;
+}
+
+:global(.glass-theme) .addStepButton:hover,
+:global(.glass-theme) .addStepButton:focus {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-color: var(--gl-accent);
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .stepInsertButton {
+  background: var(--gl-surface-strong);
+  border-color: var(--gl-border);
+  color: var(--gl-muted);
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.glass-theme) .stepInsertButton:hover,
+:global(.glass-theme) .stepInsertButton:focus {
+  color: var(--gl-accent);
+  border-color: var(--gl-accent);
+}
+
+:global(.glass-theme) .orSeparator::before,
+:global(.glass-theme) .orSeparator::after {
+  background-color: rgba(28, 35, 52, 0.12);
+}
+
+:global(.glass-theme) .typePickerOption:hover,
+:global(.glass-theme) .typePickerOption:focus {
+  background-color: rgba(28, 35, 52, 0.06);
+}
+
+/* Sticky footer: frosted bar, pill buttons with a real hierarchy —
+   Save as the solid ink CTA, Start as a soft accent pill, Duplicate
+   and Cancel as quiet neutrals, Delete as the soft red of the stamp
+   family (same grammar as the dashboard editor footer) */
+/* dark-mode.css paints .fixed-bottom with a solid !important background,
+   which would mask the frosted bar: the glass must invert WITH the theme */
+:global(.glass-theme) .editFooter,
+:global(.dark-mode .glass-theme) .editFooter {
+  background-color: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+:global(.glass-theme) .editFooter :global(.btn) {
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+}
+
+:global(.glass-theme) .editFooter :global(.btn-success) {
+  background-color: var(--gl-ink);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-success:hover) {
+  background-color: #2a3550;
+  color: #fff;
+}
+
+:global(.glass-theme) .editFooter :global(.btn-primary) {
+  background-color: var(--gl-icon-tint-bg);
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-primary:hover) {
+  background-color: #d3e2f8;
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-outline-primary),
+:global(.glass-theme) .editFooter :global(.btn-outline-secondary) {
+  background-color: rgba(28, 35, 52, 0.07);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-outline-primary:hover),
+:global(.glass-theme) .editFooter :global(.btn-outline-secondary:hover) {
+  background-color: rgba(28, 35, 52, 0.13);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .editFooter :global(.btn-outline-danger) {
+  background-color: #fbe3de;
+  color: #d4593f;
+}
+
+:global(.glass-theme) .editFooter :global(.btn-outline-danger:hover) {
+  background-color: #f6d2ca;
+  color: #c24a33;
+}
+
+/* These pills must invert with the theme in dark mode, not keep their
+   authored colors through the double-inversion list of dark-mode.css */
+:global(.dark-mode .glass-theme) .editFooter :global(.btn-success),
+:global(.dark-mode .glass-theme) .editFooter :global(.btn-primary),
+:global(.dark-mode .glass-theme) .editFooter :global(.btn-outline-primary),
+:global(.dark-mode .glass-theme) .editFooter :global(.btn-outline-danger) {
+  filter: none;
+}
+
+/* The editor is full of forms (step and trigger parameters): they join the
+   theme's soft rounded field grammar instead of staying hard Tabler white
+   on the glass, scoped to the editor container. Same declension as the
+   settings pages, on the nested-card surface of an expanded step. */
+:global(.glass-theme) .pageContainer :global(.form-control),
+:global(.glass-theme) .pageContainer :global(.custom-select) {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.75);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .pageContainer :global(.form-control:focus),
+:global(.glass-theme) .pageContainer :global(.custom-select:focus) {
+  border-color: var(--gl-accent);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
+}
+
+/* react-select (devices, houses, users…) joins the same family */
+:global(.glass-theme) .pageContainer :global(.react-select__control) {
+  border-radius: 12px;
+  border: 1px solid rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+:global(.glass-theme) .pageContainer :global(.react-select__control--is-focused) {
+  border-color: var(--gl-accent);
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
+}
+
+:global(.glass-theme) .pageContainer :global(.react-select__menu) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Same dark-mode counter-weight as the list controls: dark-mode.css paints
+   fields solid and double-inverts them, they must invert with the theme */
+:global(.dark-mode .glass-theme) .pageContainer :global(.form-control),
+:global(.dark-mode .glass-theme) .pageContainer :global(.custom-select) {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  color: var(--gl-ink) !important;
+  border-color: rgba(28, 35, 52, 0.12) !important;
+  filter: none;
+}
+
+:global(.dark-mode .glass-theme) .pageContainer :global(.form-control)::placeholder {
+  color: var(--gl-muted) !important;
+}
+
+:global(.dark-mode .glass-theme) .pageContainer :global(.react-select__control),
+:global(.dark-mode .glass-theme) .pageContainer :global(.react-select__menu) {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* ==================================================================
+   Drag & drop (pointer-events engine, utils/pointerDrag.js + stepDrag.js).
+   The ghost pill, the insertion line and the tints are overlays or class
+   toggles: a drag never shifts the layout.
+   ================================================================== */
+
+.dragHandle {
+  cursor: grab;
+  /* a touch on the handle must drag, never scroll the page */
+  touch-action: none;
+}
+
+/* the dragged element stays in place, dimmed, until the drop lands */
+.dragSourceDimmed {
+  opacity: 0.4;
+}
+
+/* the ghost pill following the pointer: same grammar as the dashboard
+   editor's (icon + label, hanging slightly under the cursor) */
+.dragGhostPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: #1c2334;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.35);
+  white-space: nowrap;
+  margin-left: -14px;
+  margin-top: 10px;
+}
+
+/* the insertion line, in the exact gap where the element would land */
+.dropIndicatorLine {
+  border-radius: 999px;
+  background: var(--gl-accent, #3d6df0);
+  box-shadow: 0 0 8px rgba(61, 109, 240, 0.6);
+}
+
+/* tint on the hovered droppable surface (parallel block body, nested flow
+   of an if/while block, condition list) */
+.parallelDropActive,
+.nestedFlowDropActive {
+  background-color: rgba(61, 109, 240, 0.08);
+  border-radius: var(--gl-radius-md, 12px);
+}
+
+/* a parallel card hovering a plain step: dropping it joins the step as an
+   "at the same time" action, so the whole card reads as the target */
+.mergeTargetActive {
+  outline: 2px solid var(--gl-accent, #3d6df0);
+  outline-offset: 2px;
+}
+
+/* a parallel card hovering an "add a step" button: the empty group adopts
+   it (doubled class to out-specify the themed button background) */
+.extractTargetActive.extractTargetActive {
+  border-style: solid;
+  border-color: var(--gl-accent, #3d6df0);
+  background-color: rgba(61, 109, 240, 0.1);
+  color: var(--gl-accent, #3d6df0);
+}
+
+/* Engine-wide drag state, duplicated from the dashboard editor styles:
+   route CSS can be code-split, so the scene chunk carries its own copy */
+:global(body.gladys-pointer-dragging),
+:global(body.gladys-pointer-dragging) * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* while a step drag is live, the in-between "+" buttons fade out of the
+   way (opacity only: no reflow) so the indicator line reads clearly */
+:global(body.gladys-scene-step-dragging) .stepInsertButton {
+  opacity: 0.15;
 }

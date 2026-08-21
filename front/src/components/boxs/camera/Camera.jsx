@@ -423,11 +423,13 @@ class CameraBoxComponent extends Component {
     if (cameraDisabled) {
       return (
         <div class="card">
-          <div class={style.cameraDisabled}>
-            <i class={cx('fe', 'fe-video-off', style.cameraDisabledIcon)} />
-            <p class={style.cameraDisabledText}>
+          <div class={style.noImagePlaceholder}>
+            <span class={style.noImageIcon}>
+              <i class="fe fe-video-off" />
+            </span>
+            <span class={style.noImageText}>
               <Text id="dashboard.boxes.camera.cameraDisabled" />
-            </p>
+            </span>
           </div>
           <div class="card-header">
             <h3 class="card-title">{props.box && props.box.name}</h3>
@@ -467,12 +469,13 @@ class CameraBoxComponent extends Component {
       <div class="card">
         {image && <img class="card-img-top" src={`data:${image}`} alt={props.roomName} />}
         {error && (
-          <div>
-            <p class={style.noImageToShowError}>
-              <span class="pl-2">
-                <Text id="dashboard.boxes.camera.noImageToShow" />
-              </span>
-            </p>
+          <div class={style.noImagePlaceholder}>
+            <span class={style.noImageIcon}>
+              <i class="fe fe-video-off" />
+            </span>
+            <span class={style.noImageText}>
+              <Text id="dashboard.boxes.camera.noImageToShow" />
+            </span>
           </div>
         )}
         {!image && loading && (

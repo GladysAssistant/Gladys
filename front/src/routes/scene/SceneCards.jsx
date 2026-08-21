@@ -1,8 +1,9 @@
 import SceneCard from './SceneCard';
+import style from './style.css';
 
 const SceneCards = ({ children, ...props }) => (
   <>
-    <div class="d-block d-lg-none list-group list-group-flush">
+    <div class={`d-block d-lg-none ${style.sceneMobileList}`}>
       {/* Only visible on small screens */}
       {props.scenes.map((scene, index) => (
         <SceneCard {...props} scene={scene} index={index} showMobileView />
