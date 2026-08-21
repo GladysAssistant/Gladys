@@ -266,6 +266,25 @@ const keyboardStep = (event, slotSelector) => {
   return { direction: event.key === 'ArrowUp' ? -1 : 1, slot };
 };
 
+// The lists are diffed by position (keying them by object identity would
+// remount every card on each edit, since immutability-helper allocates a new
+// action object), so after a keyboard move the focus is left on the handle of
+// whatever now sits at the old position. Hand it back to the moved element,
+// found by its destination path, so repeated arrow presses keep carrying the
+// same step instead of swapping it back and forth with its neighbour.
+const refocusHandleAt = destinationPath => {
+  window.requestAnimationFrame(() => {
+    // a step holding a single action carries the handle on the card itself,
+    // whose path is the group path plus the action index
+    const handle =
+      document.querySelector(`[data-cy="drag-step-${destinationPath}"]`) ||
+      document.querySelector(`[data-cy="drag-step-${destinationPath}.0"]`);
+    if (handle) {
+      handle.focus();
+    }
+  });
+};
+
 const hasAdjacentSlot = (slot, surface, surfaceSelector, slotSelector, direction) => {
   const slots = directSlots(surface, surfaceSelector, slotSelector);
   const position = slots.indexOf(slot);
@@ -284,7 +303,9 @@ export const moveStepWithKeyboard = (event, { groupPath, moveCardGroup }) => {
     return;
   }
   const { prefix, index } = splitPath(groupPath);
-  moveCardGroup(groupPath, joinPath(prefix, index + move.direction));
+  const destination = joinPath(prefix, index + move.direction);
+  moveCardGroup(groupPath, destination);
+  refocusHandleAt(destination);
 };
 
 export const moveParallelCardWithKeyboard = (event, { actionPath, moveCard }) => {
@@ -298,7 +319,9 @@ export const moveParallelCardWithKeyboard = (event, { actionPath, moveCard }) =>
     return;
   }
   const { prefix, index } = splitPath(actionPath);
-  moveCard(actionPath, `${prefix}.${index + move.direction}`);
+  const destination = `${prefix}.${index + move.direction}`;
+  moveCard(actionPath, destination);
+  refocusHandleAt(destination);
 };
 
 export const moveConditionWithKeyboard = (event, { actionPath, moveCard }) => {
@@ -312,5 +335,7 @@ export const moveConditionWithKeyboard = (event, { actionPath, moveCard }) => {
     return;
   }
   const { prefix, index } = splitPath(actionPath);
-  moveCard(actionPath, `${prefix}.${index + move.direction}`);
+  const destination = `${prefix}.${index + move.direction}`;
+  moveCard(actionPath, destination);
+  refocusHandleAt(destination);
 };

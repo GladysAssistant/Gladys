@@ -11,8 +11,9 @@ const DuplicateScenePage = ({ children, ...props }) => (
   <div class="page">
     <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
       <div class={cx('container', style.containerWithMargin)}>
-        <button onClick={props.goBack} className="btn btn-secondary btn-sm">
-          <Text id="global.backButton" />
+        <button onClick={props.goBack} type="button" class={cx('btn', style.backButton)}>
+          <i class="fe fe-arrow-left mr-2" />
+          <Text id="duplicateScene.backButton" />
         </button>
 
         <div class="row">

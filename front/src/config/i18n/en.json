@@ -4303,6 +4303,7 @@
     "noResult": "No icon matches \"{{search}}\"."
   },
   "newScene": {
+    "backButton": "Back to the scene list",
     "cardTitle": "New scene",
     "nameLabel": "Name",
     "namePlaceholder": "Enter the name of your scene",
@@ -4313,6 +4314,7 @@
     "sceneAlreadyExist": "A scene with that name already exists."
   },
   "duplicateScene": {
+    "backButton": "Back to the scene",
     "cardTitle": "Duplicate scene \"{{name}}\"",
     "nameLabel": "Name",
     "namePlaceholder": "Enter a new name",

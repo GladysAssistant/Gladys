@@ -4303,6 +4303,7 @@
     "noResult": "Aucune icône ne correspond à \"{{search}}\"."
   },
   "newScene": {
+    "backButton": "Retour à la liste des scènes",
     "cardTitle": "Nouvelle scène",
     "nameLabel": "Nom",
     "namePlaceholder": "Entrez le nom de votre scène",
@@ -4313,6 +4314,7 @@
     "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
   },
   "duplicateScene": {
+    "backButton": "Retour à la scène",
     "cardTitle": "Dupliquer la scène \"{{name}}\"",
     "nameLabel": "Nom",
     "namePlaceholder": "Entrez un nouveau nom",

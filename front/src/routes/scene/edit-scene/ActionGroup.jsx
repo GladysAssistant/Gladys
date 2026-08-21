@@ -9,7 +9,6 @@ import style from './style.css';
 
 const renderActionCard = (props, action, index) => (
   <ActionCard
-    key={action}
     moveCard={props.moveCard}
     moveCardGroup={props.moveCardGroup}
     sceneParamsData={props.sceneParamsData}

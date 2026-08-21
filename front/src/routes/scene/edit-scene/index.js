@@ -1216,20 +1216,38 @@ class EditScene extends Component {
 
     if (!element) return null;
 
-    // Move the action with in-place splices, like moveCardGroup: the group
-    // arrays keep their identity, so the keyed cards and steps keep their DOM
-    // (and their local state: expanded/collapsed, keyboard focus) when moved
-    const getContainingArray = path => {
-      const segments = path.split('.').slice(0, -1);
-      return segments.length ? getNestedValue(this.state.scene.actions, segments.join('.')) : this.state.scene.actions;
-    };
-    const sourceArray = getContainingArray(originalPath);
-    const destArray = getContainingArray(destPath);
-    if (!Array.isArray(sourceArray) || !Array.isArray(destArray)) {
-      return null;
-    }
-    sourceArray.splice(parseInt(originalPath.split('.').pop(), 10), 1);
-    destArray.splice(parseInt(destPath.split('.').pop(), 10), 0, element);
+    // Build update object for removing from original location
+    let removeUpdateObject = { scene: { actions: {} } };
+    let removeActionsPath = removeUpdateObject.scene.actions;
+
+    originalPath.split('.').forEach((segment, index, array) => {
+      if (index === array.length - 2) {
+        removeActionsPath[segment] = {
+          $splice: [[parseInt(array[array.length - 1], 10), 1]]
+        };
+      } else if (index < array.length - 2) {
+        removeActionsPath[segment] = {};
+        removeActionsPath = removeActionsPath[segment];
+      }
+    });
+
+    // Remove element from original location
+    const newStateWithoutElement = update(this.state, removeUpdateObject);
+
+    // Build update object for adding to destination
+    let addUpdateObject = { scene: { actions: {} }, variables: {} };
+    let addActionsPath = addUpdateObject.scene.actions;
+
+    destPath.split('.').forEach((segment, index, array) => {
+      if (index === array.length - 2) {
+        addActionsPath[segment] = {
+          $splice: [[parseInt(array[array.length - 1], 10), 0, element]]
+        };
+      } else if (index < array.length - 2) {
+        addActionsPath[segment] = {};
+        addActionsPath = addActionsPath[segment];
+      }
+    });
 
     // Update variables - handle all affected variables
     const updatedVariables = {};
@@ -1284,10 +1302,13 @@ class EditScene extends Component {
       }
     });
 
-    // Rename the variables which moved with the action
-    const newVariables = update(this.state.variables, updatedVariables);
+    // Add variables to the update object
+    addUpdateObject.variables = updatedVariables;
 
-    await this.setState({ ...this.state, variables: newVariables });
+    // Add element to new location and update variables
+    const newState = update(newStateWithoutElement, addUpdateObject);
+
+    await this.setState(newState);
     await this.addEmptyActionGroupIfNeeded();
     await this.cleanUpEmptyGroupAfterMove(originalPath);
   };

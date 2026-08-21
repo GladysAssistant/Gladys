@@ -13,8 +13,9 @@ const NewScenePage = ({ children, ...props }) => (
   <div class="page">
     <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
       <div class={cx('container', style.containerWithMargin)}>
-        <Link href="/dashboard/scene" class="btn btn-secondary btn-sm">
-          <Text id="global.backButton" />
+        <Link href="/dashboard/scene" class={cx('btn', style.backButton)}>
+          <i class="fe fe-arrow-left mr-2" />
+          <Text id="newScene.backButton" />
         </Link>
         <div class="row">
           <div class={cx('col mx-auto', style.sceneFormCol)}>

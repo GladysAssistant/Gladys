@@ -136,7 +136,6 @@ class ConditionWhile extends Component {
           >
             {conditions.map((condition, index) => (
               <ActionCard
-                key={condition}
                 action={condition}
                 index={index}
                 allActions={props.allActions}
@@ -206,7 +205,6 @@ class ConditionWhile extends Component {
             >
               {props.action.then.map((actions, index) => (
                 <ActionGroup
-                  key={actions}
                   actions={actions}
                   allActions={props.allActions}
                   path={`${props.path}.then.${index}`}

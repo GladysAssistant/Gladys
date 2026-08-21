@@ -4303,6 +4303,7 @@
     "noResult": "Kein Symbol entspricht \"{{search}}\"."
   },
   "newScene": {
+    "backButton": "Zurück zur Szenenliste",
     "cardTitle": "Neue Szene",
     "nameLabel": "Name",
     "namePlaceholder": "Gib den Namen deiner Szene ein",
@@ -4313,6 +4314,7 @@
     "sceneAlreadyExist": "Eine Szene mit diesem Namen existiert bereits."
   },
   "duplicateScene": {
+    "backButton": "Zurück zur Szene",
     "cardTitle": "Szene \"{{name}}\" duplizieren",
     "nameLabel": "Name",
     "namePlaceholder": "Gib einen neuen Namen ein",

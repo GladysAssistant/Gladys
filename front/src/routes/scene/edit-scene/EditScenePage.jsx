@@ -159,11 +159,8 @@ const EditScenePage = ({ children, ...props }) => {
             {/* The root step flow: the droppable surface of the whole "then"
                 sequence (stepDrag.js computes the insertion point inside it) */}
             <div data-step-flow data-flow-path="" data-flow-level="1">
-              {/* keyed by the group array itself (splices keep the reference):
-                  the DOM node follows a moved step, so keyboard focus stays on
-                  the handle of the step being moved */}
               {props.scene.actions.map((parallelActions, index) => (
-                <div key={parallelActions}>
+                <div>
                   <div class="row">
                     <ActionGroup
                       moveCard={props.moveCard}
