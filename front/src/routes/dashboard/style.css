@@ -167,9 +167,17 @@
   max-width: none;
 }
 
-/* 5 columns don't divide the 12-column grid: same behavior as a col-lg-*
-   (stacked full width below the breakpoint, fixed share above) at 20% */
-.colFifth {
+/* One sizing model for every dashboard column. Below the desktop breakpoint
+   columns stack full width, unchanged. Above it, each column asks for its
+   --column-width share of the section (set inline: equal shares in a plain
+   section, weight shares in a weighted e.g. 2|1 one) but never shrinks
+   under a readable card width: columns that no longer fit WRAP onto the
+   next line and share it, instead of crushing their widgets — a 6-column
+   dashboard renders 3+3 on a mid-size screen, 2+2+2 on a narrow one.
+   14rem keeps the historic footprint: a 3-column dashboard right at the
+   992px breakpoint (~224px per column next to the navigation rail) still
+   fits on one line, exactly as before. */
+.dashboardColumn {
   position: relative;
   width: 100%;
   padding-right: 15px;
@@ -177,30 +185,33 @@
 }
 
 @media (min-width: 992px) {
-  .colFifth {
-    flex: 0 0 20%;
-    max-width: 20%;
+  .dashboardColumn {
+    flex: 1 1 var(--column-width);
+    min-width: 14rem;
+    /* A nearly-empty last wrap line (e.g. the lone 6th column) must not
+       blow its widgets up to the whole dashboard width: growth is capped
+       near a comfortable card width and the line centers (the section row
+       is justify-content-center). max() keeps wide shares — a single 100%
+       column, a 66% weighted one — at their intended width; the plain 100%
+       line is the fallback for engines without max(). */
+    max-width: 100%;
+    max-width: max(var(--column-width), 24rem);
   }
-}
 
-/* A section with per-column weights (e.g. 2|1) shares its width in
-   percentages (--column-width, set inline) instead of grid classes.
-   Same stacking behavior as a col-lg-* below the breakpoint. */
-.weightedColumn {
-  position: relative;
-  width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
-}
-
-@media (min-width: 992px) {
-  .weightedColumn {
-    flex: 0 0 var(--column-width);
-    max-width: var(--column-width);
+  /* Bootstrap-row-style negative side margins: the outermost column
+     paddings hang outside the container edge, so the outer cards of EVERY
+     wrap line stay (near) flush with the page content. The old first/
+     last-column padding removal only aligned the single unwrapped line —
+     with wrapping it left the lines 15px out of step with each other.
+     Capped at the .container side padding (0.75rem in the vendored Tabler
+     build), not the full 15px gutter: overhanging the container would
+     open a 3px horizontal page scroll. */
+  .sectionRow {
+    margin-right: -0.75rem;
+    margin-left: -0.75rem;
   }
-}
 
-@media (min-width: 992px) {
+  /* still used by the editor canvas, which keeps one unwrapped line */
   .removePaddingFirstCol {
     padding-left: 0;
   }
