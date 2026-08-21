@@ -118,7 +118,9 @@ The state itself is stored by the standard path: `device.setValue` calls the own
   passes its value to the image refresh instead of letting it re-read the state: `setState` is
   asynchronous and that reload keeps the current view, so the state still holds the
   pre-reconnect value — a camera **enabled** while the socket was down would otherwise skip the
-  refresh and stay blank.
+  refresh and stay blank. A reload resolving to **disabled** tears the view down exactly like the
+  state event would have: an ongoing or still-starting live stream is stopped and the kept frame
+  is cleared, since both would otherwise survive a camera disabled while nobody was listening.
 - **Device rows** (`device-in-room`): `camera`/`enabled` joins the supported-types allowlist and
   routes to `BinaryDeviceFeature` — a plain on/off toggle.
 - **MQTT device page**: the type appears in the feature catalog with `min`/`max` 0/1, `read_only`

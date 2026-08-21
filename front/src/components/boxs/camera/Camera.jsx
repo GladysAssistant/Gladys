@@ -157,7 +157,16 @@ class CameraBoxComponent extends Component {
       // event: reload the device first, as on mount. Refreshing the image alone would leave the
       // frame received before the disconnect on screen (docs/specs/camera-enable-disable.md).
       const cameraDisabled = await this.refreshDevice({ keepCurrentView: true });
-      if (cameraDisabled === false) {
+      if (cameraDisabled === true) {
+        // Same teardown as the device.new-state handler: the placeholder hides the video, but a
+        // live stream that was running (or still starting) when the socket dropped, and the
+        // frame keepCurrentView deliberately kept, would otherwise both survive a camera
+        // disabled while we were not listening.
+        if (this.hasStreamingToStop()) {
+          this.stopStreaming();
+        }
+        this.setState({ image: null, error: false });
+      } else if (cameraDisabled === false) {
         // The confirmed value is passed on: this reload keeps the current view, so its only
         // setState is the one it just scheduled, and this.state still holds the pre-reconnect
         // value — a camera enabled while the socket was down would otherwise skip its refresh.
