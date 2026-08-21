@@ -269,6 +269,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDeviceStatesHistory,
     },
+    'get /api/v1/device_feature/last_state_changes': {
+      authenticated: true,
+      controller: deviceController.getLastStateChanges,
+    },
     'get /api/v1/device_feature/energy_consumption': {
       authenticated: true,
       controller: deviceController.getConsumptionByDates,

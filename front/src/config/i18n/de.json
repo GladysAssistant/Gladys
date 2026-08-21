@@ -454,7 +454,10 @@
         "doorbellRinging": "Klingelt",
         "pushButton": "Schieben",
         "cameraPresetPlaceholder": "Preset aufrufen...",
-        "vacuumDock": "Zurück zur Ladestation"
+        "vacuumDock": "Zurück zur Ladestation",
+        "displayLastStateChangeLabel": "Datum der letzten Zustandsänderung anzeigen",
+        "displayLastStateChangeDescription": "Für jeden binären Sensor dieser Box (Öffnung, Bewegung, Anwesenheit...) wird unter seinem Zustand das Datum angezeigt, an dem dieser Zustand erreicht wurde.",
+        "noLastStateChange": "Keine Zustandsänderung aufgezeichnet"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Wähle die Geräte aus, die du anzeigen möchtest:",

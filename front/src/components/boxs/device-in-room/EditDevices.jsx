@@ -7,12 +7,19 @@ import BaseEditBox from '../baseEditBox';
 import { getDeviceFeatureName } from '../../../utils/device';
 import { DeviceListWithDragAndDrop } from '../../drag-and-drop/DeviceListWithDragAndDrop';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import DisplayLastStateChangeOption from './DisplayLastStateChangeOption';
 
 class EditDevices extends Component {
   addDeviceFeature = async selectedDeviceFeatureOption => {
     const newSelectedDeviceFeaturesOptions = [...this.state.selectedDeviceFeaturesOptions, selectedDeviceFeatureOption];
     await this.setState({ selectedDeviceFeaturesOptions: newSelectedDeviceFeaturesOptions });
     this.refreshDeviceFeaturesNames();
+  };
+
+  updateDisplayLastStateChange = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      display_last_state_change: e.target.checked
+    });
   };
 
   updateName = e => {
@@ -222,6 +229,12 @@ class EditDevices extends Component {
                 />
               </div>
             )}
+            <DisplayLastStateChangeOption
+              box={props.box}
+              x={props.x}
+              y={props.y}
+              updateDisplayLastStateChange={this.updateDisplayLastStateChange}
+            />
           </div>
         </div>
       </BaseEditBox>

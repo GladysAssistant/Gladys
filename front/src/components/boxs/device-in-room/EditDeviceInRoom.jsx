@@ -7,10 +7,17 @@ import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { isSupportedFeature } from './SupportedFeatureTypes';
+import DisplayLastStateChangeOption from './DisplayLastStateChangeOption';
 
 class EditDeviceInRoom extends Component {
   updateBoxRoom = room => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_features: [] });
+  };
+
+  updateDisplayLastStateChange = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      display_last_state_change: e.target.checked
+    });
   };
 
   updateDeviceFeatures = selectedDeviceFeaturesOptions => {
@@ -115,6 +122,12 @@ class EditDeviceInRoom extends Component {
                 />
               </div>
             )}
+            <DisplayLastStateChangeOption
+              box={props.box}
+              x={props.x}
+              y={props.y}
+              updateDisplayLastStateChange={this.updateDisplayLastStateChange}
+            />
           </div>
         </div>
       </BaseEditBox>

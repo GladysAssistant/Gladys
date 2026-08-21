@@ -16,7 +16,7 @@ const isLightBinaryFeature = (feature, featureSelectors) => {
 };
 
 const DeviceCard = ({ children, ...props }) => {
-  const { boxTitle, roomLightStatus, loading, deviceFeatures = [], box = {} } = props;
+  const { boxTitle, roomLightStatus, loading, deviceFeatures = [], lastStateChanges = {}, box = {} } = props;
   const { device_features: featureSelectors = [] } = box;
 
   const hasAtLeastTwoLightBinaryFeature = countLightBinaryFeature(deviceFeatures, featureSelectors) >= 2;
@@ -72,6 +72,8 @@ const DeviceCard = ({ children, ...props }) => {
                       y={props.y}
                       device={deviceFeature.device}
                       deviceFeature={deviceFeature}
+                      displayLastStateChange={box.display_last_state_change === true}
+                      lastStateChange={lastStateChanges[deviceFeature.selector]}
                       roomIndex={props.roomIndex}
                       deviceFeatureIndex={deviceFeatureIndex}
                       updateValue={props.updateValue}

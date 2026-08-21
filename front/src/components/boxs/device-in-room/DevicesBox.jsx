@@ -16,6 +16,11 @@ import debounce from 'debounce';
 const isTextSelectFeature = feature =>
   feature.category === DEVICE_FEATURE_CATEGORIES.TEXT && feature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT;
 
+// Any read-only binary feature (opening sensor, motion sensor, presence, leak...) can display
+// the date at which its current state was reached.
+const isBinarySensorFeature = feature =>
+  feature.read_only === true && feature.type === DEVICE_FEATURE_TYPES.SENSOR.BINARY;
+
 const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
   return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
@@ -39,6 +44,39 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
   });
 };
 
+// A new state is a state change only when the value actually differs from the one displayed,
+// so a sensor re-publishing the same value never resets the displayed date.
+const getUpdatedLastStateChanges = (
+  lastStateChanges,
+  deviceFeatures,
+  deviceFeatureSelector,
+  lastValue,
+  lastValueChange
+) => {
+  const feature = deviceFeatures.find(
+    f => f.selector === deviceFeatureSelector && isBinarySensorFeature(f) && f.last_value !== lastValue
+  );
+  if (!feature) {
+    return lastStateChanges;
+  }
+  return { ...lastStateChanges, [deviceFeatureSelector]: lastValueChange };
+};
+
+// A websocket state change can land while the history request is in flight: the fetched snapshot
+// was taken before it, so replacing the whole map would put back a date older than the one already
+// displayed. Each selector keeps the most recent of the two dates instead.
+const mergeLastStateChanges = (currentLastStateChanges, fetchedLastStateChanges) => {
+  const mergedLastStateChanges = { ...currentLastStateChanges };
+  Object.keys(fetchedLastStateChanges).forEach(selector => {
+    const currentDate = mergedLastStateChanges[selector];
+    const fetchedDate = fetchedLastStateChanges[selector];
+    if (!currentDate || (fetchedDate && new Date(fetchedDate) > new Date(currentDate))) {
+      mergedLastStateChanges[selector] = fetchedDate;
+    }
+  });
+  return mergedLastStateChanges;
+};
+
 const updateDeviceFeaturesString = (deviceFeatures, deviceFeatureSelector, lastValueString, lastValueChange) => {
   return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
@@ -57,6 +95,7 @@ class DevicesComponent extends Component {
     super(props);
     this.state = {
       deviceFeatures: [],
+      lastStateChanges: {},
       status: RequestStatus.Getting
     };
     this.wasDisconnected = false;
@@ -102,6 +141,7 @@ class DevicesComponent extends Component {
         deviceFeatures: deviceFeaturesSorted,
         status: RequestStatus.Success
       });
+      this.getLastStateChanges(deviceFeaturesSorted);
     } catch (e) {
       this.setState({
         status: RequestStatus.Error
@@ -109,20 +149,55 @@ class DevicesComponent extends Component {
     }
   };
 
-  updateDeviceStateWebsocket = payload => {
-    let { deviceFeatures } = this.state;
-    if (deviceFeatures) {
-      deviceFeatures = updateDeviceFeatures(
-        deviceFeatures,
-        payload.device_feature_selector,
-        payload.last_value,
-        payload.last_value_changed
-      );
-      this.setState({
-        deviceFeatures
+  // `last_value_changed` is refreshed on every state report, even when the device re-publishes
+  // the value it already had, so the real date of the last state change is asked to the server,
+  // which reads it from the state history.
+  getLastStateChanges = async deviceFeatures => {
+    if (!this.props.box.display_last_state_change) {
+      return;
+    }
+    const binarySensorSelectors = deviceFeatures.filter(isBinarySensorFeature).map(feature => feature.selector);
+    if (binarySensorSelectors.length === 0) {
+      return;
+    }
+    try {
+      const lastStateChanges = await this.props.httpClient.get('/api/v1/device_feature/last_state_changes', {
+        device_feature_selectors: binarySensorSelectors.join(',')
       });
+      this.setState(previousState => ({
+        lastStateChanges: mergeLastStateChanges(previousState.lastStateChanges, lastStateChanges)
+      }));
+    } catch (e) {
+      console.error(e);
     }
   };
+
+  // Read through a functional update: the history request can resolve in between, and its merged
+  // result would be clobbered by a map computed from an older state.
+  updateDeviceStateWebsocket = payload => {
+    this.setState(previousState => {
+      const { deviceFeatures } = previousState;
+      if (!deviceFeatures) {
+        return null;
+      }
+      return {
+        deviceFeatures: updateDeviceFeatures(
+          deviceFeatures,
+          payload.device_feature_selector,
+          payload.last_value,
+          payload.last_value_changed
+        ),
+        lastStateChanges: getUpdatedLastStateChanges(
+          previousState.lastStateChanges,
+          deviceFeatures,
+          payload.device_feature_selector,
+          payload.last_value,
+          payload.last_value_changed
+        )
+      };
+    });
+  };
+
   updateDeviceTextWebsocket = payload => {
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
@@ -211,8 +286,12 @@ class DevicesComponent extends Component {
 
   componentDidUpdate(previousProps) {
     const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
+    const displayLastStateChangeChanged =
+      get(previousProps, 'box.display_last_state_change') !== get(this.props, 'box.display_last_state_change');
     if (deviceFeaturesChanged) {
       this.refreshData();
+    } else if (displayLastStateChangeChanged) {
+      this.getLastStateChanges(this.state.deviceFeatures);
     }
   }
 
@@ -228,7 +307,7 @@ class DevicesComponent extends Component {
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
-  render(props, { deviceFeatures, status }) {
+  render(props, { deviceFeatures, lastStateChanges, status }) {
     const boxTitle = props.box.name;
     const loading = status === RequestStatus.Getting;
     const roomLightStatus = this.getLightStatus();
@@ -239,6 +318,7 @@ class DevicesComponent extends Component {
         loading={loading}
         boxTitle={boxTitle}
         deviceFeatures={deviceFeatures}
+        lastStateChanges={lastStateChanges}
         roomLightStatus={roomLightStatus}
         updateValue={this.updateValue}
         updateValueWithDebounce={this.updateValueWithDebounce}

@@ -291,6 +291,30 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('period_start_day', 5);
   });
 
+  it('should save a devices box displaying the date of the last state change', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        [
+          {
+            type: DASHBOARD_BOX_TYPE.DEVICES,
+            device_features: ['test-devicefeature'],
+            display_last_state_change: true,
+          },
+        ],
+        [
+          {
+            type: DASHBOARD_BOX_TYPE.DEVICES_IN_ROOM,
+            room: 'test-room',
+            display_last_state_change: false,
+          },
+        ],
+      ],
+    });
+    // legacy column-based boxes are normalized to a single section on save
+    expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('display_last_state_change', true);
+    expect(updatedDashboard.boxes[0].columns[1][0]).to.have.property('display_last_state_change', false);
+  });
+
   it('should return not found', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'not-found-dashboard', {
       name: 'new name',

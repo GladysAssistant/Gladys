@@ -161,6 +161,42 @@ describe('GET /api/v1/device_feature/states_history', () => {
   });
 });
 
+describe('GET /api/v1/device_feature/last_state_changes', () => {
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 0, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      // Same value reported again: not a state change
+      { value: 0, created_at: new Date('2025-08-28T15:01:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:02:00.000Z') },
+    ]);
+  });
+  it('should get the last state change of a device feature', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/last_state_changes')
+      .query({
+        device_feature_selectors: 'test-device-feature',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          'test-device-feature': '2025-08-28T15:02:00.000Z',
+        });
+      });
+  });
+  it('should return an empty object when no device feature selector is given', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/last_state_changes')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({});
+      });
+  });
+});
+
 describe('GET /api/v1/device_feature/energy_consumption', () => {
   beforeEach(async function BeforeEach() {
     this.timeout(10000);

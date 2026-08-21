@@ -23,4 +23,20 @@ describe('API routes', () => {
     expect(route.externalIntegrationAuth).to.equal(true);
     expect(route.controller).to.be.a('function');
   });
+
+  it('should register the last state changes route as authenticated', () => {
+    const mockedGladys = {
+      service: {
+        getServices: () => [],
+      },
+    };
+
+    const routes = getRoutes(mockedGladys);
+
+    const route = routes['get /api/v1/device_feature/last_state_changes'];
+
+    expect(route).to.not.equal(undefined);
+    expect(route.authenticated).to.equal(true);
+    expect(route.controller).to.be.a('function');
+  });
 });
