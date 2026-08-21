@@ -6085,6 +6085,7 @@
     "formTitle": "Gladys Plus - Reset Password",
     "incompatibleBrowserLabel": "Sorry, your browser is not compatible with the Gladys Gateway. Your browser should support the WebCrypto API as well as IndexedDB databases.",
     "errorLinkLabel": "We cannot retrieve your reset password link. Maybe it was already used or has expired!",
+    "invalidRecoveryCodeLabel": "This recovery code is invalid or has already been used. Your reset password link is still valid, try again with another recovery code.",
     "passwordNotMatchingLabel": "Password are not matching.",
     "passwordLabel": "Password (min 8 characters)",
     "passwordPlaceholder": "Password",

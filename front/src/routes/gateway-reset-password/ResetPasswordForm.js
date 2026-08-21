@@ -17,6 +17,11 @@ const ResetPassworFrom = ({ children, ...props }) => (
           <Text id="gatewayResetPassword.errorLinkLabel" />
         </div>
       )}
+      {props.invalidRecoveryCode && (
+        <div class="alert alert-danger" role="alert">
+          <Text id="gatewayResetPassword.invalidRecoveryCodeLabel" />
+        </div>
+      )}
       {props.passwordNotMatching && (
         <div class="alert alert-warning" role="alert">
           <Text id="gatewayResetPassword.passwordNotMatchingLabel" />

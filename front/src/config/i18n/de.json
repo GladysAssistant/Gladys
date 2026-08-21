@@ -6085,6 +6085,7 @@
     "formTitle": "Gladys Plus - Passwort zurücksetzen",
     "incompatibleBrowserLabel": "Dein Browser ist leider nicht mit dem Gladys Gateway kompatibel. Dein Browser muss die WebCrypto-API sowie IndexedDB-Datenbanken unterstützen.",
     "errorLinkLabel": "Wir können deinen Link zum Zurücksetzen des Passworts nicht abrufen. Vielleicht wurde er bereits verwendet oder ist abgelaufen.",
+    "invalidRecoveryCodeLabel": "Dieser Wiederherstellungscode ist ungültig oder wurde bereits verwendet. Dein Link zum Zurücksetzen des Passworts ist weiterhin gültig, versuche es mit einem anderen Wiederherstellungscode.",
     "passwordNotMatchingLabel": "Passwörter stimmen nicht überein.",
     "passwordLabel": "Passwort (mindestens 8 Zeichen)",
     "passwordPlaceholder": "Passwort",
