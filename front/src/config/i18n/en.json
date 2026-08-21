@@ -3344,6 +3344,7 @@
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
+        "triggerVariablesLabel": "Scene triggers",
         "operatorLabel": "Operator",
         "valueLabel": "Value",
         "removeLabel": "Remove",
@@ -3613,6 +3614,10 @@
         "count": "Number of events",
         "events": "Raw list of events (advanced, not readable in a message)"
       },
+      "mqtt": {
+        "topic": "MQTT topic received",
+        "message": "MQTT message received"
+      },
       "askAi": {
         "answer": "AI answer"
       },
@@ -3782,6 +3787,7 @@
         "topicPlaceholder": "Enter your topic",
         "messageLabel": "Message",
         "messagePlaceholder": "Enter the expected message",
+        "variablesDescription": "The received topic and message can be used in the next actions of the scene: type '{{' in a text field to inject them. Note that MQTT messages are always compared as text, so a message like '23' will not match a numeric value in an \"Only continue if\" condition.",
         "messageDescription": "Enter the expected message or leave blank to run the scene regardless of the message"
       },
       "weatherAlert": {

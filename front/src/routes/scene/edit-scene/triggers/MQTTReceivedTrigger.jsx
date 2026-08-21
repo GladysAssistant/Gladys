@@ -1,6 +1,9 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
+
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 class MQTTReceived extends Component {
   updateTopicName = e => {
@@ -10,6 +13,31 @@ class MQTTReceived extends Component {
   updateMessage = e => {
     this.props.updateTriggerProperty(this.props.index, 'message', e.target.value);
   };
+
+  setVariables = () => {
+    const TOPIC_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.mqtt.topic');
+    const MESSAGE_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.mqtt.message');
+    this.props.setVariablesTrigger(this.props.index, [
+      {
+        name: 'topic',
+        type: 'mqtt',
+        ready: true,
+        label: TOPIC_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'message',
+        type: 'mqtt',
+        ready: true,
+        label: MESSAGE_VARIABLE,
+        data: {}
+      }
+    ]);
+  };
+
+  componentDidMount() {
+    this.setVariables();
+  }
 
   render({}, {}) {
     return (
@@ -48,9 +76,12 @@ class MQTTReceived extends Component {
             />
           </Localizer>
         </div>
+        <div class="alert alert-secondary">
+          <Text id="editScene.triggersCard.mqttReceived.variablesDescription" />
+        </div>
       </div>
     );
   }
 }
 
-export default connect('httpClient,user', {})(MQTTReceived);
+export default connect('httpClient,user', {})(withIntlAsProp(MQTTReceived));

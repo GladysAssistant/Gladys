@@ -177,6 +177,8 @@ const TriggerCard = ({ children, ...props }) => (
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
+          variables={props.variables}
+          setVariablesTrigger={props.setVariablesTrigger}
         />
       )}
       {WEATHER_ALERT_TRIGGERS.includes(props.trigger.type) && (
