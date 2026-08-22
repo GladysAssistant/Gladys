@@ -55,7 +55,30 @@
     "label": "weather.get.success.now.hail",
     "answers": ["It's hailing outside and the temperature is {{ temperature }} {{ units }}."]
   },
-
+  {
+    "label": "weather.get.success.now.freezing-rain",
+    "answers": ["There's freezing rain outside and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.freezing-fog",
+    "answers": ["There's freezing fog outside and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.snow-thunderstorm",
+    "answers": ["There are thundery snow showers outside and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.sandstorm",
+    "answers": ["There's a sandstorm outside and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.tornado",
+    "answers": ["There's a tornado outside and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.hurricane",
+    "answers": ["There's a hurricane outside and the temperature is {{ temperature }} {{ units }}."]
+  },
   {
     "label": "weather.get.success.today.snow",
     "answers": [
@@ -138,7 +161,42 @@
       "Today, hail is expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
     ]
   },
-
+  {
+    "label": "weather.get.success.today.freezing-rain",
+    "answers": [
+      "Today, freezing rain is expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.freezing-fog",
+    "answers": [
+      "Today, freezing fog is expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.snow-thunderstorm",
+    "answers": [
+      "Today, thundery snow showers are expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.sandstorm",
+    "answers": [
+      "Today, a sandstorm is expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.tornado",
+    "answers": [
+      "Today, a tornado is expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.hurricane",
+    "answers": [
+      "Today, a hurricane is expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
   {
     "label": "weather.get.success.tomorrow.snow",
     "answers": [
@@ -223,7 +281,42 @@
       "Tomorrow hail is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
     ]
   },
-
+  {
+    "label": "weather.get.success.tomorrow.freezing-rain",
+    "answers": [
+      "Tomorrow freezing rain is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.freezing-fog",
+    "answers": [
+      "Tomorrow freezing fog is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.snow-thunderstorm",
+    "answers": [
+      "Tomorrow thundery snow showers are expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.sandstorm",
+    "answers": [
+      "Tomorrow a sandstorm is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.tornado",
+    "answers": [
+      "Tomorrow a tornado is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.hurricane",
+    "answers": [
+      "Tomorrow a hurricane is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
   {
     "label": "weather.get.success.after-tomorrow.snow",
     "answers": [
@@ -308,7 +401,42 @@
       "The day after tomorrow hail is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
     ]
   },
-
+  {
+    "label": "weather.get.success.after-tomorrow.freezing-rain",
+    "answers": [
+      "The day after tomorrow freezing rain is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.freezing-fog",
+    "answers": [
+      "The day after tomorrow freezing fog is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.snow-thunderstorm",
+    "answers": [
+      "The day after tomorrow thundery snow showers are expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.sandstorm",
+    "answers": [
+      "The day after tomorrow a sandstorm is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.tornado",
+    "answers": [
+      "The day after tomorrow a tornado is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.hurricane",
+    "answers": [
+      "The day after tomorrow a hurricane is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
   {
     "label": "weather.get.success.day.snow",
     "answers": [
@@ -393,7 +521,42 @@
       "{{ day }}, hail is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
     ]
   },
-
+  {
+    "label": "weather.get.success.day.freezing-rain",
+    "answers": [
+      "{{ day }}, freezing rain is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.freezing-fog",
+    "answers": [
+      "{{ day }}, freezing fog is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.snow-thunderstorm",
+    "answers": [
+      "{{ day }}, thundery snow showers are expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.sandstorm",
+    "answers": [
+      "{{ day }}, a sandstorm is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.tornado",
+    "answers": [
+      "{{ day }}, a tornado is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.hurricane",
+    "answers": [
+      "{{ day }}, a hurricane is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
   {
     "label": "weather.get.fail",
     "answers": ["There was an error while getting the weather."]
