@@ -583,6 +583,14 @@
   box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
 }
 
+/* The date/time fields fill their column like every other field: react-datepicker
+   wraps its input in an inline-block that otherwise shrinks to the input's own
+   default size. The popup itself is styled in datePicker.css — it is portaled
+   onto <body>, out of this container's reach. */
+.pageContainer :global(.react-datepicker-wrapper) {
+  display: block;
+}
+
 /* react-select (devices, houses, users…) joins the same family */
 :global(.glass-theme) .pageContainer :global(.react-select__control) {
   border-radius: 12px;
