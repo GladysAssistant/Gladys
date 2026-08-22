@@ -36,7 +36,7 @@ const EditScenePage = ({ children, ...props }) => {
           <div class={cx('container', style.pageContainer)}>
             <div class="mb-4">
               <div class="row justify-content-between">
-                <div class="col-7 col-md-8">
+                <div class={cx('col', style.pageTitleColumn)}>
                   <h1 class={cx('page-title', style.pageTitle)}>
                     <Localizer>
                       <button
@@ -55,7 +55,7 @@ const EditScenePage = ({ children, ...props }) => {
                     <span class={style.sceneName}>{props.scene.name}</span>
 
                     {/* The active flag is patched on its own: keep it from racing a full save */}
-                    <label className="custom-switch m-0 ml-4">
+                    <label className="custom-switch m-0 ml-3 ml-md-4">
                       <input
                         type="checkbox"
                         name="active"
@@ -70,7 +70,7 @@ const EditScenePage = ({ children, ...props }) => {
                   </h1>
                 </div>
 
-                <div class="col-5 col-md-4">
+                <div class="col-auto">
                   <div class="text-right">
                     <Localizer>
                       <button
