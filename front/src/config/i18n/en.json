@@ -420,6 +420,12 @@
           "thunderstorm": "Thunderstorm",
           "wind": "Windy",
           "night": "Night",
+          "freezing-rain": "Freezing rain",
+          "freezing-fog": "Freezing fog",
+          "snow-thunderstorm": "Thundery snow showers",
+          "sandstorm": "Sandstorm",
+          "tornado": "Tornado",
+          "hurricane": "Hurricane",
           "unknown": "Unavailable"
         },
         "moonPhases": {

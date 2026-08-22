@@ -18,6 +18,37 @@ import {
 
 const BOX_KEY = 'Weather';
 const BOX_DATA_KEY = `${DASHBOARD_BOX_DATA_KEY}${BOX_KEY}`;
+
+/**
+ * Weather icon of a condition. `icon` is what the action layer resolved: the
+ * URL of a bundled SVG for every real condition, or an emoji for the ones
+ * with no drawing of their own (currently 'unknown'). Sizing stays with the
+ * caller, which is why the size is passed in and applied to both shapes.
+ *
+ * An emoji is told from an image by its LENGTH, not by a '.svg' suffix: Vite
+ * inlines any asset under 4 kB as a `data:image/svg+xml,...` URI, which has no
+ * extension at all and rendered as raw text when the test looked for one.
+ */
+const WeatherIcon = ({ icon, size, label }) => {
+  if (!icon) {
+    return null;
+  }
+  const isImage =
+    typeof icon === 'string' && (icon.startsWith('data:') || icon.startsWith('/') || icon.includes('.svg'));
+  if (!isImage) {
+    return <span style={`font-size: ${size}px; line-height: 1`}>{icon}</span>;
+  }
+  return (
+    <img
+      src={icon}
+      alt={label || ''}
+      width={size}
+      height={size}
+      class="weather-condition-icon"
+      style="display: block"
+    />
+  );
+};
 const BOX_STATUS_KEY = `${DASHBOARD_BOX_STATUS_KEY}${BOX_KEY}`;
 const BOX_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
 
@@ -275,8 +306,8 @@ class WeatherBoxComponent extends Component {
           {showCurrentWeather && (
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px">
               <div style="display: flex; align-items: center; min-width: 0">
-                <div class="weather-real-colors" style="font-size: 52px; line-height: 1">
-                  {weather.weatherEmoji}
+                <div style="line-height: 1">
+                  <WeatherIcon icon={weather.weatherEmoji} size={104} />
                 </div>
                 <div style="font-size: 16px; font-weight: 500; margin-left: 12px">
                   {/* same fallback as the emoji mapping: a provider omitting
@@ -459,11 +490,8 @@ class WeatherBoxComponent extends Component {
                   >
                     {hour.datetime_beautiful}h
                   </div>
-                  <div
-                    class="weather-real-colors"
-                    style={`font-size: ${index === 0 ? '30px' : '20px'}; line-height: 1.5; margin-bottom: 3px`}
-                  >
-                    {hour.weatherEmoji}
+                  <div style="line-height: 1.5; margin-bottom: 3px; display: flex; justify-content: center">
+                    <WeatherIcon icon={hour.weatherEmoji} size={index === 0 ? 62 : 50} />
                   </div>
                   <div style={`font-size: ${index === 0 ? '15px' : '12px'}; font-weight: 600; margin-bottom: 4px`}>
                     {Math.round(hour.temperature)}°
@@ -498,8 +526,8 @@ class WeatherBoxComponent extends Component {
                     {day.datetime_beautiful}
                   </div>
                   {day.weatherEmoji && (
-                    <div class="weather-real-colors" style="font-size: 32px; line-height: 1.5; margin-bottom: 3px">
-                      {day.weatherEmoji}
+                    <div style="line-height: 1.5; margin-bottom: 3px; display: flex; justify-content: center">
+                      <WeatherIcon icon={day.weatherEmoji} size={70} />
                     </div>
                   )}
                   <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px">

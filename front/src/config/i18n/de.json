@@ -420,6 +420,12 @@
           "thunderstorm": "Gewitter",
           "wind": "Windig",
           "night": "Nacht",
+          "freezing-rain": "Gefrierender Regen",
+          "freezing-fog": "Gefrierender Nebel",
+          "snow-thunderstorm": "Gewittrige Schneeschauer",
+          "sandstorm": "Sandsturm",
+          "tornado": "Tornado",
+          "hurricane": "Wirbelsturm",
           "unknown": "Nicht verfügbar"
         },
         "moonPhases": {

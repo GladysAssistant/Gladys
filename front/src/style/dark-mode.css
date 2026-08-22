@@ -218,6 +218,20 @@ body.dark-mode {
   filter: brightness(0.7) invert(100%) hue-rotate(180deg) !important;
 }
 
+/* The weather condition icons are real SVG artwork, not emojis: they need the
+   global html.dark-mode inversion cancelled EXACTLY, with no brightness step.
+   The 0.7 pre-darkening above is tuned for emoji glyphs; applied to these
+   drawings it darkened the real colors before flipping them back, which turned
+   the sun burnt orange and the clouds black.
+
+   Their container must NOT carry .weather-real-colors either: a CSS filter
+   creates a stacking context, so a filtered parent composites its children
+   through its own filter and the two would stack instead of the inner one
+   replacing the outer. */
+.dark-mode img.weather-condition-icon {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
 /* A fullscreen element is painted in the browser's top layer, where the global
    html.dark-mode inversion does not apply anymore. Every counter-inversion above only
    exists to cancel that global filter, so in fullscreen it inverts the media for real:
