@@ -212,6 +212,7 @@ describe('Device.migrate', function Describe() {
             type: 'actions',
             actions: [{ action_type: 'device-feature', device_feature: 'migration-source-temp', value: 1 }],
           },
+          { type: 'thermostat', thermostat_feature: 'migration-source-temp' },
         ],
       ],
     });
@@ -307,6 +308,10 @@ describe('Device.migrate', function Describe() {
               type: 'actions',
               actions: [{ action_type: 'device-feature', device_feature: 'migration-destination-temp', value: 1 }],
             },
+            // thermostat_feature is a device-referencing box field: it must follow
+            // the migrated feature, otherwise the widget and the regulation loop
+            // keep pointing at a selector that no longer exists.
+            { type: 'thermostat', thermostat_feature: 'migration-destination-temp' },
           ],
         ],
       },
