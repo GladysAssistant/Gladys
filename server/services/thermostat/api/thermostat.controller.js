@@ -73,11 +73,13 @@ module.exports = function ThermostatController(thermostatHandler) {
    */
   async function setSetpoint(req, res) {
     const featureSelector = req.params.feature_selector;
-    // Number('') and Number(null) are both 0, so the raw value has to be
-    // rejected before coercion: an empty body would otherwise be accepted as a
-    // manual hold at 0 °C.
+    // Number() turns '', ' ', false and [] into 0, so the raw value has to be
+    // narrowed before coercion: any of them would otherwise be accepted as a
+    // manual hold at 0 °C. Only a number or a non-blank string may go through.
     const rawValue = req.body ? req.body.value : undefined;
-    if (rawValue === undefined || rawValue === null || rawValue === '') {
+    const isNumber = typeof rawValue === 'number';
+    const isNumericString = typeof rawValue === 'string' && rawValue.trim() !== '';
+    if (!isNumber && !isNumericString) {
       res.status(400).json({ error: 'INVALID_VALUE' });
       return;
     }
