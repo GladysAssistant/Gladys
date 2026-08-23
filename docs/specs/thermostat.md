@@ -36,9 +36,9 @@ Everything the control loop needs is a `THERMOSTAT_*` device param:
 | `THERMOSTAT_MIN_TEMP` / `_MAX_TEMP` | bounds of the setpoint feature and of the widget dial |
 | `THERMOSTAT_TEMP_UNIT` | `C` or `F` |
 | `THERMOSTAT_MANUAL_DURATION` | how long a manual override holds, in minutes |
-| `THERMOSTAT_PRESET_*` | the six preset setpoints |
+| `THERMOSTAT_PRESET_*` | the five preset setpoints (`off` has no setpoint) |
 | `THERMOSTAT_HYSTERESIS_START` / `_STOP` | hysteresis band, in degrees of **difference** |
-| `THERMOSTAT_TPI_CYCLE_TIME` / `_PROPORTIONAL_BAND` | TPI tuning |
+| `THERMOSTAT_TPI_CYCLE_TIME` / `_PROPORTIONAL_BAND` | TPI tuning, clamped by the regulation loop to 5-120 min and 0.5-10 degrees |
 
 `createDevice` accepts only this list plus a single setpoint feature; anything else in the request body is dropped rather than persisted. Every field the edit form offers is in that list: a field the filter dropped would silently need a second store, which is exactly what this section forbids.
 

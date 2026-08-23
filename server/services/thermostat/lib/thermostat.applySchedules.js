@@ -16,6 +16,10 @@ const {
   DEFAULT_TPI_PROPORTIONAL_BAND,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_HYSTERESIS_STOP,
+  MIN_TPI_CYCLE_TIME,
+  MAX_TPI_CYCLE_TIME,
+  MIN_TPI_PROPORTIONAL_BAND,
+  MAX_TPI_PROPORTIONAL_BAND,
 } = require('../../../utils/thermostatConstants');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
@@ -62,6 +66,19 @@ function getSetpointForPreset(preset, config) {
 }
 
 /**
+ * @description Constrain a number to a closed range.
+ * @param {number} value - Value to constrain.
+ * @param {number} min - Lower bound.
+ * @param {number} max - Upper bound.
+ * @returns {number} The value, bounded by min and max.
+ * @example
+ * clamp(0, 0.5, 10); // 0.5
+ */
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+/**
  * @description Derive a stable per-thermostat offset inside a TPI cycle.
  * Without it every thermostat sharing a cycle time switches on at the same
  * wall-clock minute, stacking the loads on the electrical installation.
@@ -105,8 +122,19 @@ function computeSwitchActive(currentTemp, setpoint, mode, config, currentSwitchO
   if (config && config.control_type === 'tpi' && mode !== 'cooling') {
     // Over each cycle, the switch is ON for a fraction of the time proportional
     // to the temperature error within the proportional band.
-    const cycleMinutes = toNumber(config.tpi_cycle_time, DEFAULT_TPI_CYCLE_TIME);
-    const band = toNumber(config.tpi_proportional_band, DEFAULT_TPI_PROPORTIONAL_BAND);
+    // Clamp to the bounds the edit form advertises. An out-of-range value can
+    // still reach the database through the API, and a 0 would either divide by
+    // zero (band) or modulo by zero (cycle), leaving the heater stuck ON or OFF.
+    const cycleMinutes = clamp(
+      toNumber(config.tpi_cycle_time, DEFAULT_TPI_CYCLE_TIME),
+      MIN_TPI_CYCLE_TIME,
+      MAX_TPI_CYCLE_TIME,
+    );
+    const band = clamp(
+      toNumber(config.tpi_proportional_band, DEFAULT_TPI_PROPORTIONAL_BAND),
+      MIN_TPI_PROPORTIONAL_BAND,
+      MAX_TPI_PROPORTIONAL_BAND,
+    );
     const error = setpoint - currentTemp;
     const onFraction = Math.min(1, Math.max(0, error / band));
     const onMinutes = onFraction * cycleMinutes;

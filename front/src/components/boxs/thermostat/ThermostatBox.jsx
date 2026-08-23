@@ -661,7 +661,9 @@ class ThermostatBox extends Component {
   componentWillUnmount() {
     clearInterval(this.clockInterval);
     // A drag in progress keeps window-level listeners alive: unmounting
-    // mid-drag (dashboard edit, tab switch) would leak them.
+    // mid-drag (dashboard edit, tab switch) would leak them. The gesture never
+    // reached pointer-up, so nothing was persisted and there is nothing to
+    // undo — the device keeps whatever mode it had before the drag started.
     this.stopDrag();
     if (this.expectedSetpointTimer) {
       clearTimeout(this.expectedSetpointTimer);
@@ -733,7 +735,10 @@ class ThermostatBox extends Component {
         manualSetpointOverride: true
       });
     }
-    this.saveManualMode(true);
+    // MANUAL_MODE is written on release, together with the setpoint and the
+    // expiry: writing it here would leave the device in manual mode with no
+    // MANUAL_UNTIL if the box unmounts mid-drag, and the regulation loop would
+    // then hold the switch in its current state indefinitely.
     let lastDragSetpoint = this.angleToTemp(angle);
     this._onMove = ev => {
       ev.preventDefault();
@@ -744,8 +749,9 @@ class ThermostatBox extends Component {
         this.setState({ setpoint: lastDragSetpoint });
       }
     };
-    this._onUp = () => {
+    this._onUp = async () => {
       this.stopDrag();
+      await this.saveManualMode(true);
       this.sendSetpoint(lastDragSetpoint);
       this.saveManualSetpoint(lastDragSetpoint);
       // A manual setpoint only needs a timer when a schedule would otherwise
@@ -763,6 +769,8 @@ class ThermostatBox extends Component {
     if (this._onUp) window.removeEventListener('pointerup', this._onUp);
     if (this._onMove) window.removeEventListener('touchmove', this._onMove);
     if (this._onUp) window.removeEventListener('touchend', this._onUp);
+    this._onMove = null;
+    this._onUp = null;
     this.setState({ isDragging: false });
   };
 
