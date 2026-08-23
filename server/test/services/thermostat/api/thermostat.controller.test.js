@@ -229,6 +229,32 @@ describe('thermostat.controller', () => {
       assert.notCalled(handler.setValue);
     });
 
+    // Number() maps all of these to 0: a whitespace string, a boolean and an
+    // empty array would otherwise be accepted as a manual hold at 0 °C.
+    [
+      { label: 'a whitespace-only string', value: '   ' },
+      { label: 'a boolean', value: false },
+      { label: 'an array', value: [] },
+      { label: 'an object', value: {} },
+    ].forEach(({ label, value }) => {
+      it(`should reject ${label}, which Number() would turn into 0`, async () => {
+        const handler = buildHandler();
+        const routes = ThermostatController(handler);
+        const res = buildRes();
+
+        await callRoute(
+          routes,
+          route,
+          { params: { feature_selector: 'thermostat-living-room' }, body: { value } },
+          res,
+        );
+
+        expect(res.statusCode).to.equal(400);
+        expect(res.body).to.deep.equal({ error: 'INVALID_VALUE' });
+        assert.notCalled(handler.setValue);
+      });
+    });
+
     it('should refuse to write a feature that does not belong to this service', async () => {
       const handler = buildHandler();
       const routes = ThermostatController(handler);

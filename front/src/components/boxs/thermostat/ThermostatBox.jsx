@@ -717,24 +717,21 @@ class ThermostatBox extends Component {
     e.preventDefault();
     const angle = getAngleFromPointer(e, this.svgRef);
     if (!isAngleInArc(angle)) return;
-    if (this.state.activePreset === 'off') {
-      const lastPreset = this.getLastActivePreset();
-      this.setState({
-        setpoint: this.angleToTemp(angle),
-        isDragging: true,
-        isManualMode: true,
-        activePreset: lastPreset,
-        manualSetpointOverride: true
-      });
-      this.savePreset(lastPreset);
-    } else {
-      this.setState({
-        setpoint: this.angleToTemp(angle),
-        isDragging: true,
-        isManualMode: true,
-        manualSetpointOverride: true
-      });
-    }
+    // Leaving 'off' by dragging the gauge only changes the preset locally here.
+    // Writing PRESET now would debounce a regulation pass while MANUAL_MODE is
+    // still false, so a drag lasting longer than the debounce — or an unmount
+    // before the release — would let the loop apply the preset and start the
+    // heater without the user ever having released a setpoint. It is written on
+    // release instead, next to MANUAL_MODE and the setpoint.
+    const leavingOff = this.state.activePreset === 'off';
+    const presetOnRelease = leavingOff ? this.getLastActivePreset() : null;
+    this.setState({
+      setpoint: this.angleToTemp(angle),
+      isDragging: true,
+      isManualMode: true,
+      manualSetpointOverride: true,
+      ...(leavingOff ? { activePreset: presetOnRelease } : {})
+    });
     // MANUAL_MODE is written on release, together with the setpoint and the
     // expiry: writing it here would leave the device in manual mode with no
     // MANUAL_UNTIL if the box unmounts mid-drag, and the regulation loop would
@@ -751,6 +748,9 @@ class ThermostatBox extends Component {
     };
     this._onUp = async () => {
       this.stopDrag();
+      if (presetOnRelease) {
+        await this.savePreset(presetOnRelease);
+      }
       await this.saveManualMode(true);
       this.sendSetpoint(lastDragSetpoint);
       this.saveManualSetpoint(lastDragSetpoint);
@@ -762,6 +762,11 @@ class ThermostatBox extends Component {
     window.addEventListener('pointerup', this._onUp);
     window.addEventListener('touchmove', this._onMove, { passive: false });
     window.addEventListener('touchend', this._onUp);
+    // A drag taken over by the browser (scroll, gesture, window switch) fires
+    // cancel and never up: without these the listeners would stay armed and the
+    // setpoint shown on the gauge would never be written.
+    window.addEventListener('pointercancel', this._onUp);
+    window.addEventListener('touchcancel', this._onUp);
   };
 
   stopDrag = () => {
@@ -769,6 +774,8 @@ class ThermostatBox extends Component {
     if (this._onUp) window.removeEventListener('pointerup', this._onUp);
     if (this._onMove) window.removeEventListener('touchmove', this._onMove);
     if (this._onUp) window.removeEventListener('touchend', this._onUp);
+    if (this._onUp) window.removeEventListener('pointercancel', this._onUp);
+    if (this._onUp) window.removeEventListener('touchcancel', this._onUp);
     this._onMove = null;
     this._onUp = null;
     this.setState({ isDragging: false });
