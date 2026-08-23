@@ -191,6 +191,22 @@ The signature widget: an illustration (typically the user's house) with live dev
   - Assets are deleted with their dashboard — explicitly by `dashboard.destroy` (production never sets `PRAGMA foreign_keys`, so the declared FK cascade alone would not fire on SQLite). An asset orphaned by replacing a box image lives until then; a cleanup pass can come later if it ever matters.
 - Optional **night variant**: a second image auto-swapped by sun state — **deferred**, one additive field when it comes, no schema impact.
 
+## E2. New box type: `thermostat`
+
+A circular-gauge widget for the thermostat integration (`docs/specs/thermostat.md`): current temperature and humidity, target setpoint, a preset bar and a drag-to-set dial.
+
+- New `DASHBOARD_BOX_TYPE.THERMOSTAT = 'thermostat'` in `server/utils/constants.js`, stretching as a *tile*.
+- Box config — deliberately **one device-referencing key and nothing else**:
+
+| Key | Meaning |
+|---|---|
+| `thermostat_feature` | selector of the `thermostat` / `target-temperature` feature to display |
+| `name` | optional card title override (shared with every other box type) |
+
+- **Why the config is this small.** Regulation settings — the sensor, the switch, the active schedule, the six preset temperatures, hysteresis, TPI cycle and band — are **device params**, never box fields. Putting them in `t_dashboard.boxes` would make a per-user dashboard document the source of truth of a control loop that turns real heaters on and off: the loop would have to read every dashboard on each tick, including the **private** dashboards of other users, and the same thermostat displayed on two dashboards with different settings would resolve non-deterministically. The widget chooses *which* thermostat to display; it never owns the regulation.
+- `thermostat_feature` is a device-referencing field: it is listed in `FEATURE_STRING_FIELDS` (`server/lib/device/device.migrate.js`) and in `docs/specs/device-migration.md` B.3, so migrating the thermostat device rewrites the widget's selector.
+- Values update live over the device websocket plus the `THERMOSTAT.*` messages (`PRESET_UPDATED`, `MANUAL_MODE_UPDATED`, `CONFIG_UPDATED`) the service broadcasts.
+
 ## F. AI illustration generation through Gladys Plus
 
 Generating the `house-view` illustration is the one step that cannot be beautiful-by-default from a form alone. Gladys Plus already proxies AI calls; illustration generation follows the exact same pattern.
