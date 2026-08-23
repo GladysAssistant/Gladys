@@ -25,19 +25,30 @@ async function createSchedule(scheduleData) {
 
   const selector = slugify(`${validated.name}-${Date.now()}`, true);
 
-  const created = await db.ThermostatSchedule.create(
-    {
-      name: validated.name,
-      selector,
-      slots: validated.slots.map((slot) => ({
-        day_of_week: slot.day_of_week,
-        start_time: slot.start_time,
-        end_time: slot.end_time,
-        preset: slot.preset,
-      })),
-    },
-    { include: [{ model: db.ThermostatScheduleSlot, as: 'slots' }] },
-  );
+  let created;
+  try {
+    created = await db.ThermostatSchedule.create(
+      {
+        name: validated.name,
+        selector,
+        slots: validated.slots.map((slot) => ({
+          day_of_week: slot.day_of_week,
+          start_time: slot.start_time,
+          end_time: slot.end_time,
+          preset: slot.preset,
+        })),
+      },
+      { include: [{ model: db.ThermostatScheduleSlot, as: 'slots' }] },
+    );
+  } catch (e) {
+    // The precheck above is not atomic: two concurrent creates can both find no
+    // duplicate and reach this insert. Report the race the same way, so the
+    // caller sees one message whichever check caught it.
+    if (e.name === 'SequelizeUniqueConstraintError') {
+      throw new Error(`A schedule with the name "${validated.name}" already exists`);
+    }
+    throw e;
+  }
 
   const result = await db.ThermostatSchedule.findByPk(created.id, {
     include: [{ model: db.ThermostatScheduleSlot, as: 'slots' }],

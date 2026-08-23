@@ -20,6 +20,14 @@ const DEFAULT_HYSTERESIS_STOP = 0.5;
 // without the param is regulated exactly as the form displayed it.
 const DEFAULT_TPI_CYCLE_TIME = 30;
 const DEFAULT_TPI_PROPORTIONAL_BAND = 2;
+// Safety floors for the regulation loop. The edit form advertises the same
+// bounds, but an HTML `min` is only a browser hint: a device saved through the
+// API can still carry a 0, which would divide by zero in the TPI computation
+// (band) or modulo by zero in the cycle position (cycle time).
+const MIN_TPI_CYCLE_TIME = 5;
+const MAX_TPI_CYCLE_TIME = 120;
+const MIN_TPI_PROPORTIONAL_BAND = 0.5;
+const MAX_TPI_PROPORTIONAL_BAND = 10;
 
 const DEFAULT_MODE = 'heating';
 const DEFAULT_CONTROL_TYPE = 'hysteresis';
@@ -43,6 +51,10 @@ module.exports = {
   DEFAULT_HYSTERESIS_STOP,
   DEFAULT_TPI_CYCLE_TIME,
   DEFAULT_TPI_PROPORTIONAL_BAND,
+  MIN_TPI_CYCLE_TIME,
+  MAX_TPI_CYCLE_TIME,
+  MIN_TPI_PROPORTIONAL_BAND,
+  MAX_TPI_PROPORTIONAL_BAND,
   DEFAULT_MODE,
   DEFAULT_CONTROL_TYPE,
   DEFAULT_MIN_TEMP,

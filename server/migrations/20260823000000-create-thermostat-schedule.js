@@ -8,6 +8,9 @@ module.exports = {
       },
       name: {
         allowNull: false,
+        // Two concurrent creates can both pass the duplicate precheck, so the
+        // uniqueness has to be enforced by the database as well.
+        unique: true,
         type: Sequelize.STRING,
       },
       selector: {

@@ -133,6 +133,28 @@ describe('thermostat.computeSwitchActive - TPI', () => {
   it('should use the default cycle and band when unset', () => {
     expect(computeSwitchActive(15, 21, 'heating', { control_type: 'tpi' }, false, 0, '')).to.equal(true);
   });
+
+  it('should clamp a zero band instead of dividing by it', () => {
+    // band = 0 gives error/band = Infinity, which would pin the switch ON for
+    // any temperature below the setpoint. Clamped to 0.5, a 0.01 error asks for
+    // 0.2 minute of a 10-minute cycle: below the one-minute floor, so OFF.
+    const config = { control_type: 'tpi', tpi_cycle_time: 10, tpi_proportional_band: 0 };
+    expect(computeSwitchActive(20.99, 21, 'heating', config, false, 0, '')).to.equal(false);
+  });
+
+  it('should clamp a zero cycle time instead of taking a modulo of it', () => {
+    // cycle = 0 makes onMinutes 0 and minuteInCycle NaN: the switch could never
+    // turn on. Clamped to 5 minutes, a full-band error still asks for ON.
+    const config = { control_type: 'tpi', tpi_cycle_time: 0, tpi_proportional_band: 2 };
+    expect(computeSwitchActive(15, 21, 'heating', config, false, 0, '')).to.equal(true);
+  });
+
+  it('should clamp an out-of-range cycle time to the advertised maximum', () => {
+    // 100000 minutes would make a 1-minute regulation step meaningless; the
+    // clamp keeps the cycle at 120 minutes, where a full-band error is ON.
+    const config = { control_type: 'tpi', tpi_cycle_time: 100000, tpi_proportional_band: 2 };
+    expect(computeSwitchActive(15, 21, 'heating', config, false, 0, '')).to.equal(true);
+  });
 });
 
 describe('thermostat.computeSwitchActive - hysteresis', () => {

@@ -73,7 +73,15 @@ module.exports = function ThermostatController(thermostatHandler) {
    */
   async function setSetpoint(req, res) {
     const featureSelector = req.params.feature_selector;
-    const value = Number(req.body.value);
+    // Number('') and Number(null) are both 0, so the raw value has to be
+    // rejected before coercion: an empty body would otherwise be accepted as a
+    // manual hold at 0 °C.
+    const rawValue = req.body ? req.body.value : undefined;
+    if (rawValue === undefined || rawValue === null || rawValue === '') {
+      res.status(400).json({ error: 'INVALID_VALUE' });
+      return;
+    }
+    const value = Number(rawValue);
     if (!Number.isFinite(value)) {
       res.status(400).json({ error: 'INVALID_VALUE' });
       return;
