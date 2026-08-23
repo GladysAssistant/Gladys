@@ -44,8 +44,10 @@ function createActions(store) {
         await state.httpClient.delete(`/api/v1/service/thermostat/schedule/${selector}`);
         const schedules = (state.thermostatSchedules || []).filter(s => s.selector !== selector);
         store.setState({ thermostatSchedules: schedules, deleteScheduleStatus: RequestStatus.Success });
+        return true;
       } catch (e) {
         store.setState({ deleteScheduleStatus: RequestStatus.Error });
+        return false;
       }
     },
 

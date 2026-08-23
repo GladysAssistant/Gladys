@@ -98,6 +98,42 @@ describe('thermostat.createSchedule', () => {
     assert.notCalled(db.ThermostatSchedule.create);
   });
 
+  it('should report a name taken between the precheck and the insert', async () => {
+    // The precheck is not atomic: a concurrent create can take the name in
+    // between, and the database unique constraint is what catches it.
+    const db = buildDb();
+    const uniqueError = new Error('Validation error');
+    uniqueError.name = 'SequelizeUniqueConstraintError';
+    db.ThermostatSchedule.create = fake.rejects(uniqueError);
+    const { createSchedule } = load('createSchedule', db);
+
+    let error = null;
+    try {
+      await createSchedule({ name: 'Work week', slots: [] });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.not.equal(null);
+    expect(error.message).to.contain('already exists');
+  });
+
+  it('should let an unrelated create failure bubble up unchanged', async () => {
+    const db = buildDb();
+    db.ThermostatSchedule.create = fake.rejects(new Error('database is locked'));
+    const { createSchedule } = load('createSchedule', db);
+
+    let error = null;
+    try {
+      await createSchedule({ name: 'Work week', slots: [] });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.not.equal(null);
+    expect(error.message).to.equal('database is locked');
+  });
+
   it('should persist the day coerced by Joi, not the raw string', async () => {
     const db = buildDb();
     const { createSchedule } = load('createSchedule', db);
@@ -180,6 +216,44 @@ describe('thermostat.updateSchedule', () => {
     expect(error).to.not.equal(null);
     expect(error.message).to.contain('already exists');
     assert.notCalled(db.ThermostatScheduleSlot.destroy);
+  });
+
+  it('should report a name taken between the duplicate check and the update', async () => {
+    const db = buildDb({ schedule: { id: 'schedule-id', name: 'Work week' } });
+    const uniqueError = new Error('Validation error');
+    uniqueError.name = 'SequelizeUniqueConstraintError';
+    db.sequelize.transaction = async () => {
+      throw uniqueError;
+    };
+    const { updateSchedule } = load('updateSchedule', db);
+
+    let error = null;
+    try {
+      await updateSchedule('my-schedule', { name: 'Taken', slots: [] });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.not.equal(null);
+    expect(error.message).to.contain('already exists');
+  });
+
+  it('should let an unrelated update failure bubble up unchanged', async () => {
+    const db = buildDb({ schedule: { id: 'schedule-id', name: 'Work week' } });
+    db.sequelize.transaction = async () => {
+      throw new Error('database is locked');
+    };
+    const { updateSchedule } = load('updateSchedule', db);
+
+    let error = null;
+    try {
+      await updateSchedule('my-schedule', { name: 'Taken', slots: [] });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.not.equal(null);
+    expect(error.message).to.equal('database is locked');
   });
 
   it('should persist the day coerced by Joi on update too', async () => {

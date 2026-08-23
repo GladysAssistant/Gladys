@@ -29,24 +29,34 @@ async function updateSchedule(selector, scheduleData) {
   }
 
   // Replace name + slots atomically: a failure mid-way must not lose the existing slots
-  await db.sequelize.transaction(async (transaction) => {
-    await schedule.update({ name: validated.name }, { transaction });
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      await schedule.update({ name: validated.name }, { transaction });
 
-    await db.ThermostatScheduleSlot.destroy({ where: { schedule_id: schedule.id }, transaction });
+      await db.ThermostatScheduleSlot.destroy({ where: { schedule_id: schedule.id }, transaction });
 
-    if (validated.slots.length > 0) {
-      await db.ThermostatScheduleSlot.bulkCreate(
-        validated.slots.map((slot) => ({
-          schedule_id: schedule.id,
-          day_of_week: slot.day_of_week,
-          start_time: slot.start_time,
-          end_time: slot.end_time,
-          preset: slot.preset,
-        })),
-        { transaction },
-      );
+      if (validated.slots.length > 0) {
+        await db.ThermostatScheduleSlot.bulkCreate(
+          validated.slots.map((slot) => ({
+            schedule_id: schedule.id,
+            day_of_week: slot.day_of_week,
+            start_time: slot.start_time,
+            end_time: slot.end_time,
+            preset: slot.preset,
+          })),
+          { transaction },
+        );
+      }
+    });
+  } catch (e) {
+    // The duplicate check above is not atomic: a concurrent create or rename can
+    // take the name between the check and this update. Report the race the same
+    // way, so the caller sees one message whichever check caught it.
+    if (e.name === 'SequelizeUniqueConstraintError') {
+      throw new Error(`A schedule with the name "${validated.name}" already exists`);
     }
-  });
+    throw e;
+  }
 
   const result = await db.ThermostatSchedule.findByPk(schedule.id, {
     include: [{ model: db.ThermostatScheduleSlot, as: 'slots' }],

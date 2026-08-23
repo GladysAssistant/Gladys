@@ -6,6 +6,7 @@ import ThermostatPage from '../ThermostatPage';
 import ScheduleEditor from './ScheduleEditor';
 import style from './style.css';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+import { RequestStatus } from '../../../../../utils/consts';
 
 class SchedulePageComponent extends Component {
   state = {
@@ -62,15 +63,22 @@ class SchedulePageComponent extends Component {
   };
 
   handleDelete = async selector => {
-    await this.props.deleteSchedule(selector);
-    this.setState({ confirmDeleteSelector: null });
+    const deleted = await this.props.deleteSchedule(selector);
+    // Keep the confirmation open on failure: closing it silently would leave the
+    // schedule in the list with no explanation.
+    if (deleted) {
+      this.setState({ confirmDeleteSelector: null });
+    }
   };
 
   render(props, { showEditor, editingSchedule, confirmDeleteSelector }) {
     const { thermostatSchedules, getSchedulesStatus, deleteScheduleStatus } = props;
 
-    const loading = getSchedulesStatus === 'getting';
-    const deleting = deleteScheduleStatus === 'getting';
+    // The actions store RequestStatus values ('Getting', 'Error'), so comparing
+    // against lowercase literals never matched.
+    const loading = getSchedulesStatus === RequestStatus.Getting;
+    const deleting = deleteScheduleStatus === RequestStatus.Getting;
+    const deleteFailed = deleteScheduleStatus === RequestStatus.Error;
 
     return (
       <ThermostatPage>
@@ -95,6 +103,12 @@ class SchedulePageComponent extends Component {
               </div>
             </div>
             <div class="card-body">
+              {deleteFailed && (
+                <div class="alert alert-danger">
+                  <Text id="integration.thermostat.schedule.deleteError" />
+                </div>
+              )}
+
               {loading && (
                 <div class="text-center py-4">
                   <div class="spinner-border text-primary" role="status" />

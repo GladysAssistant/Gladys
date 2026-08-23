@@ -183,6 +183,52 @@ describe('thermostat.controller', () => {
       assert.notCalled(handler.setValue);
     });
 
+    it('should reject an empty value, which Number() would turn into 0', async () => {
+      const handler = buildHandler();
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(
+        routes,
+        route,
+        { params: { feature_selector: 'thermostat-living-room' }, body: { value: '' } },
+        res,
+      );
+
+      expect(res.statusCode).to.equal(400);
+      expect(res.body).to.deep.equal({ error: 'INVALID_VALUE' });
+      assert.notCalled(handler.setValue);
+    });
+
+    it('should reject a null value, which Number() would turn into 0', async () => {
+      const handler = buildHandler();
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(
+        routes,
+        route,
+        { params: { feature_selector: 'thermostat-living-room' }, body: { value: null } },
+        res,
+      );
+
+      expect(res.statusCode).to.equal(400);
+      expect(res.body).to.deep.equal({ error: 'INVALID_VALUE' });
+      assert.notCalled(handler.setValue);
+    });
+
+    it('should reject a body with no value at all', async () => {
+      const handler = buildHandler();
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(routes, route, { params: { feature_selector: 'thermostat-living-room' }, body: {} }, res);
+
+      expect(res.statusCode).to.equal(400);
+      expect(res.body).to.deep.equal({ error: 'INVALID_VALUE' });
+      assert.notCalled(handler.setValue);
+    });
+
     it('should refuse to write a feature that does not belong to this service', async () => {
       const handler = buildHandler();
       const routes = ThermostatController(handler);

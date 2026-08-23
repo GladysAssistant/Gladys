@@ -46,7 +46,12 @@ function createActions(store) {
         });
         store.setState({ temperatureFeatures, humidityFeatures, switchFeatures, openingFeatures });
       } catch (e) {
-        store.setState({ temperatureFeatures: [], humidityFeatures: [], switchFeatures: [] });
+        store.setState({
+          temperatureFeatures: [],
+          humidityFeatures: [],
+          switchFeatures: [],
+          openingFeatures: []
+        });
       }
     },
 
@@ -147,11 +152,13 @@ function createActions(store) {
         const humidityFeature = state.thermostatEditHumidityFeature || '';
         const switchFeature = state.thermostatEditSwitchFeature || '';
         const windowFeature = state.thermostatEditWindowFeature || '';
-        const presetFrost = state.thermostatEditPresetFrost || '7';
-        const presetAway = state.thermostatEditPresetAway || '16';
-        const presetEco = state.thermostatEditPresetEco || '18';
-        const presetNight = state.thermostatEditPresetNight || '17';
-        const presetComfort = state.thermostatEditPresetComfort || '21';
+        // `|| default` would discard an explicitly entered 0, which the preset
+        // inputs accept: toNumber only falls back when the value is not a number.
+        const presetFrost = String(toNumber(state.thermostatEditPresetFrost, 7));
+        const presetAway = String(toNumber(state.thermostatEditPresetAway, 16));
+        const presetEco = String(toNumber(state.thermostatEditPresetEco, 18));
+        const presetNight = String(toNumber(state.thermostatEditPresetNight, 17));
+        const presetComfort = String(toNumber(state.thermostatEditPresetComfort, 21));
         const hysteresisStart = toNumber(state.thermostatEditHysteresisStart, 0.5);
         const hysteresisStop = toNumber(state.thermostatEditHysteresisStop, 0.5);
         const tpiCycleTime = toInt(state.thermostatEditTpiCycleTime, 30);
