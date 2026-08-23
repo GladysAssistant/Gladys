@@ -502,10 +502,12 @@ async function getMoonState(house, now = new Date(), { atMidnight = false } = {}
     next_apogee: findNextExtremum(computedAt, getMoonDistance, false, ANOMALISTIC_MONTH_DAYS + 2),
     // The node is crossed when the ecliptic latitude changes sign
     next_node: findNextZeroCrossing(computedAt, getMoonEclipticLatitude, DRACONIC_MONTH_DAYS + 2, 6),
-    // The moon keeps its direction until it reaches the node, so the node it
-    // is heading to is of the same kind as its current motion: ascending
-    // while it moves north, descending while it moves south.
-    next_node_ascending: ascending,
+    // The node the moon is heading to is the one that brings it back through
+    // the ecliptic plane: northbound while it still stands south of it,
+    // southbound while it stands north of it. Its current direction says
+    // nothing about it, as the moon keeps climbing for about a week after it
+    // has already crossed the ascending node.
+    next_node_ascending: eclipticLatitude < 0,
     next_eclipse: nextEclipse ? nextEclipse.date : null,
     next_eclipse_type: nextEclipse ? nextEclipse.type : null,
   };

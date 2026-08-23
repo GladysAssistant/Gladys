@@ -116,15 +116,33 @@ describe('house.getMoonState', () => {
     // Both happen once per anomalistic month, so within ~28 days
     expect(dayjs(moonState.next_perigee).diff(summerNoon, 'day')).to.be.below(29);
     expect(dayjs(moonState.next_apogee).diff(summerNoon, 'day')).to.be.below(29);
+    // The two extremums are not interchangeable: the moon is closer at the
+    // perigee than at the apogee.
+    const perigeeState = await house.getMoonState(parisHouse, moonState.next_perigee);
+    const apogeeState = await house.getMoonState(parisHouse, moonState.next_apogee);
+    expect(perigeeState.distance).to.be.below(apogeeState.distance);
   });
 
   it('should return the next node with the direction the moon is heading to', async () => {
     const moonState = await house.getMoonState(parisHouse, summerNoon);
     expect(moonState.next_node).to.be.a('date');
-    // The moon keeps its direction until it crosses the node
-    expect(moonState.next_node_ascending).to.equal(moonState.ascending);
     // A node is crossed twice per draconic month, so within ~28 days
     expect(dayjs(moonState.next_node).diff(summerNoon, 'day')).to.be.below(29);
+  });
+
+  it('should head to the descending node while north of the ecliptic and still climbing', async () => {
+    // The moon keeps climbing for about a week after it has crossed the
+    // ascending node, so its current direction says nothing about the node it
+    // is heading to: north of the ecliptic, the next one is always descending.
+    const moonState = await house.getMoonState(parisHouse, new Date('2026-08-28T12:00:00.000Z'));
+    expect(moonState.ascending).to.equal(true);
+    expect(moonState.next_node_ascending).to.equal(false);
+  });
+
+  it('should head to the ascending node while south of the ecliptic and still falling', async () => {
+    const moonState = await house.getMoonState(parisHouse, new Date('2026-09-10T12:00:00.000Z'));
+    expect(moonState.ascending).to.equal(false);
+    expect(moonState.next_node_ascending).to.equal(true);
   });
 
   it('should return a zodiac sign', async () => {
