@@ -150,10 +150,12 @@ describe('thermostat.computeSwitchActive - TPI', () => {
   });
 
   it('should clamp an out-of-range cycle time to the advertised maximum', () => {
-    // 100000 minutes would make a 1-minute regulation step meaningless; the
-    // clamp keeps the cycle at 120 minutes, where a full-band error is ON.
+    // Half a band of error asks for half the cycle ON. At minute 60 of a cycle
+    // clamped to 120 minutes, that window is over, so the switch is OFF. Without
+    // the clamp the 100000-minute cycle would still be inside its 50000-minute
+    // ON window and the call would return true.
     const config = { control_type: 'tpi', tpi_cycle_time: 100000, tpi_proportional_band: 2 };
-    expect(computeSwitchActive(15, 21, 'heating', config, false, 0, '')).to.equal(true);
+    expect(computeSwitchActive(20, 21, 'heating', config, false, 60 * 60 * 1000, '')).to.equal(false);
   });
 });
 
