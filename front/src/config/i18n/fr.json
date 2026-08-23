@@ -72,6 +72,7 @@
       "modalTitle": "Migrer « {{name}} »",
       "description": "Migrez cet appareil vers un appareil d'une autre intégration : son <b>historique d'états</b>, les <b>scènes</b> et les <b>tableaux de bord</b> qui l'utilisent seront déplacés vers l'appareil de destination, puis <b>cet appareil sera supprimé</b>. Si les deux appareils ont enregistré des états sur la même période, seul l'historique antérieur au premier état de la destination est déplacé, afin de ne rien compter en double.",
       "destinationLabel": "Appareil de destination",
+      "unknownIntegration": "Intégration inconnue",
       "featuresTitle": "Correspondance des fonctionnalités",
       "doNotMigrate": "Ne pas migrer",
       "typeMismatchWarning": "Cette fonctionnalité a un type différent de la fonctionnalité source : son historique risque de ne plus avoir de sens une fois migré.",

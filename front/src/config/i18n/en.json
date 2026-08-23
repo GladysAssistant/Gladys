@@ -72,6 +72,7 @@
       "modalTitle": "Migrate \"{{name}}\"",
       "description": "Migrate this device to a device of another integration: its <b>state history</b>, the <b>scenes</b> and the <b>dashboards</b> referencing it will be moved to the destination device, then <b>this device will be deleted</b>. If both devices recorded states during the same period, only the history older than the destination's first state is moved, so nothing is counted twice.",
       "destinationLabel": "Destination device",
+      "unknownIntegration": "Unknown integration",
       "featuresTitle": "Feature matching",
       "doNotMigrate": "Do not migrate",
       "typeMismatchWarning": "This feature has a different type than the source feature: its history may not make sense once migrated.",

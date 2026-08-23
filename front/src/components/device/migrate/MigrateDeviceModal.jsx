@@ -6,14 +6,8 @@ import Select from 'react-select';
 import get from 'get-value';
 
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import normalizeSearchText from '../../../utils/normalizeSearchText';
 import style from './style.css';
-
-// Search should not care about case or accents ("temperature" must match "Température")
-const normalizeSearchString = str =>
-  str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
 
 class MigrateDeviceModal extends Component {
   state = {
@@ -95,9 +89,10 @@ class MigrateDeviceModal extends Component {
   // don't get confused with one another, and each option shows the room name
   // for the same reason. searchText lets typing match on room/integration too.
   getDeviceOptions = () => {
+    const unknownIntegrationLabel = get(this.props, 'intl.dictionary.device.migrate.unknownIntegration');
     const groupsByService = new Map();
     this.state.devices.forEach(candidate => {
-      const serviceName = candidate.service ? candidate.service.name : '';
+      const serviceName = candidate.service ? candidate.service.name : unknownIntegrationLabel;
       if (!groupsByService.has(serviceName)) {
         groupsByService.set(serviceName, []);
       }
@@ -106,7 +101,7 @@ class MigrateDeviceModal extends Component {
       groupsByService.get(serviceName).push({
         value: candidate.selector,
         label,
-        searchText: normalizeSearchString(`${serviceName} ${roomName} ${label}`)
+        searchText: normalizeSearchText(`${serviceName} ${roomName} ${label}`)
       });
     });
     const sortByLabel = (a, b) => a.label.localeCompare(b.label);
@@ -123,8 +118,8 @@ class MigrateDeviceModal extends Component {
     if (!rawInput) {
       return true;
     }
-    const searchText = option.data.searchText || normalizeSearchString(option.label);
-    return normalizeSearchString(rawInput)
+    const searchText = option.data.searchText || normalizeSearchText(option.label);
+    return normalizeSearchText(rawInput)
       .split(/\s+/)
       .filter(Boolean)
       .every(word => searchText.includes(word));

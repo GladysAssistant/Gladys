@@ -72,6 +72,7 @@
       "modalTitle": "„{{name}}“ migrieren",
       "description": "Migriere dieses Gerät zu einem Gerät einer anderen Integration: sein <b>Zustandsverlauf</b>, die <b>Szenen</b> und die <b>Dashboards</b>, die es verwenden, werden auf das Zielgerät übertragen, danach wird <b>dieses Gerät gelöscht</b>. Haben beide Geräte im selben Zeitraum Zustände aufgezeichnet, wird nur der Verlauf vor dem ersten Zustand des Zielgeräts übernommen, damit nichts doppelt gezählt wird.",
       "destinationLabel": "Zielgerät",
+      "unknownIntegration": "Unbekannte Integration",
       "featuresTitle": "Zuordnung der Funktionen",
       "doNotMigrate": "Nicht migrieren",
       "typeMismatchWarning": "Diese Funktion hat einen anderen Typ als die Quellfunktion: ihr Verlauf ergibt nach der Migration möglicherweise keinen Sinn mehr.",
