@@ -1,0 +1,16 @@
+{
+  "name": "gladys-thermostat",
+  "version": "1.0.0",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {}
+}
