@@ -8,6 +8,13 @@ import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
 
+// Search should not care about case or accents ("temperature" must match "Température")
+const normalizeSearchString = str =>
+  str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+
 class MigrateDeviceModal extends Component {
   state = {
     loading: true,
@@ -77,6 +84,50 @@ class MigrateDeviceModal extends Component {
     }
     const destinationDevice = this.state.devices.find(device => device.selector === option.value);
     this.setState({ destinationDevice, featuresMapping: this.computeAutoMapping(destinationDevice) });
+  };
+
+  getDeviceLabel = device => {
+    const roomName = device.room ? device.room.name : get(this.props, 'intl.dictionary.device.noRoom');
+    return `${device.name} (${roomName})`;
+  };
+
+  // Options are grouped by integration (service) so that same-named devices
+  // don't get confused with one another, and each option shows the room name
+  // for the same reason. searchText lets typing match on room/integration too.
+  getDeviceOptions = () => {
+    const groupsByService = new Map();
+    this.state.devices.forEach(candidate => {
+      const serviceName = candidate.service ? candidate.service.name : '';
+      if (!groupsByService.has(serviceName)) {
+        groupsByService.set(serviceName, []);
+      }
+      const label = this.getDeviceLabel(candidate);
+      const roomName = candidate.room ? candidate.room.name : get(this.props, 'intl.dictionary.device.noRoom');
+      groupsByService.get(serviceName).push({
+        value: candidate.selector,
+        label,
+        searchText: normalizeSearchString(`${serviceName} ${roomName} ${label}`)
+      });
+    });
+    const sortByLabel = (a, b) => a.label.localeCompare(b.label);
+    return Array.from(groupsByService.entries())
+      .sort(([serviceNameA], [serviceNameB]) => serviceNameA.localeCompare(serviceNameB))
+      .map(([serviceName, options]) => ({
+        label: serviceName,
+        options: options.sort(sortByLabel)
+      }));
+  };
+
+  // Every typed word must match (implicit AND) against integration + room + name
+  filterOption = (option, rawInput) => {
+    if (!rawInput) {
+      return true;
+    }
+    const searchText = option.data.searchText || normalizeSearchString(option.label);
+    return normalizeSearchString(rawInput)
+      .split(/\s+/)
+      .filter(Boolean)
+      .every(word => searchText.includes(word));
   };
 
   // A source feature is auto-matched when exactly one unused destination
@@ -217,10 +268,8 @@ class MigrateDeviceModal extends Component {
   ) {
     const sourceFeatures = device.features || [];
     const unmappedFeatures = sourceFeatures.filter(feature => !featuresMapping[feature.selector]);
-    const deviceOptions = devices.map(candidate => ({
-      value: candidate.selector,
-      label: candidate.name
-    }));
+    const deviceGroups = this.getDeviceOptions();
+    const hasDeviceOptions = devices.length > 0;
     return (
       <div class={style.modalOverlay} onClick={this.handleOverlayClick}>
         <div class={style.modalDialog}>
@@ -270,21 +319,23 @@ class MigrateDeviceModal extends Component {
                           <Text id="device.migrate.loadError" />
                         </div>
                       )}
-                      {!loadError && deviceOptions.length === 0 && !loading && (
+                      {!loadError && !hasDeviceOptions && !loading && (
                         <div class="alert alert-info">
                           <Text id="device.migrate.noDestinationAvailable" />
                         </div>
                       )}
-                      {deviceOptions.length > 0 && (
+                      {hasDeviceOptions && (
                         <div class="form-group">
                           <label class="form-label">
                             <Text id="device.migrate.destinationLabel" />
                           </label>
                           <Select
-                            options={deviceOptions}
+                            options={deviceGroups}
+                            filterOption={this.filterOption}
+                            menuPlacement="auto"
                             value={
                               destinationDevice
-                                ? { value: destinationDevice.selector, label: destinationDevice.name }
+                                ? { value: destinationDevice.selector, label: this.getDeviceLabel(destinationDevice) }
                                 : null
                             }
                             onChange={this.selectDestination}
