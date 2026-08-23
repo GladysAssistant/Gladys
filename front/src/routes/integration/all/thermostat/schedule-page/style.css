@@ -1,0 +1,316 @@
+/* ─── Schedule Editor : vertical day list ─── */
+
+.dayList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.dayRow {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.dayRow:last-child {
+  border-bottom: none;
+}
+
+.dayRowOpen {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.dayClickZone {
+  cursor: pointer;
+  user-select: none;
+}
+
+.dayClickZone:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.dayRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 6px 16px;
+}
+
+.dayLabel {
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+}
+
+.dayChevron {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+/* ─── 24h time bar ─── */
+
+.timeBarWrapper {
+  padding: 2px 16px 12px 16px;
+}
+
+.timeBar {
+  display: flex;
+  height: 14px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: transparent;
+  outline: 1px solid rgba(0, 0, 0, 0.06);
+  outline-offset: -1px;
+}
+
+.timeBarSegment {
+  height: 100%;
+  width: var(--seg-width);
+  background: var(--seg-color);
+  flex-shrink: 0;
+}
+
+:global(.dark-mode) .timeBarWrapper {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+.timeBarMarkers {
+  position: relative;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.timeMarker {
+  position: absolute;
+  left: var(--marker-left);
+  transform: translateX(-50%);
+  font-size: 0.68rem;
+  color: #868e96;
+  white-space: nowrap;
+  line-height: 18px;
+}
+
+.timeMarkerFixed {
+  color: #adb5bd;
+  font-size: 0.65rem;
+  opacity: 0.8;
+}
+
+/* ─── Day edit panel ─── */
+
+.dayPanel {
+  padding: 10px 16px 14px 16px;
+  border-top: 1px dashed #dee2e6;
+}
+
+.noSlotsText {
+  font-size: 0.85rem;
+}
+
+.slotEditorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.slotEditorRow:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: #dee2e6;
+}
+
+.slotTimeDisplay {
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  color: #212529;
+  min-width: 42px;
+}
+
+.slotPresetLabel {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.slotEditIcon {
+  color: #adb5bd;
+  font-size: 0.8rem;
+  margin-left: auto;
+}
+
+.newSlotForm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: rgba(32, 107, 196, 0.07);
+  border: 1px dashed #74c0fc;
+  border-radius: 6px;
+}
+
+.editSlotForm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: rgba(240, 173, 78, 0.08);
+  border: 1px dashed #f59f00;
+  border-radius: 6px;
+}
+
+.slotColorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--dot-color, #adb5bd);
+}
+
+:global(.dark-mode) .slotColorDot {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+
+.slotTimeInput {
+  width: 90px !important;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.slotArrow {
+  color: #6c757d;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.slotPresetSelect {
+  flex: 1;
+  min-width: 80px;
+}
+
+.dayPanelActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ─── Copy to days picker ─── */
+
+.copyPicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(0,40,100,0.12);
+  border-radius: 4px;
+  font-size: 0.82rem;
+}
+
+.copyPickerLabel {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.copyPickerDay {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ─── Save row ─── */
+
+.saveRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ─── Schedule list cards ─── */
+
+.scheduleCard {
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  border-radius: 3px;
+  margin-bottom: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+}
+
+.scheduleCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 40, 100, 0.06);
+}
+
+.scheduleCardTitle {
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0;
+  color: #495057;
+}
+
+.scheduleCardActions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ─── Summary mini-bars in schedule list ─── */
+
+.scheduleSummaryBars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summaryDayRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summaryDayName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.summaryBar {
+  flex: 1;
+  height: 8px;
+  border-radius: 3px;
+  background: #e9ecef;
+  display: flex;
+  overflow: hidden;
+}
+
+.summaryBarSegment {
+  height: 100%;
+  width: var(--seg-width);
+  background: var(--seg-color);
+  flex-shrink: 0;
+}
+
+.emptyIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 8px;
+}
