@@ -333,18 +333,6 @@
   border-color: #467fcf;
 }
 
-/* Manual mode icon in SVG */
-.manualModeIcon {
-  font-size: 18px;
-  opacity: 0.7;
-  animation: manualModePulse 2s ease-in-out infinite;
-}
-
-@keyframes manualModePulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.9; }
-}
-
 /* Schedule banner (planning mode) */
 .scheduleBanner {
   display: flex;

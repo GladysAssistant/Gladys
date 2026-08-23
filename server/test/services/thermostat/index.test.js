@@ -6,6 +6,11 @@ const { fake, assert } = sinon;
 
 const { EVENTS } = require('../../../utils/constants');
 
+// Every service built by a test is tracked here so afterEach can stop it: start()
+// arms a real 60-second setInterval whenever no fake clock is installed, and a
+// timer left behind keeps the Node event loop alive after the suite is done.
+const builtServices = [];
+
 const buildService = ({ applySchedulesFails = false } = {}) => {
   const handler = {
     applySchedules: applySchedulesFails ? fake.rejects(new Error('boom')) : fake.resolves(null),
@@ -30,11 +35,16 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
       removeListener: fake.returns(null),
     },
   };
-  return { service: ThermostatService(gladys, 'service-id'), gladys, handler, controllers };
+  const service = ThermostatService(gladys, 'service-id');
+  builtServices.push(service);
+  return { service, gladys, handler, controllers };
 };
 
 describe('ThermostatService', () => {
-  afterEach(() => {
+  afterEach(async () => {
+    // Stop before restoring the sandbox: a fake clock still installed here lets
+    // stop() clear its own interval instead of leaving a real one armed.
+    await Promise.all(builtServices.splice(0).map((service) => service.stop()));
     sinon.restore();
   });
 
