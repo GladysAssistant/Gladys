@@ -7,6 +7,7 @@ import get from 'get-value';
 
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import normalizeSearchText from '../../../utils/normalizeSearchText';
+import { getDeviceIntegration, disambiguateIntegrationNames } from '../../../routes/devices/integrationLinks';
 import style from './style.css';
 
 class MigrateDeviceModal extends Component {
@@ -85,32 +86,45 @@ class MigrateDeviceModal extends Component {
     return `${device.name} (${roomName})`;
   };
 
-  // Options are grouped by integration (service) so that same-named devices
-  // don't get confused with one another, and each option shows the room name
-  // for the same reason. searchText lets typing match on room/integration too.
+  // Options are grouped by integration so that same-named devices don't get
+  // confused with one another, and each option shows the room name for the
+  // same reason. Grouping is keyed on the integration's slug (technical
+  // identity), but the group is labelled and searched on the same
+  // human-readable, translated/disambiguated name shown on the devices page
+  // (getDeviceIntegration/disambiguateIntegrationNames), so e.g. a French
+  // user typing "Caméras" still finds "rtsp-camera" devices.
   getDeviceOptions = () => {
     const unknownIntegrationLabel = get(this.props, 'intl.dictionary.device.migrate.unknownIntegration');
-    const groupsByService = new Map();
-    this.state.devices.forEach(candidate => {
-      const serviceName = candidate.service ? candidate.service.name : unknownIntegrationLabel;
-      if (!groupsByService.has(serviceName)) {
-        groupsByService.set(serviceName, []);
+    const integrations = this.state.devices.map(candidate => getDeviceIntegration(candidate));
+    const nameBySlug = disambiguateIntegrationNames(integrations);
+    const getIntegrationLabel = integration => {
+      if (!integration) {
+        return unknownIntegrationLabel;
+      }
+      const translated = integration.i18nKey && get(this.props, `intl.dictionary.${integration.i18nKey}`);
+      return translated || nameBySlug.get(integration.slug) || integration.name;
+    };
+
+    const groupsBySlug = new Map();
+    this.state.devices.forEach((candidate, index) => {
+      const integration = integrations[index];
+      const groupKey = integration ? integration.slug : '';
+      const integrationLabel = getIntegrationLabel(integration);
+      if (!groupsBySlug.has(groupKey)) {
+        groupsBySlug.set(groupKey, { label: integrationLabel, options: [] });
       }
       const label = this.getDeviceLabel(candidate);
       const roomName = candidate.room ? candidate.room.name : get(this.props, 'intl.dictionary.device.noRoom');
-      groupsByService.get(serviceName).push({
+      groupsBySlug.get(groupKey).options.push({
         value: candidate.selector,
         label,
-        searchText: normalizeSearchText(`${serviceName} ${roomName} ${label}`)
+        searchText: normalizeSearchText(`${integrationLabel} ${roomName} ${label}`)
       });
     });
     const sortByLabel = (a, b) => a.label.localeCompare(b.label);
-    return Array.from(groupsByService.entries())
-      .sort(([serviceNameA], [serviceNameB]) => serviceNameA.localeCompare(serviceNameB))
-      .map(([serviceName, options]) => ({
-        label: serviceName,
-        options: options.sort(sortByLabel)
-      }));
+    return Array.from(groupsBySlug.values())
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .map(group => ({ ...group, options: group.options.sort(sortByLabel) }));
   };
 
   // Every typed word must match (implicit AND) against integration + room + name
@@ -328,6 +342,8 @@ class MigrateDeviceModal extends Component {
                             options={deviceGroups}
                             filterOption={this.filterOption}
                             menuPlacement="auto"
+                            menuPortalTarget={document.body}
+                            classNamePrefix="react-select"
                             value={
                               destinationDevice
                                 ? { value: destinationDevice.selector, label: this.getDeviceLabel(destinationDevice) }
