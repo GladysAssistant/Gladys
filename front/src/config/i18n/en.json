@@ -6158,13 +6158,14 @@
     "voiceInput": {
       "startListening": "Dictate a message",
       "stopListening": "Stop dictation",
-      "error": "Speech recognition failed. Please try again.",
+      "error": "Dictation failed. Check that Gladys Plus is connected, then try again.",
       "errorNoSpeech": "No voice detected. Check that your microphone is enabled, then try again.",
       "errorPermissionDenied": "Microphone access was denied. Allow it in your browser settings to dictate a message.",
       "errorNoMicrophone": "No microphone detected. Plug one in or enable it in system settings.",
-      "errorNetwork": "Speech recognition is unavailable, your browser could not reach its speech service.",
-      "errorNotSupported": "Speech recognition is not available in this browser.",
-      "browserTranscriptionNotice": "If you dictate a message, your browser transcribes what you say: Gladys neither records nor uploads any audio. Depending on your browser, the audio may be processed on your device or sent to your browser's own speech recognition service."
+      "errorMicrophoneUnavailable": "The microphone is unavailable. Check that it is not in use by another app.",
+      "errorNoTranscription": "I could not understand your message. Speak closer to the microphone and try again.",
+      "errorNotSupported": "Voice recording is not available in this browser.",
+      "gladysPlusTranscriptionNotice": "When you dictate a message, the audio is transcribed by Gladys Plus, the same speech recognition as the dashboard voice assistant. Recording stops when you pause, and the message is only sent when you press send."
     }
   },
   "history": {

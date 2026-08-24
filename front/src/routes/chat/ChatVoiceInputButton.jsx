@@ -1,253 +1,268 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { createSpeechRecognition } from '../../utils/speechRecognition';
+import { normalizeSpeechBlobForStt } from '../../utils/speechAudioForStt';
+import { isSpeechRecordingError } from '../../utils/speechMicrophoneAccess';
+import { prepareSpeechCommandRecording, preloadSpeechCommandRecorder } from '../../utils/speechCommandRecorder';
+import { isRecordUntilSilenceAbortError, recordUntilSilence } from '../../utils/recordUntilSilence';
 import style from './style.css';
 
-/** How long the input stays locked when a stopped session never fires `onend`. */
-const STOPPING_TIMEOUT_MS = 5000;
+const STATUS = {
+  IDLE: 'idle',
+  LISTENING: 'listening',
+  PROCESSING: 'processing'
+};
+
+/**
+ * @description Returns true when the error comes from an aborted recording or request.
+ * @param {Error} error - Caught error.
+ * @returns {boolean} Whether the error is an abort error.
+ */
+function isAbortError(error) {
+  if (isRecordUntilSilenceAbortError(error)) {
+    return true;
+  }
+  if (error && (error.code === 'ERR_CANCELED' || error.name === 'CanceledError')) {
+    return true;
+  }
+  return Boolean(error && error.name === 'AbortError');
+}
+
+/**
+ * @description Map a recording or STT error to a `chat.voiceInput` i18n key.
+ * @param {Error} error - Caught error.
+ * @returns {string} i18n key suffix.
+ */
+function getVoiceInputErrorKey(error) {
+  if (isSpeechRecordingError(error)) {
+    if (error.code === 'INSECURE_CONTEXT' || error.code === 'NOT_SUPPORTED') {
+      return 'errorNotSupported';
+    }
+    if (error.code === 'PERMISSION_DENIED') {
+      return 'errorPermissionDenied';
+    }
+    if (error.code === 'NO_MICROPHONE') {
+      return 'errorNoMicrophone';
+    }
+    if (error.code === 'MICROPHONE_UNAVAILABLE') {
+      return 'errorMicrophoneUnavailable';
+    }
+    if (error.code === 'NO_SPEECH') {
+      return 'errorNoSpeech';
+    }
+  }
+  const serverMessage = error && error.response && error.response.data && error.response.data.message;
+  if (serverMessage === 'EMPTY_TRANSCRIPTION') {
+    return 'errorNoTranscription';
+  }
+  return 'error';
+}
+
+/**
+ * @description Extract the transcription text from the Gladys Plus STT response.
+ * @param {object|string} sttResponse - STT API response.
+ * @returns {string} Transcription text.
+ */
+function extractTranscription(sttResponse) {
+  if (!sttResponse) {
+    return '';
+  }
+  if (typeof sttResponse === 'string') {
+    return sttResponse.trim();
+  }
+  const text = sttResponse.text || sttResponse.transcription || sttResponse.transcript || '';
+  return typeof text === 'string' ? text.trim() : '';
+}
 
 /**
  * Microphone button dictating what the user says in the chat message input.
- * Everything is handled by the browser with the Web Speech API: Gladys never
- * records or uploads any audio. The message is not sent automatically, the
- * user reviews the transcription and presses send.
+ * The audio is recorded by the browser until the user stops speaking, then
+ * transcribed by the Gladys Plus STT API — the same path as the dashboard
+ * voice assistant widget. The message is not sent automatically: the
+ * transcription fills the input and the user reviews it before pressing send.
  */
 class ChatVoiceInputButton extends Component {
   state = {
-    listening: false,
-    // True between the moment the user asked to stop and the moment the browser
-    // says the session ended: `stop()` still delivers a final result before
-    // `onend`, so the input must stay locked until then.
-    stopping: false
+    status: STATUS.IDLE
   };
 
   /** Text already in the input when the user started to talk. */
   baseText = '';
 
-  recognition = null;
-
-  /** Previous session which was asked to end and has not fired `onend` yet. */
-  endingRecognition = null;
-
   /**
-   * Incremented at each new session, so a session which is ending cannot reset
-   * the state of the session which just started.
+   * Incremented at each new dictation, so a cancelled session cannot update
+   * the input or the state of the session which replaced it.
    */
-  recognitionGeneration = 0;
+  sessionGeneration = 0;
 
-  /** True when the browser refused to start while the previous session was still running. */
-  startWhenPreviousEnded = false;
+  activeAbortController = null;
 
-  /** Last state reported to the parent, which locks the input while it is true. */
-  reportedListening = false;
+  /** Last locked state reported to the parent, which freezes the input while true. */
+  reportedBusy = false;
 
-  /** Safety net, in case a browser never fires `onend` after a `stop()`. */
-  stoppingTimeout = null;
+  _isMounted = false;
 
-  componentWillUnmount() {
-    this.recognitionGeneration += 1;
-    this.startWhenPreviousEnded = false;
-    this.clearStoppingTimeout();
-    if (this.recognition) {
-      this.recognition.abort();
-      this.recognition = null;
-    }
-    if (this.endingRecognition) {
-      this.endingRecognition.abort();
-      this.endingRecognition = null;
-    }
+  componentDidMount() {
+    this._isMounted = true;
+    this.preloadRecorder();
   }
 
-  clearStoppingTimeout = () => {
-    if (this.stoppingTimeout) {
-      clearTimeout(this.stoppingTimeout);
-      this.stoppingTimeout = null;
-    }
-  };
+  componentWillUnmount() {
+    this._isMounted = false;
+    this.cancelListening();
+  }
 
   /**
-   * @description Update the button state, and tell the parent whether the input
-   * must stay locked. It stays locked while a session is stopping, because a
-   * final result can still arrive and rewrite what the user typed meanwhile.
-   * @param {boolean} listening - True while a session is running.
-   * @param {boolean} stopping - True while a stopped session has not ended yet.
+   * @description Warm up the audio worklet so the first click starts recording faster.
    */
-  setListening = (listening, stopping = false) => {
-    if (!stopping) {
-      this.clearStoppingTimeout();
-    }
-    if (this.state.listening !== listening || this.state.stopping !== stopping) {
-      this.setState({ listening, stopping });
-    }
-    const shouldLock = listening || stopping;
-    if (this.reportedListening === shouldLock) {
+  preloadRecorder = async () => {
+    try {
+      await preloadSpeechCommandRecorder();
+    } catch (e) {}
+  };
+
+  isSessionActive = generation => generation === this.sessionGeneration;
+
+  setStatus = (status, generation) => {
+    if (generation !== undefined && !this.isSessionActive(generation)) {
       return;
     }
-    this.reportedListening = shouldLock;
-    if (this.props.onListeningChange) {
-      this.props.onListeningChange(shouldLock);
+    if (this._isMounted && this.state.status !== status) {
+      this.setState({ status });
     }
-  };
-
-  handleTranscript = transcript => {
-    const trimmedTranscript = transcript.trim();
-    if (trimmedTranscript.length === 0) {
-      this.props.onTranscript(this.baseText);
-      return;
-    }
-    const separator = this.baseText.length > 0 && !/\s$/.test(this.baseText) ? ' ' : '';
-    this.props.onTranscript(`${this.baseText}${separator}${trimmedTranscript}`);
-  };
-
-  handleError = errorKey => {
-    this.props.onError(errorKey);
-  };
-
-  handleEnd = generation => {
-    if (generation !== this.recognitionGeneration) {
-      // An older session ended after a new one started: it must not stop it. It
-      // can only unblock it, when the browser refused to start while it was
-      // still running.
-      this.endingRecognition = null;
-      if (this.startWhenPreviousEnded) {
-        this.startWhenPreviousEnded = false;
-        this.startRecognition();
+    const busy = status !== STATUS.IDLE;
+    if (this.reportedBusy !== busy) {
+      this.reportedBusy = busy;
+      if (this.props.onListeningChange) {
+        this.props.onListeningChange(busy);
       }
-      return;
     }
-    this.recognition = null;
-    this.setListening(false);
   };
 
   /**
-   * @description Create and start a new recognition session.
+   * @description Pre-open the microphone stream on pointer down, so the click
+   * starts recording without waiting for getUserMedia (only when the
+   * permission is already granted, so no prompt is shown early).
    */
-  startRecognition = () => {
-    this.baseText = this.props.currentText || '';
-    this.recognitionGeneration += 1;
-    const generation = this.recognitionGeneration;
-    const isCurrentSession = () => generation === this.recognitionGeneration;
-    const recognition = createSpeechRecognition({
-      language: this.props.language,
-      onTranscript: transcript => {
-        if (isCurrentSession()) {
-          this.handleTranscript(transcript);
-        }
-      },
-      onError: errorKey => {
-        if (isCurrentSession()) {
-          this.handleError(errorKey);
-        }
-      },
-      onEnd: () => this.handleEnd(generation)
-    });
-    if (!recognition) {
-      this.props.onError('errorNotSupported');
-      this.setListening(false);
+  prepareRecording = async () => {
+    if (this.state.status !== STATUS.IDLE) {
       return;
     }
-    this.recognition = recognition;
-    this.setListening(true);
-    if (recognition.start()) {
-      return;
-    }
-    this.recognition = null;
-    if (this.endingRecognition) {
-      // Chromium refuses a new session while the previous one is still running:
-      // it is started again as soon as the browser tells us that one ended.
-      this.startWhenPreviousEnded = true;
-      return;
-    }
-    // The browser refused to start: don't leave a button saying we listen.
-    this.setListening(false);
-    this.props.onError('error');
+    try {
+      await prepareSpeechCommandRecording();
+    } catch (e) {}
   };
 
-  startListening = () => {
+  /**
+   * @description Record until silence, send the audio to the Gladys Plus STT
+   * API and append the transcription to the message input.
+   */
+  startListening = async () => {
     this.props.onError(null);
-    if (this.recognition) {
-      // The previous session was stopped and has not ended yet. The new one is
-      // still started right away, in the same click: Safari (especially on iOS)
-      // refuses `start()` outside of the gesture which granted the microphone,
-      // so waiting for `onend` to start would break dictating there. Browsers
-      // which refuse a second session instead (Chromium) go through the
-      // `startWhenPreviousEnded` path, which does not need a gesture.
-      this.endingRecognition = this.recognition;
-      this.recognition = null;
-    }
-    this.startRecognition();
-  };
+    this.baseText = this.props.currentText || '';
+    this.sessionGeneration += 1;
+    const generation = this.sessionGeneration;
+    const abortController = new AbortController();
+    this.activeAbortController = abortController;
+    this.setStatus(STATUS.LISTENING, generation);
 
-  /**
-   * @description Stop listening, keeping what was already transcribed in the input.
-   */
-  stopListening = () => {
-    this.startWhenPreviousEnded = false;
-    if (!this.recognition) {
-      this.setListening(false);
-      return;
-    }
-    // The session is kept until the browser tells us it ended, so the next
-    // one is not started while this one is still running.
-    this.recognition.stop();
-    // The button goes back to its idle look right away, but the input stays
-    // locked until `onend`: `stop()` still delivers the final result of what
-    // was said, which would otherwise overwrite an edit made in between.
-    this.setListening(false, true);
-    this.clearStoppingTimeout();
-    this.stoppingTimeout = setTimeout(() => {
-      this.stoppingTimeout = null;
-      if (this.state.stopping) {
-        // A browser which never fired `onend` must not leave a locked input.
-        this.setListening(false);
+    try {
+      const recordedBlob = await recordUntilSilence({ signal: abortController.signal });
+      if (!this.isSessionActive(generation)) {
+        return;
       }
-    }, STOPPING_TIMEOUT_MS);
+      this.setStatus(STATUS.PROCESSING, generation);
+
+      const audioBlob = await normalizeSpeechBlobForStt(recordedBlob);
+      if (!this.isSessionActive(generation)) {
+        return;
+      }
+
+      const sttResponse = await this.props.httpClient.postBinary(
+        '/api/v1/gateway/stt',
+        audioBlob,
+        audioBlob.type || 'audio/wav',
+        { signal: abortController.signal }
+      );
+      if (!this.isSessionActive(generation)) {
+        return;
+      }
+
+      const transcription = extractTranscription(sttResponse);
+      if (!transcription) {
+        this.props.onError('errorNoTranscription');
+        this.setStatus(STATUS.IDLE, generation);
+        return;
+      }
+
+      const separator = this.baseText.length > 0 && !/\s$/.test(this.baseText) ? ' ' : '';
+      this.props.onTranscript(`${this.baseText}${separator}${transcription}`);
+      this.setStatus(STATUS.IDLE, generation);
+    } catch (e) {
+      if (!this.isSessionActive(generation)) {
+        return;
+      }
+      this.setStatus(STATUS.IDLE, generation);
+      if (isAbortError(e)) {
+        return;
+      }
+      console.error(e);
+      this.props.onError(getVoiceInputErrorKey(e));
+    } finally {
+      if (this.activeAbortController === abortController) {
+        this.activeAbortController = null;
+      }
+    }
   };
 
   /**
-   * @description Stop listening and drop the words still being transcribed.
-   * Called when the message is sent, so a late transcription does not refill
-   * the input the user just emptied.
+   * @description Cancel the running dictation and drop the recorded audio.
+   * Also called by the parent when the message is sent, so a late
+   * transcription does not refill the input the user just emptied.
    */
   cancelListening = () => {
-    this.startWhenPreviousEnded = false;
-    this.recognitionGeneration += 1;
-    if (this.recognition) {
-      this.recognition.abort();
-      this.recognition = null;
+    this.sessionGeneration += 1;
+    if (this.activeAbortController) {
+      this.activeAbortController.abort();
+      this.activeAbortController = null;
     }
-    if (this.endingRecognition) {
-      this.endingRecognition.abort();
-      this.endingRecognition = null;
-    }
-    this.setListening(false);
+    this.setStatus(STATUS.IDLE);
   };
 
   handleClick = () => {
-    if (this.state.listening) {
-      this.stopListening();
-    } else {
+    if (this.state.status === STATUS.IDLE) {
       this.startListening();
+    } else {
+      this.cancelListening();
     }
   };
 
-  render(props, { listening }) {
-    const labelKey = listening ? 'chat.voiceInput.stopListening' : 'chat.voiceInput.startListening';
+  render(props, { status }) {
+    const labelKey = status === STATUS.IDLE ? 'chat.voiceInput.startListening' : 'chat.voiceInput.stopListening';
 
     return (
       <Localizer>
         <button
           type="button"
           class={cx('btn', style.voiceInputButton, {
-            [style.voiceInputButtonListening]: listening
+            [style.voiceInputButtonListening]: status === STATUS.LISTENING,
+            [style.voiceInputButtonProcessing]: status === STATUS.PROCESSING
           })}
+          onPointerDown={this.prepareRecording}
           onClick={this.handleClick}
           title={<Text id={labelKey} />}
           aria-label={<Text id={labelKey} />}
-          aria-pressed={listening ? 'true' : 'false'}
+          aria-pressed={status !== STATUS.IDLE ? 'true' : 'false'}
         >
-          <i class={cx('fe', listening ? 'fe-square' : 'fe-mic')} aria-hidden="true" />
+          <i
+            class={cx('fe', {
+              'fe-mic': status === STATUS.IDLE,
+              'fe-square': status === STATUS.LISTENING,
+              'fe-loader': status === STATUS.PROCESSING,
+              [style.voiceInputSpinner]: status === STATUS.PROCESSING
+            })}
+            aria-hidden="true"
+          />
         </button>
       </Localizer>
     );

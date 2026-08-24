@@ -6158,13 +6158,14 @@
     "voiceInput": {
       "startListening": "Nachricht diktieren",
       "stopListening": "Diktat beenden",
-      "error": "Die Spracherkennung ist fehlgeschlagen. Bitte versuche es erneut.",
+      "error": "Das Diktat ist fehlgeschlagen. Prüfe, ob Gladys Plus verbunden ist, und versuche es erneut.",
       "errorNoSpeech": "Keine Stimme erkannt. Prüfe, ob dein Mikrofon aktiviert ist, und versuche es erneut.",
       "errorPermissionDenied": "Der Mikrofonzugriff wurde verweigert. Erlaube ihn in den Einstellungen deines Browsers, um eine Nachricht zu diktieren.",
       "errorNoMicrophone": "Kein Mikrofon erkannt. Schließe eines an oder aktiviere es in den Systemeinstellungen.",
-      "errorNetwork": "Die Spracherkennung ist nicht verfügbar, dein Browser konnte seinen Sprachdienst nicht erreichen.",
-      "errorNotSupported": "Spracherkennung ist in diesem Browser nicht verfügbar.",
-      "browserTranscriptionNotice": "Wenn du eine Nachricht diktierst, transkribiert dein Browser, was du sagst: Gladys nimmt kein Audio auf und lädt keines hoch. Je nach Browser kann das Audio auf deinem Gerät verarbeitet oder an den eigenen Spracherkennungsdienst des Browsers gesendet werden."
+      "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfe, ob es von einer anderen App verwendet wird.",
+      "errorNoTranscription": "Ich habe deine Nachricht nicht verstanden. Sprich näher ans Mikrofon und versuche es erneut.",
+      "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar.",
+      "gladysPlusTranscriptionNotice": "Wenn du eine Nachricht diktierst, wird das Audio von Gladys Plus transkribiert, derselben Spracherkennung wie beim Sprachassistenten des Dashboards. Die Aufnahme stoppt, wenn du eine Pause machst, und die Nachricht wird erst gesendet, wenn du auf Senden drückst."
     }
   },
   "history": {

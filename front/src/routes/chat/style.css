@@ -686,10 +686,29 @@
   }
 }
 
+.voiceInputButtonProcessing,
+.voiceInputButtonProcessing:hover,
+.voiceInputButtonProcessing:focus {
+  background: #e2e9f0;
+  color: #3564be;
+}
+
+.voiceInputSpinner {
+  display: inline-block;
+  animation: voice-input-spin 1s linear infinite;
+}
+
+@keyframes voice-input-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .voiceInputButtonListening,
   .voiceInputButtonListening:hover,
-  .voiceInputButtonListening:focus {
+  .voiceInputButtonListening:focus,
+  .voiceInputSpinner {
     animation: none !important;
   }
 }
