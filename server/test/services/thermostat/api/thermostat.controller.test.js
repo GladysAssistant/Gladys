@@ -326,6 +326,18 @@ describe('thermostat.controller', () => {
       assert.calledWith(handler.setValue, thermostatDevice, setpointFeature, 20, true);
     });
 
+    it('should reject a request with no body at all', async () => {
+      const handler = buildHandler();
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(routes, route, { params: { feature_selector: 'thermostat-living-room' } }, res);
+
+      expect(res.statusCode).to.equal(400);
+      expect(res.body).to.deep.equal({ error: 'INVALID_VALUE' });
+      assert.notCalled(handler.setValue);
+    });
+
     it('should forward manual: false so returning to the schedule does not re-arm the override', async () => {
       const handler = buildHandler();
       const routes = ThermostatController(handler);
@@ -389,6 +401,18 @@ describe('thermostat.controller', () => {
       );
 
       expect(res.statusCode).to.equal(400);
+      assert.notCalled(handler.setVariable);
+    });
+
+    it('should reject a request with no body at all', async () => {
+      const handler = buildHandler();
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(routes, route, { params: { variable_key: 'THERMOSTAT_X_PRESET' } }, res);
+
+      expect(res.statusCode).to.equal(400);
+      expect(res.body).to.deep.equal({ error: 'INVALID_VALUE' });
       assert.notCalled(handler.setVariable);
     });
 
