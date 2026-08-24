@@ -9,6 +9,7 @@ import Select from 'react-select';
 import fr from 'date-fns/locale/fr';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import datePickerStyle from '../datePicker.css';
 
 const DAYS_OF_THE_MONTH = new Array(31).fill(0, 0, 31).map((val, index) => index + 1);
 
@@ -128,6 +129,8 @@ class TurnOnLight extends Component {
                   <DatePicker
                     selected={date}
                     className="form-control"
+                    popperClassName={datePickerStyle.datePickerPopper}
+                    portalId="scene-editor-datepicker"
                     placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.dateLabel" />}
                     locale={localeSet}
                     onChange={this.handleDateChange}
@@ -147,6 +150,8 @@ class TurnOnLight extends Component {
                   <DatePicker
                     selected={time}
                     className="form-control"
+                    popperClassName={datePickerStyle.datePickerPopper}
+                    portalId="scene-editor-datepicker"
                     locale={localeSet}
                     onChange={this.handleTimeChange}
                     placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
@@ -208,6 +213,8 @@ class TurnOnLight extends Component {
                   <DatePicker
                     selected={time}
                     className="form-control"
+                    popperClassName={datePickerStyle.datePickerPopper}
+                    portalId="scene-editor-datepicker"
                     locale={localeSet}
                     onChange={this.handleTimeChange}
                     placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
@@ -278,6 +285,8 @@ class TurnOnLight extends Component {
                   <DatePicker
                     selected={time}
                     className="form-control"
+                    popperClassName={datePickerStyle.datePickerPopper}
+                    portalId="scene-editor-datepicker"
                     locale={localeSet}
                     onChange={this.handleTimeChange}
                     placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
@@ -319,6 +328,8 @@ class TurnOnLight extends Component {
                   <DatePicker
                     selected={time}
                     className="form-control"
+                    popperClassName={datePickerStyle.datePickerPopper}
+                    portalId="scene-editor-datepicker"
                     locale={localeSet}
                     onChange={this.handleTimeChange}
                     placeholderText={<Text id="editScene.triggersCard.scheduledTrigger.timeCaption" />}
