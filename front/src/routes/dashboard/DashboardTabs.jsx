@@ -2,8 +2,31 @@ import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
-import { wrapEmojisJSX } from '../../utils/emojiWrapper';
+import { splitLeadingEmoji, wrapEmojisJSX } from '../../utils/emojiWrapper';
 import style from './style.css';
+
+// The icon is often all that identifies a pill (tablet dock, collapsed
+// mobile pills), and dashboards created before icons existed all fall back
+// to the same house glyph. Many of them carry the distinguishing mark in
+// the name instead — a leading emoji — so use it as the icon and take it
+// out of the pill name so it doesn't show twice.
+const getTabAppearance = dashboard => {
+  if (dashboard.icon) {
+    return { icon: dashboard.icon, emoji: null, name: dashboard.name };
+  }
+  const { emoji, rest } = splitLeadingEmoji(dashboard.name);
+  if (emoji) {
+    return { icon: null, emoji, name: rest };
+  }
+  return { icon: 'home', emoji: null, name: dashboard.name };
+};
+
+const TabGlyph = ({ icon, emoji, class: extraClass }) =>
+  emoji ? (
+    <span class={cx(style.dashboardTabEmoji, 'emoji-no-invert', extraClass)}>{emoji}</span>
+  ) : (
+    <i class={cx('fe', `fe-${icon}`, extraClass)} />
+  );
 
 // "Priority+" navigation: a single row of one-tap pills in dashboard order —
 // the order the user already controls in the edit view — and everything that
@@ -125,6 +148,7 @@ class DashboardTabs extends Component {
     const overflowing = visibleCount !== null;
     const activeCollapsed = overflowing && activeIndex >= visibleCount;
     const activeDashboard = activeIndex >= 0 ? dashboards[activeIndex] : null;
+    const activeAppearance = activeDashboard && getTabAppearance(activeDashboard);
     return (
       <div
         class={cx(style.dashboardTabs, {
@@ -132,21 +156,26 @@ class DashboardTabs extends Component {
         })}
         ref={this.setContainerRef}
       >
-        {dashboards.map((dashboard, index) => (
-          <Link
-            data-dashboard-pill
-            href={`/dashboard/${dashboard.selector}`}
-            onClick={this.selectDashboard}
-            class={cx(style.dashboardTab, {
-              [style.dashboardTabActive]: index === activeIndex,
-              'd-none': overflowing && index >= visibleCount
-            })}
-            title={dashboard.name}
-          >
-            <i class={`fe fe-${dashboard.icon || 'home'}`} />
-            {!tabletMode && <span class={style.dashboardTabName}>{wrapEmojisJSX(dashboard.name)}</span>}
-          </Link>
-        ))}
+        {dashboards.map((dashboard, index) => {
+          const appearance = getTabAppearance(dashboard);
+          return (
+            <Link
+              data-dashboard-pill
+              href={`/dashboard/${dashboard.selector}`}
+              onClick={this.selectDashboard}
+              class={cx(style.dashboardTab, {
+                [style.dashboardTabActive]: index === activeIndex,
+                'd-none': overflowing && index >= visibleCount
+              })}
+              title={dashboard.name}
+            >
+              <TabGlyph icon={appearance.icon} emoji={appearance.emoji} />
+              {!tabletMode && appearance.name && (
+                <span class={style.dashboardTabName}>{wrapEmojisJSX(appearance.name)}</span>
+              )}
+            </Link>
+          );
+        })}
         {overflowing && (
           <div class={cx('dropdown', style.dashboardTabsOverflow)}>
             <button
@@ -161,8 +190,10 @@ class DashboardTabs extends Component {
             >
               {activeCollapsed && activeDashboard ? (
                 <>
-                  <i class={`fe fe-${activeDashboard.icon || 'home'}`} />
-                  {!tabletMode && <span class={style.dashboardTabName}>{wrapEmojisJSX(activeDashboard.name)}</span>}
+                  <TabGlyph icon={activeAppearance.icon} emoji={activeAppearance.emoji} />
+                  {!tabletMode && activeAppearance.name && (
+                    <span class={style.dashboardTabName}>{wrapEmojisJSX(activeAppearance.name)}</span>
+                  )}
                   <i class="fe fe-chevron-down" />
                 </>
               ) : (
@@ -170,16 +201,19 @@ class DashboardTabs extends Component {
               )}
             </button>
             <div class={cx('dropdown-menu dropdown-menu-right', style.dashboardTabsMenu, { show: menuOpen })}>
-              {dashboards.map((dashboard, index) => (
-                <Link
-                  class={cx('dropdown-item', { active: index === activeIndex })}
-                  href={`/dashboard/${dashboard.selector}`}
-                  onClick={this.selectDashboard}
-                >
-                  <i class={cx(`fe fe-${dashboard.icon || 'home'}`, style.dashboardTabsMenuIcon)} />
-                  {wrapEmojisJSX(dashboard.name)}
-                </Link>
-              ))}
+              {dashboards.map((dashboard, index) => {
+                const appearance = getTabAppearance(dashboard);
+                return (
+                  <Link
+                    class={cx('dropdown-item', { active: index === activeIndex })}
+                    href={`/dashboard/${dashboard.selector}`}
+                    onClick={this.selectDashboard}
+                  >
+                    <TabGlyph icon={appearance.icon} emoji={appearance.emoji} class={style.dashboardTabsMenuIcon} />
+                    {wrapEmojisJSX(appearance.name)}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}

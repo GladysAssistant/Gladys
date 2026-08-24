@@ -761,6 +761,13 @@
   flex: 0 0 auto;
 }
 
+/* Emoji standing in for the feather glyph (dashboards named "🎬 Cinéma"
+   with no explicit icon): same footprint as the icon it replaces */
+.dashboardTabEmoji {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .dashboardTabName {
   font-size: 0.875rem;
   font-weight: 600;
