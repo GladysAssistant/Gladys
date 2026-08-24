@@ -113,7 +113,12 @@ module.exports = function ThermostatController(thermostatHandler) {
       return;
     }
     // Go through setValue so the widget, the API and scenes share one path.
-    await thermostatHandler.setValue(device, deviceFeature, value);
+    // `manual: false` is how the widget writes back the scheduled setpoint when a
+    // hold ends: without it the write would immediately re-arm the very override
+    // it is clearing. Anything else — a scene, the generic API, the dial — means
+    // a manual override, so that stays the default.
+    const manual = req.body.manual !== false;
+    await thermostatHandler.setValue(device, deviceFeature, value, manual);
     res.json({ success: true, value });
   }
 

@@ -308,6 +308,55 @@ describe('thermostat.controller', () => {
     });
   });
 
+  describe('setSetpoint manual flag', () => {
+    const route = 'post /api/v1/service/thermostat/setpoint/:feature_selector';
+
+    it('should treat a write as manual by default', async () => {
+      const handler = buildHandler();
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(
+        routes,
+        route,
+        { params: { feature_selector: 'thermostat-living-room' }, body: { value: 20 } },
+        res,
+      );
+
+      assert.calledWith(handler.setValue, thermostatDevice, setpointFeature, 20, true);
+    });
+
+    it('should forward manual: false so returning to the schedule does not re-arm the override', async () => {
+      const handler = buildHandler();
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(
+        routes,
+        route,
+        { params: { feature_selector: 'thermostat-living-room' }, body: { value: 20, manual: false } },
+        res,
+      );
+
+      assert.calledWith(handler.setValue, thermostatDevice, setpointFeature, 20, false);
+    });
+
+    it('should only accept an explicit false, not any falsy value', async () => {
+      const handler = buildHandler();
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(
+        routes,
+        route,
+        { params: { feature_selector: 'thermostat-living-room' }, body: { value: 20, manual: 0 } },
+        res,
+      );
+
+      assert.calledWith(handler.setValue, thermostatDevice, setpointFeature, 20, true);
+    });
+  });
+
   describe('setVariable', () => {
     const route = 'post /api/v1/service/thermostat/state/:variable_key';
 
