@@ -116,6 +116,7 @@
       "endLabel": "Au",
       "invalidPeriod": "La date de fin doit être postérieure à la date de début.",
       "noFeatureSelected": "Sélectionnez au moins une fonctionnalité à exporter.",
+      "progress": "{{count}} états exportés…",
       "error": "L'export CSV a échoué. Veuillez réessayer.",
       "cancelButton": "Annuler",
       "exportButton": "Exporter",

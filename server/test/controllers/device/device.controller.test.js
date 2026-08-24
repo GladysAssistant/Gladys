@@ -200,6 +200,127 @@ describe('GET /api/v1/device_feature/states_csv', () => {
       .expect('Content-Type', /json/)
       .expect(400);
   });
+  it('should stream the whole file over HTTP when several chunks are needed', async () => {
+    // A one-state chunk: the response is written chunk by chunk, and still
+    // reads as one single valid CSV file.
+    // @ts-ignore
+    const previousChunkSize = global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK = 1;
+    try {
+      await authenticatedRequest
+        .get('/api/v1/device_feature/states_csv')
+        .query({
+          device_features: 'test-device-feature',
+          start: '2025-08-28T00:00:00.000Z',
+          end: '2025-08-29T00:00:00.000Z',
+        })
+        .expect('Content-Type', /csv/)
+        .expect(200)
+        .then((res) => {
+          const lines = res.text.split('\n');
+          expect(lines).to.have.lengthOf(3);
+          expect(lines[0]).to.equal('date,device,feature,unit,value');
+          expect(lines[1]).to.equal('2025-08-28T15:00:00.000Z,Test device,Test device feature,,0');
+          expect(lines[2]).to.equal('2025-08-28T15:02:00.000Z,Test device,Test device feature,,1');
+        });
+    } finally {
+      // @ts-ignore
+      global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK = previousChunkSize;
+    }
+  });
+  it('should export chunk by chunk when max_states is passed', async () => {
+    const firstChunk = await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        device_features: 'test-device-feature',
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+        max_states: 1,
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => res.body);
+    expect(firstChunk.states).to.equal(1);
+    expect(firstChunk.next).to.not.equal(null);
+    expect(firstChunk.csv.split('\n')).to.deep.equal([
+      'date,device,feature,unit,value',
+      '2025-08-28T15:00:00.000Z,Test device,Test device feature,,0',
+    ]);
+    const secondChunk = await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        device_features: 'test-device-feature',
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+        max_states: 1,
+        after_created_at_us: firstChunk.next.createdAtUs,
+        after_device_feature_id: firstChunk.next.deviceFeatureId,
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => res.body);
+    expect(secondChunk.states).to.equal(1);
+    expect(secondChunk.next).to.equal(null);
+    // No header on the following chunks: the client concatenates them
+    expect(secondChunk.csv).to.equal('2025-08-28T15:02:00.000Z,Test device,Test device feature,,1');
+  });
+  it('should export a chunk through the Gladys Gateway when max_states is passed', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+    };
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/device_feature/states_csv?device_features=test-device-feature&start=2025-08-28T00:00:00.000Z&end=2025-08-29T00:00:00.000Z&max_states=1',
+      {},
+      {},
+      (data) => {
+        expect(data.states).to.equal(1);
+        expect(data.next).to.not.equal(null);
+        expect(data.csv.split('\n')).to.have.lengthOf(2);
+        done();
+      },
+    );
+  });
+  it('should refuse a non-paginated export too big for the Gladys Gateway', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+    };
+    // @ts-ignore
+    const previousLimit = global.TEST_GLADYS_INSTANCE.device.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.device.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES = 10;
+    // A whole-file export through the gateway travels in one websocket message: past
+    // the size limit it is refused, and told to paginate instead.
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/device_feature/states_csv?device_features=test-device-feature&start=2025-08-28T00:00:00.000Z&end=2025-08-29T00:00:00.000Z',
+      {},
+      {},
+      (data) => {
+        // @ts-ignore
+        global.TEST_GLADYS_INSTANCE.device.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES = previousLimit;
+        expect(data.message).to.contain('Please paginate with max_states');
+        done();
+      },
+    );
+  });
   it('should export device feature states as CSV through the Gladys Gateway', (done) => {
     const user = {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',

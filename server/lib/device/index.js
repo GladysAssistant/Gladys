@@ -74,14 +74,17 @@ const DeviceManager = function DeviceManager(
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
   this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 200;
-  // A CSV export is built in memory before being sent, so a period containing more
-  // states than this is refused: the user is asked to export a shorter period instead.
-  // At roughly 80 bytes per line, this keeps the generated file around 8 MB, which a
-  // low-power machine like a Raspberry Pi can build and send without trouble.
-  this.MAX_STATES_TO_EXPORT_IN_CSV = 100000;
-  // When the export goes through Gladys Plus, the answer travels over the encrypted
-  // websocket, which cannot carry an arbitrarily large payload: the same limit as the
-  // log download is applied, and a bigger export is refused with a clear message.
+  // A CSV export has no size limit, but it is read and written chunk by chunk:
+  // this is the most states one chunk can hold, whatever the caller asks. At
+  // roughly 60 bytes per line, a chunk stays around 1.5 MB, which a low-power
+  // machine like a Raspberry Pi can build and send without trouble — however
+  // long the exported period is.
+  this.MAX_STATES_PER_CSV_EXPORT_CHUNK = 25000;
+  // When a NON-paginated export goes through Gladys Plus, the whole answer travels
+  // over the encrypted websocket in one message, which cannot carry an arbitrarily
+  // large payload: the same limit as the log download is applied, and a bigger
+  // export is told to use the max_states pagination instead (which the web client
+  // always does).
   this.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES = 256 * 1024;
   // Also the target size of a purge slice: a single DELETE of a million states on a
   // multi-GB history holds the write connection for minutes and inflates the file.

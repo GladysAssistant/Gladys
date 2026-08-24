@@ -202,7 +202,7 @@ const escapeCsvValue = value => {
   return stringValue;
 };
 
-const getStatesCsv = (query = {}) => {
+const buildStatesCsv = (query = {}) => {
   const selectors = [...new Set((query.device_features || '').split(',').filter(selector => selector.length > 0))];
   const end = query.end ? dayjs(query.end) : dayjs();
   const start = query.start ? dayjs(query.start) : end.subtract(1, 'day');
@@ -241,6 +241,20 @@ const getStatesCsv = (query = {}) => {
   );
 
   return [CSV_HEADER, ...lines].join('\n');
+};
+
+/*
+ * The real server answers this route in chunks ({ csv, next, states }) when
+ * `max_states` is passed, which is how the web client always calls it. The demo
+ * file is small enough to fit in one chunk, so the first answer is also the
+ * last: the whole file, and no cursor.
+ */
+const getStatesCsv = (query = {}) => {
+  const csv = buildStatesCsv(query);
+  if (query.max_states === undefined) {
+    return csv;
+  }
+  return { csv, next: null, states: Math.max(csv.split('\n').length - 1, 0) };
 };
 
 /**

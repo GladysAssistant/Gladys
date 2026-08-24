@@ -116,6 +116,7 @@
       "endLabel": "To",
       "invalidPeriod": "The end date must be after the start date.",
       "noFeatureSelected": "Select at least one feature to export.",
+      "progress": "{{count}} states exported…",
       "error": "The CSV export failed. Please retry.",
       "cancelButton": "Cancel",
       "exportButton": "Export",

@@ -613,6 +613,14 @@
   overflow-wrap: anywhere;
 }
 
+/* A long export shows how far it is, quietly, next to the spinner of the button */
+.exportProgress {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: right;
+  color: var(--gl-muted, #7c8396);
+}
+
 .exportActions {
   display: flex;
   justify-content: flex-end;

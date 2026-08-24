@@ -27,6 +27,37 @@ const buildStateManager = (deviceFeaturesBySelector, devicesById) => ({
   },
 });
 
+const oneFeatureStateManager = () =>
+  buildStateManager(
+    {
+      'my-feature': {
+        id: FEATURE_1_ID,
+        name: 'Temperature',
+        unit: 'celsius',
+        device_id: 'device-1',
+      },
+    },
+    { 'device-1': { name: 'Living room sensor' } },
+  );
+
+// Follow the cursor like the web client does, and return the reassembled file
+// with the chunks it took.
+const exportAllChunks = async (deviceInstance, selectors, start, end, maxStates) => {
+  const chunks = [];
+  let chunk = await deviceInstance.exportStatesToCsv(selectors, start, end, { maxStates });
+  chunks.push(chunk);
+  while (chunk.next !== null) {
+    // eslint-disable-next-line no-await-in-loop
+    chunk = await deviceInstance.exportStatesToCsv(selectors, start, end, { maxStates, after: chunk.next });
+    chunks.push(chunk);
+  }
+  const csv = chunks
+    .map((c) => c.csv)
+    .filter((part) => part.length > 0)
+    .join('\n');
+  return { csv, chunks };
+};
+
 describe('Device.exportStatesToCsv', function Describe() {
   this.timeout(15000);
   beforeEach(async () => {
@@ -42,19 +73,8 @@ describe('Device.exportStatesToCsv', function Describe() {
       { value: 2.5, created_at: new Date('2025-08-28T15:01:00.000Z') },
       { value: 3, created_at: new Date('2025-08-28T16:00:00.000Z') },
     ]);
-    const stateManager = buildStateManager(
-      {
-        'my-feature': {
-          id: FEATURE_1_ID,
-          name: 'Temperature',
-          unit: 'celsius',
-          device_id: 'device-1',
-        },
-      },
-      { 'device-1': { name: 'Living room sensor' } },
-    );
-    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    const csv = await deviceInstance.exportStatesToCsv(
+    const deviceInstance = new Device(event, {}, oneFeatureStateManager(), {}, {}, variable, job);
+    const { csv, next, states } = await deviceInstance.exportStatesToCsv(
       ['my-feature'],
       '2025-08-28T15:00:00.000Z',
       '2025-08-28T15:30:00.000Z',
@@ -66,6 +86,8 @@ describe('Device.exportStatesToCsv', function Describe() {
         '2025-08-28T15:01:00.000Z,Living room sensor,Temperature,celsius,2.5',
       ].join('\n'),
     );
+    expect(next).to.equal(null);
+    expect(states).to.equal(2);
   });
 
   it('should export the states of several device features, merged and sorted by date', async () => {
@@ -92,10 +114,10 @@ describe('Device.exportStatesToCsv', function Describe() {
       { 'device-1': { name: 'Living room sensor' } },
     );
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    const csv = await deviceInstance.exportStatesToCsv(
+    const { csv, next } = await deviceInstance.exportStatesToCsv(
       ['feature-1', 'feature-2'],
-      new Date('2025-08-28T15:00:00.000Z'),
-      new Date('2025-08-28T15:30:00.000Z'),
+      '2025-08-28T15:00:00.000Z',
+      '2025-08-28T15:30:00.000Z',
     );
     expect(csv).to.equal(
       [
@@ -105,6 +127,94 @@ describe('Device.exportStatesToCsv', function Describe() {
         '2025-08-28T15:02:00.000Z,Living room sensor,Temperature,celsius,3',
       ].join('\n'),
     );
+    expect(next).to.equal(null);
+  });
+
+  it('should export a big period in several chunks that reassemble into one file', async () => {
+    const states = [];
+    for (let index = 0; index < 10; index += 1) {
+      states.push({ value: index, created_at: new Date(Date.UTC(2025, 7, 28, 15, index)) });
+    }
+    await db.duckDbBatchInsertState(FEATURE_1_ID, states);
+    const deviceInstance = new Device(event, {}, oneFeatureStateManager(), {}, {}, variable, job);
+    const { csv, chunks } = await exportAllChunks(
+      deviceInstance,
+      ['my-feature'],
+      '2025-08-28T15:00:00.000Z',
+      '2025-08-28T16:00:00.000Z',
+      3,
+    );
+    // 10 states in chunks of 3: the pagination is real
+    expect(chunks.length).to.be.greaterThan(3);
+    chunks.forEach((chunk, index) => {
+      // The header only belongs to the first chunk
+      expect(chunk.csv.startsWith('date,device,feature,unit,value')).to.equal(index === 0);
+      expect(chunk.states).to.be.at.most(3);
+    });
+    const lines = csv.split('\n');
+    // No state lost, none duplicated, order preserved
+    expect(lines).to.have.lengthOf(11);
+    lines.slice(1).forEach((line, index) => {
+      expect(line).to.equal(
+        `${new Date(Date.UTC(2025, 7, 28, 15, index)).toISOString()},Living room sensor,Temperature,celsius,${index}`,
+      );
+    });
+  });
+
+  it('should not split, lose or duplicate states sharing the same date across chunks', async () => {
+    // Two features with states at the very same timestamps: the chunk boundary
+    // falls inside a same-date group, which the (date, feature) cursor handles.
+    const sameDates = [
+      new Date('2025-08-28T15:00:00.000Z'),
+      new Date('2025-08-28T15:01:00.000Z'),
+      new Date('2025-08-28T15:02:00.000Z'),
+    ];
+    await db.duckDbBatchInsertState(
+      FEATURE_1_ID,
+      sameDates.map((createdAt, index) => ({ value: index, created_at: createdAt })),
+    );
+    await db.duckDbBatchInsertState(
+      FEATURE_2_ID,
+      sameDates.map((createdAt, index) => ({ value: 10 + index, created_at: createdAt })),
+    );
+    const stateManager = buildStateManager(
+      {
+        'feature-1': { id: FEATURE_1_ID, name: 'Temperature', unit: 'celsius', device_id: 'device-1' },
+        'feature-2': { id: FEATURE_2_ID, name: 'Humidity', unit: 'percent', device_id: 'device-1' },
+      },
+      { 'device-1': { name: 'Living room sensor' } },
+    );
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { csv } = await exportAllChunks(
+      deviceInstance,
+      ['feature-1', 'feature-2'],
+      '2025-08-28T15:00:00.000Z',
+      '2025-08-28T15:30:00.000Z',
+      2,
+    );
+    const dataLines = csv.split('\n').slice(1);
+    expect(dataLines).to.have.lengthOf(6);
+    const values = dataLines.map((line) => Number(line.split(',').pop())).sort((a, b) => a - b);
+    expect(values).to.deep.equal([0, 1, 2, 10, 11, 12]);
+  });
+
+  it('should cap the size of a chunk to MAX_STATES_PER_CSV_EXPORT_CHUNK', async () => {
+    await db.duckDbBatchInsertState(FEATURE_1_ID, [
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 2, created_at: new Date('2025-08-28T15:01:00.000Z') },
+      { value: 3, created_at: new Date('2025-08-28T15:02:00.000Z') },
+    ]);
+    const deviceInstance = new Device(event, {}, oneFeatureStateManager(), {}, {}, variable, job);
+    deviceInstance.MAX_STATES_PER_CSV_EXPORT_CHUNK = 2;
+    // The caller asks for far more than the cap: the chunk stays bounded.
+    const { next, states } = await deviceInstance.exportStatesToCsv(
+      ['my-feature'],
+      '2025-08-28T15:00:00.000Z',
+      '2025-08-28T15:30:00.000Z',
+      { maxStates: 1000000 },
+    );
+    expect(states).to.equal(2);
+    expect(next).to.not.equal(null);
   });
 
   it('should escape separators, quotes and line breaks in the CSV', async () => {
@@ -121,7 +231,7 @@ describe('Device.exportStatesToCsv', function Describe() {
       { 'device-1': { name: 'Kitchen, main' } },
     );
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    const csv = await deviceInstance.exportStatesToCsv(
+    const { csv } = await deviceInstance.exportStatesToCsv(
       ['my-feature'],
       '2025-08-28T15:00:00.000Z',
       '2025-08-28T15:30:00.000Z',
@@ -148,7 +258,7 @@ describe('Device.exportStatesToCsv', function Describe() {
       { 'device-1': { name: '=1+1' } },
     );
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    const csv = await deviceInstance.exportStatesToCsv(
+    const { csv } = await deviceInstance.exportStatesToCsv(
       ['my-feature'],
       '2025-08-28T15:00:00.000Z',
       '2025-08-28T15:30:00.000Z',
@@ -176,7 +286,7 @@ describe('Device.exportStatesToCsv', function Describe() {
       { 'device-1': { name: 'Kitchen\r\nsecond line' } },
     );
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    const csv = await deviceInstance.exportStatesToCsv(
+    const { csv } = await deviceInstance.exportStatesToCsv(
       ['my-feature'],
       '2025-08-28T15:00:00.000Z',
       '2025-08-28T15:30:00.000Z',
@@ -194,22 +304,8 @@ describe('Device.exportStatesToCsv', function Describe() {
       { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
       { value: 2, created_at: new Date('2025-08-28T15:01:00.000Z') },
     ]);
-    const stateManager = buildStateManager(
-      {
-        'my-feature': {
-          id: FEATURE_1_ID,
-          name: 'Temperature',
-          unit: 'celsius',
-          device_id: 'device-1',
-        },
-      },
-      { 'device-1': { name: 'Living room sensor' } },
-    );
-    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    // The count query deduplicates selectors, so loading them twice would export
-    // more states than the limit that was checked.
-    deviceInstance.MAX_STATES_TO_EXPORT_IN_CSV = 2;
-    const csv = await deviceInstance.exportStatesToCsv(
+    const deviceInstance = new Device(event, {}, oneFeatureStateManager(), {}, {}, variable, job);
+    const { csv } = await deviceInstance.exportStatesToCsv(
       ['my-feature', 'my-feature'],
       '2025-08-28T15:00:00.000Z',
       '2025-08-28T15:30:00.000Z',
@@ -223,47 +319,16 @@ describe('Device.exportStatesToCsv', function Describe() {
     );
   });
 
-  it('should throw BadParameters when the file is bigger than the maximum size', async () => {
-    await db.duckDbBatchInsertState(FEATURE_1_ID, [{ value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') }]);
-    const stateManager = buildStateManager(
-      {
-        'my-feature': {
-          id: FEATURE_1_ID,
-          name: 'Temperature',
-          unit: 'celsius',
-          device_id: 'device-1',
-        },
-      },
-      { 'device-1': { name: 'Living room sensor' } },
-    );
-    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    await assert.isRejected(
-      deviceInstance.exportStatesToCsv(['my-feature'], '2025-08-28T15:00:00.000Z', '2025-08-28T15:30:00.000Z', {
-        maxSizeInBytes: 10,
-      }),
-      'Please export a shorter period.',
-    );
-  });
-
   it('should return only the header when there is no state in the period', async () => {
-    const stateManager = buildStateManager(
-      {
-        'my-feature': {
-          id: FEATURE_1_ID,
-          name: 'Temperature',
-          unit: 'celsius',
-          device_id: 'device-1',
-        },
-      },
-      { 'device-1': { name: 'Living room sensor' } },
-    );
-    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    const csv = await deviceInstance.exportStatesToCsv(
+    const deviceInstance = new Device(event, {}, oneFeatureStateManager(), {}, {}, variable, job);
+    const { csv, next, states } = await deviceInstance.exportStatesToCsv(
       ['my-feature'],
       '2025-08-28T15:00:00.000Z',
       '2025-08-28T15:30:00.000Z',
     );
     expect(csv).to.equal('date,device,feature,unit,value');
+    expect(next).to.equal(null);
+    expect(states).to.equal(0);
   });
 
   it('should throw BadParameters when no device feature is given', async () => {
@@ -277,7 +342,7 @@ describe('Device.exportStatesToCsv', function Describe() {
   it('should throw BadParameters when device features is not a list', async () => {
     const deviceInstance = new Device(event, {}, buildStateManager({}, {}), {}, {}, variable, job);
     await assert.isRejected(
-      deviceInstance.exportStatesToCsv(undefined, '2025-08-28T15:00:00.000Z', '2025-08-28T15:30:00.000Z'),
+      deviceInstance.exportStatesToCsv('my-feature', '2025-08-28T15:00:00.000Z', '2025-08-28T15:30:00.000Z'),
       'device_features should be a non-empty list of device feature selectors',
     );
   });
@@ -306,27 +371,13 @@ describe('Device.exportStatesToCsv', function Describe() {
     );
   });
 
-  it('should throw BadParameters when the period contains too many states', async () => {
-    await db.duckDbBatchInsertState(FEATURE_1_ID, [
-      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
-      { value: 2, created_at: new Date('2025-08-28T15:01:00.000Z') },
-    ]);
-    const stateManager = buildStateManager(
-      {
-        'my-feature': {
-          id: FEATURE_1_ID,
-          name: 'Temperature',
-          unit: 'celsius',
-          device_id: 'device-1',
-        },
-      },
-      { 'device-1': { name: 'Living room sensor' } },
-    );
-    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    deviceInstance.MAX_STATES_TO_EXPORT_IN_CSV = 1;
+  it('should throw BadParameters when the cursor is invalid', async () => {
+    const deviceInstance = new Device(event, {}, oneFeatureStateManager(), {}, {}, variable, job);
     await assert.isRejected(
-      deviceInstance.exportStatesToCsv(['my-feature'], '2025-08-28T15:00:00.000Z', '2025-08-28T15:30:00.000Z'),
-      'This period contains 2 states, which is more than the 1 states that can be exported at once.',
+      deviceInstance.exportStatesToCsv(['my-feature'], '2025-08-28T15:00:00.000Z', '2025-08-28T15:30:00.000Z', {
+        after: { createdAtUs: 'DROP TABLE', deviceFeatureId: FEATURE_1_ID },
+      }),
+      'Invalid "after" cursor',
     );
   });
 

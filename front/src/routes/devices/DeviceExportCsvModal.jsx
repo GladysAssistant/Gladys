@@ -30,6 +30,7 @@ class DeviceExportCsvModal extends Component {
         .format(DATE_FORMAT),
       end: dayjs().format(DATE_FORMAT),
       exporting: false,
+      exportedStates: 0,
       error: false,
       errorDetail: null
     };
@@ -107,14 +108,16 @@ class DeviceExportCsvModal extends Component {
     if (selectedFeatures.length === 0 || this.isPeriodInvalid()) {
       return;
     }
-    await this.setState({ exporting: true, error: false, errorDetail: null });
+    await this.setState({ exporting: true, exportedStates: 0, error: false, errorDetail: null });
     try {
       // The end date is inclusive: a user picking today expects today's states.
       await downloadDeviceFeaturesCsv(this.props.httpClient, {
         deviceFeatures: selectedFeatures,
         startAt: dayjs(start).startOf('day'),
         endAt: dayjs(end).endOf('day'),
-        filename: this.props.device.name
+        filename: this.props.device.name,
+        // The file is downloaded chunk by chunk: a long export shows how far it is.
+        onProgress: exportedStates => this.setState({ exportedStates })
       });
       this.setState({ exporting: false });
       this.props.onClose();
@@ -125,7 +128,7 @@ class DeviceExportCsvModal extends Component {
     }
   };
 
-  render({ device }, { selectedFeatures, start, end, exporting, error, errorDetail }) {
+  render({ device }, { selectedFeatures, start, end, exporting, exportedStates, error, errorDetail }) {
     const exportableFeatures = getExportableFeatures(device);
     const invalidPeriod = this.isPeriodInvalid();
     const noFeatureSelected = selectedFeatures.length === 0;
@@ -236,6 +239,15 @@ class DeviceExportCsvModal extends Component {
               </div>
             )}
 
+            {exporting && exportedStates > 0 && (
+              <div class={style.exportProgress}>
+                <Text
+                  id="devicesList.export.progress"
+                  fields={{ count: exportedStates.toLocaleString(this.props.user && this.props.user.language) }}
+                />
+              </div>
+            )}
+
             <div class={style.exportActions}>
               <button type="button" class={style.exportCancelButton} onClick={this.close} disabled={exporting}>
                 <Text id="devicesList.export.cancelButton" />
@@ -259,4 +271,4 @@ class DeviceExportCsvModal extends Component {
   }
 }
 
-export default connect('httpClient', {})(DeviceExportCsvModal);
+export default connect('httpClient,user', {})(DeviceExportCsvModal);
