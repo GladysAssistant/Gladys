@@ -4,13 +4,6 @@
   margin-bottom: 150px;
 }
 
-.columnsCard {
-  display: flex;
-  flex-wrap: nowrap;
-  width: 100%;
-  padding-right: 0;
-}
-
 .section {
   border: 1px dashed #d5d9e0;
   border-radius: 4px;
@@ -291,6 +284,89 @@
   border-radius: 16px;
 }
 
+/* ============================================================
+   Stretch preview: the viewer lets some widgets absorb the free
+   height of their column (.stretchableBox in routes/dashboard/
+   style.css). The canvas previews it by threading the same flex
+   chain through the edit chrome: drop area → box container →
+   preview wrapper → preview content → the widget itself.
+   ============================================================ */
+
+/* the drop area fills its column, so the chain has height to give (and the
+   whole column stays a drop target, not just the part behind the widgets) */
+.columnDropArea {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchPreview {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchPreview .previewWrapper,
+.stretchPreview .previewContent,
+.stretchPreview .previewContent > * {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* tile boxes center their content in the extra height, like the viewer's
+   .stretchableTile (the absolute overlay is out of flow, unaffected) */
+.stretchTilePreview .previewContent > * {
+  justify-content: center;
+}
+
+/* media boxes stretch by letting their image absorb the extra height —
+   the viewer's .stretchableBox > div > img/.dimmer rules, one wrapper deeper */
+.stretchPreview .previewContent > * > img {
+  flex: 1 1 auto;
+  object-fit: cover;
+  min-height: 0;
+}
+
+.stretchPreview .previewContent > * > :global(.dimmer) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchPreview .previewContent > * > :global(.dimmer) > :global(.dimmer-content) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* Same caps as the viewer, shifted by the edit chrome (toolbar + the "+"
+   slot ≈ 4rem): the widget card ends up at the viewer's size. Desktop only —
+   below the breakpoint columns stack and heights are natural. */
+@media (min-width: 992px) {
+  .stretchPreview {
+    max-height: calc(65vh + 4rem);
+  }
+
+  /* value tiles adapt their type scale to the rendered height via container
+     queries: the size container is the padding-less wrapper around the
+     widget, exactly like the viewer's .adaptiveTile */
+  .adaptiveTilePreview .previewContent {
+    container-type: size;
+    min-height: 6rem;
+  }
+
+  .stretchPreview.adaptiveTilePreview {
+    max-height: 20rem;
+  }
+}
+
 .previewPlaceholder {
   display: flex;
   flex-direction: column;
@@ -451,14 +527,6 @@
   margin-top: 10px;
 }
 
-.column {
-  flex-grow: 1;
-  flex-basis: 0;
-  padding: 0 8px;
-  box-sizing: border-box;
-  min-width: 0px;
-}
-
 .columnBoxHeader {
   display: flex;
   flex-direction: column;
@@ -487,12 +555,10 @@
   background-color: transparent;
 }
 
-.btnAddColumn {
-  padding: 0;
-}
-
 .dropZone {
-  height: 100%;
+  /* fills the free height of .columnDropArea, so an empty column next to a
+     tall one is droppable over its whole visible height */
+  flex: 1 1 auto;
   min-height: 10rem;
   border-width: 1px;
   border-radius: 2px;
@@ -532,50 +598,12 @@
   height: 24px;
 }
 
-@media (min-width: 1280px) {
-  .columnAddButton {
-    position: relative;
-    flex: 0 0 46px;
-    max-width: 46px;
-    padding-left: 8px;
-    display: flex;
-    align-items: center;
-  }
-
-  .btnAddColumn {
-    width: 31px;
-  }
-
-  .btnAddColumn[data-title]:hover:after {
-    content: attr(data-title);
-    position: absolute;
-    top: 100%;
-    left: 100%;
-    transform: translateX(-100%) translateY(5px);
-    white-space: normal;
-    color: #467fcf;
-    background-color: #fff;
-    padding: 2px 4px;
-    border: 1px solid #467fcf;
-    border-radius: 4px;
-    font-size: 12px;
-    z-index: 1000;
-    width: 150px;
-  }
-}
-
-@media (max-width: 1280px) {
-  .columnsCard {
-    flex-wrap: wrap;
-    width: 100%;
-  }
-
-  .column {
-    flex-grow: 1;
-    flex-basis: 100%;
-    padding: 0 0px;
-  }
-
+/* The canvas columns carry the viewer's .dashboardColumn (same classes, same
+   992px breakpoint — see routes/dashboard/style.css), so the editor previews
+   exactly the wrap the real dashboard will do. Only the editor-specific
+   chrome keeps its own rules; the add-column control lives in the section
+   header so nothing but the columns occupies the wrapping row. */
+@media (max-width: 991.98px) {
   .columnBoxHeader {
     padding-top: 1.5rem;
     margin-bottom: 2px;
@@ -583,17 +611,6 @@
     justify-content: center;
     border-top: 1px dashed #bdbdbd;
     min-height: 0px;
-  }
-
-  .columnAddButton {
-    width: 100%;
-    flex: none;
-  }
-
-  .displayTextMobile {
-    display: inline !important;
-    margin-left: 0.5rem;
-    text-wrap: wrap;
   }
 }
 
@@ -713,7 +730,6 @@
   color: #fff;
 }
 
-:global(.glass-theme) .btnAddColumn,
 :global(.glass-theme) .addSectionButton {
   border-radius: 999px;
   border: 1px solid var(--gl-border);
@@ -723,32 +739,17 @@
   color: var(--gl-ink);
   font-weight: 600;
   box-shadow: var(--gl-shadow-soft);
-}
-
-:global(.glass-theme) .addSectionButton {
   padding: 0.45rem 1.1rem;
 }
 
-:global(.glass-theme) .btnAddColumn:hover,
 :global(.glass-theme) .addSectionButton:hover {
   background-color: #fff;
   color: var(--gl-ink);
   border-color: var(--gl-border);
 }
 
-:global(.glass-theme) .btnAddColumn :global(.fe),
 :global(.glass-theme) .addSectionButton :global(.fe) {
   color: var(--gl-accent);
-}
-
-/* the add-column hover tooltip joins the drag-pill family */
-:global(.glass-theme) .btnAddColumn[data-title]:hover:after {
-  color: #fff;
-  background-color: var(--gl-ink);
-  border: none;
-  border-radius: 10px;
-  padding: 4px 10px;
-  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.35);
 }
 
 /* the mobile column separator drops the Tabler gray for the theme's ink */
