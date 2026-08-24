@@ -292,7 +292,28 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
   if (manualVal === 'true') {
     const manualUntilKey = `THERMOSTAT_${featureKey}_MANUAL_UNTIL`;
     const manualUntilVal = await gladys.variable.getValue(manualUntilKey, serviceId).catch(() => null);
-    const manualUntil = manualUntilVal ? parseInt(manualUntilVal, 10) : null;
+    let manualUntil = manualUntilVal ? parseInt(manualUntilVal, 10) : null;
+    // A hold taken while the device followed no schedule is permanent by design
+    // (setValue writes an empty expiry). If a schedule is attached afterwards,
+    // that hold would never expire and the schedule would never take over, while
+    // the widget — which only renders the manual banner when an expiry is set —
+    // would display the schedule banner with no way to cancel. Arming the expiry
+    // here makes the device behave exactly like one scheduled from the start.
+    if (!manualUntil && config.active_schedule) {
+      manualUntil = Date.now() + config.manual_duration * 60 * 1000;
+      await gladys.variable.setValue(manualUntilKey, String(manualUntil), serviceId);
+      logger.info(
+        `Thermostat schedule: permanent manual hold on ${selector} now follows a schedule, ` +
+          `expiry armed until ${new Date(manualUntil).toISOString()}`,
+      );
+      gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
+        // The expiry rides along: an open widget holds `manualUntil: null` for a
+        // permanent hold, and would otherwise keep rendering the schedule banner
+        // with no cancel button until it is reloaded.
+        payload: { key: manualVarKey, value: 'true', manualUntil: String(manualUntil) },
+      });
+    }
     if (manualUntil && Date.now() > manualUntil) {
       logger.info(`Thermostat schedule: manual timer expired for ${selector}, reverting to schedule`);
       await gladys.variable.setValue(manualVarKey, 'false', serviceId);

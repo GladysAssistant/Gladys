@@ -496,6 +496,15 @@ class ThermostatBox extends Component {
       this.loadSchedule();
     } else if (isManual !== this.state.isManualMode && !this.savingPreset) {
       this.setState({ isManualMode: isManual });
+    } else if (isManual && payload.manualUntil && !this.state.manualUntil) {
+      // A hold taken with no schedule carries no expiry, so the banner falls back
+      // to the schedule one — which has no cancel button. The server arms the
+      // expiry once a schedule is attached and sends it here: adopting it swaps
+      // the banner back to the manual one, countdown and cancel button included.
+      const until = parseInt(payload.manualUntil, 10);
+      if (until > Date.now()) {
+        this.setState({ manualUntil: until });
+      }
     }
   };
 
