@@ -844,6 +844,9 @@
         "cancelManual": "Cancel manual mode",
         "windowOpen": "Window open — heating suspended",
         "windowOpenCooling": "Window open — cooling suspended",
+        "a11ySetpoint": "Setpoint",
+        "a11yCurrentTemp": "Current temperature",
+        "a11yHumidity": "Humidity",
         "error": "Error loading thermostat data.",
         "preset": {
           "off": "Off",

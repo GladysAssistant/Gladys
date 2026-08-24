@@ -734,6 +734,9 @@
         "cancelManual": "Manuellen Modus beenden",
         "windowOpen": "Fenster offen — Heizung ausgesetzt",
         "windowOpenCooling": "Fenster offen — Kühlung ausgesetzt",
+        "a11ySetpoint": "Sollwert",
+        "a11yCurrentTemp": "Gemessene Temperatur",
+        "a11yHumidity": "Luftfeuchtigkeit",
         "error": "Fehler beim Laden der Thermostat-Daten.",
         "preset": {
           "off": "Aus",

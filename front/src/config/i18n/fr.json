@@ -734,6 +734,9 @@
         "cancelManual": "Annuler le mode manuel",
         "windowOpen": "Fenêtre ouverte — chauffage suspendu",
         "windowOpenCooling": "Fenêtre ouverte — climatisation suspendue",
+        "a11ySetpoint": "Consigne",
+        "a11yCurrentTemp": "Température mesurée",
+        "a11yHumidity": "Humidité",
         "error": "Erreur lors du chargement des données du thermostat.",
         "preset": {
           "off": "Arrêt",
