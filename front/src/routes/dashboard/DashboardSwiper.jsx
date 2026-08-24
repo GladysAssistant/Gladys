@@ -23,6 +23,10 @@ const FLICK_MIN_PX = 30;
 const RUBBER_BAND = 0.25;
 // Where the incoming dashboard slides in from
 const ENTER_OFFSET_PX = 40;
+// How long the snap-back / enter transitions run — the horizontal clip on
+// the outer wrapper is kept slightly longer than the longest of them
+const SNAP_MS = 150;
+const ENTER_MS = 200;
 
 // Widgets also hold horizontally scrollable strips (responsive device
 // tables, the weather forecast row): a touch starting inside one belongs to
@@ -48,18 +52,24 @@ const startsInHorizontalScroller = (target, boundary) => {
 // pager gesture. The listeners live on the document (bounded to the
 // dashboard's own page) so the gesture also works on the empty scene around
 // and below the widgets of a short dashboard, not only on this wrapper's
-// content. Only on the mobile/touch layout: on a desktop mouse there is
-// nothing to swipe with, and a wall tablet must not change dashboards on a
-// brushed sleeve. The content follows the finger (with rubber-band
+// content. Only on the mobile/touch PHONE layout: on a desktop mouse there
+// is nothing to swipe with, and in tablet mode (docked wall tablets — a
+// portrait iPad sits inside the same breakpoint) a brushed sleeve must not
+// change dashboards. The content follows the finger (with rubber-band
 // resistance at both ends), and the target dashboard slides in from the
 // side it was pulled from — also when it was picked from the dock, so the
 // pills and the gesture tell one consistent story.
 class DashboardSwiper extends Component {
+  setClipRef = element => {
+    this.clipElement = element;
+  };
+
   setRef = element => {
     this.element = element;
   };
 
-  isTouchLayout = () =>
+  isPagerEnabled = () =>
+    !this.props.tabletMode &&
     window.matchMedia &&
     window.matchMedia('(pointer: coarse)').matches &&
     window.matchMedia('(max-width: 991.98px)').matches;
@@ -77,9 +87,50 @@ class DashboardSwiper extends Component {
     return sibling ? sibling.selector : null;
   };
 
-  handleTouchStart = event => {
+  // While the content is translated (finger follow, snap back, enter slide)
+  // the outer wrapper clips horizontally so the page never grows a
+  // horizontal scrollbar. The clip is transient on purpose: statically it
+  // would turn the wrapper into a scroll container (overflow-x: hidden
+  // forces overflow-y out of `visible`) and clip in-card dropdown menus.
+  beginClip = () => {
+    clearTimeout(this.unclipTimeout);
+    if (this.clipElement) {
+      this.clipElement.style.overflowX = 'hidden';
+    }
+  };
+
+  scheduleUnclip = delay => {
+    clearTimeout(this.unclipTimeout);
+    this.unclipTimeout = setTimeout(() => {
+      if (this.clipElement) {
+        this.clipElement.style.overflowX = '';
+      }
+    }, delay);
+  };
+
+  // Abandons an in-flight gesture — second finger landing, touchcancel
+  // (incoming call, the OS taking over the touch), unmount — snapping the
+  // content back WITHOUT navigating, whatever distance was reached
+  cancelActiveSwipe = () => {
+    const swipe = this.swipe;
     this.swipe = null;
-    if (event.touches.length !== 1 || !this.isTouchLayout() || !this.element) {
+    if (!swipe || swipe.axis !== 'horizontal' || !this.element) {
+      return;
+    }
+    this.element.style.transition = `transform ${SNAP_MS}ms ease-out`;
+    this.element.style.transform = '';
+    this.scheduleUnclip(SNAP_MS + 50);
+  };
+
+  handleTouchStart = event => {
+    if (event.touches.length !== 1) {
+      // a second finger (pinch…) aborts the gesture — without snapping back
+      // here the content would stay stuck mid-translation
+      this.cancelActiveSwipe();
+      return;
+    }
+    this.swipe = null;
+    if (!this.isPagerEnabled() || !this.element) {
       return;
     }
     // the page bounds the gesture: the wallpaper around the widgets swipes,
@@ -125,6 +176,9 @@ class DashboardSwiper extends Component {
         return;
       }
       swipe.axis = Math.abs(dx) > Math.abs(dy) * HORIZONTAL_RATIO ? 'horizontal' : 'vertical';
+      if (swipe.axis === 'horizontal') {
+        this.beginClip();
+      }
     }
     if (swipe.axis !== 'horizontal') {
       return;
@@ -164,21 +218,37 @@ class DashboardSwiper extends Component {
       // the enter animation plays when the new dashboard's data lands
       // (componentDidUpdate); until then the pulled content springs back
     }
-    this.element.style.transition = 'transform 0.15s ease-out';
+    this.element.style.transition = `transform ${SNAP_MS}ms ease-out`;
     this.element.style.transform = '';
+    this.scheduleUnclip(SNAP_MS + 50);
+  };
+
+  // touchcancel never navigates: the browser or OS abandoned the gesture,
+  // it did not complete it
+  handleTouchCancel = () => {
+    this.cancelActiveSwipe();
   };
 
   playEnterAnimation = side => {
     const element = this.element;
+    // a still-pending previous animation must not fire on top of this one
+    cancelAnimationFrame(this.enterFrame);
+    this.beginClip();
     element.style.transition = 'none';
     element.style.transform = `translateX(${side * ENTER_OFFSET_PX}px)`;
     element.style.opacity = '0';
-    // double rAF: the starting offset must be painted before transitioning out of it
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        element.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
-        element.style.transform = '';
-        element.style.opacity = '';
+    // double rAF: the starting offset must be painted before transitioning
+    // out of it. The ids are kept so an unmount (or the next animation)
+    // cancels the pending frame instead of letting it write on a dead node.
+    this.enterFrame = requestAnimationFrame(() => {
+      this.enterFrame = requestAnimationFrame(() => {
+        if (!this.element) {
+          return;
+        }
+        this.element.style.transition = `transform ${ENTER_MS}ms ease-out, opacity ${ENTER_MS}ms ease-out`;
+        this.element.style.transform = '';
+        this.element.style.opacity = '';
+        this.scheduleUnclip(ENTER_MS + 50);
       });
     });
   };
@@ -189,7 +259,7 @@ class DashboardSwiper extends Component {
     if (!previousSelector || !currentSelector || previousSelector === currentSelector) {
       return;
     }
-    if (!this.element || !this.isTouchLayout()) {
+    if (!this.element || !this.isPagerEnabled()) {
       return;
     }
     // The slide-in side comes from the dashboards' order, not from the
@@ -207,18 +277,26 @@ class DashboardSwiper extends Component {
     document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
     document.addEventListener('touchmove', this.handleTouchMove, { passive: false });
     document.addEventListener('touchend', this.handleTouchEnd);
-    document.addEventListener('touchcancel', this.handleTouchEnd);
+    document.addEventListener('touchcancel', this.handleTouchCancel);
   }
 
   componentWillUnmount() {
     document.removeEventListener('touchstart', this.handleTouchStart);
     document.removeEventListener('touchmove', this.handleTouchMove);
     document.removeEventListener('touchend', this.handleTouchEnd);
-    document.removeEventListener('touchcancel', this.handleTouchEnd);
+    document.removeEventListener('touchcancel', this.handleTouchCancel);
+    cancelAnimationFrame(this.enterFrame);
+    clearTimeout(this.unclipTimeout);
+    this.swipe = null;
   }
 
   render({ children }) {
-    return <div ref={this.setRef}>{children}</div>;
+    // outer div: transient horizontal clip while the inner one translates
+    return (
+      <div ref={this.setClipRef}>
+        <div ref={this.setRef}>{children}</div>
+      </div>
+    );
   }
 }
 

@@ -683,10 +683,10 @@
 }
 
 :global(.glass-theme .card.loading-border) {
-  animation: glassLoadingBorderBlink 2s infinite;
+  animation: glass-loading-border-blink 2s infinite;
 }
 
-@keyframes glassLoadingBorderBlink {
+@keyframes glass-loading-border-blink {
   50% {
     border-color: rgba(61, 109, 240, 0.6);
   }

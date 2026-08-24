@@ -155,8 +155,14 @@ const DashboardPage = ({ children, ...props }) => {
                   </div>
                 )}
                 {/* On the mobile/touch layout the body is a pager: swiping
-                    left/right switches to the neighboring dashboard */}
-                <DashboardSwiper dashboards={props.dashboards} currentDashboard={props.currentDashboard}>
+                    left/right switches to the neighboring dashboard. Not in
+                    tablet mode — a docked wall tablet (a portrait iPad sits
+                    inside the same breakpoint) must not switch on a brush. */}
+                <DashboardSwiper
+                  dashboards={props.dashboards}
+                  currentDashboard={props.currentDashboard}
+                  tabletMode={props.tabletMode}
+                >
                   {props.dashboardNotConfigured && (
                     <GetStarted dashboardListEmpty={props.dashboardListEmpty} editDashboard={props.editDashboard} />
                   )}
