@@ -177,6 +177,23 @@ describe('thermostat.regulateDevice', () => {
       ...extra,
     });
 
+    it('should not actuate when the temperature sensor cannot be read', async () => {
+      // The sensor is configured but its feature is gone (renamed, deleted): the
+      // manual branch must bail out rather than compare against a missing value.
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: { 'heater-switch': { selector: 'heater-switch', last_value: 1 } },
+        variables: manualVariables({
+          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() + 60000),
+          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
+        }),
+      });
+
+      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+
+      assert.notCalled(gladys.device.setValue);
+    });
+
     it('should regulate on the manual setpoint while the timer runs', async () => {
       const mod = load(fullDaySchedule('comfort'));
       const gladys = buildGladys({

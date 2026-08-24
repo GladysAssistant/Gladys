@@ -94,6 +94,46 @@ describe('thermostat.setVariable', () => {
     assert.notCalled(handler.gladys.variable.setValue);
   });
 
+  it('should refuse a key with no feature segment at all', async () => {
+    // "THERMOSTAT_PRESET" passes the shape check — right prefix, right suffix —
+    // but names no feature: the slice between them is empty.
+    const handler = buildHandler();
+
+    let error = null;
+    try {
+      await handler.setVariable('THERMOSTAT_PRESET', 'eco');
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.not.equal(null);
+    expect(error.message).to.contain('Invalid thermostat variable key');
+    assert.notCalled(handler.gladys.device.get);
+    assert.notCalled(handler.gladys.variable.setValue);
+  });
+
+  it('should refuse the key when no thermostat exists at all', async () => {
+    // device.get resolves to null on an empty install, and a device row can be
+    // returned without its features: neither may throw on the way to the refusal.
+    const handler = buildHandler(null);
+
+    let error = null;
+    try {
+      await handler.setVariable('THERMOSTAT_LIVING_ROOM_PRESET', 'eco');
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.not.equal(null);
+    expect(error.message).to.contain('Invalid thermostat variable key');
+  });
+
+  it('should refuse the key when a thermostat carries no features', async () => {
+    const handler = buildHandler([{ selector: 'thermostat-living-room' }]);
+
+    expect(await handler.getVariable('THERMOSTAT_LIVING_ROOM_PRESET')).to.equal(null);
+  });
+
   it('should broadcast PRESET_UPDATED for a preset variable', async () => {
     const handler = buildHandler();
 
