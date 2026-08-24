@@ -8,6 +8,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* a pill can never grow past the widget: long action names wrap inside
+     (overflow-wrap on the label) instead of overflowing the card */
+  max-width: 100%;
   min-height: 2.75rem;
   padding: 6px 16px;
   border-radius: 12px;
@@ -27,7 +30,15 @@
 
 .actionIcon {
   display: inline-flex;
+  flex-shrink: 0;
   color: #467fcf;
+}
+
+.actionLabel {
+  /* min-width: 0 lets the label shrink below its longest word so
+     overflow-wrap can break names without spaces */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .actionButton:disabled .actionIcon i {
