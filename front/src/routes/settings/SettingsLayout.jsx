@@ -3,6 +3,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import config from '../../config';
 
+import ChipsScroll from '../../components/chips-scroll';
 import style from './style.css';
 import dashboardStyle from '../dashboard/style.css';
 
@@ -33,7 +34,10 @@ const MENU_ITEMS = [
 // Navigation is a horizontal frosted pill row (the dashboard switcher's
 // grammar) — with the app nav in the left rail, a second vertical menu was
 // redundant and cost a quarter of the content width. Labels are kept at
-// every width (several entries share an icon), the row simply wraps.
+// every width (several entries share an icon); instead of wrapping into a
+// tall block on phones, the row rides the shared Horizon chips scroller
+// (history filters' pattern): sideways scroll, an arrow on each side only
+// while entries remain past that edge.
 const DashboardSettings = ({ children, ...props }) => (
   <div class="page">
     <div
@@ -52,7 +56,14 @@ const DashboardSettings = ({ children, ...props }) => (
           <h3 class={cx('page-title', 'mb-3', style.settingsTitle)}>
             <Text id="settings.title" />
           </h3>
-          <div class={style.settingsTabs}>
+          <ChipsScroll
+            wrapperClass={style.settingsTabsWrapper}
+            scrollerClass={style.settingsTabs}
+            leftButtonClass={cx(style.tabsScrollBtn, style.tabsScrollBtnLeft)}
+            rightButtonClass={cx(style.tabsScrollBtn, style.tabsScrollBtnRight)}
+            scrollLeftLabel={<Text id="settings.scrollLeft" />}
+            scrollRightLabel={<Text id="settings.scrollRight" />}
+          >
             {MENU_ITEMS.filter(item => !item.gatewayOnly || config.gatewayMode).map(item => (
               <Link
                 key={item.href}
@@ -68,7 +79,7 @@ const DashboardSettings = ({ children, ...props }) => (
                 </span>
               </Link>
             ))}
-          </div>
+          </ChipsScroll>
 
           {children}
         </div>
