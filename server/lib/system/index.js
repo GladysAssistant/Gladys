@@ -43,6 +43,10 @@ const { checkIfGladysUpgraded } = require('./system.checkIfGladysUpgraded');
 const { setDuckDbTimezone } = require('./system.setDuckDbTimezone');
 
 const { shutdown } = require('./system.shutdown');
+const { rebootHost } = require('./system.rebootHost');
+const { shutdownHost } = require('./system.shutdownHost');
+const { detectHostPowerManagement } = require('./system.detectHostPowerManagement');
+const { runHostPowerDbusCommand } = require('./system.runHostPowerDbusCommand');
 
 const System = function System(sequelize, event, config, job, variable, user, message, brain) {
   this.downloadUpgradeError = null;
@@ -71,6 +75,11 @@ const System = function System(sequelize, event, config, job, variable, user, me
   // integration image cleanup so it never collects an image pulled seconds
   // ago. Bounded in practice by the number of distinct images Gladys pulls.
   this.imagePullTimes = new Map();
+  // Detected host power-management mechanism ('local' | 'docker-helper' | null)
+  // and per-action availability, populated by detectHostPowerManagement() at
+  // init and cached here.
+  this.hostPowerManagement = null;
+  this.hostPowerCapabilities = { reboot: false, shutdown: false };
 };
 
 System.prototype.init = init;
@@ -113,5 +122,9 @@ System.prototype.hasCpuCfsSupport = hasCpuCfsSupport;
 System.prototype.vacuum = vacuum;
 System.prototype.setDuckDbTimezone = setDuckDbTimezone;
 System.prototype.shutdown = shutdown;
+System.prototype.rebootHost = rebootHost;
+System.prototype.shutdownHost = shutdownHost;
+System.prototype.detectHostPowerManagement = detectHostPowerManagement;
+System.prototype.runHostPowerDbusCommand = runHostPowerDbusCommand;
 
 module.exports = System;
