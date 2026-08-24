@@ -170,6 +170,20 @@ describe('system.getGladysContainerId', () => {
       expect(e).be.instanceOf(PlatformNotCompatible);
     }
   });
+  it('should ignore a cidfile when the inspected container has no State at all', async () => {
+    FsMock.promises.access.withArgs('/var/lib/gladysassistant/containerId').resolves(null);
+    FsMock.promises.readFile.resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
+    // a degraded inspect answer: without a State, the container cannot be proven running
+    system.dockerode.getContainer = sinon.fake.returns({
+      inspect: sinon.fake.resolves({}),
+    });
+    try {
+      await system.getGladysContainerId();
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e).be.instanceOf(PlatformNotCompatible);
+    }
+  });
   it('should ignore a cidfile naming a stopped container, which cannot be the running Gladys', async () => {
     FsMock.promises.access.withArgs('/var/lib/gladysassistant/containerId').resolves(null);
     FsMock.promises.readFile.resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
