@@ -111,6 +111,8 @@ The **expiry is only armed when the device follows a schedule** — that is the 
 
 `POST /api/v1/service/thermostat/setpoint/:feature_selector` goes through the same `setValue`, and only after checking that the named feature is a `thermostat` / `target-temperature` feature **owned by this service** — otherwise any authenticated household member could persist a value on a lock, a cover or a light just by naming its selector.
 
+That route accepts an optional `manual` flag, default `true`. The widget passes `manual: false` in exactly two places: when a hold ends and the schedule takes the thermostat back, and when a preset is picked on a thermostat that follows no schedule. Both write the setpoint the loop is *already* going to regulate on, right after saving `MANUAL_MODE = false` — so treating them as overrides would re-arm the very flag they just cleared. The widget would keep showing the schedule while the database said manual, and a page refresh (which restores its state from the database) would come back in manual mode, until the expiry silently dropped it minutes later. Every other caller — scenes, the generic device API, the dial, the +/− buttons — means a manual override and gets the default.
+
 ## E. Weekly schedules
 
 Two tables (migration `20260823000000`):

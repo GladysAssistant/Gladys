@@ -582,7 +582,8 @@ class ThermostatBox extends Component {
     }
     this.setState(newState);
     if (newState.setpoint !== undefined) {
-      this.sendSetpoint(newState.setpoint);
+      // Not a manual write: this is the schedule taking the thermostat back.
+      this.sendSetpoint(newState.setpoint, false);
     } else {
       // Nothing to apply (preset "off"): release the hold placed by the caller.
       this.releaseSetpointHold();
@@ -743,11 +744,18 @@ class ThermostatBox extends Component {
     // triggered every minute and debounced after each variable/setpoint change).
   }
 
-  sendSetpoint = async value => {
+  // The setpoint route treats a write as a manual override, like a scene would.
+  // Pass manual: false when writing back the setpoint the schedule dictates —
+  // otherwise returning to the schedule immediately re-arms the override it is
+  // clearing, and the widget shows the schedule while the database says manual.
+  sendSetpoint = async (value, manual = true) => {
     const { box } = this.props;
     if (!box.thermostat_feature) return;
     try {
-      await this.props.httpClient.post(`/api/v1/service/thermostat/setpoint/${box.thermostat_feature}`, { value });
+      await this.props.httpClient.post(`/api/v1/service/thermostat/setpoint/${box.thermostat_feature}`, {
+        value,
+        manual
+      });
     } catch (e) {
       console.error(e);
     }
@@ -882,7 +890,10 @@ class ThermostatBox extends Component {
     await this.savePreset(preset.key);
     await this.saveManualMode(newManual);
     if (preset.temp !== null) {
-      this.sendSetpoint(preset.temp);
+      // Without a schedule, picking a preset is not a manual override — the
+      // preset itself is what the loop regulates on, and marking the write
+      // manual would contradict the MANUAL_MODE=false just saved above.
+      this.sendSetpoint(preset.temp, newManual);
     }
     if (hasSchedule) this.startManualTimer(newSetpoint);
   };
