@@ -20,8 +20,9 @@ async function init(startDuckDbMigration = true) {
     this.add(plainDevice);
     return plainDevice;
   });
-  // setup polling for device who need polling
-  this.setupPoll();
+  // polling is not setup here: it is started by the boot sequence, once
+  // every service is started (see lib/index.js), so that a poll never hits
+  // an integration which is not started yet
   if (startDuckDbMigration) {
     this.migrateFromSQLiteToDuckDb();
     // One-shot background cleanup, no-op once its system variable is set
