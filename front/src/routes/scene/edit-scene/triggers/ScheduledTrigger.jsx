@@ -9,7 +9,7 @@ import Select from 'react-select';
 import fr from 'date-fns/locale/fr';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import datePickerStyle from '../datePicker.css';
+import datePickerStyle from '../../../../components/datePicker.css';
 
 const DAYS_OF_THE_MONTH = new Array(31).fill(0, 0, 31).map((val, index) => index + 1);
 
