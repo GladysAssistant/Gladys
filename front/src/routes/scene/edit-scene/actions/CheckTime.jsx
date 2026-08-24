@@ -7,7 +7,7 @@ import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import datePickerStyle from '../datePicker.css';
+import datePickerStyle from '../../../../components/datePicker.css';
 import style from './CheckTime.css';
 
 import fr from 'date-fns/locale/fr';

@@ -72,6 +72,7 @@
       "modalTitle": "„{{name}}“ migrieren",
       "description": "Migriere dieses Gerät zu einem Gerät einer anderen Integration: sein <b>Zustandsverlauf</b>, die <b>Szenen</b> und die <b>Dashboards</b>, die es verwenden, werden auf das Zielgerät übertragen, danach wird <b>dieses Gerät gelöscht</b>. Haben beide Geräte im selben Zeitraum Zustände aufgezeichnet, wird nur der Verlauf vor dem ersten Zustand des Zielgeräts übernommen, damit nichts doppelt gezählt wird.",
       "destinationLabel": "Zielgerät",
+      "unknownIntegration": "Unbekannte Integration",
       "featuresTitle": "Zuordnung der Funktionen",
       "doNotMigrate": "Nicht migrieren",
       "typeMismatchWarning": "Diese Funktion hat einen anderen Typ als die Quellfunktion: ihr Verlauf ergibt nach der Migration möglicherweise keinen Sinn mehr.",
@@ -810,7 +811,7 @@
       "mist": "Nebel"
     },
     "editDashboardIconLabel": "Symbol (optional)",
-    "editDashboardIconDescription": "Wird im Tablet-Modus in der Dashboard-Tab-Leiste angezeigt.",
+    "editDashboardIconDescription": "Wird in der Dashboard-Tab-Leiste angezeigt. Ohne Symbol wird nach Möglichkeit ein zum Emoji am Anfang des Namens passendes Symbol verwendet, sonst ein generisches Haus.",
     "editDashboardWidthLabel": "Dashboard-Breite",
     "widths": {
       "standard": "Standard (empfohlen)",
@@ -839,6 +840,8 @@
     "dashboardAlreadyExist": "Ein Dashboard mit diesem Namen existiert bereits.",
     "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut!",
     "validationError": "Das hinzuzufügende Dashboard ist ungültig. Hast du alle Felder korrekt ausgefüllt?",
+    "iconLabel": "Symbol",
+    "iconDescription": "Wird in der Dashboard-Tab-Leiste angezeigt. Auf dem Smartphone und im Tablet-Modus ist es oft das einzige Erkennungsmerkmal des Dashboards.",
     "createDashboardButton": "Hinzufügen"
   },
   "integration": {
