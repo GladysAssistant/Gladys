@@ -6,6 +6,7 @@ import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
 import { USER_ROLE } from '../../../../server/utils/constants';
 import DarkModeToggle from '../darkmode/DarkModeToggle';
+import GatewayTrialIndicator from './GatewayTrialIndicator';
 import style from './style.css';
 
 const PAGES_WITHOUT_HEADER = [
@@ -230,6 +231,15 @@ class Header extends Component {
               </li>
             ))}
           </ul>
+          {Number.isInteger(props.gatewayTrialDaysLeft) && (
+            <GatewayTrialIndicator
+              daysLeft={props.gatewayTrialDaysLeft}
+              hasPaymentMethod={props.gatewayTrialHasPaymentMethod}
+              stripePortalKey={props.gatewayTrialStripePortalKey}
+              session={props.session}
+              refreshGatewayTrialState={props.refreshGatewayTrialState}
+            />
+          )}
           <div class={cx('dropdown', style.sidebarFooter, { show: props.showDropDown })} ref={this.dropdownRef}>
             <a onClick={props.toggleDropDown} class={style.profileButton} data-toggle="dropdown">
               <span class="avatar" style={`background-image: url(${props.profilePicture})`} />

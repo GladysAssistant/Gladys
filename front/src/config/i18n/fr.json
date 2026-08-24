@@ -6228,6 +6228,12 @@
     "scenes": "Scènes",
     "profile": "Profil",
     "settings": "Paramètres",
+    "trialDaysLeft": {
+      "zero": "L'essai Gladys Plus se termine aujourd'hui",
+      "one": "Essai Gladys Plus : 1 jour restant",
+      "other": "Essai Gladys Plus : {{count}} jours restants"
+    },
+    "trialAddPaymentMethod": "Ajouter un moyen de paiement",
     "needHelp": "Besoin d'aide",
     "signOut": "Déconnexion"
   },

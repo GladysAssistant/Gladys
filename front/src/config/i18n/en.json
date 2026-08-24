@@ -6228,6 +6228,12 @@
     "scenes": "Scenes",
     "profile": "Profile",
     "settings": "Settings",
+    "trialDaysLeft": {
+      "zero": "Gladys Plus trial ends today",
+      "one": "Gladys Plus trial: 1 day left",
+      "other": "Gladys Plus trial: {{count}} days left"
+    },
+    "trialAddPaymentMethod": "Add a payment method",
     "needHelp": "Need help",
     "signOut": "Sign Out"
   },
