@@ -8,6 +8,8 @@ import PRESET_COLORS from '../../../../../utils/thermostatPresetColors';
 import {
   applySlotToDay,
   mergeIntoSlots,
+  copyDayOntoDays,
+  readDayAsEntered,
   timeToMinutes,
   minutesToTime,
   DAY_MINUTES
@@ -185,7 +187,13 @@ class ScheduleEditor extends Component {
     // If end <= start, the user wants overflow past midnight (e.g. 18h→06h)
     if (newEnd <= newStart) newEnd = newEnd + DAY_MINUTES;
 
-    const existingDaySlots = this.state.slots.filter(s => s.day_of_week === dayOfWeek);
+    // Drop the morning half of the night being edited first: mergeIntoSlots
+    // only trims what the new overflow overlaps, so shortening 22:30->06:30
+    // to 05:00 would leave a stray 05:00->06:30 behind.
+    const edited = this.state.slots.find(s => s.key === slotKey);
+    const piece = this.findOvernightPiece(this.state.slots, edited);
+    const baseSlots = piece ? this.state.slots.filter(s => s.key !== piece.key) : this.state.slots;
+    const existingDaySlots = baseSlots.filter(s => s.day_of_week === dayOfWeek);
 
     const { fixedSlots, overflowSlot } = applySlotToDay(
       existingDaySlots,
@@ -197,7 +205,7 @@ class ScheduleEditor extends Component {
       slotKey
     );
     const taggedFixed = fixedSlots.map(s => ({ ...s, day_of_week: dayOfWeek }));
-    const finalSlots = mergeIntoSlots(this.state.slots, dayOfWeek, taggedFixed, overflowSlot);
+    const finalSlots = mergeIntoSlots(baseSlots, dayOfWeek, taggedFixed, overflowSlot);
 
     this.setState(prev => {
       const forms = { ...prev.editForms };
@@ -208,15 +216,34 @@ class ScheduleEditor extends Component {
 
   // ── Remove ────────────────────────────────────────────────────────────────
 
+  // The morning half a night left on the next day, matched on geometry the way
+  // readDayAsEntered does. The list shows the pair as one slot, so editing or
+  // removing that slot has to reach this row too — otherwise it survives as an
+  // orphan the user has no way to see, let alone delete.
+  findOvernightPiece = (slots, slot) => {
+    if (!slot || timeToMinutes(slot.end_time) !== 0) {
+      return null;
+    }
+    return (
+      slots.find(
+        s =>
+          s.day_of_week === (slot.day_of_week + 1) % 7 &&
+          timeToMinutes(s.start_time) === 0 &&
+          timeToMinutes(s.end_time) !== 0 &&
+          s.preset === slot.preset
+      ) || null
+    );
+  };
+
   removeSlot = slotKey => {
-    this.setState(prev => ({
-      slots: prev.slots.filter(s => s.key !== slotKey),
-      editForms: (() => {
-        const forms = { ...prev.editForms };
-        delete forms[slotKey];
-        return forms;
-      })()
-    }));
+    this.setState(prev => {
+      const removed = prev.slots.find(s => s.key === slotKey);
+      const piece = this.findOvernightPiece(prev.slots, removed);
+      const dropped = new Set([slotKey, ...(piece ? [piece.key] : [])]);
+      const forms = { ...prev.editForms };
+      delete forms[slotKey];
+      return { slots: prev.slots.filter(s => !dropped.has(s.key)), editForms: forms };
+    });
   };
 
   // ── Copy ──────────────────────────────────────────────────────────────────
@@ -242,20 +269,23 @@ class ScheduleEditor extends Component {
       this.closeCopyPicker();
       return;
     }
-    const daySlots = slots.filter(s => s.day_of_week === copySourceDay);
-    const otherSlots = slots.filter(s => !copyTargetDays.includes(s.day_of_week));
-    const copies = [];
-    copyTargetDays.forEach(d => {
-      daySlots.forEach(s => copies.push({ ...s, day_of_week: d, key: Date.now() + d * 100 + Math.random() }));
-    });
-    this.setState({ slots: [...otherSlots, ...copies], copySourceDay: null, copyTargetDays: [] });
+    // A night crossing midnight lives as two rows, the second one on the next
+    // day: copying the source day's rows alone would drop its morning half and
+    // overwrite that same half on a target. copyDayOntoDays re-joins the pair
+    // and lays it back down on every target.
+    const nextSlots = copyDayOntoDays(slots, copySourceDay, copyTargetDays, () => Date.now() + Math.random());
+    this.setState({ slots: nextSlots, copySourceDay: null, copyTargetDays: [] });
   };
 
   // ── Validation ────────────────────────────────────────────────────────────
 
+  // Uncovered ranges, per day. A gap is not an error: the regulation loop falls
+  // back on the current preset when no slot matches, which is what a
+  // daytime-only schedule (offices, 08:00 → 18:00) relies on. It is reported as
+  // a warning so an unintended hole is still visible before saving.
   validateSchedule = () => {
     const { slots } = this.state;
-    const gapDays = [];
+    const gaps = [];
     DAYS.forEach(day => {
       const daySlots = slots
         .filter(s => s.day_of_week === day)
@@ -265,23 +295,22 @@ class ScheduleEditor extends Component {
         }))
         .sort((a, b) => a.start - b.start);
 
-      if (daySlots.length === 0) {
-        gapDays.push(day);
-        return;
-      }
-
-      // Check coverage from 0 to DAY_MINUTES
+      const ranges = [];
       let covered = 0;
-      for (const s of daySlots) {
+      daySlots.forEach(s => {
         if (s.start > covered) {
-          gapDays.push(day);
-          return;
+          ranges.push({ from: covered, to: s.start });
         }
         covered = Math.max(covered, s.end);
+      });
+      if (covered < DAY_MINUTES) {
+        ranges.push({ from: covered, to: DAY_MINUTES });
       }
-      if (covered < DAY_MINUTES) gapDays.push(day);
+      if (ranges.length > 0) {
+        gaps.push({ day, ranges });
+      }
     });
-    return gapDays;
+    return gaps;
   };
 
   // ── Save ──────────────────────────────────────────────────────────────────
@@ -290,12 +319,7 @@ class ScheduleEditor extends Component {
     const { name, slots } = this.state;
     if (!name.trim()) return;
 
-    const gapDays = this.validateSchedule();
-    if (gapDays.length > 0) {
-      this.setState({ error: { type: 'gaps', days: gapDays } });
-      return;
-    }
-
+    // Gaps no longer block: they are surfaced as a warning above the form.
     this.setState({ saving: true, error: null });
     const scheduleData = {
       name: name.trim(),
@@ -368,48 +392,59 @@ class ScheduleEditor extends Component {
   }
 
   renderSlotForm(formData, onFieldChange, onConfirm, onCancel, onRemove, dictionary, isEdit) {
+    // 00:00 → 00:00 is the whole day, which reads as an empty range unless it
+    // says so: it is what an empty day is prefilled with.
+    const isFullDay = timeToMinutes(formData.start_time) === 0 && timeToMinutes(formData.end_time) === 0;
     return (
-      <div class={isEdit ? style.editSlotForm : style.newSlotForm}>
-        <div
-          class={style.slotColorDot}
-          style={`--dot-color:${PRESET_COLORS[formData.preset] || PRESET_COLORS.comfort}`}
-        />
-        <input
-          type="time"
-          class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
-          value={formData.start_time}
-          onInput={e => onFieldChange('start_time', e.target.value)}
-          onChange={e => onFieldChange('start_time', e.target.value)}
-        />
-        <span class={style.slotArrow}>→</span>
-        <input
-          type="time"
-          class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
-          value={formData.end_time}
-          onInput={e => onFieldChange('end_time', e.target.value)}
-          onChange={e => onFieldChange('end_time', e.target.value)}
-        />
-        <select
-          class={cx('form-control', 'form-control-sm', style.slotPresetSelect)}
-          value={formData.preset}
-          onChange={e => onFieldChange('preset', e.target.value)}
-        >
-          {PRESETS.map(p => (
-            <option key={p} value={p}>
-              {(dictionary.presets && dictionary.presets[p]) || p}
-            </option>
-          ))}
-        </select>
-        <button type="button" class="btn btn-sm btn-success" onClick={onConfirm}>
-          <i class="fe fe-check" />
-        </button>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onClick={onCancel}>
-          <i class="fe fe-x" />
-        </button>
-        {onRemove && (
-          <button type="button" class="btn btn-sm btn-outline-danger" onClick={onRemove}>
-            <i class="fe fe-trash-2" />
+      <div class={style.slotFormWrapper}>
+        <div class={isEdit ? style.editSlotForm : style.newSlotForm}>
+          <div
+            class={style.slotColorDot}
+            style={`--dot-color:${PRESET_COLORS[formData.preset] || PRESET_COLORS.comfort}`}
+          />
+          <input
+            type="time"
+            class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
+            value={formData.start_time}
+            onInput={e => onFieldChange('start_time', e.target.value)}
+            onChange={e => onFieldChange('start_time', e.target.value)}
+          />
+          <span class={style.slotArrow}>→</span>
+          <input
+            type="time"
+            class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
+            value={formData.end_time}
+            onInput={e => onFieldChange('end_time', e.target.value)}
+            onChange={e => onFieldChange('end_time', e.target.value)}
+          />
+          <select
+            class={cx('form-control', 'form-control-sm', style.slotPresetSelect)}
+            value={formData.preset}
+            onChange={e => onFieldChange('preset', e.target.value)}
+          >
+            {PRESETS.map(p => (
+              <option key={p} value={p}>
+                {(dictionary.presets && dictionary.presets[p]) || p}
+              </option>
+            ))}
+          </select>
+          <button type="button" class="btn btn-sm btn-success" onClick={onConfirm}>
+            <i class="fe fe-check" />
           </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" onClick={onCancel}>
+            <i class="fe fe-x" />
+          </button>
+          {onRemove && (
+            <button type="button" class="btn btn-sm btn-outline-danger" onClick={onRemove}>
+              <i class="fe fe-trash-2" />
+            </button>
+          )}
+        </div>
+        {isFullDay && (
+          <p class={style.fullDayHint}>
+            <i class="fe fe-info mr-1" />
+            <Text id="integration.thermostat.schedule.fullDayHint" />
+          </p>
         )}
       </div>
     );
@@ -423,6 +458,9 @@ class ScheduleEditor extends Component {
       intl && intl.dictionary && intl.dictionary.integration && intl.dictionary.integration.thermostat
         ? intl.dictionary.integration.thermostat.schedule
         : {};
+    // An empty schedule is a schedule being started, not one with holes: the
+    // warning would name all seven days before the user has typed anything.
+    const gaps = slots.length === 0 ? [] : this.validateSchedule();
 
     return (
       <div class="card">
@@ -438,20 +476,25 @@ class ScheduleEditor extends Component {
         <div class="card-body">
           {error && (
             <div class="alert alert-danger">
-              {error && error.type === 'gaps' ? (
-                <span>
-                  <Text id="integration.thermostat.schedule.gapError" />{' '}
-                  {error.days.map(d => (
-                    <span key={d} class="badge badge-light mr-1">
-                      <Text id={`integration.thermostat.schedule.daysShort.${d}`} />
-                    </span>
-                  ))}
-                </span>
-              ) : typeof error === 'string' ? (
-                error
-              ) : (
-                <Text id="integration.thermostat.schedule.saveError" />
-              )}
+              {typeof error === 'string' ? error : <Text id="integration.thermostat.schedule.saveError" />}
+            </div>
+          )}
+
+          {gaps.length > 0 && (
+            <div class="alert alert-warning">
+              <div class={style.gapWarningTitle}>
+                <i class="fe fe-alert-triangle mr-1" />
+                <Text id="integration.thermostat.schedule.gapWarning" />
+              </div>
+              <ul class={style.gapWarningList}>
+                {gaps.map(gap => (
+                  <li key={gap.day}>
+                    <Text id={`integration.thermostat.schedule.days.${gap.day}`} />
+                    {' : '}
+                    {gap.ranges.map(range => `${minutesToTime(range.from)} → ${minutesToTime(range.to)}`).join(', ')}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
@@ -470,9 +513,17 @@ class ScheduleEditor extends Component {
 
           <div class={style.dayList}>
             {DAYS.map(day => {
-              const daySlots = slots
+              // The bar draws what this day actually covers, so it keeps the
+              // stored rows: a night is a segment up to midnight here, and its
+              // morning half belongs to the next day's bar.
+              const barSlots = slots
                 .filter(s => s.day_of_week === day)
                 .sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time));
+              // The list shows what the user typed: a night reads back as
+              // 22:30 → 06:30 (+1d) rather than a truncated 22:30 → 00:00.
+              const daySlots = readDayAsEntered(slots, day).sort(
+                (a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time)
+              );
               const isOpen = selectedDay === day;
               const newForm = newSlotForms[day];
 
@@ -485,7 +536,7 @@ class ScheduleEditor extends Component {
                       </span>
                       <i class={`fe fe-chevron-${isOpen ? 'up' : 'down'} ${style.dayChevron}`} />
                     </div>
-                    {this.renderTimeBar(daySlots)}
+                    {this.renderTimeBar(barSlots)}
                   </div>
 
                   {isOpen && (
@@ -528,6 +579,11 @@ class ScheduleEditor extends Component {
                             <span class={style.slotTimeDisplay}>{slot.start_time}</span>
                             <span class={style.slotArrow}>→</span>
                             <span class={style.slotTimeDisplay}>{slot.end_time}</span>
+                            {slot.overnight && (
+                              <span class={style.slotNextDay}>
+                                <Text id="integration.thermostat.schedule.nextDay" />
+                              </span>
+                            )}
                             <span class={style.slotPresetLabel}>
                               {(dictionary.presets && dictionary.presets[slot.preset]) || slot.preset}
                             </span>
