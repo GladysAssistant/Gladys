@@ -184,6 +184,16 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dashboardController.updateOrder,
     },
+    'post /api/v1/dashboard_asset/:dashboard_selector': {
+      authenticated: true,
+      largeJsonBody: true,
+      rateLimit: true,
+      controller: dashboardController.createAsset,
+    },
+    'get /api/v1/dashboard_asset/:dashboard_asset_id': {
+      authenticated: true,
+      controller: dashboardController.getAsset,
+    },
     'get /api/v1/dashboard/photo/proxy': {
       authenticated: true,
       rateLimit: true,
@@ -863,6 +873,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: sceneController.get,
     },
+    'get /api/v1/scene/running': {
+      authenticated: true,
+      controller: sceneController.getRunning,
+    },
     'get /api/v1/scene/:scene_selector': {
       authenticated: true,
       controller: sceneController.getBySelector,
@@ -880,6 +894,14 @@ function getRoutes(gladys) {
     'post /api/v1/scene/:scene_selector/start': {
       authenticated: true,
       controller: sceneController.start,
+    },
+    'post /api/v1/scene/execution/:execution_id/stop': {
+      authenticated: true,
+      controller: sceneController.stopExecution,
+    },
+    'post /api/v1/scene/:scene_selector/stop': {
+      authenticated: true,
+      controller: sceneController.stop,
     },
     'post /api/v1/scene/:scene_selector/duplicate': {
       authenticated: true,

@@ -4,6 +4,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+import style from '../style.css';
 
 class BinaryDeviceState extends Component {
   handleValueChangeBinary = newValue => () => {
@@ -16,9 +17,9 @@ class BinaryDeviceState extends Component {
     const customText = get(this.props.intl.dictionary, `deviceFeatureValue.category.${category}.${type}`);
 
     return (
-      <div class="col-6">
+      <div class="col-6 d-flex">
         <button
-          class={cx('btn', 'btn-block', 'p-1', {
+          class={cx('btn', 'btn-block', 'p-1', style.deviceStateButton, {
             'btn-primary': this.props.trigger.value === value,
             'btn-outline-primary': this.props.trigger.value !== value,
             active: this.props.trigger.value === value

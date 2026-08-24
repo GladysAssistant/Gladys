@@ -9,3 +9,16 @@
     margin-top: 12px;
   }
 }
+
+/* The theme ships `white-space: nowrap` on `.btn`: in the "device state change"
+   trigger the state buttons have a fixed column width, so a long label
+   ("Mouvement détecté", "Pas de mouvement", and their equivalent in other
+   languages) overflows the button instead of being displayed. Let the label
+   wrap on several lines, and stretch the button to the height of its column so
+   a pair of buttons stays aligned when only one of them wraps. */
+.deviceStateButton {
+  flex: 1;
+  height: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

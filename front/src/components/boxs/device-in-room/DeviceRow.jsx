@@ -30,6 +30,11 @@ import VacuumCleanerCleanModeDeviceFeature from './device-features/VacuumCleaner
 import WaterHeaterModeDeviceFeature from './device-features/WaterHeaterModeDeviceFeature';
 import TextSelectDeviceFeature from './device-features/TextSelectDeviceFeature';
 
+// DeviceRow is the per-FEATURE registry, and it is not only used by the dashboard widgets: the
+// MQTT catalog preview renders one mock feature through it. The light entries therefore stay,
+// even though the widgets no longer reach most of them — DeviceCard groups the light features of
+// a same device into one LightDeviceFeature row before this map is consulted, and only what it
+// leaves ungrouped (a light with no device attached) falls back here.
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: ColorDeviceFeature,
@@ -90,6 +95,8 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
   },
   [DEVICE_FEATURE_CATEGORIES.CAMERA]: {
+    // The "enabled" gate is a plain on/off control (docs/specs/camera-enable-disable.md)
+    [DEVICE_FEATURE_TYPES.CAMERA.ENABLED]: BinaryDeviceFeature,
     [DEVICE_FEATURE_TYPES.CAMERA.MOVE]: CameraMoveDeviceFeature,
     [DEVICE_FEATURE_TYPES.CAMERA.PRESET]: CameraPresetDeviceFeature
   },

@@ -4,6 +4,7 @@ import SettingsSystemBatteryLevelWarning from './SettingsSystemBatteryLevelWarni
 import SettingsSystemContainers from './SettingsSystemContainers';
 import SettingsSystemOperations from './SettingsSystemOperations';
 import SettingsSystemTimezone from './SettingsSystemTimezone';
+import SettingsSystemMdns from './SettingsSystemMdns';
 import SettingsSystemKeepDeviceHistory from './SettingsSystemKeepDeviceHistory';
 import SettingsSystemTimeExpiryState from './SettingsSystemTimeExpiryState';
 import SettingsSystemDatabaseCleaning from './SettingsSystemDatabaseCleaning';
@@ -14,8 +15,8 @@ import SettingsSystemHostPower from './SettingsSystemHostPower';
 const SystemPage = ({ children, ...props }) => (
   <SettingsLayout>
     <div class="row">
-      <div class="col-sm-6 col-lg">
-        <div class="card p-3">
+      <div class="col-sm-6 col-lg d-flex">
+        <div class="card p-3 flex-fill">
           <div class="d-flex flex-row align-items-center flex-sm-column">
             <span class="stamp stamp-md bg-blue mr-3 mr-sm-0 mb-sm-2">
               <i class="fe fe-activity" />
@@ -32,8 +33,8 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
 
-      <div class="col-sm-6 col-lg">
-        <div class="card p-3">
+      <div class="col-sm-6 col-lg d-flex">
+        <div class="card p-3 flex-fill">
           <div class="d-flex flex-row align-items-center flex-sm-column">
             <span class="stamp stamp-md bg-green mr-3 mr-sm-0 mb-sm-2">
               <i class="fe fe-hard-drive" />
@@ -53,9 +54,27 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
 
+      {props.systemInfos && props.systemInfos.local_ip && (
+        <div class="col-sm-6 col-lg d-flex">
+          <div class="card p-3 flex-fill">
+            <div class="d-flex flex-row align-items-center flex-sm-column">
+              <span class="stamp stamp-md bg-azure mr-3 mr-sm-0 mb-sm-2">
+                <i class="fe fe-globe" />
+              </span>
+              <div class="text-sm-center">
+                <h4 class="m-0">
+                  <Text id="systemSettings.localIp" />
+                </h4>
+                <small class="text-muted">{props.systemInfos.local_ip}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {props.systemInfos && props.systemInfos.cpu_temperature != null && (
-        <div class="col-sm-6 col-lg">
-          <div class="card p-3">
+        <div class="col-sm-6 col-lg d-flex">
+          <div class="card p-3 flex-fill">
             <div class="d-flex flex-row align-items-center flex-sm-column">
               <span
                 class={`stamp stamp-md mr-3 mr-sm-0 mb-sm-2 ${
@@ -81,8 +100,8 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       )}
 
-      <div class="col-sm-6 col-lg">
-        <div class="card p-3">
+      <div class="col-sm-6 col-lg d-flex">
+        <div class="card p-3 flex-fill">
           <div class="d-flex flex-row align-items-center flex-sm-column">
             <span class="stamp stamp-md bg-red mr-3 mr-sm-0 mb-sm-2">
               <i class="fe fe-heart" />
@@ -97,8 +116,8 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
 
-      <div class="col-sm-6 col-lg">
-        <div class="card p-3">
+      <div class="col-sm-6 col-lg d-flex">
+        <div class="card p-3 flex-fill">
           <div class="d-flex flex-row align-items-center flex-sm-column">
             <span class="stamp stamp-md bg-yellow mr-3 mr-sm-0 mb-sm-2">
               <i class="fe fe-git-commit" />
@@ -113,6 +132,10 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
     </div>
+    {/* Thematic columns: system & maintenance on the left (updates,
+        containers, logs, database upkeep), behavior preferences on the
+        right — and the containers list gets a full column width instead
+        of overflowing at the bottom of a crowded one. */}
     <div class="row">
       <div class="col-lg-6">
         <SettingsSystemOperations
@@ -126,17 +149,18 @@ const SystemPage = ({ children, ...props }) => (
           CheckForUpdatesStatus={props.CheckForUpdatesStatus}
           systemInfos={props.systemInfos}
         />
+        <SettingsSystemContainers />
+        <SettingsSystemDownloadLogs />
+        <SettingsSystemDatabaseCleaning />
         <SettingsSystemDuckDbMigration />
-        <SettingsSystemKeepDeviceHistory />
-        <SettingsSystemTimeExpiryState />
+        <SettingsSystemHostPower systemInfos={props.systemInfos} />
       </div>
       <div class="col-lg-6">
         <SettingsSystemTimezone />
+        <SettingsSystemMdns systemInfos={props.systemInfos} />
         <SettingsSystemBatteryLevelWarning />
-        <SettingsSystemDownloadLogs />
-        <SettingsSystemDatabaseCleaning />
-        <SettingsSystemContainers />
-        <SettingsSystemHostPower systemInfos={props.systemInfos} />
+        <SettingsSystemKeepDeviceHistory />
+        <SettingsSystemTimeExpiryState />
       </div>
     </div>
   </SettingsLayout>

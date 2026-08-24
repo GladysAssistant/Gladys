@@ -1,81 +1,56 @@
 import { Text } from 'preact-i18n';
-import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import EditActions from './EditActions';
 import ReorderDashbordList from './ReorderDashbordList';
 import EditBoxColumns from './EditBoxColumns';
 import style from '../style.css';
+import editStyle from './style.css';
 import get from 'get-value';
+import { getBackgroundSceneClass } from '../backgroundScenes';
 
 const EditDashboard = ({ children, ...props }) => (
   <div class="page">
-    <div class="page-main">
+    {/* The editor lives on the same Horizon glass surface as the dashboard,
+        with a live preview of the scene being edited */}
+    <div
+      class={cx(
+        'page-main',
+        'glass-theme',
+        style.dashboardBackground,
+        getBackgroundSceneClass(get(props, 'currentDashboard.background_scene'))
+      )}
+    >
       <div class={props.loading ? 'dimmer active' : 'dimmer'}>
         <div class="loader" />
         <div class="dimmer-content">
           <div class="my-3 my-md-5">
-            <div class={cx('container', style.largeContainer)}>
-              <div class="row">
-                <div class="col-lg-3">
-                  <div class="card">
-                    <div class="card-header">
-                      <h3 class="card-title">
-                        <Text id="dashboard.editDashboardMyDashboards" />
-                      </h3>
-                      <div class="page-options d-flex">
-                        <Link
-                          href={`/dashboard/create/new?prev=${get(props, 'currentDashboard.selector')}`}
-                          class={cx('btn btn-sm btn-secondary', style.smallButtonOnBigScreen)}
-                        >
-                          <span>+</span>
-                        </Link>
-                      </div>
-                    </div>
-                    {props.currentDashboard && (
-                      <ReorderDashbordList
-                        dashboards={props.dashboards}
-                        currentDashboard={props.currentDashboard}
-                        updateDashboardList={props.updateDashboardList}
-                      />
-                    )}
+            <div
+              class={cx('container', style.largeContainer, editStyle.editorContainer, {
+                // live preview of the "full" width while editing
+                [style.fullWidthContainer]: get(props, 'currentDashboard.width') === 'full'
+              })}
+            >
+              {/* The dashboard list is a wrapping row of pills above the canvas
+                  (the viewer's tab-bar grammar) — a sidebar column stole a
+                  quarter of the editor's width, painful on tablets. Creation
+                  happens in the edit panel via the "+" pill: the user never
+                  leaves the editor */}
+              {props.currentDashboard && (
+                <div class={editStyle.dashboardBar}>
+                  <div class={editStyle.dashboardListHeader}>
+                    <Text id="dashboard.editDashboardMyDashboards" />
                   </div>
+                  <ReorderDashbordList
+                    dashboards={props.dashboards}
+                    currentDashboard={props.currentDashboard}
+                    updateDashboardList={props.updateDashboardList}
+                    openNewDashboard={props.openNewDashboard}
+                  />
                 </div>
-                <div class="col-lg-9">
-                  <div class="card">
-                    <div class="card-body">
-                      {props.currentDashboard && (
-                        <EditBoxColumns
-                          addBoxAtPosition={props.addBoxAtPosition}
-                          user={props.user}
-                          dashboards={props.dashboards}
-                          updateCurrentDashboardName={props.updateCurrentDashboardName}
-                          updateCurrentDashboardVisibility={props.updateCurrentDashboardVisibility}
-                          editDashboardDragEnable={props.editDashboardDragEnable}
-                          moveCard={props.moveCard}
-                          moveBoxUp={props.moveBoxUp}
-                          moveBoxDown={props.moveBoxDown}
-                          addBox={props.addBox}
-                          homeDashboard={props.currentDashboard}
-                          updateNewSelectedBox={props.updateNewSelectedBox}
-                          removeBox={props.removeBox}
-                          updateBoxConfig={props.updateBoxConfig}
-                          showReorderDashboard={props.showReorderDashboard}
-                          toggleReorderDashboard={props.toggleReorderDashboard}
-                          updateDashboardList={props.updateDashboardList}
-                          savingNewDashboardList={props.savingNewDashboardList}
-                          isMobileReordering={props.isMobileReordering}
-                          toggleMobileReorder={props.toggleMobileReorder}
-                          deleteCurrentColumn={props.deleteCurrentColumn}
-                          addColumn={props.addColumn}
-                          boxNotEmptyError={props.boxNotEmptyError}
-                          columnBoxNotEmptyError={props.columnBoxNotEmptyError}
-                        />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
+              {/* v2: the canvas sits directly on the glass scene, no wrapping card */}
+              {props.currentDashboard && <EditBoxColumns {...props} homeDashboard={props.currentDashboard} />}
 
               <EditActions {...props} />
             </div>

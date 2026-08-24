@@ -25,6 +25,20 @@ const TEST_DISCOVERY_MANIFEST = {
   ],
 };
 
+// same integration declaring several entries of the same type: 2 ports on
+// one udp-broadcast entry and 2 more (one of them a duplicate) on a second,
+// 9999 on one udp-active-broadcast entry and 20002 on a second — all valid
+// for validateManifest (5 entries max, 5 ports per entry)
+const TEST_MULTI_ENTRY_DISCOVERY_MANIFEST = {
+  ...TEST_MANIFEST,
+  network_discovery: [
+    { type: 'udp-broadcast', ports: [6666, 6667] },
+    { type: 'udp-active-broadcast', ports: [9999] },
+    { type: 'udp-broadcast', ports: [6667, 7000] },
+    { type: 'udp-active-broadcast', ports: [20002] },
+  ],
+};
+
 const seedDiscoveryService = (overrides = {}) =>
   seedExternalService({ manifest: TEST_DISCOVERY_MANIFEST, ...overrides });
 
@@ -201,6 +215,51 @@ describe('externalIntegration.runNetworkDiscoveryScan', () => {
     // once the interval has elapsed, a new scan is accepted
     externalIntegration.networkDiscoveryActiveScanTimes.set(service.id, Date.now() - 11000);
     await externalIntegration.runNetworkDiscoveryScan(service, body);
+  });
+
+  it('should authorize an active scan on a port declared by any entry of the type', async () => {
+    // a manifest may declare several entries of the same type (5 entries
+    // of 5 ports each): the install screen shows them all, so the ports of
+    // the second entry are approved just like those of the first
+    const service = await seedDiscoveryService({ manifest: TEST_MULTI_ENTRY_DISCOVERY_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.scanUdpActiveBroadcast = fake.resolves([]);
+    await externalIntegration.runNetworkDiscoveryScan(service, {
+      type: 'udp-active-broadcast',
+      port: 20002,
+      payload_base64: 'a2FzYQ==',
+      timeout_seconds: 1,
+    });
+    expect(externalIntegration.scanUdpActiveBroadcast.firstCall.args[0]).to.deep.equal({
+      port: 20002,
+      payload: Buffer.from('kasa'),
+      timeoutMs: 1000,
+    });
+    // a port declared by no entry of the type stays refused, even when
+    // another type declares it
+    externalIntegration.networkDiscoveryActiveScanTimes.delete(service.id);
+    try {
+      await externalIntegration.runNetworkDiscoveryScan(service, {
+        type: 'udp-active-broadcast',
+        port: 6666,
+        payload_base64: 'a2FzYQ==',
+      });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(ForbiddenError);
+      expect(e.message).to.include('port 6666 is not declared');
+    }
+  });
+
+  it('should capture on the ports of every declared entry of the type, each port once', async () => {
+    const service = await seedDiscoveryService({ manifest: TEST_MULTI_ENTRY_DISCOVERY_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.scanUdpBroadcast = fake.resolves([]);
+    await externalIntegration.runNetworkDiscoveryScan(service, { type: 'udp-broadcast', timeout_seconds: 1 });
+    expect(externalIntegration.scanUdpBroadcast.firstCall.args[0]).to.deep.equal({
+      ports: [6666, 6667, 7000],
+      timeoutMs: 1000,
+    });
   });
 });
 

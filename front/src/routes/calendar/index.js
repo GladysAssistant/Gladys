@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 import dayjs from 'dayjs';
 import actions from '../../actions/calendar';
 import { isBright } from '../../utils/color';
@@ -8,10 +9,12 @@ import withIntlAsProp from '../../utils/withIntlAsProp';
 import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import style from './style.css';
+import dashboardStyle from '../dashboard/style.css';
 
 const localizer = dayjsLocalizer(dayjs);
 
-class Map extends Component {
+class CalendarPage extends Component {
   onRangeChange = range => {
     let from, to;
     if (Array.isArray(range)) {
@@ -83,24 +86,25 @@ class Map extends Component {
     const noCalendarConnected = props.calendars && props.calendars.length === 0;
     return (
       <div class="page">
-        <div class="page-main">
+        {/* Same Horizon glass scene as the dashboard — the calendar lives in
+            one deep glass card on the default scene */}
+        <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
           <div class="my-3 my-md-5">
             <div class="container">
-              {noCalendarConnected && (
-                <div class="alert alert-warning">
-                  <Text id="calendar.noCalendarsConnected" />
-                </div>
-              )}
               <div class="row">
                 <div class="col-md-12">
                   <div class="card">
                     <div class="card-body">
+                      {/* inside the card so it renders as the theme's quiet tinted notice */}
+                      {noCalendarConnected && (
+                        <div class="alert alert-warning">
+                          <Text id="calendar.noCalendarsConnected" />
+                        </div>
+                      )}
                       <Calendar
+                        className={style.horizonCalendar}
                         localizer={localizer}
                         events={props.eventsFormated || []}
-                        style={{
-                          height: '550px'
-                        }}
                         popup
                         onRangeChange={this.onRangeChange}
                         defaultView={localStorage.getItem('calendar_last_view') || 'week'}
@@ -124,4 +128,4 @@ class Map extends Component {
   }
 }
 
-export default connect('eventsFormated,calendars,user', actions, dayjs)(withIntlAsProp(Map));
+export default connect('eventsFormated,calendars,user', actions, dayjs)(withIntlAsProp(CalendarPage));

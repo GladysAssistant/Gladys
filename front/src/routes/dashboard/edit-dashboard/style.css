@@ -1,16 +1,530 @@
-.columnsCard {
-  display: flex;
-  flex-wrap: nowrap;
-  width: 100%;
-  padding-right: 0;
+/* the canvas scrolls clear of the fixed save/cancel footer (editor only:
+   the viewer shares .largeContainer but has no footer) */
+.editorContainer {
+  margin-bottom: 150px;
 }
 
-.column {
-  flex-grow: 1;
-  flex-basis: 0;
-  padding: 0 8px;
-  box-sizing: border-box;
-  min-width: 0px;
+.section {
+  border: 1px dashed #d5d9e0;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+/* Horizon: section frames become quiet glass panels, drop zones frosted */
+:global(.glass-theme) .section {
+  border: 1px solid var(--gl-border);
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: var(--gl-radius-lg);
+  padding: 12px;
+}
+
+:global(.glass-theme) .sectionHeader {
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .dropZone {
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 1px dashed var(--gl-border);
+  border-radius: var(--gl-radius-md);
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .btnLinkDelete {
+  color: var(--gl-muted);
+}
+
+/* ============================================================
+   Editor v2: the canvas is the real dashboard with edit chrome
+   ============================================================ */
+
+.editorTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.editorExplanation {
+  font-size: 0.8125rem;
+  color: #9aa0ac;
+}
+
+:global(.glass-theme) .editorExplanation {
+  color: var(--gl-muted);
+}
+
+.columnLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9aa0ac;
+}
+
+:global(.glass-theme) .columnLabel {
+  color: var(--gl-muted);
+}
+
+/* Widget preview frame. The bottom margin matches the mb-2 under the
+   in-between "+" slot, so the slot floats centered in the gap instead of
+   hugging the widget above it */
+.previewWrapper {
+  position: relative;
+  margin-bottom: 0.5rem;
+  border-radius: 16px;
+}
+
+.previewWrapperDragging {
+  opacity: 0.4;
+}
+
+.previewWrapperEditing {
+  outline: 2px solid #467fcf;
+  outline-offset: 4px;
+}
+
+:global(.glass-theme) .previewWrapperEditing {
+  outline-color: var(--gl-accent);
+}
+
+.previewToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px 4px;
+}
+
+.previewTitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9aa0ac;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(.glass-theme) .previewTitle {
+  color: var(--gl-muted);
+}
+
+.previewActions {
+  display: inline-flex;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.previewButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  background-color: #fff;
+  color: #6e7687;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  padding: 0;
+}
+
+.previewButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.previewHandle {
+  cursor: move;
+  /* a touch on the handle must drag, never scroll the page */
+  touch-action: none;
+}
+
+.listDragHandle {
+  cursor: move;
+  touch-action: none;
+  display: inline-flex;
+  align-items: center;
+  color: var(--gl-muted, #7c8396);
+  flex: 0 0 auto;
+}
+
+.listDragHandle:hover {
+  color: var(--gl-ink, #1c2334);
+}
+
+/* Horizon dashboard bar (editor): the list is a wrapping row of glass
+   pills above the canvas — the viewer's tab-bar grammar — so the canvas
+   keeps the full width (the old sidebar column ate a quarter of it,
+   painful on tablets) */
+.dashboardBar {
+  margin-bottom: 1.25rem;
+}
+
+.dashboardListHeader {
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 6px 8px;
+}
+
+.dashboardList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboardListItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--gl-surface-strong, rgba(255, 255, 255, 0.78));
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  color: var(--gl-ink, #1c2334);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.newDashboardItem {
+  display: inline-flex;
+}
+
+/* the "new dashboard" pill closes the row, same height as its neighbors */
+.newDashboardButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--gl-surface-strong, rgba(255, 255, 255, 0.78));
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  color: var(--gl-ink, #1c2334);
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.newDashboardButton:hover {
+  border-color: var(--gl-accent, #3d6df0);
+  color: var(--gl-accent, #3d6df0);
+}
+
+.dashboardListItem:hover {
+  border-color: var(--gl-accent, #3d6df0);
+}
+
+.dashboardListItemActive {
+  border-color: var(--gl-accent, #3d6df0);
+  box-shadow: inset 0 0 0 1px var(--gl-accent, #3d6df0);
+  color: var(--gl-accent, #3d6df0);
+}
+
+.dashboardListItemName {
+  /* the same cap as the viewer's tab pills (.dashboardTabName): in a
+     wrapping row a flex item's default min-width is its content, so without
+     both of these one endless name grows to full width, pushes the "+" onto
+     the next line and never ellipsizes */
+  min-width: 0;
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Engine-wide drag state: the body carries these classes while a drag is
+   live, so drop zones can show up and text can't get selected mid-drag */
+:global(body.gladys-pointer-dragging),
+:global(body.gladys-pointer-dragging) * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+:global(.gladys-drag-source-dim) {
+  opacity: 0.4;
+}
+
+:global(.glass-theme) .previewButton {
+  background-color: var(--gl-surface-strong);
+  border-color: var(--gl-border);
+  color: var(--gl-ink);
+}
+
+.previewContent {
+  position: relative;
+}
+
+/* the widget keeps its own bottom margin for the real dashboard: the editor
+   spaces previews itself */
+.previewContent > * {
+  margin-bottom: 0 !important;
+}
+
+.previewOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  cursor: pointer;
+  border-radius: 16px;
+}
+
+/* ============================================================
+   Stretch preview: the viewer lets some widgets absorb the free
+   height of their column (.stretchableBox in routes/dashboard/
+   style.css). The canvas previews it by threading the same flex
+   chain through the edit chrome: drop area → box container →
+   preview wrapper → preview content → the widget itself.
+   ============================================================ */
+
+/* the drop area fills its column, so the chain has height to give (and the
+   whole column stays a drop target, not just the part behind the widgets) */
+.columnDropArea {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchPreview {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchPreview .previewWrapper,
+.stretchPreview .previewContent,
+.stretchPreview .previewContent > * {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* tile boxes center their content in the extra height, like the viewer's
+   .stretchableTile (the absolute overlay is out of flow, unaffected) */
+.stretchTilePreview .previewContent > * {
+  justify-content: center;
+}
+
+/* media boxes stretch by letting their image absorb the extra height —
+   the viewer's .stretchableBox > div > img/.dimmer rules, one wrapper deeper */
+.stretchPreview .previewContent > * > img {
+  flex: 1 1 auto;
+  object-fit: cover;
+  min-height: 0;
+}
+
+.stretchPreview .previewContent > * > :global(.dimmer) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stretchPreview .previewContent > * > :global(.dimmer) > :global(.dimmer-content) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* Same caps as the viewer, shifted by the edit chrome (toolbar + the "+"
+   slot ≈ 4rem): the widget card ends up at the viewer's size. Desktop only —
+   below the breakpoint columns stack and heights are natural. */
+@media (min-width: 992px) {
+  .stretchPreview {
+    max-height: calc(65vh + 4rem);
+  }
+
+  /* value tiles adapt their type scale to the rendered height via container
+     queries: the size container is the padding-less wrapper around the
+     widget, exactly like the viewer's .adaptiveTile */
+  .adaptiveTilePreview .previewContent {
+    container-type: size;
+    min-height: 6rem;
+  }
+
+  .stretchPreview.adaptiveTilePreview {
+    max-height: 20rem;
+  }
+}
+
+.previewPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 6rem;
+  border: 1px dashed rgba(0, 40, 100, 0.2);
+  border-radius: 16px;
+  color: #9aa0ac;
+  background-color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.btnAddNewBoxAtPosition {
+  height: 24px;
+  border: 1px dashed rgba(0, 40, 100, 0.25);
+  color: #9aa0ac;
+  background-color: transparent;
+}
+
+.btnAddNewBoxAtPosition:hover {
+  color: #467fcf;
+  border-color: #467fcf;
+}
+
+/* Edit panel: side panel on desktop, bottom sheet on mobile */
+.editPanel {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  box-shadow: 0 12px 48px rgba(20, 30, 60, 0.25);
+}
+
+@media (min-width: 992px) {
+  .editPanel {
+    top: 5rem;
+    right: 1rem;
+    bottom: 4.5rem;
+    width: 420px;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 991px) {
+  .editPanel {
+    left: 0;
+    right: 0;
+    /* clear the fixed save/cancel footer, like the desktop panel does —
+       at bottom: 0 the footer bar hides the form's last field or button */
+    bottom: 3.5rem;
+    max-height: 78vh;
+    border-radius: 16px 16px 0 0;
+  }
+}
+
+.editPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 40, 100, 0.08);
+  flex: 0 0 auto;
+}
+
+.editPanelClose {
+  border: none;
+  background: transparent;
+  color: #6e7687;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+}
+
+.editPanelBody {
+  overflow-y: auto;
+  padding: 1.25rem 1.375rem 1.5rem;
+}
+
+/* The widget form arrives wrapped in its own BaseEditBox card: inside the
+   panel that chrome is redundant (the panel has its own header, remove
+   lives on the canvas toolbar) — flatten it. !important everywhere: the
+   glass card rules fight at the same specificity and bundle order between
+   the two stylesheets is not guaranteed. */
+.editPanelBody > :global(.card) {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.editPanelBody > :global(.card) > :global(.card-header) {
+  display: none;
+}
+
+.editPanelBody > :global(.card) > :global(.card-body) {
+  padding: 0;
+}
+
+:global(.glass-theme) .editPanel {
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+}
+
+:global(.glass-theme) .editPanelHeader {
+  border-bottom-color: var(--gl-row-border);
+  color: var(--gl-ink);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9aa0ac;
+  margin-bottom: 0.5rem;
+  padding-left: 8px;
+}
+
+.sectionActions {
+  display: inline-flex;
+  gap: 4px;
+}
+
+/* Drag ghost created by the pointer-drag engine (utils/pointerDrag.js):
+   above the edit panel, never catching the pointer */
+.dragLayerPill {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1060;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: #1c2334;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.35);
+  white-space: nowrap;
+  /* the pill hangs slightly under the cursor, like a held object */
+  margin-left: -14px;
+  margin-top: 10px;
 }
 
 .columnBoxHeader {
@@ -19,6 +533,17 @@
   align-items: center;
   min-height: 48px;
   height: auto;
+}
+
+/* the width toggle shows its state: tinted primary while the column is wide */
+.btnColumnWidthActive,
+.btnColumnWidthActive:hover {
+  color: #467fcf;
+}
+
+:global(.glass-theme) .btnColumnWidthActive,
+:global(.glass-theme) .btnColumnWidthActive:hover {
+  color: var(--gl-accent);
 }
 
 .btnLinkDelete {
@@ -30,12 +555,10 @@
   background-color: transparent;
 }
 
-.btnAddColumn {
-  padding: 0;
-}
-
 .dropZone {
-  height: 100%;
+  /* fills the free height of .columnDropArea, so an empty column next to a
+     tall one is droppable over its whole visible height */
+  flex: 1 1 auto;
   min-height: 10rem;
   border-width: 1px;
   border-radius: 2px;
@@ -49,73 +572,38 @@
   margin-bottom: 1.5rem;
 }
 
-.bottomDropZone {
-  min-height: 20rem;
-  border-width: 1px;
-  border-radius: 2px;
-  padding: 1rem;
-  border-color: '#eeeeee';
-  border-style: dashed;
-  outline: none;
-  transition: border 0.24s ease-in-out;
-  background-color: #fafafa;
-  color: #bdbdbd;
-  margin-bottom: 1.5rem;
+/* Drop-placement feedback (pointer-drag engine, overlays only — starting a
+   drag never shifts the layout):
+   - .dropIndicator: the insertion line, a fixed-position element on <body>
+     placed in the gap where the widget would land;
+   - .columnDropActive: tint on the destination column while hovered. */
+.dropIndicator {
+  border-radius: 999px;
+  background: #467fcf;
+  box-shadow: 0 0 8px rgba(70, 127, 207, 0.6);
+}
+
+.columnDropActive {
+  background-color: rgba(70, 127, 207, 0.08);
+  border-radius: var(--gl-radius-md, 12px);
+}
+
+/* while dragging, the in-between "+" buttons fade out of the way (opacity
+   only: no reflow) so the indicator line reads clearly in the gaps */
+:global(body.gladys-widget-dragging) .btnAddNewBoxAtPosition {
+  opacity: 0.15;
 }
 
 .btnAddNewBoxAtPosition {
   height: 24px;
 }
 
-@media (min-width: 1280px) {
-  .columnAddButton {
-    position: relative;
-    flex: 0 0 46px;
-    max-width: 46px;
-    padding-left: 8px;
-    display: flex;
-    align-items: center;
-  }
-
-  .btnAddColumn {
-    width: 31px;
-  }
-
-  .btnAddColumn[data-title]:hover:after {
-    content: attr(data-title);
-    position: absolute;
-    top: 100%;
-    left: 100%;
-    transform: translateX(-100%) translateY(5px);
-    white-space: normal;
-    color: #467fcf;
-    background-color: #fff;
-    padding: 2px 4px;
-    border: 1px solid #467fcf;
-    border-radius: 4px;
-    font-size: 12px;
-    z-index: 1000;
-    width: 150px;
-  }
-}
-
-@media (max-width: 1280px) {
-  .bottomDropZone {
-    min-height: 5rem;
-    height: 5rem;
-  }
-
-  .columnsCard {
-    flex-wrap: wrap;
-    width: 100%;
-  }
-
-  .column {
-    flex-grow: 1;
-    flex-basis: 100%;
-    padding: 0 0px;
-  }
-
+/* The canvas columns carry the viewer's .dashboardColumn (same classes, same
+   992px breakpoint — see routes/dashboard/style.css), so the editor previews
+   exactly the wrap the real dashboard will do. Only the editor-specific
+   chrome keeps its own rules; the add-column control lives in the section
+   header so nothing but the columns occupies the wrapping row. */
+@media (max-width: 991.98px) {
   .columnBoxHeader {
     padding-top: 1.5rem;
     margin-bottom: 2px;
@@ -124,15 +612,247 @@
     border-top: 1px dashed #bdbdbd;
     min-height: 0px;
   }
+}
 
-  .columnAddButton {
-    width: 100%;
-    flex: none;
+/* ============================================================
+   Horizon chrome for the editor's own controls.
+   Colors are light-only: dark mode is the app-wide inversion filter
+   (the solid ink CTA inverts into the light pill of the dark theme,
+   exactly like the active dashboard tab).
+   ============================================================ */
+
+/* "Dashboard settings", top right: a quiet frosted capsule like the
+   viewer's header action pills — a utility, not a call to action */
+:global(.glass-theme) .editorTopBar :global(.btn-outline-primary) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--gl-ink);
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.glass-theme) .editorTopBar :global(.btn-outline-primary:hover) {
+  background-color: #fff;
+  color: var(--gl-ink);
+  border-color: var(--gl-border);
+}
+
+:global(.glass-theme) .editorTopBar :global(.btn-outline-primary .fe) {
+  color: var(--gl-accent);
+}
+
+/* The action footer becomes a frosted bar (same recipe as the nav rail)… */
+:global(.glass-theme) .editActionsFooter {
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+/* …and its buttons become pills. Hierarchy: solid ink CTA (Terminer /
+   Sauvegarder), soft red danger (the stamp family), quiet neutral cancel. */
+:global(.glass-theme) .editActionsFooter :global(.btn) {
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-primary) {
+  background-color: var(--gl-ink);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-primary:hover) {
+  background-color: #2a3550;
+  color: #fff;
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-danger) {
+  background-color: #fbe3de;
+  color: #d4593f;
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-danger:hover) {
+  background-color: #f6d2ca;
+  color: #c24a33;
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-secondary) {
+  background-color: rgba(28, 35, 52, 0.07);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .editActionsFooter :global(.btn-outline-secondary:hover) {
+  background-color: rgba(28, 35, 52, 0.13);
+  color: var(--gl-ink);
+}
+
+/* ============================================================
+   Horizon "+" affordances: every way of adding something to the
+   canvas speaks the same pill language — a quiet dashed capsule
+   for the in-between widget slots, the solid ink CTA for an empty
+   column, frosted capsules for the structural adds (column,
+   section), same family as the viewer's header pills.
+   ============================================================ */
+
+:global(.glass-theme) .btnAddNewBoxAtPosition {
+  border: 1px dashed rgba(28, 35, 52, 0.22);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.35);
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .btnAddNewBoxAtPosition:hover {
+  border-color: var(--gl-accent);
+  color: var(--gl-accent);
+  background-color: rgba(255, 255, 255, 0.65);
+}
+
+:global(.glass-theme) .addWidgetButton {
+  border: none;
+  border-radius: 999px;
+  background-color: var(--gl-ink);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+:global(.glass-theme) .addWidgetButton:hover,
+:global(.glass-theme) .addWidgetButton:focus {
+  background-color: #2a3550;
+  color: #fff;
+}
+
+:global(.glass-theme) .addSectionButton {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--gl-ink);
+  font-weight: 600;
+  box-shadow: var(--gl-shadow-soft);
+  padding: 0.45rem 1.1rem;
+}
+
+:global(.glass-theme) .addSectionButton:hover {
+  background-color: #fff;
+  color: var(--gl-ink);
+  border-color: var(--gl-border);
+}
+
+:global(.glass-theme) .addSectionButton :global(.fe) {
+  color: var(--gl-accent);
+}
+
+/* the mobile column separator drops the Tabler gray for the theme's ink */
+:global(.glass-theme) .columnBoxHeader {
+  border-top-color: rgba(28, 35, 52, 0.15);
+}
+
+/* ============================================================
+   Background scene picker: each thumbnail previews its own CSS
+   scene (the buttons carry the scene classes directly), the
+   active one gets the accent ring — same grammar as the icon
+   picker below it.
+   ============================================================ */
+
+.sceneGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.sceneThumb {
+  aspect-ratio: 16 / 10;
+  /* browsers without aspect-ratio still get a clickable swatch */
+  min-height: 2.75rem;
+  border: 2px solid rgba(28, 35, 52, 0.12);
+  border-radius: 10px;
+  padding: 0;
+  cursor: pointer;
+  background-color: #fff;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.sceneThumb:hover {
+  transform: scale(1.04);
+  border-color: rgba(28, 35, 52, 0.3);
+}
+
+.sceneThumbActive {
+  border-color: var(--gl-accent, #3d6df0);
+  box-shadow: 0 0 0 2px rgba(61, 109, 240, 0.25);
+}
+
+/* Touch targets: fingers need ~44px (Apple HIG). pointer: coarse means the
+   PRIMARY pointer is a finger (tablets, phones) — hybrid laptops with a
+   touchscreen but a trackpad keep the compact mouse sizing. */
+@media (pointer: coarse) {
+  .previewButton {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
   }
 
-  .displayTextMobile {
-    display: inline !important;
-    margin-left: 0.5rem;
-    text-wrap: wrap;
+  .btnAddNewBoxAtPosition {
+    height: 2.25rem;
+  }
+
+  .editPanelClose {
+    font-size: 1.25rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .dashboardListItem {
+    padding: 11px 14px;
+  }
+
+  .newDashboardButton {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.1rem;
+  }
+
+  /* bigger hit area without growing the row */
+  .listDragHandle {
+    padding: 0.5rem;
+    margin: -0.5rem;
+  }
+
+  /* the column header controls (trash, width toggle) are real tap targets on
+     a wall tablet. Sized like .previewButton rather than padded: these
+     buttons carry Bootstrap's p-0, whose !important would win over padding.
+     The header already reserves 48px, so the row doesn't grow. */
+  .btnLinkDelete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+
+  /* columns shrink to nothing (flex-basis 0, min-width 0), so on a narrow
+     screen the grown buttons wrap under the label instead of overflowing */
+  .columnLabel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .editorTopBar :global(.btn),
+  .editActionsFooter :global(.btn) {
+    padding: 0.5rem 1rem;
+    font-size: 0.9375rem;
   }
 }

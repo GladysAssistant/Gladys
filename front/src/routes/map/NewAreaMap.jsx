@@ -176,7 +176,7 @@ class MapComponent extends Component {
   }
 
   render() {
-    return <div ref={this.setMapRef} style="width: 100%; height: 300px; z-index: 1" />;
+    return <div ref={this.setMapRef} class={style.newAreaMap} style="width: 100%; height: 300px; z-index: 1" />;
   }
 }
 

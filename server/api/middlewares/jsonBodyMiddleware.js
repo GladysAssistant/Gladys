@@ -22,9 +22,16 @@ const HOST_API_PREFIX = '/api/integration/v1/';
 // core to buffer that much.
 const DEFAULT_JSON_BODY_LIMIT = '100kb';
 const HOST_API_JSON_BODY_LIMIT = '20mb';
+// Dashboard asset uploads carry one base64 image, bounded at 4 MB of base64
+// by dashboard.createAsset — 6 MB leaves room for the JSON envelope. Like the
+// host API bound, it is only mounted per route behind authentication, so an
+// unauthenticated caller never gets the core to buffer that much.
+const DASHBOARD_ASSET_PREFIX = '/api/v1/dashboard_asset/';
+const LARGE_JSON_BODY_LIMIT = '6mb';
 
 const defaultJsonBodyParser = express.json({ limit: DEFAULT_JSON_BODY_LIMIT });
 const hostApiJsonBodyParser = express.json({ limit: HOST_API_JSON_BODY_LIMIT });
+const largeJsonBodyParser = express.json({ limit: LARGE_JSON_BODY_LIMIT });
 
 /**
  * @description Parse the JSON body of the routes serving the frontend. The
@@ -43,7 +50,27 @@ function jsonBodyMiddleware(req, res, next) {
   if (req.path.startsWith(HOST_API_PREFIX)) {
     return next();
   }
+  // Parsed per route behind authentication with the bigger bound (see largeJsonBodyMiddleware)
+  if (req.path.startsWith(DASHBOARD_ASSET_PREFIX)) {
+    return next();
+  }
   return defaultJsonBodyParser(req, res, next);
+}
+
+/**
+ * @description Parse the JSON body of the routes flagged largeJsonBody
+ * (dashboard asset uploads). Mounted after authentication: an
+ * unauthenticated request gets its 401 without a single byte of body
+ * being read.
+ * @param {object} req - Express request.
+ * @param {object} res - Express response.
+ * @param {Function} next - Express next middleware.
+ * @returns {any} The result of the JSON body parser.
+ * @example
+ * router.post(path, authMiddleware, largeJsonBodyMiddleware, controller);
+ */
+function largeJsonBodyMiddleware(req, res, next) {
+  return largeJsonBodyParser(req, res, next);
 }
 
 /**
@@ -65,4 +92,5 @@ function integrationHostJsonBodyMiddleware(req, res, next) {
 module.exports = {
   jsonBodyMiddleware,
   integrationHostJsonBodyMiddleware,
+  largeJsonBodyMiddleware,
 };

@@ -119,6 +119,7 @@ module.exports = function ServiceController(gladys) {
    *   "name":"telegram",
    *   "selector":"telegram",
    *   "status":"RUNNING",
+   *   "type":"internal",
    *   "manifest_name":null
    *  }
    * ]

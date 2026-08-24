@@ -4,6 +4,7 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 import ActionGroup from '../ActionGroup';
 import ActionCard from '../ActionCard';
+import style from '../style.css';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
@@ -127,7 +128,12 @@ class ConditionWhile extends Component {
               </div>
             </div>
           </div>
-          <div class="row">
+          <div
+            class="row"
+            data-condition-flow
+            data-flow-path={`${props.path}.if`}
+            data-drop-active-class={style.nestedFlowDropActive}
+          >
             {conditions.map((condition, index) => (
               <ActionCard
                 action={condition}
@@ -190,7 +196,13 @@ class ConditionWhile extends Component {
             </h4>
           </div>
           {!repeatCollapsed && props.action.then && (
-            <div class="pl-4">
+            <div
+              class="pl-4"
+              data-step-flow
+              data-flow-path={`${props.path}.then`}
+              data-flow-level={props.path.split('.').length + 2}
+              data-drop-active-class={style.nestedFlowDropActive}
+            >
               {props.action.then.map((actions, index) => (
                 <ActionGroup
                   actions={actions}
@@ -208,7 +220,6 @@ class ConditionWhile extends Component {
                   triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
                   scene={props.scene}
-                  firstActionGroup={index === 0}
                   lastActionGroup={index === props.action.then.length - 1}
                 />
               ))}

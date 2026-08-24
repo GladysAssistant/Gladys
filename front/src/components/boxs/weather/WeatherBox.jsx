@@ -77,9 +77,14 @@ function getMoonPhaseIndex() {
 
 const ErrorCard = ({ messageId, children }) => (
   <div class="card">
-    <h4 class="card-header">
-      <Text id="dashboard.boxTitle.weather" />
-    </h4>
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fe fe-cloud" />
+        <span class="m-1">
+          <Text id="dashboard.boxTitle.weather" />
+        </span>
+      </h3>
+    </div>
     <div class="card-body">
       <p class="alert alert-danger mb-0">
         <i class="fe fe-bell" />
@@ -261,19 +266,26 @@ class WeatherBoxComponent extends Component {
             >
               <span style="text-transform: capitalize; min-width: 0">{weather.datetime_beautiful}</span>
               {get(weather, 'house.name') && (
-                <span style="margin-left: 8px; white-space: nowrap">{weather.house.name}</span>
+                // overflow: hidden lifts the flex min-content floor, so in a
+                // narrow column the house name ellipsizes instead of pushing
+                // the row wider than the card
+                <span style="margin-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+                  {weather.house.name}
+                </span>
               )}
             </div>
           )}
 
           {/* Current conditions */}
           {showCurrentWeather && (
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px">
+            /* flex-wrap: in a narrow column the temperature drops under the
+               condition instead of the two overlapping */
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px">
               <div style="display: flex; align-items: center; min-width: 0">
                 <div class="weather-real-colors" style="font-size: 52px; line-height: 1">
                   {weather.weatherEmoji}
                 </div>
-                <div style="font-size: 16px; font-weight: 500; margin-left: 12px">
+                <div style="font-size: 16px; font-weight: 500; margin-left: 12px; min-width: 0">
                   {/* same fallback as the emoji mapping: a provider omitting
                   the condition still gets a label instead of a blank line */}
                   <Text id={`dashboard.boxes.weather.conditions.${weather.weather || 'unknown'}`} />
@@ -438,13 +450,16 @@ class WeatherBoxComponent extends Component {
           })}
 
           {/* Hourly forecast */}
+          {/* the forecast rows scroll horizontally in a narrow column: the
+              slots keep a readable floor (flex-basis, no shrink) instead of
+              being crushed or drawing past the card edge */}
           {showHourly && (
             <div
               class={hasContentAboveHourly ? 'border-top' : ''}
-              style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 10px; margin-bottom: 10px"
+              style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 10px; margin-bottom: 10px; overflow-x: auto"
             >
               {hours.map((hour, index) => (
-                <div key={hour.datetime} style="text-align: center; flex: 1">
+                <div key={hour.datetime} style="text-align: center; flex: 1 0 2.5rem">
                   {/* the first column is the current time slot: emphasize it */}
                   <div
                     class={index === 0 ? '' : 'text-muted'}
@@ -482,10 +497,10 @@ class WeatherBoxComponent extends Component {
           {showDaily && (
             <div
               class={hasContentAboveDaily ? 'border-top' : ''}
-              style="display: flex; justify-content: space-between; padding-top: 10px"
+              style="display: flex; justify-content: space-between; padding-top: 10px; overflow-x: auto"
             >
               {days.map(day => (
-                <div key={day.datetime} style="text-align: center; flex: 1">
+                <div key={day.datetime} style="text-align: center; flex: 1 0 3.5rem">
                   <div
                     class="text-muted"
                     style="font-size: 14px; text-transform: capitalize; white-space: nowrap; margin-bottom: 3px"

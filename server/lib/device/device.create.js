@@ -37,6 +37,23 @@ const getDeviceInDb = async (device) => {
   return deviceByExternalId;
 };
 
+// Those columns hold the current STATE of a feature, not its definition: they are
+// written by device.saveState / device.saveStringState and by the aggregation jobs.
+// A caller saving a device sends back the features it read earlier (the MQTT device
+// page posts the whole device just to append one feature), so letting them through
+// rolled every existing feature back to the value the client had in hand — null for
+// a feature that had not received anything yet when the page was loaded. They are
+// only accepted when the feature is created, so an integration can declare a first
+// value along with a brand new feature (lan-manager does it for presence).
+const DEVICE_FEATURE_STATE_COLUMNS = [
+  'last_value',
+  'last_value_string',
+  'last_value_changed',
+  'last_hourly_aggregate',
+  'last_daily_aggregate',
+  'last_monthly_aggregate',
+];
+
 const matchFeatureInList = (existingFeature, features) => {
   // We are matching on both external_id and id, so we can match a device that changed external_id but kept the same id
   return features.find(
@@ -185,10 +202,23 @@ async function create(device) {
               id: matchedFeature.id,
             },
           });
+          // The purge below is a background JOB: a t_job row, several DuckDB &
+          // SQLite counts and their websocket broadcasts, per feature. It is only
+          // worth running when the feature JUST stopped keeping history. A feature
+          // already saved with keep_history = false has nothing left to purge
+          // (device.saveState / device.saveHistoricalState never write a state for
+          // it), so re-purging it on every save was pure background load: a user
+          // assigning a room to one device after another queued one such job per
+          // keep_history = false feature per save, and those jobs pile up behind the
+          // single DuckDB connection until the whole instance stops responding.
+          const keepHistoryBeforeUpdate = deviceFeature.keep_history;
           const featureToUpdate = { ...feature };
           delete featureToUpdate.selector;
+          DEVICE_FEATURE_STATE_COLUMNS.forEach((column) => {
+            delete featureToUpdate[column];
+          });
           await deviceFeature.update(featureToUpdate, { transaction });
-          if (deviceFeature.keep_history === false) {
+          if (keepHistoryBeforeUpdate !== false && deviceFeature.keep_history === false) {
             deviceFeaturesIdsToPurge.push(deviceFeature.id);
           }
           return deviceFeature.get({ plain: true });
