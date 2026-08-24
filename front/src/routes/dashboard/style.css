@@ -655,6 +655,43 @@
   padding: 0.35rem 1rem;
 }
 
+/* Loading states join the theme: the stock spinner (a solid framework-blue
+   arc floating bare over the scene) becomes a thin accent ring on a small
+   frosted puck, and the loading-border pulse of refreshing cards blinks in
+   the accent instead of the old framework blue. Dark mode still comes from
+   the global inversion filter. */
+:global(.glass-theme .loader) {
+  width: 3.25rem;
+  height: 3.25rem;
+  color: var(--gl-accent);
+  background: var(--gl-surface-strong);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid var(--gl-border);
+  border-radius: 999px;
+  box-shadow: var(--gl-shadow-soft);
+}
+
+/* ::before is the faint full track, ::after the spinning arc — both sized
+   down from the framework's 2.5rem/3px to fit centered inside the puck */
+:global(.glass-theme .loader)::before,
+:global(.glass-theme .loader)::after {
+  width: 1.625rem;
+  height: 1.625rem;
+  margin: -0.8125rem 0 0 -0.8125rem;
+  border-width: 2px;
+}
+
+:global(.glass-theme .card.loading-border) {
+  animation: glass-loading-border-blink 2s infinite;
+}
+
+@keyframes glass-loading-border-blink {
+  50% {
+    border-color: rgba(61, 109, 240, 0.6);
+  }
+}
+
 /* Remaining tables (device lists) lose their heavy borders */
 :global(.glass-theme .table td),
 :global(.glass-theme .table th) {
@@ -814,6 +851,11 @@
     right: 0.75rem;
     bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
     margin: 0;
+    /* --dock-lift (set from the VisualViewport API in DashboardPage) is how
+       much of the layout viewport's bottom is currently overlaid by the
+       browser's animating toolbars: without it iOS Safari transiently hides
+       the dock under its own bottom bar while scrolling */
+    transform: translateY(calc(-1 * var(--dock-lift, 0px)));
   }
 
   /* Opt-in, NOT on .dashboardBackground itself: the scene is shared by every
@@ -1184,15 +1226,20 @@
     height: 1.75rem;
   }
 
+  /* The knob offsets are measured from the PADDING box of the track (its
+     1px border is outside them): top must be computed from the center, not
+     copied from the visual gap, or the knob sits 1px low (3px of air above,
+     0 below). Same on the horizontal axis so both rest positions keep the
+     same 2px of track visible around the knob. */
   :global(.glass-theme .custom-switch-indicator)::before {
     width: 1.5rem;
     height: 1.5rem;
-    top: 2px;
-    left: 2px;
+    top: calc(50% - 0.75rem);
+    left: 1px;
   }
 
   :global(.glass-theme .custom-switch-input:checked ~ .custom-switch-indicator)::before {
-    left: calc(100% - 1.5rem - 2px);
+    left: calc(100% - 1.5rem - 1px);
   }
 
   /* the selector pills round up from 2.6rem to the floor, and the header
@@ -1284,13 +1331,16 @@
   color: var(--gl-ink);
 }
 
-/* the energy widget's period date picker joins it */
+/* the energy widget's period date picker joins it — the input is readonly
+   (it only opens the calendar, typing would pop the mobile keyboard), so it
+   must keep the interactive look, not the framework's grayed [readonly] one */
 :global(.glass-theme .card .react-datepicker-wrapper .form-control) {
   border-radius: 999px;
   border: 1px solid var(--gl-border);
   background-color: rgba(255, 255, 255, 0.7);
   font-weight: 600;
   color: var(--gl-ink);
+  cursor: pointer;
 }
 
 /* Mobile bottom dock (see .dashboardHeader above): the "…" menu opens from

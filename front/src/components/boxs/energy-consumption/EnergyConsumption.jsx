@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { forwardRef } from 'preact/compat';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
@@ -44,6 +45,14 @@ const PERIOD_LABELS = {
 };
 
 const SUBSCRIPTION_COLOR = '#b8c2cc';
+
+// The period field is only ever a button opening the calendar: a readonly
+// input keeps the mobile on-screen keyboard from popping over the picker.
+// It can't be `readOnly` on the customInput element itself — the DatePicker
+// clones it and passes its own (undefined) readOnly along, wiping the
+// attribute — nor the DatePicker readOnly PROP, which would keep the
+// calendar from opening. So this wrapper re-applies it after the merge.
+const ReadOnlyInput = forwardRef((props, ref) => <input {...props} ref={ref} readOnly />);
 
 const findDeviceFeatureBySelector = (devices, selector) => {
   if (!devices || !selector) {
@@ -502,6 +511,7 @@ class EnergyConsumption extends Component {
                     wrapperClassName={'w-100'}
                     popperClassName={datePickerStyle.datePickerPopper}
                     portalId="dashboard-datepicker"
+                    customInput={<ReadOnlyInput type="text" />}
                   />
                 </div>
 

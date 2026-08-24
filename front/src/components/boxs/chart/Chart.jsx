@@ -533,7 +533,7 @@ class Chartbox extends Component {
       additionalHeight = 55 * nbFeaturesDisplayed;
     }
     return (
-      <div class={cx('card', { 'loading-border': initialized && loading })}>
+      <div class={cx('card', { 'loading-border': initialized && loading, [style.cardMenuOpen]: dropdown })}>
         <div class="card-body">
           <div class={style.chartHeader}>
             <div class={cx(style.subheader)}>{box.title}</div>
@@ -557,12 +557,20 @@ class Chartbox extends Component {
                     />
                   </button>
 
+                  {/* single line next to the period label: the live dot, or —
+                      when browsing the past — an accent pill showing the range,
+                      whose one tap action (the return icon says it) is coming
+                      back to now */}
                   {offset > 0 ? (
-                    <button type="button" class={style.periodRangeButton} onClick={this.resetToCurrentPeriod}>
+                    <button
+                      type="button"
+                      class={style.periodRangeButton}
+                      onClick={this.resetToCurrentPeriod}
+                      title={props.intl.dictionary.dashboard.boxes.chart.backToNow}
+                      aria-label={props.intl.dictionary.dashboard.boxes.chart.backToNow}
+                    >
+                      <i class="fe fe-corner-up-left" />
                       <span class={style.periodRange}>{getPeriodLabel(interval, offset, props.user.language)}</span>
-                      <span class={style.backToNow}>
-                        <Text id="dashboard.boxes.chart.backToNow" />
-                      </span>
                     </button>
                   ) : (
                     <div class={style.periodLive}>
@@ -806,9 +814,6 @@ class Chartbox extends Component {
                     <div>
                       <i class="fe fe-alert-circle mr-2" />
                       <Text id="dashboard.boxes.chart.noValue" />
-                    </div>
-                    <div class={style.smallTextEmptyState}>
-                      <Text id="dashboard.boxes.chart.noValueWarning" />
                     </div>
                   </div>
                 )}

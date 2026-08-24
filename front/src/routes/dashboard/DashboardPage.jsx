@@ -1,7 +1,9 @@
 import { Text, Localizer } from 'preact-i18n';
+import { useEffect, useRef } from 'preact/hooks';
 import DashboardTabs from './DashboardTabs';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
+import DashboardSwiper from './DashboardSwiper';
 import GetStarted from './GetStarted';
 import SetTabletMode from './SetTabletMode';
 import { JOB_STATUS } from '../../../../server/utils/constants';
@@ -12,6 +14,39 @@ import { getBackgroundSceneClass } from './backgroundScenes';
 const DashboardPage = ({ children, ...props }) => {
   const backgroundScene = props.currentDashboard && props.currentDashboard.background_scene;
   const fullWidth = props.currentDashboard && props.currentDashboard.width === 'full';
+
+  // On mobile the switcher is position: fixed at the bottom — attached to the
+  // LAYOUT viewport. While iOS Safari animates its toolbars during a scroll,
+  // the layout viewport's bottom edge transiently sits below what is actually
+  // visible, and the dock disappears under the toolbar. The VisualViewport
+  // API reports the truly visible area continuously, so the dock is lifted by
+  // however much of the layout viewport's bottom is currently overlaid.
+  const dockRef = useRef(null);
+  useEffect(() => {
+    // eslint-disable-next-line compat/compat
+    const viewport = window.visualViewport;
+    if (!viewport) {
+      // pre-13 iOS / very old wall tablets: dock keeps the plain fixed behavior
+      return undefined;
+    }
+    const updateDockLift = () => {
+      if (!dockRef.current) {
+        return;
+      }
+      const overlaid = window.innerHeight - viewport.height - viewport.offsetTop;
+      // a pinch-zoom also shrinks the visual viewport, but overlays nothing
+      const lift = viewport.scale > 1.01 ? 0 : Math.max(0, Math.round(overlaid));
+      dockRef.current.style.setProperty('--dock-lift', `${lift}px`);
+    };
+    viewport.addEventListener('resize', updateDockLift);
+    viewport.addEventListener('scroll', updateDockLift);
+    updateDockLift();
+    return () => {
+      viewport.removeEventListener('resize', updateDockLift);
+      viewport.removeEventListener('scroll', updateDockLift);
+    };
+  }, []);
+
   return (
     <div class="page">
       {/* The Horizon glass theme is THE dashboard style — imposed, not chosen */}
@@ -32,7 +67,9 @@ const DashboardPage = ({ children, ...props }) => {
             <div class="my-3 my-md-5 dashboard">
               {/* same width cap as the editor canvas: edit/view must not shift */}
               <div class={cx('container', style.largeContainer, { [style.fullWidthContainer]: fullWidth })}>
-                <div class={cx('page-header', style.dashboardHeader)}>
+                {/* data-dashboard-swipe-ignore: a drag starting on the switcher
+                    dock belongs to the dock, not to the page swipe gesture */}
+                <div class={cx('page-header', style.dashboardHeader)} ref={dockRef} data-dashboard-swipe-ignore>
                   <div class={style.dashboardHeaderTabs}>
                     {/* One-tap pills in every mode; pills that don't fit on one
                         row collapse behind a "…" button opening the full list */}
@@ -117,10 +154,20 @@ const DashboardPage = ({ children, ...props }) => {
                     <Text id="dashboard.duckDbMigrationInProgress" fields={props.duckDbMigrationJob} />
                   </div>
                 )}
-                {props.dashboardNotConfigured && (
-                  <GetStarted dashboardListEmpty={props.dashboardListEmpty} editDashboard={props.editDashboard} />
-                )}
-                {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
+                {/* On the mobile/touch layout the body is a pager: swiping
+                    left/right switches to the neighboring dashboard. Not in
+                    tablet mode — a docked wall tablet (a portrait iPad sits
+                    inside the same breakpoint) must not switch on a brush. */}
+                <DashboardSwiper
+                  dashboards={props.dashboards}
+                  currentDashboard={props.currentDashboard}
+                  tabletMode={props.tabletMode}
+                >
+                  {props.dashboardNotConfigured && (
+                    <GetStarted dashboardListEmpty={props.dashboardListEmpty} editDashboard={props.editDashboard} />
+                  )}
+                  {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
+                </DashboardSwiper>
               </div>
             </div>
           </div>
