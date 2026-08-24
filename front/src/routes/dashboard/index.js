@@ -92,20 +92,34 @@ class Dashboard extends Component {
   getCurrentDashboard = async () => {
     try {
       await this.setState({ loading: true });
-      const currentDashboard = await this.props.httpClient.get(
-        `/api/v1/dashboard/${this.state.currentDashboardSelector}`
-      );
+      const currentDashboard = await this.fetchDashboardConfig(this.state.currentDashboardSelector);
       this.setState({
-        currentDashboard,
+        // a superseded response leaves the state to the newer request
+        ...(currentDashboard ? { currentDashboard } : {}),
         loading: false
       });
-      this.storeDashboardConfig(currentDashboard);
     } catch (e) {
       this.setState({
         loading: false
       });
       console.error(e);
     }
+  };
+
+  // One fetch path for dashboard configurations, with a per-selector request
+  // generation: the initial prefetch and a switch refresh can request the
+  // same selector concurrently, and responses can land out of order — only
+  // the LATEST request for a selector may write the cache (or be rendered),
+  // an older response resolving late is dropped (returns null).
+  fetchDashboardConfig = async selector => {
+    const generation = (this.dashboardConfigGenerations.get(selector) || 0) + 1;
+    this.dashboardConfigGenerations.set(selector, generation);
+    const config = await this.props.httpClient.get(`/api/v1/dashboard/${selector}`);
+    if (this.dashboardConfigGenerations.get(selector) !== generation) {
+      return null;
+    }
+    this.storeDashboardConfig(config);
+    return config;
   };
 
   // Every fully-fetched dashboard goes into a config cache keyed by
@@ -140,8 +154,7 @@ class Dashboard extends Component {
         .filter(dashboard => dashboard.selector !== currentDashboardSelector)
         .map(async dashboard => {
           try {
-            const config = await this.props.httpClient.get(`/api/v1/dashboard/${dashboard.selector}`);
-            this.storeDashboardConfig(config);
+            await this.fetchDashboardConfig(dashboard.selector);
           } catch (e) {
             console.error(e);
           }
@@ -252,6 +265,9 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.props = props;
+    // per-selector request generations for fetchDashboardConfig — plain
+    // instance state, nothing renders from it
+    this.dashboardConfigGenerations = new Map();
     this.state = {
       isGladysPlus: this.props.session.gatewayClient !== undefined,
       dashboardDropdownOpened: false,
@@ -300,14 +316,15 @@ class Dashboard extends Component {
       ...(cached ? { currentDashboard: cached } : {})
     });
     try {
-      const currentDashboard = await this.props.httpClient.get(`/api/v1/dashboard/${selector}`);
-      this.storeDashboardConfig(currentDashboard);
-      // ignore a stale response if the user switched again in the meantime —
-      // and an IDENTICAL config: widgets watch their box props by reference
+      const currentDashboard = await this.fetchDashboardConfig(selector);
+      // render only a still-relevant response: not superseded by a newer
+      // request (null), not for a dashboard the user already left — and not
+      // an IDENTICAL config: widgets watch their box props by reference
       // (device_features arrays…), so swapping in an equal-but-fresh object
       // would make every widget refetch and flash its loader a second time
       // right after the instant cached render
       if (
+        currentDashboard &&
         this.state.currentDashboardSelector === selector &&
         JSON.stringify(this.state.currentDashboard) !== JSON.stringify(currentDashboard)
       ) {
