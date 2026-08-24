@@ -31,7 +31,7 @@ const NewDashboardPage = ({ children, ...props }) => (
           </div>
         </div>
         <div class="row">
-          <div class="col col-login mx-auto">
+          <div class={cx('col', 'mx-auto', style.formCol)}>
             <form onSubmit={props.createScene} class="card">
               <div class={props.loading ? 'dimmer active' : 'dimmer'}>
                 <div class="loader" />
@@ -133,6 +133,11 @@ class Dashboard extends Component {
   };
   createDashboard = async e => {
     e.preventDefault();
+    // The create button is disabled without a name and an icon, but Enter in
+    // the name input can still submit the form: same guard on the handler.
+    if (!this.state.name || !this.state.icon) {
+      return;
+    }
     await this.setState({
       loading: true,
       dashboardAlreadyExistError: false,

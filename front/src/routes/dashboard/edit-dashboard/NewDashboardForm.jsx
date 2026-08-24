@@ -25,6 +25,11 @@ class NewDashboardForm extends Component {
 
   createDashboard = async e => {
     e.preventDefault();
+    // The submit button is disabled without a name and an icon, but Enter in
+    // the name input can still submit the form: same guard on the handler.
+    if (!this.state.name || !this.state.icon) {
+      return;
+    }
     this.setState({ loading: true, dashboardAlreadyExistError: false, unknownError: false });
     try {
       const createdDashboard = await this.props.httpClient.post('/api/v1/dashboard', {

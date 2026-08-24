@@ -1,8 +1,10 @@
-// One emoji glyph: a flag (two regional indicators) or a pictographic base
-// with its optional variation selector / skin tone, possibly extended with
+// One emoji glyph: a flag (two regional indicators), a keycap ("1️⃣": digit,
+// # or * followed by the combining keycap mark) or a pictographic base with
+// its optional variation selector / skin tone, possibly extended with
 // ZWJ-joined glyphs ("👨‍🚀"). Unicode property escapes cover far more than the
 // display regex below (which only needs to catch the common ranges).
-const EMOJI_GLYPH = '(?:\\p{Regional_Indicator}{2}|\\p{Extended_Pictographic}(?:\\uFE0F|\\p{Emoji_Modifier})*)';
+const EMOJI_GLYPH =
+  '(?:\\p{Regional_Indicator}{2}|[0-9#*]\\uFE0F?\\u20E3|\\p{Extended_Pictographic}(?:\\uFE0F|\\p{Emoji_Modifier})*)';
 const LEADING_EMOJI_REGEX = new RegExp(`^(${EMOJI_GLYPH}(?:\\u200D${EMOJI_GLYPH})*)`, 'u');
 
 /**
