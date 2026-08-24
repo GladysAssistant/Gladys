@@ -526,7 +526,6 @@
         "lastThreeMonths": "Last 3 months",
         "lastYear": "Last year",
         "noValue": "No values recorded on this interval.",
-        "noValueWarning": "Warning: if you just configured this device, it may take some time before you see something here as Gladys needs some time to collect enough data. For interval superior to 24h, it may take up to 24h before you see something here.",
         "noChartType": "No chart type selected",
         "noChartTypeWarning": "If you just configured this device, please go back to the widget edit page and select a chart type.",
         "editNameLabel": "Enter the name of this widget",

@@ -92,12 +92,25 @@
   background-color: rgba(28, 35, 52, 0.06);
 }
 
-.dropdownItemChart.active,
-.dropdownItemChart:active {
+/* The `a` prefix is doing real work: these items are href-less <a>s, and
+   the framework's `a:not([href]):not([tabindex]) { color: inherit }` is one
+   type selector more specific than the classes alone — without it the
+   selected row keeps the ink text over the accent background */
+a.dropdownItemChart.active,
+a.dropdownItemChart:active {
   color: #fff;
   font-weight: 600;
   text-decoration: none;
   background-color: var(--gl-accent, #3d6df0);
+}
+
+/* Dark mode: the app-wide inversion filter would turn this accent pill into
+   a somber navy with BLACK text. Double-inverting the row (the same trick
+   dark-mode.css uses for media) cancels the global filter, so it keeps the
+   authored accent background and white text in both modes. */
+:global(.dark-mode) a.dropdownItemChart.active,
+:global(.dark-mode) a.dropdownItemChart:active {
+  filter: invert(100%) hue-rotate(180deg);
 }
 
 .textGreen {
@@ -154,17 +167,20 @@
 
 /* The period toolbar follows the theme's segmented-control grammar (see
    .hz-segmented): a soft rounded track where the touchable parts light up
-   as white floating segments. var() fallbacks: the box only renders inside
-   .glass-theme, but the values must survive a standalone render. */
+   as white floating segments. Everything sits on ONE slim line — period
+   label, then live dot or back-to-the-past pill — so the control stays a
+   caption above the chart instead of a block competing with it.
+   var() fallbacks: the box only renders inside .glass-theme, but the
+   values must survive a standalone render. */
 .chartToolbar {
   display: flex;
   align-items: stretch;
   width: 100%;
-  margin-top: 0.65rem;
+  margin-top: 0.5rem;
   background: rgba(28, 35, 52, 0.07);
   border-radius: 999px;
-  padding: 3px;
-  gap: 3px;
+  padding: 2px;
+  gap: 2px;
   overflow: visible;
 }
 
@@ -172,7 +188,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
+  width: 2.25rem;
   flex-shrink: 0;
   border: none;
   border-radius: 999px;
@@ -198,12 +214,12 @@
   position: relative;
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.15rem;
-  padding: 0.3rem 0.75rem;
+  gap: 0.7rem;
+  padding: 0.2rem 0.5rem;
   min-width: 0;
+  min-height: 2.25rem;
 }
 
 .intervalButton {
@@ -218,6 +234,10 @@
   cursor: pointer;
   padding: 0;
   line-height: 1.2;
+  /* the label never wraps to a second line: on narrow phones the range
+     pill next to it is the part that gives way (ellipsis) */
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .intervalButton:hover {
@@ -253,20 +273,22 @@
   flex-shrink: 0;
 }
 
-/* Browsing the past: the "back to now" band becomes an accent-tinted pill —
+/* Browsing the past: an accent-tinted pill showing the displayed range —
    the one colored surface of the track, so the off-live state is readable
-   at a glance and the tap target reads as the button it is */
+   at a glance. The whole pill is the "back to now" button, said by its
+   return icon (and title/aria-label) rather than by a second line of text. */
 .periodRangeButton {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
-  gap: 0.1rem;
+  gap: 0.4rem;
   border: none;
   border-radius: 999px;
   background: rgba(61, 109, 240, 0.12);
-  padding: 0.2rem 0.9rem;
+  color: var(--gl-accent, #3d6df0);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
   cursor: pointer;
-  max-width: 100%;
+  min-width: 0;
   transition: background-color 0.15s ease;
 }
 
@@ -285,23 +307,16 @@
   max-width: 100%;
 }
 
-.backToNow {
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: var(--gl-accent, #3d6df0);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  line-height: 1.2;
-}
-
-/* Touch targets: the slim toolbar controls reach the ~44px floor on
-   coarse-pointer devices (the interval label was 16px tall) */
+/* Touch targets: the toolbar deliberately stays one slim line (it was
+   reading as a block as tall as the chart), so instead of growing every
+   control to the 44px floor, the whole ~40px track row is the touch zone
+   and the individual controls get wider rather than taller */
 @media (pointer: coarse) {
   .intervalButton {
-    min-height: 2.75rem;
+    min-height: 2.25rem;
   }
 
   .navButton {
-    width: 2.75rem;
+    width: 2.5rem;
   }
 }

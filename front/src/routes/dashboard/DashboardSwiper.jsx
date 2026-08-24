@@ -2,15 +2,32 @@ import { Component } from 'preact';
 import { route } from 'preact-router';
 
 // Elements that own their horizontal touch gestures: a swipe starting on
-// them must never turn into a dashboard switch (charts pan/zoom, maps drag,
-// sliders slide, menus scroll…)
+// them must never turn into a dashboard switch (maps drag, sliders slide,
+// menus scroll, the bottom dock has its own taps…). Charts are NOT in the
+// list: ApexCharts' selection zoom is a mouse gesture and its touch
+// pinch-zoom uses two fingers, so a one-finger drag on a chart is free —
+// and on a one-widget dashboard the chart may be most of the page.
 const OWN_GESTURE_SELECTOR =
-  'input, textarea, select, button, a, label, .apexcharts-canvas, .leaflet-container, .dropdown-menu';
+  'input, textarea, select, button, a, label, .leaflet-container, .dropdown-menu, [data-dashboard-swipe-ignore]';
+
+// Finger travel before the gesture is committed to one axis
+const AXIS_LOCK_PX = 12;
+// A horizontal move is only a swipe when clearly flatter than it is tall
+const HORIZONTAL_RATIO = 1.3;
+// Fraction of the page width that commits the switch on release…
+const COMMIT_RATIO = 0.15;
+// …or a flick: at least this fast (px/ms) over at least FLICK_MIN_PX
+const FLICK_VELOCITY = 0.4;
+const FLICK_MIN_PX = 30;
+// Follow resistance when there is no dashboard on that side
+const RUBBER_BAND = 0.25;
+// Where the incoming dashboard slides in from
+const ENTER_OFFSET_PX = 40;
 
 // Widgets also hold horizontally scrollable strips (responsive device
 // tables, the weather forecast row): a touch starting inside one belongs to
 // that scroller. Detected by geometry, not by class, so new scrollers are
-// covered by construction. This is also why the wrapper does NOT declare
+// covered by construction. This is also why no ancestor declares
 // touch-action: pan-y — that would disable these inner scrollers natively.
 const startsInHorizontalScroller = (target, boundary) => {
   let node = target;
@@ -26,25 +43,17 @@ const startsInHorizontalScroller = (target, boundary) => {
   return false;
 };
 
-// Finger travel before the gesture is committed to one axis
-const AXIS_LOCK_PX = 12;
-// A horizontal move is only a swipe when clearly flatter than it is tall
-const HORIZONTAL_RATIO = 1.3;
-// Fraction of the page width that commits the switch on release
-const COMMIT_RATIO = 0.2;
-// Follow resistance when there is no dashboard on that side
-const RUBBER_BAND = 0.25;
-// Where the incoming dashboard slides in from
-const ENTER_OFFSET_PX = 40;
-
-// Swiping left/right on the dashboard body switches to the neighboring
-// dashboard, in the order of the switcher pills — the phone pager gesture.
-// Only on the mobile/touch layout: on a desktop mouse there is nothing to
-// swipe with, and a wall tablet must not change dashboards on a brushed
-// sleeve. The content follows the finger (with rubber-band resistance at
-// both ends), and the target dashboard slides in from the side it was
-// pulled from — also when it was picked from the dock, so the pills and
-// the gesture tell one consistent story.
+// Swiping left/right anywhere on the dashboard page switches to the
+// neighboring dashboard, in the order of the switcher pills — the phone
+// pager gesture. The listeners live on the document (bounded to the
+// dashboard's own page) so the gesture also works on the empty scene around
+// and below the widgets of a short dashboard, not only on this wrapper's
+// content. Only on the mobile/touch layout: on a desktop mouse there is
+// nothing to swipe with, and a wall tablet must not change dashboards on a
+// brushed sleeve. The content follows the finger (with rubber-band
+// resistance at both ends), and the target dashboard slides in from the
+// side it was pulled from — also when it was picked from the dock, so the
+// pills and the gesture tell one consistent story.
 class DashboardSwiper extends Component {
   setRef = element => {
     this.element = element;
@@ -70,13 +79,19 @@ class DashboardSwiper extends Component {
 
   handleTouchStart = event => {
     this.swipe = null;
-    if (event.touches.length !== 1 || !this.isTouchLayout()) {
+    if (event.touches.length !== 1 || !this.isTouchLayout() || !this.element) {
+      return;
+    }
+    // the page bounds the gesture: the wallpaper around the widgets swipes,
+    // the app chrome (sidebar, top bar) and the excluded controls do not
+    const page = this.element.closest('.page-main');
+    if (!page || !page.contains(event.target)) {
       return;
     }
     if (event.target.closest && event.target.closest(OWN_GESTURE_SELECTOR)) {
       return;
     }
-    if (startsInHorizontalScroller(event.target, this.element)) {
+    if (startsInHorizontalScroller(event.target, page)) {
       return;
     }
     const touch = event.touches[0];
@@ -84,13 +99,18 @@ class DashboardSwiper extends Component {
       startX: touch.clientX,
       startY: touch.clientY,
       axis: null,
-      dx: 0
+      dx: 0,
+      // previous sample, for the release velocity of a flick
+      lastX: touch.clientX,
+      lastTime: event.timeStamp,
+      velocity: 0
     };
   };
 
   // Attached by hand with { passive: false }: once the gesture is locked
-  // horizontal the vertical page scroll must be suppressed, and JSX-attached
-  // touchmove listeners can end up passive (non-cancelable)
+  // horizontal the vertical page scroll must be suppressed, and
+  // JSX/document-attached touchmove listeners can end up passive
+  // (non-cancelable)
   handleTouchMove = event => {
     const swipe = this.swipe;
     if (!swipe || event.touches.length !== 1) {
@@ -111,6 +131,12 @@ class DashboardSwiper extends Component {
     }
 
     event.preventDefault();
+    const elapsed = event.timeStamp - swipe.lastTime;
+    if (elapsed > 0) {
+      swipe.velocity = (touch.clientX - swipe.lastX) / elapsed;
+      swipe.lastX = touch.clientX;
+      swipe.lastTime = event.timeStamp;
+    }
     const hasTarget = this.getSiblingSelector(dx < 0 ? 1 : -1) !== null;
     swipe.dx = dx;
     const followed = hasTarget ? dx : dx * RUBBER_BAND;
@@ -121,19 +147,24 @@ class DashboardSwiper extends Component {
   handleTouchEnd = () => {
     const swipe = this.swipe;
     this.swipe = null;
-    if (!swipe || swipe.axis !== 'horizontal') {
+    if (!swipe || swipe.axis !== 'horizontal' || !this.element) {
       return;
     }
     const direction = swipe.dx < 0 ? 1 : -1;
-    const targetSelector =
-      Math.abs(swipe.dx) >= this.element.offsetWidth * COMMIT_RATIO ? this.getSiblingSelector(direction) : null;
+    const pastDistance = Math.abs(swipe.dx) >= this.element.offsetWidth * COMMIT_RATIO;
+    // a flick commits early, but only in the direction the content moved
+    const flicked =
+      Math.abs(swipe.dx) >= FLICK_MIN_PX &&
+      Math.abs(swipe.velocity) >= FLICK_VELOCITY &&
+      Math.sign(swipe.velocity) === Math.sign(swipe.dx);
+    const targetSelector = pastDistance || flicked ? this.getSiblingSelector(direction) : null;
 
     if (targetSelector) {
       route(`/dashboard/${targetSelector}`);
       // the enter animation plays when the new dashboard's data lands
       // (componentDidUpdate); until then the pulled content springs back
     }
-    this.element.style.transition = 'transform 0.2s ease-out';
+    this.element.style.transition = 'transform 0.15s ease-out';
     this.element.style.transform = '';
   };
 
@@ -145,7 +176,7 @@ class DashboardSwiper extends Component {
     // double rAF: the starting offset must be painted before transitioning out of it
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        element.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
+        element.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
         element.style.transform = '';
         element.style.opacity = '';
       });
@@ -173,24 +204,21 @@ class DashboardSwiper extends Component {
   }
 
   componentDidMount() {
-    this.element.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+    document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
+    document.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+    document.addEventListener('touchend', this.handleTouchEnd);
+    document.addEventListener('touchcancel', this.handleTouchEnd);
   }
 
   componentWillUnmount() {
-    this.element.removeEventListener('touchmove', this.handleTouchMove);
+    document.removeEventListener('touchstart', this.handleTouchStart);
+    document.removeEventListener('touchmove', this.handleTouchMove);
+    document.removeEventListener('touchend', this.handleTouchEnd);
+    document.removeEventListener('touchcancel', this.handleTouchEnd);
   }
 
   render({ children }) {
-    return (
-      <div
-        ref={this.setRef}
-        onTouchStart={this.handleTouchStart}
-        onTouchEnd={this.handleTouchEnd}
-        onTouchCancel={this.handleTouchEnd}
-      >
-        {children}
-      </div>
-    );
+    return <div ref={this.setRef}>{children}</div>;
   }
 }
 

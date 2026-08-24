@@ -67,7 +67,9 @@ const DashboardPage = ({ children, ...props }) => {
             <div class="my-3 my-md-5 dashboard">
               {/* same width cap as the editor canvas: edit/view must not shift */}
               <div class={cx('container', style.largeContainer, { [style.fullWidthContainer]: fullWidth })}>
-                <div class={cx('page-header', style.dashboardHeader)} ref={dockRef}>
+                {/* data-dashboard-swipe-ignore: a drag starting on the switcher
+                    dock belongs to the dock, not to the page swipe gesture */}
+                <div class={cx('page-header', style.dashboardHeader)} ref={dockRef} data-dashboard-swipe-ignore>
                   <div class={style.dashboardHeaderTabs}>
                     {/* One-tap pills in every mode; pills that don't fit on one
                         row collapse behind a "…" button opening the full list */}
