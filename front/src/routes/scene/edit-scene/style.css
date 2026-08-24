@@ -29,6 +29,13 @@
   padding-bottom: 6rem;
 }
 
+/* The title column shrinks with the scene name: without min-width, the flex
+   item refuses to go below the intrinsic width of the name and the ellipsis
+   never kicks in */
+.pageTitleColumn {
+  min-width: 0;
+}
+
 .pageTitle {
   display: flex;
   align-items: center;
@@ -62,6 +69,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* On small screens the header action buttons are icon-only: make them compact
