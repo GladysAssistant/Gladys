@@ -90,12 +90,19 @@ class Dashboard extends Component {
   };
 
   getCurrentDashboard = async () => {
+    // captured before the await: the render guard below must compare against
+    // the selector this request was FOR, not whatever it became meanwhile
+    const selector = this.state.currentDashboardSelector;
     try {
       await this.setState({ loading: true });
-      const currentDashboard = await this.fetchDashboardConfig(this.state.currentDashboardSelector);
+      const currentDashboard = await this.fetchDashboardConfig(selector);
+      // render only a still-relevant response: not superseded by a newer
+      // request for this selector (null), and not for a dashboard the user
+      // already navigated away from — the generation is per selector, so it
+      // alone cannot catch a route change to a DIFFERENT dashboard
+      const stillCurrent = currentDashboard && this.state.currentDashboardSelector === selector;
       this.setState({
-        // a superseded response leaves the state to the newer request
-        ...(currentDashboard ? { currentDashboard } : {}),
+        ...(stillCurrent ? { currentDashboard } : {}),
         loading: false
       });
     } catch (e) {
