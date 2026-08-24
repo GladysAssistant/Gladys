@@ -351,7 +351,7 @@
    below the breakpoint columns stack and heights are natural. */
 @media (min-width: 992px) {
   .stretchPreview {
-    max-height: 65vh;
+    max-height: calc(65vh + 4rem);
   }
 
   /* value tiles adapt their type scale to the rendered height via container
@@ -555,10 +555,6 @@
   background-color: transparent;
 }
 
-.btnAddColumn {
-  padding: 0;
-}
-
 .dropZone {
   /* fills the free height of .columnDropArea, so an empty column next to a
      tall one is droppable over its whole visible height */
@@ -605,39 +601,8 @@
 /* The canvas columns carry the viewer's .dashboardColumn (same classes, same
    992px breakpoint — see routes/dashboard/style.css), so the editor previews
    exactly the wrap the real dashboard will do. Only the editor-specific
-   chrome below keeps its own rules. */
-@media (min-width: 992px) {
-  .columnAddButton {
-    position: relative;
-    flex: 0 0 46px;
-    max-width: 46px;
-    padding-left: 8px;
-    display: flex;
-    align-items: center;
-  }
-
-  .btnAddColumn {
-    width: 31px;
-  }
-
-  .btnAddColumn[data-title]:hover:after {
-    content: attr(data-title);
-    position: absolute;
-    top: 100%;
-    left: 100%;
-    transform: translateX(-100%) translateY(5px);
-    white-space: normal;
-    color: #467fcf;
-    background-color: #fff;
-    padding: 2px 4px;
-    border: 1px solid #467fcf;
-    border-radius: 4px;
-    font-size: 12px;
-    z-index: 1000;
-    width: 150px;
-  }
-}
-
+   chrome keeps its own rules; the add-column control lives in the section
+   header so nothing but the columns occupies the wrapping row. */
 @media (max-width: 991.98px) {
   .columnBoxHeader {
     padding-top: 1.5rem;
@@ -646,17 +611,6 @@
     justify-content: center;
     border-top: 1px dashed #bdbdbd;
     min-height: 0px;
-  }
-
-  .columnAddButton {
-    width: 100%;
-    flex: none;
-  }
-
-  .displayTextMobile {
-    display: inline !important;
-    margin-left: 0.5rem;
-    text-wrap: wrap;
   }
 }
 
@@ -776,7 +730,6 @@
   color: #fff;
 }
 
-:global(.glass-theme) .btnAddColumn,
 :global(.glass-theme) .addSectionButton {
   border-radius: 999px;
   border: 1px solid var(--gl-border);
@@ -786,32 +739,17 @@
   color: var(--gl-ink);
   font-weight: 600;
   box-shadow: var(--gl-shadow-soft);
-}
-
-:global(.glass-theme) .addSectionButton {
   padding: 0.45rem 1.1rem;
 }
 
-:global(.glass-theme) .btnAddColumn:hover,
 :global(.glass-theme) .addSectionButton:hover {
   background-color: #fff;
   color: var(--gl-ink);
   border-color: var(--gl-border);
 }
 
-:global(.glass-theme) .btnAddColumn :global(.fe),
 :global(.glass-theme) .addSectionButton :global(.fe) {
   color: var(--gl-accent);
-}
-
-/* the add-column hover tooltip joins the drag-pill family */
-:global(.glass-theme) .btnAddColumn[data-title]:hover:after {
-  color: #fff;
-  background-color: var(--gl-ink);
-  border: none;
-  border-radius: 10px;
-  padding: 4px 10px;
-  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.35);
 }
 
 /* the mobile column separator drops the Tabler gray for the theme's ink */

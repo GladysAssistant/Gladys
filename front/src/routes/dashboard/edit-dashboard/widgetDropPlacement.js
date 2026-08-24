@@ -12,8 +12,11 @@ const INDICATOR_THICKNESS_PX = 4;
 const INDICATOR_GAP_OFFSET_PX = 5;
 
 // A drop lands in a column: pointing directly at one wins, pointing at the
-// section (between/below short columns) resolves to the nearest column
-// horizontally, so the whole section area is usable.
+// section (between/below short columns, in the free space next to a wrapped
+// line) resolves to the nearest column by 2D point-to-rect distance. The
+// canvas wraps its columns like the viewer, so a purely horizontal pick
+// would tie (distance 0) between a wrapped column and the whole line above
+// it and let DOM order win — the widget would land in the wrong line.
 const resolveColumn = (target, point) => {
   if (target.hasAttribute('data-widget-drop')) {
     return target;
@@ -23,12 +26,9 @@ const resolveColumn = (target, point) => {
   let bestDistance = Infinity;
   columns.forEach(columnElement => {
     const rect = columnElement.getBoundingClientRect();
-    let distance = 0;
-    if (point.x < rect.left) {
-      distance = rect.left - point.x;
-    } else if (point.x > rect.right) {
-      distance = point.x - rect.right;
-    }
+    const dx = Math.max(rect.left - point.x, 0, point.x - rect.right);
+    const dy = Math.max(rect.top - point.y, 0, point.y - rect.bottom);
+    const distance = Math.hypot(dx, dy);
     if (distance < bestDistance) {
       bestDistance = distance;
       best = columnElement;

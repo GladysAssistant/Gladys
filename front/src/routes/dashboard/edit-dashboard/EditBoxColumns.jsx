@@ -74,9 +74,27 @@ const EditBoxColumns = ({ children, ...props }) => (
             <div class={style.section} data-widget-drop-section>
               <div class={style.sectionHeader}>
                 <Text id="dashboard.boxes.section" fields={{ index: sectionIndex + 1 }} />
-                {/* one-step reorder arrows: dragging a whole section would be hell */}
-                {props.sectionSizes.length > 1 && (
-                  <span class={style.sectionActions}>
+                <span class={style.sectionActions}>
+                  {/* the add-column control lives in the section header, NOT
+                      as a flex sibling of the columns: a slot in the wrapping
+                      row would make the canvas wrap a few pixels before the
+                      viewer does */}
+                  {sectionSize < MAX_COLUMNS_PER_SECTION && (
+                    <Localizer>
+                      <button
+                        type="button"
+                        class={style.previewButton}
+                        onClick={() => props.addColumn(sectionIndex)}
+                        data-cy={`add-column-${sectionIndex}`}
+                        aria-label={<Text id="dashboard.editDashboardAddColumnButton" />}
+                        title={<Text id="dashboard.editDashboardAddColumnButton" />}
+                      >
+                        <i class="fe fe-plus" />
+                      </button>
+                    </Localizer>
+                  )}
+                  {/* one-step reorder arrows: dragging a whole section would be hell */}
+                  {props.sectionSizes.length > 1 && (
                     <Localizer>
                       <button
                         type="button"
@@ -89,6 +107,8 @@ const EditBoxColumns = ({ children, ...props }) => (
                         <i class="fe fe-arrow-up" />
                       </button>
                     </Localizer>
+                  )}
+                  {props.sectionSizes.length > 1 && (
                     <Localizer>
                       <button
                         type="button"
@@ -101,8 +121,8 @@ const EditBoxColumns = ({ children, ...props }) => (
                         <i class="fe fe-arrow-down" />
                       </button>
                     </Localizer>
-                  </span>
-                )}
+                  )}
+                </span>
               </div>
               {/* the viewer's row grammar (BoxColumns): the canvas IS the
                   dashboard, so columns must wrap and size exactly like the
@@ -223,24 +243,6 @@ const EditBoxColumns = ({ children, ...props }) => (
                     </div>
                   );
                 })}
-                {sectionSize < MAX_COLUMNS_PER_SECTION && (
-                  <div class={cx('d-flex flex-column', style.columnAddButton)}>
-                    <div class={cx(style.columnBoxHeader)} />
-                    <Localizer>
-                      <button
-                        class={cx('btn btn-outline-primary', style.btnAddColumn)}
-                        onClick={() => props.addColumn(sectionIndex)}
-                        data-cy={`add-column-${sectionIndex}`}
-                        data-title={<Text id="dashboard.editDashboardAddColumnButton" />}
-                      >
-                        <i class="fe fe-plus" />
-                        <div class={cx('d-none', style.displayTextMobile)}>
-                          <Text id="dashboard.editDashboardAddColumnButton" />
-                        </div>
-                      </button>
-                    </Localizer>
-                  </div>
-                )}
               </div>
             </div>
           );
