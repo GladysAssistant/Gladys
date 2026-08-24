@@ -90,6 +90,13 @@ class ChatVoiceInputButton extends Component {
   baseText = '';
 
   /**
+   * Synchronous mirror of `state.status`: Preact does not flush `setState`
+   * before the next click can land, so routing decisions read this field
+   * instead of `this.state` (a double-click must not start a second session).
+   */
+  currentStatus = STATUS.IDLE;
+
+  /**
    * Incremented at each new dictation, so a cancelled session cannot update
    * the input or the state of the session which replaced it.
    */
@@ -127,7 +134,10 @@ class ChatVoiceInputButton extends Component {
     if (generation !== undefined && !this.isSessionActive(generation)) {
       return;
     }
-    if (this._isMounted && this.state.status !== status) {
+    this.currentStatus = status;
+    if (this._isMounted) {
+      // Always enqueue the update: `this.state` is not flushed synchronously,
+      // so comparing against it can skip a change that must still land.
       this.setState({ status });
     }
     const busy = status !== STATUS.IDLE;
@@ -145,7 +155,7 @@ class ChatVoiceInputButton extends Component {
    * permission is already granted, so no prompt is shown early).
    */
   prepareRecording = async () => {
-    if (this.state.status !== STATUS.IDLE) {
+    if (this.currentStatus !== STATUS.IDLE) {
       return;
     }
     try {
@@ -159,6 +169,12 @@ class ChatVoiceInputButton extends Component {
    */
   startListening = async () => {
     this.props.onError(null);
+    // A previous session may still hold the microphone: abort it before
+    // opening a new one.
+    if (this.activeAbortController) {
+      this.activeAbortController.abort();
+      this.activeAbortController = null;
+    }
     this.baseText = this.props.currentText || '';
     this.sessionGeneration += 1;
     const generation = this.sessionGeneration;
@@ -230,7 +246,7 @@ class ChatVoiceInputButton extends Component {
   };
 
   handleClick = () => {
-    if (this.state.status === STATUS.IDLE) {
+    if (this.currentStatus === STATUS.IDLE) {
       this.startListening();
     } else {
       this.cancelListening();

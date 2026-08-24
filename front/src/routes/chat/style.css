@@ -828,6 +828,20 @@
     min-height: 3.75rem;
     padding-right: 3.75rem;
   }
+
+  /* The microphone grows to the same 44px floor, sitting 8px left of the
+     send button (8px edge + 44px send + 8px gap = 60px). */
+  .voiceInputButton {
+    width: 2.75rem;
+    height: 2.75rem;
+    right: 3.75rem;
+  }
+
+  /* Placed after the .chatInput rule above so it wins with equal
+     specificity: 8px edge + 44px send + 8px + 44px mic + 8px text gap. */
+  .chatInputWithVoice {
+    padding-right: 7rem;
+  }
 }
 
 /* ==================================================================
