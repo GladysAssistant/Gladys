@@ -63,19 +63,21 @@
   font-size: 1.35rem;
 }
 
-/* Horizon: on small screens each scene is its own translucent pill row */
-.sceneMobileList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
+/* Horizon: on small screens each scene is its own translucent pill row.
+   The rows are spaced with a margin, not a flex `gap`: the list also carries
+   Bootstrap's `.d-block` (`display: block !important`), so a `display: flex`
+   here would never win and the gap would be dropped. */
 .sceneMobileRow {
   background-color: var(--gl-card-nested-bg, rgba(255, 255, 255, 0.4));
   border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
   border-radius: 16px;
   box-shadow: var(--gl-shadow-soft, 0 4px 16px rgba(44, 62, 118, 0.09));
   padding: 0.65rem 0.75rem;
+  margin-bottom: 10px;
+}
+
+.sceneMobileRow:last-child {
+  margin-bottom: 0;
 }
 
 /* Rows are links, but their text keeps the theme ink, not the link accent */
