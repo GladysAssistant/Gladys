@@ -21,6 +21,9 @@ const getTabAppearance = dashboard => {
   const { emoji, rest } = splitLeadingEmoji(dashboard.name);
   const icon = emoji && iconFromEmoji(emoji);
   if (icon) {
+    // rest is empty when the emoji IS the whole name: keep it as the label
+    // even next to the mapped icon — a nameless entry in the overflow menu
+    // would be worse than the doubled mark.
     return { icon, name: rest || dashboard.name };
   }
   return { icon: 'home', name: dashboard.name };

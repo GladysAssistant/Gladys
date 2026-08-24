@@ -32,7 +32,9 @@ const NewDashboardPage = ({ children, ...props }) => (
         </div>
         <div class="row">
           <div class={cx('col', 'mx-auto', style.formCol)}>
-            <form onSubmit={props.createScene} class="card">
+            {/* The submit handler is on the form, not on a button onClick, so
+                Enter-triggered submissions go through the same icon guard */}
+            <form onSubmit={props.createDashboard} class="card">
               <div class={props.loading ? 'dimmer active' : 'dimmer'}>
                 <div class="loader" />
                 <div class="dimmer-content">
@@ -100,7 +102,7 @@ const NewDashboardPage = ({ children, ...props }) => (
                     </div>
                     <div class="form-footer">
                       <button
-                        onClick={props.createDashboard}
+                        type="submit"
                         class="btn btn-primary btn-block"
                         disabled={props.loading || !props.name || !props.icon}
                       >
