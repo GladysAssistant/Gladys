@@ -82,7 +82,12 @@ function listSupportedModes(modeFeature, modeToHeatingCoolingState) {
   // a Matter cooling-only air conditioner reports cool, dry and fan — 1, 3 and 4 — so walking
   // min..max would offer HomeKit a heat mode the device cannot honour, and SET would write it.
   // min/max are only a fallback for integrations that declare no options.
-  if (modeFeature.supported_options) {
+  //
+  // The length matters: a device loaded from the database always carries the association, so a
+  // feature with no declared option arrives as an empty array rather than undefined. Treating that
+  // as a declaration of "no mode at all" left an air conditioner with an on/off command — MELCloud,
+  // among others — with Off as its only valid HomeKit state, so the Home app could not turn it on.
+  if (modeFeature.supported_options && modeFeature.supported_options.length > 0) {
     return modeFeature.supported_options.map(({ value }) => value);
   }
   return Object.keys(modeToHeatingCoolingState)
