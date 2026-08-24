@@ -205,7 +205,9 @@ class DashboardSwiper extends Component {
       return;
     }
     const direction = swipe.dx < 0 ? 1 : -1;
-    const pastDistance = Math.abs(swipe.dx) >= this.element.offsetWidth * COMMIT_RATIO;
+    // the documented threshold is a fraction of the PAGE width — the wrapper
+    // is a .container child, narrower than the page by its side padding
+    const pastDistance = Math.abs(swipe.dx) >= window.innerWidth * COMMIT_RATIO;
     // a flick commits early, but only in the direction the content moved
     const flicked =
       Math.abs(swipe.dx) >= FLICK_MIN_PX &&
