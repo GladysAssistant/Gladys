@@ -2,8 +2,20 @@ describe('Dashboard', () => {
   // The created dashboard's selector carries 4 random characters (#2906):
   // captured once at creation, reused by the later tests of this spec
   let dashboardSelector;
+  // Selector of the API-created emoji dashboard, deleted from afterEach so a
+  // failed visit or assertion never leaves it behind for the next tests
+  let emojiDashboardSelector;
   beforeEach(() => {
     cy.login();
+  });
+  afterEach(() => {
+    if (emojiDashboardSelector) {
+      cy.request({
+        method: 'DELETE',
+        url: `${Cypress.env('serverUrl')}/api/v1/dashboard/${emojiDashboardSelector}`
+      });
+      emojiDashboardSelector = null;
+    }
   });
   it('Should create new dashboard', () => {
     cy.visit('/dashboard');
@@ -76,17 +88,13 @@ describe('Dashboard', () => {
         boxes: [{ columns: [[], [], []] }]
       }
     }).then(res => {
-      const emojiDashboardSelector = res.body.selector;
+      emojiDashboardSelector = res.body.selector;
       cy.visit('/dashboard');
       cy.get(`a[href="/dashboard/${emojiDashboardSelector}"]`)
         .should('contain', 'Cinema room')
         .and('not.contain', '🎬')
         .find('i.fe-clapperboard')
         .should('exist');
-      cy.request({
-        method: 'DELETE',
-        url: `${serverUrl}/api/v1/dashboard/${emojiDashboardSelector}`
-      });
     });
   });
   it('Should delete dashboard', () => {
