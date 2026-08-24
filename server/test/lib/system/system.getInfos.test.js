@@ -6,6 +6,7 @@ const { fake, assert } = sinon;
 const System = require('../../../lib/system');
 const { getLocalIp } = require('../../../lib/system/system.getInfos');
 const Job = require('../../../lib/job');
+const logger = require('../../../utils/logger');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -120,16 +121,24 @@ describe('system.getInfos', () => {
   });
 
   it('should still resolve when the background host power retry rejects', async () => {
-    system.hostPowerManagement = null;
-    system.redetectHostPowerManagement = fake.rejects(new Error('probe crashed'));
-    const infos = await system.getInfos();
-    expect(infos).to.have.property('host_power_reboot_available', false);
-    expect(infos).to.have.property('host_power_shutdown_available', false);
-    assert.calledOnce(system.redetectHostPowerManagement);
-    // let the fire-and-forget rejection reach its handler: it must not surface
-    await new Promise((resolve) => {
-      setImmediate(resolve);
-    });
+    const debugStub = sinon.stub(logger, 'debug');
+    try {
+      const retryError = new Error('probe crashed');
+      system.hostPowerManagement = null;
+      system.redetectHostPowerManagement = fake.rejects(retryError);
+      const infos = await system.getInfos();
+      expect(infos).to.have.property('host_power_reboot_available', false);
+      expect(infos).to.have.property('host_power_shutdown_available', false);
+      assert.calledOnce(system.redetectHostPowerManagement);
+      // let the fire-and-forget rejection reach its handler: it must not surface
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+      // ...and the rejection must land in the debug log
+      assert.calledWith(debugStub, retryError);
+    } finally {
+      debugStub.restore();
+    }
   });
 
   it('should not retry the host power detection when a mechanism is already known', async () => {
