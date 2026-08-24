@@ -5,27 +5,44 @@ const { buildParamsConfig, toNumber } = require('./thermostat.deviceConfig');
 
 /**
  * @description Set a thermostat device feature value (for example the setpoint).
- * This is the path taken by scenes (`device.set-value`) and by the generic device
- * API. Persisting the value alone would not survive: the next regulation pass
- * re-applies the scheduled preset and overwrites it within a minute. So an
- * external write is treated as a manual override, exactly like turning the dial
- * on the widget.
+ * This is the path taken by scenes (`device.set-value`), by the generic device
+ * API and by the widget. Persisting the value alone would not survive: the next
+ * regulation pass re-applies the scheduled preset and overwrites it within a
+ * minute. So an external write is treated as a manual override, exactly like
+ * turning the dial on the widget.
  *
- * The expiry is only armed when the device follows a schedule: that is the only
- * case where something would otherwise take the setpoint over. Without a
- * schedule the hold is permanent, like on a physical thermostat — arming a timer
- * there would silently revert to the stored preset after a few minutes, with no
- * countdown banner to announce it (the widget only renders one for a scheduled
- * thermostat).
+ * The widget also uses this path to write back the *scheduled* setpoint when a
+ * manual hold ends. That write must not re-arm the override it is clearing, so
+ * `manual` can be turned off: the value is then persisted alone, exactly like a
+ * plain `saveState`. It defaults to true, which is what scenes and the generic
+ * device API mean when they write a setpoint.
+ *
+ * On a manual write, the expiry is only armed when the device follows a
+ * schedule: that is the only case where something would otherwise take the
+ * setpoint over. Without a schedule the hold is permanent, like on a physical
+ * thermostat — arming a timer there would silently revert to the stored preset
+ * after a few minutes, with no countdown banner to announce it (the widget only
+ * renders one for a scheduled thermostat).
  * @param {object} device - The device object.
  * @param {object} deviceFeature - The device feature to update.
  * @param {number} value - The new value.
+ * @param {boolean} [manual] - Whether this write is a manual override. Default true.
  * @returns {Promise<void>}
  * @example
  * await service.device.setValue(device, deviceFeature, 21.5);
  */
-async function setValue(device, deviceFeature, value) {
+async function setValue(device, deviceFeature, value, manual = true) {
   await this.gladys.device.saveState(deviceFeature, value);
+
+  if (!manual) {
+    // Returning to the schedule: the caller has already cleared the manual flag,
+    // and re-arming it here would leave the device in manual mode in the database
+    // while every open widget displays the schedule — until the expiry silently
+    // dropped it again, minutes later.
+    logger.info(`Thermostat: scheduled setpoint ${value} written on ${deviceFeature.selector}`);
+    this.triggerApplySchedules();
+    return;
+  }
 
   const featureKey = deviceFeature.selector.toUpperCase().replace(/-/g, '_');
   const manualVarKey = `THERMOSTAT_${featureKey}_MANUAL_MODE`;

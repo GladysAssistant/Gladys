@@ -153,6 +153,35 @@ describe('thermostat.setValue', () => {
     assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL', '');
   });
 
+  it('should not touch the manual variables when the write is not manual', async () => {
+    // The widget writes the scheduled setpoint back through this path when a
+    // hold ends. Re-arming the override here would leave the database in manual
+    // mode while every open widget displays the schedule.
+    const handler = buildHandler();
+
+    await handler.setValue(scheduledDevice(), deviceFeature, 19, false);
+
+    assert.calledWith(handler.gladys.device.saveState, deviceFeature, 19);
+    assert.notCalled(handler.gladys.variable.setValue);
+    assert.notCalled(handler.gladys.event.emit);
+  });
+
+  it('should still regulate after a non-manual write', async () => {
+    const handler = buildHandler();
+
+    await handler.setValue(scheduledDevice(), deviceFeature, 19, false);
+
+    assert.calledOnce(handler.triggerApplySchedules);
+  });
+
+  it('should treat an unspecified write as manual, like a scene does', async () => {
+    const handler = buildHandler();
+
+    await handler.setValue(scheduledDevice(), deviceFeature, 19);
+
+    assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'true');
+  });
+
   it('should write the runtime variables in this service scope', async () => {
     const handler = buildHandler();
 
