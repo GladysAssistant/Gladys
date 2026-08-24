@@ -5,7 +5,7 @@ import { house, rooms, devices, services, roomSummary, USERS } from './home';
 import { dashboards } from './dashboards';
 import { getWeather, getSunState } from './weather';
 import { scenes, sceneTags, calendars, calendarEvents, messages } from './scenes';
-import { getAggregatedStates, getEnergyConsumption, getStatesHistory } from './history';
+import { getAggregatedStates, getEnergyConsumption, getStatesCsv, getStatesHistory } from './history';
 import { uuid, hoursAgo, minutesAgo, solarPowerNow } from './helpers';
 import integrations from './integrations';
 import system from './system';
@@ -427,6 +427,7 @@ const home = {
   // --- Device states -----------------------------------------------------
   'get /api/v1/device_feature/aggregated_states': getAggregatedStates,
   'get /api/v1/device_feature/energy_consumption': getEnergyConsumption,
+  'get /api/v1/device_feature/states_csv': getStatesCsv,
   'get /api/v1/device_feature/states_history': getStatesHistory,
 
   // --- Scenes ------------------------------------------------------------

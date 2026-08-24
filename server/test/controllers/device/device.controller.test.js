@@ -2,6 +2,8 @@ const { expect } = require('chai');
 const db = require('../../../models');
 
 const { authenticatedRequest } = require('../request.test');
+const DeviceController = require('../../../api/controllers/device.controller');
+const { EVENTS } = require('../../../utils/constants');
 
 const insertStates = async (intervalInMinutes) => {
   const deviceFeatureStateToInsert = [];
@@ -158,6 +160,327 @@ describe('GET /api/v1/device_feature/states_history', () => {
       .then((res) => {
         expect(res.body).to.have.lengthOf(0);
       });
+  });
+});
+
+describe('GET /api/v1/device_feature/states_csv', () => {
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 0, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:02:00.000Z') },
+    ]);
+  });
+  it('should export device feature states as CSV', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        device_features: 'test-device-feature',
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+      })
+      .expect('Content-Type', /csv/)
+      .expect('Content-Disposition', 'attachment; filename="gladys-history-2025-08-28-2025-08-29.csv"')
+      .expect(200)
+      .then((res) => {
+        const lines = res.text.split('\n');
+        expect(lines).to.have.lengthOf(3);
+        expect(lines[0]).to.equal('date,device,feature,unit,value');
+        expect(lines[1]).to.equal('2025-08-28T15:00:00.000Z,Test device,Test device feature,,0');
+        expect(lines[2]).to.equal('2025-08-28T15:02:00.000Z,Test device,Test device feature,,1');
+      });
+  });
+  it('should return 400 when no device feature is given', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+      })
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
+  it('should stream the whole file over HTTP when several chunks are needed', async () => {
+    // A one-state chunk: the response is written chunk by chunk, and still
+    // reads as one single valid CSV file.
+    // @ts-ignore
+    const previousChunkSize = global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK = 1;
+    try {
+      await authenticatedRequest
+        .get('/api/v1/device_feature/states_csv')
+        .query({
+          device_features: 'test-device-feature',
+          start: '2025-08-28T00:00:00.000Z',
+          end: '2025-08-29T00:00:00.000Z',
+        })
+        .expect('Content-Type', /csv/)
+        .expect(200)
+        .then((res) => {
+          const lines = res.text.split('\n');
+          expect(lines).to.have.lengthOf(3);
+          expect(lines[0]).to.equal('date,device,feature,unit,value');
+          expect(lines[1]).to.equal('2025-08-28T15:00:00.000Z,Test device,Test device feature,,0');
+          expect(lines[2]).to.equal('2025-08-28T15:02:00.000Z,Test device,Test device feature,,1');
+        });
+    } finally {
+      // @ts-ignore
+      global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK = previousChunkSize;
+    }
+  });
+  it('should export chunk by chunk when max_states is passed', async () => {
+    const firstChunk = await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        device_features: 'test-device-feature',
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+        max_states: 1,
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => res.body);
+    expect(firstChunk.states).to.equal(1);
+    expect(firstChunk.next).to.not.equal(null);
+    expect(firstChunk.csv.split('\n')).to.deep.equal([
+      'date,device,feature,unit,value',
+      '2025-08-28T15:00:00.000Z,Test device,Test device feature,,0',
+    ]);
+    const secondChunk = await authenticatedRequest
+      .get('/api/v1/device_feature/states_csv')
+      .query({
+        device_features: 'test-device-feature',
+        start: '2025-08-28T00:00:00.000Z',
+        end: '2025-08-29T00:00:00.000Z',
+        max_states: 1,
+        after_created_at_us: firstChunk.next.createdAtUs,
+        after_device_feature_id: firstChunk.next.deviceFeatureId,
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => res.body);
+    expect(secondChunk.states).to.equal(1);
+    expect(secondChunk.next).to.equal(null);
+    // No header on the following chunks: the client concatenates them
+    expect(secondChunk.csv).to.equal('2025-08-28T15:02:00.000Z,Test device,Test device feature,,1');
+  });
+  it('should export a chunk through the Gladys Gateway when max_states is passed', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+    };
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/device_feature/states_csv?device_features=test-device-feature&start=2025-08-28T00:00:00.000Z&end=2025-08-29T00:00:00.000Z&max_states=1',
+      {},
+      {},
+      (data) => {
+        expect(data.states).to.equal(1);
+        expect(data.next).to.not.equal(null);
+        expect(data.csv.split('\n')).to.have.lengthOf(2);
+        done();
+      },
+    );
+  });
+  it('should refuse a non-paginated export too big for the Gladys Gateway', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+    };
+    // @ts-ignore
+    const previousLimit = global.TEST_GLADYS_INSTANCE.device.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.device.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES = 10;
+    // A whole-file export through the gateway travels in one websocket message: past
+    // the size limit it is refused, and told to paginate instead.
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/device_feature/states_csv?device_features=test-device-feature&start=2025-08-28T00:00:00.000Z&end=2025-08-29T00:00:00.000Z',
+      {},
+      {},
+      (data) => {
+        // @ts-ignore
+        global.TEST_GLADYS_INSTANCE.device.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES = previousLimit;
+        expect(data.message).to.contain('Please paginate with max_states');
+        done();
+      },
+    );
+  });
+  it('should export device feature states as CSV through the Gladys Gateway', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+    };
+    // The gateway response object has no setHeader: the export must answer the CSV
+    // instead of crashing on the missing method.
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/device_feature/states_csv?device_features=test-device-feature&start=2025-08-28T00:00:00.000Z&end=2025-08-29T00:00:00.000Z',
+      {},
+      {},
+      (data) => {
+        expect(data).to.be.a('string');
+        const lines = data.split('\n');
+        expect(lines).to.have.lengthOf(3);
+        expect(lines[0]).to.equal('date,device,feature,unit,value');
+        done();
+      },
+    );
+  });
+});
+
+describe('GET /api/v1/device_feature/states_csv (streaming edge cases)', () => {
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 0, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:02:00.000Z') },
+    ]);
+  });
+
+  const buildChunk = (next) => ({
+    csv: 'chunk',
+    next,
+    states: 1,
+  });
+
+  it('should stop streaming when the client is gone', async () => {
+    let exportCalls = 0;
+    const gladysFake = {
+      device: {
+        CSV_EXPORT_PAUSE_BETWEEN_CHUNKS_IN_MS: 1,
+        exportStatesToCsv: async () => {
+          exportCalls += 1;
+          return buildChunk({ createdAtUs: '1', deviceFeatureId: 'feature' });
+        },
+      },
+    };
+    const controller = DeviceController(gladysFake);
+    // The connection dies right after the first chunk was written
+    const req = {
+      query: { device_features: 'a', start: '2025-08-28T00:00:00.000Z', end: '2025-08-29T00:00:00.000Z' },
+      destroyed: true,
+    };
+    const writes = [];
+    let ended = false;
+    const res = {
+      setHeader: () => {},
+      write: (part) => writes.push(part),
+      end: () => {
+        ended = true;
+      },
+      writableEnded: false,
+    };
+    await controller.exportStatesToCsv(req, res, (e) => {
+      throw e;
+    });
+    // Only the first chunk was fetched and written: the loop stopped instead of
+    // draining the whole period for nobody.
+    expect(exportCalls).to.equal(1);
+    expect(writes).to.deep.equal(['chunk']);
+    expect(ended).to.equal(false);
+  });
+
+  it('should cut the stream when a chunk fails after the headers are sent', async () => {
+    let exportCalls = 0;
+    const gladysFake = {
+      device: {
+        CSV_EXPORT_PAUSE_BETWEEN_CHUNKS_IN_MS: 1,
+        exportStatesToCsv: async () => {
+          exportCalls += 1;
+          if (exportCalls > 1) {
+            throw new Error('DuckDB failed mid-export');
+          }
+          return buildChunk({ createdAtUs: '1', deviceFeatureId: 'feature' });
+        },
+      },
+    };
+    const controller = DeviceController(gladysFake);
+    const req = {
+      query: { device_features: 'a', start: '2025-08-28T00:00:00.000Z', end: '2025-08-29T00:00:00.000Z' },
+      destroyed: false,
+    };
+    let destroyed = false;
+    let ended = false;
+    let nextCalled = false;
+    const res = {
+      setHeader: () => {},
+      write: () => {},
+      end: () => {
+        ended = true;
+      },
+      destroy: () => {
+        destroyed = true;
+      },
+      writableEnded: false,
+    };
+    await controller.exportStatesToCsv(req, res, () => {
+      nextCalled = true;
+    });
+    // The stream is cut, not answered with a JSON error on headers already sent
+    expect(destroyed).to.equal(true);
+    expect(ended).to.equal(false);
+    expect(nextCalled).to.equal(false);
+  });
+
+  it('should reassemble several chunks for a whole-file gateway export', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+    };
+    // A one-state chunk: the gateway whole-file path has to loop and join
+    // @ts-ignore
+    const previousChunkSize = global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK = 1;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/device_feature/states_csv?device_features=test-device-feature&start=2025-08-28T00:00:00.000Z&end=2025-08-29T00:00:00.000Z',
+      {},
+      {},
+      (data) => {
+        // @ts-ignore
+        global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK = previousChunkSize;
+        expect(data).to.be.a('string');
+        const lines = data.split('\n');
+        expect(lines).to.have.lengthOf(3);
+        expect(lines[0]).to.equal('date,device,feature,unit,value');
+        expect(lines[1]).to.equal('2025-08-28T15:00:00.000Z,Test device,Test device feature,,0');
+        expect(lines[2]).to.equal('2025-08-28T15:02:00.000Z,Test device,Test device feature,,1');
+        done();
+      },
+    );
   });
 });
 
