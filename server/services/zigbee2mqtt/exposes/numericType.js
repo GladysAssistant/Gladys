@@ -33,6 +33,15 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.SECONDS,
       },
     },
+    // How long a siren keeps alarming once triggered, in minutes
+    // https://www.zigbee2mqtt.io/devices/NAS-AB06B2.html
+    alarm_time: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.DURATION,
+        type: DEVICE_FEATURE_TYPES.DURATION.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.MINUTES,
+      },
+    },
     battery: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.BATTERY,

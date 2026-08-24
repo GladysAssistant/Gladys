@@ -6,7 +6,8 @@ import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
-  WATER_HEATER_MODE
+  WATER_HEATER_MODE,
+  SIREN_MODE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { CAMERA_MOVE_OPTIONS } from '../../../../../utils/cameraMove';
@@ -81,6 +82,8 @@ export const isMqttCatalogFeatureVisible = (category, type) =>
   !MQTT_CATALOG_EXCLUDED_FEATURES.has(categoryTypeKey(category, type));
 
 const CATEGORIES_WITHOUT_UNIT = new Set([
+  // The battery charge level is a percentage, but knowing whether it is charging is a binary
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_TYPES.BATTERY.CHARGING),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.MODE),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING),
@@ -758,8 +761,21 @@ export const getFeatureDefaultValues = (category, type) => {
     );
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY && type === DEVICE_FEATURE_TYPES.BATTERY.CHARGING) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.BATTERY && type === DEVICE_FEATURE_TYPES.BATTERY.INTEGER) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, unit: DEVICE_FEATURE_UNITS.PERCENT }, category, type);
+  }
+
+  // Siren enums: the alarm mode is a command, the alarm state is what the siren plays right now
+  if (category === DEVICE_FEATURE_CATEGORIES.SIREN && type === DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.SIREN && type === DEVICE_FEATURE_TYPES.SIREN.ALARM_STATE) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: true }, category, type);
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR) {
@@ -880,7 +896,19 @@ export const getCatalogPreviewLabelKey = (category, type) => {
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
       DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE
-    )]: `deviceFeatureValue.category.charging-station.charging-state.${CHARGING_STATION_CHARGING_STATE.CHARGING}`
+    )]: `deviceFeatureValue.category.charging-station.charging-state.${CHARGING_STATION_CHARGING_STATE.CHARGING}`,
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.SIREN,
+      DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE
+    )]: `deviceFeatureValue.category.siren.alarm-mode.${SIREN_MODE.SOUND_AND_LIGHT}`,
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.SIREN,
+      DEVICE_FEATURE_TYPES.SIREN.ALARM_STATE
+    )]: `deviceFeatureValue.category.siren.alarm-state.${SIREN_MODE.SOUND_AND_LIGHT}`,
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.BATTERY,
+      DEVICE_FEATURE_TYPES.BATTERY.CHARGING
+    )]: 'deviceFeatureValue.category.battery.charging.1'
   };
 
   return labeledPreviewKeys[key] || null;
@@ -1067,7 +1095,16 @@ export const getFeaturePreviewValue = (category, type) => {
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.BATTERY) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY.CHARGING) {
+      return 1;
+    }
     return 85;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.SIREN) {
+    if (type === DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE || type === DEVICE_FEATURE_TYPES.SIREN.ALARM_STATE) {
+      return SIREN_MODE.SOUND_AND_LIGHT;
+    }
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR) {

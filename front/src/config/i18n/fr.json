@@ -5061,6 +5061,12 @@
           "low": "Faible",
           "medium": "Moyen",
           "high": "Fort"
+        },
+        "alarm-mode": {
+          "idle": "Pas d'alarme",
+          "sound": "Son",
+          "light": "Lumière",
+          "sound_and_light": "Son et lumière"
         }
       },
       "vacuum-cleaner": {
@@ -5354,6 +5360,25 @@
         "test-in-progress": {
           "0": "Non",
           "1": "Oui"
+        },
+        "alarm-mode": {
+          "0": "Pas d'alarme",
+          "1": "Son",
+          "2": "Lumière",
+          "3": "Son et lumière"
+        },
+        "alarm-state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Inactive",
+          "1": "Son",
+          "2": "Lumière",
+          "3": "Son et lumière"
+        }
+      },
+      "battery": {
+        "charging": {
+          "0": "Pas en charge",
+          "1": "En charge"
         }
       },
       "music": {
@@ -5586,7 +5611,8 @@
     },
     "battery": {
       "shortCategoryName": "Batterie",
-      "integer": "Batterie"
+      "integer": "Batterie",
+      "charging": "En charge"
     },
     "battery-low": {
       "shortCategoryName": "Batterie faible",
@@ -5713,7 +5739,9 @@
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
       "melody": "Mélodie",
-      "test-in-progress": "Test en cours"
+      "test-in-progress": "Test en cours",
+      "alarm-mode": "Mode d'alarme",
+      "alarm-state": "État de l'alarme"
     },
     "cube": {
       "shortCategoryName": "Cube",

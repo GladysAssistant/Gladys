@@ -21,6 +21,7 @@ import AirConditioningFanSpeedDeviceFeature from './device-features/AirCondition
 import AirConditioningSwingDeviceFeature from './device-features/AirConditioningSwingDeviceFeature';
 import PilotWireModeDeviceFeature from './device-features/PilotWireModeDeviceFeature';
 import LMHVolumeDeviceFeature from './device-features/LMHVolumeDeviceFeature';
+import SirenAlarmModeDeviceFeature from './device-features/SirenAlarmModeDeviceFeature';
 import PushDeviceFeature from './device-features/PushDeviceFeature';
 import VacuumCleanerDockDeviceFeature from './device-features/VacuumCleanerDockDeviceFeature';
 import CameraMoveDeviceFeature from './device-features/CameraMoveDeviceFeature';
@@ -66,6 +67,7 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SIREN.LMH_VOLUME]: LMHVolumeDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.MELODY]: NumberDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.BINARY]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE]: SirenAlarmModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.DURATION.DECIMAL]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.BUTTON.PUSH]: PushDeviceFeature,
   [DEVICE_FEATURE_TYPES.SWITCH.TARGET_CURRENT]: SetpointDeviceFeature,
