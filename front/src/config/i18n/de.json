@@ -810,7 +810,7 @@
       "mist": "Nebel"
     },
     "editDashboardIconLabel": "Symbol (optional)",
-    "editDashboardIconDescription": "Wird im Tablet-Modus in der Dashboard-Tab-Leiste angezeigt.",
+    "editDashboardIconDescription": "Wird in der Dashboard-Tab-Leiste angezeigt. Ohne Symbol wird das Emoji am Anfang des Dashboard-Namens verwendet, sonst ein generisches Haus.",
     "editDashboardWidthLabel": "Dashboard-Breite",
     "widths": {
       "standard": "Standard (empfohlen)",
@@ -839,6 +839,8 @@
     "dashboardAlreadyExist": "Ein Dashboard mit diesem Namen existiert bereits.",
     "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut!",
     "validationError": "Das hinzuzufügende Dashboard ist ungültig. Hast du alle Felder korrekt ausgefüllt?",
+    "iconLabel": "Symbol",
+    "iconDescription": "Wird in der Dashboard-Tab-Leiste angezeigt. Auf dem Smartphone und im Tablet-Modus ist es oft das einzige Erkennungsmerkmal des Dashboards.",
     "createDashboardButton": "Hinzufügen"
   },
   "integration": {

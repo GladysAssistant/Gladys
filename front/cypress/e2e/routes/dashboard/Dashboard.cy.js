@@ -19,8 +19,14 @@ describe('Dashboard', () => {
       cy.wrap(inputs[0]).type('My new dashboard');
     });
 
+    // the icon is required at creation: the button stays disabled until one
+    // is picked (the radio input itself is visually hidden behind the tile)
+    cy.contains('button', 'newDashboard.createDashboardButton').should('be.disabled');
+    cy.get('input[name="icon"][value="home"]').check({ force: true });
+
     cy.contains('button', 'newDashboard.createDashboardButton')
       .should('have.class', 'btn-primary')
+      .should('not.be.disabled')
       .click();
 
     // The selector of a new dashboard ends with 4 random characters, like scenes

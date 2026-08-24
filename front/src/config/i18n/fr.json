@@ -810,7 +810,7 @@
       "mist": "Brume"
     },
     "editDashboardIconLabel": "Icône (optionnel)",
-    "editDashboardIconDescription": "Affichée dans la barre d'onglets des tableaux de bord en mode tablette.",
+    "editDashboardIconDescription": "Affichée dans la barre d'onglets des tableaux de bord. Sans icône, l'emoji au début du nom du tableau de bord est utilisé, sinon une maison générique.",
     "editDashboardWidthLabel": "Largeur du tableau de bord",
     "widths": {
       "standard": "Standard (recommandé)",
@@ -839,6 +839,8 @@
     "dashboardAlreadyExist": "Un tableau de bord avec ce nom existe déjà.",
     "unknownError": "Une erreur inconnue s'est produite. Merci de réessayer !",
     "validationError": "Le tableau de bord n'est pas valide, êtes-vous sûr d'avoir rempli tous les champs ?",
+    "iconLabel": "Icône",
+    "iconDescription": "Affichée dans la barre d'onglets des tableaux de bord. Sur mobile et en mode tablette, c'est souvent elle seule qui identifie le tableau de bord.",
     "createDashboardButton": "Créer"
   },
   "integration": {
