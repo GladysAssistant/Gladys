@@ -1014,7 +1014,27 @@ class ThermostatBox extends Component {
                 </div>
               </div>
 
-              {activePreset === null
+              {isWindowOpen && (
+                <div class={style.windowBanner}>
+                  {/* An alert glyph, not a window: the icon font has none, and
+                      what matters here is that the heating is suspended. */}
+                  <i class={`fe fe-alert-triangle ${style.windowBannerIcon}`} />
+                  <span class={style.windowBannerText}>
+                    {/* The server cuts the switch whatever the mode, so an open
+                        window suspends a running air conditioner just as it
+                        suspends a heater: the banner has to name the right one. */}
+                    <Text
+                      id={
+                        configMode === 'cooling'
+                          ? 'dashboard.boxes.thermostat.windowOpenCooling'
+                          : 'dashboard.boxes.thermostat.windowOpen'
+                      }
+                    />
+                  </span>
+                </div>
+              )}
+
+              {isWindowOpen || activePreset === null
                 ? null
                 : (() => {
                     const hasSchedule = !!activeSchedule;
