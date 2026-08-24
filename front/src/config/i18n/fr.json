@@ -4675,7 +4675,7 @@
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Configurer l'authentification à deux facteurs (2FA)",
     "twoFactorNotConfigured": "L'authentification à deux facteurs (2FA) n'est pas encore configurée sur votre compte Gladys Plus. Elle est indispensable pour connecter votre instance.",
-    "scanInstructions": "Scannez ce QR code avec une application 2FA (Authy, Google Authenticator...), ou copiez le secret manuellement dans votre application.",
+    "scanInstructions": "Scannez ce QR code avec votre application 2FA, ou copiez le secret manuellement dans votre application.",
     "secretLabel": "Secret",
     "copy": "Copier",
     "confirmCodeLabel": "Entrez le code affiché dans votre application",
@@ -6377,6 +6377,9 @@
     "registeredLabel": "Enregistré le :",
     "neverUsed": "Jamais"
   },
+  "twoFactorApps": {
+    "description": "N'importe quelle application générant des codes à 6 chiffres fonctionne. Si vous n'en avez pas encore, voici quelques applications gratuites et simples à installer :"
+  },
   "gatewayTwoFactorAuth": {
     "title": "Gladys Plus",
     "configureTitle": "Configurer l'authentification à deux facteurs (\"2FA\")",
@@ -6384,7 +6387,7 @@
     "secretLabel": "Secret",
     "copy": "Copier",
     "securityIsImportant": "La sécurité de votre compte Gladys Gateway est vraiment importante pour nous.",
-    "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/fr/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
+    "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application d'authentification sur votre téléphone.",
     "invalidCode": "Le code 2FA que vous avez fourni n'est pas valide.",
     "confirmCode": "Confirmer 2FA",
     "enterCode": "Entrez le code à 6 chiffres",

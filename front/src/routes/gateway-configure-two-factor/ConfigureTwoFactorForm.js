@@ -1,5 +1,6 @@
-import { Text, MarkupText, Localizer } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import AuthLayout from '../../components/auth/AuthLayout';
+import TwoFactorAppList from '../../components/gateway/TwoFactorAppList';
 
 const ConfigureTwoFactorForm = ({ children, ...props }) => (
   <AuthLayout titleId="gatewayTwoFactorAuth.title">
@@ -13,8 +14,10 @@ const ConfigureTwoFactorForm = ({ children, ...props }) => (
             <Text id="gatewayTwoFactorAuth.securityIsImportant" />
           </p>
           <p>
-            <MarkupText id="gatewayTwoFactorAuth.securityApps" />
+            <Text id="gatewayTwoFactorAuth.securityApps" />
           </p>
+
+          <TwoFactorAppList />
 
           <div class="form-footer">
             <button onClick={props.nextStep} class="btn btn-primary btn-block">
