@@ -589,6 +589,11 @@
   overflow-y: hidden;
 }
 
+/* Leave room for the microphone button next to the send button. */
+.chatInputWithVoice {
+  padding-right: 92px;
+}
+
 .chatInput:focus {
   background-color: rgba(255, 255, 255, 0.8);
   border-color: var(--gl-accent);
@@ -636,6 +641,82 @@
 .sendButtonIdle:focus {
   background: rgba(28, 35, 52, 0.07);
   color: var(--gl-muted);
+}
+
+.voiceInputButton {
+  position: absolute;
+  right: 48px;
+  bottom: 8px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50% !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2f6;
+  color: #6c7a89;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.voiceInputButton:hover,
+.voiceInputButton:focus {
+  background: #e2e9f0;
+  color: #3564be;
+}
+
+.voiceInputButtonListening,
+.voiceInputButtonListening:hover,
+.voiceInputButtonListening:focus {
+  background: #e74c3c;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+  animation: voice-input-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes voice-input-pulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 2px 14px rgba(231, 76, 60, 0.75);
+  }
+}
+
+.voiceInputButtonProcessing,
+.voiceInputButtonProcessing:hover,
+.voiceInputButtonProcessing:focus {
+  background: #e2e9f0;
+  color: #3564be;
+}
+
+.voiceInputSpinner {
+  display: inline-block;
+  animation: voice-input-spin 1s linear infinite;
+}
+
+@keyframes voice-input-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voiceInputButtonListening,
+  .voiceInputButtonListening:hover,
+  .voiceInputButtonListening:focus,
+  .voiceInputSpinner {
+    animation: none !important;
+  }
+}
+
+.voiceInputError {
+  margin: 8px 4px 0;
+  font-size: 13px;
+  color: #cd201f;
 }
 
 .emptyChatState {
@@ -740,6 +821,20 @@
   .chatInput {
     min-height: 3.75rem;
     padding-right: 3.75rem;
+  }
+
+  /* The microphone grows to the same 44px floor, sitting 8px left of the
+     send button (8px edge + 44px send + 8px gap = 60px). */
+  .voiceInputButton {
+    width: 2.75rem;
+    height: 2.75rem;
+    right: 3.75rem;
+  }
+
+  /* Placed after the .chatInput rule above so it wins with equal
+     specificity: 8px edge + 44px send + 8px + 44px mic + 8px text gap. */
+  .chatInputWithVoice {
+    padding-right: 7rem;
   }
 }
 

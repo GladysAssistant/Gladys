@@ -6154,6 +6154,17 @@
       "label": "Modèle IA",
       "auto": "Auto",
       "priceLegend": "€ économique · €€ moyen · €€€ premium"
+    },
+    "voiceInput": {
+      "startListening": "Dicter un message",
+      "stopListening": "Arrêter la dictée",
+      "error": "La dictée a échoué. Vérifiez que Gladys Plus est connecté, puis réessayez.",
+      "errorNoSpeech": "Aucune voix détectée. Vérifiez que votre micro est activé, puis réessayez.",
+      "errorPermissionDenied": "L'accès au micro a été refusé. Autorisez-le dans les réglages de votre navigateur pour dicter un message.",
+      "errorNoMicrophone": "Aucun micro détecté. Branchez ou activez un micro dans les réglages système.",
+      "errorMicrophoneUnavailable": "Le micro est indisponible. Vérifiez qu'il n'est pas utilisé par une autre application.",
+      "errorNoTranscription": "Je n'ai pas compris votre message. Parlez plus près du micro et réessayez.",
+      "errorNotSupported": "L'enregistrement vocal n'est pas disponible dans ce navigateur."
     }
   },
   "history": {

@@ -6154,6 +6154,17 @@
       "label": "KI-Modell",
       "auto": "Auto",
       "priceLegend": "€ günstig · €€ mittel · €€€ premium"
+    },
+    "voiceInput": {
+      "startListening": "Nachricht diktieren",
+      "stopListening": "Diktat beenden",
+      "error": "Das Diktat ist fehlgeschlagen. Prüfe, ob Gladys Plus verbunden ist, und versuche es erneut.",
+      "errorNoSpeech": "Keine Stimme erkannt. Prüfe, ob dein Mikrofon aktiviert ist, und versuche es erneut.",
+      "errorPermissionDenied": "Der Mikrofonzugriff wurde verweigert. Erlaube ihn in den Einstellungen deines Browsers, um eine Nachricht zu diktieren.",
+      "errorNoMicrophone": "Kein Mikrofon erkannt. Schließe eines an oder aktiviere es in den Systemeinstellungen.",
+      "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfe, ob es von einer anderen App verwendet wird.",
+      "errorNoTranscription": "Ich habe deine Nachricht nicht verstanden. Sprich näher ans Mikrofon und versuche es erneut.",
+      "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar."
     }
   },
   "history": {

@@ -42,6 +42,11 @@ function createActions(store) {
         currentMessageTextInput: e.target.value
       });
     },
+    setMessageTextInput(state, text) {
+      store.setState({
+        currentMessageTextInput: text
+      });
+    },
     syncMessage(state, message) {
       let newMessages = store.getState().messages;
       // Check if message is already in the list
