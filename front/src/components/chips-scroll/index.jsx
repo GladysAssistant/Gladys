@@ -133,7 +133,30 @@ const ChipsScroll = ({
       }
     };
     run();
-    return () => cancelAnimationFrame(raf);
+
+    // On a cold load the fallback font is narrower than the webfont: a row
+    // that fitted (centering a no-op, arrows hidden) can overflow once the
+    // real font lands, pushing the active chip past the fold. So re-center
+    // here, not just re-measure — that also settles the edge padding the
+    // arrows reserve when they appear at that point.
+    let cancelled = false;
+    const centerWhenFontsReady = async () => {
+      if (!document.fonts || !document.fonts.ready) {
+        return;
+      }
+      await document.fonts.ready;
+      if (cancelled) {
+        return;
+      }
+      attempts = 0;
+      run();
+    };
+    centerWhenFontsReady();
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+    };
   }, [activeSelector, activeKey, updateScrollState]);
 
   const scrollBy = direction => {
