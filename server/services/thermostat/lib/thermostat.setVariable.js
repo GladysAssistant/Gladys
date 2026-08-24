@@ -9,7 +9,9 @@ const APPLY_DEBOUNCE_MS = 2000;
 const RUNTIME_SUFFIXES = ['PRESET', 'PRESET_FALLBACK', 'MANUAL_MODE', 'MANUAL_UNTIL', 'MANUAL_SETPOINT'];
 
 /**
- * @description Whether a variable key is a thermostat runtime key this service owns.
+ * @description Whether a variable key has the shape of a thermostat runtime key.
+ * This only checks the prefix and the suffix; whether the middle segment names a
+ * feature this service actually owns is settled by `resolveRuntimeVariableKey`.
  * @param {string} variableKey - Variable key to check.
  * @returns {boolean} True when the key is a known runtime key.
  * @example
@@ -23,6 +25,42 @@ function isRuntimeVariableKey(variableKey) {
 }
 
 /**
+ * @description Turn a feature selector into the middle segment of its runtime keys.
+ * @param {string} selector - Device feature selector.
+ * @returns {string} The upper-cased, underscore-separated segment.
+ * @example
+ * featureKeyFromSelector('living-room-thermostat'); // 'LIVING_ROOM_THERMOSTAT'
+ */
+function featureKeyFromSelector(selector) {
+  return selector.toUpperCase().replace(/-/g, '_');
+}
+
+/**
+ * @description Check that a runtime key names a feature owned by this service.
+ * The prefix and suffix alone are not enough: THERMOSTAT_ANYTHING_PRESET would
+ * pass, create a row for a feature that does not exist, and stay there forever —
+ * `postDelete` only cleans up the keys derived from a deleted device's features.
+ * @param {string} variableKey - Variable key, THERMOSTAT_<FEATURE>_<RUNTIME_SUFFIX>.
+ * @returns {Promise<boolean>} True when the key belongs to one of this service's features.
+ * @example
+ * await thermostatHandler.resolveRuntimeVariableKey('THERMOSTAT_LIVING_ROOM_PRESET');
+ */
+async function resolveRuntimeVariableKey(variableKey) {
+  if (!isRuntimeVariableKey(variableKey)) {
+    return false;
+  }
+  const suffix = RUNTIME_SUFFIXES.find((candidate) => variableKey.endsWith(`_${candidate}`));
+  const featureKey = variableKey.slice('THERMOSTAT_'.length, variableKey.length - `_${suffix}`.length);
+  if (featureKey.length === 0) {
+    return false;
+  }
+  const devices = await this.gladys.device.get({ service: 'thermostat' });
+  return (devices || []).some((device) =>
+    (device.features || []).some((feature) => featureKeyFromSelector(feature.selector) === featureKey),
+  );
+}
+
+/**
  * @description Set a thermostat runtime variable, broadcast the matching websocket
  * message so every open dashboard refreshes, and schedule a debounced regulation pass.
  * Only the runtime keys are accepted: the configuration lives on the device.
@@ -33,7 +71,8 @@ function isRuntimeVariableKey(variableKey) {
  * await thermostatHandler.setVariable('THERMOSTAT_MY_DEVICE_PRESET', 'comfort');
  */
 async function setVariable(variableKey, value) {
-  if (!isRuntimeVariableKey(variableKey)) {
+  const owned = await this.resolveRuntimeVariableKey(variableKey);
+  if (!owned) {
     throw new Error(`Invalid thermostat variable key: ${variableKey}`);
   }
   // Scoped to this service: unscoped rows sit in the global variable table and
@@ -81,7 +120,8 @@ function broadcastConfigUpdated() {
  * await thermostatHandler.getVariable('THERMOSTAT_LIVING_ROOM_PRESET');
  */
 async function getVariable(variableKey) {
-  if (!isRuntimeVariableKey(variableKey)) {
+  const owned = await this.resolveRuntimeVariableKey(variableKey);
+  if (!owned) {
     return null;
   }
   return this.gladys.variable.getValue(variableKey, this.serviceId);
@@ -114,6 +154,7 @@ function triggerApplySchedules() {
 module.exports = {
   setVariable,
   getVariable,
+  resolveRuntimeVariableKey,
   broadcastConfigUpdated,
   triggerApplySchedules,
   isRuntimeVariableKey,

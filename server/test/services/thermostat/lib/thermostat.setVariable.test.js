@@ -15,17 +15,22 @@ const load = () =>
     },
   });
 
-const buildHandler = () => {
-  const { setVariable, getVariable, broadcastConfigUpdated, triggerApplySchedules } = load();
+// The keys under test all name the "living-room" feature, so the handler is
+// given a thermostat owning it: a key whose middle segment names no feature of
+// this service is refused.
+const buildHandler = (devices = [{ features: [{ selector: 'living-room' }] }]) => {
+  const { setVariable, getVariable, resolveRuntimeVariableKey, broadcastConfigUpdated, triggerApplySchedules } = load();
   const handler = {
     gladys: {
       variable: { setValue: fake.resolves({ value: 'saved' }), getValue: fake.resolves('comfort') },
+      device: { get: fake.resolves(devices) },
       event: { emit: fake.returns(null) },
     },
     serviceId: 'service-id',
     applySchedules: fake.resolves(null),
     setVariable,
     getVariable,
+    resolveRuntimeVariableKey,
     broadcastConfigUpdated,
     triggerApplySchedules,
   };
@@ -67,6 +72,25 @@ describe('thermostat.setVariable', () => {
     }
 
     expect(error).to.not.equal(null);
+    assert.notCalled(handler.gladys.variable.setValue);
+  });
+
+  it('should refuse a key naming a feature this service does not own', async () => {
+    // The prefix and the suffix are right, so the shape check passes: without
+    // the ownership check this row would be created for a feature that does not
+    // exist and would never be cleaned up — postDelete only removes the keys
+    // derived from a deleted device's features.
+    const handler = buildHandler([{ features: [{ selector: 'living-room' }] }]);
+
+    let error = null;
+    try {
+      await handler.setVariable('THERMOSTAT_GHOST_ROOM_PRESET', 'eco');
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.not.equal(null);
+    expect(error.message).to.contain('Invalid thermostat variable key');
     assert.notCalled(handler.gladys.variable.setValue);
   });
 
@@ -121,6 +145,13 @@ describe('thermostat.getVariable', () => {
 
     expect(value).to.equal('comfort');
     assert.calledWith(handler.gladys.variable.getValue, 'THERMOSTAT_LIVING_ROOM_PRESET', 'service-id');
+  });
+
+  it('should return null for a key naming a feature this service does not own', async () => {
+    const handler = buildHandler([{ features: [{ selector: 'living-room' }] }]);
+
+    expect(await handler.getVariable('THERMOSTAT_GHOST_ROOM_PRESET')).to.equal(null);
+    assert.notCalled(handler.gladys.variable.getValue);
   });
 
   it('should return null for a key outside the runtime namespace', async () => {

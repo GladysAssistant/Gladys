@@ -1,10 +1,12 @@
 const { expect } = require('chai');
 
+const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
 const {
   parseEnd,
   findMatchingPreset,
   getSetpointForPreset,
   computeSwitchActive,
+  readTemperatureInThermostatUnit,
 } = require('../../../../services/thermostat/lib/thermostat.applySchedules');
 
 describe('thermostat.applySchedules - parseEnd', () => {
@@ -191,5 +193,50 @@ describe('thermostat.applySchedules - computeSwitchActive', () => {
       // error = 0.5 → 2.5 minutes, comfortably actionable
       expect(computeSwitchActive(19.5, 20, 'heating', tpiConfig, false, 0)).to.equal(true);
     });
+  });
+});
+
+describe('thermostat.applySchedules - readTemperatureInThermostatUnit', () => {
+  it('should return the reading unchanged when both units match', () => {
+    const feature = { last_value: 20, unit: DEVICE_FEATURE_UNITS.CELSIUS };
+    expect(readTemperatureInThermostatUnit(feature, 'C')).to.equal(20);
+  });
+
+  it('should convert a celsius sensor for a fahrenheit thermostat', () => {
+    // The sensor and the thermostat are two separate devices: comparing 20
+    // against a 68 setpoint would leave the heating permanently off.
+    const feature = { last_value: 20, unit: DEVICE_FEATURE_UNITS.CELSIUS };
+    expect(readTemperatureInThermostatUnit(feature, 'F')).to.equal(68);
+  });
+
+  it('should convert a fahrenheit sensor for a celsius thermostat', () => {
+    const feature = { last_value: 68, unit: DEVICE_FEATURE_UNITS.FAHRENHEIT };
+    expect(readTemperatureInThermostatUnit(feature, 'C')).to.equal(20);
+  });
+
+  it('should leave a fahrenheit sensor alone for a fahrenheit thermostat', () => {
+    const feature = { last_value: 68, unit: DEVICE_FEATURE_UNITS.FAHRENHEIT };
+    expect(readTemperatureInThermostatUnit(feature, 'F')).to.equal(68);
+  });
+
+  it('should assume the thermostat unit when the sensor declares none', () => {
+    // Pre-existing behaviour: guessing would be worse than not converting.
+    expect(readTemperatureInThermostatUnit({ last_value: 20 }, 'F')).to.equal(20);
+    expect(readTemperatureInThermostatUnit({ last_value: 68, unit: null }, 'C')).to.equal(68);
+  });
+
+  it('should ignore a unit it does not know about', () => {
+    const feature = { last_value: 20, unit: 'kelvin' };
+    expect(readTemperatureInThermostatUnit(feature, 'F')).to.equal(20);
+  });
+
+  it('should return null for a missing reading', () => {
+    expect(readTemperatureInThermostatUnit(null, 'C')).to.equal(null);
+    expect(readTemperatureInThermostatUnit({ last_value: null }, 'C')).to.equal(null);
+    expect(readTemperatureInThermostatUnit({ last_value: undefined }, 'C')).to.equal(null);
+  });
+
+  it('should keep a 0 reading, which is a legitimate temperature', () => {
+    expect(readTemperatureInThermostatUnit({ last_value: 0, unit: DEVICE_FEATURE_UNITS.CELSIUS }, 'F')).to.equal(32);
   });
 });

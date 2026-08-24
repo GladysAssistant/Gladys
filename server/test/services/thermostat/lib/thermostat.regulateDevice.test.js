@@ -4,7 +4,12 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { fake, assert } = sinon;
 
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  EVENTS,
+} = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
 
 const setpointFeature = (extra = {}) => ({
@@ -612,5 +617,70 @@ describe('thermostat.regulateDevice - config defaults', () => {
     await regulate(mod, gladys, { features: [setpointFeature()], params: [] });
 
     assert.notCalled(gladys.device.setValue);
+  });
+
+  it('should convert a celsius sensor before comparing it to a fahrenheit setpoint', async () => {
+    // 18 °C is 64.4 °F, well below the 70 °F comfort setpoint, so the heating
+    // must start. Comparing the raw 18 against 70 would also start it here — the
+    // cooling case below is the one that proves the conversion actually happens.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: {
+        'temp-sensor': { selector: 'temp-sensor', last_value: 18, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+        'heater-switch': { selector: 'heater-switch', last_value: 0 },
+      },
+    });
+
+    await regulate(mod, gladys, {
+      features: [setpointFeature()],
+      params: baseParams({ THERMOSTAT_TEMP_UNIT: 'F', THERMOSTAT_PRESET_COMFORT: '70' }),
+    });
+
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(1);
+  });
+
+  it('should not leave a fahrenheit thermostat heating on a warm celsius room', async () => {
+    // 24 °C is 75.2 °F, above the 70 °F setpoint: the heating must stop. Without
+    // the conversion the loop would compare 24 against 70 and heat forever.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: {
+        'temp-sensor': { selector: 'temp-sensor', last_value: 24, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+        'heater-switch': { selector: 'heater-switch', last_value: 1 },
+      },
+    });
+
+    await regulate(mod, gladys, {
+      features: [setpointFeature()],
+      params: baseParams({ THERMOSTAT_TEMP_UNIT: 'F', THERMOSTAT_PRESET_COMFORT: '70' }),
+    });
+
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(0);
+  });
+
+  it('should convert the sensor on the manual override path too', async () => {
+    // The manual branch returns before the schedule is resolved, so it needs its
+    // own conversion: 24 °C is 75.2 °F, above a 70 °F manual hold.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: {
+        'temp-sensor': { selector: 'temp-sensor', last_value: 24, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+        'heater-switch': { selector: 'heater-switch', last_value: 1 },
+      },
+      variables: {
+        THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE: 'true',
+        THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 70 }),
+      },
+    });
+
+    await regulate(mod, gladys, {
+      features: [setpointFeature()],
+      params: baseParams({ THERMOSTAT_TEMP_UNIT: 'F', THERMOSTAT_PRESET_COMFORT: '70' }),
+    });
+
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(0);
   });
 });

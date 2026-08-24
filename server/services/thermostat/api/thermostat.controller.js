@@ -132,7 +132,21 @@ module.exports = function ThermostatController(thermostatHandler) {
       res.status(400).json({ error: 'INVALID_VARIABLE_KEY' });
       return;
     }
-    const variable = await thermostatHandler.setVariable(req.params.variable_key, req.body.value);
+    // The variable table stores text: an object would reach `variable.setValue`
+    // as-is and come back out as "[object Object]" on the next read.
+    const rawValue = req.body ? req.body.value : undefined;
+    if (typeof rawValue !== 'string') {
+      res.status(400).json({ error: 'INVALID_VALUE' });
+      return;
+    }
+    // The key must name a feature this service owns; the shape check above only
+    // covers the prefix and the suffix.
+    const owned = await thermostatHandler.resolveRuntimeVariableKey(req.params.variable_key);
+    if (!owned) {
+      res.status(404).json({ error: 'FEATURE_NOT_FOUND' });
+      return;
+    }
+    const variable = await thermostatHandler.setVariable(req.params.variable_key, rawValue);
     res.json(variable);
   }
 
