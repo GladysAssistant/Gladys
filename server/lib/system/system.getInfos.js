@@ -236,8 +236,11 @@ function getLocalIp(networkInterfaces) {
 async function getInfos() {
   // The host power detection at init can fail transiently (on boot, Gladys
   // often starts before DBus or the Docker daemon is ready). getInfos backs
-  // the System settings page: use it to retry in the background — throttled,
-  // and fire-and-forget since a probe can take tens of seconds.
+  // the System settings page: use it to retry in the background. The retry is
+  // fire-and-forget (a probe can take tens of seconds) and self-limited
+  // (transient failures only, throttled, bounded): getInfos is polled every
+  // 30s by the front and called by periodic server tasks, it must never
+  // become a helper-container factory.
   if (!this.hostPowerManagement) {
     this.redetectHostPowerManagement().catch((e) => logger.debug(e));
   }

@@ -90,6 +90,37 @@ async function getContainerIdFromMountInfo() {
 }
 
 /**
+ * @description Return the containerId from the cidfile, only when it still
+ * names a running container. The cidfile lives in the data volume, so it
+ * outlives the container that wrote it: installs that once used
+ * `docker run --cidfile` keep the file forever, and it goes stale as soon as
+ * the container is recreated without the flag — possibly still naming a
+ * previous Gladys container the Docker daemon has not removed yet. A stale id
+ * silently breaks every feature that inspects the Gladys container (upgrade,
+ * host reboot/shutdown...).
+ * @returns {Promise} Resolve with container id or undefined.
+ * @example
+ * const containerId = await getValidatedContainerIdFromCidFile.call(system);
+ */
+async function getValidatedContainerIdFromCidFile() {
+  const containerId = await getContainerIdFromCidFile();
+  if (containerId === undefined) {
+    return undefined;
+  }
+  try {
+    const { State } = await this.dockerode.getContainer(containerId).inspect();
+    // A stopped container cannot be us, we are running: the cidfile is stale.
+    if (State && State.Running === true) {
+      return containerId;
+    }
+    logger.warn(`System: the cidfile names a container that is not running, ignoring it`);
+  } catch (e) {
+    logger.warn(`System: the cidfile names a container unknown to Docker, ignoring it (${e.message})`);
+  }
+  return undefined;
+}
+
+/**
  * @description Return the containerId of the currently running container.
  * @returns {Promise} Resolve with list of mounts.
  * @example
@@ -100,33 +131,20 @@ async function getGladysContainerId() {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
-  let containerId = await getContainerIdFromCidFile();
-
-  if (containerId !== undefined) {
-    // The cidfile lives in the data volume, so it outlives the container that
-    // wrote it: installs that once used `docker run --cidfile` keep the file
-    // forever, and it goes stale as soon as the container is recreated without
-    // the flag. A stale id silently breaks every feature that inspects the
-    // Gladys container (upgrade, host reboot/shutdown...): only trust the file
-    // when Docker still knows that container.
-    try {
-      await this.dockerode.getContainer(containerId).inspect();
-    } catch (e) {
-      logger.info(
-        `System: the container id found in the cidfile does not match a container known by Docker, ignoring it`,
-      );
-      containerId = undefined;
-    }
-  }
-
-  if (containerId === undefined) {
-    // Not found in cidfile try on cgroup
-    containerId = await getContainerIdFromCgroup();
-  }
+  // The kernel-provided sources describe the container Gladys is actually
+  // running in right now, so they are authoritative and tried first.
+  let containerId = await getContainerIdFromCgroup();
 
   if (containerId === undefined) {
     // Not found in cgroup try on mountinfo
     containerId = await getContainerIdFromMountInfo();
+  }
+
+  if (containerId === undefined) {
+    // Last resort: the cidfile, which can be stale (see above) — a running
+    // container it names may still be a previous Gladys, but nothing better
+    // is available at this point.
+    containerId = await getValidatedContainerIdFromCidFile.call(this);
   }
 
   if (containerId === undefined) {

@@ -9,6 +9,10 @@ const DBUS_SEND_BINARIES = ['/usr/bin/dbus-send', '/bin/dbus-send'];
 // A failed detection is retried (through redetectHostPowerManagement) at most
 // this often: each retry may spin up short-lived helper containers.
 const HOST_POWER_REDETECTION_THROTTLE_MS = 60 * 1000;
+// ...and at most this many times: the retries exist to cover the boot race
+// (Gladys starting before DBus or the Docker daemon), not to probe forever a
+// host where logind is simply never reachable.
+const HOST_POWER_REDETECTION_MAX_ATTEMPTS = 5;
 
 /**
  * @description Extract the reply value from a `dbus-send --print-reply` output
@@ -89,8 +93,14 @@ async function probeHostPowerCapabilities(system, mechanism) {
  */
 async function runDetection() {
   this.hostPowerCapabilities = { reboot: false, shutdown: false };
+  // Tells a transient failure from a definitive answer: true when no probe
+  // managed to talk to logind at all (DBus or Docker possibly not ready yet —
+  // worth retrying later), false as soon as logind answered, even a refusal
+  // ("no"/"challenge" — retrying would spawn helper containers for nothing).
+  this.hostPowerUnreachable = true;
   if (process.platform !== 'linux') {
     this.hostPowerManagement = null;
+    this.hostPowerUnreachable = false;
     return null;
   }
 
@@ -98,6 +108,9 @@ async function runDetection() {
   // allowed. Local first (cheap, no container), then the Docker helper.
   const tryMechanism = async (mechanism) => {
     const capabilities = await probeHostPowerCapabilities(this, mechanism);
+    if (capabilities) {
+      this.hostPowerUnreachable = false;
+    }
     if (capabilities && (capabilities.reboot || capabilities.shutdown)) {
       this.hostPowerManagement = mechanism;
       this.hostPowerCapabilities = capabilities;
@@ -153,11 +166,14 @@ async function detectHostPowerManagement() {
 }
 
 /**
- * @description Re-run the detection when the previous one found nothing, at
- * most once per throttle window. The detection at init can fail transiently
- * (on host boot Gladys often starts before DBus, or before the Docker daemon
- * is fully ready): retrying when the availability is actually read lets the
- * feature recover without a Gladys restart.
+ * @description Re-run the detection when the previous one failed transiently.
+ * The detection at init can fail because on host boot Gladys often starts
+ * before DBus or the Docker daemon is fully ready: retrying when the
+ * availability is actually read (the System settings page) lets the feature
+ * recover without a Gladys restart. Only an unreachable outcome is retried —
+ * a definitive logind refusal is not — and the retries are throttled and
+ * bounded, since getInfos is polled and each docker-helper probe spins up
+ * short-lived containers.
  * @returns {Promise<string|null>} Resolve with the mechanism or null.
  * @example
  * await system.redetectHostPowerManagement();
@@ -169,11 +185,19 @@ async function redetectHostPowerManagement() {
   if (this.hostPowerDetectionInFlight) {
     return this.hostPowerDetectionInFlight;
   }
+  // logind answered (even a refusal): nothing transient to recover from.
+  if (!this.hostPowerUnreachable) {
+    return null;
+  }
+  if ((this.hostPowerRedetectionAttempts || 0) >= HOST_POWER_REDETECTION_MAX_ATTEMPTS) {
+    return null;
+  }
   const throttled =
     this.hostPowerLastDetectionAt && Date.now() - this.hostPowerLastDetectionAt < HOST_POWER_REDETECTION_THROTTLE_MS;
   if (throttled) {
     return null;
   }
+  this.hostPowerRedetectionAttempts = (this.hostPowerRedetectionAttempts || 0) + 1;
   return this.detectHostPowerManagement();
 }
 
@@ -184,4 +208,5 @@ module.exports = {
   parseCanReply,
   replyMeansAvailable,
   HOST_POWER_REDETECTION_THROTTLE_MS,
+  HOST_POWER_REDETECTION_MAX_ATTEMPTS,
 };

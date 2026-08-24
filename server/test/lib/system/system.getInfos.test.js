@@ -119,6 +119,19 @@ describe('system.getInfos', () => {
     assert.calledOnce(system.redetectHostPowerManagement);
   });
 
+  it('should still resolve when the background host power retry rejects', async () => {
+    system.hostPowerManagement = null;
+    system.redetectHostPowerManagement = fake.rejects(new Error('probe crashed'));
+    const infos = await system.getInfos();
+    expect(infos).to.have.property('host_power_reboot_available', false);
+    expect(infos).to.have.property('host_power_shutdown_available', false);
+    assert.calledOnce(system.redetectHostPowerManagement);
+    // let the fire-and-forget rejection reach its handler: it must not surface
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+  });
+
   it('should not retry the host power detection when a mechanism is already known', async () => {
     system.hostPowerManagement = 'docker-helper';
     system.hostPowerCapabilities = { reboot: true, shutdown: true };

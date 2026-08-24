@@ -9,6 +9,7 @@ const {
   detectHostPowerManagement,
   redetectHostPowerManagement,
   HOST_POWER_REDETECTION_THROTTLE_MS,
+  HOST_POWER_REDETECTION_MAX_ATTEMPTS,
 } = require('../../../lib/system/system.detectHostPowerManagement');
 
 describe('system.parseCanReply', () => {
@@ -137,21 +138,25 @@ describe('system.detectHostPowerManagement', () => {
     expect(self.hostPowerCapabilities).to.deep.equal({ reboot: true, shutdown: false });
   });
 
-  it('should return null when the probe answers no', async () => {
+  it('should return null when the probe answers no, and mark the answer as definitive', async () => {
     platformStub = sinon.stub(process, 'platform').value('linux');
     const detect = load(() => false);
     const self = { dockerode: {}, runHostPowerDbusCommand: sinon.stub().resolves('   string "no"') };
     const result = await detect.call(self);
     expect(result).to.equal(null);
     expect(self.hostPowerManagement).to.equal(null);
+    // logind answered: the outcome is definitive, not worth retrying
+    expect(self.hostPowerUnreachable).to.equal(false);
   });
 
-  it('should return null when the probe throws', async () => {
+  it('should return null when the probe throws, and mark the host as unreachable', async () => {
     platformStub = sinon.stub(process, 'platform').value('linux');
     const detect = load(() => false);
     const self = { dockerode: {}, runHostPowerDbusCommand: sinon.stub().rejects(new Error('no socket')) };
     const result = await detect.call(self);
     expect(result).to.equal(null);
+    // logind was never reached: worth retrying later
+    expect(self.hostPowerUnreachable).to.equal(true);
   });
 
   it('should return null when there is neither local dbus nor Docker', async () => {
@@ -210,10 +215,26 @@ describe('system.redetectHostPowerManagement', () => {
     sinon.assert.notCalled(self.detectHostPowerManagement);
   });
 
+  it('should not retry when logind already answered, even a refusal', async () => {
+    const self = {
+      hostPowerManagement: null,
+      hostPowerDetectionInFlight: null,
+      // the previous detection reached logind, which refused: definitive
+      hostPowerUnreachable: false,
+      hostPowerLastDetectionAt: Date.now() - HOST_POWER_REDETECTION_THROTTLE_MS - 1,
+      detectHostPowerManagement: sinon.stub().resolves(null),
+    };
+    const result = await redetectHostPowerManagement.call(self);
+    expect(result).to.equal(null);
+    sinon.assert.notCalled(self.detectHostPowerManagement);
+  });
+
   it('should not retry within the throttle window', async () => {
     const self = {
       hostPowerManagement: null,
       hostPowerDetectionInFlight: null,
+      hostPowerUnreachable: true,
+      hostPowerRedetectionAttempts: 0,
       hostPowerLastDetectionAt: Date.now(),
       detectHostPowerManagement: sinon.stub().resolves(null),
     };
@@ -222,11 +243,27 @@ describe('system.redetectHostPowerManagement', () => {
     sinon.assert.notCalled(self.detectHostPowerManagement);
   });
 
-  it('should retry once the throttle window has passed', async () => {
+  it('should stop retrying after the maximum number of attempts', async () => {
+    const self = {
+      hostPowerManagement: null,
+      hostPowerDetectionInFlight: null,
+      hostPowerUnreachable: true,
+      hostPowerRedetectionAttempts: HOST_POWER_REDETECTION_MAX_ATTEMPTS,
+      hostPowerLastDetectionAt: Date.now() - HOST_POWER_REDETECTION_THROTTLE_MS - 1,
+      detectHostPowerManagement: sinon.stub().resolves(null),
+    };
+    const result = await redetectHostPowerManagement.call(self);
+    expect(result).to.equal(null);
+    sinon.assert.notCalled(self.detectHostPowerManagement);
+  });
+
+  it('should retry a transient failure once the throttle window has passed', async () => {
     platformStub = sinon.stub(process, 'platform').value('linux');
     const self = {
       hostPowerManagement: null,
       hostPowerDetectionInFlight: null,
+      hostPowerUnreachable: true,
+      hostPowerRedetectionAttempts: 0,
       hostPowerLastDetectionAt: Date.now() - HOST_POWER_REDETECTION_THROTTLE_MS - 1,
       dockerode: null,
       runHostPowerDbusCommand: sinon.stub(),
@@ -234,7 +271,8 @@ describe('system.redetectHostPowerManagement', () => {
     };
     const result = await redetectHostPowerManagement.call(self);
     expect(result).to.equal(null);
-    // the detection really ran: it stamped its completion time
+    // the detection really ran: it stamped its completion time and spent an attempt
     expect(self.hostPowerLastDetectionAt).to.be.greaterThan(Date.now() - 1000);
+    expect(self.hostPowerRedetectionAttempts).to.equal(1);
   });
 });

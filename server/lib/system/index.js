@@ -80,10 +80,14 @@ const System = function System(sequelize, event, config, job, variable, user, me
   // init and cached here.
   this.hostPowerManagement = null;
   this.hostPowerCapabilities = { reboot: false, shutdown: false };
-  // Single-flight detection promise and timestamp of the last completed
-  // detection, used to throttle the retries triggered from getInfos().
+  // Single-flight detection promise, timestamp of the last completed
+  // detection, whether that detection failed to reach logind at all (the only
+  // outcome worth retrying), and how many retries getInfos() already spent —
+  // together they throttle and bound the background re-detections.
   this.hostPowerDetectionInFlight = null;
   this.hostPowerLastDetectionAt = null;
+  this.hostPowerUnreachable = false;
+  this.hostPowerRedetectionAttempts = 0;
 };
 
 System.prototype.init = init;
