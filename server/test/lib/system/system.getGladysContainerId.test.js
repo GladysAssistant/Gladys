@@ -133,6 +133,24 @@ describe('system.getGladysContainerId', () => {
     const containerId = await system.getGladysContainerId();
     expect(containerId).to.eq('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
   });
+  it('should ignore a stale containerId from cidfile and fall back to cgroup', async () => {
+    FsMock.promises.access
+      .withArgs('/var/lib/gladysassistant/containerId')
+      .resolves(null)
+      .withArgs('/proc/self/cgroup')
+      .resolves(null);
+    FsMock.promises.readFile
+      .withArgs('/var/lib/gladysassistant/containerId', 'utf-8')
+      .resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c')
+      .withArgs('/proc/self/cgroup', 'utf-8')
+      .resolves(procSelfCpuGroupDebia11);
+    // the container named by the cidfile no longer exists on this Docker daemon
+    system.dockerode.getContainer = sinon.fake.returns({
+      inspect: sinon.fake.rejects(new Error('no such container')),
+    });
+    const containerId = await system.getGladysContainerId();
+    expect(containerId).to.eq('2bb2c94b0c395fc8fdff9fa4ce364a3be0dd05792145ffc93ce8d665d06521f1');
+  });
   it('should return containerId through exec in mountinfo (Debian 11)', async () => {
     FsMock.promises.access
       .withArgs('/var/lib/gladysassistant/containerId')

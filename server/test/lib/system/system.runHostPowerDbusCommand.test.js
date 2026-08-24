@@ -110,6 +110,23 @@ describe('system.runHostPowerDbusCommand (docker-helper)', () => {
     }
   });
 
+  it('should explain the failure when the Gladys image cannot be identified', async () => {
+    const self = {
+      dockerode: { createContainer: sinon.stub() },
+      getGladysImage: sinon.stub().rejects(new Error('DOCKER_CONTAINER_ID_NOT_AVAILABLE')),
+    };
+    let caught;
+    try {
+      await runHostPowerDbusCommand.call(self, 'CanReboot', 'docker-helper');
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).to.be.an('error');
+    expect(caught.message).to.contain('Unable to identify the Gladys container image');
+    expect(caught.message).to.contain('DOCKER_CONTAINER_ID_NOT_AVAILABLE');
+    sinon.assert.notCalled(self.dockerode.createContainer);
+  });
+
   it('should throw when Docker is not available for the helper', async () => {
     let caught;
     try {

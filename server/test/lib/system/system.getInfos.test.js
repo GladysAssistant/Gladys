@@ -112,6 +112,23 @@ describe('system.getInfos', () => {
     expect(infos).to.not.have.property('docker_image_pinned');
     expect(infos).to.not.have.property('recommended_docker_image');
   });
+  it('should retry the host power detection in the background when it found nothing', async () => {
+    system.hostPowerManagement = null;
+    system.redetectHostPowerManagement = fake.resolves(null);
+    await system.getInfos();
+    assert.calledOnce(system.redetectHostPowerManagement);
+  });
+
+  it('should not retry the host power detection when a mechanism is already known', async () => {
+    system.hostPowerManagement = 'docker-helper';
+    system.hostPowerCapabilities = { reboot: true, shutdown: true };
+    system.redetectHostPowerManagement = fake.resolves('docker-helper');
+    const infos = await system.getInfos();
+    assert.notCalled(system.redetectHostPowerManagement);
+    expect(infos).to.have.property('host_power_reboot_available', true);
+    expect(infos).to.have.property('host_power_shutdown_available', true);
+  });
+
   it('should report the configured server port', async () => {
     const previousPort = process.env.SERVER_PORT;
     process.env.SERVER_PORT = '8080';

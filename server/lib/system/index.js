@@ -45,7 +45,7 @@ const { setDuckDbTimezone } = require('./system.setDuckDbTimezone');
 const { shutdown } = require('./system.shutdown');
 const { rebootHost } = require('./system.rebootHost');
 const { shutdownHost } = require('./system.shutdownHost');
-const { detectHostPowerManagement } = require('./system.detectHostPowerManagement');
+const { detectHostPowerManagement, redetectHostPowerManagement } = require('./system.detectHostPowerManagement');
 const { runHostPowerDbusCommand } = require('./system.runHostPowerDbusCommand');
 
 const System = function System(sequelize, event, config, job, variable, user, message, brain) {
@@ -80,6 +80,10 @@ const System = function System(sequelize, event, config, job, variable, user, me
   // init and cached here.
   this.hostPowerManagement = null;
   this.hostPowerCapabilities = { reboot: false, shutdown: false };
+  // Single-flight detection promise and timestamp of the last completed
+  // detection, used to throttle the retries triggered from getInfos().
+  this.hostPowerDetectionInFlight = null;
+  this.hostPowerLastDetectionAt = null;
 };
 
 System.prototype.init = init;
@@ -125,6 +129,7 @@ System.prototype.shutdown = shutdown;
 System.prototype.rebootHost = rebootHost;
 System.prototype.shutdownHost = shutdownHost;
 System.prototype.detectHostPowerManagement = detectHostPowerManagement;
+System.prototype.redetectHostPowerManagement = redetectHostPowerManagement;
 System.prototype.runHostPowerDbusCommand = runHostPowerDbusCommand;
 
 module.exports = System;

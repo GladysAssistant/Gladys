@@ -70,7 +70,14 @@ async function runViaHelperContainer(method) {
   if (!this.dockerode) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
-  const { image } = await this.getGladysImage();
+  let image;
+  try {
+    ({ image } = await this.getGladysImage());
+  } catch (e) {
+    // Surface the real blocker: without an identified Gladys image there is no
+    // image to run the helper with, whatever the state of the host DBus.
+    throw new Error(`Unable to identify the Gladys container image to run the helper container (${e.message})`);
+  }
   const container = await this.dockerode.createContainer({
     Image: image,
     name: `gladys-host-power-${method.toLowerCase()}-${Date.now()}`,

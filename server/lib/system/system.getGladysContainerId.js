@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
+const logger = require('../../utils/logger');
 
 const CIDFILE_FILE_PATH_IN_CONTAINER = '/var/lib/gladysassistant/containerId';
 
@@ -100,6 +101,23 @@ async function getGladysContainerId() {
   }
 
   let containerId = await getContainerIdFromCidFile();
+
+  if (containerId !== undefined) {
+    // The cidfile lives in the data volume, so it outlives the container that
+    // wrote it: installs that once used `docker run --cidfile` keep the file
+    // forever, and it goes stale as soon as the container is recreated without
+    // the flag. A stale id silently breaks every feature that inspects the
+    // Gladys container (upgrade, host reboot/shutdown...): only trust the file
+    // when Docker still knows that container.
+    try {
+      await this.dockerode.getContainer(containerId).inspect();
+    } catch (e) {
+      logger.info(
+        `System: the container id found in the cidfile does not match a container known by Docker, ignoring it`,
+      );
+      containerId = undefined;
+    }
+  }
 
   if (containerId === undefined) {
     // Not found in cidfile try on cgroup
