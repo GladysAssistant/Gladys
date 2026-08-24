@@ -811,7 +811,7 @@
       "mist": "Mist"
     },
     "editDashboardIconLabel": "Icon (optional)",
-    "editDashboardIconDescription": "Shown in the dashboard tab bar in tablet mode.",
+    "editDashboardIconDescription": "Shown in the dashboard tab bar. Without an icon, an icon matching the emoji at the start of the dashboard name is used when possible, or a generic house.",
     "editDashboardWidthLabel": "Dashboard width",
     "widths": {
       "standard": "Standard (recommended)",
@@ -840,6 +840,8 @@
     "dashboardAlreadyExist": "A dashboard with this name already exists.",
     "unknownError": "An unknown error occurred. Please retry!",
     "validationError": "Dashboard created is not valid, did you fill all the boxes correctly?",
+    "iconLabel": "Icon",
+    "iconDescription": "Shown in the dashboard tab bar. On mobile and in tablet mode, it's often the only thing identifying the dashboard.",
     "createDashboardButton": "Create"
   },
   "integration": {

@@ -4,6 +4,7 @@ import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import cx from 'classnames';
 
+import IconSelector from '../../../components/scene/IconSelector';
 import { DASHBOARD_TYPE, DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
 
 // Dashboard creation, hosted in the edit panel so the user never leaves
@@ -18,13 +19,23 @@ class NewDashboardForm extends Component {
     this.setState({ visibility: e.target.value });
   };
 
+  updateIcon = e => {
+    this.setState({ icon: e.target.value });
+  };
+
   createDashboard = async e => {
     e.preventDefault();
+    // The submit button is disabled without a name and an icon, but Enter in
+    // the name input can still submit the form: same guard on the handler.
+    if (!this.state.name || !this.state.icon) {
+      return;
+    }
     this.setState({ loading: true, dashboardAlreadyExistError: false, unknownError: false });
     try {
       const createdDashboard = await this.props.httpClient.post('/api/v1/dashboard', {
         name: this.state.name,
         visibility: this.state.visibility,
+        icon: this.state.icon,
         type: DASHBOARD_TYPE.MAIN,
         boxes: [{ columns: [[], [], []] }]
       });
@@ -46,13 +57,14 @@ class NewDashboardForm extends Component {
     this.state = {
       name: '',
       visibility: 'private',
+      icon: null,
       loading: false,
       dashboardAlreadyExistError: false,
       unknownError: false
     };
   }
 
-  render(props, { name, visibility, loading, dashboardAlreadyExistError, unknownError }) {
+  render(props, { name, visibility, icon, loading, dashboardAlreadyExistError, unknownError }) {
     return (
       <form onSubmit={this.createDashboard}>
         <p>
@@ -99,8 +111,17 @@ class NewDashboardForm extends Component {
             ))}
           </select>
         </div>
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="newDashboard.iconLabel" />
+          </label>
+          <small class="d-block mb-2">
+            <Text id="newDashboard.iconDescription" />
+          </small>
+          <IconSelector value={icon} onChange={this.updateIcon} />
+        </div>
         <div class="form-footer">
-          <button type="submit" class="btn btn-primary btn-block" disabled={loading || !name}>
+          <button type="submit" class="btn btn-primary btn-block" disabled={loading || !name || !icon}>
             <Text id="newDashboard.createDashboardButton" />
           </button>
         </div>

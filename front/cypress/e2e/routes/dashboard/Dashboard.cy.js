@@ -2,8 +2,20 @@ describe('Dashboard', () => {
   // The created dashboard's selector carries 4 random characters (#2906):
   // captured once at creation, reused by the later tests of this spec
   let dashboardSelector;
+  // Selector of the API-created emoji dashboard, deleted from afterEach so a
+  // failed visit or assertion never leaves it behind for the next tests
+  let emojiDashboardSelector;
   beforeEach(() => {
     cy.login();
+  });
+  afterEach(() => {
+    if (emojiDashboardSelector) {
+      cy.request({
+        method: 'DELETE',
+        url: `${Cypress.env('serverUrl')}/api/v1/dashboard/${emojiDashboardSelector}`
+      });
+      emojiDashboardSelector = null;
+    }
   });
   it('Should create new dashboard', () => {
     cy.visit('/dashboard');
@@ -19,8 +31,14 @@ describe('Dashboard', () => {
       cy.wrap(inputs[0]).type('My new dashboard');
     });
 
+    // the icon is required at creation: the button stays disabled until one
+    // is picked (the radio input itself is visually hidden behind the tile)
+    cy.contains('button', 'newDashboard.createDashboardButton').should('be.disabled');
+    cy.get('input[name="icon"][value="home"]').check({ force: true });
+
     cy.contains('button', 'newDashboard.createDashboardButton')
       .should('have.class', 'btn-primary')
+      .should('not.be.disabled')
       .click();
 
     // The selector of a new dashboard ends with 4 random characters, like scenes
@@ -53,6 +71,31 @@ describe('Dashboard', () => {
       .its('request.body.boxes.0.widths')
       .should('deep.equal', [2, 1, 1]);
     cy.get('[data-cy="dashboard-saved-label"]').should('be.visible');
+  });
+  it('Should map the leading emoji of an icon-less dashboard to an icon in the tab bar', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    // Created straight through the API without an icon, like every dashboard
+    // predating the required icon: the tab bar derives the icon from the
+    // leading emoji of the name (🎬 → clapperboard), never renders the emoji
+    // itself, and strips it from the pill label.
+    cy.request({
+      method: 'POST',
+      url: `${serverUrl}/api/v1/dashboard`,
+      body: {
+        name: '🎬 Cinema room',
+        type: 'main',
+        visibility: 'private',
+        boxes: [{ columns: [[], [], []] }]
+      }
+    }).then(res => {
+      emojiDashboardSelector = res.body.selector;
+      cy.visit('/dashboard');
+      cy.get(`a[href="/dashboard/${emojiDashboardSelector}"]`)
+        .should('contain', 'Cinema room')
+        .and('not.contain', '🎬')
+        .find('i.fe-clapperboard')
+        .should('exist');
+    });
   });
   it('Should delete dashboard', () => {
     cy.then(() => {
