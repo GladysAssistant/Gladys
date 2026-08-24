@@ -732,6 +732,8 @@
         "scheduleUntil": "jusqu'à",
         "manualUntil": "jusqu'à",
         "cancelManual": "Annuler le mode manuel",
+        "windowOpen": "Fenêtre ouverte — chauffage suspendu",
+        "windowOpenCooling": "Fenêtre ouverte — climatisation suspendue",
         "error": "Erreur lors du chargement des données du thermostat.",
         "preset": {
           "off": "Arrêt",
@@ -3292,9 +3294,15 @@
         "nameLabel": "Nom",
         "roomLabel": "Pièce",
         "activeScheduleLabel": "Planning actif",
+        "noSchedule": "Aucun planning",
+        "setpointLabel": "Consigne",
+        "noSetpoint": "—",
         "saveButton": "Sauvegarder",
         "editButton": "Éditer",
         "deleteButton": "Supprimer",
+        "confirmDelete": "Supprimer ce thermostat ?",
+        "confirmYes": "Oui",
+        "confirmNo": "Non",
         "saveError": "Erreur lors de la sauvegarde.",
         "deleteError": "Erreur lors de la suppression."
       },
@@ -3365,7 +3373,7 @@
           "night": "Nuit",
           "comfort": "Confort"
         },
-        "saveButton": "Enregistrer",
+        "saveButton": "Sauvegarder",
         "cancelButton": "Annuler",
         "saveError": "Erreur lors de la sauvegarde.",
         "activeScheduleLabel": "Planning actif",

@@ -76,16 +76,40 @@
   fill: #6c757d;
 }
 
+/* The droplet keeps its own colour: the reading beside it stays grey like the
+   other secondary text. */
+.humidityIcon {
+  fill: #3b82f6;
+}
+
 @keyframes flamePulse {
-  0%   { opacity: 1;   transform: scale(1); }
-  50%  { opacity: 0.7; transform: scale(1.25); }
-  100% { opacity: 1;   transform: scale(1); }
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.25);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes frostSpin {
-  0%   { opacity: 1;   transform: rotate(0deg) scale(1); }
-  50%  { opacity: 0.6; transform: rotate(180deg) scale(1.15); }
-  100% { opacity: 1;   transform: rotate(360deg) scale(1); }
+  0% {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: rotate(180deg) scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(360deg) scale(1);
+  }
 }
 
 /* Kept deliberately tight. A wide shadow spreads the arc's colour over the pale
@@ -93,7 +117,8 @@
    halo — very visible on the blue of cooling mode, which has less contrast
    against that background than the orange of heating. */
 @keyframes arcGlowPulse {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 3px currentColor);
   }
   50% {
@@ -109,8 +134,18 @@
   animation: arcGlowPulse 2s ease-in-out infinite;
 }
 
+/* Draws SVG text with the icon font the rest of Gladys uses. The `fe fe-*`
+   classes render through a :before pseudo-element, which SVG <text> has none
+   of, so the glyph is inlined and only the font is set here. */
+.gaugeIconGlyph {
+  font-family: 'lucide';
+  font-weight: normal;
+  font-style: normal;
+}
+
 .activeIconHeating {
   font-size: 22px;
+  fill: #f97316;
   animation: flamePulse 1.4s ease-in-out infinite;
   transform-origin: center;
   transform-box: fill-box;
@@ -118,6 +153,7 @@
 
 .activeIconCooling {
   font-size: 22px;
+  fill: #3b82f6;
   animation: frostSpin 2s linear infinite;
   transform-origin: center;
   transform-box: fill-box;
@@ -203,7 +239,6 @@
   color: #467fcf;
 }
 
-
 /* Segmented Control */
 .segmentedControl {
   display: flex;
@@ -287,7 +322,6 @@
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
-
 .presetColorLabel {
   font-size: 0.8rem;
   color: #6c757d;
@@ -322,7 +356,7 @@
 .scheduleSelect {
   flex: 1;
   font-size: 0.8rem;
-  border: 1px solid rgba(0,40,100,0.12);
+  border: 1px solid rgba(0, 40, 100, 0.12);
   border-radius: 3px;
   padding: 3px 6px;
   cursor: pointer;
@@ -379,6 +413,38 @@
 .manualBannerIcon {
   font-size: 0.9rem;
   flex-shrink: 0;
+}
+
+/* An open window suspends the heating: the state is reported on its own banner
+   rather than only as a pictogram, and it replaces the schedule/manual banner
+   because neither describes what the thermostat is actually doing right now. */
+.windowBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #0ca6f240;
+  background: #0ca6f214;
+  color: #0ca6f2;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+:global(.dark-mode) .windowBanner {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+.windowBannerIcon {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.windowBannerText {
+  white-space: nowrap;
 }
 
 .manualBannerText {
@@ -463,4 +529,3 @@
   font-family: inherit;
   cursor: pointer;
 }
-

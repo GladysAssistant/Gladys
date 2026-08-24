@@ -5,6 +5,16 @@ import style from './style.css';
 export const ARC_DEGREES = 240;
 export const ARC_START_ANGLE = 150;
 
+// Feather/Lucide glyphs, by codepoint. Native emoji render differently on every
+// OS — and at different sizes — where the rest of Gladys draws its icons from
+// this font; SVG <text> cannot use the `fe fe-*` classes, which work through a
+// :before pseudo-element, so the codepoints are inlined here.
+const ICONS = {
+  droplet: '\ue0b4',
+  flame: '\ue0d2',
+  snowflake: '\ue165'
+};
+
 /**
  * Convert a polar coordinate (angle in degrees, 0 = 12 o'clock) to cartesian.
  */
@@ -44,7 +54,11 @@ const CircularGauge = ({
   const bgPath = describeArc(cx, cy, r, ARC_START_ANGLE, ARC_START_ANGLE + ARC_DEGREES);
   const fgPath = describeArc(cx, cy, r, ARC_START_ANGLE, arcEnd);
   const knob = polarToCartesian(cx, cy, r, arcEnd);
-  const arcColor = mode === 'cooling' ? '#3b82f6' : mode === 'off' ? '#adb5bd' : '#f97316';
+  // An open window suspends the heating, so the arc goes grey like the off mode:
+  // leaving it orange showed a thermostat calling for heat while the switch was
+  // being held off, which is the one thing the gauge must not misreport.
+  const baseArcColor = mode === 'cooling' ? '#3b82f6' : mode === 'off' ? '#adb5bd' : '#f97316';
+  const arcColor = isWindowOpen ? '#adb5bd' : baseArcColor;
   // Derive both halves from one rounded value: splitting the raw setpoint made
   // 20.96 render as "20.10" (the decimal carried to 10) and -3.5 as "-4.5"
   // (floor rounds away from zero for negatives).
@@ -102,7 +116,8 @@ const CircularGauge = ({
           dominantBaseline="middle"
           class={style.humidityText}
         >
-          {`\u{1F4A7} ${Math.round(humidity)} %`}
+          <tspan class={`${style.gaugeIconGlyph} ${style.humidityIcon}`}>{ICONS.droplet}</tspan>
+          {` ${Math.round(humidity)} %`}
         </text>
       )}
 
@@ -121,19 +136,28 @@ const CircularGauge = ({
       </text>
 
       {/* Active icon: at bottom of gauge */}
-      {isWindowOpen && (
-        <text x={cx} y={cy + 54} textAnchor="middle" dominantBaseline="middle" class={style.activeIconHeating}>
-          🪟
-        </text>
-      )}
+      {/* No icon for an open window: the icon font has no window glyph, and the
+          state is already named by the banner under the gauge. */}
       {!isWindowOpen && isActive && mode === 'heating' && (
-        <text x={cx} y={cy + 54} textAnchor="middle" dominantBaseline="middle" class={style.activeIconHeating}>
-          🔥
+        <text
+          x={cx}
+          y={cy + 54}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          class={`${style.activeIconHeating} ${style.gaugeIconGlyph}`}
+        >
+          {ICONS.flame}
         </text>
       )}
       {!isWindowOpen && isActive && mode === 'cooling' && (
-        <text x={cx} y={cy + 54} textAnchor="middle" dominantBaseline="middle" class={style.activeIconCooling}>
-          ❄️
+        <text
+          x={cx}
+          y={cy + 54}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          class={`${style.activeIconCooling} ${style.gaugeIconGlyph}`}
+        >
+          {ICONS.snowflake}
         </text>
       )}
 
