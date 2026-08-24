@@ -345,6 +345,21 @@ class ScheduleEditor extends Component {
 
   // ── Render helpers ────────────────────────────────────────────────────────
 
+  // Text equivalent of the coloured bar, for a collapsed day.
+  describeDay(daySlots, dictionary) {
+    if (!daySlots || daySlots.length === 0) {
+      return dictionary.noSlots || '';
+    }
+    return daySlots
+      .slice()
+      .sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time))
+      .map(slot => {
+        const preset = (dictionary.presets && dictionary.presets[slot.preset]) || slot.preset;
+        return `${preset} ${slot.start_time} – ${slot.end_time}`;
+      })
+      .join(', ');
+  }
+
   renderTimeBar(daySlots) {
     const sorted = daySlots.slice().sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time));
     const segments = [];
@@ -370,7 +385,9 @@ class ScheduleEditor extends Component {
     }
 
     return (
-      <div class={style.timeBarWrapper}>
+      // Purely visual: the colours carry no text and the hour markers would be
+      // read as loose numbers. describeDay states the same thing in words.
+      <div class={style.timeBarWrapper} aria-hidden="true">
         <div class={style.timeBar}>
           {barParts.map(({ from, to, widthPct, color }) => (
             <div
@@ -529,13 +546,29 @@ class ScheduleEditor extends Component {
 
               return (
                 <div key={day} class={cx(style.dayRow, { [style.dayRowOpen]: isOpen })}>
-                  <div class={style.dayClickZone} onClick={() => this.selectDay(day)}>
+                  <div
+                    class={style.dayClickZone}
+                    onClick={() => this.selectDay(day)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.selectDay(day);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={isOpen}
+                  >
                     <div class={style.dayRowHeader}>
                       <span class={style.dayLabel}>
                         <Text id={`integration.thermostat.schedule.days.${day}`} />
                       </span>
-                      <i class={`fe fe-chevron-${isOpen ? 'up' : 'down'} ${style.dayChevron}`} />
+                      <i class={`fe fe-chevron-${isOpen ? 'up' : 'down'} ${style.dayChevron}`} aria-hidden="true" />
                     </div>
+                    {/* The bar is colour only, so it is summarised in words for
+                        anyone who cannot see it — the same ranges the panel
+                        lists once the day is expanded. */}
+                    <span class="sr-only">{this.describeDay(barSlots, dictionary)}</span>
                     {this.renderTimeBar(barSlots)}
                   </div>
 
@@ -569,6 +602,12 @@ class ScheduleEditor extends Component {
                             key={slot.key || `${day}-${idx}`}
                             class={style.slotEditorRow}
                             onClick={() => this.openEditForm(slot)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                this.openEditForm(slot);
+                              }
+                            }}
                             role="button"
                             tabIndex={0}
                           >
