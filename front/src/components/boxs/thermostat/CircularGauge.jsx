@@ -42,7 +42,8 @@ const CircularGauge = ({
   mode,
   isActive,
   isWindowOpen,
-  tempUnit
+  tempUnit,
+  a11yLabels = {}
 }) => {
   const cx = 110;
   const cy = 110;
@@ -75,9 +76,54 @@ const CircularGauge = ({
   const hasCurrentTemp = currentTemp !== null && currentTemp !== undefined;
   const hasHumidity = humidity !== null && humidity !== undefined;
 
+  // One sentence for a screen reader, instead of the raw SVG texts being read
+  // one fragment at a time ("21", ".0", "\u00b0", "C"). The individual <text>
+  // nodes are hidden from the tree for the same reason.
+  const unit = `\u00b0${tempUnit || 'C'}`;
+  const label = [
+    `${a11yLabels.setpoint || 'Setpoint'} ${roundedSetpoint} ${unit}`,
+    hasCurrentTemp
+      ? `${a11yLabels.currentTemp || 'Current temperature'} ${Number(currentTemp).toFixed(1)} ${unit}`
+      : null,
+    hasHumidity ? `${a11yLabels.humidity || 'Humidity'} ${Math.round(humidity)} %` : null,
+    isWindowOpen ? a11yLabels.windowOpen || null : null
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  // Arrow keys move the setpoint, which is what role="slider" promises. Without
+  // this the dial is the only way to set a temperature, and a dial cannot be
+  // operated from a keyboard at all.
+  const onKeyDown = event => {
+    if (!onIncrement && !onDecrement) {
+      return;
+    }
+    if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      if (onIncrement) onIncrement();
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
+      event.preventDefault();
+      if (onDecrement) onDecrement();
+    }
+  };
+
+  const interactive = !!(onIncrement || onDecrement || onPointerDown);
+
   return (
-    <svg viewBox="0 0 220 220" class={style.gaugeSvg} onPointerDown={onPointerDown}>
-      <path d={bgPath} fill="none" stroke="#e9ecef" strokeWidth={sw} strokeLinecap="round" />
+    <svg
+      viewBox="0 0 220 220"
+      class={style.gaugeSvg}
+      onPointerDown={onPointerDown}
+      onKeyDown={interactive ? onKeyDown : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      role={interactive ? 'slider' : 'img'}
+      aria-label={label}
+      aria-valuemin={interactive ? minTemp : undefined}
+      aria-valuemax={interactive ? maxTemp : undefined}
+      aria-valuenow={interactive ? roundedSetpoint : undefined}
+      aria-valuetext={interactive ? `${roundedSetpoint} ${unit}` : undefined}
+    >
+      <path class={style.gaugeArc} d={bgPath} fill="none" stroke="#e9ecef" strokeWidth={sw} strokeLinecap="round" />
       {/* The glow marks "running right now", which is just as true of a running
           air conditioner as of a running heater, so it applies in both modes.
           It is a drop-shadow rather than a feGaussianBlur/feMerge filter: merging
@@ -86,7 +132,7 @@ const CircularGauge = ({
           leaves the stroke untouched and only casts colour around it. */}
       <path
         key={`${mode}-${arcColor}`}
-        class={isActive ? style.arcGlow : undefined}
+        class={isActive ? `${style.arcGlow} ${style.gaugeArc}` : style.gaugeArc}
         style={isActive ? `color:${arcColor}` : undefined}
         d={fgPath}
         fill="none"
@@ -94,11 +140,12 @@ const CircularGauge = ({
         strokeWidth={sw}
         strokeLinecap="round"
       />
-      <circle cx={knob.x} cy={knob.y} r="9" fill="white" stroke={arcColor} strokeWidth="2.5" />
+      <circle class={style.gaugeArc} cx={knob.x} cy={knob.y} r="9" fill="white" stroke={arcColor} strokeWidth="2.5" />
 
       {/* Current temp + humidity: above setpoint */}
       {hasCurrentTemp && (
         <text
+          aria-hidden="true"
           x={cx}
           y={hasHumidity ? cy - 46 : cy - 38}
           textAnchor="middle"
@@ -110,6 +157,7 @@ const CircularGauge = ({
       )}
       {hasHumidity && (
         <text
+          aria-hidden="true"
           x={cx}
           y={hasCurrentTemp ? cy - 28 : cy - 38}
           textAnchor="middle"
@@ -122,16 +170,37 @@ const CircularGauge = ({
       )}
 
       {/* Setpoint: integer + decimal + unit split (° above dot, C above decimal) */}
-      <text x={intX} y={cy + 25} textAnchor="start" dominantBaseline="auto" class={style.tempMain}>
+      <text aria-hidden="true" x={intX} y={cy + 25} textAnchor="start" dominantBaseline="auto" class={style.tempMain}>
         {intPart}
       </text>
-      <text x={suffixX - 2} y={cy + 25} textAnchor="start" dominantBaseline="auto" class={style.tempDecimal}>
+      <text
+        aria-hidden="true"
+        x={suffixX - 2}
+        y={cy + 25}
+        textAnchor="start"
+        dominantBaseline="auto"
+        class={style.tempDecimal}
+      >
         .{decPart}
       </text>
-      <text x={suffixX - 3} y={cy + 4} textAnchor="start" dominantBaseline="auto" class={style.tempUnit}>
+      <text
+        aria-hidden="true"
+        x={suffixX - 3}
+        y={cy + 4}
+        textAnchor="start"
+        dominantBaseline="auto"
+        class={style.tempUnit}
+      >
         °
       </text>
-      <text x={suffixX + 4} y={cy + 4} textAnchor="start" dominantBaseline="auto" class={style.tempUnit}>
+      <text
+        aria-hidden="true"
+        x={suffixX + 4}
+        y={cy + 4}
+        textAnchor="start"
+        dominantBaseline="auto"
+        class={style.tempUnit}
+      >
         {tempUnit || 'C'}
       </text>
 
@@ -140,6 +209,7 @@ const CircularGauge = ({
           state is already named by the banner under the gauge. */}
       {!isWindowOpen && isActive && mode === 'heating' && (
         <text
+          aria-hidden="true"
           x={cx}
           y={cy + 54}
           textAnchor="middle"
@@ -151,6 +221,7 @@ const CircularGauge = ({
       )}
       {!isWindowOpen && isActive && mode === 'cooling' && (
         <text
+          aria-hidden="true"
           x={cx}
           y={cy + 54}
           textAnchor="middle"
@@ -161,18 +232,40 @@ const CircularGauge = ({
         </text>
       )}
 
+      {/* The arrow keys on the slider cover the keyboard case, so these stay
+          out of the tab order and out of the accessibility tree: exposing them
+          as two more controls would make a reader announce three ways to change
+          one value. They keep their pointer behaviour. */}
       {onIncrement && (
-        <g onClick={onIncrement} onPointerDown={e => e.stopPropagation()} class={style.arcBtnGroup}>
+        <g onClick={onIncrement} onPointerDown={e => e.stopPropagation()} class={style.arcBtnGroup} aria-hidden="true">
+          {/* Transparent and wider than the visible circle: the button keeps
+              its 30px look while the tap area reaches the recommended size. */}
+          <circle cx="180" cy="40" r="24" class={style.arcBtnHitArea} />
           <circle cx="180" cy="40" r="15" class={style.arcBtnCircle} />
-          <text x="180" y="40" textAnchor="middle" dominantBaseline="middle" class={style.arcBtnText}>
+          <text
+            aria-hidden="true"
+            x="180"
+            y="40"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            class={style.arcBtnText}
+          >
             +
           </text>
         </g>
       )}
       {onDecrement && (
-        <g onClick={onDecrement} onPointerDown={e => e.stopPropagation()} class={style.arcBtnGroup}>
+        <g onClick={onDecrement} onPointerDown={e => e.stopPropagation()} class={style.arcBtnGroup} aria-hidden="true">
+          <circle cx="180" cy="180" r="24" class={style.arcBtnHitArea} />
           <circle cx="180" cy="180" r="15" class={style.arcBtnCircle} />
-          <text x="180" y="180" textAnchor="middle" dominantBaseline="middle" class={style.arcBtnText}>
+          <text
+            aria-hidden="true"
+            x="180"
+            y="180"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            class={style.arcBtnText}
+          >
             −
           </text>
         </g>

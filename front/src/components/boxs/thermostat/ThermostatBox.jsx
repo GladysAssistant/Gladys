@@ -774,9 +774,13 @@ class ThermostatBox extends Component {
 
   onPointerDown = e => {
     if (!this.svgRef) return;
-    e.preventDefault();
     const angle = getAngleFromPointer(e, this.svgRef);
     if (!isAngleInArc(angle)) return;
+    // Only once the press is known to be on the ring: preventing the default
+    // beforehand swallowed a touch starting anywhere on the gauge — the middle,
+    // where the temperatures are — and a thumb scrolling past a dashboard of
+    // thermostats found dead zones instead of the page moving.
+    e.preventDefault();
     // Leaving 'off' by dragging the gauge only changes the preset locally here.
     // Writing PRESET now would debounce a regulation pass while MANUAL_MODE is
     // still false, so a drag lasting longer than the debounce — or an unmount
@@ -929,6 +933,16 @@ class ThermostatBox extends Component {
     const minTemp = this.getMinTemp();
     const maxTemp = this.getMaxTemp();
     const configMode = cfg.default_mode || 'heating';
+    // The gauge builds one sentence out of these for screen readers; taken from
+    // the dictionary directly because it composes them with live values rather
+    // than rendering <Text> nodes.
+    const a11yDict = (props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat) || {};
+    const a11yLabels = {
+      setpoint: a11yDict.a11ySetpoint,
+      currentTemp: a11yDict.a11yCurrentTemp,
+      humidity: a11yDict.a11yHumidity,
+      windowOpen: configMode === 'cooling' ? a11yDict.windowOpenCooling : a11yDict.windowOpen
+    };
     const mode = activePreset === 'off' ? 'off' : configMode;
     const presets = this.getPresets();
     const hystStart = numOr(cfg.hysteresis_start, DEFAULT_HYSTERESIS_START);
@@ -1010,6 +1024,7 @@ class ThermostatBox extends Component {
                     isActive={showActive}
                     isWindowOpen={isWindowOpen}
                     tempUnit={tempUnit}
+                    a11yLabels={a11yLabels}
                   />
                 </div>
               </div>
