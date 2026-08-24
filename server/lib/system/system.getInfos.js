@@ -4,6 +4,7 @@ const os = require('os');
 const semver = require('semver');
 
 const { getServerPort } = require('../../utils/getServerPort');
+const logger = require('../../utils/logger');
 
 const THERMAL_ZONE_DIR = '/sys/class/thermal';
 const HWMON_DIR = '/sys/class/hwmon';
@@ -233,6 +234,16 @@ function getLocalIp(networkInterfaces) {
  * system.getInfos();
  */
 async function getInfos() {
+  // The host power detection at init can fail transiently (on boot, Gladys
+  // often starts before DBus or the Docker daemon is ready). getInfos backs
+  // the System settings page: use it to retry in the background. The retry is
+  // fire-and-forget (a probe can take tens of seconds) and self-limited
+  // (transient failures only, throttled, bounded): getInfos is polled every
+  // 30s by the front and called by periodic server tasks, it must never
+  // become a helper-container factory.
+  if (!this.hostPowerManagement) {
+    this.redetectHostPowerManagement().catch((e) => logger.debug(e));
+  }
   const networkInterfaces = os.networkInterfaces();
   // in a bridged container, the address of the container is not reachable from the
   // local network: there is no local IP to expose, and nothing is advertised with mDNS

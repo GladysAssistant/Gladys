@@ -6,6 +6,7 @@ const { fake, assert } = sinon;
 const System = require('../../../lib/system');
 const { getLocalIp } = require('../../../lib/system/system.getInfos');
 const Job = require('../../../lib/job');
+const logger = require('../../../utils/logger');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -112,6 +113,44 @@ describe('system.getInfos', () => {
     expect(infos).to.not.have.property('docker_image_pinned');
     expect(infos).to.not.have.property('recommended_docker_image');
   });
+  it('should retry the host power detection in the background when it found nothing', async () => {
+    system.hostPowerManagement = null;
+    system.redetectHostPowerManagement = fake.resolves(null);
+    await system.getInfos();
+    assert.calledOnce(system.redetectHostPowerManagement);
+  });
+
+  it('should still resolve when the background host power retry rejects', async () => {
+    const debugStub = sinon.stub(logger, 'debug');
+    try {
+      const retryError = new Error('probe crashed');
+      system.hostPowerManagement = null;
+      system.redetectHostPowerManagement = fake.rejects(retryError);
+      const infos = await system.getInfos();
+      expect(infos).to.have.property('host_power_reboot_available', false);
+      expect(infos).to.have.property('host_power_shutdown_available', false);
+      assert.calledOnce(system.redetectHostPowerManagement);
+      // let the fire-and-forget rejection reach its handler: it must not surface
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+      // ...and the rejection must land in the debug log
+      assert.calledWith(debugStub, retryError);
+    } finally {
+      debugStub.restore();
+    }
+  });
+
+  it('should not retry the host power detection when a mechanism is already known', async () => {
+    system.hostPowerManagement = 'docker-helper';
+    system.hostPowerCapabilities = { reboot: true, shutdown: true };
+    system.redetectHostPowerManagement = fake.resolves('docker-helper');
+    const infos = await system.getInfos();
+    assert.notCalled(system.redetectHostPowerManagement);
+    expect(infos).to.have.property('host_power_reboot_available', true);
+    expect(infos).to.have.property('host_power_shutdown_available', true);
+  });
+
   it('should report the configured server port', async () => {
     const previousPort = process.env.SERVER_PORT;
     process.env.SERVER_PORT = '8080';

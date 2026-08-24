@@ -127,11 +127,76 @@ describe('system.getGladysContainerId', () => {
     }
   });
 
-  it('should return containerId through cidfile', async () => {
+  it('should return containerId through cidfile as a last resort, when it names a running container', async () => {
     FsMock.promises.access.withArgs('/var/lib/gladysassistant/containerId').resolves(null);
     FsMock.promises.readFile.resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
+    system.dockerode.getContainer = sinon.fake.returns({
+      inspect: sinon.fake.resolves({ State: { Running: true } }),
+    });
     const containerId = await system.getGladysContainerId();
     expect(containerId).to.eq('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
+  });
+  it('should prefer the cgroup detection over the cidfile, which can be stale', async () => {
+    FsMock.promises.access
+      .withArgs('/var/lib/gladysassistant/containerId')
+      .resolves(null)
+      .withArgs('/proc/self/cgroup')
+      .resolves(null);
+    FsMock.promises.readFile
+      .withArgs('/var/lib/gladysassistant/containerId', 'utf-8')
+      .resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c')
+      .withArgs('/proc/self/cgroup', 'utf-8')
+      .resolves(procSelfCpuGroupDebia11);
+    const getContainer = sinon.fake.returns({
+      inspect: sinon.fake.resolves({ State: { Running: true } }),
+    });
+    system.dockerode.getContainer = getContainer;
+    const containerId = await system.getGladysContainerId();
+    expect(containerId).to.eq('2bb2c94b0c395fc8fdff9fa4ce364a3be0dd05792145ffc93ce8d665d06521f1');
+    // the cidfile was never even consulted
+    sinon.assert.notCalled(getContainer);
+  });
+  it('should ignore a cidfile naming a container unknown to Docker', async () => {
+    FsMock.promises.access.withArgs('/var/lib/gladysassistant/containerId').resolves(null);
+    FsMock.promises.readFile.resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
+    // the container named by the cidfile no longer exists on this Docker daemon
+    system.dockerode.getContainer = sinon.fake.returns({
+      inspect: sinon.fake.rejects(new Error('no such container')),
+    });
+    try {
+      await system.getGladysContainerId();
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e).be.instanceOf(PlatformNotCompatible);
+    }
+  });
+  it('should ignore a cidfile when the inspected container has no State at all', async () => {
+    FsMock.promises.access.withArgs('/var/lib/gladysassistant/containerId').resolves(null);
+    FsMock.promises.readFile.resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
+    // a degraded inspect answer: without a State, the container cannot be proven running
+    system.dockerode.getContainer = sinon.fake.returns({
+      inspect: sinon.fake.resolves({}),
+    });
+    try {
+      await system.getGladysContainerId();
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e).be.instanceOf(PlatformNotCompatible);
+    }
+  });
+  it('should ignore a cidfile naming a stopped container, which cannot be the running Gladys', async () => {
+    FsMock.promises.access.withArgs('/var/lib/gladysassistant/containerId').resolves(null);
+    FsMock.promises.readFile.resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
+    // a previous Gladys container, stopped but not removed from the daemon
+    system.dockerode.getContainer = sinon.fake.returns({
+      inspect: sinon.fake.resolves({ State: { Running: false } }),
+    });
+    try {
+      await system.getGladysContainerId();
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e).be.instanceOf(PlatformNotCompatible);
+    }
   });
   it('should return containerId through exec in mountinfo (Debian 11)', async () => {
     FsMock.promises.access

@@ -45,7 +45,7 @@ const { setDuckDbTimezone } = require('./system.setDuckDbTimezone');
 const { shutdown } = require('./system.shutdown');
 const { rebootHost } = require('./system.rebootHost');
 const { shutdownHost } = require('./system.shutdownHost');
-const { detectHostPowerManagement } = require('./system.detectHostPowerManagement');
+const { detectHostPowerManagement, redetectHostPowerManagement } = require('./system.detectHostPowerManagement');
 const { runHostPowerDbusCommand } = require('./system.runHostPowerDbusCommand');
 
 const System = function System(sequelize, event, config, job, variable, user, message, brain) {
@@ -80,6 +80,14 @@ const System = function System(sequelize, event, config, job, variable, user, me
   // init and cached here.
   this.hostPowerManagement = null;
   this.hostPowerCapabilities = { reboot: false, shutdown: false };
+  // Single-flight detection promise, timestamp of the last completed
+  // detection, whether that detection failed to reach logind at all (the only
+  // outcome worth retrying), and how many retries getInfos() already spent —
+  // together they throttle and bound the background re-detections.
+  this.hostPowerDetectionInFlight = null;
+  this.hostPowerLastDetectionAt = null;
+  this.hostPowerUnreachable = false;
+  this.hostPowerRedetectionAttempts = 0;
 };
 
 System.prototype.init = init;
@@ -125,6 +133,7 @@ System.prototype.shutdown = shutdown;
 System.prototype.rebootHost = rebootHost;
 System.prototype.shutdownHost = shutdownHost;
 System.prototype.detectHostPowerManagement = detectHostPowerManagement;
+System.prototype.redetectHostPowerManagement = redetectHostPowerManagement;
 System.prototype.runHostPowerDbusCommand = runHostPowerDbusCommand;
 
 module.exports = System;
