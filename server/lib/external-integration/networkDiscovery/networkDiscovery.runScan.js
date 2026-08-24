@@ -104,7 +104,12 @@ async function runNetworkDiscoveryScan(
       return await this.scanUdpActiveBroadcast({ port, payload, timeoutMs });
     }
     if (type === 'mdns') {
-      return await this.scanMdns({ service: firstCapture.service, timeoutMs });
+      // mdns browses every declared entry, like the UDP port union above;
+      // only ssdp deliberately keeps the first-match behaviour for now
+      return await this.scanMdns({
+        services: captures.map((declaredCapture) => declaredCapture.service),
+        timeoutMs,
+      });
     }
     return await this.scanSsdp({ st: firstCapture.st, timeoutMs });
   } finally {
