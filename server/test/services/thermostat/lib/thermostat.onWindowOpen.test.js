@@ -340,6 +340,27 @@ describe('thermostat.onDeviceNewState - window selector cache', () => {
     expect(gladys.device.get.callCount).to.equal(2);
   });
 
+  it('should drop the cache when a thermostat is updated', async () => {
+    // A device saved through the generic device route can carry a new window
+    // sensor: without postUpdate the immediate cut-off would keep watching the
+    // previous one until the next create, delete or restart.
+    const mod = loadModule();
+    const { gladys } = buildGladys();
+    const handler = {
+      gladys,
+      windowSelectorsCache: null,
+      invalidateWindowCache: mod.invalidateWindowCache,
+      postUpdate: mod.postUpdate,
+    };
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'some-other-sensor', last_value: 0 });
+    expect(handler.windowSelectorsCache).to.not.equal(null);
+
+    handler.postUpdate();
+
+    expect(handler.windowSelectorsCache).to.equal(null);
+  });
+
   it('should expose the configured window selectors', async () => {
     const mod = loadModule();
     const { gladys } = buildGladys();

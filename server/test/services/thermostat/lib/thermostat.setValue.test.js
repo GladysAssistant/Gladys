@@ -32,6 +32,13 @@ const buildHandler = () => {
 
 const deviceFeature = { selector: 'thermostat-living-room' };
 
+// The expiry is only armed on a thermostat that follows a schedule: without one
+// the manual hold is permanent, so most of these assertions need a device that
+// carries an active schedule.
+const scheduledDevice = (params = []) => ({
+  params: [{ name: 'THERMOSTAT_ACTIVE_SCHEDULE', value: 'week' }, ...params],
+});
+
 describe('thermostat.setValue', () => {
   afterEach(() => {
     sinon.restore();
@@ -49,7 +56,7 @@ describe('thermostat.setValue', () => {
     const clock = sinon.useFakeTimers(1_700_000_000_000);
     const handler = buildHandler();
 
-    await handler.setValue({}, deviceFeature, 21.5);
+    await handler.setValue(scheduledDevice(), deviceFeature, 21.5);
 
     assert.calledWith(
       handler.gladys.variable.setValue,
@@ -99,7 +106,7 @@ describe('thermostat.setValue', () => {
   it('should hold the setpoint for the duration configured on the device', async () => {
     const clock = sinon.useFakeTimers(1_700_000_000_000);
     const handler = buildHandler();
-    const device = { params: [{ name: 'THERMOSTAT_MANUAL_DURATION', value: '45' }] };
+    const device = scheduledDevice([{ name: 'THERMOSTAT_MANUAL_DURATION', value: '45' }]);
 
     await handler.setValue(device, deviceFeature, 21.5);
 
@@ -114,13 +121,36 @@ describe('thermostat.setValue', () => {
     const clock = sinon.useFakeTimers(1_700_000_000_000);
     const handler = buildHandler();
 
-    await handler.setValue({ params: [] }, deviceFeature, 21.5);
+    await handler.setValue(scheduledDevice(), deviceFeature, 21.5);
 
     assert.calledWith(
       handler.gladys.variable.setValue,
       'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL',
       String(clock.now + MANUAL_DURATION_MS),
     );
+  });
+
+  it('should not arm an expiry on a thermostat without a schedule', async () => {
+    sinon.useFakeTimers(1_700_000_000_000);
+    const handler = buildHandler();
+
+    // Nothing would take the setpoint over, so the hold is permanent — the
+    // regulation loop only expires the override when MANUAL_UNTIL is set.
+    await handler.setValue({ params: [] }, deviceFeature, 21.5);
+
+    assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL', '');
+    assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'true');
+  });
+
+  it('should clear an expiry left by a previous schedule-backed hold', async () => {
+    sinon.useFakeTimers(1_700_000_000_000);
+    const handler = buildHandler();
+
+    // The schedule was removed from the device since the last manual hold: an
+    // untouched MANUAL_UNTIL would still expire the new, permanent override.
+    await handler.setValue({ params: [{ name: 'THERMOSTAT_MANUAL_DURATION', value: '45' }] }, deviceFeature, 20);
+
+    assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL', '');
   });
 
   it('should write the runtime variables in this service scope', async () => {

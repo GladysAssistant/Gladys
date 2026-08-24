@@ -6,7 +6,9 @@ const {
   SYSTEM_VARIABLE_NAMES,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
 } = require('../../../utils/constants');
+const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
 const { toNumber, getDeviceConfig, getFeatureBySelector } = require('./thermostat.deviceConfig');
 const { parseEnd, findMatchingPreset, getCurrentDayAndMinutes } = require('../../../utils/thermostatSchedule');
 const {
@@ -44,6 +46,36 @@ function getThermostatFeature(device) {
         feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
     ) || null
   );
+}
+
+/**
+ * @description Read a temperature sensor in the thermostat's own unit.
+ * The sensor and the thermostat are configured independently: a Zigbee or
+ * Z-Wave probe reports celsius while the thermostat may be set to fahrenheit,
+ * and comparing 68 against a 20 setpoint would leave the heating permanently
+ * off (or, in cooling, permanently on). A sensor with no declared unit is
+ * assumed to already be in the thermostat's unit — that is the pre-existing
+ * behaviour, and guessing otherwise would be worse than not converting.
+ * @param {object} feature - Temperature device feature.
+ * @param {string} thermostatUnit - Thermostat unit param, 'C' or 'F'.
+ * @returns {number|null} The reading expressed in the thermostat's unit, or null.
+ * @example
+ * const temp = readTemperatureInThermostatUnit(feature, 'F');
+ */
+function readTemperatureInThermostatUnit(feature, thermostatUnit) {
+  const value = feature ? feature.last_value : null;
+  if (value === null || value === undefined) {
+    return null;
+  }
+  const wantsFahrenheit = thermostatUnit === 'F';
+  const sensorUnit = feature.unit || null;
+  if (sensorUnit === DEVICE_FEATURE_UNITS.CELSIUS && wantsFahrenheit) {
+    return celsiusToFahrenheit(value);
+  }
+  if (sensorUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && !wantsFahrenheit) {
+    return fahrenheitToCelsius(value);
+  }
+  return value;
 }
 
 /**
@@ -287,9 +319,10 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
       if (manualSetpoint !== null && config.switch_feature && config.temperature_feature) {
         const tmp = await getFeatureBySelector(gladys, config.temperature_feature);
         const sw = await getFeatureBySelector(gladys, config.switch_feature);
-        if (tmp && sw && tmp.feature.last_value !== null) {
+        const manualTemp = tmp ? readTemperatureInThermostatUnit(tmp.feature, config.temp_unit) : null;
+        if (tmp && sw && manualTemp !== null) {
           const shouldBeActive = computeSwitchActive(
-            tmp.feature.last_value,
+            manualTemp,
             manualSetpoint,
             mode,
             config,
@@ -301,7 +334,7 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
             gladys,
             config.switch_feature,
             shouldBeActive,
-            `manual, setpoint=${manualSetpoint}, temp=${tmp.feature.last_value}, ${selector}`,
+            `manual, setpoint=${manualSetpoint}, temp=${manualTemp}, ${selector}`,
           );
         }
       }
@@ -376,7 +409,7 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
   let currentTemp = null;
   try {
     const tmp = await getFeatureBySelector(gladys, config.temperature_feature);
-    currentTemp = tmp ? tmp.feature.last_value : null;
+    currentTemp = tmp ? readTemperatureInThermostatUnit(tmp.feature, config.temp_unit) : null;
   } catch (e) {
     logger.warn(`Thermostat schedule: Failed to read temperature: ${e.message}`);
     return;
@@ -451,6 +484,7 @@ async function applySchedules() {
 module.exports = {
   applySchedules,
   getThermostatFeature,
+  readTemperatureInThermostatUnit,
   phaseOffset,
   regulateDevice,
   parseEnd,

@@ -9,9 +9,14 @@ const { buildParamsConfig, toNumber } = require('./thermostat.deviceConfig');
  * API. Persisting the value alone would not survive: the next regulation pass
  * re-applies the scheduled preset and overwrites it within a minute. So an
  * external write is treated as a manual override, exactly like turning the dial
- * on the widget — the setpoint holds for the device's configured manual
- * duration (THERMOSTAT_MANUAL_DURATION, in minutes), then the schedule takes
- * over again.
+ * on the widget.
+ *
+ * The expiry is only armed when the device follows a schedule: that is the only
+ * case where something would otherwise take the setpoint over. Without a
+ * schedule the hold is permanent, like on a physical thermostat — arming a timer
+ * there would silently revert to the stored preset after a few minutes, with no
+ * countdown banner to announce it (the widget only renders one for a scheduled
+ * thermostat).
  * @param {object} device - The device object.
  * @param {object} deviceFeature - The device feature to update.
  * @param {number} value - The new value.
@@ -28,10 +33,12 @@ async function setValue(device, deviceFeature, value) {
   const manualSetpointKey = `THERMOSTAT_${featureKey}_MANUAL_SETPOINT`;
   const config = buildParamsConfig(device) || {};
   const durationMinutes = toNumber(config.manual_duration, DEFAULT_MANUAL_DURATION_MINUTES);
-  const manualUntil = Date.now() + durationMinutes * 60 * 1000;
+  // An empty string clears any expiry left by a previous schedule-backed hold:
+  // the regulation loop only expires the override when this variable is set.
+  const manualUntil = config.active_schedule ? String(Date.now() + durationMinutes * 60 * 1000) : '';
 
   await this.gladys.variable.setValue(manualSetpointKey, JSON.stringify({ setpoint: value }), this.serviceId);
-  await this.gladys.variable.setValue(manualUntilKey, String(manualUntil), this.serviceId);
+  await this.gladys.variable.setValue(manualUntilKey, manualUntil, this.serviceId);
   await this.gladys.variable.setValue(manualVarKey, 'true', this.serviceId);
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -39,7 +46,10 @@ async function setValue(device, deviceFeature, value) {
     payload: { key: manualVarKey, value: 'true' },
   });
 
-  logger.info(`Thermostat: external setValue on ${deviceFeature.selector} held as manual setpoint ${value}`);
+  logger.info(
+    `Thermostat: external setValue on ${deviceFeature.selector} held as manual setpoint ${value}` +
+      `${manualUntil ? ` until ${new Date(Number(manualUntil)).toISOString()}` : ' (no schedule, no expiry)'}`,
+  );
   this.triggerApplySchedules();
 }
 

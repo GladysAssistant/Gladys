@@ -283,33 +283,47 @@ describe('thermostat.updateSchedule', () => {
 });
 
 describe('thermostat.deleteSchedule', () => {
-  it('should delete the schedule and its slots', async () => {
-    const db = buildDb({ schedule: { id: 'schedule-id', selector: 'my-schedule' } });
+  const buildDeleteHandler = (db) => {
     const { deleteSchedule } = load('deleteSchedule', db);
+    return { deleteSchedule, detachSchedule: fake.resolves(0) };
+  };
 
-    await deleteSchedule('my-schedule');
+  it('should delete the schedule, letting the CASCADE take its slots', async () => {
+    const db = buildDb({ schedule: { id: 'schedule-id', selector: 'my-schedule' } });
+    const handler = buildDeleteHandler(db);
 
-    assert.calledOnce(db.ThermostatScheduleSlot.destroy);
-    expect(db.ThermostatScheduleSlot.destroy.firstCall.args[0]).to.deep.equal({
-      where: { schedule_id: 'schedule-id' },
-    });
+    await handler.deleteSchedule('my-schedule');
+
     assert.calledOnce(db.scheduleInstance.destroy);
+    // The slot foreign key carries ON DELETE CASCADE, so a manual destroy would
+    // be redundant — and a non-transactional one at that.
+    assert.notCalled(db.ThermostatScheduleSlot.destroy);
+  });
+
+  it('should detach the thermostats following the schedule before deleting it', async () => {
+    const db = buildDb({ schedule: { id: 'schedule-id', selector: 'my-schedule' } });
+    const handler = buildDeleteHandler(db);
+
+    await handler.deleteSchedule('my-schedule');
+
+    assert.calledWith(handler.detachSchedule, 'my-schedule');
+    expect(handler.detachSchedule.firstCall.calledBefore(db.scheduleInstance.destroy.firstCall)).to.equal(true);
   });
 
   it('should throw when the schedule does not exist', async () => {
     const db = buildDb();
-    const { deleteSchedule } = load('deleteSchedule', db);
+    const handler = buildDeleteHandler(db);
 
     let error = null;
     try {
-      await deleteSchedule('unknown');
+      await handler.deleteSchedule('unknown');
     } catch (e) {
       error = e;
     }
 
     expect(error).to.not.equal(null);
     expect(error.message).to.contain('Schedule not found');
-    assert.notCalled(db.ThermostatScheduleSlot.destroy);
+    assert.notCalled(handler.detachSchedule);
   });
 });
 

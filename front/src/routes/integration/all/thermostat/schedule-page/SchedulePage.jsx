@@ -40,7 +40,7 @@ class SchedulePageComponent extends Component {
       id: undefined,
       selector: null,
       name: `${schedule.name} ${copySuffix}`,
-      slots: schedule.slots ? schedule.slots.map(({ id, thermostat_schedule_id, ...rest }) => ({ ...rest })) : []
+      slots: schedule.slots ? schedule.slots.map(({ id, schedule_id, ...rest }) => ({ ...rest })) : []
     };
     this.setState({ showEditor: true, editingSchedule: duplicate });
   };

@@ -3327,7 +3327,7 @@
         "maxTempLabel": "Temp. max",
         "maxTempPlaceholder": "Ex: 35",
         "temperatureFeatureLabel": "Capteur de température",
-        "temperatureFeatureHelp": "Sélectionnez le capteur qui mesure la température ambiante.",
+        "temperatureFeatureHelp": "Sélectionnez le capteur qui mesure la température ambiante. Un capteur qui remonte une unité différente de celle du thermostat est converti automatiquement ; un capteur sans unité déclarée est supposé utiliser celle du thermostat.",
         "humidityFeatureLabel": "Capteur d'humidité",
         "humidityFeatureHelp": "Optionnel. Affiché dans le widget thermostat.",
         "switchFeatureLabel": "Commutateur (actionneur)",

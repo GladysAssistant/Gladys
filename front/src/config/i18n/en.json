@@ -3327,7 +3327,7 @@
         "maxTempLabel": "Max temp",
         "maxTempPlaceholder": "e.g. 35",
         "temperatureFeatureLabel": "Temperature sensor",
-        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature.",
+        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature. A sensor reporting a different unit than the thermostat is converted automatically; a sensor with no declared unit is assumed to use the thermostat's.",
         "humidityFeatureLabel": "Humidity sensor",
         "humidityFeatureHelp": "Optional. Displayed in the thermostat widget.",
         "switchFeatureLabel": "Switch (actuator)",

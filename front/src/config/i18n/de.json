@@ -3327,7 +3327,7 @@
         "maxTempLabel": "Max. Temperatur",
         "maxTempPlaceholder": "z.B. 35",
         "temperatureFeatureLabel": "Temperatursensor",
-        "temperatureFeatureHelp": "Wähle den Sensor, der die Umgebungstemperatur misst.",
+        "temperatureFeatureHelp": "Wähle den Sensor, der die Umgebungstemperatur misst. Ein Sensor, der eine andere Einheit als das Thermostat meldet, wird automatisch umgerechnet; bei einem Sensor ohne angegebene Einheit wird die Einheit des Thermostats angenommen.",
         "humidityFeatureLabel": "Feuchtigkeitssensor",
         "humidityFeatureHelp": "Optional. Wird im Thermostat-Widget angezeigt.",
         "switchFeatureLabel": "Schalter (Aktor)",
