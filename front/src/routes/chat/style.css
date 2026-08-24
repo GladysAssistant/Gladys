@@ -719,12 +719,6 @@
   color: #cd201f;
 }
 
-.voiceInputNotice {
-  margin: 8px 4px 0;
-  font-size: 12px;
-  color: #9aa7b5;
-}
-
 .emptyChatState {
   width: min(100%, 360px);
   text-align: center;

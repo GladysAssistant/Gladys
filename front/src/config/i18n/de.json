@@ -6164,8 +6164,7 @@
       "errorNoMicrophone": "Kein Mikrofon erkannt. Schließe eines an oder aktiviere es in den Systemeinstellungen.",
       "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfe, ob es von einer anderen App verwendet wird.",
       "errorNoTranscription": "Ich habe deine Nachricht nicht verstanden. Sprich näher ans Mikrofon und versuche es erneut.",
-      "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar.",
-      "gladysPlusTranscriptionNotice": "Wenn du eine Nachricht diktierst, wird das Audio von Gladys Plus transkribiert, derselben Spracherkennung wie beim Sprachassistenten des Dashboards. Die Aufnahme stoppt, wenn du eine Pause machst, und die Nachricht wird erst gesendet, wenn du auf Senden drückst."
+      "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar."
     }
   },
   "history": {

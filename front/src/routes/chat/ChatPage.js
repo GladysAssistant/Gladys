@@ -162,13 +162,6 @@ const IntegrationPage = connect(
                             <i class="fe fe-send" />
                           </button>
                         </div>
-                        {voiceInputAvailable && (
-                          // Shown as soon as the microphone button is available, so the user
-                          // knows where the audio goes before starting a dictation.
-                          <p class={style.voiceInputNotice}>
-                            <Text id="chat.voiceInput.gladysPlusTranscriptionNotice" />
-                          </p>
-                        )}
                         {voiceInputError && (
                           <p class={style.voiceInputError}>
                             <Text id={`chat.voiceInput.${voiceInputError}`} />
