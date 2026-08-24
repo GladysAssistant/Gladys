@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const db = require('../../../models');
 
 const { authenticatedRequest } = require('../request.test');
+const DeviceController = require('../../../api/controllers/device.controller');
 const { EVENTS } = require('../../../utils/constants');
 
 const insertStates = async (intervalInMinutes) => {
@@ -352,8 +353,6 @@ describe('GET /api/v1/device_feature/states_csv', () => {
 });
 
 describe('GET /api/v1/device_feature/states_csv (streaming edge cases)', () => {
-  const DeviceController = require('../../../api/controllers/device.controller');
-
   beforeEach(async function BeforeEach() {
     this.timeout(10000);
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
