@@ -2,9 +2,14 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezonePlugin from 'dayjs/plugin/timezone';
 
 import moonPhoto from './moon.png';
 import style from './style.css';
+
+dayjs.extend(utc);
+dayjs.extend(timezonePlugin);
 
 const REFRESH_INTERVAL_MS = 60 * 1000;
 
@@ -18,7 +23,14 @@ const SHADOW_COLOR = '#11131c';
 // stays readable at a glance on both the light and the dark theme.
 const SHADOW_OPACITY = 0.7;
 
-const formatTime = time => (time ? dayjs(time).format('HH:mm') : '--:--');
+/**
+ * Read a date in the timezone the values were computed in. The browser may sit
+ * in another one: without this, a dashboard opened from abroad would shift
+ * moonrise by the difference and count the days off the wrong midnight.
+ */
+const inHouseTimezone = (date, timezone) => (timezone ? dayjs(date).tz(timezone) : dayjs(date));
+
+const formatTime = (time, timezone) => (time ? inHouseTimezone(time, timezone).format('HH:mm') : '--:--');
 
 /**
  * Build the SVG path of the shadow covering the unlit part of the disk.
@@ -75,113 +87,189 @@ const MoonDisk = ({ moonState, maskId }) => {
   );
 };
 
-const MoonRow = ({ labelKey, children }) => (
-  <div class="d-flex justify-content-between align-items-baseline py-1">
-    <span class="text-muted small mr-2">
+/** Small-caps heading separating the two groups of details. */
+const MoonSectionTitle = ({ labelKey }) => (
+  <div class={`text-muted ${style.moonSectionTitle}`}>
+    <Text id={`dashboard.boxes.moon.${labelKey}`} />
+  </div>
+);
+
+/**
+ * One instantaneous state of the moon: the label sits above its value, so the
+ * cells stay compact instead of spreading label and value apart.
+ */
+const MoonState = ({ labelKey, children }) => (
+  <div class={style.moonStateCell}>
+    <div class="text-muted small">
       <Text id={`dashboard.boxes.moon.${labelKey}`} />
-    </span>
-    <span class={`text-right ${style.moonRowValue}`}>{children}</span>
+    </div>
+    <div class={style.moonValue}>{children}</div>
   </div>
 );
 
 /**
  * Format a date as a number of days from now, like "in 5 days".
- * Events are days or weeks away, so a day granularity is what matters here.
+ * Calendar days are counted from midnight to midnight in the timezone of the
+ * house, not as a number of elapsed hours: an event tomorrow morning has to
+ * read "in 1 day" all day long, and stay in step with the absolute date shown
+ * next to it. Counting hours would make it drop to "today" late in the
+ * evening, and counting them off the browser midnight would shift the whole
+ * list by a day for a dashboard opened from another timezone.
  */
-const RelativeDays = ({ date }) => {
+const RelativeDays = ({ date, timezone }) => {
   if (!date) {
     return <Text id="dashboard.boxes.moon.unknown" />;
   }
-  const days = dayjs(date).diff(dayjs(), 'day');
+  const days = inHouseTimezone(date, timezone)
+    .startOf('day')
+    .diff(inHouseTimezone(new Date(), timezone).startOf('day'), 'day');
   if (days <= 0) {
     return <Text id="dashboard.boxes.moon.today" />;
   }
   return <Text id="dashboard.boxes.moon.inDays" plural={days} fields={{ count: days }} />;
 };
 
-const MoonBox = ({ moonState, maskId, loading, error, displayDetails }) => (
-  <div class="card">
-    <div class="card-body">
-      <div class={`dimmer ${loading ? 'active' : ''}`}>
-        <div class="loader" />
-        <div class="dimmer-content">
-          {error && (
-            <p class="alert alert-warning">
-              <i class="fe fe-alert-triangle" />
-              <span class="pl-2">
-                <Text id={`dashboard.boxes.moon.${error}`} />
-              </span>
-            </p>
-          )}
-          {!error && moonState && (
-            <div class={style.moonLayout}>
-              <div class={style.moonDiskColumn}>
-                <MoonDisk moonState={moonState} maskId={maskId} />
-                <div class={`text-center mt-2 ${style.moonPhaseName}`}>
-                  <Text id={`dashboard.boxes.moon.phases.${moonState.phase_name}`} />
+/**
+ * One upcoming event. The absolute date is shown next to the countdown, so it
+ * can be read off a calendar without counting the days by hand.
+ */
+const MoonEvent = ({ labelKey, date, language, timezone }) => (
+  <div class="d-flex justify-content-between align-items-baseline py-1">
+    <span class="text-muted small mr-2">
+      <Text id={`dashboard.boxes.moon.${labelKey}`} />
+    </span>
+    <span class={`text-right ${style.moonEventValue}`}>
+      <span class={style.moonValue}>
+        <RelativeDays date={date} timezone={timezone} />
+      </span>
+      {date && (
+        <span class="text-muted small ml-2">
+          {inHouseTimezone(date, timezone)
+            .locale(language)
+            .format('ddd D MMM')}
+        </span>
+      )}
+    </span>
+  </div>
+);
+
+const MoonBox = ({ moonState, maskId, loading, error, displayDetails, language }) => {
+  // The timezone the server computed the values in
+  const timezone = moonState && moonState.timezone;
+  return (
+    <div class="card">
+      <div class="card-body">
+        <div class={`dimmer ${loading ? 'active' : ''}`}>
+          <div class="loader" />
+          <div class="dimmer-content">
+            {error && (
+              <p class="alert alert-warning">
+                <i class="fe fe-alert-triangle" />
+                <span class="pl-2">
+                  <Text id={`dashboard.boxes.moon.${error}`} />
+                </span>
+              </p>
+            )}
+            {!error && moonState && (
+              <div>
+                <div class={style.moonHeader}>
+                  <div class={style.moonDiskColumn}>
+                    <MoonDisk moonState={moonState} maskId={maskId} />
+                  </div>
+                  <div class={style.moonHeadline}>
+                    <div class={`h3 mb-0 ${style.moonPhaseName}`}>
+                      <Text id={`dashboard.boxes.moon.phases.${moonState.phase_name}`} />
+                    </div>
+                    <div class="text-muted small">
+                      <Text id="dashboard.boxes.moon.illuminationValue" fields={{ percent: moonState.illumination }} />
+                      {' · '}
+                      {/* The second decimal of the age is noise at this precision */}
+                      <Text id="dashboard.boxes.moon.ageValue" fields={{ days: moonState.age_days.toFixed(1) }} />
+                    </div>
+                    {/* Same layout as the sunrise/sunset of the sun box, so both
+                      widgets read as a family on the dashboard. */}
+                    <div class={`d-flex ${style.moonRiseSet}`}>
+                      <div>
+                        <div class="text-muted small">
+                          <Text id="dashboard.boxes.moon.moonrise" />
+                        </div>
+                        <div class={`h3 mb-0 ${style.moonValue}`}>{formatTime(moonState.moonrise, timezone)}</div>
+                      </div>
+                      <div>
+                        <div class="text-muted small">
+                          <Text id="dashboard.boxes.moon.moonset" />
+                        </div>
+                        <div class={`h3 mb-0 ${style.moonValue}`}>{formatTime(moonState.moonset, timezone)}</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="text-center text-muted small">{moonState.illumination} %</div>
+                {displayDetails && (
+                  <div>
+                    <div class={style.moonSection}>
+                      <MoonSectionTitle labelKey="todaySection" />
+                      <div class={style.moonStateGrid}>
+                        <MoonState labelKey="distance">
+                          {moonState.distance.toLocaleString()} <Text id="dashboard.boxes.moon.kilometers" />
+                        </MoonState>
+                        <MoonState labelKey="trajectory">
+                          <Text id={`dashboard.boxes.moon.${moonState.ascending ? 'ascending' : 'descending'}`} />
+                        </MoonState>
+                        <MoonState labelKey="zodiac">
+                          <Text id={`dashboard.boxes.moon.zodiacSigns.${moonState.zodiac_sign}`} />
+                        </MoonState>
+                        {/* Which node comes next is carried by the label, so the
+                          value stays a plain countdown like the other events. */}
+                        <MoonState labelKey={moonState.next_node_ascending ? 'nextNodeNorth' : 'nextNodeSouth'}>
+                          <RelativeDays date={moonState.next_node} timezone={timezone} />
+                        </MoonState>
+                      </div>
+                    </div>
+                    <div class={style.moonSection}>
+                      <MoonSectionTitle labelKey="upcomingSection" />
+                      <MoonEvent
+                        labelKey="fullMoon"
+                        date={moonState.next_full_moon}
+                        language={language}
+                        timezone={timezone}
+                      />
+                      <MoonEvent
+                        labelKey="newMoon"
+                        date={moonState.next_new_moon}
+                        language={language}
+                        timezone={timezone}
+                      />
+                      <MoonEvent
+                        labelKey="perigee"
+                        date={moonState.next_perigee}
+                        language={language}
+                        timezone={timezone}
+                      />
+                      <MoonEvent
+                        labelKey="apogee"
+                        date={moonState.next_apogee}
+                        language={language}
+                        timezone={timezone}
+                      />
+                      <MoonEvent
+                        labelKey={
+                          moonState.next_eclipse ? `eclipseLabel.${moonState.next_eclipse_type}` : 'nextEclipse'
+                        }
+                        date={moonState.next_eclipse}
+                        language={language}
+                        timezone={timezone}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
-              {displayDetails && (
-                <div class={style.moonDetails}>
-                  <MoonRow labelKey="distance">
-                    {moonState.distance.toLocaleString()} <Text id="dashboard.boxes.moon.kilometers" />
-                  </MoonRow>
-                  <MoonRow labelKey="age">
-                    <Text id="dashboard.boxes.moon.ageValue" fields={{ days: moonState.age_days }} />
-                  </MoonRow>
-                  <MoonRow labelKey="phase">
-                    <Text id={`dashboard.boxes.moon.${moonState.waxing ? 'waxing' : 'waning'}`} />
-                  </MoonRow>
-                  <MoonRow labelKey="trajectory">
-                    <Text id={`dashboard.boxes.moon.${moonState.ascending ? 'ascending' : 'descending'}`} />
-                  </MoonRow>
-                  <MoonRow labelKey="zodiac">
-                    <Text id={`dashboard.boxes.moon.zodiacSigns.${moonState.zodiac_sign}`} />
-                  </MoonRow>
-                  <MoonRow labelKey="moonrise">{formatTime(moonState.moonrise)}</MoonRow>
-                  <MoonRow labelKey="moonset">{formatTime(moonState.moonset)}</MoonRow>
-                  <MoonRow labelKey="nextFullMoon">
-                    <RelativeDays date={moonState.next_full_moon} />
-                  </MoonRow>
-                  <MoonRow labelKey="nextNewMoon">
-                    <RelativeDays date={moonState.next_new_moon} />
-                  </MoonRow>
-                  <MoonRow labelKey="nextPerigee">
-                    <RelativeDays date={moonState.next_perigee} />
-                  </MoonRow>
-                  <MoonRow labelKey="nextApogee">
-                    <RelativeDays date={moonState.next_apogee} />
-                  </MoonRow>
-                  <MoonRow labelKey="nextNode">
-                    <RelativeDays date={moonState.next_node} />
-                    <span class="text-muted small ml-1">
-                      (
-                      <Text id={`dashboard.boxes.moon.${moonState.next_node_ascending ? 'nodeNorth' : 'nodeSouth'}`} />)
-                    </span>
-                  </MoonRow>
-                  <MoonRow labelKey="nextEclipse">
-                    {moonState.next_eclipse ? (
-                      <span>
-                        <RelativeDays date={moonState.next_eclipse} />
-                        <span class="text-muted small ml-1">
-                          (
-                          <Text id={`dashboard.boxes.moon.eclipse.${moonState.next_eclipse_type}`} />)
-                        </span>
-                      </span>
-                    ) : (
-                      <Text id="dashboard.boxes.moon.unknown" />
-                    )}
-                  </MoonRow>
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 class Moon extends Component {
   refreshData = async ({ resetData = false } = {}) => {
@@ -253,7 +341,7 @@ class Moon extends Component {
     };
   }
 
-  render({ box }, { moonState, loading, error }) {
+  render({ box, user }, { moonState, loading, error }) {
     // Details are shown unless they were explicitly turned off, so the boxes
     // added before this option keep displaying them.
     const displayDetails = box.display_details !== false;
@@ -264,9 +352,10 @@ class Moon extends Component {
         loading={loading}
         error={error}
         displayDetails={displayDetails}
+        language={user && user.language}
       />
     );
   }
 }
 
-export default connect('httpClient', {})(Moon);
+export default connect('httpClient,user', {})(Moon);

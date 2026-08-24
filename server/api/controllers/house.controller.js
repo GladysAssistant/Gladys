@@ -219,6 +219,7 @@ module.exports = function HouseController(gladys) {
    * time, the way lunar calendars publish them. Moonrise and moonset are not affected.
    * @apiSuccessExample {json} Success-Example
    * {
+   *   "timezone": "Europe/Paris",
    *   "phase": 0.35,
    *   "phase_name": "waxingGibbous",
    *   "illumination": 80,

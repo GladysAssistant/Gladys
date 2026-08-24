@@ -479,6 +479,10 @@ async function getMoonState(house, now = new Date(), { atMidnight = false } = {}
   const nextEclipse = findNextLunarEclipse(computedAt);
 
   return {
+    // The timezone the values are computed in. The browser may sit in another
+    // one, so it is sent along for the countdowns to be counted in calendar
+    // days of the house, not of wherever the dashboard is opened from.
+    timezone,
     phase: roundTwoDecimals(illumination.phase),
     phase_name: getPhaseName(illumination.phase),
     // Illuminated fraction of the moon disk, as a percentage

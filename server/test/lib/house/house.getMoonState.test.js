@@ -249,6 +249,20 @@ describe('house.getMoonState', () => {
     ).to.equal('2026-08-23');
   });
 
+  it('should return the timezone the values were computed in', async () => {
+    // The browser may sit in another timezone: the front counts the days to
+    // the next events off the midnight of the house, not of its own.
+    const tokyoHouseInstance = buildHouse('Asia/Tokyo');
+    const moonState = await tokyoHouseInstance.getMoonState(parisHouse, new Date('2026-08-23T12:00:00.000Z'));
+    expect(moonState.timezone).to.equal('Asia/Tokyo');
+  });
+
+  it('should return the default timezone when none is configured', async () => {
+    const houseWithoutTimezone = buildHouse(null);
+    const moonState = await houseWithoutTimezone.getMoonState(parisHouse, new Date('2026-08-23T12:00:00.000Z'));
+    expect(moonState.timezone).to.equal('Europe/Paris');
+  });
+
   it('should return a null moon time when the moon does not cross the horizon', async () => {
     // Far enough north, the moon can stay below or above the horizon all day
     const tromsoHouse = { latitude: 69.6492, longitude: 18.9553 };
