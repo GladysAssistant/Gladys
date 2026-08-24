@@ -4675,7 +4675,7 @@
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Zwei-Faktor-Authentifizierung (2FA) konfigurieren",
     "twoFactorNotConfigured": "Die Zwei-Faktor-Authentifizierung (2FA) ist auf deinem Gladys-Plus-Account noch nicht konfiguriert. Sie ist erforderlich, um deine Instanz zu verbinden.",
-    "scanInstructions": "Scanne diesen QR-Code mit einer Zwei-Faktor-App (Authy, Google Authenticator...) oder kopiere das Secret manuell in deine App.",
+    "scanInstructions": "Scanne diesen QR-Code mit deiner Zwei-Faktor-App oder kopiere das Secret manuell in deine App.",
     "secretLabel": "Secret",
     "copy": "Kopieren",
     "confirmCodeLabel": "Gib den in deiner App angezeigten Code ein",
@@ -6377,6 +6377,9 @@
     "registeredLabel": "Registriert:",
     "neverUsed": "Nie"
   },
+  "twoFactorApps": {
+    "description": "Jede App, die 6-stellige Codes erzeugt, funktioniert. Falls du noch keine hast, hier ein paar kostenlose Apps, die einfach zu installieren sind:"
+  },
   "gatewayTwoFactorAuth": {
     "title": "Gladys Plus",
     "configureTitle": "Zwei-Faktor-Authentifizierung konfigurieren",
@@ -6384,7 +6387,7 @@
     "secretLabel": "Geheimschlüssel",
     "copy": "Kopieren",
     "securityIsImportant": "Die Sicherheit deines Gladys Gateway-Accounts ist uns sehr wichtig.",
-    "securityApps": "Um sicherzustellen, dass dein Account sicher bleibt, aktiviere bitte die Zwei-Faktor-Authentifizierung mit einer Zwei-Faktor-App wie Authy für <a href=\"https://itunes.apple.com/us/app/authy/id494168017?mt=8\">iOS</a> oder <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
+    "securityApps": "Um sicherzustellen, dass dein Account sicher bleibt, aktiviere bitte die Zwei-Faktor-Authentifizierung mit einer Authenticator-App auf deinem Smartphone.",
     "invalidCode": "Der von dir eingegebene Zwei-Faktor-Code ist ungültig.",
     "confirmCode": "Bestätige die Zwei-Faktor-Authentifizierung",
     "enterCode": "Gib den 6-stelligen Code ein",
