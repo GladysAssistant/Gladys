@@ -167,13 +167,15 @@
   max-width: none;
 }
 
-/* One sizing model for every dashboard column. Below the desktop breakpoint
-   columns stack full width, unchanged. Above it, each column asks for its
-   --column-width share of the section (set inline: equal shares in a plain
-   section, weight shares in a weighted e.g. 2|1 one) but never shrinks
-   under a readable card width: columns that no longer fit WRAP onto the
-   next line and share it, instead of crushing their widgets — a 6-column
-   dashboard renders 3+3 on a mid-size screen, 2+2+2 on a narrow one.
+/* One sizing model for every dashboard column, shared by the viewer AND the
+   editor canvas (EditBoxColumns), so what the canvas shows is what the
+   dashboard renders. Below the desktop breakpoint columns stack full width,
+   unchanged. Above it, each column asks for its --column-width share of the
+   section (set inline: equal shares in a plain section, weight shares in a
+   weighted e.g. 2|1 one) but never shrinks under a readable card width:
+   columns that no longer fit WRAP onto the next line and share it, instead
+   of crushing their widgets — a 6-column dashboard renders 3+3 on a
+   mid-size screen, 2+2+2 on a narrow one.
    14rem keeps the historic footprint: a 3-column dashboard right at the
    992px breakpoint (~224px per column next to the navigation rail) still
    fits on one line, exactly as before. */
@@ -209,15 +211,6 @@
   .sectionRow {
     margin-right: -0.75rem;
     margin-left: -0.75rem;
-  }
-
-  /* still used by the editor canvas, which keeps one unwrapped line */
-  .removePaddingFirstCol {
-    padding-left: 0;
-  }
-
-  .removePaddingLastCol {
-    padding-right: 0;
   }
 }
 

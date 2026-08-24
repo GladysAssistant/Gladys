@@ -16,16 +16,24 @@ const BoxColumns = ({ children, ...props }) => {
           // in a weighted (e.g. 2|1) one. The stylesheet turns the share
           // into a flex basis with a minimum readable width, so columns
           // that no longer fit wrap instead of crushing their widgets.
-          // An empty section maps over nothing, so the 0 total weight of
-          // the empty columns array is never used as a divisor.
           const widths = getSectionWidths(section);
-          const totalWeight = widths.reduce((sum, width) => sum + width, 0);
+          // Empty columns are editor scaffolding: rendered here they would
+          // only reserve blank space — a hole in the middle of the row, and
+          // orphan cards pushed out of place once the row wraps. The filled
+          // columns share the section on their weights alone. x keeps the
+          // column's global index, since box state paths are keyed on it.
+          // A section with no filled column maps over nothing, so the 0
+          // total weight is never used as a divisor.
+          const filledColumns = section.columns
+            .map((column, columnIndex) => ({ column, columnIndex }))
+            .filter(({ column }) => column.length > 0);
+          const totalWeight = filledColumns.reduce((sum, { columnIndex }) => sum + widths[columnIndex], 0);
           return (
             <div
               key={`section-${sectionIndex}`}
               class={cx('d-flex flex-row flex-wrap justify-content-center align-items-stretch', style.sectionRow)}
             >
-              {section.columns.map((column, columnIndex) => {
+              {filledColumns.map(({ column, columnIndex }) => {
                 const x = sectionOffset + columnIndex;
                 return (
                   <div

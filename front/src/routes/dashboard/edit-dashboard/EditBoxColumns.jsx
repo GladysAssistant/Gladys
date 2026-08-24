@@ -7,7 +7,10 @@ import EmptyColumnDropZone from './EmptyColumnDropZone';
 import {
   DEFAULT_COLUMN_WIDTH,
   WIDE_COLUMN_WIDTH,
+  canBoxStretchAt,
   getSectionOffsets,
+  isTileStretchBox,
+  isValueTileBox,
   MAX_COLUMNS_PER_SECTION
 } from '../../../utils/dashboardSections';
 import style from './style.css';
@@ -59,6 +62,14 @@ const EditBoxColumns = ({ children, ...props }) => (
         getSectionOffsets(props.sectionSizes).map((sectionOffset, sectionIndex) => {
           const sectionSize = props.sectionSizes[sectionIndex];
           const sectionColumns = props.homeDashboard.boxes.slice(sectionOffset, sectionOffset + sectionSize);
+          // Same percentage shares as the viewer (BoxColumns), so the canvas
+          // wraps its columns exactly where the real dashboard will. Only
+          // difference: empty columns keep their share here — they must stay
+          // editable — while the viewer skips them.
+          const sectionWidths = sectionColumns.map(
+            (column, i) => (props.columnWidths && props.columnWidths[sectionOffset + i]) || DEFAULT_COLUMN_WIDTH
+          );
+          const totalWeight = sectionWidths.reduce((sum, width) => sum + width, 0);
           return (
             <div class={style.section} data-widget-drop-section>
               <div class={style.sectionHeader}>
@@ -93,19 +104,23 @@ const EditBoxColumns = ({ children, ...props }) => (
                   </span>
                 )}
               </div>
-              <div class={cx('d-flex align-items-start', style.columnsCard)}>
+              {/* the viewer's row grammar (BoxColumns): the canvas IS the
+                  dashboard, so columns must wrap and size exactly like the
+                  real one — same classes, same breakpoint */}
+              <div
+                class={cx(
+                  'd-flex flex-row flex-wrap justify-content-center align-items-stretch',
+                  stylePrimary.sectionRow
+                )}
+              >
                 {sectionColumns.map((column, columnIndex) => {
                   const x = sectionOffset + columnIndex;
-                  // the canvas previews the weights: a wide column grows double
-                  const columnWidth = (props.columnWidths && props.columnWidths[x]) || DEFAULT_COLUMN_WIDTH;
+                  const columnWidth = sectionWidths[columnIndex];
                   const isWide = columnWidth === WIDE_COLUMN_WIDTH;
                   return (
                     <div
-                      class={cx('d-flex flex-column', style.column, stylePrimary.removePadding, {
-                        [stylePrimary.removePaddingFirstCol]: columnIndex === 0,
-                        [stylePrimary.removePaddingLastCol]: columnIndex === sectionSize - 1
-                      })}
-                      style={{ flexGrow: columnWidth }}
+                      class={cx('d-flex flex-column', stylePrimary.dashboardColumn, stylePrimary.removePadding)}
+                      style={`--column-width: ${((columnWidth / totalWeight) * 100).toFixed(4)}%`}
                     >
                       <div class={style.columnBoxHeader}>
                         <span class={style.columnLabel}>
@@ -155,21 +170,42 @@ const EditBoxColumns = ({ children, ...props }) => (
                           <Text id="dashboard.editDashboardBoxNotEmpty" />
                         </div>
                       )}
-                      <div data-widget-drop data-drop-x={x} data-drop-active-class={style.columnDropActive}>
+                      <div
+                        class={style.columnDropArea}
+                        data-widget-drop
+                        data-drop-x={x}
+                        data-drop-active-class={style.columnDropActive}
+                      >
                         {column.length > 0 &&
-                          column.map((box, y) => (
-                            <div key={`box-container-${x}-${y}`}>
-                              <EditableBoxPreview {...props} box={box} x={x} y={y} columnLength={column.length} />
-                              <div class="d-flex justify-content-center mb-2">
-                                <button
-                                  class={cx('btn btn-sm px-4 py-0', style.btnAddNewBoxAtPosition)}
-                                  onClick={() => props.addBoxAtPositionAndEdit(x, y)}
-                                >
-                                  <i class="fe fe-plus" />
-                                </button>
+                          column.map((box, y) => {
+                            // preview the viewer's vertical stretch (see
+                            // .stretchPreview): a stretchable widget absorbs
+                            // the free height of its column on the canvas too
+                            const stretch = canBoxStretchAt(box, y === column.length - 1);
+                            return (
+                              <div
+                                key={`box-container-${x}-${y}`}
+                                class={cx({
+                                  [style.stretchPreview]: stretch,
+                                  [style.stretchTilePreview]: stretch && isTileStretchBox(box),
+                                  [style.adaptiveTilePreview]: stretch && isValueTileBox(box),
+                                  // global marker so media widgets fill their
+                                  // stretched card from their own stylesheet
+                                  'dashboard-stretched-media': stretch && !isTileStretchBox(box)
+                                })}
+                              >
+                                <EditableBoxPreview {...props} box={box} x={x} y={y} columnLength={column.length} />
+                                <div class="d-flex justify-content-center mb-2">
+                                  <button
+                                    class={cx('btn btn-sm px-4 py-0', style.btnAddNewBoxAtPosition)}
+                                    onClick={() => props.addBoxAtPositionAndEdit(x, y)}
+                                  >
+                                    <i class="fe fe-plus" />
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
 
                         {column.length === 0 && <EmptyColumnDropZone />}
 
