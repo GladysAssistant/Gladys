@@ -18,6 +18,56 @@ import {
 
 const BOX_KEY = 'Weather';
 const BOX_DATA_KEY = `${DASHBOARD_BOX_DATA_KEY}${BOX_KEY}`;
+
+/**
+ * Weather icon of a condition. `icon` is what the action layer resolved: the
+ * URL of a bundled SVG for every real condition, or an emoji for the ones
+ * with no drawing of their own (currently 'unknown'). Sizing stays with the
+ * caller, which is why the size is passed in and applied to both shapes.
+ *
+ * An emoji is told from an image by its PREFIX, not by a '.svg' suffix: Vite
+ * inlines any asset under 4 kB as a `data:image/svg+xml,...` URI, which has no
+ * extension at all and rendered as raw text when the test looked for one.
+ *
+ * `label` is the localized condition name: it becomes the image `alt` and the
+ * emoji `aria-label`, so a screen reader announces the weather instead of
+ * skipping a decorative image.
+ *
+ * The emoji branch keeps .weather-real-colors — it needs the pre-darkened
+ * counter-inversion the class applies in dark mode. The image branch must NOT
+ * have it: a CSS filter creates a stacking context, so a filtered parent
+ * composites its children through its own filter and the two would stack.
+ */
+const WeatherIcon = ({ icon, size, label }) => {
+  if (!icon) {
+    return null;
+  }
+  const isImage =
+    typeof icon === 'string' && (icon.startsWith('data:') || icon.startsWith('/') || icon.includes('.svg'));
+  if (!isImage) {
+    return (
+      <span
+        class="weather-real-colors"
+        role="img"
+        aria-label={label || undefined}
+        style={`font-size: ${size}px; line-height: 1`}
+      >
+        {icon}
+      </span>
+    );
+  }
+  // `size` is a CEILING, not a fixed width: the icon shrinks with its column so
+  // eight hourly cells still fit a phone-width card or a one-column wall
+  // tablet, and never grows past the size the layout was designed around.
+  return (
+    <img
+      src={icon}
+      alt={label || ''}
+      class="weather-condition-icon"
+      style={`width: 100%; max-width: ${size}px; height: auto; display: block; margin: 0 auto`}
+    />
+  );
+};
 const BOX_STATUS_KEY = `${DASHBOARD_BOX_STATUS_KEY}${BOX_KEY}`;
 const BOX_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
 
@@ -282,8 +332,14 @@ class WeatherBoxComponent extends Component {
                condition instead of the two overlapping */
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px">
               <div style="display: flex; align-items: center; min-width: 0">
-                <div class="weather-real-colors" style="font-size: 52px; line-height: 1">
-                  {weather.weatherEmoji}
+                <div style="line-height: 1">
+                  <Localizer>
+                    <WeatherIcon
+                      icon={weather.weatherEmoji}
+                      size={64}
+                      label={<Text id={`dashboard.boxes.weather.conditions.${weather.weather || 'unknown'}`} />}
+                    />
+                  </Localizer>
                 </div>
                 <div style="font-size: 16px; font-weight: 500; margin-left: 12px; min-width: 0">
                   {/* same fallback as the emoji mapping: a provider omitting
@@ -469,11 +525,14 @@ class WeatherBoxComponent extends Component {
                   >
                     {hour.datetime_beautiful}h
                   </div>
-                  <div
-                    class="weather-real-colors"
-                    style={`font-size: ${index === 0 ? '30px' : '20px'}; line-height: 1.5; margin-bottom: 3px`}
-                  >
-                    {hour.weatherEmoji}
+                  <div style="line-height: 1.5; margin-bottom: 3px; display: flex; justify-content: center">
+                    <Localizer>
+                      <WeatherIcon
+                        icon={hour.weatherEmoji}
+                        size={index === 0 ? 40 : 32}
+                        label={<Text id={`dashboard.boxes.weather.conditions.${hour.weather || 'unknown'}`} />}
+                      />
+                    </Localizer>
                   </div>
                   <div style={`font-size: ${index === 0 ? '15px' : '12px'}; font-weight: 600; margin-bottom: 4px`}>
                     {Math.round(hour.temperature)}°
@@ -508,8 +567,14 @@ class WeatherBoxComponent extends Component {
                     {day.datetime_beautiful}
                   </div>
                   {day.weatherEmoji && (
-                    <div class="weather-real-colors" style="font-size: 32px; line-height: 1.5; margin-bottom: 3px">
-                      {day.weatherEmoji}
+                    <div style="line-height: 1.5; margin-bottom: 3px; display: flex; justify-content: center">
+                      <Localizer>
+                        <WeatherIcon
+                          icon={day.weatherEmoji}
+                          size={44}
+                          label={<Text id={`dashboard.boxes.weather.conditions.${day.weather || 'unknown'}`} />}
+                        />
+                      </Localizer>
                     </div>
                   )}
                   <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px">
