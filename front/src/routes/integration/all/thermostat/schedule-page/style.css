@@ -140,6 +140,30 @@
   color: #495057;
 }
 
+/* Marks the end time of a slot that runs past midnight, so the row reads
+   22:30 → 06:30 +1d instead of losing the morning the user typed. */
+.slotNextDay {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  padding: 1px 4px;
+  flex-shrink: 0;
+}
+
+.gapWarningTitle {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.gapWarningList {
+  margin: 4px 0 0;
+  padding-left: 24px;
+  font-size: 0.88rem;
+}
+
 .slotEditIcon {
   color: #adb5bd;
   font-size: 0.8rem;
@@ -180,10 +204,12 @@
   filter: invert(100%) hue-rotate(180deg);
 }
 
-
+/* Not a fixed width: in a 12-hour locale the input also renders an AM/PM
+   indicator, which a hard 90px cut off. The field sizes itself to its content
+   and only takes 90px as a floor. */
 .slotTimeInput {
-  width: 90px !important;
-  min-width: 0;
+  width: auto !important;
+  min-width: 90px;
   flex-shrink: 0;
 }
 
@@ -213,7 +239,7 @@
   gap: 6px;
   margin-top: 8px;
   padding: 8px 10px;
-  border: 1px solid rgba(0,40,100,0.12);
+  border: 1px solid rgba(0, 40, 100, 0.12);
   border-radius: 4px;
   font-size: 0.82rem;
 }
@@ -247,7 +273,7 @@
   border-radius: 3px;
   margin-bottom: 12px;
   background: #fff;
-  box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .scheduleCardHeader {
@@ -313,4 +339,19 @@
   font-size: 2rem;
   display: block;
   margin-bottom: 8px;
+}
+
+.slotFormWrapper {
+  margin-bottom: 8px;
+}
+
+.slotFormWrapper .newSlotForm,
+.slotFormWrapper .editSlotForm {
+  margin-bottom: 0;
+}
+
+.fullDayHint {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: #6c757d;
 }
