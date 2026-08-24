@@ -2,6 +2,8 @@ const { expect } = require('chai');
 const {
   applySlotToDay,
   mergeIntoSlots,
+  readDayAsEntered,
+  copyDayOntoDays,
   timeToMinutes,
   minutesToTime,
   parseEnd,
@@ -458,5 +460,192 @@ describe('thermostatSchedule.applySlotToDay - end of day sorting', () => {
     // Both slots span the new one, so both are split around it
     expect(fixedSlots.filter((s) => s.key === 'split-a')).to.have.lengthOf(1);
     expect(fixedSlots.filter((s) => s.key === 'split-b')).to.have.lengthOf(1);
+  });
+});
+
+// Builds a schedule the way the editor does: every entry goes through
+// applySlotToDay/mergeIntoSlots, so an overnight entry is stored split in two.
+const buildSchedule = (entries) => {
+  let slots = [];
+  let counter = 0;
+  entries.forEach(([day, startTime, endTime, preset]) => {
+    const start = timeToMinutes(startTime);
+    let end = timeToMinutes(endTime);
+    if (end <= start) {
+      end += DAY_MINUTES;
+    }
+    const existing = slots.filter((s) => s.day_of_week === day);
+    counter += 1;
+    const { fixedSlots, overflowSlot } = applySlotToDay(existing, day, start, end, preset, `k${counter}`, null);
+    const tagged = fixedSlots.map((s) => ({ ...s, day_of_week: day }));
+    slots = mergeIntoSlots(slots, day, tagged, overflowSlot);
+  });
+  return slots;
+};
+
+const dayOf = (slots, day) =>
+  slots
+    .filter((s) => s.day_of_week === day)
+    .sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time))
+    .map((s) => `${s.start_time}->${s.end_time} ${s.preset}`);
+
+// Same coverage rule the editor enforces before saving.
+const daysWithGaps = (slots) => {
+  const gaps = [];
+  [0, 1, 2, 3, 4, 5, 6].forEach((day) => {
+    const daySlots = slots
+      .filter((s) => s.day_of_week === day)
+      .map((s) => ({ start: timeToMinutes(s.start_time), end: timeToMinutes(s.end_time) || DAY_MINUTES }))
+      .sort((a, b) => a.start - b.start);
+    if (daySlots.length === 0) {
+      gaps.push(day);
+      return;
+    }
+    let covered = 0;
+    let holed = false;
+    daySlots.forEach((s) => {
+      if (!holed && s.start > covered) {
+        holed = true;
+      }
+      covered = Math.max(covered, s.end);
+    });
+    if (holed || covered < DAY_MINUTES) {
+      gaps.push(day);
+    }
+  });
+  return gaps;
+};
+
+let keyCounter = 0;
+const makeKey = () => {
+  keyCounter += 1;
+  return `copy-${keyCounter}`;
+};
+
+describe('thermostatSchedule.readDayAsEntered', () => {
+  it('should re-join a night crossing midnight with its piece on the next day', () => {
+    const slots = buildSchedule([[0, '22:30', '06:30', 'night']]);
+
+    const read = readDayAsEntered(slots, 0);
+
+    expect(read).to.have.lengthOf(1);
+    expect(read[0].start_time).to.equal('22:30');
+    expect(read[0].end_time).to.equal('06:30');
+    expect(read[0].overnight).to.equal(true);
+  });
+
+  it('should leave a slot merely ending at midnight alone', () => {
+    const slots = buildSchedule([[0, '18:00', '00:00', 'eco']]);
+
+    const read = readDayAsEntered(slots, 0);
+
+    expect(read[0].end_time).to.equal('00:00');
+    expect(read[0].overnight).to.equal(undefined);
+  });
+
+  it('should not pair an evening slot with a next-day slot of another preset', () => {
+    // 22:30->00:00 night then 00:00->06:00 eco is two deliberate slots, not a split one.
+    const slots = buildSchedule([
+      [0, '22:30', '00:00', 'night'],
+      [1, '00:00', '06:00', 'eco'],
+    ]);
+
+    const read = readDayAsEntered(slots, 0);
+
+    expect(read.find((s) => s.start_time === '22:30').overnight).to.equal(undefined);
+  });
+
+  it('should wrap from Sunday to Monday', () => {
+    const slots = buildSchedule([[6, '23:00', '05:00', 'night']]);
+
+    const read = readDayAsEntered(slots, 6);
+
+    expect(read[0].end_time).to.equal('05:00');
+    expect(read[0].overnight).to.equal(true);
+  });
+});
+
+describe('thermostatSchedule.copyDayOntoDays', () => {
+  it('should copy a full day with an overnight slot onto every other day without leaving a gap', () => {
+    // The nominal heating week: a Monday filled in, then copied onto all days.
+    // The night is stored as 22:30->00:00 on Monday plus 00:00->06:30 on Tuesday,
+    // so copying Monday's rows alone used to drop every morning.
+    const slots = buildSchedule([
+      [0, '06:30', '08:30', 'comfort'],
+      [0, '08:30', '17:00', 'eco'],
+      [0, '17:00', '22:30', 'comfort'],
+      [0, '22:30', '06:30', 'night'],
+    ]);
+
+    const copied = copyDayOntoDays(slots, 0, [1, 2, 3, 4, 5, 6], makeKey);
+
+    expect(daysWithGaps(copied)).to.deep.equal([]);
+    [0, 1, 2, 3, 4, 5, 6].forEach((day) => {
+      expect(dayOf(copied, day)).to.deep.equal([
+        '00:00->06:30 night',
+        '06:30->08:30 comfort',
+        '08:30->17:00 eco',
+        '17:00->22:30 comfort',
+        '22:30->00:00 night',
+      ]);
+    });
+  });
+
+  it('should push the overflow onto the day after each target', () => {
+    const slots = buildSchedule([
+      [0, '06:30', '22:30', 'comfort'],
+      [0, '22:30', '06:30', 'night'],
+    ]);
+
+    const copied = copyDayOntoDays(slots, 0, [1], makeKey);
+
+    // Tuesday now carries the night itself, and spills onto Wednesday.
+    expect(dayOf(copied, 1)).to.deep.equal(['00:00->06:30 night', '06:30->22:30 comfort', '22:30->00:00 night']);
+    expect(dayOf(copied, 2)).to.deep.equal(['00:00->06:30 night']);
+  });
+
+  it('should wrap the overflow of the last day back onto the first', () => {
+    const slots = buildSchedule([
+      [0, '06:30', '22:30', 'comfort'],
+      [0, '22:30', '06:30', 'night'],
+    ]);
+
+    const copied = copyDayOntoDays(slots, 0, [6], makeKey);
+
+    // Sunday's night spills onto Monday, which keeps its own slots otherwise.
+    expect(dayOf(copied, 0)).to.contain('00:00->06:30 night');
+    expect(dayOf(copied, 6)).to.contain('22:30->00:00 night');
+  });
+
+  it('should copy a day with no overnight slot unchanged', () => {
+    const slots = buildSchedule([
+      [0, '00:00', '12:00', 'eco'],
+      [0, '12:00', '00:00', 'comfort'],
+    ]);
+
+    const copied = copyDayOntoDays(slots, 0, [3], makeKey);
+
+    expect(dayOf(copied, 3)).to.deep.equal(['00:00->12:00 eco', '12:00->00:00 comfort']);
+    // Nothing spilled onto Thursday.
+    expect(dayOf(copied, 4)).to.deep.equal([]);
+  });
+
+  it('should replace the slots already on a target day', () => {
+    const slots = buildSchedule([
+      [0, '08:00', '00:00', 'comfort'],
+      [2, '00:00', '00:00', 'frost'],
+    ]);
+
+    const copied = copyDayOntoDays(slots, 0, [2], makeKey);
+
+    expect(dayOf(copied, 2)).to.deep.equal(['08:00->00:00 comfort']);
+  });
+
+  it('should leave the schedule untouched when there is no target', () => {
+    const slots = buildSchedule([[0, '08:00', '18:00', 'comfort']]);
+
+    const copied = copyDayOntoDays(slots, 0, [], makeKey);
+
+    expect(dayOf(copied, 0)).to.deep.equal(['08:00->18:00 comfort']);
   });
 });
