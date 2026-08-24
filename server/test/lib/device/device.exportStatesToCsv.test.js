@@ -198,6 +198,51 @@ describe('Device.exportStatesToCsv', function Describe() {
     expect(values).to.deep.equal([0, 1, 2, 10, 11, 12]);
   });
 
+  it('should export in one chunk a same-date group of one feature crossing the chunk boundary', async () => {
+    // One state at t0, then two states of the same feature in the very same
+    // microsecond at t1: the boundary of a 2-state chunk falls inside that group,
+    // which is pushed back whole to the next chunk.
+    const t1 = new Date('2025-08-28T15:01:00.000Z');
+    await db.duckDbBatchInsertState(FEATURE_1_ID, [
+      { value: 0, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 1, created_at: t1 },
+      { value: 2, created_at: t1 },
+    ]);
+    const deviceInstance = new Device(event, {}, oneFeatureStateManager(), {}, {}, variable, job);
+    const { csv, chunks } = await exportAllChunks(
+      deviceInstance,
+      ['my-feature'],
+      '2025-08-28T15:00:00.000Z',
+      '2025-08-28T15:30:00.000Z',
+      2,
+    );
+    expect(chunks[0].states).to.equal(1);
+    const dataLines = csv.split('\n').slice(1);
+    expect(dataLines).to.have.lengthOf(3);
+    const values = dataLines.map((line) => Number(line.split(',').pop())).sort((a, b) => a - b);
+    expect(values).to.deep.equal([0, 1, 2]);
+  });
+
+  it('should refuse a same-date group of one feature bigger than the chunk', async () => {
+    // Degenerate data (a broken import): more states of one feature in the very
+    // same microsecond than a whole chunk. No cursor can split that group without
+    // duplicating or losing rows, so the export refuses it with a clear message
+    // instead of loading an unbounded group in memory.
+    const sameDate = new Date('2025-08-28T15:00:00.000Z');
+    await db.duckDbBatchInsertState(FEATURE_1_ID, [
+      { value: 1, created_at: sameDate },
+      { value: 2, created_at: sameDate },
+      { value: 3, created_at: sameDate },
+    ]);
+    const deviceInstance = new Device(event, {}, oneFeatureStateManager(), {}, {}, variable, job);
+    await assert.isRejected(
+      deviceInstance.exportStatesToCsv(['my-feature'], '2025-08-28T15:00:00.000Z', '2025-08-28T15:30:00.000Z', {
+        maxStates: 2,
+      }),
+      'share the exact same date',
+    );
+  });
+
   it('should cap the size of a chunk to MAX_STATES_PER_CSV_EXPORT_CHUNK', async () => {
     await db.duckDbBatchInsertState(FEATURE_1_ID, [
       { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },

@@ -670,6 +670,12 @@
   animation: exportSpin 1s linear infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .exportSpinning {
+    animation: none;
+  }
+}
+
 @keyframes exportSpin {
   from {
     transform: rotate(0deg);

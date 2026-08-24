@@ -69,10 +69,11 @@ class DeviceExportCsvModal extends Component {
   };
 
   close = () => {
-    // Covers all close paths (X, Escape, overlay, Cancel): while the export is
-    // in flight, dismissing the modal would leave the download running blind.
+    // Covers all close paths (X, Escape, overlay, Cancel). While an export is
+    // running, closing cancels it: the download loop checks this flag before
+    // requesting the next chunk and stops without saving a partial file.
     if (this.state.exporting) {
-      return;
+      this.exportCanceled = true;
     }
     this.props.onClose();
   };
@@ -108,20 +109,29 @@ class DeviceExportCsvModal extends Component {
     if (selectedFeatures.length === 0 || this.isPeriodInvalid()) {
       return;
     }
+    this.exportCanceled = false;
     await this.setState({ exporting: true, exportedStates: 0, error: false, errorDetail: null });
     try {
       // The end date is inclusive: a user picking today expects today's states.
-      await downloadDeviceFeaturesCsv(this.props.httpClient, {
+      const { aborted } = await downloadDeviceFeaturesCsv(this.props.httpClient, {
         deviceFeatures: selectedFeatures,
         startAt: dayjs(start).startOf('day'),
         endAt: dayjs(end).endOf('day'),
         filename: this.props.device.name,
         // The file is downloaded chunk by chunk: a long export shows how far it is.
-        onProgress: exportedStates => this.setState({ exportedStates })
+        onProgress: exportedStates => this.setState({ exportedStates }),
+        shouldAbort: () => this.exportCanceled
       });
+      if (aborted) {
+        // The dialog is already closed: it closed itself when the user canceled.
+        return;
+      }
       this.setState({ exporting: false });
       this.props.onClose();
     } catch (e) {
+      if (this.exportCanceled) {
+        return;
+      }
       console.error(e);
       const { errorDetailString } = formatHttpError(e);
       this.setState({ exporting: false, error: true, errorDetail: errorDetailString });
@@ -208,17 +218,29 @@ class DeviceExportCsvModal extends Component {
                 <Text id="devicesList.export.periodLabel" />
               </span>
               <div class={style.exportDates}>
-                <label class={style.exportDateField}>
+                <label class={style.exportDateField} htmlFor="device-export-csv-start">
                   <span class={style.exportDateLabel}>
                     <Text id="devicesList.export.startLabel" />
                   </span>
-                  <input type="date" class={style.exportDateInput} value={start} onChange={this.updateStart} />
+                  <input
+                    type="date"
+                    id="device-export-csv-start"
+                    class={style.exportDateInput}
+                    value={start}
+                    onChange={this.updateStart}
+                  />
                 </label>
-                <label class={style.exportDateField}>
+                <label class={style.exportDateField} htmlFor="device-export-csv-end">
                   <span class={style.exportDateLabel}>
                     <Text id="devicesList.export.endLabel" />
                   </span>
-                  <input type="date" class={style.exportDateInput} value={end} onChange={this.updateEnd} />
+                  <input
+                    type="date"
+                    id="device-export-csv-end"
+                    class={style.exportDateInput}
+                    value={end}
+                    onChange={this.updateEnd}
+                  />
                 </label>
               </div>
             </div>
@@ -249,7 +271,8 @@ class DeviceExportCsvModal extends Component {
             )}
 
             <div class={style.exportActions}>
-              <button type="button" class={style.exportCancelButton} onClick={this.close} disabled={exporting}>
+              {/* Cancel stays enabled while exporting: it is how a long export is stopped */}
+              <button type="button" class={style.exportCancelButton} onClick={this.close}>
                 <Text id="devicesList.export.cancelButton" />
               </button>
               <button type="button" class={style.exportSubmitButton} onClick={this.exportCsv} disabled={!canExport}>

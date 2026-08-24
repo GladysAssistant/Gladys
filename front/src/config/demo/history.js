@@ -207,8 +207,9 @@ const buildStatesCsv = (query = {}) => {
   const end = query.end ? dayjs(query.end) : dayjs();
   const start = query.start ? dayjs(query.start) : end.subtract(1, 'day');
   const totalMinutes = Math.max(end.diff(start, 'minute'), 0);
-  const points = Math.min(Math.floor(totalMinutes / CSV_POINT_EVERY_MINUTES), CSV_MAX_POINTS_PER_FEATURE);
-  const step = points > 0 ? totalMinutes / points : 0;
+  // Both endpoints count toward the cap, so a feature never exceeds it
+  const sampleCount = Math.min(Math.floor(totalMinutes / CSV_POINT_EVERY_MINUTES) + 1, CSV_MAX_POINTS_PER_FEATURE);
+  const step = sampleCount > 1 ? totalMinutes / (sampleCount - 1) : 0;
 
   const rows = [];
   selectors.forEach(selector => {
@@ -216,7 +217,7 @@ const buildStatesCsv = (query = {}) => {
     if (!found) {
       return;
     }
-    for (let index = 0; index <= points; index += 1) {
+    for (let index = 0; index < sampleCount; index += 1) {
       const createdAt = start.add(index * step, 'minute');
       rows.push({
         createdAt,

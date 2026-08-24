@@ -114,7 +114,7 @@
       "periodLabel": "Zeitraum",
       "startLabel": "Von",
       "endLabel": "Bis",
-      "invalidPeriod": "Das Enddatum muss nach dem Startdatum liegen.",
+      "invalidPeriod": "Das Enddatum darf nicht vor dem Startdatum liegen.",
       "noFeatureSelected": "Wähle mindestens eine Funktion zum Exportieren aus.",
       "progress": "{{count}} Messwerte exportiert …",
       "error": "Der CSV-Export ist fehlgeschlagen. Bitte versuche es erneut.",

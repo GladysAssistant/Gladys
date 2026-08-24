@@ -1,6 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ACTIONS, ACTIONS_STATUS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { BadParameters } = require('../../utils/coreErrors');
+const logger = require('../../utils/logger');
 
 module.exports = function DeviceController(gladys) {
   /**
@@ -172,12 +173,32 @@ module.exports = function DeviceController(gladys) {
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', `attachment; filename="gladys-history-${startDay}-${endDay}.csv"`);
       res.write(chunk.csv);
-      while (chunk.next !== null) {
-        // eslint-disable-next-line no-await-in-loop
-        chunk = await gladys.device.exportStatesToCsv(deviceFeatures, start, end, { after: chunk.next });
-        if (chunk.states > 0) {
-          res.write(`\n${chunk.csv}`);
+      try {
+        while (chunk.next !== null) {
+          // A closed connection (canceled curl, closed tab) must not keep the
+          // export occupying the DuckDB read connection until the period is done.
+          if (req.destroyed || res.writableEnded) {
+            return;
+          }
+          // Let the other readers (charts, history…) take their turn on the
+          // serialized DuckDB read connection between two chunks.
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((resolve) => {
+            setTimeout(resolve, gladys.device.CSV_EXPORT_PAUSE_BETWEEN_CHUNKS_IN_MS);
+          });
+          // eslint-disable-next-line no-await-in-loop
+          chunk = await gladys.device.exportStatesToCsv(deviceFeatures, start, end, { after: chunk.next });
+          if (chunk.states > 0) {
+            res.write(`\n${chunk.csv}`);
+          }
         }
+      } catch (e) {
+        // The headers and part of the body are already sent: a JSON error cannot be
+        // answered anymore. Log and cut the stream so the client sees a failed
+        // (truncated) download instead of a file that silently misses states.
+        logger.error(e);
+        res.destroy(e);
+        return;
       }
       res.end();
       return;

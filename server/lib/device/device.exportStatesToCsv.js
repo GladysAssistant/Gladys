@@ -34,22 +34,6 @@ const AFTER_CLAUSE = `AND (
   OR (epoch_us(created_at) = CAST(? AS BIGINT) AND device_feature_id > CAST(? AS UUID))
 )`;
 
-// Fetch every row of one exact (created_at, device_feature_id) pair. Only used in
-// the pathological case where one single pair holds more rows than a whole chunk:
-// such a group cannot be split over two chunks without duplicating or losing rows,
-// so it is exported in one piece instead.
-const TIE_GROUP_QUERY = `
-  SELECT
-      device_feature_id,
-      value,
-      created_at,
-      epoch_us(created_at) AS created_at_us
-  FROM t_device_feature_state
-  WHERE device_feature_id IN (%FEATURE_PLACEHOLDERS%)
-  AND epoch_us(created_at) = CAST(? AS BIGINT)
-  AND device_feature_id = CAST(? AS UUID)
-`;
-
 /**
  * @description Escape a value so it can safely be written in a CSV cell.
  * @param {string|number|null} value - The value to escape.
@@ -176,20 +160,16 @@ async function exportStatesToCsv(deviceFeatureSelectors, startAt, endAt, { maxSt
     // boundary pair are pushed back to the next chunk instead.
     const boundaryKey = JSON.stringify(cursorOf(rows[limit]));
     chunkRows = rows.slice(0, limit).filter((row) => JSON.stringify(cursorOf(row)) !== boundaryKey);
-    if (chunkRows.length > 0) {
-      next = cursorOf(chunkRows[chunkRows.length - 1]);
-    } else {
-      // Pathological case: one single pair holds more rows than a whole chunk.
-      // Export the whole group in one (bounded) piece and move the cursor past it.
-      const boundary = cursorOf(rows[limit]);
-      chunkRows = await db.duckDbReadConnectionAllAsync(
-        TIE_GROUP_QUERY.replace('%FEATURE_PLACEHOLDERS%', featureIdPlaceholders),
-        ...featureIdParams,
-        boundary.createdAtUs,
-        boundary.deviceFeatureId,
+    if (chunkRows.length === 0) {
+      // All limit + 1 fetched rows share one single pair: this group is bigger than
+      // the chunk, and no cursor could split it without duplicating or losing rows.
+      // Such degenerate data (thousands of states of one feature in the very same
+      // microsecond) is refused instead of loading an unbounded group in memory.
+      throw new BadParameters(
+        `More than ${limit} states of one device feature share the exact same date: this history cannot be exported. Please clean the duplicated states first.`,
       );
-      next = boundary;
     }
+    next = cursorOf(chunkRows[chunkRows.length - 1]);
   }
 
   const lines = chunkRows.map((row) => {

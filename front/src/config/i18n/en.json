@@ -114,7 +114,7 @@
       "periodLabel": "Period",
       "startLabel": "From",
       "endLabel": "To",
-      "invalidPeriod": "The end date must be after the start date.",
+      "invalidPeriod": "The end date must be on or after the start date.",
       "noFeatureSelected": "Select at least one feature to export.",
       "progress": "{{count}} states exported…",
       "error": "The CSV export failed. Please retry.",

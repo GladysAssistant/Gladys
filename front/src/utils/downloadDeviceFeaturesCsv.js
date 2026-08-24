@@ -28,9 +28,13 @@ const STATES_PER_CHUNK_THROUGH_GATEWAY = 1000;
  * @param {object|Date|string} options.endAt - End of the exported period.
  * @param {string} options.filename - Name the file is built from, slugified.
  * @param {Function} [options.onProgress] - Called with the number of states downloaded so far.
- * @returns {Promise} Resolve when the download was handed to the browser.
+ * @param {Function} [options.shouldAbort] - Checked between two chunks: return true to stop the export.
+ * @returns {Promise} Resolve with { aborted } once the download was handed to the browser (or canceled).
  */
-async function downloadDeviceFeaturesCsv(httpClient, { deviceFeatures, startAt, endAt, filename, onProgress }) {
+async function downloadDeviceFeaturesCsv(
+  httpClient,
+  { deviceFeatures, startAt, endAt, filename, onProgress, shouldAbort }
+) {
   const startDate = dayjs(startAt);
   const endDate = dayjs(endAt);
   const baseQuery = {
@@ -46,6 +50,11 @@ async function downloadDeviceFeaturesCsv(httpClient, { deviceFeatures, startAt, 
   let statesCount = 0;
   let after = null;
   do {
+    // The user canceled (Cancel button, Escape, overlay): stop requesting chunks
+    // and do not download anything — a partial file would silently miss states.
+    if (shouldAbort && shouldAbort()) {
+      return { aborted: true };
+    }
     const query = after
       ? { ...baseQuery, after_created_at_us: after.createdAtUs, after_device_feature_id: after.deviceFeatureId }
       : baseQuery;
@@ -60,6 +69,9 @@ async function downloadDeviceFeaturesCsv(httpClient, { deviceFeatures, startAt, 
     }
     after = chunk.next;
   } while (after);
+  if (shouldAbort && shouldAbort()) {
+    return { aborted: true };
+  }
 
   const blob = new Blob(parts, { type: 'text/csv;charset=utf-8;' });
   const url = window.URL.createObjectURL(blob);
@@ -71,6 +83,7 @@ async function downloadDeviceFeaturesCsv(httpClient, { deviceFeatures, startAt, 
   link.click();
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
+  return { aborted: false };
 }
 
 export default downloadDeviceFeaturesCsv;

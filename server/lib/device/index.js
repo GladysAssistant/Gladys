@@ -80,6 +80,10 @@ const DeviceManager = function DeviceManager(
   // machine like a Raspberry Pi can build and send without trouble — however
   // long the exported period is.
   this.MAX_STATES_PER_CSV_EXPORT_CHUNK = 25000;
+  // Between two streamed chunks of a whole-file export, the route pauses this long
+  // so the other readers (charts, history…) get their turn on the serialized DuckDB
+  // read connection: a multi-year export must not freeze the rest of the instance.
+  this.CSV_EXPORT_PAUSE_BETWEEN_CHUNKS_IN_MS = 25;
   // When a NON-paginated export goes through Gladys Plus, the whole answer travels
   // over the encrypted websocket in one message, which cannot carry an arbitrarily
   // large payload: the same limit as the log download is applied, and a bigger
