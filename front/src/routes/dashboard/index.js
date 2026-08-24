@@ -99,12 +99,54 @@ class Dashboard extends Component {
         currentDashboard,
         loading: false
       });
+      this.storeDashboardConfig(currentDashboard);
     } catch (e) {
       this.setState({
         loading: false
       });
       console.error(e);
     }
+  };
+
+  // Every fully-fetched dashboard goes into a config cache keyed by
+  // selector. The cache serves two purposes: switching dashboards renders
+  // the target instantly from it (the widgets then fetch their own live
+  // data) instead of blanking behind a fetch, and the mobile pager draws
+  // the NEIGHBORING dashboards as data-less skeletons while a swipe pulls
+  // them into view.
+  storeDashboardConfig = dashboard => {
+    if (!dashboard || !dashboard.selector) {
+      return;
+    }
+    this.setState(prevState => ({
+      dashboardConfigsBySelector: {
+        ...prevState.dashboardConfigsBySelector,
+        [dashboard.selector]: dashboard
+      }
+    }));
+  };
+
+  // Warm the cache with every dashboard's configuration right after the
+  // list arrives. These are a handful of small JSON payloads (box layout,
+  // no device data), fetched in parallel and never blocking first paint —
+  // the price of making every later switch feel native.
+  prefetchDashboardConfigs = async () => {
+    const { dashboards, currentDashboardSelector } = this.state;
+    if (!dashboards || dashboards.length < 2) {
+      return;
+    }
+    await Promise.all(
+      dashboards
+        .filter(dashboard => dashboard.selector !== currentDashboardSelector)
+        .map(async dashboard => {
+          try {
+            const config = await this.props.httpClient.get(`/api/v1/dashboard/${dashboard.selector}`);
+            this.storeDashboardConfig(config);
+          } catch (e) {
+            console.error(e);
+          }
+        })
+    );
   };
 
   checkIfFullScreenParameterIsHere = () => {
@@ -122,6 +164,8 @@ class Dashboard extends Component {
     if (this.state.currentDashboardSelector) {
       await this.getCurrentDashboard();
     }
+    // fire and forget: the cache warms behind the visible dashboard
+    this.prefetchDashboardConfigs();
     await this.getDuckDbMigrationJob();
   };
 
@@ -215,6 +259,7 @@ class Dashboard extends Component {
       showReorderDashboard: false,
       browserFullScreenCompatible: this.isBrowserFullScreenCompatible(),
       dashboards: [],
+      dashboardConfigsBySelector: {},
       newSelectedBoxType: {},
       askDeleteDashboard: false
     };
@@ -236,19 +281,26 @@ class Dashboard extends Component {
     this.checkIfFullScreenParameterIsHere();
   }
 
-  // Client-side dashboard switch: the dashboard list is already loaded, so
-  // only the current dashboard is fetched — and the page keeps showing the
-  // previous dashboard until the new one arrives, instead of blanking
-  // everything behind the loading dimmer (which felt like a full reload)
+  // Client-side dashboard switch: the dashboard list is already loaded, and
+  // the target's configuration is (almost always) in the cache — so the
+  // target renders IMMEDIATELY from it, its widgets fetching their own live
+  // data, and only a background refresh checks the config is current. On a
+  // cold cache the page keeps showing the previous dashboard until the
+  // fetch lands, instead of blanking behind the loading dimmer.
   switchToDashboardFromUrl = async () => {
-    const { dashboards } = this.state;
+    const { dashboards, dashboardConfigsBySelector } = this.state;
     if (!dashboards || dashboards.length === 0) {
       return this.init();
     }
     const selector = this.props.dashboardSelector || dashboards[0].selector;
-    await this.setState({ currentDashboardSelector: selector });
+    const cached = dashboardConfigsBySelector[selector];
+    await this.setState({
+      currentDashboardSelector: selector,
+      ...(cached ? { currentDashboard: cached } : {})
+    });
     try {
       const currentDashboard = await this.props.httpClient.get(`/api/v1/dashboard/${selector}`);
+      this.storeDashboardConfig(currentDashboard);
       // ignore a stale response if the user switched again in the meantime
       if (this.state.currentDashboardSelector === selector) {
         this.setState({ currentDashboard });
@@ -285,6 +337,7 @@ class Dashboard extends Component {
       dashboardDropdownOpened,
       defineTabletModeOpened,
       dashboards,
+      dashboardConfigsBySelector,
       currentDashboard,
       dashboardEditMode,
       gatewayInstanceNotFound,
@@ -309,6 +362,7 @@ class Dashboard extends Component {
         defineTabletModeOpened={defineTabletModeOpened}
         dashboardEditMode={dashboardEditMode}
         dashboards={dashboards}
+        dashboardConfigsBySelector={dashboardConfigsBySelector}
         dashboardListEmpty={dashboardListEmpty}
         currentDashboard={currentDashboard}
         gatewayInstanceNotFound={gatewayInstanceNotFound}

@@ -160,6 +160,7 @@ const DashboardPage = ({ children, ...props }) => {
                     inside the same breakpoint) must not switch on a brush. */}
                 <DashboardSwiper
                   dashboards={props.dashboards}
+                  dashboardConfigsBySelector={props.dashboardConfigsBySelector}
                   currentDashboard={props.currentDashboard}
                   tabletMode={props.tabletMode}
                 >

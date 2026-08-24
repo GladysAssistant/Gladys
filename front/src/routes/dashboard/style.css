@@ -1343,6 +1343,98 @@
   cursor: pointer;
 }
 
+/* ---------- Mobile pager (DashboardSwiper + DashboardSkeleton) ---------- */
+
+/* The track the pager translates: the current dashboard in normal flow,
+   the neighbor skeletons absolutely posed one page to each side */
+.pagerTrack {
+  position: relative;
+}
+
+/* The ±16px gutter between pages must match PAGE_GUTTER_PX in
+   DashboardSwiper.jsx — the committed slide translates by width + gutter */
+.pagerNeighbor {
+  position: absolute;
+  width: 100%;
+  pointer-events: none;
+}
+
+.pagerNeighborPrevious {
+  left: calc(-100% - 16px);
+}
+
+.pagerNeighborNext {
+  left: calc(100% + 16px);
+}
+
+/* Skeleton cards: the glass card frame comes from .card (glass-theme), this
+   only lays out the placeholder content inside it */
+.skeletonCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.125rem 1.5rem;
+}
+
+/* same voice as .card-title, since it shows the widget's configured title */
+.skeletonTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted, #7c8396);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skeletonTitleBar {
+  height: 0.6rem;
+  width: 42%;
+  border-radius: 999px;
+  background: rgba(28, 35, 52, 0.12);
+}
+
+.skeletonBlock {
+  flex: 1;
+  min-height: 1.5rem;
+  border-radius: var(--gl-radius-md, 18px);
+  background: linear-gradient(
+    100deg,
+    rgba(28, 35, 52, 0.06) 40%,
+    rgba(28, 35, 52, 0.11) 50%,
+    rgba(28, 35, 52, 0.06) 60%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+/* chips boxes are bare pills, not cards — mirror that in the skeleton */
+.skeletonChipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.skeletonChip {
+  height: 2rem;
+  width: 6.5rem;
+  border-radius: 999px;
+  background: var(--gl-card-bg, rgba(255, 255, 255, 0.55));
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+}
+
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 120% 0;
+  }
+
+  to {
+    background-position: -80% 0;
+  }
+}
+
 /* Mobile bottom dock (see .dashboardHeader above): the "…" menu opens from
    inside the dock track's own backdrop root, where a nested backdrop-filter
    makes Chrome misrender the panel (content bleeding through it). Solid
