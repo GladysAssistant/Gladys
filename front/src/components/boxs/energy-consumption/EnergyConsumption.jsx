@@ -19,6 +19,7 @@ import {
 import fr from 'date-fns/locale/fr';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import datePickerStyle from '../../datePicker.css';
 
 const PERIODS = {
   YEAR: 'year',
@@ -499,6 +500,8 @@ class EnergyConsumption extends Component {
                     showYearPicker={selectedPeriod === PERIODS.YEAR}
                     className="form-control text-center w-100"
                     wrapperClassName={'w-100'}
+                    popperClassName={datePickerStyle.datePickerPopper}
+                    portalId="dashboard-datepicker"
                   />
                 </div>
 
