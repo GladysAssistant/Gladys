@@ -28,6 +28,10 @@ async function get(options) {
       model: db.Room,
       as: 'rooms',
     });
+    // Rooms come back in creation order otherwise, which is the order the user happened
+    // to add them in and not an order anyone can scan in a dropdown. Sorting them by name
+    // here fixes every room list at once, as they all read this route.
+    queryParams.order.push([{ model: db.Room, as: 'rooms' }, 'name', 'ASC']);
   }
   if (optionsWithDefault.search) {
     queryParams.where = Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_house.name')), {
