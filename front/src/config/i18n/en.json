@@ -810,7 +810,7 @@
       "mist": "Mist"
     },
     "editDashboardIconLabel": "Icon (optional)",
-    "editDashboardIconDescription": "Shown in the dashboard tab bar. Without an icon, the emoji at the start of the dashboard name is used, or a generic house.",
+    "editDashboardIconDescription": "Shown in the dashboard tab bar. Without an icon, an icon matching the emoji at the start of the dashboard name is used when possible, or a generic house.",
     "editDashboardWidthLabel": "Dashboard width",
     "widths": {
       "standard": "Standard (recommended)",

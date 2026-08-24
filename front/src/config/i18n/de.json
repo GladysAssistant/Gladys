@@ -810,7 +810,7 @@
       "mist": "Nebel"
     },
     "editDashboardIconLabel": "Symbol (optional)",
-    "editDashboardIconDescription": "Wird in der Dashboard-Tab-Leiste angezeigt. Ohne Symbol wird das Emoji am Anfang des Dashboard-Namens verwendet, sonst ein generisches Haus.",
+    "editDashboardIconDescription": "Wird in der Dashboard-Tab-Leiste angezeigt. Ohne Symbol wird nach Möglichkeit ein zum Emoji am Anfang des Namens passendes Symbol verwendet, sonst ein generisches Haus.",
     "editDashboardWidthLabel": "Dashboard-Breite",
     "widths": {
       "standard": "Standard (empfohlen)",

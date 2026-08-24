@@ -3,30 +3,28 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import { splitLeadingEmoji, wrapEmojisJSX } from '../../utils/emojiWrapper';
+import { iconFromEmoji } from '../../utils/emojiIconMapping';
 import style from './style.css';
 
 // The icon is often all that identifies a pill (tablet dock, collapsed
 // mobile pills), and dashboards created before icons existed all fall back
 // to the same house glyph. Many of them carry the distinguishing mark in
-// the name instead — a leading emoji — so use it as the icon and take it
-// out of the pill name so it doesn't show twice.
+// the name instead — a leading emoji — so translate it to the matching
+// icon of the icon set (the emoji itself is never used as the icon: its
+// rendering depends on the viewer's platform) and take it out of the pill
+// name so the mark doesn't show twice. An emoji with no match keeps the
+// generic house and the full name.
 const getTabAppearance = dashboard => {
   if (dashboard.icon) {
-    return { icon: dashboard.icon, emoji: null, name: dashboard.name };
+    return { icon: dashboard.icon, name: dashboard.name };
   }
   const { emoji, rest } = splitLeadingEmoji(dashboard.name);
-  if (emoji) {
-    return { icon: null, emoji, name: rest };
+  const icon = emoji && iconFromEmoji(emoji);
+  if (icon) {
+    return { icon, name: rest || dashboard.name };
   }
-  return { icon: 'home', emoji: null, name: dashboard.name };
+  return { icon: 'home', name: dashboard.name };
 };
-
-const TabGlyph = ({ icon, emoji, class: extraClass }) =>
-  emoji ? (
-    <span class={cx(style.dashboardTabEmoji, 'emoji-no-invert', extraClass)}>{emoji}</span>
-  ) : (
-    <i class={cx('fe', `fe-${icon}`, extraClass)} />
-  );
 
 // "Priority+" navigation: a single row of one-tap pills in dashboard order —
 // the order the user already controls in the edit view — and everything that
@@ -169,7 +167,7 @@ class DashboardTabs extends Component {
               })}
               title={dashboard.name}
             >
-              <TabGlyph icon={appearance.icon} emoji={appearance.emoji} />
+              <i class={`fe fe-${appearance.icon}`} />
               {!tabletMode && appearance.name && (
                 <span class={style.dashboardTabName}>{wrapEmojisJSX(appearance.name)}</span>
               )}
@@ -190,7 +188,7 @@ class DashboardTabs extends Component {
             >
               {activeCollapsed && activeDashboard ? (
                 <>
-                  <TabGlyph icon={activeAppearance.icon} emoji={activeAppearance.emoji} />
+                  <i class={`fe fe-${activeAppearance.icon}`} />
                   {!tabletMode && activeAppearance.name && (
                     <span class={style.dashboardTabName}>{wrapEmojisJSX(activeAppearance.name)}</span>
                   )}
@@ -209,7 +207,7 @@ class DashboardTabs extends Component {
                     href={`/dashboard/${dashboard.selector}`}
                     onClick={this.selectDashboard}
                   >
-                    <TabGlyph icon={appearance.icon} emoji={appearance.emoji} class={style.dashboardTabsMenuIcon} />
+                    <i class={cx(`fe fe-${appearance.icon}`, style.dashboardTabsMenuIcon)} />
                     {wrapEmojisJSX(appearance.name)}
                   </Link>
                 );

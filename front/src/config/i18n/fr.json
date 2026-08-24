@@ -810,7 +810,7 @@
       "mist": "Brume"
     },
     "editDashboardIconLabel": "Icône (optionnel)",
-    "editDashboardIconDescription": "Affichée dans la barre d'onglets des tableaux de bord. Sans icône, l'emoji au début du nom du tableau de bord est utilisé, sinon une maison générique.",
+    "editDashboardIconDescription": "Affichée dans la barre d'onglets des tableaux de bord. Sans icône, une icône correspondant à l'emoji au début du nom est utilisée si possible, sinon une maison générique.",
     "editDashboardWidthLabel": "Largeur du tableau de bord",
     "widths": {
       "standard": "Standard (recommandé)",
