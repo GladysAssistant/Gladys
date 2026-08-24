@@ -152,6 +152,108 @@ const mergeIntoSlots = (allSlots, dayOfWeek, taggedFixed, overflowSlot) => {
 };
 
 /**
+ * @description Read a day's slots as the user entered them, re-joining a slot that
+ * crosses midnight with the 00:00 piece it left on the next day.
+ *
+ * `applySlotToDay` stores an overnight slot as two rows — 22:30→00:00 on the day
+ * itself, 00:00→06:30 on the next one — because a row belongs to exactly one day.
+ * That split is invisible to the regulation loop, which reads yesterday's slots
+ * too, but any operation working on "this day" sees only half of it. Copying a
+ * day from its rows alone therefore drops the morning half and, when the next day
+ * is itself a copy target, overwrites it.
+ *
+ * The pairing cannot use the `overflow-` key prefix: keys are render-only handles,
+ * stripped on save and regenerated on load, so a reopened schedule has none. It is
+ * recovered from the geometry instead — a slot ending at midnight, and a slot
+ * starting at midnight on the next day with the same preset.
+ * @param {Array} allSlots - All slots across all days.
+ * @param {number} dayOfWeek - The day to read (0=Monday … 6=Sunday).
+ * @returns {Array} The day's slots, overnight ones carrying an `end_time` past 1440.
+ * @example
+ * // 22:30→00:00 on day 0 plus 00:00→06:30 on day 1 reads back as one 22:30→06:30 slot
+ * readDayAsEntered(slots, 0);
+ */
+const readDayAsEntered = (allSlots, dayOfWeek) => {
+  const nextDay = (dayOfWeek + 1) % 7;
+  const daySlots = allSlots.filter((s) => s.day_of_week === dayOfWeek);
+  const nextDaySlots = allSlots.filter((s) => s.day_of_week === nextDay);
+  return daySlots.map((slot) => {
+    const endsAtMidnight = timeToMinutes(slot.end_time) === 0;
+    if (!endsAtMidnight) {
+      return slot;
+    }
+    // A slot ending at midnight only overflows when the next day opens at
+    // midnight on the same preset. Anything else is a plain evening slot.
+    const overflow = nextDaySlots.find(
+      (s) => timeToMinutes(s.start_time) === 0 && s.preset === slot.preset && timeToMinutes(s.end_time) !== 0,
+    );
+    if (!overflow) {
+      return slot;
+    }
+    return { ...slot, end_time: overflow.end_time, overnight: true };
+  });
+};
+
+/**
+ * @description Copy one day's slots onto other days, preserving overnight slots.
+ * Each target is rebuilt from the source read as entered, so a night crossing
+ * midnight lands on the target as the same pair of rows the editor would have
+ * produced there: the evening piece on the target, the morning piece on the day
+ * after it.
+ *
+ * Targets are applied one after another through `applySlotToDay`/`mergeIntoSlots`
+ * rather than assigned wholesale, so that when consecutive days are copied the
+ * overflow written onto a day is trimmed by that day's own slots instead of
+ * silently surviving or clobbering them.
+ * @param {Array} allSlots - All slots across all days.
+ * @param {number} sourceDay - Day to copy from.
+ * @param {Array<number>} targetDays - Days to copy onto.
+ * @param {Function} makeKey - Returns a fresh unique key for a created slot.
+ * @returns {Array} The updated slots array.
+ * @example
+ * copyDayOntoDays(slots, 0, [1, 2, 3], () => Math.random());
+ */
+const copyDayOntoDays = (allSlots, sourceDay, targetDays, makeKey) => {
+  const sourceSlots = readDayAsEntered(allSlots, sourceDay)
+    .slice()
+    .sort((a, b) => {
+      return timeToMinutes(a.start_time) - timeToMinutes(b.start_time);
+    });
+  // The source is read once, up front: applying a target may rewrite the source
+  // day itself (copying Monday onto Sunday overflows back onto Monday).
+  //
+  // Every target is cleared before any is filled. Clearing them one at a time
+  // would wipe the overflow the previous target just wrote onto this one, which
+  // is the very bug this function exists to fix.
+  let result = allSlots.filter((s) => !targetDays.includes(s.day_of_week));
+  // Clearing the targets also dropped the overflow the source itself spills onto
+  // the day after it, when that day is a target. The source keeps its own rows,
+  // so replaying it onto itself is what puts that piece back.
+  const daysToFill = targetDays.includes((sourceDay + 1) % 7) ? [...targetDays, sourceDay] : targetDays;
+  daysToFill.forEach((targetDay) => {
+    sourceSlots.forEach((slot) => {
+      const start = timeToMinutes(slot.start_time);
+      const rawEnd = timeToMinutes(slot.end_time) || DAY_MINUTES;
+      // An overnight slot was re-joined above: its end belongs to the next day.
+      const end = slot.overnight ? rawEnd + DAY_MINUTES : rawEnd;
+      const existing = result.filter((s) => s.day_of_week === targetDay);
+      const { fixedSlots, overflowSlot } = applySlotToDay(
+        existing,
+        targetDay,
+        start,
+        end,
+        slot.preset,
+        makeKey(),
+        null,
+      );
+      const taggedFixed = fixedSlots.map((s) => ({ ...s, day_of_week: targetDay }));
+      result = mergeIntoSlots(result, targetDay, taggedFixed, overflowSlot);
+    });
+  });
+  return result;
+};
+
+/**
  * @description Parse an end time string, treating 00:00 as end of day (1440 minutes).
  * @param {string} timeStr - Time string in HH:MM format.
  * @returns {number} Minutes since midnight, 1440 if 00:00.
@@ -271,6 +373,8 @@ const findMatchingPreset = (todaySlots, yesterdaySlots, currentMinutes) => {
 module.exports = {
   applySlotToDay,
   mergeIntoSlots,
+  readDayAsEntered,
+  copyDayOntoDays,
   timeToMinutes,
   minutesToTime,
   parseEnd,
