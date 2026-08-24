@@ -161,11 +161,12 @@ class Dashboard extends Component {
 
   init = async () => {
     await this.getDashboards();
+    // fire and forget, concurrent with the current dashboard's own fetch:
+    // the cache warms behind the visible dashboard, not after it
+    this.prefetchDashboardConfigs();
     if (this.state.currentDashboardSelector) {
       await this.getCurrentDashboard();
     }
-    // fire and forget: the cache warms behind the visible dashboard
-    this.prefetchDashboardConfigs();
     await this.getDuckDbMigrationJob();
   };
 

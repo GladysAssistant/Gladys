@@ -287,6 +287,9 @@ class DashboardSwiper extends Component {
   commitSwipe = (direction, targetSelector) => {
     const rect = this.element.getBoundingClientRect();
     this.pendingSwap = {
+      // where to route back to if the swap gives up — the URL was already
+      // switched to the target at commit time
+      source: this.props.currentDashboard.selector,
       target: targetSelector,
       animationDone: false,
       dataReady: false,
@@ -309,7 +312,11 @@ class DashboardSwiper extends Component {
         this.maybeCompleteSwap();
       }
     }, COMMIT_MS + 20);
-    this.swapGiveUpTimeout = setTimeout(this.abortPendingSwap, SWAP_GIVE_UP_MS);
+    // the give-up path restores the source ROUTE too: the URL switched at
+    // commit, so springing back visually without it would leave the source
+    // dashboard displayed at the target's URL (and a late target response
+    // would then flip the page long after the gesture)
+    this.swapGiveUpTimeout = setTimeout(() => this.abortPendingSwap(true), SWAP_GIVE_UP_MS);
     route(`/dashboard/${targetSelector}`);
   };
 
@@ -334,12 +341,16 @@ class DashboardSwiper extends Component {
     this.scheduleUnclip(50);
   };
 
-  // The swap fell through — the fetch never landed, or the user routed
-  // somewhere else mid-hold: spring back to whatever the current slot shows
-  abortPendingSwap = () => {
+  // The swap fell through. Two flavors: the give-up timeout (fetch never
+  // landed — restoreSource re-routes to the source so the URL matches the
+  // page that springs back, and the stale-response guard then ignores a
+  // late target payload), or the user routed somewhere else mid-hold (the
+  // new route must be left alone: no re-route, just the visual snap back).
+  abortPendingSwap = restoreSource => {
     if (!this.pendingSwap) {
       return;
     }
+    const { source } = this.pendingSwap;
     this.pendingSwap = null;
     clearTimeout(this.swapAnimationTimeout);
     clearTimeout(this.swapGiveUpTimeout);
@@ -352,6 +363,9 @@ class DashboardSwiper extends Component {
     }
     this.scheduleUnclip(SNAP_MS + 50);
     this.scheduleNeighborTeardown(SNAP_MS + 50);
+    if (restoreSource && source) {
+      route(`/dashboard/${source}`);
+    }
   };
 
   componentDidUpdate(previousProps) {
