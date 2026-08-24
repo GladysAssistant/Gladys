@@ -93,8 +93,8 @@ const DashboardSkeleton = ({ dashboard }) => {
             class={cx('d-flex flex-column', style.dashboardColumn, style.removePadding)}
             style="--column-width: 100.0000%"
           >
-            {GENERIC_BOXES.map(box => (
-              <SkeletonBox box={box} />
+            {GENERIC_BOXES.map((box, index) => (
+              <SkeletonBox key={`generic-${index}-${box.type}`} box={box} />
             ))}
           </div>
         </div>
@@ -106,21 +106,29 @@ const DashboardSkeleton = ({ dashboard }) => {
   // filled columns only
   return (
     <div>
-      {dashboard.boxes.map(section => {
+      {dashboard.boxes.map((section, sectionIndex) => {
         const widths = getSectionWidths(section);
         const filledColumns = section.columns
           .map((column, columnIndex) => ({ column, columnIndex }))
           .filter(({ column }) => column.length > 0);
         const totalWeight = filledColumns.reduce((sum, { columnIndex }) => sum + widths[columnIndex], 0);
         return (
-          <div class={cx('d-flex flex-row flex-wrap justify-content-center align-items-stretch', style.sectionRow)}>
+          <div
+            key={`section-${sectionIndex}`}
+            class={cx('d-flex flex-row flex-wrap justify-content-center align-items-stretch', style.sectionRow)}
+          >
             {filledColumns.map(({ column, columnIndex }) => (
               <div
+                key={`column-${columnIndex}`}
                 class={cx('d-flex flex-column', style.dashboardColumn, style.removePadding)}
                 style={`--column-width: ${((widths[columnIndex] / totalWeight) * 100).toFixed(4)}%`}
               >
-                {column.map(box => (
-                  <SkeletonBox box={box} />
+                {/* the type is part of the key: a prefetch landing
+                    mid-gesture may reshape this tree (generic → real
+                    config), and a reused instance must not keep the old
+                    type's silhouette */}
+                {column.map((box, y) => (
+                  <SkeletonBox key={`box-${y}-${box.type}`} box={box} />
                 ))}
               </div>
             ))}

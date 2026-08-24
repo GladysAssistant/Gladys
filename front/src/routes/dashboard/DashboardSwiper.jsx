@@ -350,7 +350,7 @@ class DashboardSwiper extends Component {
     if (!this.pendingSwap) {
       return;
     }
-    const { source } = this.pendingSwap;
+    const { source, target } = this.pendingSwap;
     this.pendingSwap = null;
     clearTimeout(this.swapAnimationTimeout);
     clearTimeout(this.swapGiveUpTimeout);
@@ -363,12 +363,30 @@ class DashboardSwiper extends Component {
     }
     this.scheduleUnclip(SNAP_MS + 50);
     this.scheduleNeighborTeardown(SNAP_MS + 50);
-    if (restoreSource && source) {
+    // only reclaim the URL while it is still the abandoned target's — if
+    // the user navigated elsewhere in the meantime, their route wins
+    if (restoreSource && source && this.props.currentDashboardSelector === target) {
       route(`/dashboard/${source}`);
     }
   };
 
   componentDidUpdate(previousProps) {
+    // The HOLD is driven by the ROUTE, not by the rendered dashboard: the
+    // URL flips at commit, long before the target's data can land on a cold
+    // cache. A navigation elsewhere mid-hold (dock tap…) changes only the
+    // selector until ITS data arrives — waiting for currentDashboard would
+    // leave the hold blind to it, and the give-up could then re-route back
+    // to the swipe source, clobbering the user's navigation. Only a CHANGE
+    // of selector counts: right after commit the parent re-renders (URL
+    // store update) before its own selector state catches up, and that
+    // stale pre-navigation value must not read as "routed elsewhere".
+    if (
+      this.pendingSwap &&
+      previousProps.currentDashboardSelector !== this.props.currentDashboardSelector &&
+      this.props.currentDashboardSelector !== this.pendingSwap.target
+    ) {
+      this.abortPendingSwap();
+    }
     const previousSelector = previousProps.currentDashboard && previousProps.currentDashboard.selector;
     const currentSelector = this.props.currentDashboard && this.props.currentDashboard.selector;
     if (!previousSelector || !currentSelector || previousSelector === currentSelector) {
@@ -378,9 +396,6 @@ class DashboardSwiper extends Component {
       if (currentSelector === this.pendingSwap.target) {
         this.pendingSwap.dataReady = true;
         this.maybeCompleteSwap();
-      } else {
-        // routed elsewhere while the skeleton was holding (dock tap…)
-        this.abortPendingSwap();
       }
       return;
     }

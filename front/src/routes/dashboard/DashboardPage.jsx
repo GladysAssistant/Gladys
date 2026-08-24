@@ -162,6 +162,7 @@ const DashboardPage = ({ children, ...props }) => {
                   dashboards={props.dashboards}
                   dashboardConfigsBySelector={props.dashboardConfigsBySelector}
                   currentDashboard={props.currentDashboard}
+                  currentDashboardSelector={props.currentDashboardSelector}
                   tabletMode={props.tabletMode}
                 >
                   {props.dashboardNotConfigured && (

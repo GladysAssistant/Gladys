@@ -302,8 +302,15 @@ class Dashboard extends Component {
     try {
       const currentDashboard = await this.props.httpClient.get(`/api/v1/dashboard/${selector}`);
       this.storeDashboardConfig(currentDashboard);
-      // ignore a stale response if the user switched again in the meantime
-      if (this.state.currentDashboardSelector === selector) {
+      // ignore a stale response if the user switched again in the meantime —
+      // and an IDENTICAL config: widgets watch their box props by reference
+      // (device_features arrays…), so swapping in an equal-but-fresh object
+      // would make every widget refetch and flash its loader a second time
+      // right after the instant cached render
+      if (
+        this.state.currentDashboardSelector === selector &&
+        JSON.stringify(this.state.currentDashboard) !== JSON.stringify(currentDashboard)
+      ) {
         this.setState({ currentDashboard });
       }
     } catch (e) {
@@ -340,6 +347,7 @@ class Dashboard extends Component {
       dashboards,
       dashboardConfigsBySelector,
       currentDashboard,
+      currentDashboardSelector,
       dashboardEditMode,
       gatewayInstanceNotFound,
       loading,
@@ -366,6 +374,7 @@ class Dashboard extends Component {
         dashboardConfigsBySelector={dashboardConfigsBySelector}
         dashboardListEmpty={dashboardListEmpty}
         currentDashboard={currentDashboard}
+        currentDashboardSelector={currentDashboardSelector}
         gatewayInstanceNotFound={gatewayInstanceNotFound}
         loading={loading}
         dashboardNotConfigured={dashboardNotConfigured}
