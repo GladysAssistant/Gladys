@@ -16,7 +16,7 @@ const VARIABLE_SUFFIXES = RUNTIME_SUFFIXES;
  * await thermostatHandler.postDelete(device);
  */
 async function postDelete(device) {
-  this.invalidateWindowCache();
+  this.invalidateDeviceCaches();
   const features = (device && device.features) || [];
   await Promise.all(
     features.map(async (feature) => {

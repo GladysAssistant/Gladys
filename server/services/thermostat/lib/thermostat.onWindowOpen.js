@@ -3,15 +3,17 @@ const { getThermostatFeature } = require('./thermostat.applySchedules');
 const { buildParamsConfig, getFeatureBySelector } = require('./thermostat.deviceConfig');
 
 /**
- * @description Invalidate the cached window-sensor selectors. Called whenever a
- * thermostat device is created, updated or deleted, so the next event rebuilds
- * the map.
+ * @description Invalidate the caches derived from this service's devices: the
+ * window-sensor selectors and the runtime feature keys. Called whenever a
+ * thermostat device is created, updated or deleted — the only moments where the
+ * set of owned features can change — so the next read rebuilds them.
  * @returns {undefined}
  * @example
- * thermostatHandler.invalidateWindowCache();
+ * thermostatHandler.invalidateDeviceCaches();
  */
-function invalidateWindowCache() {
+function invalidateDeviceCaches() {
   this.windowSelectorsCache = null;
+  this.featureKeysCache = null;
 }
 
 /**
@@ -26,7 +28,7 @@ function invalidateWindowCache() {
  * thermostatHandler.postUpdate();
  */
 function postUpdate() {
-  this.invalidateWindowCache();
+  this.invalidateDeviceCaches();
 }
 
 /**
@@ -124,4 +126,4 @@ async function onDeviceNewState(event) {
   }
 }
 
-module.exports = { onDeviceNewState, getWindowSelectors, invalidateWindowCache, postUpdate };
+module.exports = { onDeviceNewState, getWindowSelectors, invalidateDeviceCaches, postUpdate };

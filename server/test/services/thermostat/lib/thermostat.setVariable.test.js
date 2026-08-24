@@ -19,7 +19,14 @@ const load = () =>
 // given a thermostat owning it: a key whose middle segment names no feature of
 // this service is refused.
 const buildHandler = (devices = [{ features: [{ selector: 'living-room' }] }]) => {
-  const { setVariable, getVariable, resolveRuntimeVariableKey, broadcastConfigUpdated, triggerApplySchedules } = load();
+  const {
+    setVariable,
+    getVariable,
+    getFeatureKeys,
+    resolveRuntimeVariableKey,
+    broadcastConfigUpdated,
+    triggerApplySchedules,
+  } = load();
   const handler = {
     gladys: {
       variable: { setValue: fake.resolves({ value: 'saved' }), getValue: fake.resolves('comfort') },
@@ -28,8 +35,10 @@ const buildHandler = (devices = [{ features: [{ selector: 'living-room' }] }]) =
     },
     serviceId: 'service-id',
     applySchedules: fake.resolves(null),
+    featureKeysCache: null,
     setVariable,
     getVariable,
+    getFeatureKeys,
     resolveRuntimeVariableKey,
     broadcastConfigUpdated,
     triggerApplySchedules,
@@ -159,6 +168,62 @@ describe('thermostat.setVariable', () => {
 
     assert.notCalled(handler.gladys.event.emit);
     assert.calledOnce(handler.gladys.variable.setValue);
+  });
+});
+
+describe('thermostat.getFeatureKeys cache', () => {
+  it('should query the devices once across several ownership checks', async () => {
+    // A widget fires four or five getVariable/setVariable calls on mount; each
+    // one used to be a device query.
+    const handler = buildHandler();
+
+    await handler.getVariable('THERMOSTAT_LIVING_ROOM_PRESET');
+    await handler.getVariable('THERMOSTAT_LIVING_ROOM_MANUAL_MODE');
+    await handler.getVariable('THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL');
+    await handler.setVariable('THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT', '{"setpoint":21}');
+
+    expect(handler.gladys.device.get.callCount).to.equal(1);
+  });
+
+  it('should rebuild the cache once it has been invalidated', async () => {
+    const handler = buildHandler();
+
+    await handler.getVariable('THERMOSTAT_LIVING_ROOM_PRESET');
+    expect(handler.gladys.device.get.callCount).to.equal(1);
+
+    handler.featureKeysCache = null;
+
+    await handler.getVariable('THERMOSTAT_LIVING_ROOM_PRESET');
+    expect(handler.gladys.device.get.callCount).to.equal(2);
+  });
+
+  it('should cache a refusal too, without re-querying', async () => {
+    const handler = buildHandler([{ features: [{ selector: 'kitchen' }] }]);
+
+    expect(await handler.getVariable('THERMOSTAT_LIVING_ROOM_PRESET')).to.equal(null);
+    expect(await handler.getVariable('THERMOSTAT_LIVING_ROOM_PRESET')).to.equal(null);
+
+    expect(handler.gladys.device.get.callCount).to.equal(1);
+  });
+
+  it('should not query the devices at all for a key outside the namespace', async () => {
+    // The shape check comes first, so a key that can never be owned costs nothing.
+    const handler = buildHandler();
+
+    expect(await handler.getVariable('SOME_OTHER_VARIABLE')).to.equal(null);
+
+    assert.notCalled(handler.gladys.device.get);
+  });
+
+  it('should collect the keys of every feature of every thermostat', async () => {
+    const handler = buildHandler([
+      { features: [{ selector: 'living-room' }, { selector: 'living-room-humidity' }] },
+      { features: [{ selector: 'kitchen' }] },
+    ]);
+
+    const keys = await handler.getFeatureKeys();
+
+    expect([...keys].sort()).to.deep.equal(['KITCHEN', 'LIVING_ROOM', 'LIVING_ROOM_HUMIDITY']);
   });
 });
 

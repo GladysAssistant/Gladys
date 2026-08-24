@@ -63,9 +63,9 @@ async function createDevice(device) {
     params,
     service_id: this.serviceId,
   });
-  // The window sensor may have changed: drop the cached selectors so the next
-  // NEW_STATE event rebuilds them.
-  this.invalidateWindowCache();
+  // The window sensor and the feature set may have changed: drop the caches
+  // derived from them so the next read rebuilds them.
+  this.invalidateDeviceCaches();
   return createdDevice;
 }
 

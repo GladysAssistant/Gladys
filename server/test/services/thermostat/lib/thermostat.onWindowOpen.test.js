@@ -328,13 +328,21 @@ describe('thermostat.onDeviceNewState - window selector cache', () => {
   it('should rebuild the cache once it has been invalidated', async () => {
     const mod = loadModule();
     const { gladys } = buildGladys();
-    const handler = { gladys, windowSelectorsCache: null, invalidateWindowCache: mod.invalidateWindowCache };
+    const handler = {
+      gladys,
+      windowSelectorsCache: null,
+      featureKeysCache: new Set(['LIVING_ROOM']),
+      invalidateDeviceCaches: mod.invalidateDeviceCaches,
+    };
 
     await mod.onDeviceNewState.call(handler, { device_feature: 'some-other-sensor', last_value: 0 });
     expect(gladys.device.get.callCount).to.equal(1);
 
-    handler.invalidateWindowCache();
+    handler.invalidateDeviceCaches();
     expect(handler.windowSelectorsCache).to.equal(null);
+    // The same invalidation covers the runtime feature keys: both are derived
+    // from this service's devices and go stale at the same moments.
+    expect(handler.featureKeysCache).to.equal(null);
 
     await mod.onDeviceNewState.call(handler, { device_feature: 'some-other-sensor', last_value: 0 });
     expect(gladys.device.get.callCount).to.equal(2);
@@ -349,7 +357,7 @@ describe('thermostat.onDeviceNewState - window selector cache', () => {
     const handler = {
       gladys,
       windowSelectorsCache: null,
-      invalidateWindowCache: mod.invalidateWindowCache,
+      invalidateDeviceCaches: mod.invalidateDeviceCaches,
       postUpdate: mod.postUpdate,
     };
 
