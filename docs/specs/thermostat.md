@@ -29,7 +29,7 @@ Everything the control loop needs is a `THERMOSTAT_*` device param:
 | `THERMOSTAT_TEMPERATURE_FEATURE` | the sensor the loop regulates on |
 | `THERMOSTAT_HUMIDITY_FEATURE` | optional, displayed only |
 | `THERMOSTAT_SWITCH_FEATURE` | the actuator the loop drives |
-| `THERMOSTAT_WINDOW_FEATURE` | optional opening sensor, cuts the heating when open |
+| `THERMOSTAT_WINDOW_FEATURE` | optional opening sensor, cuts the switch when open — whatever the mode, so a running air conditioner is suspended like a heater |
 | `THERMOSTAT_ACTIVE_SCHEDULE` | selector of the weekly schedule to follow, empty for none |
 | `THERMOSTAT_MODE` | `heating` or `cooling` |
 | `THERMOSTAT_CONTROL_TYPE` | `hysteresis` or `tpi` |

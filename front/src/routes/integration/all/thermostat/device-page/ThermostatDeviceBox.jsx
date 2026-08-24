@@ -16,8 +16,18 @@ class ThermostatDeviceBox extends Component {
     this.setState({ saving: false });
   };
 
+  askDelete = () => this.setState({ confirmDelete: true });
+
+  cancelDelete = () => this.setState({ confirmDelete: false });
+
   deleteDevice = async () => {
-    this.setState({ deleting: true, tooMuchStatesError: false, statesNumber: undefined, deleteError: false });
+    this.setState({
+      deleting: true,
+      confirmDelete: false,
+      tooMuchStatesError: false,
+      statesNumber: undefined,
+      deleteError: false
+    });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
@@ -45,9 +55,22 @@ class ThermostatDeviceBox extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'active_schedule', e.target.value);
   };
 
-  render(props, { saving, deleting, saveError, deleteError, tooMuchStatesError, statesNumber }) {
+  render(props, { saving, deleting, saveError, deleteError, tooMuchStatesError, statesNumber, confirmDelete }) {
     const { device } = props;
     const loading = saving || deleting;
+    // Both are read-only here: the card summarises what the thermostat is set to,
+    // while changing either stays in the edit page.
+    const activeSchedule = (props.thermostatSchedules || []).find(s => s.selector === device.active_schedule);
+    const scheduleName = activeSchedule ? activeSchedule.name : null;
+    const setpointFeature = (device.features || []).find(
+      f => f.category === 'thermostat' && f.type === 'target-temperature'
+    );
+    const setpoint =
+      setpointFeature && setpointFeature.last_value !== null && setpointFeature.last_value !== undefined
+        ? setpointFeature.last_value
+        : null;
+    const unitParam = (device.params || []).find(p => p.name === 'THERMOSTAT_TEMP_UNIT');
+    const tempUnitValue = unitParam && unitParam.value ? unitParam.value : 'C';
 
     return (
       <div class="col-md-6">
@@ -101,26 +124,68 @@ class ThermostatDeviceBox extends Component {
                   </select>
                 </div>
 
-                <div class={style.buttonGroup}>
-                  <button
-                    onClick={this.saveDevice}
-                    class={cx('btn', 'btn-success', 'flex-fill', { 'btn-loading': saving })}
-                  >
-                    <Text id="integration.thermostat.device.saveButton" />
-                  </button>
-                  <button
-                    onClick={this.deleteDevice}
-                    class={cx('btn', 'btn-danger', 'flex-fill', { 'btn-loading': deleting })}
-                  >
-                    <Text id="integration.thermostat.device.deleteButton" />
-                  </button>
-                  <Link
-                    href={`/dashboard/integration/device/thermostat/edit/${device.selector}`}
-                    class="btn btn-primary flex-fill"
-                  >
-                    <Text id="integration.thermostat.device.editButton" />
-                  </Link>
+                <div class={style.summaryRow}>
+                  <div class={style.summaryItem}>
+                    <span class={style.summaryLabel}>
+                      <Text id="integration.thermostat.device.activeScheduleLabel" />
+                    </span>
+                    <span class={style.summaryValue}>
+                      {scheduleName || <Text id="integration.thermostat.device.noSchedule" />}
+                    </span>
+                  </div>
+                  <div class={style.summaryItem}>
+                    <span class={style.summaryLabel}>
+                      <Text id="integration.thermostat.device.setpointLabel" />
+                    </span>
+                    <span class={style.summaryValue}>
+                      {setpoint === null ? (
+                        <Text id="integration.thermostat.device.noSetpoint" />
+                      ) : (
+                        `${setpoint} °${tempUnitValue}`
+                      )}
+                    </span>
+                  </div>
                 </div>
+
+                {confirmDelete ? (
+                  // The confirmation takes over the whole row: keeping Save and
+                  // Edit alongside it would put four buttons in a col-md-6 card,
+                  // where flex-fill shrinks them until the labels are cut off.
+                  <div class={style.confirmDeleteRow}>
+                    <span class={style.confirmDeleteText}>
+                      <Text id="integration.thermostat.device.confirmDelete" />
+                    </span>
+                    <div class={style.buttonGroup}>
+                      <button
+                        onClick={this.deleteDevice}
+                        class={cx('btn', 'btn-danger', 'flex-fill', { 'btn-loading': deleting })}
+                      >
+                        <Text id="integration.thermostat.device.confirmYes" />
+                      </button>
+                      <button onClick={this.cancelDelete} class="btn btn-secondary flex-fill">
+                        <Text id="integration.thermostat.device.confirmNo" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div class={style.buttonGroup}>
+                    <button
+                      onClick={this.saveDevice}
+                      class={cx('btn', 'btn-success', 'flex-fill', { 'btn-loading': saving })}
+                    >
+                      <Text id="integration.thermostat.device.saveButton" />
+                    </button>
+                    <button onClick={this.askDelete} class="btn btn-danger flex-fill">
+                      <Text id="integration.thermostat.device.deleteButton" />
+                    </button>
+                    <Link
+                      href={`/dashboard/integration/device/thermostat/edit/${device.selector}`}
+                      class="btn btn-primary flex-fill"
+                    >
+                      <Text id="integration.thermostat.device.editButton" />
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>
