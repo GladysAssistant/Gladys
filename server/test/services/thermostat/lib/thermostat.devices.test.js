@@ -62,7 +62,7 @@ describe('thermostat.createDevice', () => {
   const buildHandler = () => ({
     gladys: { device: { create: fake((device) => Promise.resolve(device)) } },
     serviceId: 'service-id',
-    invalidateWindowCache: fake.returns(null),
+    invalidateDeviceCaches: fake.returns(null),
     createDevice,
   });
 
@@ -174,7 +174,7 @@ describe('thermostat.createDevice', () => {
 
     await handler.createDevice({ name: 'Salon', features: [setpointFeature] });
 
-    assert.calledOnce(handler.invalidateWindowCache);
+    assert.calledOnce(handler.invalidateDeviceCaches);
   });
 });
 
@@ -182,7 +182,7 @@ describe('thermostat.postDelete', () => {
   const buildHandler = (destroy) => ({
     gladys: { variable: { destroy } },
     serviceId: 'service-id',
-    invalidateWindowCache: fake.returns(null),
+    invalidateDeviceCaches: fake.returns(null),
     postDelete,
   });
 
@@ -243,7 +243,7 @@ describe('thermostat.createDevice - defensive paths', () => {
     const handler = {
       gladys: { device: { create: fake.resolves(null) } },
       serviceId: 'service-id',
-      invalidateWindowCache: fake.returns(null),
+      invalidateDeviceCaches: fake.returns(null),
       createDevice,
     };
 

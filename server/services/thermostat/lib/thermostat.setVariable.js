@@ -36,6 +36,31 @@ function featureKeyFromSelector(selector) {
 }
 
 /**
+ * @description The runtime feature keys owned by this service, as the middle
+ * segment of their variable keys. Every getVariable/setVariable call has to
+ * check ownership, and a widget fires four or five of them on mount: without
+ * this cache each one is a device query. Dropped by `invalidateDeviceCaches`
+ * whenever a thermostat is created, updated or deleted.
+ * @returns {Promise<Set<string>>} Owned feature keys.
+ * @example
+ * const keys = await thermostatHandler.getFeatureKeys();
+ */
+async function getFeatureKeys() {
+  if (this.featureKeysCache) {
+    return this.featureKeysCache;
+  }
+  const devices = await this.gladys.device.get({ service: 'thermostat' });
+  const featureKeys = new Set();
+  (devices || []).forEach((device) => {
+    (device.features || []).forEach((feature) => {
+      featureKeys.add(featureKeyFromSelector(feature.selector));
+    });
+  });
+  this.featureKeysCache = featureKeys;
+  return featureKeys;
+}
+
+/**
  * @description Check that a runtime key names a feature owned by this service.
  * The prefix and suffix alone are not enough: THERMOSTAT_ANYTHING_PRESET would
  * pass, create a row for a feature that does not exist, and stay there forever —
@@ -54,10 +79,8 @@ async function resolveRuntimeVariableKey(variableKey) {
   if (featureKey.length === 0) {
     return false;
   }
-  const devices = await this.gladys.device.get({ service: 'thermostat' });
-  return (devices || []).some((device) =>
-    (device.features || []).some((feature) => featureKeyFromSelector(feature.selector) === featureKey),
-  );
+  const featureKeys = await getFeatureKeys.call(this);
+  return featureKeys.has(featureKey);
 }
 
 /**
@@ -154,6 +177,7 @@ function triggerApplySchedules() {
 module.exports = {
   setVariable,
   getVariable,
+  getFeatureKeys,
   resolveRuntimeVariableKey,
   broadcastConfigUpdated,
   triggerApplySchedules,

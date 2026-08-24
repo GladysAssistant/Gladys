@@ -9,7 +9,7 @@ const { applySchedules } = require('./thermostat.applySchedules');
 const {
   onDeviceNewState,
   getWindowSelectors,
-  invalidateWindowCache,
+  invalidateDeviceCaches,
   postUpdate,
 } = require('./thermostat.onWindowOpen');
 const { setValue } = require('./thermostat.setValue');
@@ -17,6 +17,7 @@ const { postDelete } = require('./thermostat.postDelete');
 const {
   setVariable,
   getVariable,
+  getFeatureKeys,
   resolveRuntimeVariableKey,
   broadcastConfigUpdated,
   triggerApplySchedules,
@@ -26,9 +27,10 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.applyTimer = null;
-  // Window-sensor selectors, rebuilt lazily and dropped whenever a thermostat
-  // device is created or deleted.
+  // Derived from this service's devices, rebuilt lazily and dropped whenever a
+  // thermostat device is created, updated or deleted.
   this.windowSelectorsCache = null;
+  this.featureKeysCache = null;
 };
 
 ThermostatHandler.prototype.createDevice = createDevice;
@@ -41,12 +43,13 @@ ThermostatHandler.prototype.detachSchedule = detachSchedule;
 ThermostatHandler.prototype.applySchedules = applySchedules;
 ThermostatHandler.prototype.onDeviceNewState = onDeviceNewState;
 ThermostatHandler.prototype.getWindowSelectors = getWindowSelectors;
-ThermostatHandler.prototype.invalidateWindowCache = invalidateWindowCache;
+ThermostatHandler.prototype.invalidateDeviceCaches = invalidateDeviceCaches;
 ThermostatHandler.prototype.postUpdate = postUpdate;
 ThermostatHandler.prototype.setValue = setValue;
 ThermostatHandler.prototype.postDelete = postDelete;
 ThermostatHandler.prototype.setVariable = setVariable;
 ThermostatHandler.prototype.getVariable = getVariable;
+ThermostatHandler.prototype.getFeatureKeys = getFeatureKeys;
 ThermostatHandler.prototype.resolveRuntimeVariableKey = resolveRuntimeVariableKey;
 ThermostatHandler.prototype.broadcastConfigUpdated = broadcastConfigUpdated;
 ThermostatHandler.prototype.triggerApplySchedules = triggerApplySchedules;
