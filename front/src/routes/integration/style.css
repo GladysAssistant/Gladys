@@ -235,3 +235,90 @@
   text-align: left;
   text-decoration: none;
 }
+
+/* ------------------------------------------------------------------
+   Horizon glass theme — catalog-specific variants (module classes of
+   this file). The .glass-theme gate, the scene and the shared page
+   furniture live in components/layout (horizonIntegrations.css); the
+   tokens (--gl-*) come from routes/dashboard/style.css.
+   ------------------------------------------------------------------ */
+
+/* Mobile category chips become the frosted pill family of the tab bar */
+:global(.glass-theme) .mobileCategoryChip {
+  color: var(--gl-muted);
+  background-color: var(--gl-card-bg);
+  border: 1px solid var(--gl-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-weight: 600;
+}
+
+:global(.glass-theme) .mobileCategoryChipActive {
+  color: #fff;
+  background-color: var(--gl-ink);
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+/* The mobile list of the catalog is not inside a card: it becomes one
+   glass surface of its own, rows separated by the quiet row border */
+:global(.glass-theme) .mobileList {
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-lg);
+  box-shadow: var(--gl-shadow);
+  padding: 0.25rem 0;
+}
+
+:global(.glass-theme) .mobileList :global(.list-group-item) {
+  background-color: transparent;
+  border-color: var(--gl-row-border);
+}
+
+:global(.glass-theme) .mobileList :global(.list-group-item:first-child) {
+  border-top: none;
+}
+
+:global(.glass-theme) .mobileList :global(.list-group-item:last-child) {
+  border-bottom: none;
+}
+
+/* dark-mode.css paints .list-group-item solid: same counter-weight as the
+   side menus so the glass surface shows through */
+:global(.dark-mode .glass-theme) .mobileList :global(.list-group-item) {
+  background-color: transparent !important;
+}
+
+:global(.glass-theme) .mobileResultCount {
+  color: var(--gl-muted);
+}
+
+/* Mobile sort/search fields: frosted pills like the desktop page options */
+:global(.glass-theme) .mobileSort,
+:global(.glass-theme) .mobileSearch :global(.form-control) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background-color: var(--gl-card-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--gl-ink);
+}
+
+/* Integration artwork rounds with the glass radii */
+:global(.glass-theme) .integrationListImg,
+:global(.glass-theme) .externalListImgPlaceholder {
+  border-radius: 12px;
+}
+
+:global(.glass-theme) .externalCoverPlaceholder {
+  border-top-left-radius: var(--gl-radius-lg);
+  border-top-right-radius: var(--gl-radius-lg);
+}
+
+/* The name of a catalog card is a link: it keeps the card's ink, the hover
+   underline stays as the affordance */
+:global(.glass-theme .card h4 a) {
+  color: inherit;
+}

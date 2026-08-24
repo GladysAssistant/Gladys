@@ -200,6 +200,23 @@ const WEATHER_IMAGE_CACHE_PREFIX = 'weather-image';
 // coerced to 'unknown' (the frontend renders a neutral icon).
 // 'night' is deprecated for providers: send the real condition plus
 // is_day: false instead (a rainy night stays 'rain').
+//
+// The conditions after 'unknown' are extensions: phenomena several providers
+// distinguish but the original enum flattened into a neighbour. They stay
+// GENERIC -- each is encoded separately by Meteo France, OpenWeather and the
+// NWS alike, never one provider's private code:
+//   - freezing-rain / freezing-fog: MF signs them with a dedicated pictogram
+//     ('p10' and 'p11' carry a black-ice road sign, 'p8' a "GIV." badge) and
+//     OpenWeather has codes 511 and 741; folding them into 'rain' and 'fog'
+//     dropped the very warning that makes them worth showing.
+//   - snow-thunderstorm: a thundery snow shower (MF 'p30'), which is neither
+//     plain 'snow' nor plain 'thunderstorm'.
+//   - sandstorm: MF 'p31', OpenWeather Dust/Sand/Ash -- a real forecast
+//     overseas, where the Saharan haze reaches the French West Indies.
+//   - tornado / hurricane: MF 'p32'-'p34' (waterspout, tornado, cyclone),
+//     OpenWeather Tornado and Squall. 'wind' said nothing of the danger.
+// A provider that cannot tell them apart keeps sending the broader condition:
+// the extension is additive, so every payload that worked before still does.
 const WEATHER_CONDITIONS = [
   'clear',
   'partly-cloudy',
@@ -215,6 +232,12 @@ const WEATHER_CONDITIONS = [
   'wind',
   'night',
   'unknown',
+  'freezing-rain',
+  'freezing-fog',
+  'snow-thunderstorm',
+  'sandstorm',
+  'tornado',
+  'hurricane',
 ];
 // CAP-style severities (Common Alerting Protocol) — generic, never one
 // provider's scale (Météo France vigilance: yellow -> moderate,

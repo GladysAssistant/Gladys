@@ -59,6 +59,21 @@ class ExternalIntegrationDevicePage extends Component {
     this.setState({ devices });
   };
 
+  updateFeatureProperty = (deviceIndex, featureIndex, property, value) => {
+    const devices = update(this.state.devices, {
+      [deviceIndex]: {
+        features: {
+          [featureIndex]: {
+            [property]: {
+              $set: value
+            }
+          }
+        }
+      }
+    });
+    this.setState({ devices });
+  };
+
   saveDevice = async index => {
     const device = this.state.devices[index];
     const savedDevice = await this.props.httpClient.post('/api/v1/device', device);
@@ -151,6 +166,7 @@ class ExternalIntegrationDevicePage extends Component {
           language={(props.user && props.user.language) || 'en'}
           getDevices={this.getDevices}
           updateDeviceField={this.updateDeviceField}
+          updateFeatureProperty={this.updateFeatureProperty}
           saveDevice={this.saveDevice}
           deleteDevice={this.deleteDevice}
         />

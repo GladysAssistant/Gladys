@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { forwardRef } from 'preact/compat';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
@@ -19,6 +20,7 @@ import {
 import fr from 'date-fns/locale/fr';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import datePickerStyle from '../../datePicker.css';
 
 const PERIODS = {
   YEAR: 'year',
@@ -43,6 +45,14 @@ const PERIOD_LABELS = {
 };
 
 const SUBSCRIPTION_COLOR = '#b8c2cc';
+
+// The period field is only ever a button opening the calendar: a readonly
+// input keeps the mobile on-screen keyboard from popping over the picker.
+// It can't be `readOnly` on the customInput element itself — the DatePicker
+// clones it and passes its own (undefined) readOnly along, wiping the
+// attribute — nor the DatePicker readOnly PROP, which would keep the
+// calendar from opening. So this wrapper re-applies it after the merge.
+const ReadOnlyInput = forwardRef((props, ref) => <input {...props} ref={ref} readOnly />);
 
 const findDeviceFeatureBySelector = (devices, selector) => {
   if (!devices || !selector) {
@@ -467,25 +477,18 @@ class EnergyConsumption extends Component {
           </div>
         )}
         <div class="card-body">
-          {/* Period Selection Buttons */}
-          <div class="row mb-3">
-            <div class="col-12">
-              <div class="d-flex justify-content-between">
-                {Object.values(PERIODS).map(period => (
-                  <button
-                    key={period}
-                    type="button"
-                    class={cx('btn flex-fill mx-1', {
-                      'btn-primary': selectedPeriod === period,
-                      'btn-outline-primary': selectedPeriod !== period
-                    })}
-                    onClick={() => this.changePeriod(period)}
-                  >
-                    <Text id={PERIOD_LABELS[period]} />
-                  </button>
-                ))}
-              </div>
-            </div>
+          {/* Period Selection: an iOS-like segmented control */}
+          <div class="btn-group hz-segmented d-flex mb-3" role="group">
+            {Object.values(PERIODS).map(period => (
+              <button
+                key={period}
+                type="button"
+                class={cx('btn flex-fill', { active: selectedPeriod === period })}
+                onClick={() => this.changePeriod(period)}
+              >
+                <Text id={PERIOD_LABELS[period]} />
+              </button>
+            ))}
           </div>
 
           {/* Navigation Controls */}
@@ -506,6 +509,9 @@ class EnergyConsumption extends Component {
                     showYearPicker={selectedPeriod === PERIODS.YEAR}
                     className="form-control text-center w-100"
                     wrapperClassName={'w-100'}
+                    popperClassName={datePickerStyle.datePickerPopper}
+                    portalId="dashboard-datepicker"
+                    customInput={<ReadOnlyInput type="text" />}
                   />
                 </div>
 
@@ -526,24 +532,18 @@ class EnergyConsumption extends Component {
           )}
 
           {/* Display Mode Toggle */}
-          <div class="row mb-3">
-            <div class="col-12 text-center">
+          <div class="text-center mb-3">
+            <div class="btn-group hz-segmented" role="group">
               <button
                 type="button"
-                class={cx('btn btn-sm mx-1', {
-                  'btn-outline-secondary': displayMode === DISPLAY_MODES.CURRENCY,
-                  'btn-secondary': displayMode !== DISPLAY_MODES.CURRENCY
-                })}
+                class={cx('btn btn-sm', { active: displayMode === DISPLAY_MODES.CURRENCY })}
                 onClick={() => this.changeDisplayMode(DISPLAY_MODES.CURRENCY)}
               >
                 <Text id="dashboard.boxes.energyConsumption.currency" />
               </button>
               <button
                 type="button"
-                class={cx('btn btn-sm mx-1', {
-                  'btn-outline-secondary': displayMode === DISPLAY_MODES.KWH,
-                  'btn-secondary': displayMode !== DISPLAY_MODES.KWH
-                })}
+                class={cx('btn btn-sm', { active: displayMode === DISPLAY_MODES.KWH })}
                 onClick={() => this.changeDisplayMode(DISPLAY_MODES.KWH)}
               >
                 <Text id="dashboard.boxes.energyConsumption.kwh" />
@@ -572,30 +572,20 @@ class EnergyConsumption extends Component {
 
                   {!error && !emptySeries && (
                     <>
-                      <div class="row mb-2">
-                        <div class="col-12">
-                          <div class="card border-0 mb-0">
-                            <div class="card-body text-center py-3">
-                              <div class="d-flex align-items-center justify-content-center">
-                                <div>
-                                  <h5 class="mb-1 text-muted small">
-                                    <Text
-                                      id={
-                                        displayMode === DISPLAY_MODES.CURRENCY
-                                          ? 'dashboard.boxes.energyConsumption.totalConsumptionCost'
-                                          : 'dashboard.boxes.energyConsumption.totalConsumptionKwh'
-                                      }
-                                    />
-                                  </h5>
-                                  <h3 class="mb-0 text-primary font-weight-bold">
-                                    {totalConsumption.toFixed(2)}{' '}
-                                    {displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : 'kWh'}
-                                  </h3>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                      <div class="text-center mb-2">
+                        <h5 class="mb-1 text-muted small">
+                          <Text
+                            id={
+                              displayMode === DISPLAY_MODES.CURRENCY
+                                ? 'dashboard.boxes.energyConsumption.totalConsumptionCost'
+                                : 'dashboard.boxes.energyConsumption.totalConsumptionKwh'
+                            }
+                          />
+                        </h5>
+                        <h3 class="mb-0 font-weight-bold">
+                          {totalConsumption.toFixed(2)}{' '}
+                          {displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : 'kWh'}
+                        </h3>
                       </div>
                       <ApexChartComponent
                         user={this.props.user}

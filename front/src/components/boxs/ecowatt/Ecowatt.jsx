@@ -1,7 +1,31 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
+import cx from 'classnames';
 import dayjs from 'dayjs';
+import style from './style.css';
+
+// The Ecowatt signal level IS the information: tinted tiles and color-dot
+// pills from the same family as the EDF Tempo widget
+const LEVEL_STYLE_KEYS = {
+  1: 'levelOk',
+  2: 'levelWarning',
+  3: 'levelCritical'
+};
+
+const LEVEL_LABEL_KEYS = {
+  1: 'ok',
+  2: 'warning',
+  3: 'critical'
+};
+
+const DayLevel = ({ level }) =>
+  LEVEL_STYLE_KEYS[level] ? (
+    <span class={cx(style.dayBadge, style[LEVEL_STYLE_KEYS[level]])}>
+      <span class={style.dayDot} />
+      <Text id={`dashboard.boxes.ecowatt.${LEVEL_LABEL_KEYS[level]}`} />
+    </span>
+  ) : null;
 
 const EcowattBox = ({ hours, days, loading, error }) => (
   <div class="card">
@@ -17,66 +41,38 @@ const EcowattBox = ({ hours, days, loading, error }) => (
       <div class={`dimmer ${loading ? 'active' : ''}`}>
         <div class="loader" />
         {error && (
-          <p class="alert alert-danger">
+          <div class={style.errorState}>
             <i class="fe fe-bell" />
-            <span class="pl-2">
+            <span>
               <Text id="dashboard.boxes.ecowatt.error" />
             </span>
-          </p>
+          </div>
         )}
         {!error && (
           <div class="dimmer-content" style={{ minHeight: '200px' }}>
-            <h4 style={{ fontSize: '16px' }}>
+            <h4 class={style.sectionTitle}>
               <Text id="dashboard.boxes.ecowatt.dailyTitle" />
             </h4>
-            <div class="row">
+            <div class={style.hoursStrip}>
               {hours &&
                 hours.map(hour => (
-                  <div style={{ width: '10%', margin: '0.25em 1.25%' }}>
-                    <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>{hour.hour}</p>
-                    <p style={{ margin: 'auto', textAlign: 'center' }}>
-                      {hour.data === 1 && <i class="fe fe-check" style={{ fontSize: '20px', color: '#00b894' }} />}
-                      {hour.data === 2 && (
-                        <i class="fe fe-alert-circle" style={{ fontSize: '20px', color: '#fdcb6e' }} />
-                      )}
-                      {hour.data === 3 && (
-                        <i class="fe fe-alert-triangle" style={{ fontSize: '20px', color: '#d63031' }} />
-                      )}
-                    </p>
+                  <div class={cx(style.hourCell, style[LEVEL_STYLE_KEYS[hour.data]])}>
+                    {hour.hour}
+                    <span class={style.hourUnit}>h</span>
                   </div>
                 ))}
             </div>
             <div class="mt-3">
-              <h4 style={{ fontSize: '16px' }}>
+              <h4 class={style.sectionTitle}>
                 <Text id="dashboard.boxes.ecowatt.nextDaysTitle" />
               </h4>
-              <ul class="list-unstyled list-separated mb-0">
-                <li class="list-separated-item">
-                  {days &&
-                    days.map(day => (
-                      <div class="row mb-1">
-                        <div class="col">{day.day}</div>
-                        <div class="col-auto">
-                          {day.data === 1 && (
-                            <span class="badge badge-success">
-                              <Text id="dashboard.boxes.ecowatt.ok" />
-                            </span>
-                          )}
-                          {day.data === 2 && (
-                            <span class="badge badge-warning">
-                              <Text id="dashboard.boxes.ecowatt.warning" />
-                            </span>
-                          )}
-                          {day.data === 3 && (
-                            <span class="badge badge-danger">
-                              <Text id="dashboard.boxes.ecowatt.critical" />
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                </li>
-              </ul>
+              {days &&
+                days.map(day => (
+                  <div class={style.dayRow}>
+                    <span class={style.dayName}>{day.day}</span>
+                    <DayLevel level={day.data} />
+                  </div>
+                ))}
             </div>
           </div>
         )}

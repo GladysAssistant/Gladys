@@ -184,6 +184,16 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dashboardController.updateOrder,
     },
+    'post /api/v1/dashboard_asset/:dashboard_selector': {
+      authenticated: true,
+      largeJsonBody: true,
+      rateLimit: true,
+      controller: dashboardController.createAsset,
+    },
+    'get /api/v1/dashboard_asset/:dashboard_asset_id': {
+      authenticated: true,
+      controller: dashboardController.getAsset,
+    },
     'get /api/v1/dashboard/photo/proxy': {
       authenticated: true,
       rateLimit: true,
@@ -258,6 +268,10 @@ function getRoutes(gladys) {
     'get /api/v1/device_feature/states_history': {
       authenticated: true,
       controller: deviceController.getDeviceStatesHistory,
+    },
+    'get /api/v1/device_feature/states_csv': {
+      authenticated: true,
+      controller: deviceController.exportStatesToCsv,
     },
     'get /api/v1/device_feature/energy_consumption': {
       authenticated: true,
@@ -923,6 +937,16 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: systemController.installUpgrade,
+    },
+    'post /api/v1/system/reboot': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.rebootHost,
+    },
+    'post /api/v1/system/shutdown-host': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.shutdownHost,
     },
     'post /api/v1/system/vacuum': {
       authenticated: true,

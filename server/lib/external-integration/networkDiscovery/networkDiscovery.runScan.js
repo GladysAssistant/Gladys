@@ -16,7 +16,9 @@ const {
  * active payload) itself — the core never parses nor builds anything.
  * The scan is strictly bounded by the authorization contract of the
  * manifest: a type (and its ports/service/st) not declared in
- * `network_discovery` is a 403, and one scan at a time per integration
+ * `network_discovery` is a 403 — the declared ports of a type being the
+ * union of every entry of that type, as shown on the install screen —,
+ * and one scan at a time per integration
  * (sockets only open during the scan, cost bounded by the timeout).
  * The active emission has its own guardrails (the core sends a packet
  * forged by a third party, the primitive must stay uninteresting to
@@ -57,9 +59,12 @@ async function runNetworkDiscoveryScan(
   if (captures.length === 0) {
     throw new ForbiddenError(`network_discovery: capture type ${type} is not declared in the manifest`);
   }
-  // mdns browses every declared entry (see below); the other types
-  // deliberately keep the first-match behaviour for now
-  const firstCapture = captures[0];
+  const [firstCapture] = captures;
+  // a manifest may legitimately declare several entries of the same type
+  // (5 entries of 5 ports each): the install screen shows every one of
+  // them, so the authorization contract is the union of the declared
+  // ports — never only those of the first entry
+  const declaredPorts = [...new Set(captures.flatMap((entry) => entry.ports || []))];
   let payload = null;
   if (type === 'udp-active-broadcast') {
     if (!Number.isInteger(port)) {
@@ -67,7 +72,7 @@ async function runNetworkDiscoveryScan(
     }
     // emitting is bounded by the same authorization contract as
     // capturing: never a port the user did not approve
-    if (!firstCapture.ports.includes(port)) {
+    if (!declaredPorts.includes(port)) {
       throw new ForbiddenError(`network_discovery: port ${port} is not declared in the manifest`);
     }
     if (typeof payloadBase64 !== 'string' || payloadBase64.length === 0) {
@@ -92,13 +97,15 @@ async function runNetworkDiscoveryScan(
   const timeoutMs = effectiveTimeoutSeconds * 1000;
   try {
     if (type === 'udp-broadcast') {
-      return await this.scanUdpBroadcast({ ports: firstCapture.ports, timeoutMs });
+      return await this.scanUdpBroadcast({ ports: declaredPorts, timeoutMs });
     }
     if (type === 'udp-active-broadcast') {
       this.networkDiscoveryActiveScanTimes.set(service.id, Date.now());
       return await this.scanUdpActiveBroadcast({ port, payload, timeoutMs });
     }
     if (type === 'mdns') {
+      // mdns browses every declared entry, like the UDP port union above;
+      // only ssdp deliberately keeps the first-match behaviour for now
       return await this.scanMdns({
         services: captures.map((declaredCapture) => declaredCapture.service),
         timeoutMs,

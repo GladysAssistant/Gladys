@@ -7,6 +7,7 @@ import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import datePickerStyle from '../../../../components/datePicker.css';
 import style from './CheckTime.css';
 
 import fr from 'date-fns/locale/fr';
@@ -63,6 +64,8 @@ class CheckTime extends Component {
                 <DatePicker
                   selected={after}
                   className="form-control"
+                  popperClassName={datePickerStyle.datePickerPopper}
+                  portalId="scene-editor-datepicker"
                   clearButtonClassName={style.clearButtonCustom}
                   locale={localeSet}
                   onChange={this.handleBeforeAfterChange}
@@ -86,6 +89,8 @@ class CheckTime extends Component {
                 <DatePicker
                   selected={before}
                   className="form-control"
+                  popperClassName={datePickerStyle.datePickerPopper}
+                  portalId="scene-editor-datepicker"
                   clearButtonClassName={style.clearButtonCustom}
                   locale={localeSet}
                   onChange={this.handleBeforeTimeChange}

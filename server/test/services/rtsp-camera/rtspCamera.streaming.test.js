@@ -7,7 +7,7 @@ const sinon = require('sinon').createSandbox();
 const { fake, assert: fakeAssert } = sinon;
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const { NotFoundError } = require('../../../utils/coreErrors');
-const { DEVICE_ROTATION } = require('../../../utils/constants');
+const { DEVICE_ROTATION, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
 const device = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
@@ -26,7 +26,7 @@ const device = {
 
 const gladys = {
   config: {
-    tempFolder: '/tmp/gladys',
+    tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
   },
   gateway: {
     gladysGatewayClient: {
@@ -107,6 +107,63 @@ describe('Camera.streaming', () => {
     const promise2 = rtspCameraManager.startStreaming('my-camera', false, 1);
     await assert.isRejected(promise2, NotFoundError);
   });
+  it('should not start streaming, camera is disabled', async () => {
+    const disabledCameraGladys = {
+      config: {
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
+      },
+      device: {
+        getBySelector: fake.resolves({
+          id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+          selector: 'my-camera',
+          params: [
+            {
+              name: 'CAMERA_URL',
+              value: 'test',
+            },
+          ],
+          features: [
+            {
+              category: DEVICE_FEATURE_CATEGORIES.CAMERA,
+              type: DEVICE_FEATURE_TYPES.CAMERA.ENABLED,
+              last_value: 0,
+            },
+          ],
+        }),
+      },
+    };
+    rtspCameraManager = new RtspCameraManager(
+      disabledCameraGladys,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    const promise = rtspCameraManager.startStreaming('my-camera', false, 1);
+    await assert.isRejected(promise, 'CAMERA_IS_DISABLED');
+    expect(rtspCameraManager.liveStreams.has('my-camera')).to.equal(false);
+  });
+  it('should not start streaming if the camera is disabled while starting', async () => {
+    const spawn = fake.throws(new Error('ffmpeg should not have been spawned'));
+    rtspCameraManager = new RtspCameraManager(gladys, { spawn }, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    const promise = rtspCameraManager.startStreaming('my-camera', false, 1);
+    // The camera is disabled while the start is still in flight: rtsp-camera setValue calls
+    // stopStreaming, which must cancel the pending start instead of racing it.
+    await rtspCameraManager.stopStreaming('my-camera');
+    await assert.isRejected(promise, 'CAMERA_STREAM_STOPPED');
+    fakeAssert.notCalled(spawn);
+    expect(rtspCameraManager.liveStreams.has('my-camera')).to.equal(false);
+  });
+  it('should use a different folder for each streaming attempt', async () => {
+    rtspCameraManager.onNewCameraFile = fake.resolves(null);
+    const firstStream = await rtspCameraManager.startStreaming('my-camera', false, 1);
+    // The camera is disabled then immediately re-enabled: both attempts happen within the same
+    // second, so a folder named after the time only would be shared. Cleaning up the first
+    // stream would then delete the files of the second one while ffmpeg is writing them.
+    await rtspCameraManager.stopStreaming('my-camera');
+    const secondStream = await rtspCameraManager.startStreaming('my-camera', false, 1);
+    expect(secondStream.camera_folder).to.not.equal(firstStream.camera_folder);
+    expect(fse.existsSync(path.join(gladys.config.tempFolder, secondStream.camera_folder))).to.equal(true);
+    await rtspCameraManager.stopStreaming('my-camera');
+  });
   it('should start, ping & stop streaming', async () => {
     rtspCameraManager.onNewCameraFile = fake.resolves(null);
     const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', false, 1);
@@ -128,7 +185,7 @@ describe('Camera.streaming', () => {
   it('should star with 90 rotation & stop streaming', async () => {
     const gladysDeviceWithRotation = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -163,7 +220,7 @@ describe('Camera.streaming', () => {
   it('should star with 180 rotation & stop streaming', async () => {
     const gladysDeviceWithRotation = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -198,7 +255,7 @@ describe('Camera.streaming', () => {
   it('should star with 270 rotation & stop streaming', async () => {
     const gladysDeviceWithRotation = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -233,7 +290,7 @@ describe('Camera.streaming', () => {
   it('should star with not rotation params & stop streaming after', async () => {
     const gladysDeviceWithRotation = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -281,7 +338,7 @@ describe('Camera.streaming', () => {
     };
     const gladysWithHlsCamera = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       device: {
         getBySelector: fake.resolves({
@@ -461,7 +518,7 @@ describe('Camera.streaming', () => {
   it('should stop streaming, but kill + clean is not working', async () => {
     const gladysWithFailClean = {
       config: {
-        tempFolder: '/tmp/gladys',
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
       },
       gateway: {
         gladysGatewayClient: {

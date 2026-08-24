@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
+import closeMenuOnScroll from '../../../utils/closeMenuOnScroll';
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
@@ -102,12 +103,17 @@ class EditDeviceInRoom extends Component {
                   <Text id="dashboard.boxes.devicesInRoom.editDeviceFeaturesLabel" />
                 </label>
                 <Select
+                  menuPlacement="auto"
+                  menuPortalTarget={document.body}
+                  closeMenuOnScroll={closeMenuOnScroll}
                   defaultValue={[]}
                   value={selectedDeviceFeaturesOptions}
                   isMulti
                   onChange={this.updateDeviceFeatures}
                   options={deviceOptions}
                   maxMenuHeight={220}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
                 />
               </div>
             )}

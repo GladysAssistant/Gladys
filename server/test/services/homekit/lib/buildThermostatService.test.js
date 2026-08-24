@@ -92,6 +92,25 @@ describe('Thermostat valid target states', () => {
     expect(buildValidTargetStates({ modeFeature: { min: 2, max: 2 } })).to.eql([1]);
   });
 
+  it('should fall back on the min/max range when the options list is empty', () => {
+    // a feature loaded from the database always carries the association, so an integration that
+    // declares no option arrives with an empty array and not with no array at all. Reading that as
+    // "no mode at all" left an air conditioner with an on/off command offering off and nothing
+    // else, and the Home app could not turn it back on
+    expect(buildValidTargetStates({ modeFeature: { min: 0, max: 4, supported_options: [] } })).to.eql([1, 2, 3]);
+    expect(
+      buildValidTargetStates({
+        powerFeature: POWER,
+        modeFeature: { min: AC_MODE.AUTO, max: AC_MODE.COOLING, supported_options: [] },
+      }),
+    ).to.eql([0, 2, 3]);
+    expect(
+      buildValidTargetStates({
+        thermostatModeFeature: { min: THERMOSTAT_MODE.OFF, max: THERMOSTAT_MODE.HEATING, supported_options: [] },
+      }),
+    ).to.eql([0, 1]);
+  });
+
   it('should offer off only when the device has an on/off command', () => {
     expect(
       buildValidTargetStates({

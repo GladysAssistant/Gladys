@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const nock = require('nock');
-const { authenticatedRequest } = require('../request.test');
+const { authenticatedRequest, request } = require('../request.test');
 const { DASHBOARD_VISIBILITY } = require('../../../utils/constants');
 
 describe('POST /api/v1/dashboard', () => {
@@ -52,7 +52,7 @@ describe('POST /api/v1/dashboard', () => {
       .expect(201)
       .then((res) => {
         expect(res.body).to.have.property('name', 'photo dashboard');
-        expect(res.body.boxes[0][0]).to.have.property('type', 'photo');
+        expect(res.body.boxes[0].columns[0][0]).to.have.property('type', 'photo');
       });
   });
 
@@ -79,7 +79,7 @@ describe('POST /api/v1/dashboard', () => {
       .expect('Content-Type', /json/)
       .expect(201)
       .then((res) => {
-        expect(res.body.boxes[0][0]).to.have.property('type', 'photo');
+        expect(res.body.boxes[0].columns[0][0]).to.have.property('type', 'photo');
       });
   });
 });
@@ -97,6 +97,7 @@ describe('GET /api/v1/dashboard', () => {
             name: 'Test dashboard',
             selector: 'test-dashboard',
             type: 'main',
+            icon: null,
             updated_at: '2019-02-12 07:49:07.556 +00:00',
           },
         ]);
@@ -116,12 +117,20 @@ describe('GET /api/v1/dashboard/:dashboard_selector', () => {
           name: 'Test dashboard',
           selector: 'test-dashboard',
           type: 'main',
+          icon: null,
+          background_scene: null,
+          width: null,
+          // stored with the legacy column-based shape, normalized to sections on read
           boxes: [
-            [
-              {
-                type: 'weather',
-              },
-            ],
+            {
+              columns: [
+                [
+                  {
+                    type: 'weather',
+                  },
+                ],
+              ],
+            },
           ],
           user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           visibility: 'private',
@@ -147,15 +156,23 @@ describe('PATCH /api/v1/dashboard/:dashboard_selector', () => {
           name: 'new name',
           selector: 'test-dashboard',
           position: 0,
+          icon: null,
+          background_scene: null,
+          width: null,
           user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           visibility: 'private',
           type: 'main',
+          // stored with the legacy column-based shape, normalized to sections on read
           boxes: [
-            [
-              {
-                type: 'weather',
-              },
-            ],
+            {
+              columns: [
+                [
+                  {
+                    type: 'weather',
+                  },
+                ],
+              ],
+            },
           ],
           updated_at: res.body.updated_at,
           created_at: '2019-02-12T07:49:07.556Z',
@@ -185,6 +202,53 @@ describe('DELETE /api/v1/dashboard/:dashboard_selector', () => {
           success: true,
         });
       });
+  });
+});
+
+describe('POST /api/v1/dashboard_asset/:dashboard_selector', () => {
+  it('should create then serve a dashboard asset', async () => {
+    const pngBase64 =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    let assetId;
+    await authenticatedRequest
+      .post('/api/v1/dashboard_asset/test-dashboard')
+      .send({ content_type: 'image/png', data: pngBase64 })
+      .expect('Content-Type', /json/)
+      .expect(201)
+      .then((res) => {
+        expect(res.body).to.have.property('id');
+        assetId = res.body.id;
+      });
+    await authenticatedRequest
+      .get(`/api/v1/dashboard_asset/${assetId}`)
+      .expect(200)
+      .then((res) => {
+        expect(res.text).to.equal(`image/png;base64,${pngBase64}`);
+      });
+  });
+});
+
+describe('POST /api/v1/dashboard_asset (large body)', () => {
+  // ~180 kB of base64: over the global 100 kB JSON bound, under the
+  // dedicated 6 MB bound mounted behind authentication on this route
+  const largeBase64 = Buffer.alloc(135 * 1024, 7).toString('base64');
+
+  it('should accept an upload larger than the global JSON body bound', async () => {
+    await authenticatedRequest
+      .post('/api/v1/dashboard_asset/test-dashboard')
+      .send({ content_type: 'image/jpeg', data: largeBase64 })
+      .expect('Content-Type', /json/)
+      .expect(201)
+      .then((res) => {
+        expect(res.body).to.have.property('id');
+      });
+  });
+
+  it('should answer 401 before parsing a large unauthenticated upload', async () => {
+    await request
+      .post('/api/v1/dashboard_asset/test-dashboard')
+      .send({ content_type: 'image/jpeg', data: largeBase64 })
+      .expect(401);
   });
 });
 

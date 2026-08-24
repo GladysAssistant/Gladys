@@ -1,0 +1,108 @@
+.actionsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  /* a pill can never grow past the widget: long action names wrap inside
+     (overflow-wrap on the label) instead of overflowing the card.
+     min-width: 0 so the flex item's min-width: auto can't win over the cap */
+  max-width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 6px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  background-color: #fff;
+  color: #495057;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.actionButton:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.actionIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: #467fcf;
+}
+
+.actionLabel {
+  /* min-width: 0 lets the label shrink below its longest word so
+     overflow-wrap can break names without spaces */
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.actionButton:disabled .actionIcon i {
+  animation: actionSpin 1s linear infinite;
+}
+
+@keyframes actionSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* State tints, derived from the command semantics: binary on / positive
+   command active = green, active close command (value < 0) = red */
+.actionActive {
+  background-color: #def0e2;
+  border-color: transparent;
+  color: #2e8f5b;
+}
+
+.actionActive .actionIcon {
+  color: #2e8f5b;
+}
+
+.actionActiveDanger {
+  background-color: #fbe3de;
+  border-color: transparent;
+  color: #d4593f;
+}
+
+.actionActiveDanger .actionIcon {
+  color: #d4593f;
+}
+
+/* Horizon glass theme */
+:global(.glass-theme) .actionButton {
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border-color: var(--gl-border);
+  box-shadow: var(--gl-shadow-soft);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .actionButton .actionIcon {
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .actionActive {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+:global(.glass-theme) .actionActive .actionIcon {
+  color: #2e8f5b;
+}
+
+:global(.glass-theme) .actionActiveDanger {
+  background-color: #fbe3de;
+  color: #d4593f;
+}
+
+:global(.glass-theme) .actionActiveDanger .actionIcon {
+  color: #d4593f;
+}

@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
+import closeMenuOnScroll from '../../../utils/closeMenuOnScroll';
 import update from 'immutability-helper';
 import BaseEditBox from '../baseEditBox';
 import { getDeviceFeatureName } from '../../../utils/device';
@@ -211,6 +212,9 @@ class EditDevices extends Component {
                   <Text id="dashboard.boxes.devices.addADeviceLabel" />
                 </label>
                 <Select
+                  menuPlacement="auto"
+                  menuPortalTarget={document.body}
+                  closeMenuOnScroll={closeMenuOnScroll}
                   onChange={this.addDeviceFeature}
                   value={[]}
                   options={deviceOptions}
