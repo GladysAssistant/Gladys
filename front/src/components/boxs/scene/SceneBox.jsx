@@ -3,12 +3,14 @@ import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../utils/consts';
 import SceneRow from './SceneRow';
 import cx from 'classnames';
+import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import { computeRunningInfo, mergeRunningScenes } from '../../../routes/scene/runningInfo';
 
 class SceneBoxComponent extends Component {
   refreshData = () => {
     this.getScene();
+    this.getStatusFeatures();
   };
 
   getScene = async () => {
@@ -26,6 +28,47 @@ class SceneBoxComponent extends Component {
         status: RequestStatus.Error
       });
     }
+  };
+
+  getStatusFeatures = async () => {
+    const statusFeaturesBySceneSelector = this.props.box.scene_status_features || {};
+    const featureSelectors = Object.keys(statusFeaturesBySceneSelector).map(
+      sceneSelector => statusFeaturesBySceneSelector[sceneSelector]
+    );
+    if (featureSelectors.length === 0) {
+      return;
+    }
+    try {
+      const devices = await this.props.httpClient.get('/api/v1/device', {
+        device_feature_selectors: featureSelectors.join(',')
+      });
+      const featuresBySelector = {};
+      devices.forEach(device => {
+        device.features.forEach(feature => {
+          featuresBySelector[feature.selector] = feature;
+        });
+      });
+      this.setState({ featuresBySelector });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  updateDeviceStateWebsocket = payload => {
+    const { featuresBySelector } = this.state;
+    if (!featuresBySelector || !featuresBySelector[payload.device_feature_selector]) {
+      return;
+    }
+    this.setState({
+      featuresBySelector: {
+        ...featuresBySelector,
+        [payload.device_feature_selector]: {
+          ...featuresBySelector[payload.device_feature_selector],
+          last_value: payload.last_value,
+          last_value_changed: payload.last_value_changed
+        }
+      }
+    });
   };
 
   getRunningScenes = async () => {
@@ -87,6 +130,10 @@ class SceneBoxComponent extends Component {
   componentDidMount() {
     this.refreshData();
     this.getRunningScenes();
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceStateWebsocket
+    );
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
   }
@@ -97,6 +144,10 @@ class SceneBoxComponent extends Component {
   }
 
   componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceStateWebsocket
+    );
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
     if (this.ticker) {
@@ -106,12 +157,15 @@ class SceneBoxComponent extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.box.scenes !== this.props.box.scenes) {
+    if (
+      nextProps.box.scenes !== this.props.box.scenes ||
+      nextProps.box.scene_status_features !== this.props.box.scene_status_features
+    ) {
       this.refreshData();
     }
   }
 
-  render(props, { scenes, status, runningScenes, now }) {
+  render(props, { scenes, status, featuresBySelector, runningScenes, now }) {
     const boxTitle = props.box.name;
     const loading = status === RequestStatus.Getting && !status;
 
@@ -129,23 +183,24 @@ class SceneBoxComponent extends Component {
         >
           <div class="loader py-3" />
           <div class="dimmer-content">
-            <div class="table-responsive">
-              <table className="table card-table table-vcenter">
-                <tbody>
-                  {scenes &&
-                    scenes.map(scene => (
-                      <SceneRow
-                        key={scene.selector}
-                        boxStatus={status}
-                        name={scene.name}
-                        icon={scene.icon}
-                        user={props.user}
-                        sceneSelector={scene.selector}
-                        runningInfo={computeRunningInfo(runningScenes, scene.selector, now)}
-                      />
-                    ))}
-                </tbody>
-              </table>
+            <div class={style.sceneList}>
+              {scenes &&
+                scenes.map(scene => (
+                  <SceneRow
+                    key={scene.selector}
+                    boxStatus={status}
+                    name={scene.name}
+                    icon={scene.icon}
+                    user={props.user}
+                    sceneSelector={scene.selector}
+                    runningInfo={computeRunningInfo(runningScenes, scene.selector, now)}
+                    statusFeature={
+                      featuresBySelector &&
+                      props.box.scene_status_features &&
+                      featuresBySelector[props.box.scene_status_features[scene.selector]]
+                    }
+                  />
+                ))}
             </div>
           </div>
         </div>
@@ -154,4 +209,4 @@ class SceneBoxComponent extends Component {
   }
 }
 
-export default connect('user,httpClient,session', {})(SceneBoxComponent);
+export default connect('user,session,httpClient', {})(SceneBoxComponent);

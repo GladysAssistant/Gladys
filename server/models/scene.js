@@ -60,6 +60,8 @@ const actionSchema = Joi.object()
       .integer()
       .min(1)
       .allow(null),
+    // Precision the "time.get-date" action truncates the current date/time to.
+    precision: Joi.string().valid('second', 'minute', 'hour', 'day'),
     request_response_keys: Joi.array().items(Joi.string()),
     ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),

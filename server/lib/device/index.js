@@ -22,6 +22,7 @@ const { getDeviceFeaturesAggregates } = require('./device.getDeviceFeaturesAggre
 const { getDeviceFeaturesAggregatesMulti } = require('./device.getDeviceFeaturesAggregatesMulti');
 const { getDeviceFeatureStates } = require('./device.getDeviceFeatureStates');
 const { getDeviceStatesHistory } = require('./device.getDeviceStatesHistory');
+const { exportStatesToCsv } = require('./device.exportStatesToCsv');
 const { onPurgeStatesEvent } = require('./device.onPurgeStatesEvent');
 const { purgeStates } = require('./device.purgeStates');
 const { purgeStatesByFeatureId } = require('./device.purgeStatesByFeatureId');
@@ -73,6 +74,22 @@ const DeviceManager = function DeviceManager(
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
   this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 200;
+  // A CSV export has no size limit, but it is read and written chunk by chunk:
+  // this is the most states one chunk can hold, whatever the caller asks. At
+  // roughly 60 bytes per line, a chunk stays around 1.5 MB, which a low-power
+  // machine like a Raspberry Pi can build and send without trouble — however
+  // long the exported period is.
+  this.MAX_STATES_PER_CSV_EXPORT_CHUNK = 25000;
+  // Between two streamed chunks of a whole-file export, the route pauses this long
+  // so the other readers (charts, history…) get their turn on the serialized DuckDB
+  // read connection: a multi-year export must not freeze the rest of the instance.
+  this.CSV_EXPORT_PAUSE_BETWEEN_CHUNKS_IN_MS = 25;
+  // When a NON-paginated export goes through Gladys Plus, the whole answer travels
+  // over the encrypted websocket in one message, which cannot carry an arbitrarily
+  // large payload: the same limit as the log download is applied, and a bigger
+  // export is told to use the max_states pagination instead (which the web client
+  // always does).
+  this.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES = 256 * 1024;
   // Also the target size of a purge slice: a single DELETE of a million states on a
   // multi-GB history holds the write connection for minutes and inflates the file.
   this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD = 200000;
@@ -164,6 +181,7 @@ DeviceManager.prototype.getDeviceFeaturesAggregates = getDeviceFeaturesAggregate
 DeviceManager.prototype.getDeviceFeaturesAggregatesMulti = getDeviceFeaturesAggregatesMulti;
 DeviceManager.prototype.getDeviceFeatureStates = getDeviceFeatureStates;
 DeviceManager.prototype.getDeviceStatesHistory = getDeviceStatesHistory;
+DeviceManager.prototype.exportStatesToCsv = exportStatesToCsv;
 DeviceManager.prototype.onPurgeStatesEvent = onPurgeStatesEvent;
 DeviceManager.prototype.purgeStates = purgeStates;
 DeviceManager.prototype.purgeStatesByFeatureId = purgeStatesByFeatureId;

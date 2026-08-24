@@ -4,6 +4,15 @@ import { route } from 'preact-router';
 import update from 'immutability-helper';
 import EditDashboardPage from './EditDashboard';
 import get from 'get-value';
+import {
+  DEFAULT_COLUMN_WIDTH,
+  MAX_COLUMNS_PER_SECTION,
+  WIDE_COLUMN_WIDTH,
+  flattenSections,
+  buildSections,
+  getSectionOffsets,
+  findSectionIndex
+} from '../../../utils/dashboardSections';
 
 class EditDashboard extends Component {
   getDashboards = async () => {
@@ -49,9 +58,16 @@ class EditDashboard extends Component {
       const currentDashboard = await this.props.httpClient.get(
         `/api/v1/dashboard/${this.state.currentDashboardSelector}`
       );
+      // The editor works on a flat list of columns so drag & drop coordinates
+      // stay global, the section sizes and column widths are kept aside and
+      // reassembled on save
+      const { columns, sectionSizes, columnWidths } = flattenSections(currentDashboard.boxes);
       this.setState({
-        currentDashboard,
-        loading: false
+        currentDashboard: { ...currentDashboard, boxes: columns },
+        sectionSizes,
+        columnWidths,
+        loading: false,
+        hasUnsavedChanges: false
       });
     } catch (e) {
       this.setState({
@@ -101,7 +117,45 @@ class EditDashboard extends Component {
         }
       }
     });
-    await this.setState({ ...newState, boxNotEmptyError: false });
+    // any structural change closes the edit panel so it never points at a stale position
+    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
+  };
+
+  moveBoxUp = (x, y) => {
+    return this.moveCard(x, y, x, y - 1);
+  };
+
+  moveBoxDown = (x, y) => {
+    return this.moveCard(x, y, x, y + 1);
+  };
+
+  openBoxSettings = (x, y) => {
+    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false, newDashboardOpen: false });
+  };
+
+  openDashboardSettings = () => {
+    this.setState({ dashboardSettingsOpen: true, editingBoxPosition: null, newDashboardOpen: false });
+  };
+
+  openNewDashboard = () => {
+    this.setState({ newDashboardOpen: true, editingBoxPosition: null, dashboardSettingsOpen: false });
+  };
+
+  closeEditPanel = () => {
+    this.setState({ editingBoxPosition: null, dashboardSettingsOpen: false, newDashboardOpen: false });
+  };
+
+  addBoxAndEdit = x => {
+    // the new box lands at the end of column x: open its settings right away
+    const y = this.state.currentDashboard.boxes[x].length;
+    this.addBox(x);
+    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false, newDashboardOpen: false });
+  };
+
+  addBoxAtPositionAndEdit = (x, y) => {
+    // addBoxAtPosition inserts after the box at y
+    this.addBoxAtPosition(x, y);
+    this.setState({ editingBoxPosition: { x, y: y + 1 }, dashboardSettingsOpen: false, newDashboardOpen: false });
   };
 
   addBox = x => {
@@ -114,7 +168,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   addBoxAtPosition = (x, y) => {
@@ -127,7 +181,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   removeBox = async (x, y) => {
@@ -140,7 +194,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    await this.setState({ ...newState, boxNotEmptyError: false });
+    await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
   };
 
   updateCurrentDashboardName = e => {
@@ -151,7 +205,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   updateCurrentDashboardVisibility = e => {
@@ -162,7 +216,18 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
+  };
+
+  updateCurrentDashboardProperty = (property, value) => {
+    const newState = update(this.state, {
+      currentDashboard: {
+        [property]: {
+          $set: value
+        }
+      }
+    });
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   updateBoxConfig = (x, y, data) => {
@@ -178,7 +243,7 @@ class EditDashboard extends Component {
           }
         }
       });
-      return { ...newState, boxNotEmptyError: false };
+      return { ...newState, boxNotEmptyError: false, hasUnsavedChanges: true };
     });
   };
 
@@ -201,7 +266,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, hasUnsavedChanges: true });
   };
 
   removeEmptyBoxes = async () => {
@@ -216,6 +281,23 @@ class EditDashboard extends Component {
           // A photo box can contain rows the user started but never filled in, we don't save them
           if (box.type === 'photo' && Array.isArray(box.photos)) {
             return { ...box, photos: box.photos.filter(photo => photo && photo.url) };
+          }
+          // Same for chips the user added but never gave a type
+          if (box.type === 'chips' && Array.isArray(box.chips)) {
+            return { ...box, chips: box.chips.filter(chip => chip && chip.chip_type) };
+          }
+          // Same for house-view pins the user placed but never assigned a feature
+          if (box.type === 'house-view' && Array.isArray(box.pins)) {
+            return { ...box, pins: box.pins.filter(pin => pin && pin.device_feature) };
+          }
+          // Same for quick actions the user added but never gave a target
+          if (box.type === 'actions' && Array.isArray(box.actions)) {
+            return {
+              ...box,
+              actions: box.actions.filter(
+                action => action && (action.action_type === 'scene' ? action.scene : action.device_feature)
+              )
+            };
           }
           return box;
         });
@@ -241,13 +323,13 @@ class EditDashboard extends Component {
       // We purge all empty boxes
       await this.removeEmptyBoxes();
 
-      const { currentDashboard: selectedDashboard, dashboards } = this.state;
+      const { currentDashboard: selectedDashboard, dashboards, sectionSizes, columnWidths } = this.state;
       const { selector } = selectedDashboard;
 
-      const currentDashboard = await this.props.httpClient.patch(
-        `/api/v1/dashboard/${selector}`,
-        this.state.currentDashboard
-      );
+      const currentDashboard = await this.props.httpClient.patch(`/api/v1/dashboard/${selector}`, {
+        ...selectedDashboard,
+        boxes: buildSections(selectedDashboard.boxes, sectionSizes, columnWidths)
+      });
 
       const currentDashboardIndex = dashboards.findIndex(d => d.selector === selector);
       const updatedDashboards = update(dashboards, {
@@ -256,12 +338,22 @@ class EditDashboard extends Component {
         }
       });
 
+      const { columns, sectionSizes: newSectionSizes, columnWidths: newColumnWidths } = flattenSections(
+        currentDashboard.boxes
+      );
       await this.setState({
-        currentDashboard,
+        currentDashboard: { ...currentDashboard, boxes: columns },
+        sectionSizes: newSectionSizes,
+        columnWidths: newColumnWidths,
         loading: false,
-        dashboards: updatedDashboards
+        dashboards: updatedDashboards,
+        justSaved: true,
+        hasUnsavedChanges: false
       });
-      route(`/dashboard/${currentDashboard.selector}`);
+      // stay in the editor so the user can chain edits: the save button
+      // briefly turns into a confirmation instead of routing away
+      clearTimeout(this.justSavedTimeout);
+      this.justSavedTimeout = setTimeout(() => this.setState({ justSaved: false }), 2500);
     } catch (e) {
       console.error(e);
       if (e.response && e.response.status === 422) {
@@ -280,28 +372,108 @@ class EditDashboard extends Component {
     }
   };
 
-  addColumn = () => {
+  addColumn = sectionIndex => {
+    const { sectionSizes } = this.state;
+    if (sectionSizes[sectionIndex] >= MAX_COLUMNS_PER_SECTION) {
+      return;
+    }
+    // the new column goes at the end of its section, in the flat column list
+    const insertAt = getSectionOffsets(sectionSizes)[sectionIndex] + sectionSizes[sectionIndex];
+    const newState = update(this.state, {
+      currentDashboard: {
+        boxes: {
+          $splice: [[insertAt, 0, []]]
+        }
+      },
+      sectionSizes: {
+        [sectionIndex]: {
+          $set: sectionSizes[sectionIndex] + 1
+        }
+      },
+      columnWidths: {
+        $splice: [[insertAt, 0, DEFAULT_COLUMN_WIDTH]]
+      }
+    });
+    this.setState({ ...newState, boxNotEmptyError: false, hasUnsavedChanges: true });
+  };
+
+  // A column is either normal (1) or wide (2): one toggle, no free resize
+  toggleColumnWidth = x => {
+    const isWide = this.state.columnWidths[x] === WIDE_COLUMN_WIDTH;
+    const newState = update(this.state, {
+      columnWidths: {
+        [x]: {
+          $set: isWide ? DEFAULT_COLUMN_WIDTH : WIDE_COLUMN_WIDTH
+        }
+      }
+    });
+    this.setState({ ...newState, hasUnsavedChanges: true });
+  };
+
+  // Sections reorder with one-step arrows — dragging a whole section
+  // across the canvas would be miserable, especially on mobile
+  moveSection = (sectionIndex, direction) => {
+    const { sectionSizes, columnWidths, currentDashboard } = this.state;
+    const target = sectionIndex + direction;
+    if (target < 0 || target >= sectionSizes.length) {
+      return;
+    }
+    const sections = buildSections(currentDashboard.boxes, sectionSizes, columnWidths);
+    [sections[sectionIndex], sections[target]] = [sections[target], sections[sectionIndex]];
+    const { columns, sectionSizes: newSectionSizes, columnWidths: newColumnWidths } = flattenSections(sections);
+    this.setState({
+      currentDashboard: { ...currentDashboard, boxes: columns },
+      sectionSizes: newSectionSizes,
+      columnWidths: newColumnWidths,
+      boxNotEmptyError: false,
+      // global column coordinates shifted: never point the panel at a stale box
+      editingBoxPosition: null,
+      hasUnsavedChanges: true
+    });
+  };
+
+  addSection = () => {
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
           $push: [[]]
         }
+      },
+      sectionSizes: {
+        $push: [1]
+      },
+      columnWidths: {
+        $push: [DEFAULT_COLUMN_WIDTH]
       }
     });
-    this.setState({ ...newState, boxNotEmptyError: false });
+    this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
   };
 
   deleteCurrentColumn = async x => {
     const { boxes } = this.state.currentDashboard;
     if (boxes[x].length === 0) {
+      const sectionIndex = findSectionIndex(this.state.sectionSizes, x);
+      const newSectionSize = this.state.sectionSizes[sectionIndex] - 1;
       const newState = update(this.state, {
         currentDashboard: {
           boxes: {
             $splice: [[x, 1]]
           }
+        },
+        // a section left without any column disappears
+        sectionSizes:
+          newSectionSize === 0
+            ? { $splice: [[sectionIndex, 1]] }
+            : {
+                [sectionIndex]: {
+                  $set: newSectionSize
+                }
+              },
+        columnWidths: {
+          $splice: [[x, 1]]
         }
       });
-      await this.setState({ ...newState, boxNotEmptyError: false });
+      await this.setState({ ...newState, boxNotEmptyError: false, editingBoxPosition: null, hasUnsavedChanges: true });
     } else {
       this.setState({
         boxNotEmptyError: true,
@@ -368,16 +540,27 @@ class EditDashboard extends Component {
     this.props = props;
     this.state = {
       dashboards: [],
+      sectionSizes: [],
+      columnWidths: [],
       newSelectedBoxType: {},
       askDeleteDashboard: false,
       boxNotEmptyError: false,
       columnBoxNotEmptyError: null,
-      isMobileReordering: false
+      isMobileReordering: false,
+      editingBoxPosition: null,
+      dashboardSettingsOpen: false,
+      newDashboardOpen: false,
+      justSaved: false,
+      hasUnsavedChanges: false
     };
   }
 
   componentDidMount() {
     this.init();
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.justSavedTimeout);
   }
 
   componentDidUpdate(prevProps) {
@@ -391,6 +574,8 @@ class EditDashboard extends Component {
     {
       dashboards,
       currentDashboard,
+      sectionSizes,
+      columnWidths,
       loading,
       dashboardValidationError,
       dashboardAlreadyExistError,
@@ -399,7 +584,12 @@ class EditDashboard extends Component {
       boxNotEmptyError,
       columnBoxNotEmptyError,
       savingNewDashboardList,
-      isMobileReordering
+      isMobileReordering,
+      editingBoxPosition,
+      dashboardSettingsOpen,
+      newDashboardOpen,
+      justSaved,
+      hasUnsavedChanges
     }
   ) {
     return (
@@ -418,14 +608,26 @@ class EditDashboard extends Component {
         moveBoxDown={this.moveBoxDown}
         moveBoxUp={this.moveBoxUp}
         moveCard={this.moveCard}
+        openBoxSettings={this.openBoxSettings}
+        openDashboardSettings={this.openDashboardSettings}
+        openNewDashboard={this.openNewDashboard}
+        closeEditPanel={this.closeEditPanel}
+        addBoxAndEdit={this.addBoxAndEdit}
+        addBoxAtPositionAndEdit={this.addBoxAtPositionAndEdit}
+        editingBoxPosition={editingBoxPosition}
+        dashboardSettingsOpen={dashboardSettingsOpen}
+        newDashboardOpen={newDashboardOpen}
         addBox={this.addBox}
         addBoxAtPosition={this.addBoxAtPosition}
         removeBox={this.removeBox}
         updateNewSelectedBox={this.updateNewSelectedBox}
         saveDashboard={this.saveDashboard}
+        justSaved={justSaved}
+        hasUnsavedChanges={hasUnsavedChanges}
         updateBoxConfig={this.updateBoxConfig}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
         updateCurrentDashboardVisibility={this.updateCurrentDashboardVisibility}
+        updateCurrentDashboardProperty={this.updateCurrentDashboardProperty}
         askDeleteCurrentDashboard={this.askDeleteCurrentDashboard}
         cancelDeleteCurrentDashboard={this.cancelDeleteCurrentDashboard}
         deleteCurrentDashboard={this.deleteCurrentDashboard}
@@ -435,6 +637,11 @@ class EditDashboard extends Component {
         toggleMobileReorder={this.toggleMobileReorder}
         isMobileReordering={isMobileReordering}
         addColumn={this.addColumn}
+        addSection={this.addSection}
+        moveSection={this.moveSection}
+        sectionSizes={sectionSizes}
+        columnWidths={columnWidths}
+        toggleColumnWidth={this.toggleColumnWidth}
         deleteCurrentColumn={this.deleteCurrentColumn}
         boxNotEmptyError={boxNotEmptyError}
         columnBoxNotEmptyError={columnBoxNotEmptyError}

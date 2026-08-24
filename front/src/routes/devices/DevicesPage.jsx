@@ -6,6 +6,7 @@ import DeviceRow from './DeviceRow';
 import DeviceMobileItem from './DeviceMobileItem';
 import EmptyState from './EmptyState';
 import style from './style.css';
+import dashboardStyle from '../dashboard/style.css';
 
 const IntegrationOption = ({ integration, selectedIntegration }) => (
   <option value={integration.slug} selected={selectedIntegration === integration.slug}>
@@ -15,8 +16,22 @@ const IntegrationOption = ({ integration, selectedIntegration }) => (
 
 const DevicesPage = ({ children, ...props }) => (
   <div class="page">
-    <div class="page-main">
-      <div class="my-3 my-md-5">
+    {/* The devices page lives on the same Horizon glass scene as the dashboard:
+        the global .glass-theme layer provides the glass cards and inks, the
+        page-scoped class below carries the page-specific pieces */}
+    <div
+      class={cx(
+        'page-main',
+        'glass-theme',
+        style.devicesPage,
+        dashboardStyle.dashboardBackground,
+        dashboardStyle.glassScene
+      )}
+    >
+      {/* padding, not margin: the wallpaper wrappers space themselves with
+          padding so a top margin can never collapse through the glass
+          page-main and shift the scene down (same as SettingsLayout) */}
+      <div class="py-3 py-md-5">
         <div class="container">
           <div class={cx('page-header', style.pageHeaderResponsive)}>
             <h1 class="page-title">
@@ -105,7 +120,9 @@ const DevicesPage = ({ children, ...props }) => (
               {props.initialized && props.filteredDevices.length > 0 && (
                 <div class="card d-none d-lg-block">
                   <div class="table-responsive">
-                    <table class="table table-hover table-outline table-vcenter card-table">
+                    {/* device-list-table: same Horizon pill-row grammar as the
+                        devices widgets on the dashboard */}
+                    <table class="table card-table table-vcenter device-list-table">
                       <thead>
                         <tr>
                           <th class="w-1" />
@@ -121,6 +138,7 @@ const DevicesPage = ({ children, ...props }) => (
                           <th>
                             <Text id="devicesList.features" />
                           </th>
+                          <th class="text-right" />
                         </tr>
                       </thead>
                       <tbody>

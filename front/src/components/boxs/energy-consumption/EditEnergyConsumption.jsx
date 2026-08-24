@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
+import closeMenuOnScroll from '../../../utils/closeMenuOnScroll';
 
 import BaseEditBox from '../baseEditBox';
 import EnergyConsumption from './EnergyConsumption';
@@ -216,12 +217,17 @@ class EditEnergyConsumption extends Component {
             <Text id="dashboard.boxes.energyConsumption.editDeviceFeatures" />
           </label>
           <Select
+            menuPlacement="auto"
+            menuPortalTarget={document.body}
+            closeMenuOnScroll={closeMenuOnScroll}
             defaultValue={[]}
             value={selectedDeviceFeatures}
             onChange={this.updateDeviceFeatures}
             options={deviceFeatureOptions.length > 0 ? deviceFeatureOptions : null}
             maxMenuHeight={220}
             isMulti
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         {selectedDeviceFeatures &&
@@ -234,6 +240,9 @@ class EditEnergyConsumption extends Component {
                 />
               </label>
               <Select
+                menuPlacement="auto"
+                menuPortalTarget={document.body}
+                closeMenuOnScroll={closeMenuOnScroll}
                 defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[i])}
                 value={
                   props.box.colors &&

@@ -235,6 +235,39 @@ function withEnergyParams(device, createdDevice) {
   };
 }
 
+/**
+ * @description Bring back the "keep history" choice the user made on the
+ * features already created. `keep_history` is published by the integration
+ * (it only knows a sensible default), but once the device exists it belongs
+ * to the user, like the device name and its room: it is edited on the device
+ * screen and must survive a re-publication. The Discovery screen posts this
+ * very object back to POST /api/v1/device on the "Update" gesture, which
+ * would otherwise restore the integration's value and silently start (or
+ * stop) storing that feature's history again. The published list stays
+ * untouched: the copy is returned.
+ * @param {object} device - The device published by the integration.
+ * @param {object} createdDevice - The device already created in DB, or null.
+ * @returns {object} The device carrying the user's keep_history choices.
+ * @example
+ * const device = withUserKeepHistory(publishedDevice, createdDevice);
+ */
+function withUserKeepHistory(device, createdDevice) {
+  const createdFeatures = (createdDevice && createdDevice.features) || [];
+  const keepHistoryByExternalId = new Map(
+    createdFeatures.map((createdFeature) => [createdFeature.external_id, createdFeature.keep_history]),
+  );
+  return {
+    ...device,
+    // every feature is copied, created or not, so the whole returned payload
+    // is detached from the in-memory published list
+    features: device.features.map((feature) =>
+      keepHistoryByExternalId.has(feature.external_id)
+        ? { ...feature, keep_history: keepHistoryByExternalId.get(feature.external_id) }
+        : { ...feature },
+    ),
+  };
+}
+
 // the published STRUCTURE differs from the created device when features
 // were added, removed or redefined — the Discovery screen then offers an
 // explicit "Update" gesture (params alone are upserted automatically)
@@ -271,7 +304,8 @@ function structureDiffers(publishedFeatures, createdFeatures) {
  * re-published features differ from the created device: the Discovery
  * screen offers an Update button). A device publishing a cumulative energy
  * index also gets its energy-tracking features (30-minutes consumption and
- * cost) added by the core.
+ * cost) added by the core. The "keep history" choice made by the user on an
+ * already-created device wins over the published one.
  * @param {string} selector - The selector of the external integration.
  * @returns {Promise<Array>} Resolve with the list of discovered devices.
  * @example
@@ -289,7 +323,10 @@ async function getDiscoveredDevices(selector) {
     const deviceWithEnergyFeatures = hasEnergyIndexFeature(device)
       ? withEnergyFeatures(device, createdDevice, defaultElectricMeterDeviceFeatureId)
       : device;
-    const deviceToReturn = withEnergyParams(deviceWithEnergyFeatures, createdDevice);
+    const deviceToReturn = withUserKeepHistory(
+      withEnergyParams(deviceWithEnergyFeatures, createdDevice),
+      createdDevice,
+    );
     return {
       ...deviceToReturn,
       created: createdDevice !== null,

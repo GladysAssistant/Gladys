@@ -72,6 +72,7 @@
       "modalTitle": "Migrer « {{name}} »",
       "description": "Migrez cet appareil vers un appareil d'une autre intégration : son <b>historique d'états</b>, les <b>scènes</b> et les <b>tableaux de bord</b> qui l'utilisent seront déplacés vers l'appareil de destination, puis <b>cet appareil sera supprimé</b>. Si les deux appareils ont enregistré des états sur la même période, seul l'historique antérieur au premier état de la destination est déplacé, afin de ne rien compter en double.",
       "destinationLabel": "Appareil de destination",
+      "unknownIntegration": "Intégration inconnue",
       "featuresTitle": "Correspondance des fonctionnalités",
       "doNotMigrate": "Ne pas migrer",
       "typeMismatchWarning": "Cette fonctionnalité a un type différent de la fonctionnalité source : son historique risque de ne plus avoir de sens une fois migré.",
@@ -105,7 +106,23 @@
     "features": "Fonctionnalités",
     "emptyState": "Aucun appareil trouvé. Ajoutez des appareils depuis la page des intégrations, ou modifiez votre recherche et vos filtres.",
     "emptyStateButton": "Parcourir les intégrations",
-    "error": "Une erreur est survenue lors du chargement des appareils. Veuillez réessayer plus tard."
+    "error": "Une erreur est survenue lors du chargement des appareils. Veuillez réessayer plus tard.",
+    "exportCsv": "Exporter en CSV",
+    "export": {
+      "modalTitle": "Exporter l'historique de {{name}}",
+      "description": "Téléchargez l'historique de cet appareil au format CSV, pour l'analyser dans un tableur.",
+      "featuresLabel": "Fonctionnalités à exporter",
+      "periodLabel": "Période",
+      "startLabel": "Du",
+      "endLabel": "Au",
+      "invalidPeriod": "La date de fin doit être identique ou postérieure à la date de début.",
+      "noFeatureSelected": "Sélectionnez au moins une fonctionnalité à exporter.",
+      "progress": "{{count}} états exportés…",
+      "error": "L'export CSV a échoué. Veuillez réessayer.",
+      "cancelButton": "Annuler",
+      "exportButton": "Exporter",
+      "closeButton": "Fermer"
+    }
   },
   "login": {
     "title": "Gladys Assistant",
@@ -277,20 +294,26 @@
       }
     },
     "success": {
-      "title": "Merci !",
-      "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\"> Pierre-Gilles Leymarie</a>, et j'ai commencé à travailler sur Gladys Assistant en 2013.",
-      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys. J'espère que vous apprécierez utiliser ce logiciel.",
-      "ifYouWantToSupportThisSoftware": "J'essaie de faire de Gladys mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
+      "title": "Bienvenue dans Gladys !",
+      "subtitle": "Votre assistant est prêt. Tout fonctionne chez vous, et vos données restent chez vous.",
+      "integrationsTitle": "Connectez toute votre maison",
+      "integrationsText": "Zigbee, Matter, Z-Wave, MQTT, Philips Hue, Sonos… Gladys est compatible avec des milliers d'appareils, et grâce aux intégrations externes, de nouvelles intégrations arrivent en continu, sans attendre une nouvelle version de Gladys.",
+      "scenesTitle": "Automatisez votre quotidien",
+      "scenesText": "Créez des scènes qui réagissent à votre maison : lumières au coucher du soleil, chauffage intelligent, alertes, routines du matin… Votre maison travaille pour vous, même quand vous n'y pensez pas.",
+      "openSourceTitle": "Un projet totalement ouvert",
+      "openSourceText": "Gladys est 100 % <a href=\"https://github.com/GladysAssistant/Gladys\" target=\"_blank\" rel=\"noopener noreferrer\">open-source</a> et ouvert aux développements : créez vos propres intégrations, proposez vos idées, rejoignez la <a href=\"https://community.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">communauté</a>.",
+      "closing": "On a hâte de voir ce que vous allez faire avec Gladys !",
       "goToDashboardButton": "Accéder au tableau de bord"
     }
   },
   "dashboard": {
     "title": "Tableau de bord",
     "editDashboardButton": "Éditer",
-    "newDashboardButton": "Nouveau",
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
+    "editDashboardSavedButton": "Enregistré",
+    "editDashboardDoneButton": "Terminer",
     "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
     "toggleDefineTabletMode": "Mode tablette",
     "closeDefineTabletMode": "Fermer",
@@ -306,9 +329,6 @@
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Éditer le tableau de bord",
-    "emptyDashboardSentenceTop": "Votre tableau de bord n'est pas encore configuré.",
-    "emptyDashboardSentenceBottom": "Cliquez sur le bouton \"Éditer\" pour le compléter.",
-    "noDashboardSentenceBottom": "Cliquez sur le bouton \"Nouveau\" pour créer un tableau de bord.",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
     "editDashboardVisibility": "Visibilité",
@@ -319,14 +339,25 @@
       "public": "public"
     },
     "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
+    "editDashboardAddSectionButton": "Ajouter une section",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bord",
-    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
+    "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer, utilisez les boutons + pour ajouter widgets, colonnes ou sections. Glissez les widgets pour les déplacer — sur mobile, utilisez les flèches.",
+    "editorDashboardSettingsButton": "Réglages du tableau de bord",
+    "editorDashboardSettings": "Réglages du tableau de bord",
+    "editorMoveSectionUp": "Monter la section",
+    "editorMoveSectionDown": "Descendre la section",
+    "editorColumnWidthWide": "Élargir la colonne (largeur double)",
+    "editorColumnWidthNormal": "Revenir à la largeur normale",
+    "editorNewWidget": "Nouveau widget",
+    "editorNewWidgetPlaceholder": "Choisissez un widget dans le panneau",
     "reorderDashboardButton": "Re-ordonner",
     "stopReorderingDashboardButton": "Arrêter de réordonner",
     "addBoxButton": "Ajouter",
     "selectBoxType": "Sélectionner un type",
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
+    "selectBoxTypeSearchPlaceholder": "Rechercher un widget (horloge, caméra…)",
+    "selectBoxTypeNoResult": "Aucun widget ne correspond à « {{search}} »",
     "boxTitle": {
       "alarm": "Alarme",
       "weather": "Météo",
@@ -347,10 +378,14 @@
       "voice-assistant": "Assistant vocal",
       "link": "Lien",
       "photo": "Photo",
-      "sun": "Soleil"
+      "sun": "Soleil",
+      "chips": "Pastilles d'état",
+      "actions": "Actions rapides",
+      "house-view": "Vue de la maison"
     },
     "boxes": {
       "column": "Colonne {{index}}",
+      "section": "Section {{index}}",
       "deleteButton": "Supprimer",
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
@@ -402,6 +437,12 @@
           "thunderstorm": "Orages",
           "wind": "Vent",
           "night": "Nuit",
+          "freezing-rain": "Pluie verglaçante",
+          "freezing-fog": "Brouillard givrant",
+          "snow-thunderstorm": "Averses de neige orageuses",
+          "sandstorm": "Tempête de sable",
+          "tornado": "Tornade",
+          "hurricane": "Cyclone",
           "unknown": "Indisponible"
         },
         "moonPhases": {
@@ -467,6 +508,7 @@
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
         "noImageToShow": "Aucune image à afficher. Êtes-vous sûr que votre caméra est connectée et accessible par Gladys ?",
+        "cameraDisabled": "Cette caméra est désactivée. Vous pouvez la réactiver depuis la page de l'appareil, un contrôle du dashboard ou une scène.",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box",
         "latencyBoxName": "Latence",
@@ -492,6 +534,7 @@
         "lastHour": "Dernière heure",
         "lastTwelveHours": "Dernières 12h",
         "lastDay": "Dernières 24h",
+        "lastThreeDays": "Derniers 3 jours",
         "lastSevenDays": "Derniers 7 jours",
         "lastThirtyDays": "Derniers 30 jours",
         "lastThreeMonths": "Derniers 3 mois",
@@ -580,7 +623,8 @@
         "currentHourState": "Actuellement",
         "peakHour": "Heure pleine",
         "offPeakHour": "Heure creuse",
-        "dayPeakTitle": "Jours tempo"
+        "dayPeakTitle": "Jours tempo",
+        "error": "Impossible de récupérer les données EDF Tempo. Vérifiez que le service EDF Tempo est bien configuré."
       },
       "clock": {
         "analog": "Analogique",
@@ -595,7 +639,9 @@
       "scene": {
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
-        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
+        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici.",
+        "editStatusFeatureLabel": "État en direct sous chaque bouton (optionnel)",
+        "editStatusFeatureDescription": "Choisissez une fonctionnalité d'appareil pour afficher son état sous le bouton de la scène, ex : position des volets ou état de l'aspirateur."
       },
       "link": {
         "editTitleLabel": "Titre",
@@ -701,7 +747,112 @@
         "errorNoTranscription": "Je n'ai pas compris votre message. Parlez plus près du micro et réessayez.",
         "configDescription": "Ce widget utilise Gladys Plus pour la reconnaissance vocale, l'IA et la synthèse vocale. Connectez votre instance à Gladys Plus pour l'utiliser.",
         "plusRequiredHint": "Connectez Gladys Plus pour activer le micro."
+      },
+      "chips": {
+        "editDescription": "Une barre compacte de pastilles d'état. Ajoutez des pastilles et choisissez ce que chacune affiche.",
+        "editChipLabel": "Pastille {{index}}",
+        "removeChipButton": "Supprimer la pastille {{index}}",
+        "editChipTypeLabel": "Que doit afficher cette pastille ?",
+        "chipTypes": {
+          "device-feature": "L'état d'un appareil",
+          "openings": "Résumé des ouvertures (portes/fenêtres)",
+          "alarm": "État de l'alarme",
+          "calendar-next-event": "Prochain événement d'agenda"
+        },
+        "editDeviceFeatureLabel": "Fonctionnalité de l'appareil",
+        "editHouseLabel": "Maison",
+        "editRoomLabel": "Pièce (optionnel, pour restreindre)",
+        "editCalendarLabel": "Agenda",
+        "allCalendars": "Tous les agendas",
+        "editEventNameFilterLabel": "Uniquement les événements contenant (optionnel)",
+        "editEventNameFilterPlaceholder": "ex : Poubelle",
+        "editLabelLabel": "Libellé (optionnel)",
+        "editLabelPlaceholder": "ex : Garage",
+        "addChipButton": "Ajouter une pastille",
+        "openings": "{{count}} ouvert(s)",
+        "allClosed": "Tout fermé",
+        "noEvent": "Aucun événement à venir",
+        "error": "Erreur",
+        "alarmModes": {
+          "disarmed": "Désactivée",
+          "armed": "Activée",
+          "partially-armed": "Partiellement activée",
+          "panic": "Panique"
+        }
+      },
+      "actions": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Volets, Lumières…",
+        "actionLabel": "Action {{index}}",
+        "removeActionButton": "Supprimer l'action {{index}}",
+        "actionTypeLabel": "Type d'action",
+        "actionTypes": {
+          "scene": "Démarrer une scène",
+          "device-feature": "Contrôler un appareil"
+        },
+        "sceneLabel": "Scène",
+        "deviceFeatureLabel": "Fonctionnalité de l'appareil",
+        "commandLabel": "Commande",
+        "commands": {
+          "open": "Ouvrir",
+          "stop": "Stop",
+          "close": "Fermer"
+        },
+        "labelLabel": "Libellé du bouton (optionnel)",
+        "labelPlaceholder": "Ouvrir RDC…",
+        "addActionButton": "Ajouter une action",
+        "noActions": "Aucune action configurée pour l'instant. Éditez le tableau de bord pour en ajouter."
+      },
+      "house-view": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "ex : Ma maison",
+        "editGalleryLabel": "Choisissez une illustration",
+        "editUploadLabel": "Ou envoyez votre propre image",
+        "uploading": "Envoi en cours...",
+        "uploadError": "L'image n'a pas pu être envoyée. Essayez une image plus légère.",
+        "editPinsLabel": "Valeurs en direct sur l'image",
+        "editPinsDescription": "Cliquez sur l'image pour poser une épingle, puis choisissez la fonctionnalité qu'elle affiche. Pour déplacer une épingle, supprimez-la et reposez-la.",
+        "editPinLabel": "Épingle {{index}}",
+        "editPinFeatureLabel": "Fonctionnalité de l'appareil",
+        "editPinLabelLabel": "Libellé (optionnel)",
+        "editPinLabelPlaceholder": "ex : Solaire",
+        "noImage": "Choisissez une illustration dans les réglages du widget.",
+        "error": "L'image n'a pas pu être chargée."
       }
+    },
+    "editDashboardBackgroundLabel": "Ambiance de fond",
+    "editDashboardBackgroundDescription": "Des scènes intégrées, légères et toujours disponibles, même sans internet.",
+    "scenes": {
+      "horizon": "Horizon",
+      "aurora": "Aurore",
+      "dusk": "Crépuscule",
+      "forest": "Forêt",
+      "lagoon": "Lagon",
+      "sand": "Sable",
+      "lavender": "Lavande",
+      "mist": "Brume"
+    },
+    "editDashboardIconLabel": "Icône (optionnel)",
+    "editDashboardIconDescription": "Affichée dans la barre d'onglets des tableaux de bord. Sans icône, une icône correspondant à l'emoji au début du nom est utilisée si possible, sinon une maison générique.",
+    "editDashboardWidthLabel": "Largeur du tableau de bord",
+    "widths": {
+      "standard": "Standard (recommandé)",
+      "full": "Pleine largeur"
+    },
+    "getStarted": {
+      "title": "Bienvenue chez vous !",
+      "subtitle": "Encore quelques étapes et votre maison prend vie.",
+      "progress": "{{done}} sur {{total}}",
+      "devicesTitle": "Connectez vos appareils",
+      "devicesText": "Parcourez les intégrations : Zigbee, Matter, MQTT, caméras… des milliers d'appareils compatibles.",
+      "dashboardCreateTitle": "Créez votre tableau de bord",
+      "dashboardCreateText": "Composez la vue de votre maison : température, lumières, caméras, météo…",
+      "dashboardFillTitle": "Ajoutez vos premiers widgets",
+      "dashboardFillText": "Ce tableau de bord est vide : ouvrez l'éditeur et composez la vue de votre maison.",
+      "scenesTitle": "Automatisez avec les scènes",
+      "scenesText": "Lumières au coucher du soleil, routines du matin : votre maison agit pour vous.",
+      "usersTitle": "Invitez votre foyer",
+      "usersText": "Créez un compte pour chaque membre de la famille."
     }
   },
   "newDashboard": {
@@ -711,6 +862,8 @@
     "dashboardAlreadyExist": "Un tableau de bord avec ce nom existe déjà.",
     "unknownError": "Une erreur inconnue s'est produite. Merci de réessayer !",
     "validationError": "Le tableau de bord n'est pas valide, êtes-vous sûr d'avoir rempli tous les champs ?",
+    "iconLabel": "Icône",
+    "iconDescription": "Affichée dans la barre d'onglets des tableaux de bord. Sur mobile et en mode tablette, c'est souvent elle seule qui identifie le tableau de bord.",
     "createDashboardButton": "Créer"
   },
   "integration": {
@@ -856,6 +1009,7 @@
         "alreadyUpToDateText": "L'intégration est déjà à jour (version {{version}}) : l'image Docker a été re-téléchargée et le conteneur recréé.",
         "statusLabel": "Statut",
         "versionLabel": "Version",
+        "changelogTitle": "Voir le changelog de cette version",
         "dockerImageLabel": "Image Docker",
         "repoLabel": "Dépôt",
         "startButton": "Démarrer",
@@ -3105,12 +3259,7 @@
     "newCondition": "Nouvelle condition",
     "selectActionType": "Sélectionnez un type d'action",
     "selectConditionType": "Sélectionner un type de condition",
-    "addActionButton": "Nouvelle action",
-    "addActionGroupButton": "Nouveau groupe d'action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
-    "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
-    "triggersDescription": "Chaque déclencheur est indépendant. Lorsque les conditions de l'un ces déclencheurs sont respectées, la scène s'exécute.",
-    "actionsDescription": "Toutes les actions de ce bloc s'exécuteront en parallèle. Pour effectuer une séquence d'actions, ajoutez des actions au bloc suivant.",
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "actionsCard": {
@@ -3131,6 +3280,8 @@
         "allServicesLabel": "Tous les services configurés",
         "serviceExplanation": "Choisissez le service de messagerie qui enverra ce message. Par défaut, le message est envoyé sur tous les services configurés par l'utilisateur.",
         "serviceUnavailable": "indisponible",
+        "serviceIntegrationExternal": "intégration externe",
+        "serviceIntegrationInternal": "intégration native",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
@@ -3203,6 +3354,14 @@
         "textPlaceholder": "Valeur de la variable",
         "computedExplanationText": "Entrez ici un calcul, son résultat sera stocké dans la variable. Pour injecter une variable dans le calcul, tapez '{{'.",
         "computedPlaceholder": "Ex : 2 * 3"
+      },
+      "getDate": {
+        "description": "Cette action récupère la date et l'heure actuelles, afin de pouvoir les utiliser dans les actions suivantes de la scène. Les 4 variables, timestamp compris, sont tronquées à la précision choisie : choisissez « Seconde » si vous avez besoin d'un timestamp exact pour un calcul.",
+        "precisionLabel": "Précision",
+        "precisionSecond": "Seconde",
+        "precisionMinute": "Minute",
+        "precisionHour": "Heure",
+        "precisionDay": "Jour"
       },
       "deviceSetValue": {
         "description": "Cette action vous permet de contrôler un appareil.",
@@ -3466,7 +3625,96 @@
       },
       "variable": {
         "set": "Définir une variable"
+      },
+      "time": {
+        "get-date": "Récupérer la date et l'heure"
       }
+    },
+    "actionsDescriptions": {
+      "light": {
+        "turn-on": "Allumer une ou plusieurs lumières",
+        "turn-off": "Éteindre une ou plusieurs lumières",
+        "toggle": "Inverser l'état actuel des lumières",
+        "blink": "Faire clignoter des lumières pour attirer l'attention"
+      },
+      "switch": {
+        "turn-on": "Allumer une prise ou un interrupteur",
+        "turn-off": "Éteindre une prise ou un interrupteur",
+        "toggle": "Inverser l'état actuel des prises"
+      },
+      "device": {
+        "set-value": "Envoyer une commande à n'importe quel appareil",
+        "get-value": "Relever la dernière valeur d'un capteur pour l'utiliser ensuite"
+      },
+      "message": {
+        "send": "Envoyer une notification (Telegram, application…)",
+        "send-camera": "Envoyer la dernière image d'une caméra"
+      },
+      "sms": {
+        "send": "Envoyer un SMS sur un téléphone"
+      },
+      "music": {
+        "play-notification": "Faire lire un texte à voix haute sur une enceinte"
+      },
+      "condition": {
+        "if-then-else": "Suivre un chemin différent selon une condition",
+        "only-continue-if": "Arrêter la scène ici si la condition n'est pas remplie",
+        "while": "Répéter des actions tant qu'une condition est vraie",
+        "check-time": "Continuer seulement à certaines heures ou certains jours"
+      },
+      "user": {
+        "check-presence": "Marquer un utilisateur absent s'il n'a pas été vu récemment",
+        "set-seen-at-home": "Indiquer à Gladys qu'un utilisateur est à la maison",
+        "set-out-of-home": "Indiquer à Gladys qu'un utilisateur a quitté la maison"
+      },
+      "house": {
+        "is-empty": "Continuer seulement si personne n'est à la maison",
+        "is-not-empty": "Continuer seulement si quelqu'un est à la maison"
+      },
+      "alarm": {
+        "check-alarm-mode": "Continuer seulement si l'alarme est dans un mode donné",
+        "set-alarm-mode": "Armer ou désarmer l'alarme d'une maison"
+      },
+      "calendar": {
+        "is-event-running": "Continuer selon qu'un évènement de calendrier est en cours",
+        "get-events": "Récupérer des évènements de calendrier pour les utiliser ensuite"
+      },
+      "ecowatt": {
+        "condition": "Continuer selon le signal Ecowatt du réseau électrique (France)"
+      },
+      "edf-tempo": {
+        "condition": "Continuer selon la couleur du jour EDF Tempo (France)"
+      },
+      "delay": "Faire une pause avant l'étape suivante",
+      "scene": {
+        "start": "Démarrer une autre scène"
+      },
+      "http": {
+        "request": "Appeler une API ou un service externe"
+      },
+      "mqtt": {
+        "send": "Publier un message sur le broker MQTT"
+      },
+      "zigbee2mqtt": {
+        "send": "Publier un message vers un appareil Zigbee2MQTT"
+      },
+      "ai": {
+        "ask": "Poser une question à l'IA et utiliser sa réponse"
+      },
+      "variable": {
+        "set": "Mémoriser une valeur pour la réutiliser dans la scène"
+      },
+      "time": {
+        "get-date": "Récupérer la date et l'heure actuelles pour les réutiliser dans la scène"
+      }
+    },
+    "actionCategories": {
+      "devices": "Appareils & lumières",
+      "messages": "Messages & notifications",
+      "conditions": "Conditions",
+      "flow": "Déroulement",
+      "homeSecurity": "Maison & sécurité",
+      "advanced": "Avancé"
     },
     "variables": {
       "device": {
@@ -3494,6 +3742,12 @@
         "set": {
           "value": "Variable"
         }
+      },
+      "getDate": {
+        "datetime": "Date et heure actuelles",
+        "date": "Date actuelle",
+        "time": "Heure actuelle",
+        "timestamp": "Timestamp actuel (en secondes, utilisable dans un calcul)"
       }
     },
     "triggers": {
@@ -3538,6 +3792,57 @@
         "alert-raised": "Alerte météo déclenchée",
         "alert-ended": "Alerte météo terminée"
       }
+    },
+    "triggersDescriptions": {
+      "device": {
+        "new-state": "Quand un capteur ou un appareil change d'état"
+      },
+      "time": {
+        "changed": "À une heure précise, une fois ou de façon répétée",
+        "sunrise": "Chaque matin au lever du soleil",
+        "sunset": "Chaque soir au coucher du soleil"
+      },
+      "calendar": {
+        "event-is-coming": "Un peu avant, au début ou à la fin d'un évènement de calendrier"
+      },
+      "user": {
+        "back-home": "Quand un membre du foyer rentre à la maison",
+        "left-home": "Quand un membre du foyer quitte la maison"
+      },
+      "house": {
+        "empty": "Quand la dernière personne quitte la maison",
+        "no-longer-empty": "Quand quelqu'un arrive dans une maison vide"
+      },
+      "area": {
+        "user-entered": "Quand un utilisateur entre dans une zone de la carte",
+        "user-left": "Quand un utilisateur sort d'une zone de la carte"
+      },
+      "alarm": {
+        "arm": "Quand l'alarme vient d'être armée",
+        "arming": "Pendant le délai avant l'armement de l'alarme",
+        "partial-arm": "Quand l'alarme passe en mode partiel (nuit)",
+        "disarm": "Quand l'alarme est désarmée",
+        "panic": "Quand le mode panique est déclenché",
+        "too-many-codes-tests": "Quand trop de codes invalides ont été essayés"
+      },
+      "system": {
+        "start": "Quand Gladys démarre ou redémarre"
+      },
+      "mqtt": {
+        "received": "Quand un message arrive sur un sujet MQTT"
+      },
+      "weather": {
+        "alert-raised": "Quand une alerte météo commence (vent, pluie…)",
+        "alert-ended": "Quand une alerte météo se termine"
+      }
+    },
+    "triggerCategories": {
+      "devices": "Appareils & capteurs",
+      "time": "Temps & calendrier",
+      "presence": "Présence",
+      "alarm": "Alarme",
+      "weather": "Météo",
+      "advanced": "Avancé"
     },
     "triggersCard": {
       "newState": {
@@ -3672,7 +3977,31 @@
           "extreme": "Extrême (rouge)"
         }
       }
-    }
+    },
+    "searchActionsPlaceholder": "Rechercher une action…",
+    "searchTriggersPlaceholder": "Rechercher un déclencheur…",
+    "noResultsFound": "Aucun résultat",
+    "whenSectionTitle": "Quand",
+    "whenSectionSubtitle": "la scène démarre dès qu'un seul de ces événements se produit",
+    "thenSectionTitle": "Alors",
+    "thenSectionSubtitle": "ces étapes s'exécutent dans l'ordre",
+    "addStepButton": "Ajouter une étape",
+    "parallelBlockTitle": "En même temps",
+    "addParallelActionButton": "Ajouter une action en parallèle",
+    "unsavedChanges": "Modifications non enregistrées",
+    "savedLabel": "Enregistré",
+    "orSeparator": "OU",
+    "triggersIndependentHint": "Chaque déclencheur démarre la scène indépendamment des autres, un seul suffit. Pour exiger plusieurs conditions à la fois, ajoutez une étape « Condition » dans le déroulé de la scène.",
+    "backButton": "Retour à la liste des scènes",
+    "insertStepButton": "Insérer une étape ici",
+    "closeSettingsButton": "Fermer les paramètres",
+    "deleteActionButton": "Supprimer cette action",
+    "deleteConditionButton": "Supprimer cette condition",
+    "deleteStepButton": "Supprimer cette étape",
+    "moveHandleLabel": "Réorganiser (glisser, ou flèches haut et bas)",
+    "deleteTriggerButton": "Supprimer ce déclencheur",
+    "expandStepButton": "Afficher le détail",
+    "collapseStepButton": "Masquer le détail"
   },
   "profile": {
     "title": "Profil",
@@ -3731,6 +4060,7 @@
     "housesTab": "Maisons",
     "usersTab": "Utilisateurs",
     "sessionsTab": "Sessions",
+    "securityTab": "Sécurité",
     "systemTab": "Système",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Sauvegardes",
@@ -3741,10 +4071,42 @@
     "gatewayOpenApiTab": "Open API"
   },
   "housesSettings": {
+    "title": "Maisons",
+    "subtitle": "Une maison contient des pièces, et chaque appareil est rangé dans une pièce. Ouvrez une maison pour la modifier.",
     "searchPlaceholder": "Chercher une maison",
     "newButton": "Nouveau",
+    "newButtonLabel": "Créer une maison",
     "defaultNewHouseName": "Nouvelle Maison",
-    "noHouseFound": "Aucune maison trouvée"
+    "noHouseFound": "Aucune maison trouvée",
+    "houseCount": "{{count}} maisons",
+    "oneHouseCount": "1 maison",
+    "saved": "Enregistré",
+    "removeRoom": "Supprimer la pièce",
+    "toggleAlarmCodeVisibility": "Afficher ou masquer le code de l'alarme",
+    "deleteConfirmTitle": "Supprimer « {{name}} » ?",
+    "deleteConfirmDescription": "La maison et toutes ses pièces seront supprimées. Cette action est irréversible.",
+    "summary": {
+      "rooms": "{{count}} pièces",
+      "oneRoom": "1 pièce",
+      "noRoom": "Aucune pièce",
+      "located": "Localisée",
+      "notLocated": "Non localisée",
+      "alarmSet": "Code d'alarme défini",
+      "alarmNotSet": "Pas de code d'alarme",
+      "neverSaved": "Non enregistrée",
+      "unsavedChanges": "Modifications non enregistrées"
+    },
+    "sections": {
+      "identity": "Identité",
+      "location": "Localisation",
+      "rooms": "Pièces",
+      "noRoomYet": "Aucune pièce pour l'instant. Ajoutez-en une ci-dessous."
+    },
+    "empty": {
+      "title": "Aucune maison",
+      "description": "Créez votre première maison pour y ajouter des pièces et y ranger vos appareils.",
+      "button": "Créer une maison"
+    }
   },
   "usersSettings": {
     "title": "Utilisateurs",
@@ -3920,6 +4282,7 @@
     "connected": "Connecté",
     "ping": "{{time}} ms ping",
     "disk": "Disque",
+    "localIp": "IP Hôte",
     "uptime": " Démarré",
     "gladysVersion": "Version",
     "gladysVersionValue": "Gladys {{version}}",
@@ -3959,6 +4322,13 @@
     "configurationTitle": "Configuration",
     "timezone": "Fuseau horaire",
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
+    "mdns": "Adresse locale (mDNS)",
+    "mdnsText": "Gladys s'annonce sur le réseau local et est accessible à l'adresse ci-dessous. Modifiez le nom si plusieurs instances de Gladys tournent sur votre réseau. Le changement est appliqué immédiatement, sans redémarrage.",
+    "mdnsSaved": "Enregistré !",
+    "mdnsInvalidName": "Nom invalide : utilisez uniquement des lettres minuscules, des chiffres et des tirets, ne commencez ni ne terminez par un tiret, et restez sous les 64 caractères.",
+    "mdnsError": "Une erreur s'est produite lors de la sauvegarde.",
+    "mdnsCurrentUrl": "Gladys est accessible sur :",
+    "mdnsNotAdvertised": "Gladys ne s'annonce pas sur le réseau local : elle tourne dans un conteneur Docker en mode bridge, ou aucune interface réseau locale n'a été détectée.",
     "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
     "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états bruts des appareils.",
     "deviceAggregatesStateRetentionTime": "Conserver les états agrégés",
@@ -3971,6 +4341,17 @@
     "vacuumDatabaseButton": "Lancer le nettoyage",
     "vacuumDatabaseStarted": "Le nettoyage a commencé... Gladys sera indisponible jusqu'à la fin du nettoyage.",
     "vacuumDatabaseFinished": "Le nettoyage a terminé. Gladys est de nouveau disponible. Temps de nettoyage : {{duration}}.",
+    "hostPowerTitle": "Redémarrer / Éteindre l'hôte",
+    "hostPowerDescription": "Redémarrez ou éteignez la machine qui héberge Gladys (par exemple votre Raspberry Pi). Cette action utilise systemd-logind via DBus : sur une installation Docker, Gladys passe par un conteneur utilitaire éphémère lancé via le socket Docker, rien n'a besoin d'être monté sur le conteneur Gladys lui-même. Gladys et toutes vos automatisations seront arrêtées jusqu'au redémarrage de la machine.",
+    "hostRebootButton": "Redémarrer l'hôte",
+    "hostShutdownButton": "Éteindre l'hôte",
+    "hostRebootConfirm": "Êtes-vous sûr de vouloir redémarrer la machine hôte ? Gladys sera indisponible pendant le redémarrage.",
+    "hostShutdownConfirm": "Êtes-vous sûr de vouloir éteindre la machine hôte ? Gladys restera éteinte jusqu'à ce que vous rallumiez la machine manuellement.",
+    "hostRebootSent": "Commande de redémarrage envoyée. La machine redémarre, Gladys sera de nouveau disponible sous peu.",
+    "hostShutdownSent": "Commande d'extinction envoyée. La machine s'éteint.",
+    "hostPowerError": "Impossible d'envoyer la commande : l'hôte l'a refusée ou systemd-logind n'a pas pu être joint. Consultez les logs de Gladys pour en savoir plus.",
+    "hostPowerUnavailable": "Le redémarrage et l'extinction ne sont pas disponibles sur cette installation : cet hôte n'autorise pas Gladys à le redémarrer ou l'éteindre via systemd-logind.",
+    "hostPowerUnavailableTooltip": "Indisponible : cet hôte n'autorise pas Gladys à le redémarrer ou l'éteindre via systemd-logind.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
@@ -3987,6 +4368,7 @@
     "duckDbMigrationProgressTitle": "Avancement de la migration",
     "duckDbMigrationMigrationDone": "Migration effectuée :",
     "duckDbNumberOfStatesinSQlite": "Nombre d'états dans SQLite",
+    "duckDbNumberOfAggregatesinSQlite": "Nombre d'agrégats dans SQLite",
     "duckDbNumberOfStatesinDuckDb": "Nombre d'états dans DuckDB",
     "restartMigrationTitle": "Relancer la migration",
     "confirm": "Confirmer",
@@ -4024,6 +4406,7 @@
     "noResult": "Aucune icône ne correspond à \"{{search}}\"."
   },
   "newScene": {
+    "backButton": "Retour à la liste des scènes",
     "cardTitle": "Nouvelle scène",
     "nameLabel": "Nom",
     "namePlaceholder": "Entrez le nom de votre scène",
@@ -4034,6 +4417,7 @@
     "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
   },
   "duplicateScene": {
+    "backButton": "Retour à la scène",
     "cardTitle": "Dupliquer la scène \"{{name}}\"",
     "nameLabel": "Nom",
     "namePlaceholder": "Entrez un nouveau nom",
@@ -4046,7 +4430,14 @@
   },
   "scene": {
     "title": "Scènes",
-    "emptySceneSentenceTop": "Impossible de trouver des scènes.",
+    "emptyState": {
+      "missionChip": "Première mission",
+      "title": "Créez votre première scène",
+      "text": "Votre maison n'attend qu'un signal : allumer la lumière au coucher du soleil, baisser le chauffage la nuit, lancer la musique au réveil... À vous de jouer !",
+      "createButton": "Créer ma première scène",
+      "noResultsTitle": "Aucune scène ne correspond",
+      "noResultsText": "Essayez un autre mot-clé ou effacez les filtres pour retrouver vos scènes."
+    },
     "newButton": "Nouveau",
     "editButton": "Éditer",
     "startButton": "Démarrer",
@@ -4067,6 +4458,7 @@
     "backupKeyDescription": "Votre clé de sauvegarde est utilisée pour chiffrer vos sauvegardes Gladys. Veuillez enregistrer cette clé quelque part en dehors de Gladys pour pouvoir restaurer Gladys. Nous vous recommandons d'utiliser un gestionnaire de mots de passe pour cela.",
     "backupKeyLabel": "Votre clé de sauvegarde",
     "backupKeyPlaceholder": "Entrez / restaurez une clé de sauvegarde",
+    "toggleBackupKeyVisibility": "Afficher ou masquer la clé de sauvegarde",
     "saveBackupKeyButton": "Sauvegarder",
     "usersListTitle": "Utilisateurs distants",
     "userColumn": "Utilisateur",
@@ -4196,6 +4588,14 @@
       "feature2": "IA proactive dans les scènes : exécute des questions domotiques à intervalle régulier (lire une plaque d'immatriculation, vérifier le niveau de CO₂, surveiller une caméra…)",
       "feature3": "Modèles IA open-weight hébergés en France · pas de données revendues"
     },
+    "chat": {
+      "title": "Discute avec ta maison grâce à l'IA Gladys Plus",
+      "description": "Gladys Plus débloque le chat : pose tes questions en langage naturel, pilote tes appareils et sache ce qui se passe chez toi. Modèles d'IA open-weight hébergés en France.",
+      "feature1": "« Éteins la lumière du salon », « Est-ce que le garage est fermé ? » : il suffit d'envoyer un message",
+      "feature2": "Dans tes scènes, l'IA analyse ce que voient tes caméras et te répond",
+      "feature3": "Obtiens un résumé hebdomadaire de ta maison : températures, consommation, appareils restés allumés",
+      "feature4": "Modèles d'IA open-weight · aucune donnée revendue"
+    },
     "enedis": {
       "title": "Suis ta consommation électrique avec Enedis",
       "description": "Gladys Plus inclut l'intégration officielle Enedis pour récupérer ta consommation électrique, l'afficher sur tes dashboards et déclencher des scènes selon ta conso.",
@@ -4265,13 +4665,33 @@
     "twoFactorCodePlaceholder": "Code à 6 chiffres",
     "loginTwoFactorButtonText": "Finaliser la connexion",
     "invalidTwoFactorCode": "Le code 2FA n'est pas valide. Réessayez avec un nouveau code généré par votre application.",
-    "lostTwoFactor": "Vous avez perdu votre 2FA ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> et nous la réinitialiserons.",
+    "invalidRecoveryCode": "Ce code de récupération est invalide ou a déjà été utilisé.",
+    "lostTwoFactor": "Vous avez perdu l'accès à votre application 2FA ?",
+    "useRecoveryCodeLink": "Utiliser un code de récupération",
+    "noRecoveryCode": "Pas de code de récupération ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> et nous la réinitialiserons.",
+    "useTwoFactorCodeLink": "Utiliser plutôt un code de votre application 2FA",
+    "recoveryCodeLabel": "Code de récupération",
+    "recoveryCodePlaceholder": "Entrez l'un de vos codes de récupération",
     "twoFactorEnabledSuccess": "La 2FA a bien été activée ! Entrez un nouveau code généré par votre application pour finaliser la connexion."
+  },
+  "gatewayRecoveryCodes": {
+    "cardTitle": "Vos codes de récupération",
+    "description": "Si vous perdez l'accès à votre application 2FA, vous pourrez vous connecter à votre compte Gladys Plus avec l'un de ces codes de récupération à usage unique.",
+    "saveThemNow": "Enregistrez ces codes dès maintenant dans un endroit sûr : ils ne seront plus jamais affichés.",
+    "downloadButton": "Télécharger",
+    "copyButton": "Copier",
+    "copiedButton": "Copié !",
+    "generationError": "Nous n'avons pas pu générer vos codes de récupération. Sans eux, vous ne pourrez pas vous connecter si vous perdez votre application 2FA.",
+    "retryButton": "Réessayer",
+    "generateButton": "Générer des codes de récupération",
+    "confirmGenerateButton": "Générer de nouveaux codes",
+    "rotationWarning": "Générer un nouveau jeu invalide immédiatement les codes de récupération que vous possédez peut-être déjà. Seuls les nouveaux fonctionneront.",
+    "continueButton": "Continuer"
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Configurer l'authentification à deux facteurs (2FA)",
     "twoFactorNotConfigured": "L'authentification à deux facteurs (2FA) n'est pas encore configurée sur votre compte Gladys Plus. Elle est indispensable pour connecter votre instance.",
-    "scanInstructions": "Scannez ce QR code avec une application 2FA (Authy, Google Authenticator...), ou copiez le secret manuellement dans votre application.",
+    "scanInstructions": "Scannez ce QR code avec votre application 2FA, ou copiez le secret manuellement dans votre application.",
     "secretLabel": "Secret",
     "copy": "Copier",
     "confirmCodeLabel": "Entrez le code affiché dans votre application",
@@ -4494,6 +4914,21 @@
     "square-meter": "m²",
     "square-kilometer": "km²",
     "decibel": "dB"
+  },
+  "lightControl": {
+    "openPanel": "Ouvrir les réglages de la lumière",
+    "brightness": "Luminosité",
+    "color": "Couleur",
+    "temperature": "Température de couleur",
+    "hue": "Teinte",
+    "saturation": "Saturation",
+    "warm": "Chaud",
+    "cold": "Froid",
+    "on": "Allumée",
+    "off": "Éteinte",
+    "turnOn": "Allumer",
+    "turnOff": "Éteindre",
+    "close": "Fermer"
   },
   "deviceFeatureAction": {
     "category": {
@@ -5251,6 +5686,7 @@
     "camera": {
       "shortCategoryName": "Caméra",
       "image": "Caméra (Image)",
+      "enabled": "Caméra activée",
       "move": "Mouvement de la caméra (PTZ)",
       "preset": "Position mémorisée de la caméra (preset)",
       "pan-position": "Position panoramique de la caméra",
@@ -5748,23 +6184,10 @@
   },
   "chat": {
     "emptyStateMessage": "Envoie-moi un message !",
-    "emptyStateMessageNoPlus": "Le chat Gladys utilise l'IA Gladys Plus. Connecte ton instance à Gladys Plus pour discuter avec ta maison.",
     "messagePlaceholder": "Ecrivez votre message...",
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
-    "sidebar": {
-      "title": "Comment fonctionne le chat ?",
-      "intro": "Le chat Gladys utilise l'intelligence artificielle Gladys Plus pour te permettre de communiquer naturellement avec ta maison connectée.",
-      "plusNotConfigured": "Connecte Gladys Plus pour utiliser le chat IA.",
-      "plusActive": "L'IA Gladys Plus est active dans ce chat.",
-      "upsellTitle": "Débloque l'IA avancée",
-      "upsellCompactDescription": "Gladys Plus donne accès à des modèles IA open-weight dans ce chat : questions ouvertes, analyse de caméras, et bien plus.",
-      "upsellDescription": "Discute naturellement avec ta maison connectée grâce à l'intelligence artificielle Gladys Plus.",
-      "upsellFeature1": "Pose des questions ouvertes à ta maison",
-      "upsellFeature2": "Analyse ce que voient tes caméras",
-      "upsellFeature3": "Modèles IA open-weight hébergés en France"
-    },
     "toolCall": {
       "statusUsed": "Utilisé",
       "statusError": "Erreur",
@@ -5775,6 +6198,17 @@
       "label": "Modèle IA",
       "auto": "Auto",
       "priceLegend": "€ économique · €€ moyen · €€€ premium"
+    },
+    "voiceInput": {
+      "startListening": "Dicter un message",
+      "stopListening": "Arrêter la dictée",
+      "error": "La dictée a échoué. Vérifiez que Gladys Plus est connecté, puis réessayez.",
+      "errorNoSpeech": "Aucune voix détectée. Vérifiez que votre micro est activé, puis réessayez.",
+      "errorPermissionDenied": "L'accès au micro a été refusé. Autorisez-le dans les réglages de votre navigateur pour dicter un message.",
+      "errorNoMicrophone": "Aucun micro détecté. Branchez ou activez un micro dans les réglages système.",
+      "errorMicrophoneUnavailable": "Le micro est indisponible. Vérifiez qu'il n'est pas utilisé par une autre application.",
+      "errorNoTranscription": "Je n'ai pas compris votre message. Parlez plus près du micro et réessayez.",
+      "errorNotSupported": "L'enregistrement vocal n'est pas disponible dans ce navigateur."
     }
   },
   "history": {
@@ -5866,6 +6300,12 @@
     "scenes": "Scènes",
     "profile": "Profil",
     "settings": "Paramètres",
+    "trialDaysLeft": {
+      "zero": "L'essai Gladys Plus se termine aujourd'hui",
+      "one": "Essai Gladys Plus : 1 jour restant",
+      "other": "Essai Gladys Plus : {{count}} jours restants"
+    },
+    "trialAddPaymentMethod": "Ajouter un moyen de paiement",
     "needHelp": "Besoin d'aide",
     "signOut": "Déconnexion"
   },
@@ -5963,6 +6403,7 @@
     "formTitle": "Gladys Plus - Réinitialiser le mot de passe",
     "incompatibleBrowserLabel": "Désolé, votre navigateur n'est pas compatible avec la passerelle Gladys. Votre navigateur doit prendre en charge l'API WebCrypto ainsi que la base de données IndexedDB.",
     "errorLinkLabel": "Nous ne pouvons pas récupérer votre lien pour la réinitialisation de votre mot de passe. Peut-être qu'il a déjà été utilisé ou a expiré !",
+    "invalidRecoveryCodeLabel": "Ce code de récupération est invalide ou a déjà été utilisé. Votre lien de réinitialisation est toujours valide, réessayez avec un autre code de récupération.",
     "passwordNotMatchingLabel": "Le mot de passe ne correspond pas.",
     "passwordLabel": "Mot de passe (min 8 caractères)",
     "passwordPlaceholder": "Mot de passe",
@@ -5970,6 +6411,11 @@
     "repeatPasswordLabel": "Répéter le mot de passe",
     "twoFactorCodeLabel": "Code à deux facteurs (\"2FA\")",
     "twoFactorCodePlaceholder": "Code 2FA à 6 chiffres",
+    "lostTwoFactor": "Vous avez perdu l'accès à votre application 2FA ?",
+    "useRecoveryCodeLink": "Utiliser un code de récupération",
+    "useTwoFactorCodeLink": "Utiliser plutôt un code de votre application 2FA",
+    "recoveryCodeLabel": "Code de récupération",
+    "recoveryCodePlaceholder": "Entrez l'un de vos codes de récupération",
     "resetPasswordButton": "Réinitialiser le mot de passe"
   },
   "gatewayOpenApi": {
@@ -5986,6 +6432,9 @@
     "registeredLabel": "Enregistré le :",
     "neverUsed": "Jamais"
   },
+  "twoFactorApps": {
+    "description": "N'importe quelle application générant des codes à 6 chiffres fonctionne. Si vous n'en avez pas encore, voici quelques applications gratuites et simples à installer :"
+  },
   "gatewayTwoFactorAuth": {
     "title": "Gladys Plus",
     "configureTitle": "Configurer l'authentification à deux facteurs (\"2FA\")",
@@ -5993,7 +6442,7 @@
     "secretLabel": "Secret",
     "copy": "Copier",
     "securityIsImportant": "La sécurité de votre compte Gladys Gateway est vraiment importante pour nous.",
-    "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/fr/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
+    "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application d'authentification sur votre téléphone.",
     "invalidCode": "Le code 2FA que vous avez fourni n'est pas valide.",
     "confirmCode": "Confirmer 2FA",
     "enterCode": "Entrez le code à 6 chiffres",
@@ -6045,5 +6494,12 @@
     "cancelUpgradeToYearly": "Annuler",
     "upgradeYearlyError": "Une erreur est survenue lors de la mise à jour vers le plan annuel, merci de nous contacter par email ou sur le forum.",
     "upgradeYearlySuccess": "Merci d'être passé au plan annuel !"
+  },
+  "deviceFeatureValueText": {
+    "noValue": "Aucune valeur",
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "on": "Allumé",
+    "off": "Éteint"
   }
 }

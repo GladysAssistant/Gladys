@@ -1,5 +1,7 @@
 const dgram = require('dgram');
+const fs = require('fs');
 const os = require('os');
+const path = require('path');
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
@@ -10,6 +12,7 @@ const { BadParameters, ForbiddenError, ConflictError, TooManyRequests } = requir
 const {
   getBroadcastAddresses,
 } = require('../../../lib/external-integration/networkDiscovery/networkDiscovery.scanUdpActiveBroadcast');
+const { readArpTable } = require('../../../lib/external-integration/networkDiscovery/networkDiscovery.scanSsdp');
 const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('./testUtils.test');
 
 // manifest of an integration declaring the four curated capture types
@@ -25,8 +28,36 @@ const TEST_DISCOVERY_MANIFEST = {
   ],
 };
 
+// same integration declaring several entries of the same type: 2 ports on
+// one udp-broadcast entry and 2 more (one of them a duplicate) on a second,
+// 9999 on one udp-active-broadcast entry and 20002 on a second — all valid
+// for validateManifest (5 entries max, 5 ports per entry)
+const TEST_MULTI_ENTRY_DISCOVERY_MANIFEST = {
+  ...TEST_MANIFEST,
+  network_discovery: [
+    { type: 'udp-broadcast', ports: [6666, 6667] },
+    { type: 'udp-active-broadcast', ports: [9999] },
+    { type: 'udp-broadcast', ports: [6667, 7000] },
+    { type: 'udp-active-broadcast', ports: [20002] },
+  ],
+};
+
 const seedDiscoveryService = (overrides = {}) =>
   seedExternalService({ manifest: TEST_DISCOVERY_MANIFEST, ...overrides });
+
+// writes a fake /proc/net/arp, the kernel neighbour table the SSDP scan
+// reads to resolve the MAC address of a responder
+const writeFakeArpTable = (content) => {
+  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'gladys-arp-'));
+  const filePath = path.join(folder, 'arp');
+  fs.writeFileSync(filePath, content);
+  return filePath;
+};
+
+const FAKE_ARP_TABLE = `IP address       HW type     Flags       HW address            Mask     Device
+192.168.1.71     0x1         0x2         64:E4:A5:B4:88:74     *        eth0
+127.0.0.1        0x1         0x2         AA:BB:CC:DD:EE:FF     *        eth0
+`;
 
 const getFreeUdpPort = () =>
   new Promise((resolve, reject) => {
@@ -201,6 +232,51 @@ describe('externalIntegration.runNetworkDiscoveryScan', () => {
     // once the interval has elapsed, a new scan is accepted
     externalIntegration.networkDiscoveryActiveScanTimes.set(service.id, Date.now() - 11000);
     await externalIntegration.runNetworkDiscoveryScan(service, body);
+  });
+
+  it('should authorize an active scan on a port declared by any entry of the type', async () => {
+    // a manifest may declare several entries of the same type (5 entries
+    // of 5 ports each): the install screen shows them all, so the ports of
+    // the second entry are approved just like those of the first
+    const service = await seedDiscoveryService({ manifest: TEST_MULTI_ENTRY_DISCOVERY_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.scanUdpActiveBroadcast = fake.resolves([]);
+    await externalIntegration.runNetworkDiscoveryScan(service, {
+      type: 'udp-active-broadcast',
+      port: 20002,
+      payload_base64: 'a2FzYQ==',
+      timeout_seconds: 1,
+    });
+    expect(externalIntegration.scanUdpActiveBroadcast.firstCall.args[0]).to.deep.equal({
+      port: 20002,
+      payload: Buffer.from('kasa'),
+      timeoutMs: 1000,
+    });
+    // a port declared by no entry of the type stays refused, even when
+    // another type declares it
+    externalIntegration.networkDiscoveryActiveScanTimes.delete(service.id);
+    try {
+      await externalIntegration.runNetworkDiscoveryScan(service, {
+        type: 'udp-active-broadcast',
+        port: 6666,
+        payload_base64: 'a2FzYQ==',
+      });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(ForbiddenError);
+      expect(e.message).to.include('port 6666 is not declared');
+    }
+  });
+
+  it('should capture on the ports of every declared entry of the type, each port once', async () => {
+    const service = await seedDiscoveryService({ manifest: TEST_MULTI_ENTRY_DISCOVERY_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.scanUdpBroadcast = fake.resolves([]);
+    await externalIntegration.runNetworkDiscoveryScan(service, { type: 'udp-broadcast', timeout_seconds: 1 });
+    expect(externalIntegration.scanUdpBroadcast.firstCall.args[0]).to.deep.equal({
+      ports: [6666, 6667, 7000],
+      timeoutMs: 1000,
+    });
   });
 });
 
@@ -382,6 +458,62 @@ describe('externalIntegration.scanSsdp', () => {
     expect(results[0].headers).to.include('LOCATION: http://192.168.1.30:8008');
   });
 
+  it('should expose the source MAC address when the neighbour table resolves it', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const responder = dgram.createSocket('udp4');
+    responder.on('message', (message, remoteInfo) => {
+      responder.send(
+        'HTTP/1.1 200 OK\r\nLOCATION: http://192.168.1.71:1900\r\n\r\n',
+        remoteInfo.port,
+        remoteInfo.address,
+      );
+    });
+    await new Promise((resolve) => {
+      responder.bind(0, '127.0.0.1', resolve);
+    });
+    const results = await externalIntegration.scanSsdp({
+      st: 'urn:lge-com:service:webos-second-screen:1',
+      timeoutMs: 700,
+      address: '127.0.0.1',
+      port: responder.address().port,
+      arpTablePath: writeFakeArpTable(FAKE_ARP_TABLE),
+    });
+    responder.close();
+    expect(results).to.have.lengthOf(1);
+    expect(results[0].source_ip).to.equal('127.0.0.1');
+    // normalized to lowercase, whatever the kernel prints
+    expect(results[0].source_mac).to.equal('aa:bb:cc:dd:ee:ff');
+    expect(results[0].source_port).to.be.a('number');
+    expect(results[0].headers).to.include('LOCATION: http://192.168.1.71:1900');
+  });
+
+  it('should omit the source MAC address when the responder is not in the neighbour table', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const responder = dgram.createSocket('udp4');
+    responder.on('message', (message, remoteInfo) => {
+      responder.send('HTTP/1.1 200 OK\r\n\r\n', remoteInfo.port, remoteInfo.address);
+    });
+    await new Promise((resolve) => {
+      responder.bind(0, '127.0.0.1', resolve);
+    });
+    const results = await externalIntegration.scanSsdp({
+      st: 'ssdp:all',
+      timeoutMs: 700,
+      address: '127.0.0.1',
+      port: responder.address().port,
+      // a table that knows another host: source_mac stays absent, the
+      // integration must treat it as optional
+      arpTablePath: writeFakeArpTable(
+        `IP address       HW type     Flags       HW address            Mask     Device
+192.168.1.71     0x1         0x2         64:e4:a5:b4:88:74     *        eth0
+`,
+      ),
+    });
+    responder.close();
+    expect(results).to.have.lengthOf(1);
+    expect(results[0]).to.not.have.property('source_mac');
+  });
+
   it('should return nothing when nobody answers', async () => {
     const { externalIntegration } = buildSupervisor();
     const port = await getFreeUdpPort();
@@ -403,6 +535,36 @@ describe('externalIntegration.scanSsdp', () => {
       port: 1900,
     });
     expect(results).to.deep.equal([]);
+  });
+});
+
+describe('networkDiscovery.readArpTable', () => {
+  it('should map the resolved neighbours and skip the entries without a usable MAC', async () => {
+    const arpTablePath = writeFakeArpTable(
+      `IP address       HW type     Flags       HW address            Mask     Device
+192.168.1.71     0x1         0x2         64:E4:A5:B4:88:74     *        eth0
+192.168.1.72     0x1         0x0         00:00:00:00:00:00     *        eth0
+192.168.1.73     0x1         0x0         incomplete            *        eth0
+192.168.1.75     0x1         0x0         AA:BB:CC:DD:EE:FF     *        eth0
+192.168.1.76     0x1         0x6         11:22:33:44:55:66     *        eth0
+192.168.1.74
+
+`,
+    );
+    const macByIp = await readArpTable(arpTablePath);
+    // 192.168.1.75 looks resolved but ATF_COM (0x2) is not set: the kernel
+    // gave up on it and kept the address it last saw, which may be stale.
+    // 192.168.1.76 is permanent (ATF_PERM | ATF_COM) and must be kept.
+    expect([...macByIp.entries()]).to.deep.equal([
+      ['192.168.1.71', '64:e4:a5:b4:88:74'],
+      ['192.168.1.76', '11:22:33:44:55:66'],
+    ]);
+  });
+
+  it('should return an empty map when the neighbour table cannot be read', async () => {
+    // a non-Linux host has no /proc/net/arp: best-effort, never an error
+    const macByIp = await readArpTable(path.join(os.tmpdir(), 'gladys-no-such-arp-table'));
+    expect(macByIp.size).to.equal(0);
   });
 });
 

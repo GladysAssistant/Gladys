@@ -73,6 +73,28 @@ describe('sceneSchemas helpers', () => {
   });
 });
 
+describe('sceneSchemas time.get-date action', () => {
+  const schema = createSceneCreateInputSchema();
+  const buildScene = (action) => ({
+    name: 'Tell me the time',
+    icon: 'clock',
+    triggers: [{ type: 'system.start' }],
+    actions: [[{ type: ACTIONS.TIME.GET_DATE, ...action }]],
+  });
+
+  it('should accept an action without precision', () => {
+    expect(schema.safeParse(buildScene({})).success).to.equal(true);
+  });
+
+  it('should accept an action with a precision', () => {
+    expect(schema.safeParse(buildScene({ precision: 'day' })).success).to.equal(true);
+  });
+
+  it('should reject an action with an unknown precision', () => {
+    expect(schema.safeParse(buildScene({ precision: 'century' })).success).to.equal(false);
+  });
+});
+
 describe('sceneSchemas calendar.get-events action', () => {
   const schema = createSceneCreateInputSchema();
   const buildScene = (action) => ({

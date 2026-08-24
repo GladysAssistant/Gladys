@@ -1,7 +1,9 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
+import DeviceExportCsvButton from './DeviceExportCsvButton';
 import { DeviceStamp, FeatureIcons, IntegrationName } from './helpers';
+import style from './style.css';
 
 const DeviceRow = ({ device, integration }) => (
   <tr>
@@ -30,6 +32,11 @@ const DeviceRow = ({ device, integration }) => (
     </td>
     <td>
       <FeatureIcons device={device} />
+    </td>
+    <td class="text-right text-nowrap">
+      <div class={style.rowActions}>
+        <DeviceExportCsvButton device={device} />
+      </div>
     </td>
   </tr>
 );

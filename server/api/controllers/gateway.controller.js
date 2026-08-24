@@ -40,9 +40,15 @@ module.exports = function GatewayController(gladys) {
    * @apiGroup Gateway
    */
   async function loginTwoFactor(req, res) {
-    await gladys.gateway.loginTwoFactor(req.body.two_factor_token, req.body.two_factor_code);
+    const { recovery_codes: recoveryCodes } = await gladys.gateway.loginTwoFactor(
+      req.body.two_factor_token,
+      req.body.two_factor_code,
+      req.body.two_factor_recovery_code,
+      req.body.generate_recovery_codes,
+    );
     res.json({
       success: true,
+      recovery_codes: recoveryCodes,
     });
   }
 

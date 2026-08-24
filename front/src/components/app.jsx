@@ -60,6 +60,7 @@ import DuplicateScenePage from '../routes/scene/duplicate-scene';
 import EditScenePage from '../routes/scene/edit-scene';
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
+import SettingsSecurityPage from '../routes/settings/settings-security';
 import SettingsHousePage from '../routes/settings/settings-house';
 import SettingsUserPage from '../routes/settings/settings-users';
 import SettingsEditUserPage from '../routes/settings/settings-users/edit-user';
@@ -215,24 +216,35 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey',
   actions
 )(props => (
   <div id="app">
+    {/* The navigation rail lives OUTSIDE the Layout wrapper: it is chrome
+        shared by every page, while that wrapper carries the current page's
+        theme (the Horizon glass gate on integration URLs). Nested inside, the
+        rail inherited the theme's furniture rules on those URLs only. It is
+        fixed-positioned, so being a sibling of .page changes nothing to its
+        layout. */}
+    <Header
+      currentUrl={props.currentUrl}
+      user={props.user}
+      externalIntegrationsToUpdate={props.externalIntegrationsToUpdate}
+      fullScreen={props.fullScreen}
+      profilePicture={props.profilePicture}
+      toggleDropDown={props.toggleDropDown}
+      showDropDown={props.showDropDown}
+      closeDropDown={props.closeDropDown}
+      toggleCollapsedMenu={props.toggleCollapsedMenu}
+      showCollapsedMenu={props.showCollapsedMenu}
+      logout={props.logout}
+      session={props.session}
+      gatewayTrialDaysLeft={props.gatewayTrialDaysLeft}
+      gatewayTrialHasPaymentMethod={props.gatewayTrialHasPaymentMethod}
+      gatewayTrialStripePortalKey={props.gatewayTrialStripePortalKey}
+      refreshGatewayTrialState={props.refreshGatewayTrialState}
+    />
     <Layout currentUrl={props.currentUrl}>
-      <Header
-        currentUrl={props.currentUrl}
-        user={props.user}
-        externalIntegrationsToUpdate={props.externalIntegrationsToUpdate}
-        fullScreen={props.fullScreen}
-        profilePicture={props.profilePicture}
-        toggleDropDown={props.toggleDropDown}
-        showDropDown={props.showDropDown}
-        closeDropDown={props.closeDropDown}
-        toggleCollapsedMenu={props.toggleCollapsedMenu}
-        showCollapsedMenu={props.showCollapsedMenu}
-        logout={props.logout}
-      />
       <Router onChange={props.handleRoute}>
         <Redirect path="/" to="/dashboard" />
         {/** ROUTE WHICH ARE DIFFERENT IN GATEWAY MODE */}
@@ -253,6 +265,7 @@ const AppRouter = connect(
         {config.gatewayMode && <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />}
         {config.gatewayMode && <GatewayConfirmEmail path="/confirm-email" />}
         {config.gatewayMode && <SettingsBilling path="/dashboard/settings/billing" />}
+        {config.gatewayMode && <SettingsSecurityPage path="/dashboard/settings/security" />}
         {config.gatewayMode && <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />}
         {config.gatewayMode && <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />}
 

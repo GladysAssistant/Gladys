@@ -6,35 +6,51 @@ import get from 'get-value';
 
 const BOX_KEY = 'Weather';
 
-// Emoji per generic condition of the pivot weather format, in a day and a
+// Weather icons of the pivot format, bundled per condition in a day and a
 // night variant. The night variant is picked from the optional is_day flag,
 // so a clear night renders as a moon while the condition stays 'clear'.
+//
+// The set is served from our own assets, never a third-party URL, and covers
+// every condition of WEATHER_CONDITIONS -- the six extensions included, so a
+// freezing rain no longer borrows the plain rain icon. `unknown` has no
+// drawing of its own on purpose: it keeps the neutral thermometer emoji, the
+// visual cue that the provider sent nothing usable.
+const WEATHER_ICONS = {};
+// Vite resolves this glob at build time: every SVG of the folder is bundled
+// and hashed, and the map holds the final URLs.
+const iconModules = import.meta.glob('../../../assets/weather/*.svg', {
+  eager: true,
+  query: '?url',
+  import: 'default'
+});
+Object.keys(iconModules).forEach(path => {
+  // '.../rain-night.svg' -> condition 'rain', variant 'night'
+  const name = path.slice(path.lastIndexOf('/') + 1).replace('.svg', '');
+  const separator = name.lastIndexOf('-');
+  const condition = name.slice(0, separator);
+  const variant = name.slice(separator + 1);
+  WEATHER_ICONS[condition] = WEATHER_ICONS[condition] || {};
+  WEATHER_ICONS[condition][variant] = iconModules[path];
+});
+
+// Kept for the conditions with no bundled drawing (currently only 'unknown'),
+// so the widget always has something to render.
 const WEATHER_EMOJIS = {
-  clear: { day: '☀️', night: '🌙' },
-  'partly-cloudy': { day: '🌤️', night: '☁️' },
-  cloud: { day: '☁️', night: '☁️' },
-  fog: { day: '🌫️', night: '🌫️' },
-  drizzle: { day: '🌦️', night: '🌦️' },
-  rain: { day: '🌧️', night: '🌧️' },
-  pouring: { day: '🌧️', night: '🌧️' },
-  sleet: { day: '🌨️', night: '🌨️' },
-  hail: { day: '🌨️', night: '🌨️' },
-  snow: { day: '❄️', night: '❄️' },
-  thunderstorm: { day: '⛈️', night: '⛈️' },
-  wind: { day: '💨', night: '💨' },
-  // 'night' is deprecated as a condition but still rendered
-  night: { day: '🌙', night: '🌙' },
-  unknown: { day: '🌡️', night: '🌡️' }
+  unknown: '🌡️'
 };
 
 /**
- * Emoji of a generic weather condition.
+ * Icon of a generic weather condition: the URL of a bundled SVG, or an emoji
+ * when the condition has no drawing of its own.
  * isDay is the optional day/night flag of the pivot format: only an explicit
  * false switches to the night variant, an absent flag stays on the day one.
  */
 const translateWeatherToEmoji = (weather, isDay) => {
-  const entry = WEATHER_EMOJIS[weather] || WEATHER_EMOJIS.unknown;
-  return isDay === false ? entry.night : entry.day;
+  const entry = WEATHER_ICONS[weather];
+  if (entry) {
+    return (isDay === false && entry.night) || entry.day || entry.night;
+  }
+  return WEATHER_EMOJIS.unknown;
 };
 
 // Wind direction in degrees to a localized cardinal key (N, NE, E, SE, S, SW, W, NW)
