@@ -9,8 +9,10 @@
   align-items: center;
   gap: 8px;
   /* a pill can never grow past the widget: long action names wrap inside
-     (overflow-wrap on the label) instead of overflowing the card */
+     (overflow-wrap on the label) instead of overflowing the card.
+     min-width: 0 so the flex item's min-width: auto can't win over the cap */
   max-width: 100%;
+  min-width: 0;
   min-height: 2.75rem;
   padding: 6px 16px;
   border-radius: 12px;
