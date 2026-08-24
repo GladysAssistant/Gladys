@@ -93,11 +93,21 @@ The widget passes that timezone explicitly, read once from `SYSTEM_VARIABLE_NAME
 - **TPI**: the switch is on for a fraction of each cycle proportional to the error within the proportional band. Heating only — a cooling compressor cannot be pulsed that way, so cooling always falls back to hysteresis. An on-time below one minute is rounded down to off: the regulation step is one minute, and a shorter pulse is both useless and hard on the relay.
 - **TPI phase.** The position inside the cycle is offset by a hash of the thermostat's feature selector. Without it, every thermostat sharing a cycle time switches on at the same wall-clock minute, stacking the loads.
 
+### C.3 Sensor unit vs thermostat unit
+
+The room sensor is a **separate device** from the thermostat, so nothing forces the two to share a unit: a Zigbee or Z-Wave probe reporting celsius next to a thermostat set to `THERMOSTAT_TEMP_UNIT = F` is a configuration the edit form allows. Comparing the raw reading to the setpoint would then put 68 against 20 and leave the heating permanently off — or, in cooling, permanently on.
+
+The reading is therefore converted into the thermostat's unit before any comparison, from the sensor's declared `feature.unit`. A sensor with **no** declared unit is assumed to already be in the thermostat's unit: that is the pre-existing behaviour, and guessing would be worse than not converting.
+
+The widget does the same on its side, and for the same reason — it renders the reading with the thermostat's unit symbol. The sensor unit is read once from the initial `GET /api/v1/device`; websocket `NEW_STATE` payloads do not carry it, so the value cached from that first read is what later events are converted with.
+
 ## D. Scenes
 
 `setValue` is the path taken by `device.set-value` and by the generic device API. Persisting the value alone would not survive: the next regulation pass re-applies the scheduled preset and overwrites it within a minute, so a scene setting 21 °C would either do nothing useful or fight the loop every minute.
 
-An external write is therefore treated as a **manual override**, exactly like turning the dial on the widget: the setpoint is saved, the manual flag and its expiry are set, `MANUAL_MODE_UPDATED` is broadcast and a regulation pass is triggered. The setpoint holds for the device's `THERMOSTAT_MANUAL_DURATION` (30 minutes by default), then the schedule takes over again. The widget's countdown reads the same param, so what it displays is what the server enforces.
+An external write is therefore treated as a **manual override**, exactly like turning the dial on the widget: the setpoint is saved, the manual flag is set, `MANUAL_MODE_UPDATED` is broadcast and a regulation pass is triggered.
+
+The **expiry is only armed when the device follows a schedule** — that is the only case where something would otherwise take the setpoint over. With a schedule, the setpoint holds for the device's `THERMOSTAT_MANUAL_DURATION` (30 minutes by default), then the schedule takes over again; the widget's countdown reads the same param, so what it displays is what the server enforces. Without a schedule the hold is **permanent**, like on a physical thermostat: arming a timer there would silently revert to the stored preset a few minutes later, and the widget only renders a countdown banner for a scheduled thermostat, so nothing would announce it.
 
 `POST /api/v1/service/thermostat/setpoint/:feature_selector` goes through the same `setValue`, and only after checking that the named feature is a `thermostat` / `target-temperature` feature **owned by this service** — otherwise any authenticated household member could persist a value on a lock, a cover or a light just by naming its selector.
 
@@ -111,6 +121,8 @@ Two tables (migration `20260823000000`):
 Slots are validated by Joi before reaching the database (`day_of_week` 0–6, `HH:MM` pattern, preset enum) and by the model itself. An invalid slot would otherwise be stored and then silently match nothing at regulation time.
 
 A slot ending at `00:00` means end of day. A slot whose end is before its start crosses midnight and is matched in two halves — the start day's evening, then the following day's small hours — which is what makes a single "22:00 → 06:00 night" slot expressible.
+
+Deleting a schedule first **detaches** the thermostats that follow it, dropping their `THERMOSTAT_ACTIVE_SCHEDULE` param. The regulation degrades gracefully on a missing schedule — it falls back on the stored preset — but the device would otherwise keep an orphan reference the edit page cannot resolve, and which a new schedule reusing the selector would silently inherit. The slots themselves go with the schedule through the foreign key's `ON DELETE CASCADE`.
 
 ## F. Out of scope
 

@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
-import { celsiusToFahrenheit } from '../../../../../server/utils/units';
+import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
 import {
   DEFAULT_MANUAL_DURATION_MINUTES,
   DEFAULT_PRESET_TEMPS,
@@ -67,7 +67,8 @@ class ThermostatBox extends Component {
 
   svgRef = null;
   timezone = null;
-  modeInitialized = false;
+  sensorUnit = null;
+  thermostatUnit = null;
   savingPreset = false;
   lastActivePreset = 'comfort';
   expectedSetpoint = null;
@@ -105,6 +106,31 @@ class ThermostatBox extends Component {
   toDisplayTemp = temp => {
     if (temp === null || temp === undefined) return temp;
     return this.needsFahrenheitConversion() ? celsiusToFahrenheit(temp) : temp;
+  };
+
+  // The room sensor is a separate device from the thermostat, so it can report a
+  // different unit — a Celsius Zigbee probe next to a Fahrenheit thermostat.
+  // Everything downstream (the gauge, the "is it heating" hint) works in the
+  // thermostat's unit, so the reading is brought into it here. The sensor unit
+  // comes from the initial GET; websocket state events do not carry it.
+  toThermostatUnit = temp => {
+    if (temp === null || temp === undefined) return temp;
+    const sensorUnit = this.sensorUnit;
+    if (!sensorUnit) return temp;
+    // Read from the instance field, not from getEffectiveUnit(): the thermostat
+    // unit is stored through setState in the same pass and would still be stale.
+    const thermostatUnit =
+      this.thermostatUnit ||
+      (this.props.user && this.props.user.temperature_unit_preference) ||
+      DEVICE_FEATURE_UNITS.CELSIUS;
+    if (sensorUnit === thermostatUnit) return temp;
+    if (sensorUnit === DEVICE_FEATURE_UNITS.CELSIUS && thermostatUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
+      return celsiusToFahrenheit(temp);
+    }
+    if (sensorUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && thermostatUnit === DEVICE_FEATURE_UNITS.CELSIUS) {
+      return fahrenheitToCelsius(temp);
+    }
+    return temp;
   };
 
   // Get the temperature unit symbol
@@ -147,17 +173,14 @@ class ThermostatBox extends Component {
           activePreset = storedPreset;
         }
       }
-      this.modeInitialized = true;
     } else {
-      // No schedule or manual mode: use the stored preset
+      // No schedule or manual mode: use the stored preset. When none is stored
+      // the widget shows no preset and writes nothing: writing a default here
+      // would make merely opening a dashboard start the heating on a thermostat
+      // the user has not turned on yet. The render already handles a null preset.
       const storedPreset = await this.readThermostatVariable('PRESET');
       if (storedPreset) {
         activePreset = knownPresets.includes(storedPreset) ? storedPreset : 'comfort';
-        this.modeInitialized = true;
-      } else if (!this.modeInitialized) {
-        this.modeInitialized = true;
-        activePreset = 'comfort';
-        await this.savePreset(activePreset);
       }
     }
 
@@ -288,6 +311,20 @@ class ThermostatBox extends Component {
         device_feature_selectors: selectors
       });
       if (devices && devices.length) {
+        // Both units must be known before any reading is converted: the two
+        // features can arrive in any order, and setState is asynchronous, so
+        // resolving them inside the loop would convert the first reading against
+        // a stale unit.
+        const allFeatures = devices.reduce((acc, device) => acc.concat(device.features || []), []);
+        const thermostatUnitFeature = allFeatures.find(feat => feat.selector === thermostatFeature);
+        if (thermostatUnitFeature && thermostatUnitFeature.unit) {
+          this.thermostatUnit = thermostatUnitFeature.unit;
+        }
+        const sensorUnitFeature = temperatureFeature
+          ? allFeatures.find(feat => feat.selector === temperatureFeature)
+          : null;
+        this.sensorUnit = (sensorUnitFeature && sensorUnitFeature.unit) || null;
+
         devices.forEach(device => {
           device.features.forEach(feat => {
             if (feat.selector === thermostatFeature) {
@@ -310,7 +347,7 @@ class ThermostatBox extends Component {
               feat.last_value !== null &&
               feat.last_value !== undefined
             ) {
-              this.setState({ currentTemp: feat.last_value });
+              this.setState({ currentTemp: this.toThermostatUnit(feat.last_value) });
             }
             if (
               humidityFeature &&
@@ -351,8 +388,14 @@ class ThermostatBox extends Component {
     const temperatureFeature = (this.state.remoteConfig && this.state.remoteConfig.temperature_feature) || null;
     const humidityFeature = (this.state.remoteConfig && this.state.remoteConfig.humidity_feature) || null;
     if (thermostatFeature && payload.device_feature_selector === thermostatFeature) {
-      // Don't overwrite setpoint during manual mode
-      if (!this.state.isManualMode) {
+      // Don't overwrite a setpoint the user is holding here. `isManualMode` is
+      // not enough on its own: a scene writing the setpoint puts the device in
+      // manual mode too, and its MANUAL_MODE_UPDATED often lands before the
+      // NEW_STATE carrying the new value — the guard would then swallow the very
+      // event that was supposed to display it, leaving the old setpoint on screen
+      // until the next refresh. `manualSetpointOverride` is set only by this
+      // widget's own dial and buttons, so it tells the two apart.
+      if (!this.state.isManualMode || !this.state.manualSetpointOverride) {
         // Just left manual mode: drop the in-flight events carrying the old
         // manual setpoint, and only resume following the device once the value
         // we just applied comes back.
@@ -369,7 +412,7 @@ class ThermostatBox extends Component {
       }
     }
     if (temperatureFeature && payload.device_feature_selector === temperatureFeature) {
-      this.setState({ currentTemp: payload.last_value });
+      this.setState({ currentTemp: this.toThermostatUnit(payload.last_value) });
     }
     if (humidityFeature && payload.device_feature_selector === humidityFeature) {
       this.setState({ humidity: payload.last_value });

@@ -4,13 +4,29 @@ const { buildParamsConfig, getFeatureBySelector } = require('./thermostat.device
 
 /**
  * @description Invalidate the cached window-sensor selectors. Called whenever a
- * thermostat device is created or deleted, so the next event rebuilds the map.
+ * thermostat device is created, updated or deleted, so the next event rebuilds
+ * the map.
  * @returns {undefined}
  * @example
  * thermostatHandler.invalidateWindowCache();
  */
 function invalidateWindowCache() {
   this.windowSelectorsCache = null;
+}
+
+/**
+ * @description Called after a thermostat device is updated. A device saved
+ * through the generic device route can carry a new THERMOSTAT_WINDOW_FEATURE,
+ * and the cached selectors would keep pointing at the previous sensor until the
+ * next create or delete: the immediate cut-off on window opening would ignore
+ * the new sensor entirely (the minute loop re-reads the params on every tick and
+ * is not affected).
+ * @returns {undefined}
+ * @example
+ * thermostatHandler.postUpdate();
+ */
+function postUpdate() {
+  this.invalidateWindowCache();
 }
 
 /**
@@ -108,4 +124,4 @@ async function onDeviceNewState(event) {
   }
 }
 
-module.exports = { onDeviceNewState, getWindowSelectors, invalidateWindowCache };
+module.exports = { onDeviceNewState, getWindowSelectors, invalidateWindowCache, postUpdate };

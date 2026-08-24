@@ -39,6 +39,7 @@ const buildHandler = (overrides = {}) => ({
   setValue: fake.resolves(null),
   setVariable: fake.resolves({ value: 'comfort' }),
   getVariable: fake.resolves('comfort'),
+  resolveRuntimeVariableKey: fake.resolves(true),
   broadcastConfigUpdated: fake.returns(null),
   triggerApplySchedules: fake.returns(null),
   ...overrides,
@@ -339,6 +340,45 @@ describe('thermostat.controller', () => {
       );
 
       expect(res.statusCode).to.equal(400);
+      assert.notCalled(handler.setVariable);
+    });
+
+    it('should reject a key naming a feature this service does not own', async () => {
+      // The shape is right, so only the ownership lookup can catch it: the row
+      // would otherwise be created for a feature that does not exist and never
+      // cleaned up.
+      const handler = buildHandler({ resolveRuntimeVariableKey: fake.resolves(false) });
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(
+        routes,
+        route,
+        { params: { variable_key: 'THERMOSTAT_GHOST_PRESET' }, body: { value: 'eco' } },
+        res,
+      );
+
+      expect(res.statusCode).to.equal(404);
+      expect(res.body).to.deep.equal({ error: 'FEATURE_NOT_FOUND' });
+      assert.notCalled(handler.setVariable);
+    });
+
+    it('should reject a value that is not a string', async () => {
+      // The variable table stores text: an object would come back out of a later
+      // read as "[object Object]".
+      const handler = buildHandler();
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(
+        routes,
+        route,
+        { params: { variable_key: 'THERMOSTAT_X_PRESET' }, body: { value: { a: 1 } } },
+        res,
+      );
+
+      expect(res.statusCode).to.equal(400);
+      expect(res.body).to.deep.equal({ error: 'INVALID_VALUE' });
       assert.notCalled(handler.setVariable);
     });
 
