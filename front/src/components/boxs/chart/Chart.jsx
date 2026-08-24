@@ -533,7 +533,7 @@ class Chartbox extends Component {
       additionalHeight = 55 * nbFeaturesDisplayed;
     }
     return (
-      <div class={cx('card', { 'loading-border': initialized && loading })}>
+      <div class={cx('card', { 'loading-border': initialized && loading, [style.cardMenuOpen]: dropdown })}>
         <div class="card-body">
           <div class={style.chartHeader}>
             <div class={cx(style.subheader)}>{box.title}</div>

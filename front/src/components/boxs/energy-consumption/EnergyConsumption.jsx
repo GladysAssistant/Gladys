@@ -491,6 +491,12 @@ class EnergyConsumption extends Component {
                 </button>
 
                 <div class="flex-fill mx-3">
+                  {/* The field is only ever a button opening the calendar, so the
+                      input is readonly — otherwise tapping it pops the on-screen
+                      keyboard on mobile, over the picker it opens at the same
+                      time. The readonly attribute has to come from a customInput:
+                      the DatePicker readOnly PROP would keep the calendar itself
+                      from opening. */}
                   <DatePicker
                     locale={localeSet}
                     selected={this.getPeriodStart()}
@@ -502,6 +508,7 @@ class EnergyConsumption extends Component {
                     wrapperClassName={'w-100'}
                     popperClassName={datePickerStyle.datePickerPopper}
                     portalId="dashboard-datepicker"
+                    customInput={<input type="text" readOnly />}
                   />
                 </div>
 
