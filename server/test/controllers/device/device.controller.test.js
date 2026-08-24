@@ -351,6 +351,140 @@ describe('GET /api/v1/device_feature/states_csv', () => {
   });
 });
 
+describe('GET /api/v1/device_feature/states_csv (streaming edge cases)', () => {
+  const DeviceController = require('../../../api/controllers/device.controller');
+
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 0, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:02:00.000Z') },
+    ]);
+  });
+
+  const buildChunk = (next) => ({
+    csv: 'chunk',
+    next,
+    states: 1,
+  });
+
+  it('should stop streaming when the client is gone', async () => {
+    let exportCalls = 0;
+    const gladysFake = {
+      device: {
+        CSV_EXPORT_PAUSE_BETWEEN_CHUNKS_IN_MS: 1,
+        exportStatesToCsv: async () => {
+          exportCalls += 1;
+          return buildChunk({ createdAtUs: '1', deviceFeatureId: 'feature' });
+        },
+      },
+    };
+    const controller = DeviceController(gladysFake);
+    // The connection dies right after the first chunk was written
+    const req = {
+      query: { device_features: 'a', start: '2025-08-28T00:00:00.000Z', end: '2025-08-29T00:00:00.000Z' },
+      destroyed: true,
+    };
+    const writes = [];
+    let ended = false;
+    const res = {
+      setHeader: () => {},
+      write: (part) => writes.push(part),
+      end: () => {
+        ended = true;
+      },
+      writableEnded: false,
+    };
+    await controller.exportStatesToCsv(req, res, (e) => {
+      throw e;
+    });
+    // Only the first chunk was fetched and written: the loop stopped instead of
+    // draining the whole period for nobody.
+    expect(exportCalls).to.equal(1);
+    expect(writes).to.deep.equal(['chunk']);
+    expect(ended).to.equal(false);
+  });
+
+  it('should cut the stream when a chunk fails after the headers are sent', async () => {
+    let exportCalls = 0;
+    const gladysFake = {
+      device: {
+        CSV_EXPORT_PAUSE_BETWEEN_CHUNKS_IN_MS: 1,
+        exportStatesToCsv: async () => {
+          exportCalls += 1;
+          if (exportCalls > 1) {
+            throw new Error('DuckDB failed mid-export');
+          }
+          return buildChunk({ createdAtUs: '1', deviceFeatureId: 'feature' });
+        },
+      },
+    };
+    const controller = DeviceController(gladysFake);
+    const req = {
+      query: { device_features: 'a', start: '2025-08-28T00:00:00.000Z', end: '2025-08-29T00:00:00.000Z' },
+      destroyed: false,
+    };
+    let destroyed = false;
+    let ended = false;
+    let nextCalled = false;
+    const res = {
+      setHeader: () => {},
+      write: () => {},
+      end: () => {
+        ended = true;
+      },
+      destroy: () => {
+        destroyed = true;
+      },
+      writableEnded: false,
+    };
+    await controller.exportStatesToCsv(req, res, () => {
+      nextCalled = true;
+    });
+    // The stream is cut, not answered with a JSON error on headers already sent
+    expect(destroyed).to.equal(true);
+    expect(ended).to.equal(false);
+    expect(nextCalled).to.equal(false);
+  });
+
+  it('should reassemble several chunks for a whole-file gateway export', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+    };
+    // A one-state chunk: the gateway whole-file path has to loop and join
+    // @ts-ignore
+    const previousChunkSize = global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK = 1;
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/device_feature/states_csv?device_features=test-device-feature&start=2025-08-28T00:00:00.000Z&end=2025-08-29T00:00:00.000Z',
+      {},
+      {},
+      (data) => {
+        // @ts-ignore
+        global.TEST_GLADYS_INSTANCE.device.MAX_STATES_PER_CSV_EXPORT_CHUNK = previousChunkSize;
+        expect(data).to.be.a('string');
+        const lines = data.split('\n');
+        expect(lines).to.have.lengthOf(3);
+        expect(lines[0]).to.equal('date,device,feature,unit,value');
+        expect(lines[1]).to.equal('2025-08-28T15:00:00.000Z,Test device,Test device feature,,0');
+        expect(lines[2]).to.equal('2025-08-28T15:02:00.000Z,Test device,Test device feature,,1');
+        done();
+      },
+    );
+  });
+});
+
 describe('GET /api/v1/device_feature/energy_consumption', () => {
   beforeEach(async function BeforeEach() {
     this.timeout(10000);
