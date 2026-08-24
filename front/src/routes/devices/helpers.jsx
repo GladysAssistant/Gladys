@@ -75,8 +75,18 @@ export const IntegrationName = ({ integration, link = true }) => {
     return <span class="text-muted">-</span>;
   }
   const name = integration.i18nKey ? <Text id={integration.i18nKey}>{integration.name}</Text> : integration.name;
-  if (!link || !integration.url) {
-    return <span>{name}</span>;
+  const label = link && integration.url ? <Link href={integration.url}>{name}</Link> : <span>{name}</span>;
+  if (!integration.external) {
+    return label;
   }
-  return <Link href={integration.url}>{name}</Link>;
+  // same tag as in the integration catalog: the list mixes both families, and
+  // a community integration can be named like a built-in one
+  return (
+    <span class={style.integrationName}>
+      {label}
+      <span class="badge badge-secondary">
+        <Text id="integration.tags.external" />
+      </span>
+    </span>
+  );
 };

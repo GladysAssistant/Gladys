@@ -21,6 +21,7 @@ describe('zigbee2mqtt status', () => {
   beforeEach(() => {
     zigbee2MqttManager = new Zigbee2MqttManager(gladys, mqtt, serviceId);
     zigbee2MqttManager.usbConfigured = true;
+    zigbee2MqttManager.networkAdapterConfigured = false;
     zigbee2MqttManager.mqttExist = true;
     zigbee2MqttManager.mqttRunning = true;
     zigbee2MqttManager.zigbee2mqttExist = true;
@@ -36,6 +37,7 @@ describe('zigbee2mqtt status', () => {
     const result = await zigbee2MqttManager.status();
     // ASSERT
     expect(result.usbConfigured).that.equal(true);
+    expect(result.networkAdapterConfigured).that.equal(false);
     expect(result.mqttExist).that.equal(true);
     expect(result.mqttRunning).that.equal(true);
     expect(result.zigbee2mqttExist).that.equal(true);

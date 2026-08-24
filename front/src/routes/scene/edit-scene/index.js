@@ -2,14 +2,13 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
-import { DndProvider } from 'react-dnd';
 import get from 'get-value'; // Import get-value package
 
 import { RequestStatus } from '../../../utils/consts';
-import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
 import EditScenePage from './EditScenePage';
+import { computeRunningInfo, mergeRunningScenes } from '../runningInfo';
 
-import { ACTIONS } from '../../../../../server/utils/constants';
+import { ACTIONS, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
@@ -24,6 +23,227 @@ const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.VARIABLE.SET]: ['text', 'evaluate_value'],
   [ACTIONS.HTTP.REQUEST]: ['body'],
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
+};
+
+// Replaces, in a text containing variables (e.g. "The temperature is {{1.0.last_value}}°C"),
+// all the references to a variable path by its new path.
+const replaceVariablePathInText = (text, prevPath, newPath) => text.split(`{{${prevPath}.`).join(`{{${newPath}.`);
+
+// Replaces the path of a variable selector (e.g. "1.0.last_value"), which is stored
+// without the surrounding curly braces.
+const replaceVariablePathInSelector = (selector, prevPath, newPath) =>
+  selector.startsWith(`${prevPath}.`) ? `${newPath}${selector.slice(prevPath.length)}` : selector;
+
+// Rewrites, in all the actions (including the ones nested in if/then/else branches), the
+// references to the scene variables whose path changed, so that a scene stays coherent when
+// an action group is inserted or deleted.
+// Replacements are applied in the order they are given: they must be sorted from the smallest
+// index to the biggest one when indexes are decremented (an action group was deleted), and the
+// other way around when they are incremented (an action group was inserted), so that a path is
+// never rewritten twice.
+const replaceVariablePathsInActions = (actions, replacements) => {
+  if (!Array.isArray(actions) || replacements.length === 0) {
+    return;
+  }
+
+  actions.forEach(actionGroup => {
+    if (!Array.isArray(actionGroup)) {
+      return;
+    }
+
+    actionGroup.forEach(action => {
+      if (!action) {
+        return;
+      }
+
+      const attributes = VARIABLES_ATTRIBUTES_IN_ACTION[action.type];
+      if (attributes) {
+        attributes.forEach(attribute => {
+          // In case there are 2 parts in the attribute (e.g., conditions[].variable)
+          if (attribute.includes('.')) {
+            const [arrayAttribute, subAttribute] = attribute.split('.');
+            // If the first part is an array (e.g., conditions[])
+            if (arrayAttribute.endsWith('[]')) {
+              const array = action[arrayAttribute.slice(0, -2)];
+              if (Array.isArray(array)) {
+                array.forEach(subAction => {
+                  if (typeof subAction[subAttribute] !== 'string') {
+                    return;
+                  }
+                  replacements.forEach(({ prevPath, newPath }) => {
+                    // A condition holds either a variable selector ("1.0.last_value"), or a
+                    // value to evaluate which contains variables ("{{1.0.last_value}} + 1")
+                    subAction[subAttribute] = replaceVariablePathInSelector(
+                      replaceVariablePathInText(subAction[subAttribute], prevPath, newPath),
+                      prevPath,
+                      newPath
+                    );
+                  });
+                });
+              }
+            }
+          } else if (typeof action[attribute] === 'string') {
+            replacements.forEach(({ prevPath, newPath }) => {
+              action[attribute] = replaceVariablePathInText(action[attribute], prevPath, newPath);
+            });
+          }
+        });
+      }
+
+      // Check for nested actions in if/then/else blocks
+      if (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE) {
+        if (Array.isArray(action.if)) {
+          replaceVariablePathsInActions([action.if], replacements);
+        }
+        if (Array.isArray(action.then)) {
+          replaceVariablePathsInActions(action.then, replacements);
+        }
+        if (Array.isArray(action.else)) {
+          replaceVariablePathsInActions(action.else, replacements);
+        }
+      }
+    });
+  });
+};
+
+// Builds the exact old path -> new path map of the action groups whose path changes when the
+// group at `sourcePath` is moved to `destPath`. A group path ("1", "0.0.then.2") is the prefix of
+// the paths of the variables its actions declare ("1.0"), so it must always be matched on segment
+// boundaries: the group "1" is not the prefix of the variable "10.0".
+// A group can only be dragged onto a target of the same level, so the source and the destination
+// containers are either the same one, or two containers of the same depth which cannot be nested
+// into one another.
+const buildMovedGroupPaths = ({ sourcePath, sourceLength, destPath, destLength }) => {
+  const sourceSegments = sourcePath.split('.');
+  const destSegments = destPath.split('.');
+  const sourceContainer = sourceSegments.slice(0, -1).join('.');
+  const destContainer = destSegments.slice(0, -1).join('.');
+  const sourceIndex = parseInt(sourceSegments[sourceSegments.length - 1], 10);
+  const destIndex = parseInt(destSegments[destSegments.length - 1], 10);
+  const buildPath = (container, index) => (container ? `${container}.${index}` : `${index}`);
+  const replacements = [];
+
+  if (sourceContainer === destContainer) {
+    // The group is reordered among its siblings: it is spliced out of the container, then spliced
+    // back in at the destination index, which shifts every group in between
+    const indexes = [];
+    for (let index = 0; index < sourceLength; index += 1) {
+      indexes.push(index);
+    }
+    indexes.splice(sourceIndex, 1);
+    indexes.splice(destIndex, 0, sourceIndex);
+    indexes.forEach((previousIndex, newIndex) => {
+      if (previousIndex !== newIndex) {
+        replacements.push({
+          prevPath: buildPath(sourceContainer, previousIndex),
+          newPath: buildPath(sourceContainer, newIndex)
+        });
+      }
+    });
+    return replacements;
+  }
+
+  // The group is moved to another container: it takes the destination path, the groups which
+  // followed it in its previous container are shifted down, and the ones which are at or after
+  // the destination index are shifted up
+  replacements.push({ prevPath: sourcePath, newPath: destPath });
+  for (let index = sourceIndex + 1; index < sourceLength; index += 1) {
+    replacements.push({ prevPath: buildPath(sourceContainer, index), newPath: buildPath(sourceContainer, index - 1) });
+  }
+  for (let index = destIndex; index < destLength; index += 1) {
+    replacements.push({ prevPath: buildPath(destContainer, index), newPath: buildPath(destContainer, index + 1) });
+  }
+  return replacements;
+};
+
+// Renames the variables declared by the action groups whose path changed. The new paths are
+// written in a fresh map: renaming in place would drop a variable whose new path is the previous
+// path of another one (e.g. "1.0" renamed to "2.0", then "2.0" renamed to "3.0" and deleted).
+const renameVariablesOfMovedGroups = (variables, replacements) => {
+  const newVariables = {};
+  Object.entries(variables).forEach(([variablePath, value]) => {
+    const replacement = replacements.find(
+      ({ prevPath }) => variablePath === prevPath || variablePath.startsWith(`${prevPath}.`)
+    );
+    const newPath = replacement
+      ? `${replacement.newPath}${variablePath.slice(replacement.prevPath.length)}`
+      : variablePath;
+    newVariables[newPath] = value;
+  });
+  return newVariables;
+};
+
+// Rewrites, in the whole scene, the references to the variables declared by the action groups
+// whose path changed. Moving a group permutes the paths of its siblings, so the replacements
+// cannot be applied in a single pass: rewriting "1" to "0" and then "0" to "1" would rewrite the
+// same reference twice. Every path is first rewritten to a unique temporary marker, then to its
+// final value.
+const replaceMovedGroupPathsInActions = (actions, replacements) => {
+  if (replacements.length === 0) {
+    return;
+  }
+  const temporaryPaths = replacements.map((replacement, index) => `moved-group-${index}`);
+  replaceVariablePathsInActions(
+    actions,
+    replacements.map(({ prevPath }, index) => ({ prevPath, newPath: temporaryPaths[index] }))
+  );
+  replaceVariablePathsInActions(
+    actions,
+    replacements.map(({ newPath }, index) => ({ prevPath: temporaryPaths[index], newPath }))
+  );
+};
+
+// Removes the empty action groups that older versions of the editor could leave
+// in a saved scene (they render as stray "add a step" buttons), and rewrites the
+// variable references of the following groups since their indexes shift down.
+// Every container (root level and if/then/else branches) is left ending with a
+// single empty group: the "add a step" insertion point.
+const removeLegacyEmptyActionGroups = (allActions, container, containerPath = '') => {
+  const buildPath = index => (containerPath ? `${containerPath}.${index}` : `${index}`);
+
+  const keptGroups = [];
+  const replacements = [];
+  let removedCount = 0;
+  container.forEach((group, originalIndex) => {
+    if (Array.isArray(group) && group.length === 0) {
+      removedCount += 1;
+      return;
+    }
+    if (removedCount > 0) {
+      replacements.push({
+        prevPath: buildPath(originalIndex),
+        newPath: buildPath(originalIndex - removedCount),
+        groupIndex: originalIndex
+      });
+    }
+    keptGroups.push(group);
+  });
+  container.splice(0, container.length, ...keptGroups);
+
+  // Indexes are decremented: apply from the smallest one first so that a path
+  // is never rewritten twice
+  replacements.sort((a, b) => a.groupIndex - b.groupIndex);
+  replaceVariablePathsInActions(allActions, replacements);
+
+  // Recurse into the branches of if/then/else and while blocks, with their new paths
+  container.forEach((group, groupIndex) => {
+    group.forEach((action, actionIndex) => {
+      if (action && (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE)) {
+        const actionPath = `${buildPath(groupIndex)}.${actionIndex}`;
+        if (Array.isArray(action.then)) {
+          removeLegacyEmptyActionGroups(allActions, action.then, `${actionPath}.then`);
+        }
+        if (Array.isArray(action.else)) {
+          removeLegacyEmptyActionGroups(allActions, action.else, `${actionPath}.else`);
+        }
+      }
+    });
+  });
+
+  // Keep a single trailing empty group as the insertion point
+  if (container.length === 0 || container[container.length - 1].length > 0) {
+    container.push([]);
+  }
 };
 
 // Helper function to merge update objects
@@ -89,9 +309,7 @@ class EditScene extends Component {
     });
     try {
       const scene = await this.props.httpClient.get(`/api/v1/scene/${this.props.scene_selector}`);
-      if (scene.actions[scene.actions.length - 1].length > 0) {
-        scene.actions.push([]);
-      }
+      removeLegacyEmptyActionGroups(scene.actions, scene.actions);
       if (!scene.triggers) {
         scene.triggers = [];
       }
@@ -102,6 +320,7 @@ class EditScene extends Component {
       });
       this.setState({
         scene,
+        savedSceneSnapshot: JSON.stringify(scene),
         variables,
         triggersVariables,
         SceneGetStatus: RequestStatus.Success
@@ -113,12 +332,76 @@ class EditScene extends Component {
     }
   };
   startScene = async () => {
+    // Prevent launching a new instance while the scene is already running
+    if (computeRunningInfo(this.state.runningScenes, this.props.scene_selector, this.state.now)) {
+      return;
+    }
     this.setState({ saving: true });
     try {
       await this.props.httpClient.post(`/api/v1/scene/${this.props.scene_selector}/start`);
       this.setState({ saving: false });
     } catch (e) {
       this.setState({ saving: false });
+    }
+  };
+  stopScene = async () => {
+    try {
+      await this.props.httpClient.post(`/api/v1/scene/${this.props.scene_selector}/stop`);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  getRunningScenes = async () => {
+    // stops received while the request is in flight would be undone by the response
+    const stoppedDuringFetch = new Set();
+    this.stoppedDuringFetch = stoppedDuringFetch;
+    try {
+      const runningScenes = await this.props.httpClient.get('/api/v1/scene/running');
+      // This page only displays the edited scene, so keep only its executions
+      // (this also scopes the ticker to the edited scene).
+      const forThisScene = runningScenes.filter(
+        runningScene => runningScene.sceneSelector === this.props.scene_selector
+      );
+      this.setState(prevState => ({
+        runningScenes: mergeRunningScenes(forThisScene, prevState.runningScenes, stoppedDuringFetch)
+      }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (this.stoppedDuringFetch === stoppedDuringFetch) {
+        this.stoppedDuringFetch = null;
+      }
+    }
+  };
+  onSceneStarted = payload => {
+    if (payload.sceneSelector !== this.props.scene_selector) {
+      return;
+    }
+    this.setState(prevState => {
+      const alreadyKnown = prevState.runningScenes.some(scene => scene.executionId === payload.executionId);
+      if (alreadyKnown) {
+        return null;
+      }
+      return { runningScenes: [...prevState.runningScenes, payload] };
+    });
+  };
+  onSceneStopped = payload => {
+    if (this.stoppedDuringFetch) {
+      this.stoppedDuringFetch.add(payload.executionId);
+    }
+    this.setState(prevState => ({
+      runningScenes: prevState.runningScenes.filter(scene => scene.executionId !== payload.executionId)
+    }));
+  };
+  // Keep a 1s ticker running only while this scene is executing, so the
+  // running badge can display a live elapsed time.
+  refreshTicker = () => {
+    const hasRunning = this.state.runningScenes.length > 0;
+    if (hasRunning && !this.ticker) {
+      this.ticker = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    } else if (!hasRunning && this.ticker) {
+      clearInterval(this.ticker);
+      this.ticker = null;
     }
   };
   switchActiveScene = async () => {
@@ -136,6 +419,16 @@ class EditScene extends Component {
       });
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, {
         active: this.state.scene.active
+      });
+      // The active flag was persisted on its own: reflect it in the saved snapshot
+      // without marking the rest of the scene as saved
+      this.setState(prevState => {
+        if (!prevState.savedSceneSnapshot) {
+          return null;
+        }
+        const snapshot = JSON.parse(prevState.savedSceneSnapshot);
+        snapshot.active = prevState.scene.active;
+        return { savedSceneSnapshot: JSON.stringify(snapshot) };
       });
       this.setState({ saving: false });
     } catch (e) {
@@ -159,9 +452,15 @@ class EditScene extends Component {
     if (e) {
       e.preventDefault();
     }
+    // Serialize the scene before the request: the local state can change while it is in
+    // flight (and the "active" switch patches the scene on its own), so snapshotting the
+    // state afterwards would display "saved" for data this request never sent
+    const savedSceneSnapshot = JSON.stringify(this.state.scene);
+    const sceneToSave = JSON.parse(savedSceneSnapshot);
     this.setState({ saving: true, error: false, errorMessage: null });
     try {
-      await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
+      await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
+      this.setState({ savedSceneSnapshot });
     } catch (e) {
       console.error(e);
       let errorMessage = null;
@@ -264,7 +563,10 @@ class EditScene extends Component {
   addActionGroupAfter = async index => {
     // Update variable paths for all actions after the inserted group
     await this.setState(prevState => {
-      const newVariables = { ...prevState.variables };
+      // The new paths are written in a fresh map: copying the previous variables and deleting the
+      // renamed paths would drop a variable whose new path is the previous path of another one
+      // (e.g. "1.0" renamed to "2.0", then "2.0" renamed to "3.0" and its previous path deleted).
+      const newVariables = {};
 
       const pathToUpdateInVariables = [];
 
@@ -282,8 +584,8 @@ class EditScene extends Component {
             if (groupIndex >= index + 1) {
               const newPath = `${groupIndex + 1}.${pathSegments[1]}`;
               newVariables[newPath] = value;
-              delete newVariables[path];
-              pathToUpdateInVariables.push({ prevPath: path, newPath });
+              pathToUpdateInVariables.push({ prevPath: path, newPath, groupIndex });
+              return;
             }
           } else {
             // Handle nested paths (e.g., "1.0.then.0.0" or "1.0.else.0.0")
@@ -298,11 +600,14 @@ class EditScene extends Component {
               const newPath = newPathSegments.join('.');
 
               newVariables[newPath] = value;
-              delete newVariables[path];
-              pathToUpdateInVariables.push({ prevPath: path, newPath });
+              pathToUpdateInVariables.push({ prevPath: path, newPath, groupIndex: rootGroupIndex });
+              return;
             }
           }
         }
+
+        // The paths which are not affected by the insertion are kept as they are
+        newVariables[path] = value;
       });
 
       const newScene = update(prevState.scene, {
@@ -311,67 +616,10 @@ class EditScene extends Component {
         }
       });
 
-      // Update variable paths for all actions after the inserted group
-      pathToUpdateInVariables.reverse().forEach(({ prevPath, newPath }) => {
-        // Recursive function to process all actions, including nested ones in if/then/else blocks
-        const processActions = actions => {
-          if (!Array.isArray(actions)) return;
-
-          actions.forEach(actionGroup => {
-            if (!Array.isArray(actionGroup)) return;
-
-            actionGroup.forEach(action => {
-              if (!action) return;
-
-              // Process the current action
-              if (VARIABLES_ATTRIBUTES_IN_ACTION[action.type]) {
-                VARIABLES_ATTRIBUTES_IN_ACTION[action.type].forEach(attribute => {
-                  // In case there are 2 parts in the attribute (e.g., conditions[0].variable)
-                  if (attribute.includes('.')) {
-                    // We split the attribute path
-                    const attributePath = attribute.split('.');
-                    // If the first part is an array (e.g., conditions[])
-                    if (attributePath[0].endsWith('[]') && action[attributePath[0].slice(0, -2)]) {
-                      // We loop through the array
-                      action[attributePath[0].slice(0, -2)].forEach(subAction => {
-                        if (subAction[attributePath[1]] && subAction[attributePath[1]].includes(prevPath)) {
-                          // And replace the second part if it is a variable
-                          // Here, we don't prefix prevPath by {{ because if it's a variable, it's not prefixed by {{
-                          subAction[attributePath[1]] = subAction[attributePath[1]].replace(prevPath, newPath);
-                        }
-                      });
-                    }
-                  } else if (action[attribute]) {
-                    // In that case, we prefix prevPath by {{ because it's usually a text like "The temperature is {{variable}}°C".
-                    action[attribute] = action[attribute].replace(`{{${prevPath}.`, `{{${newPath}.`);
-                  }
-                });
-              }
-
-              // Check for nested actions in if/then/else blocks
-              if (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE) {
-                // Process 'if' branch if it exists
-                if (Array.isArray(action.if)) {
-                  processActions([action.if]);
-                }
-
-                // Process 'then' branch if it exists
-                if (Array.isArray(action.then)) {
-                  processActions(action.then);
-                }
-
-                // Process 'else' branch if it exists
-                if (Array.isArray(action.else)) {
-                  processActions(action.else);
-                }
-              }
-            });
-          });
-        };
-
-        // Start processing from the root actions
-        processActions(prevState.scene.actions);
-      });
+      // Update the references to the variables of all the actions after the inserted group.
+      // Indexes are incremented, so we start with the biggest one to never rewrite a path twice.
+      pathToUpdateInVariables.sort((a, b) => b.groupIndex - a.groupIndex);
+      replaceVariablePathsInActions(prevState.scene.actions, pathToUpdateInVariables);
 
       return {
         variables: newVariables,
@@ -423,15 +671,43 @@ class EditScene extends Component {
       // Split the path into segments
       const pathSegments = path.split('.');
 
-      // Handle variables
-      const newVariables = {
-        ...prevState.variables
-      };
-      Object.keys(prevState.variables)
-        .filter(variablePath => variablePath.startsWith(path))
-        .forEach(pathToDelete => {
-          delete newVariables[pathToDelete];
-        });
+      // The action groups which follow the deleted one are shifted one index down, so the
+      // variables they declare must be renamed, and the references to those variables in the
+      // whole scene must be updated (the same way they are when a group is inserted).
+      const containerSegments = pathSegments.slice(0, -1);
+      const deletedGroupIndex = parseInt(pathSegments[pathSegments.length - 1], 10);
+      const newVariables = {};
+      const pathToUpdateInVariables = [];
+
+      Object.entries(prevState.variables).forEach(([variablePath, value]) => {
+        const variableSegments = variablePath.split('.');
+        // A variable belongs to the deleted group or to one of its siblings only if it is
+        // declared in the same container (the root level, or a "then"/"else" branch)
+        const isInSameContainer =
+          variableSegments.length > containerSegments.length &&
+          containerSegments.every((segment, index) => segment === variableSegments[index]);
+        const groupIndex = isInSameContainer ? parseInt(variableSegments[containerSegments.length], 10) : NaN;
+
+        if (Number.isNaN(groupIndex) || groupIndex < deletedGroupIndex) {
+          newVariables[variablePath] = value;
+          return;
+        }
+
+        // The variables declared in the deleted group are removed
+        if (groupIndex === deletedGroupIndex) {
+          return;
+        }
+
+        const newPathSegments = [...variableSegments];
+        newPathSegments[containerSegments.length] = `${groupIndex - 1}`;
+        const newPath = newPathSegments.join('.');
+        newVariables[newPath] = value;
+        pathToUpdateInVariables.push({ prevPath: variablePath, newPath, groupIndex });
+      });
+
+      // Indexes are decremented, so we start with the smallest one to never rewrite a path twice.
+      pathToUpdateInVariables.sort((a, b) => a.groupIndex - b.groupIndex);
+      replaceVariablePathsInActions(prevState.scene.actions, pathToUpdateInVariables);
 
       // If it's a root level deletion (e.g., "1")
       if (pathSegments.length === 1) {
@@ -488,6 +764,9 @@ class EditScene extends Component {
   };
 
   deleteAction = path => {
+    // Deleting the only action of a step in the middle of the flow leaves an empty group
+    // behind, which renders as a stray "add a step" button: drop it, as a drag & drop does
+    const cleanUpEmptyGroup = () => this.cleanUpEmptyGroupAfterMove(path);
     this.setState(prevState => {
       // Remove the action
       const pathSegments = path.split('.');
@@ -621,7 +900,7 @@ class EditScene extends Component {
         ...updateObject,
         variables: { $set: newVariables }
       });
-    });
+    }, cleanUpEmptyGroup);
   };
 
   updatePathAfterDeletion = (currentPath, deletedPath) => {
@@ -830,7 +1109,84 @@ class EditScene extends Component {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
   };
 
+  // After a card moved out of its group, remove the group if it became empty,
+  // unless it is the trailing empty group of its container, which is the
+  // "add a step" insertion point. Without this, dragging the only action of a
+  // step elsewhere leaves stray "add a step" buttons in the middle of the flow.
+  cleanUpEmptyGroupAfterMove = async sourceActionPath => {
+    const groupSegments = sourceActionPath.split('.').slice(0, -1);
+    // Conditions of if/while blocks are a flat list, not action groups
+    if (groupSegments.includes('if') || groupSegments.length === 0) {
+      return;
+    }
+    const containerSegments = groupSegments.slice(0, -1);
+    const groupIndex = parseInt(groupSegments[groupSegments.length - 1], 10);
+    const container = this.getActionContainer(containerSegments);
+    if (!container) {
+      return;
+    }
+    const group = container[groupIndex];
+    if (Array.isArray(group) && group.length === 0 && groupIndex < container.length - 1) {
+      await this.deleteActionGroup(groupSegments.join('.'));
+    }
+  };
+
+  // Returns the list of action groups designated by a path (the root level, or the "then" /
+  // "else" branch of an if/while block), or null when the path does not designate one
+  getActionContainer = containerSegments => {
+    let container = this.state.scene.actions;
+    for (const segment of containerSegments) {
+      container = segment === 'then' || segment === 'else' ? container[segment] : container[parseInt(segment, 10)];
+      if (!Array.isArray(container)) {
+        return null;
+      }
+    }
+    return container;
+  };
+
+  // A group holding a single action renders as a plain step, without any group chrome: dropping
+  // such a step onto another one must reorder the flow, not merge them into an "at the same
+  // time" block. Parallelism stays opt-in, through the "add a parallel action" control.
+  isSequentialStepReorder = (originalPath, destPath) => {
+    const sourceGroupSegments = originalPath.split('.').slice(0, -1);
+    const destGroupSegments = destPath.split('.').slice(0, -1);
+    // Conditions of if/while blocks are a flat list, not action groups
+    if (sourceGroupSegments.includes('if') || destGroupSegments.includes('if')) {
+      return false;
+    }
+    const sourceContainerSegments = sourceGroupSegments.slice(0, -1);
+    const destContainerSegments = destGroupSegments.slice(0, -1);
+    // Only two steps of the same container are reordered: moving an action to another
+    // container (in or out of a branch) keeps inserting it in the destination group
+    if (
+      sourceGroupSegments.length === 0 ||
+      sourceGroupSegments.join('.') === destGroupSegments.join('.') ||
+      sourceContainerSegments.join('.') !== destContainerSegments.join('.')
+    ) {
+      return false;
+    }
+    const container = this.getActionContainer(sourceContainerSegments);
+    if (!container) {
+      return false;
+    }
+    const sourceGroup = container[parseInt(sourceGroupSegments[sourceGroupSegments.length - 1], 10)];
+    const destGroup = container[parseInt(destGroupSegments[destGroupSegments.length - 1], 10)];
+    return Array.isArray(sourceGroup) && Array.isArray(destGroup) && sourceGroup.length === 1 && destGroup.length === 1;
+  };
+
   moveCard = async (originalPath, destPath) => {
+    if (this.isSequentialStepReorder(originalPath, destPath)) {
+      return this.moveCardGroup(
+        originalPath
+          .split('.')
+          .slice(0, -1)
+          .join('.'),
+        destPath
+          .split('.')
+          .slice(0, -1)
+          .join('.')
+      );
+    }
     // Helper function to get nested value using path
     const getNestedValue = (obj, path) => {
       return path.split('.').reduce((acc, key) => acc && acc[key], obj);
@@ -954,6 +1310,7 @@ class EditScene extends Component {
 
     await this.setState(newState);
     await this.addEmptyActionGroupIfNeeded();
+    await this.cleanUpEmptyGroupAfterMove(originalPath);
   };
 
   moveCardGroup = async (sourcePath, destPath) => {
@@ -986,6 +1343,14 @@ class EditScene extends Component {
       // Get the element to move
       const element = source.array[source.index];
 
+      // The paths of the groups whose index changes, computed before the arrays are mutated
+      const movedGroupPaths = buildMovedGroupPaths({
+        sourcePath,
+        sourceLength: source.array.length,
+        destPath,
+        destLength: dest.array.length
+      });
+
       // Create new state by first removing from source
       let newState = { ...this.state };
       source.array.splice(source.index, 1);
@@ -993,46 +1358,10 @@ class EditScene extends Component {
       // Then insert at destination
       dest.array.splice(dest.index, 0, element);
 
-      // Update variables - handle all affected variables
-      const newVariables = { ...this.state.variables };
-
-      // Iterate through all variables and update their paths
-      Object.entries(this.state.variables).forEach(([path, value]) => {
-        // If the path starts with sourcePath, it means this variable was under the moved group
-        if (path.startsWith(sourcePath)) {
-          // Delete the old path
-          delete newVariables[path];
-          // Create new path by replacing sourcePath with destPath
-          const newPath = path.replace(sourcePath, destPath);
-          newVariables[newPath] = value;
-        } else {
-          // For variables after the source/dest positions, we need to update their indices
-          const sourcePathParts = sourcePath.split('.');
-          const destPathParts = destPath.split('.');
-          const pathParts = path.split('.');
-
-          // Only process if we're in the same parent path
-          if (sourcePathParts.length === pathParts.length) {
-            const sourceIndex = parseInt(sourcePathParts[sourcePathParts.length - 1], 10);
-            const destIndex = parseInt(destPathParts[destPathParts.length - 1], 10);
-            const currentIndex = parseInt(pathParts[pathParts.length - 1], 10);
-
-            // If this path is after source and before dest, decrement index
-            if (currentIndex > sourceIndex && currentIndex <= destIndex) {
-              const newIndex = currentIndex - 1;
-              const newPath = [...pathParts.slice(0, -1), newIndex].join('.');
-              newVariables[newPath] = value;
-              delete newVariables[path];
-            } else if (currentIndex >= destIndex && currentIndex < sourceIndex) {
-              // If this path is before source and after dest, increment index
-              const newIndex = currentIndex + 1;
-              const newPath = [...pathParts.slice(0, -1), newIndex].join('.');
-              newVariables[newPath] = value;
-              delete newVariables[path];
-            }
-          }
-        }
-      });
+      // Rename the variables declared by the groups which moved, and update the references to
+      // those variables in the whole scene, so that it stays coherent
+      const newVariables = renameVariablesOfMovedGroups(this.state.variables, movedGroupPaths);
+      replaceMovedGroupPathsInActions(this.state.scene.actions, movedGroupPaths);
 
       // Set the new state
       await this.setState({
@@ -1071,128 +1400,106 @@ class EditScene extends Component {
     }
   };
 
-  // Recursively generate all possible action group types based on nesting level
-  generateActionGroupTypes = (actions, parentPath = '') => {
-    if (!actions || !Array.isArray(actions)) {
-      return [];
-    }
-
-    // Start with the current level
-    let types = [];
-    const currentLevel = parentPath.split('.').length;
-
-    // Add the current level if not already in the list
-    if (!parentPath.endsWith('then') && !parentPath.endsWith('else')) {
-      const groupType = `ACTION_GROUP_TYPE_LEVEL_${currentLevel}`;
-      if (!types.includes(groupType)) {
-        types.push(groupType);
-      }
-    }
-
-    // Recursively process each action group and its actions
-    actions.forEach((actionGroup, groupIndex) => {
-      const groupPath = parentPath ? `${parentPath}.${groupIndex}` : `${groupIndex}`;
-
-      const groupType = `ACTION_GROUP_TYPE_LEVEL_${groupPath.split('.').length}`;
-      if (!types.includes(groupType)) {
-        types.push(groupType);
-      }
-
-      // Process each action in the group
-      if (Array.isArray(actionGroup)) {
-        actionGroup.forEach((action, actionIndex) => {
-          const actionPath = `${groupPath}.${actionIndex}`;
-
-          // Check if this is a conditional action with nested actions
-          if (action && (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE)) {
-            // Process 'then' branch
-            if (Array.isArray(action.then)) {
-              const thenTypes = this.generateActionGroupTypes(action.then, `${actionPath}.then`);
-              types = [...types, ...thenTypes];
-            }
-
-            // Process 'else' branch
-            if (Array.isArray(action.else)) {
-              const elseTypes = this.generateActionGroupTypes(action.else, `${actionPath}.else`);
-              types = [...types, ...elseTypes];
-            }
-          }
-        });
-      }
-    });
-
-    // Remove duplicates
-    return [...new Set(types)];
-  };
-
   constructor(props) {
     super(props);
     this.state = {
       scene: null,
       variables: {},
-      triggersVariables: []
+      triggersVariables: [],
+      runningScenes: [],
+      now: Date.now()
     };
+    this.ticker = null;
   }
 
   componentDidMount() {
     this.getSceneBySelector();
     this.getTags();
+    this.getRunningScenes();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
       this.highlighCurrentlyExecutedAction(payload)
     );
     this.props.session.dispatcher.addListener('scene.finished-executing-action', payload =>
       this.removeHighlighAction(payload)
     );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
+  }
+
+  componentDidUpdate() {
+    // Start/stop the ticker based on the applied state.
+    this.refreshTicker();
   }
 
   componentWillUnmount() {
     document.removeEventListener('click', this.closeEdition, true);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
+    if (this.ticker) {
+      clearInterval(this.ticker);
+      this.ticker = null;
+    }
   }
 
-  render(props, { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene }) {
-    const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
-    const { backend, options } = getDragAndDropBackend();
+  render(
+    props,
+    {
+      saving,
+      error,
+      errorMessage,
+      variables,
+      scene,
+      triggersVariables,
+      tags,
+      askDeleteScene,
+      runningScenes,
+      now,
+      savedSceneSnapshot
+    }
+  ) {
+    const runningInfo = computeRunningInfo(runningScenes, props.scene_selector, now);
+    const hasUnsavedChanges = Boolean(scene && savedSceneSnapshot && JSON.stringify(scene) !== savedSceneSnapshot);
     return (
       scene && (
         <div>
-          <DndProvider backend={backend} options={options}>
-            <EditScenePage
-              {...props}
-              scene={scene}
-              tags={tags}
-              actionsGroupTypes={actionsGroupTypes}
-              updateActionProperty={this.updateActionProperty}
-              updateTriggerProperty={this.updateTriggerProperty}
-              addAction={this.addAction}
-              deleteActionGroup={this.deleteActionGroup}
-              deleteAction={this.deleteAction}
-              addTrigger={this.addTrigger}
-              deleteTrigger={this.deleteTrigger}
-              saving={saving}
-              error={error}
-              errorMessage={errorMessage}
-              variables={variables}
-              triggersVariables={triggersVariables}
-              setVariables={this.setVariables}
-              setVariablesTrigger={this.setVariablesTrigger}
-              switchActiveScene={this.switchActiveScene}
-              updateSceneName={this.updateSceneName}
-              moveCard={this.moveCard}
-              moveCardGroup={this.moveCardGroup}
-              updateSceneDescription={this.updateSceneDescription}
-              startScene={this.startScene}
-              deleteScene={this.deleteScene}
-              saveScene={this.saveScene}
-              duplicateScene={this.duplicateScene}
-              setTags={this.setTags}
-              updateSceneIcon={this.updateSceneIcon}
-              addActionGroupAfter={this.addActionGroupAfter}
-              askDeleteScene={askDeleteScene}
-              askDeleteCurrentScene={this.askDeleteCurrentScene}
-              cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}
-              goBack={this.goBack}
-            />
-          </DndProvider>
+          <EditScenePage
+            {...props}
+            scene={scene}
+            hasUnsavedChanges={hasUnsavedChanges}
+            runningInfo={runningInfo}
+            stopScene={this.stopScene}
+            tags={tags}
+            updateActionProperty={this.updateActionProperty}
+            updateTriggerProperty={this.updateTriggerProperty}
+            addAction={this.addAction}
+            deleteActionGroup={this.deleteActionGroup}
+            deleteAction={this.deleteAction}
+            addTrigger={this.addTrigger}
+            deleteTrigger={this.deleteTrigger}
+            saving={saving}
+            error={error}
+            errorMessage={errorMessage}
+            variables={variables}
+            triggersVariables={triggersVariables}
+            setVariables={this.setVariables}
+            setVariablesTrigger={this.setVariablesTrigger}
+            switchActiveScene={this.switchActiveScene}
+            updateSceneName={this.updateSceneName}
+            moveCard={this.moveCard}
+            moveCardGroup={this.moveCardGroup}
+            updateSceneDescription={this.updateSceneDescription}
+            startScene={this.startScene}
+            deleteScene={this.deleteScene}
+            saveScene={this.saveScene}
+            duplicateScene={this.duplicateScene}
+            setTags={this.setTags}
+            updateSceneIcon={this.updateSceneIcon}
+            addActionGroupAfter={this.addActionGroupAfter}
+            askDeleteScene={askDeleteScene}
+            askDeleteCurrentScene={this.askDeleteCurrentScene}
+            cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}
+            goBack={this.goBack}
+          />
         </div>
       )
     );

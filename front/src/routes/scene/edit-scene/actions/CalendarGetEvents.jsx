@@ -83,6 +83,10 @@ class CalendarGetEvents extends Component {
 
   setVariables = () => {
     const EVENTS_TEXT_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendarEvents.text');
+    const EVENTS_TEXT_DETAILED_VARIABLE = get(
+      this.props.intl.dictionary,
+      'editScene.variables.calendarEvents.textDetailed'
+    );
     const EVENTS_COUNT_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendarEvents.count');
     const EVENTS_LIST_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendarEvents.events');
     this.props.setVariables(this.props.path, [
@@ -91,6 +95,13 @@ class CalendarGetEvents extends Component {
         type: 'calendar',
         ready: true,
         label: EVENTS_TEXT_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'calendarEvents.textDetailed',
+        type: 'calendar',
+        ready: true,
+        label: EVENTS_TEXT_DETAILED_VARIABLE,
         data: {}
       },
       {

@@ -6,10 +6,15 @@ const Gladys = require('./lib');
 const db = require('./models');
 const { start } = require('./api');
 
-const SERVER_PORT = parseInt(process.env.SERVER_PORT, 10) || 1443;
+const { getServerPort } = require('./utils/getServerPort');
+
+const SERVER_PORT = getServerPort();
 const SERVE_FRONT = process.env.NODE_ENV === 'production' ? true : process.env.SERVE_FRONT === 'true';
 
 const logger = require('./utils/logger');
+
+/** @type {any} */
+let gladysInstance = null;
 
 process.on('unhandledRejection', (error, promise) => {
   logger.error('unhandledRejection catched:', promise);
@@ -43,6 +48,18 @@ const closeDuckDB = async () => {
   }
 };
 
+// Stop advertising Gladys on the local network. A rejection here would skip the
+// process.exit() of the shutdown and make it wait for the forced exit
+const stopMdns = async () => {
+  try {
+    if (gladysInstance) {
+      await gladysInstance.mdns.stop();
+    }
+  } catch (e) {
+    logger.warn(e);
+  }
+};
+
 const shutdown = async (signal) => {
   logger.info(`${signal} received.`);
   // We give Gladys 10 seconds to properly shutdown, otherwise we do it
@@ -51,7 +68,7 @@ const shutdown = async (signal) => {
     process.exit();
   }, 10 * 1000);
   logger.info('Closing database connections.');
-  await Promise.all([closeSQLite(), closeDuckDB()]);
+  await Promise.all([closeSQLite(), closeDuckDB(), stopMdns()]);
   process.exit();
 };
 
@@ -63,6 +80,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
   const gladys = Gladys({
     jwtSecret: process.env.JWT_SECRET,
   });
+  gladysInstance = gladys;
 
   // start Gladys
   await gladys.start();
@@ -71,4 +89,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
   start(gladys, SERVER_PORT, {
     serveFront: SERVE_FRONT,
   });
+
+  // advertise Gladys on the local network (http://<hostname>.local)
+  await gladys.mdns.start(SERVER_PORT);
 })();

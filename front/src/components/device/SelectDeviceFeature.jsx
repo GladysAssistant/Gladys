@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
+import closeMenuOnScroll from '../../utils/closeMenuOnScroll';
 
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
@@ -38,6 +39,13 @@ class SelectDeviceFeature extends Component {
             deviceDictionnary[feature.selector] = device;
 
             if (this.props.exclude_read_only_device_features === true && feature.read_only) {
+              return;
+            }
+
+            // optional caller-provided predicate: some pickers only accept a
+            // subset of features (e.g. the quick-actions box only commands
+            // writable binaries and shutter/curtain state)
+            if (typeof this.props.filterFeature === 'function' && !this.props.filterFeature(feature)) {
               return;
             }
 
@@ -230,6 +238,9 @@ class SelectDeviceFeature extends Component {
     }
     return (
       <Select
+        menuPlacement="auto"
+        menuPortalTarget={document.body}
+        closeMenuOnScroll={closeMenuOnScroll}
         class="select-device-feature"
         defaultValue={props.isMulti ? [] : ''}
         isMulti={props.isMulti}

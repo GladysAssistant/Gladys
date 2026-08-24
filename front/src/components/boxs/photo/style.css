@@ -3,6 +3,33 @@
   overflow: hidden;
 }
 
+/* Inside a stretched wrapper (the box absorbs the free height of its
+   column) the image area grows with the card instead of leaving a dead
+   white zone under the 400px cap. photo_fit keeps deciding cover/contain.
+   Desktop-only, like stretch itself (spec A.4): below the breakpoint the
+   columns stack, there is no leftover height to absorb, and lifting the
+   cap would let a portrait photo balloon on a phone. */
+@media (min-width: 992px) {
+  :global(.dashboard-stretched-media) .photoContainer {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  :global(.dashboard-stretched-media) .imageWrapper {
+    flex: 1 1 auto;
+    max-height: none;
+    min-height: 0;
+  }
+
+  :global(.dashboard-stretched-media) .photo {
+    max-height: none;
+    height: 100%;
+    min-height: 0;
+  }
+}
+
 .imageWrapper {
   position: relative;
   width: 100%;
@@ -77,6 +104,21 @@
   opacity: 1;
 }
 
+/* no hover on touch devices: the arrows must be visible outright, and at
+   the ~44px touch-target floor */
+@media (hover: none) {
+  .navButton {
+    opacity: 1;
+  }
+}
+
+@media (pointer: coarse) {
+  .navButton {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
 .navButton:hover {
   background: rgba(0, 0, 0, 0.6);
 }
@@ -92,27 +134,58 @@
 .indicators {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.5rem;
   background: #fff;
 }
 
+/* Horizon glass theme: the media block sits edge-to-edge in a rounded card
+   that deliberately has no overflow clipping, so its square corners would
+   cover the glass roundings. The container already clips (overflow: hidden
+   above): it takes the card radii itself — the top ones only when there is
+   no card header above — and the dots row trades its solid white band for
+   the glass surface. */
+:global(.glass-theme) .photoContainer {
+  border-radius: 0 0 var(--gl-radius-lg) var(--gl-radius-lg);
+}
+
+:global(.glass-theme) .photoContainer:first-child {
+  border-top-left-radius: var(--gl-radius-lg);
+  border-top-right-radius: var(--gl-radius-lg);
+}
+
+:global(.glass-theme) .indicators {
+  background: transparent;
+}
+
+/* The dot stays a small visual, but the button around it is 24px — the
+   WCAG 2.2 minimum target size, on every device (the 8px dots were nearly
+   impossible to hit on touch) */
 .indicator {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.indicator::before {
+  content: '';
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  border: none;
   background: #d1d5db;
-  cursor: pointer;
-  padding: 0;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.indicator:hover {
+.indicator:hover::before {
   background: #9ca3af;
 }
 
-.indicatorActive {
+.indicatorActive::before {
   background: #316cbe;
   transform: scale(1.25);
 }

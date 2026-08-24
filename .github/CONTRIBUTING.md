@@ -65,11 +65,11 @@ If your PR implements a forum request, add a line `Forum: https://community.glad
 
 ## 🤖 Automated review
 
-An automated review runs on your PR as soon as you open it. A draft PR waits until you mark it **ready for review**.
+An automated review runs on your PR as soon as you open it. A draft PR waits until you mark it **ready for review**. After that, every time you push new commits, a new review starts automatically about 5 minutes later — the delay lets a burst of pushes result in a single review of your latest commit, so there is no need to hold back small fixup commits.
 
-Two cases do not get that automatic review: PRs authored by `dependabot[bot]` or `renovate[bot]`, and PRs from contributors whose first contribution has not been merged yet. **If this is your first PR here, just ask for a review in a comment** (see below) or wait for a maintainer — nothing is wrong with your PR.
+Two cases do not get those automatic reviews: PRs authored by `dependabot[bot]` or `renovate[bot]`, and PRs from contributors whose first contribution has not been merged yet. **If this is your first PR here, just ask for a review in a comment** (see below) or wait for a maintainer — nothing is wrong with your PR.
 
-To ask for a new review after pushing changes, comment on the PR:
+To ask for a review on demand (as a first-time contributor, or to skip the 5-minute wait), comment on the PR:
 
 ```text
 /cursor review
@@ -78,6 +78,8 @@ To ask for a new review after pushing changes, comment on the PR:
 `/cursor-review` works too, and the command is case-insensitive. It has to start its own line — anything you write after it on the same line is ignored, and quoting someone else's command (`> /cursor review`) never triggers a review.
 
 The command works for the PR author and for repository owners, organization members and collaborators. The bot reacts to your comment with 👀 when the request is accepted, 🚀 once the review has been started, and 👎 if you are not allowed to ask for one. Maintainers can also add the `needs:cursor-review` label, which triggers the same thing.
+
+Note that the command fires immediately and is independent of the automatic post-push review: commenting `/cursor review` right after pushing can start two reviews of the same commit (the on-demand one now, the automatic one ~5 minutes later). After a push, the cheapest option is simply to wait.
 
 ---
 

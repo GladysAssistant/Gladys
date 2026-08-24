@@ -1,6 +1,7 @@
 const { ALARM_MODES } = require('../../../utils/constants');
 const { ConflictError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
+const { sanitizeName } = require('./sanitizeName');
 
 // Values of the HomeKit SecuritySystemCurrentState characteristic. The target one uses the same
 // values without ALARM_TRIGGERED: HomeKit lets an alarm report that it went off, not be asked to.
@@ -42,8 +43,9 @@ function buildAlarmAccessory(house) {
 
   // The alarm is not a device: it lives on the house, so this accessory is built from a house
   // rather than from `buildAccessory`, and its UUID is the house id.
-  const accessory = new this.hap.Accessory(house.name.substring(0, 64), house.id);
-  const service = new Service.SecuritySystem(house.name.substring(0, 64));
+  const houseName = sanitizeName(house.name);
+  const accessory = new this.hap.Accessory(houseName, house.id);
+  const service = new Service.SecuritySystem(houseName);
 
   const readState = async () => {
     const { alarm_mode: alarmMode } = await this.gladys.house.getBySelector(house.selector);

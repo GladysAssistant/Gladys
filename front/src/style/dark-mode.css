@@ -39,8 +39,11 @@ body.dark-mode {
   filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */
 }
 
-/** Should not invert icon on dashboard **/
-.dark-mode .dashboard .fe {
+/** Should not invert icons on the glass dashboard and its editor,
+    nor inside the drag ghost (it lives on <body>, outside those containers) **/
+.dark-mode .dashboard .fe,
+.dark-mode .glass-theme .fe,
+.dark-mode .gladys-drag-ghost .fe {
   filter: none;
 }
 
@@ -134,6 +137,7 @@ body.dark-mode {
 .dark-mode .btn-primary,
 .dark-mode .btn-danger,
 .dark-mode .btn-success,
+.dark-mode .btn-orange,
 .dark-mode .btn-outline-danger,
 .dark-mode .btn-outline-success,
 .dark-mode .btn-outline-primary,
@@ -213,6 +217,20 @@ body.dark-mode {
    real colors (yellow/orange suns, alert badges, UV index) */
 .dark-mode .weather-real-colors {
   filter: brightness(0.7) invert(100%) hue-rotate(180deg) !important;
+}
+
+/* The weather condition icons are real SVG artwork, not emojis: they need the
+   global html.dark-mode inversion cancelled EXACTLY, with no brightness step.
+   The 0.7 pre-darkening above is tuned for emoji glyphs; applied to these
+   drawings it darkened the real colors before flipping them back, which turned
+   the sun burnt orange and the clouds black.
+
+   Their container must NOT carry .weather-real-colors either: a CSS filter
+   creates a stacking context, so a filtered parent composites its children
+   through its own filter and the two would stack instead of the inner one
+   replacing the outer. */
+.dark-mode img.weather-condition-icon {
+  filter: invert(100%) hue-rotate(180deg) !important;
 }
 
 /* A fullscreen element is painted in the browser's top layer, where the global

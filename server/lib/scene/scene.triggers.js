@@ -1,7 +1,7 @@
 const cloneDeep = require('lodash.clonedeep');
 
 const logger = require('../../utils/logger');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, ANY_CHANGE_OPERATOR } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
 
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
@@ -39,6 +39,16 @@ const triggersFunc = {
         : [trigger.device_feature];
     if (!triggerDeviceFeatures.includes(event.device_feature)) {
       return false;
+    }
+
+    // "any change" trigger: no value is configured, the trigger fires as soon as the feature
+    // reports a value different from the previous one (a device re-sending the same value
+    // is not a state change). A change is instantaneous, so `threshold_only` (which only
+    // exists to de-duplicate a condition staying true) and `for_duration` (which waits for a
+    // condition to hold) have nothing to hold on to: they are ignored, and no timer is
+    // scheduled. The UI hides both options in that mode.
+    if (trigger.operator === ANY_CHANGE_OPERATOR) {
+      return compare(trigger.operator, event.last_value, event.previous_value);
     }
 
     // We verify if both old value and new value validate the rule

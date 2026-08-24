@@ -1,5 +1,12 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
-const { ACTION_LIST, ACTIONS, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
+const {
+  ACTION_LIST,
+  ACTIONS,
+  EVENT_LIST,
+  ALARM_MODES_LIST,
+  TRIGGER_OPERATORS,
+  ANY_CHANGE_OPERATOR,
+} = require('../utils/constants');
 const { WEATHER_ALERT_TYPES, WEATHER_ALERT_SEVERITIES } = require('../lib/external-integration/constants');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
@@ -53,6 +60,8 @@ const actionSchema = Joi.object()
       .integer()
       .min(1)
       .allow(null),
+    // Precision the "time.get-date" action truncates the current date/time to.
+    precision: Joi.string().valid('second', 'minute', 'hour', 'day'),
     request_response_keys: Joi.array().items(Joi.string()),
     ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
@@ -104,8 +113,8 @@ const actionSchema = Joi.object()
 
 const actionsSchema = Joi.array().items(Joi.array().items(actionSchema));
 
-const triggersSchema = Joi.array().items(
-  Joi.object().keys({
+const triggerSchema = Joi.object()
+  .keys({
     type: Joi.string()
       .valid(...EVENT_LIST)
       .required(),
@@ -115,7 +124,8 @@ const triggersSchema = Joi.array().items(
     device_features: Joi.array()
       .items(Joi.string())
       .min(1),
-    operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
+    // `changed` fires on any state change of the device feature, no value is needed
+    operator: Joi.string().valid(...TRIGGER_OPERATORS),
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),
     area: Joi.string(),
@@ -154,8 +164,21 @@ const triggersSchema = Joi.array().items(
     // weather-alert triggers (B.18): phenomenon type filter and minimal severity
     weather_alert_type: Joi.string().valid(...WEATHER_ALERT_TYPES, 'any'),
     weather_alert_severity: Joi.string().valid(...WEATHER_ALERT_SEVERITIES),
-  }),
-);
+  })
+  // A "changed" trigger fires on `last_value !== previous_value`: it matches no value, and
+  // neither `threshold_only` (which de-duplicates a condition staying true) nor `for_duration`
+  // (which waits for it to stay true) applies to a change, which is instantaneous. Refusing
+  // them here keeps a stored trigger consistent with what the runtime does, and matches the
+  // MCP schemas.
+  .when(Joi.object({ operator: Joi.valid(ANY_CHANGE_OPERATOR) }).unknown(), {
+    then: Joi.object().keys({
+      value: Joi.forbidden(),
+      threshold_only: Joi.forbidden(),
+      for_duration: Joi.forbidden(),
+    }),
+  });
+
+const triggersSchema = Joi.array().items(triggerSchema);
 
 /**
  * @description Build a flat validation message from Joi details.

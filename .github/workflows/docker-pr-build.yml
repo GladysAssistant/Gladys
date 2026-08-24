@@ -7,9 +7,15 @@ on:
     # instead of master) run the same CI as regular pull requests
     branches: [master, 'claude/**']
     types: [opened, synchronize, reopened, ready_for_review]
+  # Merge queue builds: the queue only merges a group once the required
+  # checks of this workflow have passed on the merge_group ref.
+  merge_group:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  # github.head_ref is empty on merge_group events, so fall back to
+  # github.ref (unique per queue entry): without the fallback every queue
+  # build would share one concurrency group and cancel the others.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -143,7 +149,11 @@ jobs:
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v4
         with:
-          fail_ci_if_error: true
+          # Codecov uploads are flaky (rate limits, see below). Failing the
+          # job is fine on a pull request, but in the merge queue it would
+          # block every group behind an external service, so only enforce
+          # the upload on pull_request builds.
+          fail_ci_if_error: ${{ github.event_name != 'merge_group' }}
           token: 08cd0d46-0291-42ed-b352-50924cb6cca6
 
           ## Yes, we are storing the CODECOV token in plain text here and not as a secret.
@@ -203,7 +213,12 @@ jobs:
           project: ./front
           command: npm run cypress:run
   build-front:
-    if: github.event.pull_request.draft == false
+    # Runs on merge queue builds (the front must build before merging) and on
+    # non-draft pull requests. The event check must be explicit: on
+    # merge_group there is no pull_request payload and GitHub expressions
+    # coerce null == false to TRUE, so the old draft-only condition would
+    # silently match every non-PR event.
+    if: github.event_name == 'merge_group' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     name: Front build
     runs-on: ubuntu-22.04
     steps:
@@ -229,7 +244,12 @@ jobs:
           name: static
           path: front/build
   docker:
-    if: github.event.pull_request.draft == false
+    # Preview images only make sense for pull requests: on merge_group there
+    # is no branch to tag the image with and nobody to comment to. The
+    # explicit event check matters (null == false is TRUE in GitHub
+    # expressions, see build-front above), otherwise this job would run on
+    # queue builds with an empty, invalid image tag.
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
     needs: build-front
     name: Docker magic !
     runs-on: ubuntu-22.04

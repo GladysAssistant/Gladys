@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
+import closeMenuOnScroll from '../../utils/closeMenuOnScroll';
 
 class RoomSelector extends Component {
   updateSelection = option => {
@@ -72,6 +73,9 @@ class RoomSelector extends Component {
   render({}, { selectedRoom, houseOptions }) {
     return (
       <Select
+        menuPlacement="auto"
+        menuPortalTarget={document.body}
+        closeMenuOnScroll={closeMenuOnScroll}
         value={selectedRoom}
         options={houseOptions}
         onChange={this.updateSelection}
