@@ -7,7 +7,7 @@ const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 
 const gladys = {
   config: {
-    tempFolder: '/tmp/gladys',
+    tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
   },
   gateway: {
     gladysGatewayClient: {

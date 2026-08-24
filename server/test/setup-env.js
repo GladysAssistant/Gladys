@@ -81,6 +81,14 @@ if (!process.env.GLADYS_TEST_TEMP_FOLDER_ROOT) {
 }
 process.env.TEMP_FOLDER = `${process.env.GLADYS_TEST_TEMP_FOLDER_ROOT}-${process.pid}`;
 
+// A test that builds its own fake `gladys` object must take its tempFolder
+// from process.env.TEMP_FOLDER (`process.env.TEMP_FOLDER || '/tmp/gladys'`)
+// and never hardcode the shared folder: the isolation above only holds if
+// every worker stays inside its own copy. Hardcoding it made the whole suite
+// share one folder across workers, so the ~30 system tests calling init()
+// emptied it under the rtsp-camera tests, whose fixtures live there — the
+// `ENOENT ... /tmp/gladys/camera-<id>/index.m3u8` failures.
+
 process.on('exit', () => {
   // eslint-disable-next-line global-require
   const { unlinkSync, readdirSync, rmSync } = require('fs');
