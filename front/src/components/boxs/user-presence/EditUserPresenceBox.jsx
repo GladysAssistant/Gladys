@@ -3,6 +3,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import get from 'get-value';
 import Select from 'react-select';
+import closeMenuOnScroll from '../../../utils/closeMenuOnScroll';
 import BaseEditBox from '../baseEditBox';
 
 const UserPresenceBox = ({ children, ...props }) => (
@@ -18,6 +19,7 @@ const UserPresenceBox = ({ children, ...props }) => (
           <Select
             menuPlacement="auto"
             menuPortalTarget={document.body}
+            closeMenuOnScroll={closeMenuOnScroll}
             class="choose-dashboard-user-presence-users"
             defaultValue={[]}
             value={props.selectedUsers}
