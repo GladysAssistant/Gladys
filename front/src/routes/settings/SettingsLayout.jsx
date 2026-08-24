@@ -63,6 +63,8 @@ const DashboardSettings = ({ children, ...props }) => (
             rightButtonClass={cx(style.tabsScrollBtn, style.tabsScrollBtnRight)}
             scrollLeftLabel={<Text id="settings.scrollLeft" />}
             scrollRightLabel={<Text id="settings.scrollRight" />}
+            activeSelector={`.${style.tabLinkActive}`}
+            activeKey={props.currentUrl}
           >
             {MENU_ITEMS.filter(item => !item.gatewayOnly || config.gatewayMode).map(item => (
               <Link
