@@ -1260,6 +1260,10 @@
     "free-mobile": {
       "title": "Free Mobile",
       "description": "Send SMS from Gladys using Free Mobile.",
+      "deprecatedWarning": {
+        "title": "Integration soon deprecated",
+        "description": "This built-in integration will be removed in a future version of Gladys. It is replaced by the community integration <b>Free Mobile SMS</b>, which offers the same features and will keep being maintained. Head to the <a href=\"/dashboard/integration/notifications\">integration catalog</a> to install it, then update your SMS scenes to use it."
+      },
       "documentation": "Free Mobile Documentation",
       "introduction": "This plugin allows you to send SMS to your Free cell phone via the notification service provided by Free. Enter your customer ID and the identification key below, which you can find on the <a href=\"https://mobile.free.fr\"> FreeMobile</a> website.",
       "username": "Free Mobile Customer ID",

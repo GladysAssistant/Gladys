@@ -1498,6 +1498,10 @@
     "free-mobile": {
       "title": "Free Mobile",
       "description": "Envoyer des sms depuis Gladys grâce à Free Mobile.",
+      "deprecatedWarning": {
+        "title": "Intégration bientôt dépréciée",
+        "description": "Cette intégration native sera supprimée dans une prochaine version de Gladys. Elle est remplacée par l'intégration communautaire <b>Free Mobile SMS</b>, qui offre les mêmes fonctionnalités et continuera d'être maintenue. Rendez-vous dans le <a href=\"/dashboard/integration/notifications\">catalogue des intégrations</a> pour l'installer, puis reconfigurez vos scènes d'envoi de SMS avec celle-ci."
+      },
       "documentation": "Documentation Free Mobile",
       "introduction": "Ce plugin vous permet d'envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
       "username": "Identifiant client Free Mobile",
