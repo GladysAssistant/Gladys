@@ -1262,7 +1262,7 @@
       "description": "Send SMS from Gladys using Free Mobile.",
       "deprecatedWarning": {
         "title": "Integration soon deprecated",
-        "description": "This built-in integration will be removed in a future version of Gladys. It is replaced by the community integration <b>Free Mobile SMS</b>, which offers the same features and will keep being maintained. Head to the <a href=\"/dashboard/integration/notifications\">integration catalog</a> to install it, then set your Free Mobile credentials in your user profile. In your scenes, the <b>Send SMS</b> action keeps using this built-in integration: replace it with a <b>Send Message</b> action targeting the Free Mobile SMS channel."
+        "description": "This built-in integration will be removed in a future version of Gladys. It is replaced by the community integration <b>Free Mobile SMS</b>, which offers the same features and will keep being maintained. Head to the <a href=\"/dashboard/integration/notifications\">integration catalog</a> to install it, then enter your Free Mobile credentials in the <b>My account</b> section of the <b>Configuration</b> tab of that integration — each Gladys user fills in their own. In your scenes, the <b>Send SMS</b> action keeps using this built-in integration: replace it with a <b>Send Message</b> action targeting the Free Mobile SMS channel and the Gladys user whose account is configured."
       },
       "documentation": "Free Mobile Documentation",
       "introduction": "This plugin allows you to send SMS to your Free cell phone via the notification service provided by Free. Enter your customer ID and the identification key below, which you can find on the <a href=\"https://mobile.free.fr\"> FreeMobile</a> website.",
@@ -3306,7 +3306,7 @@
       },
       "smsSend": {
         "deprecatedTitle": "Action soon deprecated",
-        "deprecatedDescription": "This action uses the built-in Free Mobile integration, which will be removed in a future version of Gladys. Install the community integration <b>Free Mobile SMS</b>, set your credentials in your user profile, then replace this action with a <b>Send Message</b> action targeting the Free Mobile SMS channel.",
+        "deprecatedDescription": "This action uses the built-in Free Mobile integration, which will be removed in a future version of Gladys. Install the community integration <b>Free Mobile SMS</b>, enter your Free Mobile credentials in the <b>My account</b> section of the <b>Configuration</b> tab of that integration, then replace this action with a <b>Send Message</b> action targeting the Free Mobile SMS channel and the Gladys user whose account is configured.",
         "textLabel": "Message",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
