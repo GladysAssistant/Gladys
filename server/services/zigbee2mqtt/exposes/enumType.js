@@ -178,6 +178,11 @@ addMapping('liquid_state', LIQUID_STATE.LOW, 'low');
 addMapping('liquid_state', LIQUID_STATE.NORMAL, 'normal');
 addMapping('liquid_state', LIQUID_STATE.HIGH, 'high');
 
+// Excellux ZG-104PLV motion sensor
+// https://www.zigbee2mqtt.io/devices/ZG-104PLV.html
+addMapping('presence', 0, 'false');
+addMapping('presence', 1, 'true');
+
 // SONOFF SWV water valve
 // https://www.zigbee2mqtt.io/devices/SWV.html
 addMapping('current_device_status', WATER_VALVE_CURRENT_DEVICE_STATUS.NORMAL_STATE, 'normal_state');
@@ -245,7 +250,7 @@ module.exports = {
       return melodyNumber === null ? undefined : parseInt(melodyNumber[1], 10);
     }
 
-    const subValue = value.replace(/^(\d+_)?/, '');
+    const subValue = `${value}`.replace(/^(\d+_)?/, '');
     return (READ_VALUE_MAPPING[expose.name] || {})[subValue];
   },
   feature: {
@@ -268,6 +273,15 @@ module.exports = {
           max: 1,
           forceOverride: true,
         },
+      },
+    },
+    presence: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+        min: 0,
+        max: 1,
+        forceOverride: true,
       },
     },
     volume: {
