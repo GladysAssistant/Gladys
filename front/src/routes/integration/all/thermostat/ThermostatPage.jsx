@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const ThermostatPage = ({ children }) => (
   <div class="page">
@@ -8,6 +9,7 @@ const ThermostatPage = ({ children }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.thermostat.title" />
               </h3>
