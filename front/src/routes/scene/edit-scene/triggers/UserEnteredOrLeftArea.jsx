@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 import { EVENTS } from '../../../../../../server/utils/constants';
 
 class UserPresenceTrigger extends Component {
