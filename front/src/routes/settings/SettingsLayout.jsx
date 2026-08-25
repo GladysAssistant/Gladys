@@ -37,7 +37,9 @@ const MENU_ITEMS = [
 // every width (several entries share an icon); instead of wrapping into a
 // tall block on phones, the row rides the shared Horizon chips scroller
 // (history filters' pattern): sideways scroll, an arrow on each side only
-// while entries remain past that edge.
+// while entries remain past that edge. The scroller is opted into through
+// the extra .settingsTabsScroller class — .settingsTabs alone stays the
+// plain wrapping pill grammar the signup progress row also composes on.
 const DashboardSettings = ({ children, ...props }) => (
   <div class="page">
     <div
@@ -58,7 +60,7 @@ const DashboardSettings = ({ children, ...props }) => (
           </h3>
           <ChipsScroll
             wrapperClass={style.settingsTabsWrapper}
-            scrollerClass={style.settingsTabs}
+            scrollerClass={cx(style.settingsTabs, style.settingsTabsScroller)}
             leftButtonClass={cx(style.tabsScrollBtn, style.tabsScrollBtnLeft)}
             rightButtonClass={cx(style.tabsScrollBtn, style.tabsScrollBtnRight)}
             scrollLeftLabel={<Text id="settings.scrollLeft" />}
