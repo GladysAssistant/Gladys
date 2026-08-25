@@ -29,14 +29,37 @@ class PlayNotification extends Component {
       console.error(e);
     }
   };
-  toggleVolumeType = () => this.setState({ computedVolume: !this.state.computedVolume });
+  // Switching the volume type clears the value of the other type, so the action never keeps both
+  // a "volume" and an "evaluate_volume": the server evaluates the formula as soon as it is there,
+  // and the fixed volume would be silently ignored.
+  selectVolumeType = computedVolume => {
+    if (computedVolume === this.state.computedVolume) {
+      return;
+    }
+    this.setState({ computedVolume });
+    if (computedVolume) {
+      // The formula starts from the volume currently selected, so switching to computed does not
+      // lose the value shown by the slider.
+      const { volume } = this.props.action;
+      const evaluateVolume = volume !== undefined ? `${volume}` : undefined;
+      this.props.updateActionProperty(this.props.path, 'evaluate_volume', evaluateVolume);
+      this.props.updateActionProperty(this.props.path, 'volume', undefined);
+    } else {
+      this.props.updateActionProperty(this.props.path, 'evaluate_volume', undefined);
+    }
+  };
+
+  selectSimpleType = () => this.selectVolumeType(false);
+
+  selectComputedType = () => this.selectVolumeType(true);
+
   updateVolume = e => {
     this.props.updateActionProperty(this.props.path, 'volume', parseInt(e.target.value, 10));
     this.props.updateActionProperty(this.props.path, 'evaluate_volume', undefined);
   };
   updateEvaluateVolume = text => {
     this.props.updateActionProperty(this.props.path, 'volume', undefined);
-    this.props.updateActionProperty(this.props.path, 'evaluate_volume', text);
+    this.props.updateActionProperty(this.props.path, 'evaluate_volume', text.length > 0 ? text : undefined);
   };
   updateText = text => {
     this.props.updateActionProperty(this.props.path, 'text', text);
@@ -83,11 +106,7 @@ class PlayNotification extends Component {
           </div>
           <div class="input-group">
             <TextWithVariablesInjected
-              text={
-                this.props.action.volume !== undefined
-                  ? Number(this.props.action.volume).toString()
-                  : this.props.action.evaluate_volume
-              }
+              text={this.props.action.evaluate_volume || ''}
               path={this.props.path}
               triggersVariables={this.props.triggersVariables}
               actionsGroupsBefore={this.props.actionsGroupsBefore}
@@ -155,18 +174,20 @@ class PlayNotification extends Component {
             </span>
           </label>
           <div className={cx('nav-tabs', style.valueTypeTab)}>
-            <span
+            <button
+              type="button"
               class={cx('nav-link', style.valueTypeLink, { active: !this.state.computedVolume })}
-              onClick={this.toggleVolumeType}
+              onClick={this.selectSimpleType}
             >
               <Text id="editScene.actionsCard.playNotification.valueTypeSimple" />
-            </span>
-            <span
+            </button>
+            <button
+              type="button"
               class={cx('nav-link', style.valueTypeLink, { active: this.state.computedVolume })}
-              onClick={this.toggleVolumeType}
+              onClick={this.selectComputedType}
             >
               <Text id="editScene.actionsCard.playNotification.valueTypeComputed" />
-            </span>
+            </button>
           </div>
           {this.getVolumeInput()}
         </div>
