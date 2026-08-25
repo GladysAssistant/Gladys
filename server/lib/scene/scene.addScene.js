@@ -2,7 +2,13 @@ const cloneDeep = require('lodash.clonedeep');
 const uuid = require('uuid');
 
 const { BadParameters } = require('../../utils/coreErrors');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, TIME_RANGE_EVENTS } = require('../../utils/constants');
+const {
+  daysOfTheWeekToNumbers,
+  isOvernightRange,
+  resolveTriggerTimeRanges,
+  timeToMinutes,
+} = require('../../utils/timeRanges');
 
 const MAX_VALUE_SET_INTERVAL = 2 ** 31 - 1;
 
@@ -33,6 +39,73 @@ const nodeScheduleDaysOfWeek = {
 };
 
 /**
+ * @description Schedule the jobs of a "time-range" trigger: one job at the start and one at
+ * the end of each configured range.
+ *
+ * The days of the week are attached to the START of the range. For a range crossing midnight
+ * ("22:00 -> 06:00"), the end job is therefore scheduled on the day AFTER each selected day,
+ * so a range configured on monday ends on tuesday morning — which is what `isInTimeRanges`
+ * computes as well.
+ * @param {object} self - The scene manager.
+ * @param {object} trigger - The time-range trigger.
+ * @returns {object[]} The scheduled jobs, so they can be cancelled later.
+ * @example
+ * scheduleTimeRangeJobs(this, trigger);
+ */
+function scheduleTimeRangeJobs(self, trigger) {
+  const jobs = [];
+  // The days of the week are configured once for the whole trigger; a scene saved by an
+  // earlier version has them on each range instead.
+  const timeRanges = resolveTriggerTimeRanges(trigger);
+
+  timeRanges.forEach((range, rangeIndex) => {
+    // A range covering nothing would fire its start and its end at the same second,
+    // leaving the scene with two contradictory executions.
+    if (timeToMinutes(range.start) === timeToMinutes(range.end)) {
+      throw new BadParameters(`Time range ${rangeIndex}: start and end cannot be equal`);
+    }
+
+    const startDays = daysOfTheWeekToNumbers(range.days_of_the_week);
+    if (startDays.length === 0) {
+      throw new BadParameters(`Time range ${rangeIndex}: no valid day of the week`);
+    }
+    // For an overnight range, the end happens on the next day.
+    const endDays = isOvernightRange(range) ? startDays.map((day) => (day + 1) % 7) : startDays;
+
+    const scheduleOne = (time, days, rangeEvent) => {
+      const rule = {
+        tz: self.timezone,
+        dayOfWeek: days,
+        hour: parseInt(time.substr(0, 2), 10),
+        minute: parseInt(time.substr(3, 2), 10),
+        second: 0,
+      };
+      // Only the identity of the trigger is emitted, never the trigger object itself: it
+      // holds the scheduled jobs, which would then travel through the event bus and end up
+      // in the scope of the scene, readable from any action template. `range_index` tells
+      // which range of the planning fired, so a scene can tell them apart from a template
+      // ({{triggerEvent.range_index}}).
+      return self.scheduler.scheduleJob(rule, () =>
+        self.event.emit(EVENTS.TRIGGERS.CHECK, {
+          type: trigger.type,
+          key: trigger.key,
+          scheduler_type: trigger.scheduler_type,
+          range_event: rangeEvent,
+          range_index: rangeIndex,
+        }),
+      );
+    };
+
+    // Both sides of the range always fire: a scene reacting to only one of them simply
+    // leaves the other branch of its "if/else" empty.
+    jobs.push(scheduleOne(range.start, startDays, TIME_RANGE_EVENTS.START));
+    jobs.push(scheduleOne(range.end, endDays, TIME_RANGE_EVENTS.END));
+  });
+
+  return jobs;
+}
+
+/**
  * @description Add a scene to the scene manager.
  * @param {object} sceneRaw - Scene object from DB.
  * @param {object} [options] - Options.
@@ -56,7 +129,11 @@ async function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
     scene.triggers.forEach((trigger) => {
       // First, we had a trigger key, import to uniquely identify this trigger
       trigger.key = uuid.v4();
-      if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
+      if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type === 'time-range') {
+        // A time-range trigger schedules several jobs (2 per range), unlike the other
+        // scheduler types which only need one.
+        trigger.nodeScheduleJobs = scheduleTimeRangeJobs(this, trigger);
+      } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
         const rule = {};
         rule.tz = this.timezone;
         switch (trigger.scheduler_type) {
@@ -151,4 +228,5 @@ async function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
 module.exports = {
   addScene,
   hasSunriseSunsetTrigger,
+  scheduleTimeRangeJobs,
 };

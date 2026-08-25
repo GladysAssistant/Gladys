@@ -42,6 +42,9 @@ const sceneDeclarationFieldsSchema = Joi.object()
     ),
   )
   .max(MAX_SCENE_DECLARATION_FIELDS);
+// A real time of day: a loose /[0-9]{2}:[0-9]{2}/ also matches "99:99", which builds a
+// node-schedule rule that never fires.
+const HOUR_MINUTE_REGEX = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
 const actionSchema = Joi.object()
   .keys({
@@ -161,6 +164,9 @@ const actionSchema = Joi.object()
     integration: Joi.string(),
     action_key: sceneDeclarationKeySchema,
     fields: sceneDeclarationFieldsSchema,
+    // "scene.in-time-range" condition: true checks we are inside one of the time ranges of
+    // the scene, false checks we are outside of them.
+    in_range: Joi.boolean(),
   })
   // A "variable.set" action holds either a text or a formula, never both: the runtime
   // would only evaluate the formula and silently drop the text.
@@ -192,7 +198,48 @@ const triggerSchema = Joi.object()
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),
     area: Joi.string(),
-    scheduler_type: Joi.string().valid('every-month', 'every-week', 'every-day', 'interval', 'custom-time'),
+    scheduler_type: Joi.string().valid(
+      'every-month',
+      'every-week',
+      'every-day',
+      'interval',
+      'custom-time',
+      'time-range',
+    ),
+    // "time-range" scheduler: a list of ranges, each one firing the scene at its start and
+    // at its end. The days of the week are shared by every range of the trigger
+    // (`days_of_the_week`); ranges used to carry their own list, still accepted so a scene
+    // saved by an earlier version stays editable and duplicable, but ignored by the runtime.
+    // Times are validated as real times: "99:99" matches a loose HH:mm regex but produces a
+    // node-schedule rule which never fires, so the trigger would be silently dead.
+    time_ranges: Joi.array().items(
+      Joi.object()
+        .keys({
+          start: Joi.string()
+            .regex(HOUR_MINUTE_REGEX)
+            .required(),
+          end: Joi.string()
+            .regex(HOUR_MINUTE_REGEX)
+            .required(),
+          days_of_the_week: Joi.array().items(
+            Joi.string().valid('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+          ),
+        })
+        // A range starting and ending at the same time covers nothing, and would fire its
+        // start and its end at the very same second. Rejected here so the scene is refused
+        // before it reaches the database: scheduling it throws, which would otherwise leave
+        // the saved scene out of the trigger store until the next restart.
+        .custom((range, helpers) => (range.start === range.end ? helpers.error('any.invalid') : range), 'time range')
+        .message('A time range cannot start and end at the same time'),
+    ),
+    resume_on_startup: Joi.boolean(),
+    // Both sides of a range always fire: a scene reacting to only one of them leaves the
+    // other branch of its "if/else" empty. These two flags used to make that configurable;
+    // they are still accepted so a scene saved by an earlier version can be saved and
+    // duplicated, but the runtime ignores them. They are not stripped: the model validator
+    // only reads the validation error, so the value it would rewrite is discarded anyway.
+    trigger_start: Joi.boolean(),
+    trigger_end: Joi.boolean(),
     // Calendar event
     calendar_event_attribute: Joi.string().valid('start', 'end'),
     calendar_event_name_comparator: Joi.string().valid(
@@ -253,7 +300,26 @@ const triggerSchema = Joi.object()
   // the selector and the declared key are what the matcher compares first
   .when(Joi.object({ type: Joi.valid(EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT) }).unknown(), {
     then: Joi.object({ integration: Joi.required(), trigger_key: Joi.required() }),
-  });
+  })
+  // A "time-range" trigger needs at least one range and at least one day, otherwise
+  // scheduling it throws — and it throws after the scene has been written to the database,
+  // leaving the saved scene out of the trigger store until the next restart. Refusing it
+  // here rejects the save itself, with a message the editor can display.
+  // Written as a custom rule rather than another `.when()`: two chained `when` on the same
+  // object merge destructively, and the branch of the second one ends up applying to every
+  // trigger type.
+  .custom((trigger, helpers) => {
+    if (trigger.scheduler_type !== 'time-range') {
+      return trigger;
+    }
+    if (!trigger.time_ranges || trigger.time_ranges.length === 0) {
+      return helpers.message('A "time range" trigger needs at least one time range');
+    }
+    if (trigger.days_of_the_week && trigger.days_of_the_week.length === 0) {
+      return helpers.message('A "time range" trigger needs at least one day of the week');
+    }
+    return trigger;
+  }, 'time-range trigger');
 
 const triggersSchema = Joi.array().items(triggerSchema);
 
