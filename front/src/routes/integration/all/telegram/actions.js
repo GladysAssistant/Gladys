@@ -1,4 +1,5 @@
 import { RequestStatus } from '../../../../utils/consts';
+import { USER_ROLE } from '../../../../../../server/utils/constants';
 
 const actions = store => ({
   updateTelegramApiKey(state, e) {
@@ -11,10 +12,15 @@ const actions = store => ({
       telegramGetApiKeyStatus: RequestStatus.Getting
     });
     try {
-      const variable = await state.httpClient.get('/api/v1/service/telegram/variable/TELEGRAM_API_KEY');
-      store.setState({
-        telegramApiKey: variable.value
-      });
+      // the bot API key is a service-wide secret: only an admin can read it,
+      // and only an admin is shown the form to change it. Every other user
+      // comes to this page for their own linking link, which is per-user.
+      if (state.user && state.user.role === USER_ROLE.ADMIN) {
+        const variable = await state.httpClient.get('/api/v1/service/telegram/variable/TELEGRAM_API_KEY');
+        store.setState({
+          telegramApiKey: variable.value
+        });
+      }
       const { link } = await state.httpClient.get('/api/v1/service/telegram/link');
       store.setState({
         telegramCustomLink: link,

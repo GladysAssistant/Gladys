@@ -825,12 +825,18 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: variableController.getByLocalService,
     },
+    // global variables hold instance-wide secrets (Gladys Plus keys, backup
+    // keys...): reading and writing them is reserved to admins. Per-user
+    // settings go through /api/v1/user/variable below, which stays open to
+    // every authenticated user.
     'post /api/v1/variable/:variable_key': {
       authenticated: true,
+      admin: true,
       controller: variableController.setValue,
     },
     'get /api/v1/variable/:variable_key': {
       authenticated: true,
+      admin: true,
       controller: variableController.getValue,
     },
     'post /api/v1/user/variable/:variable_key': {
