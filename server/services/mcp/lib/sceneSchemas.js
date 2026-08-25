@@ -13,6 +13,11 @@ const weekDaysSchema = z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'fr
 const comparisonOperatorSchema = z.enum(COMPARISON_OPERATORS);
 const calendarComparatorSchema = z.enum(['is-exactly', 'contains', 'starts-with', 'ends-with', 'has-any-name']);
 const triggerCalendarEventAttributeSchema = z.enum(['start', 'end']);
+// The days of the week are shared by every range, and live on the trigger itself.
+const timeRangeSchema = z.object({
+  start: z.string().regex(hhmmPattern),
+  end: z.string().regex(hhmmPattern),
+});
 
 const SCENE_TRIGGER_TYPES = new Set([
   EVENTS.DEVICE.NEW_STATE,
@@ -271,6 +276,14 @@ function createSceneCreateInputSchema(
           .optional(),
         days_of_the_week: z.array(weekDaysSchema).optional(),
       }),
+      actionSchemaByType(ACTIONS.SCENE.IN_TIME_RANGE, {
+        in_range: z
+          .boolean()
+          .optional()
+          .describe(
+            'True (default) continues when the current time is inside one of the time ranges of the scene, false when it is outside.',
+          ),
+      }),
       actionSchemaByType(ACTIONS.HOUSE.IS_EMPTY, {
         house: houseSelectorSchema,
       }),
@@ -483,6 +496,34 @@ function createSceneCreateInputSchema(
       interval: z.number().optional(),
       unit: z.string().optional(),
       days_of_the_week: z.array(weekDaysSchema).optional(),
+      day_of_the_month: z
+        .number()
+        .min(1)
+        .max(31)
+        .optional(),
+      key: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.CHANGED, {
+      scheduler_type: z.literal('time-range'),
+      time_ranges: z
+        .array(timeRangeSchema)
+        .min(1)
+        .describe('Time ranges: the scene runs at the start and at the end of each one.'),
+      resume_on_startup: z
+        .boolean()
+        .optional()
+        .describe('Also run the scene when Gladys starts, to re-apply the state of the planning.'),
+      date: z.string().optional(),
+      time: z
+        .string()
+        .regex(hhmmPattern)
+        .optional(),
+      interval: z.number().optional(),
+      unit: z.string().optional(),
+      days_of_the_week: z
+        .array(weekDaysSchema)
+        .optional()
+        .describe('Days the ranges start on. Empty or absent means every day.'),
       day_of_the_month: z
         .number()
         .min(1)

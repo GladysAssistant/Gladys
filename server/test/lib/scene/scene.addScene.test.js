@@ -336,4 +336,170 @@ describe('SceneManager.addScene', () => {
       message: 'message',
     });
   });
+  it('should add a scene with a time-range trigger, scheduling 2 jobs per range', async () => {
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          days_of_the_week: ['monday'],
+          time_ranges: [
+            { start: '12:00', end: '14:30' },
+            { start: '16:00', end: '17:30' },
+          ],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    expect(trigger).to.not.have.property('nodeScheduleJob');
+    expect(trigger)
+      .to.have.property('nodeScheduleJobs')
+      .with.lengthOf(4);
+    // start of the first range
+    expect(trigger.nodeScheduleJobs[0].date).to.deep.equal({
+      tz: 'Europe/Paris',
+      dayOfWeek: [1],
+      hour: 12,
+      minute: 0,
+      second: 0,
+    });
+    // end of the first range
+    expect(trigger.nodeScheduleJobs[1].date).to.deep.equal({
+      tz: 'Europe/Paris',
+      dayOfWeek: [1],
+      hour: 14,
+      minute: 30,
+      second: 0,
+    });
+  });
+  it('should schedule the end of an overnight range on the next day', async () => {
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          days_of_the_week: ['sunday', 'monday'],
+          time_ranges: [{ start: '22:00', end: '06:00' }],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    expect(trigger.nodeScheduleJobs[0].date.dayOfWeek).to.deep.equal([0, 1]);
+    // sunday -> monday, monday -> tuesday
+    expect(trigger.nodeScheduleJobs[1].date.dayOfWeek).to.deep.equal([1, 2]);
+  });
+  it('should schedule every day when the trigger has no days_of_the_week', async () => {
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          time_ranges: [{ start: '12:00', end: '14:00' }],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    expect(trigger.nodeScheduleJobs[0].date.dayOfWeek).to.have.members([0, 1, 2, 3, 4, 5, 6]);
+  });
+  it('should NOT add a time-range trigger where every day was unselected', async () => {
+    // An explicitly empty list is the user unselecting every day, which the editor warns
+    // about: scheduling all seven days instead would be the exact opposite.
+    try {
+      await sceneManager.addScene({
+        name: 'a-test-scene',
+        icon: 'bell',
+        active: true,
+        triggers: [
+          {
+            type: EVENTS.TIME.CHANGED,
+            scheduler_type: 'time-range',
+            days_of_the_week: [],
+            time_ranges: [{ start: '12:00', end: '14:00' }],
+          },
+        ],
+        actions: [],
+      });
+      expect.fail();
+    } catch (e) {
+      expect(e).instanceOf(BadParameters);
+    }
+  });
+  it('should emit a check event with the range side when a job fires', async () => {
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          time_ranges: [{ start: '12:00', end: '14:00' }],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    trigger.nodeScheduleJobs[0].callback();
+    assert.calledWith(
+      event.emit,
+      EVENTS.TRIGGERS.CHECK,
+      sinon.match({ range_event: 'start', range_index: 0, key: trigger.key }),
+    );
+    trigger.nodeScheduleJobs[1].callback();
+    assert.calledWith(event.emit, EVENTS.TRIGGERS.CHECK, sinon.match({ range_event: 'end', range_index: 0 }));
+  });
+  it('should not leak the scheduled jobs in the emitted event', async () => {
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          time_ranges: [{ start: '12:00', end: '14:00' }],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    trigger.nodeScheduleJobs[0].callback();
+    // The event travels to the scope of the scene, where any action template can read it:
+    // it must not carry the node-schedule jobs of the trigger.
+    const emittedEvent = event.emit.lastCall.args[1];
+    expect(emittedEvent).to.not.have.property('nodeScheduleJobs');
+    expect(emittedEvent).to.not.have.property('time_ranges');
+  });
+  it('should NOT add a time-range trigger with an empty range', async () => {
+    try {
+      await sceneManager.addScene({
+        name: 'a-test-scene',
+        icon: 'bell',
+        active: true,
+        triggers: [
+          {
+            type: EVENTS.TIME.CHANGED,
+            scheduler_type: 'time-range',
+            time_ranges: [{ start: '12:00', end: '12:00' }],
+          },
+        ],
+        actions: [],
+      });
+      expect.fail();
+    } catch (e) {
+      expect(e).instanceOf(BadParameters);
+    }
+  });
 });

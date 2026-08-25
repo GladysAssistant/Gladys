@@ -3547,6 +3547,12 @@
         "volumeLabel": "Volume",
         "textLabel": "Message to speak on the speaker",
         "variablesExplanation": "To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
+      },
+      "inTimeRange": {
+        "label": "Only continue if",
+        "inRange": "We are inside a time range",
+        "outOfRange": "We are outside the time ranges",
+        "description": "This condition uses the time ranges of the scene's “Time ranges” trigger. Put it in an “If… Then… Else” block to turn a device on at the start of a range and off at its end, with a single scene."
       }
     },
     "actions": {
@@ -3578,7 +3584,8 @@
         "toggle": "Toggle the Switches"
       },
       "scene": {
-        "start": "Start scene"
+        "start": "Start scene",
+        "in-time-range": "Time planning"
       },
       "service": {
         "start": "Start service",
@@ -3688,7 +3695,8 @@
       },
       "delay": "Pause before the next step",
       "scene": {
-        "start": "Start another scene"
+        "start": "Start another scene",
+        "in-time-range": "Only continue if we are inside one of the trigger's time ranges"
       },
       "http": {
         "request": "Call an external API or service"
@@ -3895,7 +3903,29 @@
           "saturday": "Saturday",
           "sunday": "Sunday"
         },
-        "house": "House"
+        "house": "House",
+        "timeRange": "Time ranges",
+        "timeRangesLabel": "Time ranges",
+        "noTimeRange": "No time range yet. Add one to define the planning.",
+        "addRange": "Add a range",
+        "deleteRange": "Delete range",
+        "rangeStart": "Start",
+        "rangeEnd": "End",
+        "rangeDuration": "Duration",
+        "rangeDays": "Days",
+        "overnight": "+1d",
+        "resumeOnStartup": "Re-evaluate when Gladys starts",
+        "timeRangesHelp": "The scene runs at the start and at the end of each range. Use the “Time planning” action in an “If… Then… Else” block to turn a device on at the start of a range and off at its end. If “Re-evaluate when Gladys starts” is checked, the scene also runs at startup with the real state of the planning, so your devices go back to the right state after an outage.",
+        "daysOfTheWeekShort": {
+          "monday": "MO",
+          "tuesday": "TU",
+          "wednesday": "WE",
+          "thursday": "TH",
+          "friday": "FR",
+          "saturday": "SA",
+          "sunday": "SU"
+        },
+        "lastDayLocked": "At least one day must stay selected."
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."

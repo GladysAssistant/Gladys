@@ -1,8 +1,15 @@
 const cloneDeep = require('lodash.clonedeep');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezonePlugin = require('dayjs/plugin/timezone');
 
 const logger = require('../../utils/logger');
-const { EVENTS, ANY_CHANGE_OPERATOR } = require('../../utils/constants');
+const { EVENTS, ANY_CHANGE_OPERATOR, TIME_RANGE_EVENTS } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
+const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRanges');
+
+dayjs.extend(utc);
+dayjs.extend(timezonePlugin);
 
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
   event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
@@ -120,7 +127,27 @@ const triggersFunc = {
 
     return false;
   },
-  [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => event.key === trigger.key,
+  [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => {
+    if (event.key !== trigger.key) {
+      return false;
+    }
+    // A time-range trigger carries which side of the range fired, so the scene can react
+    // differently to a start and to an end. It is exposed to the actions through the scope
+    // (`scope.triggerEvent`, written by scene.checkTrigger).
+    // `event` is the single object checkTrigger walks every scene with, so writing on it
+    // is only safe because the key guard above lets at most one trigger through: keys are
+    // uuid v4, assigned per trigger in addScene. Keep that guard before this branch.
+    if (trigger.scheduler_type === 'time-range') {
+      const now = dayjs.tz(dayjs(), self.timezone);
+      const timeRanges = resolveTriggerTimeRanges(trigger);
+      event.in_range =
+        event.range_event === TIME_RANGE_EVENTS.RESUME
+          ? isInTimeRanges(timeRanges, now)
+          : event.range_event === TIME_RANGE_EVENTS.START;
+      logger.debug(`Scene trigger time-range: ${event.range_event} event, in_range = ${event.in_range}.`);
+    }
+    return true;
+  },
   [EVENTS.TIME.SUNRISE]: matchSunEvent,
   [EVENTS.TIME.SUNSET]: matchSunEvent,
   [EVENTS.USER_PRESENCE.BACK_HOME]: (self, sceneSelector, event, trigger) =>

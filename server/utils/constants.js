@@ -713,6 +713,16 @@ const CONDITIONS = {
   },
 };
 
+// Sub-events of a "time-range" scheduled trigger. The trigger fires at the start and at the
+// end of each configured range; `resume` is the extra firing at Gladys startup, when the
+// scene asked to be re-evaluated (the scheduled jobs of a range which elapsed while Gladys
+// was down are lost, so the scene reconciles the real state with the planned one itself).
+const TIME_RANGE_EVENTS = {
+  START: 'start',
+  END: 'end',
+  RESUME: 'resume',
+};
+
 // Operators available on a "device.new-state" scene trigger. `changed` is specific to
 // triggers: it fires on any state change of the device feature, so no value is configured.
 const COMPARISON_OPERATORS = ['=', '!=', '>', '>=', '<', '<='];
@@ -752,6 +762,7 @@ const ACTIONS = {
   },
   SCENE: {
     START: 'scene.start',
+    IN_TIME_RANGE: 'scene.in-time-range',
   },
   MESSAGE: {
     SEND: 'message.send',
@@ -809,6 +820,7 @@ const CONDITION_ACTIONS = [
   ACTIONS.ECOWATT.CONDITION,
   ACTIONS.HOUSE.IS_EMPTY,
   ACTIONS.HOUSE.IS_NOT_EMPTY,
+  ACTIONS.SCENE.IN_TIME_RANGE,
 ];
 
 const INTENTS = {
@@ -2292,6 +2304,7 @@ module.exports.CONDITIONS = CONDITIONS;
 module.exports.COMPARISON_OPERATORS = COMPARISON_OPERATORS;
 module.exports.ANY_CHANGE_OPERATOR = ANY_CHANGE_OPERATOR;
 module.exports.TRIGGER_OPERATORS = TRIGGER_OPERATORS;
+module.exports.TIME_RANGE_EVENTS = TIME_RANGE_EVENTS;
 module.exports.ACTIONS = ACTIONS;
 module.exports.CONDITION_ACTIONS = CONDITION_ACTIONS;
 module.exports.INTENTS = INTENTS;

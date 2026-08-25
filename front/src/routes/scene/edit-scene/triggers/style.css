@@ -22,3 +22,21 @@
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+/* Days of the week of a time-range trigger: seven checkboxes on one line, wrapping
+   only when the container is too narrow (mobile). Checkboxes rather than toggle
+   buttons: with seven of them side by side, a tick mark says "selected" at a glance,
+   where two shades of the button palette are easy to read the wrong way round. */
+.timeRangeDays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+
+/* The theme lays .custom-control out as a block, for checkboxes stacked vertically.
+   Only the display is overridden: the left padding it reserves is what the tick mark
+   (positioned absolutely inside the control) sits in, so it must be kept. */
+.timeRangeDay {
+  display: inline-block;
+  margin-bottom: 0;
+}

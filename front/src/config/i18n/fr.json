@@ -3547,6 +3547,12 @@
         "volumeLabel": "Volume",
         "textLabel": "Message à dire sur l'enceinte",
         "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
+      },
+      "inTimeRange": {
+        "label": "Continuer seulement si",
+        "inRange": "On est dans une plage horaire",
+        "outOfRange": "On est en dehors des plages horaires",
+        "description": "Cette condition s'appuie sur les plages horaires du déclencheur « Plages horaires » de la scène. Placez-la dans un bloc « Si… Alors… Sinon » pour allumer un équipement au début d'une plage et l'éteindre à la fin, avec une seule scène."
       }
     },
     "actions": {
@@ -3578,7 +3584,8 @@
         "toggle": "Inverser les prises"
       },
       "scene": {
-        "start": "Démarrer la scène"
+        "start": "Démarrer la scène",
+        "in-time-range": "Planning horaire"
       },
       "service": {
         "start": "Démarrer le service",
@@ -3688,7 +3695,8 @@
       },
       "delay": "Faire une pause avant l'étape suivante",
       "scene": {
-        "start": "Démarrer une autre scène"
+        "start": "Démarrer une autre scène",
+        "in-time-range": "Continuer seulement si l'on est dans une plage horaire du déclencheur"
       },
       "http": {
         "request": "Appeler une API ou un service externe"
@@ -3895,7 +3903,29 @@
           "saturday": "Samedi",
           "sunday": "Dimanche"
         },
-        "house": "Maison"
+        "house": "Maison",
+        "timeRange": "Plages horaires",
+        "timeRangesLabel": "Plages horaires",
+        "noTimeRange": "Aucune plage horaire. Ajoutez-en une pour définir le planning.",
+        "addRange": "Ajouter une plage",
+        "deleteRange": "Supprimer la plage",
+        "rangeStart": "Début",
+        "rangeEnd": "Fin",
+        "rangeDuration": "Durée",
+        "rangeDays": "Jours",
+        "overnight": "J+1",
+        "resumeOnStartup": "Réévaluer au démarrage de Gladys",
+        "timeRangesHelp": "La scène est exécutée au début et à la fin de chaque plage. Utilisez l'action « Planning horaire » dans un bloc « Si… Alors… Sinon » pour allumer un équipement au début d'une plage et l'éteindre à la fin. Si « Réévaluer au démarrage » est coché, la scène est aussi exécutée au démarrage de Gladys avec l'état réel du planning, ce qui permet de remettre vos équipements dans le bon état après une coupure.",
+        "daysOfTheWeekShort": {
+          "monday": "LU",
+          "tuesday": "MA",
+          "wednesday": "ME",
+          "thursday": "JE",
+          "friday": "VE",
+          "saturday": "SA",
+          "sunday": "DI"
+        },
+        "lastDayLocked": "Au moins un jour doit rester sélectionné."
       },
       "warning": {
         "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."
