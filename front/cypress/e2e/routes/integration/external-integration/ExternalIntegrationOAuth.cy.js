@@ -81,6 +81,13 @@ describe('External integration - OAuth2 connection', () => {
       expect(request.body.key).to.equal('spotify_account');
       expect(request.body.redirect_uri).to.equal(REDIRECT_URI);
     });
+
+    // `cy.wait` resolves as soon as the proxy answered, which is one tick
+    // before the app resumes and opens the provider. Ending the test here
+    // restores the stub first, and the real `window.open` gets the provider
+    // URL: the run then dies on `ERR_FAILED loading 'https://accounts...'`
+    // with every test green. Wait for the call before letting the test end.
+    cy.get('@windowOpen').should('have.been.called');
   });
 
   it('opens the provider with the instance address wrapped in the state', () => {
