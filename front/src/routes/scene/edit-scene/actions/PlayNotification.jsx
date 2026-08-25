@@ -2,11 +2,13 @@ import Select from 'react-select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
+import style from './DeviceSetValue.css';
 
 class PlayNotification extends Component {
   getOptions = async () => {
@@ -27,8 +29,14 @@ class PlayNotification extends Component {
       console.error(e);
     }
   };
+  toggleVolumeType = () => this.setState({ computedVolume: !this.state.computedVolume });
   updateVolume = e => {
-    this.props.updateActionProperty(this.props.path, 'volume', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'volume', parseInt(e.target.value, 10));
+    this.props.updateActionProperty(this.props.path, 'evaluate_volume', undefined);
+  };
+  updateEvaluateVolume = text => {
+    this.props.updateActionProperty(this.props.path, 'volume', undefined);
+    this.props.updateActionProperty(this.props.path, 'evaluate_volume', text);
   };
   updateText = text => {
     this.props.updateActionProperty(this.props.path, 'text', text);
@@ -56,7 +64,8 @@ class PlayNotification extends Component {
     super(props);
     this.props = props;
     this.state = {
-      selectedDeviceFeatureOption: ''
+      selectedDeviceFeatureOption: '',
+      computedVolume: props.action.evaluate_volume !== undefined
     };
   }
   componentDidMount() {
@@ -65,6 +74,47 @@ class PlayNotification extends Component {
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
   }
+  getVolumeInput = () => {
+    if (this.state.computedVolume) {
+      return (
+        <div>
+          <div className={style.explanationText}>
+            <Text id="editScene.actionsCard.playNotification.computedExplanationText" />
+          </div>
+          <div class="input-group">
+            <TextWithVariablesInjected
+              text={
+                this.props.action.volume !== undefined
+                  ? Number(this.props.action.volume).toString()
+                  : this.props.action.evaluate_volume
+              }
+              path={this.props.path}
+              triggersVariables={this.props.triggersVariables}
+              actionsGroupsBefore={this.props.actionsGroupsBefore}
+              variables={this.props.variables}
+              updateText={this.updateEvaluateVolume}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <input type="text" class="form-control" value={this.props.action.volume} disabled />
+        <input
+          type="range"
+          value={this.props.action.volume}
+          onChange={this.updateVolume}
+          class="form-control custom-range"
+          step="1"
+          min={0}
+          max={100}
+        />
+      </div>
+    );
+  };
+
   render(props, { selectedDeviceFeatureOption, devicesOptions }) {
     return (
       <div>
@@ -104,16 +154,21 @@ class PlayNotification extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <input type="text" class="form-control" value={props.action.volume} disabled />
-          <input
-            type="range"
-            value={props.action.volume}
-            onChange={this.updateVolume}
-            class="form-control custom-range"
-            step="1"
-            min={0}
-            max={100}
-          />
+          <div className={cx('nav-tabs', style.valueTypeTab)}>
+            <span
+              class={cx('nav-link', style.valueTypeLink, { active: !this.state.computedVolume })}
+              onClick={this.toggleVolumeType}
+            >
+              <Text id="editScene.actionsCard.playNotification.valueTypeSimple" />
+            </span>
+            <span
+              class={cx('nav-link', style.valueTypeLink, { active: this.state.computedVolume })}
+              onClick={this.toggleVolumeType}
+            >
+              <Text id="editScene.actionsCard.playNotification.valueTypeComputed" />
+            </span>
+          </div>
+          {this.getVolumeInput()}
         </div>
         <div class="form-group">
           <label class="form-label">

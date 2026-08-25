@@ -15,7 +15,7 @@ const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.AI.ASK]: ['text'],
   [ACTIONS.MESSAGE.SEND_CAMERA]: ['text'],
   [ACTIONS.SMS.SEND]: ['text'],
-  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: ['text'],
+  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: ['text', 'evaluate_volume'],
   [ACTIONS.MQTT.SEND]: ['message'],
   [ACTIONS.ZIGBEE2MQTT.SEND]: ['message'],
   [ACTIONS.DEVICE.SET_VALUE]: ['evaluate_value'],
