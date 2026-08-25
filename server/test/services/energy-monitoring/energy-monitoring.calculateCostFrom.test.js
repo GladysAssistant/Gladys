@@ -162,6 +162,69 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState[1]).to.have.property('value', 20 * 0.18);
     expect(gladys.job.updateProgress.called).to.equal(false);
   });
+  it('should only recalculate cost for devices in options.deviceIds', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.BASE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    const date = new Date('2025-08-28T00:00:00.000Z');
+    // The power plug device is not in the list: its cost must not be recalculated
+    await energyMonitoring.calculateCostFrom(date, null, { deviceIds: ['d1fe2ab9-8c50-4053-ac40-83421f899c59'] });
+    const stateWithoutPowerPlug = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      new Date('2025-01-01T00:00:00.000Z'),
+      new Date('2025-12-01T00:00:00.000Z'),
+    );
+    expect(stateWithoutPowerPlug).to.have.lengthOf(0);
+    // The power plug device is in the list: its cost must be recalculated
+    await energyMonitoring.calculateCostFrom(date, null, { deviceIds: ['cf43f956-2f49-4cf9-a7e2-690a014de66e'] });
+    const stateWithPowerPlug = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      new Date('2025-01-01T00:00:00.000Z'),
+      new Date('2025-12-01T00:00:00.000Z'),
+    );
+    expect(stateWithPowerPlug).to.have.lengthOf(1);
+    expect(stateWithPowerPlug[0]).to.have.property('value', 10 * 0.18);
+  });
+  it('should not calculate cost when the only price expired before the state date', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.BASE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2020-01-01',
+      end_date: '2020-12-31',
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    const date = new Date('2025-08-28T00:00:00.000Z');
+    await energyMonitoring.calculateCostFrom(date);
+    const deviceFeatureState = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      new Date('2025-01-01T00:00:00.000Z'),
+      new Date('2025-12-01T00:00:00.000Z'),
+    );
+    expect(deviceFeatureState).to.have.lengthOf(0);
+  });
   it('should calculate cost from a specific date with Watt-hour unit conversion', async () => {
     // Create a device with consumption in Watt-hour (not kWh)
     await device.create({

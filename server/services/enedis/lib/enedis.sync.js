@@ -289,8 +289,23 @@ async function sync(fromStart = false, jobId = null) {
       const energyMonitoringService = this.gladys.service && this.gladys.service.getService('energy-monitoring');
       if (energyMonitoringService && energyMonitoringService.device) {
         const earliestSyncDate = getEarliestDate(syncedDates);
-        logger.debug(`Enedis: Recalculating cost from ${earliestSyncDate} after sync`);
-        await energyMonitoringService.device.calculateCostFromDate(earliestSyncDate);
+        // Only the usage points that received new data need a cost recalculation:
+        // the consumption states of every other energy device are untouched.
+        const impactedDeviceIds = usagePoints
+          .filter((usagePoint, index) => {
+            const response = syncResponses[index];
+            return (
+              (response.dailyConsumptionSync && response.dailyConsumptionSync.firstDateSync) ||
+              (response.consumptionLoadCurveSync && response.consumptionLoadCurveSync.firstDateSync)
+            );
+          })
+          .map((usagePoint) => usagePoint.id);
+        logger.debug(
+          `Enedis: Recalculating cost from ${earliestSyncDate} after sync for ${impactedDeviceIds.length} usage points`,
+        );
+        await energyMonitoringService.device.calculateCostFromDate(earliestSyncDate, {
+          deviceIds: impactedDeviceIds,
+        });
       } else {
         logger.warn('Enedis: energy-monitoring service unavailable, skipping cost recalculation after sync');
       }
