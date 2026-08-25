@@ -4067,7 +4067,9 @@
     "billingTab": "Abrechnung",
     "gatewayUsersTab": "Plus-Benutzer",
     "gatewayOpenApiTab": "Open API",
-    "jobsTab": "Aufgaben"
+    "jobsTab": "Aufgaben",
+    "scrollLeft": "Menü nach links scrollen",
+    "scrollRight": "Menü nach rechts scrollen"
   },
   "housesSettings": {
     "title": "Zuhause",
