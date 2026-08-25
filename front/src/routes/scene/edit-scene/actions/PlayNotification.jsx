@@ -10,6 +10,9 @@ import TextWithVariablesInjected from '../../../../components/scene/TextWithVari
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
 import style from './DeviceSetValue.css';
 
+// The volume a range input displays when it has no value: the midpoint of the slider.
+const DEFAULT_VOLUME = 50;
+
 class PlayNotification extends Component {
   getOptions = async () => {
     try {
@@ -45,6 +48,17 @@ class PlayNotification extends Component {
       this.props.updateActionProperty(this.props.path, 'evaluate_volume', evaluateVolume);
       this.props.updateActionProperty(this.props.path, 'volume', undefined);
     } else {
+      // Coming back to the fixed volume restores a number: the formula is dropped, and leaving
+      // "volume" undefined would save an action with no volume at all while the slider displays
+      // its own default. A formula that is already a plain number is kept, others fall back to
+      // the value the empty slider shows.
+      const formula = `${this.props.action.evaluate_volume || ''}`.trim();
+      const parsedVolume = Number(formula);
+      const volume =
+        formula.length > 0 && Number.isFinite(parsedVolume)
+          ? Math.min(100, Math.max(0, Math.round(parsedVolume)))
+          : DEFAULT_VOLUME;
+      this.props.updateActionProperty(this.props.path, 'volume', volume);
       this.props.updateActionProperty(this.props.path, 'evaluate_volume', undefined);
     }
   };
