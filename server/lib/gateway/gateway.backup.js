@@ -6,7 +6,8 @@ const fsPromise = require('fs').promises;
 const retry = require('async-retry');
 const db = require('../../models');
 const logger = require('../../utils/logger');
-const { exec } = require('../../utils/childProcess');
+const { execFile } = require('../../utils/childProcess');
+const { escapeSqlStringLiteral } = require('../../utils/backupSafety');
 const { readChunk } = require('../../utils/readChunk');
 const { NotFoundError } = require('../../utils/coreErrors');
 const { USER_ROLE } = require('../../utils/constants');
@@ -86,7 +87,7 @@ async function backup(jobId) {
         await fse.emptyDir(this.config.backupsFolder);
         // We backup database
         logger.info(`Starting Gateway backup in folder ${sqliteBackupFilePath}`);
-        await exec(`sqlite3 ${this.config.storage} ".backup '${sqliteBackupFilePath}'"`);
+        await execFile('sqlite3', [this.config.storage, `.backup '${sqliteBackupFilePath}'`]);
         logger.info(`Gateway backup: Unlocking Database`);
       });
     }, SQLITE_BACKUP_RETRY_OPTIONS);
@@ -101,7 +102,7 @@ async function backup(jobId) {
     try {
       // ZSTD compresses better than GZIP and needs less memory during the export
       await backupInstance.allAsync(
-        ` EXPORT DATABASE '${duckDbBackupFolderPath}' (
+        ` EXPORT DATABASE '${escapeSqlStringLiteral(duckDbBackupFolderPath)}' (
             FORMAT PARQUET,
             COMPRESSION ZSTD
         )`,
@@ -113,15 +114,24 @@ async function backup(jobId) {
     }
     // compress backup
     logger.info(`Gateway backup: Compressing backup`);
-    await exec(
-      `cd ${this.config.backupsFolder} && tar -czvf ${compressedBackupFileName} ${sqliteBackupFileName} ${duckDbBackupFolder}`,
-    );
+    await execFile('tar', ['-czvf', compressedBackupFileName, sqliteBackupFileName, duckDbBackupFolder], {
+      cwd: this.config.backupsFolder,
+    });
     await this.job.updateProgress(jobId, 20);
     // encrypt backup
     logger.info(`Gateway backup: Encrypting backup`);
-    await exec(
-      `openssl enc -aes-256-cbc -pass pass:${encryptKey} -in ${compressedBackupFilePath} -out ${encryptedBackupFilePath}`,
-    );
+    // the encryption key is a passphrase the user chose: passed through a shell it
+    // would be a command injection, so it goes to openssl as a plain argument
+    await execFile('openssl', [
+      'enc',
+      '-aes-256-cbc',
+      '-pass',
+      `pass:${encryptKey}`,
+      '-in',
+      compressedBackupFilePath,
+      '-out',
+      encryptedBackupFilePath,
+    ]);
     await this.job.updateProgress(jobId, 30);
     // Upload file to the Gladys Gateway
     const encryptedFileInfos = await fsPromise.stat(encryptedBackupFilePath);

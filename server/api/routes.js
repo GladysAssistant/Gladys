@@ -409,9 +409,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.createBackup,
     },
+    // reachable without authentication while the instance has no user (signup
+    // restore flow), and it makes the server download and unpack a remote file:
+    // rate limited like the other pre-authentication routes
     'post /api/v1/gateway/backup/restore': {
       authenticatedOrNotConfigured: true,
       admin: true,
+      rateLimit: true,
       controller: gatewayController.restoreBackup,
     },
     'get /api/v1/gateway/backup/restore/status': {
