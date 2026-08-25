@@ -178,8 +178,9 @@ addMapping('liquid_state', LIQUID_STATE.LOW, 'low');
 addMapping('liquid_state', LIQUID_STATE.NORMAL, 'normal');
 addMapping('liquid_state', LIQUID_STATE.HIGH, 'high');
 
-// Excellux ZG-104PLV motion sensor
-// https://www.zigbee2mqtt.io/devices/ZG-104PLV.html
+// Before Zigbee2MQTT 2.12.1, the Excellux ZG-104PLV exposed presence as the
+// string enum values "true"/"false". Keep this generic mapping for older converters.
+// https://github.com/Koenkk/zigbee-herdsman-converters/issues/12505
 addMapping('presence', 0, 'false');
 addMapping('presence', 1, 'true');
 
@@ -250,6 +251,7 @@ module.exports = {
       return melodyNumber === null ? undefined : parseInt(melodyNumber[1], 10);
     }
 
+    // Some enum exposes, such as legacy presence, publish booleans instead of strings.
     const subValue = `${value}`.replace(/^(\d+_)?/, '');
     return (READ_VALUE_MAPPING[expose.name] || {})[subValue];
   },
