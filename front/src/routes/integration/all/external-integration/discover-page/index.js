@@ -6,6 +6,7 @@ import debounce from 'debounce';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DiscoverTab from './DiscoverTab';
+import { isConfigOnlyIntegrationType } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
@@ -41,9 +42,9 @@ class ExternalIntegrationDiscoverPage extends Component {
       if (generation !== this.pageGeneration) {
         return false;
       }
-      // communication and weather integrations have no device screens:
+      // communication, weather and tts integrations have no device screens:
       // direct URL access lands on the configuration screen instead
-      if (['communication', 'weather'].includes(get(integration, 'manifest.type'))) {
+      if (isConfigOnlyIntegrationType(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
         return false;
       }

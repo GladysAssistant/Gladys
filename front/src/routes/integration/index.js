@@ -9,14 +9,14 @@ import normalizeSearchText from '../../utils/normalizeSearchText';
 import { SERVICE_STATUS, USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import debounce from 'debounce';
 import { integrations, catalogCategories } from '../../config/integrations';
-import { getLocalizedText } from './all/external-integration/utils';
+import { getLocalizedText, isConfigOnlyIntegrationType } from './all/external-integration/utils';
 import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog, rememberCatalogUrl } from './catalog-url';
 import createActionsExternalIntegrationUpdates from '../../actions/externalIntegrationUpdates';
 import { RequestStatus } from '../../utils/consts';
 
 // the role rules stay expressed on the technical `type` (spec §2.2): the
 // browse categories are display metadata and play no part in visibility
-const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
+const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'tts'];
 const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
 // cross-cutting views: they are not browse categories, they filter the whole
 // catalog (a favorite, or an integration with a pending update, can be of any
@@ -229,6 +229,9 @@ class Integration extends Component {
 
   buildExternalIntegrationCards() {
     const { user = {}, category } = this.props;
+    // technical types an external integration card can carry: the manifest
+    // type when the front knows it, "device" as the fallback
+    const EXTERNAL_CATEGORIES = ['device', 'communication', 'weather', 'tts'];
     const isAdmin = user.role === USER_ROLE.ADMIN;
     const language = user.language || 'en';
     // a non-admin user only sees the installed communication integrations:
@@ -274,12 +277,14 @@ class Integration extends Component {
       return manifestCategories.filter(key => KNOWN_CATEGORY_KEYS.has(key));
     };
 
-    // communication and weather integrations have no device screens: their
+    // a communication, weather or tts integration has no device screens: its
     // card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      ['communication', 'weather'].includes(manifest.type)
+      isConfigOnlyIntegrationType(manifest.type)
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
+    // the card category is the manifest type, "device" as the fallback
+    const getCardType = manifest => (EXTERNAL_CATEGORIES.includes(manifest.type) ? manifest.type : 'device');
 
     // Installed external integrations
     installed.forEach(integration => {
@@ -291,7 +296,7 @@ class Integration extends Component {
         key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: getCardType(manifest),
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: getInstalledUrl(integration.selector, manifest),
@@ -315,7 +320,7 @@ class Integration extends Component {
         key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: getCardType(manifest),
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled

@@ -6,6 +6,7 @@ import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DeviceTab from './DeviceTab';
+import { isConfigOnlyIntegrationType } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
@@ -13,9 +14,9 @@ class ExternalIntegrationDevicePage extends Component {
   getIntegration = async () => {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
-      // communication and weather integrations have no device screens:
+      // communication, weather and tts integrations have no device screens:
       // direct URL access lands on the configuration screen instead
-      if (['communication', 'weather'].includes(get(integration, 'manifest.type'))) {
+      if (isConfigOnlyIntegrationType(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
         return false;
       }

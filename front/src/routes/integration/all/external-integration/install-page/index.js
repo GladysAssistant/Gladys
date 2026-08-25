@@ -6,7 +6,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 
-import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from '../utils';
+import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses, isConfigOnlyIntegrationType } from '../utils';
 import BackToIntegrationsLink from '../../../../../components/integration/BackToIntegrationsLink';
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
@@ -104,12 +104,12 @@ class ExternalIntegrationInstallPage extends Component {
         body.granted_devices = this.state.grantedDevices || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      // communication and weather integrations have no device screens, and
-      // an integration with settings needs them filled before any device
+      // communication, weather and tts integrations have no device screens,
+      // and an integration with settings needs them filled before any device
       // can be discovered: all land on the configuration screen after
       // install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (['communication', 'weather'].includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
+      if (isConfigOnlyIntegrationType(get(installed, 'manifest.type')) || configSchema.length > 0) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -238,6 +238,12 @@ class ExternalIntegrationInstallPage extends Component {
                               <div class="alert alert-info">
                                 <i class="fe fe-cloud mr-1" />
                                 <Text id="integration.externalIntegration.install.weatherInfoText" />
+                              </div>
+                            )}
+                            {manifest.type === 'tts' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-volume-2 mr-1" />
+                                <Text id="integration.externalIntegration.install.ttsInfoText" />
                               </div>
                             )}
 

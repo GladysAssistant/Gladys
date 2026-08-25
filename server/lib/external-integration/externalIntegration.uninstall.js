@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const db = require('../../models');
 const logger = require('../../utils/logger');
+const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @description Uninstall an external integration. Removes everything:
@@ -51,6 +52,13 @@ async function uninstall(selector) {
     });
   } catch (e) {
     logger.warn(`Unable to remove data folder of integration ${selector}`, e);
+  }
+  // uninstalling the selected TTS provider silently returns the instance to
+  // the Gladys Plus default: no dangling selector in the system variable
+  // failing every announcement until an admin notices (B.21)
+  const selectedTtsProvider = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER);
+  if (selectedTtsProvider === service.name) {
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER);
   }
   const devices = await db.Device.findAll({ where: { service_id: service.id } });
   await Promise.each(devices, (device) => this.device.destroy(device.selector));

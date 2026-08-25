@@ -59,7 +59,7 @@ describe('externalIntegration.validateManifest', () => {
   });
 
   it('should reject an unknown type', () => {
-    expect422({ ...TEST_MANIFEST, type: 'tts' }, 'type: must be one of device');
+    expect422({ ...TEST_MANIFEST, type: 'thermostat' }, 'type: must be one of device');
   });
 
   it('should reject a name out of bounds', () => {

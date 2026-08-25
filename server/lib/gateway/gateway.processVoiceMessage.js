@@ -87,8 +87,23 @@ async function processVoiceMessage({ audio, contentType = 'application/octet-str
 
     let ttsUrl = null;
     if (answer) {
-      const ttsResponse = await this.getTTSApiUrl({ text: answer });
-      ttsUrl = ttsResponse?.url ?? null;
+      // active provider dispatch (Gladys Plus by default, or a TTS provider
+      // integration — see gladys.tts); attached post-construction in lib/index.js
+      // A TTS failure must not discard the transcription and the answer: the
+      // voice assistant degrades to a text-only reply. The Gladys Plus 403
+      // (no subscription) and 429 (quota reached) are the exception: they
+      // are the upsell paths the outer handler turns into the `forbidden` /
+      // `too_many_requests` websocket errors, and degrading them to a silent
+      // text-only reply would hide why the voice stopped working.
+      try {
+        const ttsResponse = await this.tts.getSpeechUrl({ text: answer, language: user.language });
+        ttsUrl = ttsResponse?.url ?? null;
+      } catch (e) {
+        if (e instanceof Error403 || e instanceof Error429) {
+          throw e;
+        }
+        logger.warn(e);
+      }
     }
 
     return {

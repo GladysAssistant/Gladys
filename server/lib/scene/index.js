@@ -38,6 +38,7 @@ const SceneManager = function SceneManager(
   scheduler,
   _brain,
   service,
+  tts,
 ) {
   this.stateManager = stateManager;
   this.event = event;
@@ -49,6 +50,7 @@ const SceneManager = function SceneManager(
   this.http = http;
   this.gateway = gateway;
   this.service = service;
+  this.tts = tts;
   this.scenes = {};
   // in-memory registry of scene executions currently running, keyed by executionId
   this.runningScenes = new Map();

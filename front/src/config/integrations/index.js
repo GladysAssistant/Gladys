@@ -3,6 +3,7 @@ import devices from './devices.json';
 import communications from './communications.json';
 import calendars from './calendars.json';
 import weathers from './weathers.json';
+import ttsProviders from './tts.json';
 
 // Browse categories of the catalog (docs/specs/integration-catalog-
 // categories.md): the keys and their order come from the server constants
@@ -42,5 +43,8 @@ pushAllWithType(devices, 'device');
 pushAllWithType(communications, 'communication');
 pushAllWithType(calendars, 'calendar');
 pushAllWithType(weathers, 'weather');
+// no internal TTS integration: the "tts" type is only carried by external
+// TTS provider integrations installed from the store
+pushAllWithType(ttsProviders, 'tts');
 
 export { integrations, catalogCategories };

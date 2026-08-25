@@ -1131,7 +1131,8 @@
         "webhooksTitle": "Internet webhooks (Gladys Plus)",
         "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
         "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
-        "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant)."
+        "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant).",
+        "ttsInfoText": "This integration is a text-to-speech provider: once installed, select it as the voice of your instance in the Artificial Intelligence integration. Announcements are served on your local network — speakers and browsers on the same network can play them."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
@@ -3097,7 +3098,9 @@
       },
       "rateLimit": "As the AI API is not free, this integration is limited to 3,000 text requests and 500 image requests per month per account.",
       "notOnGladysPlus": "As the AI API is not free, this integration is only available to Gladys Plus users.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
+      "ttsProvider": "Voice (text-to-speech provider)",
+      "ttsProviderText": "The provider used to speak: scene announcements on your speakers and the voice assistant replies. Gladys Plus works everywhere (including remote access); a TTS provider integration generates the voice locally, served on your local network."
     },
     "callmebot": {
       "title": "CallMeBot",

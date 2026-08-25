@@ -1131,7 +1131,8 @@
         "webhooksTitle": "Webhooks Internet (Gladys Plus)",
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
         "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
-        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant)."
+        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant).",
+        "ttsInfoText": "Cette intégration est un fournisseur de synthèse vocale : une fois installée, sélectionnez-la comme voix de votre instance dans l'intégration Intelligence Artificielle. Les annonces sont servies sur votre réseau local — les enceintes et navigateurs du même réseau peuvent les lire."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -3097,7 +3098,9 @@
       },
       "rateLimit": "L'API d'IA étant payante, cette intégration est limitée à 3 000 requêtes texte et 500 requêtes avec image par mois et par compte.",
       "notOnGladysPlus": "L'API d'IA étant payante, cette intégration est proposée via Gladys Plus uniquement.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
+      "ttsProvider": "Voix (fournisseur de synthèse vocale)",
+      "ttsProviderText": "Le fournisseur utilisé pour parler : les annonces des scènes sur vos enceintes et les réponses de l'assistant vocal. Gladys Plus fonctionne partout (y compris en accès à distance) ; une intégration fournisseur TTS génère la voix localement, servie sur votre réseau local."
     },
     "callmebot": {
       "title": "CallMeBot",
