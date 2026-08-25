@@ -33,14 +33,18 @@ const execFileAsync = promisify(childProcess.execFile);
  * @description Execute a file with arguments (no shell).
  * @param {string} file - The file to execute.
  * @param {Array<string>} args - The arguments to pass.
- * @param {object} [options] - Extra options passed to child_process.execFile (cwd...).
+ * @param {object} [options] - Options for the child process. Only `cwd` is honoured.
  * @returns {Promise<string>} Resolve with stdout if command succeeds.
  * @example
  * execFile('tar', ['-tzvf', 'file.tar.gz']);
  */
 async function execFile(file, args, options = {}) {
+  // only the options this helper needs are forwarded. It exists so the backup
+  // and restore chain never sees a shell: spreading whatever the caller passes
+  // would let a later one hand over `shell: true` and undo exactly that.
+  const { cwd } = options;
   try {
-    const { stdout } = await execFileAsync(file, args, { maxBuffer: MAX_BUFFER_SIZE, ...options });
+    const { stdout } = await execFileAsync(file, args, { maxBuffer: MAX_BUFFER_SIZE, ...(cwd ? { cwd } : {}) });
     return stdout;
   } catch (err) {
     logger.debug(`ExecFile: Fail to execute ${file} ${args.join(' ')}`);
