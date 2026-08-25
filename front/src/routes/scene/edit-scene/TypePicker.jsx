@@ -19,7 +19,7 @@ class TypePicker extends Component {
   };
 
   getVisibleCategories = () => {
-    const { categories, filter, labelPrefix, descriptionPrefix, intl } = this.props;
+    const { categories, filter, labelPrefix, descriptionPrefix, deprecated, intl } = this.props;
     const { query } = this.state;
     const normalizedQuery = normalizeSearchText(query.trim());
 
@@ -30,7 +30,7 @@ class TypePicker extends Component {
           .map(type => {
             const label = get(intl.dictionary, `${labelPrefix}.${type}`, { default: type });
             const description = get(intl.dictionary, `${descriptionPrefix}.${type}`, { default: '' });
-            return { type, label, description };
+            return { type, label, description, deprecated: Boolean(deprecated && deprecated.includes(type)) };
           })
           .filter(
             item =>
@@ -90,7 +90,14 @@ class TypePicker extends Component {
                       <i class={icons[item.type]} />
                     </span>
                     <span class={style.typePickerOptionText}>
-                      <span class={style.typePickerOptionLabel}>{item.label}</span>
+                      <span class={style.typePickerOptionLabel}>
+                        {item.label}
+                        {item.deprecated && (
+                          <span class={cx('badge', 'badge-danger', style.typePickerOptionBadge)}>
+                            <Text id="editScene.deprecatedActionBadge" />
+                          </span>
+                        )}
+                      </span>
                       {item.description && <span class={style.typePickerOptionDescription}>{item.description}</span>}
                     </span>
                   </button>

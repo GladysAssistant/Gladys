@@ -1262,7 +1262,7 @@
       "description": "SMS von Gladys über Free Mobile senden.",
       "deprecatedWarning": {
         "title": "Integration bald veraltet",
-        "description": "Diese integrierte Integration wird in einer künftigen Gladys-Version entfernt. Sie wird durch die Community-Integration <b>Free Mobile SMS</b> ersetzt, die dieselben Funktionen bietet und weiterhin gepflegt wird. Installiere sie über den <a href=\"/dashboard/integration/notifications\">Integrationskatalog</a> und stelle anschließend deine SMS-Szenen darauf um."
+        "description": "Diese integrierte Integration wird in einer künftigen Gladys-Version entfernt. Sie wird durch die Community-Integration <b>Free Mobile SMS</b> ersetzt, die dieselben Funktionen bietet und weiterhin gepflegt wird. Installiere sie über den <a href=\"/dashboard/integration/notifications\">Integrationskatalog</a> und hinterlege anschließend deine Free-Mobile-Zugangsdaten in deinem Benutzerprofil. In deinen Szenen nutzt die Aktion <b>SMS senden</b> weiterhin diese integrierte Integration: Ersetze sie durch eine Aktion <b>Nachricht senden</b>, die den Kanal Free Mobile SMS anspricht."
       },
       "documentation": "Free Mobile Dokumentation",
       "introduction": "Dieses Plugin ermöglicht es Ihnen, SMS an Ihr Free-Handy über den Benachrichtigungsdienst von Free zu senden. Geben Sie Ihre Kundennummer und den Identifizierungsschlüssel unten ein, den Sie auf der <a href=\"https://mobile.free.fr\"> FreeMobile</a>-Website finden.",
@@ -3305,6 +3305,8 @@
         "explanationText": "Um eine Variable einzufügen, geben Sie '{{' ein. Achten Sie darauf, dass Sie zuvor eine Variable in einer Aktion 'Letzten Zustand abrufen' definiert haben, die vor diesem Nachrichtenblock platziert wurde."
       },
       "smsSend": {
+        "deprecatedTitle": "Aktion bald veraltet",
+        "deprecatedDescription": "Diese Aktion nutzt die integrierte Free-Mobile-Integration, die in einer künftigen Gladys-Version entfernt wird. Installiere die Community-Integration <b>Free Mobile SMS</b>, hinterlege deine Zugangsdaten in deinem Benutzerprofil und ersetze diese Aktion anschließend durch eine Aktion <b>Nachricht senden</b>, die den Kanal Free Mobile SMS anspricht.",
         "textLabel": "Nachricht",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
@@ -3983,6 +3985,7 @@
     },
     "searchActionsPlaceholder": "Aktion suchen…",
     "searchTriggersPlaceholder": "Auslöser suchen…",
+    "deprecatedActionBadge": "Bald veraltet",
     "noResultsFound": "Keine Ergebnisse",
     "whenSectionTitle": "Wenn",
     "whenSectionSubtitle": "die Szene startet, sobald eines dieser Ereignisse eintritt",
