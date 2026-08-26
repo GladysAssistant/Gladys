@@ -32,23 +32,29 @@ function resumeTimeRangeTriggers() {
     if (!scene.active || !scene.triggers) {
       return;
     }
-    scene.triggers.forEach((trigger) => {
-      if (
-        trigger.type !== EVENTS.TIME.CHANGED ||
-        trigger.scheduler_type !== 'time-range' ||
-        trigger.resume_on_startup !== true
-      ) {
-        return;
-      }
-      logger.info(`Scene ${scene.name}: re-evaluating time-range trigger at startup.`);
-      // Like the scheduled jobs, only the identity of the trigger is emitted: the trigger
-      // object holds the scheduled jobs, which have nothing to do on the event bus.
-      this.event.emit(EVENTS.TRIGGERS.CHECK, {
-        type: trigger.type,
-        key: trigger.key,
-        scheduler_type: trigger.scheduler_type,
-        range_event: TIME_RANGE_EVENTS.RESUME,
-      });
+    // A scene resumes once, even with several time-range triggers asking for it: emitting
+    // per trigger would run the whole scene twice at boot, double-applying the state of the
+    // device it drives and sending its notifications twice. The first trigger is the one
+    // emitted; a scene reading `{{triggerEvent.in_range}}` gets the state of its ranges,
+    // and `scene.in-time-range` — which the resume branch is written around — looks at
+    // every time-range trigger of the scene anyway.
+    const triggerToResume = scene.triggers.find(
+      (trigger) =>
+        trigger.type === EVENTS.TIME.CHANGED &&
+        trigger.scheduler_type === 'time-range' &&
+        trigger.resume_on_startup === true,
+    );
+    if (!triggerToResume) {
+      return;
+    }
+    logger.info(`Scene ${scene.name}: re-evaluating time-range trigger at startup.`);
+    // Like the scheduled jobs, only the identity of the trigger is emitted: the trigger
+    // object holds the scheduled jobs, which have nothing to do on the event bus.
+    this.event.emit(EVENTS.TRIGGERS.CHECK, {
+      type: triggerToResume.type,
+      key: triggerToResume.key,
+      scheduler_type: triggerToResume.scheduler_type,
+      range_event: TIME_RANGE_EVENTS.RESUME,
     });
   });
 }

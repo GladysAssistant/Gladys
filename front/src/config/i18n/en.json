@@ -3914,6 +3914,7 @@
         "rangeDuration": "Duration",
         "rangeDays": "Days",
         "overnight": "+1d",
+        "emptyRange": "Invalid range",
         "resumeOnStartup": "Re-evaluate when Gladys starts",
         "timeRangesHelp": "The scene runs at the start and at the end of each range. Use the “Time planning” action in an “If… Then… Else” block to turn a device on at the start of a range and off at its end. If “Re-evaluate when Gladys starts” is checked, the scene also runs at startup with the real state of the planning, so your devices go back to the right state after an outage.",
         "daysOfTheWeekShort": {

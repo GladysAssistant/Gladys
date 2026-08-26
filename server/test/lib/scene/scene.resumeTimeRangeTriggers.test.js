@@ -50,6 +50,38 @@ describe('SceneManager.resumeTimeRangeTriggers', () => {
     );
   });
 
+  it('should emit only once for a scene with two triggers asking for it', () => {
+    // Emitting per trigger would run the whole scene twice at boot: the device state would
+    // be applied twice, and a scene notifying on resume would notify twice.
+    addSceneToManager('pool', {
+      triggers: [
+        timeRangeTrigger({ resume_on_startup: true, key: 'first-key' }),
+        timeRangeTrigger({ resume_on_startup: true, key: 'second-key' }),
+      ],
+    });
+    sceneManager.resumeTimeRangeTriggers();
+    assert.calledOnceWithExactly(
+      event.emit,
+      EVENTS.TRIGGERS.CHECK,
+      sinon.match({ range_event: 'resume', key: 'first-key' }),
+    );
+  });
+
+  it('should resume on the trigger asking for it, not on the first time-range one', () => {
+    addSceneToManager('pool', {
+      triggers: [
+        timeRangeTrigger({ key: 'no-resume-key' }),
+        timeRangeTrigger({ resume_on_startup: true, key: 'resume-key' }),
+      ],
+    });
+    sceneManager.resumeTimeRangeTriggers();
+    assert.calledOnceWithExactly(
+      event.emit,
+      EVENTS.TRIGGERS.CHECK,
+      sinon.match({ range_event: 'resume', key: 'resume-key' }),
+    );
+  });
+
   it('should NOT emit anything when resume_on_startup is not enabled', () => {
     addSceneToManager('pool', { triggers: [timeRangeTrigger()] });
     sceneManager.resumeTimeRangeTriggers();

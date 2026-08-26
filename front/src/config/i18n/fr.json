@@ -3914,6 +3914,7 @@
         "rangeDuration": "Durée",
         "rangeDays": "Jours",
         "overnight": "J+1",
+        "emptyRange": "Plage invalide",
         "resumeOnStartup": "Réévaluer au démarrage de Gladys",
         "timeRangesHelp": "La scène est exécutée au début et à la fin de chaque plage. Utilisez l'action « Planning horaire » dans un bloc « Si… Alors… Sinon » pour allumer un équipement au début d'une plage et l'éteindre à la fin. Si « Réévaluer au démarrage » est coché, la scène est aussi exécutée au démarrage de Gladys avec l'état réel du planning, ce qui permet de remettre vos équipements dans le bon état après une coupure.",
         "daysOfTheWeekShort": {

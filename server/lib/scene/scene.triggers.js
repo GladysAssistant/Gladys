@@ -140,10 +140,21 @@ const triggersFunc = {
     if (trigger.scheduler_type === 'time-range') {
       const now = dayjs.tz(dayjs(), self.timezone);
       const timeRanges = resolveTriggerTimeRanges(trigger);
-      event.in_range =
-        event.range_event === TIME_RANGE_EVENTS.RESUME
-          ? isInTimeRanges(timeRanges, now)
-          : event.range_event === TIME_RANGE_EVENTS.START;
+      if (event.range_event === TIME_RANGE_EVENTS.START) {
+        // The job just fired at the start of the range: we are inside it, whatever a
+        // computation on the current minute would say.
+        event.in_range = true;
+      } else if (event.range_event === TIME_RANGE_EVENTS.END) {
+        // The range which just ended no longer counts — its end is excluded — but the rest
+        // of the planning still does: with two consecutive ranges ("10:00 -> 12:00" then
+        // "12:00 -> 14:00"), or two overlapping ones, the end of the first one must not
+        // report us as outside while the next one already covers this minute.
+        const otherRanges = timeRanges.filter((range, index) => index !== event.range_index);
+        event.in_range = isInTimeRanges(otherRanges, now);
+      } else {
+        // Resume at startup: nothing fired, the state is entirely computed from the ranges.
+        event.in_range = isInTimeRanges(timeRanges, now);
+      }
       logger.debug(`Scene trigger time-range: ${event.range_event} event, in_range = ${event.in_range}.`);
     }
     return true;

@@ -14,10 +14,17 @@ const comparisonOperatorSchema = z.enum(COMPARISON_OPERATORS);
 const calendarComparatorSchema = z.enum(['is-exactly', 'contains', 'starts-with', 'ends-with', 'has-any-name']);
 const triggerCalendarEventAttributeSchema = z.enum(['start', 'end']);
 // The days of the week are shared by every range, and live on the trigger itself.
-const timeRangeSchema = z.object({
-  start: z.string().regex(hhmmPattern),
-  end: z.string().regex(hhmmPattern),
-});
+// A range starting and ending at the same time covers nothing, and is rejected by the scene
+// model: refusing it here too makes the tool fail with a message instead of failing later,
+// deeper in the create.
+const timeRangeSchema = z
+  .object({
+    start: z.string().regex(hhmmPattern),
+    end: z.string().regex(hhmmPattern),
+  })
+  .refine((range) => range.start !== range.end, {
+    message: 'A time range cannot start and end at the same time',
+  });
 
 const SCENE_TRIGGER_TYPES = new Set([
   EVENTS.DEVICE.NEW_STATE,
@@ -522,8 +529,9 @@ function createSceneCreateInputSchema(
       unit: z.string().optional(),
       days_of_the_week: z
         .array(weekDaysSchema)
+        .min(1)
         .optional()
-        .describe('Days the ranges start on. Empty or absent means every day.'),
+        .describe('Days the ranges start on. Absent means every day; an empty list is refused.'),
       day_of_the_month: z
         .number()
         .min(1)

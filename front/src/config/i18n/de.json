@@ -3914,6 +3914,7 @@
         "rangeDuration": "Dauer",
         "rangeDays": "Tage",
         "overnight": "+1T",
+        "emptyRange": "Ungültiger Zeitraum",
         "resumeOnStartup": "Beim Start von Gladys neu auswerten",
         "timeRangesHelp": "Die Szene wird zu Beginn und am Ende jedes Zeitfensters ausgeführt. Verwenden Sie die Aktion „Zeitplan“ in einem „Wenn… Dann… Sonst“-Block, um ein Gerät zu Beginn eines Zeitfensters einzuschalten und am Ende auszuschalten. Wenn „Beim Start von Gladys neu auswerten“ aktiviert ist, wird die Szene auch beim Start mit dem tatsächlichen Zustand des Zeitplans ausgeführt, sodass Ihre Geräte nach einem Ausfall wieder den richtigen Zustand annehmen.",
         "daysOfTheWeekShort": {

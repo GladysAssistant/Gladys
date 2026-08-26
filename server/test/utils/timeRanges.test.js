@@ -76,8 +76,28 @@ describe('utils.timeRanges', () => {
       ]);
     });
 
-    it('should return undefined days when nothing is configured, which means every day', () => {
+    it('should keep the days of each range saved by an earlier version', () => {
+      // Ranges used to carry their own list, so two of them could run on different days.
+      // Without days on the trigger, each one keeps the days it was configured with.
+      const trigger = {
+        time_ranges: [
+          { start: '12:00', end: '14:30', days_of_the_week: ['tuesday'] },
+          { start: '16:00', end: '17:30', days_of_the_week: ['saturday', 'sunday'] },
+        ],
+      };
+      expect(resolveTriggerTimeRanges(trigger)).to.deep.equal([
+        { start: '12:00', end: '14:30', days_of_the_week: ['tuesday'] },
+        { start: '16:00', end: '17:30', days_of_the_week: ['saturday', 'sunday'] },
+      ]);
+    });
+
+    it('should keep an explicitly empty list of days, which is never scheduled', () => {
       const trigger = { time_ranges: [{ start: '12:00', end: '14:30', days_of_the_week: [] }] };
+      expect(resolveTriggerTimeRanges(trigger)[0].days_of_the_week).to.deep.equal([]);
+    });
+
+    it('should leave the days absent when no range carries any, which means every day', () => {
+      const trigger = { time_ranges: [{ start: '12:00', end: '14:30' }] };
       expect(resolveTriggerTimeRanges(trigger)[0].days_of_the_week).to.equal(undefined);
     });
 
