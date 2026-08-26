@@ -1,5 +1,4 @@
 import { RequestStatus } from '../../../../utils/consts';
-import { USER_ROLE } from '../../../../../../server/utils/constants';
 
 const actions = store => ({
   updateTelegramApiKey(state, e) {
@@ -12,13 +11,22 @@ const actions = store => ({
       telegramGetApiKeyStatus: RequestStatus.Getting
     });
     try {
-      // the bot API key is a service-wide secret: only an admin can read it,
-      // and only an admin is shown the form to change it. Every other user
-      // comes to this page for their own linking link, which is per-user.
-      if (state.user && state.user.role === USER_ROLE.ADMIN) {
+      // The bot API key is a service-wide secret: the server answers 403 to a
+      // non-admin, and only an admin is shown the form to change it. Its own
+      // failure must not abort the load: every user comes to this page for
+      // their linking link, which is per-user.
+      // The role is deliberately not read from the store here. On a hard page
+      // load this action runs during the first render, before checkSession()
+      // has filled in the user, so an admin would be treated as a non-admin
+      // and never see the key.
+      try {
         const variable = await state.httpClient.get('/api/v1/service/telegram/variable/TELEGRAM_API_KEY');
         store.setState({
           telegramApiKey: variable.value
+        });
+      } catch (e) {
+        store.setState({
+          telegramApiKey: ''
         });
       }
       const { link } = await state.httpClient.get('/api/v1/service/telegram/link');

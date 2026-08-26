@@ -17,7 +17,10 @@ import { RequestStatus } from '../../utils/consts';
 // the role rules stay expressed on the technical `type` (spec §2.2): the
 // browse categories are display metadata and play no part in visibility
 const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
-const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
+// homekit exposes the whole house to a hub; free-mobile is a single global SMS
+// account whose page reads service-wide credentials. Neither has anything
+// per-user, so a non-admin has no business on those pages.
+const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit', 'free-mobile'];
 // cross-cutting views: they are not browse categories, they filter the whole
 // catalog (a favorite, or an integration with a pending update, can be of any
 // category) — so no category filter must be applied to them
