@@ -191,7 +191,9 @@ class ThermostatBox extends Component {
   // had. Stored server-side (not localStorage) so it follows the user across
   // browsers and devices, like every other thermostat runtime state.
   saveLastActivePreset = async preset => {
-    if (preset === 'off' || !this.props.box.thermostat_feature) {
+    // A null preset is the never-driven thermostat, not a preset to fall back
+    // to: storing it would leave 'Off' with nothing to restore.
+    if (!preset || preset === 'off' || !this.props.box.thermostat_feature) {
       return;
     }
     this.lastActivePreset = preset;
@@ -451,6 +453,7 @@ class ThermostatBox extends Component {
     await this.loadConfig();
     await this.getDeviceData();
     await this.loadSchedule();
+    this.applyFallbackSetpoint();
   };
 
   handleThermostatPresetUpdated = payload => {
@@ -678,6 +681,25 @@ class ThermostatBox extends Component {
     }
     await this.getDeviceData();
     await this.loadSchedule();
+    this.applyFallbackSetpoint();
+  };
+
+  // A thermostat that has never been driven has no setpoint anywhere: its
+  // target-temperature feature was created empty and no PRESET was ever stored.
+  // Without this the render finds no error, no missing config and no setpoint,
+  // and draws an empty card. Show the gauge on the comfort temperature instead —
+  // purely local, nothing is written to the device, so the widget stays a
+  // proposal until the user turns the dial or picks a preset.
+  applyFallbackSetpoint = () => {
+    const { setpoint, noConfig, error } = this.state;
+    if (setpoint !== null && setpoint !== undefined) return;
+    if (noConfig || error || !this.props.box.thermostat_feature) return;
+    const cfg = this.getConfig();
+    const comfort = numOr(cfg.preset_comfort, DEFAULT_PRESET_TEMPS.comfort);
+    // The comfort preset can sit outside the device's own range, which would
+    // put the needle off the arc.
+    const fallback = Math.min(this.getMaxTemp(), Math.max(this.getMinTemp(), comfort));
+    this.setState({ setpoint: fallback });
   };
 
   // Local minute tick: refresh the current slot from the cached schedule (no HTTP)
@@ -1049,11 +1071,14 @@ class ThermostatBox extends Component {
                 </div>
               )}
 
-              {isWindowOpen || activePreset === null
+              {/* A thermostat that has never been driven has no stored preset.
+                  Hiding the bar then removed the only way to pick one — the bar
+                  is shown with nothing highlighted instead. */}
+              {isWindowOpen
                 ? null
                 : (() => {
                     const hasSchedule = !!activeSchedule;
-                    if (hasSchedule) {
+                    if (hasSchedule && activePreset !== null) {
                       if (isManualMode && manualUntil) {
                         // Manual mode banner: fe-user + Manuel + until time + delete button
                         const untilDate = new Date(manualUntil);
@@ -1121,10 +1146,13 @@ class ThermostatBox extends Component {
                       );
                     }
 
-                    // No schedule: always show full icon bar
+                    // No schedule: always show full icon bar. A null preset means
+                    // the user has not chosen one yet, so nothing is highlighted —
+                    // falling back to 'comfort' would claim a setting that was
+                    // never made, and the widget writes none until it is clicked.
                     const resolvedActivePreset = [...HEATING_PRESETS, ...COOLING_PRESETS].includes(activePreset)
                       ? activePreset
-                      : 'comfort';
+                      : null;
                     return (
                       <div class={style.segmentedControl}>
                         {presets.map(preset => {
