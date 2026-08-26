@@ -42,7 +42,8 @@ describe('Scene.triggers.timeRange', () => {
   });
 
   it('should match the end of a range and be out of range', () => {
-    const event = { key: 'trigger-key', range_event: 'end' };
+    sinon.useFakeTimers(dayjs.tz('2026-08-24 14:30', TIMEZONE).valueOf());
+    const event = { key: 'trigger-key', range_event: 'end', range_index: 0 };
     expect(check(event)).to.equal(true);
     expect(event.in_range).to.equal(false);
   });
@@ -52,6 +53,70 @@ describe('Scene.triggers.timeRange', () => {
     const event = { key: 'trigger-key' };
     expect(triggersFunc[EVENTS.TIME.CHANGED](self, 'a-scene', event, classicTrigger)).to.equal(true);
     expect(event).to.not.have.property('in_range');
+  });
+
+  // The end of a range does not mean the end of the planning: another range of the same
+  // trigger may already cover this minute, and turning the device off then would leave it
+  // off for the rest of that range.
+  describe('several ranges sharing a moment', () => {
+    const checkWith = (timeRanges, event) =>
+      triggersFunc[EVENTS.TIME.CHANGED](self, 'a-scene', event, { ...trigger, time_ranges: timeRanges });
+
+    it('should stay in range at the shared boundary of two consecutive ranges', () => {
+      // "10:00 -> 12:00" then "12:00 -> 14:00": at 12:00 the planning continues.
+      sinon.useFakeTimers(dayjs.tz('2026-08-24 12:00', TIMEZONE).valueOf());
+      const event = { key: 'trigger-key', range_event: 'end', range_index: 0 };
+      expect(
+        checkWith(
+          [
+            { start: '10:00', end: '12:00' },
+            { start: '12:00', end: '14:00' },
+          ],
+          event,
+        ),
+      ).to.equal(true);
+      expect(event.in_range).to.equal(true);
+    });
+
+    it('should stay in range when the end of a range falls inside an overlapping one', () => {
+      // "10:00 -> 12:00" and "11:00 -> 14:00": at 12:00 the second one is still running.
+      sinon.useFakeTimers(dayjs.tz('2026-08-24 12:00', TIMEZONE).valueOf());
+      const event = { key: 'trigger-key', range_event: 'end', range_index: 0 };
+      expect(
+        checkWith(
+          [
+            { start: '10:00', end: '12:00' },
+            { start: '11:00', end: '14:00' },
+          ],
+          event,
+        ),
+      ).to.equal(true);
+      expect(event.in_range).to.equal(true);
+    });
+
+    it('should leave the planning at the end of the last range of a chain', () => {
+      sinon.useFakeTimers(dayjs.tz('2026-08-24 14:00', TIMEZONE).valueOf());
+      const event = { key: 'trigger-key', range_event: 'end', range_index: 1 };
+      expect(
+        checkWith(
+          [
+            { start: '10:00', end: '12:00' },
+            { start: '12:00', end: '14:00' },
+          ],
+          event,
+        ),
+      ).to.equal(true);
+      expect(event.in_range).to.equal(false);
+    });
+
+    it('should ignore the range which just ended, even if the tick is early', () => {
+      // A job firing a few milliseconds early lands in the previous minute, still inside
+      // the range it ends: excluding that range is what keeps the answer right.
+      sinon.useFakeTimers(dayjs.tz('2026-08-24 14:29', TIMEZONE).valueOf());
+      const event = { key: 'trigger-key', range_event: 'end', range_index: 0 };
+      expect(check(event)).to.equal(true);
+      expect(event.in_range).to.equal(false);
+    });
   });
 
   describe('resume at startup', () => {

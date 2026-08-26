@@ -376,6 +376,62 @@ describe('SceneManager.addScene', () => {
       second: 0,
     });
   });
+
+  it('should not schedule the end of a range when another one starts at the same time', async () => {
+    // "10:00 -> 12:00" then "12:00 -> 14:00": at 12:00 the end job and the start job would
+    // fire at the very same second, running the scene twice. Only the start is scheduled.
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          days_of_the_week: ['monday'],
+          time_ranges: [
+            { start: '10:00', end: '12:00' },
+            { start: '12:00', end: '14:00' },
+          ],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    expect(trigger)
+      .to.have.property('nodeScheduleJobs')
+      .with.lengthOf(3);
+    expect(trigger.nodeScheduleJobs.map((job) => `${job.date.hour}:${job.date.minute}`)).to.deep.equal([
+      '10:0',
+      '12:0',
+      '14:0',
+    ]);
+  });
+
+  it('should still schedule the end of a range when the next one starts on other days', async () => {
+    // The ranges touch at 12:00, but not on the same days: the end of the first one is the
+    // only thing happening on monday at 12:00, so it must stay scheduled.
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          time_ranges: [
+            { start: '10:00', end: '12:00', days_of_the_week: ['monday'] },
+            { start: '12:00', end: '14:00', days_of_the_week: ['tuesday'] },
+          ],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    expect(trigger)
+      .to.have.property('nodeScheduleJobs')
+      .with.lengthOf(4);
+  });
   it('should schedule the end of an overnight range on the next day', async () => {
     const scene = await sceneManager.addScene({
       name: 'a-test-scene',

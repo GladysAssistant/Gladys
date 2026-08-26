@@ -99,7 +99,21 @@ function scheduleTimeRangeJobs(self, trigger) {
     // Both sides of the range always fire: a scene reacting to only one of them simply
     // leaves the other branch of its "if/else" empty.
     jobs.push(scheduleOne(range.start, startDays, TIME_RANGE_EVENTS.START));
-    jobs.push(scheduleOne(range.end, endDays, TIME_RANGE_EVENTS.END));
+
+    // Two consecutive ranges ("10:00 -> 12:00" then "12:00 -> 14:00") share a boundary: the
+    // end of the first and the start of the second would fire at the very same second, running
+    // the scene twice — sending its notifications twice, and racing the two branches of its
+    // "if/else" as the scene queue is not serialized. The start wins: it carries the state the
+    // planning continues with, so the redundant end job is simply not scheduled.
+    const endDaysCoveredByAnotherStart = timeRanges.some(
+      (other, otherIndex) =>
+        otherIndex !== rangeIndex &&
+        timeToMinutes(other.start) === timeToMinutes(range.end) &&
+        endDays.every((day) => daysOfTheWeekToNumbers(other.days_of_the_week).includes(day)),
+    );
+    if (!endDaysCoveredByAnotherStart) {
+      jobs.push(scheduleOne(range.end, endDays, TIME_RANGE_EVENTS.END));
+    }
   });
 
   return jobs;

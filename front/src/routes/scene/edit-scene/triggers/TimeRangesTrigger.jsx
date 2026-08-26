@@ -18,6 +18,10 @@ const toMinutes = time => parseInt(time.substr(0, 2), 10) * 60 + parseInt(time.s
 
 const isOvernight = range => toMinutes(range.end) < toMinutes(range.start);
 
+// A range starting and ending at the same time covers nothing, and the server refuses to
+// schedule it: it is shown as invalid rather than as a duration.
+const isEmptyRange = range => toMinutes(range.end) === toMinutes(range.start);
+
 /**
  * Duration of a range, in minutes. A range whose end is before its start crosses
  * midnight, so it lasts until the next day.
@@ -196,7 +200,14 @@ class TimeRangesTrigger extends Component {
                         />
                       </td>
                       <td class="align-middle">
-                        {isComplete(range) && formatDuration(range)}
+                        {isComplete(range) &&
+                          (isEmptyRange(range) ? (
+                            <span class="text-danger">
+                              <Text id="editScene.triggersCard.scheduledTrigger.emptyRange" />
+                            </span>
+                          ) : (
+                            formatDuration(range)
+                          ))}
                         {isComplete(range) && isOvernight(range) && (
                           <span class="ml-1 badge badge-secondary">
                             <Text id="editScene.triggersCard.scheduledTrigger.overnight" />
