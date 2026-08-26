@@ -1,12 +1,12 @@
 import { Text } from 'preact-i18n';
-import { Component } from 'preact';
+import { Component, Fragment } from 'preact';
 import { Link } from 'preact-router/match';
 import { route } from 'preact-router';
 import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import ImportPricesPage from './ImportPrices';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
-import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
+import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -1552,182 +1552,162 @@ class EnergyMonitoringPage extends Component {
     const showingSettings = this.isSettingsRoute();
 
     return (
-      <div class="page">
-        <div class="page-main">
-          <div class="my-3 my-md-5">
-            <div class="container">
-              <div class="row">
-                <div class="col-lg-3">
-                  <BackToIntegrationsLink />
-                  <h3 class="page-title mb-5">
-                    <Text id="integration.energyMonitoring.title" />
-                  </h3>
-                  <div>
-                    <div class="list-group list-group-transparent mb-0">
-                      <Link
-                        href="/dashboard/integration/device/energy-monitoring"
-                        activeClassName="active"
-                        class="list-group-item list-group-item-action d-flex align-items-center"
-                      >
-                        <span class="icon mr-3">
-                          <i class="fe fe-grid" />
-                        </span>
-                        <Text id="integration.energyMonitoring.myDevicesTab" />
-                      </Link>
+      <IntegrationSubPageLayout
+        title={<Text id="integration.energyMonitoring.title" />}
+        tabs={
+          <Fragment>
+            <Link href="/dashboard/integration/device/energy-monitoring" activeClassName="active" class="hz-tab-link">
+              <i class="fe fe-grid" />
+              <span>
+                <Text id="integration.energyMonitoring.myDevicesTab" />
+              </span>
+            </Link>
 
-                      <Link
-                        href="/dashboard/integration/device/energy-monitoring/prices"
-                        activeClassName="active"
-                        class="list-group-item list-group-item-action d-flex align-items-center"
-                      >
-                        <span class="icon mr-3">
-                          <i class="fe fe-dollar-sign" />
-                        </span>
-                        <Text id="integration.energyMonitoring.energyPriceTab" />
-                      </Link>
+            <Link
+              href="/dashboard/integration/device/energy-monitoring/prices"
+              activeClassName="active"
+              class="hz-tab-link"
+            >
+              <i class="fe fe-dollar-sign" />
+              <span>
+                <Text id="integration.energyMonitoring.energyPriceTab" />
+              </span>
+            </Link>
 
-                      <Link
-                        href="/dashboard/integration/device/energy-monitoring/settings"
-                        activeClassName="active"
-                        class="list-group-item list-group-item-action d-flex align-items-center"
-                      >
-                        <span class="icon mr-3">
-                          <i class="fe fe-settings" />
-                        </span>
-                        <Text id="integration.energyMonitoring.settings" defaultMessage="Settings" />
-                      </Link>
+            <Link
+              href="/dashboard/integration/device/energy-monitoring/settings"
+              activeClassName="active"
+              class="hz-tab-link"
+            >
+              <i class="fe fe-settings" />
+              <span>
+                <Text id="integration.energyMonitoring.settings" defaultMessage="Settings" />
+              </span>
+            </Link>
 
-                      <DeviceConfigurationLink
-                        user={props.user}
-                        configurationKey="integrations"
-                        documentKey="energy-monitoring"
-                        linkClass="list-group-item list-group-item-action d-flex align-items-center"
-                      >
-                        <span class="icon mr-3">
-                          <i class="fe fe-book-open" />
-                        </span>
-                        <Text id="integration.energyMonitoring.documentation" />
-                      </DeviceConfigurationLink>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-lg-9">
-                  {!showingPrices && !showingSettings && (
-                    <div class="card">
-                      <div class="card-header">
-                        <h1 class="card-title">
-                          <Text id="integration.energyMonitoring.title" />
-                        </h1>
-                      </div>
-                      <div class="card-body">
-                        <div class={cx('dimmer', { active: props.loading || loadingDevices })}>
-                          <div class="loader" />
-                          <div class="dimmer-content">
-                            {error && (
-                              <div class="alert alert-danger" role="alert">
-                                <Text id="integration.energyMonitoring.errorLoadingDevices" />
-                              </div>
-                            )}
-                            {(() => {
-                              const circularDeps = this.detectCircularDependencies();
-                              if (circularDeps.length > 0) {
-                                return (
-                                  <div class="alert alert-warning" role="alert">
-                                    <div class="d-flex align-items-start justify-content-between">
-                                      <div>
-                                        <h4 class="alert-heading">
-                                          <i class="fe fe-alert-triangle mr-2" />
-                                          <Text id="integration.energyMonitoring.circularDependencyDetected" />
-                                        </h4>
-                                        <p class="mb-2">
-                                          <Text id="integration.energyMonitoring.circularDependencyDescription" />
-                                        </p>
-                                        <ul class="mb-0">
-                                          {circularDeps.map((dep, idx) => {
-                                            const featureName = dep.feature.__device
-                                              ? `${dep.feature.__device.name} - ${dep.feature.name ||
-                                                  dep.feature.selector}`
-                                              : dep.feature.name || dep.feature.selector;
-                                            return (
-                                              <li key={idx}>
-                                                <strong>{featureName}</strong>
-                                                {dep.type === 'broken' && (
-                                                  <span class="text-muted ml-1">
-                                                    (<Text id="integration.energyMonitoring.brokenReference" />)
-                                                  </span>
-                                                )}
-                                                {dep.type === 'cycle' && (
-                                                  <span class="text-muted ml-1">
-                                                    (<Text id="integration.energyMonitoring.circularReference" />)
-                                                  </span>
-                                                )}
-                                                {dep.type === 'self' && (
-                                                  <span class="text-muted ml-1">
-                                                    (<Text id="integration.energyMonitoring.selfReference" />)
-                                                  </span>
-                                                )}
-                                              </li>
-                                            );
-                                          })}
-                                        </ul>
-                                      </div>
-                                      <button
-                                        class="btn btn-warning ml-3 text-nowrap flex-shrink-0"
-                                        onClick={this.fixCircularDependencies}
-                                        disabled={state.fixingCircularDependencies}
-                                      >
-                                        {state.fixingCircularDependencies ? (
-                                          <span>
-                                            <span
-                                              class="spinner-border spinner-border-sm mr-2"
-                                              role="status"
-                                              aria-hidden="true"
-                                            />
-                                            <Text id="integration.energyMonitoring.fixing" />
-                                          </span>
-                                        ) : (
-                                          <span>
-                                            <i class="fe fe-tool mr-2" />
-                                            <Text id="integration.energyMonitoring.fixAutomatically" />
-                                          </span>
-                                        )}
-                                      </button>
-                                    </div>
-                                  </div>
-                                );
-                              }
-                              return null;
-                            })()}
-                            <p>
-                              <Text id="integration.energyMonitoring.hierarchicalListDescription" />
-                            </p>
-                            <div>
-                              {rootFeatures.map(f => (
-                                <div key={f.id}>{renderFeature(f, 0)}</div>
-                              ))}
-                              {rootFeatures.length === 0 && !loadingDevices && (
-                                <div class="text-muted">
-                                  <Text id="integration.energyMonitoring.noDeviceFeaturesFound" />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+            <DeviceConfigurationLink
+              user={props.user}
+              configurationKey="integrations"
+              documentKey="energy-monitoring"
+              linkClass="hz-tab-link"
+            >
+              <i class="fe fe-book-open" />
+              <span>
+                <Text id="integration.energyMonitoring.documentation" />
+              </span>
+            </DeviceConfigurationLink>
+          </Fragment>
+        }
+      >
+        {!showingPrices && !showingSettings && (
+          <div class="card">
+            <div class="card-header">
+              <h1 class="card-title">
+                <Text id="integration.energyMonitoring.title" />
+              </h1>
+            </div>
+            <div class="card-body">
+              <div class={cx('dimmer', { active: props.loading || loadingDevices })}>
+                <div class="loader" />
+                <div class="dimmer-content">
+                  {error && (
+                    <div class="alert alert-danger" role="alert">
+                      <Text id="integration.energyMonitoring.errorLoadingDevices" />
                     </div>
                   )}
-
-                  {showingPrices && !showingWizard && !showingImport && renderPrices()}
-                  {showingWizard && renderWizard()}
-                  {showingImport && <ImportPricesPage {...props} />}
-                  {showingSettings && renderSettings()}
+                  {(() => {
+                    const circularDeps = this.detectCircularDependencies();
+                    if (circularDeps.length > 0) {
+                      return (
+                        <div class="alert alert-warning" role="alert">
+                          <div class="d-flex align-items-start justify-content-between">
+                            <div>
+                              <h4 class="alert-heading">
+                                <i class="fe fe-alert-triangle mr-2" />
+                                <Text id="integration.energyMonitoring.circularDependencyDetected" />
+                              </h4>
+                              <p class="mb-2">
+                                <Text id="integration.energyMonitoring.circularDependencyDescription" />
+                              </p>
+                              <ul class="mb-0">
+                                {circularDeps.map((dep, idx) => {
+                                  const featureName = dep.feature.__device
+                                    ? `${dep.feature.__device.name} - ${dep.feature.name || dep.feature.selector}`
+                                    : dep.feature.name || dep.feature.selector;
+                                  return (
+                                    <li key={idx}>
+                                      <strong>{featureName}</strong>
+                                      {dep.type === 'broken' && (
+                                        <span class="text-muted ml-1">
+                                          (<Text id="integration.energyMonitoring.brokenReference" />)
+                                        </span>
+                                      )}
+                                      {dep.type === 'cycle' && (
+                                        <span class="text-muted ml-1">
+                                          (<Text id="integration.energyMonitoring.circularReference" />)
+                                        </span>
+                                      )}
+                                      {dep.type === 'self' && (
+                                        <span class="text-muted ml-1">
+                                          (<Text id="integration.energyMonitoring.selfReference" />)
+                                        </span>
+                                      )}
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                            <button
+                              class="btn btn-warning ml-3 text-nowrap flex-shrink-0"
+                              onClick={this.fixCircularDependencies}
+                              disabled={state.fixingCircularDependencies}
+                            >
+                              {state.fixingCircularDependencies ? (
+                                <span>
+                                  <span
+                                    class="spinner-border spinner-border-sm mr-2"
+                                    role="status"
+                                    aria-hidden="true"
+                                  />
+                                  <Text id="integration.energyMonitoring.fixing" />
+                                </span>
+                              ) : (
+                                <span>
+                                  <i class="fe fe-tool mr-2" />
+                                  <Text id="integration.energyMonitoring.fixAutomatically" />
+                                </span>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                  <p>
+                    <Text id="integration.energyMonitoring.hierarchicalListDescription" />
+                  </p>
+                  <div>
+                    {rootFeatures.map(f => (
+                      <div key={f.id}>{renderFeature(f, 0)}</div>
+                    ))}
+                    {rootFeatures.length === 0 && !loadingDevices && (
+                      <div class="text-muted">
+                        <Text id="integration.energyMonitoring.noDeviceFeaturesFound" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        )}
+
+        {showingPrices && !showingWizard && !showingImport && renderPrices()}
+        {showingWizard && renderWizard()}
+        {showingImport && <ImportPricesPage {...props} />}
+        {showingSettings && renderSettings()}
+      </IntegrationSubPageLayout>
     );
   }
 }

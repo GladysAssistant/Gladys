@@ -3231,6 +3231,8 @@
       "registeredLabel": "Registered on:"
     },
     "backToIntegrations": "Back to integrations",
+    "menuScrollLeft": "Scroll menu left",
+    "menuScrollRight": "Scroll menu right",
     "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now."
   },
   "editScene": {

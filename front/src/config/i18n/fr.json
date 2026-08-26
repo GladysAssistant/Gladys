@@ -3231,6 +3231,8 @@
       "registeredLabel": "Enregistré le :"
     },
     "backToIntegrations": "Retour aux intégrations",
+    "menuScrollLeft": "Faire défiler le menu vers la gauche",
+    "menuScrollRight": "Faire défiler le menu vers la droite",
     "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
   },
   "editScene": {

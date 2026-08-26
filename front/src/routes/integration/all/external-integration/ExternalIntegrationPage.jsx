@@ -1,10 +1,11 @@
+import { Fragment } from 'preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import { connect } from 'unistore/preact';
 import get from 'get-value';
 
 import { USER_ROLE } from '../../../../../../server/utils/constants';
-import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
+import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 
 // last known display name per integration: each tab reloads the integration
 // on mount, and showing the raw selector while it loads made the title
@@ -33,88 +34,77 @@ const ExternalIntegrationPage = ({ selector, integration, user, children }) => {
   // and logs are administration screens (and their routes are admin-only)
   const isAdmin = get(user, 'role') === USER_ROLE.ADMIN;
   return (
-    <div class="page">
-      <div class="page-main">
-        <div class="my-3 my-md-5">
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-3">
-                <BackToIntegrationsLink />
-                <h3 class="page-title mb-5">{getDisplayName(selector, integration)}</h3>
-                <div>
-                  <div class="list-group list-group-transparent mb-0">
-                    {hasDeviceScreens && isAdmin && (
-                      <Link
-                        href={`/dashboard/integration/device/external/${selector}`}
-                        activeClassName="active"
-                        class="list-group-item list-group-item-action d-flex align-items-center"
-                      >
-                        <span class="icon mr-3">
-                          <i class="fe fe-link" />
-                        </span>
-                        <Text id="integration.externalIntegration.deviceTab" />
-                      </Link>
-                    )}
+    <IntegrationSubPageLayout
+      title={getDisplayName(selector, integration)}
+      tabs={
+        <Fragment>
+          {hasDeviceScreens && isAdmin && (
+            <Link
+              href={`/dashboard/integration/device/external/${selector}`}
+              activeClassName="active"
+              class="hz-tab-link"
+            >
+              <i class="fe fe-link" />
+              <span>
+                <Text id="integration.externalIntegration.deviceTab" />
+              </span>
+            </Link>
+          )}
 
-                    {hasDeviceScreens && isAdmin && (
-                      <Link
-                        href={`/dashboard/integration/device/external/${selector}/discover`}
-                        activeClassName="active"
-                        class="list-group-item list-group-item-action d-flex align-items-center"
-                      >
-                        <span class="icon mr-3">
-                          <i class="fe fe-radio" />
-                        </span>
-                        <Text id="integration.externalIntegration.discoverTab" />
-                      </Link>
-                    )}
+          {hasDeviceScreens && isAdmin && (
+            <Link
+              href={`/dashboard/integration/device/external/${selector}/discover`}
+              activeClassName="active"
+              class="hz-tab-link"
+            >
+              <i class="fe fe-radio" />
+              <span>
+                <Text id="integration.externalIntegration.discoverTab" />
+              </span>
+            </Link>
+          )}
 
-                    <Link
-                      href={`/dashboard/integration/device/external/${selector}/config`}
-                      activeClassName="active"
-                      class="list-group-item list-group-item-action d-flex align-items-center"
-                    >
-                      <span class="icon mr-3">
-                        <i class="fe fe-sliders" />
-                      </span>
-                      <Text id="integration.externalIntegration.configTab" />
-                    </Link>
+          <Link
+            href={`/dashboard/integration/device/external/${selector}/config`}
+            activeClassName="active"
+            class="hz-tab-link"
+          >
+            <i class="fe fe-sliders" />
+            <span>
+              <Text id="integration.externalIntegration.configTab" />
+            </span>
+          </Link>
 
-                    {isAdmin && (
-                      <Link
-                        href={`/dashboard/integration/device/external/${selector}/supervision`}
-                        activeClassName="active"
-                        class="list-group-item list-group-item-action d-flex align-items-center"
-                      >
-                        <span class="icon mr-3">
-                          <i class="fe fe-activity" />
-                        </span>
-                        <Text id="integration.externalIntegration.supervisionTab" />
-                      </Link>
-                    )}
+          {isAdmin && (
+            <Link
+              href={`/dashboard/integration/device/external/${selector}/supervision`}
+              activeClassName="active"
+              class="hz-tab-link"
+            >
+              <i class="fe fe-activity" />
+              <span>
+                <Text id="integration.externalIntegration.supervisionTab" />
+              </span>
+            </Link>
+          )}
 
-                    {isAdmin && (
-                      <Link
-                        href={`/dashboard/integration/device/external/${selector}/logs`}
-                        activeClassName="active"
-                        class="list-group-item list-group-item-action d-flex align-items-center"
-                      >
-                        <span class="icon mr-3">
-                          <i class="fe fe-file-text" />
-                        </span>
-                        <Text id="integration.externalIntegration.logsTab" />
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-9">{children}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          {isAdmin && (
+            <Link
+              href={`/dashboard/integration/device/external/${selector}/logs`}
+              activeClassName="active"
+              class="hz-tab-link"
+            >
+              <i class="fe fe-file-text" />
+              <span>
+                <Text id="integration.externalIntegration.logsTab" />
+              </span>
+            </Link>
+          )}
+        </Fragment>
+      }
+    >
+      {children}
+    </IntegrationSubPageLayout>
   );
 };
 
