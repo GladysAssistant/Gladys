@@ -8,6 +8,7 @@ import { scenes, sceneTags, calendars, calendarEvents, messages } from './scenes
 import { getAggregatedStates, getEnergyConsumption, getStatesCsv, getStatesHistory } from './history';
 import { demoLanguage, uuid, hoursAgo, minutesAgo, solarPowerNow } from './helpers';
 import integrations from './integrations';
+import { getStoreCatalog, getStoreDocs } from './store';
 import system from './system';
 
 /**
@@ -130,23 +131,86 @@ const externalIntegrations = services
     containers: []
   }));
 
+// What the demo house has installed, so the store catalog flags it as such
+// instead of offering it for installation
+const installedBySlug = {};
+externalIntegrations.forEach(integration => {
+  if (integration.store_slug) {
+    installedBySlug[integration.store_slug] = integration;
+  }
+});
+
+// The pages of one installed community integration: its own screens
+// (Devices, Discovery, Configuration, Logs) plus the actions they trigger,
+// which — like everywhere else in the demo — answer without changing anything.
+const registerExternalIntegrationRoutes = (routes, integration, logs) => {
+  const base = `/api/v1/external_integration/${integration.selector}`;
+  routes[`get ${base}`] = integration;
+  routes[`get ${base}/config`] = { config: {}, configured_secrets: [] };
+  routes[`post ${base}/config`] = { config: {}, configured_secrets: [] };
+  routes[`get ${base}/contact`] = {};
+  routes[`get ${base}/logs`] = { logs };
+  routes[`get ${base}/discover`] = [];
+  routes[`get ${base}/discovered_device`] = [];
+  routes[`post ${base}/scan`] = { success: true };
+  routes[`delete ${base}`] = { success: true };
+};
+
 const externalIntegrationRoutes = {};
 externalIntegrations.forEach(integration => {
-  const base = `/api/v1/external_integration/${integration.selector}`;
-  externalIntegrationRoutes[`get ${base}`] = integration;
-  externalIntegrationRoutes[`get ${base}/config`] = { config: {}, configured_secrets: [] };
-  externalIntegrationRoutes[`get ${base}/contact`] = {};
-  externalIntegrationRoutes[`get ${base}/logs`] = {
-    logs: [
+  registerExternalIntegrationRoutes(
+    externalIntegrationRoutes,
+    integration,
+    [
       `${hoursAgo(52)} info: Solar Inverter integration started`,
       `${hoursAgo(52)} info: Connected to inverter at 192.168.1.42`,
       `${hoursAgo(2)} info: Published production power: 2380 W`,
       `${minutesAgo(4)} info: Published production power: ${solarPowerNow(3400)} W`
     ].join('\n')
-  };
-  externalIntegrationRoutes[`get ${base}/discover`] = [];
-  externalIntegrationRoutes[`get ${base}/discovered_device`] = [];
+  );
 });
+
+// Installing from the store: the demo has no Docker to run a container in, but
+// the button must not fail either (same rule as acting on a device). The
+// integration of the store index is turned into an installed one, its screens
+// are registered on the fly, and it joins the "Installed" list — until the page
+// is reloaded, since the demo persists nothing.
+const simulatedInstalls = [];
+
+const installFromStore = async ({ store_slug: storeSlug }) => {
+  const { integrations: catalog } = await getStoreCatalog({}, installedBySlug);
+  const entry = catalog.find(candidate => candidate.store_slug === storeSlug);
+  if (!entry) {
+    throw new Error(`${storeSlug} is not in the store index`);
+  }
+  const version = entry.manifest.version || '1.0.0';
+  const integration = {
+    id: uuid(`external-${storeSlug}`),
+    // selector derivation of the server (ext-<owner>-<repo>)
+    selector: `ext-${storeSlug.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+    name: entry.manifest.name,
+    store_slug: storeSlug,
+    manifest: entry.manifest,
+    status: 'RUNNING',
+    connection_status: 'connected',
+    docker_image: entry.manifest.docker_image || null,
+    version,
+    latest_version: version,
+    update_available: false,
+    started_at: new Date().toISOString(),
+    containers: []
+  };
+  registerExternalIntegrationRoutes(
+    data,
+    integration,
+    `${new Date().toISOString()} info: ${entry.manifest.name} started`
+  );
+  // nothing published yet: the devices screen of a fresh install is empty
+  // (the ones of the house are derived from home.js, per service)
+  data[`get /api/v1/service/${integration.selector}/device`] = [];
+  simulatedInstalls.push(integration);
+  return integration;
+};
 
 // Areas of the map, and the fixture each one needs when it is opened for edit
 const AREAS = [
@@ -403,7 +467,28 @@ const home = {
   ...serviceVariables,
   'post /api/v1/service/mqtt/debug_mode': { success: true },
   ...devicesByService,
-  'get /api/v1/external_integration': externalIntegrations,
+  'get /api/v1/external_integration': () => externalIntegrations.concat(simulatedInstalls),
+  // The community store is the live one: these fixtures are functions, so the
+  // public store index is only downloaded when a page actually asks for the
+  // catalog, and the demo lists the integrations published right now, with
+  // their covers, categories, GitHub stars and documentation (see ./store.js).
+  'get /api/v1/external_integration/store': query => getStoreCatalog(query, installedBySlug),
+  'post /api/v1/external_integration/store/refresh': async () => ({
+    ...(await getStoreCatalog({ refresh: true }, installedBySlug)),
+    refreshed: true
+  }),
+  'get /api/v1/external_integration/store/docs': query => getStoreDocs(query),
+  'post /api/v1/external_integration': body => installFromStore(body),
+  // Hardware access classes offered by the install screen of an integration
+  // that asks for one: what a normal Linux host reports.
+  'get /api/v1/external_integration/hardware': {
+    classes: [
+      { class: 'coral-usb', detected: true },
+      { class: 'coral-pcie', detected: false },
+      { class: 'gpu', detected: true },
+      { class: 'video', detected: true }
+    ]
+  },
   ...externalIntegrationRoutes,
   'get /api/v1/service/ecowatt/signals': getEcowattSignals,
   // Messaging channels a "send a message" scene action can target
