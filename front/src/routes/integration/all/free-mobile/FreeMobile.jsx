@@ -22,11 +22,6 @@ const FreeMobilePage = ({ children, ...props }) => (
     }
   >
     <div class="card">
-      <div class="card-header">
-        <h1 class="card-title">
-          <Text id="integration.free-mobile.title" />
-        </h1>
-      </div>
       <div class="card-body">
         <div
           class={cx('dimmer', {

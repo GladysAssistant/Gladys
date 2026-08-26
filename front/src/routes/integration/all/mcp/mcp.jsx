@@ -19,11 +19,6 @@ const MCPWelcomePage = ({ user, ...props }) => (
     }
   >
     <div class="card">
-      <div class="card-header">
-        <h1 class="card-title">
-          <Text id="integration.mcp.title" />
-        </h1>
-      </div>
       <div class="card-body">
         <MarkupText id="integration.mcp.longDescription" />
         <div class="form-group">

@@ -1601,11 +1601,6 @@ class EnergyMonitoringPage extends Component {
       >
         {!showingPrices && !showingSettings && (
           <div class="card">
-            <div class="card-header">
-              <h1 class="card-title">
-                <Text id="integration.energyMonitoring.title" />
-              </h1>
-            </div>
             <div class="card-body">
               <div class={cx('dimmer', { active: props.loading || loadingDevices })}>
                 <div class="loader" />

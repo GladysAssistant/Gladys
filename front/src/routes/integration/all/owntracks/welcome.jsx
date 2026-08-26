@@ -21,11 +21,6 @@ const OwntracksWelcomePage = ({ user }) => (
     }
   >
     <div class="card">
-      <div class="card-header">
-        <h1 class="card-title">
-          <Text id="integration.owntracks.title" />
-        </h1>
-      </div>
       <div class="card-body">
         <MarkupText id="integration.owntracks.longDescription" />
       </div>

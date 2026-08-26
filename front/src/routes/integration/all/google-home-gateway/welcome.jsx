@@ -33,11 +33,6 @@ const GoogleWelcomePage = ({ user }) => (
       ]}
     />
     <div class="card">
-      <div class="card-header">
-        <h1 class="card-title">
-          <Text id="integration.googleHome.title" />
-        </h1>
-      </div>
       <div class="card-body">
         <MarkupText id="integration.googleHome.longDescription" />
       </div>
