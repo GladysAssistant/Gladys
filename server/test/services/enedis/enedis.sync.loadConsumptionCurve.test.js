@@ -298,7 +298,9 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     await enedisService.sync();
 
     assert.calledOnce(calculateCostFromDate);
-    assert.calledWithExactly(calculateCostFromDate, '2022-08-01T00:30:00.000Z');
+    assert.calledWithExactly(calculateCostFromDate, '2022-08-01T00:30:00.000Z', {
+      deviceIds: ['865f0fd8-970c-4670-9e1d-f6926a0abed6', '15cabd5e-4c2f-4b55-80af-228c74b11ec5'],
+    });
     assert.callCount(gladys.device.saveHistoricalState, 2);
   });
   it('should sync with 1 page = 100', async () => {

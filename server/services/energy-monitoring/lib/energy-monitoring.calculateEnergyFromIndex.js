@@ -63,7 +63,9 @@ async function calculateEnergyFromIndex(kind, thirtyMinutesWindowTime, jobId) {
     });
   });
 
-  logger.info(`Found ${devicesWithBothFeatures.length} devices with both INDEX and ${kind.targetFeatureType} features`);
+  // One device can carry several index features (e.g. a Linky meter exposing EASF01..EASF10),
+  // so this counts index/target feature pairs, not distinct devices
+  logger.info(`Found ${devicesWithBothFeatures.length} INDEX/${kind.targetFeatureType} feature pairs`);
 
   // Process each device
   await Promise.each(devicesWithBothFeatures, async (deviceInfo, index) => {

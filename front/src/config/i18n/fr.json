@@ -4067,7 +4067,9 @@
     "billingTab": "Facturation",
     "jobsTab": "Tâches",
     "gatewayUsersTab": "Utilisateurs Plus",
-    "gatewayOpenApiTab": "Open API"
+    "gatewayOpenApiTab": "Open API",
+    "scrollLeft": "Faire défiler le menu vers la gauche",
+    "scrollRight": "Faire défiler le menu vers la droite"
   },
   "housesSettings": {
     "title": "Maisons",

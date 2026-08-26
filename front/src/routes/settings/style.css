@@ -16,14 +16,120 @@
 
 /* Section navigation: a horizontal row of frosted pills under the title —
    the dashboard switcher's grammar (active = inverted ink pill). With the
-   app nav in the left rail, a second vertical menu was redundant. The row
-   wraps instead of collapsing to icons: several entries share an icon, so
-   labels stay at every width. */
+   app nav in the left rail, a second vertical menu was redundant. Labels
+   stay at every width (several entries share an icon).
+
+   `.settingsTabs` / `.tabLink` are the SHARED pill grammar: the signup
+   progress row (`routes/signup/layout.jsx`) composes on them too, and it is
+   a plain wrapping row of five passive steps — no scroller, no arrows. So
+   the row keeps wrapping here, and everything the chips scroller needs
+   (no wrap, sideways overflow, hidden scrollbar, shadow bleed, the arrows'
+   edge padding) lives in the opt-in `.settingsTabsScroller` below, which
+   only `SettingsLayout` adds. */
 .settingsTabs {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 1.5rem;
+}
+
+/* ---------- scroller-only pass: SettingsLayout's menu ----------
+   On phones the settings menu wrapped into a tall block at the top of every
+   page, so it rides the shared Horizon chips scroller instead (the history
+   filters' pattern): sideways scroll with the scrollbar hidden, and an
+   overflow arrow per side while pills remain past that edge. */
+.settingsTabsWrapper {
+  --st-scroll-btn: 2rem;
+
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.settingsTabsScroller {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  /* the pills float on the scene with soft drop shadows: bleed the scroll
+     box symmetrically so the shadows aren't sheared at its edges, and give
+     the room back so the wrapper keeps the bare pill-row height (which also
+     keeps the absolute arrows centered on the pills). The wrapper carries
+     the 1.5rem gap under the row, so the shorthand drops the shared rule's
+     own bottom margin on purpose. */
+  padding: 18px 4px;
+  margin: -18px -4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* the pills size themselves in the scroller: shrinking them to fit would
+   defeat the overflow the arrows are there to expose (in the wrapping
+   signup row they still shrink, as they always did) */
+.settingsTabsScroller .tabLink {
+  flex-shrink: 0;
+}
+
+.settingsTabsScroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* Reveal a thin scrollbar on hover/focus for mouse users (e.g. Windows) */
+.settingsTabsScroller:hover,
+.settingsTabsScroller:focus-within {
+  scrollbar-width: thin;
+}
+
+.settingsTabsScroller:hover::-webkit-scrollbar,
+.settingsTabsScroller:focus-within::-webkit-scrollbar {
+  display: block;
+  height: 4px;
+}
+
+.settingsTabsScroller:hover::-webkit-scrollbar-thumb,
+.settingsTabsScroller:focus-within::-webkit-scrollbar-thumb {
+  background: rgba(28, 35, 52, 0.2);
+  border-radius: 4px;
+}
+
+.tabsScrollBtn {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--st-scroll-btn);
+  height: var(--st-scroll-btn);
+  padding: 0;
+  color: var(--gl-ink);
+  background: var(--gl-surface-strong);
+  border: 1px solid var(--gl-border);
+  border-radius: 50%;
+  box-shadow: var(--gl-shadow-soft);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 0.15s ease;
+}
+
+.tabsScrollBtn:hover {
+  color: var(--gl-accent);
+}
+
+.tabsScrollBtnLeft {
+  left: 0;
+}
+
+.tabsScrollBtnRight {
+  right: 0;
+}
+
+/* keep the first/last pill clear of a visible overflow arrow (its width +
+   a small gap), so the padding follows the coarse-pointer size */
+.settingsTabsWrapper:has(.tabsScrollBtnLeft) .settingsTabsScroller {
+  padding-left: calc(var(--st-scroll-btn) + 0.5rem);
+}
+
+.settingsTabsWrapper:has(.tabsScrollBtnRight) .settingsTabsScroller {
+  padding-right: calc(var(--st-scroll-btn) + 0.5rem);
 }
 
 .tabLink {
@@ -65,6 +171,12 @@
 @media (pointer: coarse) {
   .tabLink {
     height: 2.75rem;
+  }
+
+  /* the overflow arrows are real tap targets (they render whenever the
+     row overflows, touch included): same floor as the pills */
+  .settingsTabsWrapper {
+    --st-scroll-btn: 2.75rem;
   }
 }
 
