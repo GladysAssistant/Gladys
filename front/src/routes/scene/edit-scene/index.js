@@ -479,6 +479,14 @@ class EditScene extends Component {
     // state afterwards would display "saved" for data this request never sent
     const savedSceneSnapshot = JSON.stringify(this.state.scene);
     const sceneToSave = JSON.parse(savedSceneSnapshot);
+    // A "time-range" trigger starts with an empty range for the user to fill in. One left
+    // incomplete is dropped here rather than sent: the schema requires both times, so it
+    // would fail the whole save instead of just being ignored.
+    (sceneToSave.triggers || []).forEach(trigger => {
+      if (trigger.time_ranges) {
+        trigger.time_ranges = trigger.time_ranges.filter(range => range.start && range.end);
+      }
+    });
     // the declaration catalog is still unknown (request pending or failed):
     // an integration card cannot be validated, so the save retries the
     // request once and refuses rather than persisting an unchecked required

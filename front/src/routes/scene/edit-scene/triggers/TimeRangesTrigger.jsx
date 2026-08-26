@@ -5,10 +5,18 @@ import style from './style.css';
 
 const DAYS_OF_THE_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
+// A new range starts empty: the user types the times they want, instead of clearing a
+// pre-filled slot first. An incomplete range is dropped when the scene is saved.
 const DEFAULT_RANGE = {
-  start: '12:00',
-  end: '14:00'
+  start: '',
+  end: ''
 };
+
+const isComplete = range => Boolean(range.start) && Boolean(range.end);
+
+const toMinutes = time => parseInt(time.substr(0, 2), 10) * 60 + parseInt(time.substr(3, 2), 10);
+
+const isOvernight = range => toMinutes(range.end) < toMinutes(range.start);
 
 /**
  * Duration of a range, in minutes. A range whose end is before its start crosses
@@ -18,11 +26,27 @@ const DEFAULT_RANGE = {
  * @returns {number} The duration in minutes.
  */
 const durationInMinutes = range => {
-  const toMinutes = time => parseInt(time.substr(0, 2), 10) * 60 + parseInt(time.substr(3, 2), 10);
   const start = toMinutes(range.start);
   const end = toMinutes(range.end);
   return end > start ? end - start : end + 24 * 60 - start;
 };
+
+/**
+ * Sort the ranges by start time, then by end time, so the list always reads like a
+ * planning: a range added or moved to 10:15 shows up before the one starting at 12:00.
+ *
+ * @param {object[]} ranges - The time ranges.
+ * @returns {object[]} A new sorted array.
+ */
+const sortRanges = ranges =>
+  [...ranges].sort((a, b) => {
+    // A range still being filled in stays at the bottom, where it was added, instead of
+    // jumping to the top because an empty string sorts before every time.
+    if (isComplete(a) !== isComplete(b)) {
+      return isComplete(a) ? -1 : 1;
+    }
+    return a.start === b.start ? a.end.localeCompare(b.end) : a.start.localeCompare(b.start);
+  });
 
 const formatDuration = range => {
   const total = durationInMinutes(range);
@@ -45,11 +69,11 @@ class TimeRangesTrigger extends Component {
   };
 
   addRange = () => {
-    this.updateRanges([...this.getRanges(), { ...DEFAULT_RANGE }]);
+    this.updateRanges(sortRanges([...this.getRanges(), { ...DEFAULT_RANGE }]));
   };
 
   deleteRange = rangeIndex => {
-    this.updateRanges(this.getRanges().filter((range, i) => i !== rangeIndex));
+    this.updateRanges(sortRanges(this.getRanges().filter((range, i) => i !== rangeIndex)));
   };
 
   updateRange = (rangeIndex, property, value) => {
@@ -63,6 +87,13 @@ class TimeRangesTrigger extends Component {
 
   handleEndChange = (rangeIndex, e) => {
     this.updateRange(rangeIndex, 'end', e.target.value);
+  };
+
+  // A time input fires "change" on every valid intermediate value: typing "10:00" goes
+  // through "01:00" first. Sorting there would move the row out from under the cursor
+  // mid-typing, so the list is only re-ordered once the field is left.
+  handleTimeBlur = () => {
+    this.updateRanges(sortRanges(this.getRanges()));
   };
 
   toggleDay = day => {
@@ -152,6 +183,7 @@ class TimeRangesTrigger extends Component {
                           class="form-control"
                           value={range.start}
                           onChange={e => this.handleStartChange(rangeIndex, e)}
+                          onBlur={this.handleTimeBlur}
                         />
                       </td>
                       <td>
@@ -160,11 +192,12 @@ class TimeRangesTrigger extends Component {
                           class="form-control"
                           value={range.end}
                           onChange={e => this.handleEndChange(rangeIndex, e)}
+                          onBlur={this.handleTimeBlur}
                         />
                       </td>
                       <td class="align-middle">
-                        {formatDuration(range)}
-                        {range.end < range.start && (
+                        {isComplete(range) && formatDuration(range)}
+                        {isComplete(range) && isOvernight(range) && (
                           <span class="ml-1 badge badge-secondary">
                             <Text id="editScene.triggersCard.scheduledTrigger.overnight" />
                           </span>
