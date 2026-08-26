@@ -562,3 +562,17 @@ body .apexcharts-tooltip {
     padding-top: 3.25rem;
   }
 }
+
+/* Weather condition icons (Meteocons): the cloud artwork is drawn in near-white
+   (#f3f7fe → #deeafb, outlined #e6effc), which all but disappears on the white
+   card background in light mode. Dark mode has no such problem — the global
+   inversion turns those same whites into dark grays on a dark ground — so the
+   fix is scoped to light mode only.
+
+   A bluish 1px halo restores the silhouette. Contrast/saturation filters were
+   tried first and made things WORSE: raising contrast pushes off-whites toward
+   pure white, erasing the cloud outright. The shadow is doubled so a single
+   soft pass is not lost to antialiasing at forecast-row sizes. */
+html:not(.dark-mode) img.weather-condition-icon {
+  filter: drop-shadow(0 0 0.7px rgba(127, 147, 184, 0.8)) drop-shadow(0 0 0.7px rgba(127, 147, 184, 0.8));
+}

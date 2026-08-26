@@ -332,11 +332,17 @@ class WeatherBoxComponent extends Component {
                condition instead of the two overlapping */
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px">
               <div style="display: flex; align-items: center; min-width: 0">
-                <div style="line-height: 1">
+                {/* the Meteocons viewBox is 64x64 but the artwork only fills
+                    the middle band, so a 92px icon carries ~11px of blank
+                    padding above and below. Clipping 12% off each side trims
+                    that dead space without touching the drawing: the tallest
+                    icons (clear-day, thunderstorm) still fit their sun rays
+                    and lightning bolt inside what is left. */}
+                <div style="line-height: 1; overflow: hidden; margin-top: -11px; margin-bottom: -11px">
                   <Localizer>
                     <WeatherIcon
                       icon={weather.weatherEmoji}
-                      size={64}
+                      size={92}
                       label={<Text id={`dashboard.boxes.weather.conditions.${weather.weather || 'unknown'}`} />}
                     />
                   </Localizer>
@@ -529,7 +535,7 @@ class WeatherBoxComponent extends Component {
                     <Localizer>
                       <WeatherIcon
                         icon={hour.weatherEmoji}
-                        size={index === 0 ? 40 : 32}
+                        size={index === 0 ? 56 : 40}
                         label={<Text id={`dashboard.boxes.weather.conditions.${hour.weather || 'unknown'}`} />}
                       />
                     </Localizer>
@@ -571,7 +577,7 @@ class WeatherBoxComponent extends Component {
                       <Localizer>
                         <WeatherIcon
                           icon={day.weatherEmoji}
-                          size={44}
+                          size={62}
                           label={<Text id={`dashboard.boxes.weather.conditions.${day.weather || 'unknown'}`} />}
                         />
                       </Localizer>
