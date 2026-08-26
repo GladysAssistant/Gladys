@@ -63,7 +63,7 @@ class TurnOnLight extends Component {
         'saturday',
         'sunday'
       ]);
-      this.props.updateTriggerProperty(this.props.index, 'time_ranges', [{ start: '12:00', end: '14:00' }]);
+      this.props.updateTriggerProperty(this.props.index, 'time_ranges', [{ start: '', end: '' }]);
       this.props.updateTriggerProperty(this.props.index, 'resume_on_startup', false);
     }
   };

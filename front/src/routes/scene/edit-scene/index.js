@@ -457,6 +457,14 @@ class EditScene extends Component {
     // state afterwards would display "saved" for data this request never sent
     const savedSceneSnapshot = JSON.stringify(this.state.scene);
     const sceneToSave = JSON.parse(savedSceneSnapshot);
+    // A "time-range" trigger starts with an empty range for the user to fill in. One left
+    // incomplete is dropped here rather than sent: the schema requires both times, so it
+    // would fail the whole save instead of just being ignored.
+    (sceneToSave.triggers || []).forEach(trigger => {
+      if (trigger.time_ranges) {
+        trigger.time_ranges = trigger.time_ranges.filter(range => range.start && range.end);
+      }
+    });
     this.setState({ saving: true, error: false, errorMessage: null });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
