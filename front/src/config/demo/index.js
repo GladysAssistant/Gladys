@@ -8,6 +8,7 @@ import { scenes, sceneTags, calendars, calendarEvents, messages } from './scenes
 import { getAggregatedStates, getEnergyConsumption, getStatesCsv, getStatesHistory } from './history';
 import { demoLanguage, uuid, hoursAgo, minutesAgo, solarPowerNow } from './helpers';
 import integrations from './integrations';
+import { translate } from './i18n';
 import { getStoreCatalog, refreshStoreCatalog, getStoreDocs } from './store';
 import system from './system';
 
@@ -547,10 +548,15 @@ const home = {
   }
 };
 
-const data = {
+// Last pass over the whole map: what the house itself carries is already
+// translated (home.js does it at the source, so the generated history follows),
+// this covers everything written here and in the other fixtures — dashboards,
+// scenes, calendars, map areas, integration pages. Names the table does not
+// know (hardware models, identifiers) go through untouched.
+const data = translate({
   ...home,
   ...integrations,
   ...system
-};
+});
 
 export default data;

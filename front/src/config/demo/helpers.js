@@ -24,16 +24,13 @@ const uuid = seed => {
 };
 
 /**
- * Language the demo writes its own texts in. The demo has no server to store a
- * user preference in: `get /api/v1/me` already answers with the language of the
- * browser, so the interface is translated — the texts the fixtures write
- * themselves (the chat history) follow the same rule, otherwise a French visitor
- * reads a French interface with an English conversation in it.
+ * Language the demo speaks. The demo has no server to store a user preference
+ * in: `get /api/v1/me` answers the language of the browser, so the interface is
+ * translated — and everything the fixtures write themselves (room and device
+ * names, scenes, the chat) follows the same rule through ./i18n.js, otherwise a
+ * French visitor reads a French interface full of English data.
  */
 const demoLanguage = () => ((navigator.language || '').toLowerCase().startsWith('fr') ? 'fr' : 'en');
-
-/** Picks, out of `{ en, fr }`, the text of the language of the browser. */
-const localized = texts => texts[demoLanguage()] || texts.en;
 
 const minutesAgo = minutes =>
   dayjs()
@@ -456,7 +453,6 @@ const productionPower = (name, selector, value, options) =>
 export {
   uuid,
   demoLanguage,
-  localized,
   minutesAgo,
   hoursAgo,
   daysAgo,

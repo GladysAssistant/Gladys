@@ -21,7 +21,9 @@ const dashboard = ({ name, selector, position, icon, backgroundScene = null, wid
   icon,
   background_scene: backgroundScene,
   width,
-  boxes: sections.map(columns => ({ columns })),
+  // a section is a plain list of columns, or `{ columns, widths }` when one
+  // of them is a wide column (weight 2 against 1, see the spec)
+  boxes: sections.map(section => (Array.isArray(section) ? { columns: section } : section)),
   created_at: '2024-01-08T09:12:00.000Z',
   updated_at: '2024-01-08T09:12:00.000Z'
 });
@@ -238,49 +240,52 @@ const ENERGY_SECTIONS = [
       }
     ]
   ],
-  [
-    [
-      {
-        type: 'energy-consumption',
-        name: 'Electricity consumption',
-        device_features: ['home-index'],
-        interval: 'last-week'
-      }
-    ],
-    [
-      {
-        type: 'chart',
-        chart_type: 'area',
-        device_features: ['solar-power'],
-        interval: 'last-day',
-        units: ['watt'],
-        title: 'Solar production',
-        display_variation: true
-      },
-      {
-        type: 'gauge',
-        device_feature: 'home-battery-level',
-        name: 'Home battery',
-        gauge_use_custom_value: true,
-        gauge_min: 0,
-        gauge_max: 100
-      }
+  // The bill and the day it comes from, on two thirds of the width — they are
+  // what one opens this dashboard for — with the two live readings of the house
+  // beside them. The only weighted section of the demo: a wide column counts
+  // double, which is exactly what a chart needs and what a gauge does not.
+  {
+    widths: [2, 1],
+    columns: [
+      [
+        {
+          type: 'energy-consumption',
+          name: 'Electricity consumption',
+          device_features: ['home-index'],
+          interval: 'last-week'
+        },
+        {
+          type: 'chart',
+          chart_type: 'area',
+          device_features: ['solar-power', 'home-power'],
+          interval: 'last-day',
+          units: ['watt', 'watt'],
+          title: 'Production and consumption',
+          display_variation: true
+        }
+      ],
+      [
+        {
+          type: 'gauge',
+          device_feature: 'home-power',
+          name: 'Home consumption',
+          gauge_use_custom_value: true,
+          gauge_min: 0,
+          gauge_max: 6000
+        },
+        {
+          type: 'gauge',
+          device_feature: 'home-battery-level',
+          name: 'Home battery',
+          gauge_use_custom_value: true,
+          gauge_min: 0,
+          gauge_max: 100
+        }
+      ]
     ]
-  ],
-  [
-    [
-      {
-        type: 'gauge',
-        device_feature: 'home-power',
-        name: 'Home consumption',
-        gauge_use_custom_value: true,
-        gauge_min: 0,
-        gauge_max: 6000
-      }
-    ],
-    [{ type: 'edf-tempo' }],
-    [{ type: 'ecowatt' }]
-  ],
+  },
+  // Three columns of the same height: what the house measures, what the grid
+  // announces (the two French signals side by side), and the car.
   [
     [
       {
@@ -294,9 +299,7 @@ const ENERGY_SECTIONS = [
           'solar-daily-production'
         ],
         device_feature_names: ['Grid power', 'Solar power', 'Battery', 'Consumed today', 'Produced today']
-      }
-    ],
-    [
+      },
       {
         type: 'actions',
         name: 'Car',
@@ -304,12 +307,27 @@ const ENERGY_SECTIONS = [
           { action_type: 'scene', scene: 'solar-car-charge' },
           { action_type: 'device-feature', device_feature: 'garage-door-lock', label: 'Garage door' }
         ]
-      },
+      }
+    ],
+    [{ type: 'edf-tempo' }, { type: 'ecowatt' }],
+    [
       {
         type: 'devices-in-room',
         room: 'garage',
         device_features: ['garage-wallbox-charge', 'garage-wallbox-power', 'garage-door-lock'],
         device_feature_names: ['Car charging', 'Charging power', 'Garage door']
+      },
+      {
+        // the battery of the house over the day, not the wallbox: the car is
+        // not charging in the demo, and a curve of a charger at rest says
+        // nothing
+        type: 'chart',
+        chart_type: 'area',
+        device_features: ['home-battery-level'],
+        interval: 'last-day',
+        units: ['percent'],
+        title: 'Home battery',
+        display_variation: true
       }
     ]
   ]

@@ -43,6 +43,7 @@ history and device filters answer the request that was actually made.
 | `scenes.js`        | Scenes, calendar events and chat history.                                   |
 | `integrations.js`  | Fixtures of the integration pages (`/api/v1/service/*`).                    |
 | `store.js`         | The **live** catalog of community integrations, downloaded from the store.  |
+| `i18n.js`          | French of everything the demo house says, and the translation pass.         |
 | `system.js`        | System, gateway, sessions and background jobs pages.                        |
 | `assets.js`        | Base64 avatars and camera snapshot.                                         |
 | `index.js`         | Assembles everything into the response map.                                 |
@@ -89,8 +90,18 @@ Values are dated relatively (`minutesAgo(4)`) and the time series are generated 
 current date, so the demo never shows a forecast from three years ago. When you add a page
 or a widget, open the demo, watch the console, and add the missing fixture.
 
-Texts the demo writes as **Gladys itself** — today the chat history of `scenes.js` — go
-through `localized({ en, fr })`, so they follow the language of the browser like the
-interface does (`demoLanguage()` in `helpers.js`, also what `get /api/v1/me` answers).
-The house itself (rooms, devices, scenes) stays in English: those are the names a user
-typed in, not something the product says.
+## Two languages
+
+The fixtures are written in English, and `i18n.js` holds the French of everything the
+house says: room and device names, features, widget labels, scenes, calendar events, the
+chat. `demoLanguage()` follows the browser (it is also what `get /api/v1/me` answers, so
+the interface is translated by the front at the same time), and a `translate()` pass
+applies the table to the values of the `name`, `title`, `label`, `description` and `text`
+keys — `home.js` translates the house at the source, so everything derived from it (the
+route map, the room pages, the generated history, the activity page) follows, and
+`index.js` translates the rest of the map.
+
+A string absent from the table is left untouched, which is the rule for everything a
+human did not write: hardware and product names (ConBee II, ZBDongle-E, Sonos Play),
+selectors, identifiers, units. **A new label added to the fixtures belongs in the table**
+— otherwise it shows up in English on the French demo.
