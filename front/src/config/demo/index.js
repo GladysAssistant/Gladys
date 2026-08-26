@@ -178,6 +178,11 @@ externalIntegrations.forEach(integration => {
 const simulatedInstalls = [];
 
 const installFromStore = async ({ store_slug: storeSlug }) => {
+  // Installing twice (browser-back onto the install page, for instance) gives
+  // back the integration already installed rather than a duplicate of it.
+  if (installedBySlug[storeSlug]) {
+    return installedBySlug[storeSlug];
+  }
   const { integrations: catalog } = await getStoreCatalog({}, installedBySlug);
   const entry = catalog.find(candidate => candidate.store_slug === storeSlug);
   if (!entry) {
@@ -208,6 +213,8 @@ const installFromStore = async ({ store_slug: storeSlug }) => {
   // nothing published yet: the devices screen of a fresh install is empty
   // (the ones of the house are derived from home.js, per service)
   data[`get /api/v1/service/${integration.selector}/device`] = [];
+  // the catalog and the install page read this map to flag the entry installed
+  installedBySlug[storeSlug] = integration;
   simulatedInstalls.push(integration);
   return integration;
 };

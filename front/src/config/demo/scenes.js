@@ -222,7 +222,7 @@ const messages = [
   message(3, { en: 'The kitchen light is on.', fr: 'La lumière de la cuisine est allumée.' }, true),
   message(
     4,
-    { en: 'How much electricity did we use today?', fr: "Combien d'électricité avons-nous consommé aujourd'hui ?" },
+    { en: 'How much electricity did we use today?', fr: "Combien d'électricité avons-nous consommée aujourd'hui ?" },
     false
   ),
   message(
