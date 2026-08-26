@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import { uuid, minutesAgo, hoursAgo } from './helpers';
+import { uuid, localized, minutesAgo, hoursAgo } from './helpers';
 import { USERS } from './home';
 
 /**
@@ -199,24 +199,49 @@ const calendarEvents = [
 
 const TONY_ID = USERS[0].id;
 
-const message = (index, text, fromGladys) => ({
+// The conversation is the one text of the demo the assistant itself writes, so
+// it is served in the language of the browser: an interface translated into
+// French around an English conversation reads like a broken demo.
+const message = (index, texts, fromGladys) => ({
   id: uuid(`message-${index}`),
   sender_id: fromGladys ? null : TONY_ID,
   receiver_id: fromGladys ? TONY_ID : null,
-  text,
+  text: localized(texts),
   is_read: true,
   created_at: minutesAgo(60 - index)
 });
 
 const messages = [
-  message(0, 'What is the temperature in the living room?', false),
-  message(1, 'It is 21.4°C in the living room.', true),
-  message(2, 'Turn on the kitchen light', false),
-  message(3, 'The kitchen light is on.', true),
-  message(4, 'How much electricity did we use today?', false),
-  message(5, 'You used 9.4 kWh today, and your solar panels produced 14.6 kWh.', true),
-  message(6, 'What is the weather like tomorrow?', false),
-  message(7, 'Tomorrow will be mostly sunny, between 14°C and 24°C.', true)
+  message(
+    0,
+    { en: 'What is the temperature in the living room?', fr: 'Quelle température fait-il dans le salon ?' },
+    false
+  ),
+  message(1, { en: 'It is 21.4°C in the living room.', fr: 'Il fait 21,4°C dans le salon.' }, true),
+  message(2, { en: 'Turn on the kitchen light', fr: 'Allume la lumière de la cuisine' }, false),
+  message(3, { en: 'The kitchen light is on.', fr: 'La lumière de la cuisine est allumée.' }, true),
+  message(
+    4,
+    { en: 'How much electricity did we use today?', fr: "Combien d'électricité avons-nous consommé aujourd'hui ?" },
+    false
+  ),
+  message(
+    5,
+    {
+      en: 'You used 9.4 kWh today, and your solar panels produced 14.6 kWh.',
+      fr: "Vous avez consommé 9,4 kWh aujourd'hui, et vos panneaux solaires ont produit 14,6 kWh."
+    },
+    true
+  ),
+  message(6, { en: 'What is the weather like tomorrow?', fr: 'Quel temps fera-t-il demain ?' }, false),
+  message(
+    7,
+    {
+      en: 'Tomorrow will be mostly sunny, between 14°C and 24°C.',
+      fr: 'Demain sera plutôt ensoleillé, entre 14°C et 24°C.'
+    },
+    true
+  )
 ].reverse();
 
 export { scenes, sceneTags, calendars, calendarEvents, messages };

@@ -65,3 +65,9 @@ devices page, in the room widgets and in the scene editor at once. Nothing else 
 Values are dated relatively (`minutesAgo(4)`) and the time series are generated from the
 current date, so the demo never shows a forecast from three years ago. When you add a page
 or a widget, open the demo, watch the console, and add the missing fixture.
+
+Texts the demo writes as **Gladys itself** — today the chat history of `scenes.js` — go
+through `localized({ en, fr })`, so they follow the language of the browser like the
+interface does (`demoLanguage()` in `helpers.js`, also what `get /api/v1/me` answers).
+The house itself (rooms, devices, scenes) stays in English: those are the names a user
+typed in, not something the product says.

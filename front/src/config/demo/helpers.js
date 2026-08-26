@@ -23,6 +23,18 @@ const uuid = seed => {
   return `${raw.slice(0, 8)}-${raw.slice(8, 12)}-4${raw.slice(13, 16)}-a${raw.slice(17, 20)}-${raw.slice(20, 32)}`;
 };
 
+/**
+ * Language the demo writes its own texts in. The demo has no server to store a
+ * user preference in: `get /api/v1/me` already answers with the language of the
+ * browser, so the interface is translated — the texts the fixtures write
+ * themselves (the chat history) follow the same rule, otherwise a French visitor
+ * reads a French interface with an English conversation in it.
+ */
+const demoLanguage = () => ((navigator.language || '').toLowerCase().startsWith('fr') ? 'fr' : 'en');
+
+/** Picks, out of `{ en, fr }`, the text of the language of the browser. */
+const localized = texts => texts[demoLanguage()] || texts.en;
+
 const minutesAgo = minutes =>
   dayjs()
     .subtract(minutes, 'minute')
@@ -443,6 +455,8 @@ const productionPower = (name, selector, value, options) =>
 
 export {
   uuid,
+  demoLanguage,
+  localized,
   minutesAgo,
   hoursAgo,
   daysAgo,

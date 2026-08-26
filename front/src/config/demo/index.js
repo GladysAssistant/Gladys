@@ -6,7 +6,7 @@ import { dashboards } from './dashboards';
 import { getWeather, getSunState } from './weather';
 import { scenes, sceneTags, calendars, calendarEvents, messages } from './scenes';
 import { getAggregatedStates, getEnergyConsumption, getStatesCsv, getStatesHistory } from './history';
-import { uuid, hoursAgo, minutesAgo, solarPowerNow } from './helpers';
+import { demoLanguage, uuid, hoursAgo, minutesAgo, solarPowerNow } from './helpers';
 import integrations from './integrations';
 import system from './system';
 
@@ -336,7 +336,7 @@ const home = {
   },
   'get /api/v1/me': {
     ...USERS[0],
-    language: (navigator.language || '').toLowerCase().startsWith('fr') ? 'fr' : 'en',
+    language: demoLanguage(),
     refresh_token: REFRESH_TOKEN,
     access_token: ACCESS_TOKEN
   },

@@ -72,6 +72,23 @@ const HOUSE_VIEW = {
 
 const HOME_SECTIONS = [
   [[HOME_CHIPS]],
+  // The two hero visuals share a two-column section of their own: given half
+  // the dashboard each, the house illustration and the camera snapshot render
+  // near their natural proportions instead of one of them being cropped to
+  // fill the height of a column of small widgets.
+  [
+    [HOUSE_VIEW],
+    [
+      {
+        type: 'camera',
+        camera: 'garden-camera',
+        name: 'Garden'
+      }
+    ]
+  ],
+  // Three columns of comparable height: the reading side (time, weather, sun),
+  // the command side (actions, scenes, music) and the house side (alarm, who is
+  // home, the temperature curve). Columns that end together leave no hole.
   [
     [
       {
@@ -82,11 +99,15 @@ const HOME_SECTIONS = [
       {
         type: 'weather',
         house: 'main-house',
+        // Compact on purpose: today's weather and the five days ahead. The
+        // advanced block (humidity, pressure, sunrise/sunset, moon) is off —
+        // the sun widget right below already carries it, and stacking both
+        // made the column twice as tall as its neighbours.
         modes: {
           dateLocation: true,
           currentWeather: true,
-          advancedWeather: true,
-          hourlyForecast: true,
+          advancedWeather: false,
+          hourlyForecast: false,
           dailyForecast: true,
           alerts: true
         }
@@ -94,14 +115,6 @@ const HOME_SECTIONS = [
       {
         type: 'sun',
         house: 'main-house'
-      }
-    ],
-    [
-      HOUSE_VIEW,
-      {
-        type: 'camera',
-        camera: 'garden-camera',
-        name: 'Garden'
       }
     ],
     [
@@ -119,8 +132,26 @@ const HOME_SECTIONS = [
         }
       },
       {
+        type: 'music',
+        device: 'living-room-sonos'
+      }
+    ],
+    [
+      {
         type: 'alarm',
         house: 'main-house'
+      },
+      {
+        type: 'user-presence'
+      },
+      {
+        type: 'chart',
+        chart_type: 'area',
+        device_features: ['living-room-temperature', 'outdoor-temperature'],
+        interval: 'last-week',
+        units: ['celsius', 'celsius'],
+        title: 'Temperature',
+        display_variation: true
       }
     ]
   ],
@@ -130,6 +161,8 @@ const HOME_SECTIONS = [
     [{ type: 'temperature-in-room', room: 'kids-room' }],
     [{ type: 'temperature-in-room', room: 'office' }]
   ],
+  // One room per column, all three of the same size: the bottom of the
+  // dashboard is a straight line.
   [
     [
       {
@@ -155,10 +188,6 @@ const HOME_SECTIONS = [
           'Air conditioning',
           'Setpoint'
         ]
-      },
-      {
-        type: 'music',
-        device: 'living-room-sonos'
       }
     ],
     [
@@ -187,16 +216,18 @@ const HOME_SECTIONS = [
     ],
     [
       {
-        type: 'user-presence'
-      },
-      {
-        type: 'chart',
-        chart_type: 'area',
-        device_features: ['living-room-temperature', 'outdoor-temperature'],
-        interval: 'last-week',
-        units: ['celsius', 'celsius'],
-        title: 'Temperature',
-        display_variation: true
+        type: 'devices-in-room',
+        room: 'office',
+        device_features: [
+          'office-light-binary',
+          'office-light-brightness',
+          'office-plug-binary',
+          'office-plug-power',
+          'office-presence',
+          'office-temperature',
+          'office-co2'
+        ],
+        device_feature_names: ['Desk lamp', 'Brightness', 'Desk plug', 'Power', 'Presence', 'Temperature', 'CO2']
       }
     ]
   ]
@@ -319,6 +350,10 @@ const COMFORT_SECTIONS = [
     [{ type: 'temperature-in-room', room: 'bathroom' }],
     [{ type: 'humidity-in-room', room: 'bathroom' }]
   ],
+  // Three columns, each a curve (or a list) over the devices it comes from,
+  // and each ending at about the same height. Two wide columns used to leave
+  // the widgets stretched across half the screen, and the documentation link
+  // sat alone in a third one with a hole under it.
   [
     [
       {
@@ -329,9 +364,7 @@ const COMFORT_SECTIONS = [
         units: ['ppm', 'ppm', 'ppm'],
         title: 'CO2',
         display_variation: true
-      }
-    ],
-    [
+      },
       {
         type: 'devices-in-room',
         room: 'bathroom',
@@ -343,10 +376,17 @@ const COMFORT_SECTIONS = [
         ],
         device_feature_names: ['Water heater', 'Hot water', 'Towel rail', 'Humidity']
       }
-    ]
-  ],
-  [
+    ],
     [
+      {
+        type: 'chart',
+        chart_type: 'line',
+        device_features: ['living-room-humidity', 'bedroom-humidity', 'bathroom-humidity'],
+        interval: 'last-day',
+        units: ['percent', 'percent', 'percent'],
+        title: 'Humidity',
+        display_variation: true
+      },
       {
         type: 'devices-in-room',
         room: 'bedroom',
@@ -373,9 +413,7 @@ const COMFORT_SECTIONS = [
           'outdoor-temperature'
         ],
         device_feature_names: ['Living room', 'Kitchen', 'Bedroom', 'Kids room', 'Office', 'Outside']
-      }
-    ],
-    [
+      },
       {
         type: 'link',
         title: 'Gladys documentation',
