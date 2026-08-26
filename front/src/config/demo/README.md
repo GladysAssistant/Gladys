@@ -66,9 +66,11 @@ covers, categories, GitHub stars and documentation. A snapshot committed here
 would be out of date the week after.
 
 It is therefore the only request of the demo that leaves the browser. It is made
-only when the integrations page is opened, and a failure is not a bug: the
-catalog is then empty and the page shows the native integrations alone, exactly
-like an instance whose store is unreachable.
+only when the integrations page is opened, and a failure is not a bug: the last
+index downloaded is kept (empty if none ever was, and the page then shows the
+native integrations alone), exactly like an instance whose store is unreachable.
+The refresh button reports `refreshed: false` when the download did not happen,
+so the page warns about a stale catalog instead of claiming a fresh one.
 
 Installing from the store answers like the rest of the demo: the integration is
 turned into an installed one and its screens (Devices, Discovery, Configuration

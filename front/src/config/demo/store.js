@@ -15,9 +15,9 @@ import { version as GLADYS_VERSION } from '../../../../package.json';
  *
  * It is therefore the only request of the demo that leaves the browser. It is
  * a public, CORS-open, CDN-cached file, it is only made when the integrations
- * page is opened, and a failure is not an error: the catalog is then empty and
- * the page shows the native integrations alone, exactly like an instance whose
- * store is unreachable.
+ * page is opened, and a failure is not an error: the last index downloaded is
+ * kept (empty if none ever was, and the page then shows the native
+ * integrations alone), exactly like an instance whose store is unreachable.
  */
 
 const STORE_INDEX_URL = 'https://integration-store-storage.gladysassistant.com/index.json';
@@ -42,6 +42,9 @@ const fetchWithTimeout = async (url, options) => {
 // the install pages — and never retried in a loop if the store is down
 let indexPromise = null;
 let fetchedAt = null;
+// The last index actually downloaded, kept like the server keeps its cache:
+// empty only until a first download succeeds
+let lastDownloadedEntries = [];
 
 const downloadIndex = async () => {
   try {
@@ -54,13 +57,16 @@ const downloadIndex = async () => {
       throw new Error(`Unsupported store index format ${index.index_format}`);
     }
     fetchedAt = new Date().toISOString();
-    return Array.isArray(index.integrations) ? index.integrations : [];
+    lastDownloadedEntries = Array.isArray(index.integrations) ? index.integrations : [];
+    return lastDownloadedEntries;
   } catch (e) {
     // An unreachable store is a supported state of a real instance, not a
-    // missing fixture: say so and show an empty catalog.
-    console.error('Demo: community integration store unreachable, catalog left empty', e);
-    fetchedAt = null;
-    return [];
+    // missing fixture: say so and serve the last index downloaded, exactly
+    // like the server falls back on its cache. A refresh that times out must
+    // not empty a catalog that had just loaded; before the first successful
+    // download there is nothing to keep, and the catalog is empty.
+    console.error('Demo: community integration store unreachable, serving the last catalog downloaded', e);
+    return lastDownloadedEntries;
   }
 };
 
@@ -136,6 +142,20 @@ const getStoreCatalog = async ({ search, refresh } = {}, installedBySlug = {}) =
 };
 
 /**
+ * Refresh on demand, like the server's store.refreshCatalog.js: an
+ * unreachable store never fails the catalog, so the catalog alone cannot tell
+ * a real download from a served-from-memory one. The fetch timestamp only
+ * moves on a successful download, so comparing it around the call is the
+ * signal — and the front warns on `refreshed: false` instead of claiming a
+ * catalog it never downloaded is up to date.
+ */
+const refreshStoreCatalog = async (installedBySlug = {}) => {
+  const fetchedAtBefore = fetchedAt;
+  const catalog = await getStoreCatalog({ refresh: true }, installedBySlug);
+  return { ...catalog, refreshed: fetchedAt !== fetchedAtBefore };
+};
+
+/**
  * Documentation of a store integration. The server re-hosts the markdown of
  * the index entry; the demo downloads it from the same URL, so the modal shows
  * the real documentation of the real integration.
@@ -155,4 +175,4 @@ const getStoreDocs = async ({ store_slug: storeSlug, lang }) => {
   return { content: await response.text(), url };
 };
 
-export { getStoreCatalog, getStoreDocs, STORE_INDEX_URL };
+export { getStoreCatalog, refreshStoreCatalog, getStoreDocs, STORE_INDEX_URL };

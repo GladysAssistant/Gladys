@@ -8,7 +8,7 @@ import { scenes, sceneTags, calendars, calendarEvents, messages } from './scenes
 import { getAggregatedStates, getEnergyConsumption, getStatesCsv, getStatesHistory } from './history';
 import { demoLanguage, uuid, hoursAgo, minutesAgo, solarPowerNow } from './helpers';
 import integrations from './integrations';
-import { getStoreCatalog, getStoreDocs } from './store';
+import { getStoreCatalog, refreshStoreCatalog, getStoreDocs } from './store';
 import system from './system';
 
 /**
@@ -480,10 +480,10 @@ const home = {
   // catalog, and the demo lists the integrations published right now, with
   // their covers, categories, GitHub stars and documentation (see ./store.js).
   'get /api/v1/external_integration/store': query => getStoreCatalog(query, installedBySlug),
-  'post /api/v1/external_integration/store/refresh': async () => ({
-    ...(await getStoreCatalog({ refresh: true }, installedBySlug)),
-    refreshed: true
-  }),
+  // `refreshed` says whether the download really happened, like the server:
+  // a store that is down leaves the catalog as it was, and the page shows its
+  // stale-catalog warning instead of claiming a fresh one
+  'post /api/v1/external_integration/store/refresh': () => refreshStoreCatalog(installedBySlug),
   'get /api/v1/external_integration/store/docs': query => getStoreDocs(query),
   'post /api/v1/external_integration': body => installFromStore(body),
   // Hardware access classes offered by the install screen of an integration
