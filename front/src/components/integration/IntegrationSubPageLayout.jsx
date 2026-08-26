@@ -16,6 +16,15 @@ import BackToIntegrationsLink from './BackToIntegrationsLink';
 // components/layout/horizonIntegrations.css with the rest of the
 // integration furniture, scoped to the .glass-theme .page shell this
 // component renders.
+// activeKey re-centers the active pill on tab change without a remount:
+// most integration layouts remount per tab (each tab is its own route
+// component) so mount centering suffices, but energy-monitoring is ONE
+// component across its six routes — the instance is reused and only
+// re-renders. Read here rather than passed by each caller, so every
+// integration gets the settings menu's contract for free; same
+// window.location idiom (and guard) that page already uses.
+const getActiveKey = () => (typeof window !== 'undefined' && window.location ? window.location.pathname : undefined);
+
 const IntegrationSubPageLayout = ({ title, tabs, children }) => (
   <div class="page">
     <div class="page-main">
@@ -32,6 +41,7 @@ const IntegrationSubPageLayout = ({ title, tabs, children }) => (
               scrollLeftLabel={<Text id="integration.menuScrollLeft" />}
               scrollRightLabel={<Text id="integration.menuScrollRight" />}
               activeSelector=".hz-tab-link.active"
+              activeKey={getActiveKey()}
             >
               {tabs}
             </ChipsScroll>
