@@ -72,23 +72,6 @@ const HOUSE_VIEW = {
 
 const HOME_SECTIONS = [
   [[HOME_CHIPS]],
-  // The two hero visuals share a two-column section of their own: given half
-  // the dashboard each, the house illustration and the camera snapshot render
-  // near their natural proportions instead of one of them being cropped to
-  // fill the height of a column of small widgets.
-  [
-    [HOUSE_VIEW],
-    [
-      {
-        type: 'camera',
-        camera: 'garden-camera',
-        name: 'Garden'
-      }
-    ]
-  ],
-  // Three columns of comparable height: the reading side (time, weather, sun),
-  // the command side (actions, scenes, music) and the house side (alarm, who is
-  // home, the temperature curve). Columns that end together leave no hole.
   [
     [
       {
@@ -100,9 +83,9 @@ const HOME_SECTIONS = [
         type: 'weather',
         house: 'main-house',
         // Compact on purpose: today's weather and the five days ahead. The
-        // advanced block (humidity, pressure, sunrise/sunset, moon) is off —
-        // the sun widget right below already carries it, and stacking both
-        // made the column twice as tall as its neighbours.
+        // advanced block (humidity, pressure, sunrise/sunset, moon) duplicated
+        // the sun widget right below, and with the hourly strip on top of the
+        // daily one the card was 577px tall — half the dashboard.
         modes: {
           dateLocation: true,
           currentWeather: true,
@@ -115,6 +98,33 @@ const HOME_SECTIONS = [
       {
         type: 'sun',
         house: 'main-house'
+      },
+      // Down here rather than under the living-room card at the bottom of the
+      // dashboard: it takes back the height the weather widget gave up, so this
+      // column ends level with the two others.
+      {
+        type: 'music',
+        device: 'living-room-sonos'
+      }
+    ],
+    [
+      HOUSE_VIEW,
+      {
+        type: 'camera',
+        camera: 'garden-camera',
+        name: 'Garden'
+      },
+      // The camera is the one widget of this column that absorbs its leftover
+      // height, and it does it by cropping its image: with only the house view
+      // above it, it had close to 300px to swallow and the 4:3 snapshot was
+      // rendered as a portrait. The garden card below it — the room the camera
+      // watches — ends the column level with its neighbours, so the snapshot
+      // keeps its shape.
+      {
+        type: 'devices-in-room',
+        room: 'garden',
+        device_features: ['garden-lights-binary', 'garden-lights-brightness', 'garden-watering-binary', 'outdoor-aqi'],
+        device_feature_names: ['Garden lights', 'Brightness', 'Watering', 'Air quality']
       }
     ],
     [
@@ -132,26 +142,8 @@ const HOME_SECTIONS = [
         }
       },
       {
-        type: 'music',
-        device: 'living-room-sonos'
-      }
-    ],
-    [
-      {
         type: 'alarm',
         house: 'main-house'
-      },
-      {
-        type: 'user-presence'
-      },
-      {
-        type: 'chart',
-        chart_type: 'area',
-        device_features: ['living-room-temperature', 'outdoor-temperature'],
-        interval: 'last-week',
-        units: ['celsius', 'celsius'],
-        title: 'Temperature',
-        display_variation: true
       }
     ]
   ],
@@ -161,8 +153,6 @@ const HOME_SECTIONS = [
     [{ type: 'temperature-in-room', room: 'kids-room' }],
     [{ type: 'temperature-in-room', room: 'office' }]
   ],
-  // One room per column, all three of the same size: the bottom of the
-  // dashboard is a straight line.
   [
     [
       {
@@ -216,18 +206,16 @@ const HOME_SECTIONS = [
     ],
     [
       {
-        type: 'devices-in-room',
-        room: 'office',
-        device_features: [
-          'office-light-binary',
-          'office-light-brightness',
-          'office-plug-binary',
-          'office-plug-power',
-          'office-presence',
-          'office-temperature',
-          'office-co2'
-        ],
-        device_feature_names: ['Desk lamp', 'Brightness', 'Desk plug', 'Power', 'Presence', 'Temperature', 'CO2']
+        type: 'user-presence'
+      },
+      {
+        type: 'chart',
+        chart_type: 'area',
+        device_features: ['living-room-temperature', 'outdoor-temperature'],
+        interval: 'last-week',
+        units: ['celsius', 'celsius'],
+        title: 'Temperature',
+        display_variation: true
       }
     ]
   ]
