@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <img src="https://gladysassistant.com/en/img/external/github-gladys-4-mockups-devices.jpg" alt="Gladys on multiple devices" />
+  <img src="https://claude-gladys-homepage-horiz.v4-website.pages.dev/img/home/horizon/hero-en-2400.webp" alt="Gladys Assistant dashboard" />
 </p>
 
 ---
@@ -50,7 +50,7 @@ sudo docker run -d \
   -v /var/lib/gladysassistant:/var/lib/gladysassistant \
   -v /dev:/dev \
   -v /run/udev:/run/udev:ro \
-  gladysassistant/gladys:v4
+  gladysassistant/gladys:v5
 ```
 
 Prefer using Docker Compose? Check out our [Docker Compose installation guide](https://gladysassistant.com/docs/installation/docker-compose/).

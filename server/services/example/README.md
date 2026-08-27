@@ -1,6 +1,6 @@
 # Example Service
 
-This is an example service. The goal of this research is to build the best service system in Gladys 4.
+This is an example service. The goal of this research is to build the best service system in Gladys 5.
 
 Feel free to give your feedbacks 🙂
 

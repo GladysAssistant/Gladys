@@ -2,7 +2,7 @@ version: '3'
 
 services:
   gladys:
-    image: gladysassistant/gladys:v4
+    image: gladysassistant/gladys:v5
     container_name: gladys
     restart: always
     privileged: true
