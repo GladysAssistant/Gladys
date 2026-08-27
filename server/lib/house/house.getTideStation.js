@@ -11,6 +11,11 @@ const TIDE_STATION_VARIABLE_PREFIX = 'TIDE_STATION_';
 // them once a month keeps them fresh without ever blocking a prediction.
 const STATION_MAX_AGE_DAYS = 30;
 
+// How long a failed refresh is remembered. The widget polls every minute, so
+// without this a database that is down would be called again on every poll,
+// each call holding the dashboard for the request timeout.
+const STATION_RETRY_AFTER_FAILURE_HOURS = 6;
+
 /**
  * @public
  * @description Get the tide station of a house, downloading it the first time.
@@ -45,7 +50,14 @@ async function getTideStation(house) {
   const outdated =
     stored !== null && (!stored.downloaded_at || Date.now() - new Date(stored.downloaded_at).getTime() > maxAgeMs);
 
-  if (stored !== null && !movedAway && !outdated) {
+  // A refresh that just failed is not retried on the next poll: the stored
+  // harmonics still predict the tide, so waiting costs nothing, while calling a
+  // database that is down every minute would hold the dashboard each time.
+  const retryAfterMs = STATION_RETRY_AFTER_FAILURE_HOURS * 60 * 60 * 1000;
+  const failedRecently =
+    stored !== null && stored.last_failure_at && Date.now() - new Date(stored.last_failure_at).getTime() < retryAfterMs;
+
+  if (stored !== null && !movedAway && (!outdated || failedRecently)) {
     return stored.station;
   }
 
@@ -69,6 +81,12 @@ async function getTideStation(house) {
     // predicts tides perfectly, so it is kept rather than dropped.
     logger.warn(`Tide: unable to download the tide station of house ${house.selector}: ${e.message}`);
     if (stored !== null) {
+      // Remember when it failed, so the next polls read the stored station
+      // instead of calling a database that is down every minute.
+      await this.variable.setValue(
+        variableName,
+        JSON.stringify({ ...stored, last_failure_at: new Date().toISOString() }),
+      );
       return stored.station;
     }
     // Nothing stored to fall back on. This is not the same as having no station
@@ -82,4 +100,5 @@ module.exports = {
   getTideStation,
   TIDE_STATION_VARIABLE_PREFIX,
   STATION_MAX_AGE_DAYS,
+  STATION_RETRY_AFTER_FAILURE_HOURS,
 };
