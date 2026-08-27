@@ -1,6 +1,12 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const axios = require('axios');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezonePlugin = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezonePlugin);
 
 const { fake } = sinon;
 
@@ -9,8 +15,10 @@ const {
   distanceInKm,
   getChartDatumOffset,
   computeTideCoefficient,
+  getSpringTideRange,
   loadTidePredictor,
 } = require('../../../lib/house/house.getTideState');
+const { STATION_MAX_AGE_DAYS, STATION_RETRY_AFTER_FAILURE_HOURS } = require('../../../lib/house/house.getTideStation');
 
 // Real harmonics of Saint-Malo, from the TICON-4 dataset the tide database is
 // built on. Using the real ones keeps the assertions checkable against the
@@ -54,14 +62,16 @@ const NICE_STATION = {
 
 const event = { emit: fake.returns(null) };
 
-const buildHouse = (storedStation) => {
-  const store = {};
+// The variable store is handed back so a test can date what was stored, or
+// read what the house wrote to it.
+const buildHouse = (storedStation, store = {}) => {
   if (storedStation) {
     store[`TIDE_STATION_${storedStation.selector}`] = JSON.stringify({
       station: storedStation.station,
       house_latitude: storedStation.latitude,
       house_longitude: storedStation.longitude,
-      downloaded_at: new Date().toISOString(),
+      downloaded_at: storedStation.downloaded_at || new Date().toISOString(),
+      ...(storedStation.last_failure_at ? { last_failure_at: storedStation.last_failure_at } : {}),
     });
   }
   const variable = {
@@ -152,6 +162,32 @@ describe('house.getTideState', () => {
     });
   });
 
+  it('should span the local day on both daylight saving changes', async () => {
+    const house = buildHouse({
+      selector: 'SAINT_MALO',
+      station: SAINT_MALO_STATION,
+      latitude: saintMaloHouse.latitude,
+      longitude: saintMaloHouse.longitude,
+    });
+    // In Paris the clocks go forward on 29 March 2026 and back on 25 October,
+    // so those local days last 23 and 25 hours. Adding 24 hours would end the
+    // curve an hour into the next day, or an hour short of midnight.
+    const springForward = await house.getTideState(saintMaloHouse, new Date('2026-03-29T09:00:00.000Z'));
+    const fallBack = await house.getTideState(saintMaloHouse, new Date('2026-10-25T09:00:00.000Z'));
+
+    expect(springForward.curve.length).to.equal(139);
+    expect(fallBack.curve.length).to.equal(151);
+
+    // Both curves start and end on a local midnight
+    [springForward, fallBack].forEach((tideState) => {
+      const first = dayjs(tideState.curve[0].time).tz('Europe/Paris');
+      const last = dayjs(tideState.curve[tideState.curve.length - 1].time).tz('Europe/Paris');
+      expect(first.format('HH:mm')).to.equal('00:00');
+      expect(last.format('HH:mm')).to.equal('00:00');
+      expect(last.diff(first, 'day')).to.equal(1);
+    });
+  });
+
   it('should return the tides of the day, each high tide with its coefficient', async () => {
     const house = buildHouse({
       selector: 'SAINT_MALO',
@@ -202,6 +238,29 @@ describe('house.getTideState', () => {
     tideState.day_tides.forEach((tide) => {
       expect(tide.coefficient).to.equal(null);
     });
+  });
+
+  it('should not return a tide coefficient on a coast with another tidal regime', async () => {
+    // Lisbon is 1137 km from Brest and has a real tidal range, so only the
+    // distance keeps the Brest coefficient off it.
+    const lisbonHouse = { selector: 'lisbon', latitude: 38.72, longitude: -9.14 };
+    const station = {
+      ...SAINT_MALO_STATION,
+      name: 'Lisboa',
+      country: 'Portugal',
+      latitude: 38.7,
+      longitude: -9.15,
+      timezone: 'Europe/Lisbon',
+    };
+    const house = buildHouse({
+      selector: 'LISBON',
+      station,
+      latitude: lisbonHouse.latitude,
+      longitude: lisbonHouse.longitude,
+    });
+    const tideState = await house.getTideState(lisbonHouse, now);
+    expect(tideState.available).to.equal(true);
+    expect(tideState.coefficient).to.equal(null);
   });
 
   it('should draw another day of the week when asked to', async () => {
@@ -283,6 +342,124 @@ describe('house.getTideState', () => {
     expect(get.callCount).to.equal(1);
   });
 
+  it('should download the station again when the house has moved', async () => {
+    const get = sinon.stub(axios, 'get').resolves({ data: [SAINT_MALO_STATION] });
+    // Stored for a house that used to sit in Nice: keeping that station would
+    // silently show the wrong coast's tide.
+    const house = buildHouse({
+      selector: 'SAINT_MALO',
+      station: NICE_STATION,
+      latitude: 43.7,
+      longitude: 7.26,
+    });
+
+    const tideState = await house.getTideState(saintMaloHouse, now);
+    expect(get.callCount).to.equal(1);
+    expect(tideState.station_name).to.equal('Saint Malo');
+  });
+
+  it('should download the station again when the stored value is not readable', async () => {
+    const get = sinon.stub(axios, 'get').resolves({ data: [SAINT_MALO_STATION] });
+    const store = { TIDE_STATION_SAINT_MALO: 'not json at all' };
+    const house = buildHouse(null, store);
+
+    const tideState = await house.getTideState(saintMaloHouse, now);
+    expect(get.callCount).to.equal(1);
+    expect(tideState.available).to.equal(true);
+  });
+
+  it('should refresh a station older than a month', async () => {
+    const get = sinon.stub(axios, 'get').resolves({ data: [SAINT_MALO_STATION] });
+    const house = buildHouse({
+      selector: 'SAINT_MALO',
+      station: SAINT_MALO_STATION,
+      latitude: saintMaloHouse.latitude,
+      longitude: saintMaloHouse.longitude,
+      downloaded_at: dayjs(now)
+        .subtract(STATION_MAX_AGE_DAYS + 1, 'day')
+        .toISOString(),
+    });
+
+    const tideState = await house.getTideState(saintMaloHouse, now);
+    expect(get.callCount).to.equal(1);
+    expect(tideState.available).to.equal(true);
+  });
+
+  it('should not retry a failed refresh on every poll', async () => {
+    const get = sinon.stub(axios, 'get').rejects(new Error('getaddrinfo ENOTFOUND'));
+    const store = {};
+    const house = buildHouse(
+      {
+        selector: 'SAINT_MALO',
+        station: SAINT_MALO_STATION,
+        latitude: saintMaloHouse.latitude,
+        longitude: saintMaloHouse.longitude,
+        downloaded_at: dayjs(now)
+          .subtract(STATION_MAX_AGE_DAYS + 1, 'day')
+          .toISOString(),
+      },
+      store,
+    );
+
+    // The stale station is refreshed, the database is down, and the failure is
+    // recorded: the widget polls every minute, so retrying each time would hold
+    // the dashboard for the request timeout over and over.
+    const first = await house.getTideState(saintMaloHouse, now);
+    expect(first.available).to.equal(true);
+    expect(get.callCount).to.equal(1);
+    expect(JSON.parse(store.TIDE_STATION_SAINT_MALO)).to.have.property('last_failure_at');
+
+    const second = await house.getTideState(saintMaloHouse, now);
+    expect(second.available).to.equal(true);
+    expect(get.callCount).to.equal(1);
+  });
+
+  it('should retry a stale station once the backoff has passed', async () => {
+    const get = sinon.stub(axios, 'get').resolves({ data: [SAINT_MALO_STATION] });
+    const house = buildHouse({
+      selector: 'SAINT_MALO',
+      station: SAINT_MALO_STATION,
+      latitude: saintMaloHouse.latitude,
+      longitude: saintMaloHouse.longitude,
+      downloaded_at: dayjs(now)
+        .subtract(STATION_MAX_AGE_DAYS + 1, 'day')
+        .toISOString(),
+      last_failure_at: dayjs(now)
+        .subtract(STATION_RETRY_AFTER_FAILURE_HOURS + 1, 'hour')
+        .toISOString(),
+    });
+
+    await house.getTideState(saintMaloHouse, now);
+    expect(get.callCount).to.equal(1);
+  });
+
+  it('should keep the stored station when the database returns none', async () => {
+    const get = sinon.stub(axios, 'get').resolves({ data: [] });
+    const house = buildHouse({
+      selector: 'SAINT_MALO',
+      station: SAINT_MALO_STATION,
+      latitude: saintMaloHouse.latitude,
+      longitude: saintMaloHouse.longitude,
+      downloaded_at: dayjs(now)
+        .subtract(STATION_MAX_AGE_DAYS + 1, 'day')
+        .toISOString(),
+    });
+
+    const tideState = await house.getTideState(saintMaloHouse, now);
+    expect(get.callCount).to.equal(1);
+    expect(tideState.available).to.equal(true);
+    expect(tideState.station_name).to.equal('Saint Malo');
+  });
+
+  it('should ignore a station published without harmonic constituents', async () => {
+    sinon.stub(axios, 'get').resolves({ data: [{ ...SAINT_MALO_STATION, harmonic_constituents: [] }] });
+    const house = buildHouse(null);
+
+    const tideState = await house.getTideState(saintMaloHouse, now);
+    expect(tideState.available).to.equal(false);
+    expect(tideState.reason).to.equal('no_station_nearby');
+  });
+
   it('should keep working offline once the station is known', async () => {
     sinon.stub(axios, 'get').rejects(new Error('getaddrinfo ENOTFOUND'));
     const house = buildHouse({
@@ -328,6 +505,26 @@ describe('house.getTideState helpers', () => {
 
   it('should return a zero offset when the station publishes no datum', () => {
     expect(getChartDatumOffset({ name: 'Somewhere' })).to.equal(0);
+  });
+
+  it('should measure the spring range on the datums when the station publishes them', async () => {
+    const createTidePredictor = await loadTidePredictor();
+    const predictor = createTidePredictor(SAINT_MALO_STATION.harmonic_constituents, { phaseKey: 'phase' });
+    const range = getSpringTideRange(SAINT_MALO_STATION, predictor, new Date('2026-08-27T10:00:00.000Z'));
+    expect(range).to.equal(SAINT_MALO_STATION.datums.MHWS - SAINT_MALO_STATION.datums.MLWS);
+  });
+
+  it('should fall back on a fortnight of predictions when the station has no spring datums', async () => {
+    const createTidePredictor = await loadTidePredictor();
+    const predictor = createTidePredictor(SAINT_MALO_STATION.harmonic_constituents, { phaseKey: 'phase' });
+    // NOAA stations publish MHHW/MLLW rather than the MHWS/MLWS of the French
+    // and British services, so the range is measured on the predictions.
+    const station = { ...SAINT_MALO_STATION, datums: { MHHW: 12.1, MLLW: 1.3 } };
+    const range = getSpringTideRange(station, predictor, new Date('2026-08-27T10:00:00.000Z'));
+    // A fortnight always contains a spring tide, so the range lands near the
+    // 11.4 m the datums give for Saint-Malo.
+    expect(range).to.be.above(9);
+    expect(range).to.be.below(14);
   });
 
   it('should compute the tide coefficients published by the SHOM', async () => {
