@@ -325,6 +325,18 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
       manualJustExpired = true;
       // Fall through — the schedule/preset is applied below
     } else {
+      // A manual hold on the `off` preset means the user asked for the heating to
+      // stop, not for a setpoint to be held: the widget writes PRESET=off before
+      // arming the hold, and scenes reach the same state through setValue. Without
+      // this, the loop would regulate on the setpoint that was current *before*
+      // Off was tapped and keep the heater running until the hold expires.
+      if (currentPreset === 'off') {
+        if (config.switch_feature) {
+          await actuateSwitch(gladys, config.switch_feature, false, `manual preset=off, ${selector}`);
+        }
+        return;
+      }
+
       const manualSetpointRaw = await gladys.variable
         .getValue(`THERMOSTAT_${featureKey}_MANUAL_SETPOINT`, serviceId)
         .catch(() => null);
