@@ -632,4 +632,27 @@ describe('SceneManager.addScene', () => {
       expect(e).instanceOf(BadParameters);
     }
   });
+
+  it('should warn, and schedule nothing, for a time-range trigger without any range', async () => {
+    // The schema refuses such a trigger before it reaches the database, so this only happens
+    // for a scene already stored in an inconsistent state and loaded by init(). It must not
+    // throw: the rest of the scene keeps working, and the dead trigger is logged.
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          time_ranges: [],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    expect(trigger)
+      .to.have.property('nodeScheduleJobs')
+      .with.lengthOf(0);
+  });
 });
