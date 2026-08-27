@@ -384,6 +384,7 @@
       "link": "Lien",
       "photo": "Photo",
       "sun": "Soleil",
+      "tide": "Marées",
       "chips": "Pastilles d'état",
       "actions": "Actions rapides",
       "house-view": "Vue de la maison"
@@ -606,6 +607,23 @@
         "noHouse": "Veuillez sélectionner une maison dans les paramètres du widget.",
         "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
         "error": "Une erreur est survenue lors de la récupération des données du soleil, merci de réessayer."
+      },
+      "tide": {
+        "editDescription": "Ce widget calcule les marées à partir des constantes harmoniques de la station marégraphique la plus proche de votre maison. Les constantes sont téléchargées une seule fois, puis les prédictions sont calculées localement, sans connexion Internet.",
+        "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour trouver la station de marée la plus proche.",
+        "displayCurveLabel": "Afficher la courbe de marée",
+        "displayCurveDescription": "Affiche la hauteur d'eau sur la journée, avec un repère sur le niveau actuel.",
+        "today": "Auj.",
+        "highTideShort": "PM",
+        "lowTideShort": "BM",
+        "coefficientShort": "Coef.",
+        "currentLevel": "Niveau actuel",
+        "dataSource": "Données de marée : {{source}}, via la base Open Waters (CC BY 4.0).",
+        "noStationNearby": "Cette maison n'est pas au bord de la mer : aucune station marégraphique ne se trouve à proximité, il n'y a donc pas de marée à afficher.",
+        "negligibleTide": "Il n'y a pratiquement pas de marée à {{station}} : le marnage n'y dépasse pas {{range}} m.",
+        "noHouseSelected": "Veuillez sélectionner une maison dans les paramètres du widget.",
+        "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
+        "error": "Une erreur est survenue lors de la récupération des marées, merci de réessayer."
       },
       "ecowatt": {
         "title": "Ecowatt France",

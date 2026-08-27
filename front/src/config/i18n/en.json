@@ -384,6 +384,7 @@
       "link": "Link",
       "photo": "Photo",
       "sun": "Sun",
+      "tide": "Tides",
       "chips": "Status chips",
       "actions": "Quick actions",
       "house-view": "House view"
@@ -606,6 +607,23 @@
         "noHouse": "Please select a house in the box settings.",
         "noCoordinates": "This house has no coordinates. Please configure the house location first.",
         "error": "An error occurred while getting the sun data. Please retry."
+      },
+      "tide": {
+        "editDescription": "This widget computes tides from the harmonic constituents of the tide station closest to your house. The constituents are downloaded once, then predictions are computed locally, without an Internet connection.",
+        "editHouseLabel": "Select a house. I will use its latitude/longitude to find the closest tide station.",
+        "displayCurveLabel": "Display the tide curve",
+        "displayCurveDescription": "Shows the water height over the day, with a marker on the current level.",
+        "today": "Today",
+        "highTideShort": "HT",
+        "lowTideShort": "LT",
+        "coefficientShort": "Coef.",
+        "currentLevel": "Current level",
+        "dataSource": "Tide data: {{source}}, via the Open Waters database (CC BY 4.0).",
+        "noStationNearby": "This house is not by the sea: there is no tide station nearby, so there is no tide to display.",
+        "negligibleTide": "There is almost no tide in {{station}}: the tidal range there does not exceed {{range}} m.",
+        "noHouseSelected": "Please select a house in the widget settings.",
+        "noCoordinates": "This house has no coordinates. Please configure its location first.",
+        "error": "An error occurred while getting the tides, please try again."
       },
       "ecowatt": {
         "title": "Ecowatt France",

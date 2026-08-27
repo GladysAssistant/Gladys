@@ -1,0 +1,337 @@
+/* The widget adapts to the width of its own card rather than to the window:
+   a dashboard column can be narrow on the widest of screens. */
+.tideCard {
+  container-type: inline-size;
+  container-name: tide;
+}
+
+.tideHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/* The dial carries hour numbers and the PM/BM labels now, so it needs a little
+   more room than a plain gauge to stay readable. It gives that room back on a
+   narrow card, where the tide times matter more than the dial. */
+.tideClockColumn {
+  flex: 0 1 auto;
+  width: 104px;
+  min-width: 76px;
+}
+
+/* Below this the dial would squeeze the times into two characters a line. The
+   tide times are what the widget is read for, so the dial goes and they keep
+   the whole width; the clock face repeats what the curve already shows.
+   The threshold is where the PM/BM row stops fitting next to the dial: the row
+   needs about 200px and the dial 76px, plus the gap and the card padding.
+   Measured on the card, not on the window: a narrow dashboard column on a wide
+   screen needs this just as much. Browsers without container queries keep the
+   dial, which stays readable thanks to its own min-width. */
+@container tide (max-width: 340px) {
+  .tideClockColumn {
+    display: none;
+  }
+}
+
+.tideClock {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* The brass ring of a harbour tide clock, drawn as a plain outer circle. */
+.tideClockRim {
+  fill: none;
+  stroke: rgba(110, 117, 130, 0.45);
+  stroke-width: 2;
+}
+
+.tideClockFace {
+  stroke: rgba(110, 117, 130, 0.25);
+  stroke-width: 1;
+}
+
+/* The dial is filled like water seen from the side: deeper towards high water
+   at the top of the dial, shallower towards low water at the bottom. */
+.tideClockWaterTop {
+  stop-color: rgba(70, 127, 207, 0.28);
+}
+
+.tideClockWaterBottom {
+  stop-color: rgba(70, 127, 207, 0.06);
+}
+
+.tideClockTick {
+  stroke: rgba(110, 117, 130, 0.55);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+/* The hours left before the next tide, printed down each side of the dial. */
+.tideClockHourNumber {
+  fill: #6e7582;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* PM and BM, the two ends of the cycle. */
+.tideClockLabel {
+  fill: #467fcf;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* The dial is graduated in whole hours only, so the exact time left is spelled
+   out under the hub rather than guessed from the hand. */
+.tideClockCountdown {
+  fill: #495057;
+  font-size: 9px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The hand is the one element that has to be found instantly, so it keeps the
+   accent color rather than the muted grey of the dial. */
+.tideClockHand {
+  stroke: #f59f00;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.tideClockHub {
+  fill: #f59f00;
+}
+
+/* Last resort: on a card too narrow even without the dial, the row scrolls
+   sideways rather than spilling over the edge of the card. */
+.tideHeadline {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/* The two tide lines are a small table: shared columns keep the times and the
+   heights aligned under each other, the way a tide table prints them. Every
+   column may shrink to nothing rather than push the row past the card: on a
+   narrow dashboard column the coefficient would otherwise overflow it. */
+.tideLines {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, 1fr) minmax(0, auto);
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+  min-width: 0;
+}
+
+.tideLines > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tideLabel {
+  font-weight: 600;
+}
+
+/* The values are refreshed every minute: fixed-width digits keep them from
+   shifting sideways as the numbers change. */
+.tideTime,
+.tideHeight,
+.tideNowValue {
+  font-variant-numeric: tabular-nums;
+}
+
+.tideTime {
+  font-weight: 600;
+}
+
+/* The label stays small and muted; the number is the part worth reading. */
+.tideCoefficient {
+  color: #9aa0ac;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.tideCoefficientValue {
+  color: #495057;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A "grande marée": worth spotting without reading the number. */
+.tideCoefficientHigh .tideCoefficientValue,
+.tideCoefficientHigh {
+  color: #f59f00;
+}
+
+.tideStation {
+  margin-top: 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.tideStationName {
+  color: #f59f00;
+  font-weight: 600;
+}
+
+/* The week ahead, as a row of tabs above the curve. It scrolls sideways rather
+   than wrapping: seven days must stay one line even on a narrow card. */
+.tideDayTabs {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.25rem;
+}
+
+.tideDayTab {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05rem;
+  min-width: 3rem;
+  padding: 0.3rem 0.4rem;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #6e7582;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.tideDayTab:hover {
+  background: rgba(70, 127, 207, 0.08);
+}
+
+/* The day being looked at, picked out the way a selected tab is. */
+.tideDayTabActive,
+.tideDayTabActive:hover {
+  background: #467fcf;
+  color: #fff;
+}
+
+.tideDayTabName {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tideDayTabDate {
+  font-size: 0.625rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+.tideCurveSection {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(110, 117, 130, 0.2);
+}
+
+.tideCurve {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* The annotations are drawn inside the SVG, so their size is expressed in
+   viewBox units rather than in rem: they scale with the curve. */
+.tideCurveAxis {
+  stroke: rgba(110, 117, 130, 0.3);
+  stroke-width: 1;
+}
+
+.tideCurveAxisLabel {
+  fill: #9aa0ac;
+  font-size: 9px;
+}
+
+.tideCurveExtremeDot {
+  fill: #467fcf;
+}
+
+.tideCurveExtremeTime {
+  fill: #495057;
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tideCurveExtremeHeight {
+  fill: #9aa0ac;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tideCurveCoefficientBox {
+  fill: rgba(70, 127, 207, 0.12);
+  stroke: rgba(70, 127, 207, 0.45);
+  stroke-width: 1;
+}
+
+/* A "grande marée" badge, spotted without reading the number. */
+.tideCurveCoefficientBoxHigh {
+  fill: rgba(245, 159, 0, 0.16);
+  stroke: rgba(245, 159, 0, 0.6);
+}
+
+.tideCurveCoefficientText {
+  fill: #495057;
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tideCurveArea {
+  fill: rgba(70, 127, 207, 0.18);
+}
+
+.tideCurveLine {
+  fill: none;
+  stroke: #467fcf;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.tideCurveNowLine {
+  stroke: rgba(245, 159, 0, 0.55);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+/* The current level is the one point that must never be confused with a tide
+   marker, so it takes the amber of the clock hand rather than the blue of the
+   curve: the two are easy to tell apart even when the sea is right on a tide.
+   The white halo detaches it from the curve underneath; the surrounding
+   dark-mode-no-invert group turns that ring into the dark card background in
+   dark mode, so it separates the dot in both themes. */
+.tideCurveNowDot {
+  fill: #f59f00;
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.tideNow {
+  margin-top: 0.25rem;
+}
+
+.tideNowValue {
+  font-weight: 600;
+}
+
+/* Same amber as the dot it describes. */
+.tideTrend {
+  color: #f59f00;
+}
+
+/* The tide database is published under CC-BY-4.0, which asks for attribution:
+   the credit belongs on the widget itself, next to the data it describes. */
+.tideCredit {
+  margin-top: 0.5rem;
+  font-size: 0.6875rem;
+  line-height: 1.3;
+}

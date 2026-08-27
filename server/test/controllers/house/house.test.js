@@ -1,4 +1,6 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
+const axios = require('axios');
 const { authenticatedRequest } = require('../request.test');
 
 describe('POST /api/v1/house', () => {
@@ -210,6 +212,45 @@ describe('GET /api/v1/house/:house_selector/sun', () => {
   it('should return 404 when the house does not exist', async () => {
     await authenticatedRequest
       .get('/api/v1/house/house-does-not-exist/sun')
+      .expect('Content-Type', /json/)
+      .expect(404);
+  });
+});
+
+describe('GET /api/v1/house/:house_selector/tide', () => {
+  let axiosGetStub;
+
+  beforeEach(() => {
+    // The test house sits at 12/12, in the middle of the Sahara: no tide
+    // station is anywhere near it. The database is stubbed so the test never
+    // reaches the network, whatever the answer would be.
+    axiosGetStub = sinon.stub(axios, 'get').resolves({ data: [] });
+  });
+
+  afterEach(() => {
+    axiosGetStub.restore();
+  });
+
+  it('should tell there is no tide for a house far from any station', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/test-house/tide')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.available).to.equal(false);
+        expect(res.body.reason).to.equal('no_station_nearby');
+        expect(res.body).to.have.property('timezone');
+      });
+  });
+  it('should return 400 when the house has no coordinates', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/pepper-house/tide')
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
+  it('should return 404 when the house does not exist', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/house-does-not-exist/tide')
       .expect('Content-Type', /json/)
       .expect(404);
   });

@@ -2068,6 +2068,7 @@ const DASHBOARD_BOX_TYPE = {
   LINK: 'link',
   PHOTO: 'photo',
   SUN: 'sun',
+  TIDE: 'tide',
   CHIPS: 'chips',
   HOUSE_VIEW: 'house-view',
   ACTIONS: 'actions',
