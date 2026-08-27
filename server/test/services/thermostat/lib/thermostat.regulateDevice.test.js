@@ -194,6 +194,42 @@ describe('thermostat.regulateDevice', () => {
       assert.notCalled(gladys.device.setValue);
     });
 
+    it('should cut the switch when the manual hold is on the off preset', async () => {
+      // Tapping Off on a scheduled thermostat writes PRESET=off and arms a hold so
+      // the next slot does not turn the heating back on. The hold must not regulate
+      // on the setpoint that was current before Off was tapped.
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: standardFeatures({ temp: 15, switchOn: true }),
+        variables: manualVariables({
+          THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET: 'off',
+          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() + 60000),
+          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
+        }),
+      });
+
+      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+
+      const [, , value] = gladys.device.setValue.firstCall.args;
+      expect(value).to.equal(0);
+    });
+
+    it('should cut the switch on an off hold even with no manual setpoint stored', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: standardFeatures({ temp: 15, switchOn: true }),
+        variables: manualVariables({
+          THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET: 'off',
+          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() + 60000),
+        }),
+      });
+
+      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+
+      const [, , value] = gladys.device.setValue.firstCall.args;
+      expect(value).to.equal(0);
+    });
+
     it('should regulate on the manual setpoint while the timer runs', async () => {
       const mod = load(fullDaySchedule('comfort'));
       const gladys = buildGladys({

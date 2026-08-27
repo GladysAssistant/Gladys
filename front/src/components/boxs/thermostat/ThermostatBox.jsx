@@ -618,6 +618,9 @@ class ThermostatBox extends Component {
     }
   };
 
+  // A null setpoint arms the timer without a held temperature: that is the Off
+  // preset, which the server regulates from PRESET=off alone. Passing nothing at
+  // all keeps the current setpoint, which is what a dial drag means.
   startManualTimer = setpoint => {
     const cfg = this.getConfig();
     // Same fallback the server applies, so the countdown the widget shows matches
@@ -625,7 +628,11 @@ class ThermostatBox extends Component {
     const durationMs = numOr(cfg.manual_duration, DEFAULT_MANUAL_DURATION_MINUTES) * 60 * 1000;
     const until = Date.now() + durationMs;
     this.setState({ manualUntil: until });
-    this.saveManualSetpoint(setpoint !== undefined ? setpoint : this.state.setpoint);
+    if (setpoint === null) {
+      this.clearManualSetpoint();
+    } else {
+      this.saveManualSetpoint(setpoint !== undefined ? setpoint : this.state.setpoint);
+    }
     // Persist expiry server-side so the server can expire it even when browser is closed
     this.saveManualUntilToDb(until);
   };
@@ -811,6 +818,14 @@ class ThermostatBox extends Component {
     // release instead, next to MANUAL_MODE and the setpoint.
     const leavingOff = this.state.activePreset === 'off';
     const presetOnRelease = leavingOff ? this.getLastActivePreset() : null;
+    // Snapshot of what the drag is about to overwrite locally, so a cancelled
+    // gesture can put it back untouched.
+    const stateBeforeDrag = {
+      setpoint: this.state.setpoint,
+      isManualMode: this.state.isManualMode,
+      activePreset: this.state.activePreset,
+      manualSetpointOverride: this.state.manualSetpointOverride
+    };
     this.setState({
       setpoint: this.angleToTemp(angle),
       isDragging: true,
@@ -844,15 +859,22 @@ class ThermostatBox extends Component {
       // take it over; the active schedule now lives on the device.
       if (this.state.activeSchedule) this.startManualTimer(lastDragSetpoint);
     };
+    // A drag taken over by the browser (scroll, gesture, window switch) fires
+    // cancel and never up. That is an aborted gesture, not a release: committing
+    // it would write a setpoint the user never chose — and on a thermostat left
+    // on 'off', a finger caught by a wall-tablet scroll would restore the last
+    // preset and start the heater. Roll the local state back and persist nothing,
+    // exactly like an unmount mid-drag.
+    this._onCancel = () => {
+      this.stopDrag();
+      this.setState(stateBeforeDrag);
+    };
     window.addEventListener('pointermove', this._onMove);
     window.addEventListener('pointerup', this._onUp);
     window.addEventListener('touchmove', this._onMove, { passive: false });
     window.addEventListener('touchend', this._onUp);
-    // A drag taken over by the browser (scroll, gesture, window switch) fires
-    // cancel and never up: without these the listeners would stay armed and the
-    // setpoint shown on the gauge would never be written.
-    window.addEventListener('pointercancel', this._onUp);
-    window.addEventListener('touchcancel', this._onUp);
+    window.addEventListener('pointercancel', this._onCancel);
+    window.addEventListener('touchcancel', this._onCancel);
   };
 
   stopDrag = () => {
@@ -860,10 +882,11 @@ class ThermostatBox extends Component {
     if (this._onUp) window.removeEventListener('pointerup', this._onUp);
     if (this._onMove) window.removeEventListener('touchmove', this._onMove);
     if (this._onUp) window.removeEventListener('touchend', this._onUp);
-    if (this._onUp) window.removeEventListener('pointercancel', this._onUp);
-    if (this._onUp) window.removeEventListener('touchcancel', this._onUp);
+    if (this._onCancel) window.removeEventListener('pointercancel', this._onCancel);
+    if (this._onCancel) window.removeEventListener('touchcancel', this._onCancel);
     this._onMove = null;
     this._onUp = null;
+    this._onCancel = null;
     this.setState({ isDragging: false });
   };
 
@@ -930,7 +953,10 @@ class ThermostatBox extends Component {
       // manual would contradict the MANUAL_MODE=false just saved above.
       this.sendSetpoint(preset.temp, newManual);
     }
-    if (hasSchedule) this.startManualTimer(newSetpoint);
+    // Off holds too, so the schedule does not turn the heating back on at the next
+    // slot — but it holds the *preset*, not a setpoint: the server cuts the switch
+    // on PRESET=off rather than regulating on the temperature stored here.
+    if (hasSchedule) this.startManualTimer(preset.key === 'off' ? null : newSetpoint);
   };
 
   render(
@@ -983,6 +1009,13 @@ class ThermostatBox extends Component {
     // closed.
     const estimatedActive = (() => {
       if (!hasCurrent || mode === 'off') {
+        return false;
+      }
+      // A never-driven thermostat shows a local comfort setpoint so the card is
+      // not empty, but nothing was written and the server regulates nothing.
+      // Estimating from that proposal would light the flame against a number the
+      // user never chose; only a real switch state may say it is running.
+      if (activePreset === null || activePreset === undefined) {
         return false;
       }
       if (isTpi) {
