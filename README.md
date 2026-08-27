@@ -8,6 +8,14 @@
 <h4 align="center">Your privacy-first, open-source smart home assistant</h4>
 
 <p align="center">
+  <a href="https://github.com/GladysAssistant/Gladys/actions/workflows/docker-master-test.yml"><img src="https://github.com/GladysAssistant/Gladys/actions/workflows/docker-master-test.yml/badge.svg" alt="CI status" /></a>
+  <a href="https://codecov.io/gh/GladysAssistant/Gladys"><img src="https://codecov.io/gh/GladysAssistant/Gladys/branch/master/graph/badge.svg" alt="Codecov" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License: Apache 2.0" /></a>
+  <a href="https://community.gladysassistant.com/"><img src="https://img.shields.io/badge/community-forum-orange.svg" alt="Community forum" /></a>
+  <a href=".github/CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome" /></a>
+</p>
+
+<p align="center">
   <a href="#-try-gladys-assistant">Try It</a> •
   <a href="#-getting-started">Getting Started</a> •
   <a href="#-contribute-to-gladys">Contribute</a> •
@@ -71,6 +79,10 @@ Follow the guide that matches your system to get started:
 ### 2. Start developing
 
 Once your environment is ready, dive into our [contributing guide](https://gladysassistant.com/docs/dev/developing-a-service/) to understand the project structure, how to build features, and how to open a pull request.
+
+### 3. AI-assisted development is welcome
+
+We use AI extensively to build Gladys ourselves, and we're very favorable to AI-assisted contributions. Read the [AI-assisted development section](.github/CONTRIBUTING.md#-ai-assisted-development) of our contributing guide, and point your agent to [`AGENTS.md`](AGENTS.md): it contains everything needed to work on this codebase.
 
 ---
 
