@@ -20,3 +20,15 @@
   text-align: left;
   white-space: normal;
 }
+
+/* Horizon glass theme: over the dark backdrop the translucent card glass
+   would go gray — the dialog uses the strong surface instead, with the same
+   !important counter-weight the theme uses against dark-mode.css (same rule
+   as the external-integration store modal) */
+:global(.glass-theme) .modalDialog :global(.card) {
+  background: var(--gl-surface-strong);
+}
+
+:global(.dark-mode .glass-theme) .modalDialog :global(.card) {
+  background-color: var(--gl-surface-strong) !important;
+}
