@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const axios = require('axios');
 const { authenticatedRequest } = require('../request.test');
 
@@ -218,17 +218,15 @@ describe('GET /api/v1/house/:house_selector/sun', () => {
 });
 
 describe('GET /api/v1/house/:house_selector/tide', () => {
-  let axiosGetStub;
-
   beforeEach(() => {
     // The test house sits at 12/12, in the middle of the Sahara: no tide
     // station is anywhere near it. The database is stubbed so the test never
     // reaches the network, whatever the answer would be.
-    axiosGetStub = sinon.stub(axios, 'get').resolves({ data: [] });
+    sinon.stub(axios, 'get').resolves({ data: [] });
   });
 
   afterEach(() => {
-    axiosGetStub.restore();
+    sinon.restore();
   });
 
   it('should tell there is no tide for a house far from any station', async () => {
