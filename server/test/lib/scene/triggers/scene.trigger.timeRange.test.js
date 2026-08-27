@@ -168,8 +168,8 @@ describe('Scene.triggers.timeRange', () => {
       timezone: TIMEZONE,
       scenes: { 'a-scene': { triggers: [weekDaysTrigger, weekEndTrigger] } },
     };
-    const checkOn = (event, trigger_) =>
-      triggersFunc[EVENTS.TIME.CHANGED](selfWithScene, 'a-scene', event, trigger_);
+    const checkOn = (event, firedTrigger) =>
+      triggersFunc[EVENTS.TIME.CHANGED](selfWithScene, 'a-scene', event, firedTrigger);
 
     // Saturday 12:00, inside the weekend range. Resume emits the FIRST trigger asking for
     // it — the weekdays one — which covers nothing today: answering for its ranges alone
