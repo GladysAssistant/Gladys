@@ -474,12 +474,21 @@ class EditScene extends Component {
       // realigned on what was persisted, so the dropped range does not stay on screen until
       // a reload — unless the user edited the scene while the request was in flight, in
       // which case their edits win and only the snapshot moves.
-      const filteredSceneSnapshot = JSON.stringify(sceneToSave);
-      this.setState(prevState =>
-        JSON.stringify(prevState.scene) === sceneSnapshotBeforeSave
-          ? { scene: sceneToSave, savedSceneSnapshot: filteredSceneSnapshot }
-          : { savedSceneSnapshot: filteredSceneSnapshot }
-      );
+      this.setState(prevState => {
+        const savedScene = { ...sceneToSave };
+        // "active" has its own route: the switch may have been flipped, and persisted, while
+        // this request was in flight. Our payload then carries the value from before the
+        // flip, and writing it to the snapshot would show an unsaved change although both
+        // requests succeeded. The snapshot always holds what the server last acknowledged,
+        // so that value is the one kept.
+        if (prevState.savedSceneSnapshot) {
+          savedScene.active = JSON.parse(prevState.savedSceneSnapshot).active;
+        }
+        const savedSceneSnapshot = JSON.stringify(savedScene);
+        return JSON.stringify(prevState.scene) === sceneSnapshotBeforeSave
+          ? { scene: savedScene, savedSceneSnapshot }
+          : { savedSceneSnapshot };
+      });
     } catch (e) {
       console.error(e);
       let errorMessage = null;

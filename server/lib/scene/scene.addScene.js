@@ -104,15 +104,22 @@ function scheduleTimeRangeJobs(self, trigger) {
     // end of the first and the start of the second would fire at the very same second, running
     // the scene twice — sending its notifications twice, and racing the two branches of its
     // "if/else" as the scene queue is not serialized. The start wins: it carries the state the
-    // planning continues with, so the redundant end job is simply not scheduled.
-    const endDaysCoveredByAnotherStart = timeRanges.some(
-      (other, otherIndex) =>
-        otherIndex !== rangeIndex &&
-        timeToMinutes(other.start) === timeToMinutes(range.end) &&
-        endDays.every((day) => daysOfTheWeekToNumbers(other.days_of_the_week).includes(day)),
-    );
-    if (!endDaysCoveredByAnotherStart) {
-      jobs.push(scheduleOne(range.end, endDays, TIME_RANGE_EVENTS.END));
+    // planning continues with, so the redundant end is not scheduled.
+    //
+    // Two ranges sharing a boundary may run on different days (a range saved by an earlier
+    // version carries its own days), so the redundant days are removed one by one: a range
+    // ending on monday and tuesday, followed by one starting at the same time on monday only,
+    // still needs its end job on tuesday.
+    const daysStartedByAnotherRange = new Set();
+    timeRanges.forEach((other, otherIndex) => {
+      if (otherIndex === rangeIndex || timeToMinutes(other.start) !== timeToMinutes(range.end)) {
+        return;
+      }
+      daysOfTheWeekToNumbers(other.days_of_the_week).forEach((day) => daysStartedByAnotherRange.add(day));
+    });
+    const endDaysToSchedule = endDays.filter((day) => !daysStartedByAnotherRange.has(day));
+    if (endDaysToSchedule.length > 0) {
+      jobs.push(scheduleOne(range.end, endDaysToSchedule, TIME_RANGE_EVENTS.END));
     }
   });
 

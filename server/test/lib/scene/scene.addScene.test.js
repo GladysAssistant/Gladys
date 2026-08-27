@@ -432,6 +432,80 @@ describe('SceneManager.addScene', () => {
       .to.have.property('nodeScheduleJobs')
       .with.lengthOf(4);
   });
+
+  it('should keep the end of a range on the days the next one does not start on', async () => {
+    // The ranges touch at 12:00, but the second one only starts on monday: on tuesday, the
+    // end of the first one is the only thing happening at 12:00 and must stay scheduled,
+    // while monday keeps the start only.
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          time_ranges: [
+            { start: '10:00', end: '12:00', days_of_the_week: ['monday', 'tuesday'] },
+            { start: '12:00', end: '14:00', days_of_the_week: ['monday'] },
+          ],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    expect(trigger)
+      .to.have.property('nodeScheduleJobs')
+      .with.lengthOf(4);
+    expect(
+      trigger.nodeScheduleJobs.map((job) => ({
+        time: `${job.date.hour}:${job.date.minute}`,
+        dayOfWeek: job.date.dayOfWeek,
+      })),
+    ).to.deep.equal([
+      // start of the first range
+      { time: '10:0', dayOfWeek: [1, 2] },
+      // its end, only on tuesday: monday is covered by the start of the second range
+      { time: '12:0', dayOfWeek: [2] },
+      // start of the second range
+      { time: '12:0', dayOfWeek: [1] },
+      // its end
+      { time: '14:0', dayOfWeek: [1] },
+    ]);
+  });
+
+  it('should keep the end of an overnight range when the next one starts on other days', async () => {
+    // "22:00 -> 06:00" on monday ends on tuesday morning: only a range starting on TUESDAY at
+    // 06:00 shares that boundary. The one configured on monday does not, so both are scheduled.
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          time_ranges: [
+            { start: '22:00', end: '06:00', days_of_the_week: ['monday'] },
+            { start: '06:00', end: '08:00', days_of_the_week: ['monday'] },
+          ],
+        },
+      ],
+      actions: [],
+    });
+    const [trigger] = sceneManager.scenes[scene.selector].triggers;
+    expect(trigger)
+      .to.have.property('nodeScheduleJobs')
+      .with.lengthOf(4);
+    // the end of the overnight range happens on tuesday, where nothing else starts
+    expect(trigger.nodeScheduleJobs[1].date).to.deep.equal({
+      tz: 'Europe/Paris',
+      dayOfWeek: [2],
+      hour: 6,
+      minute: 0,
+      second: 0,
+    });
+  });
   it('should schedule the end of an overnight range on the next day', async () => {
     const scene = await sceneManager.addScene({
       name: 'a-test-scene',
