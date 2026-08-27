@@ -618,6 +618,8 @@
         "lowTideShort": "BM",
         "coefficientShort": "Coef.",
         "currentLevel": "Niveau actuel",
+        "rising": "La mer monte",
+        "falling": "La mer descend",
         "dataSource": "Données de marée : {{source}}, via la base Open Waters (CC BY 4.0).",
         "noStationNearby": "Cette maison n'est pas au bord de la mer : aucune station marégraphique ne se trouve à proximité, il n'y a donc pas de marée à afficher.",
         "negligibleTide": "Il n'y a pratiquement pas de marée à {{station}} : le marnage n'y dépasse pas {{range}} m.",

@@ -618,6 +618,8 @@
         "lowTideShort": "LT",
         "coefficientShort": "Coef.",
         "currentLevel": "Current level",
+        "rising": "The sea is rising",
+        "falling": "The sea is falling",
         "dataSource": "Tide data: {{source}}, via the Open Waters database (CC BY 4.0).",
         "noStationNearby": "This house is not by the sea: there is no tide station nearby, so there is no tide to display.",
         "negligibleTide": "There is almost no tide in {{station}}: the tidal range there does not exceed {{range}} m.",
