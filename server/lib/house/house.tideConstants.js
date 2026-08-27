@@ -72,9 +72,17 @@ const BREST_SEMI_DIURNAL_HARMONICS = [
 ];
 
 // The coefficient describes the Atlantic and Channel tide. Past this distance
-// from Brest the local regime is another one (the Mediterranean, the North Sea)
-// and publishing a Brest coefficient next to it would be misleading.
-const MAX_COEFFICIENT_DISTANCE_KM = 1200;
+// from Brest the local regime is another one and publishing a Brest coefficient
+// next to it would be misleading.
+//
+// 700 km covers the whole French coast where the coefficient is published
+// (Dunkirk 575 km, Hendaye 597 km) and stops short of the seas that follow
+// another regime: the Mediterranean (Marseille 949 km), the Baltic and the
+// German Bight (Hamburg 1163 km), the Portuguese coast (Lisbon 1137 km).
+// Britain and Ireland stay inside it — they are closer to Brest than the Basque
+// coast is, and share the Channel and Atlantic regime — even though their
+// hydrographic services do not publish the coefficient themselves.
+const MAX_COEFFICIENT_DISTANCE_KM = 700;
 
 // How many days the widget lets the user step through, today included.
 // Predictions stay accurate well beyond that, but a week is what a tide table
