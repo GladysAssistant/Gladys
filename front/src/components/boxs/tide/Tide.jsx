@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -27,7 +27,19 @@ const FORECAST_DAYS = 7;
  */
 const inHouseTimezone = (date, timezone) => (timezone ? dayjs(date).tz(timezone) : dayjs(date));
 
-const formatTime = (time, timezone) => (time ? inHouseTimezone(time, timezone).format('HH[h]mm') : '--h--');
+/**
+ * Tide times in the reader's own convention: "22:22" in France and Germany,
+ * "10:22 PM" in the United States. The widget covers harbours worldwide, so a
+ * hardcoded 24-hour clock would read as foreign to half of them.
+ */
+const formatTime = (time, timezone, language) =>
+  time
+    ? new Date(time).toLocaleTimeString(language || 'en', {
+        hour: '2-digit',
+        minute: '2-digit',
+        ...(timezone ? { timeZone: timezone } : {})
+      })
+    : '--:--';
 
 /**
  * Time left before the next tide, read the way a tide clock is: "3h20" rather
@@ -176,7 +188,15 @@ const TideDayTabs = ({ dayOffset, onSelectDay, timezone, language }) => {
     days.push({
       offset,
       weekday: offset === 0 ? null : day.format('ddd'),
-      date: day.format('DD/MM')
+      // Day and month in the reader's own order: "09/12" is the 9th of
+      // December in France and the 12th of September in the United States.
+      // The house timezone is passed on, otherwise a dashboard opened from
+      // another one would label the tab with the previous or the next day.
+      date: day.toDate().toLocaleDateString(language || 'en', {
+        day: '2-digit',
+        month: '2-digit',
+        ...(timezone ? { timeZone: timezone } : {})
+      })
     });
   }
   return (
@@ -240,14 +260,23 @@ const TideCurve = ({ tideState, timezone, language }) => {
   const nowX = nowInRange ? toX(now) : null;
   const nowY = nowInRange ? toY(tideState.current_height) : null;
 
-  // Hour marks every six hours, the rhythm a tide roughly follows.
+  // Hour marks every six hours, the rhythm a tide roughly follows. They are
+  // stepped on the local clock rather than by adding fixed hours, so they stay
+  // on round hours across a daylight saving change, and are written in the
+  // reader's own convention.
   const hourMarks = [];
+  const markDay = inHouseTimezone(firstTime, timezone).format('YYYY-MM-DD');
   for (let hour = 0; hour <= 24; hour += 6) {
-    const markTime = firstTime + hour * 60 * 60 * 1000;
-    if (markTime <= lastTime) {
+    // Each mark is re-parsed as a wall clock time on the local day, the way the
+    // server builds both midnights: adding six hours four times would drift by
+    // an hour when the clocks change, putting the "18:00" label at 17:00.
+    const label = `${String(hour % 24).padStart(2, '0')}:00:00`;
+    const day = hour === 24 ? inHouseTimezone(lastTime, timezone).format('YYYY-MM-DD') : markDay;
+    const markTime = (timezone ? dayjs.tz(`${day} ${label}`, timezone) : dayjs(`${day} ${label}`)).valueOf();
+    if (markTime >= firstTime && markTime <= lastTime) {
       hourMarks.push({
         x: toX(markTime),
-        label: hour === 24 ? '24h' : `${String(hour).padStart(2, '0')}h`,
+        label: formatTime(markTime, timezone, language),
         key: `hour-${hour}`
       });
     }
@@ -303,7 +332,7 @@ const TideCurve = ({ tideState, timezone, language }) => {
           <g key={tide.time}>
             <circle cx={x} cy={y} r="2.5" class={style.tideCurveExtremeDot} />
             <text x={labelX} y={timeY} class={style.tideCurveExtremeTime} text-anchor="middle">
-              {formatTime(tide.time, timezone)}
+              {formatTime(tide.time, timezone, language)}
             </text>
             <text x={labelX} y={heightY} class={style.tideCurveExtremeHeight} text-anchor="middle">
               {formatHeight(tide.height, language)}
@@ -362,7 +391,7 @@ const TideLine = ({ tide, timezone, language, coefficient }) => {
       <span class={style.tideLabel}>
         <Text id={`dashboard.boxes.tide.${tide.high ? 'highTideShort' : 'lowTideShort'}`} />
       </span>
-      <span class={style.tideTime}>{formatTime(tide.time, timezone)}</span>
+      <span class={style.tideTime}>{formatTime(tide.time, timezone, language)}</span>
       <span class={style.tideHeight}>{formatHeight(tide.height, language)}</span>
       {/* A bare number next to a height reads as another measurement: the
         coefficient says what it is. */}
@@ -460,20 +489,27 @@ const TideBox = ({ tideState, loading, error, displayCurve, language, gradientId
                       language={language}
                     />
                     <TideCurve tideState={tideState} timezone={timezone} language={language} />
-                    <div class={style.tideNow}>
-                      <span class="text-muted small">
-                        <Text id="dashboard.boxes.tide.currentLevel" />
-                      </span>
-                      <span class={`ml-2 ${style.tideNowValue}`}>
-                        {formatHeight(tideState.current_height, language)}
-                      </span>
-                      {tideState.rising !== null && (
-                        <i
-                          class={`fe ${tideState.rising ? 'fe-arrow-up' : 'fe-arrow-down'} ml-1 ${style.tideTrend}`}
-                          title={tideState.rising ? 'rising' : 'falling'}
-                        />
-                      )}
-                    </div>
+                    {/* The water level is the one right now, so it only belongs
+                      under today's curve: printed under a future day it would
+                      read as that day's level. */}
+                    {!dayOffset && (
+                      <div class={style.tideNow}>
+                        <span class="text-muted small">
+                          <Text id="dashboard.boxes.tide.currentLevel" />
+                        </span>
+                        <span class={`ml-2 ${style.tideNowValue}`}>
+                          {formatHeight(tideState.current_height, language)}
+                        </span>
+                        {tideState.rising !== null && (
+                          <Localizer>
+                            <i
+                              class={`fe ${tideState.rising ? 'fe-arrow-up' : 'fe-arrow-down'} ml-1 ${style.tideTrend}`}
+                              title={<Text id={`dashboard.boxes.tide.${tideState.rising ? 'rising' : 'falling'}`} />}
+                            />
+                          </Localizer>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
                 {/* CC-BY-4.0 asks for attribution, so the credit stays on the
@@ -506,13 +542,16 @@ class Tide extends Component {
   };
 
   refreshData = async ({ resetData = false } = {}) => {
-    const house = this.props.box.house;
-    if (!house) {
-      this.setState({ error: 'noHouseSelected', loading: false });
-      return;
-    }
+    // Only the latest request is allowed to update the state: a slow response
+    // must not overwrite the data of a house selected afterwards. Invalidating
+    // before the no-house case also protects it from a request still in flight.
     this.requestId += 1;
     const requestId = this.requestId;
+    const house = this.props.box.house;
+    if (!house) {
+      this.setState({ error: 'noHouseSelected', loading: false, tideState: undefined });
+      return;
+    }
     try {
       // Keep the tide visible while refreshing, so the loader does not flash
       // over the already rendered widget on every periodic refresh.
