@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <img src="https://claude-gladys-homepage-horiz.v4-website.pages.dev/img/home/horizon/hero-en-2400.webp" alt="Gladys Assistant dashboard" />
+  <img src=".github/images/gladys-dashboard-en.webp" alt="Gladys Assistant dashboard" />
 </p>
 
 ---
