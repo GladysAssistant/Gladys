@@ -81,7 +81,7 @@ class SchedulePageComponent extends Component {
     const deleteFailed = deleteScheduleStatus === RequestStatus.Error;
 
     return (
-      <ThermostatPage>
+      <ThermostatPage user={props.user}>
         {showEditor ? (
           <ScheduleEditor
             schedule={editingSchedule}
