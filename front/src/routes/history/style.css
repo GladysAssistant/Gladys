@@ -28,11 +28,13 @@
 
 /* The Horizon scene on its own fixed, full-viewport layer: composited
    once and never repainted while the feed scrolls. background-attachment:
-   fixed (the dashboard's mechanism) is a Chromium main-thread scrolling
-   reason — the gradient is repainted every frame and visibly flickers on
-   fast scrolls of a long feed. Covering the viewport also slides the
-   scene under the nav rail / mobile top bar, so their backdrop blur
-   frosts the actual scene (no negative-margin trick needed here). */
+   fixed is a main-thread scrolling reason — the gradient is repainted
+   every frame and visibly flickers on fast scrolls of a long feed. The
+   dashboard paints its scene the same way now (a ::before layer on
+   .dashboardBackground, routes/dashboard/style.css). Covering the
+   viewport also slides the scene under the nav rail / mobile top bar, so
+   their backdrop blur frosts the actual scene (no negative-margin trick
+   needed here). */
 .sceneLayer {
   position: fixed;
   inset: 0;
