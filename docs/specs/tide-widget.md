@@ -52,7 +52,7 @@ A home-grown predictor would be either wrong by metres, or a reimplementation of
 
 ## Tide coefficient
 
-The French tide coefficient is a Brest-referenced number on a 20–120 scale: it compares the range of one tide at Brest to the mean spring range there, and the whole Atlantic and Channel coast uses that single value. It is only shown for houses within `MAX_COEFFICIENT_DISTANCE_KM` of Brest, since it describes no other tidal regime.
+The French tide coefficient is a Brest-referenced number on a 20–120 scale: it compares the range of one tide at Brest to the mean spring range there, and the whole Atlantic and Channel coast uses that single value. It is only shown for houses within `MAX_COEFFICIENT_DISTANCE_KM` (700 km) of Brest, since it describes no other tidal regime. That radius covers the whole French coast where the coefficient is published (Dunkirk 575 km, Hendaye 597 km) and stops short of the Mediterranean (Marseille 949 km), the German Bight (Hamburg 1163 km) and the Portuguese coast (Lisbon 1137 km). Britain and Ireland fall inside it — they are closer to Brest than the Basque coast is, and share the Channel and Atlantic regime — even though their own hydrographic services do not publish the coefficient.
 
 **It is computed on the semi-diurnal constituents alone** (`COEFFICIENT_CONSTITUENTS`), the way the SHOM publishes it. Keeping the diurnal constituents makes the morning and the evening tide of a same day differ by about ten points, which published coefficients never do. With this, the computed values match the published ones exactly on the checked dates (74/78 on 27 Aug 2026, 83/86 on 28 Aug, 102 on 13–14 Aug and 12 Sep) — a mean error of 0.2 point, verified by test.
 
@@ -60,10 +60,13 @@ Brest's own semi-diurnal harmonics are embedded in `house.tideConstants.js` (467
 
 ## Places with no tide
 
-Not everywhere has a tide worth showing, and the widget says which case it is rather than drawing a flat curve. The two are told apart by different criteria, because the distance alone is not enough:
+Not everywhere has a tide worth showing, and the widget says which case it is rather than drawing a flat curve. The first two are told apart by different criteria, because the distance alone is not enough:
 
 - **`no_station_nearby`** — the closest station is further than `MAX_STATION_DISTANCE_KM`. The house is inland: a house in Paris matches a harbour 150 km away, whose tide says nothing about where the user lives.
 - **`negligible_tide`** — a station is genuinely nearby, but the spring range is below `NEGLIGIBLE_TIDE_RANGE_METERS`. This is the Mediterranean (Nice: 0.26 m, Ajaccio: 0.26 m) and the Baltic (Tallinn: 0.06 m), against 8.42 m in Saint-Malo.
+- **`station_unavailable`** — the station database could not be reached and nothing was downloaded yet. This one is **not** geographical: where the house sits is still unknown, so a seaside house must never be told it is inland because the network was down. It is worded as a failure and shown as an error rather than as an explanation.
+
+A failed refresh of a station already stored is not this case: the stored harmonics keep predicting the tide. The failure is recorded in the stored variable so the next polls read it instead of calling a database that is down every minute, and the download is retried after `STATION_RETRY_AFTER_FAILURE_HOURS`.
 
 ## Attribution
 
