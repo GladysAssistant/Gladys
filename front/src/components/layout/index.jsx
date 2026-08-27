@@ -14,9 +14,10 @@ import './horizonIntegrations.css';
 const INTEGRATION_URL_PREFIX = '/dashboard/integration';
 
 // The horizontally scrollable chips rows of the integration pages on phones:
-// the side menus (list-group markup restyled by horizonIntegrations.css) and
-// any scroller wearing the opt-in hz-chips-scroll marker (catalog categories)
-const CHIPS_SCROLLERS_SELECTOR = '.list-group-transparent, .hz-chips-scroll';
+// any scroller wearing the opt-in hz-chips-scroll marker (catalog categories).
+// The sub-pages' own menus ride the shared ChipsScroll component instead,
+// which does its own overflow bookkeeping.
+const CHIPS_SCROLLERS_SELECTOR = '.hz-chips-scroll';
 const CHIPS_OVERFLOW_LEFT_CLASS = 'hz-chips-overflow-left';
 const CHIPS_OVERFLOW_RIGHT_CLASS = 'hz-chips-overflow-right';
 // sub-pixel scroll positions (zoom, fractional widths) must not leave an
