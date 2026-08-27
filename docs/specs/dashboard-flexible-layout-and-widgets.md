@@ -195,7 +195,7 @@ The signature widget: an illustration (typically the user's house) with live dev
 
 A circular-gauge widget for the thermostat integration (`docs/specs/thermostat.md`): current temperature and humidity, target setpoint, a preset bar and a drag-to-set dial.
 
-- New `DASHBOARD_BOX_TYPE.THERMOSTAT = 'thermostat'` in `server/utils/constants.js`, stretching as a *tile*.
+- New `DASHBOARD_BOX_TYPE.THERMOSTAT = 'thermostat'` in `server/utils/constants.js`. It is **not** a stretching box (absent from `TILE_STRETCH_BOX_TYPES` in `front/src/utils/dashboardSections.js`): unlike a value tile, the card is a stack of a dial, a preset bar and a status banner, so absorbing a column's leftover height would only pad the gauge with empty glass rather than make anything more readable.
 - Box config — deliberately **one device-referencing key and nothing else**:
 
 | Key | Meaning |
