@@ -48,6 +48,10 @@ const getBoxHeight = box => {
     // the compact sparkline variant is a low tile, not a full chart card
     return 150;
   }
+  if (box.type === 'tide') {
+    // the dial and the two tide lines alone, or the day tabs and the curve too
+    return box.display_curve ? 340 : 170;
+  }
   return BOX_SKELETON_HEIGHTS[box.type] || DEFAULT_BOX_HEIGHT;
 };
 
