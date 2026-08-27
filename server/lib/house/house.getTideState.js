@@ -32,8 +32,11 @@ const CURVE_STEP_MINUTES = 10;
 const EARTH_RADIUS_KM = 6371;
 
 // @neaps/tide-predictor is an ES module, and the Gladys server is CommonJS: it
-// can only be pulled in through a dynamic import. The promise is kept so the
-// module is evaluated once and shared by every later prediction.
+// can only be pulled in through a dynamic import. This is the only one in the
+// server, and it is deliberate — see docs/specs/tide-widget.md for why the
+// dependency is kept rather than reimplemented, and why the import is safe
+// here (no bundler on the server, Node 24 in production). The promise is kept
+// so the module is evaluated once and shared by every later prediction.
 let tidePredictorModulePromise = null;
 
 /**
