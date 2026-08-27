@@ -50,6 +50,7 @@ sudo docker run -d \
   -v /var/lib/gladysassistant:/var/lib/gladysassistant \
   -v /dev:/dev \
   -v /run/udev:/run/udev:ro \
+  -v /run/dbus:/run/dbus:ro \
   gladysassistant/gladys:v5
 ```
 

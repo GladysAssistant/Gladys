@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   gladys:
     image: gladysassistant/gladys:v5
@@ -22,6 +20,9 @@ services:
       - /var/lib/gladysassistant:/var/lib/gladysassistant
       - /dev:/dev
       - /run/udev:/run/udev:ro
+      # Host system bus: reboot/shutdown from the System settings, and
+      # required for Bluetooth (Matter BLE pairing, sensors)
+      - /run/dbus:/run/dbus:ro
   watchtower:
     image: nickfedor/watchtower
     restart: always
