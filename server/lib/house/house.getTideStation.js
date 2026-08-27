@@ -1,4 +1,5 @@
 const logger = require('../../utils/logger');
+const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { downloadNearestStation } = require('./house.getTideState');
 
 // One variable per house, so two houses on two different coasts each keep
@@ -17,7 +18,8 @@ const STATION_MAX_AGE_DAYS = 30;
  * keep working without network access. A failed refresh keeps the stored
  * station rather than losing the widget.
  * @param {any} house - House with latitude and longitude.
- * @returns {Promise<object>} The station, or null when none could be obtained.
+ * @returns {Promise<object>} The station, or null when the database has none to give.
+ * @throws {ExternalIntegrationUnavailableError} When the station cannot be downloaded and none was stored.
  * @example
  * const station = await gladys.house.getTideStation(house);
  */
@@ -66,7 +68,13 @@ async function getTideStation(house) {
     // Offline, or the database is down: a station downloaded earlier still
     // predicts tides perfectly, so it is kept rather than dropped.
     logger.warn(`Tide: unable to download the tide station of house ${house.selector}: ${e.message}`);
-    return stored !== null ? stored.station : null;
+    if (stored !== null) {
+      return stored.station;
+    }
+    // Nothing stored to fall back on. This is not the same as having no station
+    // nearby: the sea may well be next door, so it is raised rather than
+    // returned as null, which the widget reads as "this house is inland".
+    throw new ExternalIntegrationUnavailableError('TIDE_STATION_DOWNLOAD_FAILED');
   }
 }
 

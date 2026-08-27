@@ -23,6 +23,10 @@ const NEGLIGIBLE_TIDE_RANGE_METERS = 0.5;
 const TIDE_UNAVAILABLE_REASON = {
   NO_STATION_NEARBY: 'no_station_nearby',
   NEGLIGIBLE_TIDE: 'negligible_tide',
+  // Being unable to reach the station database says nothing about where the
+  // house is: telling a seaside house it is inland would be plainly wrong, so
+  // a failed download is its own reason.
+  STATION_UNAVAILABLE: 'station_unavailable',
 };
 
 // The French tide coefficient is a Brest-referenced number: it compares the

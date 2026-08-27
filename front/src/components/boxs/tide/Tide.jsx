@@ -401,10 +401,21 @@ const TideBox = ({ tideState, loading, error, displayCurve, language, gradientId
                 </span>
               </p>
             )}
+            {/* The station database could not be reached: this says nothing
+              about the house, so it reads as a failure rather than as one of
+              the two geographical explanations below. */}
+            {!error && tideState && tideState.available === false && tideState.reason === 'station_unavailable' && (
+              <p class="alert alert-warning mb-0">
+                <i class="fe fe-alert-triangle" />
+                <span class="pl-2">
+                  <Text id="dashboard.boxes.tide.stationUnavailable" />
+                </span>
+              </p>
+            )}
             {/* Not every place on earth has a tide. Saying why - too far from
               the sea, or a sea that barely moves - is more useful than showing
               an empty widget or a flat curve. */}
-            {!error && tideState && tideState.available === false && (
+            {!error && tideState && tideState.available === false && tideState.reason !== 'station_unavailable' && (
               <p class="alert alert-info mb-0">
                 <i class="fe fe-info" />
                 <span class="pl-2">
