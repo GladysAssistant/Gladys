@@ -142,19 +142,22 @@ jobs:
           images: ${{ secrets.DOCKERHUB_REPO }},ghcr.io/${{ secrets.DOCKERHUB_REPO }}
           labels: |
             org.opencontainers.image.title=Gladys Assistant Production Image
-          # `latest` is pushed on every release. This was already the case
-          # through the default `latest=auto` flavor, made explicit here.
+          # `latest` is pushed on every release: the default `auto` flavor,
+          # made explicit here, adds it on semver tags — and unlike
+          # `latest=true` it skips pre-release tags (v5.0.0-rc.1), just as the
+          # semver patterns below never move `v5` or `v4` on a pre-release.
           flavor: |
-            latest=true
-          # Every v5 release also feeds the moving `v4` tag: Gladys Assistant 5
-          # is backward compatible, so v4 installations following that tag
-          # (Watchtower and the in-app upgrade both do) are upgraded to v5
-          # automatically. The raw entry is guarded on v5 tags so a future
-          # breaking major stops feeding `v4` without needing to remember this.
+            latest=auto
+          # Every stable v5 release also feeds the moving `v4` tag: Gladys
+          # Assistant 5 is backward compatible, so v4 installations following
+          # that tag (Watchtower and the in-app upgrade both do) are upgraded
+          # to v5 automatically. The raw entry is guarded on v5 tags so a
+          # future breaking major stops feeding `v4` without needing to
+          # remember this, and excludes pre-release tags, which contain a `-`.
           tags: |
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}
-            type=raw,value=v4,enable=${{ startsWith(github.ref, 'refs/tags/v5.') }}
+            type=raw,value=v4,enable=${{ startsWith(github.ref, 'refs/tags/v5.') && !contains(github.ref, '-') }}
             type=sha
       - name: 💽 Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -179,6 +182,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      # The single-arch `v4-arm64v8` and `v4-amd64` tags, kept for
+      # installations predating multi-arch manifests, are abandoned with
+      # Gladys Assistant 5: they stay frozen on the last v4.x images, and the
+      # remaining installations have to be recreated on the `v4` tag.
       - name: 🐳 Build and push
         uses: docker/build-push-action@v3
         with:
@@ -190,9 +197,6 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           cache-from: type=registry,ref=${{ env.DOCKERHUB_REPO }}:latest
           cache-to: type=inline
-          # The single-arch `v4-arm64v8` and `v4-amd64` tags, kept for
-          # installations predating multi-arch manifests, are deprecated with
-          # Gladys Assistant 5: they stay frozen on the last v4.x images.
   publish-gladys-plus:
     name: Publish Gladys Plus front
     needs: docker
