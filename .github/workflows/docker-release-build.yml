@@ -142,9 +142,19 @@ jobs:
           images: ${{ secrets.DOCKERHUB_REPO }},ghcr.io/${{ secrets.DOCKERHUB_REPO }}
           labels: |
             org.opencontainers.image.title=Gladys Assistant Production Image
+          # `latest` is pushed on every release. This was already the case
+          # through the default `latest=auto` flavor, made explicit here.
+          flavor: |
+            latest=true
+          # Every v5 release also feeds the moving `v4` tag: Gladys Assistant 5
+          # is backward compatible, so v4 installations following that tag
+          # (Watchtower and the in-app upgrade both do) are upgraded to v5
+          # automatically. The raw entry is guarded on v5 tags so a future
+          # breaking major stops feeding `v4` without needing to remember this.
           tags: |
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}
+            type=raw,value=v4,enable=${{ startsWith(github.ref, 'refs/tags/v5.') }}
             type=sha
       - name: 💽 Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -180,16 +190,9 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           cache-from: type=registry,ref=${{ env.DOCKERHUB_REPO }}:latest
           cache-to: type=inline
-      - name: 🐳 Legacy Tags
-        run: |
-          export DIGESTARM64=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm64").value | .digest')
-          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64
-          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64 ${{ env.DOCKERHUB_REPO }}:v4-arm64v8
-          docker push ${{ env.DOCKERHUB_REPO }}:v4-arm64v8
-          export DIGESTAMD64=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "amd64").value | .digest')
-          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64
-          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64 ${{ env.DOCKERHUB_REPO }}:v4-amd64
-          docker push ${{ env.DOCKERHUB_REPO }}:v4-amd64
+          # The single-arch `v4-arm64v8` and `v4-amd64` tags, kept for
+          # installations predating multi-arch manifests, are deprecated with
+          # Gladys Assistant 5: they stay frozen on the last v4.x images.
   publish-gladys-plus:
     name: Publish Gladys Plus front
     needs: docker
