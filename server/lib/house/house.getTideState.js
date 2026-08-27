@@ -319,18 +319,25 @@ async function getTideState(house, now = new Date(), options = {}) {
 
   // The curve spans the local day, so the widget draws the tide the user is
   // living through rather than a window sliding with the clock.
+  // Both midnights are re-parsed from their local date as wall clock times:
+  // adding to a dayjs.tz object keeps the original UTC offset, which would be
+  // wrong on a DST day (the local day then lasts 23 or 25 hours, not 24).
   const localDay = dayjs(now)
     .tz(timezone)
     .add(dayOffset, 'day');
-  const startOfDay = dayjs.tz(`${localDay.format('YYYY-MM-DD')} 00:00:00`, timezone);
-  // Adding a day rather than 24 hours keeps the window on local midnights, so
-  // the curve still spans one calendar day across a daylight saving change.
-  const endOfDay = startOfDay.add(1, 'day');
+  const today = localDay.format('YYYY-MM-DD');
+  const tomorrow = localDay.add(1, 'day').format('YYYY-MM-DD');
+  const startOfDay = dayjs.tz(`${today} 00:00:00`, timezone);
+  const endOfDay = dayjs.tz(`${tomorrow} 00:00:00`, timezone);
   const curve = [];
-  for (let time = startOfDay.valueOf(); time <= endOfDay.valueOf(); time += CURVE_STEP_MINUTES * 60 * 1000) {
+  for (let time = startOfDay.valueOf(); time < endOfDay.valueOf(); time += CURVE_STEP_MINUTES * 60 * 1000) {
     const date = new Date(time);
     curve.push({ time: date, height: toHeight(predictor.getWaterLevelAtTime({ time: date }).level) });
   }
+  // Always close the curve on the next local midnight, whatever the last step
+  // landed on: a 23-hour day does not end on a round number of steps.
+  const endDate = endOfDay.toDate();
+  curve.push({ time: endDate, height: toHeight(predictor.getWaterLevelAtTime({ time: endDate }).level) });
 
   // The coefficient is a Brest-referenced number that only describes the
   // Atlantic and Channel tide, so it is left out everywhere else.
