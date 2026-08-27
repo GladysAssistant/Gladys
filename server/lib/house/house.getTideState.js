@@ -241,7 +241,15 @@ async function getTideState(house, now = new Date(), options = {}) {
   const dayOffset = Math.min(MAX_FORECAST_DAYS - 1, Math.max(0, Math.round(options.dayOffset || 0)));
   const timezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || DEFAULT_TIMEZONE;
 
-  const station = await this.getTideStation(house);
+  let station;
+  try {
+    station = await this.getTideStation(house);
+  } catch (e) {
+    // The station database could not be reached and nothing was stored yet.
+    // Where the house sits is still unknown, so the widget says the tide is
+    // unavailable rather than claiming the house is inland.
+    return { available: false, reason: TIDE_UNAVAILABLE_REASON.STATION_UNAVAILABLE, timezone };
+  }
   if (station === null) {
     return { available: false, reason: TIDE_UNAVAILABLE_REASON.NO_STATION_NEARBY, timezone };
   }

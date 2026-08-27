@@ -621,6 +621,7 @@
         "dataSource": "Tide data: {{source}}, via the Open Waters database (CC BY 4.0).",
         "noStationNearby": "This house is not by the sea: there is no tide station nearby, so there is no tide to display.",
         "negligibleTide": "There is almost no tide in {{station}}: the tidal range there does not exceed {{range}} m.",
+        "stationUnavailable": "Tide data could not be retrieved: the tide station database is unreachable. The tide will come back as soon as the connection is restored.",
         "noHouseSelected": "Please select a house in the widget settings.",
         "noCoordinates": "This house has no coordinates. Please configure its location first.",
         "error": "An error occurred while getting the tides, please try again."

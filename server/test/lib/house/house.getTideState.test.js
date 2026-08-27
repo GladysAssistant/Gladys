@@ -295,8 +295,18 @@ describe('house.getTideState', () => {
     expect(tideState.available).to.equal(true);
   });
 
-  it('should report no tide when the station cannot be downloaded at all', async () => {
+  it('should tell a failed download apart from a house away from the sea', async () => {
+    // Saint Malo is on the coast: saying it is inland because the database is
+    // unreachable would be plainly wrong.
     sinon.stub(axios, 'get').rejects(new Error('getaddrinfo ENOTFOUND'));
+    const house = buildHouse(null);
+    const tideState = await house.getTideState(saintMaloHouse, now);
+    expect(tideState.available).to.equal(false);
+    expect(tideState.reason).to.equal('station_unavailable');
+  });
+
+  it('should report no tide when the database has no station to give', async () => {
+    sinon.stub(axios, 'get').resolves({ data: [] });
     const house = buildHouse(null);
     const tideState = await house.getTideState(saintMaloHouse, now);
     expect(tideState.available).to.equal(false);

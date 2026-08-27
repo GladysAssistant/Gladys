@@ -621,6 +621,7 @@
         "dataSource": "Gezeitendaten: {{source}}, über die Open-Waters-Datenbank (CC BY 4.0).",
         "noStationNearby": "Dieses Haus liegt nicht am Meer: In der Nähe gibt es keinen Pegel, daher können keine Gezeiten angezeigt werden.",
         "negligibleTide": "In {{station}} gibt es praktisch keine Gezeiten: Der Tidenhub übersteigt dort {{range}} m nicht.",
+        "stationUnavailable": "Die Gezeitendaten konnten nicht abgerufen werden: Die Pegel-Datenbank ist nicht erreichbar. Die Gezeiten erscheinen wieder, sobald die Verbindung steht.",
         "noHouseSelected": "Bitte wählen Sie in den Widget-Einstellungen ein Haus aus.",
         "noCoordinates": "Dieses Haus hat keine Koordinaten. Bitte konfigurieren Sie zuerst seinen Standort.",
         "error": "Beim Abrufen der Gezeiten ist ein Fehler aufgetreten, bitte versuchen Sie es erneut."

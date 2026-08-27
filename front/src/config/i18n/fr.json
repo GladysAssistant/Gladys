@@ -621,6 +621,7 @@
         "dataSource": "Données de marée : {{source}}, via la base Open Waters (CC BY 4.0).",
         "noStationNearby": "Cette maison n'est pas au bord de la mer : aucune station marégraphique ne se trouve à proximité, il n'y a donc pas de marée à afficher.",
         "negligibleTide": "Il n'y a pratiquement pas de marée à {{station}} : le marnage n'y dépasse pas {{range}} m.",
+        "stationUnavailable": "Les données de marée n'ont pas pu être récupérées : la base des stations marégraphiques est injoignable. La marée réapparaîtra dès que la connexion sera rétablie.",
         "noHouseSelected": "Veuillez sélectionner une maison dans les paramètres du widget.",
         "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
         "error": "Une erreur est survenue lors de la récupération des marées, merci de réessayer."
