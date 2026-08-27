@@ -1,61 +1,44 @@
+import { Fragment } from 'preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 
-const ThermostatPage = ({ children }) => (
-  <div class="page">
-    <div class="page-main">
-      <div class="my-3 my-md-5">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-3">
-              <BackToIntegrationsLink />
-              <h3 class="page-title mb-5">
-                <Text id="integration.thermostat.title" />
-              </h3>
-              <div>
-                <div class="list-group list-group-transparent mb-0">
-                  <Link
-                    href="/dashboard/integration/device/thermostat"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-thermometer" />
-                    </span>
-                    <Text id="integration.thermostat.deviceTab" />
-                  </Link>
-                  <Link
-                    href="/dashboard/integration/device/thermostat/schedule"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-calendar" />
-                    </span>
-                    <Text id="integration.thermostat.scheduleTab" />
-                  </Link>
-                  <a
-                    href="https://gladysassistant.com/docs/integrations/thermostat"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
-                    </span>
-                    <Text id="integration.thermostat.documentationTab" />
-                  </a>
-                </div>
-              </div>
-            </div>
+const ThermostatPage = ({ children, user }) => (
+  <IntegrationSubPageLayout
+    title={<Text id="integration.thermostat.title" />}
+    tabs={
+      <Fragment>
+        <Link href="/dashboard/integration/device/thermostat" activeClassName="active" class="hz-tab-link">
+          <i class="fe fe-thermometer" />
+          <span>
+            <Text id="integration.thermostat.deviceTab" />
+          </span>
+        </Link>
 
-            <div class="col-lg-9">{children}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <Link href="/dashboard/integration/device/thermostat/schedule" activeClassName="active" class="hz-tab-link">
+          <i class="fe fe-calendar" />
+          <span>
+            <Text id="integration.thermostat.scheduleTab" />
+          </span>
+        </Link>
+
+        <DeviceConfigurationLink
+          user={user}
+          configurationKey="integrations"
+          documentKey="thermostat"
+          linkClass="hz-tab-link"
+        >
+          <i class="fe fe-book-open" />
+          <span>
+            <Text id="integration.thermostat.documentationTab" />
+          </span>
+        </DeviceConfigurationLink>
+      </Fragment>
+    }
+  >
+    {children}
+  </IntegrationSubPageLayout>
 );
 
 export default ThermostatPage;
