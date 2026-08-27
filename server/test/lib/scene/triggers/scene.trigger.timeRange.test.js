@@ -145,4 +145,90 @@ describe('Scene.triggers.timeRange', () => {
       expect(event.in_range).to.equal(true);
     });
   });
+
+  // The days of the week are configured per trigger, so a "weekdays + weekend" planning is
+  // necessarily two triggers. The whole planning has to answer: the trigger which fired, or
+  // which happens to be first at resume, is not the one covering the current minute.
+  describe('several time-range triggers on the same scene', () => {
+    const weekDaysTrigger = {
+      type: EVENTS.TIME.CHANGED,
+      scheduler_type: 'time-range',
+      key: 'week-days-key',
+      days_of_the_week: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+      time_ranges: [{ start: '08:00', end: '10:00' }],
+    };
+    const weekEndTrigger = {
+      type: EVENTS.TIME.CHANGED,
+      scheduler_type: 'time-range',
+      key: 'week-end-key',
+      days_of_the_week: ['saturday', 'sunday'],
+      time_ranges: [{ start: '10:00', end: '18:00' }],
+    };
+    const selfWithScene = {
+      timezone: TIMEZONE,
+      scenes: { 'a-scene': { triggers: [weekDaysTrigger, weekEndTrigger] } },
+    };
+    const checkOn = (event, trigger_) =>
+      triggersFunc[EVENTS.TIME.CHANGED](selfWithScene, 'a-scene', event, trigger_);
+
+    // Saturday 12:00, inside the weekend range. Resume emits the FIRST trigger asking for
+    // it — the weekdays one — which covers nothing today: answering for its ranges alone
+    // would report the scene as outside its planning and switch the device off.
+    it('should be in range at resume when another trigger covers the day', () => {
+      sinon.useFakeTimers(dayjs.tz('2026-08-29 12:00', TIMEZONE).valueOf());
+      const event = { key: 'week-days-key', range_event: 'resume' };
+      expect(checkOn(event, weekDaysTrigger)).to.equal(true);
+      expect(event.in_range).to.equal(true);
+    });
+
+    // Monday 09:00: only the weekdays trigger covers it, and it is the one asked.
+    it('should be in range at resume inside the range of the trigger itself', () => {
+      sinon.useFakeTimers(dayjs.tz('2026-08-24 09:00', TIMEZONE).valueOf());
+      const event = { key: 'week-days-key', range_event: 'resume' };
+      expect(checkOn(event, weekDaysTrigger)).to.equal(true);
+      expect(event.in_range).to.equal(true);
+    });
+
+    // Monday 11:00: outside both plannings.
+    it('should be out of range at resume when no trigger covers the moment', () => {
+      sinon.useFakeTimers(dayjs.tz('2026-08-24 11:00', TIMEZONE).valueOf());
+      const event = { key: 'week-days-key', range_event: 'resume' };
+      expect(checkOn(event, weekDaysTrigger)).to.equal(true);
+      expect(event.in_range).to.equal(false);
+    });
+
+    // Two triggers overlapping on the same day: the end of one of them must not report the
+    // scene as outside while the other still covers this minute.
+    it('should stay in range when the end of a trigger is covered by another one', () => {
+      const morningTrigger = {
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'time-range',
+        key: 'morning-key',
+        time_ranges: [{ start: '08:00', end: '12:00' }],
+      };
+      const allDayTrigger = {
+        type: EVENTS.TIME.CHANGED,
+        scheduler_type: 'time-range',
+        key: 'all-day-key',
+        time_ranges: [{ start: '10:00', end: '18:00' }],
+      };
+      const selfOverlap = {
+        timezone: TIMEZONE,
+        scenes: { 'a-scene': { triggers: [morningTrigger, allDayTrigger] } },
+      };
+      sinon.useFakeTimers(dayjs.tz('2026-08-24 12:00', TIMEZONE).valueOf());
+      const event = { key: 'morning-key', range_event: 'end', range_index: 0 };
+      expect(triggersFunc[EVENTS.TIME.CHANGED](selfOverlap, 'a-scene', event, morningTrigger)).to.equal(true);
+      expect(event.in_range).to.equal(true);
+    });
+
+    // The range which just ended is still excluded, and only that one: the same start and
+    // end time on the other trigger must not keep the scene inside.
+    it('should be out of range when the ended range is the only one covering the minute', () => {
+      sinon.useFakeTimers(dayjs.tz('2026-08-24 10:00', TIMEZONE).valueOf());
+      const event = { key: 'week-days-key', range_event: 'end', range_index: 0 };
+      expect(checkOn(event, weekDaysTrigger)).to.equal(true);
+      expect(event.in_range).to.equal(false);
+    });
+  });
 });

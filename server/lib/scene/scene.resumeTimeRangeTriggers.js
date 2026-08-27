@@ -35,9 +35,10 @@ function resumeTimeRangeTriggers() {
     // A scene resumes once, even with several time-range triggers asking for it: emitting
     // per trigger would run the whole scene twice at boot, double-applying the state of the
     // device it drives and sending its notifications twice. The first trigger is the one
-    // emitted; a scene reading `{{triggerEvent.in_range}}` gets the state of its ranges,
-    // and `scene.in-time-range` — which the resume branch is written around — looks at
-    // every time-range trigger of the scene anyway.
+    // emitted, and which one it is does not matter: `in_range` is computed in scene.triggers
+    // from the ranges of EVERY time-range trigger of the scene, so a "weekdays + weekend"
+    // planning — necessarily two triggers, as the days are configured per trigger — answers
+    // for the whole planning rather than for the trigger which happens to come first.
     const triggerToResume = scene.triggers.find(
       (trigger) =>
         trigger.type === EVENTS.TIME.CHANGED &&
