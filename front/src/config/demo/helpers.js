@@ -23,6 +23,15 @@ const uuid = seed => {
   return `${raw.slice(0, 8)}-${raw.slice(8, 12)}-4${raw.slice(13, 16)}-a${raw.slice(17, 20)}-${raw.slice(20, 32)}`;
 };
 
+/**
+ * Language the demo speaks. The demo has no server to store a user preference
+ * in: `get /api/v1/me` answers the language of the browser, so the interface is
+ * translated — and everything the fixtures write themselves (room and device
+ * names, scenes, the chat) follows the same rule through ./i18n.js, otherwise a
+ * French visitor reads a French interface full of English data.
+ */
+const demoLanguage = () => ((navigator.language || '').toLowerCase().startsWith('fr') ? 'fr' : 'en');
+
 const minutesAgo = minutes =>
   dayjs()
     .subtract(minutes, 'minute')
@@ -443,6 +452,7 @@ const productionPower = (name, selector, value, options) =>
 
 export {
   uuid,
+  demoLanguage,
   minutesAgo,
   hoursAgo,
   daysAgo,
