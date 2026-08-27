@@ -221,29 +221,50 @@
   }
 }
 
+/* The scene class (below) sets the background-image HERE, but the element
+   paints it at zero size: the visible scene is the fixed, full-viewport
+   ::before layer, which inherits the image and is composited once — never
+   repainted while the dashboard scrolls. The previous mechanism,
+   background-attachment: fixed on this (scrolling) element, forced a
+   main-thread repaint of the whole gradient on every scroll frame — under
+   cards that re-blur their backdrop each frame, that repaint was the
+   difference between a fluid scroll and a laggy one on modest hardware
+   (see the identical fix on the Activity page, routes/history/style.css).
+   Covering the viewport also slides the scene under the nav rail / mobile
+   top bar, so their backdrop blur frosts the actual scene — no width or
+   margin trick needed for that anymore. */
 .dashboardBackground {
+  background-size: 0 0;
+  min-height: 100vh;
+  /* own stacking context so the fixed scene layer can sit at z -1 behind
+     the in-flow content but above the element's own background (the
+     dark-mode.css opaque .page-main background included) */
+  position: relative;
+  isolation: isolate;
+}
+
+.dashboardBackground::before {
+  content: '';
+  position: fixed;
+  /* longhands, not inset: — it must not silently disappear on the old
+     wall tablets (Chromium < 87) */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  background-image: inherit;
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
-  min-height: 100vh;
+  /* the layer covers areas outside the element's own box (under the nav
+     rail): it must never intercept their pointer events */
+  pointer-events: none;
 }
 
-/* With the left navigation rail, the outer .page is padded (style/index.css)
-   but the wallpaper slides back under the rail, so the rail's backdrop blur
-   frosts the actual scene instead of a flat page background. The image is
-   viewport-fixed, so the extension doesn't shift what's visible. */
-@media (min-width: 992px) {
-  :global(body.gladys-sidebar-nav) .dashboardBackground {
-    /* the box must GROW by the rail width, not merely shift: width stays
-       100% of the padded page, so without the calc the scene would stop
-       15rem short of the right edge of the viewport */
-    width: calc(100% + 15rem);
-    margin-left: -15rem;
-    padding-left: 15rem;
-  }
-}
-
-/* Same under the mobile top bar: the scene runs behind its frosted glass */
+/* Under the mobile top bar the outer .page is padded (style/index.css):
+   pull the box back up and re-pad it, so min-height: 100vh ends exactly at
+   the viewport bottom instead of 3.25rem below it (a short dashboard must
+   not scroll). The scene itself is viewport-fixed and needs no trick. */
 @media (max-width: 991.98px) {
   :global(body.gladys-sidebar-nav) .dashboardBackground {
     margin-top: -3.25rem;
