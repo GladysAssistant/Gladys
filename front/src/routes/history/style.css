@@ -720,3 +720,12 @@
     padding: 0.5rem 1rem;
   }
 }
+
+/* First load: the feed inside the dimmer is still empty, so the dimmer
+   collapses and the theme's loader — absolutely centered on the dimmer
+   (top: 50%) — ends up flush under the filter capsule. Reserve the height
+   the empty feed doesn't have so the spinner is centered in the free space
+   below the filters instead. */
+.initialLoadingDimmer {
+  min-height: 50vh;
+}

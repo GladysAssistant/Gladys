@@ -86,6 +86,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
   // (e.g. expanding/collapsing a group), since it walks the whole events list.
   const timeline = useMemo(() => buildTimeline(props.events), [props.events]);
   const language = user && user.language;
+  const initialLoading = props.loading && !props.initialized;
 
   return (
     <div class="page">
@@ -206,9 +207,15 @@ const HistoryPage = ({ intl, user, ...props }) => {
               </div>
             )}
 
+            {/* The theme centers the dimmer's loader on the dimmer itself
+                (top: 50%). On the first load the feed below is still empty,
+                so the dimmer would collapse and the loader would sit flush
+                under the filter capsule: reserve some height while it runs
+                so the spinner is centered in the empty feed area. */}
             <div
               class={cx('dimmer', {
-                active: props.loading && !props.initialized
+                active: initialLoading,
+                [style.initialLoadingDimmer]: initialLoading
               })}
             >
               <div class="loader" />
