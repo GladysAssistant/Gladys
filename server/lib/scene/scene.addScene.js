@@ -3,6 +3,7 @@ const uuid = require('uuid');
 
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS, TIME_RANGE_EVENTS } = require('../../utils/constants');
+const logger = require('../../utils/logger');
 const {
   daysOfTheWeekToNumbers,
   isOvernightRange,
@@ -154,6 +155,13 @@ async function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
         // A time-range trigger schedules several jobs (2 per range), unlike the other
         // scheduler types which only need one.
         trigger.nodeScheduleJobs = scheduleTimeRangeJobs(this, trigger);
+        // A trigger without any range schedules nothing and can never fire. The scene was
+        // refused before reaching the database, so this only shows up for a scene already
+        // stored in an inconsistent state, loaded by init(): warn rather than throw, so the
+        // rest of the scene keeps working.
+        if (trigger.nodeScheduleJobs.length === 0) {
+          logger.warn(`Scene ${scene.name}: a "time range" trigger has no range, it will never fire.`);
+        }
       } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
         const rule = {};
         rule.tz = this.timezone;
