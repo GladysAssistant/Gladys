@@ -125,6 +125,7 @@ describe('system.getGladysImage', () => {
   });
 
   it('should detect an image pinned on a digest', async () => {
+    system.gladysVersion = 'v5.0.0';
     system.inspectContainer = fake.resolves({
       Name: '/gladys',
       Config: { Image: 'gladysassistant/gladys@sha256:abcdef' },
@@ -133,7 +134,7 @@ describe('system.getGladysImage', () => {
     const gladysImage = await system.getGladysImage();
     expect(gladysImage).to.have.property('pinned', true);
     // no tag to derive the major from, the running version is used instead
-    expect(gladysImage).to.have.property('recommended_image', 'gladysassistant/gladys:v4');
+    expect(gladysImage).to.have.property('recommended_image', 'gladysassistant/gladys:v5');
   });
 
   it('should handle a container started from a raw image id', async () => {
