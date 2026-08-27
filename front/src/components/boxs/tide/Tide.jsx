@@ -54,39 +54,35 @@ const formatHeight = (height, language) =>
  * like the tide clocks sold in harbours.
  */
 const TideClock = ({ tideState, gradientId }) => {
-  const { previous_tide: previousTide, next_high_tide: nextHighTide, next_low_tide: nextLowTide } = tideState;
+  const { next_high_tide: nextHighTide, next_low_tide: nextLowTide } = tideState;
   // The tide currently being sailed towards is the earliest of the two.
   const nextTide =
     nextHighTide && nextLowTide
       ? [nextHighTide, nextLowTide].sort((a, b) => new Date(a.time) - new Date(b.time))[0]
       : nextHighTide || nextLowTide;
 
-  let progress = 0.5;
-  if (previousTide && nextTide) {
-    const from = new Date(previousTide.time).getTime();
-    const to = new Date(nextTide.time).getTime();
-    const elapsed = Date.now() - from;
-    const total = to - from;
-    if (total > 0) {
-      progress = Math.min(1, Math.max(0, elapsed / total));
-    }
-  }
+  // Hours left before the next tide, the number a tide clock is read for. The
+  // dial is graduated 1 to 5 down each side, so the hand points at roughly the
+  // hours remaining: 6 would be the opposite tide, which is already labelled.
+  const hoursLeft = nextTide ? (new Date(nextTide.time).getTime() - Date.now()) / (60 * 60 * 1000) : null;
 
   // Half a turn per half-cycle: the hand points down at low water and up at
   // high water, sweeping up the left side while the sea rises and back down
   // the right side while it falls, like the tide clocks sold in harbours.
+  //
+  // The angle comes from the hours left rather than from the share of the
+  // half-cycle already elapsed: the dial is graduated six hours per half turn,
+  // while a half-cycle really lasts 6h12 on average and swings between 5h30
+  // and 6h50. Reading the hand on a scale its own numbers do not use made it
+  // point at 4 with 5h22 still to run.
   const rising = tideState.rising === true;
-  const angle = rising ? 180 + progress * 180 : progress * 180;
+  const remainingHours = hoursLeft === null ? 3 : Math.min(6, Math.max(0, hoursLeft));
+  const angle = rising ? 360 - remainingHours * 30 : 180 - remainingHours * 30;
   const toPoint = (degrees, radius) => {
     const radians = ((degrees - 90) * Math.PI) / 180;
     return { x: 50 + radius * Math.cos(radians), y: 50 + radius * Math.sin(radians) };
   };
   const hand = toPoint(angle, 33);
-
-  // Hours left before the next tide, the number a tide clock is read for. The
-  // dial is graduated 1 to 5 down each side, so the hand points at roughly the
-  // hours remaining: 6 would be the opposite tide, which is already labelled.
-  const hoursLeft = nextTide ? (new Date(nextTide.time).getTime() - Date.now()) / (60 * 60 * 1000) : null;
 
   // The hour numbers: on a tide clock they count down to the next tide, so they
   // run down the rising side and back up the falling one.
