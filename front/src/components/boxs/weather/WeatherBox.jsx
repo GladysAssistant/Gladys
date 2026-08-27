@@ -332,13 +332,17 @@ class WeatherBoxComponent extends Component {
                condition instead of the two overlapping */
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px">
               <div style="display: flex; align-items: center; min-width: 0">
-                {/* the Meteocons viewBox is 64x64 but the artwork only fills
-                    the middle band, so a 92px icon carries ~11px of blank
-                    padding above and below. Clipping 12% off each side trims
-                    that dead space without touching the drawing: the tallest
-                    icons (clear-day, thunderstorm) still fit their sun rays
-                    and lightning bolt inside what is left. */}
-                <div style="line-height: 1; overflow: hidden; margin-top: -11px; margin-bottom: -11px">
+                {/* No crop here on purpose. The Meteocons artwork is NOT
+                    centered in its 64x64 viewBox and its padding is far from
+                    uniform: measured over the bundled set, the top edge runs
+                    from y=8 (clear-day's sun rays) to y=18.5 (tornado), and
+                    the bottom from y=45.5 (tornado) to y=59.5 (freezing-fog),
+                    before the rain/hail `animateTransform` pushes drops another
+                    10 to 18 units down. Any single inset that trims the roomy
+                    icons decapitates the tall ones, so the size bump below is
+                    the fix and the padding stays symmetric with the hourly and
+                    daily rows. */}
+                <div style="line-height: 1">
                   <Localizer>
                     <WeatherIcon
                       icon={weather.weatherEmoji}
@@ -532,10 +536,14 @@ class WeatherBoxComponent extends Component {
                     {hour.datetime_beautiful}h
                   </div>
                   <div style="line-height: 1.5; margin-bottom: 3px; display: flex; justify-content: center">
+                    {/* the secondary ceiling stays UNDER the 2.5rem (40px) flex
+                        floor of the cell: at 40 it would tie with the current
+                        slot on a narrow card, where every column is clamped to
+                        that floor, and the emphasis would vanish */}
                     <Localizer>
                       <WeatherIcon
                         icon={hour.weatherEmoji}
-                        size={index === 0 ? 56 : 40}
+                        size={index === 0 ? 56 : 36}
                         label={<Text id={`dashboard.boxes.weather.conditions.${hour.weather || 'unknown'}`} />}
                       />
                     </Localizer>
