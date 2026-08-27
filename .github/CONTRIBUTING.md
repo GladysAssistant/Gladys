@@ -11,6 +11,8 @@ Here’s how you can contribute to Gladys:
 - ✨ Propose new features
 - 🤝 Become a long-term contributor or maintainer
 
+By participating, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ---
 
 ## 💻 We Use GitHub for Everything
@@ -63,6 +65,19 @@ If your PR implements a forum request, add a line `Forum: https://community.glad
 
 ---
 
+## 🤖 AI-Assisted Development
+
+We are very favorable to AI-assisted development — we use AI extensively ourselves to build Gladys: AI code reviews run on every pull request, automated fix routines keep PRs green, and AI agents work on the codebase daily. If AI tools help you contribute better and faster, please use them!
+
+A few recommendations to make AI work well on this codebase:
+
+- **Use frontier models.** The quality gap between the latest-generation models and older or smaller ones is very real on a codebase of this size. As of today, we recommend **Fable** for complex developments and **Opus** for smaller tasks. This recommendation will evolve — always prefer the current frontier.
+- **Point your agent to [`AGENTS.md`](../AGENTS.md).** It contains everything an AI agent (or a human!) needs to work here: how to run the project, the CI requirements, every lint/test/build command, the common CI failure causes, and the spec-first process for larger features.
+- **You own your pull request.** AI or not, you are the author: read and understand every line of your diff, run the checks locally (prettier, eslint, tests with 100% patch coverage on the server), and be ready to discuss your changes during review. Pull requests that look like unreviewed AI output will be sent back.
+- **No stigma either way.** You never have to hide (or justify) using AI. What we review is the quality of the contribution, not how it was produced.
+
+---
+
 ## 🤖 Automated review
 
 An automated review runs on your PR as soon as you open it. A draft PR waits until you mark it **ready for review**. After that, every time you push new commits, a new review starts automatically about 5 minutes later — the delay lets a burst of pushes result in a single review of your latest commit, so there is no need to hold back small fixup commits.
@@ -97,9 +112,11 @@ We use [GitHub Issues](https://github.com/gladysassistant/Gladys/issues) to trac
 To report a bug:
 
 1. Head over to the [issues tab](https://github.com/gladysassistant/Gladys/issues)
-2. Click on **New Issue**
-3. Describe the problem clearly
+2. Click on **New Issue** and pick the **Bug report** template
+3. Fill in the form — your Gladys version, installation type and server logs help us a lot
 4. Hit submit — that’s it!
+
+> 🔒 **Security vulnerabilities** are the one thing that should *not* go through public issues: please follow our [security policy](../SECURITY.md) instead.
 
 ---
 

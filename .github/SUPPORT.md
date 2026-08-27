@@ -2,12 +2,16 @@
 
 First of all — thank you for using Gladys Assistant!
 
-If you need help, the best place to ask questions is on our community forum:
+If you need help, here is where to go:
 
-- 🌍 [Forum](https://community.gladysassistant.com/)
+- 📚 [Official documentation](https://gladysassistant.com/docs/) — installation guides, tutorials, and integration docs
+- 🌍 [Community forum](https://community.gladysassistant.com/) — the best place to ask questions and get help
+- 💡 [Feature requests](https://community.gladysassistant.com/c/feature-requests/43) — propose and vote for new features on the forum
 
-Please **do not open a GitHub issue for support questions** — GitHub is reserved for bug reports.
+Please **do not open a GitHub issue for support questions** — GitHub issues are reserved for bug reports.
 
-For anything else, we’ll be happy to help you on the forum!
+Found a security vulnerability? Please follow our [security policy](../SECURITY.md) instead of posting publicly.
+
+For anything else, we'll be happy to help you on the forum!
 
 See you there 🙏

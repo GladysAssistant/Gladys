@@ -1,0 +1,70 @@
+name: 🐞 Bug report
+description: Report a bug to help us improve Gladys Assistant
+labels: ['type:fix']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! 🙏
+
+        Not sure it's a bug? Come discuss it first on our [community forum](https://community.gladysassistant.com/).
+        For support questions, please use the forum — GitHub issues are reserved for bug reports.
+        For security vulnerabilities, please follow our [security policy](https://github.com/GladysAssistant/Gladys/blob/master/SECURITY.md) instead of opening a public issue.
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: To reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: input
+    id: gladys-version
+    attributes:
+      label: Gladys Assistant version
+      description: You can find it in Settings → Gateway or at the bottom of the Settings page.
+      placeholder: 'e.g. 5.0.0'
+    validations:
+      required: true
+  - type: dropdown
+    id: installation-type
+    attributes:
+      label: Installation type
+      options:
+        - Raspberry Pi OS / Gladys Assistant image
+        - Docker (manual)
+        - Docker Compose
+        - NAS (Synology, QNAP...)
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: |
+        Paste any relevant server logs (`docker logs gladys`). This will be automatically formatted as code.
+      render: shell
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Screenshots, browser/OS used, connected devices — anything else that helps us understand the problem.
