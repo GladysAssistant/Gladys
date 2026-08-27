@@ -8,7 +8,7 @@ body:
         Thanks for taking the time to report a bug! 🙏
 
         Not sure it's a bug? Come discuss it first on our [community forum](https://community.gladysassistant.com/).
-        For support questions, please use the forum — GitHub issues are reserved for bug reports.
+        For support questions, please use the forum. GitHub issues are reserved for bug reports.
         For security vulnerabilities, please follow our [security policy](https://github.com/GladysAssistant/Gladys/blob/master/SECURITY.md) instead of opening a public issue.
   - type: textarea
     id: description
@@ -40,7 +40,7 @@ body:
     id: gladys-version
     attributes:
       label: Gladys Assistant version
-      description: You can find it in Settings → Gateway or at the bottom of the Settings page.
+      description: You can find it in **Settings → System**.
       placeholder: 'e.g. 5.0.0'
     validations:
       required: true
@@ -61,10 +61,10 @@ body:
     attributes:
       label: Relevant logs
       description: |
-        Paste any relevant server logs (`docker logs gladys`). This will be automatically formatted as code.
+        You can download your Gladys logs in **Settings → System → Download logs**, then paste the relevant part here. This will be automatically formatted as code.
       render: shell
   - type: textarea
     id: context
     attributes:
       label: Additional context
-      description: Screenshots, browser/OS used, connected devices — anything else that helps us understand the problem.
+      description: Screenshots, browser/OS used, connected devices, or anything else that helps us understand the problem.

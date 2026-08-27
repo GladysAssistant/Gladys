@@ -50,7 +50,7 @@ sudo docker run -d \
   -v /var/lib/gladysassistant:/var/lib/gladysassistant \
   -v /dev:/dev \
   -v /run/udev:/run/udev:ro \
-  gladysassistant/gladys:v5
+  gladysassistant/gladys:v4
 ```
 
 Prefer using Docker Compose? Check out our [Docker Compose installation guide](https://gladysassistant.com/docs/installation/docker-compose/).
@@ -82,7 +82,7 @@ Once your environment is ready, dive into our [contributing guide](https://glady
 
 ### 3. AI-assisted development is welcome
 
-We use AI extensively to build Gladys ourselves, and we're very favorable to AI-assisted contributions. Read the [AI-assisted development section](.github/CONTRIBUTING.md#-ai-assisted-development) of our contributing guide, and point your agent to [`AGENTS.md`](AGENTS.md) — it contains everything needed to work on this codebase.
+We use AI extensively to build Gladys ourselves, and we're very favorable to AI-assisted contributions. Read the [AI-assisted development section](.github/CONTRIBUTING.md#-ai-assisted-development) of our contributing guide, and point your agent to [`AGENTS.md`](AGENTS.md): it contains everything needed to work on this codebase.
 
 ---
 

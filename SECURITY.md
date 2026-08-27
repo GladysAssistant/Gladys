@@ -1,15 +1,5 @@
 # Security Policy
 
-## Supported Versions
-
-| Version | Supported                                    |
-| ------- | -------------------------------------------- |
-| 5.x     | ✅ Actively supported                        |
-| 4.x     | ⚠️ Critical security fixes only              |
-| < 4.0   | ❌ No longer supported                       |
-
-We always recommend running the latest stable release of Gladys Assistant.
-
 ## Reporting a Vulnerability
 
 **Please do not report security vulnerabilities through public GitHub issues, forum posts, or pull requests.**
