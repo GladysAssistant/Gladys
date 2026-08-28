@@ -76,21 +76,30 @@ async function applyRename(gladys, gladysDevice, currentName, newName, newDispla
  */
 async function applyRenames(gladys, renames, gladysDevices) {
   const gladysDeviceByExternalId = new Map(gladysDevices.map((device) => [device.external_id, device]));
-  const renamedExternalIds = new Set(renames.map((rename) => rename.gladysDevice.external_id));
 
-  const applicableRenames = renames.filter((rename) => {
-    const destinationExternalId = `${EXTERNAL_ID_PREFIX}${rename.newName}`;
-    const occupant = gladysDeviceByExternalId.get(destinationExternalId);
-    if (occupant && occupant.id !== rename.gladysDevice.id && !renamedExternalIds.has(occupant.external_id)) {
-      logger.warn(
-        `Zigbee2mqtt: cannot rename "${rename.gladysDevice.external_id}" to "${destinationExternalId}":` +
-          ` another Gladys device ("${occupant.name}") already uses this external_id.` +
-          ` Delete the duplicated device to restore the link.`,
-      );
-      return false;
-    }
-    return true;
-  });
+  // A rename can only be applied if its destination external_id is free, or is freed by
+  // another rename that is itself applicable. Dropping one rename can therefore block the
+  // rename that was waiting on it (A -> B -> C where C is held by a device we don't rename),
+  // so the set is filtered again until it stops shrinking.
+  let applicableRenames = renames;
+  let previousCount = -1;
+  while (applicableRenames.length !== previousCount) {
+    previousCount = applicableRenames.length;
+    const freedExternalIds = new Set(applicableRenames.map((rename) => rename.gladysDevice.external_id));
+    applicableRenames = applicableRenames.filter((rename) => {
+      const destinationExternalId = `${EXTERNAL_ID_PREFIX}${rename.newName}`;
+      const occupant = gladysDeviceByExternalId.get(destinationExternalId);
+      if (occupant && occupant.id !== rename.gladysDevice.id && !freedExternalIds.has(occupant.external_id)) {
+        logger.warn(
+          `Zigbee2mqtt: cannot rename "${rename.gladysDevice.external_id}" to "${destinationExternalId}":` +
+            ` another Gladys device ("${occupant.name}") still uses this external_id and is not being renamed.` +
+            ` If it is a duplicate left by a previous rename, delete it to restore the link.`,
+        );
+        return false;
+      }
+      return true;
+    });
+  }
 
   const destinationExternalIds = new Set(applicableRenames.map((rename) => `${EXTERNAL_ID_PREFIX}${rename.newName}`));
 

@@ -348,6 +348,38 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
     assert.notCalled(gladys.device.create);
   });
 
+  it('should skip a whole rename chain blocked by a device not being renamed', async () => {
+    // a -> b -> c, but "c" is still owned by a device removed from the Zigbee network:
+    // renaming a -> b would free nothing and fail on the unique constraint.
+    const deviceA = buildGladysDevice();
+    deviceA.id = 'device-a';
+    deviceA.name = 'a';
+    deviceA.external_id = 'zigbee2mqtt:a';
+    deviceA.features = [];
+    deviceA.params = [{ id: 'param-a', name: 'IEEE_ADDRESS', value: '0xaaa', device_id: 'device-a' }];
+    const deviceB = buildGladysDevice();
+    deviceB.id = 'device-b';
+    deviceB.name = 'b';
+    deviceB.external_id = 'zigbee2mqtt:b';
+    deviceB.features = [];
+    deviceB.params = [{ id: 'param-b', name: 'IEEE_ADDRESS', value: '0xbbb', device_id: 'device-b' }];
+    // Removed from Zigbee2mqtt, but still in Gladys and still owning "c"
+    const removedDevice = buildGladysDevice();
+    removedDevice.id = 'device-removed';
+    removedDevice.name = 'c';
+    removedDevice.external_id = 'zigbee2mqtt:c';
+    removedDevice.features = [];
+    removedDevice.params = [{ id: 'param-removed', name: 'IEEE_ADDRESS', value: '0xddd' }];
+    gladys.device.get = fake.resolves([deviceA, deviceB, removedDevice]);
+    // EXECUTE
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'b', ieee_address: '0xaaa', type: 'Router' },
+      { friendly_name: 'c', ieee_address: '0xbbb', type: 'Router' },
+    ]);
+    // ASSERT: b -> c is blocked, so a -> b is dropped too instead of failing on the constraint
+    assert.notCalled(gladys.device.create);
+  });
+
   it('should continue with other devices when one rename fails', async () => {
     const firstDevice = buildGladysDevice();
     const secondDevice = buildGladysDevice();
