@@ -112,7 +112,7 @@ class MapComponent extends Component {
         this.areaMarkers[area.id] = leaflet.featureGroup([areaCircle, areaHandle]).addTo(this.leafletMap);
         this.markerArray.push(this.areaMarkers[area.id]);
 
-        areaHandle.bindTooltip(area.name).openTooltip();
+        areaHandle.bindTooltip(area.name, { permanent: true });
 
         this.areaMarkers[area.id].on('click', () => {
           route(`/dashboard/maps/area/edit/${area.selector}`);
