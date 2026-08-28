@@ -5,6 +5,7 @@
     "new": "New",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
+    "orderDirLabel": "Sort order",
     "emptySelectOption": "---------",
     "backButton": "◀️️ Back",
     "requiredField": "*",
