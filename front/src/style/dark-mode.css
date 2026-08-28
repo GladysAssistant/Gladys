@@ -34,6 +34,13 @@ body.dark-mode {
   filter: brightness(0.8) contrast(1.2) invert(0.9) hue-rotate(180deg);
 }
 
+/* MapLibre paints the basemap to a canvas, which the media double-invert
+   above does not cover: invert it back so the real Dark Matter style shows.
+   Only this canvas — charts and other canvases must invert with the page. */
+.dark-mode .maplibregl-canvas {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
 /* Fix icons appearance */
 .dark-mode .fe {
   filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */

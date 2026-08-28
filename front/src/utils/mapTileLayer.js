@@ -1,58 +1,67 @@
-import leaflet from 'leaflet';
-
 import 'maplibre-gl/dist/maplibre-gl.css';
+// MapLibre resolves its web worker next to its own module URL, which no
+// longer exists once Vite has bundled it: let Vite bundle the worker as its
+// own asset and give MapLibre the resulting URL (see setWorkerUrl below).
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
 // OpenFreeMap (https://openfreemap.org) hosts the open Positron/Dark Matter
 // styles previously served by CARTO, without any API key, and documents how
 // to self-host the full tile stack.
 const OPENFREEMAP_STYLE_BASE_URL = 'https://tiles.openfreemap.org/styles';
 
-const VECTOR_ATTRIBUTION =
+const ATTRIBUTION =
   '<a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>';
 
-const RASTER_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>';
-
-const isWebGLAvailable = () => {
+/**
+ * @description Check that WebGL2 is available: MapLibre GL v6 dropped WebGL1
+ * support, so a WebGL1-only browser cannot render the vector basemap.
+ * @returns {boolean} True when a WebGL2 context can be created.
+ * @example
+ * const supported = isWebGL2Available();
+ */
+const isWebGL2Available = () => {
   try {
     const canvas = document.createElement('canvas');
-    return !!(window.WebGLRenderingContext && (canvas.getContext('webgl2') || canvas.getContext('webgl')));
+    return !!(window.WebGL2RenderingContext && canvas.getContext('webgl2'));
   } catch (e) {
     return false;
   }
 };
 
-const addRasterTileLayer = leafletMap => {
-  return leaflet
-    .tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: RASTER_ATTRIBUTION,
-      maxZoom: 19
-    })
-    .addTo(leafletMap);
-};
-
-// Adds the Gladys basemap to a Leaflet map: OpenFreeMap vector tiles
-// (positron in light mode, dark in dark mode), or raster OpenStreetMap
-// tiles when WebGL is not available. MapLibre GL is loaded on demand so
-// it stays out of the main bundle.
+/**
+ * @description Add the Gladys basemap to a Leaflet map: OpenFreeMap vector
+ * tiles (positron in light mode, dark in dark mode) rendered by MapLibre GL,
+ * loaded on demand so it stays out of the main bundle. Without WebGL2, or if
+ * MapLibre cannot be loaded, no tile layer is added: the map keeps Leaflet's
+ * neutral background (which follows the dark-mode page filter) and markers,
+ * areas and click handlers keep working. Raster tiles are deliberately not
+ * used as a fallback: there is no key-free provider whose usage policy allows
+ * being the default of a distributed app (https://operations.osmfoundation.org/policies/tiles/).
+ * @param {object} leafletMap - The Leaflet map to add the tile layer to.
+ * @param {boolean} isDarkMode - Whether the dark mode is currently active.
+ * @returns {Promise} Resolving with the added layer, or null if none was added.
+ * @example
+ * await addMapTileLayer(leafletMap, this.props.darkMode);
+ */
 const addMapTileLayer = async (leafletMap, isDarkMode) => {
-  if (isWebGLAvailable()) {
-    try {
-      const { maplibreGL } = await import('@maplibre/maplibre-gl-leaflet');
-      return maplibreGL({
-        style: `${OPENFREEMAP_STYLE_BASE_URL}/${isDarkMode ? 'dark' : 'positron'}`,
-        attribution: VECTOR_ATTRIBUTION,
-        maxZoom: 19
-      }).addTo(leafletMap);
-    } catch (e) {
-      // The MapLibre module failed to load, or the map was removed while it
-      // was loading: fall back to raster tiles below.
-    }
+  if (!isWebGL2Available()) {
+    return null;
   }
   try {
-    return addRasterTileLayer(leafletMap);
+    const [{ maplibreGL }, { setWorkerUrl }] = await Promise.all([
+      import('@maplibre/maplibre-gl-leaflet'),
+      import('maplibre-gl')
+    ]);
+    setWorkerUrl(maplibreWorkerUrl);
+    return maplibreGL({
+      style: `${OPENFREEMAP_STYLE_BASE_URL}/${isDarkMode ? 'dark' : 'positron'}`,
+      attribution: ATTRIBUTION,
+      maxZoom: 19
+    }).addTo(leafletMap);
   } catch (e) {
-    // The map was removed while the tile layer was being added.
+    // The MapLibre module failed to load (offline, stale service worker...),
+    // or the map was removed while it was loading.
+    console.error('Unable to add the MapLibre GL basemap to the map', e);
     return null;
   }
 };
