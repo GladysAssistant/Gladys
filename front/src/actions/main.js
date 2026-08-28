@@ -4,6 +4,7 @@ import createActionsExternalIntegrationUpdates from './externalIntegrationUpdate
 import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
 import get from 'get-value';
+import config from '../config';
 import { isUrlInArray } from '../utils/url';
 
 const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
@@ -13,8 +14,12 @@ const MAX_TRIAL_DAYS_DISPLAYED = 92;
 // Every focus-triggered refresh costs the gateway two Stripe calls: a user
 // hopping between tabs must not pay for them over and over.
 const GATEWAY_TRIAL_REFRESH_INTERVAL_MS = 30 * 1000;
+// The instance version changes at most a few times a day (Watchtower): one
+// call a minute on tab focus is enough to notice an update happened.
+const INSTANCE_VERSION_REFRESH_INTERVAL_MS = 60 * 1000;
 
 let lastGatewayTrialRefresh = 0;
+let lastInstanceVersionRefresh = 0;
 
 const OPEN_PAGES = [
   '/signup',
@@ -93,6 +98,8 @@ function createActions(store) {
         // every page: it is loaded once the user (and their role) is known,
         // without blocking the rest of the session check
         actionsExternalIntegrationUpdates.refreshExternalIntegrationsToUpdate(state, user);
+        // same fire-and-forget for the instance version behind Gladys Plus
+        actions.refreshInstanceVersionState(state);
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
           const now = new Date();
@@ -183,6 +190,32 @@ function createActions(store) {
         gatewayTrialHasPaymentMethod: hasPaymentMethod,
         gatewayTrialStripePortalKey: stripePortalKey
       });
+    },
+    // On Gladys Plus the front redeploys at release time while the local
+    // instance waits for Watchtower (up to ~24h): the instance version is
+    // loaded so the header can announce the mismatch (InstanceUpdateNotice)
+    // instead of letting it surface as random bugs. Called at session check,
+    // and again when the tab regains focus while the notice is displayed —
+    // the moment Watchtower may just have resolved it.
+    async refreshInstanceVersionState(state) {
+      // served locally, the front comes from the instance itself: the
+      // versions cannot diverge. The demo has no real instance at all.
+      if (!config.gatewayMode || config.demoMode) {
+        return;
+      }
+      if (Date.now() - lastInstanceVersionRefresh < INSTANCE_VERSION_REFRESH_INTERVAL_MS) {
+        return;
+      }
+      lastInstanceVersionRefresh = Date.now();
+      try {
+        const systemInfos = await state.httpClient.get('/api/v1/system/info');
+        store.setState({
+          instanceGladysVersion: systemInfos.gladys_version || null
+        });
+      } catch (e) {
+        // instance unreachable: better no notice than a wrong one
+        console.error(e);
+      }
     },
     async logout(state, e) {
       e.preventDefault();

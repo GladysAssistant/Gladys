@@ -6309,6 +6309,10 @@
       "other": "Gladys-Plus-Testphase: noch {{count}} Tage"
     },
     "trialAddPaymentMethod": "Zahlungsmethode hinzufügen",
+    "instanceUpdateNoticeTitle": "Update verfügbar",
+    "instanceUpdateNoticeText": "Gladys Plus wurde auf {{latestVersion}} aktualisiert, deine Instanz ist aber noch auf {{instanceVersion}}. Einige Funktionen können fehlerhaft sein, bis deine Instanz aktualisiert ist.",
+    "instanceUpdateNoticeButton": "Meine Instanz aktualisieren",
+    "instanceUpdateNoticeDismiss": "Diese Meldung ausblenden",
     "needHelp": "Hilfe benötigt",
     "signOut": "Abmelden"
   },

@@ -144,6 +144,69 @@
   color: #3d6df0;
 }
 
+/* Version mismatch notice: the hosted Gladys Plus front updates at release
+   time while the local instance waits for Watchtower (up to ~24h) — during
+   that window the mismatch is announced here instead of surfacing as random
+   bugs. Same visual family as the trial card above. */
+.updateNoticeCard {
+  position: relative;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+  background-color: rgba(245, 166, 35, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #1c2334;
+}
+
+.updateNoticeTitle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-weight: 600;
+  /* keep clear of the dismiss cross */
+  padding-right: 1.1rem;
+}
+
+.updateNoticeIcon {
+  color: #c4762a;
+  margin-top: 1px;
+}
+
+.updateNoticeText {
+  margin-left: 1.35rem;
+}
+
+.updateNoticeCta {
+  margin-left: 1.35rem;
+  font-weight: 600;
+  color: #3d6df0;
+}
+
+.updateNoticeCta:hover {
+  color: #3d6df0;
+}
+
+.updateNoticeDismiss {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.35rem;
+  border: 0;
+  background: none;
+  padding: 0.1rem;
+  line-height: 1;
+  color: #1c2334;
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.updateNoticeDismiss:hover {
+  opacity: 1;
+}
+
 /* Footer: profile row opening a dropup menu, dark-mode toggle beside it */
 .sidebarFooter {
   position: relative;

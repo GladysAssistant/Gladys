@@ -6309,6 +6309,10 @@
       "other": "Essai Gladys Plus : {{count}} jours restants"
     },
     "trialAddPaymentMethod": "Ajouter un moyen de paiement",
+    "instanceUpdateNoticeTitle": "Mise à jour disponible",
+    "instanceUpdateNoticeText": "Gladys Plus a été mis à jour en {{latestVersion}}, mais votre instance est encore en {{instanceVersion}}. Certaines fonctionnalités peuvent mal fonctionner tant que votre instance n'est pas à jour.",
+    "instanceUpdateNoticeButton": "Mettre à jour mon instance",
+    "instanceUpdateNoticeDismiss": "Masquer ce message",
     "needHelp": "Besoin d'aide",
     "signOut": "Déconnexion"
   },

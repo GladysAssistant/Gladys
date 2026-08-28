@@ -7,6 +7,8 @@ import { isUrlInArray } from '../../utils/url';
 import { USER_ROLE } from '../../../../server/utils/constants';
 import DarkModeToggle from '../darkmode/DarkModeToggle';
 import GatewayTrialIndicator from './GatewayTrialIndicator';
+import InstanceUpdateNotice from './InstanceUpdateNotice';
+import { isInstanceBehindFront } from '../../utils/instanceVersion';
 import style from './style.css';
 
 const PAGES_WITHOUT_HEADER = [
@@ -231,6 +233,13 @@ class Header extends Component {
               </li>
             ))}
           </ul>
+          {isInstanceBehindFront(props.instanceGladysVersion) && (
+            <InstanceUpdateNotice
+              instanceVersion={props.instanceGladysVersion}
+              user={props.user}
+              refreshInstanceVersionState={props.refreshInstanceVersionState}
+            />
+          )}
           {Number.isInteger(props.gatewayTrialDaysLeft) && (
             <GatewayTrialIndicator
               daysLeft={props.gatewayTrialDaysLeft}
