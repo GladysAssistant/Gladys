@@ -1,6 +1,6 @@
 {
   "name": "gladys",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "A privacy-first, open-source home assistant",
   "main": "index.js",
   "engines": {
