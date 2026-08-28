@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const logger = require('../../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { DEVICE_PARAMS } = require('./constants');
 
 const EXTERNAL_ID_PREFIX = 'zigbee2mqtt:';
@@ -276,6 +277,7 @@ async function syncRenamedDevices(z2mDevices) {
   }
 
   this.syncRenamedDevicesRunning = true;
+  let queuedInventoryReconciled = false;
   try {
     let devicesToSync = z2mDevices;
     let retried = false;
@@ -286,6 +288,7 @@ async function syncRenamedDevices(z2mDevices) {
       this.pendingSyncRenamedDevices = null;
       if (pendingDevices) {
         devicesToSync = pendingDevices;
+        queuedInventoryReconciled = true;
         retried = false;
       } else if (someRenamesFailed && !retried) {
         // A rename that failed after its device was staged leaves it on its temporary
@@ -300,6 +303,16 @@ async function syncRenamedDevices(z2mDevices) {
     }
   } finally {
     this.syncRenamedDevicesRunning = false;
+  }
+
+  if (queuedInventoryReconciled) {
+    // The message carrying that inventory published the discovered devices right after its
+    // (queued) call returned, so that list was built before this reconciliation: publish it
+    // again now, otherwise the discovery page keeps showing renamed devices as new ones.
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
+      payload: this.getDiscoveredDevices(),
+    });
   }
 }
 

@@ -3,6 +3,8 @@ const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -47,6 +49,9 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
             return func();
           };
         },
+      },
+      event: {
+        emit: fake.returns(null),
       },
       device: {
         get: fake.resolves([]),
@@ -357,6 +362,23 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
     expect(gladys.device.create.secondCall.args[0].external_id).to.equal('zigbee2mqtt:newer-name');
     expect(zigbee2mqttManager.syncRenamedDevicesRunning).to.equal(false);
     expect(zigbee2mqttManager.pendingSyncRenamedDevices).to.equal(null);
+    // handleMqttMessage published the device list right after the queued call returned,
+    // i.e. before this reconciliation: the list is published again with the new names
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
+      payload: [],
+    });
+  });
+
+  it('should not republish the device list when no inventory was queued', async () => {
+    const gladysDevice = buildGladysDevice();
+    gladys.device.get = fake.resolves([gladysDevice]);
+    // EXECUTE
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'new-name', ieee_address: '0x00158d00045b2740', type: 'Router' },
+    ]);
+    // ASSERT: handleMqttMessage already published an up-to-date list in that case
+    assert.notCalled(gladys.event.emit);
   });
 
   it('should handle a name swap between two devices without unique constraint conflict', async () => {
