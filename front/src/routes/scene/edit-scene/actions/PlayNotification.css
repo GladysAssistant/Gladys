@@ -1,0 +1,95 @@
+/* The Horizon volume control. The editor paints every .form-control as a rounded
+   white field on the glass, which turned the slider into a boxed field and the
+   read-only value into a second full-width box: the volume now reads as a value
+   pill on the label line, over a soft rounded track.
+   Light colors only: dark mode comes from the app-wide inversion filter, which
+   leaves range inputs alone (style/dark-mode.css). */
+
+.volumeLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.volumeValue {
+  background-color: rgba(28, 35, 52, 0.07);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gl-ink, #1c2334);
+}
+
+/* The slider is not a field: it drops the .form-control box and becomes a track
+   of its own. The accent fill is a gradient stop driven by --volume-fill, set
+   inline from the current value (custom properties reach the pseudo-elements). */
+.volumeRange {
+  display: block;
+  width: 100%;
+  height: 1.5rem;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  --volume-track: linear-gradient(
+    to right,
+    var(--gl-accent, #3d6df0) 0%,
+    var(--gl-accent, #3d6df0) var(--volume-fill, 50%),
+    rgba(28, 35, 52, 0.09) var(--volume-fill, 50%),
+    rgba(28, 35, 52, 0.09) 100%
+  );
+}
+
+.volumeRange:focus {
+  outline: none;
+}
+
+/* Chrome, Safari, Edge */
+.volumeRange::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--volume-track);
+  box-shadow: inset 0 1px 3px rgba(28, 35, 52, 0.12);
+}
+
+.volumeRange::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+  /* centers the thumb on the 8px track */
+  margin-top: -6px;
+  border: none;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.3);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.volumeRange:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.3), 0 0 0 3px rgba(61, 109, 240, 0.4);
+}
+
+/* Firefox */
+.volumeRange::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--volume-track);
+  box-shadow: inset 0 1px 3px rgba(28, 35, 52, 0.12);
+}
+
+.volumeRange::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.3);
+}
+
+.volumeRange:focus-visible::-moz-range-thumb {
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.3), 0 0 0 3px rgba(61, 109, 240, 0.4);
+}
