@@ -1503,6 +1503,10 @@
     "free-mobile": {
       "title": "Free Mobile",
       "description": "Envoyer des sms depuis Gladys grâce à Free Mobile.",
+      "deprecatedWarning": {
+        "title": "Intégration bientôt dépréciée",
+        "description": "Cette intégration native sera supprimée dans une prochaine version de Gladys. Elle est remplacée par l'intégration communautaire <b>Free Mobile SMS</b>, qui offre les mêmes fonctionnalités et continuera d'être maintenue. Rendez-vous dans le <a href=\"/dashboard/integration/notifications\">catalogue des intégrations</a> pour l'installer, puis renseignez vos identifiants Free Mobile dans le bloc <b>Mon compte</b> de l'onglet <b>Configuration</b> de cette intégration — chaque utilisateur Gladys saisit les siens. Dans vos scènes, l'action <b>Envoyer un sms</b> continue d'utiliser cette intégration native : remplacez-la par une action <b>Envoyer un message</b> ciblant le canal Free Mobile SMS et l'utilisateur Gladys dont le compte est configuré."
+      },
       "documentation": "Documentation Free Mobile",
       "introduction": "Ce plugin vous permet d'envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
       "username": "Identifiant client Free Mobile",
@@ -3314,6 +3318,8 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       },
       "smsSend": {
+        "deprecatedTitle": "Action bientôt dépréciée",
+        "deprecatedDescription": "Cette action utilise l'intégration native Free Mobile, qui sera supprimée dans une prochaine version de Gladys. Installez l'intégration communautaire <b>Free Mobile SMS</b>, renseignez vos identifiants Free Mobile dans le bloc <b>Mon compte</b> de l'onglet <b>Configuration</b> de cette intégration, puis remplacez cette action par une action <b>Envoyer un message</b> ciblant le canal Free Mobile SMS et l'utilisateur Gladys dont le compte est configuré.",
         "textLabel": "Message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
         "messagePlaceholder": "Mon message"
@@ -3992,6 +3998,7 @@
     },
     "searchActionsPlaceholder": "Rechercher une action…",
     "searchTriggersPlaceholder": "Rechercher un déclencheur…",
+    "deprecatedActionBadge": "Bientôt dépréciée",
     "noResultsFound": "Aucun résultat",
     "whenSectionTitle": "Quand",
     "whenSectionSubtitle": "la scène démarre dès qu'un seul de ces événements se produit",

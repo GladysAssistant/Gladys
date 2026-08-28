@@ -21,6 +21,12 @@ const FreeMobilePage = ({ children, ...props }) => (
       </DeviceConfigurationLink>
     }
   >
+    <div class="alert alert-warning mb-4">
+      <h4 class="alert-title">
+        <Text id="integration.free-mobile.deprecatedWarning.title" />
+      </h4>
+      <MarkupText id="integration.free-mobile.deprecatedWarning.description" />
+    </div>
     <div class="card">
       <div class="card-body">
         <div

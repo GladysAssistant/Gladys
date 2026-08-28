@@ -40,6 +40,10 @@ export const ACTION_ICON = {
   [ACTIONS.TIME.GET_DATE]: 'fe fe-clock'
 };
 
+// Action types on their way out. They stay in the picker because existing scenes
+// still use them, but they carry a "soon deprecated" badge.
+export const DEPRECATED_ACTIONS = [ACTIONS.SMS.SEND];
+
 // Icons used for each trigger type, in the picker and in the trigger card headers
 export const TRIGGER_ICON = {
   [EVENTS.DEVICE.NEW_STATE]: 'fe fe-activity',
