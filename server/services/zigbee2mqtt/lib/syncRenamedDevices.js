@@ -90,7 +90,7 @@ async function applyRename(gladys, gladysDevice, currentName, newName, newDispla
  * @param {object} gladys - Gladys instance.
  * @param {Array} renames - Planned renames ({ gladysDevice, currentName, newName, ieeeAddress }).
  * @param {Array} gladysDevices - All Gladys devices of the service.
- * @returns {Promise} Resolve when all renames are applied.
+ * @returns {Promise<boolean>} Resolve with true if at least one rename could not be applied.
  * @example
  * applyRenames(gladys, renames, gladysDevices);
  */
@@ -144,6 +144,7 @@ async function applyRenames(gladys, renames, gladysDevices) {
   });
 
   // Phase 2: apply the final names.
+  let failedRenames = 0;
   await Promise.each(applicableRenames, async (rename) => {
     try {
       const { gladysDevice, currentName, newName } = rename;
@@ -158,9 +159,12 @@ async function applyRenames(gladys, renames, gladysDevices) {
         });
       }
     } catch (e) {
+      failedRenames += 1;
       logger.warn(`Zigbee2mqtt: unable to sync device "${rename.gladysDevice.external_id}" after rename: ${e}`);
     }
   });
+
+  return failedRenames > 0;
 }
 
 /**
@@ -168,7 +172,7 @@ async function applyRenames(gladys, renames, gladysDevices) {
  * address where it is missing, then plan and apply the renames it implies.
  * @param {object} manager - Zigbee2mqtt manager.
  * @param {Array} z2mDevices - Devices published by Zigbee2mqtt on the bridge/devices topic.
- * @returns {Promise} Resolve when devices are synchronized.
+ * @returns {Promise<boolean>} Resolve with true if at least one rename could not be applied.
  * @example
  * reconcileDevices(zigbee2mqttManager, devices);
  */
@@ -238,11 +242,12 @@ async function reconcileDevices(manager, z2mDevices) {
     });
 
     if (renames.length > 0) {
-      await applyRenames(self.gladys, renames, gladysDevices);
+      return applyRenames(self.gladys, renames, gladysDevices);
     }
   } catch (e) {
     logger.warn(`Zigbee2mqtt: unable to sync renamed devices: ${e}`);
   }
+  return false;
 }
 
 /**
@@ -273,11 +278,25 @@ async function syncRenamedDevices(z2mDevices) {
   this.syncRenamedDevicesRunning = true;
   try {
     let devicesToSync = z2mDevices;
+    let retried = false;
     while (devicesToSync) {
       // eslint-disable-next-line no-await-in-loop
-      await reconcileDevices(this, devicesToSync);
-      devicesToSync = this.pendingSyncRenamedDevices;
+      const someRenamesFailed = await reconcileDevices(this, devicesToSync);
+      const pendingDevices = this.pendingSyncRenamedDevices;
       this.pendingSyncRenamedDevices = null;
+      if (pendingDevices) {
+        devicesToSync = pendingDevices;
+        retried = false;
+      } else if (someRenamesFailed && !retried) {
+        // A rename that failed after its device was staged leaves it on its temporary
+        // external_id, where no MQTT state resolves. Reconciling the same inventory once
+        // more picks it up by IEEE address, and the name it was waiting for is usually
+        // free by then. Only once: a failure that persists is logged, not looped on.
+        logger.info('Zigbee2mqtt: some renames failed, running the reconciliation once more');
+        retried = true;
+      } else {
+        devicesToSync = null;
+      }
     }
   } finally {
     this.syncRenamedDevicesRunning = false;

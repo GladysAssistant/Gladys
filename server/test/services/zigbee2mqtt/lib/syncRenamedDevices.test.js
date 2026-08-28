@@ -417,6 +417,54 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
     expect(finalByDeviceId['device-b'].external_id).to.equal('zigbee2mqtt:kitchen');
   });
 
+  // Emulates the DB across several reconciliation passes: device.get returns the current
+  // rows, and device.create writes them while enforcing the unique constraint on external_id.
+  const buildFakeDb = (devices) => {
+    const rows = devices.map((device) => ({ ...device, features: device.features.map((f) => ({ ...f })) }));
+    return {
+      rows,
+      get: fake(async () => rows.map((row) => ({ ...row, features: row.features.map((f) => ({ ...f })) }))),
+      create: fake(async (device) => {
+        const conflict = rows.some((row) => row.id !== device.id && row.external_id === device.external_id);
+        if (conflict) {
+          throw new Error('SequelizeUniqueConstraintError');
+        }
+        const row = rows.find((r) => r.id === device.id);
+        row.external_id = device.external_id;
+        row.name = device.name;
+        row.features = device.features.map((f) => ({ ...f }));
+        return device;
+      }),
+    };
+  };
+
+  it('should not leave a device on its temporary id when a staging write fails', async () => {
+    const db = buildFakeDb(buildSwapDevices());
+    gladys.device.get = db.get;
+    // The second staging write (device-b) fails once: device-a is already staged, so its
+    // final rename hits the constraint and it would stay on zigbee2mqtt:__renaming__0xaaa.
+    let stagingFailed = false;
+    gladys.device.create = fake(async (device) => {
+      if (!stagingFailed && device.id === 'device-b' && device.external_id.includes('__renaming__')) {
+        stagingFailed = true;
+        throw new Error('DB error');
+      }
+      return db.create(device);
+    });
+    // EXECUTE
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'bedroom', ieee_address: '0xaaa', type: 'Router' },
+      { friendly_name: 'kitchen', ieee_address: '0xbbb', type: 'Router' },
+    ]);
+    // ASSERT: the retry pass picks device-a up by IEEE address and finishes the swap
+    const deviceA = db.rows.find((row) => row.id === 'device-a');
+    const deviceB = db.rows.find((row) => row.id === 'device-b');
+    expect(deviceA.external_id).to.equal('zigbee2mqtt:bedroom');
+    expect(deviceB.external_id).to.equal('zigbee2mqtt:kitchen');
+    expect(deviceA.features[0].external_id).to.equal('zigbee2mqtt:bedroom:switch:binary:state');
+    expect(deviceB.features[0].external_id).to.equal('zigbee2mqtt:kitchen:switch:binary:state');
+  });
+
   it('should skip a rename when the destination is owned by a device not being renamed', async () => {
     // A stale duplicate (created by the old rename behavior) already owns the new name
     const staleDuplicate = buildGladysDevice();
@@ -477,15 +525,24 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
     secondDevice.params = [{ id: 'param-id-2', name: 'IEEE_ADDRESS', value: '0xsecond', device_id: 'device-id-2' }];
     gladys.device.get = fake.resolves([firstDevice, secondDevice]);
     gladys.device.create = sinon.stub();
-    gladys.device.create.onFirstCall().rejects(new Error('SequelizeUniqueConstraintError'));
-    gladys.device.create.onSecondCall().resolves(null);
+    // The first device keeps failing, so the retry pass fails on it too
+    gladys.device.create
+      .withArgs(sinon.match({ id: 'device-id' }))
+      .rejects(new Error('SequelizeUniqueConstraintError'));
+    gladys.device.create.withArgs(sinon.match({ id: 'device-id-2' })).resolves(null);
     // EXECUTE
     await zigbee2mqttManager.syncRenamedDevices([
       { friendly_name: 'new-name', ieee_address: '0x00158d00045b2740', type: 'Router' },
       { friendly_name: 'other-new-name', ieee_address: '0xsecond', type: 'Router' },
     ]);
-    // ASSERT
-    expect(gladys.device.create.callCount).to.equal(2);
-    expect(gladys.device.create.secondCall.args[0].external_id).to.equal('zigbee2mqtt:other-new-name');
+    // ASSERT: the second device is renamed despite the first one failing, and the failure
+    // triggers exactly one extra reconciliation pass (never an endless retry loop)
+    const renamedExternalIds = gladys.device.create
+      .getCalls()
+      .map((call) => call.args[0])
+      .filter((device) => device.id === 'device-id-2')
+      .map((device) => device.external_id);
+    expect(renamedExternalIds).to.deep.equal(['zigbee2mqtt:other-new-name', 'zigbee2mqtt:other-new-name']);
+    expect(gladys.device.create.callCount).to.equal(4);
   });
 });
