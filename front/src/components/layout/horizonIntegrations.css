@@ -57,9 +57,10 @@
   color: var(--gl-ink);
 }
 
-/* Side menus (catalog categories, integration tabs): the Tabler
-   list-group-transparent becomes the nav rail's pill row family —
-   quiet rows, white active pill with the accent icon */
+/* The catalog's desktop category menu: the Tabler list-group-transparent
+   becomes the nav rail's pill row family — quiet rows, white active pill
+   with the accent icon. (The integration sub-pages' own menus are the
+   horizontal .hz-tabs bar below.) */
 .glass-theme .page .list-group-transparent .list-group-item {
   border-radius: 12px;
   padding: 0.55rem 0.75rem;
@@ -102,106 +103,163 @@
   background-color: #fff !important;
 }
 
-/* On phones the side menu must not cost half a screen of vertical space
-   before the content: the same list-group markup collapses into ONE
-   horizontally scrollable row of chips — the catalog's mobile category
-   grammar (frosted pills, solid ink active pill, partial overflow as the
-   scroll affordance). CSS-only, so the ~40 integration layouts convert at
-   once. On the catalog itself the desktop menu is display: none on mobile,
-   so these rules never double its own chips row. */
+/* ------------------------------------------------------------------
+   Integration sub-page menu: the horizontal tabs bar under the title.
+   The settings menu's grammar (frosted pills, solid ink active pill),
+   rendered by IntegrationSubPageLayout on the shared ChipsScroll: the
+   row scrolls sideways with the scrollbar hidden and an arrow button
+   on each side only while tabs remain past that edge — the old left
+   column cost a quarter of the content width next to the app's nav
+   rail. Global classes (this file is not a CSS module), scoped to
+   .glass-theme .page like the rest of the integration furniture.
+   ------------------------------------------------------------------ */
+.glass-theme .page .hz-tabs-wrapper {
+  --hz-tabs-btn: 2rem;
+
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.glass-theme .page .hz-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  /* the pills float on the scene with soft drop shadows: bleed the scroll
+     box symmetrically so the shadows aren't sheared at its edges, and give
+     the room back so the wrapper keeps the bare pill-row height (which also
+     keeps the absolute arrows centered on the pills) */
+  padding: 18px 4px;
+  margin: -18px -4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.glass-theme .page .hz-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Reveal a thin scrollbar on hover/focus for mouse users (e.g. Windows) */
+.glass-theme .page .hz-tabs:hover,
+.glass-theme .page .hz-tabs:focus-within {
+  scrollbar-width: thin;
+}
+
+.glass-theme .page .hz-tabs:hover::-webkit-scrollbar,
+.glass-theme .page .hz-tabs:focus-within::-webkit-scrollbar {
+  display: block;
+  height: 4px;
+}
+
+.glass-theme .page .hz-tabs:hover::-webkit-scrollbar-thumb,
+.glass-theme .page .hz-tabs:focus-within::-webkit-scrollbar-thumb {
+  background: rgba(28, 35, 52, 0.2);
+  border-radius: 4px;
+}
+
+.glass-theme .page .hz-tab-link {
+  display: inline-flex;
+  align-items: center;
+  /* shrinking the pills to fit would defeat the overflow the arrows expose */
+  flex-shrink: 0;
+  gap: 0.45rem;
+  height: 2.6rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.09);
+  color: #7c8396;
+  font-weight: 600;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.glass-theme .page .hz-tab-link .fe {
+  font-size: 1rem;
+}
+
+.glass-theme .page .hz-tab-link:hover {
+  background: rgba(255, 255, 255, 0.85);
+  color: #1c2334;
+  text-decoration: none;
+}
+
+.glass-theme .page .hz-tab-link.active,
+.glass-theme .page .hz-tab-link.active:hover {
+  background: #1c2334;
+  border-color: #1c2334;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+.glass-theme .page .hz-tabs-scroll-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--hz-tabs-btn);
+  height: var(--hz-tabs-btn);
+  padding: 0;
+  color: var(--gl-ink);
+  background: var(--gl-surface-strong);
+  border: 1px solid var(--gl-border);
+  border-radius: 50%;
+  box-shadow: var(--gl-shadow-soft);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 0.15s ease;
+}
+
+.glass-theme .page .hz-tabs-scroll-btn:hover {
+  color: var(--gl-accent);
+}
+
+.glass-theme .page .hz-tabs-scroll-btn-left {
+  left: 0;
+}
+
+.glass-theme .page .hz-tabs-scroll-btn-right {
+  right: 0;
+}
+
+/* keep the first/last pill clear of a visible overflow arrow (its width +
+   a small gap), so the padding follows the coarse-pointer size */
+.glass-theme .page .hz-tabs-wrapper:has(.hz-tabs-scroll-btn-left) .hz-tabs {
+  padding-left: calc(var(--hz-tabs-btn) + 0.5rem);
+}
+
+.glass-theme .page .hz-tabs-wrapper:has(.hz-tabs-scroll-btn-right) .hz-tabs {
+  padding-right: calc(var(--hz-tabs-btn) + 0.5rem);
+}
+
+@media (pointer: coarse) {
+  .glass-theme .page .hz-tab-link {
+    height: 2.75rem;
+  }
+
+  /* the overflow arrows are real tap targets (they render whenever the
+     row overflows, touch included): same floor as the pills */
+  .glass-theme .page .hz-tabs-wrapper {
+    --hz-tabs-btn: 2.75rem;
+  }
+}
+
+/* old wall tablets without backdrop-filter get opaque pills */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-theme .page .hz-tab-link {
+    background: rgba(255, 255, 255, 0.92);
+  }
+}
+
+/* On phones the catalog's category row (IntegrationMenuMobile) stays on the
+   sticky pseudo-element arrows: */
 @media (max-width: 991.98px) {
-  /* the integration titles carry mb-5 (sized for the desktop sidebar):
-     same 3rem it saves the chips row, it must not give back as a hole
-     between title and chips — !important to outweigh the utility */
-  .glass-theme .page .page-title {
-    margin-bottom: 1rem !important;
-  }
-
-  .glass-theme .page .list-group-transparent {
-    display: flex;
-    /* .list-group is a Bootstrap column flexbox: lay the chips on one row */
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 8px;
-    overflow-x: auto;
-    max-width: 100%;
-    padding: 2px 0 8px;
-    margin-bottom: 0.5rem;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .glass-theme .page .list-group-transparent::-webkit-scrollbar {
-    display: none;
-  }
-
-  .glass-theme .page .list-group-transparent .list-group-item {
-    flex: 0 0 auto;
-    /* the flex basis is the item's width: drop Tabler's full row width so
-       each chip hugs its label */
-    width: auto;
-    white-space: nowrap;
-    border-radius: 999px;
-    padding: 6px 14px;
-    margin-bottom: 0;
-    font-size: 0.8125rem;
-    color: var(--gl-muted);
-    background-color: var(--gl-card-bg);
-    border: 1px solid var(--gl-border);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-  }
-
-  /* the icon hugs its label inside the chip (the markup carries mr-3) */
-  .glass-theme .page .list-group-transparent .list-group-item .icon {
-    margin-right: 0.375rem !important;
-    font-size: 0.875rem;
-  }
-
-  .glass-theme .page .list-group-transparent .list-group-item.active {
-    background-color: var(--gl-ink);
-    border-color: transparent;
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
-  }
-
-  /* on the ink pill the icon goes white with its label (the desktop rule
-     puts the accent on it with the same weight, hence the !important) */
-  .glass-theme .page .list-group-transparent .list-group-item.active .icon {
-    color: #fff !important;
-  }
-
-  /* The desktop row rules above are not in a media query, and their :hover
-     carries one more pseudo-class than these chip rules (plus !important in
-     dark mode): without mobile counterparts, tapping a chip — coarse
-     pointers keep :hover after the tap — washed it to the quiet row tint,
-     and in dark mode washed the active ink pill too. Same weights, chip
-     colors. */
-  .glass-theme .page .list-group-transparent .list-group-item:hover,
-  .glass-theme .page .list-group-transparent .list-group-item:active {
-    background-color: var(--gl-card-bg);
-    color: var(--gl-muted);
-  }
-
-  .glass-theme .page .list-group-transparent .list-group-item.active:hover,
-  .glass-theme .page .list-group-transparent .list-group-item.active:active {
-    background-color: var(--gl-ink);
-    color: #fff;
-  }
-
-  /* same counter-weights as above, with the mobile chip colors */
-  .dark-mode .glass-theme .page .list-group-transparent .list-group-item,
-  .dark-mode .glass-theme .page .list-group-transparent .list-group-item:hover,
-  .dark-mode .glass-theme .page .list-group-transparent .list-group-item:active {
-    background-color: var(--gl-card-bg) !important;
-  }
-
-  .dark-mode .glass-theme .page .list-group-transparent .list-group-item.active,
-  .dark-mode .glass-theme .page .list-group-transparent .list-group-item.active:hover,
-  .dark-mode .glass-theme .page .list-group-transparent .list-group-item.active:active {
-    background-color: var(--gl-ink) !important;
-  }
-
   /* A row with chips beyond one of its edges wears a small arrow on that
      side — the partial chip alone does not say the menu continues, and once
      scrolled the user must also know they can come back. Each arrow is a
@@ -215,15 +273,12 @@
      the tap goes to the chip and not to the row underneath.
      The chevrons are inline SVGs in the theme ink: the dark-mode inversion
      filter derives their light variant. */
-  .glass-theme .page .list-group-transparent,
   .glass-theme .page .hz-chips-scroll {
     /* the gap these rows are laid out with, to cancel in the arrow margins */
     --hz-chips-gap: 8px;
     --hz-chips-arrow-size: 24px;
   }
 
-  .glass-theme .page .list-group-transparent::before,
-  .glass-theme .page .list-group-transparent::after,
   .glass-theme .page .hz-chips-scroll::before,
   .glass-theme .page .hz-chips-scroll::after {
     content: '';
@@ -247,23 +302,19 @@
     transition: opacity 0.15s ease;
   }
 
-  .glass-theme .page .list-group-transparent::before,
   .glass-theme .page .hz-chips-scroll::before {
     left: 0;
     margin-right: calc(-1 * (var(--hz-chips-arrow-size) + var(--hz-chips-gap)));
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c2334' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'/%3E%3C/svg%3E");
   }
 
-  .glass-theme .page .list-group-transparent::after,
   .glass-theme .page .hz-chips-scroll::after {
     right: 0;
     margin-left: calc(-1 * (var(--hz-chips-arrow-size) + var(--hz-chips-gap)));
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c2334' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'/%3E%3C/svg%3E");
   }
 
-  .glass-theme .page .list-group-transparent.hz-chips-overflow-left::before,
   .glass-theme .page .hz-chips-scroll.hz-chips-overflow-left::before,
-  .glass-theme .page .list-group-transparent.hz-chips-overflow-right::after,
   .glass-theme .page .hz-chips-scroll.hz-chips-overflow-right::after {
     opacity: 1;
   }

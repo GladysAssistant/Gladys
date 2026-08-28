@@ -35,6 +35,9 @@
     "loading": "Lädt...",
     "preview": "Vorschau"
   },
+  "errorBoundary": {
+    "message": "Beim Anzeigen ist ein Fehler aufgetreten. Lade die Seite neu und überprüfe die Konfiguration, falls es erneut auftritt."
+  },
   "color": {
     "aqua": "Aqua",
     "black": "Schwarz",
@@ -1693,6 +1696,12 @@
         "enableLabel": "Dienst aktivieren oder deaktivieren",
         "enableDescription": "Beim nächsten Neustart von Gladys wird der Dienst wieder gestartet. Abhängig von der Leistung Ihres Computers und der Geschwindigkeit Ihres Netzwerks kann das Starten dieses Dienstes im Modus \"Installation von Gladys aus\" zwischen 2 Minuten und 1 Stunde dauern. Sie können den Dienst dauerhaft von dieser Seite deaktivieren: <a href=\"/dashboard/settings/service\">Einstellungen > Dienste</a>.",
         "toggleError": "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Konfiguration des Dienstes.",
+        "mqttConnectionErrors": {
+          "BAD_CREDENTIALS": "Gladys konnte keine Verbindung zum MQTT-Broker herstellen: Der Benutzername oder das Passwort ist falsch. Überprüfen Sie die Zugangsdaten Ihres MQTT-Brokers und speichern Sie die Konfiguration erneut.",
+          "NOT_AUTHORIZED": "Der MQTT-Broker hat die Verbindung abgelehnt: nicht autorisiert. Überprüfen Sie den Benutzernamen und das Passwort Ihres MQTT-Brokers sowie die Zugriffsrechte dieses Clients und speichern Sie die Konfiguration erneut.",
+          "BROKER_UNREACHABLE": "Gladys konnte den MQTT-Broker nicht erreichen. Überprüfen Sie, ob die URL und der Port des Brokers korrekt sind und ob der Broker läuft und von Gladys aus erreichbar ist.",
+          "unknownErrorPrefix": "MQTT-Verbindungsfehler: "
+        },
         "serviceStatus": "Dienststatus",
         "description": "Dieser Dienst verwendet zwei Docker-Container (MQTT-Broker und Zigbee2mqtt). Aktivieren Sie Zigbee2mqtt, um diese Container bereitzustellen. Weitere Informationen finden Sie auf der Zigbee2mqtt-Dokumentationsseite.",
         "nonDockerEnv": "Gladys wird derzeit nicht in Docker ausgeführt. Es ist unmöglich, Zigbee2mqtt von Gladys aus zu aktivieren.",
@@ -3235,6 +3244,8 @@
       "registeredLabel": "Registriert am:"
     },
     "backToIntegrations": "Zurück zu den Integrationen",
+    "menuScrollLeft": "Menü nach links scrollen",
+    "menuScrollRight": "Menü nach rechts scrollen",
     "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden."
   },
   "editScene": {
@@ -4074,7 +4085,9 @@
     "billingTab": "Abrechnung",
     "gatewayUsersTab": "Plus-Benutzer",
     "gatewayOpenApiTab": "Open API",
-    "jobsTab": "Aufgaben"
+    "jobsTab": "Aufgaben",
+    "scrollLeft": "Menü nach links scrollen",
+    "scrollRight": "Menü nach rechts scrollen"
   },
   "housesSettings": {
     "title": "Zuhause",
@@ -6312,6 +6325,10 @@
       "other": "Gladys-Plus-Testphase: noch {{count}} Tage"
     },
     "trialAddPaymentMethod": "Zahlungsmethode hinzufügen",
+    "instanceUpdateNoticeTitle": "Update verfügbar",
+    "instanceUpdateNoticeText": "Gladys Plus wurde auf {{latestVersion}} aktualisiert, deine Instanz ist aber noch auf {{instanceVersion}}. Einige Funktionen können fehlerhaft sein, bis deine Instanz aktualisiert ist.",
+    "instanceUpdateNoticeButton": "Meine Instanz aktualisieren",
+    "instanceUpdateNoticeDismiss": "Diese Meldung ausblenden",
     "needHelp": "Hilfe benötigt",
     "signOut": "Abmelden"
   },

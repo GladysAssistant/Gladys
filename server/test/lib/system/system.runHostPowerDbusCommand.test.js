@@ -65,7 +65,44 @@ describe('system.runHostPowerDbusCommand (docker-helper)', () => {
     expect(options.Image).to.equal('gladysassistant/gladys:v4');
     expect(options.Cmd).to.include('org.freedesktop.login1.Manager.Reboot');
     expect(options.HostConfig.Binds).to.deep.equal(['/run/dbus:/run/dbus:ro']);
+    // The docker-default AppArmor profile has no dbus rules, so the helper must
+    // run unconfined to reach systemd-logind on AppArmor-mediated hosts.
+    expect(options.HostConfig.SecurityOpt).to.deep.equal(['apparmor=unconfined']);
     sinon.assert.calledOnce(container.remove);
+  });
+
+  it('should retry without the AppArmor security option when the daemon rejects it', async () => {
+    const container = buildContainer(0, 'method return\n   string "yes"\n');
+    const self = buildSelf(container);
+    self.dockerode.createContainer = sinon
+      .stub()
+      .onFirstCall()
+      .rejects(new Error('invalid --security-opt: "apparmor=unconfined"'))
+      .onSecondCall()
+      .resolves(container);
+    const output = await runHostPowerDbusCommand.call(self, 'CanReboot', 'docker-helper');
+    expect(output).to.contain('yes');
+    sinon.assert.calledTwice(self.dockerode.createContainer);
+    const firstOptions = self.dockerode.createContainer.firstCall.args[0];
+    expect(firstOptions.HostConfig.SecurityOpt).to.deep.equal(['apparmor=unconfined']);
+    const secondOptions = self.dockerode.createContainer.secondCall.args[0];
+    expect(secondOptions.HostConfig).to.not.have.property('SecurityOpt');
+    sinon.assert.calledOnce(container.remove);
+  });
+
+  it('should not retry when the helper container creation fails for an unrelated reason', async () => {
+    const container = buildContainer(0, '');
+    const self = buildSelf(container);
+    self.dockerode.createContainer = sinon.stub().rejects(new Error('No such image: gladysassistant/gladys:v4'));
+    let caught;
+    try {
+      await runHostPowerDbusCommand.call(self, 'CanReboot', 'docker-helper');
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).to.be.an('error');
+    expect(caught.message).to.contain('No such image');
+    sinon.assert.calledOnce(self.dockerode.createContainer);
   });
 
   it('should throw when the helper container exits with a non-zero status', async () => {

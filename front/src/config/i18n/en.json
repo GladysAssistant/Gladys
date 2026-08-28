@@ -35,6 +35,9 @@
     "loading": "Loading...",
     "preview": "Preview"
   },
+  "errorBoundary": {
+    "message": "Something went wrong while displaying this. Reload the page, and check the configuration if it happens again."
+  },
   "color": {
     "aqua": "Aqua",
     "black": "Black",
@@ -1588,6 +1591,12 @@
         "enableLabel": "Enable or disable the service",
         "enableDescription": "At the next restart of Gladys, the service will start again. Depending on the power of your machine and the speed of your network, starting this service in \"Installation from Gladys\" mode can take between 2 minutes and 1 hour. It is possible to permanently disable the service from this page: <a href=\"/dashboard/settings/service\">Settings > Services</a>.",
         "toggleError": "An error occurred. Please check the service configuration.",
+        "mqttConnectionErrors": {
+          "BAD_CREDENTIALS": "Gladys could not connect to the MQTT broker: the username or the password is incorrect. Check the credentials of your MQTT broker, then save the configuration again.",
+          "NOT_AUTHORIZED": "The MQTT broker refused the connection: not authorized. Check the username and password of your MQTT broker, and that this client is allowed to connect, then save the configuration again.",
+          "BROKER_UNREACHABLE": "Gladys could not reach the MQTT broker. Check that the broker URL and port are correct, and that the broker is running and reachable from Gladys.",
+          "unknownErrorPrefix": "MQTT connection error: "
+        },
         "serviceStatus": "Service Status",
         "description": "This service uses two Docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt to deploy these containers. For more information, visit the Zigbee2mqtt documentation page.",
         "nonDockerEnv": "Gladys is currently not running in Docker, it is impossible to enable Zigbee2mqtt from Gladys.",
@@ -3235,6 +3244,8 @@
       "registeredLabel": "Registered on:"
     },
     "backToIntegrations": "Back to integrations",
+    "menuScrollLeft": "Scroll menu left",
+    "menuScrollRight": "Scroll menu right",
     "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now."
   },
   "editScene": {
@@ -4074,7 +4085,9 @@
     "billingTab": "Billing",
     "gatewayUsersTab": "Plus Users",
     "gatewayOpenApiTab": "Open API",
-    "jobsTab": "Tasks"
+    "jobsTab": "Tasks",
+    "scrollLeft": "Scroll menu left",
+    "scrollRight": "Scroll menu right"
   },
   "housesSettings": {
     "title": "Houses",
@@ -6312,6 +6325,10 @@
       "other": "Gladys Plus trial: {{count}} days left"
     },
     "trialAddPaymentMethod": "Add a payment method",
+    "instanceUpdateNoticeTitle": "Update available",
+    "instanceUpdateNoticeText": "Gladys Plus has been updated to {{latestVersion}}, but your instance is still on {{instanceVersion}}. Some features may not work properly until your instance is updated.",
+    "instanceUpdateNoticeButton": "Update my instance",
+    "instanceUpdateNoticeDismiss": "Hide this message",
     "needHelp": "Need help",
     "signOut": "Sign Out"
   },

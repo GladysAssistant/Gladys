@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import { Localizer, Text } from 'preact-i18n';
-import CreatableSelect from 'react-select/creatable';
+import { CreatableSelect } from '../../../components/form/Select';
 import IconSelector from '../../../components/scene/IconSelector';
 import style from './style.css';
 

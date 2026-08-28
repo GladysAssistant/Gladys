@@ -2,6 +2,7 @@ import { defineConfig, loadEnv, transformWithEsbuild } from 'vite';
 import preact from '@preact/preset-vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { patchCssModules } from 'vite-css-modules';
+import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { preactCliCssModules } from './vite-plugins/preact-cli-css-modules.js';
@@ -10,6 +11,12 @@ import { serverCommonjsInterop } from './vite-plugins/server-commonjs-interop.js
 
 const FRONT_ROOT = dirname(fileURLToPath(import.meta.url));
 const SRC_ROOT = resolve(FRONT_ROOT, 'src');
+
+// The released Gladys version, from the same root package.json field the
+// server reads at startup (server/lib/system/system.init.js). The hosted
+// Gladys Plus front is built from the release tag, so baking it in lets the
+// front detect an instance lagging behind (see utils/instanceVersion.js).
+const GLADYS_VERSION = JSON.parse(readFileSync(resolve(FRONT_ROOT, '../package.json'), 'utf8')).version;
 
 function treatJsFilesAsJsx() {
   return {
@@ -78,6 +85,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode === 'production' ? 'production' : 'development'),
+      'process.env.GLADYS_FRONT_VERSION': JSON.stringify(GLADYS_VERSION),
       ...processEnvDefine
     },
     server: {

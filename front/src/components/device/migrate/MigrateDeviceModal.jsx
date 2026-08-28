@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { createPortal } from 'preact/compat';
 import { connect } from 'unistore/preact';
 import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
@@ -280,8 +281,12 @@ class MigrateDeviceModal extends Component {
     const unmappedFeatures = sourceFeatures.filter(feature => !featuresMapping[feature.selector]);
     const deviceGroups = this.getDeviceOptions();
     const hasDeviceOptions = devices.length > 0;
-    return (
-      <div class={style.modalOverlay} onClick={this.handleOverlayClick}>
+    // The modal is rendered on <body>: it opens from inside a glass card, whose
+    // backdrop filter would otherwise trap this fixed overlay in the card's own
+    // stacking context (same reason the light control panel is portaled).
+    // glass-theme keeps the dialog on the theme's glass surface out there.
+    return createPortal(
+      <div class={cx('glass-theme', style.modalOverlay)} onClick={this.handleOverlayClick}>
         <div class={style.modalDialog}>
           <div class="card mb-0">
             <div class="card-header">
@@ -398,7 +403,8 @@ class MigrateDeviceModal extends Component {
             </div>
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
 }

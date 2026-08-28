@@ -135,4 +135,73 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
       }
     });
   });
+
+  it('Display the MQTT connection error of a known error code', () => {
+    cy.get('[data-cy=z2m-mqtt-connection-error]').should('not.exist');
+
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.status-change',
+      payload: {
+        usbConfigured: false,
+        mqttExist: true,
+        mqttRunning: true,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+        gladysConnected: false,
+        zigbee2mqttConnected: false,
+        z2mEnabled: true,
+        dockerBased: false,
+        networkModeValid: false,
+        mqttConnectionError: { code: 'BAD_CREDENTIALS', message: null }
+      }
+    });
+
+    cy.get('[data-cy=z2m-mqtt-connection-error]').i18n(
+      'integration.zigbee2mqtt.setup.mqttConnectionErrors.BAD_CREDENTIALS'
+    );
+  });
+
+  it('Display the raw message when the error code is unknown', () => {
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.status-change',
+      payload: {
+        usbConfigured: false,
+        mqttExist: true,
+        mqttRunning: true,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+        gladysConnected: false,
+        zigbee2mqttConnected: false,
+        z2mEnabled: true,
+        dockerBased: false,
+        networkModeValid: false,
+        mqttConnectionError: { code: null, message: 'client disconnecting' }
+      }
+    });
+
+    cy.get('[data-cy=z2m-mqtt-connection-error]')
+      .i18n('integration.zigbee2mqtt.setup.mqttConnectionErrors.unknownErrorPrefix')
+      .should('contain', 'client disconnecting');
+  });
+
+  it('Hide the alert when there is no MQTT connection error', () => {
+    cy.sendWebSocket({
+      type: 'zigbee2mqtt.status-change',
+      payload: {
+        usbConfigured: false,
+        mqttExist: true,
+        mqttRunning: true,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+        gladysConnected: true,
+        zigbee2mqttConnected: false,
+        z2mEnabled: true,
+        dockerBased: false,
+        networkModeValid: false,
+        mqttConnectionError: { code: null, message: null }
+      }
+    });
+
+    cy.get('[data-cy=z2m-mqtt-connection-error]').should('not.exist');
+  });
 });

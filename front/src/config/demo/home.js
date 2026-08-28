@@ -29,6 +29,7 @@ import {
   productionPower,
   feature
 } from './helpers';
+import { translate } from './i18n';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -681,6 +682,13 @@ const ROOMS = [
     ]
   }
 ];
+
+// The house speaks the language of the browser: rooms, devices and features
+// are translated here, at the source, so everything derived from them — the
+// route map, the room pages, the history and the activity page — is translated
+// with them (see ./i18n.js).
+translate(HOUSE);
+translate(ROOMS);
 
 // Rooms and devices, with the ids and back-references the API returns
 const rooms = ROOMS.map(room => ({

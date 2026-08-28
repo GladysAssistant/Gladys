@@ -1,78 +1,53 @@
+import { Fragment } from 'preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
-import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
+import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 
 const NetatmoPage = props => (
-  <div class="page">
-    <div class="page-main">
-      <div class="my-3 my-md-5">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-3">
-              <BackToIntegrationsLink />
-              <h3 class="page-title mb-5">
-                <Text id="integration.netatmo.title" />
-              </h3>
-              <div>
-                <div class="list-group list-group-transparent mb-0">
-                  <Link
-                    href="/dashboard/integration/device/netatmo"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-link" />
-                    </span>
-                    <Text id="integration.netatmo.deviceTab" />
-                  </Link>
+  <IntegrationSubPageLayout
+    title={<Text id="integration.netatmo.title" />}
+    tabs={
+      <Fragment>
+        <Link href="/dashboard/integration/device/netatmo" activeClassName="active" class="hz-tab-link">
+          <i class="fe fe-link" />
+          <span>
+            <Text id="integration.netatmo.deviceTab" />
+          </span>
+        </Link>
 
-                  <Link
-                    href="/dashboard/integration/device/netatmo/discover"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-radio" />
-                    </span>
-                    <Text id="integration.netatmo.discoverTab" />
-                  </Link>
+        <Link href="/dashboard/integration/device/netatmo/discover" activeClassName="active" class="hz-tab-link">
+          <i class="fe fe-radio" />
+          <span>
+            <Text id="integration.netatmo.discoverTab" />
+          </span>
+        </Link>
 
-                  <Link
-                    href="/dashboard/integration/device/netatmo/setup"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-sliders" />
-                    </span>
-                    <Text id="integration.netatmo.setupTab" />
-                  </Link>
+        <Link href="/dashboard/integration/device/netatmo/setup" activeClassName="active" class="hz-tab-link">
+          <i class="fe fe-sliders" />
+          <span>
+            <Text id="integration.netatmo.setupTab" />
+          </span>
+        </Link>
 
-                  <DeviceConfigurationLink
-                    user={props.user}
-                    configurationKey="integrations"
-                    documentKey="netatmo"
-                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
-                    </span>
-                    <Text id="integration.netatmo.documentation" />
-                  </DeviceConfigurationLink>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-9">
-              <DeprecationWarning />
-              {props.children}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <DeviceConfigurationLink
+          user={props.user}
+          configurationKey="integrations"
+          documentKey="netatmo"
+          linkClass="hz-tab-link"
+        >
+          <i class="fe fe-book-open" />
+          <span>
+            <Text id="integration.netatmo.documentation" />
+          </span>
+        </DeviceConfigurationLink>
+      </Fragment>
+    }
+  >
+    <DeprecationWarning />
+    {props.children}
+  </IntegrationSubPageLayout>
 );
 
 export default NetatmoPage;
