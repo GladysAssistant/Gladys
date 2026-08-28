@@ -10,6 +10,7 @@ import dashboardStyle from '../../routes/dashboard/style.css';
 // Glass variants of the Tabler furniture the integration pages are made of —
 // loaded here (main bundle) because the code-split catalog CSS is not
 import './horizonIntegrations.css';
+import ErrorBoundary from '../ErrorBoundary';
 
 const INTEGRATION_URL_PREFIX = '/dashboard/integration';
 
@@ -151,7 +152,11 @@ class Layout extends Component {
             [`glass-theme ${dashboardStyle.dashboardBackground} ${dashboardStyle.glassScene}`]: integrationPage
           })}
         >
-          {children}
+          {/* Last-resort net around every route: an uncaught render error
+              used to freeze the whole app for good (see ErrorBoundary).
+              Keyed on the URL, so navigating away from a broken page brings
+              Gladys back without a reload. */}
+          <ErrorBoundary resetKey={currentUrl}>{children}</ErrorBoundary>
         </div>
       </div>
     );

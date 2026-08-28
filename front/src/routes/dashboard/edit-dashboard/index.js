@@ -356,16 +356,22 @@ class EditDashboard extends Component {
       this.justSavedTimeout = setTimeout(() => this.setState({ justSaved: false }), 2500);
     } catch (e) {
       console.error(e);
+      // the dimmer must come back down whatever happened: left active, it
+      // makes the whole editor transparent AND pointer-events: none, so a
+      // failed save looked like Gladys had stopped responding
       if (e.response && e.response.status === 422) {
         this.setState({
+          loading: false,
           dashboardValidationError: true
         });
       } else if (e.response && e.response.status === 409) {
         this.setState({
+          loading: false,
           dashboardAlreadyExistError: true
         });
       } else {
         this.setState({
+          loading: false,
           unknownError: true
         });
       }

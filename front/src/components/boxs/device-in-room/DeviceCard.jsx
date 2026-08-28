@@ -56,8 +56,11 @@ const DeviceCard = ({ children, ...props }) => {
         <div class="loader py-3" />
         <div class="table-responsive">
           {/* device-list-table: Horizon restyle hook — the glass theme turns
-              these rows into soft pills (see routes/dashboard/style.css) */}
-          <table class="table card-table table-vcenter device-list-table">
+              these rows into soft pills (see routes/dashboard/style.css).
+              device-widget-table narrows the rules that only make sense for
+              the widget's icon/name/control triplet: the devices page shares
+              device-list-table but lays its rows out on six columns. */}
+          <table class="table card-table table-vcenter device-list-table device-widget-table">
             <tbody>
               {loading
                 ? placeholderRows.map((_, index) => (

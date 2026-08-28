@@ -32,6 +32,13 @@ const DEVICE_PARAMS = {
   IEEE_ADDRESS: 'IEEE_ADDRESS',
 };
 
+// Reasons why Gladys failed to connect to the MQTT broker, displayed as explicit messages in the UI
+const MQTT_CONNECTION_ERROR = {
+  BAD_CREDENTIALS: 'BAD_CREDENTIALS',
+  NOT_AUTHORIZED: 'NOT_AUTHORIZED',
+  BROKER_UNREACHABLE: 'BROKER_UNREACHABLE',
+};
+
 // Zigbee coordinator connection: plugged in USB, or reachable over the network (tcp://<host>:<port>)
 const ADAPTER_MODE = {
   USB: 'usb',
@@ -101,6 +108,7 @@ module.exports = {
   CONFIGURATION,
   MQTT_MODE,
   DEVICE_PARAMS,
+  MQTT_CONNECTION_ERROR,
   ADAPTER_MODE,
   SETUP_VARIABLES,
   DEFAULT,

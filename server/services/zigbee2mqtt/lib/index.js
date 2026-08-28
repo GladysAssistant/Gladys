@@ -62,6 +62,7 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.networkModeValid = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
+  this.mqttConnectionError = null;
   this.dockerBased = false;
 
   this.containerRestartWaitTimeInMs = 5 * 1000;
