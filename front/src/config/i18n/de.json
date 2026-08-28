@@ -1689,6 +1689,11 @@
         "enableLabel": "Dienst aktivieren oder deaktivieren",
         "enableDescription": "Beim nächsten Neustart von Gladys wird der Dienst wieder gestartet. Abhängig von der Leistung Ihres Computers und der Geschwindigkeit Ihres Netzwerks kann das Starten dieses Dienstes im Modus \"Installation von Gladys aus\" zwischen 2 Minuten und 1 Stunde dauern. Sie können den Dienst dauerhaft von dieser Seite deaktivieren: <a href=\"/dashboard/settings/service\">Einstellungen > Dienste</a>.",
         "toggleError": "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Konfiguration des Dienstes.",
+        "mqttConnectionErrors": {
+          "BAD_CREDENTIALS": "Gladys konnte keine Verbindung zum MQTT-Broker herstellen: Der Benutzername oder das Passwort ist falsch. Überprüfen Sie die Zugangsdaten Ihres MQTT-Brokers und speichern Sie die Konfiguration erneut.",
+          "BROKER_UNREACHABLE": "Gladys konnte den MQTT-Broker nicht erreichen. Überprüfen Sie, ob die URL und der Port des Brokers korrekt sind und ob der Broker läuft und von Gladys aus erreichbar ist.",
+          "unknownErrorPrefix": "MQTT-Verbindungsfehler: "
+        },
         "serviceStatus": "Dienststatus",
         "description": "Dieser Dienst verwendet zwei Docker-Container (MQTT-Broker und Zigbee2mqtt). Aktivieren Sie Zigbee2mqtt, um diese Container bereitzustellen. Weitere Informationen finden Sie auf der Zigbee2mqtt-Dokumentationsseite.",
         "nonDockerEnv": "Gladys wird derzeit nicht in Docker ausgeführt. Es ist unmöglich, Zigbee2mqtt von Gladys aus zu aktivieren.",

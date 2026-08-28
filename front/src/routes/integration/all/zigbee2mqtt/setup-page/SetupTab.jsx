@@ -40,7 +40,7 @@ class SetupTab extends Component {
       resetZigbee2mqttStatus,
       configuration = {}
     } = props;
-    const { z2mContainerError } = props.zigbee2mqttStatus || {};
+    const { z2mContainerError, mqttConnectionError } = props.zigbee2mqttStatus || {};
     const loading = loadZigbee2mqttStatus === RequestStatus.Getting || loadZigbee2mqttConfig === RequestStatus.Getting;
     const error = loadZigbee2mqttStatus === RequestStatus.Error || loadZigbee2mqttConfig === RequestStatus.Error;
     const success = loadZigbee2mqttStatus === RequestStatus.Success && loadZigbee2mqttConfig === RequestStatus.Success;
@@ -108,6 +108,20 @@ class SetupTab extends Component {
                         <span>
                           <Text id="integration.zigbee2mqtt.setup.modes.local.containerErrors.unknownErrorPrefix" />
                           <code>{z2mContainerError.message}</code>
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                )}
+                {mqttConnectionError && (
+                  <li class="list-group-item">
+                    <div class="alert alert-danger my-3" data-cy="z2m-mqtt-connection-error">
+                      {mqttConnectionError.code ? (
+                        <Text id={`integration.zigbee2mqtt.setup.mqttConnectionErrors.${mqttConnectionError.code}`} />
+                      ) : (
+                        <span>
+                          <Text id="integration.zigbee2mqtt.setup.mqttConnectionErrors.unknownErrorPrefix" />
+                          <code>{mqttConnectionError.message}</code>
                         </span>
                       )}
                     </div>

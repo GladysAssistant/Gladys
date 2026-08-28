@@ -121,6 +121,7 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     assert.calledOnceWithExactly(mqttClient.subscribe, 'zigbee2mqtt/#');
@@ -150,8 +151,32 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: { code: null, message: 'mqtt_error' },
       },
     });
+  });
+
+  it('it should report wrong MQTT credentials', async () => {
+    // PREPARE
+    zigbee2mqttManager.mqttRunning = true;
+    const error = new Error('Connection refused: Bad username or password');
+    error.code = 4;
+    // EXECUTE
+    await zigbee2mqttManager.connect(configuration);
+    zigbee2mqttManager.mqttClient.emit('error', error);
+    // ASSERT
+    expect(zigbee2mqttManager.mqttConnectionError).to.deep.equal({ code: 'BAD_CREDENTIALS', message: null });
+  });
+
+  it('it should clear the MQTT connection error when connected', async () => {
+    // PREPARE
+    zigbee2mqttManager.mqttRunning = true;
+    // EXECUTE
+    await zigbee2mqttManager.connect(configuration);
+    zigbee2mqttManager.mqttClient.emit('error', new Error('mqtt_error'));
+    zigbee2mqttManager.mqttClient.emit('connect');
+    // ASSERT
+    expect(zigbee2mqttManager.mqttConnectionError).to.eq(null);
   });
 
   it('it should receive mqtt offline message', async () => {
@@ -177,6 +202,7 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
   });

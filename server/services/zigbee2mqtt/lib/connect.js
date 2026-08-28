@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { DEFAULT } = require('./constants');
+const { getMqttConnectionError } = require('../utils/getMqttConnectionError');
 
 /**
  * @description Initialize service with dependencies and connect to devices.
@@ -39,6 +40,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
       this.gladysConnected = true;
       this.mqttRunning = true;
       this.mqttExist = true;
+      this.mqttConnectionError = null;
       this.emitStatusEvent();
     });
 
@@ -46,6 +48,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
       logger.warn(`Error while connecting to MQTT - ${err}`);
       this.gladysConnected = false;
       this.zigbee2mqttConnected = false;
+      this.mqttConnectionError = getMqttConnectionError(err);
       this.emitStatusEvent();
     });
 

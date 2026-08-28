@@ -120,6 +120,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
@@ -152,6 +153,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
@@ -287,6 +289,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
@@ -397,6 +400,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
@@ -433,6 +437,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
@@ -471,6 +476,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -489,6 +495,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config, false);
