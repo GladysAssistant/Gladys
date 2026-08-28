@@ -1204,6 +1204,64 @@
   }
 }
 
+/* The weather forecast rows scroll sideways on purpose — their slots keep a
+   readable floor rather than being crushed into a narrow card. What they must
+   not do is carry a permanent scrollbar across the card: it reads as a broken
+   layout, which is how it was reported. Same treatment as the app's other
+   sideways rows (.hz-tabs, .groupChips): the bar is hidden, and a thin one
+   comes back on hover or keyboard focus for mouse users. */
+:global(.glass-theme .weather-forecast-scroll) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+:global(.glass-theme .weather-forecast-scroll::-webkit-scrollbar) {
+  display: none;
+}
+
+:global(.glass-theme .weather-forecast-scroll:hover),
+:global(.glass-theme .weather-forecast-scroll:focus-within) {
+  scrollbar-width: thin;
+}
+
+:global(.glass-theme .weather-forecast-scroll:hover::-webkit-scrollbar),
+:global(.glass-theme .weather-forecast-scroll:focus-within::-webkit-scrollbar) {
+  display: block;
+  height: 4px;
+}
+
+:global(.glass-theme .weather-forecast-scroll:hover::-webkit-scrollbar-thumb),
+:global(.glass-theme .weather-forecast-scroll:focus-within::-webkit-scrollbar-thumb) {
+  background: rgba(28, 35, 52, 0.2);
+  border-radius: 4px;
+}
+
+/* An auto-layout table sizes a column to its widest unbreakable word, and a
+   device name is very often one long token (`Volet_chambre_parentale`). That
+   minimum pushed the whole table past the card, and .table-responsive put the
+   row under a horizontal scrollbar — on a phone, and on desktop too as soon as
+   the dashboard column was narrow. `max-width: 0` takes the name column out of
+   that minimum so it can shrink and ellipsize instead, and `width: 50%` keeps
+   it the half of the row it used to get, leaving the controls the width they
+   ask for. It also unblocks the adaptive option controls (acAdaptiveControls):
+   they collapse to dropdowns while the card overflows, so a name that
+   overflowed whatever they did turned every button group of the card into a
+   dropdown for nothing. */
+:global(.glass-theme .device-widget-table tr td:nth-child(2)) {
+  max-width: 0;
+  width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* the light row splits its name cell in two lines (name + live summary) */
+:global(.glass-theme .device-widget-table tr td:nth-child(2) > div) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Structural rows are not feature pills: ColorDeviceFeature always renders
    a second tr with one colspan cell holding the (d-none while closed) color
    picker — without this reset it paints as an empty ghost pill. */
