@@ -784,29 +784,41 @@ class EditScene extends Component {
         }
       });
 
-      // Remove variables for the deleted action and update paths for subsequent actions
-      const newVariables = { ...prevState.variables };
-      delete newVariables[path];
+      // The actions which follow the deleted one in its group (or, for a condition, in the
+      // "if" list of its block) are shifted one index down, so the variables they declare must
+      // be renamed, and the references to those variables in the whole scene must be updated
+      // (the same way they are when an action group is deleted).
+      const containerSegments = pathSegments.slice(0, -1);
+      const containerPath = containerSegments.join('.');
+      const deletedActionIndex = parseInt(pathSegments[pathSegments.length - 1], 10);
+      let siblingActions = prevState.scene.actions;
+      containerSegments.forEach(segment => {
+        siblingActions =
+          siblingActions && (/^\d+$/.test(segment) ? siblingActions[parseInt(segment, 10)] : siblingActions[segment]);
+      });
+      const pathToUpdateInVariables = [];
+      if (Array.isArray(siblingActions)) {
+        // Indexes are decremented: the replacements are built from the smallest index to the
+        // biggest one so that a path is never rewritten twice
+        for (let index = deletedActionIndex + 1; index < siblingActions.length; index += 1) {
+          pathToUpdateInVariables.push({
+            prevPath: `${containerPath}.${index}`,
+            newPath: `${containerPath}.${index - 1}`
+          });
+        }
+      }
 
-      // Update paths for actions after the deleted one
-      Object.keys(newVariables).forEach(varPath => {
-        // Check if the variable path is in the same parent group as the deleted action
-        if (
-          varPath.startsWith(
-            path
-              .split('.')
-              .slice(0, -1)
-              .join('.')
-          )
-        ) {
-          const remainingVars = newVariables[varPath];
-          delete newVariables[varPath];
-          const newPath = this.updatePathAfterDeletion(varPath, path);
-          if (newPath) {
-            newVariables[newPath] = remainingVars;
-          }
+      // Drop the variables declared by the deleted action (including the ones nested in its
+      // if/then/else branches), then rename the ones declared by the shifted actions
+      const remainingVariables = {};
+      Object.entries(prevState.variables).forEach(([variablePath, value]) => {
+        if (variablePath !== path && !variablePath.startsWith(`${path}.`)) {
+          remainingVariables[variablePath] = value;
         }
       });
+      const newVariables = renameVariablesOfMovedGroups(remainingVariables, pathToUpdateInVariables);
+
+      replaceVariablePathsInActions(prevState.scene.actions, pathToUpdateInVariables);
 
       // Check if we need to remove an empty action group
       // Only if we are not in a "if" action
@@ -901,28 +913,6 @@ class EditScene extends Component {
         variables: { $set: newVariables }
       });
     }, cleanUpEmptyGroup);
-  };
-
-  updatePathAfterDeletion = (currentPath, deletedPath) => {
-    const currentSegments = currentPath.split('.');
-    const deletedSegments = deletedPath.split('.');
-    const lastDeletedIndex = parseInt(deletedSegments[deletedSegments.length - 1], 10);
-
-    // Get the parent paths to compare them
-    const currentParentPath = currentSegments.slice(0, -1).join('.');
-    const deletedParentPath = deletedSegments.slice(0, -1).join('.');
-
-    // If they are in the same parent group
-    if (currentParentPath === deletedParentPath) {
-      const currentIndex = parseInt(currentSegments[currentSegments.length - 1], 10);
-      if (currentIndex > lastDeletedIndex) {
-        currentSegments[currentSegments.length - 1] = (currentIndex - 1).toString();
-        return currentSegments.join('.');
-      }
-    }
-
-    // If not in the same group, keep the original path
-    return currentPath;
   };
 
   updateActionProperty = (path, property, value) => {
