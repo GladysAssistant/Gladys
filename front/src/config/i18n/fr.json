@@ -1822,6 +1822,12 @@
         "enableLabel": "Activer ou désactiver le service",
         "enableDescription": "Au prochain redémarrage de Gladys, le service démarrera de nouveau. Suivant la puissance de votre machine et la vitesse de votre réseau, démarrer ce service en \"Installation depuis Gladys\" peut prendre entre 2 minutes et 1 heure. Il est possible de désactiver le service de manière pérenne depuis cette page : <a href=\"/dashboard/settings/service\">Paramètres > Services</a>.",
         "toggleError": "Une erreur est survenue. Veuillez vérifier la configuration du service.",
+        "mqttConnectionErrors": {
+          "BAD_CREDENTIALS": "Gladys n'a pas réussi à se connecter au broker MQTT : le nom d'utilisateur ou le mot de passe est incorrect. Vérifiez les identifiants de votre broker MQTT, puis enregistrez à nouveau la configuration.",
+          "NOT_AUTHORIZED": "Le broker MQTT a refusé la connexion : non autorisé. Vérifiez le nom d'utilisateur et le mot de passe de votre broker MQTT, ainsi que les droits d'accès de ce client, puis enregistrez à nouveau la configuration.",
+          "BROKER_UNREACHABLE": "Gladys n'a pas réussi à joindre le broker MQTT. Vérifiez que l'URL et le port du broker sont corrects, et que le broker est démarré et joignable depuis Gladys.",
+          "unknownErrorPrefix": "Erreur de connexion MQTT : "
+        },
         "serviceStatus": "Etat du service",
         "description": "Ce service utilise deux containers Docker (MQTT broker et Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zigbee2mqtt depuis Gladys.",

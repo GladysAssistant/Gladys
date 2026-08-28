@@ -70,6 +70,7 @@ describe('zigbee2mqtt reset', () => {
     zigbee2MqttManager.z2mPermitJoin = true;
     zigbee2MqttManager.coordinatorFirmware = '20240101';
     zigbee2MqttManager.z2mContainerError = { message: 'some error' };
+    zigbee2MqttManager.mqttConnectionError = { code: 'BAD_CREDENTIALS', message: null };
     zigbee2MqttManager.discoveredDevices = { '0x1234': { friendly_name: 'lamp' } };
     zigbee2MqttManager.topicBinds = { 'zigbee2mqtt/#': () => {} };
   });
@@ -123,6 +124,7 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
     expect(zigbee2MqttManager.coordinatorFirmware).to.equal(null);
     expect(zigbee2MqttManager.z2mContainerError).to.equal(null);
+    expect(zigbee2MqttManager.mqttConnectionError).to.equal(null);
 
     // Host environment properties should be preserved
     expect(zigbee2MqttManager.dockerBased).to.equal(true);
