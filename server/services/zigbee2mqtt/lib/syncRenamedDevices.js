@@ -164,27 +164,16 @@ async function applyRenames(gladys, renames, gladysDevices) {
 }
 
 /**
- * @description Keep Gladys devices in sync with Zigbee2mqtt renames. The link between
- * Gladys and Zigbee2mqtt is the friendly_name (stored in external_ids), so a rename done
- * in Zigbee2mqtt used to break it. This function stores the immutable IEEE address as a
- * device param, and uses it to re-attach (and update) Gladys devices whose friendly_name
- * changed. It is called on every "bridge/devices" message, which is retained and
- * republished by Zigbee2mqtt after each rename, so renames done while Gladys was offline
- * are handled too.
+ * @description Reconcile Gladys devices with one Zigbee2mqtt inventory: backfill the IEEE
+ * address where it is missing, then plan and apply the renames it implies.
+ * @param {object} manager - Zigbee2mqtt manager.
  * @param {Array} z2mDevices - Devices published by Zigbee2mqtt on the bridge/devices topic.
  * @returns {Promise} Resolve when devices are synchronized.
  * @example
- * await zigbee2mqttManager.syncRenamedDevices(devices);
+ * reconcileDevices(zigbee2mqttManager, devices);
  */
-async function syncRenamedDevices(z2mDevices) {
-  // MQTT messages are handled without being awaited, and "bridge/devices" is republished on
-  // every change: two overlapping syncs would plan the same renames from the same DB snapshot
-  // and fight over the same rows. Skipping is safe, the next message re-runs the reconciliation.
-  if (this.syncRenamedDevicesRunning) {
-    logger.debug('Zigbee2mqtt: rename synchronization already running, skipping this message');
-    return;
-  }
-  this.syncRenamedDevicesRunning = true;
+async function reconcileDevices(manager, z2mDevices) {
+  const self = manager;
   try {
     const z2mDeviceByIeeeAddress = new Map();
     const z2mDeviceByName = new Map();
@@ -195,7 +184,7 @@ async function syncRenamedDevices(z2mDevices) {
         z2mDeviceByName.set(z2mDevice.friendly_name, z2mDevice);
       });
 
-    const gladysDevices = await this.gladys.device.get({ service: 'zigbee2mqtt' });
+    const gladysDevices = await self.gladys.device.get({ service: 'zigbee2mqtt' });
 
     const renames = [];
     await Promise.each(gladysDevices, async (gladysDevice) => {
@@ -213,10 +202,10 @@ async function syncRenamedDevices(z2mDevices) {
           if (!ieeeAddressParam) {
             // Backfill the IEEE address on devices added before this param existed,
             // so their next rename can be matched.
-            await this.gladys.device.setParam(gladysDevice, DEVICE_PARAMS.IEEE_ADDRESS, sameNameZ2mDevice.ieee_address);
+            await self.gladys.device.setParam(gladysDevice, DEVICE_PARAMS.IEEE_ADDRESS, sameNameZ2mDevice.ieee_address);
             // setParam only writes in DB: patch the RAM copy so the discover page
             // doesn't flag the device as needing an update.
-            const ramDevice = this.gladys.stateManager.get('deviceByExternalId', gladysDevice.external_id);
+            const ramDevice = self.gladys.stateManager.get('deviceByExternalId', gladysDevice.external_id);
             if (ramDevice && Array.isArray(ramDevice.params) && !getIeeeAddressParam(ramDevice)) {
               ramDevice.params.push({
                 name: DEVICE_PARAMS.IEEE_ADDRESS,
@@ -249,10 +238,47 @@ async function syncRenamedDevices(z2mDevices) {
     });
 
     if (renames.length > 0) {
-      await applyRenames(this.gladys, renames, gladysDevices);
+      await applyRenames(self.gladys, renames, gladysDevices);
     }
   } catch (e) {
     logger.warn(`Zigbee2mqtt: unable to sync renamed devices: ${e}`);
+  }
+}
+
+/**
+ * @description Keep Gladys devices in sync with Zigbee2mqtt renames. The link between
+ * Gladys and Zigbee2mqtt is the friendly_name (stored in external_ids), so a rename done
+ * in Zigbee2mqtt used to break it. This function stores the immutable IEEE address as a
+ * device param, and uses it to re-attach (and update) Gladys devices whose friendly_name
+ * changed. It is called on every "bridge/devices" message, which is retained and
+ * republished by Zigbee2mqtt after each rename, so renames done while Gladys was offline
+ * are handled too.
+ * @param {Array} z2mDevices - Devices published by Zigbee2mqtt on the bridge/devices topic.
+ * @returns {Promise} Resolve when devices are synchronized.
+ * @example
+ * await zigbee2mqttManager.syncRenamedDevices(devices);
+ */
+async function syncRenamedDevices(z2mDevices) {
+  // MQTT messages are handled without being awaited, so two "bridge/devices" messages can
+  // overlap: running both would plan the same renames from the same DB snapshot and fight
+  // over the same rows. The newer inventory is not dropped though, it supersedes any other
+  // pending one and is reconciled as soon as the running pass is done — waiting for the next
+  // message would leave the rename unapplied until Zigbee2mqtt publishes again.
+  if (this.syncRenamedDevicesRunning) {
+    this.pendingSyncRenamedDevices = z2mDevices;
+    logger.debug('Zigbee2mqtt: rename synchronization already running, queuing this inventory');
+    return;
+  }
+
+  this.syncRenamedDevicesRunning = true;
+  try {
+    let devicesToSync = z2mDevices;
+    while (devicesToSync) {
+      // eslint-disable-next-line no-await-in-loop
+      await reconcileDevices(this, devicesToSync);
+      devicesToSync = this.pendingSyncRenamedDevices;
+      this.pendingSyncRenamedDevices = null;
+    }
   } finally {
     this.syncRenamedDevicesRunning = false;
   }

@@ -329,23 +329,34 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
     );
   });
 
-  it('should skip a concurrent synchronization instead of racing on the same devices', async () => {
+  it('should reconcile the inventory received while a synchronization was running', async () => {
     const gladysDevice = buildGladysDevice();
+    let newerInventorySent = false;
     gladys.device.get = fake(async () => {
-      // A second bridge/devices message lands while the first sync is still running
-      await zigbee2mqttManager.syncRenamedDevices([
-        { friendly_name: 'new-name', ieee_address: '0x00158d00045b2740', type: 'Router' },
-      ]);
+      if (!newerInventorySent) {
+        newerInventorySent = true;
+        // A newer bridge/devices message lands while the first sync is still running:
+        // it must be queued, not run concurrently...
+        await zigbee2mqttManager.syncRenamedDevices([
+          { friendly_name: 'newer-name', ieee_address: '0x00158d00045b2740', type: 'Router' },
+        ]);
+        expect(gladys.device.get.callCount).to.equal(1);
+        expect(zigbee2mqttManager.pendingSyncRenamedDevices).to.not.equal(null);
+      }
       return [gladysDevice];
     });
     // EXECUTE
     await zigbee2mqttManager.syncRenamedDevices([
       { friendly_name: 'new-name', ieee_address: '0x00158d00045b2740', type: 'Router' },
     ]);
-    // ASSERT: the nested call returned immediately, the outer one did the single rename
-    assert.calledOnce(gladys.device.get);
-    assert.calledOnce(gladys.device.create);
+    // ASSERT: ...and reconciled once the running pass is done, otherwise that rename would
+    // stay unapplied until Zigbee2mqtt happens to publish bridge/devices again
+    expect(gladys.device.get.callCount).to.equal(2);
+    expect(gladys.device.create.callCount).to.equal(2);
+    expect(gladys.device.create.firstCall.args[0].external_id).to.equal('zigbee2mqtt:new-name');
+    expect(gladys.device.create.secondCall.args[0].external_id).to.equal('zigbee2mqtt:newer-name');
     expect(zigbee2mqttManager.syncRenamedDevicesRunning).to.equal(false);
+    expect(zigbee2mqttManager.pendingSyncRenamedDevices).to.equal(null);
   });
 
   it('should handle a name swap between two devices without unique constraint conflict', async () => {
