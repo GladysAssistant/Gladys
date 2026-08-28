@@ -199,6 +199,20 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
     assert.notCalled(gladys.device.create);
   });
 
+  it('should not fail when the IEEE address backfill throws', async () => {
+    const gladysDevice = buildGladysDevice();
+    gladysDevice.params = [];
+    gladys.device.get = fake.resolves([gladysDevice]);
+    gladys.device.setParam = fake.rejects(new Error('DB error'));
+    // EXECUTE
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'old-name', ieee_address: '0x00158d00045b2740', type: 'Router' },
+    ]);
+    // ASSERT
+    assert.calledOnce(gladys.device.setParam);
+    assert.notCalled(gladys.device.create);
+  });
+
   it('should not fail when device.get throws', async () => {
     gladys.device.get = fake.rejects(new Error('DB error'));
     // EXECUTE
@@ -206,6 +220,131 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
       { friendly_name: 'new-name', ieee_address: '0x00158d00045b2740', type: 'Router' },
     ]);
     // ASSERT
+    assert.notCalled(gladys.device.create);
+  });
+
+  const buildSwapDevices = () => {
+    const deviceA = buildGladysDevice();
+    deviceA.id = 'device-a';
+    deviceA.name = 'kitchen';
+    deviceA.external_id = 'zigbee2mqtt:kitchen';
+    deviceA.features = [
+      {
+        id: 'feature-a',
+        name: 'On/Off',
+        selector: 'zigbee2mqtt-kitchen-switch-binary-state',
+        external_id: 'zigbee2mqtt:kitchen:switch:binary:state',
+        category: 'switch',
+        type: 'binary',
+      },
+    ];
+    deviceA.params = [{ id: 'param-a', name: 'IEEE_ADDRESS', value: '0xaaa', device_id: 'device-a' }];
+    const deviceB = buildGladysDevice();
+    deviceB.id = 'device-b';
+    deviceB.name = 'bedroom';
+    deviceB.external_id = 'zigbee2mqtt:bedroom';
+    deviceB.features = [
+      {
+        id: 'feature-b',
+        name: 'On/Off',
+        selector: 'zigbee2mqtt-bedroom-switch-binary-state',
+        external_id: 'zigbee2mqtt:bedroom:switch:binary:state',
+        category: 'switch',
+        type: 'binary',
+      },
+    ];
+    deviceB.params = [{ id: 'param-b', name: 'IEEE_ADDRESS', value: '0xbbb', device_id: 'device-b' }];
+    return [deviceA, deviceB];
+  };
+
+  // Emulates the DB unique constraint on device external_id, like SQLite would
+  const buildUniqueConstraintCreateFake = (devices) => {
+    const externalIdByDeviceId = new Map(devices.map((device) => [device.id, device.external_id]));
+    return fake(async (device) => {
+      const conflict = [...externalIdByDeviceId.entries()].some(
+        ([id, externalId]) => id !== device.id && externalId === device.external_id,
+      );
+      if (conflict) {
+        throw new Error('SequelizeUniqueConstraintError');
+      }
+      externalIdByDeviceId.set(device.id, device.external_id);
+      return device;
+    });
+  };
+
+  it('should handle a name swap between two devices without unique constraint conflict', async () => {
+    const devices = buildSwapDevices();
+    gladys.device.get = fake.resolves(devices);
+    gladys.device.create = buildUniqueConstraintCreateFake(devices);
+    // EXECUTE: kitchen and bedroom swapped their names in Zigbee2mqtt
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'bedroom', ieee_address: '0xaaa', type: 'Router' },
+      { friendly_name: 'kitchen', ieee_address: '0xbbb', type: 'Router' },
+    ]);
+    // ASSERT: both devices staged through a temporary external_id, then renamed
+    expect(gladys.device.create.callCount).to.equal(4);
+    const finalByDeviceId = {};
+    gladys.device.create.getCalls().forEach((call) => {
+      const [createdDevice] = call.args;
+      finalByDeviceId[createdDevice.id] = createdDevice;
+    });
+    expect(finalByDeviceId['device-a'].external_id).to.equal('zigbee2mqtt:bedroom');
+    expect(finalByDeviceId['device-a'].name).to.equal('bedroom');
+    expect(finalByDeviceId['device-a'].features[0].external_id).to.equal('zigbee2mqtt:bedroom:switch:binary:state');
+    expect(finalByDeviceId['device-b'].external_id).to.equal('zigbee2mqtt:kitchen');
+    expect(finalByDeviceId['device-b'].name).to.equal('kitchen');
+    expect(finalByDeviceId['device-b'].features[0].external_id).to.equal('zigbee2mqtt:kitchen:switch:binary:state');
+    // The temporary RAM cache entries are dropped
+    assert.calledWithExactly(gladys.stateManager.deleteState, 'deviceByExternalId', 'zigbee2mqtt:__renaming__0xaaa');
+    assert.calledWithExactly(
+      gladys.stateManager.deleteState,
+      'deviceFeatureByExternalId',
+      'zigbee2mqtt:__renaming__0xaaa:switch:binary:state',
+    );
+  });
+
+  it('should recover a swap even when one temporary rename fails', async () => {
+    const devices = buildSwapDevices();
+    gladys.device.get = fake.resolves(devices);
+    const createWithConstraint = buildUniqueConstraintCreateFake(devices);
+    let firstCall = true;
+    gladys.device.create = fake(async (device) => {
+      if (firstCall) {
+        firstCall = false;
+        throw new Error('DB error');
+      }
+      return createWithConstraint(device);
+    });
+    // EXECUTE
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'bedroom', ieee_address: '0xaaa', type: 'Router' },
+      { friendly_name: 'kitchen', ieee_address: '0xbbb', type: 'Router' },
+    ]);
+    // ASSERT: staging device-a failed, but device-b freed "bedroom" so both final renames pass
+    const finalByDeviceId = {};
+    gladys.device.create.getCalls().forEach((call) => {
+      const [createdDevice] = call.args;
+      finalByDeviceId[createdDevice.id] = createdDevice;
+    });
+    expect(finalByDeviceId['device-a'].external_id).to.equal('zigbee2mqtt:bedroom');
+    expect(finalByDeviceId['device-b'].external_id).to.equal('zigbee2mqtt:kitchen');
+  });
+
+  it('should skip a rename when the destination is owned by a device not being renamed', async () => {
+    // A stale duplicate (created by the old rename behavior) already owns the new name
+    const staleDuplicate = buildGladysDevice();
+    staleDuplicate.id = 'stale-device';
+    staleDuplicate.name = 'new-name';
+    staleDuplicate.external_id = 'zigbee2mqtt:new-name';
+    staleDuplicate.features = [];
+    staleDuplicate.params = [{ id: 'param-stale', name: 'IEEE_ADDRESS', value: '0x00158d00045b2740' }];
+    const gladysDevice = buildGladysDevice();
+    gladys.device.get = fake.resolves([staleDuplicate, gladysDevice]);
+    // EXECUTE
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'new-name', ieee_address: '0x00158d00045b2740', type: 'Router' },
+    ]);
+    // ASSERT: no rename is attempted, so the sync doesn't retry a doomed update forever
     assert.notCalled(gladys.device.create);
   });
 
