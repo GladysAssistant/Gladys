@@ -8,6 +8,7 @@ import { DemoSession } from './DemoSession';
 import { GatewaySession } from './GatewaySession';
 import { GatewayHttpClient } from './GatewayHttpClient';
 import { isDarkModeEnabled } from './darkModePreference';
+import { isSidebarDrawerModeEnabled } from './sidebarPreference';
 
 function getDefaultState() {
   const session = config.gatewayMode ? new GatewaySession() : config.demoMode ? new DemoSession() : new Session();
@@ -38,6 +39,10 @@ function getDefaultState() {
     darkMode = isDarkModeEnabled();
   } catch (e) {}
 
+  // Left navigation: docked rail by default, off-canvas drawer if the user
+  // asked for it on this device (see components/header)
+  const sidebarDrawerMode = isSidebarDrawerModeEnabled();
+
   const state = {
     httpClient,
     session,
@@ -46,7 +51,9 @@ function getDefaultState() {
       language
     },
     showDropDown: false,
-    darkMode
+    showCollapsedMenu: false,
+    darkMode,
+    sidebarDrawerMode
   };
   return state;
 }

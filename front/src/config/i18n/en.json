@@ -6335,6 +6335,9 @@
     "instanceUpdateNoticeButton": "Update my instance",
     "instanceUpdateNoticeDismiss": "Hide this message",
     "needHelp": "Need help",
+    "openMenu": "Open the menu",
+    "undockMenu": "Turn the menu into a drawer",
+    "dockMenu": "Keep the menu open",
     "signOut": "Sign Out"
   },
   "gatewayLinkUser": {

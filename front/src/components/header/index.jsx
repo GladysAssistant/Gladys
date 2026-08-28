@@ -117,6 +117,15 @@ class Header extends Component {
     }
   };
 
+  // An open drawer covers the page: Escape must give it back, as it does for
+  // any other overlay. Only relevant while the drawer is open — docked, the
+  // rail is part of the layout and Escape means nothing to it.
+  handleKeyDown = e => {
+    if (e.key === 'Escape' && this.props.showCollapsedMenu) {
+      this.props.toggleCollapsedMenu();
+    }
+  };
+
   isHidden = () => isUrlInArray(this.props.currentUrl, PAGES_WITHOUT_HEADER) || this.props.fullScreen;
 
   // the dismissal is written to localStorage by the notice itself: this only
@@ -140,10 +149,14 @@ class Header extends Component {
     }
   };
 
-  // Content offsets (style/index.css) key off this body class so they vanish
-  // together with the sidebar on auth pages and in fullscreen mode
+  // Content offsets (style/index.css) key off these body classes so they
+  // vanish together with the sidebar on auth pages and in fullscreen mode.
+  // The second one is drawer mode: the page then keeps only the slim gutter
+  // its floating opener sits in, instead of a full rail-wide column.
   syncBodyClass = () => {
-    document.body.classList.toggle('gladys-sidebar-nav', !this.isHidden());
+    const visible = !this.isHidden();
+    document.body.classList.toggle('gladys-sidebar-nav', visible);
+    document.body.classList.toggle('gladys-sidebar-drawer', visible && Boolean(this.props.sidebarDrawerMode));
   };
 
   constructor(props) {
@@ -156,6 +169,7 @@ class Header extends Component {
 
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside);
+    document.addEventListener('keydown', this.handleKeyDown);
     this.syncBodyClass();
     this.maybeRefreshInstanceVersion();
   }
@@ -167,7 +181,9 @@ class Header extends Component {
 
   componentWillUnmount() {
     document.removeEventListener('mousedown', this.handleClickOutside);
+    document.removeEventListener('keydown', this.handleKeyDown);
     document.body.classList.remove('gladys-sidebar-nav');
+    document.body.classList.remove('gladys-sidebar-drawer');
   }
 
   render(props) {
@@ -184,20 +200,23 @@ class Header extends Component {
     return (
       <div>
         <div class={cx(style.mobileTopBar, 'd-lg-none')}>
-          <button
-            type="button"
-            class={style.mobileToggler}
-            onClick={props.toggleCollapsedMenu}
-            data-cy="sidebar-toggler"
-            aria-expanded={props.showCollapsedMenu ? 'true' : 'false'}
-            aria-controls="sidebar-navigation"
-          >
-            <i class="fe fe-menu" />
-            {/* on mobile the notice lives in the closed menu: this dot is
-                what tells the user there is something to open it for. Screen
-                readers get the notice content itself, in the menu. */}
-            {showInstanceUpdateNotice && <span class={style.mobileTogglerDot} aria-hidden="true" />}
-          </button>
+          <Localizer>
+            <button
+              type="button"
+              class={style.mobileToggler}
+              onClick={props.toggleCollapsedMenu}
+              data-cy="sidebar-toggler"
+              aria-label={<Text id="header.openMenu" />}
+              aria-expanded={props.showCollapsedMenu ? 'true' : 'false'}
+              aria-controls="sidebar-navigation"
+            >
+              <i class="fe fe-menu" />
+              {/* on mobile the notice lives in the closed menu: this dot is
+                  what tells the user there is something to open it for. Screen
+                  readers get the notice content itself, in the menu. */}
+              {showInstanceUpdateNotice && <span class={style.togglerDot} aria-hidden="true" />}
+            </button>
+          </Localizer>
           <a class={style.mobileBrand} href="/dashboard">
             <Localizer>
               <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt={<Text id="global.logoAlt" />} />
@@ -208,22 +227,65 @@ class Header extends Component {
           </a>
           <DarkModeToggle />
         </div>
+        {/* Drawer mode on desktop: the rail is off-canvas, so its opener is
+            this floating button, alone in the slim gutter the page keeps on
+            the left. No top bar up here — a full-width one would cost every
+            page a row, and width is exactly what drawer mode is for. */}
+        {props.sidebarDrawerMode && (
+          <Localizer>
+            <button
+              type="button"
+              class={style.drawerOpener}
+              onClick={props.toggleCollapsedMenu}
+              data-cy="sidebar-drawer-opener"
+              aria-label={<Text id="header.openMenu" />}
+              aria-expanded={props.showCollapsedMenu ? 'true' : 'false'}
+              aria-controls="sidebar-navigation"
+            >
+              <i class="fe fe-menu" />
+              {showInstanceUpdateNotice && <span class={style.togglerDot} aria-hidden="true" />}
+            </button>
+          </Localizer>
+        )}
         {props.showCollapsedMenu && (
-          <div class={cx(style.sidebarBackdrop, 'd-lg-none')} onClick={props.toggleCollapsedMenu} />
+          <div
+            class={cx(style.sidebarBackdrop, { 'd-lg-none': !props.sidebarDrawerMode })}
+            onClick={props.toggleCollapsedMenu}
+          />
         )}
         <nav
           id="sidebar-navigation"
           class={cx(style.sidebar, { [style.sidebarOpen]: props.showCollapsedMenu })}
           data-cy="sidebar-nav"
         >
-          <a class={style.sidebarBrand} href="/dashboard">
+          <div class={style.sidebarHeader}>
+            <a class={style.sidebarBrand} href="/dashboard">
+              <Localizer>
+                <img
+                  src="/assets/icons/favicon-96x96.png"
+                  class="header-brand-img"
+                  alt={<Text id="global.logoAlt" />}
+                />
+              </Localizer>
+              <span id="header-title">
+                <Text id="header.gladysAssistant" />
+              </span>
+            </a>
+            {/* Dock ⇄ undock, desktop only (the rail is always a drawer below
+                the breakpoint, where this button is hidden by CSS) */}
             <Localizer>
-              <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt={<Text id="global.logoAlt" />} />
+              <button
+                type="button"
+                class={style.drawerModeToggle}
+                onClick={props.toggleSidebarDrawerMode}
+                data-cy="sidebar-drawer-mode-toggle"
+                title={<Text id={props.sidebarDrawerMode ? 'header.dockMenu' : 'header.undockMenu'} />}
+                aria-label={<Text id={props.sidebarDrawerMode ? 'header.dockMenu' : 'header.undockMenu'} />}
+              >
+                <i class={cx('fe', props.sidebarDrawerMode ? 'fe-chevron-right' : 'fe-chevron-left')} />
+              </button>
             </Localizer>
-            <span id="header-title">
-              <Text id="header.gladysAssistant" />
-            </span>
-          </a>
+          </div>
           <ul class={style.sidebarNav}>
             {NAV_ITEMS.filter(item => !item.adminOnly || props.user.role === USER_ROLE.ADMIN).map(item => (
               <li key={item.href}>

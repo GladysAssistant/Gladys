@@ -490,10 +490,19 @@
    paints its scene on a fixed ::before layer instead. The chat page keeps
    its fixed height: the padding gives the pulled-back space to the chrome. */
 @media (min-width: 992px) {
-  :global(body.gladys-sidebar-nav) .chatPage {
+  :global(body.gladys-sidebar-nav:not(.gladys-sidebar-drawer)) .chatPage {
     width: calc(100% + 15rem);
     margin-left: -15rem;
     padding-left: 15rem;
+  }
+
+  /* Drawer mode: the page only gives back the slim opener gutter (the rail
+     is off-canvas), so the scene reaches under the floating button and under
+     the drawer when it slides over. */
+  :global(body.gladys-sidebar-nav.gladys-sidebar-drawer) .chatPage {
+    width: calc(100% + 3.25rem);
+    margin-left: -3.25rem;
+    padding-left: 3.25rem;
   }
 }
 
