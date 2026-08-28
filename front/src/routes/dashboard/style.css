@@ -891,10 +891,29 @@
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
   }
 
-  /* the "…" menu opens upward from the dock */
+  /* The "…" menu opens upward from the dock and spans the whole pill track.
+     Anchored to its own .dropdown wrapper (the "…" button) it could open
+     outside the screen: dropdown-menu-right hangs the panel leftward from
+     the button, which sits near the LEFT edge when only a pill or two are
+     visible, and a long dashboard name widens the nowrap panel past the
+     viewport. position: static on the wrapper hands the containing block
+     to the track (position: relative), whose box is always on-screen. */
+  .dashboardTabsOverflow {
+    position: static;
+  }
+
   .dashboardTabsMenu {
     top: auto;
     bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+  }
+
+  /* the panel width is now the track's, not the content's: one endless
+     dashboard name must clip, not push the panel past the viewport */
+  .dashboardTabsMenu :global(.dropdown-item) {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
