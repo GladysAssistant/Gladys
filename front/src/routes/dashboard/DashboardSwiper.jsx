@@ -38,6 +38,12 @@ const ENTER_MS = 200;
 // A committed swipe holds its skeleton until the new dashboard's data
 // lands; past this it gives up and springs back (network gone, API error)
 const SWAP_GIVE_UP_MS = 8000;
+// The dock is a slim capsule, and a thumb aiming at its scrollable pill
+// track often lands a few pixels high: without a guard that near-miss
+// grabbed the PAGE pager and switched dashboards. A page swipe never
+// starts this close above the dock; the track's own invisible touch halo
+// (style.css) covers most of the strip and scrolls the bar instead.
+const DOCK_GUARD_PX = 32;
 
 // Widgets also hold horizontally scrollable strips (responsive device
 // tables, the weather forecast row): a touch starting inside one belongs to
@@ -192,6 +198,12 @@ class DashboardSwiper extends Component {
       return;
     }
     const touch = event.touches[0];
+    // the guard strip above the dock (see DOCK_GUARD_PX) — the dock itself
+    // is already excluded through OWN_GESTURE_SELECTOR
+    const dock = page.querySelector('[data-dashboard-swipe-ignore]');
+    if (dock && touch.clientY >= dock.getBoundingClientRect().top - DOCK_GUARD_PX) {
+      return;
+    }
     this.swipe = {
       startX: touch.clientX,
       startY: touch.clientY,
