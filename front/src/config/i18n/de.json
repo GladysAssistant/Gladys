@@ -1691,6 +1691,7 @@
         "toggleError": "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Konfiguration des Dienstes.",
         "mqttConnectionErrors": {
           "BAD_CREDENTIALS": "Gladys konnte keine Verbindung zum MQTT-Broker herstellen: Der Benutzername oder das Passwort ist falsch. Überprüfen Sie die Zugangsdaten Ihres MQTT-Brokers und speichern Sie die Konfiguration erneut.",
+          "NOT_AUTHORIZED": "Der MQTT-Broker hat die Verbindung abgelehnt: nicht autorisiert. Überprüfen Sie den Benutzernamen und das Passwort Ihres MQTT-Brokers sowie die Zugriffsrechte dieses Clients und speichern Sie die Konfiguration erneut.",
           "BROKER_UNREACHABLE": "Gladys konnte den MQTT-Broker nicht erreichen. Überprüfen Sie, ob die URL und der Port des Brokers korrekt sind und ob der Broker läuft und von Gladys aus erreichbar ist.",
           "unknownErrorPrefix": "MQTT-Verbindungsfehler: "
         },

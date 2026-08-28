@@ -113,7 +113,7 @@ class SetupTab extends Component {
                     </div>
                   </li>
                 )}
-                {mqttConnectionError && (
+                {mqttConnectionError && (mqttConnectionError.code || mqttConnectionError.message) && (
                   <li class="list-group-item">
                     <div class="alert alert-danger my-3" data-cy="z2m-mqtt-connection-error">
                       {mqttConnectionError.code ? (
