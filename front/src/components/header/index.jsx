@@ -126,6 +126,20 @@ class Header extends Component {
     this.setState({});
   };
 
+  // The instance version is normally loaded at session check, but a
+  // client-side login never gets there: /login is an open page checkSession
+  // returns early from, and finishing the login routes here without
+  // remounting the app. The header is the consumer of the version, so it
+  // asks for it whenever it renders for a signed-in user — the action guards
+  // itself (gateway mode only, settled marker, one call a minute), so these
+  // calls are almost always a no-op, and double as the retry path when the
+  // instance was unreachable on the first attempt.
+  maybeRefreshInstanceVersion = () => {
+    if (!this.isHidden() && this.props.user && this.props.user.id) {
+      this.props.refreshInstanceVersionState();
+    }
+  };
+
   // Content offsets (style/index.css) key off this body class so they vanish
   // together with the sidebar on auth pages and in fullscreen mode
   syncBodyClass = () => {
@@ -143,10 +157,12 @@ class Header extends Component {
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside);
     this.syncBodyClass();
+    this.maybeRefreshInstanceVersion();
   }
 
   componentDidUpdate() {
     this.syncBodyClass();
+    this.maybeRefreshInstanceVersion();
   }
 
   componentWillUnmount() {

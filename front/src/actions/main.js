@@ -218,8 +218,15 @@ function createActions(store) {
         return;
       }
       lastInstanceVersionRefresh = Date.now();
+      // logout swaps the session object out of the store: that identity is
+      // what tells a response landing after logout that it must not write
+      // the previous session's version into the next one
+      const requestSession = state.session;
       try {
         const systemInfos = await state.httpClient.get('/api/v1/system/info');
+        if (store.getState().session !== requestSession) {
+          return;
+        }
         const instanceGladysVersion = systemInfos.gladys_version || null;
         // a response with no mismatch settles the check — an unreadable
         // version too, since it could never display the notice anyway
@@ -245,6 +252,9 @@ function createActions(store) {
       // a pending "integrations to update" request must not write the count of
       // the session being closed into the fresh state
       actionsExternalIntegrationUpdates.invalidateExternalIntegrationsToUpdate();
+      // and the instance version throttle must not carry over: logging back
+      // in right away gets a fresh check, not a 60s silence
+      lastInstanceVersionRefresh = 0;
       route('/login', true);
       const defaultState = getDefaultState();
       store.setState(defaultState, true);
