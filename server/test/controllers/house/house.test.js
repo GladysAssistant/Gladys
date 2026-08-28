@@ -217,6 +217,27 @@ describe('GET /api/v1/house/:house_selector/sun', () => {
   });
 });
 
+// A station sitting right on the test house (12/12), carrying the real
+// harmonics of Saint-Malo so the predictions are those of a genuine tide.
+const STATION_ON_THE_TEST_HOUSE = {
+  id: 'ticon/test-station',
+  name: 'Test harbour',
+  country: 'France',
+  latitude: 12,
+  longitude: 12,
+  timezone: 'Europe/Paris',
+  chart_datum: 'LAT',
+  datums: { MSL: 6.81, LAT: 0.06, MHWS: 11.918, MLWS: 1.702 },
+  source: { name: 'TICON-4' },
+  license: { type: 'cc-by-4.0' },
+  harmonic_constituents: [
+    { name: 'M2', amplitude: 3.67369853, phase: 177.533856 },
+    { name: 'N2', amplitude: 0.71660512, phase: 161.365553 },
+    { name: 'S2', amplitude: 1.43439656, phase: 227.909724 },
+    { name: 'K2', amplitude: 0.41031045, phase: 225.407325 },
+  ],
+};
+
 describe('GET /api/v1/house/:house_selector/tide', () => {
   beforeEach(() => {
     // The test house sits at 12/12, in the middle of the Sahara: no tide
@@ -238,6 +259,23 @@ describe('GET /api/v1/house/:house_selector/tide', () => {
         expect(res.body.available).to.equal(false);
         expect(res.body.reason).to.equal('no_station_nearby');
         expect(res.body).to.have.property('timezone');
+      });
+  });
+  it('should draw the day asked for by day_offset', async () => {
+    // A day_offset in the query string must be read and handed to the tide
+    // state rather than ignored: the curve then covers that day, not today.
+    axios.get.resolves({ data: [STATION_ON_THE_TEST_HOUSE] });
+    await authenticatedRequest
+      .get('/api/v1/house/test-house/tide?day_offset=2')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.available).to.equal(true);
+        expect(res.body.day_offset).to.equal(2);
+        // The curve starts on the day that was asked for, not on today.
+        const dayDrawn = new Date(res.body.curve[0].time);
+        const daysAhead = Math.round((dayDrawn.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+        expect(daysAhead).to.be.within(1, 2);
       });
   });
   it('should return 400 when the house has no coordinates', async () => {
