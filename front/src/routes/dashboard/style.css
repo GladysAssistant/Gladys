@@ -1049,9 +1049,11 @@
   padding: 0;
 }
 
-/* On small screens only the active pill keeps its name — the rest shrink
-   to icon dots so more of them fit before the overflow kicks in */
-@media (max-width: 767px) {
+/* On the whole mobile dock only the active pill keeps its name — the rest
+   shrink to icon dots so more of them fit in the scrollable track. The full
+   dock breakpoint on purpose (not just phones): the dock must not change
+   its look between a portrait and a landscape phone. */
+@media (max-width: 991.98px) {
   .dashboardTab:not(.dashboardTabActive) {
     width: 2.375rem;
     padding: 0;
@@ -1420,7 +1422,7 @@
   }
 }
 
-@media (pointer: coarse) and (max-width: 767px) {
+@media (pointer: coarse) and (max-width: 991.98px) {
   .dashboardTab:not(.dashboardTabActive) {
     width: 2.75rem;
   }

@@ -154,20 +154,23 @@ class DashboardTabs extends Component {
   // One layout pass for both modes. revealActive: also bring the active pill
   // back into view (mount, dashboard list change, mode switch). A resize that
   // CHANGES THE WIDTH (rotation, split-screen) re-lays the track out and can
-  // leave the active pill off-screen, so it re-centers too — but not the
-  // height-only resizes mobile browsers fire while their toolbars animate,
-  // where a re-center would yank a track the user just scrolled.
+  // leave the active pill off-screen, so it re-centers too — but the
+  // height-only resizes mobile browsers fire while their toolbars animate
+  // must not disturb the dock at all: no re-center of a track the user just
+  // scrolled, and no closing of the list menu under their thumb.
   measure = revealActive => {
     const scrollable = window.matchMedia ? window.matchMedia(DOCK_BREAKPOINT_QUERY).matches : false;
     const enteredScrollable = scrollable && !this.state.scrollable;
     const widthChanged = window.innerWidth !== this.lastMeasuredWidth;
     this.lastMeasuredWidth = window.innerWidth;
+    if (scrollable && !enteredScrollable && !widthChanged && !revealActive) {
+      this.updateTrackState();
+      return;
+    }
     this.setState({ scrollable, visibleCount: null, menuOpen: false }, () => {
       if (this.state.scrollable) {
+        this.scrollActiveIntoView(true);
         this.updateTrackState();
-        if (revealActive || enteredScrollable || widthChanged) {
-          this.scrollActiveIntoView(true);
-        }
       } else {
         this.ensureRowFits();
       }
@@ -203,6 +206,12 @@ class DashboardTabs extends Component {
     this.setState(prevState => ({ menuOpen: !prevState.menuOpen }));
   };
 
+  closeMenu = () => {
+    if (this.state.menuOpen) {
+      this.setState({ menuOpen: false });
+    }
+  };
+
   // The overflow menu closes like any menu: tap/click anywhere else, or
   // Escape. Without this, a wall tablet keeps the list open until another
   // dashboard is picked.
@@ -232,7 +241,7 @@ class DashboardTabs extends Component {
     document.addEventListener('keydown', this.handleDocumentKeyDown);
   }
 
-  componentDidUpdate(previousProps) {
+  componentDidUpdate(previousProps, previousState) {
     const previousSelector = previousProps.currentDashboard && previousProps.currentDashboard.selector;
     const currentSelector = this.props.currentDashboard && this.props.currentDashboard.selector;
     const listChanged =
@@ -241,15 +250,32 @@ class DashboardTabs extends Component {
       this.measure(true);
       return;
     }
+    // The full-list button only mounts once the track is known to overflow,
+    // and its mounting narrows the track: a centering that ran against the
+    // wider track is off by half a button — run one more pass against the
+    // settled layout. Converges: the second pass leaves trackOverflows (the
+    // only state this reacts to — not the fades, which flip on every user
+    // scroll past an edge) unchanged.
+    if (this.state.scrollable && previousState.trackOverflows !== this.state.trackOverflows) {
+      requestAnimationFrame(() => {
+        this.scrollActiveIntoView(true);
+        this.updateTrackState();
+      });
+    }
     if (previousSelector === currentSelector) {
       return;
     }
     if (this.state.scrollable) {
+      // a switch that didn't go through a pill/menu tap (page swipe,
+      // external redirect) must close the list like any navigation
+      this.closeMenu();
       // The switch just re-rendered the pills but their widths settle with
-      // THIS paint (the active pill regains its name): measure a frame later
+      // THIS paint (the active pill regains its name): measure a frame
+      // later. Fades AFTER the centering — assigning scrollLeft is not
+      // guaranteed to fire a scroll event on every engine.
       requestAnimationFrame(() => {
-        this.updateTrackState();
         this.scrollActiveIntoView();
+        this.updateTrackState();
       });
     } else {
       // the active pill is wider (it keeps its name, the overflow button
