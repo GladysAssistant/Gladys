@@ -14,6 +14,7 @@ const { buildParamsConfig, getFeatureBySelector } = require('./thermostat.device
 function invalidateDeviceCaches() {
   this.windowSelectorsCache = null;
   this.featureKeysCache = null;
+  this.targetSelectorsCache = null;
 }
 
 /**
@@ -45,14 +46,88 @@ async function getWindowSelectors() {
   }
   const devices = await this.gladys.device.get({ service: 'thermostat' });
   const selectors = new Set();
+  // The setpoints of the external thermostats are collected in the same pass:
+  // both sets answer a NEW_STATE, which fires for every feature in the house, so
+  // a second query here would double the cost of every state change.
+  const targets = new Set();
   (devices || []).forEach((device) => {
     const config = buildParamsConfig(device);
     if (config && config.window_feature) {
       selectors.add(config.window_feature);
     }
+    if (config && config.target_feature) {
+      targets.add(config.target_feature);
+    }
   });
   this.windowSelectorsCache = selectors;
+  this.targetSelectorsCache = targets;
   return selectors;
+}
+
+/**
+ * @description The set of setpoint selectors of the external thermostats.
+ * Same reasoning as `getWindowSelectors`: EVENTS.DEVICE.NEW_STATE fires for
+ * every feature in the house, so without this cache every state change would
+ * trigger a device query.
+ * @returns {Promise<Set<string>>} Configured external target selectors.
+ * @example
+ * const selectors = await thermostatHandler.getTargetSelectors();
+ */
+async function getTargetSelectors() {
+  if (!this.targetSelectorsCache) {
+    // Both caches are filled by the same pass over the devices.
+    await getWindowSelectors.call(this);
+  }
+  return this.targetSelectorsCache;
+}
+
+/**
+ * @description Hold a setpoint changed on the real thermostat itself.
+ *
+ * Only for external thermostats: a virtual one has no second source of truth,
+ * since Gladys is the only writer of its setpoint. The write Gladys itself just
+ * made comes back as the same event, so the value it wrote is remembered and
+ * that single echo is ignored — otherwise every scheduled write would arm a
+ * manual hold and the schedule would never apply again.
+ * @param {string} changedSelector - Selector of the feature that changed.
+ * @param {number} newValue - The value it changed to.
+ * @returns {Promise<void>}
+ * @example
+ * await onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
+ */
+async function onExternalSetpointChanged(changedSelector, newValue) {
+  if (newValue === null || newValue === undefined) {
+    return;
+  }
+  try {
+    // Cheap rejection first: NEW_STATE fires for every feature in the house, and
+    // almost none of them is a thermostat this service drives.
+    const targetSelectors = await getTargetSelectors.call(this);
+    if (!targetSelectors.has(changedSelector)) {
+      return;
+    }
+    // The selector is in the cache, so a device carries it: `getTargetSelectors`
+    // built that cache from the params of these very devices.
+    const devices = await this.gladys.device.get({ service: 'thermostat' });
+    const device = devices.find((candidate) =>
+      candidate.params.some((param) => param.name === 'THERMOSTAT_TARGET_FEATURE' && param.value === changedSelector),
+    );
+    if (!device) {
+      return;
+    }
+    // Our own write, echoed back: consume the mark and stop there.
+    if (this.selfWrittenSetpoints.get(changedSelector) === newValue) {
+      this.selfWrittenSetpoints.delete(changedSelector);
+      return;
+    }
+    const feature = { selector: changedSelector };
+    logger.info(`Thermostat: setpoint ${newValue} changed on the device itself for ${changedSelector}, holding it`);
+    // saveState is a no-op here (the value is already stored, the event is what
+    // announced it), so setValue is called only for the hold it arms.
+    await this.setValue(device, feature, newValue);
+  } catch (e) {
+    logger.warn(`Thermostat: could not hold an external setpoint change: ${e.message}`);
+  }
 }
 
 /**
@@ -71,15 +146,23 @@ async function onDeviceNewState(event) {
     return;
   }
   const newValue = event.state !== undefined ? event.state : event.last_value;
-  if (newValue !== 0) {
-    return;
-  }
   let changedSelector = event.device_feature || event.device_feature_selector || null;
   if (!changedSelector && event.device_feature_external_id) {
     const feature = this.gladys.stateManager.get('deviceFeatureByExternalId', event.device_feature_external_id);
     changedSelector = feature ? feature.selector : null;
   }
   if (!changedSelector) {
+    return;
+  }
+
+  // A setpoint changed on a real thermostat — its own dial, the vendor app, its
+  // internal programme — is a decision by whoever made it, and Gladys must not
+  // undo it: without this the regulation loop rewrites the stored preset within
+  // a minute, silently reverting the change and fighting the device for ever.
+  // It is held exactly like a turn of the widget dial (section D).
+  await onExternalSetpointChanged.call(this, changedSelector, newValue);
+
+  if (newValue !== 0) {
     return;
   }
   try {
@@ -126,4 +209,11 @@ async function onDeviceNewState(event) {
   }
 }
 
-module.exports = { onDeviceNewState, getWindowSelectors, invalidateDeviceCaches, postUpdate };
+module.exports = {
+  onDeviceNewState,
+  onExternalSetpointChanged,
+  getTargetSelectors,
+  getWindowSelectors,
+  invalidateDeviceCaches,
+  postUpdate,
+};

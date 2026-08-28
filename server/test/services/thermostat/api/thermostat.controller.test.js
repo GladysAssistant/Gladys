@@ -369,6 +369,86 @@ describe('thermostat.controller', () => {
     });
   });
 
+  // An external thermostat owns no feature: the setpoint it drives belongs to
+  // another integration, and the accepted selector is the THERMOSTAT_TARGET_FEATURE
+  // the user configured. The guard stays just as narrow — an arbitrary selector
+  // still matches nothing.
+  describe('setSetpoint on an external thermostat', () => {
+    const route = 'post /api/v1/service/thermostat/setpoint/:feature_selector';
+    const externalFeature = {
+      selector: 'netatmo-setpoint',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+    };
+    const netatmoDevice = { selector: 'netatmo-thermostat', features: [externalFeature] };
+    const externalThermostat = {
+      selector: 'my-external-thermostat',
+      features: [],
+      params: [{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }],
+    };
+
+    const buildExternalHandler = (devices) =>
+      buildHandler({
+        getDevices: fake.resolves([externalThermostat]),
+        gladys: { device: { get: fake.resolves(devices) } },
+      });
+
+    it('should write on the real device feature, with the thermostat as device', async () => {
+      const handler = buildExternalHandler([netatmoDevice]);
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(routes, route, { params: { feature_selector: 'netatmo-setpoint' }, body: { value: 21 } }, res);
+
+      // The thermostat device carries the config (manual duration, schedule);
+      // the feature written on is the real device's.
+      assert.calledWith(handler.setValue, externalThermostat, externalFeature, 21, true);
+      expect(res.body).to.deep.equal({ success: true, value: 21 });
+    });
+
+    it('should honour manual: false', async () => {
+      const handler = buildExternalHandler([netatmoDevice]);
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(
+        routes,
+        route,
+        { params: { feature_selector: 'netatmo-setpoint' }, body: { value: 19, manual: false } },
+        res,
+      );
+
+      assert.calledWith(handler.setValue, externalThermostat, externalFeature, 19, false);
+    });
+
+    // The param names a feature that no longer exists — the integration was
+    // removed, or the device renamed.
+    it('should answer 404 when the real feature is gone', async () => {
+      const handler = buildExternalHandler([]);
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(routes, route, { params: { feature_selector: 'netatmo-setpoint' }, body: { value: 21 } }, res);
+
+      expect(res.statusCode).to.equal(404);
+      expect(res.body).to.deep.equal({ error: 'FEATURE_NOT_FOUND' });
+      assert.notCalled(handler.setValue);
+    });
+
+    // Naming any other selector must still be refused: this is the guard that
+    // stops a household member persisting a value on a lock or a cover.
+    it('should refuse a selector no thermostat is configured with', async () => {
+      const handler = buildExternalHandler([netatmoDevice]);
+      const routes = ThermostatController(handler);
+      const res = buildRes();
+
+      await callRoute(routes, route, { params: { feature_selector: 'some-lock' }, body: { value: 21 } }, res);
+
+      expect(res.statusCode).to.equal(404);
+      assert.notCalled(handler.setValue);
+    });
+  });
+
   describe('setVariable', () => {
     const route = 'post /api/v1/service/thermostat/state/:variable_key';
 

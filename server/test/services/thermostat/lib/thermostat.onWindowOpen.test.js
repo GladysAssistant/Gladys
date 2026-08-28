@@ -148,13 +148,20 @@ describe('thermostat.onDeviceNewState - ignored events', () => {
     expect(gladys.device.get.called).to.equal(false);
   });
 
-  it('should ignore a non-zero value without loading any device', async () => {
+  // A non-zero value is not a window opening, but it can be a setpoint changed
+  // on a real thermostat, so the selectors are consulted. They are cached and
+  // built by the same pass as the window ones, so this costs a single query for
+  // the whole house — and nothing at all once the cache is warm.
+  it('should not act on a non-zero value that is not a driven setpoint', async () => {
     const mod = loadModule();
-    const { gladys } = buildGladys();
+    const { gladys, setValue } = buildGladys();
+    const handler = { gladys, windowSelectorsCache: null, targetSelectorsCache: null };
 
-    await mod.onDeviceNewState.call({ gladys }, { device_feature: 'window-sensor', last_value: 1 });
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 1 });
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 1 });
 
-    expect(gladys.device.get.called).to.equal(false);
+    expect(setValue.called).to.equal(false);
+    expect(gladys.device.get.callCount).to.equal(1);
   });
 
   it('should ignore an event whose feature cannot be resolved', async () => {

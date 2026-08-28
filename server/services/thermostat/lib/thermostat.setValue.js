@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { DEFAULT_MANUAL_DURATION_MINUTES } = require('../../../utils/thermostatConstants');
-const { buildParamsConfig, toNumber } = require('./thermostat.deviceConfig');
+const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
 
 /**
  * @description Set a thermostat device feature value (for example the setpoint).
@@ -32,7 +32,41 @@ const { buildParamsConfig, toNumber } = require('./thermostat.deviceConfig');
  * await service.device.setValue(device, deviceFeature, 21.5);
  */
 async function setValue(device, deviceFeature, value, manual = true) {
-  await this.gladys.device.saveState(deviceFeature, value);
+  const config = buildParamsConfig(device) || {};
+  // On a virtual thermostat the setpoint feature is this service's own, so the
+  // value is simply persisted. On an external one it belongs to the real device
+  // (Netatmo, Zigbee, Matter, MQTT...), and persisting it alone would update
+  // every Gladys screen while the thermostat itself never hears about it: the
+  // write has to go through the core, which routes it to the owning
+  // integration. Without this the setpoint only reached the device on the next
+  // regulation tick, up to a minute later.
+  if (isExternal(config) && config.target_feature === deviceFeature.selector) {
+    // The core routes a write on `device.service.name`, so it has to be handed
+    // the device that *owns* the feature — the Netatmo, the Zigbee coordinator,
+    // the MQTT bridge. Passing this service's own thermostat device would route
+    // the write straight back into this function, endlessly.
+    const owner = await getFeatureBySelector(this.gladys, deviceFeature.selector);
+    if (owner) {
+      // Mark it before writing: the device echoes the new value back as a
+      // NEW_STATE, and the listener must not mistake our own write for a change
+      // made on the thermostat itself.
+      this.selfWrittenSetpoints.set(deviceFeature.selector, value);
+      try {
+        await this.gladys.device.setValue(owner.device, owner.feature, value);
+      } catch (e) {
+        // The write never reached the device, so no echo will come: a mark left
+        // behind would make the listener swallow a real change to that same
+        // value later on. The error still propagates — the caller (a scene, the
+        // API, the widget) must know the setpoint was not applied.
+        this.selfWrittenSetpoints.delete(deviceFeature.selector);
+        throw e;
+      }
+    } else {
+      logger.warn(`Thermostat: external target feature not found for selector="${deviceFeature.selector}"`);
+    }
+  } else {
+    await this.gladys.device.saveState(deviceFeature, value);
+  }
 
   if (!manual) {
     // Returning to the schedule: the caller has already cleared the manual flag,
@@ -48,7 +82,6 @@ async function setValue(device, deviceFeature, value, manual = true) {
   const manualVarKey = `THERMOSTAT_${featureKey}_MANUAL_MODE`;
   const manualUntilKey = `THERMOSTAT_${featureKey}_MANUAL_UNTIL`;
   const manualSetpointKey = `THERMOSTAT_${featureKey}_MANUAL_SETPOINT`;
-  const config = buildParamsConfig(device) || {};
   const durationMinutes = toNumber(config.manual_duration, DEFAULT_MANUAL_DURATION_MINUTES);
   // An empty string clears any expiry left by a previous schedule-backed hold:
   // the regulation loop only expires the override when this variable is set.

@@ -342,4 +342,33 @@ describe('thermostat.applySchedules (integration)', () => {
       .filter((c) => c.args[1] && c.args[1].type === 'thermostat.preset-updated' && c.args[1].payload.value === 'away');
     expect(presetEvents).to.have.lengthOf(1);
   });
+
+  // One failing thermostat must not stop the others: they are regulated in
+  // parallel, and a device whose integration is down would otherwise leave the
+  // rest of the house unregulated until the next tick.
+  it('should isolate a device that fails to regulate', async () => {
+    const mod = loadModule(buildSchedule('comfort'));
+    const gladys = makeGladys({
+      devices: [buildThermostatDevice(baseParams()), buildThermostatDevice(baseParams())],
+      variables: {},
+      switchOn: false,
+      currentTemp: 18,
+    });
+    // The first device blows up on the preset write, which regulateDevice does
+    // not guard: the per-device catch is what keeps the second one regulated.
+    let firstCall = true;
+    const originalSetValue = gladys.variable.setValue;
+    gladys.variable.setValue = fake((key, value, serviceId) => {
+      if (key && key.endsWith('_PRESET') && firstCall) {
+        firstCall = false;
+        return Promise.reject(new Error('database down'));
+      }
+      return originalSetValue(key, value, serviceId);
+    });
+
+    await mod.applySchedules.call({ gladys, serviceId: 'svc' });
+
+    // The second device was still regulated: its setpoint was written.
+    expect(gladys.device.saveState.called).to.equal(true);
+  });
 });
