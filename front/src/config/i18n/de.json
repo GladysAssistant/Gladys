@@ -35,6 +35,9 @@
     "loading": "Lädt...",
     "preview": "Vorschau"
   },
+  "errorBoundary": {
+    "message": "Beim Anzeigen ist ein Fehler aufgetreten. Lade die Seite neu und überprüfe die Konfiguration, falls es erneut auftritt."
+  },
   "color": {
     "aqua": "Aqua",
     "black": "Schwarz",
