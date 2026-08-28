@@ -10,10 +10,6 @@ import TextWithVariablesInjected from '../../../../components/scene/TextWithVari
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
 import style from './PlayNotification.css';
 
-// The position the browser gives an untouched 0-100 range: the fill has to sit where
-// the thumb sits, even while the action carries no volume yet
-const DEFAULT_RANGE_POSITION = 50;
-
 class PlayNotification extends Component {
   getOptions = async () => {
     try {
@@ -125,13 +121,16 @@ class PlayNotification extends Component {
             </span>
             {volumeIsSet && <span class={style.volumeValue}>{`${volume}%`}</span>}
           </label>
+          {/* No accent fill until a volume is actually committed: the action still saves
+              `volume: undefined` until the slider is touched, and each speaker then applies
+              its own default, so a half-filled track would read as a 50% that is never sent. */}
           <input
             type="range"
             value={volume}
             onInput={this.updateVolumeDraft}
             onChange={this.updateVolume}
             class={style.volumeRange}
-            style={{ '--volume-fill': `${volumeIsSet ? volume : DEFAULT_RANGE_POSITION}%` }}
+            style={{ '--volume-fill': `${volumeIsSet ? volume : 0}%` }}
             step="1"
             min={0}
             max={100}

@@ -38,14 +38,22 @@
   --volume-track: linear-gradient(
     to right,
     var(--gl-accent, #3d6df0) 0%,
-    var(--gl-accent, #3d6df0) var(--volume-fill, 50%),
-    rgba(28, 35, 52, 0.09) var(--volume-fill, 50%),
+    var(--gl-accent, #3d6df0) var(--volume-fill, 0%),
+    rgba(28, 35, 52, 0.09) var(--volume-fill, 0%),
     rgba(28, 35, 52, 0.09) 100%
   );
 }
 
 .volumeRange:focus {
   outline: none;
+}
+
+/* Forced-colors mode drops box-shadow, so the focus ring below would vanish: a
+   transparent outline is repainted with a system color there and stays invisible
+   everywhere else. */
+.volumeRange:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
 /* Chrome, Safari, Edge */
@@ -75,10 +83,21 @@
 
 /* Firefox */
 .volumeRange::-moz-range-track {
+  width: 100%;
   height: 8px;
   border-radius: 999px;
   background: var(--volume-track);
   box-shadow: inset 0 1px 3px rgba(28, 35, 52, 0.12);
+}
+
+/* Firefox paints the progress part as a sibling of the track, sized to the input
+   and not to the 8px track: the fill already lives on --volume-track, so this one
+   only has to keep out of the way. */
+.volumeRange::-moz-range-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: transparent;
+  border: none;
 }
 
 .volumeRange::-moz-range-thumb {
