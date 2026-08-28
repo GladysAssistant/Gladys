@@ -35,6 +35,9 @@
     "loading": "Loading...",
     "preview": "Preview"
   },
+  "errorBoundary": {
+    "message": "Something went wrong while displaying this. Reload the page, and check the configuration if it happens again."
+  },
   "color": {
     "aqua": "Aqua",
     "black": "Black",

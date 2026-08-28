@@ -35,6 +35,9 @@
     "loading": "Chargement...",
     "preview": "Aperçu"
   },
+  "errorBoundary": {
+    "message": "Une erreur est survenue à l'affichage. Rechargez la page, et vérifiez la configuration si cela se reproduit."
+  },
   "color": {
     "aqua": "Aqua",
     "black": "Noir",
