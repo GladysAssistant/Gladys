@@ -41,8 +41,10 @@ const SWAP_GIVE_UP_MS = 8000;
 // The dock is a slim capsule, and a thumb aiming at its scrollable pill
 // track often lands a few pixels high: without a guard that near-miss
 // grabbed the PAGE pager and switched dashboards. A page swipe never
-// starts this close above the dock; the track's own invisible touch halo
-// (style.css) covers most of the strip and scrolls the bar instead.
+// starts this close above the dock: the first pixels of the strip are the
+// track's own touch halo (style.css) and still scroll the bar; the rest is
+// a dead zone — deliberately NOT a bigger halo, which would cover the tail
+// of the last widget with an invisible scroller.
 const DOCK_GUARD_PX = 32;
 
 // Widgets also hold horizontally scrollable strips (responsive device

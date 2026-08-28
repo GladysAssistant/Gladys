@@ -850,13 +850,15 @@
   -ms-overflow-style: none;
   /* A scroll container clips painted overflow: without this breathing room
      the active pill's glass shadow is cut at the track's edge. The negative
-     margin gives the room back so the bar keeps its height. The top side is
-     deliberately larger: it doubles as an invisible touch halo above the
-     slim capsule, so a thumb landing a few pixels high still grabs the bar
-     (DashboardSwiper adds a matching guard strip where a near-miss can
-     never switch dashboards). */
-  padding: 30px 0 18px;
-  margin: -30px 0 -18px;
+     margin gives the room back so the bar keeps its height. The overhang
+     also acts as a small touch halo above the slim capsule (a slightly-high
+     thumb still grabs the bar) — kept at the shadow gutter ON PURPOSE: the
+     dock floats over the page in a z-100 fixed header, so anything larger
+     covers the tail of the last widget with an invisible scroller. Beyond
+     it, DashboardSwiper's 32px guard strip is a dead zone: a higher
+     near-miss does nothing rather than switching dashboards. */
+  padding: 18px 0;
+  margin: -18px 0;
 }
 
 .dashboardTabsTrack::-webkit-scrollbar {
