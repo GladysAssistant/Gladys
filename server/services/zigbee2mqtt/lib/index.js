@@ -48,6 +48,7 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.mqttClient = null;
 
   this.discoveredDevices = {};
+  this.syncRenamedDevicesRunning = false;
   this.topicBinds = {};
   this.usbConfigured = false;
   this.networkAdapterConfigured = false;

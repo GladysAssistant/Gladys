@@ -9,6 +9,26 @@ const getIeeeAddressParam = (device) => {
 };
 
 /**
+ * @description Drop a RAM cache entry keyed by an external_id we no longer use, unless another
+ * entity took it over in the meantime. On a name swap the new owner is written to the cache
+ * before the previous owner cleans up, so a blind delete would evict the fresh entry and leave
+ * the device unreachable for incoming MQTT states.
+ * @param {object} gladys - Gladys instance.
+ * @param {string} entity - Cache to clean ("deviceByExternalId" or "deviceFeatureByExternalId").
+ * @param {string} externalId - The external_id that is no longer used.
+ * @param {string} ownerId - Id of the device (or feature) that used to own this external_id.
+ * @example
+ * deleteOwnedCacheEntry(gladys, 'deviceByExternalId', 'zigbee2mqtt:old-name', device.id);
+ */
+function deleteOwnedCacheEntry(gladys, entity, externalId, ownerId) {
+  const cachedEntity = gladys.stateManager.get(entity, externalId);
+  if (cachedEntity && cachedEntity.id !== ownerId) {
+    return;
+  }
+  gladys.stateManager.deleteState(entity, externalId);
+}
+
+/**
  * @description Update a Gladys device (and its features) external_id to follow the new
  * Zigbee2mqtt friendly_name. Selectors are left untouched so scenes, dashboards and
  * device history keep working.
@@ -32,12 +52,12 @@ async function applyRename(gladys, gladysDevice, currentName, newName, newDispla
       ? `${newPrefix}${feature.external_id.substring(oldPrefix.length)}`
       : feature.external_id,
   }));
-  const staleFeatureExternalIds = (gladysDevice.features || [])
-    .map((feature) => feature.external_id)
-    .filter((externalId, index) => externalId !== renamedFeatures[index].external_id);
+  const staleFeatures = (gladysDevice.features || []).filter(
+    (feature, index) => feature.external_id !== renamedFeatures[index].external_id,
+  );
   const writtenExternalIds = {
     device: `${EXTERNAL_ID_PREFIX}${newName}`,
-    features: renamedFeatures.map((feature) => feature.external_id),
+    features: renamedFeatures.map((feature) => ({ id: feature.id, external_id: feature.external_id })),
   };
 
   const device = {
@@ -52,10 +72,10 @@ async function applyRename(gladys, gladysDevice, currentName, newName, newDispla
   await gladys.device.create(device);
 
   // device.create registered the device under its new external_ids in the RAM cache,
-  // but the entries keyed by the old name are still there: drop them.
-  gladys.stateManager.deleteState('deviceByExternalId', oldExternalId);
-  staleFeatureExternalIds.forEach((featureExternalId) => {
-    gladys.stateManager.deleteState('deviceFeatureByExternalId', featureExternalId);
+  // but the entries keyed by the old name are still there: drop the ones we still own.
+  deleteOwnedCacheEntry(gladys, 'deviceByExternalId', oldExternalId, gladysDevice.id);
+  staleFeatures.forEach((feature) => {
+    deleteOwnedCacheEntry(gladys, 'deviceFeatureByExternalId', feature.external_id, feature.id);
   });
 
   return writtenExternalIds;
@@ -132,9 +152,9 @@ async function applyRenames(gladys, renames, gladysDevices) {
       await applyRename(gladys, gladysDevice, currentName, newName, newDisplayName);
       if (rename.staged) {
         // The temporary external_ids of phase 1 are gone from DB: drop them from RAM too.
-        gladys.stateManager.deleteState('deviceByExternalId', rename.staged.device);
-        rename.staged.features.forEach((featureExternalId) => {
-          gladys.stateManager.deleteState('deviceFeatureByExternalId', featureExternalId);
+        deleteOwnedCacheEntry(gladys, 'deviceByExternalId', rename.staged.device, gladysDevice.id);
+        rename.staged.features.forEach((feature) => {
+          deleteOwnedCacheEntry(gladys, 'deviceFeatureByExternalId', feature.external_id, feature.id);
         });
       }
     } catch (e) {
@@ -157,6 +177,14 @@ async function applyRenames(gladys, renames, gladysDevices) {
  * await zigbee2mqttManager.syncRenamedDevices(devices);
  */
 async function syncRenamedDevices(z2mDevices) {
+  // MQTT messages are handled without being awaited, and "bridge/devices" is republished on
+  // every change: two overlapping syncs would plan the same renames from the same DB snapshot
+  // and fight over the same rows. Skipping is safe, the next message re-runs the reconciliation.
+  if (this.syncRenamedDevicesRunning) {
+    logger.debug('Zigbee2mqtt: rename synchronization already running, skipping this message');
+    return;
+  }
+  this.syncRenamedDevicesRunning = true;
   try {
     const z2mDeviceByIeeeAddress = new Map();
     const z2mDeviceByName = new Map();
@@ -225,6 +253,8 @@ async function syncRenamedDevices(z2mDevices) {
     }
   } catch (e) {
     logger.warn(`Zigbee2mqtt: unable to sync renamed devices: ${e}`);
+  } finally {
+    this.syncRenamedDevicesRunning = false;
   }
 }
 
