@@ -13,6 +13,7 @@ import keyValStore from './keyValueStore';
 const FRONT_VERSION = process.env.GLADYS_FRONT_VERSION;
 
 const DISMISSED_NOTICE_KEY = 'dismissed_instance_update_notice';
+const SETTLED_CHECK_KEY = 'instance_version_check_settled_for';
 
 // Both versions come from the release process ("x.y.z", the instance with a
 // leading "v"): a plain major.minor.patch comparison is enough, the full
@@ -57,4 +58,24 @@ const isUpdateNoticeDismissed = instanceVersion =>
 const dismissUpdateNotice = instanceVersion =>
   keyValStore.set(DISMISSED_NOTICE_KEY, dismissedNoticeValue(instanceVersion));
 
-export { getFrontVersion, isInstanceBehindFront, isUpdateNoticeDismissed, dismissUpdateNotice };
+// /api/v1/system/info returns much more than a version (network interfaces,
+// docker image, CPU...) and can trigger background probes: not something to
+// pull on every session of every household member forever. Once the instance
+// has been seen at (or past) the front version, the answer cannot change
+// until the next front deploy — the front version baked in the bundle then
+// changes and the marker goes stale on its own. Steady state is thus one
+// call per browser per release, exactly in the window the check exists for.
+// The trade-off, accepted: an instance rolled back after settling is not
+// re-detected until the next release.
+const isInstanceVersionCheckSettled = () => keyValStore.get(SETTLED_CHECK_KEY) === FRONT_VERSION;
+
+const markInstanceVersionCheckSettled = () => keyValStore.set(SETTLED_CHECK_KEY, FRONT_VERSION);
+
+export {
+  getFrontVersion,
+  isInstanceBehindFront,
+  isUpdateNoticeDismissed,
+  dismissUpdateNotice,
+  isInstanceVersionCheckSettled,
+  markInstanceVersionCheckSettled
+};

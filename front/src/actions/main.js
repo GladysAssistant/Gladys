@@ -6,6 +6,11 @@ import { route } from 'preact-router';
 import get from 'get-value';
 import config from '../config';
 import { isUrlInArray } from '../utils/url';
+import {
+  isInstanceBehindFront,
+  isInstanceVersionCheckSettled,
+  markInstanceVersionCheckSettled
+} from '../utils/instanceVersion';
 
 const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 // Self-hosted gateways without Stripe get a ~100-year "trial": past this
@@ -203,17 +208,30 @@ function createActions(store) {
       if (!config.gatewayMode || config.demoMode) {
         return;
       }
+      // the system/info payload is a lot more than a version string: once the
+      // instance has caught up with this front build, stop asking for it
+      // until the next front deploy (see instanceVersion.js)
+      if (isInstanceVersionCheckSettled()) {
+        return;
+      }
       if (Date.now() - lastInstanceVersionRefresh < INSTANCE_VERSION_REFRESH_INTERVAL_MS) {
         return;
       }
       lastInstanceVersionRefresh = Date.now();
       try {
         const systemInfos = await state.httpClient.get('/api/v1/system/info');
+        const instanceGladysVersion = systemInfos.gladys_version || null;
+        // a response with no mismatch settles the check — an unreadable
+        // version too, since it could never display the notice anyway
+        if (!isInstanceBehindFront(instanceGladysVersion)) {
+          markInstanceVersionCheckSettled();
+        }
         store.setState({
-          instanceGladysVersion: systemInfos.gladys_version || null
+          instanceGladysVersion
         });
       } catch (e) {
-        // instance unreachable: better no notice than a wrong one
+        // instance unreachable: better no notice than a wrong one, and the
+        // check stays unsettled so the next session retries
         console.error(e);
       }
     },
