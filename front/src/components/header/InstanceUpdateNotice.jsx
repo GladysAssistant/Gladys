@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { USER_ROLE } from '../../../../server/utils/constants';
-import { getFrontVersion, isUpdateNoticeDismissed, dismissUpdateNotice } from '../../utils/instanceVersion';
+import { getFrontVersion, dismissUpdateNotice } from '../../utils/instanceVersion';
 import style from './style.css';
 
 // Displayed on Gladys Plus when the hosted front is on a newer release than
@@ -31,15 +31,12 @@ class InstanceUpdateNotice extends Component {
 
   dismiss = () => {
     dismissUpdateNotice(this.props.instanceVersion);
-    // the dismissal lives in localStorage: this empty setState only forces
-    // the re-render that reads it back and hides the notice
-    this.setState({});
+    // the dismissal lives in localStorage: the header owns both this notice
+    // and the mobile dot echoing it, so it is the one told to re-read it
+    this.props.onDismiss();
   };
 
   render({ instanceVersion, user }) {
-    if (isUpdateNoticeDismissed(instanceVersion)) {
-      return null;
-    }
     return (
       <div class={style.updateNoticeCard} data-cy="instance-update-notice">
         <Localizer>

@@ -8,7 +8,7 @@ import { USER_ROLE } from '../../../../server/utils/constants';
 import DarkModeToggle from '../darkmode/DarkModeToggle';
 import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
-import { isInstanceBehindFront } from '../../utils/instanceVersion';
+import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
 import style from './style.css';
 
 const PAGES_WITHOUT_HEADER = [
@@ -119,6 +119,13 @@ class Header extends Component {
 
   isHidden = () => isUrlInArray(this.props.currentUrl, PAGES_WITHOUT_HEADER) || this.props.fullScreen;
 
+  // the dismissal is written to localStorage by the notice itself: this only
+  // forces the re-render that reads it back, hiding the notice and the
+  // mobile dot echoing it in the same pass
+  handleInstanceNoticeDismiss = () => {
+    this.setState({});
+  };
+
   // Content offsets (style/index.css) key off this body class so they vanish
   // together with the sidebar on auth pages and in fullscreen mode
   syncBodyClass = () => {
@@ -155,6 +162,8 @@ class Header extends Component {
     const userLanguage = get(props, 'user.language');
     const forumUrl =
       userLanguage === 'fr' ? 'https://community.gladysassistant.com/' : 'https://community.gladysassistant.com/';
+    const showInstanceUpdateNotice =
+      isInstanceBehindFront(props.instanceGladysVersion) && !isUpdateNoticeDismissed(props.instanceGladysVersion);
 
     return (
       <div>
@@ -168,6 +177,10 @@ class Header extends Component {
             aria-controls="sidebar-navigation"
           >
             <i class="fe fe-menu" />
+            {/* on mobile the notice lives in the closed menu: this dot is
+                what tells the user there is something to open it for. Screen
+                readers get the notice content itself, in the menu. */}
+            {showInstanceUpdateNotice && <span class={style.mobileTogglerDot} aria-hidden="true" />}
           </button>
           <a class={style.mobileBrand} href="/dashboard">
             <Localizer>
@@ -233,11 +246,12 @@ class Header extends Component {
               </li>
             ))}
           </ul>
-          {isInstanceBehindFront(props.instanceGladysVersion) && (
+          {showInstanceUpdateNotice && (
             <InstanceUpdateNotice
               instanceVersion={props.instanceGladysVersion}
               user={props.user}
               refreshInstanceVersionState={props.refreshInstanceVersionState}
+              onDismiss={this.handleInstanceNoticeDismiss}
             />
           )}
           {Number.isInteger(props.gatewayTrialDaysLeft) && (

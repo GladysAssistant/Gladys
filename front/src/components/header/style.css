@@ -317,6 +317,7 @@
 }
 
 .mobileToggler {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -334,6 +335,19 @@
 .mobileToggler:hover {
   color: #1c2334;
   text-decoration: none;
+}
+
+/* Echo of the instance update notice (see .updateNoticeCard): on mobile the
+   notice sits in the closed menu, so the burger carries a dot in the same
+   amber to signal there is something worth opening it for */
+.mobileTogglerDot {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #c4762a;
 }
 
 .mobileBrand {
