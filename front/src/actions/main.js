@@ -4,7 +4,13 @@ import createActionsExternalIntegrationUpdates from './externalIntegrationUpdate
 import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
 import get from 'get-value';
+import config from '../config';
 import { isUrlInArray } from '../utils/url';
+import {
+  isInstanceBehindFront,
+  isInstanceVersionCheckSettled,
+  markInstanceVersionCheckSettled
+} from '../utils/instanceVersion';
 
 const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 // Self-hosted gateways without Stripe get a ~100-year "trial": past this
@@ -13,8 +19,12 @@ const MAX_TRIAL_DAYS_DISPLAYED = 92;
 // Every focus-triggered refresh costs the gateway two Stripe calls: a user
 // hopping between tabs must not pay for them over and over.
 const GATEWAY_TRIAL_REFRESH_INTERVAL_MS = 30 * 1000;
+// The instance version changes at most a few times a day (Watchtower): one
+// call a minute on tab focus is enough to notice an update happened.
+const INSTANCE_VERSION_REFRESH_INTERVAL_MS = 60 * 1000;
 
 let lastGatewayTrialRefresh = 0;
+let lastInstanceVersionRefresh = 0;
 
 const OPEN_PAGES = [
   '/signup',
@@ -93,6 +103,8 @@ function createActions(store) {
         // every page: it is loaded once the user (and their role) is known,
         // without blocking the rest of the session check
         actionsExternalIntegrationUpdates.refreshExternalIntegrationsToUpdate(state, user);
+        // same fire-and-forget for the instance version behind Gladys Plus
+        actions.refreshInstanceVersionState(state);
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
           const now = new Date();
@@ -184,6 +196,52 @@ function createActions(store) {
         gatewayTrialStripePortalKey: stripePortalKey
       });
     },
+    // On Gladys Plus the front redeploys at release time while the local
+    // instance waits for Watchtower (up to ~24h): the instance version is
+    // loaded so the header can announce the mismatch (InstanceUpdateNotice)
+    // instead of letting it surface as random bugs. Called at session check,
+    // and again when the tab regains focus while the notice is displayed —
+    // the moment Watchtower may just have resolved it.
+    async refreshInstanceVersionState(state) {
+      // served locally, the front comes from the instance itself: the
+      // versions cannot diverge. The demo has no real instance at all.
+      if (!config.gatewayMode || config.demoMode) {
+        return;
+      }
+      // the system/info payload is a lot more than a version string: once the
+      // instance has caught up with this front build, stop asking for it
+      // until the next front deploy (see instanceVersion.js)
+      if (isInstanceVersionCheckSettled()) {
+        return;
+      }
+      if (Date.now() - lastInstanceVersionRefresh < INSTANCE_VERSION_REFRESH_INTERVAL_MS) {
+        return;
+      }
+      lastInstanceVersionRefresh = Date.now();
+      // logout swaps the session object out of the store: that identity is
+      // what tells a response landing after logout that it must not write
+      // the previous session's version into the next one
+      const requestSession = state.session;
+      try {
+        const systemInfos = await state.httpClient.get('/api/v1/system/info');
+        if (store.getState().session !== requestSession) {
+          return;
+        }
+        const instanceGladysVersion = systemInfos.gladys_version || null;
+        // a response with no mismatch settles the check — an unreadable
+        // version too, since it could never display the notice anyway
+        if (!isInstanceBehindFront(instanceGladysVersion)) {
+          markInstanceVersionCheckSettled();
+        }
+        store.setState({
+          instanceGladysVersion
+        });
+      } catch (e) {
+        // instance unreachable: better no notice than a wrong one, and the
+        // check stays unsettled so the next session retries
+        console.error(e);
+      }
+    },
     async logout(state, e) {
       e.preventDefault();
       const user = state.session.getUser();
@@ -194,6 +252,9 @@ function createActions(store) {
       // a pending "integrations to update" request must not write the count of
       // the session being closed into the fresh state
       actionsExternalIntegrationUpdates.invalidateExternalIntegrationsToUpdate();
+      // and the instance version throttle must not carry over: logging back
+      // in right away gets a fresh check, not a 60s silence
+      lastInstanceVersionRefresh = 0;
       route('/login', true);
       const defaultState = getDefaultState();
       store.setState(defaultState, true);

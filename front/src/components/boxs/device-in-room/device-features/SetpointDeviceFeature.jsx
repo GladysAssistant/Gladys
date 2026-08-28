@@ -92,7 +92,7 @@ const SetpointDeviceFeature = ({ children, ...props }) => {
               <input
                 type="number"
                 value={props.deviceFeature.last_value}
-                class={cx('form-control text-center', style.removeNumberArrow)}
+                class={cx('form-control text-center', style.removeNumberArrow, style.setpointValue)}
                 onChange={updateValueEvent}
                 step={SETPOINT_STEP}
                 min={props.deviceFeature.min}

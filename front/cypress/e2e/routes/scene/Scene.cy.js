@@ -68,15 +68,18 @@ describe('Scene view', () => {
 
     cy.get('[data-cy="type-picker-option"][data-value="house.is-empty"]').click();
 
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[0]).as('houseControl');
-      cy.get('@houseControl').click(0, 0, { force: true });
+    cy.get('[data-cy="scene-house-empty-or-not-choose-house"] .react-select__control').click();
 
-      cy.get('@houseControl')
-        .get('[class*="-menu"]')
-        .filter(`:contains("My House")`)
-        .click(0, 0, { force: true });
-    });
+    // The menu is rendered through a portal on <body> (components/form/Select.jsx),
+    // so it is queried from the document and not from the control — only one
+    // menu is open at a time. scrollBehavior: false because a portaled menu
+    // closes on any scroll: letting Cypress scroll the option into view would
+    // close the menu it is about to click.
+    cy.get('.react-select__menu')
+      .contains('.react-select__option', 'My House')
+      .click({ scrollBehavior: false });
+
+    cy.get('[data-cy="scene-house-empty-or-not-choose-house"]').should('contain', 'My House');
   });
 
   it('Should add new condition device set value', () => {

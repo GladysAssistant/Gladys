@@ -72,6 +72,7 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
@@ -101,6 +102,7 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
@@ -136,6 +138,7 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
   });

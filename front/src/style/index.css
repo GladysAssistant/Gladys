@@ -563,6 +563,21 @@ body .apexcharts-tooltip {
   }
 }
 
+/* Every <select class="custom-select"> of the app is missing its dropdown
+   arrow: the one Tabler paints encodes the color as a raw `#999` inside a
+   data: URL, where a `#` starts a fragment — the browser drops the rest of
+   the SVG and renders nothing. Without an arrow a select is indistinguishable
+   from a text input, which is what the community reported on the sort control
+   of the page headers. Same chevron as the rest of the interface, escaped
+   (%23) so it actually loads; dark mode inverts it with the page. */
+.custom-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c8396' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 0.7rem 0.7rem;
+  padding-right: 2rem;
+}
+
 /* Weather condition icons (Meteocons): the cloud artwork is drawn in near-white
    (#f3f7fe → #deeafb, outlined #e6effc), which all but disappears on the white
    card background in light mode. Dark mode has no such problem — the global

@@ -5,6 +5,7 @@
     "new": "New",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
+    "orderDirLabel": "Sort order",
     "emptySelectOption": "---------",
     "backButton": "◀️️ Back",
     "requiredField": "*",
@@ -34,6 +35,9 @@
     "expand": "Expand",
     "loading": "Loading...",
     "preview": "Preview"
+  },
+  "errorBoundary": {
+    "message": "Something went wrong while displaying this. Reload the page, and check the configuration if it happens again."
   },
   "color": {
     "aqua": "Aqua",
@@ -309,6 +313,7 @@
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Edit",
+    "allDashboardsButton": "All dashboards",
     "enableFullScreen": "Full screen",
     "disableFullScreen": "Exit full screen",
     "editDashboardTitle": "Edit dashboard",
@@ -1260,6 +1265,10 @@
     "free-mobile": {
       "title": "Free Mobile",
       "description": "Send SMS from Gladys using Free Mobile.",
+      "deprecatedWarning": {
+        "title": "Integration soon deprecated",
+        "description": "This built-in integration will be removed in a future version of Gladys. It is replaced by the community integration <b>Free Mobile SMS</b>, which offers the same features and will keep being maintained. Head to the <a href=\"/dashboard/integration/notifications\">integration catalog</a> to install it, then enter your Free Mobile credentials in the <b>My account</b> section of the <b>Configuration</b> tab of that integration — each Gladys user fills in their own. In your scenes, the <b>Send SMS</b> action keeps using this built-in integration: replace it with a <b>Send Message</b> action targeting the Free Mobile SMS channel and the Gladys user whose account is configured."
+      },
       "documentation": "Free Mobile Documentation",
       "introduction": "This plugin allows you to send SMS to your Free cell phone via the notification service provided by Free. Enter your customer ID and the identification key below, which you can find on the <a href=\"https://mobile.free.fr\"> FreeMobile</a> website.",
       "username": "Free Mobile Customer ID",
@@ -1584,6 +1593,12 @@
         "enableLabel": "Enable or disable the service",
         "enableDescription": "At the next restart of Gladys, the service will start again. Depending on the power of your machine and the speed of your network, starting this service in \"Installation from Gladys\" mode can take between 2 minutes and 1 hour. It is possible to permanently disable the service from this page: <a href=\"/dashboard/settings/service\">Settings > Services</a>.",
         "toggleError": "An error occurred. Please check the service configuration.",
+        "mqttConnectionErrors": {
+          "BAD_CREDENTIALS": "Gladys could not connect to the MQTT broker: the username or the password is incorrect. Check the credentials of your MQTT broker, then save the configuration again.",
+          "NOT_AUTHORIZED": "The MQTT broker refused the connection: not authorized. Check the username and password of your MQTT broker, and that this client is allowed to connect, then save the configuration again.",
+          "BROKER_UNREACHABLE": "Gladys could not reach the MQTT broker. Check that the broker URL and port are correct, and that the broker is running and reachable from Gladys.",
+          "unknownErrorPrefix": "MQTT connection error: "
+        },
         "serviceStatus": "Service Status",
         "description": "This service uses two Docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt to deploy these containers. For more information, visit the Zigbee2mqtt documentation page.",
         "nonDockerEnv": "Gladys is currently not running in Docker, it is impossible to enable Zigbee2mqtt from Gladys.",
@@ -3303,6 +3318,8 @@
         "explanationText": "To insert a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
       },
       "smsSend": {
+        "deprecatedTitle": "Action soon deprecated",
+        "deprecatedDescription": "This action uses the built-in Free Mobile integration, which will be removed in a future version of Gladys. Install the community integration <b>Free Mobile SMS</b>, enter your Free Mobile credentials in the <b>My account</b> section of the <b>Configuration</b> tab of that integration, then replace this action with a <b>Send Message</b> action targeting the Free Mobile SMS channel and the Gladys user whose account is configured.",
         "textLabel": "Message",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
@@ -3545,6 +3562,9 @@
         "description": "This action will make Gladys speak on the selected speaker.",
         "deviceLabel": "Speaker",
         "volumeLabel": "Volume",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Computed",
+        "computedExplanationText": "Instead of a fixed volume, you can enter here a calculation based on a scene variable, for example to speak quieter at night. To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "textLabel": "Message to speak on the speaker",
         "variablesExplanation": "To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
       }
@@ -3981,6 +4001,7 @@
     },
     "searchActionsPlaceholder": "Search for an action…",
     "searchTriggersPlaceholder": "Search for a trigger…",
+    "deprecatedActionBadge": "Soon deprecated",
     "noResultsFound": "No results",
     "whenSectionTitle": "When",
     "whenSectionSubtitle": "the scene starts as soon as any one of these events occurs",
@@ -6309,6 +6330,10 @@
       "other": "Gladys Plus trial: {{count}} days left"
     },
     "trialAddPaymentMethod": "Add a payment method",
+    "instanceUpdateNoticeTitle": "Update available",
+    "instanceUpdateNoticeText": "Gladys Plus has been updated to {{latestVersion}}, but your instance is still on {{instanceVersion}}. Some features may not work properly until your instance is updated.",
+    "instanceUpdateNoticeButton": "Update my instance",
+    "instanceUpdateNoticeDismiss": "Hide this message",
     "needHelp": "Need help",
     "signOut": "Sign Out"
   },

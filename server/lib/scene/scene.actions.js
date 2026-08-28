@@ -939,10 +939,38 @@ const actionsFunc = {
     );
     // replace variable in text
     const messageWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
+
+    let { volume } = action;
+
+    // The volume can also be a formula based on scene variables, so an announcement can be
+    // played quieter in the evening for example.
+    if (action.evaluate_volume !== undefined) {
+      try {
+        volume = evaluate(
+          Handlebars.compile(action.evaluate_volume, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
+      } catch (e) {
+        logger.warn(`Play notification: Error evaluating volume: ${action.evaluate_volume}`);
+        logger.warn(e);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+      }
+      // mathjs can return something which is not a usable number: a string, a matrix, or
+      // Infinity when the formula overflows. The speaker services expect a real number.
+      if (typeof volume !== 'number' || !Number.isFinite(volume)) {
+        logger.warn(`Play notification: Volume is not a number: ${volume}`);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+      }
+      // The volume is a percentage: a formula going out of bounds is clamped instead of
+      // being sent as-is to the speaker.
+      volume = Math.min(100, Math.max(0, Math.round(volume)));
+    }
+
     // Get TTS URL
     const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
     // Play TTS Notification on device
-    await self.device.setValue(device, deviceFeature, url, { volume: action.volume });
+    await self.device.setValue(device, deviceFeature, url, { volume });
   },
   [ACTIONS.SMS.SEND]: async (self, action, scope) => {
     const freeMobileService = self.service.getService('free-mobile');

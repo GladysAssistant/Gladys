@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import get from 'get-value';
+import cx from 'classnames';
 
 import { WEATHER_UNITS } from '../../../../../server/utils/constants';
 
@@ -521,7 +522,7 @@ class WeatherBoxComponent extends Component {
               being crushed or drawing past the card edge */}
           {showHourly && (
             <div
-              class={hasContentAboveHourly ? 'border-top' : ''}
+              class={cx('weather-forecast-scroll', { 'border-top': hasContentAboveHourly })}
               style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 10px; margin-bottom: 10px; overflow-x: auto"
             >
               {hours.map((hour, index) => (
@@ -569,7 +570,7 @@ class WeatherBoxComponent extends Component {
           {/* Daily forecast */}
           {showDaily && (
             <div
-              class={hasContentAboveDaily ? 'border-top' : ''}
+              class={cx('weather-forecast-scroll', { 'border-top': hasContentAboveDaily })}
               style="display: flex; justify-content: space-between; padding-top: 10px; overflow-x: auto"
             >
               {days.map(day => (

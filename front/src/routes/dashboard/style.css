@@ -221,29 +221,50 @@
   }
 }
 
+/* The scene class (below) sets the background-image HERE, but the element
+   paints it at zero size: the visible scene is the fixed, full-viewport
+   ::before layer, which inherits the image and is composited once — never
+   repainted while the dashboard scrolls. The previous mechanism,
+   background-attachment: fixed on this (scrolling) element, forced a
+   main-thread repaint of the whole gradient on every scroll frame — under
+   cards that re-blur their backdrop each frame, that repaint was the
+   difference between a fluid scroll and a laggy one on modest hardware
+   (see the identical fix on the Activity page, routes/history/style.css).
+   Covering the viewport also slides the scene under the nav rail / mobile
+   top bar, so their backdrop blur frosts the actual scene — no width or
+   margin trick needed for that anymore. */
 .dashboardBackground {
+  background-size: 0 0;
+  min-height: 100vh;
+  /* own stacking context so the fixed scene layer can sit at z -1 behind
+     the in-flow content but above the element's own background (the
+     dark-mode.css opaque .page-main background included) */
+  position: relative;
+  isolation: isolate;
+}
+
+.dashboardBackground::before {
+  content: '';
+  position: fixed;
+  /* longhands, not inset: — it must not silently disappear on the old
+     wall tablets (Chromium < 87) */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  background-image: inherit;
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
-  min-height: 100vh;
+  /* the layer covers areas outside the element's own box (under the nav
+     rail): it must never intercept their pointer events */
+  pointer-events: none;
 }
 
-/* With the left navigation rail, the outer .page is padded (style/index.css)
-   but the wallpaper slides back under the rail, so the rail's backdrop blur
-   frosts the actual scene instead of a flat page background. The image is
-   viewport-fixed, so the extension doesn't shift what's visible. */
-@media (min-width: 992px) {
-  :global(body.gladys-sidebar-nav) .dashboardBackground {
-    /* the box must GROW by the rail width, not merely shift: width stays
-       100% of the padded page, so without the calc the scene would stop
-       15rem short of the right edge of the viewport */
-    width: calc(100% + 15rem);
-    margin-left: -15rem;
-    padding-left: 15rem;
-  }
-}
-
-/* Same under the mobile top bar: the scene runs behind its frosted glass */
+/* Under the mobile top bar the outer .page is padded (style/index.css):
+   pull the box back up and re-pad it, so min-height: 100vh ends exactly at
+   the viewport bottom instead of 3.25rem below it (a short dashboard must
+   not scroll). The scene itself is viewport-fixed and needs no trick. */
 @media (max-width: 991.98px) {
   :global(body.gladys-sidebar-nav) .dashboardBackground {
     margin-top: -3.25rem;
@@ -805,6 +826,63 @@
   flex: 0 0 auto;
 }
 
+/* Mobile dock (DashboardTabs scrollable layout): the pill track scrolls
+   sideways with a hidden scrollbar — same treatment as the app's other
+   sideways rows (.hz-tabs, .groupChips) — instead of collapsing pills
+   behind the "…" menu. */
+.dashboardTabsScrollable {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.dashboardTabsTrack {
+  position: relative;
+  display: flex;
+  gap: inherit;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  /* programmatic centering of the active pill glides instead of jumping;
+     old engines without scroll-behavior simply jump, which is fine */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* A scroll container clips painted overflow: without this breathing room
+     the active pill's glass shadow is cut at the track's edge. The negative
+     margin gives the room back so the bar keeps its height. The overhang
+     also acts as a small touch halo above the slim capsule (a slightly-high
+     thumb still grabs the bar) — kept at the shadow gutter ON PURPOSE: the
+     dock floats over the page in a z-100 fixed header, so anything larger
+     covers the tail of the last widget with an invisible scroller. Beyond
+     it, DashboardSwiper's 32px guard strip is a dead zone: a higher
+     near-miss does nothing rather than switching dashboards. */
+  padding: 18px 0;
+  margin: -18px 0;
+}
+
+.dashboardTabsTrack::-webkit-scrollbar {
+  display: none;
+}
+
+/* Edge fades — the scrollbar is hidden, so they are the signal that more
+   pills sit past the edge. Toggled from scroll position: an edge fully
+   scrolled to shows plain, not faded. */
+.dashboardTabsTrackFadeStart {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px);
+  mask-image: linear-gradient(to right, transparent, #000 28px);
+}
+
+.dashboardTabsTrackFadeEnd {
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 28px);
+  mask-image: linear-gradient(to left, transparent, #000 28px);
+}
+
+.dashboardTabsTrackFadeStart.dashboardTabsTrackFadeEnd {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+}
+
 .dashboardTabsMenu {
   max-height: 60vh;
   overflow-y: auto;
@@ -870,10 +948,38 @@
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
   }
 
-  /* the "…" menu opens upward from the dock */
+  /* The "…" menu opens upward from the dock and spans the whole pill track.
+     Anchored to its own .dropdown wrapper (the "…" button) it could open
+     outside the screen: dropdown-menu-right hangs the panel leftward from
+     the button, which sits near the LEFT edge when only a pill or two are
+     visible, and a long dashboard name widens the nowrap panel past the
+     viewport. position: static on the wrapper hands the containing block
+     to the track (position: relative), whose box is always on-screen. */
+  .dashboardTabsOverflow {
+    position: static;
+  }
+
   .dashboardTabsMenu {
     top: auto;
     bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+  }
+
+  /* the panel width is now the track's, not the content's: one endless
+     dashboard name must clip, not push the panel past the viewport */
+  .dashboardTabsMenu :global(.dropdown-item) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* The dock floats over arbitrary scenes (photos included): a slightly
+     deeper shadow than the desktop bar keeps it visually anchored (forum
+     feedback). The action pills alongside get the same one so the row
+     keeps one voice. */
+  :global(.glass-theme) .dashboardHeader .dashboardTabs,
+  :global(.glass-theme) .dashboardHeader :global(.page-options .btn) {
+    box-shadow: 0 10px 30px rgba(28, 35, 52, 0.24), 0 2px 8px rgba(28, 35, 52, 0.12);
   }
 }
 
@@ -945,9 +1051,11 @@
   padding: 0;
 }
 
-/* On small screens only the active pill keeps its name — the rest shrink
-   to icon dots so more of them fit before the overflow kicks in */
-@media (max-width: 767px) {
+/* On the whole mobile dock only the active pill keeps its name — the rest
+   shrink to icon dots so more of them fit in the scrollable track. The full
+   dock breakpoint on purpose (not just phones): the dock must not change
+   its look between a portrait and a landscape phone. */
+@media (max-width: 991.98px) {
   .dashboardTab:not(.dashboardTabActive) {
     width: 2.375rem;
     padding: 0;
@@ -1183,6 +1291,64 @@
   }
 }
 
+/* The weather forecast rows scroll sideways on purpose — their slots keep a
+   readable floor rather than being crushed into a narrow card. What they must
+   not do is carry a permanent scrollbar across the card: it reads as a broken
+   layout, which is how it was reported. Same treatment as the app's other
+   sideways rows (.hz-tabs, .groupChips): the bar is hidden, and a thin one
+   comes back on hover or keyboard focus for mouse users. */
+:global(.glass-theme .weather-forecast-scroll) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+:global(.glass-theme .weather-forecast-scroll::-webkit-scrollbar) {
+  display: none;
+}
+
+:global(.glass-theme .weather-forecast-scroll:hover),
+:global(.glass-theme .weather-forecast-scroll:focus-within) {
+  scrollbar-width: thin;
+}
+
+:global(.glass-theme .weather-forecast-scroll:hover::-webkit-scrollbar),
+:global(.glass-theme .weather-forecast-scroll:focus-within::-webkit-scrollbar) {
+  display: block;
+  height: 4px;
+}
+
+:global(.glass-theme .weather-forecast-scroll:hover::-webkit-scrollbar-thumb),
+:global(.glass-theme .weather-forecast-scroll:focus-within::-webkit-scrollbar-thumb) {
+  background: rgba(28, 35, 52, 0.2);
+  border-radius: 4px;
+}
+
+/* An auto-layout table sizes a column to its widest unbreakable word, and a
+   device name is very often one long token (`Volet_chambre_parentale`). That
+   minimum pushed the whole table past the card, and .table-responsive put the
+   row under a horizontal scrollbar — on a phone, and on desktop too as soon as
+   the dashboard column was narrow. `max-width: 0` takes the name column out of
+   that minimum so it can shrink and ellipsize instead, and `width: 50%` keeps
+   it the half of the row it used to get, leaving the controls the width they
+   ask for. It also unblocks the adaptive option controls (acAdaptiveControls):
+   they collapse to dropdowns while the card overflows, so a name that
+   overflowed whatever they did turned every button group of the card into a
+   dropdown for nothing. */
+:global(.glass-theme .device-widget-table tr td:nth-child(2)) {
+  max-width: 0;
+  width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* the light row splits its name cell in two lines (name + live summary) */
+:global(.glass-theme .device-widget-table tr td:nth-child(2) > div) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Structural rows are not feature pills: ColorDeviceFeature always renders
    a second tr with one colspan cell holding the (d-none while closed) color
    picker — without this reset it paints as an empty ghost pill. */
@@ -1258,7 +1424,7 @@
   }
 }
 
-@media (pointer: coarse) and (max-width: 767px) {
+@media (pointer: coarse) and (max-width: 991.98px) {
   .dashboardTab:not(.dashboardTabActive) {
     width: 2.75rem;
   }

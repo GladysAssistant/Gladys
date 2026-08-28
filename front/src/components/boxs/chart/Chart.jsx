@@ -237,7 +237,6 @@ class Chartbox extends Component {
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
     let deviceFeatureNames = this.props.box.device_feature_names;
-    let nbFeaturesDisplayed = deviceFeatures.length;
 
     if (!deviceFeatures) {
       // migrate all box (one device feature)
@@ -247,6 +246,10 @@ class Chartbox extends Component {
         return;
       }
     }
+    // counted AFTER the guard above: a chart the user just added to a
+    // dashboard has no device_features yet, and reading .length first threw
+    // on every single render of the editor canvas
+    let nbFeaturesDisplayed = deviceFeatures.length;
     // if there is no device selected
     if (deviceFeatures.length === 0) {
       await this.setState({

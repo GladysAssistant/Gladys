@@ -7,6 +7,8 @@ import { isUrlInArray } from '../../utils/url';
 import { USER_ROLE } from '../../../../server/utils/constants';
 import DarkModeToggle from '../darkmode/DarkModeToggle';
 import GatewayTrialIndicator from './GatewayTrialIndicator';
+import InstanceUpdateNotice from './InstanceUpdateNotice';
+import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
 import style from './style.css';
 
 const PAGES_WITHOUT_HEADER = [
@@ -117,6 +119,27 @@ class Header extends Component {
 
   isHidden = () => isUrlInArray(this.props.currentUrl, PAGES_WITHOUT_HEADER) || this.props.fullScreen;
 
+  // the dismissal is written to localStorage by the notice itself: this only
+  // forces the re-render that reads it back, hiding the notice and the
+  // mobile dot echoing it in the same pass
+  handleInstanceNoticeDismiss = () => {
+    this.setState({});
+  };
+
+  // The instance version is normally loaded at session check, but a
+  // client-side login never gets there: /login is an open page checkSession
+  // returns early from, and finishing the login routes here without
+  // remounting the app. The header is the consumer of the version, so it
+  // asks for it whenever it renders for a signed-in user — the action guards
+  // itself (gateway mode only, settled marker, one call a minute), so these
+  // calls are almost always a no-op, and double as the retry path when the
+  // instance was unreachable on the first attempt.
+  maybeRefreshInstanceVersion = () => {
+    if (!this.isHidden() && this.props.user && this.props.user.id) {
+      this.props.refreshInstanceVersionState();
+    }
+  };
+
   // Content offsets (style/index.css) key off this body class so they vanish
   // together with the sidebar on auth pages and in fullscreen mode
   syncBodyClass = () => {
@@ -134,10 +157,12 @@ class Header extends Component {
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside);
     this.syncBodyClass();
+    this.maybeRefreshInstanceVersion();
   }
 
   componentDidUpdate() {
     this.syncBodyClass();
+    this.maybeRefreshInstanceVersion();
   }
 
   componentWillUnmount() {
@@ -153,6 +178,8 @@ class Header extends Component {
     const userLanguage = get(props, 'user.language');
     const forumUrl =
       userLanguage === 'fr' ? 'https://community.gladysassistant.com/' : 'https://community.gladysassistant.com/';
+    const showInstanceUpdateNotice =
+      isInstanceBehindFront(props.instanceGladysVersion) && !isUpdateNoticeDismissed(props.instanceGladysVersion);
 
     return (
       <div>
@@ -166,6 +193,10 @@ class Header extends Component {
             aria-controls="sidebar-navigation"
           >
             <i class="fe fe-menu" />
+            {/* on mobile the notice lives in the closed menu: this dot is
+                what tells the user there is something to open it for. Screen
+                readers get the notice content itself, in the menu. */}
+            {showInstanceUpdateNotice && <span class={style.mobileTogglerDot} aria-hidden="true" />}
           </button>
           <a class={style.mobileBrand} href="/dashboard">
             <Localizer>
@@ -231,6 +262,14 @@ class Header extends Component {
               </li>
             ))}
           </ul>
+          {showInstanceUpdateNotice && (
+            <InstanceUpdateNotice
+              instanceVersion={props.instanceGladysVersion}
+              user={props.user}
+              refreshInstanceVersionState={props.refreshInstanceVersionState}
+              onDismiss={this.handleInstanceNoticeDismiss}
+            />
+          )}
           {Number.isInteger(props.gatewayTrialDaysLeft) && (
             <GatewayTrialIndicator
               daysLeft={props.gatewayTrialDaysLeft}
