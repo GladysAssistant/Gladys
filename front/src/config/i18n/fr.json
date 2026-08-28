@@ -610,6 +610,7 @@
       },
       "tide": {
         "editDescription": "Ce widget calcule les marées à partir des constantes harmoniques de la station marégraphique la plus proche de votre maison. Les constantes sont téléchargées une seule fois, puis les prédictions sont calculées localement, sans connexion Internet.",
+        "housesError": "La liste des maisons n'a pas pu être chargée. Fermez puis rouvrez cette fenêtre pour réessayer.",
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour trouver la station de marée la plus proche.",
         "displayCurveLabel": "Afficher la courbe de marée",
         "displayCurveDescription": "Affiche la hauteur d'eau sur la journée, avec un repère sur le niveau actuel.",

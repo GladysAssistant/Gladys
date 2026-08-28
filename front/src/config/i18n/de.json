@@ -610,6 +610,7 @@
       },
       "tide": {
         "editDescription": "Dieses Widget berechnet die Gezeiten anhand der harmonischen Konstanten des nächstgelegenen Pegels. Die Konstanten werden einmalig heruntergeladen, danach werden die Vorhersagen lokal ohne Internetverbindung berechnet.",
+        "housesError": "Die Liste der Häuser konnte nicht geladen werden. Bitte schließen und öffnen Sie dieses Fenster erneut.",
         "editHouseLabel": "Wählen Sie ein Haus aus. Ich verwende dessen Breiten- und Längengrad, um den nächstgelegenen Pegel zu finden.",
         "displayCurveLabel": "Gezeitenkurve anzeigen",
         "displayCurveDescription": "Zeigt den Wasserstand über den Tag mit einer Markierung des aktuellen Niveaus.",

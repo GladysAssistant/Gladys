@@ -610,6 +610,7 @@
       },
       "tide": {
         "editDescription": "This widget computes tides from the harmonic constituents of the tide station closest to your house. The constituents are downloaded once, then predictions are computed locally, without an Internet connection.",
+        "housesError": "The list of houses could not be loaded. Please close and reopen this window to try again.",
         "editHouseLabel": "Select a house. I will use its latitude/longitude to find the closest tide station.",
         "displayCurveLabel": "Display the tide curve",
         "displayCurveDescription": "Shows the water height over the day, with a marker on the current level.",

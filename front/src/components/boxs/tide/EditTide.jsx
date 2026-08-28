@@ -9,11 +9,16 @@ const EditTideBox = ({ ...props }) => (
     <p class="alert alert-info">
       <Text id="dashboard.boxes.tide.editDescription" />
     </p>
+    {props.housesError && (
+      <p class="alert alert-warning">
+        <Text id="dashboard.boxes.tide.housesError" />
+      </p>
+    )}
     <div class="form-group">
       <label>
         <Text id="dashboard.boxes.tide.editHouseLabel" />
       </label>
-      <select onChange={props.updateBoxHouse} class="form-control">
+      <select onChange={props.updateBoxHouse} class="form-control" disabled={props.housesPending}>
         <option value="">
           <Text id="global.emptySelectOption" />
         </option>
@@ -86,11 +91,13 @@ class EditTideBoxComponent extends Component {
     this.getHouses();
   }
 
-  render(props, { houses }) {
+  render(props, { houses, pending, error }) {
     return (
       <EditTideBox
         {...props}
         houses={houses}
+        housesPending={pending}
+        housesError={error}
         updateBoxHouse={this.updateBoxHouse}
         updateDisplayCurve={this.updateDisplayCurve}
       />
