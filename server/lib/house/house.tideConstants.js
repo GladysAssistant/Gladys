@@ -36,11 +36,6 @@ const TIDE_UNAVAILABLE_REASON = {
 const BREST_LATITUDE = 48.3828;
 const BREST_LONGITUDE = -4.4947;
 
-// The coefficient is defined on the semi-diurnal lunisolar tide alone. Keeping
-// the diurnal constituents in makes the morning and evening tides of a same day
-// differ by ten points, which the published coefficients never do.
-const COEFFICIENT_CONSTITUENTS = new Set(['M2', 'S2', 'N2', 'K2', '2N2', 'NU2', 'MU2', 'L2', 'T2', 'LDA2']);
-
 // Brest's "unité de hauteur": the half-range that scores 100. Calibrated so the
 // computed coefficients match the ones published by the SHOM (checked against
 // 2026: 74/78 on Aug 27, 83/86 on Aug 28, 102 on Aug 13-14 and Sep 12).
@@ -98,7 +93,6 @@ module.exports = {
   TIDE_UNAVAILABLE_REASON,
   BREST_LATITUDE,
   BREST_LONGITUDE,
-  COEFFICIENT_CONSTITUENTS,
   BREST_SEMI_DIURNAL_HARMONICS,
   MAX_COEFFICIENT_DISTANCE_KM,
   BREST_HEIGHT_UNIT_METERS,
