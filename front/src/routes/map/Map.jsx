@@ -5,6 +5,7 @@ import { connect } from 'unistore/preact';
 import cx from 'classnames';
 
 import 'leaflet/dist/leaflet.css';
+import { addMapTileLayer } from '../../utils/mapTileLayer';
 import style from './style.css';
 import { route } from 'preact-router';
 
@@ -18,24 +19,7 @@ class MapComponent extends Component {
     this.leafletMap = leaflet.map(this.map).setView(DEFAULT_COORDS, 2);
 
     // Use the global dark mode state from props
-    const isDarkMode = this.props.darkMode;
-
-    // Use dark tiles if dark mode is active, otherwise use light tiles
-    // Force new tile layer by adding timestamp to URL to prevent caching
-    const tileStyle = isDarkMode ? 'dark_all' : 'light_all';
-    const timestamp = new Date().getTime();
-
-    const tileUrl = `https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}.png?_=${timestamp}`;
-
-    leaflet
-      .tileLayer(tileUrl, {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-        subdomains: 'abcd',
-        maxZoom: 19,
-        noCache: true
-      })
-      .addTo(this.leafletMap);
+    addMapTileLayer(this.leafletMap, this.props.darkMode);
     this.displayAll(this.props);
   };
 
