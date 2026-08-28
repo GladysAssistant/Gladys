@@ -66,7 +66,7 @@ class HouseEmptyOrNotCondition extends Component {
             )}
           </p>
         )}
-        <div class="form-group">
+        <div class="form-group" data-cy="scene-house-empty-or-not-choose-house">
           <label class="form-label">
             <Text id="editScene.actionsCard.houseEmptyOrNot.houseLabel" />
             <span class="form-required">
@@ -75,7 +75,6 @@ class HouseEmptyOrNotCondition extends Component {
           </label>
           <Select
             options={houseOptions}
-            class="scene-house-empty-or-not-choose-house"
             value={selectedHouseOption}
             onChange={this.handleHouseChange}
             className="react-select-container"

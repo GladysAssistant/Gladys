@@ -16,11 +16,21 @@ import closeMenuOnScroll from '../../utils/closeMenuOnScroll';
  * closeMenuOnScroll closes it when the page or a panel scrolls underneath,
  * since a portaled menu is positioned once, when it opens.
  *
+ * menuPosition is what keeps that pair from fighting each other: with the
+ * default 'absolute', react-select makes room for a menu that doesn't fit
+ * below the fold by scrolling the page itself (menuShouldScrollIntoView) —
+ * and that scroll is seen by closeMenuOnScroll, which closes the menu it just
+ * opened. 'fixed' positions the menu against the viewport instead, so
+ * react-select never scrolls the page ("DO NOT scroll if position is fixed"):
+ * a menu with no room below simply flips above its control, and only a real
+ * user scroll closes it.
+ *
  * Import this instead of 'react-select' — same API, the portal props can still
  * be overridden by the caller.
  */
 const portalProps = () => ({
   menuPlacement: 'auto',
+  menuPosition: 'fixed',
   menuPortalTarget: document.body,
   closeMenuOnScroll
 });
