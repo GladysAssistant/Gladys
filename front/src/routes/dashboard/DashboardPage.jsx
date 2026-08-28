@@ -71,8 +71,10 @@ const DashboardPage = ({ children, ...props }) => {
                     dock belongs to the dock, not to the page swipe gesture */}
                 <div class={cx('page-header', style.dashboardHeader)} ref={dockRef} data-dashboard-swipe-ignore>
                   <div class={style.dashboardHeaderTabs}>
-                    {/* One-tap pills in every mode; pills that don't fit on one
-                        row collapse behind a "…" button opening the full list */}
+                    {/* One-tap pills in every mode. Desktop: pills that don't
+                        fit on one row collapse behind a "…" button opening the
+                        full list. Mobile dock: the pill track scrolls sideways
+                        instead, and a list button opens the full named list. */}
                     {!props.dashboardListEmpty && (
                       <DashboardTabs
                         dashboards={props.dashboards}

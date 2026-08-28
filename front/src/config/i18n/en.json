@@ -312,6 +312,7 @@
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Edit",
+    "allDashboardsButton": "All dashboards",
     "enableFullScreen": "Full screen",
     "disableFullScreen": "Exit full screen",
     "editDashboardTitle": "Edit dashboard",

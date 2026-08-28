@@ -312,6 +312,7 @@
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Bearbeiten",
+    "allDashboardsButton": "Alle Dashboards",
     "enableFullScreen": "Vollbild",
     "disableFullScreen": "Vollbild beenden",
     "editDashboardTitle": "Dashboard bearbeiten",
