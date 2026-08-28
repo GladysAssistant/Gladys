@@ -826,6 +826,57 @@
   flex: 0 0 auto;
 }
 
+/* Mobile dock (DashboardTabs scrollable layout): the pill track scrolls
+   sideways with a hidden scrollbar — same treatment as the app's other
+   sideways rows (.hz-tabs, .groupChips) — instead of collapsing pills
+   behind the "…" menu. */
+.dashboardTabsScrollable {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.dashboardTabsTrack {
+  position: relative;
+  display: flex;
+  gap: inherit;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  /* programmatic centering of the active pill glides instead of jumping;
+     old engines without scroll-behavior simply jump, which is fine */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* a scroll container clips painted overflow: without this breathing room
+     the active pill's glass shadow is cut at the track's edge. The negative
+     margin gives the room back so the bar keeps its height. */
+  padding: 18px 0;
+  margin: -18px 0;
+}
+
+.dashboardTabsTrack::-webkit-scrollbar {
+  display: none;
+}
+
+/* Edge fades — the scrollbar is hidden, so they are the signal that more
+   pills sit past the edge. Toggled from scroll position: an edge fully
+   scrolled to shows plain, not faded. */
+.dashboardTabsTrackFadeStart {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px);
+  mask-image: linear-gradient(to right, transparent, #000 28px);
+}
+
+.dashboardTabsTrackFadeEnd {
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 28px);
+  mask-image: linear-gradient(to left, transparent, #000 28px);
+}
+
+.dashboardTabsTrackFadeStart.dashboardTabsTrackFadeEnd {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+}
+
 .dashboardTabsMenu {
   max-height: 60vh;
   overflow-y: auto;
@@ -914,6 +965,15 @@
   .dashboardTabsMenu :global(.dropdown-item) {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  /* The dock floats over arbitrary scenes (photos included): a slightly
+     deeper shadow than the desktop bar keeps it visually anchored (forum
+     feedback). The action pills alongside get the same one so the row
+     keeps one voice. */
+  :global(.glass-theme) .dashboardHeader .dashboardTabs,
+  :global(.glass-theme) .dashboardHeader :global(.page-options .btn) {
+    box-shadow: 0 10px 30px rgba(28, 35, 52, 0.24), 0 2px 8px rgba(28, 35, 52, 0.12);
   }
 }
 

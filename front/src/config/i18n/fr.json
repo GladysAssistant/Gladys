@@ -312,6 +312,7 @@
   "dashboard": {
     "title": "Tableau de bord",
     "editDashboardButton": "Éditer",
+    "allDashboardsButton": "Tous les tableaux de bord",
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
