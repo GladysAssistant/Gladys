@@ -11,6 +11,14 @@ const LOGIND_PATH = '/org/freedesktop/login1';
 // The host system DBus socket, bind-mounted read-only INTO THE HELPER container
 // by the Docker daemon (Gladys itself does not need it mounted).
 const HOST_DBUS_SOCKET_BIND = '/run/dbus:/run/dbus:ro';
+// The default `docker-default` AppArmor profile carries no dbus rules, and on
+// hosts where dbus-daemon enforces AppArmor mediation (Debian 12+,
+// Ubuntu 23.10+...) that means default-deny: a confined helper is rejected by
+// the bus before it can even complete the DBus handshake. The helper only runs
+// a single dbus-send against logind, so it is started unconfined. Docker
+// daemons on hosts without AppArmor ignore the option; a daemon that rejects
+// it outright is retried without it (see runViaHelperContainer).
+const HELPER_SECURITY_OPT = ['apparmor=unconfined'];
 // Bound the DBus call so it can never hang forever.
 const COMMAND_TIMEOUT_MS = 10000;
 // Bound the helper container lifetime: a stuck container would otherwise block
@@ -78,14 +86,31 @@ async function runViaHelperContainer(method) {
     // image to run the helper with, whatever the state of the host DBus.
     throw new Error(`Unable to identify the Gladys container image to run the helper container (${e.message})`);
   }
-  const container = await this.dockerode.createContainer({
-    Image: image,
-    name: `gladys-host-power-${method.toLowerCase()}-${Date.now()}`,
-    Cmd: buildDbusArgv(method),
-    HostConfig: {
-      Binds: [HOST_DBUS_SOCKET_BIND],
-    },
-  });
+  const createHelperContainer = async (securityOpt) =>
+    this.dockerode.createContainer({
+      Image: image,
+      name: `gladys-host-power-${method.toLowerCase()}-${Date.now()}`,
+      Cmd: buildDbusArgv(method),
+      HostConfig: {
+        Binds: [HOST_DBUS_SOCKET_BIND],
+        ...(securityOpt ? { SecurityOpt: securityOpt } : {}),
+      },
+    });
+  let container;
+  try {
+    container = await createHelperContainer(HELPER_SECURITY_OPT);
+  } catch (e) {
+    // Only a daemon that rejects the AppArmor option itself is retried
+    // confined; any other creation failure (bad image, dead daemon...) would
+    // fail again identically and is surfaced as-is.
+    if (!/apparmor|security.?opt/i.test(`${e && e.message}`)) {
+      throw e;
+    }
+    logger.warn(
+      `System: Docker rejected the AppArmor security option for the host power helper container, retrying without it: ${e.message}`,
+    );
+    container = await createHelperContainer(null);
+  }
   let output = '';
   let timeout;
   try {

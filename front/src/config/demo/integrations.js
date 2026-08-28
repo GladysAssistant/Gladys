@@ -437,9 +437,6 @@ const integrations = {
   },
   'post /api/v1/service/broadlink/learn': {},
   'post /api/v1/service/broadlink/learn/cancel': {},
-  // The installed community integration is derived from the house (see
-  // index.js); the store itself is empty, the demo cannot install anything
-  'get /api/v1/external_integration/store': { integrations: [] },
   'get /api/v1/service/mqtt': {},
   'get /api/v1/service/mqtt/status': {
     configured: true,

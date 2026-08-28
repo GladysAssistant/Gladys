@@ -43,21 +43,23 @@ class SceneRow extends Component {
             </div>
           )}
         </div>
-        {props.runningInfo ? (
-          <RunningStopButton runningInfo={props.runningInfo} onStop={this.stopScene} small />
-        ) : (
-          <button
-            onClick={this.startScene}
-            type="button"
-            class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
-              'btn-loading': loading
-            })}
-            disabled={loading}
-          >
-            <i class="fe fe-play" />
-            <Text id="scene.startButton" />
-          </button>
-        )}
+        <div class={style.sceneAction}>
+          {props.runningInfo ? (
+            <RunningStopButton runningInfo={props.runningInfo} onStop={this.stopScene} small />
+          ) : (
+            <button
+              onClick={this.startScene}
+              type="button"
+              class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
+                'btn-loading': loading
+              })}
+              disabled={loading}
+            >
+              <i class="fe fe-play" />
+              <Text id="scene.startButton" />
+            </button>
+          )}
+        </div>
       </div>
     );
   }

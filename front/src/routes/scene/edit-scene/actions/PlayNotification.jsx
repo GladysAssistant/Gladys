@@ -1,4 +1,4 @@
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
@@ -8,9 +8,12 @@ import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
-import style from './DeviceSetValue.css';
+import style from './PlayNotification.css';
+// The Simple/Computed selector is the one already used by the other actions.
+import valueTypeStyle from './DeviceSetValue.css';
 
-// The volume a range input displays when it has no value: the midpoint of the slider.
+// The volume the slider falls back to when leaving the computed mode without a usable
+// number: the midpoint of the slider.
 const DEFAULT_VOLUME = 50;
 
 class PlayNotification extends Component {
@@ -44,14 +47,13 @@ class PlayNotification extends Component {
       // The formula starts from the volume currently selected, so switching to computed does not
       // lose the value shown by the slider.
       const { volume } = this.props.action;
-      const evaluateVolume = volume !== undefined ? `${volume}` : undefined;
+      const evaluateVolume = volume !== undefined && volume !== null && volume !== '' ? `${volume}` : undefined;
       this.props.updateActionProperty(this.props.path, 'evaluate_volume', evaluateVolume);
       this.props.updateActionProperty(this.props.path, 'volume', undefined);
     } else {
       // Coming back to the fixed volume restores a number: the formula is dropped, and leaving
-      // "volume" undefined would save an action with no volume at all while the slider displays
-      // its own default. A formula that is already a plain number is kept, others fall back to
-      // the value the empty slider shows.
+      // "volume" undefined would save an action with no volume at all. A formula that is already
+      // a plain number is kept, others fall back to the midpoint of the slider.
       const formula = `${this.props.action.evaluate_volume || ''}`.trim();
       const parsedVolume = Number(formula);
       const volume =
@@ -67,6 +69,11 @@ class PlayNotification extends Component {
 
   selectComputedType = () => this.selectVolumeType(true);
 
+  // A range input only fires `change` when the pointer is released: the fill and the
+  // value pill follow the drag through a local draft, the action is updated on release
+  updateVolumeDraft = e => {
+    this.setState({ volumeDraft: e.target.value });
+  };
   updateVolume = e => {
     this.props.updateActionProperty(this.props.path, 'volume', parseInt(e.target.value, 10));
     this.props.updateActionProperty(this.props.path, 'evaluate_volume', undefined);
@@ -109,13 +116,18 @@ class PlayNotification extends Component {
     this.getOptions();
   }
   componentWillReceiveProps(nextProps) {
+    // The committed volume is authoritative again as soon as it moves, whether the
+    // change comes from the drag that just ended or from the editor itself
+    if (nextProps.action.volume !== this.props.action.volume) {
+      this.setState({ volumeDraft: undefined });
+    }
     this.refreshSelectedOptions(nextProps);
   }
-  getVolumeInput = () => {
+  getVolumeInput = (volume, volumeIsSet) => {
     if (this.state.computedVolume) {
       return (
         <div>
-          <div className={style.explanationText}>
+          <div className={valueTypeStyle.explanationText}>
             <Text id="editScene.actionsCard.playNotification.computedExplanationText" />
           </div>
           <div class="input-group">
@@ -133,22 +145,26 @@ class PlayNotification extends Component {
     }
 
     return (
-      <div>
-        <input type="text" class="form-control" value={this.props.action.volume} disabled />
-        <input
-          type="range"
-          value={this.props.action.volume}
-          onChange={this.updateVolume}
-          class="form-control custom-range"
-          step="1"
-          min={0}
-          max={100}
-        />
-      </div>
+      /* No accent fill until a volume is actually committed: the action still saves
+         `volume: undefined` until the slider is touched, and each speaker then applies
+         its own default, so a half-filled track would read as a 50% that is never sent. */
+      <input
+        type="range"
+        value={volume}
+        onInput={this.updateVolumeDraft}
+        onChange={this.updateVolume}
+        class={style.volumeRange}
+        style={{ '--volume-fill': `${volumeIsSet ? volume : 0}%` }}
+        step="1"
+        min={0}
+        max={100}
+      />
     );
   };
 
-  render(props, { selectedDeviceFeatureOption, devicesOptions }) {
+  render(props, { selectedDeviceFeatureOption, devicesOptions, volumeDraft, computedVolume }) {
+    const volume = volumeDraft !== undefined ? volumeDraft : props.action.volume;
+    const volumeIsSet = volume !== undefined && volume !== null && volume !== '';
     return (
       <div>
         <GladysPlusUpsell
@@ -181,29 +197,33 @@ class PlayNotification extends Component {
           />
         </div>
         <div class="form-group">
-          <label class="form-label">
-            <Text id="editScene.actionsCard.playNotification.volumeLabel" />
-            <span class="form-required">
-              <Text id="global.requiredField" />
+          <label class={cx('form-label', style.volumeLabel)}>
+            <span>
+              <Text id="editScene.actionsCard.playNotification.volumeLabel" />
+              <span class="form-required">
+                <Text id="global.requiredField" />
+              </span>
             </span>
+            {/* The pill reads the slider: in computed mode the volume is only known at runtime. */}
+            {!computedVolume && volumeIsSet && <span class={style.volumeValue}>{`${volume}%`}</span>}
           </label>
-          <div className={cx('nav-tabs', style.valueTypeTab)}>
+          <div className={cx('nav-tabs', valueTypeStyle.valueTypeTab)}>
             <button
               type="button"
-              class={cx('nav-link', style.valueTypeLink, { active: !this.state.computedVolume })}
+              class={cx('nav-link', valueTypeStyle.valueTypeLink, { active: !computedVolume })}
               onClick={this.selectSimpleType}
             >
               <Text id="editScene.actionsCard.playNotification.valueTypeSimple" />
             </button>
             <button
               type="button"
-              class={cx('nav-link', style.valueTypeLink, { active: this.state.computedVolume })}
+              class={cx('nav-link', valueTypeStyle.valueTypeLink, { active: computedVolume })}
               onClick={this.selectComputedType}
             >
               <Text id="editScene.actionsCard.playNotification.valueTypeComputed" />
             </button>
           </div>
-          {this.getVolumeInput()}
+          {this.getVolumeInput(volume, volumeIsSet)}
         </div>
         <div class="form-group">
           <label class="form-label">

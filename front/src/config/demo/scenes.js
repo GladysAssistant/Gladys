@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 
 import { uuid, minutesAgo, hoursAgo } from './helpers';
+import { t } from './i18n';
 import { USERS } from './home';
 
 /**
@@ -204,19 +205,52 @@ const message = (index, text, fromGladys) => ({
   sender_id: fromGladys ? null : TONY_ID,
   receiver_id: fromGladys ? TONY_ID : null,
   text,
+  message_type: 'chat',
   is_read: true,
   created_at: minutesAgo(60 - index)
 });
 
+/**
+ * Gladys does not answer a question about the house from memory: it calls its
+ * tools, and the chat shows every call between the question and the answer —
+ * the tool name, and the arguments the model sent, folded until one opens
+ * them. The demo shows the same traces, with the names and the format of the
+ * real ones (`formatToolCallTraceText` in
+ * `server/lib/gateway/gateway.forwardMessageToAiChat.js`); a chat where the
+ * answers appear out of nowhere hides half of what the assistant does.
+ */
+const toolCall = (index, toolName, args) => ({
+  id: uuid(`message-${index}`),
+  sender_id: null,
+  receiver_id: TONY_ID,
+  text: `${toolName}(${JSON.stringify(args)})`,
+  message_type: 'tool_call',
+  tool_name: toolName,
+  tool_status: 'success',
+  is_read: true,
+  created_at: minutesAgo(60 - index)
+});
+
+const today = dayjs().format('YYYY-MM-DD');
+
 const messages = [
   message(0, 'What is the temperature in the living room?', false),
-  message(1, 'It is 21.4°C in the living room.', true),
-  message(2, 'Turn on the kitchen light', false),
-  message(3, 'The kitchen light is on.', true),
-  message(4, 'How much electricity did we use today?', false),
-  message(5, 'You used 9.4 kWh today, and your solar panels produced 14.6 kWh.', true),
-  message(6, 'What is the weather like tomorrow?', false),
-  message(7, 'Tomorrow will be mostly sunny, between 14°C and 24°C.', true)
+  toolCall(1, 'device_get_state', { room: t('Living room'), device_type: 'temperature-sensor' }),
+  message(2, 'It is 21.4°C in the living room.', true),
+  message(3, 'Turn on the kitchen light', false),
+  toolCall(4, 'device_turn_on_off', { action: 'on', device: t('Kitchen spots') }),
+  message(5, 'The kitchen light is on.', true),
+  message(6, 'How much electricity did we use today?', false),
+  toolCall(7, 'device_get_energy_consumption', {
+    device: t('Electric meter'),
+    start_date: today,
+    end_date: today
+  }),
+  toolCall(8, 'device_get_state', { device_type: 'energy-production-sensor' }),
+  message(9, 'You used 9.4 kWh today, and your solar panels produced 14.6 kWh.', true),
+  message(10, 'What is the weather like tomorrow?', false),
+  toolCall(11, 'weather_get', { house: t('Home') }),
+  message(12, 'Tomorrow will be mostly sunny, between 14°C and 24°C.', true)
 ].reverse();
 
 export { scenes, sceneTags, calendars, calendarEvents, messages };

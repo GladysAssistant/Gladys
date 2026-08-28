@@ -145,6 +145,14 @@
   color: var(--gl-muted);
 }
 
+/* The room, integration and sort selects say what the list is showing: they
+   are labels like the buttons of the other page headers, not typed-in
+   content, so they take the quieter label ink and the row reads as one
+   family (same grammar as the scene page's tag filter) */
+.devicesPage .pageOptions :global(select.form-control) {
+  color: var(--gl-muted);
+}
+
 /* dark-mode.css paints selects and inputs with solid !important backgrounds
    and double-inverts the inputs back to their light look: under glass they
    are frosted pills that must invert WITH the theme, like every other glass
@@ -154,6 +162,10 @@
   color: var(--gl-ink) !important;
   border-color: var(--gl-border) !important;
   filter: none;
+}
+
+:global(.dark-mode) .devicesPage .pageOptions :global(select.form-control) {
+  color: var(--gl-muted) !important;
 }
 
 /* dark-mode.css authors the placeholder for double-inverted inputs; with
@@ -305,10 +317,14 @@
     flex: 1 1 calc(50% - 2rem);
   }
 
-  /* the ordering select keeps its natural width so the search bar
-     fits next to it on the same row */
-  .pageOptions > select:nth-of-type(3) {
+  /* the sort control keeps its natural width so the search bar fits next to
+     it on the same row (it is a wrapper since its icon moved in, hence the
+     class rather than a child <select>) */
+  .pageOptions > :global(.sort-select) {
     flex: 0 1 auto;
+    /* the 10rem floor below is meant for the search bar, not for a pill
+       sized by its own options */
+    min-width: auto;
   }
 
   /* the search bar needs real room to be usable: below a comfortable
