@@ -1,7 +1,9 @@
 const nock = require('nock');
 const { expect } = require('chai');
 const getConfig = require('../../../utils/getConfig');
-const { authenticatedRequest } = require('../request.test');
+const db = require('../../../models');
+const { authenticatedRequest, nonAdminRequest, NON_ADMIN_USER_ID } = require('../request.test');
+const { USER_ROLE } = require('../../../utils/constants');
 
 const config = getConfig();
 
@@ -70,6 +72,35 @@ describe('GET /api/v1/gateway/status', () => {
         expect(res.body).to.have.property('connected');
         expect(res.body).to.have.property('configured');
       });
+  });
+  it('should get gateway status as a non-admin user', async () => {
+    // Every user needs to know if the instance is linked to Gladys Plus:
+    // it's what tells the front-end that the AI chat, the voice assistant
+    // and the camera live are available, instead of offering a free trial
+    // for a subscription the instance already has.
+    await db.User.create({
+      id: NON_ADMIN_USER_ID,
+      firstname: 'Pepper',
+      lastname: 'Potts',
+      selector: 'pepper-gateway-status',
+      email: 'pepper-gateway-status@pots.com',
+      password: 'mysuperpassword',
+      role: USER_ROLE.HABITANT,
+      language: 'en',
+      birthdate: '1990-12-12',
+    });
+    try {
+      await nonAdminRequest
+        .get('/api/v1/gateway/status')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.have.property('connected');
+          expect(res.body).to.have.property('configured');
+        });
+    } finally {
+      await db.User.destroy({ where: { id: NON_ADMIN_USER_ID } });
+    }
   });
 });
 
