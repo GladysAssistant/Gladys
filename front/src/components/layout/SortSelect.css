@@ -10,26 +10,18 @@
   height: 1rem;
 }
 
-/* Tabler's .custom-select caret never renders: its data URI embeds the arrow
-   color as a raw `#999`, and a `#` inside a data: URL starts a fragment, so
-   the browser drops the rest of the SVG. Ours is escaped (%23) — without it
-   the control has no dropdown affordance at all, which is half of why it
-   reads as a text field.
+/* The sort mode is a label, not typed-in content: it takes the ink and the
+   weight of the neighbouring page-option pills (the tag filter, the buttons)
+   rather than the page ink of a filled-in field.
 
    The stacked selector and the !important go together: the two themes that
    turn these headers into frosted pills (routes/scene/style.css and
    components/layout/horizonIntegrations.css) paint .form-control with
    four-class selectors, in dark mode with !important. The look of this
    shared control belongs here, in one place, rather than being re-stated
-   in every header that uses it. */
+   in every header that uses it. (The dropdown caret is not here: every
+   .custom-select of the app gets it back in style/index.css.) */
 select.select:global(.form-control):global(.custom-select) {
-  padding-right: 2rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c8396' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.7rem center;
-  background-size: 0.7rem 0.7rem;
-  /* the label ink of the neighbouring page-option pills (the tag filter, the
-     buttons): the sort mode is a label, not typed-in content */
   font-weight: 600 !important;
   color: var(--gl-muted, #7c8396) !important;
 }

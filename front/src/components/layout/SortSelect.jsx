@@ -26,15 +26,18 @@ const SortIcon = () => (
 );
 
 /**
- * The sort control of the page headers (scenes, integration catalog, device
- * lists). A bare <select> next to a search field of the same pill family read
- * as an empty search box — no icon, and no caret either, Tabler's .custom-select
- * arrow being lost to a broken data URI (see SortSelect.css). It says what it
- * is here: sort icon on the left, caret on the right, and the quiet label ink
- * of the buttons it sits next to.
+ * The sort control of the page headers (scenes, devices, integration catalog,
+ * integration device tabs). A bare <select> next to a search field of the same
+ * pill family read as an empty search box — no icon, and no caret either, the
+ * .custom-select arrow of the theme being lost to a broken data URI (fixed for
+ * every select of the app in style/index.css). It says what it is here: sort
+ * icon on the left, and the quiet label ink of the controls it sits next to.
+ *
+ * The wrapper carries an un-hashed `sort-select` class next to its module one,
+ * as a stable hook for the headers that lay their controls out themselves.
  */
 const SortSelect = ({ value, onChange, options, class: className, selectClass }) => (
-  <div class={cx('input-icon', style.sortSelect, className)}>
+  <div class={cx('input-icon', 'sort-select', style.sortSelect, className)}>
     <span class="input-icon-addon">
       <SortIcon />
     </span>
