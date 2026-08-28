@@ -64,7 +64,10 @@ async function getTideStation(house) {
   try {
     const station = await downloadNearestStation(latitude, longitude);
     if (station === null) {
-      return stored !== null ? stored.station : null;
+      // The database has nothing to give. A station stored for this same place
+      // is still the right one, but one stored before the house moved describes
+      // another shoreline: it is dropped rather than shown for the new address.
+      return stored !== null && !movedAway ? stored.station : null;
     }
     await this.variable.setValue(
       variableName,
@@ -80,7 +83,9 @@ async function getTideStation(house) {
     // Offline, or the database is down: a station downloaded earlier still
     // predicts tides perfectly, so it is kept rather than dropped.
     logger.warn(`Tide: unable to download the tide station of house ${house.selector}: ${e.message}`);
-    if (stored !== null) {
+    // A station stored before the house moved is not a fallback: it would show
+    // the tide of the coast the user left.
+    if (stored !== null && !movedAway) {
       // Remember when it failed, so the next polls read the stored station
       // instead of calling a database that is down every minute.
       await this.variable.setValue(

@@ -460,6 +460,37 @@ describe('house.getTideState', () => {
     expect(tideState.reason).to.equal('no_station_nearby');
   });
 
+  it('should not fall back on the station of the coast the house left', async () => {
+    // The house moved from Nice to Saint Malo and the database has nothing to
+    // answer: showing the Mediterranean tide for a Channel harbour would be
+    // worse than showing none.
+    sinon.stub(axios, 'get').resolves({ data: [] });
+    const house = buildHouse({
+      selector: 'SAINT_MALO',
+      station: NICE_STATION,
+      latitude: 43.7,
+      longitude: 7.26,
+    });
+
+    const tideState = await house.getTideState(saintMaloHouse, now);
+    expect(tideState.available).to.equal(false);
+    expect(tideState.reason).to.equal('no_station_nearby');
+  });
+
+  it('should not fall back on the station of the coast the house left when the download fails', async () => {
+    sinon.stub(axios, 'get').rejects(new Error('getaddrinfo ENOTFOUND'));
+    const house = buildHouse({
+      selector: 'SAINT_MALO',
+      station: NICE_STATION,
+      latitude: 43.7,
+      longitude: 7.26,
+    });
+
+    const tideState = await house.getTideState(saintMaloHouse, now);
+    expect(tideState.available).to.equal(false);
+    expect(tideState.reason).to.equal('station_unavailable');
+  });
+
   it('should keep working offline once the station is known', async () => {
     sinon.stub(axios, 'get').rejects(new Error('getaddrinfo ENOTFOUND'));
     const house = buildHouse({
@@ -525,6 +556,21 @@ describe('house.getTideState helpers', () => {
     // 11.4 m the datums give for Saint-Malo.
     expect(range).to.be.above(9);
     expect(range).to.be.below(14);
+  });
+
+  it('should return a zero range when the predictions hold no extreme', async () => {
+    // A station whose harmonics predict a flat sea: the fortnight of
+    // predictions contains no high or low tide to measure a range on.
+    const predictor = { getExtremesPrediction: () => [] };
+    const station = { ...SAINT_MALO_STATION, datums: { MHHW: 12.1, MLLW: 1.3 } };
+    expect(getSpringTideRange(station, predictor, new Date('2026-08-27T10:00:00.000Z'))).to.equal(0);
+  });
+
+  it('should return no coefficient when no high tide is followed by a low one', async () => {
+    // Brest's harmonics always give a pair, so the missing-pair branch is
+    // reached with a window the predictor answers with a single extreme.
+    const createTidePredictor = () => ({ getExtremesPrediction: () => [{ time: new Date(), level: 4, high: true }] });
+    expect(computeTideCoefficient(createTidePredictor, new Date('2026-08-27T05:30:00+02:00'))).to.equal(null);
   });
 
   it('should compute the tide coefficients published by the SHOM', async () => {
