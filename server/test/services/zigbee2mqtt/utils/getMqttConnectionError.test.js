@@ -10,14 +10,38 @@ describe('zigbee2mqtt getMqttConnectionError', () => {
   });
 
   it('should detect wrong credentials in MQTT 5', () => {
+    const error = new Error('Connection refused: Bad user name or password');
+    error.code = 134;
+    expect(getMqttConnectionError(error)).to.deep.equal({ code: 'BAD_CREDENTIALS', message: null });
+  });
+
+  it('should detect a not authorized client in MQTT 3.1.1', () => {
+    const error = new Error('Connection refused: Not authorized');
+    error.code = 5;
+    expect(getMqttConnectionError(error)).to.deep.equal({ code: 'NOT_AUTHORIZED', message: null });
+  });
+
+  it('should detect a not authorized client in MQTT 5', () => {
     const error = new Error('Connection refused: Not authorized');
     error.code = 135;
-    expect(getMqttConnectionError(error)).to.deep.equal({ code: 'BAD_CREDENTIALS', message: null });
+    expect(getMqttConnectionError(error)).to.deep.equal({ code: 'NOT_AUTHORIZED', message: null });
   });
 
   it('should detect an unreachable broker', () => {
     const error = new Error('connect ECONNREFUSED 127.0.0.1:1883');
     error.code = 'ECONNREFUSED';
+    expect(getMqttConnectionError(error)).to.deep.equal({ code: 'BROKER_UNREACHABLE', message: null });
+  });
+
+  it('should detect a broker closing the connection', () => {
+    const error = new Error('read ECONNRESET');
+    error.code = 'ECONNRESET';
+    expect(getMqttConnectionError(error)).to.deep.equal({ code: 'BROKER_UNREACHABLE', message: null });
+  });
+
+  it('should detect an unknown broker host', () => {
+    const error = new Error('getaddrinfo ENOTFOUND broker.local');
+    error.code = 'ENOTFOUND';
     expect(getMqttConnectionError(error)).to.deep.equal({ code: 'BROKER_UNREACHABLE', message: null });
   });
 

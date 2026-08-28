@@ -28,6 +28,7 @@ const MQTT_MODE = {
 // Reasons why Gladys failed to connect to the MQTT broker, displayed as explicit messages in the UI
 const MQTT_CONNECTION_ERROR = {
   BAD_CREDENTIALS: 'BAD_CREDENTIALS',
+  NOT_AUTHORIZED: 'NOT_AUTHORIZED',
   BROKER_UNREACHABLE: 'BROKER_UNREACHABLE',
 };
 
