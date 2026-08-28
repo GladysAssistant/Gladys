@@ -286,9 +286,9 @@ class VoiceAssistantBox extends Component {
         this.setState({ gatewayConnected: status.configured === true });
       }
     } catch (e) {
-      if (this._isMounted) {
-        this.setState({ gatewayConnected: false });
-      }
+      // The status stays unknown on a failed call: the box remains disabled,
+      // but no Gladys Plus upsell is displayed on top of it.
+      console.error(e);
     }
   };
 
