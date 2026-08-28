@@ -17,6 +17,7 @@ import CircularGauge from './CircularGauge';
 import { angleToTemp as angleToSetpoint, getAngleFromPointer, isAngleInArc } from './gaugeGeometry';
 import { fetchSchedule, fetchTimezone, getCurrentSlot, resolvePresetFromSchedule } from './scheduleLookup';
 import { loadDeviceConfig } from './deviceConfig';
+import { isRunningFromStateFeature } from './operatingState';
 
 const PRESET_ICONS = {
   off: 'fe-power',
@@ -70,11 +71,29 @@ class ThermostatBox extends Component {
   sensorUnit = null;
   thermostatUnit = null;
   savingPreset = false;
+  // True while selectPreset writes: the hold it may arm is the widget's own, so
+  // the preset it just lit must not be un-highlighted by the server's echo.
+  pickingPreset = false;
   lastActivePreset = 'comfort';
   expectedSetpoint = null;
   expectedSetpointTimer = null;
 
   getConfig = () => ({ ...this.props.box, ...(this.state.remoteConfig || {}) });
+
+  isExternal = () => {
+    const cfg = this.getConfig();
+    return cfg.thermostat_type === 'external';
+  };
+
+  // Which feature tells the widget the equipment is running: the switch Gladys
+  // drives on a virtual thermostat, the real device's state feature on an
+  // external one. An external thermostat that exposes neither returns null, and
+  // the widget estimates the state from the setpoint instead.
+  getRunningStateFeature = () => {
+    const cfg = this.state.remoteConfig;
+    if (!cfg) return null;
+    return (this.isExternal() ? cfg.state_feature : cfg.switch_feature) || null;
+  };
   getMinTemp = () => {
     // Device feature native min has top priority
     if (this.state.featureMin !== null) return this.state.featureMin;
@@ -292,7 +311,10 @@ class ThermostatBox extends Component {
     const temperatureFeature = (this.state.remoteConfig && this.state.remoteConfig.temperature_feature) || null;
     const humidityFeature = (this.state.remoteConfig && this.state.remoteConfig.humidity_feature) || null;
     const windowFeature = (this.state.remoteConfig && this.state.remoteConfig.window_feature) || null;
-    const switchFeature = (this.state.remoteConfig && this.state.remoteConfig.switch_feature) || null;
+    // The running state comes from the switch Gladys drives on a virtual
+    // thermostat, and from the real device's state feature on an external one.
+    // Both end up in `isSwitchOn`, which is what draws the heating halo.
+    const switchFeature = this.getRunningStateFeature();
     if (!thermostatFeature && !temperatureFeature) {
       this.setState({ noConfig: true });
       return;
@@ -373,7 +395,8 @@ class ThermostatBox extends Component {
               feat.last_value !== null &&
               feat.last_value !== undefined
             ) {
-              this.setState({ isSwitchOn: feat.last_value === 1 });
+              this.stateFeature = feat;
+              this.setState({ isSwitchOn: isRunningFromStateFeature(feat, feat.last_value) });
             }
           });
         });
@@ -397,7 +420,13 @@ class ThermostatBox extends Component {
       // event that was supposed to display it, leaving the old setpoint on screen
       // until the next refresh. `manualSetpointOverride` is set only by this
       // widget's own dial and buttons, so it tells the two apart.
-      if (!this.state.isManualMode || !this.state.manualSetpointOverride) {
+      // On an external thermostat the real device is a second source of truth:
+      // turning the dial on the Netatmo itself, or a change made in its own app,
+      // arrives here as a NEW_STATE and has to be displayed. Holding the local
+      // setpoint would leave the widget showing a value the thermostat no longer
+      // has. A virtual thermostat has no such second source, so its own manual
+      // hold still wins there.
+      if (this.isExternal() || !this.state.isManualMode || !this.state.manualSetpointOverride) {
         // Just left manual mode: drop the in-flight events carrying the old
         // manual setpoint, and only resume following the device once the value
         // we just applied comes back.
@@ -424,9 +453,11 @@ class ThermostatBox extends Component {
       // The server (onDeviceNewState) cuts the switch; the widget only reflects the state
       this.setState({ isWindowOpen: payload.last_value === 0 });
     }
-    const switchFeature = (this.state.remoteConfig && this.state.remoteConfig.switch_feature) || null;
+    const switchFeature = this.getRunningStateFeature();
     if (switchFeature && payload.device_feature_selector === switchFeature) {
-      this.setState({ isSwitchOn: payload.last_value === 1 });
+      // NEW_STATE carries no category/type, so the shape cached from the initial
+      // GET /api/v1/device is what the value is normalised against.
+      this.setState({ isSwitchOn: isRunningFromStateFeature(this.stateFeature, payload.last_value) });
     }
   };
 
@@ -489,6 +520,18 @@ class ThermostatBox extends Component {
     const key = this.getFeatureVarKey();
     if (!key || payload.key !== `THERMOSTAT_${key}_MANUAL_MODE`) return;
     const isManual = payload.value === 'true';
+    // On an external thermostat this event also announces a setpoint changed on
+    // the device itself (its dial, the vendor app, its own programme): the
+    // setpoint no longer comes from the preset, so the preset must stop being
+    // shown as active. `manualSetpointOverride` is what un-highlights it, and
+    // only this widget's own dial and buttons would otherwise set it.
+    //
+    // This cannot hang off a *change* of isManualMode: without a schedule the
+    // hold is permanent, so a thermostat already in manual mode stays in it, and
+    // every later change on the device re-emits `true` with nothing to compare.
+    if (isManual && !this.savingPreset && !this.pickingPreset && this.isExternal()) {
+      this.setState({ manualSetpointOverride: true });
+    }
     if (!isManual && this.state.isManualMode) {
       // Server expired the manual timer — revert UI to schedule.
       // Hold the setpoint first: see cancelManualMode for why.
@@ -647,6 +690,13 @@ class ThermostatBox extends Component {
     const stateInit = {};
     if (activePreset !== null) stateInit.activePreset = activePreset;
     if (isManualMode !== null) stateInit.isManualMode = isManualMode;
+    // A page reload restores the state from the database, where a hold taken on
+    // the real thermostat looks exactly like one taken on the dial: on an
+    // external device a manual setpoint never comes from the preset, so the
+    // preset must not come back highlighted.
+    if (isManualMode && this.isExternal()) {
+      stateInit.manualSetpointOverride = true;
+    }
 
     // If not in manual mode and a preset was resolved, apply its setpoint immediately
     // so the gauge shows the correct temperature without waiting for getDeviceData
@@ -945,13 +995,22 @@ class ThermostatBox extends Component {
       manualSetpointOverride: false
     });
     if (!newManual) this.clearManualSetpoint();
-    await this.savePreset(preset.key);
-    await this.saveManualMode(newManual);
-    if (preset.temp !== null) {
-      // Without a schedule, picking a preset is not a manual override — the
-      // preset itself is what the loop regulates on, and marking the write
-      // manual would contradict the MANUAL_MODE=false just saved above.
-      this.sendSetpoint(preset.temp, newManual);
+    // With a schedule the setpoint below is written as a manual hold, and the
+    // server echoes MANUAL_MODE_UPDATED back: on an external thermostat that
+    // event un-highlights the preset, which is exactly the preset just picked.
+    // The flag tells the handler this hold came from here, not from the device.
+    this.pickingPreset = true;
+    try {
+      await this.savePreset(preset.key);
+      await this.saveManualMode(newManual);
+      if (preset.temp !== null) {
+        // Without a schedule, picking a preset is not a manual override — the
+        // preset itself is what the loop regulates on, and marking the write
+        // manual would contradict the MANUAL_MODE=false just saved above.
+        await this.sendSetpoint(preset.temp, newManual);
+      }
+    } finally {
+      this.pickingPreset = false;
     }
     // Off holds too, so the schedule does not turn the heating back on at the next
     // slot — but it holds the *preset*, not a setpoint: the server cuts the switch

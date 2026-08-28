@@ -10,6 +10,8 @@ const {
   DEFAULT_MAX_TEMP,
   DEFAULT_TEMP_UNIT,
   DEFAULT_MANUAL_DURATION_MINUTES,
+  DEFAULT_THERMOSTAT_TYPE,
+  THERMOSTAT_TYPES,
 } = require('../../../utils/thermostatConstants');
 
 /**
@@ -45,6 +47,14 @@ function buildParamsConfig(device) {
     temperature_feature: getParam('THERMOSTAT_TEMPERATURE_FEATURE') || null,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
     switch_feature: getParam('THERMOSTAT_SWITCH_FEATURE') || null,
+    // External thermostats: the real device regulates itself. `target_feature`
+    // is the setpoint Gladys writes, `state_feature` the heating state it reads
+    // back, `mode_feature` the optional operating mode. All three point at
+    // features owned by another integration (Netatmo, Zigbee, Matter, MQTT...).
+    thermostat_type: getParam('THERMOSTAT_TYPE') || DEFAULT_THERMOSTAT_TYPE,
+    target_feature: getParam('THERMOSTAT_TARGET_FEATURE') || null,
+    state_feature: getParam('THERMOSTAT_STATE_FEATURE') || null,
+    mode_feature: getParam('THERMOSTAT_MODE_FEATURE') || null,
     window_feature: getParam('THERMOSTAT_WINDOW_FEATURE') || null,
     // Device-owned: the widget only chooses which thermostat to display.
     active_schedule: getParam('THERMOSTAT_ACTIVE_SCHEDULE') || null,
@@ -81,6 +91,17 @@ function getDeviceConfig(device) {
 }
 
 /**
+ * @description Whether a thermostat device is driven by a real external device.
+ * @param {object|null} config - Config built by getDeviceConfig.
+ * @returns {boolean} True when the device regulates itself.
+ * @example
+ * if (isExternal(config)) { ... }
+ */
+function isExternal(config) {
+  return Boolean(config) && config.thermostat_type === THERMOSTAT_TYPES.EXTERNAL;
+}
+
+/**
  * @description Fetch a device feature (and its device) by feature selector.
  * @param {object} gladys - Gladys instance.
  * @param {string} selector - Device feature selector.
@@ -100,4 +121,5 @@ module.exports = {
   buildParamsConfig,
   getDeviceConfig,
   getFeatureBySelector,
+  isExternal,
 };

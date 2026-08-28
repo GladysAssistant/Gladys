@@ -42,6 +42,14 @@ class EditThermostatBoxComponent extends Component {
           label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
         });
       });
+      // An external thermostat owns no feature: the setpoint it drives belongs
+      // to the real device (Netatmo, Zigbee, Matter, MQTT...). It is still one of
+      // this service's thermostats, so it is offered under its own name — without
+      // this it could never be added to a dashboard at all.
+      const targetParam = (device.params || []).find(param => param.name === 'THERMOSTAT_TARGET_FEATURE');
+      if (featureOptions.length === 0 && targetParam && targetParam.value) {
+        featureOptions.push({ value: targetParam.value, label: device.name });
+      }
       if (featureOptions.length > 0) {
         options.push({ label: device.name, options: featureOptions });
       }

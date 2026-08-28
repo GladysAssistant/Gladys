@@ -9,7 +9,7 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
-const { toNumber, getDeviceConfig, getFeatureBySelector } = require('./thermostat.deviceConfig');
+const { toNumber, getDeviceConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
 const { parseEnd, findMatchingPreset, getCurrentDayAndMinutes } = require('../../../utils/thermostatSchedule');
 const {
   DEFAULT_PRESET_TEMPS,
@@ -25,6 +25,84 @@ const {
 } = require('../../../utils/thermostatConstants');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
+
+/**
+ * @description Write a setpoint on an external thermostat.
+ *
+ * The real device owns the feature, so the write goes through the core, which
+ * routes it to the owning service (Netatmo, Zigbee2MQTT, Matter, MQTT...). It
+ * is skipped when the value already matches: several of those services call a
+ * cloud API on every write, and re-sending an unchanged setpoint every minute
+ * would burn the rate limit for nothing.
+ *
+ * The value is converted into the target feature's own unit first. A thermostat
+ * configured in celsius pointing at a fahrenheit device would otherwise write
+ * 21 where the device reads 21 °F.
+ * @param {object} gladys - Gladys instance.
+ * @param {string} targetSelector - Selector of the external setpoint feature.
+ * @param {number} setpoint - Setpoint in the thermostat's unit.
+ * @param {string} thermostatUnit - Thermostat unit param, 'C' or 'F'.
+ * @param {string} logContext - Context for the log line.
+ * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote,
+ * so the echo of this write is not mistaken for a change made on the device itself.
+ * @returns {Promise<void>}
+ * @example
+ * await writeExternalSetpoint(gladys, 'netatmo:x:setpoint', 21, 'C', 'salon');
+ */
+async function writeExternalSetpoint(gladys, targetSelector, setpoint, thermostatUnit, logContext, selfWritten) {
+  try {
+    const found = await getFeatureBySelector(gladys, targetSelector);
+    if (!found) {
+      logger.warn(`Thermostat schedule: external target feature not found for selector="${targetSelector}"`);
+      return;
+    }
+    let value = setpoint;
+    const featureUnit = found.feature.unit;
+    if (featureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && thermostatUnit === 'C') {
+      value = celsiusToFahrenheit(setpoint);
+    } else if (featureUnit === DEVICE_FEATURE_UNITS.CELSIUS && thermostatUnit === 'F') {
+      value = fahrenheitToCelsius(setpoint);
+    }
+    // The real device advertises the range it accepts. Netatmo says 5-30,
+    // Zigbee 5-40, Matter -100-200: writing outside it is rejected by the
+    // integration, or silently clamped, so clamp here where it can be logged.
+    const min = toNumber(found.feature.min, null);
+    const max = toNumber(found.feature.max, null);
+    if (min !== null && value < min) {
+      logger.info(`Thermostat schedule: setpoint ${value} below the device minimum ${min}, clamped (${logContext})`);
+      value = min;
+    }
+    if (max !== null && value > max) {
+      logger.info(`Thermostat schedule: setpoint ${value} above the device maximum ${max}, clamped (${logContext})`);
+      value = max;
+    }
+    if (found.feature.last_value === value) {
+      logger.debug(`Thermostat schedule: external setpoint already ${value} (${logContext})`);
+      return;
+    }
+    // Mark before writing: the device echoes the value back as a NEW_STATE, and
+    // the listener must not take our own write for a change made on the device.
+    if (selfWritten) {
+      selfWritten.set(targetSelector, value);
+    }
+    try {
+      await gladys.device.setValue(found.device, found.feature, value);
+    } catch (e) {
+      // The write never reached the device (an unreachable integration, an
+      // expired token, an external integration that did not acknowledge in
+      // time), so no echo will come: leaving the mark behind would make the
+      // listener swallow a *real* change to that same value, and the loop would
+      // then overwrite what the user set on the thermostat.
+      if (selfWritten) {
+        selfWritten.delete(targetSelector);
+      }
+      throw e;
+    }
+    logger.info(`Thermostat schedule: external setpoint ${value} written (${logContext})`);
+  } catch (e) {
+    logger.warn(`Thermostat schedule: Failed to write external setpoint: ${e.message}`);
+  }
+}
 
 /**
  * @description Resolve the setpoint feature of a thermostat device.
@@ -243,26 +321,32 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext)
  * @param {number} dayOfWeek - Current day (0=Monday … 6=Sunday).
  * @param {number} currentMinutes - Current time in minutes since midnight.
  * @param {string} [serviceId] - This service's id, used to scope the runtime variables.
+ * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote.
  * @returns {Promise<void>}
  * @example
  * await regulateDevice(gladys, device, 0, 480, serviceId);
  */
-async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, serviceId = null) {
-  const thermostatFeature = getThermostatFeature(device);
-  if (!thermostatFeature) {
-    logger.debug('Thermostat schedule: device has no target-temperature feature, skipping');
+async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, serviceId = null, selfWritten = null) {
+  const config = getDeviceConfig(device);
+  if (!config) {
+    logger.warn(`Thermostat schedule: no config found for device "${device && device.name}"`);
     return;
   }
-  const { selector } = thermostatFeature;
+  const external = isExternal(config);
+
+  // A virtual thermostat owns its setpoint feature; an external one has none,
+  // and is identified by the feature of the real device it drives. Either way
+  // the selector is what keys the runtime variables and what the widget holds,
+  // so the rest of the loop is written once for both.
+  const thermostatFeature = external ? null : getThermostatFeature(device);
+  const selector = external ? config.target_feature : thermostatFeature && thermostatFeature.selector;
+  if (!selector) {
+    logger.debug('Thermostat schedule: device has no setpoint to regulate, skipping');
+    return;
+  }
   const featureKey = selector.toUpperCase().replace(/-/g, '_');
   const presetVarKey = `THERMOSTAT_${featureKey}_PRESET`;
   const manualVarKey = `THERMOSTAT_${featureKey}_MANUAL_MODE`;
-
-  const config = getDeviceConfig(device);
-  if (!config) {
-    logger.warn(`Thermostat schedule: no config found for ${selector}`);
-    return;
-  }
   // getDeviceConfig always fills this in from THERMOSTAT_MODE or the shared default.
   const { default_mode: mode } = config;
 
@@ -271,8 +355,26 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     try {
       const win = await getFeatureBySelector(gladys, config.window_feature);
       if (win && win.feature.last_value === 0) {
-        logger.info(`Thermostat schedule: window open for ${selector}, switch OFF`);
-        if (config.switch_feature) {
+        logger.info(`Thermostat schedule: window open for ${selector}`);
+        if (external) {
+          // Nothing to cut: the real thermostat holds the contact. Writing the
+          // frost-protection setpoint is what stops it heating, and it is
+          // supported by every thermostat that accepts a setpoint at all —
+          // unlike a mode feature, which almost none of them expose. The
+          // schedule restores its own setpoint on the next pass once the
+          // window closes.
+          const frostSetpoint = getSetpointForPreset('frost', config);
+          if (frostSetpoint !== null) {
+            await writeExternalSetpoint(
+              gladys,
+              config.target_feature,
+              frostSetpoint,
+              config.temp_unit,
+              `window open, ${selector}`,
+              selfWritten,
+            );
+          }
+        } else if (config.switch_feature) {
           await actuateSwitch(gladys, config.switch_feature, false, `window open, ${selector}`);
         }
         return;
@@ -331,7 +433,19 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
       // this, the loop would regulate on the setpoint that was current *before*
       // Off was tapped and keep the heater running until the hold expires.
       if (currentPreset === 'off') {
-        if (config.switch_feature) {
+        if (external) {
+          const frostSetpoint = getSetpointForPreset('frost', config);
+          if (frostSetpoint !== null) {
+            await writeExternalSetpoint(
+              gladys,
+              config.target_feature,
+              frostSetpoint,
+              config.temp_unit,
+              `manual preset=off, ${selector}`,
+              selfWritten,
+            );
+          }
+        } else if (config.switch_feature) {
           await actuateSwitch(gladys, config.switch_feature, false, `manual preset=off, ${selector}`);
         }
         return;
@@ -348,6 +462,20 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
         } catch (e) {
           /* ignore */
         }
+      }
+      if (manualSetpoint !== null && external) {
+        // The real thermostat regulates itself: hand it the held setpoint and
+        // let it decide when to fire. There is no room sensor to read and no
+        // hysteresis to run — running one here would fight the device's own.
+        await writeExternalSetpoint(
+          gladys,
+          config.target_feature,
+          manualSetpoint,
+          config.temp_unit,
+          `manual, ${selector}`,
+          selfWritten,
+        );
+        return;
       }
       if (manualSetpoint !== null && config.switch_feature && config.temperature_feature) {
         const tmp = await getFeatureBySelector(gladys, config.temperature_feature);
@@ -402,9 +530,12 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     return;
   }
 
-  // Enforce the target setpoint on the thermostat feature, only when it changed.
+  // Enforce the target setpoint, only when it changed. On a virtual thermostat
+  // the setpoint is this service's own feature, so it is persisted directly; on
+  // an external one it belongs to the real device, and the write is routed
+  // through the core to the owning integration.
   const newSetpoint = getSetpointForPreset(targetPreset, config);
-  if (newSetpoint !== null && thermostatFeature.last_value !== newSetpoint) {
+  if (newSetpoint !== null && !external && thermostatFeature.last_value !== newSetpoint) {
     try {
       await gladys.device.saveState(thermostatFeature, newSetpoint);
     } catch (e) {
@@ -422,6 +553,25 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
       type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.PRESET_UPDATED,
       payload: { key: presetVarKey, value: targetPreset },
     });
+  }
+
+  if (external) {
+    // The real thermostat runs its own heuristic off this setpoint, so there is
+    // nothing left to decide here: no hysteresis, no TPI, no switch. `off` is
+    // expressed as the frost-protection setpoint, the only way to say "stop"
+    // that every thermostat understands.
+    const externalSetpoint = targetPreset === 'off' ? getSetpointForPreset('frost', config) : newSetpoint;
+    if (externalSetpoint !== null) {
+      await writeExternalSetpoint(
+        gladys,
+        config.target_feature,
+        externalSetpoint,
+        config.temp_unit,
+        `preset="${targetPreset}", ${selector}`,
+        selfWritten,
+      );
+    }
+    return;
   }
 
   if (!config.switch_feature) {
@@ -503,7 +653,8 @@ async function applySchedules() {
     await Promise.all(
       thermostatDevices.map(async (device) => {
         try {
-          await regulateDevice(this.gladys, device, dayOfWeek, currentMinutes, this.serviceId);
+          const { serviceId, selfWrittenSetpoints } = this;
+          await regulateDevice(this.gladys, device, dayOfWeek, currentMinutes, serviceId, selfWrittenSetpoints);
         } catch (e) {
           logger.warn(`Thermostat schedule: Failed to regulate device: ${e.message}`);
         }
@@ -517,6 +668,7 @@ async function applySchedules() {
 module.exports = {
   applySchedules,
   getThermostatFeature,
+  writeExternalSetpoint,
   readTemperatureInThermostatUnit,
   phaseOffset,
   regulateDevice,

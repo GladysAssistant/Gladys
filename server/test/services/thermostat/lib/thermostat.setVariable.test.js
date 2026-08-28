@@ -225,6 +225,46 @@ describe('thermostat.getFeatureKeys cache', () => {
 
     expect([...keys].sort()).to.deep.equal(['KITCHEN', 'LIVING_ROOM', 'LIVING_ROOM_HUMIDITY']);
   });
+
+  // An external thermostat owns no feature: its runtime state is keyed on the
+  // real device's setpoint feature. Without this its preset and its manual hold
+  // would be refused as "not owned by this service", and the widget would get a
+  // 404 on every read.
+  it('should collect the target feature of an external thermostat', async () => {
+    const handler = buildHandler([
+      { features: [], params: [{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }] },
+    ]);
+
+    const keys = await handler.getFeatureKeys();
+
+    expect([...keys]).to.deep.equal(['NETATMO_SETPOINT']);
+  });
+
+  it('should accept a runtime key named after an external target feature', async () => {
+    const handler = buildHandler([
+      { features: [], params: [{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }] },
+    ]);
+
+    expect(await handler.resolveRuntimeVariableKey('THERMOSTAT_NETATMO_SETPOINT_PRESET')).to.equal(true);
+  });
+
+  it('should ignore a target param left empty', async () => {
+    const handler = buildHandler([
+      { features: [{ selector: 'living-room' }], params: [{ name: 'THERMOSTAT_TARGET_FEATURE', value: '' }] },
+    ]);
+
+    const keys = await handler.getFeatureKeys();
+
+    expect([...keys]).to.deep.equal(['LIVING_ROOM']);
+  });
+
+  it('should ignore a device carrying no params at all', async () => {
+    const handler = buildHandler([{ features: [{ selector: 'living-room' }] }]);
+
+    const keys = await handler.getFeatureKeys();
+
+    expect([...keys]).to.deep.equal(['LIVING_ROOM']);
+  });
 });
 
 describe('thermostat.broadcastConfigUpdated', () => {

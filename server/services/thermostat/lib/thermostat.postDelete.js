@@ -17,10 +17,17 @@ const VARIABLE_SUFFIXES = RUNTIME_SUFFIXES;
  */
 async function postDelete(device) {
   this.invalidateDeviceCaches();
-  const features = (device && device.features) || [];
+  const selectors = ((device && device.features) || []).map((feature) => feature.selector);
+  // An external thermostat carries no feature of its own: its runtime state is
+  // keyed on the real device's setpoint feature. That feature survives the
+  // deletion — it belongs to another integration — so only the variables go.
+  const targetParam = ((device && device.params) || []).find((param) => param.name === 'THERMOSTAT_TARGET_FEATURE');
+  if (targetParam && targetParam.value && !selectors.includes(targetParam.value)) {
+    selectors.push(targetParam.value);
+  }
   await Promise.all(
-    features.map(async (feature) => {
-      const featureKey = feature.selector.toUpperCase().replace(/-/g, '_');
+    selectors.map(async (selector) => {
+      const featureKey = selector.toUpperCase().replace(/-/g, '_');
       const keys = VARIABLE_SUFFIXES.map((suffix) => `THERMOSTAT_${featureKey}_${suffix}`);
       await Promise.all(
         keys.map(async (key) => {
