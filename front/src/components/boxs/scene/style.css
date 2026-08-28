@@ -41,9 +41,14 @@
 
 .sceneName {
   font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Long scene names wrap on several lines instead of being truncated */
+  overflow-wrap: anywhere;
+}
+
+.sceneAction {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
 }
 
 /* Horizon glass theme */
