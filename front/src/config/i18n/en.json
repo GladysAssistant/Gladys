@@ -6309,6 +6309,10 @@
       "other": "Gladys Plus trial: {{count}} days left"
     },
     "trialAddPaymentMethod": "Add a payment method",
+    "instanceUpdateNoticeTitle": "Update available",
+    "instanceUpdateNoticeText": "Gladys Plus has been updated to {{latestVersion}}, but your instance is still on {{instanceVersion}}. Some features may not work properly until your instance is updated.",
+    "instanceUpdateNoticeButton": "Update my instance",
+    "instanceUpdateNoticeDismiss": "Hide this message",
     "needHelp": "Need help",
     "signOut": "Sign Out"
   },
