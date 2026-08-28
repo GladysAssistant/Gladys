@@ -12,20 +12,34 @@ const OPENFREEMAP_STYLE_BASE_URL = 'https://tiles.openfreemap.org/styles';
 const ATTRIBUTION =
   '<a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>';
 
+let webGL2Available;
+
 /**
  * @description Check that WebGL2 is available: MapLibre GL v6 dropped WebGL1
- * support, so a WebGL1-only browser cannot render the vector basemap.
+ * support, so a WebGL1-only browser cannot render the vector basemap. The
+ * result is cached (and the probe context released) so toggling dark mode,
+ * which rebuilds every map, does not create a throwaway GL context each time.
  * @returns {boolean} True when a WebGL2 context can be created.
  * @example
  * const supported = isWebGL2Available();
  */
 const isWebGL2Available = () => {
-  try {
-    const canvas = document.createElement('canvas');
-    return !!(window.WebGL2RenderingContext && canvas.getContext('webgl2'));
-  } catch (e) {
-    return false;
+  if (webGL2Available === undefined) {
+    try {
+      const canvas = document.createElement('canvas');
+      const context = window.WebGL2RenderingContext && canvas.getContext('webgl2');
+      webGL2Available = !!context;
+      if (context) {
+        const loseContextExtension = context.getExtension('WEBGL_lose_context');
+        if (loseContextExtension) {
+          loseContextExtension.loseContext();
+        }
+      }
+    } catch (e) {
+      webGL2Available = false;
+    }
   }
+  return webGL2Available;
 };
 
 /**
@@ -55,7 +69,9 @@ const addMapTileLayer = async (leafletMap, isDarkMode) => {
     setWorkerUrl(maplibreWorkerUrl);
     return maplibreGL({
       style: `${OPENFREEMAP_STYLE_BASE_URL}/${isDarkMode ? 'dark' : 'positron'}`,
-      attribution: ATTRIBUTION,
+      // maplibre-gl-leaflet reads attributionControl.customAttribution, not
+      // Leaflet's usual attribution option
+      attributionControl: { customAttribution: ATTRIBUTION },
       maxZoom: 19
     }).addTo(leafletMap);
   } catch (e) {
