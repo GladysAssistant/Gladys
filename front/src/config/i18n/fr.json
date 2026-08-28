@@ -5,6 +5,7 @@
     "new": "Nouveau",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
+    "orderDirLabel": "Ordre de tri",
     "emptySelectOption": "---------",
     "backButton": "◀️️ Retour",
     "requiredField": "*",

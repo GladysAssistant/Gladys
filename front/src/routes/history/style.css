@@ -129,6 +129,13 @@
   color: var(--gl-muted);
 }
 
+/* The room filter names what the feed is showing — a label, like the pills
+   of the other page headers, not typed-in content */
+.headerControls :global(select.form-control) {
+  font-weight: 600;
+  color: var(--gl-muted);
+}
+
 .dateInput {
   width: auto;
   min-width: 150px;
