@@ -25,6 +25,13 @@ const MQTT_MODE = {
   EXTERNAL: 'external',
 };
 
+// Params stored on each Gladys device created by this service
+const DEVICE_PARAMS = {
+  // The Zigbee IEEE address is the immutable hardware identifier of the device,
+  // used to keep the link with Gladys when the device is renamed in Zigbee2mqtt.
+  IEEE_ADDRESS: 'IEEE_ADDRESS',
+};
+
 // Zigbee coordinator connection: plugged in USB, or reachable over the network (tcp://<host>:<port>)
 const ADAPTER_MODE = {
   USB: 'usb',
@@ -93,6 +100,7 @@ const DEFAULT = {
 module.exports = {
   CONFIGURATION,
   MQTT_MODE,
+  DEVICE_PARAMS,
   ADAPTER_MODE,
   SETUP_VARIABLES,
   DEFAULT,

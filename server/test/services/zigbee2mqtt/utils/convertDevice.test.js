@@ -150,6 +150,7 @@ describe('zigbee2mqtt convertDevice', () => {
       name: '0x5c0272fffxxxxx',
       model: 'E1743',
       ieee_address: '0x5c0272fffxxxxx',
+      params: [{ name: 'IEEE_ADDRESS', value: '0x5c0272fffxxxxx' }],
       external_id: 'zigbee2mqtt:0x5c0272fffxxxxx',
       features: [
         {
@@ -257,6 +258,7 @@ describe('zigbee2mqtt convertDevice', () => {
       name: 'Lixee ZLinky TIC',
       model: 'ZLinky_TIC',
       ieee_address: '0x00158d00045a8abc',
+      params: [{ name: 'IEEE_ADDRESS', value: '0x00158d00045a8abc' }],
       external_id: 'zigbee2mqtt:Lixee ZLinky TIC',
       features: [
         {
