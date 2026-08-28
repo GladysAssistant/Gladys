@@ -55,6 +55,14 @@ async function getFeatureKeys() {
     (device.features || []).forEach((feature) => {
       featureKeys.add(featureKeyFromSelector(feature.selector));
     });
+    // An external thermostat owns no feature: its runtime state is keyed on the
+    // real device's setpoint feature, which the user named in the integration
+    // page. Without this the preset and the manual hold of every external
+    // thermostat would be refused as "not owned by this service".
+    const targetParam = (device.params || []).find((param) => param.name === 'THERMOSTAT_TARGET_FEATURE');
+    if (targetParam && targetParam.value) {
+      featureKeys.add(featureKeyFromSelector(targetParam.value));
+    }
   });
   this.featureKeysCache = featureKeys;
   return featureKeys;

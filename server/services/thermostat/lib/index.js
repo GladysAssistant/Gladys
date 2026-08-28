@@ -8,6 +8,8 @@ const { detachSchedule } = require('./thermostat.detachSchedule');
 const { applySchedules } = require('./thermostat.applySchedules');
 const {
   onDeviceNewState,
+  onExternalSetpointChanged,
+  getTargetSelectors,
   getWindowSelectors,
   invalidateDeviceCaches,
   postUpdate,
@@ -31,6 +33,12 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // thermostat device is created, updated or deleted.
   this.windowSelectorsCache = null;
   this.featureKeysCache = null;
+  this.targetSelectorsCache = null;
+  // Setpoints this service just wrote on a real thermostat, by selector. The
+  // write comes back as a NEW_STATE, and without this mark that echo would be
+  // taken for a change made on the device and arm a manual hold — so a
+  // scheduled write would suspend the very schedule that made it.
+  this.selfWrittenSetpoints = new Map();
 };
 
 ThermostatHandler.prototype.createDevice = createDevice;
@@ -42,6 +50,8 @@ ThermostatHandler.prototype.deleteSchedule = deleteSchedule;
 ThermostatHandler.prototype.detachSchedule = detachSchedule;
 ThermostatHandler.prototype.applySchedules = applySchedules;
 ThermostatHandler.prototype.onDeviceNewState = onDeviceNewState;
+ThermostatHandler.prototype.onExternalSetpointChanged = onExternalSetpointChanged;
+ThermostatHandler.prototype.getTargetSelectors = getTargetSelectors;
 ThermostatHandler.prototype.getWindowSelectors = getWindowSelectors;
 ThermostatHandler.prototype.invalidateDeviceCaches = invalidateDeviceCaches;
 ThermostatHandler.prototype.postUpdate = postUpdate;

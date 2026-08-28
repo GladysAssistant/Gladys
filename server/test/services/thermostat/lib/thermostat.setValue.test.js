@@ -20,11 +20,21 @@ const buildHandler = () => {
   const { setValue } = load();
   return {
     gladys: {
-      device: { saveState: fake.resolves(null) },
+      device: {
+        saveState: fake.resolves(null),
+        setValue: fake.resolves(null),
+        // The owner of an external setpoint feature: another integration's
+        // device, which is what the core has to be handed to route the write.
+        get: fake.resolves([
+          { selector: 'netatmo-device', service: { name: 'netatmo' }, features: [{ selector: 'netatmo-setpoint' }] },
+        ]),
+      },
       variable: { setValue: fake.resolves(null) },
       event: { emit: fake.returns(null) },
     },
     serviceId: 'service-id',
+    // The real handler always creates this map in its constructor.
+    selfWrittenSetpoints: new Map(),
     triggerApplySchedules: fake.returns(null),
     setValue,
   };
@@ -189,6 +199,117 @@ describe('thermostat.setValue', () => {
 
     handler.gladys.variable.setValue.getCalls().forEach((call) => {
       expect(call.args[2]).to.equal('service-id');
+    });
+  });
+
+  // An external thermostat drives a feature owned by another integration
+  // (Netatmo, Zigbee, Matter, MQTT...). Persisting the value with saveState
+  // would update every Gladys screen while the real thermostat never hears
+  // about it — the setpoint would only reach it on the next regulation tick.
+  describe('external thermostat', () => {
+    const externalDevice = (params = []) => ({
+      params: [
+        { name: 'THERMOSTAT_TYPE', value: 'external' },
+        { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+        ...params,
+      ],
+    });
+    const externalFeature = { selector: 'netatmo-setpoint' };
+
+    it('should write through the owning integration, not saveState', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(externalDevice(), externalFeature, 21);
+
+      assert.calledOnce(handler.gladys.device.setValue);
+      // The device handed to the core is the one owning the feature, never this
+      // service's thermostat: routing is done on device.service.name, so passing
+      // our own device would call this very function again, endlessly.
+      const [ownerDevice, ownerFeature, written] = handler.gladys.device.setValue.firstCall.args;
+      expect(ownerDevice.service.name).to.equal('netatmo');
+      expect(ownerFeature.selector).to.equal('netatmo-setpoint');
+      expect(written).to.equal(21);
+      assert.notCalled(handler.gladys.device.saveState);
+    });
+
+    // A failed write produces no echo, so a mark left behind would make the
+    // listener swallow a real change to that same value later on — and the loop
+    // would then overwrite what the user set on the thermostat itself.
+    it('should drop the mark when the write fails', async () => {
+      const handler = buildHandler();
+      handler.gladys.device.setValue = fake.rejects(new Error('integration timeout'));
+
+      let error = null;
+      try {
+        await handler.setValue(externalDevice(), externalFeature, 21);
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).to.be.an('error');
+      expect(handler.selfWrittenSetpoints.has('netatmo-setpoint')).to.equal(false);
+    });
+
+    it('should mark the value it writes, so its echo is not held', async () => {
+      const handler = buildHandler();
+      handler.selfWrittenSetpoints = new Map();
+
+      await handler.setValue(externalDevice(), externalFeature, 21);
+
+      expect(handler.selfWrittenSetpoints.get('netatmo-setpoint')).to.equal(21);
+    });
+    it('should still write through the integration when returning to the schedule', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(externalDevice(), externalFeature, 19, false);
+
+      expect(handler.gladys.device.setValue.firstCall.args[0].service.name).to.equal('netatmo');
+      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(19);
+      assert.notCalled(handler.gladys.device.saveState);
+    });
+
+    it('should hold the write as a manual override, like a virtual one', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(externalDevice(), externalFeature, 21);
+
+      assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_NETATMO_SETPOINT_MANUAL_MODE', 'true');
+    });
+
+    // Only the configured target is written through the integration: a device
+    // left with a stale param, or any other feature, stays on saveState.
+    // The param names a feature that no longer exists: the integration was
+    // removed, or the device renamed. Nothing must be written anywhere.
+    it('should not write anything when the owning device is gone', async () => {
+      const handler = buildHandler();
+      handler.gladys.device.get = fake.resolves([]);
+
+      await handler.setValue(externalDevice(), externalFeature, 21);
+
+      assert.notCalled(handler.gladys.device.setValue);
+      assert.notCalled(handler.gladys.device.saveState);
+    });
+
+    it('should persist a feature that is not the configured target', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(externalDevice(), { selector: 'some-other-feature' }, 21);
+
+      assert.calledOnce(handler.gladys.device.saveState);
+      assert.notCalled(handler.gladys.device.setValue);
+    });
+
+    it('should persist through saveState when the device is virtual', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(
+        { params: [{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }] },
+        externalFeature,
+        21,
+      );
+
+      assert.calledOnce(handler.gladys.device.saveState);
+      assert.notCalled(handler.gladys.device.setValue);
     });
   });
 });

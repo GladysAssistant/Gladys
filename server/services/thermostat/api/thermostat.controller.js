@@ -1,6 +1,7 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const { isRuntimeVariableKey } = require('../lib/thermostat.setVariable');
+const { getFeatureBySelector } = require('../lib/thermostat.deviceConfig');
 
 module.exports = function ThermostatController(thermostatHandler) {
   /**
@@ -88,9 +89,16 @@ module.exports = function ThermostatController(thermostatHandler) {
       res.status(400).json({ error: 'INVALID_VALUE' });
       return;
     }
-    // Only a thermostat setpoint owned by this service may be written here.
-    // Without this check any authenticated user could persist a value on a lock,
-    // a cover or a light just by naming its selector.
+    // Only a setpoint this service regulates may be written here. Without this
+    // check any authenticated user could persist a value on a lock, a cover or
+    // a light just by naming its selector.
+    //
+    // For a virtual thermostat that means a target-temperature feature of one of
+    // this service's own devices. An external thermostat owns no feature — its
+    // setpoint belongs to Netatmo, Zigbee, Matter... — so the accepted selector
+    // is the THERMOSTAT_TARGET_FEATURE the user configured on the integration
+    // page. The guard is just as narrow: an arbitrary selector still matches
+    // nothing, only a feature deliberately wired to a thermostat is reachable.
     const devices = await thermostatHandler.getDevices({});
     let device = null;
     let deviceFeature = null;
@@ -106,10 +114,31 @@ module.exports = function ThermostatController(thermostatHandler) {
         deviceFeature = found;
         return true;
       }
+      const target = (candidate.params || []).find(
+        (param) => param.name === 'THERMOSTAT_TARGET_FEATURE' && param.value === featureSelector,
+      );
+      if (target) {
+        device = candidate;
+        return true;
+      }
       return false;
     });
-    if (!deviceFeature) {
+    if (!device) {
       res.status(404).json({ error: 'FEATURE_NOT_FOUND' });
+      return;
+    }
+    if (!deviceFeature) {
+      // External: resolve the real device and its feature, so setValue writes
+      // through the owning integration rather than on a feature of ours.
+      const external = await getFeatureBySelector(thermostatHandler.gladys, featureSelector);
+      if (!external) {
+        res.status(404).json({ error: 'FEATURE_NOT_FOUND' });
+        return;
+      }
+      // setValue needs the thermostat device for its config (manual duration,
+      // active schedule), but the feature of the real device to write on.
+      await thermostatHandler.setValue(device, external.feature, value, req.body.manual !== false);
+      res.json({ success: true, value });
       return;
     }
     // Go through setValue so the widget, the API and scenes share one path.

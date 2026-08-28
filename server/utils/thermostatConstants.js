@@ -44,6 +44,22 @@ const MANUAL_DURATION_MS = DEFAULT_MANUAL_DURATION_MINUTES * 60 * 1000;
 
 const PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 
+// How a thermostat device is regulated.
+// - `virtual`: Gladys is the thermostat. It reads a room sensor, applies
+//   hysteresis or TPI, and drives a switch (a relay, a plug, a boiler contact).
+// - `external`: a real thermostat regulates on its own. Gladys only writes the
+//   setpoint its schedule resolves, and reads back whether the device is
+//   currently heating. There is no switch and no heuristic to run: the device
+//   already does that, and a second control loop would fight it.
+const THERMOSTAT_TYPES = {
+  VIRTUAL: 'virtual',
+  EXTERNAL: 'external',
+};
+
+// Devices created before the external type existed carry no THERMOSTAT_TYPE
+// param, and they are all virtual ones.
+const DEFAULT_THERMOSTAT_TYPE = THERMOSTAT_TYPES.VIRTUAL;
+
 module.exports = {
   DEFAULT_PRESET_TEMPS,
   FALLBACK_SETPOINT,
@@ -63,4 +79,6 @@ module.exports = {
   DEFAULT_MANUAL_DURATION_MINUTES,
   MANUAL_DURATION_MS,
   PRESETS,
+  THERMOSTAT_TYPES,
+  DEFAULT_THERMOSTAT_TYPE,
 };

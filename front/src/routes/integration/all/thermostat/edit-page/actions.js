@@ -1,5 +1,5 @@
 import { RequestStatus } from '../../../../../utils/consts';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 import { route } from 'preact-router';
 import createActionsHouse from '../../../../../actions/house';
 
@@ -27,7 +27,14 @@ function createActions(store) {
         const humidityFeatures = [];
         const switchFeatures = [];
         const openingFeatures = [];
+        const targetFeatures = [];
+        const stateFeatures = [];
+        const modeFeatures = [];
         devices.forEach(device => {
+          // A thermostat this integration created is not a real thermostat to
+          // drive: pointing an external thermostat at one would make Gladys
+          // write its own setpoint back to itself.
+          const isOwnThermostat = device.service && device.service.name === 'thermostat';
           device.features.forEach(feature => {
             const entry = { selector: feature.selector, label: `${device.name} - ${feature.name}` };
             if (TEMPERATURE_CATEGORIES.includes(feature.category)) {
@@ -38,19 +45,50 @@ function createActions(store) {
             }
             if (SWITCH_CATEGORIES.includes(feature.category) && feature.type === 'binary') {
               switchFeatures.push(entry);
+              // No integration publishes thermostat/operating-state yet: Netatmo
+              // reports its boiler contact as a read-only switch, and that is the
+              // only "is it heating" signal most real thermostats expose.
+              if (!isOwnThermostat) {
+                stateFeatures.push(entry);
+              }
             }
             if (OPENING_CATEGORIES.includes(feature.category)) {
               openingFeatures.push(entry);
             }
+            if (!isOwnThermostat && feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT) {
+              if (feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE && !feature.read_only) {
+                // Zigbee, Matter and MQTT expose several setpoints on one device
+                // (heating/cooling, occupied/unoccupied): only the user knows
+                // which one drives their heating, so all of them are offered.
+                targetFeatures.push(entry);
+              }
+              if (feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE) {
+                stateFeatures.push(entry);
+              }
+              if (feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) {
+                modeFeatures.push(entry);
+              }
+            }
           });
         });
-        store.setState({ temperatureFeatures, humidityFeatures, switchFeatures, openingFeatures });
+        store.setState({
+          temperatureFeatures,
+          humidityFeatures,
+          switchFeatures,
+          openingFeatures,
+          targetFeatures,
+          stateFeatures,
+          modeFeatures
+        });
       } catch (e) {
         store.setState({
           temperatureFeatures: [],
           humidityFeatures: [],
           switchFeatures: [],
-          openingFeatures: []
+          openingFeatures: [],
+          targetFeatures: [],
+          stateFeatures: [],
+          modeFeatures: []
         });
       }
     },
@@ -75,6 +113,10 @@ function createActions(store) {
           thermostatEditTemperatureFeature: getParam('THERMOSTAT_TEMPERATURE_FEATURE') || '',
           thermostatEditHumidityFeature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || '',
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
+          thermostatEditType: getParam('THERMOSTAT_TYPE') || 'virtual',
+          thermostatEditTargetFeature: getParam('THERMOSTAT_TARGET_FEATURE') || '',
+          thermostatEditStateFeature: getParam('THERMOSTAT_STATE_FEATURE') || '',
+          thermostatEditModeFeature: getParam('THERMOSTAT_MODE_FEATURE') || '',
           thermostatEditWindowFeature: getParam('THERMOSTAT_WINDOW_FEATURE') || '',
           thermostatEditPresetFrost: getParam('THERMOSTAT_PRESET_FROST') || '7',
           thermostatEditPresetAway: getParam('THERMOSTAT_PRESET_AWAY') || '16',
@@ -170,30 +212,39 @@ function createActions(store) {
         const slugName = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
         const newExternalId = `thermostat:${slugName}-${timestamp}`;
 
+        const thermostatType = state.thermostatEditType === 'external' ? 'external' : 'virtual';
+        const isExternalThermostat = thermostatType === 'external';
+
         const device = {
           name,
           external_id: isEdit ? state.thermostatEditDevice.external_id : newExternalId,
           selector: isEdit ? state.thermostatEditDevice.selector : undefined,
           should_poll: false,
-          features: [
-            {
-              // The thermostat/target-temperature category already means "setpoint"
-              // in every language; a hardcoded French suffix would leak into the
-              // device name shown in scenes, MQTT and every UI.
-              name,
-              external_id: isEdit
-                ? `${state.thermostatEditDevice.external_id}:target-temperature`
-                : `${newExternalId}:target-temperature`,
-              category: 'thermostat',
-              type: 'target-temperature',
-              read_only: false,
-              keep_history: true,
-              has_feedback: false,
-              min: minTemp,
-              max: maxTemp,
-              unit: tempUnit === 'F' ? 'fahrenheit' : 'celsius'
-            }
-          ],
+          // An external thermostat carries no setpoint feature of its own: the
+          // setpoint is the real device's, named by THERMOSTAT_TARGET_FEATURE.
+          // Creating a second one here would give the house two setpoints that
+          // drift apart.
+          features: isExternalThermostat
+            ? []
+            : [
+                {
+                  // The thermostat/target-temperature category already means "setpoint"
+                  // in every language; a hardcoded French suffix would leak into the
+                  // device name shown in scenes, MQTT and every UI.
+                  name,
+                  external_id: isEdit
+                    ? `${state.thermostatEditDevice.external_id}:target-temperature`
+                    : `${newExternalId}:target-temperature`,
+                  category: 'thermostat',
+                  type: 'target-temperature',
+                  read_only: false,
+                  keep_history: true,
+                  has_feedback: false,
+                  min: minTemp,
+                  max: maxTemp,
+                  unit: tempUnit === 'F' ? 'fahrenheit' : 'celsius'
+                }
+              ],
           room_id: state.thermostatEditRoomId || undefined,
           params: [
             // The active schedule is device-owned: the dashboard widget only
@@ -206,7 +257,23 @@ function createActions(store) {
             { name: 'THERMOSTAT_CONTROL_TYPE', value: controlType },
             { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: temperatureFeature },
             { name: 'THERMOSTAT_HUMIDITY_FEATURE', value: humidityFeature },
-            { name: 'THERMOSTAT_SWITCH_FEATURE', value: switchFeature },
+            { name: 'THERMOSTAT_SWITCH_FEATURE', value: isExternalThermostat ? '' : switchFeature },
+            { name: 'THERMOSTAT_TYPE', value: thermostatType },
+            // Only meaningful on an external thermostat, and cleared otherwise so
+            // switching a device back to virtual cannot leave it driving a real
+            // one through a stale param.
+            {
+              name: 'THERMOSTAT_TARGET_FEATURE',
+              value: isExternalThermostat ? state.thermostatEditTargetFeature || '' : ''
+            },
+            {
+              name: 'THERMOSTAT_STATE_FEATURE',
+              value: isExternalThermostat ? state.thermostatEditStateFeature || '' : ''
+            },
+            {
+              name: 'THERMOSTAT_MODE_FEATURE',
+              value: isExternalThermostat ? state.thermostatEditModeFeature || '' : ''
+            },
             { name: 'THERMOSTAT_WINDOW_FEATURE', value: windowFeature },
             { name: 'THERMOSTAT_PRESET_FROST', value: presetFrost },
             { name: 'THERMOSTAT_PRESET_AWAY', value: presetAway },
@@ -239,6 +306,10 @@ function createActions(store) {
           thermostatEditTemperatureFeature: '',
           thermostatEditHumidityFeature: '',
           thermostatEditSwitchFeature: '',
+          thermostatEditType: 'virtual',
+          thermostatEditTargetFeature: '',
+          thermostatEditStateFeature: '',
+          thermostatEditModeFeature: '',
           thermostatEditWindowFeature: '',
           thermostatEditActiveSchedule: '',
           thermostatEditPresetFrost: '7',

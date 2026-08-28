@@ -3316,6 +3316,19 @@
         "namePlaceholder": "z.B. Wohnzimmer Thermostat",
         "roomLabel": "Raum",
         "modeLabel": "Modus",
+        "typeLabel": "Thermostattyp",
+        "typeVirtual": "Virtuelles Thermostat (Gladys regelt)",
+        "typeExternal": "Echtes Thermostat (das Gerät regelt)",
+        "typeHelp": {
+          "virtual": "Gladys arbeitet als Thermostat: Sie liest einen Temperatursensor und steuert einen Schalter (Relais, Steckdose, Kesselkontakt), um den Sollwert zu erreichen.",
+          "external": "Das Thermostat regelt selbst und steuert seine Heizung selbst. Gladys schreibt nur den Sollwert aus dem Zeitplan und zeigt den Zustand des Geräts an."
+        },
+        "targetFeatureLabel": "Sollwert des echten Thermostats",
+        "targetFeatureHelp": "Die Funktion, auf die Gladys die Zieltemperatur schreibt. Manche Geräte bieten mehrere an (Heizen/Kühlen, anwesend/abwesend): Wählen Sie diejenige, die Ihre Heizung tatsächlich steuert.",
+        "stateFeatureLabel": "Heizzustand (optional)",
+        "stateFeatureHelp": "Zeigt an, ob das Gerät gerade läuft. Wird sowohl als Betriebszustand als auch als Kesselkontakt akzeptiert. Leer lassen, wenn Ihr Thermostat diese Information nicht liefert.",
+        "modeFeatureLabel": "Betriebsmodus (optional)",
+        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden.",
         "mode": {
           "heating": "Heizen",
           "cooling": "Kühlen"

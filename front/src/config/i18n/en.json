@@ -3316,6 +3316,19 @@
         "namePlaceholder": "e.g. Living Room Thermostat",
         "roomLabel": "Room",
         "modeLabel": "Mode",
+        "typeLabel": "Thermostat type",
+        "typeVirtual": "Virtual thermostat (Gladys regulates)",
+        "typeExternal": "Real thermostat (the device regulates)",
+        "typeHelp": {
+          "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) to reach the setpoint.",
+          "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state."
+        },
+        "targetFeatureLabel": "Setpoint of the real thermostat",
+        "targetFeatureHelp": "The feature Gladys writes the target temperature on. Some devices expose several (heating/cooling, occupied/unoccupied): pick the one that actually drives your heating.",
+        "stateFeatureLabel": "Heating state (optional)",
+        "stateFeatureHelp": "Used to show whether the device is currently running. Accepted either as an operating state or as a boiler contact. Leave empty if your thermostat does not report it.",
+        "modeFeatureLabel": "Operating mode (optional)",
+        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one.",
         "mode": {
           "heating": "Heating",
           "cooling": "Cooling"

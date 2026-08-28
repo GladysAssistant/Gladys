@@ -38,6 +38,11 @@ const EditForm = ({ ...props }) => {
   };
 
   const controlType = props.thermostatEditControlType || 'hysteresis';
+  // A real thermostat runs its own heuristic and drives its own heater: Gladys
+  // only writes the setpoint its schedule resolves. Hysteresis, TPI and the
+  // switch are therefore hidden — offering them would suggest Gladys regulates
+  // a device that regulates itself.
+  const isExternalThermostat = props.thermostatEditType === 'external';
 
   return (
     <div class="card">
@@ -102,6 +107,84 @@ const EditForm = ({ ...props }) => {
               </select>
             </div>
 
+            {/* Type de thermostat */}
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.thermostat.edit.typeLabel" />
+              </label>
+              <select
+                class="form-control"
+                value={props.thermostatEditType || 'virtual'}
+                onChange={e => props.updateThermostatField('thermostatEditType', e.target.value)}
+              >
+                <option value="virtual">
+                  <Text id="integration.thermostat.edit.typeVirtual" />
+                </option>
+                <option value="external">
+                  <Text id="integration.thermostat.edit.typeExternal" />
+                </option>
+              </select>
+              <small class="form-text text-muted">
+                <Text id={`integration.thermostat.edit.typeHelp.${isExternalThermostat ? 'external' : 'virtual'}`} />
+              </small>
+            </div>
+
+            {/* Thermostat réel piloté */}
+            {isExternalThermostat && (
+              <div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.thermostat.edit.targetFeatureLabel" />
+                  </label>
+                  <Localizer>
+                    <FeatureSelect
+                      value={props.thermostatEditTargetFeature || ''}
+                      features={props.targetFeatures}
+                      onChange={e => props.updateThermostatField('thermostatEditTargetFeature', e.target.value)}
+                      emptyLabel={<Text id="global.emptySelectOption" />}
+                    />
+                  </Localizer>
+                  <small class="form-text text-muted">
+                    <Text id="integration.thermostat.edit.targetFeatureHelp" />
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.thermostat.edit.stateFeatureLabel" />
+                  </label>
+                  <Localizer>
+                    <FeatureSelect
+                      value={props.thermostatEditStateFeature || ''}
+                      features={props.stateFeatures}
+                      onChange={e => props.updateThermostatField('thermostatEditStateFeature', e.target.value)}
+                      emptyLabel={<Text id="global.emptySelectOption" />}
+                    />
+                  </Localizer>
+                  <small class="form-text text-muted">
+                    <Text id="integration.thermostat.edit.stateFeatureHelp" />
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.thermostat.edit.modeFeatureLabel" />
+                  </label>
+                  <Localizer>
+                    <FeatureSelect
+                      value={props.thermostatEditModeFeature || ''}
+                      features={props.modeFeatures}
+                      onChange={e => props.updateThermostatField('thermostatEditModeFeature', e.target.value)}
+                      emptyLabel={<Text id="global.emptySelectOption" />}
+                    />
+                  </Localizer>
+                  <small class="form-text text-muted">
+                    <Text id="integration.thermostat.edit.modeFeatureHelp" />
+                  </small>
+                </div>
+              </div>
+            )}
+
             {/* Mode */}
             <div class="form-group">
               <label class="form-label">
@@ -127,159 +210,166 @@ const EditForm = ({ ...props }) => {
               </select>
             </div>
 
-            {/* Type de calcul + paramètres associés */}
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="integration.thermostat.edit.controlTypeLabel" />
-              </label>
-              <select
-                class="form-control"
-                value={controlType}
-                onChange={e => props.updateThermostatField('thermostatEditControlType', e.target.value)}
-              >
-                <option value="hysteresis">
-                  <Text id="integration.thermostat.edit.controlType.hysteresis" />
-                </option>
-                {/* TPI modulates the on-time over a cycle, which only makes sense
-                    for heating: a compressor cannot be pulsed that way */}
-                {mode !== 'cooling' && (
-                  <option value="tpi">
-                    <Text id="integration.thermostat.edit.controlType.tpi" />
-                  </option>
-                )}
-              </select>
-              <small class="form-text text-muted">
-                {controlType === 'tpi' ? (
-                  <span>
-                    <strong>
-                      <Text id="integration.thermostat.edit.controlType.tpi" />
-                    </strong>
-                    {' — '}
-                    <Text id="integration.thermostat.edit.tpiExplain" />
-                  </span>
-                ) : (
-                  <span>
-                    <strong>
+            {/* Type de calcul + paramètres associés. Un vrai thermostat gère sa
+                propre heuristique : Gladys ne lui envoie qu'une consigne. */}
+            {!isExternalThermostat && (
+              <div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.thermostat.edit.controlTypeLabel" />
+                  </label>
+                  <select
+                    class="form-control"
+                    value={controlType}
+                    onChange={e => props.updateThermostatField('thermostatEditControlType', e.target.value)}
+                  >
+                    <option value="hysteresis">
                       <Text id="integration.thermostat.edit.controlType.hysteresis" />
-                    </strong>
-                    {' — '}
-                    <Text id={`integration.thermostat.edit.hysteresisExplain.${modeSuffix}`} />
-                  </span>
+                    </option>
+                    {/* TPI modulates the on-time over a cycle, which only makes sense
+                    for heating: a compressor cannot be pulsed that way */}
+                    {mode !== 'cooling' && (
+                      <option value="tpi">
+                        <Text id="integration.thermostat.edit.controlType.tpi" />
+                      </option>
+                    )}
+                  </select>
+                  <small class="form-text text-muted">
+                    {controlType === 'tpi' ? (
+                      <span>
+                        <strong>
+                          <Text id="integration.thermostat.edit.controlType.tpi" />
+                        </strong>
+                        {' — '}
+                        <Text id="integration.thermostat.edit.tpiExplain" />
+                      </span>
+                    ) : (
+                      <span>
+                        <strong>
+                          <Text id="integration.thermostat.edit.controlType.hysteresis" />
+                        </strong>
+                        {' — '}
+                        <Text id={`integration.thermostat.edit.hysteresisExplain.${modeSuffix}`} />
+                      </span>
+                    )}
+                  </small>
+                </div>
+
+                {/* Paramètres hystérésis */}
+                {controlType === 'hysteresis' && (
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-label">
+                          <Text id="integration.thermostat.edit.hysteresisStartLabel" />
+                        </label>
+                        <div class="input-group">
+                          <input
+                            type="number"
+                            class="form-control"
+                            step="0.1"
+                            min="0"
+                            max="5"
+                            value={props.thermostatEditHysteresisStart || '0.5'}
+                            onInput={e => props.updateThermostatField('thermostatEditHysteresisStart', e.target.value)}
+                          />
+                          <div class="input-group-append">
+                            <span class="input-group-text">
+                              {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
+                            </span>
+                          </div>
+                        </div>
+                        <small class="form-text text-muted">
+                          <Text id={`integration.thermostat.edit.hysteresisStartHelp.${modeSuffix}`} />
+                        </small>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-label">
+                          <Text id="integration.thermostat.edit.hysteresisStopLabel" />
+                        </label>
+                        <div class="input-group">
+                          <input
+                            type="number"
+                            class="form-control"
+                            step="0.1"
+                            min="0"
+                            max="5"
+                            value={props.thermostatEditHysteresisStop || '0.5'}
+                            onInput={e => props.updateThermostatField('thermostatEditHysteresisStop', e.target.value)}
+                          />
+                          <div class="input-group-append">
+                            <span class="input-group-text">
+                              {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
+                            </span>
+                          </div>
+                        </div>
+                        <small class="form-text text-muted">
+                          <Text id={`integration.thermostat.edit.hysteresisStopHelp.${modeSuffix}`} />
+                        </small>
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </small>
-            </div>
 
-            {/* Paramètres hystérésis */}
-            {controlType === 'hysteresis' && (
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.thermostat.edit.hysteresisStartLabel" />
-                    </label>
-                    <div class="input-group">
-                      <input
-                        type="number"
-                        class="form-control"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={props.thermostatEditHysteresisStart || '0.5'}
-                        onInput={e => props.updateThermostatField('thermostatEditHysteresisStart', e.target.value)}
-                      />
-                      <div class="input-group-append">
-                        <span class="input-group-text">
-                          {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                        </span>
+                {/* Paramètres TPI */}
+                {controlType === 'tpi' && (
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-label">
+                          <Text id="integration.thermostat.edit.tpiCycleTimeLabel" />
+                        </label>
+                        <div class="input-group">
+                          <input
+                            type="number"
+                            class="form-control"
+                            step="1"
+                            min="5"
+                            max="120"
+                            value={props.thermostatEditTpiCycleTime || '30'}
+                            onInput={e => props.updateThermostatField('thermostatEditTpiCycleTime', e.target.value)}
+                          />
+                          <div class="input-group-append">
+                            <span class="input-group-text">min</span>
+                          </div>
+                        </div>
+                        <small class="form-text text-muted">
+                          <Text id="integration.thermostat.edit.tpiCycleTimeHelp" />
+                        </small>
                       </div>
                     </div>
-                    <small class="form-text text-muted">
-                      <Text id={`integration.thermostat.edit.hysteresisStartHelp.${modeSuffix}`} />
-                    </small>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.thermostat.edit.hysteresisStopLabel" />
-                    </label>
-                    <div class="input-group">
-                      <input
-                        type="number"
-                        class="form-control"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={props.thermostatEditHysteresisStop || '0.5'}
-                        onInput={e => props.updateThermostatField('thermostatEditHysteresisStop', e.target.value)}
-                      />
-                      <div class="input-group-append">
-                        <span class="input-group-text">
-                          {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                        </span>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-label">
+                          <Text id="integration.thermostat.edit.tpiProportionalBandLabel" />
+                        </label>
+                        <div class="input-group">
+                          <input
+                            type="number"
+                            class="form-control"
+                            step="0.5"
+                            min="0.5"
+                            max="10"
+                            value={props.thermostatEditTpiProportionalBand || '2'}
+                            onInput={e =>
+                              props.updateThermostatField('thermostatEditTpiProportionalBand', e.target.value)
+                            }
+                          />
+                          <div class="input-group-append">
+                            <span class="input-group-text">
+                              {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
+                            </span>
+                          </div>
+                        </div>
+                        <small class="form-text text-muted">
+                          <Text id="integration.thermostat.edit.tpiProportionalBandHelp" />
+                        </small>
                       </div>
                     </div>
-                    <small class="form-text text-muted">
-                      <Text id={`integration.thermostat.edit.hysteresisStopHelp.${modeSuffix}`} />
-                    </small>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Paramètres TPI */}
-            {controlType === 'tpi' && (
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.thermostat.edit.tpiCycleTimeLabel" />
-                    </label>
-                    <div class="input-group">
-                      <input
-                        type="number"
-                        class="form-control"
-                        step="1"
-                        min="5"
-                        max="120"
-                        value={props.thermostatEditTpiCycleTime || '30'}
-                        onInput={e => props.updateThermostatField('thermostatEditTpiCycleTime', e.target.value)}
-                      />
-                      <div class="input-group-append">
-                        <span class="input-group-text">min</span>
-                      </div>
-                    </div>
-                    <small class="form-text text-muted">
-                      <Text id="integration.thermostat.edit.tpiCycleTimeHelp" />
-                    </small>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.thermostat.edit.tpiProportionalBandLabel" />
-                    </label>
-                    <div class="input-group">
-                      <input
-                        type="number"
-                        class="form-control"
-                        step="0.5"
-                        min="0.5"
-                        max="10"
-                        value={props.thermostatEditTpiProportionalBand || '2'}
-                        onInput={e => props.updateThermostatField('thermostatEditTpiProportionalBand', e.target.value)}
-                      />
-                      <div class="input-group-append">
-                        <span class="input-group-text">
-                          {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                        </span>
-                      </div>
-                    </div>
-                    <small class="form-text text-muted">
-                      <Text id="integration.thermostat.edit.tpiProportionalBandHelp" />
-                    </small>
-                  </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -388,23 +478,25 @@ const EditForm = ({ ...props }) => {
               </small>
             </div>
 
-            {/* Commutateur */}
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="integration.thermostat.edit.switchFeatureLabel" />
-              </label>
-              <Localizer>
-                <FeatureSelect
-                  value={props.thermostatEditSwitchFeature || ''}
-                  features={props.switchFeatures}
-                  onChange={e => props.updateThermostatField('thermostatEditSwitchFeature', e.target.value)}
-                  emptyLabel={<Text id="global.emptySelectOption" />}
-                />
-              </Localizer>
-              <small class="form-text text-muted">
-                <Text id={`integration.thermostat.edit.switchFeatureHelp.${modeSuffix}`} />
-              </small>
-            </div>
+            {/* Commutateur : seul un thermostat virtuel pilote un interrupteur. */}
+            {!isExternalThermostat && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.switchFeatureLabel" />
+                </label>
+                <Localizer>
+                  <FeatureSelect
+                    value={props.thermostatEditSwitchFeature || ''}
+                    features={props.switchFeatures}
+                    onChange={e => props.updateThermostatField('thermostatEditSwitchFeature', e.target.value)}
+                    emptyLabel={<Text id="global.emptySelectOption" />}
+                  />
+                </Localizer>
+                <small class="form-text text-muted">
+                  <Text id={`integration.thermostat.edit.switchFeatureHelp.${modeSuffix}`} />
+                </small>
+              </div>
+            )}
 
             {/* Capteur d'ouverture de fenêtre */}
             <div class="form-group">

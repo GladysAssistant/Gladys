@@ -3316,6 +3316,19 @@
         "namePlaceholder": "Ex: Thermostat Salon",
         "roomLabel": "Pièce",
         "modeLabel": "Mode",
+        "typeLabel": "Type de thermostat",
+        "typeVirtual": "Thermostat virtuel (Gladys régule)",
+        "typeExternal": "Thermostat réel (le device régule)",
+        "typeHelp": {
+          "virtual": "Gladys fait office de thermostat : elle lit un capteur de température et pilote un interrupteur (relais, prise, contact de chaudière) selon la consigne.",
+          "external": "Le thermostat gère lui-même sa régulation et son chauffage. Gladys lui envoie seulement la consigne du planning et affiche son état."
+        },
+        "targetFeatureLabel": "Consigne du thermostat réel",
+        "targetFeatureHelp": "La fonctionnalité sur laquelle Gladys écrit la température de consigne. Certains appareils en exposent plusieurs (chauffage/refroidissement, présent/absent) : choisissez celle qui pilote réellement votre chauffage.",
+        "stateFeatureLabel": "État de chauffe (facultatif)",
+        "stateFeatureHelp": "Permet d'afficher si l'appareil est en train de chauffer. Acceptée aussi bien sous forme d'état de fonctionnement que de contact de chaudière. Laissez vide si votre thermostat ne remonte pas cette information.",
+        "modeFeatureLabel": "Mode de fonctionnement (facultatif)",
+        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un.",
         "mode": {
           "heating": "Chauffage",
           "cooling": "Climatisation"
