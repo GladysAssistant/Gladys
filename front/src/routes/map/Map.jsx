@@ -81,21 +81,38 @@ class MapComponent extends Component {
 
   displayAreas = async props => {
     if (props.areas) {
+      // The handles below live above the marker pane (z-index 600), so a
+      // user avatar sitting at a zone's center cannot cover them and
+      // swallow their clicks. 620 stays below the tooltip pane (650).
+      if (!this.leafletMap.getPane('areaHandles')) {
+        this.leafletMap.createPane('areaHandles').style.zIndex = 620;
+      }
       props.areas.forEach(area => {
         if (this.areaMarkers[area.id]) {
           this.areaMarkers[area.id].remove();
         }
-        this.areaMarkers[area.id] = leaflet
-          .circle([area.latitude, area.longitude], {
-            radius: area.radius,
-            color: area.color,
-            fillColor: area.color,
-            fillOpacity: 0.2
-          })
-          .addTo(this.leafletMap);
+        const areaCircle = leaflet.circle([area.latitude, area.longitude], {
+          radius: area.radius,
+          color: area.color,
+          fillColor: area.color,
+          fillOpacity: 0.2
+        });
+        // The circle above has a geographic size: a small zone is sub-pixel
+        // as soon as the map is zoomed out, so it cannot be seen or clicked
+        // to be edited or deleted. This fixed screen-size handle keeps every
+        // zone visible and clickable at any zoom level.
+        const areaHandle = leaflet.circleMarker([area.latitude, area.longitude], {
+          radius: 9,
+          color: area.color,
+          weight: 2,
+          fillColor: area.color,
+          fillOpacity: 0.4,
+          pane: 'areaHandles'
+        });
+        this.areaMarkers[area.id] = leaflet.featureGroup([areaCircle, areaHandle]).addTo(this.leafletMap);
         this.markerArray.push(this.areaMarkers[area.id]);
 
-        this.areaMarkers[area.id].bindTooltip(area.name).openTooltip();
+        areaHandle.bindTooltip(area.name).openTooltip();
 
         this.areaMarkers[area.id].on('click', () => {
           route(`/dashboard/maps/area/edit/${area.selector}`);
