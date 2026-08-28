@@ -12,6 +12,8 @@ const OPENFREEMAP_STYLE_BASE_URL = 'https://tiles.openfreemap.org/styles';
 const ATTRIBUTION =
   '<a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>';
 
+const MAX_ZOOM = 19;
+
 let webGL2Available;
 
 /**
@@ -58,6 +60,12 @@ const isWebGL2Available = () => {
  * await addMapTileLayer(leafletMap, this.props.darkMode);
  */
 const addMapTileLayer = async (leafletMap, isDarkMode) => {
+  // The basemap layer is added asynchronously, so it cannot bound the map's
+  // zoom the way the old raster layer did synchronously. Without a bound,
+  // fitBounds on a single point resolves getMaxZoom() to Infinity and
+  // corrupts the whole map state (NaN center/zoom): bound the map itself,
+  // synchronously, before any fitBounds can run.
+  leafletMap.setMaxZoom(MAX_ZOOM);
   if (!isWebGL2Available()) {
     return null;
   }
@@ -66,13 +74,18 @@ const addMapTileLayer = async (leafletMap, isDarkMode) => {
       import('@maplibre/maplibre-gl-leaflet'),
       import('maplibre-gl')
     ]);
+    if (!leafletMap.getPane('tilePane')) {
+      // The map was removed while MapLibre was loading (e.g. a dark-mode
+      // toggle rebuilt it): adding a layer to it would throw.
+      return null;
+    }
     setWorkerUrl(maplibreWorkerUrl);
     return maplibreGL({
       style: `${OPENFREEMAP_STYLE_BASE_URL}/${isDarkMode ? 'dark' : 'positron'}`,
       // maplibre-gl-leaflet reads attributionControl.customAttribution, not
       // Leaflet's usual attribution option
       attributionControl: { customAttribution: ATTRIBUTION },
-      maxZoom: 19
+      maxZoom: MAX_ZOOM
     }).addTo(leafletMap);
   } catch (e) {
     // The MapLibre module failed to load (offline, stale service worker...),
