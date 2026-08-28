@@ -9,7 +9,19 @@ import SelectDeviceFeature from '../../device/SelectDeviceFeature';
 import { HOUSE_VIEW_GALLERY } from './gallery';
 import { resolveHouseViewImage } from './HouseViewBox';
 import { prepareImageUpload } from '../../../utils/downscaleImage';
+import { startPinDrag, percentFromPointer, clampPercent } from './pinDrag';
 import style from './style.css';
+
+// Keyboard nudge on a focused pin: one percent per key press, a tenth with
+// shift for the last bit of precision.
+const KEYBOARD_STEP_PCT = 1;
+const KEYBOARD_FINE_STEP_PCT = 0.1;
+const KEYBOARD_MOVES = {
+  ArrowLeft: { x: -1, y: 0 },
+  ArrowRight: { x: 1, y: 0 },
+  ArrowUp: { x: 0, y: -1 },
+  ArrowDown: { x: 0, y: 1 }
+};
 
 class EditHouseViewBox extends Component {
   updateName = e => {
@@ -50,12 +62,50 @@ class EditHouseViewBox extends Component {
   };
 
   addPinOnImage = e => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const xPct = Math.round(((e.clientX - rect.left) / rect.width) * 1000) / 10;
-    const yPct = Math.round(((e.clientY - rect.top) / rect.height) * 1000) / 10;
+    const position = percentFromPointer(e.currentTarget.getBoundingClientRect(), e.clientX, e.clientY);
     const pins = this.props.box.pins || [];
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      pins: [...pins, { x_pct: xPct, y_pct: yPct, device_feature: undefined }]
+      pins: [...pins, { ...position, device_feature: undefined }]
+    });
+  };
+
+  attachImage = element => {
+    this.imageElement = element;
+  };
+
+  getImageRect = () => (this.imageElement ? this.imageElement.getBoundingClientRect() : null);
+
+  // Dragging a pin marker on the image moves it: no more remove & place again.
+  onPinPointerDown = (index, e) => {
+    startPinDrag(e, {
+      draggingClass: style.editPinNumberDragging,
+      getImageRect: this.getImageRect,
+      onMove: (marker, position) => {
+        marker.style.left = `${position.x_pct}%`;
+        marker.style.top = `${position.y_pct}%`;
+      },
+      onDrop: position => this.updatePin(index, position),
+      onCancel: marker => {
+        const pin = this.props.box.pins[index];
+        marker.style.left = `${pin.x_pct}%`;
+        marker.style.top = `${pin.y_pct}%`;
+      }
+    });
+  };
+
+  // A focused pin also moves with the arrow keys — precise, and the only way
+  // to move one without a pointer.
+  movePinWithKeyboard = (index, e) => {
+    const move = KEYBOARD_MOVES[e.key];
+    if (!move) {
+      return;
+    }
+    e.preventDefault();
+    const step = e.shiftKey ? KEYBOARD_FINE_STEP_PCT : KEYBOARD_STEP_PCT;
+    const pin = this.props.box.pins[index];
+    this.updatePin(index, {
+      x_pct: clampPercent(pin.x_pct + move.x * step),
+      y_pct: clampPercent(pin.y_pct + move.y * step)
     });
   };
 
@@ -145,11 +195,28 @@ class EditHouseViewBox extends Component {
               <Text id="dashboard.boxes.house-view.editPinsDescription" />
             </small>
             <div class={style.imageWrapper}>
-              <img class={cx(style.image, style.editImage)} src={imageUrl} alt="" onClick={this.addPinOnImage} />
+              <img
+                class={cx(style.image, style.editImage)}
+                src={imageUrl}
+                alt=""
+                ref={this.attachImage}
+                onClick={this.addPinOnImage}
+              />
               {pins.map((pin, index) => (
-                <span class={style.editPinNumber} style={`left: ${pin.x_pct}%; top: ${pin.y_pct}%;`}>
-                  {index + 1}
-                </span>
+                <Localizer>
+                  <span
+                    class={style.editPinNumber}
+                    style={`left: ${pin.x_pct}%; top: ${pin.y_pct}%;`}
+                    role="button"
+                    tabIndex="0"
+                    title={<Text id="dashboard.boxes.house-view.editPinMoveHelp" />}
+                    aria-label={<Text id="dashboard.boxes.house-view.editPinLabel" fields={{ index: index + 1 }} />}
+                    onPointerDown={e => this.onPinPointerDown(index, e)}
+                    onKeyDown={e => this.movePinWithKeyboard(index, e)}
+                  >
+                    {index + 1}
+                  </span>
+                </Localizer>
               ))}
             </div>
             {pins.map((pin, index) => (

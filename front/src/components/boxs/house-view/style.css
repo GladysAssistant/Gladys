@@ -81,6 +81,33 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 6px rgba(31, 45, 61, 0.25);
+  /* a pin is a drag handle: the browser must not scroll or select instead */
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Fingers are bigger than 22px: widen the hit area without touching the looks */
+.editPinNumber::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  bottom: -7px;
+  left: -7px;
+  border-radius: 999px;
+}
+
+.editPinNumber:focus-visible {
+  outline: 2px solid #467fcf;
+  outline-offset: 2px;
+}
+
+.editPinNumberDragging {
+  cursor: grabbing;
+  z-index: 1;
+  box-shadow: 0 4px 12px rgba(31, 45, 61, 0.4);
 }
 
 /* Horizon glass theme */
