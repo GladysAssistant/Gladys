@@ -3562,6 +3562,9 @@
         "description": "This action will make Gladys speak on the selected speaker.",
         "deviceLabel": "Speaker",
         "volumeLabel": "Volume",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Computed",
+        "computedExplanationText": "Instead of a fixed volume, you can enter here a calculation based on a scene variable, for example to speak quieter at night. To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "textLabel": "Message to speak on the speaker",
         "variablesExplanation": "To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
       }

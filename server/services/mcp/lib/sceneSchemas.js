@@ -351,6 +351,12 @@ function createSceneCreateInputSchema(
           .min(0)
           .max(100)
           .optional(),
+        evaluate_volume: z
+          .string()
+          .optional()
+          .describe(
+            'Formula evaluated to a volume in percent, for example {{0.0.value}} * 10. Used instead of volume, and clamped between 0 and 100.',
+          ),
       }),
       actionSchemaByType(ACTIONS.SMS.SEND, {
         text: z.string(),
