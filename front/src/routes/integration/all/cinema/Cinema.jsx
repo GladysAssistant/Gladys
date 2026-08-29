@@ -19,6 +19,11 @@ const CinemaPage = ({ children, ...props }) => (
             <p>
               <MarkupText id="integration.cinema.instructions" />
             </p>
+            {props.error && (
+              <p class="alert alert-danger">
+                <Text id="integration.cinema.saveError" />
+              </p>
+            )}
             <form onSubmit={props.saveApiKey}>
               <div class="form-group">
                 <div class="form-label">

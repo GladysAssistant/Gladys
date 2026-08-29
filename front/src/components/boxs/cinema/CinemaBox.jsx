@@ -181,7 +181,15 @@ const CinemaBox = ({
 };
 
 class CinemaBoxComponent extends Component {
+  // Bumped on every refreshData call, and captured locally in the closure of
+  // each call. Two overlapping requests (a days_ahead/region change firing
+  // while the 30-minute interval's own call is still in flight, or two rapid
+  // config edits) can settle out of order — without this guard, an older
+  // response landing last would silently replace newer, already-correct data.
+  refreshSequence = 0;
+
   refreshData = async () => {
+    const refreshSequence = (this.refreshSequence += 1);
     try {
       await this.setState(prevState => ({ error: false, loading: !prevState.movies }));
       const params = {};
@@ -195,8 +203,14 @@ class CinemaBoxComponent extends Component {
         '/api/v1/service/cinema/movies/upcoming',
         Object.keys(params).length > 0 ? params : undefined
       );
+      if (refreshSequence !== this.refreshSequence) {
+        return;
+      }
       this.setState({ movies, loading: false, error: false });
     } catch (e) {
+      if (refreshSequence !== this.refreshSequence) {
+        return;
+      }
       const responseMessage = e && e.response && e.response.data && e.response.data.message;
       this.setState({ loading: false, error: responseMessage || true });
     }

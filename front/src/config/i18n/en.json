@@ -3276,7 +3276,8 @@
       "apiKeyLabel": "Then, enter your API key here:",
       "apiKeyPlaceholder": "Enter TMDB API key",
       "saveButton": "Save",
-      "instructionsToUse": "To use this integration, go to the dashboard and create a cinema box."
+      "instructionsToUse": "To use this integration, go to the dashboard and create a cinema box.",
+      "saveError": "Something went wrong while loading or saving your API key. Please try again."
     }
   },
   "editScene": {

@@ -3276,7 +3276,8 @@
       "apiKeyLabel": "Gib dann deinen API-Schlüssel hier ein:",
       "apiKeyPlaceholder": "TMDB API-Schlüssel eingeben",
       "saveButton": "Speichern",
-      "instructionsToUse": "Um diese Integration zu nutzen, gehe zum Dashboard und erstelle eine Kino-Box."
+      "instructionsToUse": "Um diese Integration zu nutzen, gehe zum Dashboard und erstelle eine Kino-Box.",
+      "saveError": "Beim Laden oder Speichern deines API-Schlüssels ist ein Fehler aufgetreten. Bitte versuche es erneut."
     }
   },
   "editScene": {

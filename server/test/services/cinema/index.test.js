@@ -122,11 +122,13 @@ const detailsByIdAndLanguage = {
 
 const buildWorkingAxios = () => {
   const urls = [];
+  const configs = [];
   return {
     axios: {
       default: {
-        get: (url) => {
+        get: (url, config) => {
           urls.push(url);
+          configs.push(config);
           if (url.includes('discover/movie')) {
             return Promise.resolve({ data: discoverResponse });
           }
@@ -138,6 +140,7 @@ const buildWorkingAxios = () => {
       },
     },
     getUrls: () => urls,
+    getConfigs: () => configs,
   };
 };
 
@@ -285,6 +288,35 @@ describe('CinemaService', () => {
     // A different region is a cache miss, even with the same daysAhead.
     await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'FR' });
     expect(workingAxios.getUrls().length).to.be.greaterThan(urlsAfterFirstCall);
+  });
+  it('should ignore an invalid region and fall back to the default rather than forward it as-is', async () => {
+    const workingAxios = buildWorkingAxios();
+    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
+    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await cinemaService.start();
+    // Neither a 3-letter code nor a query-string injection attempt is a
+    // valid ISO 3166-1 alpha-2 region: both must fall back to the default,
+    // not leak into the cache key or the TMDB URL unchanged.
+    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'FRA' });
+    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'FR&evil=1' });
+    const discoverUrls = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
+    expect(discoverUrls).to.have.lengthOf(1);
+    expect(discoverUrls[0]).to.include('region=FR');
+  });
+  it('should send a finite timeout on every TMDB request', async () => {
+    const workingAxios = buildWorkingAxios();
+    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
+    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await cinemaService.start();
+    await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const configs = workingAxios.getConfigs();
+    expect(configs.length).to.be.greaterThan(0);
+    configs.forEach((config) => {
+      expect(config)
+        .to.have.property('timeout')
+        .that.is.a('number')
+        .and.is.greaterThan(0);
+    });
   });
   it('should not request an English fallback when the requested language already is English', async () => {
     const workingAxios = buildWorkingAxios();

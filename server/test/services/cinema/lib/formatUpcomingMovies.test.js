@@ -16,4 +16,8 @@ describe('formatUpcomingMovies', () => {
     const movies = formatUpcomingMovies({});
     expect(movies).to.deep.equal([]);
   });
+  it('should return an empty array when the result itself is falsy', () => {
+    const movies = formatUpcomingMovies(null);
+    expect(movies).to.deep.equal([]);
+  });
 });

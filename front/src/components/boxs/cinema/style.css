@@ -1,4 +1,4 @@
-@keyframes skeletonPulse {
+@keyframes skeleton-pulse {
   0%,
   100% {
     opacity: 0.6;
@@ -12,7 +12,7 @@
   aspect-ratio: 2 / 3;
   border-radius: 6px;
   background: rgba(127, 127, 127, 0.15);
-  animation: skeletonPulse 1.4s ease-in-out infinite;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
 }
 
 .skeletonLineWide {
@@ -20,7 +20,7 @@
   margin-top: 8px;
   border-radius: 4px;
   background: rgba(127, 127, 127, 0.15);
-  animation: skeletonPulse 1.4s ease-in-out infinite;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
 }
 
 .skeletonLineNarrow {
@@ -29,7 +29,7 @@
   margin-top: 6px;
   border-radius: 4px;
   background: rgba(127, 127, 127, 0.15);
-  animation: skeletonPulse 1.4s ease-in-out infinite;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
 }
 
 .posterButton {

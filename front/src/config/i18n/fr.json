@@ -3276,7 +3276,8 @@
       "apiKeyLabel": "Puis, entrez votre clé API ici :",
       "apiKeyPlaceholder": "Entrez la clé API TMDB",
       "saveButton": "Enregistrer",
-      "instructionsToUse": "Pour utiliser cette intégration, allez sur le tableau de bord et créez une box cinéma."
+      "instructionsToUse": "Pour utiliser cette intégration, allez sur le tableau de bord et créez une box cinéma.",
+      "saveError": "Une erreur est survenue lors du chargement ou de l'enregistrement de votre clé API. Merci de réessayer."
     }
   },
   "editScene": {

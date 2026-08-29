@@ -45,4 +45,8 @@ describe('resolveRegionalReleaseDate', () => {
   it('should return null when results is missing', () => {
     expect(resolveRegionalReleaseDate({}, 'FR')).to.equal(null);
   });
+  it('should return null when the region matches but carries no release_dates field', () => {
+    const result = { results: [{ iso_3166_1: 'FR' }] };
+    expect(resolveRegionalReleaseDate(result, 'FR')).to.equal(null);
+  });
 });

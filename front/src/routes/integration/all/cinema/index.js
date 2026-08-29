@@ -12,7 +12,9 @@ class CinemaIntegration extends Component {
   render(props, {}) {
     const loading =
       props.cinemaSaveApiKeyStatus === RequestStatus.Getting || props.cinemaGetApiKeyStatus === RequestStatus.Getting;
-    return <CinemaPage {...props} loading={loading} />;
+    const error =
+      props.cinemaSaveApiKeyStatus === RequestStatus.Error || props.cinemaGetApiKeyStatus === RequestStatus.Error;
+    return <CinemaPage {...props} loading={loading} error={error} />;
   }
 }
 

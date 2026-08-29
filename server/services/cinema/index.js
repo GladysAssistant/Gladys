@@ -23,6 +23,14 @@ const ENRICH_CONCURRENCY = 5;
 // requested language. English is by far the most complete language on
 // TMDB, so it's the fallback tried before giving up on either.
 const FALLBACK_OVERVIEW_LANGUAGE = 'en-US';
+// req.query.region is user-controlled and reaches both the cache key and the
+// TMDB URL unchanged. Restricting it to a real ISO 3166-1 alpha-2 code closes
+// two things at once: an unbounded/arbitrary cache key space, and a garbage
+// value leaking into the discover URL's query string.
+const REGION_PATTERN = /^[A-Z]{2}$/;
+// Axios 1.x defaults to timeout: 0 (no timeout) — a stalled TMDB connection
+// would otherwise hang a concurrency slot (see ENRICH_CONCURRENCY) forever.
+const REQUEST_TIMEOUT_IN_MS = 10 * 1000;
 
 /**
  * @description Format a date as TMDB expects it (YYYY-MM-DD), in the server's local timezone.
@@ -102,7 +110,7 @@ module.exports = function CinemaService(gladys, serviceId) {
   async function getMovieDetails(movieId, language) {
     try {
       const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${tmdbApiKey}&language=${language}&append_to_response=release_dates,videos`;
-      const { data } = await axios.get(url);
+      const { data } = await axios.get(url, { timeout: REQUEST_TIMEOUT_IN_MS });
       return data;
     } catch (e) {
       logger.warn(`Cinema service: unable to get details for movie ${movieId}`);
@@ -165,7 +173,7 @@ module.exports = function CinemaService(gladys, serviceId) {
       throw new ServiceNotConfiguredError('TMDB API Key not found');
     }
     const language = options.language || FALLBACK_OVERVIEW_LANGUAGE;
-    const region = options.region || DEFAULT_REGION;
+    const region = REGION_PATTERN.test(options.region) ? options.region : DEFAULT_REGION;
     const daysAhead = ALLOWED_DAYS_AHEAD.includes(options.daysAhead) ? options.daysAhead : DEFAULT_DAYS_AHEAD;
     const cacheKey = `upcoming:${language}:${region}:${daysAhead}`;
     return getOrCompute(cacheKey, async () => {
@@ -184,7 +192,7 @@ module.exports = function CinemaService(gladys, serviceId) {
       ].join('&');
       const url = `https://api.themoviedb.org/3/discover/movie?${params}`;
       try {
-        const { data } = await axios.get(url);
+        const { data } = await axios.get(url, { timeout: REQUEST_TIMEOUT_IN_MS });
         const candidates = formatUpcomingMovies(data);
         const enrichedMovies = await mapWithConcurrency(candidates, ENRICH_CONCURRENCY, (movie) =>
           enrichMovie(movie, language, region),
