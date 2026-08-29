@@ -54,6 +54,21 @@ describe('cinema.getUpcoming', () => {
     const result = await cinema.getUpcoming(options);
     expect(result).to.deep.equal(fakeMovies);
   });
+  it('should prefer an external movie integration over tmdb and never call the second candidate', async () => {
+    const externalMovies = [{ id: 3, title: 'External movie' }];
+    const extTvdb = {
+      movies: { getUpcoming: fake.resolves(externalMovies) },
+    };
+    const tmdb = {
+      movies: { getUpcoming: fake.resolves(fakeMovies) },
+    };
+    const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
+    const cinema = new Cinema(service);
+    const result = await cinema.getUpcoming(options);
+    expect(result).to.deep.equal(externalMovies);
+    assert.calledWith(extTvdb.movies.getUpcoming, options);
+    assert.notCalled(tmdb.movies.getUpcoming);
+  });
   it('should try the next provider (alphabetical order) when the first one fails', async () => {
     const extTvdb = {
       movies: { getUpcoming: fake.rejects(new Error('REQUEST_TO_THIRD_PARTY_FAILED')) },
