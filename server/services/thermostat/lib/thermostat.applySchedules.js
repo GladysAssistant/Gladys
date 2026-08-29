@@ -7,6 +7,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
+  THERMOSTAT_MODE,
 } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
 const { toNumber, getDeviceConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
@@ -105,6 +106,71 @@ async function writeExternalSetpoint(gladys, targetSelector, setpoint, thermosta
 }
 
 /**
+ * @description Write the operating mode of an external thermostat.
+ *
+ * A real thermostat that exposes a mode feature is only truly stopped when that
+ * mode says so: writing the frost-protection setpoint alone leaves it in
+ * `heating`, ready to fire again as soon as the room drops below 7 °C. This is
+ * what the `off` preset means, and it is the mode Gladys hands back to
+ * `heating` (or `cooling`) as soon as a heating preset takes over again.
+ *
+ * The write is skipped when the mode already matches: like the setpoint, it
+ * goes through the core to a service that may call a cloud API on every write,
+ * and re-sending the same mode every minute would burn the rate limit.
+ *
+ * Thermostats exposing no mode feature keep the previous behaviour — the frost
+ * setpoint is the only "stop" they understand.
+ * @param {object} gladys - Gladys instance.
+ * @param {string} modeSelector - Selector of the external mode feature.
+ * @param {number} mode - Value from the THERMOSTAT_MODE enum.
+ * @param {string} logContext - Context for the log line.
+ * @returns {Promise<void>}
+ * @example
+ * await writeExternalMode(gladys, 'netatmo:x:mode', THERMOSTAT_MODE.OFF, 'salon');
+ */
+async function writeExternalMode(gladys, modeSelector, mode, logContext) {
+  try {
+    const found = await getFeatureBySelector(gladys, modeSelector);
+    if (!found) {
+      logger.warn(`Thermostat schedule: external mode feature not found for selector="${modeSelector}"`);
+      return;
+    }
+    // The device advertises the modes it accepts: a heating-only thermostat
+    // declares max = 1 (OFF, HEATING) and rejects COOLING or AUTO. Asking for a
+    // mode it does not support would be refused by the integration, so fall
+    // back to the highest it does accept rather than write something invalid.
+    const max = toNumber(found.feature.max, null);
+    let value = mode;
+    if (max !== null && value > max) {
+      logger.info(`Thermostat schedule: mode ${value} above the device maximum ${max}, clamped (${logContext})`);
+      value = max;
+    }
+    if (found.feature.last_value === value) {
+      logger.debug(`Thermostat schedule: external mode already ${value} (${logContext})`);
+      return;
+    }
+    await gladys.device.setValue(found.device, found.feature, value);
+    logger.info(`Thermostat schedule: external mode ${value} written (${logContext})`);
+  } catch (e) {
+    logger.warn(`Thermostat schedule: Failed to write external mode: ${e.message}`);
+  }
+}
+
+/**
+ * @description The THERMOSTAT_MODE value a running external thermostat should carry.
+ * The thermostat's own `default_mode` param is the intent the user configured
+ * ("this device heats" / "this device cools"), and it is what the mode feature
+ * has to be handed back to once the heating resumes after an `off` slot.
+ * @param {object} config - Thermostat config object.
+ * @returns {number} A value from the THERMOSTAT_MODE enum.
+ * @example
+ * getRunningMode({ default_mode: 'cooling' }); // THERMOSTAT_MODE.COOLING
+ */
+function getRunningMode(config) {
+  return config && config.default_mode === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
+}
+
+/**
  * @description Resolve the setpoint feature of a thermostat device.
  * Feature order is not a contract, so the feature is matched on its category
  * and type rather than taken from index 0.
@@ -173,6 +239,40 @@ function getSetpointForPreset(preset, config) {
     return configValue;
   }
   return DEFAULT_PRESET_TEMPS[preset] !== undefined ? DEFAULT_PRESET_TEMPS[preset] : FALLBACK_SETPOINT;
+}
+
+/**
+ * @description Stop an external thermostat.
+ *
+ * Two things say "stop" to a real thermostat, and which one it understands
+ * depends on the device: the operating mode, which almost none expose, and the
+ * frost-protection setpoint, which every thermostat accepting a setpoint at all
+ * understands. Both are written when both are configured — the mode is what
+ * actually stops it, and the setpoint keeps the frost protection in place for a
+ * device that would otherwise be left on its comfort target.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} config - Thermostat config object.
+ * @param {string} logContext - Context for the log lines.
+ * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote.
+ * @returns {Promise<void>}
+ * @example
+ * await stopExternalThermostat(gladys, config, 'preset=off, salon');
+ */
+async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
+  const frostSetpoint = getSetpointForPreset('frost', config);
+  if (frostSetpoint !== null) {
+    await writeExternalSetpoint(
+      gladys,
+      config.target_feature,
+      frostSetpoint,
+      config.temp_unit,
+      logContext,
+      selfWritten,
+    );
+  }
+  if (config.mode_feature) {
+    await writeExternalMode(gladys, config.mode_feature, THERMOSTAT_MODE.OFF, logContext);
+  }
 }
 
 /**
@@ -358,22 +458,12 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
         logger.info(`Thermostat schedule: window open for ${selector}`);
         if (external) {
           // Nothing to cut: the real thermostat holds the contact. Writing the
-          // frost-protection setpoint is what stops it heating, and it is
-          // supported by every thermostat that accepts a setpoint at all —
-          // unlike a mode feature, which almost none of them expose. The
-          // schedule restores its own setpoint on the next pass once the
-          // window closes.
-          const frostSetpoint = getSetpointForPreset('frost', config);
-          if (frostSetpoint !== null) {
-            await writeExternalSetpoint(
-              gladys,
-              config.target_feature,
-              frostSetpoint,
-              config.temp_unit,
-              `window open, ${selector}`,
-              selfWritten,
-            );
-          }
+          // frost-protection setpoint is what stops it heating, and its mode is
+          // turned off too when it exposes one — a thermostat left in `heating`
+          // fires again as soon as the room drops below the frost setpoint,
+          // window open or not. The schedule restores both on the next pass
+          // once the window closes.
+          await stopExternalThermostat(gladys, config, `window open, ${selector}`, selfWritten);
         } else if (config.switch_feature) {
           await actuateSwitch(gladys, config.switch_feature, false, `window open, ${selector}`);
         }
@@ -434,17 +524,7 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
       // Off was tapped and keep the heater running until the hold expires.
       if (currentPreset === 'off') {
         if (external) {
-          const frostSetpoint = getSetpointForPreset('frost', config);
-          if (frostSetpoint !== null) {
-            await writeExternalSetpoint(
-              gladys,
-              config.target_feature,
-              frostSetpoint,
-              config.temp_unit,
-              `manual preset=off, ${selector}`,
-              selfWritten,
-            );
-          }
+          await stopExternalThermostat(gladys, config, `manual preset=off, ${selector}`, selfWritten);
         } else if (config.switch_feature) {
           await actuateSwitch(gladys, config.switch_feature, false, `manual preset=off, ${selector}`);
         }
@@ -467,6 +547,11 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
         // The real thermostat regulates itself: hand it the held setpoint and
         // let it decide when to fire. There is no room sensor to read and no
         // hysteresis to run — running one here would fight the device's own.
+        // The mode is handed back first: a setpoint written to a thermostat
+        // still switched off by a previous `off` preset would change nothing.
+        if (config.mode_feature) {
+          await writeExternalMode(gladys, config.mode_feature, getRunningMode(config), `manual, ${selector}`);
+        }
         await writeExternalSetpoint(
           gladys,
           config.target_feature,
@@ -557,15 +642,29 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
 
   if (external) {
     // The real thermostat runs its own heuristic off this setpoint, so there is
-    // nothing left to decide here: no hysteresis, no TPI, no switch. `off` is
-    // expressed as the frost-protection setpoint, the only way to say "stop"
-    // that every thermostat understands.
-    const externalSetpoint = targetPreset === 'off' ? getSetpointForPreset('frost', config) : newSetpoint;
-    if (externalSetpoint !== null) {
+    // nothing left to decide here: no hysteresis, no TPI, no switch. `off` puts
+    // the device's mode on OFF when it exposes one, and always writes the
+    // frost-protection setpoint — the only way to say "stop" that every
+    // thermostat understands, mode feature or not.
+    if (targetPreset === 'off') {
+      await stopExternalThermostat(gladys, config, `preset="off", ${selector}`, selfWritten);
+      return;
+    }
+    // Coming back from an `off` slot, the device is still switched off: the
+    // mode has to be handed back before the setpoint means anything.
+    if (config.mode_feature) {
+      await writeExternalMode(
+        gladys,
+        config.mode_feature,
+        getRunningMode(config),
+        `preset="${targetPreset}", ${selector}`,
+      );
+    }
+    if (newSetpoint !== null) {
       await writeExternalSetpoint(
         gladys,
         config.target_feature,
-        externalSetpoint,
+        newSetpoint,
         config.temp_unit,
         `preset="${targetPreset}", ${selector}`,
         selfWritten,
@@ -669,6 +768,9 @@ module.exports = {
   applySchedules,
   getThermostatFeature,
   writeExternalSetpoint,
+  writeExternalMode,
+  stopExternalThermostat,
+  getRunningMode,
   readTemperatureInThermostatUnit,
   phaseOffset,
   regulateDevice,

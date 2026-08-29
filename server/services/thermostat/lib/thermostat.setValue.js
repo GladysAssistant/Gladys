@@ -2,6 +2,7 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { DEFAULT_MANUAL_DURATION_MINUTES } = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
+const { writeExternalMode, getRunningMode } = require('./thermostat.applySchedules');
 
 /**
  * @description Set a thermostat device feature value (for example the setpoint).
@@ -47,6 +48,18 @@ async function setValue(device, deviceFeature, value, manual = true) {
     // the write straight back into this function, endlessly.
     const owner = await getFeatureBySelector(this.gladys, deviceFeature.selector);
     if (owner) {
+      // A thermostat left switched off by an `off` preset ignores a setpoint:
+      // asking for 21 °C on a device whose mode is OFF changes the number on
+      // its screen and nothing else. Hand the mode back first, so the setpoint
+      // this write carries actually means something.
+      if (config.mode_feature) {
+        await writeExternalMode(
+          this.gladys,
+          config.mode_feature,
+          getRunningMode(config),
+          `setValue ${value}, ${deviceFeature.selector}`,
+        );
+      }
       // Mark it before writing: the device echoes the new value back as a
       // NEW_STATE, and the listener must not mistake our own write for a change
       // made on the thermostat itself.
