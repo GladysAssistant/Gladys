@@ -116,4 +116,9 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
 
 .rangeInput {
   flex: 1;
+  /* The slider is the widget's one elastic control: its cell may shrink for
+     a long device name (see .device-widget-table in routes/dashboard), and
+     this floor is where it stops — below ~6rem the thumb is no longer
+     usable on a phone. */
+  min-width: 6rem;
 }
