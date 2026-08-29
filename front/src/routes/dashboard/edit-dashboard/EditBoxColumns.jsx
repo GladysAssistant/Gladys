@@ -209,9 +209,11 @@ const EditBoxColumns = ({ children, ...props }) => (
                                   [style.stretchPreview]: stretch,
                                   [style.stretchTilePreview]: stretch && isTileStretchBox(box),
                                   [style.adaptiveTilePreview]: stretch && isValueTileBox(box),
-                                  // global marker so media widgets fill their
-                                  // stretched card from their own stylesheet
-                                  'dashboard-stretched-media': stretch && !isTileStretchBox(box)
+                                  // global markers so widgets adapt their content
+                                  // to their stretched card from their own
+                                  // stylesheet, like the viewer's BoxColumns
+                                  'dashboard-stretched-media': stretch && !isTileStretchBox(box),
+                                  'dashboard-stretched-tile': stretch && isTileStretchBox(box)
                                 })}
                               >
                                 <EditableBoxPreview {...props} box={box} x={x} y={y} columnLength={column.length} />

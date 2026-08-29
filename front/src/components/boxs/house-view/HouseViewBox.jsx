@@ -6,7 +6,7 @@ import get from 'get-value';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../utils/consts';
 import DeviceFeatureValueText from '../../device/DeviceFeatureValueText';
-import { getGalleryUrl } from './gallery';
+import { getGalleryRatio, getGalleryUrl } from './gallery';
 import style from './style.css';
 
 export const resolveHouseViewImage = async (httpClient, imageRef) => {
@@ -40,13 +40,27 @@ export const getPinIcon = (pin, feature) => {
 class HouseViewBox extends Component {
   refreshData = async () => {
     try {
-      const imageUrl = await resolveHouseViewImage(this.props.httpClient, this.props.box.image);
-      this.setState({ imageUrl, error: false });
+      const imageRef = this.props.box.image;
+      const imageUrl = await resolveHouseViewImage(this.props.httpClient, imageRef);
+      // The image width/height ratio drives the stretched-tile sizing (see
+      // style.css). Gallery illustrations are viewBox-only SVGs — an <img>
+      // reports no natural size for them — so their ratio is declared in
+      // gallery.js; an uploaded photo's ratio is measured on load instead.
+      const [kind, id] = (imageRef || '').split(':');
+      const imageRatio = kind === 'gallery' ? getGalleryRatio(id) : null;
+      this.setState({ imageUrl, imageRatio, error: false });
     } catch (e) {
       console.error(e);
       this.setState({ error: true });
     }
     await this.getPinFeatures();
+  };
+
+  handleImageLoad = event => {
+    const { naturalWidth, naturalHeight } = event.target;
+    if (!this.state.imageRatio && naturalWidth > 0 && naturalHeight > 0) {
+      this.setState({ imageRatio: naturalWidth / naturalHeight });
+    }
   };
 
   getPinFeatures = async () => {
@@ -108,7 +122,7 @@ class HouseViewBox extends Component {
     );
   }
 
-  render(props, { imageUrl, featuresBySelector, error }) {
+  render(props, { imageUrl, imageRatio, featuresBySelector, error }) {
     const boxTitle = props.box.name;
     const pins = props.box.pins || [];
     return (
@@ -118,7 +132,7 @@ class HouseViewBox extends Component {
             <h3 class="card-title">{boxTitle}</h3>
           </div>
         )}
-        <div class="card-body p-3">
+        <div class={`card-body p-3 ${style.cardBody}`}>
           {error && (
             <div class="alert alert-warning mb-0">
               <Text id="dashboard.boxes.house-view.error" />
@@ -130,8 +144,8 @@ class HouseViewBox extends Component {
             </div>
           )}
           {!error && imageUrl && (
-            <div class={style.imageWrapper}>
-              <img class={style.image} src={imageUrl} alt={boxTitle || ''} />
+            <div class={style.imageWrapper} style={imageRatio ? `--hv-ratio: ${imageRatio}` : undefined}>
+              <img class={style.image} src={imageUrl} alt={boxTitle || ''} onLoad={this.handleImageLoad} />
               {pins.map(pin => {
                 const feature = featuresBySelector && featuresBySelector[pin.device_feature];
                 return (

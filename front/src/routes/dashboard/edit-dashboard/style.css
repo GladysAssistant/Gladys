@@ -329,6 +329,7 @@
   flex: 1 1 auto;
   object-fit: contain;
   min-height: 0;
+  background-color: #1a1a2e;
 }
 
 .stretchPreview .previewContent > * > :global(.dimmer) {
@@ -352,13 +353,6 @@
 @media (min-width: 992px) {
   .stretchPreview {
     max-height: calc(65vh + 4rem);
-  }
-
-  /* growth limit, never a clamp, like the viewer's .stretchableTile rule:
-     a house illustration taller than the cap lifts it instead of bleeding
-     out of its shrunk card (forum 10737) */
-  .stretchPreview.stretchTilePreview:not(.adaptiveTilePreview) {
-    min-height: fit-content;
   }
 
   /* value tiles adapt their type scale to the rendered height via container

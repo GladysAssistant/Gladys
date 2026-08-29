@@ -3,17 +3,45 @@
   width: 100%;
 }
 
-/* width: 100%, never intrinsic sizing: the bundled gallery illustrations are
-   SVGs with only a viewBox — no intrinsic width/height — so any auto-sized
-   rule collapses them to nothing (that exact regression shipped to the forum
-   10737 preview). The wrapper width drives the size, the ratio drives the
-   height, whatever the image kind. The card never clips this natural height:
-   the stretch cap only limits growth (min-height: fit-content on the tile
-   stretch wrapper, routes/dashboard/style.css). */
+/* width: 100% of the wrapper, never intrinsic sizing: the bundled gallery
+   illustrations are SVGs with only a viewBox — no intrinsic width/height —
+   so any auto-sized rule collapses them to nothing (that exact regression
+   shipped to the forum 10737 preview). The wrapper width drives the size,
+   the ratio drives the height, whatever the image kind. */
 .image {
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* Stretched at the bottom of a desktop column, the wrapper caps the card at
+   65vh (.stretchableBox in routes/dashboard/style.css) — but only the card
+   shrank around its content: the illustration kept its width-driven natural
+   height and bled out of the card, over the header and the neighbors (forum
+   10737). Fit the illustration inside the cap by bounding the WIDTH of its
+   wrapper: height is width / ratio, so wrapperWidth ≤ (cap - card chrome,
+   header ≈ 3.5rem + body p-3 = 2rem) × ratio keeps the whole card under the
+   cap. --hv-ratio is set inline by HouseViewBox (declared for the gallery,
+   measured on load for an uploaded photo — see gallery.js); until known, the
+   9999 fallback makes min() resolve to the plain 100%. Only min()/calc()/
+   var(), on the width axis: block-axis intrinsic keywords proved unreliable
+   across engines on this flex chain (Firefox field report, forum 10737).
+   The wrapper keeps hugging the image exactly, so the %-positioned pins stay
+   glued to the same points of the plan; the flex body centers the possibly
+   narrower image. Desktop only, like stretch itself: below the breakpoint
+   columns stack and the image keeps its natural full-width render. */
+@media (min-width: 992px) {
+  :global(.dashboard-stretched-tile) .cardBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  :global(.dashboard-stretched-tile) .imageWrapper {
+    width: min(100%, calc((65vh - 6rem) * var(--hv-ratio, 9999)));
+  }
 }
 
 .pin {
