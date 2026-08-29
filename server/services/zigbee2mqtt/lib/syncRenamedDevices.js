@@ -124,6 +124,14 @@ async function applyRenames(gladys, renames, gladysDevices) {
 
   const destinationExternalIds = new Set(applicableRenames.map((rename) => `${EXTERNAL_ID_PREFIX}${rename.newName}`));
 
+  // The Gladys name follows the rename only if the user didn't customize it. That is decided
+  // here, before any write, and used from phase 1 on: once a device is staged its external_id
+  // holds the temporary name, so a later pass (the retry after a failed swap) could no longer
+  // tell a name that merely followed the friendly_name from one the user chose.
+  applicableRenames.forEach((rename) => {
+    rename.newDisplayName = rename.gladysDevice.name === rename.currentName ? rename.newName : rename.gladysDevice.name;
+  });
+
   // Phase 1: a device whose current external_id is wanted by another rename moves to a
   // temporary external_id (unique thanks to the IEEE address) to free its name first.
   await Promise.each(applicableRenames, async (rename) => {
@@ -137,7 +145,7 @@ async function applyRenames(gladys, renames, gladysDevices) {
         rename.gladysDevice,
         rename.currentName,
         temporaryName,
-        rename.gladysDevice.name,
+        rename.newDisplayName,
       );
     } catch (e) {
       logger.warn(`Zigbee2mqtt: unable to stage rename of "${rename.gladysDevice.external_id}": ${e}`);
@@ -148,9 +156,7 @@ async function applyRenames(gladys, renames, gladysDevices) {
   let failedRenames = 0;
   await Promise.each(applicableRenames, async (rename) => {
     try {
-      const { gladysDevice, currentName, newName } = rename;
-      // Only follow the rename on the Gladys name if the user didn't customize it
-      const newDisplayName = gladysDevice.name === currentName ? newName : gladysDevice.name;
+      const { gladysDevice, currentName, newName, newDisplayName } = rename;
       await applyRename(gladys, gladysDevice, currentName, newName, newDisplayName);
       if (rename.staged) {
         // The temporary external_ids of phase 1 are gone from DB: drop them from RAM too.

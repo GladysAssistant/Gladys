@@ -485,6 +485,34 @@ describe('zigbee2mqtt syncRenamedDevices', () => {
     expect(deviceB.external_id).to.equal('zigbee2mqtt:kitchen');
     expect(deviceA.features[0].external_id).to.equal('zigbee2mqtt:bedroom:switch:binary:state');
     expect(deviceB.features[0].external_id).to.equal('zigbee2mqtt:kitchen:switch:binary:state');
+    // The display name follows the rename too: the retry reads the temporary name as the
+    // current one, so a device staged with its old display name would look customized forever
+    expect(deviceA.name).to.equal('bedroom');
+    expect(deviceB.name).to.equal('kitchen');
+  });
+
+  it('should keep a custom Gladys device name when a staging write fails', async () => {
+    const devices = buildSwapDevices();
+    devices[0].name = 'Cuisine';
+    const db = buildFakeDb(devices);
+    gladys.device.get = db.get;
+    let stagingFailed = false;
+    gladys.device.create = fake(async (device) => {
+      if (!stagingFailed && device.id === 'device-b' && device.external_id.includes('__renaming__')) {
+        stagingFailed = true;
+        throw new Error('DB error');
+      }
+      return db.create(device);
+    });
+    // EXECUTE
+    await zigbee2mqttManager.syncRenamedDevices([
+      { friendly_name: 'bedroom', ieee_address: '0xaaa', type: 'Router' },
+      { friendly_name: 'kitchen', ieee_address: '0xbbb', type: 'Router' },
+    ]);
+    // ASSERT: the recovery pass must not overwrite a name the user chose
+    const deviceA = db.rows.find((row) => row.id === 'device-a');
+    expect(deviceA.external_id).to.equal('zigbee2mqtt:bedroom');
+    expect(deviceA.name).to.equal('Cuisine');
   });
 
   it('should skip a rename when the destination is owned by a device not being renamed', async () => {
