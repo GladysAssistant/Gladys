@@ -30,7 +30,7 @@ const startPinDrag = (event, options) => {
     return;
   }
   dragInProgress = true;
-  const { getImageRect, onMove, onDrop, onCancel, draggingClass } = options;
+  const { getImageRect, getSurface, onMove, onDrop, onCancel, draggingClass } = options;
   const marker = event.currentTarget;
   const { pointerId } = event;
   // stops text selection and the native image drag, and keeps the gesture
@@ -54,17 +54,25 @@ const startPinDrag = (event, options) => {
 
   // a click fired by the pointerup that ended a real drag must not reach the
   // app: browsers that deliver it at the drop point (a delayed iOS click)
-  // would hit the image and add a pin there
+  // would hit the image and add a pin there.
+  // Scoped to the editor surface (the image and its markers), not the window:
+  // the click that has to be swallowed always lands in there, while a
+  // window-wide listener would also eat the first click on any other control
+  // of the page during those 300 ms.
   const suppressNextClick = () => {
+    const surface = getSurface && getSurface();
+    if (!surface) {
+      return;
+    }
     const suppress = clickEvent => {
       clickEvent.preventDefault();
       clickEvent.stopPropagation();
       removeSuppress();
     };
     const removeSuppress = () => {
-      window.removeEventListener('click', suppress, true);
+      surface.removeEventListener('click', suppress, true);
     };
-    window.addEventListener('click', suppress, true);
+    surface.addEventListener('click', suppress, true);
     window.setTimeout(removeSuppress, 300);
   };
 

@@ -73,13 +73,21 @@ class EditHouseViewBox extends Component {
     this.imageElement = element;
   };
 
+  // the image and its pin markers: the surface a drag lives on
+  attachImageWrapper = element => {
+    this.imageWrapperElement = element;
+  };
+
   getImageRect = () => (this.imageElement ? this.imageElement.getBoundingClientRect() : null);
+
+  getSurface = () => this.imageWrapperElement || null;
 
   // Dragging a pin marker on the image moves it: no more remove & place again.
   onPinPointerDown = (index, e) => {
     startPinDrag(e, {
       draggingClass: style.editPinNumberDragging,
       getImageRect: this.getImageRect,
+      getSurface: this.getSurface,
       onMove: (marker, position) => {
         marker.style.left = `${position.x_pct}%`;
         marker.style.top = `${position.y_pct}%`;
@@ -194,7 +202,7 @@ class EditHouseViewBox extends Component {
             <small class="d-block mb-2">
               <Text id="dashboard.boxes.house-view.editPinsDescription" />
             </small>
-            <div class={style.imageWrapper}>
+            <div class={style.imageWrapper} ref={this.attachImageWrapper}>
               <img
                 class={cx(style.image, style.editImage)}
                 src={imageUrl}
