@@ -354,6 +354,13 @@
     max-height: calc(65vh + 4rem);
   }
 
+  /* growth limit, never a clamp, like the viewer's .stretchableTile rule:
+     a house illustration taller than the cap lifts it instead of bleeding
+     out of its shrunk card (forum 10737) */
+  .stretchPreview.stretchTilePreview:not(.adaptiveTilePreview) {
+    min-height: fit-content;
+  }
+
   /* value tiles adapt their type scale to the rendered height via container
      queries: the size container is the padding-less wrapper around the
      widget, exactly like the viewer's .adaptiveTile */

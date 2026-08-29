@@ -1141,6 +1141,20 @@
   .stretchableBox {
     max-height: 65vh;
   }
+
+  /* The cap is a growth limit, never a clamp: a tile card keeps its aspect-
+     ratio image at its natural width-driven height, so a card capped below
+     that height only shrank around its content and the house illustration
+     bled out of it, over the header and the neighbors (forum 10737).
+     min-height wins over max-height in CSS, so fit-content lifts the cap
+     exactly when the natural content is taller than 65vh — the column simply
+     gets taller, like on mobile. Media boxes are not concerned: their image
+     shrinks with the card (object-fit). Value tiles are excluded because
+     their wrapper is a size container (.adaptiveTile): containment computes
+     fit-content as if the box were empty. */
+  .stretchableBox.stretchableTile:not(.adaptiveTile) {
+    min-height: fit-content;
+  }
 }
 
 /* On large screens a stretched value tile's height is imposed by its

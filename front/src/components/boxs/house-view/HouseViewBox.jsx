@@ -118,7 +118,7 @@ class HouseViewBox extends Component {
             <h3 class="card-title">{boxTitle}</h3>
           </div>
         )}
-        <div class={`card-body p-3 ${style.cardBody}`}>
+        <div class="card-body p-3">
           {error && (
             <div class="alert alert-warning mb-0">
               <Text id="dashboard.boxes.house-view.error" />
