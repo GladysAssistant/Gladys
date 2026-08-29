@@ -10,6 +10,10 @@
 // pin must stay harmless (it must not nudge the pin by a pixel).
 const DRAG_START_THRESHOLD_PX = 4;
 
+// One pin drag at a time: a second pointer (another finger, a mouse button
+// pressed during a touch drag) must not stack a second set of listeners.
+let dragInProgress = false;
+
 export const clampPercent = value => Math.min(100, Math.max(0, Math.round(value * 10) / 10));
 
 // Pointer position as a percentage of the image box, which is how pins are
@@ -20,17 +24,24 @@ export const percentFromPointer = (rect, clientX, clientY) => ({
 });
 
 const startPinDrag = (event, options) => {
-  // event.button is 0 for touch, pen and the main mouse button
-  if (event.button > 0) {
+  // event.button is 0 for touch, pen and the main mouse button; a secondary
+  // touch reports button 0 too, hence the isPrimary guard
+  if (dragInProgress || !event.isPrimary || event.button > 0) {
     return;
   }
+  dragInProgress = true;
   const { getImageRect, onMove, onDrop, onCancel, draggingClass } = options;
   const marker = event.currentTarget;
   const { pointerId } = event;
-  // the pin sits on top of the image, whose click handler adds a pin: the
-  // gesture must never reach it
+  // stops text selection and the native image drag, and keeps the gesture
+  // from reaching any pointerdown handler further up the editor
   event.preventDefault();
   event.stopPropagation();
+  // preventDefault() also cancels the browser's focus default: the marker is
+  // focusable on purpose (arrow keys move the pin), so focus it by hand
+  try {
+    marker.focus({ preventScroll: true });
+  } catch (e) {} // eslint-disable-line no-empty
 
   let started = false;
   let position = null;
@@ -41,17 +52,35 @@ const startPinDrag = (event, options) => {
     marker.setPointerCapture(pointerId);
   } catch (e) {} // eslint-disable-line no-empty
 
+  // a click fired by the pointerup that ended a real drag must not reach the
+  // app: browsers that deliver it at the drop point (a delayed iOS click)
+  // would hit the image and add a pin there
+  const suppressNextClick = () => {
+    const suppress = clickEvent => {
+      clickEvent.preventDefault();
+      clickEvent.stopPropagation();
+      removeSuppress();
+    };
+    const removeSuppress = () => {
+      window.removeEventListener('click', suppress, true);
+    };
+    window.addEventListener('click', suppress, true);
+    window.setTimeout(removeSuppress, 300);
+  };
+
   const cleanup = () => {
     window.removeEventListener('pointermove', onPointerMove, true);
     window.removeEventListener('pointerup', onPointerUp, true);
     window.removeEventListener('pointercancel', onPointerCancel, true);
     window.removeEventListener('keydown', onKeyDown, true);
+    window.removeEventListener('blur', onWindowBlur);
     if (started && draggingClass) {
       marker.classList.remove(draggingClass);
     }
     try {
       marker.releasePointerCapture(pointerId);
     } catch (e) {} // eslint-disable-line no-empty
+    dragInProgress = false;
   };
 
   const abort = () => {
@@ -95,6 +124,7 @@ const startPinDrag = (event, options) => {
     cleanup();
     if (dropped) {
       upEvent.preventDefault();
+      suppressNextClick();
       onDrop(position);
     }
   };
@@ -113,10 +143,17 @@ const startPinDrag = (event, options) => {
     }
   };
 
+  // a backgrounded tab often never delivers the pointerup: without this the
+  // listeners stay attached and the marker is left where the last move put it
+  const onWindowBlur = () => {
+    abort();
+  };
+
   window.addEventListener('pointermove', onPointerMove, true);
   window.addEventListener('pointerup', onPointerUp, true);
   window.addEventListener('pointercancel', onPointerCancel, true);
   window.addEventListener('keydown', onKeyDown, true);
+  window.addEventListener('blur', onWindowBlur);
 };
 
 export { startPinDrag };
