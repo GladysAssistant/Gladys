@@ -1,7 +1,9 @@
 const Promise = require('bluebird');
 
 const logger = require('../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
+const { ServiceNotConfiguredError, ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
+const { Error400 } = require('../../utils/httpErrors');
+const { ERROR_MESSAGES } = require('../../utils/constants');
 
 /**
  * @description Get the upcoming movies from the first working movie provider.
@@ -64,6 +66,14 @@ async function getUpcoming(options = {}) {
   );
   if (movies === null) {
     if (firstRealError !== null) {
+      // a store movie integration's transport/payload failure (disconnected,
+      // ack timeout, invalid payload) surfaces as the standard
+      // REQUEST_TO_THIRD_PARTY_FAILED error the widget already maps to its
+      // call to action — internal error codes never leak to the user as an
+      // opaque "unknown error" (same translation as weather.get)
+      if (firstRealError instanceof ExternalIntegrationUnavailableError) {
+        throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+      }
       throw firstRealError;
     }
     throw new ServiceNotConfiguredError('No movie provider is installed or configured.');

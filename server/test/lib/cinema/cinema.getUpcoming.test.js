@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { fake, assert } = sinon;
 
 const Cinema = require('../../../lib/cinema');
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const { ServiceNotConfiguredError, ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 
 const fakeMovies = [{ id: 1, title: 'A movie', releaseDate: '2026-06-15' }];
 
@@ -156,6 +156,24 @@ describe('cinema.getUpcoming', () => {
       },
     );
     assert.notCalled(tmdb.movies.getUpcoming);
+  });
+  it('should surface an external movie integration failure as a request-to-third-party error', async () => {
+    const extTvdb = {
+      movies: {
+        getUpcoming: fake.rejects(new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_COMMAND_TIMEOUT')),
+      },
+    };
+    const service = buildServiceManager({ 'ext-tvdb': extTvdb });
+    const cinema = new Cinema(service);
+    const promise = cinema.getUpcoming(options);
+    await promise.then(
+      () => Promise.reject(new Error('should have failed')),
+      (e) => {
+        // the widget knows this error and shows its movie-integrations CTA;
+        // the internal EXTERNAL_INTEGRATION_* code never leaks to the user
+        expect(e.message).to.equal('REQUEST_TO_THIRD_PARTY_FAILED');
+      },
+    );
   });
   it('should rethrow the first real failure over a not configured one', async () => {
     const realError = new Error('REQUEST_TO_THIRD_PARTY_FAILED');
