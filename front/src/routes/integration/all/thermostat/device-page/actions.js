@@ -85,13 +85,7 @@ function createActions(store) {
     async saveDevice(state, device, index) {
       // Everything the list added for display only is stripped here: the device
       // route validates its payload, and an unknown field makes the save fail.
-      const {
-        active_schedule,
-        thermostat_type,
-        target_feature,
-        external_setpoint_feature,
-        ...deviceToSave
-      } = device;
+      const { active_schedule, thermostat_type, target_feature, external_setpoint_feature, ...deviceToSave } = device;
       // Persist the schedule as a device param rather than a global variable.
       const otherParams = (deviceToSave.params || []).filter(p => p.name !== 'THERMOSTAT_ACTIVE_SCHEDULE');
       deviceToSave.params = [...otherParams, { name: 'THERMOSTAT_ACTIVE_SCHEDULE', value: active_schedule || '' }];
