@@ -6,6 +6,7 @@ const db = require('../models');
 const Area = require('./area');
 const Brain = require('./brain');
 const Calendar = require('./calendar');
+const Cinema = require('./cinema');
 const Dashboard = require('./dashboard');
 const Event = require('./event');
 const House = require('./house');
@@ -77,6 +78,7 @@ function Gladys(params = {}) {
   const calendar = new Calendar(service);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
+  const cinema = new Cinema(service);
   const energyPrice = new EnergyPrice(stateManager);
   const externalIntegration = new ExternalIntegration(
     event,
@@ -131,6 +133,7 @@ function Gladys(params = {}) {
     area,
     brain,
     calendar,
+    cinema,
     config,
     dashboard,
     event,

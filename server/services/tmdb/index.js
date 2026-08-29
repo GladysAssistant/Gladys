@@ -1,15 +1,23 @@
 const logger = require('../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 const { Error400 } = require('../../utils/httpErrors');
-const { ERROR_MESSAGES } = require('../../utils/constants');
+const { ERROR_MESSAGES, AVAILABLE_LANGUAGES } = require('../../utils/constants');
 const { formatUpcomingMovies } = require('./lib/formatUpcomingMovies');
 const { resolveRegionalReleaseDate } = require('./lib/resolveRegionalReleaseDate');
 const { resolveTrailerUrl } = require('./lib/resolveTrailerUrl');
 const { mapWithConcurrency } = require('./lib/mapWithConcurrency');
 const { isAssignedRegion } = require('./lib/isAssignedRegion');
-const TmdbController = require('./controllers/tmdb.controller');
 
 const TMDB_API_KEY = 'TMDB_API_KEY';
+// Gladys stores a bare 2-letter language code (en/fr/de); TMDB expects a
+// full locale. Any Gladys language not listed here (there are only 3) maps
+// to undefined, and the FALLBACK_OVERVIEW_LANGUAGE default (English —
+// TMDB's most complete language) takes over.
+const TMDB_LANGUAGE_BY_GLADYS_LANGUAGE = {
+  [AVAILABLE_LANGUAGES.EN]: 'en-US',
+  [AVAILABLE_LANGUAGES.FR]: 'fr-FR',
+  [AVAILABLE_LANGUAGES.DE]: 'de-DE',
+};
 const CACHE_DURATION_IN_MS = 30 * 60 * 1000;
 const DEFAULT_DAYS_AHEAD = 30;
 const ALLOWED_DAYS_AHEAD = [15, 30, 60];
@@ -163,18 +171,19 @@ module.exports = function TmdbService(gladys, serviceId) {
   /**
    * @description Get the list of upcoming movie releases.
    * @param {object} [options] - Options parameters.
-   * @param {string} [options.language] - The language of the results (TMDB format, ex. 'fr-FR').
+   * @param {string} [options.language] - Gladys UI language (2-letter code, ex. 'fr'), mapped
+   * internally to a TMDB locale. Unrecognized/missing values fall back to English.
    * @param {string} [options.region] - The region to get theatrical release dates for (ISO 3166-1).
    * @param {number} [options.daysAhead] - How many days ahead to look for releases (15, 30 or 60).
    * @returns {Promise<Array>} Resolve with the list of upcoming movies, soonest release first.
    * @example
-   * gladys.services.tmdb.movies.getUpcoming({ language: 'fr-FR', region: 'FR', daysAhead: 30 });
+   * gladys.services.tmdb.movies.getUpcoming({ language: 'fr', region: 'FR', daysAhead: 30 });
    */
   async function getUpcoming(options = {}) {
     if (!tmdbApiKey) {
       throw new ServiceNotConfiguredError('TMDB API Key not found');
     }
-    const language = options.language || FALLBACK_OVERVIEW_LANGUAGE;
+    const language = TMDB_LANGUAGE_BY_GLADYS_LANGUAGE[options.language] || FALLBACK_OVERVIEW_LANGUAGE;
     const region = isAssignedRegion(options.region) ? options.region : DEFAULT_REGION;
     const daysAhead = ALLOWED_DAYS_AHEAD.includes(options.daysAhead) ? options.daysAhead : DEFAULT_DAYS_AHEAD;
     const cacheKey = `upcoming:${language}:${region}:${daysAhead}`;
@@ -212,7 +221,6 @@ module.exports = function TmdbService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    controllers: TmdbController(getUpcoming),
     movies: {
       getUpcoming,
     },

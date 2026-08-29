@@ -1,6 +1,7 @@
 const AreaController = require('./controllers/area.controller');
 const CalendarController = require('./controllers/calendar.controller');
 const CameraController = require('./controllers/camera.controller');
+const CinemaController = require('./controllers/cinema.controller');
 const DashboardController = require('./controllers/dashboard.controller');
 const DeviceController = require('./controllers/device.controller');
 const UserController = require('./controllers/user.controller');
@@ -34,6 +35,7 @@ function getRoutes(gladys) {
   const areaController = AreaController(gladys);
   const calendarController = CalendarController(gladys);
   const cameraController = CameraController(gladys);
+  const cinemaController = CinemaController(gladys);
   const dashboardController = DashboardController(gladys);
   const deviceController = DeviceController(gladys);
   const lightController = LightController(gladys);
@@ -985,6 +987,15 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather/image/:image_key': {
       authenticated: true,
       controller: weatherController.getImage,
+    },
+    // cinema
+    'get /api/v1/cinema/provider': {
+      authenticated: true,
+      controller: cinemaController.getProviders,
+    },
+    'get /api/v1/cinema/upcoming': {
+      authenticated: true,
+      controller: cinemaController.getUpcoming,
     },
     // energy price
     'get /api/v1/energy_price': {

@@ -222,7 +222,7 @@ describe('TmdbService', () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await tmdbService.start();
-    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr' });
     expect(movies.map((movie) => ({ id: movie.id, releaseDate: movie.releaseDate }))).to.deep.equal([
       { id: 1002, releaseDate: '2026-06-10' },
       { id: 2001, releaseDate: '2026-06-12' },
@@ -238,7 +238,7 @@ describe('TmdbService', () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await tmdbService.start();
-    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr' });
     const fallbackMovie = movies.find((movie) => movie.id === 1004);
     expect(fallbackMovie.releaseDate).to.equal('2026-06-15');
   });
@@ -246,7 +246,7 @@ describe('TmdbService', () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await tmdbService.start();
-    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr' });
     const movie = movies.find((m) => m.id === 2001);
     expect(movie.overview).to.equal('English summary for 2001');
   });
@@ -254,7 +254,7 @@ describe('TmdbService', () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await tmdbService.start();
-    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr' });
     const movie = movies.find((m) => m.id === 2002);
     expect(movie.overview).to.equal('');
   });
@@ -319,7 +319,7 @@ describe('TmdbService', () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await tmdbService.start();
-    await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr' });
     const configs = workingAxios.getConfigs();
     expect(configs.length).to.be.greaterThan(0);
     configs.forEach((config) => {
@@ -334,7 +334,7 @@ describe('TmdbService', () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await tmdbService.start();
-    await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'en-US' });
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'en' });
     const movieDetailCalls = workingAxios.getUrls().filter((url) => url.includes('/movie/2001?'));
     expect(movieDetailCalls).to.have.lengthOf(1);
   });
@@ -355,7 +355,7 @@ describe('TmdbService', () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', flaky);
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await tmdbService.start();
-    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr' });
     // 1001's details lookup failed: it falls back to its (out-of-window)
     // discover-provided date and is filtered out, but the request still succeeds.
     expect(movies.map((movie) => movie.id)).to.deep.equal([1002, 2001, 2002, 3001, 1004, 3002, 3003]);
@@ -364,7 +364,7 @@ describe('TmdbService', () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await tmdbService.start();
-    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr' });
     const findMovie = (id) => movies.find((movie) => movie.id === id);
     expect(findMovie(3001).trailerUrl).to.equal('https://www.youtube.com/watch?v=fr-trailer-3001');
     expect(findMovie(3002).trailerUrl).to.equal('https://www.youtube.com/watch?v=en-trailer-3002');
