@@ -1342,6 +1342,17 @@
   display: block;
 }
 
+/* A block box has no border-spacing: the `0 8px` of .device-list-table is
+   gone, and `tr + tr` below only brings back the gap BETWEEN pills. That
+   spacing also framed the rows — 8px above the first, 8px under the last,
+   on top of the table's own 8px bottom padding. This widget has no
+   .card-body and the card header stops at padding-bottom: 0, so the top one
+   was the only air under the title. Both are restored here as padding. */
+:global(.glass-theme .device-widget-table) {
+  padding-top: 8px;
+  padding-bottom: 16px;
+}
+
 :global(.glass-theme .device-widget-table tr) {
   display: flex;
   /* stretch (default): the three cells paint one equal-height pill */
@@ -1386,14 +1397,21 @@
   white-space: nowrap;
 }
 
-/* The dropdown fallback of the adaptive controls is a select.form-control,
-   whose framework width: 100% resolves against a shrinkable flex cell: a
-   long name could crush it to its arrow. Intrinsic width, floored so the
-   current value stays readable, capped so one long option label does not
-   hand the select the row. */
+/* An option select is a form-control, so the framework gives it width: 100%
+   — resolved against a shrinkable flex cell, a long name could crush it to
+   its arrow. Intrinsic width instead, floored so the current value stays
+   readable. */
 :global(.glass-theme .device-widget-table td select.form-control) {
   width: auto;
   min-width: 4.5rem;
+}
+
+/* Only the adaptive controls' fallback is also capped: it stands in for a
+   button group the coordinator judged too wide, so it must stay compact. The
+   selects that are always the control of their row (camera preset, fan,
+   vacuum and pilot-wire modes) show a real label — "Recall a preset…" — and
+   a cap would clip it, which is what this PR is fixing everywhere else. */
+:global(.glass-theme .device-widget-table td .adaptive-option-select select.form-control) {
   max-width: 9rem;
 }
 

@@ -118,7 +118,9 @@ class AdaptiveOptionControl extends Component {
               </button>
             ))}
           </div>
-          <div class="form-group mb-0" ref={this.setSelect}>
+          {/* adaptive-option-select: hook for the dashboard widget's width cap, which
+              must not reach the selects that are always their row's control. */}
+          <div class="form-group mb-0 adaptive-option-select" ref={this.setSelect}>
             <select value={value} onChange={this.updateFromSelect} class="form-control form-control-sm">
               {options.map(option => (
                 <option value={option.value} key={option.value}>
