@@ -387,7 +387,7 @@
       "chips": "Status-Chips",
       "actions": "Schnellaktionen",
       "house-view": "Hausansicht",
-      "cinema": "Kinostarts"
+      "premieres": "Neuerscheinungen"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -824,7 +824,7 @@
         "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
         "error": "Das Bild konnte nicht geladen werden."
       },
-      "cinema": {
+      "premieres": {
         "description": "Diese Box zeigt die nächsten Kinostarts.",
         "serviceNotConfigured": "Es ist kein Film-Dienst konfiguriert. Gehe zum Tab \"Integrationen\" und konfiguriere eine Film-Integration (TMDB oder eine Film-Integration aus dem Store).",
         "clickHere": "Klicke hier, um zu den Film-Integrationen zu gelangen.",
@@ -3279,7 +3279,7 @@
       "apiKeyLabel": "Gib dann deinen API-Schlüssel hier ein:",
       "apiKeyPlaceholder": "TMDB API-Schlüssel eingeben",
       "saveButton": "Speichern",
-      "instructionsToUse": "Um diese Integration zu nutzen, gehe zum Dashboard und erstelle eine Kino-Box.",
+      "instructionsToUse": "Um diese Integration zu nutzen, gehe zum Dashboard und erstelle eine Neuerscheinungen-Box.",
       "saveError": "Beim Laden oder Speichern deines API-Schlüssels ist ein Fehler aufgetreten. Bitte versuche es erneut.",
       "documentation": "TMDB-Dokumentation"
     }

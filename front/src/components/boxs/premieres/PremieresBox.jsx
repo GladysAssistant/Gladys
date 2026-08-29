@@ -19,7 +19,7 @@ const ErrorCard = ({ messageId, children }) => (
       <h3 class="card-title">
         <i class="fe fe-film" />
         <span class="m-1">
-          <Text id="dashboard.boxTitle.cinema" />
+          <Text id="dashboard.boxTitle.premieres" />
         </span>
       </h3>
     </div>
@@ -78,14 +78,14 @@ const MovieDetailModal = ({ movie, userLanguage, onClose }) => (
             <p>{movie.overview}</p>
           ) : (
             <p class="text-muted">
-              <Text id="dashboard.boxes.cinema.noOverview" />
+              <Text id="dashboard.boxes.premieres.noOverview" />
             </p>
           )}
           <div style="display: flex; gap: 8px; flex-wrap: wrap">
             {movie.trailerUrl && (
               <a href={movie.trailerUrl} target="_blank" rel="noopener noreferrer" class="btn btn-danger btn-sm">
                 <i class="fe fe-play mr-1" />
-                <Text id="dashboard.boxes.cinema.watchTrailer" />
+                <Text id="dashboard.boxes.premieres.watchTrailer" />
               </a>
             )}
             <a
@@ -94,7 +94,7 @@ const MovieDetailModal = ({ movie, userLanguage, onClose }) => (
               rel="noopener noreferrer"
               class="btn btn-outline-secondary btn-sm"
             >
-              <Text id="dashboard.boxes.cinema.viewOnTmdb" />
+              <Text id="dashboard.boxes.premieres.viewOnTmdb" />
             </a>
           </div>
         </div>
@@ -103,7 +103,7 @@ const MovieDetailModal = ({ movie, userLanguage, onClose }) => (
   </Modal>
 );
 
-const CinemaBox = ({
+const PremieresBox = ({
   movies,
   loading,
   error,
@@ -119,19 +119,19 @@ const CinemaBox = ({
   const userLanguage = rawUserLanguage || 'en';
   if (error === ERROR_MESSAGES.SERVICE_NOT_CONFIGURED) {
     return (
-      <ErrorCard messageId="dashboard.boxes.cinema.serviceNotConfigured">
+      <ErrorCard messageId="dashboard.boxes.premieres.serviceNotConfigured">
         {' '}
         <Link href="/dashboard/integration/multimedia">
-          <Text id="dashboard.boxes.cinema.clickHere" />
+          <Text id="dashboard.boxes.premieres.clickHere" />
         </Link>
       </ErrorCard>
     );
   }
   if (error === ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED) {
-    return <ErrorCard messageId="dashboard.boxes.cinema.requestToThirdPartyFailed" />;
+    return <ErrorCard messageId="dashboard.boxes.premieres.requestToThirdPartyFailed" />;
   }
   if (error) {
-    return <ErrorCard messageId="dashboard.boxes.cinema.unknownError" />;
+    return <ErrorCard messageId="dashboard.boxes.premieres.unknownError" />;
   }
 
   return (
@@ -141,7 +141,7 @@ const CinemaBox = ({
           <h3 class="card-title">
             <i class="fe fe-film" />
             <span class="m-1">
-              <Text id="dashboard.boxTitle.cinema" />
+              <Text id="dashboard.boxTitle.premieres" />
             </span>
           </h3>
         </div>
@@ -149,7 +149,7 @@ const CinemaBox = ({
           {loading && !movies && <SkeletonGrid />}
           {movies && movies.length === 0 && (
             <p class="text-muted mb-0">
-              <Text id="dashboard.boxes.cinema.noUpcomingMovies" />
+              <Text id="dashboard.boxes.premieres.noUpcomingMovies" />
             </p>
           )}
           {movies && movies.length > 0 && (
@@ -180,7 +180,7 @@ const CinemaBox = ({
   );
 };
 
-class CinemaBoxComponent extends Component {
+class PremieresBoxComponent extends Component {
   // Bumped on every refreshData call, and captured locally in the closure of
   // each call. Two overlapping requests (a days_ahead/region change firing
   // while the 30-minute interval's own call is still in flight, or two rapid
@@ -196,14 +196,14 @@ class CinemaBoxComponent extends Component {
       if (this.props.box.days_ahead) {
         params.daysAhead = this.props.box.days_ahead;
       }
-      if (this.props.box.cinema_region) {
-        params.region = this.props.box.cinema_region;
+      if (this.props.box.premieres_region) {
+        params.region = this.props.box.premieres_region;
       }
       if (this.props.box.provider) {
         params.service = this.props.box.provider;
       }
       const movies = await this.props.httpClient.get(
-        '/api/v1/cinema/upcoming',
+        '/api/v1/premieres/upcoming',
         Object.keys(params).length > 0 ? params : undefined
       );
       if (refreshSequence !== this.refreshSequence) {
@@ -235,7 +235,7 @@ class CinemaBoxComponent extends Component {
   componentDidUpdate(previousProps) {
     if (
       previousProps.box.days_ahead !== this.props.box.days_ahead ||
-      previousProps.box.cinema_region !== this.props.box.cinema_region ||
+      previousProps.box.premieres_region !== this.props.box.premieres_region ||
       previousProps.box.provider !== this.props.box.provider
     ) {
       this.refreshData();
@@ -253,7 +253,7 @@ class CinemaBoxComponent extends Component {
 
   render({ user }, { movies, loading, error, selectedMovie }) {
     return (
-      <CinemaBox
+      <PremieresBox
         movies={movies}
         loading={loading}
         error={error}
@@ -266,4 +266,4 @@ class CinemaBoxComponent extends Component {
   }
 }
 
-export default connect('httpClient,user', {})(CinemaBoxComponent);
+export default connect('httpClient,user', {})(PremieresBoxComponent);

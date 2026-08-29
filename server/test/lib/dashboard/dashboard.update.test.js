@@ -59,33 +59,33 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[0].columns[1][0]).to.have.property('provider', '');
   });
 
-  it('should save a cinema box carrying a region, and an empty region for automatic mode', async () => {
+  it('should save a premieres box carrying a region, and an empty region for automatic mode', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [
         [
           {
-            type: DASHBOARD_BOX_TYPE.CINEMA,
+            type: DASHBOARD_BOX_TYPE.PREMIERES,
             days_ahead: 15,
-            cinema_region: 'US',
+            premieres_region: 'US',
           },
         ],
         [
           {
-            type: DASHBOARD_BOX_TYPE.CINEMA,
+            type: DASHBOARD_BOX_TYPE.PREMIERES,
             // '' = automatic mode (service default, France), what the input
             // stores when the user clears the region field
-            cinema_region: '',
+            premieres_region: '',
           },
         ],
       ],
     });
     // legacy column-based boxes are normalized to a single section on save
-    expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('cinema_region', 'US');
-    expect(updatedDashboard.boxes[0].columns[1][0]).to.have.property('cinema_region', '');
+    expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('premieres_region', 'US');
+    expect(updatedDashboard.boxes[0].columns[1][0]).to.have.property('premieres_region', '');
   });
-  it('should reject an invalid cinema region', async () => {
+  it('should reject an invalid premieres region', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
-      boxes: [[{ type: DASHBOARD_BOX_TYPE.CINEMA, cinema_region: 'USA' }]],
+      boxes: [[{ type: DASHBOARD_BOX_TYPE.PREMIERES, premieres_region: 'USA' }]],
     });
     return assert.isRejected(promise);
   });

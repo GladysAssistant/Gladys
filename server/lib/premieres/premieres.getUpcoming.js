@@ -21,7 +21,7 @@ const { ERROR_MESSAGES } = require('../../utils/constants');
  * (widget configuration): no fallback, its failure is surfaced as-is.
  * @returns {Promise<Array>} Resolve with the list of upcoming movies.
  * @example
- * gladys.cinema.getUpcoming({ language: 'fr', region: 'FR', daysAhead: 30 });
+ * gladys.premieres.getUpcoming({ language: 'fr', region: 'FR', daysAhead: 30 });
  */
 async function getUpcoming(options = {}) {
   const serviceNames = this.service.stateManager.getAllKeys('service');

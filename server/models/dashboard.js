@@ -43,9 +43,9 @@ const boxSchema = Joi.object().keys({
   scenes: Joi.array().items(Joi.string()),
   // scene box: optional live status subtitle per scene button (scene selector -> device feature selector)
   scene_status_features: Joi.object().pattern(Joi.string(), Joi.string()),
-  // cinema box: how many days ahead to look for upcoming movie releases, and
-  // in which country's theatrical calendar (ISO 3166-1 alpha-2, ex. 'FR').
-  // '' = automatic (service default, France), same convention as the
+  // premieres box: how many days ahead to look for upcoming movie releases,
+  // and in which country's theatrical calendar (ISO 3166-1 alpha-2, ex.
+  // 'FR'). '' = automatic (service default, France), same convention as the
   // weather box's `provider` above. Uppercase only for a real code: Joi's
   // `.uppercase()` transform isn't applied back to the stored value here
   // (the isEven() validator below only checks for errors, it doesn't
@@ -53,7 +53,7 @@ const boxSchema = Joi.object().keys({
   // but stored mismatched — the pattern rejects it outright instead, and
   // the editor UI always sends an uppercased value.
   days_ahead: Joi.number().valid(15, 30, 60),
-  cinema_region: Joi.string()
+  premieres_region: Joi.string()
     .pattern(/^[A-Z]{2}$/)
     .allow(''),
   humidity_use_custom_value: Joi.boolean(),

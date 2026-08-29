@@ -8,22 +8,22 @@ const DAYS_AHEAD_OPTIONS = [15, 30, 60];
 const DEFAULT_DAYS_AHEAD = 30;
 const REGION_LENGTH = 2;
 
-const EditCinemaBox = ({ regionInput, updateDaysAhead, updateRegion, updateProvider, providers, ...props }) => (
-  <BaseEditBox {...props} titleKey="dashboard.boxTitle.cinema">
-    <Text id="dashboard.boxes.cinema.description" />
+const EditPremieresBox = ({ regionInput, updateDaysAhead, updateRegion, updateProvider, providers, ...props }) => (
+  <BaseEditBox {...props} titleKey="dashboard.boxTitle.premieres">
+    <Text id="dashboard.boxes.premieres.description" />
     <div class="form-group mt-3">
       <label>
-        <Text id="dashboard.boxes.cinema.editProviderLabel" />
+        <Text id="dashboard.boxes.premieres.editProviderLabel" />
       </label>
       <select onChange={updateProvider} class="form-control">
         <option value="" selected={!props.box.provider}>
-          <Text id="dashboard.boxes.cinema.providerAuto" />
+          <Text id="dashboard.boxes.premieres.providerAuto" />
         </option>
         {providers &&
           providers.map(provider => (
             <option selected={provider.service_name === props.box.provider} value={provider.service_name}>
               {provider.service_name === 'tmdb' ? (
-                <Text id="dashboard.boxes.cinema.providerInternalTmdb" />
+                <Text id="dashboard.boxes.premieres.providerInternalTmdb" />
               ) : (
                 provider.label || provider.service_name
               )}
@@ -33,7 +33,7 @@ const EditCinemaBox = ({ regionInput, updateDaysAhead, updateRegion, updateProvi
     </div>
     <div class="form-group">
       <label>
-        <Text id="dashboard.boxes.cinema.daysAheadLabel" />
+        <Text id="dashboard.boxes.premieres.daysAheadLabel" />
       </label>
       <select onChange={updateDaysAhead} class="form-control">
         {DAYS_AHEAD_OPTIONS.map(daysAhead => (
@@ -42,33 +42,33 @@ const EditCinemaBox = ({ regionInput, updateDaysAhead, updateRegion, updateProvi
             value={daysAhead}
             selected={(props.box.days_ahead || DEFAULT_DAYS_AHEAD) === daysAhead}
           >
-            <Text id={`dashboard.boxes.cinema.daysAhead${daysAhead}`} />
+            <Text id={`dashboard.boxes.premieres.daysAhead${daysAhead}`} />
           </option>
         ))}
       </select>
     </div>
     <div class="form-group">
       <label>
-        <Text id="dashboard.boxes.cinema.regionLabel" />
+        <Text id="dashboard.boxes.premieres.regionLabel" />
       </label>
       <Localizer>
         <input
           type="text"
           class="form-control"
           maxLength="2"
-          placeholder={<Text id="dashboard.boxes.cinema.regionPlaceholder" />}
+          placeholder={<Text id="dashboard.boxes.premieres.regionPlaceholder" />}
           value={regionInput}
           onInput={updateRegion}
         />
       </Localizer>
       <small class="form-text text-muted">
-        <Text id="dashboard.boxes.cinema.regionHelp" />
+        <Text id="dashboard.boxes.premieres.regionHelp" />
       </small>
     </div>
   </BaseEditBox>
 );
 
-class EditCinemaBoxComponent extends Component {
+class EditPremieresBoxComponent extends Component {
   updateDaysAhead = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       days_ahead: Number(e.target.value)
@@ -84,7 +84,7 @@ class EditCinemaBoxComponent extends Component {
 
   getProviders = async () => {
     try {
-      const providers = await this.props.httpClient.get('/api/v1/cinema/provider');
+      const providers = await this.props.httpClient.get('/api/v1/premieres/provider');
       this.setState({ providers });
     } catch (e) {
       // without the list the select simply stays on automatic mode
@@ -96,7 +96,7 @@ class EditCinemaBoxComponent extends Component {
     this.getProviders();
   }
 
-  // Kept in local state, decoupled from box.cinema_region: the server schema
+  // Kept in local state, decoupled from box.premieres_region: the server schema
   // only accepts '' (automatic) or a full 2-letter code, so a single
   // mid-typed letter must never be persisted — but the field still has to
   // display what the user is typing before it reaches that state.
@@ -108,19 +108,19 @@ class EditCinemaBoxComponent extends Component {
     this.setState({ regionInput: region });
     if (region.length === 0 || region.length === REGION_LENGTH) {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
-        cinema_region: region
+        premieres_region: region
       });
     }
   };
 
   constructor(props) {
     super(props);
-    this.state = { regionInput: props.box.cinema_region || '' };
+    this.state = { regionInput: props.box.premieres_region || '' };
   }
 
   render(props, { regionInput, providers }) {
     return (
-      <EditCinemaBox
+      <EditPremieresBox
         {...props}
         regionInput={regionInput}
         providers={providers}
@@ -132,4 +132,4 @@ class EditCinemaBoxComponent extends Component {
   }
 }
 
-export default connect('httpClient', actions)(EditCinemaBoxComponent);
+export default connect('httpClient', actions)(EditPremieresBoxComponent);

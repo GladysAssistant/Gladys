@@ -3,7 +3,7 @@ const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
-const Cinema = require('../../../lib/cinema');
+const Premieres = require('../../../lib/premieres');
 const { ServiceNotConfiguredError, ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 
 const fakeMovies = [{ id: 1, title: 'A movie', releaseDate: '2026-06-15' }];
@@ -30,14 +30,14 @@ function buildServiceManager(services) {
   };
 }
 
-describe('cinema.getUpcoming', () => {
+describe('premieres.getUpcoming', () => {
   it('should get the upcoming movies from the only provider', async () => {
     const tmdb = {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ tmdb });
-    const cinema = new Cinema(service);
-    const result = await cinema.getUpcoming(options);
+    const premieres = new Premieres(service);
+    const result = await premieres.getUpcoming(options);
     expect(result).to.deep.equal(fakeMovies);
     assert.calledWith(tmdb.movies.getUpcoming, options);
   });
@@ -50,8 +50,8 @@ describe('cinema.getUpcoming', () => {
       'not-a-movie-service': {},
       tmdb,
     });
-    const cinema = new Cinema(service);
-    const result = await cinema.getUpcoming(options);
+    const premieres = new Premieres(service);
+    const result = await premieres.getUpcoming(options);
     expect(result).to.deep.equal(fakeMovies);
   });
   it('should prefer an external movie integration over tmdb and never call the second candidate', async () => {
@@ -63,8 +63,8 @@ describe('cinema.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const cinema = new Cinema(service);
-    const result = await cinema.getUpcoming(options);
+    const premieres = new Premieres(service);
+    const result = await premieres.getUpcoming(options);
     expect(result).to.deep.equal(externalMovies);
     assert.calledWith(extTvdb.movies.getUpcoming, options);
     assert.notCalled(tmdb.movies.getUpcoming);
@@ -77,8 +77,8 @@ describe('cinema.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const cinema = new Cinema(service);
-    const result = await cinema.getUpcoming(options);
+    const premieres = new Premieres(service);
+    const result = await premieres.getUpcoming(options);
     expect(result).to.deep.equal(fakeMovies);
     assert.called(extTvdb.movies.getUpcoming);
   });
@@ -86,8 +86,8 @@ describe('cinema.getUpcoming', () => {
     const service = buildServiceManager({
       telegram: { message: { send: fake.resolves(null) } },
     });
-    const cinema = new Cinema(service);
-    const promise = cinema.getUpcoming(options);
+    const premieres = new Premieres(service);
+    const promise = premieres.getUpcoming(options);
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
       (e) => {
@@ -100,8 +100,8 @@ describe('cinema.getUpcoming', () => {
       movies: { getUpcoming: fake.rejects(new ServiceNotConfiguredError('TMDB API Key not found')) },
     };
     const service = buildServiceManager({ tmdb });
-    const cinema = new Cinema(service);
-    const promise = cinema.getUpcoming(options);
+    const premieres = new Premieres(service);
+    const promise = premieres.getUpcoming(options);
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
       (e) => {
@@ -117,9 +117,9 @@ describe('cinema.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const cinema = new Cinema(service);
+    const premieres = new Premieres(service);
     // ext-tvdb wins although tmdb has precedence, because it's pinned
-    const result = await cinema.getUpcoming({ ...options, service: 'ext-tvdb' });
+    const result = await premieres.getUpcoming({ ...options, service: 'ext-tvdb' });
     expect(result).to.deep.equal([{ id: 2, title: 'Another movie' }]);
     assert.notCalled(tmdb.movies.getUpcoming);
   });
@@ -132,8 +132,8 @@ describe('cinema.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const cinema = new Cinema(service);
-    const promise = cinema.getUpcoming({ ...options, service: 'ext-tvdb' });
+    const premieres = new Premieres(service);
+    const promise = premieres.getUpcoming({ ...options, service: 'ext-tvdb' });
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
       (e) => {
@@ -147,8 +147,8 @@ describe('cinema.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ tmdb });
-    const cinema = new Cinema(service);
-    const promise = cinema.getUpcoming({ ...options, service: 'ext-uninstalled-provider' });
+    const premieres = new Premieres(service);
+    const promise = premieres.getUpcoming({ ...options, service: 'ext-uninstalled-provider' });
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
       (e) => {
@@ -164,8 +164,8 @@ describe('cinema.getUpcoming', () => {
       },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb });
-    const cinema = new Cinema(service);
-    const promise = cinema.getUpcoming(options);
+    const premieres = new Premieres(service);
+    const promise = premieres.getUpcoming(options);
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
       (e) => {
@@ -184,8 +184,8 @@ describe('cinema.getUpcoming', () => {
       movies: { getUpcoming: fake.rejects(new ServiceNotConfiguredError('TMDB API Key not found')) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const cinema = new Cinema(service);
-    const promise = cinema.getUpcoming(options);
+    const premieres = new Premieres(service);
+    const promise = premieres.getUpcoming(options);
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
       (e) => {
@@ -195,14 +195,14 @@ describe('cinema.getUpcoming', () => {
   });
 });
 
-describe('cinema.getProviders', () => {
+describe('premieres.getProviders', () => {
   it('should list the movie providers in the precedence order of the loop', () => {
     const service = buildServiceManager({
       tmdb: { movies: { getUpcoming: fake.resolves([]) } },
       telegram: { message: { send: fake.resolves(null) } },
       'ext-tvdb': { movies: { getUpcoming: fake.resolves([]) } },
     });
-    const cinema = new Cinema(service);
-    expect(cinema.getProviders()).to.deep.equal(['ext-tvdb', 'tmdb']);
+    const premieres = new Premieres(service);
+    expect(premieres.getProviders()).to.deep.equal(['ext-tvdb', 'tmdb']);
   });
 });

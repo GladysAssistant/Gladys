@@ -387,7 +387,7 @@
       "chips": "Pastilles d'état",
       "actions": "Actions rapides",
       "house-view": "Vue de la maison",
-      "cinema": "Sorties Cinéma"
+      "premieres": "Prochaines sorties"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -824,7 +824,7 @@
         "noImage": "Choisissez une illustration dans les réglages du widget.",
         "error": "L'image n'a pas pu être chargée."
       },
-      "cinema": {
+      "premieres": {
         "description": "Cette box affiche les prochaines sorties de films au cinéma.",
         "serviceNotConfigured": "Aucun service de films n'est configuré. Veuillez accéder à l'onglet «Intégrations» et configurer une intégration de films (TMDB, ou une intégration de films du store).",
         "clickHere": "Cliquez ici pour accéder aux intégrations de films.",
@@ -3279,7 +3279,7 @@
       "apiKeyLabel": "Puis, entrez votre clé API ici :",
       "apiKeyPlaceholder": "Entrez la clé API TMDB",
       "saveButton": "Enregistrer",
-      "instructionsToUse": "Pour utiliser cette intégration, allez sur le tableau de bord et créez une box cinéma.",
+      "instructionsToUse": "Pour utiliser cette intégration, allez sur le tableau de bord et créez une box Prochaines sorties.",
       "saveError": "Une erreur est survenue lors du chargement ou de l'enregistrement de votre clé API. Merci de réessayer.",
       "documentation": "Documentation TMDB"
     }

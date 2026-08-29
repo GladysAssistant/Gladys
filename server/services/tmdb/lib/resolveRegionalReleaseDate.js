@@ -1,6 +1,6 @@
 // TMDB release types: 1 = Premiere, 2 = Theatrical (limited), 3 = Theatrical,
-// 4 = Digital, 5 = Physical, 6 = TV. Only theatrical releases matter for a
-// cinema widget.
+// 4 = Digital, 5 = Physical, 6 = TV. Only theatrical releases matter for the
+// premieres widget.
 const THEATRICAL_RELEASE_TYPES = [2, 3];
 
 /**

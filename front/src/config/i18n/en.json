@@ -387,7 +387,7 @@
       "chips": "Status chips",
       "actions": "Quick actions",
       "house-view": "House view",
-      "cinema": "Movie Releases"
+      "premieres": "Upcoming Releases"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -824,7 +824,7 @@
         "noImage": "Pick an illustration in the widget settings.",
         "error": "The image could not be loaded."
       },
-      "cinema": {
+      "premieres": {
         "description": "This box shows upcoming movie releases.",
         "serviceNotConfigured": "No movie service is configured. Please go to the 'Integrations' tab and configure a movie integration (TMDB, or a movie integration from the store).",
         "clickHere": "Click here to access the movie integrations.",
@@ -3279,7 +3279,7 @@
       "apiKeyLabel": "Then, enter your API key here:",
       "apiKeyPlaceholder": "Enter TMDB API key",
       "saveButton": "Save",
-      "instructionsToUse": "To use this integration, go to the dashboard and create a cinema box.",
+      "instructionsToUse": "To use this integration, go to the dashboard and create an Upcoming Releases box.",
       "saveError": "Something went wrong while loading or saving your API key. Please try again.",
       "documentation": "TMDB documentation"
     }
