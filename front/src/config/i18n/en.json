@@ -386,7 +386,8 @@
       "sun": "Sun",
       "chips": "Status chips",
       "actions": "Quick actions",
-      "house-view": "House view"
+      "house-view": "House view",
+      "cinema": "Movie Releases"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -822,6 +823,21 @@
         "editPinLabelPlaceholder": "e.g. Solar",
         "noImage": "Pick an illustration in the widget settings.",
         "error": "The image could not be loaded."
+      },
+      "cinema": {
+        "description": "This box shows upcoming movie releases.",
+        "serviceNotConfigured": "The Cinema service is not configured.",
+        "clickHere": "Click here to configure it.",
+        "requestToThirdPartyFailed": "An error occurred while fetching movie data. Please retry later.",
+        "unknownError": "An unknown error occurred.",
+        "noUpcomingMovies": "No upcoming movies found.",
+        "daysAheadLabel": "Time window",
+        "daysAhead15": "15 days",
+        "daysAhead30": "1 month",
+        "daysAhead60": "2 months",
+        "viewOnTmdb": "View on TMDB",
+        "noOverview": "No summary available for this movie.",
+        "watchTrailer": "Watch trailer"
       }
     },
     "editDashboardBackgroundLabel": "Background mood",
@@ -3248,7 +3264,17 @@
     "backToIntegrations": "Back to integrations",
     "menuScrollLeft": "Scroll menu left",
     "menuScrollRight": "Scroll menu right",
-    "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now."
+    "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now.",
+    "cinema": {
+      "title": "TMDB API",
+      "description": "Display upcoming movie releases on your dashboard.",
+      "introduction": "This integration helps you connect to The Movie Database (TMDB) API to get upcoming movie releases in Gladys.",
+      "instructions": "You first need to create a free account on the TMDB website: <a href=\"https://www.themoviedb.org/settings/api\">https://www.themoviedb.org/settings/api</a>.",
+      "apiKeyLabel": "Then, enter your API key here:",
+      "apiKeyPlaceholder": "Enter TMDB API key",
+      "saveButton": "Save",
+      "instructionsToUse": "To use this integration, go to the dashboard and create a cinema box."
+    }
   },
   "editScene": {
     "settings": "Settings",

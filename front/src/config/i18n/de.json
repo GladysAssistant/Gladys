@@ -386,7 +386,8 @@
       "sun": "Sonne",
       "chips": "Status-Chips",
       "actions": "Schnellaktionen",
-      "house-view": "Hausansicht"
+      "house-view": "Hausansicht",
+      "cinema": "Kinostarts"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -822,6 +823,21 @@
         "editPinLabelPlaceholder": "z. B. Solar",
         "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
         "error": "Das Bild konnte nicht geladen werden."
+      },
+      "cinema": {
+        "description": "Diese Box zeigt die nächsten Kinostarts.",
+        "serviceNotConfigured": "Der Kino-Dienst ist nicht konfiguriert.",
+        "clickHere": "Klicke hier, um ihn zu konfigurieren.",
+        "requestToThirdPartyFailed": "Beim Abrufen der Filmdaten ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
+        "unknownError": "Ein unbekannter Fehler ist aufgetreten.",
+        "noUpcomingMovies": "Keine kommenden Kinostarts gefunden.",
+        "daysAheadLabel": "Zeitraum",
+        "daysAhead15": "15 Tage",
+        "daysAhead30": "1 Monat",
+        "daysAhead60": "2 Monate",
+        "viewOnTmdb": "Auf TMDB ansehen",
+        "noOverview": "Keine Zusammenfassung für diesen Film verfügbar.",
+        "watchTrailer": "Trailer ansehen"
       }
     },
     "editDashboardBackgroundLabel": "Hintergrundstimmung",
@@ -3248,7 +3264,17 @@
     "backToIntegrations": "Zurück zu den Integrationen",
     "menuScrollLeft": "Menü nach links scrollen",
     "menuScrollRight": "Menü nach rechts scrollen",
-    "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden."
+    "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden.",
+    "cinema": {
+      "title": "TMDB API",
+      "description": "Zeige die nächsten Kinostarts auf deinem Dashboard an.",
+      "introduction": "Diese Integration hilft dir, dich mit der The Movie Database (TMDB) API zu verbinden, um kommende Kinostarts in Gladys abzurufen.",
+      "instructions": "Du musst zunächst ein kostenloses Konto auf der TMDB-Website erstellen: <a href=\"https://www.themoviedb.org/settings/api\">https://www.themoviedb.org/settings/api</a>.",
+      "apiKeyLabel": "Gib dann deinen API-Schlüssel hier ein:",
+      "apiKeyPlaceholder": "TMDB API-Schlüssel eingeben",
+      "saveButton": "Speichern",
+      "instructionsToUse": "Um diese Integration zu nutzen, gehe zum Dashboard und erstelle eine Kino-Box."
+    }
   },
   "editScene": {
     "settings": "Einstellungen",

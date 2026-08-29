@@ -386,7 +386,8 @@
       "sun": "Soleil",
       "chips": "Pastilles d'état",
       "actions": "Actions rapides",
-      "house-view": "Vue de la maison"
+      "house-view": "Vue de la maison",
+      "cinema": "Sorties Cinéma"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -822,6 +823,21 @@
         "editPinLabelPlaceholder": "ex : Solaire",
         "noImage": "Choisissez une illustration dans les réglages du widget.",
         "error": "L'image n'a pas pu être chargée."
+      },
+      "cinema": {
+        "description": "Cette box affiche les prochaines sorties de films au cinéma.",
+        "serviceNotConfigured": "Le service Cinéma n'est pas configuré.",
+        "clickHere": "Cliquez ici pour le configurer.",
+        "requestToThirdPartyFailed": "Une erreur est survenue lors de la récupération des films, merci de réessayer plus tard.",
+        "unknownError": "Une erreur inconnue est survenue.",
+        "noUpcomingMovies": "Aucune sortie de film à venir trouvée.",
+        "daysAheadLabel": "Période",
+        "daysAhead15": "15 jours",
+        "daysAhead30": "1 mois",
+        "daysAhead60": "2 mois",
+        "viewOnTmdb": "Voir sur TMDB",
+        "noOverview": "Aucun résumé disponible pour ce film.",
+        "watchTrailer": "Voir la bande-annonce"
       }
     },
     "editDashboardBackgroundLabel": "Ambiance de fond",
@@ -3248,7 +3264,17 @@
     "backToIntegrations": "Retour aux intégrations",
     "menuScrollLeft": "Faire défiler le menu vers la gauche",
     "menuScrollRight": "Faire défiler le menu vers la droite",
-    "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
+    "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment.",
+    "cinema": {
+      "title": "API TMDB",
+      "description": "Affichez les prochaines sorties de films sur votre tableau de bord.",
+      "introduction": "Cette intégration vous permet de vous connecter à l'API The Movie Database (TMDB) pour récupérer les prochaines sorties de films dans Gladys.",
+      "instructions": "Vous devez d'abord créer un compte gratuit sur le site de TMDB : <a href=\"https://www.themoviedb.org/settings/api\">https://www.themoviedb.org/settings/api</a>.",
+      "apiKeyLabel": "Puis, entrez votre clé API ici :",
+      "apiKeyPlaceholder": "Entrez la clé API TMDB",
+      "saveButton": "Enregistrer",
+      "instructionsToUse": "Pour utiliser cette intégration, allez sur le tableau de bord et créez une box cinéma."
+    }
   },
   "editScene": {
     "settings": "Configuration",

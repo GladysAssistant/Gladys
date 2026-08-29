@@ -1,0 +1,21 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "id": 1234,
+      "title": "Un film incroyable",
+      "overview": "Un synopsis passionnant.",
+      "release_date": "2026-09-16",
+      "poster_path": "/abcdef.jpg"
+    },
+    {
+      "id": 5678,
+      "title": "Sans affiche",
+      "overview": "Un autre synopsis.",
+      "release_date": "2026-09-23",
+      "poster_path": null
+    }
+  ],
+  "total_pages": 1,
+  "total_results": 2
+}

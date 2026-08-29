@@ -43,6 +43,8 @@ const boxSchema = Joi.object().keys({
   scenes: Joi.array().items(Joi.string()),
   // scene box: optional live status subtitle per scene button (scene selector -> device feature selector)
   scene_status_features: Joi.object().pattern(Joi.string(), Joi.string()),
+  // cinema box: how many days ahead to look for upcoming movie releases
+  days_ahead: Joi.number().valid(15, 30, 60),
   humidity_use_custom_value: Joi.boolean(),
   humidity_min: Joi.number(),
   humidity_max: Joi.number(),

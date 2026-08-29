@@ -2071,6 +2071,7 @@ const DASHBOARD_BOX_TYPE = {
   CHIPS: 'chips',
   HOUSE_VIEW: 'house-view',
   ACTIONS: 'actions',
+  CINEMA: 'cinema',
 };
 
 const DASHBOARD_WIDTH = {

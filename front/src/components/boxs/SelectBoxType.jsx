@@ -34,7 +34,8 @@ const BOX_TYPE_ICONS = {
   sun: 'sun',
   chips: 'more-horizontal',
   'house-view': 'home',
-  actions: 'zap'
+  actions: 'zap',
+  cinema: 'film'
 };
 
 import BaseEditBox from './baseEditBox';

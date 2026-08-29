@@ -1,0 +1,70 @@
+@keyframes skeletonPulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.skeletonTile {
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  background: rgba(127, 127, 127, 0.15);
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
+
+.skeletonLineWide {
+  height: 10px;
+  margin-top: 8px;
+  border-radius: 4px;
+  background: rgba(127, 127, 127, 0.15);
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
+
+.skeletonLineNarrow {
+  height: 8px;
+  width: 60%;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: rgba(127, 127, 127, 0.15);
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
+
+.posterButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+/* Side-by-side on desktop: fine, the dialog is wide enough for a fixed
+   110px poster to leave a comfortable text column next to it. On a phone
+   the modal shrinks close to the viewport width (see modal.css), so the
+   same fixed poster only leaves a sliver for the synopsis, wrapping it
+   into a tall column of near-single-word lines. Stacking the poster above
+   the text below that width gives the synopsis the full column back. */
+.detailLayout {
+  display: flex;
+  gap: 16px;
+}
+
+.detailPoster {
+  flex: 0 0 110px;
+}
+
+@media (max-width: 480px) {
+  .detailLayout {
+    flex-direction: column;
+  }
+
+  .detailPoster {
+    flex-basis: auto;
+    width: 140px;
+    margin: 0 auto;
+  }
+}
