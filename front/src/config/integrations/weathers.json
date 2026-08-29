@@ -8,8 +8,8 @@
     "categories": ["environment"]
   },
   {
-    "key": "cinema",
-    "img": "/assets/integrations/cover/cinema.jpg",
+    "key": "tmdb",
+    "img": "/assets/integrations/cover/tmdb.jpg",
     "cloud": true,
     "categories": ["multimedia"]
   }

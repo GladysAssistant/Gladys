@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { isAssignedRegion } = require('../../../../services/cinema/lib/isAssignedRegion');
+const { isAssignedRegion } = require('../../../../services/tmdb/lib/isAssignedRegion');
 
 describe('isAssignedRegion', () => {
   it('should accept a real ISO 3166-1 alpha-2 region', () => {

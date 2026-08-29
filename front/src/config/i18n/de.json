@@ -3268,7 +3268,7 @@
     "menuScrollLeft": "Menü nach links scrollen",
     "menuScrollRight": "Menü nach rechts scrollen",
     "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden.",
-    "cinema": {
+    "tmdb": {
       "title": "TMDB",
       "description": "Zeige die nächsten Kinostarts auf deinem Dashboard an.",
       "introduction": "Diese Integration hilft dir, dich mit der The Movie Database (TMDB) API zu verbinden, um kommende Kinostarts in Gladys abzurufen.",

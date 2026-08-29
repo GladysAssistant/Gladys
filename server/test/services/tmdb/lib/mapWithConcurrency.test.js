@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { mapWithConcurrency } = require('../../../../services/cinema/lib/mapWithConcurrency');
+const { mapWithConcurrency } = require('../../../../services/tmdb/lib/mapWithConcurrency');
 
 describe('mapWithConcurrency', () => {
   it('should map every item and preserve the original order', async () => {

@@ -3,9 +3,9 @@ const sinon = require('sinon').createSandbox();
 
 const { fake } = sinon;
 const expectedResult = require('./expected-result.json');
-const CinemaController = require('../../../services/cinema/controllers/cinema.controller');
+const TmdbController = require('../../../services/tmdb/controllers/tmdb.controller');
 
-describe('CinemaController', () => {
+describe('TmdbController', () => {
   afterEach(() => {
     sinon.restore();
   });
@@ -15,20 +15,20 @@ describe('CinemaController', () => {
     const res = {
       json: fake.returns(null),
     };
-    const cinemaController = CinemaController(getUpcoming);
-    await cinemaController['get /api/v1/service/cinema/movies/upcoming'].controller(req, res);
+    const tmdbController = TmdbController(getUpcoming);
+    await tmdbController['get /api/v1/service/tmdb/movies/upcoming'].controller(req, res);
     expect(getUpcoming.firstCall.args[0]).to.deep.equal({ language: 'fr-FR', region: undefined, daysAhead: NaN });
     expect(res.json.firstCall.args[0]).to.deep.equal(expectedResult);
   });
   it('should map every Gladys language to its TMDB locale', async () => {
     const getUpcoming = fake.resolves(expectedResult);
     const res = { json: fake.returns(null) };
-    const cinemaController = CinemaController(getUpcoming);
-    await cinemaController['get /api/v1/service/cinema/movies/upcoming'].controller(
+    const tmdbController = TmdbController(getUpcoming);
+    await tmdbController['get /api/v1/service/tmdb/movies/upcoming'].controller(
       { query: {}, user: { language: 'en' } },
       res,
     );
-    await cinemaController['get /api/v1/service/cinema/movies/upcoming'].controller(
+    await tmdbController['get /api/v1/service/tmdb/movies/upcoming'].controller(
       { query: {}, user: { language: 'de' } },
       res,
     );
@@ -41,8 +41,8 @@ describe('CinemaController', () => {
     const res = {
       json: fake.returns(null),
     };
-    const cinemaController = CinemaController(getUpcoming);
-    await cinemaController['get /api/v1/service/cinema/movies/upcoming'].controller(req, res);
+    const tmdbController = TmdbController(getUpcoming);
+    await tmdbController['get /api/v1/service/tmdb/movies/upcoming'].controller(req, res);
     expect(getUpcoming.firstCall.args[0]).to.deep.equal({ language: 'fr-FR', region: undefined, daysAhead: 15 });
   });
 });

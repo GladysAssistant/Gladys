@@ -164,7 +164,7 @@ const gladysNotConfigured = {
   },
 };
 
-describe('CinemaService', () => {
+describe('TmdbService', () => {
   let clock;
   beforeEach(() => {
     clock = useFakeTimers(NOW);
@@ -173,56 +173,56 @@ describe('CinemaService', () => {
     clock.restore();
   });
   it('should start service', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
   });
   it('should not start service when TMDB API Key is not configured', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
-    const cinemaService = CinemaService(gladysNotConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    return assert.isRejected(cinemaService.start(), 'Cinema Service not configured');
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysNotConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    return assert.isRejected(tmdbService.start(), 'TMDB Service not configured');
   });
   it('should stop service', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.stop();
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.stop();
   });
   it('should return an error when the TMDB API Key is not configured', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
-    const cinemaService = CinemaService(gladysNotConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    return assert.isRejected(cinemaService.movies.getUpcoming(), 'TMDB API Key not found');
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysNotConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    return assert.isRejected(tmdbService.movies.getUpcoming(), 'TMDB API Key not found');
   });
   it('should return error, unable to contact third party provider', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', brokenAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    const promise = cinemaService.movies.getUpcoming();
+    const TmdbService = proxyquire('../../../services/tmdb/index', brokenAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    const promise = tmdbService.movies.getUpcoming();
     return assert.isRejected(promise, 'REQUEST_TO_THIRD_PARTY_FAILED');
   });
   it('should cache the result and not call the third-party API twice', async () => {
     const workingAxios = buildWorkingAxios();
-    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    const firstCallCount = (await cinemaService.movies.getUpcoming(), workingAxios.getUrls().length);
-    await cinemaService.movies.getUpcoming();
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    const firstCallCount = (await tmdbService.movies.getUpcoming(), workingAxios.getUrls().length);
+    await tmdbService.movies.getUpcoming();
     expect(workingAxios.getUrls().length).to.equal(firstCallCount);
   });
   it('should use a separate cache entry per days ahead window', async () => {
     const workingAxios = buildWorkingAxios();
-    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    await cinemaService.movies.getUpcoming({ daysAhead: 15 });
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    await tmdbService.movies.getUpcoming({ daysAhead: 15 });
     const urlsAfterFirstCall = workingAxios.getUrls().length;
-    await cinemaService.movies.getUpcoming({ daysAhead: 60 });
+    await tmdbService.movies.getUpcoming({ daysAhead: 60 });
     expect(workingAxios.getUrls().length).to.be.greaterThan(urlsAfterFirstCall);
   });
   it('should resolve the actual regional release date, filter to the window and sort chronologically', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     expect(movies.map((movie) => ({ id: movie.id, releaseDate: movie.releaseDate }))).to.deep.equal([
       { id: 1002, releaseDate: '2026-06-10' },
       { id: 2001, releaseDate: '2026-06-12' },
@@ -235,91 +235,91 @@ describe('CinemaService', () => {
     ]);
   });
   it('should keep the discover-provided date when a movie has no release_dates entry for the region', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     const fallbackMovie = movies.find((movie) => movie.id === 1004);
     expect(fallbackMovie.releaseDate).to.equal('2026-06-15');
   });
   it('should fall back to the English overview when the requested language has none', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     const movie = movies.find((m) => m.id === 2001);
     expect(movie.overview).to.equal('English summary for 2001');
   });
   it('should fall back to the discover overview when neither the requested nor English language has one', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     const movie = movies.find((m) => m.id === 2002);
     expect(movie.overview).to.equal('');
   });
   it('should default the language to English when none is given (TMDB is most complete in English)', async () => {
     const workingAxios = buildWorkingAxios();
-    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    await tmdbService.movies.getUpcoming({ daysAhead: 30 });
     const [discoverUrl] = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
     expect(discoverUrl).to.include('language=en-US');
   });
   it('should default the region to France when none is given', async () => {
     const workingAxios = buildWorkingAxios();
-    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    await tmdbService.movies.getUpcoming({ daysAhead: 30 });
     const [discoverUrl] = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
     expect(discoverUrl).to.include('region=FR');
   });
   it('should use the given region in the TMDB request and in the cache key', async () => {
     const workingAxios = buildWorkingAxios();
-    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'US' });
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, region: 'US' });
     const [discoverUrl] = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
     expect(discoverUrl).to.include('region=US');
     const urlsAfterFirstCall = workingAxios.getUrls().length;
     // A different region is a cache miss, even with the same daysAhead.
-    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'FR' });
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, region: 'FR' });
     expect(workingAxios.getUrls().length).to.be.greaterThan(urlsAfterFirstCall);
   });
   it('should ignore an invalid region and fall back to the default rather than forward it as-is', async () => {
     const workingAxios = buildWorkingAxios();
-    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
     // Neither a 3-letter code nor a query-string injection attempt is a
     // valid ISO 3166-1 alpha-2 region: both must fall back to the default,
     // not leak into the cache key or the TMDB URL unchanged.
-    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'FRA' });
-    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'FR&evil=1' });
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, region: 'FRA' });
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, region: 'FR&evil=1' });
     const discoverUrls = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
     expect(discoverUrls).to.have.lengthOf(1);
     expect(discoverUrls[0]).to.include('region=FR');
   });
   it('should ignore a well-formed but unassigned region code (ZZ)', async () => {
     const workingAxios = buildWorkingAxios();
-    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
     // 'ZZ' passes a bare 2-uppercase-letter regex but isn't a real ISO
     // 3166-1 region — the reserved "unknown territory" code.
-    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'ZZ' });
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, region: 'ZZ' });
     const [discoverUrl] = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
     expect(discoverUrl).to.include('region=FR');
   });
   it('should send a finite timeout on every TMDB request', async () => {
     const workingAxios = buildWorkingAxios();
-    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     const configs = workingAxios.getConfigs();
     expect(configs.length).to.be.greaterThan(0);
     configs.forEach((config) => {
@@ -331,10 +331,10 @@ describe('CinemaService', () => {
   });
   it('should not request an English fallback when the requested language already is English', async () => {
     const workingAxios = buildWorkingAxios();
-    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'en-US' });
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'en-US' });
     const movieDetailCalls = workingAxios.getUrls().filter((url) => url.includes('/movie/2001?'));
     expect(movieDetailCalls).to.have.lengthOf(1);
   });
@@ -352,19 +352,19 @@ describe('CinemaService', () => {
         },
       },
     };
-    const CinemaService = proxyquire('../../../services/cinema/index', flaky);
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const TmdbService = proxyquire('../../../services/tmdb/index', flaky);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     // 1001's details lookup failed: it falls back to its (out-of-window)
     // discover-provided date and is filtered out, but the request still succeeds.
     expect(movies.map((movie) => movie.id)).to.deep.equal([1002, 2001, 2002, 3001, 1004, 3002, 3003]);
   });
   it('should resolve a trailer, falling back to English only when the requested language has none', async () => {
-    const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
-    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
-    await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     const findMovie = (id) => movies.find((movie) => movie.id === id);
     expect(findMovie(3001).trailerUrl).to.equal('https://www.youtube.com/watch?v=fr-trailer-3001');
     expect(findMovie(3002).trailerUrl).to.equal('https://www.youtube.com/watch?v=en-trailer-3002');

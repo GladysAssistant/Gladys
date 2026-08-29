@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const tmdbUpcomingResponse = require('../tmdb-upcoming-response.json');
 const expectedResult = require('../expected-result.json');
-const { formatUpcomingMovies } = require('../../../../services/cinema/lib/formatUpcomingMovies');
+const { formatUpcomingMovies } = require('../../../../services/tmdb/lib/formatUpcomingMovies');
 
 describe('formatUpcomingMovies', () => {
   it('should format a TMDB discover/movie response', () => {

@@ -121,7 +121,7 @@ const CinemaBox = ({
     return (
       <ErrorCard messageId="dashboard.boxes.cinema.serviceNotConfigured">
         {' '}
-        <Link href="/dashboard/integration/weather/cinema">
+        <Link href="/dashboard/integration/weather/tmdb">
           <Text id="dashboard.boxes.cinema.clickHere" />
         </Link>
       </ErrorCard>
@@ -200,7 +200,7 @@ class CinemaBoxComponent extends Component {
         params.region = this.props.box.cinema_region;
       }
       const movies = await this.props.httpClient.get(
-        '/api/v1/service/cinema/movies/upcoming',
+        '/api/v1/service/tmdb/movies/upcoming',
         Object.keys(params).length > 0 ? params : undefined
       );
       if (refreshSequence !== this.refreshSequence) {

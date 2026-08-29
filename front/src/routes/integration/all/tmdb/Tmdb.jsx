@@ -3,19 +3,19 @@ import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 
-const CinemaPage = ({ children, ...props }) => (
+const TmdbPage = ({ children, ...props }) => (
   <IntegrationSubPageLayout
-    title={<Text id="integration.cinema.title" />}
+    title={<Text id="integration.tmdb.title" />}
     tabs={
       <DeviceConfigurationLink
         user={props.user}
         configurationKey="integrations"
-        documentKey="cinema"
+        documentKey="tmdb"
         linkClass="hz-tab-link"
       >
         <i class="fe fe-book-open" />
         <span>
-          <Text id="integration.cinema.documentation" />
+          <Text id="integration.tmdb.documentation" />
         </span>
       </DeviceConfigurationLink>
     }
@@ -30,27 +30,27 @@ const CinemaPage = ({ children, ...props }) => (
           <div class="loader" />
           <div class="dimmer-content">
             <p>
-              <Text id="integration.cinema.introduction" />
+              <Text id="integration.tmdb.introduction" />
             </p>
             <p>
-              <MarkupText id="integration.cinema.instructions" />
+              <MarkupText id="integration.tmdb.instructions" />
             </p>
             {props.error && (
               <p class="alert alert-danger">
-                <Text id="integration.cinema.saveError" />
+                <Text id="integration.tmdb.saveError" />
               </p>
             )}
             <form onSubmit={props.saveApiKey}>
               <div class="form-group">
                 <div class="form-label">
-                  <Text id="integration.cinema.apiKeyLabel" />
+                  <Text id="integration.tmdb.apiKeyLabel" />
                 </div>
                 <div class="input-group">
                   <Localizer>
                     <input
                       type="text"
                       class="form-control"
-                      placeholder={<Text id="integration.cinema.apiKeyPlaceholder" />}
+                      placeholder={<Text id="integration.tmdb.apiKeyPlaceholder" />}
                       onInput={props.updateApiKey}
                       value={props.tmdbApiKey}
                     />
@@ -62,7 +62,7 @@ const CinemaPage = ({ children, ...props }) => (
                       })}
                       type="submit"
                     >
-                      <Text id="integration.cinema.saveButton" />
+                      <Text id="integration.tmdb.saveButton" />
                     </button>
                   </span>
                 </div>
@@ -70,7 +70,7 @@ const CinemaPage = ({ children, ...props }) => (
 
               <div class="form-group">
                 <label>
-                  <Text id="integration.cinema.instructionsToUse" />
+                  <Text id="integration.tmdb.instructionsToUse" />
                 </label>
               </div>
             </form>
@@ -81,4 +81,4 @@ const CinemaPage = ({ children, ...props }) => (
   </IntegrationSubPageLayout>
 );
 
-export default CinemaPage;
+export default TmdbPage;

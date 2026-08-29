@@ -3268,7 +3268,7 @@
     "menuScrollLeft": "Scroll menu left",
     "menuScrollRight": "Scroll menu right",
     "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now.",
-    "cinema": {
+    "tmdb": {
       "title": "TMDB",
       "description": "Display upcoming movie releases on your dashboard.",
       "introduction": "This integration helps you connect to The Movie Database (TMDB) API to get upcoming movie releases in Gladys.",

@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { resolveTrailerUrl } = require('../../../../services/cinema/lib/resolveTrailerUrl');
+const { resolveTrailerUrl } = require('../../../../services/tmdb/lib/resolveTrailerUrl');
 
 describe('resolveTrailerUrl', () => {
   it('should prefer a Trailer over a Teaser', () => {

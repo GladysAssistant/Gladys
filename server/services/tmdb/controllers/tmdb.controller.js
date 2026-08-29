@@ -11,11 +11,11 @@ const TMDB_LANGUAGE_BY_GLADYS_LANGUAGE = {
   [AVAILABLE_LANGUAGES.DE]: 'de-DE',
 };
 
-module.exports = function CinemaController(getUpcoming) {
+module.exports = function TmdbController(getUpcoming) {
   /**
-   * @api {get} /api/v1/service/cinema/movies/upcoming Get upcoming movies
+   * @api {get} /api/v1/service/tmdb/movies/upcoming Get upcoming movies
    * @apiName getUpcomingMovies
-   * @apiGroup Cinema
+   * @apiGroup Tmdb
    */
   async function getUpcomingController(req, res) {
     const movies = await getUpcoming({
@@ -27,7 +27,7 @@ module.exports = function CinemaController(getUpcoming) {
   }
 
   return {
-    'get /api/v1/service/cinema/movies/upcoming': {
+    'get /api/v1/service/tmdb/movies/upcoming': {
       authenticated: true,
       controller: asyncMiddleware(getUpcomingController),
     },

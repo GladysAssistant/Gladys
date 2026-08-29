@@ -8,44 +8,44 @@ const actions = store => ({
   },
   async getApiKey(state) {
     store.setState({
-      cinemaGetApiKeyStatus: RequestStatus.Getting
+      tmdbGetApiKeyStatus: RequestStatus.Getting
     });
     try {
-      const variable = await state.httpClient.get('/api/v1/service/cinema/variable/TMDB_API_KEY');
+      const variable = await state.httpClient.get('/api/v1/service/tmdb/variable/TMDB_API_KEY');
       store.setState({
         tmdbApiKey: variable.value,
-        cinemaGetApiKeyStatus: RequestStatus.Success
+        tmdbGetApiKeyStatus: RequestStatus.Success
       });
     } catch (e) {
       store.setState({
-        cinemaGetApiKeyStatus: RequestStatus.Error
+        tmdbGetApiKeyStatus: RequestStatus.Error
       });
     }
   },
   async saveApiKey(state, e) {
     e.preventDefault();
     store.setState({
-      cinemaSaveApiKeyStatus: RequestStatus.Getting,
+      tmdbSaveApiKeyStatus: RequestStatus.Getting,
       // A save attempt supersedes any stale error from the initial key load:
       // otherwise a failed getApiKey() followed by a successful save would
-      // keep the error alert visible forever (cinemaGetApiKeyStatus is never
+      // keep the error alert visible forever (tmdbGetApiKeyStatus is never
       // touched by saveApiKey otherwise, so it never clears on its own).
-      cinemaGetApiKeyStatus: RequestStatus.Success
+      tmdbGetApiKeyStatus: RequestStatus.Success
     });
     try {
       store.setState({
         tmdbApiKey: state.tmdbApiKey.trim()
       });
-      await state.httpClient.post('/api/v1/service/cinema/variable/TMDB_API_KEY', {
+      await state.httpClient.post('/api/v1/service/tmdb/variable/TMDB_API_KEY', {
         value: state.tmdbApiKey.trim()
       });
-      await state.httpClient.post('/api/v1/service/cinema/start');
+      await state.httpClient.post('/api/v1/service/tmdb/start');
       store.setState({
-        cinemaSaveApiKeyStatus: RequestStatus.Success
+        tmdbSaveApiKeyStatus: RequestStatus.Success
       });
     } catch (e) {
       store.setState({
-        cinemaSaveApiKeyStatus: RequestStatus.Error
+        tmdbSaveApiKeyStatus: RequestStatus.Error
       });
     }
   }

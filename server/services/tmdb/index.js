@@ -7,7 +7,7 @@ const { resolveRegionalReleaseDate } = require('./lib/resolveRegionalReleaseDate
 const { resolveTrailerUrl } = require('./lib/resolveTrailerUrl');
 const { mapWithConcurrency } = require('./lib/mapWithConcurrency');
 const { isAssignedRegion } = require('./lib/isAssignedRegion');
-const CinemaController = require('./controllers/cinema.controller');
+const TmdbController = require('./controllers/tmdb.controller');
 
 const TMDB_API_KEY = 'TMDB_API_KEY';
 const CACHE_DURATION_IN_MS = 30 * 60 * 1000;
@@ -54,7 +54,7 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-module.exports = function CinemaService(gladys, serviceId) {
+module.exports = function TmdbService(gladys, serviceId) {
   const { default: axios } = require('axios');
   let tmdbApiKey;
   const cache = new Map();
@@ -63,13 +63,13 @@ module.exports = function CinemaService(gladys, serviceId) {
    * @public
    * @description This function starts the service.
    * @example
-   * gladys.services.cinema.start();
+   * gladys.services.tmdb.start();
    */
   async function start() {
-    logger.info('Starting Cinema service');
+    logger.info('Starting TMDB service');
     tmdbApiKey = await gladys.variable.getValue(TMDB_API_KEY, serviceId);
     if (!tmdbApiKey) {
-      throw new ServiceNotConfiguredError('Cinema Service not configured');
+      throw new ServiceNotConfiguredError('TMDB Service not configured');
     }
   }
 
@@ -77,10 +77,10 @@ module.exports = function CinemaService(gladys, serviceId) {
    * @public
    * @description This function stops the service.
    * @example
-   * gladys.services.cinema.stop();
+   * gladys.services.tmdb.stop();
    */
   async function stop() {
-    logger.info('Stopping Cinema service');
+    logger.info('Stopping TMDB service');
   }
 
   /**
@@ -115,7 +115,7 @@ module.exports = function CinemaService(gladys, serviceId) {
       const { data } = await axios.get(url, { timeout: REQUEST_TIMEOUT_IN_MS });
       return data;
     } catch (e) {
-      logger.warn(`Cinema service: unable to get details for movie ${movieId}`);
+      logger.warn(`TMDB service: unable to get details for movie ${movieId}`);
       return null;
     }
   }
@@ -168,7 +168,7 @@ module.exports = function CinemaService(gladys, serviceId) {
    * @param {number} [options.daysAhead] - How many days ahead to look for releases (15, 30 or 60).
    * @returns {Promise<Array>} Resolve with the list of upcoming movies, soonest release first.
    * @example
-   * gladys.services.cinema.movies.getUpcoming({ language: 'fr-FR', region: 'FR', daysAhead: 30 });
+   * gladys.services.tmdb.movies.getUpcoming({ language: 'fr-FR', region: 'FR', daysAhead: 30 });
    */
   async function getUpcoming(options = {}) {
     if (!tmdbApiKey) {
@@ -212,7 +212,7 @@ module.exports = function CinemaService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    controllers: CinemaController(getUpcoming),
+    controllers: TmdbController(getUpcoming),
     movies: {
       getUpcoming,
     },

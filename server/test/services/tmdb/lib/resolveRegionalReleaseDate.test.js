@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { resolveRegionalReleaseDate } = require('../../../../services/cinema/lib/resolveRegionalReleaseDate');
+const { resolveRegionalReleaseDate } = require('../../../../services/tmdb/lib/resolveRegionalReleaseDate');
 
 describe('resolveRegionalReleaseDate', () => {
   it('should return the earliest theatrical release date for the region', () => {
