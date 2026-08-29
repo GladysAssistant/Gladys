@@ -4,7 +4,7 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { fake, assert } = sinon;
 
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, THERMOSTAT_MODE } = require('../../../../utils/constants');
 const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 
 const load = () =>
@@ -25,9 +25,21 @@ const buildHandler = () => {
         setValue: fake.resolves(null),
         // The owner of an external setpoint feature: another integration's
         // device, which is what the core has to be handed to route the write.
-        get: fake.resolves([
-          { selector: 'netatmo-device', service: { name: 'netatmo' }, features: [{ selector: 'netatmo-setpoint' }] },
-        ]),
+        // The mode lives on that same device, and is looked up the same way.
+        get: fake((query) => {
+          const selector = query && query.device_feature_selectors;
+          const features = [{ selector: 'netatmo-setpoint' }];
+          if (selector === 'netatmo-mode') {
+            return Promise.resolve([
+              {
+                selector: 'netatmo-device',
+                service: { name: 'netatmo' },
+                features: [{ selector: 'netatmo-mode', last_value: THERMOSTAT_MODE.OFF }],
+              },
+            ]);
+          }
+          return Promise.resolve([{ selector: 'netatmo-device', service: { name: 'netatmo' }, features }]);
+        }),
       },
       variable: { setValue: fake.resolves(null) },
       event: { emit: fake.returns(null) },
@@ -258,6 +270,51 @@ describe('thermostat.setValue', () => {
 
       expect(handler.selfWrittenSetpoints.get('netatmo-setpoint')).to.equal(21);
     });
+    // A thermostat stopped by an `off` preset ignores a setpoint: asking for
+    // 21 °C on a device whose mode is OFF changes the number on its screen and
+    // nothing else. The mode has to be handed back first.
+    it('should hand the mode back before writing the setpoint', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(
+        externalDevice([{ name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' }]),
+        externalFeature,
+        21,
+      );
+
+      const [modeCall, setpointCall] = handler.gladys.device.setValue.getCalls();
+      expect(modeCall.args[1].selector).to.equal('netatmo-mode');
+      expect(modeCall.args[2]).to.equal(THERMOSTAT_MODE.HEATING);
+      expect(setpointCall.args[1].selector).to.equal('netatmo-setpoint');
+      expect(setpointCall.args[2]).to.equal(21);
+    });
+
+    it('should hand back the cooling mode on a cooling thermostat', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(
+        externalDevice([
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+          { name: 'THERMOSTAT_MODE', value: 'cooling' },
+        ]),
+        externalFeature,
+        21,
+      );
+
+      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.COOLING);
+    });
+
+    // Almost no integration exposes a mode feature: those thermostats get the
+    // setpoint alone, exactly as before.
+    it('should write only the setpoint when no mode feature is configured', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(externalDevice(), externalFeature, 21);
+
+      assert.calledOnce(handler.gladys.device.setValue);
+      expect(handler.gladys.device.setValue.firstCall.args[1].selector).to.equal('netatmo-setpoint');
+    });
+
     it('should still write through the integration when returning to the schedule', async () => {
       const handler = buildHandler();
 
