@@ -120,10 +120,20 @@ class Header extends Component {
   // The open mobile drawer covers the page: Escape must give it back, as it
   // does for any other overlay. Only relevant while that drawer is open — on
   // desktop the rail (expanded or collapsed) is part of the layout, never an
-  // overlay, so Escape means nothing to it.
+  // overlay, so Escape means nothing to it. Innermost overlay first (the
+  // profile dropup opens above the drawer), and a dedicated close and not a
+  // toggle: another document-level Escape handler closing the drawer in the
+  // same tick must not see it toggled back open here.
   handleKeyDown = e => {
-    if (e.key === 'Escape' && this.props.showCollapsedMenu) {
-      this.props.toggleCollapsedMenu();
+    if (e.key !== 'Escape') {
+      return;
+    }
+    if (this.props.showDropDown) {
+      this.props.closeDropDown();
+      return;
+    }
+    if (this.props.showCollapsedMenu) {
+      this.props.closeCollapsedMenu();
     }
   };
 
@@ -207,7 +217,7 @@ class Header extends Component {
               class={style.mobileToggler}
               onClick={props.toggleCollapsedMenu}
               data-cy="sidebar-toggler"
-              aria-label={<Text id="header.openMenu" />}
+              aria-label={<Text id={props.showCollapsedMenu ? 'header.closeMenu' : 'header.openMenu'} />}
               aria-expanded={props.showCollapsedMenu ? 'true' : 'false'}
               aria-controls="sidebar-navigation"
             >

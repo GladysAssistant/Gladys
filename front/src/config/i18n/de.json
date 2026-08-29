@@ -6336,6 +6336,7 @@
     "instanceUpdateNoticeDismiss": "Diese Meldung ausblenden",
     "needHelp": "Hilfe benötigt",
     "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
     "collapseMenu": "Menü einklappen",
     "expandMenu": "Menü anzeigen",
     "signOut": "Abmelden"

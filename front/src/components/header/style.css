@@ -60,6 +60,15 @@
   height: 28px;
 }
 
+/* The name shares the row with the collapse button, which leaves it about
+   half the width it used to have: nowrap alone would let it paint over that
+   button (and grow the rail's overflow-y scroller), so it ellipsises instead. */
+.sidebarBrand span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Hidden below the desktop breakpoint: down there the rail is an on-demand
    drawer whatever the preference says, and the backdrop already closes it. */
 .collapseButton {
@@ -496,6 +505,14 @@
   color: #1c2334;
 }
 
+/* On a keyboard this button is the only way back into a collapsed rail, so
+   it must be visible when it is focused */
+.expandButton:focus-visible,
+.collapseButton:focus-visible {
+  outline: 2px solid #467fcf;
+  outline-offset: 2px;
+}
+
 .expandButton .togglerDot {
   top: 0.4rem;
   right: 0.4rem;
@@ -511,6 +528,16 @@
   .navLink,
   .profileButton {
     min-height: 2.75rem;
+  }
+
+  /* The collapsible rail is aimed at wall tablets, which are coarse-pointer
+     at desktop widths: its two controls need the same ~44px target as the
+     rest of the rail. The expand button still clears the 3.25rem gutter at
+     this size (2.75rem + its 0.375rem inset). */
+  .collapseButton,
+  .expandButton {
+    width: 2.75rem;
+    height: 2.75rem;
   }
 }
 

@@ -67,6 +67,11 @@ function createActions(store) {
         showCollapsedMenu: !state.showCollapsedMenu
       });
     },
+    closeCollapsedMenu() {
+      store.setState({
+        showCollapsedMenu: false
+      });
+    },
     // Expanded rail ⇄ collapsed, at desktop widths (below them the rail is
     // an on-demand drawer whatever this says). Both states are resting
     // states: expanded is the docked rail with the content beside it, never
