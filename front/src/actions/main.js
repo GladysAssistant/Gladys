@@ -6,7 +6,7 @@ import { route } from 'preact-router';
 import get from 'get-value';
 import config from '../config';
 import { isUrlInArray } from '../utils/url';
-import { setSidebarDrawerModePreference } from '../utils/sidebarPreference';
+import { setSidebarCollapsedPreference } from '../utils/sidebarPreference';
 import {
   isInstanceBehindFront,
   isInstanceVersionCheckSettled,
@@ -67,15 +67,15 @@ function createActions(store) {
         showCollapsedMenu: !state.showCollapsedMenu
       });
     },
-    // Docked rail ⇄ off-canvas drawer, at desktop widths (below them the rail
-    // is always a drawer). Undocking closes the panel: the click that asked
-    // for it came from inside the open drawer.
-    toggleSidebarDrawerMode(state) {
-      const sidebarDrawerMode = !state.sidebarDrawerMode;
-      setSidebarDrawerModePreference(sidebarDrawerMode);
+    // Expanded rail ⇄ collapsed, at desktop widths (below them the rail is
+    // an on-demand drawer whatever this says). Both states are resting
+    // states: expanded is the docked rail with the content beside it, never
+    // an overlay.
+    toggleSidebarCollapsed(state) {
+      const sidebarCollapsed = !state.sidebarCollapsed;
+      setSidebarCollapsedPreference(sidebarCollapsed);
       store.setState({
-        sidebarDrawerMode,
-        showCollapsedMenu: false
+        sidebarCollapsed
       });
     },
     redirectToLogin() {

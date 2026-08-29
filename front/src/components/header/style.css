@@ -1,14 +1,15 @@
 /* Left-sidebar navigation (Horizon): app-level navigation lives in a fixed
    frosted panel on the left, so the top of the screen belongs to the current
    page — on dashboards, to the dashboard switcher pills.
-   Desktop (≥992px): docked rail by default; in drawer mode (a per-device
-   preference, utils/sidebarPreference) it becomes the same off-canvas drawer
-   as below the breakpoint, opened by a floating button so widgets get the
-   width the rail used to hold. Below 992px: off-canvas drawer opened by the
-   slim fixed top bar's menu button. A drawer is closed by backdrop tap,
-   Escape or navigation (handleRoute resets showCollapsedMenu). Content
-   offsets live in style/index.css on body.gladys-sidebar-nav /
-   body.gladys-sidebar-drawer, toggled by the component. */
+   Desktop (≥992px): docked rail, collapsible (a per-device preference,
+   utils/sidebarPreference) — collapsed it slides off-canvas and the page
+   takes the width back, a floating button expanding it into the same docked
+   rail again; both are resting states, neither is an overlay. Below 992px:
+   off-canvas drawer over a backdrop, opened by the slim fixed top bar's menu
+   button, closed by backdrop tap, Escape or navigation (handleRoute resets
+   showCollapsedMenu). Content offsets live in style/index.css on
+   body.gladys-sidebar-nav / body.gladys-sidebar-collapsed, toggled by the
+   component. */
 
 .sidebar {
   position: fixed;
@@ -28,7 +29,7 @@
   overscroll-behavior: contain;
 }
 
-/* Brand row: the logo, and on desktop the button that docks/undocks the rail */
+/* Brand row: the logo, and on desktop the button that collapses the rail */
 .sidebarHeader {
   display: flex;
   align-items: center;
@@ -59,9 +60,9 @@
   height: 28px;
 }
 
-/* Hidden below the desktop breakpoint: down there the rail is a drawer
-   whatever the preference says, so there is nothing to dock it back into. */
-.drawerModeToggle {
+/* Hidden below the desktop breakpoint: down there the rail is an on-demand
+   drawer whatever the preference says, and the backdrop already closes it. */
+.collapseButton {
   display: none;
   align-items: center;
   justify-content: center;
@@ -77,13 +78,13 @@
   cursor: pointer;
 }
 
-.drawerModeToggle:hover {
+.collapseButton:hover {
   background-color: rgba(28, 35, 52, 0.06);
   color: #1c2334;
 }
 
 @media (min-width: 992px) {
-  .drawerModeToggle {
+  .collapseButton {
     display: inline-flex;
   }
 }
@@ -445,35 +446,31 @@
   }
 }
 
-/* Drawer mode at desktop widths: the very same off-canvas behaviour, now the
-   user's choice instead of the breakpoint's. Written out a second time rather
-   than shared with the block above — a media query cannot be joined to a
-   class in one selector list, and this is the whole duplication it costs.
-   The rail keeps its docked 15rem width here: on a wide screen there is no
-   reason to widen it, and the panel is the one the user already knows. */
+/* Collapsed rail at desktop widths: the rail slides off-canvas and the page
+   takes the width back (style/index.css) — the expanded state stays the
+   plain docked rail beside the content, so this is NOT the mobile drawer: no
+   backdrop, no raised z-index, no overlay. Same off-canvas mechanics as the
+   drawer though (translate + delayed visibility flip), so the collapsed rail
+   leaves the tab order and the accessibility tree while the slide animates. */
 @media (min-width: 992px) {
-  :global(body.gladys-sidebar-drawer) .sidebar {
-    z-index: 1055;
-    background-color: rgba(255, 255, 255, 0.92);
+  .sidebar {
+    /* both ways: expanding animates too — without this the transition only
+       exists while the collapsed class is present, and expanding snaps */
+    transition: transform 0.22s ease;
+  }
+
+  :global(body.gladys-sidebar-collapsed) .sidebar {
     transform: translateX(-105%);
     visibility: hidden;
     transition: transform 0.22s ease, visibility 0s linear 0.22s;
-    box-shadow: 0 12px 48px rgba(20, 30, 60, 0.3);
-  }
-
-  /* same specificity as the rule above, so order decides: open wins */
-  :global(body.gladys-sidebar-drawer) .sidebarOpen {
-    transform: none;
-    visibility: visible;
-    transition: transform 0.22s ease;
   }
 }
 
-/* The floating opener of the desktop drawer: it lives in the slim gutter the
-   page keeps free on the left (style/index.css), so it overlaps nothing and
-   costs no row. Only rendered in drawer mode; hidden below the breakpoint,
-   where the top bar's burger already opens the drawer. */
-.drawerOpener {
+/* The floating expand button of the collapsed rail: it lives in the slim
+   gutter the page keeps free on the left (style/index.css), so it overlaps
+   nothing and costs no row. Only rendered while collapsed; hidden below the
+   breakpoint, where the top bar's burger opens the drawer instead. */
+.expandButton {
   position: fixed;
   top: 0.5rem;
   left: 0.375rem;
@@ -494,18 +491,18 @@
   cursor: pointer;
 }
 
-.drawerOpener:hover {
+.expandButton:hover {
   background-color: rgba(255, 255, 255, 0.92);
   color: #1c2334;
 }
 
-.drawerOpener .togglerDot {
+.expandButton .togglerDot {
   top: 0.4rem;
   right: 0.4rem;
 }
 
 @media (min-width: 992px) {
-  .drawerOpener {
+  .expandButton {
     display: inline-flex;
   }
 }
@@ -524,6 +521,6 @@
    like their labels (same exception the glass theme carries). */
 :global(.dark-mode) .sidebar :global(.fe),
 :global(.dark-mode) .mobileTopBar :global(.fe),
-:global(.dark-mode) .drawerOpener :global(.fe) {
+:global(.dark-mode) .expandButton :global(.fe) {
   filter: none;
 }

@@ -117,9 +117,10 @@ class Header extends Component {
     }
   };
 
-  // An open drawer covers the page: Escape must give it back, as it does for
-  // any other overlay. Only relevant while the drawer is open — docked, the
-  // rail is part of the layout and Escape means nothing to it.
+  // The open mobile drawer covers the page: Escape must give it back, as it
+  // does for any other overlay. Only relevant while that drawer is open — on
+  // desktop the rail (expanded or collapsed) is part of the layout, never an
+  // overlay, so Escape means nothing to it.
   handleKeyDown = e => {
     if (e.key === 'Escape' && this.props.showCollapsedMenu) {
       this.props.toggleCollapsedMenu();
@@ -151,12 +152,12 @@ class Header extends Component {
 
   // Content offsets (style/index.css) key off these body classes so they
   // vanish together with the sidebar on auth pages and in fullscreen mode.
-  // The second one is drawer mode: the page then keeps only the slim gutter
-  // its floating opener sits in, instead of a full rail-wide column.
+  // The second one is the collapsed rail: the page then keeps only the slim
+  // gutter the expand button sits in, instead of a full rail-wide column.
   syncBodyClass = () => {
     const visible = !this.isHidden();
     document.body.classList.toggle('gladys-sidebar-nav', visible);
-    document.body.classList.toggle('gladys-sidebar-drawer', visible && Boolean(this.props.sidebarDrawerMode));
+    document.body.classList.toggle('gladys-sidebar-collapsed', visible && Boolean(this.props.sidebarCollapsed));
   };
 
   constructor(props) {
@@ -183,7 +184,7 @@ class Header extends Component {
     document.removeEventListener('mousedown', this.handleClickOutside);
     document.removeEventListener('keydown', this.handleKeyDown);
     document.body.classList.remove('gladys-sidebar-nav');
-    document.body.classList.remove('gladys-sidebar-drawer');
+    document.body.classList.remove('gladys-sidebar-collapsed');
   }
 
   render(props) {
@@ -227,19 +228,20 @@ class Header extends Component {
           </a>
           <DarkModeToggle />
         </div>
-        {/* Drawer mode on desktop: the rail is off-canvas, so its opener is
-            this floating button, alone in the slim gutter the page keeps on
-            the left. No top bar up here — a full-width one would cost every
-            page a row, and width is exactly what drawer mode is for. */}
-        {props.sidebarDrawerMode && (
+        {/* Collapsed rail on desktop: this floating button, alone in the slim
+            gutter the page keeps on the left, expands it back — into the
+            docked rail, never an overlay. No top bar up here: a full-width
+            one would cost every page a row, and width is exactly what
+            collapsing is for. */}
+        {props.sidebarCollapsed && (
           <Localizer>
             <button
               type="button"
-              class={style.drawerOpener}
-              onClick={props.toggleCollapsedMenu}
-              data-cy="sidebar-drawer-opener"
-              aria-label={<Text id="header.openMenu" />}
-              aria-expanded={props.showCollapsedMenu ? 'true' : 'false'}
+              class={style.expandButton}
+              onClick={props.toggleSidebarCollapsed}
+              data-cy="sidebar-expand-button"
+              aria-label={<Text id="header.expandMenu" />}
+              aria-expanded="false"
               aria-controls="sidebar-navigation"
             >
               <i class="fe fe-menu" />
@@ -248,10 +250,7 @@ class Header extends Component {
           </Localizer>
         )}
         {props.showCollapsedMenu && (
-          <div
-            class={cx(style.sidebarBackdrop, { 'd-lg-none': !props.sidebarDrawerMode })}
-            onClick={props.toggleCollapsedMenu}
-          />
+          <div class={cx(style.sidebarBackdrop, 'd-lg-none')} onClick={props.toggleCollapsedMenu} />
         )}
         <nav
           id="sidebar-navigation"
@@ -271,18 +270,20 @@ class Header extends Component {
                 <Text id="header.gladysAssistant" />
               </span>
             </a>
-            {/* Dock ⇄ undock, desktop only (the rail is always a drawer below
-                the breakpoint, where this button is hidden by CSS) */}
+            {/* Collapse, desktop only (the rail is an on-demand drawer below
+                the breakpoint, where this button is hidden by CSS). Only ever
+                seen expanded — collapsed, the whole rail is off-screen and
+                the floating expand button takes over. */}
             <Localizer>
               <button
                 type="button"
-                class={style.drawerModeToggle}
-                onClick={props.toggleSidebarDrawerMode}
-                data-cy="sidebar-drawer-mode-toggle"
-                title={<Text id={props.sidebarDrawerMode ? 'header.dockMenu' : 'header.undockMenu'} />}
-                aria-label={<Text id={props.sidebarDrawerMode ? 'header.dockMenu' : 'header.undockMenu'} />}
+                class={style.collapseButton}
+                onClick={props.toggleSidebarCollapsed}
+                data-cy="sidebar-collapse-button"
+                title={<Text id="header.collapseMenu" />}
+                aria-label={<Text id="header.collapseMenu" />}
               >
-                <i class={cx('fe', props.sidebarDrawerMode ? 'fe-chevron-right' : 'fe-chevron-left')} />
+                <i class="fe fe-chevron-left" />
               </button>
             </Localizer>
           </div>

@@ -547,22 +547,26 @@ body .apexcharts-tooltip {
    (wall-panel) mode keep the full viewport. Only the OUTER .page is padded:
    the dashboard routes nest a .page of their own that must not double it. */
 @media (min-width: 992px) {
-  body.gladys-sidebar-nav:not(.gladys-sidebar-drawer) #app > .page {
+  body.gladys-sidebar-nav #app > .page {
     padding-left: 15rem;
+    /* keeps pace with the rail's own 0.22s slide when it is collapsed or
+       expanded, so content and rail move as one */
+    transition: padding-left 0.22s ease;
   }
   /* fixed-bottom bars (dashboard editor footer) span the viewport: keep them
      clear of the rail */
-  body.gladys-sidebar-nav:not(.gladys-sidebar-drawer) .fixed-bottom {
+  body.gladys-sidebar-nav:not(.gladys-sidebar-collapsed) .fixed-bottom {
     left: 15rem;
   }
 
-  /* Drawer mode: the rail is off-canvas, so the page gives back the whole
-     column it held and keeps only the gutter its floating opener sits in
-     (2.5rem button + its 0.375rem inset, rounded up so nothing crowds it).
-     A gutter and not zero: at zero the button would sit on top of the first
-     dashboard pill / page title. Vertically nothing moves — no top bar up
-     there — so every full-height page keeps working untouched. */
-  body.gladys-sidebar-nav.gladys-sidebar-drawer #app > .page {
+  /* Collapsed rail: it slid off-canvas (components/header), so the page
+     gives back the whole column it held and keeps only the gutter the
+     floating expand button sits in (2.5rem button + its 0.375rem inset,
+     rounded up so nothing crowds it). A gutter and not zero: at zero the
+     button would sit on top of the first dashboard pill / page title.
+     Vertically nothing moves — no top bar up there — so every full-height
+     page keeps working untouched. */
+  body.gladys-sidebar-nav.gladys-sidebar-collapsed #app > .page {
     padding-left: 3.25rem;
   }
 }

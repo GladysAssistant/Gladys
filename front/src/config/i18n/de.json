@@ -6336,8 +6336,8 @@
     "instanceUpdateNoticeDismiss": "Diese Meldung ausblenden",
     "needHelp": "Hilfe benötigt",
     "openMenu": "Menü öffnen",
-    "undockMenu": "Menü als Schublade anzeigen",
-    "dockMenu": "Menü offen halten",
+    "collapseMenu": "Menü einklappen",
+    "expandMenu": "Menü anzeigen",
     "signOut": "Abmelden"
   },
   "gatewayLinkUser": {

@@ -1,21 +1,21 @@
-/* Drawer mode is a per-device choice, not a per-account one: the same user
-   wants the rail docked on a wide desktop screen and out of the way on a
-   wall tablet. It therefore lives in localStorage, like the dark-mode
-   preference, and never travels to the server. */
-const SIDEBAR_DRAWER_MODE_KEY = 'sidebar-drawer-mode';
+/* Collapsing the sidebar is a per-device choice, not a per-account one: the
+   same user wants the rail expanded on a wide desktop screen and out of the
+   way on a wall tablet. It therefore lives in localStorage, like the
+   dark-mode preference, and never travels to the server. */
+const SIDEBAR_COLLAPSED_KEY = 'sidebar-collapsed';
 
-function isSidebarDrawerModeEnabled() {
+function isSidebarCollapsed() {
   try {
-    return localStorage.getItem(SIDEBAR_DRAWER_MODE_KEY) === 'true';
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
   } catch (e) {
     return false;
   }
 }
 
-function setSidebarDrawerModePreference(enabled) {
+function setSidebarCollapsedPreference(collapsed) {
   try {
-    localStorage.setItem(SIDEBAR_DRAWER_MODE_KEY, enabled ? 'true' : 'false');
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? 'true' : 'false');
   } catch (e) {}
 }
 
-export { SIDEBAR_DRAWER_MODE_KEY, isSidebarDrawerModeEnabled, setSidebarDrawerModePreference };
+export { SIDEBAR_COLLAPSED_KEY, isSidebarCollapsed, setSidebarCollapsedPreference };

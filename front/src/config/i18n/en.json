@@ -6336,8 +6336,8 @@
     "instanceUpdateNoticeDismiss": "Hide this message",
     "needHelp": "Need help",
     "openMenu": "Open the menu",
-    "undockMenu": "Turn the menu into a drawer",
-    "dockMenu": "Keep the menu open",
+    "collapseMenu": "Collapse the menu",
+    "expandMenu": "Show the menu",
     "signOut": "Sign Out"
   },
   "gatewayLinkUser": {
