@@ -236,6 +236,7 @@ const AppRouter = connect(
       showDropDown={props.showDropDown}
       closeDropDown={props.closeDropDown}
       toggleCollapsedMenu={props.toggleCollapsedMenu}
+      closeCollapsedMenu={props.closeCollapsedMenu}
       showCollapsedMenu={props.showCollapsedMenu}
       toggleSidebarDrawerMode={props.toggleSidebarDrawerMode}
       sidebarDrawerMode={props.sidebarDrawerMode}

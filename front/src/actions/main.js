@@ -67,6 +67,11 @@ function createActions(store) {
         showCollapsedMenu: !state.showCollapsedMenu
       });
     },
+    closeCollapsedMenu() {
+      store.setState({
+        showCollapsedMenu: false
+      });
+    },
     // Docked rail ⇄ off-canvas drawer, at desktop widths (below them the rail
     // is always a drawer). Undocking closes the panel: the click that asked
     // for it came from inside the open drawer.

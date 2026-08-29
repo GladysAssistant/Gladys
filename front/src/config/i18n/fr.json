@@ -6336,6 +6336,7 @@
     "instanceUpdateNoticeDismiss": "Masquer ce message",
     "needHelp": "Besoin d'aide",
     "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
     "undockMenu": "Passer le menu en mode tiroir",
     "dockMenu": "Garder le menu ouvert",
     "signOut": "Déconnexion"
