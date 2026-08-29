@@ -25,7 +25,12 @@ const actions = store => ({
   async saveApiKey(state, e) {
     e.preventDefault();
     store.setState({
-      cinemaSaveApiKeyStatus: RequestStatus.Getting
+      cinemaSaveApiKeyStatus: RequestStatus.Getting,
+      // A save attempt supersedes any stale error from the initial key load:
+      // otherwise a failed getApiKey() followed by a successful save would
+      // keep the error alert visible forever (cinemaGetApiKeyStatus is never
+      // touched by saveApiKey otherwise, so it never clears on its own).
+      cinemaGetApiKeyStatus: RequestStatus.Success
     });
     try {
       store.setState({

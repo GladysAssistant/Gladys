@@ -303,6 +303,17 @@ describe('CinemaService', () => {
     expect(discoverUrls).to.have.lengthOf(1);
     expect(discoverUrls[0]).to.include('region=FR');
   });
+  it('should ignore a well-formed but unassigned region code (ZZ)', async () => {
+    const workingAxios = buildWorkingAxios();
+    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
+    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await cinemaService.start();
+    // 'ZZ' passes a bare 2-uppercase-letter regex but isn't a real ISO
+    // 3166-1 region — the reserved "unknown territory" code.
+    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'ZZ' });
+    const [discoverUrl] = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
+    expect(discoverUrl).to.include('region=FR');
+  });
   it('should send a finite timeout on every TMDB request', async () => {
     const workingAxios = buildWorkingAxios();
     const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);

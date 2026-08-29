@@ -6,6 +6,7 @@ const { formatUpcomingMovies } = require('./lib/formatUpcomingMovies');
 const { resolveRegionalReleaseDate } = require('./lib/resolveRegionalReleaseDate');
 const { resolveTrailerUrl } = require('./lib/resolveTrailerUrl');
 const { mapWithConcurrency } = require('./lib/mapWithConcurrency');
+const { isAssignedRegion } = require('./lib/isAssignedRegion');
 const CinemaController = require('./controllers/cinema.controller');
 
 const TMDB_API_KEY = 'TMDB_API_KEY';
@@ -24,10 +25,11 @@ const ENRICH_CONCURRENCY = 5;
 // TMDB, so it's the fallback tried before giving up on either.
 const FALLBACK_OVERVIEW_LANGUAGE = 'en-US';
 // req.query.region is user-controlled and reaches both the cache key and the
-// TMDB URL unchanged. Restricting it to a real ISO 3166-1 alpha-2 code closes
-// two things at once: an unbounded/arbitrary cache key space, and a garbage
-// value leaking into the discover URL's query string.
-const REGION_PATTERN = /^[A-Z]{2}$/;
+// TMDB URL unchanged. Restricting it to an actually assigned ISO 3166-1
+// alpha-2 code (see isAssignedRegion) closes two things at once: an
+// unbounded/arbitrary cache key space, and a garbage value (including
+// well-formed-but-meaningless ones like 'ZZ'/'XX') leaking into the discover
+// URL's query string and silently returning empty/wrong regional releases.
 // Axios 1.x defaults to timeout: 0 (no timeout) — a stalled TMDB connection
 // would otherwise hang a concurrency slot (see ENRICH_CONCURRENCY) forever.
 const REQUEST_TIMEOUT_IN_MS = 10 * 1000;
@@ -173,7 +175,7 @@ module.exports = function CinemaService(gladys, serviceId) {
       throw new ServiceNotConfiguredError('TMDB API Key not found');
     }
     const language = options.language || FALLBACK_OVERVIEW_LANGUAGE;
-    const region = REGION_PATTERN.test(options.region) ? options.region : DEFAULT_REGION;
+    const region = isAssignedRegion(options.region) ? options.region : DEFAULT_REGION;
     const daysAhead = ALLOWED_DAYS_AHEAD.includes(options.daysAhead) ? options.daysAhead : DEFAULT_DAYS_AHEAD;
     const cacheKey = `upcoming:${language}:${region}:${daysAhead}`;
     return getOrCompute(cacheKey, async () => {
