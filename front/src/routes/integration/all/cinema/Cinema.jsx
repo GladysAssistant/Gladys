@@ -1,9 +1,25 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 
 const CinemaPage = ({ children, ...props }) => (
-  <IntegrationSubPageLayout title={<Text id="integration.cinema.title" />}>
+  <IntegrationSubPageLayout
+    title={<Text id="integration.cinema.title" />}
+    tabs={
+      <DeviceConfigurationLink
+        user={props.user}
+        configurationKey="integrations"
+        documentKey="cinema"
+        linkClass="hz-tab-link"
+      >
+        <i class="fe fe-book-open" />
+        <span>
+          <Text id="integration.cinema.documentation" />
+        </span>
+      </DeviceConfigurationLink>
+    }
+  >
     <div class="card">
       <div class="card-body">
         <div

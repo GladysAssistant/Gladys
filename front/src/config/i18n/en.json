@@ -3269,7 +3269,7 @@
     "menuScrollRight": "Scroll menu right",
     "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now.",
     "cinema": {
-      "title": "TMDB API",
+      "title": "TMDB",
       "description": "Display upcoming movie releases on your dashboard.",
       "introduction": "This integration helps you connect to The Movie Database (TMDB) API to get upcoming movie releases in Gladys.",
       "instructions": "You first need to create a free account on the TMDB website: <a href=\"https://www.themoviedb.org/settings/api\">https://www.themoviedb.org/settings/api</a>.",
@@ -3277,7 +3277,8 @@
       "apiKeyPlaceholder": "Enter TMDB API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a cinema box.",
-      "saveError": "Something went wrong while loading or saving your API key. Please try again."
+      "saveError": "Something went wrong while loading or saving your API key. Please try again.",
+      "documentation": "TMDB documentation"
     }
   },
   "editScene": {

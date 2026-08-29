@@ -3269,7 +3269,7 @@
     "menuScrollRight": "Menü nach rechts scrollen",
     "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden.",
     "cinema": {
-      "title": "TMDB API",
+      "title": "TMDB",
       "description": "Zeige die nächsten Kinostarts auf deinem Dashboard an.",
       "introduction": "Diese Integration hilft dir, dich mit der The Movie Database (TMDB) API zu verbinden, um kommende Kinostarts in Gladys abzurufen.",
       "instructions": "Du musst zunächst ein kostenloses Konto auf der TMDB-Website erstellen: <a href=\"https://www.themoviedb.org/settings/api\">https://www.themoviedb.org/settings/api</a>.",
@@ -3277,7 +3277,8 @@
       "apiKeyPlaceholder": "TMDB API-Schlüssel eingeben",
       "saveButton": "Speichern",
       "instructionsToUse": "Um diese Integration zu nutzen, gehe zum Dashboard und erstelle eine Kino-Box.",
-      "saveError": "Beim Laden oder Speichern deines API-Schlüssels ist ein Fehler aufgetreten. Bitte versuche es erneut."
+      "saveError": "Beim Laden oder Speichern deines API-Schlüssels ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+      "documentation": "TMDB-Dokumentation"
     }
   },
   "editScene": {
