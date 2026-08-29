@@ -76,12 +76,20 @@ const CircularGauge = ({
   const hasCurrentTemp = currentTemp !== null && currentTemp !== undefined;
   const hasHumidity = humidity !== null && humidity !== undefined;
 
+  // A stopped thermostat has no setpoint to show. The number the gauge would
+  // otherwise draw is the frost-protection fallback the server writes to stop a
+  // real device — 7 °C under a lit Off button reads as "it is aiming at 7 °C",
+  // which is the opposite of what the user asked for. The word takes its place,
+  // and the arc keeps showing where that fallback sits.
+  const isOff = mode === 'off';
+  const offLabel = a11yLabels.off || 'Off';
+
   // One sentence for a screen reader, instead of the raw SVG texts being read
   // one fragment at a time ("21", ".0", "\u00b0", "C"). The individual <text>
   // nodes are hidden from the tree for the same reason.
   const unit = `\u00b0${tempUnit || 'C'}`;
   const label = [
-    `${a11yLabels.setpoint || 'Setpoint'} ${roundedSetpoint} ${unit}`,
+    isOff ? offLabel : `${a11yLabels.setpoint || 'Setpoint'} ${roundedSetpoint} ${unit}`,
     hasCurrentTemp
       ? `${a11yLabels.currentTemp || 'Current temperature'} ${Number(currentTemp).toFixed(1)} ${unit}`
       : null,
@@ -121,7 +129,7 @@ const CircularGauge = ({
       aria-valuemin={interactive ? minTemp : undefined}
       aria-valuemax={interactive ? maxTemp : undefined}
       aria-valuenow={interactive ? roundedSetpoint : undefined}
-      aria-valuetext={interactive ? `${roundedSetpoint} ${unit}` : undefined}
+      aria-valuetext={interactive ? (isOff ? offLabel : `${roundedSetpoint} ${unit}`) : undefined}
     >
       <path class={style.gaugeArc} d={bgPath} fill="none" stroke="#e9ecef" strokeWidth={sw} strokeLinecap="round" />
       {/* The glow marks "running right now", which is just as true of a running
@@ -169,40 +177,56 @@ const CircularGauge = ({
         </text>
       )}
 
-      {/* Setpoint: integer + decimal + unit split (° above dot, C above decimal) */}
-      <text aria-hidden="true" x={intX} y={cy + 25} textAnchor="start" dominantBaseline="auto" class={style.tempMain}>
-        {intPart}
-      </text>
-      <text
-        aria-hidden="true"
-        x={suffixX - 2}
-        y={cy + 25}
-        textAnchor="start"
-        dominantBaseline="auto"
-        class={style.tempDecimal}
-      >
-        .{decPart}
-      </text>
-      <text
-        aria-hidden="true"
-        x={suffixX - 3}
-        y={cy + 4}
-        textAnchor="start"
-        dominantBaseline="auto"
-        class={style.tempUnit}
-      >
-        °
-      </text>
-      <text
-        aria-hidden="true"
-        x={suffixX + 4}
-        y={cy + 4}
-        textAnchor="start"
-        dominantBaseline="auto"
-        class={style.tempUnit}
-      >
-        {tempUnit || 'C'}
-      </text>
+      {/* Setpoint: integer + decimal + unit split (° above dot, C above decimal),
+          replaced by the word "off" when the thermostat is stopped. */}
+      {isOff ? (
+        <text aria-hidden="true" x={cx} y={cy + 18} textAnchor="middle" dominantBaseline="auto" class={style.offText}>
+          {offLabel}
+        </text>
+      ) : (
+        <g>
+          <text
+            aria-hidden="true"
+            x={intX}
+            y={cy + 25}
+            textAnchor="start"
+            dominantBaseline="auto"
+            class={style.tempMain}
+          >
+            {intPart}
+          </text>
+          <text
+            aria-hidden="true"
+            x={suffixX - 2}
+            y={cy + 25}
+            textAnchor="start"
+            dominantBaseline="auto"
+            class={style.tempDecimal}
+          >
+            .{decPart}
+          </text>
+          <text
+            aria-hidden="true"
+            x={suffixX - 3}
+            y={cy + 4}
+            textAnchor="start"
+            dominantBaseline="auto"
+            class={style.tempUnit}
+          >
+            °
+          </text>
+          <text
+            aria-hidden="true"
+            x={suffixX + 4}
+            y={cy + 4}
+            textAnchor="start"
+            dominantBaseline="auto"
+            class={style.tempUnit}
+          >
+            {tempUnit || 'C'}
+          </text>
+        </g>
+      )}
 
       {/* Active icon: at bottom of gauge */}
       {/* No icon for an open window: the icon font has no window glyph, and the

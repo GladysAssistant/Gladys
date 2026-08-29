@@ -205,6 +205,16 @@
   fill: #212529;
 }
 
+/* Shown instead of the setpoint when the thermostat is off. Smaller than the
+   number it replaces: a word set at 50px overflows the gauge in the languages
+   that spell it out ("Arrêt", "Ausgeschaltet"), and the muted grey matches the
+   arc, which goes grey in that mode too. */
+.offText {
+  font-size: 32px;
+  fill: #868e96;
+  letter-spacing: 1px;
+}
+
 .modeIcon {
   font-size: 20px !important;
 }

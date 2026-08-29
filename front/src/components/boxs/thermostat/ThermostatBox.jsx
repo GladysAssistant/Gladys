@@ -1048,7 +1048,11 @@ class ThermostatBox extends Component {
       setpoint: a11yDict.a11ySetpoint,
       currentTemp: a11yDict.a11yCurrentTemp,
       humidity: a11yDict.a11yHumidity,
-      windowOpen: configMode === 'cooling' ? a11yDict.windowOpenCooling : a11yDict.windowOpen
+      windowOpen: configMode === 'cooling' ? a11yDict.windowOpenCooling : a11yDict.windowOpen,
+      // Shown in place of the setpoint when the thermostat is off: the number
+      // the gauge would otherwise draw is the frost-protection fallback, not
+      // something the user asked for (see the gauge).
+      off: (a11yDict.preset && a11yDict.preset.off) || 'Off'
     };
     const mode = activePreset === 'off' ? 'off' : configMode;
     const presets = this.getPresets();

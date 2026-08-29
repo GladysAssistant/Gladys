@@ -62,15 +62,25 @@ class ThermostatDeviceBox extends Component {
     // while changing either stays in the edit page.
     const activeSchedule = (props.thermostatSchedules || []).find(s => s.selector === device.active_schedule);
     const scheduleName = activeSchedule ? activeSchedule.name : null;
-    const setpointFeature = (device.features || []).find(
-      f => f.category === 'thermostat' && f.type === 'target-temperature'
-    );
+    // A virtual thermostat owns its setpoint feature; an external one has none,
+    // and its setpoint lives on the real device it drives — read alongside the
+    // list and handed over as `external_setpoint_feature`. Looking for a
+    // target-temperature feature on the thermostat device itself would find
+    // nothing there, and the card would read "no setpoint" on a thermostat that
+    // has one.
+    const setpointFeature =
+      device.external_setpoint_feature ||
+      (device.features || []).find(f => f.category === 'thermostat' && f.type === 'target-temperature');
     const setpoint =
       setpointFeature && setpointFeature.last_value !== null && setpointFeature.last_value !== undefined
         ? setpointFeature.last_value
         : null;
     const unitParam = (device.params || []).find(p => p.name === 'THERMOSTAT_TEMP_UNIT');
-    const tempUnitValue = unitParam && unitParam.value ? unitParam.value : 'C';
+    // The real device declares the unit it works in, and it is the one the value
+    // read above is expressed in: a celsius thermostat pointing at a fahrenheit
+    // device would otherwise display its 70 as 70 °C.
+    const featureUnit = setpointFeature && setpointFeature.unit;
+    const tempUnitValue = featureUnit === 'fahrenheit' ? 'F' : (unitParam && unitParam.value) || 'C';
 
     return (
       <div class="col-md-6">
