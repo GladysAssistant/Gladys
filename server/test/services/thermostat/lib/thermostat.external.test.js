@@ -8,6 +8,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
+  THERMOSTAT_MODE,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
 
@@ -74,7 +75,21 @@ const targetFeature = (extra = {}) => ({
   ...extra,
 });
 
+const modeFeature = (extra = {}) => ({
+  selector: 'netatmo-mode',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+  last_value: THERMOSTAT_MODE.HEATING,
+  ...extra,
+});
+
 const regulate = async (mod, gladys, device) => mod.regulateDevice(gladys, device, todayDow, 12 * 60);
+
+// The value written on a given feature, or undefined when it was never written.
+const writtenOn = (gladys, selector) => {
+  const call = gladys.device.setValue.getCalls().find((c) => c.args[1].selector === selector);
+  return call ? call.args[2] : undefined;
+};
 
 describe('thermostat.writeExternalSetpoint', () => {
   afterEach(() => {
@@ -327,6 +342,138 @@ describe('thermostat.regulateDevice - external', () => {
       await regulate(mod, gladys, externalDevice());
 
       expect(gladys.device.setValue.firstCall.args[2]).to.equal(7);
+    });
+  });
+
+  // The frost setpoint alone leaves a real thermostat in `heating`: it stops
+  // aiming at 21 °C, but it fires again as soon as the room drops below 7 °C,
+  // and its own screen still reads "heating". Only the mode says "stop".
+  describe('mode feature', () => {
+    const withMode = (overrides = {}) => externalDevice({ THERMOSTAT_MODE_FEATURE: 'netatmo-mode', ...overrides });
+    const modeFeatures = (extra = {}) => ({
+      'netatmo-setpoint': targetFeature(),
+      'netatmo-mode': modeFeature(),
+      ...extra,
+    });
+
+    it('should switch the device off for the off preset', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: modeFeatures() });
+
+      await regulate(mod, gladys, withMode());
+
+      expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.OFF);
+      // The frost setpoint is still written: it is the fallback for the day the
+      // device is turned back on, and the only "stop" some thermostats hear.
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(7);
+    });
+
+    it('should switch the device off for a manual off hold', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: modeFeatures(),
+        variables: {
+          THERMOSTAT_NETATMO_SETPOINT_MANUAL_MODE: 'true',
+          THERMOSTAT_NETATMO_SETPOINT_MANUAL_SETPOINT: JSON.stringify({ setpoint: 23 }),
+          THERMOSTAT_NETATMO_SETPOINT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
+          THERMOSTAT_NETATMO_SETPOINT_PRESET: 'off',
+        },
+      });
+
+      await regulate(mod, gladys, withMode());
+
+      expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.OFF);
+    });
+
+    it('should switch the device off when a window opens', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: modeFeatures({ 'window-sensor': { selector: 'window-sensor', last_value: 0 } }),
+      });
+
+      await regulate(mod, gladys, withMode({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }));
+
+      expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.OFF);
+    });
+
+    // Coming back from an `off` slot, a device still switched off would take the
+    // new setpoint and do nothing with it.
+    it('should hand the mode back when a heating preset takes over', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: modeFeatures({ 'netatmo-mode': modeFeature({ last_value: THERMOSTAT_MODE.OFF }) }),
+      });
+
+      await regulate(mod, gladys, withMode());
+
+      expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.HEATING);
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(21);
+    });
+
+    it('should hand back the cooling mode on a cooling thermostat', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: modeFeatures({ 'netatmo-mode': modeFeature({ last_value: THERMOSTAT_MODE.OFF }) }),
+      });
+
+      await regulate(mod, gladys, withMode({ THERMOSTAT_MODE: 'cooling' }));
+
+      expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.COOLING);
+    });
+
+    // Like the setpoint, the mode goes through an integration that may call a
+    // cloud API on every write.
+    it('should skip a mode write when the device already carries it', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: modeFeatures() });
+
+      await regulate(mod, gladys, withMode());
+
+      expect(writtenOn(gladys, 'netatmo-mode')).to.equal(undefined);
+    });
+
+    // A heating-only thermostat declares max = 1: asking it for COOLING would be
+    // rejected by the integration.
+    it('should clamp a mode the device does not support', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: modeFeatures({
+          'netatmo-mode': modeFeature({ last_value: THERMOSTAT_MODE.OFF, max: THERMOSTAT_MODE.HEATING }),
+        }),
+      });
+
+      await regulate(mod, gladys, withMode({ THERMOSTAT_MODE: 'cooling' }));
+
+      expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.HEATING);
+    });
+
+    // Almost no integration exposes a mode feature: those thermostats keep
+    // being stopped by the frost setpoint alone.
+    it('should keep writing only the setpoint when no mode feature is configured', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: { 'netatmo-setpoint': targetFeature() } });
+
+      await regulate(mod, gladys, externalDevice());
+
+      assert.calledOnce(gladys.device.setValue);
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(7);
+    });
+
+    it('should survive a mode feature that no longer exists', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: { 'netatmo-setpoint': targetFeature() } });
+
+      await regulate(mod, gladys, withMode());
+
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(7);
+    });
+
+    it('should survive a failing mode write', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: modeFeatures() });
+      gladys.device.setValue = fake.rejects(new Error('cloud down'));
+
+      await regulate(mod, gladys, withMode());
     });
   });
 });

@@ -3328,7 +3328,7 @@
         "stateFeatureLabel": "État de chauffe (facultatif)",
         "stateFeatureHelp": "Permet d'afficher si l'appareil est en train de chauffer. Acceptée aussi bien sous forme d'état de fonctionnement que de contact de chaudière. Laissez vide si votre thermostat ne remonte pas cette information.",
         "modeFeatureLabel": "Mode de fonctionnement (facultatif)",
-        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un.",
+        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un. Gladys le bascule sur Arrêt lorsque le préréglage Arrêt s'applique, et le rétablit dès qu'une consigne reprend la main.",
         "mode": {
           "heating": "Chauffage",
           "cooling": "Climatisation"

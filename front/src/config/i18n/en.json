@@ -3328,7 +3328,7 @@
         "stateFeatureLabel": "Heating state (optional)",
         "stateFeatureHelp": "Used to show whether the device is currently running. Accepted either as an operating state or as a boiler contact. Leave empty if your thermostat does not report it.",
         "modeFeatureLabel": "Operating mode (optional)",
-        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one.",
+        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one. Gladys switches it to Off when the Off preset applies, and hands it back as soon as a setpoint takes over again.",
         "mode": {
           "heating": "Heating",
           "cooling": "Cooling"

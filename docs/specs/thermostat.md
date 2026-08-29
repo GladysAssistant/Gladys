@@ -114,17 +114,22 @@ A single `setInterval` in the service ticks every 60 s and calls `applySchedules
 
 **Order of decisions**, per device. Steps 1 to 3 are identical for both device types — that is the whole point of the design; only steps 4 and 5 differ.
 
-1. **Window open** — if a window sensor is configured and reads `0`, the pass stops after suspending the heating: the switch is cut (virtual), or the frost-protection setpoint is written (external). A `NEW_STATE` listener applies the same cut immediately, without waiting for the next tick, using device params only (no dashboard read).
+1. **Window open** — if a window sensor is configured and reads `0`, the pass stops after suspending the heating: the switch is cut (virtual), or the device is stopped (external — frost-protection setpoint, plus `OFF` on its mode feature when it has one). A `NEW_STATE` listener applies the same cut immediately, without waiting for the next tick, using device params only (no dashboard read).
 2. **Manual override** — if `THERMOSTAT_*_MANUAL_MODE` is `true` and its `_MANUAL_UNTIL` has not passed, the loop regulates on the manual setpoint. On expiry it clears the flag, broadcasts `MANUAL_MODE_UPDATED` and falls through to the schedule.
 3. **Target preset** — the active schedule's slot for the current day and minute; failing that, the current preset variable; failing that, nothing is regulated.
-4. **Setpoint** — on a virtual thermostat, saved on this service's own feature when it changed. On an external one, **written onto the real device** through the core, which routes it to the owning integration.
+4. **Setpoint** — on a virtual thermostat, saved on this service's own feature when it changed. On an external one, **written onto the real device** through the core, which routes it to the owning integration, preceded by the **mode** when the device exposes one (section C.0).
 5. **Switch** — **virtual only**, actuated only when its state differs from the computed one.
 
 ### C.0 An external thermostat stops at step 4
 
 There is no step 5, and no hysteresis or TPI computation at all: the real thermostat runs its own heuristic off the setpoint it was given, and a second control loop would fight it. This is the entire difference between the two types.
 
-`off` has no setpoint of its own, so on an external device it is expressed as the **frost-protection setpoint** — the only way to say "stop heating" that every thermostat understands, unlike a mode feature that almost none expose.
+`off` has no setpoint of its own. On an external device it is expressed two ways at once, and which one the thermostat actually obeys depends on the device:
+
+- the **frost-protection setpoint**, always written — the only way to say "stop heating" that every thermostat understands, and the value it falls back on;
+- **`THERMOSTAT_MODE.OFF` on `THERMOSTAT_MODE_FEATURE`**, when the real device exposes a mode. The setpoint alone leaves such a thermostat in `heating`: it stops aiming at 21 °C, but it fires again as soon as the room drops below 7 °C, and its own screen still reads "heating". Only the mode is a real stop.
+
+The mode is handed back to `heating` (or `cooling`, from `THERMOSTAT_MODE`) as soon as a heating preset takes over, and before the setpoint is written — a device still switched off would take the new setpoint and do nothing with it. The same applies to a manual setpoint, whether it comes from the widget dial, a scene or the device API. Like the setpoint, a mode write is skipped when the device already carries it, and clamped to the feature's `max`: a heating-only thermostat declares `max = 1` and would reject `COOLING`.
 
 Three properties of that write, each one required by a different vendor:
 
@@ -228,4 +233,3 @@ The dial bounds come from the target feature's own `min`/`max` when it declares 
 - Presets as a Gladys-wide device feature type (section B).
 - Multi-zone grouping, holiday mode, open-window *detection* by temperature drop (as opposed to a sensor).
 - **Driving a second setpoint on an external thermostat.** A reversible Matter or Zigbee device exposes a heating *and* a cooling setpoint; one `THERMOSTAT_TARGET_FEATURE` is written, and a house wanting both creates two thermostats. Additive.
-- **Writing the mode of an external thermostat.** `THERMOSTAT_MODE_FEATURE` is captured but not yet driven by the schedule: no integration publishes a mode feature today, so there is nothing to test against.

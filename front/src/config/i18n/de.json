@@ -3328,7 +3328,7 @@
         "stateFeatureLabel": "Heizzustand (optional)",
         "stateFeatureHelp": "Zeigt an, ob das Gerät gerade läuft. Wird sowohl als Betriebszustand als auch als Kesselkontakt akzeptiert. Leer lassen, wenn Ihr Thermostat diese Information nicht liefert.",
         "modeFeatureLabel": "Betriebsmodus (optional)",
-        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden.",
+        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden. Gladys schaltet ihn auf Aus, sobald die Voreinstellung Aus greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt.",
         "mode": {
           "heating": "Heizen",
           "cooling": "Kühlen"
