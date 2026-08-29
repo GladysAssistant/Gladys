@@ -1145,6 +1145,27 @@
   .stretchableBox {
     max-height: 65vh;
   }
+
+  /* The column is a width query container so media cards can turn their
+     image ratio into a height cap below: 100cqw is the column content
+     width, which is the card width (columns are padding-less on desktop).
+     Value tiles keep their own nearer size container (.adaptiveTile). */
+  .dashboardColumn {
+    container-type: inline-size;
+  }
+
+  /* A media card never stretches past its own image: capped at the ratio
+     height plus the header chrome, so a camera alone next to a taller
+     column ends with its snapshot — the background breathes below — instead
+     of filling the column with letterbox bands (forum 10737 follow-up).
+     --media-ratio (width/height) is measured on snapshot load by the camera
+     box; until known, the tiny fallback makes the calc huge and the plain
+     65vh cap wins. Capping the card, not the wrapper: the wrapper keeps
+     absorbing the column leftover invisibly, so the section grid is
+     unchanged. Non-media stretch cards never set the variable. */
+  .stretchableBox > div {
+    max-height: min(65vh, calc(100cqw / var(--media-ratio, 0.001) + 3.75rem));
+  }
 }
 
 /* On large screens a stretched value tile's height is imposed by its

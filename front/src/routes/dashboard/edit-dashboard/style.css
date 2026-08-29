@@ -355,6 +355,13 @@
     max-height: calc(65vh + 4rem);
   }
 
+  /* same media ratio cap as the viewer (.stretchableBox > div in
+     routes/dashboard/style.css): the canvas columns reuse the viewer's
+     .dashboardColumn, so 100cqw resolves against the same width there */
+  .stretchPreview .previewContent > * {
+    max-height: min(65vh, calc(100cqw / var(--media-ratio, 0.001) + 3.75rem));
+  }
+
   /* value tiles adapt their type scale to the rendered height via container
      queries: the size container is the padding-less wrapper around the
      widget, exactly like the viewer's .adaptiveTile */
