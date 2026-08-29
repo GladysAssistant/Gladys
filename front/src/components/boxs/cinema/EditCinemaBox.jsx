@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import BaseEditBox from '../baseEditBox';
 import actions from '../../../actions/dashboard/boxActions';
@@ -10,6 +10,15 @@ const EditCinemaBox = ({ ...props }) => {
   const updateDaysAhead = e => {
     props.updateBoxConfig(props.x, props.y, {
       days_ahead: Number(e.target.value)
+    });
+  };
+  const updateRegion = e => {
+    const region = e.target.value
+      .toUpperCase()
+      .replace(/[^A-Z]/g, '')
+      .slice(0, 2);
+    props.updateBoxConfig(props.x, props.y, {
+      cinema_region: region
     });
   };
   return (
@@ -30,6 +39,24 @@ const EditCinemaBox = ({ ...props }) => {
             </option>
           ))}
         </select>
+      </div>
+      <div class="form-group">
+        <label>
+          <Text id="dashboard.boxes.cinema.regionLabel" />
+        </label>
+        <Localizer>
+          <input
+            type="text"
+            class="form-control"
+            maxLength="2"
+            placeholder={<Text id="dashboard.boxes.cinema.regionPlaceholder" />}
+            value={props.box.cinema_region || ''}
+            onInput={updateRegion}
+          />
+        </Localizer>
+        <small class="form-text text-muted">
+          <Text id="dashboard.boxes.cinema.regionHelp" />
+        </small>
       </div>
     </BaseEditBox>
   );

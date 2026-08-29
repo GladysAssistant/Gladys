@@ -2,8 +2,9 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { AVAILABLE_LANGUAGES } = require('../../../utils/constants');
 
 // Gladys stores a bare 2-letter language code (en/fr/de); TMDB expects a
-// full locale. Any Gladys language not listed here (there are only 3) falls
-// back to French, matching the service's other defaults.
+// full locale. Any Gladys language not listed here (there are only 3) maps
+// to undefined, and getUpcoming's own default (English — TMDB's most
+// complete language) takes over.
 const TMDB_LANGUAGE_BY_GLADYS_LANGUAGE = {
   [AVAILABLE_LANGUAGES.EN]: 'en-US',
   [AVAILABLE_LANGUAGES.FR]: 'fr-FR',

@@ -5,12 +5,19 @@ const { ERROR_MESSAGES } = require('../../utils/constants');
 const { formatUpcomingMovies } = require('./lib/formatUpcomingMovies');
 const { resolveRegionalReleaseDate } = require('./lib/resolveRegionalReleaseDate');
 const { resolveTrailerUrl } = require('./lib/resolveTrailerUrl');
+const { mapWithConcurrency } = require('./lib/mapWithConcurrency');
 const CinemaController = require('./controllers/cinema.controller');
 
 const TMDB_API_KEY = 'TMDB_API_KEY';
 const CACHE_DURATION_IN_MS = 30 * 60 * 1000;
 const DEFAULT_DAYS_AHEAD = 30;
 const ALLOWED_DAYS_AHEAD = [15, 30, 60];
+const DEFAULT_REGION = 'FR';
+// Enriching a movie fires 1-2 extra TMDB requests (details + an occasional
+// English fallback). Firing all of them at once for a full discover page
+// (up to 20 movies) is a burst of 20-40 simultaneous HTTPS calls — a rate-
+// limit risk, and needlessly heavy on a Raspberry Pi. Small batches instead.
+const ENRICH_CONCURRENCY = 5;
 // Smaller/foreign titles are often not translated into every language on
 // TMDB yet: `overview` and the trailer can genuinely be missing for the
 // requested language. English is by far the most complete language on
@@ -18,14 +25,23 @@ const ALLOWED_DAYS_AHEAD = [15, 30, 60];
 const FALLBACK_OVERVIEW_LANGUAGE = 'en-US';
 
 /**
- * @description Format a date as TMDB expects it (YYYY-MM-DD).
+ * @description Format a date as TMDB expects it (YYYY-MM-DD), in the server's local timezone.
  * @param {Date} date - The date to format.
  * @returns {string} The formatted date.
  * @example
  * const formatted = formatDate(new Date());
  */
 function formatDate(date) {
-  return date.toISOString().slice(0, 10);
+  // Deliberately local (getFullYear/getMonth/getDate), not
+  // toISOString()/UTC: Gladys is self-hosted, so the server's OS timezone is
+  // almost always the house's own — using UTC here could drop or include a
+  // release near local midnight. A fully house-scoped timezone (like the
+  // weather service's house selector) would need this service to accept a
+  // house, which it doesn't today.
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 module.exports = function CinemaService(gladys, serviceId) {
@@ -148,8 +164,8 @@ module.exports = function CinemaService(gladys, serviceId) {
     if (!tmdbApiKey) {
       throw new ServiceNotConfiguredError('TMDB API Key not found');
     }
-    const language = options.language || 'fr-FR';
-    const region = options.region || 'FR';
+    const language = options.language || FALLBACK_OVERVIEW_LANGUAGE;
+    const region = options.region || DEFAULT_REGION;
     const daysAhead = ALLOWED_DAYS_AHEAD.includes(options.daysAhead) ? options.daysAhead : DEFAULT_DAYS_AHEAD;
     const cacheKey = `upcoming:${language}:${region}:${daysAhead}`;
     return getOrCompute(cacheKey, async () => {
@@ -170,7 +186,9 @@ module.exports = function CinemaService(gladys, serviceId) {
       try {
         const { data } = await axios.get(url);
         const candidates = formatUpcomingMovies(data);
-        const enrichedMovies = await Promise.all(candidates.map((movie) => enrichMovie(movie, language, region)));
+        const enrichedMovies = await mapWithConcurrency(candidates, ENRICH_CONCURRENCY, (movie) =>
+          enrichMovie(movie, language, region),
+        );
         return enrichedMovies
           .filter((movie) => movie.releaseDate >= todayFormatted && movie.releaseDate <= lastDayFormatted)
           .sort((a, b) => (a.releaseDate < b.releaseDate ? -1 : 1));

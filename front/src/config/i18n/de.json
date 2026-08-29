@@ -837,7 +837,10 @@
         "daysAhead60": "2 Monate",
         "viewOnTmdb": "Auf TMDB ansehen",
         "noOverview": "Keine Zusammenfassung für diesen Film verfügbar.",
-        "watchTrailer": "Trailer ansehen"
+        "watchTrailer": "Trailer ansehen",
+        "regionLabel": "Land",
+        "regionPlaceholder": "FR",
+        "regionHelp": "ISO-Ländercode für den Kinostart-Kalender (z. B. FR, US, DE, GB, BE, CH...). Standardmäßig Frankreich, wenn leer gelassen."
       }
     },
     "editDashboardBackgroundLabel": "Hintergrundstimmung",

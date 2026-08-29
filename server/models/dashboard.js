@@ -43,8 +43,15 @@ const boxSchema = Joi.object().keys({
   scenes: Joi.array().items(Joi.string()),
   // scene box: optional live status subtitle per scene button (scene selector -> device feature selector)
   scene_status_features: Joi.object().pattern(Joi.string(), Joi.string()),
-  // cinema box: how many days ahead to look for upcoming movie releases
+  // cinema box: how many days ahead to look for upcoming movie releases, and
+  // in which country's theatrical calendar (ISO 3166-1 alpha-2, ex. 'FR').
+  // Uppercase only: Joi's `.uppercase()` transform isn't applied back to the
+  // stored value here (the isEven() validator below only checks for errors,
+  // it doesn't persist the converted value), so a lowercase input would be
+  // accepted but stored mismatched — the pattern rejects it outright instead,
+  // and the editor UI always sends an uppercased value.
   days_ahead: Joi.number().valid(15, 30, 60),
+  cinema_region: Joi.string().pattern(/^[A-Z]{2}$/),
   humidity_use_custom_value: Joi.boolean(),
   humidity_min: Joi.number(),
   humidity_max: Joi.number(),

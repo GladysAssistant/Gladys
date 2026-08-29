@@ -837,7 +837,10 @@
         "daysAhead60": "2 mois",
         "viewOnTmdb": "Voir sur TMDB",
         "noOverview": "Aucun résumé disponible pour ce film.",
-        "watchTrailer": "Voir la bande-annonce"
+        "watchTrailer": "Voir la bande-annonce",
+        "regionLabel": "Pays",
+        "regionPlaceholder": "FR",
+        "regionHelp": "Code pays ISO pour le calendrier des sorties en salle (ex : FR, US, DE, GB, BE, CH...). France par défaut si laissé vide."
       }
     },
     "editDashboardBackgroundLabel": "Ambiance de fond",

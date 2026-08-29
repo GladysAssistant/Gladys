@@ -219,7 +219,7 @@ describe('CinemaService', () => {
     const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
     const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     expect(movies.map((movie) => ({ id: movie.id, releaseDate: movie.releaseDate }))).to.deep.equal([
       { id: 1002, releaseDate: '2026-06-10' },
       { id: 2001, releaseDate: '2026-06-12' },
@@ -235,7 +235,7 @@ describe('CinemaService', () => {
     const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
     const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     const fallbackMovie = movies.find((movie) => movie.id === 1004);
     expect(fallbackMovie.releaseDate).to.equal('2026-06-15');
   });
@@ -243,7 +243,7 @@ describe('CinemaService', () => {
     const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
     const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     const movie = movies.find((m) => m.id === 2001);
     expect(movie.overview).to.equal('English summary for 2001');
   });
@@ -251,9 +251,40 @@ describe('CinemaService', () => {
     const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
     const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     const movie = movies.find((m) => m.id === 2002);
     expect(movie.overview).to.equal('');
+  });
+  it('should default the language to English when none is given (TMDB is most complete in English)', async () => {
+    const workingAxios = buildWorkingAxios();
+    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
+    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await cinemaService.start();
+    await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const [discoverUrl] = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
+    expect(discoverUrl).to.include('language=en-US');
+  });
+  it('should default the region to France when none is given', async () => {
+    const workingAxios = buildWorkingAxios();
+    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
+    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await cinemaService.start();
+    await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const [discoverUrl] = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
+    expect(discoverUrl).to.include('region=FR');
+  });
+  it('should use the given region in the TMDB request and in the cache key', async () => {
+    const workingAxios = buildWorkingAxios();
+    const CinemaService = proxyquire('../../../services/cinema/index', workingAxios);
+    const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await cinemaService.start();
+    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'US' });
+    const [discoverUrl] = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
+    expect(discoverUrl).to.include('region=US');
+    const urlsAfterFirstCall = workingAxios.getUrls().length;
+    // A different region is a cache miss, even with the same daysAhead.
+    await cinemaService.movies.getUpcoming({ daysAhead: 30, region: 'FR' });
+    expect(workingAxios.getUrls().length).to.be.greaterThan(urlsAfterFirstCall);
   });
   it('should not request an English fallback when the requested language already is English', async () => {
     const workingAxios = buildWorkingAxios();
@@ -281,7 +312,7 @@ describe('CinemaService', () => {
     const CinemaService = proxyquire('../../../services/cinema/index', flaky);
     const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     // 1001's details lookup failed: it falls back to its (out-of-window)
     // discover-provided date and is filtered out, but the request still succeeds.
     expect(movies.map((movie) => movie.id)).to.deep.equal([1002, 2001, 2002, 3001, 1004, 3002, 3003]);
@@ -290,7 +321,7 @@ describe('CinemaService', () => {
     const CinemaService = proxyquire('../../../services/cinema/index', buildWorkingAxios());
     const cinemaService = CinemaService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await cinemaService.start();
-    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30 });
+    const movies = await cinemaService.movies.getUpcoming({ daysAhead: 30, language: 'fr-FR' });
     const findMovie = (id) => movies.find((movie) => movie.id === id);
     expect(findMovie(3001).trailerUrl).to.equal('https://www.youtube.com/watch?v=fr-trailer-3001');
     expect(findMovie(3002).trailerUrl).to.equal('https://www.youtube.com/watch?v=en-trailer-3002');

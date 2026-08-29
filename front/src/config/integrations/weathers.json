@@ -6,5 +6,11 @@
     "cloud": true,
     "deprecated": true,
     "categories": ["environment"]
+  },
+  {
+    "key": "cinema",
+    "img": "/assets/integrations/cover/cinema.jpg",
+    "cloud": true,
+    "categories": ["multimedia"]
   }
 ]

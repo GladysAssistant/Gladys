@@ -59,7 +59,7 @@ const SkeletonGrid = () => (
   </div>
 );
 
-const MovieDetailModal = ({ movie, onClose }) => (
+const MovieDetailModal = ({ movie, userLanguage, onClose }) => (
   <Modal title={movie.title} onClose={onClose}>
     <div class="card-body">
       <div class={style.detailLayout}>
@@ -67,7 +67,13 @@ const MovieDetailModal = ({ movie, onClose }) => (
           <MoviePoster movie={movie} sizeStyle="width: 100%; aspect-ratio: 2 / 3;" />
         </div>
         <div style="min-width: 0">
-          {movie.releaseDate && <div class="text-muted mb-2">{dayjs(movie.releaseDate).format('D MMMM YYYY')}</div>}
+          {movie.releaseDate && (
+            <div class="text-muted mb-2">
+              {dayjs(movie.releaseDate)
+                .locale(userLanguage)
+                .format('D MMMM YYYY')}
+            </div>
+          )}
           {movie.overview ? (
             <p>{movie.overview}</p>
           ) : (
@@ -97,12 +103,25 @@ const MovieDetailModal = ({ movie, onClose }) => (
   </Modal>
 );
 
-const CinemaBox = ({ movies, loading, error, selectedMovie, onSelectMovie, onCloseDetail }) => {
+const CinemaBox = ({
+  movies,
+  loading,
+  error,
+  userLanguage: rawUserLanguage,
+  selectedMovie,
+  onSelectMovie,
+  onCloseDetail
+}) => {
+  // dayjs().locale() with no truthy argument is a GETTER (returns the locale
+  // name string, not a chainable instance): a real fallback is required, not
+  // just an `undefined` pass-through, or `.format()` would crash on it —
+  // guards the brief moment before the `user` global state is loaded.
+  const userLanguage = rawUserLanguage || 'en';
   if (error === ERROR_MESSAGES.SERVICE_NOT_CONFIGURED) {
     return (
       <ErrorCard messageId="dashboard.boxes.cinema.serviceNotConfigured">
         {' '}
-        <Link href="/dashboard/integration/movies/cinema">
+        <Link href="/dashboard/integration/weather/cinema">
           <Text id="dashboard.boxes.cinema.clickHere" />
         </Link>
       </ErrorCard>
@@ -144,7 +163,9 @@ const CinemaBox = ({ movies, loading, error, selectedMovie, onSelectMovie, onClo
                     </div>
                     {movie.releaseDate && (
                       <div class="text-muted" style="font-size: 11px">
-                        {dayjs(movie.releaseDate).format('D MMMM')}
+                        {dayjs(movie.releaseDate)
+                          .locale(userLanguage)
+                          .format('D MMMM')}
                       </div>
                     )}
                   </button>
@@ -154,7 +175,7 @@ const CinemaBox = ({ movies, loading, error, selectedMovie, onSelectMovie, onClo
           )}
         </div>
       </div>
-      {selectedMovie && <MovieDetailModal movie={selectedMovie} onClose={onCloseDetail} />}
+      {selectedMovie && <MovieDetailModal movie={selectedMovie} userLanguage={userLanguage} onClose={onCloseDetail} />}
     </>
   );
 };
@@ -163,8 +184,17 @@ class CinemaBoxComponent extends Component {
   refreshData = async () => {
     try {
       await this.setState(prevState => ({ error: false, loading: !prevState.movies }));
-      const daysAheadParams = this.props.box.days_ahead ? { daysAhead: this.props.box.days_ahead } : undefined;
-      const movies = await this.props.httpClient.get('/api/v1/service/cinema/movies/upcoming', daysAheadParams);
+      const params = {};
+      if (this.props.box.days_ahead) {
+        params.daysAhead = this.props.box.days_ahead;
+      }
+      if (this.props.box.cinema_region) {
+        params.region = this.props.box.cinema_region;
+      }
+      const movies = await this.props.httpClient.get(
+        '/api/v1/service/cinema/movies/upcoming',
+        Object.keys(params).length > 0 ? params : undefined
+      );
       this.setState({ movies, loading: false, error: false });
     } catch (e) {
       const responseMessage = e && e.response && e.response.data && e.response.data.message;
@@ -186,7 +216,10 @@ class CinemaBoxComponent extends Component {
   }
 
   componentDidUpdate(previousProps) {
-    if (previousProps.box.days_ahead !== this.props.box.days_ahead) {
+    if (
+      previousProps.box.days_ahead !== this.props.box.days_ahead ||
+      previousProps.box.cinema_region !== this.props.box.cinema_region
+    ) {
       this.refreshData();
     }
   }
@@ -200,12 +233,13 @@ class CinemaBoxComponent extends Component {
     this.state = { loading: true, error: false, selectedMovie: null };
   }
 
-  render({}, { movies, loading, error, selectedMovie }) {
+  render({ user }, { movies, loading, error, selectedMovie }) {
     return (
       <CinemaBox
         movies={movies}
         loading={loading}
         error={error}
+        userLanguage={user && user.language}
         selectedMovie={selectedMovie}
         onSelectMovie={this.selectMovie}
         onCloseDetail={this.closeDetail}
@@ -214,4 +248,4 @@ class CinemaBoxComponent extends Component {
   }
 }
 
-export default connect('httpClient', {})(CinemaBoxComponent);
+export default connect('httpClient,user', {})(CinemaBoxComponent);

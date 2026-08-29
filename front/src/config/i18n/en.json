@@ -837,7 +837,10 @@
         "daysAhead60": "2 months",
         "viewOnTmdb": "View on TMDB",
         "noOverview": "No summary available for this movie.",
-        "watchTrailer": "Watch trailer"
+        "watchTrailer": "Watch trailer",
+        "regionLabel": "Country",
+        "regionPlaceholder": "FR",
+        "regionHelp": "ISO country code for the theatrical release calendar (e.g. FR, US, DE, GB, BE, CH...). Defaults to France if left empty."
       }
     },
     "editDashboardBackgroundLabel": "Background mood",
