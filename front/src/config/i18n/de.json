@@ -825,13 +825,13 @@
         "error": "Das Bild konnte nicht geladen werden."
       },
       "premieres": {
-        "description": "Diese Box zeigt die nächsten Kinostarts.",
+        "description": "Diese Box zeigt die nächsten Veröffentlichungen.",
         "serviceNotConfigured": "Es ist kein Film-Dienst konfiguriert. Gehe zum Tab \"Integrationen\" und konfiguriere eine Film-Integration (TMDB oder eine Film-Integration aus dem Store).",
         "clickHere": "Klicke hier, um zu den Film-Integrationen zu gelangen.",
         "requestToThirdPartyFailed": "Beim Abrufen der Filmdaten ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
         "unknownError": "Ein unbekannter Fehler ist aufgetreten.",
         "noUpcomingMovies": "Keine kommenden Kinostarts gefunden.",
-        "editProviderLabel": "Filmanbieter:",
+        "editProviderLabel": "Anbieter:",
         "providerAuto": "Automatisch (erster verfügbarer Anbieter)",
         "providerInternalTmdb": "Internes TMDB",
         "daysAheadLabel": "Zeitraum",

@@ -825,13 +825,13 @@
         "error": "L'image n'a pas pu être chargée."
       },
       "premieres": {
-        "description": "Cette box affiche les prochaines sorties de films au cinéma.",
+        "description": "Cette box affiche les prochaines sorties.",
         "serviceNotConfigured": "Aucun service de films n'est configuré. Veuillez accéder à l'onglet «Intégrations» et configurer une intégration de films (TMDB, ou une intégration de films du store).",
         "clickHere": "Cliquez ici pour accéder aux intégrations de films.",
         "requestToThirdPartyFailed": "Une erreur est survenue lors de la récupération des films, merci de réessayer plus tard.",
         "unknownError": "Une erreur inconnue est survenue.",
         "noUpcomingMovies": "Aucune sortie de film à venir trouvée.",
-        "editProviderLabel": "Fournisseur de films :",
+        "editProviderLabel": "Fournisseur :",
         "providerAuto": "Automatique (premier fournisseur disponible)",
         "providerInternalTmdb": "TMDB interne",
         "daysAheadLabel": "Période",

@@ -825,13 +825,13 @@
         "error": "The image could not be loaded."
       },
       "premieres": {
-        "description": "This box shows upcoming movie releases.",
+        "description": "This box shows upcoming releases.",
         "serviceNotConfigured": "No movie service is configured. Please go to the 'Integrations' tab and configure a movie integration (TMDB, or a movie integration from the store).",
         "clickHere": "Click here to access the movie integrations.",
         "requestToThirdPartyFailed": "An error occurred while fetching movie data. Please retry later.",
         "unknownError": "An unknown error occurred.",
         "noUpcomingMovies": "No upcoming movies found.",
-        "editProviderLabel": "Movie provider:",
+        "editProviderLabel": "Provider:",
         "providerAuto": "Automatic (first available provider)",
         "providerInternalTmdb": "Internal TMDB",
         "daysAheadLabel": "Time window",
