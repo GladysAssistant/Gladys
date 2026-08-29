@@ -327,7 +327,7 @@
    the viewer's .stretchableBox > div > img/.dimmer rules, one wrapper deeper */
 .stretchPreview .previewContent > * > img {
   flex: 1 1 auto;
-  object-fit: cover;
+  object-fit: contain;
   min-height: 0;
 }
 

@@ -1097,9 +1097,13 @@
   min-height: 0;
 }
 
+/* contain, not cover: the snapshot is a camera view, so cropping is losing
+   information — covered by a tall stretch, a 16:9 frame was reduced to a
+   vertical slice of its center ("zoom tronqué", forum 10737). The full frame
+   letterboxed on the card is the acceptable cost of equal column heights. */
 .stretchableBox > div > img {
   flex: 1 1 auto;
-  object-fit: cover;
+  object-fit: contain;
   min-height: 0;
 }
 

@@ -9,6 +9,39 @@
   height: auto;
 }
 
+/* Stretched at the bottom of a desktop column, the wrapper caps the card at
+   65vh (.stretchableBox in routes/dashboard/style.css) — but only the card
+   shrank: the illustration kept its width-driven natural height and bled out
+   of the card top and bottom, covering the header and the neighbors (forum
+   10737). Bound the image by the cap itself, minus the card chrome (header
+   ≈ 3.5rem + card-body p-3 = 2rem), so the card always wraps it. The image
+   then no longer always spans the card width, so the wrapper shrink-wraps it
+   (fit-content + the centering flex body): the pins are positioned in % of
+   the wrapper and stay glued to the same points of the illustration.
+   Desktop only, like stretch: below the breakpoint columns stack and the
+   image keeps its natural full-width render. */
+@media (min-width: 992px) {
+  :global(.dashboard-stretched-tile) .cardBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  :global(.dashboard-stretched-tile) .imageWrapper {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  :global(.dashboard-stretched-tile) .image {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: calc(65vh - 6rem);
+  }
+}
+
 .pin {
   position: absolute;
   transform: translate(-50%, -50%);
