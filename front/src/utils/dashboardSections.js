@@ -27,7 +27,13 @@ export const getSectionWidths = section =>
 // because their height is fixed by the chart library options.
 // Media boxes stretch by letting their image absorb the extra height,
 // tile boxes stretch by vertically centering their content in the card.
-const MEDIA_STRETCH_BOX_TYPES = [DASHBOARD_BOX_TYPE.CAMERA, DASHBOARD_BOX_TYPE.PHOTO];
+// The camera is deliberately NOT stretchable (forum 10737): a snapshot is
+// information at a fixed aspect ratio, and every way of stretching its card
+// was rejected in field testing — cover cropped the view, contain padded it
+// with letterbox bands, and capping the card at the image ratio left the
+// absorbed leftover as holes between the widgets of the column. A camera
+// card keeps its natural height; the column simply ends earlier.
+const MEDIA_STRETCH_BOX_TYPES = [DASHBOARD_BOX_TYPE.PHOTO];
 const TILE_STRETCH_BOX_TYPES = [
   DASHBOARD_BOX_TYPE.TEMPERATURE_IN_ROOM,
   DASHBOARD_BOX_TYPE.HUMIDITY_IN_ROOM,

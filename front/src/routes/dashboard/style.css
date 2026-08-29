@@ -1097,38 +1097,6 @@
   min-height: 0;
 }
 
-/* contain, not cover: the snapshot is a camera view, so cropping is losing
-   information — covered by a tall stretch, a 16:9 frame was reduced to a
-   vertical slice of its center ("zoom tronqué", forum 10737). The full frame
-   letterboxed on the card is the acceptable cost of equal column heights,
-   and the dark background paints the letterbox bands as deliberate video
-   bands (same color as the photo widget's contain mode) instead of holes of
-   glass in the card. */
-.stretchableBox > div > img {
-  flex: 1 1 auto;
-  object-fit: contain;
-  min-height: 0;
-  background-color: #1a1a2e;
-}
-
-/* the media region of a camera card (live dimmer, error placeholder) absorbs
-   the stretch too — otherwise a camera without image stretches into a blank
-   white void under its header */
-.stretchableBox > div > :global(.dimmer) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.stretchableBox > div > :global(.dimmer) > :global(.dimmer-content) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-}
-
 /* Tile boxes (room temperature/humidity) center their content in the
    extra height instead of leaving it under the card */
 .stretchableTile > div {
@@ -1144,27 +1112,6 @@
 @media (min-width: 992px) {
   .stretchableBox {
     max-height: 65vh;
-  }
-
-  /* The column is a width query container so media cards can turn their
-     image ratio into a height cap below: 100cqw is the column content
-     width, which is the card width (columns are padding-less on desktop).
-     Value tiles keep their own nearer size container (.adaptiveTile). */
-  .dashboardColumn {
-    container-type: inline-size;
-  }
-
-  /* A media card never stretches past its own image: capped at the ratio
-     height plus the header chrome, so a camera alone next to a taller
-     column ends with its snapshot — the background breathes below — instead
-     of filling the column with letterbox bands (forum 10737 follow-up).
-     --media-ratio (width/height) is measured on snapshot load by the camera
-     box; until known, the tiny fallback makes the calc huge and the plain
-     65vh cap wins. Capping the card, not the wrapper: the wrapper keeps
-     absorbing the column leftover invisibly, so the section grid is
-     unchanged. Non-media stretch cards never set the variable. */
-  .stretchableBox > div {
-    max-height: min(65vh, calc(100cqw / var(--media-ratio, 0.001) + 3.75rem));
   }
 }
 

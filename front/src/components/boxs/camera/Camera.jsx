@@ -64,10 +64,9 @@ class CameraBoxComponent extends Component {
     const requestId = this.deviceRequestId;
     // Everything displayed belongs to the camera we are leaving, image included: it must not
     // stay on screen while the new one loads, and a disabled new camera must show its
-    // placeholder rather than the last frame of the previous one. The measured ratio goes
-    // with it: the new camera may not frame in the same aspect.
+    // placeholder rather than the last frame of the previous one.
     if (!keepCurrentView) {
-      this.setState({ device: null, cameraDisabled: false, image: null, error: false, mediaRatio: null });
+      this.setState({ device: null, cameraDisabled: false, image: null, error: false });
     }
     if (!cameraSelector) {
       return null;
@@ -189,20 +188,6 @@ class CameraBoxComponent extends Component {
         image: payload.last_value_string,
         error: false
       });
-    }
-  };
-
-  // The snapshot's width/height ratio caps how far the stretched card may grow (the
-  // --media-ratio custom property, see routes/dashboard/style.css): a camera card then ends
-  // with its image instead of filling a tall column with letterbox bands. Snapshots are
-  // raster images, so the natural size is always readable here.
-  handleImageLoad = event => {
-    const { naturalWidth, naturalHeight } = event.target;
-    if (naturalWidth > 0 && naturalHeight > 0) {
-      const mediaRatio = naturalWidth / naturalHeight;
-      if (mediaRatio !== this.state.mediaRatio) {
-        this.setState({ mediaRatio });
-      }
     }
   };
 
@@ -465,13 +450,9 @@ class CameraBoxComponent extends Component {
       liveNotSupportedBrowser,
       liveTooManyRequestsError,
       upgradeGladysPlusPlanRequired,
-      cameraDisabled,
-      mediaRatio
+      cameraDisabled
     }
   ) {
-    // Threads the measured snapshot ratio to the dashboard stylesheet; also set on the live
-    // card (the stream frames like the snapshot) so starting the live does not regrow the card.
-    const mediaRatioStyle = mediaRatio ? `--media-ratio: ${mediaRatio}` : undefined;
     // A disabled camera shows a clear placeholder: no image (not even the last one received
     // before it was turned off) and no way to start a live stream.
     if (cameraDisabled) {
@@ -496,7 +477,7 @@ class CameraBoxComponent extends Component {
     const ptzControls = streaming ? this.renderPtzControls() : null;
     if (streaming) {
       return (
-        <div class="card" style={mediaRatioStyle}>
+        <div class="card">
           <div
             class={cx('dimmer card-img-top', {
               active: loading
@@ -520,8 +501,8 @@ class CameraBoxComponent extends Component {
       );
     }
     return (
-      <div class="card" style={mediaRatioStyle}>
-        {image && <img class="card-img-top" src={`data:${image}`} alt={props.roomName} onLoad={this.handleImageLoad} />}
+      <div class="card">
+        {image && <img class="card-img-top" src={`data:${image}`} alt={props.roomName} />}
         {error && (
           <div class={style.noImagePlaceholder}>
             <span class={style.noImageIcon}>

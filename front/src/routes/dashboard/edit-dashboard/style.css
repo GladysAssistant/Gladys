@@ -323,43 +323,12 @@
   justify-content: center;
 }
 
-/* media boxes stretch by letting their image absorb the extra height —
-   the viewer's .stretchableBox > div > img/.dimmer rules, one wrapper deeper */
-.stretchPreview .previewContent > * > img {
-  flex: 1 1 auto;
-  object-fit: contain;
-  min-height: 0;
-  background-color: #1a1a2e;
-}
-
-.stretchPreview .previewContent > * > :global(.dimmer) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.stretchPreview .previewContent > * > :global(.dimmer) > :global(.dimmer-content) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-}
-
 /* Same caps as the viewer, shifted by the edit chrome (toolbar + the "+"
    slot ≈ 4rem): the widget card ends up at the viewer's size. Desktop only —
    below the breakpoint columns stack and heights are natural. */
 @media (min-width: 992px) {
   .stretchPreview {
     max-height: calc(65vh + 4rem);
-  }
-
-  /* same media ratio cap as the viewer (.stretchableBox > div in
-     routes/dashboard/style.css): the canvas columns reuse the viewer's
-     .dashboardColumn, so 100cqw resolves against the same width there */
-  .stretchPreview .previewContent > * {
-    max-height: min(65vh, calc(100cqw / var(--media-ratio, 0.001) + 3.75rem));
   }
 
   /* value tiles adapt their type scale to the rendered height via container
