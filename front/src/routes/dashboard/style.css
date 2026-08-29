@@ -1097,30 +1097,6 @@
   min-height: 0;
 }
 
-.stretchableBox > div > img {
-  flex: 1 1 auto;
-  object-fit: cover;
-  min-height: 0;
-}
-
-/* the media region of a camera card (live dimmer, error placeholder) absorbs
-   the stretch too — otherwise a camera without image stretches into a blank
-   white void under its header */
-.stretchableBox > div > :global(.dimmer) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.stretchableBox > div > :global(.dimmer) > :global(.dimmer-content) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-}
-
 /* Tile boxes (room temperature/humidity) center their content in the
    extra height instead of leaving it under the card */
 .stretchableTile > div {

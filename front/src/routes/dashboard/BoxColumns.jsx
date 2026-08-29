@@ -48,9 +48,12 @@ const BoxColumns = ({ children, ...props }) => {
                           class={cx(style.stretchableBox, {
                             [style.stretchableTile]: isTileStretchBox(box),
                             [style.adaptiveTile]: isValueTileBox(box),
-                            // global marker so media widgets can make their image
-                            // fill the stretched card from their own stylesheet
-                            'dashboard-stretched-media': !isTileStretchBox(box)
+                            // global markers so widgets can adapt their content to
+                            // the stretched card from their own stylesheet: media
+                            // widgets make their image fill it, tile widgets (the
+                            // house view) fit their illustration inside its cap
+                            'dashboard-stretched-media': !isTileStretchBox(box),
+                            'dashboard-stretched-tile': isTileStretchBox(box)
                           })}
                         >
                           <Box box={box} x={x} y={y} />
