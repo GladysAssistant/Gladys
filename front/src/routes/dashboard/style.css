@@ -1323,30 +1323,95 @@
   border-radius: 4px;
 }
 
-/* An auto-layout table sizes a column to its widest unbreakable word, and a
-   device name is very often one long token (`Volet_chambre_parentale`). That
-   minimum pushed the whole table past the card, and .table-responsive put the
-   row under a horizontal scrollbar — on a phone, and on desktop too as soon as
-   the dashboard column was narrow. `max-width: 0` takes the name column out of
-   that minimum so it can shrink and ellipsize instead, and `width: 50%` keeps
-   it the half of the row it used to get, leaving the controls the width they
-   ask for. It also unblocks the adaptive option controls (acAdaptiveControls):
-   they collapse to dropdowns while the card overflows, so a name that
-   overflowed whatever they did turned every button group of the card into a
-   dropdown for nothing. */
+/* Each widget row becomes an independent flex row (the <tr>/<td> markup of
+   the 25+ feature components stays untouched). As a real table, the three
+   columns were SHARED by every row of the card: one wide control (a shutter
+   button group, a setpoint capsule) claimed that width for the whole control
+   column, and every name of the card was crushed against it — the truncated
+   MQTT names of the community report ("noms d'appareils MQTT tronqués sur
+   mobile"), while narrow rows showed a large dead gap. Flex frees each row
+   to split itself: the control keeps exactly its natural width, the name
+   gets every remaining pixel of ITS row, and instead of a nowrap ellipsis
+   it WRAPS on several lines like the scene rows (overflow-wrap: anywhere
+   breaks even single-token names). The adaptive option controls
+   (acAdaptiveControls) still collapse to dropdowns on real overflow: a
+   control cell never shrinks, so an oversized button group still overflows
+   the .table-responsive box, which is what the coordinator measures. */
+:global(.glass-theme .device-widget-table),
+:global(.glass-theme .device-widget-table tbody) {
+  display: block;
+}
+
+:global(.glass-theme .device-widget-table tr) {
+  display: flex;
+  /* stretch (default): the three cells paint one equal-height pill */
+}
+
+:global(.glass-theme .device-widget-table tr + tr) {
+  margin-top: 8px;
+}
+
+/* the width: 1% of the shared table sizing would crush the icon cell now
+   that width feeds flex-basis */
+:global(.glass-theme .device-widget-table tr td:first-child) {
+  flex: 0 0 auto;
+  width: auto;
+  display: flex;
+  align-items: center;
+}
+
+/* Column flex, not block: the light row stacks two divs (name + summary)
+   in this cell; plain text rows put their text in an anonymous item. */
 :global(.glass-theme .device-widget-table tr td:nth-child(2)) {
-  max-width: 0;
-  width: 50%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-wrap: anywhere;
+}
+
+/* The control never grows past its natural width, and never wraps: nowrap
+   makes the natural width of a switch, stepper or button group its flex
+   minimum too, so those keep their designed size and hit area whatever the
+   name's length. shrink: 1 (not 0) matters for the one elastic control, the
+   slider: its track can give width back to a long name down to the
+   .rangeInput min-width floor, instead of imposing its full track on a
+   narrow card. */
+:global(.glass-theme .device-widget-table tr td:last-child) {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   white-space: nowrap;
 }
 
-/* the light row splits its name cell in two lines (name + live summary) */
-:global(.glass-theme .device-widget-table tr td:nth-child(2) > div) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* The dropdown fallback of the adaptive controls is a select.form-control,
+   whose framework width: 100% resolves against a shrinkable flex cell: a
+   long name could crush it to its arrow. Intrinsic width, floored so the
+   current value stays readable, capped so one long option label does not
+   hand the select the row. */
+:global(.glass-theme .device-widget-table td select.form-control) {
+  width: auto;
+  min-width: 4.5rem;
+  max-width: 9rem;
+}
+
+/* The slider row (MultiLevelDeviceFeature) wraps its control in a Bootstrap
+   .col: its 15px grid gutters are 30px of dead width taken from the name. */
+:global(.glass-theme .device-widget-table td .col) {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* The "no recent value" badge is the exception to nowrap: folded on two
+   balanced lines (forum suggestion) it stops stealing half the row from
+   the name next to it. */
+:global(.glass-theme .device-widget-table .no-recent-value-badge) {
+  white-space: normal;
+  max-width: 7rem;
+  line-height: 1.25;
+  text-align: center;
 }
 
 /* Structural rows are not feature pills: ColorDeviceFeature always renders
@@ -1357,6 +1422,10 @@
   border: none;
   border-radius: 0;
   padding: 0;
+  /* in the flex rows of the widget (see below) this lone cell is both
+     first and last child: it must span its whole row, not shrink-to-fit */
+  flex: 1 1 auto;
+  width: 100%;
 }
 
 /* ============================================================
