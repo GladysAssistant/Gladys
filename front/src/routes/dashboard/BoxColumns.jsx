@@ -1,7 +1,12 @@
 import Box from './Box';
 import cx from 'classnames';
 import style from './style.css';
-import { canBoxStretchAt, getSectionWidths, isTileStretchBox, isValueTileBox } from '../../utils/dashboardSections';
+import {
+  canBoxStretchInColumn,
+  getSectionWidths,
+  isTileStretchBox,
+  isValueTileBox
+} from '../../utils/dashboardSections';
 
 const BoxColumns = ({ children, ...props }) => {
   let columnOffset = 0;
@@ -42,15 +47,18 @@ const BoxColumns = ({ children, ...props }) => {
                     style={`--column-width: ${((widths[columnIndex] / totalWeight) * 100).toFixed(4)}%`}
                   >
                     {column.map((box, y) =>
-                      canBoxStretchAt(box, y === column.length - 1) ? (
+                      canBoxStretchInColumn(box, column, y === column.length - 1) ? (
                         <div
                           key={`${props.homeDashboard.id}-${x}-${y}`}
                           class={cx(style.stretchableBox, {
                             [style.stretchableTile]: isTileStretchBox(box),
                             [style.adaptiveTile]: isValueTileBox(box),
-                            // global marker so media widgets can make their image
-                            // fill the stretched card from their own stylesheet
-                            'dashboard-stretched-media': !isTileStretchBox(box)
+                            // global markers so widgets can adapt their content to
+                            // the stretched card from their own stylesheet: media
+                            // widgets make their image fill it, tile widgets (the
+                            // house view) fit their illustration inside its cap
+                            'dashboard-stretched-media': !isTileStretchBox(box),
+                            'dashboard-stretched-tile': isTileStretchBox(box)
                           })}
                         >
                           <Box box={box} x={x} y={y} />
