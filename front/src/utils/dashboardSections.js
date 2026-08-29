@@ -65,6 +65,22 @@ const VALUE_TILE_BOX_TYPES = [DASHBOARD_BOX_TYPE.TEMPERATURE_IN_ROOM, DASHBOARD_
 
 export const isValueTileBox = box => box && VALUE_TILE_BOX_TYPES.includes(box.type);
 
+// Whether the box absorbs leftover column height, given the whole column.
+// Value tiles share leftover height only in all-tile columns — the design's
+// target: a row or stack of tiles equalizing with its neighbors (A.4). In a
+// MIXED column (tiles above device lists, forum 10753) the tile kept
+// absorbing too, but whether that absorption crosses the big-tile threshold
+// hangs on the exact height balance of the section's columns — a balance the
+// editor canvas cannot reproduce, since every widget wears ~4rem of edit
+// chrome there and a column's height is therefore shifted by its widget
+// count: the tile validated compact on the canvas came out as a big tile on
+// the dashboard. Reserving the sharing for all-tile columns turns the
+// decision into a structural one that the canvas applies identically without
+// measuring anything: in a mixed column the tile keeps the compact card the
+// editor showed and the column simply ends earlier, per the cap principle.
+export const canBoxStretchInColumn = (box, column, isLastInColumn) =>
+  canBoxStretchAt(box, isLastInColumn) && (!isValueTileBox(box) || column.every(isValueTileBox));
+
 // The editor works on a flat list of columns (so drag & drop coordinates stay
 // global) plus the number of columns of each section. Column widths flatten
 // the same way, into one weight per global column index.

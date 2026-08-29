@@ -1,7 +1,12 @@
 import Box from './Box';
 import cx from 'classnames';
 import style from './style.css';
-import { canBoxStretchAt, getSectionWidths, isTileStretchBox, isValueTileBox } from '../../utils/dashboardSections';
+import {
+  canBoxStretchInColumn,
+  getSectionWidths,
+  isTileStretchBox,
+  isValueTileBox
+} from '../../utils/dashboardSections';
 
 const BoxColumns = ({ children, ...props }) => {
   let columnOffset = 0;
@@ -42,7 +47,7 @@ const BoxColumns = ({ children, ...props }) => {
                     style={`--column-width: ${((widths[columnIndex] / totalWeight) * 100).toFixed(4)}%`}
                   >
                     {column.map((box, y) =>
-                      canBoxStretchAt(box, y === column.length - 1) ? (
+                      canBoxStretchInColumn(box, column, y === column.length - 1) ? (
                         <div
                           key={`${props.homeDashboard.id}-${x}-${y}`}
                           class={cx(style.stretchableBox, {

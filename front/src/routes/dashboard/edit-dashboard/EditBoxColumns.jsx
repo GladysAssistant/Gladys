@@ -7,7 +7,7 @@ import EmptyColumnDropZone from './EmptyColumnDropZone';
 import {
   DEFAULT_COLUMN_WIDTH,
   WIDE_COLUMN_WIDTH,
-  canBoxStretchAt,
+  canBoxStretchInColumn,
   getSectionOffsets,
   isTileStretchBox,
   isValueTileBox,
@@ -201,7 +201,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                             // preview the viewer's vertical stretch (see
                             // .stretchPreview): a stretchable widget absorbs
                             // the free height of its column on the canvas too
-                            const stretch = canBoxStretchAt(box, y === column.length - 1);
+                            const stretch = canBoxStretchInColumn(box, column, y === column.length - 1);
                             return (
                               <div
                                 key={`box-container-${x}-${y}`}
