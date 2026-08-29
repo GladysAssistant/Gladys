@@ -368,6 +368,25 @@ describe('thermostat.regulateDevice - external', () => {
       expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(7);
     });
 
+    // A manual hold arrives on a thermostat that may still be switched off by a
+    // previous `off` slot: the held setpoint alone would change nothing.
+    it('should hand the mode back for a manual hold on a setpoint', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: modeFeatures({ 'netatmo-mode': modeFeature({ last_value: THERMOSTAT_MODE.OFF }) }),
+        variables: {
+          THERMOSTAT_NETATMO_SETPOINT_MANUAL_MODE: 'true',
+          THERMOSTAT_NETATMO_SETPOINT_MANUAL_SETPOINT: JSON.stringify({ setpoint: 23 }),
+          THERMOSTAT_NETATMO_SETPOINT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
+        },
+      });
+
+      await regulate(mod, gladys, withMode());
+
+      expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.HEATING);
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(23);
+    });
+
     it('should switch the device off for a manual off hold', async () => {
       const mod = load(fullDaySchedule('comfort'));
       const gladys = buildGladys({
