@@ -578,11 +578,15 @@ body .apexcharts-tooltip {
   padding-right: 2rem;
 }
 
-/* All `.custom-switch-indicator` elements are missing the pointer cursor 
-that indicates they are clickable.
+/* All `.custom-switch-indicator` elements are missing the pointer cursor
+   that indicates they are clickable.
 */
 .custom-switch-indicator {
   cursor: pointer;
+}
+
+.custom-switch-input:disabled ~ .custom-switch-indicator {
+  cursor: default;
 }
 
 /* Weather condition icons (Meteocons): the cloud artwork is drawn in near-white
