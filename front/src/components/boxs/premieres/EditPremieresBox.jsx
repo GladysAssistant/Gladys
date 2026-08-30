@@ -94,9 +94,18 @@ class EditPremieresBoxComponent extends Component {
 
   updateProvider = e => {
     // '' = automatic mode (first available provider, the default)
-    this.props.updateBoxConfig(this.props.x, this.props.y, {
-      provider: e.target.value
-    });
+    const provider = e.target.value;
+    const config = { provider };
+    if (!supportsRegionAndPeriod(this.state.providers, provider)) {
+      // The fields are about to disappear (see supportsRegionAndPeriod in
+      // the render below): clear their values too, so switching back later
+      // to a provider that does support them doesn't resurrect a leftover
+      // period/country the user never meant to set for it.
+      config.days_ahead = undefined;
+      config.premieres_region = '';
+      this.setState({ regionInput: '' });
+    }
+    this.props.updateBoxConfig(this.props.x, this.props.y, config);
   };
 
   getProviders = async () => {

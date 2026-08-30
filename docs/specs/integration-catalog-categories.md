@@ -120,7 +120,7 @@ Two consequences worth deciding in Phase A rather than discovering later:
 
 ### 6.1 Native catalog (`front/src/config/integrations/*.json`)
 
-Each entry gains a `categories` array (1..3 keys from §3). The four per-type JSON files remain as they are (they encode `type`, still needed); `config/integrations/index.js` additionally exposes the category → integrations mapping used by the sidebar. Labels come from `integration.root.menu.<key>` in the i18n files.
+Each entry gains a `categories` array (1..3 keys from §3). The five per-type JSON files remain as they are (they encode `type`, still needed); `config/integrations/index.js` additionally exposes the category → integrations mapping used by the sidebar. Labels come from `integration.root.menu.<key>` in the i18n files.
 
 ### 6.2 Manifest (`gladys-assistant-integration.json`)
 
@@ -173,9 +173,9 @@ Because §6.2 and §6.3 alter the manifest and the indexer formats, whose source
 
 ## 7. Proposed assignment of the current catalog
 
-Full assignment of the 81 integrations — snapshot of 2026-08-14: the 36 native entries of `front/src/config/integrations/*.json` on this branch, plus the 45 community entries of the public store index (`generated_at: 2026-08-13T17:08:35Z`); rerun the counts against a fresh index to detect catalog drift. Native/community duplicates (Philips Hue, Tuya, Telegram…) are expected — they are migrations in progress — and naturally receive the same categories. Resulting distribution (multi-membership, so the sum exceeds 81):
+Full assignment of the 82 integrations — snapshot of 2026-08-14, plus TMDB (native, `movies` type, added after this snapshot was taken): the 37 native entries of `front/src/config/integrations/*.json` on this branch, plus the 45 community entries of the public store index (`generated_at: 2026-08-13T17:08:35Z`); rerun the counts against a fresh index to detect catalog drift. Native/community duplicates (Philips Hue, Tuya, Telegram…) are expected — they are migrations in progress — and naturally receive the same categories. Resulting distribution (multi-membership, so the sum exceeds 82):
 
-`climate` 13 · `lighting` 13 · `environment` 11 · `protocols` 11 · `notifications` 9 · `energy` 8 · `multimedia` 8 · `network` 7 · `security` 7 · `assistants` 5 · `appliances` 4 · `services` 1
+`climate` 13 · `lighting` 13 · `environment` 11 · `protocols` 11 · `notifications` 9 · `energy` 8 · `multimedia` 9 · `network` 7 · `security` 7 · `assistants` 5 · `appliances` 4 · `services` 1
 
 Every category except `services` clears the sidebar threshold, versus today's 62/14/4/1 split — and the heaviest clusters of the real catalog (heating & cooling, lighting & covers) finally get shelves, which no current category even hints at.
 
@@ -257,6 +257,7 @@ This is not a formality: six display names appear twice in the catalog, once nat
 | Tasmota | native | `device` | `lighting`, `energy` |
 | Telegram | community | `communication` | `notifications` |
 | Telegram | native | `communication` | `notifications` |
+| TMDB | native | `movies` | `multimedia` |
 | TP-Link | native | `device` | `lighting` |
 | TP-Link Kasa | community | `device` | `lighting` |
 | Tuya | community | `device` | `lighting`, `climate` |
