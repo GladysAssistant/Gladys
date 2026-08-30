@@ -64,20 +64,39 @@ describe('PremieresController', () => {
   });
 
   describe('getProviders', () => {
-    it('should list the providers with their integration label', async () => {
+    it('should list the providers with their integration label and region/period support', async () => {
+      const services = {
+        'ext-tvdb': { movies: { getUpcoming: fake.resolves([]) } },
+        tmdb: { movies: { getUpcoming: fake.resolves([]), supportsRegionAndPeriod: true } },
+      };
       const gladys = {
         premieres: { getProviders: fake.returns(['ext-tvdb', 'tmdb']) },
         externalIntegration: {
           get: fake.resolves([{ name: 'ext-tvdb', manifest: { name: 'TVDB' } }]),
         },
+        service: { getService: (name) => services[name] },
       };
       const req = {};
       const res = { json: fake.returns(null) };
       const premieresController = PremieresController(gladys);
       await premieresController.getProviders(req, res);
       expect(res.json.firstCall.args[0]).to.deep.equal([
-        { service_name: 'ext-tvdb', label: 'TVDB' },
-        { service_name: 'tmdb', label: null },
+        { service_name: 'ext-tvdb', label: 'TVDB', supports_region_and_period: false },
+        { service_name: 'tmdb', label: null, supports_region_and_period: true },
+      ]);
+    });
+    it('should default to false when the service cannot be found', async () => {
+      const gladys = {
+        premieres: { getProviders: fake.returns(['gone']) },
+        externalIntegration: { get: fake.resolves([]) },
+        service: { getService: fake.returns(null) },
+      };
+      const req = {};
+      const res = { json: fake.returns(null) };
+      const premieresController = PremieresController(gladys);
+      await premieresController.getProviders(req, res);
+      expect(res.json.firstCall.args[0]).to.deep.equal([
+        { service_name: 'gone', label: null, supports_region_and_period: false },
       ]);
     });
   });

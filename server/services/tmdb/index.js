@@ -226,6 +226,12 @@ module.exports = function TmdbService(gladys, serviceId) {
     stop,
     movies: {
       getUpcoming,
+      // TMDB's daysAhead/region options map directly onto its own
+      // discover/movie query (see getUpcoming above): the "Prochaines
+      // sorties" widget config only makes sense for a provider that
+      // interprets them this way, which is not true of every "movies"-type
+      // external integration (e.g. a single-cinema "now playing" provider).
+      supportsRegionAndPeriod: true,
     },
   });
 };

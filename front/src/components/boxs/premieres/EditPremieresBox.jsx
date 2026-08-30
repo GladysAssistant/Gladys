@@ -8,6 +8,19 @@ const DAYS_AHEAD_OPTIONS = [15, 30, 60];
 const DEFAULT_DAYS_AHEAD = 30;
 const REGION_LENGTH = 2;
 
+// A provider not found yet (still loading) or not in the list (stale config)
+// defaults to "assume it supports them": hiding the fields would be a worse
+// mistake than briefly showing fields that turn out not to apply.
+const supportsRegionAndPeriod = (providers, selectedProvider) => {
+  if (!selectedProvider) {
+    // automatic mode: any candidate in the precedence order could end up
+    // serving the request, so the fields stay visible.
+    return true;
+  }
+  const provider = providers && providers.find(p => p.service_name === selectedProvider);
+  return !provider || Boolean(provider.supports_region_and_period);
+};
+
 const EditPremieresBox = ({ regionInput, updateDaysAhead, updateRegion, updateProvider, providers, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.premieres">
     <Text id="dashboard.boxes.premieres.description" />
@@ -31,40 +44,44 @@ const EditPremieresBox = ({ regionInput, updateDaysAhead, updateRegion, updatePr
           ))}
       </select>
     </div>
-    <div class="form-group">
-      <label>
-        <Text id="dashboard.boxes.premieres.daysAheadLabel" />
-      </label>
-      <select onChange={updateDaysAhead} class="form-control">
-        {DAYS_AHEAD_OPTIONS.map(daysAhead => (
-          <option
-            key={daysAhead}
-            value={daysAhead}
-            selected={(props.box.days_ahead || DEFAULT_DAYS_AHEAD) === daysAhead}
-          >
-            <Text id={`dashboard.boxes.premieres.daysAhead${daysAhead}`} />
-          </option>
-        ))}
-      </select>
-    </div>
-    <div class="form-group">
-      <label>
-        <Text id="dashboard.boxes.premieres.regionLabel" />
-      </label>
-      <Localizer>
-        <input
-          type="text"
-          class="form-control"
-          maxLength="2"
-          placeholder={<Text id="dashboard.boxes.premieres.regionPlaceholder" />}
-          value={regionInput}
-          onInput={updateRegion}
-        />
-      </Localizer>
-      <small class="form-text text-muted">
-        <Text id="dashboard.boxes.premieres.regionHelp" />
-      </small>
-    </div>
+    {supportsRegionAndPeriod(providers, props.box.provider) && (
+      <div class="form-group">
+        <label>
+          <Text id="dashboard.boxes.premieres.daysAheadLabel" />
+        </label>
+        <select onChange={updateDaysAhead} class="form-control">
+          {DAYS_AHEAD_OPTIONS.map(daysAhead => (
+            <option
+              key={daysAhead}
+              value={daysAhead}
+              selected={(props.box.days_ahead || DEFAULT_DAYS_AHEAD) === daysAhead}
+            >
+              <Text id={`dashboard.boxes.premieres.daysAhead${daysAhead}`} />
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+    {supportsRegionAndPeriod(providers, props.box.provider) && (
+      <div class="form-group">
+        <label>
+          <Text id="dashboard.boxes.premieres.regionLabel" />
+        </label>
+        <Localizer>
+          <input
+            type="text"
+            class="form-control"
+            maxLength="2"
+            placeholder={<Text id="dashboard.boxes.premieres.regionPlaceholder" />}
+            value={regionInput}
+            onInput={updateRegion}
+          />
+        </Localizer>
+        <small class="form-text text-muted">
+          <Text id="dashboard.boxes.premieres.regionHelp" />
+        </small>
+      </div>
+    )}
   </BaseEditBox>
 );
 

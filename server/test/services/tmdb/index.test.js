@@ -187,6 +187,11 @@ describe('TmdbService', () => {
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await tmdbService.stop();
   });
+  it('should report supporting the region/period widget options', async () => {
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    expect(tmdbService.movies.supportsRegionAndPeriod).to.equal(true);
+  });
   it('should return an error when the TMDB API Key is not configured', async () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
     const tmdbService = TmdbService(gladysNotConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
