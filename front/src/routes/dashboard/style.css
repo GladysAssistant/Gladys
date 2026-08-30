@@ -1351,7 +1351,13 @@
    in this cell; plain text rows put their text in an anonymous item. */
 :global(.glass-theme .device-widget-table tr td:nth-child(2)) {
   flex: 1 1 auto;
-  min-width: 0;
+  /* The floor under the name: without it, a control wide enough (the shutter
+     buttons before their compact mode) squeezed this cell to a letter per
+     line — overflow-wrap: anywhere breaks ANYWHERE, including every
+     character. 6rem still wraps long names, but on readable chunks, and a
+     control that truly cannot coexist with it overflows the wrapper again,
+     which is the signal acAdaptiveControls listens for. */
+  min-width: 6rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
