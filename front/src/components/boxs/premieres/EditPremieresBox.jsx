@@ -92,26 +92,43 @@ class EditPremieresBoxComponent extends Component {
     });
   };
 
+  // The fields are about to disappear (see supportsRegionAndPeriod in the
+  // render below): clear their values too, so switching back later to a
+  // provider that does support them doesn't resurrect a leftover
+  // period/country the user never meant to set for it. Only writes when
+  // there is actually something to clear, so it stays a no-op for a box
+  // already on automatic/tmdb or already clean.
+  clearRegionAndPeriodIfUnsupported = (providers, provider) => {
+    if (supportsRegionAndPeriod(providers, provider)) {
+      return;
+    }
+    const hasLeftoverValue = this.props.box.days_ahead !== undefined || Boolean(this.props.box.premieres_region);
+    if (!hasLeftoverValue) {
+      return;
+    }
+    this.setState({ regionInput: '' });
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      days_ahead: undefined,
+      premieres_region: ''
+    });
+  };
+
   updateProvider = e => {
     // '' = automatic mode (first available provider, the default)
     const provider = e.target.value;
-    const config = { provider };
-    if (!supportsRegionAndPeriod(this.state.providers, provider)) {
-      // The fields are about to disappear (see supportsRegionAndPeriod in
-      // the render below): clear their values too, so switching back later
-      // to a provider that does support them doesn't resurrect a leftover
-      // period/country the user never meant to set for it.
-      config.days_ahead = undefined;
-      config.premieres_region = '';
-      this.setState({ regionInput: '' });
-    }
-    this.props.updateBoxConfig(this.props.x, this.props.y, config);
+    this.props.updateBoxConfig(this.props.x, this.props.y, { provider });
+    this.clearRegionAndPeriodIfUnsupported(this.state.providers, provider);
   };
 
   getProviders = async () => {
     try {
       const providers = await this.props.httpClient.get('/api/v1/premieres/provider');
       this.setState({ providers });
+      // The list may still have been loading (or missing this provider) the
+      // moment the user picked a provider above: re-check now that it is
+      // authoritative, instead of leaving a stale period/country uncleared
+      // until the box happens to be edited again.
+      this.clearRegionAndPeriodIfUnsupported(providers, this.props.box.provider);
     } catch (e) {
       // without the list the select simply stays on automatic mode
       console.error(e);
