@@ -3,6 +3,7 @@ import devices from './devices.json';
 import communications from './communications.json';
 import calendars from './calendars.json';
 import weathers from './weathers.json';
+import movies from './movies.json';
 
 // Browse categories of the catalog (docs/specs/integration-catalog-
 // categories.md): the keys and their order come from the server constants
@@ -42,5 +43,6 @@ pushAllWithType(devices, 'device');
 pushAllWithType(communications, 'communication');
 pushAllWithType(calendars, 'calendar');
 pushAllWithType(weathers, 'weather');
+pushAllWithType(movies, 'movies');
 
 export { integrations, catalogCategories };

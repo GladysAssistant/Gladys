@@ -6,11 +6,5 @@
     "cloud": true,
     "deprecated": true,
     "categories": ["environment"]
-  },
-  {
-    "key": "tmdb",
-    "img": "/assets/integrations/cover/tmdb.jpg",
-    "cloud": true,
-    "categories": ["multimedia"]
   }
 ]

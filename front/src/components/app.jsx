@@ -301,6 +301,7 @@ const AppRouter = connect(
         <Redirect path="/dashboard/integration/communication" to="/dashboard/integration" />
         <Redirect path="/dashboard/integration/calendar" to="/dashboard/integration/services" />
         <Redirect path="/dashboard/integration/weather" to="/dashboard/integration/environment" />
+        <Redirect path="/dashboard/integration/weather/tmdb" to="/dashboard/integration/movies/tmdb" />
         <Redirect path="/dashboard/integration/music" to="/dashboard/integration" />
         <Redirect path="/dashboard/integration/health" to="/dashboard/integration" />
         <Redirect path="/dashboard/integration/navigation" to="/dashboard/integration" />
@@ -316,7 +317,7 @@ const AppRouter = connect(
         <CalDAVSyncPage path="/dashboard/integration/calendar/caldav/sync" />
         <CalDAVSharePage path="/dashboard/integration/calendar/caldav/share" />
         <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
-        <TmdbPage path="/dashboard/integration/weather/tmdb" />
+        <TmdbPage path="/dashboard/integration/movies/tmdb" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
