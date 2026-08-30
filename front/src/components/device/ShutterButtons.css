@@ -1,0 +1,31 @@
+/* In a narrow dashboard card, the text button group ("Ouvrir | ⏸ | Fermé" in
+   French) is wider than half a phone screen and starves the device name next
+   to it. Inside the device widget — the only place that declares the
+   `device-widget` container, on its .table-responsive wrapper — the group
+   swaps its labels for arrow icons below the width where text + a readable
+   name no longer coexist. Everywhere else (scene editor, wide cards) there is
+   no matching container, so the query never applies and the labels stay. */
+
+.shutter-btn-icon {
+  display: none;
+}
+
+@container device-widget (max-width: 24rem) {
+  .shutter-btn-icon {
+    display: inline;
+  }
+
+  /* Visually hidden, not display: none — the label keeps naming the button
+     for screen readers while the icon takes its place on screen. */
+  .shutter-btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
