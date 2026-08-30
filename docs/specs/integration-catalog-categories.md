@@ -20,7 +20,7 @@ The numbers confirm it. As of 2026-08 the catalog contains **81 integrations**: 
 | `weather` | 1 | 3 | 4 |
 | `calendar` | 1 | 0 | 1 |
 
-A category holding ~77% of the catalog segments nothing, and the store index makes it worse: the front forces every store entry that is not `communication`/`weather` into `device` (`front/src/routes/integration/index.js`), so each new community integration falls into the catch-all by default.
+A category holding ~77% of the catalog segments nothing, and the store index makes it worse: the front forces every store entry that is not `communication`/`weather`/`movies` (B.19) into `device` (`front/src/routes/integration/index.js`), so each new community integration falls into the catch-all by default.
 
 The manifest field also shows that `type` cannot be repaired into a browsing taxonomy: community integrations such as *Pollens*, *VigiEau*, *Indice UV* or *Prix carburants* are typed `device` — not because they are devices, but because they **create devices** (sensors) in Gladys and therefore need the Devices/Discovery/Configuration screens. Authors correctly use `type` as a technical mechanism (which screens, which host-API surface), not as a domain. This spec keeps it that way.
 

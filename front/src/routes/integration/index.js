@@ -16,7 +16,7 @@ import { RequestStatus } from '../../utils/consts';
 
 // the role rules stay expressed on the technical `type` (spec §2.2): the
 // browse categories are display metadata and play no part in visibility
-const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
+const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'movies'];
 const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
 // cross-cutting views: they are not browse categories, they filter the whole
 // catalog (a favorite, or an integration with a pending update, can be of any
