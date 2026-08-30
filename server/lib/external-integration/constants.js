@@ -196,6 +196,12 @@ const MAX_WEATHER_IMAGE_LABEL_LENGTH = 50;
 const MAX_WEATHER_IMAGE_BYTES = 500 * 1024;
 const WEATHER_IMAGE_CACHE_TTL_MS = 10 * 60 * 1000;
 const WEATHER_IMAGE_CACHE_PREFIX = 'weather-image';
+// Movie providers: movies.getUpcoming triggers a fresh third-party API call
+// from the integration, same exception to the 5s ack rule as weather.get.
+const MOVIES_GET_UPCOMING_TIMEOUT_MS = 15 * 1000;
+// Bound of the normalized pivot movies format: the payload comes from
+// unaudited code, the array is capped before entering the core.
+const MAX_MOVIES = 50;
 // The generic condition enum of the pivot format; anything else is
 // coerced to 'unknown' (the frontend renders a neutral icon).
 // 'night' is deprecated for providers: send the real condition plus
@@ -399,6 +405,8 @@ module.exports = {
   MAX_WEATHER_IMAGE_BYTES,
   WEATHER_IMAGE_CACHE_TTL_MS,
   WEATHER_IMAGE_CACHE_PREFIX,
+  MOVIES_GET_UPCOMING_TIMEOUT_MS,
+  MAX_MOVIES,
   RESERVED_PARAM_PREFIX,
   TRANSPORT_PARAM,
   DEVICE_TRANSPORTS,

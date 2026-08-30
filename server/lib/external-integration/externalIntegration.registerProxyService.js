@@ -4,11 +4,13 @@ const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constan
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
 const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
 const { normalizeWeatherImage } = require('./externalIntegration.normalizeWeatherImage');
+const { normalizeMovies } = require('./externalIntegration.normalizeMovies');
 const {
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
   WEATHER_IMAGE_CACHE_TTL_MS,
   WEATHER_IMAGE_CACHE_PREFIX,
+  MOVIES_GET_UPCOMING_TIMEOUT_MS,
 } = require('./constants');
 
 // scheduled polls only make sense against a live integration: outside
@@ -146,6 +148,35 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // movie integrations expose the generic provider interface
+  // movies.getUpcoming(options) — the same interface the internal tmdb
+  // service implements, duck-typed by lib/premieres's provider loop. The
+  // returned payload is normalized and bounded before entering the core:
+  // unaudited code never hands raw data to the widget.
+  const isMovies = service.manifest && service.manifest.type === 'movies';
+  const moviesCapability = isMovies
+    ? {
+        movies: Object.freeze({
+          getUpcoming: async (options) => {
+            // a fresh third-party API call can be slow: 15s ack deadline
+            const result = await this.sendCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MOVIES_GET_UPCOMING,
+              {
+                options: {
+                  language: options.language,
+                  region: options.region,
+                  daysAhead: options.daysAhead,
+                },
+              },
+              { timeoutMs: MOVIES_GET_UPCOMING_TIMEOUT_MS },
+            );
+            const payload = result && result.data && result.data.movies;
+            return normalizeMovies(payload);
+          },
+        }),
+      }
+    : {};
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -155,6 +186,7 @@ function registerProxyService(service) {
     },
     ...messageCapability,
     ...weatherCapability,
+    ...moviesCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {

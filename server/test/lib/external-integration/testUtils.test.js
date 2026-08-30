@@ -117,6 +117,21 @@ const TEST_WEATHER_MANIFEST = {
   gladys_version: '>=4.62.0',
 };
 
+// Movies-provider fixture: a dedicated provider API — answers the core's
+// upcoming-movies requests over WebSocket, no device screens.
+const TEST_MOVIES_MANIFEST = {
+  manifest_version: 1,
+  type: 'movies',
+  name: 'Movies Provider Demo',
+  description: {
+    en: 'Movies provider demo integration.',
+    fr: 'Intégration démo : fournisseur de films.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-movies-demo:1.0.0',
+  gladys_version: '>=4.62.0',
+};
+
 // Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
 // gateway — one fire-and-forget event stream (default mode) and one sync
 // challenge/response registration callback.
@@ -286,6 +301,7 @@ module.exports = {
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
   TEST_WEATHER_MANIFEST,
+  TEST_MOVIES_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,

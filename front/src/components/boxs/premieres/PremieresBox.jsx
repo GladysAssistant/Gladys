@@ -88,14 +88,16 @@ const MovieDetailModal = ({ movie, userLanguage, onClose }) => (
                 <Text id="dashboard.boxes.premieres.watchTrailer" />
               </a>
             )}
-            <a
-              href={`https://www.themoviedb.org/movie/${movie.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn-outline-secondary btn-sm"
-            >
-              <Text id="dashboard.boxes.premieres.viewOnTmdb" />
-            </a>
+            {movie.sourceUrl && (
+              <a
+                href={movie.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-outline-secondary btn-sm"
+              >
+                <Text id="dashboard.boxes.premieres.viewSource" />
+              </a>
+            )}
           </div>
         </div>
       </div>

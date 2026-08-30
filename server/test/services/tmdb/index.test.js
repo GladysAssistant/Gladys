@@ -234,6 +234,14 @@ describe('TmdbService', () => {
       { id: 1001, releaseDate: '2026-06-20' },
     ]);
   });
+  it('should expose a themoviedb.org sourceUrl so the widget never hardcodes a provider link', async () => {
+    const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    const movies = await tmdbService.movies.getUpcoming({ daysAhead: 30, language: 'fr' });
+    const movie = movies.find((m) => m.id === 1002);
+    expect(movie.sourceUrl).to.equal('https://www.themoviedb.org/movie/1002');
+  });
   it('should keep the discover-provided date when a movie has no release_dates entry for the region', async () => {
     const TmdbService = proxyquire('../../../services/tmdb/index', buildWorkingAxios());
     const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');

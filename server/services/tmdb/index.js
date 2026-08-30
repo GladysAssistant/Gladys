@@ -165,7 +165,10 @@ module.exports = function TmdbService(gladys, serviceId) {
     const releaseDate =
       (details && details.release_dates && resolveRegionalReleaseDate(details.release_dates, region)) ||
       movie.releaseDate;
-    return { ...movie, overview, trailerUrl, releaseDate };
+    // generic field the widget renders as its "view details" link, so it
+    // never has to hardcode a provider-specific URL pattern
+    const sourceUrl = `https://www.themoviedb.org/movie/${movie.id}`;
+    return { ...movie, overview, trailerUrl, releaseDate, sourceUrl };
   }
 
   /**

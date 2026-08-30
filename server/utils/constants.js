@@ -2031,6 +2031,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     WEATHER_GET: 'external-integration.weather.get',
     WEATHER_GET_IMAGE: 'external-integration.weather.get-image',
     WEATHER_REFRESH: 'external-integration.weather.refresh',
+    MOVIES_GET_UPCOMING: 'external-integration.movies.get-upcoming',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
     WEBHOOK_REQUEST: 'external-integration.webhook.request',

@@ -34,7 +34,7 @@ const {
 // These rules are the exact mirror of the canonical manifest schema owned by
 // GladysAssistant/integration-store (vendored copy in manifest.schema.json):
 // a manifest accepted by the indexer must always install here, and vice versa.
-const MANIFEST_TYPES = ['device', 'communication', 'weather'];
+const MANIFEST_TYPES = ['device', 'communication', 'weather', 'movies'];
 const MANIFEST_FIELDS = [
   'manifest_version',
   'type',

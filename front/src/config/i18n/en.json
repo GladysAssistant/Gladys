@@ -838,7 +838,7 @@
         "daysAhead15": "15 days",
         "daysAhead30": "1 month",
         "daysAhead60": "2 months",
-        "viewOnTmdb": "View on TMDB",
+        "viewSource": "View details",
         "noOverview": "No summary available for this movie.",
         "watchTrailer": "Watch trailer",
         "regionLabel": "Country",
