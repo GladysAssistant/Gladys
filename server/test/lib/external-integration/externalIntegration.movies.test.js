@@ -130,4 +130,50 @@ describe('externalIntegration.normalizeMovies', () => {
     expect(() => normalizeMovies('movies')).to.throw(ExternalIntegrationUnavailableError);
     expect(() => normalizeMovies({})).to.throw(ExternalIntegrationUnavailableError);
   });
+
+  it('should drop a javascript: or data: URL instead of keeping it', () => {
+    const movies = normalizeMovies([
+      {
+        id: 1,
+        title: 'Malicious',
+        releaseDate: '2026-08-01T00:00:00.000Z',
+        // eslint-disable-next-line no-script-url -- deliberately testing that this scheme is rejected
+        posterUrl: 'javascript:alert(1)',
+        trailerUrl: 'data:text/html,<script>alert(1)</script>',
+        sourceUrl: 'not a url at all',
+      },
+    ]);
+    expect(movies[0]).to.deep.equal({
+      id: '1',
+      title: 'Malicious',
+      releaseDate: new Date('2026-08-01T00:00:00.000Z'),
+    });
+  });
+
+  it('should accept http (not only https) URLs', () => {
+    const movies = normalizeMovies([
+      { id: 1, title: 'Valid', releaseDate: '2026-08-01T00:00:00.000Z', posterUrl: 'http://example.com/poster.jpg' },
+    ]);
+    expect(movies[0].posterUrl).to.equal('http://example.com/poster.jpg');
+  });
+
+  it('should accept a finite numeric id and reject a non-finite one', () => {
+    const movies = normalizeMovies([
+      { id: 42, title: 'Finite', releaseDate: '2026-08-01T00:00:00.000Z' },
+      { id: Infinity, title: 'Infinite', releaseDate: '2026-08-01T00:00:00.000Z' },
+      { id: NaN, title: 'NaN', releaseDate: '2026-08-01T00:00:00.000Z' },
+    ]);
+    expect(movies).to.deep.equal([{ id: '42', title: 'Finite', releaseDate: new Date('2026-08-01T00:00:00.000Z') }]);
+  });
+
+  it('should reject an empty or oversized string id', () => {
+    const movies = normalizeMovies([
+      { id: '', title: 'Empty id', releaseDate: '2026-08-01T00:00:00.000Z' },
+      { id: 'x'.repeat(201), title: 'Oversized id', releaseDate: '2026-08-01T00:00:00.000Z' },
+      { id: 'valid-id', title: 'Valid', releaseDate: '2026-08-01T00:00:00.000Z' },
+    ]);
+    expect(movies).to.deep.equal([
+      { id: 'valid-id', title: 'Valid', releaseDate: new Date('2026-08-01T00:00:00.000Z') },
+    ]);
+  });
 });

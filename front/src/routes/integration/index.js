@@ -274,10 +274,10 @@ class Integration extends Component {
       return manifestCategories.filter(key => KNOWN_CATEGORY_KEYS.has(key));
     };
 
-    // communication and weather integrations have no device screens: their
-    // card lands straight on the configuration screen
+    // communication, weather and movies integrations have no device screens:
+    // their card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      ['communication', 'weather'].includes(manifest.type)
+      ['communication', 'weather', 'movies'].includes(manifest.type)
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
 
@@ -291,7 +291,7 @@ class Integration extends Component {
         key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: ['communication', 'weather', 'movies'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: getInstalledUrl(integration.selector, manifest),
@@ -315,7 +315,7 @@ class Integration extends Component {
         key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: ['communication', 'weather', 'movies'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled

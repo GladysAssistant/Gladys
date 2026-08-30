@@ -2,20 +2,69 @@ const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors'
 const { MAX_MOVIES } = require('./constants');
 
 const MAX_STRING_LENGTH = 2000;
+const MAX_ID_LENGTH = 200;
 
 /**
  * @description Coerce a value to a bounded, trimmed non-empty string.
  * @param {any} value - The value to coerce.
+ * @param {number} [maxLength] - The max length to bound to.
  * @returns {string|null} The trimmed string, or null when not a non-empty string.
  * @example
  * toBoundedString('  Some title  ');
  */
-function toBoundedString(value) {
+function toBoundedString(value, maxLength = MAX_STRING_LENGTH) {
   if (typeof value !== 'string') {
     return null;
   }
   const trimmed = value.trim();
-  return trimmed.length === 0 ? null : trimmed.substring(0, MAX_STRING_LENGTH);
+  return trimmed.length === 0 ? null : trimmed.substring(0, maxLength);
+}
+
+/**
+ * @description Coerce a value to a bounded http(s) URL string. Any other
+ * scheme (`javascript:`, `data:`, ...) is rejected: these fields render
+ * unmodified as `img src` / `a href` on the dashboard, and the payload
+ * comes from unaudited integration code.
+ * @param {any} value - The value to coerce.
+ * @returns {string|null} The bounded URL string, or null when invalid.
+ * @example
+ * toBoundedHttpUrl('https://example.com/poster.jpg');
+ */
+function toBoundedHttpUrl(value) {
+  const bounded = toBoundedString(value);
+  if (bounded === null) {
+    return null;
+  }
+  let url;
+  try {
+    url = new URL(bounded);
+  } catch (e) {
+    return null;
+  }
+  return url.protocol === 'http:' || url.protocol === 'https:' ? bounded : null;
+}
+
+/**
+ * @description Coerce a value to a bounded movie id: a non-empty string, or
+ * a finite number coerced to string. Anything else (Infinity, NaN, an
+ * object, an oversized string) is rejected.
+ * @param {any} value - The value to coerce.
+ * @returns {string|null} The bounded id string, or null when invalid.
+ * @example
+ * toBoundedId(42);
+ */
+function toBoundedId(value) {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? String(value) : null;
+  }
+  if (typeof value !== 'string') {
+    return null;
+  }
+  // an id is an identifier, not free text: truncating it (like a title or
+  // an overview) would silently rewrite it into a different, possibly
+  // colliding one, so an oversized value is rejected outright instead
+  const trimmed = value.trim();
+  return trimmed.length === 0 || trimmed.length > MAX_ID_LENGTH ? null : trimmed;
 }
 
 /**
@@ -35,7 +84,10 @@ function toValidDate(value) {
 
 // the optional string fields of the pivot movies format, copied when
 // present and valid, silently dropped otherwise
-const OPTIONAL_STRING_FIELDS = ['overview', 'posterUrl', 'trailerUrl', 'sourceUrl'];
+const OPTIONAL_STRING_FIELDS = ['overview'];
+// the optional URL fields: rendered as img src / a href on the dashboard, so
+// only http(s) is accepted (see toBoundedHttpUrl)
+const OPTIONAL_URL_FIELDS = ['posterUrl', 'trailerUrl', 'sourceUrl'];
 
 /**
  * @description Normalize and bound one movie entry. Returns null when a
@@ -50,7 +102,7 @@ function normalizeMovie(rawMovie) {
   if (rawMovie === null || typeof rawMovie !== 'object') {
     return null;
   }
-  const id = typeof rawMovie.id === 'string' || typeof rawMovie.id === 'number' ? String(rawMovie.id) : null;
+  const id = toBoundedId(rawMovie.id);
   const title = toBoundedString(rawMovie.title);
   const releaseDate = toValidDate(rawMovie.releaseDate);
   if (id === null || title === null || releaseDate === null) {
@@ -59,6 +111,12 @@ function normalizeMovie(rawMovie) {
   const movie = { id, title, releaseDate };
   OPTIONAL_STRING_FIELDS.forEach((field) => {
     const value = toBoundedString(rawMovie[field]);
+    if (value !== null) {
+      movie[field] = value;
+    }
+  });
+  OPTIONAL_URL_FIELDS.forEach((field) => {
+    const value = toBoundedHttpUrl(rawMovie[field]);
     if (value !== null) {
       movie[field] = value;
     }

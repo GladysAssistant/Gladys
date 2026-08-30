@@ -24,12 +24,13 @@ const getDisplayName = (selector, integration) => {
 };
 
 const ExternalIntegrationPage = ({ selector, integration, user, children }) => {
-  // communication and weather integrations have no device screens (they are
-  // dedicated provider APIs, not device controllers): the generic page
-  // branches by type and only shows Configuration and Logs. An unknown type
-  // (metadata still loading) hides the tabs too, instead of flashing them.
+  // communication, weather and movies integrations have no device screens
+  // (they are dedicated provider APIs, not device controllers): the generic
+  // page branches by type and only shows Configuration and Logs. An unknown
+  // type (metadata still loading) hides the tabs too, instead of flashing them.
   const integrationType = get(integration, 'manifest.type');
-  const hasDeviceScreens = Boolean(integrationType) && !['communication', 'weather'].includes(integrationType);
+  const hasDeviceScreens =
+    Boolean(integrationType) && !['communication', 'weather', 'movies'].includes(integrationType);
   // a non-admin user only comes here to link their own account: supervision
   // and logs are administration screens (and their routes are admin-only)
   const isAdmin = get(user, 'role') === USER_ROLE.ADMIN;
