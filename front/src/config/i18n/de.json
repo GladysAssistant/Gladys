@@ -841,6 +841,7 @@
         "viewSource": "Details ansehen",
         "noOverview": "Keine Zusammenfassung für diesen Film verfügbar.",
         "watchTrailer": "Trailer ansehen",
+        "showtimesTitle": "Vorstellungszeiten",
         "regionLabel": "Land",
         "regionPlaceholder": "FR",
         "regionHelp": "ISO-Ländercode für den Kinostart-Kalender (z. B. FR, US, DE, GB, BE, CH...). Standardmäßig Frankreich, wenn leer gelassen."

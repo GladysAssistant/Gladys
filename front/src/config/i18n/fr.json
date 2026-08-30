@@ -841,6 +841,7 @@
         "viewSource": "Voir la fiche",
         "noOverview": "Aucun résumé disponible pour ce film.",
         "watchTrailer": "Voir la bande-annonce",
+        "showtimesTitle": "Horaires",
         "regionLabel": "Pays",
         "regionPlaceholder": "FR",
         "regionHelp": "Code pays ISO pour le calendrier des sorties en salle (ex : FR, US, DE, GB, BE, CH...). France par défaut si laissé vide."

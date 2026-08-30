@@ -202,6 +202,9 @@ const MOVIES_GET_UPCOMING_TIMEOUT_MS = 15 * 1000;
 // Bound of the normalized pivot movies format: the payload comes from
 // unaudited code, the array is capped before entering the core.
 const MAX_MOVIES = 50;
+// Bound of movie.showtimes: a busy single-day "now playing" listing has at
+// most a few dozen sessions per film across a cinema's screens.
+const MAX_SHOWTIMES = 100;
 // The generic condition enum of the pivot format; anything else is
 // coerced to 'unknown' (the frontend renders a neutral icon).
 // 'night' is deprecated for providers: send the real condition plus
@@ -407,6 +410,7 @@ module.exports = {
   WEATHER_IMAGE_CACHE_PREFIX,
   MOVIES_GET_UPCOMING_TIMEOUT_MS,
   MAX_MOVIES,
+  MAX_SHOWTIMES,
   RESERVED_PARAM_PREFIX,
   TRANSPORT_PARAM,
   DEVICE_TRANSPORTS,

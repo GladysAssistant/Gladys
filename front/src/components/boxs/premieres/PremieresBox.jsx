@@ -99,6 +99,25 @@ const MovieDetailModal = ({ movie, userLanguage, onClose }) => (
               </a>
             )}
           </div>
+          {movie.showtimes && movie.showtimes.length > 0 && (
+            <div class="mt-3">
+              <h4>
+                <Text id="dashboard.boxes.premieres.showtimesTitle" />
+              </h4>
+              <div style="max-height: 220px; overflow-y: auto">
+                <table class="table table-sm mb-0">
+                  <tbody>
+                    {movie.showtimes.map((showtime, index) => (
+                      <tr key={`${showtime.time}-${showtime.version || ''}-${index}`}>
+                        <td>{showtime.time}</td>
+                        <td class="text-muted">{showtime.version}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -167,7 +186,7 @@ const PremieresBox = ({
                       <div class="text-muted" style="font-size: 11px">
                         {dayjs(movie.releaseDate)
                           .locale(userLanguage)
-                          .format('D MMMM')}
+                          .format('D MMMM YYYY')}
                       </div>
                     )}
                   </button>

@@ -841,6 +841,7 @@
         "viewSource": "View details",
         "noOverview": "No summary available for this movie.",
         "watchTrailer": "Watch trailer",
+        "showtimesTitle": "Showtimes",
         "regionLabel": "Country",
         "regionPlaceholder": "FR",
         "regionHelp": "ISO country code for the theatrical release calendar (e.g. FR, US, DE, GB, BE, CH...). Defaults to France if left empty."

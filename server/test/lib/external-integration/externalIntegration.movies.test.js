@@ -6,7 +6,11 @@ const { assert: sinonAssert, fake } = sinon;
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 const { normalizeMovies } = require('../../../lib/external-integration/externalIntegration.normalizeMovies');
-const { MOVIES_GET_UPCOMING_TIMEOUT_MS, MAX_MOVIES } = require('../../../lib/external-integration/constants');
+const {
+  MOVIES_GET_UPCOMING_TIMEOUT_MS,
+  MAX_MOVIES,
+  MAX_SHOWTIMES,
+} = require('../../../lib/external-integration/constants');
 const { buildSupervisor, seedExternalService, TEST_MOVIES_MANIFEST } = require('./testUtils.test');
 
 const seedMoviesService = (overrides = {}) => seedExternalService({ manifest: TEST_MOVIES_MANIFEST, ...overrides });
@@ -175,5 +179,46 @@ describe('externalIntegration.normalizeMovies', () => {
     expect(movies).to.deep.equal([
       { id: 'valid-id', title: 'Valid', releaseDate: new Date('2026-08-01T00:00:00.000Z') },
     ]);
+  });
+
+  it('should normalize showtimes, keeping only valid entries', () => {
+    const movies = normalizeMovies([
+      {
+        id: 1,
+        title: 'With showtimes',
+        releaseDate: '2026-08-01T00:00:00.000Z',
+        showtimes: [
+          { time: '13:30', version: 'VF' },
+          { time: '20:15' },
+          { time: '  ' },
+          { version: 'VOST' },
+          null,
+          'not an object',
+        ],
+      },
+    ]);
+    expect(movies[0].showtimes).to.deep.equal([{ time: '13:30', version: 'VF' }, { time: '20:15' }]);
+  });
+
+  it('should drop the showtimes field entirely when nothing survives normalization', () => {
+    const movies = normalizeMovies([
+      { id: 1, title: 'No valid showtime', releaseDate: '2026-08-01T00:00:00.000Z', showtimes: [null, {}] },
+    ]);
+    expect(movies[0]).to.not.have.property('showtimes');
+  });
+
+  it('should ignore a showtimes field that is not an array', () => {
+    const movies = normalizeMovies([
+      { id: 1, title: 'Bad shape', releaseDate: '2026-08-01T00:00:00.000Z', showtimes: 'not an array' },
+    ]);
+    expect(movies[0]).to.not.have.property('showtimes');
+  });
+
+  it('should cap showtimes at MAX_SHOWTIMES entries', () => {
+    const oversized = Array.from({ length: MAX_SHOWTIMES + 10 }).map((value, index) => ({ time: `${index}:00` }));
+    const movies = normalizeMovies([
+      { id: 1, title: 'Many showtimes', releaseDate: '2026-08-01T00:00:00.000Z', showtimes: oversized },
+    ]);
+    expect(movies[0].showtimes).to.have.lengthOf(MAX_SHOWTIMES);
   });
 });

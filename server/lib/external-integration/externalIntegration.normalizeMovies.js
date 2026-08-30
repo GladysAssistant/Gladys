@@ -1,8 +1,9 @@
 const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
-const { MAX_MOVIES } = require('./constants');
+const { MAX_MOVIES, MAX_SHOWTIMES } = require('./constants');
 
 const MAX_STRING_LENGTH = 2000;
 const MAX_ID_LENGTH = 200;
+const MAX_SHOWTIME_STRING_LENGTH = 100;
 
 /**
  * @description Coerce a value to a bounded, trimmed non-empty string.
@@ -90,6 +91,33 @@ const OPTIONAL_STRING_FIELDS = ['overview'];
 const OPTIONAL_URL_FIELDS = ['posterUrl', 'trailerUrl', 'sourceUrl'];
 
 /**
+ * @description Normalize and bound one showtime entry of `movie.showtimes`.
+ * Deliberately small and generic (a time and an optional version label, e.g.
+ * "VF"/"VOST"): a provider-specific session id, room or booking link is not
+ * part of the pivot, matching the same "small, additive" philosophy as the
+ * rest of the movies format.
+ * @param {any} rawShowtime - One entry of `movie.showtimes`.
+ * @returns {object|null} The normalized showtime, or null when invalid.
+ * @example
+ * normalizeShowtime({ time: '13:30', version: 'VF' });
+ */
+function normalizeShowtime(rawShowtime) {
+  if (rawShowtime === null || typeof rawShowtime !== 'object') {
+    return null;
+  }
+  const time = toBoundedString(rawShowtime.time, MAX_SHOWTIME_STRING_LENGTH);
+  if (time === null) {
+    return null;
+  }
+  const showtime = { time };
+  const version = toBoundedString(rawShowtime.version, MAX_SHOWTIME_STRING_LENGTH);
+  if (version !== null) {
+    showtime.version = version;
+  }
+  return showtime;
+}
+
+/**
  * @description Normalize and bound one movie entry. Returns null when a
  * required field is missing or invalid, so the caller can drop the entry
  * without rejecting the whole list.
@@ -121,6 +149,15 @@ function normalizeMovie(rawMovie) {
       movie[field] = value;
     }
   });
+  if (Array.isArray(rawMovie.showtimes)) {
+    const showtimes = rawMovie.showtimes
+      .slice(0, MAX_SHOWTIMES)
+      .map(normalizeShowtime)
+      .filter((showtime) => showtime !== null);
+    if (showtimes.length > 0) {
+      movie.showtimes = showtimes;
+    }
+  }
   return movie;
 }
 
