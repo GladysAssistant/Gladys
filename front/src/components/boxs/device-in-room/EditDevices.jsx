@@ -107,8 +107,9 @@ class EditDevices extends Component {
           feature => !selectedDeviceFeaturesOptions.some(selected => selected.value === feature.value)
         );
         if (filteredDeviceFeatures.length > 0) {
+          const roomName = device.room && device.room.name;
           deviceOptions.push({
-            label: device.name,
+            label: roomName ? `${device.name} - ${roomName}` : device.name,
             options: filteredDeviceFeatures
           });
         }
