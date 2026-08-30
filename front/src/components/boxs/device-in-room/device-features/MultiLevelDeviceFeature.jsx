@@ -3,6 +3,7 @@ import get from 'get-value';
 import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { smartRound } from '../../../../../../server/utils/units';
 
 import style from './style.css';
 
@@ -38,11 +39,11 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
           <span class="ml-2 text-right">
             {props.deviceFeature.unit ? (
               <span>
-                {`${props.deviceFeature.last_value} `}
+                {`${smartRound(props.deviceFeature.last_value)} `}
                 <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
               </span>
             ) : (
-              <span>{props.deviceFeature.last_value}</span>
+              <span>{smartRound(props.deviceFeature.last_value)}</span>
             )}
           </span>
         </div>
