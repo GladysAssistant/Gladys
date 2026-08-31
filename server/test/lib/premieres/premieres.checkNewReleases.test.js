@@ -158,6 +158,18 @@ describe('premieres.checkNewReleases', () => {
     expect(services['ext-other'].movies.getUpcoming.callCount).to.equal(0);
   });
 
+  it('should call no provider when the only pinned provider is not registered', async () => {
+    await db.Scene.update(
+      { triggers: [{ type: EVENTS.MOVIES.NEW_RELEASE, movies_provider: 'not-installed' }] },
+      { where: { id: scene.id } },
+    );
+    const { premieres, services } = buildPremieres({
+      tmdb: [[{ id: 1, title: 'A', releaseDate: '2026-01-01' }]],
+    });
+    await premieres.checkNewReleases();
+    expect(services.tmdb.movies.getUpcoming.callCount).to.equal(0);
+  });
+
   it('should poll every provider as soon as one active trigger has no provider filter', async () => {
     await db.Scene.update(
       {
