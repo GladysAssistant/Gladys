@@ -316,6 +316,15 @@ describe('TmdbService', () => {
     expect(discoverUrls).to.have.lengthOf(1);
     expect(discoverUrls[0]).to.include('region=FR');
   });
+  it('should uppercase a lowercase but otherwise valid region before forwarding it', async () => {
+    const workingAxios = buildWorkingAxios();
+    const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);
+    const tmdbService = TmdbService(gladysConfigured, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await tmdbService.start();
+    await tmdbService.movies.getUpcoming({ daysAhead: 30, region: 'fr' });
+    const [discoverUrl] = workingAxios.getUrls().filter((url) => url.includes('discover/movie'));
+    expect(discoverUrl).to.include('region=FR');
+  });
   it('should ignore a well-formed but unassigned region code (ZZ)', async () => {
     const workingAxios = buildWorkingAxios();
     const TmdbService = proxyquire('../../../services/tmdb/index', workingAxios);

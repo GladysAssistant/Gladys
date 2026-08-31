@@ -187,7 +187,12 @@ module.exports = function TmdbService(gladys, serviceId) {
       throw new ServiceNotConfiguredError('TMDB API Key not found');
     }
     const language = TMDB_LANGUAGE_BY_GLADYS_LANGUAGE[options.language] || FALLBACK_OVERVIEW_LANGUAGE;
-    const region = isAssignedRegion(options.region) ? options.region : DEFAULT_REGION;
+    // uppercased before the check: isAssignedRegion is deliberately
+    // case-sensitive (it matches TMDB's own ISO 3166-1 codes verbatim), so a
+    // lowercase but otherwise valid code (e.g. a direct API call, unlike the
+    // widget which always sends uppercase) must not fall back to the default
+    const requestedRegion = typeof options.region === 'string' ? options.region.toUpperCase() : options.region;
+    const region = isAssignedRegion(requestedRegion) ? requestedRegion : DEFAULT_REGION;
     const daysAhead = ALLOWED_DAYS_AHEAD.includes(options.daysAhead) ? options.daysAhead : DEFAULT_DAYS_AHEAD;
     const cacheKey = `upcoming:${language}:${region}:${daysAhead}`;
     return getOrCompute(cacheKey, async () => {
