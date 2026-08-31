@@ -71,6 +71,48 @@ describe('sceneSchemas helpers', () => {
     expect(error).to.be.an('error');
     expect(error.message).to.contain('must be in the top-level triggers array');
   });
+
+  it('should reject a movies.new-release trigger placed in actions', () => {
+    let error = null;
+    try {
+      assertTriggerTypesNotInActions({
+        actions: [[{ type: 'movies.new-release' }]],
+      });
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.an('error');
+    expect(error.message).to.contain('must be in the top-level triggers array');
+  });
+});
+
+describe('sceneSchemas movies.new-release trigger', () => {
+  const buildScene = (trigger) => ({
+    name: 'My scene',
+    icon: 'lightbulb',
+    triggers: [trigger],
+    actions: [[{ type: 'delay', unit: 'minutes', value: 1 }]],
+  });
+
+  it('should accept a trigger with no filter', () => {
+    const schema = createSceneCreateInputSchema();
+    const result = schema.safeParse(buildScene({ type: 'movies.new-release' }));
+    expect(result.success).to.equal(true);
+  });
+
+  it('should accept a trigger with both an optional provider and a title keyword', () => {
+    const schema = createSceneCreateInputSchema();
+    const result = schema.safeParse(
+      buildScene({ type: 'movies.new-release', movies_provider: 'gladys-ugc', movies_title_keyword: 'dune' }),
+    );
+    expect(result.success).to.equal(true);
+  });
+
+  it('should reject an unknown field on the trigger', () => {
+    const schema = createSceneCreateInputSchema();
+    const result = schema.safeParse(buildScene({ type: 'movies.new-release', unknown_field: 'x' }));
+    expect(result.success).to.equal(false);
+  });
 });
 
 describe('sceneSchemas time.get-date action', () => {

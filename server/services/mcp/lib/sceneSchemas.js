@@ -34,6 +34,7 @@ const SCENE_TRIGGER_TYPES = new Set([
   EVENTS.SYSTEM.START,
   EVENTS.MQTT.RECEIVED,
   EVENTS.CALENDAR.EVENT_IS_COMING,
+  EVENTS.MOVIES.NEW_RELEASE,
 ]);
 
 /**
@@ -580,6 +581,17 @@ function createSceneCreateInputSchema(
       calendars: z.array(z.string()).min(1),
       calendar_event_name: z.string().optional(),
       duration: z.number().optional(),
+    }),
+    triggerSchemaByType(EVENTS.MOVIES.NEW_RELEASE, {
+      movies_provider: z
+        .string()
+        .optional()
+        .describe('Optional movie provider service name to restrict to. Omit to match every provider.'),
+      movies_title_keyword: z
+        .string()
+        .max(200)
+        .optional()
+        .describe('Optional case-insensitive "title contains" filter. Omit to match every title.'),
     }),
   ]);
 
