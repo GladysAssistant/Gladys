@@ -134,16 +134,16 @@ async function runCheck() {
       return;
     }
     const currentIds = new Set(movies.map((movie) => String(movie.id)));
-    const previousIds = this.providerMovieIds.get(providerName);
-    this.providerMovieIds.set(providerName, currentIds);
+    const knownIds = this.providerMovieIds.get(providerName);
     // the first poll of a provider is a baseline: no events, so a core
     // restart never re-fires scenes for movies that were already listed
-    if (previousIds === undefined) {
+    if (knownIds === undefined) {
+      this.providerMovieIds.set(providerName, currentIds);
       return;
     }
     movies.forEach((movie) => {
       const id = String(movie.id);
-      if (previousIds.has(id)) {
+      if (knownIds.has(id)) {
         return;
       }
       this.event.emit(EVENTS.TRIGGERS.CHECK, {
@@ -159,6 +159,12 @@ async function runCheck() {
         },
       });
     });
+    // the baseline is cumulative ("ever seen"), not just the last poll: a
+    // provider limited to a single page (TMDB's discover, 20 titles) can
+    // drop an id off its visible window as sorting shifts, then show it
+    // again later — merging into the existing Set (not replacing it) keeps
+    // that reappearance from firing the trigger a second time
+    currentIds.forEach((id) => knownIds.add(id));
   });
 }
 

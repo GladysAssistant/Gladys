@@ -219,6 +219,26 @@ describe('premieres.checkNewReleases', () => {
     expect(services['ext-other'].movies.getUpcoming.callCount).to.equal(1);
   });
 
+  it('should not re-fire when a previously-seen movie falls off the provider list and later reappears', async () => {
+    const movieA = { id: 1, title: 'A', releaseDate: '2026-01-01' };
+    const movieB = { id: 2, title: 'B', releaseDate: '2026-02-01' };
+    const { premieres, event } = buildPremieres({
+      tmdb: [
+        [movieA], // poll 1: baseline
+        [movieA, movieB], // poll 2: B is new, fires once
+        [movieA], // poll 3: B falls off the provider's single page
+        [movieA, movieB], // poll 4: B reappears, must not re-fire
+      ],
+    });
+    await premieres.checkNewReleases();
+    await premieres.checkNewReleases();
+    await premieres.checkNewReleases();
+    await premieres.checkNewReleases();
+    const calls = triggerCheckCalls(event);
+    expect(calls).to.have.lengthOf(1);
+    expect(calls[0].args[1].movie.title).to.equal('B');
+  });
+
   it('should keep the previous baseline when a provider fails', async () => {
     const movieA = { id: 1, title: 'A', releaseDate: '2026-01-01' };
     const { premieres, event, services } = buildPremieres({
