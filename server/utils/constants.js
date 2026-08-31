@@ -646,6 +646,10 @@ const EVENTS = {
     ALERT_RAISED: 'weather.alert-raised',
     ALERT_ENDED: 'weather.alert-ended',
   },
+  MOVIES: {
+    CHECK_NEW_RELEASES: 'movies.check-new-releases',
+    NEW_RELEASE: 'movies.new-release',
+  },
   EXTERNAL_INTEGRATION: {
     STATUS_CHANGED: 'external-integration.status-changed',
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',

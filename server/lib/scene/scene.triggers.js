@@ -25,6 +25,13 @@ const matchWeatherAlert = (self, sceneSelector, event, trigger) =>
   WEATHER_ALERT_SEVERITY_RANK[event.alert.severity] >=
     (WEATHER_ALERT_SEVERITY_RANK[trigger.weather_alert_severity] || 1);
 
+// same provider (absent or 'any' = every provider), plus an optional
+// case-insensitive "title contains" filter
+const matchMoviesNewRelease = (self, sceneSelector, event, trigger) =>
+  (!trigger.movies_provider || trigger.movies_provider === event.service) &&
+  (!trigger.movies_title_keyword ||
+    event.movie.title.toLowerCase().includes(trigger.movies_title_keyword.trim().toLowerCase()));
+
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
     // Multi-select triggers store their features in `device_features`, legacy triggers
@@ -144,6 +151,7 @@ const triggersFunc = {
     event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
   [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,
   [EVENTS.WEATHER.ALERT_ENDED]: matchWeatherAlert,
+  [EVENTS.MOVIES.NEW_RELEASE]: matchMoviesNewRelease,
 };
 
 module.exports = {

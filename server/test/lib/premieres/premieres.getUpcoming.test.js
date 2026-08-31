@@ -6,6 +6,11 @@ const { fake, assert } = sinon;
 const Premieres = require('../../../lib/premieres');
 const { ServiceNotConfiguredError, ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 
+// Premieres now subscribes to EVENTS.MOVIES.CHECK_NEW_RELEASES on
+// construction (like Weather does for weather.check-alerts): a fake with a
+// no-op `on` is enough for tests that never exercise checkNewReleases.
+const event = { on: fake.returns(null) };
+
 const fakeMovies = [{ id: 1, title: 'A movie', releaseDate: '2026-06-15' }];
 
 const options = {
@@ -36,7 +41,7 @@ describe('premieres.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ tmdb });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const result = await premieres.getUpcoming(options);
     expect(result).to.deep.equal(fakeMovies);
     assert.calledWith(tmdb.movies.getUpcoming, options);
@@ -50,7 +55,7 @@ describe('premieres.getUpcoming', () => {
       'not-a-movie-service': {},
       tmdb,
     });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const result = await premieres.getUpcoming(options);
     expect(result).to.deep.equal(fakeMovies);
   });
@@ -63,7 +68,7 @@ describe('premieres.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const result = await premieres.getUpcoming(options);
     expect(result).to.deep.equal(externalMovies);
     assert.calledWith(extTvdb.movies.getUpcoming, options);
@@ -77,7 +82,7 @@ describe('premieres.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const result = await premieres.getUpcoming(options);
     expect(result).to.deep.equal(fakeMovies);
     assert.called(extTvdb.movies.getUpcoming);
@@ -86,7 +91,7 @@ describe('premieres.getUpcoming', () => {
     const service = buildServiceManager({
       telegram: { message: { send: fake.resolves(null) } },
     });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const promise = premieres.getUpcoming(options);
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
@@ -100,7 +105,7 @@ describe('premieres.getUpcoming', () => {
       movies: { getUpcoming: fake.rejects(new ServiceNotConfiguredError('TMDB API Key not found')) },
     };
     const service = buildServiceManager({ tmdb });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const promise = premieres.getUpcoming(options);
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
@@ -117,7 +122,7 @@ describe('premieres.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     // ext-tvdb wins although tmdb has precedence, because it's pinned
     const result = await premieres.getUpcoming({ ...options, service: 'ext-tvdb' });
     expect(result).to.deep.equal([{ id: 2, title: 'Another movie' }]);
@@ -132,7 +137,7 @@ describe('premieres.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const promise = premieres.getUpcoming({ ...options, service: 'ext-tvdb' });
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
@@ -147,7 +152,7 @@ describe('premieres.getUpcoming', () => {
       movies: { getUpcoming: fake.resolves(fakeMovies) },
     };
     const service = buildServiceManager({ tmdb });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const promise = premieres.getUpcoming({ ...options, service: 'ext-uninstalled-provider' });
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
@@ -164,7 +169,7 @@ describe('premieres.getUpcoming', () => {
       },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const promise = premieres.getUpcoming(options);
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
@@ -184,7 +189,7 @@ describe('premieres.getUpcoming', () => {
       movies: { getUpcoming: fake.rejects(new ServiceNotConfiguredError('TMDB API Key not found')) },
     };
     const service = buildServiceManager({ 'ext-tvdb': extTvdb, tmdb });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     const promise = premieres.getUpcoming(options);
     await promise.then(
       () => Promise.reject(new Error('should have failed')),
@@ -202,7 +207,7 @@ describe('premieres.getProviders', () => {
       telegram: { message: { send: fake.resolves(null) } },
       'ext-tvdb': { movies: { getUpcoming: fake.resolves([]) } },
     });
-    const premieres = new Premieres(service);
+    const premieres = new Premieres(service, event);
     expect(premieres.getProviders()).to.deep.equal(['ext-tvdb', 'tmdb']);
   });
 });

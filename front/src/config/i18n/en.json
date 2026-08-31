@@ -3792,6 +3792,14 @@
         "count": "Number of events",
         "events": "Raw list of events (advanced, not readable in a message)"
       },
+      "movies": {
+        "title": "Title",
+        "releaseDate": "Release date",
+        "showtimesText": "Showtimes summary",
+        "trailerUrl": "Trailer link",
+        "sourceUrl": "Provider link",
+        "cinema": "Provider"
+      },
       "askAi": {
         "answer": "AI answer"
       },
@@ -3848,6 +3856,9 @@
       "weather": {
         "alert-raised": "Weather alert raised",
         "alert-ended": "Weather alert ended"
+      },
+      "movies": {
+        "new-release": "New release"
       }
     },
     "triggersDescriptions": {
@@ -3891,6 +3902,9 @@
       "weather": {
         "alert-raised": "When a weather alert starts (wind, rain…)",
         "alert-ended": "When a weather alert ends"
+      },
+      "movies": {
+        "new-release": "When a new title appears in a provider's upcoming list"
       }
     },
     "triggerCategories": {
@@ -3899,6 +3913,7 @@
       "presence": "Presence",
       "alarm": "Alarm",
       "weather": "Weather",
+      "media": "Media",
       "advanced": "Advanced"
     },
     "triggersCard": {
@@ -4033,6 +4048,13 @@
           "severe": "Severe (orange)",
           "extreme": "Extreme (red)"
         }
+      },
+      "moviesNewRelease": {
+        "description": "This will trigger when a new title appears in a provider's upcoming list (checked twice a day).",
+        "providerLabel": "Provider",
+        "anyProvider": "Any provider",
+        "keywordLabel": "Title contains (optional)",
+        "keywordPlaceholder": "e.g. Dune"
       }
     },
     "searchActionsPlaceholder": "Search for an action…",

@@ -66,7 +66,8 @@ export const TRIGGER_ICON = {
   [EVENTS.SYSTEM.START]: 'fe fe-activity',
   [EVENTS.MQTT.RECEIVED]: 'fe fe-hash',
   [EVENTS.WEATHER.ALERT_RAISED]: 'fe fe-alert-triangle',
-  [EVENTS.WEATHER.ALERT_ENDED]: 'fe fe-check-circle'
+  [EVENTS.WEATHER.ALERT_ENDED]: 'fe fe-check-circle',
+  [EVENTS.MOVIES.NEW_RELEASE]: 'fe fe-film'
 };
 
 // Actions grouped by category, in the order they are displayed in the picker.
@@ -194,6 +195,14 @@ export const TRIGGER_CATEGORIES = [
     key: 'weather',
     color: 'yellow',
     items: [EVENTS.WEATHER.ALERT_RAISED, EVENTS.WEATHER.ALERT_ENDED]
+  },
+  {
+    // broader than "movies": the same category will hold whatever other
+    // content-release triggers show up later (series, music…), so it isn't
+    // named after this one trigger's own event type
+    key: 'media',
+    color: 'purple',
+    items: [EVENTS.MOVIES.NEW_RELEASE]
   },
   {
     key: 'advanced',

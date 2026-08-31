@@ -3792,6 +3792,14 @@
         "count": "Anzahl der Ereignisse",
         "events": "Rohe Liste der Ereignisse (fortgeschritten, in einer Nachricht nicht lesbar)"
       },
+      "movies": {
+        "title": "Titel",
+        "releaseDate": "Erscheinungsdatum",
+        "showtimesText": "Zusammenfassung der Vorstellungszeiten",
+        "trailerUrl": "Trailer-Link",
+        "sourceUrl": "Anbieter-Link",
+        "cinema": "Anbieter"
+      },
       "askAi": {
         "answer": "AI Antwort"
       },
@@ -3848,6 +3856,9 @@
       "weather": {
         "alert-raised": "Wetterwarnung ausgelöst",
         "alert-ended": "Wetterwarnung beendet"
+      },
+      "movies": {
+        "new-release": "Neue Veröffentlichung"
       }
     },
     "triggersDescriptions": {
@@ -3891,6 +3902,9 @@
       "weather": {
         "alert-raised": "Wenn eine Wetterwarnung beginnt (Wind, Regen…)",
         "alert-ended": "Wenn eine Wetterwarnung endet"
+      },
+      "movies": {
+        "new-release": "Wenn ein neuer Titel in der Vorschau-Liste eines Anbieters erscheint"
       }
     },
     "triggerCategories": {
@@ -3899,6 +3913,7 @@
       "presence": "Anwesenheit",
       "alarm": "Alarmanlage",
       "weather": "Wetter",
+      "media": "Medien",
       "advanced": "Erweitert"
     },
     "triggersCard": {
@@ -4033,6 +4048,13 @@
           "severe": "Schwer (orange)",
           "extreme": "Extrem (rot)"
         }
+      },
+      "moviesNewRelease": {
+        "description": "Wird ausgelöst, wenn ein neuer Titel in der Vorschau-Liste eines Anbieters erscheint (zweimal täglich geprüft).",
+        "providerLabel": "Anbieter",
+        "anyProvider": "Alle Anbieter",
+        "keywordLabel": "Titel enthält (optional)",
+        "keywordPlaceholder": "z. B. Dune"
       }
     },
     "searchActionsPlaceholder": "Aktion suchen…",

@@ -36,6 +36,11 @@ const jobs = [
     rule: '0 */30 * * * *', // every 30 minutes
     event: EVENTS.WEATHER.CHECK_ALERTS,
   },
+  {
+    name: 'check-movies-new-releases',
+    rule: '0 0 7,19 * * *', // twice a day, 07:00 and 19:00
+    event: EVENTS.MOVIES.CHECK_NEW_RELEASES,
+  },
 ];
 
 module.exports = jobs;

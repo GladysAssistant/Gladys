@@ -167,6 +167,11 @@ const triggerSchema = Joi.object()
     // weather-alert triggers (B.18): phenomenon type filter and minimal severity
     weather_alert_type: Joi.string().valid(...WEATHER_ALERT_TYPES, 'any'),
     weather_alert_severity: Joi.string().valid(...WEATHER_ALERT_SEVERITIES),
+    // movies new-release trigger: both filters optional, absent = no filter (matches anything)
+    movies_provider: Joi.string().allow(''),
+    movies_title_keyword: Joi.string()
+      .allow('')
+      .max(200),
   })
   // A "changed" trigger fires on `last_value !== previous_value`: it matches no value, and
   // neither `threshold_only` (which de-duplicates a condition staying true) nor `for_duration`

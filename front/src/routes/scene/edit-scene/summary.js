@@ -205,6 +205,8 @@ const getTriggerSummary = (trigger, dictionary) => {
     case EVENTS.WEATHER.ALERT_RAISED:
     case EVENTS.WEATHER.ALERT_ENDED:
       return joinParts([trigger.house, trigger.weather_alert_type]);
+    case EVENTS.MOVIES.NEW_RELEASE:
+      return joinParts([trigger.movies_provider, truncate(trigger.movies_title_keyword)]);
     default:
       return null;
   }

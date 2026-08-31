@@ -78,7 +78,7 @@ function Gladys(params = {}) {
   const calendar = new Calendar(service);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
-  const premieres = new Premieres(service);
+  const premieres = new Premieres(service, event);
   const energyPrice = new EnergyPrice(stateManager);
   const externalIntegration = new ExternalIntegration(
     event,

@@ -13,6 +13,7 @@ import CalendarEventIsComing from './triggers/CalendarEventIsComing';
 import AlarmModeTrigger from './triggers/AlarmModeTrigger';
 import MQTTReceivedTrigger from './triggers/MQTTReceivedTrigger';
 import WeatherAlert from './triggers/WeatherAlert';
+import MoviesNewRelease from './triggers/MoviesNewRelease';
 
 import { EVENTS } from '../../../../../server/utils/constants';
 import { TRIGGER_ICON, TRIGGER_COLOR, COLOR_CLASS } from './typesCatalog';
@@ -194,6 +195,15 @@ const TriggerCard = ({ children, ...props }) => {
             updateTriggerProperty={props.updateTriggerProperty}
             index={props.index}
             trigger={props.trigger}
+          />
+        )}
+        {props.trigger.type === EVENTS.MOVIES.NEW_RELEASE && (
+          <MoviesNewRelease
+            updateTriggerProperty={props.updateTriggerProperty}
+            index={props.index}
+            trigger={props.trigger}
+            variables={props.variables}
+            setVariablesTrigger={props.setVariablesTrigger}
           />
         )}
       </div>
