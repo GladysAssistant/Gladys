@@ -122,8 +122,10 @@ async function runCheck() {
     let movies;
     try {
       // forwarded so a TMDB-backed provider returns titles/overviews in the
-      // household's language instead of its own English/France defaults —
-      // cinema-timetable providers ignore an option they don't recognize
+      // household's language instead of its own English default — there is
+      // no trigger-level region, so a TMDB-backed trigger still watches the
+      // provider's own default region (France); a cinema-timetable provider
+      // ignores an option it doesn't recognize
       movies = await this.getUpcoming({ service: providerName, language });
     } catch (e) {
       // provider not configured, or a real failure: nothing to diff, the
