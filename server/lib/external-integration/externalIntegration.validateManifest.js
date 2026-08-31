@@ -48,6 +48,7 @@ const MANIFEST_FIELDS = [
   'containers',
   'location',
   'network_wake',
+  'movies_supports_region_and_period',
   'network_discovery',
   'actions',
   'transports',
@@ -875,6 +876,13 @@ function validateManifest(manifest) {
   }
   if (manifest.network_wake !== undefined && typeof manifest.network_wake !== 'boolean') {
     errors.push('network_wake: must be a boolean');
+  }
+  if (manifest.movies_supports_region_and_period !== undefined) {
+    if (manifest.type !== 'movies') {
+      errors.push('movies_supports_region_and_period: only allowed on movies integrations');
+    } else if (typeof manifest.movies_supports_region_and_period !== 'boolean') {
+      errors.push('movies_supports_region_and_period: must be a boolean');
+    }
   }
   if (manifest.network_discovery !== undefined) {
     if (

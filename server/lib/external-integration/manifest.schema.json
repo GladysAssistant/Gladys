@@ -80,6 +80,10 @@
       "type": "boolean",
       "description": "Declare true to request permission to send Wake-on-LAN magic packets through the Gladys core Host API. The request is shown on the install screen and is enforced server-side; an integration that does not declare it gets a 403."
     },
+    "movies_supports_region_and_period": {
+      "type": "boolean",
+      "description": "Movies type only. Declare true when the integration actually interprets the `region`/`daysAhead` options forwarded by GET /api/v1/premieres/upcoming and the movies.new-release scene trigger (a TMDB-like catalog covering several countries/periods), the same way the built-in tmdb service does. A single-cinema \"now playing\" provider has no use for either and should omit it (default false): the premieres dashboard widget then hides its \"period\"/\"country\" fields whenever this provider is pinned."
+    },
     "network_discovery": {
       "type": "array",
       "minItems": 1,
@@ -171,6 +175,19 @@
         "properties": {
           "type": {
             "const": "communication"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "movies_supports_region_and_period only makes sense on movies integrations",
+      "if": {
+        "required": ["movies_supports_region_and_period"]
+      },
+      "then": {
+        "properties": {
+          "type": {
+            "const": "movies"
           }
         }
       }

@@ -157,6 +157,10 @@ function registerProxyService(service) {
   const moviesCapability = isMovies
     ? {
         movies: Object.freeze({
+          // opt-in manifest flag (default false): most "movies" integrations
+          // are a single-cinema "now playing" feed with no use for region/
+          // period, unlike a TMDB-like catalog — see manifest.schema.json
+          supportsRegionAndPeriod: Boolean(service.manifest.movies_supports_region_and_period),
           getUpcoming: async (options) => {
             // a fresh third-party API call can be slow: 15s ack deadline
             const result = await this.sendCommand(

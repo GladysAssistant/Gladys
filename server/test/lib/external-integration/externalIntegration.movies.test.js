@@ -44,6 +44,24 @@ describe('externalIntegration movies proxy capability', () => {
     expect(deviceProxy.movies).to.equal(undefined);
   });
 
+  it('should default supportsRegionAndPeriod to false when the manifest does not declare it', async () => {
+    const { externalIntegration, stateManager } = buildSupervisor();
+    const moviesService = await seedMoviesService();
+    externalIntegration.registerProxyService(moviesService);
+    const moviesProxy = stateManager.get('service', moviesService.name);
+    expect(moviesProxy.movies.supportsRegionAndPeriod).to.equal(false);
+  });
+
+  it('should report supportsRegionAndPeriod true when the manifest declares it', async () => {
+    const { externalIntegration, stateManager } = buildSupervisor();
+    const moviesService = await seedMoviesService({
+      manifest: { ...TEST_MOVIES_MANIFEST, movies_supports_region_and_period: true },
+    });
+    externalIntegration.registerProxyService(moviesService);
+    const moviesProxy = stateManager.get('service', moviesService.name);
+    expect(moviesProxy.movies.supportsRegionAndPeriod).to.equal(true);
+  });
+
   it('should relay movies.getUpcoming over websocket and normalize the payload', async () => {
     const { externalIntegration, stateManager } = buildSupervisor();
     const service = await seedMoviesService();

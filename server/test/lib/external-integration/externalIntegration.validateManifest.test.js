@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 
 const { Error422 } = require('../../../utils/httpErrors');
-const { buildSupervisor, TEST_MANIFEST } = require('./testUtils.test');
+const { buildSupervisor, TEST_MANIFEST, TEST_MOVIES_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.validateManifest', () => {
   let externalIntegration;
@@ -1175,6 +1175,32 @@ describe('externalIntegration.validateManifest', () => {
         network_wake: 'true',
       },
       'network_wake: must be a boolean',
+    );
+  });
+  it('should accept movies_supports_region_and_period on a movies integration', () => {
+    const manifest = {
+      ...TEST_MOVIES_MANIFEST,
+      movies_supports_region_and_period: true,
+    };
+
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+  it('should reject movies_supports_region_and_period when it is not a boolean', () => {
+    expect422(
+      {
+        ...TEST_MOVIES_MANIFEST,
+        movies_supports_region_and_period: 'true',
+      },
+      'movies_supports_region_and_period: must be a boolean',
+    );
+  });
+  it('should reject movies_supports_region_and_period on a non-movies integration', () => {
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        movies_supports_region_and_period: true,
+      },
+      'movies_supports_region_and_period: only allowed on movies integrations',
     );
   });
 });
