@@ -26,11 +26,14 @@ const matchWeatherAlert = (self, sceneSelector, event, trigger) =>
     (WEATHER_ALERT_SEVERITY_RANK[trigger.weather_alert_severity] || 1);
 
 // same provider (absent or 'any' = every provider), plus an optional
-// case-insensitive "title contains" filter
+// case-insensitive "title contains" filter. A missing title (native TMDB
+// copies movie.title as-is, unlike normalizeMovies which would drop it) is
+// treated as a non-match rather than thrown, so it doesn't abort evaluation
+// of every remaining scene for the event.
 const matchMoviesNewRelease = (self, sceneSelector, event, trigger) =>
   (!trigger.movies_provider || trigger.movies_provider === event.service) &&
   (!trigger.movies_title_keyword ||
-    event.movie.title.toLowerCase().includes(trigger.movies_title_keyword.trim().toLowerCase()));
+    (event.movie.title || '').toLowerCase().includes(trigger.movies_title_keyword.trim().toLowerCase()));
 
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {

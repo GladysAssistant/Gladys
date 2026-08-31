@@ -134,6 +134,39 @@ describe('premieres.checkNewReleases', () => {
     expect(calls[0].args[1].movie.releaseDate).to.equal('1 février 2026');
   });
 
+  it('should forward the resolved language to getUpcoming, so a TMDB-backed provider returns it', async () => {
+    await db.User.update({ language: 'de' }, { where: { role: 'admin' } });
+    const movieA = { id: 1, title: 'A', releaseDate: '2026-01-01' };
+    const { premieres, services } = buildPremieres({ tmdb: [[movieA]] });
+    await premieres.checkNewReleases();
+    expect(services.tmdb.movies.getUpcoming.getCall(0).args[0]).to.deep.equal({ service: 'tmdb', language: 'de' });
+  });
+
+  it('should return the release date unchanged when it cannot be parsed', async () => {
+    const movieA = { id: 1, title: 'A', releaseDate: 'not-a-date' };
+    const movieB = { id: 2, title: 'B', releaseDate: 'still-not-a-date' };
+    const { premieres, event } = buildPremieres({ tmdb: [[movieA], [movieA, movieB]] });
+    await premieres.checkNewReleases();
+    await premieres.checkNewReleases();
+    const calls = triggerCheckCalls(event);
+    expect(calls[0].args[1].movie.releaseDate).to.equal('still-not-a-date');
+  });
+
+  it('should join a showtime with no version as the bare time', async () => {
+    const movieA = { id: 1, title: 'A', releaseDate: '2026-01-01' };
+    const movieB = {
+      id: 2,
+      title: 'B',
+      releaseDate: '2026-02-01',
+      showtimes: [{ time: '14:00' }, { time: '16:35', version: 'VOST' }],
+    };
+    const { premieres, event } = buildPremieres({ tmdb: [[movieA], [movieA, movieB]] });
+    await premieres.checkNewReleases();
+    await premieres.checkNewReleases();
+    const calls = triggerCheckCalls(event);
+    expect(calls[0].args[1].movie.showtimesText).to.equal('14:00, 16:35 VOST');
+  });
+
   it('should omit showtimesText (empty string) when the movie has no showtimes', async () => {
     const movieA = { id: 1, title: 'A', releaseDate: '2026-01-01' };
     const movieB = { id: 2, title: 'B', releaseDate: '2026-02-01' };
