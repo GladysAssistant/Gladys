@@ -128,9 +128,7 @@ describe('Scene.triggers.moviesNewRelease', () => {
     const matcher = triggersFunc[EVENTS.MOVIES.NEW_RELEASE];
     const movieWithNoTitle = { releaseDate: '2026-01-01', showtimesText: '' };
 
-    expect(() =>
-      matcher(null, 'scene', buildEvent(movieWithNoTitle), { movies_title_keyword: 'dune' }),
-    ).to.not.throw();
+    expect(() => matcher(null, 'scene', buildEvent(movieWithNoTitle), { movies_title_keyword: 'dune' })).to.not.throw();
     expect(matcher(null, 'scene', buildEvent(movieWithNoTitle), { movies_title_keyword: 'dune' })).to.equal(false);
     // no keyword filter: still matches, title is irrelevant
     expect(matcher(null, 'scene', buildEvent(movieWithNoTitle), {})).to.equal(true);
