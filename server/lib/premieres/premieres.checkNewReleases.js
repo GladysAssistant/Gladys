@@ -170,8 +170,11 @@ async function runCheck() {
 
 /**
  * @description Poll every provider referenced by an active `movies.new-release`
- * trigger and diff its upcoming list against the previous poll, firing the
- * trigger for each newly-appeared movie id. Runs twice a day (scheduler job
+ * trigger and diff its upcoming list against a cumulative "ever seen"
+ * baseline (not just the previous poll), firing the trigger for each
+ * newly-appeared movie id — an id that falls off a single-page provider's
+ * visible window (TMDB's discover, 20 titles) and later reappears is not
+ * mistaken for new a second time. Runs twice a day (scheduler job
  * check-movies-new-releases): a release calendar changes far less often than
  * weather. Gated: no active scene with a movies.new-release trigger means
  * zero third-party calls.
