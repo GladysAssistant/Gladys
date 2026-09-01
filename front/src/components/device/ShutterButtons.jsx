@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { COVER_STATE } from '../../../../server/utils/constants';
+import './ShutterButtons.css';
 
 class ShutterButtons extends Component {
   open = () => {
@@ -26,11 +27,14 @@ class ShutterButtons extends Component {
           })}
           onClick={this.open}
         >
-          {value === COVER_STATE.OPEN && isLive ? (
-            <Text id={`deviceFeatureAction.category.${category}.stateLiveFinished`} plural={COVER_STATE.OPEN} />
-          ) : (
-            <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.OPEN} />
-          )}
+          <i class="fe fe-arrow-up shutter-btn-icon" aria-hidden="true" />
+          <span class="shutter-btn-label">
+            {value === COVER_STATE.OPEN && isLive ? (
+              <Text id={`deviceFeatureAction.category.${category}.stateLiveFinished`} plural={COVER_STATE.OPEN} />
+            ) : (
+              <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.OPEN} />
+            )}
+          </span>
         </button>
         <button
           class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
@@ -44,11 +48,14 @@ class ShutterButtons extends Component {
           })}
           onClick={this.close}
         >
-          {value === COVER_STATE.CLOSE && isLive ? (
-            <Text id={`deviceFeatureAction.category.${category}.stateLiveFinished`} plural={COVER_STATE.CLOSE} />
-          ) : (
-            <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.CLOSE} />
-          )}
+          <i class="fe fe-arrow-down shutter-btn-icon" aria-hidden="true" />
+          <span class="shutter-btn-label">
+            {value === COVER_STATE.CLOSE && isLive ? (
+              <Text id={`deviceFeatureAction.category.${category}.stateLiveFinished`} plural={COVER_STATE.CLOSE} />
+            ) : (
+              <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.CLOSE} />
+            )}
+          </span>
         </button>
       </div>
     );

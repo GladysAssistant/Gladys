@@ -36,6 +36,18 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   min-width: 7rem;
 }
 
+/* The value input takes what is left of the capsule once the − and + buttons
+   have taken theirs, and .form-control's 0.75rem of side padding ate almost
+   all of it: on a phone a decimal setpoint (`20.5`) was cut down to two
+   glyphs, the rest hidden behind the buttons. The input keeps room for a
+   signed decimal value and drops the wide padding it does not need between
+   two buttons, so the capsule grows instead of clipping the value. */
+.setpointHorizontalControls .setpointValue {
+  min-width: 3.75rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
 .setpointVerticalControls {
   display: none;
 }
@@ -104,4 +116,9 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
 
 .rangeInput {
   flex: 1;
+  /* The slider is the widget's one elastic control: its cell may shrink for
+     a long device name (see .device-widget-table in routes/dashboard), and
+     this floor is where it stops — below ~6rem the thumb is no longer
+     usable on a phone. */
+  min-width: 6rem;
 }

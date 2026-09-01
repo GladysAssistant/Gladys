@@ -21,7 +21,9 @@ const dashboard = ({ name, selector, position, icon, backgroundScene = null, wid
   icon,
   background_scene: backgroundScene,
   width,
-  boxes: sections.map(columns => ({ columns })),
+  // a section is a plain list of columns, or `{ columns, widths }` when one
+  // of them is a wide column (weight 2 against 1, see the spec)
+  boxes: sections.map(section => (Array.isArray(section) ? { columns: section } : section)),
   created_at: '2024-01-08T09:12:00.000Z',
   updated_at: '2024-01-08T09:12:00.000Z'
 });
@@ -82,11 +84,15 @@ const HOME_SECTIONS = [
       {
         type: 'weather',
         house: 'main-house',
+        // Compact on purpose: today's weather and the five days ahead. The
+        // advanced block (humidity, pressure, sunrise/sunset, moon) duplicated
+        // the sun widget right below, and with the hourly strip on top of the
+        // daily one the card was 577px tall — half the dashboard.
         modes: {
           dateLocation: true,
           currentWeather: true,
-          advancedWeather: true,
-          hourlyForecast: true,
+          advancedWeather: false,
+          hourlyForecast: false,
           dailyForecast: true,
           alerts: true
         }
@@ -94,6 +100,13 @@ const HOME_SECTIONS = [
       {
         type: 'sun',
         house: 'main-house'
+      },
+      // Down here rather than under the living-room card at the bottom of the
+      // dashboard: it takes back the height the weather widget gave up, so this
+      // column ends level with the two others.
+      {
+        type: 'music',
+        device: 'living-room-sonos'
       }
     ],
     [
@@ -102,6 +115,18 @@ const HOME_SECTIONS = [
         type: 'camera',
         camera: 'garden-camera',
         name: 'Garden'
+      },
+      // The camera is the one widget of this column that absorbs its leftover
+      // height, and it does it by cropping its image: with only the house view
+      // above it, it had close to 300px to swallow and the 4:3 snapshot was
+      // rendered as a portrait. The garden card below it — the room the camera
+      // watches — ends the column level with its neighbours, so the snapshot
+      // keeps its shape.
+      {
+        type: 'devices-in-room',
+        room: 'garden',
+        device_features: ['garden-lights-binary', 'garden-lights-brightness', 'garden-watering-binary', 'outdoor-aqi'],
+        device_feature_names: ['Garden lights', 'Brightness', 'Watering', 'Air quality']
       }
     ],
     [
@@ -155,10 +180,6 @@ const HOME_SECTIONS = [
           'Air conditioning',
           'Setpoint'
         ]
-      },
-      {
-        type: 'music',
-        device: 'living-room-sonos'
       }
     ],
     [
@@ -219,49 +240,52 @@ const ENERGY_SECTIONS = [
       }
     ]
   ],
-  [
-    [
-      {
-        type: 'energy-consumption',
-        name: 'Electricity consumption',
-        device_features: ['home-index'],
-        interval: 'last-week'
-      }
-    ],
-    [
-      {
-        type: 'chart',
-        chart_type: 'area',
-        device_features: ['solar-power'],
-        interval: 'last-day',
-        units: ['watt'],
-        title: 'Solar production',
-        display_variation: true
-      },
-      {
-        type: 'gauge',
-        device_feature: 'home-battery-level',
-        name: 'Home battery',
-        gauge_use_custom_value: true,
-        gauge_min: 0,
-        gauge_max: 100
-      }
+  // The bill and the day it comes from, on two thirds of the width — they are
+  // what one opens this dashboard for — with the two live readings of the house
+  // beside them. The only weighted section of the demo: a wide column counts
+  // double, which is exactly what a chart needs and what a gauge does not.
+  {
+    widths: [2, 1],
+    columns: [
+      [
+        {
+          type: 'energy-consumption',
+          name: 'Electricity consumption',
+          device_features: ['home-index'],
+          interval: 'last-week'
+        },
+        {
+          type: 'chart',
+          chart_type: 'area',
+          device_features: ['solar-power', 'home-power'],
+          interval: 'last-day',
+          units: ['watt', 'watt'],
+          title: 'Production and consumption',
+          display_variation: true
+        }
+      ],
+      [
+        {
+          type: 'gauge',
+          device_feature: 'home-power',
+          name: 'Home consumption',
+          gauge_use_custom_value: true,
+          gauge_min: 0,
+          gauge_max: 6000
+        },
+        {
+          type: 'gauge',
+          device_feature: 'home-battery-level',
+          name: 'Home battery',
+          gauge_use_custom_value: true,
+          gauge_min: 0,
+          gauge_max: 100
+        }
+      ]
     ]
-  ],
-  [
-    [
-      {
-        type: 'gauge',
-        device_feature: 'home-power',
-        name: 'Home consumption',
-        gauge_use_custom_value: true,
-        gauge_min: 0,
-        gauge_max: 6000
-      }
-    ],
-    [{ type: 'edf-tempo' }],
-    [{ type: 'ecowatt' }]
-  ],
+  },
+  // Three columns of the same height: what the house measures, what the grid
+  // announces (the two French signals side by side), and the car.
   [
     [
       {
@@ -275,9 +299,7 @@ const ENERGY_SECTIONS = [
           'solar-daily-production'
         ],
         device_feature_names: ['Grid power', 'Solar power', 'Battery', 'Consumed today', 'Produced today']
-      }
-    ],
-    [
+      },
       {
         type: 'actions',
         name: 'Car',
@@ -285,12 +307,27 @@ const ENERGY_SECTIONS = [
           { action_type: 'scene', scene: 'solar-car-charge' },
           { action_type: 'device-feature', device_feature: 'garage-door-lock', label: 'Garage door' }
         ]
-      },
+      }
+    ],
+    [{ type: 'edf-tempo' }, { type: 'ecowatt' }],
+    [
       {
         type: 'devices-in-room',
         room: 'garage',
         device_features: ['garage-wallbox-charge', 'garage-wallbox-power', 'garage-door-lock'],
         device_feature_names: ['Car charging', 'Charging power', 'Garage door']
+      },
+      {
+        // the battery of the house over the day, not the wallbox: the car is
+        // not charging in the demo, and a curve of a charger at rest says
+        // nothing
+        type: 'chart',
+        chart_type: 'area',
+        device_features: ['home-battery-level'],
+        interval: 'last-day',
+        units: ['percent'],
+        title: 'Home battery',
+        display_variation: true
       }
     ]
   ]
@@ -319,6 +356,10 @@ const COMFORT_SECTIONS = [
     [{ type: 'temperature-in-room', room: 'bathroom' }],
     [{ type: 'humidity-in-room', room: 'bathroom' }]
   ],
+  // Three columns, each a curve (or a list) over the devices it comes from,
+  // and each ending at about the same height. Two wide columns used to leave
+  // the widgets stretched across half the screen, and the documentation link
+  // sat alone in a third one with a hole under it.
   [
     [
       {
@@ -329,9 +370,7 @@ const COMFORT_SECTIONS = [
         units: ['ppm', 'ppm', 'ppm'],
         title: 'CO2',
         display_variation: true
-      }
-    ],
-    [
+      },
       {
         type: 'devices-in-room',
         room: 'bathroom',
@@ -343,10 +382,17 @@ const COMFORT_SECTIONS = [
         ],
         device_feature_names: ['Water heater', 'Hot water', 'Towel rail', 'Humidity']
       }
-    ]
-  ],
-  [
+    ],
     [
+      {
+        type: 'chart',
+        chart_type: 'line',
+        device_features: ['living-room-humidity', 'bedroom-humidity', 'bathroom-humidity'],
+        interval: 'last-day',
+        units: ['percent', 'percent', 'percent'],
+        title: 'Humidity',
+        display_variation: true
+      },
       {
         type: 'devices-in-room',
         room: 'bedroom',
@@ -373,9 +419,7 @@ const COMFORT_SECTIONS = [
           'outdoor-temperature'
         ],
         device_feature_names: ['Living room', 'Kitchen', 'Bedroom', 'Kids room', 'Office', 'Outside']
-      }
-    ],
-    [
+      },
       {
         type: 'link',
         title: 'Gladys documentation',

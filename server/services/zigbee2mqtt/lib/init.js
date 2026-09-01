@@ -24,6 +24,7 @@ async function init(setupMode = false) {
   this.z2mPermitJoin = false;
   this.networkModeValid = false;
   this.z2mContainerError = null;
+  this.mqttConnectionError = null;
   this.dockerBased = false;
 
   // Load stored configuration

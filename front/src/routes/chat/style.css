@@ -484,8 +484,11 @@
 
 /* The scene slides back under the frosted nav chrome, so the rail's and the
    top bar's backdrop blur frost the actual scene instead of a flat page
-   background (same trick as .dashboardBackground). The chat page keeps its
-   fixed height: the padding gives the pulled-back space to the chrome. */
+   background. The width/margin trick is fine here — this element does not
+   scroll (the messages column inside it does), so its fixed background is
+   never repainted, unlike the old scrolling .dashboardBackground, which now
+   paints its scene on a fixed ::before layer instead. The chat page keeps
+   its fixed height: the padding gives the pulled-back space to the chrome. */
 @media (min-width: 992px) {
   :global(body.gladys-sidebar-nav) .chatPage {
     width: calc(100% + 15rem);

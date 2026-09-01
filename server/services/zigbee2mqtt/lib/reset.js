@@ -57,6 +57,7 @@ async function reset() {
   this.z2mPermitJoin = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
+  this.mqttConnectionError = null;
 
   // 5. Emit status event
   this.emitStatusEvent();

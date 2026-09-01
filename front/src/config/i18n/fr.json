@@ -5,6 +5,7 @@
     "new": "Nouveau",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
+    "orderDirLabel": "Ordre de tri",
     "emptySelectOption": "---------",
     "backButton": "◀️️ Retour",
     "requiredField": "*",
@@ -34,6 +35,9 @@
     "expand": "Développer",
     "loading": "Chargement...",
     "preview": "Aperçu"
+  },
+  "errorBoundary": {
+    "message": "Une erreur est survenue à l'affichage. Rechargez la page, et vérifiez la configuration si cela se reproduit."
   },
   "color": {
     "aqua": "Aqua",
@@ -309,6 +313,7 @@
   "dashboard": {
     "title": "Tableau de bord",
     "editDashboardButton": "Éditer",
+    "allDashboardsButton": "Tous les tableaux de bord",
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
@@ -1498,6 +1503,10 @@
     "free-mobile": {
       "title": "Free Mobile",
       "description": "Envoyer des sms depuis Gladys grâce à Free Mobile.",
+      "deprecatedWarning": {
+        "title": "Intégration bientôt dépréciée",
+        "description": "Cette intégration native sera supprimée dans une prochaine version de Gladys. Elle est remplacée par l'intégration communautaire <b>Free Mobile SMS</b>, qui offre les mêmes fonctionnalités et continuera d'être maintenue. Rendez-vous dans le <a href=\"/dashboard/integration/notifications\">catalogue des intégrations</a> pour l'installer, puis renseignez vos identifiants Free Mobile dans le bloc <b>Mon compte</b> de l'onglet <b>Configuration</b> de cette intégration — chaque utilisateur Gladys saisit les siens. Dans vos scènes, l'action <b>Envoyer un sms</b> continue d'utiliser cette intégration native : remplacez-la par une action <b>Envoyer un message</b> ciblant le canal Free Mobile SMS et l'utilisateur Gladys dont le compte est configuré."
+      },
       "documentation": "Documentation Free Mobile",
       "introduction": "Ce plugin vous permet d'envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
       "username": "Identifiant client Free Mobile",
@@ -1822,6 +1831,12 @@
         "enableLabel": "Activer ou désactiver le service",
         "enableDescription": "Au prochain redémarrage de Gladys, le service démarrera de nouveau. Suivant la puissance de votre machine et la vitesse de votre réseau, démarrer ce service en \"Installation depuis Gladys\" peut prendre entre 2 minutes et 1 heure. Il est possible de désactiver le service de manière pérenne depuis cette page : <a href=\"/dashboard/settings/service\">Paramètres > Services</a>.",
         "toggleError": "Une erreur est survenue. Veuillez vérifier la configuration du service.",
+        "mqttConnectionErrors": {
+          "BAD_CREDENTIALS": "Gladys n'a pas réussi à se connecter au broker MQTT : le nom d'utilisateur ou le mot de passe est incorrect. Vérifiez les identifiants de votre broker MQTT, puis enregistrez à nouveau la configuration.",
+          "NOT_AUTHORIZED": "Le broker MQTT a refusé la connexion : non autorisé. Vérifiez le nom d'utilisateur et le mot de passe de votre broker MQTT, ainsi que les droits d'accès de ce client, puis enregistrez à nouveau la configuration.",
+          "BROKER_UNREACHABLE": "Gladys n'a pas réussi à joindre le broker MQTT. Vérifiez que l'URL et le port du broker sont corrects, et que le broker est démarré et joignable depuis Gladys.",
+          "unknownErrorPrefix": "Erreur de connexion MQTT : "
+        },
         "serviceStatus": "Etat du service",
         "description": "Ce service utilise deux containers Docker (MQTT broker et Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zigbee2mqtt depuis Gladys.",
@@ -3231,6 +3246,8 @@
       "registeredLabel": "Enregistré le :"
     },
     "backToIntegrations": "Retour aux intégrations",
+    "menuScrollLeft": "Faire défiler le menu vers la gauche",
+    "menuScrollRight": "Faire défiler le menu vers la droite",
     "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
   },
   "editScene": {
@@ -3301,6 +3318,8 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       },
       "smsSend": {
+        "deprecatedTitle": "Action bientôt dépréciée",
+        "deprecatedDescription": "Cette action utilise l'intégration native Free Mobile, qui sera supprimée dans une prochaine version de Gladys. Installez l'intégration communautaire <b>Free Mobile SMS</b>, renseignez vos identifiants Free Mobile dans le bloc <b>Mon compte</b> de l'onglet <b>Configuration</b> de cette intégration, puis remplacez cette action par une action <b>Envoyer un message</b> ciblant le canal Free Mobile SMS et l'utilisateur Gladys dont le compte est configuré.",
         "textLabel": "Message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
         "messagePlaceholder": "Mon message"
@@ -3543,6 +3562,9 @@
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
         "deviceLabel": "Enceinte",
         "volumeLabel": "Volume",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Calculé",
+        "computedExplanationText": "À la place d'un volume fixe, vous pouvez entrer ici un calcul basé sur une variable de scène, par exemple pour parler moins fort la nuit. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc.",
         "textLabel": "Message à dire sur l'enceinte",
         "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       }
@@ -3979,6 +4001,7 @@
     },
     "searchActionsPlaceholder": "Rechercher une action…",
     "searchTriggersPlaceholder": "Rechercher un déclencheur…",
+    "deprecatedActionBadge": "Bientôt dépréciée",
     "noResultsFound": "Aucun résultat",
     "whenSectionTitle": "Quand",
     "whenSectionSubtitle": "la scène démarre dès qu'un seul de ces événements se produit",
@@ -6307,6 +6330,10 @@
       "other": "Essai Gladys Plus : {{count}} jours restants"
     },
     "trialAddPaymentMethod": "Ajouter un moyen de paiement",
+    "instanceUpdateNoticeTitle": "Mise à jour disponible",
+    "instanceUpdateNoticeText": "Gladys Plus a été mis à jour en {{latestVersion}}, mais votre instance est encore en {{instanceVersion}}. Certaines fonctionnalités peuvent mal fonctionner tant que votre instance n'est pas à jour.",
+    "instanceUpdateNoticeButton": "Mettre à jour mon instance",
+    "instanceUpdateNoticeDismiss": "Masquer ce message",
     "needHelp": "Besoin d'aide",
     "signOut": "Déconnexion"
   },

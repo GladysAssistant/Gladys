@@ -29,6 +29,11 @@ function setupRoutes(gladys) {
   const routes = getRoutes(gladys);
   const authMiddleware = AuthMiddleware('dashboard:write', gladys);
   const authenticatedOrNotConfiguredMiddleware = AuthenticatedOrNotConfiguredMiddleware('dashboard:write', gladys);
+  const authenticatedOrNotConfiguredNonAdminMiddleware = AuthenticatedOrNotConfiguredMiddleware(
+    'dashboard:write',
+    gladys,
+    false,
+  );
   const isInstanceConfiguredMiddleware = IsInstanceConfiguredMiddleware(gladys);
   const resetPasswordAuthMiddleware = AuthMiddleware('reset-password:write', gladys);
   const alarmMiddleware = AuthMiddleware('alarm:write', gladys);
@@ -57,9 +62,14 @@ function setupRoutes(gladys) {
     if (routes[routeKey].admin && !routes[routeKey].authenticatedOrNotConfigured) {
       routerParams.push(adminMiddleware);
     }
-    // if the route requires an authenticated admin user only once the instance is configured
+    // if the route requires an authenticated user only once the instance is configured
+    // (an admin one, unless the route is not marked as admin)
     if (routes[routeKey].authenticatedOrNotConfigured) {
-      routerParams.push(authenticatedOrNotConfiguredMiddleware);
+      routerParams.push(
+        routes[routeKey].admin
+          ? authenticatedOrNotConfiguredMiddleware
+          : authenticatedOrNotConfiguredNonAdminMiddleware,
+      );
     }
     // if the route need rate limit
     if (routes[routeKey].rateLimit) {

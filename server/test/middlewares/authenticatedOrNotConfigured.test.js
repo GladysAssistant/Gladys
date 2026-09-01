@@ -69,6 +69,52 @@ describe('authenticatedOrNotConfiguredMiddleware', () => {
       }
     });
   });
+  it('should allow access to a non-admin user when the route is not admin only', (done) => {
+    const gladys = {
+      user: {
+        getUserCount: () => 1,
+        getById: () => Promise.resolve({ id: 'user-id', role: 'habitant' }),
+      },
+      session: {
+        validateAccessToken: () => ({ user_id: 'user-id', session_id: 'session-id' }),
+      },
+    };
+    const middleware = AuthenticatedOrNotConfiguredMiddleware('dashboard:write', gladys, false);
+    const req = new MockExpressRequest({
+      headers: {
+        authorization: 'Bearer access-token',
+      },
+    });
+    middleware(req, {}, (error) => {
+      if (error) {
+        done(error);
+        return;
+      }
+      expect(req).to.have.property('user');
+      // @ts-ignore
+      expect(req.user).to.deep.equal({ id: 'user-id', role: 'habitant' });
+      done();
+    });
+  });
+  it('should refuse access without authentication when the route is not admin only', (done) => {
+    const gladys = {
+      user: {
+        getUserCount: () => 1,
+      },
+    };
+    const middleware = AuthenticatedOrNotConfiguredMiddleware('dashboard:write', gladys, false);
+    const req = new MockExpressRequest({
+      headers: {},
+    });
+    middleware(req, {}, (error) => {
+      if (!error) {
+        done('should have thrown an error');
+      } else {
+        expect(error).to.be.instanceOf(Error401);
+        done();
+      }
+    });
+  });
   it('should refuse access to a non-admin user when the instance is configured', (done) => {
     const gladys = {
       user: {

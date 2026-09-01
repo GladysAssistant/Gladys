@@ -6,7 +6,7 @@ const { fake, assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
-const { isNanoCpusError } = require('../../../lib/system/system.createContainer');
+const { isNanoCpusError, isCpuCfsError } = require('../../../lib/system/system.createContainer');
 const DockerodeMock = require('./DockerodeMock.test');
 
 const System = proxyquire('../../../lib/system', {
@@ -157,5 +157,50 @@ describe('system.createContainer isNanoCpusError', () => {
       false,
     );
     expect(isNanoCpusError(Object.assign(new Error(NANO_CPUS_MESSAGE), { statusCode: 500 }))).to.equal(false);
+  });
+});
+
+describe('system.createContainer isCpuCfsError', () => {
+  // the start-time failure of cgroup v2 kernels without CFS bandwidth
+  // control (Khadas VIM1S among others): the creation passed, runc cannot
+  // open the missing cpu.max file
+  const CPU_MAX_MESSAGE =
+    'failed to create task for container: failed to create shim task: OCI runtime create failed: ' +
+    'runc create failed: unable to start container process: error during container init: ' +
+    'error setting cgroup config for procHooks process: ' +
+    'openat2 /sys/fs/cgroup/system.slice/docker-abc123.scope/cpu.max: no such file or directory: unknown';
+
+  it('should return false without an error', () => {
+    expect(isCpuCfsError(null)).to.equal(false);
+    expect(isCpuCfsError(undefined)).to.equal(false);
+  });
+
+  it('should match the creation-time NanoCPUs rejection', () => {
+    const nanoCpusMessage =
+      'NanoCPUs can not be set, as your kernel does not support CPU CFS scheduler or the cgroup is not mounted';
+    const error = Object.assign(new Error(`(HTTP code 400) unexpected - ${nanoCpusMessage}`), { statusCode: 400 });
+    expect(isCpuCfsError(error)).to.equal(true);
+  });
+
+  it('should match the start-time cpu.max cgroup error whatever the status code', () => {
+    const error = Object.assign(new Error(`(HTTP code 500) server error - ${CPU_MAX_MESSAGE}`), { statusCode: 500 });
+    expect(isCpuCfsError(error)).to.equal(true);
+  });
+
+  it('should match on the daemon json message alone', () => {
+    expect(isCpuCfsError({ statusCode: 500, json: { message: CPU_MAX_MESSAGE } })).to.equal(true);
+  });
+
+  it('should not match another error', () => {
+    expect(isCpuCfsError(Object.assign(new Error('(HTTP code 500) server error - oom'), { statusCode: 500 }))).to.equal(
+      false,
+    );
+    expect(
+      isCpuCfsError(
+        Object.assign(new Error('openat2 /sys/fs/cgroup/x/memory.max: no such file or directory'), {
+          statusCode: 500,
+        }),
+      ),
+    ).to.equal(false);
   });
 });

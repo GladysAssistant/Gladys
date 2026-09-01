@@ -323,29 +323,6 @@
   justify-content: center;
 }
 
-/* media boxes stretch by letting their image absorb the extra height —
-   the viewer's .stretchableBox > div > img/.dimmer rules, one wrapper deeper */
-.stretchPreview .previewContent > * > img {
-  flex: 1 1 auto;
-  object-fit: cover;
-  min-height: 0;
-}
-
-.stretchPreview .previewContent > * > :global(.dimmer) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.stretchPreview .previewContent > * > :global(.dimmer) > :global(.dimmer-content) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-}
-
 /* Same caps as the viewer, shifted by the edit chrome (toolbar + the "+"
    slot ≈ 4rem): the widget card ends up at the viewer's size. Desktop only —
    below the breakpoint columns stack and heights are natural. */
@@ -419,8 +396,10 @@
     left: 0;
     right: 0;
     /* clear the fixed save/cancel footer, like the desktop panel does —
-       at bottom: 0 the footer bar hides the form's last field or button */
-    bottom: 3.5rem;
+       at bottom: 0 the footer bar hides the form's last field or button.
+       The bar measures itself (EditActions) because it wraps to two rows
+       when the labels don't fit; the fallback is its one-row height. */
+    bottom: var(--gl-editor-footer-height, 3.5rem);
     max-height: 78vh;
     border-radius: 16px 16px 0 0;
   }
@@ -643,6 +622,33 @@
 
 :global(.glass-theme) .editorTopBar :global(.btn-outline-primary .fe) {
   color: var(--gl-accent);
+}
+
+/* The editor's action bar: one right-aligned row that wraps instead of
+   overflowing. The old markup was a Bootstrap .row / .col-auto pair, and a
+   .col-auto is sized by its content: on a 390px phone the French labels
+   ("Annuler", "Supprimer", "Sauvegarder") made it 452px wide. Right-aligned,
+   the extra 62px went off the LEFT of the screen and cut the cancel button in
+   half — an action the user could see but not fully reach. */
+.editActionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.editActionsQuestion {
+  flex: 0 1 auto;
+}
+
+/* A wrapped bar is two rows tall, and on a phone every pixel it takes is one
+   the widget list loses (the edit panel stops right above it) */
+@media (max-width: 991px) {
+  .editActionsFooter {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
 }
 
 /* The action footer becomes a frosted bar (same recipe as the nav rail)… */

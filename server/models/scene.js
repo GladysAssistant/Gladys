@@ -96,6 +96,9 @@ const actionSchema = Joi.object()
       .integer()
       .max(100)
       .min(0),
+    // Volume of a "play notification" action calculated from a formula, instead of the
+    // fixed "volume" above.
+    evaluate_volume: Joi.string(),
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
