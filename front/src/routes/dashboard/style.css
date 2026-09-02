@@ -1347,6 +1347,13 @@
   align-items: center;
 }
 
+/* Read-only sensor icons carry Bootstrap's mr-2 utility for legacy table
+   layouts. In this flex layout that margin enlarges their icon cell by 8px,
+   shifting only sensor names (temperature, opening, etc.) to the right. */
+:global(.glass-theme .device-widget-table tr td:first-child > .fe) {
+  margin-right: 0 !important;
+}
+
 /* Column flex, not block: the light row stacks two divs (name + summary)
    in this cell; plain text rows put their text in an anonymous item. */
 :global(.glass-theme .device-widget-table tr td:nth-child(2)) {
