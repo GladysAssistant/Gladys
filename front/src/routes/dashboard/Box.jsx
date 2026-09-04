@@ -18,6 +18,7 @@ import VoiceAssistantBox from '../../components/boxs/voice-assistant/VoiceAssist
 import LinkBox from '../../components/boxs/link/LinkBox';
 import PhotoBox from '../../components/boxs/photo/PhotoBox';
 import SunBox from '../../components/boxs/sun/Sun';
+import MoonBox from '../../components/boxs/moon/Moon';
 import ChipsBox from '../../components/boxs/chips/ChipsBox';
 import ActionsBox from '../../components/boxs/actions/ActionsBox';
 import HouseViewBox from '../../components/boxs/house-view/HouseViewBox';
@@ -65,6 +66,8 @@ const BoxContent = ({ children, ...props }) => {
       return <PhotoBox {...props} />;
     case 'sun':
       return <SunBox {...props} />;
+    case 'moon':
+      return <MoonBox {...props} />;
     case 'chips':
       return <ChipsBox {...props} />;
     case 'house-view':

@@ -208,6 +208,53 @@ module.exports = function HouseController(gladys) {
     res.json(sunState);
   }
 
+  /**
+   * @api {get} /api/v1/house/:house_selector/moon getMoonState
+   * @apiName getMoonState
+   * @apiGroup House
+   * @apiDescription Get the moon phase, illumination, position and upcoming lunar events for a house.
+   * Moonrise and moonset are computed for the local day of the instance timezone, and are null
+   * when the moon does not cross the horizon on that day.
+   * @apiParam {Boolean} [at_midnight] Compute the values at local midnight instead of the current
+   * time, the way lunar calendars publish them. Moonrise and moonset are not affected.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "timezone": "Europe/Paris",
+   *   "phase": 0.35,
+   *   "phase_name": "waxingGibbous",
+   *   "illumination": 80,
+   *   "waxing": true,
+   *   "ascending": true,
+   *   "age_days": 10.4,
+   *   "distance": 405562,
+   *   "zodiac_sign": "capricorn",
+   *   "azimuth": 84.47,
+   *   "elevation": -41.7,
+   *   "moonrise": "2026-08-23T16:45:54.459Z",
+   *   "moonset": "2026-08-22T23:23:11.684Z",
+   *   "next_new_moon": "2026-09-11T01:27:46.406Z",
+   *   "next_first_quarter": "2026-09-18T19:46:03.281Z",
+   *   "next_full_moon": "2026-08-28T07:00:21.094Z",
+   *   "next_last_quarter": "2026-09-04T06:54:43.594Z",
+   *   "next_perigee": "2026-09-05T11:31:53.587Z",
+   *   "next_apogee": "2026-09-19T06:11:02.904Z",
+   *   "next_node": "2026-08-27T10:12:04.219Z",
+   *   "next_node_ascending": true,
+   *   "next_eclipse": "2027-02-20T21:04:48.282Z",
+   *   "next_eclipse_type": "penumbral"
+   * }
+   */
+  async function getMoonState(req, res) {
+    const house = await gladys.house.getBySelector(req.params.house_selector);
+    const { latitude, longitude } = house;
+    if (latitude === null || latitude === undefined || longitude === null || longitude === undefined) {
+      throw new Error400(ERROR_MESSAGES.HOUSE_HAS_NO_COORDINATES);
+    }
+    const atMidnight = req.query.at_midnight === 'true';
+    const moonState = await gladys.house.getMoonState(house, new Date(), { atMidnight });
+    res.json(moonState);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
@@ -217,6 +264,7 @@ module.exports = function HouseController(gladys) {
     userSeen: asyncMiddleware(userSeen),
     getRooms: asyncMiddleware(getRooms),
     getSunState: asyncMiddleware(getSunState),
+    getMoonState: asyncMiddleware(getMoonState),
     arm: asyncMiddleware(arm),
     disarm: asyncMiddleware(disarm),
     disarmWithCode: asyncMiddleware(disarmWithCode),

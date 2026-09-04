@@ -214,3 +214,57 @@ describe('GET /api/v1/house/:house_selector/sun', () => {
       .expect(404);
   });
 });
+
+describe('GET /api/v1/house/:house_selector/moon', () => {
+  it('should return the moon state of the house', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/test-house/moon')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.phase).to.be.a('number');
+        expect(res.body.phase_name).to.be.a('string');
+        expect(res.body.illumination).to.be.a('number');
+        expect(res.body.waxing).to.be.a('boolean');
+        expect(res.body.ascending).to.be.a('boolean');
+        expect(res.body.age_days).to.be.a('number');
+        expect(res.body.distance).to.be.a('number');
+        expect(res.body.zodiac_sign).to.be.a('string');
+        expect(res.body.azimuth).to.be.a('number');
+        expect(res.body.elevation).to.be.a('number');
+        expect(res.body).to.have.property('moonrise');
+        expect(res.body).to.have.property('moonset');
+        expect(res.body).to.have.property('next_new_moon');
+        expect(res.body).to.have.property('next_first_quarter');
+        expect(res.body).to.have.property('next_full_moon');
+        expect(res.body).to.have.property('next_last_quarter');
+        expect(res.body).to.have.property('next_perigee');
+        expect(res.body).to.have.property('next_apogee');
+        expect(res.body).to.have.property('next_node');
+        expect(res.body).to.have.property('next_eclipse');
+      });
+  });
+  it('should return the moon state computed at midnight', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/test-house/moon?at_midnight=true')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.phase).to.be.a('number');
+        expect(res.body.illumination).to.be.a('number');
+        expect(res.body.distance).to.be.a('number');
+      });
+  });
+  it('should return 400 when the house has no coordinates', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/pepper-house/moon')
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
+  it('should return 404 when the house does not exist', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/house-does-not-exist/moon')
+      .expect('Content-Type', /json/)
+      .expect(404);
+  });
+});
