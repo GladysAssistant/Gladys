@@ -71,7 +71,7 @@ const getVisibleViewport = () => {
 // against the visible viewport and the control alone: the side never depends
 // on the menu's content, and the height never exceeds the room there is, so a
 // list that grows while the menu is open cannot push it off screen.
-const placeMenu = ({ rect, viewport, menuPlacement, maxMenuHeight, minMenuHeight, gutter }) => {
+const placeMenu = ({ rect, viewport, menuPlacement, maxMenuHeight, minMenuHeight, rowHeight, gutter }) => {
   const below = { placement: 'bottom', maxHeight: Math.min(maxMenuHeight, viewport.bottom - rect.bottom - gutter) };
   const above = { placement: 'top', maxHeight: Math.min(maxMenuHeight, rect.top - viewport.top - gutter) };
   const [preferred, other] = menuPlacement === 'top' ? [above, below] : [below, above];
@@ -81,9 +81,11 @@ const placeMenu = ({ rect, viewport, menuPlacement, maxMenuHeight, minMenuHeight
   if (other.maxHeight >= minMenuHeight) {
     return other;
   }
-  // no decent room on either side: the larger one, and the list scrolls
+  // no decent room on either side: the larger one, as tall as that room and
+  // no taller (a menu past the edge of the screen is the bug), the list
+  // scrolls — down to one option row on a screen that cannot even fit that
   const larger = preferred.maxHeight >= other.maxHeight ? preferred : other;
-  return { placement: larger.placement, maxHeight: minMenuHeight };
+  return { placement: larger.placement, maxHeight: Math.max(larger.maxHeight, rowHeight) };
 };
 
 const MenuPortal = props => {
@@ -117,6 +119,7 @@ const MenuPortal = props => {
     menuPlacement: selectProps.menuPlacement,
     maxMenuHeight: selectProps.maxMenuHeight,
     minMenuHeight: selectProps.minMenuHeight,
+    rowHeight: theme.spacing.controlHeight,
     gutter: theme.spacing.menuGutter
   });
   // the menu hangs from the portal's edge: its top for a menu below the
