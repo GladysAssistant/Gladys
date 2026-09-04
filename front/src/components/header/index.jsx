@@ -112,6 +112,10 @@ const NAV_ITEMS = [
 class Header extends Component {
   dropdownRef = createRef(null);
 
+  collapseButtonRef = createRef(null);
+
+  expandButtonRef = createRef(null);
+
   handleClickOutside = e => {
     if (this.dropdownRef.current && !this.dropdownRef.current.contains(e.target)) {
       this.props.closeDropDown();
@@ -186,9 +190,21 @@ class Header extends Component {
     this.maybeRefreshInstanceVersion();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     this.syncBodyClass();
     this.maybeRefreshInstanceVersion();
+    // Toggling always takes away the control that was just pressed —
+    // collapsing rides the footer chevron off-canvas, expanding unmounts the
+    // floating button — so the keyboard would be dropped back to the top of
+    // the document mid-task. Hand it to the control that took over. Only on
+    // a real change: on mount the collapsed rail must not steal focus from
+    // the page the user just opened.
+    if (prevProps.sidebarCollapsed !== this.props.sidebarCollapsed) {
+      const takingOver = this.props.sidebarCollapsed ? this.expandButtonRef : this.collapseButtonRef;
+      if (takingOver.current) {
+        takingOver.current.focus();
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -252,6 +268,7 @@ class Header extends Component {
               type="button"
               class={style.expandButton}
               onClick={props.toggleSidebarCollapsed}
+              ref={this.expandButtonRef}
               data-cy="sidebar-expand-button"
               aria-label={<Text id="header.expandMenu" />}
               aria-expanded="false"
@@ -359,6 +376,7 @@ class Header extends Component {
                 type="button"
                 class={style.collapseButton}
                 onClick={props.toggleSidebarCollapsed}
+                ref={this.collapseButtonRef}
                 data-cy="sidebar-collapse-button"
                 title={<Text id="header.collapseMenu" />}
                 aria-label={<Text id="header.collapseMenu" />}
