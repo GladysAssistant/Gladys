@@ -4718,7 +4718,8 @@
     "generateButton": "Wiederherstellungscodes erzeugen",
     "confirmGenerateButton": "Neue Codes erzeugen",
     "rotationWarning": "Ein neuer Satz macht die Wiederherstellungscodes, die du eventuell schon hast, sofort ungültig. Nur die neuen funktionieren.",
-    "continueButton": "Weiter"
+    "continueButton": "Weiter",
+    "twoFactorCodeRequired": "Gib einen Code aus deiner Zwei-Faktor-App ein: Das Gateway verlangt ihn, um Wiederherstellungscodes zu erzeugen."
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Zwei-Faktor-Authentifizierung (2FA) konfigurieren",

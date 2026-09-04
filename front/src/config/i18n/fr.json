@@ -4718,7 +4718,8 @@
     "generateButton": "Générer des codes de récupération",
     "confirmGenerateButton": "Générer de nouveaux codes",
     "rotationWarning": "Générer un nouveau jeu invalide immédiatement les codes de récupération que vous possédez peut-être déjà. Seuls les nouveaux fonctionneront.",
-    "continueButton": "Continuer"
+    "continueButton": "Continuer",
+    "twoFactorCodeRequired": "Entrez un code de votre application 2FA : la Gateway l'exige pour générer les codes de récupération."
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Configurer l'authentification à deux facteurs (2FA)",

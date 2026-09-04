@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import get from 'get-value';
 import SecurityPage from './SecurityPage';
 import { RequestStatus } from '../../../utils/consts';
 
@@ -10,36 +11,56 @@ class SettingsSecurity extends Component {
   state = {
     status: null,
     confirming: false,
-    recoveryCodes: null
+    recoveryCodes: null,
+    // the Gateway requires a current code from the two-factor app to generate recovery codes
+    twoFactorCode: '',
+    wrongTwoFactorCode: false
   };
 
   askConfirmation = () => {
-    this.setState({ confirming: true, status: null });
+    this.setState({ confirming: true, status: null, twoFactorCode: '', wrongTwoFactorCode: false });
   };
 
   cancelGenerate = () => {
-    this.setState({ confirming: false });
+    this.setState({ confirming: false, twoFactorCode: '' });
+  };
+
+  updateTwoFactorCode = e => {
+    this.setState({ twoFactorCode: e.target.value });
   };
 
   generateRecoveryCodes = async () => {
-    this.setState({ status: RequestStatus.Getting });
+    this.setState({ status: RequestStatus.Getting, wrongTwoFactorCode: false });
     try {
-      const { recovery_codes: recoveryCodes } = await this.props.session.gatewayClient.generateTwoFactorRecoveryCodes();
-      this.setState({ recoveryCodes, confirming: false, status: RequestStatus.Success });
+      const { recovery_codes: recoveryCodes } = await this.props.session.gatewayClient.generateTwoFactorRecoveryCodes(
+        this.state.twoFactorCode
+      );
+      this.setState({ recoveryCodes, confirming: false, twoFactorCode: '', status: RequestStatus.Success });
     } catch (e) {
       console.error(e);
-      this.setState({ confirming: false, status: RequestStatus.Error });
+      const status = get(e, 'response.status');
+      // 403: the code is wrong or expired, the user stays on the form to enter a new one
+      const wrongTwoFactorCode = status === 403;
+      this.setState({
+        confirming: wrongTwoFactorCode,
+        wrongTwoFactorCode,
+        twoFactorCode: '',
+        status: RequestStatus.Error
+      });
     }
   };
 
-  render(props, { status, confirming, recoveryCodes }) {
+  render(props, { status, confirming, recoveryCodes, twoFactorCode, wrongTwoFactorCode }) {
     return (
       <SecurityPage
         status={status}
         confirming={confirming}
         recoveryCodes={recoveryCodes}
+        twoFactorCode={twoFactorCode}
+        wrongTwoFactorCode={wrongTwoFactorCode}
         askConfirmation={this.askConfirmation}
         cancelGenerate={this.cancelGenerate}
+        updateTwoFactorCode={this.updateTwoFactorCode}
         generateRecoveryCodes={this.generateRecoveryCodes}
       />
     );
