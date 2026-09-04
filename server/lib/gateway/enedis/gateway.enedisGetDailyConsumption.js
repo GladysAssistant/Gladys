@@ -15,8 +15,10 @@ const { Error403 } = require('../../../utils/httpErrors');
 async function enedisGetDailyConsumption(query) {
   try {
     const consumption = await this.gladysGatewayClient.enedisGetDailyConsumption(query);
+    await this.setSubscriptionActive(true);
     return consumption;
   } catch (e) {
+    await this.throwIfPaymentRequired(e);
     if (get(e, 'response.status') === 403) {
       throw new Error403();
     }

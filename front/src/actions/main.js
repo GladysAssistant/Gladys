@@ -5,6 +5,7 @@ import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
 import get from 'get-value';
 import config from '../config';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../server/utils/constants';
 import { isUrlInArray } from '../utils/url';
 import {
   isInstanceBehindFront,
@@ -25,6 +26,9 @@ const INSTANCE_VERSION_REFRESH_INTERVAL_MS = 60 * 1000;
 
 let lastGatewayTrialRefresh = 0;
 let lastInstanceVersionRefresh = 0;
+// the session whose websocket already forwards the Gladys Plus subscription
+// changes to the store: the listener is registered once per session
+let gatewaySubscriptionListenerSession = null;
 
 const OPEN_PAGES = [
   '/signup',
@@ -105,6 +109,8 @@ function createActions(store) {
         actionsExternalIntegrationUpdates.refreshExternalIntegrationsToUpdate(state, user);
         // same fire-and-forget for the instance version behind Gladys Plus
         actions.refreshInstanceVersionState(state);
+        // and for the Gladys Plus subscription lock, announced in the header
+        actions.refreshGatewaySubscriptionState(state);
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
           const now = new Date();
@@ -195,6 +201,29 @@ function createActions(store) {
         gatewayTrialHasPaymentMethod: hasPaymentMethod,
         gatewayTrialStripePortalKey: stripePortalKey
       });
+    },
+    // The instance pauses its Gladys Plus features (backups, Enedis, AI) when
+    // Gladys Plus answers "payment required": the header announces it on every
+    // page. Loaded at session check, then kept up to date by the instance
+    // itself through the websocket, in both directions (lock and unlock).
+    async refreshGatewaySubscriptionState(state) {
+      if (state.session && state.session.dispatcher && gatewaySubscriptionListenerSession !== state.session) {
+        gatewaySubscriptionListenerSession = state.session;
+        state.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED, payload => {
+          store.setState({
+            gatewayPaymentRequired: get(payload, 'subscription_active') === false
+          });
+        });
+      }
+      try {
+        const gatewayStatus = await state.httpClient.get('/api/v1/gateway/status');
+        store.setState({
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false
+        });
+      } catch (e) {
+        // status unknown: better no notice than a wrong one
+        console.error(e);
+      }
     },
     // On Gladys Plus the front redeploys at release time while the local
     // instance waits for Watchtower (up to ~24h): the instance version is

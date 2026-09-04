@@ -43,6 +43,7 @@ async function aiChat(body) {
     return response;
   } catch (e) {
     logger.debug(e);
+    await this.throwIfPaymentRequired(e);
     const status = get(e, 'response.status');
     const message = get(e, 'response.data.error_message');
     if (status === 403) {

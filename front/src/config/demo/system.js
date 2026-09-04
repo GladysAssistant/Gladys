@@ -7,7 +7,9 @@ import { uuid, daysAgo, minutesAgo } from './helpers';
 const system = {
   'get /api/v1/gateway/status': {
     configured: true,
-    connected: true
+    connected: true,
+    subscription_active: true,
+    payment_required_since: null
   },
   'get /api/v1/gateway/backup/restore/status': {
     restore_in_progress: false,

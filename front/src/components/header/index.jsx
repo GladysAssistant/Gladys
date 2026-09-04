@@ -8,6 +8,7 @@ import { USER_ROLE } from '../../../../server/utils/constants';
 import DarkModeToggle from '../darkmode/DarkModeToggle';
 import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
+import GatewaySubscriptionNotice from './GatewaySubscriptionNotice';
 import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
 import style from './style.css';
 
@@ -196,7 +197,9 @@ class Header extends Component {
             {/* on mobile the notice lives in the closed menu: this dot is
                 what tells the user there is something to open it for. Screen
                 readers get the notice content itself, in the menu. */}
-            {showInstanceUpdateNotice && <span class={style.mobileTogglerDot} aria-hidden="true" />}
+            {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
+              <span class={style.mobileTogglerDot} aria-hidden="true" />
+            )}
           </button>
           <a class={style.mobileBrand} href="/dashboard">
             <Localizer>
@@ -270,6 +273,7 @@ class Header extends Component {
               onDismiss={this.handleInstanceNoticeDismiss}
             />
           )}
+          {props.gatewayPaymentRequired && <GatewaySubscriptionNotice user={props.user} />}
           {Number.isInteger(props.gatewayTrialDaysLeft) && (
             <GatewayTrialIndicator
               daysLeft={props.gatewayTrialDaysLeft}

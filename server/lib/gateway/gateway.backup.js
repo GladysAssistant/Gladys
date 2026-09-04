@@ -184,6 +184,9 @@ async function backup(jobId) {
       encryptedBackupFilePath,
     };
   } catch (e) {
+    // Unpaid subscription: the admins are already told by the lock itself,
+    // no need for a "backup failed" message on top of it
+    await this.throwIfPaymentRequired(e);
     // If the backup fails, we need to warn the admins of this installation
     const admins = await this.user.getByRole(USER_ROLE.ADMIN);
     admins.forEach((admin) => {

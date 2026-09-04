@@ -24,6 +24,26 @@ function createActions(store) {
         });
       }
     },
+    // "Check again" of the Gladys Plus settings, once the payment method has
+    // been updated: asks the instance to check the subscription with Gladys
+    // Plus right now, instead of waiting for its daily check
+    async refreshSubscriptionStatus(state) {
+      store.setState({
+        gatewayRefreshSubscriptionStatus: RequestStatus.Getting
+      });
+      try {
+        const gatewayStatus = await state.httpClient.post('/api/v1/gateway/subscription/refresh');
+        store.setState({
+          gatewayStatus,
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false,
+          gatewayRefreshSubscriptionStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          gatewayRefreshSubscriptionStatus: RequestStatus.Error
+        });
+      }
+    },
     async login(state, e) {
       if (e) {
         e.preventDefault();

@@ -190,6 +190,32 @@
   color: #3d6df0;
 }
 
+/* Unpaid Gladys Plus subscription (see GatewaySubscriptionNotice): same shape
+   as the notices above, in red — this one is not informational, the Gladys
+   Plus features of the instance are paused until it is dealt with */
+.subscriptionNoticeCard {
+  background-color: rgba(205, 32, 31, 0.12);
+}
+
+.subscriptionNoticeIcon {
+  color: #c0392b;
+  margin-top: 1px;
+}
+
+.subscriptionNoticeCta {
+  display: block;
+  font-weight: 600;
+  color: #3d6df0;
+}
+
+.subscriptionNoticeCta + .subscriptionNoticeCta {
+  margin-top: 0.15rem;
+}
+
+.subscriptionNoticeCta:hover {
+  color: #3d6df0;
+}
+
 .updateNoticeDismiss {
   position: absolute;
   top: 0.3rem;

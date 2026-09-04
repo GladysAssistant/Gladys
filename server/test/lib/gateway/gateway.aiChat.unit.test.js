@@ -3,7 +3,7 @@ const sinon = require('sinon').createSandbox();
 
 const { fake } = sinon;
 
-const { Error400, Error403, Error429 } = require('../../../utils/httpErrors');
+const { Error400, Error402, Error403, Error429 } = require('../../../utils/httpErrors');
 const { aiChat, normalizeAiChatRequestBody } = require('../../../lib/gateway/gateway.aiChat');
 const { DEFAULT_TEXT_MODEL } = require('../../../utils/aiChatModels');
 
@@ -44,6 +44,26 @@ describe('gateway.aiChat unit', () => {
     expect(() => normalizeAiChatRequestBody({ messages: [], model: 'unknown-model' })).to.throw(Error400);
   });
 
+  it('should let the payment check lock the instance on a 402 error', async () => {
+    const paymentRequired = new Error('payment required');
+    paymentRequired.response = { status: 402, data: { error_code: 'PAYMENT_REQUIRED' } };
+    const ctx = {
+      gladysGatewayClient: {
+        openAIAsk: fake.rejects(paymentRequired),
+      },
+      throwIfPaymentRequired: fake.rejects(new Error402('GLADYS_PLUS_PAYMENT_REQUIRED')),
+    };
+
+    let error = null;
+    try {
+      await aiChat.call(ctx, { messages: [] });
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.instanceOf(Error402);
+    expect(ctx.throwIfPaymentRequired.firstCall.args[0]).to.equal(paymentRequired);
+  });
+
   it('should map 403 and 429 errors to typed http errors', async () => {
     const forbidden = new Error('forbidden');
     forbidden.response = { status: 403, data: { error_message: 'forbidden' } };
@@ -54,11 +74,13 @@ describe('gateway.aiChat unit', () => {
       gladysGatewayClient: {
         openAIAsk: fake.rejects(forbidden),
       },
+      throwIfPaymentRequired: fake.resolves(null),
     };
     const ctx429 = {
       gladysGatewayClient: {
         openAIAsk: fake.rejects(tooMany),
       },
+      throwIfPaymentRequired: fake.resolves(null),
     };
 
     let error403 = null;

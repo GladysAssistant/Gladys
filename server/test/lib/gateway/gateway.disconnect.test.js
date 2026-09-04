@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 
@@ -52,7 +53,8 @@ describe('gateway.disconnect', () => {
     await gateway.disconnect();
 
     assert.calledOnceWithExactly(gateway.gladysGatewayClient.disconnect);
-    assert.callCount(variable.destroy, 7);
+    assert.callCount(variable.destroy, 8);
+    expect(gateway.subscriptionActive).to.equal(true);
     // Plus is now unlinked: external integration webhooks recompute
     assert.calledWith(gateway.event.emit, EVENTS.GATEWAY.LINK_STATUS_CHANGED);
   });

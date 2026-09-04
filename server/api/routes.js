@@ -362,6 +362,11 @@ function getRoutes(gladys) {
       authenticatedOrNotConfigured: true,
       controller: gatewayController.getStatus,
     },
+    'post /api/v1/gateway/subscription/refresh': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.refreshSubscriptionStatus,
+    },
     'post /api/v1/gateway/login': {
       authenticatedOrNotConfigured: true,
       admin: true,

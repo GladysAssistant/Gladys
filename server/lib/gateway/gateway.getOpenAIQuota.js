@@ -5,7 +5,12 @@
  * const quota = await getOpenAIQuota();
  */
 async function getOpenAIQuota() {
-  return this.gladysGatewayClient.openAIGetQuota();
+  try {
+    return await this.gladysGatewayClient.openAIGetQuota();
+  } catch (e) {
+    await this.throwIfPaymentRequired(e);
+    throw e;
+  }
 }
 
 module.exports = {

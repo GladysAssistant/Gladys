@@ -13,9 +13,13 @@ const { Error403, Error500 } = require('../../utils/httpErrors');
 async function getBackups() {
   try {
     const backups = await this.gladysGatewayClient.getBackups();
+    // this route is behind the "plus" plan check: a success means the
+    // subscription is active (again)
+    await this.setSubscriptionActive(true);
     return backups;
   } catch (e) {
     logger.debug(e);
+    await this.throwIfPaymentRequired(e);
     const status = get(e, 'response.status');
     if (status) {
       throw new Error403();

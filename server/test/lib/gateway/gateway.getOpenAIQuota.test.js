@@ -5,6 +5,7 @@ const { fake } = sinon;
 const EventEmitter = require('events');
 
 const Gateway = require('../../../lib/gateway');
+const { Error402 } = require('../../../utils/httpErrors');
 
 const event = new EventEmitter();
 
@@ -37,6 +38,32 @@ describe('gateway.getOpenAIQuota', () => {
         reset_in_seconds: 0,
       },
     });
+  });
+
+  it('should lock Gladys Plus features and throw 402 when payment is required', async () => {
+    const error = new Error();
+    error.response = { status: 402, data: { error_code: 'PAYMENT_REQUIRED' } };
+    gateway.gladysGatewayClient.openAIGetQuota = fake.rejects(error);
+
+    try {
+      await gateway.getOpenAIQuota();
+      expect.fail();
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error402);
+    }
+    expect(gateway.subscriptionActive).to.equal(false);
+  });
+
+  it('should forward other errors', async () => {
+    gateway.gladysGatewayClient.openAIGetQuota = fake.rejects(new Error('network'));
+
+    try {
+      await gateway.getOpenAIQuota();
+      expect.fail();
+    } catch (e) {
+      expect(e.message).to.equal('network');
+    }
+    expect(gateway.subscriptionActive).to.equal(true);
   });
 
   it('should return OpenAI quota from gateway', async () => {

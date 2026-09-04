@@ -13,6 +13,17 @@ module.exports = function GatewayController(gladys) {
     res.json(status);
   }
   /**
+   * @api {post} /api/v1/gateway/subscription/refresh
+   * @apiName refreshSubscriptionStatus
+   * @apiGroup Gateway
+   * @apiDescription Ask Gladys Plus again whether the subscription is paid, and
+   * unlock the Gladys Plus features of this instance when it is.
+   */
+  async function refreshSubscriptionStatus(req, res) {
+    const status = await gladys.gateway.refreshSubscriptionStatus();
+    res.json(status);
+  }
+  /**
    * @api {post} /api/v1/gateway/login
    * @apiName Login
    * @apiGroup Gateway
@@ -278,6 +289,7 @@ module.exports = function GatewayController(gladys) {
 
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
+    refreshSubscriptionStatus: asyncMiddleware(refreshSubscriptionStatus),
     login: asyncMiddleware(login),
     logout: asyncMiddleware(logout),
     loginTwoFactor: asyncMiddleware(loginTwoFactor),
