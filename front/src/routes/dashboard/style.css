@@ -1467,6 +1467,19 @@
     padding: 0.375rem;
   }
 
+  /* The color picker's structural second row (see the td[colspan] reset
+     below) is not a pill either: painted on the row it would be an empty
+     bordered line under every ungrouped color row. An explicit class on the
+     <tr> rather than :has(td[colspan]): :has() is unknown to Firefox < 121,
+     which already evaluates @container, and an unknown pseudo-class drops
+     the whole rule. */
+  :global(.glass-theme .device-widget-table tr.device-color-picker-row) {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    margin-top: 0;
+  }
+
   :global(.glass-theme .device-widget-table tr td:first-child) {
     padding-left: 0.375rem;
   }
