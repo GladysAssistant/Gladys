@@ -224,11 +224,15 @@ describe('gateway subscription lock', () => {
         }),
       );
       const pending = gateway.callPlanGatedApi(call);
-      // unlinked while the call is in flight
+      // unlinked while the call is in flight, and the new link is locked
       gateway.subscriptionLinkGeneration += 1;
+      gateway.subscriptionActive = false;
+      gateway.subscriptionPaymentRequiredSince = '2026-09-01T00:00:00.000Z';
       resolveCall('result');
 
       expect(await pending).to.equal('result');
+      // the stale success did not unlock the new link
+      expect(gateway.subscriptionActive).to.equal(false);
       assert.notCalled(variable.destroy);
       assert.notCalled(event.emit);
     });

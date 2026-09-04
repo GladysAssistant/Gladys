@@ -109,6 +109,28 @@ describe('gateway.disconnect', () => {
     expect(lastStatusEvent.payload).to.deep.equal({ subscription_active: true, payment_required_since: null });
   });
 
+  it('should still reset the lock when the lock in progress fails to persist', async () => {
+    let rejectSetValue;
+    const setValuePromise = new Promise((resolve, reject) => {
+      rejectSetValue = reject;
+    });
+    variable.setValue = fake.returns(setValuePromise);
+
+    const lock = gateway.setSubscriptionActive(false);
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    const disconnect = gateway.disconnect();
+    rejectSetValue(new Error('db locked'));
+    await disconnect;
+    await lock.catch(() => null);
+
+    expect(gateway.subscriptionActive).to.equal(true);
+    expect(gateway.subscriptionPaymentRequiredSince).to.equal(null);
+    assert.calledWith(variable.destroy, SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE);
+    assert.calledWith(gateway.event.emit, EVENTS.GATEWAY.LINK_STATUS_CHANGED);
+  });
+
   it('should drop a lock asked by a call made for the unlinked account', async () => {
     const generationBeforeDisconnect = gateway.subscriptionLinkGeneration;
 
