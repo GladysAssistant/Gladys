@@ -93,9 +93,13 @@ describe('Dashboard Devices Box select', () => {
       expect(bottom).to.be.at.most(Cypress.config('viewportHeight'));
     });
 
-    // …and the option at the end of the list can be reached and picked
-    cy.contains('.react-select__menu-portal .react-select__option', lastOption).scrollIntoView();
-    cy.contains('.react-select__menu-portal .react-select__option', lastOption).click();
+    // …and the option at the end of the list can be reached and picked. The
+    // list is scrolled itself (a scroll inside the menu keeps it open) and the
+    // click must not scroll anything else: a portaled menu closes on any
+    // other scroll (closeMenuOnScroll), so Cypress's default scrollBehavior
+    // would close the menu it is about to click — same as Scene.cy.js
+    cy.get('.react-select__menu-portal .react-select__menu-list').scrollTo('bottom');
+    cy.contains('.react-select__menu-portal .react-select__option', lastOption).click({ scrollBehavior: false });
     cy.get('[data-cy="edit-panel"]').should('contain', lastOption);
   });
 });
