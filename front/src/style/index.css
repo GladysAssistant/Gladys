@@ -578,6 +578,17 @@ body .apexcharts-tooltip {
   padding-right: 2rem;
 }
 
+/* All `.custom-switch-indicator` elements are missing the pointer cursor
+   that indicates they are clickable.
+*/
+.custom-switch-indicator {
+  cursor: pointer;
+}
+
+.custom-switch-input:disabled ~ .custom-switch-indicator {
+  cursor: default;
+}
+
 /* Weather condition icons (Meteocons): the cloud artwork is drawn in near-white
    (#f3f7fe → #deeafb, outlined #e6effc), which all but disappears on the white
    card background in light mode. Dark mode has no such problem — the global
