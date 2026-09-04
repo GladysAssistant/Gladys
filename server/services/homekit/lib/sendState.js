@@ -49,6 +49,20 @@ function refreshCharacteristic(hap, service, characteristicType) {
 }
 
 /**
+ * @description Tell a HeaterCooler service from a Thermostat one. An air conditioning feature can
+ * land on either: on its own the device is a HeaterCooler, next to thermostat features it joins a
+ * Thermostat, and the two services do not carry the same characteristics.
+ * @param {object} hap - HAP library.
+ * @param {object} service - HomeKit service a feature was built into.
+ * @returns {boolean} True when the service is a HeaterCooler.
+ * @example
+ * isHeaterCooler(hap, service);
+ */
+function isHeaterCooler(hap, service) {
+  return service.UUID !== undefined && service.UUID === hap.Service.HeaterCooler.UUID;
+}
+
+/**
  * @description Forward new state value to HomeKit.
  * @param {object} hkAccessory - HomeKit accessories.
  * @param {object} feature - Updated Gladys feature.
@@ -171,8 +185,10 @@ function sendState(hkAccessory, feature, event) {
       } else if (feature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
         currentTemp = fahrenheitToCelsius(currentTemp);
       }
-      // On a heating or cooling device the temperature sensor is merged into the Thermostat service.
-      const service = serviceFor() || hkAccessory.getService(Service.Thermostat);
+      // On a heating or cooling device the temperature sensor is merged into the Thermostat or the
+      // HeaterCooler service.
+      const service =
+        serviceFor() || hkAccessory.getService(Service.Thermostat) || hkAccessory.getService(Service.HeaterCooler);
       // Clamped like the GET path: HAP throws on a value outside the characteristic bounds, and a
       // sensor reporting an out-of-range reading must not take the bridge down.
       service.updateCharacteristic(
@@ -180,12 +196,38 @@ function sendState(hkAccessory, feature, event) {
         clampToCharacteristic(currentTemp, service.getCharacteristic(Characteristic.CurrentTemperature).props),
       );
       // In AUTO, whether the device is heating or cooling depends on the room temperature.
-      refreshCharacteristic(this.hap, service, Characteristic.CurrentHeatingCoolingState);
+      refreshCharacteristic(
+        this.hap,
+        service,
+        isHeaterCooler(this.hap, service)
+          ? Characteristic.CurrentHeaterCoolerState
+          : Characteristic.CurrentHeatingCoolingState,
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.THERMOSTAT}:${DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE}`:
     case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE}`: {
       const service = serviceFor();
+
+      if (isHeaterCooler(this.hap, service)) {
+        // The single setpoint of an air conditioner stands behind both thresholds.
+        const setpoint = toCelsius(event.last_value, feature.unit);
+
+        [Characteristic.CoolingThresholdTemperature, Characteristic.HeatingThresholdTemperature].forEach(
+          (thresholdCharacteristic) => {
+            if (service.testCharacteristic(thresholdCharacteristic)) {
+              service.updateCharacteristic(
+                thresholdCharacteristic,
+                clampToCharacteristic(setpoint, service.getCharacteristic(thresholdCharacteristic).props),
+              );
+            }
+          },
+        );
+        // In auto, heating or cooling is deduced from the setpoint.
+        refreshCharacteristic(this.hap, service, Characteristic.CurrentHeaterCoolerState);
+        break;
+      }
+
       const thresholdCharacteristic =
         feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT
           ? Characteristic.HeatingThresholdTemperature
@@ -209,6 +251,14 @@ function sendState(hkAccessory, feature, event) {
     case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE}`:
     case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY}`: {
       const service = serviceFor();
+
+      if (isHeaterCooler(this.hap, service)) {
+        refreshCharacteristic(this.hap, service, Characteristic.Active);
+        refreshCharacteristic(this.hap, service, Characteristic.TargetHeaterCoolerState);
+        refreshCharacteristic(this.hap, service, Characteristic.CurrentHeaterCoolerState);
+        break;
+      }
+
       refreshCharacteristic(this.hap, service, Characteristic.TargetHeatingCoolingState);
       refreshCharacteristic(this.hap, service, Characteristic.CurrentHeatingCoolingState);
       refreshCharacteristic(this.hap, service, Characteristic.TargetTemperature);

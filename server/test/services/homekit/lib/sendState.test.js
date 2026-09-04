@@ -38,6 +38,8 @@ describe('Send state to HomeKit', () => {
         HeatingThresholdTemperature: 'HEATINGTHRESHOLDTEMPERATURE',
         TargetHeatingCoolingState: 'TARGETHEATINGCOOLINGSTATE',
         CurrentHeatingCoolingState: 'CURRENTHEATINGCOOLINGSTATE',
+        TargetHeaterCoolerState: 'TARGETHEATERCOOLERSTATE',
+        CurrentHeaterCoolerState: 'CURRENTHEATERCOOLERSTATE',
         TargetTemperature: 'TARGETTEMPERATURE',
         MotionDetected: 'MOTIONDETECTED',
         OccupancyDetected: 'OCCUPANCYDETECTED',
@@ -75,6 +77,8 @@ describe('Send state to HomeKit', () => {
         OccupancySensor: 'OCCUPANCYSENSOR',
         WindowCovering: 'WINDOWCOVERING',
         Thermostat: 'THERMOSTAT',
+        // sendState tells a HeaterCooler from a Thermostat by its UUID
+        HeaterCooler: { UUID: 'HEATERCOOLER' },
         TemperatureSensor: 'TEMPERATURESENSOR',
         LockMechanism: 'LOCKMECHANISM',
         LightSensor: 'LIGHTSENSOR',
@@ -1572,6 +1576,160 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['TARGETHEATINGCOOLINGSTATE', 0]);
     expect(updateCharacteristic.args[1]).eql(['CURRENTHEATINGCOOLINGSTATE', 0]);
     expect(updateCharacteristic.args[2]).eql(['TARGETTEMPERATURE', 0]);
+  });
+
+  it('should notify an air conditioning setpoint on a heater cooler', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 3), props: { minValue: 16, maxValue: 31 } };
+    const heaterCoolerService = {
+      UUID: 'HEATERCOOLER',
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(heaterCoolerService),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Setpoint',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+      unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+    };
+
+    // 82.4 °F is 28 °C
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 82.4 });
+
+    // the single setpoint stands behind both thresholds
+    expect(updateCharacteristic.args[0][0]).eql('COOLINGTHRESHOLDTEMPERATURE');
+    expect(updateCharacteristic.args[0][1]).to.be.closeTo(28, 0.001);
+    expect(updateCharacteristic.args[1][0]).eql('HEATINGTHRESHOLDTEMPERATURE');
+    expect(updateCharacteristic.args[1][1]).to.be.closeTo(28, 0.001);
+    // heating or cooling in auto depends on the setpoint, so it is recomputed
+    expect(updateCharacteristic.args[2]).eql(['CURRENTHEATERCOOLERSTATE', 3]);
+    expect(updateCharacteristic.callCount).eql(3);
+
+    // a setpoint outside the bounds the thresholds were given is clamped, HAP would throw
+    updateCharacteristic.resetHistory();
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+      {
+        type: EVENTS.DEVICE.NEW_STATE,
+        last_value: 40,
+      },
+    );
+
+    expect(updateCharacteristic.args[0]).eql(['COOLINGTHRESHOLDTEMPERATURE', 31]);
+    expect(updateCharacteristic.args[1]).eql(['HEATINGTHRESHOLDTEMPERATURE', 31]);
+  });
+
+  it('should notify an air conditioning mode change on a heater cooler', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 1) };
+    const heaterCoolerService = {
+      UUID: 'HEATERCOOLER',
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(heaterCoolerService),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Mode',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 2 });
+
+    // the HeaterCooler characteristics, not the Thermostat ones
+    expect(updateCharacteristic.args).eql([
+      ['ACTIVE', 1],
+      ['TARGETHEATERCOOLERSTATE', 1],
+      ['CURRENTHEATERCOOLERSTATE', 1],
+    ]);
+  });
+
+  it('should notify an air conditioning power change on a heater cooler', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 0) };
+    const heaterCoolerService = {
+      UUID: 'HEATERCOOLER',
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(heaterCoolerService),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Power',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 0 });
+
+    expect(updateCharacteristic.args).eql([
+      ['ACTIVE', 0],
+      ['TARGETHEATERCOOLERSTATE', 0],
+      ['CURRENTHEATERCOOLERSTATE', 0],
+    ]);
+  });
+
+  it('should notify current temperature on a merged heater cooler', async () => {
+    const updateCharacteristic = stub().returns();
+    const currentStateCharacteristic = {
+      emit: stub().callsArgWith(1, undefined, 3),
+      props: { minValue: -270, maxValue: 100 },
+    };
+    const heaterCoolerService = {
+      UUID: 'HEATERCOOLER',
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(currentStateCharacteristic),
+    };
+    // the device has no standalone TemperatureSensor service and is no Thermostat either, its
+    // sensor was merged into the HeaterCooler
+    const getService = stub();
+    getService.withArgs('TEMPERATURESENSOR').returns(undefined);
+    getService.withArgs('THERMOSTAT').returns(undefined);
+    getService.withArgs(homekitHandler.hap.Service.HeaterCooler).returns(heaterCoolerService);
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Room temperature',
+      category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.CELSIUS,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 26.5 });
+
+    expect(updateCharacteristic.args).eql([
+      ['CURRENTTEMPERATURE', 26.5],
+      // heating or cooling in auto depends on the room temperature, so it is recomputed
+      ['CURRENTHEATERCOOLERSTATE', 3],
+    ]);
   });
 
   it('should notify a thermostat mode change', async () => {
