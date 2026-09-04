@@ -169,16 +169,40 @@
 
 /* One sizing model for every dashboard column, shared by the viewer AND the
    editor canvas (EditBoxColumns), so what the canvas shows is what the
-   dashboard renders. Below the desktop breakpoint columns stack full width,
+   dashboard renders. Below the COLUMNS breakpoint columns stack full width,
    unchanged. Above it, each column asks for its --column-width share of the
    section (set inline: equal shares in a plain section, weight shares in a
    weighted e.g. 2|1 one) but never shrinks under a readable card width:
    columns that no longer fit WRAP onto the next line and share it, instead
    of crushing their widgets — a 6-column dashboard renders 3+3 on a
    mid-size screen, 2+2+2 on a narrow one.
-   14rem keeps the historic footprint: a 3-column dashboard right at the
-   992px breakpoint (~224px per column next to the navigation rail) still
-   fits on one line, exactly as before. */
+
+   The COLUMNS breakpoint is 700px, NOT the 992px desktop one that drives
+   the navigation (rail vs. mobile dock): a wall tablet in portrait (a
+   Shelly Wall Display XL is 752 CSS px wide, an iPad 768, most Android
+   tablets ~800) is nowhere near a phone, yet sat in the "phone" layout
+   with one stacked column and a lone widget blown up to the full width.
+   Two readable columns fit there easily. 700 rather than Bootstrap's 768
+   "md": the Shelly sits below 768, and a few px of margin keep it on the
+   columns side even when the page is embedded (an iframe panel with a
+   scrollbar). A phone in portrait (360–430px) keeps its single column; a
+   phone in landscape gets the columns like a tablet, which is the natural
+   use of that width. Every column-layout rule (stretch caps, adaptive
+   tiles, the editor canvas, the stretched media widgets) keys on this
+   same 700px so the tablet renders one coherent desktop-style layout
+   under the mobile dock.
+
+   The readable floor has two values. Between the columns and the desktop
+   breakpoints (portrait tablets, landscape phones) it is 18rem: a
+   portrait tablet is 744–834px wide (iPad mini to iPad Pro 11), where
+   three columns would be ~250px — a card width in which the row widgets
+   break (scene names wrap letter by letter, setpoint steppers overflow) —
+   so a 3-column dashboard renders 2+1 and a 4-column one 2+2 there, like
+   Home Assistant's two columns. From the desktop breakpoint up the floor
+   stays 14rem, the historic footprint: a 3-column dashboard right at
+   992px (~224px per column next to the navigation rail) still fits on one
+   line, and wide desktops keep their 5–6 narrow tile columns, exactly as
+   before — a tablet fix must not reflow anyone's desktop. */
 .dashboardColumn {
   position: relative;
   width: 100%;
@@ -186,10 +210,10 @@
   padding-left: 15px;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 700px) {
   .dashboardColumn {
     flex: 1 1 var(--column-width);
-    min-width: 14rem;
+    min-width: 18rem;
     /* A nearly-empty last wrap line (e.g. the lone 6th column) must not
        blow its widgets up to the whole dashboard width: growth is capped
        near a comfortable card width and the line centers (the section row
@@ -214,7 +238,13 @@
   }
 }
 
-@media (max-width: 992px) {
+@media (min-width: 992px) {
+  .dashboardColumn {
+    min-width: 14rem;
+  }
+}
+
+@media (max-width: 699.98px) {
   .removePadding {
     padding-left: 0;
     padding-right: 0;
@@ -1107,9 +1137,9 @@
    the free height of its column only up to this cap. Beyond it the column
    simply ends earlier and the dashboard background breathes, instead of a
    photo — or a house illustration card — blown up to several times its
-   natural size. Desktop only — below the breakpoint columns stack and
+   natural size. Columns breakpoint only — below it columns stack and
    heights are natural. */
-@media (min-width: 992px) {
+@media (min-width: 700px) {
   .stretchableBox {
     max-height: 65vh;
   }
@@ -1121,8 +1151,9 @@
    container is the padding-less wrapper, not the card, because container
    queries evaluate against the content box. The min-height keeps a
    sensible tile when every box of a section is a value tile. Not applied
-   on mobile, where columns stack and heights are natural. */
-@media (min-width: 992px) {
+   below the columns breakpoint, where columns stack and heights are
+   natural. */
+@media (min-width: 700px) {
   .adaptiveTile {
     container-type: size;
     min-height: 6rem;

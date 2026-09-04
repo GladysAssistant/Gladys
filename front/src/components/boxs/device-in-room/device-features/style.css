@@ -52,9 +52,11 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   display: none;
 }
 
-/* Stacked +/value/− only where the CARD is narrow (3+ desktop columns);
-   phones keep the horizontal capsule — a full-width row fits it fine */
-@media (min-width: 992px) and (max-width: 1300px) {
+/* Stacked +/value/− only where the CARD is narrow (2 columns on a
+   portrait tablet, 3+ on a desktop — the columns breakpoint is 700px, see
+   routes/dashboard/style.css); phones keep the horizontal capsule — a
+   full-width row fits it fine */
+@media (min-width: 700px) and (max-width: 1300px) {
   .setpointVerticalControls {
     display: block;
     min-width: 5rem;
