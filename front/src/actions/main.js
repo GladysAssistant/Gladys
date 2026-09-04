@@ -5,6 +5,7 @@ import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
 import get from 'get-value';
 import config from '../config';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../server/utils/constants';
 import { isUrlInArray } from '../utils/url';
 import {
   isInstanceBehindFront,
@@ -25,6 +26,10 @@ const INSTANCE_VERSION_REFRESH_INTERVAL_MS = 60 * 1000;
 
 let lastGatewayTrialRefresh = 0;
 let lastInstanceVersionRefresh = 0;
+// the session whose websocket already forwards the Gladys Plus subscription
+// changes to the store: the listener is registered once per session
+let gatewaySubscriptionListenerSession = null;
+let gatewaySubscriptionListener = null;
 
 const OPEN_PAGES = [
   '/signup',
@@ -105,6 +110,8 @@ function createActions(store) {
         actionsExternalIntegrationUpdates.refreshExternalIntegrationsToUpdate(state, user);
         // same fire-and-forget for the instance version behind Gladys Plus
         actions.refreshInstanceVersionState(state);
+        // and for the Gladys Plus subscription lock, announced in the header
+        actions.refreshGatewaySubscriptionState(state);
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
           const now = new Date();
@@ -195,6 +202,54 @@ function createActions(store) {
         gatewayTrialHasPaymentMethod: hasPaymentMethod,
         gatewayTrialStripePortalKey: stripePortalKey
       });
+    },
+    // The instance pauses its Gladys Plus features (backups, Enedis, AI) when
+    // Gladys Plus answers "payment required": the header announces it on every
+    // page. Loaded at session check, then kept up to date by the instance
+    // itself through the websocket, in both directions (lock and unlock).
+    async refreshGatewaySubscriptionState(state) {
+      // logout swaps the session object out of the store: a listener or a
+      // response belonging to a previous session must not write the notice
+      // of that session into the next one
+      const requestSession = state.session;
+      // a session check resumed after a logout/login must not replace the
+      // listener of the session now in use with one bound to the old session
+      if (store.getState().session !== requestSession) {
+        return;
+      }
+      if (requestSession && requestSession.dispatcher && gatewaySubscriptionListenerSession !== requestSession) {
+        if (gatewaySubscriptionListenerSession && gatewaySubscriptionListenerSession.dispatcher) {
+          gatewaySubscriptionListenerSession.dispatcher.removeListener(
+            WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED,
+            gatewaySubscriptionListener
+          );
+        }
+        gatewaySubscriptionListenerSession = requestSession;
+        gatewaySubscriptionListener = payload => {
+          if (store.getState().session !== requestSession) {
+            return;
+          }
+          store.setState({
+            gatewayPaymentRequired: get(payload, 'subscription_active') === false
+          });
+        };
+        requestSession.dispatcher.addListener(
+          WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED,
+          gatewaySubscriptionListener
+        );
+      }
+      try {
+        const gatewayStatus = await state.httpClient.get('/api/v1/gateway/status');
+        if (store.getState().session !== requestSession) {
+          return;
+        }
+        store.setState({
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false
+        });
+      } catch (e) {
+        // status unknown: better no notice than a wrong one
+        console.error(e);
+      }
     },
     // On Gladys Plus the front redeploys at release time while the local
     // instance waits for Watchtower (up to ~24h): the instance version is

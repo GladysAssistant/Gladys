@@ -24,6 +24,15 @@ class Error401 extends HttpError {
   }
 }
 
+class Error402 extends HttpError {
+  constructor(message) {
+    super();
+    this.status = 402;
+    this.code = 'PAYMENT_REQUIRED';
+    this.message = message;
+  }
+}
+
 class Error403 extends HttpError {
   constructor(message) {
     super();
@@ -94,6 +103,7 @@ module.exports = {
   HttpError,
   Error400,
   Error401,
+  Error402,
   Error403,
   Error404,
   Error409,

@@ -749,6 +749,7 @@
         "errorMicrophoneUnavailable": "The microphone is unavailable. Check that it is not in use by another app.",
         "errorNoSpeech": "No voice detected. Check that your microphone is enabled, then try again.",
         "errorNoTranscription": "I could not understand your message. Speak closer to the microphone and try again.",
+        "errorPaymentRequired": "Your Gladys Plus subscription is suspended: a payment is required. The voice assistant is paused until it is paid.",
         "configDescription": "This widget uses Gladys Plus for speech recognition, AI and text-to-speech. Connect your instance to Gladys Plus to use it.",
         "plusRequiredHint": "Connect Gladys Plus to enable the microphone."
       },
@@ -4498,7 +4499,13 @@
     "gatewayConnectedSuccessDescription": "Your Gladys instance was successfully connected.",
     "gatewayConnectedSuccessBackupKey": "It'll backup automatically everyday, encrypted with the following key. So you can restore your instance later, please save this encryption key somewhere, outside of Gladys. Without this key, you will not be able to restore Gladys.",
     "gatewayConnectedSuccessButton": "I saved the backup key!",
-    "accountExpired": "Your Gladys Plus account has expired. To renew your subscription, you can go to the <a href=\"/dashboard/settings/billing\">billing tab</a>."
+    "accountExpired": "Your Gladys Plus account has expired. To renew your subscription, you can go to the <a href=\"/dashboard/settings/billing\">billing tab</a>.",
+    "subscriptionPaymentRequiredTitle": "Gladys Plus subscription suspended: payment required",
+    "subscriptionPaymentRequiredText": "Gladys Plus refused the last requests of your instance because your subscription is not paid. Backups, Enedis synchronization and AI features are paused until it is. Nothing is lost: update your payment method in your Gladys Plus account, then check again here. Your instance also checks by itself once a day.",
+    "subscriptionOpenBilling": "Update my payment method",
+    "subscriptionCheckAgain": "Check again",
+    "subscriptionStillNotPaid": "Gladys Plus still reports that a payment is required. Once the payment is received, it can take a few minutes before it is taken into account.",
+    "subscriptionCheckError": "Unable to check the subscription with Gladys Plus: please check your internet connection and try again."
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
@@ -6232,6 +6239,7 @@
       "errorNoMicrophone": "No microphone detected. Plug one in or enable it in system settings.",
       "errorMicrophoneUnavailable": "The microphone is unavailable. Check that it is not in use by another app.",
       "errorNoTranscription": "I could not understand your message. Speak closer to the microphone and try again.",
+      "errorPaymentRequired": "Your Gladys Plus subscription is suspended: a payment is required. The voice assistant is paused until it is paid.",
       "errorNotSupported": "Voice recording is not available in this browser."
     }
   },
@@ -6330,6 +6338,11 @@
       "other": "Gladys Plus trial: {{count}} days left"
     },
     "trialAddPaymentMethod": "Add a payment method",
+    "subscriptionNoticeTitle": "Gladys Plus suspended",
+    "subscriptionNoticeText": "A payment is required: backups, Enedis synchronization and AI features are paused until the subscription is paid.",
+    "subscriptionNoticeButton": "Update my payment method",
+    "subscriptionNoticeCheck": "Check the subscription",
+    "subscriptionNoticeContactAdmin": "Please contact the administrator of your Gladys Plus account.",
     "instanceUpdateNoticeTitle": "Update available",
     "instanceUpdateNoticeText": "Gladys Plus has been updated to {{latestVersion}}, but your instance is still on {{instanceVersion}}. Some features may not work properly until your instance is updated.",
     "instanceUpdateNoticeButton": "Update my instance",
