@@ -25,6 +25,13 @@ const MQTT_MODE = {
   EXTERNAL: 'external',
 };
 
+// Params stored on each Gladys device created by this service
+const DEVICE_PARAMS = {
+  // The Zigbee IEEE address is the immutable hardware identifier of the device,
+  // used to keep the link with Gladys when the device is renamed in Zigbee2mqtt.
+  IEEE_ADDRESS: 'IEEE_ADDRESS',
+};
+
 // Reasons why Gladys failed to connect to the MQTT broker, displayed as explicit messages in the UI
 const MQTT_CONNECTION_ERROR = {
   BAD_CREDENTIALS: 'BAD_CREDENTIALS',
@@ -100,6 +107,7 @@ const DEFAULT = {
 module.exports = {
   CONFIGURATION,
   MQTT_MODE,
+  DEVICE_PARAMS,
   MQTT_CONNECTION_ERROR,
   ADAPTER_MODE,
   SETUP_VARIABLES,
