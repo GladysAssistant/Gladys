@@ -4,7 +4,7 @@ const { fake, stub, assert, match } = sinon;
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 
-const { Error429 } = require('../../../utils/httpErrors');
+const { Error402, Error429 } = require('../../../utils/httpErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const z = require('../../../services/mcp/node_modules/zod/v4');
 
@@ -647,6 +647,25 @@ describe('gateway.forwardMessageToAiChat', () => {
       message,
       'Error while running tool "scene_create": scene.create validation failed (422): actions: Invalid input',
     );
+  });
+
+  it('should reply with payment required message on Error402', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.rejects(new Error402('GLADYS_PLUS_PAYMENT_REQUIRED'));
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'hello', user: { id: 'user-id' } };
+    const context = { user: { id: 'user-id' } };
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [],
+      context,
+    });
+
+    expect(result).to.deep.equal({ answer: '', imagesSent: 0, paymentRequired: true });
+    assert.notCalled(reply);
+    assert.calledWith(replyByIntent, message, 'gateway.payment-required', context);
   });
 
   it('should reply with too many requests message on Error429', async () => {

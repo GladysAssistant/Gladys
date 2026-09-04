@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import Select from 'react-select';
-import closeMenuOnScroll from '../../utils/closeMenuOnScroll';
+import Select from '../form/Select';
 
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
@@ -254,9 +253,6 @@ class SelectDeviceFeature extends Component {
     }
     return (
       <Select
-        menuPlacement="auto"
-        menuPortalTarget={document.body}
-        closeMenuOnScroll={closeMenuOnScroll}
         class="select-device-feature"
         defaultValue={props.isMulti ? [] : ''}
         isMulti={props.isMulti}

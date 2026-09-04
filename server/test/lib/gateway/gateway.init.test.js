@@ -52,6 +52,9 @@ describe('gateway.init', () => {
       if (name === SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_HOUR) {
         return '18';
       }
+      if (name === SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE) {
+        return null;
+      }
       return JSON.stringify(userKeys);
     };
     variable.setValue = fake.resolves(null);
@@ -112,6 +115,86 @@ describe('gateway.init', () => {
     expect(gateway.backupSchedule).to.deep.contains({
       rule: { tz: 'Europe/Paris', hour: 2, minute: 0, second: 0 },
     });
+  });
+
+  it('should start unlocked when no payment lock was saved', async () => {
+    await gateway.init();
+
+    expect(gateway.subscriptionActive).to.equal(true);
+    expect(gateway.subscriptionPaymentRequiredSince).to.equal(null);
+    assert.notCalled(gateway.gladysGatewayClient.getBackups);
+  });
+
+  it('should start locked and check the subscription again when a payment lock was saved', async () => {
+    const { getValue } = variable;
+    variable.getValue = (name) => {
+      if (name === SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE) {
+        return '2026-09-01T00:00:00.000Z';
+      }
+      return getValue(name);
+    };
+    variable.destroy = fake.resolves(null);
+    const error = new Error();
+    error.response = { status: 402 };
+    gateway.gladysGatewayClient.getBackups = fake.rejects(error);
+
+    await gateway.init();
+
+    expect(gateway.connected).to.equal(true);
+    expect(gateway.subscriptionActive).to.equal(false);
+    expect(gateway.subscriptionPaymentRequiredSince).to.equal('2026-09-01T00:00:00.000Z');
+    assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+  });
+
+  it('should unlock at startup when the subscription was paid while the instance was off', async () => {
+    const { getValue } = variable;
+    variable.getValue = (name) => {
+      if (name === SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE) {
+        return '2026-09-01T00:00:00.000Z';
+      }
+      return getValue(name);
+    };
+    variable.destroy = fake.resolves(null);
+
+    await gateway.init();
+
+    expect(gateway.subscriptionActive).to.equal(true);
+    expect(gateway.subscriptionPaymentRequiredSince).to.equal(null);
+    assert.calledOnceWithExactly(variable.destroy, SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE);
+  });
+
+  it('should continue init when the subscription check fails at startup', async () => {
+    const { getValue } = variable;
+    variable.getValue = (name) => {
+      if (name === SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE) {
+        return '2026-09-01T00:00:00.000Z';
+      }
+      return getValue(name);
+    };
+    gateway.gladysGatewayClient.getBackups = fake.rejects(new Error('network'));
+
+    await gateway.init();
+
+    expect(gateway.connected).to.equal(true);
+    expect(gateway.subscriptionActive).to.equal(false);
+    assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+  });
+
+  it('should stay locked when a payment lock was saved and Gladys Plus is unreachable', async () => {
+    const { getValue } = variable;
+    variable.getValue = (name) => {
+      if (name === SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE) {
+        return '2026-09-01T00:00:00.000Z';
+      }
+      return getValue(name);
+    };
+    gateway.gladysGatewayClient.instanceConnect = fake.rejects(null);
+
+    await gateway.init();
+
+    expect(gateway.connected).to.equal(false);
+    expect(gateway.subscriptionActive).to.equal(false);
+    assert.notCalled(gateway.gladysGatewayClient.getBackups);
   });
 
   it('should continue init when user keys sync fails', async () => {
