@@ -233,32 +233,34 @@ class ApexChartComponent extends Component {
     } else {
       options = this.getAreaChartOptions();
     }
+    this.addHiddenSeriesEvents(options);
     this.tooltipPositioning.addToOptions(options);
-    this.addLegendClickEvent(options);
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
       this.chart = new ApexCharts(this.chartRef.current, options);
 
       this.chart.render();
-      // A new chart displays all its series, whatever was hidden in a previous instance
-      if (this.props.onChartCreated) {
-        this.props.onChartCreated();
-      }
     }
   };
-  // Let the parent know when the user shows/hides a series through the legend, so the
-  // values it displays next to the chart can follow what is actually visible.
-  // ApexCharts fires this event with the index of the clicked series, before toggling it.
-  addLegendClickEvent(options) {
-    if (!this.props.onLegendClick) {
+  // Tell the parent which series are hidden (collapsed through the legend) each time the
+  // chart is drawn: after a legend click, after a data refresh (ApexCharts keeps the
+  // collapsed series) and when the chart is (re)created (all series visible again).
+  // Reading the state of the chart itself, rather than mirroring the legend clicks, keeps
+  // the parent in sync whatever ApexCharts did with the click.
+  addHiddenSeriesEvents(options) {
+    if (!this.props.onHiddenSeriesChange) {
       return;
     }
-    if (!options.chart.events) {
-      options.chart.events = {};
-    }
-    options.chart.events.legendClick = (chartContext, seriesIndex) => {
-      this.props.onLegendClick(seriesIndex);
+    const reportHiddenSeries = chartContext => {
+      const { collapsedSeriesIndices, ancillaryCollapsedSeriesIndices } = chartContext.w.globals;
+      const hiddenSeriesIndexes = [...collapsedSeriesIndices, ...ancillaryCollapsedSeriesIndices].sort((a, b) => a - b);
+      this.props.onHiddenSeriesChange(hiddenSeriesIndexes);
+    };
+    options.chart.events = {
+      ...(options.chart.events || {}),
+      mounted: reportHiddenSeries,
+      updated: reportHiddenSeries
     };
   }
   componentDidMount() {

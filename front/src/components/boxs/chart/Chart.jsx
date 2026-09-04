@@ -448,30 +448,21 @@ class Chartbox extends Component {
       this.getData();
     }
   };
-  // The user toggled a series in the chart legend (ApexCharts fires this event before
-  // hiding/showing the series): recompute the header from the series that remain visible.
-  handleLegendClick = seriesIndex => {
+  // Called by the chart each time it is drawn, with the indexes of the series hidden through
+  // the legend: recompute the header from the series that are actually visible.
+  handleHiddenSeriesChange = hiddenSeriesIndexes => {
     this.setState(prevState => {
-      const hiddenSeriesIndexes = prevState.hiddenSeriesIndexes.includes(seriesIndex)
-        ? prevState.hiddenSeriesIndexes.filter(index => index !== seriesIndex)
-        : [...prevState.hiddenSeriesIndexes, seriesIndex];
+      if (
+        hiddenSeriesIndexes.length === prevState.hiddenSeriesIndexes.length &&
+        hiddenSeriesIndexes.every((index, position) => index === prevState.hiddenSeriesIndexes[position])
+      ) {
+        return null;
+      }
       return {
         hiddenSeriesIndexes,
-        ...getHeaderValues(prevState.featuresSummary || [], hiddenSeriesIndexes)
+        ...getHeaderValues(prevState.featuresSummary, hiddenSeriesIndexes)
       };
     });
-  };
-  // A freshly created chart displays all its series, so the header must follow.
-  // ApexCharts keeps the hidden series when only the data is refreshed, so this is
-  // only called when the chart is (re)created, not on every data refresh.
-  resetHiddenSeries = () => {
-    if (this.state.hiddenSeriesIndexes.length === 0) {
-      return;
-    }
-    this.setState(prevState => ({
-      hiddenSeriesIndexes: [],
-      ...getHeaderValues(prevState.featuresSummary || [], [])
-    }));
   };
   updateInterval = async () => {
     await this.setState({
@@ -544,6 +535,9 @@ class Chartbox extends Component {
   ) {
     const { box } = this.props;
     const displayVariation = box.display_variation;
+    // The hidden series are positional, in ApexCharts as in the header: recreate the chart
+    // (all series visible again) when the devices of the box change, e.g. in the editor.
+    const deviceFeaturesKey = (box.device_features || []).join(',');
     let additionalHeight = 30 * (nbFeaturesDisplayed - 1);
     if (props.box.chart_type === 'timeline') {
       additionalHeight = 55 * nbFeaturesDisplayed;
@@ -774,6 +768,7 @@ class Chartbox extends Component {
               {emptySeries === false && props.box.display_axes && (
                 <div class="mt-4">
                   <ApexChartComponent
+                    key={deviceFeaturesKey}
                     series={series}
                     interval={interval}
                     user={props.user}
@@ -783,8 +778,7 @@ class Chartbox extends Component {
                     colors={props.box.colors}
                     additionalHeight={additionalHeight}
                     dictionary={props.intl.dictionary}
-                    onLegendClick={this.handleLegendClick}
-                    onChartCreated={this.resetHiddenSeries}
+                    onHiddenSeriesChange={this.handleHiddenSeriesChange}
                   />
                 </div>
               )}
@@ -837,6 +831,7 @@ class Chartbox extends Component {
                 )}
                 {emptySeries === false && !props.box.display_axes && (
                   <ApexChartComponent
+                    key={deviceFeaturesKey}
                     series={series}
                     interval={interval}
                     user={props.user}
@@ -846,8 +841,7 @@ class Chartbox extends Component {
                     colors={props.box.colors}
                     additionalHeight={additionalHeight}
                     dictionary={props.intl.dictionary}
-                    onLegendClick={this.handleLegendClick}
-                    onChartCreated={this.resetHiddenSeries}
+                    onHiddenSeriesChange={this.handleHiddenSeriesChange}
                   />
                 )}
               </div>
