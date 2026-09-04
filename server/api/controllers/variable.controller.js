@@ -1,5 +1,27 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
-const { NotFoundError } = require('../../utils/coreErrors');
+const { NotFoundError, ForbiddenError } = require('../../utils/coreErrors');
+const { USER_ROLE } = require('../../utils/constants');
+
+/**
+ * @description Ensure only an admin can reach a service-wide variable.
+ * Service variables that are not scoped to a user hold the credentials of the
+ * integrations (API keys, broker passwords, OAuth tokens), so reading or
+ * writing them is an administration gesture. Variables scoped to the calling
+ * user are left alone: a user can only ever touch their own row.
+ * @param {object} req - The Express request.
+ * @param {string} [userId] - The user the variable is scoped to, or null when it is service-wide.
+ * @returns {void}
+ * @example
+ * ensureAdminOnServiceWideVariable(req, null);
+ */
+function ensureAdminOnServiceWideVariable(req, userId) {
+  if (userId) {
+    return;
+  }
+  if (!req.user || req.user.role !== USER_ROLE.ADMIN) {
+    throw new ForbiddenError('This route is only accessible to admin user.');
+  }
+}
 
 module.exports = function VariableController(gladys) {
   /**
@@ -10,6 +32,7 @@ module.exports = function VariableController(gladys) {
    */
   async function setForLocalService(req, res) {
     const userId = req.body.userRelated ? req.user.id : null;
+    ensureAdminOnServiceWideVariable(req, userId);
     const service = await gladys.service.getLocalServiceByName(req.params.service_name);
     const variable = await gladys.variable.setValue(req.params.variable_key, req.body.value, service.id, userId);
     res.json(variable);
@@ -22,6 +45,7 @@ module.exports = function VariableController(gladys) {
    */
   async function getByLocalService(req, res) {
     const userId = req.query.userRelated ? req.user.id : null;
+    ensureAdminOnServiceWideVariable(req, userId);
     const service = await gladys.service.getLocalServiceByName(req.params.service_name);
     const value = await gladys.variable.getValue(req.params.variable_key, service.id, userId);
     if (!value) {

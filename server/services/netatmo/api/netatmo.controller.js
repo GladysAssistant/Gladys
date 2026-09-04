@@ -98,12 +98,15 @@ module.exports = function NetatmoController(netatmoHandler) {
   }
 
   return {
+    // returns the Netatmo client id and client secret in clear
     'get /api/v1/service/netatmo/configuration': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(getConfiguration),
     },
     'post /api/v1/service/netatmo/configuration': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(saveConfiguration),
     },
     'get /api/v1/service/netatmo/status': {
