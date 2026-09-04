@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 1280px;
+    height: 640px;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: #1c2334;
+    position: relative;
+    /* Horizon glass scene — same recipe as the app's default dashboard theme */
+    background-image:
+      radial-gradient(76% 78% at 12% -10%, rgba(126, 166, 233, 0.55), transparent 60%),
+      radial-gradient(62% 72% at 95% 8%, rgba(244, 190, 148, 0.5), transparent 55%),
+      radial-gradient(69% 89% at 85% 100%, rgba(187, 160, 228, 0.42), transparent 60%),
+      radial-gradient(62% 78% at 10% 105%, rgba(150, 212, 195, 0.4), transparent 55%),
+      linear-gradient(160deg, #eef3fb 0%, #eeeaf7 48%, #f7efe6 100%);
+  }
+
+  /* ---------------- Left column ---------------- */
+  .copy {
+    position: absolute;
+    left: 72px;
+    top: 0;
+    height: 640px;
+    width: 560px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .brand img {
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+    box-shadow: 0 10px 26px rgba(44, 62, 118, 0.18);
+  }
+
+  .brand .name {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .brand .version {
+    align-self: center;
+    margin-left: 2px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #fff;
+    background: linear-gradient(100deg, #3d6df0 0%, #7a5af0 100%);
+    box-shadow: 0 6px 16px rgba(61, 109, 240, 0.32);
+  }
+
+  h1 {
+    font-size: 47px;
+    line-height: 1.14;
+    font-weight: 800;
+    letter-spacing: -0.033em;
+    margin-bottom: 20px;
+  }
+
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(100deg, #3d6df0 0%, #7a5af0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  p.sub {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 450;
+    color: #5c6478;
+    max-width: 470px;
+    margin-bottom: 30px;
+  }
+
+  .chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 17px 10px 14px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 999px;
+    color: #2a3348;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 16px rgba(44, 62, 118, 0.09);
+  }
+
+  .chip svg {
+    width: 18px;
+    height: 18px;
+    stroke: #3d6df0;
+    stroke-width: 2.2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ---------------- Right: the v5 dashboard ---------------- */
+  .stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 640px;
+    perspective: 1700px;
+    z-index: 1;
+  }
+
+  .window {
+    position: absolute;
+    left: 656px;
+    top: 50px;
+    width: 950px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    transform: rotateY(-16deg) rotateX(4deg) rotateZ(-1.2deg);
+    transform-origin: left center;
+    box-shadow:
+      0 44px 90px rgba(44, 62, 118, 0.28),
+      0 10px 26px rgba(44, 62, 118, 0.14);
+  }
+
+  .window img {
+    display: block;
+    width: 100%;
+  }
+
+  /* glass sheen over the screenshot */
+  .window::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 42%);
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="window">
+      <img src="../gladys-dashboard-en.webp" alt="">
+    </div>
+  </div>
+
+  <div class="copy">
+    <div class="brand">
+      <img src="../../../front/src/assets/icons/android-icon-512x512.png" alt="">
+      <span class="name">Gladys Assistant</span>
+      <span class="version">v5</span>
+    </div>
+    <h1>Your smart home,<br><em>100% yours.</em></h1>
+    <p class="sub">The privacy-first, open-source home assistant. Runs on your own hardware — no cloud, no subscription.</p>
+    <div class="chips">
+      <div class="chip">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        100% local
+      </div>
+      <div class="chip">
+        <svg viewBox="0 0 24 24"><path d="M9 3H4a1 1 0 0 0-1 1v5m6-6h11a1 1 0 0 1 1 1v5M9 3v18M3 9v11a1 1 0 0 0 1 1h5m-6-12h18m0 0v11a1 1 0 0 1-1 1H9"/></svg>
+        35+ integrations
+      </div>
+      <div class="chip">
+        <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M2 12h4m12 0h4M4.9 4.9l2.9 2.9m8.4 8.4 2.9 2.9M4.9 19.1l2.9-2.9m8.4-8.4 2.9-2.9"/></svg>
+        Apache 2.0
+      </div>
+    </div>
+  </div>
+</body>
+</html>
