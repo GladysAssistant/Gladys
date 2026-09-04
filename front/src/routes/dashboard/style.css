@@ -1414,6 +1414,19 @@
   text-align: center;
 }
 
+/* A text feature is the other exception: its value is free-form text of any
+   length (a sun-protection advice, a TV app name...), not a control with a
+   designed width. Kept on one line by the nowrap above, a long sentence
+   pushed the pill past the card and gave the widget a horizontal scrollbar
+   (community report "débordement horizontal"). It wraps like the name
+   next to it — overflow-wrap: anywhere so a single long token (a URL, a
+   serial number) breaks too — and stays right-aligned, as every value is. */
+:global(.glass-theme .device-widget-table .text-device-value) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
 /* Structural rows are not feature pills: ColorDeviceFeature always renders
    a second tr with one colspan cell holding the (d-none while closed) color
    picker — without this reset it paints as an empty ghost pill. */
