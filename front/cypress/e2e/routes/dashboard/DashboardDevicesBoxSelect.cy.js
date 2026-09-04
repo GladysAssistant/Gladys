@@ -75,10 +75,14 @@ describe('Dashboard Devices Box select', () => {
     });
 
     cy.get('[data-cy="edit-panel"] .react-select__control').click();
-    cy.get('[data-cy="edit-panel"] .react-select__input input').type('{esc}zzz');
+    // react-select's search input is a 2px-wide autosize input under the
+    // placeholder: Cypress deems it covered, force: true types into it anyway
+    cy.get('[data-cy="edit-panel"] .react-select__input input').type('{esc}zzz', { force: true });
     cy.get('.react-select__menu-portal .react-select__menu-notice--no-options').should('be.visible');
 
-    cy.get('[data-cy="edit-panel"] .react-select__input input').type('{backspace}{backspace}{backspace}');
+    cy.get('[data-cy="edit-panel"] .react-select__input input').type('{backspace}{backspace}{backspace}', {
+      force: true
+    });
     const lastOption = `Multi sensor (Probe ${FEATURE_COUNT})`;
     cy.contains('.react-select__menu-portal .react-select__option', lastOption).should('exist');
 
