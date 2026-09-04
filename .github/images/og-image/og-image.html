@@ -17,7 +17,7 @@
     font-family: 'Inter', -apple-system, sans-serif;
     color: #1c2334;
     position: relative;
-    /* Horizon glass scene — same recipe as the app's default dashboard theme */
+    /* Horizon glass scene: same recipe as the app's default dashboard theme */
     background-image:
       radial-gradient(76% 78% at 12% -10%, rgba(126, 166, 233, 0.55), transparent 60%),
       radial-gradient(62% 72% at 95% 8%, rgba(244, 190, 148, 0.5), transparent 55%),
@@ -59,19 +59,6 @@
     letter-spacing: -0.02em;
   }
 
-  .brand .version {
-    align-self: center;
-    margin-left: 2px;
-    padding: 5px 12px;
-    border-radius: 999px;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    color: #fff;
-    background: linear-gradient(100deg, #3d6df0 0%, #7a5af0 100%);
-    box-shadow: 0 6px 16px rgba(61, 109, 240, 0.32);
-  }
-
   h1 {
     font-size: 47px;
     line-height: 1.14;
@@ -100,7 +87,7 @@
   .chips {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   .chip {
@@ -179,22 +166,22 @@
     <div class="brand">
       <img src="../../../front/src/assets/icons/android-icon-512x512.png" alt="">
       <span class="name">Gladys Assistant</span>
-      <span class="version">v5</span>
     </div>
-    <h1>Your smart home,<br><em>100% yours.</em></h1>
-    <p class="sub">The privacy-first, open-source home assistant. Runs on your own hardware — no cloud, no subscription.</p>
+    <h1>A smart home<br>that <em>stays yours.</em></h1>
+    <p class="sub">Open-source, local smart home. Integrations install in one click,
+      and anyone can create one.</p>
     <div class="chips">
       <div class="chip">
-        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        100% local
+        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Open source
       </div>
       <div class="chip">
-        <svg viewBox="0 0 24 24"><path d="M9 3H4a1 1 0 0 0-1 1v5m6-6h11a1 1 0 0 1 1 1v5M9 3v18M3 9v11a1 1 0 0 0 1 1h5m-6-12h18m0 0v11a1 1 0 0 1-1 1H9"/></svg>
-        35+ integrations
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></svg>
+        Self-hosted
       </div>
       <div class="chip">
-        <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M2 12h4m12 0h4M4.9 4.9l2.9 2.9m8.4 8.4 2.9 2.9M4.9 19.1l2.9-2.9m8.4-8.4 2.9-2.9"/></svg>
-        Apache 2.0
+        <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><path d="M12 19h8"/></svg>
+        One Docker command
       </div>
     </div>
   </div>

@@ -4,7 +4,7 @@
 **Settings → General → Social preview**. GitHub reuses it for the Open Graph
 and Twitter cards shown when the repository is shared.
 
-It is generated from `og-image.html`, which reuses the v5 dashboard screenshot
+It is generated from `og-image.html`, which reuses the dashboard screenshot
 (`../gladys-dashboard-en.webp`), the app icon and the "Horizon" glass gradient
 of the default dashboard theme (`front/src/routes/dashboard/style.css`).
 
