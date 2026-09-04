@@ -59,7 +59,7 @@ function refreshCharacteristic(hap, service, characteristicType) {
  * isHeaterCooler(hap, service);
  */
 function isHeaterCooler(hap, service) {
-  return service.UUID !== undefined && service.UUID === hap.Service.HeaterCooler.UUID;
+  return Boolean(service) && service.UUID !== undefined && service.UUID === hap.Service.HeaterCooler.UUID;
 }
 
 /**
@@ -100,7 +100,16 @@ function sendState(hkAccessory, feature, event) {
       );
     }
 
-    return hkAccessory.getService(serviceType);
+    // An air conditioning feature is built into a HeaterCooler on its own, but joins the Thermostat
+    // of a device that also carries thermostat features (a Matter heat pump). The type it maps to
+    // only names the first of the two, so the other is tried as well, like the merged temperature
+    // sensor does below.
+    const typedService = hkAccessory.getService(serviceType);
+    if (!typedService && feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING) {
+      return hkAccessory.getService(Service.Thermostat);
+    }
+
+    return typedService;
   };
 
   switch (`${feature.category}:${feature.type}`) {

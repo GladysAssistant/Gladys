@@ -134,6 +134,13 @@ function buildHeaterCoolerService(service, device, features) {
   // always considered on.
   const isOn = () => (powerFeature ? Boolean(readValue(powerFeature)) : true);
 
+  // The states the device can be switched to. They are read here and not only next to the
+  // characteristic they constrain, because what a device is able to do also bounds what it can be
+  // reported as doing, and which setpoint sliders it may be given.
+  const validTargetStates = buildValidHeaterCoolerStates({ modeFeature, setpointFeature });
+  const canHeat = validTargetStates.includes(HOMEKIT_HEATER_COOLER_STATE.HEAT);
+  const canCool = validTargetStates.includes(HOMEKIT_HEATER_COOLER_STATE.COOL);
+
   const readTargetState = () => {
     if (modeFeature) {
       const state = acModeToHeaterCoolerState[readValue(modeFeature)];
@@ -162,20 +169,23 @@ function buildHeaterCoolerService(service, device, features) {
       return HOMEKIT_CURRENT_HEATER_COOLER_STATE.COOLING;
     }
 
-    // In auto the device decides: the setpoint against the room temperature says which way it goes.
+    // In auto the device decides: the setpoint against the room temperature says which way it goes
+    // — but only a way the device declared it can go. A cooling-only air conditioner sitting below
+    // its setpoint is idle, not heating: reporting heating would announce a capability HomeKit was
+    // told the device does not have.
     if (currentTemperatureFeature && setpointFeature) {
       const currentTemperature = readCelsius(currentTemperatureFeature);
       const setpoint = readCelsius(setpointFeature);
-      if (currentTemperature < setpoint) {
+      if (canHeat && currentTemperature < setpoint) {
         return HOMEKIT_CURRENT_HEATER_COOLER_STATE.HEATING;
       }
-      if (currentTemperature > setpoint) {
+      if (canCool && currentTemperature > setpoint) {
         return HOMEKIT_CURRENT_HEATER_COOLER_STATE.COOLING;
       }
       return HOMEKIT_CURRENT_HEATER_COOLER_STATE.IDLE;
     }
     // Without a room temperature to compare against, an air conditioner is assumed to be cooling.
-    return HOMEKIT_CURRENT_HEATER_COOLER_STATE.COOLING;
+    return canCool ? HOMEKIT_CURRENT_HEATER_COOLER_STATE.COOLING : HOMEKIT_CURRENT_HEATER_COOLER_STATE.IDLE;
   };
 
   // A mode the device never declared must not be written to it.
@@ -203,7 +213,6 @@ function buildHeaterCoolerService(service, device, features) {
   });
 
   const targetStateCharacteristic = service.getCharacteristic(Characteristic.TargetHeaterCoolerState);
-  const validTargetStates = buildValidHeaterCoolerStates({ modeFeature, setpointFeature });
   // An integration declaring only modes HomeKit has no equivalent for would leave the list empty,
   // and HAP rejects a characteristic with no valid value at all.
   if (validTargetStates.length > 0) {
@@ -249,25 +258,37 @@ function buildHeaterCoolerService(service, device, features) {
   }
 
   // A HeaterCooler has no TargetTemperature: the Home app shows the heating threshold in heat mode,
-  // the cooling one in cool mode and both in auto. An air conditioner has a single setpoint, so it
-  // stands behind both.
+  // the cooling one in cool mode and, when both are there, a range in auto. An air conditioner has a
+  // single setpoint, so it only gets the thresholds of the modes it declared: a cooling-only device
+  // given both would grow a heating slider it cannot honour, and the Home app would show it a range
+  // whose two ends are the same value and fight each other on every write. A device that can both
+  // heat and cool does share its one setpoint between the two — the range stays zero-width there,
+  // and that is the device's own limitation.
   if (setpointFeature) {
     const thresholdProps = buildThresholdProps(setpointFeature);
+    const thresholdCharacteristics = [];
 
-    [Characteristic.CoolingThresholdTemperature, Characteristic.HeatingThresholdTemperature].forEach(
-      (characteristicType) => {
-        const characteristic = service.getCharacteristic(characteristicType);
-        characteristic.setProps(thresholdProps);
+    // A device that declared neither heat nor cool — auto alone, or auto with dry and fan — still
+    // has to expose its setpoint somewhere, and an air conditioning setpoint is a cooling one.
+    if (canCool || !canHeat) {
+      thresholdCharacteristics.push(Characteristic.CoolingThresholdTemperature);
+    }
+    if (canHeat) {
+      thresholdCharacteristics.push(Characteristic.HeatingThresholdTemperature);
+    }
 
-        characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          callback(undefined, clampToCharacteristic(readCelsius(setpointFeature), characteristic.props));
-        });
-        characteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-          emitValue(setpointFeature, fromCelsius(value, setpointFeature.unit));
-          callback();
-        });
-      },
-    );
+    thresholdCharacteristics.forEach((characteristicType) => {
+      const characteristic = service.getCharacteristic(characteristicType);
+      characteristic.setProps(thresholdProps);
+
+      characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+        callback(undefined, clampToCharacteristic(readCelsius(setpointFeature), characteristic.props));
+      });
+      characteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+        emitValue(setpointFeature, fromCelsius(value, setpointFeature.unit));
+        callback();
+      });
+    });
   }
 
   return service;

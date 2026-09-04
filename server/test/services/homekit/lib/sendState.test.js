@@ -1691,6 +1691,44 @@ describe('Send state to HomeKit', () => {
     ]);
   });
 
+  it('should fall back on the thermostat of a heat pump for an unindexed air conditioning feature', async () => {
+    // An air conditioning feature maps to a HeaterCooler, but on a device that also carries
+    // thermostat features it was built into the Thermostat. Without the index — a service that
+    // buildAccessory did not build — the type lookup finds no HeaterCooler, and the Thermostat has
+    // to be tried rather than leaving the update to throw on an undefined service.
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 2) };
+    const thermostatService = {
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const getService = stub();
+    getService.withArgs(homekitHandler.hap.Service.HeaterCooler).returns(undefined);
+    getService.withArgs('THERMOSTAT').returns(thermostatService);
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Mode',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 });
+
+    // the Thermostat characteristics, since that is the service the feature lives on
+    expect(updateCharacteristic.args).eql([
+      ['TARGETHEATINGCOOLINGSTATE', 2],
+      ['CURRENTHEATINGCOOLINGSTATE', 2],
+      ['TARGETTEMPERATURE', 2],
+    ]);
+  });
+
   it('should notify current temperature on a merged heater cooler', async () => {
     const updateCharacteristic = stub().returns();
     const currentStateCharacteristic = {
