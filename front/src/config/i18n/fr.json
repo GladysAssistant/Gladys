@@ -6349,6 +6349,10 @@
     "instanceUpdateNoticeButton": "Mettre à jour mon instance",
     "instanceUpdateNoticeDismiss": "Masquer ce message",
     "needHelp": "Besoin d'aide",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "collapseMenu": "Réduire le menu",
+    "expandMenu": "Afficher le menu",
     "signOut": "Déconnexion"
   },
   "gatewayLinkUser": {
