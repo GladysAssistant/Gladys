@@ -1,4 +1,6 @@
-import { useCallback, useLayoutEffect, useRef } from 'preact/hooks';
+import { createContext } from 'preact';
+import { createPortal } from 'preact/compat';
+import { useContext, useLayoutEffect, useReducer } from 'preact/hooks';
 import ReactSelect, { components } from 'react-select';
 import ReactCreatableSelect from 'react-select/creatable';
 
@@ -15,115 +17,142 @@ import closeMenuOnScroll from '../../utils/closeMenuOnScroll';
  * <body>, out of every card, and positioned against its control. Its z-index
  * lives on `.react-select__menu-portal` (style/index.css), and
  * closeMenuOnScroll closes it when the page or a panel scrolls underneath,
- * since a portaled menu is positioned once, when it opens.
+ * since a portaled menu is positioned against its control, not scrolled with
+ * it.
  *
- * menuPosition is what keeps that pair from fighting each other: with the
- * default 'absolute', react-select makes room for a menu that doesn't fit
- * below the fold by scrolling the page itself (menuShouldScrollIntoView) —
- * and that scroll is seen by closeMenuOnScroll, which closes the menu it just
- * opened. 'fixed' positions the menu against the viewport instead, so
- * react-select never scrolls the page ("DO NOT scroll if position is fixed"):
- * a menu with no room below simply flips above its control, and only a real
- * user scroll closes it.
+ * The placement itself (below or above the control, how tall) is this
+ * wrapper's, not react-select's. react-select 4 decides it exactly once, when
+ * the menu mounts, by measuring the menu against window.innerHeight — and
+ * that left menus out of reach at the bottom of the screen (forum 10749):
  *
- * Import this instead of 'react-select' — same API, the portal props can still
- * be overridden by the caller.
+ * - it measures the menu, so the side depends on how many options the filter
+ *   leaves at that moment: a menu opened short (one match) fits below, and
+ *   when the filter is erased it grows to its full height, past the bottom
+ *   of the viewport;
+ * - it never looks again: the soft keyboard that slides up right after the
+ *   tap which opened the menu shrinks the viewport under a menu placed for
+ *   the full height;
+ * - innerHeight is the layout viewport: on iOS (and some Android WebViews)
+ *   the keyboard shrinks the visual viewport only, so even a fresh placement
+ *   would put the menu under the keys;
+ * - and it measures at ref time, before the layout effects of the same
+ *   commit — where, under preact/compat, emotion inserts the styles of a
+ *   class it meets for the first time — so the very first menu of a page was
+ *   measured unstyled, an in-flow div at the end of <body>, and placed on
+ *   garbage (usually flipped above its control, cut by the top of the screen
+ *   when there was no room there).
+ *
+ * So MenuPortal below decides the side and the height from the control's
+ * rectangle and the visible viewport alone, on every render and whenever the
+ * visible viewport changes, and hands them to Menu and MenuList through a
+ * context; react-select's own MenuPlacer is left with nothing to measure.
+ *
+ * Import this instead of 'react-select' — same API, the portal props and the
+ * components can still be overridden by the caller.
  */
 
-/**
- * react-select decides where the menu goes (below or above the control, and
- * how tall) exactly once, when the menu mounts, against window.innerHeight
- * at that moment. Two things routinely change after that, and either one left
- * the bottom of the menu out of reach — the options down there could not be
- * selected at all:
- *
- * - the soft keyboard: on a phone or a tablet the tap that opens the menu
- *   also focuses the search input, and the keyboard slides up right after —
- *   the viewport shrinks by a third and the menu, placed against the old
- *   height, ends up under the keys. A control at the bottom of the widget
- *   edit panel is the typical victim;
- * - the option list growing while the menu is open (the user erases part of
- *   what they typed): a menu that fit below when short grows past the
- *   viewport bottom.
- *
- * This Menu re-runs react-select's own placement (innerRef is MenuPlacer's
- * getPlacement) when the viewport resizes or the menu grows, so
- * the menu is constrained or flipped above the control against the real
- * available space. Only a menu currently below its control is re-placed: the
- * portal ignores a return to the initial 'bottom' placement (react-select
- * 4.x "avoid re-renders if the placement has not changed"), so a menu that
- * went 'top' would be drawn over its control if it came back — and a menu
- * above the control is never under the keyboard anyway.
- */
-const Menu = props => {
-  const { innerRef, placement } = props;
-  const menuElement = useRef(null);
-  const lastHeight = useRef(null);
-  const latest = useRef();
-  latest.current = { innerRef, placement };
+// the placement decided by MenuPortal, read by Menu (side) and MenuList (height)
+const PlacementContext = createContext(null);
 
-  const replace = () => {
-    const element = menuElement.current;
-    if (!element || latest.current.placement !== 'bottom') {
-      return;
-    }
-    latest.current.innerRef(element);
-  };
+// The part of the layout viewport the user can actually see, in the
+// coordinates of getBoundingClientRect and position: fixed. Both differ when
+// the soft keyboard is up on iOS: the visual viewport shrinks (and scrolls),
+// window.innerHeight does not move.
+const getVisibleViewport = () => {
+  const { visualViewport } = window;
+  if (visualViewport) {
+    return { top: visualViewport.offsetTop, bottom: visualViewport.offsetTop + visualViewport.height };
+  }
+  return { top: 0, bottom: window.innerHeight };
+};
 
-  // Stable: a ref callback that changes identity is called again on every
-  // render, and each call re-runs the placement — which re-renders.
-  // Deferred to a microtask: refs are attached before the layout effects of
-  // the same commit, and under preact/compat that is where emotion inserts
-  // the styles of a class it meets for the first time — so the very first
-  // menu of a page is measured unstyled (a plain in-flow div at the end of
-  // <body>, every option visible) and lands wherever that garbage says. The
-  // microtask runs once the commit and its effects are done, before paint.
-  const setRef = useCallback(element => {
-    menuElement.current = element;
-    if (!element) {
-      latest.current.innerRef(element);
-      return;
-    }
-    queueMicrotask(() => {
-      if (menuElement.current === element) {
-        latest.current.innerRef(element);
-      }
-    });
-  }, []);
+// react-select's own policy for a fixed 'auto' menu — below when at least
+// minMenuHeight fits there (constrained to the room), above otherwise — but
+// against the visible viewport and the control alone: the side never depends
+// on the menu's content, and the height never exceeds the room there is, so a
+// list that grows while the menu is open cannot push it off screen.
+const placeMenu = ({ rect, viewport, menuPlacement, maxMenuHeight, minMenuHeight, gutter }) => {
+  const below = { placement: 'bottom', maxHeight: Math.min(maxMenuHeight, viewport.bottom - rect.bottom - gutter) };
+  const above = { placement: 'top', maxHeight: Math.min(maxMenuHeight, rect.top - viewport.top - gutter) };
+  const [preferred, other] = menuPlacement === 'top' ? [above, below] : [below, above];
+  if (preferred.maxHeight >= minMenuHeight) {
+    return preferred;
+  }
+  if (other.maxHeight >= minMenuHeight) {
+    return other;
+  }
+  // no decent room on either side: the larger one, and the list scrolls
+  const larger = preferred.maxHeight >= other.maxHeight ? preferred : other;
+  return { placement: larger.placement, maxHeight: minMenuHeight };
+};
 
+const MenuPortal = props => {
+  const { appendTo, children, className, controlElement, cx, innerProps, selectProps, theme } = props;
+  // re-read the control and the viewport when the visible viewport changes:
+  // window resize (Android's keyboard, a desktop window), visual viewport
+  // resize and scroll (iOS's keyboard, a pinch-zoom)
+  const [, relayout] = useReducer(count => count + 1, 0);
   useLayoutEffect(() => {
-    window.addEventListener('resize', replace);
     const { visualViewport } = window;
+    window.addEventListener('resize', relayout);
     if (visualViewport) {
-      visualViewport.addEventListener('resize', replace);
+      visualViewport.addEventListener('resize', relayout);
+      visualViewport.addEventListener('scroll', relayout);
     }
     return () => {
-      window.removeEventListener('resize', replace);
+      window.removeEventListener('resize', relayout);
       if (visualViewport) {
-        visualViewport.removeEventListener('resize', replace);
+        visualViewport.removeEventListener('resize', relayout);
+        visualViewport.removeEventListener('scroll', relayout);
       }
     };
   }, []);
-
-  // After every render: the option list is the menu's content, so the menu's
-  // height is the cheapest honest signal that the list changed. Only growth
-  // re-places: a menu that grew may now overflow the viewport, while one that
-  // shrank still fits where it is — and re-placing a menu react-select just
-  // constrained would lift the constraint (it fits!) and grow it right back.
-  useLayoutEffect(() => {
-    const element = menuElement.current;
-    if (!element) {
-      return;
-    }
-    const { height } = element.getBoundingClientRect();
-    const grew = lastHeight.current !== null && height > lastHeight.current;
-    lastHeight.current = height;
-    if (grew) {
-      replace();
-    }
+  if (!controlElement) {
+    return null;
+  }
+  const rect = controlElement.getBoundingClientRect();
+  const placement = placeMenu({
+    rect,
+    viewport: getVisibleViewport(),
+    menuPlacement: selectProps.menuPlacement,
+    maxMenuHeight: selectProps.maxMenuHeight,
+    minMenuHeight: selectProps.minMenuHeight,
+    gutter: theme.spacing.menuGutter
   });
+  // the menu hangs from the portal's edge: its top for a menu below the
+  // control (react-select's Menu sets top: 100%), its bottom for one above
+  // (bottom: 100%) — so the portal sits on the control's bottom or top edge
+  const style = {
+    position: 'fixed',
+    left: rect.left,
+    width: rect.width,
+    top: placement.placement === 'top' ? rect.top : rect.bottom,
+    zIndex: 1
+  };
+  return createPortal(
+    <PlacementContext.Provider value={placement}>
+      {/* eslint-disable-next-line react/forbid-dom-props -- a position computed at render, like react-select's own portal */}
+      <div className={cx({ 'menu-portal': true }, className)} style={style} {...innerProps}>
+        {children}
+      </div>
+    </PlacementContext.Provider>,
+    appendTo || document.body
+  );
+};
 
-  return <components.Menu {...props} innerRef={setRef} />;
+const Menu = props => {
+  const placement = useContext(PlacementContext);
+  // innerRef is MenuPlacer's measure-and-place, withheld: the portal placed
+  // the menu already, and MenuPlacer would scroll the page for a menu it
+  // believes does not fit
+  return (
+    <components.Menu {...props} innerRef={undefined} placement={placement ? placement.placement : props.placement} />
+  );
+};
+
+const MenuList = props => {
+  const placement = useContext(PlacementContext);
+  return <components.MenuList {...props} maxHeight={placement ? placement.maxHeight : props.maxHeight} />;
 };
 
 const portalProps = () => ({
@@ -133,14 +162,14 @@ const portalProps = () => ({
   closeMenuOnScroll
 });
 
-// a caller's own `components` still win, Menu included
-const withMenu = props => ({
+// a caller's own components still win
+const withComponents = props => ({
   ...props,
-  components: { Menu, ...props.components }
+  components: { MenuPortal, Menu, MenuList, ...props.components }
 });
 
-const Select = props => <ReactSelect {...portalProps()} {...withMenu(props)} />;
+const Select = props => <ReactSelect {...portalProps()} {...withComponents(props)} />;
 
-export const CreatableSelect = props => <ReactCreatableSelect {...portalProps()} {...withMenu(props)} />;
+export const CreatableSelect = props => <ReactCreatableSelect {...portalProps()} {...withComponents(props)} />;
 
 export default Select;
