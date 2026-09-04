@@ -104,6 +104,22 @@ class EditDevices extends Component {
     );
   };
 
+  // Without the devices list, fall back to what the box already stores: the
+  // picker loads on its own, and a pick must not write the list back without
+  // the features that were saved before.
+  getStoredDeviceFeaturesOptions = () => {
+    const deviceFeatures = this.props.box.device_features || [];
+    const deviceFeatureNames = this.props.box.device_feature_names || [];
+    return deviceFeatures.map((selector, index) => {
+      const option = { value: selector, label: deviceFeatureNames[index] || selector };
+      // same shape as the resolved options: the list fills its name inputs from new_label
+      if (deviceFeatureNames[index]) {
+        option.new_label = deviceFeatureNames[index];
+      }
+      return option;
+    });
+  };
+
   getDeviceFeatures = async () => {
     try {
       this.setState({ loading: true });
@@ -113,7 +129,7 @@ class EditDevices extends Component {
       this.refreshDeviceFeaturesNames();
     } catch (e) {
       console.error(e);
-      this.setState({ loading: false });
+      this.setState({ selectedDeviceFeaturesOptions: this.getStoredDeviceFeaturesOptions(), loading: false });
     }
   };
 
