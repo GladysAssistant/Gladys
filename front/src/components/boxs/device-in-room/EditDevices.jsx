@@ -110,10 +110,14 @@ class EditDevices extends Component {
   getStoredDeviceFeaturesOptions = () => {
     const deviceFeatures = this.props.box.device_features || [];
     const deviceFeatureNames = this.props.box.device_feature_names || [];
-    return deviceFeatures.map((selector, index) => ({
-      value: selector,
-      label: deviceFeatureNames[index] || selector
-    }));
+    return deviceFeatures.map((selector, index) => {
+      const option = { value: selector, label: deviceFeatureNames[index] || selector };
+      // same shape as the resolved options: the list fills its name inputs from new_label
+      if (deviceFeatureNames[index]) {
+        option.new_label = deviceFeatureNames[index];
+      }
+      return option;
+    });
   };
 
   getDeviceFeatures = async () => {
