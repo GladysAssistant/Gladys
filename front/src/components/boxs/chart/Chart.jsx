@@ -100,6 +100,25 @@ const calculateVariation = (firstValue, lastValue) => {
 
 const allEqual = arr => arr.every(val => val === arr[0]);
 
+// Compute the values displayed in the header of the box (last value + variation over the period)
+// from the per-series summaries, ignoring the series hidden by the user in the chart legend.
+// The variation is the one of the averaged value, so the two numbers describe the same thing:
+// "the average of the visible series is now X, that is Y% more/less than at the start of the period".
+const getHeaderValues = (featuresSummary, hiddenSeriesIndexes) => {
+  const visibleSummaries = featuresSummary.filter(
+    (summary, index) => summary !== null && !hiddenSeriesIndexes.includes(index)
+  );
+  if (visibleSummaries.length === 0) {
+    return { variation: undefined, lastValueRounded: null };
+  }
+  const firstValue = average(visibleSummaries.map(summary => summary.firstValue));
+  const lastValue = average(visibleSummaries.map(summary => summary.lastValue));
+  return {
+    variation: calculateVariation(firstValue, lastValue),
+    lastValueRounded: roundWith2DecimalIfNeeded(lastValue)
+  };
+};
+
 const getPeriodLabel = (interval, offset, language) => {
   const endDate = dayjs().subtract(offset, 'minute');
   const startDate = endDate.subtract(interval, 'minute');
@@ -375,71 +394,38 @@ class Chartbox extends Component {
         // We check if all deviceFeatures selected are in the same unit
         const allUnitsAreSame = this.props.box.units ? allEqual(unitsByFeature) : false;
 
-        // If all deviceFeatures selected are in the same unit
-        // We do a average of all values
-        if (allUnitsAreSame) {
-          const lastValuesArray = [];
-          const variationArray = [];
-          data.forEach(oneFeature => {
-            const { values } = oneFeature;
-            if (values.length === 0) {
-              return;
-            }
-            let firstElement = values[0];
-            let lastElement = values[values.length - 1];
-            // Convert the value if it is a convertible unit
-            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
-              firstElement.value,
-              unit,
-              userUnitPreference
-            );
-            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
-            firstElement.value = firstElementValue;
-            lastElement.value = lastElementValue;
-            displayUnit = firstElementUnit;
-
-            const variation = calculateVariation(
-              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
-              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
-            );
-            const lastValue = getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function);
-            variationArray.push(variation);
-            lastValuesArray.push(lastValue);
-          });
-          newState.variation = average(variationArray);
-          newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(displayUnit);
-          newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
-          newState.unit = displayUnit;
-        } else {
-          // If not, we only display the first value
-          const oneFeature = data[0];
+        // First and last value of the period for each feature (one entry per series, in the same
+        // order as the chart series). If all features share the same unit, they are all summarized
+        // and averaged together, otherwise only the first feature is displayed.
+        // The header (last value + variation) is derived from these summaries, restricted to the
+        // series currently visible in the chart legend (see getHeaderValues).
+        const featuresSummary = data.map((oneFeature, index) => {
           const { values } = oneFeature;
-          if (values.length > 0) {
-            let firstElement = values[0];
-            let lastElement = values[values.length - 1];
-
-            // Convert the value if it is a convertible unit
-            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
-              firstElement.value,
-              unit,
-              userUnitPreference
-            );
-            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
-            firstElement.value = firstElementValue;
-            lastElement.value = lastElementValue;
-            displayUnit = firstElementUnit;
-
-            newState.variation = calculateVariation(
-              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
-              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
-            );
-            newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
-            newState.lastValueRounded = roundWith2DecimalIfNeeded(
-              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
-            );
-            newState.unit = displayUnit;
+          if (values.length === 0 || (!allUnitsAreSame && index > 0)) {
+            return null;
           }
-        }
+          const firstElement = values[0];
+          const lastElement = values[values.length - 1];
+          const rawFirstValue = getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function);
+          const rawLastValue = getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function);
+          if (!notNullNotUndefined(rawFirstValue) || !notNullNotUndefined(rawLastValue)) {
+            return null;
+          }
+          // Convert the value if it is a convertible unit
+          const { value: firstValue, unit: firstElementUnit } = checkAndConvertUnit(
+            rawFirstValue,
+            unit,
+            userUnitPreference
+          );
+          const { value: lastValue } = checkAndConvertUnit(rawLastValue, unit, userUnitPreference);
+          displayUnit = firstElementUnit;
+          return { firstValue, lastValue };
+        });
+
+        newState.featuresSummary = featuresSummary;
+        newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(displayUnit);
+        newState.unit = displayUnit;
+        Object.assign(newState, getHeaderValues(featuresSummary, this.state.hiddenSeriesIndexes));
       }
       await this.setState(newState);
     } catch (e) {
@@ -462,6 +448,31 @@ class Chartbox extends Component {
       this.getData();
     }
   };
+  // The user toggled a series in the chart legend (ApexCharts fires this event before
+  // hiding/showing the series): recompute the header from the series that remain visible.
+  handleLegendClick = seriesIndex => {
+    this.setState(prevState => {
+      const hiddenSeriesIndexes = prevState.hiddenSeriesIndexes.includes(seriesIndex)
+        ? prevState.hiddenSeriesIndexes.filter(index => index !== seriesIndex)
+        : [...prevState.hiddenSeriesIndexes, seriesIndex];
+      return {
+        hiddenSeriesIndexes,
+        ...getHeaderValues(prevState.featuresSummary || [], hiddenSeriesIndexes)
+      };
+    });
+  };
+  // A freshly created chart displays all its series, so the header must follow.
+  // ApexCharts keeps the hidden series when only the data is refreshed, so this is
+  // only called when the chart is (re)created, not on every data refresh.
+  resetHiddenSeries = () => {
+    if (this.state.hiddenSeriesIndexes.length === 0) {
+      return;
+    }
+    this.setState(prevState => ({
+      hiddenSeriesIndexes: [],
+      ...getHeaderValues(prevState.featuresSummary || [], [])
+    }));
+  };
   updateInterval = async () => {
     await this.setState({
       interval: intervalByName[this.props.box.interval],
@@ -477,7 +488,9 @@ class Chartbox extends Component {
       loading: true,
       initialized: false,
       height: 'small',
-      nbFeaturesDisplayed: 0
+      nbFeaturesDisplayed: 0,
+      featuresSummary: [],
+      hiddenSeriesIndexes: []
     };
   }
   componentDidMount() {
@@ -770,6 +783,8 @@ class Chartbox extends Component {
                     colors={props.box.colors}
                     additionalHeight={additionalHeight}
                     dictionary={props.intl.dictionary}
+                    onLegendClick={this.handleLegendClick}
+                    onChartCreated={this.resetHiddenSeries}
                   />
                 </div>
               )}
@@ -831,6 +846,8 @@ class Chartbox extends Component {
                     colors={props.box.colors}
                     additionalHeight={additionalHeight}
                     dictionary={props.intl.dictionary}
+                    onLegendClick={this.handleLegendClick}
+                    onChartCreated={this.resetHiddenSeries}
                   />
                 )}
               </div>

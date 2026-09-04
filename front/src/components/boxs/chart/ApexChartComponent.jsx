@@ -234,14 +234,33 @@ class ApexChartComponent extends Component {
       options = this.getAreaChartOptions();
     }
     this.tooltipPositioning.addToOptions(options);
+    this.addLegendClickEvent(options);
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
       this.chart = new ApexCharts(this.chartRef.current, options);
 
       this.chart.render();
+      // A new chart displays all its series, whatever was hidden in a previous instance
+      if (this.props.onChartCreated) {
+        this.props.onChartCreated();
+      }
     }
   };
+  // Let the parent know when the user shows/hides a series through the legend, so the
+  // values it displays next to the chart can follow what is actually visible.
+  // ApexCharts fires this event with the index of the clicked series, before toggling it.
+  addLegendClickEvent(options) {
+    if (!this.props.onLegendClick) {
+      return;
+    }
+    if (!options.chart.events) {
+      options.chart.events = {};
+    }
+    options.chart.events.legendClick = (chartContext, seriesIndex) => {
+      this.props.onLegendClick(seriesIndex);
+    };
+  }
   componentDidMount() {
     this.displayChart();
   }
