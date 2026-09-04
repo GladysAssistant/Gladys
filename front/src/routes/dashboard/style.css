@@ -338,6 +338,8 @@
   --gl-card-bg: rgba(255, 255, 255, 0.52);
   --gl-card-nested-bg: rgba(255, 255, 255, 0.4);
   --gl-surface-strong: rgba(255, 255, 255, 0.78);
+  /* floating menus over content (the dashboard switcher's "…" list) */
+  --gl-popover-bg: rgba(255, 255, 255, 0.94);
   --gl-border: rgba(255, 255, 255, 0.85);
   --gl-shadow: 0 18px 50px rgba(44, 62, 118, 0.13), 0 2px 8px rgba(44, 62, 118, 0.05);
   --gl-shadow-soft: 0 4px 16px rgba(44, 62, 118, 0.09);
@@ -796,16 +798,40 @@
   filter: none;
 }
 
-/* Tablet dock: frosted pill, active tab inverted */
+/* Tablet dock: frosted pill, active tab inverted.
+   The frost (background + backdrop blur) is painted by the ::before layer
+   below, NOT by the bar itself, on purpose: the "…" overflow menu is a DOM
+   descendant of the bar, and an element with backdrop-filter is a backdrop
+   root — per spec (and strictly in Chromium) the backdrop-filter of a
+   descendant then only samples what is painted INSIDE that ancestor, never
+   the page behind it. With the blur on the bar, the menu's own blur was a
+   silent no-op on desktop Chrome/Edge: the cards' text showed through its
+   78% white, crisp (forum feedback). Safari does not isolate, which is why
+   the same CSS looked opaque on iOS. */
 :global(.glass-theme) .dashboardTabs {
-  background: var(--gl-card-bg);
-  backdrop-filter: blur(24px) saturate(1.5);
-  -webkit-backdrop-filter: blur(24px) saturate(1.5);
   border: 1px solid var(--gl-border);
   border-radius: 999px;
   padding: 5px;
   box-shadow: var(--gl-shadow-soft);
   gap: 4px;
+}
+
+:global(.glass-theme) .dashboardTabs::before {
+  content: '';
+  position: absolute;
+  /* longhands, not inset: — Chromium < 87 on the old wall tablets */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  /* behind the pills, inside the bar's own stacking context (see the
+     z-index on .dashboardTabs) */
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  pointer-events: none;
 }
 
 :global(.glass-theme) .dashboardTab {
@@ -833,9 +859,10 @@
   gap: 6px;
   min-width: 0;
   max-width: 100%;
-  /* The glass variant's backdrop-filter makes this a stacking context, which
-     would trap the overflow menu below the dashboard cards: stack the whole
-     bar above the page content so the menu opens on top */
+  /* Stacked above the page content so the overflow menu opens on top of
+     the dashboard cards. The stacking context this creates is also what
+     keeps the glass variant's ::before frost layer (z-index: -1) behind the
+     pills instead of behind the whole page. */
   position: relative;
   z-index: 10;
 }
@@ -1049,9 +1076,13 @@
 }
 
 /* Horizon glass theme: the overflow menu is a glass surface like the bar
-   it opens from, not a stock white dropdown */
+   it opens from, not a stock white dropdown. It floats over the cards'
+   text, not over the scene: a popover needs a much denser glass than a
+   card to stay readable, whatever sits under it — the blur (which now
+   works, see the bar's ::before) softens the backdrop, the near-opaque
+   white guarantees the legibility even where backdrop-filter is missing. */
 :global(.glass-theme) .dashboardTabsMenu {
-  background: var(--gl-surface-strong);
+  background: var(--gl-popover-bg);
   backdrop-filter: blur(28px) saturate(1.6);
   -webkit-backdrop-filter: blur(28px) saturate(1.6);
   border: 1px solid var(--gl-border);
@@ -1066,8 +1097,9 @@
   font-weight: 500;
 }
 
+/* an ink tint, not more white: white on the near-opaque panel is invisible */
 :global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item):hover {
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(44, 62, 118, 0.08);
 }
 
 :global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item.active) {
@@ -1086,7 +1118,7 @@
 /* dark-mode.css paints .dropdown-menu with a solid !important background:
    restore the glass surface with the same weight (see the card rules above) */
 :global(.dark-mode .glass-theme) .dashboardTabsMenu {
-  background-color: var(--gl-surface-strong) !important;
+  background-color: var(--gl-popover-bg) !important;
 }
 
 /* Tablet mode keeps the compact icon dock */
