@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../utils/consts';
 
@@ -21,10 +21,25 @@ class GatewayRecoveryCodes extends Component {
     }
   };
 
-  render({ recoveryCodes, status, onRetry, onContinue, continueLabelId }, { copied }) {
+  render(
+    {
+      recoveryCodes,
+      status,
+      onRetry,
+      onContinue,
+      continueLabelId,
+      twoFactorCode,
+      onTwoFactorCodeChange,
+      wrongTwoFactorCode
+    },
+    { copied }
+  ) {
     const downloadUrl = recoveryCodes
       ? `data:text/plain;charset=utf-8,${encodeURIComponent(recoveryCodes.join('\n'))}`
       : null;
+    // The Gateway requires a current code from the two-factor app to generate recovery
+    // codes: when the caller collects one, the retry needs a fresh 6 digits code.
+    const retryDisabled = onTwoFactorCodeChange && (!twoFactorCode || twoFactorCode.length < 6);
     return (
       <div class="card">
         <div class="card-body p-6">
@@ -37,11 +52,43 @@ class GatewayRecoveryCodes extends Component {
               {status === RequestStatus.Error ? (
                 <div>
                   <div class="alert alert-danger" role="alert">
-                    <Text id="gatewayRecoveryCodes.generationError" />
+                    {wrongTwoFactorCode ? (
+                      <Text id="gatewayLogin.invalidTwoFactorCode" />
+                    ) : (
+                      <Text id="gatewayRecoveryCodes.generationError" />
+                    )}
                   </div>
+                  {onTwoFactorCodeChange && (
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="gatewayLogin.twoFactorCodeLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
+                          value={twoFactorCode}
+                          onInput={onTwoFactorCodeChange}
+                          inputmode="numeric"
+                          autocomplete="one-time-code"
+                          maxlength="6"
+                          autofocus
+                        />
+                      </Localizer>
+                      <small class="form-text text-muted">
+                        <Text id="gatewayRecoveryCodes.twoFactorCodeRequired" />
+                      </small>
+                    </div>
+                  )}
                   {onRetry && (
                     <div class="form-footer">
-                      <button type="button" class="btn btn-primary btn-block" onClick={onRetry}>
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-block"
+                        onClick={onRetry}
+                        disabled={retryDisabled}
+                      >
                         <Text id="gatewayRecoveryCodes.retryButton" />
                       </button>
                     </div>

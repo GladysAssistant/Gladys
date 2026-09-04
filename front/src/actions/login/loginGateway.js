@@ -32,7 +32,9 @@ function createActions(store) {
         gatewayLoginUseRecoveryCode: false,
         gatewayLoginRecoveryCode: null,
         gatewayLoginRecoveryCodes: null,
-        gatewayLoginRecoveryCodesStatus: null
+        gatewayLoginRecoveryCodesStatus: null,
+        gatewayLoginRecoveryCodesTwoFactorCode: null,
+        gatewayLoginRecoveryCodesWrongTwoFactorCode: false
       };
       // If there is a return URL and the URL is relative to this domain
       // (we want to avoid redirecting to another domain for security issues)
@@ -146,22 +148,37 @@ function createActions(store) {
       // The login itself already succeeded here, so a failure must not send the user
       // back to the login form: we display it on the recovery codes screen instead,
       // where they can retry, because there is no other way to get a set of codes.
+      // The Gateway requires a current code from the two-factor app: the code the user just
+      // logged in with is reused, but it expires quickly so a retry asks for a fresh one.
+      const twoFactorCode = state.gatewayLoginRecoveryCodesTwoFactorCode || state.gatewayLoginTwoFactorCode;
       store.setState({
         gatewayLoginRecoveryCodesStatus: RequestStatus.Getting,
+        gatewayLoginRecoveryCodesWrongTwoFactorCode: false,
         gatewayLoginRecoveryCodes: null
       });
       try {
-        const { recovery_codes: recoveryCodes } = await state.session.gatewayClient.generateTwoFactorRecoveryCodes();
+        const { recovery_codes: recoveryCodes } = await state.session.gatewayClient.generateTwoFactorRecoveryCodes(
+          twoFactorCode
+        );
         store.setState({
           gatewayLoginRecoveryCodes: recoveryCodes,
           gatewayLoginRecoveryCodesStatus: RequestStatus.Success
         });
       } catch (e) {
         console.error(e);
+        const status = get(e, 'response.status');
         store.setState({
-          gatewayLoginRecoveryCodesStatus: RequestStatus.Error
+          gatewayLoginRecoveryCodesStatus: RequestStatus.Error,
+          // 403: the code is wrong or expired, a new one is needed
+          gatewayLoginRecoveryCodesWrongTwoFactorCode: status === 403,
+          gatewayLoginRecoveryCodesTwoFactorCode: null
         });
       }
+    },
+    updateRecoveryCodesTwoFactorCode(state, e) {
+      store.setState({
+        gatewayLoginRecoveryCodesTwoFactorCode: e.target.value
+      });
     },
     async handleLoginError(state, e, wrongCodeStatus) {
       console.error(e);
@@ -235,7 +252,9 @@ function createActions(store) {
       store.setState({
         gatewayLoginRecoveryCodes: null,
         gatewayLoginRecoveryCodesNextUrl: null,
-        gatewayLoginRecoveryCodesStatus: null
+        gatewayLoginRecoveryCodesStatus: null,
+        gatewayLoginRecoveryCodesTwoFactorCode: null,
+        gatewayLoginRecoveryCodesWrongTwoFactorCode: false
       });
       route(nextUrl);
     },

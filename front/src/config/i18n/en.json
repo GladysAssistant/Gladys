@@ -4718,7 +4718,8 @@
     "generateButton": "Generate recovery codes",
     "confirmGenerateButton": "Generate new codes",
     "rotationWarning": "Generating a new set immediately invalidates the recovery codes you may already have. Only the new ones will work.",
-    "continueButton": "Continue"
+    "continueButton": "Continue",
+    "twoFactorCodeRequired": "Enter a code from your two-factor app: the Gateway requires it to generate recovery codes."
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Configure two-factor authentication (2FA)",
