@@ -8,6 +8,24 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../utils/constants');
  * device.add(device);
  */
 function add(device) {
+  // A feature must be ONE object in RAM, whatever the store it is read from.
+  // The stores merge an update into the object they already hold (Store.setState),
+  // so a device saved a second time (edited in the UI, re-discovered by an
+  // integration) kept the "deviceFeature" store on its first object, while the
+  // "device" store pointed to the fresh objects of the new features array. From
+  // then on, device.saveState only refreshed the former: anything reading a
+  // feature through the device (the scene "toggle" actions, the switch/light
+  // voice commands...) saw a last_value frozen at the time of the save, until
+  // the next restart. Merging the new feature into the object already in RAM,
+  // and putting that object back into the device, keeps every store in sync.
+  device.features = device.features.map((feature) => {
+    const featureInRam = this.stateManager.get('deviceFeature', feature.selector);
+    if (featureInRam && featureInRam !== feature) {
+      Object.assign(featureInRam, feature);
+      return featureInRam;
+    }
+    return feature;
+  });
   this.stateManager.setState('device', device.selector, device);
   this.stateManager.setState('deviceByExternalId', device.external_id, device);
   this.stateManager.setState('deviceById', device.id, device);
