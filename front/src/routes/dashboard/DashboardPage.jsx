@@ -107,8 +107,11 @@ const DashboardPage = ({ children, ...props }) => {
                         </button>
                       </Localizer>
                     )}
-                    {/* fullscreen is pointless on a phone: hidden below tablet width */}
-                    {!props.dashboardNotConfigured &&
+                    {/* fullscreen is pointless on a phone: hidden below tablet width.
+                        Only for a loaded dashboard with widgets — not while the
+                        configuration is still being fetched */}
+                    {props.currentDashboard &&
+                      !props.dashboardNotConfigured &&
                       props.browserFullScreenCompatible &&
                       !props.hideExitFullScreenButton && (
                         <Localizer>
