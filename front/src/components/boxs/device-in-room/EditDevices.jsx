@@ -1,16 +1,29 @@
 import { Component } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
-import Select from '../../form/Select';
 import update from 'immutability-helper';
 import BaseEditBox from '../baseEditBox';
+import SelectDeviceFeature from '../../device/SelectDeviceFeature';
 import { getDeviceFeatureName } from '../../../utils/device';
 import { DeviceListWithDragAndDrop } from '../../drag-and-drop/DeviceListWithDragAndDrop';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 class EditDevices extends Component {
-  addDeviceFeature = async selectedDeviceFeatureOption => {
-    const newSelectedDeviceFeaturesOptions = [...this.state.selectedDeviceFeaturesOptions, selectedDeviceFeatureOption];
+  addDeviceFeature = async (feature, device) => {
+    // SelectDeviceFeature also reports a cleared selection with null
+    if (!feature) {
+      return;
+    }
+    const selectedDeviceFeatureOption = {
+      value: feature.selector,
+      label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+    };
+    // The picker loads on its own, so it can be used even if the fetch of the
+    // already picked features failed and left this list unset.
+    const newSelectedDeviceFeaturesOptions = [
+      ...(this.state.selectedDeviceFeaturesOptions || []),
+      selectedDeviceFeatureOption
+    ];
     await this.setState({ selectedDeviceFeaturesOptions: newSelectedDeviceFeaturesOptions });
     this.refreshDeviceFeaturesNames();
   };
@@ -41,13 +54,8 @@ class EditDevices extends Component {
     if (!this.props.box || !this.props.box.device_features) {
       return;
     }
-    if (!this.state.deviceOptions) {
-      return;
-    }
-    const { deviceOptions, selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(
-      this.state.devices
-    );
-    await this.setState({ deviceOptions, selectedDeviceFeaturesOptions });
+    const selectedDeviceFeaturesOptions = this.getSelectedDeviceFeaturesOptions(this.state.devices);
+    await this.setState({ selectedDeviceFeaturesOptions });
   };
 
   updateDeviceFeatureName = async (index, name) => {
@@ -67,67 +75,41 @@ class EditDevices extends Component {
     }
   };
 
-  getSelectedDeviceFeaturesAndOptions = devices => {
-    const deviceOptions = [];
-    let selectedDeviceFeaturesOptions = [];
-
+  // Builds the list of already picked features (with their custom names) from the
+  // box config. The picker itself is SelectDeviceFeature, which loads its own options.
+  getSelectedDeviceFeaturesOptions = devices => {
+    const selectedDeviceFeaturesOptions = [];
+    if (!this.props.box.device_features) {
+      return selectedDeviceFeaturesOptions;
+    }
     devices.forEach(device => {
-      const deviceFeatures = [];
       device.features.forEach(feature => {
+        const featureIndex = this.props.box.device_features.indexOf(feature.selector);
+        if (featureIndex === -1) {
+          return;
+        }
         const featureOption = {
           value: feature.selector,
           label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
         };
-        deviceFeatures.push(featureOption);
-        // If the feature is already selected
-        if (this.props.box.device_features) {
-          const featureIndex = this.props.box.device_features.indexOf(feature.selector);
-          if (this.props.box.device_features && featureIndex !== -1) {
-            // and there is a name associated to it
-            if (this.props.box.device_feature_names && this.props.box.device_feature_names[featureIndex]) {
-              // We set the new_label in the object
-              featureOption.new_label = this.props.box.device_feature_names[featureIndex];
-            }
-            // And we push this to the list of selected feature
-            selectedDeviceFeaturesOptions.push(featureOption);
-          }
+        // and there is a name associated to it
+        if (this.props.box.device_feature_names && this.props.box.device_feature_names[featureIndex]) {
+          featureOption.new_label = this.props.box.device_feature_names[featureIndex];
         }
+        selectedDeviceFeaturesOptions.push(featureOption);
       });
-      if (deviceFeatures.length > 0) {
-        deviceFeatures.sort((a, b) => {
-          if (a.label < b.label) {
-            return -1;
-          } else if (a.label > b.label) {
-            return 1;
-          }
-          return 0;
-        });
-        const filteredDeviceFeatures = deviceFeatures.filter(
-          feature => !selectedDeviceFeaturesOptions.some(selected => selected.value === feature.value)
-        );
-        if (filteredDeviceFeatures.length > 0) {
-          deviceOptions.push({
-            label: device.name,
-            options: filteredDeviceFeatures
-          });
-        }
-      }
     });
-    if (this.props.box.device_features) {
-      selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions.sort(
-        (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value)
-      );
-    }
-    return { deviceOptions, selectedDeviceFeaturesOptions };
+    return selectedDeviceFeaturesOptions.sort(
+      (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value)
+    );
   };
 
   getDeviceFeatures = async () => {
     try {
       this.setState({ loading: true });
-      // we get the rooms with the devices
       const devices = await this.props.httpClient.get(`/api/v1/device`);
-      const { deviceOptions, selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(devices);
-      await this.setState({ devices, deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      const selectedDeviceFeaturesOptions = this.getSelectedDeviceFeaturesOptions(devices);
+      await this.setState({ devices, selectedDeviceFeaturesOptions, loading: false });
       this.refreshDeviceFeaturesNames();
     } catch (e) {
       console.error(e);
@@ -172,7 +154,8 @@ class EditDevices extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
+  render(props, { selectedDeviceFeaturesOptions, loading }) {
+    const selectedDeviceFeatures = (selectedDeviceFeaturesOptions || []).map(option => option.value);
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices">
         <div class={loading ? 'dimmer active' : 'dimmer'}>
@@ -205,21 +188,19 @@ class EditDevices extends Component {
                 />
               )}
             </div>
-            {deviceOptions && (
-              <div class="form-group">
-                <label>
-                  <Text id="dashboard.boxes.devices.addADeviceLabel" />
-                </label>
-                <Select
-                  onChange={this.addDeviceFeature}
-                  value={[]}
-                  options={deviceOptions}
-                  maxMenuHeight={220}
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                />
-              </div>
-            )}
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.devices.addADeviceLabel" />
+              </label>
+              {/* Grouped by room (same picker as scenes), so two devices sharing a
+                  name stay distinguishable. No value: the picker resets after each add.
+                  Mounted right away so its own fetches overlap the one above, under
+                  the dimmer, instead of leaving a gap here once the dimmer lifts. */}
+              <SelectDeviceFeature
+                excludedDeviceFeatures={selectedDeviceFeatures}
+                onDeviceFeatureChange={this.addDeviceFeature}
+              />
+            </div>
           </div>
         </div>
       </BaseEditBox>

@@ -12,6 +12,15 @@ const normalizeSearchString = str =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
 
+// Keeps the room grouping while filtering options, dropping rooms left empty
+const filterOptionGroups = (groups, predicate) =>
+  groups
+    .map(group => ({
+      ...group,
+      options: group.options.filter(predicate)
+    }))
+    .filter(group => group.options.length > 0);
+
 class SelectDeviceFeature extends Component {
   getOptions = async () => {
     try {
@@ -185,22 +194,29 @@ class SelectDeviceFeature extends Component {
   // Side effect: the huge all-features list shrinks to the relevant ones.
   getDisplayedOptions = () => {
     const { deviceOptions, deviceFeaturesDictionnary, selectedOptions = [] } = this.state;
+    const { excludedDeviceFeatures = [] } = this.props;
+    let displayedOptions = deviceOptions;
+    // Callers that manage their own list of picked features (e.g. the dashboard
+    // devices box) hide the ones already picked so they cannot be added twice.
+    // This is evaluated at render time (unlike filterFeature) because the list
+    // changes after every pick.
+    if (excludedDeviceFeatures.length > 0) {
+      displayedOptions = filterOptionGroups(
+        displayedOptions,
+        option => excludedDeviceFeatures.indexOf(option.value) === -1
+      );
+    }
     if (!this.props.isMulti || selectedOptions.length === 0) {
-      return deviceOptions;
+      return displayedOptions;
     }
     const firstFeature = deviceFeaturesDictionnary[selectedOptions[0].value];
     if (!firstFeature) {
-      return deviceOptions;
+      return displayedOptions;
     }
-    return deviceOptions
-      .map(group => ({
-        ...group,
-        options: group.options.filter(option => {
-          const feature = deviceFeaturesDictionnary[option.value];
-          return feature && feature.category === firstFeature.category && feature.type === firstFeature.type;
-        })
-      }))
-      .filter(group => group.options.length > 0);
+    return filterOptionGroups(displayedOptions, option => {
+      const feature = deviceFeaturesDictionnary[option.value];
+      return feature && feature.category === firstFeature.category && feature.type === firstFeature.type;
+    });
   };
   // Every typed word must match (implicit AND) against room + device + feature,
   // so "motion living" finds the motion sensor of the living room
