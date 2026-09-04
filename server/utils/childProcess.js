@@ -102,6 +102,11 @@ function spawnToFile(file, args, outputPath) {
       stderr += chunk.toString();
     });
     child.on('error', fail);
+    // `pipe()` does not forward the errors of its source, and a stream without
+    // an `error` listener throws: an error on either stdio pipe must reject the
+    // promise, not take the process down
+    child.stdout.on('error', fail);
+    child.stderr.on('error', fail);
     writeStream.on('error', fail);
     writeStream.on('finish', () => {
       streamFinished = true;

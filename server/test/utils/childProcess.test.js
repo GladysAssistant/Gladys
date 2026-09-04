@@ -1,7 +1,11 @@
 const { expect } = require('chai');
 const path = require('path');
 const os = require('os');
+const EventEmitter = require('events');
+const childProcess = require('child_process');
+const { PassThrough } = require('stream');
 const fse = require('fs-extra');
+const proxyquire = require('proxyquire').noCallThru();
 const { execFile, spawnToFile } = require('../../utils/childProcess');
 
 describe('childProcess', () => {
@@ -23,8 +27,14 @@ describe('childProcess', () => {
     });
 
     it('should run the command in the given working directory', async () => {
-      const result = await execFile('pwd', [], { cwd: os.tmpdir() });
-      expect(result.trim()).to.contain('tmp');
+      const workingFolder = await fse.mkdtemp(path.join(os.tmpdir(), 'gladys-exec-file-cwd-'));
+      try {
+        const result = await execFile('pwd', [], { cwd: workingFolder });
+        // the temp folder can sit behind a symlink (macOS), `pwd` prints the resolved path
+        expect(result.trim()).to.equal(await fse.realpath(workingFolder));
+      } finally {
+        await fse.remove(workingFolder);
+      }
     });
   });
 
@@ -88,6 +98,34 @@ describe('childProcess', () => {
       }
       expect(error).to.be.an('error');
       expect(error.code).to.equal('ENOENT');
+    });
+
+    // `pipe()` does not forward the errors of its source: without a listener on
+    // the child stdio streams, an error there is an uncaught exception that
+    // takes the whole process down instead of failing the restore.
+    ['stdout', 'stderr'].forEach((stream) => {
+      it(`should reject when the child ${stream} stream errors, instead of crashing`, async () => {
+        const child = new EventEmitter();
+        child.stdout = new PassThrough();
+        child.stderr = new PassThrough();
+        child.kill = () => {};
+        const { spawnToFile: spawnToFileWithFakeChild } = proxyquire('../../utils/childProcess', {
+          child_process: { ...childProcess, spawn: () => child },
+        });
+
+        const promise = spawnToFileWithFakeChild('gzip', ['-dc', 'backup.gz'], path.join(workingFolder, 'output.db'));
+        const streamError = new Error('read EPIPE');
+        streamError.code = 'EPIPE';
+        child[stream].emit('error', streamError);
+
+        let error;
+        try {
+          await promise;
+        } catch (err) {
+          error = err;
+        }
+        expect(error).to.equal(streamError);
+      });
     });
   });
 });

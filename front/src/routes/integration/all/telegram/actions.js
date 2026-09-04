@@ -25,6 +25,13 @@ const actions = store => ({
           telegramApiKey: variable.value
         });
       } catch (e) {
+        // only the expected answers are swallowed: 403 for a non-admin, 404 when
+        // no key is set yet. Anything else (a 500, a network failure) is a real
+        // error and must not leave an admin in front of a silently empty field.
+        const status = e && e.response && e.response.status;
+        if (status !== 403 && status !== 404) {
+          throw e;
+        }
         store.setState({
           telegramApiKey: ''
         });
