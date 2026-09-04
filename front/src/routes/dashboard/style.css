@@ -1208,8 +1208,10 @@
 /* ============================================================
    Horizon device list: the Tabler table rows of the devices widgets
    become soft pill rows of the scene/actions family — icon in a tinted
-   badge, one rounded surface per row. CSS-only: the 25+ feature
-   components keep their <tr> markup untouched.
+   badge, one rounded surface per row. Almost CSS-only: the 25+ feature
+   components keep their <tr> markup — the one exception is the legacy
+   Bootstrap `mr-2` dropped from the read-only sensor icon, the single
+   feature row that carried one (see SensorDeviceFeature.jsx).
    ============================================================ */
 
 :global(.glass-theme .device-list-table) {
