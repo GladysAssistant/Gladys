@@ -57,6 +57,7 @@ const logMemoryUsage = async (label) => {
  * backup();
  */
 async function backup(jobId) {
+  const linkGeneration = this.subscriptionLinkGeneration;
   try {
     // no point in dumping and encrypting the database when Gladys Plus will
     // refuse the upload anyway
@@ -192,7 +193,7 @@ async function backup(jobId) {
   } catch (e) {
     // Unpaid subscription: the admins are already told by the lock itself,
     // no need for a "backup failed" message on top of it
-    await this.throwIfPaymentRequired(e);
+    await this.throwIfPaymentRequired(e, linkGeneration);
     if (e instanceof Error402) {
       throw e;
     }

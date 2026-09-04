@@ -92,6 +92,9 @@ const Gateway = function Gateway(
   this.subscriptionPaymentRequiredSince = null;
   // pending subscription transition, see gateway.setSubscriptionActive
   this.subscriptionTransition = null;
+  // bumped when the Gladys Plus account is unlinked: a transition asked by a
+  // call made for the previous account is dropped instead of applied
+  this.subscriptionLinkGeneration = 0;
   this.restoreInProgress = false;
   this.restoreErrored = false;
   this.usersKeys = [];

@@ -30,11 +30,16 @@ async function notifyAdmins(gateway, intent) {
  * front and the admins. Runs alone (see setSubscriptionActive).
  * @param {object} gateway - The gateway instance.
  * @param {boolean} active - The new state.
+ * @param {number} generation - The link generation the transition was asked for.
  * @returns {Promise} Resolve when the transition is done.
  * @example
- * await transition(this, false);
+ * await transition(this, false, 0);
  */
-async function transition(gateway, active) {
+async function transition(gateway, active, generation) {
+  if (generation !== gateway.subscriptionLinkGeneration) {
+    logger.debug('Gateway: subscription transition dropped, the Gladys Plus account was unlinked meanwhile.');
+    return;
+  }
   if (gateway.subscriptionActive === active) {
     return;
   }
@@ -78,14 +83,18 @@ async function transition(gateway, active) {
  * Transitions run one at a time: a 402 and a success landing at the same
  * moment (Enedis and a backup, say) cannot interleave their persistence and
  * leave the saved lock and the announced state out of step.
+ * A transition asked for a previous link (the account was unlinked while the
+ * call was in flight) is dropped: it must not re-lock the instance for the
+ * next account.
  * @param {boolean} active - True when the subscription is active again, false when payment is required.
+ * @param {number} [generation] - The link generation captured when the call to Gladys Plus was made.
  * @returns {Promise} Resolve when the new state is saved.
  * @example
  * await gateway.setSubscriptionActive(false);
  */
-async function setSubscriptionActive(active) {
+async function setSubscriptionActive(active, generation = this.subscriptionLinkGeneration) {
   const previous = this.subscriptionTransition || Promise.resolve();
-  const current = previous.catch(() => null).then(() => transition(this, active));
+  const current = previous.catch(() => null).then(() => transition(this, active, generation));
   this.subscriptionTransition = current;
   return current;
 }

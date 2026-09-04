@@ -18,15 +18,16 @@ function isPaymentRequiredError(e) {
  * lock the plan-gated features locally and throw a 402. Any other error is ignored:
  * the caller keeps its own error handling.
  * @param {Error} e - The error thrown by the gateway client.
+ * @param {number} [generation] - The link generation captured before the call was made.
  * @returns {Promise} Resolve when the error is not a payment error.
  * @example
  * try { await this.gladysGatewayClient.getBackups(); } catch (e) { await this.throwIfPaymentRequired(e); }
  */
-async function throwIfPaymentRequired(e) {
+async function throwIfPaymentRequired(e, generation = this.subscriptionLinkGeneration) {
   if (!isPaymentRequiredError(e)) {
     return;
   }
-  await this.setSubscriptionActive(false);
+  await this.setSubscriptionActive(false, generation);
   throw new Error402(ERROR_MESSAGES.GLADYS_PLUS_PAYMENT_REQUIRED);
 }
 

@@ -73,7 +73,9 @@ describe('gateway.getOpenAIQuota', () => {
 
     await gateway.getOpenAIQuota();
 
-    expect(gateway.setSubscriptionActive.calledOnceWithExactly(true)).to.equal(true);
+    expect(gateway.setSubscriptionActive.calledOnceWithExactly(true, gateway.subscriptionLinkGeneration)).to.equal(
+      true,
+    );
   });
 
   it('should forward other errors', async () => {

@@ -11,6 +11,12 @@ async function disconnect() {
     // Disconnect from Gladys Gateway
     this.gladysGatewayClient.disconnect();
     this.connected = false;
+    // The payment lock goes with the account. From now on, a transition asked
+    // by a call made for this account (a 402 still in flight) is dropped, and
+    // the one in progress is left to finish before the state is reset, so that
+    // it cannot re-lock the instance for the next account.
+    this.subscriptionLinkGeneration += 1;
+    await (this.subscriptionTransition || Promise.resolve()).catch(() => null);
     if (!this.subscriptionActive) {
       // the lock goes with the account: the front drops its notice right away
       // (no "active again" chat message: nothing was paid, the link is gone)

@@ -216,6 +216,23 @@ describe('gateway subscription lock', () => {
   });
 
   describe('callPlanGatedApi', () => {
+    it('should drop the answer of a call made before the account was unlinked', async () => {
+      let resolveCall;
+      const call = fake.returns(
+        new Promise((resolve) => {
+          resolveCall = resolve;
+        }),
+      );
+      const pending = gateway.callPlanGatedApi(call);
+      // unlinked while the call is in flight
+      gateway.subscriptionLinkGeneration += 1;
+      resolveCall('result');
+
+      expect(await pending).to.equal('result');
+      assert.notCalled(variable.destroy);
+      assert.notCalled(event.emit);
+    });
+
     it('should refuse the call locally while locked', async () => {
       gateway.subscriptionActive = false;
       const call = fake.resolves('result');

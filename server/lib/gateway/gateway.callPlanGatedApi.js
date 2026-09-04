@@ -21,14 +21,16 @@ async function callPlanGatedApi(call, { probe = false } = {}) {
   if (!probe && !this.subscriptionActive) {
     throw new Error402(ERROR_MESSAGES.GLADYS_PLUS_PAYMENT_REQUIRED);
   }
+  // the answer belongs to the account linked when the call was made
+  const generation = this.subscriptionLinkGeneration;
   let result;
   try {
     result = await call();
   } catch (e) {
-    await this.throwIfPaymentRequired(e);
+    await this.throwIfPaymentRequired(e, generation);
     throw e;
   }
-  await this.setSubscriptionActive(true);
+  await this.setSubscriptionActive(true, generation);
   return result;
 }
 
