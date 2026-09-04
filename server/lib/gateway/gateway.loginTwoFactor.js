@@ -21,9 +21,11 @@ async function loginTwoFactor(twoFactorToken, twoFactorCode, twoFactorRecoveryCo
   // Generating recovery codes is a Gladys Plus user operation, so it has to be done here:
   // the client is still authenticated as the user, while init() below connects as the
   // instance and replaces the user access token with an instance one.
+  // The Gateway requires the current two factor code to generate recovery codes (an access
+  // token alone is not enough), so this is only possible right after a two factor login.
   let recoveryCodes = null;
   if (generateRecoveryCodes) {
-    const result = await this.gladysGatewayClient.generateTwoFactorRecoveryCodes();
+    const result = await this.gladysGatewayClient.generateTwoFactorRecoveryCodes(twoFactorCode);
     recoveryCodes = result.recovery_codes;
   }
   // we get all variables

@@ -100,6 +100,8 @@ describe('gateway.login', () => {
       gateway.gladysGatewayClient.generateTwoFactorRecoveryCodes,
       gateway.gladysGatewayClient.createInstance,
     );
+    // the Gateway requires the current two factor code to generate recovery codes
+    assert.calledWith(gateway.gladysGatewayClient.generateTwoFactorRecoveryCodes, '123456');
     expect(result).to.deep.equal({
       recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'],
     });
