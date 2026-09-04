@@ -192,17 +192,20 @@
    same 700px so the tablet renders one coherent desktop-style layout
    under the mobile dock.
 
-   The readable floor has two values. Between the columns and the desktop
-   breakpoints (portrait tablets, landscape phones) it is 18rem: a
-   portrait tablet is 744–834px wide (iPad mini to iPad Pro 11), where
-   three columns would be ~250px — a card width in which the row widgets
-   break (scene names wrap letter by letter, setpoint steppers overflow) —
-   so a 3-column dashboard renders 2+1 and a 4-column one 2+2 there, like
-   Home Assistant's two columns. From the desktop breakpoint up the floor
-   stays 14rem, the historic footprint: a 3-column dashboard right at
-   992px (~224px per column next to the navigation rail) still fits on one
-   line, and wide desktops keep their 5–6 narrow tile columns, exactly as
-   before — a tablet fix must not reflow anyone's desktop. */
+   Between the columns and the desktop breakpoints (portrait tablets,
+   landscape phones) a line holds AT MOST TWO columns: every column asks
+   for half the row, so a 3-column dashboard renders 2+1, a
+   4-column one 2+2, and a weighted 2|1 section becomes two equal halves
+   instead of its wide column alone on a line. Three columns on a portrait
+   tablet (744–834px, iPad mini to iPad Pro 11) would be ~250px each — a
+   card width in which the row widgets break (scene names wrap letter by
+   letter, setpoint steppers overflow) — and two columns is what Home
+   Assistant shows there too. From the desktop breakpoint up the shares
+   and the 14rem floor are the historic ones, exactly as before: a
+   3-column dashboard right at 992px (~224px per column next to the
+   navigation rail) still fits on one line, and wide desktops keep their
+   5–6 narrow tile columns — a tablet fix must not reflow anyone's
+   desktop. */
 .dashboardColumn {
   position: relative;
   width: 100%;
@@ -212,16 +215,18 @@
 
 @media (min-width: 700px) {
   .dashboardColumn {
-    flex: 1 1 var(--column-width);
-    min-width: 18rem;
-    /* A nearly-empty last wrap line (e.g. the lone 6th column) must not
-       blow its widgets up to the whole dashboard width: growth is capped
-       near a comfortable card width and the line centers (the section row
-       is justify-content-center). max() keeps wide shares — a single 100%
-       column, a 66% weighted one — at their intended width; the plain 100%
-       line is the fallback for engines without max(). */
+    /* half the row whatever the share: a lone 100% column still grows to
+       the full row, a 2|1 pair becomes two halves, a third column wraps */
+    flex: 1 1 50%;
+    min-width: 14rem;
+    /* and never wider than half the row either (except a full-width
+       column): the odd column that wraps alone keeps the width of the
+       pair above it and centers under them (the section row is
+       justify-content-center), instead of blowing its widgets up to the
+       whole dashboard width. The plain 100% line is the fallback for
+       engines without max(). */
     max-width: 100%;
-    max-width: max(var(--column-width), 24rem);
+    max-width: max(var(--column-width), 50%);
   }
 
   /* Bootstrap-row-style negative side margins: the outermost column
@@ -238,9 +243,18 @@
   }
 }
 
+/* Desktop: back to the real shares, so 3, 4, 6 columns sit on one line */
 @media (min-width: 992px) {
   .dashboardColumn {
-    min-width: 14rem;
+    flex-basis: var(--column-width);
+    /* A nearly-empty last wrap line (e.g. the lone 6th column) must not
+       blow its widgets up to the whole dashboard width: growth is capped
+       near a comfortable card width and the line centers. max() keeps wide
+       shares — a single 100% column, a 66% weighted one — at their
+       intended width; the plain 100% line is the fallback for engines
+       without max(). */
+    max-width: 100%;
+    max-width: max(var(--column-width), 24rem);
   }
 }
 
