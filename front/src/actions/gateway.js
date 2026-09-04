@@ -16,11 +16,34 @@ function createActions(store) {
         const gatewayStatus = await state.httpClient.get('/api/v1/gateway/status');
         store.setState({
           gatewayStatus,
+          // the header notice reads this flag: kept in step with the status
+          // wherever it is loaded (after a disconnect, for instance)
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false,
           gatewayGetStatusStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
           gatewayGetStatusStatus: RequestStatus.Error
+        });
+      }
+    },
+    // "Check again" of the Gladys Plus settings, once the payment method has
+    // been updated: asks the instance to check the subscription with Gladys
+    // Plus right now, instead of waiting for its daily check
+    async refreshSubscriptionStatus(state) {
+      store.setState({
+        gatewayRefreshSubscriptionStatus: RequestStatus.Getting
+      });
+      try {
+        const gatewayStatus = await state.httpClient.post('/api/v1/gateway/subscription/refresh');
+        store.setState({
+          gatewayStatus,
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false,
+          gatewayRefreshSubscriptionStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          gatewayRefreshSubscriptionStatus: RequestStatus.Error
         });
       }
     },

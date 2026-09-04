@@ -577,6 +577,7 @@ const integrations = {
   'get /api/v1/service/zigbee2mqtt/adapter': [
     { label: 'ConBee', configKey: 'deconz' },
     { label: 'ConBee II', configKey: 'deconz' },
+    { label: 'ConBee III', configKey: 'deconz' },
     { label: 'RaspBee', configKey: 'deconz' },
     { label: 'RaspBee II', configKey: 'deconz' },
     { label: 'Home Assistant Connect ZBT-2', configKey: 'ember' },

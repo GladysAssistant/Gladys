@@ -183,9 +183,23 @@ describe('checkAndConvertUnit pressure', () => {
 });
 
 describe('smartRound', () => {
-  it('returns value as is for abs(value) < 1', () => {
+  it('keeps 3 significant digits for abs(value) < 1', () => {
     expect(smartRound(0.123)).to.equal(0.123);
     expect(smartRound(-0.456)).to.equal(-0.456);
+    // never collapses a small value to 0: the magnitude is the information
+    expect(smartRound(0.005)).to.equal(0.005);
+    expect(smartRound(0.00123456)).to.equal(0.00123);
+    expect(smartRound(-0.00098765)).to.equal(-0.000988);
+    // strips float32 noise instead of displaying it
+    expect(smartRound(0.10000000149011612)).to.equal(0.1);
+    expect(smartRound(0.9999)).to.equal(1);
+  });
+  it('returns zero and non-numbers untouched', () => {
+    expect(smartRound(0)).to.equal(0);
+    expect(smartRound(null)).to.equal(null);
+    expect(smartRound(undefined)).to.equal(undefined);
+    expect(smartRound('on')).to.equal('on');
+    expect(Number.isNaN(smartRound(NaN))).to.equal(true);
   });
   it('rounds to 2 decimals for 1 <= abs(value) < 10', () => {
     expect(smartRound(2.345)).to.equal(2.35);

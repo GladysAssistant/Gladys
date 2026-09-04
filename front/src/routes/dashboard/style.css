@@ -169,16 +169,43 @@
 
 /* One sizing model for every dashboard column, shared by the viewer AND the
    editor canvas (EditBoxColumns), so what the canvas shows is what the
-   dashboard renders. Below the desktop breakpoint columns stack full width,
+   dashboard renders. Below the COLUMNS breakpoint columns stack full width,
    unchanged. Above it, each column asks for its --column-width share of the
    section (set inline: equal shares in a plain section, weight shares in a
    weighted e.g. 2|1 one) but never shrinks under a readable card width:
    columns that no longer fit WRAP onto the next line and share it, instead
    of crushing their widgets — a 6-column dashboard renders 3+3 on a
    mid-size screen, 2+2+2 on a narrow one.
-   14rem keeps the historic footprint: a 3-column dashboard right at the
-   992px breakpoint (~224px per column next to the navigation rail) still
-   fits on one line, exactly as before. */
+
+   The COLUMNS breakpoint is 700px, NOT the 992px desktop one that drives
+   the navigation (rail vs. mobile dock): a wall tablet in portrait (a
+   Shelly Wall Display XL is 752 CSS px wide, an iPad 768, most Android
+   tablets ~800) is nowhere near a phone, yet sat in the "phone" layout
+   with one stacked column and a lone widget blown up to the full width.
+   Two readable columns fit there easily. 700 rather than Bootstrap's 768
+   "md": the Shelly sits below 768, and a few px of margin keep it on the
+   columns side even when the page is embedded (an iframe panel with a
+   scrollbar). A phone in portrait (360–430px) keeps its single column; a
+   phone in landscape gets the columns like a tablet, which is the natural
+   use of that width. Every column-layout rule (stretch caps, adaptive
+   tiles, the editor canvas, the stretched media widgets) keys on this
+   same 700px so the tablet renders one coherent desktop-style layout
+   under the mobile dock.
+
+   Between the columns and the desktop breakpoints (portrait tablets,
+   landscape phones) a line holds AT MOST TWO columns: every column asks
+   for half the row, so a 3-column dashboard renders 2+1, a
+   4-column one 2+2, and a weighted 2|1 section becomes two equal halves
+   instead of its wide column alone on a line. Three columns on a portrait
+   tablet (744–834px, iPad mini to iPad Pro 11) would be ~250px each — a
+   card width in which the row widgets break (scene names wrap letter by
+   letter, setpoint steppers overflow) — and two columns is what Home
+   Assistant shows there too. From the desktop breakpoint up the shares
+   and the 14rem floor are the historic ones, exactly as before: a
+   3-column dashboard right at 992px (~224px per column next to the
+   navigation rail) still fits on one line, and wide desktops keep their
+   5–6 narrow tile columns — a tablet fix must not reflow anyone's
+   desktop. */
 .dashboardColumn {
   position: relative;
   width: 100%;
@@ -186,18 +213,20 @@
   padding-left: 15px;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 700px) {
   .dashboardColumn {
-    flex: 1 1 var(--column-width);
+    /* half the row whatever the share: a lone 100% column still grows to
+       the full row, a 2|1 pair becomes two halves, a third column wraps */
+    flex: 1 1 50%;
     min-width: 14rem;
-    /* A nearly-empty last wrap line (e.g. the lone 6th column) must not
-       blow its widgets up to the whole dashboard width: growth is capped
-       near a comfortable card width and the line centers (the section row
-       is justify-content-center). max() keeps wide shares — a single 100%
-       column, a 66% weighted one — at their intended width; the plain 100%
-       line is the fallback for engines without max(). */
+    /* and never wider than half the row either (except a full-width
+       column): the odd column that wraps alone keeps the width of the
+       pair above it and centers under them (the section row is
+       justify-content-center), instead of blowing its widgets up to the
+       whole dashboard width. The plain 100% line is the fallback for
+       engines without max(). */
     max-width: 100%;
-    max-width: max(var(--column-width), 24rem);
+    max-width: max(var(--column-width), 50%);
   }
 
   /* Bootstrap-row-style negative side margins: the outermost column
@@ -214,7 +243,22 @@
   }
 }
 
-@media (max-width: 992px) {
+/* Desktop: back to the real shares, so 3, 4, 6 columns sit on one line */
+@media (min-width: 992px) {
+  .dashboardColumn {
+    flex-basis: var(--column-width);
+    /* A nearly-empty last wrap line (e.g. the lone 6th column) must not
+       blow its widgets up to the whole dashboard width: growth is capped
+       near a comfortable card width and the line centers. max() keeps wide
+       shares — a single 100% column, a 66% weighted one — at their
+       intended width; the plain 100% line is the fallback for engines
+       without max(). */
+    max-width: 100%;
+    max-width: max(var(--column-width), 24rem);
+  }
+}
+
+@media (max-width: 699.98px) {
   .removePadding {
     padding-left: 0;
     padding-right: 0;
@@ -294,6 +338,8 @@
   --gl-card-bg: rgba(255, 255, 255, 0.52);
   --gl-card-nested-bg: rgba(255, 255, 255, 0.4);
   --gl-surface-strong: rgba(255, 255, 255, 0.78);
+  /* floating menus over content (the dashboard switcher's "…" list) */
+  --gl-popover-bg: rgba(255, 255, 255, 0.94);
   --gl-border: rgba(255, 255, 255, 0.85);
   --gl-shadow: 0 18px 50px rgba(44, 62, 118, 0.13), 0 2px 8px rgba(44, 62, 118, 0.05);
   --gl-shadow-soft: 0 4px 16px rgba(44, 62, 118, 0.09);
@@ -752,16 +798,40 @@
   filter: none;
 }
 
-/* Tablet dock: frosted pill, active tab inverted */
+/* Tablet dock: frosted pill, active tab inverted.
+   The frost (background + backdrop blur) is painted by the ::before layer
+   below, NOT by the bar itself, on purpose: the "…" overflow menu is a DOM
+   descendant of the bar, and an element with backdrop-filter is a backdrop
+   root — per spec (and strictly in Chromium) the backdrop-filter of a
+   descendant then only samples what is painted INSIDE that ancestor, never
+   the page behind it. With the blur on the bar, the menu's own blur was a
+   silent no-op on desktop Chrome/Edge: the cards' text showed through its
+   78% white, crisp (forum feedback). Safari does not isolate, which is why
+   the same CSS looked opaque on iOS. */
 :global(.glass-theme) .dashboardTabs {
-  background: var(--gl-card-bg);
-  backdrop-filter: blur(24px) saturate(1.5);
-  -webkit-backdrop-filter: blur(24px) saturate(1.5);
   border: 1px solid var(--gl-border);
   border-radius: 999px;
   padding: 5px;
   box-shadow: var(--gl-shadow-soft);
   gap: 4px;
+}
+
+:global(.glass-theme) .dashboardTabs::before {
+  content: '';
+  position: absolute;
+  /* longhands, not inset: — Chromium < 87 on the old wall tablets */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  /* behind the pills, inside the bar's own stacking context (see the
+     z-index on .dashboardTabs) */
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  pointer-events: none;
 }
 
 :global(.glass-theme) .dashboardTab {
@@ -789,9 +859,10 @@
   gap: 6px;
   min-width: 0;
   max-width: 100%;
-  /* The glass variant's backdrop-filter makes this a stacking context, which
-     would trap the overflow menu below the dashboard cards: stack the whole
-     bar above the page content so the menu opens on top */
+  /* Stacked above the page content so the overflow menu opens on top of
+     the dashboard cards. The stacking context this creates is also what
+     keeps the glass variant's ::before frost layer (z-index: -1) behind the
+     pills instead of behind the whole page. */
   position: relative;
   z-index: 10;
 }
@@ -1005,9 +1076,13 @@
 }
 
 /* Horizon glass theme: the overflow menu is a glass surface like the bar
-   it opens from, not a stock white dropdown */
+   it opens from, not a stock white dropdown. It floats over the cards'
+   text, not over the scene: a popover needs a much denser glass than a
+   card to stay readable, whatever sits under it — the blur (which now
+   works, see the bar's ::before) softens the backdrop, the near-opaque
+   white guarantees the legibility even where backdrop-filter is missing. */
 :global(.glass-theme) .dashboardTabsMenu {
-  background: var(--gl-surface-strong);
+  background: var(--gl-popover-bg);
   backdrop-filter: blur(28px) saturate(1.6);
   -webkit-backdrop-filter: blur(28px) saturate(1.6);
   border: 1px solid var(--gl-border);
@@ -1022,8 +1097,9 @@
   font-weight: 500;
 }
 
+/* an ink tint, not more white: white on the near-opaque panel is invisible */
 :global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item):hover {
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(44, 62, 118, 0.08);
 }
 
 :global(.glass-theme) .dashboardTabsMenu :global(.dropdown-item.active) {
@@ -1042,7 +1118,7 @@
 /* dark-mode.css paints .dropdown-menu with a solid !important background:
    restore the glass surface with the same weight (see the card rules above) */
 :global(.dark-mode .glass-theme) .dashboardTabsMenu {
-  background-color: var(--gl-surface-strong) !important;
+  background-color: var(--gl-popover-bg) !important;
 }
 
 /* Tablet mode keeps the compact icon dock */
@@ -1097,30 +1173,6 @@
   min-height: 0;
 }
 
-.stretchableBox > div > img {
-  flex: 1 1 auto;
-  object-fit: cover;
-  min-height: 0;
-}
-
-/* the media region of a camera card (live dimmer, error placeholder) absorbs
-   the stretch too — otherwise a camera without image stretches into a blank
-   white void under its header */
-.stretchableBox > div > :global(.dimmer) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.stretchableBox > div > :global(.dimmer) > :global(.dimmer-content) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-}
-
 /* Tile boxes (room temperature/humidity) center their content in the
    extra height instead of leaving it under the card */
 .stretchableTile > div {
@@ -1131,9 +1183,9 @@
    the free height of its column only up to this cap. Beyond it the column
    simply ends earlier and the dashboard background breathes, instead of a
    photo — or a house illustration card — blown up to several times its
-   natural size. Desktop only — below the breakpoint columns stack and
+   natural size. Columns breakpoint only — below it columns stack and
    heights are natural. */
-@media (min-width: 992px) {
+@media (min-width: 700px) {
   .stretchableBox {
     max-height: 65vh;
   }
@@ -1145,8 +1197,9 @@
    container is the padding-less wrapper, not the card, because container
    queries evaluate against the content box. The min-height keeps a
    sensible tile when every box of a section is a value tile. Not applied
-   on mobile, where columns stack and heights are natural. */
-@media (min-width: 992px) {
+   below the columns breakpoint, where columns stack and heights are
+   natural. */
+@media (min-width: 700px) {
   .adaptiveTile {
     container-type: size;
     min-height: 6rem;
@@ -1323,30 +1376,214 @@
   border-radius: 4px;
 }
 
-/* An auto-layout table sizes a column to its widest unbreakable word, and a
-   device name is very often one long token (`Volet_chambre_parentale`). That
-   minimum pushed the whole table past the card, and .table-responsive put the
-   row under a horizontal scrollbar — on a phone, and on desktop too as soon as
-   the dashboard column was narrow. `max-width: 0` takes the name column out of
-   that minimum so it can shrink and ellipsize instead, and `width: 50%` keeps
-   it the half of the row it used to get, leaving the controls the width they
-   ask for. It also unblocks the adaptive option controls (acAdaptiveControls):
-   they collapse to dropdowns while the card overflows, so a name that
-   overflowed whatever they did turned every button group of the card into a
-   dropdown for nothing. */
+/* Each widget row becomes an independent flex row (the <tr>/<td> markup of
+   the 25+ feature components stays untouched). As a real table, the three
+   columns were SHARED by every row of the card: one wide control (a shutter
+   button group, a setpoint capsule) claimed that width for the whole control
+   column, and every name of the card was crushed against it — the truncated
+   MQTT names of the community report ("noms d'appareils MQTT tronqués sur
+   mobile"), while narrow rows showed a large dead gap. Flex frees each row
+   to split itself: the control keeps exactly its natural width, the name
+   gets every remaining pixel of ITS row, and instead of a nowrap ellipsis
+   it WRAPS on several lines like the scene rows (overflow-wrap: anywhere
+   breaks even single-token names). The adaptive option controls
+   (acAdaptiveControls) still collapse to dropdowns on real overflow: a
+   control cell never shrinks, so an oversized button group still overflows
+   the .table-responsive box, which is what the coordinator measures. */
+:global(.glass-theme .device-widget-table),
+:global(.glass-theme .device-widget-table tbody) {
+  display: block;
+}
+
+/* A block box has no border-spacing: the `0 8px` of .device-list-table is
+   gone, and `tr + tr` below only brings back the gap BETWEEN pills. That
+   spacing also framed the rows — 8px above the first, 8px under the last,
+   on top of the table's own 8px bottom padding. This widget has no
+   .card-body and the card header stops at padding-bottom: 0, so the top one
+   was the only air under the title. Both are restored here as padding. */
+:global(.glass-theme .device-widget-table) {
+  padding-top: 8px;
+  padding-bottom: 16px;
+}
+
+:global(.glass-theme .device-widget-table tr) {
+  display: flex;
+  /* stretch (default): the three cells paint one equal-height pill */
+}
+
+:global(.glass-theme .device-widget-table tr + tr) {
+  margin-top: 8px;
+}
+
+/* the width: 1% of the shared table sizing would crush the icon cell now
+   that width feeds flex-basis */
+:global(.glass-theme .device-widget-table tr td:first-child) {
+  flex: 0 0 auto;
+  width: auto;
+  display: flex;
+  align-items: center;
+}
+
+/* Column flex, not block: the light row stacks two divs (name + summary)
+   in this cell; plain text rows put their text in an anonymous item. */
 :global(.glass-theme .device-widget-table tr td:nth-child(2)) {
-  max-width: 0;
-  width: 50%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex: 1 1 auto;
+  /* The floor under the name: without it, a control wide enough (the shutter
+     buttons before their compact mode) squeezed this cell to a letter per
+     line — overflow-wrap: anywhere breaks ANYWHERE, including every
+     character. 6rem still wraps long names, but on readable chunks, and a
+     control that truly cannot coexist with it overflows the wrapper again,
+     which is the signal acAdaptiveControls listens for. */
+  min-width: 6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-wrap: anywhere;
+}
+
+/* The control never grows past its natural width, and never wraps: nowrap
+   makes the natural width of a switch, stepper or button group its flex
+   minimum too, so those keep their designed size and hit area whatever the
+   name's length. shrink: 1 (not 0) matters for the one elastic control, the
+   slider: its track can give width back to a long name down to the
+   .rangeInput min-width floor, instead of imposing its full track on a
+   narrow card. */
+:global(.glass-theme .device-widget-table tr td:last-child) {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   white-space: nowrap;
 }
 
-/* the light row splits its name cell in two lines (name + live summary) */
-:global(.glass-theme .device-widget-table tr td:nth-child(2) > div) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* An option select is a form-control, so the framework gives it width: 100%
+   — resolved against a shrinkable flex cell, a long name could crush it to
+   its arrow. Intrinsic width instead, floored so the current value stays
+   readable. */
+:global(.glass-theme .device-widget-table td select.form-control) {
+  width: auto;
+  min-width: 4.5rem;
+}
+
+/* Only the adaptive controls' fallback is also capped: it stands in for a
+   button group the coordinator judged too wide, so it must stay compact. The
+   selects that are always the control of their row (camera preset, fan,
+   vacuum and pilot-wire modes) show a real label — "Recall a preset…" — and
+   a cap would clip it, which is what this PR is fixing everywhere else. */
+:global(.glass-theme .device-widget-table td .adaptive-option-select select.form-control) {
+  max-width: 9rem;
+}
+
+/* The slider row (MultiLevelDeviceFeature) wraps its control in a Bootstrap
+   .col: its 15px grid gutters are 30px of dead width taken from the name. */
+:global(.glass-theme .device-widget-table td .col) {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* The "no recent value" badge is the exception to nowrap: folded on two
+   balanced lines (forum suggestion) it stops stealing half the row from
+   the name next to it. */
+:global(.glass-theme .device-widget-table .no-recent-value-badge) {
+  white-space: normal;
+  max-width: 7rem;
+  line-height: 1.25;
+  text-align: center;
+}
+
+/* A text feature is the other exception: its value is free-form text of any
+   length (a sun-protection advice, a TV app name...), not a control with a
+   designed width. Kept on one line by the nowrap above, a long sentence
+   pushed the pill past the card and gave the widget a horizontal scrollbar
+   (community report "débordement horizontal"). It wraps like the name
+   next to it — overflow-wrap: anywhere so a single long token (a URL, a
+   serial number) breaks too — and stays right-aligned, as every value is. */
+:global(.glass-theme .device-widget-table .text-device-value) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+/* Compact card mode. Below ~20rem (3+ desktop columns under ~1200px, an
+   iPad Pro in portrait) a card is too narrow for icon + a 6rem name + a
+   setpoint capsule or a temperature value on one line: the control was
+   pushed past the card and clipped, and a name at its floor still broke
+   mid-word ("Temperatu / re"). The row wraps instead: a control that no
+   longer fits next to a 6rem name drops under it, right-aligned, on the
+   full width of the row — the setpoint capsule and long values do, a
+   switch or a short badge stays on the name's line. A container query on
+   the card (device-widget, declared on the .table-responsive wrapper in
+   components/boxs/device-in-room), not on the viewport: a two-column
+   tablet card is wide and keeps the one-line rows. Wide cards are left
+   exactly as they are, so acAdaptiveControls keeps collapsing an oversized
+   button group to a dropdown there; in a compact card the group first drops
+   under the name, and only overflows (which the coordinator measures) if it
+   is wider than the whole row. */
+@container device-widget (max-width: 20rem) {
+  /* The pill moves from the three cells to the row: painted on the cells,
+     it breaks apart as soon as one of them wraps to a second line. */
+  :global(.glass-theme .device-widget-table tr) {
+    flex-wrap: wrap;
+    background-color: var(--gl-card-nested-bg);
+    border: 1px solid var(--gl-border);
+    border-radius: 14px;
+  }
+
+  /* Tighter chrome, ~30px given back to the name and the control: at the
+     narrowest desktop column (a 14rem column, 223px card) that is what lets
+     a switch or a short badge keep the name's line. */
+  :global(.glass-theme .device-widget-table) {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  :global(.glass-theme .device-widget-table tr td) {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0.375rem;
+  }
+
+  /* The color picker's structural second row (see the td[colspan] reset
+     below) is not a pill either: painted on the row it would be an empty
+     bordered line under every ungrouped color row. An explicit class on the
+     <tr> rather than :has(td[colspan]): :has() is unknown to Firefox < 121,
+     which already evaluates @container, and an unknown pseudo-class drops
+     the whole rule. */
+  :global(.glass-theme .device-widget-table tr.device-color-picker-row) {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    margin-top: 0;
+  }
+
+  :global(.glass-theme .device-widget-table tr td:first-child) {
+    padding-left: 0.375rem;
+  }
+
+  /* The basis is the name's floor: a control that leaves it less than 6rem
+     wraps under it. The huge grow factor keeps a control that shares the
+     line at its natural width (the free space goes 999:1 to the name)
+     while a wrapped control, alone on its line, gets the whole line. */
+  :global(.glass-theme .device-widget-table tr td:nth-child(2)) {
+    flex: 999 1 6rem;
+  }
+
+  :global(.glass-theme .device-widget-table tr td:last-child) {
+    flex: 1 1 auto;
+    margin-left: auto;
+    padding-right: 0.5rem;
+  }
+
+  @media (pointer: coarse) {
+    :global(.glass-theme .device-list-table .device-row-tappable:active td) {
+      background-color: transparent;
+    }
+
+    :global(.glass-theme .device-widget-table .device-row-tappable:active) {
+      background-color: var(--gl-icon-tint-bg);
+    }
+  }
 }
 
 /* Structural rows are not feature pills: ColorDeviceFeature always renders
@@ -1357,6 +1594,10 @@
   border: none;
   border-radius: 0;
   padding: 0;
+  /* in the flex rows of the widget (see below) this lone cell is both
+     first and last child: it must span its whole row, not shrink-to-fit */
+  flex: 1 1 auto;
+  width: 100%;
 }
 
 /* ============================================================

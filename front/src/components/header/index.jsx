@@ -8,6 +8,7 @@ import { USER_ROLE } from '../../../../server/utils/constants';
 import DarkModeToggle from '../darkmode/DarkModeToggle';
 import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
+import GatewaySubscriptionNotice from './GatewaySubscriptionNotice';
 import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
 import style from './style.css';
 
@@ -225,7 +226,9 @@ class Header extends Component {
               {/* on mobile the notice lives in the closed menu: this dot is
                   what tells the user there is something to open it for. Screen
                   readers get the notice content itself, in the menu. */}
-              {showInstanceUpdateNotice && <span class={style.togglerDot} aria-hidden="true" />}
+              {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
+                <span class={style.togglerDot} aria-hidden="true" />
+              )}
             </button>
           </Localizer>
           <a class={style.mobileBrand} href="/dashboard">
@@ -255,7 +258,9 @@ class Header extends Component {
               aria-controls="sidebar-navigation"
             >
               <i class="fe fe-menu" />
-              {showInstanceUpdateNotice && <span class={style.togglerDot} aria-hidden="true" />}
+              {(showInstanceUpdateNotice || props.gatewayPaymentRequired) && (
+                <span class={style.togglerDot} aria-hidden="true" />
+              )}
             </button>
           </Localizer>
         )}
@@ -267,36 +272,14 @@ class Header extends Component {
           class={cx(style.sidebar, { [style.sidebarOpen]: props.showCollapsedMenu })}
           data-cy="sidebar-nav"
         >
-          <div class={style.sidebarHeader}>
-            <a class={style.sidebarBrand} href="/dashboard">
-              <Localizer>
-                <img
-                  src="/assets/icons/favicon-96x96.png"
-                  class="header-brand-img"
-                  alt={<Text id="global.logoAlt" />}
-                />
-              </Localizer>
-              <span id="header-title">
-                <Text id="header.gladysAssistant" />
-              </span>
-            </a>
-            {/* Collapse, desktop only (the rail is an on-demand drawer below
-                the breakpoint, where this button is hidden by CSS). Only ever
-                seen expanded — collapsed, the whole rail is off-screen and
-                the floating expand button takes over. */}
+          <a class={style.sidebarBrand} href="/dashboard">
             <Localizer>
-              <button
-                type="button"
-                class={style.collapseButton}
-                onClick={props.toggleSidebarCollapsed}
-                data-cy="sidebar-collapse-button"
-                title={<Text id="header.collapseMenu" />}
-                aria-label={<Text id="header.collapseMenu" />}
-              >
-                <i class="fe fe-chevron-left" />
-              </button>
+              <img src="/assets/icons/favicon-96x96.png" class="header-brand-img" alt={<Text id="global.logoAlt" />} />
             </Localizer>
-          </div>
+            <span id="header-title">
+              <Text id="header.gladysAssistant" />
+            </span>
+          </a>
           <ul class={style.sidebarNav}>
             {NAV_ITEMS.filter(item => !item.adminOnly || props.user.role === USER_ROLE.ADMIN).map(item => (
               <li key={item.href}>
@@ -343,6 +326,7 @@ class Header extends Component {
               onDismiss={this.handleInstanceNoticeDismiss}
             />
           )}
+          {props.gatewayPaymentRequired && <GatewaySubscriptionNotice user={props.user} />}
           {Number.isInteger(props.gatewayTrialDaysLeft) && (
             <GatewayTrialIndicator
               daysLeft={props.gatewayTrialDaysLeft}
@@ -364,6 +348,24 @@ class Header extends Component {
               </span>
             </a>
             <DarkModeToggle />
+            {/* Collapse, desktop only (below the breakpoint the rail is an
+                on-demand drawer, where this button is hidden by CSS). It sits
+                here rather than in the brand row: at 15rem that row has no
+                width to spare beside the logo lockup — even less once the
+                ~44px coarse-pointer target applies — and the footer is
+                already where the view toggles live. */}
+            <Localizer>
+              <button
+                type="button"
+                class={style.collapseButton}
+                onClick={props.toggleSidebarCollapsed}
+                data-cy="sidebar-collapse-button"
+                title={<Text id="header.collapseMenu" />}
+                aria-label={<Text id="header.collapseMenu" />}
+              >
+                <i class="fe fe-chevron-left" />
+              </button>
+            </Localizer>
             <div class={cx('dropdown-menu', style.profileMenu, { show: props.showDropDown })}>
               <a class="dropdown-item" href="/dashboard/profile">
                 <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />

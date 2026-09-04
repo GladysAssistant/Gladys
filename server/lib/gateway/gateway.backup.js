@@ -9,7 +9,8 @@ const logger = require('../../utils/logger');
 const { exec } = require('../../utils/childProcess');
 const { readChunk } = require('../../utils/readChunk');
 const { NotFoundError } = require('../../utils/coreErrors');
-const { USER_ROLE } = require('../../utils/constants');
+const { USER_ROLE, ERROR_MESSAGES } = require('../../utils/constants');
+const { Error402 } = require('../../utils/httpErrors');
 
 const BACKUP_NAME_BASE = 'gladys-db-backup';
 
@@ -56,7 +57,13 @@ const logMemoryUsage = async (label) => {
  * backup();
  */
 async function backup(jobId) {
+  const linkGeneration = this.subscriptionLinkGeneration;
   try {
+    // no point in dumping and encrypting the database when Gladys Plus will
+    // refuse the upload anyway
+    if (!this.subscriptionActive) {
+      throw new Error402(ERROR_MESSAGES.GLADYS_PLUS_PAYMENT_REQUIRED);
+    }
     await logMemoryUsage('before backup');
     const encryptKey = await this.variable.getValue('GLADYS_GATEWAY_BACKUP_KEY');
     if (encryptKey === null) {
@@ -184,6 +191,12 @@ async function backup(jobId) {
       encryptedBackupFilePath,
     };
   } catch (e) {
+    // Unpaid subscription: the admins are already told by the lock itself,
+    // no need for a "backup failed" message on top of it
+    await this.throwIfPaymentRequired(e, linkGeneration);
+    if (e instanceof Error402) {
+      throw e;
+    }
     // If the backup fails, we need to warn the admins of this installation
     const admins = await this.user.getByRole(USER_ROLE.ADMIN);
     admins.forEach((admin) => {

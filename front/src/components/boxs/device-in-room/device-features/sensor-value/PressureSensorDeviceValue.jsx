@@ -1,5 +1,5 @@
 import { Text } from 'preact-i18n';
-import { checkAndConvertUnit } from '../../../../../../../server/utils/units';
+import { checkAndConvertUnit, smartRound } from '../../../../../../../server/utils/units';
 
 const PressureSensorDeviceValue = ({ deviceFeature, user }) => {
   const { last_value: lastValue = null, unit } = deviceFeature;
@@ -13,7 +13,9 @@ const PressureSensorDeviceValue = ({ deviceFeature, user }) => {
       {displayValue === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
       {displayValue !== null && (
         <span>
-          {`${displayValue} `}
+          {/* checkAndConvertUnit only rounds when it converts: the no-conversion
+              path hands back the raw value, float noise included */}
+          {`${smartRound(displayValue)} `}
           <Text id={`deviceFeatureUnitShort.${displayUnit}`} />
         </span>
       )}

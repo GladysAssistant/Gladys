@@ -216,7 +216,7 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,sidebarCollapsed,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,instanceGladysVersion',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,sidebarCollapsed,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion',
   actions
 )(props => (
   <div id="app">
@@ -246,6 +246,7 @@ const AppRouter = connect(
       gatewayTrialHasPaymentMethod={props.gatewayTrialHasPaymentMethod}
       gatewayTrialStripePortalKey={props.gatewayTrialStripePortalKey}
       refreshGatewayTrialState={props.refreshGatewayTrialState}
+      gatewayPaymentRequired={props.gatewayPaymentRequired}
       instanceGladysVersion={props.instanceGladysVersion}
       refreshInstanceVersionState={props.refreshInstanceVersionState}
     />

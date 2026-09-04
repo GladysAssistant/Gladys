@@ -749,6 +749,7 @@
         "errorMicrophoneUnavailable": "Le micro est indisponible. Vérifiez qu'il n'est pas utilisé par une autre application.",
         "errorNoSpeech": "Aucune voix détectée. Vérifiez que votre micro est activé, puis réessayez.",
         "errorNoTranscription": "Je n'ai pas compris votre message. Parlez plus près du micro et réessayez.",
+        "errorPaymentRequired": "Votre abonnement Gladys Plus est suspendu : un paiement est requis. L'assistant vocal est en pause jusqu'à régularisation.",
         "configDescription": "Ce widget utilise Gladys Plus pour la reconnaissance vocale, l'IA et la synthèse vocale. Connectez votre instance à Gladys Plus pour l'utiliser.",
         "plusRequiredHint": "Connectez Gladys Plus pour activer le micro."
       },
@@ -815,7 +816,8 @@
         "uploading": "Envoi en cours...",
         "uploadError": "L'image n'a pas pu être envoyée. Essayez une image plus légère.",
         "editPinsLabel": "Valeurs en direct sur l'image",
-        "editPinsDescription": "Cliquez sur l'image pour poser une épingle, puis choisissez la fonctionnalité qu'elle affiche. Pour déplacer une épingle, supprimez-la et reposez-la.",
+        "editPinsDescription": "Cliquez sur l'image pour poser une épingle, puis choisissez la fonctionnalité qu'elle affiche. Faites glisser une épingle pour la déplacer, ou sélectionnez-la et utilisez les flèches du clavier.",
+        "editPinMoveHelp": "Faites glisser cette épingle pour la déplacer, ou utilisez les flèches du clavier",
         "editPinLabel": "Épingle {{index}}",
         "editPinFeatureLabel": "Fonctionnalité de l'appareil",
         "editPinLabelLabel": "Libellé (optionnel)",
@@ -4498,7 +4500,13 @@
     "gatewayConnectedSuccessDescription": "Votre instance de Gladys s'est connectée avec succès.",
     "gatewayConnectedSuccessBackupKey": "Une sauvegarde sera faite chaque jour, encodée avec la clé suivante. Ainsi vous pourrez restaurer votre instance plus tard, merci d'enregistrer cette clé de chiffrement quelque part, en dehors de Gladys. Sans cette clé, il vous sera impossible de restaurer Gladys.",
     "gatewayConnectedSuccessButton": "J'ai enregistré la clé de sauvegarde !",
-    "accountExpired": "Votre compte Gladys Plus a expiré. Pour réactiver votre compte, merci de mettre à jour votre moyen de paiement dans <a href=\"/dashboard/settings/billing\">l'onglet facturation</a>."
+    "accountExpired": "Votre compte Gladys Plus a expiré. Pour réactiver votre compte, merci de mettre à jour votre moyen de paiement dans <a href=\"/dashboard/settings/billing\">l'onglet facturation</a>.",
+    "subscriptionPaymentRequiredTitle": "Abonnement Gladys Plus suspendu : paiement requis",
+    "subscriptionPaymentRequiredText": "Gladys Plus a refusé les dernières requêtes de votre instance car votre abonnement n'est pas payé. Les sauvegardes, la synchronisation Enedis et les fonctionnalités IA sont en pause jusqu'à régularisation. Rien n'est perdu : mettez à jour votre moyen de paiement depuis votre compte Gladys Plus, puis revérifiez ici. Votre instance revérifie aussi d'elle-même une fois par jour.",
+    "subscriptionOpenBilling": "Mettre à jour mon moyen de paiement",
+    "subscriptionCheckAgain": "Revérifier",
+    "subscriptionStillNotPaid": "Gladys Plus indique toujours qu'un paiement est requis. Une fois le paiement reçu, quelques minutes peuvent être nécessaires avant sa prise en compte.",
+    "subscriptionCheckError": "Impossible de vérifier l'abonnement auprès de Gladys Plus : vérifiez votre connexion internet puis réessayez."
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
@@ -6232,6 +6240,7 @@
       "errorNoMicrophone": "Aucun micro détecté. Branchez ou activez un micro dans les réglages système.",
       "errorMicrophoneUnavailable": "Le micro est indisponible. Vérifiez qu'il n'est pas utilisé par une autre application.",
       "errorNoTranscription": "Je n'ai pas compris votre message. Parlez plus près du micro et réessayez.",
+      "errorPaymentRequired": "Votre abonnement Gladys Plus est suspendu : un paiement est requis. L'assistant vocal est en pause jusqu'à régularisation.",
       "errorNotSupported": "L'enregistrement vocal n'est pas disponible dans ce navigateur."
     }
   },
@@ -6330,6 +6339,11 @@
       "other": "Essai Gladys Plus : {{count}} jours restants"
     },
     "trialAddPaymentMethod": "Ajouter un moyen de paiement",
+    "subscriptionNoticeTitle": "Gladys Plus suspendu",
+    "subscriptionNoticeText": "Un paiement est requis : les sauvegardes, la synchronisation Enedis et les fonctionnalités IA sont en pause jusqu'à régularisation de l'abonnement.",
+    "subscriptionNoticeButton": "Mettre à jour mon moyen de paiement",
+    "subscriptionNoticeCheck": "Vérifier l'abonnement",
+    "subscriptionNoticeContactAdmin": "Merci de contacter l'administrateur de votre compte Gladys Plus.",
     "instanceUpdateNoticeTitle": "Mise à jour disponible",
     "instanceUpdateNoticeText": "Gladys Plus a été mis à jour en {{latestVersion}}, mais votre instance est encore en {{instanceVersion}}. Certaines fonctionnalités peuvent mal fonctionner tant que votre instance n'est pas à jour.",
     "instanceUpdateNoticeButton": "Mettre à jour mon instance",

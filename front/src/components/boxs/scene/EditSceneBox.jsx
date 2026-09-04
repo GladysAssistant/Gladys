@@ -3,8 +3,7 @@ import { Localizer, Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { connect } from 'unistore/preact';
-import Select from 'react-select';
-import closeMenuOnScroll from '../../../utils/closeMenuOnScroll';
+import Select from '../../form/Select';
 import { RequestStatus } from '../../../utils/consts';
 import SelectDeviceFeature from '../../device/SelectDeviceFeature';
 
@@ -115,9 +114,6 @@ class EditSceneBox extends Component {
                   <Text id="dashboard.boxes.scene.editSceneLabel" />
                 </label>
                 <Select
-                  menuPlacement="auto"
-                  menuPortalTarget={document.body}
-                  closeMenuOnScroll={closeMenuOnScroll}
                   defaultValue={[]}
                   value={selectedSceneOptions}
                   options={sceneOptions}

@@ -6,7 +6,7 @@ const CONFIG_KEYS = {
 };
 
 const ADAPTERS_BY_CONFIG_KEY = {
-  [CONFIG_KEYS.DECONZ]: ['ConBee', 'ConBee II', 'RaspBee', 'RaspBee II'],
+  [CONFIG_KEYS.DECONZ]: ['ConBee', 'ConBee II', 'ConBee III', 'RaspBee', 'RaspBee II'],
   [CONFIG_KEYS.EMBER]: [
     'Aeotec Zi-Stick (ZGA008)',
     'CoolKit ZB-GW04 USB dongle (a.k.a. easyiot stick)',
@@ -88,8 +88,35 @@ const ADAPTERS_BY_CONFIG_KEY = {
   ],
 };
 
+// Serial settings that depend on the coordinator model, on top of the adapter driver itself.
+// Zigbee2mqtt's deconz driver talks at 38400 bauds by default, but the ConBee III runs at 115200:
+// without it, Zigbee2mqtt fails to start with "failed to start adapter connection to firmware".
+// The whole deconz family is listed, even at the default value, so that switching from a model to
+// another always rewrites the baudrate instead of keeping the one of the previous coordinator.
+const SERIAL_OPTIONS_BY_ADAPTER = {
+  ConBee: { baudrate: 38400 },
+  'ConBee II': { baudrate: 38400 },
+  'ConBee III': { baudrate: 115200 },
+  RaspBee: { baudrate: 38400 },
+  'RaspBee II': { baudrate: 38400 },
+};
+
+// Serial keys Gladys owns in the Zigbee2mqtt configuration file: they are written for the models
+// requiring them, and removed for the models that don't, so that switching coordinator never
+// leaves behind a setting belonging to the previous one.
+const MANAGED_SERIAL_OPTION_KEYS = [
+  ...new Set(Object.values(SERIAL_OPTIONS_BY_ADAPTER).flatMap((options) => Object.keys(options))),
+];
+
 const ADAPTERS = Object.entries(ADAPTERS_BY_CONFIG_KEY)
   .flatMap(([configKey, labels]) => labels.map((label) => ({ label, configKey })))
   .sort((a, b) => a.label.localeCompare(b.label));
 
-module.exports = { ADAPTERS, ADAPTERS_BY_CONFIG_KEY, CONFIG_KEYS, DEFAULT_KEY: CONFIG_KEYS.ZSTACK };
+module.exports = {
+  ADAPTERS,
+  ADAPTERS_BY_CONFIG_KEY,
+  CONFIG_KEYS,
+  SERIAL_OPTIONS_BY_ADAPTER,
+  MANAGED_SERIAL_OPTION_KEYS,
+  DEFAULT_KEY: CONFIG_KEYS.ZSTACK,
+};
