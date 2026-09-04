@@ -11,8 +11,18 @@
   gap: 10px;
 }
 
+/* A row is icon | name | Start button. The icon and the button have a fixed
+   width, so in a narrow dashboard column (3+ desktop columns under ~1200px,
+   an iPad Pro in portrait) the name was the only thing left to shrink and
+   ended up 20-50px wide: "Good morning" broke letter by letter. The row
+   wraps instead: when icon + a readable name + button no longer fit on one
+   line, the button drops under the name and takes the whole line. Flex
+   wrapping decides on the row's real width and the button's real width
+   (a French "Démarrer" or a running "Running 12s" button wraps sooner than
+   "Start"), so no viewport or card breakpoint is involved. */
 .sceneRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   background-color: #f8f9fa;
@@ -34,21 +44,34 @@
   font-size: 1.05rem;
 }
 
+/* The flex basis is the name's readable floor: the button stays on the
+   line as long as this much is left for the name (a two-line "Good /
+   morning" rather than a stacked row), and wraps under it below. The huge
+   grow factor keeps the button at its natural width when they share a line:
+   the free space goes 999:1 to the name, so the button grows by a fraction
+   of a pixel — while alone on its line it gets it all (see .sceneAction). */
 .sceneInfo {
-  flex: 1 1 auto;
+  flex: 999 1 4.5rem;
   min-width: 0;
 }
 
 .sceneName {
   font-weight: 600;
-  /* Long scene names wrap on several lines instead of being truncated */
+  /* Long scene names wrap on several lines instead of being truncated. The
+     floor above means this only ever breaks inside a word wider than the
+     whole name column (a 12+ letter spaceless name), never letter by letter. */
   overflow-wrap: anywhere;
 }
 
+/* Natural width next to the name; the full line once wrapped under it. */
 .sceneAction {
-  flex: 0 0 auto;
+  flex: 1 0 auto;
   display: flex;
   align-items: center;
+}
+
+.sceneAction > :global(.btn) {
+  flex: 1 1 auto;
 }
 
 /* Horizon glass theme */

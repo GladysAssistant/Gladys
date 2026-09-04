@@ -1504,6 +1504,88 @@
   text-align: right;
 }
 
+/* Compact card mode. Below ~20rem (3+ desktop columns under ~1200px, an
+   iPad Pro in portrait) a card is too narrow for icon + a 6rem name + a
+   setpoint capsule or a temperature value on one line: the control was
+   pushed past the card and clipped, and a name at its floor still broke
+   mid-word ("Temperatu / re"). The row wraps instead: a control that no
+   longer fits next to a 6rem name drops under it, right-aligned, on the
+   full width of the row — the setpoint capsule and long values do, a
+   switch or a short badge stays on the name's line. A container query on
+   the card (device-widget, declared on the .table-responsive wrapper in
+   components/boxs/device-in-room), not on the viewport: a two-column
+   tablet card is wide and keeps the one-line rows. Wide cards are left
+   exactly as they are, so acAdaptiveControls keeps collapsing an oversized
+   button group to a dropdown there; in a compact card the group first drops
+   under the name, and only overflows (which the coordinator measures) if it
+   is wider than the whole row. */
+@container device-widget (max-width: 20rem) {
+  /* The pill moves from the three cells to the row: painted on the cells,
+     it breaks apart as soon as one of them wraps to a second line. */
+  :global(.glass-theme .device-widget-table tr) {
+    flex-wrap: wrap;
+    background-color: var(--gl-card-nested-bg);
+    border: 1px solid var(--gl-border);
+    border-radius: 14px;
+  }
+
+  /* Tighter chrome, ~30px given back to the name and the control: at the
+     narrowest desktop column (a 14rem column, 223px card) that is what lets
+     a switch or a short badge keep the name's line. */
+  :global(.glass-theme .device-widget-table) {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  :global(.glass-theme .device-widget-table tr td) {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0.375rem;
+  }
+
+  /* The color picker's structural second row (see the td[colspan] reset
+     below) is not a pill either: painted on the row it would be an empty
+     bordered line under every ungrouped color row. An explicit class on the
+     <tr> rather than :has(td[colspan]): :has() is unknown to Firefox < 121,
+     which already evaluates @container, and an unknown pseudo-class drops
+     the whole rule. */
+  :global(.glass-theme .device-widget-table tr.device-color-picker-row) {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    margin-top: 0;
+  }
+
+  :global(.glass-theme .device-widget-table tr td:first-child) {
+    padding-left: 0.375rem;
+  }
+
+  /* The basis is the name's floor: a control that leaves it less than 6rem
+     wraps under it. The huge grow factor keeps a control that shares the
+     line at its natural width (the free space goes 999:1 to the name)
+     while a wrapped control, alone on its line, gets the whole line. */
+  :global(.glass-theme .device-widget-table tr td:nth-child(2)) {
+    flex: 999 1 6rem;
+  }
+
+  :global(.glass-theme .device-widget-table tr td:last-child) {
+    flex: 1 1 auto;
+    margin-left: auto;
+    padding-right: 0.5rem;
+  }
+
+  @media (pointer: coarse) {
+    :global(.glass-theme .device-list-table .device-row-tappable:active td) {
+      background-color: transparent;
+    }
+
+    :global(.glass-theme .device-widget-table .device-row-tappable:active) {
+      background-color: var(--gl-icon-tint-bg);
+    }
+  }
+}
+
 /* Structural rows are not feature pills: ColorDeviceFeature always renders
    a second tr with one colspan cell holding the (d-none while closed) color
    picker — without this reset it paints as an empty ghost pill. */
