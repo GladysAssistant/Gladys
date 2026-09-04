@@ -18,7 +18,12 @@ class EditDevices extends Component {
       value: feature.selector,
       label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
     };
-    const newSelectedDeviceFeaturesOptions = [...this.state.selectedDeviceFeaturesOptions, selectedDeviceFeatureOption];
+    // The picker loads on its own, so it can be used even if the fetch of the
+    // already picked features failed and left this list unset.
+    const newSelectedDeviceFeaturesOptions = [
+      ...(this.state.selectedDeviceFeaturesOptions || []),
+      selectedDeviceFeatureOption
+    ];
     await this.setState({ selectedDeviceFeaturesOptions: newSelectedDeviceFeaturesOptions });
     this.refreshDeviceFeaturesNames();
   };
