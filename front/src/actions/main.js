@@ -212,6 +212,11 @@ function createActions(store) {
       // response belonging to a previous session must not write the notice
       // of that session into the next one
       const requestSession = state.session;
+      // a session check resumed after a logout/login must not replace the
+      // listener of the session now in use with one bound to the old session
+      if (store.getState().session !== requestSession) {
+        return;
+      }
       if (requestSession && requestSession.dispatcher && gatewaySubscriptionListenerSession !== requestSession) {
         if (gatewaySubscriptionListenerSession && gatewaySubscriptionListenerSession.dispatcher) {
           gatewaySubscriptionListenerSession.dispatcher.removeListener(
