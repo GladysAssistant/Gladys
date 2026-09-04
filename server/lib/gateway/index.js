@@ -47,6 +47,7 @@ const { buildWeeklyDigestData } = require('./gateway.buildWeeklyDigestData');
 const { sendWeeklyDigest } = require('./gateway.sendWeeklyDigest');
 const { scheduleWeeklyDigest } = require('./gateway.scheduleWeeklyDigest');
 const { setSubscriptionActive } = require('./gateway.setSubscriptionActive');
+const { callPlanGatedApi } = require('./gateway.callPlanGatedApi');
 const { throwIfPaymentRequired } = require('./gateway.throwIfPaymentRequired');
 const { refreshSubscriptionStatus } = require('./gateway.refreshSubscriptionStatus');
 
@@ -89,6 +90,8 @@ const Gateway = function Gateway(
   // (backups, Enedis, AI) are paused locally, see gateway.setSubscriptionActive
   this.subscriptionActive = true;
   this.subscriptionPaymentRequiredSince = null;
+  // pending subscription transition, see gateway.setSubscriptionActive
+  this.subscriptionTransition = null;
   this.restoreInProgress = false;
   this.restoreErrored = false;
   this.usersKeys = [];
@@ -161,6 +164,7 @@ Gateway.prototype.buildWeeklyDigestData = buildWeeklyDigestData;
 Gateway.prototype.sendWeeklyDigest = sendWeeklyDigest;
 Gateway.prototype.scheduleWeeklyDigest = scheduleWeeklyDigest;
 Gateway.prototype.setSubscriptionActive = setSubscriptionActive;
+Gateway.prototype.callPlanGatedApi = callPlanGatedApi;
 Gateway.prototype.throwIfPaymentRequired = throwIfPaymentRequired;
 Gateway.prototype.refreshSubscriptionStatus = refreshSubscriptionStatus;
 

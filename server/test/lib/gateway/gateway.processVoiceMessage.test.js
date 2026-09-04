@@ -241,6 +241,23 @@ describe('gateway.processVoiceMessage', () => {
     });
   });
 
+  it('should emit payment required websocket error when the AI chat reports it', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      forwardMessageToAiChat: fake.resolves({ answer: '', imagesSent: 0, paymentRequired: true }),
+    });
+
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), Error402);
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload.payload.error).to.equal('payment_required');
+    sinonAssert.notCalled(ctx.getTTSApiUrl);
+  });
+
   it('should emit forbidden websocket error and rethrow Error403', async () => {
     const eventEmit = fake();
     const forbidden = new Error403('forbidden');

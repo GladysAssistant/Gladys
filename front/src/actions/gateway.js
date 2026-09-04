@@ -16,6 +16,9 @@ function createActions(store) {
         const gatewayStatus = await state.httpClient.get('/api/v1/gateway/status');
         store.setState({
           gatewayStatus,
+          // the header notice reads this flag: kept in step with the status
+          // wherever it is loaded (after a disconnect, for instance)
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false,
           gatewayGetStatusStatus: RequestStatus.Success
         });
       } catch (e) {

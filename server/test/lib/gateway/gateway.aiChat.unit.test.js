@@ -10,6 +10,7 @@ const { DEFAULT_TEXT_MODEL } = require('../../../utils/aiChatModels');
 describe('gateway.aiChat unit', () => {
   it('should return gateway response on success', async () => {
     const ctx = {
+      callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk: fake.resolves({ choices: [] }),
       },
@@ -21,6 +22,7 @@ describe('gateway.aiChat unit', () => {
   it('should omit model when auto is selected', async () => {
     const openAIAsk = fake.resolves({ choices: [] });
     const ctx = {
+      callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk,
       },
@@ -32,6 +34,7 @@ describe('gateway.aiChat unit', () => {
   it('should forward a valid model to the gateway', async () => {
     const openAIAsk = fake.resolves({ choices: [] });
     const ctx = {
+      callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk,
       },
@@ -48,10 +51,7 @@ describe('gateway.aiChat unit', () => {
     const paymentRequired = new Error('payment required');
     paymentRequired.response = { status: 402, data: { error_code: 'PAYMENT_REQUIRED' } };
     const ctx = {
-      gladysGatewayClient: {
-        openAIAsk: fake.rejects(paymentRequired),
-      },
-      throwIfPaymentRequired: fake.rejects(new Error402('GLADYS_PLUS_PAYMENT_REQUIRED')),
+      callPlanGatedApi: fake.rejects(new Error402('GLADYS_PLUS_PAYMENT_REQUIRED')),
     };
 
     let error = null;
@@ -61,7 +61,7 @@ describe('gateway.aiChat unit', () => {
       error = e;
     }
     expect(error).to.be.instanceOf(Error402);
-    expect(ctx.throwIfPaymentRequired.firstCall.args[0]).to.equal(paymentRequired);
+    expect(ctx.callPlanGatedApi.calledOnce).to.equal(true);
   });
 
   it('should map 403 and 429 errors to typed http errors', async () => {
@@ -71,16 +71,16 @@ describe('gateway.aiChat unit', () => {
     tooMany.response = { status: 429, data: { error_message: 'too many' } };
 
     const ctx403 = {
+      callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk: fake.rejects(forbidden),
       },
-      throwIfPaymentRequired: fake.resolves(null),
     };
     const ctx429 = {
+      callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk: fake.rejects(tooMany),
       },
-      throwIfPaymentRequired: fake.resolves(null),
     };
 
     let error403 = null;

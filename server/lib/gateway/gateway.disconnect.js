@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { EVENTS, SYSTEM_VARIABLE_NAMES, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
 /**
  * @description Disconnect Gladys Gateway.
@@ -11,8 +11,16 @@ async function disconnect() {
     // Disconnect from Gladys Gateway
     this.gladysGatewayClient.disconnect();
     this.connected = false;
-    this.subscriptionActive = true;
-    this.subscriptionPaymentRequiredSince = null;
+    if (!this.subscriptionActive) {
+      // the lock goes with the account: the front drops its notice right away
+      // (no "active again" chat message: nothing was paid, the link is gone)
+      this.subscriptionActive = true;
+      this.subscriptionPaymentRequiredSince = null;
+      this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED,
+        payload: { subscription_active: true, payment_required_since: null },
+      });
+    }
     // Delete all variables related to the Gateway
     await this.variable.destroy('GLADYS_GATEWAY_REFRESH_TOKEN');
     await this.variable.destroy('GLADYS_GATEWAY_RSA_PRIVATE_KEY');

@@ -12,11 +12,10 @@ const { Error403, Error429 } = require('../../utils/httpErrors');
  */
 async function stt(audio, contentType = 'application/octet-stream') {
   try {
-    const response = await this.gladysGatewayClient.stt(audio, contentType);
+    const response = await this.callPlanGatedApi(() => this.gladysGatewayClient.stt(audio, contentType));
     return response;
   } catch (e) {
     logger.warn(e);
-    await this.throwIfPaymentRequired(e);
     const status = get(e, 'response.status');
     const message = get(e, 'response.data.error_message');
     if (status === 403) {

@@ -39,11 +39,10 @@ function normalizeAiChatRequestBody(body) {
 async function aiChat(body) {
   const requestBody = normalizeAiChatRequestBody(body);
   try {
-    const response = await this.gladysGatewayClient.openAIAsk(requestBody);
+    const response = await this.callPlanGatedApi(() => this.gladysGatewayClient.openAIAsk(requestBody));
     return response;
   } catch (e) {
     logger.debug(e);
-    await this.throwIfPaymentRequired(e);
     const status = get(e, 'response.status');
     const message = get(e, 'response.data.error_message');
     if (status === 403) {

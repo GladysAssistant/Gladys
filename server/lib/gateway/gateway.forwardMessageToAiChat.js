@@ -807,7 +807,10 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     logger.warn(e);
     if (e instanceof Error402) {
       await this.message.replyByIntent(message, 'gateway.payment-required', context);
-    } else if (e instanceof Error429) {
+      // the voice assistant needs the signal too, on top of the chat reply
+      return { answer: '', imagesSent: 0, paymentRequired: true };
+    }
+    if (e instanceof Error429) {
       await this.message.replyByIntent(message, 'openai.request.tooManyRequests', context);
     } else {
       await this.message.replyByIntent(message, 'openai.request.fail', context);

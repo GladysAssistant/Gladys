@@ -1,6 +1,6 @@
 const logger = require('../../utils/logger');
 const db = require('../../models');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, ERROR_MESSAGES } = require('../../utils/constants');
 const { Error402, Error403, Error429 } = require('../../utils/httpErrors');
 
 /**
@@ -79,6 +79,9 @@ async function processVoiceMessage({ audio, contentType = 'application/octet-str
       previousQuestions,
       context: { user },
     });
+    if (aiResult?.paymentRequired) {
+      throw new Error402(ERROR_MESSAGES.GLADYS_PLUS_PAYMENT_REQUIRED);
+    }
     const answer = aiResult?.answer ?? '';
 
     if (answer) {

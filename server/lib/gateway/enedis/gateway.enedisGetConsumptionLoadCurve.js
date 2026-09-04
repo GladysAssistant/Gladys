@@ -14,11 +14,11 @@ const { Error403 } = require('../../../utils/httpErrors');
  */
 async function enedisGetConsumptionLoadCurve(query) {
   try {
-    const consumption = await this.gladysGatewayClient.enedisGetConsumptionLoadCurve(query);
-    await this.setSubscriptionActive(true);
+    const consumption = await this.callPlanGatedApi(() =>
+      this.gladysGatewayClient.enedisGetConsumptionLoadCurve(query),
+    );
     return consumption;
   } catch (e) {
-    await this.throwIfPaymentRequired(e);
     if (get(e, 'response.status') === 403) {
       throw new Error403();
     }

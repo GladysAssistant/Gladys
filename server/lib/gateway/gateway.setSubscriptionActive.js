@@ -26,6 +26,45 @@ async function notifyAdmins(gateway, intent) {
 }
 
 /**
+ * @description One transition of the subscription state: persist it, tell the
+ * front and the admins. Runs alone (see setSubscriptionActive).
+ * @param {object} gateway - The gateway instance.
+ * @param {boolean} active - The new state.
+ * @returns {Promise} Resolve when the transition is done.
+ * @example
+ * await transition(this, false);
+ */
+async function transition(gateway, active) {
+  if (gateway.subscriptionActive === active) {
+    return;
+  }
+  const paymentRequiredSince = active ? null : new Date().toISOString();
+  if (active) {
+    logger.info('Gateway: Gladys Plus subscription is active again, Gladys Plus features are back on.');
+    await gateway.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE);
+  } else {
+    logger.warn(
+      'Gateway: Gladys Plus answered "payment required". Backups, Enedis sync and AI features are paused until the subscription is paid.',
+    );
+    await gateway.variable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE, paymentRequiredSince);
+  }
+  // in-memory state changes only once the new state is persisted, so that
+  // what the instance does and what it saved never disagree
+  gateway.subscriptionActive = active;
+  gateway.subscriptionPaymentRequiredSince = paymentRequiredSince;
+  const payload = {
+    subscription_active: active,
+    payment_required_since: paymentRequiredSince,
+  };
+  gateway.event.emit(EVENTS.GATEWAY.SUBSCRIPTION_STATUS_CHANGED, payload);
+  gateway.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    type: WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED,
+    payload,
+  });
+  await notifyAdmins(gateway, active ? 'gateway.subscription-active' : 'gateway.payment-required');
+}
+
+/**
  * @description Switch the local Gladys Plus subscription state.
  *
  * When Gladys Plus answers "payment required", every plan-gated feature (backups,
@@ -35,42 +74,20 @@ async function notifyAdmins(gateway, intent) {
  * linked, its keys and backup key are kept, and the first successful plan-gated
  * call (daily backup check, manual re-check from the settings) turns everything
  * back on without any action on the instance.
+ *
+ * Transitions run one at a time: a 402 and a success landing at the same
+ * moment (Enedis and a backup, say) cannot interleave their persistence and
+ * leave the saved lock and the announced state out of step.
  * @param {boolean} active - True when the subscription is active again, false when payment is required.
  * @returns {Promise} Resolve when the new state is saved.
  * @example
  * await gateway.setSubscriptionActive(false);
  */
 async function setSubscriptionActive(active) {
-  if (this.subscriptionActive === active) {
-    return;
-  }
-  // set synchronously first: concurrent 402s (Enedis + backup at the same time)
-  // must not save and notify twice
-  this.subscriptionActive = active;
-  if (active) {
-    this.subscriptionPaymentRequiredSince = null;
-    logger.info('Gateway: Gladys Plus subscription is active again, Gladys Plus features are back on.');
-    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE);
-  } else {
-    this.subscriptionPaymentRequiredSince = new Date().toISOString();
-    logger.warn(
-      'Gateway: Gladys Plus answered "payment required". Backups, Enedis sync and AI features are paused until the subscription is paid.',
-    );
-    await this.variable.setValue(
-      SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE,
-      this.subscriptionPaymentRequiredSince,
-    );
-  }
-  const payload = {
-    subscription_active: active,
-    payment_required_since: this.subscriptionPaymentRequiredSince,
-  };
-  this.event.emit(EVENTS.GATEWAY.SUBSCRIPTION_STATUS_CHANGED, payload);
-  this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED,
-    payload,
-  });
-  await notifyAdmins(this, active ? 'gateway.subscription-active' : 'gateway.payment-required');
+  const previous = this.subscriptionTransition || Promise.resolve();
+  const current = previous.catch(() => null).then(() => transition(this, active));
+  this.subscriptionTransition = current;
+  return current;
 }
 
 module.exports = {

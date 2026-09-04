@@ -4498,7 +4498,13 @@
     "gatewayConnectedSuccessDescription": "Dein Gladys wurde erfolgreich verbunden.",
     "gatewayConnectedSuccessBackupKey": "Es wird täglich automatisch ein Backup erstellt, verschlüsselt mit dem folgenden Schlüssel. Damit du dein Gladys später wiederherstellen kannst, bewahre bitte diesen Verschlüsselungsschlüssel an einem sicheren Ort außerhalb von Gladys auf. Ohne diesen Schlüssel kannst du Gladys nicht wiederherstellen.",
     "gatewayConnectedSuccessButton": "Ich habe den Backup-Schlüssel sicher aufbewahrt!",
-    "accountExpired": "Dein Gladys-Plus-Account ist abgelaufen. Um dein Abonnement zu verlängern, gehe zum Tab \"<a href=\"/dashboard/settings/billing\">Abrechnung</a>\"."
+    "accountExpired": "Dein Gladys-Plus-Account ist abgelaufen. Um dein Abonnement zu verlängern, gehe zum Tab \"<a href=\"/dashboard/settings/billing\">Abrechnung</a>\".",
+    "subscriptionPaymentRequiredTitle": "Gladys-Plus-Abonnement ausgesetzt: Zahlung erforderlich",
+    "subscriptionPaymentRequiredText": "Gladys Plus hat die letzten Anfragen deiner Instanz abgelehnt, weil dein Abonnement nicht bezahlt ist. Backups, die Enedis-Synchronisation und die KI-Funktionen sind so lange pausiert. Es geht nichts verloren: Aktualisiere deine Zahlungsmethode in deinem Gladys-Plus-Konto und prüfe dann hier erneut. Deine Instanz prüft außerdem einmal täglich von selbst.",
+    "subscriptionOpenBilling": "Zahlungsmethode aktualisieren",
+    "subscriptionCheckAgain": "Erneut prüfen",
+    "subscriptionStillNotPaid": "Gladys Plus meldet weiterhin, dass eine Zahlung erforderlich ist. Nach Zahlungseingang kann es einige Minuten dauern, bis sie berücksichtigt wird.",
+    "subscriptionCheckError": "Das Abonnement konnte bei Gladys Plus nicht geprüft werden: Bitte überprüfe deine Internetverbindung und versuche es erneut."
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
@@ -6330,6 +6336,11 @@
       "other": "Gladys-Plus-Testphase: noch {{count}} Tage"
     },
     "trialAddPaymentMethod": "Zahlungsmethode hinzufügen",
+    "subscriptionNoticeTitle": "Gladys Plus ausgesetzt",
+    "subscriptionNoticeText": "Eine Zahlung ist erforderlich: Backups, die Enedis-Synchronisation und die KI-Funktionen sind pausiert, bis das Abonnement bezahlt ist.",
+    "subscriptionNoticeButton": "Zahlungsmethode aktualisieren",
+    "subscriptionNoticeCheck": "Abonnement prüfen",
+    "subscriptionNoticeContactAdmin": "Bitte wende dich an den Administrator deines Gladys-Plus-Kontos.",
     "instanceUpdateNoticeTitle": "Update verfügbar",
     "instanceUpdateNoticeText": "Gladys Plus wurde auf {{latestVersion}} aktualisiert, deine Instanz ist aber noch auf {{instanceVersion}}. Einige Funktionen können fehlerhaft sein, bis deine Instanz aktualisiert ist.",
     "instanceUpdateNoticeButton": "Meine Instanz aktualisieren",

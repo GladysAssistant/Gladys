@@ -118,6 +118,56 @@ describe('gateway subscription lock', () => {
       assert.calledTwice(message.sendToUser);
     });
 
+    it('should run transitions one at a time, whatever the order their persistence completes in', async () => {
+      // the lock persists slowly, the unlock quickly: without serialization the
+      // unlock would be announced first and the lock saved last
+      let resolveSetValue;
+      const setValuePromise = new Promise((resolve) => {
+        resolveSetValue = resolve;
+      });
+      variable.setValue = fake.returns(setValuePromise);
+
+      const lock = gateway.setSubscriptionActive(false);
+      const unlock = gateway.setSubscriptionActive(true);
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
+      // the unlock waits for the lock to be persisted
+      assert.notCalled(variable.destroy);
+      expect(gateway.subscriptionActive).to.equal(true);
+
+      resolveSetValue();
+      await Promise.all([lock, unlock]);
+
+      assert.calledOnce(variable.setValue);
+      assert.calledOnce(variable.destroy);
+      expect(gateway.subscriptionActive).to.equal(true);
+      expect(gateway.subscriptionPaymentRequiredSince).to.equal(null);
+      const statusEvents = event.emit
+        .getCalls()
+        .filter((call) => call.args[0] === EVENTS.GATEWAY.SUBSCRIPTION_STATUS_CHANGED)
+        .map((call) => call.args[1]);
+      expect(statusEvents).to.deep.equal([
+        { subscription_active: false, payment_required_since: statusEvents[0].payment_required_since },
+        { subscription_active: true, payment_required_since: null },
+      ]);
+    });
+
+    it('should keep accepting transitions after a failed one', async () => {
+      variable.setValue = fake.rejects(new Error('db locked'));
+      try {
+        await gateway.setSubscriptionActive(false);
+        expect.fail();
+      } catch (e) {
+        expect(e.message).to.equal('db locked');
+      }
+      expect(gateway.subscriptionActive).to.equal(true);
+
+      variable.setValue = fake.resolves(null);
+      await gateway.setSubscriptionActive(false);
+      expect(gateway.subscriptionActive).to.equal(false);
+    });
+
     it('should unlock the instance and clear the persisted lock', async () => {
       await gateway.setSubscriptionActive(false);
       sinon.reset();
@@ -162,6 +212,56 @@ describe('gateway subscription lock', () => {
       await gateway.throwIfPaymentRequired(new Error('network'));
       await gateway.throwIfPaymentRequired(null);
       expect(gateway.subscriptionActive).to.equal(true);
+    });
+  });
+
+  describe('callPlanGatedApi', () => {
+    it('should refuse the call locally while locked', async () => {
+      gateway.subscriptionActive = false;
+      const call = fake.resolves('result');
+
+      try {
+        await gateway.callPlanGatedApi(call);
+        expect.fail();
+      } catch (e) {
+        expect(e).instanceOf(Error402);
+      }
+      assert.notCalled(call);
+    });
+
+    it('should let a probe through while locked and unlock on success', async () => {
+      gateway.subscriptionActive = false;
+      const call = fake.resolves('result');
+
+      const result = await gateway.callPlanGatedApi(call, { probe: true });
+
+      expect(result).to.equal('result');
+      expect(gateway.subscriptionActive).to.equal(true);
+    });
+
+    it('should lock on a payment required answer', async () => {
+      const call = fake.rejects(new AxiosPaymentRequiredError());
+
+      try {
+        await gateway.callPlanGatedApi(call);
+        expect.fail();
+      } catch (e) {
+        expect(e).instanceOf(Error402);
+      }
+      expect(gateway.subscriptionActive).to.equal(false);
+    });
+
+    it('should forward other errors without touching the state', async () => {
+      const call = fake.rejects(new Error('network'));
+
+      try {
+        await gateway.callPlanGatedApi(call);
+        expect.fail();
+      } catch (e) {
+        expect(e.message).to.equal('network');
+      }
+      expect(gateway.subscriptionActive).to.equal(true);
+      assert.notCalled(variable.setValue);
     });
   });
 

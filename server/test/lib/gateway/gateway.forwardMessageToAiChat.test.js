@@ -663,7 +663,7 @@ describe('gateway.forwardMessageToAiChat', () => {
       context,
     });
 
-    expect(result).to.equal(null);
+    expect(result).to.deep.equal({ answer: '', imagesSent: 0, paymentRequired: true });
     assert.notCalled(reply);
     assert.calledWith(replyByIntent, message, 'gateway.payment-required', context);
   });

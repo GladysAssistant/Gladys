@@ -91,22 +91,23 @@ describe('gateway.enedisApi', () => {
     const promise2 = gateway.enedisGetDailyConsumption();
     await assert.isRejected(promise2, Error);
   });
-  it('should lock Gladys Plus features on payment required, and unlock on success', async () => {
+  it('should lock Gladys Plus features on payment required, and refuse calls locally while locked', async () => {
     gateway.gladysGatewayClient.enedisGetDailyConsumption = fake.rejects(new AxiosPaymentRequiredError());
     await assert.isRejected(gateway.enedisGetDailyConsumption(), Error402);
     expect(gateway.subscriptionActive).to.equal(false);
+    // locked: the next calls do not reach Gladys Plus
     gateway.gladysGatewayClient.enedisGetDailyConsumption = fake.resolves([]);
-    await gateway.enedisGetDailyConsumption();
-    expect(gateway.subscriptionActive).to.equal(true);
+    await assert.isRejected(gateway.enedisGetDailyConsumption(), Error402);
+    expect(gateway.gladysGatewayClient.enedisGetDailyConsumption.called).to.equal(false);
+    await gateway.setSubscriptionActive(true);
     gateway.gladysGatewayClient.enedisGetConsumptionLoadCurve = fake.rejects(new AxiosPaymentRequiredError());
     await assert.isRejected(gateway.enedisGetConsumptionLoadCurve(), Error402);
     expect(gateway.subscriptionActive).to.equal(false);
-    gateway.gladysGatewayClient.enedisGetDailyConsumptionMaxPower = fake.resolves([]);
-    await gateway.enedisGetDailyConsumptionMaxPower();
-    expect(gateway.subscriptionActive).to.equal(true);
+    await gateway.setSubscriptionActive(true);
     gateway.gladysGatewayClient.enedisGetDailyConsumptionMaxPower = fake.rejects(new AxiosPaymentRequiredError());
     await assert.isRejected(gateway.enedisGetDailyConsumptionMaxPower(), Error402);
     expect(gateway.subscriptionActive).to.equal(false);
+    await gateway.setSubscriptionActive(true);
   });
   it('should receive error on enedisGetDailyConsumptionMaxPower', async () => {
     gateway.gladysGatewayClient.enedisGetDailyConsumptionMaxPower = fake.rejects(new AxiosForbiddenError());

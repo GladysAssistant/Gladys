@@ -207,9 +207,16 @@ function createActions(store) {
     // page. Loaded at session check, then kept up to date by the instance
     // itself through the websocket, in both directions (lock and unlock).
     async refreshGatewaySubscriptionState(state) {
-      if (state.session && state.session.dispatcher && gatewaySubscriptionListenerSession !== state.session) {
-        gatewaySubscriptionListenerSession = state.session;
-        state.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED, payload => {
+      // logout swaps the session object out of the store: a listener or a
+      // response belonging to a previous session must not write the notice
+      // of that session into the next one
+      const requestSession = state.session;
+      if (requestSession && requestSession.dispatcher && gatewaySubscriptionListenerSession !== requestSession) {
+        gatewaySubscriptionListenerSession = requestSession;
+        requestSession.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED, payload => {
+          if (store.getState().session !== requestSession) {
+            return;
+          }
           store.setState({
             gatewayPaymentRequired: get(payload, 'subscription_active') === false
           });
@@ -217,6 +224,9 @@ function createActions(store) {
       }
       try {
         const gatewayStatus = await state.httpClient.get('/api/v1/gateway/status');
+        if (store.getState().session !== requestSession) {
+          return;
+        }
         store.setState({
           gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false
         });

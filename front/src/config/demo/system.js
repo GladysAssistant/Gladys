@@ -11,6 +11,12 @@ const system = {
     subscription_active: true,
     payment_required_since: null
   },
+  'post /api/v1/gateway/subscription/refresh': {
+    configured: true,
+    connected: true,
+    subscription_active: true,
+    payment_required_since: null
+  },
   'get /api/v1/gateway/backup/restore/status': {
     restore_in_progress: false,
     restore_errored: false

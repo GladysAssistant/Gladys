@@ -54,6 +54,28 @@ describe('gateway.getOpenAIQuota', () => {
     expect(gateway.subscriptionActive).to.equal(false);
   });
 
+  it('should refuse the call locally while the instance is locked', async () => {
+    gateway.subscriptionActive = false;
+
+    try {
+      await gateway.getOpenAIQuota();
+      expect.fail();
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error402);
+    }
+    expect(gateway.gladysGatewayClient.openAIGetQuota.called).to.equal(false);
+  });
+
+  it('should unlock the instance when the quota is served again', async () => {
+    gateway.subscriptionActive = true;
+    gateway.gladysGatewayClient.openAIGetQuota = fake.resolves({ text: {}, image: {} });
+    gateway.setSubscriptionActive = fake.resolves(null);
+
+    await gateway.getOpenAIQuota();
+
+    expect(gateway.setSubscriptionActive.calledOnceWithExactly(true)).to.equal(true);
+  });
+
   it('should forward other errors', async () => {
     gateway.gladysGatewayClient.openAIGetQuota = fake.rejects(new Error('network'));
 
