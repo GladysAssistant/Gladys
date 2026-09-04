@@ -104,6 +104,9 @@ function getHttpVoiceErrorState(message) {
   if (message === 'EMPTY_TRANSCRIPTION') {
     return { errorType: 'no_transcription', errorMessage: null };
   }
+  if (message === 'GLADYS_PLUS_PAYMENT_REQUIRED') {
+    return { errorType: 'payment_required', errorMessage: null };
+  }
   return { errorType: 'http', errorMessage: message };
 }
 
@@ -333,7 +336,10 @@ class VoiceAssistantBox extends Component {
     }
     this.clearMessagesClearTimeout();
     const message = (payload && payload.message) || null;
-    const httpErrorState = getHttpVoiceErrorState(message);
+    const httpErrorState =
+      payload && payload.error === 'payment_required'
+        ? { errorType: 'payment_required', errorMessage: null }
+        : getHttpVoiceErrorState(message);
     this.setState({
       uiState: STATE.ERROR,
       errorType: httpErrorState ? httpErrorState.errorType : 'http',
@@ -694,6 +700,11 @@ class VoiceAssistantBox extends Component {
             {errorType === 'no_transcription' && (
               <p class={style.error}>
                 <Text id="dashboard.boxes.voice-assistant.errorNoTranscription" />
+              </p>
+            )}
+            {errorType === 'payment_required' && (
+              <p class={style.error}>
+                <Text id="dashboard.boxes.voice-assistant.errorPaymentRequired" />
               </p>
             )}
             {errorType === 'http' && errorMessage && <p class={style.error}>{errorMessage}</p>}

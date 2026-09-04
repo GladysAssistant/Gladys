@@ -29,6 +29,7 @@ let lastInstanceVersionRefresh = 0;
 // the session whose websocket already forwards the Gladys Plus subscription
 // changes to the store: the listener is registered once per session
 let gatewaySubscriptionListenerSession = null;
+let gatewaySubscriptionListener = null;
 
 const OPEN_PAGES = [
   '/signup',
@@ -212,15 +213,25 @@ function createActions(store) {
       // of that session into the next one
       const requestSession = state.session;
       if (requestSession && requestSession.dispatcher && gatewaySubscriptionListenerSession !== requestSession) {
+        if (gatewaySubscriptionListenerSession && gatewaySubscriptionListenerSession.dispatcher) {
+          gatewaySubscriptionListenerSession.dispatcher.removeListener(
+            WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED,
+            gatewaySubscriptionListener
+          );
+        }
         gatewaySubscriptionListenerSession = requestSession;
-        requestSession.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED, payload => {
+        gatewaySubscriptionListener = payload => {
           if (store.getState().session !== requestSession) {
             return;
           }
           store.setState({
             gatewayPaymentRequired: get(payload, 'subscription_active') === false
           });
-        });
+        };
+        requestSession.dispatcher.addListener(
+          WEBSOCKET_MESSAGE_TYPES.GATEWAY.SUBSCRIPTION_STATUS_CHANGED,
+          gatewaySubscriptionListener
+        );
       }
       try {
         const gatewayStatus = await state.httpClient.get('/api/v1/gateway/status');

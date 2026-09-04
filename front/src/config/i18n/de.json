@@ -749,6 +749,7 @@
         "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfen Sie, ob es von einer anderen App verwendet wird.",
         "errorNoSpeech": "Keine Stimme erkannt. Prüfen Sie, ob Ihr Mikrofon aktiviert ist, und versuchen Sie es erneut.",
         "errorNoTranscription": "Ich habe Ihre Nachricht nicht verstanden. Sprechen Sie näher ans Mikrofon und versuchen Sie es erneut.",
+        "errorPaymentRequired": "Dein Gladys-Plus-Abonnement ist ausgesetzt: Eine Zahlung ist erforderlich. Der Sprachassistent ist bis zur Zahlung pausiert.",
         "configDescription": "Dieses Widget nutzt Gladys Plus für Spracherkennung, KI und Sprachausgabe. Verbinden Sie Ihre Instanz mit Gladys Plus, um es zu nutzen.",
         "plusRequiredHint": "Gladys Plus verbinden, um das Mikrofon zu aktivieren."
       },
@@ -6238,6 +6239,7 @@
       "errorNoMicrophone": "Kein Mikrofon erkannt. Schließe eines an oder aktiviere es in den Systemeinstellungen.",
       "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfe, ob es von einer anderen App verwendet wird.",
       "errorNoTranscription": "Ich habe deine Nachricht nicht verstanden. Sprich näher ans Mikrofon und versuche es erneut.",
+      "errorPaymentRequired": "Dein Gladys-Plus-Abonnement ist ausgesetzt: Eine Zahlung ist erforderlich. Der Sprachassistent ist bis zur Zahlung pausiert.",
       "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar."
     }
   },
