@@ -183,19 +183,19 @@ class EditDevices extends Component {
                 />
               )}
             </div>
-            {selectedDeviceFeaturesOptions && (
-              <div class="form-group">
-                <label>
-                  <Text id="dashboard.boxes.devices.addADeviceLabel" />
-                </label>
-                {/* Grouped by room (same picker as scenes), so two devices sharing a
-                    name stay distinguishable. No value: the picker resets after each add. */}
-                <SelectDeviceFeature
-                  excludedDeviceFeatures={selectedDeviceFeatures}
-                  onDeviceFeatureChange={this.addDeviceFeature}
-                />
-              </div>
-            )}
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.devices.addADeviceLabel" />
+              </label>
+              {/* Grouped by room (same picker as scenes), so two devices sharing a
+                  name stay distinguishable. No value: the picker resets after each add.
+                  Mounted right away so its own fetches overlap the one above, under
+                  the dimmer, instead of leaving a gap here once the dimmer lifts. */}
+              <SelectDeviceFeature
+                excludedDeviceFeatures={selectedDeviceFeatures}
+                onDeviceFeatureChange={this.addDeviceFeature}
+              />
+            </div>
           </div>
         </div>
       </BaseEditBox>
