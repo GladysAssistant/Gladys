@@ -233,6 +233,7 @@ class ApexChartComponent extends Component {
     } else {
       options = this.getAreaChartOptions();
     }
+    this.addHiddenSeriesEvents(options);
     this.tooltipPositioning.addToOptions(options);
     if (this.chart) {
       this.chart.updateOptions(options);
@@ -242,6 +243,39 @@ class ApexChartComponent extends Component {
       this.chart.render();
     }
   };
+  // Tell the parent which series are hidden (collapsed through the legend) each time the
+  // chart is drawn: after a legend click, after a data refresh (ApexCharts keeps the
+  // collapsed series) and when the chart is (re)created (all series visible again).
+  // Reading the state of the chart itself, rather than mirroring the legend clicks, keeps
+  // the parent in sync whatever ApexCharts did with the click.
+  addHiddenSeriesEvents(options) {
+    if (!this.props.onHiddenSeriesChange) {
+      return;
+    }
+    const reportHiddenSeries = chartContext => {
+      const { collapsedSeriesIndices, ancillaryCollapsedSeriesIndices } = chartContext.w.globals;
+      const hiddenSeriesIndexes = [...collapsedSeriesIndices, ...ancillaryCollapsedSeriesIndices].sort((a, b) => a - b);
+      this.props.onHiddenSeriesChange(hiddenSeriesIndexes);
+    };
+    // Chain the handlers already registered by the chart options (e.g. the y-axis
+    // styles of the timeline chart), don't replace them
+    const existingEvents = options.chart.events || {};
+    options.chart.events = {
+      ...existingEvents,
+      mounted(chartContext, config) {
+        if (typeof existingEvents.mounted === 'function') {
+          existingEvents.mounted(chartContext, config);
+        }
+        reportHiddenSeries(chartContext);
+      },
+      updated(chartContext, config) {
+        if (typeof existingEvents.updated === 'function') {
+          existingEvents.updated(chartContext, config);
+        }
+        reportHiddenSeries(chartContext);
+      }
+    };
+  }
   componentDidMount() {
     this.displayChart();
   }
