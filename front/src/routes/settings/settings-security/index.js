@@ -22,7 +22,8 @@ class SettingsSecurity extends Component {
   };
 
   cancelGenerate = () => {
-    this.setState({ confirming: false, twoFactorCode: '' });
+    // also drops a stale "invalid code" alert left by a refused code
+    this.setState({ confirming: false, status: null, twoFactorCode: '', wrongTwoFactorCode: false });
   };
 
   updateTwoFactorCode = e => {
