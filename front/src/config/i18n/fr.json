@@ -386,7 +386,8 @@
       "sun": "Soleil",
       "chips": "Pastilles d'état",
       "actions": "Actions rapides",
-      "house-view": "Vue de la maison"
+      "house-view": "Vue de la maison",
+      "thermostat": "Thermostat"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -712,6 +713,39 @@
         "thresholdsLegendLabel": "Seuils :",
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord"
+      },
+      "thermostat": {
+        "defaultTitle": "Thermostat",
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Ex: Thermostat Salon",
+        "thermostatFeatureLabel": "Fonctionnalité thermostat (consigne)",
+        "thermostatFeatureHelp": "Sélectionnez la fonctionnalité qui contrôle la température cible.",
+        "selectPlaceholder": "Sélectionner...",
+        "inactive": "Inactif",
+        "current": "Actuel",
+        "modeHeating": "Mode Chauffage",
+        "modeCooling": "Mode Climatisation",
+        "modeOff": "Mode Arrêt",
+        "noConfig": "Veuillez configurer le widget en cliquant sur le bouton d'édition.",
+        "manualMode": "Mode manuel",
+        "scheduleLabel": "Planning :",
+        "scheduleUntil": "jusqu'à",
+        "manualUntil": "jusqu'à",
+        "cancelManual": "Annuler le mode manuel",
+        "windowOpen": "Fenêtre ouverte — chauffage suspendu",
+        "windowOpenCooling": "Fenêtre ouverte — climatisation suspendue",
+        "a11ySetpoint": "Consigne",
+        "a11yCurrentTemp": "Température mesurée",
+        "a11yHumidity": "Humidité",
+        "error": "Erreur lors du chargement des données du thermostat.",
+        "preset": {
+          "off": "Arrêt",
+          "frost": "Hors-gel",
+          "away": "Absent",
+          "comfort": "Confort",
+          "eco": "Éco",
+          "night": "Nuit"
+        }
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",
@@ -3248,7 +3282,180 @@
     "backToIntegrations": "Retour aux intégrations",
     "menuScrollLeft": "Faire défiler le menu vers la gauche",
     "menuScrollRight": "Faire défiler le menu vers la droite",
-    "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
+    "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment.",
+    "thermostat": {
+      "title": "Thermostat",
+      "description": "Créez et gérez vos thermostats virtuels",
+      "deviceTab": "Mes thermostats",
+      "scheduleTab": "Plannings",
+      "documentationTab": "Documentation",
+      "device": {
+        "title": "Mes thermostats",
+        "newButton": "Nouveau",
+        "noNameLabel": "Sans nom",
+        "noDevices": "Aucun thermostat créé. Cliquez sur \"Nouveau\" pour commencer.",
+        "nameLabel": "Nom",
+        "roomLabel": "Pièce",
+        "activeScheduleLabel": "Planning actif",
+        "noSchedule": "Aucun planning",
+        "setpointLabel": "Consigne",
+        "noSetpoint": "—",
+        "saveButton": "Sauvegarder",
+        "editButton": "Éditer",
+        "deleteButton": "Supprimer",
+        "confirmDelete": "Supprimer ce thermostat ?",
+        "confirmYes": "Oui",
+        "confirmNo": "Non",
+        "saveError": "Erreur lors de la sauvegarde.",
+        "deleteError": "Erreur lors de la suppression."
+      },
+      "edit": {
+        "titleNew": "Nouveau thermostat",
+        "titleEdit": "Modifier le thermostat",
+        "nameLabel": "Nom",
+        "namePlaceholder": "Ex: Thermostat Salon",
+        "roomLabel": "Pièce",
+        "modeLabel": "Mode",
+        "typeLabel": "Type de thermostat",
+        "typeVirtual": "Thermostat virtuel (Gladys régule)",
+        "typeExternal": "Thermostat réel (le device régule)",
+        "typeHelp": {
+          "virtual": "Gladys fait office de thermostat : elle lit un capteur de température et pilote un interrupteur (relais, prise, contact de chaudière) selon la consigne.",
+          "external": "Le thermostat gère lui-même sa régulation et son chauffage. Gladys lui envoie seulement la consigne du planning et affiche son état."
+        },
+        "targetFeatureLabel": "Consigne du thermostat réel",
+        "targetFeatureHelp": "La fonctionnalité sur laquelle Gladys écrit la température de consigne. Certains appareils en exposent plusieurs (chauffage/refroidissement, présent/absent) : choisissez celle qui pilote réellement votre chauffage.",
+        "stateFeatureLabel": "État de chauffe (facultatif)",
+        "stateFeatureHelp": "Permet d'afficher si l'appareil est en train de chauffer. Acceptée aussi bien sous forme d'état de fonctionnement que de contact de chaudière. Laissez vide si votre thermostat ne remonte pas cette information.",
+        "modeFeatureLabel": "Mode de fonctionnement (facultatif)",
+        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un. Gladys le bascule sur Arrêt lorsque le préréglage Arrêt s'applique, et le rétablit dès qu'une consigne reprend la main.",
+        "mode": {
+          "heating": "Chauffage",
+          "cooling": "Climatisation"
+        },
+        "controlTypeLabel": "Type de calcul",
+        "hysteresisExplain": {
+          "heating": "Le thermostat allume le chauffage lorsque la température descend sous la consigne moins le seuil de démarrage, et l'éteint lorsqu'elle remonte au-dessus de la consigne plus le seuil d'arrêt. Simple et robuste.",
+          "cooling": "Le thermostat allume la climatisation lorsque la température monte au-dessus de la consigne plus le seuil de démarrage, et l'éteint lorsqu'elle redescend sous la consigne moins le seuil d'arrêt. Simple et robuste."
+        },
+        "tpiExplain": "Calcule un rapport ON/OFF sur un cycle fixe selon l'écart entre la température actuelle et la consigne. Plus l'écart est grand, plus le chauffage est actif longtemps dans le cycle. Recommandé pour les planchers chauffants ou les systèmes à inertie élevée.",
+        "controlType": {
+          "hysteresis": "Hystérésis",
+          "tpi": "TPI (Time Proportional Integral)"
+        },
+        "tempUnitLabel": "Unité",
+        "celsius": "Celsius (°C)",
+        "fahrenheit": "Fahrenheit (°F)",
+        "minTempLabel": "Temp. min",
+        "minTempPlaceholder": "Ex: 5",
+        "maxTempLabel": "Temp. max",
+        "maxTempPlaceholder": "Ex: 35",
+        "temperatureFeatureLabel": "Capteur de température",
+        "temperatureFeatureHelp": "Sélectionnez le capteur qui mesure la température ambiante. Un capteur qui remonte une unité différente de celle du thermostat est converti automatiquement ; un capteur sans unité déclarée est supposé utiliser celle du thermostat.",
+        "humidityFeatureLabel": "Capteur d'humidité",
+        "humidityFeatureHelp": "Optionnel. Affiché dans le widget thermostat.",
+        "switchFeatureLabel": "Commutateur (actionneur)",
+        "switchFeatureHelp": {
+          "heating": "Interrupteur qui sera allumé et éteint pour chauffer la pièce.",
+          "cooling": "Interrupteur qui sera allumé et éteint pour rafraîchir la pièce."
+        },
+        "windowFeatureLabel": "Capteur d'ouverture de fenêtre",
+        "windowFeatureHelp": {
+          "heating": "Optionnel. Si une fenêtre est ouverte, le chauffage est automatiquement coupé.",
+          "cooling": "Optionnel. Si une fenêtre est ouverte, la climatisation est automatiquement coupée."
+        },
+        "hysteresisStartLabel": "Seuil de démarrage",
+        "hysteresisStartHelp": {
+          "heating": "Le chauffage démarre lorsque la température est inférieure à (consigne − seuil de démarrage). Ex. : consigne 21 °C, seuil 0,5 °C → démarre sous 20,5 °C.",
+          "cooling": "La climatisation démarre lorsque la température est supérieure à (consigne + seuil de démarrage). Ex. : consigne 24 °C, seuil 0,5 °C → démarre au-dessus de 24,5 °C."
+        },
+        "hysteresisStopLabel": "Seuil d'arrêt",
+        "hysteresisStopHelp": {
+          "heating": "Le chauffage s'arrête lorsque la température dépasse (consigne + seuil d'arrêt). Ex. : consigne 21 °C, seuil 0,5 °C → s'arrête au-dessus de 21,5 °C.",
+          "cooling": "La climatisation s'arrête lorsque la température descend sous (consigne − seuil d'arrêt). Ex. : consigne 24 °C, seuil 0,5 °C → s'arrête sous 23,5 °C."
+        },
+        "tpiCycleTimeLabel": "Durée du cycle TPI",
+        "tpiCycleTimeHelp": "Durée totale d'un cycle ON/OFF en minutes. Ex: 30 min → si le besoin est 50%, le chauffage est ON 15 min puis OFF 15 min.",
+        "tpiProportionalBandLabel": "Bande proportionnelle TPI",
+        "tpiProportionalBandHelp": "Écart de température (en °C) correspondant à 100% de chauffe. Ex: bande = 2°C, écart actuel = 1°C → 50% du cycle en ON.",
+        "presetsLabel": "Presets de température",
+        "presetColNameLabel": "Preset",
+        "presetColTempLabel": "Consigne",
+        "preset": {
+          "off": "Arrêt",
+          "frost": "Hors-gel",
+          "away": "Absence",
+          "eco": "Éco",
+          "night": "Nuit",
+          "comfort": "Confort"
+        },
+        "saveButton": "Sauvegarder",
+        "cancelButton": "Annuler",
+        "saveError": "Erreur lors de la sauvegarde.",
+        "activeScheduleLabel": "Planning actif",
+        "activeScheduleHelp": "Sélectionnez le planning à appliquer automatiquement à ce thermostat.",
+        "noActiveSchedule": "Aucun planning (contrôle manuel)",
+        "manualDurationLabel": "Durée du mode manuel",
+        "manualDurationUnit": "min",
+        "manualDurationHelp": "Durée en minutes avant de revenir automatiquement au planning après une action manuelle (défaut : 30 min)."
+      },
+      "schedule": {
+        "title": "Plannings",
+        "newButton": "Nouveau planning",
+        "noSchedules": "Aucun planning créé. Cliquez sur \"Nouveau planning\" pour commencer.",
+        "nameLabel": "Nom du planning",
+        "namePlaceholder": "Ex: Semaine de travail",
+        "saveButton": "Sauvegarder",
+        "cancelButton": "Annuler",
+        "deleteButton": "Supprimer",
+        "editButton": "Éditer",
+        "confirmDelete": "Confirmer la suppression ?",
+        "confirmYes": "Oui",
+        "confirmNo": "Non",
+        "saveError": "Erreur lors de la sauvegarde.",
+        "gapWarning": "Certains jours ne sont pas couverts en totalité. Le thermostat restera sur son preset courant pendant ces plages :",
+        "nextDay": "+1j",
+        "fullDayHint": "00:00 → 00:00 couvre la journée entière.",
+        "duplicateButton": "Dupliquer",
+        "duplicateSuffix": "(copie)",
+        "deleteError": "Erreur lors de la suppression.",
+        "days": {
+          "0": "Lundi",
+          "1": "Mardi",
+          "2": "Mercredi",
+          "3": "Jeudi",
+          "4": "Vendredi",
+          "5": "Samedi",
+          "6": "Dimanche"
+        },
+        "daysShort": {
+          "0": "Lun",
+          "1": "Mar",
+          "2": "Mer",
+          "3": "Jeu",
+          "4": "Ven",
+          "5": "Sam",
+          "6": "Dim"
+        },
+        "addSlot": "Ajouter une plage",
+        "copyTo": "Copier vers...",
+        "copyToLabel": "Copier vers :",
+        "applyButton": "Appliquer",
+        "removeSlot": "Supprimer",
+        "startTime": "Début",
+        "endTime": "Fin",
+        "preset": "Preset",
+        "presets": {
+          "off": "Arrêt",
+          "frost": "Hors-gel",
+          "away": "Absence",
+          "eco": "Éco",
+          "night": "Nuit",
+          "comfort": "Confort"
+        },
+        "noSlots": "Aucune plage horaire. Cliquez sur \"Ajouter une plage\" pour commencer."
+      }
+    }
   },
   "editScene": {
     "settings": "Configuration",

@@ -386,7 +386,8 @@
       "sun": "Sun",
       "chips": "Status chips",
       "actions": "Quick actions",
-      "house-view": "House view"
+      "house-view": "House view",
+      "thermostat": "Thermostat"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -822,6 +823,39 @@
         "editPinLabelPlaceholder": "e.g. Solar",
         "noImage": "Pick an illustration in the widget settings.",
         "error": "The image could not be loaded."
+      },
+      "thermostat": {
+        "defaultTitle": "Thermostat",
+        "editNameLabel": "Widget Name (optional)",
+        "editNamePlaceholder": "e.g. Living Room Thermostat",
+        "thermostatFeatureLabel": "Thermostat feature (setpoint)",
+        "thermostatFeatureHelp": "Select the feature that controls the target temperature.",
+        "selectPlaceholder": "Select...",
+        "inactive": "Inactive",
+        "current": "Current",
+        "modeHeating": "Heating Mode",
+        "modeCooling": "Cooling Mode",
+        "modeOff": "Off Mode",
+        "noConfig": "Please configure the widget by clicking the edit button.",
+        "manualMode": "Manual mode",
+        "scheduleLabel": "Schedule:",
+        "scheduleUntil": "until",
+        "manualUntil": "until",
+        "cancelManual": "Cancel manual mode",
+        "windowOpen": "Window open — heating suspended",
+        "windowOpenCooling": "Window open — cooling suspended",
+        "a11ySetpoint": "Setpoint",
+        "a11yCurrentTemp": "Current temperature",
+        "a11yHumidity": "Humidity",
+        "error": "Error loading thermostat data.",
+        "preset": {
+          "off": "Off",
+          "frost": "Frost",
+          "away": "Away",
+          "comfort": "Comfort",
+          "eco": "Eco",
+          "night": "Night"
+        }
       }
     },
     "editDashboardBackgroundLabel": "Background mood",
@@ -3248,7 +3282,180 @@
     "backToIntegrations": "Back to integrations",
     "menuScrollLeft": "Scroll menu left",
     "menuScrollRight": "Scroll menu right",
-    "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now."
+    "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now.",
+    "thermostat": {
+      "title": "Thermostat",
+      "description": "Create and manage your virtual thermostats",
+      "deviceTab": "My Thermostats",
+      "scheduleTab": "Schedules",
+      "documentationTab": "Documentation",
+      "device": {
+        "title": "My Thermostats",
+        "newButton": "New",
+        "noNameLabel": "No name",
+        "noDevices": "No thermostat created yet. Click \"New\" to get started.",
+        "nameLabel": "Name",
+        "roomLabel": "Room",
+        "activeScheduleLabel": "Active schedule",
+        "noSchedule": "No schedule",
+        "setpointLabel": "Setpoint",
+        "noSetpoint": "—",
+        "saveButton": "Save",
+        "editButton": "Edit",
+        "deleteButton": "Delete",
+        "confirmDelete": "Delete this thermostat?",
+        "confirmYes": "Yes",
+        "confirmNo": "No",
+        "saveError": "Error while saving.",
+        "deleteError": "Error while deleting."
+      },
+      "edit": {
+        "titleNew": "New Thermostat",
+        "titleEdit": "Edit Thermostat",
+        "nameLabel": "Name",
+        "namePlaceholder": "e.g. Living Room Thermostat",
+        "roomLabel": "Room",
+        "modeLabel": "Mode",
+        "typeLabel": "Thermostat type",
+        "typeVirtual": "Virtual thermostat (Gladys regulates)",
+        "typeExternal": "Real thermostat (the device regulates)",
+        "typeHelp": {
+          "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) to reach the setpoint.",
+          "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state."
+        },
+        "targetFeatureLabel": "Setpoint of the real thermostat",
+        "targetFeatureHelp": "The feature Gladys writes the target temperature on. Some devices expose several (heating/cooling, occupied/unoccupied): pick the one that actually drives your heating.",
+        "stateFeatureLabel": "Heating state (optional)",
+        "stateFeatureHelp": "Used to show whether the device is currently running. Accepted either as an operating state or as a boiler contact. Leave empty if your thermostat does not report it.",
+        "modeFeatureLabel": "Operating mode (optional)",
+        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one. Gladys switches it to Off when the Off preset applies, and hands it back as soon as a setpoint takes over again.",
+        "mode": {
+          "heating": "Heating",
+          "cooling": "Cooling"
+        },
+        "controlTypeLabel": "Control type",
+        "hysteresisExplain": {
+          "heating": "The thermostat turns the heating on when the temperature drops below the setpoint minus the start threshold, and turns it off when it rises above the setpoint plus the stop threshold. Simple and robust.",
+          "cooling": "The thermostat turns the cooling on when the temperature rises above the setpoint plus the start threshold, and turns it off when it drops below the setpoint minus the stop threshold. Simple and robust."
+        },
+        "tpiExplain": "Computes an ON/OFF ratio over a fixed cycle based on the gap between the current temperature and the setpoint. The larger the gap, the longer the heating stays on within the cycle. Recommended for underfloor heating or high-inertia systems.",
+        "controlType": {
+          "hysteresis": "Hysteresis",
+          "tpi": "TPI (Time Proportional Integral)"
+        },
+        "tempUnitLabel": "Unit",
+        "celsius": "Celsius (°C)",
+        "fahrenheit": "Fahrenheit (°F)",
+        "minTempLabel": "Min temp",
+        "minTempPlaceholder": "e.g. 5",
+        "maxTempLabel": "Max temp",
+        "maxTempPlaceholder": "e.g. 35",
+        "temperatureFeatureLabel": "Temperature sensor",
+        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature. A sensor reporting a different unit than the thermostat is converted automatically; a sensor with no declared unit is assumed to use the thermostat's.",
+        "humidityFeatureLabel": "Humidity sensor",
+        "humidityFeatureHelp": "Optional. Displayed in the thermostat widget.",
+        "switchFeatureLabel": "Switch (actuator)",
+        "switchFeatureHelp": {
+          "heating": "The switch that will be turned on and off to heat the room.",
+          "cooling": "The switch that will be turned on and off to cool the room."
+        },
+        "windowFeatureLabel": "Window opening sensor",
+        "windowFeatureHelp": {
+          "heating": "Optional. If a window is open, the heating is automatically cut off.",
+          "cooling": "Optional. If a window is open, the cooling is automatically cut off."
+        },
+        "hysteresisStartLabel": "Start threshold",
+        "hysteresisStartHelp": {
+          "heating": "The heating turns on when the temperature is below (setpoint − start threshold). E.g. setpoint 21°C, threshold 0.5°C → turns on below 20.5°C.",
+          "cooling": "The cooling turns on when the temperature is above (setpoint + start threshold). E.g. setpoint 24°C, threshold 0.5°C → turns on above 24.5°C."
+        },
+        "hysteresisStopLabel": "Stop threshold",
+        "hysteresisStopHelp": {
+          "heating": "The heating turns off when the temperature rises above (setpoint + stop threshold). E.g. setpoint 21°C, threshold 0.5°C → turns off above 21.5°C.",
+          "cooling": "The cooling turns off when the temperature drops below (setpoint − stop threshold). E.g. setpoint 24°C, threshold 0.5°C → turns off below 23.5°C."
+        },
+        "tpiCycleTimeLabel": "TPI cycle time",
+        "tpiCycleTimeHelp": "Total duration of an ON/OFF cycle in minutes. E.g. 30 min → if the demand is 50%, the heating is ON for 15 min then OFF for 15 min.",
+        "tpiProportionalBandLabel": "TPI proportional band",
+        "tpiProportionalBandHelp": "Temperature gap (in °C) corresponding to 100% heating. E.g. band = 2°C, current gap = 1°C → 50% of the cycle ON.",
+        "presetsLabel": "Temperature presets",
+        "presetColNameLabel": "Preset",
+        "presetColTempLabel": "Setpoint",
+        "preset": {
+          "off": "Off",
+          "frost": "Frost protection",
+          "away": "Away",
+          "eco": "Eco",
+          "night": "Night",
+          "comfort": "Comfort"
+        },
+        "saveButton": "Save",
+        "cancelButton": "Cancel",
+        "saveError": "Error while saving.",
+        "activeScheduleLabel": "Active schedule",
+        "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
+        "noActiveSchedule": "No schedule (manual control)",
+        "manualDurationLabel": "Manual mode duration",
+        "manualDurationUnit": "min",
+        "manualDurationHelp": "Duration in minutes before automatically returning to the schedule after a manual action (default: 30 min)."
+      },
+      "schedule": {
+        "title": "Schedules",
+        "newButton": "New schedule",
+        "noSchedules": "No schedule created yet. Click \"New schedule\" to get started.",
+        "nameLabel": "Schedule name",
+        "namePlaceholder": "e.g. Work week",
+        "saveButton": "Save",
+        "cancelButton": "Cancel",
+        "deleteButton": "Delete",
+        "editButton": "Edit",
+        "confirmDelete": "Confirm deletion?",
+        "confirmYes": "Yes",
+        "confirmNo": "No",
+        "saveError": "Error while saving.",
+        "gapWarning": "Some days are not fully covered. The thermostat will stay on its current preset during these ranges:",
+        "nextDay": "+1d",
+        "fullDayHint": "00:00 → 00:00 covers the whole day.",
+        "duplicateButton": "Duplicate",
+        "duplicateSuffix": "(copy)",
+        "deleteError": "Error while deleting.",
+        "days": {
+          "0": "Monday",
+          "1": "Tuesday",
+          "2": "Wednesday",
+          "3": "Thursday",
+          "4": "Friday",
+          "5": "Saturday",
+          "6": "Sunday"
+        },
+        "daysShort": {
+          "0": "Mon",
+          "1": "Tue",
+          "2": "Wed",
+          "3": "Thu",
+          "4": "Fri",
+          "5": "Sat",
+          "6": "Sun"
+        },
+        "addSlot": "Add time slot",
+        "copyTo": "Copy to...",
+        "copyToLabel": "Copy to:",
+        "applyButton": "Apply",
+        "removeSlot": "Remove",
+        "startTime": "Start",
+        "endTime": "End",
+        "preset": "Preset",
+        "presets": {
+          "off": "Off",
+          "frost": "Frost protection",
+          "away": "Away",
+          "eco": "Eco",
+          "night": "Night",
+          "comfort": "Comfort"
+        },
+        "noSlots": "No time slots yet. Click \"Add time slot\" to get started."
+      }
+    }
   },
   "editScene": {
     "settings": "Settings",

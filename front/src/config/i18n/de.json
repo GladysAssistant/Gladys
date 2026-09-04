@@ -386,7 +386,8 @@
       "sun": "Sonne",
       "chips": "Status-Chips",
       "actions": "Schnellaktionen",
-      "house-view": "Hausansicht"
+      "house-view": "Hausansicht",
+      "thermostat": "Thermostat"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -712,6 +713,39 @@
       },
       "music": {
         "selectDeviceLabel": "Wähle das zu steuernde Gerät aus"
+      },
+      "thermostat": {
+        "defaultTitle": "Thermostat",
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "z.B. Wohnzimmer Thermostat",
+        "thermostatFeatureLabel": "Thermostat-Funktion (Sollwert)",
+        "thermostatFeatureHelp": "Wähle die Funktion, die die Zieltemperatur steuert.",
+        "selectPlaceholder": "Auswählen...",
+        "inactive": "Inaktiv",
+        "current": "Aktuell",
+        "modeHeating": "Heizmodus",
+        "modeCooling": "Kühlmodus",
+        "modeOff": "Aus-Modus",
+        "noConfig": "Bitte konfiguriere das Widget über den Bearbeiten-Button.",
+        "manualMode": "Manueller Modus",
+        "scheduleLabel": "Zeitplan:",
+        "scheduleUntil": "bis",
+        "manualUntil": "bis",
+        "cancelManual": "Manuellen Modus beenden",
+        "windowOpen": "Fenster offen — Heizung ausgesetzt",
+        "windowOpenCooling": "Fenster offen — Kühlung ausgesetzt",
+        "a11ySetpoint": "Sollwert",
+        "a11yCurrentTemp": "Gemessene Temperatur",
+        "a11yHumidity": "Luftfeuchtigkeit",
+        "error": "Fehler beim Laden der Thermostat-Daten.",
+        "preset": {
+          "off": "Aus",
+          "frost": "Frostschutz",
+          "away": "Abwesend",
+          "comfort": "Komfort",
+          "eco": "Eco",
+          "night": "Nacht"
+        }
       },
       "energyConsumption": {
         "editName": "Widget-Name (optional)",
@@ -3248,7 +3282,180 @@
     "backToIntegrations": "Zurück zu den Integrationen",
     "menuScrollLeft": "Menü nach links scrollen",
     "menuScrollRight": "Menü nach rechts scrollen",
-    "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden."
+    "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden.",
+    "thermostat": {
+      "title": "Thermostat",
+      "description": "Erstelle und verwalte deine virtuellen Thermostate",
+      "deviceTab": "Meine Thermostate",
+      "scheduleTab": "Zeitpläne",
+      "documentationTab": "Dokumentation",
+      "device": {
+        "title": "Meine Thermostate",
+        "newButton": "Neu",
+        "noNameLabel": "Ohne Namen",
+        "noDevices": "Noch kein Thermostat erstellt. Klicke auf \"Neu\", um zu beginnen.",
+        "nameLabel": "Name",
+        "roomLabel": "Raum",
+        "activeScheduleLabel": "Aktiver Zeitplan",
+        "noSchedule": "Kein Zeitplan",
+        "setpointLabel": "Sollwert",
+        "noSetpoint": "—",
+        "saveButton": "Speichern",
+        "editButton": "Bearbeiten",
+        "deleteButton": "Löschen",
+        "confirmDelete": "Dieses Thermostat löschen?",
+        "confirmYes": "Ja",
+        "confirmNo": "Nein",
+        "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
+        "deleteError": "Beim Löschen ist ein Fehler aufgetreten."
+      },
+      "edit": {
+        "titleNew": "Neues Thermostat",
+        "titleEdit": "Thermostat bearbeiten",
+        "nameLabel": "Name",
+        "namePlaceholder": "z.B. Wohnzimmer Thermostat",
+        "roomLabel": "Raum",
+        "modeLabel": "Modus",
+        "typeLabel": "Thermostattyp",
+        "typeVirtual": "Virtuelles Thermostat (Gladys regelt)",
+        "typeExternal": "Echtes Thermostat (das Gerät regelt)",
+        "typeHelp": {
+          "virtual": "Gladys arbeitet als Thermostat: Sie liest einen Temperatursensor und steuert einen Schalter (Relais, Steckdose, Kesselkontakt), um den Sollwert zu erreichen.",
+          "external": "Das Thermostat regelt selbst und steuert seine Heizung selbst. Gladys schreibt nur den Sollwert aus dem Zeitplan und zeigt den Zustand des Geräts an."
+        },
+        "targetFeatureLabel": "Sollwert des echten Thermostats",
+        "targetFeatureHelp": "Die Funktion, auf die Gladys die Zieltemperatur schreibt. Manche Geräte bieten mehrere an (Heizen/Kühlen, anwesend/abwesend): Wählen Sie diejenige, die Ihre Heizung tatsächlich steuert.",
+        "stateFeatureLabel": "Heizzustand (optional)",
+        "stateFeatureHelp": "Zeigt an, ob das Gerät gerade läuft. Wird sowohl als Betriebszustand als auch als Kesselkontakt akzeptiert. Leer lassen, wenn Ihr Thermostat diese Information nicht liefert.",
+        "modeFeatureLabel": "Betriebsmodus (optional)",
+        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden. Gladys schaltet ihn auf Aus, sobald die Voreinstellung Aus greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt.",
+        "mode": {
+          "heating": "Heizen",
+          "cooling": "Kühlen"
+        },
+        "controlTypeLabel": "Regelungsart",
+        "hysteresisExplain": {
+          "heating": "Das Thermostat schaltet die Heizung ein, wenn die Temperatur unter den Sollwert minus die Einschaltschwelle fällt, und aus, wenn sie über den Sollwert plus die Ausschaltschwelle steigt. Einfach und robust.",
+          "cooling": "Das Thermostat schaltet die Kühlung ein, wenn die Temperatur über den Sollwert plus die Einschaltschwelle steigt, und aus, wenn sie unter den Sollwert minus die Ausschaltschwelle fällt. Einfach und robust."
+        },
+        "tpiExplain": "Berechnet ein ON/OFF-Verhältnis über einen festen Zyklus anhand der Abweichung zwischen aktueller Temperatur und Sollwert. Je größer die Abweichung, desto länger heizt das System innerhalb des Zyklus. Empfohlen für Fußbodenheizungen oder Systeme mit hoher Trägheit.",
+        "controlType": {
+          "hysteresis": "Hysterese",
+          "tpi": "TPI (Time Proportional Integral)"
+        },
+        "tempUnitLabel": "Einheit",
+        "celsius": "Celsius (°C)",
+        "fahrenheit": "Fahrenheit (°F)",
+        "minTempLabel": "Min. Temperatur",
+        "minTempPlaceholder": "z.B. 5",
+        "maxTempLabel": "Max. Temperatur",
+        "maxTempPlaceholder": "z.B. 35",
+        "temperatureFeatureLabel": "Temperatursensor",
+        "temperatureFeatureHelp": "Wähle den Sensor, der die Umgebungstemperatur misst. Ein Sensor, der eine andere Einheit als das Thermostat meldet, wird automatisch umgerechnet; bei einem Sensor ohne angegebene Einheit wird die Einheit des Thermostats angenommen.",
+        "humidityFeatureLabel": "Feuchtigkeitssensor",
+        "humidityFeatureHelp": "Optional. Wird im Thermostat-Widget angezeigt.",
+        "switchFeatureLabel": "Schalter (Aktor)",
+        "switchFeatureHelp": {
+          "heating": "Der Schalter, der zum Heizen des Raums ein- und ausgeschaltet wird.",
+          "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
+        },
+        "windowFeatureLabel": "Fensterkontakt",
+        "windowFeatureHelp": {
+          "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",
+          "cooling": "Optional. Wenn ein Fenster geöffnet ist, wird die Kühlung automatisch abgeschaltet."
+        },
+        "hysteresisStartLabel": "Einschaltschwelle",
+        "hysteresisStartHelp": {
+          "heating": "Die Heizung schaltet ein, wenn die Temperatur unter (Sollwert − Einschaltschwelle) liegt. Z. B. Sollwert 21 °C, Schwelle 0,5 °C → schaltet unter 20,5 °C ein.",
+          "cooling": "Die Kühlung schaltet ein, wenn die Temperatur über (Sollwert + Einschaltschwelle) liegt. Z. B. Sollwert 24 °C, Schwelle 0,5 °C → schaltet über 24,5 °C ein."
+        },
+        "hysteresisStopLabel": "Ausschaltschwelle",
+        "hysteresisStopHelp": {
+          "heating": "Die Heizung schaltet aus, wenn die Temperatur über (Sollwert + Ausschaltschwelle) steigt. Z. B. Sollwert 21 °C, Schwelle 0,5 °C → schaltet über 21,5 °C aus.",
+          "cooling": "Die Kühlung schaltet aus, wenn die Temperatur unter (Sollwert − Ausschaltschwelle) fällt. Z. B. Sollwert 24 °C, Schwelle 0,5 °C → schaltet unter 23,5 °C aus."
+        },
+        "tpiCycleTimeLabel": "TPI-Zykluszeit",
+        "tpiCycleTimeHelp": "Gesamtdauer eines ON/OFF-Zyklus in Minuten. Z.B. 30 Min. → bei einem Bedarf von 50% heizt das System 15 Min. und pausiert 15 Min.",
+        "tpiProportionalBandLabel": "TPI-Proportionalband",
+        "tpiProportionalBandHelp": "Temperaturabweichung (in °C), die 100% Heizleistung entspricht. Z.B. Band = 2°C, aktuelle Abweichung = 1°C → 50% des Zyklus ON.",
+        "presetsLabel": "Temperatur-Voreinstellungen",
+        "presetColNameLabel": "Voreinstellung",
+        "presetColTempLabel": "Sollwert",
+        "preset": {
+          "off": "Aus",
+          "frost": "Frostschutz",
+          "away": "Abwesend",
+          "eco": "Eco",
+          "night": "Nacht",
+          "comfort": "Komfort"
+        },
+        "saveButton": "Speichern",
+        "cancelButton": "Abbrechen",
+        "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
+        "activeScheduleLabel": "Aktiver Zeitplan",
+        "activeScheduleHelp": "Wähle den Zeitplan, der automatisch auf dieses Thermostat angewendet wird.",
+        "noActiveSchedule": "Kein Zeitplan (manuelle Steuerung)",
+        "manualDurationLabel": "Dauer des manuellen Modus",
+        "manualDurationUnit": "Min.",
+        "manualDurationHelp": "Dauer in Minuten, bis nach einer manuellen Aktion automatisch zum Zeitplan zurückgekehrt wird (Standard: 30 Min.)."
+      },
+      "schedule": {
+        "title": "Zeitpläne",
+        "newButton": "Neuer Zeitplan",
+        "noSchedules": "Noch kein Zeitplan erstellt. Klicke auf \"Neuer Zeitplan\", um zu beginnen.",
+        "nameLabel": "Name des Zeitplans",
+        "namePlaceholder": "z.B. Arbeitswoche",
+        "saveButton": "Speichern",
+        "cancelButton": "Abbrechen",
+        "deleteButton": "Löschen",
+        "editButton": "Bearbeiten",
+        "confirmDelete": "Löschen bestätigen?",
+        "confirmYes": "Ja",
+        "confirmNo": "Nein",
+        "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
+        "gapWarning": "Einige Tage sind nicht vollständig abgedeckt. Das Thermostat bleibt in diesen Zeiträumen auf seinem aktuellen Preset:",
+        "nextDay": "+1T",
+        "fullDayHint": "00:00 → 00:00 deckt den ganzen Tag ab.",
+        "duplicateButton": "Duplizieren",
+        "duplicateSuffix": "(Kopie)",
+        "deleteError": "Beim Löschen ist ein Fehler aufgetreten.",
+        "days": {
+          "0": "Montag",
+          "1": "Dienstag",
+          "2": "Mittwoch",
+          "3": "Donnerstag",
+          "4": "Freitag",
+          "5": "Samstag",
+          "6": "Sonntag"
+        },
+        "daysShort": {
+          "0": "Mo",
+          "1": "Di",
+          "2": "Mi",
+          "3": "Do",
+          "4": "Fr",
+          "5": "Sa",
+          "6": "So"
+        },
+        "addSlot": "Zeitfenster hinzufügen",
+        "copyTo": "Kopieren nach...",
+        "copyToLabel": "Kopieren nach:",
+        "applyButton": "Anwenden",
+        "removeSlot": "Entfernen",
+        "startTime": "Beginn",
+        "endTime": "Ende",
+        "preset": "Voreinstellung",
+        "presets": {
+          "off": "Aus",
+          "frost": "Frostschutz",
+          "away": "Abwesend",
+          "eco": "Eco",
+          "night": "Nacht",
+          "comfort": "Komfort"
+        },
+        "noSlots": "Noch keine Zeitfenster. Klicke auf \"Zeitfenster hinzufügen\", um zu beginnen."
+      }
+    }
   },
   "editScene": {
     "settings": "Einstellungen",

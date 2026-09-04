@@ -425,6 +425,12 @@
 }
 
 .editPanelBody {
+  /* Fill the height the panel leaves below its header: without flex the body
+     is only as tall as its content, so a short form sits squeezed at the top
+     with its own scrollbar instead of using the panel. min-height: 0 lets it
+     shrink below that content height so the scrollbar appears on the body. */
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   padding: 1.25rem 1.375rem 1.5rem;
 }
