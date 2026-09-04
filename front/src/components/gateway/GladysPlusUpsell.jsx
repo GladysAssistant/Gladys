@@ -23,15 +23,16 @@ class GladysPlusUpsell extends Component {
     const { httpClient } = this.props;
     if (!httpClient) {
       console.error('GladysPlusUpsell: httpClient is required');
-      this.setState({ gladysPlusConnected: false });
       return;
     }
     try {
       const response = await httpClient.get('/api/v1/gateway/status');
       this.setState({ gladysPlusConnected: response.configured === true });
     } catch (e) {
+      // Only a successful answer saying the instance is not linked to Gladys
+      // Plus should trigger the upsell: on a failed call the status stays
+      // unknown and the card is not displayed.
       console.error(e);
-      this.setState({ gladysPlusConnected: false });
     }
   };
 

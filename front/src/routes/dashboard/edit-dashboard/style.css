@@ -323,29 +323,6 @@
   justify-content: center;
 }
 
-/* media boxes stretch by letting their image absorb the extra height —
-   the viewer's .stretchableBox > div > img/.dimmer rules, one wrapper deeper */
-.stretchPreview .previewContent > * > img {
-  flex: 1 1 auto;
-  object-fit: cover;
-  min-height: 0;
-}
-
-.stretchPreview .previewContent > * > :global(.dimmer) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.stretchPreview .previewContent > * > :global(.dimmer) > :global(.dimmer-content) {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-}
-
 /* Same caps as the viewer, shifted by the edit chrome (toolbar + the "+"
    slot ≈ 4rem): the widget card ends up at the viewer's size. Desktop only —
    below the breakpoint columns stack and heights are natural. */

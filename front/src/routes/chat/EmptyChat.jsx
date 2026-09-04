@@ -24,10 +24,10 @@ class EmptyChat extends Component {
         gladysPlusConfigured: gatewayStatus.configured === true
       });
     } catch (e) {
+      // A failed call doesn't mean the instance has no Gladys Plus: it can
+      // simply be a network error. Staying unknown keeps the regular empty
+      // state instead of upselling a subscription the instance may already have.
       console.error(e);
-      this.setState({
-        gladysPlusConfigured: false
-      });
     }
   };
 
