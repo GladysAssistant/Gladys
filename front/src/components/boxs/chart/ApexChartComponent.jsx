@@ -257,10 +257,23 @@ class ApexChartComponent extends Component {
       const hiddenSeriesIndexes = [...collapsedSeriesIndices, ...ancillaryCollapsedSeriesIndices].sort((a, b) => a - b);
       this.props.onHiddenSeriesChange(hiddenSeriesIndexes);
     };
+    // Chain the handlers already registered by the chart options (e.g. the y-axis
+    // styles of the timeline chart), don't replace them
+    const existingEvents = options.chart.events || {};
     options.chart.events = {
-      ...(options.chart.events || {}),
-      mounted: reportHiddenSeries,
-      updated: reportHiddenSeries
+      ...existingEvents,
+      mounted(chartContext, config) {
+        if (typeof existingEvents.mounted === 'function') {
+          existingEvents.mounted(chartContext, config);
+        }
+        reportHiddenSeries(chartContext);
+      },
+      updated(chartContext, config) {
+        if (typeof existingEvents.updated === 'function') {
+          existingEvents.updated(chartContext, config);
+        }
+        reportHiddenSeries(chartContext);
+      }
     };
   }
   componentDidMount() {
