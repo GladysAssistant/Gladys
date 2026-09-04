@@ -3,8 +3,7 @@ import { createPortal } from 'preact/compat';
 import { connect } from 'unistore/preact';
 import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
-import Select from 'react-select';
-import closeMenuOnScroll from '../../../utils/closeMenuOnScroll';
+import Select from '../../form/Select';
 import get from 'get-value';
 
 import withIntlAsProp from '../../../utils/withIntlAsProp';
@@ -347,9 +346,6 @@ class MigrateDeviceModal extends Component {
                           <Select
                             options={deviceGroups}
                             filterOption={this.filterOption}
-                            menuPlacement="auto"
-                            menuPortalTarget={document.body}
-                            closeMenuOnScroll={closeMenuOnScroll}
                             classNamePrefix="react-select"
                             value={
                               destinationDevice

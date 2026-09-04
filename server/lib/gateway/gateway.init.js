@@ -14,6 +14,16 @@ async function init() {
     const gladysGatewayEcdsaPrivateKey = await this.variable.getValue('GLADYS_GATEWAY_ECDSA_PRIVATE_KEY');
 
     if (gladysGatewayRefreshToken && gladysGatewayRsaPrivateKey && gladysGatewayEcdsaPrivateKey) {
+      // The lock survives restarts, whether the connection below succeeds or
+      // not: the features stay off until Gladys Plus confirms the subscription
+      // is paid, which is checked right away (one call, only for locked
+      // instances) in case the payment was made while the instance was off.
+      const paymentRequiredSince = await this.variable.getValue(
+        SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE,
+      );
+      this.subscriptionActive = paymentRequiredSince === null;
+      this.subscriptionPaymentRequiredSince = paymentRequiredSince;
+
       try {
         await this.gladysGatewayClient.instanceConnect(
           gladysGatewayRefreshToken,
@@ -41,6 +51,14 @@ async function init() {
       }
 
       await this.refreshUserKeys();
+
+      if (this.connected && !this.subscriptionActive) {
+        try {
+          await this.refreshSubscriptionStatus();
+        } catch (e) {
+          logger.debug(e);
+        }
+      }
     }
   } catch (e) {
     logger.debug(e);
