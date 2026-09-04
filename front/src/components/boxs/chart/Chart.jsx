@@ -537,7 +537,8 @@ class Chartbox extends Component {
     const displayVariation = box.display_variation;
     // The hidden series are positional, in ApexCharts as in the header: recreate the chart
     // (all series visible again) when the devices of the box change, e.g. in the editor.
-    const deviceFeaturesKey = (box.device_features || []).join(',');
+    // Same fallback on the legacy "device_feature" (one device) attribute as in getData.
+    const deviceFeaturesKey = (box.device_features || [box.device_feature]).join(',');
     let additionalHeight = 30 * (nbFeaturesDisplayed - 1);
     if (props.box.chart_type === 'timeline') {
       additionalHeight = 55 * nbFeaturesDisplayed;
