@@ -28,9 +28,10 @@
    across engines on this flex chain (Firefox field report, forum 10737).
    The wrapper keeps hugging the image exactly, so the %-positioned pins stay
    glued to the same points of the plan; the flex body centers the possibly
-   narrower image. Desktop only, like stretch itself: below the breakpoint
-   columns stack and the image keeps its natural full-width render. */
-@media (min-width: 992px) {
+   narrower image. Columns breakpoint only, like stretch itself (700px —
+   see routes/dashboard/style.css): below it columns stack and the image
+   keeps its natural full-width render. */
+@media (min-width: 700px) {
   :global(.dashboard-stretched-tile) .cardBody {
     display: flex;
     flex-direction: column;
