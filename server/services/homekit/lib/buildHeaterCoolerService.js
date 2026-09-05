@@ -141,12 +141,29 @@ function buildHeaterCoolerService(service, device, features) {
   const canHeat = validTargetStates.includes(HOMEKIT_HEATER_COOLER_STATE.HEAT);
   const canCool = validTargetStates.includes(HOMEKIT_HEATER_COOLER_STATE.COOL);
 
-  const readTargetState = () => {
+  // The mode the device reports it is running in. Modes HomeKit has no equivalent for — dry, fan —
+  // read as auto, and so does a mode the device has not reported yet, or one the mapping does not
+  // know about.
+  const readReportedState = () => {
     if (modeFeature) {
       const state = acModeToHeaterCoolerState[readValue(modeFeature)];
       return state === undefined ? HOMEKIT_HEATER_COOLER_STATE.AUTO : state;
     }
     return setpointFeature ? HOMEKIT_HEATER_COOLER_STATE.COOL : HOMEKIT_HEATER_COOLER_STATE.AUTO;
+  };
+
+  // What HomeKit is told. The valid values set on the characteristic are a contract, and HAP only
+  // validates what a controller writes, not what a GET returns: reporting a state outside them
+  // would leave the Home app to make what it can of a mode it was told the device does not have.
+  // That is what the fallback to auto above does on a heat-only air conditioner, which has no auto.
+  // Such a state is reported as the first one the device does declare — auto when it has it, since
+  // the list is sorted, and its lowest mode otherwise.
+  const readTargetState = () => {
+    const state = readReportedState();
+    if (validTargetStates.length === 0 || validTargetStates.includes(state)) {
+      return state;
+    }
+    return validTargetStates[0];
   };
 
   const readCurrentState = () => {
@@ -161,11 +178,14 @@ function buildHeaterCoolerService(service, device, features) {
       return HOMEKIT_CURRENT_HEATER_COOLER_STATE.IDLE;
     }
 
-    const targetState = readTargetState();
-    if (targetState === HOMEKIT_HEATER_COOLER_STATE.HEAT) {
+    // What the device says it is doing, not what HomeKit was told it can do: this characteristic
+    // carries no valid values of its own, so an unknown mode is better deduced below than reported
+    // as the mode the target state falls back on.
+    const reportedState = readReportedState();
+    if (reportedState === HOMEKIT_HEATER_COOLER_STATE.HEAT) {
       return HOMEKIT_CURRENT_HEATER_COOLER_STATE.HEATING;
     }
-    if (targetState === HOMEKIT_HEATER_COOLER_STATE.COOL) {
+    if (reportedState === HOMEKIT_HEATER_COOLER_STATE.COOL) {
       return HOMEKIT_CURRENT_HEATER_COOLER_STATE.COOLING;
     }
 

@@ -400,6 +400,8 @@ describe('Build heater cooler service', () => {
     await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]);
 
     expect(characteristics.TargetHeaterCoolerState.setProps.callCount).to.equal(0);
+    // with no contract set on the characteristic, the unknown mode is reported as auto as it is
+    expect(await readCharacteristic(characteristics.TargetHeaterCoolerState)).to.equal(0);
   });
 
   it('should report idle in the dry and fan modes, and auto as their target', async () => {
@@ -530,7 +532,11 @@ describe('Build heater cooler service', () => {
     );
 
     expect(characteristics.TargetHeaterCoolerState.setProps.args[0][0]).to.eql({ validValues: [1] });
-    // warmer than the setpoint, and unable to cool: idle, not cooling
+    // the unknown mode reads as auto, which this device does not have: HomeKit is told the only
+    // state it was given, not one outside the valid values it was just handed
+    expect(await readCharacteristic(characteristics.TargetHeaterCoolerState)).to.equal(1);
+    // warmer than the setpoint, and unable to cool: idle, not cooling — the current state follows
+    // the mode the device reports, not the state the target one falls back on
     expect(await readCharacteristic(characteristics.CurrentHeaterCoolerState)).to.equal(1);
 
     expect(await readCharacteristic(characteristics.HeatingThresholdTemperature)).to.equal(20);
