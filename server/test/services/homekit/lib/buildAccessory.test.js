@@ -309,6 +309,50 @@ describe('Build accessory', () => {
     expect(addService.callCount).to.equal(1);
   });
 
+  it('should build an air conditioner on its own as a heater cooler, with its temperature sensor', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Clim',
+      features: [
+        {
+          name: 'Température',
+          category: 'temperature-sensor',
+          type: 'decimal',
+        },
+        {
+          name: 'Marche',
+          category: 'air-conditioning',
+          type: 'binary',
+        },
+        {
+          name: 'Mode',
+          category: 'air-conditioning',
+          type: 'mode',
+        },
+        {
+          name: 'Consigne',
+          category: 'air-conditioning',
+          type: 'target-temperature',
+        },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    // without thermostat features the device is a HeaterCooler, so that switching it on from
+    // HomeKit is a power command and not a mode
+    expect(homekitHandler.buildService.callCount).to.equal(1);
+    expect(homekitHandler.buildService.args[0][1]).to.have.deep.members(device.features);
+    expect(homekitHandler.buildService.args[0][2].service).to.equal('HeaterCooler');
+    expect(addService.callCount).to.equal(1);
+  });
+
   it('should keep extra temperature sensors out of the thermostat service', async () => {
     homekitHandler.buildService = sinon.stub().returns('builded-service');
     const addService = sinon.stub();
