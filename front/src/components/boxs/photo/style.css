@@ -6,10 +6,11 @@
 /* Inside a stretched wrapper (the box absorbs the free height of its
    column) the image area grows with the card instead of leaving a dead
    white zone under the 400px cap. photo_fit keeps deciding cover/contain.
-   Desktop-only, like stretch itself (spec A.4): below the breakpoint the
-   columns stack, there is no leftover height to absorb, and lifting the
-   cap would let a portrait photo balloon on a phone. */
-@media (min-width: 992px) {
+   Columns breakpoint only, like stretch itself (spec A.4, 700px — see
+   routes/dashboard/style.css): below it the columns stack, there is no
+   leftover height to absorb, and lifting the cap would let a portrait
+   photo balloon on a phone. */
+@media (min-width: 700px) {
   :global(.dashboard-stretched-media) .photoContainer {
     flex: 1 1 auto;
     display: flex;

@@ -61,6 +61,16 @@ describe('gateway.sendWeeklyDigest', () => {
     assert.notCalled(gateway.buildWeeklyDigestData);
   });
 
+  it('should skip when the Gladys Plus subscription is not paid', async () => {
+    gateway.getStatus = fake.resolves({ configured: true, subscription_active: false });
+
+    const result = await sendWeeklyDigest.call(gateway);
+
+    expect(result).to.deep.equal({ sent: 0 });
+    assert.notCalled(gateway.buildWeeklyDigestData);
+    assert.notCalled(gateway.aiChat);
+  });
+
   it('should send digest to admins', async () => {
     const result = await sendWeeklyDigest.call(gateway);
 

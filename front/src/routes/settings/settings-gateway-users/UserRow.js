@@ -7,6 +7,12 @@ const UserRow = ({ children, ...props }) => {
     props.revokeUser(props.user, props.index);
   };
 
+  // The gateway only allows admins to revoke users, and never lets a user revoke themselves.
+  // Hide the button in those cases so users don't get a 403 when clicking on it.
+  const isAdmin = props.currentUser && props.currentUser.role === 'admin';
+  const isCurrentUser = props.currentUser && props.currentUser.id === props.user.id;
+  const canRevoke = isAdmin && !isCurrentUser;
+
   return (
     <tr>
       <td>
@@ -24,9 +30,7 @@ const UserRow = ({ children, ...props }) => {
       <td class="text-nowrap">
         {new Date(props.user.created_at).toLocaleDateString(props.user.language, dateDisplayOptions)}
       </td>
-      <td class="w-1">
-        <i onClick={revokeUser} class="fe fe-trash-2 cursor-pointer" />
-      </td>
+      <td class="w-1">{canRevoke && <i onClick={revokeUser} class="fe fe-trash-2 cursor-pointer" />}</td>
     </tr>
   );
 };

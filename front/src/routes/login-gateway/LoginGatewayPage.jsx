@@ -11,6 +11,9 @@ const LoginGatewayPage = ({ children, ...props }) => (
         status={props.gatewayLoginRecoveryCodesStatus}
         onRetry={props.generateRecoveryCodes}
         onContinue={props.continueAfterRecoveryCodes}
+        twoFactorCode={props.gatewayLoginRecoveryCodesTwoFactorCode}
+        onTwoFactorCodeChange={props.updateRecoveryCodesTwoFactorCode}
+        wrongTwoFactorCode={props.gatewayLoginRecoveryCodesWrongTwoFactorCode}
       />
     ) : (
       <GatewayLoginForm {...props} />

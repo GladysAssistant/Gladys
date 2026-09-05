@@ -1700,7 +1700,7 @@ class EnergyMonitoringPage extends Component {
 
         {showingPrices && !showingWizard && !showingImport && renderPrices()}
         {showingWizard && renderWizard()}
-        {showingImport && <ImportPricesPage {...props} />}
+        {showingImport && <ImportPricesPage {...props} startCreatePrice={this.startCreatePrice} />}
         {showingSettings && renderSettings()}
       </IntegrationSubPageLayout>
     );

@@ -8,13 +8,23 @@ import update from 'immutability-helper';
 class DashboardUsersPage extends Component {
   state = {
     users: [],
-    role: 'user'
+    role: 'user',
+    currentUser: null
   };
 
   getUsers = () => {
     this.props.session.gatewayClient.getUsersInAccount().then(users => {
       this.setState({ users });
     });
+  };
+
+  getCurrentUser = async () => {
+    try {
+      const currentUser = await this.props.session.gatewayClient.getMyself();
+      this.setState({ currentUser });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   inviteUser = () => {
@@ -48,13 +58,15 @@ class DashboardUsersPage extends Component {
 
   componentDidMount() {
     this.getUsers();
+    this.getCurrentUser();
   }
 
-  render({}, { users, email, role, revokeUserError }) {
+  render({}, { users, email, role, revokeUserError, currentUser }) {
     return (
       <SettingsLayout>
         <UserList
           users={users}
+          currentUser={currentUser}
           getUsers={this.getUsers}
           inviteUser={this.inviteUser}
           email={email}

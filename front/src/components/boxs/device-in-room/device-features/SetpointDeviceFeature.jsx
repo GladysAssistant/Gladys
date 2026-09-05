@@ -80,54 +80,32 @@ const SetpointDeviceFeature = ({ children, ...props }) => {
       </td>
       <td>{props.rowName}</td>
 
+      {/* One horizontal − value + capsule at every width: in a card too narrow
+          for it next to the name, the compact card mode of the device widget
+          (routes/dashboard/style.css) drops it under the name instead — which
+          replaced the stacked +/value/− variant this row used to carry for
+          the 992-1300px viewports. */}
       <td class="py-0">
         <div class="d-flex justify-content-end">
-          <div class="d-flex">
-            <div class={cx('input-group', style.setpointHorizontalControls)}>
-              <div class="input-group-prepend">
-                <button class="btn btn-outline-secondary" type="button" onClick={substract}>
-                  <Text id="dashboard.boxes.devicesInRoom.substractButton" />
-                </button>
-              </div>
-              <input
-                type="number"
-                value={props.deviceFeature.last_value}
-                class={cx('form-control text-center', style.removeNumberArrow, style.setpointValue)}
-                onChange={updateValueEvent}
-                step={SETPOINT_STEP}
-                min={props.deviceFeature.min}
-                max={props.deviceFeature.max}
-              />
-              <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" onClick={add}>
-                  <Text id="dashboard.boxes.devicesInRoom.addButton" />
-                </button>
-              </div>
+          <div class={cx('input-group', style.setpointHorizontalControls)}>
+            <div class="input-group-prepend">
+              <button class="btn btn-outline-secondary" type="button" onClick={substract}>
+                <Text id="dashboard.boxes.devicesInRoom.substractButton" />
+              </button>
             </div>
-            <div class={cx('input-group input-group-sm', style.setpointVerticalControls)}>
-              <div class="d-flex flex-column mt-2 mb-2">
-                <div class="mb-1">
-                  <button class="btn btn-block btn-sm btn-outline-secondary" type="button" onClick={add}>
-                    <Text id="dashboard.boxes.devicesInRoom.addButton" />
-                  </button>
-                </div>
-                <div>
-                  <input
-                    type="number"
-                    value={props.deviceFeature.last_value}
-                    class={cx('form-control text-center input-sm', style.removeNumberArrow)}
-                    onChange={updateValueEvent}
-                    step={SETPOINT_STEP}
-                    min={props.deviceFeature.min}
-                    max={props.deviceFeature.max}
-                  />
-                </div>
-                <div class="mt-1">
-                  <button class="btn btn-block btn-sm btn-outline-secondary" type="button" onClick={substract}>
-                    <Text id="dashboard.boxes.devicesInRoom.substractButton" />
-                  </button>
-                </div>
-              </div>
+            <input
+              type="number"
+              value={props.deviceFeature.last_value}
+              class={cx('form-control text-center', style.removeNumberArrow, style.setpointValue)}
+              onChange={updateValueEvent}
+              step={SETPOINT_STEP}
+              min={props.deviceFeature.min}
+              max={props.deviceFeature.max}
+            />
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" onClick={add}>
+                <Text id="dashboard.boxes.devicesInRoom.addButton" />
+              </button>
             </div>
           </div>
         </div>

@@ -749,6 +749,7 @@
         "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfen Sie, ob es von einer anderen App verwendet wird.",
         "errorNoSpeech": "Keine Stimme erkannt. Prüfen Sie, ob Ihr Mikrofon aktiviert ist, und versuchen Sie es erneut.",
         "errorNoTranscription": "Ich habe Ihre Nachricht nicht verstanden. Sprechen Sie näher ans Mikrofon und versuchen Sie es erneut.",
+        "errorPaymentRequired": "Dein Gladys-Plus-Abonnement ist ausgesetzt: Eine Zahlung ist erforderlich. Der Sprachassistent ist bis zur Zahlung pausiert.",
         "configDescription": "Dieses Widget nutzt Gladys Plus für Spracherkennung, KI und Sprachausgabe. Verbinden Sie Ihre Instanz mit Gladys Plus, um es zu nutzen.",
         "plusRequiredHint": "Gladys Plus verbinden, um das Mikrofon zu aktivieren."
       },
@@ -815,7 +816,8 @@
         "uploading": "Wird hochgeladen...",
         "uploadError": "Das Bild konnte nicht hochgeladen werden. Versuchen Sie ein kleineres Bild.",
         "editPinsLabel": "Live-Werte auf dem Bild",
-        "editPinsDescription": "Klicken Sie auf das Bild, um einen Pin zu setzen, und wählen Sie dann die Gerätefunktion aus. Zum Verschieben einen Pin entfernen und neu setzen.",
+        "editPinsDescription": "Klicken Sie auf das Bild, um einen Pin zu setzen, und wählen Sie dann die Gerätefunktion aus. Ziehen Sie einen Pin, um ihn zu verschieben, oder wählen Sie ihn aus und nutzen Sie die Pfeiltasten.",
+        "editPinMoveHelp": "Ziehen Sie diesen Pin, um ihn zu verschieben, oder nutzen Sie die Pfeiltasten",
         "editPinLabel": "Pin {{index}}",
         "editPinFeatureLabel": "Gerätefunktion",
         "editPinLabelLabel": "Beschriftung (optional)",
@@ -1430,6 +1432,12 @@
       "importPricesButton": "Tarife importieren",
       "importSuccess": "Tarife erfolgreich importiert!",
       "errorLoadingContracts": "Fehler beim Laden der Verträge",
+      "contractNotListedTitle": "Ihr Vertrag ist nicht in der Liste?",
+      "contractNotListedDescription": "Diese Vertragsliste wird von der Gladys-Community gepflegt. Wenn Ihr Energieanbieter oder Ihr Vertrag fehlt, haben Sie zwei Möglichkeiten:",
+      "contractNotListedShare": "Schlagen Sie Ihren Vertrag der Community im Repository der Energieverträge vor. Gladys lädt diese Liste direkt aus diesem Repository herunter: Sobald Ihr Vertrag dort hinzugefügt wurde, erscheint er hier, ohne dass Gladys aktualisiert werden muss.",
+      "contractNotListedShareButton": "Einen Vertrag auf GitHub vorschlagen",
+      "contractNotListedCreate": "Oder erstellen Sie Ihren Vertrag selbst in Gladys mit der Schaltfläche „Erstellen“. Er existiert nur in Ihrer Gladys-Installation und Sie können ihn jederzeit ändern.",
+      "contractNotListedCreateButton": "Einen Vertrag manuell erstellen",
       "availablePowers": "Verfügbare Leistungen",
       "contractId": "Vertrags-ID",
       "hourSlotsRequiredInfo": "Dieser Vertrag erfordert die Angabe der Hauptzeiten für Ihren Standort. Die verbleibenden Stunden werden als Nebenzeiten betrachtet.",
@@ -4498,7 +4506,13 @@
     "gatewayConnectedSuccessDescription": "Dein Gladys wurde erfolgreich verbunden.",
     "gatewayConnectedSuccessBackupKey": "Es wird täglich automatisch ein Backup erstellt, verschlüsselt mit dem folgenden Schlüssel. Damit du dein Gladys später wiederherstellen kannst, bewahre bitte diesen Verschlüsselungsschlüssel an einem sicheren Ort außerhalb von Gladys auf. Ohne diesen Schlüssel kannst du Gladys nicht wiederherstellen.",
     "gatewayConnectedSuccessButton": "Ich habe den Backup-Schlüssel sicher aufbewahrt!",
-    "accountExpired": "Dein Gladys-Plus-Account ist abgelaufen. Um dein Abonnement zu verlängern, gehe zum Tab \"<a href=\"/dashboard/settings/billing\">Abrechnung</a>\"."
+    "accountExpired": "Dein Gladys-Plus-Account ist abgelaufen. Um dein Abonnement zu verlängern, gehe zum Tab \"<a href=\"/dashboard/settings/billing\">Abrechnung</a>\".",
+    "subscriptionPaymentRequiredTitle": "Gladys-Plus-Abonnement ausgesetzt: Zahlung erforderlich",
+    "subscriptionPaymentRequiredText": "Gladys Plus hat die letzten Anfragen deiner Instanz abgelehnt, weil dein Abonnement nicht bezahlt ist. Backups, die Enedis-Synchronisation und die KI-Funktionen sind so lange pausiert. Es geht nichts verloren: Aktualisiere deine Zahlungsmethode in deinem Gladys-Plus-Konto und prüfe dann hier erneut. Deine Instanz prüft außerdem einmal täglich von selbst.",
+    "subscriptionOpenBilling": "Zahlungsmethode aktualisieren",
+    "subscriptionCheckAgain": "Erneut prüfen",
+    "subscriptionStillNotPaid": "Gladys Plus meldet weiterhin, dass eine Zahlung erforderlich ist. Nach Zahlungseingang kann es einige Minuten dauern, bis sie berücksichtigt wird.",
+    "subscriptionCheckError": "Das Abonnement konnte bei Gladys Plus nicht geprüft werden: Bitte überprüfe deine Internetverbindung und versuche es erneut."
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
@@ -4710,7 +4724,8 @@
     "generateButton": "Wiederherstellungscodes erzeugen",
     "confirmGenerateButton": "Neue Codes erzeugen",
     "rotationWarning": "Ein neuer Satz macht die Wiederherstellungscodes, die du eventuell schon hast, sofort ungültig. Nur die neuen funktionieren.",
-    "continueButton": "Weiter"
+    "continueButton": "Weiter",
+    "twoFactorCodeRequired": "Gib einen Code aus deiner Zwei-Faktor-App ein: Das Gateway verlangt ihn, um Wiederherstellungscodes zu erzeugen."
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Zwei-Faktor-Authentifizierung (2FA) konfigurieren",
@@ -6232,6 +6247,7 @@
       "errorNoMicrophone": "Kein Mikrofon erkannt. Schließe eines an oder aktiviere es in den Systemeinstellungen.",
       "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfe, ob es von einer anderen App verwendet wird.",
       "errorNoTranscription": "Ich habe deine Nachricht nicht verstanden. Sprich näher ans Mikrofon und versuche es erneut.",
+      "errorPaymentRequired": "Dein Gladys-Plus-Abonnement ist ausgesetzt: Eine Zahlung ist erforderlich. Der Sprachassistent ist bis zur Zahlung pausiert.",
       "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar."
     }
   },
@@ -6330,6 +6346,11 @@
       "other": "Gladys-Plus-Testphase: noch {{count}} Tage"
     },
     "trialAddPaymentMethod": "Zahlungsmethode hinzufügen",
+    "subscriptionNoticeTitle": "Gladys Plus ausgesetzt",
+    "subscriptionNoticeText": "Eine Zahlung ist erforderlich: Backups, die Enedis-Synchronisation und die KI-Funktionen sind pausiert, bis das Abonnement bezahlt ist.",
+    "subscriptionNoticeButton": "Zahlungsmethode aktualisieren",
+    "subscriptionNoticeCheck": "Abonnement prüfen",
+    "subscriptionNoticeContactAdmin": "Bitte wende dich an den Administrator deines Gladys-Plus-Kontos.",
     "instanceUpdateNoticeTitle": "Update verfügbar",
     "instanceUpdateNoticeText": "Gladys Plus wurde auf {{latestVersion}} aktualisiert, deine Instanz ist aber noch auf {{instanceVersion}}. Einige Funktionen können fehlerhaft sein, bis deine Instanz aktualisiert ist.",
     "instanceUpdateNoticeButton": "Meine Instanz aktualisieren",

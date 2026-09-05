@@ -6,6 +6,7 @@ mqtt:
 serial:
   port: /dev/ttyACM0
   adapter: deconz
+  baudrate: 38400
 map_options:
   graphviz:
     colors:

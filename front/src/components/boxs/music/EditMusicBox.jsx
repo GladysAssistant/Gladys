@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
-import Select from 'react-select';
-import closeMenuOnScroll from '../../../utils/closeMenuOnScroll';
+import Select from '../../form/Select';
 import { connect } from 'unistore/preact';
 
 import BaseEditBox from '../baseEditBox';
@@ -56,9 +55,6 @@ class EditMusicBoxComponent extends Component {
             <Text id="dashboard.boxes.music.selectDeviceLabel" />
           </label>
           <Select
-            menuPlacement="auto"
-            menuPortalTarget={document.body}
-            closeMenuOnScroll={closeMenuOnScroll}
             defaultValue={null}
             value={optionSelected}
             onChange={this.updateDevice}

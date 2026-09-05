@@ -2,6 +2,8 @@ const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 const path = require('path');
+const os = require('os');
+const fse = require('fs-extra');
 
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 const getConfig = require('../../../utils/getConfig');
@@ -111,6 +113,47 @@ describe('gateway.downloadBackup', () => {
 
   it('should reject backup with nested path traversal (folder/../../etc/passwd)', async () => {
     const maliciousBackupFilePath = path.join(__dirname, 'malicious-backup-nested-traversal.tar.gz.enc');
+    try {
+      await gateway.downloadBackup(maliciousBackupFilePath);
+      assert.fail('Should have thrown BACKUP_CONTAINS_UNSAFE_PATHS');
+    } catch (e) {
+      expect(e.message).to.equal('BACKUP_CONTAINS_UNSAFE_PATHS');
+    }
+    assert.notCalled(event.emit);
+  });
+
+  // The name of the downloaded file is chosen by whoever calls the restore route,
+  // and it used to be interpolated into a shell command (`gzip -dc <name> > <name>`).
+  // A name carrying a command substitution was therefore executed by /bin/sh.
+  it('should reject a backup whose file name carries a shell command, without running it', async () => {
+    const workingFolder = await fse.mkdtemp(path.join(os.tmpdir(), 'gladys-backup-name-'));
+    const markerPath = path.join(workingFolder, 'rce-marker');
+    try {
+      // a real backup, renamed the way an attacker would name theirs
+      const maliciousName = `evil$(touch ${markerPath}).enc`;
+      const maliciousBackupFilePath = path.join(workingFolder, maliciousName);
+      await fse.copy(path.join(__dirname, 'encoded-old-gladys-db-backup.db.gz.enc'), maliciousBackupFilePath);
+
+      try {
+        await gateway.downloadBackup(maliciousBackupFilePath);
+        assert.fail('Should have thrown BACKUP_UNSAFE_FILE_NAME');
+      } catch (e) {
+        expect(e.message).to.equal('BACKUP_UNSAFE_FILE_NAME');
+      }
+
+      // the command inside the file name must never have been executed
+      expect(await fse.pathExists(markerPath)).to.equal(false);
+      assert.notCalled(event.emit);
+    } finally {
+      await fse.remove(workingFolder);
+    }
+  });
+
+  // Same escape, one layer deeper: the archive is valid and passes the traversal
+  // and symlink checks, but the name of the file it contains ends up in the
+  // sqlite3 and DuckDB commands of the restore.
+  it('should reject a backup whose archive entry carries a shell command', async () => {
+    const maliciousBackupFilePath = path.join(__dirname, 'malicious-backup-shell-metacharacters.tar.gz.enc');
     try {
       await gateway.downloadBackup(maliciousBackupFilePath);
       assert.fail('Should have thrown BACKUP_CONTAINS_UNSAFE_PATHS');
