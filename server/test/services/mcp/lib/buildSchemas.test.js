@@ -631,12 +631,14 @@ describe('build schemas', () => {
     expect(tools[1].intent).to.eq('scene.create');
     expect(tools[1].config.title).to.eq('Create scene');
     expect(tools[1].config.description).to.eq(SCENE_CREATE_TOOL_DESCRIPTION);
+    expect(tools[1].config.description).to.include('Gladys AI');
+    expect(tools[1].config.inputSchema.tags.description).to.include('Gladys AI');
     const sceneCreatedResult = await tools[1].cb({
       name: 'MCP Generated Scene',
       icon: 'bell',
       triggers: [{ type: 'system.start' }],
       actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
-      tags: [{ name: 'ai-generated' }, { name: 'Gladys AI' }],
+      tags: [{ name: 'ai-generated' }],
     });
     expect(mcpHandler.gladys.scene.create.callCount).to.eq(1);
     expect(mcpHandler.gladys.scene.create.firstCall.args[0].tags).to.deep.equal([

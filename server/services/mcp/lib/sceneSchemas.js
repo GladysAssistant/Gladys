@@ -621,7 +621,9 @@ function createSceneCreateInputSchema(
         }),
       )
       .default([])
-      .describe('Optional scene tags.'),
+      .describe(
+        'Optional user-requested scene tags. Do not add a tag to mark AI authorship; Gladys automatically adds "Gladys AI".',
+      ),
   });
 }
 
@@ -720,7 +722,7 @@ function formatSceneCreateZodIssue(issue, rawScene) {
 }
 
 const SCENE_CREATE_TOOL_DESCRIPTION =
-  'Create a new home automation scene. The payload MUST have two separate top-level arrays: triggers (when the scene starts) and actions (what the scene does). NEVER put device.new-state, time.changed, time.sunrise or any trigger type inside actions. device.new-state belongs in triggers with numeric value (1=ON, 0=OFF). actions is nested groups only: [[group1],[group2]]. Example: {"name":"Switchbeau de ville","icon":"droplet","triggers":[{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}],"actions":[[{"type":"delay","unit":"minutes","value":45}],[{"type":"device.get-value","device_feature":"mqtt-co2"}],[{"type":"condition.only-continue-if","conditions":[{"variable":"1.0.last_value","operator":">","value":2400}]}],[{"type":"light.turn-off","devices":["mqtt-lumiere"]}]]}';
+  'Create a new home automation scene. Gladys automatically adds the "Gladys AI" tag; do not add another tag to mark AI authorship. The payload MUST have two separate top-level arrays: triggers (when the scene starts) and actions (what the scene does). NEVER put device.new-state, time.changed, time.sunrise or any trigger type inside actions. device.new-state belongs in triggers with numeric value (1=ON, 0=OFF). actions is nested groups only: [[group1],[group2]]. Example: {"name":"Switchbeau de ville","icon":"droplet","triggers":[{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}],"actions":[[{"type":"delay","unit":"minutes","value":45}],[{"type":"device.get-value","device_feature":"mqtt-co2"}],[{"type":"condition.only-continue-if","conditions":[{"variable":"1.0.last_value","operator":">","value":2400}]}],[{"type":"light.turn-off","devices":["mqtt-lumiere"]}]]}';
 
 module.exports = {
   createSceneCreateInputSchema,

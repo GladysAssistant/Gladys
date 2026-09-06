@@ -1,4 +1,6 @@
 const sinon = require('sinon').createSandbox();
+const fs = require('fs');
+const path = require('path');
 
 const { fake, stub, assert, match } = sinon;
 const { expect } = require('chai');
@@ -84,6 +86,16 @@ function buildContext({
 describe('gateway.forwardMessageToAiChat', () => {
   beforeEach(() => {
     resizeImageMock.resetHistory();
+  });
+
+  it('should tell the model that Gladys adds the AI scene tag automatically', () => {
+    const scenesPrompt = fs.readFileSync(
+      path.join(__dirname, '../../../config/prompts/aiChatScenes.prompt.txt'),
+      'utf8',
+    );
+
+    expect(scenesPrompt).to.include('Do not add a tag to identify a scene as AI-created.');
+    expect(scenesPrompt).to.include('Gladys automatically adds the `Gladys AI` tag.');
   });
 
   it('should build system prompt with current date and time in the configured timezone', () => {
