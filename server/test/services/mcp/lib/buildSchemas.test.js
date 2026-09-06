@@ -636,9 +636,13 @@ describe('build schemas', () => {
       icon: 'bell',
       triggers: [{ type: 'system.start' }],
       actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
-      tags: [{ name: 'ai-generated' }],
+      tags: [{ name: 'ai-generated' }, { name: 'Gladys AI' }],
     });
     expect(mcpHandler.gladys.scene.create.callCount).to.eq(1);
+    expect(mcpHandler.gladys.scene.create.firstCall.args[0].tags).to.deep.equal([
+      { name: 'ai-generated' },
+      { name: 'Gladys AI' },
+    ]);
     expect(sceneCreatedResult.content[0].text).to.eq('toonmockdata');
 
     let flatActionsError = null;

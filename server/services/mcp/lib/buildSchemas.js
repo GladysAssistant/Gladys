@@ -24,6 +24,7 @@ const { compareTimes } = require('./compareTimes');
 const { formatWeather } = require('./formatWeather');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
+const AI_CREATED_SCENE_TAG = 'Gladys AI';
 
 const noRoom = {
   id: null,
@@ -494,9 +495,12 @@ async function getAllTools(userId) {
         try {
           assertTriggerTypesNotInActions(scene);
           const parsedScene = sceneCreateInputSchema.parse(scene);
+          const sceneTags = new Map(parsedScene.tags.map((tag) => [tag.name, tag]));
+          sceneTags.set(AI_CREATED_SCENE_TAG, { name: AI_CREATED_SCENE_TAG });
           const createdScene = await this.gladys.scene.create({
             ...parsedScene,
             actions: parsedScene.actions,
+            tags: Array.from(sceneTags.values()),
           });
 
           return {
