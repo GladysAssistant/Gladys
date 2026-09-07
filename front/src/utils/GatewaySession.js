@@ -1,4 +1,5 @@
 import GladysGatewayClient from '@gladysassistant/gladys-gateway-js';
+import gatewayRequest from '@gladysassistant/gladys-gateway-js/lib/request';
 
 import config from '../config';
 import { Dispatcher } from './Dispatcher';
@@ -82,6 +83,13 @@ class GatewaySession {
 
   async getGatewayUser() {
     return this.gatewayClient.getMyself();
+  }
+
+  // Fields of the Gladys Plus user the client library has no method for (the
+  // instance offline alert for instance). Same request helper as the client:
+  // access token of the session, refreshed on 401.
+  async updateGatewayUser(fields) {
+    return gatewayRequest.patch(`${this.gladysGatewayApiUrl}/users/me`, fields, this.gatewayClient);
   }
 
   saveLoginInformations(data) {

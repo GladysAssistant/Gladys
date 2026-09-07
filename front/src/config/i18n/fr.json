@@ -4512,7 +4512,17 @@
     "subscriptionOpenBilling": "Mettre à jour mon moyen de paiement",
     "subscriptionCheckAgain": "Revérifier",
     "subscriptionStillNotPaid": "Gladys Plus indique toujours qu'un paiement est requis. Une fois le paiement reçu, quelques minutes peuvent être nécessaires avant sa prise en compte.",
-    "subscriptionCheckError": "Impossible de vérifier l'abonnement auprès de Gladys Plus : vérifiez votre connexion internet puis réessayez."
+    "subscriptionCheckError": "Impossible de vérifier l'abonnement auprès de Gladys Plus : vérifiez votre connexion internet puis réessayez.",
+    "instanceOfflineAlertTitle": "Être prévenu quand Gladys est hors ligne",
+    "instanceOfflineAlertDescription": "Gladys Plus voit votre instance se connecter et se déconnecter : si elle reste injoignable (coupure de courant, box internet plantée, carte SD morte…) plus longtemps que le délai choisi, Gladys Plus vous envoie un email, puis un second quand elle est de retour en ligne. Ce réglage est personnel : chaque utilisateur Gladys Plus du compte le choisit pour lui-même.",
+    "instanceOfflineAlertLocalModeNotice": "Ce réglage appartient à votre compte Gladys Plus : ouvrez cette page depuis Gladys Plus pour le modifier.",
+    "instanceOfflineAlertOpenGladysPlus": "Ouvrir Gladys Plus",
+    "instanceOfflineAlertLoadError": "Impossible de charger vos préférences Gladys Plus : vérifiez votre connexion internet puis réessayez.",
+    "instanceOfflineAlertEnabledLabel": "M'envoyer un email à {{email}} quand ma Gladys est hors ligne",
+    "instanceOfflineAlertDelayLabel": "Me prévenir après",
+    "instanceOfflineAlertDelayHelp": "Assez court pour être utile, assez long pour ne pas être réveillé par une box qui redémarre. Gladys Plus vérifie toutes les quelques minutes : l'email peut partir quelques minutes après ce délai.",
+    "instanceOfflineAlertSaved": "Enregistré.",
+    "instanceOfflineAlertSaveError": "Impossible d'enregistrer ce réglage : vérifiez votre connexion internet puis réessayez."
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
