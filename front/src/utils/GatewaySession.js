@@ -85,10 +85,19 @@ class GatewaySession {
     return this.gatewayClient.getMyself();
   }
 
-  // Fields of the Gladys Plus user the client library has no method for (the
-  // instance offline alert for instance). Same request helper as the client:
-  // access token of the session, refreshed on 401.
-  async updateGatewayUser(fields) {
+  // "Email me when my Gladys is offline" preference of the Gladys Plus user. The
+  // client library has no method for these two fields yet, so the request goes
+  // through its request helper (access token of the session, refreshed on 401).
+  // Only these two fields are sent: name, email and language keep going through
+  // updateMyself, which asks for the two-factor code on an email change.
+  async updateInstanceOfflineAlert({ enabled, delayInMinutes }) {
+    const fields = {};
+    if (enabled !== undefined) {
+      fields.instance_offline_alert_enabled = enabled;
+    }
+    if (delayInMinutes !== undefined) {
+      fields.instance_offline_alert_delay_in_minutes = delayInMinutes;
+    }
     return gatewayRequest.patch(`${this.gladysGatewayApiUrl}/users/me`, fields, this.gatewayClient);
   }
 

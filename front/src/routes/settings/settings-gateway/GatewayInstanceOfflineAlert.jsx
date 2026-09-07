@@ -41,7 +41,7 @@ class GatewayInstanceOfflineAlert extends Component {
   save = async fields => {
     this.setState({ saveStatus: RequestStatus.Getting });
     try {
-      const updatedUser = await this.props.session.updateGatewayUser(fields);
+      const updatedUser = await this.props.session.updateInstanceOfflineAlert(fields);
       this.setState(({ user }) => ({
         user: Object.assign({}, user, updatedUser),
         saveStatus: RequestStatus.Success
@@ -53,11 +53,11 @@ class GatewayInstanceOfflineAlert extends Component {
   };
 
   toggleEnabled = () => {
-    this.save({ instance_offline_alert_enabled: !this.state.user.instance_offline_alert_enabled });
+    this.save({ enabled: !this.state.user.instance_offline_alert_enabled });
   };
 
   updateDelay = e => {
-    this.save({ instance_offline_alert_delay_in_minutes: parseInt(e.target.value, 10) });
+    this.save({ delayInMinutes: parseInt(e.target.value, 10) });
   };
 
   componentDidMount() {
