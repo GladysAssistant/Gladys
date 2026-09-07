@@ -36,7 +36,7 @@ const DEVICE_EDIT_LINKS = {
  * - name: raw name to display when there is no translation
  * - external: true for a community integration (own group in the filter)
  * - discriminant: technical identity, displayed only when two integrations
- *   share the same name (see disambiguateIntegrationNames)
+ *   share the same name (see utils/integrationNames)
  * - url: integration page listing the devices
  * - deviceUrl: most specific page for this device in its integration
  */
@@ -78,40 +78,4 @@ export function getDeviceIntegration(device) {
     url,
     deviceUrl: buildDeviceLink ? buildDeviceLink(device.selector) : url
   };
-}
-
-/**
- * Two community integrations can display the same name (two repositories
- * publishing a manifest with the same name, or two dev installs of the same
- * integration): those are the only ones that carry their technical identity
- * next to their name, so the common case stays readable. Built-in integrations
- * have unique names, and are told apart from community ones by their own group
- * in the filter and by the "community" tag in the list.
- * @param {Array} integrations - Integrations of the listed devices, with duplicates.
- * @returns {Map} Name to display, by integration slug.
- */
-export function disambiguateIntegrationNames(integrations) {
-  // names are compared lowercased: two manifests differing only by case read
-  // as the same name in the list
-  const slugsByName = new Map();
-  integrations.forEach(integration => {
-    if (integration && integration.external) {
-      const key = integration.name.toLowerCase();
-      const slugs = slugsByName.get(key) || new Set();
-      slugs.add(integration.slug);
-      slugsByName.set(key, slugs);
-    }
-  });
-  const nameBySlug = new Map();
-  integrations.forEach(integration => {
-    if (!integration || nameBySlug.has(integration.slug)) {
-      return;
-    }
-    const isDuplicated = integration.external && slugsByName.get(integration.name.toLowerCase()).size > 1;
-    nameBySlug.set(
-      integration.slug,
-      isDuplicated ? `${integration.name} (${integration.discriminant})` : integration.name
-    );
-  });
-  return nameBySlug;
 }
