@@ -4,7 +4,7 @@ import cx from 'classnames';
 import config from '../../../config';
 import { RequestStatus } from '../../../utils/consts';
 
-// The setting lives on the Gladys Plus user, so it is edited from Gladys Plus
+// The setting lives on the Gladys Plus account, so it is edited from Gladys Plus
 export const GLADYS_PLUS_SETTINGS_URL = 'https://plus.gladysassistant.com/dashboard/settings/gateway';
 
 // Delays offered in the select, in minutes. Gladys Plus accepts anything from 5
