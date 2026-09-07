@@ -41,12 +41,17 @@ class GatewayInstanceOfflineAlert extends Component {
   save = async fields => {
     this.setState({ saveStatus: RequestStatus.Getting });
     try {
-      const settings = await this.props.session.updateInstanceOfflineAlert(fields);
+      const settings = (await this.props.session.updateInstanceOfflineAlert(fields)) || {};
+      // Gladys Plus answers with both fields; a field it would leave out keeps its value
+      const changes = {};
+      if (settings.enabled !== undefined) {
+        changes.instance_offline_alert_enabled = settings.enabled;
+      }
+      if (settings.delay_in_minutes !== undefined) {
+        changes.instance_offline_alert_delay_in_minutes = settings.delay_in_minutes;
+      }
       this.setState(({ user }) => ({
-        user: Object.assign({}, user, {
-          instance_offline_alert_enabled: settings.enabled,
-          instance_offline_alert_delay_in_minutes: settings.delay_in_minutes
-        }),
+        user: Object.assign({}, user, changes),
         saveStatus: RequestStatus.Success
       }));
     } catch (e) {
