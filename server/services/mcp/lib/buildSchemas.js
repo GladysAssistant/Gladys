@@ -6,6 +6,7 @@ const {
   DEVICE_FEATURE_UNITS,
   COVER_STATE,
   AI_CHAT_TOOL_CATEGORIES,
+  AI_GENERATED_SCENE_TAG,
   WEATHER_UNITS,
 } = require('../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
@@ -24,6 +25,25 @@ const { compareTimes } = require('./compareTimes');
 const { formatWeather } = require('./formatWeather');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
+
+/**
+ * @description Add the "created by AI" tag to the tags of a scene created by the AI.
+ * Tags are deduplicated because t_tag_scene has a composite primary key
+ * (scene_id, name): inserting the same name twice would fail. The AI tag is always
+ * stored with its canonical casing, because the scene list filters on an exact name.
+ * @param {Array} [tags] - Tags provided by the model.
+ * @returns {Array} Tags including the AI generated scene tag.
+ * @example
+ * withAiGeneratedTag([{ name: 'lights' }]);
+ */
+function withAiGeneratedTag(tags) {
+  const tagsByName = new Map();
+  (tags || []).forEach((tag) => {
+    tagsByName.set(tag.name.toLowerCase(), tag);
+  });
+  tagsByName.set(AI_GENERATED_SCENE_TAG.toLowerCase(), { name: AI_GENERATED_SCENE_TAG });
+  return [...tagsByName.values()];
+}
 
 const noRoom = {
   id: null,
@@ -497,6 +517,7 @@ async function getAllTools(userId) {
           const createdScene = await this.gladys.scene.create({
             ...parsedScene,
             actions: parsedScene.actions,
+            tags: withAiGeneratedTag(parsedScene.tags),
           });
 
           return {

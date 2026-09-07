@@ -2,6 +2,8 @@ const { expect } = require('chai');
 const Promise = require('bluebird');
 const EventEmitter = require('events');
 const SceneManager = require('../../../lib/scene');
+const db = require('../../../models');
+const { AI_GENERATED_SCENE_TAG } = require('../../../utils/constants');
 
 const event = new EventEmitter();
 
@@ -89,6 +91,38 @@ describe('SceneManager.get', () => {
         updated_at: new Date('2022-04-15T07:49:07.556Z'),
       },
     ]);
+  });
+
+  it('should search scene by an exact tag name only', async () => {
+    // "Maison" contains "ai": a substring match would return it as well, and the
+    // AND semantics between tag groups would then hide the scene actually tagged AI.
+    await db.TagScene.create({ scene_id: '3a30636c-b3f0-4251-a347-90787f0fe940', name: AI_GENERATED_SCENE_TAG });
+    await db.TagScene.create({ scene_id: '88428a7d-ea9d-46a6-b0d2-46bf82d37e53', name: 'Maison' });
+
+    const sceneManager = new SceneManager({}, event);
+    const scenes = await sceneManager.get({
+      searchTags: AI_GENERATED_SCENE_TAG,
+    });
+    expect(scenes).to.be.instanceOf(Array);
+    expect(scenes.map((scene) => scene.selector)).to.deep.equal(['test-scene']);
+  });
+
+  it('should return 0 scene when searching a partial tag name', async () => {
+    const sceneManager = new SceneManager({}, event);
+    const scenes = await sceneManager.get({
+      searchTags: 'tag',
+    });
+    expect(scenes).to.be.instanceOf(Array);
+    expect(scenes).to.deep.equal([]);
+  });
+
+  it('should return 0 scene when searching an unknown tag', async () => {
+    const sceneManager = new SceneManager({}, event);
+    const scenes = await sceneManager.get({
+      searchTags: `tag 1,${AI_GENERATED_SCENE_TAG}`,
+    });
+    expect(scenes).to.be.instanceOf(Array);
+    expect(scenes).to.deep.equal([]);
   });
 
   it('should return 0 result in search', async () => {

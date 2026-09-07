@@ -62,16 +62,24 @@ async function get(options) {
   if (optionsWithDefault.searchTags) {
     const tags = optionsWithDefault.searchTags.split(',');
 
+    // Exact match on the tag name: a partial match would make a short tag
+    // like "AI" also select every tag containing it ("Maison", "Salaire", ...),
+    // and those unrelated groups would then be intersected below.
     const sceneIdsAndNames = (
       await db.TagScene.findAll({
         fields: ['name', 'scene_id'],
         where: {
-          [Op.or]: tags.map((tag) => ({ name: { [Op.like]: `%${tag}%` } })),
+          name: { [Op.in]: tags },
         },
       })
     ).map((tag) => tag.get({ plain: true }));
 
+    // Every requested tag gets its own group, even when no scene carries it,
+    // so the intersection below keeps its AND semantics.
     const tagsWithSceneId = {};
+    tags.forEach((tag) => {
+      tagsWithSceneId[tag] = [];
+    });
     sceneIdsAndNames.forEach((sceneIdAndName) => {
       if (sceneIdAndName.name in tagsWithSceneId === false) {
         tagsWithSceneId[sceneIdAndName.name] = [];

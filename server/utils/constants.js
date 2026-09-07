@@ -2223,6 +2223,10 @@ const AI_CHAT_PURPOSES = {
   WEEKLY_DIGEST: 'weekly-digest',
 };
 
+// Tag automatically added to every scene created by the AI through the
+// scene.create tool, so those scenes can be found back in the scene list.
+const AI_GENERATED_SCENE_TAG = 'AI';
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -2382,6 +2386,7 @@ module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
 module.exports.AI_CHAT_TOOL_CATEGORIES = AI_CHAT_TOOL_CATEGORIES;
 module.exports.AI_CHAT_TOOL_CATEGORIES_LIST = AI_CHAT_TOOL_CATEGORIES_LIST;
 module.exports.AI_CHAT_PURPOSES = AI_CHAT_PURPOSES;
+module.exports.AI_GENERATED_SCENE_TAG = AI_GENERATED_SCENE_TAG;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;
