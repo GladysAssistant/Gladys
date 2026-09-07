@@ -15,10 +15,10 @@ const DELAY_OPTIONS_IN_MINUTES = [10, 30, 60, 120, 360, 720, 1440];
 const formatDelay = delayInMinutes =>
   delayInMinutes < 60 ? `${delayInMinutes} min` : `${Math.round((delayInMinutes / 60) * 10) / 10} h`;
 
-// "Is my Gladys alive?": Gladys Plus emails the user when the instance has been
-// unreachable for longer than the delay, and again when it is back. The setting
-// is per Gladys Plus user (each one receives the emails at his own address), so
-// it is read and written on the Gladys Plus user: only the gateway mode has that
+// "Is my Gladys alive?": Gladys Plus emails the admins of the account when the
+// instance has been unreachable for longer than the delay, and again when it is
+// back. The setting belongs to the Gladys Plus account and is changed by its
+// admins, with the Gladys Plus user session: only the gateway mode has that
 // session. In local mode the card explains where to change it.
 class GatewayInstanceOfflineAlert extends Component {
   state = {
@@ -41,9 +41,12 @@ class GatewayInstanceOfflineAlert extends Component {
   save = async fields => {
     this.setState({ saveStatus: RequestStatus.Getting });
     try {
-      const updatedUser = await this.props.session.updateInstanceOfflineAlert(fields);
+      const settings = await this.props.session.updateInstanceOfflineAlert(fields);
       this.setState(({ user }) => ({
-        user: Object.assign({}, user, updatedUser),
+        user: Object.assign({}, user, {
+          instance_offline_alert_enabled: settings.enabled,
+          instance_offline_alert_delay_in_minutes: settings.delay_in_minutes
+        }),
         saveStatus: RequestStatus.Success
       }));
     } catch (e) {
@@ -73,6 +76,9 @@ class GatewayInstanceOfflineAlert extends Component {
         ? [...DELAY_OPTIONS_IN_MINUTES, currentDelay].sort((a, b) => a - b)
         : DELAY_OPTIONS_IN_MINUTES;
     const saving = saveStatus === RequestStatus.Getting;
+    // the Gladys Plus role, not the local one: only a Plus admin can change the account
+    const isPlusAdmin = user && user.role === 'admin';
+    const disabled = saving || !isPlusAdmin;
     return (
       <div class="card" data-cy="gateway-instance-offline-alert">
         <div class="card-header">
@@ -105,6 +111,11 @@ class GatewayInstanceOfflineAlert extends Component {
               )}
               {config.gatewayMode && user && (
                 <div>
+                  {!isPlusAdmin && (
+                    <div class="alert alert-info">
+                      <Text id="gateway.instanceOfflineAlertAdminOnly" />
+                    </div>
+                  )}
                   <div class="form-group">
                     <label class="custom-switch">
                       <input
@@ -112,12 +123,12 @@ class GatewayInstanceOfflineAlert extends Component {
                         class="custom-switch-input"
                         checked={user.instance_offline_alert_enabled}
                         onChange={this.toggleEnabled}
-                        disabled={saving}
+                        disabled={disabled}
                         data-cy="gateway-instance-offline-alert-switch"
                       />
                       <span class="custom-switch-indicator" />
                       <span class="custom-switch-description">
-                        <Text id="gateway.instanceOfflineAlertEnabledLabel" fields={{ email: user.email }} />
+                        <Text id="gateway.instanceOfflineAlertEnabledLabel" />
                       </span>
                     </label>
                   </div>
@@ -131,7 +142,7 @@ class GatewayInstanceOfflineAlert extends Component {
                         class="form-control"
                         value={currentDelay}
                         onChange={this.updateDelay}
-                        disabled={saving}
+                        disabled={disabled}
                         data-cy="gateway-instance-offline-alert-delay"
                       >
                         {delayOptions.map(delay => (
