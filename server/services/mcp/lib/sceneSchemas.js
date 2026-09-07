@@ -621,7 +621,7 @@ function createSceneCreateInputSchema(
         }),
       )
       .default([])
-      .describe('Optional scene tags.'),
+      .describe('Optional scene tags. Do not add a tag saying the scene was created by an AI, Gladys adds it itself.'),
   });
 }
 
