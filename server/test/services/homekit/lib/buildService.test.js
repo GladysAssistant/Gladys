@@ -2137,21 +2137,24 @@ describe('Build service', () => {
     const { hap, characteristics } = buildThermostatHapStub();
     homekitHandler.hap = hap;
 
-    // an air conditioner exposing only an on/off command has nothing to back TargetTemperature,
-    // and binding a handler there would throw on the first HomeKit poll
+    // a thermostat exposing only a mode has nothing to back TargetTemperature, and binding a
+    // handler there would throw on the first HomeKit poll
     const features = [
       {
-        name: 'Marche',
-        selector: 'clim-power',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
+        name: 'Mode',
+        selector: 'chauffage-mode',
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+        supported_options: [{ value: THERMOSTAT_MODE.OFF }, { value: THERMOSTAT_MODE.HEATING }],
       },
     ];
 
-    await homekitHandler.buildService({ name: 'Clim' }, features, mappings[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]);
+    await homekitHandler.buildService({ name: 'Chauffage' }, features, mappings[DEVICE_FEATURE_CATEGORIES.THERMOSTAT]);
 
     expect(characteristics.TargetTemperature.handlers.get).to.equal(undefined);
     expect(characteristics.TargetTemperature.handlers.set).to.equal(undefined);
+    // nothing carries a temperature either, CurrentTemperature is left unbound
+    expect(characteristics.CurrentTemperature.handlers.get).to.equal(undefined);
     // the states it can honour are still offered
     expect(characteristics.TargetHeatingCoolingState.handlers.get).to.be.a('function');
   });
@@ -2167,14 +2170,14 @@ describe('Build service', () => {
     const features = [
       {
         name: 'Mode',
-        selector: 'clim-mode-inconnu',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+        selector: 'chauffage-mode-inconnu',
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
         supported_options: [{ value: 99 }],
       },
     ];
 
-    await homekitHandler.buildService({ name: 'Clim' }, features, mappings[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]);
+    await homekitHandler.buildService({ name: 'Chauffage' }, features, mappings[DEVICE_FEATURE_CATEGORIES.THERMOSTAT]);
 
     expect(characteristics.TargetHeatingCoolingState.setProps.callCount).to.equal(0);
   });
@@ -2223,13 +2226,14 @@ describe('Build service', () => {
     expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(2);
   });
 
-  it('should not write an auto mode the air conditioner never declared', async () => {
+  it('should not write an auto mode the air conditioning mode of a thermostat never declared', async () => {
     homekitHandler.gladys.stateManager.get = stub().returns({ last_value: AC_MODE.COOLING });
     homekitHandler.gladys.event.emit = stub();
     const { hap, characteristics } = buildThermostatHapStub();
     homekitHandler.hap = hap;
 
-    // a Matter cooling-only air conditioner: cool, dry and fan, no auto
+    // an air conditioning mode declaring cool, dry and fan, no auto, next to a thermostat setpoint
+    // that keeps the device a Thermostat rather than a HeaterCooler
     const features = [
       {
         name: 'Marche',
@@ -2244,9 +2248,16 @@ describe('Build service', () => {
         type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
         supported_options: [{ value: AC_MODE.COOLING }, { value: AC_MODE.DRYING }, { value: AC_MODE.FAN }],
       },
+      {
+        name: 'Consigne',
+        selector: 'clim-heat',
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+      },
     ];
 
-    await homekitHandler.buildService({ name: 'Clim' }, features, mappings[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]);
+    await homekitHandler.buildService({ name: 'Clim' }, features, mappings[DEVICE_FEATURE_CATEGORIES.THERMOSTAT]);
 
     // dry and fan are reported to HomeKit as auto, so auto stays selectable
     expect(characteristics.TargetHeatingCoolingState.setProps.args[0][0]).to.eql({ validValues: [0, 2, 3] });
@@ -2266,69 +2277,147 @@ describe('Build service', () => {
     expect(homekitHandler.gladys.event.emit.args[2][1].value).to.equal(AC_MODE.COOLING);
   });
 
-  it('should still offer the on states when the device declares an empty options list', async () => {
+  it('should report auto on an air conditioning mode value Gladys does not know', async () => {
     homekitHandler.gladys.stateManager.get = stub();
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-power').returns({ last_value: 0 });
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-mode').returns({ last_value: AC_MODE.AUTO });
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-temp').returns({ last_value: 21 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pac-power').returns({ last_value: 1 });
+    // a mode value the AC_MODE mapping does not know about
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pac-mode').returns({ last_value: 99 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pac-heat').returns({ last_value: 20 });
     homekitHandler.gladys.event.emit = stub();
 
     const { hap, characteristics } = buildThermostatHapStub();
     homekitHandler.hap = hap;
 
-    // an air conditioner whose integration declares no supported option: loaded from the database
-    // the feature carries an empty list, not a missing one, and the modes must still be deduced
-    // from the min/max range — otherwise off is the only state HomeKit is given and the Home app
-    // cannot turn the device back on
-    const device = { name: 'Clim', selector: 'clim' };
+    // a heat pump: the thermostat setpoint keeps it a Thermostat, the air conditioning mode drives it
+    const device = { name: 'PAC', selector: 'pac' };
     const features = [
       {
         name: 'Marche',
-        selector: 'clim-power',
+        selector: 'pac-power',
         category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
         type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
-        min: 0,
-        max: 1,
-        supported_options: [],
       },
       {
         name: 'Mode',
-        selector: 'clim-mode',
+        selector: 'pac-mode',
         category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
         type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
         min: AC_MODE.AUTO,
-        max: AC_MODE.COOLING,
-        supported_options: [],
+        max: AC_MODE.FAN,
       },
       {
         name: 'Consigne',
-        selector: 'clim-temp',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+        selector: 'pac-heat',
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
-        min: 16,
-        max: 31,
-        supported_options: [],
       },
     ];
 
-    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]);
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.THERMOSTAT]);
 
-    // off, cool and auto, instead of off alone
+    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(3);
+    // in auto without any room temperature, the single setpoint is the one to compare against,
+    // and it is also the temperature reported: heating is the assumed state
+    expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(1);
+
+    // switched off through its on/off command, whatever the mode says
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pac-power').returns({ last_value: 0 });
+    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(0);
+    expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(0);
+  });
+
+  it('should drive TargetTemperature from a cooling setpoint next to a thermostat mode', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-mode').returns({
+      last_value: THERMOSTAT_MODE.COOLING,
+    });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-cool').returns({ last_value: 24 });
+    homekitHandler.gladys.event.emit = stub();
+
+    const { hap, characteristics } = buildThermostatHapStub();
+    homekitHandler.hap = hap;
+
+    // a cooling only thermostat declaring its setpoint as an air conditioning one
+    const device = { name: 'Clim', selector: 'clim' };
+    const features = [
+      {
+        name: 'Mode',
+        selector: 'clim-mode',
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+        supported_options: [
+          { value: THERMOSTAT_MODE.OFF },
+          { value: THERMOSTAT_MODE.COOLING },
+          { value: THERMOSTAT_MODE.AUTO },
+        ],
+      },
+      {
+        name: 'Consigne froid',
+        selector: 'clim-cool',
+        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+      },
+    ];
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.THERMOSTAT]);
+
     expect(characteristics.TargetHeatingCoolingState.setProps.args[0][0]).to.eql({ validValues: [0, 2, 3] });
+    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(2);
+    // the cooling setpoint is the only setpoint, so it drives TargetTemperature
+    expect(await readCharacteristic(characteristics.TargetTemperature)).to.equal(24);
+    // and it stands in for the missing room temperature
+    expect(await readCharacteristic(characteristics.CurrentTemperature)).to.equal(24);
 
     const cb = stub();
-    await characteristics.TargetHeatingCoolingState.handlers.set(2, cb);
+    await characteristics.TargetTemperature.handlers.set(25, cb);
+    expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(25);
+    expect(homekitHandler.gladys.event.emit.args[0][1].device_feature).to.equal('clim-cool');
 
-    expect(homekitHandler.gladys.event.emit.args[0][1].device_feature).to.equal('clim-power');
-    expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(1);
-    expect(homekitHandler.gladys.event.emit.args[1][1].device_feature).to.equal('clim-mode');
-    expect(homekitHandler.gladys.event.emit.args[1][1].value).to.equal(AC_MODE.COOLING);
+    // in auto with no room temperature to compare against, the device can only cool
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-mode').returns({
+      last_value: THERMOSTAT_MODE.AUTO,
+    });
+    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(3);
+    expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(2);
+  });
 
-    await characteristics.TargetHeatingCoolingState.handlers.set(0, cb);
+  it('should report cooling on a cooling setpoint next to an operating state', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-cool').returns({ last_value: 24 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-state').returns({
+      last_value: THERMOSTAT_OPERATING_STATE.IDLE,
+    });
+    homekitHandler.gladys.event.emit = stub();
 
-    expect(homekitHandler.gladys.event.emit.args[2][1].device_feature).to.equal('clim-power');
-    expect(homekitHandler.gladys.event.emit.args[2][1].value).to.equal(0);
+    const { hap, characteristics } = buildThermostatHapStub();
+    homekitHandler.hap = hap;
+
+    // no mode of either kind: the states are deduced from the one setpoint the device exposes
+    const device = { name: 'Clim', selector: 'clim' };
+    const features = [
+      {
+        name: 'Consigne froid',
+        selector: 'clim-cool',
+        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+      },
+      {
+        name: 'État',
+        selector: 'clim-state',
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+      },
+    ];
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.THERMOSTAT]);
+
+    expect(characteristics.TargetHeatingCoolingState.setProps.args[0][0]).to.eql({ validValues: [2] });
+    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(2);
+    // the device says what it is doing: idle, whatever the setpoint
+    expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(0);
   });
 
   it('should build thermostat service from a setpoint and a temperature sensor', async () => {
@@ -2381,84 +2470,6 @@ describe('Build service', () => {
       device: device.selector,
       device_feature: features[0].selector,
     });
-  });
-
-  it('should build thermostat service for an air conditioner', async () => {
-    homekitHandler.gladys.stateManager.get = stub();
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-power').returns({ last_value: 1 });
-    homekitHandler.gladys.stateManager.get
-      .withArgs('deviceFeature', 'clim-mode')
-      .returns({ last_value: AC_MODE.COOLING });
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-setpoint').returns({ last_value: 24 });
-    homekitHandler.gladys.event.emit = stub();
-
-    const { hap, characteristics } = buildThermostatHapStub();
-    homekitHandler.hap = hap;
-
-    const device = { name: 'Clim', selector: 'clim' };
-    const features = [
-      {
-        name: 'Marche',
-        selector: 'clim-power',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
-        min: 0,
-        max: 1,
-      },
-      {
-        name: 'Mode',
-        selector: 'clim-mode',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
-        min: AC_MODE.AUTO,
-        max: AC_MODE.FAN,
-      },
-      {
-        name: 'Consigne',
-        selector: 'clim-setpoint',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
-        unit: DEVICE_FEATURE_UNITS.CELSIUS,
-        min: 16,
-        max: 31,
-      },
-    ];
-
-    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]);
-
-    expect(characteristics.TargetHeatingCoolingState.setProps.args[0][0]).to.eql({ validValues: [0, 1, 2, 3] });
-    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(2);
-    expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(2);
-    // no temperature sensor on the device, the setpoint is the closest reading available
-    expect(await readCharacteristic(characteristics.CurrentTemperature)).to.equal(24);
-
-    const cb = stub();
-    await characteristics.TargetHeatingCoolingState.handlers.set(1, cb);
-    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
-      type: ACTIONS.DEVICE.SET_VALUE,
-      status: ACTIONS_STATUS.PENDING,
-      value: 1,
-      device: device.selector,
-      device_feature: features[0].selector,
-    });
-    expect(homekitHandler.gladys.event.emit.args[1][1]).to.eql({
-      type: ACTIONS.DEVICE.SET_VALUE,
-      status: ACTIONS_STATUS.PENDING,
-      value: AC_MODE.HEATING,
-      device: device.selector,
-      device_feature: features[1].selector,
-    });
-
-    // switching off only writes the binary feature, Gladys has no "off" AC mode
-    homekitHandler.gladys.event.emit = stub();
-    await characteristics.TargetHeatingCoolingState.handlers.set(0, cb);
-    expect(homekitHandler.gladys.event.emit.callCount).to.equal(1);
-    expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(0);
-    expect(homekitHandler.gladys.event.emit.args[0][1].device_feature).to.equal(features[0].selector);
-
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-power').returns({ last_value: 0 });
-    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(0);
-    expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(0);
   });
 
   it('should build thermostat service with both setpoints in Fahrenheit', async () => {
@@ -2540,41 +2551,6 @@ describe('Build service', () => {
     expect(await readCharacteristic(characteristics.TargetTemperature)).to.equal(25);
   });
 
-  it('should report cooling in auto when only a cooling setpoint is known', async () => {
-    homekitHandler.gladys.stateManager.get = stub();
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-mode').returns({ last_value: AC_MODE.AUTO });
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-cool').returns({ last_value: 24 });
-    homekitHandler.gladys.event.emit = stub();
-
-    const { hap, characteristics } = buildThermostatHapStub();
-    homekitHandler.hap = hap;
-
-    const device = { name: 'Clim', selector: 'clim' };
-    const features = [
-      {
-        name: 'Mode',
-        selector: 'clim-mode',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
-        min: AC_MODE.AUTO,
-        max: AC_MODE.COOLING,
-      },
-      {
-        name: 'Consigne froid',
-        selector: 'clim-cool',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
-        unit: DEVICE_FEATURE_UNITS.CELSIUS,
-      },
-    ];
-
-    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]);
-
-    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(3);
-    // no room temperature to compare against, but the device can only cool
-    expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(2);
-  });
-
   it('should build thermostat service with both setpoints and no mode feature', async () => {
     homekitHandler.gladys.stateManager.get = stub();
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pac-heat').returns({ last_value: 22 });
@@ -2632,80 +2608,6 @@ describe('Build service', () => {
     // above the cooling setpoint it is cooling
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pac-temp').returns({ last_value: 28 });
     expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(2);
-  });
-
-  it('should build thermostat service for a cooling only device', async () => {
-    homekitHandler.gladys.stateManager.get = stub();
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-cool').returns({ last_value: 24 });
-    homekitHandler.gladys.event.emit = stub();
-
-    const { hap, characteristics } = buildThermostatHapStub();
-    homekitHandler.hap = hap;
-
-    const device = { name: 'Clim', selector: 'clim' };
-    const features = [
-      {
-        name: 'Consigne froid',
-        selector: 'clim-cool',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
-        unit: DEVICE_FEATURE_UNITS.CELSIUS,
-      },
-    ];
-
-    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]);
-
-    // no mode and no heating setpoint: the device can only cool
-    expect(characteristics.TargetHeatingCoolingState.setProps.args[0][0]).to.eql({ validValues: [2] });
-    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(2);
-    expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(2);
-    // the cooling setpoint is the only setpoint, so it drives TargetTemperature
-    expect(await readCharacteristic(characteristics.TargetTemperature)).to.equal(24);
-    // and it stands in for the missing room temperature
-    expect(await readCharacteristic(characteristics.CurrentTemperature)).to.equal(24);
-
-    const cb = stub();
-    await characteristics.TargetTemperature.handlers.set(25, cb);
-    expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(25);
-    expect(homekitHandler.gladys.event.emit.args[0][1].device_feature).to.equal(features[0].selector);
-  });
-
-  it('should build thermostat service without any temperature feature', async () => {
-    homekitHandler.gladys.stateManager.get = stub();
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-power').returns({ last_value: 1 });
-    // a mode value the AC_MODE mapping does not know about
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'clim-mode').returns({ last_value: 99 });
-    homekitHandler.gladys.event.emit = stub();
-
-    const { hap, characteristics } = buildThermostatHapStub();
-    homekitHandler.hap = hap;
-
-    const device = { name: 'Clim', selector: 'clim' };
-    const features = [
-      {
-        name: 'Marche',
-        selector: 'clim-power',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
-      },
-      {
-        name: 'Mode',
-        selector: 'clim-mode',
-        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
-        min: AC_MODE.AUTO,
-        max: AC_MODE.FAN,
-      },
-    ];
-
-    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]);
-
-    // nothing carries a temperature, CurrentTemperature is left unbound
-    expect(characteristics.CurrentTemperature.handlers.get).to.equal(undefined);
-    // an unknown AC mode falls back to auto
-    expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(3);
-    // in auto without any temperature to compare, heating is the assumed state
-    expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(1);
   });
 
   it('should build thermostat service without an on/off command', async () => {
