@@ -46,7 +46,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/gateway/login-two-factor Finish the Gladys Plus login with a two-factor code
+   * @api {post} /api/v1/gateway/login-two-factor Finish the Gladys Plus login with a two-factor code
    * @apiName LoginTwoFactor
    * @apiGroup Gateway
    */
@@ -235,6 +235,7 @@ module.exports = function GatewayController(gladys) {
    * {
    *   "text": "turn on the light in the living room"
    * }
+   * @apiError (Error 400) BadRequest The request body contains no audio.
    * @apiError (Error 402) PaymentRequired The Gladys Plus subscription is not active.
    * @apiError (Error 403) Forbidden The Gladys Plus plan does not allow this call.
    * @apiError (Error 429) TooManyRequests The speech-to-text quota is exhausted.
@@ -308,6 +309,7 @@ module.exports = function GatewayController(gladys) {
    *   "text": "The living room is 21 degrees."
    * }
    * @apiSuccess {String} url Temporary URL of the generated audio file.
+   * @apiError (Error 402) PaymentRequired The Gladys Plus subscription is not active.
    * @apiError (Error 403) Forbidden The Gladys Plus plan does not allow this call.
    * @apiError (Error 429) TooManyRequests The text-to-speech quota is exhausted.
    */

@@ -25,7 +25,7 @@ function ensureAdminOnServiceWideVariable(req, userId) {
 
 module.exports = function VariableController(gladys) {
   /**
-   * @api {post} /api/service/:service_name/variable/:variable_key Save service variable
+   * @api {post} /api/v1/service/:service_name/variable/:variable_key Save service variable
    * @apiName SaveServiceVariable
    * @apiGroup Variable
    * @apiParam {string} value value to save
@@ -39,7 +39,7 @@ module.exports = function VariableController(gladys) {
   }
 
   /**
-   * @api {get} /api/service/:service_name/variable/:variable_key Get service variable
+   * @api {get} /api/v1/service/:service_name/variable/:variable_key Get service variable
    * @apiName GetVariableByService
    * @apiGroup Variable
    */
@@ -57,7 +57,7 @@ module.exports = function VariableController(gladys) {
   }
 
   /**
-   * @api {post} /api/variable/:variable_key Save variable
+   * @api {post} /api/v1/variable/:variable_key Save variable
    * @apiName SaveVariable
    * @apiGroup Variable
    * @apiParam {string} value value to save
@@ -68,7 +68,7 @@ module.exports = function VariableController(gladys) {
   }
 
   /**
-   * @api {post} /api/user/variable/:variable_key Save user variable
+   * @api {post} /api/v1/user/variable/:variable_key Save user variable
    * @apiName SaveUserVariable
    * @apiGroup Variable
    * @apiParam {string} value value to save
@@ -79,7 +79,7 @@ module.exports = function VariableController(gladys) {
   }
 
   /**
-   * @api {get} /api/user/variable/:variable_key Get user variable
+   * @api {get} /api/v1/user/variable/:variable_key Get user variable
    * @apiName GetUserVariable
    * @apiGroup Variable
    */
@@ -92,7 +92,7 @@ module.exports = function VariableController(gladys) {
   }
 
   /**
-   * @api {get} /api/variable/:variable_key Get variable
+   * @api {get} /api/v1/variable/:variable_key Get variable
    * @apiName getVariable
    * @apiGroup Variable
    * @apiParam {string} value value to save

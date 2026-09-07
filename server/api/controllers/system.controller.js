@@ -4,7 +4,7 @@ const { acknowledgeHostPowerCommand } = require('./system.controller.helpers');
 
 module.exports = function SystemController(gladys) {
   /**
-   * @api {post} /api/v1/system/info Get information about the system
+   * @api {get} /api/v1/system/info Get information about the system
    * @apiName getSystemInfos
    * @apiGroup System
    */
@@ -14,7 +14,7 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/system/disk Get the disk space used and available
+   * @api {get} /api/v1/system/disk Get the disk space used and available
    * @apiName getDiskUsage
    * @apiGroup System
    */
