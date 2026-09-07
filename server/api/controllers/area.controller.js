@@ -93,7 +93,7 @@ module.exports = function AreaController(gladys) {
 
   /**
    * @api {get} /api/v1/area/:selector getBySelector
-   * @apiName get
+   * @apiName getBySelector
    * @apiGroup Area
    * @apiSuccessExample {json} Success-Response
    * {

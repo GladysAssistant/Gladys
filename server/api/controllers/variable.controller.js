@@ -26,7 +26,7 @@ function ensureAdminOnServiceWideVariable(req, userId) {
 module.exports = function VariableController(gladys) {
   /**
    * @api {post} /api/service/:service_name/variable/:variable_key Save service variable
-   * @apiName SaveVariable
+   * @apiName SaveServiceVariable
    * @apiGroup Variable
    * @apiParam {string} value value to save
    */

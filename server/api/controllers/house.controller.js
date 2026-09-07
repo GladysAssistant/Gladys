@@ -170,8 +170,8 @@ module.exports = function HouseController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/house/:house_selector/disarm Disarm
-   * @apiName Disarm
+   * @api {post} /api/v1/house/:house_selector/panic Panic
+   * @apiName Panic
    * @apiGroup Alarm
    */
   async function panic(req, res) {
