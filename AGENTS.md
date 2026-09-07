@@ -40,6 +40,7 @@ All changes made by agents must follow this workflow:
 1. **Never commit directly to `master`.** Create a feature branch for every change (no matter how small) and open a pull request targeting `master`.
 2. **Write PR titles and descriptions in English**, even when the conversation with the user is in another language. This keeps the project history accessible to all contributors and matches the existing CI, templates, and documentation.
 3. **Create pull requests as ready for review (not draft).** When opening a PR, set `draft: false`. Do not create draft PRs.
+4. **Link the PR to the request it answers.** Every PR description must contain either the community forum topic (`Forum: https://community.gladysassistant.com/t/...`, on its own line, exact format) or the GitHub issue (`Closes #1234`). Without this link the release automations (forum announcement, automatic closing of the topic / issue) cannot run. If the user gave you a forum or issue link, put it in the description; if not, ask for it.
 
 ## Pull Request requirements (CI)
 
