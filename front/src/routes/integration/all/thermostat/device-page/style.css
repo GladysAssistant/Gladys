@@ -1,0 +1,53 @@
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+}
+
+/* Wraps on a narrow card: the question goes on its own line and the two
+   answers keep a usable width instead of being squeezed beside it. */
+.confirmDeleteRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.confirmDeleteRow .buttonGroup {
+  flex: 1;
+  min-width: 160px;
+}
+
+.confirmDeleteText {
+  font-weight: 500;
+}
+
+/* Read-only summary of what the thermostat is set to, so the card answers the
+   two questions that used to require opening the edit page. */
+.summaryRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-bottom: 16px;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summaryLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9aa0ac;
+}
+
+.summaryValue {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

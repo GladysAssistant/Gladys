@@ -9,7 +9,7 @@ const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes')
 // Fields carrying selectors in scene actions/triggers and dashboard boxes.
 // This list is a contract with the Joi schemas of models/scene.js and
 // models/dashboard.js (see docs/specs/device-migration.md, B.3).
-const FEATURE_STRING_FIELDS = ['device_feature'];
+const FEATURE_STRING_FIELDS = ['device_feature', 'thermostat_feature'];
 const FEATURE_ARRAY_FIELDS = ['device_features'];
 const DEVICE_STRING_FIELDS = ['device', 'camera'];
 const DEVICE_ARRAY_FIELDS = ['devices'];

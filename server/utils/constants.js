@@ -1931,6 +1931,11 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STARTED: 'scene.started',
     STOPPED: 'scene.stopped',
   },
+  THERMOSTAT: {
+    CONFIG_UPDATED: 'thermostat.config-updated',
+    PRESET_UPDATED: 'thermostat.preset-updated',
+    MANUAL_MODE_UPDATED: 'thermostat.manual-mode-updated',
+  },
   SYSTEM: {
     VACUUM_FINISHED: 'system.vacuum-finished',
     WATCHTOWER_LOG: 'system.watchtower-log',
@@ -2076,6 +2081,7 @@ const DASHBOARD_BOX_TYPE = {
   CHIPS: 'chips',
   HOUSE_VIEW: 'house-view',
   ACTIONS: 'actions',
+  THERMOSTAT: 'thermostat',
 };
 
 const DASHBOARD_WIDTH = {

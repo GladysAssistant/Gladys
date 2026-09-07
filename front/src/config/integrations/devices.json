@@ -191,5 +191,13 @@
     "invertInDarkMode": true,
     "local": true,
     "categories": ["energy"]
+  },
+  {
+    "key": "thermostat",
+    "link": "thermostat",
+    "img": "/assets/integrations/cover/thermostat.jpg",
+    "whiteBackground": true,
+    "local": true,
+    "categories": ["climate"]
   }
 ]
