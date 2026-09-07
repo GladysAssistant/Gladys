@@ -4,7 +4,7 @@ const { acknowledgeHostPowerCommand } = require('./system.controller.helpers');
 
 module.exports = function SystemController(gladys) {
   /**
-   * @api {post} /api/v1/system/info
+   * @api {get} /api/v1/system/info Get information about the system
    * @apiName getSystemInfos
    * @apiGroup System
    */
@@ -14,7 +14,7 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/system/disk
+   * @api {get} /api/v1/system/disk Get the disk space used and available
    * @apiName getDiskUsage
    * @apiGroup System
    */
@@ -24,7 +24,7 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/system/container
+   * @api {get} /api/v1/system/container List the Docker containers of the installation
    * @apiName getContainers
    * @apiGroup System
    */
@@ -34,7 +34,7 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/system/upgrade
+   * @api {post} /api/v1/system/upgrade Install the latest Gladys version
    * @apiName installUpgrade
    * @apiGroup System
    */
@@ -47,7 +47,7 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/system/shutdown
+   * @api {post} /api/v1/system/shutdown Shutdown the Gladys container
    * @apiName shutdownSystem
    * @apiGroup System
    */
@@ -60,7 +60,7 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/system/reboot
+   * @api {post} /api/v1/system/reboot Reboot the host machine
    * @apiName rebootHost
    * @apiGroup System
    */
@@ -75,7 +75,7 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/system/shutdown-host
+   * @api {post} /api/v1/system/shutdown-host Shutdown the host machine
    * @apiName shutdownHost
    * @apiGroup System
    */
@@ -89,7 +89,7 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/system/vacuum
+   * @api {post} /api/v1/system/vacuum Vacuum the SQLite database
    * @apiName vacuumSystem
    * @apiGroup System
    */
