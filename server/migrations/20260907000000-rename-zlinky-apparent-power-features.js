@@ -29,9 +29,19 @@ const RENAMED_FEATURES = [
 
 module.exports = {
   up: async () => {
+    const zlinkyDevices = await db.Device.findAll({
+      attributes: ['id'],
+      where: {
+        model: 'ZLinky_TIC',
+      },
+    });
+    if (zlinkyDevices.length === 0) {
+      return;
+    }
     const features = await db.DeviceFeature.findAll({
       attributes: ['id', 'name', 'type'],
       where: {
+        device_id: zlinkyDevices.map((device) => device.id),
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         [Op.or]: RENAMED_FEATURES.map(({ type, oldName }) => ({ type, name: oldName })),
       },

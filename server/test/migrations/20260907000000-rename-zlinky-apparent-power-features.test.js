@@ -26,9 +26,20 @@ const createZlinky = async () => {
   });
 };
 
-const createFeature = (name, type, property) =>
+const OTHER_DEVICE_ID = 'c3d4e5f6-0a1b-4c2d-8e9f-1a2b3c4d5e6f';
+
+const createOtherTeleinformationDevice = () =>
+  db.Device.create({
+    id: OTHER_DEVICE_ID,
+    name: 'Custom TIC',
+    selector: 'mqtt-custom-tic',
+    external_id: 'mqtt:custom-tic',
+    service_id: ZIGBEE2MQTT_SERVICE_ID,
+  });
+
+const createFeature = (name, type, property, deviceId = ZLINKY_DEVICE_ID) =>
   db.DeviceFeature.create({
-    device_id: ZLINKY_DEVICE_ID,
+    device_id: deviceId,
     name,
     selector: `zigbee2mqtt-lixee-zlinky-tic-teleinformation-${type}-${property}`,
     external_id: `zigbee2mqtt:Lixee ZLinky TIC:teleinformation:${type}:${property}`,
@@ -42,9 +53,9 @@ const createFeature = (name, type, property) =>
     max: 10000,
   });
 
-const getFeatureName = async (type) => {
+const getFeatureName = async (type, deviceId = ZLINKY_DEVICE_ID) => {
   const feature = await db.DeviceFeature.findOne({
-    where: { device_id: ZLINKY_DEVICE_ID, type },
+    where: { device_id: deviceId, type },
   });
   return feature.name;
 };
@@ -114,6 +125,23 @@ describe('migration 20260907000000-rename-zlinky-apparent-power-features', () =>
     );
     expect(await getFeatureName(DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1)).to.equal(
       'Puissance apparente maximale soutirée n Phase 1',
+    );
+  });
+
+  it('should keep the features of a device which is not a ZLinky_TIC untouched', async () => {
+    await createZlinky();
+    await createOtherTeleinformationDevice();
+    await createFeature(
+      'Puissance apparente instantanée soutirée Phase 1',
+      DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS,
+      'total_apparent_power',
+      OTHER_DEVICE_ID,
+    );
+
+    await migration.up();
+
+    expect(await getFeatureName(DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS, OTHER_DEVICE_ID)).to.equal(
+      'Puissance apparente instantanée soutirée Phase 1',
     );
   });
 
