@@ -33,6 +33,7 @@ import UserPresence from './actions/UserPresence';
 import HttpRequest from './actions/HttpRequest';
 import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
+import InTimeRange from './actions/InTimeRange';
 import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
 import CalendarGetEvents from './actions/CalendarGetEvents';
@@ -70,6 +71,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.USER.SET_OUT_OF_HOME]: UserPresence,
   [ACTIONS.HTTP.REQUEST]: HttpRequest,
   [ACTIONS.CONDITION.CHECK_TIME]: CheckTime,
+  [ACTIONS.SCENE.IN_TIME_RANGE]: InTimeRange,
   [ACTIONS.SCENE.START]: StartSceneParams,
   [ACTIONS.HOUSE.IS_EMPTY]: HouseEmptyOrNotCondition,
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: HouseEmptyOrNotCondition,

@@ -65,6 +65,37 @@ describe('SceneManager.cancelTriggers', () => {
     sceneManager.cancelTriggers(scene.selector);
     expect(sceneManager.scenes[scene.selector].triggers[0]).not.to.have.property('nodeScheduleJob');
   });
+  it('should cancel every job of a time-range trigger', async () => {
+    const cancelledJobs = [];
+    sceneManager.scheduler.scheduleJob = (date, callback) => ({
+      callback,
+      date,
+      cancel: () => cancelledJobs.push(date),
+    });
+    const scene = await sceneManager.create({
+      name: 'a-test-scene',
+      icon: 'bell',
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'time-range',
+          time_ranges: [
+            { start: '12:00', end: '14:30' },
+            { start: '16:00', end: '17:30' },
+          ],
+        },
+      ],
+      actions: [],
+      tags: [],
+    });
+    expect(sceneManager.scenes[scene.selector].triggers[0])
+      .to.have.property('nodeScheduleJobs')
+      .with.lengthOf(4);
+    sceneManager.cancelTriggers(scene.selector);
+    // all four jobs must be cancelled, otherwise the scene keeps firing on its former ranges
+    expect(cancelledJobs).to.have.lengthOf(4);
+    expect(sceneManager.scenes[scene.selector].triggers[0]).not.to.have.property('nodeScheduleJobs');
+  });
   it('should cancel a js interval trigger', async () => {
     const scene = await sceneManager.create({
       name: 'a-test-scene',
