@@ -208,6 +208,41 @@ module.exports = function HouseController(gladys) {
     res.json(sunState);
   }
 
+  /**
+   * @api {get} /api/v1/house/:house_selector/tide getTideState
+   * @apiName getTideState
+   * @apiGroup House
+   * @apiDescription Get the tide state of a house: the tides framing the current moment, the
+   * water level right now, the curve of the local day and, on the French coast, the tide
+   * coefficient. When the house is inland or on a sea with no meaningful tide, "available" is
+   * false and "reason" says which of the two it is.
+   * @apiParam {Number} [day_offset=0] Which day to return, 0 being today, up to 6.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "available": true,
+   *   "timezone": "Europe/Paris",
+   *   "station_name": "Saint Malo",
+   *   "station_distance": 1,
+   *   "current_height": 6.21,
+   *   "rising": true,
+   *   "next_high_tide": { "time": "2026-08-27T18:00:01.628Z", "height": 11.18, "high": true },
+   *   "next_low_tide": { "time": "2026-08-28T00:47:14.218Z", "height": 2.27, "high": false },
+   *   "coefficient": 78,
+   *   "tide_range": 10.22,
+   *   "curve": [{ "time": "2026-08-27T00:00:00.000Z", "height": 3.1 }]
+   * }
+   */
+  async function getTideState(req, res) {
+    const house = await gladys.house.getBySelector(req.params.house_selector);
+    const { latitude, longitude } = house;
+    if (latitude === null || latitude === undefined || longitude === null || longitude === undefined) {
+      throw new Error400(ERROR_MESSAGES.HOUSE_HAS_NO_COORDINATES);
+    }
+    const dayOffset = req.query.day_offset ? Number.parseInt(req.query.day_offset, 10) : 0;
+    const tideState = await gladys.house.getTideState(house, new Date(), { dayOffset });
+    res.json(tideState);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
@@ -217,6 +252,7 @@ module.exports = function HouseController(gladys) {
     userSeen: asyncMiddleware(userSeen),
     getRooms: asyncMiddleware(getRooms),
     getSunState: asyncMiddleware(getSunState),
+    getTideState: asyncMiddleware(getTideState),
     arm: asyncMiddleware(arm),
     disarm: asyncMiddleware(disarm),
     disarmWithCode: asyncMiddleware(disarmWithCode),
