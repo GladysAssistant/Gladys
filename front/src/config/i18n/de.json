@@ -6061,6 +6061,7 @@
       "smaxn3_1": "Max. entnommene Scheinleistung n-1 (SMAXN3-1)",
       "hhphc": "HPHC-Programm (HHPHC)",
       "imax": "Spitzenstrom (IMAX)",
+      "imax1": "Spitzenstrom (IMAX1)",
       "adps": "Warnung bei Überschreitung der Vertragsleistung (ADPS)",
       "imax2": "Spitzenstrom (IMAX2)",
       "imax3": "Spitzenstrom (IMAX3)",

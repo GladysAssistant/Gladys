@@ -810,11 +810,22 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.HHPHC,
       },
     },
+    // Currents of a ZLinky_TIC in historic mode: a single-phase meter exposes
+    // IMAX / IINST, a three-phase meter exposes IMAX1/2/3 and IINST1/2/3.
+    // https://www.zigbee2mqtt.io/devices/ZLinky_TIC.html
     IMAX: {
+      feature: {
+        name: 'Intensité maximale',
+        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      },
+    },
+    IMAX1: {
       feature: {
         name: 'Intensité maximale Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX,
+        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX1,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
     },
@@ -967,6 +978,14 @@ module.exports = {
       },
     },
     IINST: {
+      feature: {
+        name: 'Intensité instantanée',
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      },
+    },
+    IINST1: {
       feature: {
         name: 'Intensité instantanée Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,

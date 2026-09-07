@@ -1239,6 +1239,7 @@ const DEVICE_FEATURE_TYPES = {
     SMAXN3_1: 'smaxn3_1',
     HHPHC: 'hhphc',
     IMAX: 'imax',
+    IMAX1: 'imax1',
     ADPS: 'adps',
     IMAX2: 'imax2',
     IMAX3: 'imax3',

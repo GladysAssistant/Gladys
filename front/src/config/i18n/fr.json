@@ -6061,6 +6061,7 @@
       "smaxn3_1": "Puissance apparente max. soutirée n-1 (SMAXN3-1)",
       "hhphc": "Programme HPHC (HHPHC)",
       "imax": "Intensité maximale (IMAX)",
+      "imax1": "Intensité maximale (IMAX1)",
       "adps": "Alerte dépassement puissance souscrite (ADPS)",
       "imax2": "Intensité maximale (IMAX2)",
       "imax3": "Intensité maximale (IMAX3)",

@@ -140,6 +140,44 @@ describe('zigbee2mqtt numericType', () => {
     });
   });
 
+  describe('ZLinky_TIC historic mode current features', () => {
+    it('should map IMAX to the single-phase max current, without phase suffix', () => {
+      assert.deepEqual(numericType.names.IMAX.feature, {
+        name: 'Intensité maximale',
+        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      });
+    });
+
+    it('should map IMAX1 to the phase 1 of a three-phase meter', () => {
+      assert.deepEqual(numericType.names.IMAX1.feature, {
+        name: 'Intensité maximale Phase 1',
+        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX1,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      });
+    });
+
+    it('should map IINST to the single-phase current, without phase suffix', () => {
+      assert.deepEqual(numericType.names.IINST.feature, {
+        name: 'Intensité instantanée',
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      });
+    });
+
+    it('should map IINST1 to the phase 1 of a three-phase meter', () => {
+      assert.deepEqual(numericType.names.IINST1.feature, {
+        name: 'Intensité instantanée Phase 1',
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      });
+    });
+  });
+
   describe('Siren features', () => {
     it('should configure max_duration feature', () => {
       assert.deepEqual(numericType.names.max_duration.feature, {

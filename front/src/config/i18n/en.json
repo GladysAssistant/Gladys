@@ -6061,6 +6061,7 @@
       "smaxn3_1": "Apparent power max. draw-off n-1 (SMAXN3-1)",
       "hhphc": "HPHC Program (HHPHC)",
       "imax": "RMS current peak (IMAX)",
+      "imax1": "RMS current peak (IMAX1)",
       "adps": "Subscribed Power Exceeded Warning (ADPS)",
       "imax2": "RMS current peak (IMAX2)",
       "imax3": "RMS current peak (IMAX3)",

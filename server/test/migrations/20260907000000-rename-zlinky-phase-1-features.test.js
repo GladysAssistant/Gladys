@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const db = require('../../models');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../utils/constants');
 
-const migration = require('../../migrations/20260907000000-rename-zlinky-apparent-power-features');
+const migration = require('../../migrations/20260907000000-rename-zlinky-phase-1-features');
 
 const ZIGBEE2MQTT_SERVICE_ID = '2f2ebeb0-6d0c-4a3f-9f2a-4c2b9b0f1e11';
 const ZLINKY_DEVICE_ID = '7a1c3d8e-5b6f-4e2a-8c9d-0f1e2d3c4b5a';
@@ -37,13 +37,19 @@ const createOtherTeleinformationDevice = () =>
     service_id: ZIGBEE2MQTT_SERVICE_ID,
   });
 
-const createFeature = (name, type, property, deviceId = ZLINKY_DEVICE_ID) =>
+const createFeature = (
+  name,
+  type,
+  property,
+  deviceId = ZLINKY_DEVICE_ID,
+  category = DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+) =>
   db.DeviceFeature.create({
     device_id: deviceId,
     name,
-    selector: `zigbee2mqtt-lixee-zlinky-tic-teleinformation-${type}-${property}`,
-    external_id: `zigbee2mqtt:Lixee ZLinky TIC:teleinformation:${type}:${property}`,
-    category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+    selector: `zigbee2mqtt-lixee-zlinky-tic-${category}-${type}-${property}`,
+    external_id: `zigbee2mqtt:Lixee ZLinky TIC:${category}:${type}:${property}`,
+    category,
     type,
     unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
     read_only: true,
@@ -60,7 +66,7 @@ const getFeatureName = async (type, deviceId = ZLINKY_DEVICE_ID) => {
   return feature.name;
 };
 
-describe('migration 20260907000000-rename-zlinky-apparent-power-features', () => {
+describe('migration 20260907000000-rename-zlinky-phase-1-features', () => {
   it('should do nothing when there is no ZLinky_TIC feature', async () => {
     await migration.up();
   });
@@ -94,6 +100,23 @@ describe('migration 20260907000000-rename-zlinky-apparent-power-features', () =>
     expect(await getFeatureName(DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN_1)).to.equal(
       'Puissance apparente maximale soutirée n-1',
     );
+  });
+
+  it('should drop the "Phase 1" suffix of the historic mode currents still carrying the old default name', async () => {
+    await createZlinky();
+    await createFeature('Intensité maximale Phase 1', DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX, 'rms_current_max');
+    await createFeature(
+      'Intensité instantanée Phase 1',
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+      'rms_current',
+      ZLINKY_DEVICE_ID,
+      DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+    );
+
+    await migration.up();
+
+    expect(await getFeatureName(DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX)).to.equal('Intensité maximale');
+    expect(await getFeatureName(DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT)).to.equal('Intensité instantanée');
   });
 
   it('should keep a name chosen by the user', async () => {

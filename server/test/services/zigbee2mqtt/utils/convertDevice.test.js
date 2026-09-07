@@ -242,6 +242,57 @@ describe('zigbee2mqtt convertDevice', () => {
     ]);
   });
 
+  it('should return the current features of a three-phase Lixee TIC in historic mode', () => {
+    const exposeCurrent = (name, property) => ({
+      access: 1,
+      name,
+      property,
+      type: 'numeric',
+      unit: 'A',
+    });
+    const lixeeTicDevice = {
+      friendly_name: 'Lixee ZLinky TIC',
+      ieee_address: '0x00158d00045a8abc',
+      status: 'successful',
+      supported: true,
+      definition: {
+        description: 'Lixee ZLinky TIC',
+        exposes: [exposeCurrent('IINST1', 'rms_current'), exposeCurrent('IMAX1', 'rms_current_max')],
+        model: 'ZLinky_TIC',
+        vendor: 'Lixee',
+      },
+    };
+
+    const result = convertDevice(lixeeTicDevice, serviceId);
+
+    expect(result.features).to.deep.equal([
+      {
+        name: 'Intensité instantanée Phase 1',
+        read_only: true,
+        has_feedback: false,
+        min: 0,
+        max: 10000,
+        category: 'energy-sensor',
+        type: 'current',
+        unit: 'ampere',
+        external_id: 'zigbee2mqtt:Lixee ZLinky TIC:energy-sensor:current:rms_current',
+        selector: 'zigbee2mqtt-lixee-zlinky-tic-energy-sensor-current-rms-current',
+      },
+      {
+        name: 'Intensité maximale Phase 1',
+        read_only: true,
+        has_feedback: false,
+        min: 0,
+        max: 10000,
+        category: 'teleinformation',
+        type: 'imax1',
+        unit: 'ampere',
+        external_id: 'zigbee2mqtt:Lixee ZLinky TIC:teleinformation:imax1:rms_current_max',
+        selector: 'zigbee2mqtt-lixee-zlinky-tic-teleinformation-imax1-rms-current-max',
+      },
+    ]);
+  });
+
   it('should return Lixee TIC device with custom names', () => {
     const lixeeTicDevice = {
       friendly_name: 'Lixee ZLinky TIC',
