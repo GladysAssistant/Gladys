@@ -123,10 +123,11 @@ class GatewayInstanceOfflineAlert extends Component {
                   </div>
                   {user.instance_offline_alert_enabled && (
                     <div class="form-group">
-                      <label class="form-label">
+                      <label class="form-label" htmlFor="gateway-instance-offline-alert-delay">
                         <Text id="gateway.instanceOfflineAlertDelayLabel" />
                       </label>
                       <select
+                        id="gateway-instance-offline-alert-delay"
                         class="form-control"
                         value={currentDelay}
                         onChange={this.updateDelay}
