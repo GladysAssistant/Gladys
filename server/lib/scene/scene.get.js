@@ -75,8 +75,9 @@ async function get(options) {
     ).map((tag) => tag.get({ plain: true }));
 
     // Every requested tag gets its own group, even when no scene carries it,
-    // so the intersection below keeps its AND semantics.
-    const tagsWithSceneId = {};
+    // so the intersection below keeps its AND semantics. The map has no prototype,
+    // so a tag named like an Object built-in ("__proto__") stays a plain own key.
+    const tagsWithSceneId = Object.create(null);
     tags.forEach((tag) => {
       tagsWithSceneId[tag] = [];
     });

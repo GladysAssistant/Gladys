@@ -116,6 +116,19 @@ describe('SceneManager.get', () => {
     expect(scenes).to.deep.equal([]);
   });
 
+  it('should return 0 scene when searching a tag named like an Object built-in', async () => {
+    // "__proto__" must get an empty group like any other unmatched tag, and not
+    // be swallowed by the Object prototype, otherwise the AND semantics are lost.
+    await db.TagScene.create({ scene_id: '3a30636c-b3f0-4251-a347-90787f0fe940', name: AI_GENERATED_SCENE_TAG });
+
+    const sceneManager = new SceneManager({}, event);
+    const scenes = await sceneManager.get({
+      searchTags: `${AI_GENERATED_SCENE_TAG},__proto__`,
+    });
+    expect(scenes).to.be.instanceOf(Array);
+    expect(scenes).to.deep.equal([]);
+  });
+
   it('should return 0 scene when searching an unknown tag', async () => {
     const sceneManager = new SceneManager({}, event);
     const scenes = await sceneManager.get({
