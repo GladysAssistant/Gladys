@@ -204,3 +204,59 @@ jobs:
     steps:
       - name: Run Cloudflare Pages deploy hook
         run: curl -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}"
+  publish-gladys-version:
+    name: Publish the version to Gladys Plus
+    # Runs once the production images are pushed: as soon as the version is
+    # published, the Gladys Plus backend tells every instance that it is the
+    # latest one, so the images it points to must already be available.
+    needs: docker
+    # Pre-release tags (v5.1.0-rc.1) are built above, but they never move
+    # `latest`, so they must not become the version every instance is
+    # invited to upgrade to.
+    if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-')
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚀 Create the version on Gladys Plus
+        env:
+          # Base URL of the Gladys Plus backend (Gladys Gateway), without a
+          # trailing slash, e.g. https://api.gladysgateway.com
+          GLADYS_PLUS_BACKEND_URL: ${{ secrets.GLADYS_PLUS_BACKEND_URL }}
+          # Restricted admin API key of the Gladys Gateway, only allowed on
+          # POST /admin/api/gladys/versions
+          GLADYS_VERSION_API_KEY: ${{ secrets.GLADYS_VERSION_API_KEY }}
+          VERSION: ${{ github.ref_name }}
+          RELEASE_NOTE_LINK: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GLADYS_PLUS_BACKEND_URL}" ] || [ -z "${GLADYS_VERSION_API_KEY}" ]; then
+            echo "::error::The GLADYS_PLUS_BACKEND_URL and GLADYS_VERSION_API_KEY secrets are required to publish the version to Gladys Plus."
+            exit 1
+          fi
+          # The release note links can be changed afterwards from the Gladys
+          # Plus admin (PATCH /admin/api/gladys/versions/:id), for instance to
+          # point to the forum topic of the release once it is written.
+          BODY=$(jq -n --arg name "${VERSION}" --arg link "${RELEASE_NOTE_LINK}" \
+            '{ name: $name, default_release_note_link: $link }')
+          STATUS=$(curl --silent --show-error --output response.json --write-out "%{http_code}" \
+            --retry 3 --retry-connrefused --max-time 30 \
+            -X POST "${GLADYS_PLUS_BACKEND_URL%/}/admin/api/gladys/versions" \
+            -H "Content-Type: application/json" \
+            -H "X-Admin-Api-Key: ${GLADYS_VERSION_API_KEY}" \
+            --data "${BODY}")
+          cat response.json
+          echo
+          case "${STATUS}" in
+            201)
+              echo "Version ${VERSION} published to Gladys Plus."
+              echo "- Version \`${VERSION}\` published to Gladys Plus" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            409)
+              # Already published by a previous run of this workflow on the same tag.
+              echo "Version ${VERSION} was already published to Gladys Plus, nothing to do."
+              echo "- Version \`${VERSION}\` was already published to Gladys Plus" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            *)
+              echo "::error::Gladys Plus answered ${STATUS} while publishing version ${VERSION}."
+              exit 1
+              ;;
+          esac
