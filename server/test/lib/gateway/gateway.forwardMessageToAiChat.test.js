@@ -95,7 +95,7 @@ describe('gateway.forwardMessageToAiChat', () => {
     );
 
     expect(scenesPrompt).to.include('Do not add a tag to identify a scene as AI-created.');
-    expect(scenesPrompt).to.include('Gladys automatically adds the `Gladys AI` tag.');
+    expect(scenesPrompt).to.include('Gladys automatically adds the "Gladys AI" tag.');
   });
 
   it('should build system prompt with current date and time in the configured timezone', () => {
