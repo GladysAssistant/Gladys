@@ -2,13 +2,14 @@
 
 <!-- A short description of the change. Screenshots are always welcome! -->
 
-### Related request (required)
+### Related request
 
 <!--
-Every pull request must link the request it answers. Keep ONE of the two lines
-below (delete the other) and fill it in. Without this link, the PR cannot be
-tied to its topic and the release automations (announcing the release on the
-forum topic and closing the topic / issue when the feature ships) cannot run.
+If this pull request answers a forum topic or a GitHub issue, please link it
+here (strongly recommended): keep the matching line below and fill it in.
+This link is what ties the PR to its topic and lets the release automations
+run (announcing the release on the forum topic and closing the topic / issue
+when the feature ships). Without it, those automations cannot happen.
 
 - Feature requested on the community forum: paste the topic URL on a single
   line using this exact format (the release pipeline parses it):
@@ -23,7 +24,7 @@ forum topic and closing the topic / issue when the feature ships) cannot run.
 
 ### Checklist
 
-- [ ] The description links the forum topic (`Forum: https://community.gladysassistant.com/t/...`) or the GitHub issue (`Closes #...`)
+- [ ] If a forum topic or GitHub issue exists, the description links it (`Forum: https://community.gladysassistant.com/t/...` or `Closes #...`)
 - [ ] Tests pass: `cd server && npm run coverage` (Codecov requires 100% coverage on changed lines) and Cypress (`npm run cypress:run`) if the UI changed
 - [ ] Linter and prettier pass on both front and server (`npm run eslint`, `npm run prettier`)
 - [ ] No undocumented breaking change
