@@ -1,5 +1,75 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 
+/**
+ * @description Build the Gladys feature of a ZLinky_TIC apparent power label.
+ * @param {string} name - Default name of the feature.
+ * @param {string} type - Teleinformation feature type.
+ * @returns {object} The feature definition.
+ * @example
+ * buildZlinkyApparentPowerFeature('Puissance apparente instantanée soutirée', 'sinsts');
+ */
+function buildZlinkyApparentPowerFeature(name, type) {
+  return {
+    feature: {
+      name,
+      category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+      type,
+      unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
+    },
+  };
+}
+
+const ZLINKY_APPARENT_POWER_FEATURES = {
+  SMAXN: buildZlinkyApparentPowerFeature(
+    'Puissance apparente maximale soutirée n',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN,
+  ),
+  SMAXN1: buildZlinkyApparentPowerFeature(
+    'Puissance apparente maximale soutirée n Phase 1',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1,
+  ),
+  SMAXN2: buildZlinkyApparentPowerFeature(
+    'Puissance apparente maximale soutirée n Phase 2',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2,
+  ),
+  SMAXN3: buildZlinkyApparentPowerFeature(
+    'Puissance apparente maximale soutirée n Phase 3',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3,
+  ),
+  SINSTS: buildZlinkyApparentPowerFeature(
+    'Puissance apparente instantanée soutirée',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS,
+  ),
+  SINSTS1: buildZlinkyApparentPowerFeature(
+    'Puissance apparente instantanée soutirée Phase 1',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS1,
+  ),
+  SINSTS2: buildZlinkyApparentPowerFeature(
+    'Puissance apparente instantanée soutirée Phase 2',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS2,
+  ),
+  SINSTS3: buildZlinkyApparentPowerFeature(
+    'Puissance apparente instantanée soutirée Phase 3',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3,
+  ),
+  SMAXN_1: buildZlinkyApparentPowerFeature(
+    'Puissance apparente maximale soutirée n-1',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN_1,
+  ),
+  SMAXN1_1: buildZlinkyApparentPowerFeature(
+    'Puissance apparente maximale soutirée n-1 Phase 1',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1_1,
+  ),
+  SMAXN2_1: buildZlinkyApparentPowerFeature(
+    'Puissance apparente maximale soutirée n-1 Phase 2',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2_1,
+  ),
+  SMAXN3_1: buildZlinkyApparentPowerFeature(
+    'Puissance apparente maximale soutirée n-1 Phase 3',
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3_1,
+  ),
+};
+
 module.exports = {
   type: 'numeric',
   writeValue: (expose, value) => {
@@ -706,78 +776,33 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.BINARY,
       },
     },
-    SMAXN: {
-      feature: {
-        name: 'Puissance apparente maximale soutirée n Phase 1',
-        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN,
-        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-      },
-    },
-    SMAXN2: {
-      feature: {
-        name: 'Puissance apparente maximale soutirée n Phase 2',
-        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2,
-        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-      },
-    },
-    SMAXN3: {
-      feature: {
-        name: 'Puissance apparente maximale soutirée n Phase 3',
-        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3,
-        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-      },
-    },
-    SINSTS: {
-      feature: {
-        name: 'Puissance apparente instantanée soutirée Phase 1',
-        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS,
-        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-      },
-    },
-    SINSTS2: {
-      feature: {
-        name: 'Puissance apparente instantanée soutirée Phase 2',
-        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS2,
-        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-      },
-    },
-    SINSTS3: {
-      feature: {
-        name: 'Puissance apparente instantanée soutirée Phase 3',
-        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3,
-        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-      },
-    },
-    'SMAXN-1': {
-      feature: {
-        name: 'Puissance apparente maximale soutirée n-1 Phase 1',
-        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN_1,
-        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-      },
-    },
-    'SMAXN2-1': {
-      feature: {
-        name: 'Puissance apparente maximale soutirée n-1 Phase 2',
-        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2_1,
-        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-      },
-    },
-    'SMAXN3-1': {
-      feature: {
-        name: 'Puissance apparente maximale soutirée n-1 Phase 3',
-        category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3_1,
-        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-      },
-    },
+    // Apparent power of a ZLinky_TIC in standard mode, one entry per TIC label.
+    // Zigbee2mqtt renamed the SMAXN labels to SMAXSN, so both spellings are
+    // mapped to the same features: the feature type stored in the database
+    // does not change. On a three-phase meter, SINSTS is the three-phase total
+    // and SINSTS1/2/3 are the phases; on a single-phase meter, only SINSTS,
+    // SMAXSN and SMAXSN-1 exist.
+    // https://www.zigbee2mqtt.io/devices/ZLinky_TIC.html
+    SMAXN: ZLINKY_APPARENT_POWER_FEATURES.SMAXN,
+    SMAXSN: ZLINKY_APPARENT_POWER_FEATURES.SMAXN,
+    SMAXN1: ZLINKY_APPARENT_POWER_FEATURES.SMAXN1,
+    SMAXSN1: ZLINKY_APPARENT_POWER_FEATURES.SMAXN1,
+    SMAXN2: ZLINKY_APPARENT_POWER_FEATURES.SMAXN2,
+    SMAXSN2: ZLINKY_APPARENT_POWER_FEATURES.SMAXN2,
+    SMAXN3: ZLINKY_APPARENT_POWER_FEATURES.SMAXN3,
+    SMAXSN3: ZLINKY_APPARENT_POWER_FEATURES.SMAXN3,
+    SINSTS: ZLINKY_APPARENT_POWER_FEATURES.SINSTS,
+    SINSTS1: ZLINKY_APPARENT_POWER_FEATURES.SINSTS1,
+    SINSTS2: ZLINKY_APPARENT_POWER_FEATURES.SINSTS2,
+    SINSTS3: ZLINKY_APPARENT_POWER_FEATURES.SINSTS3,
+    'SMAXN-1': ZLINKY_APPARENT_POWER_FEATURES.SMAXN_1,
+    'SMAXSN-1': ZLINKY_APPARENT_POWER_FEATURES.SMAXN_1,
+    'SMAXN1-1': ZLINKY_APPARENT_POWER_FEATURES.SMAXN1_1,
+    'SMAXSN1-1': ZLINKY_APPARENT_POWER_FEATURES.SMAXN1_1,
+    'SMAXN2-1': ZLINKY_APPARENT_POWER_FEATURES.SMAXN2_1,
+    'SMAXSN2-1': ZLINKY_APPARENT_POWER_FEATURES.SMAXN2_1,
+    'SMAXN3-1': ZLINKY_APPARENT_POWER_FEATURES.SMAXN3_1,
+    'SMAXSN3-1': ZLINKY_APPARENT_POWER_FEATURES.SMAXN3_1,
     HHPHC: {
       feature: {
         name: 'Horaire Heures Pleines Heures Creuses',

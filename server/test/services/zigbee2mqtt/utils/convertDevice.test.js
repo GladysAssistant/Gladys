@@ -194,6 +194,54 @@ describe('zigbee2mqtt convertDevice', () => {
     });
   });
 
+  it('should return the apparent power features of a three-phase Lixee TIC in standard mode', () => {
+    const exposeApparentPower = (name, property) => ({
+      access: 1,
+      name,
+      property,
+      type: 'numeric',
+      unit: 'VA',
+    });
+    const lixeeTicDevice = {
+      friendly_name: 'Lixee ZLinky TIC',
+      ieee_address: '0x00158d00045a8abc',
+      status: 'successful',
+      supported: true,
+      definition: {
+        description: 'Lixee ZLinky TIC',
+        exposes: [
+          exposeApparentPower('SINSTS1', 'apparent_power'),
+          exposeApparentPower('SINSTS', 'total_apparent_power'),
+          exposeApparentPower('SMAXSN1', 'active_power_max'),
+          exposeApparentPower('SMAXSN1-1', 'drawn_v_a_max_n1'),
+        ],
+        model: 'ZLinky_TIC',
+        vendor: 'Lixee',
+      },
+    };
+
+    const result = convertDevice(lixeeTicDevice, serviceId);
+
+    const expectedFeature = (name, type, property) => ({
+      name,
+      read_only: true,
+      has_feedback: false,
+      min: 0,
+      max: 10000,
+      category: 'teleinformation',
+      type,
+      unit: 'volt-ampere',
+      external_id: `zigbee2mqtt:Lixee ZLinky TIC:teleinformation:${type}:${property}`,
+      selector: `zigbee2mqtt-lixee-zlinky-tic-teleinformation-${type}-${property}`.replace(/_/g, '-'),
+    });
+    expect(result.features).to.deep.equal([
+      expectedFeature('Puissance apparente instantanée soutirée Phase 1', 'sinsts1', 'apparent_power'),
+      expectedFeature('Puissance apparente instantanée soutirée', 'sinsts', 'total_apparent_power'),
+      expectedFeature('Puissance apparente maximale soutirée n Phase 1', 'smaxn1', 'active_power_max'),
+      expectedFeature('Puissance apparente maximale soutirée n-1 Phase 1', 'smaxn1_1', 'drawn_v_a_max_n1'),
+    ]);
+  });
+
   it('should return Lixee TIC device with custom names', () => {
     const lixeeTicDevice = {
       friendly_name: 'Lixee ZLinky TIC',
