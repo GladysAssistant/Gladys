@@ -1,0 +1,66 @@
+.moonHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.moonDiskColumn {
+  flex: 0 0 auto;
+  width: 96px;
+}
+
+.moonDisk {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.moonHeadline {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.moonPhaseName {
+  overflow-wrap: anywhere;
+}
+
+.moonRiseSet {
+  gap: 1.5rem;
+  margin-top: 0.75rem;
+}
+
+/* The values are refreshed every minute: fixed-width digits keep them from
+   shifting sideways as the numbers change. */
+.moonValue {
+  font-variant-numeric: tabular-nums;
+}
+
+.moonSection {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(110, 117, 130, 0.2);
+}
+
+.moonSectionTitle {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.moonStateGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.moonStateCell {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.moonEventValue {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

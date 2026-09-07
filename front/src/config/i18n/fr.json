@@ -384,6 +384,7 @@
       "link": "Lien",
       "photo": "Photo",
       "sun": "Soleil",
+      "moon": "Lune",
       "chips": "Pastilles d'état",
       "actions": "Actions rapides",
       "house-view": "Vue de la maison"
@@ -606,6 +607,69 @@
         "noHouse": "Veuillez sélectionner une maison dans les paramètres du widget.",
         "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
         "error": "Une erreur est survenue lors de la récupération des données du soleil, merci de réessayer."
+      },
+      "moon": {
+        "editHouseLabel": "Sélectionnez une maison. J'utiliserai ses latitude/longitude pour calculer la position de la lune.",
+        "displayDetailsLabel": "Afficher les détails",
+        "displayDetailsDescription": "Affiche la liste des informations détaillées (distance, âge, prochaines phases, périgée, éclipse…) à côté de la lune. Décochez pour n'afficher que la lune et sa phase.",
+        "computeAtMidnightLabel": "Calculer les valeurs à minuit",
+        "computeAtMidnightDescription": "Calcule la visibilité, la distance, l'âge et les prochains événements à minuit, comme le font les calendriers lunaires, au lieu de l'heure actuelle. Le lever et le coucher de la lune ne changent pas.",
+        "illuminationValue": "{{percent}} % éclairée",
+        "ageValue": "{{days}} jours",
+        "moonrise": "Lever de la lune",
+        "moonset": "Coucher de la lune",
+        "todaySection": "Aujourd'hui",
+        "distance": "Distance Terre-Lune",
+        "kilometers": "km",
+        "trajectory": "Trajectoire",
+        "ascending": "Ascendante",
+        "descending": "Descendante",
+        "zodiac": "Constellation",
+        "nextNodeNorth": "Nœud nord",
+        "nextNodeSouth": "Nœud sud",
+        "upcomingSection": "À venir",
+        "fullMoon": "Pleine lune",
+        "newMoon": "Nouvelle lune",
+        "perigee": "Périgée",
+        "apogee": "Apogée",
+        "nextEclipse": "Prochaine éclipse de lune",
+        "eclipseLabel": {
+          "penumbral": "Éclipse pénombrale",
+          "partialOrTotal": "Éclipse partielle ou totale"
+        },
+        "today": "Aujourd'hui",
+        "inDays": {
+          "one": "Dans 1 jour",
+          "other": "Dans {{count}} jours"
+        },
+        "unknown": "Inconnu",
+        "phases": {
+          "newMoon": "Nouvelle Lune",
+          "waxingCrescent": "Premier Croissant",
+          "firstQuarter": "Premier Quartier",
+          "waxingGibbous": "Gibbeuse Croissante",
+          "fullMoon": "Pleine Lune",
+          "waningGibbous": "Gibbeuse Décroissante",
+          "lastQuarter": "Dernier Quartier",
+          "waningCrescent": "Dernier Croissant"
+        },
+        "zodiacSigns": {
+          "aries": "Bélier",
+          "taurus": "Taureau",
+          "gemini": "Gémeaux",
+          "cancer": "Cancer",
+          "leo": "Lion",
+          "virgo": "Vierge",
+          "libra": "Balance",
+          "scorpio": "Scorpion",
+          "sagittarius": "Sagittaire",
+          "capricorn": "Capricorne",
+          "aquarius": "Verseau",
+          "pisces": "Poissons"
+        },
+        "noHouse": "Veuillez sélectionner une maison dans les paramètres du widget.",
+        "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
+        "error": "Une erreur est survenue lors de la récupération des données de la lune, merci de réessayer."
       },
       "ecowatt": {
         "title": "Ecowatt France",

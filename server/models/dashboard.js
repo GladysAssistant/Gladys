@@ -34,6 +34,10 @@ const boxSchema = Joi.object().keys({
   group_by: Joi.string().valid('hour', 'day', 'week', 'month', 'year'),
   display_axes: Joi.boolean(),
   display_variation: Joi.boolean(),
+  // moon box: show the detailed list of lunar events next to the disk
+  display_details: Joi.boolean(),
+  // moon box: compute the values at local midnight, like a lunar calendar
+  compute_at_midnight: Joi.boolean(),
   chart_type: Joi.string(),
   users: Joi.array().items(Joi.string()),
   clock_type: Joi.string(),
