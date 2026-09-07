@@ -81,9 +81,6 @@ async function get(options) {
       tagsWithSceneId[tag] = [];
     });
     sceneIdsAndNames.forEach((sceneIdAndName) => {
-      if (sceneIdAndName.name in tagsWithSceneId === false) {
-        tagsWithSceneId[sceneIdAndName.name] = [];
-      }
       tagsWithSceneId[sceneIdAndName.name].push(sceneIdAndName.scene_id);
     });
 

@@ -31,14 +31,14 @@ const DEFAULT_TIMEZONE = 'Europe/Paris';
  * Tags are deduplicated because t_tag_scene has a composite primary key
  * (scene_id, name): inserting the same name twice would fail. The AI tag is always
  * stored with its canonical casing, because the scene list filters on an exact name.
- * @param {Array} [tags] - Tags provided by the model.
+ * @param {Array} tags - Tags provided by the model, defaulted to an empty array by the schema.
  * @returns {Array} Tags including the AI generated scene tag.
  * @example
  * withAiGeneratedTag([{ name: 'lights' }]);
  */
 function withAiGeneratedTag(tags) {
   const tagsByName = new Map();
-  (tags || []).forEach((tag) => {
+  tags.forEach((tag) => {
     tagsByName.set(tag.name.toLowerCase(), tag);
   });
   tagsByName.set(AI_GENERATED_SCENE_TAG.toLowerCase(), { name: AI_GENERATED_SCENE_TAG });

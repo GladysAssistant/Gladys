@@ -2301,9 +2301,7 @@ describe('build schemas', () => {
     // Deduplication is case-insensitive, and the canonical casing wins: the scene
     // list filters on an exact tag name, so a scene tagged "ai" would be missed.
     await sceneCreateTool.cb({ ...baseScene, name: 'Scene tagged in lowercase', tags: [{ name: 'ai' }] });
-    expect(mcpHandler.gladys.scene.create.getCall(3).args[0].tags).to.deep.equal([
-      { name: AI_GENERATED_SCENE_TAG },
-    ]);
+    expect(mcpHandler.gladys.scene.create.getCall(3).args[0].tags).to.deep.equal([{ name: AI_GENERATED_SCENE_TAG }]);
   });
 
   it('should reject scene.create when http.request action misses headers', async () => {
