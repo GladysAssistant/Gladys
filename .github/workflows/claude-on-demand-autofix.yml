@@ -1,0 +1,434 @@
+name: Claude autofix on demand
+run-name: 'Claude autofix on demand for PR #${{ github.event.issue.number || github.event.pull_request.number }}'
+
+# Lets a maintainer hand any feedback to Claude directly from a pull request,
+# by writing a comment whose line starts with "/claude" followed by what to
+# do:
+#
+#   /claude fix the merge conflicts with master
+#   /claude the tests fail on listenToStateChange, have a look
+#   /claude the alarm badges are green even when the fault is active
+#
+# This is the on-demand counterpart of claude-scheduled-autofix.yml. That
+# workflow is a cron that only ever reacts to REVIEW BOT comments (Cursor,
+# CodeRabbit) on conflict-free PRs; it cannot be triggered by a comment, and
+# it deliberately skips PRs in conflict. So a human message like "Please fix
+# PR conflicts" used to reach nothing at all — hence this workflow.
+#
+# Both fire the SAME claude.ai routine (same URL and token, see
+# .github/CLAUDE_AUTOFIX.md), which branches on the payload's "mode" field.
+# The differences that matter:
+#
+#   - the work order is the comment itself, not a list of bot comment ids;
+#   - a merge conflict is not a skip reason (fixing one can be the request);
+#   - a draft PR is fine, and the claude:autofix-exhausted /
+#     claude:autofix-skip labels are ignored: they stop the CRON, and an
+#     explicit human request outranks them;
+#   - the resulting commit carries an "Autofix-Request: <comment id>"
+#     trailer instead of "Autofix-Pass: <n>", so asking Claude something by
+#     hand never eats into the cron's MAX_PASSES budget for that PR.
+#
+# SECURITY: issue_comment / pull_request_review* all run from the base branch
+# with secrets available, including for comments on fork PRs. Like
+# cursor-automation-webhook.yml, this workflow must NEVER check out or execute
+# code from the PR head: it only reads PR metadata through the GitHub API and
+# POSTs to the Anthropic routine API. The comment body is passed on as a
+# payload field and only ever transits through shell variables and files,
+# never interpolated into code.
+#
+# Only the logins in COMMAND_ALLOWED_LOGINS below may use the command —
+# deliberately much stricter than "/cursor review", which the PR author may
+# also run. Triggering Cursor costs a Cursor run; triggering Claude pushes
+# commits and spends the maintainer's own claude.ai allowance, so the two do
+# not deserve the same bar.
+#
+# Required configuration (shared with claude-scheduled-autofix.yml):
+#   vars.CLAUDE_AUTOFIX_FIRE_URL         - the routine's API trigger URL
+#   secrets.CLAUDE_AUTOFIX_ROUTINE_TOKEN - the routine's bearer token
+on:
+  # A comment in the PR conversation.
+  issue_comment:
+    types: [created]
+  # A comment on a line of the diff, in a review.
+  pull_request_review_comment:
+    types: [created]
+  # The summary body of a submitted review.
+  pull_request_review:
+    types: [submitted]
+
+env:
+  # WHO MAY RUN THE COMMAND. Space-separated GitHub logins, matched
+  # case-insensitively; this is the whole access control of this workflow, so
+  # keep it to people you accept spending your claude.ai allowance and pushing
+  # to claude/ branches under your GitHub identity.
+  #
+  # An author_association check alone would NOT do: "MEMBER" is granted to
+  # every member of the GladysAssistant organisation, including the eight
+  # collaborators whose repository role is "triage" — who cannot push to this
+  # repository at all. Letting them fire a session would hand them, indirectly,
+  # a write access GitHub deliberately withholds. The association is still
+  # checked below, as a second barrier in case a login here stops being a
+  # member.
+  COMMAND_ALLOWED_LOGINS: 'Pierre-Gilles'
+  # Cloud sessions may only push to branches with this prefix (other branches
+  # are rejected when they carry commits by someone else).
+  HEAD_BRANCH_PREFIX: 'claude/'
+  # Upper bound on the instruction forwarded to the routine. Long enough for
+  # a detailed review note, short enough to keep the payload bounded.
+  MAX_INSTRUCTION_CHARS: 4000
+
+# One command at a time per PR, so two comments posted back to back queue
+# instead of racing.
+concurrency:
+  group: claude-on-demand-autofix-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  # Reacting to the triggering comment and posting a refusal notice. A PR
+  # comment is an issue comment, but GitHub authorises the reaction endpoint
+  # against the parent resource (a pull request), so both scopes are needed —
+  # same reason as in cursor-automation-webhook.yml.
+  pull-requests: write
+  issues: write
+
+jobs:
+  fire:
+    name: Fire a Claude Code cloud session
+    # Coarse filter so a runner is not started for every single comment: the
+    # anchored command match, the permission check and the PR checks all
+    # happen in "Resolve command" below.
+    # The association test is here rather than only in the script so that a
+    # drive-by "/claude" from outside the organisation cannot spend a runner
+    # at all: on a public repository anyone can comment on any PR. Those
+    # authors therefore get no 👎 — they never reach the script. The real
+    # access control stays COMMAND_ALLOWED_LOGINS below, which this does not
+    # duplicate.
+    if: >-
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'),
+               github.event.comment.author_association || github.event.review.author_association) &&
+      (
+        (github.event_name == 'issue_comment' &&
+          github.event.issue.pull_request != null &&
+          contains(github.event.comment.body, '/claude')) ||
+        (github.event_name == 'pull_request_review_comment' &&
+          contains(github.event.comment.body, '/claude')) ||
+        (github.event_name == 'pull_request_review' &&
+          contains(github.event.review.body, '/claude'))
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Resolve command
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          # The PR number lives in a different place per event.
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          PR_NUMBER_EVENT: ${{ github.event.pull_request.number }}
+          # Comment (issue_comment, pull_request_review_comment) or review
+          # body (pull_request_review); exactly one of the two is set.
+          COMMENT_BODY: ${{ github.event.comment.body || github.event.review.body }}
+          COMMENT_ID: ${{ github.event.comment.id || github.event.review.id }}
+          COMMENT_URL: ${{ github.event.comment.html_url || github.event.review.html_url }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login || github.event.review.user.login }}
+          COMMENT_AUTHOR_TYPE: ${{ github.event.comment.user.type || github.event.review.user.type }}
+          COMMENT_ASSOCIATION: ${{ github.event.comment.author_association || github.event.review.author_association }}
+        run: |
+          set -uo pipefail
+
+          # Reaction endpoints differ per comment kind, and reviews have none
+          # at all: react() is a best-effort acknowledgement, never fatal.
+          case "$EVENT_NAME" in
+            issue_comment)
+              PR_NUMBER="$ISSUE_NUMBER"
+              COMMENT_KIND='issue'
+              REACTION_PATH="repos/${GH_REPO}/issues/comments/${COMMENT_ID}/reactions"
+              ;;
+            pull_request_review_comment)
+              PR_NUMBER="$PR_NUMBER_EVENT"
+              COMMENT_KIND='review'
+              REACTION_PATH="repos/${GH_REPO}/pulls/comments/${COMMENT_ID}/reactions"
+              ;;
+            pull_request_review)
+              PR_NUMBER="$PR_NUMBER_EVENT"
+              COMMENT_KIND='review_body'
+              REACTION_PATH=''
+              ;;
+            *)
+              echo "::error::Unsupported event ${EVENT_NAME}"
+              exit 1
+              ;;
+          esac
+
+          react() {
+            [ -n "$REACTION_PATH" ] || return 0
+            gh api --silent -X POST "$REACTION_PATH" -f "content=$1" \
+              || echo "::warning::Could not react to comment ${COMMENT_ID}"
+          }
+
+          # Answers go back where the command was written: a command typed as
+          # an inline review comment gets its answer in that thread, keeping
+          # the file and line context. Reviews have no reply endpoint, so a
+          # review body falls back to the PR conversation, as does a thread
+          # reply GitHub refuses (an outdated or collapsed thread).
+          # Every notice carries the Autofix-Request marker so the loop guard
+          # below can never mistake it for a new command.
+          respond() {
+            BODY_TEXT=$(printf '%s\n\n<!-- Autofix-Request: %s -->' "$1" "$COMMENT_ID")
+            if [ "$COMMENT_KIND" = 'review' ]; then
+              gh api --silent -X POST \
+                "repos/${GH_REPO}/pulls/${PR_NUMBER}/comments/${COMMENT_ID}/replies" \
+                -f "body=${BODY_TEXT}" && return 0
+              echo "::warning::Could not reply in the review thread of comment ${COMMENT_ID}, falling back to the PR conversation"
+            fi
+            gh api --silent -X POST "repos/${GH_REPO}/issues/${PR_NUMBER}/comments" \
+              -f "body=${BODY_TEXT}" \
+              || echo "::warning::Could not post a comment on PR #${PR_NUMBER}"
+          }
+
+          # An explicit command that silently does nothing is worse than a
+          # noisy one: when Claude cannot act on a request it CAN see, say so
+          # in the thread instead of only in the job log.
+          refuse() {
+            echo "PR #${PR_NUMBER}: $1"
+            react 'confused'
+            respond "$(printf '🤖 I cannot run the `/claude` command here: %s\n\nSee `.github/CLAUDE_AUTOFIX.md` for what the on-demand autofix can work on.' "$1")"
+          }
+
+          BODY=$(printf '%s\n' "$COMMENT_BODY" | tr -d '\r')
+
+          # The command must start its own line, so quoting someone else
+          # ("> /claude ...") never fires a session. Trailing text on the
+          # line is the instruction.
+          if ! printf '%s\n' "$BODY" | grep -qiE '^[[:blank:]]*/claude([[:blank:]]|$)'; then
+            echo "No /claude command at the start of a line, skipping."
+            echo 'run=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Loop guard 1: review bots and this workflow's own notices.
+          if [ "$COMMENT_AUTHOR_TYPE" = 'Bot' ]; then
+            echo "Comment authored by the bot ${COMMENT_AUTHOR}, skipping."
+            echo 'run=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Loop guard 2: replies written by a cloud session. The author check
+          # above does NOT cover them — sessions post under the routine
+          # owner's identity, a User and the very login that types "/claude" —
+          # so the marker is the only thing that distinguishes a session's
+          # answer from a new command. The routine prompt requires every
+          # on-demand reply to carry it.
+          # Quoted lines are excluded first: GitHub's "Quote reply" copies the
+          # marker into the quote, and that must not swallow the maintainer's
+          # own command written underneath.
+          if printf '%s\n' "$BODY" | grep -vE '^[[:blank:]]*>' \
+               | grep -qE 'Autofix-(Handled|Request):'; then
+            echo "Comment is an autofix reply (carries an unquoted Autofix- marker), skipping."
+            echo 'run=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # A bare "/claude" carries no work order.
+          if [ -z "$(printf '%s' "$BODY" | sed -E 's#/claude##gI' | tr -d '[:space:]')" ]; then
+            refuse 'the command carries no instruction. Write what you want done on the same line, for example `/claude fix the merge conflicts with master`.'
+            echo 'run=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Access control, in two independent barriers (see the header).
+          # 1. The author must be listed in COMMAND_ALLOWED_LOGINS. Logins are
+          #    alphanumerics and hyphens, so the unquoted expansion below can
+          #    neither glob nor split anywhere unintended.
+          AUTHOR_LC=$(printf '%s' "$COMMENT_AUTHOR" | tr '[:upper:]' '[:lower:]')
+          ALLOWED=false
+          for LOGIN in $COMMAND_ALLOWED_LOGINS; do
+            if [ "$(printf '%s' "$LOGIN" | tr '[:upper:]' '[:lower:]')" = "$AUTHOR_LC" ]; then
+              ALLOWED=true
+              break
+            fi
+          done
+          if [ "$ALLOWED" != true ]; then
+            echo "::warning::${COMMENT_AUTHOR} is not in COMMAND_ALLOWED_LOGINS: not running /claude on PR #${PR_NUMBER}."
+            react '-1'
+            echo 'run=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # 2. And still hold a write-ish relationship to the repository, so a
+          #    login that stays in the list after leaving the organisation
+          #    stops working on its own.
+          case "$COMMENT_ASSOCIATION" in
+            OWNER | MEMBER | COLLABORATOR) ;;
+            *)
+              echo "::warning::${COMMENT_AUTHOR} is allow-listed but their association is ${COMMENT_ASSOCIATION}: not running /claude on PR #${PR_NUMBER}."
+              react '-1'
+              echo 'run=false' >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+          esac
+
+          # Both end up in the payload as JSON numbers (jq --argjson), which
+          # fails cryptically on anything else.
+          case "$PR_NUMBER" in
+            '' | *[!0-9]*)
+              echo "::error::Invalid PR number '$PR_NUMBER'"
+              exit 1
+              ;;
+          esac
+          case "$COMMENT_ID" in
+            '' | *[!0-9]*)
+              echo "::error::Invalid comment id '$COMMENT_ID'"
+              exit 1
+              ;;
+          esac
+
+          PR=$(gh api "repos/${GH_REPO}/pulls/${PR_NUMBER}") || {
+            echo "::error::Could not fetch PR #${PR_NUMBER}"
+            exit 1
+          }
+          PR_STATE=$(echo "$PR" | jq -r '.state')
+          HEAD_REPO=$(echo "$PR" | jq -r '.head.repo.full_name // ""')
+          BRANCH=$(echo "$PR" | jq -r '.head.ref')
+
+          # Deliberately NOT checked, unlike the cron: mergeable_state (a
+          # conflict is a legitimate thing to ask about), draft, and the
+          # autofix labels.
+          if [ "$PR_STATE" != 'open' ]; then
+            refuse "pull request #${PR_NUMBER} is ${PR_STATE}."
+            echo 'run=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$HEAD_REPO" != "$GH_REPO" ]; then
+            refuse "this pull request comes from the fork \`${HEAD_REPO}\`, and a cloud session can only push to branches of \`${GH_REPO}\`."
+            echo 'run=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          case "$BRANCH" in
+            "$HEAD_BRANCH_PREFIX"*) ;;
+            *)
+              refuse "the head branch \`${BRANCH}\` is not \`${HEAD_BRANCH_PREFIX}\`-prefixed, and a cloud session may only push to such branches."
+              echo 'run=false' >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+          esac
+
+          # The instruction is written to a file rather than to $GITHUB_OUTPUT:
+          # it is multi-line free text, which no output delimiter handles
+          # safely. head -c cuts BYTES, so an accented character or an emoji
+          # sitting on the boundary leaves a dangling UTF-8 sequence behind.
+          # jq --rawfile tolerates it (it substitutes a replacement
+          # character), so this is cosmetic rather than fatal: iconv -c drops
+          # the incomplete sequence instead of forwarding mojibake as the last
+          # thing the session reads of the request.
+          printf '%s' "$BODY" | head -c "$MAX_INSTRUCTION_CHARS" \
+            | iconv -c -f UTF-8 -t UTF-8 > /tmp/claude-instruction.txt
+          if [ "$(wc -c < /tmp/claude-instruction.txt)" -lt "$(printf '%s' "$BODY" | wc -c)" ]; then
+            echo "::warning::Instruction truncated to ${MAX_INSTRUCTION_CHARS} bytes."
+          fi
+
+          echo "PR #${PR_NUMBER}: /claude requested by ${COMMENT_AUTHOR} (${COMMENT_ASSOCIATION}) on ${COMMENT_KIND} comment ${COMMENT_ID}."
+          react 'eyes'
+
+          {
+            echo 'run=true'
+            echo "number=${PR_NUMBER}"
+            echo "branch=${BRANCH}"
+            echo "comment_kind=${COMMENT_KIND}"
+            echo "reaction_path=${REACTION_PATH}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: 🚀 Fire a Claude Code cloud session
+        if: steps.gate.outputs.run == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          # The URL is not sensitive (the token is), so it belongs in a
+          # repository variable — but a secret of the same name works too.
+          FIRE_URL: ${{ vars.CLAUDE_AUTOFIX_FIRE_URL || secrets.CLAUDE_AUTOFIX_FIRE_URL }}
+          FIRE_TOKEN: ${{ secrets.CLAUDE_AUTOFIX_ROUTINE_TOKEN }}
+          PR_NUMBER: ${{ steps.gate.outputs.number }}
+          PR_BRANCH: ${{ steps.gate.outputs.branch }}
+          COMMENT_KIND: ${{ steps.gate.outputs.comment_kind }}
+          REACTION_PATH: ${{ steps.gate.outputs.reaction_path }}
+          COMMENT_ID: ${{ github.event.comment.id || github.event.review.id }}
+          COMMENT_URL: ${{ github.event.comment.html_url || github.event.review.html_url }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login || github.event.review.user.login }}
+        run: |
+          set -uo pipefail
+
+          # Same routing as the gate's respond(): the answer goes back to
+          # where the command was written, and always carries the marker so it
+          # cannot be read as a new command.
+          respond() {
+            BODY_TEXT=$(printf '%s\n\n<!-- Autofix-Request: %s -->' "$1" "$COMMENT_ID")
+            if [ "$COMMENT_KIND" = 'review' ]; then
+              gh api --silent -X POST \
+                "repos/${GH_REPO}/pulls/${PR_NUMBER}/comments/${COMMENT_ID}/replies" \
+                -f "body=${BODY_TEXT}" && return 0
+              echo "::warning::Could not reply in the review thread of comment ${COMMENT_ID}, falling back to the PR conversation"
+            fi
+            gh api --silent -X POST "repos/${GH_REPO}/issues/${PR_NUMBER}/comments" \
+              -f "body=${BODY_TEXT}" \
+              || echo "::warning::Could not post a comment on PR #${PR_NUMBER}"
+          }
+
+          MISSING=''
+          [ -n "${FIRE_URL:-}" ] || MISSING="CLAUDE_AUTOFIX_FIRE_URL (repository variable, or secret)"
+          [ -n "${FIRE_TOKEN:-}" ] || MISSING="${MISSING:+$MISSING and }CLAUDE_AUTOFIX_ROUTINE_TOKEN (repository secret)"
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing: $MISSING. Both live under Settings > Secrets and variables > Actions. See .github/CLAUDE_AUTOFIX.md for the one-time routine setup."
+            exit 1
+          fi
+
+          # The payload reaches the routine wrapped in an untrusted
+          # <routine-fire-payload> block; the routine's saved prompt opts in
+          # to acting on it. "mode" is what tells the prompt which procedure
+          # to run, and "instruction" is the only field it may read as a work
+          # order — everything else stays data.
+          PAYLOAD=$(jq -cn --argjson number "$PR_NUMBER" --arg branch "$PR_BRANCH" \
+            --arg kind "$COMMENT_KIND" --argjson comment_id "$COMMENT_ID" \
+            --arg comment_url "$COMMENT_URL" --arg requested_by "$COMMENT_AUTHOR" \
+            --rawfile instruction /tmp/claude-instruction.txt \
+            '{mode: "on-demand", number: $number, branch: $branch,
+              comment_kind: $kind, comment_id: $comment_id,
+              comment_url: $comment_url, requested_by: $requested_by,
+              instruction: $instruction}')
+          BODY=$(jq -cn --arg text "$PAYLOAD" '{text: $text}')
+
+          HTTP_CODE=$(curl -sS -o /tmp/fire-response.json -w '%{http_code}' \
+            -X POST "$FIRE_URL" \
+            -H "Authorization: Bearer ${FIRE_TOKEN}" \
+            -H 'anthropic-beta: experimental-cc-routine-2026-04-01' \
+            -H 'anthropic-version: 2023-06-01' \
+            -H 'Content-Type: application/json' \
+            -d "$BODY")
+
+          case "$HTTP_CODE" in
+            2*)
+              SESSION_URL=$(jq -r '.claude_code_session_url // empty' /tmp/fire-response.json)
+              echo "PR #${PR_NUMBER}: cloud session started: ${SESSION_URL}"
+              echo "- PR [#${PR_NUMBER}](https://github.com/${GH_REPO}/pull/${PR_NUMBER}) — requested by ${COMMENT_AUTHOR} — [cloud session](${SESSION_URL})" >> "$GITHUB_STEP_SUMMARY"
+              if [ -n "$REACTION_PATH" ]; then
+                gh api --silent -X POST "$REACTION_PATH" -f 'content=rocket' \
+                  || echo "::warning::Could not react to comment ${COMMENT_ID}"
+              else
+                # A submitted review has no reaction endpoint, so 👀 and 🚀
+                # were both no-ops: without this the command looks ignored
+                # until the session answers, minutes later.
+                respond '🤖 On it — a Claude Code session has started for this request. It will answer in this pull request when it is done.'
+              fi
+              ;;
+            *)
+              # Response body is only printed on failure: Actions logs are
+              # public on this repo.
+              echo "::error::PR #${PR_NUMBER}: routine fire failed with HTTP ${HTTP_CODE} (401: bad or revoked token; 429: daily routine cap or rate limit reached)"
+              head -c 2000 /tmp/fire-response.json
+              echo
+              # The requester is waiting on a session that will never start,
+              # so tell them where they asked rather than only in the job log.
+              respond "$(printf '🤖 I could not start a Claude Code session for this request (HTTP %s from the routine API). A maintainer can check the [workflow run](https://github.com/%s/actions/runs/%s) and retry the command.' "$HTTP_CODE" "$GH_REPO" "$GITHUB_RUN_ID")"
+              exit 1
+              ;;
+          esac

@@ -10,3 +10,60 @@
     transform: rotate(360deg);
   }
 }
+
+/* Containers widget: Horizon pill rows (the scene/device-list family) —
+   name + creation date stacked on the left, state badge on the right.
+   Light colors only: dark mode comes from the app inversion filter. */
+.containerList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 19rem;
+  overflow-y: auto;
+}
+
+.containerRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem 0.5rem 0.625rem;
+  border-radius: 14px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.containerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  background-color: #e3ebfb;
+  color: #3d6df0;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.containerInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.containerName {
+  color: #1c2334;
+  font-weight: 600;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.containerCreated {
+  color: #7c8396;
+  font-size: 0.75rem;
+}
+
+.containerRow .badge {
+  flex-shrink: 0;
+}

@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const db = require('../../models');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../utils/constants');
-const { getFeaturesInclude } = require('../../utils/deviceQueryIncludes');
+const { getFeaturesInclude, ROOM_DEVICE_FEATURES_ATTRIBUTES } = require('../../utils/deviceQueryIncludes');
 
 const { NotFoundError } = require('../../utils/coreErrors');
 
@@ -10,19 +10,6 @@ const DEFAULT_OPTIONS = {
 };
 
 const DEVICE_ATTRIBUTES = ['name', 'selector'];
-const DEVICE_FEATURES_ATTRIBUTES = [
-  'name',
-  'selector',
-  'category',
-  'type',
-  'read_only',
-  'unit',
-  'min',
-  'max',
-  'last_value',
-  'last_value_string',
-  'last_value_changed',
-];
 const SERVICE_ATTRIBUTES = ['name'];
 
 /**
@@ -43,7 +30,7 @@ async function getBySelector(selector, options) {
       attributes: DEVICE_ATTRIBUTES,
       include: [
         getFeaturesInclude({
-          attributes: DEVICE_FEATURES_ATTRIBUTES,
+          attributes: ROOM_DEVICE_FEATURES_ATTRIBUTES,
           where: {
             category: {
               [Op.not]: DEVICE_FEATURE_CATEGORIES.CAMERA,

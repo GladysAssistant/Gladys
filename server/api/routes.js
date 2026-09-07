@@ -184,6 +184,16 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dashboardController.updateOrder,
     },
+    'post /api/v1/dashboard_asset/:dashboard_selector': {
+      authenticated: true,
+      largeJsonBody: true,
+      rateLimit: true,
+      controller: dashboardController.createAsset,
+    },
+    'get /api/v1/dashboard_asset/:dashboard_asset_id': {
+      authenticated: true,
+      controller: dashboardController.getAsset,
+    },
     'get /api/v1/dashboard/photo/proxy': {
       authenticated: true,
       rateLimit: true,
@@ -258,6 +268,10 @@ function getRoutes(gladys) {
     'get /api/v1/device_feature/states_history': {
       authenticated: true,
       controller: deviceController.getDeviceStatesHistory,
+    },
+    'get /api/v1/device_feature/states_csv': {
+      authenticated: true,
+      controller: deviceController.exportStatesToCsv,
     },
     'get /api/v1/device_feature/energy_consumption': {
       authenticated: true,
@@ -338,10 +352,20 @@ function getRoutes(gladys) {
     // flow can restore a Gladys Plus backup without creating a local account.
     // The "admin" flag is kept on those routes because it is also used by
     // setupGateway to protect API calls done through the Gladys Plus tunnel.
+    // The status route is the exception: it only returns two booleans (is the
+    // instance linked to Gladys Plus, is it currently connected), and every
+    // user needs it, not just admins. The front-end uses it to know whether a
+    // Gladys Plus feature (AI chat, voice assistant, camera live) is available:
+    // when it is denied, a user invited on the Plus account is wrongly invited
+    // to start a free trial for a subscription the instance already has.
     'get /api/v1/gateway/status': {
       authenticatedOrNotConfigured: true,
-      admin: true,
       controller: gatewayController.getStatus,
+    },
+    'post /api/v1/gateway/subscription/refresh': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.refreshSubscriptionStatus,
     },
     'post /api/v1/gateway/login': {
       authenticatedOrNotConfigured: true,
@@ -395,9 +419,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.createBackup,
     },
+    // reachable without authentication while the instance has no user (signup
+    // restore flow), and it makes the server download and unpack a remote file:
+    // rate limited like the other pre-authentication routes
     'post /api/v1/gateway/backup/restore': {
       authenticatedOrNotConfigured: true,
       admin: true,
+      rateLimit: true,
       controller: gatewayController.restoreBackup,
     },
     'get /api/v1/gateway/backup/restore/status': {
@@ -500,6 +528,13 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: serviceController.stop,
+    },
+    // ⚠️ the literal `message` route must be declared BEFORE `:service_name`
+    // (setupRoutes registers routes in declaration order), otherwise it would
+    // be swallowed and read as a service named "message".
+    'get /api/v1/service/message': {
+      authenticated: true,
+      controller: serviceController.getMessageServices,
     },
     'get /api/v1/service/:service_name': {
       authenticated: true,
@@ -688,6 +723,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.networkDiscoveryScan,
     },
+    'post /api/integration/v1/network/wake': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.networkWake,
+    },
     'post /api/integration/v1/camera/image': {
       authenticated: false,
       externalIntegrationAuth: true,
@@ -844,12 +884,18 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: variableController.getByLocalService,
     },
+    // global variables hold instance-wide secrets (Gladys Plus keys, backup
+    // keys...): reading and writing them is reserved to admins. Per-user
+    // settings go through /api/v1/user/variable below, which stays open to
+    // every authenticated user.
     'post /api/v1/variable/:variable_key': {
       authenticated: true,
+      admin: true,
       controller: variableController.setValue,
     },
     'get /api/v1/variable/:variable_key': {
       authenticated: true,
+      admin: true,
       controller: variableController.getValue,
     },
     'post /api/v1/user/variable/:variable_key': {
@@ -896,6 +942,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: sceneController.get,
     },
+    'get /api/v1/scene/running': {
+      authenticated: true,
+      controller: sceneController.getRunning,
+    },
     'get /api/v1/scene/:scene_selector': {
       authenticated: true,
       controller: sceneController.getBySelector,
@@ -913,6 +963,14 @@ function getRoutes(gladys) {
     'post /api/v1/scene/:scene_selector/start': {
       authenticated: true,
       controller: sceneController.start,
+    },
+    'post /api/v1/scene/execution/:execution_id/stop': {
+      authenticated: true,
+      controller: sceneController.stopExecution,
+    },
+    'post /api/v1/scene/:scene_selector/stop': {
+      authenticated: true,
+      controller: sceneController.stop,
     },
     'post /api/v1/scene/:scene_selector/duplicate': {
       authenticated: true,
@@ -944,6 +1002,16 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: systemController.installUpgrade,
+    },
+    'post /api/v1/system/reboot': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.rebootHost,
+    },
+    'post /api/v1/system/shutdown-host': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.shutdownHost,
     },
     'post /api/v1/system/vacuum': {
       authenticated: true,

@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 import { EVENTS } from '../../../../../../server/utils/constants';
 
 class UserPresenceTrigger extends Component {

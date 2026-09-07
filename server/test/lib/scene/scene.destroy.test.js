@@ -28,6 +28,27 @@ describe('scene.destroy', () => {
     const promise = sceneManager.destroy('not-found-scene');
     return assert.isRejected(promise);
   });
+  it('should stop the in-flight executions of the destroyed scene', async () => {
+    sceneManager.scenes['test-scene'] = {
+      name: 'Test Scene',
+      triggers: [],
+    };
+    const abortController = new AbortController();
+    sceneManager.runningScenes.set('execution-1', {
+      sceneSelector: 'test-scene',
+      abortController,
+    });
+    const otherAbortController = new AbortController();
+    sceneManager.runningScenes.set('execution-2', {
+      sceneSelector: 'other-scene',
+      abortController: otherAbortController,
+    });
+
+    await sceneManager.destroy('test-scene');
+
+    expect(abortController.signal.aborted).to.equal(true);
+    expect(otherAbortController.signal.aborted).to.equal(false);
+  });
   it('should call dailyUpdate when destroying a scene with sunrise trigger', async () => {
     sceneManager.dailyUpdate = fake.resolves(null);
     sceneManager.scenes['test-scene'] = {

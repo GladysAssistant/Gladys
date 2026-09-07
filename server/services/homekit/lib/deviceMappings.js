@@ -6,6 +6,8 @@ const {
   LOCK,
   BUTTON_STATUS,
   AC_MODE,
+  THERMOSTAT_MODE,
+  THERMOSTAT_OPERATING_STATE,
 } = require('../../../utils/constants');
 
 const mappings = {
@@ -294,6 +296,13 @@ const mappings = {
       [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: {
         characteristics: ['TargetTemperature'],
       },
+      [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: {
+        characteristics: ['TargetHeatingCoolingState', 'CurrentHeatingCoolingState'],
+      },
+      // Read-only: it says what the device is doing, HomeKit has nothing to command there.
+      [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: {
+        characteristics: ['CurrentHeatingCoolingState'],
+      },
     },
   },
   [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
@@ -484,6 +493,32 @@ const heatingCoolingStateToAcMode = {
   [HOMEKIT_HEATING_COOLING_STATE.COOL]: AC_MODE.COOLING,
   [HOMEKIT_HEATING_COOLING_STATE.AUTO]: AC_MODE.AUTO,
 };
+
+// Unlike the air conditioning mode, the thermostat mode carries its own off value, so a device
+// driven by it needs no separate on/off command to be switched off from the Home app. The two enums
+// happen to agree value for value, but they are written out rather than passed through: a change to
+// either one has to be a change here, not a mode silently shifting by one.
+const thermostatModeToHeatingCoolingState = {
+  [THERMOSTAT_MODE.OFF]: HOMEKIT_HEATING_COOLING_STATE.OFF,
+  [THERMOSTAT_MODE.HEATING]: HOMEKIT_HEATING_COOLING_STATE.HEAT,
+  [THERMOSTAT_MODE.COOLING]: HOMEKIT_HEATING_COOLING_STATE.COOL,
+  [THERMOSTAT_MODE.AUTO]: HOMEKIT_HEATING_COOLING_STATE.AUTO,
+};
+
+const heatingCoolingStateToThermostatMode = {
+  [HOMEKIT_HEATING_COOLING_STATE.OFF]: THERMOSTAT_MODE.OFF,
+  [HOMEKIT_HEATING_COOLING_STATE.HEAT]: THERMOSTAT_MODE.HEATING,
+  [HOMEKIT_HEATING_COOLING_STATE.COOL]: THERMOSTAT_MODE.COOLING,
+  [HOMEKIT_HEATING_COOLING_STATE.AUTO]: THERMOSTAT_MODE.AUTO,
+};
+
+// CurrentHeatingCoolingState has no idle value: a device running but doing nothing is reported as
+// off, which the Home app shows as "Idle".
+const thermostatOperatingStateToHeatingCoolingState = {
+  [THERMOSTAT_OPERATING_STATE.IDLE]: HOMEKIT_HEATING_COOLING_STATE.OFF,
+  [THERMOSTAT_OPERATING_STATE.HEATING]: HOMEKIT_HEATING_COOLING_STATE.HEAT,
+  [THERMOSTAT_OPERATING_STATE.COOLING]: HOMEKIT_HEATING_COOLING_STATE.COOL,
+};
 // HomeKit knows three button events, Gladys has more than a hundred button statuses. Only those
 // with an exact HomeKit equivalent are forwarded: anything else — arrow keys, rotation, shake,
 // brightness gestures — would have to be reported as one of these three, and firing the wrong
@@ -533,4 +568,7 @@ module.exports = {
   HOMEKIT_HEATING_COOLING_STATE,
   acModeToHeatingCoolingState,
   heatingCoolingStateToAcMode,
+  thermostatModeToHeatingCoolingState,
+  heatingCoolingStateToThermostatMode,
+  thermostatOperatingStateToHeatingCoolingState,
 };

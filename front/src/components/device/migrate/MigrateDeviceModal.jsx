@@ -1,11 +1,14 @@
 import { Component } from 'preact';
+import { createPortal } from 'preact/compat';
 import { connect } from 'unistore/preact';
 import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
-import Select from 'react-select';
+import Select from '../../form/Select';
 import get from 'get-value';
 
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import normalizeSearchText from '../../../utils/normalizeSearchText';
+import { getDeviceIntegration, disambiguateIntegrationNames } from '../../../routes/devices/integrationLinks';
 import style from './style.css';
 
 class MigrateDeviceModal extends Component {
@@ -77,6 +80,64 @@ class MigrateDeviceModal extends Component {
     }
     const destinationDevice = this.state.devices.find(device => device.selector === option.value);
     this.setState({ destinationDevice, featuresMapping: this.computeAutoMapping(destinationDevice) });
+  };
+
+  getDeviceLabel = device => {
+    const roomName = device.room ? device.room.name : get(this.props, 'intl.dictionary.device.noRoom');
+    return `${device.name} (${roomName})`;
+  };
+
+  // Options are grouped by integration so that same-named devices don't get
+  // confused with one another, and each option shows the room name for the
+  // same reason. Grouping is keyed on the integration's slug (technical
+  // identity), but the group is labelled and searched on the same
+  // human-readable, translated/disambiguated name shown on the devices page
+  // (getDeviceIntegration/disambiguateIntegrationNames), so e.g. a French
+  // user typing "Caméras" still finds "rtsp-camera" devices.
+  getDeviceOptions = () => {
+    const unknownIntegrationLabel = get(this.props, 'intl.dictionary.device.migrate.unknownIntegration');
+    const integrations = this.state.devices.map(candidate => getDeviceIntegration(candidate));
+    const nameBySlug = disambiguateIntegrationNames(integrations);
+    const getIntegrationLabel = integration => {
+      if (!integration) {
+        return unknownIntegrationLabel;
+      }
+      const translated = integration.i18nKey && get(this.props, `intl.dictionary.${integration.i18nKey}`);
+      return translated || nameBySlug.get(integration.slug) || integration.name;
+    };
+
+    const groupsBySlug = new Map();
+    this.state.devices.forEach((candidate, index) => {
+      const integration = integrations[index];
+      const groupKey = integration ? integration.slug : '';
+      const integrationLabel = getIntegrationLabel(integration);
+      if (!groupsBySlug.has(groupKey)) {
+        groupsBySlug.set(groupKey, { label: integrationLabel, options: [] });
+      }
+      const label = this.getDeviceLabel(candidate);
+      const roomName = candidate.room ? candidate.room.name : get(this.props, 'intl.dictionary.device.noRoom');
+      groupsBySlug.get(groupKey).options.push({
+        value: candidate.selector,
+        label,
+        searchText: normalizeSearchText(`${integrationLabel} ${roomName} ${label}`)
+      });
+    });
+    const sortByLabel = (a, b) => a.label.localeCompare(b.label);
+    return Array.from(groupsBySlug.values())
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .map(group => ({ ...group, options: group.options.sort(sortByLabel) }));
+  };
+
+  // Every typed word must match (implicit AND) against integration + room + name
+  filterOption = (option, rawInput) => {
+    if (!rawInput) {
+      return true;
+    }
+    const searchText = option.data.searchText || normalizeSearchText(option.label);
+    return normalizeSearchText(rawInput)
+      .split(/\s+/)
+      .filter(Boolean)
+      .every(word => searchText.includes(word));
   };
 
   // A source feature is auto-matched when exactly one unused destination
@@ -217,12 +278,14 @@ class MigrateDeviceModal extends Component {
   ) {
     const sourceFeatures = device.features || [];
     const unmappedFeatures = sourceFeatures.filter(feature => !featuresMapping[feature.selector]);
-    const deviceOptions = devices.map(candidate => ({
-      value: candidate.selector,
-      label: candidate.name
-    }));
-    return (
-      <div class={style.modalOverlay} onClick={this.handleOverlayClick}>
+    const deviceGroups = this.getDeviceOptions();
+    const hasDeviceOptions = devices.length > 0;
+    // The modal is rendered on <body>: it opens from inside a glass card, whose
+    // backdrop filter would otherwise trap this fixed overlay in the card's own
+    // stacking context (same reason the light control panel is portaled).
+    // glass-theme keeps the dialog on the theme's glass surface out there.
+    return createPortal(
+      <div class={cx('glass-theme', style.modalOverlay)} onClick={this.handleOverlayClick}>
         <div class={style.modalDialog}>
           <div class="card mb-0">
             <div class="card-header">
@@ -270,21 +333,23 @@ class MigrateDeviceModal extends Component {
                           <Text id="device.migrate.loadError" />
                         </div>
                       )}
-                      {!loadError && deviceOptions.length === 0 && !loading && (
+                      {!loadError && !hasDeviceOptions && !loading && (
                         <div class="alert alert-info">
                           <Text id="device.migrate.noDestinationAvailable" />
                         </div>
                       )}
-                      {deviceOptions.length > 0 && (
+                      {hasDeviceOptions && (
                         <div class="form-group">
                           <label class="form-label">
                             <Text id="device.migrate.destinationLabel" />
                           </label>
                           <Select
-                            options={deviceOptions}
+                            options={deviceGroups}
+                            filterOption={this.filterOption}
+                            classNamePrefix="react-select"
                             value={
                               destinationDevice
-                                ? { value: destinationDevice.selector, label: destinationDevice.name }
+                                ? { value: destinationDevice.selector, label: this.getDeviceLabel(destinationDevice) }
                                 : null
                             }
                             onChange={this.selectDestination}
@@ -334,7 +399,8 @@ class MigrateDeviceModal extends Component {
             </div>
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
 }

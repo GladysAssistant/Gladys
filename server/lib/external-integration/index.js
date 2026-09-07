@@ -20,12 +20,14 @@ const { registerProxyService } = require('./externalIntegration.registerProxySer
 const { clearTimers } = require('./externalIntegration.clearTimers');
 const { handleStartupTimeout } = require('./externalIntegration.handleStartupTimeout');
 const { isUpdateAvailable } = require('./externalIntegration.isUpdateAvailable');
+const { getLatestVersion } = require('./externalIntegration.getLatestVersion');
 const { getDocsUrls } = require('./externalIntegration.getDocsUrls');
 const { update } = require('./externalIntegration.update');
 const { validateToken } = require('./externalIntegration.validateToken');
 const { verifyContainerToken } = require('./externalIntegration.verifyContainerToken');
 const { setDiscoveredDevices } = require('./externalIntegration.setDiscoveredDevices');
 const { upsertDeviceParams } = require('./externalIntegration.upsertDeviceParams');
+const { upsertFeatureSupportedOptions } = require('./externalIntegration.upsertFeatureSupportedOptions');
 const { removeDeviceParams } = require('./externalIntegration.removeDeviceParams');
 const { saveCameraImage } = require('./externalIntegration.saveCameraImage');
 const { setDeviceTransports } = require('./externalIntegration.setDeviceTransports');
@@ -119,6 +121,7 @@ const { installFromStore } = require('./store/store.installFromStore');
 const { installFromRepoUrl } = require('./store/store.installFromRepoUrl');
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
+const { wakeOnLan } = require('./externalIntegration.wakeOnLan');
 
 /**
  * @description External integration supervisor: complete lifecycle of the
@@ -131,11 +134,12 @@ const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
  * @param {object} stateManager - State manager.
  * @param {object} device - Device manager.
  * @param {object} variable - Variable manager.
+ * @param {object} energyPrice - Energy price manager (default electric meter).
  * @param {string} jwtSecret - Secret to sign integration JWTs.
  * @param {object} cache - In-memory cache (contact link codes).
  * @param {object} calendar - Calendar manager (calendar-type integrations, B.19).
  * @example
- * const externalIntegration = new ExternalIntegration(event, system, service, stateManager, device, variable, 's');
+ * const externalIntegration = new ExternalIntegration(event, system, service, state, device, variable, price, 's');
  */
 const ExternalIntegration = function ExternalIntegration(
   event,
@@ -144,6 +148,7 @@ const ExternalIntegration = function ExternalIntegration(
   stateManager,
   device,
   variable,
+  energyPrice,
   jwtSecret,
   cache,
   calendar,
@@ -154,6 +159,7 @@ const ExternalIntegration = function ExternalIntegration(
   this.stateManager = stateManager;
   this.device = device;
   this.variable = variable;
+  this.energyPrice = energyPrice;
   this.jwtSecret = jwtSecret;
   this.cache = cache;
   this.calendar = calendar;
@@ -178,6 +184,8 @@ const ExternalIntegration = function ExternalIntegration(
   // serviceId -> { count, resetAt } fixed one-minute window rate limit on
   // the calendar write endpoints (POST/DELETE /calendar*)
   this.calendarWriteRateLimits = new Map();
+  // serviceId -> timestamp of the last Wake-on-LAN emission (1/2s)
+  this.networkWakeTimes = new Map();
   // supervision timers
   this.startupTimers = new Map();
   this.restartTimers = new Map();
@@ -233,12 +241,14 @@ ExternalIntegration.prototype.registerProxyService = registerProxyService;
 ExternalIntegration.prototype.clearTimers = clearTimers;
 ExternalIntegration.prototype.handleStartupTimeout = handleStartupTimeout;
 ExternalIntegration.prototype.isUpdateAvailable = isUpdateAvailable;
+ExternalIntegration.prototype.getLatestVersion = getLatestVersion;
 ExternalIntegration.prototype.getDocsUrls = getDocsUrls;
 ExternalIntegration.prototype.update = update;
 ExternalIntegration.prototype.validateToken = validateToken;
 ExternalIntegration.prototype.verifyContainerToken = verifyContainerToken;
 ExternalIntegration.prototype.setDiscoveredDevices = setDiscoveredDevices;
 ExternalIntegration.prototype.upsertDeviceParams = upsertDeviceParams;
+ExternalIntegration.prototype.upsertFeatureSupportedOptions = upsertFeatureSupportedOptions;
 ExternalIntegration.prototype.removeDeviceParams = removeDeviceParams;
 ExternalIntegration.prototype.saveCameraImage = saveCameraImage;
 ExternalIntegration.prototype.setDeviceTransports = setDeviceTransports;
@@ -329,5 +339,6 @@ ExternalIntegration.prototype.getDocsMarkdown = getDocsMarkdown;
 ExternalIntegration.prototype.fetchManifestFromRepo = fetchManifestFromRepo;
 ExternalIntegration.prototype.installFromStore = installFromStore;
 ExternalIntegration.prototype.installFromRepoUrl = installFromRepoUrl;
+ExternalIntegration.prototype.wakeOnLan = wakeOnLan;
 
 module.exports = ExternalIntegration;

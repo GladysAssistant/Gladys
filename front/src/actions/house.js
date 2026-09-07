@@ -9,8 +9,34 @@ import debounce from 'debounce';
 import get from 'get-value';
 import uuid from 'uuid';
 
+import translations from '../config/i18n';
+
 function sortRoomsInHouses(houses) {
   houses.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
+}
+
+/**
+ * @description Returns the localized name given to a house that was just created,
+ * suffixed so that creating several houses in a row doesn't hit the unique
+ * name constraint.
+ * @param {object} state - Current state.
+ * @returns {string} The name of the new house.
+ * @example getDefaultHouseName(state);
+ */
+function getDefaultHouseName(state) {
+  // the current locale lives in the user, not at the root of the state
+  const language = get(state, 'user.language');
+  const dictionary = (language && translations[language]) || translations.en;
+  const baseName = get(dictionary, 'housesSettings.defaultNewHouseName') || 'New House';
+  const existingNames = (state.houses || []).map(house => house.name);
+  if (!existingNames.includes(baseName)) {
+    return baseName;
+  }
+  let index = 2;
+  while (existingNames.includes(`${baseName} ${index}`)) {
+    index += 1;
+  }
+  return `${baseName} ${index}`;
 }
 
 function createActions(store) {
@@ -175,7 +201,10 @@ function createActions(store) {
           $unshift: [
             {
               id: uuid.v4(),
-              name: null,
+              // a named house from the start: the list shows houses by name,
+              // and an empty one would be an unreadable row (and a house the
+              // server refuses to save)
+              name: getDefaultHouseName(state),
               latitude: null,
               longitude: null,
               rooms: []
@@ -186,10 +215,13 @@ function createActions(store) {
       store.setState(newState);
     },
     async saveHouse(state, houseIndex) {
-      store.setState({
-        houseUpdateStatus: RequestStatus.Getting
-      });
       const house = state.houses[houseIndex];
+      // statuses are keyed by house: a save must not wipe the alert another
+      // house is currently displaying, and starting a save clears the
+      // previous result of that same house
+      store.setState({
+        houseUpdateStatus: { ...state.houseUpdateStatus, [house.id]: RequestStatus.Getting }
+      });
       try {
         let houseCreatedOrUpdated;
 
@@ -215,9 +247,25 @@ function createActions(store) {
         const rooms = await Promise.all(promises);
         const roomsWithoutDeleted = rooms.filter(room => room.selector !== undefined);
 
-        const newState = update(state, {
+        // the state may have moved while the request was in flight (another
+        // house added, deleted or saved): apply the result to the current
+        // state, on the row holding this house id
+        const currentState = store.getState();
+        const currentIndex = currentState.houses.findIndex(currentHouse => currentHouse.id === house.id);
+        const houseUpdateStatus = {
+          ...currentState.houseUpdateStatus,
+          [house.id]: RequestStatus.Success,
+          // should the server ever answer with another id, the row reads its
+          // status under that new id
+          [houseCreatedOrUpdated.id]: RequestStatus.Success
+        };
+        if (currentIndex === -1) {
+          store.setState({ houseUpdateStatus });
+          return;
+        }
+        const newState = update(currentState, {
           houses: {
-            [houseIndex]: {
+            [currentIndex]: {
               id: {
                 $set: houseCreatedOrUpdated.id
               },
@@ -233,81 +281,56 @@ function createActions(store) {
             }
           },
           houseUpdateStatus: {
-            $auto: {
-              [house.id]: {
-                $set: RequestStatus.Success
-              }
-            }
+            $set: houseUpdateStatus
           }
         });
         store.setState(newState);
       } catch (e) {
         const status = get(e, 'response.status');
         const url = get(e, 'response.config.url');
+        let houseStatus = RequestStatus.Error;
         if (status === 409 && url.endsWith('/room')) {
-          store.setState({
-            houseUpdateStatus: {
-              [house.id]: RequestStatus.RoomConflictError
-            }
-          });
+          houseStatus = RequestStatus.RoomConflictError;
         } else if (status === 409) {
-          store.setState({
-            houseUpdateStatus: {
-              [house.id]: RequestStatus.ConflictError
-            }
-          });
+          houseStatus = RequestStatus.ConflictError;
         } else if (status === 422 && url.includes('/room')) {
-          store.setState({
-            houseUpdateStatus: {
-              [house.id]: RequestStatus.RoomValidationError
-            }
-          });
+          houseStatus = RequestStatus.RoomValidationError;
         } else if (status === 422) {
-          store.setState({
-            houseUpdateStatus: {
-              [house.id]: RequestStatus.ValidationError
-            }
-          });
-        } else {
-          store.setState({
-            houseUpdateStatus: {
-              [house.id]: RequestStatus.Error
-            }
-          });
+          houseStatus = RequestStatus.ValidationError;
         }
+        store.setState({
+          houseUpdateStatus: { ...store.getState().houseUpdateStatus, [house.id]: houseStatus }
+        });
       }
     },
     async deleteHouse(state, houseIndex) {
-      store.setState({
-        houseUpdateStatus: RequestStatus.Getting
-      });
       const house = state.houses[houseIndex];
+      store.setState({
+        houseUpdateStatus: { ...state.houseUpdateStatus, [house.id]: RequestStatus.Getting }
+      });
       try {
         if (house.created_at && house.selector) {
           await state.httpClient.delete(`/api/v1/house/${house.selector}`);
         }
-        const newState = update(state, {
+        const currentState = store.getState();
+        const currentIndex = currentState.houses.findIndex(currentHouse => currentHouse.id === house.id);
+        const houseUpdateStatus = { ...currentState.houseUpdateStatus, [house.id]: RequestStatus.Success };
+        if (currentIndex === -1) {
+          store.setState({ houseUpdateStatus });
+          return;
+        }
+        const newState = update(currentState, {
           houses: {
-            $splice: [[houseIndex, 1]]
+            $splice: [[currentIndex, 1]]
           },
           houseUpdateStatus: {
-            $auto: {
-              [house.id]: {
-                $set: RequestStatus.Success
-              }
-            }
+            $set: houseUpdateStatus
           }
         });
         store.setState(newState);
       } catch (e) {
         store.setState({
-          houseUpdateStatus: {
-            $auto: {
-              [house.id]: {
-                $set: RequestStatus.Error
-              }
-            }
-          }
+          houseUpdateStatus: { ...store.getState().houseUpdateStatus, [house.id]: RequestStatus.Error }
         });
       }
     }

@@ -29,6 +29,7 @@ const DeviceTab = ({
   getDevicesStatus,
   getDevices,
   updateDeviceField,
+  updateFeatureProperty,
   saveDevice,
   deleteDevice
 }) => {
@@ -96,6 +97,7 @@ const DeviceTab = ({
                     houses={houses}
                     language={language}
                     updateDeviceField={updateDeviceField}
+                    updateFeatureProperty={updateFeatureProperty}
                     saveDevice={saveDevice}
                     deleteDevice={deleteDevice}
                   />

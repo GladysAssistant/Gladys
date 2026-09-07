@@ -2,6 +2,9 @@
   display: block;
   text-decoration: none;
   color: inherit;
+  /* The card inside carries mb-0, so the anchor holds the standard card
+     spacing: without it the next box (or section) sits flush against it */
+  margin-bottom: 1.5rem;
 }
 
 .linkCard:hover {

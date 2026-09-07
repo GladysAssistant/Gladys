@@ -173,6 +173,12 @@ const NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS = 10;
 // small payload, one scan per 10 seconds per integration.
 const MAX_ACTIVE_BROADCAST_PAYLOAD_BYTES = 512;
 const ACTIVE_BROADCAST_MIN_INTERVAL_MS = 10 * 1000;
+// Wake-on-LAN (POST /network/wake): the payload is the fixed magic packet
+// (never integration-provided bytes), and the emission rate is bounded so
+// the primitive cannot be turned into a UDP flood from the core's network
+// namespace. 2 seconds still allows the usual "send a few packets until
+// the device wakes up" retry loop.
+const NETWORK_WAKE_MIN_INTERVAL_MS = 2 * 1000;
 // Camera images: pushed through POST /camera/image (core's 150 KB bound),
 // never through POST /state (dedicated saveStringState path, no state
 // history). Continuous video streaming is out of the v1 scope.
@@ -211,6 +217,23 @@ const WEATHER_IMAGE_CACHE_PREFIX = 'weather-image';
 // coerced to 'unknown' (the frontend renders a neutral icon).
 // 'night' is deprecated for providers: send the real condition plus
 // is_day: false instead (a rainy night stays 'rain').
+//
+// The conditions after 'unknown' are extensions: phenomena several providers
+// distinguish but the original enum flattened into a neighbour. They stay
+// GENERIC -- each is encoded separately by Meteo France, OpenWeather and the
+// NWS alike, never one provider's private code:
+//   - freezing-rain / freezing-fog: MF signs them with a dedicated pictogram
+//     ('p10' and 'p11' carry a black-ice road sign, 'p8' a "GIV." badge) and
+//     OpenWeather has codes 511 and 741; folding them into 'rain' and 'fog'
+//     dropped the very warning that makes them worth showing.
+//   - snow-thunderstorm: a thundery snow shower (MF 'p30'), which is neither
+//     plain 'snow' nor plain 'thunderstorm'.
+//   - sandstorm: MF 'p31', OpenWeather Dust/Sand/Ash -- a real forecast
+//     overseas, where the Saharan haze reaches the French West Indies.
+//   - tornado / hurricane: MF 'p32'-'p34' (waterspout, tornado, cyclone),
+//     OpenWeather Tornado and Squall. 'wind' said nothing of the danger.
+// A provider that cannot tell them apart keeps sending the broader condition:
+// the extension is additive, so every payload that worked before still does.
 const WEATHER_CONDITIONS = [
   'clear',
   'partly-cloudy',
@@ -226,6 +249,12 @@ const WEATHER_CONDITIONS = [
   'wind',
   'night',
   'unknown',
+  'freezing-rain',
+  'freezing-fog',
+  'snow-thunderstorm',
+  'sandstorm',
+  'tornado',
+  'hurricane',
 ];
 // CAP-style severities (Common Alerting Protocol) — generic, never one
 // provider's scale (Météo France vigilance: yellow -> moderate,
@@ -268,6 +297,18 @@ const MAX_TRANSPORT_MESSAGE_LENGTH = 200;
 // writable by it).
 const MANIFEST_TRANSPORTS = ['local', 'cloud'];
 const PREFER_LOCAL_CONFIG_KEY = 'GLADYS_PREFER_LOCAL';
+// The two config field types that link a provider account instead of holding a
+// value: both render a Connect button fed by the connection status, and both
+// keep their credentials off-schema. `oauth2` is the redirect-based OAuth2 flow
+// (the provider comes back to a redirect URI with a code); `account_link` is for
+// a provider that never redirects back — a QR sign-in approved in the vendor
+// app, a pairing confirmed on a device — so it has no redirect URI, no anti-CSRF
+// state and no callback, and the integration reports the approval itself.
+const ACCOUNT_FIELD_TYPES = ['oauth2', 'account_link'];
+// Optional `categories` manifest field: browse categories of the integration
+// catalog (docs/specs/integration-catalog-categories.md). More than 3 means
+// the assignment is lazy, not the vocabulary too narrow.
+const MAX_MANIFEST_CATEGORIES = 3;
 // Inbound webhooks via Gladys Plus (B.17): the gateway relays third-party
 // webhook calls to the instance under a single integration-agnostic action;
 // the supervisor routes them to the declared integration. Two modes exist
@@ -364,6 +405,7 @@ module.exports = {
   MAX_UDP_BROADCAST_PORTS,
   MAX_ACTIVE_BROADCAST_PAYLOAD_BYTES,
   ACTIVE_BROADCAST_MIN_INTERVAL_MS,
+  NETWORK_WAKE_MIN_INTERVAL_MS,
   NETWORK_DISCOVERY_MIN_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_MAX_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS,
@@ -395,6 +437,8 @@ module.exports = {
   MAX_TRANSPORT_MESSAGE_LENGTH,
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
+  ACCOUNT_FIELD_TYPES,
+  MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   WEBHOOK_DEFAULT_MODE,

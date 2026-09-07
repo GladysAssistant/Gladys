@@ -2,6 +2,8 @@ const { BadParameters } = require('../../utils/coreErrors');
 const {
   EVENTS,
   WEBSOCKET_MESSAGE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_CATEGORIES_LIST,
   DEVICE_FEATURE_TYPES_LIST,
   DEVICE_FEATURE_UNITS_LIST,
@@ -16,6 +18,7 @@ const {
   DEVICE_TRANSPORTS,
 } = require('./constants');
 const { validateTransportMessage } = require('./externalIntegration.setDeviceTransports');
+const { normalizeSupportedOptions } = require('../../utils/normalizeSupportedOptions');
 
 /**
  * @description Store the complete list of discovered devices published by an
@@ -72,10 +75,31 @@ async function setDiscoveredDevices(service, devices) {
       if (feature.unit !== undefined && feature.unit !== null && !DEVICE_FEATURE_UNITS_LIST.includes(feature.unit)) {
         throw new BadParameters(`${featurePath}.unit: unknown unit`);
       }
+      if (
+        feature.step !== undefined &&
+        feature.step !== null &&
+        (typeof feature.step !== 'number' || !Number.isFinite(feature.step) || feature.step <= 0)
+      ) {
+        throw new BadParameters(`${featurePath}.step: must be a positive number`);
+      }
       // the selector is derived and made unique by the core at creation
       // (buildUniqueSelector): an integration publishes none, and dropping it
       // here keeps the Discovery screen from posting one back to POST /device
       const { selector: publishedFeatureSelector, ...featureWithoutSelector } = feature;
+      if (feature.supported_options !== undefined) {
+        // labeled option lists (camera presets, supported movements, AC modes...);
+        // string option values only exist on dynamic selects (installed TV apps,
+        // HDMI sources...), like in device.syncFeatureSupportedOptions
+        const allowStringValues =
+          feature.category === DEVICE_FEATURE_CATEGORIES.TEXT && feature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT;
+        try {
+          featureWithoutSelector.supported_options = normalizeSupportedOptions(feature.supported_options, {
+            allowStringValues,
+          });
+        } catch (e) {
+          throw new BadParameters(`${featurePath}.supported_options: ${e.message}`);
+        }
+      }
       return featureWithoutSelector;
     });
     const params = Array.isArray(device.params) ? device.params : [];
@@ -124,6 +148,7 @@ async function setDiscoveredDevices(service, devices) {
       const createdDevice = this.stateManager.get('deviceByExternalId', device.external_id);
       if (createdDevice && createdDevice.service_id === service.id) {
         await this.upsertDeviceParams(createdDevice, device.params);
+        await this.upsertFeatureSupportedOptions(createdDevice, device.features);
       }
     }),
   );

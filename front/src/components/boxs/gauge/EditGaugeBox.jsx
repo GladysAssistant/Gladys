@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
-import Select from 'react-select';
+import Select from '../../form/Select';
 import ReactSlider from 'react-slider';
 import cx from 'classnames';
 import { connect } from 'unistore/preact';

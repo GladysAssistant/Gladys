@@ -25,6 +25,7 @@ const {
   LOW_BATTERY_THRESHOLD,
 } = require('./deviceMappings');
 const { buildThermostatService } = require('./buildThermostatService');
+const { sanitizeName } = require('./sanitizeName');
 
 const sleep = promisify(setTimeout);
 
@@ -41,10 +42,10 @@ const sleep = promisify(setTimeout);
 function buildService(device, features, categoryMapping, subtype) {
   const { Characteristic, CharacteristicEventTypes, Perms, Service } = this.hap;
 
-  const service = new Service[categoryMapping.service](
-    (subtype ? features[0].name : device.name).substring(0, 64),
-    subtype,
-  );
+  // A service sharing its accessory with another one of the same type is named after the feature it
+  // was built from, since the device name would read the same on both.
+  const serviceName = subtype ? features[0].name : device.name;
+  const service = new Service[categoryMapping.service](sanitizeName(serviceName || device.name), subtype);
 
   // A thermostat is driven by features of several Gladys categories at once, so its characteristics
   // cannot be wired one feature at a time like the others.

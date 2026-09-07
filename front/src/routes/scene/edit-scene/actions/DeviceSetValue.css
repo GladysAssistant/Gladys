@@ -1,6 +1,6 @@
 .explanationText {
   font-size: 12px;
-  margin-bottom: .375rem;
+  margin-bottom: 0.375rem;
 }
 
 .valueTypeTab {
@@ -8,6 +8,11 @@
   margin: 0;
 }
 
+/* The reset keeps a <button> tab looking exactly like the <span> tabs: the value type
+   selector needs a real button to stay reachable with the keyboard. */
 .valueTypeLink {
   width: 50%;
+  background: none;
+  border: 0;
+  text-align: inherit;
 }

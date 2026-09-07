@@ -1,3 +1,11 @@
+/* Width reference for the shutter buttons' compact mode (ShutterButtons.css):
+   the buttons react to the card's real width, not the viewport's, so a narrow
+   desktop column compacts them just like a phone does. inline-size only — a
+   size container would need a fixed height this wrapper doesn't have. */
+.deviceWidgetContainer {
+  container: device-widget / inline-size;
+}
+
 .loadingSkeleton {
   height: 1.2em;
   background: #eee;

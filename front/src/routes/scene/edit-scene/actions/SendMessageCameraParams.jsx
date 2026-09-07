@@ -1,9 +1,10 @@
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
+import MessageServiceSelector from './MessageServiceSelector';
 
 class SendMessageCameraParams extends Component {
   getOptions = async () => {
@@ -137,6 +138,11 @@ class SendMessageCameraParams extends Component {
             classNamePrefix="react-select"
           />
         </div>
+        <MessageServiceSelector
+          action={props.action}
+          path={props.path}
+          updateActionProperty={props.updateActionProperty}
+        />
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.messageCameraSend.textLabel" />{' '}

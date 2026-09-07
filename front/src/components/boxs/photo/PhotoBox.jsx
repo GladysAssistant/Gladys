@@ -219,7 +219,7 @@ class PhotoBox extends Component {
     const hasMultiple = photos.length > 1;
 
     return (
-      <div class="card mb-0">
+      <div class="card">
         {name && (
           <div class="card-header">
             <h3 class="card-title">{name}</h3>

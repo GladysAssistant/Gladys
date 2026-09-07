@@ -36,12 +36,17 @@ const { restartContainer } = require('./system.restartContainer');
 const { removeContainer } = require('./system.removeContainer');
 const { stopContainer } = require('./system.stopContainer');
 const { getNetworkMode } = require('./system.getNetworkMode');
+const { isOnHostNetwork } = require('./system.isOnHostNetwork');
 const { hasCpuCfsSupport } = require('./system.hasCpuCfsSupport');
 const { vacuum } = require('./system.vacuum');
 const { checkIfGladysUpgraded } = require('./system.checkIfGladysUpgraded');
 const { setDuckDbTimezone } = require('./system.setDuckDbTimezone');
 
 const { shutdown } = require('./system.shutdown');
+const { rebootHost } = require('./system.rebootHost');
+const { shutdownHost } = require('./system.shutdownHost');
+const { detectHostPowerManagement, redetectHostPowerManagement } = require('./system.detectHostPowerManagement');
+const { runHostPowerDbusCommand } = require('./system.runHostPowerDbusCommand');
 
 const System = function System(sequelize, event, config, job, variable, user, message, brain) {
   this.downloadUpgradeError = null;
@@ -70,6 +75,19 @@ const System = function System(sequelize, event, config, job, variable, user, me
   // integration image cleanup so it never collects an image pulled seconds
   // ago. Bounded in practice by the number of distinct images Gladys pulls.
   this.imagePullTimes = new Map();
+  // Detected host power-management mechanism ('local' | 'docker-helper' | null)
+  // and per-action availability, populated by detectHostPowerManagement() at
+  // init and cached here.
+  this.hostPowerManagement = null;
+  this.hostPowerCapabilities = { reboot: false, shutdown: false };
+  // Single-flight detection promise, timestamp of the last completed
+  // detection, whether that detection failed to reach logind at all (the only
+  // outcome worth retrying), and how many retries getInfos() already spent —
+  // together they throttle and bound the background re-detections.
+  this.hostPowerDetectionInFlight = null;
+  this.hostPowerLastDetectionAt = null;
+  this.hostPowerUnreachable = false;
+  this.hostPowerRedetectionAttempts = 0;
 };
 
 System.prototype.init = init;
@@ -107,9 +125,15 @@ System.prototype.restartContainer = restartContainer;
 System.prototype.removeContainer = removeContainer;
 System.prototype.stopContainer = stopContainer;
 System.prototype.getNetworkMode = getNetworkMode;
+System.prototype.isOnHostNetwork = isOnHostNetwork;
 System.prototype.hasCpuCfsSupport = hasCpuCfsSupport;
 System.prototype.vacuum = vacuum;
 System.prototype.setDuckDbTimezone = setDuckDbTimezone;
 System.prototype.shutdown = shutdown;
+System.prototype.rebootHost = rebootHost;
+System.prototype.shutdownHost = shutdownHost;
+System.prototype.detectHostPowerManagement = detectHostPowerManagement;
+System.prototype.redetectHostPowerManagement = redetectHostPowerManagement;
+System.prototype.runHostPowerDbusCommand = runHostPowerDbusCommand;
 
 module.exports = System;

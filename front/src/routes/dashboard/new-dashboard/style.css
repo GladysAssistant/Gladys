@@ -1,5 +1,15 @@
+/* The form borrowed Tabler's .col-login (24rem), which is too narrow for the
+   labelled icon grid — same move as the scene creation form (sceneFormCol).
+   Scoped here so the login pages keep their width. */
+.formCol {
+  max-width: 42rem;
+}
+
 .containerWithMargin {
-  margin-top: 3rem;
+  /* padding, not margin: a margin would collapse through the glass
+     page-main and leave a white band above the scene */
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 
 @media (max-width: 768px) {

@@ -19,6 +19,7 @@ dayjs.extend(localizedFormat);
 const ONE_HOUR_IN_MINUTES = 60;
 const TWELVE_HOURS_IN_MINUTES = 12 * 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
+const THREE_DAYS_IN_MINUTES = 3 * 24 * 60;
 const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
 const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
 const THREE_MONTHS_IN_MINUTES = 3 * 30 * 24 * 60;
@@ -28,6 +29,7 @@ const intervalByName = {
   'last-hour': ONE_HOUR_IN_MINUTES,
   'last-twelve-hours': TWELVE_HOURS_IN_MINUTES,
   'last-day': ONE_DAY_IN_MINUTES,
+  'last-three-days': THREE_DAYS_IN_MINUTES,
   'last-week': SEVEN_DAYS_IN_MINUTES,
   'last-month': THIRTY_DAYS_IN_MINUTES,
   'last-three-months': THREE_MONTHS_IN_MINUTES,
@@ -98,6 +100,25 @@ const calculateVariation = (firstValue, lastValue) => {
 
 const allEqual = arr => arr.every(val => val === arr[0]);
 
+// Compute the values displayed in the header of the box (last value + variation over the period)
+// from the per-series summaries, ignoring the series hidden by the user in the chart legend.
+// The variation is the one of the averaged value, so the two numbers describe the same thing:
+// "the average of the visible series is now X, that is Y% more/less than at the start of the period".
+const getHeaderValues = (featuresSummary, hiddenSeriesIndexes) => {
+  const visibleSummaries = featuresSummary.filter(
+    (summary, index) => summary !== null && !hiddenSeriesIndexes.includes(index)
+  );
+  if (visibleSummaries.length === 0) {
+    return { variation: undefined, lastValueRounded: null };
+  }
+  const firstValue = average(visibleSummaries.map(summary => summary.firstValue));
+  const lastValue = average(visibleSummaries.map(summary => summary.lastValue));
+  return {
+    variation: calculateVariation(firstValue, lastValue),
+    lastValueRounded: roundWith2DecimalIfNeeded(lastValue)
+  };
+};
+
 const getPeriodLabel = (interval, offset, language) => {
   const endDate = dayjs().subtract(offset, 'minute');
   const startDate = endDate.subtract(interval, 'minute');
@@ -111,6 +132,7 @@ const INTERVAL_LABELS = {
   [ONE_HOUR_IN_MINUTES]: 'dashboard.boxes.chart.lastHour',
   [TWELVE_HOURS_IN_MINUTES]: 'dashboard.boxes.chart.lastTwelveHours',
   [ONE_DAY_IN_MINUTES]: 'dashboard.boxes.chart.lastDay',
+  [THREE_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastThreeDays',
   [SEVEN_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastSevenDays',
   [THIRTY_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastThirtyDays',
   [THREE_MONTHS_IN_MINUTES]: 'dashboard.boxes.chart.lastThreeMonths',
@@ -153,6 +175,15 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: ONE_DAY_IN_MINUTES,
+      offset: 0,
+      dropdown: false
+    });
+    this.getData();
+  };
+  switchTo3DaysView = async e => {
+    e.preventDefault();
+    await this.setState({
+      interval: THREE_DAYS_IN_MINUTES,
       offset: 0,
       dropdown: false
     });
@@ -225,7 +256,6 @@ class Chartbox extends Component {
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
     let deviceFeatureNames = this.props.box.device_feature_names;
-    let nbFeaturesDisplayed = deviceFeatures.length;
 
     if (!deviceFeatures) {
       // migrate all box (one device feature)
@@ -235,6 +265,10 @@ class Chartbox extends Component {
         return;
       }
     }
+    // counted AFTER the guard above: a chart the user just added to a
+    // dashboard has no device_features yet, and reading .length first threw
+    // on every single render of the editor canvas
+    let nbFeaturesDisplayed = deviceFeatures.length;
     // if there is no device selected
     if (deviceFeatures.length === 0) {
       await this.setState({
@@ -360,71 +394,38 @@ class Chartbox extends Component {
         // We check if all deviceFeatures selected are in the same unit
         const allUnitsAreSame = this.props.box.units ? allEqual(unitsByFeature) : false;
 
-        // If all deviceFeatures selected are in the same unit
-        // We do a average of all values
-        if (allUnitsAreSame) {
-          const lastValuesArray = [];
-          const variationArray = [];
-          data.forEach(oneFeature => {
-            const { values } = oneFeature;
-            if (values.length === 0) {
-              return;
-            }
-            let firstElement = values[0];
-            let lastElement = values[values.length - 1];
-            // Convert the value if it is a convertible unit
-            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
-              firstElement.value,
-              unit,
-              userUnitPreference
-            );
-            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
-            firstElement.value = firstElementValue;
-            lastElement.value = lastElementValue;
-            displayUnit = firstElementUnit;
-
-            const variation = calculateVariation(
-              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
-              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
-            );
-            const lastValue = getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function);
-            variationArray.push(variation);
-            lastValuesArray.push(lastValue);
-          });
-          newState.variation = average(variationArray);
-          newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(displayUnit);
-          newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
-          newState.unit = displayUnit;
-        } else {
-          // If not, we only display the first value
-          const oneFeature = data[0];
+        // First and last value of the period for each feature (one entry per series, in the same
+        // order as the chart series). If all features share the same unit, they are all summarized
+        // and averaged together, otherwise only the first feature is displayed.
+        // The header (last value + variation) is derived from these summaries, restricted to the
+        // series currently visible in the chart legend (see getHeaderValues).
+        const featuresSummary = data.map((oneFeature, index) => {
           const { values } = oneFeature;
-          if (values.length > 0) {
-            let firstElement = values[0];
-            let lastElement = values[values.length - 1];
-
-            // Convert the value if it is a convertible unit
-            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
-              firstElement.value,
-              unit,
-              userUnitPreference
-            );
-            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
-            firstElement.value = firstElementValue;
-            lastElement.value = lastElementValue;
-            displayUnit = firstElementUnit;
-
-            newState.variation = calculateVariation(
-              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
-              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
-            );
-            newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
-            newState.lastValueRounded = roundWith2DecimalIfNeeded(
-              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
-            );
-            newState.unit = displayUnit;
+          if (values.length === 0 || (!allUnitsAreSame && index > 0)) {
+            return null;
           }
-        }
+          const firstElement = values[0];
+          const lastElement = values[values.length - 1];
+          const rawFirstValue = getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function);
+          const rawLastValue = getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function);
+          if (!notNullNotUndefined(rawFirstValue) || !notNullNotUndefined(rawLastValue)) {
+            return null;
+          }
+          // Convert the value if it is a convertible unit
+          const { value: firstValue, unit: firstElementUnit } = checkAndConvertUnit(
+            rawFirstValue,
+            unit,
+            userUnitPreference
+          );
+          const { value: lastValue } = checkAndConvertUnit(rawLastValue, unit, userUnitPreference);
+          displayUnit = firstElementUnit;
+          return { firstValue, lastValue };
+        });
+
+        newState.featuresSummary = featuresSummary;
+        newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(displayUnit);
+        newState.unit = displayUnit;
+        Object.assign(newState, getHeaderValues(featuresSummary, this.state.hiddenSeriesIndexes));
       }
       await this.setState(newState);
     } catch (e) {
@@ -447,6 +448,22 @@ class Chartbox extends Component {
       this.getData();
     }
   };
+  // Called by the chart each time it is drawn, with the indexes of the series hidden through
+  // the legend: recompute the header from the series that are actually visible.
+  handleHiddenSeriesChange = hiddenSeriesIndexes => {
+    this.setState(prevState => {
+      if (
+        hiddenSeriesIndexes.length === prevState.hiddenSeriesIndexes.length &&
+        hiddenSeriesIndexes.every((index, position) => index === prevState.hiddenSeriesIndexes[position])
+      ) {
+        return null;
+      }
+      return {
+        hiddenSeriesIndexes,
+        ...getHeaderValues(prevState.featuresSummary, hiddenSeriesIndexes)
+      };
+    });
+  };
   updateInterval = async () => {
     await this.setState({
       interval: intervalByName[this.props.box.interval],
@@ -462,7 +479,9 @@ class Chartbox extends Component {
       loading: true,
       initialized: false,
       height: 'small',
-      nbFeaturesDisplayed: 0
+      nbFeaturesDisplayed: 0,
+      featuresSummary: [],
+      hiddenSeriesIndexes: []
     };
   }
   componentDidMount() {
@@ -516,12 +535,16 @@ class Chartbox extends Component {
   ) {
     const { box } = this.props;
     const displayVariation = box.display_variation;
+    // The hidden series are positional, in ApexCharts as in the header: recreate the chart
+    // (all series visible again) when the devices of the box change, e.g. in the editor.
+    // Same fallback on the legacy "device_feature" (one device) attribute as in getData.
+    const deviceFeaturesKey = (box.device_features || [box.device_feature]).join(',');
     let additionalHeight = 30 * (nbFeaturesDisplayed - 1);
     if (props.box.chart_type === 'timeline') {
       additionalHeight = 55 * nbFeaturesDisplayed;
     }
     return (
-      <div class={cx('card', { 'loading-border': initialized && loading })}>
+      <div class={cx('card', { 'loading-border': initialized && loading, [style.cardMenuOpen]: dropdown })}>
         <div class="card-body">
           <div class={style.chartHeader}>
             <div class={cx(style.subheader)}>{box.title}</div>
@@ -545,12 +568,20 @@ class Chartbox extends Component {
                     />
                   </button>
 
+                  {/* single line next to the period label: the live dot, or —
+                      when browsing the past — an accent pill showing the range,
+                      whose one tap action (the return icon says it) is coming
+                      back to now */}
                   {offset > 0 ? (
-                    <button type="button" class={style.periodRangeButton} onClick={this.resetToCurrentPeriod}>
+                    <button
+                      type="button"
+                      class={style.periodRangeButton}
+                      onClick={this.resetToCurrentPeriod}
+                      title={props.intl.dictionary.dashboard.boxes.chart.backToNow}
+                      aria-label={props.intl.dictionary.dashboard.boxes.chart.backToNow}
+                    >
+                      <i class="fe fe-corner-up-left" />
                       <span class={style.periodRange}>{getPeriodLabel(interval, offset, props.user.language)}</span>
-                      <span class={style.backToNow}>
-                        <Text id="dashboard.boxes.chart.backToNow" />
-                      </span>
                     </button>
                   ) : (
                     <div class={style.periodLive}>
@@ -588,6 +619,16 @@ class Chartbox extends Component {
                     >
                       <Text id="dashboard.boxes.chart.lastDay" />
                     </a>
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === THREE_DAYS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo3DaysView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastThreeDays" />
+                      </a>
+                    )}
                     {props.box.chart_type !== 'timeline' && (
                       <a
                         className={cx(style.dropdownItemChart, {
@@ -728,6 +769,7 @@ class Chartbox extends Component {
               {emptySeries === false && props.box.display_axes && (
                 <div class="mt-4">
                   <ApexChartComponent
+                    key={deviceFeaturesKey}
                     series={series}
                     interval={interval}
                     user={props.user}
@@ -737,6 +779,7 @@ class Chartbox extends Component {
                     colors={props.box.colors}
                     additionalHeight={additionalHeight}
                     dictionary={props.intl.dictionary}
+                    onHiddenSeriesChange={this.handleHiddenSeriesChange}
                   />
                 </div>
               )}
@@ -785,13 +828,11 @@ class Chartbox extends Component {
                       <i class="fe fe-alert-circle mr-2" />
                       <Text id="dashboard.boxes.chart.noValue" />
                     </div>
-                    <div class={style.smallTextEmptyState}>
-                      <Text id="dashboard.boxes.chart.noValueWarning" />
-                    </div>
                   </div>
                 )}
                 {emptySeries === false && !props.box.display_axes && (
                   <ApexChartComponent
+                    key={deviceFeaturesKey}
                     series={series}
                     interval={interval}
                     user={props.user}
@@ -801,6 +842,7 @@ class Chartbox extends Component {
                     colors={props.box.colors}
                     additionalHeight={additionalHeight}
                     dictionary={props.intl.dictionary}
+                    onHiddenSeriesChange={this.handleHiddenSeriesChange}
                   />
                 )}
               </div>

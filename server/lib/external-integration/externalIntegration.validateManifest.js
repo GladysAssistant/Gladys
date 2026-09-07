@@ -1,6 +1,8 @@
 const semver = require('semver');
 
+const logger = require('../../utils/logger');
 const { Error422 } = require('../../utils/httpErrors');
+const { INTEGRATION_CATALOG_CATEGORIES } = require('../../utils/constants');
 const {
   SUPPORTED_MANIFEST_VERSION,
   MAX_SUB_CONTAINERS,
@@ -23,8 +25,10 @@ const {
   ACTION_MIN_TIMEOUT_SECONDS,
   ACTION_MAX_TIMEOUT_SECONDS,
   MANIFEST_TRANSPORTS,
+  MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
+  ACCOUNT_FIELD_TYPES,
 } = require('./constants');
 
 // These rules are the exact mirror of the canonical manifest schema owned by
@@ -43,14 +47,22 @@ const MANIFEST_FIELDS = [
   'config_schema',
   'containers',
   'location',
+  'network_wake',
   'network_discovery',
   'actions',
   'transports',
+  'categories',
   'webhooks',
   'messaging',
   'contact_schema',
   'account_schema',
 ];
+// Browse categories of the catalog (docs/specs/integration-catalog-
+// categories.md §6.2), validated in two ordered stages: the SHAPE (1..3
+// unique non-empty strings) rejects like any other malformed field, then the
+// VOCABULARY filters — unknown keys are dropped with a warning, never a
+// rejection, so an integration published with a newer vocabulary than this
+// instance knows still installs.
 // communication type only: chat channels (receive true, the default —
 // inbound + outbound, code-based link) vs notification channels (receive
 // false — send only, per-user identity through contact_schema)
@@ -91,7 +103,17 @@ const NETWORK_DISCOVERY_FIELDS = {
 // standard DNS-SD service type, e.g. _hue._tcp
 const MDNS_SERVICE_REGEX = /^_[a-z0-9-]+\._(tcp|udp)$/;
 const SSDP_ST_MAX_LENGTH = 200;
-const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'secret', 'oauth2', 'section'];
+const CONFIG_FIELD_TYPES = [
+  'string',
+  'number',
+  'boolean',
+  'select',
+  'multi_select',
+  'secret',
+  'oauth2',
+  'account_link',
+  'section',
+];
 const OPTION_FIELD_TYPES = ['select', 'multi_select'];
 // `section` intro blocks: purely presentational chapters splitting the
 // generated form (title + plain text + typed https links) — the
@@ -239,7 +261,8 @@ function validateConfigFieldDefault(field, path, errors) {
     }
     default:
       // secret: it would end up published in the store ;
-      // oauth2: the value is the Connect flow, tokens live off-schema ;
+      // oauth2 / account_link: the value is the Connect flow, the credentials
+      // live off-schema ;
       // section: purely presentational, no value at all
       errors.push(`${path}.default: not allowed for ${field.type} fields`);
   }
@@ -852,6 +875,9 @@ function validateManifest(manifest) {
   if (manifest.location !== undefined && typeof manifest.location !== 'boolean') {
     errors.push('location: must be a boolean');
   }
+  if (manifest.network_wake !== undefined && typeof manifest.network_wake !== 'boolean') {
+    errors.push('network_wake: must be a boolean');
+  }
   if (manifest.network_discovery !== undefined) {
     if (
       !Array.isArray(manifest.network_discovery) ||
@@ -906,9 +932,9 @@ function validateManifest(manifest) {
       const seenContactKeys = new Set();
       manifest.contact_schema.forEach((field, index) => {
         validateConfigField(field, index, seenContactKeys, errors, 'contact_schema', declaredPortNames);
-        if (field && field.type === 'oauth2') {
-          // the OAuth relay is integration-scoped, never per user
-          errors.push(`contact_schema[${index}].type: oauth2 is not allowed in the per-user contact schema`);
+        if (field && ACCOUNT_FIELD_TYPES.includes(field.type)) {
+          // linking a provider account is integration-scoped, never per user
+          errors.push(`contact_schema[${index}].type: ${field.type} is not allowed in the per-user contact schema`);
         }
         if (field && field.type === 'section') {
           // the per-user block is the one screen a non-admin reaches, and
@@ -934,9 +960,10 @@ function validateManifest(manifest) {
       const seenAccountKeys = new Set();
       manifest.account_schema.forEach((field, index) => {
         validateConfigField(field, index, seenAccountKeys, errors, 'account_schema', declaredPortNames);
-        if (field && field.type === 'oauth2') {
-          // the OAuth relay is integration-scoped, never per user (milestone 1)
-          errors.push(`account_schema[${index}].type: oauth2 is not allowed in the per-user account schema`);
+        if (field && (field.type === 'oauth2' || field.type === 'account_link')) {
+          // the Connect relay (oauth2 / account_link) is integration-scoped,
+          // never per user (milestone 1)
+          errors.push(`account_schema[${index}].type: ${field.type} is not allowed in the per-user account schema`);
         }
         if (field && field.type === 'section') {
           // the per-user block is the one screen a non-admin reaches, and
@@ -970,6 +997,36 @@ function validateManifest(manifest) {
       new Set(manifest.transports).size !== manifest.transports.length
     ) {
       errors.push(`transports: must be a non-empty subset of ${MANIFEST_TRANSPORTS.join(', ')}`);
+    }
+  }
+  if (manifest.categories !== undefined) {
+    if (
+      !Array.isArray(manifest.categories) ||
+      manifest.categories.length === 0 ||
+      manifest.categories.length > MAX_MANIFEST_CATEGORIES ||
+      !manifest.categories.every((category) => typeof category === 'string' && category.length > 0) ||
+      new Set(manifest.categories).size !== manifest.categories.length
+    ) {
+      errors.push(`categories: must be 1-${MAX_MANIFEST_CATEGORIES} unique non-empty strings`);
+    } else {
+      const knownCategories = manifest.categories.filter((category) =>
+        INTEGRATION_CATALOG_CATEGORIES.includes(category),
+      );
+      if (knownCategories.length !== manifest.categories.length) {
+        const unknownCategories = manifest.categories.filter(
+          (category) => !INTEGRATION_CATALOG_CATEGORIES.includes(category),
+        );
+        logger.warn(`validateManifest: dropping unknown categories ${unknownCategories.join(', ')}`);
+      }
+      // an all-unknown declaration is "uncategorized", not an error: the field
+      // is REMOVED rather than set to [] — the install and update flows
+      // validate the same manifest object again, and a stored empty array
+      // would fail the shape stage on that second pass
+      if (knownCategories.length === 0) {
+        delete manifest.categories;
+      } else {
+        manifest.categories = knownCategories;
+      }
     }
   }
   if (errors.length > 0) {

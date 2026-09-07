@@ -10,6 +10,11 @@ const EXPOSURE_MODES = {
 const EXPOSURE_MODE_VARIABLE = 'HOMEKIT_EXPOSURE_MODE';
 const EXPOSED_DEVICES_VARIABLE = 'HOMEKIT_EXPOSED_DEVICES';
 
+// The alarm of a house is not a device, but the exposure setting is an allow list of selectors and
+// someone who does not use the Gladys alarm must be able to leave it out like any other accessory.
+// It is offered under a prefixed selector, which cannot collide with a device one.
+const ALARM_SELECTOR_PREFIX = 'house-alarm:';
+
 /**
  * @description Tell if a device carries at least one feature HomeKit knows how to expose.
  * @param {object} device - Gladys device to test.
@@ -35,19 +40,29 @@ async function getCompatibleDevices() {
 }
 
 /**
- * @description Get the devices the bridge must expose: every compatible one by default, or only the
- * ones the user selected. The selection is an allow list, so a device added later stays out of
- * HomeKit until it is picked.
- * @returns {Promise<Array>} The devices to expose.
+ * @description List the house alarms the bridge is able to expose. Every house has an alarm mode,
+ * so every house is offered.
+ * @returns {Promise<Array>} The exposable alarms, each carrying the house it belongs to.
  * @example
- * const devices = await getExposedDevices();
+ * const alarms = await getCompatibleAlarms();
  */
-async function getExposedDevices() {
-  const compatibleDevices = await this.getCompatibleDevices();
+async function getCompatibleAlarms() {
+  const houses = await this.gladys.house.get();
 
+  return houses.map((house) => ({ name: house.name, selector: `${ALARM_SELECTOR_PREFIX}${house.selector}`, house }));
+}
+
+/**
+ * @description Read the allow list of selectors the user picked, or null when every compatible
+ * accessory is exposed.
+ * @returns {Promise<Array|null>} The selected selectors, or null when the mode is not a selection.
+ * @example
+ * const selection = await readSelection();
+ */
+async function readSelection() {
   const mode = await this.gladys.variable.getValue(EXPOSURE_MODE_VARIABLE, this.serviceId);
   if (mode !== EXPOSURE_MODES.SELECTION) {
-    return compatibleDevices;
+    return null;
   }
 
   const rawSelection = await this.gladys.variable.getValue(EXPOSED_DEVICES_VARIABLE, this.serviceId);
@@ -66,14 +81,46 @@ async function getExposedDevices() {
     return [];
   }
 
-  return compatibleDevices.filter((device) => selectedSelectors.includes(device.selector));
+  return selectedSelectors;
+}
+
+/**
+ * @description Get the devices the bridge must expose: every compatible one by default, or only the
+ * ones the user selected. The selection is an allow list, so a device added later stays out of
+ * HomeKit until it is picked.
+ * @returns {Promise<Array>} The devices to expose.
+ * @example
+ * const devices = await getExposedDevices();
+ */
+async function getExposedDevices() {
+  const compatibleDevices = await this.getCompatibleDevices();
+  const selection = await readSelection.call(this);
+
+  return selection === null ? compatibleDevices : compatibleDevices.filter((d) => selection.includes(d.selector));
+}
+
+/**
+ * @description Get the house alarms the bridge must expose, through the same allow list as the
+ * devices.
+ * @returns {Promise<Array>} The alarms to expose.
+ * @example
+ * const alarms = await getExposedAlarms();
+ */
+async function getExposedAlarms() {
+  const compatibleAlarms = await this.getCompatibleAlarms();
+  const selection = await readSelection.call(this);
+
+  return selection === null ? compatibleAlarms : compatibleAlarms.filter((a) => selection.includes(a.selector));
 }
 
 module.exports = {
   EXPOSURE_MODES,
   EXPOSURE_MODE_VARIABLE,
   EXPOSED_DEVICES_VARIABLE,
+  ALARM_SELECTOR_PREFIX,
   isCompatibleDevice,
   getCompatibleDevices,
+  getCompatibleAlarms,
   getExposedDevices,
+  getExposedAlarms,
 };

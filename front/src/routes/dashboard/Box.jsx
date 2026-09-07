@@ -18,8 +18,12 @@ import VoiceAssistantBox from '../../components/boxs/voice-assistant/VoiceAssist
 import LinkBox from '../../components/boxs/link/LinkBox';
 import PhotoBox from '../../components/boxs/photo/PhotoBox';
 import SunBox from '../../components/boxs/sun/Sun';
+import ChipsBox from '../../components/boxs/chips/ChipsBox';
+import ActionsBox from '../../components/boxs/actions/ActionsBox';
+import HouseViewBox from '../../components/boxs/house-view/HouseViewBox';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
-const Box = ({ children, ...props }) => {
+const BoxContent = ({ children, ...props }) => {
   switch (props.box.type) {
     case 'weather':
       return <WeatherBox {...props} />;
@@ -61,7 +65,24 @@ const Box = ({ children, ...props }) => {
       return <PhotoBox {...props} />;
     case 'sun':
       return <SunBox {...props} />;
+    case 'chips':
+      return <ChipsBox {...props} />;
+    case 'house-view':
+      return <HouseViewBox {...props} />;
+    case 'actions':
+      return <ActionsBox {...props} />;
   }
 };
+
+// Every widget renders user-supplied configuration, and a dashboard is a wall
+// of them: a single widget throwing while it renders used to take the whole
+// app down with it (see ErrorBoundary), including the editor the user needs
+// to fix that very widget. Contain it to its own card instead — the rest of
+// the dashboard keeps working, and re-picking a type clears the message.
+const Box = ({ children, ...props }) => (
+  <ErrorBoundary resetKey={props.box.type} compact>
+    <BoxContent {...props} />
+  </ErrorBoundary>
+);
 
 export default Box;

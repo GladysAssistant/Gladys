@@ -3,6 +3,8 @@ import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import debounce from 'debounce';
 import update from 'immutability-helper';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
+import { mergeRunningScenes } from './runningInfo';
 import ScenePage from './ScenePage';
 
 class Scene extends Component {
@@ -46,6 +48,53 @@ class Scene extends Component {
         loading: false,
         getError: true
       });
+    }
+  };
+  getRunningScenes = async () => {
+    // stops received while the request is in flight would be undone by the response
+    const stoppedDuringFetch = new Set();
+    this.stoppedDuringFetch = stoppedDuringFetch;
+    try {
+      const runningScenes = await this.props.httpClient.get('/api/v1/scene/running');
+      // Merge with any websocket-driven updates received while fetching
+      this.setState(prevState => ({
+        runningScenes: mergeRunningScenes(runningScenes, prevState.runningScenes, stoppedDuringFetch)
+      }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (this.stoppedDuringFetch === stoppedDuringFetch) {
+        this.stoppedDuringFetch = null;
+      }
+    }
+  };
+  onSceneStarted = payload => {
+    this.setState(prevState => {
+      const alreadyKnown = prevState.runningScenes.some(scene => scene.executionId === payload.executionId);
+      if (alreadyKnown) {
+        return null;
+      }
+      return { runningScenes: [...prevState.runningScenes, payload] };
+    });
+  };
+  onSceneStopped = payload => {
+    if (this.stoppedDuringFetch) {
+      this.stoppedDuringFetch.add(payload.executionId);
+    }
+    this.setState(prevState => ({
+      runningScenes: prevState.runningScenes.filter(scene => scene.executionId !== payload.executionId)
+    }));
+  };
+  // Keep a 1s ticker running only while at least one scene is executing,
+  // so running cards can display a live elapsed time. Managed from
+  // componentDidUpdate so it reacts to the *applied* state, not the pending one.
+  refreshTicker = () => {
+    const hasRunning = this.state.runningScenes.length > 0;
+    if (hasRunning && !this.ticker) {
+      this.ticker = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    } else if (!hasRunning && this.ticker) {
+      clearInterval(this.ticker);
+      this.ticker = null;
     }
   };
   getTags = async () => {
@@ -144,23 +193,45 @@ class Scene extends Component {
     this.props = props;
     this.state = {
       scenes: [],
+      runningScenes: [],
+      now: Date.now(),
       loading: true
     };
+    this.ticker = null;
     this.debouncedGetScenes = debounce(this.getScenes.bind(this), 200);
   }
 
   componentWillMount() {
     this.getScenes();
     this.getTags();
+    this.getRunningScenes();
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
   }
 
-  render(props, { scenes, loading, getError, tags }) {
+  componentDidUpdate() {
+    // Start/stop the ticker based on the applied state.
+    this.refreshTicker();
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
+    if (this.ticker) {
+      clearInterval(this.ticker);
+      this.ticker = null;
+    }
+  }
+
+  render(props, { scenes, runningScenes, now, loading, getError, tags }) {
     const { sceneSearch, sceneTagSearch, orderDir } = this.getUrlParams();
     return (
       <ScenePage
         httpClient={props.httpClient}
         currentUrl={props.currentUrl}
         scenes={scenes}
+        runningScenes={runningScenes}
+        now={now}
         getError={getError}
         loading={loading}
         search={this.search}
@@ -176,4 +247,4 @@ class Scene extends Component {
   }
 }
 
-export default connect('httpClient,currentUrl', {})(Scene);
+export default connect('httpClient,currentUrl,session', {})(Scene);

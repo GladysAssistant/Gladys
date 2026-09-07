@@ -26,6 +26,7 @@ async function disconnect() {
     logger.debug('Not connected');
   }
   this.gladysConnected = false;
+  this.mqttConnectionError = null;
   this.emitStatusEvent();
 
   // Stop & remove MQTT container

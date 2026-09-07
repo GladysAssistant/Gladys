@@ -31,11 +31,12 @@ describe('externalIntegration.setDiscoveredDevices', () => {
   let externalIntegration;
   let event;
   let stateManager;
+  let deviceLib;
   let service;
 
   beforeEach(async () => {
     service = await seedExternalService();
-    ({ externalIntegration, event, stateManager } = buildSupervisor());
+    ({ externalIntegration, event, stateManager, device: deviceLib } = buildSupervisor());
   });
 
   it('should store the discovered devices and notify the frontend', async () => {
@@ -121,6 +122,32 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     await expectBadParameters([wrongUnit], 'unknown unit');
   });
 
+  it('should reject a non-positive or non-numeric step', async () => {
+    const zeroStep = buildDiscoveredDevice(service.selector);
+    zeroStep.features[0].step = 0;
+    await expectBadParameters([zeroStep], 'features[0].step: must be a positive number');
+    const stringStep = buildDiscoveredDevice(service.selector);
+    stringStep.features[0].step = '0.5';
+    await expectBadParameters([stringStep], 'features[0].step: must be a positive number');
+  });
+
+  it('should accept a valid step and hand it back untouched', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].step = 0.5;
+    const count = await externalIntegration.setDiscoveredDevices(service, [device]);
+    expect(count).to.equal(1);
+    // the step has to survive the normalization: it is the whole point of
+    // publishing it, and the Discovery screen posts back what it reads here
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0]).to.have.property('step', 0.5);
+  });
+
+  it('should hand back no step when the integration declares none', async () => {
+    await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector)]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0]).to.not.have.property('step');
+  });
+
   it('should reject an invalid poll_frequency', async () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 12345 };
     await expectBadParameters([device], 'poll_frequency');
@@ -143,6 +170,85 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 60000 };
     const count = await externalIntegration.setDiscoveredDevices(service, [device]);
     expect(count).to.equal(1);
+  });
+
+  it('should normalize the supported_options of a feature', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].supported_options = [
+      { value: 1, label: 'Entrance' },
+      { value: 2, label: 'Garden' },
+    ];
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0].supported_options).to.deep.equal([
+      { value: 1, label: 'Entrance', sort_order: 0 },
+      { value: 2, label: 'Garden', sort_order: 1 },
+    ]);
+  });
+
+  it('should accept string option values on a text/select feature', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features.push({
+      name: 'Application',
+      external_id: `ext:${service.selector}:paris:app`,
+      category: 'text',
+      type: 'select',
+      read_only: false,
+      has_feedback: false,
+      keep_history: false,
+      supported_options: [
+        { value: 'netflix', label: 'Netflix' },
+        { value: 'youtube.leanback.v4', label: 'YouTube' },
+      ],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[1].supported_options).to.deep.equal([
+      { value: 'netflix', label: 'Netflix', sort_order: 0 },
+      { value: 'youtube.leanback.v4', label: 'YouTube', sort_order: 1 },
+    ]);
+  });
+
+  it('should keep rejecting string option values outside text/select', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].supported_options = [{ value: 'high', label: 'High' }];
+    await expectBadParameters([device], 'features[0].supported_options');
+  });
+
+  it('should reject invalid supported_options', async () => {
+    const duplicatedValues = buildDiscoveredDevice(service.selector);
+    duplicatedValues.features[0].supported_options = [
+      { value: 1, label: 'Entrance' },
+      { value: 1, label: 'Garden' },
+    ];
+    await expectBadParameters([duplicatedValues], 'features[0].supported_options');
+    const emptyLabel = buildDiscoveredDevice(service.selector);
+    emptyLabel.features[0].supported_options = [{ value: 1, label: '' }];
+    await expectBadParameters([emptyLabel], 'features[0].supported_options');
+  });
+
+  it('should upsert the supported_options of an already-created device', async () => {
+    deviceLib.syncFeatureSupportedOptions = sinon.fake.resolves([{ value: 1, label: 'Entrance', sort_order: 0 }]);
+    const device = buildDiscoveredDevice(service.selector);
+    device.params = [];
+    device.features[0].supported_options = [{ value: 1, label: 'Entrance' }];
+    stateManager.setState('deviceByExternalId', device.external_id, {
+      id: 'device-id',
+      service_id: service.id,
+      features: [
+        {
+          id: 'feature-id',
+          external_id: device.features[0].external_id,
+          supported_options: [],
+        },
+      ],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    // the full in-memory feature is passed: syncFeatureSupportedOptions needs its
+    // category/type to allow string values on dynamic selects
+    sinonAssert.calledWith(deviceLib.syncFeatureSupportedOptions, sinon.match({ id: 'feature-id' }), [
+      { value: 1, label: 'Entrance', sort_order: 0 },
+    ]);
   });
 });
 

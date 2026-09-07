@@ -8,6 +8,7 @@ function status() {
   const z2mEnabled = this.isEnabled();
   const zigbee2mqttStatus = {
     usbConfigured: this.usbConfigured,
+    networkAdapterConfigured: this.networkAdapterConfigured,
     mqttExist: this.mqttExist,
     mqttRunning: this.mqttRunning,
     zigbee2mqttExist: this.zigbee2mqttExist,
@@ -19,6 +20,7 @@ function status() {
     networkModeValid: this.networkModeValid,
     coordinatorFirmware: this.coordinatorFirmware,
     z2mContainerError: this.z2mContainerError,
+    mqttConnectionError: this.mqttConnectionError,
   };
   return zigbee2mqttStatus;
 }

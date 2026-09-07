@@ -1,0 +1,14 @@
+[
+  {
+    "label": "gateway.payment-required",
+    "answers": [
+      "Votre abonnement Gladys Plus est suspendu : un paiement est requis. Les sauvegardes, la synchronisation Enedis et les fonctionnalités IA sont en pause sur cette instance. Pour régulariser, mettez à jour votre moyen de paiement depuis votre compte Gladys Plus (https://plus.gladysassistant.com/dashboard/settings/billing), puis cliquez sur « Revérifier » dans « Paramètres » => « Gladys Plus ». Tout reprend automatiquement dès que le paiement est reçu, rien n'est perdu."
+    ]
+  },
+  {
+    "label": "gateway.subscription-active",
+    "answers": [
+      "Votre abonnement Gladys Plus est de nouveau actif. Les sauvegardes, la synchronisation Enedis et les fonctionnalités IA sont réactivées."
+    ]
+  }
+]

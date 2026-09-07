@@ -107,6 +107,13 @@ const isHistoryFeature = (deviceFeature) => {
   );
 };
 
+// Battery levels are deliberately kept out of `sensorFeatures`: they would then be
+// part of every `device.get-state` answer and of the home schema, where they say
+// nothing about what the user asked. They get their own tool instead.
+const isBatteryFeature = (deviceFeature) => {
+  return deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY;
+};
+
 const isWritableSensorFeature = (deviceFeature, device) => {
   if (deviceFeature.read_only !== true) {
     return false;
@@ -125,5 +132,6 @@ module.exports = {
   isLightControlFeature,
   isShutterFeature,
   isHistoryFeature,
+  isBatteryFeature,
   isWritableSensorFeature,
 };

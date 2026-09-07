@@ -3,8 +3,12 @@ import cx from 'classnames';
 
 import { RequestStatus } from '../../../utils/consts';
 import RestoreBackupRow from './RestoreBackupRow';
+import style from '../style.css';
 
-const GatewayPage = ({ children, ...props }) => (
+// Pill rows instead of a table (same grammar as the settings containers
+// card): date + size stack on the left, the restore action sits on the
+// right — no horizontal overflow in the narrow auth column.
+const RestoreBackup = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h2 class="page-title">
@@ -34,36 +38,19 @@ const GatewayPage = ({ children, ...props }) => (
               <Text id="signup.gatewayBackup.error" />
             </div>
           )}
+          {props.gatewayBackups && props.gatewayBackups.length > 0 && (
+            <div class={style.backupList}>
+              {props.gatewayBackups.map(backup => (
+                <RestoreBackupRow
+                  key={backup.id}
+                  backup={backup}
+                  user={props.user}
+                  restoreBackup={props.restoreBackup}
+                />
+              ))}
+            </div>
+          )}
         </div>
-        {props.gatewayBackups && props.gatewayBackups.length > 0 && (
-          <div class="table-responsive-lg">
-            <table class="table table-hover table-outline table-vcenter text-nowrap card-table">
-              <thead>
-                <tr>
-                  <th>
-                    <Text id="gatewayBackup.createdAtColumn" />
-                  </th>
-                  <th>
-                    <Text id="gatewayBackup.sizeColumn" />
-                  </th>
-                  <th class="text-right">
-                    <Text id="gatewayBackup.restoreColumn" />
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {props.gatewayBackups.map(backup => (
-                  <RestoreBackupRow
-                    key={backup.id}
-                    backup={backup}
-                    user={props.user}
-                    restoreBackup={props.restoreBackup}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
         <div class="card-footer d-flex">
           <button class="btn btn-secondary" onClick={props.changeStepToUpdateRestoreKey}>
             <Text id="signup.gatewayBackup.changeKeyButton" />
@@ -77,4 +64,4 @@ const GatewayPage = ({ children, ...props }) => (
   </div>
 );
 
-export default GatewayPage;
+export default RestoreBackup;

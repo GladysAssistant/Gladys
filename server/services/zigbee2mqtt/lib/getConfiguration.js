@@ -16,6 +16,15 @@ async function getConfiguration() {
   const z2mDriverPath = await this.gladys.variable.getValue(CONFIGURATION.Z2M_DRIVER_PATH, this.serviceId);
   const z2mDongleName = await this.gladys.variable.getValue(CONFIGURATION.ZIGBEE_DONGLE_NAME, this.serviceId);
   const z2mTcpPort = await this.gladys.variable.getValue(CONFIGURATION.Z2M_TCP_PORT, this.serviceId);
+  const z2mAdapterMode = await this.gladys.variable.getValue(CONFIGURATION.Z2M_ADAPTER_MODE, this.serviceId);
+  const z2mNetworkAdapterUrl = await this.gladys.variable.getValue(
+    CONFIGURATION.Z2M_NETWORK_ADAPTER_URL,
+    this.serviceId,
+  );
+  const z2mNetworkAdapterType = await this.gladys.variable.getValue(
+    CONFIGURATION.Z2M_NETWORK_ADAPTER_TYPE,
+    this.serviceId,
+  );
   const z2mMqttUsername = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, this.serviceId);
   const z2mMqttPassword = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, this.serviceId);
   const mqttMode = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_MODE, this.serviceId);
@@ -36,6 +45,9 @@ async function getConfiguration() {
     z2mDriverPath,
     z2mDongleName,
     z2mTcpPort,
+    z2mAdapterMode,
+    z2mNetworkAdapterUrl,
+    z2mNetworkAdapterType,
     z2mMqttUsername,
     z2mMqttPassword,
     mqttMode,

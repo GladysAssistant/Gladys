@@ -4,6 +4,7 @@
     "img": "/assets/integrations/cover/caldav.jpg",
     "whiteBackground": true,
     "local": true,
-    "cloud": true
+    "cloud": true,
+    "categories": ["services"]
   }
 ]

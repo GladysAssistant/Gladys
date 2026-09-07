@@ -1,4 +1,6 @@
 import { Component } from 'preact';
+import { createPortal } from 'preact/compat';
+import cx from 'classnames';
 import style from './modal.css';
 
 class Modal extends Component {
@@ -25,9 +27,13 @@ class Modal extends Component {
   };
 
   render({ children, title, onClose, large }) {
-    return (
-      <div class={style.modalOverlay} onClick={this.handleOverlayClick}>
-        <div class={`${style.modalDialog} ${large ? style.modalDialogLarge : ''}`.trim()}>
+    // The modal is rendered on <body>: it opens from inside a glass card, whose
+    // backdrop filter would otherwise trap this fixed overlay in the card's own
+    // stacking context (same reason the light control panel is portaled).
+    // glass-theme keeps the dialog on the theme's glass surface out there.
+    return createPortal(
+      <div class={cx('glass-theme', style.modalOverlay)} onClick={this.handleOverlayClick}>
+        <div class={cx(style.modalDialog, { [style.modalDialogLarge]: large })}>
           <div class="card mb-0">
             <div class="card-header">
               <h3 class="card-title">{title}</h3>
@@ -40,7 +46,8 @@ class Modal extends Component {
             {children}
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
 }

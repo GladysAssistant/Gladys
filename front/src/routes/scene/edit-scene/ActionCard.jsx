@@ -1,11 +1,22 @@
 import { h } from 'preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import cx from 'classnames';
-import { useRef, useCallback } from 'preact/hooks';
-import { useDrag, useDrop } from 'react-dnd';
+import { useCallback, useState } from 'preact/hooks';
 
 import style from './style.css';
 import { ACTIONS } from '../../../../../server/utils/constants';
+import { ACTION_ICON, ACTION_COLOR, COLOR_CLASS } from './typesCatalog';
+import {
+  getGroupPath,
+  startStepDrag,
+  startParallelCardDrag,
+  startConditionDrag,
+  moveStepWithKeyboard,
+  moveParallelCardWithKeyboard,
+  moveConditionWithKeyboard
+} from './stepDrag';
+import { getActionSummary } from './summary';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 // Actions cards
 import ChooseActionTypeParams from './actions/ChooseActionTypeCard';
@@ -24,6 +35,7 @@ import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
 import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
+import CalendarGetEvents from './actions/CalendarGetEvents';
 import EcowattCondition from './actions/EcowattCondition';
 import SendMessageCameraParams from './actions/SendMessageCameraParams';
 import CheckAlarmMode from './actions/CheckAlarmMode';
@@ -35,41 +47,9 @@ import EdfTempoCondition from './actions/EdfTempoCondition';
 import AskAI from './actions/AskAI';
 import SendSms from './actions/SendSms';
 import ConditionIfElseThen from './actions/ConditionIfElseThen';
-
-const ACTION_ICON = {
-  [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
-  [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
-  [ACTIONS.LIGHT.TOGGLE]: 'fe fe-shuffle',
-  [ACTIONS.LIGHT.BLINK]: 'fe fe-star',
-  [ACTIONS.SWITCH.TURN_ON]: 'fe fe-toggle-right',
-  [ACTIONS.SWITCH.TURN_OFF]: 'fe fe-toggle-left',
-  [ACTIONS.SWITCH.TOGGLE]: 'fe fe-shuffle',
-  [ACTIONS.TIME.DELAY]: 'fe fe-clock',
-  [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
-  [ACTIONS.MESSAGE.SEND_CAMERA]: 'fe fe-message-square',
-  [ACTIONS.CONDITION.IF_THEN_ELSE]: 'fe fe-shuffle',
-  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
-  [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
-  [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
-  [ACTIONS.USER.SET_OUT_OF_HOME]: 'fe fe-home',
-  [ACTIONS.HTTP.REQUEST]: 'fe fe-link',
-  [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-home',
-  [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch',
-  [ACTIONS.SCENE.START]: 'fe fe-fast-forward',
-  [ACTIONS.HOUSE.IS_EMPTY]: 'fe fe-home',
-  [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
-  [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
-  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar',
-  [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
-  [ACTIONS.EDF_TEMPO.CONDITION]: 'fe fe-zap',
-  [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
-  [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
-  [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
-  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
-  [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
-  [ACTIONS.AI.ASK]: 'fe fe-cpu',
-  [ACTIONS.SMS.SEND]: 'fe fe-message-circle'
-};
+import ConditionWhile from './actions/ConditionWhile';
+import SetVariable from './actions/SetVariable';
+import GetDate from './actions/GetDate';
 
 const ACTION_COMPONENTS = {
   [null]: ChooseActionTypeParams,
@@ -95,6 +75,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: HouseEmptyOrNotCondition,
   [ACTIONS.DEVICE.SET_VALUE]: DeviceSetValue,
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: CalendarIsEventRunning,
+  [ACTIONS.CALENDAR.GET_EVENTS]: CalendarGetEvents,
   [ACTIONS.ECOWATT.CONDITION]: EcowattCondition,
   [ACTIONS.EDF_TEMPO.CONDITION]: EdfTempoCondition,
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: CheckAlarmMode,
@@ -104,101 +85,157 @@ const ACTION_COMPONENTS = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
   [ACTIONS.AI.ASK]: AskAI,
   [ACTIONS.SMS.SEND]: SendSms,
-  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen
-};
-
-const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
-const CONDITION_CARD_TYPE = 'CONDITION_CARD_TYPE';
-const ACTION_CARD_IF_THEN_ELSE_TYPE = 'ACTION_CARD_IF_THEN_ELSE_TYPE';
-
-const getDragAndDropType = (actionType, path) => {
-  if (path.includes('if')) {
-    return CONDITION_CARD_TYPE;
-  }
-  if (actionType === ACTIONS.CONDITION.IF_THEN_ELSE) {
-    return ACTION_CARD_IF_THEN_ELSE_TYPE;
-  }
-  return ACTION_CARD_TYPE;
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
+  [ACTIONS.CONDITION.WHILE]: ConditionWhile,
+  [ACTIONS.VARIABLE.SET]: SetVariable,
+  [ACTIONS.TIME.GET_DATE]: GetDate
 };
 
 const ActionCard = ({ children, ...props }) => {
-  const { path, deleteAction } = props;
-  const ref = useRef(null);
+  const { path, deleteAction, addAction, moveCard, moveCardGroup } = props;
+  const groupPath = getGroupPath(path);
+  const cardIndex = parseInt(path.split('.').pop(), 10);
+  // The conditions of an if/while block are a flat list, not a group of actions
+  const isCondition = path.includes('if');
+  const isSequentialStep = props.isSequentialStep && !isCondition;
+  // A card of an "at the same time" block: it moves on its own, while a
+  // sequential step moves as a whole group
+  const isParallelMember = !isCondition && !isSequentialStep;
+
+  // Structural conditions embed their own action groups: they cannot be collapsed
+  const isStructuralCondition =
+    props.action.type === ACTIONS.CONDITION.IF_THEN_ELSE || props.action.type === ACTIONS.CONDITION.WHILE;
+  // A new action starts expanded (the type picker is shown), an existing one starts
+  // collapsed so the scene can be read at a glance
+  const [expanded, setExpanded] = useState(props.action.type === null);
+  const isExpanded = expanded || isStructuralCondition;
+
+  const toggleExpanded = useCallback(() => {
+    setExpanded(previousExpanded => !previousExpanded);
+  }, []);
 
   const handleDelete = useCallback(() => {
     deleteAction(path);
   }, [path, deleteAction]);
 
-  const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: getDragAndDropType(props.action.type, props.path),
-    item: () => {
-      return { path };
-    },
-    collect: monitor => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }));
-  const [{ isActive }, drop] = useDrop({
-    accept: getDragAndDropType(props.action.type, props.path),
-    collect: monitor => ({
-      isActive: monitor.canDrop() && monitor.isOver()
-    }),
-    drop(item) {
-      if (!ref.current) {
-        return;
+  const addParallelAction = useCallback(() => {
+    addAction(
+      path
+        .split('.')
+        .slice(0, -1)
+        .join('.')
+    );
+  }, [path, addAction]);
+
+  // The drag handle drives the pointer-events engine; the arrow keys move
+  // the card one position at a time, so dragging is never the only way
+  const onHandlePointerDown = useCallback(
+    event => {
+      if (isCondition) {
+        startConditionDrag(event, { actionPath: path, moveCard });
+      } else if (isSequentialStep) {
+        startStepDrag(event, { groupPath, moveCardGroup });
+      } else {
+        startParallelCardDrag(event, { actionPath: path, moveCard });
       }
-      props.moveCard(item.path, path);
-    }
-  });
-  preview(drop(ref));
+    },
+    [isCondition, isSequentialStep, path, groupPath, moveCard, moveCardGroup]
+  );
+  const onHandleKeyDown = useCallback(
+    event => {
+      if (isCondition) {
+        moveConditionWithKeyboard(event, { actionPath: path, moveCard });
+      } else if (isSequentialStep) {
+        moveStepWithKeyboard(event, { groupPath, moveCardGroup });
+      } else {
+        moveParallelCardWithKeyboard(event, { actionPath: path, moveCard });
+      }
+    },
+    [isCondition, isSequentialStep, path, groupPath, moveCard, moveCardGroup]
+  );
+
+  const summary = !isExpanded ? getActionSummary(props.action, props.intl.dictionary) : null;
+
+  // A card of a parallel block and a condition are slots of their list, so
+  // the drop placement can be computed from the pointer position alone
+  const slotAttributes = isCondition
+    ? { 'data-condition-slot': true, 'data-card-index': cardIndex }
+    : isParallelMember
+    ? { 'data-card-slot': true, 'data-card-index': cardIndex }
+    : {};
+  // A plain step welcomes a dropped parallel card: it joins the step as an
+  // "at the same time" action (structural blocks and the type picker do not)
+  const mergeAttributes =
+    isSequentialStep && !isStructuralCondition && props.action.type !== null
+      ? {
+          'data-step-merge': true,
+          'data-group-path': groupPath,
+          'data-drop-active-class': style.mergeTargetActive
+        }
+      : {};
+
   return (
-    <div
-      class={cx({
-        'col-lg-12':
-          props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF ||
-          props.action.type === ACTIONS.CONDITION.IF_THEN_ELSE,
-        'col-lg-6':
-          props.action.type === ACTIONS.MESSAGE.SEND ||
-          props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
-          props.action.type === ACTIONS.MQTT.SEND ||
-          props.action.type === ACTIONS.ZIGBEE2MQTT.SEND ||
-          props.action.type === ACTIONS.LIGHT.BLINK ||
-          props.action.type === ACTIONS.SMS.SEND,
-        'col-lg-4':
-          props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
-          props.action.type !== ACTIONS.MESSAGE.SEND &&
-          props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING &&
-          props.action.type !== ACTIONS.SMS.SEND
-      })}
-    >
-      <div
-        ref={ref}
-        class={cx('card cursor-pointer user-select-none', {
-          [style.dropZoneActive]: isActive,
-          [style.dropZoneDragging]: isDragging
-        })}
-      >
-        <div ref={drag} class="card-header">
-          {props.action.type !== null && <i class={cx(ACTION_ICON[props.action.type], 'dark-mode-fe-none-filter')} />}
-          {props.action.type === null && <i class="fe fe-plus-circle" />}
-          <div class="card-title">
-            <i class={cx(props.action.icon, 'mr-4')} /> <Text id={`editScene.actions.${props.action.type}`} />
-            {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
-            {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
+    <div class="col-12" {...slotAttributes}>
+      <div class={cx('card user-select-none', style.stepCard)} {...mergeAttributes}>
+        <div class={cx('card-header', style.stepCardHeader)}>
+          <span
+            class={cx(style.stepIconTile, style[COLOR_CLASS[ACTION_COLOR[props.action.type]] || 'typePickerIconGray'])}
+          >
+            {props.action.type !== null && <i class={cx(ACTION_ICON[props.action.type], 'dark-mode-fe-none-filter')} />}
+            {props.action.type === null && <i class="fe fe-plus-circle" />}
+          </span>
+          <div class={style.stepText} onClick={toggleExpanded}>
+            <span class={style.stepLabel} data-step-label>
+              <Text id={`editScene.actions.${props.action.type}`} />
+              {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
+              {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
+            </span>
+            {summary && <span class={style.stepSummary}>{summary}</span>}
           </div>
           {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
             <div class="card-status bg-blue" />
           )}
           <div class="card-options">
-            <a>
-              <i class="fe fe-move mr-4" />
-            </a>
-            <a onClick={handleDelete} class="card-options-remove">
-              <i class="fe fe-x" />
-            </a>
+            <Localizer>
+              <button
+                type="button"
+                class={cx('mr-4', style.cardOptionButton, style.dragHandle)}
+                data-cy={`drag-step-${path}`}
+                onPointerDown={onHandlePointerDown}
+                onKeyDown={onHandleKeyDown}
+                aria-label={<Text id="editScene.moveHandleLabel" />}
+              >
+                <i class="fe fe-move" />
+              </button>
+            </Localizer>
+            <Localizer>
+              <button
+                type="button"
+                onClick={handleDelete}
+                class={cx('card-options-remove mr-4', style.cardOptionButton)}
+                aria-label={
+                  <Text id={isCondition ? 'editScene.deleteConditionButton' : 'editScene.deleteActionButton'} />
+                }
+              >
+                <i class="fe fe-x" />
+              </button>
+            </Localizer>
+            {!isStructuralCondition && (
+              <Localizer>
+                <button
+                  type="button"
+                  onClick={toggleExpanded}
+                  class={style.cardOptionButton}
+                  aria-expanded={isExpanded}
+                  aria-label={<Text id={isExpanded ? 'editScene.collapseStepButton' : 'editScene.expandStepButton'} />}
+                >
+                  <i class={cx('fe', isExpanded ? 'fe-chevron-up' : 'fe-chevron-down')} />
+                </button>
+              </Localizer>
+            )}
           </div>
         </div>
-        <div class="card-body">
+        <div class={cx('card-body', { 'd-none': !isExpanded })}>
           {(() => {
             const Component = ACTION_COMPONENTS[props.action.type];
             if (!Component) return null;
@@ -222,10 +259,21 @@ const ActionCard = ({ children, ...props }) => {
 
             return <Component {...commonProps} />;
           })()}
+          {!isCondition && !isStructuralCondition && props.action.type !== null && props.showParallelLink && (
+            <div class="text-right mt-3">
+              <button
+                type="button"
+                class={cx('text-muted', style.parallelLink, style.cardOptionButton)}
+                onClick={addParallelAction}
+              >
+                <i class="fe fe-git-merge" /> <Text id="editScene.addParallelActionButton" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default ActionCard;
+export default withIntlAsProp(ActionCard);

@@ -9,6 +9,7 @@ import EventLine from './EventLine';
 import GroupChipsScroll from './GroupChipsScroll';
 import { ALL_GROUPS } from './categoryGroups';
 import style from './style.css';
+import dashboardStyle from '../dashboard/style.css';
 
 // Groups consecutive events of the same device feature ("bursts") so
 // a chatty sensor doesn't flood the timeline, then splits them by day.
@@ -85,10 +86,17 @@ const HistoryPage = ({ intl, user, ...props }) => {
   // (e.g. expanding/collapsing a group), since it walks the whole events list.
   const timeline = useMemo(() => buildTimeline(props.events), [props.events]);
   const language = user && user.language;
+  const initialLoading = props.loading && !props.initialized;
 
   return (
     <div class="page">
-      <div class="page-main">
+      {/* The activity feed lives on the same Horizon glass surface as the
+          dashboard: same theme gate, same default scene. The scene is painted
+          on a dedicated fixed layer (not background-attachment: fixed, which
+          forces a main-thread repaint of the gradient on every scroll frame —
+          visible flicker when scrolling the feed fast). */}
+      <div class={cx('page-main', 'glass-theme', style.historyPage)}>
+        <div class={cx(style.sceneLayer, dashboardStyle.glassScene)} aria-hidden="true" />
         <div class="my-3 my-md-5">
           <div class="container">
             <div class={cx('page-header', style.pageHeader)}>
@@ -199,9 +207,15 @@ const HistoryPage = ({ intl, user, ...props }) => {
               </div>
             )}
 
+            {/* The theme centers the dimmer's loader on the dimmer itself
+                (top: 50%). On the first load the feed below is still empty,
+                so the dimmer would collapse and the loader would sit flush
+                under the filter capsule: reserve some height while it runs
+                so the spinner is centered in the empty feed area. */}
             <div
               class={cx('dimmer', {
-                active: props.loading && !props.initialized
+                active: initialLoading,
+                [style.initialLoadingDimmer]: initialLoading
               })}
             >
               <div class="loader" />

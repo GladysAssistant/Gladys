@@ -1,9 +1,11 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 import get from 'get-value';
 
 import actions from '../../../actions/dashboard/boxes/temperatureInRoom';
+import tileStyle from '../roomTile.css';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
 import {
   DEFAULT_VALUE_TEMPERATURE,
@@ -16,7 +18,7 @@ const isNotNullOrUndefined = value => value !== undefined && value !== null;
 
 const RoomTemperatureBox = ({ children, ...props }) => (
   <div class="card p-3">
-    <div class="d-flex align-items-center">
+    <div class={cx('d-flex align-items-center', tileStyle.tileContent)}>
       {isNotNullOrUndefined(props.temperature) &&
         props.temperature >= props.temperatureMin &&
         props.temperature <= props.temperatureMax && (
@@ -42,7 +44,7 @@ const RoomTemperatureBox = ({ children, ...props }) => (
 
       <div>
         {isNotNullOrUndefined(props.temperature) && (
-          <h4 class="m-0">
+          <h4 class={cx('m-0', tileStyle.tileValue)}>
             <Text id="global.degreeValue" fields={{ value: Number(props.temperature).toFixed(1) }} />
             <Text id={`global.${props.unit}`} />
           </h4>
@@ -52,7 +54,7 @@ const RoomTemperatureBox = ({ children, ...props }) => (
             <Text id="dashboard.boxes.temperatureInRoom.noTemperatureRecorded" />
           </p>
         )}
-        <small class="text-muted">{props.roomName}</small>
+        <small class={cx('text-muted', tileStyle.tileLabel)}>{props.roomName}</small>
       </div>
     </div>
   </div>

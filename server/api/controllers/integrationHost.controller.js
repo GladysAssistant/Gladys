@@ -122,13 +122,29 @@ module.exports = function IntegrationHostController(gladys) {
    * broadcasts/mDNS/SSDP, and their own broadcasts never reach the LAN)
    * and returns the RAW results — the integration interprets them itself.
    * Bounded to the capture requests declared in the manifest (403
-   * otherwise), 1-30s, one scan at a time per integration; the active
+   * otherwise); an mDNS scan browses every declared mDNS service. Scans
+   * last 1-30s, one at a time per integration; the active
    * emission is broadcast-only, on a declared port, payload 512 bytes
    * max, 1 scan per 10 seconds per integration (429 otherwise).
    */
   async function networkDiscoveryScan(req, res) {
     const results = await gladys.externalIntegration.runNetworkDiscoveryScan(req.externalIntegrationService, req.body);
     res.json(results);
+  }
+
+  /**
+   * @api {post} /api/integration/v1/network/wake networkWake
+   * @apiName networkWake
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Send a Wake-on-LAN magic packet from the Gladys core
+   * network namespace.
+   */
+  async function networkWake(req, res) {
+    await gladys.externalIntegration.wakeOnLan(req.externalIntegrationService, req.body);
+
+    res.json({
+      success: true,
+    });
   }
 
   /**
@@ -383,6 +399,7 @@ module.exports = function IntegrationHostController(gladys) {
     heartbeat: asyncMiddleware(heartbeat),
     saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
     networkDiscoveryScan: asyncMiddleware(networkDiscoveryScan),
+    networkWake: asyncMiddleware(networkWake),
     saveCameraImage: asyncMiddleware(saveCameraImage),
     setDeviceTransports: asyncMiddleware(setDeviceTransports),
     publishDiscoveredDevices: asyncMiddleware(publishDiscoveredDevices),

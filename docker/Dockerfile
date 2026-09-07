@@ -2,7 +2,7 @@ ARG TARGET
 ARG VERSION
 ARG BUILD_DATE
 
-FROM ${TARGET}/node:22-slim
+FROM ${TARGET}/node:24-slim
 
 LABEL \
   org.label-schema.build-date=$BUILD_DATE \
@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
          gzip \
          udev \
          bluez \
+         dbus-bin \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
@@ -38,7 +39,7 @@ RUN apt-get update && apt-get install -y \
          python3-pip \
          git \
          libffi-dev \
-         && npm ci --unsafe-perm --production \
+         && npm ci --production \
          && npm cache clean --force \
          && apt-get autoremove -y build-essential python3 python3-pip git libffi-dev \
          && apt-get purge -y --auto-remove \

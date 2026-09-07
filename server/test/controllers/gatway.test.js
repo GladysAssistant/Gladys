@@ -54,6 +54,35 @@ describe('Gladys Gateway call', () => {
       },
     );
   });
+  it('should get the Gladys Plus status as a non-admin user', (done) => {
+    // A user invited on the Gladys Plus account reaches Gladys through the
+    // gateway: they must be able to see that the instance is linked to Gladys
+    // Plus, otherwise the front-end offers them a free trial for a
+    // subscription the instance already has.
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+      role: 'user',
+    };
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/gateway/status',
+      {},
+      {},
+      (data) => {
+        expect(data).to.have.property('configured');
+        expect(data).to.have.property('connected');
+        done();
+      },
+    );
+  });
   it('should call admin API route as admin and get response', (done) => {
     const user = {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',

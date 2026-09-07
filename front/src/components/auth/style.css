@@ -1,0 +1,70 @@
+/* Horizon scene for logged-out pages (AuthLayout). The grammar for cards,
+   forms, buttons, alerts and tables comes from routes/settings/style.css via
+   the shared .settings-page class; only what is specific to these pages
+   lives here, scoped to the global .auth-page class set by AuthLayout. */
+
+.authColumn {
+  width: 100%;
+  max-width: 26rem;
+  margin: 0 auto;
+}
+
+.authColumnMedium {
+  max-width: 42rem;
+}
+
+.authColumnWide {
+  max-width: 60rem;
+}
+
+/* Brand header: the logo floats on the wallpaper above the card, replacing
+   the old inline logo-in-title (.header-brand-img) */
+.authBrand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.authBrand img {
+  width: 3.5rem;
+  height: 3.5rem;
+  filter: drop-shadow(0 8px 20px rgba(44, 62, 118, 0.25));
+}
+
+.authBrand h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--gl-ink);
+}
+
+/* .page-single centers vertically; breathing room when the card is tall */
+:global(.page-single.auth-page) {
+  padding: 3rem 0;
+}
+
+/* Muted helper texts sit directly on the wallpaper here (not in a card) */
+:global(.auth-page .text-muted) {
+  color: var(--gl-muted) !important;
+}
+
+/* The settings grammar has no outline-success (locked page validate button):
+   map it to the same pastel green pill as btn-success */
+:global(.auth-page .btn-outline-success) {
+  background-color: #def0e2;
+  border: none;
+  color: #2e8f5b;
+}
+
+:global(.auth-page .btn-outline-success:hover) {
+  background-color: #cfe9d6;
+  color: #27794d;
+}
+
+/* like the other pastel pills, invert WITH the theme into a dark tint */
+:global(.dark-mode .auth-page .btn-outline-success) {
+  filter: none;
+}

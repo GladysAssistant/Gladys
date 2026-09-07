@@ -6,12 +6,13 @@ import { route } from 'preact-router';
 import actions from '../../actions/map';
 import cx from 'classnames';
 import style from './style.css';
+import dashboardStyle from '../dashboard/style.css';
 import ColorPicker from './ColorPicker';
 import NewAreaMap from './NewAreaMap';
 
 const NewAreaPage = ({ children, ...props }) => (
   <div class={cx('container', style.containerWithMargin)}>
-    <Link href="/dashboard/maps" class="btn btn-secondary btn-sm">
+    <Link href="/dashboard/maps" class={cx('btn', style.pillButton, style.backPill)}>
       <Text id="global.backButton" />
     </Link>
     <div class="row">
@@ -228,32 +229,39 @@ class NewArea extends Component {
     props,
     { name, color, radius, latitude, longitude, houses, loading, createAreaError, deleteAreaError, getAreaError }
   ) {
+    // Same Horizon glass scene as the dashboard: the form is a glass card
+    // over the default scene, and .glass-theme + the mapPage scope drive
+    // the pill buttons and the mini-map chrome
     return (
       <div class="page">
-        <div class="page-main">
-          <div class="my-3 my-md-5">
-            <div class="map-header">
-              <NewAreaPage
-                name={name}
-                color={color}
-                radius={radius}
-                setName={this.setName}
-                setColor={this.setColor}
-                setRadius={this.setRadius}
-                createArea={this.createArea}
-                deleteArea={this.deleteArea}
-                setLatLong={this.setLatLong}
-                latitude={latitude}
-                longitude={longitude}
-                houses={houses}
-                loading={loading}
-                createAreaError={createAreaError}
-                deleteAreaError={deleteAreaError}
-                getAreaError={getAreaError}
-                creationMode={this.props.areaSelector === undefined}
-              />
-            </div>
-          </div>
+        <div
+          class={cx(
+            'page-main',
+            'glass-theme',
+            style.mapPage,
+            dashboardStyle.dashboardBackground,
+            dashboardStyle.glassScene
+          )}
+        >
+          <NewAreaPage
+            name={name}
+            color={color}
+            radius={radius}
+            setName={this.setName}
+            setColor={this.setColor}
+            setRadius={this.setRadius}
+            createArea={this.createArea}
+            deleteArea={this.deleteArea}
+            setLatLong={this.setLatLong}
+            latitude={latitude}
+            longitude={longitude}
+            houses={houses}
+            loading={loading}
+            createAreaError={createAreaError}
+            deleteAreaError={deleteAreaError}
+            getAreaError={getAreaError}
+            creationMode={this.props.areaSelector === undefined}
+          />
         </div>
       </div>
     );

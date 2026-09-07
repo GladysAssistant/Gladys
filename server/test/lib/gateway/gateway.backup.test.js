@@ -8,6 +8,7 @@ const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 const db = require('../../../models');
 const getConfig = require('../../../utils/getConfig');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { Error402 } = require('../../../utils/httpErrors');
 
 const { fake, assert } = sinon;
 const Gateway = proxyquire('../../../lib/gateway', {
@@ -164,6 +165,19 @@ describe('gateway.backup', async function describe() {
     assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
     assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
     assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
+  });
+
+  it('should not backup while the Gladys Plus subscription is not paid', async () => {
+    gateway.subscriptionActive = false;
+
+    try {
+      await gateway.backup();
+      assert.fail();
+    } catch (e) {
+      expect(e).instanceOf(Error402);
+    }
+    assert.notCalled(gateway.gladysGatewayClient.initializeMultiPartBackup);
+    assert.notCalled(message.sendToUser);
   });
 
   it('should not backup, no backup key found', async () => {

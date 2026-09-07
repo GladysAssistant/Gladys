@@ -1,12 +1,129 @@
-.noImageToShowError {
-  background-color: #34495e;
-  color: white;
-  height: 244px;
-  padding: 12px;
-  padding-bottom: 0px;
-  margin-bottom: 0px;
-  display: table-cell;
-  vertical-align: middle;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+.cameraMediaContainer {
+  position: relative;
+}
+
+/* Anchored top-right: the bottom band of the video belongs to the native <video> controls
+   (seek bar, volume…), which the pad used to cover (field feedback) */
+.ptzOverlay {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.cameraMediaContainer:hover .ptzOverlay,
+.ptzOverlay:focus-within {
+  opacity: 1;
+}
+
+/* Touch devices have no hover: keep the controls always visible */
+@media (hover: none) {
+  .ptzOverlay {
+    opacity: 1;
+  }
+}
+
+.ptzPad {
+  display: grid;
+  grid-template-areas:
+    '. up .'
+    'left stop right'
+    '. down .';
+  gap: 2px;
+}
+
+.ptzUp {
+  grid-area: up;
+}
+
+.ptzLeft {
+  grid-area: left;
+}
+
+.ptzRight {
+  grid-area: right;
+}
+
+.ptzDown {
+  grid-area: down;
+}
+
+.ptzStop {
+  grid-area: stop;
+}
+
+.ptzZoom {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ptzButton {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  touch-action: none;
+}
+
+.ptzButton:hover,
+.ptzButton:focus {
+  background-color: rgba(0, 0, 0, 0.65);
+  color: #fff;
+}
+
+.ptzButtonActive {
+  background-color: rgba(32, 107, 196, 0.85);
+}
+
+.ptzPreset {
+  max-width: 9rem;
+  background-color: rgba(0, 0, 0, 0.45);
+  border-color: transparent;
+  color: #fff;
+}
+
+/* Snapshot unavailable, or camera disabled ("private mode"): a quiet placeholder in the
+   media slot. flex-grow lets it absorb the stretch of a short column (the card is a flex
+   column there) instead of leaving a blank void under the header */
+.noImagePlaceholder {
+  flex: 1 1 auto;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.noImageIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 14px;
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.noImageText {
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.875rem;
+  max-width: 22rem;
 }

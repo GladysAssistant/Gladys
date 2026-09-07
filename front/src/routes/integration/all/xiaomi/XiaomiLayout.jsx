@@ -1,61 +1,43 @@
+import { Fragment } from 'preact';
 import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
-import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
+import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 
 const XiaomiLayout = ({ children, user }) => (
-  <div class="page">
-    <div class="page-main">
-      <div class="my-3 my-md-5">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-3">
-              <BackToIntegrationsLink />
-              <h3 class="page-title mb-5">
-                <Text id="integration.xiaomi.title" />
-              </h3>
-              <div>
-                <div class="list-group list-group-transparent mb-0">
-                  <Link
-                    href="/dashboard/integration/device/xiaomi"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-radio" />
-                    </span>
-                    <Text id="integration.xiaomi.deviceTab" />
-                  </Link>
+  <IntegrationSubPageLayout
+    title={<Text id="integration.xiaomi.title" />}
+    tabs={
+      <Fragment>
+        <Link href="/dashboard/integration/device/xiaomi" activeClassName="active" class="hz-tab-link">
+          <i class="fe fe-radio" />
+          <span>
+            <Text id="integration.xiaomi.deviceTab" />
+          </span>
+        </Link>
 
-                  <DeviceConfigurationLink
-                    user={user}
-                    configurationKey="integrations"
-                    documentKey="xiaomi"
-                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
-                    </span>
-                    <Text id="integration.xiaomi.documentation" />
-                  </DeviceConfigurationLink>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-9">
-              <div class="alert alert-warning mb-4">
-                <h4 class="alert-title">
-                  <Text id="integration.xiaomi.deprecatedWarning.title" />
-                </h4>
-                <MarkupText id="integration.xiaomi.deprecatedWarning.description" />
-              </div>
-              {children}
-            </div>
-          </div>
-        </div>
-      </div>
+        <DeviceConfigurationLink
+          user={user}
+          configurationKey="integrations"
+          documentKey="xiaomi"
+          linkClass="hz-tab-link"
+        >
+          <i class="fe fe-book-open" />
+          <span>
+            <Text id="integration.xiaomi.documentation" />
+          </span>
+        </DeviceConfigurationLink>
+      </Fragment>
+    }
+  >
+    <div class="alert alert-warning mb-4">
+      <h4 class="alert-title">
+        <Text id="integration.xiaomi.deprecatedWarning.title" />
+      </h4>
+      <MarkupText id="integration.xiaomi.deprecatedWarning.description" />
     </div>
-  </div>
+    {children}
+  </IntegrationSubPageLayout>
 );
 
 export default XiaomiLayout;

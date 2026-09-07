@@ -71,4 +71,44 @@ describe('variable.setValue', () => {
     await customVariable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_USERS_KEYS, 'TIMEZONE');
     assert.calledWith(event.emit, EVENTS.GATEWAY.USER_KEYS_CHANGED);
   });
+  it('should create mDNS hostname variable and emit event', async () => {
+    const event = {
+      emit: fake.returns(),
+    };
+    const customVariable = new Variable(event);
+    await customVariable.setValue(SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME, 'gladys2');
+    assert.calledWith(event.emit, EVENTS.SYSTEM.MDNS_HOSTNAME_CHANGED);
+  });
+  it('should store the mDNS hostname normalized', async () => {
+    const event = {
+      emit: fake.returns(),
+    };
+    const customVariable = new Variable(event);
+    // the stored value must be exactly what is advertised on the network
+    const createdVariable = await customVariable.setValue(
+      SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME,
+      '  Gladys-Garage.local ',
+    );
+    expect(createdVariable.value).to.equal('gladys-garage');
+    const updatedVariable = await customVariable.setValue(SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME, 'GLADYS-CAVE');
+    expect(updatedVariable.value).to.equal('gladys-cave');
+  });
+  it('should not allow an invalid mDNS hostname', async () => {
+    const event = {
+      emit: fake.returns(),
+    };
+    const customVariable = new Variable(event);
+    const promise = customVariable.setValue(SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME, 'not a valid hostname!');
+    await chaiAssert.isRejected(promise, 'Invalid mDNS hostname "not a valid hostname!"');
+    assert.notCalled(event.emit);
+  });
+  it('should not allow an mDNS hostname which is not a string', async () => {
+    const event = {
+      emit: fake.returns(),
+    };
+    const customVariable = new Variable(event);
+    const promise = customVariable.setValue(SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME, 42);
+    await chaiAssert.isRejected(promise, 'Invalid mDNS hostname "42"');
+    assert.notCalled(event.emit);
+  });
 });

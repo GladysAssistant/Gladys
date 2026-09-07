@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const { buildAccessory } = require('../../../../services/homekit/lib/buildAccessory');
+const { findFeatureService } = require('../../../../services/homekit/lib/featureServices');
 
 describe('Build accessory', () => {
   const homekitHandler = {
@@ -348,6 +349,108 @@ describe('Build accessory', () => {
     expect(addService.callCount).to.equal(2);
   });
 
+  it('should index every service by the features it was built from', async () => {
+    homekitHandler.buildService = sinon.stub();
+    homekitHandler.buildService.onFirstCall().returns('switch-service-1');
+    homekitHandler.buildService.onSecondCall().returns('switch-service-2');
+    const addService = sinon.stub();
+    const accessory = { addService, services: ['service1', 'service2'] };
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns(accessory),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Double interrupteur',
+      features: [
+        { selector: 'switch-1', name: 'Switch 1', category: 'switch', type: 'binary', read_only: false },
+        { selector: 'switch-2', name: 'Switch 2', category: 'switch', type: 'binary', read_only: false },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    // sendState resolves through this index, so the second switch reaches its own service instead
+    // of the first one getService would return
+    expect(findFeatureService(accessory, device.features[0])).to.equal('switch-service-1');
+    expect(findFeatureService(accessory, device.features[1])).to.equal('switch-service-2');
+  });
+
+  it('should index the read-only twin dropped from a service onto that service', async () => {
+    homekitHandler.buildService = sinon.stub().returns('fan-service');
+    const addService = sinon.stub();
+    const accessory = { addService, services: ['service1', 'service2'] };
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns(accessory),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Ventilateur',
+      features: [
+        { selector: 'fan-speed', name: 'Speed %', category: 'fan', type: 'percent', read_only: false },
+        { selector: 'fan-speed-current', name: 'Speed % current', category: 'fan', type: 'percent', read_only: true },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    // the read-only twin builds no characteristic of its own, but an update on it still has to
+    // reach the Fanv2 service its writable twin was built into
+    expect(homekitHandler.buildService.args[0][1]).to.have.deep.members([device.features[0]]);
+    expect(findFeatureService(accessory, device.features[0])).to.equal('fan-service');
+    expect(findFeatureService(accessory, device.features[1])).to.equal('fan-service');
+  });
+
+  it('should index the writable twin dropped from a service onto that service', async () => {
+    homekitHandler.buildService = sinon.stub().returns('fan-service');
+    const addService = sinon.stub();
+    const accessory = { addService, services: ['service1', 'service2'] };
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns(accessory),
+    };
+
+    // the read-only counterpart comes first this time, so it is the one replaced in the config
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Ventilateur',
+      features: [
+        { selector: 'fan-speed-current', name: 'Speed % current', category: 'fan', type: 'percent', read_only: true },
+        { selector: 'fan-speed', name: 'Speed %', category: 'fan', type: 'percent', read_only: false },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.args[0][1]).to.have.deep.members([device.features[1]]);
+    expect(findFeatureService(accessory, device.features[0])).to.equal('fan-service');
+    expect(findFeatureService(accessory, device.features[1])).to.equal('fan-service');
+  });
+
+  it('should index a merged service under every feature it carries', async () => {
+    homekitHandler.buildService = sinon.stub().returns('thermostat-service');
+    const addService = sinon.stub();
+    const accessory = { addService, services: ['service1', 'service2'] };
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns(accessory),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Thermostat',
+      features: [
+        { selector: 'room-temperature', name: 'Température', category: 'temperature-sensor', type: 'decimal' },
+        { selector: 'setpoint', name: 'Chauffage', category: 'thermostat', type: 'target-temperature' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    // both the host feature and the temperature folded into it point at the Thermostat service
+    expect(findFeatureService(accessory, device.features[0])).to.equal('thermostat-service');
+    expect(findFeatureService(accessory, device.features[1])).to.equal('thermostat-service');
+  });
+
   it('should leave a temperature sensor alone when the device has no thermostat', async () => {
     homekitHandler.buildService = sinon.stub().returns('builded-service');
     const addService = sinon.stub();
@@ -371,5 +474,121 @@ describe('Build accessory', () => {
 
     expect(homekitHandler.buildService.callCount).to.equal(1);
     expect(homekitHandler.buildService.args[0][2].service).to.equal('TemperatureSensor');
+  });
+
+  it('should give a subtype to every Gladys category landing on one HomeKit service', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    // a Zigbee2mqtt detector carrying its own siren: two Gladys categories, one HomeKit Switch
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Detecteur cave',
+      features: [
+        { selector: 'relais', name: 'Relais', category: 'switch', type: 'binary' },
+        { selector: 'sirene', name: 'Sirène', category: 'siren', type: 'binary' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.callCount).to.equal(2);
+    // both are a Switch, so HAP needs to tell them apart — and neither keeps the bare service, which
+    // would otherwise hand one of them the identity the other had before
+    expect(homekitHandler.buildService.args[0][2].service).to.equal('Switch');
+    expect(homekitHandler.buildService.args[1][2].service).to.equal('Switch');
+    expect(homekitHandler.buildService.args[0][3]).to.equal('switch');
+    expect(homekitHandler.buildService.args[1][3]).to.equal('siren');
+  });
+
+  it('should give each category the same subtype whatever order the features come in', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    // the same device, its features read the other way round: the subtype takes part in the
+    // identifiers HAP persists, so it may not depend on the order features happen to arrive in
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Detecteur cave',
+      features: [
+        { selector: 'sirene', name: 'Sirène', category: 'siren', type: 'binary' },
+        { selector: 'relais', name: 'Relais', category: 'switch', type: 'binary' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.args[0][3]).to.equal('siren');
+    expect(homekitHandler.buildService.args[1][3]).to.equal('switch');
+  });
+
+  it('should leave the bare service to a category that shares it with nobody', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    // no siren here, so the switch keeps the subtype it has always had and a paired home does not
+    // see its service change identity
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Prise salon',
+      features: [
+        { selector: 'relais', name: 'Relais', category: 'switch', type: 'binary' },
+        { selector: 'temperature', name: 'Température', category: 'temperature-sensor', type: 'decimal' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.args[0][3]).to.equal(undefined);
+    expect(homekitHandler.buildService.args[1][3]).to.equal(undefined);
+  });
+
+  it('should still number several services built from a single category', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Volets salon',
+      features: [
+        { selector: 'volet-1', name: 'Volet 1', category: 'shutter', type: 'position' },
+        { selector: 'volet-2', name: 'Volet 2', category: 'shutter', type: 'position' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.args[0][3]).to.equal('shutter 1');
+    expect(homekitHandler.buildService.args[1][3]).to.equal('shutter 2');
+  });
+
+  it('should name the accessory with a name HomeKit accepts', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Detecteur_Cave ',
+      features: [{ selector: 'sirene', name: 'Sirène', category: 'siren', type: 'binary' }],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.hap.Accessory.args[0][0]).to.equal('Detecteur Cave');
   });
 });

@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { SETUP_VARIABLES } = require('./constants');
+const { validateSetup } = require('../utils/validateSetup');
 
 /**
  * @description Setup Zigbee2mqtt properties.
@@ -9,13 +10,14 @@ const { SETUP_VARIABLES } = require('./constants');
  */
 async function setup(config) {
   logger.debug('Zigbee2mqtt: storing setp...', config);
+  const validatedConfig = validateSetup(config);
   await Promise.all(
-    SETUP_VARIABLES.filter((key) => config[key] !== undefined).map((key) =>
-      this.saveOrDestroyVariable(key, config[key]),
+    SETUP_VARIABLES.filter((key) => validatedConfig[key] !== undefined).map((key) =>
+      this.saveOrDestroyVariable(key, validatedConfig[key]),
     ),
   );
 
-  // Reload z2m container with new USB configuration
+  // Reload z2m container with new coordinator configuration
   await this.init(true);
 }
 

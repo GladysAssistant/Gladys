@@ -92,6 +92,9 @@ describe('room.getBySelector', () => {
       expect(device).to.have.property('features');
       expect(device).to.have.property('service');
       expect(device.service).to.have.property('name');
+      device.features.forEach((oneFeature) => {
+        expect(oneFeature).to.have.property('step');
+      });
     });
   });
   it('should return room not found', async () => {
@@ -139,6 +142,10 @@ describe('room.get', () => {
           expect(oneFeature).to.have.property('unit');
           expect(oneFeature).to.have.property('min');
           expect(oneFeature).to.have.property('max');
+          // the dashboard resolves the setpoint step from it: served by both
+          // room endpoints, or the front never sees what the device declared
+          expect(oneFeature).to.have.property('step');
+          expect(oneFeature).to.have.property('last_value_string');
           expect(oneFeature).not.to.have.property('id');
           expect(oneFeature).not.to.have.property('device_id');
           expect(oneFeature).not.to.have.property('created_at');

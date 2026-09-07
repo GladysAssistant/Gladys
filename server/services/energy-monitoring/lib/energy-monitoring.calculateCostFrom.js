@@ -21,21 +21,37 @@ const { buildEdfTempoDayMap } = require('../contracts/contracts.buildEdfTempoDay
 
 const isNullOrEmpty = (value) => value === null || value === undefined || value === '';
 
+const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000;
+
 /**
  * @description Calculate energy monitoring cost from a specific date.
  * @param {Date} startAt - The start date.
- * @param {string} jobId - The job id.
+ * @param {string} [jobId] - The job id.
+ * @param {object} [options] - Options.
+ * @param {Array<string>} [options.deviceIds] - Only recalculate cost for these device ids.
  * @returns {Promise<null>} Return null when finished.
  * @example
  * calculateCostFrom(new Date(), '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateCostFrom(startAt, jobId) {
+async function calculateCostFrom(startAt, jobId, options = {}) {
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
   logger.info(`Calculating cost in timezone ${systemTimezone}`);
-  const energyDevices = await this.gladys.device.get({
+  let energyDevices = await this.gladys.device.get({
     device_feature_category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
   });
-  logger.info(`Found ${energyDevices.length} energy devices`);
+  // When a sync only touched some devices (e.g. Enedis), don't rewrite the cost
+  // history of every other energy device: their consumption states are unchanged.
+  if (options.deviceIds && options.deviceIds.length > 0) {
+    const deviceIdsSet = new Set(options.deviceIds);
+    const totalDevices = energyDevices.length;
+    energyDevices = energyDevices.filter((energyDevice) => deviceIdsSet.has(energyDevice.id));
+    logger.info(`Found ${totalDevices} energy devices, recalculating cost for ${energyDevices.length} of them`);
+  } else {
+    logger.info(`Found ${energyDevices.length} energy devices`);
+  }
+  // Energy prices are per root electric meter and don't change during the run,
+  // so fetch and pre-parse them once per meter instead of once per feature.
+  const pricesByElectricMeterDeviceId = new Map();
   let edfTempoHistoricalMap = null;
   await Promise.each(energyDevices, async (energyDevice, index) => {
     try {
@@ -118,9 +134,29 @@ async function calculateCostFrom(startAt, jobId) {
         logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
         await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
         // Get the energy prices from this electrical meter device
-        const energyPrices = await this.gladys.energyPrice.get({
-          electric_meter_device_id: electricMeterFeature.device_id,
-        });
+        let meterPrices = pricesByElectricMeterDeviceId.get(electricMeterFeature.device_id);
+        if (!meterPrices) {
+          const energyPrices = await this.gladys.energyPrice.get({
+            electric_meter_device_id: electricMeterFeature.device_id,
+          });
+          meterPrices = {
+            energyPrices,
+            // Pre-parse validity boundaries of consumption prices once: parsing
+            // start/end dates in the system timezone for every single state is
+            // what made large recalculations slow.
+            consumptionPrices: energyPrices
+              .filter((price) => price.price_type === ENERGY_PRICE_TYPES.CONSUMPTION)
+              .map((price) => ({
+                price,
+                validFromTimestamp: dayjs.tz(`${price.start_date} 00:00:00`, systemTimezone).valueOf(),
+                validUntilTimestamp: isNullOrEmpty(price.end_date)
+                  ? Infinity
+                  : dayjs.tz(`${price.end_date} 23:59:59`, systemTimezone).valueOf(),
+              })),
+          };
+          pricesByElectricMeterDeviceId.set(electricMeterFeature.device_id, meterPrices);
+        }
+        const { energyPrices, consumptionPrices } = meterPrices;
         const hasTempo = energyPrices.some((p) => p.contract === ENERGY_CONTRACT_TYPES.EDF_TEMPO);
         if (hasTempo && !edfTempoHistoricalMap) {
           logger.info(
@@ -144,21 +180,18 @@ async function calculateCostFrom(startAt, jobId) {
         logger.debug(`Found ${deviceFeatureStates.length} states for device ${ecf.consumptionFeature.selector}`);
         // For each state
         await Promise.each(deviceFeatureStates, async (deviceFeatureState) => {
-          const createdAtRemoved30Minutes = dayjs
-            .tz(deviceFeatureState.created_at, systemTimezone)
-            .subtract(30, 'minutes')
-            .toDate();
-          // Get the prices for this date
-          const energyPricesForDate = energyPrices.filter((price) => {
-            // We only keep consumption prices (no subscription)
-            return (
-              price.price_type === ENERGY_PRICE_TYPES.CONSUMPTION &&
-              // We only keep prices that are valid for this date
-              dayjs.tz(`${price.start_date} 00:00:00`, systemTimezone).toDate() <= createdAtRemoved30Minutes &&
-              (isNullOrEmpty(price.end_date) ||
-                dayjs.tz(`${price.end_date} 23:59:59`, systemTimezone).toDate() >= createdAtRemoved30Minutes)
-            );
-          });
+          // Subtracting 30 minutes is plain instant arithmetic, no timezone conversion needed
+          const createdAtRemoved30MinutesTimestamp =
+            new Date(deviceFeatureState.created_at).getTime() - THIRTY_MINUTES_IN_MS;
+          const createdAtRemoved30Minutes = new Date(createdAtRemoved30MinutesTimestamp);
+          // Get the consumption prices (no subscription) that are valid for this date
+          const energyPricesForDate = consumptionPrices
+            .filter(
+              (p) =>
+                p.validFromTimestamp <= createdAtRemoved30MinutesTimestamp &&
+                p.validUntilTimestamp >= createdAtRemoved30MinutesTimestamp,
+            )
+            .map((p) => p.price);
           if (energyPricesForDate.length === 0) {
             logger.debug(
               `No energy price found for device ${electricMeterFeature.device_id} at ${deviceFeatureState.created_at}`,

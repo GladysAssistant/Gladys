@@ -1,5 +1,4 @@
-import { Text } from 'preact-i18n';
-import cx from 'classnames';
+import AdaptiveOptionControl from './AdaptiveOptionControl';
 
 const BinaryDeviceType = ({ children, ...props }) => {
   const { category, type, last_value: lastValue } = props.deviceFeature;
@@ -15,15 +14,43 @@ const BinaryDeviceType = ({ children, ...props }) => {
     props.updateValue(props.deviceFeature, targetValue);
   }
 
+  // Whole-row tap is a coarse-pointer affordance only (checked at tap time —
+  // matchMedia at render would go stale on convertibles): with a mouse the
+  // switch is a comfortable target, and a stray click on the device NAME
+  // must not be a live device write.
+  function updateValueFromRowTap() {
+    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
+      updateValue();
+    }
+  }
+
+  // The current-state button shows the live state and is disabled; the other one shows the action
+  // that moves the device to its value. Some of these labels are long (e.g. the water heater's
+  // "Annuler le boost"), so the pair goes through AdaptiveOptionControl, which collapses it to a
+  // dropdown when the card is too narrow — such as in a 3-column dashboard layout.
+  const options = [0, 1].map(optionValue => ({
+    value: optionValue,
+    i18nKey: lastValue === optionValue ? `stateLiveFinished.${optionValue}` : `state.${optionValue}`,
+    disabled: lastValue === optionValue
+  }));
+
+  // Plain on/off rows toggle from a tap anywhere on the row, not only on the
+  // 36px switch — on a phone the switch alone is far below the ~44px
+  // touch-target floor, and the whole row reads as one control anyway
+  // (HomeKit behaves the same). The label stops propagation so a tap
+  // landing on the switch itself doesn't toggle twice.
   return (
-    <tr>
+    <tr
+      class={!customText ? 'device-row-tappable' : undefined}
+      onClick={!customText ? updateValueFromRowTap : undefined}
+    >
       <td>
         <i class="fe fe-toggle-right" />
       </td>
       <td>{props.rowName}</td>
-      <td class="text-right">
-        {!customText ? (
-          <label class="custom-switch">
+      {!customText ? (
+        <td class="text-right">
+          <label class="custom-switch" onClick={event => event.stopPropagation()}>
             <input
               type="radio"
               name={`box-${props.x}-${props.y}-${props.deviceFeature.id}`}
@@ -34,37 +61,16 @@ const BinaryDeviceType = ({ children, ...props }) => {
             />
             <span class="custom-switch-indicator" />
           </label>
-        ) : (
-          <div class="btn-group" role="group">
-            <button
-              class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === 0
-              })}
-              onClick={updateValue}
-              disabled={lastValue === 0}
-            >
-              {lastValue === 0 ? (
-                <Text id={`deviceFeatureAction.category.${category}.${type}.stateLiveFinished.${lastValue}`} />
-              ) : (
-                <Text id={`deviceFeatureAction.category.${category}.${type}.state.${targetValue}`} />
-              )}
-            </button>
-            <button
-              class={cx('btn btn-sm', 'btn-secondary', {
-                active: lastValue === 1
-              })}
-              onClick={updateValue}
-              disabled={lastValue === 1}
-            >
-              {lastValue === 1 ? (
-                <Text id={`deviceFeatureAction.category.${category}.${type}.stateLiveFinished.${lastValue}`} />
-              ) : (
-                <Text id={`deviceFeatureAction.category.${category}.${type}.state.${targetValue}`} />
-              )}
-            </button>
-          </div>
-        )}
-      </td>
+        </td>
+      ) : (
+        <AdaptiveOptionControl
+          options={options}
+          value={lastValue}
+          category={category}
+          type={type}
+          updateValue={value => props.updateValue(props.deviceFeature, value)}
+        />
+      )}
     </tr>
   );
 };

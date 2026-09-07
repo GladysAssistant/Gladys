@@ -107,9 +107,10 @@ function validateConfigValue(field, value, dynamicOptions = {}) {
       break;
     }
     case 'oauth2':
-      // the value of an oauth2 field is the Connect flow itself: the tokens
+    case 'account_link':
+      // the value of these fields is the Connect flow itself: the credentials
       // are stored by the integration under keys outside the schema
-      throw new Error422(`config.${key}: oauth2 fields cannot be set directly`);
+      throw new Error422(`config.${key}: ${type} fields cannot be set directly`);
     case 'section':
       // purely presentational intro block: no stored value, its key is
       // never accepted in a config payload

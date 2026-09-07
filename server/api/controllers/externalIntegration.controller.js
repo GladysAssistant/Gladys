@@ -72,7 +72,8 @@ module.exports = function ExternalIntegrationController(gladys) {
    *     "docker_image": "ghcr.io/john/gladys-open-meteo-demo:1.2.0",
    *     "store_slug": null,
    *     "manifest": {},
-   *     "update_available": false
+   *     "update_available": false,
+   *     "latest_version": null
    *   }
    * ]
    * @apiDescription A non-admin user only gets the installed communication
@@ -114,6 +115,7 @@ module.exports = function ExternalIntegrationController(gladys) {
     res.json({
       ...integration,
       update_available: gladys.externalIntegration.isUpdateAvailable(integration),
+      latest_version: gladys.externalIntegration.getLatestVersion(integration),
       connection_status: gladys.externalIntegration.getConnectionStatus(integration.id),
       started_at: await gladys.externalIntegration.getContainerStartedAt(integration),
       docs: gladys.externalIntegration.getDocsUrls(integration),

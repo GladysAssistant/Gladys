@@ -33,6 +33,26 @@ function buildByName(names, name, parentType) {
 }
 
 /**
+ * @description Build the supported options of a feature from the values its Zigbee "expose" lists.
+ * Some Gladys value sets are wider than what a given device accepts (a siren able to ring or to
+ * flash, but never to be set to stay quiet): the values the expose advertises, read through the
+ * mapping of the expose type, are the subset this very device supports.
+ * @param {object} exposeHandler - Handler of the Zigbee "expose" type.
+ * @param {object} expose - Zigbee "expose" values.
+ * @returns {Array} The supported options, or undefined when none could be mapped.
+ * @example buildSupportedOptions(enumType, { name: 'alarm_mode', values: ['alarm_sound'] });
+ */
+function buildSupportedOptions(exposeHandler, expose) {
+  const { values = [] } = expose;
+  const options = values
+    .map((value) => ({ value: exposeHandler.readValue(expose, value), label: value }))
+    .filter((option) => option.value !== undefined)
+    .map((option, index) => ({ ...option, sort_order: index }));
+
+  return options.length === 0 ? undefined : options;
+}
+
+/**
  * @description Build a Gladys feature according to Zigbee "expose" values.
  * @param {string} deviceName - Device friendly name.
  * @param {object} expose - Zigbee "expose" values.
@@ -42,7 +62,8 @@ function buildByName(names, name, parentType) {
  */
 function buildFeatures(deviceName, expose, parentType) {
   const { type, name, property, access, value_min: minValue, value_max: maxValue, unit: deviceUnit, values } = expose;
-  const { names = {}, feature, getFeatureIndexes = () => [''] } = exposesMap[type] || {};
+  const exposeHandler = exposesMap[type] || {};
+  const { names = {}, feature, getFeatureIndexes = () => [''] } = exposeHandler;
   const byName = buildByName(names, name, parentType);
 
   if (!byName) {
@@ -59,8 +80,13 @@ function buildFeatures(deviceName, expose, parentType) {
 
   const createdFeature = { read_only: readOnly, has_feedback: hasFeedback, ...(feature || {}), ...(byName || {}) };
 
+  // Supported options, when the mapping asks for the subset this device really supports
+  const supportedOptions = createdFeature.buildSupportedOptions
+    ? buildSupportedOptions(exposeHandler, expose)
+    : undefined;
+
   // Min value
-  const min = minValue !== undefined ? minValue : createdFeature.min;
+  let min = minValue !== undefined ? minValue : createdFeature.min;
 
   // Max value
   let { max } = createdFeature;
@@ -68,6 +94,13 @@ function buildFeatures(deviceName, expose, parentType) {
     max = maxValue;
   } else if (values !== undefined) {
     max = values.length;
+  }
+
+  // The supported options are the values this device accepts, so they bound the feature too
+  if (supportedOptions !== undefined) {
+    const optionValues = supportedOptions.map((option) => option.value);
+    min = Math.min(...optionValues);
+    max = Math.max(...optionValues);
   }
 
   // Unit
@@ -79,8 +112,12 @@ function buildFeatures(deviceName, expose, parentType) {
       { ...createdFeature, min, max, unit, ...(byName || {}) }
     : // Values from z2m are kept
       { ...createdFeature, min, max, unit };
-  // Clean additional attribute
+  // Clean additional attributes
   delete definedFeature.forceOverride;
+  delete definedFeature.buildSupportedOptions;
+  if (supportedOptions !== undefined) {
+    definedFeature.supported_options = supportedOptions;
+  }
 
   // Add missing properties
   const typeFeaturesIndexes = getFeatureIndexes(values);
@@ -92,5 +129,6 @@ function buildFeatures(deviceName, expose, parentType) {
 module.exports = {
   buildByParentType,
   buildByName,
+  buildSupportedOptions,
   buildFeatures,
 };

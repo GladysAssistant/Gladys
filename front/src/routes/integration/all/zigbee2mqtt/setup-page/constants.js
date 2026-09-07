@@ -8,4 +8,9 @@ const SETUP_MODES = {
   REMOTE: 'remote'
 };
 
-export { MQTT_MODE, SETUP_MODES };
+const ADAPTER_MODE = {
+  USB: 'usb',
+  NETWORK: 'network'
+};
+
+export { MQTT_MODE, SETUP_MODES, ADAPTER_MODE };

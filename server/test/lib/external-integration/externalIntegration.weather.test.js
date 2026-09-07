@@ -291,6 +291,33 @@ describe('externalIntegration.normalizeWeather', () => {
     expect(weather.hours[2].is_day).to.equal(undefined);
   });
 
+  it('should accept the extended conditions and still coerce an unknown one', () => {
+    const weather = normalizeWeather(
+      {
+        temperature: -2,
+        weather: 'freezing-rain',
+        datetime: '2026-01-15T08:00:00.000Z',
+        hours: [
+          { temperature: -3, weather: 'freezing-fog', datetime: '2026-01-15T09:00:00.000Z' },
+          { temperature: -1, weather: 'snow-thunderstorm', datetime: '2026-01-15T10:00:00.000Z' },
+          { temperature: 28, weather: 'sandstorm', datetime: '2026-01-15T11:00:00.000Z' },
+          { temperature: 24, weather: 'tornado', datetime: '2026-01-15T12:00:00.000Z' },
+          { temperature: 26, weather: 'hurricane', datetime: '2026-01-15T13:00:00.000Z' },
+          // still not a condition of the enum: coerced, not passed through
+          { temperature: 20, weather: 'p14bisj', datetime: '2026-01-15T14:00:00.000Z' },
+        ],
+      },
+      'metric',
+    );
+    expect(weather.weather).to.equal('freezing-rain');
+    expect(weather.hours[0].weather).to.equal('freezing-fog');
+    expect(weather.hours[1].weather).to.equal('snow-thunderstorm');
+    expect(weather.hours[2].weather).to.equal('sandstorm');
+    expect(weather.hours[3].weather).to.equal('tornado');
+    expect(weather.hours[4].weather).to.equal('hurricane');
+    expect(weather.hours[5].weather).to.equal('unknown');
+  });
+
   it('should keep a valid alert type and drop an invalid one without rejecting the alert', () => {
     const weather = normalizeWeather(
       {

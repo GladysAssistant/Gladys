@@ -1,10 +1,15 @@
 import { Component } from 'preact';
 
 import EditHouse from './EditHouse';
+import { RequestStatus } from '../../utils/consts';
 
 class EditHouseComponent extends Component {
   getErrors = () => {
     const errors = {};
+    const name = this.props.house.name;
+    if (!name || name.trim().length === 0) {
+      errors.houseName = true;
+    }
     if (this.props.house.alarm_code) {
       const code = this.props.house.alarm_code;
       const isNum = /^\d+$/.test(code);
@@ -32,6 +37,9 @@ class EditHouseComponent extends Component {
   updateHouseDelayBeforeArming = e => {
     this.props.updateHouseDelayBeforeArming(e.target.value, this.props.houseIndex);
   };
+  selectHouseLocation = (latitude, longitude) => {
+    this.props.updateHouseLocation(latitude, longitude, this.props.houseIndex);
+  };
   addRoom = () => {
     this.props.addRoom(this.state.newRoomName, this.props.houseIndex);
     this.setState({
@@ -49,9 +57,23 @@ class EditHouseComponent extends Component {
       loading: true
     });
     await this.props.saveHouse(this.props.houseIndex);
+    if (this.unmounted) {
+      return;
+    }
     this.setState({
       loading: false
     });
+  };
+  // a short "saved" confirmation next to the button: the panel otherwise
+  // gives no sign that anything happened when a save goes through
+  showSavedNotice = () => {
+    clearTimeout(this.savedNoticeTimer);
+    this.setState({ justSaved: true });
+    this.savedNoticeTimer = setTimeout(() => {
+      if (!this.unmounted) {
+        this.setState({ justSaved: false });
+      }
+    }, 4000);
   };
   deleteHouse = () => {
     this.setState({
@@ -64,6 +86,9 @@ class EditHouseComponent extends Component {
       loading: true
     });
     await this.props.deleteHouse(this.props.houseIndex);
+    if (this.unmounted) {
+      return;
+    }
     this.setState({
       loading: false
     });
@@ -88,11 +113,28 @@ class EditHouseComponent extends Component {
     this.props = props;
     this.state = {
       newRoomName: '',
-      showAlarmCode: false
+      showAlarmCode: false,
+      justSaved: false
     };
   }
 
-  render(props, { newRoomName, wantToDeleteHouse, loading, showAlarmCode }) {
+  // the store sets the status of this house to Getting when its save starts,
+  // so a Getting -> Success transition is exactly "this save went through"
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.houseUpdateStatus === RequestStatus.Getting &&
+      this.props.houseUpdateStatus === RequestStatus.Success
+    ) {
+      this.showSavedNotice();
+    }
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true;
+    clearTimeout(this.savedNoticeTimer);
+  }
+
+  render(props, { newRoomName, wantToDeleteHouse, loading, showAlarmCode, justSaved }) {
     const errors = this.getErrors();
     return (
       <EditHouse
@@ -102,6 +144,7 @@ class EditHouseComponent extends Component {
         updateNewRoomName={this.updateNewRoomName}
         updateHouseAlarmCode={this.updateHouseAlarmCode}
         updateHouseDelayBeforeArming={this.updateHouseDelayBeforeArming}
+        selectHouseLocation={this.selectHouseLocation}
         newRoomName={newRoomName}
         addRoom={this.addRoom}
         removeRoom={this.removeRoom}
@@ -114,6 +157,7 @@ class EditHouseComponent extends Component {
         cancelDeleteHouse={this.cancelDeleteHouse}
         toggleAlarmCodePassword={this.toggleAlarmCodePassword}
         showAlarmCode={showAlarmCode}
+        justSaved={justSaved}
         loading={loading}
         errors={errors}
       />

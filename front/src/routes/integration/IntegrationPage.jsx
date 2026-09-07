@@ -1,7 +1,10 @@
 import { Text, MarkupText } from 'preact-i18n';
 import IntegrationMenu, { IntegrationMenuMobile } from './IntegrationMenu';
 import IntegrationCategory, { IntegrationListItem } from './IntegrationCategory';
+import IntegrationFacets from './IntegrationFacets';
+import IntegrationGatewayBanner from './IntegrationGatewayBanner';
 import IntegrationPageHeader from './IntegrationPageHeader';
+import InstalledIntegrationsSummary from './InstalledIntegrationsSummary';
 import StoreRefreshFooter from './all/external-integration/store-refresh/StoreRefreshFooter';
 import style from './style.css';
 
@@ -21,7 +24,16 @@ const IntegrationPage = ({
   refreshStoreStatus,
   refreshStoreStale,
   integrationsToUpdate,
-  category
+  installedIntegrationsCount,
+  installedStatusCounts,
+  installedInventoryKnown,
+  category,
+  origin,
+  transports,
+  gladysPlus,
+  setOriginFacet,
+  setTransportFacet,
+  toggleGladysPlusFacet
 }) => (
   <div class="page">
     <div class="page-main">
@@ -40,29 +52,45 @@ const IntegrationPage = ({
             <IntegrationMenuMobile
               integrationCategories={integrationCategories}
               integrationsToUpdate={integrationsToUpdate}
+              installedIntegrationsCount={installedIntegrationsCount}
               category={category}
             />
-            <div class="alert alert-info mb-4">
-              <h4 class="alert-title">
-                <Text id="integration.root.gatewayBanner.title" />
-              </h4>
-              <MarkupText id="integration.root.gatewayBanner.description" />
-            </div>
+            <IntegrationFacets
+              origin={origin}
+              transports={transports}
+              gladysPlus={gladysPlus}
+              setOriginFacet={setOriginFacet}
+              setTransportFacet={setTransportFacet}
+              toggleGladysPlusFacet={toggleGladysPlusFacet}
+            />
+            <IntegrationGatewayBanner />
             <div class="row">
               <div class={`col-lg-3 ${style.desktopMenuCol}`}>
                 <IntegrationMenu
                   integrationCategories={integrationCategories}
                   integrationsToUpdate={integrationsToUpdate}
+                  installedIntegrationsCount={installedIntegrationsCount}
                   category={category}
                 />
               </div>
               <div class="col-lg-9">
+                {/* the "Installed" view is the inventory of what runs on this
+                    instance: it opens on the live state breakdown, and every
+                    card wears its status badge — including the nominal ones,
+                    hidden everywhere else in the catalog */}
+                {category === 'installed' && installedIntegrationsCount > 0 && (
+                  <InstalledIntegrationsSummary
+                    installedIntegrationsCount={installedIntegrationsCount}
+                    installedStatusCounts={installedStatusCounts}
+                  />
+                )}
                 <div class={`list-group list-group-flush ${style.mobileList}`}>
                   {integrations.map(integration => (
                     <IntegrationListItem
                       key={integration.key}
                       integration={integration}
                       toggleFavorite={toggleFavorite}
+                      alwaysShowStatus={category === 'installed'}
                     />
                   ))}
                 </div>
@@ -73,6 +101,7 @@ const IntegrationPage = ({
                         key={integration.key}
                         integration={integration}
                         toggleFavorite={toggleFavorite}
+                        alwaysShowStatus={category === 'installed'}
                       />
                     ))}
                   </div>
@@ -88,6 +117,13 @@ const IntegrationPage = ({
                       </div>
                     ) : category === 'updates' ? (
                       <Text id="integration.root.allIntegrationsUpToDate" />
+                    ) : /* "nothing is installed here" is only true when the inventory is known
+                         to be empty. A facet kept from another category can empty the card list
+                         while integrations are installed, and a failed fetch leaves the inventory
+                         unknown: both fall back to the generic empty state, so the body never
+                         contradicts the summary above it */
+                    category === 'installed' && installedInventoryKnown && installedIntegrationsCount === 0 ? (
+                      <Text id="integration.root.noInstalledIntegrations" />
                     ) : (
                       <Text id="integration.root.noIntegrations" />
                     )}

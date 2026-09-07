@@ -285,13 +285,13 @@ class GaugeBox extends Component {
           dataLabels: {
             name: {
               fontSize: '16px',
-              color: undefined,
+              color: '#7c8396',
               offsetY: 120
             },
             value: {
               offsetY: 76,
               fontSize: '22px',
-              color: undefined,
+              color: '#1c2334',
               formatter: () => {
                 // Show actual value with unit if available
                 return this.formatValueWithUnit(value, deviceFeature.unit);

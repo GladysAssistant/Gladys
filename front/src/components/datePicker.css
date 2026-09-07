@@ -1,0 +1,258 @@
+/* Shared skin for every react-datepicker popup of the app (scene editor
+   date/time fields, energy consumption widget period picker). Two things
+   are handled here:
+
+   - the popup is rendered on <body> through a portal (portalId), because it
+     otherwise paints UNDER the content that follows it: the stock popper
+     sits at z-index 1, exactly like the Bootstrap buttons of a .btn-group,
+     which win by document order — and inside the dashboard, every glass card
+     carries a backdrop filter, so a popup opened in one is its own stacking
+     context's prisoner whatever z-index it gets from the inside;
+   - react-datepicker's stock look (grey header, hard 1px borders, square
+     corners, 0.3rem radii, triangle arrows, wide list rows) is replaced by
+     the theme's soft "Horizon" grammar: translucent card, pill cells, accent
+     selection. The popup lives outside .glass-theme, hence the var()
+     fallbacks.
+
+   Light colors only: dark mode comes from the app-wide inversion filter. */
+
+.datePickerPopper {
+  /* above the scene editor's sticky footer (.fixed-bottom, z-index 1030) */
+  z-index: 1050;
+}
+
+.datePickerPopper :global(.react-datepicker) {
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--gl-ink, #1c2334);
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(44, 62, 118, 0.18), 0 2px 8px rgba(44, 62, 118, 0.06);
+  overflow: hidden;
+}
+
+/* the stock triangle is drawn with the 1px border this card no longer has */
+.datePickerPopper :global(.react-datepicker__triangle) {
+  display: none;
+}
+
+/* ---- header (month name, year, "Time") ---- */
+
+.datePickerPopper :global(.react-datepicker__header) {
+  background-color: transparent;
+  border-bottom: 1px solid rgba(28, 35, 52, 0.08);
+  padding: 0.75rem 0.5rem 0.5rem;
+}
+
+.datePickerPopper :global(.react-datepicker-time__header),
+.datePickerPopper :global(.react-datepicker-year-header),
+.datePickerPopper :global(.react-datepicker__current-month) {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gl-muted, #7c8396);
+}
+
+/* The previous/next arrows are stock CSS triangles made of a 0.45rem border
+   on a 10px box. Redrawn here as round icon buttons with a chevron of their
+   own, the way every other control of the theme is shaped. Only the two
+   month/year arrows are restyled: --years-previous/--years-upcoming, inside
+   the scrollable year dropdown, still need the stock triangle border. */
+.datePickerPopper :global(.react-datepicker__navigation--previous),
+.datePickerPopper :global(.react-datepicker__navigation--next) {
+  /* centred on the header title; left/right stay stock so the "with time"
+     variant keeps making room for the time column */
+  top: 0.3rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: 50%;
+  transition: background-color 0.15s ease;
+}
+
+.datePickerPopper :global(.react-datepicker__navigation--previous:hover),
+.datePickerPopper :global(.react-datepicker__navigation--next:hover) {
+  background-color: rgba(28, 35, 52, 0.06);
+}
+
+.datePickerPopper :global(.react-datepicker__navigation--previous)::before,
+.datePickerPopper :global(.react-datepicker__navigation--next)::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.4rem;
+  height: 0.4rem;
+  border: solid var(--gl-muted, #7c8396);
+  border-width: 2px 2px 0 0;
+}
+
+.datePickerPopper :global(.react-datepicker__navigation--previous)::before {
+  transform: translate(-30%, -50%) rotate(-135deg);
+}
+
+.datePickerPopper :global(.react-datepicker__navigation--next)::before {
+  transform: translate(-70%, -50%) rotate(45deg);
+}
+
+.datePickerPopper :global(.react-datepicker__navigation--previous--disabled)::before,
+.datePickerPopper :global(.react-datepicker__navigation--next--disabled)::before {
+  opacity: 0.35;
+}
+
+/* ---- time list ---- */
+
+.datePickerPopper :global(.react-datepicker__time-container),
+.datePickerPopper :global(.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box) {
+  width: 6.5rem;
+  border-left: none;
+}
+
+.datePickerPopper :global(.react-datepicker__time-container .react-datepicker__time) {
+  background-color: transparent;
+}
+
+.datePickerPopper
+  :global(.react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list) {
+  box-sizing: border-box;
+  padding: 0.25rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.datePickerPopper
+  :global(.react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list
+    li.react-datepicker__time-list-item) {
+  height: auto;
+  padding: 0.375rem 0.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.datePickerPopper
+  :global(.react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list
+    li.react-datepicker__time-list-item:hover) {
+  background-color: rgba(28, 35, 52, 0.06);
+}
+
+.datePickerPopper
+  :global(.react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list
+    li.react-datepicker__time-list-item--selected),
+.datePickerPopper
+  :global(.react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list
+    li.react-datepicker__time-list-item--selected:hover) {
+  background-color: var(--gl-accent, #3d6df0);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ---- day grid ---- */
+
+.datePickerPopper :global(.react-datepicker__month) {
+  margin: 0.5rem;
+}
+
+.datePickerPopper :global(.react-datepicker__day-name),
+.datePickerPopper :global(.react-datepicker__day) {
+  width: 2rem;
+  line-height: 2rem;
+  margin: 0.125rem;
+  border-radius: 10px;
+  color: var(--gl-ink, #1c2334);
+}
+
+.datePickerPopper :global(.react-datepicker__day-name) {
+  font-weight: 600;
+  color: var(--gl-muted, #7c8396);
+}
+
+.datePickerPopper :global(.react-datepicker__day:hover) {
+  border-radius: 10px;
+  background-color: rgba(28, 35, 52, 0.06);
+}
+
+.datePickerPopper :global(.react-datepicker__day--outside-month),
+.datePickerPopper :global(.react-datepicker__day--disabled) {
+  color: var(--gl-muted, #7c8396);
+}
+
+.datePickerPopper :global(.react-datepicker__day--selected),
+.datePickerPopper :global(.react-datepicker__day--keyboard-selected),
+.datePickerPopper :global(.react-datepicker__day--selected:hover),
+.datePickerPopper :global(.react-datepicker__day--keyboard-selected:hover) {
+  background-color: var(--gl-accent, #3d6df0);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ---- month and year grids (the widget's "month" and "year" periods) ----
+   Same pills as the day grid, on the wider cells these two views use. The
+   stock rules are two classes deep, hence the nested selectors. */
+
+.datePickerPopper :global(.react-datepicker__monthPicker),
+.datePickerPopper :global(.react-datepicker__year) {
+  margin: 0.5rem 0.375rem;
+}
+
+.datePickerPopper :global(.react-datepicker__month .react-datepicker__month-text),
+.datePickerPopper :global(.react-datepicker__year .react-datepicker__year-text) {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 4.25rem;
+  padding: 0.5rem 0;
+  margin: 0.125rem;
+  border-radius: 12px;
+  font-weight: 500;
+  color: var(--gl-ink, #1c2334);
+}
+
+/* three years per row, like the three months of the month grid */
+.datePickerPopper :global(.react-datepicker__year-wrapper) {
+  justify-content: center;
+  max-width: 13.5rem;
+}
+
+.datePickerPopper :global(.react-datepicker__month-text:hover),
+.datePickerPopper :global(.react-datepicker__year-text:hover) {
+  border-radius: 12px;
+  background-color: rgba(28, 35, 52, 0.06);
+}
+
+.datePickerPopper :global(.react-datepicker__month-text--disabled),
+.datePickerPopper :global(.react-datepicker__year-text--disabled) {
+  color: var(--gl-muted, #7c8396);
+}
+
+.datePickerPopper :global(.react-datepicker__month--selected),
+.datePickerPopper :global(.react-datepicker__month-text--selected),
+.datePickerPopper :global(.react-datepicker__month-text--keyboard-selected),
+.datePickerPopper :global(.react-datepicker__month-text--selected:hover),
+.datePickerPopper :global(.react-datepicker__month-text--keyboard-selected:hover),
+.datePickerPopper :global(.react-datepicker__year-text--selected),
+.datePickerPopper :global(.react-datepicker__year-text--keyboard-selected),
+.datePickerPopper :global(.react-datepicker__year-text--selected:hover),
+.datePickerPopper :global(.react-datepicker__year-text--keyboard-selected:hover) {
+  border-radius: 12px;
+  background-color: var(--gl-accent, #3d6df0);
+  color: #fff;
+  font-weight: 600;
+}

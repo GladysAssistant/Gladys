@@ -25,7 +25,7 @@ const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
-const { AbortScene } = require('../../utils/coreErrors');
+const { AbortScene, SceneStopped } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
@@ -53,6 +53,28 @@ const { evaluate } = create({
   roundDependencies,
   randomDependencies,
 });
+
+// Formats of the "date" variable of the "get date" action, by precision.
+// The date/time is truncated to the chosen precision, so a scene displaying "it's 14:30"
+// doesn't end up saying "it's 14:30:27.412".
+const GET_DATE_FORMATS = {
+  second: 'YYYY-MM-DD HH:mm:ss',
+  minute: 'YYYY-MM-DD HH:mm',
+  hour: 'YYYY-MM-DD HH:00',
+  day: 'YYYY-MM-DD',
+};
+const GET_DATE_TIME_FORMATS = {
+  second: 'HH:mm:ss',
+  minute: 'HH:mm',
+  hour: 'HH:00',
+  day: 'HH:mm',
+};
+const GET_DATE_DEFAULT_PRECISION = 'minute';
+
+// Safety limits for the "while" loop action
+const WHILE_DEFAULT_MAX_ITERATIONS = 1000;
+const WHILE_ABSOLUTE_MAX_ITERATIONS = 10000;
+const WHILE_MIN_ITERATION_TIME_MS = 100;
 
 /**
  * @description Warn the user when a rendered MQTT payload looks like JSON but is not valid JSON.
@@ -86,6 +108,26 @@ const actionsFunc = {
     }
 
     let { value } = action;
+
+    // A text feature (a message displayed on a TV, a text virtual sensor, a select among
+    // string values discovered on the appliance...) receives the value as a raw string with
+    // scene variables injected, and skips the math evaluation below which would reject any
+    // non-numeric text
+    if (
+      deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+      (deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT || deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT)
+    ) {
+      if (action.evaluate_value !== undefined) {
+        value = Handlebars.compile(action.evaluate_value, {
+          noEscape: true,
+        })(scope);
+      }
+      if (value === undefined || value === null || value === '') {
+        throw new AbortScene('ACTION_VALUE_EMPTY');
+      }
+      return self.device.setValue(device, deviceFeature, String(value));
+    }
+
     if (action.evaluate_value !== undefined) {
       value = evaluate(
         Handlebars.compile(action.evaluate_value, {
@@ -288,7 +330,30 @@ const actionsFunc = {
 
     logger.debug(`Delay: Wait ${timeToWaitMilliseconds} milliseconds.`);
 
-    await Promise.delay(timeToWaitMilliseconds);
+    const { abortSignal } = scope;
+    // Abortable wait: resolves after the delay, or rejects immediately if the
+    // scene is stopped while waiting (so a long "delay" can be interrupted).
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(resolve, timeToWaitMilliseconds);
+      if (!abortSignal) {
+        return;
+      }
+      // An already-aborted signal never fires its 'abort' listeners, so re-check
+      // before subscribing.
+      if (abortSignal.aborted) {
+        clearTimeout(timer);
+        reject(new SceneStopped('SCENE_STOPPED'));
+        return;
+      }
+      abortSignal.addEventListener(
+        'abort',
+        () => {
+          clearTimeout(timer);
+          reject(new SceneStopped('SCENE_STOPPED'));
+        },
+        { once: true },
+      );
+    });
   },
 
   [ACTIONS.SCENE.START]: async (self, action, scope) => {
@@ -299,21 +364,26 @@ const actionsFunc = {
       return;
     }
     // we clone the scope so that the new scene is not polluting
-    // other scenes writing on the same scope: it needs to be a fresh object
-    self.execute(action.scene, cloneDeep(scope));
+    // other scenes writing on the same scope: it needs to be a fresh object.
+    // The signal is dropped rather than deep-cloned, execute() gives the child
+    // its own.
+    const { abortSignal, ...scopeToClone } = scope;
+    self.execute(action.scene, cloneDeep(scopeToClone));
   },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text, {
       noEscape: true,
     })(scope);
-    await self.message.sendToUser(action.user, textWithVariables);
+    // no `service` on the action = historical behaviour: broadcast to every
+    // channel the user has configured
+    await self.message.sendToUser(action.user, textWithVariables, null, { service: action.service });
   },
   [ACTIONS.MESSAGE.SEND_CAMERA]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text, {
       noEscape: true,
     })(scope);
     const image = await self.device.camera.getLiveImage(action.camera);
-    await self.message.sendToUser(action.user, textWithVariables, image);
+    await self.message.sendToUser(action.user, textWithVariables, image, { service: action.service });
   },
   [ACTIONS.AI.ASK]: async (self, action, scope, path) => {
     const textWithVariables = Handlebars.compile(action.text, {
@@ -345,6 +415,91 @@ const actionsFunc = {
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, path) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
     set(scope, path, cloneDeep(deviceFeature), { merge: true });
+  },
+  [ACTIONS.TIME.GET_DATE]: async (self, action, scope, path) => {
+    // Only an absent precision falls back to the default: a precision explicitly set to
+    // an empty/falsy value is not a supported precision, so it must abort the scene below.
+    const precision = action.precision === undefined ? GET_DATE_DEFAULT_PRECISION : action.precision;
+    const dateFormat = GET_DATE_FORMATS[precision];
+    // An action written by hand (or coming from an older/newer version of Gladys) could
+    // contain a precision we don't know: we abort instead of storing an unusable date.
+    if (dateFormat === undefined) {
+      logger.warn(`Get date: Unknown precision "${precision}".`);
+      throw new AbortScene('INVALID_PRECISION');
+    }
+    // The date is returned in the timezone configured by the user, so a scene displays
+    // the local time and not the time of the server.
+    const now = dayjs.tz(dayjs(), self.timezone).startOf(precision);
+    set(
+      scope,
+      path,
+      {
+        datetime: now.format(dateFormat),
+        date: now.format('YYYY-MM-DD'),
+        time: now.format(GET_DATE_TIME_FORMATS[precision]),
+        // Unix timestamp in seconds, so it can be compared/subtracted in a formula
+        // to another date stored earlier (in a variable or in a device feature).
+        // It is truncated like the other variables, so that the 4 of them always describe
+        // the same instant: a formula needing an exact date should use the "second" precision.
+        timestamp: now.unix(),
+      },
+      { merge: true },
+    );
+  },
+  [ACTIONS.VARIABLE.SET]: async (self, action, scope, path) => {
+    let value;
+
+    // "text" and "evaluate_value" are mutually exclusive. The scene editor never sets both,
+    // but an action written by hand could: in that case we cannot guess which one was meant,
+    // so we fail closed instead of silently ignoring one of them.
+    if (action.text !== undefined && action.evaluate_value !== undefined) {
+      logger.warn('Set variable: "text" and "evaluate_value" cannot be used at the same time.');
+      throw new AbortScene('VARIABLE_VALUE_AMBIGUOUS');
+    }
+
+    // If the value should be calculated from a formula
+    if (action.evaluate_value !== undefined) {
+      try {
+        value = evaluate(
+          Handlebars.compile(action.evaluate_value, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
+      } catch (e) {
+        logger.warn(`Set variable: Error evaluating value: ${action.evaluate_value}`);
+        logger.warn(e);
+        throw new AbortScene('VARIABLE_VALUE_NOT_A_NUMBER');
+      }
+      // mathjs can return something which is not a usable number: a string, a matrix, or
+      // Infinity when the formula overflows (1e309). The next actions expect a real number,
+      // so anything else aborts the scene instead of storing an unusable variable.
+      if (typeof value !== 'number' || !Number.isFinite(value)) {
+        logger.warn(`Set variable: Value is not a number: ${value}`);
+        throw new AbortScene('VARIABLE_VALUE_NOT_A_NUMBER');
+      }
+    } else {
+      // Otherwise, the text is a simple template which can contain other variables.
+      // Like the formula branch, an invalid template aborts the scene: the following
+      // actions rely on this variable being set.
+      try {
+        value = Handlebars.compile(action.text || '', {
+          noEscape: true,
+        })(scope);
+      } catch (e) {
+        logger.warn(`Set variable: Error rendering text: ${action.text}`);
+        logger.warn(e);
+        throw new AbortScene('VARIABLE_TEXT_NOT_VALID');
+      }
+      // A text which renders to a plain number ("123", or an injected numeric variable)
+      // is stored as a number: "only continue if" compares strictly, so keeping the
+      // string would make an equality between identical values fail (123 !== '123').
+      const valueAsNumber = Number(value);
+      if (value.trim() !== '' && Number.isFinite(valueAsNumber)) {
+        value = valueAsNumber;
+      }
+    }
+
+    set(scope, path, { value }, { merge: true });
   },
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
@@ -563,6 +718,122 @@ const actionsFunc = {
       );
     }
   },
+  [ACTIONS.CALENDAR.GET_EVENTS]: async (self, action, scope, path) => {
+    const now = dayjs.tz(dayjs(), self.timezone);
+    let from;
+    let to;
+    // The day ranges are calendar days, the "next x hours" range is a rolling time window.
+    let dayRange = false;
+    // eslint-disable-next-line default-case
+    switch (action.time_range) {
+      case 'today':
+        from = now.startOf('day');
+        to = now.endOf('day');
+        dayRange = true;
+        break;
+      case 'tomorrow':
+        from = now.add(1, 'day').startOf('day');
+        to = now.add(1, 'day').endOf('day');
+        dayRange = true;
+        break;
+      case 'next-x-hours':
+        // dayjs.add(undefined) returns an invalid date and dayjs.add(null) an empty
+        // range, so the duration is validated before building the range.
+        if (!Number.isInteger(action.duration) || action.duration < 1) {
+          throw new AbortScene('INVALID_DURATION');
+        }
+        from = now;
+        to = now.add(action.duration, 'hour');
+        break;
+    }
+    if (!from || !to) {
+      throw new AbortScene('INVALID_TIME_RANGE');
+    }
+
+    // Full-day events are stored at midnight UTC, so on a calendar day range they are
+    // matched on the UTC days covered by the range instead of its local bounds. Otherwise
+    // a full-day event of the day is missed in the timezones west of UTC (and the one of
+    // the next day returned instead).
+    let fullDayFrom;
+    let fullDayTo;
+    if (dayRange) {
+      fullDayFrom = dayjs.utc(from.format('YYYY-MM-DD')).toDate();
+      fullDayTo = dayjs
+        .utc(to.format('YYYY-MM-DD'))
+        .endOf('day')
+        .toDate();
+    }
+
+    const events = await self.calendar.findEventsInRange(
+      action.calendars,
+      from.toDate(),
+      to.toDate(),
+      fullDayFrom,
+      fullDayTo,
+    );
+
+    if (events.length === 0 && action.stop_scene_if_no_events === true) {
+      throw new AbortScene('NO_EVENTS_FOUND');
+    }
+
+    // Small translation map for the generated summary sentence, as the
+    // server has no i18n system. Falls back to english.
+    const AT_TRANSLATIONS = {
+      en: 'at',
+      fr: 'à',
+      de: 'um',
+    };
+
+    const eventsFormatted = events.map((eventRaw) => {
+      const language = get(eventRaw, 'calendar.creator.language') || 'en';
+      const startDayjs = dayjs(eventRaw.start)
+        .tz(self.timezone)
+        .locale(language);
+      let summary;
+      if (eventRaw.full_day) {
+        summary = eventRaw.name;
+      } else {
+        // Events starting on the same day as the range are announced with the
+        // time only, events further away with the full date.
+        const startFormatted = startDayjs.isSame(from, 'day') ? startDayjs.format('LT') : startDayjs.format('LLL');
+        summary = `${eventRaw.name} ${AT_TRANSLATIONS[language] || AT_TRANSLATIONS.en} ${startFormatted}`;
+      }
+      return {
+        name: eventRaw.name,
+        location: eventRaw.location,
+        description: eventRaw.description,
+        start: startDayjs.format('LLL'),
+        end: eventRaw.end
+          ? dayjs(eventRaw.end)
+              .tz(self.timezone)
+              .locale(language)
+              .format('LLL')
+          : null,
+        summary,
+      };
+    });
+
+    // The list of events is an array of objects, so injecting it directly in a message gives
+    // an unreadable result. A ready-to-use multi-line list, with one line per event, is
+    // exposed as well so the events can be sent to the user without iterating over the array.
+    const textDetailed = eventsFormatted
+      .map((event) => (event.location ? `- ${event.summary} (${event.location})` : `- ${event.summary}`))
+      .join('\n');
+
+    set(
+      scope,
+      path,
+      {
+        calendarEvents: {
+          text: eventsFormatted.map((event) => event.summary).join(', '),
+          textDetailed,
+          count: eventsFormatted.length,
+          events: eventsFormatted,
+        },
+      },
+      { merge: true },
+    );
+  },
   [ACTIONS.ECOWATT.CONDITION]: async (self, action) => {
     try {
       const data = await self.gateway.getEcowattSignals();
@@ -668,10 +939,38 @@ const actionsFunc = {
     );
     // replace variable in text
     const messageWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
+
+    let { volume } = action;
+
+    // The volume can also be a formula based on scene variables, so an announcement can be
+    // played quieter in the evening for example.
+    if (action.evaluate_volume !== undefined) {
+      try {
+        volume = evaluate(
+          Handlebars.compile(action.evaluate_volume, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
+      } catch (e) {
+        logger.warn(`Play notification: Error evaluating volume: ${action.evaluate_volume}`);
+        logger.warn(e);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+      }
+      // mathjs can return something which is not a usable number: a string, a matrix, or
+      // Infinity when the formula overflows. The speaker services expect a real number.
+      if (typeof volume !== 'number' || !Number.isFinite(volume)) {
+        logger.warn(`Play notification: Volume is not a number: ${volume}`);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+      }
+      // The volume is a percentage: a formula going out of bounds is clamped instead of
+      // being sent as-is to the speaker.
+      volume = Math.min(100, Math.max(0, Math.round(volume)));
+    }
+
     // Get TTS URL
     const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
     // Play TTS Notification on device
-    await self.device.setValue(device, deviceFeature, url, { volume: action.volume });
+    await self.device.setValue(device, deviceFeature, url, { volume });
   },
   [ACTIONS.SMS.SEND]: async (self, action, scope) => {
     const freeMobileService = self.service.getService('free-mobile');
@@ -681,17 +980,82 @@ const actionsFunc = {
       freeMobileService.sms.send(textWithVariables);
     }
   },
+  [ACTIONS.CONDITION.WHILE]: async (self, action, scope, path) => {
+    const { if: conditionActions, then: loopActions } = action;
+    const { executeAction, executeActions } = executeActionsFactory(actionsFunc);
+
+    // Without conditions, the loop would run until the max iterations safety limit
+    if (!conditionActions || conditionActions.length === 0) {
+      throw new AbortScene('WHILE_CONDITION_EMPTY');
+    }
+
+    // A loop with an empty body would only burn iterations doing nothing
+    const numberOfActionsInLoop = (loopActions || []).reduce((acc, group) => acc + group.length, 0);
+    if (numberOfActionsInLoop === 0) {
+      throw new AbortScene('WHILE_ACTIONS_EMPTY');
+    }
+
+    const maxIterations = Math.min(
+      action.max_iterations !== undefined ? action.max_iterations : WHILE_DEFAULT_MAX_ITERATIONS,
+      WHILE_ABSOLUTE_MAX_ITERATIONS,
+    );
+
+    const verifyConditions = async () => {
+      try {
+        // Unlike "if-then-else", conditions are executed in serie: it allows a "device.get-value"
+        // placed before a condition to refresh the scope with the live value of the device
+        // on each iteration, instead of comparing a value read once before the loop.
+        // The path matches the path used by the scene editor, so variables can be re-used.
+        await Promise.mapSeries(conditionActions, (conditionAction, index) =>
+          executeAction(self, conditionAction, scope, `${path}.if.${index}`, { throwUnknownError: true }),
+        );
+        return true;
+      } catch (e) {
+        if (e instanceof AbortScene && !(e instanceof SceneStopped)) {
+          return false;
+        }
+        throw e;
+      }
+    };
+
+    let iterations = 0;
+    /* eslint-disable no-await-in-loop */
+    // Iterations are sequential by design: conditions are re-evaluated before each one.
+    // The max iterations limit is checked first, so conditions are never evaluated
+    // one extra time after the last allowed iteration.
+    while (iterations < maxIterations) {
+      if (!(await verifyConditions())) {
+        // Conditions are not verified anymore: this is the normal end of the loop
+        return;
+      }
+      const iterationStartTime = Date.now();
+      await executeActions(self, loopActions, scope, `${path}.then`);
+      iterations += 1;
+      // Safety: prevent CPU-intensive tight loops when the executed actions are instantaneous
+      const iterationDuration = Date.now() - iterationStartTime;
+      if (iterationDuration < WHILE_MIN_ITERATION_TIME_MS) {
+        await Promise.delay(WHILE_MIN_ITERATION_TIME_MS - iterationDuration);
+      }
+    }
+    /* eslint-enable no-await-in-loop */
+    logger.warn(`While loop: max number of iterations reached (${maxIterations}), stopping the loop.`);
+  },
   [ACTIONS.CONDITION.IF_THEN_ELSE]: async (self, action, scope, path) => {
     const { if: ifActions, then: thenActions, else: elseActions } = action;
-    const { executeActions } = executeActionsFactory(actionsFunc);
+    const { executeAction, executeActions } = executeActionsFactory(actionsFunc);
 
     // verify the conditions
     let conditionsVerified;
     try {
-      await executeActions(self, [ifActions], scope, `${path}.if`, { throwUnknownError: true });
+      // Conditions are executed in parallel, but each one writes in the scope at the path
+      // used by the scene editor, so a variable declared by a condition (for example the
+      // event of a "calendar.is-event-running") can be re-used in the branches.
+      await Promise.map(ifActions, (ifAction, index) =>
+        executeAction(self, ifAction, scope, `${path}.if.${index}`, { throwUnknownError: true }),
+      );
       conditionsVerified = true;
     } catch (e) {
-      if (e instanceof AbortScene) {
+      if (e instanceof AbortScene && !(e instanceof SceneStopped)) {
         conditionsVerified = false;
       } else {
         throw e;

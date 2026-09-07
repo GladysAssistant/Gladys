@@ -12,6 +12,7 @@ import { getApexChartAreaOptions } from './ApexChartAreaOptions';
 import { getApexChartLineOptions } from './ApexChartLineOptions';
 import { getApexChartStepLineOptions } from './ApexChartStepLineOptions';
 import { getApexChartTimelineOptions } from './ApexChartTimelineOptions';
+import { createTooltipPositioning } from './apexChartTooltipPositioning';
 import mergeArray from '../../../utils/mergeArray';
 
 dayjs.extend(localizedFormat);
@@ -31,6 +32,9 @@ const DEFAULT_COLORS_NAME = ['blue', 'red', 'green', 'yellow', 'purple', 'aqua',
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
+  // One instance for the life of the chart, so the tooltip positioning state
+  // (cursor position, observer) survives live data re-renders
+  tooltipPositioning = createTooltipPositioning();
   addDateFormatter(options) {
     let formatter;
     if (this.props.interval <= 24 * 60) {
@@ -46,15 +50,10 @@ class ApexChartComponent extends Component {
           .format('LL');
       };
     }
-    // Configure tooltip with fixed position and date formatter
+    // Configure tooltip with date formatter. The tooltip follows the cursor
+    // so it doesn't permanently mask the curves (see community feedback)
     options.tooltip = {
-      followCursor: false,
-      fixed: {
-        enabled: true,
-        position: 'topLeft',
-        offsetX: 0,
-        offsetY: -30
-      },
+      followCursor: true,
       x: {
         formatter
       }
@@ -234,6 +233,8 @@ class ApexChartComponent extends Component {
     } else {
       options = this.getAreaChartOptions();
     }
+    this.addHiddenSeriesEvents(options);
+    this.tooltipPositioning.addToOptions(options);
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
@@ -242,6 +243,39 @@ class ApexChartComponent extends Component {
       this.chart.render();
     }
   };
+  // Tell the parent which series are hidden (collapsed through the legend) each time the
+  // chart is drawn: after a legend click, after a data refresh (ApexCharts keeps the
+  // collapsed series) and when the chart is (re)created (all series visible again).
+  // Reading the state of the chart itself, rather than mirroring the legend clicks, keeps
+  // the parent in sync whatever ApexCharts did with the click.
+  addHiddenSeriesEvents(options) {
+    if (!this.props.onHiddenSeriesChange) {
+      return;
+    }
+    const reportHiddenSeries = chartContext => {
+      const { collapsedSeriesIndices, ancillaryCollapsedSeriesIndices } = chartContext.w.globals;
+      const hiddenSeriesIndexes = [...collapsedSeriesIndices, ...ancillaryCollapsedSeriesIndices].sort((a, b) => a - b);
+      this.props.onHiddenSeriesChange(hiddenSeriesIndexes);
+    };
+    // Chain the handlers already registered by the chart options (e.g. the y-axis
+    // styles of the timeline chart), don't replace them
+    const existingEvents = options.chart.events || {};
+    options.chart.events = {
+      ...existingEvents,
+      mounted(chartContext, config) {
+        if (typeof existingEvents.mounted === 'function') {
+          existingEvents.mounted(chartContext, config);
+        }
+        reportHiddenSeries(chartContext);
+      },
+      updated(chartContext, config) {
+        if (typeof existingEvents.updated === 'function') {
+          existingEvents.updated(chartContext, config);
+        }
+        reportHiddenSeries(chartContext);
+      }
+    };
+  }
   componentDidMount() {
     this.displayChart();
   }
@@ -272,6 +306,7 @@ class ApexChartComponent extends Component {
     }
   }
   componentWillUnmount() {
+    this.tooltipPositioning.dispose();
     if (this.chart && typeof this.chart.destroy === 'function') {
       this.chart.destroy();
     }

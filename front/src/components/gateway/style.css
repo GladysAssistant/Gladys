@@ -47,3 +47,85 @@
 .upsellCompact a {
   text-decoration: none;
 }
+
+/* ==================================================================
+   "Horizon" glass variant — the upsell also shows up on glass-themed
+   pages (chat empty state, dashboard widgets), where the flat Tabler
+   card and its solid blue rail read as a foreign object. Composes on
+   the global .glass-theme class like the other component variants,
+   and is authored light only: dark mode derives from the global
+   inversion filter (style/dark-mode.css).
+   The second selector is the same rule one class heavier, so the
+   panel keeps its own surface over the theme's nested-card rule
+   (.glass-theme .card .card) whatever the bundle order.
+   ================================================================== */
+:global(.glass-theme) .upsellCard:global(.card),
+:global(.glass-theme .card) .upsellCard:global(.card) {
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-md);
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  box-shadow: var(--gl-shadow-soft);
+}
+
+/* dark-mode.css repaints glass cards with a solid !important background:
+   restore the panel surface with the same weight so the inversion filter
+   derives its dark counterpart, like the theme does for its own cards */
+:global(.dark-mode .glass-theme .card) .upsellCard:global(.card) {
+  background-color: var(--gl-card-bg) !important;
+}
+
+:global(.glass-theme) .upsellCard h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--gl-ink);
+}
+
+/* Hanging indent: the check keeps its own column so a wrapping feature
+   stays aligned on the text, not under the icon. Tabler's .text-success
+   is !important, hence the counter-weight on the tint. */
+:global(.glass-theme) .upsellFeatureList li {
+  display: flex;
+  align-items: flex-start;
+}
+
+:global(.glass-theme) .upsellFeatureList li :global(.fe-check) {
+  flex: none;
+  margin-top: 0.2rem;
+  color: var(--gl-success-ink) !important;
+}
+
+/* Stacked layout: the badge leads the panel like the title, not centered */
+@media (max-width: 767.98px) {
+  :global(.glass-theme) .upsellIconWrapper {
+    justify-content: flex-start;
+  }
+}
+
+/* The CTA joins the theme's pill family, in the Gladys Plus accent so it
+   stays the loudest thing on the panel. It carries .btn to outrank the
+   pages that repaint .btn-success with their own pill (settings), so the
+   upsell keeps one CTA identity wherever it appears. */
+:global(.glass-theme) .upsellCta:global(.btn) {
+  background-color: var(--gl-accent);
+  border: none;
+  border-radius: 999px;
+  padding: 0.45rem 1.15rem;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(61, 109, 240, 0.26);
+}
+
+:global(.glass-theme) .upsellCta:global(.btn):hover,
+:global(.glass-theme) .upsellCta:global(.btn):focus {
+  background-color: #3462e0;
+  color: #fff;
+}
+
+/* dark-mode.css double-inverts .btn-success to preserve its green; under
+   glass the pill must invert with the theme like every other surface */
+:global(.dark-mode .glass-theme) .upsellCta:global(.btn) {
+  filter: none;
+}

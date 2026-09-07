@@ -303,6 +303,11 @@ describe('externalIntegration.validateManifest', () => {
       { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'oauth2', label: { en: 'L' }, default: 'x' }] },
       'config_schema[0].default: not allowed for oauth2 fields',
     );
+    // same for account_link: the credentials live off-schema too
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'account_link', label: { en: 'L' }, default: 'x' }] },
+      'config_schema[0].default: not allowed for account_link fields',
+    );
   });
 
   it('should accept an oauth2 config field without placeholder', () => {
@@ -316,6 +321,29 @@ describe('externalIntegration.validateManifest', () => {
       {
         ...TEST_MANIFEST,
         config_schema: [{ key: 'k', type: 'oauth2', label: { en: 'L' }, placeholder: { en: 'x' } }],
+      },
+      'config_schema[0].placeholder: only allowed on',
+    );
+  });
+
+  it('should accept an account_link config field, for a provider that never redirects back', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [
+        {
+          key: 'xiaomi_account',
+          type: 'account_link',
+          label: { en: 'Xiaomi account', fr: 'Compte Xiaomi' },
+          description: { en: 'Approve the sign-in in the Xiaomi Home app.' },
+        },
+      ],
+    };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+    // it holds no value either, so a placeholder makes no sense
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'account_link', label: { en: 'L' }, placeholder: { en: 'x' } }],
       },
       'config_schema[0].placeholder: only allowed on',
     );
@@ -960,6 +988,49 @@ describe('externalIntegration.validateManifest', () => {
     });
   });
 
+  it('should accept a valid categories declaration', () => {
+    const manifest = { ...TEST_MANIFEST, categories: ['climate', 'energy'] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should drop unknown category keys and keep the known ones', () => {
+    // forward compatibility (spec §6.2 stage 2): an integration published
+    // with a newer vocabulary than this instance knows must still install —
+    // the unknown keys are filtered out with a warning, never rejected
+    const manifest = { ...TEST_MANIFEST, categories: ['climate', 'brand-new-shelf'] };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated.categories).to.deep.equal(['climate']);
+  });
+
+  it('should treat a declaration made only of unknown keys as uncategorized, not as an error', () => {
+    const manifest = { ...TEST_MANIFEST, categories: ['brand-new-shelf'] };
+    const validated = externalIntegration.validateManifest(manifest);
+    // removed, not [], so the manifest stays valid on re-validation (below)
+    expect(validated).to.not.have.property('categories');
+  });
+
+  it('should stay valid when validated twice, the install and update flows do it', () => {
+    // installFromStore and fetchManifestFromRepo validate the manifest, then
+    // install()/buildUpdateCandidates validate the SAME object again: the
+    // filtered result of the first pass must pass the shape stage of the next
+    [['climate', 'brand-new-shelf'], ['brand-new-shelf']].forEach((categories) => {
+      const manifest = { ...TEST_MANIFEST, categories };
+      const firstPass = externalIntegration.validateManifest(manifest);
+      const secondPass = externalIntegration.validateManifest(firstPass);
+      expect(secondPass).to.deep.equal(firstPass);
+    });
+  });
+
+  it('should reject a malformed categories declaration', () => {
+    // spec §6.2 stage 1 (shape): not an array, empty, more than 3 items,
+    // duplicates, non-string or empty-string items
+    ['climate', [], ['climate', 'energy', 'security', 'lighting'], ['climate', 'climate'], [null], [42], ['']].forEach(
+      (categories) => {
+        expect422({ ...TEST_MANIFEST, categories }, 'categories: must be 1-3 unique non-empty strings');
+      },
+    );
+  });
+
   it('should accept the messaging declaration and its contact_schema on send-only channels', () => {
     const chatManifest = { ...TEST_MANIFEST, type: 'communication', messaging: { receive: true } };
     expect(externalIntegration.validateManifest(chatManifest)).to.deep.equal(chatManifest);
@@ -1010,10 +1081,14 @@ describe('externalIntegration.validateManifest', () => {
       },
       'contact_schema[1].key: duplicate key "dup"',
     );
-    // the OAuth relay is integration-scoped, never per user
+    // linking a provider account is integration-scoped, never per user
     expect422(
       { ...base, contact_schema: [{ key: 'account', type: 'oauth2', label: { en: 'Account' } }] },
       'contact_schema[0].type: oauth2 is not allowed in the per-user contact schema',
+    );
+    expect422(
+      { ...base, contact_schema: [{ key: 'account', type: 'account_link', label: { en: 'Account' } }] },
+      'contact_schema[0].type: account_link is not allowed in the per-user contact schema',
     );
   });
 
@@ -1036,10 +1111,15 @@ describe('externalIntegration.validateManifest', () => {
     const base = { ...TEST_MANIFEST, type: 'calendar', config_schema: undefined };
     expect422({ ...base, account_schema: 'server_url' }, 'account_schema: must be an array');
     expect422({ ...base, account_schema: [{ key: 'x', type: 'unknown', label: { en: 'X' } }] }, 'account_schema[0]');
-    // the OAuth relay is integration-scoped, never per user (milestone 1)
+    // the Connect relay (oauth2 / account_link) is integration-scoped, never
+    // per user (milestone 1)
     expect422(
       { ...base, account_schema: [{ key: 'account', type: 'oauth2', label: { en: 'Account' } }] },
       'account_schema[0].type: oauth2 is not allowed in the per-user account schema',
+    );
+    expect422(
+      { ...base, account_schema: [{ key: 'account', type: 'account_link', label: { en: 'Account' } }] },
+      'account_schema[0].type: account_link is not allowed in the per-user account schema',
     );
     // the per-user block carries no container state: {{port:<name>}} refused
     expect422(
@@ -1124,6 +1204,23 @@ describe('externalIntegration.validateManifest', () => {
         ],
       },
       'config_schema[0].options[0].icon: unknown field',
+    );
+  });
+  it('should accept network_wake boolean', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      network_wake: true,
+    };
+
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+  it('should reject network_wake when it is not a boolean', () => {
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        network_wake: 'true',
+      },
+      'network_wake: must be a boolean',
     );
   });
 });

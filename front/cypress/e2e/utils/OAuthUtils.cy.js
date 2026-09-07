@@ -1,5 +1,6 @@
 import {
   OAUTH_REDIRECT_URI,
+  assertOpenableUrl,
   getAuthorizeUrlState,
   getOAuthCallbackPath,
   wrapAuthorizeUrl,
@@ -105,5 +106,37 @@ describe('OAuth2 redirect utils', () => {
     expect(() =>
       wrapAuthorizeUrl(authorizeUrl(tooLong), { origin: 'http://192.168.1.50:1443', path: '/callback' })
     ).to.throw('EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE');
+  });
+
+  // assertOpenableUrl is the security gate in front of every window.open of a
+  // URL built by an integration: only http(s) may go through, because an active
+  // scheme like javascript: would run in a document inheriting this origin —
+  // noopener,noreferrer does nothing against that
+  it('opens an https sign-in URL untouched', () => {
+    const url = 'https://eu.account.xiaomi.com/longPolling/login?ticket=lp_42';
+
+    expect(assertOpenableUrl(url)).to.equal(url);
+  });
+
+  it('opens a plain-http sign-in URL untouched', () => {
+    // a provider approved on the local network — a device pairing page — has
+    // no certificate to offer: http stays a legitimate account_link case
+    const url = 'http://192.168.1.50/pair';
+
+    expect(assertOpenableUrl(url)).to.equal(url);
+  });
+
+  it('refuses an active scheme in a sign-in URL', () => {
+    expect(() => assertOpenableUrl(`javascript:alert('xss')`)).to.throw('EXTERNAL_INTEGRATION_OAUTH_INVALID_URL');
+    expect(() => assertOpenableUrl('data:text/html,<script>alert(1)</script>')).to.throw(
+      'EXTERNAL_INTEGRATION_OAUTH_INVALID_URL'
+    );
+    expect(() => assertOpenableUrl('ftp://host/x')).to.throw('EXTERNAL_INTEGRATION_OAUTH_INVALID_URL');
+  });
+
+  it('refuses a sign-in URL that does not parse', () => {
+    expect(() => assertOpenableUrl('not-a-url')).to.throw('EXTERNAL_INTEGRATION_OAUTH_INVALID_URL');
+    expect(() => assertOpenableUrl('')).to.throw('EXTERNAL_INTEGRATION_OAUTH_INVALID_URL');
+    expect(() => assertOpenableUrl(undefined)).to.throw('EXTERNAL_INTEGRATION_OAUTH_INVALID_URL');
   });
 });

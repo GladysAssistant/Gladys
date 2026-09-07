@@ -7,7 +7,9 @@ const {
   EXPOSURE_MODE_VARIABLE,
   EXPOSED_DEVICES_VARIABLE,
   getCompatibleDevices,
+  getCompatibleAlarms,
   getExposedDevices,
+  getExposedAlarms,
 } = require('../../../../services/homekit/lib/exposedDevices');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
@@ -47,13 +49,20 @@ const NOT_COMPATIBLE = {
   ],
 };
 
+const HOUSE = { id: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55', name: 'Maison', selector: 'maison' };
+
 const buildHandler = () => ({
   serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
   getCompatibleDevices,
+  getCompatibleAlarms,
   getExposedDevices,
+  getExposedAlarms,
   gladys: {
     device: {
       get: stub().resolves([LAMP, SWITCH, NOT_COMPATIBLE]),
+    },
+    house: {
+      get: stub().resolves([HOUSE]),
     },
     variable: {
       getValue: stub().resolves(null),
@@ -142,5 +151,49 @@ describe('Exposed devices', () => {
     const devices = await homekitHandler.getExposedDevices();
 
     expect(devices).to.deep.equal([]);
+  });
+  it('should offer the alarm of every house under a selector of its own', async () => {
+    const homekitHandler = buildHandler();
+
+    const alarms = await homekitHandler.getCompatibleAlarms();
+
+    // prefixed so it cannot collide with a device selector in the same allow list
+    expect(alarms).to.eql([{ name: 'Maison', selector: 'house-alarm:maison', house: HOUSE }]);
+  });
+
+  it('should expose every alarm when no selection is made', async () => {
+    const homekitHandler = buildHandler();
+
+    const alarms = await homekitHandler.getExposedAlarms();
+
+    expect(alarms.map(({ selector }) => selector)).to.eql(['house-alarm:maison']);
+  });
+
+  it('should leave the alarm out when the user did not pick it', async () => {
+    const homekitHandler = buildHandler();
+    homekitHandler.gladys.variable.getValue
+      .withArgs(EXPOSURE_MODE_VARIABLE, homekitHandler.serviceId)
+      .resolves(EXPOSURE_MODES.SELECTION);
+    homekitHandler.gladys.variable.getValue
+      .withArgs(EXPOSED_DEVICES_VARIABLE, homekitHandler.serviceId)
+      .resolves(JSON.stringify(['lampe-bureau']));
+
+    // someone who does not use the Gladys alarm must be able to keep it out of the Home app, like
+    // any other accessory
+    expect(await homekitHandler.getExposedAlarms()).to.eql([]);
+    expect((await homekitHandler.getExposedDevices()).map(({ selector }) => selector)).to.eql(['lampe-bureau']);
+  });
+
+  it('should expose the alarm when the user picked it', async () => {
+    const homekitHandler = buildHandler();
+    homekitHandler.gladys.variable.getValue
+      .withArgs(EXPOSURE_MODE_VARIABLE, homekitHandler.serviceId)
+      .resolves(EXPOSURE_MODES.SELECTION);
+    homekitHandler.gladys.variable.getValue
+      .withArgs(EXPOSED_DEVICES_VARIABLE, homekitHandler.serviceId)
+      .resolves(JSON.stringify(['house-alarm:maison']));
+
+    expect((await homekitHandler.getExposedAlarms()).map(({ selector }) => selector)).to.eql(['house-alarm:maison']);
+    expect(await homekitHandler.getExposedDevices()).to.eql([]);
   });
 });

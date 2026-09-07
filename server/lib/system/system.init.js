@@ -33,6 +33,13 @@ async function init() {
   }
   // Set DuckDB timezone
   this.setDuckDbTimezone();
+  // Detect (in the background) how the host can be rebooted/powered off, and
+  // cache the result so getInfos() reports availability without blocking init
+  // (the Docker-helper probe may spin up a short-lived container).
+  this.detectHostPowerManagement().catch((e) => {
+    logger.warn('System.init: host power management detection failed');
+    logger.debug(e);
+  });
 }
 
 module.exports = {

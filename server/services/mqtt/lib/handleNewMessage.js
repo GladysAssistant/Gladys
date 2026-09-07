@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { mqttTopicMatches } = require('./mqttTopicMatches');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -27,8 +28,7 @@ function handleNewMessage(topic, message) {
 
     // foreach topic, we see if it matches
     Object.keys(this.topicBinds).forEach((key) => {
-      const regexKey = key.replace('+', '[^/]+').replace('#', '.+');
-      if (topic.match(regexKey)) {
+      if (mqttTopicMatches(key, topic)) {
         forwardedMessage = true;
         this.topicBinds[key](topic, message);
       }

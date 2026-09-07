@@ -5,7 +5,7 @@ const {
   fromCelsius,
 } = require('../../../../services/homekit/lib/buildThermostatService');
 const { clampToCharacteristic } = require('../../../../services/homekit/lib/deviceMappings');
-const { DEVICE_FEATURE_UNITS, AC_MODE } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_UNITS, AC_MODE, THERMOSTAT_MODE } = require('../../../../utils/constants');
 
 const HEATING_SETPOINT = { selector: 'heating' };
 const COOLING_SETPOINT = { selector: 'cooling' };
@@ -92,6 +92,25 @@ describe('Thermostat valid target states', () => {
     expect(buildValidTargetStates({ modeFeature: { min: 2, max: 2 } })).to.eql([1]);
   });
 
+  it('should fall back on the min/max range when the options list is empty', () => {
+    // a feature loaded from the database always carries the association, so an integration that
+    // declares no option arrives with an empty array and not with no array at all. Reading that as
+    // "no mode at all" left an air conditioner with an on/off command offering off and nothing
+    // else, and the Home app could not turn it back on
+    expect(buildValidTargetStates({ modeFeature: { min: 0, max: 4, supported_options: [] } })).to.eql([1, 2, 3]);
+    expect(
+      buildValidTargetStates({
+        powerFeature: POWER,
+        modeFeature: { min: AC_MODE.AUTO, max: AC_MODE.COOLING, supported_options: [] },
+      }),
+    ).to.eql([0, 2, 3]);
+    expect(
+      buildValidTargetStates({
+        thermostatModeFeature: { min: THERMOSTAT_MODE.OFF, max: THERMOSTAT_MODE.HEATING, supported_options: [] },
+      }),
+    ).to.eql([0, 1]);
+  });
+
   it('should offer off only when the device has an on/off command', () => {
     expect(
       buildValidTargetStates({
@@ -99,6 +118,58 @@ describe('Thermostat valid target states', () => {
         heatingSetpointFeature: HEATING_SETPOINT,
       }),
     ).to.eql([0, 1]);
+  });
+
+  it('should offer off on a thermostat mode, which carries its own off value', () => {
+    // a heating only thermostat: off and heat, and no cool the device could not honour — the whole
+    // point of mapping the thermostat mode, since without it the device is heat-only with no off
+    expect(
+      buildValidTargetStates({
+        thermostatModeFeature: {
+          supported_options: [{ value: THERMOSTAT_MODE.OFF }, { value: THERMOSTAT_MODE.HEATING }],
+        },
+        heatingSetpointFeature: HEATING_SETPOINT,
+      }),
+    ).to.eql([0, 1]);
+  });
+
+  it('should fall back on the min/max range of a thermostat mode', () => {
+    // what the MQTT integration declares by default for a thermostat mode feature
+    expect(buildValidTargetStates({ thermostatModeFeature: { min: 0, max: 3 } })).to.eql([0, 1, 2, 3]);
+    expect(
+      buildValidTargetStates({ thermostatModeFeature: { min: THERMOSTAT_MODE.OFF, max: THERMOSTAT_MODE.HEATING } }),
+    ).to.eql([0, 1]);
+  });
+
+  it('should not offer off twice when the device has both an on/off command and a thermostat mode', () => {
+    expect(
+      buildValidTargetStates({
+        powerFeature: POWER,
+        thermostatModeFeature: { supported_options: [{ value: THERMOSTAT_MODE.OFF }, { value: THERMOSTAT_MODE.AUTO }] },
+      }),
+    ).to.eql([0, 3]);
+  });
+
+  it('should offer only the air conditioning states when both mode features exist', () => {
+    // the air conditioning mode is the authority for the reads and the writes, so offering heat
+    // here would let HomeKit set a state the next read could not report back
+    expect(
+      buildValidTargetStates({
+        modeFeature: { supported_options: [{ value: AC_MODE.COOLING }] },
+        thermostatModeFeature: { supported_options: [{ value: THERMOSTAT_MODE.HEATING }] },
+      }),
+    ).to.eql([2]);
+  });
+
+  it('should ignore the setpoints when a thermostat mode is declared', () => {
+    // both setpoints would otherwise fold into auto, which this device does not support
+    expect(
+      buildValidTargetStates({
+        thermostatModeFeature: { supported_options: [{ value: THERMOSTAT_MODE.HEATING }] },
+        heatingSetpointFeature: HEATING_SETPOINT,
+        coolingSetpointFeature: COOLING_SETPOINT,
+      }),
+    ).to.eql([1]);
   });
 
   it('should derive the states from the AC modes the device declares', () => {

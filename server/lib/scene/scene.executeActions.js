@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
-const { AbortScene } = require('../../utils/coreErrors');
+const { AbortScene, SceneStopped } = require('../../utils/coreErrors');
 const logger = require('../../utils/logger');
 
 module.exports = (actionsFunc) => {
@@ -17,6 +17,11 @@ module.exports = (actionsFunc) => {
    * executeAction(this, action, {});
    */
   async function executeAction(self, action, scope, path, { throwUnknownError = false } = {}) {
+    // Stop the scene promptly if it was aborted (e.g. a manual stop): this
+    // prevents the remaining actions from running once the scene is stopped.
+    if (scope.abortSignal && scope.abortSignal.aborted) {
+      throw new SceneStopped('SCENE_STOPPED');
+    }
     logger.debug(`Executing action ${action.type}`);
     if (!actionsFunc[action.type]) {
       throw new Error(`Action type "${action.type}" does not exist.`);

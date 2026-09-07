@@ -1,5 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS, ACTIONS, ACTIONS_STATUS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { BadParameters } = require('../../utils/coreErrors');
+const logger = require('../../utils/logger');
 
 module.exports = function DeviceController(gladys) {
   /**
@@ -123,6 +125,110 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/device_feature/states_csv exportStatesToCsv
+   * @apiName exportStatesToCsv
+   * @apiGroup Device
+   * @apiParam {String} device_features Comma separated list of device feature selectors.
+   * @apiParam {String} start Beginning of the exported period (ISO 8601 date).
+   * @apiParam {String} end End of the exported period (ISO 8601 date).
+   * @apiParam {Number} [max_states] When set, answer one JSON chunk of at most this many
+   * states ({ csv, next, states }) instead of the whole file: the caller keeps requesting
+   * with the returned `next` cursor until it is null, and concatenates the `csv` chunks.
+   * @apiParam {String} [after_created_at_us] Cursor of the previous chunk (next.createdAtUs).
+   * @apiParam {String} [after_device_feature_id] Cursor of the previous chunk (next.deviceFeatureId).
+   */
+  async function exportStatesToCsv(req, res) {
+    const deviceFeatures = req.query.device_features ? req.query.device_features.split(',') : [];
+    const { start, end } = req.query;
+    // Calls coming from Gladys Plus are answered through the gateway, whose response
+    // object only implements send/json/status: there is no header to set, and each
+    // message has to stay small enough to travel over the websocket.
+    const isHttpResponse = typeof res.setHeader === 'function';
+
+    // Paginated mode: one small JSON chunk per call, whatever the transport. This is
+    // how the web client exports without any limit on the size of the period: it
+    // reassembles the file chunk by chunk.
+    if (req.query.max_states !== undefined) {
+      const after =
+        req.query.after_created_at_us !== undefined
+          ? { createdAtUs: req.query.after_created_at_us, deviceFeatureId: req.query.after_device_feature_id }
+          : undefined;
+      const chunk = await gladys.device.exportStatesToCsv(deviceFeatures, start, end, {
+        maxStates: parseInt(req.query.max_states, 10),
+        after,
+      });
+      res.json(chunk);
+      return;
+    }
+
+    // Whole-file mode, kept for direct API/scripting use. Over HTTP the file is
+    // streamed chunk by chunk, so a period of any size can be exported while the
+    // server never holds more than one chunk in memory.
+    let chunk = await gladys.device.exportStatesToCsv(deviceFeatures, start, end);
+    if (isHttpResponse) {
+      // The dates are already validated by the export itself, so they can safely be
+      // used to build a filename explaining what the file contains.
+      const startDay = new Date(start).toISOString().slice(0, 10);
+      const endDay = new Date(end).toISOString().slice(0, 10);
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="gladys-history-${startDay}-${endDay}.csv"`);
+      res.write(chunk.csv);
+      try {
+        while (chunk.next !== null) {
+          // A closed connection (canceled curl, closed tab) must not keep the
+          // export occupying the DuckDB read connection until the period is done.
+          if (req.destroyed || res.writableEnded) {
+            return;
+          }
+          // Let the other readers (charts, history…) take their turn on the
+          // serialized DuckDB read connection between two chunks.
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((resolve) => {
+            setTimeout(resolve, gladys.device.CSV_EXPORT_PAUSE_BETWEEN_CHUNKS_IN_MS);
+          });
+          // eslint-disable-next-line no-await-in-loop
+          chunk = await gladys.device.exportStatesToCsv(deviceFeatures, start, end, { after: chunk.next });
+          if (chunk.states > 0) {
+            res.write(`\n${chunk.csv}`);
+          }
+        }
+      } catch (e) {
+        // The headers and part of the body are already sent: a JSON error cannot be
+        // answered anymore. Log and cut the stream so the client sees a failed
+        // (truncated) download instead of a file that silently misses states.
+        logger.error(e);
+        res.destroy(e);
+        return;
+      }
+      res.end();
+      return;
+    }
+
+    // A non-paginated call through the gateway has to fit in one websocket message:
+    // it is refused beyond the same limit as the log download, with the pagination
+    // as the way out (the web client always paginates, so it never hits this).
+    const parts = [chunk.csv];
+    let sizeInBytes = Buffer.byteLength(chunk.csv, 'utf8');
+    for (;;) {
+      if (sizeInBytes > gladys.device.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES) {
+        throw new BadParameters(
+          `This export is bigger than the ${gladys.device.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES} bytes a Gladys Plus answer can carry. Please paginate with max_states, or export a shorter period.`,
+        );
+      }
+      if (chunk.next === null) {
+        break;
+      }
+      // eslint-disable-next-line no-await-in-loop
+      chunk = await gladys.device.exportStatesToCsv(deviceFeatures, start, end, { after: chunk.next });
+      if (chunk.states > 0) {
+        parts.push(chunk.csv);
+        sizeInBytes += Buffer.byteLength(chunk.csv, 'utf8') + 1;
+      }
+    }
+    res.send(parts.join('\n'));
+  }
+
+  /**
    * @api {get} /api/v1/device_feature/energy_consumption getConsumptionByDates
    * @apiName getConsumptionByDates
    * @apiGroup Device
@@ -198,6 +304,7 @@ module.exports = function DeviceController(gladys) {
     setValueFeature: asyncMiddleware(setValueFeature),
     getDeviceFeaturesAggregated: asyncMiddleware(getDeviceFeaturesAggregated),
     getDeviceStatesHistory: asyncMiddleware(getDeviceStatesHistory),
+    exportStatesToCsv: asyncMiddleware(exportStatesToCsv),
     getConsumptionByDates: asyncMiddleware(getConsumptionByDates),
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),

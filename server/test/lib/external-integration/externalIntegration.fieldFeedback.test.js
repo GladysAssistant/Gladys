@@ -306,6 +306,39 @@ describe('externalIntegration params upsert on re-publish', () => {
     devices = await externalIntegration.getDiscoveredDevices(service.selector);
     expect(devices[0]).to.include({ created: true, structure_changed: true });
   });
+
+  it('should flag a step that appears on an already-created feature', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, stateManager } = buildSupervisor();
+    const createdDevice = await seedCreatedDevice(service, stateManager);
+    const createdFeature = {
+      external_id: `ext:${service.selector}:plug-1:setpoint`,
+      category: 'air-conditioning',
+      type: 'target-temperature',
+      unit: 'celsius',
+      min: 16,
+      max: 31,
+      step: null,
+    };
+    createdDevice.features = [createdFeature];
+    const publish = (step) =>
+      externalIntegration.setDiscoveredDevices(service, [
+        {
+          ...buildPublishedDevice(service, []),
+          features: [{ ...createdFeature, step }],
+        },
+      ]);
+    // the created feature declares no step: re-publishing none changes nothing
+    await publish(undefined);
+    let devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0]).to.include({ created: true, structure_changed: false });
+    // the unit turns out to accept half degrees: without the step in the
+    // signature the Discovery screen would never offer "Update", and the step
+    // could never reach the created feature
+    await publish(0.5);
+    devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0]).to.include({ created: true, structure_changed: true });
+  });
 });
 
 describe('externalIntegration poll silent no-op', () => {

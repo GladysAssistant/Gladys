@@ -2,6 +2,8 @@ name: Trigger Cursor automation
 
 # Starts a Cursor Automation webhook for a given PR, either:
 # - automatically when a PR is opened (or marked "ready for review"),
+# - automatically ~5 minutes after new commits are pushed to the PR
+#   (debounced: a burst of pushes yields ONE review, of its last commit),
 # - when anyone allowed to do so comments "/cursor review" on the PR,
 # - when the label "needs:cursor-review" is added to a PR, or
 # - manually via workflow_dispatch.
@@ -22,7 +24,7 @@ name: Trigger Cursor automation
 on:
   # Secrets are available for fork PRs with pull_request_target.
   pull_request_target:
-    types: [opened, ready_for_review, labeled]
+    types: [opened, ready_for_review, labeled, synchronize]
   # Comment command. issue_comment always runs from the base branch with
   # secrets available, including for comments on fork PRs.
   issue_comment:
@@ -58,6 +60,18 @@ jobs:
         github.event.issue.pull_request != null &&
         contains(github.event.comment.body, '/cursor'))
     runs-on: ubuntu-latest
+    # Debounce for push bursts: every synchronize event of a given PR shares
+    # one concurrency group with cancel-in-progress, so a new push cancels
+    # the previous job while it sleeps in "Debounce push bursts" below and
+    # restarts the 5-minute timer — one review per burst, of its last
+    # commit, and no way to stack reviews (Cursor runs cannot be cancelled
+    # once fired). Every other trigger gets a unique group (run_id) and is
+    # never debounced nor cancelled.
+    concurrency:
+      group: ${{ github.event_name == 'pull_request_target' && github.event.action == 'synchronize' && format('cursor-review-sync-{0}', github.event.pull_request.number) || format('cursor-review-{0}', github.run_id) }}
+      cancel-in-progress: true
+    # Covers the 5-minute debounce sleep plus the API calls.
+    timeout-minutes: 15
     steps:
       - name: Resolve trigger
         id: gate
@@ -161,6 +175,17 @@ jobs:
                     RUN=true
                   fi
                   ;;
+                synchronize)
+                  # New commits pushed to the PR: same eligibility rules as
+                  # "opened" (the AUTO_ALLOWED gate below), plus the debounce
+                  # step before the webhook call.
+                  if [ "$EVENT_PR_DRAFT" = 'true' ]; then
+                    echo "PR #${PR_NUMBER}: push on a draft, the review will run when it is marked ready for review."
+                  else
+                    REASON='pr_synchronize'
+                    RUN=true
+                  fi
+                  ;;
               esac
 
               # Applies to the automatic triggers only: the label and
@@ -241,8 +266,42 @@ jobs:
             exit 1
           fi
 
+      - name: Debounce push bursts
+        id: debounce
+        if: steps.gate.outputs.run == 'true' && steps.gate.outputs.reason == 'pr_synchronize'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ steps.gate.outputs.number }}
+          EVENT_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -uo pipefail
+
+          # Wait out the burst: while this sleeps, any newer push cancels
+          # the whole job through the concurrency group and restarts its own
+          # 5-minute timer, so only the last push of a burst reaches the
+          # webhook call.
+          sleep 300
+
+          # Belt and braces for cancellation races: if the head moved anyway
+          # or the PR is no longer open, skip — the newer push's run (or
+          # nobody) fires the review.
+          PR_JSON=$(gh api "repos/${GH_REPO}/pulls/${PR_NUMBER}") \
+            || { echo "::warning::Could not re-fetch PR #${PR_NUMBER} after the debounce, skipping."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; }
+          STATE=$(echo "$PR_JSON" | jq -r '.state')
+          HEAD_SHA=$(echo "$PR_JSON" | jq -r '.head.sha')
+          if [ "$STATE" != 'open' ]; then
+            echo "PR #${PR_NUMBER} is ${STATE} after the debounce: not firing a review."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          elif [ "$HEAD_SHA" != "$EVENT_HEAD_SHA" ]; then
+            echo "PR #${PR_NUMBER} moved from ${EVENT_HEAD_SHA} to ${HEAD_SHA} during the debounce: the newer push's run fires the review."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Fetch PR metadata and call Cursor webhook
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' && steps.debounce.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}

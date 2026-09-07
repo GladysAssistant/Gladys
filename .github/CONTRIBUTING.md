@@ -11,6 +11,8 @@ Here’s how you can contribute to Gladys:
 - ✨ Propose new features
 - 🤝 Become a long-term contributor or maintainer
 
+By participating, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ---
 
 ## 💻 We Use GitHub for Everything
@@ -59,17 +61,35 @@ Most labels are applied automatically, you don't need to set them yourself:
 
 Labels for contributors: look for [`good first issue`](https://github.com/gladysassistant/Gladys/labels/good%20first%20issue) and [`help wanted`](https://github.com/gladysassistant/Gladys/labels/help%20wanted) to find issues to work on.
 
-If your PR implements a forum request, add a line `Forum: https://community.gladysassistant.com/t/...` in the PR description (see the PR template): the release pipeline uses it to notify the forum topic when the feature ships.
+If your PR answers a forum topic or a GitHub issue, we strongly recommend linking it in the PR description (see the PR template):
+
+- a forum request: add a line `Forum: https://community.gladysassistant.com/t/...` — the release pipeline uses it to notify the forum topic when the feature ships and to close the topic;
+- a GitHub issue: add a line `Closes #1234` — GitHub links the issue and closes it when the PR is merged.
+
+Without this link we cannot tie the PR to its topic, and those automations cannot run.
+
+---
+
+## 🤖 AI-Assisted Development
+
+We are very favorable to AI-assisted development. We use AI extensively ourselves to build Gladys: AI code reviews run on every pull request, automated fix routines keep PRs green, and AI agents work on the codebase daily. If AI tools help you contribute better and faster, please use them!
+
+A few recommendations to make AI work well on this codebase:
+
+- **Use frontier models.** The quality gap between the latest-generation models and older or smaller ones is very real on a codebase of this size. As of today, we recommend **Fable** for complex developments and **Opus** for smaller tasks. This recommendation will evolve, so always prefer the current frontier.
+- **Point your agent to [`AGENTS.md`](../AGENTS.md).** It contains everything an AI agent (or a human!) needs to work here: how to run the project, the CI requirements, every lint/test/build command, the common CI failure causes, and the spec-first process for larger features.
+- **You own your pull request.** AI or not, you are the author: read and understand every line of your diff, run the checks locally (prettier, eslint, tests with 100% patch coverage on the server), and be ready to discuss your changes during review. Pull requests that look like unreviewed AI output will be sent back.
+- **No stigma either way.** You never have to hide (or justify) using AI. What we review is the quality of the contribution, not how it was produced.
 
 ---
 
 ## 🤖 Automated review
 
-An automated review runs on your PR as soon as you open it. A draft PR waits until you mark it **ready for review**.
+An automated review runs on your PR as soon as you open it. A draft PR waits until you mark it **ready for review**. After that, every time you push new commits, a new review starts automatically about 5 minutes later — the delay lets a burst of pushes result in a single review of your latest commit, so there is no need to hold back small fixup commits.
 
-Two cases do not get that automatic review: PRs authored by `dependabot[bot]` or `renovate[bot]`, and PRs from contributors whose first contribution has not been merged yet. **If this is your first PR here, just ask for a review in a comment** (see below) or wait for a maintainer — nothing is wrong with your PR.
+Two cases do not get those automatic reviews: PRs authored by `dependabot[bot]` or `renovate[bot]`, and PRs from contributors whose first contribution has not been merged yet. **If this is your first PR here, just ask for a review in a comment** (see below) or wait for a maintainer — nothing is wrong with your PR.
 
-To ask for a new review after pushing changes, comment on the PR:
+To ask for a review on demand (as a first-time contributor, or to skip the 5-minute wait), comment on the PR:
 
 ```text
 /cursor review
@@ -78,6 +98,8 @@ To ask for a new review after pushing changes, comment on the PR:
 `/cursor-review` works too, and the command is case-insensitive. It has to start its own line — anything you write after it on the same line is ignored, and quoting someone else's command (`> /cursor review`) never triggers a review.
 
 The command works for the PR author and for repository owners, organization members and collaborators. The bot reacts to your comment with 👀 when the request is accepted, 🚀 once the review has been started, and 👎 if you are not allowed to ask for one. Maintainers can also add the `needs:cursor-review` label, which triggers the same thing.
+
+Note that the command fires immediately and is independent of the automatic post-push review: commenting `/cursor review` right after pushing can start two reviews of the same commit (the on-demand one now, the automatic one ~5 minutes later). After a push, the cheapest option is simply to wait.
 
 ---
 
@@ -95,9 +117,11 @@ We use [GitHub Issues](https://github.com/gladysassistant/Gladys/issues) to trac
 To report a bug:
 
 1. Head over to the [issues tab](https://github.com/gladysassistant/Gladys/issues)
-2. Click on **New Issue**
-3. Describe the problem clearly
+2. Click on **New Issue** and pick the **Bug report** template
+3. Fill in the form: your Gladys version, installation type and logs help us a lot (you can download your logs in **Settings → System → Download logs**)
 4. Hit submit — that’s it!
+
+> 🔒 **Security vulnerabilities** are the one thing that should *not* go through public issues: please follow our [security policy](../SECURITY.md) instead.
 
 ---
 

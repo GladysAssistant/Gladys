@@ -284,7 +284,9 @@ describe('enedis.sync.dailySync', () => {
     await enedisService.sync();
 
     assert.calledOnce(calculateCostFromDate);
-    assert.calledWithExactly(calculateCostFromDate, '2022-08-02');
+    assert.calledWithExactly(calculateCostFromDate, '2022-08-02', {
+      deviceIds: ['865f0fd8-970c-4670-9e1d-f6926a0abed6'],
+    });
   });
   it('should not recalculate cost when enedis daily sync returns no new data', async () => {
     const calculateCostFromDate = fake.resolves(null);

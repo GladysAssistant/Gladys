@@ -25,6 +25,7 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -32,6 +33,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
+  LOCK,
   FAN_MODE,
   FAN_AIRFLOW_DIRECTION,
   FAN_ROCK_SETTING,
@@ -40,6 +42,7 @@ const {
 const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
 const { getAcModeSupportedOptions } = require('./thermostatMatterMapping');
+const { getBooleanStateFeatureCategoryAndType } = require('./booleanStateMatterMapping');
 
 /**
  * @description Build a stable Gladys selector from a Matter external_id.
@@ -147,10 +150,14 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           max: 1,
         });
       } else if (clusterIndex === BooleanState.Complete.id) {
+        // The BooleanState cluster only exposes a raw boolean: the device type of the endpoint
+        // tells us if it's a water leak detector, a contact sensor, a rain sensor...
+        // When the device type is unknown, we fallback on a generic read-only switch.
+        const { category, type } = getBooleanStateFeatureCategoryAndType(device);
         gladysDevice.features.push({
           ...commonNewFeature,
-          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          category,
+          type,
           read_only: true,
           has_feedback: true,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
@@ -640,6 +647,28 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
           max: 6,
+        });
+      } else if (clusterIndex === DoorLock.Complete.id) {
+        // The lock/unlock command feature, and the detailed lock state reported by the lock
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Lock)`,
+          category: DEVICE_FEATURE_CATEGORIES.LOCK,
+          type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:lock`,
+          min: LOCK.ACTION.UNLOCK,
+          max: LOCK.ACTION.LOCK,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (State)`,
+          category: DEVICE_FEATURE_CATEGORIES.LOCK,
+          type: DEVICE_FEATURE_TYPES.LOCK.STATE,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:state`,
+          min: LOCK.STATE.UNLOCKED,
+          max: LOCK.STATE.ERROR,
         });
       } else if (clusterIndex === PowerSource.Complete.id) {
         if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.battery) {

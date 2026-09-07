@@ -1,0 +1,36 @@
+/* Profile page: one centered column instead of the old 2-column layout
+   (a small identity card lost above a tall empty gutter). A horizontal
+   hero card (avatar + name + role) tops the form card — long forms read
+   best in a single narrow column. Light colors only: dark mode comes
+   from the app inversion filter. */
+
+.profileColumn {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.profileHero {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.profileAvatar {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(44, 62, 118, 0.18);
+}
+
+.profileIdentity {
+  min-width: 0;
+}
+
+.profileIdentity h3 {
+  margin: 0 0 0.35rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

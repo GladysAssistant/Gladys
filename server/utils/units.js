@@ -70,10 +70,15 @@ function hslToRgb(h, s, l) {
 
 /**
  * @description Smart rounding for display:
- * - No rounding if value < 1 (keep full precision)
+ * - 3 significant digits if value < 1 — NOT a fixed number of decimals: a
+ *   fixed cut would collapse a meaningful 0.005 to 0, while full precision
+ *   would keep float noise like 0.10000000149. Significant digits keep the
+ *   magnitude readable whatever it is (0.005 stays 0.005, 0.00123 stays
+ *   0.00123, 0.10000000149 becomes 0.1)
  * - 2 decimals if value < 10
  * - 1 decimal if value < 1000
  * - No decimals (integer) if value >= 1000.
+ * Anything that is not a finite number (null, strings…) is returned untouched.
  * @param {number} value - Value to round.
  * @returns {number} Rounded value.
  * @example
@@ -83,8 +88,14 @@ function hslToRgb(h, s, l) {
  * smartRound(1234.56); // returns 1235
  */
 function smartRound(value) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return value;
+  }
+  if (value === 0) {
+    return 0;
+  }
   if (Math.abs(value) < 1) {
-    return value; // No rounding for very small values
+    return Number(value.toPrecision(3)); // 3 significant digits
   }
   if (Math.abs(value) < 10) {
     return Math.round(value * 100) / 100; // 2 decimals

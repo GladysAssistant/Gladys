@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
-import Select from 'react-select';
+import Select from '../../form/Select';
 import update from 'immutability-helper';
 import get from 'get-value';
 
@@ -499,7 +499,6 @@ class EditChart extends Component {
                   moveDevice={this.moveDevice}
                   removeDevice={this.removeDevice}
                   updateDeviceFeatureName={this.updateDeviceFeatureName}
-                  isTouchDevice={false}
                 />
               )}
             </div>
@@ -706,6 +705,11 @@ class EditChart extends Component {
                     <option value="last-day">
                       <Text id="dashboard.boxes.chart.lastDay" />
                     </option>
+                    {props.box.chart_type !== 'timeline' && (
+                      <option value="last-three-days">
+                        <Text id="dashboard.boxes.chart.lastThreeDays" />
+                      </option>
+                    )}
                     {props.box.chart_type !== 'timeline' && (
                       <option value="last-week">
                         <Text id="dashboard.boxes.chart.lastSevenDays" />

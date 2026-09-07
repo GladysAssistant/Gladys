@@ -78,7 +78,10 @@ class AdaptiveOptionControl extends Component {
   }
 
   updateFromSelect = e => {
-    this.props.updateValue(Number(e.currentTarget.value));
+    // The DOM select yields strings: the matching option gives the value back with its
+    // real type (number for enum-like features, string for dynamic text selects)
+    const selectedOption = this.props.options.find(option => `${option.value}` === e.currentTarget.value);
+    this.props.updateValue(selectedOption ? selectedOption.value : Number(e.currentTarget.value));
   };
 
   renderLabel(option) {
@@ -103,14 +106,21 @@ class AdaptiveOptionControl extends Component {
               <button
                 type="button"
                 key={option.value}
-                class={cx('btn btn-sm btn-secondary', { active: value === option.value })}
+                class={cx('btn btn-sm btn-secondary', {
+                  // Stringified comparison: a string select state always compares to its
+                  // option as text, and numeric states keep matching their numeric options
+                  active: value !== null && value !== undefined && `${value}` === `${option.value}`
+                })}
+                disabled={option.disabled}
                 onClick={() => this.props.updateValue(option.value)}
               >
                 {this.renderLabel(option)}
               </button>
             ))}
           </div>
-          <div class="form-group mb-0" ref={this.setSelect}>
+          {/* adaptive-option-select: hook for the dashboard widget's width cap, which
+              must not reach the selects that are always their row's control. */}
+          <div class="form-group mb-0 adaptive-option-select" ref={this.setSelect}>
             <select value={value} onChange={this.updateFromSelect} class="form-control form-control-sm">
               {options.map(option => (
                 <option value={option.value} key={option.value}>

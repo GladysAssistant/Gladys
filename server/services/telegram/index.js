@@ -35,9 +35,22 @@ module.exports = function TelegramService(gladys, serviceId) {
     await messageHandler.disconnect();
   }
 
+  /**
+   * @public
+   * @description This function returns if the Telegram service is used.
+   * @returns {Promise<boolean>} Returns true if a Telegram API token is configured.
+   * @example
+   * const used = await gladys.services.telegram.isUsed();
+   */
+  async function isUsed() {
+    const token = await gladys.variable.getValue('TELEGRAM_API_KEY', serviceId);
+    return Boolean(token);
+  }
+
   return Object.freeze({
     start,
     stop,
+    isUsed,
     message: messageHandler,
     controllers: TelegramControllers(messageHandler),
   });

@@ -31,6 +31,7 @@ const AreaModel = require('./area');
 const CalendarModel = require('./calendar');
 const CalendarEventModel = require('./calendar_event');
 const DashboardModel = require('./dashboard');
+const DashboardAssetModel = require('./dashboard_asset');
 const DeviceFeatureStateModel = require('./device_feature_state');
 const DeviceFeatureAggregateModel = require('./device_feature_state_aggregate');
 const DeviceFeatureModel = require('./device_feature');
@@ -58,6 +59,7 @@ const models = {
   Calendar: CalendarModel(sequelize, Sequelize),
   CalendarEvent: CalendarEventModel(sequelize, Sequelize),
   Dashboard: DashboardModel(sequelize, Sequelize),
+  DashboardAsset: DashboardAssetModel(sequelize, Sequelize),
   DeviceFeatureState: DeviceFeatureStateModel(sequelize, Sequelize),
   DeviceFeatureStateAggregate: DeviceFeatureAggregateModel(sequelize, Sequelize),
   DeviceFeature: DeviceFeatureModel(sequelize, Sequelize),

@@ -244,7 +244,7 @@ function buildFakeSystem(overrides = {}) {
  * @description Build a supervisor wired with fakes for tests.
  * @param {object} [options] - Options.
  * @param {object} [options.system] - System fakes overrides.
- * @returns {object} { externalIntegration, event, system, stateManager, device, variable }.
+ * @returns {object} { externalIntegration, event, system, stateManager, device, variable, energyPrice }.
  * @example
  * const { externalIntegration } = buildSupervisor();
  */
@@ -257,6 +257,9 @@ function buildSupervisor({ system: systemOverrides } = {}) {
   const serviceManager = {};
   const cache = new Cache();
   const calendar = new Calendar();
+  // no energy price configured by default: a discovered energy index then gets
+  // its derived features with no parent meter (see getDiscoveredDevices)
+  const energyPrice = { getDefaultElectricMeterFeatureId: fake.resolves(null) };
   const externalIntegration = new ExternalIntegration(
     event,
     system,
@@ -264,12 +267,13 @@ function buildSupervisor({ system: systemOverrides } = {}) {
     stateManager,
     device,
     variable,
+    energyPrice,
     TEST_JWT_SECRET,
     cache,
     calendar,
   );
   externalIntegration.available = true;
-  return { externalIntegration, event, system, stateManager, device, variable, cache, calendar };
+  return { externalIntegration, event, system, stateManager, device, variable, cache, energyPrice, calendar };
 }
 
 /**

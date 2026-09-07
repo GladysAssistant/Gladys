@@ -49,6 +49,7 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.discoveredDevices = {};
   this.topicBinds = {};
   this.usbConfigured = false;
+  this.networkAdapterConfigured = false;
   this.mqttExist = false;
   this.mqttRunning = false;
   this.mqttContainerRunning = false;
@@ -60,6 +61,7 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.networkModeValid = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
+  this.mqttConnectionError = null;
   this.dockerBased = false;
 
   this.containerRestartWaitTimeInMs = 5 * 1000;

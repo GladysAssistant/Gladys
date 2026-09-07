@@ -4,7 +4,7 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 const getConfig = require('../../../utils/getConfig');
-const { Error403, Error500 } = require('../../../utils/httpErrors');
+const { Error402, Error403, Error500 } = require('../../../utils/httpErrors');
 
 const { fake } = sinon;
 const Gateway = proxyquire('../../../lib/gateway', {
@@ -75,6 +75,30 @@ describe('gateway.getBackups', () => {
     } catch (e) {
       expect(e).instanceOf(Error403);
     }
+  });
+
+  it('should lock Gladys Plus features and throw 402 when payment is required', async () => {
+    const error = new Error();
+    error.response = { status: 402, data: { error_code: 'PAYMENT_REQUIRED' } };
+    gateway.gladysGatewayClient.getBackups = fake.rejects(error);
+    gateway.variable = { setValue: fake.resolves(null), destroy: fake.resolves(null) };
+
+    try {
+      await gateway.getBackups();
+      expect.fail();
+    } catch (e) {
+      expect(e).instanceOf(Error402);
+    }
+    expect(gateway.subscriptionActive).to.equal(false);
+  });
+
+  it('should unlock Gladys Plus features when backups are listed again', async () => {
+    gateway.subscriptionActive = false;
+    gateway.variable = { setValue: fake.resolves(null), destroy: fake.resolves(null) };
+
+    await gateway.getBackups();
+
+    expect(gateway.subscriptionActive).to.equal(true);
   });
 
   it('should throw 500 error on invalid gateway', async () => {

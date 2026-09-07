@@ -39,7 +39,7 @@ describe('dashboard.updateOrder', () => {
       raw: true,
     });
     expect(dashboardsInNewOrder).to.deep.equal([
-      { selector: 'my-new-dashboard', position: 0 },
+      { selector: newDashboard.selector, position: 0 },
       { selector: 'test-dashboard', position: 1 },
       { selector: 'my-new-public-dashoard', position: 2 },
     ]);

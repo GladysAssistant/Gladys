@@ -34,10 +34,7 @@ describe('Scene view', () => {
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
 
-    cy.get('div[class*="card-header"]')
-      .contains('editScene.settings')
-      .should('have.class', 'card-title')
-      .click();
+    cy.get('[data-cy="edit-scene-settings-button"]').click();
 
     cy.get('div[class*="form-group"]').then(inputs => {
       cy.wrap(inputs[0])
@@ -65,33 +62,24 @@ describe('Scene view', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
-    cy.contains('editScene.addActionButton')
+    cy.contains('editScene.addStepButton')
       .should('have.class', 'btn-outline-primary')
       .click();
 
-    const i18n = Cypress.env('i18n');
+    cy.get('[data-cy="type-picker-option"][data-value="house.is-empty"]').click();
 
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('houseControl');
+    cy.get('[data-cy="scene-house-empty-or-not-choose-house"] .react-select__control').click();
 
-      cy.get('@houseControl').click(0, 0, { force: true });
+    // The menu is rendered through a portal on <body> (components/form/Select.jsx),
+    // so it is queried from the document and not from the control — only one
+    // menu is open at a time. scrollBehavior: false because a portaled menu
+    // closes on any scroll: letting Cypress scroll the option into view would
+    // close the menu it is about to click.
+    cy.get('.react-select__menu')
+      .contains('.react-select__option', 'My House')
+      .click({ scrollBehavior: false });
 
-      cy.get('@houseControl')
-        .get('[class*="-menu"]')
-        .find('[class*="-option"]')
-        .filter(`:contains("${i18n.editScene.actions.house['is-empty']}")`)
-        .click(0, 0, { force: true });
-    });
-
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('houseControl');
-      cy.get('@houseControl').click(0, 0, { force: true });
-
-      cy.get('@houseControl')
-        .get('[class*="-menu"]')
-        .filter(`:contains("My House")`)
-        .click(0, 0, { force: true });
-    });
+    cy.get('[data-cy="scene-house-empty-or-not-choose-house"]').should('contain', 'My House');
   });
 
   it('Should add new condition device set value', () => {
@@ -144,22 +132,11 @@ describe('Scene view', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
-    cy.contains('editScene.addActionButton')
+    cy.contains('editScene.addStepButton')
       .should('have.class', 'btn-outline-primary')
       .click();
 
-    const i18n = Cypress.env('i18n');
-
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('deviceControl');
-      cy.get('@deviceControl').click(0, 0, { force: true });
-
-      cy.get('@deviceControl')
-        .get('[class*="-menu"]')
-        .find('[class*="-option"]')
-        .filter(`:contains("${i18n.editScene.actions.device['set-value']}")`)
-        .click(0, 0, { force: true });
-    });
+    cy.get('[data-cy="type-picker-option"][data-value="device.set-value"]').click();
 
     cy.wait('@loadDevices');
     cy.wait('@loadAllDevices');
@@ -167,7 +144,7 @@ describe('Scene view', () => {
     cy.wait(100);
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('deviceControl');
+      cy.wrap(inputs[0]).as('deviceControl');
       cy.get('@deviceControl').click(0, 0, { force: true });
 
       cy.get('@deviceControl')
@@ -187,18 +164,7 @@ describe('Scene view', () => {
       .should('have.class', 'btn-outline-primary')
       .click();
 
-    const i18n = Cypress.env('i18n');
-
-    cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1]).as('calendarControl');
-      cy.get('@calendarControl').click(0, 0, { force: true });
-
-      cy.get('@calendarControl')
-        .get('[class*="-menu"]')
-        .find('[class*="-option"]')
-        .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
-        .click(0, 0, { force: true });
-    });
+    cy.get('[data-cy="type-picker-option"][data-value="calendar.event-is-coming"]').click();
 
     cy.get('select').then(selects => {
       cy.wrap(selects[0]).select('contains');

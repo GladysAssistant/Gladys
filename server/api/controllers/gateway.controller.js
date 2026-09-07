@@ -4,7 +4,7 @@ const { getAudioBufferFromRequest, getAudioContentTypeFromRequest } = require('.
 
 module.exports = function GatewayController(gladys) {
   /**
-   * @api {get} /api/v1/gateway/status
+   * @api {get} /api/v1/gateway/status Get the Gladys Plus connection status
    * @apiName getStatus
    * @apiGroup Gateway
    */
@@ -13,7 +13,18 @@ module.exports = function GatewayController(gladys) {
     res.json(status);
   }
   /**
-   * @api {post} /api/v1/gateway/login
+   * @api {post} /api/v1/gateway/subscription/refresh Refresh the Gladys Plus subscription status
+   * @apiName refreshSubscriptionStatus
+   * @apiGroup Gateway
+   * @apiDescription Ask Gladys Plus again whether the subscription is paid, and
+   * unlock the Gladys Plus features of this instance when it is.
+   */
+  async function refreshSubscriptionStatus(req, res) {
+    const status = await gladys.gateway.refreshSubscriptionStatus();
+    res.json(status);
+  }
+  /**
+   * @api {post} /api/v1/gateway/login Log in to Gladys Plus
    * @apiName Login
    * @apiGroup Gateway
    */
@@ -23,7 +34,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/logout
+   * @api {post} /api/v1/gateway/logout Log out from Gladys Plus
    * @apiName Logout
    * @apiGroup Gateway
    */
@@ -35,19 +46,25 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/gateway/login-two-factor
+   * @api {post} /api/v1/gateway/login-two-factor Finish the Gladys Plus login with a two-factor code
    * @apiName LoginTwoFactor
    * @apiGroup Gateway
    */
   async function loginTwoFactor(req, res) {
-    await gladys.gateway.loginTwoFactor(req.body.two_factor_token, req.body.two_factor_code);
+    const { recovery_codes: recoveryCodes } = await gladys.gateway.loginTwoFactor(
+      req.body.two_factor_token,
+      req.body.two_factor_code,
+      req.body.two_factor_recovery_code,
+      req.body.generate_recovery_codes,
+    );
     res.json({
       success: true,
+      recovery_codes: recoveryCodes,
     });
   }
 
   /**
-   * @api {post} /api/v1/gateway/configure-two-factor
+   * @api {post} /api/v1/gateway/configure-two-factor Start the two-factor configuration on Gladys Plus
    * @apiName ConfigureTwoFactor
    * @apiGroup Gateway
    */
@@ -57,7 +74,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/enable-two-factor
+   * @api {post} /api/v1/gateway/enable-two-factor Enable two-factor authentication on Gladys Plus
    * @apiName EnableTwoFactor
    * @apiGroup Gateway
    */
@@ -67,7 +84,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/gateway/key
+   * @api {get} /api/v1/gateway/key Get the encryption keys of the Gladys Plus users
    * @apiName getUsersKeys
    * @apiGroup Gateway
    */
@@ -77,8 +94,8 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {patch} /api/v1/gateway/key
-   * @apiName getUsersKeys
+   * @api {patch} /api/v1/gateway/key Save the encryption keys of the Gladys Plus users
+   * @apiName saveUsersKeys
    * @apiGroup Gateway
    */
   async function saveUsersKeys(req, res) {
@@ -89,7 +106,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/backup-key
+   * @api {post} /api/v1/gateway/backup-key Save the backup encryption key
    * @apiName saveBackupKey
    * @apiGroup Gateway
    * @apiParam {String} backup_key The backup encryption key.
@@ -102,7 +119,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/gateway/backup
+   * @api {get} /api/v1/gateway/backup List the Gladys Plus backups
    * @apiName getBackups
    * @apiGroup Gateway
    */
@@ -112,7 +129,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/backup
+   * @api {post} /api/v1/gateway/backup Start a new backup
    * @apiName createBackup
    * @apiGroup Gateway
    */
@@ -124,7 +141,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/backup/restore
+   * @api {post} /api/v1/gateway/backup/restore Restore a backup
    * @apiName restoreBackup
    * @apiGroup Gateway
    */
@@ -138,7 +155,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/gateway/backup/restore/status
+   * @api {get} /api/v1/gateway/backup/restore/status Get the status of the running restore
    * @apiName getRestoreStatus
    * @apiGroup Gateway
    */
@@ -150,7 +167,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/gateway/instance/key
+   * @api {get} /api/v1/gateway/instance/key Get the fingerprint of the instance keys
    * @apiName getInstanceKeysFingerprint
    * @apiGroup Gateway
    */
@@ -160,7 +177,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/aichat/chat
+   * @api {post} /api/v1/gateway/aichat/chat Ask the Gladys Plus AI chat
    * @apiName aiChat
    * @apiGroup Gateway
    */
@@ -170,7 +187,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/gateway/aichat/debug-context
+   * @api {get} /api/v1/gateway/aichat/debug-context Get the context sent to the AI chat
    * @apiName getAiChatDebugContext
    * @apiGroup Gateway
    */
@@ -180,7 +197,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/gateway/aichat/quota
+   * @api {get} /api/v1/gateway/aichat/quota Get the AI chat quota of the account
    * @apiName getOpenAIQuota
    * @apiGroup Gateway
    */
@@ -190,7 +207,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/gateway/aichat/models
+   * @api {get} /api/v1/gateway/aichat/models List the AI chat models available
    * @apiName getAiChatModels
    * @apiGroup Gateway
    */
@@ -200,10 +217,28 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/stt
+   * @api {post} /api/v1/gateway/stt Transcribe an audio recording to text
    * @apiName stt
    * @apiGroup Gateway
+   * @apiDescription Send an audio recording and get back its transcription. The
+   * speech-to-text runs on Gladys Plus, so an active subscription is required.
+   *
+   * The body is the raw audio bytes, not a multipart form and not base64. Set the
+   * `Content-Type` header to the format you send: any `audio/*` type or
+   * `application/octet-stream` is accepted, and the body is limited to 5 MB. The
+   * Gladys front-end sends mono 16-bit PCM WAV at 16 kHz, which is the safest
+   * format to send.
+   * @apiHeader {String} Authorization Access token (`Bearer <token>`) or API key.
    * @apiParam {Binary} body Raw audio (application/octet-stream or audio/*).
+   * @apiSuccess {String} text Transcription of the recording.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "text": "turn on the light in the living room"
+   * }
+   * @apiError (Error 400) BadRequest The request body contains no audio.
+   * @apiError (Error 402) PaymentRequired The Gladys Plus subscription is not active.
+   * @apiError (Error 403) Forbidden The Gladys Plus plan does not allow this call.
+   * @apiError (Error 429) TooManyRequests The speech-to-text quota is exhausted.
    */
   async function stt(req, res) {
     const audioBuffer = getAudioBufferFromRequest(req);
@@ -213,10 +248,41 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/voice
+   * @api {post} /api/v1/gateway/voice Talk to Gladys with your voice
    * @apiName processVoice
    * @apiGroup Gateway
+   * @apiDescription Run a full voice command in one call: the recording is
+   * transcribed, the transcription is answered by the AI assistant (which can read
+   * the state of the house and control it), and the answer is turned into speech.
+   *
+   * This is the endpoint the voice assistant of the dashboard calls, and the one to
+   * call to plug an external wake word engine into Gladys: record after the wake
+   * word, POST the audio here, then play `ttsUrl` (or read `answer` with your own
+   * text-to-speech).
+   *
+   * The body is the raw audio bytes, not a multipart form and not base64. Set the
+   * `Content-Type` header to the format you send: any `audio/*` type or
+   * `application/octet-stream` is accepted, and the body is limited to 5 MB. The
+   * Gladys front-end sends mono 16-bit PCM WAV at 16 kHz, which is the safest
+   * format to send.
+   *
+   * Speech-to-text, the AI answer and text-to-speech all run on Gladys Plus, so an
+   * active subscription is required.
+   * @apiHeader {String} Authorization Access token (`Bearer <token>`) or API key.
    * @apiParam {Binary} body Raw audio (application/octet-stream or audio/*).
+   * @apiSuccess {String} transcription What Gladys understood.
+   * @apiSuccess {String} answer Answer of the assistant, in the language of the user.
+   * @apiSuccess {String} ttsUrl Temporary URL of the answer read out loud, `null` when there is no answer.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "transcription": "turn on the light in the living room",
+   *   "answer": "Done, I turned on the light in the living room.",
+   *   "ttsUrl": "https://.../tts.mp3"
+   * }
+   * @apiError (Error 400) BadRequest The request body contains no audio.
+   * @apiError (Error 402) PaymentRequired The Gladys Plus subscription is not active.
+   * @apiError (Error 403) Forbidden The Gladys Plus plan does not allow this call.
+   * @apiError (Error 429) TooManyRequests The voice assistant quota is exhausted.
    */
   async function processVoice(req, res) {
     const audioBuffer = getAudioBufferFromRequest(req);
@@ -230,10 +296,22 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/tts
+   * @api {post} /api/v1/gateway/tts Get an audio URL reading a text out loud
    * @apiName getTtsUrl
    * @apiGroup Gateway
-   * @apiParam {string} text Text to synthesize.
+   * @apiDescription Turn a text into speech and get a temporary URL to play the
+   * result. The text-to-speech runs on Gladys Plus, so an active subscription is
+   * required.
+   * @apiHeader {String} Authorization Access token (`Bearer <token>`) or API key.
+   * @apiParam {String} text Text to synthesize.
+   * @apiParamExample {json} Request-Example
+   * {
+   *   "text": "The living room is 21 degrees."
+   * }
+   * @apiSuccess {String} url Temporary URL of the generated audio file.
+   * @apiError (Error 402) PaymentRequired The Gladys Plus subscription is not active.
+   * @apiError (Error 403) Forbidden The Gladys Plus plan does not allow this call.
+   * @apiError (Error 429) TooManyRequests The text-to-speech quota is exhausted.
    */
   async function getTtsUrl(req, res) {
     const response = await gladys.gateway.getTTSApiUrl(req.body);
@@ -241,7 +319,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/refresh-latest-gladys-version
+   * @api {post} /api/v1/gateway/refresh-latest-gladys-version Refresh the latest Gladys version available
    * @apiName refreshLatestGladysVersion
    * @apiGroup Gateway
    */
@@ -251,7 +329,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/weekly-digest/send
+   * @api {post} /api/v1/gateway/weekly-digest/send Send the weekly digest now
    * @apiName sendWeeklyDigest
    * @apiGroup Gateway
    */
@@ -261,7 +339,7 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/weekly-digest/reschedule
+   * @api {post} /api/v1/gateway/weekly-digest/reschedule Reschedule the weekly digest
    * @apiName rescheduleWeeklyDigest
    * @apiGroup Gateway
    */
@@ -272,6 +350,7 @@ module.exports = function GatewayController(gladys) {
 
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
+    refreshSubscriptionStatus: asyncMiddleware(refreshSubscriptionStatus),
     login: asyncMiddleware(login),
     logout: asyncMiddleware(logout),
     loginTwoFactor: asyncMiddleware(loginTwoFactor),

@@ -23,7 +23,7 @@ const device = {
 
 const gladys = {
   config: {
-    tempFolder: '/tmp/gladys',
+    tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
   },
   device: {
     camera: {

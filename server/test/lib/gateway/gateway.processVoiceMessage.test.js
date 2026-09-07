@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { fake, assert: sinonAssert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
-const { Error403, Error429 } = require('../../../utils/httpErrors');
+const { Error402, Error403, Error429 } = require('../../../utils/httpErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const messageCreate = sinon.stub().resolves({});
@@ -219,6 +219,43 @@ describe('gateway.processVoiceMessage', () => {
       .map((call) => call.args[1])
       .filter((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
     expect(errorEvents[0].payload).to.deep.equal({ error: 'unknown', message: 'EMPTY_TRANSCRIPTION' });
+  });
+
+  it('should emit payment required websocket error and rethrow Error402', async () => {
+    const eventEmit = fake();
+    const paymentRequired = new Error402('GLADYS_PLUS_PAYMENT_REQUIRED');
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      stt: fake.rejects(paymentRequired),
+    });
+
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), Error402);
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload.payload).to.deep.equal({
+      error: 'payment_required',
+      message: 'GLADYS_PLUS_PAYMENT_REQUIRED',
+    });
+  });
+
+  it('should emit payment required websocket error when the AI chat reports it', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      forwardMessageToAiChat: fake.resolves({ answer: '', imagesSent: 0, paymentRequired: true }),
+    });
+
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), Error402);
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload.payload.error).to.equal('payment_required');
+    sinonAssert.notCalled(ctx.getTTSApiUrl);
   });
 
   it('should emit forbidden websocket error and rethrow Error403', async () => {

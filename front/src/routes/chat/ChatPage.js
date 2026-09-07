@@ -4,10 +4,13 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { connect } from 'unistore/preact';
 import actions from '../../actions/message';
 import { RequestStatus } from '../../utils/consts';
+import { isSpeechRecordingSupported } from '../../utils/speechMicrophoneAccess';
 import ChatItems from './ChatItems';
 import EmptyChat from './EmptyChat';
 import AiModelSelector from './AiModelSelector';
+import ChatVoiceInputButton from './ChatVoiceInputButton';
 import style from './style.css';
+import dashboardStyle from '../dashboard/style.css';
 
 const IntegrationPage = connect(
   'user,messages,currentMessageTextInput,gladysIsTyping,MessageGetStatus,httpClient',
@@ -19,14 +22,27 @@ const IntegrationPage = connect(
     MessageGetStatus,
     currentMessageTextInput,
     updateMessageTextInput,
+    setMessageTextInput,
     onKeyPress,
     sendMessage,
     gladysIsTyping,
     httpClient
   }) => {
     const textareaRef = useRef(null);
+    const voiceInputRef = useRef(null);
     const [selectedModel, setSelectedModel] = useState('auto');
     const [gladysPlusConfigured, setGladysPlusConfigured] = useState(null);
+    const [voiceInputError, setVoiceInputError] = useState(null);
+    // While a dictation is running, the transcription is appended to what was
+    // in the input when it started: the textarea is read-only so an edit made
+    // meanwhile cannot be overwritten when the transcription arrives.
+    const [voiceInputListening, setVoiceInputListening] = useState(false);
+    // Browsers without microphone recording support (or outside a secure
+    // context) simply don't get a microphone button.
+    const [voiceInputSupported] = useState(isSpeechRecordingSupported);
+    // Dictation is transcribed by the Gladys Plus STT API, so the microphone
+    // is only shown when Gladys Plus is configured.
+    const voiceInputAvailable = voiceInputSupported && gladysPlusConfigured === true;
     const hasMessageToSend = Boolean(currentMessageTextInput && currentMessageTextInput.trim().length > 0);
 
     useEffect(() => {
@@ -63,13 +79,16 @@ const IntegrationPage = connect(
     };
 
     const handleSendMessage = () => {
+      if (voiceInputRef.current) {
+        voiceInputRef.current.cancelListening();
+      }
       sendMessage(selectedModel);
     };
 
     const handleKeyPress = e => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        sendMessage(selectedModel);
+        handleSendMessage();
         return;
       }
       onKeyPress(e);
@@ -80,7 +99,9 @@ const IntegrationPage = connect(
     }, [currentMessageTextInput]);
 
     return (
-      <div class={cx('page', style.chatPage)}>
+      // Same Horizon glass theme and scene as the dashboard — the chat
+      // composes on the global .glass-theme class (see routes/dashboard/style.css)
+      <div class={cx('page', 'glass-theme', style.chatPage, dashboardStyle.glassScene)}>
         <div class={cx('page-main', style.chatPageMain)}>
           <div class={style.chatPageContent}>
             <div class={cx('container', style.chatPageContainer)}>
@@ -109,13 +130,26 @@ const IntegrationPage = connect(
                             <textarea
                               ref={textareaRef}
                               rows="1"
-                              class={cx('form-control', style.chatInput)}
+                              class={cx('form-control', style.chatInput, {
+                                [style.chatInputWithVoice]: voiceInputAvailable
+                              })}
                               placeholder={<Text id="chat.messagePlaceholder" />}
                               value={currentMessageTextInput}
+                              readOnly={voiceInputListening}
                               onInput={onComposerInput}
                               onKeyPress={handleKeyPress}
                             />
                           </Localizer>
+                          {voiceInputAvailable && (
+                            <ChatVoiceInputButton
+                              ref={voiceInputRef}
+                              httpClient={httpClient}
+                              currentText={currentMessageTextInput}
+                              onTranscript={setMessageTextInput}
+                              onError={setVoiceInputError}
+                              onListeningChange={setVoiceInputListening}
+                            />
+                          )}
                           <button
                             type="button"
                             class={cx('btn', style.sendButton, {
@@ -128,6 +162,11 @@ const IntegrationPage = connect(
                             <i class="fe fe-send" />
                           </button>
                         </div>
+                        {voiceInputError && (
+                          <p class={style.voiceInputError}>
+                            <Text id={`chat.voiceInput.${voiceInputError}`} />
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

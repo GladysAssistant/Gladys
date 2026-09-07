@@ -101,4 +101,47 @@ describe('scene.send-message', () => {
     );
     assert.calledWith(message.sendToUser, 'pepper', "Event d'aujourd'hui starting.");
   });
+  it('should send message through the selected service only', async () => {
+    const stateManager = new StateManager(event);
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, message },
+      [
+        [
+          {
+            type: ACTIONS.MESSAGE.SEND,
+            user: 'pepper',
+            service: 'telegram',
+            text: 'Hello',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(message.sendToUser, 'pepper', 'Hello', null, { service: 'telegram' });
+  });
+  it('should broadcast to every service when no service is selected', async () => {
+    const stateManager = new StateManager(event);
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, message },
+      [
+        [
+          {
+            type: ACTIONS.MESSAGE.SEND,
+            user: 'pepper',
+            text: 'Hello',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(message.sendToUser, 'pepper', 'Hello', null, { service: undefined });
+  });
 });

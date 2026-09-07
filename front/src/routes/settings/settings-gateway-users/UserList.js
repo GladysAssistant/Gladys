@@ -39,39 +39,41 @@ const UserList = ({ children, ...props }) => (
           </thead>
           <tbody>
             {props.users.map((user, index) => (
-              <UserRow user={user} index={index} revokeUser={props.revokeUser} />
+              <UserRow user={user} index={index} currentUser={props.currentUser} revokeUser={props.revokeUser} />
             ))}
 
-            <tr>
-              <td>
-                <Localizer>
-                  <input
-                    onChange={props.updateEmail}
-                    value={props.email}
-                    type="email"
-                    class="form-control"
-                    placeholder={<Text id="gatewayUsers.emailPlaceholder" />}
-                  />
-                </Localizer>
-              </td>
-              <td>
-                <select class="form-control custom-select selectized" onChange={props.updateRole} value={props.role}>
-                  <option value="admin">
-                    <Text id="gatewayUsers.roleAdmin" />
-                  </option>
-                  <option value="user">
-                    <Text id="gatewayUsers.roleUser" />
-                  </option>
-                </select>
-              </td>
-              <td>
-                <button onClick={props.inviteUser} class="btn btn-primary ml-auto">
-                  <Text id="gatewayUsers.inviteUserButton" />
-                </button>
-              </td>
-              <td />
-              <td />
-            </tr>
+            {props.currentUser && props.currentUser.role === 'admin' && (
+              <tr>
+                <td>
+                  <Localizer>
+                    <input
+                      onChange={props.updateEmail}
+                      value={props.email}
+                      type="email"
+                      class="form-control"
+                      placeholder={<Text id="gatewayUsers.emailPlaceholder" />}
+                    />
+                  </Localizer>
+                </td>
+                <td>
+                  <select class="form-control custom-select selectized" onChange={props.updateRole} value={props.role}>
+                    <option value="admin">
+                      <Text id="gatewayUsers.roleAdmin" />
+                    </option>
+                    <option value="user">
+                      <Text id="gatewayUsers.roleUser" />
+                    </option>
+                  </select>
+                </td>
+                <td>
+                  <button onClick={props.inviteUser} class="btn btn-primary ml-auto">
+                    <Text id="gatewayUsers.inviteUserButton" />
+                  </button>
+                </td>
+                <td />
+                <td />
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

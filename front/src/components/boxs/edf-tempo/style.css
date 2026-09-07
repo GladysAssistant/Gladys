@@ -1,24 +1,153 @@
+/* Horizon variant of the EDF Tempo widget: soft tinted pill rows instead of
+   bordered boxes and stock Bootstrap badges. Light colors only — dark mode
+   is the app-wide inversion filter, hues survive it (invert + hue-rotate). */
+
 .h4Title {
-  font-size: 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted, #7c8396);
+  margin-bottom: 0.5rem;
 }
 
-.hourDisplay {
-  width: 100%;
-  padding: 0.5rem 1rem;
-  font-size: 1.25rem;
-  line-height: 1.5;
-  border-radius: 0.3rem;
-  text-align: 'center';
+/* Current tariff window: one full-width pill, icon in a tinted disc */
+.hourPill {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.9375rem;
 }
 
-.peakHour {
-  color: #f1c40f;
-  background-color: transparent;
-  background-image: none;
-  border-color: #f1c40f;
-  border: 1px solid;
+.hourIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.65);
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
-.offPeakHour {
-  border: 1px solid;
+.hourPeak {
+  background-color: #f9eeda;
+  color: #a5701e;
+}
+
+.hourPeak .hourIcon {
+  color: #c98a2c;
+}
+
+.hourOffPeak {
+  background-color: #ece9fb;
+  color: #5d4fb8;
+}
+
+.hourOffPeak .hourIcon {
+  color: #7a68d8;
+}
+
+/* Today / tomorrow: quiet rows, date in ink, the Tempo color as a pill */
+.dayRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+}
+
+.dayRow + .dayRow {
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+.dayName {
+  color: var(--gl-ink, #1c2334);
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* the API dates start with a lowercase weekday */
+  text-transform: capitalize;
+}
+
+.dayBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dayDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.dayBlue {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+.dayBlue .dayDot {
+  background-color: #3d6df0;
+}
+
+/* a white Tempo day is literally white: white pill, soft border */
+.dayWhite {
+  background-color: #fff;
+  color: #5b6373;
+  border: 1px solid rgba(44, 62, 118, 0.14);
+}
+
+.dayWhite .dayDot {
+  background-color: #fff;
+  border: 1px solid rgba(44, 62, 118, 0.3);
+}
+
+.dayRed {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+.dayRed .dayDot {
+  background-color: #d4593f;
+}
+
+.dayUnknown {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #667081;
+}
+
+.dayUnknown .dayDot {
+  background-color: rgba(28, 35, 52, 0.25);
+}
+
+/* Service unreachable: a quiet tinted notice, not a shouting alert */
+.errorState {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 14px;
+  background-color: #fbe3de;
+  color: #c24a33;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.errorState .fe {
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }

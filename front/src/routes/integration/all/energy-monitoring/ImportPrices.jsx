@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import { Link } from 'preact-router/match';
+import { route } from 'preact-router';
 import cx from 'classnames';
 import get from 'get-value';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
@@ -181,6 +182,15 @@ class ImportPricesPage extends Component {
       this.setState({ devicesError: error });
     } finally {
       this.setState({ loadingDevices: false });
+    }
+  };
+
+  startCreatePrice = () => {
+    // Delegate to the parent page so the creation wizard is properly reset
+    if (this.props.startCreatePrice) {
+      this.props.startCreatePrice();
+    } else {
+      route('/dashboard/integration/device/energy-monitoring/prices/create');
     }
   };
 
@@ -488,6 +498,58 @@ class ImportPricesPage extends Component {
                 />
               </div>
             )}
+          </div>
+
+          <div class="alert alert-info">
+            <h4 class="alert-heading">
+              <Text
+                id="integration.energyMonitoring.contractNotListedTitle"
+                defaultMessage="Your contract is not in the list?"
+              />
+            </h4>
+            <p>
+              <Text
+                id="integration.energyMonitoring.contractNotListedDescription"
+                defaultMessage="This list of contracts is maintained by the Gladys community. If your energy provider or your contract is missing, you have two options:"
+              />
+            </p>
+            <ol class="pl-4 mb-0">
+              <li class="mb-3">
+                <Text
+                  id="integration.energyMonitoring.contractNotListedShare"
+                  defaultMessage="Propose your contract to the community, on the energy contracts repository. Gladys downloads this list directly from that repository: as soon as your contract is added there, it shows up here, without having to update Gladys."
+                />
+                <div class="mt-2">
+                  <a
+                    href="https://github.com/GladysAssistant/energy-contracts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn btn-sm btn-outline-primary"
+                  >
+                    <Text
+                      id="integration.energyMonitoring.contractNotListedShareButton"
+                      defaultMessage="Propose a contract on GitHub"
+                    />{' '}
+                    <i class="fe fe-external-link" />
+                  </a>
+                </div>
+              </li>
+              <li>
+                <Text
+                  id="integration.energyMonitoring.contractNotListedCreate"
+                  defaultMessage="Or create your contract yourself in Gladys, with the “Create” button. It will only exist in your Gladys installation, and you can edit it at any time."
+                />
+                <div class="mt-2">
+                  <button type="button" class="btn btn-sm btn-outline-primary" onClick={this.startCreatePrice}>
+                    <Text
+                      id="integration.energyMonitoring.contractNotListedCreateButton"
+                      defaultMessage="Create a contract manually"
+                    />{' '}
+                    <i class="fe fe-plus" />
+                  </button>
+                </div>
+              </li>
+            </ol>
           </div>
 
           {selectedContract && (

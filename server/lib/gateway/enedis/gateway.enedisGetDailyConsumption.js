@@ -14,7 +14,7 @@ const { Error403 } = require('../../../utils/httpErrors');
  */
 async function enedisGetDailyConsumption(query) {
   try {
-    const consumption = await this.gladysGatewayClient.enedisGetDailyConsumption(query);
+    const consumption = await this.callPlanGatedApi(() => this.gladysGatewayClient.enedisGetDailyConsumption(query));
     return consumption;
   } catch (e) {
     if (get(e, 'response.status') === 403) {

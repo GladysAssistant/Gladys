@@ -1,9 +1,11 @@
+const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 const getConfig = require('../../../utils/getConfig');
 const { EVENTS } = require('../../../utils/constants');
+const { Error500 } = require('../../../utils/httpErrors');
 
 const { fake, assert } = sinon;
 const Gateway = proxyquire('../../../lib/gateway', {
@@ -63,6 +65,35 @@ describe('gateway.checkIfBackupNeeded', () => {
     // wait Xms and see if backup was called
     clock.tick(gateway.backupRandomInterval * 10);
     assert.notCalled(event.emit);
+  });
+
+  it('should not backup when Gladys Plus answers payment required', async () => {
+    gateway.connected = true;
+    const error = new Error();
+    error.response = { status: 402 };
+    gateway.gladysGatewayClient.getBackups = fake.rejects(error);
+    gateway.variable = { setValue: fake.resolves(null), destroy: fake.resolves(null) };
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+    expect(gateway.subscriptionActive).to.equal(false);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.neverCalledWith(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+  });
+
+  it('should forward errors other than payment required', async () => {
+    gateway.connected = true;
+    gateway.gladysGatewayClient.getBackups = fake.rejects(new Error('network'));
+
+    try {
+      await gateway.checkIfBackupNeeded();
+      expect.fail();
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error500);
+    }
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.neverCalledWith(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
   });
 
   it('should check if backup is needed and execute backup as none exists', async () => {

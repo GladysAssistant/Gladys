@@ -99,6 +99,82 @@ describe('externalIntegration.start', () => {
     externalIntegration.clearTimers(service.id);
   });
 
+  // cgroup v2 kernel without CFS bandwidth control (Khadas among others):
+  // the creation passed, runc fails at start on the missing cpu.max file
+  const buildCpuMaxError = () =>
+    Object.assign(
+      new Error(
+        '(HTTP code 500) server error - failed to create task for container: ' +
+          'error setting cgroup config for procHooks process: ' +
+          'openat2 /sys/fs/cgroup/system.slice/docker-abc123.scope/cpu.max: no such file or directory: unknown',
+      ),
+      { statusCode: 500 },
+    );
+
+  it('should recreate the container without CPU limit when its stored limit is rejected at start', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        restartContainer: sinon
+          .stub()
+          .onFirstCall()
+          .rejects(buildCpuMaxError())
+          .onSecondCall()
+          .resolves(true),
+      },
+    });
+    await externalIntegration.start(service.selector);
+    // remembered before the recreation so the new descriptor omits NanoCpus
+    expect(system.cpuCfsSupport).to.equal(false);
+    sinonAssert.calledOnce(system.createContainer);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should recreate a fresh container without CPU limit when its first start is rejected', async () => {
+    const service = await seedExternalService({ container_id: null });
+    const createContainer = sinon.stub();
+    createContainer.onFirstCall().resolves({ id: 'container-a' });
+    createContainer.onSecondCall().resolves({ id: 'container-b' });
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        createContainer,
+        restartContainer: sinon
+          .stub()
+          .onFirstCall()
+          .rejects(buildCpuMaxError())
+          .onSecondCall()
+          .resolves(true),
+      },
+    });
+    const integration = await externalIntegration.start(service.selector);
+    expect(integration.status).to.equal(SERVICE_STATUS.LOADING);
+    expect(system.cpuCfsSupport).to.equal(false);
+    sinonAssert.calledTwice(createContainer);
+    // the first container (created with the CPU limit) is not left behind
+    sinonAssert.calledWith(system.removeContainer, 'container-a', { force: true });
+    sinonAssert.calledWith(system.restartContainer, 'container-b');
+    const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
+    expect(serviceInDb.container_id).to.equal('container-b');
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should set ERROR when the start still fails without the CPU limit', async () => {
+    const service = await seedExternalService({ container_id: null });
+    const { externalIntegration } = buildSupervisor({
+      system: {
+        restartContainer: fake.rejects(buildCpuMaxError()),
+      },
+    });
+    try {
+      await externalIntegration.start(service.selector);
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.include('cpu.max');
+    }
+    const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
+    expect(serviceInDb.status).to.equal(SERVICE_STATUS.ERROR);
+  });
+
   it('should reset failure_count on manual start', async () => {
     const service = await seedExternalService({ failure_count: 5, status: SERVICE_STATUS.ERROR });
     const { externalIntegration } = buildSupervisor();

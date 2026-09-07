@@ -9,6 +9,8 @@ import { isVariableAvailableAtThisPath, convertPathToText } from '../../routes/s
 
 const OPENING_VARIABLE = '{{';
 const CLOSING_VARIABLE = '}}';
+const ZERO_WIDTH_SPACE = '\u200B';
+const NON_BREAKING_SPACE = '\u00A0';
 
 class TextWithVariablesInjected extends Component {
   setRef = dom => (this.tagifyInputRef = dom);
@@ -29,7 +31,14 @@ class TextWithVariablesInjected extends Component {
         maxItems: 200
       },
       whitelist: this.state.variableWhileList,
-      mixTagsInterpolator: [OPENING_VARIABLE, CLOSING_VARIABLE]
+      mixTagsInterpolator: [OPENING_VARIABLE, CLOSING_VARIABLE],
+      mixMode: {
+        // By default, Tagify inserts a non-breaking space after each variable, and this space
+        // ends up in the saved text (breaking JSON/MQTT payloads). We insert a zero-width space
+        // instead: the caret stays right after the variable so the user can keep typing
+        // (with or without a space), but nothing visible is added to the text.
+        insertAfterTag: ZERO_WIDTH_SPACE
+      }
     });
     const text = this.props.text || '';
     this.tagify.loadOriginalValues(text);
@@ -97,6 +106,12 @@ class TextWithVariablesInjected extends Component {
   };
   parseText = async textContent => {
     let text = textContent ? textContent : '';
+    // The zero-width spaces used to place the caret after a variable are not part of the text
+    // and non-breaking spaces (inserted by older versions of Gladys, or by the browser in
+    // contenteditable elements) are replaced by regular spaces, otherwise the text sent
+    // (MQTT payload, HTTP body, ...) would be invalid.
+    text = text.replaceAll(ZERO_WIDTH_SPACE, '');
+    text = text.replaceAll(NON_BREAKING_SPACE, ' ');
     const variableWhileListSorted = this.state.variableWhileList.sort((a, b) => b.id.length - a.id.length);
     variableWhileListSorted.forEach(variable => {
       text = text.replaceAll(variable.text, `${OPENING_VARIABLE}${variable.id}${CLOSING_VARIABLE}`);

@@ -57,7 +57,28 @@ function getStandardDeviceIncludes(featuresOptions = {}) {
   ];
 }
 
+// the feature columns the room endpoints serve to the frontend. Shared on
+// purpose: room.get and room.getBySelector each kept their own copy and the
+// two had already drifted (only one served last_value_string), so every new
+// column had to be remembered twice or one endpoint silently served features
+// without it.
+const ROOM_DEVICE_FEATURES_ATTRIBUTES = [
+  'name',
+  'selector',
+  'category',
+  'type',
+  'read_only',
+  'unit',
+  'min',
+  'max',
+  'step',
+  'last_value',
+  'last_value_string',
+  'last_value_changed',
+];
+
 module.exports = {
   getFeaturesInclude,
   getStandardDeviceIncludes,
+  ROOM_DEVICE_FEATURES_ATTRIBUTES,
 };

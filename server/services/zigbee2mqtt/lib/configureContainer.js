@@ -5,10 +5,19 @@ const yaml = require('yaml');
 const portfinder = require('portfinder');
 
 const logger = require('../../../utils/logger');
-const { DEFAULT } = require('./constants');
-const { DEFAULT_KEY, CONFIG_KEYS, ADAPTERS_BY_CONFIG_KEY } = require('../adapters');
+const { DEFAULT, ADAPTER_MODE } = require('./constants');
+const {
+  DEFAULT_KEY,
+  CONFIG_KEYS,
+  ADAPTERS_BY_CONFIG_KEY,
+  SERIAL_OPTIONS_BY_ADAPTER,
+  MANAGED_SERIAL_OPTION_KEYS,
+} = require('../adapters');
 
 const YAML_CONFIG = { singleQuote: true };
+// A network coordinator serial port is a URL ('tcp://', 'socket://', 'mdns://'...),
+// while a USB one is a device path
+const NETWORK_SERIAL_PORT_REGEX = /^[a-z][a-z0-9+.-]*:\/\//i;
 
 /**
  * @description Configure Z2M container.
@@ -55,16 +64,38 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
   }
 
   // Setup adapter
-  let adapterKey = Object.values(CONFIG_KEYS).find((configKey) =>
-    ADAPTERS_BY_CONFIG_KEY[configKey].includes(config.z2mDongleName),
-  );
   const { serial = {} } = loadedConfig;
+  let adapterKey;
+  let serialPort = serial.port;
+  // Serial settings specific to the selected coordinator model, such as the ConBee III baudrate
+  let serialOptions = {};
+  if (config.z2mAdapterMode === ADAPTER_MODE.NETWORK) {
+    // Network coordinator: Z2M reaches it over TCP, the adapter type is given by the user
+    adapterKey = config.z2mNetworkAdapterType || DEFAULT_KEY;
+    serialPort = config.z2mNetworkAdapterUrl;
+  } else {
+    adapterKey = Object.values(CONFIG_KEYS).find((configKey) =>
+      ADAPTERS_BY_CONFIG_KEY[configKey].includes(config.z2mDongleName),
+    );
+    // Set default adapter if not found
+    adapterKey = adapterKey || DEFAULT_KEY;
+    serialOptions = SERIAL_OPTIONS_BY_ADAPTER[config.z2mDongleName] || {};
+    if (NETWORK_SERIAL_PORT_REGEX.test(`${serialPort}`)) {
+      // Coming back from a network coordinator: restore the USB device path bound in the container
+      serialPort = DEFAULT.CONFIGURATION_CONTENT.serial.port;
+    }
+  }
 
-  // Set default adapter if not found
-  adapterKey = adapterKey || DEFAULT_KEY;
+  const newSerial = { ...serial, port: serialPort, adapter: adapterKey, ...serialOptions };
+  // Drop the model-specific settings of a previously selected coordinator: a baudrate left behind
+  // by another dongle would prevent the new one from talking to its firmware
+  MANAGED_SERIAL_OPTION_KEYS.filter((key) => !(key in serialOptions)).forEach((key) => delete newSerial[key]);
 
-  if (serial.adapter !== adapterKey) {
-    loadedConfig.serial.adapter = adapterKey;
+  const serialChanged =
+    Object.keys(newSerial).length !== Object.keys(serial).length ||
+    Object.entries(newSerial).some(([key, value]) => serial[key] !== value);
+  if (serialChanged) {
+    loadedConfig.serial = newSerial;
     configChanged = true;
     adapterChanged = true;
   }

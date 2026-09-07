@@ -151,6 +151,10 @@
             "message": "Test files must use a per-file sinon sandbox: require('sinon').createSandbox(). The shared singleton accumulates every fake of the whole suite and makes sinon.reset() slower for everyone."
           },
           {
+            "selector": "Property[key.name='tempFolder'][value.value='/tmp/gladys']",
+            "message": "Take the temp folder from the environment: tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys'. setup-env.js gives each mocha worker its own copy because system.init() empties that folder at every Gladys boot; hardcoding the shared one lets a worker running the system suite wipe the fixtures another worker is reading."
+          },
+          {
             "selector": "ForInStatement",
             "message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
           },

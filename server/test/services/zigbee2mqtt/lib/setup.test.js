@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 
@@ -83,5 +84,51 @@ describe('zigbee2mqtt setup', () => {
 
     // z2m was not running, we don't reload it
     assert.calledOnceWithExactly(init, true);
+  });
+
+  it('should store network coordinator configuration, and reload Z2M containers', async () => {
+    // PREPARE
+    const config = {
+      Z2M_ADAPTER_MODE: 'network',
+      Z2M_NETWORK_ADAPTER_URL: '192.168.1.20:6638',
+      Z2M_NETWORK_ADAPTER_TYPE: 'ember',
+      ZIGBEE2MQTT_DRIVER_PATH: null,
+      ZIGBEE_DONGLE_NAME: null,
+    };
+    // EXECUTE
+    await zigbee2MqttManager.setup(config);
+    // ASSERT
+    assert.callCount(gladys.variable.setValue, 3);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_ADAPTER_MODE', 'network', serviceId);
+    // The URL has been normalized
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_NETWORK_ADAPTER_URL', 'tcp://192.168.1.20:6638', serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_NETWORK_ADAPTER_TYPE', 'ember', serviceId);
+    // Destroy variables
+    assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
+
+    assert.calledOnceWithExactly(init, true);
+  });
+
+  it('should not store an invalid network coordinator configuration', async () => {
+    // PREPARE
+    const config = {
+      Z2M_ADAPTER_MODE: 'network',
+      Z2M_NETWORK_ADAPTER_URL: 'not-an-url',
+      Z2M_NETWORK_ADAPTER_TYPE: 'ember',
+    };
+    // EXECUTE
+    try {
+      await zigbee2MqttManager.setup(config);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal(
+        'Zigbee2mqtt: network coordinator URL "not-an-url" is invalid, expected format is "tcp://<host>:<port>"',
+      );
+    }
+    // ASSERT
+    assert.notCalled(gladys.variable.setValue);
+    assert.notCalled(gladys.variable.destroy);
+    assert.notCalled(init);
   });
 });

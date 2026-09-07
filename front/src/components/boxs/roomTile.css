@@ -1,0 +1,44 @@
+/* Shared by the room temperature and room humidity tiles.
+
+   When the tile is stretched to fill its column (the wrapper declares a
+   size container, see routes/dashboard/style.css), the layout adapts to
+   the real rendered height: past the threshold the compact row becomes a
+   centered "big tile" with the value scaled to the available height.
+   Browsers without container queries simply keep the compact layout. */
+
+.tileContent {
+  height: 100%;
+}
+
+@container (min-height: 130px) {
+  .tileContent {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .tileContent :global(.stamp) {
+    margin-right: 0 !important;
+  }
+
+  .tileValue {
+    font-size: clamp(1.8rem, 20cqh, 3.2rem);
+    line-height: 1.1;
+  }
+
+  .tileLabel {
+    font-size: clamp(0.85rem, 8cqh, 1.05rem);
+  }
+}
+
+/* Horizon glass theme */
+:global(.glass-theme) .tileValue {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+:global(.glass-theme) .tileLabel {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}

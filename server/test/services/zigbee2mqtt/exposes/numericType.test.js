@@ -67,4 +67,14 @@ describe('zigbee2mqtt numericType', () => {
       });
     });
   });
+
+  describe('Siren features', () => {
+    it('should configure max_duration feature', () => {
+      assert.deepEqual(numericType.names.max_duration.feature, {
+        category: DEVICE_FEATURE_CATEGORIES.DURATION,
+        type: DEVICE_FEATURE_TYPES.DURATION.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.SECONDS,
+      });
+    });
+  });
 });

@@ -1,8 +1,9 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import KeepHistoryFeature, { isHistorizableFeature } from './KeepHistoryFeature';
 import DeviceParams from '../components/DeviceParams';
 import TransportBadge from '../components/TransportBadge';
 import { getDeviceTransport, getDeviceTransportMessage, isDeviceTransportDegraded } from '../utils';
@@ -15,6 +16,10 @@ class DeviceBox extends Component {
 
   updateRoom = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value || null);
+  };
+
+  updateFeatureKeepHistory = (featureIndex, value) => {
+    this.props.updateFeatureProperty(this.props.deviceIndex, featureIndex, 'keep_history', value);
   };
 
   saveDevice = async () => {
@@ -42,6 +47,11 @@ class DeviceBox extends Component {
   };
 
   render({ device, deviceIndex, houses = [], language }, { loading, saveError, deleteError }) {
+    // the index kept here is the one in device.features: it is what the
+    // save posts back, the text features filtered out would shift it
+    const historizableFeatures = (device.features || [])
+      .map((feature, featureIndex) => ({ feature, featureIndex }))
+      .filter(({ feature }) => isHistorizableFeature(feature));
     return (
       <div class="col-md-6">
         <div class="card">
@@ -117,6 +127,28 @@ class DeviceBox extends Component {
                   </label>
                   <DeviceFeatures features={device.features} />
                 </div>
+
+                {historizableFeatures.length > 0 && (
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="editDeviceForm.keepHistoryLabel" />
+                    </label>
+                    {historizableFeatures.map(({ feature, featureIndex }) => (
+                      <KeepHistoryFeature
+                        key={feature.id || feature.external_id}
+                        deviceIndex={deviceIndex}
+                        feature={feature}
+                        featureIndex={featureIndex}
+                        updateFeatureKeepHistory={this.updateFeatureKeepHistory}
+                      />
+                    ))}
+                    <p class="mb-0">
+                      <small>
+                        <MarkupText id="editDeviceForm.keepHistoryDescription" />
+                      </small>
+                    </p>
+                  </div>
+                )}
 
                 <DeviceParams device={device} />
 

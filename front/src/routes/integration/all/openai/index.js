@@ -92,6 +92,9 @@ class OpenAIGateway extends Component {
               <li>
                 <Text id="integration.openai.exampleChat4" />
               </li>
+              <li>
+                <Text id="integration.openai.exampleChat5" />
+              </li>
             </ul>
             <p class="mb-1 mt-3">
               <strong>

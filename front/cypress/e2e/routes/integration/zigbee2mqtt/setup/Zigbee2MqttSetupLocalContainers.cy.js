@@ -145,6 +145,9 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
         ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
         ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
         Z2M_TCP_PORT: '12345',
+        Z2M_ADAPTER_MODE: 'usb',
+        Z2M_NETWORK_ADAPTER_URL: null,
+        Z2M_NETWORK_ADAPTER_TYPE: null,
         Z2M_MQTT_MODE: 'local'
       });
 
@@ -186,6 +189,9 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
         ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
         ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
         Z2M_TCP_PORT: null,
+        Z2M_ADAPTER_MODE: 'usb',
+        Z2M_NETWORK_ADAPTER_URL: null,
+        Z2M_NETWORK_ADAPTER_TYPE: null,
         Z2M_MQTT_MODE: 'local'
       });
 
@@ -201,6 +207,7 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
       type: 'zigbee2mqtt.status-change',
       payload: {
         usbConfigured: true,
+        networkAdapterConfigured: false,
         mqttExist: true,
         mqttRunning: true,
         zigbee2mqttExist: true,

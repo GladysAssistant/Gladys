@@ -6,6 +6,7 @@ import { route } from 'preact-router';
 import get from 'get-value';
 
 import style from './style.css';
+import AuthLayout from '../../components/auth/AuthLayout';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 
 const BUTTON_ARRAY = [
@@ -152,68 +153,51 @@ class Locked extends Component {
   }
   render({}, { currentCode, error, wrongCode, tooManyRequests, waitTimeInMinute, errorMessage, errorStatus }) {
     return (
-      <div class={cx('container', style.lockedContainer)}>
-        <div class="row">
-          <div class={cx('col col-login mx-auto', style.lockedMainCol)}>
-            <div class="text-center mb-6">
-              <h2>
-                <Localizer>
-                  <img
-                    src="/assets/icons/favicon-96x96.png"
-                    class="header-brand-img"
-                    alt={<Text id="global.logoAlt" />}
-                  />
-                </Localizer>
-                <Text id="login.title" />
-              </h2>
+      <AuthLayout>
+        <form class="card">
+          <div class="card-body p-6">
+            <div class="card-title mb-2">
+              <Text id="locked.cardTitle" />
             </div>
-
-            <form class="card">
-              <div class="card-body p-6">
-                <div class={cx('card-title mb-2', style.cardTitle)}>
-                  <Text id="locked.cardTitle" />
-                </div>
-                <p>
-                  <Text id="locked.description" />
-                </p>
-                {error && (
-                  <div class="alert alert-danger">
-                    <Text id="locked.error" />
-                  </div>
-                )}
-                {errorMessage && (
-                  <div class="alert alert-danger">
-                    {errorStatus} {errorMessage}
-                  </div>
-                )}
-                {wrongCode && (
-                  <div class="alert alert-warning">
-                    <Text id="locked.wrongCodeError" />
-                  </div>
-                )}
-                {tooManyRequests && (
-                  <div class="alert alert-danger">
-                    <Text id="locked.tooManyRequests" fields={{ count: waitTimeInMinute }} />
-                  </div>
-                )}
-                <div class="form" autocomplete="off">
-                  <KeyPadComponent
-                    currentCode={currentCode}
-                    typeLetter={this.typeLetter}
-                    clearPreviousLetter={this.clearPreviousLetter}
-                  />
-                  <button
-                    class={cx('mt-4 btn btn-block btn-outline-success', style.lockedButton)}
-                    onClick={this.validateCode}
-                  >
-                    <Text id="locked.validateButton" />
-                  </button>
-                </div>
+            <p>
+              <Text id="locked.description" />
+            </p>
+            {error && (
+              <div class="alert alert-danger">
+                <Text id="locked.error" />
               </div>
-            </form>
+            )}
+            {errorMessage && (
+              <div class="alert alert-danger">
+                {errorStatus} {errorMessage}
+              </div>
+            )}
+            {wrongCode && (
+              <div class="alert alert-warning">
+                <Text id="locked.wrongCodeError" />
+              </div>
+            )}
+            {tooManyRequests && (
+              <div class="alert alert-danger">
+                <Text id="locked.tooManyRequests" fields={{ count: waitTimeInMinute }} />
+              </div>
+            )}
+            <div class="form" autocomplete="off">
+              <KeyPadComponent
+                currentCode={currentCode}
+                typeLetter={this.typeLetter}
+                clearPreviousLetter={this.clearPreviousLetter}
+              />
+              <button
+                class={cx('mt-4 btn btn-block btn-outline-success', style.lockedButton)}
+                onClick={this.validateCode}
+              >
+                <Text id="locked.validateButton" />
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
+        </form>
+      </AuthLayout>
     );
   }
 }

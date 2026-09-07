@@ -67,6 +67,19 @@ const boot = async () => {
   global.TEST_GLADYS_INSTANCE = gladys;
 };
 
+// utils/logger is a singleton, and a handful of test files rely on that:
+// they run sinon.stub(logger, 'debug') on the module object and expect the
+// production code under test to log through the very same object. proxyquire
+// in noPreserveCache mode deletes every module it stubbed from require.cache
+// once the call returns, so a single test stubbing '../../utils/logger' would
+// leave the next require() building a brand new logger while the production
+// modules already loaded keep the old one — the stub then sits on an object
+// nobody logs to, and the assertion fails with an empty call list in whatever
+// file mocha happens to schedule next on that worker. Pin the original module
+// back after every file so the singleton stays a singleton for the worker.
+const loggerModuleId = require.resolve('../utils/logger');
+const loggerModule = require.cache[loggerModuleId];
+
 exports.mochaHooks = {
   beforeAll: async function beforeAll() {
     this.timeout(30000);
@@ -86,6 +99,14 @@ exports.mochaHooks = {
     } catch (e) {
       logger.trace(e);
       throw e;
+    }
+  },
+  // In parallel mode mocha runs this once per test FILE, before the worker
+  // requires the next one: that is exactly where an evicted logger has to be
+  // put back, since the damage only shows up in the files loaded afterwards.
+  afterAll: function afterAll() {
+    if (require.cache[loggerModuleId] !== loggerModule) {
+      require.cache[loggerModuleId] = loggerModule;
     }
   },
 };

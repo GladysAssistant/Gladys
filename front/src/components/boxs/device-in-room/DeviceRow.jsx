@@ -21,12 +21,21 @@ import AirConditioningFanSpeedDeviceFeature from './device-features/AirCondition
 import AirConditioningSwingDeviceFeature from './device-features/AirConditioningSwingDeviceFeature';
 import PilotWireModeDeviceFeature from './device-features/PilotWireModeDeviceFeature';
 import LMHVolumeDeviceFeature from './device-features/LMHVolumeDeviceFeature';
+import SirenAlarmModeDeviceFeature from './device-features/SirenAlarmModeDeviceFeature';
 import PushDeviceFeature from './device-features/PushDeviceFeature';
 import VacuumCleanerDockDeviceFeature from './device-features/VacuumCleanerDockDeviceFeature';
+import CameraMoveDeviceFeature from './device-features/CameraMoveDeviceFeature';
+import CameraPresetDeviceFeature from './device-features/CameraPresetDeviceFeature';
 import VacuumCleanerModeDeviceFeature from './device-features/VacuumCleanerModeDeviceFeature';
 import VacuumCleanerCleanModeDeviceFeature from './device-features/VacuumCleanerCleanModeDeviceFeature';
 import WaterHeaterModeDeviceFeature from './device-features/WaterHeaterModeDeviceFeature';
+import TextSelectDeviceFeature from './device-features/TextSelectDeviceFeature';
 
+// DeviceRow is the per-FEATURE registry, and it is not only used by the dashboard widgets: the
+// MQTT catalog preview renders one mock feature through it. The light entries therefore stay,
+// even though the widgets no longer reach most of them — DeviceCard groups the light features of
+// a same device into one LightDeviceFeature row before this map is consulted, and only what it
+// leaves ungrouped (a light with no device attached) falls back here.
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: ColorDeviceFeature,
@@ -58,6 +67,7 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SIREN.LMH_VOLUME]: LMHVolumeDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.MELODY]: NumberDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.BINARY]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE]: SirenAlarmModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.DURATION.DECIMAL]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.BUTTON.PUSH]: PushDeviceFeature,
   [DEVICE_FEATURE_TYPES.SWITCH.TARGET_CURRENT]: SetpointDeviceFeature,
@@ -86,6 +96,12 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.FAN]: {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
   },
+  [DEVICE_FEATURE_CATEGORIES.CAMERA]: {
+    // The "enabled" gate is a plain on/off control (docs/specs/camera-enable-disable.md)
+    [DEVICE_FEATURE_TYPES.CAMERA.ENABLED]: BinaryDeviceFeature,
+    [DEVICE_FEATURE_TYPES.CAMERA.MOVE]: CameraMoveDeviceFeature,
+    [DEVICE_FEATURE_TYPES.CAMERA.PRESET]: CameraPresetDeviceFeature
+  },
   // `mode` and `target-temperature` are strings other categories already own, so routing them from
   // the type-keyed map would let declaration order decide the winner for every category. `binary`
   // and `boost` would resolve correctly there too; they are kept here so the whole category reads
@@ -104,6 +120,11 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   ),
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: ThermostatModeDeviceFeature
+  },
+  // A dynamic select: its options are string values discovered on the appliance by the
+  // integration (installed TV apps, HDMI sources...), declared through supported_options
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: {
+    [DEVICE_FEATURE_TYPES.TEXT.SELECT]: TextSelectDeviceFeature
   }
 };
 

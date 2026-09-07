@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import leaflet from 'leaflet';
+import { addMapTileLayer } from '../../utils/mapTileLayer';
 
 const icon = leaflet.icon({
   iconUrl: '/assets/leaflet/marker-icon.png',
@@ -30,24 +31,7 @@ class MapComponent extends Component {
     this.leafletMap = leaflet.map(this.map).setView(coordinates, 2);
 
     // Use the global dark mode state from props
-    const isDarkMode = this.props.darkMode;
-
-    // Use dark tiles if dark mode is active, otherwise use light tiles
-    // Force new tile layer by adding timestamp to URL to prevent caching
-    const tileStyle = isDarkMode ? 'dark_all' : 'light_all';
-    const timestamp = new Date().getTime();
-
-    const tileUrl = `https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}.png?_=${timestamp}`;
-
-    leaflet
-      .tileLayer(tileUrl, {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-        subdomains: 'abcd',
-        maxZoom: 19,
-        noCache: true
-      })
-      .addTo(this.leafletMap);
+    addMapTileLayer(this.leafletMap, this.props.darkMode);
     this.leafletMap.on('click', this.onClickOnMap);
 
     // add house pin
@@ -57,8 +41,14 @@ class MapComponent extends Component {
   };
 
   onClickOnMap = e => {
+    // Leaflet repeats the world horizontally and gives the raw longitude of
+    // the copy that was clicked, which can be outside -180/+180 (e.g. +236
+    // instead of -124). Store the wrapped value, which every service expects,
+    // but keep the clicked coordinates for the marker so that it stays under
+    // the cursor instead of jumping to the main copy of the world.
+    const { lat, lng } = e.latlng.wrap();
     this.setPinMap(e.latlng.lat, e.latlng.lng);
-    this.props.updateHouseLocation(e.latlng.lat, e.latlng.lng, this.props.houseIndex);
+    this.props.updateHouseLocation(lat, lng, this.props.houseIndex);
   };
 
   setPinMap = (latitude, longitude) => {
@@ -94,6 +84,22 @@ class MapComponent extends Component {
     // If dark mode state has changed, reinitialize the map
     if (prevProps.darkMode !== this.props.darkMode) {
       this.initMap();
+      return;
+    }
+    // If the house location was changed from outside the map (address search),
+    // move the pin and center the view on it. A click on the map already moved
+    // the marker to this position, so it is skipped here.
+    const { latitude, longitude } = this.props.house;
+    const locationChanged = prevProps.house.latitude !== latitude || prevProps.house.longitude !== longitude;
+    if (locationChanged && latitude && longitude) {
+      // The marker may sit on a repeated copy of the world after a click, so
+      // compare wrapped longitudes: the house always holds the wrapped one.
+      const markerPosition = this.houseMarker && this.houseMarker.getLatLng().wrap();
+      const markerAlreadyThere = markerPosition && markerPosition.lat === latitude && markerPosition.lng === longitude;
+      if (!markerAlreadyThere) {
+        this.setPinMap(latitude, longitude);
+        this.leafletMap.setView([latitude, longitude], 16);
+      }
     }
   }
 

@@ -3,6 +3,7 @@ import get from 'get-value';
 import cx from 'classnames';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../../server/utils/constants';
+import { smartRound } from '../../../../../../../server/utils/units';
 import RawDeviceValue from './RawDeviceValue';
 
 // Mass concentrations are declared in milligrams, micrograms or nanograms per cubic meter, while
@@ -168,7 +169,7 @@ const BadgeNumberDeviceValue = props => {
       {!valued && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
       {valued && !valueIsEnum && (
         <span>
-          {`${lastValue} `}
+          {`${smartRound(lastValue)} `}
           <Text id={`deviceFeatureUnitShort.${unit}`} />
         </span>
       )}

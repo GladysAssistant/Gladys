@@ -29,6 +29,13 @@ async function destroy(userId, selector) {
     throw new NotFoundError('Dashboard not found');
   }
 
+  // Explicit cleanup: the ON DELETE CASCADE of t_dashboard_asset only fires
+  // when SQLite foreign_keys enforcement is on, which production does not set
+  await db.DashboardAsset.destroy({
+    where: {
+      dashboard_id: dashboard.id,
+    },
+  });
   await dashboard.destroy();
 }
 

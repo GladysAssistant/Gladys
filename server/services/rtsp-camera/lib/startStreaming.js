@@ -9,6 +9,7 @@ const randomBytes = util.promisify(require('crypto').randomBytes);
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const { DEVICE_ROTATION } = require('../../../utils/constants');
+const { isCameraEnabled } = require('../../../utils/device');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
@@ -35,13 +36,20 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       encryption_key: liveStream.encryptionKey,
     };
   }
-  // Init the stream object
-  this.liveStreams.set(cameraSelector, {
+  // Init the stream object. This object also identifies this start attempt: stopStreaming
+  // removes it from the Map, so a camera disabled while we are starting (there are several
+  // awaits before ffmpeg is spawned) cancels this start instead of racing it.
+  const pendingLiveStream = {
     isGladysGateway,
-  });
+  };
+  this.liveStreams.set(cameraSelector, pendingLiveStream);
 
   try {
     const device = await this.gladys.device.getBySelector(cameraSelector);
+    // A disabled camera never streams (spec docs/specs/camera-enable-disable.md)
+    if (!isCameraEnabled(device)) {
+      throw new NotFoundError('CAMERA_IS_DISABLED');
+    }
     // we find the camera url in the device
     const cameraUrlParam = device.params && device.params.find((param) => param.name === DEVICE_PARAM_CAMERA_URL);
     if (!cameraUrlParam) {
@@ -56,9 +64,14 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
     if (!cameraRotationParam) {
       cameraRotationParam = '0';
     }
-    // we create a temp folder
+    // we create a temp folder. The random suffix makes the folder unique per start attempt:
+    // the timestamp alone has a one second resolution, so a quick disable/re-enable would give
+    // two attempts the same folder, and the cancelled one would delete the files of the
+    // running one when cleaning up (spec docs/specs/camera-enable-disable.md).
     const now = new Date();
-    const cameraFolder = `camera-${device.id}-${now.getSeconds()}-${now.getMinutes()}-${now.getHours()}`;
+    const folderUniqueId = (await randomBytes(4)).toString('hex');
+    const folderTime = `${now.getSeconds()}-${now.getMinutes()}-${now.getHours()}`;
+    const cameraFolder = `camera-${device.id}-${folderTime}-${folderUniqueId}`;
     const folderPath = path.join(this.gladys.config.tempFolder, cameraFolder);
     await fse.ensureDir(folderPath);
     const indexFilePath = path.join(folderPath, 'index.m3u8');
@@ -178,6 +191,15 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       timeout: 5 * 60 * 1000, // 5 minutes
     };
 
+    // The stream was stopped while we were starting it (the camera was disabled, typically):
+    // spawning ffmpeg now would leave a process streaming a camera nobody can stop anymore
+    // (spec docs/specs/camera-enable-disable.md).
+    if (this.liveStreams.get(cameraSelector) !== pendingLiveStream) {
+      watchAbortController.abort();
+      await fse.remove(folderPath);
+      throw new NotFoundError('CAMERA_STREAM_STOPPED');
+    }
+
     const liveStreamingProcess = this.childProcess.spawn('ffmpeg', args, options);
 
     this.liveStreams.set(cameraSelector, {
@@ -241,7 +263,11 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       });
     });
   } catch (e) {
-    this.liveStreams.delete(cameraSelector);
+    // Only clean up our own attempt: the entry may already have been removed by stopStreaming
+    // (or replaced by a newer start).
+    if (this.liveStreams.get(cameraSelector) === pendingLiveStream) {
+      this.liveStreams.delete(cameraSelector);
+    }
     throw e;
   }
 }

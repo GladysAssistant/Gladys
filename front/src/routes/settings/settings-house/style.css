@@ -1,0 +1,171 @@
+/* Houses settings: a collapsible list instead of a pile of full forms.
+   Every house is one row that can be read at a glance (name + what is
+   configured), and only the house being edited opens its form — with two
+   houses the page used to be two stacked 1000px forms with two maps and
+   no way to tell them apart. Colors are light only: the app darkens
+   through the global inversion filter (style/dark-mode.css), like the
+   rest of the Horizon glass theme. */
+
+.pageSubtitle {
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.875rem;
+  margin: 0.15rem 0 0;
+}
+
+/* the list header ("2 houses · 12 rooms"): the theme's uppercase
+   micro-label, so it reads as a heading for the list and not as a second
+   page subtitle */
+.listSummary {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted, #7c8396);
+  margin-bottom: 0.75rem;
+}
+
+.houseList {
+  min-height: 10rem;
+}
+
+/* ---------- the accordion row ---------- */
+
+.houseHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 0.9rem 1.25rem;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.houseHeader:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* the browser's own focus ring on this full-width button is a heavy black
+   rectangle around the whole card: replace it with the theme's accent ring,
+   and only for keyboard focus */
+.houseHeader:focus {
+  outline: none;
+}
+
+.houseHeader:focus-visible {
+  outline: 2px solid var(--gl-accent, #3d6df0);
+  outline-offset: -3px;
+}
+
+.houseHeaderOpen {
+  border-bottom: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.houseIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 14px;
+  background: var(--gl-icon-tint-bg, #e3ebfb);
+  color: var(--gl-accent, #3d6df0);
+  font-size: 1.1rem;
+}
+
+.houseHeading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.houseName {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gl-ink, #1c2334);
+  overflow-wrap: anywhere;
+}
+
+.houseNamePlaceholder {
+  color: var(--gl-muted, #7c8396);
+  font-style: italic;
+}
+
+/* the "what is configured" line: room count, location, alarm — the three
+   things a house holds, so a collapsed row still answers "is this one set
+   up?" without opening it */
+.houseMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.85rem;
+  margin-top: 0.15rem;
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.metaItem i {
+  font-size: 0.9rem;
+}
+
+.metaItemSet {
+  color: var(--gl-success-ink, #2e8f5b);
+}
+
+.headerBadge {
+  flex-shrink: 0;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--gl-muted, #7c8396);
+  font-size: 1.25rem;
+}
+
+.housePanel {
+  padding-top: 1.25rem;
+}
+
+/* ---------- empty states ---------- */
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.emptyIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 1rem;
+  border-radius: 20px;
+  background: var(--gl-icon-tint-bg, #e3ebfb);
+  color: var(--gl-accent, #3d6df0);
+  font-size: 1.5rem;
+}
+
+.emptyTitle {
+  font-weight: 700;
+  color: var(--gl-ink, #1c2334);
+  margin-bottom: 0.35rem;
+}
+
+.emptyText {
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.875rem;
+  max-width: 26rem;
+  margin: 0 auto 1.25rem;
+}

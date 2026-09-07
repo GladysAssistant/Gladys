@@ -1,5 +1,6 @@
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
+const { Error402 } = require('../../utils/httpErrors');
 
 /**
  * @description Generate a number between 0 and max included.
@@ -23,7 +24,18 @@ async function checkIfBackupNeeded() {
     logger.info(`Instance not connected to Gladys Gateway, not backing up.`);
     return;
   }
-  const backups = await this.getBackups();
+  // Also the daily probe of a locked instance: one cheap call a day, and the
+  // first success after the payment unlocks the features (see getBackups)
+  let backups;
+  try {
+    backups = await this.getBackups();
+  } catch (e) {
+    if (e instanceof Error402) {
+      logger.info(`Gladys Plus subscription is not paid, not backing up.`);
+      return;
+    }
+    throw e;
+  }
   let shouldBackup = false;
   if (backups.length === 0) {
     shouldBackup = true;

@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Localizer, Text } from 'preact-i18n';
+import { Localizer, MarkupText, Text } from 'preact-i18n';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
@@ -12,6 +12,12 @@ class SendSms extends Component {
   render(props, {}) {
     return (
       <div>
+        <div class="alert alert-warning">
+          <h4 class="alert-title">
+            <Text id="editScene.actionsCard.smsSend.deprecatedTitle" />
+          </h4>
+          <MarkupText id="editScene.actionsCard.smsSend.deprecatedDescription" />
+        </div>
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.smsSend.textLabel" />{' '}

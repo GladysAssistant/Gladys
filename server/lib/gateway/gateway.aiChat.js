@@ -39,7 +39,7 @@ function normalizeAiChatRequestBody(body) {
 async function aiChat(body) {
   const requestBody = normalizeAiChatRequestBody(body);
   try {
-    const response = await this.gladysGatewayClient.openAIAsk(requestBody);
+    const response = await this.callPlanGatedApi(() => this.gladysGatewayClient.openAIAsk(requestBody));
     return response;
   } catch (e) {
     logger.debug(e);

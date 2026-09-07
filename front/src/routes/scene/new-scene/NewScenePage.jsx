@@ -5,67 +5,75 @@ import cx from 'classnames';
 import get from 'get-value';
 import IconSelector from '../../../components/scene/IconSelector';
 import style from './style.css';
+import dashboardStyle from '../../dashboard/style.css';
 
+// Reached from the scene list, which sits on the Horizon glass scene: the form
+// stays on the same wallpaper instead of dropping the user onto a white page
 const NewScenePage = ({ children, ...props }) => (
-  <div class={cx('container', style.containerWithMargin)}>
-    <Link href="/dashboard/scene" class="btn btn-secondary btn-sm">
-      <Text id="global.backButton" />
-    </Link>
-    <div class="row">
-      <div class={cx('col mx-auto', style.sceneFormCol)}>
-        <form onSubmit={props.createScene} class="card">
-          <div class="card-body p-6">
-            <div class="card-title">
-              <Text id="newScene.cardTitle" />
-            </div>
-            {props.createSceneStatus === RequestStatus.ConflictError && (
-              <div class="alert alert-danger">
-                <Text id="newScene.sceneAlreadyExist" />
-              </div>
-            )}
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="newScene.nameLabel" />
-              </label>
-              <Localizer>
-                <input
-                  type="text"
-                  class={cx('form-control', {
-                    'is-invalid': get(props, 'newSceneErrors.name')
-                  })}
-                  placeholder={<Text id="newScene.nameLabel" />}
-                  value={get(props, 'newScene.name')}
-                  onInput={props.updateNewSceneName}
-                />
-              </Localizer>
-              <div class="invalid-feedback">
-                <Text id="newScene.invalidName" />
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="newScene.iconLabel" />
-              </label>
-              {get(props, 'newSceneErrors.icon') && (
-                <div class="alert alert-danger">
-                  <Text id="newScene.invalidIcon" />
+  <div class="page">
+    <div class={cx('page-main', 'glass-theme', dashboardStyle.dashboardBackground, dashboardStyle.glassScene)}>
+      <div class={cx('container', style.containerWithMargin)}>
+        <Link href="/dashboard/scene" class={cx('btn', style.backButton)}>
+          <i class="fe fe-arrow-left mr-2" />
+          <Text id="newScene.backButton" />
+        </Link>
+        <div class="row">
+          <div class={cx('col mx-auto', style.sceneFormCol)}>
+            <form onSubmit={props.createScene} class="card">
+              <div class="card-body p-6">
+                <div class="card-title">
+                  <Text id="newScene.cardTitle" />
                 </div>
-              )}
-              <IconSelector value={get(props, 'newScene.icon')} onChange={props.updateNewSceneIcon} />
-            </div>
+                {props.createSceneStatus === RequestStatus.ConflictError && (
+                  <div class="alert alert-danger">
+                    <Text id="newScene.sceneAlreadyExist" />
+                  </div>
+                )}
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="newScene.nameLabel" />
+                  </label>
+                  <Localizer>
+                    <input
+                      type="text"
+                      class={cx('form-control', {
+                        'is-invalid': get(props, 'newSceneErrors.name')
+                      })}
+                      placeholder={<Text id="newScene.nameLabel" />}
+                      value={get(props, 'newScene.name')}
+                      onInput={props.updateNewSceneName}
+                    />
+                  </Localizer>
+                  <div class="invalid-feedback">
+                    <Text id="newScene.invalidName" />
+                  </div>
+                </div>
 
-            <div class="form-footer">
-              <button
-                onClick={props.createScene}
-                className="btn btn-primary btn-block"
-                disabled={props.createSceneStatus === RequestStatus.Getting}
-              >
-                <Text id="newScene.createSceneButton" />
-              </button>
-            </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="newScene.iconLabel" />
+                  </label>
+                  {get(props, 'newSceneErrors.icon') && (
+                    <div class="alert alert-danger">
+                      <Text id="newScene.invalidIcon" />
+                    </div>
+                  )}
+                  <IconSelector value={get(props, 'newScene.icon')} onChange={props.updateNewSceneIcon} />
+                </div>
+
+                <div class="form-footer">
+                  <button
+                    onClick={props.createScene}
+                    className="btn btn-primary btn-block"
+                    disabled={props.createSceneStatus === RequestStatus.Getting}
+                  >
+                    <Text id="newScene.createSceneButton" />
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>

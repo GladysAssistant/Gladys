@@ -16,11 +16,34 @@ function createActions(store) {
         const gatewayStatus = await state.httpClient.get('/api/v1/gateway/status');
         store.setState({
           gatewayStatus,
+          // the header notice reads this flag: kept in step with the status
+          // wherever it is loaded (after a disconnect, for instance)
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false,
           gatewayGetStatusStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
           gatewayGetStatusStatus: RequestStatus.Error
+        });
+      }
+    },
+    // "Check again" of the Gladys Plus settings, once the payment method has
+    // been updated: asks the instance to check the subscription with Gladys
+    // Plus right now, instead of waiting for its daily check
+    async refreshSubscriptionStatus(state) {
+      store.setState({
+        gatewayRefreshSubscriptionStatus: RequestStatus.Getting
+      });
+      try {
+        const gatewayStatus = await state.httpClient.post('/api/v1/gateway/subscription/refresh');
+        store.setState({
+          gatewayStatus,
+          gatewayPaymentRequired: gatewayStatus.configured === true && gatewayStatus.subscription_active === false,
+          gatewayRefreshSubscriptionStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          gatewayRefreshSubscriptionStatus: RequestStatus.Error
         });
       }
     },
@@ -158,10 +181,19 @@ function createActions(store) {
         gatewayLoginStatus: RequestStatus.Getting
       });
       try {
-        await state.httpClient.post('/api/v1/gateway/login-two-factor', {
-          two_factor_token: state.gatewayLoginResults.two_factor_token,
-          two_factor_code: state.gatewayLoginTwoFactorCode
-        });
+        // The user just enabled two-factor: the Gateway generates their recovery codes
+        // during this call and returns them once (it only stores hashes). It has to be
+        // done there: right after, Gladys connects to the Gateway as the instance and
+        // loses the Gladys Plus user token needed to generate them.
+        const { recovery_codes: gatewayLoginRecoveryCodes } = await state.httpClient.post(
+          '/api/v1/gateway/login-two-factor',
+          {
+            two_factor_token: state.gatewayLoginResults.two_factor_token,
+            two_factor_code: state.gatewayLoginUseRecoveryCode ? undefined : state.gatewayLoginTwoFactorCode,
+            two_factor_recovery_code: state.gatewayLoginUseRecoveryCode ? state.gatewayLoginRecoveryCode : undefined,
+            generate_recovery_codes: state.gatewayTwoFactorJustEnabled === true && !state.gatewayLoginUseRecoveryCode
+          }
+        );
         await actions.getStatus(store.getState());
         await actions.getKeys(store.getState());
         await actions.getInstanceKeys(store.getState());
@@ -171,13 +203,18 @@ function createActions(store) {
           displayGatewayLogin: false,
           gatewayLoginStep2: false,
           gatewayTwoFactorJustEnabled: false,
+          gatewayLoginUseRecoveryCode: false,
+          gatewayLoginRecoveryCode: null,
+          gatewayLoginRecoveryCodes: gatewayLoginRecoveryCodes || null,
           displayConnectedSuccess: true
         });
       } catch (e) {
         const status = get(e, 'response.status');
         if (status >= 400 && status < 500) {
           store.setState({
-            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError
+            gatewayLoginStatus: state.gatewayLoginUseRecoveryCode
+              ? LoginStatus.WrongRecoveryCodeError
+              : LoginStatus.WrongTwoFactorCodeError
           });
         } else {
           store.setState({
@@ -186,9 +223,36 @@ function createActions(store) {
         }
       }
     },
+    loginTwoFactorRecoveryCode(state, e) {
+      return actions.loginTwoFactor(state, e);
+    },
+    showRecoveryCodeLogin(state, e) {
+      if (e) {
+        e.preventDefault();
+      }
+      store.setState({
+        gatewayLoginUseRecoveryCode: true,
+        gatewayLoginStatus: null
+      });
+    },
+    showTwoFactorCodeLogin(state, e) {
+      if (e) {
+        e.preventDefault();
+      }
+      store.setState({
+        gatewayLoginUseRecoveryCode: false,
+        gatewayLoginStatus: null
+      });
+    },
+    updateLoginRecoveryCode(state, e) {
+      store.setState({
+        gatewayLoginRecoveryCode: e.target.value
+      });
+    },
     finalizeGatewaySetup() {
       store.setState({
-        displayConnectedSuccess: false
+        displayConnectedSuccess: false,
+        gatewayLoginRecoveryCodes: null
       });
     },
     async disconnect(state) {
@@ -453,6 +517,8 @@ function createActions(store) {
         displayGatewayLogin: false,
         gatewayLoginStatus: null,
         gatewayLoginStep2: false,
+        gatewayLoginUseRecoveryCode: false,
+        gatewayLoginRecoveryCode: null,
         displayGatewayConfigureTwoFactor: false,
         gatewayConfigureTwoFactorAccessToken: null,
         gatewayConfigureTwoFactorDataUrl: null,
@@ -472,6 +538,8 @@ function createActions(store) {
         gatewayLoginEmail: null,
         gatewayLoginPassword: null,
         gatewayLoginTwoFactorCode: null,
+        gatewayLoginUseRecoveryCode: false,
+        gatewayLoginRecoveryCode: null,
         displayGatewayConfigureTwoFactor: false,
         gatewayConfigureTwoFactorAccessToken: null,
         gatewayConfigureTwoFactorDataUrl: null,

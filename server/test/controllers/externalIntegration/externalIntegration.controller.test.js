@@ -97,7 +97,23 @@ describe('External integration admin API', () => {
         .expect('Content-Type', /json/)
         .expect(200);
       expect(res.body).to.have.property('selector', service.selector);
+      expect(res.body).to.have.property('update_available', false);
+      expect(res.body).to.have.property('latest_version', null);
       expect(res.body.manifest).to.deep.equal(TEST_MANIFEST);
+    });
+
+    it('should expose the latest known version in the detail', async () => {
+      const service = await seedExternalService({ store_slug: 'john/demo', version: '1.0.0' });
+      gladys.externalIntegration.storeIndex = {
+        index_format: 1,
+        integrations: [{ store_slug: 'john/demo', manifest: { ...TEST_MANIFEST, version: '1.4.2' } }],
+      };
+      const res = await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}`)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(res.body).to.have.property('update_available', true);
+      expect(res.body).to.have.property('latest_version', '1.4.2');
     });
 
     it('should return 404 on unknown selector', async () => {
@@ -469,6 +485,76 @@ describe('External integration admin API', () => {
         .expect(200);
       expect(res.body).to.have.lengthOf(1);
       expect(res.body[0]).to.have.property('created', false);
+    });
+
+    it('should create the energy tracking features of a published energy index, then update without duplicating', async () => {
+      const service = await seedExternalService();
+      const indexExternalId = `ext:${service.selector}:plug:index`;
+      const publishedDevice = {
+        name: 'Prise connectée',
+        external_id: `ext:${service.selector}:plug`,
+        features: [
+          {
+            name: 'Consommation totale',
+            external_id: indexExternalId,
+            category: 'energy-sensor',
+            type: 'index',
+            unit: 'kilowatt-hour',
+            min: 0,
+            max: 100000000000,
+            read_only: true,
+            has_feedback: false,
+            keep_history: true,
+          },
+        ],
+        params: [],
+      };
+      await gladys.externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+
+      const discovery = await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}/discovered_device`)
+        .expect(200);
+      expect(discovery.body[0].features).to.have.lengthOf(3);
+
+      // the Discovery screen posts the device it received, untouched
+      const toCreate = { ...discovery.body[0] };
+      delete toCreate.created;
+      delete toCreate.structure_changed;
+      const created = await authenticatedRequest
+        .post('/api/v1/device')
+        .send(toCreate)
+        .expect(200);
+      expect(created.body.features).to.have.lengthOf(3);
+      const indexFeature = created.body.features.find((feature) => feature.external_id === indexExternalId);
+      const consumptionFeature = created.body.features.find(
+        (feature) => feature.external_id === `${indexExternalId}_consumption`,
+      );
+      const costFeature = created.body.features.find((feature) => feature.external_id === `${indexExternalId}_cost`);
+      expect(consumptionFeature.energy_parent_id).to.equal(indexFeature.id);
+      expect(costFeature.energy_parent_id).to.equal(consumptionFeature.id);
+      // the core resolved the selectors, the integration published none
+      expect(consumptionFeature.selector).to.equal('consommation-totale-consumption');
+      expect(costFeature.selector).to.equal('consommation-totale-cost');
+
+      // republishing the very same device leaves the structure unchanged, and
+      // re-posting it updates the existing rows instead of duplicating them
+      await gladys.externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+      const secondDiscovery = await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}/discovered_device`)
+        .expect(200);
+      expect(secondDiscovery.body[0]).to.have.property('created', true);
+      expect(secondDiscovery.body[0]).to.have.property('structure_changed', false);
+      const toUpdate = { ...secondDiscovery.body[0] };
+      delete toUpdate.created;
+      delete toUpdate.structure_changed;
+      const updated = await authenticatedRequest
+        .post('/api/v1/device')
+        .send(toUpdate)
+        .expect(200);
+      expect(updated.body.features).to.have.lengthOf(3);
+      expect(updated.body.features.map((feature) => feature.id).sort()).to.deep.equal(
+        created.body.features.map((feature) => feature.id).sort(),
+      );
     });
   });
 
