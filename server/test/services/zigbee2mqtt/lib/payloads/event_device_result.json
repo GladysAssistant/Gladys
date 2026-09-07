@@ -58,7 +58,13 @@
     "room_id": "room_id",
     "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
     "should_poll": false,
-    "updatable": true
+    "updatable": true,
+    "params": [
+      {
+        "name": "IEEE_ADDRESS",
+        "value": "0x00158d00033e88d5"
+      }
+    ]
   },
   {
     "name": "0x00158d00033e88d1",
@@ -131,7 +137,13 @@
       }
     ],
     "should_poll": false,
-    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
+    "params": [
+      {
+        "name": "IEEE_ADDRESS",
+        "value": "0x00158d00033e88d1"
+      }
+    ]
   },
   {
     "name": "0x00158d0004019127",
@@ -177,7 +189,13 @@
       }
     ],
     "should_poll": false,
-    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
+    "params": [
+      {
+        "name": "IEEE_ADDRESS",
+        "value": "0x00158d0004019127"
+      }
+    ]
   },
   {
     "name": "0x00158d00045b2740",
@@ -271,7 +289,13 @@
       }
     ],
     "should_poll": false,
-    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
+    "params": [
+      {
+        "name": "IEEE_ADDRESS",
+        "value": "0x00158d00045b2740"
+      }
+    ]
   },
   {
     "name": "bosch-outdoor-siren",
@@ -305,7 +329,13 @@
       }
     ],
     "should_poll": false,
-    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
+    "params": [
+      {
+        "name": "IEEE_ADDRESS",
+        "value": "0x00124b0023a1b2c3"
+      }
+    ]
   },
   {
     "name": "heiman-indoor-siren",
@@ -351,6 +381,12 @@
       }
     ],
     "should_poll": false,
-    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
+    "params": [
+      {
+        "name": "IEEE_ADDRESS",
+        "value": "0x00124b0023a1b2c4"
+      }
+    ]
   }
 ]

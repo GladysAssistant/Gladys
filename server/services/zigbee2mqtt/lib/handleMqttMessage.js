@@ -35,6 +35,10 @@ async function handleMqttMessage(topic, message) {
           this.discoveredDevices[device.friendly_name] = device;
         });
 
+      // Re-attach Gladys devices renamed in Zigbee2mqtt (matched by IEEE address)
+      // before publishing the discovered devices, so they merge with the right device.
+      await this.syncRenamedDevices(devices);
+
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
         payload: this.getDiscoveredDevices(),
