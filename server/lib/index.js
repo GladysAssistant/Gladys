@@ -29,6 +29,7 @@ const services = require('../services');
 const Weather = require('./weather');
 const { EVENTS } = require('../utils/constants');
 const EnergyPrice = require('./energy-price');
+const EnergyCalendar = require('./energy-calendar');
 const ExternalIntegration = require('./external-integration');
 
 /**
@@ -78,6 +79,7 @@ function Gladys(params = {}) {
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
   const energyPrice = new EnergyPrice(stateManager);
+  const energyCalendar = new EnergyCalendar(service);
   const externalIntegration = new ExternalIntegration(
     event,
     system,
@@ -154,6 +156,7 @@ function Gladys(params = {}) {
     variable,
     weather,
     energyPrice,
+    energyCalendar,
     externalIntegration,
     start: async () => {
       // set wal mode

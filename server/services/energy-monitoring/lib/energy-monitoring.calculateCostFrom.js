@@ -53,6 +53,9 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
   // so fetch and pre-parse them once per meter instead of once per feature.
   const pricesByElectricMeterDeviceId = new Map();
   let edfTempoHistoricalMap = null;
+  // day types (weekday, weekend, holiday...) of day-type contracts, fetched
+  // once per run from the energy calendar provider (B.19)
+  let dayTypeMap = null;
   await Promise.each(energyDevices, async (energyDevice, index) => {
     try {
       const energyConsumptionFeatures = [];
@@ -169,6 +172,18 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
             .format('YYYY-MM-DD');
           edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
         }
+        const hasDayType = energyPrices.some((p) => p.contract === ENERGY_CONTRACT_TYPES.DAY_TYPE);
+        if (hasDayType && !dayTypeMap) {
+          logger.info(
+            `Device ${electricMeterFeature.device_id} has day-type prices and Map is empty, getting day types from the energy calendar`,
+          );
+          dayTypeMap = await this.gladys.energyCalendar.getDayTypes({
+            start_date: dayjs.tz(startAt, systemTimezone).format('YYYY-MM-DD'),
+            end_date: dayjs()
+              .tz(systemTimezone)
+              .format('YYYY-MM-DD'),
+          });
+        }
         logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);
         // We get all the states of the consumption feature in the time range
         const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
@@ -216,7 +231,7 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
             createdAtRemoved30Minutes,
             valueInKwh,
             systemTimezone,
-            { edfTempoHistoricalMap },
+            { edfTempoHistoricalMap, dayTypeMap },
           );
           deviceFeatureCostStatesToInsert.push({
             value: cost,

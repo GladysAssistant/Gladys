@@ -1138,7 +1138,8 @@
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
-        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent)."
+        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "energyCalendarInfoText": "Diese Integration ist ein Energiekalender-Anbieter: Nach der Installation teilt sie Gladys mit, welche Tage Wochentage, Wochenenden oder Feiertage sind, damit Energieverträge mit tagesabhängigen Preisen korrekt abgerechnet werden."
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
@@ -1367,6 +1368,8 @@
       "startDate": "Startdatum",
       "endDate": "Enddatum",
       "dayType": "Tagestyp",
+      "dayTypePlaceholder": "weekday, weekend...",
+      "dayTypeContractHelp": "Die Preise werden nach dem Tagestyp Ihrer Energiekalender-Integration eingeordnet (zum Beispiel „weekday“ und „weekend“). Ein Preis ohne Zeitfenster gilt für den ganzen Tag.",
       "dayTypeOptions": {
         "any": "beliebig",
         "red": "rot",
@@ -1392,7 +1395,8 @@
       "contractTypes": {
         "base": "Basis",
         "peak-off-peak": "Haupt-/Nebenzeiten",
-        "edf-tempo": "EDF Tempo"
+        "edf-tempo": "EDF Tempo",
+        "day-type": "nach Tagestyp (Wochenende, Feiertage...)"
       },
       "priceTypes": {
         "consumption": "Verbrauch",

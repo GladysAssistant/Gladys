@@ -213,4 +213,106 @@ describe('Contracts.calculateCost', () => {
       expect(cost).to.equal(1.5); // 0.1500 * 10 = 1.5 EUR (BLUE day peak price)
     });
   });
+
+  describe('DAY_TYPE contract', () => {
+    const systemTimezone = 'Europe/Paris';
+    const prices = [
+      { price: 2260, currency: 'EUR', day_type: 'weekday', hour_slots: '08:00,08:30,09:00' },
+      { price: 1692, currency: 'EUR', day_type: 'weekday', hour_slots: '04:30,05:00,05:30' },
+      // whole day price on weekends (no hour slots)
+      { price: 1692, currency: 'EUR', day_type: 'weekend', hour_slots: '' },
+    ];
+    const dayTypeMap = new Map([
+      ['2026-09-04', 'weekday'],
+      ['2026-09-05', 'weekend'],
+      ['2026-09-06', 'holiday'],
+    ]);
+
+    it('should use the price of the day type and the time slot', async () => {
+      // Friday 2026-09-04 08:30 Paris time
+      const cost = await contractsCalculateCost[ENERGY_CONTRACT_TYPES.DAY_TYPE](
+        prices,
+        new Date('2026-09-04T06:30:00.000Z'),
+        10,
+        systemTimezone,
+        { dayTypeMap },
+      );
+      expect(cost).to.equal(10 * 0.226);
+    });
+
+    it('should use a whole day price when a day type has no hour slots', async () => {
+      // Saturday 2026-09-05 08:30 Paris time
+      const cost = await contractsCalculateCost[ENERGY_CONTRACT_TYPES.DAY_TYPE](
+        prices,
+        new Date('2026-09-05T06:30:00.000Z'),
+        10,
+        systemTimezone,
+        { dayTypeMap },
+      );
+      expect(cost).to.equal(10 * 0.1692);
+    });
+
+    it('should prefer a price listing the slot over a whole day price', async () => {
+      const pricesWithDefault = [
+        { price: 1000, currency: 'EUR', day_type: 'weekday', hour_slots: '' },
+        { price: 2000, currency: 'EUR', day_type: 'weekday', hour_slots: '08:30' },
+      ];
+      const cost = await contractsCalculateCost[ENERGY_CONTRACT_TYPES.DAY_TYPE](
+        pricesWithDefault,
+        new Date('2026-09-04T06:30:00.000Z'),
+        1,
+        systemTimezone,
+        { dayTypeMap },
+      );
+      expect(cost).to.equal(0.2);
+      const costOutsideSlot = await contractsCalculateCost[ENERGY_CONTRACT_TYPES.DAY_TYPE](
+        pricesWithDefault,
+        new Date('2026-09-04T10:30:00.000Z'),
+        1,
+        systemTimezone,
+        { dayTypeMap },
+      );
+      expect(costOutsideSlot).to.equal(0.1);
+    });
+
+    it('should fall back to prices without a day type', async () => {
+      const pricesWithFallback = [
+        { price: 3000, currency: 'EUR', day_type: 'weekend', hour_slots: '' },
+        { price: 1500, currency: 'EUR', day_type: null, hour_slots: '' },
+        { price: 1200, currency: 'EUR', day_type: 'any', hour_slots: '08:30' },
+      ];
+      // a holiday: no dedicated price, the fallback prices apply
+      const cost = await contractsCalculateCost[ENERGY_CONTRACT_TYPES.DAY_TYPE](
+        pricesWithFallback,
+        new Date('2026-09-06T06:30:00.000Z'),
+        1,
+        systemTimezone,
+        { dayTypeMap },
+      );
+      expect(cost).to.equal(0.12);
+    });
+
+    it('should throw NotFoundError when the day has no day type', async () => {
+      const promise = contractsCalculateCost[ENERGY_CONTRACT_TYPES.DAY_TYPE](
+        prices,
+        new Date('2026-09-10T06:30:00.000Z'),
+        10,
+        systemTimezone,
+        { dayTypeMap },
+      );
+      return assert.isRejected(promise, 'No day type found for day 2026-09-10');
+    });
+
+    it('should throw NotFoundError when no price covers the time slot', async () => {
+      // Friday 2026-09-04 12:30 Paris time: no weekday price for this slot
+      const promise = contractsCalculateCost[ENERGY_CONTRACT_TYPES.DAY_TYPE](
+        prices,
+        new Date('2026-09-04T10:30:00.000Z'),
+        10,
+        systemTimezone,
+        { dayTypeMap },
+      );
+      return assert.isRejected(promise, 'No price found for time slot 12:30 on day type weekday');
+    });
+  });
 });

@@ -1039,7 +1039,15 @@ class EnergyMonitoringPage extends Component {
                         <option value="edf-tempo">
                           <Text id="integration.energyMonitoring.contractTypes.edf-tempo" />
                         </option>
+                        <option value="day-type">
+                          <Text id="integration.energyMonitoring.contractTypes.day-type" />
+                        </option>
                       </select>
+                      {state.newPrice.contract === 'day-type' && (
+                        <small class="form-text text-muted">
+                          <Text id="integration.energyMonitoring.dayTypeContractHelp" />
+                        </small>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1128,24 +1136,35 @@ class EnergyMonitoringPage extends Component {
                       <label>
                         <Text id="integration.energyMonitoring.dayType" />
                       </label>
-                      <select
-                        class="form-control"
-                        value={state.newPrice.day_type}
-                        onChange={e => updateNewPrice({ day_type: e.target.value })}
-                      >
-                        <option value="any">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.any" />
-                        </option>
-                        <option value="red">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.red" />
-                        </option>
-                        <option value="white">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.white" />
-                        </option>
-                        <option value="blue">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.blue" />
-                        </option>
-                      </select>
+                      {state.newPrice.contract === 'day-type' ? (
+                        <input
+                          type="text"
+                          class="form-control"
+                          value={state.newPrice.day_type === 'any' ? '' : state.newPrice.day_type}
+                          placeholder={this.props.intl.dictionary.integration.energyMonitoring.dayTypePlaceholder}
+                          pattern="[a-z0-9][a-z0-9-]{0,31}"
+                          onInput={e => updateNewPrice({ day_type: e.target.value.trim() || 'any' })}
+                        />
+                      ) : (
+                        <select
+                          class="form-control"
+                          value={state.newPrice.day_type}
+                          onChange={e => updateNewPrice({ day_type: e.target.value })}
+                        >
+                          <option value="any">
+                            <Text id="integration.energyMonitoring.dayTypeOptions.any" />
+                          </option>
+                          <option value="red">
+                            <Text id="integration.energyMonitoring.dayTypeOptions.red" />
+                          </option>
+                          <option value="white">
+                            <Text id="integration.energyMonitoring.dayTypeOptions.white" />
+                          </option>
+                          <option value="blue">
+                            <Text id="integration.energyMonitoring.dayTypeOptions.blue" />
+                          </option>
+                        </select>
+                      )}
                     </div>
                   </div>
                   <div class="col-md-3">

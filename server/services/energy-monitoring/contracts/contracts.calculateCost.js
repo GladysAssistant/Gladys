@@ -22,6 +22,22 @@ function formatDateToSlotLabel(date, systemTimezone) {
   return `${hh}:${minutes}`;
 }
 
+/**
+ * @description Whether a price row applies to the given HH:MM slot label.
+ * A row without hour slots applies to the whole day.
+ * @param {object} price - The energy price row.
+ * @param {string} label - The HH:MM slot label.
+ * @returns {boolean} True when the price covers the slot.
+ * @example priceCoversSlot({ hour_slots: '08:00,08:30' }, '08:00');
+ */
+function priceCoversSlot(price, label) {
+  const hourSlots = (price.hour_slots || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return hourSlots.length === 0 || hourSlots.includes(label);
+}
+
 module.exports = {
   [ENERGY_CONTRACT_TYPES.BASE]: async (energyPricesAtConsumptionDate, consumptionDate, consumptionValue) => {
     const price = energyPricesAtConsumptionDate[0];
@@ -99,6 +115,45 @@ module.exports = {
       `Found price: ${price.price / 10000}${
         price.currency
       }/kWh for time slot ${label} on day ${tempoDayDayType}, cost: ${cost}`,
+    );
+    return cost;
+  },
+  [ENERGY_CONTRACT_TYPES.DAY_TYPE]: async (
+    energyPricesAtConsumptionDate,
+    consumptionDate,
+    consumptionValue,
+    systemTimezone,
+    { dayTypeMap },
+  ) => {
+    // The day type (weekday, weekend, holiday...) comes from the energy
+    // calendar provider, keyed by the calendar day in the system timezone.
+    const consumptionDay = dayjs(consumptionDate)
+      .tz(systemTimezone)
+      .format('YYYY-MM-DD');
+    const dayType = dayTypeMap.get(consumptionDay);
+    if (!dayType) {
+      throw new NotFoundError(`No day type found for day ${consumptionDay}`);
+    }
+    // Prices of this day type first; prices without a day type are the
+    // fallback for the days the contract does not single out.
+    let energyPricesAtDay = energyPricesAtConsumptionDate.filter((p) => p.day_type === dayType);
+    if (energyPricesAtDay.length === 0) {
+      energyPricesAtDay = energyPricesAtConsumptionDate.filter((p) => !p.day_type || p.day_type === 'any');
+    }
+    const label = formatDateToSlotLabel(consumptionDate, systemTimezone);
+    // A price listing the slot wins over a whole-day price.
+    const price =
+      energyPricesAtDay.find((p) => (p.hour_slots || '').trim().length > 0 && priceCoversSlot(p, label)) ||
+      energyPricesAtDay.find((p) => priceCoversSlot(p, label));
+    if (!price) {
+      throw new NotFoundError(`No price found for time slot ${label} on day type ${dayType}`);
+    }
+    // Price are stored as integer with 4 decimals
+    const cost = (price.price / 10000) * consumptionValue;
+    logger.debug(
+      `Found price: ${price.price / 10000}${
+        price.currency
+      }/kWh for time slot ${label} on day type ${dayType}, cost: ${cost}`,
     );
     return cost;
   },

@@ -1138,7 +1138,8 @@
         "webhooksTitle": "Webhooks Internet (Gladys Plus)",
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
         "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
-        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant)."
+        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant).",
+        "energyCalendarInfoText": "Cette intégration est un fournisseur de calendrier énergie : une fois installée, elle indiquera à Gladys quels jours sont des jours de semaine, des week-ends ou des jours fériés, afin que les contrats d'énergie dont les prix dépendent du jour soient facturés correctement."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -1251,6 +1252,8 @@
       "startDate": "Date de début",
       "endDate": "Date de fin",
       "dayType": "Type de jour",
+      "dayTypePlaceholder": "weekday, weekend...",
+      "dayTypeContractHelp": "Les prix sont classés par type de jour publié par votre intégration de calendrier énergie (par exemple « weekday » et « weekend »). Un prix sans créneau horaire s'applique à toute la journée.",
       "dayTypeOptions": {
         "any": "tous",
         "red": "rouge",
@@ -1276,7 +1279,8 @@
       "contractTypes": {
         "base": "base",
         "peak-off-peak": "heures pleines/creuses",
-        "edf-tempo": "EDF Tempo"
+        "edf-tempo": "EDF Tempo",
+        "day-type": "selon le type de jour (week-end, jours fériés...)"
       },
       "priceTypes": {
         "consumption": "consommation",

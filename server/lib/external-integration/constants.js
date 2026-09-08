@@ -196,6 +196,17 @@ const MAX_WEATHER_IMAGE_LABEL_LENGTH = 50;
 const MAX_WEATHER_IMAGE_BYTES = 500 * 1024;
 const WEATHER_IMAGE_CACHE_TTL_MS = 10 * 60 * 1000;
 const WEATHER_IMAGE_CACHE_PREFIX = 'weather-image';
+// Energy calendar providers (B.19): energy-calendar.get-day-types may hit a
+// third-party API (public holidays), same exception to the 5s ack rule as
+// the weather.
+const ENERGY_CALENDAR_GET_TIMEOUT_MS = 15 * 1000;
+// Bounds of the normalized day types map (B.19): the payload comes from
+// unaudited code, every key and value is validated and the map is capped.
+// 8000 days is ~22 years of history: the core never asks for more (the
+// requested range is clamped) and drops anything beyond.
+const MAX_ENERGY_CALENDAR_DAYS = 8000;
+const ENERGY_CALENDAR_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const ENERGY_CALENDAR_DAY_TYPE_REGEX = /^[a-z0-9][a-z0-9-]{0,31}$/;
 // The generic condition enum of the pivot format; anything else is
 // coerced to 'unknown' (the frontend renders a neutral icon).
 // 'night' is deprecated for providers: send the real condition plus
@@ -399,6 +410,10 @@ module.exports = {
   MAX_WEATHER_IMAGE_BYTES,
   WEATHER_IMAGE_CACHE_TTL_MS,
   WEATHER_IMAGE_CACHE_PREFIX,
+  ENERGY_CALENDAR_GET_TIMEOUT_MS,
+  MAX_ENERGY_CALENDAR_DAYS,
+  ENERGY_CALENDAR_DATE_REGEX,
+  ENERGY_CALENDAR_DAY_TYPE_REGEX,
   RESERVED_PARAM_PREFIX,
   TRANSPORT_PARAM,
   DEVICE_TRANSPORTS,

@@ -2035,6 +2035,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
     WEATHER_GET: 'external-integration.weather.get',
     WEATHER_GET_IMAGE: 'external-integration.weather.get-image',
+    ENERGY_CALENDAR_GET_DAY_TYPES: 'external-integration.energy-calendar.get-day-types',
     WEATHER_REFRESH: 'external-integration.weather.refresh',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
@@ -2192,6 +2193,10 @@ const ENERGY_CONTRACT_TYPES = {
   PEAK_OFF_PEAK: 'peak-off-peak',
   // EDF Tempo
   EDF_TEMPO: 'edf-tempo',
+  // Generic contract whose prices depend on a day type (weekday, weekend,
+  // holiday...) resolved by an energy calendar provider (external
+  // integration of type "energy-calendar"), plus optional hour slots.
+  DAY_TYPE: 'day-type',
 };
 
 const ENERGY_PRICE_TYPES = {

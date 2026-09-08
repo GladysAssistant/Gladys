@@ -109,7 +109,10 @@ class ExternalIntegrationInstallPage extends Component {
       // can be discovered: all land on the configuration screen after
       // install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (['communication', 'weather'].includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
+      if (
+        ['communication', 'weather', 'energy-calendar'].includes(get(installed, 'manifest.type')) ||
+        configSchema.length > 0
+      ) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -238,6 +241,13 @@ class ExternalIntegrationInstallPage extends Component {
                               <div class="alert alert-info">
                                 <i class="fe fe-cloud mr-1" />
                                 <Text id="integration.externalIntegration.install.weatherInfoText" />
+                              </div>
+                            )}
+
+                            {manifest.type === 'energy-calendar' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-calendar mr-1" />
+                                <Text id="integration.externalIntegration.install.energyCalendarInfoText" />
                               </div>
                             )}
 

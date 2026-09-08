@@ -1,8 +1,4 @@
-const {
-  ENERGY_CONTRACT_TYPES_LIST,
-  ENERGY_PRICE_TYPES_LIST,
-  ENERGY_PRICE_DAY_TYPES_LIST,
-} = require('../utils/constants');
+const { ENERGY_CONTRACT_TYPES_LIST, ENERGY_PRICE_TYPES_LIST } = require('../utils/constants');
 const { slugify } = require('../utils/slugify');
 
 module.exports = (sequelize, DataTypes) => {
@@ -62,9 +58,17 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.STRING,
       },
+      // Free day type: the Tempo colors (red, white, blue) for edf-tempo
+      // contracts, any slug for day-type contracts (weekday, weekend,
+      // holiday... whatever the energy calendar provider publishes). Was an
+      // ENUM of the Tempo colors: under SQLite an ENUM is a TEXT column, so
+      // the widening needs no migration.
       day_type: {
         allowNull: true,
-        type: DataTypes.ENUM(...ENERGY_PRICE_DAY_TYPES_LIST),
+        type: DataTypes.STRING,
+        validate: {
+          is: /^[a-z0-9][a-z0-9-]{0,31}$/,
+        },
       },
       selector: {
         allowNull: false,

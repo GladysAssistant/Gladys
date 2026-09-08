@@ -117,6 +117,19 @@ const TEST_WEATHER_MANIFEST = {
   gladys_version: '>=4.62.0',
 };
 
+const TEST_ENERGY_CALENDAR_MANIFEST = {
+  manifest_version: 1,
+  type: 'energy-calendar',
+  name: 'French Calendar Demo',
+  description: {
+    en: 'Weekend and public holidays energy calendar demo integration.',
+    fr: 'Intégration démo : calendrier énergie week-ends et jours fériés.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-french-calendar:1.0.0',
+  gladys_version: '>=4.62.0',
+};
+
 // Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
 // gateway — one fire-and-forget event stream (default mode) and one sync
 // challenge/response registration callback.
@@ -286,6 +299,7 @@ module.exports = {
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
   TEST_WEATHER_MANIFEST,
+  TEST_ENERGY_CALENDAR_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,

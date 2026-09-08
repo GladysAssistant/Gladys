@@ -4,9 +4,11 @@ const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constan
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
 const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
 const { normalizeWeatherImage } = require('./externalIntegration.normalizeWeatherImage');
+const { normalizeEnergyDayTypes } = require('./externalIntegration.normalizeEnergyDayTypes');
 const {
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
+  ENERGY_CALENDAR_GET_TIMEOUT_MS,
   WEATHER_IMAGE_CACHE_TTL_MS,
   WEATHER_IMAGE_CACHE_PREFIX,
 } = require('./constants');
@@ -146,6 +148,29 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // energy calendar integrations expose the generic provider interface
+  // energyCalendar.getDayTypes(range), duck-typed by lib/energy-calendar's
+  // provider loop (B.19): the map of day types (weekday, weekend,
+  // holiday...) the "day-type" energy contract prices are keyed by. The
+  // returned map is normalized and bounded before entering the core.
+  const isEnergyCalendar = service.manifest && service.manifest.type === 'energy-calendar';
+  const energyCalendarCapability = isEnergyCalendar
+    ? {
+        energyCalendar: Object.freeze({
+          getDayTypes: async ({ start_date: startDate, end_date: endDate }) => {
+            // a public holidays API call can be slow: 15s ack deadline
+            const result = await this.sendCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.ENERGY_CALENDAR_GET_DAY_TYPES,
+              { options: { start_date: startDate, end_date: endDate } },
+              { timeoutMs: ENERGY_CALENDAR_GET_TIMEOUT_MS },
+            );
+            const payload = result && result.data && result.data.day_types;
+            return normalizeEnergyDayTypes(payload, { start_date: startDate, end_date: endDate });
+          },
+        }),
+      }
+    : {};
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -155,6 +180,7 @@ function registerProxyService(service) {
     },
     ...messageCapability,
     ...weatherCapability,
+    ...energyCalendarCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {
