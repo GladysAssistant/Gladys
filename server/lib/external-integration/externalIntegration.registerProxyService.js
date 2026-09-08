@@ -150,7 +150,7 @@ function registerProxyService(service) {
     : {};
   // energy calendar integrations expose the generic provider interface
   // energyCalendar.getDayTypes(range), duck-typed by lib/energy-calendar's
-  // provider loop (B.19): the map of day types (weekday, weekend,
+  // provider loop (B.21): the map of day types (weekday, weekend,
   // holiday...) the "day-type" energy contract prices are keyed by. The
   // returned map is normalized and bounded before entering the core.
   const isEnergyCalendar = service.manifest && service.manifest.type === 'energy-calendar';

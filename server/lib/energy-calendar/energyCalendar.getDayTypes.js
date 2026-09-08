@@ -29,7 +29,7 @@ function validateDay(name, value) {
  * days from the first working energy calendar provider. The core does not
  * know any provider by name: every service in the stateManager exposing
  * `energyCalendar.getDayTypes(range)` — the proxy service of an external
- * "energy-calendar" integration (B.19) — is a candidate. Candidates are
+ * "energy-calendar" integration (B.21) — is a candidate. Candidates are
  * sorted by service name and tried in order, first success wins; a failing
  * candidate (stopped integration, third-party API down, invalid payload)
  * falls through to the next one.

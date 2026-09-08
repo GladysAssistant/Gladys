@@ -54,7 +54,7 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
   const pricesByElectricMeterDeviceId = new Map();
   let edfTempoHistoricalMap = null;
   // day types (weekday, weekend, holiday...) of day-type contracts, fetched
-  // once per run from the energy calendar provider (B.19)
+  // once per run from the energy calendar provider (B.21)
   let dayTypeMap = null;
   await Promise.each(energyDevices, async (energyDevice, index) => {
     try {

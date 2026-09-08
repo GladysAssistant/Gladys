@@ -196,11 +196,11 @@ const MAX_WEATHER_IMAGE_LABEL_LENGTH = 50;
 const MAX_WEATHER_IMAGE_BYTES = 500 * 1024;
 const WEATHER_IMAGE_CACHE_TTL_MS = 10 * 60 * 1000;
 const WEATHER_IMAGE_CACHE_PREFIX = 'weather-image';
-// Energy calendar providers (B.19): energy-calendar.get-day-types may hit a
+// Energy calendar providers (B.21): energy-calendar.get-day-types may hit a
 // third-party API (public holidays), same exception to the 5s ack rule as
 // the weather.
 const ENERGY_CALENDAR_GET_TIMEOUT_MS = 15 * 1000;
-// Bounds of the normalized day types map (B.19): the payload comes from
+// Bounds of the normalized day types map (B.21): the payload comes from
 // unaudited code, every key and value is validated and the map is capped.
 // 8000 days is ~22 years of history: the core never asks for more (the
 // requested range is clamped) and drops anything beyond.

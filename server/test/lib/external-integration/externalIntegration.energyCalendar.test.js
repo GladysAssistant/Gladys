@@ -111,6 +111,27 @@ describe('externalIntegration.normalizeEnergyDayTypes', () => {
     expect(() => normalizeEnergyDayTypes(['2026-09-05'], RANGE)).to.throw(ExternalIntegrationUnavailableError);
   });
 
+  it('should reject a payload without any valid entry', () => {
+    expect(() => normalizeEnergyDayTypes({}, RANGE)).to.throw(
+      ExternalIntegrationUnavailableError,
+      'EXTERNAL_INTEGRATION_EMPTY_ENERGY_DAY_TYPES',
+    );
+    expect(() => normalizeEnergyDayTypes({ '2026-09-05': 'Week-End', '2026-09-06': 'week_end' }, RANGE)).to.throw(
+      ExternalIntegrationUnavailableError,
+      'EXTERNAL_INTEGRATION_EMPTY_ENERGY_DAY_TYPES',
+    );
+  });
+
+  it('should inspect at most the maximum number of keys', () => {
+    const payload = {};
+    for (let i = 0; i < MAX_ENERGY_CALENDAR_DAYS; i += 1) {
+      payload[`not-a-date-${i}`] = 'weekday';
+    }
+    // a valid entry past the cap is never even looked at
+    payload['2026-09-05'] = 'weekend';
+    expect(() => normalizeEnergyDayTypes(payload, RANGE)).to.throw(ExternalIntegrationUnavailableError);
+  });
+
   it('should cap the number of entries', () => {
     const payload = {};
     const start = new Date('2000-01-01T00:00:00.000Z');
