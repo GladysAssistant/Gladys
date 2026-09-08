@@ -122,6 +122,13 @@ describe('externalIntegration.normalizeEnergyDayTypes', () => {
     );
   });
 
+  it('should ignore inherited keys', () => {
+    const payload = Object.create({ '2026-09-05': 'weekend' });
+    expect(() => normalizeEnergyDayTypes(payload, RANGE)).to.throw(ExternalIntegrationUnavailableError);
+    payload['2026-09-06'] = 'weekend';
+    expect(Array.from(normalizeEnergyDayTypes(payload, RANGE).entries())).to.deep.equal([['2026-09-06', 'weekend']]);
+  });
+
   it('should inspect at most the maximum number of keys', () => {
     const payload = {};
     for (let i = 0; i < MAX_ENERGY_CALENDAR_DAYS; i += 1) {

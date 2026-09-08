@@ -32,24 +32,30 @@ function normalizeEnergyDayTypes(payload, { start_date: startDate, end_date: end
   const dayTypes = new Map();
   let dropped = 0;
   // bound the work itself, not only the result: a huge object of invalid
-  // keys must not be walked in full
-  const keys = Object.keys(payload);
-  if (keys.length > MAX_ENERGY_CALENDAR_DAYS) {
-    logger.debug(`Energy calendar: ${keys.length - MAX_ENERGY_CALENDAR_DAYS} entries beyond the cap ignored`);
-  }
-  keys.slice(0, MAX_ENERGY_CALENDAR_DAYS).forEach((date) => {
-    const dayType = payload[date];
-    const validDate =
-      ENERGY_CALENDAR_DATE_REGEX.test(date) &&
-      dayjs(date).format('YYYY-MM-DD') === date &&
-      date >= startDate &&
-      date <= endDate;
-    if (!validDate || typeof dayType !== 'string' || !ENERGY_CALENDAR_DAY_TYPE_REGEX.test(dayType)) {
-      dropped += 1;
-      return;
+  // keys must not be walked in full — nor even enumerated (Object.keys
+  // would materialize every key first), hence the plain for...in
+  let inspected = 0;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const date in payload) {
+    if (Object.prototype.hasOwnProperty.call(payload, date)) {
+      if (inspected >= MAX_ENERGY_CALENDAR_DAYS) {
+        logger.debug('Energy calendar: entries beyond the cap ignored');
+        break;
+      }
+      inspected += 1;
+      const dayType = payload[date];
+      const validDate =
+        ENERGY_CALENDAR_DATE_REGEX.test(date) &&
+        dayjs(date).format('YYYY-MM-DD') === date &&
+        date >= startDate &&
+        date <= endDate;
+      if (validDate && typeof dayType === 'string' && ENERGY_CALENDAR_DAY_TYPE_REGEX.test(dayType)) {
+        dayTypes.set(date, dayType);
+      } else {
+        dropped += 1;
+      }
     }
-    dayTypes.set(date, dayType);
-  });
+  }
   if (dropped > 0) {
     logger.debug(`Energy calendar: ${dropped} invalid day type entries dropped`);
   }
