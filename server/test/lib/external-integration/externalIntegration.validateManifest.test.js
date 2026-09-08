@@ -35,6 +35,11 @@ describe('externalIntegration.validateManifest', () => {
     expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
   });
 
+  it('should accept an energy-calendar manifest', () => {
+    const manifest = { ...TEST_MANIFEST, type: 'energy-calendar' };
+    expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
+  });
+
   it('should accept a manifest without optional fields', () => {
     const { cover_image: coverImage, config_schema: configSchema, ...minimalManifest } = TEST_MANIFEST;
     const validated = externalIntegration.validateManifest(minimalManifest);

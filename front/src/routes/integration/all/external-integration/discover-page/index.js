@@ -43,7 +43,7 @@ class ExternalIntegrationDiscoverPage extends Component {
       }
       // communication and weather integrations have no device screens:
       // direct URL access lands on the configuration screen instead
-      if (['communication', 'weather'].includes(get(integration, 'manifest.type'))) {
+      if (['communication', 'weather', 'energy-calendar'].includes(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
         return false;
       }

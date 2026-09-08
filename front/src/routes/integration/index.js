@@ -16,7 +16,7 @@ import { RequestStatus } from '../../utils/consts';
 
 // the role rules stay expressed on the technical `type` (spec §2.2): the
 // browse categories are display metadata and play no part in visibility
-const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
+const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'energy-calendar'];
 // homekit exposes the whole house to a hub; free-mobile is a single global SMS
 // account whose page reads service-wide credentials. Neither has anything
 // per-user, so a non-admin has no business on those pages.
@@ -280,7 +280,7 @@ class Integration extends Component {
     // communication and weather integrations have no device screens: their
     // card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      ['communication', 'weather'].includes(manifest.type)
+      ['communication', 'weather', 'energy-calendar'].includes(manifest.type)
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
 
@@ -294,7 +294,7 @@ class Integration extends Component {
         key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: ['communication', 'weather', 'energy-calendar'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: getInstalledUrl(integration.selector, manifest),
@@ -318,7 +318,7 @@ class Integration extends Component {
         key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: ['communication', 'weather', 'energy-calendar'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled

@@ -64,6 +64,15 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       gateway: {
         getEdfTempoHistorical: fake.resolves(historicalTempoData),
       },
+      energyCalendar: {
+        getDayTypes: fake.resolves(
+          new Map([
+            ['2025-01-03', 'weekday'],
+            ['2025-01-04', 'weekend'],
+            ['2025-01-05', 'weekend'],
+          ]),
+        ),
+      },
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
@@ -460,6 +469,149 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1447);
     expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1552);
     expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1288);
+  });
+  it('should calculate cost from a specific date for a day-type contract', async () => {
+    // weekdays: peak / off-peak hours
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.DAY_TYPE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1692,
+      hour_slots: '01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,22:00,22:30,23:00,23:30',
+      day_type: 'weekday',
+    });
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.DAY_TYPE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 2260,
+      hour_slots:
+        '06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30',
+      day_type: 'weekday',
+    });
+    // weekends and public holidays: off-peak price all day long
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.DAY_TYPE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1692,
+      day_type: 'weekend',
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        // Friday, off peak
+        created_at: dayjs.tz('2025-01-03T05:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // Friday, peak
+        created_at: dayjs.tz('2025-01-03T10:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // Saturday, peak hours but weekend price
+        created_at: dayjs.tz('2025-01-04T15:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // Sunday, off peak
+        created_at: dayjs.tz('2025-01-05T22:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    const date = new Date('2025-01-01T00:00:00.000Z');
+    await energyMonitoring.calculateCostFrom(date);
+    expect(gladys.energyCalendar.getDayTypes.callCount).to.equal(1);
+    expect(gladys.energyCalendar.getDayTypes.firstCall.args[0]).to.deep.equal({
+      start_date: '2025-01-01',
+      end_date: dayjs()
+        .tz('Europe/Paris')
+        .format('YYYY-MM-DD'),
+    });
+    const deviceFeatureState = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      dayjs.tz('2025-01-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+      dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+    );
+    expect(deviceFeatureState).to.have.lengthOf(4);
+    expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.1692);
+    expect(deviceFeatureState[1]).to.have.property('value', 10 * 0.226);
+    expect(deviceFeatureState[2]).to.have.property('value', 10 * 0.1692);
+    expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1692);
+  });
+  it('should not calculate cost for a day-type contract without energy calendar provider', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.DAY_TYPE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1692,
+      day_type: 'weekend',
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: dayjs.tz('2025-01-04T15:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+    ]);
+    // a cost computed by a previous run must survive a failing provider
+    await db.duckDbBatchInsertState('0f4133be-b86c-4a97-9cc8-585fadb74006', [
+      {
+        value: 1.692,
+        created_at: dayjs.tz('2025-01-04T15:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+    ]);
+    gladys.energyCalendar.getDayTypes = fake.rejects(new Error('No energy calendar provider'));
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    await energyMonitoring.calculateCostFrom(new Date('2025-01-01T00:00:00.000Z'));
+    const deviceFeatureState = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      dayjs.tz('2025-01-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+      dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+    );
+    expect(deviceFeatureState).to.have.lengthOf(1);
+    expect(deviceFeatureState[0]).to.have.property('value', 1.692);
+  });
+  it('should ask the calendar for the day before startAt (a state at midnight covers the previous day)', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.DAY_TYPE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1692,
+      day_type: 'weekday',
+    });
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.DAY_TYPE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1000,
+      day_type: 'weekend',
+    });
+    // Saturday 2025-01-04 00:00 Paris time: the interval is Friday 23:30-00:00
+    const startAt = dayjs.tz('2025-01-04 00:00:00', 'Europe/Paris').toDate();
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [{ value: 10, created_at: startAt }]);
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    await energyMonitoring.calculateCostFrom(startAt);
+    expect(gladys.energyCalendar.getDayTypes.firstCall.args[0].start_date).to.equal('2025-01-03');
+    const deviceFeatureState = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      dayjs.tz('2025-01-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+      dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+    );
+    expect(deviceFeatureState).to.have.lengthOf(1);
+    expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.1692);
   });
   it('should calculate cost from a specific date for a base contract on a daily consumption', async () => {
     // We create a new device with consumption & consumption cost

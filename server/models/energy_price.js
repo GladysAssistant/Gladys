@@ -1,4 +1,5 @@
 const {
+  ENERGY_CONTRACT_TYPES,
   ENERGY_CONTRACT_TYPES_LIST,
   ENERGY_PRICE_TYPES_LIST,
   ENERGY_PRICE_DAY_TYPES_LIST,
@@ -62,9 +63,17 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.STRING,
       },
+      // Free day type: the Tempo colors (red, white, blue) for edf-tempo
+      // contracts, any slug for day-type contracts (weekday, weekend,
+      // holiday... whatever the energy calendar provider publishes). Was an
+      // ENUM of the Tempo colors: under SQLite an ENUM is a TEXT column, so
+      // the widening needs no migration.
       day_type: {
         allowNull: true,
-        type: DataTypes.ENUM(...ENERGY_PRICE_DAY_TYPES_LIST),
+        type: DataTypes.STRING,
+        validate: {
+          is: /^[a-z0-9][a-z0-9-]{0,31}$/,
+        },
       },
       selector: {
         allowNull: false,
@@ -72,7 +81,24 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
     },
-    {},
+    {
+      validate: {
+        // EDF Tempo prices are keyed by the Tempo colors: any other day type
+        // would never match the historical color and break the cost run
+        edfTempoDayType() {
+          if (
+            this.contract === ENERGY_CONTRACT_TYPES.EDF_TEMPO &&
+            this.day_type &&
+            this.day_type !== 'any' &&
+            !ENERGY_PRICE_DAY_TYPES_LIST.includes(this.day_type)
+          ) {
+            throw new Error(
+              `day_type: must be one of ${ENERGY_PRICE_DAY_TYPES_LIST.join(', ')} for an EDF Tempo contract`,
+            );
+          }
+        },
+      },
+    },
   );
 
   energyPrice.beforeValidate((item) => {

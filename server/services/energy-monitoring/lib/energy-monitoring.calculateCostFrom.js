@@ -53,6 +53,9 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
   // so fetch and pre-parse them once per meter instead of once per feature.
   const pricesByElectricMeterDeviceId = new Map();
   let edfTempoHistoricalMap = null;
+  // day types (weekday, weekend, holiday...) of day-type contracts, fetched
+  // once per run from the energy calendar provider (B.21)
+  let dayTypeMap = null;
   await Promise.each(energyDevices, async (energyDevice, index) => {
     try {
       const energyConsumptionFeatures = [];
@@ -130,9 +133,6 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           );
           return;
         }
-        // First, clean the cost feature states
-        logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
-        await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
         // Get the energy prices from this electrical meter device
         let meterPrices = pricesByElectricMeterDeviceId.get(electricMeterFeature.device_id);
         if (!meterPrices) {
@@ -169,7 +169,28 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
             .format('YYYY-MM-DD');
           edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
         }
+        const hasDayType = energyPrices.some((p) => p.contract === ENERGY_CONTRACT_TYPES.DAY_TYPE);
+        if (hasDayType && !dayTypeMap) {
+          logger.info(
+            `Device ${electricMeterFeature.device_id} has day-type prices and Map is empty, getting day types from the energy calendar`,
+          );
+          dayTypeMap = await this.gladys.energyCalendar.getDayTypes({
+            // a state at startAt covers the 30 minutes before it: the first
+            // consumption interval can fall on the previous calendar day
+            start_date: dayjs
+              .tz(new Date(startAt.getTime() - THIRTY_MINUTES_IN_MS), systemTimezone)
+              .format('YYYY-MM-DD'),
+            end_date: dayjs()
+              .tz(systemTimezone)
+              .format('YYYY-MM-DD'),
+          });
+        }
         logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);
+        // Everything the run needs is loaded: only now clean the cost feature
+        // states, so a failing prerequisite (calendar or Tempo provider down)
+        // leaves the existing cost history untouched
+        logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
+        await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
         // We get all the states of the consumption feature in the time range
         const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
           ecf.consumptionFeature.selector,
@@ -216,7 +237,7 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
             createdAtRemoved30Minutes,
             valueInKwh,
             systemTimezone,
-            { edfTempoHistoricalMap },
+            { edfTempoHistoricalMap, dayTypeMap },
           );
           deviceFeatureCostStatesToInsert.push({
             value: cost,

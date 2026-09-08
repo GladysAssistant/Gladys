@@ -40,6 +40,9 @@ const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
   DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF10
 ];
 
+// same rule as the server model (t_energy_price.day_type)
+const DAY_TYPE_REGEX = /^[a-z0-9][a-z0-9-]{0,31}$/;
+
 class EnergyMonitoringPage extends Component {
   state = {
     devices: [],
@@ -313,9 +316,15 @@ class EnergyMonitoringPage extends Component {
     }
   };
 
+  isDayTypeValid = dayType => dayType === 'any' || DAY_TYPE_REGEX.test(dayType);
+
   savePrice = async () => {
     try {
       const payload = { ...this.state.newPrice };
+      // the day type input is free text: it must match what the server accepts
+      if (!this.isDayTypeValid(payload.day_type)) {
+        throw new Error('INVALID_DAY_TYPE');
+      }
       // Save hour slots from wizardHourSlots as comma-separated HH:MM string
       if (this.state.wizardHourSlots && this.state.wizardHourSlots.size > 0) {
         payload.hour_slots = this.formatSetToHourSlots(this.state.wizardHourSlots);
@@ -1028,7 +1037,9 @@ class EnergyMonitoringPage extends Component {
                       <select
                         class="form-control"
                         value={state.newPrice.contract}
-                        onChange={e => updateNewPrice({ contract: e.target.value })}
+                        // the day types of one contract mean nothing to another
+                        // (Tempo colors vs calendar slugs): start from "any"
+                        onChange={e => updateNewPrice({ contract: e.target.value, day_type: 'any' })}
                       >
                         <option value="base">
                           <Text id="integration.energyMonitoring.contractTypes.base" />
@@ -1039,7 +1050,15 @@ class EnergyMonitoringPage extends Component {
                         <option value="edf-tempo">
                           <Text id="integration.energyMonitoring.contractTypes.edf-tempo" />
                         </option>
+                        <option value="day-type">
+                          <Text id="integration.energyMonitoring.contractTypes.day-type" />
+                        </option>
                       </select>
+                      {state.newPrice.contract === 'day-type' && (
+                        <small class="form-text text-muted">
+                          <Text id="integration.energyMonitoring.dayTypeContractHelp" />
+                        </small>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1128,24 +1147,40 @@ class EnergyMonitoringPage extends Component {
                       <label>
                         <Text id="integration.energyMonitoring.dayType" />
                       </label>
-                      <select
-                        class="form-control"
-                        value={state.newPrice.day_type}
-                        onChange={e => updateNewPrice({ day_type: e.target.value })}
-                      >
-                        <option value="any">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.any" />
-                        </option>
-                        <option value="red">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.red" />
-                        </option>
-                        <option value="white">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.white" />
-                        </option>
-                        <option value="blue">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.blue" />
-                        </option>
-                      </select>
+                      {state.newPrice.contract === 'day-type' ? (
+                        <input
+                          type="text"
+                          class="form-control"
+                          value={state.newPrice.day_type === 'any' ? '' : state.newPrice.day_type}
+                          placeholder={this.props.intl.dictionary.integration.energyMonitoring.dayTypePlaceholder}
+                          pattern="[a-z0-9][a-z0-9-]{0,31}"
+                          onInput={e => updateNewPrice({ day_type: e.target.value.trim() || 'any' })}
+                        />
+                      ) : (
+                        <select
+                          class="form-control"
+                          value={state.newPrice.day_type}
+                          onChange={e => updateNewPrice({ day_type: e.target.value })}
+                        >
+                          <option value="any">
+                            <Text id="integration.energyMonitoring.dayTypeOptions.any" />
+                          </option>
+                          <option value="red">
+                            <Text id="integration.energyMonitoring.dayTypeOptions.red" />
+                          </option>
+                          <option value="white">
+                            <Text id="integration.energyMonitoring.dayTypeOptions.white" />
+                          </option>
+                          <option value="blue">
+                            <Text id="integration.energyMonitoring.dayTypeOptions.blue" />
+                          </option>
+                        </select>
+                      )}
+                      {state.newPrice.contract === 'day-type' && !this.isDayTypeValid(state.newPrice.day_type) && (
+                        <small class="form-text text-danger">
+                          <Text id="integration.energyMonitoring.dayTypeInvalid" />
+                        </small>
+                      )}
                     </div>
                   </div>
                   <div class="col-md-3">
