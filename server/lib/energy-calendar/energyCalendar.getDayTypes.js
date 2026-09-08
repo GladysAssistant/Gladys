@@ -33,9 +33,9 @@ function validateDay(name, value) {
  * sorted by service name and tried in order, first success wins; a failing
  * candidate (stopped integration, third-party API down, invalid payload)
  * falls through to the next one.
- * @param {object} range - The requested range of days, inclusive.
- * @param {string} range.start_date - First day (YYYY-MM-DD).
- * @param {string} range.end_date - Last day (YYYY-MM-DD).
+ * @param {object} requestedRange - The requested range of days, inclusive.
+ * @param {string} requestedRange.start_date - First day (YYYY-MM-DD).
+ * @param {string} requestedRange.end_date - Last day (YYYY-MM-DD).
  * @returns {Promise<Map<string, string>>} Map of `YYYY-MM-DD` -> day type.
  * @example
  * const dayTypes = await gladys.energyCalendar.getDayTypes({
@@ -44,7 +44,8 @@ function validateDay(name, value) {
  * });
  * dayTypes.get('2026-09-05'); // 'weekend'
  */
-async function getDayTypes({ start_date: startDate, end_date: endDate } = {}) {
+async function getDayTypes(requestedRange) {
+  const { start_date: startDate, end_date: endDate } = requestedRange || {};
   validateDay('start_date', startDate);
   validateDay('end_date', endDate);
   if (startDate > endDate) {

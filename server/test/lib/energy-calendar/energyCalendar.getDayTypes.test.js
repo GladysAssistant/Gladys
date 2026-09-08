@@ -107,6 +107,7 @@ describe('energyCalendar.getDayTypes', () => {
     const provider = { energyCalendar: { getDayTypes: fake.resolves(DAY_TYPES) } };
     const energyCalendar = new EnergyCalendar(buildServiceManager({ 'ext-french-calendar': provider }));
     await expect(energyCalendar.getDayTypes()).to.be.rejectedWith(BadParameters);
+    await expect(energyCalendar.getDayTypes(null)).to.be.rejectedWith(BadParameters);
     await expect(energyCalendar.getDayTypes({ start_date: '2026-09-31', end_date: '2026-09-30' })).to.be.rejectedWith(
       BadParameters,
     );

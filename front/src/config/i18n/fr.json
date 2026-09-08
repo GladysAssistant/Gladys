@@ -1252,6 +1252,7 @@
       "startDate": "Date de début",
       "endDate": "Date de fin",
       "dayType": "Type de jour",
+      "dayTypeInvalid": "Le type de jour ne doit contenir que des lettres minuscules, des chiffres et des tirets, et commencer par une lettre ou un chiffre (32 caractères maximum).",
       "dayTypePlaceholder": "weekday, weekend...",
       "dayTypeContractHelp": "Les prix sont classés par type de jour publié par votre intégration de calendrier énergie (par exemple « weekday » et « weekend »). Un prix sans créneau horaire s'applique à toute la journée.",
       "dayTypeOptions": {

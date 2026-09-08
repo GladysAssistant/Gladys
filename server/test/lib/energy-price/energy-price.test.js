@@ -114,4 +114,25 @@ describe('energy-price', () => {
     });
     await assert.isRejected(promise, 'Validation error');
   });
+
+  it('should only accept the Tempo colors as day type of an EDF Tempo price', async () => {
+    const created = await energyPrice.create({
+      contract: 'edf-tempo',
+      price_type: 'consumption',
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1288,
+      day_type: 'blue',
+    });
+    expect(created).to.have.property('day_type', 'blue');
+    const promise = energyPrice.create({
+      contract: 'edf-tempo',
+      price_type: 'consumption',
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1288,
+      day_type: 'holiday',
+    });
+    await assert.isRejected(promise, 'must be one of red, blue, white for an EDF Tempo contract');
+  });
 });

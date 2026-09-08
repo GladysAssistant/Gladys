@@ -2717,6 +2717,7 @@
       "startDate": "Start Date",
       "endDate": "End Date",
       "dayType": "Day Type",
+      "dayTypeInvalid": "Day types must contain only lowercase letters, digits and hyphens, and start with a letter or a digit (32 characters max).",
       "dayTypePlaceholder": "weekday, weekend...",
       "dayTypeContractHelp": "The prices are keyed by the day type published by your energy calendar integration (for example \"weekday\" and \"weekend\"). A price without hour slots applies to the whole day.",
       "dayTypeOptions": {

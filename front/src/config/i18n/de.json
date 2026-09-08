@@ -1368,6 +1368,7 @@
       "startDate": "Startdatum",
       "endDate": "Enddatum",
       "dayType": "Tagestyp",
+      "dayTypeInvalid": "Der Tagestyp darf nur Kleinbuchstaben, Ziffern und Bindestriche enthalten und muss mit einem Buchstaben oder einer Ziffer beginnen (maximal 32 Zeichen).",
       "dayTypePlaceholder": "weekday, weekend...",
       "dayTypeContractHelp": "Die Preise werden nach dem Tagestyp Ihrer Energiekalender-Integration eingeordnet (zum Beispiel „weekday“ und „weekend“). Ein Preis ohne Zeitfenster gilt für den ganzen Tag.",
       "dayTypeOptions": {

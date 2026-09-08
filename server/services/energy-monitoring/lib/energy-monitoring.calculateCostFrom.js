@@ -133,9 +133,6 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           );
           return;
         }
-        // First, clean the cost feature states
-        logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
-        await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
         // Get the energy prices from this electrical meter device
         let meterPrices = pricesByElectricMeterDeviceId.get(electricMeterFeature.device_id);
         if (!meterPrices) {
@@ -178,13 +175,22 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
             `Device ${electricMeterFeature.device_id} has day-type prices and Map is empty, getting day types from the energy calendar`,
           );
           dayTypeMap = await this.gladys.energyCalendar.getDayTypes({
-            start_date: dayjs.tz(startAt, systemTimezone).format('YYYY-MM-DD'),
+            // a state at startAt covers the 30 minutes before it: the first
+            // consumption interval can fall on the previous calendar day
+            start_date: dayjs
+              .tz(new Date(startAt.getTime() - THIRTY_MINUTES_IN_MS), systemTimezone)
+              .format('YYYY-MM-DD'),
             end_date: dayjs()
               .tz(systemTimezone)
               .format('YYYY-MM-DD'),
           });
         }
         logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);
+        // Everything the run needs is loaded: only now clean the cost feature
+        // states, so a failing prerequisite (calendar or Tempo provider down)
+        // leaves the existing cost history untouched
+        logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
+        await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
         // We get all the states of the consumption feature in the time range
         const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
           ecf.consumptionFeature.selector,

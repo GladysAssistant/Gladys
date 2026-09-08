@@ -562,6 +562,13 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
         created_at: dayjs.tz('2025-01-04T15:30:00.000Z', 'Europe/Paris').toDate(),
       },
     ]);
+    // a cost computed by a previous run must survive a failing provider
+    await db.duckDbBatchInsertState('0f4133be-b86c-4a97-9cc8-585fadb74006', [
+      {
+        value: 1.692,
+        created_at: dayjs.tz('2025-01-04T15:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+    ]);
     gladys.energyCalendar.getDayTypes = fake.rejects(new Error('No energy calendar provider'));
     const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
     await energyMonitoring.calculateCostFrom(new Date('2025-01-01T00:00:00.000Z'));
@@ -570,7 +577,41 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       dayjs.tz('2025-01-01T00:00:00.000Z', 'Europe/Paris').toDate(),
       dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
     );
-    expect(deviceFeatureState).to.have.lengthOf(0);
+    expect(deviceFeatureState).to.have.lengthOf(1);
+    expect(deviceFeatureState[0]).to.have.property('value', 1.692);
+  });
+  it('should ask the calendar for the day before startAt (a state at midnight covers the previous day)', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.DAY_TYPE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1692,
+      day_type: 'weekday',
+    });
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.DAY_TYPE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1000,
+      day_type: 'weekend',
+    });
+    // Saturday 2025-01-04 00:00 Paris time: the interval is Friday 23:30-00:00
+    const startAt = dayjs.tz('2025-01-04 00:00:00', 'Europe/Paris').toDate();
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [{ value: 10, created_at: startAt }]);
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    await energyMonitoring.calculateCostFrom(startAt);
+    expect(gladys.energyCalendar.getDayTypes.firstCall.args[0].start_date).to.equal('2025-01-03');
+    const deviceFeatureState = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      dayjs.tz('2025-01-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+      dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+    );
+    expect(deviceFeatureState).to.have.lengthOf(1);
+    expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.1692);
   });
   it('should calculate cost from a specific date for a base contract on a daily consumption', async () => {
     // We create a new device with consumption & consumption cost

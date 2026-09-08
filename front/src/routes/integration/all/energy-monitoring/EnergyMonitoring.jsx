@@ -40,6 +40,9 @@ const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
   DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF10
 ];
 
+// same rule as the server model (t_energy_price.day_type)
+const DAY_TYPE_REGEX = /^[a-z0-9][a-z0-9-]{0,31}$/;
+
 class EnergyMonitoringPage extends Component {
   state = {
     devices: [],
@@ -313,9 +316,15 @@ class EnergyMonitoringPage extends Component {
     }
   };
 
+  isDayTypeValid = dayType => dayType === 'any' || DAY_TYPE_REGEX.test(dayType);
+
   savePrice = async () => {
     try {
       const payload = { ...this.state.newPrice };
+      // the day type input is free text: it must match what the server accepts
+      if (!this.isDayTypeValid(payload.day_type)) {
+        throw new Error('INVALID_DAY_TYPE');
+      }
       // Save hour slots from wizardHourSlots as comma-separated HH:MM string
       if (this.state.wizardHourSlots && this.state.wizardHourSlots.size > 0) {
         payload.hour_slots = this.formatSetToHourSlots(this.state.wizardHourSlots);
@@ -1164,6 +1173,11 @@ class EnergyMonitoringPage extends Component {
                             <Text id="integration.energyMonitoring.dayTypeOptions.blue" />
                           </option>
                         </select>
+                      )}
+                      {state.newPrice.contract === 'day-type' && !this.isDayTypeValid(state.newPrice.day_type) && (
+                        <small class="form-text text-danger">
+                          <Text id="integration.energyMonitoring.dayTypeInvalid" />
+                        </small>
                       )}
                     </div>
                   </div>
