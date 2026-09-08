@@ -1037,7 +1037,9 @@ class EnergyMonitoringPage extends Component {
                       <select
                         class="form-control"
                         value={state.newPrice.contract}
-                        onChange={e => updateNewPrice({ contract: e.target.value })}
+                        // the day types of one contract mean nothing to another
+                        // (Tempo colors vs calendar slugs): start from "any"
+                        onChange={e => updateNewPrice({ contract: e.target.value, day_type: 'any' })}
                       >
                         <option value="base">
                           <Text id="integration.energyMonitoring.contractTypes.base" />
