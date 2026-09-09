@@ -326,7 +326,7 @@
       "description": "Der Tablet-Modus wird für die Alarmfunktion verwendet. Wenn du den Alarm scharf schaltest, werden alle Tablets in deinem Zuhause gesperrt und zeigen eine Bildschirmtastatur an, um den Alarm zu deaktivieren.",
       "currentBrowserOnly": "<strong>Diese Einstellung gilt nur für dieses Gerät.</strong> Mit dem Speichern legst du fest, dass der Browser, den du gerade verwendest, ein Tablet ist. Jedes Gerät wird separat konfiguriert: Aktiviere den Tablet-Modus nur auf Geräten, die bei scharf geschaltetem Alarm gesperrt werden dürfen.",
       "fullScreenForce": "Wenn du ein Tablet dazu zwingen möchtest, im Vollbildmodus zu bleiben, füge der URL <code>?fullscreen=force</code> hinzu.",
-      "tabletModeForce": "Du kannst den Tablet-Modus für ein Zuhause auch direkt aktivieren, indem du der URL <code>?tabletmode=HAUS_SELEKTOR</code> hinzufügst, wobei <code>HAUS_SELEKTOR</code> der Selektor des oben ausgewählten Zuhauses ist.",
+      "tabletModeForce": "Du kannst den Tablet-Modus für ein Zuhause auch direkt aktivieren, indem du der URL <code>?tabletmode=HAUS_NAME</code> hinzufügst, wobei <code>HAUS_NAME</code> der Name des oben ausgewählten Zuhauses ist.",
       "houseLabel": "Zuhause dieses Tablets",
       "howToDisable": "Um den Tablet-Modus auf einem Gerät zu deaktivieren, öffne dieses Menü auf dem betreffenden Gerät und wähle „Tablet-Modus deaktiviert“.",
       "tabletModeDisabled": "Tablet-Modus deaktiviert"

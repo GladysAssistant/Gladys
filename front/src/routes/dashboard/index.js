@@ -186,25 +186,38 @@ class Dashboard extends Component {
     }
   };
 
-  // Mirrors checkIfFullScreenParameterIsHere: ?tabletmode=<house_selector> in
-  // the URL activates tablet mode for that house directly, the same way the
-  // "Tablet Mode" menu (SetTabletMode.jsx) does, without going through its UI.
-  // Unlike ?fullscreen=force, this persists server-side on the session, so it
-  // is ignored on Gladys Plus: the "Tablet Mode" menu is hidden there
+  // Mirrors checkIfFullScreenParameterIsHere: ?tabletmode=<house_name_or_selector>
+  // in the URL activates tablet mode for that house directly, the same way
+  // the "Tablet Mode" menu (SetTabletMode.jsx) does, without going through
+  // its UI. Matched against the house name first - the selector is an
+  // internal slug never shown in the UI (the menu's dropdown only displays
+  // house.name) - falling back to the selector for anyone who already knows
+  // it. Unlike ?fullscreen=force, this persists server-side on the session,
+  // so it is ignored on Gladys Plus: the "Tablet Mode" menu is hidden there
   // (isGladysPlus in DashboardPage.jsx), which would leave a Plus browser
   // locked by the house alarm with no UI to turn tablet mode back off.
   checkIfTabletModeParameterIsHere = async () => {
-    const houseSelector = this.props.tabletmode;
-    if (!houseSelector || this.state.isGladysPlus) {
+    const houseNameOrSelector = this.props.tabletmode;
+    if (!houseNameOrSelector || this.state.isGladysPlus) {
       return;
     }
     try {
+      const houses = await this.props.httpClient.get('/api/v1/house');
+      const house =
+        houses &&
+        houses.find(
+          h => h.selector === houseNameOrSelector || h.name.toLowerCase() === houseNameOrSelector.toLowerCase()
+        );
+      if (!house) {
+        console.error(`?tabletmode=${houseNameOrSelector} does not match any house`);
+        return;
+      }
       await this.props.httpClient.post('/api/v1/session/tablet_mode', {
         tablet_mode: true,
-        house: houseSelector
+        house: house.selector
       });
       await this.props.refreshTabletMode();
-      this.props.session.setTabletModeCurrentHouseSelector(houseSelector);
+      this.props.session.setTabletModeCurrentHouseSelector(house.selector);
     } catch (e) {
       console.error(e);
     }
