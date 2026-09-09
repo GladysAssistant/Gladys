@@ -4,9 +4,15 @@ import { route } from 'preact-router';
 
 import DashboardPage from './DashboardPage';
 import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
-import actions from '../../actions/dashboard';
+import dashboardActions from '../../actions/dashboard';
+import mainActions from '../../actions/main';
 import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
+
+// dashboard actions plus refreshTabletMode (main.js), needed to sync the
+// store's tabletMode after the ?tabletmode=<house_selector> URL param below
+// activates it server-side
+const actions = store => ({ ...dashboardActions(store), ...mainActions(store) });
 
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
@@ -180,6 +186,26 @@ class Dashboard extends Component {
     }
   };
 
+  // Mirrors checkIfFullScreenParameterIsHere: ?tabletmode=<house_selector> in
+  // the URL activates tablet mode for that house directly, the same way the
+  // "Tablet Mode" menu (SetTabletMode.jsx) does, without going through its UI.
+  checkIfTabletModeParameterIsHere = async () => {
+    const houseSelector = this.props.tabletmode;
+    if (!houseSelector) {
+      return;
+    }
+    try {
+      await this.props.httpClient.post('/api/v1/session/tablet_mode', {
+        tablet_mode: true,
+        house: houseSelector
+      });
+      await this.props.refreshTabletMode();
+      this.props.session.setTabletModeCurrentHouseSelector(houseSelector);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   init = async () => {
     await this.getDashboards();
     // fire and forget, concurrent with the current dashboard's own fetch:
@@ -307,6 +333,7 @@ class Dashboard extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
     this.checkIfFullScreenParameterIsHere();
+    this.checkIfTabletModeParameterIsHere();
   }
 
   // Client-side dashboard switch: the dashboard list is already loaded, and

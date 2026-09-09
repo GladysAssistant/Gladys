@@ -122,6 +122,9 @@ class SetTabletMode extends Component {
                   <p>
                     <MarkupText id="dashboard.tabletMode.fullScreenForce" />
                   </p>
+                  <p>
+                    <MarkupText id="dashboard.tabletMode.tabletModeForce" />
+                  </p>
                   <div className="form-group">
                     <button class="btn btn-success" onClick={this.saveTabletMode}>
                       <Text id="global.save" />
