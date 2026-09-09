@@ -189,9 +189,13 @@ class Dashboard extends Component {
   // Mirrors checkIfFullScreenParameterIsHere: ?tabletmode=<house_selector> in
   // the URL activates tablet mode for that house directly, the same way the
   // "Tablet Mode" menu (SetTabletMode.jsx) does, without going through its UI.
+  // Unlike ?fullscreen=force, this persists server-side on the session, so it
+  // is ignored on Gladys Plus: the "Tablet Mode" menu is hidden there
+  // (isGladysPlus in DashboardPage.jsx), which would leave a Plus browser
+  // locked by the house alarm with no UI to turn tablet mode back off.
   checkIfTabletModeParameterIsHere = async () => {
     const houseSelector = this.props.tabletmode;
-    if (!houseSelector) {
+    if (!houseSelector || this.state.isGladysPlus) {
       return;
     }
     try {
