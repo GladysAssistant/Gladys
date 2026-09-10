@@ -5,6 +5,7 @@ const dayjs = require('dayjs');
 require('dayjs/locale/en');
 require('dayjs/locale/fr');
 require('dayjs/locale/de');
+require('dayjs/locale/es');
 
 const LocalizedFormat = require('dayjs/plugin/localizedFormat');
 const db = require('../../models');
