@@ -84,6 +84,17 @@ arming is still `disarmed` in database until the delay elapses, which is why `di
 Scenes pass `disableWaitTime = true`: the delay exists to let someone walk out of the house, and a
 scene is not a person walking out.
 
+An arming already counting down is **replaced**, never stacked: asking for Night while Presence is
+pending clears the first timer, so a single mode is written at the end. `panic` clears it too — a
+timer firing afterwards would overwrite `triggered` with the mode it was asked for and switch the
+alarm back off. And `armHouse` removes its own entry when it completes, so a house that finished
+arming is no longer reported as "arming in progress" to `disarm`.
+
+Because cancelling a countdown means disarming, the widget offers no way to go straight from one
+arming mode to another: the other two tiles are disabled while the house is armed. On a wall
+tablet, "Cancel" must never quietly mean "turn the alarm off" — the way from one mode to another
+goes through Disarm.
+
 The timeout lives in memory. A restart during a countdown loses it, and the house stays disarmed —
 the behavior that was already in place, unchanged here.
 
@@ -182,6 +193,11 @@ original migration created it as `STRING`), so the values are rewritten in place
 recreation.
 
 - `t_house`: `partially-armed` → `presence-armed`, `armed` → `away-armed`, `panic` → `triggered`.
+  Partial was semantically Stay — arming part of the house while its occupants live in it — which
+  is what presence means, so that is where it lands. Some people stretched it into a night mode for
+  want of one, and their houses and scenes will come up in Presence: Gladys never recorded *why*
+  partial was used, so there is no way to tell the two populations apart. Worth a line in the
+  release notes.
 - `t_scene.actions`: the same remapping on `alarm.set-alarm-mode` and `alarm.check-alarm-mode`,
   walking recursively into the `if` / `then` / `else` blocks of nested actions. An
   `alarm.set-alarm-mode` set to `panic` becomes an `alarm.trigger-panic` action.
@@ -189,7 +205,9 @@ recreation.
 
 Scenes are rewritten in raw SQL rather than through the model, so the Joi validator of `t_scene`
 cannot reject a scene over unrelated legacy content, and only the scenes that actually changed are
-written.
+written. A scene whose JSON cannot be parsed is logged and skipped rather than aborting the
+migration: the houses have already been rewritten by then, and giving up would leave the instance
+half migrated on every boot.
 
 ### B.8 What is not affected
 

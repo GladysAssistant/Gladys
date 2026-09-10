@@ -26,6 +26,12 @@ async function panic(selector) {
   if (house.alarm_mode === ALARM_MODES.TRIGGERED) {
     throw new ConflictError('House alarm is already triggered');
   }
+  // An arming in progress would otherwise fire later and overwrite the triggered state with the
+  // mode it was asked for, silently switching the alarm back off.
+  if (this.armingHouseTimeout.has(selector)) {
+    clearTimeout(this.armingHouseTimeout.get(selector));
+    this.armingHouseTimeout.delete(selector);
+  }
   // Update database
   await house.update({ alarm_mode: ALARM_MODES.TRIGGERED });
   // Check scene triggers

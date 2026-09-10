@@ -27,7 +27,12 @@ class AlarmComponent extends Component {
   state = {};
 
   arming = async payload => {
-    await this.setState({ arming: true, armingMode: payload && payload.mode });
+    // Two alarm widgets can sit on the same dashboard: only the one whose house is arming
+    // should show the countdown.
+    if (!payload || payload.house !== this.props.box.house) {
+      return;
+    }
+    await this.setState({ arming: true, armingMode: payload.mode });
   };
 
   cancelArming = async () => {
@@ -100,6 +105,10 @@ class AlarmComponent extends Component {
     const isCurrentlyArmingWithCoutdown = arming && house.alarm_delay_before_arming > 0;
     const triggered = house && house.alarm_mode === ALARM_MODES.TRIGGERED;
     const disarmed = house && house.alarm_mode === ALARM_MODES.DISARMED;
+    // Switching straight from one arming mode to another would start a countdown whose Cancel
+    // disarms the house — on a wall tablet, "Cancel" must never mean "turn the alarm off". The
+    // way from one mode to another goes through Disarm.
+    const modeSwitchBlocked = house && !disarmed;
     return (
       <div class="card">
         {props.box.name && (
@@ -146,7 +155,7 @@ class AlarmComponent extends Component {
                         <button
                           key={mode}
                           onClick={() => this.arm(route)}
-                          disabled={house.alarm_mode === mode || arming}
+                          disabled={modeSwitchBlocked || arming}
                           class={cx(style.alarmTile, tile, {
                             [style.alarmTileActive]: house.alarm_mode === mode
                           })}

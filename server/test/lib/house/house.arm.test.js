@@ -138,6 +138,35 @@ describe('house.arm', () => {
     });
   });
 
+  it('should replace a pending arming instead of stacking a second one', async () => {
+    await house.update('test-house', { alarm_delay_before_arming: 0.05 });
+    sinon.reset();
+
+    await house.arm('test-house', ALARM_MODES.PRESENCE_ARMED);
+    await house.arm('test-house', ALARM_MODES.NIGHT_ARMED);
+    expect(house.armingHouseTimeout.size).to.equal(1);
+
+    await Promise.delay(120);
+
+    // Only the mode asked for last is written, and the one it replaced never announced itself
+    const houseInDb = await house.getBySelector('test-house');
+    expect(houseInDb.alarm_mode).to.equal(ALARM_MODES.NIGHT_ARMED);
+    const triggerTypes = event.emit
+      .getCalls()
+      .filter((call) => call.args[0] === EVENTS.TRIGGERS.CHECK)
+      .map((call) => call.args[1].type);
+    expect(triggerTypes).to.not.include(EVENTS.ALARM.PRESENCE_ARM);
+    expect(triggerTypes).to.include(EVENTS.ALARM.NIGHT_ARM);
+  });
+  it('should stop reporting an arming in progress once the delay is over', async () => {
+    await house.update('test-house', { alarm_delay_before_arming: 0.05 });
+    await house.arm('test-house', ALARM_MODES.AWAY_ARMED);
+    expect(house.armingHouseTimeout.has('test-house')).to.equal(true);
+
+    await Promise.delay(120);
+
+    expect(house.armingHouseTimeout.has('test-house')).to.equal(false);
+  });
   it('should reject a mode that is not an arming mode', async () => {
     const promise = house.arm('test-house', ALARM_MODES.TRIGGERED);
     return assertChai.isRejected(promise, '"triggered" is not an alarm arming mode');

@@ -1,4 +1,5 @@
 const { ACTIONS, ALARM_MODES, EVENTS } = require('../utils/constants');
+const logger = require('../utils/logger');
 
 // Old alarm mode value -> new one. `panic` is no longer an arming mode: what it described is the
 // alarm going off, which is now its own state.
@@ -83,28 +84,35 @@ module.exports = {
 
     await Promise.all(
       scenes.map(async (scene) => {
-        const actions = typeof scene.actions === 'string' ? JSON.parse(scene.actions) : scene.actions;
-        const triggers = typeof scene.triggers === 'string' ? JSON.parse(scene.triggers) : scene.triggers;
+        try {
+          const actions = typeof scene.actions === 'string' ? JSON.parse(scene.actions) : scene.actions;
+          const triggers = typeof scene.triggers === 'string' ? JSON.parse(scene.triggers) : scene.triggers;
 
-        const newActions = Array.isArray(actions)
-          ? actions.map((group) => (Array.isArray(group) ? group.map(migrateAction) : group))
-          : actions;
-        const newTriggers = Array.isArray(triggers) ? triggers.map(migrateTrigger) : triggers;
+          const newActions = Array.isArray(actions)
+            ? actions.map((group) => (Array.isArray(group) ? group.map(migrateAction) : group))
+            : actions;
+          const newTriggers = Array.isArray(triggers) ? triggers.map(migrateTrigger) : triggers;
 
-        const actionsJson = JSON.stringify(newActions);
-        const triggersJson = JSON.stringify(newTriggers);
+          const actionsJson = JSON.stringify(newActions);
+          const triggersJson = JSON.stringify(newTriggers);
 
-        // Nothing to do for the scenes that never mentioned the alarm.
-        if (actionsJson === JSON.stringify(actions) && triggersJson === JSON.stringify(triggers)) {
-          return;
+          // Nothing to do for the scenes that never mentioned the alarm.
+          if (actionsJson === JSON.stringify(actions) && triggersJson === JSON.stringify(triggers)) {
+            return;
+          }
+
+          // Written in raw SQL rather than through the model: the Joi validator of t_scene would
+          // reject any unrelated legacy content still sitting in another scene field.
+          await queryInterface.sequelize.query(
+            'UPDATE t_scene SET actions = :actions, triggers = :triggers WHERE id = :id',
+            { replacements: { actions: actionsJson, triggers: triggersJson, id: scene.id } },
+          );
+        } catch (e) {
+          // One scene holding unparseable JSON must not abort the migration: the houses have
+          // already been rewritten, and giving up here would leave the instance half migrated
+          // on every boot. That scene keeps its old values and is reported instead.
+          logger.warn(`Alarm modes migration: skipping scene ${scene.id}, could not migrate it: ${e.message}`);
         }
-
-        // Written in raw SQL rather than through the model: the Joi validator of t_scene would
-        // reject any unrelated legacy content still sitting in another scene field.
-        await queryInterface.sequelize.query(
-          'UPDATE t_scene SET actions = :actions, triggers = :triggers WHERE id = :id',
-          { replacements: { actions: actionsJson, triggers: triggersJson, id: scene.id } },
-        );
       }),
     );
   },

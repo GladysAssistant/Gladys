@@ -159,6 +159,28 @@ describe('migration 20260910090000-alarm-modes-presence-night-away', () => {
       expect(JSON.parse(sceneUpdate.args[1].replacements.triggers)[0].type).to.equal(EVENTS.ALARM.AWAY_ARM);
     });
 
+    it('should skip a scene holding unparseable JSON rather than abort the migration', async () => {
+      const queryInterface = buildQueryInterface([
+        { id: 'scene-corrupt', actions: '{not json', triggers: null },
+        {
+          id: 'scene-ok',
+          actions: JSON.stringify([[{ type: ACTIONS.ALARM.SET_ALARM_MODE, house: 'main', alarm_mode: 'armed' }]]),
+          triggers: JSON.stringify([]),
+        },
+      ]);
+
+      await migration.up(queryInterface);
+
+      // The houses are already rewritten by then: giving up here would leave the instance half
+      // migrated on every boot, so the sound scene must still go through.
+      const sceneUpdates = queryInterface.sequelize.query
+        .getCalls()
+        .filter((call) => call.args[0].startsWith('UPDATE t_scene'));
+
+      expect(sceneUpdates).to.have.lengthOf(1);
+      expect(sceneUpdates[0].args[1].replacements.id).to.equal('scene-ok');
+    });
+
     it('should leave a scene with no actions and no triggers alone', async () => {
       const queryInterface = buildQueryInterface([{ id: 'scene-empty', actions: null, triggers: null }]);
 

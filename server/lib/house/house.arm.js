@@ -69,6 +69,8 @@ async function arm(selector, mode, disableWaitTime = false) {
   const waitTimeInMs = disableWaitTime ? 0 : house.alarm_delay_before_arming * 1000;
 
   const armHouse = async () => {
+    // The delay is over: this house is no longer arming, and `disarm` must not treat it as such.
+    this.armingHouseTimeout.delete(selector);
     // Update database
     await house.update({ alarm_mode: mode });
 
@@ -99,6 +101,13 @@ async function arm(selector, mode, disableWaitTime = false) {
       },
     });
   };
+
+  // An arming already running is replaced, never stacked: asking for Night while Presence is
+  // counting down must leave one timer, not two racing to write their own mode.
+  if (this.armingHouseTimeout.has(selector)) {
+    clearTimeout(this.armingHouseTimeout.get(selector));
+    this.armingHouseTimeout.delete(selector);
+  }
 
   // if the wait time is 0, just arm now
   if (waitTimeInMs === 0) {
