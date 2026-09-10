@@ -1,0 +1,22 @@
+[
+  {
+    "label": "light.turn-on.success",
+    "answers": ["He encendido la luz."]
+  },
+  {
+    "label": "light.turn-on.fail",
+    "answers": ["No he podido encender la luz."]
+  },
+  {
+    "label": "light.turn-off.success",
+    "answers": ["He apagado la luz."]
+  },
+  {
+    "label": "light.turn-off.fail",
+    "answers": ["No he podido apagar la luz."]
+  },
+  {
+    "label": "light.not-found",
+    "answers": ["No he encontrado ninguna luz en esta habitación."]
+  }
+]

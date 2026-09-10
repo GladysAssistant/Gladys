@@ -1,0 +1,572 @@
+[
+  {
+    "label": "weather.get.success.now.snow",
+    "answers": ["Está nevando fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.rain",
+    "answers": ["Está lloviendo y la temperatura fuera es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.clear",
+    "answers": ["Hoy es un día despejado. La temperatura fuera es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.cloud",
+    "answers": ["Está nublado fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.fog",
+    "answers": ["Hoy hay niebla. La temperatura fuera es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.sleet",
+    "answers": ["La temperatura fuera es de {{ temperature }} {{ units }}, con lluvia helada y aguanieve."]
+  },
+  {
+    "label": "weather.get.success.now.wind",
+    "answers": ["Hoy hace viento. La temperatura fuera es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.unknown",
+    "answers": ["La temperatura fuera es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.drizzle",
+    "answers": ["Llovizna ligera fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.thunderstorm",
+    "answers": ["Hay una tormenta fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.night",
+    "answers": ["El cielo está despejado esta noche y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.partly-cloudy",
+    "answers": ["Está parcialmente nublado fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.pouring",
+    "answers": ["Está lloviendo a cántaros fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.hail",
+    "answers": ["Está granizando fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.freezing-rain",
+    "answers": ["Hay lluvia helada fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.freezing-fog",
+    "answers": ["Hay niebla helada fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.snow-thunderstorm",
+    "answers": ["Hay chubascos de nieve con tormenta fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.sandstorm",
+    "answers": ["Hay una tormenta de arena fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.tornado",
+    "answers": ["Hay un tornado fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.hurricane",
+    "answers": ["Hay un huracán fuera y la temperatura es de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.today.snow",
+    "answers": [
+      "Hoy está nevando y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.rain",
+    "answers": [
+      "Hoy está lloviendo y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.clear",
+    "answers": [
+      "Hoy el cielo está despejado y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.cloud",
+    "answers": [
+      "Hoy el cielo está nublado y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.fog",
+    "answers": [
+      "Hoy hay niebla y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.sleet",
+    "answers": [
+      "Hoy la temperatura está entre {{temperature min}} {{units}} y {{temperature max}} {{units}} con lluvia helada."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.wind",
+    "answers": [
+      "Hoy hace mucho viento y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.unknown",
+    "answers": ["Hoy la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."]
+  },
+  {
+    "label": "weather.get.success.today.drizzle",
+    "answers": [
+      "Hoy hay llovizna ligera y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.thunderstorm",
+    "answers": [
+      "Hoy se esperan tormentas y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.night",
+    "answers": [
+      "Hoy la noche será despejada y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.partly-cloudy",
+    "answers": [
+      "Hoy el cielo está parcialmente nublado y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.pouring",
+    "answers": [
+      "Hoy se esperan lluvias intensas y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.hail",
+    "answers": [
+      "Hoy se espera granizo y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.freezing-rain",
+    "answers": [
+      "Hoy se espera lluvia helada y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.freezing-fog",
+    "answers": [
+      "Hoy se espera niebla helada y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.snow-thunderstorm",
+    "answers": [
+      "Hoy se esperan chubascos de nieve con tormenta y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.sandstorm",
+    "answers": [
+      "Hoy se espera una tormenta de arena y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.tornado",
+    "answers": [
+      "Hoy se espera un tornado y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.hurricane",
+    "answers": [
+      "Hoy se espera un huracán y la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.snow",
+    "answers": [
+      "Mañana nevará y la temperatura estará entre {{ temperature_min }} {{ units }} y {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.rain",
+    "answers": [
+      "Mañana lloverá y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.clear",
+    "answers": [
+      "Mañana el cielo estará despejado y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.cloud",
+    "answers": [
+      "Mañana habrá nubes y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.fog",
+    "answers": [
+      "Mañana habrá niebla y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.sleet",
+    "answers": [
+      "Mañana la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}} con lluvia helada."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.wind",
+    "answers": [
+      "Mañana hará viento y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.unknown",
+    "answers": ["Mañana la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."]
+  },
+  {
+    "label": "weather.get.success.tomorrow.drizzle",
+    "answers": [
+      "Mañana habrá llovizna ligera y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.thunderstorm",
+    "answers": [
+      "Mañana se esperan tormentas y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.night",
+    "answers": [
+      "Mañana la noche será despejada y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.partly-cloudy",
+    "answers": [
+      "Mañana el cielo estará parcialmente nublado y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.pouring",
+    "answers": [
+      "Mañana se esperan lluvias intensas y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.hail",
+    "answers": [
+      "Mañana se espera granizo y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.freezing-rain",
+    "answers": [
+      "Mañana se espera lluvia helada y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.freezing-fog",
+    "answers": [
+      "Mañana se espera niebla helada y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.snow-thunderstorm",
+    "answers": [
+      "Mañana se esperan chubascos de nieve con tormenta y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.sandstorm",
+    "answers": [
+      "Mañana se espera una tormenta de arena y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.tornado",
+    "answers": [
+      "Mañana se espera un tornado y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.hurricane",
+    "answers": [
+      "Mañana se espera un huracán y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.snow",
+    "answers": [
+      "Pasado mañana nevará y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.rain",
+    "answers": [
+      "Pasado mañana lloverá y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.clear",
+    "answers": [
+      "Pasado mañana el cielo estará despejado y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.cloud",
+    "answers": [
+      "Pasado mañana habrá nubes y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.fog",
+    "answers": [
+      "Pasado mañana habrá niebla y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.sleet",
+    "answers": [
+      "Pasado mañana la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}} con lluvia helada."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.wind",
+    "answers": [
+      "Pasado mañana hará viento y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.unknown",
+    "answers": [
+      "Pasado mañana la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.drizzle",
+    "answers": [
+      "Pasado mañana habrá llovizna ligera y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.thunderstorm",
+    "answers": [
+      "Pasado mañana se esperan tormentas y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.night",
+    "answers": [
+      "Pasado mañana la noche será despejada y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.partly-cloudy",
+    "answers": [
+      "Pasado mañana el cielo estará parcialmente nublado y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.pouring",
+    "answers": [
+      "Pasado mañana se esperan lluvias intensas y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.hail",
+    "answers": [
+      "Pasado mañana se espera granizo y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.freezing-rain",
+    "answers": [
+      "Pasado mañana se espera lluvia helada y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.freezing-fog",
+    "answers": [
+      "Pasado mañana se espera niebla helada y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.snow-thunderstorm",
+    "answers": [
+      "Pasado mañana se esperan chubascos de nieve con tormenta y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.sandstorm",
+    "answers": [
+      "Pasado mañana se espera una tormenta de arena y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.tornado",
+    "answers": [
+      "Pasado mañana se espera un tornado y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.hurricane",
+    "answers": [
+      "Pasado mañana se espera un huracán y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.snow",
+    "answers": [
+      "{{day}}, va a nevar y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.rain",
+    "answers": [
+      "{{ day }}, lloverá y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.clear",
+    "answers": [
+      "{{ day }}, el cielo estará despejado y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.cloud",
+    "answers": [
+      "{{ day }}, habrá nubes y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.fog",
+    "answers": [
+      "{{ day }} habrá niebla y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.sleet",
+    "answers": [
+      "{{ day }} la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}} con lluvia helada."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.wind",
+    "answers": [
+      "{{ day }} hará viento y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.unknown",
+    "answers": ["{{ day }} la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."]
+  },
+  {
+    "label": "weather.get.success.day.drizzle",
+    "answers": [
+      "{{ day }}, habrá llovizna ligera y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.thunderstorm",
+    "answers": [
+      "{{ day }}, se esperan tormentas y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.night",
+    "answers": [
+      "{{ day }}, la noche será despejada y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.partly-cloudy",
+    "answers": [
+      "{{ day }}, el cielo estará parcialmente nublado y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.pouring",
+    "answers": [
+      "{{ day }}, se esperan lluvias intensas y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.hail",
+    "answers": [
+      "{{ day }}, se espera granizo y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.freezing-rain",
+    "answers": [
+      "{{ day }}, se espera lluvia helada y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.freezing-fog",
+    "answers": [
+      "{{ day }}, se espera niebla helada y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.snow-thunderstorm",
+    "answers": [
+      "{{ day }}, se esperan chubascos de nieve con tormenta y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.sandstorm",
+    "answers": [
+      "{{ day }}, se espera una tormenta de arena y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.tornado",
+    "answers": [
+      "{{ day }}, se espera un tornado y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.hurricane",
+    "answers": [
+      "{{ day }}, se espera un huracán y la temperatura estará entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.fail",
+    "answers": ["Se produjo un error al obtener el tiempo."]
+  },
+  {
+    "label": "weather.get.fail.not-configured",
+    "answers": ["Debes configurar la API de OpenWeather en la pestaña de Integración antes de usar esta función."]
+  },
+  {
+    "label": "weather.get.fail.no-weather",
+    "answers": ["No se pudo encontrar la previsión meteorológica para ese día."]
+  },
+  {
+    "label": "weather.get.fail.no-house",
+    "answers": ["Primero debes configurar tu casa y su ubicación en los parámetros."]
+  }
+]
