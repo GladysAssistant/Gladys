@@ -21,7 +21,7 @@ describe('house.disarmWithCode', () => {
     await house.update('test-house', {
       alarm_code: '123456',
       alarm_delay_before_arming: 0,
-      alarm_mode: ALARM_MODES.ARMED,
+      alarm_mode: ALARM_MODES.AWAY_ARMED,
     });
     sinon.reset();
     house.alarmCodeRateLimit.delete('test-house');
@@ -80,7 +80,7 @@ describe('house.disarmWithCode', () => {
       alarm_delay_before_arming: 5,
       alarm_mode: ALARM_MODES.DISARMED,
     });
-    await house.arm('test-house');
+    await house.arm('test-house', ALARM_MODES.AWAY_ARMED);
     sinon.reset();
     await house.disarmWithCode('test-house', '123456');
     // Timeout should be deleted

@@ -5,11 +5,12 @@ const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
 
 /**
  * @public
- * @description Make house alarm in panic mode.
- * @param {object} selector - Selector of the house.
+ * @description Set off the alarm of a house. Panic is an action, not an arming mode: it leaves
+ * the house in the `triggered` state whatever mode it was armed in.
+ * @param {string} selector - Selector of the house.
  * @returns {Promise} Resolve with house object.
  * @example
- * const mainHouse = await gladys.house.arm('main-house');
+ * const mainHouse = await gladys.house.panic('main-house');
  */
 async function panic(selector) {
   const house = await db.House.findOne({
@@ -22,11 +23,17 @@ async function panic(selector) {
     throw new NotFoundError('House not found');
   }
 
-  if (house.alarm_mode === ALARM_MODES.PANIC) {
-    throw new ConflictError('House is already in panic mode');
+  if (house.alarm_mode === ALARM_MODES.TRIGGERED) {
+    throw new ConflictError('House alarm is already triggered');
+  }
+  // An arming in progress would otherwise fire later and overwrite the triggered state with the
+  // mode it was asked for, silently switching the alarm back off.
+  if (this.armingHouseTimeout.has(selector)) {
+    clearTimeout(this.armingHouseTimeout.get(selector));
+    this.armingHouseTimeout.delete(selector);
   }
   // Update database
-  await house.update({ alarm_mode: ALARM_MODES.PANIC });
+  await house.update({ alarm_mode: ALARM_MODES.TRIGGERED });
   // Check scene triggers
   this.event.emit(EVENTS.TRIGGERS.CHECK, {
     type: EVENTS.ALARM.PANIC,
@@ -34,7 +41,7 @@ async function panic(selector) {
   });
   // Emit websocket event to update UI
   this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.ALARM.PANIC,
+    type: WEBSOCKET_MESSAGE_TYPES.ALARM.TRIGGERED,
     payload: {
       house: selector,
     },

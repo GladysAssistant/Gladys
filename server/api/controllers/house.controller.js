@@ -1,6 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { Error400 } = require('../../utils/httpErrors');
-const { ERROR_MESSAGES } = require('../../utils/constants');
+const { ALARM_MODES, ERROR_MESSAGES } = require('../../utils/constants');
 
 /**
  * @apiDefine HouseParam
@@ -130,12 +130,13 @@ module.exports = function HouseController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/house/:house_selector/arm arm
-   * @apiName arm
+   * @api {post} /api/v1/house/:house_selector/away_arm Away arm
+   * @apiName awayArm
    * @apiGroup Alarm
+   * @apiDescription Arm the alarm in "away" mode, after the delay configured on the house.
    */
-  async function arm(req, res) {
-    await gladys.house.arm(req.params.house_selector);
+  async function awayArm(req, res) {
+    await gladys.house.arm(req.params.house_selector, ALARM_MODES.AWAY_ARMED);
     res.json({ success: true });
   }
 
@@ -160,13 +161,25 @@ module.exports = function HouseController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/house/:house_selector/partial_arm Partial Arm
-   * @apiName Partial Arm
+   * @api {post} /api/v1/house/:house_selector/presence_arm Presence arm
+   * @apiName presenceArm
    * @apiGroup Alarm
+   * @apiDescription Arm the alarm in "presence" mode, after the delay configured on the house.
    */
-  async function partialArm(req, res) {
-    const house = await gladys.house.partialArm(req.params.house_selector);
-    res.json(house);
+  async function presenceArm(req, res) {
+    await gladys.house.arm(req.params.house_selector, ALARM_MODES.PRESENCE_ARMED);
+    res.json({ success: true });
+  }
+
+  /**
+   * @api {post} /api/v1/house/:house_selector/night_arm Night arm
+   * @apiName nightArm
+   * @apiGroup Alarm
+   * @apiDescription Arm the alarm in "night" mode, after the delay configured on the house.
+   */
+  async function nightArm(req, res) {
+    await gladys.house.arm(req.params.house_selector, ALARM_MODES.NIGHT_ARMED);
+    res.json({ success: true });
   }
 
   /**
@@ -217,10 +230,11 @@ module.exports = function HouseController(gladys) {
     userSeen: asyncMiddleware(userSeen),
     getRooms: asyncMiddleware(getRooms),
     getSunState: asyncMiddleware(getSunState),
-    arm: asyncMiddleware(arm),
+    awayArm: asyncMiddleware(awayArm),
+    presenceArm: asyncMiddleware(presenceArm),
+    nightArm: asyncMiddleware(nightArm),
     disarm: asyncMiddleware(disarm),
     disarmWithCode: asyncMiddleware(disarmWithCode),
-    partialArm: asyncMiddleware(partialArm),
     panic: asyncMiddleware(panic),
   });
 };

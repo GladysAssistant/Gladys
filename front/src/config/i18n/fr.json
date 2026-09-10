@@ -683,17 +683,15 @@
         "imageError": "Impossible de charger cette image."
       },
       "alarm": {
-        "armButton": "Armer",
         "disarmButton": "Désarmer",
-        "partiallyArmedButton": "Armement",
-        "partiallyArmedButtonSecondLine": "partiel",
         "panicButton": "Panique",
         "editBoxNameLabel": "Nom du widget (optionnel)",
         "editBoxNamePlaceholder": "Entrez le nom du widget",
         "editHouseLabel": "Sélectionnez la maison qui est concernée pour l'activation/désactivation de l'alarme.",
         "alarmStatusText": "Votre maison est ",
         "alarmArming": "Votre maison est en train d'être armée...",
-        "cancelAlarmArming": "Annuler"
+        "cancelAlarmArming": "Annuler",
+        "alarmArmingInMode": "Armement en mode"
       },
       "music": {
         "selectDeviceLabel": "Sélectionner l'appareil à contrôler"
@@ -780,9 +778,10 @@
         "error": "Erreur",
         "alarmModes": {
           "disarmed": "Désactivée",
-          "armed": "Activée",
-          "partially-armed": "Partiellement activée",
-          "panic": "Panique"
+          "presence-armed": "Présence",
+          "night-armed": "Nuit",
+          "away-armed": "Absence",
+          "triggered": "Déclenchée"
         }
       },
       "actions": {
@@ -3575,6 +3574,10 @@
         "computedExplanationText": "À la place d'un volume fixe, vous pouvez entrer ici un calcul basé sur une variable de scène, par exemple pour parler moins fort la nuit. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc.",
         "textLabel": "Message à dire sur l'enceinte",
         "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
+      },
+      "alarmTriggerPanic": {
+        "description": "Cette action fait passer l'alarme de la maison sélectionnée en état déclenché.",
+        "houseLabel": "Maison"
       }
     },
     "actions": {
@@ -3638,7 +3641,8 @@
       },
       "alarm": {
         "check-alarm-mode": "Si l'alarme est en mode",
-        "set-alarm-mode": "Passer l'alarme en mode"
+        "set-alarm-mode": "Passer l'alarme en mode",
+        "trigger-panic": "Déclencher la panique"
       },
       "mqtt": {
         "send": "Envoyer un message MQTT"
@@ -3702,7 +3706,8 @@
       },
       "alarm": {
         "check-alarm-mode": "Continuer seulement si l'alarme est dans un mode donné",
-        "set-alarm-mode": "Armer ou désarmer l'alarme d'une maison"
+        "set-alarm-mode": "Armer ou désarmer l'alarme d'une maison",
+        "trigger-panic": "Faire hurler l'alarme d'une maison, quel que soit son mode"
       },
       "calendar": {
         "is-event-running": "Continuer selon qu'un évènement de calendrier est en cours",
@@ -3804,11 +3809,12 @@
         "event-is-coming": "Un évènement dans le calendrier arrive"
       },
       "alarm": {
-        "arm": "L'alarme est armée",
         "arming": "L'alarme est en cours d'armement",
+        "presence-arm": "L'alarme est armée en mode Présence",
+        "night-arm": "L'alarme est armée en mode Nuit",
+        "away-arm": "L'alarme est armée en mode Absence",
         "disarm": "L'alarme est désarmée",
-        "partial-arm": "L'alarme est armée partiellement",
-        "panic": "L'alarme est en mode panique",
+        "panic": "La panique est déclenchée",
         "too-many-codes-tests": "Alarme : Trop de codes invalides"
       },
       "system": {
@@ -3847,11 +3853,12 @@
         "user-left": "Quand un utilisateur sort d'une zone de la carte"
       },
       "alarm": {
-        "arm": "Quand l'alarme vient d'être armée",
         "arming": "Pendant le délai avant l'armement de l'alarme",
-        "partial-arm": "Quand l'alarme passe en mode partiel (nuit)",
+        "presence-arm": "Quand l'alarme passe en mode Présence",
+        "night-arm": "Quand l'alarme passe en mode Nuit",
+        "away-arm": "Quand l'alarme passe en mode Absence",
         "disarm": "Quand l'alarme est désarmée",
-        "panic": "Quand le mode panique est déclenché",
+        "panic": "Quand la panique est déclenchée",
         "too-many-codes-tests": "Quand trop de codes invalides ont été essayés"
       },
       "system": {
@@ -3972,11 +3979,12 @@
       },
       "alarmMode": {
         "alarm": {
-          "arm": "Ce déclencheur se lancera quand la maison sélectionnée est armée.",
           "arming": "Ce déclencheur se lancera quand la maison sélectionnée va être armée.",
+          "presence-arm": "Ce déclencheur se lancera quand la maison sélectionnée est armée en mode Présence.",
+          "night-arm": "Ce déclencheur se lancera quand la maison sélectionnée est armée en mode Nuit.",
+          "away-arm": "Ce déclencheur se lancera quand la maison sélectionnée est armée en mode Absence.",
           "disarm": "Ce déclencheur se lancera quand la maison sélectionnée est désarmée.",
-          "partial-arm": "Ce déclencheur se lancera quand la maison sélectionnée est armée partiellement.",
-          "panic": "Ce déclencheur se lancera quand la maison sélectionnée est en mode panique.",
+          "panic": "Ce déclencheur se lancera quand la panique est déclenchée dans la maison sélectionnée.",
           "too-many-codes-tests": "Ce déclencheur se lancera à chaque échec de saisie du code de l'alarme à partir de 3 essais ratés."
         },
         "houseLabel": "Maison"
@@ -4755,10 +4763,11 @@
     "restoreFailed": "La restauration de votre backup a échoué. Êtes-vous sûr que votre clé de sauvegarde est la même que celle utilisée par Gladys lorsque le backup a été créé ? Vous pouvez modifier la clé de sauvegarde dans l'onglet Gladys Plus des paramètres."
   },
   "alarmModes": {
-    "armed": "armée",
     "disarmed": "désarmée",
-    "partially-armed": "armée partiellement",
-    "panic": "en mode panique"
+    "presence-armed": "armée en mode Présence",
+    "night-armed": "armée en mode Nuit",
+    "away-armed": "armée en mode Absence",
+    "triggered": "déclenchée"
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
@@ -6550,5 +6559,12 @@
     "closed": "Fermé",
     "on": "Allumé",
     "off": "Éteint"
+  },
+  "alarmModeNames": {
+    "disarmed": "Désarmée",
+    "presence-armed": "Présence",
+    "night-armed": "Nuit",
+    "away-armed": "Absence",
+    "triggered": "Déclenchée"
   }
 }
