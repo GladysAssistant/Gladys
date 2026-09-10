@@ -1005,7 +1005,7 @@
         "closeText": "Puede cerrar esta ventana.",
         "backToConfigButton": "Volver a la configuración"
       },
-     "supervision": {
+      "supervision": {
         "title": "Supervisión",
         "loadError": "Se produjo un error al cargar la integración.",
         "actionError": "Se produjo un error al ejecutar esta acción.",
@@ -2006,7 +2006,7 @@
         "noDeviceFound": "No se encontró ningún dispositivo Sonos.",
         "featuresLabel": "Funciones"
       },
-"discover": {
+      "discover": {
         "title": "Dispositivos detectados en su red local",
         "description": "Los dispositivos Sonos se descubren automáticamente.",
         "error": "Error al descubrir los dispositivos Sonos. ¿Está su altavoz Sonos encendido y accesible en la red local?",
@@ -2993,7 +2993,7 @@
         "conflictError": "El dispositivo actual ya está en Gladys."
       }
     },
-   "nuki": {
+    "nuki": {
       "title": "Nuki",
       "description": "Controle sus dispositivos Nuki.",
       "deviceTab": "Dispositivos",
@@ -5002,7 +5002,7 @@
           "one": "Abierta",
           "other": "Cerrada"
         },
-       "state": {
+        "state": {
           "zero": "Detener",
           "one": "Abrir",
           "other": "Cerrar"
@@ -6006,7 +6006,7 @@
       "discharge-index": "Índice de descarga",
       "battery-energy-remaining": "Energía restante de la batería"
     },
-   "teleinformation": {
+    "teleinformation": {
       "shortCategoryName": "Teleinformación",
       "binary": "Interruptor",
       "east": "Energía activa total entregada (EAST)",

@@ -4,4 +4,9 @@ import de from './de.json';
 import es from './es.json';
 import { AVAILABLE_LANGUAGES } from '../../../../server/utils/constants';
 
-export default { [AVAILABLE_LANGUAGES.FR]: fr, [AVAILABLE_LANGUAGES.EN]: en, [AVAILABLE_LANGUAGES.DE]: de, [AVAILABLE_LANGUAGES.ES]: es};
+export default {
+  [AVAILABLE_LANGUAGES.FR]: fr,
+  [AVAILABLE_LANGUAGES.EN]: en,
+  [AVAILABLE_LANGUAGES.DE]: de,
+  [AVAILABLE_LANGUAGES.ES]: es
+};
