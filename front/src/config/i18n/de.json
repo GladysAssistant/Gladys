@@ -698,17 +698,15 @@
         "imageError": "Dieses Bild konnte nicht geladen werden."
       },
       "alarm": {
-        "armButton": "Einschalten",
         "disarmButton": "Ausschalten",
-        "partiallyArmedButton": "Teilweise eingeschaltet",
-        "partiallyArmedButtonSecondLine": "Einschalten",
         "panicButton": "Panik",
         "editBoxNameLabel": "Widget-Name (optional)",
         "editBoxNamePlaceholder": "Gib den Widget-Namen ein",
         "editHouseLabel": "Wähle das Zuhause für die Aktivierung/Deaktivierung des Alarms.",
         "alarmStatusText": "Dein Zuhause ist ",
         "alarmArming": "Die Alarmanlage in deinem Zuhause wird scharf geschaltet …",
-        "cancelAlarmArming": "Abbrechen"
+        "cancelAlarmArming": "Abbrechen",
+        "alarmArmingInMode": "Scharfschaltung im Modus"
       },
       "music": {
         "selectDeviceLabel": "Wähle das zu steuernde Gerät aus"
@@ -780,9 +778,10 @@
         "error": "Fehler",
         "alarmModes": {
           "disarmed": "Deaktiviert",
-          "armed": "Aktiviert",
-          "partially-armed": "Teilweise aktiviert",
-          "panic": "Panik"
+          "presence-armed": "Anwesenheit",
+          "night-armed": "Nacht",
+          "away-armed": "Abwesenheit",
+          "triggered": "Ausgelöst"
         }
       },
       "actions": {
@@ -3575,6 +3574,10 @@
         "computedExplanationText": "Anstelle einer festen Lautstärke kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben, zum Beispiel um nachts leiser zu sprechen. Um eine Variable einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Block das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "textLabel": "Nachricht zum Sprechen auf dem Lautsprecher",
         "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Hinweis: Du musst vor diesem Block eine Variable in einer \"Letzten Zustand abrufen\"-Aktion definiert haben."
+      },
+      "alarmTriggerPanic": {
+        "description": "Diese Aktion versetzt die Alarmanlage des ausgewählten Hauses in den ausgelösten Zustand.",
+        "houseLabel": "Haus"
       }
     },
     "actions": {
@@ -3638,7 +3641,8 @@
       },
       "alarm": {
         "check-alarm-mode": "Wenn der Alarm im Modus ist",
-        "set-alarm-mode": "Alarmmodus setzen auf"
+        "set-alarm-mode": "Alarmmodus setzen auf",
+        "trigger-panic": "Panikalarm auslösen"
       },
       "mqtt": {
         "send": "MQTT-Message senden"
@@ -3702,7 +3706,8 @@
       },
       "alarm": {
         "check-alarm-mode": "Nur fortfahren, wenn sich der Alarm in einem bestimmten Modus befindet",
-        "set-alarm-mode": "Die Alarmanlage eines Hauses scharf oder unscharf schalten"
+        "set-alarm-mode": "Die Alarmanlage eines Hauses scharf oder unscharf schalten",
+        "trigger-panic": "Die Alarmanlage eines Hauses auslösen, unabhängig vom Modus"
       },
       "calendar": {
         "is-event-running": "Fortfahren, je nachdem ob gerade ein Kalendertermin läuft",
@@ -3804,12 +3809,13 @@
         "event-is-coming": "Kalenderereignis steht bevor"
       },
       "alarm": {
-        "arm": "Der Alarm ist scharf geschaltet",
-        "arming": "Der Alarm wird scharf geschaltet",
-        "disarm": "Der Alarm ist deaktiviert",
-        "partial-arm": "Der Alarm ist teilweise scharf geschaltet",
-        "panic": "Der Alarm befindet sich im Panikmodus",
-        "too-many-codes-tests": "Zu viele Fehlversuche bei Eingabe des Alarmcodes"
+        "arming": "Die Alarmanlage wird scharf geschaltet",
+        "presence-arm": "Die Alarmanlage ist im Modus Anwesenheit scharf",
+        "night-arm": "Die Alarmanlage ist im Modus Nacht scharf",
+        "away-arm": "Die Alarmanlage ist im Modus Abwesenheit scharf",
+        "disarm": "Die Alarmanlage ist deaktiviert",
+        "panic": "Der Panikalarm wird ausgelöst",
+        "too-many-codes-tests": "Alarm: Zu viele ungültige Codes"
       },
       "system": {
         "start": "Gladys startet"
@@ -3847,12 +3853,13 @@
         "user-left": "Wenn ein Benutzer einen Bereich der Karte verlässt"
       },
       "alarm": {
-        "arm": "Wenn die Alarmanlage gerade scharf geschaltet wurde",
         "arming": "Während der Verzögerung vor dem Scharfschalten",
-        "partial-arm": "Wenn die Alarmanlage in den Teilmodus (Nacht) wechselt",
-        "disarm": "Wenn die Alarmanlage unscharf geschaltet wird",
-        "panic": "Wenn der Panikmodus ausgelöst wird",
-        "too-many-codes-tests": "Wenn zu oft ein ungültiger Code eingegeben wurde"
+        "presence-arm": "Wenn die Alarmanlage in den Modus Anwesenheit wechselt",
+        "night-arm": "Wenn die Alarmanlage in den Modus Nacht wechselt",
+        "away-arm": "Wenn die Alarmanlage in den Modus Abwesenheit wechselt",
+        "disarm": "Wenn die Alarmanlage deaktiviert wird",
+        "panic": "Wenn der Panikalarm ausgelöst wird",
+        "too-many-codes-tests": "Wenn zu viele ungültige Codes eingegeben wurden"
       },
       "system": {
         "start": "Wenn Gladys startet oder neu startet"
@@ -3972,12 +3979,13 @@
       },
       "alarmMode": {
         "alarm": {
-          "arm": "Dieser Auslöser wird aktiviert, wenn der Alarm im ausgewählten Zuhause scharf geschaltet ist.",
-          "arming": "Dieser Auslöser wird aktiviert, wenn der Alarm im ausgewählten Zuhause gerade scharf geschaltet wird.",
-          "disarm": "Dieser Auslöser wird aktiviert, wenn der Alarm im ausgewählten Zuhause nicht scharf geschaltet ist.",
-          "partial-arm": "Dieser Auslöser wird aktiviert, wenn der Alarm im ausgewählten Zuhause teilweise scharf geschaltet ist.",
-          "panic": "Dieser Auslöser wird aktiviert, wenn der Alarm im ausgewählten Zuhause im Panikmodus ist.",
-          "too-many-codes-tests": "Dieser Auslöser wird bei drei Fehleingaben des Alarmcodes ausgelöst."
+          "arming": "Dieser Auslöser wird aktiviert, wenn das ausgewählte Haus scharf geschaltet wird.",
+          "presence-arm": "Dieser Auslöser wird aktiviert, wenn das ausgewählte Haus im Modus Anwesenheit scharf ist.",
+          "night-arm": "Dieser Auslöser wird aktiviert, wenn das ausgewählte Haus im Modus Nacht scharf ist.",
+          "away-arm": "Dieser Auslöser wird aktiviert, wenn das ausgewählte Haus im Modus Abwesenheit scharf ist.",
+          "disarm": "Dieser Auslöser wird aktiviert, wenn das ausgewählte Haus deaktiviert wird.",
+          "panic": "Dieser Auslöser wird aktiviert, wenn im ausgewählten Haus der Panikalarm ausgelöst wird.",
+          "too-many-codes-tests": "Dieser Auslöser wird bei jeder fehlgeschlagenen Eingabe des Alarmcodes ab 3 Fehlversuchen aktiviert."
         },
         "houseLabel": "Haus"
       },
@@ -4755,10 +4763,11 @@
     "restoreFailed": "Die Wiederherstellung des Backups ist fehlgeschlagen. Bist du sicher, dass du denselben Schlüssel wie während des Backups verwendest? Du kannst zum Tab \"Gladys Plus\" in den Einstellungen gehen, um einen anderen Backup-Schlüssel festzulegen."
   },
   "alarmModes": {
-    "armed": "eingeschaltet",
-    "disarmed": "ausgeschaltet",
-    "partially-armed": "teilweise eingeschaltet",
-    "panic": "im Panikmodus"
+    "disarmed": "deaktiviert",
+    "presence-armed": "im Modus Anwesenheit scharf",
+    "night-armed": "im Modus Nacht scharf",
+    "away-armed": "im Modus Abwesenheit scharf",
+    "triggered": "ausgelöst"
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
@@ -6550,5 +6559,12 @@
     "closed": "Geschlossen",
     "on": "An",
     "off": "Aus"
+  },
+  "alarmModeNames": {
+    "disarmed": "Deaktiviert",
+    "presence-armed": "Anwesenheit",
+    "night-armed": "Nacht",
+    "away-armed": "Abwesenheit",
+    "triggered": "Ausgelöst"
   }
 }

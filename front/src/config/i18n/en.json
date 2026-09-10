@@ -717,17 +717,15 @@
         "imageError": "Unable to load this image."
       },
       "alarm": {
-        "armButton": "Arm",
         "disarmButton": "Disarm",
-        "partiallyArmedButton": "Partial",
-        "partiallyArmedButtonSecondLine": "Arm",
         "panicButton": "Panic",
         "editBoxNameLabel": "Widget Name (optional)",
         "editBoxNamePlaceholder": "Enter the widget name",
         "editHouseLabel": "Select the house for alarm activation/disarmament.",
         "alarmStatusText": "Your house is ",
         "alarmArming": "Your house is being armed...",
-        "cancelAlarmArming": "Cancel"
+        "cancelAlarmArming": "Cancel",
+        "alarmArmingInMode": "Arming in mode"
       },
       "music": {
         "selectDeviceLabel": "Select device to control"
@@ -780,9 +778,10 @@
         "error": "Error",
         "alarmModes": {
           "disarmed": "Disarmed",
-          "armed": "Armed",
-          "partially-armed": "Partially armed",
-          "panic": "Panic"
+          "presence-armed": "Presence",
+          "night-armed": "Night",
+          "away-armed": "Away",
+          "triggered": "Triggered"
         }
       },
       "actions": {
@@ -3575,6 +3574,10 @@
         "computedExplanationText": "Instead of a fixed volume, you can enter here a calculation based on a scene variable, for example to speak quieter at night. To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "textLabel": "Message to speak on the speaker",
         "variablesExplanation": "To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
+      },
+      "alarmTriggerPanic": {
+        "description": "This action puts the alarm of the selected house in the triggered state.",
+        "houseLabel": "House"
       }
     },
     "actions": {
@@ -3638,7 +3641,8 @@
       },
       "alarm": {
         "check-alarm-mode": "If the alarm is in mode",
-        "set-alarm-mode": "Set alarm mode to"
+        "set-alarm-mode": "Set alarm mode to",
+        "trigger-panic": "Trigger panic"
       },
       "mqtt": {
         "send": "Send MQTT Message"
@@ -3702,7 +3706,8 @@
       },
       "alarm": {
         "check-alarm-mode": "Only continue if the alarm is in a given mode",
-        "set-alarm-mode": "Arm or disarm the alarm of a house"
+        "set-alarm-mode": "Arm or disarm the alarm of a house",
+        "trigger-panic": "Set off the alarm of a house, whatever mode it is in"
       },
       "calendar": {
         "is-event-running": "Continue depending on whether a calendar event is running",
@@ -3804,11 +3809,12 @@
         "event-is-coming": "Calendar event is coming"
       },
       "alarm": {
-        "arm": "The alarm is armed",
         "arming": "The alarm is arming",
+        "presence-arm": "The alarm is armed in Presence mode",
+        "night-arm": "The alarm is armed in Night mode",
+        "away-arm": "The alarm is armed in Away mode",
         "disarm": "The alarm is disarmed",
-        "partial-arm": "The alarm is partially armed",
-        "panic": "The alarm is in panic mode",
+        "panic": "Panic is triggered",
         "too-many-codes-tests": "Alarm: Too many invalid codes"
       },
       "system": {
@@ -3847,11 +3853,12 @@
         "user-left": "When a user leaves an area of the map"
       },
       "alarm": {
-        "arm": "When the alarm has just been armed",
         "arming": "During the delay before the alarm arms",
-        "partial-arm": "When the alarm switches to partial mode (night)",
+        "presence-arm": "When the alarm switches to Presence mode",
+        "night-arm": "When the alarm switches to Night mode",
+        "away-arm": "When the alarm switches to Away mode",
         "disarm": "When the alarm is disarmed",
-        "panic": "When panic mode is triggered",
+        "panic": "When panic is triggered",
         "too-many-codes-tests": "When too many invalid codes have been tried"
       },
       "system": {
@@ -3972,12 +3979,13 @@
       },
       "alarmMode": {
         "alarm": {
-          "arm": "This trigger will activate when the selected house is armed.",
-          "arming": "This trigger will activate when the selected house is in the process of arming.",
+          "arming": "This trigger will activate when the selected house is about to be armed.",
+          "presence-arm": "This trigger will activate when the selected house is armed in Presence mode.",
+          "night-arm": "This trigger will activate when the selected house is armed in Night mode.",
+          "away-arm": "This trigger will activate when the selected house is armed in Away mode.",
           "disarm": "This trigger will activate when the selected house is disarmed.",
-          "partial-arm": "This trigger will activate when the selected house is partially armed.",
-          "panic": "This trigger will activate when the selected house is in panic mode.",
-          "too-many-codes-tests": "This trigger will activate on every alarm code entry failure after 3 unsuccessful attempts."
+          "panic": "This trigger will activate when panic is triggered in the selected house.",
+          "too-many-codes-tests": "This trigger will activate on every failed alarm code entry, from 3 failed attempts onwards."
         },
         "houseLabel": "House"
       },
@@ -4755,10 +4763,11 @@
     "restoreFailed": "Restoring the backup failed. Are you sure you have the same backup key used during the backup ? You can go to the Gladys Plus tab in settings to set another backup key."
   },
   "alarmModes": {
-    "armed": "armed",
     "disarmed": "disarmed",
-    "partially-armed": "partially armed",
-    "panic": "in panic mode"
+    "presence-armed": "armed in Presence mode",
+    "night-armed": "armed in Night mode",
+    "away-armed": "armed in Away mode",
+    "triggered": "triggered"
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
@@ -6550,5 +6559,12 @@
     "closed": "Closed",
     "on": "On",
     "off": "Off"
+  },
+  "alarmModeNames": {
+    "disarmed": "Disarmed",
+    "presence-armed": "Presence",
+    "night-armed": "Night",
+    "away-armed": "Away",
+    "triggered": "Triggered"
   }
 }

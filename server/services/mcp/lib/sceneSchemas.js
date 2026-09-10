@@ -4,6 +4,7 @@ const {
   ACTIONS,
   EVENTS,
   ALARM_MODES_LIST,
+  ALARM_SETTABLE_MODES_LIST,
   COMPARISON_OPERATORS,
   ANY_CHANGE_OPERATOR,
 } = require('../../../utils/constants');
@@ -25,10 +26,11 @@ const SCENE_TRIGGER_TYPES = new Set([
   EVENTS.HOUSE.NO_LONGER_EMPTY,
   EVENTS.AREA.USER_ENTERED,
   EVENTS.AREA.USER_LEFT,
-  EVENTS.ALARM.ARM,
   EVENTS.ALARM.ARMING,
+  EVENTS.ALARM.PRESENCE_ARM,
+  EVENTS.ALARM.NIGHT_ARM,
+  EVENTS.ALARM.AWAY_ARM,
   EVENTS.ALARM.DISARM,
-  EVENTS.ALARM.PARTIAL_ARM,
   EVENTS.ALARM.PANIC,
   EVENTS.ALARM.TOO_MANY_CODES_TESTS,
   EVENTS.SYSTEM.START,
@@ -332,7 +334,10 @@ function createSceneCreateInputSchema(
       }),
       actionSchemaByType(ACTIONS.ALARM.SET_ALARM_MODE, {
         house: houseSelectorSchema,
-        alarm_mode: z.enum(ALARM_MODES_LIST),
+        alarm_mode: z.enum(ALARM_SETTABLE_MODES_LIST),
+      }),
+      actionSchemaByType(ACTIONS.ALARM.TRIGGER_PANIC, {
+        house: houseSelectorSchema,
       }),
       actionSchemaByType(ACTIONS.MQTT.SEND, {
         topic: z.string(),
@@ -551,16 +556,19 @@ function createSceneCreateInputSchema(
       user: userSelectorSchema,
       area: areaSelectorSchema,
     }),
-    triggerSchemaByType(EVENTS.ALARM.ARM, {
-      house: houseSelectorSchema,
-    }),
     triggerSchemaByType(EVENTS.ALARM.ARMING, {
       house: houseSelectorSchema,
     }),
-    triggerSchemaByType(EVENTS.ALARM.DISARM, {
+    triggerSchemaByType(EVENTS.ALARM.PRESENCE_ARM, {
       house: houseSelectorSchema,
     }),
-    triggerSchemaByType(EVENTS.ALARM.PARTIAL_ARM, {
+    triggerSchemaByType(EVENTS.ALARM.NIGHT_ARM, {
+      house: houseSelectorSchema,
+    }),
+    triggerSchemaByType(EVENTS.ALARM.AWAY_ARM, {
+      house: houseSelectorSchema,
+    }),
+    triggerSchemaByType(EVENTS.ALARM.DISARM, {
       house: houseSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.ALARM.PANIC, {

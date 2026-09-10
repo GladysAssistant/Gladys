@@ -31,6 +31,7 @@ export const ACTION_ICON = {
   [ACTIONS.EDF_TEMPO.CONDITION]: 'fe fe-zap',
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
+  [ACTIONS.ALARM.TRIGGER_PANIC]: 'fe fe-alert-triangle',
   [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
@@ -57,9 +58,10 @@ export const TRIGGER_ICON = {
   [EVENTS.AREA.USER_ENTERED]: 'fe fe-compass',
   [EVENTS.AREA.USER_LEFT]: 'fe fe-compass',
   [EVENTS.CALENDAR.EVENT_IS_COMING]: 'fe fe-calendar',
-  [EVENTS.ALARM.ARM]: 'fe fe-bell',
   [EVENTS.ALARM.ARMING]: 'fe fe-clock',
-  [EVENTS.ALARM.PARTIAL_ARM]: 'fe fe-bell',
+  [EVENTS.ALARM.PRESENCE_ARM]: 'fe fe-home',
+  [EVENTS.ALARM.NIGHT_ARM]: 'fe fe-moon',
+  [EVENTS.ALARM.AWAY_ARM]: 'fe fe-log-out',
   [EVENTS.ALARM.DISARM]: 'fe fe-bell-off',
   [EVENTS.ALARM.PANIC]: 'fe fe-alert-triangle',
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: 'fe fe-alert-triangle',
@@ -117,7 +119,12 @@ export const ACTION_CATEGORIES = [
   {
     key: 'homeSecurity',
     color: 'orange',
-    items: [ACTIONS.ALARM.SET_ALARM_MODE, ACTIONS.USER.SET_SEEN_AT_HOME, ACTIONS.USER.SET_OUT_OF_HOME]
+    items: [
+      ACTIONS.ALARM.SET_ALARM_MODE,
+      ACTIONS.ALARM.TRIGGER_PANIC,
+      ACTIONS.USER.SET_SEEN_AT_HOME,
+      ACTIONS.USER.SET_OUT_OF_HOME
+    ]
   },
   {
     key: 'advanced',
@@ -182,9 +189,10 @@ export const TRIGGER_CATEGORIES = [
     key: 'alarm',
     color: 'red',
     items: [
-      EVENTS.ALARM.ARM,
       EVENTS.ALARM.ARMING,
-      EVENTS.ALARM.PARTIAL_ARM,
+      EVENTS.ALARM.PRESENCE_ARM,
+      EVENTS.ALARM.NIGHT_ARM,
+      EVENTS.ALARM.AWAY_ARM,
       EVENTS.ALARM.DISARM,
       EVENTS.ALARM.PANIC,
       EVENTS.ALARM.TOO_MANY_CODES_TESTS

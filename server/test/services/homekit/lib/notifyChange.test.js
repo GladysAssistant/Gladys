@@ -276,9 +276,9 @@ describe('Notify change to HomeKit', () => {
   it('should forward an alarm change without any debounce', async () => {
     homekitHandler.sendAlarmState = stub().resolves();
 
-    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.ARM, house: 'maison' });
+    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.AWAY_ARM, house: 'maison' });
     await homekitHandler.notifyChange([], { type: EVENTS.ALARM.DISARM, house: 'maison' });
-    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.PARTIAL_ARM, house: 'maison' });
+    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.PRESENCE_ARM, house: 'maison' });
     await homekitHandler.notifyChange([], { type: EVENTS.ALARM.PANIC, house: 'maison' });
 
     // an alarm arming or going off is exactly what HomeKit must hear about at once
@@ -294,7 +294,7 @@ describe('Notify change to HomeKit', () => {
     homekitHandler.sendAlarmState = stub().rejects(new Error('House not found'));
 
     // this runs from an event listener: a dropped rejection would go unhandled
-    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.ARM, house: 'maison' });
+    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.AWAY_ARM, house: 'maison' });
     await new Promise((resolve) => {
       setImmediate(resolve);
     });

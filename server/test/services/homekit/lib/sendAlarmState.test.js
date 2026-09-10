@@ -35,7 +35,7 @@ describe('Send alarm state to HomeKit', () => {
   };
 
   it('should push both states when the house is armed', async () => {
-    const { homekitHandler, updateCharacteristic } = build(ALARM_MODES.ARMED);
+    const { homekitHandler, updateCharacteristic } = build(ALARM_MODES.AWAY_ARMED);
 
     await homekitHandler.sendAlarmState('maison');
 
@@ -48,7 +48,7 @@ describe('Send alarm state to HomeKit', () => {
   it('should take the target from the accessory when the alarm goes off', async () => {
     // the accessory knows the house was armed in part, which this module cannot derive from the
     // alarm mode alone — deciding it in both places is how the two came to disagree
-    const { homekitHandler, updateCharacteristic } = build(ALARM_MODES.PANIC, 0);
+    const { homekitHandler, updateCharacteristic } = build(ALARM_MODES.TRIGGERED, 0);
 
     await homekitHandler.sendAlarmState('maison');
 
@@ -59,7 +59,7 @@ describe('Send alarm state to HomeKit', () => {
   });
 
   it('should do nothing for a house the bridge has no accessory for', async () => {
-    const { homekitHandler, updateCharacteristic } = build(ALARM_MODES.ARMED);
+    const { homekitHandler, updateCharacteristic } = build(ALARM_MODES.AWAY_ARMED);
 
     // a house created since the bridge was built has no accessory until the next reload
     await homekitHandler.sendAlarmState('maison-secondaire');

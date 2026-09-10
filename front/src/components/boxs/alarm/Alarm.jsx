@@ -7,11 +7,27 @@ import Countdown from './Coutdown';
 
 import style from './style.css';
 
+// The three arming modes, in the order they appear in the widget: from the lightest protection to
+// the strictest. Each one is a tile, an endpoint and a tint of its own.
+const ARM_MODES = [
+  { mode: ALARM_MODES.PRESENCE_ARMED, route: 'presence_arm', tile: style.alarmTilePresence, icon: 'fe fe-home' },
+  { mode: ALARM_MODES.NIGHT_ARMED, route: 'night_arm', tile: style.alarmTileNight, icon: 'fe fe-moon' },
+  { mode: ALARM_MODES.AWAY_ARMED, route: 'away_arm', tile: style.alarmTileAway, icon: 'fe fe-log-out' }
+];
+
+const ARMED_WEBSOCKET_TYPES = [
+  WEBSOCKET_MESSAGE_TYPES.ALARM.PRESENCE_ARMED,
+  WEBSOCKET_MESSAGE_TYPES.ALARM.NIGHT_ARMED,
+  WEBSOCKET_MESSAGE_TYPES.ALARM.AWAY_ARMED,
+  WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED,
+  WEBSOCKET_MESSAGE_TYPES.ALARM.TRIGGERED
+];
+
 class AlarmComponent extends Component {
   state = {};
 
-  arming = async () => {
-    await this.setState({ arming: true });
+  arming = async payload => {
+    await this.setState({ arming: true, armingMode: payload && payload.mode });
   };
 
   cancelArming = async () => {
@@ -23,7 +39,7 @@ class AlarmComponent extends Component {
     await this.setState({ loading: true });
     try {
       const house = await this.props.httpClient.get(`/api/v1/house/${this.props.box.house}`);
-      await this.setState({ house, arming: false });
+      await this.setState({ house, arming: false, armingMode: undefined });
     } catch (e) {
       console.error(e);
     }
@@ -50,14 +66,11 @@ class AlarmComponent extends Component {
     await this.setState({ loading: false });
   };
 
-  arm = async () => {
-    await this.callAlarmApi('arm');
+  arm = async route => {
+    await this.callAlarmApi(route);
   };
   disarm = async () => {
     await this.callAlarmApi('disarm');
-  };
-  partialArm = async () => {
-    await this.callAlarmApi('partial_arm');
   };
   panic = async () => {
     await this.callAlarmApi('panic');
@@ -65,20 +78,14 @@ class AlarmComponent extends Component {
 
   componentDidMount() {
     this.getHouse();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.getHouse);
+    ARMED_WEBSOCKET_TYPES.forEach(type => this.props.session.dispatcher.addListener(type, this.getHouse));
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.arming);
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.getHouse);
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.PARTIALLY_ARMED, this.getHouse);
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.PANIC, this.getHouse);
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentWillUnmount() {
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.getHouse);
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.getHouse);
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.getHouse);
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.PARTIALLY_ARMED, this.getHouse);
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.PANIC, this.getHouse);
+    ARMED_WEBSOCKET_TYPES.forEach(type => this.props.session.dispatcher.removeListener(type, this.getHouse));
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.arming);
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
@@ -89,10 +96,10 @@ class AlarmComponent extends Component {
     }
   }
 
-  render(props, { house, loading, arming }) {
-    const armingDisabled = (house && house.alarm_mode === ALARM_MODES.ARMED) || arming;
-    const partialArmDisabled = (house && house.alarm_mode === ALARM_MODES.PARTIALLY_ARMED) || arming;
+  render(props, { house, loading, arming, armingMode }) {
     const isCurrentlyArmingWithCoutdown = arming && house.alarm_delay_before_arming > 0;
+    const triggered = house && house.alarm_mode === ALARM_MODES.TRIGGERED;
+    const disarmed = house && house.alarm_mode === ALARM_MODES.DISARMED;
     return (
       <div class="card">
         {props.box.name && (
@@ -101,7 +108,7 @@ class AlarmComponent extends Component {
           </div>
         )}
         {house && (
-          <div class="card-body">
+          <div class={cx('card-body', { [style.alarmTriggered]: triggered })}>
             <div class={loading ? 'dimmer active' : 'dimmer'}>
               <div class="loader" />
               <div class="dimmer-content">
@@ -116,7 +123,16 @@ class AlarmComponent extends Component {
                 )}
                 {isCurrentlyArmingWithCoutdown && (
                   <p>
-                    <Text id="dashboard.boxes.alarm.alarmArming" />
+                    {armingMode ? (
+                      <span>
+                        <Text id="dashboard.boxes.alarm.alarmArmingInMode" />{' '}
+                        <b>
+                          <Text id={`alarmModeNames.${armingMode}`} />
+                        </b>
+                      </span>
+                    ) : (
+                      <Text id="dashboard.boxes.alarm.alarmArming" />
+                    )}
                     <Countdown seconds={house.alarm_delay_before_arming} />
                     <button class="btn btn-outline-warning btn-block mt-4" onClick={this.cancelArming}>
                       <Text id="dashboard.boxes.alarm.cancelAlarmArming" />
@@ -124,64 +140,39 @@ class AlarmComponent extends Component {
                   </p>
                 )}
                 {!isCurrentlyArmingWithCoutdown && (
-                  <div class={style.alarmGrid}>
-                    <button
-                      onClick={this.arm}
-                      disabled={armingDisabled}
-                      class={cx(style.alarmTile, style.alarmTileArm, {
-                        [style.alarmTileActive]: house.alarm_mode === ALARM_MODES.ARMED
-                      })}
-                    >
-                      <span class={style.alarmTileIcon}>
-                        <i class="fe fe-bell" />
-                      </span>
-                      <span>
-                        <Text id="dashboard.boxes.alarm.armButton" />
-                      </span>
-                    </button>
+                  <div>
+                    <div class={style.alarmGrid}>
+                      {ARM_MODES.map(({ mode, route, tile, icon }) => (
+                        <button
+                          key={mode}
+                          onClick={() => this.arm(route)}
+                          disabled={house.alarm_mode === mode || arming}
+                          class={cx(style.alarmTile, tile, {
+                            [style.alarmTileActive]: house.alarm_mode === mode
+                          })}
+                        >
+                          <span class={style.alarmTileIcon}>
+                            <i class={icon} />
+                          </span>
+                          <span>
+                            <Text id={`alarmModeNames.${mode}`} />
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                     <button
                       onClick={this.disarm}
-                      disabled={house.alarm_mode === ALARM_MODES.DISARMED}
-                      class={cx(style.alarmTile, style.alarmTileDisarm, {
-                        [style.alarmTileActive]: house.alarm_mode === ALARM_MODES.DISARMED
-                      })}
+                      disabled={disarmed}
+                      class={cx(style.alarmDisarmButton, { [style.alarmDisarmButtonActive]: disarmed })}
                     >
-                      <span class={style.alarmTileIcon}>
-                        <i class="fe fe-home" />
-                      </span>
-                      <span>
-                        <Text id="dashboard.boxes.alarm.disarmButton" />
-                      </span>
+                      <i class="fe fe-shield-off" />
+                      <Text id="dashboard.boxes.alarm.disarmButton" />
                     </button>
-                    <button
-                      onClick={this.partialArm}
-                      disabled={partialArmDisabled}
-                      class={cx(style.alarmTile, style.alarmTilePartial, {
-                        [style.alarmTileActive]: house.alarm_mode === ALARM_MODES.PARTIALLY_ARMED
-                      })}
-                    >
-                      <span class={style.alarmTileIcon}>
-                        <i class="fe fe-shield" />
-                      </span>
-                      <span>
-                        <Text id="dashboard.boxes.alarm.partiallyArmedButton" />
-                        <br />
-                        <Text id="dashboard.boxes.alarm.partiallyArmedButtonSecondLine" />
-                      </span>
-                    </button>
-                    <button
-                      onClick={this.panic}
-                      disabled={house.alarm_mode === ALARM_MODES.PANIC}
-                      class={cx(style.alarmTile, style.alarmTilePanic, {
-                        [style.alarmTileActive]: house.alarm_mode === ALARM_MODES.PANIC
-                      })}
-                    >
-                      <span class={style.alarmTileIcon}>
-                        <i class="fe fe-alert-circle" />
-                      </span>
-                      <span>
-                        <Text id="dashboard.boxes.alarm.panicButton" />
-                      </span>
+                    {/* panic is an action, not a mode: it sits apart, below the modes */}
+                    <div class={style.alarmPanicSeparator} />
+                    <button onClick={this.panic} disabled={triggered} class={style.alarmPanicButton}>
+                      <i class="fe fe-alert-circle" />
+                      <Text id="dashboard.boxes.alarm.panicButton" />
                     </button>
                   </div>
                 )}

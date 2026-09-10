@@ -133,10 +133,11 @@ const triggersFunc = {
     event.user === trigger.user && event.area === trigger.area,
   [EVENTS.AREA.USER_LEFT]: (self, sceneSelector, event, trigger) =>
     event.user === trigger.user && event.area === trigger.area,
-  [EVENTS.ALARM.ARM]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
+  [EVENTS.ALARM.AWAY_ARM]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.ARMING]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.DISARM]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
-  [EVENTS.ALARM.PARTIAL_ARM]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
+  [EVENTS.ALARM.PRESENCE_ARM]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
+  [EVENTS.ALARM.NIGHT_ARM]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.PANIC]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.SYSTEM.START]: () => true,
