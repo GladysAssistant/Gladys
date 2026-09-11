@@ -635,7 +635,7 @@
         "analog": "Analógico",
         "digital": "Digital",
         "date": "{{day}}, {{dayNumber}} de {{month}} de {{year}}",
-        "smallDate": "{{dayNumber}} de {{month}} de {{year}}",
+        "smallDate": "{{dayNumber}} de {{month}}",
         "type": "¿Tipo de reloj?",
         "displaySecond": "¿Mostrar segundos?",
         "yes": "Sí",
