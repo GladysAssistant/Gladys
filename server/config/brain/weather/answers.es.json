@@ -112,7 +112,7 @@
   {
     "label": "weather.get.success.today.sleet",
     "answers": [
-      "Hoy la temperatura está entre {{temperature min}} {{units}} y {{temperature max}} {{units}} con lluvia helada."
+      "Hoy la temperatura está entre {{temperature_min}} {{units}} y {{temperature_max}} {{units}} con lluvia helada."
     ]
   },
   {
