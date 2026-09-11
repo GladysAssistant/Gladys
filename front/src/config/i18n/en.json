@@ -5663,7 +5663,8 @@
       "decimal": "Temperature",
       "min": "Minimum temperature",
       "max": "Maximum temperature",
-      "average": "Average temperature"
+      "average": "Average temperature",
+      "probe": "Probe temperature"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Device temperature sensor",

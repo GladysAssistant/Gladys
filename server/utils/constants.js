@@ -972,6 +972,10 @@ const DEVICE_FEATURE_TYPES = {
     MIN: 'min',
     MAX: 'max',
     AVERAGE: 'average',
+    // Temperature read by an external probe wired to the device (fridge, tank, outdoor
+    // probe...), as opposed to `decimal`, the ambient temperature at the device itself.
+    // Kept out of the room average on purpose: see temperature-sensor.getTemperatureInRoom.
+    PROBE: 'probe',
   },
   SWITCH: {
     BINARY: 'binary',

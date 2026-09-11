@@ -68,6 +68,18 @@ describe('zigbee2mqtt numericType', () => {
     });
   });
 
+  describe('Temperature probe features', () => {
+    it('should configure probe_temperature feature', () => {
+      assert.deepEqual(numericType.names.probe_temperature.feature, {
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.PROBE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        min: -100,
+        max: 150,
+      });
+    });
+  });
+
   describe('Siren features', () => {
     it('should configure max_duration feature', () => {
       assert.deepEqual(numericType.names.max_duration.feature, {
