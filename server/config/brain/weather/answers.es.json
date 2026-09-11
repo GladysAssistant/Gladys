@@ -559,7 +559,7 @@
   },
   {
     "label": "weather.get.fail.not-configured",
-    "answers": ["Debes configurar la API de OpenWeather en la pestaña de Integración antes de usar esta función."]
+    "answers": ["Debe configurar la API de OpenWeather en la pestaña de Integración antes de usar esta función."]
   },
   {
     "label": "weather.get.fail.no-weather",
@@ -567,6 +567,6 @@
   },
   {
     "label": "weather.get.fail.no-house",
-    "answers": ["Primero debes configurar tu casa y su ubicación en los parámetros."]
+    "answers": ["Primero usted debe configurar su casa y su ubicación en los parámetros."]
   }
 ]
