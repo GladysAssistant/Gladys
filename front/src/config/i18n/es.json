@@ -924,7 +924,7 @@
         "security": "Cámaras y seguridad",
         "multimedia": "Multimedia",
         "appliances": "Electrodomésticos y jardín",
-        "environment": "Clima y entorno",
+        "environment": "Meteorología y entorno",
         "protocols": "Protocolos y concentradores",
         "network": "Red y presencia",
         "notifications": "Mensajería y notificaciones",
@@ -6281,7 +6281,7 @@
       "motion": "Movimiento y presencia",
       "buttons": "Botones y mandos",
       "lights": "Luces e interruptores",
-      "climate": "Clima y entorno",
+      "climate": "Meteorología y entorno",
       "security": "Seguridad",
       "energy": "Energía",
       "other": "Otro"
