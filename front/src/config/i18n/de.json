@@ -5663,7 +5663,8 @@
       "decimal": "Temperatur",
       "min": "Minimale Temperatur",
       "max": "Maximale Temperatur",
-      "average": "Mitteltemperatur Temperatur"
+      "average": "Mitteltemperatur Temperatur",
+      "probe": "Fühlertemperatur"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Gerätetemperatursensor",
