@@ -33,8 +33,7 @@ class CheckTime extends Component {
   render() {
     const language = get(this.props, 'user.language');
     const { path } = this.props;
-
-    const localeSet = LOCALES[this.props.user.language] || 'en';
+    const localeSet = LOCALES[language] || 'en';
     const before = this.props.action.before
       ? new Date().setHours(this.props.action.before.substr(0, 2), this.props.action.before.substr(3, 2))
       : null;

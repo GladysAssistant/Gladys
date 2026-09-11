@@ -80,7 +80,7 @@ class TurnOnLight extends Component {
 
   render({}, {}) {
     const language = get(this.props, 'user.language');
-    const localeSet = LOCALES[this.props.user.language] || 'en';
+    const localeSet = LOCALES[language] || 'en';
     const time = this.props.trigger.time
       ? new Date().setHours(this.props.trigger.time.substr(0, 2), this.props.trigger.time.substr(3, 2))
       : null;
