@@ -1,10 +1,10 @@
 [
   {
     "label": "calendar.next-event.get-location.success",
-    "answers": ["Tu próximo evento es {{ event.name }} y se encuentra en {{ event.location }}"]
+    "answers": ["Su próximo evento es {{ event.name }} y se encuentra en {{ event.location }}"]
   },
   {
     "label": "calendar.next-event.get-location.fail",
-    "answers": ["No he podido obtener tu próximo evento."]
+    "answers": ["No he podido obtener su próximo evento."]
   }
 ]
