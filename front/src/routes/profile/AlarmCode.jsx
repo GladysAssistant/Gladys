@@ -18,6 +18,8 @@ class AlarmCode extends Component {
 
   updateCode = e => this.setState({ code: e.target.value, error: null, saved: false });
 
+  toggleCodeVisibility = () => this.setState(prevState => ({ showCode: !prevState.showCode }));
+
   saveCode = async () => {
     this.setState({ loading: true, error: null, saved: false });
     try {
@@ -55,6 +57,7 @@ class AlarmCode extends Component {
       defined: false,
       loading: false,
       saved: false,
+      showCode: false,
       error: null
     };
   }
@@ -63,7 +66,7 @@ class AlarmCode extends Component {
     this.getStatus();
   }
 
-  render(props, { code, defined, loading, saved, error }) {
+  render(props, { code, defined, loading, saved, showCode, error }) {
     return (
       <div class="card">
         <div class="card-header">
@@ -92,17 +95,27 @@ class AlarmCode extends Component {
                 <label class="form-label">
                   <Text id={defined ? 'profile.alarmCode.replaceLabel' : 'profile.alarmCode.label'} />
                 </label>
-                <Localizer>
-                  <input
-                    type="password"
-                    class={cx('form-control', { 'is-invalid': error === 'invalid' })}
-                    value={code}
-                    onInput={this.updateCode}
-                    placeholder={<Text id="profile.alarmCode.placeholder" />}
-                  />
-                </Localizer>
-                <div class="invalid-feedback">
-                  <Text id="profile.alarmCode.error.invalid" />
+                <div class="input-icon">
+                  <Localizer>
+                    <input
+                      type={showCode ? 'text' : 'password'}
+                      class={cx('form-control', { 'is-invalid': error === 'invalid' })}
+                      value={code}
+                      onInput={this.updateCode}
+                      placeholder={<Text id="profile.alarmCode.placeholder" />}
+                    />
+                  </Localizer>
+                  <Localizer>
+                    <button
+                      type="button"
+                      class="input-icon-addon cursor-pointer"
+                      onClick={this.toggleCodeVisibility}
+                      aria-pressed={showCode}
+                      aria-label={<Text id="profile.alarmCode.toggleVisibility" />}
+                    >
+                      <i class={cx('fe', { 'fe-eye': !showCode, 'fe-eye-off': showCode })} />
+                    </button>
+                  </Localizer>
                 </div>
               </div>
               <div class="form-group">

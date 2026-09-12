@@ -4093,6 +4093,7 @@
       "title": "Alarmcode",
       "description": "Dein persönlicher Code aktiviert und deaktiviert den Alarm deiner Häuser, in der Gladys-App wie auf einem Wandtablet. Niemand kann ihn wieder auslesen, auch kein Administrator.",
       "label": "Dein Alarmcode",
+      "toggleVisibility": "Code anzeigen oder ausblenden",
       "replaceLabel": "Neuer Alarmcode",
       "placeholder": "4 bis 8 Ziffern",
       "saveButton": "Diesen Code speichern",
@@ -4147,6 +4148,7 @@
       "revoke": "Widerrufen",
       "noCodes": "Noch kein Zugangscode. Jede Person legt ihren eigenen im Profil fest.",
       "namePlaceholder": "Name des Gasts",
+      "toggleVisibility": "Code anzeigen oder ausblenden",
       "codePlaceholder": "Code, 4 bis 8 Ziffern",
       "addButton": "Hinzufügen",
       "error": {

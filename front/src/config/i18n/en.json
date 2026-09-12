@@ -4093,6 +4093,7 @@
       "title": "Alarm code",
       "description": "Your own code arms and disarms the alarm of your houses, from the Gladys app as well as from a wall tablet. Nobody can read it back, not even an administrator.",
       "label": "Your alarm code",
+      "toggleVisibility": "Show or hide the code",
       "replaceLabel": "New alarm code",
       "placeholder": "4 to 8 digits",
       "saveButton": "Save this code",
@@ -4147,6 +4148,7 @@
       "revoke": "Revoke",
       "noCodes": "No access code yet. Each user sets their own from their profile.",
       "namePlaceholder": "Guest name",
+      "toggleVisibility": "Show or hide the code",
       "codePlaceholder": "Code, 4 to 8 digits",
       "addButton": "Add",
       "error": {

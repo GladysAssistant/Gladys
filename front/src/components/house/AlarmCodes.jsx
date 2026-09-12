@@ -28,6 +28,8 @@ class AlarmCodes extends Component {
 
   updateNewValidUntil = e => this.setState({ newValidUntil: e.target.value, error: null });
 
+  toggleNewCodeVisibility = () => this.setState(prevState => ({ showNewCode: !prevState.showNewCode }));
+
   createCode = async () => {
     const { newCodeName, newCode, newValidUntil } = this.state;
     try {
@@ -67,6 +69,7 @@ class AlarmCodes extends Component {
       newCodeName: '',
       newCode: '',
       newValidUntil: '',
+      showNewCode: false,
       error: null,
       status: null
     };
@@ -76,7 +79,7 @@ class AlarmCodes extends Component {
     this.getCodes();
   }
 
-  render({ user }, { codes, newCodeName, newCode, newValidUntil, error, status }) {
+  render({ user }, { codes, newCodeName, newCode, newValidUntil, showNewCode, error, status }) {
     const language = get(user, 'language') || 'en';
     return (
       <div class="form-group">
@@ -162,15 +165,28 @@ class AlarmCodes extends Component {
                       placeholder={<Text id="housesSettings.alarmCodes.namePlaceholder" />}
                     />
                   </Localizer>
-                  <Localizer>
-                    <input
-                      type="password"
-                      class="form-control mt-2"
-                      value={newCode}
-                      onInput={this.updateNewCode}
-                      placeholder={<Text id="housesSettings.alarmCodes.codePlaceholder" />}
-                    />
-                  </Localizer>
+                  <div class="input-icon mt-2">
+                    <Localizer>
+                      <input
+                        type={showNewCode ? 'text' : 'password'}
+                        class="form-control"
+                        value={newCode}
+                        onInput={this.updateNewCode}
+                        placeholder={<Text id="housesSettings.alarmCodes.codePlaceholder" />}
+                      />
+                    </Localizer>
+                    <Localizer>
+                      <button
+                        type="button"
+                        class="input-icon-addon cursor-pointer"
+                        onClick={this.toggleNewCodeVisibility}
+                        aria-pressed={showNewCode}
+                        aria-label={<Text id="housesSettings.alarmCodes.toggleVisibility" />}
+                      >
+                        <i class={cx('fe', { 'fe-eye': !showNewCode, 'fe-eye-off': showNewCode })} />
+                      </button>
+                    </Localizer>
+                  </div>
                 </td>
                 <td>
                   <input type="date" class="form-control" value={newValidUntil} onInput={this.updateNewValidUntil} />

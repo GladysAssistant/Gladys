@@ -4093,6 +4093,7 @@
       "title": "Code d'alarme",
       "description": "Votre code personnel arme et désarme l'alarme de vos maisons, depuis l'application Gladys comme depuis une tablette murale. Personne ne peut le relire, pas même un administrateur.",
       "label": "Votre code d'alarme",
+      "toggleVisibility": "Afficher ou masquer le code",
       "replaceLabel": "Nouveau code d'alarme",
       "placeholder": "4 à 8 chiffres",
       "saveButton": "Enregistrer ce code",
@@ -4147,6 +4148,7 @@
       "revoke": "Révoquer",
       "noCodes": "Aucun code d'accès. Chaque utilisateur définit le sien depuis son profil.",
       "namePlaceholder": "Nom de l'invité",
+      "toggleVisibility": "Afficher ou masquer le code",
       "codePlaceholder": "Code, 4 à 8 chiffres",
       "addButton": "Ajouter",
       "error": {
