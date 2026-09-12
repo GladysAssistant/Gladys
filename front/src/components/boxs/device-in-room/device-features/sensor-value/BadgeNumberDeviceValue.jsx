@@ -44,6 +44,18 @@ const colorLowAsGreenWithAlert = (value, safeLimit, warnLimit, alertLimit) => {
   return 'danger';
 };
 
+// Mirror of colorLowAsGreen for the metrics where the HIGH end is the good one (the carbon-free
+// and renewable shares of a grid: the more, the better).
+const colorHighAsGreen = (value, goodLimit, mediumLimit) => {
+  if (value >= goodLimit) {
+    return 'success';
+  } else if (value >= mediumLimit) {
+    return 'warning';
+  }
+
+  return 'danger';
+};
+
 const getAqiColor = value => {
   if (value < 50) {
     // Safe
@@ -116,6 +128,11 @@ const BADGE_CATEGORIES = {
     colorLowAsGreenWithAlert(toMicrogramPerCubicMeter(value, unit), 100, 160, 240),
   [DEVICE_FEATURE_CATEGORIES.SO2_SENSOR]: (value, unit) =>
     colorLowAsGreenWithAlert(toMicrogramPerCubicMeter(value, unit), 40, 100, 300),
+  // The grid carbon category holds two scales: the intensity, where LOW is clean (a grid under
+  // 150 gCO2eq/kWh is among the cleanest, one over 400 is fossil-heavy), and the carbon-free /
+  // renewable shares, where HIGH is clean. The unit tells them apart: only the shares are percents.
+  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: (value, unit) =>
+    unit === DEVICE_FEATURE_UNITS.PERCENT ? colorHighAsGreen(value, 70, 40) : colorLowAsGreen(value, 150, 400),
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: value => getAqiColor(value),
   [DEVICE_FEATURE_CATEGORIES.RISK]: value => getRiskColor(value)
 };
