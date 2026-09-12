@@ -6,7 +6,8 @@
 > spec **in the same diff**.
 >
 > Companion specs: `dashboard-flexible-layout-and-widgets.md` (the alarm widget and the `alarm`
-> chip live there).
+> chip live there), `house-alarm-codes.md` (who holds an alarm code, how it is stored and
+> validated).
 
 ## Context
 
@@ -102,10 +103,12 @@ the behavior that was already in place, unchanged here.
 
 ### B.1 Server
 
-- `server/lib/house/house.arm.js` — a single `arm(selector, mode, disableWaitTime = false)`. The
-  three modes share one code path (same delay, same tablet locking, same conflict check) and differ
-  only by the pair of events they announce themselves with, held in a local table. An unknown or
-  non-arming mode is a `BadParameters`.
+- `server/lib/house/house.arm.js` — a single
+  `arm(selector, mode, disableWaitTime = false, author = NOBODY)`. The three modes share one code
+  path (same delay, same tablet locking — gated on an alarm code existing, see
+  `house-alarm-codes.md` B.6 — same conflict check) and differ only by the pair of events they
+  announce themselves with, held in a local table. An unknown or non-arming mode is a
+  `BadParameters`. `author` is who asked, and only feeds the events of B.2.
 - `server/lib/house/house.panic.js` — writes `triggered`.
 - `house.partialArm.js` is gone.
 
@@ -124,6 +127,9 @@ The `alarm.arming` websocket payload carries `mode` so the widget can name the m
 during the countdown. The scene trigger does not: a scene reacting to "the alarm is arming" gets
 the house, as before.
 
+Every payload of this table also carries `user` and `user_name` — who asked, `null` when nobody
+did. `house-alarm-codes.md` B.5 owns that contract.
+
 `alarm.too-many-codes-tests` is unchanged.
 
 ### B.3 REST API
@@ -134,7 +140,7 @@ the house, as before.
 | `POST /api/v1/house/:house_selector/night_arm` | arm in `night-armed` |
 | `POST /api/v1/house/:house_selector/away_arm` | arm in `away-armed` |
 | `POST /api/v1/house/:house_selector/disarm` | disarm |
-| `POST /api/v1/house/:house_selector/disarm_with_code` | disarm with the house code (scope `alarm:write`) |
+| `POST /api/v1/house/:house_selector/disarm_with_code` | disarm with a personal or guest code (scope `alarm:write`, see `house-alarm-codes.md`) |
 | `POST /api/v1/house/:house_selector/panic` | set the alarm off |
 
 The three arming routes answer `{ success: true }` — they may return before the house is actually
