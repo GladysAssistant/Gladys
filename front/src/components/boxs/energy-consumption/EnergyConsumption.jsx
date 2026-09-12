@@ -17,10 +17,12 @@ import {
   getPreviousEnergyPeriodStart
 } from '../../../../../server/utils/energyPeriod';
 
-import fr from 'date-fns/locale/fr';
+import { fr, de, es } from 'date-fns/locale';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import datePickerStyle from '../../datePicker.css';
+
+const LOCALES = { fr, de, es };
 
 const PERIODS = {
   YEAR: 'year',
@@ -467,7 +469,7 @@ class EnergyConsumption extends Component {
       totalConsumption,
       displayMode
     } = state;
-    const localeSet = this.props.user.language === 'fr' ? fr : 'en';
+    const localeSet = LOCALES[this.props.user.language] || 'en';
     return (
       <div class="card">
         {/* Widget Title */}

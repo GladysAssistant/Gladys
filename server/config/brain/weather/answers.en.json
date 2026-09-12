@@ -112,7 +112,7 @@
   {
     "label": "weather.get.success.today.sleet",
     "answers": [
-      "Today, the temperature is between {{temperature min}} {{units}} and {{temperature max}} {{units}} with freezing rain."
+      "Today, the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}} with freezing rain."
     ]
   },
   {

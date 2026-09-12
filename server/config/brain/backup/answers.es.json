@@ -1,0 +1,8 @@
+[
+  {
+    "label": "backup.fail",
+    "answers": [
+      "La copia de seguridad de Gladys Plus ha fallado. Para más información, vaya a la pestaña \"Configuración\" => \"Tareas\". El mensaje de error es {{ errorMessage }}"
+    ]
+  }
+]
