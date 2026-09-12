@@ -2,7 +2,11 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS
+} from '../../../../../../../server/utils/constants';
 import { smartRound } from '../../../../../../../server/utils/units';
 import RawDeviceValue from './RawDeviceValue';
 
@@ -130,9 +134,12 @@ const BADGE_CATEGORIES = {
     colorLowAsGreenWithAlert(toMicrogramPerCubicMeter(value, unit), 40, 100, 300),
   // The grid carbon category holds two scales: the intensity, where LOW is clean (a grid under
   // 150 gCO2eq/kWh is among the cleanest, one over 400 is fossil-heavy), and the carbon-free /
-  // renewable shares, where HIGH is clean. The unit tells them apart: only the shares are percents.
-  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: (value, unit) =>
-    unit === DEVICE_FEATURE_UNITS.PERCENT ? colorHighAsGreen(value, 70, 40) : colorLowAsGreen(value, 150, 400),
+  // renewable shares, where HIGH is clean. The type tells them apart, not the unit: a feature
+  // created by hand (MQTT) or by an external integration can carry no unit at all.
+  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: (value, unit, type) =>
+    type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY
+      ? colorLowAsGreen(value, 150, 400)
+      : colorHighAsGreen(value, 70, 40),
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: value => getAqiColor(value),
   [DEVICE_FEATURE_CATEGORIES.RISK]: value => getRiskColor(value)
 };
@@ -179,7 +186,7 @@ const BadgeNumberDeviceValue = props => {
     valueIsEnum = true;
   }
 
-  const colorClass = `bg-${valued ? colorMethod(value, unit) : 'secondary'}`;
+  const colorClass = `bg-${valued ? colorMethod(value, unit, type) : 'secondary'}`;
 
   return (
     <span class={cx('badge', colorClass)}>

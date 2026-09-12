@@ -879,10 +879,13 @@ const DEVICE_FEATURE_CATEGORIES = {
   FAN: 'fan',
   // Carbon content of the electricity DELIVERED BY THE GRID of a zone, as published by a grid data
   // provider (national TSO, Electricity Maps, WattTime...) or broadcast in the premises by a device
-  // implementing the Matter Electrical Grid Conditions cluster. It describes the grid, not the home:
-  // the energy a device imports or exports stays in `grid-sensor`, and the carbon intensity measured
-  // behind the meter (grid mix + local generation) is deliberately out of scope for now - it is a
-  // different quantity, and would be its own type once a device reports it.
+  // implementing the Matter Electrical Grid Conditions cluster. It describes the electricity, not
+  // the appliance: the energy a device imports or exports stays in `grid-sensor`.
+  // Behind-the-meter ("local") carbon intensity - the grid mix blended with the local generation -
+  // is a different quantity, not published yet because no integration reports it. When one does, it
+  // becomes a `local-carbon-intensity` TYPE of this category, never a separate category: Matter
+  // carries both in the same struct (GridCarbonIntensity and LocalCarbonIntensity), and the
+  // category name mirrors that cluster's own grid-first naming, so adding it renames nothing.
   GRID_CARBON_SENSOR: 'grid-carbon-sensor',
   GRID_SENSOR: 'grid-sensor',
   HEATER: 'heater',
@@ -1158,8 +1161,18 @@ const DEVICE_FEATURE_TYPES = {
   },
   // Carbon content of the grid electricity of a zone. `carbon-intensity` mirrors the Matter
   // Electrical Grid Conditions cluster (0x00A0) GridCarbonIntensity attribute, in grams of CO2
-  // equivalent per kWh consumed; the two shares describe the generation mix behind it and come
-  // from the grid data providers, which publish them alongside the intensity.
+  // equivalent per kWh consumed. The two shares describe the generation mix behind it: Matter has
+  // NO equivalent attribute for them (the cluster carries the intensity and a Low/Medium/High
+  // level, nothing else), they are a deliberate addition, published alongside the intensity by
+  // every grid data provider (Electricity Maps, the UK Carbon Intensity API, RTE eCO2mix...) -
+  // the contract is the providers' common denominator, not one provider's API.
+  // `carbon-intensity` is the AVERAGE intensity of the electricity consumed in the zone, which is
+  // what Matter models. A MARGINAL rate (the emissions of the next kWh, e.g. the WattTime MOER) is
+  // a different quantity and must not be published here - mixing the two would make charts and
+  // scene thresholds meaningless; a provider exposing both publishes its average here, and a
+  // marginal rate gets its own type the day an integration needs it.
+  // Matter's GridCarbonLevel (Low/Medium/High) is deliberately left out: it is a banding of the
+  // same intensity, which the room badge already colors from the value itself.
   // Value conventions: the intensity is >= 0 (gCO2eq/kWh), both shares are percentages of the
   // consumed electricity (0-100). `carbon-free-percentage` counts every non-fossil source
   // (renewables AND nuclear), `renewable-percentage` only the renewable ones, so renewable is
