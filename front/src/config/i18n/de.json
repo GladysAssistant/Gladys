@@ -283,7 +283,7 @@
       "validationError": "Der Name des Zuhauses muss zwischen 1 und 40 Zeichen lang sein",
       "validationErrorRoom": "Der Raumname muss zwischen 1 und 40 Zeichen lang sein",
       "alarmTitle": "Alarm",
-      "alarmDescription": "Wenn du den Alarmmodus in Gladys verwendest, kannst du den Deaktivierungscode und die Verzögerung vor der Scharfschaltung des Alarms hier konfigurieren. Diese Verzögerung gilt nur im Fall einer manueller Auslösung und nicht in Szenen.",
+      "alarmDescription": "Wenn du den Alarm in Gladys nutzt, kannst du hier die Verzögerung bis zur Aktivierung einstellen und die Zugangscodes verwalten, die ihn deaktivieren. Deinen eigenen Code legst du auf deiner Profilseite fest. Diese Verzögerung gilt nur bei manueller Aktivierung, nicht in Szenen.",
       "alarmDelayBeforeArmingLabel": "Verzögerung vor Scharfschaltung des Alarms",
       "alarmDelays": {
         "0": "Keine Verzögerung",
@@ -4091,7 +4091,7 @@
     "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut oder kontaktiere die Gladys-Community.",
     "alarmCode": {
       "title": "Alarmcode",
-      "description": "Dein persönlicher Code aktiviert und deaktiviert den Alarm deiner Häuser, in der Gladys-App wie auf einem Wandtablet. Niemand kann ihn wieder auslesen, auch kein Administrator.",
+      "description": "Dein persönlicher Code deaktiviert den Alarm deiner Häuser, in der Gladys-App wie auf einem Wandtablet. Niemand kann ihn wieder auslesen, auch kein Administrator.",
       "label": "Dein Alarmcode",
       "toggleVisibility": "Code anzeigen oder ausblenden",
       "replaceLabel": "Neuer Alarmcode",
@@ -4138,7 +4138,7 @@
     "removeRoom": "Raum entfernen",
     "alarmCodes": {
       "label": "Zugangscodes",
-      "description": "Ein Code pro Person, dazu Gastcodes für jemanden ohne Gladys-Konto. Ein Code aktiviert und deaktiviert den Alarm aller Häuser und ist nach dem Speichern nie wieder lesbar.",
+      "description": "Ein Code pro Person, dazu Gastcodes für jemanden ohne Gladys-Konto. Ein Code deaktiviert den Alarm aller Häuser — aktiviert wird er von einer angemeldeten Person oder einer Szene — und ist nach dem Speichern nie wieder lesbar.",
       "holder": "Inhaber",
       "guest": "Gast",
       "validUntil": "Gültig bis",
@@ -4154,6 +4154,7 @@
       "error": {
         "invalid": "Ein Alarmcode besteht aus 4 bis 8 Ziffern.",
         "alreadyUsed": "Dieser Code ist nicht verfügbar, bitte wähle einen anderen.",
+        "tooManyWrites": "Zu viele Codeänderungen in kurzer Zeit. Bitte versuche es später erneut.",
         "generic": "Die Zugangscodes konnten nicht aktualisiert werden. Bitte versuche es erneut."
       }
     },

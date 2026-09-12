@@ -36,8 +36,10 @@ person, valid on every house of the instance: the alarm is per house, the code i
 installation with a second house does not get a second code to remember, and a keypad does not have
 to ask which house a code belongs to.
 
-Every active code both **arms and disarms**. There is no per-code permission: a code that can send
-the house back to disarmed is already the keys to the house.
+A code **disarms**; it does not arm. Arming is asked for by a logged-in user, a scene or HomeKit,
+and no arming route consumes a code — a locked wall tablet only holds the `alarm:write` scope, so it
+cannot arm either. There is no per-code permission: a code that can send the house back to disarmed
+is already the keys to the house.
 
 ### A.2 Two kinds of holders
 
@@ -62,7 +64,14 @@ the keypad must not tell a stranger that the code they hold used to open this ho
 listed as expired for the admin, who can delete it.
 
 Revoking is deleting. There is no `revoked` flag: keeping the hash of a code nobody may use again
-buys nothing, and expiry already covers "this access ends on Sunday".
+buys nothing, and expiry already covers "this access ends on Sunday". Only **guest** codes are
+revocable: a personal code belongs to its holder (A.2), and revoking one would take no access away
+anyway — its owner sets a new one in a second, and a logged-in user disarms without any code.
+
+`valid_until` is stored as an instant, and the date picker of the frontend is what gives it a
+calendar meaning: the picked day is kept whole, so the expiry is the **end of that local day**.
+Reading `YYYY-MM-DD` as an instant would make it midnight UTC and kill the code the evening before
+west of UTC.
 
 ### A.4 Hashing, and what it actually protects
 
@@ -77,8 +86,10 @@ backup in readable form. Whoever wants more than that types more digits.
 
 Because a hash cannot be looked up, validating a typed code means comparing it against the active
 codes one after another. That is deliberate: the keypad of a locked tablet does not say who is
-standing in front of it, so the code itself is the identity. The scan is bounded by the number of
-codes and by the rate limit below.
+standing in front of it, so the code itself is the identity. Nothing caps the number of codes, so
+nothing caps that scan: a wrong code on an instance holding twenty of them costs about two seconds
+of bcrypt. The rate limits below are what keep it from being worth attacking; should a household
+ever hold enough codes for the keypad to feel slow, a cap belongs here before an optimisation does.
 
 ### A.5 Two codes are never the same
 
@@ -90,6 +101,13 @@ clear: it is compared with every active code, and a collision is refused with
 That refusal is a one-bit oracle ("this code is taken"), and on 10 000 combinations an oracle is an
 enumeration tool. So writing a code is rate limited (B.4), the same way typing one already is. An
 expired code is not "active" and can be taken over by somebody else.
+
+Uniqueness is a read followed by a write, and a salted bcrypt hash cannot take a unique index, so
+the database cannot hold this invariant for us. Code writes are therefore **serialized**: they queue
+one behind the other, and two requests writing the same code cannot both find it free. Gladys is a
+single process, so a queue is all it takes — a deterministic fingerprint column with a unique index
+would work too, but a keyed hash over 10 000 candidates is reversible the moment that key leaks,
+which is the property A.4 exists to avoid.
 
 ## B. Detailed design
 
@@ -122,11 +140,12 @@ A code carries no `house_id`: see A.1.
 | `validate(code)` | Returns the active code row matching `code`, or `null`. Compares against the active rows in turn. |
 | `setForUser(userId, code)` | Creates or replaces that user's code. Validates shape, uniqueness, rate limit. |
 | `createGuest(createdByUserId, { name, code, valid_until })` | Same validation; `name` is required. The admin's id keys the rate limit. |
-| `destroy(id)` | Revokes one code. |
+| `destroy(id)` | Revokes one guest code; a personal one is a `ForbiddenError` (`PERSONAL_ALARM_CODE`). |
 | `destroyForUser(userId)` | Deletes that user's own code; deleting nothing is not an error. |
 | `get()` | Lists codes — holder, name, expiry, never the hash. |
 | `existsActive()` | Is there at least one usable code on this instance? |
 | `existsForUser(userId)` | Does this user have a code? All the frontend can be told. |
+| `serializeWrite(write)` | Queues the check-then-write of A.5, so two of them cannot overlap. |
 
 `existsActive` replaces the `alarm_code === null || …` triplet that used to be copy-pasted in
 `house.arm.js` and `session.getTabletMode.js`. The "active" condition itself lives in one place,
@@ -141,7 +160,7 @@ already had. A collision is a `ConflictError`, so the API answers 409 without an
 |---|---|---|
 | `GET /api/v1/alarm_code` | admin | list every code, hashes excluded |
 | `POST /api/v1/alarm_code` | admin | create a guest code (`name`, `code`, `valid_until`) |
-| `DELETE /api/v1/alarm_code/:id` | admin | revoke a code |
+| `DELETE /api/v1/alarm_code/:id` | admin | revoke a **guest** code; 403 on a personal one |
 | `GET /api/v1/me/alarm_code` | any user | `{ defined: true \| false }` — is my code set? |
 | `PATCH /api/v1/me/alarm_code` | any user | set or replace my own code |
 | `DELETE /api/v1/me/alarm_code` | any user | delete my own code |
@@ -216,17 +235,22 @@ code exists on the instance" (`alarmCode.existsActive()`), in `house.arm.js` and
 `server/migrations/20260912090000-per-user-alarm-codes.js`:
 
 1. Creates `t_alarm_code` and its partial unique index.
-2. Migrates the existing codes. Houses are walked in creation order; the first code found is hashed
-   and given to the **first admin** (oldest `t_user` with `role = 'admin'`), because that is the
-   closest thing to an owner Gladys records — `t_house` has no owner column. Any further *distinct*
-   code becomes a guest code named after its house, so a second house with its own code keeps
-   working; identical codes are not duplicated. With no admin in database, every code becomes a
-   guest code.
+2. Migrates the existing codes. Every distinct `t_house.alarm_code` becomes a **guest** code named
+   after its house; identical codes are not duplicated. Not the personal code of one person, even
+   though `t_house` has no owner column and the first admin would be the closest thing to one: that
+   code was shared by the whole household, and handing it to somebody's personal slot would have the
+   profile card invite them to *replace* what everybody else still types on the tablet — one write
+   away from locking the family out. As a guest code it belongs to nobody, survives the deletion of
+   any account, and whoever wants it as their own revokes that row and types it into their profile.
 3. Clears `t_house.alarm_code`. The column itself stays: no migration in this repo drops a column,
    and on SQLite dropping one means recreating `t_house` and its foreign keys. The field is removed
    from the Sequelize model, so nothing reads it, writes it or serializes it any more — which is
    what closes the leak through the house endpoints.
 4. `down` is empty, like every other migration here.
+
+All of it runs in **one transaction**: an instance interrupted midway comes back with no table and
+its house codes intact, rather than with half the codes migrated and a unique index that refuses
+the retry.
 
 Nobody is locked out by the update: the code that worked yesterday still works, and it now belongs
 to somebody.
@@ -262,11 +286,13 @@ cd ../front && npm run prettier-check && npm run eslint && npm run compare-trans
 End to end, from the repo root with `npm start`, starting from a database that still holds a house
 alarm code:
 
-1. After the migration, the old code still disarms the alarm from the locked-tablet keypad.
+1. After the migration, the old code still disarms the alarm from the locked-tablet keypad, and it
+   is listed as a guest code named after its house.
 2. A non-admin sets their own code in their profile, arms from the widget, and disarms with it. The
-   Houses tab is gone for them, and the house endpoints no longer return any code.
-3. An admin creates a guest code valid for two days: it disarms. Back-dated, it is refused like a
-   wrong code.
+   Houses tab is gone for them, and the house endpoints no longer return any code. The list offers
+   no way to revoke that code.
+3. An admin creates a guest code valid until today: it still disarms tonight. Back-dated, it is
+   refused like a wrong code.
 4. Saving a code that somebody else already uses is refused without naming them; an eleventh write
    in the hour answers 429.
 5. Three wrong codes on the keypad still fire the `alarm.too-many-codes-tests` scene.

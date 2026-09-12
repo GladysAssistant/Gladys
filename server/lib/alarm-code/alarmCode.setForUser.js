@@ -21,20 +21,22 @@ async function setForUser(userId, code) {
     throw new NotFoundError('User not found');
   }
 
-  const existingCode = await db.AlarmCode.findOne({ where: { user_id: userId } });
+  return this.serializeWrite(async () => {
+    const existingCode = await db.AlarmCode.findOne({ where: { user_id: userId } });
 
-  // Replacing a code by itself is not a conflict with itself.
-  await checkNewCode(code, existingCode === null ? null : existingCode.id);
+    // Replacing a code by itself is not a conflict with itself.
+    await checkNewCode(code, existingCode === null ? null : existingCode.id);
 
-  const hashedCode = await passwordUtils.hash(code);
+    const hashedCode = await passwordUtils.hash(code);
 
-  if (existingCode !== null) {
-    await existingCode.update({ code: hashedCode });
-    return { id: existingCode.id };
-  }
+    if (existingCode !== null) {
+      await existingCode.update({ code: hashedCode });
+      return { id: existingCode.id };
+    }
 
-  const createdCode = await db.AlarmCode.create({ user_id: userId, code: hashedCode });
-  return { id: createdCode.id };
+    const createdCode = await db.AlarmCode.create({ user_id: userId, code: hashedCode });
+    return { id: createdCode.id };
+  });
 }
 
 module.exports = {

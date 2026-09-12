@@ -283,7 +283,7 @@
       "validationError": "Erreur de validation : Le nom d'une maison doit être compris entre 1 et 40 caractères.",
       "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être compris entre 1 et 40 caractères.",
       "alarmTitle": "Alarme",
-      "alarmDescription": "Si vous utilisez le mode alarme dans Gladys, vous pouvez configurer ici le code de désactivation de l'alarme, ainsi que le délai avant le déclenchement de l'alarme. Ce délai sera appliqué lors d'un déclenchement manuel uniquement, pas dans les scènes.",
+      "alarmDescription": "Si vous utilisez l'alarme dans Gladys, vous pouvez régler ici le délai avant son armement et gérer les codes d'accès qui la désarment. Votre code personnel se règle depuis votre page de profil. Ce délai sera appliqué lors d'un déclenchement manuel uniquement, pas dans les scènes.",
       "alarmDelayBeforeArmingLabel": "Délai avant armement de l'alarme",
       "alarmDelays": {
         "0": "Pas de délai",
@@ -4091,7 +4091,7 @@
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter Gladys community.",
     "alarmCode": {
       "title": "Code d'alarme",
-      "description": "Votre code personnel arme et désarme l'alarme de vos maisons, depuis l'application Gladys comme depuis une tablette murale. Personne ne peut le relire, pas même un administrateur.",
+      "description": "Votre code personnel désarme l'alarme de vos maisons, depuis l'application Gladys comme depuis une tablette murale. Personne ne peut le relire, pas même un administrateur.",
       "label": "Votre code d'alarme",
       "toggleVisibility": "Afficher ou masquer le code",
       "replaceLabel": "Nouveau code d'alarme",
@@ -4138,7 +4138,7 @@
     "removeRoom": "Supprimer la pièce",
     "alarmCodes": {
       "label": "Codes d'accès",
-      "description": "Un code par personne, plus des codes invités pour quelqu'un qui n'a pas de compte Gladys. Un code arme et désarme l'alarme de toutes les maisons, et n'est plus jamais lisible une fois enregistré.",
+      "description": "Un code par personne, plus des codes invités pour quelqu'un qui n'a pas de compte Gladys. Un code désarme l'alarme de toutes les maisons — l'armement, lui, passe par un utilisateur connecté ou une scène — et n'est plus jamais lisible une fois enregistré.",
       "holder": "Titulaire",
       "guest": "Invité",
       "validUntil": "Valable jusqu'au",
@@ -4154,6 +4154,7 @@
       "error": {
         "invalid": "Un code d'alarme comporte 4 à 8 chiffres.",
         "alreadyUsed": "Ce code n'est pas disponible, choisissez-en un autre.",
+        "tooManyWrites": "Trop de changements de code d'affilée. Réessayez plus tard.",
         "generic": "Les codes d'accès n'ont pas pu être mis à jour. Réessayez."
       }
     },

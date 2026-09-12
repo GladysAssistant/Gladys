@@ -53,6 +53,18 @@ describe('alarmCode.createGuest', () => {
     await assert.isRejected(promise, 'ALARM_CODE_ALREADY_USED');
   });
 
+  it('should let only one of two concurrent writes take the same code', async () => {
+    // A bcrypt hash cannot take a unique index, so writes queue rather than race
+    const results = await Promise.allSettled([
+      alarmCode.createGuest(JOHN_ID, { name: 'Home help', code: '4321' }),
+      alarmCode.createGuest(JOHN_ID, { name: 'Dog sitter', code: '4321' }),
+    ]);
+
+    expect(results.filter((result) => result.status === 'fulfilled')).to.have.lengthOf(1);
+    expect(results.filter((result) => result.status === 'rejected')).to.have.lengthOf(1);
+    expect(await db.AlarmCode.count()).to.equal(1);
+  });
+
   it('should refuse to write once the rate limit is spent', async () => {
     await alarmCode.writeRateLimit.consume(JOHN_ID, 10);
 

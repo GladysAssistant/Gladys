@@ -8,9 +8,13 @@ import cx from 'classnames';
 // set, so this card either offers to create one or to replace it.
 class AlarmCode extends Component {
   getStatus = async () => {
+    const generation = this.mutations;
     try {
       const { defined } = await this.props.httpClient.get('/api/v1/me/alarm_code');
-      this.setState({ defined });
+      // A save or a delete may have landed while this was in flight: what it wrote is fresher
+      if (generation === this.mutations) {
+        this.setState({ defined });
+      }
     } catch (e) {
       this.setState({ error: 'generic' });
     }
@@ -21,6 +25,7 @@ class AlarmCode extends Component {
   toggleCodeVisibility = () => this.setState(prevState => ({ showCode: !prevState.showCode }));
 
   saveCode = async () => {
+    this.mutations += 1;
     this.setState({ loading: true, error: null, saved: false });
     try {
       await this.props.httpClient.patch('/api/v1/me/alarm_code', { code: this.state.code });
@@ -40,6 +45,7 @@ class AlarmCode extends Component {
   };
 
   deleteCode = async () => {
+    this.mutations += 1;
     this.setState({ loading: true, error: null, saved: false });
     try {
       await this.props.httpClient.delete('/api/v1/me/alarm_code');
@@ -52,6 +58,9 @@ class AlarmCode extends Component {
   constructor(props) {
     super(props);
     this.props = props;
+    // Counts the writes this card has made, so a status response started before one of them cannot
+    // land after it and report the previous state.
+    this.mutations = 0;
     this.state = {
       code: '',
       defined: false,
@@ -100,6 +109,7 @@ class AlarmCode extends Component {
                     <input
                       type={showCode ? 'text' : 'password'}
                       class={cx('form-control', { 'is-invalid': error === 'invalid' })}
+                      autocomplete="new-password"
                       value={code}
                       onInput={this.updateCode}
                       placeholder={<Text id="profile.alarmCode.placeholder" />}

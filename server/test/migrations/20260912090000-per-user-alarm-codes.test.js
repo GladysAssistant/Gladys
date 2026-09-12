@@ -1,14 +1,10 @@
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 
 const db = require('../../models');
-const { USER_ROLE } = require('../../utils/constants');
 
 const AlarmCode = require('../../lib/alarm-code');
 
 const migration = require('../../migrations/20260912090000-per-user-alarm-codes');
-
-const JOHN_ID = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
-const PEPPER_ID = '7a137a56-069e-4996-8816-36558174b727';
 
 const queryInterface = () => db.sequelize.getQueryInterface();
 
@@ -29,15 +25,16 @@ describe('migration 20260912090000-per-user-alarm-codes', () => {
     expect(await db.AlarmCode.count()).to.equal(0);
   });
 
-  it('should give the code of the house to the first admin, and clear the column', async () => {
+  it('should turn the code of a house into a guest code named after it, and clear the column', async () => {
     await setHouseCode('test-house', '123456');
 
     await migration.migrateHouseCodes(queryInterface());
 
     const codes = await db.AlarmCode.findAll();
     expect(codes).to.have.lengthOf(1);
-    expect(codes[0].user_id).to.be.oneOf([JOHN_ID, PEPPER_ID]);
-    expect(codes[0].name).to.equal(null);
+    // A house code was shared by the household: it belongs to nobody in particular
+    expect(codes[0].user_id).to.equal(null);
+    expect(codes[0].name).to.equal('Test house');
     expect(codes[0].valid_until).to.equal(null);
     // The code that worked yesterday still works, hashed now
     expect(await new AlarmCode().validate('123456')).to.not.equal(null);
@@ -45,18 +42,14 @@ describe('migration 20260912090000-per-user-alarm-codes', () => {
     houses.forEach((house) => expect(house.alarm_code).to.equal(null));
   });
 
-  it('should turn a second, different house code into a guest code named after its house', async () => {
+  it('should migrate the code of every house', async () => {
     await setHouseCode('test-house', '123456');
     await setHouseCode('pepper-house', '654321');
 
     await migration.migrateHouseCodes(queryInterface());
 
-    const codes = await db.AlarmCode.findAll();
-    expect(codes).to.have.lengthOf(2);
-    const personalCode = codes.find((code) => code.user_id !== null);
-    const guestCode = codes.find((code) => code.user_id === null);
-    expect(personalCode).to.not.equal(undefined);
-    expect(guestCode.name).to.be.oneOf(['Test house', 'Peppers house']);
+    const codes = await db.AlarmCode.findAll({ order: [['name', 'ASC']] });
+    expect(codes.map((code) => code.name)).to.deep.equal(['Peppers house', 'Test house']);
     const alarmCode = new AlarmCode();
     expect(await alarmCode.validate('123456')).to.not.equal(null);
     expect(await alarmCode.validate('654321')).to.not.equal(null);
@@ -71,18 +64,6 @@ describe('migration 20260912090000-per-user-alarm-codes', () => {
     expect(await db.AlarmCode.count()).to.equal(1);
   });
 
-  it('should fall back to a guest code when no admin exists', async () => {
-    await db.User.update({ role: USER_ROLE.HABITANT }, { where: {} });
-    await setHouseCode('test-house', '123456');
-
-    await migration.migrateHouseCodes(queryInterface());
-
-    const codes = await db.AlarmCode.findAll();
-    expect(codes).to.have.lengthOf(1);
-    expect(codes[0].user_id).to.equal(null);
-    expect(codes[0].name).to.equal('Test house');
-  });
-
   it('should be safe to run twice', async () => {
     await setHouseCode('test-house', '123456');
 
@@ -90,6 +71,22 @@ describe('migration 20260912090000-per-user-alarm-codes', () => {
     await migration.migrateHouseCodes(queryInterface());
 
     expect(await db.AlarmCode.count()).to.equal(1);
+  });
+
+  it('should leave nothing behind when its transaction is rolled back', async () => {
+    await setHouseCode('test-house', '123456');
+
+    // An instance interrupted midway comes back with its house codes intact, rather than with half
+    // the codes migrated and an index that refuses the retry
+    const interrupted = db.sequelize.transaction(async (transaction) => {
+      await migration.migrateHouseCodes(queryInterface(), transaction);
+      throw new Error('interrupted');
+    });
+    await assert.isRejected(interrupted, 'interrupted');
+
+    expect(await db.AlarmCode.count()).to.equal(0);
+    const houses = await getHouseCodes();
+    expect(houses.filter((house) => house.alarm_code === '123456')).to.have.lengthOf(1);
   });
 
   it('should have an empty down migration', async () => {

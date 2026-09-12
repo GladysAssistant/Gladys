@@ -283,7 +283,7 @@
       "validationError": "House name should be between 1 and 40 characters",
       "validationErrorRoom": "Room name should be between 1 and 40 characters",
       "alarmTitle": "Alarm",
-      "alarmDescription": "If you are using the alarm mode in Gladys, you can configure the alarm deactivation code and the delay before the alarm triggers here. This delay will only apply in the case of manual triggering and not in scenes.",
+      "alarmDescription": "If you are using the alarm in Gladys, you can set the delay before it arms here, and manage the access codes that disarm it. Your own code lives on your profile page. This delay will only apply in the case of manual triggering and not in scenes.",
       "alarmDelayBeforeArmingLabel": "Delay before arming the alarm",
       "alarmDelays": {
         "0": "No delay",
@@ -4091,7 +4091,7 @@
     "unknownError": "An unknown error occurred. Please try again or contact Gladys community.",
     "alarmCode": {
       "title": "Alarm code",
-      "description": "Your own code arms and disarms the alarm of your houses, from the Gladys app as well as from a wall tablet. Nobody can read it back, not even an administrator.",
+      "description": "Your own code disarms the alarm of your houses, from the Gladys app as well as from a wall tablet. Nobody can read it back, not even an administrator.",
       "label": "Your alarm code",
       "toggleVisibility": "Show or hide the code",
       "replaceLabel": "New alarm code",
@@ -4138,7 +4138,7 @@
     "removeRoom": "Remove room",
     "alarmCodes": {
       "label": "Access codes",
-      "description": "One code per person, plus guest codes for someone who has no Gladys account. A code arms and disarms the alarm of every house, and can never be read back once saved.",
+      "description": "One code per person, plus guest codes for someone who has no Gladys account. A code disarms the alarm of every house — arming is done by a logged-in user or a scene — and can never be read back once saved.",
       "holder": "Holder",
       "guest": "Guest",
       "validUntil": "Valid until",
@@ -4154,6 +4154,7 @@
       "error": {
         "invalid": "An alarm code is 4 to 8 digits.",
         "alreadyUsed": "This code is not available, please choose another one.",
+        "tooManyWrites": "Too many code changes in a row. Please try again later.",
         "generic": "The access codes could not be updated. Please try again."
       }
     },

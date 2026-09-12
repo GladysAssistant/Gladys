@@ -7,6 +7,7 @@ const { destroyForUser } = require('./alarmCode.destroyForUser');
 const { existsActive } = require('./alarmCode.existsActive');
 const { existsForUser } = require('./alarmCode.existsForUser');
 const { get } = require('./alarmCode.get');
+const { serializeWrite } = require('./alarmCode.serializeWrite');
 const { setForUser } = require('./alarmCode.setForUser');
 const { validate } = require('./alarmCode.validate');
 
@@ -15,6 +16,7 @@ const AlarmCode = function AlarmCode() {
     points: 10, // 10 writes
     duration: 60 * 60, // Per hour
   });
+  this.writeQueue = Promise.resolve();
 };
 
 AlarmCode.prototype.consumeWriteRateLimit = consumeWriteRateLimit;
@@ -24,6 +26,7 @@ AlarmCode.prototype.destroyForUser = destroyForUser;
 AlarmCode.prototype.existsActive = existsActive;
 AlarmCode.prototype.existsForUser = existsForUser;
 AlarmCode.prototype.get = get;
+AlarmCode.prototype.serializeWrite = serializeWrite;
 AlarmCode.prototype.setForUser = setForUser;
 AlarmCode.prototype.validate = validate;
 

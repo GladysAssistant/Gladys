@@ -11,6 +11,14 @@ const dateDisplayOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 // A code is never readable, so the table shows who holds one, not what it is.
 const formatDate = (date, language) => new Date(date).toLocaleDateString(language, dateDisplayOptions);
 
+// `<input type="date">` yields 'YYYY-MM-DD', and `new Date('YYYY-MM-DD')` is midnight UTC — which
+// expires the code the evening before west of UTC. A date picker reads as "that whole day", so the
+// picked day is kept whole, until the end of it, locally.
+const endOfLocalDay = pickedDay => {
+  const [year, month, day] = pickedDay.split('-').map(Number);
+  return new Date(year, month - 1, day, 23, 59, 59, 999);
+};
+
 class AlarmCodes extends Component {
   getCodes = async () => {
     this.setState({ status: RequestStatus.Getting });
@@ -36,19 +44,21 @@ class AlarmCodes extends Component {
       await this.props.httpClient.post('/api/v1/alarm_code', {
         name: newCodeName,
         code: newCode,
-        valid_until: newValidUntil === '' ? null : new Date(newValidUntil)
+        valid_until: newValidUntil === '' ? null : endOfLocalDay(newValidUntil)
       });
       this.setState({ newCodeName: '', newCode: '', newValidUntil: '', error: null });
       await this.getCodes();
     } catch (e) {
       const status = get(e, 'response.status');
+      let error = 'generic';
       if (status === 409) {
-        this.setState({ error: 'alreadyUsed' });
+        error = 'alreadyUsed';
       } else if (status === 400) {
-        this.setState({ error: 'invalid' });
-      } else {
-        this.setState({ error: 'generic' });
+        error = 'invalid';
+      } else if (status === 429) {
+        error = 'tooManyWrites';
       }
+      this.setState({ error });
     }
   };
 
@@ -149,7 +159,14 @@ class AlarmCodes extends Component {
                       )}
                     </td>
                     <td>
-                      <i style={{ cursor: 'pointer' }} onClick={() => this.revokeCode(code.id)} class="fe fe-trash-2" />
+                      {/* a personal code is its holder's business: only guest codes are revoked here */}
+                      {!code.user && (
+                        <i
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => this.revokeCode(code.id)}
+                          class="fe fe-trash-2"
+                        />
+                      )}
                     </td>
                   </tr>
                 );
@@ -170,6 +187,7 @@ class AlarmCodes extends Component {
                       <input
                         type={showNewCode ? 'text' : 'password'}
                         class="form-control"
+                        autocomplete="new-password"
                         value={newCode}
                         onInput={this.updateNewCode}
                         placeholder={<Text id="housesSettings.alarmCodes.codePlaceholder" />}

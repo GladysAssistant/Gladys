@@ -88,6 +88,14 @@ describe('DELETE /api/v1/alarm_code/:alarm_code_id', () => {
   it('should return 404 on a code that does not exist', async () => {
     await authenticatedRequest.delete('/api/v1/alarm_code/e5c1d94a-bd8f-4ad4-8dc0-c0e0f6e9f2f4').expect(404);
   });
+  it('should refuse to revoke the personal code of a user', async () => {
+    const code = await db.AlarmCode.create({ user_id: JOHN_ID, code: await passwordUtils.hash('1234') });
+
+    const res = await authenticatedRequest.delete(`/api/v1/alarm_code/${code.id}`).expect(403);
+
+    expect(res.body).to.have.property('message', 'PERSONAL_ALARM_CODE');
+    expect(await db.AlarmCode.count()).to.equal(1);
+  });
   it('should not be revocable by a non-admin', async () => {
     await seedNonAdminUser();
     const code = await db.AlarmCode.create({ name: 'Home help', code: await passwordUtils.hash('4321') });

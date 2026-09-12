@@ -26,6 +26,16 @@ describe('alarmCode.destroy', () => {
     const promise = alarmCode.destroy('e5c1d94a-bd8f-4ad4-8dc0-c0e0f6e9f2f4');
     await assert.isRejected(promise, 'Alarm code not found');
   });
+
+  it('should refuse to revoke the personal code of a user', async () => {
+    // Somebody else's code is their business, and revoking it takes no access away
+    const code = await db.AlarmCode.create({ user_id: JOHN_ID, code: await passwordUtils.hash('1234') });
+
+    const promise = alarmCode.destroy(code.id);
+
+    await assert.isRejected(promise, 'PERSONAL_ALARM_CODE');
+    expect(await alarmCode.existsForUser(JOHN_ID)).to.equal(true);
+  });
 });
 
 describe('alarmCode.destroyForUser', () => {

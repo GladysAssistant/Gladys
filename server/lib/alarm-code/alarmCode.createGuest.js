@@ -22,18 +22,20 @@ async function createGuest(createdByUserId, guestCode) {
     throw new BadParameters('A guest alarm code needs a name');
   }
 
-  await checkNewCode(code);
+  return this.serializeWrite(async () => {
+    await checkNewCode(code);
 
-  const createdCode = await db.AlarmCode.create({
-    user_id: null,
-    name,
-    code: await passwordUtils.hash(code),
-    valid_until: validUntil,
+    const createdCode = await db.AlarmCode.create({
+      user_id: null,
+      name,
+      code: await passwordUtils.hash(code),
+      valid_until: validUntil,
+    });
+
+    const plainCode = createdCode.get({ plain: true });
+    delete plainCode.code;
+    return plainCode;
   });
-
-  const plainCode = createdCode.get({ plain: true });
-  delete plainCode.code;
-  return plainCode;
 }
 
 module.exports = {
