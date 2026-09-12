@@ -2,7 +2,7 @@
   {
     "label": "gateway.payment-required",
     "answers": [
-      "Su suscripción a Gladys Plus está suspendida: se requiere un pago. Las copias de seguridad, la sincronización con Enedis y las funciones de IA están en pausa en esta instancia. Para solucionarlo, actualiza tu método de pago en tu cuenta de Gladys Plus (https://plus.gladysassistant.com/dashboard/settings/billing) y luego haz clic en \"Comprobar de nuevo\" en \"Configuración\" => \"Gladys Plus\". Todo se reanuda automáticamente en cuanto se recibe el pago, no se pierde nada."
+      "Su suscripción a Gladys Plus está suspendida: se requiere un pago. Las copias de seguridad, la sincronización con Enedis y las funciones de IA están en pausa en esta instancia. Para solucionarlo, actualice su método de pago en su cuenta de Gladys Plus (https://plus.gladysassistant.com/dashboard/settings/billing) y luego haga clic en \"Comprobar de nuevo\" en \"Configuración\" => \"Gladys Plus\". Todo se reanuda automáticamente en cuanto se recibe el pago, no se pierde nada."
     ]
   },
   {
