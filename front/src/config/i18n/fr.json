@@ -284,10 +284,7 @@
       "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être compris entre 1 et 40 caractères.",
       "alarmTitle": "Alarme",
       "alarmDescription": "Si vous utilisez le mode alarme dans Gladys, vous pouvez configurer ici le code de désactivation de l'alarme, ainsi que le délai avant le déclenchement de l'alarme. Ce délai sera appliqué lors d'un déclenchement manuel uniquement, pas dans les scènes.",
-      "alarmCodeLabel": "Code de l'alarme",
-      "alarmCodePlaceholder": "Entrez un code numérique entre 4 et 8 chiffres",
       "alarmDelayBeforeArmingLabel": "Délai avant armement de l'alarme",
-      "alarmCodeError": "Le code doit être numérique et entre 4 et 8 chiffres.",
       "alarmDelays": {
         "0": "Pas de délai",
         "5": "5 secondes",
@@ -4091,7 +4088,23 @@
     "emailAlreadyExistError": "Un utilisateur avec cet e-mail existe déjà.",
     "selectorAlreadyExistError": "Un utilisateur portant ce prénom existe déjà.",
     "instanceAlreadyConfiguredError": "Cette instance est déjà configurée. Vous ne pouvez pas créer un autre compte.",
-    "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter Gladys community."
+    "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter Gladys community.",
+    "alarmCode": {
+      "title": "Code d'alarme",
+      "description": "Votre code personnel arme et désarme l'alarme de vos maisons, depuis l'application Gladys comme depuis une tablette murale. Personne ne peut le relire, pas même un administrateur.",
+      "label": "Votre code d'alarme",
+      "replaceLabel": "Nouveau code d'alarme",
+      "placeholder": "4 à 8 chiffres",
+      "saveButton": "Enregistrer ce code",
+      "deleteButton": "Supprimer mon code",
+      "saved": "Votre code d'alarme a été enregistré.",
+      "error": {
+        "invalid": "Un code d'alarme comporte 4 à 8 chiffres.",
+        "alreadyUsed": "Ce code n'est pas disponible, choisissez-en un autre.",
+        "tooManyWrites": "Trop de changements de code d'affilée. Réessayez plus tard.",
+        "generic": "Votre code d'alarme n'a pas pu être enregistré. Réessayez."
+      }
+    }
   },
   "settings": {
     "title": "Paramètres",
@@ -4122,7 +4135,26 @@
     "oneHouseCount": "1 maison",
     "saved": "Enregistré",
     "removeRoom": "Supprimer la pièce",
-    "toggleAlarmCodeVisibility": "Afficher ou masquer le code de l'alarme",
+    "alarmCodes": {
+      "label": "Codes d'accès",
+      "description": "Un code par personne, plus des codes invités pour quelqu'un qui n'a pas de compte Gladys. Un code arme et désarme l'alarme de toutes les maisons, et n'est plus jamais lisible une fois enregistré.",
+      "holder": "Titulaire",
+      "guest": "Invité",
+      "validUntil": "Valable jusqu'au",
+      "validUntilHelp": "Laissez vide pour ne pas mettre de fin",
+      "noExpiry": "Sans fin",
+      "expired": "expiré",
+      "revoke": "Révoquer",
+      "noCodes": "Aucun code d'accès. Chaque utilisateur définit le sien depuis son profil.",
+      "namePlaceholder": "Nom de l'invité",
+      "codePlaceholder": "Code, 4 à 8 chiffres",
+      "addButton": "Ajouter",
+      "error": {
+        "invalid": "Un code d'alarme comporte 4 à 8 chiffres.",
+        "alreadyUsed": "Ce code n'est pas disponible, choisissez-en un autre.",
+        "generic": "Les codes d'accès n'ont pas pu être mis à jour. Réessayez."
+      }
+    },
     "deleteConfirmTitle": "Supprimer « {{name}} » ?",
     "deleteConfirmDescription": "La maison et toutes ses pièces seront supprimées. Cette action est irréversible.",
     "summary": {
@@ -4131,8 +4163,6 @@
       "noRoom": "Aucune pièce",
       "located": "Localisée",
       "notLocated": "Non localisée",
-      "alarmSet": "Code d'alarme défini",
-      "alarmNotSet": "Pas de code d'alarme",
       "neverSaved": "Non enregistrée",
       "unsavedChanges": "Modifications non enregistrées"
     },

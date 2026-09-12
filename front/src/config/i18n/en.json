@@ -284,10 +284,7 @@
       "validationErrorRoom": "Room name should be between 1 and 40 characters",
       "alarmTitle": "Alarm",
       "alarmDescription": "If you are using the alarm mode in Gladys, you can configure the alarm deactivation code and the delay before the alarm triggers here. This delay will only apply in the case of manual triggering and not in scenes.",
-      "alarmCodeLabel": "Alarm Code",
-      "alarmCodePlaceholder": "Enter a numeric code between 4 and 8 digits",
       "alarmDelayBeforeArmingLabel": "Delay before arming the alarm",
-      "alarmCodeError": "The code must be numeric and between 4 and 8 digits.",
       "alarmDelays": {
         "0": "No delay",
         "5": "5 seconds",
@@ -4091,7 +4088,23 @@
     "emailAlreadyExistError": "A user with this email already exists.",
     "selectorAlreadyExistError": "A user with this first name already exists.",
     "instanceAlreadyConfiguredError": "This instance is already configured. You cannot create another account.",
-    "unknownError": "An unknown error occurred. Please try again or contact Gladys community."
+    "unknownError": "An unknown error occurred. Please try again or contact Gladys community.",
+    "alarmCode": {
+      "title": "Alarm code",
+      "description": "Your own code arms and disarms the alarm of your houses, from the Gladys app as well as from a wall tablet. Nobody can read it back, not even an administrator.",
+      "label": "Your alarm code",
+      "replaceLabel": "New alarm code",
+      "placeholder": "4 to 8 digits",
+      "saveButton": "Save this code",
+      "deleteButton": "Delete my code",
+      "saved": "Your alarm code has been saved.",
+      "error": {
+        "invalid": "An alarm code is 4 to 8 digits.",
+        "alreadyUsed": "This code is not available, please choose another one.",
+        "tooManyWrites": "Too many code changes in a row. Please try again later.",
+        "generic": "Your alarm code could not be saved. Please try again."
+      }
+    }
   },
   "settings": {
     "title": "Settings",
@@ -4122,7 +4135,26 @@
     "oneHouseCount": "1 house",
     "saved": "Saved",
     "removeRoom": "Remove room",
-    "toggleAlarmCodeVisibility": "Show or hide the alarm code",
+    "alarmCodes": {
+      "label": "Access codes",
+      "description": "One code per person, plus guest codes for someone who has no Gladys account. A code arms and disarms the alarm of every house, and can never be read back once saved.",
+      "holder": "Holder",
+      "guest": "Guest",
+      "validUntil": "Valid until",
+      "validUntilHelp": "Leave empty for no expiry",
+      "noExpiry": "No expiry",
+      "expired": "expired",
+      "revoke": "Revoke",
+      "noCodes": "No access code yet. Each user sets their own from their profile.",
+      "namePlaceholder": "Guest name",
+      "codePlaceholder": "Code, 4 to 8 digits",
+      "addButton": "Add",
+      "error": {
+        "invalid": "An alarm code is 4 to 8 digits.",
+        "alreadyUsed": "This code is not available, please choose another one.",
+        "generic": "The access codes could not be updated. Please try again."
+      }
+    },
     "deleteConfirmTitle": "Delete “{{name}}”?",
     "deleteConfirmDescription": "The house and all its rooms will be deleted. This cannot be undone.",
     "summary": {
@@ -4131,8 +4163,6 @@
       "noRoom": "No room",
       "located": "Located",
       "notLocated": "No location",
-      "alarmSet": "Alarm code set",
-      "alarmNotSet": "No alarm code",
       "neverSaved": "Not saved yet",
       "unsavedChanges": "Unsaved changes"
     },

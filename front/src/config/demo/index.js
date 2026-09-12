@@ -441,6 +441,9 @@ const home = {
     tablet_mode: false,
     current_house_id: house.id
   },
+  // Alarm codes are never readable, so the demo only says whether one is set
+  'get /api/v1/alarm_code': [],
+  'get /api/v1/me/alarm_code': { defined: false },
 
   // --- Dashboards --------------------------------------------------------
   'get /api/v1/dashboard': dashboards.map(

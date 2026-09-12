@@ -284,10 +284,7 @@
       "validationErrorRoom": "Der Raumname muss zwischen 1 und 40 Zeichen lang sein",
       "alarmTitle": "Alarm",
       "alarmDescription": "Wenn du den Alarmmodus in Gladys verwendest, kannst du den Deaktivierungscode und die Verzögerung vor der Scharfschaltung des Alarms hier konfigurieren. Diese Verzögerung gilt nur im Fall einer manueller Auslösung und nicht in Szenen.",
-      "alarmCodeLabel": "Deaktivierungscode",
-      "alarmCodePlaceholder": "Gib einen numerischen Code zwischen 4 und 8 Ziffern ein",
       "alarmDelayBeforeArmingLabel": "Verzögerung vor Scharfschaltung des Alarms",
-      "alarmCodeError": "Der Code muss numerisch und zwischen 4 und 8 Ziffern lang sein.",
       "alarmDelays": {
         "0": "Keine Verzögerung",
         "5": "5 Sekunden",
@@ -4091,7 +4088,23 @@
     "emailAlreadyExistError": "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits.",
     "selectorAlreadyExistError": "Ein Benutzer mit diesem Vornamen existiert bereits.",
     "instanceAlreadyConfiguredError": "Diese Instanz ist bereits konfiguriert. Du kannst keinen weiteren Account erstellen.",
-    "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut oder kontaktiere die Gladys-Community."
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut oder kontaktiere die Gladys-Community.",
+    "alarmCode": {
+      "title": "Alarmcode",
+      "description": "Dein persönlicher Code aktiviert und deaktiviert den Alarm deiner Häuser, in der Gladys-App wie auf einem Wandtablet. Niemand kann ihn wieder auslesen, auch kein Administrator.",
+      "label": "Dein Alarmcode",
+      "replaceLabel": "Neuer Alarmcode",
+      "placeholder": "4 bis 8 Ziffern",
+      "saveButton": "Diesen Code speichern",
+      "deleteButton": "Meinen Code löschen",
+      "saved": "Dein Alarmcode wurde gespeichert.",
+      "error": {
+        "invalid": "Ein Alarmcode besteht aus 4 bis 8 Ziffern.",
+        "alreadyUsed": "Dieser Code ist nicht verfügbar, bitte wähle einen anderen.",
+        "tooManyWrites": "Zu viele Codeänderungen in kurzer Zeit. Bitte versuche es später erneut.",
+        "generic": "Dein Alarmcode konnte nicht gespeichert werden. Bitte versuche es erneut."
+      }
+    }
   },
   "settings": {
     "title": "Einstellungen",
@@ -4122,7 +4135,26 @@
     "oneHouseCount": "1 Zuhause",
     "saved": "Gespeichert",
     "removeRoom": "Raum entfernen",
-    "toggleAlarmCodeVisibility": "Alarmcode anzeigen oder ausblenden",
+    "alarmCodes": {
+      "label": "Zugangscodes",
+      "description": "Ein Code pro Person, dazu Gastcodes für jemanden ohne Gladys-Konto. Ein Code aktiviert und deaktiviert den Alarm aller Häuser und ist nach dem Speichern nie wieder lesbar.",
+      "holder": "Inhaber",
+      "guest": "Gast",
+      "validUntil": "Gültig bis",
+      "validUntilHelp": "Leer lassen für kein Ablaufdatum",
+      "noExpiry": "Kein Ablaufdatum",
+      "expired": "abgelaufen",
+      "revoke": "Widerrufen",
+      "noCodes": "Noch kein Zugangscode. Jede Person legt ihren eigenen im Profil fest.",
+      "namePlaceholder": "Name des Gasts",
+      "codePlaceholder": "Code, 4 bis 8 Ziffern",
+      "addButton": "Hinzufügen",
+      "error": {
+        "invalid": "Ein Alarmcode besteht aus 4 bis 8 Ziffern.",
+        "alreadyUsed": "Dieser Code ist nicht verfügbar, bitte wähle einen anderen.",
+        "generic": "Die Zugangscodes konnten nicht aktualisiert werden. Bitte versuche es erneut."
+      }
+    },
     "deleteConfirmTitle": "„{{name}}“ löschen?",
     "deleteConfirmDescription": "Das Zuhause und alle seine Räume werden gelöscht. Das kann nicht rückgängig gemacht werden.",
     "summary": {
@@ -4131,8 +4163,6 @@
       "noRoom": "Kein Raum",
       "located": "Verortet",
       "notLocated": "Nicht verortet",
-      "alarmSet": "Alarmcode festgelegt",
-      "alarmNotSet": "Kein Alarmcode",
       "neverSaved": "Noch nicht gespeichert",
       "unsavedChanges": "Nicht gespeicherte Änderungen"
     },
