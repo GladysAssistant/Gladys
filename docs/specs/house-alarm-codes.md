@@ -184,6 +184,10 @@ The first one is the existing protection of the keypad, kept exactly as it is, i
 the uniqueness answer of A.5 from becoming an enumeration oracle. Both are in-memory
 (`RateLimiterMemory`) and both answer `429` with `time_before_next`.
 
+In memory means both budgets are forgotten on a restart — the behavior the keypad limiter already
+had. Restarting Gladys to buy three more tries is not a shortcut worth closing: whoever can restart
+the server owns the database.
+
 ### B.5 Knowing who armed or disarmed
 
 Alarm payloads used to be exactly `{ house }`. They now also carry:
@@ -273,6 +277,10 @@ now ship hashes instead of a clear-text code.
   a scene can notify or log it, but Gladys stores nothing: there is no event table in the repo, and
   building one belongs to its own request.
 - **Codes scoped to one house**, and more than one code per person.
+- **Taking a Gladys account's access away.** A code gates the keypad, not the authenticated API: a
+  logged-in user disarms with no code at all, so revoking their code changes nothing for them.
+  Removing somebody's access to the house is still deleting their account — which does take their
+  code with it (`onDelete: CASCADE`). Only guest codes are access that a code *is*.
 - **Anything a code triggers beyond disarming**: the reaction to repeated wrong codes stays the
   existing `alarm.too-many-codes-tests` scene trigger, with no notification and no siren of its own.
 
