@@ -16,7 +16,10 @@ class AlarmCode extends Component {
         this.setState({ defined });
       }
     } catch (e) {
-      this.setState({ error: 'generic' });
+      // and a status request that failed after a write must not report that write as failed
+      if (generation === this.mutations) {
+        this.setState({ error: 'generic' });
+      }
     }
   };
 

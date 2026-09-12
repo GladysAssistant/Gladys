@@ -161,11 +161,16 @@ class AlarmCodes extends Component {
                     <td>
                       {/* a personal code is its holder's business: only guest codes are revoked here */}
                       {!code.user && (
-                        <i
-                          style={{ cursor: 'pointer' }}
-                          onClick={() => this.revokeCode(code.id)}
-                          class="fe fe-trash-2"
-                        />
+                        <Localizer>
+                          <button
+                            type="button"
+                            class="btn btn-link p-0 text-muted"
+                            onClick={() => this.revokeCode(code.id)}
+                            aria-label={<Text id="housesSettings.alarmCodes.revoke" />}
+                          >
+                            <i class="fe fe-trash-2" />
+                          </button>
+                        </Localizer>
                       )}
                     </td>
                   </tr>
