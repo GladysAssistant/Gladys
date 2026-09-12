@@ -1,3 +1,4 @@
+const AlarmCodeController = require('./controllers/alarm-code.controller');
 const AreaController = require('./controllers/area.controller');
 const CalendarController = require('./controllers/calendar.controller');
 const CameraController = require('./controllers/camera.controller');
@@ -41,6 +42,7 @@ function getRoutes(gladys) {
   const locationController = LocationController(gladys);
   const userController = UserController(gladys);
   const houseController = HouseController(gladys);
+  const alarmCodeController = AlarmCodeController(gladys);
   const httpController = HttpController(gladys);
   const messageController = MessageController(gladys);
   const pingController = PingController();
@@ -337,6 +339,35 @@ function getRoutes(gladys) {
     'post /api/v1/house/:house_selector/panic': {
       authenticated: true,
       controller: houseController.panic,
+    },
+    // Alarm codes. Configuring the alarm is reserved to admins, but every user manages their own
+    // code, so the "me" routes are open to any authenticated user.
+    'get /api/v1/alarm_code': {
+      authenticated: true,
+      admin: true,
+      controller: alarmCodeController.get,
+    },
+    'post /api/v1/alarm_code': {
+      authenticated: true,
+      admin: true,
+      controller: alarmCodeController.createGuest,
+    },
+    'delete /api/v1/alarm_code/:alarm_code_id': {
+      authenticated: true,
+      admin: true,
+      controller: alarmCodeController.destroy,
+    },
+    'get /api/v1/me/alarm_code': {
+      authenticated: true,
+      controller: alarmCodeController.getMine,
+    },
+    'patch /api/v1/me/alarm_code': {
+      authenticated: true,
+      controller: alarmCodeController.setMine,
+    },
+    'delete /api/v1/me/alarm_code': {
+      authenticated: true,
+      controller: alarmCodeController.destroyMine,
     },
     // job
     'get /api/v1/job': {

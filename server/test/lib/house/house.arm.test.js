@@ -29,9 +29,13 @@ const ARM_MODES = [
   },
 ];
 
+// Nobody asked, which is what a scene or an integration looks like in an alarm event.
+const NOBODY = { user: null, user_name: null };
+
 describe('house.arm', () => {
   let house;
   let event;
+  let alarmCode;
   beforeEach(async () => {
     const session = {
       setTabletModeLocked: fake.resolves(null),
@@ -39,7 +43,10 @@ describe('house.arm', () => {
     event = {
       emit: fake.returns(null),
     };
-    house = new House(event, {}, session);
+    alarmCode = {
+      existsActive: fake.resolves(true),
+    };
+    house = new House(event, {}, session, {}, alarmCode);
     await house.update('test-house', {
       alarm_delay_before_arming: 0.001,
       alarm_mode: ALARM_MODES.DISARMED,
@@ -82,6 +89,7 @@ describe('house.arm', () => {
           payload: {
             house: 'test-house',
             mode,
+            ...NOBODY,
           },
         },
       ]);
@@ -90,6 +98,7 @@ describe('house.arm', () => {
         {
           type: EVENTS.ALARM.ARMING,
           house: 'test-house',
+          ...NOBODY,
         },
       ]);
       expect(originalEmit.thirdCall.args).to.deep.equal([
@@ -97,6 +106,7 @@ describe('house.arm', () => {
         {
           type: trigger,
           house: 'test-house',
+          ...NOBODY,
         },
       ]);
       expect(originalEmit.args[3]).to.deep.equal([
@@ -105,6 +115,7 @@ describe('house.arm', () => {
           type: websocket,
           payload: {
             house: 'test-house',
+            ...NOBODY,
           },
         },
       ]);
@@ -118,6 +129,7 @@ describe('house.arm', () => {
         {
           type: trigger,
           house: 'test-house',
+          ...NOBODY,
         },
       ]);
       expect(event.emit.args[3]).to.deep.equal([
@@ -126,6 +138,7 @@ describe('house.arm', () => {
           type: websocket,
           payload: {
             house: 'test-house',
+            ...NOBODY,
           },
         },
       ]);
@@ -185,14 +198,36 @@ describe('house.arm', () => {
     const updatedHouse = await house.getBySelector('test-house');
     expect(updatedHouse.alarm_mode).to.equal(ALARM_MODES.NIGHT_ARMED);
   });
-  it('should call setTabletModeLocked when alarm_code is set', async () => {
+  it('should name who armed the house in its events', async () => {
+    await house.arm('test-house', ALARM_MODES.AWAY_ARMED, true, { user: 'john', user_name: 'John' });
+
+    expect(event.emit.thirdCall.args).to.deep.equal([
+      EVENTS.TRIGGERS.CHECK,
+      {
+        type: EVENTS.ALARM.AWAY_ARM,
+        house: 'test-house',
+        user: 'john',
+        user_name: 'John',
+      },
+    ]);
+    expect(event.emit.args[3]).to.deep.equal([
+      EVENTS.WEBSOCKET.SEND_ALL,
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.ALARM.AWAY_ARMED,
+        payload: {
+          house: 'test-house',
+          user: 'john',
+          user_name: 'John',
+        },
+      },
+    ]);
+  });
+  it('should call setTabletModeLocked when an alarm code exists', async () => {
     const session = {
       setTabletModeLocked: fake.resolves(null),
     };
-    house = new House(event, {}, session);
-    // Set alarm_code on the house
+    house = new House(event, {}, session, {}, { existsActive: fake.resolves(true) });
     await house.update('test-house', {
-      alarm_code: '1234',
       alarm_delay_before_arming: 0,
       alarm_mode: ALARM_MODES.DISARMED,
     });
@@ -202,14 +237,13 @@ describe('house.arm', () => {
     assert.calledOnce(session.setTabletModeLocked);
     assert.calledWith(session.setTabletModeLocked, 'a741dfa6-24de-4b46-afc7-370772f068d5');
   });
-  it('should not call setTabletModeLocked when alarm_code is null', async () => {
+  it('should not call setTabletModeLocked when no alarm code exists', async () => {
     const session = {
       setTabletModeLocked: fake.resolves(null),
     };
-    house = new House(event, {}, session);
-    // Ensure alarm_code is null
+    // Locking a tablet nobody can unlock would leave it stuck on the keypad
+    house = new House(event, {}, session, {}, { existsActive: fake.resolves(false) });
     await house.update('test-house', {
-      alarm_code: null,
       alarm_delay_before_arming: 0,
       alarm_mode: ALARM_MODES.DISARMED,
     });

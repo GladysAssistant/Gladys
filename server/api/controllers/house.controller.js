@@ -1,6 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { Error400 } = require('../../utils/httpErrors');
 const { ALARM_MODES, ERROR_MESSAGES } = require('../../utils/constants');
+const { authorFromUser } = require('../../utils/alarmEventAuthor');
 
 /**
  * @apiDefine HouseParam
@@ -136,7 +137,7 @@ module.exports = function HouseController(gladys) {
    * @apiDescription Arm the alarm in "away" mode, after the delay configured on the house.
    */
   async function awayArm(req, res) {
-    await gladys.house.arm(req.params.house_selector, ALARM_MODES.AWAY_ARMED);
+    await gladys.house.arm(req.params.house_selector, ALARM_MODES.AWAY_ARMED, false, authorFromUser(req.user));
     res.json({ success: true });
   }
 
@@ -146,7 +147,7 @@ module.exports = function HouseController(gladys) {
    * @apiGroup Alarm
    */
   async function disarm(req, res) {
-    const house = await gladys.house.disarm(req.params.house_selector);
+    const house = await gladys.house.disarm(req.params.house_selector, authorFromUser(req.user));
     res.json(house);
   }
 
@@ -167,7 +168,7 @@ module.exports = function HouseController(gladys) {
    * @apiDescription Arm the alarm in "presence" mode, after the delay configured on the house.
    */
   async function presenceArm(req, res) {
-    await gladys.house.arm(req.params.house_selector, ALARM_MODES.PRESENCE_ARMED);
+    await gladys.house.arm(req.params.house_selector, ALARM_MODES.PRESENCE_ARMED, false, authorFromUser(req.user));
     res.json({ success: true });
   }
 
@@ -178,7 +179,7 @@ module.exports = function HouseController(gladys) {
    * @apiDescription Arm the alarm in "night" mode, after the delay configured on the house.
    */
   async function nightArm(req, res) {
-    await gladys.house.arm(req.params.house_selector, ALARM_MODES.NIGHT_ARMED);
+    await gladys.house.arm(req.params.house_selector, ALARM_MODES.NIGHT_ARMED, false, authorFromUser(req.user));
     res.json({ success: true });
   }
 
@@ -188,7 +189,7 @@ module.exports = function HouseController(gladys) {
    * @apiGroup Alarm
    */
   async function panic(req, res) {
-    const house = await gladys.house.panic(req.params.house_selector);
+    const house = await gladys.house.panic(req.params.house_selector, authorFromUser(req.user));
     res.json(house);
   }
 

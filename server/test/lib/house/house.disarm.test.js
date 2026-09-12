@@ -17,7 +17,7 @@ describe('house.disarm', () => {
   const session = {
     unlockTabletMode: fake.resolves(null),
   };
-  const house = new House(event, {}, session);
+  const house = new House(event, {}, session, {}, { existsActive: fake.resolves(false) });
   beforeEach(async () => {
     await house.update('test-house', {
       alarm_delay_before_arming: 0,
@@ -37,6 +37,8 @@ describe('house.disarm', () => {
       {
         type: EVENTS.ALARM.DISARM,
         house: 'test-house',
+        user: null,
+        user_name: null,
       },
     ]);
     expect(event.emit.secondCall.args).to.deep.equal([
@@ -45,6 +47,8 @@ describe('house.disarm', () => {
         type: WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED,
         payload: {
           house: 'test-house',
+          user: null,
+          user_name: null,
         },
       },
     ]);
@@ -66,6 +70,8 @@ describe('house.disarm', () => {
       {
         type: EVENTS.ALARM.DISARM,
         house: 'test-house',
+        user: null,
+        user_name: null,
       },
     ]);
     expect(event.emit.secondCall.args).to.deep.equal([
@@ -74,6 +80,8 @@ describe('house.disarm', () => {
         type: WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED,
         payload: {
           house: 'test-house',
+          user: null,
+          user_name: null,
         },
       },
     ]);
@@ -89,6 +97,29 @@ describe('house.disarm', () => {
     await Promise.delay(20);
     const houseInDb = await house.getBySelector('test-house');
     expect(houseInDb.alarm_mode).to.equal(ALARM_MODES.DISARMED);
+  });
+  it('should name who disarmed the house in its events', async () => {
+    await house.disarm('test-house', { user: 'john', user_name: 'John' });
+    expect(event.emit.firstCall.args).to.deep.equal([
+      EVENTS.TRIGGERS.CHECK,
+      {
+        type: EVENTS.ALARM.DISARM,
+        house: 'test-house',
+        user: 'john',
+        user_name: 'John',
+      },
+    ]);
+    expect(event.emit.secondCall.args).to.deep.equal([
+      EVENTS.WEBSOCKET.SEND_ALL,
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED,
+        payload: {
+          house: 'test-house',
+          user: 'john',
+          user_name: 'John',
+        },
+      },
+    ]);
   });
   it('should return house not found', async () => {
     const promise = house.disarm('house-not-found');

@@ -17,7 +17,7 @@ describe('house.panic', () => {
   const session = {
     setTabletModeLocked: fake.resolves(null),
   };
-  const house = new House(event, {}, session);
+  const house = new House(event, {}, session, {}, { existsActive: fake.resolves(false) });
   beforeEach(async () => {
     await house.update('test-house', {
       alarm_mode: ALARM_MODES.DISARMED,
@@ -37,6 +37,8 @@ describe('house.panic', () => {
       {
         type: EVENTS.ALARM.PANIC,
         house: 'test-house',
+        user: null,
+        user_name: null,
       },
     ]);
     expect(event.emit.secondCall.args).to.deep.equal([
@@ -45,7 +47,21 @@ describe('house.panic', () => {
         type: WEBSOCKET_MESSAGE_TYPES.ALARM.TRIGGERED,
         payload: {
           house: 'test-house',
+          user: null,
+          user_name: null,
         },
+      },
+    ]);
+  });
+  it('should name who set the alarm off in its events', async () => {
+    await house.panic('test-house', { user: 'john', user_name: 'John' });
+    expect(event.emit.firstCall.args).to.deep.equal([
+      EVENTS.TRIGGERS.CHECK,
+      {
+        type: EVENTS.ALARM.PANIC,
+        house: 'test-house',
+        user: 'john',
+        user_name: 'John',
       },
     ]);
   });

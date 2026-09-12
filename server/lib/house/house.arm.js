@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 const db = require('../../models');
 const { ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { NotFoundError, ConflictError, BadParameters } = require('../../utils/coreErrors');
+const { NOBODY } = require('../../utils/alarmEventAuthor');
 const logger = require('../../utils/logger');
 
 // The three arming modes behave identically — same delay, same tablet locking — so they only
@@ -27,11 +28,12 @@ const ARM_MODE_EVENTS = {
  * @param {string} selector - Selector of the house.
  * @param {string} mode - Arming mode to switch to.
  * @param {boolean} disableWaitTime - Should not wait to arm.
+ * @param {object} [author] - Who asked, as `{ user, user_name }`; nobody by default.
  * @returns {Promise} Resolve when the house is armed, or when the delay before arming started.
  * @example
  * await gladys.house.arm('main-house', ALARM_MODES.NIGHT_ARMED);
  */
-async function arm(selector, mode, disableWaitTime = false) {
+async function arm(selector, mode, disableWaitTime = false, author = NOBODY) {
   const modeEvents = ARM_MODE_EVENTS[mode];
 
   if (!modeEvents) {
@@ -58,12 +60,14 @@ async function arm(selector, mode, disableWaitTime = false) {
     payload: {
       house: selector,
       mode,
+      ...author,
     },
   });
   // Check trigger scene is arming
   this.event.emit(EVENTS.TRIGGERS.CHECK, {
     type: EVENTS.ALARM.ARMING,
     house: selector,
+    ...author,
   });
 
   const waitTimeInMs = disableWaitTime ? 0 : house.alarm_delay_before_arming * 1000;
@@ -74,30 +78,28 @@ async function arm(selector, mode, disableWaitTime = false) {
     // Update database
     await house.update({ alarm_mode: mode });
 
-    const alarmCodeIsDefined = !(
-      house.alarm_code === null ||
-      house.alarm_code === '' ||
-      house.alarm_code === undefined
-    );
-
-    if (alarmCodeIsDefined) {
-      logger.info('House alarm code is set, locking tablets');
+    // Locking the tablets of the house only makes sense when a code exists to unlock them,
+    // otherwise the tablet is stuck on a keypad nobody can answer.
+    if (await this.alarmCode.existsActive()) {
+      logger.info('An alarm code exists, locking tablets');
       // Lock all tablets in this house
       await this.session.setTabletModeLocked(house.id);
     } else {
-      logger.info('House alarm code is not set, skipping setTabletModeLocked');
+      logger.info('No alarm code exists, skipping setTabletModeLocked');
     }
 
     // Check scene triggers
     this.event.emit(EVENTS.TRIGGERS.CHECK, {
       type: modeEvents.trigger,
       house: selector,
+      ...author,
     });
     // Emit websocket event to update UI
     this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: modeEvents.websocket,
       payload: {
         house: selector,
+        ...author,
       },
     });
   };

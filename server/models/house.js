@@ -36,14 +36,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM(ALARM_MODES_LIST),
         defaultValue: ALARM_MODES.DISARMED,
       },
-      alarm_code: {
-        allowNull: true,
-        type: DataTypes.STRING,
-        validate: {
-          len: [4, 8],
-          isNumeric: true,
-        },
-      },
       alarm_delay_before_arming: {
         allowNull: false,
         type: DataTypes.INTEGER,
