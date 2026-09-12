@@ -2,16 +2,18 @@ const Promise = require('bluebird');
 const db = require('../../models');
 const { ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
+const { NOBODY } = require('../../utils/alarmEventAuthor');
 
 /**
  * @public
  * @description Disarm house Alarm.
  * @param {object} selector - Selector of the house.
+ * @param {object} [author] - Who asked, as `{ user, user_name }`; nobody by default.
  * @returns {Promise} Resolve with house object.
  * @example
  * const mainHouse = await gladys.house.disarm('main-house');
  */
-async function disarm(selector) {
+async function disarm(selector, author = NOBODY) {
   // In case there is a timeout to arm this house, we clear it
   const armingWasInProgress = this.armingHouseTimeout.has(selector);
   if (armingWasInProgress) {
@@ -45,12 +47,14 @@ async function disarm(selector) {
   this.event.emit(EVENTS.TRIGGERS.CHECK, {
     type: EVENTS.ALARM.DISARM,
     house: selector,
+    ...author,
   });
   // Emit websocket event to update UI
   this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED,
     payload: {
       house: selector,
+      ...author,
     },
   });
   return house.get({ plain: true });

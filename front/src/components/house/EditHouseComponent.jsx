@@ -10,16 +10,6 @@ class EditHouseComponent extends Component {
     if (!name || name.trim().length === 0) {
       errors.houseName = true;
     }
-    if (this.props.house.alarm_code) {
-      const code = this.props.house.alarm_code;
-      const isNum = /^\d+$/.test(code);
-      if (!isNum) {
-        errors.alarm_code = true;
-      }
-      if (code.length < 4 || code.length > 8) {
-        errors.alarm_code = true;
-      }
-    }
     return errors;
   };
   updateNewRoomName = e => {
@@ -29,10 +19,6 @@ class EditHouseComponent extends Component {
   };
   updateHouseName = e => {
     this.props.updateHouseName(e.target.value, this.props.houseIndex);
-  };
-  updateHouseAlarmCode = e => {
-    const alarmCode = e.target.value && e.target.value.length ? e.target.value : null;
-    this.props.updateHouseAlarmCode(alarmCode, this.props.houseIndex);
   };
   updateHouseDelayBeforeArming = e => {
     this.props.updateHouseDelayBeforeArming(e.target.value, this.props.houseIndex);
@@ -103,17 +89,11 @@ class EditHouseComponent extends Component {
       this.addRoom();
     }
   };
-  toggleAlarmCodePassword = () => {
-    this.setState(prevState => {
-      return { ...prevState, showAlarmCode: !this.state.showAlarmCode };
-    });
-  };
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
       newRoomName: '',
-      showAlarmCode: false,
       justSaved: false
     };
   }
@@ -134,7 +114,7 @@ class EditHouseComponent extends Component {
     clearTimeout(this.savedNoticeTimer);
   }
 
-  render(props, { newRoomName, wantToDeleteHouse, loading, showAlarmCode, justSaved }) {
+  render(props, { newRoomName, wantToDeleteHouse, loading, justSaved }) {
     const errors = this.getErrors();
     return (
       <EditHouse
@@ -142,7 +122,6 @@ class EditHouseComponent extends Component {
         setMapRef={this.setMapRef}
         updateHouseName={this.updateHouseName}
         updateNewRoomName={this.updateNewRoomName}
-        updateHouseAlarmCode={this.updateHouseAlarmCode}
         updateHouseDelayBeforeArming={this.updateHouseDelayBeforeArming}
         selectHouseLocation={this.selectHouseLocation}
         newRoomName={newRoomName}
@@ -155,8 +134,6 @@ class EditHouseComponent extends Component {
         deleteHouse={this.deleteHouse}
         confirmDeleteHouse={this.confirmDeleteHouse}
         cancelDeleteHouse={this.cancelDeleteHouse}
-        toggleAlarmCodePassword={this.toggleAlarmCodePassword}
-        showAlarmCode={showAlarmCode}
         justSaved={justSaved}
         loading={loading}
         errors={errors}

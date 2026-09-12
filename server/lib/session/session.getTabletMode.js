@@ -22,15 +22,9 @@ async function getTabletMode(userId, sessionId) {
     throw new NotFoundError('Session not found');
   }
 
-  let hasAlarmCode = false;
-  if (session.current_house_id) {
-    const house = await db.House.findOne({
-      where: {
-        id: session.current_house_id,
-      },
-    });
-    hasAlarmCode = house.alarm_code !== null && house.alarm_code !== '' && house.alarm_code !== undefined;
-  }
+  // Codes belong to people, not to houses: a tablet can be unlocked as soon as one active code
+  // exists on the instance.
+  const hasAlarmCode = await this.alarmCode.existsActive();
 
   return { ...session.get({ plain: true }), has_alarm_code: hasAlarmCode };
 }

@@ -5,7 +5,13 @@ const { mappings } = require('./deviceMappings');
 // The alarm of a house is not a device feature, so its changes arrive on the same trigger stream
 // under their own event types. ARMING is left out: it announces the delay before the house actually
 // arms, and the mode has not changed yet when it fires.
-const ALARM_EVENTS = new Set([EVENTS.ALARM.ARM, EVENTS.ALARM.DISARM, EVENTS.ALARM.PARTIAL_ARM, EVENTS.ALARM.PANIC]);
+const ALARM_EVENTS = new Set([
+  EVENTS.ALARM.PRESENCE_ARM,
+  EVENTS.ALARM.NIGHT_ARM,
+  EVENTS.ALARM.AWAY_ARM,
+  EVENTS.ALARM.DISARM,
+  EVENTS.ALARM.PANIC,
+]);
 
 /**
  * @description Add delay before send new state to Homekit.

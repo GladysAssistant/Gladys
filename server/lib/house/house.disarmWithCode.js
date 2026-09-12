@@ -3,12 +3,13 @@ const Promise = require('bluebird');
 const db = require('../../models');
 const { ALARM_MODES, EVENTS } = require('../../utils/constants');
 const { NotFoundError, ForbiddenError, TooManyRequests } = require('../../utils/coreErrors');
+const { authorFromAlarmCode } = require('../../utils/alarmEventAuthor');
 
 /**
  * @public
- * @description Disarm alarm with code.
+ * @description Disarm alarm with an alarm code — a personal one, or a guest one.
  * @param {string} selector - Selector of the house.
- * @param {string} code - Code of the house.
+ * @param {string} code - Code as typed on the keypad.
  * @returns {Promise} Resolve when unlocked.
  * @example
  * await gladys.house.disarmWithCode('main-house', '123456');
@@ -37,7 +38,11 @@ async function disarmWithCode(selector, code) {
     throw new TooManyRequests('TOO_MANY_CODES_TESTS', rateLimitRes.msBeforeNext);
   }
 
-  if (house.alarm_code !== code) {
+  // An expired code is refused exactly like a wrong one: the keypad must not tell a stranger that
+  // the code they hold used to open this house.
+  const matchingCode = await this.alarmCode.validate(code);
+
+  if (matchingCode === null) {
     await this.alarmCodeRateLimit.consume(selector, 1);
     throw new ForbiddenError('INVALID_CODE');
   }
@@ -54,7 +59,7 @@ async function disarmWithCode(selector, code) {
   }
 
   // Disarm house
-  return this.disarm(selector);
+  return this.disarm(selector, authorFromAlarmCode(matchingCode));
 }
 
 module.exports = {

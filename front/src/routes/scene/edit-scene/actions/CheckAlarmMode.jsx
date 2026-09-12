@@ -7,10 +7,6 @@ import get from 'get-value';
 
 import { ALARM_MODES_LIST } from '../../../../../../server/utils/constants';
 
-const capitalizeFirstLetter = string => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
-
 class CheckAlarmMode extends Component {
   getOptions = async () => {
     try {
@@ -67,7 +63,7 @@ class CheckAlarmMode extends Component {
     const alarmModesOptions = ALARM_MODES_LIST.map(alarmMode => {
       return {
         value: alarmMode,
-        label: capitalizeFirstLetter(get(props.intl.dictionary, `alarmModes.${alarmMode}`, { default: alarmMode }))
+        label: get(props.intl.dictionary, `alarmModeNames.${alarmMode}`, { default: alarmMode })
       };
     });
     this.state = {

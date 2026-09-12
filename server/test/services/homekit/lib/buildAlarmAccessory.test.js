@@ -52,7 +52,6 @@ describe('Build alarm accessory', () => {
         house: {
           getBySelector: stub().resolves({ ...HOUSE, alarm_mode: alarmMode }),
           arm: stub().resolves(),
-          partialArm: stub().resolves(),
           disarm: stub().resolves(),
         },
       },
@@ -71,11 +70,11 @@ describe('Build alarm accessory', () => {
   it('should report every alarm mode Gladys knows', async () => {
     const cases = [
       [ALARM_MODES.DISARMED, 3],
-      [ALARM_MODES.ARMED, 1],
-      // Gladys arms part of the house where HomeKit calls it staying home: the same idea seen from
-      // the other side
-      [ALARM_MODES.PARTIALLY_ARMED, 0],
-      [ALARM_MODES.PANIC, 4],
+      [ALARM_MODES.AWAY_ARMED, 1],
+      // what Gladys calls presence is what HomeKit calls staying home
+      [ALARM_MODES.PRESENCE_ARMED, 0],
+      [ALARM_MODES.NIGHT_ARMED, 2],
+      [ALARM_MODES.TRIGGERED, 4],
     ];
 
     await Promise.all(
@@ -87,30 +86,30 @@ describe('Build alarm accessory', () => {
   });
 
   it('should report the target the house was set to', async () => {
-    const { characteristics } = build(ALARM_MODES.PARTIALLY_ARMED);
+    const { characteristics } = build(ALARM_MODES.PRESENCE_ARMED);
 
     expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(0);
   });
 
   it('should assume away for a house that went off before the bridge started', async () => {
-    const { characteristics } = build(ALARM_MODES.PANIC);
+    const { characteristics } = build(ALARM_MODES.TRIGGERED);
 
     // HomeKit has no triggered target, and reporting disarmed there would show the alarm as
     // switched off while it rings. Nothing records what preceded the panic, so away is assumed —
-    // the stricter of the two.
+    // the strictest of the three.
     expect(await readCharacteristic(characteristics.CURRENTSTATE)).to.equal(4);
     expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(1);
   });
 
   it('should keep the target the house was armed with while the alarm is going off', async () => {
-    const { homekitHandler, characteristics } = build(ALARM_MODES.PARTIALLY_ARMED);
+    const { homekitHandler, characteristics } = build(ALARM_MODES.PRESENCE_ARMED);
 
-    // read once while partially armed, so the accessory knows what the house is running
+    // read once while armed in presence, so the accessory knows what the house is running
     expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(0);
 
-    homekitHandler.gladys.house.getBySelector = stub().resolves({ ...HOUSE, alarm_mode: ALARM_MODES.PANIC });
+    homekitHandler.gladys.house.getBySelector = stub().resolves({ ...HOUSE, alarm_mode: ALARM_MODES.TRIGGERED });
 
-    // a house armed in part that goes off must not be shown as armed away
+    // a house armed in presence that goes off must not be shown as armed away
     expect(await readCharacteristic(characteristics.CURRENTSTATE)).to.equal(4);
     expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(0);
   });
@@ -120,16 +119,16 @@ describe('Build alarm accessory', () => {
     const cb = stub();
 
     await characteristics.TARGETSTATE.handlers.set(0, cb);
-    homekitHandler.gladys.house.getBySelector = stub().resolves({ ...HOUSE, alarm_mode: ALARM_MODES.PANIC });
+    homekitHandler.gladys.house.getBySelector = stub().resolves({ ...HOUSE, alarm_mode: ALARM_MODES.TRIGGERED });
 
     // the mode it was armed with is what it goes back to showing, without waiting for a read first
     expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(0);
   });
 
-  it('should not offer the night mode Gladys has no equivalent for', async () => {
+  it('should offer every mode but the triggered one, which is never a target', async () => {
     const { characteristics } = build(ALARM_MODES.DISARMED);
 
-    expect(characteristics.TARGETSTATE.setProps.args[0][0]).to.eql({ validValues: [0, 1, 3] });
+    expect(characteristics.TARGETSTATE.setProps.args[0][0]).to.eql({ validValues: [0, 1, 2, 3] });
   });
 
   it('should report an unknown alarm mode as disarmed', async () => {
@@ -139,22 +138,26 @@ describe('Build alarm accessory', () => {
     expect(await readCharacteristic(characteristics.CURRENTSTATE)).to.equal(3);
   });
 
-  it('should arm, partially arm and disarm the house', async () => {
+  it('should arm the house in each mode and disarm it', async () => {
     const { homekitHandler, characteristics } = build(ALARM_MODES.DISARMED);
     const cb = stub();
 
     await characteristics.TARGETSTATE.handlers.set(1, cb);
     await characteristics.TARGETSTATE.handlers.set(0, cb);
+    await characteristics.TARGETSTATE.handlers.set(2, cb);
     await characteristics.TARGETSTATE.handlers.set(3, cb);
 
-    expect(homekitHandler.gladys.house.arm.args).to.eql([['maison']]);
-    expect(homekitHandler.gladys.house.partialArm.args).to.eql([['maison']]);
+    expect(homekitHandler.gladys.house.arm.args).to.eql([
+      ['maison', ALARM_MODES.AWAY_ARMED],
+      ['maison', ALARM_MODES.PRESENCE_ARMED],
+      ['maison', ALARM_MODES.NIGHT_ARMED],
+    ]);
     expect(homekitHandler.gladys.house.disarm.args).to.eql([['maison']]);
-    expect(cb.callCount).to.equal(3);
+    expect(cb.callCount).to.equal(4);
   });
 
   it('should answer without failing when the house is already in the mode asked for', async () => {
-    const { homekitHandler, characteristics } = build(ALARM_MODES.ARMED);
+    const { homekitHandler, characteristics } = build(ALARM_MODES.AWAY_ARMED);
     homekitHandler.gladys.house.arm = stub().rejects(new ConflictError('House is already armed'));
     const cb = stub();
 
@@ -167,7 +170,7 @@ describe('Build alarm accessory', () => {
   });
 
   it('should report a command that really failed', async () => {
-    const { homekitHandler, characteristics } = build(ALARM_MODES.ARMED);
+    const { homekitHandler, characteristics } = build(ALARM_MODES.AWAY_ARMED);
     const failure = new NotFoundError('House not found');
     homekitHandler.gladys.house.disarm = stub().rejects(failure);
     const cb = stub();
@@ -179,7 +182,7 @@ describe('Build alarm accessory', () => {
   });
 
   it('should answer a read that failed instead of leaving it hanging', async () => {
-    const { homekitHandler, characteristics } = build(ALARM_MODES.ARMED);
+    const { homekitHandler, characteristics } = build(ALARM_MODES.AWAY_ARMED);
     const failure = new NotFoundError('House not found');
     homekitHandler.gladys.house.getBySelector = stub().rejects(failure);
 

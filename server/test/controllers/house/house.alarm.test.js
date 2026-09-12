@@ -1,11 +1,20 @@
 const { expect } = require('chai');
 const { authenticatedRequest, request, alarmModeToken } = require('../request.test');
 const db = require('../../../models');
+const passwordUtils = require('../../../utils/password');
+
+const JOHN_ID = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
 
 describe('House.alarm', () => {
-  it('should arm house', async () => {
+  it('should arm house in away mode', async () => {
     await authenticatedRequest
-      .post('/api/v1/house/test-house/arm')
+      .post('/api/v1/house/test-house/away_arm')
+      .expect('Content-Type', /json/)
+      .expect(200);
+  });
+  it('should arm house in night mode', async () => {
+    await authenticatedRequest
+      .post('/api/v1/house/test-house/night_arm')
       .expect('Content-Type', /json/)
       .expect(200);
   });
@@ -15,7 +24,7 @@ describe('House.alarm', () => {
         selector: 'test-house',
       },
     });
-    await testHouse.update({ alarm_mode: 'armed' });
+    await testHouse.update({ alarm_mode: 'away-armed' });
     await authenticatedRequest
       .post('/api/v1/house/test-house/disarm')
       .expect('Content-Type', /json/)
@@ -27,7 +36,8 @@ describe('House.alarm', () => {
         selector: 'test-house',
       },
     });
-    await testHouse.update({ alarm_mode: 'armed', alarm_code: '123456' });
+    await testHouse.update({ alarm_mode: 'away-armed' });
+    await db.AlarmCode.create({ user_id: JOHN_ID, code: await passwordUtils.hash('123456') });
     const res = await request
       .post('/api/v1/house/test-house/disarm_with_code')
       .set('Authorization', `Bearer ${alarmModeToken}`)
@@ -55,7 +65,8 @@ describe('House.alarm', () => {
         selector: 'test-house',
       },
     });
-    await testHouse.update({ alarm_mode: 'armed', alarm_code: '123456' });
+    await testHouse.update({ alarm_mode: 'away-armed' });
+    await db.AlarmCode.create({ user_id: JOHN_ID, code: await passwordUtils.hash('123456') });
     const res = await request
       .post('/api/v1/house/test-house/disarm_with_code')
       .set('Authorization', `Bearer ${alarmModeToken}`)
@@ -73,7 +84,8 @@ describe('House.alarm', () => {
         selector: 'test-house',
       },
     });
-    await testHouse.update({ alarm_mode: 'armed', alarm_code: '123456' });
+    await testHouse.update({ alarm_mode: 'away-armed' });
+    await db.AlarmCode.create({ user_id: JOHN_ID, code: await passwordUtils.hash('123456') });
     await request
       .post('/api/v1/house/test-house/disarm_with_code')
       .set('Authorization', `Bearer ${alarmModeToken}`)
@@ -125,9 +137,9 @@ describe('House.alarm', () => {
       properties: { time_before_next: res.body.properties.time_before_next },
     });
   });
-  it('should partially arm house', async () => {
+  it('should arm house in presence mode', async () => {
     await authenticatedRequest
-      .post('/api/v1/house/test-house/partial_arm')
+      .post('/api/v1/house/test-house/presence_arm')
       .expect('Content-Type', /json/)
       .expect(200);
   });

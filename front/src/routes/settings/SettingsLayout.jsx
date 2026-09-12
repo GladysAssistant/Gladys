@@ -10,7 +10,7 @@ import style from './style.css';
 import dashboardStyle from '../dashboard/style.css';
 
 const MENU_ITEMS = [
-  { href: '/dashboard/settings/house', icon: 'home', textId: 'settings.housesTab' },
+  { href: '/dashboard/settings/house', icon: 'home', textId: 'settings.housesTab', adminOnly: true },
   { href: '/dashboard/settings/user', icon: 'user', textId: 'settings.usersTab', matchPrefix: true },
   { href: '/dashboard/settings/session', icon: 'smartphone', textId: 'settings.sessionsTab' },
   { href: '/dashboard/settings/security', icon: 'shield', textId: 'settings.securityTab', gatewayOnly: true },
@@ -31,7 +31,8 @@ const MENU_ITEMS = [
 
 // `adminOnly` marks the tabs whose API is reserved to admins: the system
 // settings and the backup key are instance-wide, the Gladys Plus status and the
-// background jobs are admin routes of their own. A non-admin used to reach them
+// background jobs are admin routes of their own, and configuring the houses —
+// alarm codes included — is an admin route too. A non-admin used to reach them
 // and land on error states. Hiding the entry mirrors the app nav
 // (components/header), the server stays the authority on a deep link.
 // The settings live on the same Horizon glass scene as the dashboard: the

@@ -62,6 +62,8 @@ const getActionSummary = (action, dictionary) => {
     case ACTIONS.ALARM.SET_ALARM_MODE:
     case ACTIONS.ALARM.CHECK_ALARM_MODE:
       return joinParts([action.house, action.alarm_mode]);
+    case ACTIONS.ALARM.TRIGGER_PANIC:
+      return truncate(action.house);
     case ACTIONS.HOUSE.IS_EMPTY:
     case ACTIONS.HOUSE.IS_NOT_EMPTY:
       return truncate(action.house);
@@ -193,9 +195,10 @@ const getTriggerSummary = (trigger, dictionary) => {
     case EVENTS.AREA.USER_ENTERED:
     case EVENTS.AREA.USER_LEFT:
       return joinParts([trigger.user, trigger.area]);
-    case EVENTS.ALARM.ARM:
     case EVENTS.ALARM.ARMING:
-    case EVENTS.ALARM.PARTIAL_ARM:
+    case EVENTS.ALARM.PRESENCE_ARM:
+    case EVENTS.ALARM.NIGHT_ARM:
+    case EVENTS.ALARM.AWAY_ARM:
     case EVENTS.ALARM.DISARM:
     case EVENTS.ALARM.PANIC:
     case EVENTS.ALARM.TOO_MANY_CODES_TESTS:

@@ -43,11 +43,6 @@ class SettingsHouses extends Component {
     this.markHouseDirty(houseIndex);
   };
 
-  updateHouseAlarmCode = (code, houseIndex) => {
-    this.props.updateHouseAlarmCode(code, houseIndex);
-    this.markHouseDirty(houseIndex);
-  };
-
   updateHouseDelayBeforeArming = (delay, houseIndex) => {
     this.props.updateHouseDelayBeforeArming(delay, houseIndex);
     this.markHouseDirty(houseIndex);
@@ -189,7 +184,6 @@ class SettingsHouses extends Component {
         toggleHouse={this.toggleHouse}
         addHouse={this.addHouse}
         updateHouseName={this.updateHouseName}
-        updateHouseAlarmCode={this.updateHouseAlarmCode}
         updateHouseDelayBeforeArming={this.updateHouseDelayBeforeArming}
         updateHouseLocation={this.updateHouseLocation}
         addRoom={this.addRoom}

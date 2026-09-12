@@ -3,6 +3,7 @@ const logger = require('../utils/logger');
 const { Cache } = require('../utils/cache');
 const getConfig = require('../utils/getConfig');
 const db = require('../models');
+const AlarmCode = require('./alarm-code');
 const Area = require('./area');
 const Brain = require('./brain');
 const Calendar = require('./calendar');
@@ -63,8 +64,9 @@ function Gladys(params = {}) {
   const area = new Area(event);
   const dashboard = new Dashboard();
   const stateManager = new StateManager(event);
-  const session = new Session(params.jwtSecret, cache);
-  const house = new House(event, stateManager, session, variable);
+  const alarmCode = new AlarmCode();
+  const session = new Session(params.jwtSecret, cache, alarmCode);
+  const house = new House(event, stateManager, session, variable, alarmCode);
   const room = new Room();
   const service = new Service(services, stateManager);
   const message = new MessageHandler(event, brain, service, stateManager, variable);
@@ -128,6 +130,7 @@ function Gladys(params = {}) {
 
   const gladys = {
     version: '0.1.0', // todo, read package.json
+    alarmCode,
     area,
     brain,
     calendar,

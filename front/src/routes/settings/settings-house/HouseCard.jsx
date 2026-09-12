@@ -36,16 +36,6 @@ const LocationSummary = ({ house }) => {
   );
 };
 
-const AlarmSummary = ({ house }) => {
-  const hasCode = Boolean(house.alarm_code);
-  return (
-    <span class={cx(style.metaItem, { [style.metaItemSet]: hasCode })}>
-      <i class="fe fe-bell" />
-      <Text id={hasCode ? 'housesSettings.summary.alarmSet' : 'housesSettings.summary.alarmNotSet'} />
-    </span>
-  );
-};
-
 const HouseCard = ({ children, ...props }) => {
   const { house, expanded, dirty } = props;
   const panelId = `house-panel-${house.id}`;
@@ -74,7 +64,6 @@ const HouseCard = ({ children, ...props }) => {
           <span class={style.houseMeta}>
             <RoomsSummary rooms={house.rooms} />
             <LocationSummary house={house} />
-            <AlarmSummary house={house} />
           </span>
         </span>
         {neverSaved && (

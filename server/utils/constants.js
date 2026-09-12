@@ -500,10 +500,11 @@ function normalizeMdnsHostname(rawValue) {
 
 const EVENTS = {
   ALARM: {
-    ARM: 'alarm.arm',
     ARMING: 'alarm.arming',
+    PRESENCE_ARM: 'alarm.presence-arm',
+    NIGHT_ARM: 'alarm.night-arm',
+    AWAY_ARM: 'alarm.away-arm',
     DISARM: 'alarm.disarm',
-    PARTIAL_ARM: 'alarm.partial-arm',
     PANIC: 'alarm.panic',
     TOO_MANY_CODES_TESTS: 'alarm.too-many-codes-tests',
   },
@@ -730,6 +731,9 @@ const ACTIONS = {
   ALARM: {
     CHECK_ALARM_MODE: 'alarm.check-alarm-mode',
     SET_ALARM_MODE: 'alarm.set-alarm-mode',
+    // Panic is an action, not a mode: it is not something the alarm can be set to, it is
+    // something someone does. 'alarm.panic' is already the event, hence the distinct value.
+    TRIGGER_PANIC: 'alarm.trigger-panic',
   },
   CALENDAR: {
     IS_EVENT_RUNNING: 'calendar.is-event-running',
@@ -1888,10 +1892,11 @@ const DEVICE_ROTATION = {
 const WEBSOCKET_MESSAGE_TYPES = {
   ALARM: {
     ARMING: 'alarm.arming',
-    ARMED: 'alarm.armed',
+    PRESENCE_ARMED: 'alarm.presence-armed',
+    NIGHT_ARMED: 'alarm.night-armed',
+    AWAY_ARMED: 'alarm.away-armed',
     DISARMED: 'alarm.disarmed',
-    PARTIALLY_ARMED: 'alarm.partial-arm',
-    PANIC: 'alarm.panic',
+    TRIGGERED: 'alarm.triggered',
   },
   BACKUP: {
     DOWNLOADED: 'backup.downloaded',
@@ -2178,12 +2183,24 @@ const DEFAULT_VALUE_TEMPERATURE = {
   MAXIMUM: 24,
 };
 
+// The state of a house alarm. The first four are arming modes, named after what the house is
+// doing rather than how much of it is watched — the vocabulary alarm panels and HomeKit share.
+// `triggered` is not one of them: it is a state the alarm enters by itself.
 const ALARM_MODES = {
   DISARMED: 'disarmed',
-  ARMED: 'armed',
-  PARTIALLY_ARMED: 'partially-armed',
-  PANIC: 'panic',
+  PRESENCE_ARMED: 'presence-armed',
+  NIGHT_ARMED: 'night-armed',
+  AWAY_ARMED: 'away-armed',
+  TRIGGERED: 'triggered',
 };
+
+// The modes a user or a scene can ask for. `triggered` is excluded: you never request it.
+const ALARM_SETTABLE_MODES_LIST = [
+  ALARM_MODES.DISARMED,
+  ALARM_MODES.PRESENCE_ARMED,
+  ALARM_MODES.NIGHT_ARMED,
+  ALARM_MODES.AWAY_ARMED,
+];
 
 const ENERGY_CONTRACT_TYPES = {
   // Generic base contract
@@ -2378,6 +2395,7 @@ module.exports.DEFAULT_VALUE_TEMPERATURE = DEFAULT_VALUE_TEMPERATURE;
 
 module.exports.ALARM_MODES = ALARM_MODES;
 module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
+module.exports.ALARM_SETTABLE_MODES_LIST = ALARM_SETTABLE_MODES_LIST;
 
 module.exports.AI_CHAT_TOOL_CATEGORIES = AI_CHAT_TOOL_CATEGORIES;
 module.exports.AI_CHAT_TOOL_CATEGORIES_LIST = AI_CHAT_TOOL_CATEGORIES_LIST;
