@@ -9,7 +9,7 @@ const {
   PILOT_WIRE_MODE,
   LIQUID_STATE,
   WATER_VALVE_CURRENT_DEVICE_STATUS,
-  SMOKE_CHAMBER_CONTAMINATION,
+  CONTAMINATION_STATE,
   STATE,
 } = require('../../../utils/constants');
 
@@ -215,12 +215,13 @@ addMapping('trigger_selftest', BUTTON_PUSH.PRESSED, 'test');
 addMapping('siren_for_automation_only', STATE.OFF, 'stop');
 addMapping('siren_for_automation_only', STATE.ON, 'smoke_siren');
 
-// Contamination of the smoke chamber, e.g. Heiman HS1SA-E-PLUS
+// Contamination of the sensing chamber, e.g. Heiman HS1SA-E-PLUS. The detector names its
+// levels its own way: they are mapped onto the standard contamination states.
 // https://www.zigbee2mqtt.io/devices/HS1SA-E-PLUS.html
-addMapping('chamber_contamination', SMOKE_CHAMBER_CONTAMINATION.NORMAL, 'normal');
-addMapping('chamber_contamination', SMOKE_CHAMBER_CONTAMINATION.LIGHT, 'light_contamination');
-addMapping('chamber_contamination', SMOKE_CHAMBER_CONTAMINATION.MEDIUM, 'medium_contamination');
-addMapping('chamber_contamination', SMOKE_CHAMBER_CONTAMINATION.CRITICAL, 'critical_contamination');
+addMapping('chamber_contamination', CONTAMINATION_STATE.NORMAL, 'normal');
+addMapping('chamber_contamination', CONTAMINATION_STATE.LOW, 'light_contamination');
+addMapping('chamber_contamination', CONTAMINATION_STATE.WARNING, 'medium_contamination');
+addMapping('chamber_contamination', CONTAMINATION_STATE.CRITICAL, 'critical_contamination');
 
 module.exports = {
   type: 'enum',
@@ -366,7 +367,7 @@ module.exports = {
     chamber_contamination: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CHAMBER_CONTAMINATION,
+        type: DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CONTAMINATION_STATE,
         min: 0,
         max: 3,
         forceOverride: true,

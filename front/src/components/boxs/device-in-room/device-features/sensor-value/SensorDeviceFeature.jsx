@@ -26,7 +26,7 @@ import ThermostatOperatingStateDeviceValue from './ThermostatOperatingStateDevic
 import ChargingStationConnectorStatusDeviceValue from './ChargingStationConnectorStatusDeviceValue';
 import ChargingStationChargingStateDeviceValue from './ChargingStationChargingStateDeviceValue';
 import SirenAlarmStateDeviceValue from './SirenAlarmStateDeviceValue';
-import SmokeSensorDeviceValue from './SmokeSensorDeviceValue';
+import SmokeSensorContaminationDeviceValue from './SmokeSensorContaminationDeviceValue';
 import SmokeSensorMutedDeviceValue from './SmokeSensorMutedDeviceValue';
 
 // Checked before the category map: a category whose renderer only makes sense for one of its
@@ -60,7 +60,7 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE]: LevelSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: WaterValveDeviceValue,
-  [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CHAMBER_CONTAMINATION]: SmokeSensorDeviceValue,
+  [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CONTAMINATION_STATE]: SmokeSensorContaminationDeviceValue,
   [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.MUTED]: SmokeSensorMutedDeviceValue,
   [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH]: DistanceSensorDeviceValue,

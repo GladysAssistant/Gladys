@@ -47,8 +47,8 @@ module.exports = {
 
     return `${value}`;
   },
-  // A text expose Gladys has no mapping for would be a plain text feature: it has no numeric
-  // range, but min/max are mandatory on a Gladys feature.
+  // Defaults completing the mappings above (an expose with no mapping builds no feature at
+  // all): a text feature has no numeric range, but min/max are mandatory on a Gladys feature.
   feature: {
     category: DEVICE_FEATURE_CATEGORIES.TEXT,
     type: DEVICE_FEATURE_TYPES.TEXT.TEXT,

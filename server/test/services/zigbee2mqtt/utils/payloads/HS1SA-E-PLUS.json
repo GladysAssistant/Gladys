@@ -335,10 +335,10 @@
         "min": 0,
         "max": 3,
         "category": "smoke-sensor",
-        "type": "chamber-contamination",
+        "type": "contamination-state",
         "unit": null,
-        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:chamber-contamination:chamber_contamination",
-        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-chamber-contamination-chamber-contamination"
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:contamination-state:chamber_contamination",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-contamination-state-chamber-contamination"
       },
       {
         "name": "Siren for automation only",

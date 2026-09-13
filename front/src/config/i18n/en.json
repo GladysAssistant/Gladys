@@ -5454,7 +5454,7 @@
           "zero": "Clear",
           "one": "Smoke detected"
         },
-        "chamber-contamination": {
+        "contamination-state": {
           "0": "Clean",
           "1": "Lightly contaminated",
           "2": "Moderately contaminated",
@@ -5764,7 +5764,7 @@
       "shortCategoryName": "Smoke sensor",
       "binary": "Smoke (on/off)",
       "decimal": "Density (decimal)",
-      "chamber-contamination": "Chamber contamination",
+      "contamination-state": "Contamination",
       "muted": "Muted"
     },
     "co-sensor": {

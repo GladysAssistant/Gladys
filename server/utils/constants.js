@@ -286,14 +286,15 @@ const WATER_VALVE_CURRENT_DEVICE_STATUS = {
   WATER_SHORTAGE_AND_WATER_LEAKAGE: 3,
 };
 
-// How dirty the optical chamber of a smoke detector is. Values are ordered from a clean
-// chamber to a chamber so contaminated the detector can no longer be trusted, and are
-// append-only: an existing integer never changes meaning, it is stored in device states
-// and hard-coded in users' scenes.
-const SMOKE_CHAMBER_CONTAMINATION = {
+// How contaminated a smoke detector's sensing chamber is: from a clean detector to one so
+// dirty it can no longer be trusted. Names and integers are Matter's ContaminationStateEnum
+// (Smoke CO Alarm cluster), so a Matter detector maps onto it without conversion.
+// Values are append-only: an existing integer never changes meaning, it is stored in device
+// states and hard-coded in users' scenes.
+const CONTAMINATION_STATE = {
   NORMAL: 0,
-  LIGHT: 1,
-  MEDIUM: 2,
+  LOW: 1,
+  WARNING: 2,
   CRITICAL: 3,
 };
 
@@ -1342,9 +1343,10 @@ const DEVICE_FEATURE_TYPES = {
   // categories: a detector's battery, temperature or tamper contact are features of their own
   // categories on the same device, and its siren is a `siren` feature.
   SMOKE_SENSOR: {
-    // Dirt accumulated in the optical chamber, SMOKE_CHAMBER_CONTAMINATION (integer - sensor).
-    // A contaminated chamber blinds the detector: it tells the user to clean or replace it.
-    CHAMBER_CONTAMINATION: 'chamber-contamination',
+    // Dirt accumulated in the sensing chamber, CONTAMINATION_STATE (integer - sensor), named
+    // after Matter's ContaminationState attribute. A contaminated detector is blinded: the
+    // state tells the user to clean or replace it.
+    CONTAMINATION_STATE: 'contamination-state',
     // The detector's own siren is silenced, 1 when muted, 0 when it can ring (binary - sensor).
     // Boundary with the siren category: this is the detector muting itself (a user pressing its
     // button, an alarm hushed after a false trigger), not a siren Gladys drives.
@@ -2316,7 +2318,7 @@ module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
-module.exports.SMOKE_CHAMBER_CONTAMINATION = SMOKE_CHAMBER_CONTAMINATION;
+module.exports.CONTAMINATION_STATE = CONTAMINATION_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

@@ -5454,7 +5454,7 @@
           "zero": "Kein Rauch",
           "one": "Rauch erkannt"
         },
-        "chamber-contamination": {
+        "contamination-state": {
           "0": "Sauber",
           "1": "Leicht verschmutzt",
           "2": "Mittel verschmutzt",
@@ -5764,7 +5764,7 @@
       "shortCategoryName": "Rauchsensor",
       "binary": "Rauch (an/aus)",
       "decimal": "Dichte (dezimal)",
-      "chamber-contamination": "Kammerverschmutzung",
+      "contamination-state": "Verschmutzung",
       "muted": "Stummgeschaltet"
     },
     "co-sensor": {

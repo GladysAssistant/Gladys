@@ -5454,7 +5454,7 @@
           "zero": "Sain",
           "one": "Fumée détectée"
         },
-        "chamber-contamination": {
+        "contamination-state": {
           "0": "Propre",
           "1": "Légèrement encrassée",
           "2": "Moyennement encrassée",
@@ -5764,7 +5764,7 @@
       "shortCategoryName": "Détecteur de fumée",
       "binary": "Capteur de fumée - Oui/Non",
       "decimal": "Valeur de fumée décimale",
-      "chamber-contamination": "Encrassement de la chambre de détection",
+      "contamination-state": "Encrassement du détecteur",
       "muted": "Alarme coupée"
     },
     "co-sensor": {

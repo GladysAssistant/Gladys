@@ -2,21 +2,21 @@ import { Component, Fragment } from 'preact';
 import Select from '../../../../../components/form/Select';
 import get from 'get-value';
 
-import { SMOKE_CHAMBER_CONTAMINATION } from '../../../../../../../server/utils/constants';
+import { CONTAMINATION_STATE } from '../../../../../../../server/utils/constants';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
-class SmokeSensorDeviceState extends Component {
+class SmokeSensorContaminationDeviceState extends Component {
   handleValueChange = ({ value }) => {
     this.props.updateTriggerProperty(this.props.index, 'value', value);
   };
 
   getOptions = () => {
-    const options = Object.keys(SMOKE_CHAMBER_CONTAMINATION).map(key => {
-      const value = SMOKE_CHAMBER_CONTAMINATION[key];
+    const options = Object.keys(CONTAMINATION_STATE).map(key => {
+      const value = CONTAMINATION_STATE[key];
       return {
         label: get(
           this.props.intl.dictionary,
-          `deviceFeatureValue.category.smoke-sensor.chamber-contamination.${value}`,
+          `deviceFeatureValue.category.smoke-sensor.contamination-state.${value}`,
           {
             default: value
           }
@@ -54,4 +54,4 @@ class SmokeSensorDeviceState extends Component {
   }
 }
 
-export default withIntlAsProp(SmokeSensorDeviceState);
+export default withIntlAsProp(SmokeSensorContaminationDeviceState);
