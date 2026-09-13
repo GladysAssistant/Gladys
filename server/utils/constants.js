@@ -1345,6 +1345,14 @@ const DEVICE_FEATURE_TYPES = {
     // Dirt accumulated in the optical chamber, SMOKE_CHAMBER_CONTAMINATION (integer - sensor).
     // A contaminated chamber blinds the detector: it tells the user to clean or replace it.
     CHAMBER_CONTAMINATION: 'chamber-contamination',
+    // The detector reports a fault and can no longer be trusted: 1 when any fault is raised
+    // (sensor failure, wiring, pollution...), 0 when it works normally (binary - sensor).
+    // Which fault it is stays detector-specific: only "faulty or not" is modeled here.
+    FAULT: 'fault',
+    // The detector's own siren is silenced, 1 when muted, 0 when it can ring (binary - sensor).
+    // Boundary with the siren category: this is the detector muting itself (a user pressing its
+    // button, an alarm hushed after a false trigger), not a siren Gladys drives.
+    MUTED: 'muted',
   },
   // Domestic hot water appliances: electric storage tanks, heat-pump water heaters,
   // gas-fired water heaters. Scope is limited to producing and storing hot water.

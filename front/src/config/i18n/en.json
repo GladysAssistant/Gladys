@@ -5460,6 +5460,14 @@
           "2": "Moderately contaminated",
           "3": "Critically contaminated",
           "unknown": "{{value}} (unknown)"
+        },
+        "fault": {
+          "0": "Working",
+          "1": "Faulty"
+        },
+        "muted": {
+          "0": "Can ring",
+          "1": "Muted"
         }
       },
       "co-sensor": {
@@ -5760,7 +5768,9 @@
       "shortCategoryName": "Smoke sensor",
       "binary": "Smoke (on/off)",
       "decimal": "Density (decimal)",
-      "chamber-contamination": "Chamber contamination"
+      "chamber-contamination": "Chamber contamination",
+      "fault": "Fault state",
+      "muted": "Muted"
     },
     "co-sensor": {
       "shortCategoryName": "Carbon Monoxide (CO) Sensor",

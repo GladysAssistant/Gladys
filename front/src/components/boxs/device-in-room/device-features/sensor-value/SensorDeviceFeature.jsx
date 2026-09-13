@@ -27,6 +27,7 @@ import ChargingStationConnectorStatusDeviceValue from './ChargingStationConnecto
 import ChargingStationChargingStateDeviceValue from './ChargingStationChargingStateDeviceValue';
 import SirenAlarmStateDeviceValue from './SirenAlarmStateDeviceValue';
 import SmokeSensorDeviceValue from './SmokeSensorDeviceValue';
+import SmokeSensorMutedDeviceValue from './SmokeSensorMutedDeviceValue';
 
 // Checked before the category map: a category whose renderer only makes sense for one of its
 // types needs an escape hatch. presence-sensor is historically a "push" category rendered as a
@@ -60,6 +61,10 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE]: LevelSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: WaterValveDeviceValue,
   [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CHAMBER_CONTAMINATION]: SmokeSensorDeviceValue,
+  // A detector in fault is a danger: BinaryDeviceValue already paints the smoke-sensor
+  // category's binaries green at 0 and red at 1.
+  [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.FAULT]: BinaryDeviceValue,
+  [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.MUTED]: SmokeSensorMutedDeviceValue,
   [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.SIREN.TEST_IN_PROGRESS]: BinaryDeviceValue,

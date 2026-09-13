@@ -5460,6 +5460,14 @@
           "2": "Mittel verschmutzt",
           "3": "Stark verschmutzt",
           "unknown": "{{value}} (unbekannt)"
+        },
+        "fault": {
+          "0": "Funktioniert",
+          "1": "Störung"
+        },
+        "muted": {
+          "0": "Kann auslösen",
+          "1": "Stummgeschaltet"
         }
       },
       "co-sensor": {
@@ -5760,7 +5768,9 @@
       "shortCategoryName": "Rauchsensor",
       "binary": "Rauch (an/aus)",
       "decimal": "Dichte (dezimal)",
-      "chamber-contamination": "Kammerverschmutzung"
+      "chamber-contamination": "Kammerverschmutzung",
+      "fault": "Störungsstatus",
+      "muted": "Stummgeschaltet"
     },
     "co-sensor": {
       "shortCategoryName": "Kohlenmonoxid (CO)-Sensor",

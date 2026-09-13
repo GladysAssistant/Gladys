@@ -26,10 +26,12 @@ class BinaryDeviceState extends Component {
           })}
           onClick={this.handleValueChangeBinary(value)}
         >
-          <Text id={`deviceFeatureValue.category.${category}.binary`} plural={value}>
-            {!customText && <Text id={`editScene.triggersCard.newState.${value ? 'on' : 'off'}`} />}
-            {customText && <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`} />}
-          </Text>
+          {customText && <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`} />}
+          {!customText && (
+            <Text id={`deviceFeatureValue.category.${category}.binary`} plural={value}>
+              <Text id={`editScene.triggersCard.newState.${value ? 'on' : 'off'}`} />
+            </Text>
+          )}
         </button>
       </div>
     );

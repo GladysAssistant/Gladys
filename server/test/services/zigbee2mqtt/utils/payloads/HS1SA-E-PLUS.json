@@ -285,24 +285,24 @@
         "read_only": true,
         "has_feedback": false,
         "min": 0,
-        "max": 0,
-        "category": "text",
-        "type": "text",
+        "max": 1,
+        "category": "smoke-sensor",
+        "type": "fault",
         "unit": null,
-        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:text:text:fault_state",
-        "selector": "zigbee2mqtt-hs1sa-e-plus-device-text-text-fault-state"
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:fault:fault_state",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-fault-fault-state"
       },
       {
         "name": "Muted",
         "read_only": true,
         "has_feedback": false,
         "min": 0,
-        "max": 0,
-        "category": "text",
-        "type": "text",
+        "max": 1,
+        "category": "smoke-sensor",
+        "type": "muted",
         "unit": null,
-        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:text:text:muted",
-        "selector": "zigbee2mqtt-hs1sa-e-plus-device-text-text-muted"
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:muted:muted",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-muted-muted"
       },
       {
         "name": "Trigger selftest",
@@ -327,18 +327,6 @@
         "unit": null,
         "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:decimal:smoke_level",
         "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-decimal-smoke-level"
-      },
-      {
-        "name": "Smoke unit",
-        "read_only": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 0,
-        "category": "text",
-        "type": "text",
-        "unit": null,
-        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:text:text:smoke_unit",
-        "selector": "zigbee2mqtt-hs1sa-e-plus-device-text-text-smoke-unit"
       },
       {
         "name": "Chamber contamination",
@@ -373,16 +361,6 @@
       "property": "smoke_level"
     },
     {
-      "internal": "dB/m",
-      "external": "dB/m",
-      "property": "smoke_unit"
-    },
-    {
-      "internal": "%ft OBS",
-      "external": "%ft OBS",
-      "property": "smoke_unit"
-    },
-    {
       "internal": 0,
       "external": "normal",
       "property": "chamber_contamination"
@@ -403,22 +381,22 @@
       "property": "chamber_contamination"
     },
     {
-      "internal": "normal",
+      "internal": 0,
       "external": "normal",
       "property": "fault_state"
     },
     {
-      "internal": "fault | pollution_fault",
+      "internal": 1,
       "external": "fault | pollution_fault",
       "property": "fault_state"
     },
     {
-      "internal": "normal",
+      "internal": 0,
       "external": "normal",
       "property": "muted"
     },
     {
-      "internal": "alarm_muted | low_battery_muted",
+      "internal": 1,
       "external": "alarm_muted | low_battery_muted",
       "property": "muted"
     },
