@@ -285,12 +285,12 @@
         "read_only": true,
         "has_feedback": false,
         "min": 0,
-        "max": 1,
-        "category": "smoke-sensor",
-        "type": "fault",
+        "max": 0,
+        "category": "text",
+        "type": "text",
         "unit": null,
-        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:fault:fault_state",
-        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-fault-fault-state"
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:text:text:fault_state",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-text-text-fault-state"
       },
       {
         "name": "Muted",
@@ -381,12 +381,12 @@
       "property": "chamber_contamination"
     },
     {
-      "internal": 0,
+      "internal": "normal",
       "external": "normal",
       "property": "fault_state"
     },
     {
-      "internal": 1,
+      "internal": "fault | pollution_fault",
       "external": "fault | pollution_fault",
       "property": "fault_state"
     },

@@ -5461,10 +5461,6 @@
           "3": "Fortement encrassée",
           "unknown": "{{value}} (inconnu)"
         },
-        "fault": {
-          "0": "Fonctionne",
-          "1": "En défaut"
-        },
         "muted": {
           "0": "Peut sonner",
           "1": "Alarme coupée"
@@ -5769,7 +5765,6 @@
       "binary": "Capteur de fumée - Oui/Non",
       "decimal": "Valeur de fumée décimale",
       "chamber-contamination": "Encrassement de la chambre de détection",
-      "fault": "État de défaut",
       "muted": "Alarme coupée"
     },
     "co-sensor": {

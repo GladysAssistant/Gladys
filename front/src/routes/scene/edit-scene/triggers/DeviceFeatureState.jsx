@@ -197,8 +197,7 @@ class TurnOnLight extends Component {
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE ||
         (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
           (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST || type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING)) ||
-        (category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR &&
-          (type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.FAULT || type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.MUTED));
+        (category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR && type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.MUTED);
       // Scoped to `push`: the locked "device seen" widget only makes sense for a heartbeat
       // sensor. A binary presence sensor (a camera reporting a person) shares the 'binary'
       // string with SWITCH, so it is already served by BinaryDeviceState above, and both

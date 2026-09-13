@@ -61,9 +61,6 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE]: LevelSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: WaterValveDeviceValue,
   [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CHAMBER_CONTAMINATION]: SmokeSensorDeviceValue,
-  // A detector in fault is a danger: BinaryDeviceValue already paints the smoke-sensor
-  // category's binaries green at 0 and red at 1.
-  [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.FAULT]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.MUTED]: SmokeSensorMutedDeviceValue,
   [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH]: DistanceSensorDeviceValue,

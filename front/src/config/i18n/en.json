@@ -5461,10 +5461,6 @@
           "3": "Critically contaminated",
           "unknown": "{{value}} (unknown)"
         },
-        "fault": {
-          "0": "Working",
-          "1": "Faulty"
-        },
         "muted": {
           "0": "Can ring",
           "1": "Muted"
@@ -5769,7 +5765,6 @@
       "binary": "Smoke (on/off)",
       "decimal": "Density (decimal)",
       "chamber-contamination": "Chamber contamination",
-      "fault": "Fault state",
       "muted": "Muted"
     },
     "co-sensor": {

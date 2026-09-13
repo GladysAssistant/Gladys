@@ -25,12 +25,9 @@ describe('zigbee2mqtt textType', () => {
     access: 5,
   };
 
-  it('should read a normal fault state as 0', () => {
-    assert.equal(textType.readValue(faultStateExpose, 'normal'), 0);
-  });
-
-  it('should read any raised fault as 1', () => {
-    assert.equal(textType.readValue(faultStateExpose, 'fault | pollution_fault'), 1);
+  it('should read the fault state as the string the detector sends', () => {
+    assert.equal(textType.readValue(faultStateExpose, 'normal'), 'normal');
+    assert.equal(textType.readValue(faultStateExpose, 'fault | pollution_fault'), 'fault | pollution_fault');
   });
 
   it('should read a detector able to ring as 0', () => {
@@ -49,19 +46,19 @@ describe('zigbee2mqtt textType', () => {
     assert.equal(textType.writeValue(mutedExpose, 'normal'), 'normal');
   });
 
-  it('should build the fault state as a binary smoke sensor feature', () => {
+  it('should build the fault state as a text feature', () => {
     const [feature] = buildFeatures('smoke-detector', faultStateExpose);
 
     assert.deepEqual(feature, {
       read_only: true,
       has_feedback: false,
       min: 0,
-      max: 1,
-      category: 'smoke-sensor',
-      type: 'fault',
+      max: 0,
+      category: 'text',
+      type: 'text',
       name: 'Fault state',
-      external_id: 'zigbee2mqtt:smoke-detector:smoke-sensor:fault:fault_state',
-      selector: 'zigbee2mqtt-smoke-detector-smoke-sensor-fault-fault-state',
+      external_id: 'zigbee2mqtt:smoke-detector:text:text:fault_state',
+      selector: 'zigbee2mqtt-smoke-detector-text-text-fault-state',
       unit: null,
     });
   });

@@ -5461,10 +5461,6 @@
           "3": "Stark verschmutzt",
           "unknown": "{{value}} (unbekannt)"
         },
-        "fault": {
-          "0": "Funktioniert",
-          "1": "Störung"
-        },
         "muted": {
           "0": "Kann auslösen",
           "1": "Stummgeschaltet"
@@ -5769,7 +5765,6 @@
       "binary": "Rauch (an/aus)",
       "decimal": "Dichte (dezimal)",
       "chamber-contamination": "Kammerverschmutzung",
-      "fault": "Störungsstatus",
       "muted": "Stummgeschaltet"
     },
     "co-sensor": {
