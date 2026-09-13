@@ -5453,6 +5453,13 @@
           "other": "Aucune valeur reçue",
           "zero": "Sain",
           "one": "Fumée détectée"
+        },
+        "chamber-contamination": {
+          "0": "Propre",
+          "1": "Légèrement encrassée",
+          "2": "Moyennement encrassée",
+          "3": "Fortement encrassée",
+          "unknown": "{{value}} (inconnu)"
         }
       },
       "co-sensor": {
@@ -5752,7 +5759,8 @@
     "smoke-sensor": {
       "shortCategoryName": "Détecteur de fumée",
       "binary": "Capteur de fumée - Oui/Non",
-      "decimal": "Valeur de fumée décimale"
+      "decimal": "Valeur de fumée décimale",
+      "chamber-contamination": "Encrassement de la chambre de détection"
     },
     "co-sensor": {
       "shortCategoryName": "Capteur de monoxyde de carbone (CO)",

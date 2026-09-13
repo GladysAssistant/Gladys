@@ -9,12 +9,17 @@ const {
   PILOT_WIRE_MODE,
   LIQUID_STATE,
   WATER_VALVE_CURRENT_DEVICE_STATUS,
+  SMOKE_CHAMBER_CONTAMINATION,
   STATE,
 } = require('../../../utils/constants');
 
 // Sirens naming their melodies "melody_1", "melody_2"… instead of publishing a plain number:
 // the number is the Gladys value, and the expose list says which melodies the siren really has.
 const MELODY_NAME = /^melody_(\d+)$/;
+
+// Enum exposes whose values are labels rather than a value set Gladys can map onto one of its
+// own: they are published as text features, keeping the string the device sends.
+const RAW_TEXT_VALUE_EXPOSES = ['smoke_unit'];
 
 const WRITE_VALUE_MAPPING = {};
 const READ_VALUE_MAPPING = {};
@@ -214,6 +219,13 @@ addMapping('trigger_selftest', BUTTON_PUSH.PRESSED, 'test');
 addMapping('siren_for_automation_only', STATE.OFF, 'stop');
 addMapping('siren_for_automation_only', STATE.ON, 'smoke_siren');
 
+// Contamination of the smoke chamber, e.g. Heiman HS1SA-E-PLUS
+// https://www.zigbee2mqtt.io/devices/HS1SA-E-PLUS.html
+addMapping('chamber_contamination', SMOKE_CHAMBER_CONTAMINATION.NORMAL, 'normal');
+addMapping('chamber_contamination', SMOKE_CHAMBER_CONTAMINATION.LIGHT, 'light_contamination');
+addMapping('chamber_contamination', SMOKE_CHAMBER_CONTAMINATION.MEDIUM, 'medium_contamination');
+addMapping('chamber_contamination', SMOKE_CHAMBER_CONTAMINATION.CRITICAL, 'critical_contamination');
+
 module.exports = {
   type: 'enum',
   writeValue: (expose, value) => {
@@ -224,6 +236,11 @@ module.exports = {
     if (expose.name === 'alarm_melody') {
       const melodyName = `melody_${value}`;
       return (expose.values || []).includes(melodyName) ? melodyName : undefined;
+    }
+
+    if (RAW_TEXT_VALUE_EXPOSES.includes(expose.name)) {
+      const rawValue = `${value}`;
+      return (expose.values || []).includes(rawValue) ? rawValue : undefined;
     }
 
     const relatedValue = (WRITE_VALUE_MAPPING[expose.name] || {})[value];
@@ -243,6 +260,10 @@ module.exports = {
     if (expose.name === 'alarm_melody') {
       const melodyNumber = MELODY_NAME.exec(value);
       return melodyNumber === null ? undefined : parseInt(melodyNumber[1], 10);
+    }
+
+    if (RAW_TEXT_VALUE_EXPOSES.includes(expose.name)) {
+      return `${value}`;
     }
 
     const subValue = value.replace(/^(\d+_)?/, '');
@@ -353,6 +374,27 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      },
+    },
+    chamber_contamination: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CHAMBER_CONTAMINATION,
+        min: 0,
+        max: 3,
+        forceOverride: true,
+      },
+    },
+    // Unit the detector uses for the smoke level it measures ("dB/m", "%ft OBS"): a label
+    // describing another measurement, and not one of the Gladys units, so it is published
+    // as a text feature holding the string the detector sends.
+    smoke_unit: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.TEXT,
+        type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+        min: 0,
+        max: 0,
+        forceOverride: true,
       },
     },
   },

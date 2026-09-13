@@ -5453,6 +5453,13 @@
           "other": "No value received",
           "zero": "Clear",
           "one": "Smoke detected"
+        },
+        "chamber-contamination": {
+          "0": "Clean",
+          "1": "Lightly contaminated",
+          "2": "Moderately contaminated",
+          "3": "Critically contaminated",
+          "unknown": "{{value}} (unknown)"
         }
       },
       "co-sensor": {
@@ -5752,7 +5759,8 @@
     "smoke-sensor": {
       "shortCategoryName": "Smoke sensor",
       "binary": "Smoke (on/off)",
-      "decimal": "Density (decimal)"
+      "decimal": "Density (decimal)",
+      "chamber-contamination": "Chamber contamination"
     },
     "co-sensor": {
       "shortCategoryName": "Carbon Monoxide (CO) Sensor",

@@ -5453,6 +5453,13 @@
           "other": "Kein Wert empfangen",
           "zero": "Kein Rauch",
           "one": "Rauch erkannt"
+        },
+        "chamber-contamination": {
+          "0": "Sauber",
+          "1": "Leicht verschmutzt",
+          "2": "Mittel verschmutzt",
+          "3": "Stark verschmutzt",
+          "unknown": "{{value}} (unbekannt)"
         }
       },
       "co-sensor": {
@@ -5752,7 +5759,8 @@
     "smoke-sensor": {
       "shortCategoryName": "Rauchsensor",
       "binary": "Rauch (an/aus)",
-      "decimal": "Dichte (dezimal)"
+      "decimal": "Dichte (dezimal)",
+      "chamber-contamination": "Kammerverschmutzung"
     },
     "co-sensor": {
       "shortCategoryName": "Kohlenmonoxid (CO)-Sensor",

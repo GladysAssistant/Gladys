@@ -286,6 +286,17 @@ const WATER_VALVE_CURRENT_DEVICE_STATUS = {
   WATER_SHORTAGE_AND_WATER_LEAKAGE: 3,
 };
 
+// How dirty the optical chamber of a smoke detector is. Values are ordered from a clean
+// chamber to a chamber so contaminated the detector can no longer be trusted, and are
+// append-only: an existing integer never changes meaning, it is stored in device states
+// and hard-coded in users' scenes.
+const SMOKE_CHAMBER_CONTAMINATION = {
+  NORMAL: 0,
+  LIGHT: 1,
+  MEDIUM: 2,
+  CRITICAL: 3,
+};
+
 // Operating modes of a domestic hot water appliance. This is the full generic set:
 // an appliance supporting only some of them declares its subset through the
 // supported_options of its `mode` feature, never by narrowing this enum.
@@ -1325,6 +1336,16 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
   },
+  // Smoke detectors. The detection itself stays on the generic sensor types the category
+  // has always used (`binary` for "smoke detected", `decimal` for the measured smoke level):
+  // this group only holds what is specific to a smoke chamber. Boundary with neighboring
+  // categories: a detector's battery, temperature or tamper contact are features of their own
+  // categories on the same device, and its siren is a `siren` feature.
+  SMOKE_SENSOR: {
+    // Dirt accumulated in the optical chamber, SMOKE_CHAMBER_CONTAMINATION (integer - sensor).
+    // A contaminated chamber blinds the detector: it tells the user to clean or replace it.
+    CHAMBER_CONTAMINATION: 'chamber-contamination',
+  },
   // Domestic hot water appliances: electric storage tanks, heat-pump water heaters,
   // gas-fired water heaters. Scope is limited to producing and storing hot water.
   // Boundary with neighboring categories: the water temperature measured in the tank
@@ -2291,6 +2312,7 @@ module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
+module.exports.SMOKE_CHAMBER_CONTAMINATION = SMOKE_CHAMBER_CONTAMINATION;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

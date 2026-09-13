@@ -190,6 +190,19 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
       },
     },
+    // Smoke concentration measured in the detection chamber, e.g. Heiman HS1SA-E-PLUS.
+    // Its unit is not the same on every detector (dB/m, %ft OBS...) and is published by the
+    // device itself, in the "smoke_unit" expose: none of them is a Gladys unit, so the
+    // measurement is kept unit-less.
+    // https://www.zigbee2mqtt.io/devices/HS1SA-E-PLUS.html
+    smoke_level: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        min: 0,
+        max: 100,
+      },
+    },
     humidity: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
