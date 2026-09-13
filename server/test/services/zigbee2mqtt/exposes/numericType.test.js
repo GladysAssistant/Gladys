@@ -78,6 +78,16 @@ describe('zigbee2mqtt numericType', () => {
         max: 150,
       });
     });
+
+    it('should configure temperature_probe feature, the Tuya alias', () => {
+      assert.deepEqual(numericType.names.temperature_probe.feature, {
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.PROBE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        min: -100,
+        max: 150,
+      });
+    });
   });
 
   describe('Siren features', () => {
