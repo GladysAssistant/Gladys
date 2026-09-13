@@ -155,6 +155,16 @@ const names = {
       type: DEVICE_FEATURE_TYPES.BATTERY.CHARGING,
     },
   },
+  // Silences the siren of a smoke/CO detector for a few minutes, e.g. Heiman HS1SA-E-PLUS.
+  // It is the writable counterpart of the read-only `muted` state, which says whether the
+  // detector is currently silenced: a user hushing a false alarm from Gladys writes here.
+  // https://www.zigbee2mqtt.io/devices/HS1SA-E-PLUS.html
+  temporary_mute: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    },
+  },
   // SONOFF SWV water valve
   // https://www.zigbee2mqtt.io/devices/SWV.html
   auto_close_when_water_shortage: {
