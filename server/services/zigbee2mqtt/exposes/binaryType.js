@@ -161,8 +161,8 @@ const names = {
   // https://www.zigbee2mqtt.io/devices/HS1SA-E-PLUS.html
   temporary_mute: {
     feature: {
-      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE,
     },
   },
   // SONOFF SWV water valve

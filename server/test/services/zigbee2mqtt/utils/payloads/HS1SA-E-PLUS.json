@@ -322,11 +322,11 @@
         "has_feedback": true,
         "min": 0,
         "max": 1,
-        "category": "switch",
-        "type": "binary",
+        "category": "smoke-sensor",
+        "type": "temporary-mute",
         "unit": null,
-        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:switch:binary:temporary_mute",
-        "selector": "zigbee2mqtt-hs1sa-e-plus-device-switch-binary-temporary-mute"
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:temporary-mute:temporary_mute",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-temporary-mute-temporary-mute"
       },
       {
         "name": "Smoke level",

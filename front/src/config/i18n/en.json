@@ -5464,6 +5464,10 @@
         "muted": {
           "0": "Can ring",
           "1": "Muted"
+        },
+        "temporary-mute": {
+          "0": "Let it ring",
+          "1": "Hush the alarm"
         }
       },
       "co-sensor": {
@@ -5765,7 +5769,8 @@
       "binary": "Smoke (on/off)",
       "decimal": "Density (decimal)",
       "contamination-state": "Contamination",
-      "muted": "Muted"
+      "muted": "Muted",
+      "temporary-mute": "Hush the alarm"
     },
     "co-sensor": {
       "shortCategoryName": "Carbon Monoxide (CO) Sensor",

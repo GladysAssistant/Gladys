@@ -1351,6 +1351,11 @@ const DEVICE_FEATURE_TYPES = {
     // Boundary with the siren category: this is the detector muting itself (a user pressing its
     // button, an alarm hushed after a false trigger), not a siren Gladys drives.
     MUTED: 'muted',
+    // Silence the detector's siren for as long as it allows, 1 to hush, 0 to let it ring again
+    // (binary - command). It is the command counterpart of `muted`, which reports the result,
+    // and stays in this category on purpose: hushing an alarm is not a generic switch, and
+    // must not be reachable through "turn everything off" in a voice assistant or a scene.
+    TEMPORARY_MUTE: 'temporary-mute',
   },
   // Domestic hot water appliances: electric storage tanks, heat-pump water heaters,
   // gas-fired water heaters. Scope is limited to producing and storing hot water.

@@ -5464,6 +5464,10 @@
         "muted": {
           "0": "Peut sonner",
           "1": "Alarme coupée"
+        },
+        "temporary-mute": {
+          "0": "Laisser sonner",
+          "1": "Couper l'alarme"
         }
       },
       "co-sensor": {
@@ -5765,7 +5769,8 @@
       "binary": "Capteur de fumée - Oui/Non",
       "decimal": "Valeur de fumée décimale",
       "contamination-state": "Encrassement du détecteur",
-      "muted": "Alarme coupée"
+      "muted": "Alarme coupée",
+      "temporary-mute": "Couper l'alarme"
     },
     "co-sensor": {
       "shortCategoryName": "Capteur de monoxyde de carbone (CO)",

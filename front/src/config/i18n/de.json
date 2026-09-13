@@ -5464,6 +5464,10 @@
         "muted": {
           "0": "Kann auslösen",
           "1": "Stummgeschaltet"
+        },
+        "temporary-mute": {
+          "0": "Auslösen lassen",
+          "1": "Alarm stummschalten"
         }
       },
       "co-sensor": {
@@ -5765,7 +5769,8 @@
       "binary": "Rauch (an/aus)",
       "decimal": "Dichte (dezimal)",
       "contamination-state": "Verschmutzung",
-      "muted": "Stummgeschaltet"
+      "muted": "Stummgeschaltet",
+      "temporary-mute": "Alarm stummschalten"
     },
     "co-sensor": {
       "shortCategoryName": "Kohlenmonoxid (CO)-Sensor",
