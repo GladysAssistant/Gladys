@@ -1,4 +1,4 @@
-> Part of the [external integrations living spec](README.md) — the section index, the editing rules and the cross-repo map are there.
+> Part of the [external integrations living spec](../README.md) — the layout, the editing rules and the cross-repo map are there.
 
 # B.20 Docker image cleanup
 

@@ -2,7 +2,7 @@
 
 > **Living specification — source of truth.** This spec describes the behavior of external integrations and the contracts binding the monorepo to the ecosystem repos (section C: manifest, host API, WS protocol, store formats). Phase 1 is implemented, and the phase 2 workstreams of sections B.15–B.18 (communication type, mediated network discovery, inbound webhooks, weather type) have shipped since. **Rule: any PR that changes an external-integration behavior or contract modifies this spec in the same diff** — spec first, code second. Field feedback (pilot ports, forum) is captured here before being coded.
 >
-> The spec is split into **one file per section** (this folder). Section identifiers (`A`, `B.1`…`B.20`, `C.1`…`C.8`) are stable and are what the other specs, the code comments and the ecosystem repos refer to: a file's heading keeps its identifier, and the map below tells which file holds which section.
+> The spec is split into **one file per topic** in this folder (layout and editing rules below): the framework in `core/`, the contracts in `contracts/`, and one self-contained file per integration type or capability in `capabilities/`.
 
 ## Context
 
@@ -19,51 +19,27 @@ Scoping decisions validated with the maintainer:
 - **Frontend on par with internal integrations**: presence in the integration catalog with a simple "external" badge, then a generic 3-screen page — Devices / Discovery / Configuration (form defined in JSON by the integration). A single integration type in v1: "Devices".
 - **Multi-container integrations**: some integrations need additional containers (the Frigate case: Frigate container + Mosquitto broker, with a web UI reachable on the LAN and access to the Coral). The manifest **declares** what may run — images, limits, published ports, hardware access — and that is what the user approves at install time; the integration **then drives the lifecycle via the host API** (create/start/stop/restart, only within the declared bounds). Data confined to the integration's folder, full deletion at uninstall, and **never** any access to the Docker socket.
 
-## Map of the spec
+## Layout of the spec
 
-| File | Section | Content |
-|---|---|---|
-| [`a-architecture.md`](a-architecture.md) | A | Overall architecture, deliverable phases |
-| [`b01-data-model.md`](b01-data-model.md) | B.1 | Data model: everything in `t_service` |
-| [`b02-supervisor.md`](b02-supervisor.md) | B.2 | Supervisor (`server/lib/external-integration/`): state machine, locked-down container, networking, sub-containers, hardware access |
-| [`b03-integration-auth.md`](b03-integration-auth.md) | B.3 | Integration auth: stateless JWT, outside `t_session` |
-| [`b04-host-api.md`](b04-host-api.md) | B.4 | REST host API design (`/api/integration/v1/`) |
-| [`b05-integration-websocket.md`](b05-integration-websocket.md) | B.5 | Integration WebSocket design |
-| [`b06-command-routing.md`](b06-command-routing.md) | B.6 | Command routing (proxy service, `sendCommand`) |
-| [`b07-management-api.md`](b07-management-api.md) | B.7 | Management API design (admin) |
-| [`b08-frontend.md`](b08-frontend.md) | B.8 | Frontend: catalog, install screens, generic 3-screen page |
-| [`b09-store.md`](b09-store.md) | B.9 | The store: auto-generated decentralized index, update detection |
-| [`b10-js-sdk.md`](b10-js-sdk.md) | B.10 | JS SDK: repo `GladysAssistant/integration-sdk-js` |
-| [`b11-integration-template.md`](b11-integration-template.md) | B.11 | Integration template: repo `GladysAssistant/integration-template-js` |
-| [`b12-documentation.md`](b12-documentation.md) | B.12 | Documentation: website `GladysAssistant/v4-website` |
-| [`b13-tests.md`](b13-tests.md) | B.13 | Tests (100% patch coverage required in CI) |
-| [`b14-accepted-risks.md`](b14-accepted-risks.md) | B.14 | Accepted risks (v1) |
-| [`b15-communication-type.md`](b15-communication-type.md) | B.15 | "Communication" type (phase 2, shipped) |
-| [`b16-network-discovery.md`](b16-network-discovery.md) | B.16 | Mediated network discovery (phase 2, shipped) |
-| [`b17-webhooks.md`](b17-webhooks.md) | B.17 | Inbound webhooks via Gladys Plus (phase 2, shipped) |
-| [`b18-weather-type.md`](b18-weather-type.md) | B.18 | "Weather" type (phase 2, shipped) |
-| [`b20-image-cleanup.md`](b20-image-cleanup.md) | B.20 | Docker image cleanup |
-| [`c00-conventions.md`](c00-conventions.md) | C | Interface specification: general conventions (REST errors, WS envelope, dates, `external_id` prefix) |
-| [`c01-manifest.md`](c01-manifest.md) | C.1 | The `gladys-assistant-integration.json` manifest (`config_schema`, `containers`, `actions`, `transports`…) |
-| [`c02-host-api-conventions.md`](c02-host-api-conventions.md) | C.2 | Host API: access conventions |
-| [`c03-host-api-endpoints.md`](c03-host-api-endpoints.md) | C.3 | Host API: endpoints |
-| [`c04-websocket-protocol.md`](c04-websocket-protocol.md) | C.4 | Integration WebSocket: protocol |
-| [`c05-management-api.md`](c05-management-api.md) | C.5 | Management API (frontend ↔ server) |
-| [`c06-indexer-formats.md`](c06-indexer-formats.md) | C.6 | Formats published by the indexer (`index.json`, `rejected.json`) |
-| [`c07-container-descriptor.md`](c07-container-descriptor.md) | C.7 | The integration container: Docker descriptor and environment |
-| [`c08-js-sdk-api.md`](c08-js-sdk-api.md) | C.8 | JS SDK: public API of `@gladysassistant/integration-sdk` |
-| [`verification.md`](verification.md) | — | Verification: automated checks and manual e2e journeys |
+The spec is a folder, not a file, so that workstreams landing in parallel never edit the same file. **The folder listing is the index**: there is no hand-maintained table of contents to update, and file names are topics, never numbers, so two branches adding two topics can never pick the same name.
 
-There is no B.19: section numbers are never reused nor renumbered, so a reference written yesterday stays valid tomorrow.
+| Folder / file | What lives there |
+|---|---|
+| [`architecture.md`](architecture.md) | Section A: overall architecture, deliverable phases |
+| `core/` | Sections B.1–B.14 and B.20: the design of the framework itself — `data-model`, `supervisor`, `integration-auth`, `host-api`, `integration-websocket`, `command-routing`, `management-api`, `frontend`, `store`, `js-sdk`, `integration-template`, `documentation`, `tests`, `accepted-risks`, `image-cleanup` |
+| `capabilities/` | **One file per integration type or capability** built on the framework — the folder listing is the list, this README never repeats it (the phase-2 workstreams B.15–B.18 live there, each file's first heading carries its identifier). Each file is self-contained: the problem, the design, the manifest field it adds, the host API endpoints and WebSocket messages it introduces, the SDK surface, the frontend behavior, its tests and its manual verification steps |
+| `contracts/` | Section C, the v1 contracts binding the monorepo to the ecosystem repos: `conventions`, `manifest` (C.1), `host-api-conventions` (C.2), `host-api-endpoints` (C.3), `websocket-protocol` (C.4), `management-api` (C.5), `indexer-formats` (C.6), `container-descriptor` (C.7), `js-sdk-api` (C.8) |
+| [`verification.md`](verification.md) | Automated checks and the manual e2e journeys of the framework |
+
+**Section identifiers.** The original single-file spec numbered its sections (A, B.1…B.20, C.1…C.8), and those identifiers are cited by the other specs, by code comments and by the ecosystem repos. Existing files keep their identifier in their first heading so every such reference still resolves (there is no B.19; nothing is ever renumbered). **No new identifier is allocated**: a new file is cited by its path (`capabilities/<topic>.md`), which is unique by construction — two parallel branches cannot both take "B.21".
 
 ## How to extend this spec
 
-The split exists so that two workstreams landing at the same time do not fight over one file. Follow these rules:
-
-- **A new integration type, a new capability or a new phase-2/3 workstream gets its own new file** (`b21-<topic>.md`, then `b22-…`), self-contained on the model of B.15–B.18 and B.20: the problem, the design, the manifest field it adds, the host API / WebSocket messages it introduces and the frontend behavior, all in that file. Add its row to the map above and a one-line pointer where the shared contracts reference it (a row in the C.1 field table, the C.4 message table, the C.8 SDK tables) — the detailed design stays in the new file.
+- **A new integration type, capability or workstream is a new file in `capabilities/`** (`capabilities/<topic>.md`, kebab-case topic name), self-contained on the model of the four existing ones. It owns everything it adds — including its contracts: its manifest field, its endpoints, its WebSocket messages and its SDK methods are specified **in that file**, not as rows added to the shared tables of `contracts/` (two branches appending rows to the same table is exactly the conflict this layout removes). The shared contract files describe the v1 core surface and point to `capabilities/` for the rest.
 - **A change to an existing behavior or contract edits the file that owns it**, in the same diff as the code, per the living-spec rule.
-- **Do not renumber or move sections**: identifiers are cited across specs (`camera-ptz-control.md`, `water-heater.md`, `integration-catalog-categories.md`, `device-migration.md`), in code comments and in the ecosystem repos. Take the next free number for a new section.
-- Every file starts with the one-line back-link to this README, and its first heading is the section identifier followed by the title.
+- **Nothing is renumbered, moved or renamed**: paths and section identifiers are cited elsewhere. A file that grows a second topic is split into a new topic file, never renamed.
+- **This README is stable by design**: it describes the layout and the rules, never the list of capabilities. Do not add a per-file map here.
+- Every file starts with the one-line back-link to this README, and its first heading is its title (with the historic section identifier for the files that have one).
 
 ## Repo ecosystem
 

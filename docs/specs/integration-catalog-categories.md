@@ -78,7 +78,7 @@ Facets are cumulative filter chips displayed above the grid, combinable with the
 | Gladys Plus | Requires Gladys Plus | `gladysPlus` field (native JSONs) | Native only today; extending it to the manifest is an open question (§9) |
 | Updates | Update available | existing `updateAvailable` | Already shipped as the conditional "Updates" sidebar entry; unchanged |
 
-**Transport normalization.** The two sources have different shapes — native JSONs carry two independent booleans (`"local": true`, `"cloud": true`), manifests carry an array (`"transports": ["local", "cloud"]`, 1..2 unique values from that enum, per §C.1 of `external-integrations/c01-manifest.md`). The front normalizes both into the same set before filtering, so that equivalent integrations always produce the same facet result:
+**Transport normalization.** The two sources have different shapes — native JSONs carry two independent booleans (`"local": true`, `"cloud": true`), manifests carry an array (`"transports": ["local", "cloud"]`, 1..2 unique values from that enum, per §C.1 of `external-integrations/contracts/manifest.md`). The front normalizes both into the same set before filtering, so that equivalent integrations always produce the same facet result:
 
 | Source shape | Normalized set | Local chip | Cloud chip |
 |---|---|---|---|

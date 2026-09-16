@@ -1,4 +1,4 @@
-> Part of the [external integrations living spec](README.md) — the section index, the editing rules and the cross-repo map are there.
+> Part of the [external integrations living spec](../README.md) — the layout, the editing rules and the cross-repo map are there.
 
 # B.17 Inbound webhooks via Gladys Plus (phase 2, shipped)
 
@@ -15,7 +15,7 @@ Problem: third-party services push their events by webhook (Netatmo: setpoint ch
 
 Two modes, because both exist in the field: **`fire_and_forget`** (default) — the third party pushes and only expects an acknowledgment (the Netatmo class); **`sync`** — the caller waits for the **integration's response** (registration challenge/response à la Strava/Microsoft Graph, application-level returns).
 
-**Cloud side (repo `GladysAssistant/gladys-gateway`, outside the ecosystem listed in the spec's `README.md` — carried by the maintainer, the spec defines the contract)**: a generic route `GET|POST /v1/api/external-integration/:open_api_key/:selector/:webhook_key` that relays `{ selector, webhook_key, method, query, raw body, content_type }` (body ≤ 256 KB) under the single action `external-integration-webhook`, waits for the instance's ack with a **hard timeout** (10 s) and responds with whatever the ack contains; **timeout or unreachable instance → `200` empty body, always** — the durable fix for the Netatmo lesson (5 consecutive failures = webhook banned by the third party, observed for real; PR #2627 notes that the current gateway lets the request fail). The gateway relays, period: zero knowledge of integrations.
+**Cloud side (repo `GladysAssistant/gladys-gateway`, outside the ecosystem listed in the spec's `../README.md` — carried by the maintainer, the spec defines the contract)**: a generic route `GET|POST /v1/api/external-integration/:open_api_key/:selector/:webhook_key` that relays `{ selector, webhook_key, method, query, raw body, content_type }` (body ≤ 256 KB) under the single action `external-integration-webhook`, waits for the instance's ack with a **hard timeout** (10 s) and responds with whatever the ack contains; **timeout or unreachable instance → `200` empty body, always** — the durable fix for the Netatmo lesson (5 consecutive failures = webhook banned by the third party, observed for real; PR #2627 notes that the current gateway lets the request fail). The gateway relays, period: zero knowledge of integrations.
 
 **Instance side**: an `external-integration-webhook` branch in `gateway.handleNewMessage.js` → the supervisor verifies selector + declared `webhook_key` (unknown → empty `200` ack, silent — no validity leak), then depending on the mode:
 - `fire_and_forget`: **immediate** ack `{ status: 200 }`, asynchronous relay over the integration WS — `external-integration.webhook.received` `{ "webhook_key", "method", "query", "body", "content_type" }`, without `message_id` or ack; integration disconnected/stopped → lost without error (see doctrine below);

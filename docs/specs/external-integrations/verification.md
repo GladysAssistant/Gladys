@@ -1,6 +1,8 @@
-> Part of the [external integrations living spec](README.md) — the section index, the editing rules and the cross-repo map are there.
+> Part of the [external integrations living spec](README.md) — the layout, the editing rules and the cross-repo map are there.
 
 # Verification
+
+The journeys below verify the framework. A capability's own verification steps live in its file under `capabilities/`.
 
 1. `cd server && npm test` (100% patch coverage), `npm run compare-translations` on the frontend side, lint of both workspaces.
 2. **Manual e2e journey** (environment with the Docker socket): publish the `integration-template-js` template repo (B.11) as a third-party dev would (`gladys-assistant-integration` topic + `gladys-assistant-integration.json` at the root + multi-arch image pushed to a public registry) → wait for/trigger the indexing → the demo appears in the Gladys catalog with the "external" badge, **with no approval whatsoever** → one-click install (warning screen) → the card appears in the list with the "external" badge, status `Starting → Running` in real time → Configuration screen: latitude/longitude form generated from the `config_schema`, save → the integration receives `CONFIG_UPDATED` → the demo devices appear in the Discovery screen → creation from the UI → the integration receives `DEVICE_CREATED` and publishes its states, devices visible in the Devices screen and the dashboard → actuate the virtual switch (command received in the container logs, state republished) → `docker kill` of the container → `Degraded` status then auto restart → force 5 crashes → `Broken` status with visible logs and a restart button → bump `version` in the template repo's manifest → after re-indexing, "update available" badge → one-click update (new container, old JWT invalidated) → clean uninstall (container removed, `t_service` row destroyed, old JWT refused).

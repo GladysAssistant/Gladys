@@ -1,8 +1,8 @@
-> Part of the [external integrations living spec](README.md) — the section index, the editing rules and the cross-repo map are there.
+> Part of the [external integrations living spec](../README.md) — the layout, the editing rules and the cross-repo map are there.
 
 # B.11 Integration template: dedicated repo `GladysAssistant/integration-template-js`
 
-Public repo marked as a **GitHub "Template repository"** from its creation: "Use this template" + edit the manifest + tag the topic = being in the store. It is both the **official starting point** for a third-party dev and the **PoC** used in the e2e journey (`verification.md`) — it is published in the store exactly as a third-party dev would (topic + image on a public registry), which validates the "zero approval" path end to end.
+Public repo marked as a **GitHub "Template repository"** from its creation: "Use this template" + edit the manifest + tag the topic = being in the store. It is both the **official starting point** for a third-party dev and the **PoC** used in the e2e journey (`../verification.md`) — it is published in the store exactly as a third-party dev would (topic + image on a public registry), which validates the "zero approval" path end to end.
 
 **Content = a complete, working integration** (testable without hardware, covers the whole cycle including the 3 screens): publishes two discovered devices — an Open-Meteo temperature sensor (public API, no key) and a virtual switch. The user creates them from the Discovery screen; the integration then publishes the temperature every 10 min and responds to the switch's commands (receives `onSetValue`, republishes the state). Its manifest embeds a `config_schema` (latitude/longitude + refresh interval) to exercise the Configuration screen's generated form and `onConfigUpdated`.
 
