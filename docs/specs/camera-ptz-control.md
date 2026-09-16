@@ -76,7 +76,7 @@ The `preset` feature models the camera's saved positions ("Entrance", "Garden"�
 - `setValue(feature, n)` = **recall** preset `n`. Nothing else — creating/renaming/deleting presets on the camera stays in the camera's own app or the integration's settings screen (v1 non-goal, see Phases).
 - The preset list lives in the feature's **`supported_options`**: `value` = integer slot sent as the command value, `label` = human name (free text, per device — unlike `move`, there are no canonical values), `sort_order` = display order. Integration side, `value` maps to the protocol token (ONVIF preset token, Tapo preset id…). Values MUST be unique per feature; contiguity is not required.
 - `min` = 0, `max` = highest option value (kept consistent by the integration when it syncs options).
-- The list is synced through the existing device payload path: `POST /api/v1/device` with `features[].supported_options` → `device.syncFeatureSupportedOptions` (already implemented, transaction-safe, preserves ids). An integration that can read presets from the camera (ONVIF `GetPresets`) republishes the device with the fresh list; for external integrations the supervisor silently upserts the options of already-created devices on re-publish, like the `params` (`upsertFeatureSupportedOptions`, see `external-integrations.md` C.3).
+- The list is synced through the existing device payload path: `POST /api/v1/device` with `features[].supported_options` → `device.syncFeatureSupportedOptions` (already implemented, transaction-safe, preserves ids). An integration that can read presets from the camera (ONVIF `GetPresets`) republishes the device with the fresh list; for external integrations the supervisor silently upserts the options of already-created devices on re-publish, like the `params` (`upsertFeatureSupportedOptions`, see `external-integrations/c03-host-api-endpoints.md`, C.3).
 - A `preset` feature with zero options is valid but renders nothing in dashboards.
 
 ### A.4 Absolute position (optional tier)
@@ -131,7 +131,7 @@ The user's "Tapo ONVIF" bridge therefore subscribes to the command topics and tr
 
 The scalar command already flows: `external-integration.device.set-value` carries `{ device, device_feature: { external_id, category, type }, value }` — a PTZ command is just `category: "camera", type: "move", value: 1`. Camera image and states are untouched.
 
-**One contract addition is required:** the *discovered device* payload (`POST /discovered_device`, C.2 of `external-integrations.md`) and the device payload accepted at creation must carry `features[].supported_options` so an ONVIF integration can publish both its supported movements and the preset list it read from the camera (and republish when presets change). The core side (`device.create` → `syncFeatureSupportedOptions`) already supports it; the external-integrations spec, SDK typings (`publishDiscoveredDevices`), and store validator must document/accept the field. **Per the living-spec rule, `docs/specs/external-integrations.md` is updated in the same diff as that implementation.**
+**One contract addition is required:** the *discovered device* payload (`POST /discovered_device`, C.3 of `external-integrations/c03-host-api-endpoints.md`) and the device payload accepted at creation must carry `features[].supported_options` so an ONVIF integration can publish both its supported movements and the preset list it read from the camera (and republish when presets change). The core side (`device.create` → `syncFeatureSupportedOptions`) already supports it; the external-integrations spec, SDK typings (`publishDiscoveredDevices`), and store validator must document/accept the field. **Per the living-spec rule, `docs/specs/external-integrations/` is updated in the same diff as that implementation.**
 
 ### C.3 Internal services
 
@@ -192,7 +192,7 @@ Per repo policy (100% patch coverage server-side):
 
 | Phase | Content | Deliverable |
 |---|---|---|
-| **1** | Constants (`CAMERA_MOVE` + types) + i18n + camera widget overlay (D-pad, zoom, stop, presets) + devices-in-room rows + MQTT catalog, movement checkboxes & preset options editor + `external-integrations.md` contract addition (C.2) | A Tapo ONVIF bridge (MQTT or store integration) gives full pan/tilt/zoom/preset control from the dashboard; presets callable from scenes |
+| **1** | Constants (`CAMERA_MOVE` + types) + i18n + camera widget overlay (D-pad, zoom, stop, presets) + devices-in-room rows + MQTT catalog, movement checkboxes & preset options editor + `external-integrations/c03-host-api-endpoints.md` contract addition (C.3) | A Tapo ONVIF bridge (MQTT or store integration) gives full pan/tilt/zoom/preset control from the dashboard; presets callable from scenes |
 | **2** *(not committed)* | Labeled select for `supported_options` features in the scene editor (B.2), saving/renaming presets from the Gladys UI, position sliders UI, speed control, diagonal moves (new `CAMERA_MOVE` values), a device-structure WebSocket event so open widgets pick up resynced preset lists live (D.1), internal ONVIF service (discovery + preset auto-sync), voice intents | — |
 
 ## Alternatives considered (rejected)

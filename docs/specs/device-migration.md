@@ -4,7 +4,7 @@
 
 ## Context
 
-Several native integrations are deprecated (Netatmo, MELCloud, Tuya — and, with this feature, Philips Hue and TP-Link) in favor of external integrations (see `external-integrations.md`) or other native paths (MQTT, Zigbee2MQTT…). Users who recreate their devices in the new integration lose three things tied to the old device: the state history (DuckDB), the scene references, and the dashboard references. This feature lets a user migrate a device to another device **in one click**: Gladys moves the DuckDB history, rewrites scenes and dashboards, then deletes the old device.
+Several native integrations are deprecated (Netatmo, MELCloud, Tuya — and, with this feature, Philips Hue and TP-Link) in favor of external integrations (see `external-integrations/README.md`) or other native paths (MQTT, Zigbee2MQTT…). Users who recreate their devices in the new integration lose three things tied to the old device: the state history (DuckDB), the scene references, and the dashboard references. This feature lets a user migrate a device to another device **in one click**: Gladys moves the DuckDB history, rewrites scenes and dashboards, then deletes the old device.
 
 Scoping decisions validated with the maintainer:
 - **The source device is deleted automatically** after a successful migration. That is the point of the migration: one device remains, no duplicate in rooms or in the UI. Since its history has just been moved, the deletion is cheap (no "too much states" refusal).
