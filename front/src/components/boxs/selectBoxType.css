@@ -59,3 +59,13 @@
 :global(.glass-theme) .boxTypeIcon {
   color: var(--gl-accent);
 }
+
+/* the integration a community widget tile comes from, under its label */
+.boxTypeCaption {
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
