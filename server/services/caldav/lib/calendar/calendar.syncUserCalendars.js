@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
 const { ServiceNotConfiguredError, NotFoundError } = require('../../../../utils/coreErrors');
+const { CALENDAR_TYPES } = require('../../../../utils/constants');
 
 /**
  * @description Return the different URLs an event can be saved with in Gladys.
@@ -97,7 +98,7 @@ async function syncUserCalendars(userId) {
         // For a CalDAV calendar, the new ctag & sync token are saved only once the events
         // have been synchronized: if this sync fails, Gladys would otherwise consider the
         // calendar up to date and never fetch those changes again.
-        if (gladysCalendar[0].type === 'CALDAV') {
+        if (gladysCalendar[0].type === CALENDAR_TYPES.CALDAV) {
           return { ...gladysCalendar[0], newProperties: formatedCalendar };
         }
         await this.gladys.calendar.update(gladysCalendar[0].selector, formatedCalendar);
@@ -109,7 +110,9 @@ async function syncUserCalendars(userId) {
   );
 
   await Promise.map(
-    calendarsToUpdate.filter((updatedCalendar) => updatedCalendar !== null && updatedCalendar.type === 'CALDAV'),
+    calendarsToUpdate.filter(
+      (updatedCalendar) => updatedCalendar !== null && updatedCalendar.type === CALENDAR_TYPES.CALDAV,
+    ),
     async (calendarToUpdate) => {
       // Get events that have changed
       let eventsToUpdate;

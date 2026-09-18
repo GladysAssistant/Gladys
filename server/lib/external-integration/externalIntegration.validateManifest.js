@@ -34,7 +34,7 @@ const {
 // These rules are the exact mirror of the canonical manifest schema owned by
 // GladysAssistant/integration-store (vendored copy in manifest.schema.json):
 // a manifest accepted by the indexer must always install here, and vice versa.
-const MANIFEST_TYPES = ['device', 'communication', 'weather'];
+const MANIFEST_TYPES = ['device', 'communication', 'weather', 'calendar'];
 const MANIFEST_FIELDS = [
   'manifest_version',
   'type',
@@ -55,6 +55,7 @@ const MANIFEST_FIELDS = [
   'webhooks',
   'messaging',
   'contact_schema',
+  'account_schema',
 ];
 // Browse categories of the catalog (docs/specs/integration-catalog-
 // categories.md §6.2), validated in two ordered stages: the SHAPE (1..3
@@ -316,12 +317,13 @@ function validateSectionPortPlaceholders(value, path, declaredPortNames, errors)
  * @param {object} value - The multi-language text to scan.
  * @param {string} path - The path of the field, for error messages.
  * @param {Array} errors - The array of errors to push to.
+ * @param {string} schemaLabel - The per-user schema name, for error messages.
  * @example
- * rejectContactSchemaPortPlaceholders({ en: '{{port:ocpp}}' }, 'contact_schema[0].label', errors);
+ * rejectPerUserSchemaPortPlaceholders({ en: '{{port:ocpp}}' }, 'contact_schema[0].label', errors, 'contact');
  */
-function rejectContactSchemaPortPlaceholders(value, path, errors) {
+function rejectPerUserSchemaPortPlaceholders(value, path, errors, schemaLabel) {
   forEachPortPlaceholder(value, (name, language) => {
-    errors.push(`${path}.${language}: {{port:${name}}} is not available in the per-user contact schema`);
+    errors.push(`${path}.${language}: {{port:${name}}} is not available in the per-user ${schemaLabel} schema`);
   });
 }
 
@@ -937,8 +939,42 @@ function validateManifest(manifest) {
         if (field && field.type === 'section') {
           // the per-user block is the one screen a non-admin reaches, and
           // their reduced view carries no container state
-          rejectContactSchemaPortPlaceholders(field.label, `contact_schema[${index}].label`, errors);
-          rejectContactSchemaPortPlaceholders(field.description, `contact_schema[${index}].description`, errors);
+          rejectPerUserSchemaPortPlaceholders(field.label, `contact_schema[${index}].label`, errors, 'contact');
+          rejectPerUserSchemaPortPlaceholders(
+            field.description,
+            `contact_schema[${index}].description`,
+            errors,
+            'contact',
+          );
+        }
+      });
+    }
+  }
+  if (manifest.account_schema !== undefined) {
+    // the per-user account form only makes sense on a calendar integration
+    if (manifest.type !== 'calendar') {
+      errors.push('account_schema: only allowed on calendar integrations');
+    } else if (!Array.isArray(manifest.account_schema)) {
+      errors.push('account_schema: must be an array');
+    } else {
+      const seenAccountKeys = new Set();
+      manifest.account_schema.forEach((field, index) => {
+        validateConfigField(field, index, seenAccountKeys, errors, 'account_schema', declaredPortNames);
+        if (field && (field.type === 'oauth2' || field.type === 'account_link')) {
+          // the Connect relay (oauth2 / account_link) is integration-scoped,
+          // never per user (milestone 1)
+          errors.push(`account_schema[${index}].type: ${field.type} is not allowed in the per-user account schema`);
+        }
+        if (field && field.type === 'section') {
+          // the per-user block is the one screen a non-admin reaches, and
+          // their reduced view carries no container state
+          rejectPerUserSchemaPortPlaceholders(field.label, `account_schema[${index}].label`, errors, 'account');
+          rejectPerUserSchemaPortPlaceholders(
+            field.description,
+            `account_schema[${index}].description`,
+            errors,
+            'account',
+          );
         }
       });
     }
