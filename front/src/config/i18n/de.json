@@ -4512,7 +4512,18 @@
     "subscriptionOpenBilling": "Zahlungsmethode aktualisieren",
     "subscriptionCheckAgain": "Erneut prüfen",
     "subscriptionStillNotPaid": "Gladys Plus meldet weiterhin, dass eine Zahlung erforderlich ist. Nach Zahlungseingang kann es einige Minuten dauern, bis sie berücksichtigt wird.",
-    "subscriptionCheckError": "Das Abonnement konnte bei Gladys Plus nicht geprüft werden: Bitte überprüfe deine Internetverbindung und versuche es erneut."
+    "subscriptionCheckError": "Das Abonnement konnte bei Gladys Plus nicht geprüft werden: Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+    "instanceOfflineAlertTitle": "Benachrichtigung, wenn Gladys offline ist",
+    "instanceOfflineAlertDescription": "Gladys Plus sieht, wann sich deine Instanz verbindet und trennt: Bleibt sie länger als die gewählte Zeit unerreichbar (Stromausfall, abgestürzter Internetrouter, defekte SD-Karte …), schickt Gladys Plus den Administratoren deines Gladys-Plus-Kontos eine E-Mail und eine weitere, sobald sie wieder online ist.",
+    "instanceOfflineAlertLocalModeNotice": "Diese Einstellung gehört zu deinem Gladys-Plus-Konto: Öffne diese Seite über Gladys Plus, um sie zu ändern.",
+    "instanceOfflineAlertOpenGladysPlus": "Gladys Plus öffnen",
+    "instanceOfflineAlertLoadError": "Deine Gladys-Plus-Einstellungen konnten nicht geladen werden: Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+    "instanceOfflineAlertEnabledLabel": "Den Administratoren meines Gladys-Plus-Kontos eine E-Mail schicken, wenn meine Gladys offline ist",
+    "instanceOfflineAlertAdminOnly": "Nur ein Administrator des Gladys-Plus-Kontos kann diese Einstellung ändern.",
+    "instanceOfflineAlertDelayLabel": "Benachrichtigen nach",
+    "instanceOfflineAlertDelayHelp": "Kurz genug, um nützlich zu sein, lang genug, um nicht von einem neu startenden Router geweckt zu werden. Gladys Plus prüft alle paar Minuten, die E-Mail kann also einige Minuten nach dieser Zeit verschickt werden.",
+    "instanceOfflineAlertSaved": "Gespeichert.",
+    "instanceOfflineAlertSaveError": "Diese Einstellung konnte nicht gespeichert werden: Bitte überprüfe deine Internetverbindung und versuche es erneut."
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
