@@ -312,6 +312,105 @@ const MAX_WEBHOOK_RESPONSE_BODY_BYTES = 64 * 1024;
 const WEBHOOK_RESPONSE_MIN_STATUS = 200;
 const WEBHOOK_RESPONSE_MAX_STATUS = 499;
 
+// Dashboard widgets declared by integrations (capabilities/dashboard-widgets.md).
+// The `widgets` manifest field: identity of each widget (key, label, icon,
+// per-instance settings), validated by the indexer and the server alike.
+const MAX_WIDGETS = 5;
+const WIDGET_KEY_REGEX = /^[a-z0-9_]{2,32}$/;
+const WIDGET_LABEL_MIN_LENGTH = 3;
+const WIDGET_LABEL_MAX_LENGTH = 30;
+const WIDGET_DESCRIPTION_MAX_LENGTH = 100;
+// a Feather icon name (the set the box picker already uses); an unknown
+// name renders the generic widget icon, never an error
+const WIDGET_ICON_REGEX = /^[a-z0-9-]{1,40}$/;
+// widget settings live in the dashboard JSON, readable by every user of a
+// public dashboard: nothing sensitive (secret / oauth2 / account_link) and no
+// {{port:<name>}} placeholder (the editor is reachable by non-admins)
+const MAX_WIDGET_SETTINGS = 10;
+const WIDGET_SETTINGS_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'section'];
+// the settings of one box instance travel URL-encoded in the content route
+// query string: an HTTP request-line budget as much as a storage one
+const MAX_WIDGET_SETTING_STRING_LENGTH = 100;
+const MAX_WIDGET_SETTINGS_BYTES = 1024;
+// The type of an integration made only of capabilities (no device surface,
+// none of the core-consumed interfaces of the other types): it must declare
+// at least one of these manifest fields. The list grows with capabilities/.
+const CAPABILITY_MANIFEST_FIELDS = ['widgets'];
+// widget.get / widget.get-image typically call a third-party API: the same
+// exception to the 5s ack rule as camera.get-image and weather.get
+const WIDGET_GET_TIMEOUT_MS = 15 * 1000;
+// content freshness declared by the integration (ttl_seconds), clamped
+const WIDGET_CONTENT_TTL_MIN_SECONDS = 10;
+const WIDGET_CONTENT_TTL_MAX_SECONDS = 3600;
+const WIDGET_CONTENT_TTL_DEFAULT_SECONDS = 60;
+// a raw content above this size is an invalid payload, never parsed further
+const MAX_WIDGET_CONTENT_BYTES = 256 * 1024;
+// highest content `version` this Gladys renders; a higher one is refused as a
+// whole with the dedicated WIDGET_CONTENT_VERSION_UNSUPPORTED code
+const SUPPORTED_WIDGET_CONTENT_VERSION = 1;
+// in-memory content cache: per integration, LRU, one entry per
+// (widget, settings, language, units); dropped in full on stop/update/uninstall
+const MAX_WIDGET_CONTENT_CACHE_ENTRIES = 50;
+// bounded pulls: at most this many widget.get commands in flight per
+// integration (further misses queue), and this many cache-miss commands per
+// minute per integration beyond which the route answers 429
+const MAX_WIDGET_GET_IN_FLIGHT = 2;
+const MAX_WIDGET_GET_MISSES_PER_MINUTE = 30;
+// freshness nudge (widget.refresh): 1 per 10 s per (integration, widget key),
+// silently dropped beyond — fire-and-forget has no error path
+const WIDGET_REFRESH_MIN_INTERVAL_MS = 10 * 1000;
+// images: keys declared in the content, bytes served by the integration on
+// demand (never a third-party URL loaded by the browser, never fetched by the
+// core), validated by magic numbers, cached 1 h per (integration, key)
+const WIDGET_IMAGE_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const MAX_WIDGET_IMAGE_BYTES = 300 * 1024;
+// the pixel bound, read from the image header before the bytes are cached or
+// served: a 300 KB file can decode to a gigantic bitmap in the browser
+const MAX_WIDGET_IMAGE_DIMENSION = 4096;
+const WIDGET_IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
+const MAX_WIDGET_IMAGE_CACHE_ENTRIES = 100;
+const MAX_WIDGET_IMAGE_IN_FLIGHT = 4;
+// widget actions (button component): allowlisted from the integration's own
+// last normalized content, rate-limited per integration
+const WIDGET_ACTION_KEY_REGEX = /^[a-z0-9_]{2,32}$/;
+const MAX_WIDGET_ACTION_PARAMS_BYTES = 1024;
+const MAX_WIDGET_ACTIONS_PER_MINUTE = 30;
+// bounded free-form texts an integration hands back outside the content
+// vocabulary: the action result message and the `error` of a failed command
+const MAX_WIDGET_MESSAGE_LENGTH = 200;
+// the content vocabulary enums (section 4 of the capability spec) — the
+// frontend maps them to theme colors, icons and layouts, never a free value
+const WIDGET_COLORS = ['neutral', 'primary', 'success', 'warning', 'danger', 'info'];
+const WIDGET_TEXT_VARIANTS = ['heading', 'body', 'caption'];
+const WIDGET_CHART_TYPES = ['line', 'area', 'bar', 'stepline'];
+// the chart box's interval enum, reused as-is for live device_features series
+const WIDGET_CHART_INTERVALS = [
+  'last-hour',
+  'last-twelve-hours',
+  'last-day',
+  'last-three-days',
+  'last-week',
+  'last-month',
+  'last-three-months',
+  'last-year',
+];
+const WIDGET_CARD_LIST_DISPLAYS = ['grid', 'list'];
+const WIDGET_IMAGE_FITS = ['cover', 'contain'];
+const WIDGET_BUTTON_STYLES = ['primary', 'secondary', 'danger'];
+const MAX_WIDGET_URL_LENGTH = 2048;
+// The content budget (section 5): components beyond a cap are dropped in
+// content order, never the whole content. Tiles = value/gauge; focal =
+// chart/card-list/image; the budget is what keeps every widget card-shaped.
+const WIDGET_CONTENT_BUDGET = {
+  components: 8,
+  focal: 1,
+  tiles: 6,
+  texts: 2,
+  bodyTexts: 1,
+  status: 1,
+  buttons: 4,
+};
+
 module.exports = {
   EXTERNAL_INTEGRATION_LABEL,
   MANIFEST_IMAGE_LABEL,
@@ -418,4 +517,44 @@ module.exports = {
   MAX_WEBHOOK_RESPONSE_BODY_BYTES,
   WEBHOOK_RESPONSE_MIN_STATUS,
   WEBHOOK_RESPONSE_MAX_STATUS,
+  MAX_WIDGETS,
+  WIDGET_KEY_REGEX,
+  WIDGET_LABEL_MIN_LENGTH,
+  WIDGET_LABEL_MAX_LENGTH,
+  WIDGET_DESCRIPTION_MAX_LENGTH,
+  WIDGET_ICON_REGEX,
+  MAX_WIDGET_SETTINGS,
+  WIDGET_SETTINGS_FIELD_TYPES,
+  MAX_WIDGET_SETTING_STRING_LENGTH,
+  MAX_WIDGET_SETTINGS_BYTES,
+  CAPABILITY_MANIFEST_FIELDS,
+  WIDGET_GET_TIMEOUT_MS,
+  WIDGET_CONTENT_TTL_MIN_SECONDS,
+  WIDGET_CONTENT_TTL_MAX_SECONDS,
+  WIDGET_CONTENT_TTL_DEFAULT_SECONDS,
+  MAX_WIDGET_CONTENT_BYTES,
+  SUPPORTED_WIDGET_CONTENT_VERSION,
+  MAX_WIDGET_CONTENT_CACHE_ENTRIES,
+  MAX_WIDGET_GET_IN_FLIGHT,
+  MAX_WIDGET_GET_MISSES_PER_MINUTE,
+  WIDGET_REFRESH_MIN_INTERVAL_MS,
+  WIDGET_IMAGE_KEY_REGEX,
+  MAX_WIDGET_IMAGE_BYTES,
+  MAX_WIDGET_IMAGE_DIMENSION,
+  WIDGET_IMAGE_CACHE_TTL_MS,
+  MAX_WIDGET_IMAGE_CACHE_ENTRIES,
+  MAX_WIDGET_IMAGE_IN_FLIGHT,
+  WIDGET_ACTION_KEY_REGEX,
+  MAX_WIDGET_ACTION_PARAMS_BYTES,
+  MAX_WIDGET_ACTIONS_PER_MINUTE,
+  MAX_WIDGET_MESSAGE_LENGTH,
+  WIDGET_COLORS,
+  WIDGET_TEXT_VARIANTS,
+  WIDGET_CHART_TYPES,
+  WIDGET_CHART_INTERVALS,
+  WIDGET_CARD_LIST_DISPLAYS,
+  WIDGET_IMAGE_FITS,
+  WIDGET_BUTTON_STYLES,
+  MAX_WIDGET_URL_LENGTH,
+  WIDGET_CONTENT_BUDGET,
 };

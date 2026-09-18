@@ -15,8 +15,8 @@
     },
     "type": {
       "type": "string",
-      "enum": ["device", "communication", "weather"],
-      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API; \"weather\" integrations are weather providers: a dedicated API (no device screens), they answer the core's weather requests over WebSocket."
+      "enum": ["device", "communication", "weather", "provider"],
+      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API; \"weather\" integrations are weather providers: a dedicated API (no device screens), they answer the core's weather requests over WebSocket; \"provider\" integrations are made only of capabilities (dashboard widgets today): no device surface, a configuration-only page, and at least one capability field (widgets) is required."
     },
     "name": {
       "type": "string",
@@ -159,6 +159,15 @@
           }
         ]
       }
+    },
+    "widgets": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Dashboard widgets declared by the integration (capability, any type may declare them): identity, icon and per-instance settings; the content itself is produced at runtime over widget.get in the published widget-content vocabulary. Listed on the install screen and in the dashboard box picker.",
+      "items": {
+        "$ref": "#/definitions/widget"
+      }
     }
   },
   "allOf": [
@@ -192,6 +201,20 @@
             }
           }
         }
+      }
+    },
+    {
+      "$comment": "a provider integration must declare at least one capability field",
+      "if": {
+        "properties": {
+          "type": {
+            "const": "provider"
+          }
+        },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["widgets"]
       }
     }
   ],
@@ -703,6 +726,69 @@
           "enum": ["fire_and_forget", "sync"],
           "default": "fire_and_forget",
           "description": "fire_and_forget: immediate 200 to the caller, asynchronous relay without ack. sync: the integration's response is relayed back to the caller."
+        }
+      }
+    },
+    "widgetSettingField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/configField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["string", "number", "boolean", "select", "multi_select", "section"],
+              "description": "Widget settings live in the dashboard JSON, readable by every user of a public dashboard: `secret`, `oauth2` and `account_link` are not allowed. {{port:<name>}} placeholders are not allowed in section texts either (code-enforced)."
+            }
+          }
+        }
+      ]
+    },
+    "widget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]{2,32}$",
+          "description": "Unique key of the widget: the identifier in the dashboard box, the API and the WebSocket messages."
+        },
+        "label": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/multiLanguageText"
+            }
+          ],
+          "description": "Name of the widget in the box picker and default card title, 3-30 characters per language (code-enforced)."
+        },
+        "description": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/multiLanguageText"
+            }
+          ],
+          "description": "Shown under the picker tile and on the install screen, at most 100 characters per language (code-enforced)."
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]{1,40}$",
+          "description": "Feather icon name; an unknown name renders the generic widget icon, never an error."
+        },
+        "settings": {
+          "type": "array",
+          "maxItems": 10,
+          "description": "Per-instance settings of the widget, the config_schema grammar restricted to non-sensitive types; `source: \"devices\"` binds an instance to one of the integration's devices.",
+          "items": {
+            "$ref": "#/definitions/widgetSettingField"
+          }
+        },
+        "action_timeout_seconds": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 120,
+          "default": 30,
+          "description": "Ack delay granted to widget.action (the same exception to the 5s command rule as manifest actions)."
         }
       }
     }

@@ -117,6 +117,56 @@ const TEST_WEATHER_MANIFEST = {
   gladys_version: '>=4.62.0',
 };
 
+// Device integration declaring dashboard widgets (capabilities/dashboard-
+// widgets.md): a cinema-like widget with static settings and a vacuum widget
+// bound to one of the integration's devices through `source: "devices"`.
+const TEST_WIDGET_MANIFEST = {
+  ...TEST_MANIFEST,
+  widgets: [
+    {
+      key: 'upcoming_releases',
+      label: { en: 'Upcoming releases', fr: 'Prochaines sorties' },
+      description: { en: 'Movies coming to theaters in your region.' },
+      icon: 'film',
+      settings: [
+        {
+          key: 'period_days',
+          type: 'select',
+          label: { en: 'Period' },
+          default: '30',
+          options: [
+            { value: '15', label: { en: '15 days' } },
+            { value: '30', label: { en: '1 month' } },
+          ],
+        },
+        { key: 'region', type: 'string', label: { en: 'Country code' } },
+      ],
+      action_timeout_seconds: 15,
+    },
+    {
+      key: 'vacuum',
+      label: { en: 'Vacuum' },
+      settings: [{ key: 'device', type: 'select', label: { en: 'Vacuum' }, source: 'devices', required: true }],
+    },
+  ],
+};
+
+// Provider fixture: an integration made only of capabilities (no device
+// surface) — its whole contract is the widget it declares.
+const TEST_PROVIDER_MANIFEST = {
+  manifest_version: 1,
+  type: 'provider',
+  name: 'TMDB Demo',
+  description: {
+    en: 'Upcoming movie releases demo integration.',
+    fr: 'Intégration démo : prochaines sorties cinéma.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-tmdb-demo:1.0.0',
+  gladys_version: '>=4.62.0',
+  widgets: [TEST_WIDGET_MANIFEST.widgets[0]],
+};
+
 // Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
 // gateway — one fire-and-forget event stream (default mode) and one sync
 // challenge/response registration callback.
@@ -286,6 +336,8 @@ module.exports = {
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
   TEST_WEATHER_MANIFEST,
+  TEST_WIDGET_MANIFEST,
+  TEST_PROVIDER_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,

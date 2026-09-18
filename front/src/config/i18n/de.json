@@ -363,6 +363,8 @@
     "selectBoxTypeLabel": "Wähle aus, welches Widget hier angezeigt werden soll",
     "selectBoxTypeSearchPlaceholder": "Widget suchen (Uhr, Kamera…)",
     "selectBoxTypeNoResult": "Kein Widget entspricht \"{{search}}\"",
+    "selectBoxTypeCoreSection": "Gladys-Widgets",
+    "selectBoxTypeIntegrationSection": "Integrations-Widgets",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Wetter",
@@ -386,7 +388,8 @@
       "sun": "Sonne",
       "chips": "Status-Chips",
       "actions": "Schnellaktionen",
-      "house-view": "Hausansicht"
+      "house-view": "Hausansicht",
+      "external-widget": "Integrations-Widget"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -824,6 +827,25 @@
         "editPinLabelPlaceholder": "z. B. Solar",
         "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
         "error": "Das Bild konnte nicht geladen werden."
+      },
+      "external-widget": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Standardmäßig der Name des Widgets",
+        "editSettingsLabel": "Widget-Einstellungen",
+        "editIntegrationNotInstalled": "Die Integration, die dieses Widget bereitstellt, ist nicht mehr installiert. Entfernen Sie das Widget oder installieren Sie die Integration erneut.",
+        "notInstalled": "Diese Integration ist nicht mehr installiert.",
+        "notInstalledHint": "Bearbeiten Sie das Dashboard, um dieses Widget zu entfernen, oder installieren Sie die Integration erneut.",
+        "stopped": "Die Integration ist gestoppt.",
+        "openIntegrationLink": "Integration öffnen",
+        "unavailable": "Die Widget-Daten sind nicht verfügbar.",
+        "retryButton": "Erneut versuchen",
+        "checkSettings": "Prüfen Sie die Einstellungen dieses Widgets.",
+        "checkSettingsHint": "Bearbeiten Sie das Dashboard, um die Widget-Einstellungen zu korrigieren.",
+        "needsNewerGladys": "Dieses Widget benötigt eine neuere Gladys-Version.",
+        "empty": "Derzeit nichts anzuzeigen.",
+        "emptyChart": "Noch keine Daten für diesen Zeitraum.",
+        "confirmAction": "„{{label}}“ ausführen?",
+        "actionError": "Die Aktion ist fehlgeschlagen."
       }
     },
     "editDashboardBackgroundLabel": "Hintergrundstimmung",
@@ -1138,7 +1160,10 @@
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
-        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent)."
+        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "widgetsTitle": "Dashboard-Widgets",
+        "widgetsText": "Diese Integration stellt die folgenden Widgets bereit, die allen Benutzern im Dashboard-Editor zur Verfügung stehen:",
+        "providerInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Dashboard-Widgets bereit. Konfigurieren Sie sie hier und fügen Sie ihre Widgets dann im Dashboard-Editor hinzu."
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",

@@ -57,7 +57,7 @@ Complete example (the PoC's):
 | Field | Type | Required | Validation rules (indexer **and** server) |
 |---|---|---|---|
 | `manifest_version` | integer | yes | `1`; rejected if higher than the supported version |
-| `type` | string | yes | `"device"` \| `"communication"` (B.15) \| `"weather"` (B.18) |
+| `type` | string | yes | `"device"` \| `"communication"` (B.15) \| `"weather"` (B.18) \| `"provider"` — an integration with no device surface whose contract is its declared capability fields, at least one required (`capabilities/provider-type.md`) |
 | `name` | string | yes | 3–30 characters (displayed as the catalog card's title; internal integrations run 3–23) |
 | `description` | object `{lang: string}` | yes | `en` key required, other languages optional; each value **10–100 characters** (displayed on the card; internal descriptions run 23–63, one short sentence) |
 | `version` | string | yes | strict semver; must be bumped to trigger "update available" |
