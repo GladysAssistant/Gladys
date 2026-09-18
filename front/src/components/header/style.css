@@ -1,10 +1,15 @@
 /* Left-sidebar navigation (Horizon): app-level navigation lives in a fixed
    frosted panel on the left, so the top of the screen belongs to the current
    page — on dashboards, to the dashboard switcher pills.
-   Desktop (≥992px): always-visible rail. Below: off-canvas drawer opened by
-   the slim fixed top bar's menu button, closed by backdrop tap or navigation
-   (handleRoute resets showCollapsedMenu). Content offsets live in
-   style/index.css on body.gladys-sidebar-nav, toggled by the component. */
+   Desktop (≥992px): docked rail, collapsible (a per-device preference,
+   utils/sidebarPreference) — collapsed it slides off-canvas and the page
+   takes the width back, a floating button expanding it into the same docked
+   rail again; both are resting states, neither is an overlay. Below 992px:
+   off-canvas drawer over a backdrop, opened by the slim fixed top bar's menu
+   button, closed by backdrop tap, Escape or navigation (handleRoute resets
+   showCollapsedMenu). Content offsets live in style/index.css on
+   body.gladys-sidebar-nav / body.gladys-sidebar-collapsed, toggled by the
+   component. */
 
 .sidebar {
   position: fixed;
@@ -260,6 +265,38 @@
   text-decoration: none;
 }
 
+/* Collapse control, in the footer beside the dark-mode toggle. It is NOT in
+   the brand row: at 15rem that row is already full with the logo lockup, and
+   the name would ellipsise (worse still with the ~44px coarse-pointer target
+   below). Hidden below the desktop breakpoint — down there the rail is an
+   on-demand drawer whatever the preference says, and the backdrop closes it. */
+.collapseButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  padding: 0;
+  border-radius: 10px;
+  color: rgba(28, 35, 52, 0.62);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.collapseButton:hover {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #1c2334;
+}
+
+@media (min-width: 992px) {
+  .collapseButton {
+    display: inline-flex;
+  }
+}
+
 .profileName {
   display: flex;
   flex-direction: column;
@@ -363,10 +400,10 @@
   text-decoration: none;
 }
 
-/* Echo of the instance update notice (see .updateNoticeCard): on mobile the
-   notice sits in the closed menu, so the burger carries a dot in the same
-   amber to signal there is something worth opening it for */
-.mobileTogglerDot {
+/* Echo of the instance update notice (see .updateNoticeCard): whenever the
+   notice sits in a closed drawer, the burger carries a dot in the same amber
+   to signal there is something worth opening it for */
+.togglerDot {
   position: absolute;
   top: 0.55rem;
   right: 0.55rem;
@@ -428,10 +465,89 @@
   }
 }
 
+/* Collapsed rail at desktop widths: the rail slides off-canvas and the page
+   takes the width back (style/index.css) — the expanded state stays the
+   plain docked rail beside the content, so this is NOT the mobile drawer: no
+   backdrop, no raised z-index, no overlay. Same off-canvas mechanics as the
+   drawer though (translate + delayed visibility flip), so the collapsed rail
+   leaves the tab order and the accessibility tree while the slide animates. */
+@media (min-width: 992px) {
+  .sidebar {
+    /* both ways: expanding animates too — without this the transition only
+       exists while the collapsed class is present, and expanding snaps */
+    transition: transform 0.22s ease;
+  }
+
+  :global(body.gladys-sidebar-collapsed) .sidebar {
+    transform: translateX(-105%);
+    visibility: hidden;
+    transition: transform 0.22s ease, visibility 0s linear 0.22s;
+  }
+}
+
+/* The floating expand button of the collapsed rail: it lives in the slim
+   gutter the page keeps free on the left (style/index.css), so it overlaps
+   nothing and costs no row. Only rendered while collapsed; hidden below the
+   breakpoint, where the top bar's burger opens the drawer instead. */
+.expandButton {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.375rem;
+  z-index: 1035;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid rgba(28, 35, 52, 0.08);
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  color: #1c2334;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.expandButton:hover {
+  background-color: rgba(255, 255, 255, 0.92);
+  color: #1c2334;
+}
+
+/* On a keyboard this button is the only way back into a collapsed rail, so
+   it must be visible when it is focused */
+.expandButton:focus-visible,
+.collapseButton:focus-visible {
+  outline: 2px solid #467fcf;
+  outline-offset: 2px;
+}
+
+.expandButton .togglerDot {
+  top: 0.4rem;
+  right: 0.4rem;
+}
+
+@media (min-width: 992px) {
+  .expandButton {
+    display: inline-flex;
+  }
+}
+
 @media (pointer: coarse) {
   .navLink,
   .profileButton {
     min-height: 2.75rem;
+  }
+
+  /* The collapsible rail is aimed at wall tablets, which are coarse-pointer
+     at desktop widths: its two controls need the same ~44px target as the
+     rest of the rail. The expand button still clears the 3.25rem gutter at
+     this size (2.75rem + its 0.375rem inset). */
+  .collapseButton,
+  .expandButton {
+    width: 2.75rem;
+    height: 2.75rem;
   }
 }
 
@@ -441,6 +557,7 @@
    would push them back to dark-on-dark, so let them follow the inversion
    like their labels (same exception the glass theme carries). */
 :global(.dark-mode) .sidebar :global(.fe),
-:global(.dark-mode) .mobileTopBar :global(.fe) {
+:global(.dark-mode) .mobileTopBar :global(.fe),
+:global(.dark-mode) .expandButton :global(.fe) {
   filter: none;
 }
