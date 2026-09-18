@@ -29,8 +29,14 @@ class ExternalIntegrationAction extends Component {
     if (!declaration || !(declaration.fields || []).some(field => field.source === 'devices')) {
       return;
     }
+    // the response is bound to the declaration it was requested for: a
+    // slower answer of a previous integration must not overwrite the current one
+    const { integration, action_key: key } = this.props.action;
     try {
-      const devices = await this.props.httpClient.get(`/api/v1/service/${this.props.action.integration}/device`);
+      const devices = await this.props.httpClient.get(`/api/v1/service/${integration}/device`);
+      if (this.props.action.integration !== integration || this.props.action.action_key !== key) {
+        return;
+      }
       this.setState({
         dynamicOptions: { devices: devices.map(device => ({ value: device.external_id, label: device.name })) }
       });

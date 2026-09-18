@@ -109,7 +109,13 @@ describe('Scene - external integration triggers and actions', () => {
       .click();
     cy.wait('@getDevices');
 
-    // the required device filter, and the variables block of the trigger
+    // the required device filter blocks the save while empty (a wildcard on
+    // a required filter would fire on every camera), then the variables block
+    cy.contains('button', 'editScene.saveButton').click();
+    const requiredFieldError = Cypress.env('i18n')
+      .editScene.externalIntegration.requiredFieldError.replace('{{field}}', 'Camera')
+      .replace('{{title}}', 'Frigate · Object detected');
+    cy.get('.alert-danger').should('contain', requiredFieldError);
     cy.get('select#config_camera').select(CAMERA_EXTERNAL_ID);
     cy.contains('editScene.externalIntegration.variablesTitle').should('exist');
     cy.contains('{{triggerEvent.data.label}}').should('exist');

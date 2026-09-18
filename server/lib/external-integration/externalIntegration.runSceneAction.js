@@ -90,9 +90,10 @@ async function resolveSceneActionFields(service, declaration, storedFields, rend
  * (resolveSceneActionFields), reserve an in-flight slot BEFORE any wait
  * (at most 10 pending scene actions per integration, an 11th fails
  * immediately with EXTERNAL_INTEGRATION_BUSY), then relay over WebSocket
- * under ONE deadline — the declared timeout_seconds covers the connection
- * wait of the startup window and the ack alike, so a disconnected
- * integration never holds a scene longer than the declared timeout. The
+ * under ONE deadline started at entry — the declared timeout_seconds covers
+ * the resolution, the connection wait of the startup window and the ack
+ * alike, so a scene never holds on the action longer than the declared
+ * timeout. The
  * whitelisted outputs are returned to the scene.
  * @param {object} service - The external integration service.
  * @param {string} actionKey - The declared scene action key.
@@ -104,6 +105,9 @@ async function resolveSceneActionFields(service, declaration, storedFields, rend
  * const outputs = await gladys.externalIntegration.runSceneAction(service, 'create_snapshot', {}, { render });
  */
 async function runSceneAction(service, actionKey, storedFields = {}, { render = (value) => value } = {}) {
+  // the deadline starts when the scene reaches the action: the resolution
+  // below (a DB lookup for the dynamic device options) is on the budget too
+  const entryTime = Date.now();
   const declaration = getDeclaredSceneActions(service.manifest).find((action) => action.key === actionKey);
   if (!declaration) {
     throw new NotFoundError(`SCENE_ACTION_NOT_DECLARED: scene action ${actionKey} is not declared in the manifest`);
@@ -111,6 +115,8 @@ async function runSceneAction(service, actionKey, storedFields = {}, { render = 
   if (storedFields === null || typeof storedFields !== 'object' || Array.isArray(storedFields)) {
     throw new BadParameters('fields: must be an object');
   }
+  const timeoutSeconds = declaration.timeout_seconds || ACTION_DEFAULT_TIMEOUT_SECONDS;
+  const deadline = entryTime + timeoutSeconds * 1000;
   const fields = await resolveSceneActionFields(service, declaration, storedFields, render);
   const pending = this.pendingSceneActions.get(service.id) || 0;
   if (pending >= MAX_PENDING_SCENE_ACTIONS) {
@@ -118,11 +124,9 @@ async function runSceneAction(service, actionKey, storedFields = {}, { render = 
   }
   this.pendingSceneActions.set(service.id, pending + 1);
   try {
-    const timeoutSeconds = declaration.timeout_seconds || ACTION_DEFAULT_TIMEOUT_SECONDS;
-    const deadline = Date.now() + timeoutSeconds * 1000;
     // a system.start scene fires while the containers are still booting:
     // wait for the connection inside the startup window, against the deadline
-    await this.waitForConnection(service, Math.min(MESSAGE_CONNECTION_WAIT_MS, deadline - Date.now()));
+    await this.waitForConnection(service, Math.max(0, Math.min(MESSAGE_CONNECTION_WAIT_MS, deadline - Date.now())));
     const remainingMs = deadline - Date.now();
     if (remainingMs <= 0) {
       throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_COMMAND_TIMEOUT');

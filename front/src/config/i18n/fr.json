@@ -4060,7 +4060,8 @@
       "wildcardHint": "Un champ laissé vide accepte n'importe quelle valeur.",
       "variablesTitle": "Variables fournies par ce déclencheur",
       "outputsTitle": "Variables renvoyées par cette action",
-      "variablesExplanation": "Pour injecter une variable de la scène dans un champ texte, tapez '{{'."
+      "variablesExplanation": "Pour injecter une variable de la scène dans un champ texte, tapez '{{'.",
+      "requiredFieldError": "Le champ « {{field}} » de « {{title}} » est obligatoire : il ne peut pas rester vide."
     }
   },
   "profile": {

@@ -947,7 +947,9 @@ const actionsFunc = {
         noEscape: true,
       })(scope);
     const outputs = await integrationService.scene.runAction(action.action_key, action.fields || {}, { render });
-    set(scope, path, outputs, { merge: true });
+    // replaced, never merged: an action running again at the same path (a
+    // loop) must not leave the outputs of a previous run behind
+    set(scope, path, outputs);
   },
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: async (self, action, scope) => {
     // Get device

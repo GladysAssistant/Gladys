@@ -30,8 +30,14 @@ class ExternalIntegrationTrigger extends Component {
     if (!declaration || !(declaration.fields || []).some(field => field.source === 'devices')) {
       return;
     }
+    // the response is bound to the declaration it was requested for: a
+    // slower answer of a previous integration must not overwrite the current one
+    const { integration, trigger_key: key } = this.props.trigger;
     try {
-      const devices = await this.props.httpClient.get(`/api/v1/service/${this.props.trigger.integration}/device`);
+      const devices = await this.props.httpClient.get(`/api/v1/service/${integration}/device`);
+      if (this.props.trigger.integration !== integration || this.props.trigger.trigger_key !== key) {
+        return;
+      }
       this.setState({
         dynamicOptions: { devices: devices.map(device => ({ value: device.external_id, label: device.name })) }
       });

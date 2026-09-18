@@ -2,6 +2,7 @@ const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
 const {
   ACTION_LIST,
   ACTIONS,
+  EVENTS,
   EVENT_LIST,
   ALARM_MODES_LIST,
   TRIGGER_OPERATORS,
@@ -142,6 +143,11 @@ const actionSchema = Joi.object()
   .when(Joi.object({ type: Joi.valid(ACTIONS.VARIABLE.SET) }).unknown(), {
     then: Joi.object().oxor('text', 'evaluate_value'),
   })
+  // An integration-declared action without its target is unrunnable: the
+  // selector and the declared key are the only way to resolve it at execution
+  .when(Joi.object({ type: Joi.valid(ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION) }).unknown(), {
+    then: Joi.object({ integration: Joi.required(), action_key: Joi.required() }),
+  })
   .id('action');
 
 const actionsSchema = Joi.array().items(Joi.array().items(actionSchema));
@@ -216,6 +222,11 @@ const triggerSchema = Joi.object()
       threshold_only: Joi.forbidden(),
       for_duration: Joi.forbidden(),
     }),
+  })
+  // An integration-declared trigger without its target could never match:
+  // the selector and the declared key are what the matcher compares first
+  .when(Joi.object({ type: Joi.valid(EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT) }).unknown(), {
+    then: Joi.object({ integration: Joi.required(), trigger_key: Joi.required() }),
   });
 
 const triggersSchema = Joi.array().items(triggerSchema);

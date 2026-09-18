@@ -102,6 +102,13 @@ const EditScenePage = ({ children, ...props }) => {
                       <small>{props.errorMessage}</small>
                     </div>
                   )}
+                  {props.errorMessageId && (
+                    <div class="mt-2">
+                      <small>
+                        <Text id={props.errorMessageId} fields={props.errorMessageFields} />
+                      </small>
+                    </div>
+                  )}
                 </div>
               )}
               {settingsOpen && (

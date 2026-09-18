@@ -4060,7 +4060,8 @@
       "wildcardHint": "Ein leer gelassenes Feld akzeptiert jeden Wert.",
       "variablesTitle": "Von diesem Auslöser bereitgestellte Variablen",
       "outputsTitle": "Von dieser Aktion zurückgegebene Variablen",
-      "variablesExplanation": "Um eine Szenenvariable in ein Textfeld einzufügen, tippen Sie '{{'."
+      "variablesExplanation": "Um eine Szenenvariable in ein Textfeld einzufügen, tippen Sie '{{'.",
+      "requiredFieldError": "Das Feld „{{field}}“ von „{{title}}“ ist erforderlich: es darf nicht leer bleiben."
     }
   },
   "profile": {

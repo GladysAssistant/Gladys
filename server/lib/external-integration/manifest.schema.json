@@ -747,6 +747,20 @@
         }
       }
     },
+    "sceneSectionText": {
+      "description": "A section text of a scene trigger / action: the {{port:<name>}} placeholder is refused in every language, the scene editor never loads the container detail that resolves it (same rule as the contact_schema).",
+      "allOf": [
+        {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        {
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^(?!.*\\{\\{port:)"
+          }
+        }
+      ]
+    },
     "sceneTriggerField": {
       "description": "A trigger filter: same format as a config_schema entry, restricted types (no secret, no account linking, no boolean — a toggle could never express \"any\"), no {{port:<name>}} placeholder in sections.",
       "allOf": [
@@ -757,6 +771,25 @@
           "properties": {
             "type": {
               "enum": ["string", "number", "select", "multi_select", "section"]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "section"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "label": {
+                "$ref": "#/definitions/sceneSectionText"
+              },
+              "description": {
+                "$ref": "#/definitions/sceneSectionText"
+              }
             }
           }
         }
@@ -772,6 +805,25 @@
           "properties": {
             "type": {
               "enum": ["string", "number", "boolean", "select", "multi_select", "section"]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "section"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "label": {
+                "$ref": "#/definitions/sceneSectionText"
+              },
+              "description": {
+                "$ref": "#/definitions/sceneSectionText"
+              }
             }
           }
         }

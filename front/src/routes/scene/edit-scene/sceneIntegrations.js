@@ -136,3 +136,59 @@ export const buildDeclaredVariables = (entries, language, namePrefix = '') =>
     label: getLocalizedText(entry.label, language) || entry.key,
     data: {}
   }));
+
+// The declared `required` fields of a live card still holding a wildcard,
+// with their localized labels: the editor is the only place a required filter
+// can be enforced (the matcher never consults the manifest), and a saved
+// trigger with an empty required camera would fire on every camera. An
+// orphan card (unresolved) is inert and is not walked.
+export const getMissingRequiredFields = (sceneIntegrations, kind, step, language) => {
+  const { integration, declaration } = resolveSceneDeclaration(sceneIntegrations, kind, step);
+  if (!integration || !declaration) {
+    return [];
+  }
+  const values = step.fields || {};
+  return (declaration.fields || [])
+    .filter(field => field.type !== 'section' && field.required && isWildcardValue(values[field.key]))
+    .map(field => getLocalizedText(field.label, language) || field.key);
+};
+
+// Every action of a scene, the ones nested in if/then/else and while blocks
+// included, as a flat list
+export const flattenSceneActions = actions => {
+  const flat = [];
+  (actions || []).forEach(group => {
+    (Array.isArray(group) ? group : [group]).forEach(action => {
+      if (!action || typeof action !== 'object') {
+        return;
+      }
+      flat.push(action);
+      ['if', 'then', 'else'].forEach(branch => {
+        if (Array.isArray(action[branch])) {
+          flat.push(...flattenSceneActions(action[branch]));
+        }
+      });
+    });
+  });
+  return flat;
+};
+
+// The first required field left empty on a live integration card of the
+// scene, as { title, field } for the save error, or null when the scene is
+// complete
+export const findMissingRequiredField = (sceneIntegrations, scene, language) => {
+  const steps = [
+    ...(scene.triggers || []).map(trigger => ({ kind: SCENE_DECLARATION_KINDS.trigger, step: trigger })),
+    ...flattenSceneActions(scene.actions).map(action => ({ kind: SCENE_DECLARATION_KINDS.action, step: action }))
+  ];
+  for (let index = 0; index < steps.length; index += 1) {
+    const { kind, step } = steps[index];
+    if (step.type === kind.type) {
+      const [field] = getMissingRequiredFields(sceneIntegrations, kind, step, language);
+      if (field) {
+        return { title: getSceneDeclarationTitle(sceneIntegrations, kind, step, language), field };
+      }
+    }
+  }
+  return null;
+};

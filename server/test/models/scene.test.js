@@ -79,6 +79,31 @@ describe('models/scene', () => {
     });
   });
 
+  it('should require the integration and the declared key on the external integration types', async () => {
+    await assert.isRejected(
+      buildScene({ type: EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT, trigger_key: 'object_detected' }).validate(),
+      '"[0].integration" is required',
+    );
+    await assert.isRejected(
+      buildScene({ type: EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT, integration: 'ext-frigate' }).validate(),
+      '"[0].trigger_key" is required',
+    );
+    await assert.isRejected(
+      buildSceneWithActions([
+        [{ type: ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, action_key: 'create_snapshot' }],
+      ]).validate(),
+      '"[0][0].integration" is required',
+    );
+    await assert.isRejected(
+      buildSceneWithActions([
+        [{ type: ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, integration: 'ext-frigate' }],
+      ]).validate(),
+      '"[0][0].action_key" is required',
+    );
+    // the other types keep them optional
+    await buildScene({ type: EVENTS.SYSTEM.START }).validate();
+  });
+
   it('should reject a declared key outside the manifest key format', async () => {
     const triggerPromise = buildScene({
       type: EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT,

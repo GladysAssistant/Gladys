@@ -9,6 +9,7 @@ import EditScenePage from './EditScenePage';
 import { computeRunningInfo, mergeRunningScenes } from '../runningInfo';
 
 import { ACTIONS, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import { findMissingRequiredField } from './sceneIntegrations';
 
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
@@ -478,7 +479,24 @@ class EditScene extends Component {
     // state afterwards would display "saved" for data this request never sent
     const savedSceneSnapshot = JSON.stringify(this.state.scene);
     const sceneToSave = JSON.parse(savedSceneSnapshot);
-    this.setState({ saving: true, error: false, errorMessage: null });
+    // a required filter of an integration trigger left empty would match any
+    // value: the editor is the only place it can be refused (the matcher never
+    // consults the manifest), so the save stops here with the field named
+    const missingRequiredField = findMissingRequiredField(
+      this.state.sceneIntegrations,
+      sceneToSave,
+      get(this.props, 'user.language') || 'en'
+    );
+    if (missingRequiredField) {
+      this.setState({
+        error: true,
+        errorMessage: null,
+        errorMessageId: 'editScene.externalIntegration.requiredFieldError',
+        errorMessageFields: missingRequiredField
+      });
+      return;
+    }
+    this.setState({ saving: true, error: false, errorMessage: null, errorMessageId: null });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
       this.setState({ savedSceneSnapshot });
@@ -1474,6 +1492,8 @@ class EditScene extends Component {
       saving,
       error,
       errorMessage,
+      errorMessageId,
+      errorMessageFields,
       variables,
       scene,
       triggersVariables,
@@ -1507,6 +1527,8 @@ class EditScene extends Component {
             saving={saving}
             error={error}
             errorMessage={errorMessage}
+            errorMessageId={errorMessageId}
+            errorMessageFields={errorMessageFields}
             variables={variables}
             triggersVariables={triggersVariables}
             sceneIntegrations={sceneIntegrations}
@@ -1535,4 +1557,4 @@ class EditScene extends Component {
   }
 }
 
-export default connect('session,httpClient', {})(EditScene);
+export default connect('session,httpClient,user', {})(EditScene);

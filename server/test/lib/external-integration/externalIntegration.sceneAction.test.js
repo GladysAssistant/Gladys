@@ -264,6 +264,48 @@ describe('externalIntegration.runSceneAction', () => {
     expect(externalIntegration.waitForConnection.firstCall.args[1]).to.equal(15000);
   });
 
+  it('should start the deadline when the scene reaches the action, resolution included', async () => {
+    const clock = sinon.useFakeTimers({ toFake: ['Date'] });
+    const shortService = await seedExternalService({
+      name: 'ext-dev-short',
+      selector: 'ext-dev-short',
+      manifest: {
+        ...TEST_SCENE_MANIFEST,
+        scene_actions: [
+          {
+            key: 'quick',
+            label: { en: 'Quick' },
+            timeout_seconds: 5,
+            fields: [{ key: 'caption', type: 'string', label: { en: 'Caption' } }],
+          },
+        ],
+      },
+    });
+    externalIntegration.waitForConnection = fake.resolves(true);
+    externalIntegration.sendCommand = fake.resolves({ success: true });
+    // a slow resolution (3s spent rendering) eats into the 5s budget
+    const slowRender = (value) => {
+      clock.tick(3000);
+      return value;
+    };
+    await externalIntegration.runSceneAction(shortService, 'quick', { caption: 'x' }, { render: slowRender });
+    expect(externalIntegration.waitForConnection.firstCall.args[1]).to.equal(2000);
+    expect(externalIntegration.sendCommand.firstCall.args[3]).to.deep.equal({ timeoutMs: 2000 });
+    // a resolution longer than the budget: no wait, no command, a timeout
+    externalIntegration.waitForConnection = fake.resolves(true);
+    externalIntegration.sendCommand = fake.resolves({ success: true });
+    const tooSlowRender = (value) => {
+      clock.tick(6000);
+      return value;
+    };
+    await expect(
+      externalIntegration.runSceneAction(shortService, 'quick', { caption: 'x' }, { render: tooSlowRender }),
+    ).to.be.rejectedWith(ExternalIntegrationUnavailableError, 'EXTERNAL_INTEGRATION_COMMAND_TIMEOUT');
+    expect(externalIntegration.waitForConnection.firstCall.args[1]).to.equal(0);
+    sinonAssert.notCalled(externalIntegration.sendCommand);
+    expect(externalIntegration.pendingSceneActions.has(shortService.id)).to.equal(false);
+  });
+
   it('should fail like any command outside the startup window when disconnected', async () => {
     await expect(externalIntegration.runSceneAction(service, 'echo')).to.be.rejectedWith(
       ExternalIntegrationUnavailableError,

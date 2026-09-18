@@ -109,6 +109,27 @@ describe('sceneSchemas external integration scene trigger and action', () => {
     ).to.equal(true);
   });
 
+  it('should enforce the key format and the field count of the scene model', () => {
+    expect(
+      schema.safeParse({ ...baseScene, triggers: [{ ...baseScene.triggers[0], trigger_key: 'Object Detected' }] })
+        .success,
+    ).to.equal(false);
+    expect(
+      schema.safeParse({ ...baseScene, actions: [[{ ...baseScene.actions[0][0], action_key: 'Snap!' }]] }).success,
+    ).to.equal(false);
+    expect(
+      schema.safeParse({ ...baseScene, triggers: [{ ...baseScene.triggers[0], fields: { 'Bad-Key': 'x' } }] }).success,
+    ).to.equal(false);
+    const tooManyFields = Object.fromEntries(Array.from({ length: 11 }, (value, index) => [`k${index}`, 'x']));
+    expect(
+      schema.safeParse({ ...baseScene, triggers: [{ ...baseScene.triggers[0], fields: tooManyFields }] }).success,
+    ).to.equal(false);
+    const tenFields = Object.fromEntries(Array.from({ length: 10 }, (value, index) => [`k${index}`, 'x']));
+    expect(
+      schema.safeParse({ ...baseScene, triggers: [{ ...baseScene.triggers[0], fields: tenFields }] }).success,
+    ).to.equal(true);
+  });
+
   it('should reject a nested field value and a missing key', () => {
     expect(
       schema.safeParse({

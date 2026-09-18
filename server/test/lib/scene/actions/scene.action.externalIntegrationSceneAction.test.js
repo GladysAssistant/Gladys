@@ -88,6 +88,24 @@ describe('scene.external-integration.scene-action', () => {
     assert.calledWith(self.message.sendToUser, 'pepper', 'Clip clip-15 in driveway');
   });
 
+  it('should replace the outputs of a previous run at the same path, never merge them', async () => {
+    const runAction = sinon.stub();
+    runAction.onFirstCall().resolves({ clip_id: 'clip-1', count: 2 });
+    runAction.onSecondCall().resolves({ count: 3 });
+    const proxy = { scene: { runAction } };
+    const self = buildSelf(proxy);
+    const scope = {};
+    const actions = [
+      [{ type: ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, integration: 'ext-frigate', action_key: 'create_snapshot' }],
+    ];
+    await executeActions(self, actions, scope);
+    expect(scope['0']['0']).to.deep.equal({ clip_id: 'clip-1', count: 2 });
+    // the same action runs again (a loop): an output omitted by the second
+    // run does not survive from the first one
+    await executeActions(self, actions, scope);
+    expect(scope['0']['0']).to.deep.equal({ count: 3 });
+  });
+
   it('should pass an empty object when the action stores no fields', async () => {
     const proxy = { scene: { runAction: fake.resolves({}) } };
     const self = buildSelf(proxy);

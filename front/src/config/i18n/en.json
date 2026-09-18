@@ -4060,7 +4060,8 @@
       "wildcardHint": "A field left empty matches any value.",
       "variablesTitle": "Variables provided by this trigger",
       "outputsTitle": "Variables returned by this action",
-      "variablesExplanation": "To inject a scene variable in a text field, press '{{'."
+      "variablesExplanation": "To inject a scene variable in a text field, press '{{'.",
+      "requiredFieldError": "The field \"{{field}}\" of \"{{title}}\" is required: it cannot be left empty."
     }
   },
   "profile": {
