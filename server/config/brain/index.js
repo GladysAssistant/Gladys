@@ -1,7 +1,7 @@
 const { lstatSync, readdirSync, readFileSync, existsSync } = require('fs');
 const { join, dirname } = require('path');
 
-const SUPPORTED_LANGUAGES = ['en', 'fr'];
+const SUPPORTED_LANGUAGES = ['en', 'fr', 'es'];
 
 const isDirectory = (source) => lstatSync(source).isDirectory();
 const getDirectories = (source) =>
