@@ -6,6 +6,7 @@ import cx from 'classnames';
 import Select from '../../form/Select';
 import get from 'get-value';
 
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import normalizeSearchText from '../../../utils/normalizeSearchText';
 import { getDeviceIntegration, disambiguateIntegrationNames } from '../../../routes/devices/integrationLinks';
@@ -278,6 +279,18 @@ class MigrateDeviceModal extends Component {
   ) {
     const sourceFeatures = device.features || [];
     const unmappedFeatures = sourceFeatures.filter(feature => !featuresMapping[feature.selector]);
+    // A `play_notification` scene action references the device, not a feature: the
+    // migration re-points it to the destination whatever the mapping says, and the
+    // action then looks up MUSIC.PLAY_NOTIFICATION on the destination at run time.
+    // The mapping table cannot express that, so it gets its own warning.
+    const hasPlayNotification = features =>
+      (features || []).some(
+        feature =>
+          feature.category === DEVICE_FEATURE_CATEGORIES.MUSIC &&
+          feature.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION
+      );
+    const playNotificationLost =
+      destinationDevice && hasPlayNotification(sourceFeatures) && !hasPlayNotification(destinationDevice.features);
     const deviceGroups = this.getDeviceOptions();
     const hasDeviceOptions = devices.length > 0;
     // The modal is rendered on <body>: it opens from inside a glass card, whose
@@ -366,6 +379,11 @@ class MigrateDeviceModal extends Component {
                           {unmappedFeatures.length > 0 && (
                             <div class="alert alert-warning">
                               <Text id="device.migrate.unmappedWarning" />
+                            </div>
+                          )}
+                          {playNotificationLost && (
+                            <div class="alert alert-warning">
+                              <Text id="device.migrate.playNotificationWarning" />
                             </div>
                           )}
                         </div>
