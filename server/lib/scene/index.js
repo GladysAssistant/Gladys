@@ -19,6 +19,7 @@ const { dailyUpdate } = require('./scene.dailyUpdate');
 const { duplicate } = require('./scene.duplicate');
 const { command } = require('./scene.command');
 const { getTag } = require('./scene.getTag');
+const { resumeTimeRangeTriggers } = require('./scene.resumeTimeRangeTriggers');
 
 const { EVENTS, INTENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
@@ -61,6 +62,9 @@ const SceneManager = function SceneManager(
   this.scheduler = scheduler;
   this.jobs = [];
   this.checkTriggersDurationTimer = new Map();
+  // The time-range plannings are re-applied once per Gladys start, not on every init()
+  // (which also runs when the timezone changes).
+  this.timeRangeTriggersResumed = false;
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
   this.event.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));
   // on timezone change, reload all scenes
@@ -95,5 +99,6 @@ SceneManager.prototype.update = update;
 SceneManager.prototype.duplicate = duplicate;
 SceneManager.prototype.command = command;
 SceneManager.prototype.getTag = getTag;
+SceneManager.prototype.resumeTimeRangeTriggers = resumeTimeRangeTriggers;
 
 module.exports = SceneManager;

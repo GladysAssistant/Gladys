@@ -39,6 +39,9 @@ async function init() {
   //  At every minute, check if calendar event is coming
   this.scheduler.scheduleJob('* * * * *', () => this.event.emit(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING));
 
+  // Only re-applies the plannings on the first init: init() also runs on a timezone change.
+  this.resumeTimeRangeTriggers();
+
   return plainScenes;
 }
 

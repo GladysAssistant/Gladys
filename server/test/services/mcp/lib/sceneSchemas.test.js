@@ -248,3 +248,51 @@ describe('sceneSchemas device.new-state trigger', () => {
     expect(result.success).to.equal(false);
   });
 });
+
+describe('sceneSchemas time-range trigger', () => {
+  const schema = createSceneCreateInputSchema();
+  const buildScene = (trigger) => ({
+    name: 'Test scene',
+    icon: 'bell',
+    triggers: [{ type: 'time.changed', scheduler_type: 'time-range', ...trigger }],
+    actions: [[{ type: 'delay', unit: 'minutes', value: 1 }]],
+  });
+
+  it('should accept a planning with several ranges', () => {
+    const result = schema.safeParse(
+      buildScene({
+        time_ranges: [
+          { start: '12:00', end: '14:30' },
+          { start: '16:00', end: '17:30' },
+        ],
+        days_of_the_week: ['monday', 'tuesday'],
+        resume_on_startup: true,
+      }),
+    );
+    expect(result.success).to.equal(true);
+  });
+
+  it('should accept a trigger without days of the week, which means every day', () => {
+    const result = schema.safeParse(buildScene({ time_ranges: [{ start: '12:00', end: '14:30' }] }));
+    expect(result.success).to.equal(true);
+  });
+
+  // The scene model refuses these too: failing here gives a useful message instead of an
+  // error raised further down, in the create itself.
+  it('should reject a range starting and ending at the same time', () => {
+    const result = schema.safeParse(buildScene({ time_ranges: [{ start: '12:00', end: '12:00' }] }));
+    expect(result.success).to.equal(false);
+  });
+
+  it('should reject an explicitly empty list of days of the week', () => {
+    const result = schema.safeParse(
+      buildScene({ time_ranges: [{ start: '12:00', end: '14:30' }], days_of_the_week: [] }),
+    );
+    expect(result.success).to.equal(false);
+  });
+
+  it('should reject a trigger without any range', () => {
+    const result = schema.safeParse(buildScene({ time_ranges: [] }));
+    expect(result.success).to.equal(false);
+  });
+});
