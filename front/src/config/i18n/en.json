@@ -4058,9 +4058,9 @@
       "actionNotDeclared": "This action is no longer declared by the installed version of the integration. It will fail when the scene runs.",
       "actionInactive": "The integration is stopped: this action will fail until it runs.",
       "wildcardHint": "A field left empty matches any value.",
-      "variablesTitle": "Variables provided by this trigger",
-      "outputsTitle": "Variables returned by this action",
-      "variablesExplanation": "To inject a scene variable in a text field, press '{{'.",
+      "variablesAvailable": "Information passed on to the scene actions:",
+      "outputsAvailable": "Results available to the following steps:",
+      "variablesHint": "Type '{{' to insert scene information, such as the details passed on by the trigger.",
       "requiredFieldError": "The field \"{{field}}\" of \"{{title}}\" is required: it cannot be left empty."
     }
   },

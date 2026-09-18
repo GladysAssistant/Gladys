@@ -4058,9 +4058,9 @@
       "actionNotDeclared": "Diese Aktion wird von der installierten Version der Integration nicht mehr deklariert. Sie schlägt beim Ausführen der Szene fehl.",
       "actionInactive": "Die Integration ist gestoppt: diese Aktion schlägt fehl, bis sie läuft.",
       "wildcardHint": "Ein leer gelassenes Feld akzeptiert jeden Wert.",
-      "variablesTitle": "Von diesem Auslöser bereitgestellte Variablen",
-      "outputsTitle": "Von dieser Aktion zurückgegebene Variablen",
-      "variablesExplanation": "Um eine Szenenvariable in ein Textfeld einzufügen, tippen Sie '{{'.",
+      "variablesAvailable": "Informationen, die an die Aktionen der Szene weitergegeben werden:",
+      "outputsAvailable": "Ergebnisse, die in den folgenden Schritten verwendbar sind:",
+      "variablesHint": "Tippe '{{', um Informationen der Szene einzufügen, zum Beispiel die vom Auslöser übermittelten.",
       "requiredFieldError": "Das Feld „{{field}}“ von „{{title}}“ ist erforderlich: es darf nicht leer bleiben."
     }
   },

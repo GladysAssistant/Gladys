@@ -17,7 +17,8 @@ import {
 // manifest): the declared fields are the filters the user fills in, rendered
 // by the config_schema form engine — a field left empty matches any value —
 // and the declared variables are what the actions can read from the event
-// ({{triggerEvent.data.<key>}}).
+// ({{triggerEvent.data.<key>}}): they are declared to the editor for the
+// variable picker of the text fields, and only named to the user, by label.
 class ExternalIntegrationTrigger extends Component {
   getLanguage = () => get(this.props, 'user.language') || 'en';
 
@@ -128,19 +129,14 @@ class ExternalIntegrationTrigger extends Component {
           </div>
         )}
         {variables.length > 0 && (
-          <div class="mt-3">
-            <div class="form-label">
-              <Text id="editScene.externalIntegration.variablesTitle" />
-            </div>
-            <ul class="mb-0 small">
-              {variables.map(variable => (
-                <li key={variable.key}>
-                  {getLocalizedText(variable.label, language) || variable.key}{' '}
-                  <code>{`{{triggerEvent.data.${variable.key}}}`}</code>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <p class="text-muted small mb-0 mt-3">
+            <Text id="editScene.externalIntegration.variablesAvailable" />{' '}
+            {variables.map(variable => (
+              <span key={variable.key} class="badge badge-secondary mr-1">
+                {getLocalizedText(variable.label, language) || variable.key}
+              </span>
+            ))}
+          </p>
         )}
       </div>
     );

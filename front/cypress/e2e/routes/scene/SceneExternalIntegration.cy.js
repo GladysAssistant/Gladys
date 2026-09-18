@@ -110,15 +110,17 @@ describe('Scene - external integration triggers and actions', () => {
     cy.wait('@getDevices');
 
     // the required device filter blocks the save while empty (a wildcard on
-    // a required filter would fire on every camera), then the variables block
+    // a required filter would fire on every camera), then the information the
+    // trigger passes on, named by label (never by path)
     cy.contains('button', 'editScene.saveButton').click();
     const requiredFieldError = Cypress.env('i18n')
       .editScene.externalIntegration.requiredFieldError.replace('{{field}}', 'Camera')
       .replace('{{title}}', 'Frigate · Object detected');
     cy.get('.alert-danger').should('contain', requiredFieldError);
     cy.get('select#config_camera').select(CAMERA_EXTERNAL_ID);
-    cy.contains('editScene.externalIntegration.variablesTitle').should('exist');
-    cy.contains('{{triggerEvent.data.label}}').should('exist');
+    cy.contains('editScene.externalIntegration.variablesAvailable').should('exist');
+    cy.contains('.badge', 'Object type').should('exist');
+    cy.contains('{{triggerEvent.data.label}}').should('not.exist');
 
     // the "Integrations" category of the action picker
     cy.contains('editScene.addStepButton')
@@ -131,12 +133,13 @@ describe('Scene - external integration triggers and actions', () => {
     cy.wait('@getDevices');
 
     // the device parameter, the variables-aware string parameter and the
-    // outputs block of the action
+    // results of the action, named by label
     cy.get('select#config_camera')
       .last()
       .select(CAMERA_EXTERNAL_ID);
     cy.get('.tagify__input').type('Visitor detected');
-    cy.contains('editScene.externalIntegration.outputsTitle').should('exist');
+    cy.contains('editScene.externalIntegration.outputsAvailable').should('exist');
+    cy.contains('.badge', 'Clip identifier').should('exist');
 
     cy.contains('button', 'editScene.saveButton').click();
     cy.contains('editScene.savedLabel').should('exist');

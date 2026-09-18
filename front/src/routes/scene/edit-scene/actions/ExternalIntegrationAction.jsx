@@ -18,7 +18,8 @@ import {
 // manifest): the declared fields are its parameters, rendered by the
 // config_schema form engine — the string ones by the variables-aware input,
 // so the user inserts {{…}} from the picker — and the declared outputs are
-// exposed to the following actions as variables of this step.
+// exposed to the following actions as variables of this step (declared to the
+// editor, and only named to the user, by label).
 class ExternalIntegrationAction extends Component {
   getLanguage = () => get(this.props, 'user.language') || 'en';
 
@@ -125,7 +126,9 @@ class ExternalIntegrationAction extends Component {
             placeholder={getLocalizedText(field.placeholder, language) || ''}
           />
         </Localizer>
-        {description && <small class="form-text text-muted">{description}</small>}
+        <small class="form-text text-muted">
+          {description || <Text id="editScene.externalIntegration.variablesHint" />}
+        </small>
       </div>
     );
   };
@@ -150,26 +153,16 @@ class ExternalIntegrationAction extends Component {
           </div>
         )}
         {description && <p>{description}</p>}
-        {fields.length > 0 && (
-          <p class="text-muted small">
-            <Text id="editScene.externalIntegration.variablesExplanation" />
-          </p>
-        )}
         {fields.map(field => this.renderField(field, language, dynamicOptions))}
         {outputs.length > 0 && (
-          <div class="mt-3">
-            <div class="form-label">
-              <Text id="editScene.externalIntegration.outputsTitle" />
-            </div>
-            <ul class="mb-0 small">
-              {outputs.map(output => (
-                <li key={output.key}>
-                  {getLocalizedText(output.label, language) || output.key}{' '}
-                  <code>{`{{${props.path}.${output.key}}}`}</code>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <p class="text-muted small mb-0 mt-3">
+            <Text id="editScene.externalIntegration.outputsAvailable" />{' '}
+            {outputs.map(output => (
+              <span key={output.key} class="badge badge-secondary mr-1">
+                {getLocalizedText(output.label, language) || output.key}
+              </span>
+            ))}
+          </p>
         )}
       </div>
     );
