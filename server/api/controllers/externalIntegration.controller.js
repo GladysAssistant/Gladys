@@ -1,6 +1,8 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { BadParameters, NotFoundError } = require('../../utils/coreErrors');
+const { Error422 } = require('../../utils/httpErrors');
 const { USER_ROLE } = require('../../utils/constants');
+const { MAX_WIDGET_SETTINGS_BYTES } = require('../../lib/external-integration/constants');
 
 // Manifest type of the integrations a non-admin user can act on: they link
 // their own account on a communication integration, exactly like on the
@@ -52,6 +54,45 @@ function toNonAdminView(integration) {
     status: integration.status,
     store_slug: integration.store_slug,
     manifest: integration.manifest,
+  };
+}
+
+/**
+ * @description Parse the `settings` of a widget instance out of the query
+ * string (URL-encoded JSON object). Absent → no settings; malformed or above
+ * the 1 KB budget → 422, like any other invalid setting.
+ * @param {object} query - The Express query.
+ * @returns {object} The raw settings object.
+ * @example
+ * const settings = parseWidgetSettings(req.query);
+ */
+function parseWidgetSettings(query) {
+  if (query.settings === undefined) {
+    return {};
+  }
+  if (typeof query.settings !== 'string' || query.settings.length > MAX_WIDGET_SETTINGS_BYTES) {
+    throw new Error422(`settings: must be a JSON object of at most ${MAX_WIDGET_SETTINGS_BYTES} bytes`);
+  }
+  try {
+    return JSON.parse(query.settings);
+  } catch (e) {
+    throw new Error422('settings: must be valid JSON');
+  }
+}
+
+/**
+ * @description The preferences of the requesting user that the widget path
+ * sends to the integration — server-derived from the session, never taken
+ * from the query.
+ * @param {object} req - The Express request.
+ * @returns {object} { language, units }.
+ * @example
+ * const preferences = getUserPreferences(req);
+ */
+function getUserPreferences(req) {
+  return {
+    language: req.user.language,
+    units: req.user.distance_unit_preference,
   };
 }
 
@@ -358,6 +399,98 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/external_integration/widget getWidgets
+   * @apiName getWidgets
+   * @apiGroup ExternalIntegration
+   * @apiDescription The dashboard widgets declared by every installed
+   * integration, for the box picker: open to every authenticated user, the
+   * declaration plus the integration status (the one operational field a
+   * dashboard needs to show a stopped integration as stopped).
+   * @apiSuccessExample {json} Success-Example
+   * [
+   *   {
+   *     "integration_selector": "ext-tmdb",
+   *     "integration_name": "TMDB",
+   *     "integration_status": "RUNNING",
+   *     "key": "upcoming_releases",
+   *     "label": { "en": "Upcoming releases" },
+   *     "description": { "en": "Movies coming to theaters." },
+   *     "icon": "film",
+   *     "settings": []
+   *   }
+   * ]
+   */
+  async function getWidgets(req, res) {
+    res.json(await gladys.externalIntegration.getWidgets());
+  }
+
+  /**
+   * @api {get} /api/v1/external_integration/:selector/widget/:key/content getWidgetContent
+   * @apiName getWidgetContent
+   * @apiGroup ExternalIntegration
+   * @apiParam {string} [settings] URL-encoded JSON object, the settings of the box instance.
+   * @apiDescription The normalized content of one widget instance, pulled
+   * from the integration and cached. 404 unknown integration or widget, 422
+   * on an invalid setting (naming the key), 400 REQUEST_TO_THIRD_PARTY_FAILED
+   * when the integration is unavailable or answered an invalid payload, 400
+   * WIDGET_CONTENT_VERSION_UNSUPPORTED on a content version this Gladys does
+   * not render, 429 beyond the per-integration pull bound.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "expires_at": "2026-09-18T09:12:30.000Z",
+   *   "content": { "version": 1, "components": [{ "type": "text", "variant": "heading", "text": "Hello" }] }
+   * }
+   */
+  async function getWidgetContent(req, res) {
+    const content = await gladys.externalIntegration.getWidgetContent(
+      req.params.selector,
+      req.params.key,
+      parseWidgetSettings(req.query),
+      getUserPreferences(req),
+    );
+    res.json(content);
+  }
+
+  /**
+   * @api {get} /api/v1/external_integration/:selector/image/:image_key getWidgetImage
+   * @apiName getWidgetImage
+   * @apiGroup ExternalIntegration
+   * @apiDescription An image declared by a widget content of the
+   * integration, served from the Gladys origin. 404 on a key declared in no
+   * cached content (nothing is sent to the integration).
+   * @apiSuccessExample {json} Success-Example
+   * { "image": "data:image/png;base64,iVBORw0KGgo..." }
+   */
+  async function getWidgetImage(req, res) {
+    const image = await gladys.externalIntegration.getWidgetImage(req.params.selector, req.params.image_key);
+    res.json({ image });
+  }
+
+  /**
+   * @api {post} /api/v1/external_integration/:selector/widget/:key/action/:action_key runWidgetAction
+   * @apiName runWidgetAction
+   * @apiGroup ExternalIntegration
+   * @apiParam {object} [settings] The settings of the box instance.
+   * @apiDescription Run an action declared by a button of the widget's own
+   * content. 404 on an action absent from that content (nothing is sent to
+   * the integration), 429 beyond 30 actions per minute per integration, 400
+   * REQUEST_TO_THIRD_PARTY_FAILED on timeout, refusal or disconnection.
+   * @apiSuccessExample {json} Success-Example
+   * { "message": { "en": "Cleaning started" } }
+   */
+  async function runWidgetAction(req, res) {
+    const settings = req.body && req.body.settings !== undefined ? req.body.settings : {};
+    const result = await gladys.externalIntegration.runWidgetAction(
+      req.params.selector,
+      req.params.key,
+      req.params.action_key,
+      settings,
+      getUserPreferences(req),
+    );
+    res.json(result);
+  }
+
+  /**
    * @api {post} /api/v1/external_integration/:selector/start start
    * @apiName start
    * @apiGroup ExternalIntegration
@@ -511,6 +644,10 @@ module.exports = function ExternalIntegrationController(gladys) {
     getOAuthAuthorizeUrl: asyncMiddleware(getOAuthAuthorizeUrl),
     oauthCallback: asyncMiddleware(oauthCallback),
     runAction: asyncMiddleware(runAction),
+    getWidgets: asyncMiddleware(getWidgets),
+    getWidgetContent: asyncMiddleware(getWidgetContent),
+    getWidgetImage: asyncMiddleware(getWidgetImage),
+    runWidgetAction: asyncMiddleware(runWidgetAction),
     start: asyncMiddleware(start),
     stop: asyncMiddleware(stop),
     restart: asyncMiddleware(restart),

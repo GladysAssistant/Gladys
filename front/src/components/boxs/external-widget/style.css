@@ -1,0 +1,549 @@
+/* Integration widget card: the five canonical slots (header, tiles, focal,
+   status, buttons) share the visual families of the core widgets — the
+   temperature tile, the chips bar, the quick-actions pills — so any widget
+   an integration can express has the silhouette of a core one. */
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heading {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.caption {
+  font-size: 0.8125rem;
+  color: #667081;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.body {
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+
+/* --- tiles: one wrapping row of value / gauge tiles --- */
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tile {
+  flex: 1 1 96px;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background-color: rgba(0, 40, 100, 0.04);
+  border: 1px solid rgba(0, 40, 100, 0.08);
+  text-align: center;
+}
+
+.tileIcon {
+  color: #467fcf;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.tileValue {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tileUnit {
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-left: 2px;
+  color: #667081;
+}
+
+.tileLabel {
+  font-size: 0.75rem;
+  color: #667081;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* semantic color accents: they tint an icon, a dot, a badge or a tile
+   value — never a surface */
+.colorPrimary {
+  color: #467fcf;
+}
+.colorSuccess {
+  color: #2e8f5b;
+}
+.colorWarning {
+  color: #f68f00;
+}
+.colorDanger {
+  color: #d63939;
+}
+.colorInfo {
+  color: #45aaf2;
+}
+.colorNeutral {
+  color: #667081;
+}
+
+/* --- gauge tile: a 270° SVG arc, value in the middle --- */
+.gauge {
+  width: 88px;
+  height: 72px;
+  display: block;
+}
+
+.gaugeTrack {
+  fill: none;
+  stroke: rgba(0, 40, 100, 0.1);
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.gaugeArc {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s ease;
+}
+
+.gaugeValue {
+  margin-top: -34px;
+}
+
+/* --- status list --- */
+.statusList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.statusDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.statusIcon {
+  flex-shrink: 0;
+  font-size: 0.875rem;
+}
+
+.statusLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #667081;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusValue {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- focal: image in a fixed 16:9 frame --- */
+.imageFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: rgba(0, 40, 100, 0.06);
+}
+
+.imageFrame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.imageCover {
+  object-fit: cover;
+}
+
+.imageContain {
+  object-fit: contain;
+}
+
+.imagePlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667081;
+}
+
+/* --- focal: card list --- */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 12px;
+}
+
+.cardGridItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+
+.cardGridItem .imageFrame {
+  aspect-ratio: 2 / 3;
+}
+
+.cardTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardMeta {
+  font-size: 0.75rem;
+  color: #667081;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardListItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  width: 100%;
+}
+
+.cardListItem .imageFrame {
+  flex: 0 0 48px;
+  width: 48px;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+}
+
+.cardListText {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardListText .cardTitle {
+  -webkit-line-clamp: 1;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  background-color: rgba(0, 40, 100, 0.08);
+  white-space: nowrap;
+}
+
+.badgeColorPrimary {
+  background-color: #dbe7f7;
+}
+.badgeColorSuccess {
+  background-color: #def0e2;
+}
+.badgeColorWarning {
+  background-color: #fdebd0;
+}
+.badgeColorDanger {
+  background-color: #fbe3de;
+}
+.badgeColorInfo {
+  background-color: #dbeffb;
+}
+
+.detailDescription {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+/* --- buttons: one wrapping row of pills (the quick-actions family) --- */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  background-color: #fff;
+  color: #495057;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.button:hover {
+  text-decoration: none;
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.buttonIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: #467fcf;
+}
+
+.buttonLabel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.buttonDomain {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #667081;
+}
+
+.buttonPrimary {
+  background-color: #467fcf;
+  border-color: transparent;
+  color: #fff;
+}
+
+.buttonPrimary .buttonIcon,
+.buttonPrimary .buttonDomain {
+  color: #fff;
+}
+
+.buttonDanger {
+  background-color: #fbe3de;
+  border-color: transparent;
+  color: #d4593f;
+}
+
+.buttonDanger .buttonIcon {
+  color: #d4593f;
+}
+
+.buttonActive {
+  background-color: #def0e2;
+  border-color: transparent;
+  color: #2e8f5b;
+}
+
+.buttonActive .buttonIcon {
+  color: #2e8f5b;
+}
+
+.button:disabled .buttonIcon i {
+  animation: widgetSpin 1s linear infinite;
+}
+
+@keyframes widgetSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.actionMessage {
+  font-size: 0.8125rem;
+  color: #667081;
+}
+
+/* --- states --- */
+.stateBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.errorDetail {
+  font-size: 0.8125rem;
+  color: #667081;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.skeleton {
+  min-height: 72px;
+}
+
+.slots {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Horizon glass theme */
+:global(.glass-theme) .tile {
+  background-color: var(--gl-surface-strong);
+  border-color: var(--gl-border);
+  box-shadow: var(--gl-shadow-soft);
+}
+
+:global(.glass-theme) .tileIcon,
+:global(.glass-theme) .buttonIcon,
+:global(.glass-theme) .colorPrimary {
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .caption,
+:global(.glass-theme) .tileLabel,
+:global(.glass-theme) .tileUnit,
+:global(.glass-theme) .statusLabel,
+:global(.glass-theme) .cardMeta,
+:global(.glass-theme) .colorNeutral,
+:global(.glass-theme) .actionMessage,
+:global(.glass-theme) .errorDetail {
+  color: #5b6373;
+}
+
+:global(.glass-theme) .button {
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border-color: var(--gl-border);
+  box-shadow: var(--gl-shadow-soft);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .buttonPrimary {
+  background-color: var(--gl-accent);
+  color: #fff;
+}
+
+:global(.glass-theme) .buttonPrimary .buttonIcon {
+  color: #fff;
+}
+
+:global(.glass-theme) .buttonActive {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+:global(.glass-theme) .buttonDanger {
+  background-color: #fbe3de;
+  color: #d4593f;
+}
+
+:global(.glass-theme) .imageFrame,
+:global(.glass-theme) .gaugeTrack {
+  background-color: var(--gl-border);
+  stroke: var(--gl-border);
+}
+
+/* dark mode */
+:global(.dark-mode) .tile {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global(.dark-mode) .button {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: inherit;
+}
+
+:global(.dark-mode) .imageFrame {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+:global(.dark-mode) .badge {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+:global(.dark-mode) .badgeColorPrimary,
+:global(.dark-mode) .badgeColorSuccess,
+:global(.dark-mode) .badgeColorWarning,
+:global(.dark-mode) .badgeColorDanger,
+:global(.dark-mode) .badgeColorInfo {
+  color: #1c2334;
+}

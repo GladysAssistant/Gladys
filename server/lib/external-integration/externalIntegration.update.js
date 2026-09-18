@@ -224,6 +224,9 @@ async function update(selector) {
     logger.warn(`Unable to remove sub-containers of integration ${selector} before update`, e);
   }
   await db.Service.update({ version: manifest.version, manifest, docker_image: image }, { where: { id: service.id } });
+  // the new manifest may declare other widgets, other settings: no content
+  // produced under the previous version survives the update
+  this.clearWidgetCaches(service);
   service = await this.getBySelector(selector);
   // the proxy closes over the service object it was registered with: the
   // updated row (manifest, version, image) replaces the boot-time snapshot

@@ -31,7 +31,9 @@ The result: two out of three integrations that expose events or operations (Frig
 
 ## 3. Declaration in the manifest
 
-Two optional top-level fields, declarable by **every** integration type (`device`, `communication`, `weather`): a doorbell is a device integration, a "message received on my channel" trigger is a communication one.
+Two optional top-level fields, declarable by **every** integration type (`device`, `communication`, `weather`, `provider`): a doorbell is a device integration, a "message received on my channel" trigger is a communication one.
+
+`scene_triggers` and `scene_actions` are **capability fields** in the sense of `capabilities/provider-type.md`: any type may declare them on top of its primary contract, and an integration with no device surface whose whole contract is its declarations (an events-only bridge) is a `provider` — the two fields count for the "at least one capability field" rule of that type (`CAPABILITY_MANIFEST_FIELDS`). The install screen lists them next to the widgets, one disclosure line per capability.
 
 ```json
 "scene_triggers": [

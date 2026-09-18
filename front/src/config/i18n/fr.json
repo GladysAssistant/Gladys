@@ -363,6 +363,8 @@
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
     "selectBoxTypeSearchPlaceholder": "Rechercher un widget (horloge, caméra…)",
     "selectBoxTypeNoResult": "Aucun widget ne correspond à « {{search}} »",
+    "selectBoxTypeCoreSection": "Widgets Gladys",
+    "selectBoxTypeIntegrationSection": "Widgets d'intégrations",
     "boxTitle": {
       "alarm": "Alarme",
       "weather": "Météo",
@@ -386,7 +388,8 @@
       "sun": "Soleil",
       "chips": "Pastilles d'état",
       "actions": "Actions rapides",
-      "house-view": "Vue de la maison"
+      "house-view": "Vue de la maison",
+      "external-widget": "Widget d'intégration"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -824,6 +827,25 @@
         "editPinLabelPlaceholder": "ex : Solaire",
         "noImage": "Choisissez une illustration dans les réglages du widget.",
         "error": "L'image n'a pas pu être chargée."
+      },
+      "external-widget": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Par défaut, le nom du widget",
+        "editSettingsLabel": "Paramètres du widget",
+        "editIntegrationNotInstalled": "L'intégration qui fournit ce widget n'est plus installée. Supprimez ce widget ou réinstallez l'intégration.",
+        "notInstalled": "Cette intégration n'est plus installée.",
+        "notInstalledHint": "Modifiez le tableau de bord pour retirer ce widget, ou réinstallez l'intégration pour le retrouver.",
+        "stopped": "L'intégration est arrêtée.",
+        "openIntegrationLink": "Ouvrir l'intégration",
+        "unavailable": "Les données du widget sont indisponibles.",
+        "retryButton": "Réessayer",
+        "checkSettings": "Vérifiez les paramètres de ce widget.",
+        "checkSettingsHint": "Modifiez le tableau de bord pour corriger les paramètres du widget.",
+        "needsNewerGladys": "Ce widget nécessite une version plus récente de Gladys.",
+        "empty": "Rien à afficher pour le moment.",
+        "emptyChart": "Pas encore de données sur cette période.",
+        "confirmAction": "Lancer « {{label}} » ?",
+        "actionError": "L'action a échoué."
       }
     },
     "editDashboardBackgroundLabel": "Ambiance de fond",
@@ -1142,7 +1164,10 @@
         "sceneDeclarationsTitle": "Déclencheurs et actions de scènes",
         "sceneDeclarationsText": "Cette intégration ajoute {{triggers}} déclencheur(s) et {{actions}} action(s) à l'éditeur de scènes.",
         "sceneTriggerPrefix": "Déclencheur :",
-        "sceneActionPrefix": "Action :"
+        "sceneActionPrefix": "Action :",
+        "widgetsTitle": "Widgets de tableau de bord",
+        "widgetsText": "Cette intégration fournit les widgets suivants, disponibles pour tous les utilisateurs dans l'éditeur de tableau de bord :",
+        "providerInfoText": "Cette intégration ne gère aucun appareil : elle fournit des widgets de tableau de bord. Configurez-la ici, puis ajoutez ses widgets depuis l'éditeur de tableau de bord."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",

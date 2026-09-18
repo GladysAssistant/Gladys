@@ -575,6 +575,12 @@ function getRoutes(gladys) {
       admin: true,
       controller: externalIntegrationController.refreshStore,
     },
+    // dashboard widgets declared by integrations: every authenticated user
+    // (the dashboard's audience) — the literal `widget` route before `:selector`
+    'get /api/v1/external_integration/widget': {
+      authenticated: true,
+      controller: externalIntegrationController.getWidgets,
+    },
     'post /api/v1/external_integration': {
       authenticated: true,
       admin: true,
@@ -682,6 +688,21 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: externalIntegrationController.runAction,
+    },
+    'get /api/v1/external_integration/:selector/widget/:key/content': {
+      authenticated: true,
+      controller: externalIntegrationController.getWidgetContent,
+    },
+    // images are integration-scoped and sit directly under `:selector`: a
+    // nested `widget/image/:image_key` would share its shape with
+    // `widget/:key/content` (`image` is a reserved widget key for the same reason)
+    'get /api/v1/external_integration/:selector/image/:image_key': {
+      authenticated: true,
+      controller: externalIntegrationController.getWidgetImage,
+    },
+    'post /api/v1/external_integration/:selector/widget/:key/action/:action_key': {
+      authenticated: true,
+      controller: externalIntegrationController.runWidgetAction,
     },
     'delete /api/v1/external_integration/:selector': {
       authenticated: true,

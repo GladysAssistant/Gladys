@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 
-import { ConfigField } from '../../../integration/all/external-integration/config-page/ConfigSchemaForm';
+import { ConfigField } from '../../../../components/integration/ConfigSchemaForm';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 import ExternalIntegrationDeclarationState from '../ExternalIntegrationDeclarationState';
 import { getLocalizedText } from '../../../../utils/getLocalizedText';

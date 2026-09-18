@@ -13,6 +13,7 @@ import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
 import WebhooksSummary from '../components/WebhooksSummary';
 import SceneDeclarationsSummary from '../components/SceneDeclarationsSummary';
+import WidgetsSummary from '../components/WidgetsSummary';
 import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
@@ -241,6 +242,12 @@ class ExternalIntegrationInstallPage extends Component {
                                 <Text id="integration.externalIntegration.install.weatherInfoText" />
                               </div>
                             )}
+                            {manifest.type === 'provider' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-grid mr-1" />
+                                <Text id="integration.externalIntegration.install.providerInfoText" />
+                              </div>
+                            )}
 
                             {containers.length > 0 && (
                               <SubContainersSummary containers={containers} language={language} />
@@ -280,6 +287,8 @@ class ExternalIntegrationInstallPage extends Component {
                               sceneActions={manifest.scene_actions}
                               language={language}
                             />
+
+                            <WidgetsSummary widgets={manifest.widgets} language={language} />
 
                             {duplicateOfInstalled && (
                               <div class="alert alert-warning">

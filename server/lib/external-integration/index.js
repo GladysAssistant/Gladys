@@ -42,6 +42,16 @@ const { saveConfigFromFront } = require('./externalIntegration.saveConfigFromFro
 const { setRunning } = require('./externalIntegration.setRunning');
 const { handleHeartbeat } = require('./externalIntegration.handleHeartbeat');
 const { handleWeatherRefresh } = require('./externalIntegration.handleWeatherRefresh');
+const { getWidgets } = require('./externalIntegration.getWidgets');
+const { getWidgetContent } = require('./externalIntegration.getWidgetContent');
+const { getWidgetImage } = require('./externalIntegration.getWidgetImage');
+const { runWidgetAction } = require('./externalIntegration.runWidgetAction');
+const { handleWidgetRefresh } = require('./externalIntegration.handleWidgetRefresh');
+const {
+  getWidgetGeneration,
+  invalidateWidgetContent,
+  clearWidgetCaches,
+} = require('./externalIntegration.widgetCache');
 const { integrationConnected } = require('./externalIntegration.integrationConnected');
 const { integrationDisconnected } = require('./externalIntegration.integrationDisconnected');
 const { sendCommand } = require('./externalIntegration.sendCommand');
@@ -188,6 +198,29 @@ const ExternalIntegration = function ExternalIntegration(
   // serviceId -> number of scene actions in flight (reserved before any
   // connection wait, released on every terminal outcome)
   this.pendingSceneActions = new Map();
+  // dashboard widgets declared by integrations (capabilities/dashboard-
+  // widgets.md): per-integration caches and counters, all keyed by service
+  // id and dropped in full on stop / update / uninstall (clearWidgetCaches)
+  // serviceId -> LRU Map of cacheKey -> normalized content entry
+  this.widgetContentCache = new Map();
+  // serviceId -> Map of cacheKey -> { promise, generation } of the widget.get in flight
+  this.widgetInFlight = new Map();
+  // `${serviceId}:${widgetKey}` -> generation counter (bumped by every invalidation)
+  this.widgetGenerations = new Map();
+  // serviceId -> { active, queue } concurrency limit of widget.get commands
+  this.widgetPullSlots = new Map();
+  // serviceId -> { count, resetAt } cache-miss rate limit per minute
+  this.widgetPullRates = new Map();
+  // `${serviceId}:${widgetKey}` -> timestamp of the last accepted widget nudge
+  this.widgetRefreshTimes = new Map();
+  // serviceId -> LRU Map of imageKey -> { image, expiresAt }
+  this.widgetImageCache = new Map();
+  // serviceId -> Map of imageKey -> promise of the widget.get-image in flight
+  this.widgetImageInFlight = new Map();
+  // serviceId -> { active, queue } concurrency limit of widget.get-image commands
+  this.widgetImageSlots = new Map();
+  // serviceId -> { count, resetAt } widget action rate limit per minute
+  this.widgetActionRates = new Map();
   this.checkHealthInterval = null;
   // store index cache (see store/ sub-folder)
   this.storeIndex = null;
@@ -252,6 +285,14 @@ ExternalIntegration.prototype.saveConfigFromFront = saveConfigFromFront;
 ExternalIntegration.prototype.setRunning = setRunning;
 ExternalIntegration.prototype.handleHeartbeat = handleHeartbeat;
 ExternalIntegration.prototype.handleWeatherRefresh = handleWeatherRefresh;
+ExternalIntegration.prototype.getWidgets = getWidgets;
+ExternalIntegration.prototype.getWidgetContent = getWidgetContent;
+ExternalIntegration.prototype.getWidgetImage = getWidgetImage;
+ExternalIntegration.prototype.runWidgetAction = runWidgetAction;
+ExternalIntegration.prototype.handleWidgetRefresh = handleWidgetRefresh;
+ExternalIntegration.prototype.getWidgetGeneration = getWidgetGeneration;
+ExternalIntegration.prototype.invalidateWidgetContent = invalidateWidgetContent;
+ExternalIntegration.prototype.clearWidgetCaches = clearWidgetCaches;
 ExternalIntegration.prototype.integrationConnected = integrationConnected;
 ExternalIntegration.prototype.integrationDisconnected = integrationDisconnected;
 ExternalIntegration.prototype.sendCommand = sendCommand;
