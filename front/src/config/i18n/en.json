@@ -363,6 +363,8 @@
     "selectBoxTypeLabel": "Choose which widget to display here",
     "selectBoxTypeSearchPlaceholder": "Search for a widget (clock, camera…)",
     "selectBoxTypeNoResult": "No widget matches \"{{search}}\"",
+    "selectBoxTypeCoreSection": "Gladys widgets",
+    "selectBoxTypeIntegrationSection": "Integration widgets",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Weather",

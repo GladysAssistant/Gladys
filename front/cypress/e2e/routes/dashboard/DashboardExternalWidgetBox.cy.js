@@ -84,7 +84,9 @@ describe('Dashboard integration widget box', () => {
     });
     cy.contains('.btn-primary', 'dashboard.addBoxButton').click();
     cy.wait('@getWidgets');
-    // the tile comes after the core tiles, with the integration as caption
+    // the tile comes after the core tiles, under its own heading, with the
+    // integration as caption
+    cy.get('[data-cy="select-box-type-integrations"]').i18n('dashboard.selectBoxTypeIntegrationSection');
     cy.get(`[data-cy="box-type-external-widget-${SELECTOR}-${WIDGET_KEY}"]`)
       .should('contain', 'Vacuum')
       .and('contain', 'Roborock Demo')

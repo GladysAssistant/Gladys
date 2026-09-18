@@ -293,8 +293,8 @@ describe('externalIntegration.normalizeWidgetContent', () => {
           description: 'Line 1\n\nLine 2',
           links: [
             { url: 'https://www.youtube.com/watch?v=1', label: 'Trailer' },
-            { url: 'https://a.example' },
-            { url: 'https://b.example' },
+            { url: 'https://a.example/' },
+            { url: 'https://b.example/' },
           ],
         },
         { title: 'Minimal' },
@@ -321,7 +321,14 @@ describe('externalIntegration.normalizeWidgetContent', () => {
           items: [
             {
               title: 'Links',
-              links: [{ url: `https://x.example/${'a'.repeat(2100)}` }, { url: 'https://' }, { url: 42 }],
+              links: [
+                { url: `https://x.example/${'a'.repeat(2100)}` },
+                { url: 'https://' },
+                { url: 42 },
+                // credentials never reach a dashboard link
+                { url: 'https://user:pass@evil.example/path' },
+                { url: 'https://:token@evil.example/' },
+              ],
             },
           ],
         },
@@ -368,7 +375,7 @@ describe('externalIntegration.normalizeWidgetContent', () => {
           action: { key: 'start', params: { mode: 'full' }, confirm: true },
         },
         { type: 'button', label: 'Dock', style: 'secondary', device_feature: 'ext:demo:dock', value: 1 },
-        { type: 'button', label: 'Site', style: 'secondary', link: { url: 'https://example.com' } },
+        { type: 'button', label: 'Site', style: 'secondary', link: { url: 'https://example.com/' } },
       ]);
     });
 

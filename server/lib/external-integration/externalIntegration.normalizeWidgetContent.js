@@ -183,7 +183,12 @@ function toHttpsUrl(value) {
   }
   try {
     const url = new URL(value);
-    return url.protocol === 'https:' ? value : null;
+    // credentials never reach a dashboard link, and the browser gets the
+    // very string the parser validated (normalized href), never the raw one
+    if (url.protocol !== 'https:' || url.username || url.password) {
+      return null;
+    }
+    return url.href;
   } catch (e) {
     return null;
   }

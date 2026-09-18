@@ -98,8 +98,14 @@ class SelectBoxType extends Component {
       }))
       .filter(
         ({ widget, label, caption }) =>
-          searchTerm.length === 0 || normalizeSearchText(`${widget.key} ${label} ${caption}`).includes(searchTerm)
+          searchTerm.length === 0 ||
+          normalizeSearchText(
+            `${widget.key} ${label} ${caption} ${getLocalizedText(widget.description, language)}`
+          ).includes(searchTerm)
       );
+    // the two families are told apart with a heading each, as soon as an
+    // installed integration brings widgets of its own
+    const showSections = (externalWidgets || []).length > 0;
     return (
       <BaseEditBox {...props} titleKey="dashboard.selectBoxType">
         <div class="form-group">
@@ -121,6 +127,12 @@ class SelectBoxType extends Component {
             </Localizer>
           </div>
           <div class={style.boxTypeGrid} data-cy="select-box-type">
+            {showSections && boxTypes.length > 0 && (
+              <div class={cx('text-muted', style.boxTypeSection)}>
+                <i class="fe fe-grid" />
+                <Text id="dashboard.selectBoxTypeCoreSection" />
+              </div>
+            )}
             {boxTypes.map(({ type, label }) => (
               <button
                 type="button"
@@ -133,6 +145,12 @@ class SelectBoxType extends Component {
                 <span class={style.boxTypeLabel}>{label}</span>
               </button>
             ))}
+            {widgetTiles.length > 0 && (
+              <div class={cx('text-muted', style.boxTypeSection)} data-cy="select-box-type-integrations">
+                <i class="fe fe-package" />
+                <Text id="dashboard.selectBoxTypeIntegrationSection" />
+              </div>
+            )}
             {widgetTiles.map(({ widget, label, caption }) => (
               <button
                 type="button"

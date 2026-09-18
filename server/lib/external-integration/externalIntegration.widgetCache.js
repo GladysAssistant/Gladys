@@ -182,14 +182,31 @@ function invalidateWidgetContent(service, widgetKey, { broadcast = false } = {})
  * gladys.externalIntegration.clearWidgetCaches(service);
  */
 function clearWidgetCaches(service) {
-  this.widgetContentCache.delete(service.id);
-  this.widgetImageCache.delete(service.id);
-  this.widgetPullRates.delete(service.id);
-  this.widgetActionRates.delete(service.id);
   const prefix = `${service.id}:`;
-  [this.widgetGenerations, this.widgetRefreshTimes].forEach((state) => {
-    [...state.keys()].filter((key) => key.startsWith(prefix)).forEach((key) => state.delete(key));
-  });
+  // the generation of every widget MOVES instead of resetting: a widget.get
+  // that started before the stop carries the previous stamp and is never
+  // cached when it lands, and a request arriving after the restart never
+  // coalesces onto it (the in-flight maps are dropped too)
+  const widgetKeys = new Set([
+    ...((service.manifest && service.manifest.widgets) || []).map((widget) => widget.key),
+    ...[...this.widgetGenerations.keys()]
+      .filter((key) => key.startsWith(prefix))
+      .map((key) => key.slice(prefix.length)),
+  ]);
+  widgetKeys.forEach((widgetKey) => this.invalidateWidgetContent(service, widgetKey));
+  [
+    this.widgetContentCache,
+    this.widgetInFlight,
+    this.widgetPullSlots,
+    this.widgetPullRates,
+    this.widgetImageCache,
+    this.widgetImageInFlight,
+    this.widgetImageSlots,
+    this.widgetActionRates,
+  ].forEach((state) => state.delete(service.id));
+  [...this.widgetRefreshTimes.keys()]
+    .filter((key) => key.startsWith(prefix))
+    .forEach((key) => this.widgetRefreshTimes.delete(key));
 }
 
 module.exports = {

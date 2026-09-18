@@ -559,9 +559,33 @@ describe('externalIntegration widgets — content path', () => {
       expect(externalIntegration.widgetPullRates.has(service.id)).to.equal(false);
       expect(externalIntegration.widgetActionRates.has(service.id)).to.equal(false);
       expect(externalIntegration.widgetRefreshTimes.has(`${service.id}:upcoming_releases`)).to.equal(false);
-      expect(externalIntegration.getWidgetGeneration(service.id, 'upcoming_releases')).to.equal(0);
+      // the generations move (never reset): one nudge, then the clear
+      expect(externalIntegration.getWidgetGeneration(service.id, 'upcoming_releases')).to.equal(2);
+      expect(externalIntegration.getWidgetGeneration(service.id, 'vacuum')).to.equal(1);
       // another integration is untouched
       expect(externalIntegration.widgetGenerations.get(`${other.id}:x`)).to.equal(3);
+    });
+
+    it('should neither cache a pull started before the clear nor coalesce a later request onto it', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const service = await seedWidgetService();
+      const command = deferredCommand();
+      externalIntegration.sendCommand = command.fake;
+      const before = externalIntegration.getWidgetContent(service.selector, 'upcoming_releases', {}, PREFERENCES);
+      await waitForCalls(command.fake, 1);
+      externalIntegration.clearWidgetCaches(service);
+      // a dashboard refetching after the restart starts its own command
+      const after = externalIntegration.getWidgetContent(service.selector, 'upcoming_releases', {}, PREFERENCES);
+      await waitForCalls(command.fake, 2);
+      expect(command.fake.callCount).to.equal(2);
+      command.resolve(0, { ...CINEMA_CONTENT, ttl_seconds: 3600 });
+      const staleContent = await before;
+      expect(staleContent.content.components).to.have.lengthOf(CINEMA_CONTENT.components.length);
+      // the pre-clear result was served to its caller, never cached
+      expect((externalIntegration.widgetContentCache.get(service.id) || new Map()).size).to.equal(0);
+      command.resolve(1);
+      await after;
+      expect(externalIntegration.widgetContentCache.get(service.id).size).to.equal(1);
     });
 
     it('should clear the widget caches when the integration stops or is uninstalled', async () => {

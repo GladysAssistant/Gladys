@@ -14,6 +14,8 @@ import { loadWidgetList, findWidgetDeclaration } from './widgetList';
 // config_schema engine (one engine, one look). `source: "devices"` options
 // are the integration's own devices, loaded from the standard device route
 // every user can read.
+const DISCRETE_SETTING_TYPES = ['boolean', 'select', 'multi_select'];
+
 class EditExternalWidgetBox extends Component {
   state = { declaration: undefined, dynamicOptions: {} };
 
@@ -74,10 +76,17 @@ class EditExternalWidgetBox extends Component {
     const language = get(props, 'user.language') || 'en';
     const settings = declaration ? declaration.settings || [] : [];
     // an absent setting takes its declared default on the server: the form
-    // shows that default, so the preview and the form never disagree
+    // shows that default on the discrete controls (toggle, select), so the
+    // preview and the form never disagree. Text and number inputs are left
+    // as stored: an emptied field means "default applies", and echoing the
+    // default back into a controlled input would fight the user's typing.
     const displayedValues = { ...(props.box.settings || {}) };
     settings.forEach(field => {
-      if (displayedValues[field.key] === undefined && field.default !== undefined) {
+      if (
+        displayedValues[field.key] === undefined &&
+        field.default !== undefined &&
+        DISCRETE_SETTING_TYPES.includes(field.type)
+      ) {
         displayedValues[field.key] = field.default;
       }
     });
