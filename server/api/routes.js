@@ -309,6 +309,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: houseController.getSunState,
     },
+    'get /api/v1/house/:house_selector/tide': {
+      authenticated: true,
+      controller: houseController.getTideState,
+    },
     'post /api/v1/house/:house_selector/user/:user_selector/seen': {
       authenticated: true,
       controller: houseController.userSeen,

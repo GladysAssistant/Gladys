@@ -34,6 +34,8 @@ const boxSchema = Joi.object().keys({
   group_by: Joi.string().valid('hour', 'day', 'week', 'month', 'year'),
   display_axes: Joi.boolean(),
   display_variation: Joi.boolean(),
+  // tide box: show the tide curve under the times
+  display_curve: Joi.boolean(),
   chart_type: Joi.string(),
   users: Joi.array().items(Joi.string()),
   clock_type: Joi.string(),
