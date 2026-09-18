@@ -134,7 +134,7 @@ describe('scene.external-integration.scene-action', () => {
     assert.calledWith(self.message.sendToUser, 'pepper', 'Clip []');
   });
 
-  it('should log and continue when the integration declares no scene action', async () => {
+  it('should log and continue when the selector points at a service without the scene capability', async () => {
     const loggerWarn = sinon.stub(logger, 'warn');
     const self = buildSelf({ device: { setValue: fake.resolves(null) } });
     await executeActions(

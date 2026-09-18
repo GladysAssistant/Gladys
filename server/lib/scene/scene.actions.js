@@ -937,8 +937,10 @@ const actionsFunc = {
     if (!integrationService) {
       throw new NotFoundError(`EXTERNAL_INTEGRATION_NOT_FOUND: ${action.integration}`);
     }
+    // every external integration carries the scene capability; a selector
+    // pointing at a core service does not
     if (!integrationService.scene || typeof integrationService.scene.runAction !== 'function') {
-      throw new NotFoundError(`SCENE_ACTION_NOT_DECLARED: ${action.integration} declares no scene action`);
+      throw new NotFoundError(`SCENE_ACTION_NOT_DECLARED: ${action.integration} exposes no scene action`);
     }
     // the stored fields travel untouched; the supervisor renders the declared
     // string fields through this callback, bound to the scope of the scene

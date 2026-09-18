@@ -9,7 +9,7 @@ import EditScenePage from './EditScenePage';
 import { computeRunningInfo, mergeRunningScenes } from '../runningInfo';
 
 import { ACTIONS, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
-import { findMissingRequiredField } from './sceneIntegrations';
+import { findMissingRequiredField, hasIntegrationSteps } from './sceneIntegrations';
 
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
@@ -479,6 +479,23 @@ class EditScene extends Component {
     // state afterwards would display "saved" for data this request never sent
     const savedSceneSnapshot = JSON.stringify(this.state.scene);
     const sceneToSave = JSON.parse(savedSceneSnapshot);
+    // the declaration catalog is still unknown (request pending or failed):
+    // an integration card cannot be validated, so the save retries the
+    // request once and refuses rather than persisting an unchecked required
+    // filter — a successfully loaded EMPTY catalog is another thing (nothing
+    // installed: the orphan cards save as they are)
+    if (this.state.sceneIntegrations === null && hasIntegrationSteps(sceneToSave)) {
+      await this.getSceneIntegrations();
+      if (this.state.sceneIntegrations === null) {
+        this.setState({
+          error: true,
+          errorMessage: null,
+          errorMessageId: 'editScene.externalIntegration.catalogUnavailableError',
+          errorMessageFields: {}
+        });
+        return;
+      }
+    }
     // a required filter of an integration trigger left empty would match any
     // value: the editor is the only place it can be refused (the matcher never
     // consults the manifest), so the save stops here with the field named
@@ -1421,9 +1438,10 @@ class EditScene extends Component {
   getSceneIntegrations = async () => {
     // the scene triggers and actions declared by the installed external
     // integrations: the "Integrations" category of both pickers, and what a
-    // stored integration card is resolved against. Fetched once when the
-    // editor opens; an unreachable list only hides the category, the stored
-    // cards then render as orphans until the next load.
+    // stored integration card is resolved against. Fetched when the editor
+    // opens, and again by a save attempted before it answered. Null until it
+    // succeeds: the cards then wait instead of posing as orphans, and the
+    // save of a scene holding one is refused (saveScene).
     try {
       const { integrations } = await this.props.httpClient.get('/api/v1/external_integration/scene');
       this.setState({ sceneIntegrations: integrations || [] });
@@ -1449,7 +1467,7 @@ class EditScene extends Component {
       scene: null,
       variables: {},
       triggersVariables: [],
-      sceneIntegrations: [],
+      sceneIntegrations: null,
       runningScenes: [],
       now: Date.now()
     };

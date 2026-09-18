@@ -90,7 +90,8 @@ describe('externalIntegration.runSceneAction', () => {
     expect(outputs).to.deep.equal({ clip_id: 'clip-1' });
     sinonAssert.calledOnce(externalIntegration.sendCommand);
     const [sentService, type, payload, options] = externalIntegration.sendCommand.firstCall.args;
-    expect(sentService).to.equal(service);
+    // the current row, freshly read, never the object the caller holds
+    expect(sentService).to.include({ id: service.id, selector: service.selector });
     expect(type).to.equal(WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.SCENE_ACTION_RUN);
     expect(payload).to.deep.equal({
       key: 'create_snapshot',
@@ -184,10 +185,12 @@ describe('externalIntegration.runSceneAction', () => {
     const pending = Array.from({ length: MAX_PENDING_SCENE_ACTIONS }, () =>
       externalIntegration.runSceneAction(service, 'echo'),
     );
-    for (let i = 0; i < 50 && waitForConnection.callCount < MAX_PENDING_SCENE_ACTIONS; i += 1) {
+    // each run reads its row from the DB before reserving its slot: real I/O,
+    // polled with a short timer rather than a microtask flush
+    for (let i = 0; i < 200 && waitForConnection.callCount < MAX_PENDING_SCENE_ACTIONS; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       await new Promise((resolve) => {
-        setImmediate(resolve);
+        setTimeout(resolve, 5);
       });
     }
     expect(externalIntegration.pendingSceneActions.get(service.id)).to.equal(MAX_PENDING_SCENE_ACTIONS);
@@ -248,7 +251,9 @@ describe('externalIntegration.runSceneAction', () => {
       ExternalIntegrationUnavailableError,
       'EXTERNAL_INTEGRATION_COMMAND_TIMEOUT',
     );
-    sinonAssert.calledOnceWithExactly(externalIntegration.waitForConnection, shortService, 5000);
+    sinonAssert.calledOnce(externalIntegration.waitForConnection);
+    expect(externalIntegration.waitForConnection.firstCall.args[0]).to.include({ id: shortService.id });
+    expect(externalIntegration.waitForConnection.firstCall.args[1]).to.equal(5000);
     sinonAssert.notCalled(externalIntegration.sendCommand);
     expect(externalIntegration.pendingSceneActions.has(shortService.id)).to.equal(false);
     // connected after 2s: the ack gets what is left of the 5s
@@ -346,7 +351,7 @@ describe('externalIntegration.normalizeSceneActionOutputs', () => {
 });
 
 describe('externalIntegration scene proxy capability', () => {
-  it('should expose scene.runAction on integrations declaring scene actions only', async () => {
+  it('should expose scene.runAction on every external integration, declared scene actions or not', async () => {
     const { externalIntegration, stateManager } = buildSupervisor();
     const sceneService = await seedSceneService();
     const plainService = await seedExternalService({ name: 'ext-dev-plain', selector: 'ext-dev-plain' });
@@ -361,10 +366,32 @@ describe('externalIntegration scene proxy capability', () => {
     const sceneProxy = stateManager.get('service', sceneService.name);
     expect(sceneProxy.scene).to.have.property('runAction');
     expect(sceneProxy.device).to.have.property('setValue');
-    expect(stateManager.get('service', plainService.name)).to.not.have.property('scene');
+    // the capability is not gated on the manifest known at registration:
+    // a scene action added by an update must not wait for a restart
+    expect(stateManager.get('service', plainService.name).scene).to.have.property('runAction');
     const weatherProxy = stateManager.get('service', weatherService.name);
-    expect(weatherProxy).to.not.have.property('scene');
+    expect(weatherProxy.scene).to.have.property('runAction');
     expect(weatherProxy.weather).to.have.property('get');
+  });
+
+  it('should run against the current declaration, not the one registered with the proxy', async () => {
+    const { externalIntegration, stateManager } = buildSupervisor();
+    // registered without any scene action (the manifest installed at boot)
+    const plainService = await seedExternalService({ name: 'ext-dev-plain', selector: 'ext-dev-plain' });
+    externalIntegration.registerProxyService(plainService);
+    const proxy = stateManager.get('service', plainService.name);
+    await expect(proxy.scene.runAction('echo', {})).to.be.rejectedWith(NotFoundError, 'SCENE_ACTION_NOT_DECLARED');
+    // an update rewrites the row with a manifest declaring the action, without
+    // going through init: the very next run follows the new declaration
+    await db.Service.update({ manifest: TEST_SCENE_MANIFEST }, { where: { id: plainService.id } });
+    externalIntegration.sendCommand = fake.resolves({ success: true, data: { outputs: {} } });
+    await proxy.scene.runAction('echo', {});
+    sinonAssert.calledOnce(externalIntegration.sendCommand);
+    expect(externalIntegration.sendCommand.firstCall.args[0]).to.include({ id: plainService.id });
+    expect(externalIntegration.sendCommand.firstCall.args[2]).to.deep.equal({ key: 'echo', fields: {} });
+    // the integration uninstalled under a still-registered proxy
+    await db.Service.destroy({ where: { id: plainService.id } });
+    await expect(proxy.scene.runAction('echo', {})).to.be.rejectedWith(NotFoundError, 'EXTERNAL_INTEGRATION_NOT_FOUND');
   });
 
   it('should relay scene.runAction to the supervisor with the service', async () => {

@@ -173,6 +173,12 @@ export const flattenSceneActions = actions => {
   return flat;
 };
 
+// True when the scene holds at least one card of the two generic types: the
+// only scenes whose save depends on the declaration catalog
+export const hasIntegrationSteps = scene =>
+  (scene.triggers || []).some(trigger => trigger.type === SCENE_TRIGGER_KIND.type) ||
+  flattenSceneActions(scene.actions).some(action => action.type === SCENE_ACTION_KIND.type);
+
 // The first required field left empty on a live integration card of the
 // scene, as { title, field } for the save error, or null when the scene is
 // complete

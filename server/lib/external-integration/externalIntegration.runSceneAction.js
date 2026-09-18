@@ -94,8 +94,12 @@ async function resolveSceneActionFields(service, declaration, storedFields, rend
  * the resolution, the connection wait of the startup window and the ack
  * alike, so a scene never holds on the action longer than the declared
  * timeout. The
- * whitelisted outputs are returned to the scene.
- * @param {object} service - The external integration service.
+ * whitelisted outputs are returned to the scene. The declaration is read
+ * from the CURRENT t_service row (getBySelector, like runAction), never from
+ * the object the proxy was registered with: an update rewrites the row and
+ * its manifest, and the scene must follow the new declaration at once.
+ * @param {object} registeredService - The external integration service (the selector
+ * and id are read from it, the declaration is not).
  * @param {string} actionKey - The declared scene action key.
  * @param {object} [storedFields] - The fields stored in the scene, untouched.
  * @param {object} [options] - Options.
@@ -104,10 +108,12 @@ async function resolveSceneActionFields(service, declaration, storedFields, rend
  * @example
  * const outputs = await gladys.externalIntegration.runSceneAction(service, 'create_snapshot', {}, { render });
  */
-async function runSceneAction(service, actionKey, storedFields = {}, { render = (value) => value } = {}) {
+async function runSceneAction(registeredService, actionKey, storedFields = {}, { render = (value) => value } = {}) {
   // the deadline starts when the scene reaches the action: the resolution
-  // below (a DB lookup for the dynamic device options) is on the budget too
+  // below (the current row, a DB lookup for the dynamic device options) is
+  // on the budget too
   const entryTime = Date.now();
+  const service = await this.getBySelector(registeredService.selector);
   const declaration = getDeclaredSceneActions(service.manifest).find((action) => action.key === actionKey);
   if (!declaration) {
     throw new NotFoundError(`SCENE_ACTION_NOT_DECLARED: scene action ${actionKey} is not declared in the manifest`);

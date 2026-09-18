@@ -4057,6 +4057,8 @@
       "actionNotInstalled": "Diese Aktion stammt von einer Integration, die nicht mehr installiert ist. Sie schlägt fehl, bis die Integration erneut installiert wird.",
       "actionNotDeclared": "Diese Aktion wird von der installierten Version der Integration nicht mehr deklariert. Sie schlägt beim Ausführen der Szene fehl.",
       "actionInactive": "Die Integration ist gestoppt: diese Aktion schlägt fehl, bis sie läuft.",
+      "catalogLoading": "Auslöser und Aktionen der Integration werden geladen…",
+      "catalogUnavailableError": "Die Auslöser und Aktionen der Integrationen konnten nicht geladen werden, die Szene wurde daher nicht gespeichert. Versuche es gleich noch einmal.",
       "wildcardHint": "Ein leer gelassenes Feld akzeptiert jeden Wert.",
       "variablesAvailable": "Informationen, die an die Aktionen der Szene weitergegeben werden:",
       "outputsAvailable": "Ergebnisse, die in den folgenden Schritten verwendbar sind:",

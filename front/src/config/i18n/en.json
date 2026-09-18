@@ -4057,6 +4057,8 @@
       "actionNotInstalled": "This action is provided by an integration that is no longer installed. It will fail until the integration is installed again.",
       "actionNotDeclared": "This action is no longer declared by the installed version of the integration. It will fail when the scene runs.",
       "actionInactive": "The integration is stopped: this action will fail until it runs.",
+      "catalogLoading": "Loading the integration's triggers and actions…",
+      "catalogUnavailableError": "The triggers and actions of the integrations could not be loaded, so the scene was not saved. Try again in a moment.",
       "wildcardHint": "A field left empty matches any value.",
       "variablesAvailable": "Information passed on to the scene actions:",
       "outputsAvailable": "Results available to the following steps:",

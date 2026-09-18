@@ -155,6 +155,31 @@ describe('Scene - external integration triggers and actions', () => {
     });
   });
 
+  it('Should refuse the save while the declarations cannot be loaded', () => {
+    cy.intercept('GET', '**/api/v1/external_integration/scene', { statusCode: 500, body: {} }).as(
+      'getSceneIntegrations'
+    );
+
+    const sceneUrl = Cypress.env('integrationSceneUrl');
+    expect(sceneUrl).to.exist;
+    cy.visit(sceneUrl);
+    cy.wait('@getSceneIntegrations');
+
+    // the cards wait for the catalog instead of posing as orphans
+    cy.contains('editScene.triggers.external-integration.scene-event').click();
+    cy.contains('editScene.externalIntegration.catalogLoading').should('exist');
+    cy.contains('editScene.externalIntegration.triggerNotInstalled').should('not.exist');
+
+    // the save retries the catalog once, then refuses: an unchecked required
+    // filter must never be persisted
+    cy.contains('button', 'editScene.saveButton').click();
+    cy.wait('@getSceneIntegrations');
+    cy.get('.alert-danger').should(
+      'contain',
+      Cypress.env('i18n').editScene.externalIntegration.catalogUnavailableError
+    );
+  });
+
   it('Should keep the cards, flagged as orphans, when the integration is gone', () => {
     cy.intercept('GET', '**/api/v1/external_integration/scene', { integrations: [] }).as('getSceneIntegrations');
 

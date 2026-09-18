@@ -4057,6 +4057,8 @@
       "actionNotInstalled": "Cette action est fournie par une intégration qui n'est plus installée. Elle échouera tant qu'elle n'est pas réinstallée.",
       "actionNotDeclared": "Cette action n'est plus déclarée par la version installée de l'intégration. Elle échouera à l'exécution de la scène.",
       "actionInactive": "L'intégration est arrêtée : cette action échouera tant qu'elle ne tourne pas.",
+      "catalogLoading": "Chargement des déclencheurs et actions de l'intégration…",
+      "catalogUnavailableError": "Les déclencheurs et actions des intégrations n'ont pas pu être chargés : la scène n'a pas été enregistrée. Réessayez dans un instant.",
       "wildcardHint": "Un champ laissé vide accepte n'importe quelle valeur.",
       "variablesAvailable": "Informations transmises aux actions de la scène :",
       "outputsAvailable": "Résultats utilisables dans les étapes suivantes :",

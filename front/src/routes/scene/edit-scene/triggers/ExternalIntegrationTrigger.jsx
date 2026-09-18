@@ -89,6 +89,15 @@ class ExternalIntegrationTrigger extends Component {
   }
 
   render(props, { dynamicOptions }) {
+    if (props.sceneIntegrations === null) {
+      // catalog unknown (pending or failed): neither live nor orphan yet
+      return (
+        <p class="text-muted small mb-0">
+          <i class="fe fe-loader mr-1" />
+          <Text id="editScene.externalIntegration.catalogLoading" />
+        </p>
+      );
+    }
     const language = this.getLanguage();
     const { integration, declaration, inactive } = this.resolve(props);
     if (!integration || !declaration) {
