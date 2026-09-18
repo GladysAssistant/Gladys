@@ -13,21 +13,21 @@ const HOMEKIT_SECURITY_SYSTEM_STATE = {
   ALARM_TRIGGERED: 4,
 };
 
-// Gladys arms the whole house or only part of it, where HomeKit distinguishes being away from
-// staying home — which is the same idea seen from the other side: a partially armed house is one
-// its occupants are still living in.
+// Gladys and HomeKit name the same three arming modes: what HomeKit calls staying home is what
+// Gladys calls presence, and the two others match word for word.
 const alarmModeToSecuritySystemState = {
-  [ALARM_MODES.ARMED]: HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM,
-  [ALARM_MODES.PARTIALLY_ARMED]: HOMEKIT_SECURITY_SYSTEM_STATE.STAY_ARM,
+  [ALARM_MODES.PRESENCE_ARMED]: HOMEKIT_SECURITY_SYSTEM_STATE.STAY_ARM,
+  [ALARM_MODES.NIGHT_ARMED]: HOMEKIT_SECURITY_SYSTEM_STATE.NIGHT_ARM,
+  [ALARM_MODES.AWAY_ARMED]: HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM,
   [ALARM_MODES.DISARMED]: HOMEKIT_SECURITY_SYSTEM_STATE.DISARMED,
-  [ALARM_MODES.PANIC]: HOMEKIT_SECURITY_SYSTEM_STATE.ALARM_TRIGGERED,
+  [ALARM_MODES.TRIGGERED]: HOMEKIT_SECURITY_SYSTEM_STATE.ALARM_TRIGGERED,
 };
 
-// NIGHT_ARM is absent on purpose: Gladys has no night mode, and offering a state the house cannot
-// honour would let the Home app ask for something that silently does nothing.
+// Every state but ALARM_TRIGGERED, which HomeKit only ever reports and never asks for.
 const SUPPORTED_TARGET_STATES = [
   HOMEKIT_SECURITY_SYSTEM_STATE.STAY_ARM,
   HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM,
+  HOMEKIT_SECURITY_SYSTEM_STATE.NIGHT_ARM,
   HOMEKIT_SECURITY_SYSTEM_STATE.DISARMED,
 ];
 
@@ -71,7 +71,7 @@ function buildAlarmAccessory(house) {
   // HomeKit has no triggered target, so a house that went off has to keep the target it was armed
   // with — reporting disarmed there would show the alarm as switched off while it rings. Gladys
   // does not record which mode preceded the panic, so it is remembered here. A bridge restart
-  // forgets it, and away is then the assumption: it is the stricter of the two.
+  // forgets it, and away is then the assumption: it is the strictest of the three.
   let lastArmedTarget = HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM;
 
   const targetStateCharacteristic = service.getCharacteristic(Characteristic.SecuritySystemTargetState);
@@ -99,9 +99,11 @@ function buildAlarmAccessory(house) {
       if (value === HOMEKIT_SECURITY_SYSTEM_STATE.DISARMED) {
         await this.gladys.house.disarm(house.selector);
       } else if (value === HOMEKIT_SECURITY_SYSTEM_STATE.STAY_ARM) {
-        await this.gladys.house.partialArm(house.selector);
+        await this.gladys.house.arm(house.selector, ALARM_MODES.PRESENCE_ARMED);
+      } else if (value === HOMEKIT_SECURITY_SYSTEM_STATE.NIGHT_ARM) {
+        await this.gladys.house.arm(house.selector, ALARM_MODES.NIGHT_ARMED);
       } else if (value === HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM) {
-        await this.gladys.house.arm(house.selector);
+        await this.gladys.house.arm(house.selector, ALARM_MODES.AWAY_ARMED);
       }
 
       // What the house is armed with is what it goes back to showing once the siren stops.

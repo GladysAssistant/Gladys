@@ -894,18 +894,15 @@ const actionsFunc = {
     }
   },
   [ACTIONS.ALARM.SET_ALARM_MODE]: async (self, action) => {
-    if (action.alarm_mode === ALARM_MODES.ARMED) {
-      await self.house.arm(action.house, true);
-    }
     if (action.alarm_mode === ALARM_MODES.DISARMED) {
       await self.house.disarm(action.house);
+      return;
     }
-    if (action.alarm_mode === ALARM_MODES.PARTIALLY_ARMED) {
-      await self.house.partialArm(action.house);
-    }
-    if (action.alarm_mode === ALARM_MODES.PANIC) {
-      await self.house.panic(action.house);
-    }
+    // A scene arms right away: the delay before arming exists to let someone walk out.
+    await self.house.arm(action.house, action.alarm_mode, true);
+  },
+  [ACTIONS.ALARM.TRIGGER_PANIC]: async (self, action) => {
+    await self.house.panic(action.house);
   },
   [ACTIONS.MQTT.SEND]: (self, action, scope) => {
     const mqttService = self.service.getService('mqtt');

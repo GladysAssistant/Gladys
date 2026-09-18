@@ -8,6 +8,14 @@ import actions from '../../actions/dashboard';
 import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
 
+// Any of the three arming modes locks the tablets of the house, so all three send the user back
+// to the code screen.
+const ARMED_WEBSOCKET_TYPES = [
+  WEBSOCKET_MESSAGE_TYPES.ALARM.PRESENCE_ARMED,
+  WEBSOCKET_MESSAGE_TYPES.ALARM.NIGHT_ARMED,
+  WEBSOCKET_MESSAGE_TYPES.ALARM.AWAY_ARMED
+];
+
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
     this.setState(prevState => {
@@ -251,7 +259,7 @@ class Dashboard extends Component {
     route(`/locked${window.location.search}`);
   };
 
-  alarmArmedOrPartiallyArmed = async () => {
+  alarmArmed = async () => {
     // Check server side if we are in tablet mode
     try {
       const currentSession = await this.props.httpClient.get('/api/v1/session/tablet_mode');
@@ -299,11 +307,7 @@ class Dashboard extends Component {
     document.addEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('mozfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('click', this.closeDashboardDropdown, true);
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmedOrPartiallyArmed);
-    this.props.session.dispatcher.addListener(
-      WEBSOCKET_MESSAGE_TYPES.ALARM.PARTIALLY_ARMED,
-      this.alarmArmedOrPartiallyArmed
-    );
+    ARMED_WEBSOCKET_TYPES.forEach(type => this.props.session.dispatcher.addListener(type, this.alarmArmed));
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
     this.checkIfFullScreenParameterIsHere();
@@ -357,11 +361,7 @@ class Dashboard extends Component {
     document.removeEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('mozfullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('click', this.closeDashboardDropdown, true);
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmedOrPartiallyArmed);
-    this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.ALARM.PARTIALLY_ARMED,
-      this.alarmArmedOrPartiallyArmed
-    );
+    ARMED_WEBSOCKET_TYPES.forEach(type => this.props.session.dispatcher.removeListener(type, this.alarmArmed));
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
   }

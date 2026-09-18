@@ -257,10 +257,11 @@ describe('session.setTabletMode', () => {
 
 describe('session.getTabletMode', () => {
   const cache = new Cache();
-  it('should get tablet mode with has_alarm_code false when alarm_code is null', async () => {
-    const session = new Session('secret', cache);
-    // Ensure house has no alarm_code
-    await db.House.update({ alarm_code: null }, { where: { id: 'a741dfa6-24de-4b46-afc7-370772f068d5' } });
+  // Codes belong to people, not to houses: one active code anywhere unlocks the tablets.
+  const noAlarmCode = { existsActive: () => Promise.resolve(false) };
+  const oneAlarmCode = { existsActive: () => Promise.resolve(true) };
+  it('should get tablet mode with has_alarm_code false when no alarm code exists', async () => {
+    const session = new Session('secret', cache, noAlarmCode);
     await session.setTabletMode(
       '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       'ada07710-5f25-4510-ac63-b002aca3bd32',
@@ -275,10 +276,8 @@ describe('session.getTabletMode', () => {
     expect(oneSession).to.have.property('current_house_id', 'a741dfa6-24de-4b46-afc7-370772f068d5');
     expect(oneSession).to.have.property('has_alarm_code', false);
   });
-  it('should get tablet mode with has_alarm_code true when alarm_code is set', async () => {
-    const session = new Session('secret', cache);
-    // Set alarm_code on the house
-    await db.House.update({ alarm_code: '1234' }, { where: { id: 'a741dfa6-24de-4b46-afc7-370772f068d5' } });
+  it('should get tablet mode with has_alarm_code true when an alarm code exists', async () => {
+    const session = new Session('secret', cache, oneAlarmCode);
     await session.setTabletMode(
       '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       'ada07710-5f25-4510-ac63-b002aca3bd32',
@@ -292,11 +291,9 @@ describe('session.getTabletMode', () => {
     expect(oneSession).to.have.property('tablet_mode', true);
     expect(oneSession).to.have.property('current_house_id', 'a741dfa6-24de-4b46-afc7-370772f068d5');
     expect(oneSession).to.have.property('has_alarm_code', true);
-    // Reset alarm_code
-    await db.House.update({ alarm_code: null }, { where: { id: 'a741dfa6-24de-4b46-afc7-370772f068d5' } });
   });
-  it('should get tablet mode with has_alarm_code false when no current_house_id', async () => {
-    const session = new Session('secret', cache);
+  it('should get tablet mode with no current_house_id', async () => {
+    const session = new Session('secret', cache, noAlarmCode);
     await session.setTabletMode(
       '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       'ada07710-5f25-4510-ac63-b002aca3bd32',

@@ -40,6 +40,7 @@ import EcowattCondition from './actions/EcowattCondition';
 import SendMessageCameraParams from './actions/SendMessageCameraParams';
 import CheckAlarmMode from './actions/CheckAlarmMode';
 import SetAlarmMode from './actions/SetAlarmMode';
+import TriggerPanic from './actions/TriggerPanic';
 import SendMqttMessage from './actions/SendMqttMessage';
 import SendZigbee2MqttMessage from './actions/SendZigbee2MqttMessage';
 import PlayNotification from './actions/PlayNotification';
@@ -80,6 +81,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.EDF_TEMPO.CONDITION]: EdfTempoCondition,
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: CheckAlarmMode,
   [ACTIONS.ALARM.SET_ALARM_MODE]: SetAlarmMode,
+  [ACTIONS.ALARM.TRIGGER_PANIC]: TriggerPanic,
   [ACTIONS.MQTT.SEND]: SendMqttMessage,
   [ACTIONS.ZIGBEE2MQTT.SEND]: SendZigbee2MqttMessage,
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
