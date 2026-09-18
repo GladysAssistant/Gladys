@@ -1,6 +1,7 @@
 import get from 'get-value';
 
 import { ACTIONS, EVENTS } from '../../../../../server/utils/constants';
+import { isWildcardValue } from './sceneIntegrations';
 
 const truncate = (text, maxLength = 60) => {
   if (typeof text !== 'string') {
@@ -16,6 +17,18 @@ const truncate = (text, maxLength = 60) => {
 const joinParts = parts => {
   const filtered = parts.filter(part => part !== null && part !== undefined && part !== '');
   return filtered.length > 0 ? filtered.join(' · ') : null;
+};
+
+// The filled parameters of an integration-declared step ("camera: front,
+// label: person, car"), the wildcards left out
+const listDeclaredFields = fields => {
+  if (!fields || typeof fields !== 'object') {
+    return null;
+  }
+  const parts = Object.keys(fields)
+    .filter(key => !isWildcardValue(fields[key]))
+    .map(key => `${key}: ${Array.isArray(fields[key]) ? fields[key].join(', ') : fields[key]}`);
+  return parts.length > 0 ? truncate(parts.join(' · ')) : null;
 };
 
 const listSelectors = selectors => {
@@ -53,6 +66,8 @@ const getActionSummary = (action, dictionary) => {
     case ACTIONS.MQTT.SEND:
     case ACTIONS.ZIGBEE2MQTT.SEND:
       return truncate(action.topic);
+    case ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION:
+      return listDeclaredFields(action.fields);
     case ACTIONS.HTTP.REQUEST:
       return joinParts([action.method ? String(action.method).toUpperCase() : null, truncate(action.url)]);
     case ACTIONS.SCENE.START:
@@ -205,6 +220,8 @@ const getTriggerSummary = (trigger, dictionary) => {
     case EVENTS.WEATHER.ALERT_RAISED:
     case EVENTS.WEATHER.ALERT_ENDED:
       return joinParts([trigger.house, trigger.weather_alert_type]);
+    case EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT:
+      return listDeclaredFields(trigger.fields);
     default:
       return null;
   }

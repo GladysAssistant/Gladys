@@ -38,6 +38,13 @@ const {
   MAX_WIDGET_SETTINGS,
   WIDGET_SETTINGS_FIELD_TYPES,
   CAPABILITY_MANIFEST_FIELDS,
+  MAX_SCENE_DECLARATIONS,
+  MAX_SCENE_DECLARATION_KEY_LENGTH,
+  MAX_SCENE_DECLARATION_FIELDS,
+  MAX_SCENE_DECLARATION_VARIABLES,
+  SCENE_TRIGGER_FIELD_TYPES,
+  SCENE_ACTION_FIELD_TYPES,
+  SCENE_VARIABLE_TYPES,
 } = require('./constants');
 
 // These rules are the exact mirror of the canonical manifest schema owned by
@@ -70,6 +77,8 @@ const MANIFEST_FIELDS = [
   'messaging',
   'contact_schema',
   'widgets',
+  'scene_triggers',
+  'scene_actions',
 ];
 // Browse categories of the catalog (docs/specs/integration-catalog-
 // categories.md §6.2), validated in two ordered stages: the SHAPE (1..3
@@ -106,6 +115,26 @@ const ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields
 // widgets.md, section 1): identity + per-instance settings, the content
 // itself is produced at runtime over widget.get
 const WIDGET_FIELDS = ['key', 'label', 'description', 'icon', 'settings', 'action_timeout_seconds'];
+// scene triggers and actions declared for the scene editor: the filters /
+// parameters reuse the config_schema field format with a restricted type
+// list, the variables / outputs are the only data exchanged with a scene
+const SCENE_TRIGGER_FIELDS = ['key', 'label', 'description', 'fields', 'variables'];
+const SCENE_ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields', 'outputs'];
+const SCENE_VARIABLE_FIELDS = ['key', 'type', 'label', 'description'];
+const SCENE_DECLARATION_KINDS = {
+  trigger: {
+    listName: 'scene_triggers',
+    entryFields: SCENE_TRIGGER_FIELDS,
+    fieldTypes: SCENE_TRIGGER_FIELD_TYPES,
+    variablesName: 'variables',
+  },
+  action: {
+    listName: 'scene_actions',
+    entryFields: SCENE_ACTION_FIELDS,
+    fieldTypes: SCENE_ACTION_FIELD_TYPES,
+    variablesName: 'outputs',
+  },
+};
 // inbound webhooks via Gladys Plus (B.17): shown on the install screen
 // ("will be able to receive events from the Internet via Gladys Plus")
 const WEBHOOK_FIELDS = ['key', 'label', 'mode'];
@@ -569,6 +598,22 @@ function rejectWidgetSettingsPortPlaceholders(value, path, errors) {
 }
 
 /**
+ * @description Reject the {{port:<name>}} placeholders of a scene trigger /
+ * action section: the scene editor never loads the container detail that
+ * resolves them (the same reason the contact_schema refuses them).
+ * @param {object} value - The multi-language text to scan.
+ * @param {string} path - The path of the field, for error messages.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * rejectScenePortPlaceholders({ en: '{{port:ocpp}}' }, 'scene_triggers[0].fields[0].label', errors);
+ */
+function rejectScenePortPlaceholders(value, path, errors) {
+  forEachPortPlaceholder(value, (name, language) => {
+    errors.push(`${path}.${language}: {{port:${name}}} is not available in the scene editor`);
+  });
+}
+
+/**
  * @description Validate one entry of the manifest widgets list: a dashboard
  * widget declared by the integration. The manifest holds its identity (key,
  * label, description, icon), its per-instance settings (the config_schema
@@ -637,6 +682,132 @@ function validateWidget(widget, index, seenKeys, errors, declaredPortNames) {
     ) {
       errors.push(
         `${path}.action_timeout_seconds: must be an integer between ${ACTION_MIN_TIMEOUT_SECONDS} and ${ACTION_MAX_TIMEOUT_SECONDS}`,
+      );
+    }
+  }
+}
+
+/**
+ * @description Validate one variable (of a scene trigger) or output (of a
+ * scene action): the only data a scene reads from an integration, scalars
+ * only — an identifier, a count, a short text; never an image or a file.
+ * @param {object} variable - The variable to validate.
+ * @param {string} path - The path of the entry, for error messages.
+ * @param {Set} seenKeys - Keys already seen in the list, to detect duplicates.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateSceneVariable({ key: 'label', type: 'string', label: { en: 'Object' } }, 'scene_triggers[0]', seen, errors);
+ */
+function validateSceneVariable(variable, path, seenKeys, errors) {
+  if (variable === null || typeof variable !== 'object' || Array.isArray(variable)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  Object.keys(variable).forEach((key) => {
+    if (!SCENE_VARIABLE_FIELDS.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
+  if (typeof variable.key !== 'string' || !CONFIG_KEY_REGEX.test(variable.key)) {
+    errors.push(`${path}.key: must be a non-empty string matching [a-z0-9_]`);
+  } else if (seenKeys.has(variable.key)) {
+    errors.push(`${path}.key: duplicate key "${variable.key}"`);
+  } else {
+    seenKeys.add(variable.key);
+  }
+  if (!SCENE_VARIABLE_TYPES.includes(variable.type)) {
+    errors.push(`${path}.type: must be one of ${SCENE_VARIABLE_TYPES.join(', ')}`);
+  }
+  validateMultiLanguageText(variable.label, `${path}.label`, errors);
+  if (variable.description !== undefined) {
+    validateMultiLanguageText(variable.description, `${path}.description`, errors);
+  }
+}
+
+/**
+ * @description Validate one entry of the scene_triggers / scene_actions
+ * lists: a trigger or an action of the scene editor, declared once in the
+ * manifest and rendered by the core. The filters (trigger) / parameters
+ * (action) reuse the config_schema field format with a restricted type list:
+ * no secret (a scene JSON is readable by every user), no account linking
+ * (integration-scoped), no boolean trigger filter (it could never express
+ * "any"), no {{port:<name>}} in sections. A published key is never renamed:
+ * the scenes store it.
+ * @param {object} entry - The declaration to validate.
+ * @param {number} index - Index of the entry in the list.
+ * @param {Set} seenKeys - Keys already seen in the list, to detect duplicates.
+ * @param {Array} errors - The array of errors to push to.
+ * @param {Set} declaredPortNames - Port names declared in the manifest.
+ * @param {string} kind - 'trigger' or 'action'.
+ * @example
+ * validateSceneDeclaration({ key: 'object_detected', label: { en: 'Detected' } }, 0, seen, errors, ports, 'trigger');
+ */
+function validateSceneDeclaration(entry, index, seenKeys, errors, declaredPortNames, kind) {
+  const { listName, entryFields, fieldTypes, variablesName } = SCENE_DECLARATION_KINDS[kind];
+  const path = `${listName}[${index}]`;
+  if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  Object.keys(entry).forEach((key) => {
+    if (!entryFields.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
+  if (
+    typeof entry.key !== 'string' ||
+    !CONFIG_KEY_REGEX.test(entry.key) ||
+    entry.key.length > MAX_SCENE_DECLARATION_KEY_LENGTH
+  ) {
+    errors.push(`${path}.key: must be a string of 1-${MAX_SCENE_DECLARATION_KEY_LENGTH} characters matching [a-z0-9_]`);
+  } else if (seenKeys.has(entry.key)) {
+    errors.push(`${path}.key: duplicate key "${entry.key}"`);
+  } else {
+    seenKeys.add(entry.key);
+  }
+  validateMultiLanguageText(entry.label, `${path}.label`, errors);
+  if (entry.description !== undefined) {
+    validateMultiLanguageText(entry.description, `${path}.description`, errors);
+  }
+  if (entry.timeout_seconds !== undefined) {
+    if (
+      !Number.isInteger(entry.timeout_seconds) ||
+      entry.timeout_seconds < ACTION_MIN_TIMEOUT_SECONDS ||
+      entry.timeout_seconds > ACTION_MAX_TIMEOUT_SECONDS
+    ) {
+      errors.push(
+        `${path}.timeout_seconds: must be an integer between ${ACTION_MIN_TIMEOUT_SECONDS} and ${ACTION_MAX_TIMEOUT_SECONDS}`,
+      );
+    }
+  }
+  if (entry.fields !== undefined) {
+    if (!Array.isArray(entry.fields) || entry.fields.length > MAX_SCENE_DECLARATION_FIELDS) {
+      errors.push(`${path}.fields: must be an array of at most ${MAX_SCENE_DECLARATION_FIELDS} fields`);
+    } else {
+      const seenFieldKeys = new Set();
+      entry.fields.forEach((field, fieldIndex) => {
+        const fieldPath = `${path}.fields[${fieldIndex}]`;
+        // same format and rules as the config_schema, the type restriction on
+        // top — no second engine
+        validateConfigField(field, fieldIndex, seenFieldKeys, errors, `${path}.fields`, declaredPortNames);
+        if (field && CONFIG_FIELD_TYPES.includes(field.type) && !fieldTypes.includes(field.type)) {
+          errors.push(`${fieldPath}.type: must be one of ${fieldTypes.join(', ')} in a scene ${kind}`);
+        }
+        if (field && field.type === 'section') {
+          rejectScenePortPlaceholders(field.label, `${fieldPath}.label`, errors);
+          rejectScenePortPlaceholders(field.description, `${fieldPath}.description`, errors);
+        }
+      });
+    }
+  }
+  const variables = entry[variablesName];
+  if (variables !== undefined) {
+    if (!Array.isArray(variables) || variables.length > MAX_SCENE_DECLARATION_VARIABLES) {
+      errors.push(`${path}.${variablesName}: must be an array of at most ${MAX_SCENE_DECLARATION_VARIABLES} entries`);
+    } else {
+      const seenVariableKeys = new Set();
+      variables.forEach((variable, variableIndex) =>
+        validateSceneVariable(variable, `${path}.${variablesName}[${variableIndex}]`, seenVariableKeys, errors),
       );
     }
   }
@@ -1073,6 +1244,22 @@ function validateManifest(manifest) {
       );
     }
   }
+  ['trigger', 'action'].forEach((kind) => {
+    const { listName } = SCENE_DECLARATION_KINDS[kind];
+    const declarations = manifest[listName];
+    if (declarations === undefined) {
+      return;
+    }
+    if (!Array.isArray(declarations) || declarations.length === 0 || declarations.length > MAX_SCENE_DECLARATIONS) {
+      errors.push(`${listName}: must be a list of 1-${MAX_SCENE_DECLARATIONS} entries`);
+      return;
+    }
+    // triggers and actions are two namespaces: a key may exist in both
+    const seenKeys = new Set();
+    declarations.forEach((entry, index) =>
+      validateSceneDeclaration(entry, index, seenKeys, errors, declaredPortNames, kind),
+    );
+  });
   if (manifest.type === PROVIDER_TYPE) {
     // a provider providing nothing has no contract at all: explicit error
     const declaresCapability = CAPABILITY_MANIFEST_FIELDS.some((field) => manifest[field] !== undefined);

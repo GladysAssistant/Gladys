@@ -118,6 +118,9 @@ const { installFromRepoUrl } = require('./store/store.installFromRepoUrl');
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 const { wakeOnLan } = require('./externalIntegration.wakeOnLan');
+const { publishSceneEvent } = require('./externalIntegration.publishSceneEvent');
+const { runSceneAction } = require('./externalIntegration.runSceneAction');
+const { getSceneDeclarations } = require('./externalIntegration.getSceneDeclarations');
 
 /**
  * @description External integration supervisor: complete lifecycle of the
@@ -189,6 +192,12 @@ const ExternalIntegration = function ExternalIntegration(
   this.cameraImageRateLimits = new Map();
   // serviceId -> timestamp of the last accepted weather freshness nudge
   this.weatherRefreshTimes = new Map();
+  // serviceId -> { count, resetAt } rate limit on POST /scene/event, a
+  // counter separate from the states'
+  this.sceneEventRateLimits = new Map();
+  // serviceId -> number of scene actions in flight (reserved before any
+  // connection wait, released on every terminal outcome)
+  this.pendingSceneActions = new Map();
   // dashboard widgets declared by integrations (capabilities/dashboard-
   // widgets.md): per-integration caches and counters, all keyed by service
   // id and dropped in full on stop / update / uninstall (clearWidgetCaches)
@@ -348,5 +357,8 @@ ExternalIntegration.prototype.fetchManifestFromRepo = fetchManifestFromRepo;
 ExternalIntegration.prototype.installFromStore = installFromStore;
 ExternalIntegration.prototype.installFromRepoUrl = installFromRepoUrl;
 ExternalIntegration.prototype.wakeOnLan = wakeOnLan;
+ExternalIntegration.prototype.publishSceneEvent = publishSceneEvent;
+ExternalIntegration.prototype.runSceneAction = runSceneAction;
+ExternalIntegration.prototype.getSceneDeclarations = getSceneDeclarations;
 
 module.exports = ExternalIntegration;

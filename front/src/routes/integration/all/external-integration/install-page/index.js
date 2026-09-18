@@ -12,6 +12,7 @@ import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
 import WebhooksSummary from '../components/WebhooksSummary';
+import SceneDeclarationsSummary from '../components/SceneDeclarationsSummary';
 import WidgetsSummary from '../components/WidgetsSummary';
 import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -281,6 +282,11 @@ class ExternalIntegrationInstallPage extends Component {
                             )}
 
                             <WebhooksSummary webhooks={manifest.webhooks} language={language} />
+                            <SceneDeclarationsSummary
+                              sceneTriggers={manifest.scene_triggers}
+                              sceneActions={manifest.scene_actions}
+                              language={language}
+                            />
 
                             <WidgetsSummary widgets={manifest.widgets} language={language} />
 

@@ -362,6 +362,16 @@
   color: #5f6877;
 }
 
+.typePickerIconTeal {
+  background-color: #d9f2ef;
+  color: #23837a;
+}
+
+.typePickerOptionSubtitle {
+  font-size: 0.75rem;
+  color: #6e7687;
+}
+
 .typePickerOptionText {
   display: flex;
   flex-direction: column;

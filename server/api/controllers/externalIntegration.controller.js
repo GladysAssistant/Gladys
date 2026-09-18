@@ -130,6 +130,27 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/external_integration/scene getSceneDeclarations
+   * @apiName getSceneDeclarations
+   * @apiGroup ExternalIntegration
+   * @apiDescription The scene triggers and actions declared by the installed
+   * integrations, for the scene editor. Open to every authenticated user:
+   * the editor is reachable by every role (only saving is admin) and the
+   * payload carries nothing operational.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "integrations": [
+   *     { "selector": "ext-frigate", "name": "Frigate",
+   *       "status": "RUNNING", "scene_triggers": [ ], "scene_actions": [ ] }
+   *   ]
+   * }
+   */
+  async function getSceneDeclarations(req, res) {
+    const integrations = await gladys.externalIntegration.getSceneDeclarations();
+    res.json({ integrations });
+  }
+
+  /**
    * @api {get} /api/v1/external_integration/:selector getBySelector
    * @apiName getBySelector
    * @apiGroup ExternalIntegration
@@ -608,6 +629,7 @@ module.exports = function ExternalIntegrationController(gladys) {
   return Object.freeze({
     getAll: asyncMiddleware(getAll),
     getBySelector: asyncMiddleware(getBySelector),
+    getSceneDeclarations: asyncMiddleware(getSceneDeclarations),
     getHardware: asyncMiddleware(getHardware),
     setHardware: asyncMiddleware(setHardware),
     getStore: asyncMiddleware(getStore),

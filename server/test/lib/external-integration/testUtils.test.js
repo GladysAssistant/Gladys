@@ -207,6 +207,74 @@ const TEST_CONTAINERS_MANIFEST = {
   ],
 };
 
+// Frigate-like fixture declaring one scene trigger (filters on a device and
+// on an enum, an optional free text, three exposed variables — `camera` is
+// deliberately NOT a variable, so the whitelist rule is visible) and one
+// scene action (a device parameter, a templated caption, a boolean, a
+// select, a defaulted number, one scalar output).
+const TEST_SCENE_MANIFEST = {
+  ...TEST_MANIFEST,
+  name: 'Frigate Demo',
+  scene_triggers: [
+    {
+      key: 'object_detected',
+      label: { en: 'Object detected', fr: 'Objet détecté' },
+      description: { en: 'Frigate detected an object on a camera.' },
+      fields: [
+        { key: 'intro', type: 'section', label: { en: 'Zones are the names configured in Frigate' } },
+        { key: 'camera', type: 'select', source: 'devices', label: { en: 'Camera' }, required: true },
+        {
+          key: 'label',
+          type: 'multi_select',
+          label: { en: 'Object types' },
+          options: [
+            { value: 'person', label: { en: 'Person' } },
+            { value: 'car', label: { en: 'Car' } },
+          ],
+        },
+        { key: 'zone', type: 'string', label: { en: 'Zone' } },
+        { key: 'min_score', type: 'number', label: { en: 'Minimal score' } },
+      ],
+      variables: [
+        { key: 'label', type: 'string', label: { en: 'Object type' } },
+        { key: 'zone', type: 'string', label: { en: 'Zone' } },
+        { key: 'score', type: 'number', label: { en: 'Confidence' } },
+        { key: 'moving', type: 'boolean', label: { en: 'Moving' } },
+      ],
+    },
+    { key: 'doorbell_pressed', label: { en: 'Doorbell pressed' } },
+  ],
+  scene_actions: [
+    {
+      key: 'create_snapshot',
+      label: { en: 'Take a snapshot', fr: 'Prendre un instantané' },
+      timeout_seconds: 20,
+      fields: [
+        { key: 'intro', type: 'section', label: { en: 'Snapshot options' } },
+        { key: 'camera', type: 'select', source: 'devices', label: { en: 'Camera' }, required: true },
+        { key: 'caption', type: 'string', label: { en: 'Caption' } },
+        { key: 'hd', type: 'boolean', label: { en: 'HD' } },
+        {
+          key: 'format',
+          type: 'select',
+          label: { en: 'Format' },
+          options: [
+            { value: 'jpg', label: { en: 'JPEG' } },
+            { value: '{{png}}', label: { en: 'Odd value' } },
+          ],
+        },
+        { key: 'quality', type: 'number', label: { en: 'Quality' }, default: 80, min: 1, max: 100 },
+      ],
+      outputs: [
+        { key: 'clip_id', type: 'string', label: { en: 'Clip identifier' } },
+        { key: 'count', type: 'number', label: { en: 'Objects count' } },
+        { key: 'ok', type: 'boolean', label: { en: 'Success' } },
+      ],
+    },
+    { key: 'echo', label: { en: 'Echo' } },
+  ],
+};
+
 const TEST_DETECTED_CLASSES = [
   { class: 'coral-usb', detected: true, paths: ['/dev/bus/usb'] },
   { class: 'coral-pcie', detected: false, paths: [] },
@@ -340,6 +408,7 @@ module.exports = {
   TEST_PROVIDER_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
+  TEST_SCENE_MANIFEST,
   TEST_DETECTED_CLASSES,
   buildFakeSystem,
   buildSupervisor,

@@ -7,6 +7,7 @@ const {
   COMPARISON_OPERATORS,
   ANY_CHANGE_OPERATOR,
 } = require('../../../utils/constants');
+const { MAX_SCENE_DECLARATION_FIELDS } = require('../../../lib/external-integration/constants');
 
 const hhmmPattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const weekDaysSchema = z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
@@ -34,7 +35,23 @@ const SCENE_TRIGGER_TYPES = new Set([
   EVENTS.SYSTEM.START,
   EVENTS.MQTT.RECEIVED,
   EVENTS.CALENDAR.EVENT_IS_COMING,
+  EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT,
 ]);
+
+// Integration-declared scene triggers and actions: the declared key and the
+// values of the filters (trigger) / parameters (action), the exact shape
+// rules of the scene model (models/scene.js) so the assistant never builds a
+// scene the persistence rejects
+const sceneDeclarationKeySchema = z.string().regex(/^[a-z0-9_]+$/);
+const sceneDeclarationFieldsSchema = z
+  .record(
+    sceneDeclarationKeySchema,
+    z.union([z.string(), z.number(), z.boolean(), z.null(), z.array(z.union([z.string(), z.number()]))]),
+  )
+  .refine((fields) => Object.keys(fields).length <= MAX_SCENE_DECLARATION_FIELDS, {
+    message: `at most ${MAX_SCENE_DECLARATION_FIELDS} fields`,
+  })
+  .optional();
 
 /**
  * @description Flatten nested scene actions into a single list.
@@ -342,6 +359,11 @@ function createSceneCreateInputSchema(
         topic: z.string(),
         message: z.string(),
       }),
+      actionSchemaByType(ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, {
+        integration: z.string(),
+        action_key: sceneDeclarationKeySchema,
+        fields: sceneDeclarationFieldsSchema,
+      }),
       actionSchemaByType(ACTIONS.MUSIC.PLAY_NOTIFICATION, {
         device: musicNotificationDevicesSchema,
         text: z.string(),
@@ -573,6 +595,11 @@ function createSceneCreateInputSchema(
     triggerSchemaByType(EVENTS.MQTT.RECEIVED, {
       topic: z.string(),
       message: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT, {
+      integration: z.string(),
+      trigger_key: sceneDeclarationKeySchema,
+      fields: sceneDeclarationFieldsSchema,
     }),
     triggerSchemaByType(EVENTS.CALENDAR.EVENT_IS_COMING, {
       calendar_event_attribute: triggerCalendarEventAttributeSchema,

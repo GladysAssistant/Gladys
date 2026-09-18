@@ -181,6 +181,7 @@ class ConditionIfElseThen extends Component {
                   triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
                   scene={props.scene}
+                  sceneIntegrations={props.sceneIntegrations}
                   lastActionGroup={index === props.action.then.length - 1}
                 />
               ))}
@@ -235,6 +236,7 @@ class ConditionIfElseThen extends Component {
                   triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
                   scene={props.scene}
+                  sceneIntegrations={props.sceneIntegrations}
                   lastActionGroup={index === props.action.else.length - 1}
                 />
               ))}

@@ -1,7 +1,13 @@
 const { expect } = require('chai');
 
 const { Error422 } = require('../../../utils/httpErrors');
-const { buildSupervisor, TEST_MANIFEST, TEST_WIDGET_MANIFEST, TEST_PROVIDER_MANIFEST } = require('./testUtils.test');
+const {
+  buildSupervisor,
+  TEST_MANIFEST,
+  TEST_WIDGET_MANIFEST,
+  TEST_PROVIDER_MANIFEST,
+  TEST_SCENE_MANIFEST,
+} = require('./testUtils.test');
 
 describe('externalIntegration.validateManifest — widgets and provider type', () => {
   let externalIntegration;
@@ -35,9 +41,23 @@ describe('externalIntegration.validateManifest — widgets and provider type', (
     expect(externalIntegration.validateManifest(TEST_PROVIDER_MANIFEST)).to.deep.equal(TEST_PROVIDER_MANIFEST);
   });
 
+  it('should accept a provider manifest declaring only scene triggers or actions', () => {
+    // scene declarations are capability fields too: an event source with no
+    // device surface (a Frigate-like "events only" bridge) is a provider
+    const { widgets, ...providerWithoutWidgets } = TEST_PROVIDER_MANIFEST;
+    const triggersOnly = { ...providerWithoutWidgets, scene_triggers: TEST_SCENE_MANIFEST.scene_triggers };
+    expect(externalIntegration.validateManifest(triggersOnly)).to.deep.equal(triggersOnly);
+    const actionsOnly = { ...providerWithoutWidgets, scene_actions: TEST_SCENE_MANIFEST.scene_actions };
+    expect(externalIntegration.validateManifest(actionsOnly)).to.deep.equal(actionsOnly);
+    expect(widgets).to.be.an('array');
+  });
+
   it('should reject a provider manifest declaring no capability', () => {
     const { widgets, ...manifest } = TEST_PROVIDER_MANIFEST;
-    expect422(manifest, 'type: a provider integration must declare at least one capability field (widgets)');
+    expect422(
+      manifest,
+      'type: a provider integration must declare at least one capability field (widgets, scene_triggers, scene_actions)',
+    );
   });
 
   it('should reject a widgets list that is empty or too long', () => {
