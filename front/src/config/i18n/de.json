@@ -5453,6 +5453,21 @@
           "other": "Kein Wert empfangen",
           "zero": "Kein Rauch",
           "one": "Rauch erkannt"
+        },
+        "contamination-state": {
+          "0": "Sauber",
+          "1": "Leicht verschmutzt",
+          "2": "Mittel verschmutzt",
+          "3": "Stark verschmutzt",
+          "unknown": "{{value}} (unbekannt)"
+        },
+        "muted": {
+          "0": "Kann auslösen",
+          "1": "Stummgeschaltet"
+        },
+        "temporary-mute": {
+          "0": "Auslösen lassen",
+          "1": "Alarm stummschalten"
         }
       },
       "co-sensor": {
@@ -5752,7 +5767,10 @@
     "smoke-sensor": {
       "shortCategoryName": "Rauchsensor",
       "binary": "Rauch (an/aus)",
-      "decimal": "Dichte (dezimal)"
+      "decimal": "Dichte (dezimal)",
+      "contamination-state": "Verschmutzung",
+      "muted": "Stummgeschaltet",
+      "temporary-mute": "Alarm stummschalten"
     },
     "co-sensor": {
       "shortCategoryName": "Kohlenmonoxid (CO)-Sensor",

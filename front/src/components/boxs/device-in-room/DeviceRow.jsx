@@ -96,6 +96,10 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.FAN]: {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
   },
+  [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: {
+    // Hushing the detector's siren is a plain on/off control
+    [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE]: BinaryDeviceFeature
+  },
   [DEVICE_FEATURE_CATEGORIES.CAMERA]: {
     // The "enabled" gate is a plain on/off control (docs/specs/camera-enable-disable.md)
     [DEVICE_FEATURE_TYPES.CAMERA.ENABLED]: BinaryDeviceFeature,

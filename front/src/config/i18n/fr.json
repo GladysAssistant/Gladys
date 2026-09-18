@@ -5453,6 +5453,21 @@
           "other": "Aucune valeur reçue",
           "zero": "Sain",
           "one": "Fumée détectée"
+        },
+        "contamination-state": {
+          "0": "Propre",
+          "1": "Légèrement encrassée",
+          "2": "Moyennement encrassée",
+          "3": "Fortement encrassée",
+          "unknown": "{{value}} (inconnu)"
+        },
+        "muted": {
+          "0": "Peut sonner",
+          "1": "Alarme coupée"
+        },
+        "temporary-mute": {
+          "0": "Laisser sonner",
+          "1": "Couper l'alarme"
         }
       },
       "co-sensor": {
@@ -5752,7 +5767,10 @@
     "smoke-sensor": {
       "shortCategoryName": "Détecteur de fumée",
       "binary": "Capteur de fumée - Oui/Non",
-      "decimal": "Valeur de fumée décimale"
+      "decimal": "Valeur de fumée décimale",
+      "contamination-state": "Encrassement du détecteur",
+      "muted": "Alarme coupée",
+      "temporary-mute": "Couper l'alarme"
     },
     "co-sensor": {
       "shortCategoryName": "Capteur de monoxyde de carbone (CO)",
