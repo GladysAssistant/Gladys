@@ -4780,6 +4780,7 @@
     "watt-hour": "Watt hour (Wh)",
     "kilowatt-hour": "Kilowatt hour (kWh)",
     "megawatt-hour": "Megawatt hour (MWh)",
+    "gram-co2eq-per-kilowatt-hour": "Gram of CO₂ equivalent per kilowatt hour (gCO₂eq/kWh)",
     "ampere": "Ampere (A)",
     "milliampere": "Milliampere (mA)",
     "millivolt": "Millivolt (mV)",
@@ -4877,6 +4878,7 @@
     "watt-hour": "Wh",
     "kilowatt-hour": "kWh",
     "megawatt-hour": "MWh",
+    "gram-co2eq-per-kilowatt-hour": "gCO₂eq/kWh",
     "ampere": "A",
     "milliampere": "mA",
     "millivolt": "mV",
@@ -5979,6 +5981,12 @@
       "daily-production-revenue": "Daily Revenue",
       "thirty-minutes-production": "30 Minutes Production",
       "thirty-minutes-production-revenue": "30 Minutes Revenue"
+    },
+    "grid-carbon-sensor": {
+      "shortCategoryName": "Grid carbon sensor",
+      "carbon-intensity": "Grid carbon intensity",
+      "carbon-free-percentage": "Carbon-free electricity",
+      "renewable-percentage": "Renewable electricity"
     },
     "grid-sensor": {
       "shortCategoryName": "Grid sensor",

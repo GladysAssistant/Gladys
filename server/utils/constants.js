@@ -877,6 +877,16 @@ const DEVICE_FEATURE_CATEGORIES = {
   ENERGY_SENSOR: 'energy-sensor',
   ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
   FAN: 'fan',
+  // Carbon content of the electricity DELIVERED BY THE GRID of a zone, as published by a grid data
+  // provider (national TSO, Electricity Maps, WattTime...) or broadcast in the premises by a device
+  // implementing the Matter Electrical Grid Conditions cluster. It describes the electricity, not
+  // the appliance: the energy a device imports or exports stays in `grid-sensor`.
+  // Behind-the-meter ("local") carbon intensity - the grid mix blended with the local generation -
+  // is a different quantity, not published yet because no integration reports it. When one does, it
+  // becomes a `local-carbon-intensity` TYPE of this category, never a separate category: Matter
+  // carries both in the same struct (GridCarbonIntensity and LocalCarbonIntensity), and the
+  // category name mirrors that cluster's own grid-first naming, so adding it renames nothing.
+  GRID_CARBON_SENSOR: 'grid-carbon-sensor',
   GRID_SENSOR: 'grid-sensor',
   HEATER: 'heater',
   HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
@@ -1148,6 +1158,30 @@ const DEVICE_FEATURE_TYPES = {
     DAILY_PRODUCTION_REVENUE: 'daily-production-revenue',
     THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
     THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
+  },
+  // Carbon content of the grid electricity of a zone. `carbon-intensity` mirrors the Matter
+  // Electrical Grid Conditions cluster (0x00A0) GridCarbonIntensity attribute, in grams of CO2
+  // equivalent per kWh consumed. The two shares describe the generation mix behind it: Matter has
+  // NO equivalent attribute for them (the cluster carries the intensity and a Low/Medium/High
+  // level, nothing else), they are a deliberate addition, published alongside the intensity by
+  // every grid data provider (Electricity Maps, the UK Carbon Intensity API, RTE eCO2mix...) -
+  // the contract is the providers' common denominator, not one provider's API.
+  // `carbon-intensity` is the AVERAGE intensity of the electricity consumed in the zone, which is
+  // what Matter models. A MARGINAL rate (the emissions of the next kWh, e.g. the WattTime MOER) is
+  // a different quantity and must not be published here - mixing the two would make charts and
+  // scene thresholds meaningless; a provider exposing both publishes its average here, and a
+  // marginal rate gets its own type the day an integration needs it.
+  // Matter's GridCarbonLevel (Low/Medium/High) is deliberately left out: it is a banding of the
+  // same intensity, which the room badge already colors from the value itself.
+  // Value conventions: the intensity is >= 0 (gCO2eq/kWh), both shares are percentages of the
+  // consumed electricity (0-100). `carbon-free-percentage` counts every non-fossil source
+  // (renewables AND nuclear), `renewable-percentage` only the renewable ones, so renewable is
+  // always <= carbon-free. A provider publishing the FOSSIL share reports its complement here,
+  // rather than a fourth type holding the same measurement upside down.
+  GRID_CARBON_SENSOR: {
+    CARBON_INTENSITY: 'carbon-intensity', // gCO2eq per kWh consumed in the zone (>= 0)
+    CARBON_FREE_PERCENTAGE: 'carbon-free-percentage', // share of renewables + nuclear, % (0-100)
+    RENEWABLE_PERCENTAGE: 'renewable-percentage', // share of renewables only, % (0-100)
   },
   // Exchange with the public grid (the connection point), whatever the
   // measuring device: a plug-in battery's grid port, an EM clamp or a
@@ -1486,6 +1520,9 @@ const DEVICE_FEATURE_UNITS = {
   KILOWATT_HOUR_PER_100_KM: 'kilowatt-hour-per-100-km',
   WATT_HOUR_PER_MILE: 'watt-hour-per-mile',
   KILOWATT_HOUR_PER_100_MILE: 'kilowatt-hour-per-100-mile',
+  // Carbon intensity units (grams of CO2 equivalent per kWh, the unit of the Matter
+  // Electrical Grid Conditions cluster)
+  GRAM_CO2_EQ_PER_KILOWATT_HOUR: 'gram-co2eq-per-kilowatt-hour',
   // Efficiency units
   KM_PER_KILOWATT_HOUR: 'km-per-kilowatt-hour',
   MILE_PER_KILOWATT_HOUR: 'mile-per-kilowatt-hour',
@@ -1650,6 +1687,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: [
+    DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.PERCENT,
   ],
   [DEVICE_FEATURE_CATEGORIES.GRID_SENSOR]: [
     DEVICE_FEATURE_UNITS.WATT,
@@ -1831,6 +1872,13 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
 // when the category-level list mixes units of different dimensions.
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: {
+    // The intensity is a mass per energy, the two shares are percentages: without this entry
+    // both would offer the whole category list.
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY]: [DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR],
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.RENEWABLE_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
+  },
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
     // The whole BATTERY category is a percent (the charge level), but a charging flag is a
     // binary and carries no unit: without this entry it would inherit the category percent.
