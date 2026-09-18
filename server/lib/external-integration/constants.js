@@ -124,6 +124,34 @@ const ACTION_DEFAULT_TIMEOUT_SECONDS = 30;
 const MAX_DISCOVERED_DEVICES = 2000;
 const MAX_STATES_PER_REQUEST = 100;
 const MAX_STATES_PER_MINUTE = 300;
+// Scene triggers and actions declared by the manifest (scene_triggers /
+// scene_actions): the scene editor renders them with the config_schema
+// form engine, the core matches the events and relays the actions. One
+// trigger type and one action type in the scene engine, nothing per
+// integration.
+const MAX_SCENE_DECLARATIONS = 20;
+const MAX_SCENE_DECLARATION_KEY_LENGTH = 40;
+const MAX_SCENE_DECLARATION_FIELDS = 10;
+const MAX_SCENE_DECLARATION_VARIABLES = 20;
+// a trigger filter must be able to express "any": a boolean toggle has no
+// empty state, so it is an action parameter only
+const SCENE_TRIGGER_FIELD_TYPES = ['string', 'number', 'select', 'multi_select', 'section'];
+const SCENE_ACTION_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'section'];
+// the data an event exposes to the scene (variables) and the values an
+// action returns to it (outputs): scalars only, never an image or a file
+const SCENE_VARIABLE_TYPES = ['string', 'number', 'boolean'];
+// POST /scene/event payload bounds: flat, one primitive per key
+const MAX_SCENE_EVENT_DATA_KEYS = 30;
+const MAX_SCENE_EVENT_STRING_LENGTH = 1000;
+// same constant and window as the states, on a SEPARATE counter (an
+// integration publishing both never sees them compete)
+const MAX_SCENE_EVENTS_PER_MINUTE = MAX_STATES_PER_MINUTE;
+// scene actions pending on one integration, counted from the slot
+// reservation (before any connection wait) to the terminal outcome: a slow
+// or disconnected container never accumulates 120s commands
+const MAX_PENDING_SCENE_ACTIONS = 10;
+// bound of a string output returned by a scene action
+const MAX_SCENE_ACTION_OUTPUT_LENGTH = 10000;
 // Communication integrations: user <-> contact link. The link itself is a
 // variable scoped (service_id, user_id) — no migration needed; the short
 // link codes live in the in-memory cache with a 15 minutes TTL.
@@ -365,6 +393,18 @@ module.exports = {
   MAX_DISCOVERED_DEVICES,
   MAX_STATES_PER_REQUEST,
   MAX_STATES_PER_MINUTE,
+  MAX_SCENE_DECLARATIONS,
+  MAX_SCENE_DECLARATION_KEY_LENGTH,
+  MAX_SCENE_DECLARATION_FIELDS,
+  MAX_SCENE_DECLARATION_VARIABLES,
+  SCENE_TRIGGER_FIELD_TYPES,
+  SCENE_ACTION_FIELD_TYPES,
+  SCENE_VARIABLE_TYPES,
+  MAX_SCENE_EVENT_DATA_KEYS,
+  MAX_SCENE_EVENT_STRING_LENGTH,
+  MAX_SCENE_EVENTS_PER_MINUTE,
+  MAX_PENDING_SCENE_ACTIONS,
+  MAX_SCENE_ACTION_OUTPUT_LENGTH,
   CONTACT_VARIABLE,
   CONTACT_PROFILE_VARIABLE,
   LINK_CODE_CACHE_PREFIX,

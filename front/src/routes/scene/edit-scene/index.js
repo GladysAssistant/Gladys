@@ -25,6 +25,23 @@ const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
 };
 
+// The parameters of an action declared by an external integration live under
+// `fields`, keyed by the declaration: the string ones may hold variables
+// ({{triggerEvent.data.…}}, {{0.0.…}}), so every string value is rewritten
+// on a reorder — the rule above only knows fixed attributes
+const replaceVariablePathsInDeclaredFields = (action, replacements) => {
+  if (!action.fields || typeof action.fields !== 'object') {
+    return;
+  }
+  Object.keys(action.fields).forEach(key => {
+    if (typeof action.fields[key] === 'string') {
+      replacements.forEach(({ prevPath, newPath }) => {
+        action.fields[key] = replaceVariablePathInText(action.fields[key], prevPath, newPath);
+      });
+    }
+  });
+};
+
 // Replaces, in a text containing variables (e.g. "The temperature is {{1.0.last_value}}°C"),
 // all the references to a variable path by its new path.
 const replaceVariablePathInText = (text, prevPath, newPath) => text.split(`{{${prevPath}.`).join(`{{${newPath}.`);
@@ -88,6 +105,10 @@ const replaceVariablePathsInActions = (actions, replacements) => {
             });
           }
         });
+      }
+
+      if (action.type === ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION) {
+        replaceVariablePathsInDeclaredFields(action, replacements);
       }
 
       // Check for nested actions in if/then/else blocks
@@ -1379,6 +1400,20 @@ class EditScene extends Component {
     });
   };
 
+  getSceneIntegrations = async () => {
+    // the scene triggers and actions declared by the installed external
+    // integrations: the "Integrations" category of both pickers, and what a
+    // stored integration card is resolved against. Fetched once when the
+    // editor opens; an unreachable list only hides the category, the stored
+    // cards then render as orphans until the next load.
+    try {
+      const { integrations } = await this.props.httpClient.get('/api/v1/external_integration/scene');
+      this.setState({ sceneIntegrations: integrations || [] });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   getTags = async () => {
     try {
       const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
@@ -1396,6 +1431,7 @@ class EditScene extends Component {
       scene: null,
       variables: {},
       triggersVariables: [],
+      sceneIntegrations: [],
       runningScenes: [],
       now: Date.now()
     };
@@ -1404,6 +1440,7 @@ class EditScene extends Component {
 
   componentDidMount() {
     this.getSceneBySelector();
+    this.getSceneIntegrations();
     this.getTags();
     this.getRunningScenes();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
@@ -1440,6 +1477,7 @@ class EditScene extends Component {
       variables,
       scene,
       triggersVariables,
+      sceneIntegrations,
       tags,
       askDeleteScene,
       runningScenes,
@@ -1471,6 +1509,7 @@ class EditScene extends Component {
             errorMessage={errorMessage}
             variables={variables}
             triggersVariables={triggersVariables}
+            sceneIntegrations={sceneIntegrations}
             setVariables={this.setVariables}
             setVariablesTrigger={this.setVariablesTrigger}
             switchActiveScene={this.switchActiveScene}

@@ -34,7 +34,17 @@ const SCENE_TRIGGER_TYPES = new Set([
   EVENTS.SYSTEM.START,
   EVENTS.MQTT.RECEIVED,
   EVENTS.CALENDAR.EVENT_IS_COMING,
+  EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT,
 ]);
+
+// Values of an integration-declared scene trigger (filters) or action
+// (parameters): a permissive record, the shape rule of the scene model
+const sceneDeclarationFieldsSchema = z
+  .record(
+    z.string(),
+    z.union([z.string(), z.number(), z.boolean(), z.null(), z.array(z.union([z.string(), z.number()]))]),
+  )
+  .optional();
 
 /**
  * @description Flatten nested scene actions into a single list.
@@ -342,6 +352,11 @@ function createSceneCreateInputSchema(
         topic: z.string(),
         message: z.string(),
       }),
+      actionSchemaByType(ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, {
+        integration: z.string(),
+        action_key: z.string(),
+        fields: sceneDeclarationFieldsSchema,
+      }),
       actionSchemaByType(ACTIONS.MUSIC.PLAY_NOTIFICATION, {
         device: musicNotificationDevicesSchema,
         text: z.string(),
@@ -573,6 +588,11 @@ function createSceneCreateInputSchema(
     triggerSchemaByType(EVENTS.MQTT.RECEIVED, {
       topic: z.string(),
       message: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT, {
+      integration: z.string(),
+      trigger_key: z.string(),
+      fields: sceneDeclarationFieldsSchema,
     }),
     triggerSchemaByType(EVENTS.CALENDAR.EVENT_IS_COMING, {
       calendar_event_attribute: triggerCalendarEventAttributeSchema,

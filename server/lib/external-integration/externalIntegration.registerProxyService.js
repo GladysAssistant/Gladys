@@ -4,6 +4,7 @@ const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constan
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
 const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
 const { normalizeWeatherImage } = require('./externalIntegration.normalizeWeatherImage');
+const { getDeclaredSceneActions } = require('./externalIntegration.sceneDeclarations');
 const {
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
@@ -146,6 +147,19 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // integrations declaring scene actions expose the generic scene
+  // capability: the scene engine relays a reached action through it
+  // (scene.actions.js, the exact path mqtt.send takes), the supervisor
+  // resolves the stored fields against the current declaration and bounds
+  // the relay (runSceneAction)
+  const sceneCapability =
+    getDeclaredSceneActions(service.manifest).length > 0
+      ? {
+          scene: Object.freeze({
+            runAction: async (actionKey, fields, options) => this.runSceneAction(service, actionKey, fields, options),
+          }),
+        }
+      : {};
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -155,6 +169,7 @@ function registerProxyService(service) {
     },
     ...messageCapability,
     ...weatherCapability,
+    ...sceneCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {

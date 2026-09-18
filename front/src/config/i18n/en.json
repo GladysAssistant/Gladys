@@ -1138,7 +1138,11 @@
         "webhooksTitle": "Internet webhooks (Gladys Plus)",
         "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
         "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
-        "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant)."
+        "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant).",
+        "sceneDeclarationsTitle": "Scene triggers and actions",
+        "sceneDeclarationsText": "This integration adds {{triggers}} trigger(s) and {{actions}} action(s) to the scene editor.",
+        "sceneTriggerPrefix": "Trigger:",
+        "sceneActionPrefix": "Action:"
       },
       "networkDiscovery": {
         "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
@@ -3657,6 +3661,9 @@
       },
       "time": {
         "get-date": "Get the current date and time"
+      },
+      "external-integration": {
+        "scene-action": "Integration action"
       }
     },
     "actionsDescriptions": {
@@ -3735,6 +3742,9 @@
       },
       "time": {
         "get-date": "Get the current date and time to reuse it later in the scene"
+      },
+      "external-integration": {
+        "scene-action": "An action declared by an external integration"
       }
     },
     "actionCategories": {
@@ -3743,7 +3753,8 @@
       "conditions": "Conditions",
       "flow": "Flow",
       "homeSecurity": "Home & security",
-      "advanced": "Advanced"
+      "advanced": "Advanced",
+      "integrations": "Integrations"
     },
     "variables": {
       "device": {
@@ -3820,6 +3831,9 @@
       "weather": {
         "alert-raised": "Weather alert raised",
         "alert-ended": "Weather alert ended"
+      },
+      "external-integration": {
+        "scene-event": "Integration trigger"
       }
     },
     "triggersDescriptions": {
@@ -3863,6 +3877,9 @@
       "weather": {
         "alert-raised": "When a weather alert starts (wind, rain…)",
         "alert-ended": "When a weather alert ends"
+      },
+      "external-integration": {
+        "scene-event": "A trigger declared by an external integration"
       }
     },
     "triggerCategories": {
@@ -3871,7 +3888,8 @@
       "presence": "Presence",
       "alarm": "Alarm",
       "weather": "Weather",
-      "advanced": "Advanced"
+      "advanced": "Advanced",
+      "integrations": "Integrations"
     },
     "triggersCard": {
       "newState": {
@@ -4031,7 +4049,19 @@
     "moveHandleLabel": "Reorder (drag, or use the up and down arrow keys)",
     "deleteTriggerButton": "Delete this trigger",
     "expandStepButton": "Show the details",
-    "collapseStepButton": "Hide the details"
+    "collapseStepButton": "Hide the details",
+    "externalIntegration": {
+      "triggerNotInstalled": "This trigger is provided by an integration that is no longer installed. It cannot fire until the integration is installed again.",
+      "triggerNotDeclared": "This trigger is no longer declared by the installed version of the integration. It cannot fire anymore.",
+      "triggerInactive": "The integration is stopped: this trigger cannot fire until it runs.",
+      "actionNotInstalled": "This action is provided by an integration that is no longer installed. It will fail until the integration is installed again.",
+      "actionNotDeclared": "This action is no longer declared by the installed version of the integration. It will fail when the scene runs.",
+      "actionInactive": "The integration is stopped: this action will fail until it runs.",
+      "wildcardHint": "A field left empty matches any value.",
+      "variablesTitle": "Variables provided by this trigger",
+      "outputsTitle": "Variables returned by this action",
+      "variablesExplanation": "To inject a scene variable in a text field, press '{{'."
+    }
   },
   "profile": {
     "title": "Profile",

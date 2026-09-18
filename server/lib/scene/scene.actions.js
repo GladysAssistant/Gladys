@@ -25,7 +25,7 @@ const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
-const { AbortScene, SceneStopped } = require('../../utils/coreErrors');
+const { AbortScene, SceneStopped, NotFoundError } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
@@ -928,6 +928,26 @@ const actionsFunc = {
       warnIfInvalidJsonMessage('Zigbee2mqtt', action.topic, messageWithVariables);
       zigbee2mqttService.device.publish(action.topic, messageWithVariables);
     }
+  },
+  [ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION]: async (self, action, scope, path) => {
+    // the proxy service of the integration, registered under its selector in
+    // the stateManager (the exact path mqtt.send takes). Absent = uninstalled;
+    // without a scene capability = a manifest declaring no scene_actions.
+    const integrationService = self.service.getService(action.integration);
+    if (!integrationService) {
+      throw new NotFoundError(`EXTERNAL_INTEGRATION_NOT_FOUND: ${action.integration}`);
+    }
+    if (!integrationService.scene || typeof integrationService.scene.runAction !== 'function') {
+      throw new NotFoundError(`SCENE_ACTION_NOT_DECLARED: ${action.integration} declares no scene action`);
+    }
+    // the stored fields travel untouched; the supervisor renders the declared
+    // string fields through this callback, bound to the scope of the scene
+    const render = (value) =>
+      Handlebars.compile(value, {
+        noEscape: true,
+      })(scope);
+    const outputs = await integrationService.scene.runAction(action.action_key, action.fields || {}, { render });
+    set(scope, path, outputs, { merge: true });
   },
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: async (self, action, scope) => {
     // Get device

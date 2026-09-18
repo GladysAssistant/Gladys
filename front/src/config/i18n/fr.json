@@ -1138,7 +1138,11 @@
         "webhooksTitle": "Webhooks Internet (Gladys Plus)",
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
         "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
-        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant)."
+        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant).",
+        "sceneDeclarationsTitle": "Déclencheurs et actions de scènes",
+        "sceneDeclarationsText": "Cette intégration ajoute {{triggers}} déclencheur(s) et {{actions}} action(s) à l'éditeur de scènes.",
+        "sceneTriggerPrefix": "Déclencheur :",
+        "sceneActionPrefix": "Action :"
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -3657,6 +3661,9 @@
       },
       "time": {
         "get-date": "Récupérer la date et l'heure"
+      },
+      "external-integration": {
+        "scene-action": "Action d'intégration"
       }
     },
     "actionsDescriptions": {
@@ -3735,6 +3742,9 @@
       },
       "time": {
         "get-date": "Récupérer la date et l'heure actuelles pour les réutiliser dans la scène"
+      },
+      "external-integration": {
+        "scene-action": "Une action déclarée par une intégration externe"
       }
     },
     "actionCategories": {
@@ -3743,7 +3753,8 @@
       "conditions": "Conditions",
       "flow": "Déroulement",
       "homeSecurity": "Maison & sécurité",
-      "advanced": "Avancé"
+      "advanced": "Avancé",
+      "integrations": "Intégrations"
     },
     "variables": {
       "device": {
@@ -3820,6 +3831,9 @@
       "weather": {
         "alert-raised": "Alerte météo déclenchée",
         "alert-ended": "Alerte météo terminée"
+      },
+      "external-integration": {
+        "scene-event": "Déclencheur d'intégration"
       }
     },
     "triggersDescriptions": {
@@ -3863,6 +3877,9 @@
       "weather": {
         "alert-raised": "Quand une alerte météo commence (vent, pluie…)",
         "alert-ended": "Quand une alerte météo se termine"
+      },
+      "external-integration": {
+        "scene-event": "Un déclencheur déclaré par une intégration externe"
       }
     },
     "triggerCategories": {
@@ -3871,7 +3888,8 @@
       "presence": "Présence",
       "alarm": "Alarme",
       "weather": "Météo",
-      "advanced": "Avancé"
+      "advanced": "Avancé",
+      "integrations": "Intégrations"
     },
     "triggersCard": {
       "newState": {
@@ -4031,7 +4049,19 @@
     "moveHandleLabel": "Réorganiser (glisser, ou flèches haut et bas)",
     "deleteTriggerButton": "Supprimer ce déclencheur",
     "expandStepButton": "Afficher le détail",
-    "collapseStepButton": "Masquer le détail"
+    "collapseStepButton": "Masquer le détail",
+    "externalIntegration": {
+      "triggerNotInstalled": "Ce déclencheur est fourni par une intégration qui n'est plus installée. Il ne pourra pas se déclencher tant qu'elle n'est pas réinstallée.",
+      "triggerNotDeclared": "Ce déclencheur n'est plus déclaré par la version installée de l'intégration. Il ne se déclenchera plus.",
+      "triggerInactive": "L'intégration est arrêtée : ce déclencheur ne peut pas se déclencher tant qu'elle ne tourne pas.",
+      "actionNotInstalled": "Cette action est fournie par une intégration qui n'est plus installée. Elle échouera tant qu'elle n'est pas réinstallée.",
+      "actionNotDeclared": "Cette action n'est plus déclarée par la version installée de l'intégration. Elle échouera à l'exécution de la scène.",
+      "actionInactive": "L'intégration est arrêtée : cette action échouera tant qu'elle ne tourne pas.",
+      "wildcardHint": "Un champ laissé vide accepte n'importe quelle valeur.",
+      "variablesTitle": "Variables fournies par ce déclencheur",
+      "outputsTitle": "Variables renvoyées par cette action",
+      "variablesExplanation": "Pour injecter une variable de la scène dans un champ texte, tapez '{{'."
+    }
   },
   "profile": {
     "title": "Profil",

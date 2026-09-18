@@ -1,21 +1,8 @@
-// Get a localized text from a manifest multi-language object ({ en: '...', fr: '...' }).
-// Falls back to English, then to the first available language.
-export const getLocalizedText = (value, language) => {
-  if (!value) {
-    return '';
-  }
-  if (typeof value === 'string') {
-    return value;
-  }
-  if (value[language]) {
-    return value[language];
-  }
-  if (value.en) {
-    return value.en;
-  }
-  const firstLanguage = Object.keys(value)[0];
-  return firstLanguage ? value[firstLanguage] : '';
-};
+import { getLocalizedText } from '../../../../utils/getLocalizedText';
+
+// re-exported from its historical home: the scene editor needs it too, so the
+// helper now lives in src/utils
+export { getLocalizedText };
 
 // Badge color for each external integration status
 export const EXTERNAL_INTEGRATION_STATUS_BADGES = {

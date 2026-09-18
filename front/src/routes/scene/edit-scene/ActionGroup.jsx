@@ -24,6 +24,7 @@ const renderActionCard = (props, action, index) => (
     triggersVariables={props.triggersVariables}
     setVariables={props.setVariables}
     scene={props.scene}
+    sceneIntegrations={props.sceneIntegrations}
     allActions={props.allActions}
     columnIndex={props.index}
     index={index}

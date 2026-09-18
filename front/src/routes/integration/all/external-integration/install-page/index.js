@@ -12,6 +12,7 @@ import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
 import WebhooksSummary from '../components/WebhooksSummary';
+import SceneDeclarationsSummary from '../components/SceneDeclarationsSummary';
 import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
@@ -274,6 +275,11 @@ class ExternalIntegrationInstallPage extends Component {
                             )}
 
                             <WebhooksSummary webhooks={manifest.webhooks} language={language} />
+                            <SceneDeclarationsSummary
+                              sceneTriggers={manifest.scene_triggers}
+                              sceneActions={manifest.scene_actions}
+                              language={language}
+                            />
 
                             {duplicateOfInstalled && (
                               <div class="alert alert-warning">
