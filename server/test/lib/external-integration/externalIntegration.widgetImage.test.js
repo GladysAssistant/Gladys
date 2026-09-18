@@ -9,14 +9,22 @@ const { NotFoundError, ExternalIntegrationUnavailableError } = require('../../..
 const {
   WIDGET_GET_TIMEOUT_MS,
   MAX_WIDGET_IMAGE_BYTES,
+  MAX_WIDGET_IMAGE_DIMENSION,
   MAX_WIDGET_IMAGE_CACHE_ENTRIES,
 } = require('../../../lib/external-integration/constants');
 const { normalizeWidgetImage } = require('../../../lib/external-integration/externalIntegration.normalizeWidgetImage');
 const { buildSupervisor, seedExternalService, TEST_WIDGET_MANIFEST } = require('./testUtils.test');
+const {
+  buildPng,
+  buildJpeg,
+  buildWebp,
+  buildWebpLossless,
+  buildWebpExtended,
+} = require('../../helpers/widgetImages.test');
 
-const PNG = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(16, 1)]);
-const JPEG = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(16, 1)]);
-const WEBP = Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4, 0), Buffer.from('WEBP'), Buffer.alloc(16, 1)]);
+const PNG = buildPng();
+const JPEG = buildJpeg();
+const WEBP = buildWebp();
 const GIF = Buffer.concat([Buffer.from('GIF89a'), Buffer.alloc(16, 1)]);
 const SVG = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"></svg>');
 
@@ -77,6 +85,66 @@ describe('externalIntegration widgets — images', () => {
       );
       expect(normalizeWidgetImage(WEBP.toString('base64'))).to.equal(
         `data:image/webp;base64,${WEBP.toString('base64')}`,
+      );
+    });
+
+    it('should read the pixel size of every format and refuse images beyond the dimension bound', () => {
+      const max = MAX_WIDGET_IMAGE_DIMENSION;
+      expect(normalizeWidgetImage(buildPng(max, max).toString('base64'))).to.be.a('string');
+      expect(normalizeWidgetImage(buildJpeg(max, 1).toString('base64'))).to.be.a('string');
+      expect(normalizeWidgetImage(buildWebpLossless(max, max).toString('base64'))).to.be.a('string');
+      expect(normalizeWidgetImage(buildWebpExtended(1, max).toString('base64'))).to.be.a('string');
+      expectInvalidImage(buildPng(max + 1, 1).toString('base64'));
+      expectInvalidImage(buildPng(1, max + 1).toString('base64'));
+      expectInvalidImage(buildJpeg(max + 1, 16).toString('base64'));
+      expectInvalidImage(buildWebp(max + 1, 16).toString('base64'));
+      expectInvalidImage(buildWebpLossless(16, max + 1).toString('base64'));
+      expectInvalidImage(buildWebpExtended(max + 1, 16).toString('base64'));
+      expectInvalidImage(buildPng(0, 16).toString('base64'));
+    });
+
+    it('should fail closed on a header it cannot read', () => {
+      // a PNG signature with no IHDR chunk
+      expectInvalidImage(
+        Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(16, 1)]).toString(
+          'base64',
+        ),
+      );
+      // a JPEG whose scan starts before any frame header, one with a bad
+      // marker byte, one that ends before any header
+      const app0 = JPEG.slice(2, 20);
+      expectInvalidImage(
+        Buffer.concat([Buffer.from([0xff, 0xd8]), app0, Buffer.from([0xff, 0xda, 0, 4, 1, 1])]).toString('base64'),
+      );
+      // a first segment followed by a byte that is not a marker
+      expectInvalidImage(
+        Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x04, 0, 0, 0x00]), Buffer.alloc(16, 1)]).toString(
+          'base64',
+        ),
+      );
+      // a scan marker right after the start of image
+      expectInvalidImage(
+        Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xda, 0, 4, 1, 1]), Buffer.alloc(16, 1)]).toString('base64'),
+      );
+      expectInvalidImage(Buffer.concat([Buffer.from([0xff, 0xd8]), app0]).toString('base64'));
+      // padding bytes and standalone markers are walked over
+      const padded = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xff, 0xd0]), JPEG.slice(2)]);
+      expect(normalizeWidgetImage(padded.toString('base64'))).to.be.a('string');
+      // a WebP with an unknown first chunk, a lossy one without its start
+      // code, a lossless one without its signature, a truncated one
+      const unknownChunk = buildWebp();
+      unknownChunk.write('ALPH', 12, 'ascii');
+      expectInvalidImage(unknownChunk.toString('base64'));
+      const noStartCode = buildWebp();
+      noStartCode[23] = 0;
+      expectInvalidImage(noStartCode.toString('base64'));
+      const noSignature = buildWebpLossless();
+      noSignature[20] = 0;
+      expectInvalidImage(noSignature.toString('base64'));
+      expectInvalidImage(
+        buildWebp()
+          .slice(0, 20)
+          .toString('base64'),
       );
     });
 

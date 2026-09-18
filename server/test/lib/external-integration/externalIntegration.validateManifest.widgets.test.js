@@ -52,10 +52,9 @@ describe('externalIntegration.validateManifest — widgets and provider type', (
     expect422(withWidget({ ...CINEMA_WIDGET, color: 'red' }), 'widgets[0].color: unknown field');
   });
 
-  it('should validate the widget key: shape, reserved and duplicate keys', () => {
+  it('should validate the widget key: shape and duplicate keys', () => {
     expect422(withWidget({ ...CINEMA_WIDGET, key: 'A' }), 'widgets[0].key: must be a string matching [a-z0-9_]{2,32}');
     expect422(withWidget({ ...CINEMA_WIDGET, key: undefined }), 'widgets[0].key: must be a string matching');
-    expect422(withWidget({ ...CINEMA_WIDGET, key: 'image' }), 'widgets[0].key: "image" is a reserved key');
     expect422(
       { ...TEST_MANIFEST, widgets: [CINEMA_WIDGET, { ...CINEMA_WIDGET }] },
       'widgets[1].key: duplicate key "upcoming_releases"',

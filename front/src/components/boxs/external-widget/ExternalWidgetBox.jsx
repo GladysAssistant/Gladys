@@ -62,7 +62,8 @@ class ExternalWidgetBox extends Component {
       });
       if (declaration && SERVING_STATUSES.includes(declaration.integration_status)) {
         if (!SERVING_STATUSES.includes(previousStatus) || !this.state.content) {
-          this.fetchContent();
+          // setState is asynchronous: the status just learned is passed along
+          this.fetchContent(declaration.integration_status);
         }
       }
     } catch (e) {
@@ -83,7 +84,7 @@ class ExternalWidgetBox extends Component {
     invalidateWidgetList();
     this.setState({ integrationStatus: payload.status });
     if (SERVING_STATUSES.includes(payload.status) && !wasServing) {
-      this.fetchContent();
+      this.fetchContent(payload.status);
     }
     if (STOPPED_STATUSES.includes(payload.status)) {
       this.clearRefreshTimer();
@@ -92,9 +93,12 @@ class ExternalWidgetBox extends Component {
 
   // --- content --------------------------------------------------------------
 
-  fetchContent = async () => {
+  // `integrationStatus` is passed by the callers that just learned it (the
+  // state may not have settled yet); the refresh timer and the WebSocket
+  // events read the settled state
+  fetchContent = async (integrationStatus = this.state.integrationStatus) => {
     const { box, httpClient } = this.props;
-    if (!SERVING_STATUSES.includes(this.state.integrationStatus)) {
+    if (!SERVING_STATUSES.includes(integrationStatus)) {
       return;
     }
     this.clearRefreshTimer();
@@ -149,7 +153,7 @@ class ExternalWidgetBox extends Component {
     // never earlier than a few seconds, never later than an hour: expiry is
     // the integration's word, the bounds are the card's
     const delay = Math.min(60 * 60 * 1000, Math.max(5000, delayMs || 0));
-    this.refreshTimer = setTimeout(this.fetchContent, delay);
+    this.refreshTimer = setTimeout(() => this.fetchContent(), delay);
   };
 
   clearRefreshTimer = () => {
@@ -347,7 +351,7 @@ class ExternalWidgetBox extends Component {
         )}
         {detail && <div class={style.errorDetail}>{detail}</div>}
         {retry && (
-          <button type="button" class="btn btn-sm btn-outline-secondary" onClick={this.fetchContent}>
+          <button type="button" class="btn btn-sm btn-outline-secondary" onClick={() => this.fetchContent()}>
             <i class="fe fe-refresh-cw mr-1" />
             <Text id="dashboard.boxes.external-widget.retryButton" />
           </button>

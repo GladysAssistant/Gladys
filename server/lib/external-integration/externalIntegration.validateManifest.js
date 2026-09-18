@@ -31,7 +31,6 @@ const {
   ACCOUNT_FIELD_TYPES,
   MAX_WIDGETS,
   WIDGET_KEY_REGEX,
-  RESERVED_WIDGET_KEYS,
   WIDGET_LABEL_MIN_LENGTH,
   WIDGET_LABEL_MAX_LENGTH,
   WIDGET_DESCRIPTION_MAX_LENGTH,
@@ -596,10 +595,6 @@ function validateWidget(widget, index, seenKeys, errors, declaredPortNames) {
   });
   if (typeof widget.key !== 'string' || !WIDGET_KEY_REGEX.test(widget.key)) {
     errors.push(`${path}.key: must be a string matching [a-z0-9_]{2,32}`);
-  } else if (RESERVED_WIDGET_KEYS.includes(widget.key)) {
-    // a literal segment of the image route: the two namespaces must never
-    // be confusable in a URL
-    errors.push(`${path}.key: "${widget.key}" is a reserved key`);
   } else if (seenKeys.has(widget.key)) {
     errors.push(`${path}.key: duplicate key "${widget.key}"`);
   } else {

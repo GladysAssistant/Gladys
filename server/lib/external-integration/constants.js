@@ -317,9 +317,6 @@ const WEBHOOK_RESPONSE_MAX_STATUS = 499;
 // per-instance settings), validated by the indexer and the server alike.
 const MAX_WIDGETS = 5;
 const WIDGET_KEY_REGEX = /^[a-z0-9_]{2,32}$/;
-// `image` is a literal segment of the image route (/:selector/image/:key):
-// reserved so the two URL namespaces can never be confused
-const RESERVED_WIDGET_KEYS = ['image'];
 const WIDGET_LABEL_MIN_LENGTH = 3;
 const WIDGET_LABEL_MAX_LENGTH = 30;
 const WIDGET_DESCRIPTION_MAX_LENGTH = 100;
@@ -367,6 +364,9 @@ const WIDGET_REFRESH_MIN_INTERVAL_MS = 10 * 1000;
 // core), validated by magic numbers, cached 1 h per (integration, key)
 const WIDGET_IMAGE_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const MAX_WIDGET_IMAGE_BYTES = 300 * 1024;
+// the pixel bound, read from the image header before the bytes are cached or
+// served: a 300 KB file can decode to a gigantic bitmap in the browser
+const MAX_WIDGET_IMAGE_DIMENSION = 4096;
 const WIDGET_IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
 const MAX_WIDGET_IMAGE_CACHE_ENTRIES = 100;
 const MAX_WIDGET_IMAGE_IN_FLIGHT = 4;
@@ -519,7 +519,6 @@ module.exports = {
   WEBHOOK_RESPONSE_MAX_STATUS,
   MAX_WIDGETS,
   WIDGET_KEY_REGEX,
-  RESERVED_WIDGET_KEYS,
   WIDGET_LABEL_MIN_LENGTH,
   WIDGET_LABEL_MAX_LENGTH,
   WIDGET_DESCRIPTION_MAX_LENGTH,
@@ -541,6 +540,7 @@ module.exports = {
   WIDGET_REFRESH_MIN_INTERVAL_MS,
   WIDGET_IMAGE_KEY_REGEX,
   MAX_WIDGET_IMAGE_BYTES,
+  MAX_WIDGET_IMAGE_DIMENSION,
   WIDGET_IMAGE_CACHE_TTL_MS,
   MAX_WIDGET_IMAGE_CACHE_ENTRIES,
   MAX_WIDGET_IMAGE_IN_FLIGHT,

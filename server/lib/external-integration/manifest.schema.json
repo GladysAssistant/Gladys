@@ -752,7 +752,7 @@
         "key": {
           "type": "string",
           "pattern": "^[a-z0-9_]{2,32}$",
-          "description": "Unique key of the widget: the identifier in the dashboard box, the API and the WebSocket messages. `image` is reserved (code-enforced)."
+          "description": "Unique key of the widget: the identifier in the dashboard box, the API and the WebSocket messages."
         },
         "label": {
           "allOf": [

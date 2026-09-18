@@ -94,9 +94,12 @@ describe('Dashboard integration widget box', () => {
     cy.get('[data-cy="external-widget-name"]').type('Robot');
     // the card renders live in the editor canvas, in the canonical order:
     // header, tiles, status, buttons — whatever the order of the content
-    cy.wait('@getContent')
-      .its('request.url')
-      .should('include', encodeURIComponent('"mode":"full"'));
+    // the card may have pulled once with the default setting before the
+    // select: the last pull carries the chosen one
+    cy.wait('@getContent');
+    cy.get('@getContent.all').should(calls => {
+      expect(decodeURIComponent(calls[calls.length - 1].request.url)).to.include('"mode":"full"');
+    });
     cy.get('[data-cy="external-widget-box"]').within(() => {
       cy.contains('Robot');
       cy.contains('Living room');
@@ -130,7 +133,7 @@ describe('Dashboard integration widget box', () => {
       cy.visit(`/dashboard/${selector}`);
     });
     cy.wait('@getWidgets');
-    cy.get('[data-cy="external-widget-state"]').should('contain', 'dashboard.boxes.external-widget.stopped');
+    cy.get('[data-cy="external-widget-state"]').i18n('dashboard.boxes.external-widget.stopped');
     cy.get('@contentRequest').should('not.have.been.called');
   });
 
@@ -141,7 +144,7 @@ describe('Dashboard integration widget box', () => {
       cy.visit(`/dashboard/${selector}`);
     });
     cy.wait('@getWidgets');
-    cy.get('[data-cy="external-widget-state"]').should('contain', 'dashboard.boxes.external-widget.notInstalled');
+    cy.get('[data-cy="external-widget-state"]').i18n('dashboard.boxes.external-widget.notInstalled');
 
     cy.intercept('GET', '**/api/v1/external_integration/widget', [buildWidget('RUNNING')]).as('getWidgetsRunning');
     cy.intercept('GET', CONTENT_URL, { statusCode: 422, body: { properties: 'settings.mode: must be one of' } }).as(
@@ -149,9 +152,8 @@ describe('Dashboard integration widget box', () => {
     );
     cy.reload();
     cy.wait('@getContent422');
-    cy.get('[data-cy="external-widget-state"]')
-      .should('contain', 'dashboard.boxes.external-widget.checkSettings')
-      .and('contain', 'settings.mode');
+    cy.get('[data-cy="external-widget-state"]').i18n('dashboard.boxes.external-widget.checkSettings');
+    cy.get('[data-cy="external-widget-state"]').should('contain', 'settings.mode');
 
     cy.intercept('GET', CONTENT_URL, {
       statusCode: 400,
@@ -159,9 +161,8 @@ describe('Dashboard integration widget box', () => {
     }).as('getContent400');
     cy.reload();
     cy.wait('@getContent400');
-    cy.get('[data-cy="external-widget-state"]')
-      .should('contain', 'dashboard.boxes.external-widget.unavailable')
-      .and('contain', 'API key invalid');
+    cy.get('[data-cy="external-widget-state"]').i18n('dashboard.boxes.external-widget.unavailable');
+    cy.get('[data-cy="external-widget-state"]').should('contain', 'API key invalid');
 
     cy.intercept('GET', CONTENT_URL, {
       statusCode: 400,
@@ -169,7 +170,7 @@ describe('Dashboard integration widget box', () => {
     }).as('getContentVersion');
     cy.reload();
     cy.wait('@getContentVersion');
-    cy.get('[data-cy="external-widget-state"]').should('contain', 'dashboard.boxes.external-widget.needsNewerGladys');
+    cy.get('[data-cy="external-widget-state"]').i18n('dashboard.boxes.external-widget.needsNewerGladys');
   });
 
   it('posts a widget action and shows the integration message', () => {
@@ -183,8 +184,9 @@ describe('Dashboard integration widget box', () => {
       cy.visit(`/dashboard/${selector}`);
     });
     // a degraded integration still serves content, with its badge on the card
+    cy.wait('@getWidgets');
     cy.wait('@getContent');
-    cy.get('[data-cy="external-widget-box"]').should('contain', 'integration.externalIntegration.status.DEGRADED');
+    cy.get('[data-cy="external-widget-box"]').i18n('integration.externalIntegration.status.DEGRADED');
     cy.get('[data-cy="external-widget-action-start"]').click();
     cy.wait('@runAction')
       .its('request.body')
