@@ -73,6 +73,14 @@ class EditExternalWidgetBox extends Component {
   render(props, { declaration, dynamicOptions }) {
     const language = get(props, 'user.language') || 'en';
     const settings = declaration ? declaration.settings || [] : [];
+    // an absent setting takes its declared default on the server: the form
+    // shows that default, so the preview and the form never disagree
+    const displayedValues = { ...(props.box.settings || {}) };
+    settings.forEach(field => {
+      if (displayedValues[field.key] === undefined && field.default !== undefined) {
+        displayedValues[field.key] = field.default;
+      }
+    });
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.external-widget">
         {declaration && (
@@ -120,7 +128,7 @@ class EditExternalWidgetBox extends Component {
                 key={field.key}
                 field={field}
                 language={language}
-                values={props.box.settings || {}}
+                values={displayedValues}
                 configuredSecrets={[]}
                 touchedSecrets={{}}
                 updateConfigValue={this.updateSettingValue}
