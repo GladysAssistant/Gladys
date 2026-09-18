@@ -365,6 +365,18 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
       },
     },
+    // External probe of a temperature/humidity sensor, e.g. Excellux ZG-105NTH
+    // https://www.zigbee2mqtt.io/devices/ZG-105NTH.html
+    // Tuya spells the same capability `temperature_probe`: both map to the same feature.
+    probe_temperature: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.PROBE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        min: -100,
+        max: 150,
+      },
+    },
     rain_intensity: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
@@ -376,6 +388,17 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        min: -100,
+        max: 150,
+      },
+    },
+    // Tuya's spelling of `probe_temperature`, e.g. TZ-ZT01_GA4
+    // https://www.zigbee2mqtt.io/devices/TZ-ZT01_GA4.html
+    temperature_probe: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.PROBE,
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
         min: -100,
         max: 150,
