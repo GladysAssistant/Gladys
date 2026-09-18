@@ -180,6 +180,29 @@ describe('Scene - external integration triggers and actions', () => {
     );
   });
 
+  it('Should save on the retried catalog when the first request failed', () => {
+    let requests = 0;
+    cy.intercept('GET', '**/api/v1/external_integration/scene', req => {
+      requests += 1;
+      // the editor opens on a failed request, the save retries and gets the list
+      req.reply(requests === 1 ? { statusCode: 500, body: {} } : SCENE_INTEGRATIONS);
+    }).as('getSceneIntegrations');
+    cy.intercept('GET', `**/api/v1/service/${SELECTOR}/device`, DEVICES).as('getDevices');
+
+    const sceneUrl = Cypress.env('integrationSceneUrl');
+    expect(sceneUrl).to.exist;
+    cy.visit(sceneUrl);
+    cy.wait('@getSceneIntegrations');
+    cy.contains('editScene.externalIntegration.catalogLoading').should('exist');
+
+    // the retried list is what the save validates against (not a stale
+    // state): the filled required filter passes, the cards come alive
+    cy.contains('button', 'editScene.saveButton').click();
+    cy.wait('@getSceneIntegrations');
+    cy.get('.alert-danger').should('not.exist');
+    cy.contains('Frigate · Object detected').should('exist');
+  });
+
   it('Should keep the cards, flagged as orphans, when the integration is gone', () => {
     cy.intercept('GET', '**/api/v1/external_integration/scene', { integrations: [] }).as('getSceneIntegrations');
 

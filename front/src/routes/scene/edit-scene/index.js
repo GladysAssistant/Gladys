@@ -484,9 +484,12 @@ class EditScene extends Component {
     // request once and refuses rather than persisting an unchecked required
     // filter — a successfully loaded EMPTY catalog is another thing (nothing
     // installed: the orphan cards save as they are)
-    if (this.state.sceneIntegrations === null && hasIntegrationSteps(sceneToSave)) {
-      await this.getSceneIntegrations();
-      if (this.state.sceneIntegrations === null) {
+    // (setState is asynchronous: the retried value is read from the return
+    // value, never from this.state)
+    let { sceneIntegrations } = this.state;
+    if (sceneIntegrations === null && hasIntegrationSteps(sceneToSave)) {
+      sceneIntegrations = await this.getSceneIntegrations();
+      if (sceneIntegrations === null) {
         this.setState({
           error: true,
           errorMessage: null,
@@ -500,7 +503,7 @@ class EditScene extends Component {
     // value: the editor is the only place it can be refused (the matcher never
     // consults the manifest), so the save stops here with the field named
     const missingRequiredField = findMissingRequiredField(
-      this.state.sceneIntegrations,
+      sceneIntegrations,
       sceneToSave,
       get(this.props, 'user.language') || 'en'
     );
@@ -1441,12 +1444,17 @@ class EditScene extends Component {
     // stored integration card is resolved against. Fetched when the editor
     // opens, and again by a save attempted before it answered. Null until it
     // succeeds: the cards then wait instead of posing as orphans, and the
-    // save of a scene holding one is refused (saveScene).
+    // save of a scene holding one is refused (saveScene). Returns the list,
+    // or null when the request failed, for a caller that cannot wait for the
+    // asynchronous setState.
     try {
       const { integrations } = await this.props.httpClient.get('/api/v1/external_integration/scene');
-      this.setState({ sceneIntegrations: integrations || [] });
+      const sceneIntegrations = integrations || [];
+      this.setState({ sceneIntegrations });
+      return sceneIntegrations;
     } catch (e) {
       console.error(e);
+      return null;
     }
   };
 
