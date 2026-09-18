@@ -4,9 +4,15 @@ import { route } from 'preact-router';
 
 import DashboardPage from './DashboardPage';
 import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
-import actions from '../../actions/dashboard';
+import dashboardActions from '../../actions/dashboard';
+import mainActions from '../../actions/main';
 import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
+
+// dashboard actions plus refreshTabletMode (main.js), needed to sync the
+// store's tabletMode after the ?tabletmode=<house_selector> URL param below
+// activates it server-side
+const actions = store => ({ ...dashboardActions(store), ...mainActions(store) });
 
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
@@ -180,6 +186,46 @@ class Dashboard extends Component {
     }
   };
 
+  // Mirrors checkIfFullScreenParameterIsHere: ?tabletmode=<house_name_or_selector>
+  // in the URL activates tablet mode for that house directly, the same way
+  // the "Tablet Mode" menu (SetTabletMode.jsx) does, without going through
+  // its UI. The selector is an internal slug never shown in the UI (the
+  // menu's dropdown only displays house.name), so the selector and the name
+  // are each matched exactly, in their own pass - selector first, since it's
+  // the more precise identifier - rather than combined in one predicate:
+  // both columns are unique, so neither pass alone can ever be ambiguous,
+  // and a house's selector can never be mistaken for a different house's
+  // name. No case-insensitive fallback: two houses may legitimately have
+  // names that differ only by case. Unlike ?fullscreen=force, this persists
+  // server-side on the session, so it is ignored on Gladys Plus: the
+  // "Tablet Mode" menu is hidden there (isGladysPlus in DashboardPage.jsx),
+  // which would leave a Plus browser locked by the house alarm with no UI
+  // to turn tablet mode back off.
+  checkIfTabletModeParameterIsHere = async () => {
+    const houseNameOrSelector = this.props.tabletmode;
+    if (!houseNameOrSelector || this.state.isGladysPlus) {
+      return;
+    }
+    try {
+      const houses = await this.props.httpClient.get('/api/v1/house');
+      const house =
+        houses &&
+        (houses.find(h => h.selector === houseNameOrSelector) || houses.find(h => h.name === houseNameOrSelector));
+      if (!house) {
+        console.error(`?tabletmode=${houseNameOrSelector} does not match any house`);
+        return;
+      }
+      await this.props.httpClient.post('/api/v1/session/tablet_mode', {
+        tablet_mode: true,
+        house: house.selector
+      });
+      await this.props.refreshTabletMode();
+      this.props.session.setTabletModeCurrentHouseSelector(house.selector);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   init = async () => {
     await this.getDashboards();
     // fire and forget, concurrent with the current dashboard's own fetch:
@@ -307,6 +353,7 @@ class Dashboard extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
     this.checkIfFullScreenParameterIsHere();
+    this.checkIfTabletModeParameterIsHere();
   }
 
   // Client-side dashboard switch: the dashboard list is already loaded, and
