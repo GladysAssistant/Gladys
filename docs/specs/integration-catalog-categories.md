@@ -1,6 +1,6 @@
 # Integration catalog categories & filters
 
-> **Status: living spec.** Phases A and B (§8) are implemented in the monorepo — core contracts and catalog UI — and the manifest/index contract additions are reflected in `docs/specs/external-integrations.md` (§C.1, §C.5, §C.6), which remains the source of truth for those formats. The `GladysAssistant/integration-store` side of phase A (canonical schema, fallback mapping, `first_seen_at` persistence and backfill) and phase C ship separately. This document formalizes the redesign of the integration catalog's navigation (the categories in the left menu of the Integrations page) and its facet filters, based on two converging pieces of user feedback and on the actual content of the catalog. Usual rule: any PR that changes the catalog's categorization behavior or one of the contracts below modifies this file in the same diff.
+> **Status: living spec.** Phases A and B (§8) are implemented in the monorepo — core contracts and catalog UI — and the manifest/index contract additions are reflected in `docs/specs/external-integrations/` (§C.1, §C.5, §C.6), which remains the source of truth for those formats. The `GladysAssistant/integration-store` side of phase A (canonical schema, fallback mapping, `first_seen_at` persistence and backfill) and phase C ship separately. This document formalizes the redesign of the integration catalog's navigation (the categories in the left menu of the Integrations page) and its facet filters, based on two converging pieces of user feedback and on the actual content of the catalog. Usual rule: any PR that changes the catalog's categorization behavior or one of the contracts below modifies this file in the same diff.
 
 Related community topic: [Intégrations : revoir découpage des catégories + mettre des filtres (topic 10419)](https://community.gladysassistant.com/t/integrations-revoir-decoupage-des-categories-mettre-des-filtres/10419).
 
@@ -78,7 +78,7 @@ Facets are cumulative filter chips displayed above the grid, combinable with the
 | Gladys Plus | Requires Gladys Plus | `gladysPlus` field (native JSONs) | Native only today; extending it to the manifest is an open question (§9) |
 | Updates | Update available | existing `updateAvailable` | Already shipped as the conditional "Updates" sidebar entry; unchanged |
 
-**Transport normalization.** The two sources have different shapes — native JSONs carry two independent booleans (`"local": true`, `"cloud": true`), manifests carry an array (`"transports": ["local", "cloud"]`, 1..2 unique values from that enum, per §C.1 of `external-integrations.md`). The front normalizes both into the same set before filtering, so that equivalent integrations always produce the same facet result:
+**Transport normalization.** The two sources have different shapes — native JSONs carry two independent booleans (`"local": true`, `"cloud": true`), manifests carry an array (`"transports": ["local", "cloud"]`, 1..2 unique values from that enum, per §C.1 of `external-integrations/contracts/manifest.md`). The front normalizes both into the same set before filtering, so that equivalent integrations always produce the same facet result:
 
 | Source shape | Normalized set | Local chip | Cloud chip |
 |---|---|---|---|
@@ -165,7 +165,7 @@ Two implementation consequences for Phase A, from the current code:
 
 So: **browsing is backward compatible in both directions, installing a `categories`-declaring manifest is not** — it is gated, by design, on `gladys_version`. Install flows themselves are unchanged in code; what changes is which instances see the integration as compatible. The fallback file is expected to shrink over time as authors adopt the manifest field, which always wins over it.
 
-Because §6.2 and §6.3 alter the manifest and the indexer formats, whose source of truth is `docs/specs/external-integrations.md` (§C.1, §C.5 payload, §C.6), **Phase A updates that spec in the same diff**. Until then this RFC stays non-normative and the two documents cannot drift.
+Because §6.2 and §6.3 alter the manifest and the indexer formats, whose source of truth is `docs/specs/external-integrations/` (§C.1, §C.5 payload, §C.6), **Phase A updates that spec in the same diff**. Until then this RFC stays non-normative and the two documents cannot drift.
 
 ### 6.4 What does not change
 
@@ -276,7 +276,7 @@ Notes on debatable rows: the native *Xiaomi Home* integration is the Xiaomi gate
 
 Three phases, each independently shippable:
 
-- **Phase A — contracts (no visible change).** Core: accept the optional `categories` manifest field (validator + schema, two-stage validation §6.2), add `categories` and `first_seen_at` to the `getCatalog` field allowlist, and update `docs/specs/external-integrations.md` (§C.1, §C.5, §C.6) in the same diff — it is the source of truth for those formats, and this RFC stays non-normative until it does. Store repo: canonical schema update, fallback mapping seeded with §7 (keyed by `store_slug`), `first_seen_at` persistence and backfill (§4), author-facing validation warnings.
+- **Phase A — contracts (no visible change).** Core: accept the optional `categories` manifest field (validator + schema, two-stage validation §6.2), add `categories` and `first_seen_at` to the `getCatalog` field allowlist, and update `docs/specs/external-integrations/` (§C.1, §C.5, §C.6) in the same diff — it is the source of truth for those formats, and this RFC stays non-normative until it does. Store repo: canonical schema update, fallback mapping seeded with §7 (keyed by `store_slug`), `first_seen_at` persistence and backfill (§4), author-facing validation warnings.
 - **Phase B — catalog UI.** Sidebar driven by categories (§5) with the redirects — including the three dead legacy routes (`music`, `health`, `navigation`) — facet chips with the transport normalization (§4), "Newest first" sort and "New" badge, i18n labels. This is the phase that removes the "Devices" trap and delivers the visible value of topic 10419. Includes the `transports` completion pass on existing store manifests (or accepting their "unspecified" state in the transport facet).
 - **Phase C — ecosystem adoption.** Website developer docs, SDK template and example manifests updated to declare `categories`; the fallback mapping shrinks as authors adopt the field.
 
