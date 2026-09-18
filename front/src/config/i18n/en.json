@@ -384,6 +384,7 @@
       "link": "Link",
       "photo": "Photo",
       "sun": "Sun",
+      "moon": "Moon",
       "chips": "Status chips",
       "actions": "Quick actions",
       "house-view": "House view"
@@ -606,6 +607,69 @@
         "noHouse": "Please select a house in the box settings.",
         "noCoordinates": "This house has no coordinates. Please configure the house location first.",
         "error": "An error occurred while getting the sun data. Please retry."
+      },
+      "moon": {
+        "editHouseLabel": "Select a house. I will use its latitude/longitude to compute the moon position.",
+        "displayDetailsLabel": "Display details",
+        "displayDetailsDescription": "Shows the detailed list of information (distance, age, next phases, perigee, eclipse…) next to the moon. Uncheck to only display the moon and its phase.",
+        "computeAtMidnightLabel": "Compute the values at midnight",
+        "computeAtMidnightDescription": "Computes the visibility, distance, age and upcoming events at midnight, the way lunar calendars do, instead of the current time. Moonrise and moonset are not affected.",
+        "illuminationValue": "{{percent}} % illuminated",
+        "ageValue": "{{days}} days",
+        "moonrise": "Moonrise",
+        "moonset": "Moonset",
+        "todaySection": "Today",
+        "distance": "Earth-Moon distance",
+        "kilometers": "km",
+        "trajectory": "Trajectory",
+        "ascending": "Ascending",
+        "descending": "Descending",
+        "zodiac": "Constellation",
+        "nextNodeNorth": "North node",
+        "nextNodeSouth": "South node",
+        "upcomingSection": "Upcoming",
+        "fullMoon": "Full moon",
+        "newMoon": "New moon",
+        "perigee": "Perigee",
+        "apogee": "Apogee",
+        "nextEclipse": "Next lunar eclipse",
+        "eclipseLabel": {
+          "penumbral": "Penumbral eclipse",
+          "partialOrTotal": "Partial or total eclipse"
+        },
+        "today": "Today",
+        "inDays": {
+          "one": "In 1 day",
+          "other": "In {{count}} days"
+        },
+        "unknown": "Unknown",
+        "phases": {
+          "newMoon": "New Moon",
+          "waxingCrescent": "Waxing Crescent",
+          "firstQuarter": "First Quarter",
+          "waxingGibbous": "Waxing Gibbous",
+          "fullMoon": "Full Moon",
+          "waningGibbous": "Waning Gibbous",
+          "lastQuarter": "Last Quarter",
+          "waningCrescent": "Waning Crescent"
+        },
+        "zodiacSigns": {
+          "aries": "Aries",
+          "taurus": "Taurus",
+          "gemini": "Gemini",
+          "cancer": "Cancer",
+          "leo": "Leo",
+          "virgo": "Virgo",
+          "libra": "Libra",
+          "scorpio": "Scorpio",
+          "sagittarius": "Sagittarius",
+          "capricorn": "Capricorn",
+          "aquarius": "Aquarius",
+          "pisces": "Pisces"
+        },
+        "noHouse": "Please select a house in the box settings.",
+        "noCoordinates": "This house has no coordinates. Please configure the house location first.",
+        "error": "An error occurred while getting the moon data. Please retry."
       },
       "ecowatt": {
         "title": "Ecowatt France",

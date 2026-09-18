@@ -384,6 +384,7 @@
       "link": "Link",
       "photo": "Foto",
       "sun": "Sonne",
+      "moon": "Mond",
       "chips": "Status-Chips",
       "actions": "Schnellaktionen",
       "house-view": "Hausansicht"
@@ -606,6 +607,69 @@
         "noHouse": "Bitte wähle ein Zuhause in den Widget-Einstellungen aus.",
         "noCoordinates": "Dieses Zuhause hat keine Koordinaten. Bitte konfiguriere zuerst seinen Standort.",
         "error": "Beim Abrufen der Sonnendaten ist ein Fehler aufgetreten. Bitte versuche es erneut."
+      },
+      "moon": {
+        "editHouseLabel": "Wähle ein Zuhause aus. Ich werde seine Breiten- und Längengrade verwenden, um die Mondposition zu berechnen.",
+        "displayDetailsLabel": "Details anzeigen",
+        "displayDetailsDescription": "Zeigt die detaillierte Liste der Informationen (Entfernung, Alter, nächste Phasen, Perigäum, Finsternis…) neben dem Mond an. Deaktiviere die Option, um nur den Mond und seine Phase anzuzeigen.",
+        "computeAtMidnightLabel": "Werte um Mitternacht berechnen",
+        "computeAtMidnightDescription": "Berechnet Sichtbarkeit, Entfernung, Alter und die nächsten Ereignisse um Mitternacht, so wie es Mondkalender tun, statt zur aktuellen Uhrzeit. Mondauf- und -untergang bleiben unverändert.",
+        "illuminationValue": "{{percent}} % beleuchtet",
+        "ageValue": "{{days}} Tage",
+        "moonrise": "Mondaufgang",
+        "moonset": "Monduntergang",
+        "todaySection": "Heute",
+        "distance": "Entfernung Erde-Mond",
+        "kilometers": "km",
+        "trajectory": "Bahn",
+        "ascending": "Aufsteigend",
+        "descending": "Absteigend",
+        "zodiac": "Sternbild",
+        "nextNodeNorth": "Aufsteigender Knoten",
+        "nextNodeSouth": "Absteigender Knoten",
+        "upcomingSection": "Demnächst",
+        "fullMoon": "Vollmond",
+        "newMoon": "Neumond",
+        "perigee": "Perigäum",
+        "apogee": "Apogäum",
+        "nextEclipse": "Nächste Mondfinsternis",
+        "eclipseLabel": {
+          "penumbral": "Halbschattenfinsternis",
+          "partialOrTotal": "Partielle oder totale Finsternis"
+        },
+        "today": "Heute",
+        "inDays": {
+          "one": "In 1 Tag",
+          "other": "In {{count}} Tagen"
+        },
+        "unknown": "Unbekannt",
+        "phases": {
+          "newMoon": "Neumond",
+          "waxingCrescent": "Zunehmende Sichel",
+          "firstQuarter": "Erstes Viertel",
+          "waxingGibbous": "Zunehmender Dreiviertelmond",
+          "fullMoon": "Vollmond",
+          "waningGibbous": "Abnehmender Dreiviertelmond",
+          "lastQuarter": "Letztes Viertel",
+          "waningCrescent": "Abnehmende Sichel"
+        },
+        "zodiacSigns": {
+          "aries": "Widder",
+          "taurus": "Stier",
+          "gemini": "Zwillinge",
+          "cancer": "Krebs",
+          "leo": "Löwe",
+          "virgo": "Jungfrau",
+          "libra": "Waage",
+          "scorpio": "Skorpion",
+          "sagittarius": "Schütze",
+          "capricorn": "Steinbock",
+          "aquarius": "Wassermann",
+          "pisces": "Fische"
+        },
+        "noHouse": "Bitte wähle ein Zuhause in den Widget-Einstellungen aus.",
+        "noCoordinates": "Dieses Zuhause hat keine Koordinaten. Bitte konfiguriere zuerst seinen Standort.",
+        "error": "Beim Abrufen der Monddaten ist ein Fehler aufgetreten. Bitte versuche es erneut."
       },
       "ecowatt": {
         "title": "Ecowatt France",
