@@ -1,9 +1,11 @@
 const sinon = require('sinon').createSandbox();
 const HomeKitController = require('../../../../services/homekit/api/homekit.controller');
 
-const { assert, fake } = sinon;
+const { assert, fake, stub } = sinon;
 
 const homekitHandler = {
+  createBridge: stub(),
+  resetBridge: stub(),
   getCompatibleDevices: fake.resolves([
     {
       id: '4756151c-369e-4772-8bf7-943a6ac70583',
@@ -48,5 +50,27 @@ describe('HomeKitController GET /api/v1/service/homekit/device', () => {
       { name: 'Détecteur de fumée', selector: 'detecteur-fumee' },
       { name: 'Maison', selector: 'house-alarm:maison' },
     ]);
+  });
+});
+
+describe('HomeKitController GET /api/v1/service/homekit/reload', () => {
+  it('should reload HomeKit bridge', async () => {
+    const controller = HomeKitController(homekitHandler);
+    const res = { json: fake.returns(null) };
+
+    await controller['get /api/v1/service/homekit/reload'].controller({}, res);
+
+    assert.calledOnce(homekitHandler.createBridge);
+  });
+});
+
+describe('HomeKitController GET /api/v1/service/homekit/reset', () => {
+  it('should reset HomeKit bridge', async () => {
+    const controller = HomeKitController(homekitHandler);
+    const res = { json: fake.returns(null) };
+
+    await controller['get /api/v1/service/homekit/reset'].controller({}, res);
+
+    assert.calledOnce(homekitHandler.resetBridge);
   });
 });

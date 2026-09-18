@@ -4,14 +4,14 @@
 
 .alarmGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 0.75rem;
 }
 
 .alarmTile {
   border: none;
   border-radius: 16px;
-  padding: 0.85rem 0.5rem;
+  padding: 0.85rem 0.35rem;
   min-height: 6rem;
   display: flex;
   flex-direction: column;
@@ -50,19 +50,21 @@
   color: #414b5e;
 }
 
-.alarmTileArm .alarmTileIcon {
+/* Presence is the only new hue: away keeps the blue the single "arm" tile had,
+   and night takes the ink the partial tile used to wear — it suits it better. */
+.alarmTilePresence .alarmTileIcon {
+  background-color: #d9eef0;
+  color: #1f7a86;
+}
+
+.alarmTileNight .alarmTileIcon {
+  background-color: #e1e4ee;
+  color: #38415b;
+}
+
+.alarmTileAway .alarmTileIcon {
   background-color: #dde9fb;
   color: #2f5bd7;
-}
-
-.alarmTileDisarm .alarmTileIcon {
-  background-color: #def0e2;
-  color: #2e8f5b;
-}
-
-.alarmTilePanic .alarmTileIcon {
-  background-color: #fbe3de;
-  color: #c24a33;
 }
 
 /* active mode: the whole tile takes the tint, the disc goes white */
@@ -70,33 +72,107 @@
   background-color: rgba(255, 255, 255, 0.75);
 }
 
-.alarmTileActive.alarmTileArm {
+.alarmTileActive.alarmTilePresence {
+  background-color: #d9eef0;
+  color: #1f7a86;
+}
+
+.alarmTileActive.alarmTileAway {
   background-color: #dde9fb;
   color: #2f5bd7;
 }
 
-.alarmTileActive.alarmTileDisarm {
-  background-color: #def0e2;
-  color: #2e8f5b;
-}
-
-.alarmTileActive.alarmTilePartial {
+.alarmTileActive.alarmTileNight {
   background-color: var(--gl-ink, #1c2334);
   color: #fff;
 }
 
-.alarmTileActive.alarmTilePartial .alarmTileIcon {
+.alarmTileActive.alarmTileNight .alarmTileIcon {
   background-color: rgba(255, 255, 255, 0.16);
   color: #fff;
 }
 
-/* panic is the one loud state: the alarm is blaring */
-.alarmTileActive.alarmTilePanic {
+/* disarming is not a mode among the three: it is the way out, full width */
+.alarmDisarmButton {
+  margin-top: 0.75rem;
+  width: 100%;
+  border: 1px solid rgba(28, 35, 52, 0.14);
+  background-color: transparent;
+  color: var(--gl-ink, #1c2334);
+  border-radius: 12px;
+  padding: 0.7rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.alarmDisarmButtonActive {
+  background-color: #def0e2;
+  border-color: transparent;
+  color: #2e8f5b;
+  cursor: default;
+}
+
+.alarmPanicSeparator {
+  height: 1px;
+  background-color: rgba(28, 35, 52, 0.08);
+  margin: 0.9rem 0 0.75rem;
+}
+
+/* panic is an action, not a mode: quieter than a tile, and set apart */
+.alarmPanicButton {
+  width: 100%;
+  border: 1px solid rgba(194, 74, 51, 0.32);
+  background-color: transparent;
+  color: #c24a33;
+  border-radius: 12px;
+  padding: 0.6rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.alarmPanicButton:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* the alarm going off is the one loud state: it takes the whole card */
+.alarmTriggered {
   background-color: #d4593f;
+  color: #fff;
+  border-radius: 12px;
+}
+
+.alarmTriggered .alarmTile {
+  background-color: rgba(255, 255, 255, 0.14);
   color: #fff;
 }
 
-.alarmTileActive.alarmTilePanic .alarmTileIcon {
-  background-color: rgba(255, 255, 255, 0.2);
+.alarmTriggered .alarmTileIcon {
+  background-color: rgba(255, 255, 255, 0.18);
   color: #fff;
+}
+
+.alarmTriggered .alarmDisarmButton {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.alarmTriggered .alarmPanicSeparator {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.alarmTriggered .alarmPanicButton {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.7);
 }

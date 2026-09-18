@@ -21,7 +21,7 @@ describe('house.disarm', () => {
   beforeEach(async () => {
     await house.update('test-house', {
       alarm_delay_before_arming: 0,
-      alarm_mode: ALARM_MODES.ARMED,
+      alarm_mode: ALARM_MODES.AWAY_ARMED,
     });
     sinon.reset();
   });
@@ -54,7 +54,7 @@ describe('house.disarm', () => {
       alarm_delay_before_arming: 5,
       alarm_mode: ALARM_MODES.DISARMED,
     });
-    await house.arm('test-house');
+    await house.arm('test-house', ALARM_MODES.AWAY_ARMED);
     sinon.reset();
     await house.disarm('test-house');
     // Timeout should be deleted
@@ -83,7 +83,7 @@ describe('house.disarm', () => {
       alarm_delay_before_arming: 0.001,
       alarm_mode: ALARM_MODES.DISARMED,
     });
-    await house.arm('test-house');
+    await house.arm('test-house', ALARM_MODES.AWAY_ARMED);
     await house.disarm('test-house');
     // Wait for the arming delay to be over
     await Promise.delay(20);
