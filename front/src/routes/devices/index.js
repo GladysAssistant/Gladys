@@ -3,8 +3,9 @@ import { connect } from 'unistore/preact';
 import get from 'get-value';
 
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import disambiguateIntegrationNames from '../../utils/integrationNames';
 import DevicesPage from './DevicesPage';
-import { getDeviceIntegration, disambiguateIntegrationNames } from './integrationLinks';
+import { getDeviceIntegration } from './integrationLinks';
 
 class Devices extends Component {
   // The endpoint returns the whole list: load it once, then search, order
