@@ -1,0 +1,608 @@
+.noSpinner::-webkit-outer-spin-button,
+.noSpinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.noSpinner {
+  -moz-appearance: textfield;
+}
+
+.gaugeContainer {
+  width: 100%;
+  max-width: 220px;
+}
+
+.arcBtnGroup {
+  cursor: pointer;
+}
+
+.arcBtnGroup:hover .arcBtnCircle {
+  fill: #e9ecef;
+}
+
+.arcBtnGroup:active .arcBtnCircle {
+  fill: #dee2e6;
+}
+
+/* Invisible, but it receives the pointer: the visible circle is 30px across in
+   a gauge that renders at 220px, which is under every touch-target minimum. */
+.arcBtnHitArea {
+  fill: transparent;
+}
+
+.arcBtnCircle {
+  fill: white;
+  stroke: #adb5bd;
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+:global(.dark-mode) .arcBtnCircle {
+  fill: #ced8e6;
+}
+
+:global(.dark-mode) .arcBtnGroup:hover .arcBtnCircle {
+  fill: #b8c4d4;
+}
+
+:global(.dark-mode) .arcBtnGroup:active .arcBtnCircle {
+  fill: #a8b4c4;
+}
+
+.arcBtnText {
+  font-size: 18px;
+  fill: #495057;
+  font-weight: 400;
+  pointer-events: none;
+  user-select: none;
+}
+
+.gaugeSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* The gauge is reachable by tab now that it is a slider, so it has to show it.
+   :focus-visible only fires for keyboard focus, so tapping the dial does not
+   draw a ring around it. */
+.gaugeSvg:focus {
+  outline: none;
+}
+
+.gaugeSvg:focus-visible {
+  outline: 2px solid #206bc4;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Only the ring opts out of touch scrolling, not the whole gauge: the SVG spans
+   the widget on a phone, and taking the gesture everywhere turned each
+   thermostat on a dashboard into a patch the page would not scroll under.
+   A drag that does start on the ring is held by the non-passive touchmove
+   listener, which preventDefaults once the gesture is under way. */
+.gaugeArc {
+  touch-action: none;
+}
+
+.arcLabel {
+  font-size: 9px;
+  fill: #adb5bd;
+}
+
+.currentTempText {
+  font-size: 16px;
+  fill: #495057;
+  font-weight: 600;
+}
+
+.humidityText {
+  font-size: 13px;
+  fill: #6c757d;
+}
+
+/* The droplet keeps its own colour: the reading beside it stays grey like the
+   other secondary text. */
+.humidityIcon {
+  fill: #3b82f6;
+}
+
+@keyframes flamePulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.25);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes frostSpin {
+  0% {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: rotate(180deg) scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* Kept deliberately tight. A wide shadow spreads the arc's colour over the pale
+   background until it reads as a grey smear around the stroke rather than a
+   halo — very visible on the blue of cooling mode, which has less contrast
+   against that background than the orange of heating. */
+@keyframes arcGlowPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+}
+
+/* The arc sets `color` inline to its own stroke colour, which is what
+   currentColor resolves against: the halo is then orange when heating and blue
+   when cooling without either being named here. Inheriting `color` is not
+   enough — with none set, currentColor falls back to the initial black. */
+.arcGlow {
+  animation: arcGlowPulse 2s ease-in-out infinite;
+}
+
+/* Draws SVG text with the icon font the rest of Gladys uses. The `fe fe-*`
+   classes render through a :before pseudo-element, which SVG <text> has none
+   of, so the glyph is inlined and only the font is set here. */
+.gaugeIconGlyph {
+  font-family: 'lucide';
+  font-weight: normal;
+  font-style: normal;
+}
+
+.activeIconHeating {
+  font-size: 22px;
+  fill: #f97316;
+  animation: flamePulse 1.4s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.activeIconCooling {
+  font-size: 22px;
+  fill: #3b82f6;
+  animation: frostSpin 2s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.tempMain {
+  font-size: 50px;
+  fill: #212529;
+  padding-top: 5px;
+  /*font-weight: 700;*/
+}
+
+.tempDecimal {
+  font-size: 24px;
+  fill: #212529;
+  /*font-weight: 500;*/
+}
+
+.tempUnit {
+  font-size: 20px;
+  fill: #212529;
+}
+
+/* Shown instead of the setpoint when the thermostat is off. Smaller than the
+   number it replaces: a word set at 50px overflows the gauge in the languages
+   that spell it out ("Arrêt", "Ausgeschaltet"), and the muted grey matches the
+   arc, which goes grey in that mode too. */
+.offText {
+  font-size: 32px;
+  fill: #868e96;
+  letter-spacing: 1px;
+}
+
+.modeIcon {
+  font-size: 20px !important;
+}
+
+.presetWrapper {
+  position: relative;
+}
+
+.presetMenu {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 160px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+}
+
+.presetItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(0, 40, 100, 0.06);
+  color: #495057;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.presetItem:last-child {
+  border-bottom: none;
+}
+
+.presetItem:hover {
+  background: #f8f9fa;
+}
+
+.presetItemActive {
+  color: #467fcf;
+  font-weight: 600;
+}
+
+.presetLabel {
+  flex: 1;
+}
+
+.presetTemp {
+  font-size: 0.8rem;
+  color: #adb5bd;
+  margin-left: 8px;
+}
+
+.presetItemActive .presetTemp {
+  color: #467fcf;
+}
+
+/* Segmented Control */
+.segmentedControl {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.segmentBtn {
+  flex: 1;
+  max-width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: #adb5bd;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  outline: none;
+}
+
+/* Cleared for the pointer, restored for the keyboard: :focus-visible only
+   matches when the browser judges focus should be shown, so tapping a preset
+   stays clean while tabbing through them is followable. */
+.segmentBtn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.segmentBtn:focus-visible {
+  outline: 2px solid #206bc4;
+  outline-offset: 2px;
+}
+
+.segmentBtn:hover {
+  transform: translateY(-2px);
+}
+
+.segmentBtn i {
+  transition: all 0.25s ease;
+}
+
+.segmentBtn:active {
+  transform: translateY(0);
+}
+
+.segmentBtn:active i {
+  transform: scale(0.85);
+}
+
+/* Inactive segment buttons: medium grey to clearly show inactive state */
+.segmentBtn i {
+  color: #6c757d;
+  opacity: 1;
+  transition: color 0.25s ease, opacity 0.25s ease;
+}
+
+/* Active segment button: use preset color + glow */
+.segmentBtnActive i {
+  color: var(--preset-color, #f59f00);
+  opacity: 1;
+  filter: drop-shadow(0 2px 6px var(--preset-color, #f59f00));
+}
+
+.segmentBtn:hover i {
+  opacity: 0.65;
+}
+
+/* Dark mode: cancel the global invert(100%) on preset-colored elements.
+   !important needed to override .dark-mode .dashboard .fe { filter: none } */
+:global(.dark-mode) .segmentBtn i {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+:global(.dark-mode) .segmentBtnActive i {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+:global(.dark-mode) .scheduleBanner {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+:global(.dark-mode) .manualBanner {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+.presetColorLabel {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.presetColorInput {
+  width: 36px;
+  height: 32px;
+  padding: 0;
+  cursor: pointer;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.presetColorRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Schedule selector row in widget */
+.scheduleRow {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  padding: 0 4px;
+  gap: 4px;
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.scheduleSelect {
+  flex: 1;
+  font-size: 0.8rem;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  border-radius: 3px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+
+.scheduleSelect:focus {
+  outline: none;
+  border-color: #467fcf;
+}
+
+.scheduleSelect:focus-visible {
+  outline: 2px solid #206bc4;
+  outline-offset: 1px;
+}
+
+/* Schedule banner (planning mode) */
+.scheduleBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--banner-color) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--banner-color) 30%, transparent);
+  margin: 0 auto;
+  width: fit-content;
+  font-size: 0.875rem;
+  color: var(--banner-color);
+  font-weight: 500;
+}
+
+.scheduleBannerIcon {
+  font-size: 0.9rem;
+}
+
+.scheduleBannerUntil {
+  color: #6c757d;
+  font-weight: 400;
+}
+
+/* Manual mode banner (replaces planning banner during manual mode) */
+.manualBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #ffc10740;
+  background: #ffc10714;
+  color: #ffc107;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.manualBannerIcon {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+/* An open window suspends the heating: the state is reported on its own banner
+   rather than only as a pictogram, and it replaces the schedule/manual banner
+   because neither describes what the thermostat is actually doing right now. */
+.windowBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #0ca6f240;
+  background: #0ca6f214;
+  color: #0ca6f2;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+:global(.dark-mode) .windowBanner {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+.windowBannerIcon {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.windowBannerText {
+  white-space: nowrap;
+}
+
+.manualBannerText {
+  white-space: nowrap;
+}
+
+.manualBannerUntil {
+  color: #6c757d;
+  font-weight: 400;
+}
+
+.manualBannerCancel {
+  position: relative;
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid #ffc10760;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffc107;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.75rem;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+/* The visible circle stays 22px, which suits the banner, but the tap area is
+   extended to the 44px Apple asks for (WCAG 2.5.8 wants 24 minimum). This is
+   the control that ends a forced heating: it has to be reliable under a thumb. */
+.manualBannerCancel::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+.manualBannerCancel:hover {
+  background: #ffc10730;
+}
+
+/* Manual timer badge shown above preset buttons */
+.manualTimerBadge {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #f59f00;
+  margin-bottom: 4px;
+  opacity: 0.85;
+}
+
+/* SVG manual timer button (clickable zone between +/-) */
+.manualTimerBtn {
+  cursor: pointer;
+}
+
+.manualTimerBtn:hover circle {
+  opacity: 0.8;
+}
+
+/* SVG text showing remaining minutes */
+.manualTimerSvgText {
+  font-size: 13px;
+  font-weight: 700;
+  fill: #ffc107;
+  font-family: inherit;
+}
+
+/* SVG 'min' unit label below the countdown number */
+.manualTimerSvgUnit {
+  font-size: 8px;
+  font-weight: 500;
+  fill: #ffc107;
+  opacity: 0.8;
+  font-family: inherit;
+}
+
+/* SVG confirm text "OK?" */
+.manualTimerSvgConfirm {
+  font-size: 9px;
+  font-weight: 600;
+  fill: #dc3545;
+  font-family: inherit;
+}
+
+/* SVG confirm yes button text */
+.manualTimerSvgConfirmYes {
+  font-size: 9px;
+  font-weight: 600;
+  fill: #fff;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Three infinite animations run whenever the thermostat is heating or cooling,
+   which is most of the time on a wall tablet. Users who ask for less motion get
+   the same information without the movement: the glow keeps its colour, it just
+   stops pulsing. */
+@media (prefers-reduced-motion: reduce) {
+  .arcGlow,
+  .activeIconHeating,
+  .activeIconCooling {
+    animation: none;
+  }
+}

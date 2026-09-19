@@ -22,6 +22,7 @@ import ChipsBox from '../../components/boxs/chips/ChipsBox';
 import ActionsBox from '../../components/boxs/actions/ActionsBox';
 import HouseViewBox from '../../components/boxs/house-view/HouseViewBox';
 import ErrorBoundary from '../../components/ErrorBoundary';
+import ThermostatBox from '../../components/boxs/thermostat/ThermostatBox';
 
 const BoxContent = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -71,6 +72,8 @@ const BoxContent = ({ children, ...props }) => {
       return <HouseViewBox {...props} />;
     case 'actions':
       return <ActionsBox {...props} />;
+    case 'thermostat':
+      return <ThermostatBox {...props} />;
   }
 };
 

@@ -1,0 +1,24 @@
+.presetColName {
+  width: 30%;
+}
+
+.presetTempInput {
+  max-width: 90px;
+}
+
+/* Preset colour swatch: only the colour itself is dynamic, passed as a CSS
+   variable. The dark theme inverts the whole page, so re-invert the dot to
+   keep its real colour — same handling as the schedule editor dot. */
+.presetColorDot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+  background: var(--dot-color, #adb5bd);
+}
+
+:global(.dark-mode) .presetColorDot {
+  filter: invert(100%) hue-rotate(180deg);
+}

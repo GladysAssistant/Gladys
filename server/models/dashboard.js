@@ -137,6 +137,10 @@ const boxSchema = Joi.object().keys({
     .min(0)
     .max(3600),
   photo_show_caption: Joi.boolean(),
+  // thermostat box: the widget only chooses which thermostat to display.
+  // Every regulation setting (presets, hysteresis, TPI, switch, active schedule)
+  // lives on the device, so a dashboard can never drive the heating of the house.
+  thermostat_feature: Joi.string().allow(null),
 });
 
 // A dashboard is a stack of sections, each section holding its own columns
