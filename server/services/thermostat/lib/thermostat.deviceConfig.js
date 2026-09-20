@@ -56,8 +56,6 @@ function buildParamsConfig(device) {
     state_feature: getParam('THERMOSTAT_STATE_FEATURE') || null,
     mode_feature: getParam('THERMOSTAT_MODE_FEATURE') || null,
     window_feature: getParam('THERMOSTAT_WINDOW_FEATURE') || null,
-    // Device-owned: the widget only chooses which thermostat to display.
-    active_schedule: getParam('THERMOSTAT_ACTIVE_SCHEDULE') || null,
     default_mode: getParam('THERMOSTAT_MODE') || DEFAULT_MODE,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
     temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),

@@ -9,10 +9,20 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4,
       },
+      house_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+        references: {
+          model: 't_house',
+          key: 'id',
+        },
+      },
       name: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING,
+        validate: {
+          len: [1, 40],
+        },
       },
       selector: {
         allowNull: false,
@@ -30,9 +40,18 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   thermostatSchedule.associate = (models) => {
-    thermostatSchedule.hasMany(models.ThermostatScheduleSlot, {
+    thermostatSchedule.belongsTo(models.House, {
+      foreignKey: 'house_id',
+      targetKey: 'id',
+      as: 'house',
+    });
+    thermostatSchedule.hasMany(models.ThermostatScheduleTransition, {
       foreignKey: 'schedule_id',
-      as: 'slots',
+      as: 'transitions',
+    });
+    thermostatSchedule.hasMany(models.ThermostatScheduleDevice, {
+      foreignKey: 'schedule_id',
+      as: 'thermostats',
     });
   };
 

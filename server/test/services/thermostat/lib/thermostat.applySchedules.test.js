@@ -15,14 +15,6 @@ const thermostatFeature = (extra = {}) => ({
   ...extra,
 });
 
-// Build a slot covering the whole day so the current time always matches.
-const fullDaySlot = (preset) => ({
-  day_of_week: 0,
-  start_time: '00:00',
-  end_time: '00:00', // 00:00 end = end of day (1440)
-  preset,
-});
-
 // Schedule slots use the real "today" day-of-week so findMatchingPreset matches now.
 // Regulation reads the clock in the Gladys timezone, which falls back to
 // Europe/Paris when the TIMEZONE variable is unset, as it is in these fixtures.
@@ -30,21 +22,26 @@ const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedul
 
 const todayDow = getCurrentDayAndMinutes(new Date(), 'Europe/Paris').dayOfWeek;
 
+// A single point at 00:00 today: it is the last transition at or before now
+// whatever the time of day, so the whole day carries this preset.
 const buildSchedule = (preset) => ({
   selector: 'my-schedule',
-  slots: [{ ...fullDaySlot(preset), day_of_week: todayDow }],
+  transitions: [{ day_of_week: todayDow, time: '00:00', preset }],
 });
 
 const buildDb = (schedule) => ({
-  ThermostatSchedule: {
-    findOne: fake.resolves(schedule),
+  ThermostatScheduleDevice: {
+    findOne: fake.resolves(schedule ? { schedule } : null),
+    count: fake.resolves(schedule ? 1 : 0),
   },
-  ThermostatScheduleSlot: {},
+  ThermostatSchedule: {},
+  ThermostatScheduleTransition: {},
 });
 
 const loadModule = (schedule) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.applySchedules', {
     '../../../models': buildDb(schedule),
+    './thermostat.scheduleDevice': { followsSchedule: fake.resolves(Boolean(schedule)) },
     '../../../utils/logger': {
       debug: fake.returns(null),
       info: fake.returns(null),
@@ -63,7 +60,6 @@ const baseParams = (overrides = {}) => {
     THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
     THERMOSTAT_SWITCH_FEATURE: 'heater-switch',
     // The active schedule is device-owned since the config moved off the dashboard.
-    THERMOSTAT_ACTIVE_SCHEDULE: 'my-schedule',
     THERMOSTAT_MODE: 'heating',
     THERMOSTAT_HYSTERESIS_START: '0.5',
     THERMOSTAT_HYSTERESIS_STOP: '0.5',
@@ -197,8 +193,8 @@ describe('thermostat.applySchedules (integration)', () => {
   });
 
   it('should do nothing when there is no schedule and no preset selected', async () => {
-    const device = buildThermostatDevice(baseParams({ THERMOSTAT_ACTIVE_SCHEDULE: '' }));
-    const mod = loadModule(buildSchedule('comfort'));
+    const device = buildThermostatDevice(baseParams());
+    const mod = loadModule(null);
     const gladys = makeGladys({
       devices: [device],
       variables: {},

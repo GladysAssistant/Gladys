@@ -370,7 +370,67 @@ const findMatchingPreset = (todaySlots, yesterdaySlots, currentMinutes) => {
   return slot ? slot.preset : null;
 };
 
+/**
+ * @description Find the transition point that applies at a given moment: the
+ * last point at or before now. When no point of the week precedes now, the last
+ * point of the week applies — the programme wraps, which is what makes a
+ * schedule gapless, and what lets a Sunday-night point hold into Monday morning.
+ * @param {Array} transitions - Every transition of the schedule: { day_of_week, time, preset }.
+ * @param {number} dayOfWeek - Current day, 0 = Monday.
+ * @param {number} currentMinutes - Current time in minutes since midnight.
+ * @returns {object|null} The transition in force, or null on a schedule with no point.
+ * @example
+ * findCurrentTransition(transitions, 0, 480); // { day_of_week: 0, time: '06:30', preset: 'comfort' }
+ */
+const findCurrentTransition = (transitions, dayOfWeek, currentMinutes) => {
+  if (!transitions || transitions.length === 0) {
+    return null;
+  }
+  // Order the week from its first point, so "the last point at or before now" is
+  // a scan rather than a set of day comparisons.
+  const sorted = [...transitions].sort(
+    (a, b) => a.day_of_week - b.day_of_week || timeToMinutes(a.time) - timeToMinutes(b.time),
+  );
+  const nowPosition = dayOfWeek * DAY_MINUTES + currentMinutes;
+  const positionOf = (transition) => transition.day_of_week * DAY_MINUTES + timeToMinutes(transition.time);
+
+  let current = null;
+  sorted.forEach((transition) => {
+    if (positionOf(transition) <= nowPosition) {
+      current = transition;
+    }
+  });
+  // Nothing yet this week: the programme wraps onto its last point.
+  return current || sorted[sorted.length - 1];
+};
+
+/**
+ * @description The transition that follows the one in force, wrapping onto the
+ * first point of the week. The widget renders "Eco until 08:30" from it.
+ * @param {Array} transitions - Every transition of the schedule.
+ * @param {number} dayOfWeek - Current day, 0 = Monday.
+ * @param {number} currentMinutes - Current time in minutes since midnight.
+ * @returns {object|null} The next transition, or null on a schedule with no point.
+ * @example
+ * findNextTransition(transitions, 0, 480); // { day_of_week: 0, time: '08:30', preset: 'eco' }
+ */
+const findNextTransition = (transitions, dayOfWeek, currentMinutes) => {
+  const current = findCurrentTransition(transitions, dayOfWeek, currentMinutes);
+  if (!current) {
+    return null;
+  }
+  const sorted = [...transitions].sort(
+    (a, b) => a.day_of_week - b.day_of_week || timeToMinutes(a.time) - timeToMinutes(b.time),
+  );
+  const index = sorted.findIndex(
+    (transition) => transition.day_of_week === current.day_of_week && transition.time === current.time,
+  );
+  return sorted[(index + 1) % sorted.length];
+};
+
 module.exports = {
+  findCurrentTransition,
+  findNextTransition,
   applySlotToDay,
   mergeIntoSlots,
   readDayAsEntered,

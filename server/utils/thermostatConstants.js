@@ -42,7 +42,16 @@ const DEFAULT_TEMP_UNIT = 'C';
 const DEFAULT_MANUAL_DURATION_MINUTES = 30;
 const MANUAL_DURATION_MS = DEFAULT_MANUAL_DURATION_MINUTES * 60 * 1000;
 
-const PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
+// The preset names, as they are stored in a schedule transition and used to key
+// DEFAULT_PRESET_TEMPS. `schedule` is not one of them: it is a state of the
+// thermostat ("follow the programme"), carried by the preset feature, and a
+// transition saying it would be the programme referring to itself.
+const PRESETS = ['frost', 'away', 'eco', 'night', 'comfort'];
+
+// What a transition point accepts: a preset, or `off`. Stopping is a mode
+// (THERMOSTAT_MODE.OFF) rather than a preset, but a programme may legitimately
+// stop the heating, so the column's domain is wider than the preset enum.
+const TRANSITION_PRESETS = [...PRESETS, 'off'];
 
 // How a thermostat device is regulated.
 // - `virtual`: Gladys is the thermostat. It reads a room sensor, applies
@@ -79,6 +88,7 @@ module.exports = {
   DEFAULT_MANUAL_DURATION_MINUTES,
   MANUAL_DURATION_MS,
   PRESETS,
+  TRANSITION_PRESETS,
   THERMOSTAT_TYPES,
   DEFAULT_THERMOSTAT_TYPE,
 };
