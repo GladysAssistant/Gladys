@@ -121,18 +121,20 @@ Two consequences follow from the split:
 
 `DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET`, with the `THERMOSTAT_PRESET` enum:
 
-| Value      | Meaning                               |
-| ---------- | ------------------------------------- |
-| `schedule` | follow the weekly programme           |
-| `frost`    | frost protection, the lowest setpoint |
-| `away`     | nobody home                           |
-| `eco`      | reduced                               |
-| `night`    | night-time reduced                    |
-| `comfort`  | the normal occupied setpoint          |
+| Value | Name       | Meaning                               |
+| ----- | ---------- | ------------------------------------- |
+| `0`   | `SCHEDULE` | follow the weekly programme           |
+| `1`   | `FROST`    | frost protection, the lowest setpoint |
+| `2`   | `AWAY`     | nobody home                           |
+| `3`   | `ECO`      | reduced                               |
+| `4`   | `NIGHT`    | night-time reduced                    |
+| `5`   | `COMFORT`  | the normal occupied setpoint          |
 
 It is a **Gladys-wide** type, documented in `docs/specs/device-feature-categories.md` alongside the rest of the thermostat category, not a private notion of this service: Netatmo, Tado and Overkiz all publish the same thing, and an integration that gains it later must not have to invent a second spelling. Per `device-feature-categories.md`, a device that supports only some of these values declares what it supports in `supported_options` rather than getting a narrower enum.
 
-The preset is stored as a string (`last_value_string`), like the other enum-shaped features the taxonomy defines.
+**The values are integers, not strings.** `device-feature-categories.md` scopes string values to the `text` / `select` type, for lists that only exist on the appliance itself — installed TV apps, HDMI sources — and states that a capability standards do cover keeps its own type with integer values; `normalizeSupportedOptions` rejects a string value on any other feature type outright. A preset is exactly such a capability: Zigbee TRVs and Home Assistant both define the set. So `THERMOSTAT_PRESET` is an integer enum like `THERMOSTAT_MODE` and `WATER_HEATER_MODE`, the state lives in `last_value`, and the labels come from the `deviceFeatureValue` translations in every locale file.
+
+The values are **append-only**, for the reason `WATER_HEATER_MODE` gives: an integer already written into device states and hard-coded in users' scenes can never change meaning.
 
 ### B.3 What a virtual thermostat carries
 
@@ -313,7 +315,9 @@ t_thermostat_schedule_device
 
 The primary key on `device_id` alone is what enforces **one schedule per thermostat**. Deleting a schedule, a house or a thermostat cleans the link up with no code at all, which is what replaces `detachSchedule`.
 
-`preset` is stored as a string rather than an ENUM: SQLite does not enforce ENUM anyway, and a column ENUM would mean a migration every time a preset is added. Validation stays in Joi and in the model. `off` is accepted here — a transition may legitimately stop the heating — and is applied as a mode write (B.1).
+`preset` is stored as a string rather than an ENUM: SQLite does not enforce ENUM anyway, and a column ENUM would mean a migration every time a preset is added. Validation stays in Joi and in the model.
+
+**The column is a string although the feature is an integer** (B.2), and the two are not in conflict: a transition also accepts `off`, which is a mode and has no place in the preset enum, so the column's domain is "a preset name, or `off`" rather than the preset enum itself. Names also keep a hand-read schedule row meaningful, which matters more here than on a feature whose value is rendered through translations. The loop maps the name to its enum value when it writes the `preset` feature, and `off` to a mode write (B.1).
 
 This replaces the `t_thermostat_schedule_slot` table of migration `20260823000000`.
 
