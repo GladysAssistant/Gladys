@@ -17,13 +17,14 @@ const {
 const { setValue } = require('./thermostat.setValue');
 const { postDelete } = require('./thermostat.postDelete');
 const {
-  setVariable,
-  getVariable,
-  getFeatureKeys,
-  resolveRuntimeVariableKey,
+  getPreset,
+  savePreset,
+  getManualHold,
+  setManualHold,
+  clearManualHold,
   broadcastConfigUpdated,
   triggerApplySchedules,
-} = require('./thermostat.setVariable');
+} = require('./thermostat.state');
 
 const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   this.gladys = gladys;
@@ -32,12 +33,12 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // Derived from this service's devices, rebuilt lazily and dropped whenever a
   // thermostat device is created, updated or deleted.
   this.windowSelectorsCache = null;
-  this.featureKeysCache = null;
   this.targetSelectorsCache = null;
-  // Setpoints this service just wrote on a real thermostat, by selector. The
-  // write comes back as a NEW_STATE, and without this mark that echo would be
-  // taken for a change made on the device and arm a manual hold — so a
-  // scheduled write would suspend the very schedule that made it.
+  // The last setpoint this service wrote on each real thermostat, by selector.
+  // The write is reported back as a NEW_STATE, and without this mark that report
+  // would be taken for a change made on the device and arm a manual hold — so a
+  // scheduled write would suspend the very schedule that made it. The mark is
+  // kept, not consumed: integrations re-report unchanged values.
   this.selfWrittenSetpoints = new Map();
 };
 
@@ -59,10 +60,11 @@ ThermostatHandler.prototype.invalidateDeviceCaches = invalidateDeviceCaches;
 ThermostatHandler.prototype.postUpdate = postUpdate;
 ThermostatHandler.prototype.setValue = setValue;
 ThermostatHandler.prototype.postDelete = postDelete;
-ThermostatHandler.prototype.setVariable = setVariable;
-ThermostatHandler.prototype.getVariable = getVariable;
-ThermostatHandler.prototype.getFeatureKeys = getFeatureKeys;
-ThermostatHandler.prototype.resolveRuntimeVariableKey = resolveRuntimeVariableKey;
+ThermostatHandler.prototype.getPreset = getPreset;
+ThermostatHandler.prototype.savePreset = savePreset;
+ThermostatHandler.prototype.getManualHold = getManualHold;
+ThermostatHandler.prototype.setManualHold = setManualHold;
+ThermostatHandler.prototype.clearManualHold = clearManualHold;
 ThermostatHandler.prototype.broadcastConfigUpdated = broadcastConfigUpdated;
 ThermostatHandler.prototype.triggerApplySchedules = triggerApplySchedules;
 

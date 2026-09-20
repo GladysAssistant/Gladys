@@ -1,5 +1,11 @@
 const logger = require('../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  THERMOSTAT_MODE,
+  THERMOSTAT_OPERATING_STATE,
+  THERMOSTAT_PRESET,
+} = require('../../../utils/constants');
 const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
 
 // Params the integration owns. Anything else sent by a client is dropped rather
@@ -29,6 +35,68 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_TPI_CYCLE_TIME',
   'THERMOSTAT_TPI_PROPORTIONAL_BAND',
 ];
+
+/**
+ * @description Build the state features a thermostat carries besides its
+ * setpoint: which temperature it aims for, what the machine does, and whether it
+ * is currently heating. They are features rather than service variables because
+ * they are state of the device: on a feature, a scene can read and write them,
+ * and MQTT, HomeKit and Gladys Plus see them.
+ * @param {object} device - The device being created, for its selector.
+ * @param {boolean} external - Whether the real thermostat runs itself.
+ * @returns {Array} The features to create alongside the setpoint.
+ * @example
+ * buildStateFeatures({ selector: 'living-room' }, false);
+ */
+function buildStateFeatures(device, external) {
+  const base = device.selector || device.external_id;
+  const preset = {
+    name: 'Preset',
+    external_id: `${base}:preset`,
+    selector: `${base}:preset`,
+    read_only: false,
+    has_feedback: false,
+    min: THERMOSTAT_PRESET.SCHEDULE,
+    max: THERMOSTAT_PRESET.COMFORT,
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
+  };
+  if (external) {
+    // The real device owns its setpoint, its mode and its running state, and
+    // mirroring them here would give the house two sources that drift apart.
+    // The preset is the exception: no thermostat on the market publishes Gladys's
+    // preset vocabulary, so it is genuinely this integration's own state.
+    return [preset];
+  }
+  return [
+    preset,
+    {
+      name: 'Mode',
+      external_id: `${base}:mode`,
+      selector: `${base}:mode`,
+      read_only: false,
+      has_feedback: false,
+      min: THERMOSTAT_MODE.OFF,
+      max: THERMOSTAT_MODE.COOLING,
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+    },
+    {
+      // Written by the regulation loop, never by a client: a virtual thermostat
+      // knows whether it is heating, and saying so on a standard feature makes it
+      // visible to HomeKit rather than to this widget only.
+      name: 'Operating state',
+      external_id: `${base}:operating-state`,
+      selector: `${base}:operating-state`,
+      read_only: true,
+      has_feedback: false,
+      min: THERMOSTAT_OPERATING_STATE.IDLE,
+      max: THERMOSTAT_OPERATING_STATE.COOLING,
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+    },
+  ];
+}
 
 /**
  * @description Create a thermostat device linked to this service.
@@ -79,7 +147,10 @@ async function createDevice(device) {
     room_id: device.room_id,
     model: device.model,
     should_poll: false,
-    features: external ? [] : features.slice(0, 1),
+    // The state features are built here rather than taken from the payload: they
+    // are not the client's to shape, and a device saved before they existed gets
+    // them on its next save.
+    features: [...(external ? [] : features.slice(0, 1)), ...buildStateFeatures(device, external)],
     params,
     service_id: this.serviceId,
   });
@@ -89,4 +160,4 @@ async function createDevice(device) {
   return createdDevice;
 }
 
-module.exports = { createDevice, ALLOWED_PARAMS };
+module.exports = { createDevice, buildStateFeatures, ALLOWED_PARAMS };

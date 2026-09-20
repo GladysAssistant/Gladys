@@ -133,6 +133,89 @@ describe('thermostat.onDeviceNewState (window open)', () => {
   });
 });
 
+// The immediate cut has to reach an external thermostat too: it carries no
+// setpoint feature and no switch, so a listener that requires either skips it
+// and leaves the heating running until the next minute tick.
+describe('thermostat.onDeviceNewState (window open, external thermostat)', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  const buildExternalGladys = ({ modeValue = 1 } = {}) => {
+    const externalThermostat = {
+      selector: 'netatmo-thermostat',
+      // No feature of its own beyond the preset: the real device owns the rest.
+      features: [],
+      params: [
+        { name: 'THERMOSTAT_TYPE', value: 'external' },
+        { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+        { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+        { name: 'THERMOSTAT_WINDOW_FEATURE', value: 'window-sensor' },
+      ],
+    };
+    const setValue = fake.resolves(null);
+    return {
+      gladys: {
+        device: {
+          get: fake((query) => {
+            if (query && query.service === 'thermostat') {
+              return Promise.resolve([externalThermostat]);
+            }
+            if (query && query.device_feature_selectors === 'netatmo-setpoint') {
+              return Promise.resolve([
+                { selector: 'netatmo-device', features: [{ selector: 'netatmo-setpoint', last_value: 21 }] },
+              ]);
+            }
+            if (query && query.device_feature_selectors === 'netatmo-mode') {
+              return Promise.resolve([
+                { selector: 'netatmo-device', features: [{ selector: 'netatmo-mode', last_value: modeValue }] },
+              ]);
+            }
+            return Promise.resolve([]);
+          }),
+          setValue,
+        },
+        stateManager: { get: fake.returns(null) },
+      },
+      setValue,
+      selfWrittenSetpoints: new Map(),
+    };
+  };
+
+  it('should stop an external thermostat instead of looking for a switch', async () => {
+    const mod = loadModule();
+    const handler = { ...buildExternalGladys(), windowSelectorsCache: null, targetSelectorsCache: new Set() };
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
+
+    const written = handler.gladys.device.setValue.getCalls().map((call) => [call.args[1].selector, call.args[2]]);
+    // The mode goes first — it is the actual stop — then the frost setpoint as
+    // the fallback for a device with no mode feature.
+    expect(written).to.deep.equal([
+      ['netatmo-mode', 0],
+      ['netatmo-setpoint', 7],
+    ]);
+  });
+
+  it('should mark the frost setpoint it writes, so the report is not held', async () => {
+    const mod = loadModule();
+    const handler = { ...buildExternalGladys(), windowSelectorsCache: null, targetSelectorsCache: new Set() };
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
+
+    expect(handler.selfWrittenSetpoints.get('netatmo-setpoint')).to.equal(7);
+  });
+
+  it('should swallow a failure to stop the device', async () => {
+    const mod = loadModule();
+    const handler = { ...buildExternalGladys(), windowSelectorsCache: null, targetSelectorsCache: new Set() };
+    handler.gladys.device.setValue = fake.rejects(new Error('offline'));
+
+    // One unreachable thermostat must not stop the listener for the others.
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
+  });
+});
+
 describe('thermostat.onDeviceNewState - ignored events', () => {
   beforeEach(() => {
     sinon.reset();
@@ -338,7 +421,7 @@ describe('thermostat.onDeviceNewState - window selector cache', () => {
     const handler = {
       gladys,
       windowSelectorsCache: null,
-      featureKeysCache: new Set(['LIVING_ROOM']),
+      targetSelectorsCache: new Set(['netatmo-setpoint']),
       invalidateDeviceCaches: mod.invalidateDeviceCaches,
     };
 
@@ -347,9 +430,9 @@ describe('thermostat.onDeviceNewState - window selector cache', () => {
 
     handler.invalidateDeviceCaches();
     expect(handler.windowSelectorsCache).to.equal(null);
-    // The same invalidation covers the runtime feature keys: both are derived
-    // from this service's devices and go stale at the same moments.
-    expect(handler.featureKeysCache).to.equal(null);
+    // The same invalidation covers the driven setpoints: both are derived from
+    // this service's devices and go stale at the same moments.
+    expect(handler.targetSelectorsCache).to.equal(null);
 
     await mod.onDeviceNewState.call(handler, { device_feature: 'some-other-sensor', last_value: 0 });
     expect(gladys.device.get.callCount).to.equal(2);

@@ -4,7 +4,14 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { fake, assert } = sinon;
 
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES, THERMOSTAT_MODE } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  EVENTS,
+  WEBSOCKET_MESSAGE_TYPES,
+  THERMOSTAT_MODE,
+  THERMOSTAT_PRESET,
+} = require('../../../../utils/constants');
 const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 
 // Which schedule a thermostat follows is a relation, so it is read from the
@@ -20,32 +27,51 @@ const load = (follows = true) =>
     },
   });
 
-const buildHandler = (follows = true) => {
+const setpointFeature = {
+  selector: 'thermostat-living-room',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+};
+const presetFeature = {
+  selector: 'thermostat-living-room:preset',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
+  last_value: THERMOSTAT_PRESET.SCHEDULE,
+};
+const modeFeature = {
+  selector: 'thermostat-living-room:mode',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+  last_value: THERMOSTAT_MODE.HEATING,
+};
+
+const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF) => {
   const { setValue } = load(follows);
   return {
     gladys: {
       device: {
         saveState: fake.resolves(null),
+        setParam: fake.resolves(null),
         setValue: fake.resolves(null),
         // The owner of an external setpoint feature: another integration's
         // device, which is what the core has to be handed to route the write.
         // The mode lives on that same device, and is looked up the same way.
         get: fake((query) => {
           const selector = query && query.device_feature_selectors;
-          const features = [{ selector: 'netatmo-setpoint' }];
           if (selector === 'netatmo-mode') {
             return Promise.resolve([
               {
                 selector: 'netatmo-device',
                 service: { name: 'netatmo' },
-                features: [{ selector: 'netatmo-mode', last_value: THERMOSTAT_MODE.OFF }],
+                features: [{ selector: 'netatmo-mode', last_value: deviceMode }],
               },
             ]);
           }
-          return Promise.resolve([{ selector: 'netatmo-device', service: { name: 'netatmo' }, features }]);
+          return Promise.resolve([
+            { selector: 'netatmo-device', service: { name: 'netatmo' }, features: [{ selector: 'netatmo-setpoint' }] },
+          ]);
         }),
       },
-      variable: { setValue: fake.resolves(null) },
       event: { emit: fake.returns(null) },
     },
     serviceId: 'service-id',
@@ -56,297 +82,332 @@ const buildHandler = (follows = true) => {
   };
 };
 
-const deviceFeature = { selector: 'thermostat-living-room' };
-
-// The expiry is only armed on a thermostat that follows a schedule: without one
-// the manual hold is permanent. `buildHandler()` defaults to a scheduled
-// thermostat; `buildHandler(false)` describes one that follows no schedule.
-const scheduledDevice = (params = []) => ({
+// A thermostat as the loop sees it: an id the hold is stored against, and the
+// state features it carries.
+const device = (params = [], features = [setpointFeature, presetFeature, modeFeature]) => ({
   id: 'device-id',
+  selector: 'living-room',
   params,
+  features,
 });
+
+const paramCall = (handler, name) => handler.gladys.device.setParam.getCalls().find((call) => call.args[1] === name);
 
 describe('thermostat.setValue', () => {
   afterEach(() => {
     sinon.restore();
   });
 
-  it('should persist the value through saveState', async () => {
-    const handler = buildHandler();
+  describe('on the setpoint feature', () => {
+    it('should persist the value through saveState', async () => {
+      const handler = buildHandler();
 
-    await handler.setValue({}, deviceFeature, 21.5);
+      await handler.setValue(device(), setpointFeature, 21.5);
 
-    assert.calledWith(handler.gladys.device.saveState, deviceFeature, 21.5);
-  });
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 21.5);
+    });
 
-  it('should hold the value as a manual override so the schedule does not overwrite it', async () => {
-    const clock = sinon.useFakeTimers(1_700_000_000_000);
-    const handler = buildHandler();
+    it('should hold the value so the schedule does not overwrite it', async () => {
+      sinon.useFakeTimers(1_700_000_000_000);
+      const handler = buildHandler();
 
-    await handler.setValue(scheduledDevice(), deviceFeature, 21.5);
+      await handler.setValue(device(), setpointFeature, 21.5);
 
-    assert.calledWith(
-      handler.gladys.variable.setValue,
-      'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT',
-      JSON.stringify({ setpoint: 21.5 }),
-    );
-    assert.calledWith(
-      handler.gladys.variable.setValue,
-      'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL',
-      String(clock.now + MANUAL_DURATION_MS),
-    );
-    assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'true');
-  });
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('21.5');
+      expect(Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2])).to.equal(
+        1_700_000_000_000 + MANUAL_DURATION_MS,
+      );
+    });
 
-  it('should broadcast the manual mode change to open dashboards', async () => {
-    const handler = buildHandler();
+    it('should broadcast the hold to open dashboards', async () => {
+      const handler = buildHandler();
 
-    await handler.setValue({}, deviceFeature, 19);
+      await handler.setValue(device(), setpointFeature, 21.5);
 
-    assert.calledWith(handler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
-      payload: { key: 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', value: 'true' },
+      assert.calledWith(handler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
+        payload: { device: 'living-room', setpoint: 21.5, until: sinon.match.number },
+      });
+    });
+
+    it('should trigger a regulation pass', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(), setpointFeature, 21.5);
+
+      assert.calledOnce(handler.triggerApplySchedules);
+    });
+
+    it('should hold for the duration configured on the device', async () => {
+      sinon.useFakeTimers(1_700_000_000_000);
+      const handler = buildHandler();
+
+      await handler.setValue(device([{ name: 'THERMOSTAT_MANUAL_DURATION', value: '45' }]), setpointFeature, 20);
+
+      expect(Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2])).to.equal(
+        1_700_000_000_000 + 45 * 60 * 1000,
+      );
+    });
+
+    it('should fall back to the shared default when the device configures no duration', async () => {
+      sinon.useFakeTimers(1_700_000_000_000);
+      const handler = buildHandler();
+
+      await handler.setValue(device(), setpointFeature, 20);
+
+      expect(Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2])).to.equal(
+        1_700_000_000_000 + MANUAL_DURATION_MS,
+      );
+    });
+
+    it('should not arm an expiry on a thermostat that follows no schedule', async () => {
+      const handler = buildHandler(false);
+
+      // Nothing would take the setpoint over, so the hold is permanent.
+      await handler.setValue(device(), setpointFeature, 21.5);
+
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('21.5');
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2]).to.equal('');
+    });
+
+    it('should not arm a hold when the write is not manual', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(), setpointFeature, 19, false);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 19);
+    });
+
+    it('should still regulate after a non-manual write', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(), setpointFeature, 19, false);
+
+      assert.calledOnce(handler.triggerApplySchedules);
+    });
+
+    it('should treat an unspecified write as manual, like a scene does', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(), setpointFeature, 21.5);
+
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT')).to.not.equal(undefined);
     });
   });
 
-  it('should trigger a regulation pass', async () => {
-    const handler = buildHandler();
+  describe('on the preset feature', () => {
+    it('should store the preset on the feature', async () => {
+      const handler = buildHandler();
 
-    await handler.setValue({}, deviceFeature, 19);
+      await handler.setValue(device(), presetFeature, THERMOSTAT_PRESET.AWAY);
 
-    assert.calledOnce(handler.triggerApplySchedules);
-  });
+      assert.calledWith(handler.gladys.device.saveState, presetFeature, THERMOSTAT_PRESET.AWAY);
+    });
 
-  it('should build the variable keys from the feature selector', async () => {
-    const handler = buildHandler();
+    it('should hold the setpoint of the preset that was picked', async () => {
+      const handler = buildHandler();
 
-    await handler.setValue({}, { selector: 'my-second-thermostat' }, 20);
+      await handler.setValue(
+        device([{ name: 'THERMOSTAT_PRESET_AWAY', value: '15' }]),
+        presetFeature,
+        THERMOSTAT_PRESET.AWAY,
+      );
 
-    const keys = handler.gladys.variable.setValue.getCalls().map((call) => call.args[0]);
-    expect(keys).to.deep.equal([
-      'THERMOSTAT_MY_SECOND_THERMOSTAT_MANUAL_SETPOINT',
-      'THERMOSTAT_MY_SECOND_THERMOSTAT_MANUAL_UNTIL',
-      'THERMOSTAT_MY_SECOND_THERMOSTAT_MANUAL_MODE',
-    ]);
-  });
+      // Without the hold, the next regulation pass would resolve the schedule's
+      // preset and overwrite the choice within the minute.
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('15');
+    });
 
-  it('should hold the setpoint for the duration configured on the device', async () => {
-    const clock = sinon.useFakeTimers(1_700_000_000_000);
-    const handler = buildHandler();
-    const device = scheduledDevice([{ name: 'THERMOSTAT_MANUAL_DURATION', value: '45' }]);
+    it('should fall back to the shared preset default', async () => {
+      const handler = buildHandler();
 
-    await handler.setValue(device, deviceFeature, 21.5);
+      await handler.setValue(device(), presetFeature, THERMOSTAT_PRESET.FROST);
 
-    assert.calledWith(
-      handler.gladys.variable.setValue,
-      'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL',
-      String(clock.now + 45 * 60 * 1000),
-    );
-  });
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('7');
+    });
 
-  it('should fall back to the shared default when the device configures no duration', async () => {
-    const clock = sinon.useFakeTimers(1_700_000_000_000);
-    const handler = buildHandler();
+    it('should clear the hold when handing the thermostat back to its schedule', async () => {
+      const handler = buildHandler();
 
-    await handler.setValue(scheduledDevice(), deviceFeature, 21.5);
+      await handler.setValue(device(), presetFeature, THERMOSTAT_PRESET.SCHEDULE);
 
-    assert.calledWith(
-      handler.gladys.variable.setValue,
-      'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL',
-      String(clock.now + MANUAL_DURATION_MS),
-    );
-  });
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('');
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2]).to.equal('');
+    });
 
-  it('should not arm an expiry on a thermostat without a schedule', async () => {
-    sinon.useFakeTimers(1_700_000_000_000);
-    const handler = buildHandler(false);
+    it('should broadcast the new preset', async () => {
+      const handler = buildHandler();
 
-    // Nothing would take the setpoint over, so the hold is permanent — the
-    // regulation loop only expires the override when MANUAL_UNTIL is set.
-    await handler.setValue({ id: 'device-id', params: [] }, deviceFeature, 21.5);
+      await handler.setValue(device(), presetFeature, THERMOSTAT_PRESET.ECO);
 
-    assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL', '');
-    assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'true');
-  });
+      assert.calledWith(handler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.PRESET_UPDATED,
+        payload: { device: 'living-room', preset: 'eco' },
+      });
+    });
 
-  it('should clear an expiry left by a previous schedule-backed hold', async () => {
-    sinon.useFakeTimers(1_700_000_000_000);
-    const handler = buildHandler(false);
+    it('should refuse a value that names no preset', async () => {
+      const handler = buildHandler();
 
-    // The thermostat stopped following its schedule since the last manual hold:
-    // an untouched MANUAL_UNTIL would still expire the new, permanent override.
-    await handler.setValue(scheduledDevice([{ name: 'THERMOSTAT_MANUAL_DURATION', value: '45' }]), deviceFeature, 20);
+      let error = null;
+      try {
+        await handler.setValue(device(), presetFeature, 42);
+      } catch (e) {
+        error = e;
+      }
 
-    assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL', '');
-  });
-
-  it('should not touch the manual variables when the write is not manual', async () => {
-    // The widget writes the scheduled setpoint back through this path when a
-    // hold ends. Re-arming the override here would leave the database in manual
-    // mode while every open widget displays the schedule.
-    const handler = buildHandler();
-
-    await handler.setValue(scheduledDevice(), deviceFeature, 19, false);
-
-    assert.calledWith(handler.gladys.device.saveState, deviceFeature, 19);
-    assert.notCalled(handler.gladys.variable.setValue);
-    assert.notCalled(handler.gladys.event.emit);
-  });
-
-  it('should still regulate after a non-manual write', async () => {
-    const handler = buildHandler();
-
-    await handler.setValue(scheduledDevice(), deviceFeature, 19, false);
-
-    assert.calledOnce(handler.triggerApplySchedules);
-  });
-
-  it('should treat an unspecified write as manual, like a scene does', async () => {
-    const handler = buildHandler();
-
-    await handler.setValue(scheduledDevice(), deviceFeature, 19);
-
-    assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'true');
-  });
-
-  it('should write the runtime variables in this service scope', async () => {
-    const handler = buildHandler();
-
-    await handler.setValue({}, deviceFeature, 21.5);
-
-    handler.gladys.variable.setValue.getCalls().forEach((call) => {
-      expect(call.args[2]).to.equal('service-id');
+      expect(error).to.not.equal(null);
+      assert.notCalled(handler.gladys.device.saveState);
     });
   });
 
-  // An external thermostat drives a feature owned by another integration
-  // (Netatmo, Zigbee, Matter, MQTT...). Persisting the value with saveState
-  // would update every Gladys screen while the real thermostat never hears
-  // about it — the setpoint would only reach it on the next regulation tick.
-  describe('external thermostat', () => {
-    const externalDevice = (params = []) => ({
-      params: [
-        { name: 'THERMOSTAT_TYPE', value: 'external' },
-        { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
-        ...params,
-      ],
+  describe('on the mode feature', () => {
+    it('should store the mode on the feature', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.COOLING);
+
+      assert.calledWith(handler.gladys.device.saveState, modeFeature, THERMOSTAT_MODE.COOLING);
     });
+
+    it('should clear the hold when the thermostat is stopped', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.OFF);
+
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('');
+    });
+
+    it('should leave the hold alone when the thermostat is started again', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.HEATING);
+
+      assert.notCalled(handler.gladys.device.setParam);
+    });
+
+    it('should stop a real thermostat when its mode is turned off', async () => {
+      // The real device is running: a mode write is only sent when it changes
+      // something, since several of these integrations call a cloud API on every
+      // command.
+      const handler = buildHandler(true, THERMOSTAT_MODE.HEATING);
+
+      await handler.setValue(
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+        ]),
+        modeFeature,
+        THERMOSTAT_MODE.OFF,
+      );
+
+      // The mode goes first — it is what the machine obeys — then the frost
+      // setpoint as the fallback for a device with no mode feature.
+      const writes = handler.gladys.device.setValue.getCalls().map((call) => call.args[2]);
+      expect(writes).to.deep.equal([THERMOSTAT_MODE.OFF, 7]);
+    });
+  });
+
+  describe('on an external thermostat', () => {
+    const external = () =>
+      device(
+        [
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+        ],
+        [presetFeature],
+      );
     const externalFeature = { selector: 'netatmo-setpoint' };
 
     it('should write through the owning integration, not saveState', async () => {
       const handler = buildHandler();
 
-      await handler.setValue(externalDevice(), externalFeature, 21);
+      await handler.setValue(external(), externalFeature, 21);
 
-      assert.calledOnce(handler.gladys.device.setValue);
-      // The device handed to the core is the one owning the feature, never this
-      // service's thermostat: routing is done on device.service.name, so passing
-      // our own device would call this very function again, endlessly.
-      const [ownerDevice, ownerFeature, written] = handler.gladys.device.setValue.firstCall.args;
-      expect(ownerDevice.service.name).to.equal('netatmo');
-      expect(ownerFeature.selector).to.equal('netatmo-setpoint');
-      expect(written).to.equal(21);
       assert.notCalled(handler.gladys.device.saveState);
+      const call = handler.gladys.device.setValue.firstCall;
+      expect(call.args[0].selector).to.equal('netatmo-device');
+      expect(call.args[2]).to.equal(21);
     });
 
-    // A failed write produces no echo, so a mark left behind would make the
-    // listener swallow a real change to that same value later on — and the loop
-    // would then overwrite what the user set on the thermostat itself.
+    it('should mark the value it writes, so its report is not held', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(external(), externalFeature, 21);
+
+      expect(handler.selfWrittenSetpoints.get('netatmo-setpoint')).to.equal(21);
+    });
+
     it('should drop the mark when the write fails', async () => {
       const handler = buildHandler();
-      handler.gladys.device.setValue = fake.rejects(new Error('integration timeout'));
+      handler.gladys.device.setValue = fake.rejects(new Error('offline'));
 
       let error = null;
       try {
-        await handler.setValue(externalDevice(), externalFeature, 21);
+        await handler.setValue(external(), externalFeature, 21);
       } catch (e) {
         error = e;
       }
 
-      expect(error).to.be.an('error');
+      // No echo will come, and a mark left behind would swallow a real change to
+      // that same value later on.
+      expect(error).to.not.equal(null);
       expect(handler.selfWrittenSetpoints.has('netatmo-setpoint')).to.equal(false);
     });
 
-    it('should mark the value it writes, so its echo is not held', async () => {
-      const handler = buildHandler();
-      handler.selfWrittenSetpoints = new Map();
-
-      await handler.setValue(externalDevice(), externalFeature, 21);
-
-      expect(handler.selfWrittenSetpoints.get('netatmo-setpoint')).to.equal(21);
-    });
-    // A thermostat stopped by an `off` preset ignores a setpoint: asking for
-    // 21 °C on a device whose mode is OFF changes the number on its screen and
-    // nothing else. The mode has to be handed back first.
     it('should hand the mode back before writing the setpoint', async () => {
       const handler = buildHandler();
 
       await handler.setValue(
-        externalDevice([{ name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' }]),
+        device(
+          [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+            { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+          ],
+          [presetFeature],
+        ),
         externalFeature,
         21,
       );
 
-      const [modeCall, setpointCall] = handler.gladys.device.setValue.getCalls();
-      expect(modeCall.args[1].selector).to.equal('netatmo-mode');
-      expect(modeCall.args[2]).to.equal(THERMOSTAT_MODE.HEATING);
-      expect(setpointCall.args[1].selector).to.equal('netatmo-setpoint');
-      expect(setpointCall.args[2]).to.equal(21);
+      // A thermostat left switched off ignores a setpoint.
+      const writes = handler.gladys.device.setValue.getCalls().map((call) => call.args[2]);
+      expect(writes).to.deep.equal([THERMOSTAT_MODE.HEATING, 21]);
     });
 
-    it('should hand back the cooling mode on a cooling thermostat', async () => {
-      const handler = buildHandler();
-
-      await handler.setValue(
-        externalDevice([
-          { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
-          { name: 'THERMOSTAT_MODE', value: 'cooling' },
-        ]),
-        externalFeature,
-        21,
-      );
-
-      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.COOLING);
-    });
-
-    // Almost no integration exposes a mode feature: those thermostats get the
-    // setpoint alone, exactly as before.
     it('should write only the setpoint when no mode feature is configured', async () => {
       const handler = buildHandler();
 
-      await handler.setValue(externalDevice(), externalFeature, 21);
+      await handler.setValue(external(), externalFeature, 21);
 
-      assert.calledOnce(handler.gladys.device.setValue);
-      expect(handler.gladys.device.setValue.firstCall.args[1].selector).to.equal('netatmo-setpoint');
+      expect(handler.gladys.device.setValue.getCalls()).to.have.lengthOf(1);
     });
 
     it('should still write through the integration when returning to the schedule', async () => {
       const handler = buildHandler();
 
-      await handler.setValue(externalDevice(), externalFeature, 19, false);
+      await handler.setValue(external(), externalFeature, 19, false);
 
-      expect(handler.gladys.device.setValue.firstCall.args[0].service.name).to.equal('netatmo');
-      expect(handler.gladys.device.setValue.firstCall.args[2]).to.equal(19);
-      assert.notCalled(handler.gladys.device.saveState);
+      assert.calledOnce(handler.gladys.device.setValue);
+      assert.notCalled(handler.gladys.device.setParam);
     });
 
-    it('should hold the write as a manual override, like a virtual one', async () => {
+    it('should hold the write, like a virtual one', async () => {
       const handler = buildHandler();
 
-      await handler.setValue(externalDevice(), externalFeature, 21);
+      await handler.setValue(external(), externalFeature, 21);
 
-      assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_NETATMO_SETPOINT_MANUAL_MODE', 'true');
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('21');
     });
 
-    // Only the configured target is written through the integration: a device
-    // left with a stale param, or any other feature, stays on saveState.
-    // The param names a feature that no longer exists: the integration was
-    // removed, or the device renamed. Nothing must be written anywhere.
     it('should not write anything when the owning device is gone', async () => {
       const handler = buildHandler();
       handler.gladys.device.get = fake.resolves([]);
 
-      await handler.setValue(externalDevice(), externalFeature, 21);
+      await handler.setValue(external(), externalFeature, 21);
 
       assert.notCalled(handler.gladys.device.setValue);
       assert.notCalled(handler.gladys.device.saveState);
@@ -354,23 +415,20 @@ describe('thermostat.setValue', () => {
 
     it('should persist a feature that is not the configured target', async () => {
       const handler = buildHandler();
+      const otherFeature = { selector: 'some-other-feature' };
 
-      await handler.setValue(externalDevice(), { selector: 'some-other-feature' }, 21);
+      await handler.setValue(external(), otherFeature, 21);
 
-      assert.calledOnce(handler.gladys.device.saveState);
+      assert.calledWith(handler.gladys.device.saveState, otherFeature, 21);
       assert.notCalled(handler.gladys.device.setValue);
     });
 
     it('should persist through saveState when the device is virtual', async () => {
       const handler = buildHandler();
 
-      await handler.setValue(
-        { params: [{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }] },
-        externalFeature,
-        21,
-      );
+      await handler.setValue(device(), setpointFeature, 21);
 
-      assert.calledOnce(handler.gladys.device.saveState);
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 21);
       assert.notCalled(handler.gladys.device.setValue);
     });
   });

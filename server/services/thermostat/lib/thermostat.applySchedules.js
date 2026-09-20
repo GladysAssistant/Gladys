@@ -1,17 +1,24 @@
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const {
-  EVENTS,
-  WEBSOCKET_MESSAGE_TYPES,
   SYSTEM_VARIABLE_NAMES,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   THERMOSTAT_MODE,
+  THERMOSTAT_OPERATING_STATE,
 } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
 const { toNumber, getDeviceConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
 const { followsSchedule } = require('./thermostat.scheduleDevice');
+const {
+  getPreset,
+  savePreset,
+  saveOperatingState,
+  getManualHold,
+  setManualHold,
+  clearManualHold,
+} = require('./thermostat.state');
 const {
   parseEnd,
   findMatchingPreset,
@@ -265,6 +272,16 @@ function getSetpointForPreset(preset, config) {
  * await stopExternalThermostat(gladys, config, 'preset=off, salon');
  */
 async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
+  // The mode goes first, in both directions: it is what the machine obeys.
+  // Writing the frost setpoint to a thermostat still in COOLING asks it to cool
+  // the room to 7 °C until the mode write lands — and to keep doing so if that
+  // write fails on an expired token or the core's 5 s budget, which is the
+  // opposite of suspending it.
+  if (config.mode_feature) {
+    await writeExternalMode(gladys, config.mode_feature, THERMOSTAT_MODE.OFF, logContext);
+  }
+  // Then the frost setpoint, which is the fallback for a device with no mode
+  // feature and the only "stop heating" every thermostat understands.
   const frostSetpoint = getSetpointForPreset('frost', config);
   if (frostSetpoint !== null) {
     await writeExternalSetpoint(
@@ -275,9 +292,6 @@ async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
       logContext,
       selfWritten,
     );
-  }
-  if (config.mode_feature) {
-    await writeExternalMode(gladys, config.mode_feature, THERMOSTAT_MODE.OFF, logContext);
   }
 }
 
@@ -450,9 +464,6 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     logger.debug('Thermostat schedule: device has no setpoint to regulate, skipping');
     return;
   }
-  const featureKey = selector.toUpperCase().replace(/-/g, '_');
-  const presetVarKey = `THERMOSTAT_${featureKey}_PRESET`;
-  const manualVarKey = `THERMOSTAT_${featureKey}_MANUAL_MODE`;
   // getDeviceConfig always fills this in from THERMOSTAT_MODE or the shared default.
   const { default_mode: mode } = config;
 
@@ -472,6 +483,7 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
           await stopExternalThermostat(gladys, config, `window open, ${selector}`, selfWritten);
         } else if (config.switch_feature) {
           await actuateSwitch(gladys, config.switch_feature, false, `window open, ${selector}`);
+          await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
         }
         return;
       }
@@ -480,76 +492,38 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     }
   }
 
-  const [currentPreset, manualVal] = await Promise.all([
-    gladys.variable.getValue(presetVarKey, serviceId).catch(() => null),
-    gladys.variable.getValue(manualVarKey, serviceId).catch(() => null),
-  ]);
+  // The preset the thermostat carries, and the hold armed on it: both are on the
+  // device now — the preset as a feature, the hold as params — so neither costs
+  // a variable round-trip, and a scene can read and write them.
+  const currentPreset = getPreset(device);
+  const hold = getManualHold(device);
 
-  // Manual mode: regulate on the manual setpoint until the timer expires.
+  // Manual hold: regulate on the held setpoint until it expires.
   let manualJustExpired = false;
-  if (manualVal === 'true') {
-    const manualUntilKey = `THERMOSTAT_${featureKey}_MANUAL_UNTIL`;
-    const manualUntilVal = await gladys.variable.getValue(manualUntilKey, serviceId).catch(() => null);
-    let manualUntil = manualUntilVal ? parseInt(manualUntilVal, 10) : null;
-    // A hold taken while the device followed no schedule is permanent by design
-    // (setValue writes an empty expiry). If a schedule is attached afterwards,
-    // that hold would never expire and the schedule would never take over, while
-    // the widget — which only renders the manual banner when an expiry is set —
-    // would display the schedule banner with no way to cancel. Arming the expiry
-    // here makes the device behave exactly like one scheduled from the start.
+  if (hold) {
+    let manualUntil = hold.until;
+    // A hold taken while the device followed no schedule is permanent by design.
+    // If a schedule is attached afterwards, that hold would never expire and the
+    // schedule would never take over, while the widget — which only renders the
+    // countdown when an expiry is set — would display the schedule banner with
+    // no way to cancel. Arming the expiry here makes the device behave exactly
+    // like one scheduled from the start.
     if (!manualUntil && (await followsSchedule(device.id))) {
       manualUntil = Date.now() + config.manual_duration * 60 * 1000;
-      await gladys.variable.setValue(manualUntilKey, String(manualUntil), serviceId);
+      await setManualHold.call({ gladys }, device, hold.setpoint, manualUntil);
       logger.info(
         `Thermostat schedule: permanent manual hold on ${selector} now follows a schedule, ` +
           `expiry armed until ${new Date(manualUntil).toISOString()}`,
       );
-      gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
-        // The expiry rides along: an open widget holds `manualUntil: null` for a
-        // permanent hold, and would otherwise keep rendering the schedule banner
-        // with no cancel button until it is reloaded.
-        payload: { key: manualVarKey, value: 'true', manualUntil: String(manualUntil) },
-      });
     }
     if (manualUntil && Date.now() > manualUntil) {
-      logger.info(`Thermostat schedule: manual timer expired for ${selector}, reverting to schedule`);
-      await gladys.variable.setValue(manualVarKey, 'false', serviceId);
-      await gladys.variable.setValue(manualUntilKey, '', serviceId);
-      gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.MANUAL_MODE_UPDATED,
-        payload: { key: manualVarKey, value: 'false' },
-      });
+      logger.info(`Thermostat schedule: manual hold expired for ${selector}, reverting to schedule`);
+      await clearManualHold.call({ gladys }, device);
       manualJustExpired = true;
       // Fall through — the schedule/preset is applied below
     } else {
-      // A manual hold on the `off` preset means the user asked for the heating to
-      // stop, not for a setpoint to be held: the widget writes PRESET=off before
-      // arming the hold, and scenes reach the same state through setValue. Without
-      // this, the loop would regulate on the setpoint that was current *before*
-      // Off was tapped and keep the heater running until the hold expires.
-      if (currentPreset === 'off') {
-        if (external) {
-          await stopExternalThermostat(gladys, config, `manual preset=off, ${selector}`, selfWritten);
-        } else if (config.switch_feature) {
-          await actuateSwitch(gladys, config.switch_feature, false, `manual preset=off, ${selector}`);
-        }
-        return;
-      }
-
-      const manualSetpointRaw = await gladys.variable
-        .getValue(`THERMOSTAT_${featureKey}_MANUAL_SETPOINT`, serviceId)
-        .catch(() => null);
-      let manualSetpoint = null;
-      if (manualSetpointRaw) {
-        try {
-          const parsed = JSON.parse(manualSetpointRaw);
-          manualSetpoint = toNumber(parsed && parsed.setpoint, null);
-        } catch (e) {
-          /* ignore */
-        }
-      }
-      if (manualSetpoint !== null && external) {
+      const manualSetpoint = hold.setpoint;
+      if (external) {
         // The real thermostat regulates itself: hand it the held setpoint and
         // let it decide when to fire. There is no room sensor to read and no
         // hysteresis to run — running one here would fight the device's own.
@@ -640,12 +614,8 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
   // mode: dashboards then display the manual preset, so they need the schedule
   // preset pushed back even though the stored value never moved.
   if (currentPreset !== targetPreset || manualJustExpired) {
-    await gladys.variable.setValue(presetVarKey, targetPreset, serviceId);
+    await savePreset.call({ gladys }, device, targetPreset, manualJustExpired);
     logger.info(`Thermostat schedule: preset "${targetPreset}" applied to ${selector}`);
-    gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.PRESET_UPDATED,
-      payload: { key: presetVarKey, value: targetPreset },
-    });
   }
 
   if (external) {
@@ -688,6 +658,7 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
 
   if (targetPreset === 'off') {
     await actuateSwitch(gladys, config.switch_feature, false, `preset=off, ${selector}`);
+    await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
     return;
   }
 
@@ -731,6 +702,14 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     shouldBeActive,
     `preset="${targetPreset}", temp=${currentTemp}, setpoint=${newSetpoint}, ${selector}`,
   );
+  // Say on a standard feature what the loop just decided, rather than leaving
+  // every client to infer it from the switch: a virtual thermostat knows whether
+  // it is heating, and HomeKit and the rest of the house can read it here.
+  let operatingState = THERMOSTAT_OPERATING_STATE.IDLE;
+  if (shouldBeActive) {
+    operatingState = mode === 'cooling' ? THERMOSTAT_OPERATING_STATE.COOLING : THERMOSTAT_OPERATING_STATE.HEATING;
+  }
+  await saveOperatingState.call({ gladys }, device, operatingState);
 }
 
 /**
