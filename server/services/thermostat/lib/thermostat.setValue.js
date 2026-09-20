@@ -3,6 +3,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { DEFAULT_MANUAL_DURATION_MINUTES } = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
 const { writeExternalMode, getRunningMode } = require('./thermostat.applySchedules');
+const { followsSchedule } = require('./thermostat.scheduleDevice');
 
 /**
  * @description Set a thermostat device feature value (for example the setpoint).
@@ -98,7 +99,7 @@ async function setValue(device, deviceFeature, value, manual = true) {
   const durationMinutes = toNumber(config.manual_duration, DEFAULT_MANUAL_DURATION_MINUTES);
   // An empty string clears any expiry left by a previous schedule-backed hold:
   // the regulation loop only expires the override when this variable is set.
-  const manualUntil = config.active_schedule ? String(Date.now() + durationMinutes * 60 * 1000) : '';
+  const manualUntil = (await followsSchedule(device.id)) ? String(Date.now() + durationMinutes * 60 * 1000) : '';
 
   await this.gladys.variable.setValue(manualSetpointKey, JSON.stringify({ setpoint: value }), this.serviceId);
   await this.gladys.variable.setValue(manualUntilKey, manualUntil, this.serviceId);

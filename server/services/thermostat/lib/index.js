@@ -1,10 +1,10 @@
 const { createDevice } = require('./thermostat.createDevice');
 const { getDevices } = require('./thermostat.getDevices');
-const { getSchedules } = require('./thermostat.getSchedules');
+const { getSchedules, getScheduleBySelector } = require('./thermostat.getSchedules');
 const { createSchedule } = require('./thermostat.createSchedule');
 const { updateSchedule } = require('./thermostat.updateSchedule');
 const { deleteSchedule } = require('./thermostat.deleteSchedule');
-const { detachSchedule } = require('./thermostat.detachSchedule');
+const { attachScheduleToDevice, detachScheduleFromDevice } = require('./thermostat.scheduleDevice');
 const { applySchedules } = require('./thermostat.applySchedules');
 const {
   onDeviceNewState,
@@ -44,10 +44,12 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
 ThermostatHandler.prototype.createDevice = createDevice;
 ThermostatHandler.prototype.getDevices = getDevices;
 ThermostatHandler.prototype.getSchedules = getSchedules;
+ThermostatHandler.prototype.getScheduleBySelector = getScheduleBySelector;
 ThermostatHandler.prototype.createSchedule = createSchedule;
 ThermostatHandler.prototype.updateSchedule = updateSchedule;
 ThermostatHandler.prototype.deleteSchedule = deleteSchedule;
-ThermostatHandler.prototype.detachSchedule = detachSchedule;
+ThermostatHandler.prototype.attachScheduleToDevice = attachScheduleToDevice;
+ThermostatHandler.prototype.detachScheduleFromDevice = detachScheduleFromDevice;
 ThermostatHandler.prototype.applySchedules = applySchedules;
 ThermostatHandler.prototype.onDeviceNewState = onDeviceNewState;
 ThermostatHandler.prototype.onExternalSetpointChanged = onExternalSetpointChanged;

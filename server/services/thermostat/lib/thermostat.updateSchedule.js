@@ -1,51 +1,66 @@
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const { validateSchedule } = require('../../../utils/thermostatValidateSchedule');
+const { getScheduleBySelector } = require('./thermostat.getSchedules');
 
 /**
- * @description Update a thermostat schedule (name + full replace of slots).
+ * @description Update a thermostat schedule: rename it, replace its transition
+ * points, or both. A field left out of the payload is untouched.
  * @param {string} selector - Schedule selector.
- * @param {object} scheduleData - Updated data: { name, slots }.
- * @returns {Promise<object>} Updated schedule with slots.
+ * @param {object} scheduleData - Updated data: { name, transitions }.
+ * @returns {Promise<object>} Updated schedule.
  * @example
- * await thermostatHandler.updateSchedule('my-schedule', { name: 'New name', slots: [] });
+ * await thermostatHandler.updateSchedule('week', { name: 'New name' });
  */
 async function updateSchedule(selector, scheduleData) {
   logger.info(`Thermostat: Updating schedule "${selector}"`);
-
-  // Use the validated payload: Joi coerces day_of_week and defaults slots to [].
-  const validated = validateSchedule(scheduleData);
 
   const schedule = await db.ThermostatSchedule.findOne({ where: { selector } });
   if (!schedule) {
     throw new Error(`Schedule not found: ${selector}`);
   }
 
+  // PATCH semantics: an absent field is left alone, so the payload is validated
+  // against the schedule as it stands rather than against a bare object — a
+  // rename must not wipe the points, and a points-only write must not have to
+  // resend the name.
+  const merged = {
+    name: scheduleData && scheduleData.name !== undefined ? scheduleData.name : schedule.name,
+    transitions:
+      scheduleData && scheduleData.transitions !== undefined
+        ? scheduleData.transitions
+        : await db.ThermostatScheduleTransition.findAll({ where: { schedule_id: schedule.id } }),
+  };
+  const validated = validateSchedule(merged);
+  const replaceTransitions = Boolean(scheduleData && scheduleData.transitions !== undefined);
+
   const duplicate = await db.ThermostatSchedule.findOne({
-    where: { name: validated.name },
+    where: { house_id: schedule.house_id, name: validated.name },
   });
   if (duplicate && duplicate.id !== schedule.id) {
     throw new Error(`A schedule with the name "${validated.name}" already exists`);
   }
 
-  // Replace name + slots atomically: a failure mid-way must not lose the existing slots
+  // Replace name + points atomically: a failure mid-way must not lose the
+  // existing programme.
   try {
     await db.sequelize.transaction(async (transaction) => {
       await schedule.update({ name: validated.name }, { transaction });
 
-      await db.ThermostatScheduleSlot.destroy({ where: { schedule_id: schedule.id }, transaction });
+      if (replaceTransitions) {
+        await db.ThermostatScheduleTransition.destroy({ where: { schedule_id: schedule.id }, transaction });
 
-      if (validated.slots.length > 0) {
-        await db.ThermostatScheduleSlot.bulkCreate(
-          validated.slots.map((slot) => ({
-            schedule_id: schedule.id,
-            day_of_week: slot.day_of_week,
-            start_time: slot.start_time,
-            end_time: slot.end_time,
-            preset: slot.preset,
-          })),
-          { transaction },
-        );
+        if (validated.transitions.length > 0) {
+          await db.ThermostatScheduleTransition.bulkCreate(
+            validated.transitions.map(({ day_of_week: dayOfWeek, time, preset }) => ({
+              schedule_id: schedule.id,
+              day_of_week: dayOfWeek,
+              time,
+              preset,
+            })),
+            { transaction },
+          );
+        }
       }
     });
   } catch (e) {
@@ -58,14 +73,7 @@ async function updateSchedule(selector, scheduleData) {
     throw e;
   }
 
-  const result = await db.ThermostatSchedule.findByPk(schedule.id, {
-    include: [{ model: db.ThermostatScheduleSlot, as: 'slots' }],
-    order: [
-      [{ model: db.ThermostatScheduleSlot, as: 'slots' }, 'day_of_week', 'ASC'],
-      [{ model: db.ThermostatScheduleSlot, as: 'slots' }, 'start_time', 'ASC'],
-    ],
-  });
-  return result.get({ plain: true });
+  return getScheduleBySelector(selector);
 }
 
 module.exports = { updateSchedule };

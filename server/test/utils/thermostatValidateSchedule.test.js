@@ -2,10 +2,9 @@ const { expect } = require('chai');
 
 const { validateSchedule } = require('../../utils/thermostatValidateSchedule');
 
-const validSlot = {
+const validTransition = {
   day_of_week: 0,
-  start_time: '07:00',
-  end_time: '09:00',
+  time: '07:00',
   preset: 'comfort',
 };
 
@@ -23,89 +22,90 @@ const expectRejected = (payload, fragment) => {
 };
 
 describe('thermostatValidateSchedule', () => {
-  it('should accept a schedule with valid slots', () => {
-    const value = validateSchedule({ name: 'Semaine', slots: [validSlot] });
+  it('should accept a schedule with valid transitions', () => {
+    const value = validateSchedule({ name: 'Semaine', transitions: [validTransition] });
 
     expect(value.name).to.equal('Semaine');
-    expect(value.slots).to.have.lengthOf(1);
+    expect(value.transitions).to.have.lengthOf(1);
+    expect(value.transitions[0].preset).to.equal('comfort');
   });
 
-  it('should default an absent slot list to an empty array', () => {
-    expect(validateSchedule({ name: 'Semaine' }).slots).to.deep.equal([]);
+  it('should default transitions to an empty array', () => {
+    const value = validateSchedule({ name: 'Semaine' });
+
+    expect(value.transitions).to.deep.equal([]);
   });
 
-  it('should require a name', () => {
-    expectRejected({ slots: [] }, 'name');
+  it('should accept off, which stops the heating on that point', () => {
+    const value = validateSchedule({ name: 'Semaine', transitions: [{ ...validTransition, preset: 'off' }] });
+
+    expect(value.transitions[0].preset).to.equal('off');
+  });
+
+  it('should keep the row metadata a transition read from the database carries', () => {
+    const value = validateSchedule({
+      name: 'Semaine',
+      transitions: [{ ...validTransition, id: 'aa6a6b1a-0f1c-4b1e-9d3f-9f8e7d6c5b4a' }],
+    });
+
+    expect(value.transitions[0].id).to.equal('aa6a6b1a-0f1c-4b1e-9d3f-9f8e7d6c5b4a');
   });
 
   it('should reject an empty name', () => {
-    expectRejected({ name: '', slots: [] }, 'name');
+    expectRejected({ name: '', transitions: [] });
+  });
+
+  it('should reject a missing name', () => {
+    expectRejected({ transitions: [] });
+  });
+
+  it('should reject an undefined payload', () => {
+    expectRejected(undefined);
   });
 
   it('should reject a day outside 0-6', () => {
-    expectRejected({ name: 'x', slots: [{ ...validSlot, day_of_week: 7 }] }, 'day_of_week');
-    expectRejected({ name: 'x', slots: [{ ...validSlot, day_of_week: -1 }] }, 'day_of_week');
+    expectRejected({ name: 'Semaine', transitions: [{ ...validTransition, day_of_week: 7 }] });
+    expectRejected({ name: 'Semaine', transitions: [{ ...validTransition, day_of_week: -1 }] });
   });
 
   it('should reject a non-integer day', () => {
-    expectRejected({ name: 'x', slots: [{ ...validSlot, day_of_week: 1.5 }] }, 'day_of_week');
+    expectRejected({ name: 'Semaine', transitions: [{ ...validTransition, day_of_week: 1.5 }] });
   });
 
   it('should reject a malformed time', () => {
-    expectRejected({ name: 'x', slots: [{ ...validSlot, start_time: '7h' }] }, 'start_time');
-    expectRejected({ name: 'x', slots: [{ ...validSlot, end_time: '25:00' }] }, 'end_time');
-    expectRejected({ name: 'x', slots: [{ ...validSlot, end_time: '09:70' }] }, 'end_time');
+    expectRejected({ name: 'Semaine', transitions: [{ ...validTransition, time: '7:00' }] });
+    expectRejected({ name: 'Semaine', transitions: [{ ...validTransition, time: '24:00' }] });
+    expectRejected({ name: 'Semaine', transitions: [{ ...validTransition, time: '07:60' }] });
   });
 
-  it('should accept the boundary times', () => {
-    const value = validateSchedule({
-      name: 'x',
-      slots: [{ ...validSlot, start_time: '00:00', end_time: '23:59' }],
-    });
-
-    expect(value.slots).to.have.lengthOf(1);
+  it('should reject a missing time', () => {
+    expectRejected({ name: 'Semaine', transitions: [{ day_of_week: 0, preset: 'comfort' }] });
   });
 
   it('should reject an unknown preset', () => {
-    expectRejected({ name: 'x', slots: [{ ...validSlot, preset: 'party' }] }, 'preset');
+    expectRejected({ name: 'Semaine', transitions: [{ ...validTransition, preset: 'party' }] });
   });
 
-  it('should accept every known preset', () => {
-    ['off', 'frost', 'away', 'eco', 'night', 'comfort'].forEach((preset) => {
-      expect(validateSchedule({ name: 'x', slots: [{ ...validSlot, preset }] }).slots[0].preset).to.equal(preset);
+  it('should reject schedule as a transition preset, the programme referring to itself', () => {
+    expectRejected({ name: 'Semaine', transitions: [{ ...validTransition, preset: 'schedule' }] });
+  });
+
+  it('should reject two transitions on the same day at the same time', () => {
+    expectRejected(
+      {
+        name: 'Semaine',
+        transitions: [validTransition, { ...validTransition, preset: 'eco' }],
+      },
+      'duplicate transition on day 0 at 07:00',
+    );
+  });
+
+  it('should accept the same time on two different days', () => {
+    const value = validateSchedule({
+      name: 'Semaine',
+      transitions: [validTransition, { ...validTransition, day_of_week: 1 }],
     });
-  });
 
-  it('should accept the row metadata a slot read from the database carries', () => {
-    // The editor sends back the slots it was given, ids and timestamps included.
-    // Rejecting them would make every edit of an existing schedule fail.
-    const stored = {
-      ...validSlot,
-      id: '5bbaaea4-2ad6-4f3e-9bbc-819b9d310309',
-      schedule_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      created_at: '2026-08-23T10:00:00.000Z',
-      updated_at: '2026-08-23T10:00:00.000Z',
-    };
-
-    expect(validateSchedule({ name: 'Absent', slots: [stored] }).slots).to.have.lengthOf(1);
-  });
-
-  it('should still reject an invalid slot that carries row metadata', () => {
-    const stored = { ...validSlot, id: '5bbaaea4-2ad6-4f3e-9bbc-819b9d310309' };
-
-    expectRejected({ name: 'x', slots: [{ ...stored, day_of_week: 9 }] }, 'day_of_week');
-    expectRejected({ name: 'x', slots: [{ ...stored, preset: 'party' }] }, 'preset');
-  });
-
-  it('should reject a missing slot field', () => {
-    expectRejected({ name: 'x', slots: [{ day_of_week: 0, start_time: '07:00', end_time: '09:00' }] }, 'preset');
-  });
-
-  it('should reject a payload that is not an object', () => {
-    expectRejected('nonsense');
-  });
-
-  it('should tolerate an undefined payload', () => {
-    expectRejected(undefined, 'name');
+    expect(value.transitions).to.have.lengthOf(2);
   });
 });

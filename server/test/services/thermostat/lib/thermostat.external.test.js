@@ -14,17 +14,24 @@ const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedul
 
 const todayDow = getCurrentDayAndMinutes(new Date(), 'Europe/Paris').dayOfWeek;
 
+// A single point at 00:00 today: it is the last transition at or before now
+// whatever the time of day, so the whole day carries this preset.
 const fullDaySchedule = (preset) => ({
   selector: 'my-schedule',
-  slots: [{ day_of_week: todayDow, start_time: '00:00', end_time: '00:00', preset }],
+  transitions: [{ day_of_week: todayDow, time: '00:00', preset }],
 });
 
 const load = (schedule) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.applySchedules', {
     '../../../models': {
-      ThermostatSchedule: { findOne: fake.resolves(schedule) },
-      ThermostatScheduleSlot: {},
+      ThermostatScheduleDevice: {
+        findOne: fake.resolves(schedule ? { schedule } : null),
+        count: fake.resolves(schedule ? 1 : 0),
+      },
+      ThermostatSchedule: {},
+      ThermostatScheduleTransition: {},
     },
+    './thermostat.scheduleDevice': { followsSchedule: fake.resolves(Boolean(schedule)) },
     '../../../utils/logger': {
       debug: fake.returns(null),
       info: fake.returns(null),
@@ -40,7 +47,6 @@ const externalParams = (overrides = {}) =>
   params({
     THERMOSTAT_TYPE: 'external',
     THERMOSTAT_TARGET_FEATURE: 'netatmo-setpoint',
-    THERMOSTAT_ACTIVE_SCHEDULE: 'my-schedule',
     THERMOSTAT_MODE: 'heating',
     THERMOSTAT_PRESET_COMFORT: '21',
     THERMOSTAT_PRESET_FROST: '7',

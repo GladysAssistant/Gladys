@@ -11,7 +11,13 @@ const {
 } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
 const { toNumber, getDeviceConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
-const { parseEnd, findMatchingPreset, getCurrentDayAndMinutes } = require('../../../utils/thermostatSchedule');
+const { followsSchedule } = require('./thermostat.scheduleDevice');
+const {
+  parseEnd,
+  findMatchingPreset,
+  findCurrentTransition,
+  getCurrentDayAndMinutes,
+} = require('../../../utils/thermostatSchedule');
 const {
   DEFAULT_PRESET_TEMPS,
   FALLBACK_SETPOINT,
@@ -491,7 +497,7 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     // the widget — which only renders the manual banner when an expiry is set —
     // would display the schedule banner with no way to cancel. Arming the expiry
     // here makes the device behave exactly like one scheduled from the start.
-    if (!manualUntil && config.active_schedule) {
+    if (!manualUntil && (await followsSchedule(device.id))) {
       manualUntil = Date.now() + config.manual_duration * 60 * 1000;
       await gladys.variable.setValue(manualUntilKey, String(manualUntil), serviceId);
       logger.info(
@@ -588,24 +594,26 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     }
   }
 
-  // Resolve the target preset: schedule slot first, then the current preset variable.
-  // A thermostat without schedule (or between slots) keeps being regulated on its preset.
-  // The active schedule is device-owned: dashboards only choose which thermostat to
-  // display, so a private dashboard can never drive the regulation of the whole house.
-  const scheduleSelector = config.active_schedule || null;
-
+  // Resolve the target preset from the schedule this thermostat follows, then
+  // fall back on the current preset. Which schedule it follows is a relation
+  // (t_thermostat_schedule_device), not a device param and not a dashboard
+  // setting: a private dashboard can never drive the regulation of the house.
   let targetPreset = null;
-  if (scheduleSelector) {
-    const schedule = await db.ThermostatSchedule.findOne({
-      where: { selector: scheduleSelector },
-      include: [{ model: db.ThermostatScheduleSlot, as: 'slots' }],
-    });
-    if (schedule) {
-      const slotsForToday = schedule.slots.filter((s) => s.day_of_week === dayOfWeek);
-      const yesterdayOfWeek = (dayOfWeek + 6) % 7;
-      const slotsForYesterday = schedule.slots.filter((s) => s.day_of_week === yesterdayOfWeek);
-      targetPreset = findMatchingPreset(slotsForToday, slotsForYesterday, currentMinutes);
-    }
+  const link = await db.ThermostatScheduleDevice.findOne({
+    where: { device_id: device.id },
+    include: [
+      {
+        model: db.ThermostatSchedule,
+        as: 'schedule',
+        include: [{ model: db.ThermostatScheduleTransition, as: 'transitions' }],
+      },
+    ],
+  });
+  if (link && link.schedule) {
+    // The last point at or before now, the week wrapping onto its last point:
+    // there is no gap to fall through and no interval to reconstruct.
+    const transition = findCurrentTransition(link.schedule.transitions, dayOfWeek, currentMinutes);
+    targetPreset = transition ? transition.preset : null;
   }
   if (!targetPreset) {
     targetPreset = currentPreset || null;

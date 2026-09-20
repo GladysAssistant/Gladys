@@ -7,8 +7,12 @@ const { fake, assert } = sinon;
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES, THERMOSTAT_MODE } = require('../../../../utils/constants');
 const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 
-const load = () =>
+// Which schedule a thermostat follows is a relation, so it is read from the
+// database rather than from the device's params: the tests that describe a
+// scheduled thermostat say so here.
+const load = (follows = true) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
+    './thermostat.scheduleDevice': { followsSchedule: fake.resolves(follows) },
     '../../../utils/logger': {
       debug: fake.returns(null),
       info: fake.returns(null),
@@ -16,8 +20,8 @@ const load = () =>
     },
   });
 
-const buildHandler = () => {
-  const { setValue } = load();
+const buildHandler = (follows = true) => {
+  const { setValue } = load(follows);
   return {
     gladys: {
       device: {
@@ -55,10 +59,11 @@ const buildHandler = () => {
 const deviceFeature = { selector: 'thermostat-living-room' };
 
 // The expiry is only armed on a thermostat that follows a schedule: without one
-// the manual hold is permanent, so most of these assertions need a device that
-// carries an active schedule.
+// the manual hold is permanent. `buildHandler()` defaults to a scheduled
+// thermostat; `buildHandler(false)` describes one that follows no schedule.
 const scheduledDevice = (params = []) => ({
-  params: [{ name: 'THERMOSTAT_ACTIVE_SCHEDULE', value: 'week' }, ...params],
+  id: 'device-id',
+  params,
 });
 
 describe('thermostat.setValue', () => {
@@ -154,11 +159,11 @@ describe('thermostat.setValue', () => {
 
   it('should not arm an expiry on a thermostat without a schedule', async () => {
     sinon.useFakeTimers(1_700_000_000_000);
-    const handler = buildHandler();
+    const handler = buildHandler(false);
 
     // Nothing would take the setpoint over, so the hold is permanent — the
     // regulation loop only expires the override when MANUAL_UNTIL is set.
-    await handler.setValue({ params: [] }, deviceFeature, 21.5);
+    await handler.setValue({ id: 'device-id', params: [] }, deviceFeature, 21.5);
 
     assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL', '');
     assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'true');
@@ -166,11 +171,11 @@ describe('thermostat.setValue', () => {
 
   it('should clear an expiry left by a previous schedule-backed hold', async () => {
     sinon.useFakeTimers(1_700_000_000_000);
-    const handler = buildHandler();
+    const handler = buildHandler(false);
 
-    // The schedule was removed from the device since the last manual hold: an
-    // untouched MANUAL_UNTIL would still expire the new, permanent override.
-    await handler.setValue({ params: [{ name: 'THERMOSTAT_MANUAL_DURATION', value: '45' }] }, deviceFeature, 20);
+    // The thermostat stopped following its schedule since the last manual hold:
+    // an untouched MANUAL_UNTIL would still expire the new, permanent override.
+    await handler.setValue(scheduledDevice([{ name: 'THERMOSTAT_MANUAL_DURATION', value: '45' }]), deviceFeature, 20);
 
     assert.calledWith(handler.gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL', '');
   });

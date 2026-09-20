@@ -13,9 +13,11 @@ const {
 const load = () =>
   proxyquire('../../../../services/thermostat/lib/thermostat.applySchedules', {
     '../../../models': {
-      ThermostatSchedule: { findOne: fake.resolves(null) },
-      ThermostatScheduleSlot: {},
+      ThermostatScheduleDevice: { findOne: fake.resolves(null), count: fake.resolves(0) },
+      ThermostatSchedule: {},
+      ThermostatScheduleTransition: {},
     },
+    './thermostat.scheduleDevice': { followsSchedule: fake.resolves(false) },
     '../../../utils/logger': {
       debug: fake.returns(null),
       info: fake.returns(null),

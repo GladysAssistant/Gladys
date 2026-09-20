@@ -21,16 +21,28 @@ const setpointFeature = (extra = {}) => ({
 
 const todayDow = getCurrentDayAndMinutes(new Date(), 'Europe/Paris').dayOfWeek;
 
+// A single point at 00:00 today: whatever the time of day, it is the last
+// transition at or before now, so the whole day carries this preset.
 const fullDaySchedule = (preset) => ({
   selector: 'my-schedule',
-  slots: [{ day_of_week: todayDow, start_time: '00:00', end_time: '00:00', preset }],
+  transitions: [{ day_of_week: todayDow, time: '00:00', preset }],
 });
 
-const load = (schedule) =>
+// `follows` defaults to "a schedule is attached", which is what the schedule
+// argument means; it is passed explicitly only to describe a thermostat that
+// follows none — the case where a manual hold stays permanent.
+const load = (schedule, follows = Boolean(schedule)) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.applySchedules', {
     '../../../models': {
-      ThermostatSchedule: { findOne: fake.resolves(schedule) },
-      ThermostatScheduleSlot: {},
+      ThermostatScheduleDevice: {
+        findOne: fake.resolves(schedule && follows ? { schedule } : null),
+        count: fake.resolves(follows ? 1 : 0),
+      },
+      ThermostatSchedule: {},
+      ThermostatScheduleTransition: {},
+    },
+    './thermostat.scheduleDevice': {
+      followsSchedule: fake.resolves(follows),
     },
     '../../../utils/logger': {
       debug: fake.returns(null),
@@ -45,7 +57,6 @@ const baseParams = (overrides = {}) =>
   params({
     THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
     THERMOSTAT_SWITCH_FEATURE: 'heater-switch',
-    THERMOSTAT_ACTIVE_SCHEDULE: 'my-schedule',
     THERMOSTAT_MODE: 'heating',
     THERMOSTAT_PRESET_COMFORT: '21',
     ...overrides,
@@ -164,7 +175,6 @@ describe('thermostat.regulateDevice', () => {
       params: params({
         THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
         THERMOSTAT_WINDOW_FEATURE: 'window-sensor',
-        THERMOSTAT_ACTIVE_SCHEDULE: 'my-schedule',
       }),
     });
 
@@ -380,7 +390,7 @@ describe('thermostat.regulateDevice', () => {
     it('should leave a permanent hold alone while no schedule is attached', async () => {
       // Without a schedule the hold is permanent by design: nothing would take
       // the setpoint over, and the widget offers the preset bar to leave it.
-      const mod = load(fullDaySchedule('comfort'));
+      const mod = load(fullDaySchedule('comfort'), false);
       const gladys = buildGladys({
         features: standardFeatures({ temp: 15 }),
         variables: manualVariables({
@@ -391,7 +401,7 @@ describe('thermostat.regulateDevice', () => {
 
       await regulate(mod, gladys, {
         features: [setpointFeature()],
-        params: baseParams({ THERMOSTAT_ACTIVE_SCHEDULE: '' }),
+        params: baseParams(),
       });
 
       assert.neverCalledWith(gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL');
@@ -455,8 +465,8 @@ describe('thermostat.regulateDevice', () => {
       assert.calledOnce(gladys.device.setValue);
     });
 
-    it('should ignore a legacy active-schedule variable: the schedule is a device param', async () => {
-      const mod = load(fullDaySchedule('comfort'));
+    it('should ignore a legacy active-schedule variable: the schedule is a relation', async () => {
+      const mod = load(fullDaySchedule('comfort'), false);
       const gladys = buildGladys({
         features: standardFeatures({ temp: 18 }),
         variables: { THERMOSTAT_ACTIVE_SCHEDULE_THERMOSTAT_LIVING_ROOM: 'my-schedule' },
@@ -464,7 +474,7 @@ describe('thermostat.regulateDevice', () => {
 
       await regulate(mod, gladys, {
         features: [setpointFeature()],
-        params: baseParams({ THERMOSTAT_ACTIVE_SCHEDULE: '' }),
+        params: baseParams(),
       });
 
       // No schedule and no preset variable: nothing to regulate on.
@@ -516,7 +526,6 @@ describe('thermostat.regulateDevice', () => {
         features: [setpointFeature()],
         params: params({
           THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
-          THERMOSTAT_ACTIVE_SCHEDULE: 'my-schedule',
         }),
       });
 
@@ -531,7 +540,6 @@ describe('thermostat.regulateDevice', () => {
         features: [setpointFeature()],
         params: params({
           THERMOSTAT_SWITCH_FEATURE: 'heater-switch',
-          THERMOSTAT_ACTIVE_SCHEDULE: 'my-schedule',
           THERMOSTAT_PRESET_COMFORT: '21',
         }),
       });
@@ -687,14 +695,14 @@ describe('thermostat.regulateDevice - resilience', () => {
     assert.notCalled(gladys.device.setValue);
   });
 
-  it('should treat an empty active-schedule param as no schedule', async () => {
-    const mod = load(fullDaySchedule('comfort'));
+  it('should regulate on nothing when the thermostat follows no schedule', async () => {
+    const mod = load(fullDaySchedule('comfort'), false);
     const gladys = buildGladys({ features: standardFeatures({ temp: 18 }) });
     gladys.variable.getValue = fake.resolves(null);
 
     await regulate(mod, gladys, {
       features: [setpointFeature()],
-      params: baseParams({ THERMOSTAT_ACTIVE_SCHEDULE: '' }),
+      params: baseParams(),
     });
 
     // No schedule and no preset: nothing to regulate on
@@ -716,7 +724,6 @@ describe('thermostat.regulateDevice - defensive paths', () => {
       params: params({
         THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
         THERMOSTAT_SWITCH_FEATURE: 'heater-switch',
-        THERMOSTAT_ACTIVE_SCHEDULE: 'my-schedule',
         THERMOSTAT_PRESET_COMFORT: '21',
       }),
     });
@@ -765,7 +772,6 @@ describe('thermostat.regulateDevice - config defaults', () => {
         { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: 'temp-sensor' },
         { name: 'THERMOSTAT_SWITCH_FEATURE', value: 'heater-switch' },
         { name: 'THERMOSTAT_PRESET_COMFORT', value: '21' },
-        { name: 'THERMOSTAT_ACTIVE_SCHEDULE', value: 'my-schedule' },
       ],
     });
 
