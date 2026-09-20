@@ -3493,7 +3493,8 @@
           "night": "Night",
           "comfort": "Comfort"
         },
-        "noSlots": "No time slots yet. Click \"Add time slot\" to get started."
+        "noSlots": "No time slots yet. Click \"Add time slot\" to get started.",
+        "followedBy": "Followed by:"
       }
     }
   },

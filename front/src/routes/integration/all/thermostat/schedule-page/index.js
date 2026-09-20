@@ -3,6 +3,6 @@ import actions from './actions';
 import SchedulePage from './SchedulePage';
 
 export default connect(
-  'user,httpClient,thermostatSchedules,getSchedulesStatus,saveScheduleStatus,deleteScheduleStatus',
+  'user,httpClient,houses,thermostatSchedules,getSchedulesStatus,saveScheduleStatus,deleteScheduleStatus',
   actions
 )(SchedulePage);

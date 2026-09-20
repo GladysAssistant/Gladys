@@ -12,7 +12,11 @@ const PARAM_FIELDS = [
   ['state_feature', 'THERMOSTAT_STATE_FEATURE'],
   ['mode_feature', 'THERMOSTAT_MODE_FEATURE'],
   ['window_feature', 'THERMOSTAT_WINDOW_FEATURE'],
-  ['active_schedule', 'THERMOSTAT_ACTIVE_SCHEDULE'],
+  // The manual hold: the setpoint held by hand, and when it gives the thermostat
+  // back to its programme. Empty expiry means a permanent hold, which is what a
+  // thermostat that follows no schedule gets.
+  ['manual_setpoint', 'THERMOSTAT_MANUAL_SETPOINT', parseFloat],
+  ['manual_until', 'THERMOSTAT_MANUAL_UNTIL', v => parseInt(v, 10)],
   ['default_mode', 'THERMOSTAT_MODE'],
   ['control_type', 'THERMOSTAT_CONTROL_TYPE'],
   ['temp_min', 'THERMOSTAT_MIN_TEMP', parseFloat],
@@ -60,6 +64,27 @@ export const buildConfigFromParams = device => {
 };
 
 /**
+ * Read the state a thermostat carries on its own features: the preset it
+ * follows, its mode, and whether it is currently heating. Reading them here
+ * rather than through a handful of requests is what the preset/mode/
+ * operating-state features are for.
+ */
+export const buildStateFromFeatures = device => {
+  const features = (device && device.features) || [];
+  const find = type => features.find(feature => feature.category === 'thermostat' && feature.type === type) || null;
+  const preset = find('preset');
+  const mode = find('mode');
+  const operatingState = find('operating-state');
+  return {
+    presetFeature: preset,
+    modeFeature: mode,
+    preset: preset ? preset.last_value : null,
+    mode: mode ? mode.last_value : null,
+    operatingState: operatingState ? operatingState.last_value : null
+  };
+};
+
+/**
  * Read the thermostat config for a feature selector.
  *
  * Device params are the only store: the server regulation loop reads the very
@@ -71,6 +96,8 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
   }
 
   let paramsConfig = null;
+  let deviceState = null;
+  let deviceSelector = null;
   try {
     // The config lives on this integration's own device, so it is looked up
     // among this service's thermostats — never by feature selector on
@@ -87,6 +114,8 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
         )
     );
     paramsConfig = device ? buildConfigFromParams(device) : null;
+    deviceState = device ? buildStateFromFeatures(device) : null;
+    deviceSelector = device ? device.selector : null;
   } catch (e) {
     paramsConfig = null;
   }
@@ -96,7 +125,7 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
   }
 
   // A param left empty falls back to the shared default rather than staying null.
-  const merged = { ...paramsConfig };
+  const merged = { ...paramsConfig, ...(deviceState || {}), device_selector: deviceSelector };
   Object.keys(DEFAULTS).forEach(field => {
     if (merged[field] === null || merged[field] === undefined) {
       merged[field] = DEFAULTS[field];

@@ -428,9 +428,42 @@ const findNextTransition = (transitions, dayOfWeek, currentMinutes) => {
   return sorted[(index + 1) % sorted.length];
 };
 
+/**
+ * @description When the next transition point falls, as a timestamp. A manual
+ * hold runs until then by default, which is what Tado and Netatmo do: a
+ * temperature set at 3pm holds until the evening point rather than lapsing after
+ * an arbitrary half hour.
+ *
+ * The distance is computed in minutes of the week, so it crosses midnight and
+ * wraps onto the first point of the week without a special case. A schedule with
+ * a single point gives a full week, which is the honest answer: that point is
+ * indeed the next one.
+ * @param {Array} transitions - Every transition of the schedule.
+ * @param {Date} [now] - The moment to measure from.
+ * @param {string} [timezone] - The Gladys timezone the points are resolved in.
+ * @returns {number|null} The timestamp of the next point, or null when there is none.
+ * @example
+ * nextTransitionTimestamp(transitions);
+ */
+const nextTransitionTimestamp = (transitions, now = new Date(), timezone = null) => {
+  if (!transitions || transitions.length === 0) {
+    return null;
+  }
+  const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(now, timezone);
+  // findNextTransition only returns null on an empty list, which is handled above.
+  const next = findNextTransition(transitions, dayOfWeek, currentMinutes);
+  const nowPosition = dayOfWeek * DAY_MINUTES + currentMinutes;
+  const nextPosition = next.day_of_week * DAY_MINUTES + timeToMinutes(next.time);
+  // The next point may be earlier in the week than now: the programme wraps.
+  const minutesAway =
+    nextPosition > nowPosition ? nextPosition - nowPosition : 7 * DAY_MINUTES - nowPosition + nextPosition;
+  return now.getTime() + minutesAway * 60 * 1000;
+};
+
 module.exports = {
   findCurrentTransition,
   findNextTransition,
+  nextTransitionTimestamp,
   applySlotToDay,
   mergeIntoSlots,
   readDayAsEntered,

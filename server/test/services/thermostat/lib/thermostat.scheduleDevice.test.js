@@ -2,7 +2,10 @@ const { expect } = require('chai');
 
 const db = require('../../../../models');
 const ThermostatHandler = require('../../../../services/thermostat/lib');
-const { followsSchedule } = require('../../../../services/thermostat/lib/thermostat.scheduleDevice');
+const {
+  followsSchedule,
+  getScheduleOfDevice,
+} = require('../../../../services/thermostat/lib/thermostat.scheduleDevice');
 
 const HOUSE_SELECTOR = 'test-house';
 const OTHER_HOUSE_SELECTOR = 'pepper-house';
@@ -118,6 +121,24 @@ describe('thermostat schedule <-> device link', () => {
     await handler.attachScheduleToDevice(schedule.selector, thermostat.selector);
 
     expect(await followsSchedule(thermostat.id)).to.equal(true);
+  });
+
+  it('should return the schedule a thermostat follows, with its points', async () => {
+    await handler.attachScheduleToDevice(schedule.selector, thermostat.selector);
+    await handler.updateSchedule(schedule.selector, {
+      transitions: [{ day_of_week: 0, time: '06:30', preset: 'comfort' }],
+    });
+
+    const followed = await getScheduleOfDevice(thermostat.id);
+
+    // A hold ends on the next point of this schedule rather than after a fixed
+    // duration, so the points come along with it.
+    expect(followed.selector).to.equal(schedule.selector);
+    expect(followed.transitions).to.have.lengthOf(1);
+  });
+
+  it('should return null for a thermostat that follows none', async () => {
+    expect(await getScheduleOfDevice(thermostat.id)).to.equal(null);
   });
 
   it('should reject an unknown schedule', async () => {

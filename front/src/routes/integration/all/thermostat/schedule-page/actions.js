@@ -1,7 +1,12 @@
 import { RequestStatus } from '../../../../../utils/consts';
+import createHouseActions from '../../../../../actions/house';
 
 function createActions(store) {
+  const houseActions = createHouseActions(store);
   const actions = {
+    // A schedule belongs to a house, so the page needs the house list to group
+    // the schedules and to say where a new one goes.
+    getHouses: houseActions.getHouses,
     async getSchedules(state) {
       store.setState({ getSchedulesStatus: RequestStatus.Getting });
       try {

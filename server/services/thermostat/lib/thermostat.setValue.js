@@ -8,7 +8,8 @@ const {
   stopExternalThermostat,
   getSetpointForPreset,
 } = require('./thermostat.applySchedules');
-const { followsSchedule } = require('./thermostat.scheduleDevice');
+const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
+const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
 const { presetName, savePreset, setManualHold, clearManualHold } = require('./thermostat.state');
 
 /**
@@ -69,23 +70,40 @@ async function writeSetpoint(device, deviceFeature, value) {
 }
 
 /**
- * @description How long a manual hold lasts on this device, or null when it is
- * permanent. A hold expires only on a thermostat that follows a schedule: that
- * is the only case where something would otherwise take the setpoint back.
- * Without a schedule it is permanent, like on a physical thermostat — arming a
- * timer there would silently revert minutes later with nothing to announce it.
+ * @description When a manual hold ends, or null when it is permanent.
+ *
+ * A hold expires only on a thermostat that follows a schedule: that is the only
+ * case where something would otherwise take the setpoint back. Without a
+ * schedule it is permanent, like on a physical thermostat — arming a timer there
+ * would silently revert minutes later with nothing to announce it.
+ *
+ * With a schedule it runs **until the next transition point** by default, which
+ * is the Tado and Netatmo behaviour and the one people expect: a temperature set
+ * at 3pm holds until the evening point, rather than lapsing after an arbitrary
+ * half hour. A device that sets THERMOSTAT_MANUAL_DURATION asks for that fixed
+ * duration instead.
  * @param {object} device - The thermostat device.
  * @returns {Promise<number|null>} The expiry timestamp, or null.
  * @example
  * await holdExpiry(device);
  */
 async function holdExpiry(device) {
-  if (!(await followsSchedule(device.id))) {
+  const link = await getScheduleOfDevice(device.id);
+  if (!link) {
     return null;
   }
   const config = buildParamsConfig(device) || {};
-  const durationMinutes = toNumber(config.manual_duration, DEFAULT_MANUAL_DURATION_MINUTES);
-  return Date.now() + durationMinutes * 60 * 1000;
+  const configuredDuration = toNumber(config.manual_duration, null);
+  if (configuredDuration !== null) {
+    return Date.now() + configuredDuration * 60 * 1000;
+  }
+  const nextTransition = nextTransitionTimestamp(link.transitions);
+  if (nextTransition !== null) {
+    return nextTransition;
+  }
+  // A schedule with no point has nothing to hand the thermostat back to: fall
+  // back on the shared duration rather than holding for ever.
+  return Date.now() + DEFAULT_MANUAL_DURATION_MINUTES * 60 * 1000;
 }
 
 /**

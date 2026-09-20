@@ -3493,7 +3493,8 @@
           "night": "Nuit",
           "comfort": "Confort"
         },
-        "noSlots": "Aucune plage horaire. Cliquez sur \"Ajouter une plage\" pour commencer."
+        "noSlots": "Aucune plage horaire. Cliquez sur \"Ajouter une plage\" pour commencer.",
+        "followedBy": "Suivi par :"
       }
     }
   },

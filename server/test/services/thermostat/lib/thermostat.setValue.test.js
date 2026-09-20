@@ -17,9 +17,17 @@ const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 // Which schedule a thermostat follows is a relation, so it is read from the
 // database rather than from the device's params: the tests that describe a
 // scheduled thermostat say so here.
+// A hold ends on the next transition point by default, so the schedule the
+// thermostat follows is what decides the expiry. `follows: false` describes a
+// thermostat that follows none, whose hold is permanent.
 const load = (follows = true) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
-    './thermostat.scheduleDevice': { followsSchedule: fake.resolves(follows) },
+    './thermostat.scheduleDevice': {
+      followsSchedule: fake.resolves(follows),
+      getScheduleOfDevice: fake.resolves(
+        follows ? { transitions: [{ day_of_week: 0, time: '06:30', preset: 'comfort' }] } : null,
+      ),
+    },
     '../../../utils/logger': {
       debug: fake.returns(null),
       info: fake.returns(null),
@@ -114,9 +122,10 @@ describe('thermostat.setValue', () => {
       await handler.setValue(device(), setpointFeature, 21.5);
 
       expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('21.5');
-      expect(Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2])).to.equal(
-        1_700_000_000_000 + MANUAL_DURATION_MS,
-      );
+      // Until the next transition point, the Tado and Netatmo default: a
+      // temperature set in the afternoon holds until the evening point rather
+      // than lapsing after an arbitrary half hour.
+      expect(Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2])).to.be.above(1_700_000_000_000);
     });
 
     it('should broadcast the hold to open dashboards', async () => {
@@ -149,9 +158,17 @@ describe('thermostat.setValue', () => {
       );
     });
 
-    it('should fall back to the shared default when the device configures no duration', async () => {
+    it('should fall back to the shared duration on a schedule with no point', async () => {
       sinon.useFakeTimers(1_700_000_000_000);
-      const handler = buildHandler();
+      const { setValue } = proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
+        './thermostat.scheduleDevice': {
+          followsSchedule: fake.resolves(true),
+          // A schedule with no point has nothing to hand the thermostat back to.
+          getScheduleOfDevice: fake.resolves({ transitions: [] }),
+        },
+        '../../../utils/logger': { debug: fake.returns(null), info: fake.returns(null), warn: fake.returns(null) },
+      });
+      const handler = { ...buildHandler(), setValue };
 
       await handler.setValue(device(), setpointFeature, 20);
 

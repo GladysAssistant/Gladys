@@ -1,7 +1,12 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
+import {
+  WEBSOCKET_MESSAGE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  THERMOSTAT_MODE,
+  THERMOSTAT_PRESET
+} from '../../../../../server/utils/constants';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
 import {
   DEFAULT_MANUAL_DURATION_MINUTES,
@@ -15,7 +20,6 @@ import style from './style.css';
 import { getPresetColor as presetColorForMode } from '../../../utils/thermostatPresetColors';
 import CircularGauge from './CircularGauge';
 import { angleToTemp as angleToSetpoint, getAngleFromPointer, isAngleInArc } from './gaugeGeometry';
-import { fetchSchedule, fetchTimezone, getCurrentSlot, resolvePresetFromSchedule } from './scheduleLookup';
 import { loadDeviceConfig } from './deviceConfig';
 import { isRunningFromStateFeature } from './operatingState';
 
@@ -32,6 +36,17 @@ const PRESET_ICONS = {
 const COMFORT_ICON = { heating: 'fe-flame', cooling: 'fe-snowflake' };
 const HEATING_PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
 const COOLING_PRESETS = ['off', 'comfort'];
+// The preset feature carries an integer; the widget speaks in names. `off` is in
+// neither table: stopping is a mode, and it goes to the mode feature.
+const PRESET_VALUES = {
+  schedule: THERMOSTAT_PRESET.SCHEDULE,
+  frost: THERMOSTAT_PRESET.FROST,
+  away: THERMOSTAT_PRESET.AWAY,
+  eco: THERMOSTAT_PRESET.ECO,
+  night: THERMOSTAT_PRESET.NIGHT,
+  comfort: THERMOSTAT_PRESET.COMFORT
+};
+const PRESET_NAMES = Object.keys(PRESET_VALUES).reduce((acc, name) => ({ ...acc, [PRESET_VALUES[name]]: name }), {});
 // Sentinel: hold every incoming setpoint, whatever its value
 const HOLD_ANY_SETPOINT = Symbol('hold-any-setpoint');
 
@@ -56,7 +71,6 @@ class ThermostatBox extends Component {
     featureMax: null,
     featureUnit: null,
     activeSchedule: null,
-    currentSlot: null,
     manualUntil: null,
     isWindowOpen: false,
     // Real state of the actuator, as reported by the switch feature. The widget
@@ -166,115 +180,76 @@ class ThermostatBox extends Component {
     return remoteConfig;
   };
 
-  loadMode = async () => {
-    const { box } = this.props;
-    if (!box.thermostat_feature) return {};
-    if (this.savingPreset) return {};
-    let activePreset = null;
-    let isManualMode = null;
-
-    // Read manual mode first — it determines which source to use for the preset
-    const manualModeValue = await this.readThermostatVariable('MANUAL_MODE');
-    if (manualModeValue !== null) {
-      isManualMode = manualModeValue === 'true';
+  // The preset and the hold both arrive with the device: the preset as the
+  // last_value of its feature, the hold as device params. There is nothing to
+  // resolve and nothing to fetch — that is what moving them onto the device is
+  // for. A thermostat that was never driven carries no preset, and the render
+  // already handles that: writing a default here would make merely opening a
+  // dashboard start the heating.
+  loadMode = () => {
+    const cfg = this.state.remoteConfig;
+    if (!cfg) {
+      return {};
     }
-
-    const knownPresets = [...HEATING_PRESETS, ...COOLING_PRESETS];
-
-    if (isManualMode !== true && this.getActiveScheduleSelector()) {
-      // Schedule is active and not in manual mode: derive preset from current slot directly
-      // This avoids stale DB variable values
-      activePreset = await this.getScheduledPreset();
-      if (!activePreset) {
-        // No matching slot right now — fall back to the stored preset
-        const storedPreset = await this.readThermostatVariable('PRESET');
-        if (storedPreset && knownPresets.includes(storedPreset)) {
-          activePreset = storedPreset;
-        }
-      }
-    } else {
-      // No schedule or manual mode: use the stored preset. When none is stored
-      // the widget shows no preset and writes nothing: writing a default here
-      // would make merely opening a dashboard start the heating on a thermostat
-      // the user has not turned on yet. The render already handles a null preset.
-      const storedPreset = await this.readThermostatVariable('PRESET');
-      if (storedPreset) {
-        activePreset = knownPresets.includes(storedPreset) ? storedPreset : 'comfort';
-      }
-    }
-
-    return { activePreset, isManualMode };
+    const activePreset = PRESET_NAMES[cfg.preset] || null;
+    const hold = this.getHold();
+    return { activePreset, isManualMode: !!hold };
   };
 
-  // Last non-off preset, so turning the thermostat back on restores what the user
-  // had. Stored server-side (not localStorage) so it follows the user across
-  // browsers and devices, like every other thermostat runtime state.
-  saveLastActivePreset = async preset => {
-    // A null preset is the never-driven thermostat, not a preset to fall back
-    // to: storing it would leave 'Off' with nothing to restore.
-    if (!preset || preset === 'off' || !this.props.box.thermostat_feature) {
-      return;
-    }
-    this.lastActivePreset = preset;
-    try {
-      await this.saveThermostatVariable('PRESET_FALLBACK', preset);
-    } catch (e) {
-      console.error('Failed to save last active preset:', e);
-    }
-  };
-
-  // Read synchronously from the in-memory cache: the pointer/increment handlers
-  // need it during the same tick to stay responsive. Refreshed by loadLastActivePreset.
-  getLastActivePreset = () => this.lastActivePreset || 'comfort';
-
-  loadLastActivePreset = async () => {
-    if (!this.props.box.thermostat_feature) {
-      return;
-    }
-    const storedPreset = await this.readThermostatVariable('PRESET_FALLBACK');
-    if (storedPreset) {
-      this.lastActivePreset = storedPreset;
-    }
-  };
-
-  // Thermostat runtime state goes through the service endpoint: it persists the
-  // variable in the service's own scope, broadcasts the matching websocket message
-  // and triggers a server regulation pass. Reading uses the same scope, so the
-  // widget sees exactly the rows the regulation loop writes.
-  saveThermostatVariable = async (suffix, value) => {
-    const key = this.getFeatureVarKey();
-    if (!key) return;
-    await this.props.httpClient.post(`/api/v1/service/thermostat/state/THERMOSTAT_${key}_${suffix}`, { value });
-  };
-
-  readThermostatVariable = async suffix => {
-    const key = this.getFeatureVarKey();
-    if (!key) return null;
-    try {
-      const response = await this.props.httpClient.get(`/api/v1/service/thermostat/state/THERMOSTAT_${key}_${suffix}`);
-      return response && response.value !== undefined ? response.value : null;
-    } catch (e) {
-      // Not set yet, or unreadable: the caller falls back to its default.
+  // The manual hold, as the device carries it. `until` is null on a permanent
+  // hold, which is what a thermostat following no schedule gets.
+  getHold = () => {
+    const cfg = this.state.remoteConfig;
+    if (!cfg || cfg.manual_setpoint === null || cfg.manual_setpoint === undefined) {
       return null;
+    }
+    const until = cfg.manual_until && cfg.manual_until > Date.now() ? cfg.manual_until : null;
+    return { setpoint: cfg.manual_setpoint, until };
+  };
+
+  // Last preset that was not a stop, so turning the thermostat back on restores
+  // what the user had. Stopping is a mode now, and a mode leaves the preset
+  // feature untouched, so the preset the device carries *is* the fallback —
+  // there is nothing left to store on the side.
+  saveLastActivePreset = preset => {
+    if (preset && preset !== 'off') {
+      this.lastActivePreset = preset;
+    }
+  };
+
+  // Read synchronously: the pointer/increment handlers need it during the same
+  // tick to stay responsive.
+  getLastActivePreset = () => {
+    const cfg = this.state.remoteConfig;
+    const carried = cfg && PRESET_NAMES[cfg.preset];
+    return this.lastActivePreset || carried || 'comfort';
+  };
+
+  // Every write goes through the generic feature value route, the one the whole
+  // of Gladys already uses: picking a preset is a value on the preset feature,
+  // holding a temperature a value on target-temperature, stopping a value on
+  // mode. The widget owns no state machine — the server does — so there is
+  // nothing here to keep in step with it.
+  writeFeature = async (feature, value) => {
+    if (!feature) return;
+    try {
+      await this.props.httpClient.post(`/api/v1/device_feature/${feature.selector}/value`, { value });
+    } catch (e) {
+      console.error('Failed to write a thermostat feature:', e);
     }
   };
 
   savePreset = async preset => {
+    const cfg = this.state.remoteConfig;
+    const value = PRESET_VALUES[preset];
+    if (!cfg || !cfg.presetFeature || value === undefined) {
+      return;
+    }
     this.savingPreset = true;
     try {
-      await this.saveThermostatVariable('PRESET', preset);
-    } catch (e) {
-      console.error('Failed to save preset:', e);
+      await this.writeFeature(cfg.presetFeature, value);
     } finally {
       this.savingPreset = false;
-    }
-  };
-
-  saveManualMode = async isManual => {
-    try {
-      await this.saveThermostatVariable('MANUAL_MODE', isManual.toString());
-    } catch (e) {
-      console.error('Failed to save manual mode:', e);
     }
   };
 
@@ -470,12 +445,6 @@ class ThermostatBox extends Component {
     }
   };
 
-  getFeatureVarKey = () => {
-    const { box } = this.props;
-    if (!box.thermostat_feature) return null;
-    return box.thermostat_feature.toUpperCase().replace(/-/g, '_');
-  };
-
   // The configuration lives on the device, so the event carries none: it only
   // says "reload it". Reading a copy out of the payload would be a second store
   // that could disagree with the device the regulation loop actually reads.
@@ -487,39 +456,41 @@ class ThermostatBox extends Component {
     this.applyFallbackSetpoint();
   };
 
+  // The server names the thermostat, not a variable key: the preset is a feature
+  // of that device now.
+  isOurDevice = payload => {
+    const cfg = this.state.remoteConfig;
+    return !!cfg && !!payload && payload.device === cfg.device_selector;
+  };
+
   handleThermostatPresetUpdated = payload => {
-    const key = this.getFeatureVarKey();
-    if (!key || payload.key !== `THERMOSTAT_${key}_PRESET`) return;
-    if (this.savingPreset) return;
-    // A preset event never clears an active manual override. The server only
-    // pushes a preset while manual mode is off (or just expired, in which case
-    // MANUAL_MODE_UPDATED arrives too), so clearing the flag here would drop a
-    // genuine override — including the one selectPreset is in the middle of
-    // setting, whose savePreset fires before saveManualMode.
-    if (payload.value) {
-      const knownPresets = [...HEATING_PRESETS, ...COOLING_PRESETS];
-      const resolvedPreset = knownPresets.includes(payload.value) ? payload.value : 'comfort';
-      if (this.state.isManualMode) {
-        this.setState({ activePreset: resolvedPreset });
-        return;
-      }
-      const newState = { activePreset: resolvedPreset, isManualMode: false, manualSetpointOverride: false };
-      if (resolvedPreset !== 'off') {
-        const presets = this.getPresets();
-        const preset = presets.find(p => p.key === resolvedPreset);
-        if (preset && preset.temp !== null && preset.temp !== undefined) {
-          newState.setpoint = preset.temp;
-        }
-      }
-      this.loadSchedule();
-      this.setState(newState);
+    if (!this.isOurDevice(payload) || this.savingPreset) return;
+    const knownPresets = [...HEATING_PRESETS, ...COOLING_PRESETS];
+    if (!payload.preset || !knownPresets.includes(payload.preset)) return;
+    const resolvedPreset = payload.preset;
+    // A preset event never clears an active hold: the server only pushes a preset
+    // while none is armed, or just as one expires — in which case the hold event
+    // arrives too and does the clearing.
+    if (this.state.isManualMode) {
+      this.setState({ activePreset: resolvedPreset });
+      return;
     }
+    const newState = { activePreset: resolvedPreset, isManualMode: false, manualSetpointOverride: false };
+    if (resolvedPreset !== 'off') {
+      const presets = this.getPresets();
+      const preset = presets.find(p => p.key === resolvedPreset);
+      if (preset && preset.temp !== null && preset.temp !== undefined) {
+        newState.setpoint = preset.temp;
+      }
+    }
+    this.loadSchedule();
+    this.setState(newState);
   };
 
   handleThermostatManualModeUpdated = payload => {
-    const key = this.getFeatureVarKey();
-    if (!key || payload.key !== `THERMOSTAT_${key}_MANUAL_MODE`) return;
-    const isManual = payload.value === 'true';
+    if (!this.isOurDevice(payload)) return;
+    // A hold with no setpoint is a cleared hold.
+    const isManual = payload.setpoint !== null && payload.setpoint !== undefined;
     // On an external thermostat this event also announces a setpoint changed on
     // the device itself (its dial, the vendor app, its own programme): the
     // setpoint no longer comes from the preset, so the preset must stop being
@@ -533,74 +504,71 @@ class ThermostatBox extends Component {
       this.setState({ manualSetpointOverride: true });
     }
     if (!isManual && this.state.isManualMode) {
-      // Server expired the manual timer — revert UI to schedule.
+      // The server let the hold expire — the schedule takes the thermostat back.
       // Hold the setpoint first: see cancelManualMode for why.
       this.holdSetpointUntilApplied();
       this.setState({ isManualMode: false, manualUntil: null, manualSetpointOverride: false });
-      this.clearManualSetpoint();
-      this.applyPlanningPreset();
-      this.loadSchedule();
+      this.refreshFromDevice();
     } else if (isManual !== this.state.isManualMode && !this.savingPreset) {
       this.setState({ isManualMode: isManual });
-    } else if (isManual && payload.manualUntil && !this.state.manualUntil) {
+    } else if (isManual && payload.until && !this.state.manualUntil) {
       // A hold taken with no schedule carries no expiry, so the banner falls back
       // to the schedule one — which has no cancel button. The server arms the
       // expiry once a schedule is attached and sends it here: adopting it swaps
       // the banner back to the manual one, countdown and cancel button included.
-      const until = parseInt(payload.manualUntil, 10);
-      if (until > Date.now()) {
-        this.setState({ manualUntil: until });
+      if (payload.until > Date.now()) {
+        this.setState({ manualUntil: payload.until });
       }
     }
   };
 
-  getActiveScheduleSelector = () => (this.state.remoteConfig && this.state.remoteConfig.active_schedule) || null;
+  // Re-read the device and adopt what it carries. Everything the widget shows is
+  // state of the device now, so one reload replaces the handful of round-trips
+  // this used to take.
+  refreshFromDevice = async () => {
+    await this.loadConfig();
+    const { activePreset, isManualMode } = this.loadMode();
+    this.setState({ activePreset, isManualMode });
+    this.loadSchedule();
+  };
 
-  getScheduledPreset = async () =>
-    resolvePresetFromSchedule(
-      this.props.httpClient,
-      this.getActiveScheduleSelector(),
-      [...HEATING_PRESETS, ...COOLING_PRESETS],
-      this.timezone
-    );
-
-  // Slots are resolved in the Gladys timezone, like the server does: the browser
-  // may sit in another one, and the banner would then name a different slot than
+  // Which schedule a thermostat follows is a relation, so the server is asked
+  // rather than a device param read: the schedule that lists this thermostat is
+  // the one it follows. It comes back with `current` and `next` already resolved
+  // in the Gladys timezone, so the widget never reads a timezone and never
+  // recomputes a point — a phone abroad would otherwise name a point other than
   // the one actually heating the house.
-  loadTimezone = async () => {
-    this.timezone = await fetchTimezone(this.props.httpClient);
-  };
-
   loadSchedule = async () => {
-    const schedule = await fetchSchedule(this.props.httpClient, this.getActiveScheduleSelector());
-    this.setState({
-      activeSchedule: schedule,
-      currentSlot: schedule ? getCurrentSlot(schedule, this.timezone) : null
-    });
-  };
-
-  saveManualSetpoint = async (setpoint, override = true) => {
+    const cfg = this.state.remoteConfig;
+    const deviceSelector = cfg && cfg.device_selector;
+    if (!deviceSelector) {
+      this.setState({ activeSchedule: null });
+      return;
+    }
     try {
-      await this.saveThermostatVariable('MANUAL_SETPOINT', JSON.stringify({ setpoint, override: !!override }));
+      const schedules = await this.props.httpClient.get('/api/v1/service/thermostat/schedule');
+      const schedule = (schedules || []).find(candidate =>
+        (candidate.devices || []).some(device => device.selector === deviceSelector)
+      );
+      this.setState({ activeSchedule: schedule || null });
     } catch (e) {
-      /* ignore */
+      // A schedule deleted behind the widget's back degrades to "no schedule"
+      // rather than leaving a stale banner.
+      this.setState({ activeSchedule: null });
     }
   };
 
-  clearManualSetpoint = () => {
-    this.saveManualSetpoint(null, false);
-  };
-
-  cancelManualMode = () => {
-    this.clearManualSetpoint();
-    this.saveManualUntilToDb(0);
-    // Hold the setpoint before lowering the manual guard: applyPlanningPreset
-    // needs a round-trip to resolve the schedule, and the device event carrying
-    // the manual setpoint would otherwise be applied in the meantime.
+  // Handing the thermostat back to its programme is a single write: `schedule`
+  // on the preset feature. The server clears the hold and regulates on the
+  // programme from there — the widget does not have to resolve which preset that
+  // is, nor clear anything itself.
+  cancelManualMode = async () => {
     this.holdSetpointUntilApplied();
     this.setState({ isManualMode: false, manualUntil: null, manualSetpointOverride: false });
-    this.saveManualMode(false);
-    this.applyPlanningPreset();
+    await this.savePreset('schedule');
+    await this.loadConfig();
+    const { activePreset } = this.loadMode();
+    this.setState({ activePreset });
     this.loadSchedule();
   };
 
@@ -618,33 +586,6 @@ class ThermostatBox extends Component {
     }, 10000);
   };
 
-  applyPlanningPreset = async () => {
-    // Called when the manual timer expires or the user cancels manual mode.
-    // activePreset still holds whatever was picked by hand, so resolve the preset
-    // from the schedule instead of trusting it — otherwise the manual preset
-    // would simply be re-applied.
-    const schedulePreset = await this.getScheduledPreset();
-    const targetPreset = schedulePreset || this.state.activePreset;
-    const presets = this.getPresets();
-    const preset = presets.find(p => p.key === targetPreset);
-    const newState = { activePreset: targetPreset };
-    if (preset && preset.temp !== null && preset.temp !== undefined) {
-      newState.setpoint = preset.temp;
-      // The manual setpoint was saved server-side, so its device state event is
-      // still in flight and would land after the manual guard is lifted. Record
-      // what we are switching to, and ignore any other value until it arrives.
-      this.holdSetpointUntilApplied(preset.temp);
-    }
-    this.setState(newState);
-    if (newState.setpoint !== undefined) {
-      // Not a manual write: this is the schedule taking the thermostat back.
-      this.sendSetpoint(newState.setpoint, false);
-    } else {
-      // Nothing to apply (preset "off"): release the hold placed by the caller.
-      this.releaseSetpointHold();
-    }
-  };
-
   releaseSetpointHold = () => {
     this.expectedSetpoint = null;
     if (this.expectedSetpointTimer) {
@@ -653,36 +594,18 @@ class ThermostatBox extends Component {
     }
   };
 
-  saveManualUntilToDb = async until => {
-    try {
-      await this.saveThermostatVariable('MANUAL_UNTIL', String(until));
-    } catch (e) {
-      /* ignore */
-    }
-  };
-
-  // A null setpoint arms the timer without a held temperature: that is the Off
-  // preset, which the server regulates from PRESET=off alone. Passing nothing at
-  // all keeps the current setpoint, which is what a dial drag means.
-  startManualTimer = setpoint => {
+  // The server arms the hold and its expiry; this only shows the countdown while
+  // the reload that carries the real expiry is in flight. Same fallback the
+  // server applies, so what the widget displays is what the loop enforces.
+  showManualCountdown = () => {
     const cfg = this.getConfig();
-    // Same fallback the server applies, so the countdown the widget shows matches
-    // the expiry the regulation loop enforces.
     const durationMs = numOr(cfg.manual_duration, DEFAULT_MANUAL_DURATION_MINUTES) * 60 * 1000;
-    const until = Date.now() + durationMs;
-    this.setState({ manualUntil: until });
-    if (setpoint === null) {
-      this.clearManualSetpoint();
-    } else {
-      this.saveManualSetpoint(setpoint !== undefined ? setpoint : this.state.setpoint);
-    }
-    // Persist expiry server-side so the server can expire it even when browser is closed
-    this.saveManualUntilToDb(until);
+    this.setState({ manualUntil: Date.now() + durationMs });
   };
 
   initData = async () => {
-    await Promise.all([this.loadConfig(), this.loadLastActivePreset(), this.loadTimezone()]);
-    const { activePreset, isManualMode } = await this.loadMode();
+    await this.loadConfig();
+    const { activePreset, isManualMode } = this.loadMode();
 
     // Build initial state update: apply preset and manual mode atomically,
     // then restore the manual setpoint if it is still active.
@@ -709,26 +632,13 @@ class ThermostatBox extends Component {
       }
     }
 
-    // Restore manual mode state from the server (the single source of truth)
-    if (isManualMode === true) {
-      // Restore manual until for UI countdown display
-      const untilValue = await this.readThermostatVariable('MANUAL_UNTIL');
-      if (untilValue) {
-        const until = parseInt(untilValue, 10);
-        if (until > Date.now()) stateInit.manualUntil = until;
-      }
-      // Restore manual setpoint
-      const setpointValue = await this.readThermostatVariable('MANUAL_SETPOINT');
-      if (setpointValue) {
-        try {
-          const parsed = JSON.parse(setpointValue);
-          if (parsed && parsed.setpoint !== null && !isNaN(parsed.setpoint)) {
-            stateInit.setpoint = parsed.setpoint;
-            if (parsed.override) stateInit.manualSetpointOverride = true;
-          }
-        } catch (e) {
-          /* stored value is not valid JSON, keep the computed setpoint */
-        }
+    // The hold came with the device, so there is nothing left to fetch here.
+    const hold = this.getHold();
+    if (hold) {
+      stateInit.setpoint = hold.setpoint;
+      stateInit.manualSetpointOverride = true;
+      if (hold.until) {
+        stateInit.manualUntil = hold.until;
       }
     }
 
@@ -759,13 +669,11 @@ class ThermostatBox extends Component {
     this.setState({ setpoint: fallback });
   };
 
-  // Local minute tick: refresh the current slot from the cached schedule (no HTTP)
-  // and clear the manual banner when the timer visually expires.
+  // Local minute tick. The current point is resolved by the server, so this only
+  // clears the countdown when it visually expires; the server's own event is
+  // what actually ends the hold.
   refreshClock = () => {
-    const { activeSchedule, manualUntil } = this.state;
-    if (activeSchedule) {
-      this.setState({ currentSlot: getCurrentSlot(activeSchedule, this.timezone) });
-    }
+    const { manualUntil } = this.state;
     if (manualUntil && Date.now() > manualUntil) {
       this.setState({ manualUntil: null });
     }
@@ -836,14 +744,14 @@ class ThermostatBox extends Component {
   // Pass manual: false when writing back the setpoint the schedule dictates —
   // otherwise returning to the schedule immediately re-arms the override it is
   // clearing, and the widget shows the schedule while the database says manual.
-  sendSetpoint = async (value, manual = true) => {
+  // Writing a temperature is a value on the setpoint feature. The server turns it
+  // into a hold, with the expiry the device's own settings say — the widget does
+  // not arm anything, and does not have to stay in step with what it armed.
+  sendSetpoint = async value => {
     const { box } = this.props;
     if (!box.thermostat_feature) return;
     try {
-      await this.props.httpClient.post(`/api/v1/service/thermostat/setpoint/${box.thermostat_feature}`, {
-        value,
-        manual
-      });
+      await this.props.httpClient.post(`/api/v1/device_feature/${box.thermostat_feature}/value`, { value });
     } catch (e) {
       console.error(e);
     }
@@ -902,12 +810,9 @@ class ThermostatBox extends Component {
       if (presetOnRelease) {
         await this.savePreset(presetOnRelease);
       }
-      await this.saveManualMode(true);
-      this.sendSetpoint(lastDragSetpoint);
-      this.saveManualSetpoint(lastDragSetpoint);
-      // A manual setpoint only needs a timer when a schedule would otherwise
-      // take it over; the active schedule now lives on the device.
-      if (this.state.activeSchedule) this.startManualTimer(lastDragSetpoint);
+      await this.sendSetpoint(lastDragSetpoint);
+      // A hold only expires when a schedule would otherwise take it over.
+      if (this.state.activeSchedule) this.showManualCountdown();
     };
     // A drag taken over by the browser (scroll, gesture, window switch) fires
     // cancel and never up. That is an aborted gesture, not a release: committing
@@ -955,10 +860,8 @@ class ThermostatBox extends Component {
     } else {
       this.setState({ setpoint: newSetpoint, isManualMode: true, manualSetpointOverride: true });
     }
-    this.saveManualMode(true);
-    this.saveManualSetpoint(newSetpoint);
     this.sendSetpoint(newSetpoint);
-    if (this.state.activeSchedule) this.startManualTimer(newSetpoint);
+    if (this.state.activeSchedule) this.showManualCountdown();
   };
 
   decrement = () => {
@@ -976,46 +879,40 @@ class ThermostatBox extends Component {
     } else {
       this.setState({ setpoint: newSetpoint, isManualMode: true, manualSetpointOverride: true });
     }
-    this.saveManualMode(true);
-    this.saveManualSetpoint(newSetpoint);
     this.sendSetpoint(newSetpoint);
-    if (this.state.activeSchedule) this.startManualTimer(newSetpoint);
+    if (this.state.activeSchedule) this.showManualCountdown();
   };
 
+  // Picking a preset is a single write on the preset feature. The server arms the
+  // hold on that preset's setpoint and regulates on it: nothing else to send, and
+  // no sequence of writes for the two sides to disagree about.
+  //
+  // `off` is the exception, because stopping is a mode rather than a preset: it
+  // goes to the mode feature instead.
   selectPreset = async preset => {
     this.saveLastActivePreset(this.state.activePreset);
     const hasSchedule = !!this.state.activeSchedule;
-    const newManual = hasSchedule;
     const newSetpoint = preset.temp !== null && preset.temp !== undefined ? preset.temp : this.state.setpoint;
-    // Selecting a preset clears any manual temp override
     this.setState({
       activePreset: preset.key,
       setpoint: newSetpoint,
-      isManualMode: newManual,
+      isManualMode: hasSchedule,
       manualSetpointOverride: false
     });
-    if (!newManual) this.clearManualSetpoint();
-    // With a schedule the setpoint below is written as a manual hold, and the
-    // server echoes MANUAL_MODE_UPDATED back: on an external thermostat that
-    // event un-highlights the preset, which is exactly the preset just picked.
-    // The flag tells the handler this hold came from here, not from the device.
+    // The hold the server arms is the widget's own, so the event it echoes back
+    // must not un-highlight the preset that was just picked.
     this.pickingPreset = true;
     try {
-      await this.savePreset(preset.key);
-      await this.saveManualMode(newManual);
-      if (preset.temp !== null) {
-        // Without a schedule, picking a preset is not a manual override — the
-        // preset itself is what the loop regulates on, and marking the write
-        // manual would contradict the MANUAL_MODE=false just saved above.
-        await this.sendSetpoint(preset.temp, newManual);
+      if (preset.key === 'off') {
+        const cfg = this.state.remoteConfig;
+        await this.writeFeature(cfg && cfg.modeFeature, THERMOSTAT_MODE.OFF);
+      } else {
+        await this.savePreset(preset.key);
       }
     } finally {
       this.pickingPreset = false;
     }
-    // Off holds too, so the schedule does not turn the heating back on at the next
-    // slot — but it holds the *preset*, not a setpoint: the server cuts the switch
-    // on PRESET=off rather than regulating on the temperature stored here.
-    if (hasSchedule) this.startManualTimer(preset.key === 'off' ? null : newSetpoint);
+    if (hasSchedule) this.showManualCountdown();
   };
 
   render(
@@ -1028,7 +925,6 @@ class ThermostatBox extends Component {
       error,
       noConfig,
       isManualMode,
-      currentSlot,
       manualUntil,
       manualSetpointOverride,
       isWindowOpen,
@@ -1174,7 +1070,14 @@ class ThermostatBox extends Component {
                 ? null
                 : (() => {
                     const hasSchedule = !!activeSchedule;
-                    if (hasSchedule && activePreset !== null) {
+                    // The banner says what the thermostat is following; the bar
+                    // below stays reachable whatever it says. Replacing the bar
+                    // with the banner meant "I am away for the weekend -> Frost"
+                    // required detaching the programme on the integration page.
+                    const banner = (() => {
+                      if (!hasSchedule || activePreset === null) {
+                        return null;
+                      }
                       if (isManualMode && manualUntil) {
                         // Manual mode banner: fe-user + Manuel + until time + delete button
                         const untilDate = new Date(manualUntil);
@@ -1207,7 +1110,7 @@ class ThermostatBox extends Component {
                         );
                       }
 
-                      // Planning mode banner: preset icon + name + slot end time
+                      // Planning banner: preset icon + name + next transition time
                       const knownPresetKeys = [...HEATING_PRESETS, ...COOLING_PRESETS];
                       const resolvedPresetKey = knownPresetKeys.includes(activePreset) ? activePreset : 'comfort';
                       const activePresetObj =
@@ -1231,51 +1134,54 @@ class ThermostatBox extends Component {
                           <i class={`fe ${presetIcon} ${style.scheduleBannerIcon}`} />
                           <span class={style.scheduleBannerText}>
                             {presetName}
-                            {currentSlot && currentSlot.end_time && (
+                            {activeSchedule && activeSchedule.next && (
                               <span class={style.scheduleBannerUntil}>
                                 {' '}
-                                {untilLabel} {currentSlot.end_time.substring(0, 5)}
+                                {untilLabel} {activeSchedule.next.time}
                               </span>
                             )}
                           </span>
                         </div>
                       );
-                    }
+                    })();
 
-                    // No schedule: always show full icon bar. A null preset means
-                    // the user has not chosen one yet, so nothing is highlighted —
-                    // falling back to 'comfort' would claim a setting that was
-                    // never made, and the widget writes none until it is clicked.
+                    // A null preset means the user has not chosen one yet, so
+                    // nothing is highlighted — falling back to 'comfort' would
+                    // claim a setting that was never made, and the widget writes
+                    // none until it is clicked.
                     const resolvedActivePreset = [...HEATING_PRESETS, ...COOLING_PRESETS].includes(activePreset)
                       ? activePreset
                       : null;
                     return (
-                      <div class={style.segmentedControl}>
-                        {presets.map(preset => {
-                          const presetTitle =
-                            props.intl &&
-                            props.intl.dictionary &&
-                            props.intl.dictionary.dashboard &&
-                            props.intl.dictionary.dashboard.boxes &&
-                            props.intl.dictionary.dashboard.boxes.thermostat &&
-                            props.intl.dictionary.dashboard.boxes.thermostat.preset &&
-                            props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
-                              ? props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
-                              : preset.key;
-                          const isActive = resolvedActivePreset === preset.key && !manualSetpointOverride;
-                          const presetColor = this.getPresetColor(preset.key);
-                          return (
-                            <button
-                              key={preset.key}
-                              class={`${style.segmentBtn} ${isActive ? style.segmentBtnActive : ''}`}
-                              style={isActive ? `--preset-color:${presetColor}` : undefined}
-                              onClick={() => this.selectPreset(preset)}
-                              title={presetTitle}
-                            >
-                              <i class={`fe ${preset.icon}`} />
-                            </button>
-                          );
-                        })}
+                      <div>
+                        {banner}
+                        <div class={style.segmentedControl}>
+                          {presets.map(preset => {
+                            const presetTitle =
+                              props.intl &&
+                              props.intl.dictionary &&
+                              props.intl.dictionary.dashboard &&
+                              props.intl.dictionary.dashboard.boxes &&
+                              props.intl.dictionary.dashboard.boxes.thermostat &&
+                              props.intl.dictionary.dashboard.boxes.thermostat.preset &&
+                              props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
+                                ? props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
+                                : preset.key;
+                            const isActive = resolvedActivePreset === preset.key && !manualSetpointOverride;
+                            const presetColor = this.getPresetColor(preset.key);
+                            return (
+                              <button
+                                key={preset.key}
+                                class={`${style.segmentBtn} ${isActive ? style.segmentBtnActive : ''}`}
+                                style={isActive ? `--preset-color:${presetColor}` : undefined}
+                                onClick={() => this.selectPreset(preset)}
+                                title={presetTitle}
+                              >
+                                <i class={`fe ${preset.icon}`} />
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     );
                   })()}
