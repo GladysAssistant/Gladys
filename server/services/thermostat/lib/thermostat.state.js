@@ -4,6 +4,7 @@ const {
   DEVICE_FEATURE_TYPES,
   EVENTS,
   WEBSOCKET_MESSAGE_TYPES,
+  THERMOSTAT_MODE,
   THERMOSTAT_PRESET,
 } = require('../../../utils/constants');
 const { PRESETS } = require('../../../utils/thermostatConstants');
@@ -95,6 +96,24 @@ function getFeature(device, type) {
 function getPreset(device) {
   const feature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET);
   return feature ? presetName(feature.last_value) : null;
+}
+
+/**
+ * @description Whether the thermostat has been stopped by hand: its mode feature
+ * reads OFF.
+ *
+ * A stop is not a preset with a low setpoint, it is the machine switched off, so
+ * it outranks the programme: without this the regulation pass triggered by the
+ * stop itself would resolve the schedule's preset and start the heating again
+ * within seconds. It holds until a mode is written back.
+ * @param {object} device - The thermostat device.
+ * @returns {boolean} True when the thermostat is stopped.
+ * @example
+ * isStopped(device);
+ */
+function isStopped(device) {
+  const feature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
+  return Boolean(feature) && Number(feature.last_value) === THERMOSTAT_MODE.OFF;
 }
 
 /**
@@ -246,6 +265,7 @@ function triggerApplySchedules() {
 
 module.exports = {
   getFeature,
+  isStopped,
   getPreset,
   savePreset,
   saveOperatingState,

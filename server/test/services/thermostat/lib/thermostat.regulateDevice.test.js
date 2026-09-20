@@ -9,6 +9,7 @@ const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   EVENTS,
+  THERMOSTAT_MODE,
   THERMOSTAT_PRESET,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
@@ -27,6 +28,13 @@ const presetFeature = (preset) => ({
   category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
   type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
   last_value: THERMOSTAT_PRESET[preset.toUpperCase()],
+});
+
+const modeFeature = (mode) => ({
+  selector: 'thermostat-living-room:mode',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+  last_value: mode,
 });
 
 const todayDow = getCurrentDayAndMinutes(new Date(), 'Europe/Paris').dayOfWeek;
@@ -614,6 +622,41 @@ describe('thermostat.regulateDevice - resilience', () => {
     // Manual mode holds rather than silently reverting to the schedule
     assert.neverCalledWith(gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'false');
     assert.calledOnce(gladys.device.setValue);
+  });
+
+  it('should leave a stopped thermostat alone, whatever the schedule says', async () => {
+    // Stopping writes OFF on the mode feature and triggers a regulation pass:
+    // without this the pass would resolve the schedule's preset and start the
+    // heating again within seconds — the stop would undo itself.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15, switchOn: true }) });
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature(), modeFeature(THERMOSTAT_MODE.OFF)],
+      params: baseParams(),
+    });
+
+    // The switch is cut, and nothing is regulated on the schedule's preset.
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(0);
+    expect(gladys.device.setValue.getCalls()).to.have.lengthOf(1);
+  });
+
+  it('should regulate normally once the mode is handed back', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature(), modeFeature(THERMOSTAT_MODE.HEATING)],
+      params: baseParams(),
+    });
+
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(1);
   });
 
   it('should regulate on nothing when the thermostat follows no schedule', async () => {
