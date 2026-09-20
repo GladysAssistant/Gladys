@@ -73,6 +73,51 @@
   flex-shrink: 0;
 }
 
+/* A stretch with no range is not a temperature: hatching it says "nothing is
+   scheduled here" where a flat colour would read as one more preset. */
+.timeBarSegmentEmpty {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.07),
+    rgba(0, 0, 0, 0.07) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+}
+
+/* Says what the hatching means, next to a sample of it. */
+.stoppedLegend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0 0;
+  font-size: 0.75rem;
+  color: #868e96;
+}
+
+.stoppedLegendSwatch {
+  display: inline-block;
+  width: 22px;
+  height: 10px;
+  border-radius: 2px;
+  outline: 1px solid rgba(0, 0, 0, 0.06);
+  outline-offset: -1px;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.07),
+    rgba(0, 0, 0, 0.07) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+}
+
+/* Where a day with no point of its own gets its colour from. */
+.carriedFrom {
+  padding: 0 16px 8px 16px;
+  font-size: 0.78rem;
+  color: #868e96;
+}
+
 :global(.dark-mode) .timeBarWrapper {
   filter: invert(100%) hue-rotate(180deg);
 }
@@ -142,6 +187,12 @@
 
 /* Marks the end time of a slot that runs past midnight, so the row reads
    22:30 → 06:30 +1d instead of losing the morning the user typed. */
+/* The end of a point is read, not set: it is the next point's time. Greying it
+   says so without a second input that would mean intervals again. */
+.slotEndTime {
+  color: #868e96;
+}
+
 .slotNextDay {
   font-size: 0.7rem;
   font-weight: 600;
