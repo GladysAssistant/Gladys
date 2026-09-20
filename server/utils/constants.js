@@ -187,6 +187,25 @@ const THERMOSTAT_OPERATING_STATE = {
   COOLING: 2,
 };
 
+// Which temperature a thermostat aims for, as opposed to THERMOSTAT_MODE, which says
+// what the machine does (off, heating, cooling). The two compose: a thermostat in
+// heating mode follows a programme whose 07:00 point is COMFORT. This is the
+// hvac_mode / preset_mode split of Home Assistant and the system_mode / preset split
+// of Zigbee TRVs, and it is what makes a weekly schedule expressible — "heating" is
+// not something that can be put in a time slot.
+// SCHEDULE means "follow the weekly programme", like preset: auto on Zigbee2MQTT.
+// There is no OFF: stopping is a mode, and THERMOSTAT_MODE.OFF already carries it.
+// Values are append-only: an existing integer never changes meaning, because it is
+// stored in device states and hard-coded in users' scenes.
+const THERMOSTAT_PRESET = {
+  SCHEDULE: 0,
+  FROST: 1,
+  AWAY: 2,
+  ECO: 3,
+  NIGHT: 4,
+  COMFORT: 5,
+};
+
 const FAN_MODE = {
   OFF: 0,
   LOW: 1,
@@ -1363,8 +1382,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   THERMOSTAT: {
     TARGET_TEMPERATURE: 'target-temperature',
-    MODE: 'mode',
+    MODE: 'mode', // what the machine does, THERMOSTAT_MODE (command)
     OPERATING_STATE: 'operating-state',
+    PRESET: 'preset', // which temperature to aim for, THERMOSTAT_PRESET (command)
   },
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
@@ -2403,6 +2423,7 @@ module.exports.AC_MODE = AC_MODE;
 module.exports.CAMERA_MOVE = CAMERA_MOVE;
 module.exports.THERMOSTAT_MODE = THERMOSTAT_MODE;
 module.exports.THERMOSTAT_OPERATING_STATE = THERMOSTAT_OPERATING_STATE;
+module.exports.THERMOSTAT_PRESET = THERMOSTAT_PRESET;
 module.exports.FAN_MODE = FAN_MODE;
 module.exports.FAN_AIRFLOW_DIRECTION = FAN_AIRFLOW_DIRECTION;
 module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;

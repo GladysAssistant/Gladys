@@ -5372,6 +5372,14 @@
           "heating": "Heat",
           "cooling": "Cool",
           "auto": "Auto"
+        },
+        "preset": {
+          "schedule": "Schedule",
+          "frost": "Frost protection",
+          "away": "Away",
+          "eco": "Eco",
+          "night": "Night",
+          "comfort": "Comfort"
         }
       },
       "heater": {
@@ -5671,6 +5679,14 @@
           "1": "Heating",
           "2": "Cooling",
           "3": "Auto"
+        },
+        "preset": {
+          "0": "Schedule",
+          "1": "Frost protection",
+          "2": "Away",
+          "3": "Eco",
+          "4": "Night",
+          "5": "Comfort"
         },
         "operating-state": {
           "unknown": "{{value}} (unknown)",
@@ -6465,6 +6481,7 @@
       "shortCategoryName": "Thermostat",
       "target-temperature": "Thermostat Temperature",
       "mode": "Thermostat Mode",
+      "preset": "Thermostat Preset",
       "operating-state": "Thermostat Operating State"
     },
     "airquality-sensor": {

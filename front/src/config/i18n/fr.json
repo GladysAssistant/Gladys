@@ -5372,6 +5372,14 @@
           "heating": "Chauffage",
           "cooling": "Refroidissement",
           "auto": "Auto"
+        },
+        "preset": {
+          "schedule": "Planning",
+          "frost": "Hors-gel",
+          "away": "Absence",
+          "eco": "Éco",
+          "night": "Nuit",
+          "comfort": "Confort"
         }
       },
       "heater": {
@@ -5671,6 +5679,14 @@
           "1": "Chauffage",
           "2": "Refroidissement",
           "3": "Auto"
+        },
+        "preset": {
+          "0": "Planning",
+          "1": "Hors-gel",
+          "2": "Absence",
+          "3": "Éco",
+          "4": "Nuit",
+          "5": "Confort"
         },
         "operating-state": {
           "unknown": "{{value}} (inconnu)",
@@ -6465,6 +6481,7 @@
       "shortCategoryName": "Thermostat",
       "target-temperature": "Température de consigne",
       "mode": "Mode du thermostat",
+      "preset": "Preset du thermostat",
       "operating-state": "État de fonctionnement du thermostat"
     },
     "airquality-sensor": {
