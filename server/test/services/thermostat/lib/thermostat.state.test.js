@@ -9,6 +9,7 @@ const {
   DEVICE_FEATURE_TYPES,
   EVENTS,
   WEBSOCKET_MESSAGE_TYPES,
+  THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
 } = require('../../../../utils/constants');
@@ -21,6 +22,12 @@ const state = proxyquire('../../../../services/thermostat/lib/thermostat.state',
   },
 });
 
+const modeFeature = (lastValue) => ({
+  selector: 'living-room:mode',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+  last_value: lastValue,
+});
 const presetFeature = (lastValue) => ({
   selector: 'living-room:preset',
   category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
@@ -72,6 +79,25 @@ describe('thermostat.state presets', () => {
     expect(state.getPreset({ features: [] })).to.equal(null);
     expect(state.getPreset({})).to.equal(null);
     expect(state.getPreset(null)).to.equal(null);
+  });
+});
+
+describe('thermostat.state isStopped', () => {
+  it('should report a thermostat switched off', () => {
+    expect(state.isStopped({ features: [modeFeature(THERMOSTAT_MODE.OFF)] })).to.equal(true);
+  });
+
+  it('should report a running thermostat', () => {
+    expect(state.isStopped({ features: [modeFeature(THERMOSTAT_MODE.HEATING)] })).to.equal(false);
+    expect(state.isStopped({ features: [modeFeature(THERMOSTAT_MODE.COOLING)] })).to.equal(false);
+  });
+
+  it('should report a device with no mode feature as running', () => {
+    // An external thermostat carries no mode of its own: it is never stopped
+    // through this path.
+    expect(state.isStopped({ features: [] })).to.equal(false);
+    expect(state.isStopped({})).to.equal(false);
+    expect(state.isStopped(null)).to.equal(false);
   });
 });
 

@@ -12,6 +12,7 @@ const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/uni
 const { toNumber, getDeviceConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
 const { followsSchedule } = require('./thermostat.scheduleDevice');
 const {
+  isStopped,
   getPreset,
   savePreset,
   saveOperatingState,
@@ -490,6 +491,21 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     } catch (e) {
       logger.warn(`Thermostat schedule: Failed to read window sensor: ${e.message}`);
     }
+  }
+
+  // Stopped by hand: the machine is off, which outranks the programme. Without
+  // this the pass triggered by the stop itself would resolve the schedule's
+  // preset and start the heating again within seconds — the stop would undo
+  // itself. It holds until a mode is written back.
+  if (isStopped(device)) {
+    logger.debug(`Thermostat schedule: ${selector} is stopped, leaving it alone`);
+    if (external) {
+      await stopExternalThermostat(gladys, config, `mode=off, ${selector}`, selfWritten);
+    } else if (config.switch_feature) {
+      await actuateSwitch(gladys, config.switch_feature, false, `mode=off, ${selector}`);
+      await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
+    }
+    return;
   }
 
   // The preset the thermostat carries, and the hold armed on it: both are on the

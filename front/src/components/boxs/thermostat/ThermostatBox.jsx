@@ -191,9 +191,56 @@ class ThermostatBox extends Component {
     if (!cfg) {
       return {};
     }
-    const activePreset = PRESET_NAMES[cfg.preset] || null;
+    // A stopped thermostat shows Off, whatever preset it carries underneath:
+    // that preset is what it returns to, not what it is doing.
+    const activePreset = this.isStopped() ? 'off' : this.followedPreset();
     const hold = this.getHold();
-    return { activePreset, isManualMode: !!hold };
+    return { activePreset, isManualMode: !this.isStopped() && !!hold };
+  };
+
+  // The preset the thermostat is actually on. `schedule` is not one of them: it
+  // says "follow the programme", so what is in force is the programme's current
+  // point — which the server sends alongside the schedule, already resolved.
+  //
+  // Reading it here rather than waiting for the regulation pass is what stops the
+  // bar flashing: the pass is debounced by a couple of seconds, and until it ran
+  // the widget would fall back on its default and light up Comfort.
+  followedPreset = () => {
+    const cfg = this.state.remoteConfig;
+    const name = cfg ? PRESET_NAMES[cfg.preset] : null;
+    if (name !== 'schedule') {
+      return name || null;
+    }
+    const { activeSchedule, activePreset } = this.state;
+    if (activeSchedule && activeSchedule.current) {
+      return activeSchedule.current.preset;
+    }
+    // The schedule is not loaded yet, or carries no point. Keeping what is on
+    // screen beats blanking it: a null preset hides the banner entirely, and the
+    // widget would lose it for the time of a round trip.
+    return activePreset || null;
+  };
+
+  // Stopped by hand: the machine is off, which outranks the programme. The
+  // widget shows Off highlighted and the loop leaves the thermostat alone.
+  isStopped = () => {
+    const cfg = this.state.remoteConfig;
+    return !!cfg && Number(cfg.mode) === THERMOSTAT_MODE.OFF;
+  };
+
+  // The mode a running thermostat carries, from what it is configured to do.
+  getRunningMode = () =>
+    this.getConfig().default_mode === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
+
+  // Leaving a stop takes a mode write: the regulation loop skips a stopped
+  // thermostat, so a setpoint or a preset written alone would be stored and
+  // never applied. Every way out of Off goes through here.
+  resumeIfStopped = async () => {
+    if (!this.isStopped()) {
+      return;
+    }
+    const cfg = this.state.remoteConfig;
+    await this.writeFeature(cfg && cfg.modeFeature, this.getRunningMode());
   };
 
   // The manual hold, as the device carries it. `until` is null on a permanent
@@ -451,8 +498,12 @@ class ThermostatBox extends Component {
   handleThermostatConfigUpdated = async () => {
     if (!this.props.box.thermostat_feature) return;
     await this.loadConfig();
-    await this.getDeviceData();
+    // The schedule before the state that reads it: a thermostat following its
+    // programme takes its preset from the point in force.
     await this.loadSchedule();
+    const { activePreset, isManualMode } = this.loadMode();
+    this.setState({ activePreset, isManualMode });
+    await this.getDeviceData();
     this.applyFallbackSetpoint();
   };
 
@@ -526,10 +577,12 @@ class ThermostatBox extends Component {
   // state of the device now, so one reload replaces the handful of round-trips
   // this used to take.
   refreshFromDevice = async () => {
+    // The schedule first: a thermostat following it takes its preset from the
+    // point in force, which loadMode reads out of it.
+    await this.loadSchedule();
     await this.loadConfig();
     const { activePreset, isManualMode } = this.loadMode();
     this.setState({ activePreset, isManualMode });
-    this.loadSchedule();
   };
 
   // Which schedule a thermostat follows is a relation, so the server is asked
@@ -562,14 +615,20 @@ class ThermostatBox extends Component {
   // on the preset feature. The server clears the hold and regulates on the
   // programme from there — the widget does not have to resolve which preset that
   // is, nor clear anything itself.
+  // Hand the thermostat back to its programme, from a hold or from a stop. A
+  // stopped thermostat is skipped by the regulation loop, so the mode has to be
+  // written back first or the preset would be stored and never applied.
   cancelManualMode = async () => {
     this.holdSetpointUntilApplied();
     this.setState({ isManualMode: false, manualUntil: null, manualSetpointOverride: false });
+    await this.resumeIfStopped();
     await this.savePreset('schedule');
+    // The schedule first: its `current` point is what the thermostat follows
+    // from now on, and loadMode reads it.
+    await this.loadSchedule();
     await this.loadConfig();
     const { activePreset } = this.loadMode();
     this.setState({ activePreset });
-    this.loadSchedule();
   };
 
   // Ignore incoming device setpoints until the one we are about to apply lands.
@@ -605,6 +664,10 @@ class ThermostatBox extends Component {
 
   initData = async () => {
     await this.loadConfig();
+    // The schedule before the state that reads it: a thermostat following its
+    // programme takes its preset from the point in force, and the banner needs
+    // the schedule to exist at all.
+    await this.loadSchedule();
     const { activePreset, isManualMode } = this.loadMode();
 
     // Build initial state update: apply preset and manual mode atomically,
@@ -647,7 +710,6 @@ class ThermostatBox extends Component {
       await new Promise(resolve => this.setState(stateInit, resolve));
     }
     await this.getDeviceData();
-    await this.loadSchedule();
     this.applyFallbackSetpoint();
   };
 
@@ -808,6 +870,7 @@ class ThermostatBox extends Component {
     this._onUp = async () => {
       this.stopDrag();
       if (presetOnRelease) {
+        await this.resumeIfStopped();
         await this.savePreset(presetOnRelease);
       }
       await this.sendSetpoint(lastDragSetpoint);
@@ -856,7 +919,7 @@ class ThermostatBox extends Component {
         activePreset: lastPreset,
         manualSetpointOverride: true
       });
-      this.savePreset(lastPreset);
+      this.resumeIfStopped().then(() => this.savePreset(lastPreset));
     } else {
       this.setState({ setpoint: newSetpoint, isManualMode: true, manualSetpointOverride: true });
     }
@@ -875,7 +938,7 @@ class ThermostatBox extends Component {
         activePreset: lastPreset,
         manualSetpointOverride: true
       });
-      this.savePreset(lastPreset);
+      this.resumeIfStopped().then(() => this.savePreset(lastPreset));
     } else {
       this.setState({ setpoint: newSetpoint, isManualMode: true, manualSetpointOverride: true });
     }
@@ -903,16 +966,20 @@ class ThermostatBox extends Component {
     // must not un-highlight the preset that was just picked.
     this.pickingPreset = true;
     try {
+      const cfg = this.state.remoteConfig;
       if (preset.key === 'off') {
-        const cfg = this.state.remoteConfig;
+        // Stopping is a mode, not a preset: it switches the machine off, and the
+        // regulation loop then leaves it alone whatever the programme says.
         await this.writeFeature(cfg && cfg.modeFeature, THERMOSTAT_MODE.OFF);
       } else {
+        await this.resumeIfStopped();
         await this.savePreset(preset.key);
       }
     } finally {
       this.pickingPreset = false;
     }
-    if (hasSchedule) this.showManualCountdown();
+    await this.refreshFromDevice();
+    if (hasSchedule && preset.key !== 'off') this.showManualCountdown();
   };
 
   render(
@@ -1129,18 +1196,35 @@ class ThermostatBox extends Component {
                         props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
                       const untilLabel = (t2 && t2.scheduleUntil) || '';
 
+                      // A stopped thermostat is not waiting for the next point:
+                      // the programme does not start it again, only a mode does.
+                      // Announcing an hour here promises a return that will not
+                      // happen — and the cross is the only way back to the
+                      // programme, since every preset arms a hold instead.
+                      const stopped = resolvedPresetKey === 'off';
+                      const backToScheduleLabel = (t2 && t2.backToSchedule) || '';
+
                       return (
                         <div class={style.scheduleBanner} style={`--banner-color:${bannerColor}`}>
                           <i class={`fe ${presetIcon} ${style.scheduleBannerIcon}`} />
                           <span class={style.scheduleBannerText}>
                             {presetName}
-                            {activeSchedule && activeSchedule.next && (
+                            {!stopped && activeSchedule && activeSchedule.next && (
                               <span class={style.scheduleBannerUntil}>
                                 {' '}
                                 {untilLabel} {activeSchedule.next.time}
                               </span>
                             )}
                           </span>
+                          {stopped && (
+                            <button
+                              class={style.manualBannerCancel}
+                              onClick={this.cancelManualMode}
+                              title={backToScheduleLabel}
+                            >
+                              <i class="fe fe-x" />
+                            </button>
+                          )}
                         </div>
                       );
                     })();
