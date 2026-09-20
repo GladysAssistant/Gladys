@@ -58,6 +58,17 @@ function createActions(store) {
 
     updateScheduleField(state, field, value) {
       store.setState({ [field]: value });
+    },
+
+    // The whole list is already in memory — a schedule is a name and a handful of
+    // points — so searching and sorting happen here rather than through a round
+    // trip per keystroke.
+    search(state, e) {
+      store.setState({ thermostatScheduleSearch: e.target.value });
+    },
+
+    changeOrderDir(state, e) {
+      store.setState({ getThermostatScheduleOrderDir: e.target.value });
     }
   };
   return actions;

@@ -750,7 +750,8 @@
           "comfort": "Confort",
           "eco": "Éco",
           "night": "Nuit"
-        }
+        },
+        "backToSchedule": "Revenir au planning"
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",
@@ -3494,7 +3495,14 @@
           "comfort": "Confort"
         },
         "noSlots": "Aucune plage horaire. Cliquez sur \"Ajouter une plage\" pour commencer.",
-        "followedBy": "Suivi par :"
+        "followedBy": "Suivi par :",
+        "houseLabel": "Maison",
+        "carriedSince": "depuis",
+        "overlapError": "Cette plage en chevauche une autre le même jour. Un thermostat ne suit qu’un preset à la fois : ajustez les horaires, ou modifiez la plage existante.",
+        "stoppedLegend": "En dehors de ces plages, le thermostat est à l’arrêt.",
+        "houseLockedByDevices": "Un planning ne change de maison que si aucun thermostat ne le suit. Suivi par :",
+        "searchPlaceHolder": "Chercher un planning",
+        "noSearchResult": "Aucun planning ne correspond à cette recherche."
       }
     }
   },

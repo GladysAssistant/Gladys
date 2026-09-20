@@ -311,19 +311,17 @@ function createActions(store) {
         const previousSchedule = (state.thermostatEditDevice && state.thermostatEditDeviceSchedule) || '';
         const wantedSchedule = state.thermostatEditActiveSchedule || '';
         if (wantedSchedule !== previousSchedule && savedDevice && savedDevice.selector) {
-          try {
-            if (wantedSchedule) {
-              await state.httpClient.put(
-                `/api/v1/service/thermostat/schedule/${wantedSchedule}/device/${savedDevice.selector}`
-              );
-            } else if (previousSchedule) {
-              await state.httpClient.delete(
-                `/api/v1/service/thermostat/schedule/${previousSchedule}/device/${savedDevice.selector}`
-              );
-            }
-          } catch (e) {
-            // The link was refused — the thermostat has no room, or its room is
-            // in another house than the schedule. The device itself is saved.
+          // A refused link is not a detail to swallow: the thermostat would keep
+          // following what it followed before while the form claimed success.
+          // The device itself is saved either way.
+          if (wantedSchedule) {
+            await state.httpClient.post(
+              `/api/v1/service/thermostat/schedule/${wantedSchedule}/device/${savedDevice.selector}`
+            );
+          } else if (previousSchedule) {
+            await state.httpClient.delete(
+              `/api/v1/service/thermostat/schedule/${previousSchedule}/device/${savedDevice.selector}`
+            );
           }
         }
 

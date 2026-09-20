@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
 import ThermostatPage from '../ThermostatPage';
@@ -7,6 +7,7 @@ import ScheduleEditor from './ScheduleEditor';
 import style from './style.css';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 import { RequestStatus } from '../../../../../utils/consts';
+import CardFilter from '../../../../../components/layout/CardFilter';
 
 class SchedulePageComponent extends Component {
   state = {
@@ -24,9 +25,16 @@ class SchedulePageComponent extends Component {
   }
 
   // A schedule belongs to a house: that is what makes its name unique per house
-  // and keeps a thermostat from following another house's programme.
-  startCreate = house => {
-    this.setState({ showEditor: true, editingSchedule: null, editingHouse: house });
+  // and keeps a thermostat from following another house's programme. Which house
+  // is picked in the editor, like the name — one button per house turned the
+  // page header into a row of them on an installation with four.
+  startCreate = () => {
+    const firstHouse = (this.props.houses || [])[0];
+    this.setState({
+      showEditor: true,
+      editingSchedule: null,
+      editingHouse: firstHouse ? firstHouse.selector : null
+    });
   };
 
   startEdit = schedule => {
@@ -138,7 +146,22 @@ class SchedulePageComponent extends Component {
   );
 
   render(props, { showEditor, editingSchedule, editingHouse, confirmDeleteSelector }) {
-    const { thermostatSchedules, getSchedulesStatus, deleteScheduleStatus, houses } = props;
+    const {
+      thermostatSchedules,
+      getSchedulesStatus,
+      deleteScheduleStatus,
+      houses,
+      thermostatScheduleSearch,
+      getThermostatScheduleOrderDir
+    } = props;
+
+    // Searching and sorting happen on the list already loaded: a schedule is a
+    // name and a handful of points, so there is nothing to fetch again.
+    const search = (thermostatScheduleSearch || '').trim().toLowerCase();
+    const orderDir = getThermostatScheduleOrderDir || 'asc';
+    const visibleSchedules = (thermostatSchedules || [])
+      .filter(schedule => !search || (schedule.name || '').toLowerCase().includes(search))
+      .sort((a, b) => (orderDir === 'desc' ? -1 : 1) * (a.name || '').localeCompare(b.name || ''));
 
     // The actions store RequestStatus values ('Getting', 'Error'), so comparing
     // against lowercase literals never matched.
@@ -152,6 +175,7 @@ class SchedulePageComponent extends Component {
           <ScheduleEditor
             schedule={editingSchedule}
             house={editingHouse}
+            houses={houses}
             httpClient={props.httpClient}
             onSaved={this.handleSaved}
             onCancel={this.cancelEditor}
@@ -164,17 +188,18 @@ class SchedulePageComponent extends Component {
                 <Text id="integration.thermostat.schedule.title" />
               </h1>
               <div class="page-options d-flex">
-                {(houses || []).map(house => (
-                  <button
-                    key={house.selector}
-                    type="button"
-                    class="btn btn-outline-primary ml-2"
-                    onClick={() => this.startCreate(house.selector)}
-                  >
-                    <Text id="integration.thermostat.schedule.newButton" />
-                    {(houses || []).length > 1 && <span class="ml-1">{house.name}</span>} <i class="fe fe-plus" />
-                  </button>
-                ))}
+                <Localizer>
+                  <CardFilter
+                    changeOrderDir={props.changeOrderDir}
+                    orderValue={orderDir}
+                    search={props.search}
+                    searchValue={thermostatScheduleSearch}
+                    searchPlaceHolder={<Text id="integration.thermostat.schedule.searchPlaceHolder" />}
+                  />
+                </Localizer>
+                <button type="button" class="btn btn-outline-primary ml-2" onClick={() => this.startCreate()}>
+                  <Text id="integration.thermostat.schedule.newButton" /> <i class="fe fe-plus" />
+                </button>
               </div>
             </div>
             <div class="card-body">
@@ -190,20 +215,22 @@ class SchedulePageComponent extends Component {
                 </div>
               )}
 
-              {!loading && (!thermostatSchedules || thermostatSchedules.length === 0) && (
+              {!loading && visibleSchedules.length === 0 && (
                 <div class="text-center text-muted py-4">
                   <i class={`fe fe-calendar ${style.emptyIcon}`} />
                   <p>
-                    <Text id="integration.thermostat.schedule.noSchedules" />
+                    {search ? (
+                      <Text id="integration.thermostat.schedule.noSearchResult" />
+                    ) : (
+                      <Text id="integration.thermostat.schedule.noSchedules" />
+                    )}
                   </p>
                 </div>
               )}
 
               {!loading &&
                 (houses || []).map(house => {
-                  const houseSchedules = (thermostatSchedules || []).filter(
-                    schedule => schedule.house === house.selector
-                  );
+                  const houseSchedules = visibleSchedules.filter(schedule => schedule.house === house.selector);
                   if (houseSchedules.length === 0) {
                     return null;
                   }

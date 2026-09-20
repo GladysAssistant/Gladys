@@ -882,7 +882,8 @@
           "comfort": "Comfort",
           "eco": "Eco",
           "night": "Night"
-        }
+        },
+        "backToSchedule": "Back to the schedule"
       }
     },
     "editDashboardBackgroundLabel": "Background mood",
@@ -3494,7 +3495,14 @@
           "comfort": "Comfort"
         },
         "noSlots": "No time slots yet. Click \"Add time slot\" to get started.",
-        "followedBy": "Followed by:"
+        "followedBy": "Followed by:",
+        "houseLabel": "House",
+        "carriedSince": "since",
+        "overlapError": "This range overlaps another one on the same day. A thermostat follows one preset at a time: adjust the times, or edit the existing range.",
+        "stoppedLegend": "Outside these ranges, the thermostat is stopped.",
+        "houseLockedByDevices": "A schedule only moves house while no thermostat follows it. Followed by:",
+        "searchPlaceHolder": "Search for a schedule",
+        "noSearchResult": "No schedule matches this search."
       }
     }
   },

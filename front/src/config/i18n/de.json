@@ -750,7 +750,8 @@
           "comfort": "Komfort",
           "eco": "Eco",
           "night": "Nacht"
-        }
+        },
+        "backToSchedule": "Zurück zum Zeitplan"
       },
       "energyConsumption": {
         "editName": "Widget-Name (optional)",
@@ -3494,7 +3495,14 @@
           "comfort": "Komfort"
         },
         "noSlots": "Noch keine Zeitfenster. Klicke auf \"Zeitfenster hinzufügen\", um zu beginnen.",
-        "followedBy": "Befolgt von:"
+        "followedBy": "Befolgt von:",
+        "houseLabel": "Haus",
+        "carriedSince": "seit",
+        "overlapError": "Dieser Zeitraum überschneidet sich mit einem anderen am selben Tag. Ein Thermostat folgt nur einer Voreinstellung: Passen Sie die Zeiten an oder bearbeiten Sie den vorhandenen Zeitraum.",
+        "stoppedLegend": "Außerhalb dieser Zeiträume ist das Thermostat ausgeschaltet.",
+        "houseLockedByDevices": "Ein Zeitplan wechselt nur das Haus, solange ihm kein Thermostat folgt. Befolgt von:",
+        "searchPlaceHolder": "Zeitplan suchen",
+        "noSearchResult": "Kein Zeitplan entspricht dieser Suche."
       }
     }
   },

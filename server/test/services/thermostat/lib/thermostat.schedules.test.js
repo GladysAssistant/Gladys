@@ -299,6 +299,49 @@ describe('thermostat schedules CRUD', () => {
       expect(schedule.transitions).to.have.lengthOf(1);
     });
 
+    it('should move a schedule to another house while nothing follows it', async () => {
+      const updated = await handler.updateSchedule(selector, { house: OTHER_HOUSE_SELECTOR });
+
+      expect(updated.house).to.equal(OTHER_HOUSE_SELECTOR);
+    });
+
+    it('should refuse to move a schedule a thermostat follows', async () => {
+      // Its thermostats live in the house it would leave: they would end up
+      // following a programme from somewhere else.
+      const service = await db.Service.create({
+        name: 'thermostat',
+        selector: 'thermostat-move-service',
+        version: '1.0.0',
+      });
+      const thermostat = await db.Device.create({
+        name: 'Living room',
+        selector: 'living-room-move',
+        external_id: 'thermostat:living-room-move',
+        service_id: service.id,
+        room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      });
+      await handler.attachScheduleToDevice(selector, thermostat.selector);
+
+      await expectRejected(
+        handler.updateSchedule(selector, { house: OTHER_HOUSE_SELECTOR }),
+        'Schedule is followed by a thermostat',
+      );
+
+      await db.Device.destroy({ where: { id: thermostat.id } });
+      await db.Service.destroy({ where: { id: service.id } });
+    });
+
+    it('should reject a move onto an unknown house', async () => {
+      await expectRejected(handler.updateSchedule(selector, { house: 'no-such-house' }), 'House not found');
+    });
+
+    it('should check the name against the house it moves to', async () => {
+      await handler.createSchedule(OTHER_HOUSE_SELECTOR, { name: 'Week' });
+
+      // 'Week' is free in this house, taken in the other one.
+      await expectRejected(handler.updateSchedule(selector, { house: OTHER_HOUSE_SELECTOR }), 'already exists');
+    });
+
     it('should persist the day coerced by Joi on update too', async () => {
       const updated = await handler.updateSchedule(selector, {
         transitions: [{ day_of_week: '5', time: '10:00', preset: 'away' }],
