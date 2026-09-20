@@ -166,7 +166,7 @@ describe('thermostat.controller', () => {
 
     await callRoute(
       routes,
-      'put /api/v1/service/thermostat/schedule/:selector/device/:device_selector',
+      'post /api/v1/service/thermostat/schedule/:selector/device/:device_selector',
       { params: { selector: 'my-schedule', device_selector: 'living-room' } },
       res,
     );
@@ -229,7 +229,7 @@ describe('thermostat.controller', () => {
 
         await callRoute(
           routes,
-          'put /api/v1/service/thermostat/schedule/:selector/device/:device_selector',
+          'post /api/v1/service/thermostat/schedule/:selector/device/:device_selector',
           { params: { selector: 'week', device_selector: 'x' } },
           res,
         );
@@ -280,7 +280,7 @@ describe('thermostat.controller', () => {
         { params: { selector: 'x' }, body: {} },
       ],
       [
-        'put /api/v1/service/thermostat/schedule/:selector/device/:device_selector',
+        'post /api/v1/service/thermostat/schedule/:selector/device/:device_selector',
         'attachScheduleToDevice',
         { params: { selector: 'x', device_selector: 'y' } },
       ],

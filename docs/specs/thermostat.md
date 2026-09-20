@@ -340,8 +340,12 @@ Every route is authenticated, under `/api/v1/service/thermostat`. The schedule's
 | `POST /schedule`                                     | `{ house, name, transitions }` | Creates a schedule in that house. `transitions` is optional, empty by default.                     |
 | `PATCH /schedule/:selector`                          | `{ name?, transitions? }`      | Renames and/or **replaces the points wholesale**, in a transaction. An absent field is left alone. |
 | `DELETE /schedule/:selector`                         |                                | Deletes the schedule; the links go by cascade.                                                     |
-| `PUT /schedule/:selector/device/:device_selector`    |                                | Makes that thermostat follow this schedule, replacing the one it followed. Idempotent.             |
+| `POST /schedule/:selector/device/:device_selector`   |                                | Makes that thermostat follow this schedule, replacing the one it followed. Idempotent.             |
 | `DELETE /schedule/:selector/device/:device_selector` |                                | The thermostat follows no schedule any more.                                                       |
+
+Attaching is a `POST` rather than the `PUT` its idempotence would suggest:
+neither the front's `HttpClient` nor the Gladys Plus gateway client sends `PUT`,
+so such a route is unreachable from either.
 
 `PATCH` replaces the whole set of points rather than editing them one by one: the editor always holds the complete programme of a schedule, and a partial protocol would need to express deletions, reorderings and a conflict policy for no gain.
 

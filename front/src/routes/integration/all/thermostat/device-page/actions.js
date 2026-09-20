@@ -105,7 +105,7 @@ function createActions(store) {
       if (savedSchedule !== (previous.active_schedule || '')) {
         try {
           if (savedSchedule) {
-            await state.httpClient.put(
+            await state.httpClient.post(
               `/api/v1/service/thermostat/schedule/${savedSchedule}/device/${savedDevice.selector}`
             );
           } else if (previous.active_schedule) {

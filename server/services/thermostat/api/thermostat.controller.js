@@ -10,6 +10,7 @@ const SCHEDULE_ERRORS = [
   { match: /already exists$/, status: 409, error: 'SCHEDULE_NAME_ALREADY_EXISTS' },
   { match: /^Device is not a thermostat/, status: 400, error: 'NOT_A_THERMOSTAT' },
   { match: /^Device is not in the house/, status: 400, error: 'DEVICE_NOT_IN_HOUSE' },
+  { match: /^Schedule is followed by a thermostat/, status: 409, error: 'SCHEDULE_HAS_DEVICES' },
   { match: /^Invalid thermostat schedule: duplicate transition/, status: 400, error: 'DUPLICATE_TRANSITION' },
   { match: /^Invalid thermostat schedule/, status: 400, error: 'INVALID_SCHEDULE' },
 ];
@@ -130,7 +131,7 @@ module.exports = function ThermostatController(thermostatHandler) {
   }
 
   /**
-   * @api {put} /api/v1/service/thermostat/schedule/:selector/device/:device_selector Follow a schedule
+   * @api {post} /api/v1/service/thermostat/schedule/:selector/device/:device_selector Follow a schedule
    * @apiName attachScheduleToDevice
    * @apiGroup Thermostat
    * @apiDescription Makes that thermostat follow this schedule, replacing the one
@@ -184,7 +185,9 @@ module.exports = function ThermostatController(thermostatHandler) {
       authenticated: true,
       controller: asyncMiddleware(getSchedule),
     },
-    'put /api/v1/service/thermostat/schedule/:selector/device/:device_selector': {
+    // POST rather than PUT: neither the front's HttpClient nor the Gladys Plus
+    // gateway client sends PUT, so a PUT route is unreachable from either.
+    'post /api/v1/service/thermostat/schedule/:selector/device/:device_selector': {
       authenticated: true,
       controller: asyncMiddleware(attachScheduleToDevice),
     },
