@@ -3,17 +3,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import style from './style.css';
 import PRESET_COLORS from '../../../../../utils/thermostatPresetColors';
-// The slot algebra is shared with the server rather than reimplemented here:
-// the editor and the regulation loop must agree on what a slot list means.
-import {
-  applySlotToDay,
-  mergeIntoSlots,
-  copyDayOntoDays,
-  readDayAsEntered,
-  timeToMinutes,
-  minutesToTime,
-  DAY_MINUTES
-} from '../../../../../../../server/utils/thermostatSchedule';
+import { timeToMinutes, DAY_MINUTES } from '../../../../../../../server/utils/thermostatSchedule';
 
 const DAYS = [0, 1, 2, 3, 4, 5, 6];
 const PRESETS = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
@@ -25,24 +15,32 @@ function formatLabel(minutes) {
   return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2, '0')}`;
 }
 
-function ensureKeys(slots) {
-  return slots.map((s, i) => (s.key ? s : { ...s, key: Date.now() + i + Math.random() }));
+function ensureKeys(transitions) {
+  return transitions.map((t, i) => (t.key ? t : { ...t, key: Date.now() + i + Math.random() }));
 }
 
+const byTime = (a, b) => timeToMinutes(a.time) - timeToMinutes(b.time);
+
+/**
+ * A schedule is a list of transition points: from this day and this time, this
+ * preset, until the next point. Editing one is adding, moving or deleting a
+ * point — there is no interval algebra left, because there are no intervals:
+ * deleting a point simply extends the one before it.
+ */
 class ScheduleEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
       name: props.schedule ? props.schedule.name : '',
-      slots: ensureKeys(props.schedule ? props.schedule.slots : []),
+      transitions: ensureKeys(props.schedule ? props.schedule.transitions || [] : []),
       saving: false,
       error: null,
       selectedDay: null,
       lastScheduleSelector: props.schedule ? props.schedule.selector : null,
       copySourceDay: null,
       copyTargetDays: [],
-      newSlotForms: {}, // { [day]: { start_time, end_time, preset } }
-      editForms: {} // { [key]: { start_time, end_time, preset, day_of_week } }
+      newForms: {}, // { [day]: { time, preset } }
+      editForms: {} // { [key]: { time, preset } }
     };
   }
 
@@ -51,11 +49,11 @@ class ScheduleEditor extends Component {
     if (incomingSelector !== state.lastScheduleSelector) {
       return {
         name: props.schedule ? props.schedule.name : '',
-        slots: ensureKeys(props.schedule ? props.schedule.slots : []),
+        transitions: ensureKeys(props.schedule ? props.schedule.transitions || [] : []),
         error: null,
         selectedDay: null,
         lastScheduleSelector: incomingSelector,
-        newSlotForms: {},
+        newForms: {},
         editForms: {}
       };
     }
@@ -68,273 +66,149 @@ class ScheduleEditor extends Component {
     this.setState(prev => ({ selectedDay: prev.selectedDay === day ? null : day }));
   };
 
-  // ── New slot ──────────────────────────────────────────────────────────────
+  dayTransitions = (transitions, day) => transitions.filter(t => t.day_of_week === day).sort(byTime);
 
-  openNewSlotForm = dayOfWeek => {
-    const daySlots = this.state.slots
-      .filter(s => s.day_of_week === dayOfWeek)
-      .sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time));
+  // ── Adding a point ────────────────────────────────────────────────────────
 
-    // Default: fill the first uncovered gap, or full day if no slots
-    let startMins = 0;
-    let endMins = 0; // 00:00 = full day (midnight)
-    if (daySlots.length > 0) {
-      startMins = timeToMinutes(daySlots[daySlots.length - 1].end_time) || DAY_MINUTES;
-      startMins = Math.min(startMins, DAY_MINUTES - 60);
-      endMins = Math.min(startMins + 120, DAY_MINUTES) % DAY_MINUTES;
-    }
-
+  openNewForm = day => {
+    const existing = this.dayTransitions(this.state.transitions, day);
+    // Start after the last point of the day, so a second point does not land on
+    // the first one and get refused as a duplicate.
+    const last = existing[existing.length - 1];
+    const startMins = last ? Math.min(timeToMinutes(last.time) + 60, DAY_MINUTES - 60) : 6 * 60;
+    const h = String(Math.floor(startMins / 60)).padStart(2, '0');
+    const m = String(startMins % 60).padStart(2, '0');
     this.setState(prev => ({
-      newSlotForms: {
-        ...prev.newSlotForms,
-        [dayOfWeek]: {
-          start_time: minutesToTime(startMins),
-          end_time: minutesToTime(endMins),
-          preset: 'comfort'
-        }
-      }
+      newForms: { ...prev.newForms, [day]: { time: `${h}:${m}`, preset: 'comfort' } }
     }));
   };
 
-  closeNewSlotForm = dayOfWeek => {
+  closeNewForm = day => {
     this.setState(prev => {
-      const forms = { ...prev.newSlotForms };
-      delete forms[dayOfWeek];
-      return { newSlotForms: forms };
+      const forms = { ...prev.newForms };
+      delete forms[day];
+      return { newForms: forms };
     });
   };
 
-  updateNewSlotForm = (dayOfWeek, field, value) => {
+  updateNewForm = (day, field, value) => {
     this.setState(prev => ({
-      newSlotForms: {
-        ...prev.newSlotForms,
-        [dayOfWeek]: { ...prev.newSlotForms[dayOfWeek], [field]: value }
-      }
+      newForms: { ...prev.newForms, [day]: { ...prev.newForms[day], [field]: value } }
     }));
   };
 
-  confirmNewSlot = dayOfWeek => {
-    const form = this.state.newSlotForms[dayOfWeek];
-    if (!form) return;
-
-    const newStart = timeToMinutes(form.start_time);
-    let newEnd = timeToMinutes(form.end_time);
-    // If end <= start, the user wants overflow past midnight (e.g. 18h→06h)
-    if (newEnd <= newStart) newEnd = newEnd + DAY_MINUTES;
-
-    const newKey = Date.now() + Math.random();
-    const existingDaySlots = this.state.slots.filter(s => s.day_of_week === dayOfWeek);
-
-    const { fixedSlots, overflowSlot } = applySlotToDay(
-      existingDaySlots,
-      dayOfWeek,
-      newStart,
-      newEnd,
-      form.preset,
-      newKey,
-      null
-    );
-    const taggedFixed = fixedSlots.map(s => ({ ...s, day_of_week: dayOfWeek }));
-    const finalSlots = mergeIntoSlots(this.state.slots, dayOfWeek, taggedFixed, overflowSlot);
-
-    this.setState(prev => {
-      const forms = { ...prev.newSlotForms };
-      delete forms[dayOfWeek];
-      return { slots: finalSlots, newSlotForms: forms };
-    });
-  };
-
-  // ── Edit existing slot ────────────────────────────────────────────────────
-
-  openEditForm = slot => {
+  confirmNewForm = day => {
+    const form = this.state.newForms[day];
+    if (!form || !form.time) return;
+    // Two points on the same day and the same time would make the programme
+    // ambiguous, and the server refuses them: replace rather than add.
+    const withoutSameTime = this.state.transitions.filter(t => !(t.day_of_week === day && t.time === form.time));
     this.setState(prev => ({
-      editForms: {
-        ...prev.editForms,
-        [slot.key]: {
-          start_time: slot.start_time,
-          end_time: slot.end_time,
-          preset: slot.preset,
-          day_of_week: slot.day_of_week
-        }
-      }
+      transitions: [
+        ...withoutSameTime,
+        { key: Date.now() + Math.random(), day_of_week: day, time: form.time, preset: form.preset }
+      ],
+      newForms: (() => {
+        const forms = { ...prev.newForms };
+        delete forms[day];
+        return forms;
+      })()
     }));
   };
 
-  closeEditForm = slotKey => {
+  // ── Editing a point ───────────────────────────────────────────────────────
+
+  openEditForm = transition => {
+    this.setState(prev => ({
+      editForms: { ...prev.editForms, [transition.key]: { time: transition.time, preset: transition.preset } }
+    }));
+  };
+
+  closeEditForm = key => {
     this.setState(prev => {
       const forms = { ...prev.editForms };
-      delete forms[slotKey];
+      delete forms[key];
       return { editForms: forms };
     });
   };
 
-  updateEditForm = (slotKey, field, value) => {
+  updateEditForm = (key, field, value) => {
     this.setState(prev => ({
-      editForms: {
-        ...prev.editForms,
-        [slotKey]: { ...prev.editForms[slotKey], [field]: value }
-      }
+      editForms: { ...prev.editForms, [key]: { ...prev.editForms[key], [field]: value } }
     }));
   };
 
-  confirmEdit = slotKey => {
-    const form = this.state.editForms[slotKey];
-    if (!form) return;
-
-    const { day_of_week: dayOfWeek } = form;
-    const newStart = timeToMinutes(form.start_time);
-    let newEnd = timeToMinutes(form.end_time);
-    // If end <= start, the user wants overflow past midnight (e.g. 18h→06h)
-    if (newEnd <= newStart) newEnd = newEnd + DAY_MINUTES;
-
-    // Drop the morning half of the night being edited first: mergeIntoSlots
-    // only trims what the new overflow overlaps, so shortening 22:30->06:30
-    // to 05:00 would leave a stray 05:00->06:30 behind.
-    const edited = this.state.slots.find(s => s.key === slotKey);
-    const piece = this.findOvernightPiece(this.state.slots, edited);
-    const baseSlots = piece ? this.state.slots.filter(s => s.key !== piece.key) : this.state.slots;
-    const existingDaySlots = baseSlots.filter(s => s.day_of_week === dayOfWeek);
-
-    const { fixedSlots, overflowSlot } = applySlotToDay(
-      existingDaySlots,
-      dayOfWeek,
-      newStart,
-      newEnd,
-      form.preset,
-      slotKey,
-      slotKey
-    );
-    const taggedFixed = fixedSlots.map(s => ({ ...s, day_of_week: dayOfWeek }));
-    const finalSlots = mergeIntoSlots(baseSlots, dayOfWeek, taggedFixed, overflowSlot);
-
+  confirmEdit = key => {
+    const form = this.state.editForms[key];
+    if (!form || !form.time) return;
     this.setState(prev => {
+      const edited = prev.transitions.find(t => t.key === key);
+      const transitions = prev.transitions
+        // A move onto another point of the same day replaces it.
+        .filter(t => t.key === key || !(t.day_of_week === edited.day_of_week && t.time === form.time))
+        .map(t => (t.key === key ? { ...t, time: form.time, preset: form.preset } : t));
       const forms = { ...prev.editForms };
-      delete forms[slotKey];
-      return { slots: finalSlots, editForms: forms };
+      delete forms[key];
+      return { transitions, editForms: forms };
     });
   };
 
-  // ── Remove ────────────────────────────────────────────────────────────────
-
-  // The morning half a night left on the next day, matched on geometry the way
-  // readDayAsEntered does. The list shows the pair as one slot, so editing or
-  // removing that slot has to reach this row too — otherwise it survives as an
-  // orphan the user has no way to see, let alone delete.
-  findOvernightPiece = (slots, slot) => {
-    if (!slot || timeToMinutes(slot.end_time) !== 0) {
-      return null;
-    }
-    return (
-      slots.find(
-        s =>
-          s.day_of_week === (slot.day_of_week + 1) % 7 &&
-          timeToMinutes(s.start_time) === 0 &&
-          timeToMinutes(s.end_time) !== 0 &&
-          s.preset === slot.preset
-      ) || null
-    );
-  };
-
-  removeSlot = slotKey => {
+  // Deleting a point extends the one before it: there is nothing else to do,
+  // which is the whole point of storing points rather than intervals.
+  removeTransition = key => {
     this.setState(prev => {
-      const removed = prev.slots.find(s => s.key === slotKey);
-      const piece = this.findOvernightPiece(prev.slots, removed);
-      const dropped = new Set([slotKey, ...(piece ? [piece.key] : [])]);
       const forms = { ...prev.editForms };
-      delete forms[slotKey];
-      return { slots: prev.slots.filter(s => !dropped.has(s.key)), editForms: forms };
+      delete forms[key];
+      return { transitions: prev.transitions.filter(t => t.key !== key), editForms: forms };
     });
   };
 
-  // ── Copy ──────────────────────────────────────────────────────────────────
+  // ── Copying a day ─────────────────────────────────────────────────────────
 
-  openCopyPicker = dayOfWeek => this.setState({ copySourceDay: dayOfWeek, copyTargetDays: [] });
+  openCopyPicker = day => this.setState({ copySourceDay: day, copyTargetDays: [] });
   closeCopyPicker = () => this.setState({ copySourceDay: null, copyTargetDays: [] });
 
   toggleCopyTarget = day => {
-    this.setState(prev => {
-      const set = new Set(prev.copyTargetDays || []);
-      if (set.has(day)) {
-        set.delete(day);
-      } else {
-        set.add(day);
-      }
-      return { copyTargetDays: Array.from(set) };
-    });
+    this.setState(prev => ({
+      copyTargetDays: prev.copyTargetDays.includes(day)
+        ? prev.copyTargetDays.filter(d => d !== day)
+        : [...prev.copyTargetDays, day]
+    }));
   };
 
+  // Copying a day is copying its points — no algebra, no overflow to propagate.
   applyCopy = () => {
-    const { copySourceDay, copyTargetDays, slots } = this.state;
-    if (!copyTargetDays || copyTargetDays.length === 0) {
-      this.closeCopyPicker();
-      return;
-    }
-    // A night crossing midnight lives as two rows, the second one on the next
-    // day: copying the source day's rows alone would drop its morning half and
-    // overwrite that same half on a target. copyDayOntoDays re-joins the pair
-    // and lays it back down on every target.
-    const nextSlots = copyDayOntoDays(slots, copySourceDay, copyTargetDays, () => Date.now() + Math.random());
-    this.setState({ slots: nextSlots, copySourceDay: null, copyTargetDays: [] });
+    const { copySourceDay, copyTargetDays, transitions } = this.state;
+    if (copySourceDay === null || copyTargetDays.length === 0) return;
+    const source = this.dayTransitions(transitions, copySourceDay);
+    const kept = transitions.filter(t => !copyTargetDays.includes(t.day_of_week));
+    const copies = copyTargetDays.flatMap(day =>
+      source.map(t => ({ key: Date.now() + Math.random(), day_of_week: day, time: t.time, preset: t.preset }))
+    );
+    this.setState({ transitions: [...kept, ...copies], copySourceDay: null, copyTargetDays: [] });
   };
-
-  // ── Validation ────────────────────────────────────────────────────────────
-
-  // Uncovered ranges, per day. A gap is not an error: the regulation loop falls
-  // back on the current preset when no slot matches, which is what a
-  // daytime-only schedule (offices, 08:00 → 18:00) relies on. It is reported as
-  // a warning so an unintended hole is still visible before saving.
-  validateSchedule = () => {
-    const { slots } = this.state;
-    const gaps = [];
-    DAYS.forEach(day => {
-      const daySlots = slots
-        .filter(s => s.day_of_week === day)
-        .map(s => ({
-          start: timeToMinutes(s.start_time),
-          end: timeToMinutes(s.end_time) || DAY_MINUTES
-        }))
-        .sort((a, b) => a.start - b.start);
-
-      const ranges = [];
-      let covered = 0;
-      daySlots.forEach(s => {
-        if (s.start > covered) {
-          ranges.push({ from: covered, to: s.start });
-        }
-        covered = Math.max(covered, s.end);
-      });
-      if (covered < DAY_MINUTES) {
-        ranges.push({ from: covered, to: DAY_MINUTES });
-      }
-      if (ranges.length > 0) {
-        gaps.push({ day, ranges });
-      }
-    });
-    return gaps;
-  };
-
-  // ── Save ──────────────────────────────────────────────────────────────────
 
   save = async () => {
-    const { name, slots } = this.state;
+    const { name, transitions } = this.state;
     if (!name.trim()) return;
 
-    // Gaps no longer block: they are surfaced as a warning above the form.
     this.setState({ saving: true, error: null });
     const scheduleData = {
       name: name.trim(),
       // key is a render-only handle, and id/schedule_id belong to the row being
-      // replaced: neither is part of what a slot means.
-      slots: slots.map(({ key, id, schedule_id, ...rest }) => rest)
+      // replaced: neither is part of what a transition means.
+      transitions: transitions.map(({ key, id, schedule_id, ...rest }) => rest)
     };
     try {
-      const { schedule, httpClient, onSaved } = this.props;
+      const { schedule, httpClient, onSaved, house } = this.props;
       // A duplicate arrives as a schedule object with no selector: it is a
       // creation, so gating on the object alone would PATCH /schedule/null.
       if (schedule && schedule.selector) {
         await httpClient.patch(`/api/v1/service/thermostat/schedule/${schedule.selector}`, scheduleData);
       } else {
-        await httpClient.post('/api/v1/service/thermostat/schedule', scheduleData);
+        // A schedule belongs to a house: that is what makes its name unique per
+        // house and keeps a thermostat from following another house's programme.
+        await httpClient.post('/api/v1/service/thermostat/schedule', { ...scheduleData, house });
       }
       if (onSaved) onSaved();
     } catch (e) {
@@ -346,54 +220,48 @@ class ScheduleEditor extends Component {
   // ── Render helpers ────────────────────────────────────────────────────────
 
   // Text equivalent of the coloured bar, for a collapsed day.
-  describeDay(daySlots, dictionary) {
-    if (!daySlots || daySlots.length === 0) {
-      return dictionary.noSlots || '';
+  describeDay = (dayTransitions, dictionary) => {
+    if (dayTransitions.length === 0) {
+      return (dictionary && dictionary.noSlots) || '';
     }
-    return daySlots
-      .slice()
-      .sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time))
-      .map(slot => {
-        const preset = (dictionary.presets && dictionary.presets[slot.preset]) || slot.preset;
-        return `${preset} ${slot.start_time} – ${slot.end_time}`;
-      })
+    return dayTransitions
+      .map(t => `${t.time} ${(dictionary.presets && dictionary.presets[t.preset]) || t.preset}`)
       .join(', ');
-  }
+  };
 
-  renderTimeBar(daySlots) {
-    const sorted = daySlots.slice().sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time));
+  // The bar draws what each point covers until the next one. The last point of
+  // the day runs to midnight here: what happens after that belongs to the next
+  // day's bar, and the week wraps on the server.
+  renderTimeBar = (dayTransitions, carriedPreset) => {
     const segments = [];
-    sorted.forEach(slot => {
-      const start = timeToMinutes(slot.start_time);
-      const end = Math.min(timeToMinutes(slot.end_time) || DAY_MINUTES, DAY_MINUTES);
-      if (end <= start) return;
-      segments.push({ start, end, preset: slot.preset });
-    });
-
-    const allPoints = Array.from(new Set([0, ...segments.flatMap(s => [s.start, s.end]), DAY_MINUTES])).sort(
-      (a, b) => a - b
-    );
-
-    const barParts = [];
-    for (let i = 0; i < allPoints.length - 1; i++) {
-      const from = allPoints[i];
-      const to = allPoints[i + 1];
-      const widthPct = ((to - from) / DAY_MINUTES) * 100;
-      const seg = segments.find(s => s.start <= from && s.end >= to);
-      const color = seg ? PRESET_COLORS[seg.preset] || '#ddd' : '#e9ecef';
-      barParts.push({ from, to, widthPct, color });
+    if (dayTransitions.length === 0) {
+      if (carriedPreset) {
+        segments.push({ start: 0, end: DAY_MINUTES, preset: carriedPreset });
+      }
+    } else {
+      // Before the first point, the day carries whatever the previous day left.
+      const firstStart = timeToMinutes(dayTransitions[0].time);
+      if (firstStart > 0 && carriedPreset) {
+        segments.push({ start: 0, end: firstStart, preset: carriedPreset });
+      }
+      dayTransitions.forEach((transition, index) => {
+        const start = timeToMinutes(transition.time);
+        const next = dayTransitions[index + 1];
+        segments.push({ start, end: next ? timeToMinutes(next.time) : DAY_MINUTES, preset: transition.preset });
+      });
     }
 
     return (
-      // Purely visual: the colours carry no text and the hour markers would be
-      // read as loose numbers. describeDay states the same thing in words.
       <div class={style.timeBarWrapper} aria-hidden="true">
         <div class={style.timeBar}>
-          {barParts.map(({ from, to, widthPct, color }) => (
+          {segments.map(segment => (
             <div
-              key={`${from}-${to}`}
+              key={`${segment.start}-${segment.end}`}
               class={style.timeBarSegment}
-              style={`--seg-width:${widthPct}%;--seg-color:${color}`}
+              style={`--segment-left:${(segment.start / DAY_MINUTES) * 100}%;--segment-width:${((segment.end -
+                segment.start) /
+                DAY_MINUTES) *
+                100}%;--segment-color:${PRESET_COLORS[segment.preset] || PRESET_COLORS.comfort}`}
             />
           ))}
         </div>
@@ -406,313 +274,243 @@ class ScheduleEditor extends Component {
         </div>
       </div>
     );
-  }
+  };
 
-  renderSlotForm(formData, onFieldChange, onConfirm, onCancel, onRemove, dictionary, isEdit) {
-    // 00:00 → 00:00 is the whole day, which reads as an empty range unless it
-    // says so: it is what an empty day is prefilled with.
-    const isFullDay = timeToMinutes(formData.start_time) === 0 && timeToMinutes(formData.end_time) === 0;
-    return (
-      <div class={style.slotFormWrapper}>
-        <div class={isEdit ? style.editSlotForm : style.newSlotForm}>
-          <div
-            class={style.slotColorDot}
-            style={`--dot-color:${PRESET_COLORS[formData.preset] || PRESET_COLORS.comfort}`}
-          />
-          <input
-            type="time"
-            class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
-            value={formData.start_time}
-            onInput={e => onFieldChange('start_time', e.target.value)}
-            onChange={e => onFieldChange('start_time', e.target.value)}
-          />
-          <span class={style.slotArrow}>→</span>
-          <input
-            type="time"
-            class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
-            value={formData.end_time}
-            onInput={e => onFieldChange('end_time', e.target.value)}
-            onChange={e => onFieldChange('end_time', e.target.value)}
-          />
-          <select
-            class={cx('form-control', 'form-control-sm', style.slotPresetSelect)}
-            value={formData.preset}
-            onChange={e => onFieldChange('preset', e.target.value)}
-          >
-            {PRESETS.map(p => (
-              <option key={p} value={p}>
-                {(dictionary.presets && dictionary.presets[p]) || p}
-              </option>
-            ))}
-          </select>
-          <button type="button" class="btn btn-sm btn-success" onClick={onConfirm}>
-            <i class="fe fe-check" />
+  renderTransitionForm = (form, onChange, onConfirm, onCancel, onRemove, dictionary, isEdit) => (
+    <div class={style.slotFormWrapper}>
+      <div class={isEdit ? style.editSlotForm : style.newSlotForm}>
+        <div class={style.slotColorDot} style={`--dot-color:${PRESET_COLORS[form.preset] || PRESET_COLORS.comfort}`} />
+        <input
+          type="time"
+          class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
+          value={form.time}
+          onChange={e => onChange('time', e.target.value)}
+        />
+        <select
+          class={cx('form-control', 'form-control-sm', style.slotPresetSelect)}
+          value={form.preset}
+          onChange={e => onChange('preset', e.target.value)}
+        >
+          {PRESETS.map(preset => (
+            <option key={preset} value={preset}>
+              {(dictionary.presets && dictionary.presets[preset]) || preset}
+            </option>
+          ))}
+        </select>
+        <button type="button" class="btn btn-sm btn-primary" onClick={onConfirm}>
+          <i class="fe fe-check" />
+        </button>
+        <button type="button" class="btn btn-sm btn-secondary" onClick={onCancel}>
+          <i class="fe fe-x" />
+        </button>
+        {onRemove && (
+          <button type="button" class="btn btn-sm btn-outline-danger" onClick={onRemove}>
+            <i class="fe fe-trash-2" />
           </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary" onClick={onCancel}>
-            <i class="fe fe-x" />
-          </button>
-          {onRemove && (
-            <button type="button" class="btn btn-sm btn-outline-danger" onClick={onRemove}>
-              <i class="fe fe-trash-2" />
-            </button>
-          )}
-        </div>
-        {isFullDay && (
-          <p class={style.fullDayHint}>
-            <i class="fe fe-info mr-1" />
-            <Text id="integration.thermostat.schedule.fullDayHint" />
-          </p>
         )}
       </div>
-    );
-  }
+    </div>
+  );
 
   render(
     { onCancel, intl },
-    { name, slots, saving, error, selectedDay, copySourceDay, copyTargetDays, newSlotForms, editForms }
+    { name, transitions, saving, error, selectedDay, copySourceDay, copyTargetDays, newForms, editForms }
   ) {
     const dictionary =
       intl && intl.dictionary && intl.dictionary.integration && intl.dictionary.integration.thermostat
         ? intl.dictionary.integration.thermostat.schedule
         : {};
-    // An empty schedule is a schedule being started, not one with holes: the
-    // warning would name all seven days before the user has typed anything.
-    const gaps = slots.length === 0 ? [] : this.validateSchedule();
+
+    // What each day inherits from the one before it: the week wraps, so a day
+    // with no point of its own carries the last preset set before it.
+    const sorted = [...transitions].sort((a, b) => a.day_of_week - b.day_of_week || byTime(a, b));
+    const lastOfWeek = sorted[sorted.length - 1];
+    const carriedByDay = {};
+    let carried = lastOfWeek ? lastOfWeek.preset : null;
+    DAYS.forEach(day => {
+      carriedByDay[day] = carried;
+      const dayPoints = this.dayTransitions(transitions, day);
+      if (dayPoints.length > 0) {
+        carried = dayPoints[dayPoints.length - 1].preset;
+      }
+    });
 
     return (
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">
-            {this.props.schedule ? (
-              <Text id="integration.thermostat.schedule.editButton" />
-            ) : (
-              <Text id="integration.thermostat.schedule.newButton" />
-            )}
-          </h3>
+      <div class={style.scheduleEditor}>
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="integration.thermostat.schedule.nameLabel" />
+          </label>
+          <input type="text" class="form-control" value={name} onChange={this.updateName} />
         </div>
-        <div class="card-body">
-          {error && (
-            <div class="alert alert-danger">
-              {typeof error === 'string' ? error : <Text id="integration.thermostat.schedule.saveError" />}
-            </div>
-          )}
 
-          {gaps.length > 0 && (
-            <div class="alert alert-warning">
-              <div class={style.gapWarningTitle}>
-                <i class="fe fe-alert-triangle mr-1" />
-                <Text id="integration.thermostat.schedule.gapWarning" />
-              </div>
-              <ul class={style.gapWarningList}>
-                {gaps.map(gap => (
-                  <li key={gap.day}>
-                    <Text id={`integration.thermostat.schedule.days.${gap.day}`} />
-                    {' : '}
-                    {gap.ranges.map(range => `${minutesToTime(range.from)} → ${minutesToTime(range.to)}`).join(', ')}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div class="form-group">
-            <label class="form-label">
-              <Text id="integration.thermostat.schedule.nameLabel" />
-            </label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder={dictionary.namePlaceholder || ''}
-              value={name}
-              onInput={this.updateName}
-            />
+        {error && (
+          <div class="alert alert-warning">
+            {typeof error === 'string' ? error : <Text id="integration.thermostat.schedule.saveError" />}
           </div>
+        )}
 
-          <div class={style.dayList}>
-            {DAYS.map(day => {
-              // The bar draws what this day actually covers, so it keeps the
-              // stored rows: a night is a segment up to midnight here, and its
-              // morning half belongs to the next day's bar.
-              const barSlots = slots
-                .filter(s => s.day_of_week === day)
-                .sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time));
-              // The list shows what the user typed: a night reads back as
-              // 22:30 → 06:30 (+1d) rather than a truncated 22:30 → 00:00.
-              const daySlots = readDayAsEntered(slots, day).sort(
-                (a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time)
-              );
-              const isOpen = selectedDay === day;
-              const newForm = newSlotForms[day];
+        <div class={style.dayList}>
+          {DAYS.map(day => {
+            const dayPoints = this.dayTransitions(transitions, day);
+            const isOpen = selectedDay === day;
+            const newForm = newForms[day];
 
-              return (
-                <div key={day} class={cx(style.dayRow, { [style.dayRowOpen]: isOpen })}>
-                  <div
-                    class={style.dayClickZone}
-                    onClick={() => this.selectDay(day)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.selectDay(day);
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    aria-expanded={isOpen}
-                  >
-                    <div class={style.dayRowHeader}>
-                      <span class={style.dayLabel}>
-                        <Text id={`integration.thermostat.schedule.days.${day}`} />
-                      </span>
-                      <i class={`fe fe-chevron-${isOpen ? 'up' : 'down'} ${style.dayChevron}`} aria-hidden="true" />
-                    </div>
-                    {/* The bar is colour only, so it is summarised in words for
-                        anyone who cannot see it — the same ranges the panel
-                        lists once the day is expanded. */}
-                    <span class="sr-only">{this.describeDay(barSlots, dictionary)}</span>
-                    {this.renderTimeBar(barSlots)}
+            return (
+              <div key={day} class={cx(style.dayRow, { [style.dayRowOpen]: isOpen })}>
+                <div
+                  class={style.dayClickZone}
+                  onClick={() => this.selectDay(day)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      this.selectDay(day);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isOpen}
+                >
+                  <div class={style.dayRowHeader}>
+                    <span class={style.dayLabel}>
+                      <Text id={`integration.thermostat.schedule.days.${day}`} />
+                    </span>
+                    <i class={`fe fe-chevron-${isOpen ? 'up' : 'down'} ${style.dayChevron}`} aria-hidden="true" />
                   </div>
+                  {/* The bar is colour only, so it is summarised in words for
+                      anyone who cannot see it. */}
+                  <span class="sr-only">{this.describeDay(dayPoints, dictionary)}</span>
+                  {this.renderTimeBar(dayPoints, carriedByDay[day])}
+                </div>
 
-                  {isOpen && (
-                    <div class={style.dayPanel}>
-                      {daySlots.length === 0 && !newForm && (
-                        <p class={`text-muted mb-2 ${style.noSlotsText}`}>
-                          <Text id="integration.thermostat.schedule.noSlots" />
-                        </p>
-                      )}
+                {isOpen && (
+                  <div class={style.dayPanel}>
+                    {dayPoints.length === 0 && !newForm && (
+                      <p class={`text-muted mb-2 ${style.noSlotsText}`}>
+                        <Text id="integration.thermostat.schedule.noSlots" />
+                      </p>
+                    )}
 
-                      {daySlots.map((slot, idx) => {
-                        const editForm = editForms[slot.key];
-                        if (editForm) {
-                          return (
-                            <div key={slot.key || `${day}-${idx}`}>
-                              {this.renderSlotForm(
-                                editForm,
-                                (field, value) => this.updateEditForm(slot.key, field, value),
-                                () => this.confirmEdit(slot.key),
-                                () => this.closeEditForm(slot.key),
-                                () => this.removeSlot(slot.key),
-                                dictionary,
-                                true
-                              )}
-                            </div>
-                          );
-                        }
+                    {dayPoints.map((transition, idx) => {
+                      const editForm = editForms[transition.key];
+                      if (editForm) {
                         return (
-                          <div
-                            key={slot.key || `${day}-${idx}`}
-                            class={style.slotEditorRow}
-                            onClick={() => this.openEditForm(slot)}
-                            onKeyDown={e => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                this.openEditForm(slot);
-                              }
-                            }}
-                            role="button"
-                            tabIndex={0}
-                          >
-                            <div
-                              class={style.slotColorDot}
-                              style={`--dot-color:${PRESET_COLORS[slot.preset] || PRESET_COLORS.comfort}`}
-                            />
-                            <span class={style.slotTimeDisplay}>{slot.start_time}</span>
-                            <span class={style.slotArrow}>→</span>
-                            <span class={style.slotTimeDisplay}>{slot.end_time}</span>
-                            {slot.overnight && (
-                              <span class={style.slotNextDay}>
-                                <Text id="integration.thermostat.schedule.nextDay" />
-                              </span>
+                          <div key={transition.key || `${day}-${idx}`}>
+                            {this.renderTransitionForm(
+                              editForm,
+                              (field, value) => this.updateEditForm(transition.key, field, value),
+                              () => this.confirmEdit(transition.key),
+                              () => this.closeEditForm(transition.key),
+                              () => this.removeTransition(transition.key),
+                              dictionary,
+                              true
                             )}
-                            <span class={style.slotPresetLabel}>
-                              {(dictionary.presets && dictionary.presets[slot.preset]) || slot.preset}
-                            </span>
-                            <i class={`fe fe-edit-2 ${style.slotEditIcon}`} />
                           </div>
                         );
-                      })}
+                      }
+                      return (
+                        <div
+                          key={transition.key || `${day}-${idx}`}
+                          class={style.slotEditorRow}
+                          onClick={() => this.openEditForm(transition)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              this.openEditForm(transition);
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                        >
+                          <div
+                            class={style.slotColorDot}
+                            style={`--dot-color:${PRESET_COLORS[transition.preset] || PRESET_COLORS.comfort}`}
+                          />
+                          <span class={style.slotTimeDisplay}>{transition.time}</span>
+                          <span class={style.slotPresetLabel}>
+                            {(dictionary.presets && dictionary.presets[transition.preset]) || transition.preset}
+                          </span>
+                          <i class={`fe fe-edit-2 ${style.slotEditIcon}`} />
+                        </div>
+                      );
+                    })}
 
-                      {newForm &&
-                        this.renderSlotForm(
-                          newForm,
-                          (field, value) => this.updateNewSlotForm(day, field, value),
-                          () => this.confirmNewSlot(day),
-                          () => this.closeNewSlotForm(day),
-                          null,
-                          dictionary,
-                          false
-                        )}
+                    {newForm &&
+                      this.renderTransitionForm(
+                        newForm,
+                        (field, value) => this.updateNewForm(day, field, value),
+                        () => this.confirmNewForm(day),
+                        () => this.closeNewForm(day),
+                        null,
+                        dictionary,
+                        false
+                      )}
 
-                      <div class={style.dayPanelActions}>
-                        {!newForm && (
+                    <div class={style.dayPanelActions}>
+                      {!newForm && (
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-primary"
+                          onClick={() => this.openNewForm(day)}
+                        >
+                          <i class="fe fe-plus mr-1" />
+                          <Text id="integration.thermostat.schedule.addSlot" />
+                        </button>
+                      )}
+                      {copySourceDay !== day && (
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          onClick={() => this.openCopyPicker(day)}
+                        >
+                          <i class="fe fe-copy mr-1" />
+                          <Text id="integration.thermostat.schedule.copyTo" />
+                        </button>
+                      )}
+
+                      {copySourceDay === day && (
+                        <div class={style.copyPicker}>
+                          <span class={style.copyPickerLabel}>
+                            <Text id="integration.thermostat.schedule.copyToLabel" />
+                          </span>
+                          {DAYS.filter(d => d !== day).map(d => (
+                            <label key={d} class={style.copyPickerDay}>
+                              <input
+                                type="checkbox"
+                                checked={(copyTargetDays || []).includes(d)}
+                                onChange={() => this.toggleCopyTarget(d)}
+                              />{' '}
+                              <Text id={`integration.thermostat.schedule.daysShort.${d}`} />
+                            </label>
+                          ))}
                           <button
                             type="button"
-                            class="btn btn-sm btn-outline-primary"
-                            onClick={() => this.openNewSlotForm(day)}
+                            class="btn btn-xs btn-primary ml-2"
+                            onClick={this.applyCopy}
+                            disabled={!(copyTargetDays && copyTargetDays.length > 0)}
                           >
-                            <i class="fe fe-plus mr-1" />
-                            <Text id="integration.thermostat.schedule.addSlot" />
+                            <Text id="integration.thermostat.schedule.applyButton" />
                           </button>
-                        )}
-                        {copySourceDay !== day && (
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-outline-secondary"
-                            onClick={() => this.openCopyPicker(day)}
-                          >
-                            <i class="fe fe-copy mr-1" />
-                            <Text id="integration.thermostat.schedule.copyTo" />
+                          <button type="button" class="btn btn-xs btn-secondary ml-1" onClick={this.closeCopyPicker}>
+                            <Text id="integration.thermostat.schedule.cancelButton" />
                           </button>
-                        )}
-
-                        {copySourceDay === day && (
-                          <div class={style.copyPicker}>
-                            <span class={style.copyPickerLabel}>
-                              <Text id="integration.thermostat.schedule.copyToLabel" />
-                            </span>
-                            {DAYS.filter(d => d !== day).map(d => (
-                              <label key={d} class={style.copyPickerDay}>
-                                <input
-                                  type="checkbox"
-                                  checked={(copyTargetDays || []).includes(d)}
-                                  onChange={() => this.toggleCopyTarget(d)}
-                                />{' '}
-                                <Text id={`integration.thermostat.schedule.daysShort.${d}`} />
-                              </label>
-                            ))}
-                            <button
-                              type="button"
-                              class="btn btn-xs btn-primary ml-2"
-                              onClick={this.applyCopy}
-                              disabled={!(copyTargetDays && copyTargetDays.length > 0)}
-                            >
-                              <Text id="integration.thermostat.schedule.applyButton" />
-                            </button>
-                            <button type="button" class="btn btn-xs btn-secondary ml-1" onClick={this.closeCopyPicker}>
-                              <Text id="integration.thermostat.schedule.cancelButton" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
-          <div class={style.saveRow}>
-            <button
-              type="button"
-              class={cx('btn', 'btn-success', { 'btn-loading': saving })}
-              onClick={this.save}
-              disabled={!name.trim()}
-            >
-              <Text id="integration.thermostat.schedule.saveButton" />
-            </button>
-            <button type="button" class="btn btn-secondary" onClick={onCancel}>
-              <Text id="integration.thermostat.schedule.cancelButton" />
-            </button>
-          </div>
+        <div class={style.editorActions}>
+          <button type="button" class="btn btn-primary" onClick={this.save} disabled={saving || !name.trim()}>
+            <Text id="integration.thermostat.schedule.saveButton" />
+          </button>
+          <button type="button" class="btn btn-secondary ml-2" onClick={onCancel}>
+            <Text id="integration.thermostat.schedule.cancelButton" />
+          </button>
         </div>
       </div>
     );

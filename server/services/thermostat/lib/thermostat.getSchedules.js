@@ -1,4 +1,10 @@
 const db = require('../../../models');
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const {
+  findCurrentTransition,
+  findNextTransition,
+  getCurrentDayAndMinutes,
+} = require('../../../utils/thermostatSchedule');
 
 const TRANSITION_ORDER = [
   [{ model: db.ThermostatScheduleTransition, as: 'transitions' }, 'day_of_week', 'ASC'],
@@ -26,13 +32,24 @@ const SCHEDULE_INCLUDE = [
  * @description Shape a schedule row as the API object: the house and the
  * thermostats are named by selector, like everywhere else in the API, rather
  * than exposing the join rows and the internal ids.
+ * `current` and `next` are computed here rather than by the client: they are
+ * wall-clock times in the house, so resolving them in the browser would show a
+ * phone abroad a different point than the one actually heating the house. The
+ * widget renders "Eco until 08:30" straight from `next`.
  * @param {object} schedule - Schedule row, with its transitions, house and thermostats loaded.
+ * @param {string} [timezone] - The Gladys timezone the points are resolved in.
  * @returns {object} The schedule as the API returns it.
  * @example
- * formatSchedule(await db.ThermostatSchedule.findByPk(id, { include: SCHEDULE_INCLUDE }));
+ * formatSchedule(await db.ThermostatSchedule.findByPk(id, { include: SCHEDULE_INCLUDE }), 'Europe/Paris');
  */
-function formatSchedule(schedule) {
+function formatSchedule(schedule, timezone) {
   const plain = schedule.get({ plain: true });
+  const transitions = plain.transitions.map(({ day_of_week: dayOfWeek, time, preset }) => ({
+    day_of_week: dayOfWeek,
+    time,
+    preset,
+  }));
+  const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(new Date(), timezone);
   return {
     id: plain.id,
     selector: plain.selector,
@@ -40,17 +57,34 @@ function formatSchedule(schedule) {
     // house_id is NOT NULL with a cascade, and the include is always present, so
     // the house is always there — unlike the room, which a device may not have.
     house: plain.house.selector,
-    transitions: plain.transitions.map(({ day_of_week: dayOfWeek, time, preset }) => ({
-      day_of_week: dayOfWeek,
-      time,
-      preset,
-    })),
+    transitions,
+    current: findCurrentTransition(transitions, dayOfWeek, currentMinutes),
+    next: findNextTransition(transitions, dayOfWeek, currentMinutes),
     devices: plain.thermostats.map((link) => ({
       selector: link.device.selector,
       name: link.device.name,
       room: link.device.room ? link.device.room.selector : null,
     })),
   };
+}
+
+/**
+ * @description The timezone the house's wall-clock times are resolved in, like
+ * the regulation loop reads it. Null when it cannot be read, which leaves the
+ * shared helper on its own default.
+ * @returns {Promise<string|null>} The Gladys timezone.
+ * @example
+ * await getTimezone();
+ */
+async function getTimezone() {
+  try {
+    const timezone = await db.Variable.findOne({
+      where: { name: SYSTEM_VARIABLE_NAMES.TIMEZONE, service_id: null },
+    });
+    return timezone ? timezone.value : null;
+  } catch (e) {
+    return null;
+  }
 }
 
 /**
@@ -68,11 +102,14 @@ async function getSchedules(houseSelector) {
     include[1] = { ...include[1], where: { selector: houseSelector }, required: true };
   }
 
-  const schedules = await db.ThermostatSchedule.findAll({
-    include,
-    order: [['name', 'ASC'], ...TRANSITION_ORDER],
-  });
-  return schedules.map(formatSchedule);
+  const [schedules, timezone] = await Promise.all([
+    db.ThermostatSchedule.findAll({
+      include,
+      order: [['name', 'ASC'], ...TRANSITION_ORDER],
+    }),
+    getTimezone(),
+  ]);
+  return schedules.map((schedule) => formatSchedule(schedule, timezone));
 }
 
 /**
@@ -91,7 +128,7 @@ async function getScheduleBySelector(selector) {
   if (!schedule) {
     throw new Error(`Schedule not found: ${selector}`);
   }
-  return formatSchedule(schedule);
+  return formatSchedule(schedule, await getTimezone());
 }
 
 module.exports = { getSchedules, getScheduleBySelector, formatSchedule, SCHEDULE_INCLUDE, TRANSITION_ORDER };

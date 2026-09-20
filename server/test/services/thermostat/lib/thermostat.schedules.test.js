@@ -167,6 +167,51 @@ describe('thermostat schedules CRUD', () => {
       await expectRejected(handler.getScheduleBySelector('no-such-schedule'), 'Schedule not found');
     });
 
+    it('should compute the current and next points server-side', async () => {
+      // The widget renders "Eco until 08:30" straight from `next`, so it never
+      // reads the timezone: these are wall-clock times in the house, and a phone
+      // abroad would otherwise show a point other than the one heating it.
+      const { selector } = await handler.createSchedule(HOUSE_SELECTOR, {
+        name: 'Full week',
+        transitions: [
+          { day_of_week: 0, time: '00:00', preset: 'comfort' },
+          { day_of_week: 6, time: '23:59', preset: 'night' },
+        ],
+      });
+
+      const schedule = await handler.getScheduleBySelector(selector);
+
+      expect(schedule.current).to.not.equal(null);
+      expect(schedule.next).to.not.equal(null);
+      // Whatever the moment, the two are points of this schedule.
+      expect(['comfort', 'night']).to.include(schedule.current.preset);
+      expect(['comfort', 'night']).to.include(schedule.next.preset);
+    });
+
+    it('should resolve the points in the Gladys timezone', async () => {
+      // Wall-clock times in the house: the process runs in UTC in the official
+      // image, so reading the system timezone would fire a 07:00 point at 08:00.
+      await db.Variable.create({ name: 'TIMEZONE', value: 'Europe/Paris' });
+      const { selector } = await handler.createSchedule(HOUSE_SELECTOR, {
+        name: 'Timezoned',
+        transitions: [{ day_of_week: 0, time: '06:30', preset: 'comfort' }],
+      });
+
+      const schedule = await handler.getScheduleBySelector(selector);
+
+      expect(schedule.current.preset).to.equal('comfort');
+      await db.Variable.destroy({ where: { name: 'TIMEZONE' } });
+    });
+
+    it('should report no current point on a schedule with none', async () => {
+      const { selector } = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Bare' });
+
+      const schedule = await handler.getScheduleBySelector(selector);
+
+      expect(schedule.current).to.equal(null);
+      expect(schedule.next).to.equal(null);
+    });
+
     it('should report a thermostat with no room as having none', async () => {
       const service = await db.Service.create({
         name: 'thermostat',

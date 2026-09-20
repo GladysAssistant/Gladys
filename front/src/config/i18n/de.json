@@ -3506,7 +3506,8 @@
           "night": "Nacht",
           "comfort": "Komfort"
         },
-        "noSlots": "Noch keine Zeitfenster. Klicke auf \"Zeitfenster hinzufügen\", um zu beginnen."
+        "noSlots": "Noch keine Zeitfenster. Klicke auf \"Zeitfenster hinzufügen\", um zu beginnen.",
+        "followedBy": "Befolgt von:"
       }
     }
   },

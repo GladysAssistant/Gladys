@@ -89,9 +89,33 @@ async function followsSchedule(deviceId) {
   return count > 0;
 }
 
+/**
+ * @description The schedule a thermostat follows, with its transition points, or
+ * null when it follows none. Used to end a hold on the next point rather than
+ * after a fixed duration.
+ * @param {string} deviceId - The thermostat's id.
+ * @returns {Promise<object|null>} The schedule, transitions included.
+ * @example
+ * await getScheduleOfDevice(device.id);
+ */
+async function getScheduleOfDevice(deviceId) {
+  const link = await db.ThermostatScheduleDevice.findOne({
+    where: { device_id: deviceId },
+    include: [
+      {
+        model: db.ThermostatSchedule,
+        as: 'schedule',
+        include: [{ model: db.ThermostatScheduleTransition, as: 'transitions' }],
+      },
+    ],
+  });
+  return link && link.schedule ? link.schedule : null;
+}
+
 module.exports = {
   attachScheduleToDevice,
   detachScheduleFromDevice,
   resolveScheduleAndDevice,
   followsSchedule,
+  getScheduleOfDevice,
 };

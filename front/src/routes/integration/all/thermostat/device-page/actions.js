@@ -15,10 +15,20 @@ function createActions(store) {
         if (state.thermostatDeviceSearch && state.thermostatDeviceSearch.length) {
           options.search = state.thermostatDeviceSearch;
         }
-        const allDevices = await state.httpClient.get('/api/v1/service/thermostat/device', options);
+        const [allDevices, schedules] = await Promise.all([
+          state.httpClient.get('/api/v1/service/thermostat/device', options),
+          // Which schedule a thermostat follows is a relation now, and each
+          // schedule lists the thermostats that follow it: one request for the
+          // whole page rather than a lookup per device.
+          state.httpClient.get('/api/v1/service/thermostat/schedule').catch(() => [])
+        ]);
         const filtered = Array.isArray(allDevices) ? allDevices : [];
-        // The active schedule is a device param, so it comes back with the device:
-        // no extra variable round-trip per thermostat.
+        const scheduleByDevice = {};
+        (Array.isArray(schedules) ? schedules : []).forEach(schedule => {
+          (schedule.devices || []).forEach(device => {
+            scheduleByDevice[device.selector] = schedule.selector;
+          });
+        });
         const enriched = filtered.map(device => {
           const getParam = name => {
             const param = (device.params || []).find(p => p.name === name);
@@ -26,7 +36,7 @@ function createActions(store) {
           };
           return {
             ...device,
-            active_schedule: getParam('THERMOSTAT_ACTIVE_SCHEDULE'),
+            active_schedule: scheduleByDevice[device.selector] || '',
             // An external thermostat owns no setpoint feature: the card has to
             // read the one on the real device it drives, whose selector is the
             // only trace of it the thermostat device carries.
@@ -86,15 +96,29 @@ function createActions(store) {
       // Everything the list added for display only is stripped here: the device
       // route validates its payload, and an unknown field makes the save fail.
       const { active_schedule, thermostat_type, target_feature, external_setpoint_feature, ...deviceToSave } = device;
-      // Persist the schedule as a device param rather than a global variable.
-      const otherParams = (deviceToSave.params || []).filter(p => p.name !== 'THERMOSTAT_ACTIVE_SCHEDULE');
-      deviceToSave.params = [...otherParams, { name: 'THERMOSTAT_ACTIVE_SCHEDULE', value: active_schedule || '' }];
       const savedDevice = await state.httpClient.post('/api/v1/device', deviceToSave);
-      // Read the schedule back from what the server actually stored rather than
-      // from the form value: the widget derives its banner from this param, and
-      // showing an unsaved value would make it disagree with the regulation.
-      const savedParam = (savedDevice.params || []).find(p => p.name === 'THERMOSTAT_ACTIVE_SCHEDULE');
-      const savedSchedule = savedParam ? savedParam.value : active_schedule || '';
+      // Which schedule a thermostat follows is a relation, not a param: it is
+      // written through the schedule's own routes, which also check the device is
+      // a thermostat of that schedule's house.
+      const previous = state.thermostatDevices[index] || {};
+      let savedSchedule = active_schedule || '';
+      if (savedSchedule !== (previous.active_schedule || '')) {
+        try {
+          if (savedSchedule) {
+            await state.httpClient.put(
+              `/api/v1/service/thermostat/schedule/${savedSchedule}/device/${savedDevice.selector}`
+            );
+          } else if (previous.active_schedule) {
+            await state.httpClient.delete(
+              `/api/v1/service/thermostat/schedule/${previous.active_schedule}/device/${savedDevice.selector}`
+            );
+          }
+        } catch (e) {
+          // The link was refused (the thermostat is not in that schedule's
+          // house): keep showing what the server actually holds.
+          savedSchedule = previous.active_schedule || '';
+        }
+      }
       const newState = update(state, {
         thermostatDevices: {
           $splice: [
@@ -116,12 +140,8 @@ function createActions(store) {
         }
       });
       store.setState(newState);
-      // Apply the new schedule now instead of waiting for the next minute tick.
-      try {
-        await state.httpClient.post('/api/v1/service/thermostat/apply-schedules', {});
-      } catch (e) {
-        // The regulation loop picks it up within a minute anyway.
-      }
+      // No regulation pass to trigger: attaching a schedule already debounces one
+      // server-side, and a plain device save is picked up on the next minute tick.
     },
     updateDeviceProperty(state, index, property, value) {
       const newState = update(state, {

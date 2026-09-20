@@ -8,6 +8,7 @@ const {
   minutesToTime,
   findCurrentTransition,
   findNextTransition,
+  nextTransitionTimestamp,
   parseEnd,
   getCurrentDayAndMinutes,
   findMatchingSlot,
@@ -699,5 +700,49 @@ describe('thermostatSchedule transition points', () => {
 
     expect(findCurrentTransition(single, 0, 480).preset).to.equal('eco');
     expect(findNextTransition(single, 0, 480).preset).to.equal('eco');
+  });
+
+  describe('nextTransitionTimestamp', () => {
+    // Monday 2026-09-21, 08:00 UTC.
+    const monday8am = new Date('2026-09-21T08:00:00.000Z');
+
+    it('should measure the distance to the next point of the day', () => {
+      const transitions = [
+        { day_of_week: 0, time: '06:30', preset: 'comfort' },
+        { day_of_week: 0, time: '22:30', preset: 'night' },
+      ];
+
+      const timestamp = nextTransitionTimestamp(transitions, monday8am, 'UTC');
+
+      // 08:00 -> 22:30 is 14h30.
+      expect(timestamp - monday8am.getTime()).to.equal((14 * 60 + 30) * 60 * 1000);
+    });
+
+    it('should cross midnight onto the next day', () => {
+      const transitions = [
+        { day_of_week: 0, time: '06:30', preset: 'comfort' },
+        { day_of_week: 1, time: '06:30', preset: 'comfort' },
+      ];
+
+      const timestamp = nextTransitionTimestamp(transitions, monday8am, 'UTC');
+
+      // Monday 08:00 -> Tuesday 06:30 is 22h30.
+      expect(timestamp - monday8am.getTime()).to.equal((22 * 60 + 30) * 60 * 1000);
+    });
+
+    it('should wrap onto the first point of the week', () => {
+      // The only point is earlier in the week than now: the programme wraps.
+      const transitions = [{ day_of_week: 0, time: '06:30', preset: 'comfort' }];
+
+      const timestamp = nextTransitionTimestamp(transitions, monday8am, 'UTC');
+
+      // A full week minus the 1h30 already elapsed since that point.
+      expect(timestamp - monday8am.getTime()).to.equal((7 * 24 * 60 - 90) * 60 * 1000);
+    });
+
+    it('should return null on a schedule with no point', () => {
+      expect(nextTransitionTimestamp([], monday8am, 'UTC')).to.equal(null);
+      expect(nextTransitionTimestamp(null, monday8am, 'UTC')).to.equal(null);
+    });
   });
 });

@@ -101,7 +101,21 @@ function createActions(store) {
           const p = (device.params || []).find(x => x.name === name);
           return p ? p.value : null;
         };
+        // Which schedule the thermostat follows is a relation, so the schedule
+        // that lists it is the one it follows.
+        let activeSchedule = '';
+        try {
+          const schedules = await state.httpClient.get('/api/v1/service/thermostat/schedule');
+          const followed = (schedules || []).find(schedule =>
+            (schedule.devices || []).some(followedDevice => followedDevice.selector === device.selector)
+          );
+          activeSchedule = followed ? followed.selector : '';
+        } catch (e) {
+          activeSchedule = '';
+        }
         store.setState({
+          thermostatEditActiveSchedule: activeSchedule,
+          thermostatEditDeviceSchedule: activeSchedule,
           thermostatEditDevice: device,
           thermostatEditName: device.name,
           thermostatEditMode: getParam('THERMOSTAT_MODE') || 'heating',
@@ -109,7 +123,6 @@ function createActions(store) {
           thermostatEditMaxTemp: getParam('THERMOSTAT_MAX_TEMP') || '35',
           thermostatEditTempUnit: getParam('THERMOSTAT_TEMP_UNIT') || 'C',
           thermostatEditControlType: getParam('THERMOSTAT_CONTROL_TYPE') || 'hysteresis',
-          thermostatEditActiveSchedule: getParam('THERMOSTAT_ACTIVE_SCHEDULE') || '',
           thermostatEditTemperatureFeature: getParam('THERMOSTAT_TEMPERATURE_FEATURE') || '',
           thermostatEditHumidityFeature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || '',
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
@@ -249,7 +262,6 @@ function createActions(store) {
           params: [
             // The active schedule is device-owned: the dashboard widget only
             // chooses which thermostat to display, it never drives regulation.
-            { name: 'THERMOSTAT_ACTIVE_SCHEDULE', value: state.thermostatEditActiveSchedule || '' },
             { name: 'THERMOSTAT_MODE', value: mode },
             { name: 'THERMOSTAT_MIN_TEMP', value: String(minTemp) },
             { name: 'THERMOSTAT_MAX_TEMP', value: String(maxTemp) },
@@ -292,7 +304,28 @@ function createActions(store) {
         // is a device param. Writing a THERMOSTAT_CONFIG_* variable as well would
         // reintroduce two sources of truth for the same settings, and a failure
         // between the two writes would leave them disagreeing.
-        await state.httpClient.post('/api/v1/service/thermostat/device', device);
+        const savedDevice = await state.httpClient.post('/api/v1/service/thermostat/device', device);
+
+        // The schedule link is written through the schedule's own routes, which
+        // also check the thermostat belongs to that schedule's house.
+        const previousSchedule = (state.thermostatEditDevice && state.thermostatEditDeviceSchedule) || '';
+        const wantedSchedule = state.thermostatEditActiveSchedule || '';
+        if (wantedSchedule !== previousSchedule && savedDevice && savedDevice.selector) {
+          try {
+            if (wantedSchedule) {
+              await state.httpClient.put(
+                `/api/v1/service/thermostat/schedule/${wantedSchedule}/device/${savedDevice.selector}`
+              );
+            } else if (previousSchedule) {
+              await state.httpClient.delete(
+                `/api/v1/service/thermostat/schedule/${previousSchedule}/device/${savedDevice.selector}`
+              );
+            }
+          } catch (e) {
+            // The link was refused — the thermostat has no room, or its room is
+            // in another house than the schedule. The device itself is saved.
+          }
+        }
 
         store.setState({
           thermostatCreateStatus: RequestStatus.Success,
