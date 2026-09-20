@@ -4,10 +4,16 @@ const { TRANSITION_PRESETS } = require('./thermostatConstants');
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 const transitionSchema = Joi.object({
-  day_of_week: Joi.number().integer().min(0).max(6).required(),
+  day_of_week: Joi.number()
+    .integer()
+    .min(0)
+    .max(6)
+    .required(),
   // The moment this preset starts applying. There is no end: a transition holds
   // until the next point, and the last point of the week wraps onto the first.
-  time: Joi.string().regex(TIME_PATTERN).required(),
+  time: Joi.string()
+    .regex(TIME_PATTERN)
+    .required(),
   preset: Joi.string()
     .valid(...TRANSITION_PRESETS)
     .required(),
@@ -19,8 +25,12 @@ const transitionSchema = Joi.object({
   .unknown(true);
 
 const scheduleSchema = Joi.object({
-  name: Joi.string().min(1).required(),
-  transitions: Joi.array().items(transitionSchema).default([]),
+  name: Joi.string()
+    .min(1)
+    .required(),
+  transitions: Joi.array()
+    .items(transitionSchema)
+    .default([]),
 }).unknown(true);
 
 /**

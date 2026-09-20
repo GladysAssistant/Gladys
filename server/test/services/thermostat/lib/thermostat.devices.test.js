@@ -58,6 +58,11 @@ describe('thermostat.getDevices', () => {
   });
 });
 
+// A thermostat now carries its state on features: the setpoint plus preset,
+// mode and operating-state, built by the integration rather than taken from the
+// payload.
+const featureTypes = (created) => created.features.map((feature) => feature.type);
+
 describe('thermostat.createDevice', () => {
   const buildHandler = () => ({
     gladys: { device: { create: fake((device) => Promise.resolve(device)) } },
@@ -98,7 +103,7 @@ describe('thermostat.createDevice', () => {
       features: [{ category: 'light', type: 'binary' }, setpointFeature],
     });
 
-    expect(created.features).to.deep.equal([setpointFeature]);
+    expect(featureTypes(created)).to.deep.equal(['target-temperature', 'preset', 'mode', 'operating-state']);
   });
 
   it('should keep a single setpoint feature', async () => {
@@ -109,7 +114,7 @@ describe('thermostat.createDevice', () => {
       features: [setpointFeature, { ...setpointFeature, external_id: 'second' }],
     });
 
-    expect(created.features).to.have.lengthOf(1);
+    expect(featureTypes(created).filter((type) => type === 'target-temperature')).to.have.lengthOf(1);
   });
 
   it('should drop params outside the thermostat namespace', async () => {
@@ -193,12 +198,14 @@ describe('thermostat.createDevice - external', () => {
     { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
   ];
 
-  it('should create the device without any feature of its own', async () => {
+  it('should carry a preset feature, and nothing else of its own', async () => {
     const handler = buildHandler();
 
     const created = await handler.createDevice({ name: 'Netatmo', params: externalParams });
 
-    expect(created.features).to.deep.equal([]);
+    // The real device owns its setpoint, mode and state; the preset is the one
+    // piece of state that is genuinely this integration's.
+    expect(featureTypes(created)).to.deep.equal(['preset']);
     expect(created.service_id).to.equal('service-id');
   });
 
@@ -212,7 +219,7 @@ describe('thermostat.createDevice - external', () => {
       params: externalParams,
     });
 
-    expect(created.features).to.deep.equal([]);
+    expect(featureTypes(created)).to.deep.equal(['preset']);
   });
 
   it('should keep the external params', async () => {
@@ -278,104 +285,28 @@ describe('thermostat.createDevice - external', () => {
 });
 
 describe('thermostat.postDelete', () => {
-  const buildHandler = (destroy) => ({
-    gladys: { variable: { destroy } },
-    serviceId: 'service-id',
+  const buildHandler = () => ({
     invalidateDeviceCaches: fake.returns(null),
     postDelete,
   });
 
-  it('should remove every runtime variable of the deleted features', async () => {
-    const handler = buildHandler(fake.resolves(null));
+  it('should drop the caches derived from the device list', async () => {
+    // The features, the params and the schedule link all go with the device row,
+    // so there is no state left to clean up: only the caches, or the next pass
+    // would still regulate a thermostat that no longer exists.
+    const handler = buildHandler();
 
     await handler.postDelete({ features: [{ selector: 'thermostat-living-room' }] });
 
-    const keys = handler.gladys.variable.destroy.getCalls().map((call) => call.args[0]);
-    // The configuration is not in this list: it lives on the device row, which
-    // is deleted with the device itself.
-    expect(keys).to.have.members([
-      'THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET',
-      'THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET_FALLBACK',
-      'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE',
-      'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL',
-      'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT',
-    ]);
+    assert.calledOnce(handler.invalidateDeviceCaches);
   });
 
-  // An external thermostat carries no feature: its runtime state is keyed on the
-  // real device's setpoint feature, which survives the deletion (it belongs to
-  // another integration) — only the variables go.
-  it('should remove the runtime variables of an external thermostat', async () => {
-    const handler = buildHandler(fake.resolves(null));
-
-    await handler.postDelete({
-      features: [],
-      params: [{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }],
-    });
-
-    const keys = handler.gladys.variable.destroy.getCalls().map((call) => call.args[0]);
-    expect(keys).to.have.members([
-      'THERMOSTAT_NETATMO_SETPOINT_PRESET',
-      'THERMOSTAT_NETATMO_SETPOINT_PRESET_FALLBACK',
-      'THERMOSTAT_NETATMO_SETPOINT_MANUAL_MODE',
-      'THERMOSTAT_NETATMO_SETPOINT_MANUAL_UNTIL',
-      'THERMOSTAT_NETATMO_SETPOINT_MANUAL_SETPOINT',
-    ]);
-  });
-
-  // A virtual thermostat left with a stale target param must not have its
-  // variables cleaned up twice.
-  it('should not clean the same selector twice', async () => {
-    const handler = buildHandler(fake.resolves(null));
-
-    await handler.postDelete({
-      features: [{ selector: 'netatmo-setpoint' }],
-      params: [{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }],
-    });
-
-    expect(handler.gladys.variable.destroy.callCount).to.equal(5);
-  });
-
-  it('should ignore a device with no params at all', async () => {
-    const handler = buildHandler(fake.resolves(null));
-
-    await handler.postDelete({ features: [{ selector: 'thermostat-living-room' }] });
-
-    expect(handler.gladys.variable.destroy.callCount).to.equal(5);
-  });
-
-  it('should remove the variables in this service scope', async () => {
-    const handler = buildHandler(fake.resolves(null));
-
-    await handler.postDelete({ features: [{ selector: 'thermostat-living-room' }] });
-
-    handler.gladys.variable.destroy.getCalls().forEach((call) => {
-      expect(call.args[1]).to.equal('service-id');
-    });
-  });
-
-  it('should swallow a variable that cannot be removed', async () => {
-    const handler = buildHandler(fake.rejects(new Error('gone')));
-
-    await handler.postDelete({ features: [{ selector: 'thermostat-living-room' }] });
-
-    assert.called(handler.gladys.variable.destroy);
-  });
-
-  it('should do nothing for a device without features', async () => {
-    const handler = buildHandler(fake.resolves(null));
+  it('should not need the deleted device to carry anything', async () => {
+    const handler = buildHandler();
 
     await handler.postDelete({});
 
-    assert.notCalled(handler.gladys.variable.destroy);
-  });
-
-  it('should do nothing when no device is given', async () => {
-    const handler = buildHandler(fake.resolves(null));
-
-    await handler.postDelete(undefined);
-
-    assert.notCalled(handler.gladys.variable.destroy);
+    assert.calledOnce(handler.invalidateDeviceCaches);
   });
 });
 

@@ -9,6 +9,7 @@ const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   EVENTS,
+  THERMOSTAT_PRESET,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
 
@@ -17,6 +18,15 @@ const setpointFeature = (extra = {}) => ({
   category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
   type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
   ...extra,
+});
+
+// The preset a thermostat currently carries is the last_value of its preset
+// feature, not a variable.
+const presetFeature = (preset) => ({
+  selector: 'thermostat-living-room:preset',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
+  last_value: THERMOSTAT_PRESET[preset.toUpperCase()],
 });
 
 const todayDow = getCurrentDayAndMinutes(new Date(), 'Europe/Paris').dayOfWeek;
@@ -78,7 +88,12 @@ const buildGladys = ({ features = {}, variables = {}, getOverride = null } = {})
     return Promise.resolve([]);
   });
   return {
-    device: { get: deviceGet, setValue: fake.resolves(null), saveState: fake.resolves(null) },
+    device: {
+      get: deviceGet,
+      setValue: fake.resolves(null),
+      saveState: fake.resolves(null),
+      setParam: fake.resolves(null),
+    },
     variable: {
       getValue: fake((key) => Promise.resolve(variables[key] !== undefined ? variables[key] : null)),
       setValue: fake.resolves(null),
@@ -182,9 +197,18 @@ describe('thermostat.regulateDevice', () => {
   });
 
   describe('manual mode', () => {
-    const manualVariables = (extra = {}) => ({
-      THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE: 'true',
-      ...extra,
+    // The hold lives on the device now, as params, so it is described here
+    // rather than through the variable table. `setpoint` null means a hold whose
+    // setpoint is missing, `until` null a permanent one.
+    const heldDevice = ({ setpoint = 22, until = Date.now() + 60000, extraParams = {} } = {}) => ({
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature()],
+      params: baseParams({
+        ...(setpoint === null ? {} : { THERMOSTAT_MANUAL_SETPOINT: String(setpoint) }),
+        THERMOSTAT_MANUAL_UNTIL: until === null ? '' : String(until),
+        ...extraParams,
+      }),
     });
 
     it('should not actuate when the temperature sensor cannot be read', async () => {
@@ -193,46 +217,19 @@ describe('thermostat.regulateDevice', () => {
       const mod = load(fullDaySchedule('comfort'));
       const gladys = buildGladys({
         features: { 'heater-switch': { selector: 'heater-switch', last_value: 1 } },
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() + 60000),
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
       });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, heldDevice());
 
       assert.notCalled(gladys.device.setValue);
     });
 
-    it('should cut the switch when the manual hold is on the off preset', async () => {
-      // Tapping Off on a scheduled thermostat writes PRESET=off and arms a hold so
-      // the next slot does not turn the heating back on. The hold must not regulate
-      // on the setpoint that was current before Off was tapped.
-      const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15, switchOn: true }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET: 'off',
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() + 60000),
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
-      });
-
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
-
-      const [, , value] = gladys.device.setValue.firstCall.args;
-      expect(value).to.equal(0);
-    });
-
-    it('should cut the switch on an off hold even with no manual setpoint stored', async () => {
-      const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15, switchOn: true }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET: 'off',
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() + 60000),
-        }),
-      });
+    it('should cut the switch when the schedule reaches an off transition', async () => {
+      // Stopping is a mode, not a preset with a setpoint: a transition saying
+      // `off` must cut the heating rather than regulate on whatever setpoint was
+      // current before it.
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15, switchOn: true }) });
 
       await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
 
@@ -242,15 +239,9 @@ describe('thermostat.regulateDevice', () => {
 
     it('should regulate on the manual setpoint while the timer runs', async () => {
       const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15 }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() + 60000),
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, heldDevice());
 
       const [, , value] = gladys.device.setValue.firstCall.args;
       expect(value).to.equal(1);
@@ -258,42 +249,36 @@ describe('thermostat.regulateDevice', () => {
 
     it('should hold manual mode forever when no expiry is stored', async () => {
       const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15 }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, heldDevice({ until: null }));
 
-      assert.neverCalledWith(gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'false');
+      // A permanent hold is never cleared by the loop.
+      assert.neverCalledWith(gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', '');
     });
 
-    it('should ignore a malformed manual setpoint', async () => {
+    it('should fall through to the schedule on a malformed manual setpoint', async () => {
       const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15 }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: 'not-json',
-        }),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(
+        mod,
+        gladys,
+        heldDevice({ setpoint: null, extraParams: { THERMOSTAT_MANUAL_SETPOINT: 'not-a-number' } }),
+      );
 
-      assert.notCalled(gladys.device.setValue);
+      // An unreadable hold is no hold: the schedule applies rather than the loop
+      // stopping and leaving the heating wherever it was.
+      assert.calledOnce(gladys.device.setValue);
     });
 
-    it('should do nothing when the manual setpoint variable is absent', async () => {
+    it('should fall through to the schedule when no hold is armed', async () => {
       const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15 }),
-        variables: manualVariables(),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, heldDevice({ setpoint: null }));
 
-      assert.notCalled(gladys.device.setValue);
+      assert.calledOnce(gladys.device.setValue);
     });
 
     it('should not actuate in manual mode without a temperature reading', async () => {
@@ -303,12 +288,9 @@ describe('thermostat.regulateDevice', () => {
           'temp-sensor': { selector: 'temp-sensor', last_value: null },
           'heater-switch': { selector: 'heater-switch', last_value: 0 },
         },
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
       });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, heldDevice());
 
       assert.notCalled(gladys.device.setValue);
     });
@@ -318,22 +300,16 @@ describe('thermostat.regulateDevice', () => {
       // schedule is attached, that hold must stop being permanent, otherwise the
       // schedule never takes over.
       const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15 }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: '',
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
       const before = Date.now();
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, heldDevice({ until: null }));
 
-      const call = gladys.variable.setValue
+      const call = gladys.device.setParam
         .getCalls()
-        .find((c) => c.args[0] === 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL');
+        .find((c) => c.args[1] === 'THERMOSTAT_MANUAL_UNTIL' && c.args[2] !== '');
       expect(call).to.not.equal(undefined);
-      const armed = parseInt(call.args[1], 10);
+      const armed = parseInt(call.args[2], 10);
       // 30 minutes is the shared default, the device configures no duration here.
       expect(armed).to.be.at.least(before + 30 * 60 * 1000);
       expect(armed).to.be.at.most(Date.now() + 30 * 60 * 1000);
@@ -343,124 +319,87 @@ describe('thermostat.regulateDevice', () => {
 
     it('should use the duration configured on the device when arming that expiry', async () => {
       const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15 }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: '',
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
       const before = Date.now();
 
-      await regulate(mod, gladys, {
-        features: [setpointFeature()],
-        params: baseParams({ THERMOSTAT_MANUAL_DURATION: '120' }),
-      });
+      await regulate(mod, gladys, heldDevice({ until: null, extraParams: { THERMOSTAT_MANUAL_DURATION: '120' } }));
 
-      const call = gladys.variable.setValue
+      const call = gladys.device.setParam
         .getCalls()
-        .find((c) => c.args[0] === 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL');
-      expect(parseInt(call.args[1], 10)).to.be.at.least(before + 120 * 60 * 1000);
+        .find((c) => c.args[1] === 'THERMOSTAT_MANUAL_UNTIL' && c.args[2] !== '');
+      expect(parseInt(call.args[2], 10)).to.be.at.least(before + 120 * 60 * 1000);
     });
 
     it('should carry the armed expiry to open dashboards', async () => {
-      // The widget renders the manual banner only when it holds an expiry; a
+      // The widget renders the countdown only when it holds an expiry; a
       // permanent hold leaves it on the schedule banner, which has no cancel
       // button. The broadcast carries the expiry so it can swap back.
       const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15 }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: '',
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, heldDevice({ until: null }));
 
       const emitted = gladys.event.emit
         .getCalls()
-        .find((c) => c.args[1] && c.args[1].payload && c.args[1].payload.manualUntil);
+        .find((c) => c.args[1] && c.args[1].payload && c.args[1].payload.until);
       expect(emitted).to.not.equal(undefined);
-      expect(emitted.args[1].payload.key).to.equal('THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE');
-      expect(emitted.args[1].payload.value).to.equal('true');
-      expect(parseInt(emitted.args[1].payload.manualUntil, 10)).to.be.above(Date.now());
+      expect(emitted.args[1].payload.device).to.equal('living-room');
+      expect(emitted.args[1].payload.until).to.be.above(Date.now());
     });
 
     it('should leave a permanent hold alone while no schedule is attached', async () => {
       // Without a schedule the hold is permanent by design: nothing would take
       // the setpoint over, and the widget offers the preset bar to leave it.
       const mod = load(fullDaySchedule('comfort'), false);
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15 }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: '',
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
 
-      await regulate(mod, gladys, {
-        features: [setpointFeature()],
-        params: baseParams(),
-      });
+      await regulate(mod, gladys, heldDevice({ until: null }));
 
-      assert.neverCalledWith(gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL');
-      assert.neverCalledWith(gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'false');
+      assert.notCalled(gladys.device.setParam);
     });
 
     it('should not re-arm an expiry that is already set', async () => {
       const mod = load(fullDaySchedule('comfort'));
-      const until = String(Date.now() + 60000);
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 15 }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: until,
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT: JSON.stringify({ setpoint: 22 }),
-        }),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, heldDevice());
 
-      assert.neverCalledWith(gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL');
+      assert.notCalled(gladys.device.setParam);
     });
 
     it('should revert to the schedule once the manual timer expired', async () => {
       const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 18 }),
-        variables: manualVariables({
-          THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() - 60000),
-        }),
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 18 }) });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, heldDevice({ until: Date.now() - 60000 }));
 
-      assert.calledWith(gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'false');
+      // The hold is cleared and the schedule takes over again.
+      assert.calledWith(gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', '');
       assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL);
     });
   });
 
   describe('preset resolution', () => {
-    it('should fall back to the preset variable when the schedule has no slot for now', async () => {
-      const mod = load({ selector: 'my-schedule', slots: [] });
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 18 }),
-        variables: { THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET: 'comfort' },
-      });
+    it('should fall back to the preset the thermostat carries when the schedule is empty', async () => {
+      const mod = load({ selector: 'my-schedule', transitions: [] });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 18 }) });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, {
+        features: [setpointFeature(), presetFeature('comfort')],
+        params: baseParams(),
+      });
 
       assert.calledOnce(gladys.device.setValue);
     });
 
-    it('should fall back to the preset variable when the schedule is missing', async () => {
+    it('should fall back to the preset the thermostat carries when it follows no schedule', async () => {
       const mod = load(null);
-      const gladys = buildGladys({
-        features: standardFeatures({ temp: 18 }),
-        variables: { THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET: 'comfort' },
-      });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 18 }) });
 
-      await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
+      await regulate(mod, gladys, {
+        features: [setpointFeature(), presetFeature('comfort')],
+        params: baseParams(),
+      });
 
       assert.calledOnce(gladys.device.setValue);
     });
@@ -675,24 +614,6 @@ describe('thermostat.regulateDevice - resilience', () => {
     // Manual mode holds rather than silently reverting to the schedule
     assert.neverCalledWith(gladys.variable.setValue, 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE', 'false');
     assert.calledOnce(gladys.device.setValue);
-  });
-
-  it('should treat an unreadable manual setpoint as absent', async () => {
-    const mod = load(fullDaySchedule('comfort'));
-    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
-    gladys.variable.getValue = fake((key) => {
-      if (key === 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE') {
-        return Promise.resolve('true');
-      }
-      if (key === 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_SETPOINT') {
-        return Promise.reject(new Error('unreadable'));
-      }
-      return Promise.resolve(null);
-    });
-
-    await regulate(mod, gladys, { features: [setpointFeature()], params: baseParams() });
-
-    assert.notCalled(gladys.device.setValue);
   });
 
   it('should regulate on nothing when the thermostat follows no schedule', async () => {

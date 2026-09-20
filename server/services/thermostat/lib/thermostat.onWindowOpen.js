@@ -1,6 +1,6 @@
 const logger = require('../../../utils/logger');
-const { getThermostatFeature } = require('./thermostat.applySchedules');
-const { buildParamsConfig, getFeatureBySelector } = require('./thermostat.deviceConfig');
+const { getThermostatFeature, stopExternalThermostat } = require('./thermostat.applySchedules');
+const { buildParamsConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
 
 /**
  * @description Invalidate the caches derived from this service's devices: the
@@ -13,7 +13,6 @@ const { buildParamsConfig, getFeatureBySelector } = require('./thermostat.device
  */
 function invalidateDeviceCaches() {
   this.windowSelectorsCache = null;
-  this.featureKeysCache = null;
   this.targetSelectorsCache = null;
 }
 
@@ -115,9 +114,15 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     if (!device) {
       return;
     }
-    // Our own write, echoed back: consume the mark and stop there.
+    // Our own write, reported back. The mark is *kept* rather than consumed: a
+    // change is what differs from the last value this service wrote, not what
+    // arrives after it. Zigbee2MQTT reports periodically and Netatmo is polled
+    // every two minutes, both re-emitting an unchanged value — consuming the
+    // mark on the first report would make the second one look like a setting
+    // made on the device, arm a hold, rewrite the same value (a cloud call per
+    // poll), and start the cycle again on the next report. The visible result is
+    // a thermostat stuck in "manual" for ever.
     if (this.selfWrittenSetpoints.get(changedSelector) === newValue) {
-      this.selfWrittenSetpoints.delete(changedSelector);
       return;
     }
     const feature = { selector: changedSelector };
@@ -178,16 +183,34 @@ async function onDeviceNewState(event) {
     }
     await Promise.all(
       thermostatDevices.map(async (device) => {
-        const thermostatFeature = getThermostatFeature(device);
-        if (!thermostatFeature) {
-          return;
-        }
         // Window and switch are device-owned params: no dashboard read here.
         // buildParamsConfig already returns null fields for the params it misses,
         // so the checks below cover both an unconfigured and an absent config.
         const paramsConfig = buildParamsConfig(device) || {};
         const { window_feature: windowFeature, switch_feature: switchFeature } = paramsConfig;
-        if (windowFeature !== changedSelector || !switchFeature) {
+        if (windowFeature !== changedSelector) {
+          return;
+        }
+        // An external thermostat carries no setpoint feature and no switch: it is
+        // stopped by writing its mode and the frost setpoint, exactly as the
+        // minute loop does. Requiring either here is what used to skip it
+        // entirely, leaving the heating on until the next tick.
+        if (isExternal(paramsConfig)) {
+          logger.info(`Thermostat: window opened (${changedSelector}) for ${device.selector}, stopping it`);
+          try {
+            await stopExternalThermostat(
+              this.gladys,
+              paramsConfig,
+              `window open, ${device.selector}`,
+              this.selfWrittenSetpoints,
+            );
+          } catch (e) {
+            logger.warn(`Thermostat: Failed to stop an external thermostat on window open: ${e.message}`);
+          }
+          return;
+        }
+        const thermostatFeature = getThermostatFeature(device);
+        if (!thermostatFeature || !switchFeature) {
           return;
         }
         logger.info(

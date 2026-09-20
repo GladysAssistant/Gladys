@@ -6,6 +6,8 @@ const {
   copyDayOntoDays,
   timeToMinutes,
   minutesToTime,
+  findCurrentTransition,
+  findNextTransition,
   parseEnd,
   getCurrentDayAndMinutes,
   findMatchingSlot,
@@ -647,5 +649,55 @@ describe('thermostatSchedule.copyDayOntoDays', () => {
     const copied = copyDayOntoDays(slots, 0, [], makeKey);
 
     expect(dayOf(copied, 0)).to.deep.equal(['08:00->18:00 comfort']);
+  });
+});
+
+describe('thermostatSchedule transition points', () => {
+  // Monday 06:30 comfort, Monday 22:30 night, Wednesday 08:00 eco.
+  const week = [
+    { day_of_week: 0, time: '22:30', preset: 'night' },
+    { day_of_week: 2, time: '08:00', preset: 'eco' },
+    { day_of_week: 0, time: '06:30', preset: 'comfort' },
+  ];
+
+  it('should find the last point at or before now', () => {
+    expect(findCurrentTransition(week, 0, 8 * 60).preset).to.equal('comfort');
+    expect(findCurrentTransition(week, 0, 23 * 60).preset).to.equal('night');
+    expect(findCurrentTransition(week, 1, 12 * 60).preset).to.equal('night');
+  });
+
+  it('should match a point exactly on its minute', () => {
+    expect(findCurrentTransition(week, 0, 6 * 60 + 30).preset).to.equal('comfort');
+  });
+
+  it('should wrap the week onto its last point before the first one', () => {
+    // Monday 05:00: nothing yet this week, so the Wednesday-evening point still
+    // holds. This is what removes the gaps intervals used to leave.
+    expect(findCurrentTransition(week, 0, 5 * 60).preset).to.equal('eco');
+  });
+
+  it('should return null on a schedule with no point', () => {
+    expect(findCurrentTransition([], 0, 480)).to.equal(null);
+    expect(findCurrentTransition(null, 0, 480)).to.equal(null);
+  });
+
+  it('should find the point that follows the current one', () => {
+    expect(findNextTransition(week, 0, 8 * 60).preset).to.equal('night');
+    expect(findNextTransition(week, 0, 23 * 60).preset).to.equal('eco');
+  });
+
+  it('should wrap the next point onto the first of the week', () => {
+    expect(findNextTransition(week, 2, 9 * 60).preset).to.equal('comfort');
+  });
+
+  it('should return null for the next point of an empty schedule', () => {
+    expect(findNextTransition([], 0, 480)).to.equal(null);
+  });
+
+  it('should return the only point as both current and next', () => {
+    const single = [{ day_of_week: 3, time: '12:00', preset: 'eco' }];
+
+    expect(findCurrentTransition(single, 0, 480).preset).to.equal('eco');
+    expect(findNextTransition(single, 0, 480).preset).to.equal('eco');
   });
 });

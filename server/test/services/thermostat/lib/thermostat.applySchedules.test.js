@@ -4,7 +4,7 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { fake } = sinon;
 
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, THERMOSTAT_PRESET } = require('../../../../utils/constants');
 
 // The regulation loop resolves the setpoint feature by category and type,
 // never by position in the features array.
@@ -50,8 +50,19 @@ const loadModule = (schedule) =>
   });
 
 // Helper to build a thermostat device with params-based config.
-const buildThermostatDevice = (params) => ({
-  features: [thermostatFeature()],
+// A thermostat carries its state on features now: the preset it follows, and
+// the hold on its params.
+const presetFeature = (preset) => ({
+  selector: 'thermostat-living-room:preset',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
+  last_value: THERMOSTAT_PRESET[preset.toUpperCase()],
+});
+
+const buildThermostatDevice = (params, preset = null) => ({
+  id: 'device-id',
+  selector: 'living-room',
+  features: preset ? [thermostatFeature(), presetFeature(preset)] : [thermostatFeature()],
   params,
 });
 
@@ -72,11 +83,13 @@ const baseParams = (overrides = {}) => {
 describe('thermostat.applySchedules (integration)', () => {
   let gladysDeviceSetValue;
   let gladysVariableSetValue;
+  let gladysDeviceSetParam;
   let eventEmit;
 
   const makeGladys = ({ devices, variables, switchOn, currentTemp, windowOpen = false }) => {
     gladysDeviceSetValue = fake.resolves(null);
     gladysVariableSetValue = fake.resolves(null);
+    gladysDeviceSetParam = fake.resolves(null);
     eventEmit = fake.returns(null);
 
     const switchDevice = {
@@ -109,6 +122,7 @@ describe('thermostat.applySchedules (integration)', () => {
         }),
         setValue: gladysDeviceSetValue,
         saveState: fake.resolves(null),
+        setParam: gladysDeviceSetParam,
       },
       variable: {
         getValue: fake((key) => Promise.resolve((variables && variables[key]) || null)),
@@ -207,11 +221,11 @@ describe('thermostat.applySchedules (integration)', () => {
   });
 
   it('should regulate on the current preset when no schedule is configured', async () => {
-    const device = buildThermostatDevice(baseParams({ THERMOSTAT_PRESET_COMFORT: '21' }));
+    const device = buildThermostatDevice(baseParams({ THERMOSTAT_PRESET_COMFORT: '21' }), 'comfort');
     const mod = loadModule(null);
     const gladys = makeGladys({
       devices: [device],
-      variables: { THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET: 'comfort' },
+      variables: {},
       switchOn: false,
       currentTemp: 18, // cold → heating must turn ON even without a schedule
     });
@@ -289,25 +303,23 @@ describe('thermostat.applySchedules (integration)', () => {
   });
 
   it('should revert manual mode and apply schedule when the manual timer expired', async () => {
-    const device = buildThermostatDevice(baseParams());
+    const device = buildThermostatDevice(
+      baseParams({ THERMOSTAT_MANUAL_SETPOINT: '23', THERMOSTAT_MANUAL_UNTIL: String(Date.now() - 1000) }),
+    );
     const mod = loadModule(buildSchedule('comfort'));
     const gladys = makeGladys({
       devices: [device],
-      variables: {
-        THERMOSTAT_ACTIVE_SCHEDULE_THERMOSTAT_LIVING_ROOM: 'my-schedule',
-        THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE: 'true',
-        THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() - 1000),
-      },
+      variables: {},
       switchOn: false,
       currentTemp: 18,
     });
     const ctx = { gladys, serviceId: 'svc' };
     await mod.applySchedules.call(ctx);
-    // Manual mode should be turned off.
-    const manualOff = gladysVariableSetValue
+    // The hold should be cleared.
+    const cleared = gladysDeviceSetParam
       .getCalls()
-      .filter((c) => c.args[0] === 'THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE' && c.args[1] === 'false');
-    expect(manualOff).to.have.lengthOf(1);
+      .filter((c) => c.args[1] === 'THERMOSTAT_MANUAL_SETPOINT' && c.args[2] === '');
+    expect(cleared).to.have.lengthOf(1);
     // And the heating switch should be actuated by the schedule (ON, since cold).
     expect(gladysDeviceSetValue.called).to.equal(true);
   });
@@ -317,16 +329,14 @@ describe('thermostat.applySchedules (integration)', () => {
     // raises the temperature by hand (dashboards show "comfort"), and the timer
     // expires. The stored preset never left "away", so notifying only on change
     // left every open dashboard stuck on "comfort" until a page refresh.
-    const device = buildThermostatDevice(baseParams());
+    const device = buildThermostatDevice(
+      baseParams({ THERMOSTAT_MANUAL_SETPOINT: '23', THERMOSTAT_MANUAL_UNTIL: String(Date.now() - 1000) }),
+      'away',
+    );
     const mod = loadModule(buildSchedule('away'));
     const gladys = makeGladys({
       devices: [device],
-      variables: {
-        THERMOSTAT_ACTIVE_SCHEDULE_THERMOSTAT_LIVING_ROOM: 'my-schedule',
-        THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_MODE: 'true',
-        THERMOSTAT_THERMOSTAT_LIVING_ROOM_MANUAL_UNTIL: String(Date.now() - 1000),
-        THERMOSTAT_THERMOSTAT_LIVING_ROOM_PRESET: 'away',
-      },
+      variables: {},
       switchOn: false,
       currentTemp: 18,
     });
@@ -335,7 +345,9 @@ describe('thermostat.applySchedules (integration)', () => {
 
     const presetEvents = eventEmit
       .getCalls()
-      .filter((c) => c.args[1] && c.args[1].type === 'thermostat.preset-updated' && c.args[1].payload.value === 'away');
+      .filter(
+        (c) => c.args[1] && c.args[1].type === 'thermostat.preset-updated' && c.args[1].payload.preset === 'away',
+      );
     expect(presetEvents).to.have.lengthOf(1);
   });
 

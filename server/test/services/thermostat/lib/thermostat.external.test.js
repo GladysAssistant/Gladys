@@ -53,7 +53,21 @@ const externalParams = (overrides = {}) =>
     ...overrides,
   });
 
-const externalDevice = (overrides = {}) => ({ name: 'Netatmo', features: [], params: externalParams(overrides) });
+const externalDevice = (overrides = {}) => ({
+  id: 'device-id',
+  selector: 'netatmo-thermostat',
+  name: 'Netatmo',
+  features: [],
+  params: externalParams(overrides),
+});
+
+// The hold lives on the device, as params.
+const heldExternalDevice = (setpoint, overrides = {}) =>
+  externalDevice({
+    THERMOSTAT_MANUAL_SETPOINT: String(setpoint),
+    THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
+    ...overrides,
+  });
 
 const buildGladys = ({ features = {}, variables = {} } = {}) => {
   const deviceGet = fake((query) => {
@@ -64,7 +78,12 @@ const buildGladys = ({ features = {}, variables = {} } = {}) => {
     return Promise.resolve([]);
   });
   return {
-    device: { get: deviceGet, setValue: fake.resolves(null), saveState: fake.resolves(null) },
+    device: {
+      get: deviceGet,
+      setValue: fake.resolves(null),
+      saveState: fake.resolves(null),
+      setParam: fake.resolves(null),
+    },
     variable: {
       getValue: fake((key) => Promise.resolve(variables[key] !== undefined ? variables[key] : null)),
       setValue: fake.resolves(null),
@@ -318,32 +337,21 @@ describe('thermostat.regulateDevice - external', () => {
   });
 
   describe('manual hold', () => {
-    const manualVariables = (setpoint) => ({
-      THERMOSTAT_NETATMO_SETPOINT_MANUAL_MODE: 'true',
-      THERMOSTAT_NETATMO_SETPOINT_MANUAL_SETPOINT: JSON.stringify({ setpoint }),
-      THERMOSTAT_NETATMO_SETPOINT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
-    });
-
     it('should hand the held setpoint to the real device', async () => {
       const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: { 'netatmo-setpoint': targetFeature() },
-        variables: manualVariables(23),
-      });
+      const gladys = buildGladys({ features: { 'netatmo-setpoint': targetFeature() } });
 
-      await regulate(mod, gladys, externalDevice());
+      await regulate(mod, gladys, heldExternalDevice(23));
 
       assert.calledOnce(gladys.device.setValue);
       expect(gladys.device.setValue.firstCall.args[2]).to.equal(23);
     });
 
-    // A manual hold on `off` means the user asked for the heating to stop.
-    it('should write the frost setpoint for a manual off hold', async () => {
-      const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: { 'netatmo-setpoint': targetFeature() },
-        variables: { ...manualVariables(23), THERMOSTAT_NETATMO_SETPOINT_PRESET: 'off' },
-      });
+    // Stopping is a mode, not a held setpoint: a transition saying `off` writes
+    // the frost setpoint, which is the "stop" every thermostat understands.
+    it('should write the frost setpoint on an off transition', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: { 'netatmo-setpoint': targetFeature() } });
 
       await regulate(mod, gladys, externalDevice());
 
@@ -380,34 +388,24 @@ describe('thermostat.regulateDevice - external', () => {
       const mod = load(fullDaySchedule('comfort'));
       const gladys = buildGladys({
         features: modeFeatures({ 'netatmo-mode': modeFeature({ last_value: THERMOSTAT_MODE.OFF }) }),
-        variables: {
-          THERMOSTAT_NETATMO_SETPOINT_MANUAL_MODE: 'true',
-          THERMOSTAT_NETATMO_SETPOINT_MANUAL_SETPOINT: JSON.stringify({ setpoint: 23 }),
-          THERMOSTAT_NETATMO_SETPOINT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
-        },
       });
 
-      await regulate(mod, gladys, withMode());
+      await regulate(mod, gladys, heldExternalDevice(23, { THERMOSTAT_MODE_FEATURE: 'netatmo-mode' }));
 
       expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.HEATING);
       expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(23);
     });
 
-    it('should switch the device off for a manual off hold', async () => {
-      const mod = load(fullDaySchedule('comfort'));
-      const gladys = buildGladys({
-        features: modeFeatures(),
-        variables: {
-          THERMOSTAT_NETATMO_SETPOINT_MANUAL_MODE: 'true',
-          THERMOSTAT_NETATMO_SETPOINT_MANUAL_SETPOINT: JSON.stringify({ setpoint: 23 }),
-          THERMOSTAT_NETATMO_SETPOINT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
-          THERMOSTAT_NETATMO_SETPOINT_PRESET: 'off',
-        },
-      });
+    it('should write the mode before the frost setpoint when stopping', async () => {
+      // The mode is what the machine obeys: writing 7 °C to a thermostat still in
+      // COOLING asks it to cool the room to 7 °C until the mode write lands.
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: modeFeatures() });
 
       await regulate(mod, gladys, withMode());
 
-      expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.OFF);
+      const order = gladys.device.setValue.getCalls().map((call) => call.args[1].selector);
+      expect(order).to.deep.equal(['netatmo-mode', 'netatmo-setpoint']);
     });
 
     it('should switch the device off when a window opens', async () => {
@@ -546,10 +544,10 @@ describe('thermostat.onExternalSetpointChanged', () => {
     expect(handler.setValue.firstCall.args[2]).to.equal(19);
   });
 
-  // Our own write echoes back as the very same event: taking it for a change
+  // Our own write is reported back as the very same event: taking it for a change
   // made on the device would arm a manual hold on every scheduled write, and the
   // schedule would suspend itself for ever.
-  it('should ignore the echo of a setpoint this service just wrote', async () => {
+  it('should ignore the report of a setpoint this service just wrote', async () => {
     const mod = loadListener();
     const handler = buildHandler();
     handler.selfWrittenSetpoints.set('netatmo-setpoint', 21);
@@ -557,8 +555,38 @@ describe('thermostat.onExternalSetpointChanged', () => {
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
 
     assert.notCalled(handler.setValue);
-    // The mark is consumed: a later change to the same value is a real one.
-    expect(handler.selfWrittenSetpoints.has('netatmo-setpoint')).to.equal(false);
+    // The mark is KEPT, not consumed: a change is what differs from the last
+    // value this service wrote.
+    expect(handler.selfWrittenSetpoints.get('netatmo-setpoint')).to.equal(21);
+  });
+
+  // Zigbee2MQTT reports periodically and Netatmo is polled every two minutes,
+  // both re-emitting an unchanged value. Consuming the mark on the first report
+  // would make the second one look like a setting made on the device: a hold
+  // would be armed, the same value rewritten (a cloud call per poll), and the
+  // cycle would start again — leaving the thermostat stuck in "manual" for ever.
+  it('should ignore an unchanged value however many times it is reported', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+    handler.selfWrittenSetpoints.set('netatmo-setpoint', 21);
+
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
+
+    assert.notCalled(handler.setValue);
+  });
+
+  it('should hold a change made on the device after our own value was reported back', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+    handler.selfWrittenSetpoints.set('netatmo-setpoint', 21);
+
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
+    // Someone turns the dial: this one differs, so it is a real change.
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 23);
+
+    assert.calledOnce(handler.setValue);
   });
 
   it('should hold a change to a different value than the one written', async () => {
