@@ -4575,7 +4575,18 @@
     "subscriptionOpenBilling": "Actualizar mi método de pago",
     "subscriptionCheckAgain": "Volver a comprobar",
     "subscriptionStillNotPaid": "Gladys Plus sigue indicando que se requiere un pago. Una vez recibido el pago, puede tardar unos minutos en tenerse en cuenta.",
-    "subscriptionCheckError": "No se pudo comprobar la suscripción con Gladys Plus: compruebe su conexión a Internet y vuelva a intentarlo."
+    "subscriptionCheckError": "No se pudo comprobar la suscripción con Gladys Plus: compruebe su conexión a Internet y vuelva a intentarlo.",
+    "instanceOfflineAlertTitle": "Recibir un aviso cuando Gladys esté fuera de línea",
+    "instanceOfflineAlertDescription": "Gladys Plus ve su instancia conectarse y desconectarse: si permanece inaccesible (corte de corriente, router de Internet caído, tarjeta SD dañada…) durante más tiempo que el plazo elegido, Gladys Plus envía un correo a los administradores de su cuenta de Gladys Plus, y otro cuando vuelve a estar en línea.",
+    "instanceOfflineAlertLocalModeNotice": "Este ajuste pertenece a su cuenta de Gladys Plus: abra esta página desde Gladys Plus para modificarlo.",
+    "instanceOfflineAlertOpenGladysPlus": "Abrir Gladys Plus",
+    "instanceOfflineAlertLoadError": "No se pudieron cargar sus preferencias de Gladys Plus: compruebe su conexión a Internet y vuelva a intentarlo.",
+    "instanceOfflineAlertEnabledLabel": "Enviar un correo a los administradores de mi cuenta de Gladys Plus cuando mi Gladys esté fuera de línea",
+    "instanceOfflineAlertAdminOnly": "Solo un administrador de la cuenta de Gladys Plus puede modificar este ajuste.",
+    "instanceOfflineAlertDelayLabel": "Avisarme después de",
+    "instanceOfflineAlertDelayHelp": "Lo bastante corto para ser útil, lo bastante largo para no despertarle por un router que se reinicia. Gladys Plus comprueba cada pocos minutos: el correo puede salir unos minutos después de este plazo.",
+    "instanceOfflineAlertSaved": "Guardado.",
+    "instanceOfflineAlertSaveError": "No se pudo guardar este ajuste: compruebe su conexión a Internet y vuelva a intentarlo."
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
