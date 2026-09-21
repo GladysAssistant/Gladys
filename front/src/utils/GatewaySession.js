@@ -1,4 +1,5 @@
 import GladysGatewayClient from '@gladysassistant/gladys-gateway-js';
+import gatewayRequest from '@gladysassistant/gladys-gateway-js/lib/request';
 
 import config from '../config';
 import { Dispatcher } from './Dispatcher';
@@ -82,6 +83,25 @@ class GatewaySession {
 
   async getGatewayUser() {
     return this.gatewayClient.getMyself();
+  }
+
+  // "Email the admins when Gladys is offline" alert of the Gladys Plus account (admin
+  // only on the Gladys Plus side). The client library has no method for it yet, so the
+  // request goes through its request helper (access token of the session, refreshed
+  // on 401).
+  async updateInstanceOfflineAlert({ enabled, delayInMinutes }) {
+    const fields = {};
+    if (enabled !== undefined) {
+      fields.enabled = enabled;
+    }
+    if (delayInMinutes !== undefined) {
+      fields.delay_in_minutes = delayInMinutes;
+    }
+    return gatewayRequest.patch(
+      `${this.gladysGatewayApiUrl}/accounts/instance-offline-alert`,
+      fields,
+      this.gatewayClient
+    );
   }
 
   saveLoginInformations(data) {
