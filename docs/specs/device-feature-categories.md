@@ -54,6 +54,46 @@ Real devices rarely support the whole set: an air conditioner may only do cool +
 
 Option values are either **integers** (the enum-like case above) or **free strings**. String values exist for one specific situation: lists that no generic value set can describe because the values only exist on the appliance itself — installed TV apps, HDMI sources, vacuum rooms, native scenes. Those lists go through the dedicated `text` / `select` feature type: the integration declares the discovered choices as `supported_options` (`{ value: 'com.disney.disneyplus-prod', label: 'Disney+' }`), the UI shows the labels, and the selected value is the feature's state — stored as a string in `last_value_string`, with **no state history** (like `text`/`text`). Storage mirrors `last_value` / `last_value_string` on the feature itself: a string value lives in the option row's `value_string` column while the integer `value` column keeps a filler, and the model exposes whichever is set as one polymorphic `value` — an API consumer never sees the split. An integer and its string twin (`5` and `'5'`) are rejected as duplicates within a feature's options, and a string value on any feature other than `text`/`select` is rejected outright (`normalizeSupportedOptions` scopes the value domain by feature type). A dynamic select is **not** a way to bypass the taxonomy: a capability standards do cover (AC modes, fan speeds…) keeps its own category/type with integer values and translated labels.
 
+#### Worked example: `thermostat` / `preset`
+
+The thermostat category holds a `preset` type alongside `mode`, because the two
+answer different questions and compose rather than compete: **the mode says what
+the machine does** (off, heating, cooling, auto — a property of the equipment),
+**the preset says which temperature to aim for** (frost, away, eco, night,
+comfort — a property of the programme). This is the `hvac_mode` / `preset_mode`
+split of Home Assistant and the `system_mode` / `preset` split of Zigbee TRVs,
+and it is what makes a weekly schedule expressible: "heating" cannot be put in a
+time slot.
+
+It follows the rules above:
+
+- **integers, append-only** (rule 6): a preset is a capability standards cover,
+  so it keeps its own type with integer values and translated labels rather than
+  a `text`/`select`. `normalizeSupportedOptions` would reject string values on it
+  anyway;
+- **the full generic set** (rule 6): `frost` / `away` / `eco` / `night` /
+  `comfort` are the values branded thermostats share — Netatmo, Tado and Overkiz
+  all publish the same notion. A device supporting only some of them declares
+  that through `supported_options`;
+- **no unit** (`DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE`): the category is a
+  temperature, but a preset, a mode and an operating state are enums.
+
+`off` is deliberately **not** a preset: stopping is a mode, and
+`THERMOSTAT_MODE.OFF` already carries it. A schedule transition may still say
+`off`, and it is applied as a mode write.
+
+`schedule` **is** one, and it is the one value that deserves an argument. It
+means "follow the weekly programme", which is Gladys's own control state rather
+than a temperature the equipment aims for. It is in the generic set because the
+notion is not Gladys-specific — Netatmo has `mode: schedule`, Tado has its Smart
+Schedule, and a Zigbee TRV has `preset: auto` — so an integration that gains it
+later must not have to invent a second spelling. But those are each _their own_
+programme, not Gladys's: an integration mapping a device's native "follow my
+programme" onto this value has to decide whether it means the appliance's
+schedule or Gladys's, and the two are not interchangeable. An integration that
+cannot answer that question simply leaves `schedule` out of its
+`supported_options`.
+
 Consequence for reviews: "brand X only supports 3 of the 5 modes" is **never** a reason to create a narrower category, a brand-specific type, or a stripped-down enum. Keep the generic value set and let the integration declare what each device supports. The air-conditioning features are the reference example: the Matter service builds the `supported_options` of the AC mode feature from the Thermostat cluster's capability flags (heating/cooling/autoMode).
 
 ### 7. Naming conventions — renaming is the costly mistake
