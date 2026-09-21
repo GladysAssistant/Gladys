@@ -8,6 +8,11 @@ const {
 } = require('../../../utils/constants');
 const { THERMOSTAT_TYPES, DEFAULT_THERMOSTAT_TYPE } = require('../../../utils/thermostatConstants');
 
+// Runtime state kept as params rather than features: a hold is bookkeeping of
+// the regulation loop, not a property of the equipment. No form sends them, so
+// they are carried over on save instead of being wiped.
+const RUNTIME_PARAMS = ['THERMOSTAT_MANUAL_SETPOINT', 'THERMOSTAT_MANUAL_UNTIL'];
+
 // Params the integration owns. Anything else sent by a client is dropped rather
 // than persisted, so the device never carries unknown regulation settings.
 const ALLOWED_PARAMS = [
@@ -25,6 +30,10 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_MAX_TEMP',
   'THERMOSTAT_TEMP_UNIT',
   'THERMOSTAT_MANUAL_DURATION',
+  // The manual hold. Not a setting the edit form offers, but a param all the
+  // same: it has to survive a save, see RUNTIME_PARAMS below.
+  'THERMOSTAT_MANUAL_SETPOINT',
+  'THERMOSTAT_MANUAL_UNTIL',
   'THERMOSTAT_PRESET_FROST',
   'THERMOSTAT_PRESET_AWAY',
   'THERMOSTAT_PRESET_ECO',
@@ -61,26 +70,33 @@ function buildStateFeatures(device, external) {
     category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
     type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
   };
+  const mode = {
+    name: 'Mode',
+    external_id: `${base}:mode`,
+    selector: `${base}:mode`,
+    read_only: false,
+    has_feedback: false,
+    min: THERMOSTAT_MODE.OFF,
+    max: THERMOSTAT_MODE.COOLING,
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+  };
   if (external) {
-    // The real device owns its setpoint, its mode and its running state, and
-    // mirroring them here would give the house two sources that drift apart.
-    // The preset is the exception: no thermostat on the market publishes Gladys's
-    // preset vocabulary, so it is genuinely this integration's own state.
-    return [preset];
+    // The real device owns its setpoint and its running state, and mirroring
+    // them here would give the house two of each, drifting apart.
+    //
+    // The preset and the mode are the exceptions, because they are Gladys's own
+    // state rather than the appliance's. No thermostat publishes Gladys's preset
+    // vocabulary; and "stopped by Gladys" is a decision this service takes — it
+    // is what tells the regulation loop to leave the device alone, and a real
+    // thermostat may not even expose a mode of its own (Netatmo does not).
+    // Stopping the appliance is a separate act, done through
+    // THERMOSTAT_MODE_FEATURE when it has one, plus the frost setpoint.
+    return [preset, mode];
   }
   return [
     preset,
-    {
-      name: 'Mode',
-      external_id: `${base}:mode`,
-      selector: `${base}:mode`,
-      read_only: false,
-      has_feedback: false,
-      min: THERMOSTAT_MODE.OFF,
-      max: THERMOSTAT_MODE.COOLING,
-      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-      type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
-    },
+    mode,
     {
       // Written by the regulation loop, never by a client: a virtual thermostat
       // knows whether it is heating, and saying so on a standard feature makes it
@@ -119,6 +135,26 @@ async function createDevice(device) {
   logger.info(`Thermostat: Creating device "${device.name}"`);
 
   const params = (device.params || []).filter((param) => ALLOWED_PARAMS.includes(param.name));
+
+  // `device.create` deletes every param the payload leaves out. The hold is
+  // runtime state the edit form knows nothing about, so saving the form would
+  // silently drop it — and the next regulation pass would overwrite the setpoint
+  // the user, a scene or the physical dial had just chosen. Carry it over from
+  // the device as it stands, unless the caller sent it explicitly.
+  if (device.selector) {
+    const devices = await this.gladys.device.get({ service: 'thermostat' });
+    const existing = (devices || []).find((candidate) => candidate.selector === device.selector);
+    const existingParams = (existing && existing.params) || [];
+    RUNTIME_PARAMS.forEach((name) => {
+      if (params.some((param) => param.name === name)) {
+        return;
+      }
+      const carried = existingParams.find((param) => param.name === name);
+      if (carried) {
+        params.push({ name, value: carried.value });
+      }
+    });
+  }
 
   const typeParam = params.find((param) => param.name === 'THERMOSTAT_TYPE');
   const thermostatType = (typeParam && typeParam.value) || DEFAULT_THERMOSTAT_TYPE;
@@ -160,4 +196,4 @@ async function createDevice(device) {
   return createdDevice;
 }
 
-module.exports = { createDevice, buildStateFeatures, ALLOWED_PARAMS };
+module.exports = { createDevice, buildStateFeatures, ALLOWED_PARAMS, RUNTIME_PARAMS };

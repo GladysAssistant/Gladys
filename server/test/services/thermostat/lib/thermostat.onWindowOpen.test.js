@@ -207,11 +207,40 @@ describe('thermostat.onDeviceNewState (window open, external thermostat)', () =>
   });
 
   it('should swallow a failure to stop the device', async () => {
-    const mod = loadModule();
-    const handler = { ...buildExternalGladys(), windowSelectorsCache: null, targetSelectorsCache: new Set() };
-    handler.gladys.device.setValue = fake.rejects(new Error('offline'));
-
+    // stopExternalThermostat swallows its own write errors, so the guard here is
+    // for the unexpected — a lookup that throws, a device row that vanished.
     // One unreachable thermostat must not stop the listener for the others.
+    const mod = proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
+      './thermostat.applySchedules': {
+        getThermostatFeature: () => null,
+        stopExternalThermostat: () => Promise.reject(new Error('offline')),
+      },
+      '../../../utils/logger': {
+        debug: fake.returns(null),
+        info: fake.returns(null),
+        warn: fake.returns(null),
+      },
+    });
+    const handler = { ...buildExternalGladys(), windowSelectorsCache: null, targetSelectorsCache: new Set() };
+    // The lookup itself fails, which stopExternalThermostat does not guard: one
+    // unreachable thermostat must not stop the listener for the others.
+    handler.gladys.device.get = fake((query) => {
+      if (query && query.service === 'thermostat') {
+        return Promise.resolve([
+          {
+            selector: 'netatmo-thermostat',
+            features: [],
+            params: [
+              { name: 'THERMOSTAT_TYPE', value: 'external' },
+              { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+              { name: 'THERMOSTAT_WINDOW_FEATURE', value: 'window-sensor' },
+            ],
+          },
+        ]);
+      }
+      return Promise.reject(new Error('offline'));
+    });
+
     await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
   });
 });

@@ -624,6 +624,100 @@ describe('thermostat.regulateDevice - resilience', () => {
     assert.calledOnce(gladys.device.setValue);
   });
 
+  it('should leave a preset the user picked alone, rather than re-applying the schedule', async () => {
+    // A preset chosen on the widget or by a scene outranks the programme: the
+    // loop reads the schedule only while the preset feature says `schedule`.
+    // Without this the choice would last at most one minute.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15, switchOn: true }) });
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'living-room',
+      // Frost is 7 °C: at 15 °C the heating must stay off, where comfort (21 °C)
+      // would turn it on.
+      features: [setpointFeature(), presetFeature('frost')],
+      params: baseParams(),
+    });
+
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(0);
+  });
+
+  it('should stop a stopped external thermostat, not a switch it does not have', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: {
+        'netatmo-setpoint': { selector: 'netatmo-setpoint', last_value: 21, min: 5, max: 30 },
+      },
+    });
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'netatmo',
+      features: [modeFeature(THERMOSTAT_MODE.OFF)],
+      params: baseParams({
+        THERMOSTAT_TYPE: 'external',
+        THERMOSTAT_TARGET_FEATURE: 'netatmo-setpoint',
+        THERMOSTAT_SWITCH_FEATURE: '',
+      }),
+    });
+
+    // The frost setpoint is what stops a device with no mode feature of its own.
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(7);
+  });
+
+  it('should fall back on the preset it carries when the schedule has no point', async () => {
+    // A schedule with no transition resolves to nothing, so the preset the
+    // thermostat carries applies — here `schedule` itself, whose setpoint is the
+    // shared fallback rather than a temperature of its own.
+    const mod = load({ selector: 'my-schedule', transitions: [] });
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature(), presetFeature('schedule')],
+      params: baseParams(),
+    });
+
+    // 15 °C against the fallback setpoint: the heating runs.
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(1);
+  });
+
+  it('should report a running cooling thermostat as cooling', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    // Warm room, cooling mode: the compressor runs, and the operating state has
+    // to say "cooling" rather than "heating".
+    const gladys = buildGladys({ features: standardFeatures({ temp: 28 }) });
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature(), presetFeature('schedule')],
+      params: baseParams({ THERMOSTAT_MODE: 'cooling' }),
+    });
+
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(1);
+  });
+
+  it('should follow the schedule while the thermostat asks for it', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature(), presetFeature('schedule')],
+      params: baseParams(),
+    });
+
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(1);
+  });
+
   it('should leave a stopped thermostat alone, whatever the schedule says', async () => {
     // Stopping writes OFF on the mode feature and triggers a regulation pass:
     // without this the pass would resolve the schedule's preset and start the

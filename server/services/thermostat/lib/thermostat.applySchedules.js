@@ -56,7 +56,9 @@ const DEFAULT_TIMEZONE = 'Europe/Paris';
  * @param {object} gladys - Gladys instance.
  * @param {string} targetSelector - Selector of the external setpoint feature.
  * @param {number} setpoint - Setpoint in the thermostat's unit.
- * @param {string} thermostatUnit - Thermostat unit param, 'C' or 'F'.
+ * @param {string|null} thermostatUnit - Thermostat unit param, 'C' or 'F', or null
+ * when the setpoint is already in the target feature's own unit — the case of a
+ * manual hold on an external thermostat, whose value came from that very feature.
  * @param {string} logContext - Context for the log line.
  * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote,
  * so the echo of this write is not mistaken for a change made on the device itself.
@@ -73,10 +75,14 @@ async function writeExternalSetpoint(gladys, targetSelector, setpoint, thermosta
     }
     let value = setpoint;
     const featureUnit = found.feature.unit;
-    if (featureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && thermostatUnit === 'C') {
-      value = celsiusToFahrenheit(setpoint);
-    } else if (featureUnit === DEVICE_FEATURE_UNITS.CELSIUS && thermostatUnit === 'F') {
-      value = fahrenheitToCelsius(setpoint);
+    // A null unit means the value is already in the feature's own: converting it
+    // again would command 158 °F for a 70 °F hold, or -6 °C for a 21 °C one.
+    if (thermostatUnit !== null) {
+      if (featureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && thermostatUnit === 'C') {
+        value = celsiusToFahrenheit(setpoint);
+      } else if (featureUnit === DEVICE_FEATURE_UNITS.CELSIUS && thermostatUnit === 'F') {
+        value = fahrenheitToCelsius(setpoint);
+      }
     }
     // The real device advertises the range it accepts. Netatmo says 5-30,
     // Zigbee 5-40, Matter -100-200: writing outside it is rejected by the
@@ -511,7 +517,7 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
   // The preset the thermostat carries, and the hold armed on it: both are on the
   // device now — the preset as a feature, the hold as params — so neither costs
   // a variable round-trip, and a scene can read and write them.
-  const currentPreset = getPreset(device);
+  let currentPreset = getPreset(device);
   const hold = getManualHold(device);
 
   // Manual hold: regulate on the held setpoint until it expires.
@@ -535,6 +541,12 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     if (manualUntil && Date.now() > manualUntil) {
       logger.info(`Thermostat schedule: manual hold expired for ${selector}, reverting to schedule`);
       await clearManualHold.call({ gladys }, device);
+      // Hand the thermostat back to its programme rather than to the preset the
+      // hold was on: the preset feature has to read `schedule` again, or the
+      // next pass would take that stale preset for a deliberate choice and stop
+      // following the programme for good.
+      await savePreset.call({ gladys }, device, 'schedule');
+      currentPreset = 'schedule';
       manualJustExpired = true;
       // Fall through — the schedule/preset is applied below
     } else {
@@ -548,11 +560,15 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
         if (config.mode_feature) {
           await writeExternalMode(gladys, config.mode_feature, getRunningMode(config), `manual, ${selector}`);
         }
+        // The hold is stored in the unit it was set in, which on an external
+        // thermostat is the real feature's own: the widget dial reads that
+        // feature's unit, and a change made on the device arrives in it too.
+        // Passing null says so, so it is written through untouched.
         await writeExternalSetpoint(
           gladys,
           config.target_feature,
           manualSetpoint,
-          config.temp_unit,
+          null,
           `manual, ${selector}`,
           selfWritten,
         );
@@ -599,7 +615,14 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
       },
     ],
   });
-  if (link && link.schedule) {
+  // The programme applies only while the thermostat asks to follow it: that is
+  // what the `schedule` preset means. A preset the user picked — or a scene set
+  // — is a decision that outranks the programme, and reading the schedule
+  // regardless would overwrite it on the very next tick. A thermostat carrying
+  // no preset at all has never been driven: it follows its schedule if it has
+  // one, which is what a freshly attached programme should do.
+  const followsProgramme = currentPreset === 'schedule' || currentPreset === null;
+  if (followsProgramme && link && link.schedule) {
     // The last point at or before now, the week wrapping onto its last point:
     // there is no gap to fall through and no interval to reconstruct.
     const transition = findCurrentTransition(link.schedule.transitions, dayOfWeek, currentMinutes);

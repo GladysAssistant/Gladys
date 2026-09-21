@@ -117,6 +117,93 @@ describe('thermostat.createDevice', () => {
     expect(featureTypes(created).filter((type) => type === 'target-temperature')).to.have.lengthOf(1);
   });
 
+  it('should keep a live hold across a save', async () => {
+    // `device.create` deletes every param the payload leaves out, and the edit
+    // form knows nothing about the hold: without carrying it over, saving the
+    // form would drop it and the next pass would overwrite the setpoint the user
+    // had just chosen.
+    const handler = buildHandler();
+    handler.gladys.device.get = fake.resolves([
+      {
+        selector: 'living-room',
+        params: [
+          { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21.5' },
+          { name: 'THERMOSTAT_MANUAL_UNTIL', value: '1700000000000' },
+        ],
+      },
+    ]);
+
+    const created = await handler.createDevice({ name: 'Salon', selector: 'living-room', features: [setpointFeature] });
+
+    const names = created.params.map((param) => param.name);
+    expect(names).to.include('THERMOSTAT_MANUAL_SETPOINT');
+    expect(names).to.include('THERMOSTAT_MANUAL_UNTIL');
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_MANUAL_SETPOINT').value).to.equal('21.5');
+  });
+
+  it('should let the caller clear a hold explicitly', async () => {
+    const handler = buildHandler();
+    handler.gladys.device.get = fake.resolves([
+      { selector: 'living-room', params: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21.5' }] },
+    ]);
+
+    const created = await handler.createDevice({
+      name: 'Salon',
+      selector: 'living-room',
+      features: [setpointFeature],
+      params: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '' }],
+    });
+
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_MANUAL_SETPOINT').value).to.equal('');
+  });
+
+  it('should not carry a hold the caller did not have', async () => {
+    // The device exists but carries no hold: nothing to preserve.
+    const handler = buildHandler();
+    handler.gladys.device.get = fake.resolves([{ selector: 'living-room', params: [] }]);
+
+    const created = await handler.createDevice({ name: 'Salon', selector: 'living-room', features: [setpointFeature] });
+
+    expect(created.params.map((param) => param.name)).to.not.include('THERMOSTAT_MANUAL_SETPOINT');
+  });
+
+  it('should carry only the hold params the device actually has', async () => {
+    // A setpoint held with no expiry — the permanent hold of a thermostat that
+    // follows no schedule: only the one param is carried.
+    const handler = buildHandler();
+    handler.gladys.device.get = fake.resolves([
+      { selector: 'living-room', params: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '19' }] },
+    ]);
+
+    const created = await handler.createDevice({ name: 'Salon', selector: 'living-room', features: [setpointFeature] });
+
+    const names = created.params.map((param) => param.name);
+    expect(names).to.include('THERMOSTAT_MANUAL_SETPOINT');
+    expect(names).to.not.include('THERMOSTAT_MANUAL_UNTIL');
+  });
+
+  it('should survive a device that cannot be read back', async () => {
+    const handler = buildHandler();
+    handler.gladys.device.get = fake.resolves(null);
+
+    const created = await handler.createDevice({ name: 'Salon', selector: 'living-room', features: [setpointFeature] });
+
+    expect(created.name).to.equal('Salon');
+  });
+
+  it('should carry no hold onto a device being created', async () => {
+    const handler = buildHandler();
+    handler.gladys.device.get = fake.resolves([
+      { selector: 'someone-else', params: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21.5' }] },
+    ]);
+
+    // No selector yet: there is nothing of its own to carry over, and another
+    // device's hold must not leak onto it.
+    const created = await handler.createDevice({ name: 'Salon', features: [setpointFeature] });
+
+    expect(created.params.map((param) => param.name)).to.not.include('THERMOSTAT_MANUAL_SETPOINT');
+  });
+
   it('should drop params outside the thermostat namespace', async () => {
     const handler = buildHandler();
 
@@ -198,14 +285,16 @@ describe('thermostat.createDevice - external', () => {
     { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
   ];
 
-  it('should carry a preset feature, and nothing else of its own', async () => {
+  it('should carry the preset and the mode, and nothing else of its own', async () => {
     const handler = buildHandler();
 
     const created = await handler.createDevice({ name: 'Netatmo', params: externalParams });
 
-    // The real device owns its setpoint, mode and state; the preset is the one
-    // piece of state that is genuinely this integration's.
-    expect(featureTypes(created)).to.deep.equal(['preset']);
+    // The real device owns its setpoint and its running state. The preset and
+    // the mode are Gladys's own: no thermostat publishes Gladys's presets, and
+    // "stopped by Gladys" is a decision this service takes — a Netatmo does not
+    // even expose a mode of its own.
+    expect(featureTypes(created)).to.deep.equal(['preset', 'mode']);
     expect(created.service_id).to.equal('service-id');
   });
 
@@ -219,7 +308,7 @@ describe('thermostat.createDevice - external', () => {
       params: externalParams,
     });
 
-    expect(featureTypes(created)).to.deep.equal(['preset']);
+    expect(featureTypes(created)).to.deep.equal(['preset', 'mode']);
   });
 
   it('should keep the external params', async () => {

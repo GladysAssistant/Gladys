@@ -976,15 +976,11 @@ class ThermostatBox extends Component {
       const cfg = this.state.remoteConfig;
       if (preset.key === 'off') {
         // Stopping is a mode, not a preset: it switches the machine off, and the
-        // regulation loop then leaves it alone whatever the programme says. An
-        // external thermostat carries no mode feature of its own — the real
-        // device owns its mode — so it is stopped through its frost preset,
-        // which is what the loop writes to a device it has to shut down.
-        if (cfg && cfg.modeFeature) {
-          await this.writeFeature(cfg.modeFeature, THERMOSTAT_MODE.OFF);
-        } else {
-          await this.savePreset('frost');
-        }
+        // regulation loop then leaves it alone whatever the programme says.
+        // External thermostats carry this mode feature too — it is Gladys's own
+        // stop, and the server turns it into the real device's stop (its mode
+        // when it has one, plus the frost setpoint).
+        await this.writeFeature(cfg && cfg.modeFeature, THERMOSTAT_MODE.OFF);
       } else {
         await this.resumeIfStopped();
         await this.savePreset(preset.key);

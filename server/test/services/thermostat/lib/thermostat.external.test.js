@@ -347,6 +347,20 @@ describe('thermostat.regulateDevice - external', () => {
       expect(gladys.device.setValue.firstCall.args[2]).to.equal(23);
     });
 
+    it('should write a held setpoint in the unit it was set in', async () => {
+      // The hold came from the real feature — the widget dial reads its unit, and
+      // a change made on the device arrives in it. Converting it again as if it
+      // were in the thermostat's unit would command 158 °F for a 70 °F hold.
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: { 'netatmo-setpoint': { ...targetFeature(), unit: 'fahrenheit' } },
+      });
+
+      await regulate(mod, gladys, heldExternalDevice(70, { THERMOSTAT_TEMP_UNIT: 'C' }));
+
+      expect(gladys.device.setValue.firstCall.args[2]).to.equal(70);
+    });
+
     // Stopping is a mode, not a held setpoint: a transition saying `off` writes
     // the frost setpoint, which is the "stop" every thermostat understands.
     it('should write the frost setpoint on an off transition', async () => {
