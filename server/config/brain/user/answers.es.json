@@ -2,5 +2,11 @@
   {
     "label": "user.forgot-password.success",
     "answers": ["Ha solicitado restablecer su contraseña. Aquí tiene el enlace:"]
+  },
+  {
+    "label": "user.forgot-password.code",
+    "answers": [
+      "Ha solicitado restablecer su contraseña. Aquí tiene su código de un solo uso, válido durante 15 minutos, para introducir en el formulario de restablecimiento:"
+    ]
   }
 ]

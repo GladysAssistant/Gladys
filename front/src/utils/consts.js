@@ -19,7 +19,8 @@ export const CreateUserErrors = {
 
 export const ForgotPasswordStatus = {
   WrongEmailError: 'WrongEmailError',
-  UserNotFound: 'UserNotFound'
+  UserNotFound: 'UserNotFound',
+  InvalidCode: 'InvalidCode'
 };
 
 export const ResetPasswordStatus = {

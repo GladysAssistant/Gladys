@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { authenticatedRequest, request } = require('../request.test');
+const db = require('../../../models');
 
 describe('POST /user', () => {
   it('should create user', async () => {
@@ -19,6 +20,27 @@ describe('POST /user', () => {
       .then((res) => {
         expect(res.body).to.have.property('id');
       });
+  });
+  it('should record the origin the account is created from', async () => {
+    let sessionId;
+    await authenticatedRequest
+      .post('/api/v1/user')
+      .set('Origin', 'http://gladys.local:1443')
+      .send({
+        firstname: 'Tony',
+        lastname: 'Stark',
+        email: 'tony.stark@gladysassistant.com',
+        password: 'testststs',
+        birthdate: new Date('01/01/2019'),
+        language: 'en',
+        role: 'admin',
+      })
+      .expect(201)
+      .then((res) => {
+        sessionId = res.body.session_id;
+      });
+    const session = await db.Session.findOne({ where: { id: sessionId } });
+    expect(session.origin).to.equal('http://gladys.local:1443');
   });
   it('should not create user, missing email', async () => {
     await authenticatedRequest
