@@ -291,7 +291,12 @@
 
 .typePickerOption {
   display: flex;
-  align-items: center;
+  /* top-aligned, not centered: the grid stretches every option of a row to
+     the tallest one, and a centered icon/text pair would then sit at a
+     different height in each column (visible with the long labels of the
+     integration declarations). A one-line text still faces the icon's
+     middle through the min-height of the text block below. */
+  align-items: flex-start;
   gap: 0.75rem;
   width: 100%;
   min-height: 3rem;
@@ -367,14 +372,20 @@
   color: #23837a;
 }
 
+/* the integration name under the declared label, always on its own line:
+   inline after the label it wrapped in the middle of the name */
 .typePickerOptionSubtitle {
   font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.3;
   color: #6e7687;
 }
 
 .typePickerOptionText {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  min-height: 2.25rem;
   min-width: 0;
 }
 

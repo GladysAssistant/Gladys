@@ -105,13 +105,13 @@ class TypePicker extends Component {
                     <span class={style.typePickerOptionText}>
                       <span class={style.typePickerOptionLabel}>
                         {item.label}
-                        {item.subtitle && <span class={style.typePickerOptionSubtitle}> · {item.subtitle}</span>}
                         {item.deprecated && (
                           <span class={cx('badge', 'badge-danger', style.typePickerOptionBadge)}>
                             <Text id="editScene.deprecatedActionBadge" />
                           </span>
                         )}
                       </span>
+                      {item.subtitle && <span class={style.typePickerOptionSubtitle}>{item.subtitle}</span>}
                       {item.description && <span class={style.typePickerOptionDescription}>{item.description}</span>}
                     </span>
                   </button>
