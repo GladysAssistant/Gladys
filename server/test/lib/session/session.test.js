@@ -10,6 +10,32 @@ describe('session.create', () => {
     expect(res).to.have.property('refresh_token');
     expect(res).to.have.property('access_token');
     expect(res).to.have.property('session_id');
+    const sessionInDb = await db.Session.findOne({ where: { id: res.session_id } });
+    expect(sessionInDb.origin).to.equal(null);
+  });
+  it('should store the canonical origin of an authenticated session', async () => {
+    const session = new Session('secret');
+    const res = await session.create(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      ['dashboard:read'],
+      60,
+      'android',
+      'HTTP://Gladys.local:80/',
+    );
+    const sessionInDb = await db.Session.findOne({ where: { id: res.session_id } });
+    expect(sessionInDb.origin).to.equal('http://gladys.local');
+  });
+  it('should not store an invalid origin', async () => {
+    const session = new Session('secret');
+    const res = await session.create(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      ['dashboard:read'],
+      60,
+      'android',
+      'http://gladys.local/some/path',
+    );
+    const sessionInDb = await db.Session.findOne({ where: { id: res.session_id } });
+    expect(sessionInDb.origin).to.equal(null);
   });
 });
 
@@ -42,6 +68,28 @@ describe('session.getAccessToken', () => {
     const session = new Session('secret');
     const res = await session.getAccessToken('refresh-token-test', ['dashboard:read']);
     expect(res).to.have.property('access_token');
+  });
+  it('should record the origin of a session which has none yet', async () => {
+    const session = new Session('secret');
+    const res = await session.getAccessToken('refresh-token-test', ['dashboard:read'], 'https://gladys.example.com');
+    expect(res).to.have.property('access_token');
+    const sessionInDb = await db.Session.findOne({ where: { id: 'ada07710-5f25-4510-ac63-b002aca3bd32' } });
+    expect(sessionInDb.origin).to.equal('https://gladys.example.com');
+  });
+  it('should keep the origin a session already has', async () => {
+    const oneSession = await db.Session.findOne({ where: { id: 'ada07710-5f25-4510-ac63-b002aca3bd32' } });
+    await oneSession.update({ origin: 'http://gladys.local' });
+    const session = new Session('secret');
+    await session.getAccessToken('refresh-token-test', ['dashboard:read'], 'https://gladys.example.com');
+    await oneSession.reload();
+    expect(oneSession.origin).to.equal('http://gladys.local');
+  });
+  it('should not record an invalid or missing origin', async () => {
+    const session = new Session('secret');
+    await session.getAccessToken('refresh-token-test', ['dashboard:read'], 'http://gladys.local/path');
+    await session.getAccessToken('refresh-token-test', ['dashboard:read']);
+    const sessionInDb = await db.Session.findOne({ where: { id: 'ada07710-5f25-4510-ac63-b002aca3bd32' } });
+    expect(sessionInDb.origin).to.equal(null);
   });
   it('should return bad request error, refresh token is null', async () => {
     const session = new Session('secret');

@@ -89,6 +89,11 @@ function getRoutes(gladys) {
       rateLimit: true,
       controller: userController.forgotPassword,
     },
+    'post /api/v1/forgot_password/code': {
+      authenticated: false,
+      rateLimit: true,
+      controller: userController.verifyForgotPasswordCode,
+    },
     'post /api/v1/reset_password': {
       authenticated: false,
       rateLimit: true,

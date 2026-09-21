@@ -4,16 +4,20 @@ const { Error401 } = require('../../utils/httpErrors');
 const { BadParameters } = require('../../utils/coreErrors');
 const { hashRefreshToken } = require('../../utils/refreshToken');
 const { generateAccessToken } = require('../../utils/accessToken');
+const { parseOrigin } = require('../../utils/origin');
 
 /**
  * @description Create and save in database a refresh_token.
  * @param {string} refreshToken - The refresh token of the user.
  * @param {Array} scope - The scope to allow.
+ * @param {string} [origin] - Browser origin the refresh is made from. A
+ * session opened before origins were recorded learns its origin here, so
+ * password reset links keep working for it without a new login.
  * @returns {Promise} Resolving with the refreshToken.
  * @example
  * gladys.session.getAccessToken('xxxx');
  */
-async function getAccessToken(refreshToken, scope) {
+async function getAccessToken(refreshToken, scope, origin = null) {
   if (!refreshToken || refreshToken.length === 0) {
     throw new BadParameters();
   }
@@ -43,6 +47,15 @@ async function getAccessToken(refreshToken, scope) {
     if (!scopeIsAlarmWrite) {
       throw new Error401('TABLET_IS_LOCKED');
     }
+  }
+
+  // the refresh token is a proof of authentication: record the origin it is
+  // used from when the session has none yet (sessions opened before the
+  // column existed). The token stays in the origin-scoped storage of the
+  // browser, so a session only ever lives on one origin.
+  const parsedOrigin = parseOrigin(origin);
+  if (session.origin === null && parsedOrigin !== null) {
+    await session.update({ origin: parsedOrigin });
   }
 
   const accessToken = generateAccessToken(session.user_id, scope, session.id, this.jwtSecret);

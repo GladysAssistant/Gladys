@@ -19,7 +19,13 @@ export const CreateUserErrors = {
 
 export const ForgotPasswordStatus = {
   WrongEmailError: 'WrongEmailError',
-  UserNotFound: 'UserNotFound'
+  UserNotFound: 'UserNotFound',
+  InvalidCode: 'InvalidCode'
+};
+
+export const ForgotPasswordMethod = {
+  Link: 'link',
+  Code: 'code'
 };
 
 export const ResetPasswordStatus = {
