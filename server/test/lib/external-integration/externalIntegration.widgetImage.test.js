@@ -295,6 +295,34 @@ describe('externalIntegration widgets — images', () => {
       expect(externalIntegration.widgetImageSlots.get(service.id).active).to.equal(0);
     });
 
+    it('should not cache an image pulled before a lifecycle clear, and pull again after it', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const service = await seedWidgetService();
+      declareImages(externalIntegration, service, ['cleaning-map']);
+      const pending = [];
+      externalIntegration.sendCommand = fake(
+        () =>
+          new Promise((resolve) => {
+            pending.push(resolve);
+          }),
+      );
+      const before = externalIntegration.getWidgetImage(service.selector, 'cleaning-map');
+      await waitForCalls(externalIntegration.sendCommand, 1);
+      // the integration restarts: caches, in-flight commands and generations move
+      externalIntegration.clearWidgetCaches(service);
+      declareImages(externalIntegration, service, ['cleaning-map']);
+      const after = externalIntegration.getWidgetImage(service.selector, 'cleaning-map');
+      await waitForCalls(externalIntegration.sendCommand, 2);
+      expect(externalIntegration.sendCommand.callCount).to.equal(2);
+      pending[0]({ success: true, data: { image: PNG.toString('base64') } });
+      expect(await before).to.equal(`data:image/png;base64,${PNG.toString('base64')}`);
+      // the pre-clear map was served to its caller, never cached
+      expect((externalIntegration.widgetImageCache.get(service.id) || new Map()).size).to.equal(0);
+      pending[1]({ success: true, data: { image: WEBP.toString('base64') } });
+      expect(await after).to.equal(`data:image/webp;base64,${WEBP.toString('base64')}`);
+      expect(externalIntegration.widgetImageCache.get(service.id).get('cleaning-map').image).to.include('image/webp');
+    });
+
     it('should never serve one integration image keys declared by another integration', async () => {
       const { externalIntegration } = buildSupervisor();
       const service = await seedWidgetService();

@@ -236,10 +236,11 @@ class ApexChartComponent extends Component {
     this.addHiddenSeriesEvents(options);
     this.tooltipPositioning.addToOptions(options);
     // markers a caller draws on the chart (ApexCharts `annotations`: xaxis
-    // lines and points), built by the caller so the options stay generic
-    if (this.props.annotations) {
-      options.annotations = this.props.annotations;
-    }
+    // lines and points), built by the caller so the options stay generic.
+    // Always assigned: `updateOptions` merges into the live config, so a
+    // missing key would keep the previous markers on the instance; empty
+    // arrays do replace them
+    options.annotations = this.props.annotations || { xaxis: [], points: [] };
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {

@@ -114,6 +114,12 @@ function countPerMinute(limits, serviceId, max) {
   return limit.count <= max;
 }
 
+// The generation stamp of an integration's images: a pseudo widget key no
+// manifest can declare (WIDGET_KEY_REGEX has no '#'), moved by every
+// lifecycle clear like the widgets' own, so a widget.get-image started
+// before a stop never refills the image cache when it lands
+const WIDGET_IMAGE_GENERATION_KEY = '#images';
+
 /**
  * @description Generation key of a (integration, widget key) pair.
  * @param {string} serviceId - The integration service id.
@@ -188,6 +194,7 @@ function clearWidgetCaches(service) {
   // cached when it lands, and a request arriving after the restart never
   // coalesces onto it (the in-flight maps are dropped too)
   const widgetKeys = new Set([
+    WIDGET_IMAGE_GENERATION_KEY,
     ...((service.manifest && service.manifest.widgets) || []).map((widget) => widget.key),
     ...[...this.widgetGenerations.keys()]
       .filter((key) => key.startsWith(prefix))
@@ -210,6 +217,7 @@ function clearWidgetCaches(service) {
 }
 
 module.exports = {
+  WIDGET_IMAGE_GENERATION_KEY,
   getServiceMap,
   lruGet,
   lruSet,
