@@ -844,6 +844,7 @@
         "needsNewerGladys": "This widget needs a newer version of Gladys.",
         "empty": "Nothing to show right now.",
         "emptyChart": "No data for this period yet.",
+        "now": "Now",
         "confirmAction": "Run \"{{label}}\"?",
         "actionError": "The action failed."
       }

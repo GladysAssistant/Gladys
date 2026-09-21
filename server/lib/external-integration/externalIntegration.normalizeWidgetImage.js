@@ -1,7 +1,20 @@
 const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { MAX_WIDGET_IMAGE_BYTES, MAX_WIDGET_IMAGE_DIMENSION } = require('./constants');
 
-const INVALID_IMAGE_ERROR = 'EXTERNAL_INTEGRATION_INVALID_WIDGET_IMAGE';
+// One code per refusal, so the developer reads *why* an image was refused
+// (field feedback, topic 10641: poster CDNs serve files over the size cap,
+// and a single opaque code cost the author an afternoon of tracing). Each
+// error carries a core-authored `details` sentence with the measured value
+// against the bound, logged by the caller and echoed in the route's 400.
+const WIDGET_IMAGE_ERRORS = {
+  // no image, an empty string, a non-string: the integration answered nothing usable
+  INVALID: 'EXTERNAL_INTEGRATION_INVALID_WIDGET_IMAGE',
+  TOO_LARGE: 'EXTERNAL_INTEGRATION_WIDGET_IMAGE_TOO_LARGE',
+  UNSUPPORTED_FORMAT: 'EXTERNAL_INTEGRATION_WIDGET_IMAGE_UNSUPPORTED_FORMAT',
+  DIMENSIONS_EXCEEDED: 'EXTERNAL_INTEGRATION_WIDGET_IMAGE_DIMENSIONS_EXCEEDED',
+};
+const WIDGET_IMAGE_ERROR_CODES = Object.values(WIDGET_IMAGE_ERRORS);
+const MAX_WIDGET_IMAGE_KB = Math.round(MAX_WIDGET_IMAGE_BYTES / 1024);
 
 // magic numbers of the accepted formats: PNG, JPEG, and WebP (a RIFF
 // container whose type is 'WEBP' — the format every poster CDN serves)
@@ -14,6 +27,32 @@ const WEBP_MAGIC_OFFSET = 8;
 // base64 encodes 3 bytes in 4 chars: any string longer than this cannot
 // decode under the size cap, and is rejected before the decode allocates
 const MAX_BASE64_LENGTH = Math.ceil(MAX_WIDGET_IMAGE_BYTES / 3) * 4 + 4;
+
+/**
+ * @description Build the error of a refused image: the code names the rule,
+ * `details` states the measured value against the bound.
+ * @param {string} code - One of WIDGET_IMAGE_ERRORS.
+ * @param {string} details - The core-authored reason.
+ * @returns {ExternalIntegrationUnavailableError} The error to throw.
+ * @example
+ * throw imageError(WIDGET_IMAGE_ERRORS.TOO_LARGE, '378 KB received, 300 KB allowed');
+ */
+function imageError(code, details) {
+  const error = new ExternalIntegrationUnavailableError(code);
+  error.details = details;
+  return error;
+}
+
+/**
+ * @description Format a byte count in KB for the error details.
+ * @param {number} bytes - The byte count.
+ * @returns {string} The count in KB.
+ * @example
+ * toKb(387072); // '378 KB'
+ */
+function toKb(bytes) {
+  return `${Math.ceil(bytes / 1024)} KB`;
+}
 
 /**
  * @description True when the bytes start with the given magic at an offset.
@@ -133,19 +172,33 @@ const DIMENSION_READERS = {
  * gigantic bitmap in the browser; an unreadable header fails closed.
  * Returns a data URI served from the Gladys origin, re-encoded from the
  * decoded bytes so stray characters of the original base64 never reach the
- * browser.
+ * browser. Throws one of WIDGET_IMAGE_ERRORS with a `details` sentence.
  * @param {any} rawBase64 - The data.image of the command-result (no data-URI prefix).
  * @returns {string} The validated image as a data URI.
  * @example
  * const image = normalizeWidgetImage('iVBORw0KGgo...');
  */
 function normalizeWidgetImage(rawBase64) {
-  if (typeof rawBase64 !== 'string' || rawBase64.length === 0 || rawBase64.length > MAX_BASE64_LENGTH) {
-    throw new ExternalIntegrationUnavailableError(INVALID_IMAGE_ERROR);
+  if (typeof rawBase64 !== 'string' || rawBase64.length === 0) {
+    throw imageError(WIDGET_IMAGE_ERRORS.INVALID, 'no image bytes in the command result');
+  }
+  if (rawBase64.length > MAX_BASE64_LENGTH) {
+    // refused before the decode allocates: the size is the lower bound the
+    // base64 length guarantees
+    throw imageError(
+      WIDGET_IMAGE_ERRORS.TOO_LARGE,
+      `at least ${toKb((rawBase64.length * 3) / 4)} received, ${MAX_WIDGET_IMAGE_KB} KB allowed`,
+    );
   }
   const bytes = Buffer.from(rawBase64, 'base64');
-  if (bytes.length === 0 || bytes.length > MAX_WIDGET_IMAGE_BYTES) {
-    throw new ExternalIntegrationUnavailableError(INVALID_IMAGE_ERROR);
+  if (bytes.length === 0) {
+    throw imageError(WIDGET_IMAGE_ERRORS.INVALID, 'the image is not valid base64');
+  }
+  if (bytes.length > MAX_WIDGET_IMAGE_BYTES) {
+    throw imageError(
+      WIDGET_IMAGE_ERRORS.TOO_LARGE,
+      `${toKb(bytes.length)} received, ${MAX_WIDGET_IMAGE_KB} KB allowed — resize the image integration-side`,
+    );
   }
   let mimeType = null;
   if (hasMagic(bytes, PNG_MAGIC)) {
@@ -156,22 +209,28 @@ function normalizeWidgetImage(rawBase64) {
     mimeType = 'image/webp';
   }
   if (mimeType === null) {
-    throw new ExternalIntegrationUnavailableError(INVALID_IMAGE_ERROR);
+    throw imageError(WIDGET_IMAGE_ERRORS.UNSUPPORTED_FORMAT, 'not a PNG, JPEG or WebP (magic numbers)');
   }
   const dimensions = DIMENSION_READERS[mimeType](bytes);
+  if (dimensions === null) {
+    throw imageError(WIDGET_IMAGE_ERRORS.DIMENSIONS_EXCEEDED, `unreadable ${mimeType} header, pixel size unknown`);
+  }
   if (
-    dimensions === null ||
     dimensions.width < 1 ||
     dimensions.height < 1 ||
     dimensions.width > MAX_WIDGET_IMAGE_DIMENSION ||
     dimensions.height > MAX_WIDGET_IMAGE_DIMENSION
   ) {
-    throw new ExternalIntegrationUnavailableError(INVALID_IMAGE_ERROR);
+    throw imageError(
+      WIDGET_IMAGE_ERRORS.DIMENSIONS_EXCEEDED,
+      `${dimensions.width}×${dimensions.height} px, at most ${MAX_WIDGET_IMAGE_DIMENSION}×${MAX_WIDGET_IMAGE_DIMENSION} allowed`,
+    );
   }
   return `data:${mimeType};base64,${bytes.toString('base64')}`;
 }
 
 module.exports = {
   normalizeWidgetImage,
-  INVALID_IMAGE_ERROR,
+  WIDGET_IMAGE_ERRORS,
+  WIDGET_IMAGE_ERROR_CODES,
 };

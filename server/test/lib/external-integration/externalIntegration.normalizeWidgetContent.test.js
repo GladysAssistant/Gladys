@@ -252,6 +252,57 @@ describe('externalIntegration.normalizeWidgetContent', () => {
       expect(normalizeOne({ type: 'chart', device_features: ['ext:a', 42] })).to.deep.equal([]);
       expect(normalizeOne({ type: 'chart', device_features: [] })).to.deep.equal([]);
     });
+
+    it('should normalize annotations and the now marker on both chart forms', () => {
+      const points = [{ t: '2026-09-19T00:00:00Z', v: 3.2 }];
+      const annotations = Array.from({ length: 9 }, (value, index) => ({
+        t: `2026-09-19T${String(index).padStart(2, '0')}:48:00Z`,
+        value: 10.69,
+        label: { en: `High tide ${index}`, fr: `PM ${index}` },
+        color: 'primary',
+      }));
+      const [inline] = normalize([{ type: 'chart', series: [{ points }], annotations, now_marker: true }]);
+      // capped at 8, label bounded to 16 characters per language value
+      expect(inline.annotations).to.have.lengthOf(8);
+      expect(inline.annotations[0]).to.deep.equal({
+        t: '2026-09-19T00:48:00.000Z',
+        value: 10.69,
+        label: { en: 'High tide 0', fr: 'PM 0' },
+        color: 'primary',
+      });
+      expect(inline.now_marker).to.equal(true);
+      const [live] = normalize([
+        {
+          type: 'chart',
+          device_features: ['ext:tide:height'],
+          annotations: [
+            // a time alone is a vertical marker; the rest is optional
+            { t: '2026-09-19T13:59:00Z' },
+            { t: '2026-09-19T20:12:00Z', label: 'Low tide, coefficient 74', color: 'rainbow', value: 'x' },
+            // dropped: no valid time, not an object
+            { value: 1, label: 'no time' },
+            { t: 'yesterday' },
+            'nope',
+            null,
+          ],
+          now_marker: 'yes',
+        },
+      ]);
+      expect(live.annotations).to.deep.equal([
+        { t: '2026-09-19T13:59:00.000Z' },
+        { t: '2026-09-19T20:12:00.000Z', label: 'Low tide, coeff…' },
+      ]);
+      // anything but `true` is no marker; no field when nothing survived
+      expect(live).to.not.have.property('now_marker');
+      const [bare] = normalize([{ type: 'chart', series: [{ points }], annotations: [{ t: 'nope' }], now_marker: 1 }]);
+      expect(bare).to.deep.equal({
+        type: 'chart',
+        chart_type: 'line',
+        series: [{ points: [{ t: '2026-09-19T00:00:00.000Z', v: 3.2 }] }],
+      });
+      const [notArray] = normalize([{ type: 'chart', series: [{ points }], annotations: { t: '2026-09-19' } }]);
+      expect(notArray).to.not.have.property('annotations');
+    });
   });
 
   describe('card-list', () => {

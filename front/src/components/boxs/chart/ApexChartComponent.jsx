@@ -235,6 +235,11 @@ class ApexChartComponent extends Component {
     }
     this.addHiddenSeriesEvents(options);
     this.tooltipPositioning.addToOptions(options);
+    // markers a caller draws on the chart (ApexCharts `annotations`: xaxis
+    // lines and points), built by the caller so the options stay generic
+    if (this.props.annotations) {
+      options.annotations = this.props.annotations;
+    }
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
@@ -290,6 +295,7 @@ class ApexChartComponent extends Component {
     const yAxisFormatterDifferent = nextProps.y_axis_formatter !== this.props.y_axis_formatter;
     const yAxisUnitDifferent = nextProps.y_axis_unit !== this.props.y_axis_unit;
     const colorsDifferent = nextProps.colors !== this.props.colors;
+    const annotationsDifferent = nextProps.annotations !== this.props.annotations;
     if (
       seriesDifferent ||
       chartTypeDifferent ||
@@ -300,7 +306,8 @@ class ApexChartComponent extends Component {
       additionalHeightDifferent ||
       yAxisFormatterDifferent ||
       yAxisUnitDifferent ||
-      colorsDifferent
+      colorsDifferent ||
+      annotationsDifferent
     ) {
       this.displayChart();
     }

@@ -1,3 +1,4 @@
+const logger = require('../../utils/logger');
 const { NotFoundError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const {
@@ -7,7 +8,7 @@ const {
   MAX_WIDGET_IMAGE_CACHE_ENTRIES,
   MAX_WIDGET_IMAGE_IN_FLIGHT,
 } = require('./constants');
-const { normalizeWidgetImage } = require('./externalIntegration.normalizeWidgetImage');
+const { normalizeWidgetImage, WIDGET_IMAGE_ERROR_CODES } = require('./externalIntegration.normalizeWidgetImage');
 const { getServiceMap, lruGet, lruSet, acquireSlot } = require('./externalIntegration.widgetCache');
 const { toWidgetHttpError } = require('./externalIntegration.widgetErrors');
 
@@ -40,6 +41,11 @@ async function pullWidgetImage(supervisor, service, imageKey) {
     );
     return image;
   } catch (e) {
+    if (WIDGET_IMAGE_ERROR_CODES.includes(e.message)) {
+      // the developer's channel: which integration, which key, which rule,
+      // and the measured value against the bound
+      logger.warn(`Widget image ${service.selector}/${imageKey} refused: ${e.message} (${e.details})`);
+    }
     throw toWidgetHttpError(e);
   } finally {
     release();

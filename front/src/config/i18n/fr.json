@@ -844,6 +844,7 @@
         "needsNewerGladys": "Ce widget nécessite une version plus récente de Gladys.",
         "empty": "Rien à afficher pour le moment.",
         "emptyChart": "Pas encore de données sur cette période.",
+        "now": "Maintenant",
         "confirmAction": "Lancer « {{label}} » ?",
         "actionError": "L'action a échoué."
       }

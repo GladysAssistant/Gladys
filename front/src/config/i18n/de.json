@@ -844,6 +844,7 @@
         "needsNewerGladys": "Dieses Widget benötigt eine neuere Gladys-Version.",
         "empty": "Derzeit nichts anzuzeigen.",
         "emptyChart": "Noch keine Daten für diesen Zeitraum.",
+        "now": "Jetzt",
         "confirmAction": "„{{label}}“ ausführen?",
         "actionError": "Die Aktion ist fehlgeschlagen."
       }
