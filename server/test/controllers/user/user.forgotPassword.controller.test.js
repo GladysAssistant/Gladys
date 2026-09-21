@@ -63,10 +63,10 @@ describe('user.controller forgotPassword', () => {
       'http://localhost:1444/reset-password?token=reset-token',
     );
     sinonAssert.calledOnce(res.json);
-    expect(res.json.firstCall.args[0]).to.deep.equal({ success: true, method: 'link' });
+    expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
   });
 
-  it('should send the one-time code and return the method', async () => {
+  it('should send the one-time code without telling which method was used', async () => {
     gladys.user.forgotPassword = fake.resolves({
       method: 'code',
       code: 'ABCD-EFGH',
@@ -83,7 +83,7 @@ describe('user.controller forgotPassword', () => {
     sinonAssert.calledTwice(gladys.message.sendToUser);
     sinonAssert.calledWith(gladys.message.sendToUser.firstCall, 'tony', 'Password reset instructions');
     sinonAssert.calledWith(gladys.message.sendToUser.secondCall, 'tony', 'ABCD-EFGH');
-    expect(res.json.firstCall.args[0]).to.deep.equal({ success: true, method: 'code' });
+    expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
   });
 
   it('should fall back to English when the brain has no answer in the language of the user', async () => {
@@ -106,7 +106,7 @@ describe('user.controller forgotPassword', () => {
     sinonAssert.calledWith(gladys.brain.getReply.firstCall, 'de', 'user.forgot-password.success', {});
     sinonAssert.calledWith(gladys.brain.getReply.secondCall, 'en', 'user.forgot-password.success', {});
     sinonAssert.calledWith(gladys.message.sendToUser.firstCall, 'tony', 'English instructions');
-    expect(res.json.firstCall.args[0]).to.deep.equal({ success: true, method: 'link' });
+    expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
   });
 
   it('should still return success when sending forgot password message fails', async () => {
@@ -117,7 +117,7 @@ describe('user.controller forgotPassword', () => {
 
     sinonAssert.calledOnce(gladys.message.sendToUser);
     sinonAssert.calledOnce(res.json);
-    expect(res.json.firstCall.args[0]).to.deep.equal({ success: true, method: 'link' });
+    expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
   });
 
   it('should exchange the code for a reset token', async () => {

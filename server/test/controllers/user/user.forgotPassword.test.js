@@ -27,10 +27,15 @@ describe('POST /api/v1/forgot_password', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.deep.equal({ success: true, method: 'link' });
+        expect(res.body).to.deep.equal({ success: true });
       });
+    // a link was sent: no code is pending and a reset session exists
     // @ts-ignore
     expect(global.TEST_GLADYS_INSTANCE.user.forgotPasswordCodes.size).to.equal(0);
+    const resetSessions = await db.Session.findAll({
+      where: { user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5', scope: 'reset-password:write' },
+    });
+    expect(resetSessions).to.have.lengthOf(2); // the seeded one and the new one
   });
   it('should send a code when the origin is unknown', async () => {
     await request
@@ -42,12 +47,14 @@ describe('POST /api/v1/forgot_password', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.deep.equal({ success: true, method: 'code' });
+        expect(res.body).to.deep.equal({ success: true });
       });
     const resetSessions = await db.Session.findAll({
       where: { user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5', scope: 'reset-password:write' },
     });
     expect(resetSessions).to.have.lengthOf(1); // the seeded one only
+    // @ts-ignore
+    expect(global.TEST_GLADYS_INSTANCE.user.forgotPasswordCodes.size).to.equal(1);
   });
   it('should return 404 not found', async () => {
     await request

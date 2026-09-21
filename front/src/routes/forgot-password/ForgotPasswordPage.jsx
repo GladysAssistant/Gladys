@@ -1,14 +1,11 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
-import { RequestStatus, ForgotPasswordStatus, ForgotPasswordMethod } from '../../utils/consts';
+import { RequestStatus, ForgotPasswordStatus } from '../../utils/consts';
 import AuthLayout from '../../components/auth/AuthLayout';
 
 const ForgotPasswordPage = ({ children, ...props }) => {
-  const codeSent =
-    props.forgotPasswordStatus === RequestStatus.Success && props.forgotPasswordMethod === ForgotPasswordMethod.Code;
-  const linkSent =
-    props.forgotPasswordStatus === RequestStatus.Success && props.forgotPasswordMethod === ForgotPasswordMethod.Link;
+  const codeSent = props.forgotPasswordStatus === RequestStatus.Success;
   return (
     <AuthLayout titleId="forgotPassword.title">
       <form onSubmit={codeSent ? props.verifyCode : props.forgotPassword} class="card">
@@ -25,18 +22,9 @@ const ForgotPasswordPage = ({ children, ...props }) => {
                 <Text id="forgotPassword.cardTitle" />
               </div>
 
-              {linkSent && (
-                <div class="alert alert-success" role="alert">
-                  <Text id="forgotPassword.success" />
-                  <br />
-                  <br />
-                  <Text id="forgotPassword.howToAccessLogs" />
-                </div>
-              )}
-
               {codeSent && (
                 <div class="alert alert-success" role="alert">
-                  <Text id="forgotPassword.successCode" />
+                  <Text id="forgotPassword.success" />
                   <br />
                   <br />
                   <Text id="forgotPassword.howToAccessLogs" />
@@ -94,7 +82,7 @@ const ForgotPasswordPage = ({ children, ...props }) => {
                   </div>
                   <div class="form-footer">
                     <button
-                      onClick={props.forgotPassword}
+                      type="submit"
                       class="btn btn-primary btn-block"
                       disabled={props.forgotPasswordStatus === RequestStatus.Getting}
                     >
@@ -152,7 +140,7 @@ const ForgotPasswordPage = ({ children, ...props }) => {
                   </div>
                   <div class="form-footer">
                     <button
-                      onClick={props.verifyCode}
+                      type="submit"
                       class="btn btn-primary btn-block"
                       disabled={props.verifyCodeStatus === RequestStatus.Getting}
                     >

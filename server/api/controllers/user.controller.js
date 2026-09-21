@@ -171,7 +171,7 @@ module.exports = function UserController(gladys) {
    */
   async function getAccessToken(req, res) {
     const scope = req.body.scope || ['dashboard:write', 'dashboard:read'];
-    const session = await gladys.session.getAccessToken(req.body.refresh_token, scope, req.headers.origin);
+    const session = await gladys.session.getAccessToken(req.body.refresh_token, scope);
     res.json(session);
   }
 
@@ -181,14 +181,13 @@ module.exports = function UserController(gladys) {
    * @apiGroup User
    * @apiParam {string} email Email of the user
    * @apiParam {string} origin Origin the front is served from (window.location.origin)
-   * @apiSuccess {string="link","code"} method "link" when a reset link was sent (the
-   * origin was already used by an authenticated session of this instance),
-   * "code" when a one-time code was sent instead, to type on the reset form.
    * @apiSuccessExample {json} Success-Example
    * {
-   *   "success": true,
-   *   "method": "link"
+   *   "success": true
    * }
+   * @apiDescription Sends the user a reset link when the origin is used by a live
+   * session of this user, a one-time code otherwise. The answer does not tell which,
+   * so the origins the user works from cannot be enumerated from this route.
    */
   async function forgotPassword(req, res) {
     const { method, link, code, user } = await gladys.user.forgotPassword(
@@ -209,7 +208,6 @@ module.exports = function UserController(gladys) {
     logger.info(`Forgot password initiated for user ${req.body.email}, ${method} = ${secret}`);
     res.json({
       success: true,
-      method,
     });
   }
 

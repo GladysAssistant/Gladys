@@ -4,7 +4,7 @@ import { route } from 'preact-router';
 import get from 'get-value';
 
 import validateEmail from '../../utils/validateEmail';
-import { ForgotPasswordStatus, ForgotPasswordMethod, RequestStatus } from '../../utils/consts';
+import { ForgotPasswordStatus, RequestStatus } from '../../utils/consts';
 import ForgotPasswordPage from './ForgotPasswordPage';
 
 class ForgotPassword extends Component {
@@ -12,6 +12,10 @@ class ForgotPassword extends Component {
     const { forgotPasswordEmail } = this.state;
     if (e) {
       e.preventDefault();
+    }
+
+    if (this.state.forgotPasswordStatus === RequestStatus.Getting) {
+      return null;
     }
 
     if (!validateEmail(forgotPasswordEmail)) {
@@ -22,22 +26,20 @@ class ForgotPassword extends Component {
 
     this.setState({
       forgotPasswordStatus: RequestStatus.Getting,
-      forgotPasswordMethod: null
+      verifyCodeStatus: null
     });
 
     try {
-      const { method } = await this.props.httpClient.post('/api/v1/forgot_password', {
+      // the server sends a reset link when this origin is used by a live
+      // session of the user, a one-time code otherwise, and does not say
+      // which: the code form is shown in both cases, a link is simply clicked
+      await this.props.httpClient.post('/api/v1/forgot_password', {
         email: forgotPasswordEmail,
         origin: window.location.origin
       });
 
       this.setState({
-        forgotPasswordStatus: RequestStatus.Success,
-        // "link": the reset link was sent. "code": this origin has never been
-        // used to log in to the instance, so a one-time code was sent instead
-        // and is typed here, on the instance the user is on.
-        forgotPasswordMethod:
-          method === ForgotPasswordMethod.Code ? ForgotPasswordMethod.Code : ForgotPasswordMethod.Link
+        forgotPasswordStatus: RequestStatus.Success
       });
     } catch (e) {
       const status = get(e, 'response.status');
@@ -65,6 +67,12 @@ class ForgotPassword extends Component {
     const { forgotPasswordEmail, forgotPasswordCode } = this.state;
     if (e) {
       e.preventDefault();
+    }
+
+    // one request at a time: the code is single use, a second request in
+    // flight would consume it and fail
+    if (this.state.verifyCodeStatus === RequestStatus.Getting) {
+      return null;
     }
 
     if (!forgotPasswordCode || forgotPasswordCode.trim().length === 0) {

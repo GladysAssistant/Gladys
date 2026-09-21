@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { Op } = require('sequelize');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { NotFoundError } = require('../../utils/coreErrors');
@@ -45,17 +46,27 @@ function normalizeResetCode(code) {
 }
 
 /**
- * @description Tell whether an origin was already used by an authenticated
- * session of this instance, so a reset link may safely point to it.
+ * @description Tell whether an origin is currently used by a live authenticated
+ * session of this user, so a reset link may safely point to it. Only the
+ * sessions of the user whose password is reset count: another account of the
+ * instance must not be able to make an origin trusted for this one. Revoked
+ * and expired sessions do not count either: a hostname used once must not stay
+ * a valid link target forever, it may point somewhere else by now.
+ * @param {string} userId - Id of the user whose password is reset.
  * @param {string} origin - The canonical origin.
- * @returns {Promise<boolean>} True when a session was opened from this origin.
+ * @returns {Promise<boolean>} True when a live session of the user was opened from this origin.
  * @example
- * await isKnownOrigin('https://gladys.example.com');
+ * await isKnownOrigin('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'https://gladys.example.com');
  */
-async function isKnownOrigin(origin) {
+async function isKnownOrigin(userId, origin) {
   const count = await db.Session.count({
     where: {
+      user_id: userId,
       origin,
+      revoked: false,
+      valid_until: {
+        [Op.gt]: new Date(),
+      },
     },
   });
   return count > 0;
@@ -63,8 +74,8 @@ async function isKnownOrigin(origin) {
 
 /**
  * @description Start a password reset for a user. When the origin the request
- * comes from was already used by an authenticated session of the instance, a
- * reset link pointing to that origin is generated. Otherwise, so a link can
+ * comes from is used by a live authenticated session of this user, a reset
+ * link pointing to that origin is generated. Otherwise, so a link can
  * never point to a host chosen by whoever filled the form, a short one-time
  * code is generated instead: the user types it on the instance he is on.
  * @param {string} email - Email of the user who forgot his password.
@@ -95,7 +106,7 @@ async function forgotPassword(email, useragent, origin = null) {
   delete userPlain.password;
   const parsedOrigin = parseOrigin(origin);
 
-  if (parsedOrigin !== null && (await isKnownOrigin(parsedOrigin))) {
+  if (parsedOrigin !== null && (await isKnownOrigin(user.id, parsedOrigin))) {
     // generate a session token, without origin: this session is not an
     // authenticated one and must not make any origin trusted
     const scope = ['reset-password:write'];

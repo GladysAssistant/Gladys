@@ -23,11 +23,6 @@ export const ForgotPasswordStatus = {
   InvalidCode: 'InvalidCode'
 };
 
-export const ForgotPasswordMethod = {
-  Link: 'link',
-  Code: 'code'
-};
-
 export const ResetPasswordStatus = {
   ResetTokenNotFound: 'ResetTokenNotFound'
 };
