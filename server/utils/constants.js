@@ -2048,6 +2048,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
     WEBHOOK_REQUEST: 'external-integration.webhook.request',
     WEBHOOK_UPDATED: 'external-integration.webhook-updated',
+    // dashboard widgets declared by integrations (capabilities/dashboard-widgets.md)
+    WIDGET_GET: 'external-integration.widget.get',
+    WIDGET_GET_IMAGE: 'external-integration.widget.get-image',
+    WIDGET_ACTION: 'external-integration.widget.action',
+    WIDGET_REFRESH: 'external-integration.widget.refresh',
+    WIDGET_UPDATED: 'external-integration.widget-updated',
   },
 };
 
@@ -2084,6 +2090,8 @@ const DASHBOARD_BOX_TYPE = {
   CHIPS: 'chips',
   HOUSE_VIEW: 'house-view',
   ACTIONS: 'actions',
+  // one core box type serving every widget declared by an external integration
+  EXTERNAL_WIDGET: 'external-widget',
 };
 
 const DASHBOARD_WIDTH = {
@@ -2111,6 +2119,9 @@ const ERROR_MESSAGES = {
   INVALID_ACCESS_TOKEN: 'INVALID_ACCESS_TOKEN',
   NO_CONNECTED_TO_THE_INTERNET: 'NO_CONNECTED_TO_THE_INTERNET',
   GLADYS_PLUS_PAYMENT_REQUIRED: 'GLADYS_PLUS_PAYMENT_REQUIRED',
+  // an integration widget answered with a content version this Gladys does
+  // not render: the remedy is on the user's side (upgrade), not the integration's
+  WIDGET_CONTENT_VERSION_UNSUPPORTED: 'WIDGET_CONTENT_VERSION_UNSUPPORTED',
 };
 
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES = {

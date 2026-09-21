@@ -171,6 +171,11 @@ function init() {
             this.gladys.externalIntegration.handleWeatherRefresh(integrationService);
           }
           break;
+        case WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WIDGET_REFRESH:
+          if (integrationService) {
+            this.gladys.externalIntegration.handleWidgetRefresh(integrationService, parsedMessage.payload);
+          }
+          break;
         default:
           logger.debug(`Message type not handled`);
       }
