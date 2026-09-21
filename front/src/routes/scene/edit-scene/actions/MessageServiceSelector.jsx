@@ -5,6 +5,7 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { MESSAGE_GLADYS_ONLY_SERVICE } from '../../../../../../server/utils/constants';
 
 const ALL_SERVICES_VALUE = '__all__';
 
@@ -30,6 +31,11 @@ const toI18nKey = name => name.replace(/-([a-z])/g, (match, letter) => letter.to
  * the message is broadcast to every messaging channel the user configured.
  * That case is represented by the first option, so an existing scene opened
  * in the editor shows "All configured services" without being rewritten.
+ *
+ * The second option is the opposite choice: keep the message in the Gladys
+ * conversation only. It is the only way to write a message that installing a
+ * messaging integration later cannot turn into a text message, and it stays
+ * available even when the user has no messaging channel at all.
  */
 class MessageServiceSelector extends Component {
   buildName = service => {
@@ -120,16 +126,26 @@ class MessageServiceSelector extends Component {
       label: <Text id="editScene.actionsCard.messageSend.allServicesLabel" />,
       value: ALL_SERVICES_VALUE
     };
-    const options = [allServicesOption, ...serviceOptions];
-    const selectedOption = currentService
-      ? // a channel saved in the scene but no longer listed (service removed
-        // or uninstalled) still needs to be readable: translate what we can
-        // and mark it unavailable, rather than showing a raw technical name
-        serviceOptions.find(option => option.value === currentService) || {
-          label: this.buildLabel({ name: currentService, status: null }),
-          value: currentService
-        }
-      : allServicesOption;
+    const gladysOnlyOption = {
+      label: <Text id="editScene.actionsCard.messageSend.gladysOnlyLabel" />,
+      value: MESSAGE_GLADYS_ONLY_SERVICE
+    };
+    const options = [allServicesOption, gladysOnlyOption, ...serviceOptions];
+    let selectedOption;
+    if (!currentService) {
+      selectedOption = allServicesOption;
+    } else if (currentService === MESSAGE_GLADYS_ONLY_SERVICE) {
+      // not a service name: it never appears in the list returned by the server
+      selectedOption = gladysOnlyOption;
+    } else {
+      // a channel saved in the scene but no longer listed (service removed
+      // or uninstalled) still needs to be readable: translate what we can
+      // and mark it unavailable, rather than showing a raw technical name
+      selectedOption = serviceOptions.find(option => option.value === currentService) || {
+        label: this.buildLabel({ name: currentService, status: null }),
+        value: currentService
+      };
+    }
     return (
       <div class="form-group">
         <label class="form-label">

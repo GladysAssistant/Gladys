@@ -4,6 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 const EventEmitter = require('events');
 const MessageHandler = require('../../../lib/message');
+const { MESSAGE_GLADYS_ONLY_SERVICE } = require('../../../utils/constants');
 
 describe('message.reply', () => {
   const eventEmitter = new EventEmitter();
@@ -125,6 +126,45 @@ describe('message.reply', () => {
     expect(telegramService.message.sendToUser.firstCall.args[1]).to.have.property('text', 'hey!');
     assert.calledOnce(nextCloudTalkService.message.sendToUser);
     assert.calledOnce(callmebotService.message.sendToUser);
+  });
+  it('should keep an AI answer in the Gladys conversation only', async () => {
+    await messageHandler.reply(
+      {
+        language: 'en',
+        source: 'AI',
+        source_user_id: 'XXXX',
+        service: MESSAGE_GLADYS_ONLY_SERVICE,
+        user: {
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          language: 'en',
+        },
+      },
+      'hey!',
+      {},
+    );
+    // the message is in database and on the websocket, but no channel was called
+    assert.notCalled(telegramService.message.sendToUser);
+    assert.notCalled(nextCloudTalkService.message.sendToUser);
+    assert.notCalled(callmebotService.message.sendToUser);
+  });
+  it('should send an AI answer to the single channel chosen by the scene', async () => {
+    await messageHandler.reply(
+      {
+        language: 'en',
+        source: 'AI',
+        source_user_id: 'XXXX',
+        service: 'telegram',
+        user: {
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          language: 'en',
+        },
+      },
+      'hey!',
+      {},
+    );
+    assert.calledOnce(telegramService.message.sendToUser);
+    assert.notCalled(nextCloudTalkService.message.sendToUser);
+    assert.notCalled(callmebotService.message.sendToUser);
   });
   it('should still reply through the other channels when one fails', async () => {
     telegramService.message.sendToUser = fake.rejects(new Error('CHANNEL_DOWN'));
