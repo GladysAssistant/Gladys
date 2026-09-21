@@ -259,7 +259,13 @@ class DeviceSetValue extends Component {
       );
     }
 
-    if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.FAN.MODE) {
+    // The category matters as much as the type here: `mode` is the type of five
+    // categories (cube, air conditioning, fan, thermostat, water heater), so
+    // testing the type alone handed every one of them the fan's speeds.
+    if (
+      this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.FAN &&
+      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.FAN.MODE
+    ) {
       return <SelectFanMode updateValue={this.handleNewPureValue} value={this.props.action.value} />;
     }
 
