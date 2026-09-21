@@ -19,21 +19,36 @@ const DISCRETE_SETTING_TYPES = ['boolean', 'select', 'multi_select'];
 class EditExternalWidgetBox extends Component {
   state = { declaration: undefined, dynamicOptions: {} };
 
+  // the widget of the box can change while a load is pending: only the
+  // latest request may write, so a slow answer never shows another
+  // integration's devices
+  loadRequestId = 0;
+
   loadDeclaration = async () => {
     const { box, httpClient } = this.props;
+    this.loadRequestId += 1;
+    const requestId = this.loadRequestId;
     try {
       const widgets = await loadWidgetList(httpClient);
       const declaration = findWidgetDeclaration(widgets, box.integration, box.widget);
+      if (requestId !== this.loadRequestId) {
+        return;
+      }
       this.setState({ declaration });
       if (declaration && (declaration.settings || []).some(field => field.source === 'devices')) {
         const devices = await httpClient.get(`/api/v1/service/${encodeURIComponent(box.integration)}/device`);
+        if (requestId !== this.loadRequestId) {
+          return;
+        }
         this.setState({
           dynamicOptions: { devices: devices.map(device => ({ value: device.external_id, label: device.name })) }
         });
       }
     } catch (e) {
       console.error(e);
-      this.setState({ declaration: null });
+      if (requestId === this.loadRequestId) {
+        this.setState({ declaration: null });
+      }
     }
   };
 

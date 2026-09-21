@@ -175,7 +175,10 @@ export class LazyWidgetImage extends Component {
     }
   }
 
-  // another key: the frame empties and the new image loads
+  // another key: the frame empties and the new image loads; the answer of
+  // the previous key, if still pending, is ignored
+  imageGeneration = 0;
+
   reload = () => {
     this.setState({ src: null, error: false });
     this.load();
@@ -201,15 +204,17 @@ export class LazyWidgetImage extends Component {
 
   load = async () => {
     const { httpClient, selector, imageKey } = this.props;
+    this.imageGeneration += 1;
+    const generation = this.imageGeneration;
     try {
       const { image } = await httpClient.get(
         `/api/v1/external_integration/${encodeURIComponent(selector)}/image/${encodeURIComponent(imageKey)}`
       );
-      if (!this.unmounted) {
+      if (!this.unmounted && generation === this.imageGeneration) {
         this.setState({ src: image, error: false });
       }
     } catch (e) {
-      if (!this.unmounted) {
+      if (!this.unmounted && generation === this.imageGeneration) {
         this.setState({ error: true });
       }
     }
@@ -418,6 +423,10 @@ const buildAnnotations = (component, series, language, nowLabel) => {
 export class WidgetChart extends Component {
   state = { series: null };
 
+  // one generation per content: a history load started for a previous
+  // content never replaces the current curve, nor writes after unmount
+  seriesGeneration = 0;
+
   componentDidMount() {
     this.loadSeries();
   }
@@ -426,6 +435,10 @@ export class WidgetChart extends Component {
     if (previousProps.component !== this.props.component) {
       this.loadSeries();
     }
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true;
   }
 
   // series and markers are built once per content: ApexCharts redraws on a
@@ -438,6 +451,8 @@ export class WidgetChart extends Component {
 
   loadSeries = async () => {
     const { component, httpClient, language, deviceNamesBySelector } = this.props;
+    this.seriesGeneration += 1;
+    const generation = this.seriesGeneration;
     if (component.series) {
       const series = component.series.map((oneSeries, index) => ({
         name: text(oneSeries.name, language) || `${index + 1}`,
@@ -455,6 +470,9 @@ export class WidgetChart extends Component {
         max_states: 100,
         device_features: component.device_feature_selectors.join(',')
       });
+      if (this.unmounted || generation !== this.seriesGeneration) {
+        return;
+      }
       this.setSeries(
         data.map((oneFeature, index) => ({
           name:
@@ -467,7 +485,9 @@ export class WidgetChart extends Component {
       );
     } catch (e) {
       console.error(e);
-      this.setState({ series: [], annotations: undefined });
+      if (!this.unmounted && generation === this.seriesGeneration) {
+        this.setState({ series: [], annotations: undefined });
+      }
     }
   };
 
@@ -480,7 +500,7 @@ export class WidgetChart extends Component {
       <div>
         {component.title && <div class={cx(style.caption, 'mb-1')}>{text(component.title, language)}</div>}
         {isEmpty ? (
-          <div class="text-muted small">
+          <div class="text-muted small" role="status">
             <Text id="dashboard.boxes.external-widget.emptyChart" />
           </div>
         ) : (

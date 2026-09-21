@@ -670,7 +670,7 @@ function normalizeButtonComponent(raw) {
       return null;
     }
     const params = isPlainObject(raw.action.params) ? raw.action.params : {};
-    if (JSON.stringify(params).length > MAX_WIDGET_ACTION_PARAMS_BYTES) {
+    if (Buffer.byteLength(JSON.stringify(params), 'utf8') > MAX_WIDGET_ACTION_PARAMS_BYTES) {
       return null;
     }
     component.action = { key: raw.action.key, params, confirm: raw.action.confirm === true };
@@ -789,7 +789,7 @@ function normalizeWidgetContent(payload, context = 'widget') {
   if (!isPlainObject(payload)) {
     throw new ExternalIntegrationUnavailableError(INVALID_CONTENT_ERROR);
   }
-  if (JSON.stringify(payload).length > MAX_WIDGET_CONTENT_BYTES) {
+  if (Buffer.byteLength(JSON.stringify(payload), 'utf8') > MAX_WIDGET_CONTENT_BYTES) {
     throw new ExternalIntegrationUnavailableError(INVALID_CONTENT_ERROR);
   }
   const version = payload.version === undefined ? 1 : payload.version;

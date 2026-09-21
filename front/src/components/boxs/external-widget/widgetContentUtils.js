@@ -58,18 +58,23 @@ export const formatNumber = (value, language) => {
   }
 };
 
-// ISO dates are formatted in the user's locale; a midnight UTC date (the
-// "2026-10-07" of a release) shows as a day, anything else as a day and time
+// ISO dates are formatted in the user's locale. A calendar date (the
+// "2026-10-07" of a release, which the core re-serializes as midnight UTC)
+// is a day, not an instant: it is read as a local day so it never shifts to
+// the day before west of Greenwich, and shows without a time; anything else
+// shows as a day and time in the user's timezone
+const CALENDAR_DATE_REGEX = /^(\d{4}-\d{2}-\d{2})(T00:00:00(\.000)?Z)?$/;
+
 export const formatDate = (value, language) => {
   if (!value) {
     return '';
   }
-  const date = dayjs(value);
+  const calendarDate = CALENDAR_DATE_REGEX.exec(value);
+  const date = calendarDate ? dayjs(calendarDate[1]) : dayjs(value);
   if (!date.isValid()) {
     return '';
   }
-  const isMidnightUtc = /T00:00:00(\.000)?Z$/.test(value);
-  return date.locale(language).format(isMidnightUtc ? 'll' : 'lll');
+  return date.locale(language).format(calendarDate ? 'll' : 'lll');
 };
 
 // The chart box interval enum, in minutes (the span the history route needs)

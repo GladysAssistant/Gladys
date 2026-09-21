@@ -182,7 +182,13 @@ class ExternalWidgetBox extends Component {
 
   // --- live device bindings -------------------------------------------------
 
+  // one generation per content: a device load started for a previous
+  // content never overwrites the features of the current one
+  featuresGeneration = 0;
+
   loadFeatures = async components => {
+    this.featuresGeneration += 1;
+    const generation = this.featuresGeneration;
     const selectors = collectFeatureSelectors(components);
     if (selectors.length === 0) {
       return;
@@ -191,7 +197,7 @@ class ExternalWidgetBox extends Component {
       const devices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_selectors: selectors.join(',')
       });
-      if (this.unmounted) {
+      if (this.unmounted || generation !== this.featuresGeneration) {
         return;
       }
       const featuresBySelector = {};
@@ -209,11 +215,12 @@ class ExternalWidgetBox extends Component {
   };
 
   onDeviceNewState = payload => {
-    const { featuresBySelector } = this.state;
-    if (!featuresBySelector[payload.device_feature_selector]) {
+    if (!this.state.featuresBySelector[payload.device_feature_selector]) {
       return;
     }
-    this.setState({
+    // functional update: two states of two features arriving in one tick
+    // must both land, whatever the render batching does
+    this.setState(({ featuresBySelector }) => ({
       featuresBySelector: {
         ...featuresBySelector,
         [payload.device_feature_selector]: {
@@ -222,13 +229,13 @@ class ExternalWidgetBox extends Component {
           last_value_changed: payload.last_value_changed
         }
       }
-    });
+    }));
   };
 
   // --- buttons --------------------------------------------------------------
 
   setPending = (index, value) => {
-    this.setState({ pending: { ...this.state.pending, [index]: value } });
+    this.setState(({ pending }) => ({ pending: { ...pending, [index]: value } }));
   };
 
   showActionMessage = message => {
@@ -339,7 +346,7 @@ class ExternalWidgetBox extends Component {
 
   renderState(messageId, { icon = 'info', hint, detail, retry, children } = {}) {
     return (
-      <div class={style.stateBox} data-cy="external-widget-state">
+      <div class={style.stateBox} data-cy="external-widget-state" role="status">
         <div>
           <i class={`fe fe-${icon} mr-2`} />
           <Text id={messageId} />
@@ -424,6 +431,7 @@ class ExternalWidgetBox extends Component {
           <div
             class={cx(style.actionMessage, { 'text-danger': actionMessage.error })}
             data-cy="external-widget-action-message"
+            role="status"
           >
             {actionMessage.error && <Text id="dashboard.boxes.external-widget.actionError" />}
             {actionMessage.error && actionMessage.text ? ' — ' : ''}

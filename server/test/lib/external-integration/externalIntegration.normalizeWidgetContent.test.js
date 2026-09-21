@@ -51,9 +51,12 @@ describe('externalIntegration.normalizeWidgetContent', () => {
       expect(normalizeWidgetContent({ components: [], ttl_seconds: '300' }).ttl_seconds).to.equal(60);
     });
 
-    it('should refuse a raw content above 256 KB', () => {
+    it('should refuse a raw content above 256 KB, counted in UTF-8 bytes', () => {
       const description = 'x'.repeat(300 * 1024);
       expectInvalid({ components: [{ type: 'card-list', items: [{ title: 'Big', description }] }] });
+      // 140 K characters but 280 KB once encoded: the bound is on bytes
+      const multibyte = 'é'.repeat(140 * 1024);
+      expectInvalid({ components: [{ type: 'card-list', items: [{ title: 'Big', description: multibyte }] }] });
     });
 
     it('should accept an empty components array', () => {
@@ -436,6 +439,8 @@ describe('externalIntegration.normalizeWidgetContent', () => {
           { type: 'button', label: 'Bad key', action: { key: 'Start!' } },
           { type: 'button', label: 'Not object', action: 'start' },
           { type: 'button', label: 'Big params', action: { key: 'big', params: { blob: 'x'.repeat(1100) } } },
+          // 600 characters, 1200 bytes: the params bound counts UTF-8 bytes
+          { type: 'button', label: 'Multibyte', action: { key: 'wide', params: { blob: 'é'.repeat(600) } } },
           { type: 'button', label: 'Defaults', action: { key: 'ok', params: 'nope', confirm: 'yes' } },
         ]),
       ).to.deep.equal([
