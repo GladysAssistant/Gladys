@@ -656,6 +656,10 @@ const EVENTS = {
     CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     CLEAN_IMAGES: 'external-integration.clean-images',
+    // scene trigger declared by an external integration (scene_triggers of
+    // the manifest): the integration selector and the declared key travel
+    // as fields, one generic type for every integration
+    SCENE_EVENT: 'external-integration.scene-event',
   },
 };
 
@@ -796,6 +800,11 @@ const ACTIONS = {
   },
   SMS: {
     SEND: 'sms.send',
+  },
+  EXTERNAL_INTEGRATION: {
+    // scene action declared by an external integration (scene_actions of
+    // the manifest), relayed to its container over WebSocket
+    SCENE_ACTION: 'external-integration.scene-action',
   },
   VARIABLE: {
     SET: 'variable.set',
@@ -2048,6 +2057,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
     WEBHOOK_REQUEST: 'external-integration.webhook.request',
     WEBHOOK_UPDATED: 'external-integration.webhook-updated',
+    SCENE_ACTION_RUN: 'external-integration.scene-action.run',
     // dashboard widgets declared by integrations (capabilities/dashboard-widgets.md)
     WIDGET_GET: 'external-integration.widget.get',
     WIDGET_GET_IMAGE: 'external-integration.widget.get-image',

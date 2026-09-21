@@ -2,14 +2,40 @@ const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
 const {
   ACTION_LIST,
   ACTIONS,
+  EVENTS,
   EVENT_LIST,
   ALARM_MODES_LIST,
   TRIGGER_OPERATORS,
   ANY_CHANGE_OPERATOR,
 } = require('../utils/constants');
-const { WEATHER_ALERT_TYPES, WEATHER_ALERT_SEVERITIES } = require('../lib/external-integration/constants');
+const {
+  WEATHER_ALERT_TYPES,
+  WEATHER_ALERT_SEVERITIES,
+  MAX_SCENE_DECLARATION_FIELDS,
+} = require('../lib/external-integration/constants');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
+
+// Values of the trigger filters / action parameters of an integration-declared
+// scene trigger or action (external-integration.scene-event / scene-action).
+// Validated for their SHAPE only: the manifest is consulted at execution
+// time, never at save time, so a scene still loads and saves when its
+// integration is uninstalled or stopped — exactly like a scene referencing a
+// deleted device. Nested under `fields` to stay out of the flat trigger/action
+// namespace (cancelTriggers reacts to a top-level `topic`, for one).
+const sceneDeclarationKeySchema = Joi.string().regex(/^[a-z0-9_]+$/);
+const sceneDeclarationFieldsSchema = Joi.object()
+  .pattern(
+    /^[a-z0-9_]+$/,
+    Joi.alternatives().try(
+      Joi.string().allow(''),
+      Joi.number(),
+      Joi.boolean(),
+      Joi.valid(null),
+      Joi.array().items(Joi.string(), Joi.number()),
+    ),
+  )
+  .max(MAX_SCENE_DECLARATION_FIELDS);
 
 const actionSchema = Joi.object()
   .keys({
@@ -106,11 +132,21 @@ const actionSchema = Joi.object()
       .integer()
       .min(1)
       .max(10000),
+    // scene action declared by an external integration: its selector, the
+    // declared key (not `key`, see the trigger note) and the parameters
+    integration: Joi.string(),
+    action_key: sceneDeclarationKeySchema,
+    fields: sceneDeclarationFieldsSchema,
   })
   // A "variable.set" action holds either a text or a formula, never both: the runtime
   // would only evaluate the formula and silently drop the text.
   .when(Joi.object({ type: Joi.valid(ACTIONS.VARIABLE.SET) }).unknown(), {
     then: Joi.object().oxor('text', 'evaluate_value'),
+  })
+  // An integration-declared action without its target is unrunnable: the
+  // selector and the declared key are the only way to resolve it at execution
+  .when(Joi.object({ type: Joi.valid(ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION) }).unknown(), {
+    then: Joi.object({ integration: Joi.required(), action_key: Joi.required() }),
   })
   .id('action');
 
@@ -167,6 +203,13 @@ const triggerSchema = Joi.object()
     // weather-alert triggers (B.18): phenomenon type filter and minimal severity
     weather_alert_type: Joi.string().valid(...WEATHER_ALERT_TYPES, 'any'),
     weather_alert_severity: Joi.string().valid(...WEATHER_ALERT_SEVERITIES),
+    // scene trigger declared by an external integration: its selector, the
+    // declared key and the filters. `trigger_key`, not `key`: addScene stamps a
+    // runtime uuid `key` on every trigger in RAM (matched by the time.changed
+    // checker), a persisted `key` would be overwritten
+    integration: Joi.string(),
+    trigger_key: sceneDeclarationKeySchema,
+    fields: sceneDeclarationFieldsSchema,
   })
   // A "changed" trigger fires on `last_value !== previous_value`: it matches no value, and
   // neither `threshold_only` (which de-duplicates a condition staying true) nor `for_duration`
@@ -179,6 +222,11 @@ const triggerSchema = Joi.object()
       threshold_only: Joi.forbidden(),
       for_duration: Joi.forbidden(),
     }),
+  })
+  // An integration-declared trigger without its target could never match:
+  // the selector and the declared key are what the matcher compares first
+  .when(Joi.object({ type: Joi.valid(EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT) }).unknown(), {
+    then: Joi.object({ integration: Joi.required(), trigger_key: Joi.required() }),
   });
 
 const triggersSchema = Joi.array().items(triggerSchema);

@@ -586,6 +586,12 @@ function getRoutes(gladys) {
       admin: true,
       controller: externalIntegrationController.install,
     },
+    // scene editor catalog, every authenticated user (a literal route, before
+    // `:selector` like `store`)
+    'get /api/v1/external_integration/scene': {
+      authenticated: true,
+      controller: externalIntegrationController.getSceneDeclarations,
+    },
     'get /api/v1/external_integration/:selector': {
       authenticated: true,
       controller: externalIntegrationController.getBySelector,
@@ -760,6 +766,11 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.publishStates,
+    },
+    'post /api/integration/v1/scene/event': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishSceneEvent,
     },
     'get /api/integration/v1/config': {
       authenticated: false,
