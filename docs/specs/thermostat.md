@@ -230,6 +230,14 @@ The reading is therefore converted into the thermostat's unit before any compari
 
 The widget does the same on its side, and for the same reason — it renders the reading with the thermostat's unit symbol. The sensor unit is read once from the initial `GET /api/v1/device`; websocket `NEW_STATE` payloads do not carry it, so the value cached from that first read is what later events are converted with.
 
+**The unit a manual hold is stored in** is the unit it was set in, and it differs by device type — which is why the write path is told rather than left to guess.
+
+On a **virtual** thermostat the setpoint feature is this service's own, declared in `THERMOSTAT_TEMP_UNIT`: the hold is in the thermostat's unit, like a preset setpoint resolved from `THERMOSTAT_PRESET_*`.
+
+On an **external** one the hold comes from the real device's own feature — the widget dial reads that feature's unit, and a setpoint changed on the appliance arrives in it. It is therefore stored in the _feature's_ unit, not the thermostat's, and `writeExternalSetpoint` is passed a null unit so it writes the value through untouched. Converting it as if it were in `THERMOSTAT_TEMP_UNIT` would command 158 °F for a 70 °F hold on a celsius-configured thermostat, or about −6 °C for a 21 °C one — and MQTT/Home Assistant takes its unit from the discovery payload, so the mismatch is reachable.
+
+The mark that tells our own write apart from a real change (C.0.1) is in the feature's unit too, since it records exactly what was sent to the device.
+
 ## D. One write path: the generic feature value route
 
 Once the preset and the mode are features (B), there is no reason left for this service to expose its own write API. **Everything a client does to a thermostat is a value written on one of its features**, through the route the whole of Gladys already uses:

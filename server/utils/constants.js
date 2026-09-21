@@ -1958,6 +1958,14 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
     [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.RENEWABLE_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
   },
+  [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
+    // The category is a temperature, but three of its types are enums: a preset,
+    // an operating mode and a running state carry no unit. Without this entry the
+    // MQTT setup and the feature editor would offer °C/°F on all three.
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET]: [],
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: [],
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: [],
+  },
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
     // The whole BATTERY category is a percent (the charge level), but a charging flag is a
     // binary and carries no unit: without this entry it would inherit the category percent.
