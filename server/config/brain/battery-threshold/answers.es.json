@@ -1,0 +1,12 @@
+[
+  {
+    "label": "battery-threshold.success",
+    "answers": [
+      "¡Advertencia! El nivel de batería de {{ device.name }} está por debajo del {{ value.min }}% (actual: {{ value.current }}%)"
+    ]
+  },
+  {
+    "label": "battery-level-is-low.success",
+    "answers": ["¡Advertencia! El nivel de batería de {{ device.name }} es bajo!"]
+  }
+]

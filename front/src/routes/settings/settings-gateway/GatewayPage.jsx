@@ -7,6 +7,7 @@ import GatewayRecoveryCodes from '../../../components/gateway/GatewayRecoveryCod
 import GatewayConfigureTwoFactor from './GatewayConfigureTwoFactor';
 import GatewayPricing from './GatewayPricing';
 import GatewayConfigured from './GatewayConfigured';
+import GatewayInstanceOfflineAlert from './GatewayInstanceOfflineAlert';
 import GatewayBackupKey from './GatewayBackupKey';
 import GatewayUsersList from './GatewayUsersList';
 import GatewayDisconnect from './GatewayDisconnect';
@@ -52,6 +53,9 @@ const GatewayPage = ({ children, ...props }) => (
       <div class="row">
         <div class="col-md-12">
           <GatewayConfigured {...props} />
+        </div>
+        <div class="col-md-12">
+          <GatewayInstanceOfflineAlert session={props.session} />
         </div>
         <div class="col-md-12">
           <GatewayUsersList {...props} />

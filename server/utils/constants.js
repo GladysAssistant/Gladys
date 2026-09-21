@@ -409,6 +409,7 @@ const AVAILABLE_LANGUAGES = {
   EN: 'en',
   FR: 'fr',
   DE: 'de',
+  ES: 'es',
 };
 
 const SESSION_TOKEN_TYPES = {
@@ -432,6 +433,15 @@ const SERVICE_TYPES = {
   INTERNAL: 'internal',
   EXTERNAL: 'external',
 };
+
+// Sentinel value of the `service` property of the message scene actions
+// ("send message", "send message with camera", "ask the AI"): keep the
+// message in the Gladys conversation only, without forwarding it to a single
+// external messaging channel. A service name is a slug, so a real service can
+// never collide with this value. The other two cases of that property are a
+// service name (send through this channel only) and its absence, the
+// historical behaviour: broadcast to every channel the user configured.
+const MESSAGE_GLADYS_ONLY_SERVICE = '__gladys_only__';
 
 // Browse categories of the integration catalog (docs/specs/
 // integration-catalog-categories.md): display metadata describing the domain
@@ -668,6 +678,10 @@ const EVENTS = {
     CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     CLEAN_IMAGES: 'external-integration.clean-images',
+    // scene trigger declared by an external integration (scene_triggers of
+    // the manifest): the integration selector and the declared key travel
+    // as fields, one generic type for every integration
+    SCENE_EVENT: 'external-integration.scene-event',
   },
 };
 
@@ -809,6 +823,11 @@ const ACTIONS = {
   SMS: {
     SEND: 'sms.send',
   },
+  EXTERNAL_INTEGRATION: {
+    // scene action declared by an external integration (scene_actions of
+    // the manifest), relayed to its container over WebSocket
+    SCENE_ACTION: 'external-integration.scene-action',
+  },
   VARIABLE: {
     SET: 'variable.set',
   },
@@ -889,6 +908,16 @@ const DEVICE_FEATURE_CATEGORIES = {
   ENERGY_SENSOR: 'energy-sensor',
   ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
   FAN: 'fan',
+  // Carbon content of the electricity DELIVERED BY THE GRID of a zone, as published by a grid data
+  // provider (national TSO, Electricity Maps, WattTime...) or broadcast in the premises by a device
+  // implementing the Matter Electrical Grid Conditions cluster. It describes the electricity, not
+  // the appliance: the energy a device imports or exports stays in `grid-sensor`.
+  // Behind-the-meter ("local") carbon intensity - the grid mix blended with the local generation -
+  // is a different quantity, not published yet because no integration reports it. When one does, it
+  // becomes a `local-carbon-intensity` TYPE of this category, never a separate category: Matter
+  // carries both in the same struct (GridCarbonIntensity and LocalCarbonIntensity), and the
+  // category name mirrors that cluster's own grid-first naming, so adding it renames nothing.
+  GRID_CARBON_SENSOR: 'grid-carbon-sensor',
   GRID_SENSOR: 'grid-sensor',
   HEATER: 'heater',
   HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
@@ -984,6 +1013,10 @@ const DEVICE_FEATURE_TYPES = {
     MIN: 'min',
     MAX: 'max',
     AVERAGE: 'average',
+    // Temperature read by an external probe wired to the device (fridge, tank, outdoor
+    // probe...), as opposed to `decimal`, the ambient temperature at the device itself.
+    // Kept out of the room average on purpose: see temperature-sensor.getTemperatureInRoom.
+    PROBE: 'probe',
   },
   SWITCH: {
     BINARY: 'binary',
@@ -1161,6 +1194,30 @@ const DEVICE_FEATURE_TYPES = {
     THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
     THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
   },
+  // Carbon content of the grid electricity of a zone. `carbon-intensity` mirrors the Matter
+  // Electrical Grid Conditions cluster (0x00A0) GridCarbonIntensity attribute, in grams of CO2
+  // equivalent per kWh consumed. The two shares describe the generation mix behind it: Matter has
+  // NO equivalent attribute for them (the cluster carries the intensity and a Low/Medium/High
+  // level, nothing else), they are a deliberate addition, published alongside the intensity by
+  // every grid data provider (Electricity Maps, the UK Carbon Intensity API, RTE eCO2mix...) -
+  // the contract is the providers' common denominator, not one provider's API.
+  // `carbon-intensity` is the AVERAGE intensity of the electricity consumed in the zone, which is
+  // what Matter models. A MARGINAL rate (the emissions of the next kWh, e.g. the WattTime MOER) is
+  // a different quantity and must not be published here - mixing the two would make charts and
+  // scene thresholds meaningless; a provider exposing both publishes its average here, and a
+  // marginal rate gets its own type the day an integration needs it.
+  // Matter's GridCarbonLevel (Low/Medium/High) is deliberately left out: it is a banding of the
+  // same intensity, which the room badge already colors from the value itself.
+  // Value conventions: the intensity is >= 0 (gCO2eq/kWh), both shares are percentages of the
+  // consumed electricity (0-100). `carbon-free-percentage` counts every non-fossil source
+  // (renewables AND nuclear), `renewable-percentage` only the renewable ones, so renewable is
+  // always <= carbon-free. A provider publishing the FOSSIL share reports its complement here,
+  // rather than a fourth type holding the same measurement upside down.
+  GRID_CARBON_SENSOR: {
+    CARBON_INTENSITY: 'carbon-intensity', // gCO2eq per kWh consumed in the zone (>= 0)
+    CARBON_FREE_PERCENTAGE: 'carbon-free-percentage', // share of renewables + nuclear, % (0-100)
+    RENEWABLE_PERCENTAGE: 'renewable-percentage', // share of renewables only, % (0-100)
+  },
   // Exchange with the public grid (the connection point), whatever the
   // measuring device: a plug-in battery's grid port, an EM clamp or a
   // whole-home meter all publish here, so the same physical quantity never
@@ -1238,16 +1295,20 @@ const DEVICE_FEATURE_TYPES = {
     SMAXIN: 'smaxin',
     SMAXIN_1: 'smaxin_1',
     SMAXN: 'smaxn',
+    SMAXN1: 'smaxn1',
     SMAXN2: 'smaxn2',
     SMAXN3: 'smaxn3',
     SINSTS: 'sinsts',
+    SINSTS1: 'sinsts1',
     SINSTS2: 'sinsts2',
     SINSTS3: 'sinsts3',
     SMAXN_1: 'smaxn_1',
+    SMAXN1_1: 'smaxn1_1',
     SMAXN2_1: 'smaxn2_1',
     SMAXN3_1: 'smaxn3_1',
     HHPHC: 'hhphc',
     IMAX: 'imax',
+    IMAX1: 'imax1',
     ADPS: 'adps',
     IMAX2: 'imax2',
     IMAX3: 'imax3',
@@ -1518,6 +1579,9 @@ const DEVICE_FEATURE_UNITS = {
   KILOWATT_HOUR_PER_100_KM: 'kilowatt-hour-per-100-km',
   WATT_HOUR_PER_MILE: 'watt-hour-per-mile',
   KILOWATT_HOUR_PER_100_MILE: 'kilowatt-hour-per-100-mile',
+  // Carbon intensity units (grams of CO2 equivalent per kWh, the unit of the Matter
+  // Electrical Grid Conditions cluster)
+  GRAM_CO2_EQ_PER_KILOWATT_HOUR: 'gram-co2eq-per-kilowatt-hour',
   // Efficiency units
   KM_PER_KILOWATT_HOUR: 'km-per-kilowatt-hour',
   MILE_PER_KILOWATT_HOUR: 'mile-per-kilowatt-hour',
@@ -1682,6 +1746,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: [
+    DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.PERCENT,
   ],
   [DEVICE_FEATURE_CATEGORIES.GRID_SENSOR]: [
     DEVICE_FEATURE_UNITS.WATT,
@@ -1863,6 +1931,13 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
 // when the category-level list mixes units of different dimensions.
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: {
+    // The intensity is a mass per energy, the two shares are percentages: without this entry
+    // both would offer the whole category list.
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY]: [DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR],
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.RENEWABLE_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
+  },
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
     // The whole BATTERY category is a percent (the charge level), but a charging flag is a
     // binary and carries no unit: without this entry it would inherit the category percent.
@@ -2072,6 +2147,13 @@ const WEBSOCKET_MESSAGE_TYPES = {
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
     WEBHOOK_REQUEST: 'external-integration.webhook.request',
     WEBHOOK_UPDATED: 'external-integration.webhook-updated',
+    SCENE_ACTION_RUN: 'external-integration.scene-action.run',
+    // dashboard widgets declared by integrations (capabilities/dashboard-widgets.md)
+    WIDGET_GET: 'external-integration.widget.get',
+    WIDGET_GET_IMAGE: 'external-integration.widget.get-image',
+    WIDGET_ACTION: 'external-integration.widget.action',
+    WIDGET_REFRESH: 'external-integration.widget.refresh',
+    WIDGET_UPDATED: 'external-integration.widget-updated',
   },
 };
 
@@ -2108,6 +2190,8 @@ const DASHBOARD_BOX_TYPE = {
   CHIPS: 'chips',
   HOUSE_VIEW: 'house-view',
   ACTIONS: 'actions',
+  // one core box type serving every widget declared by an external integration
+  EXTERNAL_WIDGET: 'external-widget',
 };
 
 const DASHBOARD_WIDTH = {
@@ -2135,6 +2219,9 @@ const ERROR_MESSAGES = {
   INVALID_ACCESS_TOKEN: 'INVALID_ACCESS_TOKEN',
   NO_CONNECTED_TO_THE_INTERNET: 'NO_CONNECTED_TO_THE_INTERNET',
   GLADYS_PLUS_PAYMENT_REQUIRED: 'GLADYS_PLUS_PAYMENT_REQUIRED',
+  // an integration widget answered with a content version this Gladys does
+  // not render: the remedy is on the user's side (upgrade), not the integration's
+  WIDGET_CONTENT_VERSION_UNSUPPORTED: 'WIDGET_CONTENT_VERSION_UNSUPPORTED',
 };
 
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES = {
@@ -2255,6 +2342,10 @@ const AI_CHAT_PURPOSES = {
   WEEKLY_DIGEST: 'weekly-digest',
 };
 
+// Tag automatically added to every scene created by the AI through the
+// scene.create tool, so those scenes can be found back in the scene list.
+const AI_GENERATED_SCENE_TAG = 'AI';
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -2369,6 +2460,7 @@ module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 
 module.exports.SERVICE_TYPES = SERVICE_TYPES;
+module.exports.MESSAGE_GLADYS_ONLY_SERVICE = MESSAGE_GLADYS_ONLY_SERVICE;
 module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
 
 module.exports.INTEGRATION_CATALOG_CATEGORIES = INTEGRATION_CATALOG_CATEGORIES;
@@ -2415,6 +2507,7 @@ module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
 module.exports.AI_CHAT_TOOL_CATEGORIES = AI_CHAT_TOOL_CATEGORIES;
 module.exports.AI_CHAT_TOOL_CATEGORIES_LIST = AI_CHAT_TOOL_CATEGORIES_LIST;
 module.exports.AI_CHAT_PURPOSES = AI_CHAT_PURPOSES;
+module.exports.AI_GENERATED_SCENE_TAG = AI_GENERATED_SCENE_TAG;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;

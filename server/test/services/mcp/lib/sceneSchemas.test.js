@@ -5,7 +5,7 @@ const {
   assertTriggerTypesNotInActions,
   createSceneCreateInputSchema,
 } = require('../../../../services/mcp/lib/sceneSchemas');
-const { ACTIONS } = require('../../../../utils/constants');
+const { ACTIONS, EVENTS, MESSAGE_GLADYS_ONLY_SERVICE } = require('../../../../utils/constants');
 
 describe('sceneSchemas helpers', () => {
   it('should accept a variable.set action', () => {
@@ -29,6 +29,32 @@ describe('sceneSchemas helpers', () => {
       icon: 'lightbulb',
       triggers: [{ type: 'system.start' }],
       actions: [[{ type: 'variable.set', text: 'Hello', evaluate_value: '2 * 3' }]],
+    });
+    expect(result.success).to.equal(false);
+  });
+
+  it('should accept a channel on an ai.ask action, like the send message actions', () => {
+    const schema = createSceneCreateInputSchema();
+    // the three cases of the `service` property must be authorable by the AI
+    // too, otherwise a scene built in the UI cannot be copied through scene.create
+    [MESSAGE_GLADYS_ONLY_SERVICE, 'telegram', null, undefined].forEach((service) => {
+      const result = schema.safeParse({
+        name: 'My scene',
+        icon: 'lightbulb',
+        triggers: [{ type: 'system.start' }],
+        actions: [[{ type: ACTIONS.AI.ASK, user: 'john', text: 'Is the living room too hot?', service }]],
+      });
+      expect(result.success, `service: ${service}`).to.equal(true);
+    });
+  });
+
+  it('should reject an unknown property on an ai.ask action', () => {
+    const schema = createSceneCreateInputSchema();
+    const result = schema.safeParse({
+      name: 'My scene',
+      icon: 'lightbulb',
+      triggers: [{ type: 'system.start' }],
+      actions: [[{ type: ACTIONS.AI.ASK, user: 'john', text: 'Hello', unknown_property: 'nope' }]],
     });
     expect(result.success).to.equal(false);
   });
@@ -70,6 +96,85 @@ describe('sceneSchemas helpers', () => {
     }
     expect(error).to.be.an('error');
     expect(error.message).to.contain('must be in the top-level triggers array');
+  });
+});
+
+describe('sceneSchemas external integration scene trigger and action', () => {
+  const schema = createSceneCreateInputSchema();
+  const baseScene = {
+    name: 'Frigate scene',
+    icon: 'bell',
+    triggers: [
+      {
+        type: EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT,
+        integration: 'ext-frigate',
+        trigger_key: 'object_detected',
+        fields: { camera: 'ext:frigate:front', label: ['person', 'car'], zone: null, min_score: 0.5 },
+      },
+    ],
+    actions: [
+      [
+        {
+          type: ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION,
+          integration: 'ext-frigate',
+          action_key: 'create_snapshot',
+          fields: { camera: 'ext:frigate:front', caption: '{{triggerEvent.data.label}}', hd: true },
+        },
+      ],
+    ],
+  };
+
+  it('should accept the two types with a fields passthrough', () => {
+    expect(schema.safeParse(baseScene).success).to.equal(true);
+    expect(
+      schema.safeParse({
+        ...baseScene,
+        triggers: [{ ...baseScene.triggers[0], fields: undefined }],
+        actions: [[{ ...baseScene.actions[0][0], fields: undefined }]],
+      }).success,
+    ).to.equal(true);
+  });
+
+  it('should enforce the key format and the field count of the scene model', () => {
+    expect(
+      schema.safeParse({ ...baseScene, triggers: [{ ...baseScene.triggers[0], trigger_key: 'Object Detected' }] })
+        .success,
+    ).to.equal(false);
+    expect(
+      schema.safeParse({ ...baseScene, actions: [[{ ...baseScene.actions[0][0], action_key: 'Snap!' }]] }).success,
+    ).to.equal(false);
+    expect(
+      schema.safeParse({ ...baseScene, triggers: [{ ...baseScene.triggers[0], fields: { 'Bad-Key': 'x' } }] }).success,
+    ).to.equal(false);
+    const tooManyFields = Object.fromEntries(Array.from({ length: 11 }, (value, index) => [`k${index}`, 'x']));
+    expect(
+      schema.safeParse({ ...baseScene, triggers: [{ ...baseScene.triggers[0], fields: tooManyFields }] }).success,
+    ).to.equal(false);
+    const tenFields = Object.fromEntries(Array.from({ length: 10 }, (value, index) => [`k${index}`, 'x']));
+    expect(
+      schema.safeParse({ ...baseScene, triggers: [{ ...baseScene.triggers[0], fields: tenFields }] }).success,
+    ).to.equal(true);
+  });
+
+  it('should reject a nested field value and a missing key', () => {
+    expect(
+      schema.safeParse({
+        ...baseScene,
+        triggers: [{ ...baseScene.triggers[0], fields: { camera: { nested: true } } }],
+      }).success,
+    ).to.equal(false);
+    expect(
+      schema.safeParse({
+        ...baseScene,
+        actions: [[{ type: ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, integration: 'ext-frigate' }]],
+      }).success,
+    ).to.equal(false);
+  });
+
+  it('should keep the scene event type a trigger, never an action', () => {
+    expect(() =>
+      assertTriggerTypesNotInActions({ actions: [[{ type: EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT }]] }),
+    ).to.throw('must be in the top-level triggers array');
   });
 });
 
