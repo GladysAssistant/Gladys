@@ -92,6 +92,13 @@ describe('thermostat.state isStopped', () => {
     expect(state.isStopped({ features: [modeFeature(THERMOSTAT_MODE.COOLING)] })).to.equal(false);
   });
 
+  it('should report a mode that was never written as running', () => {
+    // Number(null) is 0, which is OFF: without a guard every thermostat whose
+    // mode was never set would read as stopped.
+    expect(state.isStopped({ features: [modeFeature(null)] })).to.equal(false);
+    expect(state.isStopped({ features: [modeFeature(undefined)] })).to.equal(false);
+  });
+
   it('should report a device with no mode feature as running', () => {
     // An external thermostat carries no mode of its own: it is never stopped
     // through this path.

@@ -225,7 +225,14 @@ class ThermostatBox extends Component {
   // widget shows Off highlighted and the loop leaves the thermostat alone.
   isStopped = () => {
     const cfg = this.state.remoteConfig;
-    return !!cfg && Number(cfg.mode) === THERMOSTAT_MODE.OFF;
+    // A device with no mode feature carries no mode at all — an external
+    // thermostat never has one. `Number(null)` is 0, which is OFF, so the value
+    // has to be checked for being there before it is compared: otherwise every
+    // external thermostat reads as permanently stopped.
+    if (!cfg || cfg.mode === null || cfg.mode === undefined) {
+      return false;
+    }
+    return Number(cfg.mode) === THERMOSTAT_MODE.OFF;
   };
 
   // The mode a running thermostat carries, from what it is configured to do.
@@ -969,8 +976,15 @@ class ThermostatBox extends Component {
       const cfg = this.state.remoteConfig;
       if (preset.key === 'off') {
         // Stopping is a mode, not a preset: it switches the machine off, and the
-        // regulation loop then leaves it alone whatever the programme says.
-        await this.writeFeature(cfg && cfg.modeFeature, THERMOSTAT_MODE.OFF);
+        // regulation loop then leaves it alone whatever the programme says. An
+        // external thermostat carries no mode feature of its own — the real
+        // device owns its mode — so it is stopped through its frost preset,
+        // which is what the loop writes to a device it has to shut down.
+        if (cfg && cfg.modeFeature) {
+          await this.writeFeature(cfg.modeFeature, THERMOSTAT_MODE.OFF);
+        } else {
+          await this.savePreset('frost');
+        }
       } else {
         await this.resumeIfStopped();
         await this.savePreset(preset.key);
