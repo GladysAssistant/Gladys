@@ -5,7 +5,7 @@ const {
   assertTriggerTypesNotInActions,
   createSceneCreateInputSchema,
 } = require('../../../../services/mcp/lib/sceneSchemas');
-const { ACTIONS } = require('../../../../utils/constants');
+const { ACTIONS, MESSAGE_GLADYS_ONLY_SERVICE } = require('../../../../utils/constants');
 
 describe('sceneSchemas helpers', () => {
   it('should accept a variable.set action', () => {
@@ -29,6 +29,32 @@ describe('sceneSchemas helpers', () => {
       icon: 'lightbulb',
       triggers: [{ type: 'system.start' }],
       actions: [[{ type: 'variable.set', text: 'Hello', evaluate_value: '2 * 3' }]],
+    });
+    expect(result.success).to.equal(false);
+  });
+
+  it('should accept a channel on an ai.ask action, like the send message actions', () => {
+    const schema = createSceneCreateInputSchema();
+    // the three cases of the `service` property must be authorable by the AI
+    // too, otherwise a scene built in the UI cannot be copied through scene.create
+    [MESSAGE_GLADYS_ONLY_SERVICE, 'telegram', null, undefined].forEach((service) => {
+      const result = schema.safeParse({
+        name: 'My scene',
+        icon: 'lightbulb',
+        triggers: [{ type: 'system.start' }],
+        actions: [[{ type: ACTIONS.AI.ASK, user: 'john', text: 'Is the living room too hot?', service }]],
+      });
+      expect(result.success, `service: ${service}`).to.equal(true);
+    });
+  });
+
+  it('should reject an unknown property on an ai.ask action', () => {
+    const schema = createSceneCreateInputSchema();
+    const result = schema.safeParse({
+      name: 'My scene',
+      icon: 'lightbulb',
+      triggers: [{ type: 'system.start' }],
+      actions: [[{ type: ACTIONS.AI.ASK, user: 'john', text: 'Hello', unknown_property: 'nope' }]],
     });
     expect(result.success).to.equal(false);
   });
