@@ -869,6 +869,11 @@
         "scheduleUntil": "hasta",
         "manualUntil": "hasta",
         "cancelManual": "Cancelar el modo manual",
+        "windowOpen": "Ventana abierta — calefacción suspendida",
+        "windowOpenCooling": "Ventana abierta — refrigeración suspendida",
+        "a11ySetpoint": "Consigna",
+        "a11yCurrentTemp": "Temperatura actual",
+        "a11yHumidity": "Humedad",
         "error": "Error al cargar los datos del termostato.",
         "preset": {
           "off": "Apagado",
@@ -877,7 +882,8 @@
           "comfort": "Confort",
           "eco": "Eco",
           "night": "Noche"
-        }
+        },
+        "backToSchedule": "Volver a la programación"
       }
     },
     "editDashboardBackgroundLabel": "Ambiente de fondo",
@@ -1547,158 +1553,6 @@
         "defaultError": "Se produjo un error al guardar el dispositivo.",
         "defaultDeletionError": "Se produjo un error al eliminar el dispositivo.",
         "conflictError": "El tema actual ya está en uso."
-      }
-    },
-    "thermostat": {
-      "title": "Termostato",
-      "description": "Crea y gestiona tus termostatos virtuales",
-      "deviceTab": "Mis termostatos",
-      "scheduleTab": "Programaciones",
-      "documentationTab": "Documentación",
-      "device": {
-        "title": "Mis termostatos",
-        "newButton": "Nuevo",
-        "noNameLabel": "Sin nombre",
-        "noDevices": "Todavía no has creado ningún termostato. Haz clic en «Nuevo» para empezar.",
-        "nameLabel": "Nombre",
-        "roomLabel": "Habitación",
-        "activeScheduleLabel": "Programación activa",
-        "saveButton": "Guardar",
-        "editButton": "Editar",
-        "deleteButton": "Eliminar",
-        "saveError": "Error al guardar.",
-        "deleteError": "Error al eliminar."
-      },
-      "edit": {
-        "titleNew": "Nuevo termostato",
-        "titleEdit": "Editar termostato",
-        "nameLabel": "Nombre",
-        "namePlaceholder": "ej. Termostato del salón",
-        "roomLabel": "Habitación",
-        "modeLabel": "Modo",
-        "mode": {
-          "heating": "Calefacción",
-          "cooling": "Refrigeración"
-        },
-        "controlTypeLabel": "Control type",
-        "hysteresisExplain": {
-          "heating": "The thermostat turns the heating on when the temperature drops below the setpoint minus the start threshold, and turns it off when it rises above the setpoint plus the stop threshold. Simple and robust.",
-          "cooling": "The thermostat turns the cooling on when the temperature rises above the setpoint plus the start threshold, and turns it off when it drops below the setpoint minus the stop threshold. Simple and robust."
-        },
-        "tpiExplain": "Computes an ON/OFF ratio over a fixed cycle based on the gap between the current temperature and the setpoint. The larger the gap, the longer the heating stays on within the cycle. Recommended for underfloor heating or high-inertia systems.",
-        "controlType": {
-          "hysteresis": "Hysteresis",
-          "tpi": "TPI (Time Proportional Integral)"
-        },
-        "tempUnitLabel": "Unit",
-        "celsius": "Celsius (°C)",
-        "fahrenheit": "Fahrenheit (°F)",
-        "minTempLabel": "Min temp",
-        "minTempPlaceholder": "e.g. 5",
-        "maxTempLabel": "Max temp",
-        "maxTempPlaceholder": "e.g. 35",
-        "temperatureFeatureLabel": "Temperature sensor",
-        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature.",
-        "humidityFeatureLabel": "Humidity sensor",
-        "humidityFeatureHelp": "Optional. Displayed in the thermostat widget.",
-        "switchFeatureLabel": "Switch (actuator)",
-        "switchFeatureHelp": {
-          "heating": "The switch that will be turned on and off to heat the room.",
-          "cooling": "The switch that will be turned on and off to cool the room."
-        },
-        "windowFeatureLabel": "Sensor de apertura de ventana",
-        "windowFeatureHelp": {
-          "heating": "Optional. If a window is open, the heating is automatically cut off.",
-          "cooling": "Optional. If a window is open, the cooling is automatically cut off."
-        },
-        "hysteresisStartLabel": "Umbral de arranque",
-        "hysteresisStartHelp": {
-          "heating": "The heating turns on when the temperature is below (setpoint − start threshold). E.g. setpoint 21°C, threshold 0.5°C → turns on below 20.5°C.",
-          "cooling": "The cooling turns on when the temperature is above (setpoint + start threshold). E.g. setpoint 24°C, threshold 0.5°C → turns on above 24.5°C."
-        },
-        "hysteresisStopLabel": "Umbral de parada",
-        "hysteresisStopHelp": {
-          "heating": "The heating turns off when the temperature rises above (setpoint + stop threshold). E.g. setpoint 21°C, threshold 0.5°C → turns off above 21.5°C.",
-          "cooling": "The cooling turns off when the temperature drops below (setpoint − stop threshold). E.g. setpoint 24°C, threshold 0.5°C → turns off below 23.5°C."
-        },
-        "tpiCycleTimeLabel": "Duración del ciclo TPI",
-        "tpiCycleTimeHelp": "Total duration of an ON/OFF cycle in minutes. E.g. 30 min → if the demand is 50%, the heating is ON for 15 min then OFF for 15 min.",
-        "tpiProportionalBandLabel": "Banda proporcional TPI",
-        "tpiProportionalBandHelp": "Temperature gap (in °C) corresponding to 100% heating. E.g. band = 2°C, current gap = 1°C → 50% of the cycle ON.",
-        "presetsLabel": "Preajustes de temperatura",
-        "presetColNameLabel": "Preajuste",
-        "presetColTempLabel": "Consigna",
-        "preset": {
-          "off": "Apagado",
-          "frost": "Antihielo",
-          "away": "Ausencia",
-          "eco": "Eco",
-          "night": "Noche",
-          "comfort": "Confort"
-        },
-        "saveButton": "Guardar",
-        "cancelButton": "Cancelar",
-        "saveError": "Error al guardar.",
-        "activeScheduleLabel": "Programación activa",
-        "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",
-        "noActiveSchedule": "Sin programación (control manual)",
-        "manualDurationLabel": "Duración del modo manual",
-        "manualDurationUnit": "min",
-        "manualDurationHelp": "Duration in minutes before automatically returning to the schedule after a manual action (default: 30 min)."
-      },
-      "schedule": {
-        "title": "Programaciones",
-        "newButton": "Nueva programación",
-        "noSchedules": "Todavía no has creado ninguna programación. Haz clic en «Nueva programación» para empezar.",
-        "nameLabel": "Nombre de la programación",
-        "namePlaceholder": "ej. Semana laboral",
-        "saveButton": "Guardar",
-        "cancelButton": "Cancelar",
-        "deleteButton": "Eliminar",
-        "editButton": "Editar",
-        "confirmDelete": "¿Confirmar la eliminación?",
-        "confirmYes": "Sí",
-        "confirmNo": "No",
-        "saveError": "Error al guardar.",
-        "gapError": "Some days have uncovered time slots (gaps):",
-        "duplicateButton": "Duplicar",
-        "duplicateSuffix": "(copia)",
-        "deleteError": "Error al eliminar.",
-        "days": {
-          "0": "Lunes",
-          "1": "Martes",
-          "2": "Miércoles",
-          "3": "Jueves",
-          "4": "Viernes",
-          "5": "Sábado",
-          "6": "Domingo"
-        },
-        "daysShort": {
-          "0": "Lun",
-          "1": "Mar",
-          "2": "Mié",
-          "3": "Jue",
-          "4": "Vie",
-          "5": "Sáb",
-          "6": "Dom"
-        },
-        "addSlot": "Añadir un intervalo",
-        "copyTo": "Copiar a...",
-        "copyToLabel": "Copiar a:",
-        "applyButton": "Aplicar",
-        "removeSlot": "Quitar",
-        "startTime": "Inicio",
-        "endTime": "Fin",
-        "preset": "Preajuste",
-        "presets": {
-          "off": "Apagado",
-          "frost": "Antihielo",
-          "away": "Ausencia",
-          "eco": "Eco",
-          "night": "Noche",
-          "comfort": "Confort"
-        },
-        "noSlots": "Todavía no hay intervalos. Haz clic en «Añadir un intervalo» para empezar."
       }
     },
     "tpLink": {
@@ -3469,7 +3323,188 @@
     "backToIntegrations": "Volver a las integraciones",
     "menuScrollLeft": "Desplazar el menú a la izquierda",
     "menuScrollRight": "Desplazar el menú a la derecha",
-    "deprecationWarning": "Esta integración incorporada quedará pronto <b>obsoleta</b> en favor de una integración externa de la comunidad equivalente. Ambas versiones coexistirán en el catálogo durante la transición; puede seguir utilizando esta por ahora."
+    "deprecationWarning": "Esta integración incorporada quedará pronto <b>obsoleta</b> en favor de una integración externa de la comunidad equivalente. Ambas versiones coexistirán en el catálogo durante la transición; puede seguir utilizando esta por ahora.",
+    "thermostat": {
+      "title": "Termostato",
+      "description": "Crea y gestiona tus termostatos virtuales",
+      "deviceTab": "Mis termostatos",
+      "scheduleTab": "Programaciones",
+      "documentationTab": "Documentación",
+      "device": {
+        "title": "Mis termostatos",
+        "newButton": "Nuevo",
+        "noNameLabel": "Sin nombre",
+        "noDevices": "Todavía no has creado ningún termostato. Haz clic en «Nuevo» para empezar.",
+        "nameLabel": "Nombre",
+        "roomLabel": "Habitación",
+        "activeScheduleLabel": "Programación activa",
+        "noSchedule": "Sin programación",
+        "setpointLabel": "Consigna",
+        "noSetpoint": "—",
+        "saveButton": "Guardar",
+        "editButton": "Editar",
+        "deleteButton": "Eliminar",
+        "confirmDelete": "¿Eliminar este termostato?",
+        "confirmYes": "Sí",
+        "confirmNo": "No",
+        "saveError": "Error al guardar.",
+        "deleteError": "Error al eliminar."
+      },
+      "edit": {
+        "titleNew": "Nuevo termostato",
+        "titleEdit": "Editar termostato",
+        "nameLabel": "Nombre",
+        "namePlaceholder": "ej. Termostato del salón",
+        "roomLabel": "Habitación",
+        "modeLabel": "Modo",
+        "typeLabel": "Tipo de termostato",
+        "typeVirtual": "Termostato virtual (Gladys regula)",
+        "typeExternal": "Termostato real (el dispositivo regula)",
+        "typeHelp": {
+          "virtual": "Gladys actúa como termostato: lee un sensor de temperatura y acciona un interruptor (un relé, un enchufe, un contacto de caldera) para alcanzar la consigna.",
+          "external": "El termostato gestiona su propia regulación y su propio calefactor. Gladys solo escribe la consigna que resuelve su programación y muestra el estado del dispositivo."
+        },
+        "targetFeatureLabel": "Consigna del termostato real",
+        "targetFeatureHelp": "La función en la que Gladys escribe la temperatura de consigna. Algunos dispositivos exponen varias (calefacción/refrigeración, ocupado/desocupado): elige la que realmente controla tu calefacción.",
+        "stateFeatureLabel": "Estado de calefacción (opcional)",
+        "stateFeatureHelp": "Se usa para mostrar si el dispositivo está funcionando. Se acepta como estado de funcionamiento o como contacto de caldera. Déjalo vacío si tu termostato no lo informa.",
+        "modeFeatureLabel": "Modo de funcionamiento (opcional)",
+        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno. Gladys lo pone en Apagado cuando se aplica el preajuste Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo.",
+        "mode": {
+          "heating": "Calefacción",
+          "cooling": "Refrigeración"
+        },
+        "controlTypeLabel": "Tipo de regulación",
+        "hysteresisExplain": {
+          "heating": "El termostato enciende la calefacción cuando la temperatura baja por debajo de la consigna menos el umbral de arranque, y la apaga cuando sube por encima de la consigna más el umbral de parada. Simple y robusto.",
+          "cooling": "El termostato enciende la refrigeración cuando la temperatura sube por encima de la consigna más el umbral de arranque, y la apaga cuando baja por debajo de la consigna menos el umbral de parada. Simple y robusto."
+        },
+        "tpiExplain": "Calcula una proporción de encendido/apagado sobre un ciclo fijo según la diferencia entre la temperatura actual y la consigna. Cuanto mayor es la diferencia, más tiempo permanece encendida la calefacción dentro del ciclo. Recomendado para suelo radiante o sistemas de alta inercia.",
+        "controlType": {
+          "hysteresis": "Histéresis",
+          "tpi": "TPI (integral proporcional al tiempo)"
+        },
+        "tempUnitLabel": "Unidad",
+        "celsius": "Celsius (°C)",
+        "fahrenheit": "Fahrenheit (°F)",
+        "minTempLabel": "Temp. mín.",
+        "minTempPlaceholder": "ej. 5",
+        "maxTempLabel": "Temp. máx.",
+        "maxTempPlaceholder": "ej. 35",
+        "temperatureFeatureLabel": "Sensor de temperatura",
+        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature.",
+        "humidityFeatureLabel": "Sensor de humedad",
+        "humidityFeatureHelp": "Opcional. Se muestra en el widget del termostato.",
+        "switchFeatureLabel": "Interruptor (actuador)",
+        "switchFeatureHelp": {
+          "heating": "El interruptor que se encenderá y apagará para calentar la habitación.",
+          "cooling": "El interruptor que se encenderá y apagará para enfriar la habitación."
+        },
+        "windowFeatureLabel": "Sensor de apertura de ventana",
+        "windowFeatureHelp": {
+          "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",
+          "cooling": "Opcional. Si una ventana está abierta, la refrigeración se corta automáticamente."
+        },
+        "hysteresisStartLabel": "Umbral de arranque",
+        "hysteresisStartHelp": {
+          "heating": "La calefacción se enciende cuando la temperatura está por debajo de (consigna − umbral de arranque). Ej. consigna 21 °C, umbral 0,5 °C → se enciende por debajo de 20,5 °C.",
+          "cooling": "La refrigeración se enciende cuando la temperatura está por encima de (consigna + umbral de arranque). Ej. consigna 24 °C, umbral 0,5 °C → se enciende por encima de 24,5 °C."
+        },
+        "hysteresisStopLabel": "Umbral de parada",
+        "hysteresisStopHelp": {
+          "heating": "La calefacción se apaga cuando la temperatura sube por encima de (consigna + umbral de parada). Ej. consigna 21 °C, umbral 0,5 °C → se apaga por encima de 21,5 °C.",
+          "cooling": "La refrigeración se apaga cuando la temperatura baja por debajo de (consigna − umbral de parada). Ej. consigna 24 °C, umbral 0,5 °C → se apaga por debajo de 23,5 °C."
+        },
+        "tpiCycleTimeLabel": "Duración del ciclo TPI",
+        "tpiCycleTimeHelp": "Duración total de un ciclo de encendido/apagado en minutos. Ej. 30 min → si la demanda es del 50 %, la calefacción está encendida 15 min y luego apagada 15 min.",
+        "tpiProportionalBandLabel": "Banda proporcional TPI",
+        "tpiProportionalBandHelp": "Diferencia de temperatura (en °C) que corresponde al 100 % de calefacción. Ej. banda = 2 °C, diferencia actual = 1 °C → 50 % del ciclo encendido.",
+        "presetsLabel": "Preajustes de temperatura",
+        "presetColNameLabel": "Preajuste",
+        "presetColTempLabel": "Consigna",
+        "preset": {
+          "off": "Apagado",
+          "frost": "Antihielo",
+          "away": "Ausencia",
+          "eco": "Eco",
+          "night": "Noche",
+          "comfort": "Confort"
+        },
+        "saveButton": "Guardar",
+        "cancelButton": "Cancelar",
+        "saveError": "Error al guardar.",
+        "activeScheduleLabel": "Programación activa",
+        "activeScheduleHelp": "Selecciona la programación que se aplicará automáticamente a este termostato.",
+        "noActiveSchedule": "Sin programación (control manual)",
+        "manualDurationLabel": "Duración del modo manual",
+        "manualDurationUnit": "min",
+        "manualDurationHelp": "Duración en minutos antes de volver automáticamente a la programación tras una acción manual (por defecto: 30 min)."
+      },
+      "schedule": {
+        "title": "Programaciones",
+        "newButton": "Nueva programación",
+        "noSchedules": "Todavía no has creado ninguna programación. Haz clic en «Nueva programación» para empezar.",
+        "nameLabel": "Nombre de la programación",
+        "namePlaceholder": "ej. Semana laboral",
+        "saveButton": "Guardar",
+        "cancelButton": "Cancelar",
+        "deleteButton": "Eliminar",
+        "editButton": "Editar",
+        "confirmDelete": "¿Confirmar la eliminación?",
+        "confirmYes": "Sí",
+        "confirmNo": "No",
+        "saveError": "Error al guardar.",
+        "gapWarning": "Algunos días no están totalmente cubiertos. El termostato mantendrá su preajuste actual durante estos intervalos:",
+        "nextDay": "+1d",
+        "fullDayHint": "00:00 → 00:00 cubre todo el día.",
+        "duplicateButton": "Duplicar",
+        "duplicateSuffix": "(copia)",
+        "deleteError": "Error al eliminar.",
+        "days": {
+          "0": "Lunes",
+          "1": "Martes",
+          "2": "Miércoles",
+          "3": "Jueves",
+          "4": "Viernes",
+          "5": "Sábado",
+          "6": "Domingo"
+        },
+        "daysShort": {
+          "0": "Lun",
+          "1": "Mar",
+          "2": "Mié",
+          "3": "Jue",
+          "4": "Vie",
+          "5": "Sáb",
+          "6": "Dom"
+        },
+        "addSlot": "Añadir un intervalo",
+        "copyTo": "Copiar a...",
+        "copyToLabel": "Copiar a:",
+        "applyButton": "Aplicar",
+        "removeSlot": "Quitar",
+        "startTime": "Inicio",
+        "endTime": "Fin",
+        "preset": "Preajuste",
+        "presets": {
+          "off": "Apagado",
+          "frost": "Antihielo",
+          "away": "Ausencia",
+          "eco": "Eco",
+          "night": "Noche",
+          "comfort": "Confort"
+        },
+        "noSlots": "Todavía no hay intervalos. Haz clic en «Añadir un intervalo» para empezar.",
+        "followedBy": "Seguida por:",
+        "houseLabel": "Casa",
+        "carriedSince": "desde",
+        "overlapError": "Este intervalo se solapa con otro del mismo día. Un termostato sigue un solo preajuste a la vez: ajusta los horarios o edita el intervalo existente.",
+        "stoppedLegend": "Fuera de estos intervalos, el termostato está apagado.",
+        "houseLockedByDevices": "Una programación solo cambia de casa mientras ningún termostato la siga. Seguida por:",
+        "searchPlaceHolder": "Buscar una programación",
+        "noSearchResult": "Ninguna programación coincide con esta búsqueda."
+      }
+    }
   },
   "editScene": {
     "settings": "Configuración",
@@ -5343,9 +5378,17 @@
       "thermostat": {
         "mode": {
           "off": "Apagado",
-          "heating": "Heat",
-          "cooling": "Cool",
+          "heating": "Calor",
+          "cooling": "Frío",
           "auto": "Auto"
+        },
+        "preset": {
+          "schedule": "Programación",
+          "frost": "Antihielo",
+          "away": "Ausencia",
+          "eco": "Eco",
+          "night": "Noche",
+          "comfort": "Confort"
         }
       },
       "heater": {
@@ -5642,15 +5685,23 @@
       "thermostat": {
         "mode": {
           "0": "Apagado",
-          "1": "Calefacción",
-          "2": "Refrigeración",
+          "1": "Calor",
+          "2": "Frío",
           "3": "Auto"
         },
+        "preset": {
+          "0": "Programación",
+          "1": "Antihielo",
+          "2": "Ausencia",
+          "3": "Eco",
+          "4": "Noche",
+          "5": "Confort"
+        },
         "operating-state": {
-          "unknown": "{{value}} (unknown)",
-          "0": "Idle",
-          "1": "Calefacción",
-          "2": "Refrigeración"
+          "unknown": "{{value}} (desconocido)",
+          "0": "Inactivo",
+          "1": "Calentando",
+          "2": "Enfriando"
         }
       },
       "siren": {
@@ -6055,12 +6106,6 @@
       "energy": "Consumo de energía",
       "target-current": "Corriente objetivo"
     },
-    "thermostat": {
-      "shortCategoryName": "Termostato",
-      "target-temperature": "Temperatura del termostato",
-      "mode": "Modo del termostato",
-      "operating-state": "Estado de funcionamiento del termostato"
-    },
     "siren": {
       "shortCategoryName": "Sirena",
       "binary": "Sirena",
@@ -6440,6 +6485,13 @@
     "datarate": {
       "shortCategoryName": "Tasa de datos",
       "rate": "Tasa"
+    },
+    "thermostat": {
+      "shortCategoryName": "Termostato",
+      "target-temperature": "Temperatura del termostato",
+      "mode": "Modo del termostato",
+      "preset": "Preajuste del termostato",
+      "operating-state": "Estado de funcionamiento del termostato"
     },
     "airquality-sensor": {
       "shortCategoryName": "Calidad del aire",
