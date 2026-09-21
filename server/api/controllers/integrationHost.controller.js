@@ -112,6 +112,27 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/scene/event publishSceneEvent
+   * @apiName publishSceneEvent
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Fire a scene trigger declared in the manifest
+   * (scene_triggers[].key): the core matches the flat `data` against the
+   * filters configured in the scenes and starts the matching ones,
+   * exposing the declared variables to their actions. 404 on an
+   * undeclared key, 400 on nested data (one primitive per key, 30 keys,
+   * strings of 1000 characters max), 429 past 300 events/minute (a counter
+   * separate from the states). 200 means accepted and evaluated once —
+   * never "a scene ran". A scene event is a trigger, never a state: a
+   * value goes through POST /state, a picture through POST /camera/image.
+   * @apiParamExample {json} Request-Example
+   * { "key": "object_detected", "data": { "camera": "ext:frigate:front", "label": "person", "score": 0.92 } }
+   */
+  async function publishSceneEvent(req, res) {
+    gladys.externalIntegration.publishSceneEvent(req.externalIntegrationService, req.body);
+    res.json({ success: true });
+  }
+
+  /**
    * @api {post} /api/integration/v1/network_discovery/scan networkDiscoveryScan
    * @apiName networkDiscoveryScan
    * @apiGroup IntegrationHostApi
@@ -334,6 +355,7 @@ module.exports = function IntegrationHostController(gladys) {
     getDevices: asyncMiddleware(getDevices),
     getHouses: asyncMiddleware(getHouses),
     publishStates: asyncMiddleware(publishStates),
+    publishSceneEvent: asyncMiddleware(publishSceneEvent),
     getConfig: asyncMiddleware(getConfig),
     saveConfig: asyncMiddleware(saveConfig),
     publishMessage: asyncMiddleware(publishMessage),

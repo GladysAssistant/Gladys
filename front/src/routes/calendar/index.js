@@ -14,6 +14,19 @@ import dashboardStyle from '../dashboard/style.css';
 
 const localizer = dayjsLocalizer(dayjs);
 
+/**
+ * The day/week views size their grid from `getTotalMin()`, which returns the
+ * elapsed minutes between both ends of the day. On a DST day that is 1500 or
+ * 1380 minutes instead of 1440, so the grid gets 25 rows in autumn and 23 in
+ * spring. Event placement doesn't follow: it goes through `getDstOffset()`,
+ * which already folds the shift away and keeps working on a 1440 minute scale
+ * — a 2pm event landed at 1:26pm on the October change, 2:36pm on the March
+ * one. Applying the same offset here puts the grid back on clock hours, so
+ * both agree again.
+ */
+const getTotalMin = localizer.getTotalMin;
+localizer.getTotalMin = (start, end) => getTotalMin(start, end) + localizer.getDstOffset(start, end);
+
 class CalendarPage extends Component {
   onRangeChange = range => {
     let from, to;

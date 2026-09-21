@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { TYPES_WITHOUT_DEVICE_SCREENS } from '../utils';
 import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import get from 'get-value';
@@ -41,9 +42,9 @@ class ExternalIntegrationDiscoverPage extends Component {
       if (generation !== this.pageGeneration) {
         return false;
       }
-      // communication and weather integrations have no device screens:
+      // communication, weather and provider integrations have no device screens:
       // direct URL access lands on the configuration screen instead
-      if (['communication', 'weather'].includes(get(integration, 'manifest.type'))) {
+      if (TYPES_WITHOUT_DEVICE_SCREENS.includes(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
         return false;
       }

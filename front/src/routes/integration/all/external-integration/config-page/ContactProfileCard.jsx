@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import { ConfigField } from './ConfigSchemaForm';
+import { ConfigField } from '../../../../../components/integration/ConfigSchemaForm';
 import { RequestStatus } from '../../../../../utils/consts';
 
 // Send-only notification channels (messaging.receive false): no inbound

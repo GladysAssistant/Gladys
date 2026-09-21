@@ -47,7 +47,7 @@ featureParentKey.forEach(parentKey => {
 // without one would be unreachable through the search box in that language.
 // Entries for icons that no longer exist are reported too, so the files cannot
 // silently drift from icons.json.
-['en', 'fr', 'de'].forEach(language => {
+['en', 'fr', 'de', 'es'].forEach(language => {
   // eslint-disable-next-line global-require, import/no-dynamic-require
   const icons = require(`../src/config/i18n/icon-keywords/${language}.json`);
 
