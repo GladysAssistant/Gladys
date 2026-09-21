@@ -203,6 +203,23 @@ describe('thermostat schedules CRUD', () => {
       await db.Variable.destroy({ where: { name: 'TIMEZONE' } });
     });
 
+    it('should fall back on the default timezone when it cannot be read', async () => {
+      const original = db.Variable.findOne.bind(db.Variable);
+      db.Variable.findOne = async () => {
+        throw new Error('database is on fire');
+      };
+
+      try {
+        const [{ selector }] = await handler.getSchedules(HOUSE_SELECTOR);
+        // A timezone that cannot be read must not fail the whole read: the
+        // shared helper falls back on its own default.
+        const schedule = await handler.getScheduleBySelector(selector);
+        expect(schedule.name).to.equal('Week');
+      } finally {
+        db.Variable.findOne = original;
+      }
+    });
+
     it('should report no current point on a schedule with none', async () => {
       const { selector } = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Bare' });
 

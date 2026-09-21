@@ -357,21 +357,35 @@ describe('thermostat.applySchedules (integration)', () => {
   it('should isolate a device that fails to regulate', async () => {
     const mod = loadModule(buildSchedule('comfort'));
     const gladys = makeGladys({
-      devices: [buildThermostatDevice(baseParams()), buildThermostatDevice(baseParams())],
+      devices: [buildThermostatDevice(baseParams(), 'schedule'), buildThermostatDevice(baseParams(), 'schedule')],
       variables: {},
       switchOn: false,
       currentTemp: 18,
     });
-    // The first device blows up on the preset write, which regulateDevice does
-    // not guard: the per-device catch is what keeps the second one regulated.
+    // The first device blows up while its config is read, which regulateDevice
+    // does not guard: the per-device catch is what keeps the second one
+    // regulated rather than letting one dead thermostat stop the house.
+    // A device whose features cannot even be read: `getPreset` throws before any
+    // of the guarded paths is reached, which is what the per-device catch is for.
     let firstCall = true;
-    const originalSetValue = gladys.variable.setValue;
-    gladys.variable.setValue = fake((key, value, serviceId) => {
-      if (key && key.endsWith('_PRESET') && firstCall) {
+    const devices = gladys.device.get;
+    gladys.device.get = fake((query) => {
+      if (query && query.service === 'thermostat' && firstCall) {
         firstCall = false;
-        return Promise.reject(new Error('database down'));
+        return Promise.resolve([
+          // `features` is not an array: every read of it throws inside
+          // regulateDevice, where nothing catches it.
+          {
+            selector: 'broken',
+            params: baseParams(),
+            get features() {
+              throw new Error('database down');
+            },
+          },
+          buildThermostatDevice(baseParams(), 'schedule'),
+        ]);
       }
-      return originalSetValue(key, value, serviceId);
+      return devices(query);
     });
 
     await mod.applySchedules.call({ gladys, serviceId: 'svc' });
