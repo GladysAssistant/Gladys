@@ -777,6 +777,199 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept scene triggers and scene actions declarations', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      scene_triggers: [
+        {
+          key: 'object_detected',
+          label: { en: 'Object detected', fr: 'Objet détecté' },
+          description: { en: 'Frigate detected an object on a camera.' },
+          fields: [
+            { key: 'intro', type: 'section', label: { en: 'Zones' }, description: { en: 'Host: {{gladys_host}}' } },
+            { key: 'camera', type: 'select', source: 'devices', label: { en: 'Camera' }, required: true },
+            {
+              key: 'label',
+              type: 'multi_select',
+              label: { en: 'Object types' },
+              options: [{ value: 'person', label: { en: 'Person' } }],
+            },
+            { key: 'zone', type: 'string', label: { en: 'Zone' }, placeholder: { en: 'driveway' } },
+            { key: 'min_score', type: 'number', label: { en: 'Score' }, min: 0, max: 1 },
+          ],
+          variables: [
+            { key: 'label', type: 'string', label: { en: 'Object type' }, description: { en: 'The label' } },
+            { key: 'score', type: 'number', label: { en: 'Confidence' } },
+            { key: 'moving', type: 'boolean', label: { en: 'Moving' } },
+          ],
+        },
+        // a key may exist in both namespaces
+        { key: 'echo', label: { en: 'Echo event' } },
+      ],
+      scene_actions: [
+        {
+          key: 'create_snapshot',
+          label: { en: 'Take a snapshot' },
+          description: { en: 'Returns a clip identifier.' },
+          timeout_seconds: 20,
+          fields: [
+            { key: 'camera', type: 'select', source: 'devices', label: { en: 'Camera' }, required: true },
+            { key: 'caption', type: 'string', label: { en: 'Caption' } },
+            // boolean is allowed on an action parameter
+            { key: 'hd', type: 'boolean', label: { en: 'HD' }, default: true },
+          ],
+          outputs: [{ key: 'clip_id', type: 'string', label: { en: 'Clip identifier' } }],
+        },
+        { key: 'echo', label: { en: 'Echo' } },
+      ],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+    // every integration type may declare them
+    externalIntegration.validateManifest({
+      ...manifest,
+      type: 'communication',
+      name: 'Signal Bridge Demo',
+      docker_image: 'ghcr.io/john/gladys-signal-bridge:1.0.0',
+    });
+  });
+
+  it('should reject malformed scene declaration lists', () => {
+    const trigger = { key: 'a', label: { en: 'A' } };
+    ['scene_triggers', 'scene_actions'].forEach((listName) => {
+      expect422({ ...TEST_MANIFEST, [listName]: 'all' }, `${listName}: must be a list of 1-20 entries`);
+      expect422({ ...TEST_MANIFEST, [listName]: [] }, `${listName}: must be a list of 1-20 entries`);
+      expect422(
+        { ...TEST_MANIFEST, [listName]: Array(21).fill(trigger) },
+        `${listName}: must be a list of 1-20 entries`,
+      );
+      expect422({ ...TEST_MANIFEST, [listName]: ['run'] }, `${listName}[0]: must be an object`);
+      expect422({ ...TEST_MANIFEST, [listName]: [{ key: 'Bad Key', label: { en: 'A' } }] }, `${listName}[0].key`);
+      expect422({ ...TEST_MANIFEST, [listName]: [{ key: 'a'.repeat(41), label: { en: 'A' } }] }, `${listName}[0].key`);
+      expect422({ ...TEST_MANIFEST, [listName]: [trigger, { key: 'a', label: { en: 'Again' } }] }, 'duplicate key "a"');
+      expect422(
+        { ...TEST_MANIFEST, [listName]: [{ key: 'a', label: { fr: 'Sans anglais' } }] },
+        `${listName}[0].label.en`,
+      );
+      expect422({ ...TEST_MANIFEST, [listName]: [{ ...trigger, description: 'plain' }] }, `${listName}[0].description`);
+      expect422(
+        { ...TEST_MANIFEST, [listName]: [{ ...trigger, unknown_field: true }] },
+        `${listName}[0].unknown_field`,
+      );
+      expect422({ ...TEST_MANIFEST, [listName]: [{ ...trigger, fields: 'camera' }] }, `${listName}[0].fields: must be`);
+      expect422(
+        {
+          ...TEST_MANIFEST,
+          [listName]: [
+            {
+              ...trigger,
+              fields: Array.from({ length: 11 }, (v, i) => ({ key: `f${i}`, type: 'string', label: { en: 'F' } })),
+            },
+          ],
+        },
+        `${listName}[0].fields: must be an array of at most 10 fields`,
+      );
+      // the config_schema engine, errors included
+      expect422(
+        { ...TEST_MANIFEST, [listName]: [{ ...trigger, fields: [{ key: 'x', type: 'unknown-type' }] }] },
+        `${listName}[0].fields[0].type: must be one of`,
+      );
+      // secrets and account linking never reach a scene
+      ['secret', 'oauth2', 'account_link'].forEach((type) => {
+        expect422(
+          { ...TEST_MANIFEST, [listName]: [{ ...trigger, fields: [{ key: 'x', type, label: { en: 'X' } }] }] },
+          `${listName}[0].fields[0].type: must be one of`,
+        );
+      });
+      // {{port:<name>}} never resolves in the scene editor, even when declared
+      expect422(
+        {
+          ...TEST_MANIFEST,
+          containers: [
+            {
+              name: 'ui',
+              docker_image: 'nginx:1.27',
+              ports: [{ container_port: 80, name: 'web', label: { en: 'Web' } }],
+            },
+          ],
+          [listName]: [{ ...trigger, fields: [{ key: 'x', type: 'section', label: { en: 'See {{port:web}}' } }] }],
+        },
+        `${listName}[0].fields[0].label.en: {{port:web}} is not available in the scene editor`,
+      );
+    });
+    // a boolean trigger filter could never express "any"
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        scene_triggers: [{ ...trigger, fields: [{ key: 'x', type: 'boolean', label: { en: 'X' } }] }],
+      },
+      'scene_triggers[0].fields[0].type: must be one of string, number, select, multi_select, section in a scene trigger',
+    );
+    // timeout and outputs are action-only, variables trigger-only
+    expect422(
+      { ...TEST_MANIFEST, scene_triggers: [{ ...trigger, timeout_seconds: 10 }] },
+      'scene_triggers[0].timeout_seconds: unknown field',
+    );
+    expect422(
+      { ...TEST_MANIFEST, scene_triggers: [{ ...trigger, outputs: [] }] },
+      'scene_triggers[0].outputs: unknown field',
+    );
+    expect422(
+      { ...TEST_MANIFEST, scene_actions: [{ ...trigger, variables: [] }] },
+      'scene_actions[0].variables: unknown field',
+    );
+    expect422(
+      { ...TEST_MANIFEST, scene_actions: [{ ...trigger, timeout_seconds: 4 }] },
+      'scene_actions[0].timeout_seconds: must be an integer between 5 and 120',
+    );
+    expect422(
+      { ...TEST_MANIFEST, scene_actions: [{ ...trigger, timeout_seconds: 121 }] },
+      'scene_actions[0].timeout_seconds: must be an integer between 5 and 120',
+    );
+  });
+
+  it('should reject malformed variables and outputs', () => {
+    const cases = [
+      ['scene_triggers', 'variables'],
+      ['scene_actions', 'outputs'],
+    ];
+    cases.forEach(([listName, variablesName]) => {
+      const withVariables = (variables) => ({
+        ...TEST_MANIFEST,
+        [listName]: [{ key: 'a', label: { en: 'A' }, [variablesName]: variables }],
+      });
+      const path = `${listName}[0].${variablesName}`;
+      expect422(withVariables('label'), `${path}: must be an array of at most 20 entries`);
+      expect422(
+        withVariables(Array.from({ length: 21 }, (v, i) => ({ key: `v${i}`, type: 'string', label: { en: 'V' } }))),
+        `${path}: must be an array of at most 20 entries`,
+      );
+      expect422(withVariables(['label']), `${path}[0]: must be an object`);
+      expect422(withVariables([{ key: 'Bad', type: 'string', label: { en: 'V' } }]), `${path}[0].key`);
+      expect422(
+        withVariables([
+          { key: 'v', type: 'string', label: { en: 'V' } },
+          { key: 'v', type: 'number', label: { en: 'V' } },
+        ]),
+        `${path}[1].key: duplicate key "v"`,
+      );
+      // scalars only: an image or an object output does not exist
+      expect422(
+        withVariables([{ key: 'v', type: 'image', label: { en: 'V' } }]),
+        `${path}[0].type: must be one of string, number, boolean`,
+      );
+      expect422(withVariables([{ key: 'v', type: 'string', label: { fr: 'V' } }]), `${path}[0].label.en`);
+      expect422(
+        withVariables([{ key: 'v', type: 'string', label: { en: 'V' }, description: 'x' }]),
+        `${path}[0].description`,
+      );
+      expect422(
+        withVariables([{ key: 'v', type: 'string', label: { en: 'V' }, unit: 'x' }]),
+        `${path}[0].unit: unknown field`,
+      );
+    });
+  });
+
   it('should accept a valid containers declaration', () => {
     const manifest = {
       ...TEST_MANIFEST,

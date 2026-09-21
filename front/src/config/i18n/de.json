@@ -82,6 +82,7 @@
       "typeMismatchWarning": "Diese Funktion hat einen anderen Typ als die Quellfunktion: ihr Verlauf ergibt nach der Migration möglicherweise keinen Sinn mehr.",
       "unitMismatchWarning": "Diese Funktion hat eine andere Einheit als die Quellfunktion: die Werte werden ohne Umrechnung übernommen, die Diagramme können dadurch inkonsistent werden.",
       "unmappedWarning": "Einige Funktionen sind nicht zugeordnet: ihr Verlauf wird gelöscht, und die Szenen und Dashboards, die sie verwenden, werden nicht aktualisiert.",
+      "playNotificationWarning": "Das Zielgerät kann keine Benachrichtigungen abspielen: die Szenen, die über diesen Lautsprecher „sprechen“, werden auf das Zielgerät umgeleitet und schlagen bei der Ausführung fehl. Wähle ein kompatibles Zielgerät oder passe diese Szenen nach der Migration an.",
       "noDestinationAvailable": "Es wurde kein Gerät einer anderen Integration gefunden. Erstelle zuerst das Zielgerät in seiner neuen Integration und komme dann hierher zurück, um zu migrieren.",
       "loadError": "Die Geräteliste konnte nicht geladen werden. Bitte versuche es erneut.",
       "migrateError": "Die Migration ist fehlgeschlagen. Das alte Gerät wurde nicht gelöscht, aber ein Teil des Verlaufs wurde möglicherweise bereits zum Zielgerät verschoben. Überprüfe die Aufgaben-Seite und deine Geräteliste und versuche es dann erneut: ein neuer Versuch migriert nur, was noch übrig ist.",
@@ -364,6 +365,8 @@
     "selectBoxTypeLabel": "Wähle aus, welches Widget hier angezeigt werden soll",
     "selectBoxTypeSearchPlaceholder": "Widget suchen (Uhr, Kamera…)",
     "selectBoxTypeNoResult": "Kein Widget entspricht \"{{search}}\"",
+    "selectBoxTypeCoreSection": "Gladys-Widgets",
+    "selectBoxTypeIntegrationSection": "Integrations-Widgets",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Wetter",
@@ -387,7 +390,8 @@
       "sun": "Sonne",
       "chips": "Status-Chips",
       "actions": "Schnellaktionen",
-      "house-view": "Hausansicht"
+      "house-view": "Hausansicht",
+      "external-widget": "Integrations-Widget"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -825,6 +829,26 @@
         "editPinLabelPlaceholder": "z. B. Solar",
         "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
         "error": "Das Bild konnte nicht geladen werden."
+      },
+      "external-widget": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Standardmäßig der Name des Widgets",
+        "editSettingsLabel": "Widget-Einstellungen",
+        "editIntegrationNotInstalled": "Die Integration, die dieses Widget bereitstellt, ist nicht mehr installiert. Entfernen Sie das Widget oder installieren Sie die Integration erneut.",
+        "notInstalled": "Diese Integration ist nicht mehr installiert.",
+        "notInstalledHint": "Bearbeiten Sie das Dashboard, um dieses Widget zu entfernen, oder installieren Sie die Integration erneut.",
+        "stopped": "Die Integration ist gestoppt.",
+        "openIntegrationLink": "Integration öffnen",
+        "unavailable": "Die Widget-Daten sind nicht verfügbar.",
+        "retryButton": "Erneut versuchen",
+        "checkSettings": "Prüfen Sie die Einstellungen dieses Widgets.",
+        "checkSettingsHint": "Bearbeiten Sie das Dashboard, um die Widget-Einstellungen zu korrigieren.",
+        "needsNewerGladys": "Dieses Widget benötigt eine neuere Gladys-Version.",
+        "empty": "Derzeit nichts anzuzeigen.",
+        "emptyChart": "Noch keine Daten für diesen Zeitraum.",
+        "now": "Jetzt",
+        "confirmAction": "„{{label}}“ ausführen?",
+        "actionError": "Die Aktion ist fehlgeschlagen."
       }
     },
     "editDashboardBackgroundLabel": "Hintergrundstimmung",
@@ -1139,7 +1163,14 @@
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
-        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent)."
+        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "widgetsTitle": "Dashboard-Widgets",
+        "widgetsText": "Diese Integration stellt die folgenden Widgets bereit, die allen Benutzern im Dashboard-Editor zur Verfügung stehen:",
+        "providerInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Dashboard-Widgets bereit. Konfigurieren Sie sie hier und fügen Sie ihre Widgets dann im Dashboard-Editor hinzu.",
+        "sceneDeclarationsTitle": "Szenen-Auslöser und -Aktionen",
+        "sceneDeclarationsText": "Diese Integration fügt dem Szenen-Editor {{triggers}} Auslöser und {{actions}} Aktion(en) hinzu.",
+        "sceneTriggerPrefix": "Auslöser:",
+        "sceneActionPrefix": "Aktion:"
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
@@ -3303,7 +3334,8 @@
         "userLabel": "Benutzer",
         "serviceLabel": "Senden über",
         "allServicesLabel": "Alle konfigurierten Dienste",
-        "serviceExplanation": "Wähle den Nachrichtendienst, der diese Nachricht sendet. Standardmäßig wird die Nachricht an alle vom Benutzer konfigurierten Dienste gesendet.",
+        "gladysOnlyLabel": "Nur Gladys-Konversation",
+        "serviceExplanation": "Wähle, wo diese Nachricht zugestellt wird. Die Nachricht bleibt immer in der Gladys-Konversation: standardmäßig wird sie zusätzlich an alle vom Benutzer konfigurierten Nachrichtendienste gesendet.",
         "serviceUnavailable": "nicht verfügbar",
         "serviceIntegrationExternal": "externe Integration",
         "serviceIntegrationInternal": "native Integration",
@@ -3658,6 +3690,9 @@
       },
       "time": {
         "get-date": "Datum und Uhrzeit abrufen"
+      },
+      "external-integration": {
+        "scene-action": "Integrations-Aktion"
       }
     },
     "actionsDescriptions": {
@@ -3736,6 +3771,9 @@
       },
       "time": {
         "get-date": "Das aktuelle Datum und die Uhrzeit abrufen, um sie in der Szene wiederzuverwenden"
+      },
+      "external-integration": {
+        "scene-action": "Eine von einer externen Integration deklarierte Aktion"
       }
     },
     "actionCategories": {
@@ -3744,7 +3782,8 @@
       "conditions": "Bedingungen",
       "flow": "Ablauf",
       "homeSecurity": "Zuhause & Sicherheit",
-      "advanced": "Erweitert"
+      "advanced": "Erweitert",
+      "integrations": "Integrationen"
     },
     "variables": {
       "device": {
@@ -3821,6 +3860,9 @@
       "weather": {
         "alert-raised": "Wetterwarnung ausgelöst",
         "alert-ended": "Wetterwarnung beendet"
+      },
+      "external-integration": {
+        "scene-event": "Integrations-Auslöser"
       }
     },
     "triggersDescriptions": {
@@ -3864,6 +3906,9 @@
       "weather": {
         "alert-raised": "Wenn eine Wetterwarnung beginnt (Wind, Regen…)",
         "alert-ended": "Wenn eine Wetterwarnung endet"
+      },
+      "external-integration": {
+        "scene-event": "Ein von einer externen Integration deklarierter Auslöser"
       }
     },
     "triggerCategories": {
@@ -3872,7 +3917,8 @@
       "presence": "Anwesenheit",
       "alarm": "Alarmanlage",
       "weather": "Wetter",
-      "advanced": "Erweitert"
+      "advanced": "Erweitert",
+      "integrations": "Integrationen"
     },
     "triggersCard": {
       "newState": {
@@ -4032,7 +4078,22 @@
     "moveHandleLabel": "Neu anordnen (ziehen, oder Pfeiltasten hoch und runter)",
     "deleteTriggerButton": "Diesen Auslöser löschen",
     "expandStepButton": "Details anzeigen",
-    "collapseStepButton": "Details ausblenden"
+    "collapseStepButton": "Details ausblenden",
+    "externalIntegration": {
+      "triggerNotInstalled": "Dieser Auslöser stammt von einer Integration, die nicht mehr installiert ist. Er kann erst wieder auslösen, wenn die Integration erneut installiert wird.",
+      "triggerNotDeclared": "Dieser Auslöser wird von der installierten Version der Integration nicht mehr deklariert. Er wird nicht mehr auslösen.",
+      "triggerInactive": "Die Integration ist gestoppt: dieser Auslöser kann erst auslösen, wenn sie läuft.",
+      "actionNotInstalled": "Diese Aktion stammt von einer Integration, die nicht mehr installiert ist. Sie schlägt fehl, bis die Integration erneut installiert wird.",
+      "actionNotDeclared": "Diese Aktion wird von der installierten Version der Integration nicht mehr deklariert. Sie schlägt beim Ausführen der Szene fehl.",
+      "actionInactive": "Die Integration ist gestoppt: diese Aktion schlägt fehl, bis sie läuft.",
+      "catalogLoading": "Auslöser und Aktionen der Integration werden geladen…",
+      "catalogUnavailableError": "Die Auslöser und Aktionen der Integrationen konnten nicht geladen werden, die Szene wurde daher nicht gespeichert. Versuche es gleich noch einmal.",
+      "wildcardHint": "Ein leer gelassenes Feld akzeptiert jeden Wert.",
+      "variablesAvailable": "Informationen, die an die Aktionen der Szene weitergegeben werden:",
+      "outputsAvailable": "Ergebnisse, die in den folgenden Schritten verwendbar sind:",
+      "variablesHint": "Tippe '{{', um Informationen der Szene einzufügen, zum Beispiel die vom Auslöser übermittelten.",
+      "requiredFieldError": "Das Feld „{{field}}“ von „{{title}}“ ist erforderlich: es darf nicht leer bleiben."
+    }
   },
   "profile": {
     "title": "Profil",
@@ -5665,7 +5726,8 @@
       "decimal": "Temperatur",
       "min": "Minimale Temperatur",
       "max": "Maximale Temperatur",
-      "average": "Mitteltemperatur Temperatur"
+      "average": "Mitteltemperatur Temperatur",
+      "probe": "Fühlertemperatur"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Gerätetemperatursensor",
@@ -6050,16 +6112,20 @@
       "smaxin": "Max. eingespeiste Scheinleistung n (SMAXIN)",
       "smaxin_1": "Max. eingespeiste Scheinleistung n-1 (SMAXIN-1)",
       "smaxn": "Max. abgegebene Scheinleistung (SMAXN)",
+      "smaxn1": "Max. abgegebene Scheinleistung (SMAXN1)",
       "smaxn2": "Max. abgegebene Scheinleistung (SMAXN2)",
       "smaxn3": "Max. abgegebene Scheinleistung (SMAXN3)",
       "sinsts": "Momentane abgegebene Scheinleistung (SINSTS)",
+      "sinsts1": "Momentane abgegebene Scheinleistung (SINSTS1)",
       "sinsts2": "Momentane abgegebene Scheinleistung (SINSTS2)",
       "sinsts3": "Momentane abgegebene Scheinleistung (SINSTS3)",
       "smaxn_1": "Max. entnommene Scheinleistung n-1 (SMAXN-1)",
+      "smaxn1_1": "Max. entnommene Scheinleistung n-1 (SMAXN1-1)",
       "smaxn2_1": "Max. entnommene Scheinleistung n-1 (SMAXN2-1)",
       "smaxn3_1": "Max. entnommene Scheinleistung n-1 (SMAXN3-1)",
       "hhphc": "HPHC-Programm (HHPHC)",
       "imax": "Spitzenstrom (IMAX)",
+      "imax1": "Spitzenstrom (IMAX1)",
       "adps": "Warnung bei Überschreitung der Vertragsleistung (ADPS)",
       "imax2": "Spitzenstrom (IMAX2)",
       "imax3": "Spitzenstrom (IMAX3)",

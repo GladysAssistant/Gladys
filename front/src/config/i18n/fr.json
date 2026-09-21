@@ -82,6 +82,7 @@
       "typeMismatchWarning": "Cette fonctionnalité a un type différent de la fonctionnalité source : son historique risque de ne plus avoir de sens une fois migré.",
       "unitMismatchWarning": "Cette fonctionnalité a une unité différente de la fonctionnalité source : les valeurs sont déplacées sans conversion, les graphiques risquent de devenir incohérents.",
       "unmappedWarning": "Certaines fonctionnalités n'ont pas de correspondance : leur historique sera supprimé, et les scènes et tableaux de bord qui les utilisent ne seront pas mis à jour.",
+      "playNotificationWarning": "L'appareil de destination ne peut pas jouer de notifications : les scènes qui « parlent sur » cette enceinte seront re-pointées vers la destination, et échoueront à l'exécution. Choisissez une destination compatible, ou modifiez ces scènes après la migration.",
       "noDestinationAvailable": "Aucun appareil d'une autre intégration n'a été trouvé. Créez d'abord l'appareil de destination dans sa nouvelle intégration, puis revenez ici pour migrer.",
       "loadError": "Impossible de charger la liste des appareils. Veuillez réessayer.",
       "migrateError": "La migration a échoué. L'ancien appareil n'a pas été supprimé, mais une partie de l'historique a pu être déjà déplacée vers la destination. Vérifiez la page des tâches et votre liste d'appareils, puis réessayez : une nouvelle tentative ne migre que ce qu'il reste à migrer.",
@@ -364,6 +365,8 @@
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
     "selectBoxTypeSearchPlaceholder": "Rechercher un widget (horloge, caméra…)",
     "selectBoxTypeNoResult": "Aucun widget ne correspond à « {{search}} »",
+    "selectBoxTypeCoreSection": "Widgets Gladys",
+    "selectBoxTypeIntegrationSection": "Widgets d'intégrations",
     "boxTitle": {
       "alarm": "Alarme",
       "weather": "Météo",
@@ -387,7 +390,8 @@
       "sun": "Soleil",
       "chips": "Pastilles d'état",
       "actions": "Actions rapides",
-      "house-view": "Vue de la maison"
+      "house-view": "Vue de la maison",
+      "external-widget": "Widget d'intégration"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -825,6 +829,26 @@
         "editPinLabelPlaceholder": "ex : Solaire",
         "noImage": "Choisissez une illustration dans les réglages du widget.",
         "error": "L'image n'a pas pu être chargée."
+      },
+      "external-widget": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Par défaut, le nom du widget",
+        "editSettingsLabel": "Paramètres du widget",
+        "editIntegrationNotInstalled": "L'intégration qui fournit ce widget n'est plus installée. Supprimez ce widget ou réinstallez l'intégration.",
+        "notInstalled": "Cette intégration n'est plus installée.",
+        "notInstalledHint": "Modifiez le tableau de bord pour retirer ce widget, ou réinstallez l'intégration pour le retrouver.",
+        "stopped": "L'intégration est arrêtée.",
+        "openIntegrationLink": "Ouvrir l'intégration",
+        "unavailable": "Les données du widget sont indisponibles.",
+        "retryButton": "Réessayer",
+        "checkSettings": "Vérifiez les paramètres de ce widget.",
+        "checkSettingsHint": "Modifiez le tableau de bord pour corriger les paramètres du widget.",
+        "needsNewerGladys": "Ce widget nécessite une version plus récente de Gladys.",
+        "empty": "Rien à afficher pour le moment.",
+        "emptyChart": "Pas encore de données sur cette période.",
+        "now": "Maintenant",
+        "confirmAction": "Lancer « {{label}} » ?",
+        "actionError": "L'action a échoué."
       }
     },
     "editDashboardBackgroundLabel": "Ambiance de fond",
@@ -1139,7 +1163,14 @@
         "webhooksTitle": "Webhooks Internet (Gladys Plus)",
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
         "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
-        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant)."
+        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant).",
+        "widgetsTitle": "Widgets de tableau de bord",
+        "widgetsText": "Cette intégration fournit les widgets suivants, disponibles pour tous les utilisateurs dans l'éditeur de tableau de bord :",
+        "providerInfoText": "Cette intégration ne gère aucun appareil : elle fournit des widgets de tableau de bord. Configurez-la ici, puis ajoutez ses widgets depuis l'éditeur de tableau de bord.",
+        "sceneDeclarationsTitle": "Déclencheurs et actions de scènes",
+        "sceneDeclarationsText": "Cette intégration ajoute {{triggers}} déclencheur(s) et {{actions}} action(s) à l'éditeur de scènes.",
+        "sceneTriggerPrefix": "Déclencheur :",
+        "sceneActionPrefix": "Action :"
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -3303,7 +3334,8 @@
         "userLabel": "Utilisateur",
         "serviceLabel": "Envoyer via",
         "allServicesLabel": "Tous les services configurés",
-        "serviceExplanation": "Choisissez le service de messagerie qui enverra ce message. Par défaut, le message est envoyé sur tous les services configurés par l'utilisateur.",
+        "gladysOnlyLabel": "Conversation Gladys uniquement",
+        "serviceExplanation": "Choisissez où ce message est délivré. Le message reste toujours dans la conversation Gladys : par défaut, il est aussi envoyé sur tous les services de messagerie configurés par l'utilisateur.",
         "serviceUnavailable": "indisponible",
         "serviceIntegrationExternal": "intégration externe",
         "serviceIntegrationInternal": "intégration native",
@@ -3658,6 +3690,9 @@
       },
       "time": {
         "get-date": "Récupérer la date et l'heure"
+      },
+      "external-integration": {
+        "scene-action": "Action d'intégration"
       }
     },
     "actionsDescriptions": {
@@ -3736,6 +3771,9 @@
       },
       "time": {
         "get-date": "Récupérer la date et l'heure actuelles pour les réutiliser dans la scène"
+      },
+      "external-integration": {
+        "scene-action": "Une action déclarée par une intégration externe"
       }
     },
     "actionCategories": {
@@ -3744,7 +3782,8 @@
       "conditions": "Conditions",
       "flow": "Déroulement",
       "homeSecurity": "Maison & sécurité",
-      "advanced": "Avancé"
+      "advanced": "Avancé",
+      "integrations": "Intégrations"
     },
     "variables": {
       "device": {
@@ -3821,6 +3860,9 @@
       "weather": {
         "alert-raised": "Alerte météo déclenchée",
         "alert-ended": "Alerte météo terminée"
+      },
+      "external-integration": {
+        "scene-event": "Déclencheur d'intégration"
       }
     },
     "triggersDescriptions": {
@@ -3864,6 +3906,9 @@
       "weather": {
         "alert-raised": "Quand une alerte météo commence (vent, pluie…)",
         "alert-ended": "Quand une alerte météo se termine"
+      },
+      "external-integration": {
+        "scene-event": "Un déclencheur déclaré par une intégration externe"
       }
     },
     "triggerCategories": {
@@ -3872,7 +3917,8 @@
       "presence": "Présence",
       "alarm": "Alarme",
       "weather": "Météo",
-      "advanced": "Avancé"
+      "advanced": "Avancé",
+      "integrations": "Intégrations"
     },
     "triggersCard": {
       "newState": {
@@ -4032,7 +4078,22 @@
     "moveHandleLabel": "Réorganiser (glisser, ou flèches haut et bas)",
     "deleteTriggerButton": "Supprimer ce déclencheur",
     "expandStepButton": "Afficher le détail",
-    "collapseStepButton": "Masquer le détail"
+    "collapseStepButton": "Masquer le détail",
+    "externalIntegration": {
+      "triggerNotInstalled": "Ce déclencheur est fourni par une intégration qui n'est plus installée. Il ne pourra pas se déclencher tant qu'elle n'est pas réinstallée.",
+      "triggerNotDeclared": "Ce déclencheur n'est plus déclaré par la version installée de l'intégration. Il ne se déclenchera plus.",
+      "triggerInactive": "L'intégration est arrêtée : ce déclencheur ne peut pas se déclencher tant qu'elle ne tourne pas.",
+      "actionNotInstalled": "Cette action est fournie par une intégration qui n'est plus installée. Elle échouera tant qu'elle n'est pas réinstallée.",
+      "actionNotDeclared": "Cette action n'est plus déclarée par la version installée de l'intégration. Elle échouera à l'exécution de la scène.",
+      "actionInactive": "L'intégration est arrêtée : cette action échouera tant qu'elle ne tourne pas.",
+      "catalogLoading": "Chargement des déclencheurs et actions de l'intégration…",
+      "catalogUnavailableError": "Les déclencheurs et actions des intégrations n'ont pas pu être chargés : la scène n'a pas été enregistrée. Réessayez dans un instant.",
+      "wildcardHint": "Un champ laissé vide accepte n'importe quelle valeur.",
+      "variablesAvailable": "Informations transmises aux actions de la scène :",
+      "outputsAvailable": "Résultats utilisables dans les étapes suivantes :",
+      "variablesHint": "Tapez « {{ » pour insérer une information de la scène, par exemple celles transmises par le déclencheur.",
+      "requiredFieldError": "Le champ « {{field}} » de « {{title}} » est obligatoire : il ne peut pas rester vide."
+    }
   },
   "profile": {
     "title": "Profil",
@@ -5665,7 +5726,8 @@
       "decimal": "Température",
       "min": "Température minimale",
       "max": "Température maximale",
-      "average": "Température moyenne"
+      "average": "Température moyenne",
+      "probe": "Température sonde"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Température de l'appareil",
@@ -6050,16 +6112,20 @@
       "smaxin": "Puissance apparente max. injectée n (SMAXIN)",
       "smaxin_1": "Puissance apparente max. injectée n-1 (SMAXIN-1)",
       "smaxn": "Puissance apparente max. soutirée (SMAXN)",
+      "smaxn1": "Puissance apparente max. soutirée (SMAXN1)",
       "smaxn2": "Puissance apparente max. soutirée (SMAXN2)",
       "smaxn3": "Puissance apparente max. soutirée (SMAXN3)",
       "sinsts": "Puissance apparente instantanée soutirée (SINSTS)",
+      "sinsts1": "Puissance apparente instantanée soutirée (SINSTS1)",
       "sinsts2": "Puissance apparente instantanée soutirée (SINSTS2)",
       "sinsts3": "Puissance apparente instantanée soutirée (SINSTS3)",
       "smaxn_1": "Puissance apparente max. soutirée n-1 (SMAXN-1)",
+      "smaxn1_1": "Puissance apparente max. soutirée n-1 (SMAXN1-1)",
       "smaxn2_1": "Puissance apparente max. soutirée n-1 (SMAXN2-1)",
       "smaxn3_1": "Puissance apparente max. soutirée n-1 (SMAXN3-1)",
       "hhphc": "Programme HPHC (HHPHC)",
       "imax": "Intensité maximale (IMAX)",
+      "imax1": "Intensité maximale (IMAX1)",
       "adps": "Alerte dépassement puissance souscrite (ADPS)",
       "imax2": "Intensité maximale (IMAX2)",
       "imax3": "Intensité maximale (IMAX3)",

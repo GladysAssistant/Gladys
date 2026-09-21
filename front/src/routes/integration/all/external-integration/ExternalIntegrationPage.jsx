@@ -6,6 +6,7 @@ import get from 'get-value';
 
 import { USER_ROLE } from '../../../../../../server/utils/constants';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
+import { TYPES_WITHOUT_DEVICE_SCREENS } from './utils';
 
 // last known display name per integration: each tab reloads the integration
 // on mount, and showing the raw selector while it loads made the title
@@ -24,12 +25,13 @@ const getDisplayName = (selector, integration) => {
 };
 
 const ExternalIntegrationPage = ({ selector, integration, user, children }) => {
-  // communication and weather integrations have no device screens (they are
-  // dedicated provider APIs, not device controllers): the generic page
-  // branches by type and only shows Configuration and Logs. An unknown type
-  // (metadata still loading) hides the tabs too, instead of flashing them.
+  // communication, weather and provider integrations have no device screens
+  // (dedicated provider APIs or capability-only contracts, not device
+  // controllers): the generic page branches by type and only shows
+  // Configuration, Supervision and Logs. An unknown type (metadata still
+  // loading) hides the tabs too, instead of flashing them.
   const integrationType = get(integration, 'manifest.type');
-  const hasDeviceScreens = Boolean(integrationType) && !['communication', 'weather'].includes(integrationType);
+  const hasDeviceScreens = Boolean(integrationType) && !TYPES_WITHOUT_DEVICE_SCREENS.includes(integrationType);
   // a non-admin user only comes here to link their own account: supervision
   // and logs are administration screens (and their routes are admin-only)
   const isAdmin = get(user, 'role') === USER_ROLE.ADMIN;

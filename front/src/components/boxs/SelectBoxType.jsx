@@ -1,15 +1,20 @@
 import { Component } from 'preact';
+import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
 import { DASHBOARD_BOX_TYPE_LIST } from '../../../../server/utils/constants';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import normalizeSearchText from '../../utils/normalizeSearchText';
+import { getLocalizedText } from '../../routes/integration/all/external-integration/utils';
+import { loadWidgetList } from './external-widget/widgetList';
 import style from './selectBoxType.css';
 
-// Widget "devices in room" is deprecated and will be removed soon
+// Widget "devices in room" is deprecated and will be removed soon.
+// "external-widget" is not a tile of its own either: the picker lists one
+// tile per widget declared by the installed integrations instead (below).
 const DASHBOARD_BOX_TYPE_LIST_FILTERED = DASHBOARD_BOX_TYPE_LIST.filter(
-  dashboardBoxType => dashboardBoxType !== 'devices-in-room'
+  dashboardBoxType => !['devices-in-room', 'external-widget'].includes(dashboardBoxType)
 );
 
 const BOX_TYPE_ICONS = {
@@ -40,7 +45,7 @@ const BOX_TYPE_ICONS = {
 import BaseEditBox from './baseEditBox';
 
 class SelectBoxType extends Component {
-  state = { search: '' };
+  state = { search: '', externalWidgets: [] };
 
   updateSearch = e => {
     this.setState({ search: e.target.value });
@@ -50,7 +55,29 @@ class SelectBoxType extends Component {
     this.props.updateNewSelectedBox(this.props.x, this.props.y, type);
   };
 
-  render(props, { search }) {
+  // an integration widget tile stands for one declared widget of one
+  // installed integration: the box carries both on top of its type
+  selectExternalWidget = widget => {
+    this.props.updateNewSelectedBox(this.props.x, this.props.y, 'external-widget', {
+      integration: widget.integration_selector,
+      widget: widget.key
+    });
+  };
+
+  loadExternalWidgets = async () => {
+    try {
+      const externalWidgets = await loadWidgetList(this.props.httpClient);
+      this.setState({ externalWidgets });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  componentDidMount() {
+    this.loadExternalWidgets();
+  }
+
+  render(props, { search, externalWidgets }) {
     const searchTerm = normalizeSearchText(search);
     const boxTypes = DASHBOARD_BOX_TYPE_LIST_FILTERED.map(dashboardBoxType => ({
       type: dashboardBoxType,
@@ -60,6 +87,25 @@ class SelectBoxType extends Component {
         ({ type, label }) => searchTerm.length === 0 || normalizeSearchText(`${type} ${label}`).includes(searchTerm)
       )
       .sort((a, b) => a.label.localeCompare(b.label));
+    const language = get(props, 'user.language') || 'en';
+    // after the core tiles: one tile per widget of every installed
+    // integration, searchable on its label and the integration's name
+    const widgetTiles = (externalWidgets || [])
+      .map(widget => ({
+        widget,
+        label: getLocalizedText(widget.label, language) || widget.key,
+        caption: widget.integration_name
+      }))
+      .filter(
+        ({ widget, label, caption }) =>
+          searchTerm.length === 0 ||
+          normalizeSearchText(
+            `${widget.key} ${label} ${caption} ${getLocalizedText(widget.description, language)}`
+          ).includes(searchTerm)
+      );
+    // the two families are told apart with a heading each, as soon as an
+    // installed integration brings widgets of its own
+    const showSections = (externalWidgets || []).length > 0;
     return (
       <BaseEditBox {...props} titleKey="dashboard.selectBoxType">
         <div class="form-group">
@@ -81,6 +127,12 @@ class SelectBoxType extends Component {
             </Localizer>
           </div>
           <div class={style.boxTypeGrid} data-cy="select-box-type">
+            {showSections && boxTypes.length > 0 && (
+              <div class={cx('text-muted', style.boxTypeSection)}>
+                <i class="fe fe-grid" />
+                <Text id="dashboard.selectBoxTypeCoreSection" />
+              </div>
+            )}
             {boxTypes.map(({ type, label }) => (
               <button
                 type="button"
@@ -93,7 +145,27 @@ class SelectBoxType extends Component {
                 <span class={style.boxTypeLabel}>{label}</span>
               </button>
             ))}
-            {boxTypes.length === 0 && (
+            {widgetTiles.length > 0 && (
+              <div class={cx('text-muted', style.boxTypeSection)} data-cy="select-box-type-integrations">
+                <i class="fe fe-package" />
+                <Text id="dashboard.selectBoxTypeIntegrationSection" />
+              </div>
+            )}
+            {widgetTiles.map(({ widget, label, caption }) => (
+              <button
+                type="button"
+                key={`external-widget-${widget.integration_selector}-${widget.key}`}
+                data-cy={`box-type-external-widget-${widget.integration_selector}-${widget.key}`}
+                class={style.boxTypeTile}
+                title={getLocalizedText(widget.description, language) || undefined}
+                onClick={() => this.selectExternalWidget(widget)}
+              >
+                <i class={cx(`fe fe-${widget.icon || 'grid'}`, style.boxTypeIcon)} />
+                <span class={style.boxTypeLabel}>{label}</span>
+                <span class={cx('text-muted', style.boxTypeCaption)}>{caption}</span>
+              </button>
+            ))}
+            {boxTypes.length === 0 && widgetTiles.length === 0 && (
               <div class={cx('text-muted', style.boxTypeNoResult)}>
                 <Text id="dashboard.selectBoxTypeNoResult" fields={{ search }} />
               </div>
@@ -105,4 +177,4 @@ class SelectBoxType extends Component {
   }
 }
 
-export default withIntlAsProp(SelectBoxType);
+export default connect('httpClient,user', {})(withIntlAsProp(SelectBoxType));
