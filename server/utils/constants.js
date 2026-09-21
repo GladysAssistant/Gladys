@@ -421,6 +421,15 @@ const SERVICE_TYPES = {
   EXTERNAL: 'external',
 };
 
+// Sentinel value of the `service` property of the message scene actions
+// ("send message", "send message with camera", "ask the AI"): keep the
+// message in the Gladys conversation only, without forwarding it to a single
+// external messaging channel. A service name is a slug, so a real service can
+// never collide with this value. The other two cases of that property are a
+// service name (send through this channel only) and its absence, the
+// historical behaviour: broadcast to every channel the user configured.
+const MESSAGE_GLADYS_ONLY_SERVICE = '__gladys_only__';
+
 // Browse categories of the integration catalog (docs/specs/
 // integration-catalog-categories.md): display metadata describing the domain
 // of use, fully decoupled from the technical `type` of an integration. The
@@ -2369,6 +2378,7 @@ module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 
 module.exports.SERVICE_TYPES = SERVICE_TYPES;
+module.exports.MESSAGE_GLADYS_ONLY_SERVICE = MESSAGE_GLADYS_ONLY_SERVICE;
 module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
 
 module.exports.INTEGRATION_CATALOG_CATEGORIES = INTEGRATION_CATALOG_CATEGORIES;

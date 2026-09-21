@@ -1,4 +1,4 @@
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, MESSAGE_GLADYS_ONLY_SERVICE } = require('../../utils/constants');
 const { NotFoundError } = require('../../utils/coreErrors');
 const logger = require('../../utils/logger');
 const db = require('../../models');
@@ -10,7 +10,8 @@ const db = require('../../models');
  * @param {string} [file] - An optional file sent with the message.
  * @param {object} [options] - Extra message options.
  * @param {string} [options.messageType='chat'] - Message display type.
- * @param {string} [options.service] - Send through this single channel instead of every one.
+ * @param {string} [options.service] - Send through this single channel instead of every one, or
+ * MESSAGE_GLADYS_ONLY_SERVICE to keep the message in the Gladys conversation only.
  * @returns {Promise} Resolve with created message.
  * @example
  * sendToUser('tony', 'Bonjour, voici votre bilan.', null, { messageType: 'notification' });
@@ -39,6 +40,13 @@ async function sendToUser(userSelector, text, file = null, options = {}) {
     userId: user.id,
     payload: messageCreated,
   });
+  // "Gladys conversation only": the message is in database and on the
+  // websocket, which is all the user asked for. Stop here, before any
+  // external channel is called — installing a messaging integration must
+  // never turn such a message into a notification the user did not want.
+  if (service === MESSAGE_GLADYS_ONLY_SERVICE) {
+    return messageCreated;
+  }
   // forward to the outbound channels of the user: every service exposing
   // message.sendToUser resolves its own identity and no-ops when the user
   // is not linked — the core does not know any channel by name. When a

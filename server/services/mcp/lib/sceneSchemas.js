@@ -6,6 +6,7 @@ const {
   ALARM_MODES_LIST,
   COMPARISON_OPERATORS,
   ANY_CHANGE_OPERATOR,
+  MESSAGE_GLADYS_ONLY_SERVICE,
 } = require('../../../utils/constants');
 const { MAX_SCENE_DECLARATION_FIELDS } = require('../../../lib/external-integration/constants');
 
@@ -175,7 +176,10 @@ function createSceneCreateInputSchema(
     .string()
     .nullish()
     .describe(
-      'Name of the messaging service to send through (example: "telegram"). Omit or set to null to send to every messaging channel the user configured.',
+      'Where the message is delivered. It always appears in the Gladys conversation; this field only decides which external messaging channels also receive it. ' +
+        'Name of a messaging service (example: "telegram") to use that channel only, ' +
+        `"${MESSAGE_GLADYS_ONLY_SERVICE}" to keep the message in the Gladys conversation and send it to no external channel at all, ` +
+        'or omit/set to null to send it to every messaging channel the user configured.',
     );
   const sceneActionSchema = z.lazy(() =>
     z.discriminatedUnion('type', [
@@ -237,6 +241,7 @@ function createSceneCreateInputSchema(
             'Prompt text for AI (required). To inject values from previous "device.get-value" actions, use Handlebars variables with action coordinates, for example {{1.1.last_value}} (or {{0.0.last_value}}) and {{1.1.last_value_string}}.',
           ),
         camera: z.string().optional(),
+        service: messageServiceSchema,
       }),
       actionSchemaByType(ACTIONS.DEVICE.GET_VALUE, {
         device_feature: deviceFeatureSelectorSchema,

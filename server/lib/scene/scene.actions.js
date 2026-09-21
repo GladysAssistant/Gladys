@@ -404,6 +404,11 @@ const actionsFunc = {
       },
       language: user.language,
       text: textWithVariables,
+      // where the answer is delivered, like the "send message" actions: the
+      // Gladys conversation only, a single channel, or — without a `service`
+      // on the action — every channel of the user, the historical behaviour.
+      // Read by message.reply, never sent to the chat API.
+      service: action.service || null,
     };
     const { answer } = await self.gateway.forwardMessageToAiChat({
       message,

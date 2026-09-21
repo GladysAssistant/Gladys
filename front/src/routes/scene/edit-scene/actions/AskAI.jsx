@@ -7,6 +7,7 @@ import get from 'get-value';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
+import MessageServiceSelector from './MessageServiceSelector';
 
 class AskAI extends Component {
   getOptions = async () => {
@@ -165,6 +166,11 @@ class AskAI extends Component {
             classNamePrefix="react-select"
           />
         </div>
+        <MessageServiceSelector
+          action={props.action}
+          path={props.path}
+          updateActionProperty={props.updateActionProperty}
+        />
         <div class="form-group">
           <label className="form-label">
             <Text id="editScene.actionsCard.askAi.cameraLabel" />
