@@ -82,6 +82,7 @@
       "typeMismatchWarning": "This feature has a different type than the source feature: its history may not make sense once migrated.",
       "unitMismatchWarning": "This feature has a different unit than the source feature: values are moved without conversion, so charts may become inconsistent.",
       "unmappedWarning": "Some features are not matched: their history will be deleted, and the scenes and dashboards using them will not be updated.",
+      "playNotificationWarning": "The destination device cannot play notifications: the scenes that \"talk on\" this speaker will be re-pointed to the destination, and will fail when they run. Pick a destination that supports notifications, or edit those scenes after the migration.",
       "noDestinationAvailable": "No device from another integration was found. Create the destination device in its new integration first, then come back here to migrate.",
       "loadError": "Unable to load the list of devices. Please try again.",
       "migrateError": "The migration failed. The old device was not deleted, but some history may already have been moved to the destination. Check the jobs page and your device list, then try again: re-running only moves what remains to migrate.",
@@ -178,6 +179,7 @@
       "english": "English",
       "french": "Français",
       "german": "Deutsch",
+      "spanish": "Español",
       "birthdateLabel": "Birthdate",
       "birthdatePlaceHolder": "Enter your birthdate",
       "january": "January",
@@ -363,6 +365,8 @@
     "selectBoxTypeLabel": "Choose which widget to display here",
     "selectBoxTypeSearchPlaceholder": "Search for a widget (clock, camera…)",
     "selectBoxTypeNoResult": "No widget matches \"{{search}}\"",
+    "selectBoxTypeCoreSection": "Gladys widgets",
+    "selectBoxTypeIntegrationSection": "Integration widgets",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Weather",
@@ -386,7 +390,8 @@
       "sun": "Sun",
       "chips": "Status chips",
       "actions": "Quick actions",
-      "house-view": "House view"
+      "house-view": "House view",
+      "external-widget": "Integration widget"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -824,6 +829,26 @@
         "editPinLabelPlaceholder": "e.g. Solar",
         "noImage": "Pick an illustration in the widget settings.",
         "error": "The image could not be loaded."
+      },
+      "external-widget": {
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "Defaults to the widget's name",
+        "editSettingsLabel": "Widget settings",
+        "editIntegrationNotInstalled": "The integration providing this widget is no longer installed. Remove this widget or reinstall the integration.",
+        "notInstalled": "This integration is no longer installed.",
+        "notInstalledHint": "Edit the dashboard to remove this widget, or reinstall the integration to get it back.",
+        "stopped": "The integration is stopped.",
+        "openIntegrationLink": "Open the integration",
+        "unavailable": "The widget data is unavailable.",
+        "retryButton": "Retry",
+        "checkSettings": "Check the settings of this widget.",
+        "checkSettingsHint": "Edit the dashboard to fix the widget settings.",
+        "needsNewerGladys": "This widget needs a newer version of Gladys.",
+        "empty": "Nothing to show right now.",
+        "emptyChart": "No data for this period yet.",
+        "now": "Now",
+        "confirmAction": "Run \"{{label}}\"?",
+        "actionError": "The action failed."
       }
     },
     "editDashboardBackgroundLabel": "Background mood",
@@ -1138,7 +1163,14 @@
         "webhooksTitle": "Internet webhooks (Gladys Plus)",
         "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
         "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
-        "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant)."
+        "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant).",
+        "widgetsTitle": "Dashboard widgets",
+        "widgetsText": "This integration provides the following widgets, available to every user in the dashboard editor:",
+        "providerInfoText": "This integration manages no device: it provides dashboard widgets. Configure it here, then add its widgets from the dashboard editor.",
+        "sceneDeclarationsTitle": "Scene triggers and actions",
+        "sceneDeclarationsText": "This integration adds {{triggers}} trigger(s) and {{actions}} action(s) to the scene editor.",
+        "sceneTriggerPrefix": "Trigger:",
+        "sceneActionPrefix": "Action:"
       },
       "networkDiscovery": {
         "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
@@ -3302,7 +3334,8 @@
         "userLabel": "User",
         "serviceLabel": "Send through",
         "allServicesLabel": "All configured services",
-        "serviceExplanation": "Choose the messaging service which will send this message. By default, the message is sent to every service configured by the user.",
+        "gladysOnlyLabel": "Gladys conversation only",
+        "serviceExplanation": "Choose where this message is delivered. The message always stays in the Gladys conversation: by default, it is also sent to every messaging service configured by the user.",
         "serviceUnavailable": "unavailable",
         "serviceIntegrationExternal": "external integration",
         "serviceIntegrationInternal": "built-in integration",
@@ -3657,6 +3690,9 @@
       },
       "time": {
         "get-date": "Get the current date and time"
+      },
+      "external-integration": {
+        "scene-action": "Integration action"
       }
     },
     "actionsDescriptions": {
@@ -3735,6 +3771,9 @@
       },
       "time": {
         "get-date": "Get the current date and time to reuse it later in the scene"
+      },
+      "external-integration": {
+        "scene-action": "An action declared by an external integration"
       }
     },
     "actionCategories": {
@@ -3743,7 +3782,8 @@
       "conditions": "Conditions",
       "flow": "Flow",
       "homeSecurity": "Home & security",
-      "advanced": "Advanced"
+      "advanced": "Advanced",
+      "integrations": "Integrations"
     },
     "variables": {
       "device": {
@@ -3820,6 +3860,9 @@
       "weather": {
         "alert-raised": "Weather alert raised",
         "alert-ended": "Weather alert ended"
+      },
+      "external-integration": {
+        "scene-event": "Integration trigger"
       }
     },
     "triggersDescriptions": {
@@ -3863,6 +3906,9 @@
       "weather": {
         "alert-raised": "When a weather alert starts (wind, rain…)",
         "alert-ended": "When a weather alert ends"
+      },
+      "external-integration": {
+        "scene-event": "A trigger declared by an external integration"
       }
     },
     "triggerCategories": {
@@ -3871,7 +3917,8 @@
       "presence": "Presence",
       "alarm": "Alarm",
       "weather": "Weather",
-      "advanced": "Advanced"
+      "advanced": "Advanced",
+      "integrations": "Integrations"
     },
     "triggersCard": {
       "newState": {
@@ -4031,7 +4078,22 @@
     "moveHandleLabel": "Reorder (drag, or use the up and down arrow keys)",
     "deleteTriggerButton": "Delete this trigger",
     "expandStepButton": "Show the details",
-    "collapseStepButton": "Hide the details"
+    "collapseStepButton": "Hide the details",
+    "externalIntegration": {
+      "triggerNotInstalled": "This trigger is provided by an integration that is no longer installed. It cannot fire until the integration is installed again.",
+      "triggerNotDeclared": "This trigger is no longer declared by the installed version of the integration. It cannot fire anymore.",
+      "triggerInactive": "The integration is stopped: this trigger cannot fire until it runs.",
+      "actionNotInstalled": "This action is provided by an integration that is no longer installed. It will fail until the integration is installed again.",
+      "actionNotDeclared": "This action is no longer declared by the installed version of the integration. It will fail when the scene runs.",
+      "actionInactive": "The integration is stopped: this action will fail until it runs.",
+      "catalogLoading": "Loading the integration's triggers and actions…",
+      "catalogUnavailableError": "The triggers and actions of the integrations could not be loaded, so the scene was not saved. Try again in a moment.",
+      "wildcardHint": "A field left empty matches any value.",
+      "variablesAvailable": "Information passed on to the scene actions:",
+      "outputsAvailable": "Results available to the following steps:",
+      "variablesHint": "Type '{{' to insert scene information, such as the details passed on by the trigger.",
+      "requiredFieldError": "The field \"{{field}}\" of \"{{title}}\" is required: it cannot be left empty."
+    }
   },
   "profile": {
     "title": "Profile",
@@ -4064,6 +4126,7 @@
     "english": "English",
     "french": "Français",
     "german": "Deutsch",
+    "spanish": "Español",
     "roleLabel": "Role",
     "passwordLabel": "Password (min 8 characters)",
     "passwordPlaceholder": "Enter your password",
@@ -5674,7 +5737,8 @@
       "decimal": "Temperature",
       "min": "Minimum temperature",
       "max": "Maximum temperature",
-      "average": "Average temperature"
+      "average": "Average temperature",
+      "probe": "Probe temperature"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Device temperature sensor",
@@ -6059,16 +6123,20 @@
       "smaxin": "Apparent power max. injected n (SMAXIN)",
       "smaxin_1": "Apparent power max. injected n-1 (SMAXIN-1)",
       "smaxn": "Apparent power delivered peak (SMAXN)",
+      "smaxn1": "Apparent power delivered peak (SMAXN1)",
       "smaxn2": "Apparent power delivered peak (SMAXN2)",
       "smaxn3": "Apparent power delivered peak (SMAXN3)",
       "sinsts": "Immediate apparent power delivered (SINSTS)",
+      "sinsts1": "Immediate apparent power delivered (SINSTS1)",
       "sinsts2": "Immediate apparent power delivered (SINSTS2)",
       "sinsts3": "Immediate apparent power delivered (SINSTS3)",
       "smaxn_1": "Apparent power max. draw-off n-1 (SMAXN-1)",
+      "smaxn1_1": "Apparent power max. draw-off n-1 (SMAXN1-1)",
       "smaxn2_1": "Apparent power max. draw-off n-1 (SMAXN2-1)",
       "smaxn3_1": "Apparent power max. draw-off n-1 (SMAXN3-1)",
       "hhphc": "HPHC Program (HHPHC)",
       "imax": "RMS current peak (IMAX)",
+      "imax1": "RMS current peak (IMAX1)",
       "adps": "Subscribed Power Exceeded Warning (ADPS)",
       "imax2": "RMS current peak (IMAX2)",
       "imax3": "RMS current peak (IMAX3)",

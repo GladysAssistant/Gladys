@@ -4,7 +4,12 @@ const sinon = require('sinon').createSandbox();
 const { stub, fake } = sinon;
 const nock = require('nock');
 const dns = require('dns');
-const { SYSTEM_VARIABLE_NAMES, COVER_STATE, AI_CHAT_TOOL_CATEGORIES } = require('../../../../utils/constants');
+const {
+  SYSTEM_VARIABLE_NAMES,
+  COVER_STATE,
+  AI_CHAT_TOOL_CATEGORIES,
+  AI_GENERATED_SCENE_TAG,
+} = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const {
   getAllResources,
@@ -2220,6 +2225,83 @@ describe('build schemas', () => {
     }
     expect(unknownThrown).to.be.an('error');
     expect(unknownThrown.message).to.eq('db down');
+  });
+
+  it('should tag every scene created by the AI with the AI generated scene tag', async () => {
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isBatteryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+      })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]) },
+        house: { get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]) },
+        calendar: { get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]) },
+        area: { get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]) },
+        scene: {
+          get: stub().resolves([]),
+          create: stub().resolves({ id: 'scene-id', name: 'Scene', selector: 'scene' }),
+        },
+        device: {
+          get: stub().resolves([]),
+          getBySelector: stub().resolves(null),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: {
+            getImagesInRoom: stub().resolves([]),
+          },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+    const baseScene = {
+      icon: 'bell',
+      triggers: [{ type: 'system.start' }],
+      actions: [[{ type: 'delay', unit: 'minutes', value: 45 }]],
+    };
+
+    // No tag provided by the model
+    await sceneCreateTool.cb({ ...baseScene, name: 'Scene without tag' });
+    expect(mcpHandler.gladys.scene.create.firstCall.args[0].tags).to.deep.equal([{ name: AI_GENERATED_SCENE_TAG }]);
+
+    // Tags provided by the model are kept, and the AI tag is added
+    await sceneCreateTool.cb({ ...baseScene, name: 'Scene with tags', tags: [{ name: 'lights' }] });
+    expect(mcpHandler.gladys.scene.create.secondCall.args[0].tags).to.deep.equal([
+      { name: 'lights' },
+      { name: AI_GENERATED_SCENE_TAG },
+    ]);
+
+    // The AI tag is not duplicated: t_tag_scene has a composite primary key
+    await sceneCreateTool.cb({
+      ...baseScene,
+      name: 'Scene already tagged by the model',
+      tags: [{ name: AI_GENERATED_SCENE_TAG }, { name: 'lights' }],
+    });
+    expect(mcpHandler.gladys.scene.create.thirdCall.args[0].tags).to.deep.equal([
+      { name: AI_GENERATED_SCENE_TAG },
+      { name: 'lights' },
+    ]);
+
+    // Deduplication is case-insensitive, and the canonical casing wins: the scene
+    // list filters on an exact tag name, so a scene tagged "ai" would be missed.
+    await sceneCreateTool.cb({ ...baseScene, name: 'Scene tagged in lowercase', tags: [{ name: 'ai' }] });
+    expect(mcpHandler.gladys.scene.create.getCall(3).args[0].tags).to.deep.equal([{ name: AI_GENERATED_SCENE_TAG }]);
   });
 
   it('should reject scene.create when http.request action misses headers', async () => {

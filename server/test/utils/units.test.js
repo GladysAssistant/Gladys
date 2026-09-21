@@ -6,6 +6,8 @@ const {
   checkAndConvertUnit,
   convertEnergyUnit,
   smartRound,
+  decimalsOf,
+  formatValueWithStep,
 } = require('../../utils/units');
 const { DEVICE_FEATURE_UNITS } = require('../../utils/constants');
 
@@ -239,5 +241,41 @@ describe('convertEnergyUnit', () => {
   it('converts MWh to kWh', () => {
     const result = convertEnergyUnit(2, DEVICE_FEATURE_UNITS.MEGAWATT_HOUR, DEVICE_FEATURE_UNITS.KILOWATT_HOUR);
     expect(result).to.equal(2000);
+  });
+});
+
+describe('decimalsOf', () => {
+  it('counts the decimals of a plain number', () => {
+    expect(decimalsOf(1)).to.equal(0);
+    expect(decimalsOf(0.5)).to.equal(1);
+    expect(decimalsOf(0.0001)).to.equal(4);
+    expect(decimalsOf(-20.25)).to.equal(2);
+  });
+  it('counts the decimals hidden in a scientific notation', () => {
+    // 1e-7 has no dot, but seven decimals
+    expect(decimalsOf(1e-7)).to.equal(7);
+    expect(decimalsOf(1.5e-3)).to.equal(4);
+    expect(decimalsOf(1e3)).to.equal(0);
+  });
+});
+
+describe('formatValueWithStep', () => {
+  it('displays a value at the precision of a step finer than 1', () => {
+    // a tariff typed on a 0.0001 step keeps its 4 decimals, where smartRound
+    // would have displayed 0.173
+    expect(formatValueWithStep(0.1734, 0.0001)).to.equal('0.1734');
+    expect(formatValueWithStep(0.25, 0.0001)).to.equal('0.2500');
+    expect(formatValueWithStep(20.5, 0.5)).to.equal('20.5');
+  });
+  it('falls back to smartRound when no finer step is declared', () => {
+    expect(formatValueWithStep(0.1734, 1)).to.equal(0.173);
+    expect(formatValueWithStep(0.1734, undefined)).to.equal(0.173);
+    expect(formatValueWithStep(0.1734, null)).to.equal(0.173);
+    expect(formatValueWithStep(1234.56, 10)).to.equal(1235);
+  });
+  it('returns non-numbers untouched', () => {
+    expect(formatValueWithStep(null, 0.0001)).to.equal(null);
+    expect(formatValueWithStep(undefined, 0.0001)).to.equal(undefined);
+    expect(formatValueWithStep('on', 0.0001)).to.equal('on');
   });
 });

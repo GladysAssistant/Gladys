@@ -476,6 +476,8 @@ const home = {
   'post /api/v1/service/mqtt/debug_mode': { success: true },
   ...devicesByService,
   'get /api/v1/external_integration': () => externalIntegrations.concat(simulatedInstalls),
+  // dashboard widgets declared by installed integrations: none in the demo
+  'get /api/v1/external_integration/widget': [],
   // The community store is the live one: these fixtures are functions, so the
   // public store index is only downloaded when a page actually asks for the
   // catalog, and the demo lists the integrations published right now, with

@@ -36,6 +36,8 @@ async function getTemperatureInRoom(roomId, options) {
     ],
     where: {
       category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      // Ambient readings only: an external probe (`probe`) measures a fridge, a tank or the
+      // outside, not the room it sits in, so it must not skew the room average.
       type: {
         [Op.or]: [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.AVERAGE],
       },

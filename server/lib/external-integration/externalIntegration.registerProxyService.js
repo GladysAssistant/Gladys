@@ -146,6 +146,18 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // every external integration exposes the generic scene capability, like
+  // device.setValue: the scene engine relays a reached action through it
+  // (scene.actions.js, the exact path mqtt.send takes) and the supervisor
+  // reads the CURRENT manifest on every run (runSceneAction) — gating the
+  // capability on the manifest known here would freeze the declarations at
+  // registration time, and a scene action added by an update would fail
+  // until the next restart
+  const sceneCapability = {
+    scene: Object.freeze({
+      runAction: async (actionKey, fields, options) => this.runSceneAction(service, actionKey, fields, options),
+    }),
+  };
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -155,6 +167,7 @@ function registerProxyService(service) {
     },
     ...messageCapability,
     ...weatherCapability,
+    ...sceneCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {

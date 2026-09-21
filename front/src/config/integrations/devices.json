@@ -150,6 +150,7 @@
     "img": "/assets/integrations/cover/sonos.jpg",
     "invertInDarkMode": true,
     "local": true,
+    "deprecated": true,
     "categories": ["multimedia"]
   },
   {

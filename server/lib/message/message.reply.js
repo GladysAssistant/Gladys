@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, MESSAGE_GLADYS_ONLY_SERVICE } = require('../../utils/constants');
 const db = require('../../models');
 
 /**
@@ -44,6 +44,8 @@ function formatMessageForExternalChannel(message) {
 /**
  * @description Reply to a question from the user.
  * @param {object} originalMessage - The message sent by the user.
+ * @param {string} [originalMessage.service] - For an "AI" source, the channel the answer
+ * goes to: a service name, MESSAGE_GLADYS_ONLY_SERVICE, or absent for every channel.
  * @param {string} text - The answer to send.
  * @param {object} context - Contain the context, and sometimes additionnal data.
  * @param {string} [file] - An optional file sent with the message.
@@ -89,8 +91,15 @@ async function reply(originalMessage, text, context, file = null, options = {}) 
     // every service exposing message.sendToUser resolves its own identity and
     // no-ops when the user is not linked (generic loop, no channel hard-coded)
     if (originalMessage.source === 'AI') {
+      // The "ask the AI" scene action carries the channel picked by the user
+      // in `service`: the Gladys conversation only, a single channel, or —
+      // when the property is absent — every channel, as before. A scene only
+      // storing the answer in a variable must not text the user.
+      if (originalMessage.service === MESSAGE_GLADYS_ONLY_SERVICE) {
+        return;
+      }
       const user = this.state.get('user', originalMessage.user.selector);
-      await this.forwardToChannels(user, externalMessage);
+      await this.forwardToChannels(user, externalMessage, originalMessage.service || null);
     } else if (sourceService) {
       // if the service exist, we send the message
       await sourceService.message.send(originalMessage.source_user_id, externalMessage);

@@ -15,8 +15,8 @@
     },
     "type": {
       "type": "string",
-      "enum": ["device", "communication", "weather"],
-      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API; \"weather\" integrations are weather providers: a dedicated API (no device screens), they answer the core's weather requests over WebSocket."
+      "enum": ["device", "communication", "weather", "provider"],
+      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API; \"weather\" integrations are weather providers: a dedicated API (no device screens), they answer the core's weather requests over WebSocket; \"provider\" integrations are made only of capabilities (dashboard widgets today): no device surface, a configuration-only page, and at least one capability field (widgets) is required."
     },
     "name": {
       "type": "string",
@@ -159,6 +159,33 @@
           }
         ]
       }
+    },
+    "widgets": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Dashboard widgets declared by the integration (capability, any type may declare them): identity, icon and per-instance settings; the content itself is produced at runtime over widget.get in the published widget-content vocabulary. Listed on the install screen and in the dashboard box picker.",
+      "items": {
+        "$ref": "#/definitions/widget"
+      }
+    },
+    "scene_triggers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "description": "Scene triggers declared for the Gladys scene editor (\"Integrations\" category of the trigger picker). The integration fires a declared key through POST /api/integration/v1/scene/event with flat data; the core compares the declared `fields` (filters filled by the scene author, wildcard when empty) with the event and starts the matching scenes, exposing the declared `variables` as {{triggerEvent.data.<key>}}. A published key is never renamed (scenes store it); removing one is a breaking update. Declaring the field requires gladys_version >= the first release accepting it.",
+      "items": {
+        "$ref": "#/definitions/sceneTrigger"
+      }
+    },
+    "scene_actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "description": "Scene actions declared for the Gladys scene editor (\"Integrations\" category of the action picker). A scene reaching one relays it to the integration over WebSocket (external-integration.scene-action.run) with the resolved `fields` (scene variables substituted in string fields), acked within the declared timeout; the `outputs` of the command-result are exposed to the following actions. Same key rules as scene_triggers; a required field added without a default is a breaking update.",
+      "items": {
+        "$ref": "#/definitions/sceneAction"
+      }
     }
   },
   "allOf": [
@@ -192,6 +219,30 @@
             }
           }
         }
+      }
+    },
+    {
+      "$comment": "a provider integration must declare at least one capability field",
+      "if": {
+        "properties": {
+          "type": {
+            "const": "provider"
+          }
+        },
+        "required": ["type"]
+      },
+      "then": {
+        "anyOf": [
+          {
+            "required": ["widgets"]
+          },
+          {
+            "required": ["scene_triggers"]
+          },
+          {
+            "required": ["scene_actions"]
+          }
+        ]
       }
     }
   ],
@@ -703,6 +754,251 @@
           "enum": ["fire_and_forget", "sync"],
           "default": "fire_and_forget",
           "description": "fire_and_forget: immediate 200 to the caller, asynchronous relay without ack. sync: the integration's response is relayed back to the caller."
+        }
+      }
+    },
+    "widgetSettingField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/configField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["string", "number", "boolean", "select", "multi_select", "section"],
+              "description": "Widget settings live in the dashboard JSON, readable by every user of a public dashboard: `secret`, `oauth2` and `account_link` are not allowed. {{port:<name>}} placeholders are not allowed in section texts either (code-enforced)."
+            }
+          }
+        }
+      ]
+    },
+    "widget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]{2,32}$",
+          "description": "Unique key of the widget: the identifier in the dashboard box, the API and the WebSocket messages."
+        },
+        "label": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/multiLanguageText"
+            }
+          ],
+          "description": "Name of the widget in the box picker and default card title, 3-30 characters per language (code-enforced)."
+        },
+        "description": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/multiLanguageText"
+            }
+          ],
+          "description": "Shown under the picker tile and on the install screen, at most 100 characters per language (code-enforced)."
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]{1,40}$",
+          "description": "Feather icon name; an unknown name renders the generic widget icon, never an error."
+        },
+        "settings": {
+          "type": "array",
+          "maxItems": 10,
+          "description": "Per-instance settings of the widget, the config_schema grammar restricted to non-sensitive types; `source: \"devices\"` binds an instance to one of the integration's devices.",
+          "items": {
+            "$ref": "#/definitions/widgetSettingField"
+          }
+        },
+        "action_timeout_seconds": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 120,
+          "default": 30,
+          "description": "Ack delay granted to widget.action (the same exception to the 5s command rule as manifest actions)."
+        }
+      }
+    },
+    "sceneVariable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "type", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Unique key of the variable (trigger) or output (action) in its list."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean"],
+          "description": "Scalars only: an identifier, a count, a short text — never an image or a file (a picture goes through POST /camera/image)."
+        },
+        "label": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "description": {
+          "$ref": "#/definitions/multiLanguageText"
+        }
+      }
+    },
+    "sceneSectionText": {
+      "description": "A section text of a scene trigger / action: the {{port:<name>}} placeholder is refused in every language, the scene editor never loads the container detail that resolves it (same rule as the contact_schema).",
+      "allOf": [
+        {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        {
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^(?!.*\\{\\{port:)"
+          }
+        }
+      ]
+    },
+    "sceneTriggerField": {
+      "description": "A trigger filter: same format as a config_schema entry, restricted types (no secret, no account linking, no boolean — a toggle could never express \"any\"), no {{port:<name>}} placeholder in sections.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/configField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["string", "number", "select", "multi_select", "section"]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "section"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "label": {
+                "$ref": "#/definitions/sceneSectionText"
+              },
+              "description": {
+                "$ref": "#/definitions/sceneSectionText"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sceneActionField": {
+      "description": "An action parameter: same format as a config_schema entry, restricted types (no secret, no account linking), no {{port:<name>}} placeholder in sections. `string` fields accept scene variables ({{...}}), resolved by the core before the action is sent.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/configField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["string", "number", "boolean", "select", "multi_select", "section"]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "section"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "label": {
+                "$ref": "#/definitions/sceneSectionText"
+              },
+              "description": {
+                "$ref": "#/definitions/sceneSectionText"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sceneTrigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "maxLength": 40,
+          "description": "Unique key of the trigger, fired by the integration and stored by the scenes. Never renamed once published."
+        },
+        "label": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "description": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "fields": {
+          "type": "array",
+          "maxItems": 10,
+          "description": "Filters the scene author fills in, compared with the event value of the same key (equality, or membership for a multi_select). An empty field is a wildcard; `required: true` denies the wildcard in the editor.",
+          "items": {
+            "$ref": "#/definitions/sceneTriggerField"
+          }
+        },
+        "variables": {
+          "type": "array",
+          "maxItems": 20,
+          "description": "The only data the event exposes to the scene actions ({{triggerEvent.data.<key>}}): a whitelist, every other event key is dropped.",
+          "items": {
+            "$ref": "#/definitions/sceneVariable"
+          }
+        }
+      }
+    },
+    "sceneAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "maxLength": 40,
+          "description": "Unique key of the action, stored by the scenes. Never renamed once published."
+        },
+        "label": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "description": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 120,
+          "default": 30,
+          "description": "Ack delay granted to the action, connection wait included (the manifest actions exception to the 5s command rule)."
+        },
+        "fields": {
+          "type": "array",
+          "maxItems": 10,
+          "description": "Parameters of the action, filled by the scene author.",
+          "items": {
+            "$ref": "#/definitions/sceneActionField"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "maxItems": 20,
+          "description": "Values returned to the scene in the command-result `data.outputs`, exposed to the following actions as {{<column>.<row>.<key>}}: a whitelist, every other key is dropped.",
+          "items": {
+            "$ref": "#/definitions/sceneVariable"
+          }
         }
       }
     }
