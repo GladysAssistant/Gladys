@@ -160,7 +160,7 @@ const boxSchema = Joi.object().keys({
     )
     .max(MAX_WIDGET_SETTINGS)
     .custom((value, helpers) => {
-      if (JSON.stringify(value).length > MAX_WIDGET_SETTINGS_BYTES) {
+      if (Buffer.byteLength(JSON.stringify(value), 'utf8') > MAX_WIDGET_SETTINGS_BYTES) {
         return helpers.message(`"settings" must be at most ${MAX_WIDGET_SETTINGS_BYTES} bytes serialized`);
       }
       return value;

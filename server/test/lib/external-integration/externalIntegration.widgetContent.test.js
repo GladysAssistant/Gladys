@@ -367,6 +367,9 @@ describe('externalIntegration widgets — content path', () => {
       // 1 KB serialized: many short strings in a multi_select-like array
       bigList.list = Array.from({ length: 200 }, () => 'abcde');
       await expect422('upcoming_releases', bigList, 'settings: must be at most 1024 bytes serialized');
+      // 840 characters serialized but 1340 bytes: the bound counts UTF-8 bytes
+      const multibyte = { region: 'FR', period_days: '30', list: Array.from({ length: 100 }, () => 'ééééé') };
+      await expect422('upcoming_releases', multibyte, 'settings: must be at most 1024 bytes serialized');
       await expect422('vacuum', {}, 'settings.device: required');
       await expect422('vacuum', { device: 'ext:other:s7' }, 'settings.device: must be one of the devices');
       const { device } = await seedVacuum(service);

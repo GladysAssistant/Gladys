@@ -82,6 +82,7 @@
       "typeMismatchWarning": "Cette fonctionnalité a un type différent de la fonctionnalité source : son historique risque de ne plus avoir de sens une fois migré.",
       "unitMismatchWarning": "Cette fonctionnalité a une unité différente de la fonctionnalité source : les valeurs sont déplacées sans conversion, les graphiques risquent de devenir incohérents.",
       "unmappedWarning": "Certaines fonctionnalités n'ont pas de correspondance : leur historique sera supprimé, et les scènes et tableaux de bord qui les utilisent ne seront pas mis à jour.",
+      "playNotificationWarning": "L'appareil de destination ne peut pas jouer de notifications : les scènes qui « parlent sur » cette enceinte seront re-pointées vers la destination, et échoueront à l'exécution. Choisissez une destination compatible, ou modifiez ces scènes après la migration.",
       "noDestinationAvailable": "Aucun appareil d'une autre intégration n'a été trouvé. Créez d'abord l'appareil de destination dans sa nouvelle intégration, puis revenez ici pour migrer.",
       "loadError": "Impossible de charger la liste des appareils. Veuillez réessayer.",
       "migrateError": "La migration a échoué. L'ancien appareil n'a pas été supprimé, mais une partie de l'historique a pu être déjà déplacée vers la destination. Vérifiez la page des tâches et votre liste d'appareils, puis réessayez : une nouvelle tentative ne migre que ce qu'il reste à migrer.",
@@ -844,6 +845,7 @@
         "needsNewerGladys": "Ce widget nécessite une version plus récente de Gladys.",
         "empty": "Rien à afficher pour le moment.",
         "emptyChart": "Pas encore de données sur cette période.",
+        "now": "Maintenant",
         "confirmAction": "Lancer « {{label}} » ?",
         "actionError": "L'action a échoué."
       }
@@ -1161,13 +1163,13 @@
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
         "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
         "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant).",
+        "widgetsTitle": "Widgets de tableau de bord",
+        "widgetsText": "Cette intégration fournit les widgets suivants, disponibles pour tous les utilisateurs dans l'éditeur de tableau de bord :",
+        "providerInfoText": "Cette intégration ne gère aucun appareil : elle fournit des widgets de tableau de bord. Configurez-la ici, puis ajoutez ses widgets depuis l'éditeur de tableau de bord.",
         "sceneDeclarationsTitle": "Déclencheurs et actions de scènes",
         "sceneDeclarationsText": "Cette intégration ajoute {{triggers}} déclencheur(s) et {{actions}} action(s) à l'éditeur de scènes.",
         "sceneTriggerPrefix": "Déclencheur :",
-        "sceneActionPrefix": "Action :",
-        "widgetsTitle": "Widgets de tableau de bord",
-        "widgetsText": "Cette intégration fournit les widgets suivants, disponibles pour tous les utilisateurs dans l'éditeur de tableau de bord :",
-        "providerInfoText": "Cette intégration ne gère aucun appareil : elle fournit des widgets de tableau de bord. Configurez-la ici, puis ajoutez ses widgets depuis l'éditeur de tableau de bord."
+        "sceneActionPrefix": "Action :"
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -5721,7 +5723,8 @@
       "decimal": "Température",
       "min": "Température minimale",
       "max": "Température maximale",
-      "average": "Température moyenne"
+      "average": "Température moyenne",
+      "probe": "Température sonde"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Température de l'appareil",
@@ -6106,16 +6109,20 @@
       "smaxin": "Puissance apparente max. injectée n (SMAXIN)",
       "smaxin_1": "Puissance apparente max. injectée n-1 (SMAXIN-1)",
       "smaxn": "Puissance apparente max. soutirée (SMAXN)",
+      "smaxn1": "Puissance apparente max. soutirée (SMAXN1)",
       "smaxn2": "Puissance apparente max. soutirée (SMAXN2)",
       "smaxn3": "Puissance apparente max. soutirée (SMAXN3)",
       "sinsts": "Puissance apparente instantanée soutirée (SINSTS)",
+      "sinsts1": "Puissance apparente instantanée soutirée (SINSTS1)",
       "sinsts2": "Puissance apparente instantanée soutirée (SINSTS2)",
       "sinsts3": "Puissance apparente instantanée soutirée (SINSTS3)",
       "smaxn_1": "Puissance apparente max. soutirée n-1 (SMAXN-1)",
+      "smaxn1_1": "Puissance apparente max. soutirée n-1 (SMAXN1-1)",
       "smaxn2_1": "Puissance apparente max. soutirée n-1 (SMAXN2-1)",
       "smaxn3_1": "Puissance apparente max. soutirée n-1 (SMAXN3-1)",
       "hhphc": "Programme HPHC (HHPHC)",
       "imax": "Intensité maximale (IMAX)",
+      "imax1": "Intensité maximale (IMAX1)",
       "adps": "Alerte dépassement puissance souscrite (ADPS)",
       "imax2": "Intensité maximale (IMAX2)",
       "imax3": "Intensité maximale (IMAX3)",

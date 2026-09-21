@@ -232,7 +232,17 @@
         "required": ["type"]
       },
       "then": {
-        "anyOf": [{ "required": ["widgets"] }, { "required": ["scene_triggers"] }, { "required": ["scene_actions"] }]
+        "anyOf": [
+          {
+            "required": ["widgets"]
+          },
+          {
+            "required": ["scene_triggers"]
+          },
+          {
+            "required": ["scene_actions"]
+          }
+        ]
       }
     }
   ],

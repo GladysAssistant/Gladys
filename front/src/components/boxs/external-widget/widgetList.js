@@ -11,11 +11,15 @@ export const loadWidgetList = httpClient => {
   const now = Date.now();
   if (!cachedPromise || now - cachedAt > LIST_CACHE_TTL_MS) {
     cachedAt = now;
-    cachedPromise = httpClient.get('/api/v1/external_integration/widget').catch(e => {
-      // a failed list is not kept: the next card retries
-      cachedPromise = null;
+    const promise = httpClient.get('/api/v1/external_integration/widget').catch(e => {
+      // a failed list is not kept: the next card retries — unless a newer
+      // request already replaced it, which stays shared
+      if (cachedPromise === promise) {
+        cachedPromise = null;
+      }
       throw e;
     });
+    cachedPromise = promise;
   }
   return cachedPromise;
 };

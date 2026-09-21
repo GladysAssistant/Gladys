@@ -57,6 +57,12 @@ describe('dashboard model — external-widget box', () => {
       tooBig[`k${index}`] = Array.from({ length: 30 }, () => 'abcd');
     });
     await expect(updateBoxes({ ...base, settings: tooBig })).to.be.rejectedWith('at most 1024 bytes');
+    // 680 characters serialized but 1280 bytes: the bound counts UTF-8 bytes
+    const multibyte = {};
+    Array.from({ length: 10 }, (value, index) => index).forEach((index) => {
+      multibyte[`k${index}`] = 'é'.repeat(60);
+    });
+    await expect(updateBoxes({ ...base, settings: multibyte })).to.be.rejectedWith('at most 1024 bytes');
     await expect(updateBoxes({ ...base, settings: { nested: { a: 1 } } })).to.be.rejectedWith('.settings.nested"');
   });
 

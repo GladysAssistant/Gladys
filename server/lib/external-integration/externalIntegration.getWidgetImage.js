@@ -1,3 +1,4 @@
+const logger = require('../../utils/logger');
 const { NotFoundError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const {
@@ -7,14 +8,23 @@ const {
   MAX_WIDGET_IMAGE_CACHE_ENTRIES,
   MAX_WIDGET_IMAGE_IN_FLIGHT,
 } = require('./constants');
-const { normalizeWidgetImage } = require('./externalIntegration.normalizeWidgetImage');
-const { getServiceMap, lruGet, lruSet, acquireSlot } = require('./externalIntegration.widgetCache');
+const { normalizeWidgetImage, WIDGET_IMAGE_ERROR_CODES } = require('./externalIntegration.normalizeWidgetImage');
+const {
+  WIDGET_IMAGE_GENERATION_KEY,
+  getServiceMap,
+  lruGet,
+  lruSet,
+  acquireSlot,
+} = require('./externalIntegration.widgetCache');
 const { toWidgetHttpError } = require('./externalIntegration.widgetErrors');
 
 /**
  * @description Pull one image from the integration over widget.get-image
  * (15 s ack, at most 4 image commands in flight per integration, the others
- * queued), validate the bytes and cache the data URI for an hour.
+ * queued), validate the bytes and cache the data URI for an hour — under the
+ * image generation stamped at the start: a result landing after a lifecycle
+ * clear (stop, update, uninstall) is served to its waiting callers but never
+ * cached, the widget.get rule applied to images.
  * @param {object} supervisor - The external integration manager.
  * @param {object} service - The external integration service.
  * @param {string} imageKey - The declared image key.
@@ -23,6 +33,7 @@ const { toWidgetHttpError } = require('./externalIntegration.widgetErrors');
  * const image = await pullWidgetImage(this, service, 'poster-20637522');
  */
 async function pullWidgetImage(supervisor, service, imageKey) {
+  const generation = supervisor.getWidgetGeneration(service.id, WIDGET_IMAGE_GENERATION_KEY);
   const release = await acquireSlot(supervisor.widgetImageSlots, service.id, MAX_WIDGET_IMAGE_IN_FLIGHT);
   try {
     const result = await supervisor.sendCommand(
@@ -32,14 +43,21 @@ async function pullWidgetImage(supervisor, service, imageKey) {
       { timeoutMs: WIDGET_GET_TIMEOUT_MS },
     );
     const image = normalizeWidgetImage(result && result.data && result.data.image);
-    lruSet(
-      getServiceMap(supervisor.widgetImageCache, service.id),
-      imageKey,
-      { image, expiresAt: Date.now() + WIDGET_IMAGE_CACHE_TTL_MS },
-      MAX_WIDGET_IMAGE_CACHE_ENTRIES,
-    );
+    if (generation === supervisor.getWidgetGeneration(service.id, WIDGET_IMAGE_GENERATION_KEY)) {
+      lruSet(
+        getServiceMap(supervisor.widgetImageCache, service.id),
+        imageKey,
+        { image, expiresAt: Date.now() + WIDGET_IMAGE_CACHE_TTL_MS },
+        MAX_WIDGET_IMAGE_CACHE_ENTRIES,
+      );
+    }
     return image;
   } catch (e) {
+    if (WIDGET_IMAGE_ERROR_CODES.includes(e.message)) {
+      // the developer's channel: which integration, which key, which rule,
+      // and the measured value against the bound
+      logger.warn(`Widget image ${service.selector}/${imageKey} refused: ${e.message} (${e.details})`);
+    }
     throw toWidgetHttpError(e);
   } finally {
     release();

@@ -981,6 +981,10 @@ const DEVICE_FEATURE_TYPES = {
     MIN: 'min',
     MAX: 'max',
     AVERAGE: 'average',
+    // Temperature read by an external probe wired to the device (fridge, tank, outdoor
+    // probe...), as opposed to `decimal`, the ambient temperature at the device itself.
+    // Kept out of the room average on purpose: see temperature-sensor.getTemperatureInRoom.
+    PROBE: 'probe',
   },
   SWITCH: {
     BINARY: 'binary',
@@ -1235,16 +1239,20 @@ const DEVICE_FEATURE_TYPES = {
     SMAXIN: 'smaxin',
     SMAXIN_1: 'smaxin_1',
     SMAXN: 'smaxn',
+    SMAXN1: 'smaxn1',
     SMAXN2: 'smaxn2',
     SMAXN3: 'smaxn3',
     SINSTS: 'sinsts',
+    SINSTS1: 'sinsts1',
     SINSTS2: 'sinsts2',
     SINSTS3: 'sinsts3',
     SMAXN_1: 'smaxn_1',
+    SMAXN1_1: 'smaxn1_1',
     SMAXN2_1: 'smaxn2_1',
     SMAXN3_1: 'smaxn3_1',
     HHPHC: 'hhphc',
     IMAX: 'imax',
+    IMAX1: 'imax1',
     ADPS: 'adps',
     IMAX2: 'imax2',
     IMAX3: 'imax3',
@@ -2244,6 +2252,10 @@ const AI_CHAT_PURPOSES = {
   WEEKLY_DIGEST: 'weekly-digest',
 };
 
+// Tag automatically added to every scene created by the AI through the
+// scene.create tool, so those scenes can be found back in the scene list.
+const AI_GENERATED_SCENE_TAG = 'AI';
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -2403,6 +2415,7 @@ module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
 module.exports.AI_CHAT_TOOL_CATEGORIES = AI_CHAT_TOOL_CATEGORIES;
 module.exports.AI_CHAT_TOOL_CATEGORIES_LIST = AI_CHAT_TOOL_CATEGORIES_LIST;
 module.exports.AI_CHAT_PURPOSES = AI_CHAT_PURPOSES;
+module.exports.AI_GENERATED_SCENE_TAG = AI_GENERATED_SCENE_TAG;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;

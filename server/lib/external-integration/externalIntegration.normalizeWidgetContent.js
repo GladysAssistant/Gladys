@@ -42,6 +42,7 @@ const TEXT_BOUNDS = {
   statusValue: 40,
   seriesName: 24,
   chartTitle: 40,
+  annotationLabel: 16,
   cardTitle: 60,
   cardSubtitle: 60,
   badgeText: 16,
@@ -54,6 +55,9 @@ const MAX_STATUS_ITEMS = 10;
 const MAX_CHART_SERIES = 4;
 const MAX_CHART_POINTS = 300;
 const MAX_CHART_DEVICE_FEATURES = 4;
+// markers the core draws on a chart: a time (a vertical line), optionally a
+// value (a dot on the curve), a short label and a semantic color
+const MAX_CHART_ANNOTATIONS = 8;
 const MAX_CARD_LIST_ITEMS = { grid: 12, list: 8 };
 const MAX_CARD_LINKS = 3;
 const DEFAULT_CHART_INTERVAL = 'last-day';
@@ -434,8 +438,43 @@ function normalizeChartSeries(rawSeries) {
 }
 
 /**
+ * @description Normalize one annotation of a `chart` component: a point in
+ * time the core marks on the chart (high tide at 07:48 and 10.69 m, the
+ * peak of a solar forecast, the start of an off-peak tariff slot). The time
+ * is required; the value, the label and the color are optional.
+ * @param {object} rawAnnotation - The raw annotation.
+ * @returns {object|null} The normalized annotation, or null to drop it.
+ * @example
+ * normalizeChartAnnotation({ t: '2026-09-19T07:48:00Z', value: 10.69, label: 'PM 10,69 m', color: 'primary' });
+ */
+function normalizeChartAnnotation(rawAnnotation) {
+  if (!isPlainObject(rawAnnotation)) {
+    return null;
+  }
+  const t = toIsoDate(rawAnnotation.t);
+  if (t === null) {
+    return null;
+  }
+  const annotation = { t };
+  const value = toFiniteNumber(rawAnnotation.value);
+  if (value !== null) {
+    annotation.value = value;
+  }
+  const label = normalizeText(rawAnnotation.label, TEXT_BOUNDS.annotationLabel);
+  if (label !== null) {
+    annotation.label = label;
+  }
+  const color = toEnum(rawAnnotation.color, WIDGET_COLORS);
+  if (color !== undefined) {
+    annotation.color = color;
+  }
+  return annotation;
+}
+
+/**
  * @description Normalize a `chart` component: inline series, or live device
- * feature references with an interval of the chart box.
+ * feature references with an interval of the chart box; optional
+ * annotations and a "now" marker on either form.
  * @param {object} raw - The raw component.
  * @returns {object|null} The normalized component, or null to drop it.
  * @example
@@ -471,6 +510,18 @@ function normalizeChartComponent(raw) {
     component.title = title;
   }
   copyCommonFields(raw, component, { unit: TEXT_BOUNDS.unit });
+  if (Array.isArray(raw.annotations)) {
+    const annotations = raw.annotations
+      .slice(0, MAX_CHART_ANNOTATIONS)
+      .map(normalizeChartAnnotation)
+      .filter((annotation) => annotation !== null);
+    if (annotations.length > 0) {
+      component.annotations = annotations;
+    }
+  }
+  if (raw.now_marker === true) {
+    component.now_marker = true;
+  }
   return component;
 }
 
@@ -619,7 +670,7 @@ function normalizeButtonComponent(raw) {
       return null;
     }
     const params = isPlainObject(raw.action.params) ? raw.action.params : {};
-    if (JSON.stringify(params).length > MAX_WIDGET_ACTION_PARAMS_BYTES) {
+    if (Buffer.byteLength(JSON.stringify(params), 'utf8') > MAX_WIDGET_ACTION_PARAMS_BYTES) {
       return null;
     }
     component.action = { key: raw.action.key, params, confirm: raw.action.confirm === true };
@@ -738,7 +789,7 @@ function normalizeWidgetContent(payload, context = 'widget') {
   if (!isPlainObject(payload)) {
     throw new ExternalIntegrationUnavailableError(INVALID_CONTENT_ERROR);
   }
-  if (JSON.stringify(payload).length > MAX_WIDGET_CONTENT_BYTES) {
+  if (Buffer.byteLength(JSON.stringify(payload), 'utf8') > MAX_WIDGET_CONTENT_BYTES) {
     throw new ExternalIntegrationUnavailableError(INVALID_CONTENT_ERROR);
   }
   const version = payload.version === undefined ? 1 : payload.version;

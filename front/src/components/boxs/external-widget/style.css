@@ -421,7 +421,9 @@
   color: #2e8f5b;
 }
 
-.button:disabled .buttonIcon i {
+/* only the loader of a pending request spins: a device button disabled
+   because its feature is not loaded keeps its own icon still */
+.buttonIcon :global(.fe-loader) {
   animation: widgetSpin 1s linear infinite;
 }
 

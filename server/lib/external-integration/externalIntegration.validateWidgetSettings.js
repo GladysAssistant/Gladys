@@ -59,7 +59,7 @@ function checkSettingsBounds(settings) {
       }
     });
   });
-  if (JSON.stringify(settings).length > MAX_WIDGET_SETTINGS_BYTES) {
+  if (Buffer.byteLength(JSON.stringify(settings), 'utf8') > MAX_WIDGET_SETTINGS_BYTES) {
     throw new Error422(`settings: must be at most ${MAX_WIDGET_SETTINGS_BYTES} bytes serialized`);
   }
 }

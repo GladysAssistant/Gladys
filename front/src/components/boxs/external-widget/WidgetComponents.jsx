@@ -175,7 +175,10 @@ export class LazyWidgetImage extends Component {
     }
   }
 
-  // another key: the frame empties and the new image loads
+  // another key: the frame empties and the new image loads; the answer of
+  // the previous key, if still pending, is ignored
+  imageGeneration = 0;
+
   reload = () => {
     this.setState({ src: null, error: false });
     this.load();
@@ -201,15 +204,17 @@ export class LazyWidgetImage extends Component {
 
   load = async () => {
     const { httpClient, selector, imageKey } = this.props;
+    this.imageGeneration += 1;
+    const generation = this.imageGeneration;
     try {
       const { image } = await httpClient.get(
         `/api/v1/external_integration/${encodeURIComponent(selector)}/image/${encodeURIComponent(imageKey)}`
       );
-      if (!this.unmounted) {
+      if (!this.unmounted && generation === this.imageGeneration) {
         this.setState({ src: image, error: false });
       }
     } catch (e) {
-      if (!this.unmounted) {
+      if (!this.unmounted && generation === this.imageGeneration) {
         this.setState({ error: true });
       }
     }
@@ -327,22 +332,100 @@ export class WidgetCardList extends Component {
 
 // --- chart ---------------------------------------------------------------
 
-// The span of inline series, for the date formatter of the chart tooltip
-const inlineSeriesSpanMinutes = series => {
+// The time span of the plotted series: the tooltip date format follows it,
+// and the "now" marker is only drawn when now falls inside it
+const seriesTimeRange = series => {
   let min = Infinity;
   let max = -Infinity;
   series.forEach(oneSeries => {
-    oneSeries.points.forEach(point => {
-      const time = new Date(point.t).getTime();
+    oneSeries.data.forEach(([time]) => {
       min = Math.min(min, time);
       max = Math.max(max, time);
     });
   });
-  return max > min ? Math.round((max - min) / 60000) : 60;
+  return { min, max, minutes: max > min ? Math.round((max - min) / 60000) : 60 };
+};
+
+// semantic colors of the vocabulary -> the accent the chart draws with (the
+// same values as the accent classes of style.css: ApexCharts needs a value)
+const ANNOTATION_COLORS = {
+  neutral: '#667081',
+  primary: '#467fcf',
+  success: '#2e8f5b',
+  warning: '#f68f00',
+  danger: '#d63939',
+  info: '#45aaf2'
+};
+
+// A label sits centered on its marker, except near the right edge of the
+// chart where it hangs to the left so it is never clipped by the card
+const annotationLabel = (label, color, textAnchor = 'middle') => ({
+  text: label,
+  borderColor: color,
+  orientation: 'horizontal',
+  position: 'top',
+  textAnchor,
+  style: { background: color, color: '#fff', fontSize: '10px', fontWeight: 600, padding: { left: 4, right: 4 } }
+});
+
+const labelAnchor = (x, { min, max }) => (x > max - (max - min) * 0.08 ? 'end' : 'middle');
+
+// The markers of the content, in the ApexCharts `annotations` shape: a time
+// with a value is a dot on the curve, a time alone is a vertical line; the
+// `now_marker` is a dashed line at the current time, when the series spans it
+const buildAnnotations = (component, series, language, nowLabel) => {
+  const xaxis = [];
+  const points = [];
+  const range = seriesTimeRange(series);
+  (component.annotations || []).forEach(annotation => {
+    const x = new Date(annotation.t).getTime();
+    const color = ANNOTATION_COLORS[annotation.color] || ANNOTATION_COLORS.neutral;
+    const label = text(annotation.label, language);
+    if (typeof annotation.value === 'number') {
+      points.push({
+        x,
+        y: annotation.value,
+        marker: { size: 4, fillColor: '#fff', strokeColor: color, strokeWidth: 2 },
+        ...(label ? { label: annotationLabel(label, color, labelAnchor(x, range)) } : {})
+      });
+    } else {
+      xaxis.push({
+        x,
+        borderColor: color,
+        strokeDashArray: 0,
+        ...(label ? { label: annotationLabel(label, color, labelAnchor(x, range)) } : {})
+      });
+    }
+  });
+  if (component.now_marker) {
+    const now = Date.now();
+    const { min, max } = range;
+    // a series that ends "now" was produced a few minutes before it renders:
+    // now sits just past its last point, and is drawn there rather than off
+    // the chart; a forecast entirely in the future has no "now" to draw
+    const tolerance = Math.max((max - min) * 0.05, 5 * 60 * 1000);
+    if (now >= min - tolerance && now <= max + tolerance) {
+      const x = Math.min(Math.max(now, min), max);
+      xaxis.push({
+        x,
+        borderColor: ANNOTATION_COLORS.neutral,
+        strokeDashArray: 4,
+        ...(nowLabel ? { label: annotationLabel(nowLabel, ANNOTATION_COLORS.neutral, labelAnchor(x, range)) } : {})
+      });
+    }
+  }
+  if (xaxis.length === 0 && points.length === 0) {
+    return undefined;
+  }
+  return { xaxis, points };
 };
 
 export class WidgetChart extends Component {
   state = { series: null };
+
+  // one generation per content: a history load started for a previous
+  // content never replaces the current curve, nor writes after unmount
+  seriesGeneration = 0;
 
   componentDidMount() {
     this.loadSeries();
@@ -354,16 +437,28 @@ export class WidgetChart extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.unmounted = true;
+  }
+
+  // series and markers are built once per content: ApexCharts redraws on a
+  // new reference, so the state keeps one for the life of the content
+  setSeries = (series, interval) => {
+    const { component, language, dictionary } = this.props;
+    const nowLabel = get(dictionary, 'dashboard.boxes.external-widget.now');
+    this.setState({ series, interval, annotations: buildAnnotations(component, series, language, nowLabel) });
+  };
+
   loadSeries = async () => {
     const { component, httpClient, language, deviceNamesBySelector } = this.props;
+    this.seriesGeneration += 1;
+    const generation = this.seriesGeneration;
     if (component.series) {
-      this.setState({
-        series: component.series.map((oneSeries, index) => ({
-          name: text(oneSeries.name, language) || `${index + 1}`,
-          data: oneSeries.points.map(point => [new Date(point.t).getTime(), point.v])
-        })),
-        interval: inlineSeriesSpanMinutes(component.series)
-      });
+      const series = component.series.map((oneSeries, index) => ({
+        name: text(oneSeries.name, language) || `${index + 1}`,
+        data: oneSeries.points.map(point => [new Date(point.t).getTime(), point.v])
+      }));
+      this.setSeries(series, seriesTimeRange(series).minutes);
       return;
     }
     // live device features: the history the core already keeps, with the
@@ -375,23 +470,28 @@ export class WidgetChart extends Component {
         max_states: 100,
         device_features: component.device_feature_selectors.join(',')
       });
-      this.setState({
-        interval,
-        series: data.map((oneFeature, index) => ({
+      if (this.unmounted || generation !== this.seriesGeneration) {
+        return;
+      }
+      this.setSeries(
+        data.map((oneFeature, index) => ({
           name:
             get(oneFeature, 'deviceFeature.name') ||
             deviceNamesBySelector[component.device_feature_selectors[index]] ||
             `${index + 1}`,
           data: (oneFeature.values || []).map(point => [new Date(point.created_at).getTime(), point.value])
-        }))
-      });
+        })),
+        interval
+      );
     } catch (e) {
       console.error(e);
-      this.setState({ series: [] });
+      if (!this.unmounted && generation === this.seriesGeneration) {
+        this.setState({ series: [], annotations: undefined });
+      }
     }
   };
 
-  render({ component, language, user, dictionary }, { series, interval }) {
+  render({ component, language, user, dictionary }, { series, interval, annotations }) {
     if (!series) {
       return <div class={style.skeleton} />;
     }
@@ -400,7 +500,7 @@ export class WidgetChart extends Component {
       <div>
         {component.title && <div class={cx(style.caption, 'mb-1')}>{text(component.title, language)}</div>}
         {isEmpty ? (
-          <div class="text-muted small">
+          <div class="text-muted small" role="status">
             <Text id="dashboard.boxes.external-widget.emptyChart" />
           </div>
         ) : (
@@ -411,6 +511,8 @@ export class WidgetChart extends Component {
             size="small"
             chart_type={component.chart_type}
             display_axes
+            additionalHeight={0}
+            annotations={annotations}
             dictionary={dictionary}
             y_axis_unit={component.unit ? text(component.unit, language) : undefined}
           />
