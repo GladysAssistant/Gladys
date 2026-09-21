@@ -3675,6 +3675,8 @@
           "heating": "Interrupteur qui sera allumé et éteint pour chauffer la pièce.",
           "cooling": "Interrupteur qui sera allumé et éteint pour rafraîchir la pièce."
         },
+        "pilotWireFeatureLabel": "Fil pilote (actionneur)",
+        "pilotWireFeatureHelp": "Un radiateur à fil pilote : Gladys lui envoie l’ordre correspondant au preset (confort, éco, hors-gel, arrêt) au lieu de couper son alimentation. Le radiateur garde son propre thermostat, donc ni seuil ni cycle ne s’appliquent. Laissez l’interrupteur vide si vous utilisez ce mode.",
         "windowFeatureLabel": "Capteur d'ouverture de fenêtre",
         "windowFeatureHelp": {
           "heating": "Optionnel. Si une fenêtre est ouverte, le chauffage est automatiquement coupé.",

@@ -3675,6 +3675,8 @@
           "heating": "El interruptor que se encenderá y apagará para calentar la habitación.",
           "cooling": "El interruptor que se encenderá y apagará para enfriar la habitación."
         },
+        "pilotWireFeatureLabel": "Hilo piloto (actuador)",
+        "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía la orden correspondiente al preajuste (confort, eco, antihielo, apagado) en lugar de cortar su alimentación. El radiador conserva su propio termostato, así que no se aplican ni umbral ni ciclo. Deja el interruptor vacío si usas este modo.",
         "windowFeatureLabel": "Sensor de apertura de ventana",
         "windowFeatureHelp": {
           "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",

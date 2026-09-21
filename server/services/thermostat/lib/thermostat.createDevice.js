@@ -20,6 +20,9 @@ const ALLOWED_PARAMS = [
   'THERMOSTAT_TEMPERATURE_FEATURE',
   'THERMOSTAT_HUMIDITY_FEATURE',
   'THERMOSTAT_SWITCH_FEATURE',
+  // A pilot-wire heater takes an order rather than a contact: the same actuator
+  // slot, driven with six orders instead of on/off.
+  'THERMOSTAT_PILOT_WIRE_FEATURE',
   'THERMOSTAT_TYPE',
   'THERMOSTAT_TARGET_FEATURE',
   'THERMOSTAT_STATE_FEATURE',

@@ -8,6 +8,7 @@ const {
   DEVICE_FEATURE_UNITS,
   THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
+  PILOT_WIRE_MODE,
 } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
 const {
@@ -333,6 +334,61 @@ async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
   await writeExternalSetpoint(gladys, config.target_feature, stopSetpoint, config.temp_unit, logContext, selfWritten);
 }
 
+// A pilot-wire heater is not driven by a temperature but by one of six orders,
+// carried on the wire itself. The thermostat's presets map onto them almost one
+// for one — which is unsurprising: both vocabularies come from the same French
+// heating tradition (confort / éco / hors-gel).
+//
+// `away` has no order of its own: the wire offers no "nobody home", and eco is
+// what an absence actually asks for. Comfort -1 and -2 are the orders a heater
+// derives itself from comfort; Gladys does not pick them, it lets the appliance.
+const PILOT_WIRE_ORDER_BY_PRESET = {
+  off: PILOT_WIRE_MODE.OFF,
+  frost: PILOT_WIRE_MODE.FROST_PROTECTION,
+  away: PILOT_WIRE_MODE.ECO,
+  eco: PILOT_WIRE_MODE.ECO,
+  night: PILOT_WIRE_MODE.ECO,
+  comfort: PILOT_WIRE_MODE.COMFORT,
+};
+
+/**
+ * @description Drive a pilot-wire heater: write the order its preset maps to.
+ *
+ * There is no hysteresis and no cycle to run here, and no room sensor to read:
+ * the heater has its own thermostat and applies the order it is given, exactly
+ * like an external thermostat applies a setpoint. Gladys chooses the order, the
+ * appliance decides when to draw current.
+ * @param {object} gladys - Gladys instance.
+ * @param {string} pilotWireSelector - The heater's pilot-wire-mode feature.
+ * @param {string} preset - The preset in force.
+ * @param {string} logContext - What this write is for, for the log line.
+ * @returns {Promise<void>}
+ * @example
+ * await writePilotWireOrder(gladys, 'heater-pilot-wire', 'comfort', 'schedule');
+ */
+async function writePilotWireOrder(gladys, pilotWireSelector, preset, logContext) {
+  const order = PILOT_WIRE_ORDER_BY_PRESET[preset];
+  if (order === undefined) {
+    logger.warn(`Thermostat schedule: no pilot-wire order for preset "${preset}" (${logContext})`);
+    return;
+  }
+  try {
+    const found = await getFeatureBySelector(gladys, pilotWireSelector);
+    if (!found) {
+      logger.warn(`Thermostat schedule: pilot-wire feature not found for selector="${pilotWireSelector}"`);
+      return;
+    }
+    if (found.feature.last_value === order) {
+      logger.debug(`Thermostat schedule: pilot-wire already on order ${order} (${logContext})`);
+      return;
+    }
+    await gladys.device.setValue(found.device, found.feature, order);
+    logger.info(`Thermostat schedule: pilot-wire order ${order} written (${logContext})`);
+  } catch (e) {
+    logger.warn(`Thermostat schedule: Failed to write the pilot-wire order: ${e.message}`);
+  }
+}
+
 /**
  * @description Constrain a number to a closed range.
  * @param {number} value - Value to constrain.
@@ -528,6 +584,11 @@ async function regulateDevice(
           // window open or not. The schedule restores both on the next pass
           // once the window closes.
           await stopExternalThermostat(gladys, config, `window open, ${selector}`, selfWritten);
+        } else if (config.pilot_wire_feature) {
+          // A pilot-wire heater is stopped by the order, not by cutting its
+          // supply: the wire is a command line, not the power feed.
+          await writePilotWireOrder(gladys, config.pilot_wire_feature, 'off', `window open, ${selector}`);
+          await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
         } else if (config.switch_feature) {
           await actuateSwitch(gladys, config.switch_feature, false, `window open, ${selector}`);
           await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
@@ -547,6 +608,9 @@ async function regulateDevice(
     logger.debug(`Thermostat schedule: ${selector} is stopped, leaving it alone`);
     if (external) {
       await stopExternalThermostat(gladys, config, `mode=off, ${selector}`, selfWritten);
+    } else if (config.pilot_wire_feature) {
+      await writePilotWireOrder(gladys, config.pilot_wire_feature, 'off', `mode=off, ${selector}`);
+      await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
     } else if (config.switch_feature) {
       await actuateSwitch(gladys, config.switch_feature, false, `mode=off, ${selector}`);
       await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
@@ -800,6 +864,20 @@ async function regulateDevice(
         selfWritten,
       );
     }
+    return;
+  }
+
+  // A pilot-wire heater stops here, like an external thermostat: it is handed
+  // the order its preset maps to and decides itself when to draw current. There
+  // is no hysteresis to run — it has its own thermostat, and a second control
+  // loop would fight it — and no room sensor to read.
+  if (config.pilot_wire_feature) {
+    await writePilotWireOrder(gladys, config.pilot_wire_feature, targetPreset, `preset="${targetPreset}", ${selector}`);
+    await saveOperatingState.call(
+      { gladys },
+      device,
+      targetPreset === 'off' ? THERMOSTAT_OPERATING_STATE.IDLE : THERMOSTAT_OPERATING_STATE.HEATING,
+    );
     return;
   }
 

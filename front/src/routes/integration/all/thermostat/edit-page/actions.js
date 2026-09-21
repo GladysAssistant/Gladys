@@ -27,6 +27,7 @@ function createActions(store) {
         const humidityFeatures = [];
         const switchFeatures = [];
         const openingFeatures = [];
+        const pilotWireFeatures = [];
         const targetFeatures = [];
         const stateFeatures = [];
         const modeFeatures = [];
@@ -52,6 +53,12 @@ function createActions(store) {
             }
             if (HUMIDITY_CATEGORIES.includes(feature.category)) {
               humidityFeatures.push(entry);
+            }
+            // A pilot-wire heater takes one of six orders on its command wire
+            // rather than a contact: the same actuator slot, a different way of
+            // driving it.
+            if (feature.category === 'heater' && feature.type === 'pilot-wire-mode') {
+              pilotWireFeatures.push(entry);
             }
             if (SWITCH_CATEGORIES.includes(feature.category) && feature.type === 'binary') {
               // The actuator has to be writable: a read-only switch — Netatmo's
@@ -91,6 +98,7 @@ function createActions(store) {
           temperatureFeatures,
           humidityFeatures,
           switchFeatures,
+          pilotWireFeatures,
           openingFeatures,
           targetFeatures,
           stateFeatures,
@@ -101,6 +109,7 @@ function createActions(store) {
           temperatureFeatures: [],
           humidityFeatures: [],
           switchFeatures: [],
+          pilotWireFeatures: [],
           openingFeatures: [],
           targetFeatures: [],
           stateFeatures: [],
@@ -142,6 +151,7 @@ function createActions(store) {
           thermostatEditTemperatureFeature: getParam('THERMOSTAT_TEMPERATURE_FEATURE') || '',
           thermostatEditHumidityFeature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || '',
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
+          thermostatEditPilotWireFeature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || '',
           thermostatEditType: getParam('THERMOSTAT_TYPE') || 'virtual',
           thermostatEditTargetFeature: getParam('THERMOSTAT_TARGET_FEATURE') || '',
           thermostatEditStateFeature: getParam('THERMOSTAT_STATE_FEATURE') || '',
@@ -307,6 +317,12 @@ function createActions(store) {
             { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: temperatureFeature },
             { name: 'THERMOSTAT_HUMIDITY_FEATURE', value: humidityFeature },
             { name: 'THERMOSTAT_SWITCH_FEATURE', value: isExternalThermostat ? '' : switchFeature },
+            // A heater is driven by one actuator or the other, never both: the
+            // loop would send an order and cut the supply at the same time.
+            {
+              name: 'THERMOSTAT_PILOT_WIRE_FEATURE',
+              value: isExternalThermostat ? '' : state.thermostatEditPilotWireFeature || ''
+            },
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
             // Only meaningful on an external thermostat, and cleared otherwise so
             // switching a device back to virtual cannot leave it driving a real
@@ -385,6 +401,7 @@ function createActions(store) {
           thermostatEditTemperatureFeature: '',
           thermostatEditHumidityFeature: '',
           thermostatEditSwitchFeature: '',
+          thermostatEditPilotWireFeature: '',
           thermostatEditType: 'virtual',
           thermostatEditTargetFeature: '',
           thermostatEditStateFeature: '',
