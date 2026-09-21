@@ -364,6 +364,8 @@
     "selectBoxTypeLabel": "Wähle aus, welches Widget hier angezeigt werden soll",
     "selectBoxTypeSearchPlaceholder": "Widget suchen (Uhr, Kamera…)",
     "selectBoxTypeNoResult": "Kein Widget entspricht \"{{search}}\"",
+    "selectBoxTypeCoreSection": "Gladys-Widgets",
+    "selectBoxTypeIntegrationSection": "Integrations-Widgets",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Wetter",
@@ -387,7 +389,8 @@
       "sun": "Sonne",
       "chips": "Status-Chips",
       "actions": "Schnellaktionen",
-      "house-view": "Hausansicht"
+      "house-view": "Hausansicht",
+      "external-widget": "Integrations-Widget"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -825,6 +828,26 @@
         "editPinLabelPlaceholder": "z. B. Solar",
         "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
         "error": "Das Bild konnte nicht geladen werden."
+      },
+      "external-widget": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Standardmäßig der Name des Widgets",
+        "editSettingsLabel": "Widget-Einstellungen",
+        "editIntegrationNotInstalled": "Die Integration, die dieses Widget bereitstellt, ist nicht mehr installiert. Entfernen Sie das Widget oder installieren Sie die Integration erneut.",
+        "notInstalled": "Diese Integration ist nicht mehr installiert.",
+        "notInstalledHint": "Bearbeiten Sie das Dashboard, um dieses Widget zu entfernen, oder installieren Sie die Integration erneut.",
+        "stopped": "Die Integration ist gestoppt.",
+        "openIntegrationLink": "Integration öffnen",
+        "unavailable": "Die Widget-Daten sind nicht verfügbar.",
+        "retryButton": "Erneut versuchen",
+        "checkSettings": "Prüfen Sie die Einstellungen dieses Widgets.",
+        "checkSettingsHint": "Bearbeiten Sie das Dashboard, um die Widget-Einstellungen zu korrigieren.",
+        "needsNewerGladys": "Dieses Widget benötigt eine neuere Gladys-Version.",
+        "empty": "Derzeit nichts anzuzeigen.",
+        "emptyChart": "Noch keine Daten für diesen Zeitraum.",
+        "now": "Jetzt",
+        "confirmAction": "„{{label}}“ ausführen?",
+        "actionError": "Die Aktion ist fehlgeschlagen."
       }
     },
     "editDashboardBackgroundLabel": "Hintergrundstimmung",
@@ -1139,7 +1162,14 @@
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
-        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent)."
+        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "widgetsTitle": "Dashboard-Widgets",
+        "widgetsText": "Diese Integration stellt die folgenden Widgets bereit, die allen Benutzern im Dashboard-Editor zur Verfügung stehen:",
+        "providerInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Dashboard-Widgets bereit. Konfigurieren Sie sie hier und fügen Sie ihre Widgets dann im Dashboard-Editor hinzu.",
+        "sceneDeclarationsTitle": "Szenen-Auslöser und -Aktionen",
+        "sceneDeclarationsText": "Diese Integration fügt dem Szenen-Editor {{triggers}} Auslöser und {{actions}} Aktion(en) hinzu.",
+        "sceneTriggerPrefix": "Auslöser:",
+        "sceneActionPrefix": "Aktion:"
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
@@ -3659,6 +3689,9 @@
       },
       "time": {
         "get-date": "Datum und Uhrzeit abrufen"
+      },
+      "external-integration": {
+        "scene-action": "Integrations-Aktion"
       }
     },
     "actionsDescriptions": {
@@ -3737,6 +3770,9 @@
       },
       "time": {
         "get-date": "Das aktuelle Datum und die Uhrzeit abrufen, um sie in der Szene wiederzuverwenden"
+      },
+      "external-integration": {
+        "scene-action": "Eine von einer externen Integration deklarierte Aktion"
       }
     },
     "actionCategories": {
@@ -3745,7 +3781,8 @@
       "conditions": "Bedingungen",
       "flow": "Ablauf",
       "homeSecurity": "Zuhause & Sicherheit",
-      "advanced": "Erweitert"
+      "advanced": "Erweitert",
+      "integrations": "Integrationen"
     },
     "variables": {
       "device": {
@@ -3822,6 +3859,9 @@
       "weather": {
         "alert-raised": "Wetterwarnung ausgelöst",
         "alert-ended": "Wetterwarnung beendet"
+      },
+      "external-integration": {
+        "scene-event": "Integrations-Auslöser"
       }
     },
     "triggersDescriptions": {
@@ -3865,6 +3905,9 @@
       "weather": {
         "alert-raised": "Wenn eine Wetterwarnung beginnt (Wind, Regen…)",
         "alert-ended": "Wenn eine Wetterwarnung endet"
+      },
+      "external-integration": {
+        "scene-event": "Ein von einer externen Integration deklarierter Auslöser"
       }
     },
     "triggerCategories": {
@@ -3873,7 +3916,8 @@
       "presence": "Anwesenheit",
       "alarm": "Alarmanlage",
       "weather": "Wetter",
-      "advanced": "Erweitert"
+      "advanced": "Erweitert",
+      "integrations": "Integrationen"
     },
     "triggersCard": {
       "newState": {
@@ -4033,7 +4077,22 @@
     "moveHandleLabel": "Neu anordnen (ziehen, oder Pfeiltasten hoch und runter)",
     "deleteTriggerButton": "Diesen Auslöser löschen",
     "expandStepButton": "Details anzeigen",
-    "collapseStepButton": "Details ausblenden"
+    "collapseStepButton": "Details ausblenden",
+    "externalIntegration": {
+      "triggerNotInstalled": "Dieser Auslöser stammt von einer Integration, die nicht mehr installiert ist. Er kann erst wieder auslösen, wenn die Integration erneut installiert wird.",
+      "triggerNotDeclared": "Dieser Auslöser wird von der installierten Version der Integration nicht mehr deklariert. Er wird nicht mehr auslösen.",
+      "triggerInactive": "Die Integration ist gestoppt: dieser Auslöser kann erst auslösen, wenn sie läuft.",
+      "actionNotInstalled": "Diese Aktion stammt von einer Integration, die nicht mehr installiert ist. Sie schlägt fehl, bis die Integration erneut installiert wird.",
+      "actionNotDeclared": "Diese Aktion wird von der installierten Version der Integration nicht mehr deklariert. Sie schlägt beim Ausführen der Szene fehl.",
+      "actionInactive": "Die Integration ist gestoppt: diese Aktion schlägt fehl, bis sie läuft.",
+      "catalogLoading": "Auslöser und Aktionen der Integration werden geladen…",
+      "catalogUnavailableError": "Die Auslöser und Aktionen der Integrationen konnten nicht geladen werden, die Szene wurde daher nicht gespeichert. Versuche es gleich noch einmal.",
+      "wildcardHint": "Ein leer gelassenes Feld akzeptiert jeden Wert.",
+      "variablesAvailable": "Informationen, die an die Aktionen der Szene weitergegeben werden:",
+      "outputsAvailable": "Ergebnisse, die in den folgenden Schritten verwendbar sind:",
+      "variablesHint": "Tippe '{{', um Informationen der Szene einzufügen, zum Beispiel die vom Auslöser übermittelten.",
+      "requiredFieldError": "Das Feld „{{field}}“ von „{{title}}“ ist erforderlich: es darf nicht leer bleiben."
+    }
   },
   "profile": {
     "title": "Profil",

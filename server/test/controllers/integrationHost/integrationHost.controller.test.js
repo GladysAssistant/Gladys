@@ -4,7 +4,7 @@ const request = require('supertest');
 const db = require('../../../models');
 const { generateIntegrationToken } = require('../../../utils/integrationToken');
 const { generateAccessToken } = require('../../../utils/accessToken');
-const { SERVICE_STATUS, SERVICE_TYPES } = require('../../../utils/constants');
+const { SERVICE_STATUS, SERVICE_TYPES, EVENTS } = require('../../../utils/constants');
 const IntegrationHostController = require('../../../api/controllers/integrationHost.controller');
 
 const TEST_MANIFEST = {
@@ -459,6 +459,128 @@ describe('Integration host API', () => {
         .post('/api/integration/v1/state')
         .send({ states: [batch[0]] })
         .expect(429);
+    });
+  });
+
+  describe('POST /api/integration/v1/scene/event', () => {
+    const SCENE_MANIFEST = {
+      ...TEST_MANIFEST,
+      scene_triggers: [
+        {
+          key: 'object_detected',
+          label: { en: 'Object detected' },
+          fields: [
+            { key: 'intro', type: 'section', label: { en: 'Zones' } },
+            { key: 'camera', type: 'select', source: 'devices', label: { en: 'Camera' }, required: true },
+            { key: 'label', type: 'select', label: { en: 'Type' }, options: [{ value: 'person', label: { en: 'P' } }] },
+            { key: 'min_score', type: 'number', label: { en: 'Score' } },
+          ],
+          variables: [
+            { key: 'label', type: 'string', label: { en: 'Type' } },
+            { key: 'score', type: 'number', label: { en: 'Score' } },
+            { key: 'moving', type: 'boolean', label: { en: 'Moving' } },
+          ],
+        },
+      ],
+    };
+    let sceneService;
+    let sceneToken;
+    let emittedEvents;
+    let onTriggerCheck;
+
+    beforeEach(async () => {
+      sceneService = await seedExternalService({
+        name: 'ext-dev-frigate',
+        selector: 'ext-dev-frigate',
+        manifest: SCENE_MANIFEST,
+      });
+      sceneToken = generateIntegrationToken(sceneService.id, 1, 'secret');
+      emittedEvents = [];
+      onTriggerCheck = (payload) => emittedEvents.push(payload);
+      gladys.event.on(EVENTS.TRIGGERS.CHECK, onTriggerCheck);
+    });
+
+    afterEach(() => {
+      gladys.event.removeListener(EVENTS.TRIGGERS.CHECK, onTriggerCheck);
+      gladys.externalIntegration.sceneEventRateLimits.clear();
+    });
+
+    it('should accept a declared event and emit it on the scene pipeline with the two whitelists', async () => {
+      await integrationRequest(sceneToken)
+        .post('/api/integration/v1/scene/event')
+        .send({
+          key: 'object_detected',
+          data: { camera: 'ext:ext-dev-frigate:front', label: 3, score: '0.9', moving: 'true', junk: 'x' },
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.deep.equal({ success: true });
+        });
+      expect(emittedEvents).to.deep.equal([
+        {
+          type: EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT,
+          integration: 'ext-dev-frigate',
+          trigger_key: 'object_detected',
+          // a select filter on a number payload: "3" in the filters, 3 nowhere
+          // else since label is a string variable too... coerced to "3"
+          filters: { camera: 'ext:ext-dev-frigate:front', label: '3', min_score: null },
+          data: { label: '3', score: 0.9, moving: true },
+        },
+      ]);
+    });
+
+    it('should return 404 on an undeclared key and on an integration declaring no trigger', async () => {
+      await integrationRequest(sceneToken)
+        .post('/api/integration/v1/scene/event')
+        .send({ key: 'doorbell_pressed' })
+        .expect(404);
+      // tenant isolation: the lookup is on the caller's own manifest
+      await integrationRequest(token)
+        .post('/api/integration/v1/scene/event')
+        .send({ key: 'object_detected' })
+        .expect(404);
+      expect(emittedEvents).to.have.lengthOf(0);
+    });
+
+    it('should return 400 on nested data, arrays, long strings and too many keys', async () => {
+      const invalidPayloads = [
+        { key: 'object_detected', data: { label: { nested: true } } },
+        { key: 'object_detected', data: { label: ['person'] } },
+        { key: 'object_detected', data: { label: 'x'.repeat(1001) } },
+        { key: 'object_detected', data: Object.fromEntries(Array.from({ length: 31 }, (v, i) => [`k${i}`, 1])) },
+        { key: 'object_detected', data: 'person' },
+        { data: {} },
+      ];
+      await Promise.all(
+        invalidPayloads.map((payload) =>
+          integrationRequest(sceneToken)
+            .post('/api/integration/v1/scene/event')
+            .send(payload)
+            .expect(400),
+        ),
+      );
+      expect(emittedEvents).to.have.lengthOf(0);
+    });
+
+    it('should rate limit to 300 events/minute, separately from the states', async () => {
+      gladys.externalIntegration.sceneEventRateLimits.set(sceneService.id, {
+        count: 299,
+        resetAt: Date.now() + 60 * 1000,
+      });
+      await integrationRequest(sceneToken)
+        .post('/api/integration/v1/scene/event')
+        .send({ key: 'object_detected' })
+        .expect(200);
+      await integrationRequest(sceneToken)
+        .post('/api/integration/v1/scene/event')
+        .send({ key: 'object_detected' })
+        .expect(429);
+      // the states keep their own budget
+      await integrationRequest(sceneToken)
+        .post('/api/integration/v1/state')
+        .send({ states: [{ device_feature_external_id: `ext:${sceneService.selector}:x`, state: 1 }] })
+        .expect(200);
     });
   });
 

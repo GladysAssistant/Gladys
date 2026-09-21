@@ -33,10 +33,12 @@ function checkTrigger(event) {
           const conditionVerified = triggersFunc[event.type](this, sceneSelector, event, trigger);
           logger.debug(`Trigger ${trigger.type}, conditionVerified = ${conditionVerified}...`);
 
-          // if yes, we execute the scene
+          // if yes, we execute the scene. A checker returning an object builds
+          // the trigger event the actions see (the reduced event of an
+          // integration scene trigger); a boolean keeps the raw event.
           if (conditionVerified) {
             this.execute(sceneSelector, {
-              triggerEvent: event,
+              triggerEvent: typeof conditionVerified === 'object' ? conditionVerified : event,
             });
           }
         }
