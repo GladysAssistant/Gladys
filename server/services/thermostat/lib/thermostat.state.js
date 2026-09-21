@@ -113,7 +113,13 @@ function getPreset(device) {
  */
 function isStopped(device) {
   const feature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
-  return Boolean(feature) && Number(feature.last_value) === THERMOSTAT_MODE.OFF;
+  // A mode that was never written carries null, and `Number(null)` is 0 — which
+  // is OFF. Checking the value is there before comparing it is what keeps a
+  // thermostat whose mode feature has never been set from reading as stopped.
+  if (!feature || feature.last_value === null || feature.last_value === undefined) {
+    return false;
+  }
+  return Number(feature.last_value) === THERMOSTAT_MODE.OFF;
 }
 
 /**
