@@ -179,6 +179,10 @@ function bindThresholdCharacteristic(service, characteristicType, feature, helpe
  * Unlike the other categories, a thermostat is built from features of several Gladys categories at
  * once (the setpoints, the mode, the on/off command and the temperature sensor of the same device),
  * so the whole service is wired here instead of feature by feature.
+ * The air conditioning features are handled here only on a device carrying thermostat features next
+ * to them, such as a Matter heat pump. An air conditioner on its own is a HeaterCooler, see
+ * buildHeaterCoolerService: a Thermostat is only ever on by being in a mode, and the mode Siri picks
+ * for "turn on" is Auto, which on an air conditioner can mean heating.
  * @param {object} service - HomeKit Thermostat service to fill.
  * @param {object} device - Gladys device exposed as this thermostat.
  * @param {object} features - Device features merged into the thermostat service.
@@ -440,6 +444,7 @@ function buildThermostatService(service, device, features) {
 module.exports = {
   buildThermostatService,
   buildValidTargetStates,
+  listSupportedModes,
   toCelsius,
   fromCelsius,
 };

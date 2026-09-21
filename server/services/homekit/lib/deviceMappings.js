@@ -305,17 +305,24 @@ const mappings = {
       },
     },
   },
+  // An air conditioner is a HeaterCooler, not a Thermostat: HomeKit gives the former an Active
+  // characteristic of its own, so "turn on the air conditioning" is a power command that leaves the
+  // mode alone. On a Thermostat the only way to be on is to be in a mode, and Siri picks Auto — an
+  // air conditioner told to turn on in summer would start heating. A device carrying thermostat
+  // features next to these ones is still a Thermostat, see mergedServiceCategories.
   [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
-    service: 'Thermostat',
+    service: 'HeaterCooler',
     capabilities: {
+      // A single setpoint stands behind both thresholds: the Home app shows the heating one in heat
+      // mode and the cooling one in cool mode.
       [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: {
-        characteristics: ['TargetTemperature'],
+        characteristics: ['CoolingThresholdTemperature', 'HeatingThresholdTemperature'],
       },
       [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: {
-        characteristics: ['TargetHeatingCoolingState', 'CurrentHeatingCoolingState'],
+        characteristics: ['TargetHeaterCoolerState', 'CurrentHeaterCoolerState'],
       },
       [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY]: {
-        characteristics: ['TargetHeatingCoolingState', 'CurrentHeatingCoolingState'],
+        characteristics: ['Active', 'CurrentHeaterCoolerState'],
       },
     },
   },
@@ -462,8 +469,12 @@ const mergedServiceCategories = [
     hosts: [DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_CATEGORIES.BATTERY_LOW],
     merged: [],
   },
-  // A heating or cooling device is one Thermostat service, while Gladys splits it across the
-  // setpoints, the mode, the on/off command and the temperature sensor reading the room.
+  // A heating or cooling device is one HomeKit service, while Gladys splits it across the
+  // setpoints, the mode, the on/off command and the temperature sensor reading the room. The first
+  // host present decides the service: a device with thermostat features is a Thermostat, and its
+  // air conditioning features join it (a Matter heat pump declares its heating setpoint as a
+  // thermostat and its cooling setpoint and mode as air conditioning); a device with air
+  // conditioning features alone is a HeaterCooler.
   {
     hosts: [DEVICE_FEATURE_CATEGORIES.THERMOSTAT, DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING],
     merged: [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR],
@@ -492,6 +503,38 @@ const heatingCoolingStateToAcMode = {
   [HOMEKIT_HEATING_COOLING_STATE.HEAT]: AC_MODE.HEATING,
   [HOMEKIT_HEATING_COOLING_STATE.COOL]: AC_MODE.COOLING,
   [HOMEKIT_HEATING_COOLING_STATE.AUTO]: AC_MODE.AUTO,
+};
+
+// Values of the HomeKit TargetHeaterCoolerState characteristic. They are not the Thermostat ones:
+// there is no off, the device is switched off through Active, and auto is 0 rather than 3.
+const HOMEKIT_HEATER_COOLER_STATE = {
+  AUTO: 0,
+  HEAT: 1,
+  COOL: 2,
+};
+
+// Values of the HomeKit CurrentHeaterCoolerState characteristic. Unlike CurrentHeatingCoolingState
+// it tells a device that is off from one that is on and doing nothing.
+const HOMEKIT_CURRENT_HEATER_COOLER_STATE = {
+  INACTIVE: 0,
+  IDLE: 1,
+  HEATING: 2,
+  COOLING: 3,
+};
+
+// AC_MODE.DRYING and AC_MODE.FAN have no HomeKit equivalent here either, they are reported as AUTO.
+const acModeToHeaterCoolerState = {
+  [AC_MODE.AUTO]: HOMEKIT_HEATER_COOLER_STATE.AUTO,
+  [AC_MODE.COOLING]: HOMEKIT_HEATER_COOLER_STATE.COOL,
+  [AC_MODE.HEATING]: HOMEKIT_HEATER_COOLER_STATE.HEAT,
+  [AC_MODE.DRYING]: HOMEKIT_HEATER_COOLER_STATE.AUTO,
+  [AC_MODE.FAN]: HOMEKIT_HEATER_COOLER_STATE.AUTO,
+};
+
+const heaterCoolerStateToAcMode = {
+  [HOMEKIT_HEATER_COOLER_STATE.AUTO]: AC_MODE.AUTO,
+  [HOMEKIT_HEATER_COOLER_STATE.HEAT]: AC_MODE.HEATING,
+  [HOMEKIT_HEATER_COOLER_STATE.COOL]: AC_MODE.COOLING,
 };
 
 // Unlike the air conditioning mode, the thermostat mode carries its own off value, so a device
@@ -568,6 +611,10 @@ module.exports = {
   HOMEKIT_HEATING_COOLING_STATE,
   acModeToHeatingCoolingState,
   heatingCoolingStateToAcMode,
+  HOMEKIT_HEATER_COOLER_STATE,
+  HOMEKIT_CURRENT_HEATER_COOLER_STATE,
+  acModeToHeaterCoolerState,
+  heaterCoolerStateToAcMode,
   thermostatModeToHeatingCoolingState,
   heatingCoolingStateToThermostatMode,
   thermostatOperatingStateToHeatingCoolingState,
