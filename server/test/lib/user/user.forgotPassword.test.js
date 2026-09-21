@@ -88,7 +88,13 @@ describe('user.forgotPassword', () => {
 
   it('should send a code when the origin is only used by a session of another user', async () => {
     // pepper logs in from attacker.example, that must not make it a link target for john
-    await session.create('7a137a56-069e-4996-8816-36558174b727', ['dashboard:write'], 60, 'chrome', 'https://attacker.example');
+    await session.create(
+      '7a137a56-069e-4996-8816-36558174b727',
+      ['dashboard:write'],
+      60,
+      'chrome',
+      'https://attacker.example',
+    );
     const result = await user.forgotPassword('demo@demo.com', 'chrome', 'https://attacker.example');
     expect(result.method).to.equal('code');
     const pepper = await user.forgotPassword('pepper@pots.com', 'chrome', 'https://attacker.example');
