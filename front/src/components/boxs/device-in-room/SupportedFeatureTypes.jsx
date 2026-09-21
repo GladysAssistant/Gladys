@@ -58,7 +58,10 @@ const SUPPORTED_FEATURE_TYPES_BY_CATEGORY = {
     DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE,
     DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST
   ],
-  [DEVICE_FEATURE_CATEGORIES.TEXT]: [DEVICE_FEATURE_TYPES.TEXT.SELECT]
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: [DEVICE_FEATURE_TYPES.TEXT.SELECT],
+  // Hushing a detector is a control, but scoped to its category: it must never be picked up by
+  // the generic switch handling (quick actions, "turn everything off"…)
+  [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE]
 };
 
 const isSupportedFeature = ({ category, type }) =>

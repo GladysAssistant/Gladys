@@ -653,6 +653,14 @@ export const getFeatureDefaultValues = (category, type) => {
     return { ...defaults, min: 0, max: 1, read_only: false, keep_history: false };
   }
 
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR &&
+    type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE
+  ) {
+    // Command silencing the detector's siren: written, not measured
+    return { ...defaults, min: 0, max: 1, read_only: false, keep_history: false };
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.MOVE) {
     // min/max cover the CAMERA_MOVE canonical values (STOP=0 .. ZOOM_OUT=6)
     return { ...defaults, min: 0, max: 6, read_only: false, keep_history: false };

@@ -5534,6 +5534,21 @@
           "other": "No value received",
           "zero": "Clear",
           "one": "Smoke detected"
+        },
+        "contamination-state": {
+          "0": "Clean",
+          "1": "Lightly contaminated",
+          "2": "Moderately contaminated",
+          "3": "Critically contaminated",
+          "unknown": "{{value}} (unknown)"
+        },
+        "muted": {
+          "0": "Can ring",
+          "1": "Muted"
+        },
+        "temporary-mute": {
+          "0": "Let it ring",
+          "1": "Hush the alarm"
         }
       },
       "co-sensor": {
@@ -5834,7 +5849,10 @@
     "smoke-sensor": {
       "shortCategoryName": "Smoke sensor",
       "binary": "Smoke (on/off)",
-      "decimal": "Density (decimal)"
+      "decimal": "Density (decimal)",
+      "contamination-state": "Contamination",
+      "muted": "Muted",
+      "temporary-mute": "Hush the alarm"
     },
     "co-sensor": {
       "shortCategoryName": "Carbon Monoxide (CO) Sensor",

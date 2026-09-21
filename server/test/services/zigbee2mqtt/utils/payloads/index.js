@@ -5,5 +5,6 @@ const TS0601GarageDoorOpener = require('./TS0601_garage_door_opener.json');
 const SWV = require('./SWV.json');
 const HS2WDE = require('./HS2WD-E.json');
 const NASAB06B2 = require('./NAS-AB06B2.json');
+const HS1SAEPLUS = require('./HS1SA-E-PLUS.json');
 
-module.exports = [CCT5015, ZSSZKTHL, SNZB01M, TS0601GarageDoorOpener, SWV, HS2WDE, NASAB06B2];
+module.exports = [CCT5015, ZSSZKTHL, SNZB01M, TS0601GarageDoorOpener, SWV, HS2WDE, NASAB06B2, HS1SAEPLUS];

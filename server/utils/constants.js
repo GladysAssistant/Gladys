@@ -286,6 +286,18 @@ const WATER_VALVE_CURRENT_DEVICE_STATUS = {
   WATER_SHORTAGE_AND_WATER_LEAKAGE: 3,
 };
 
+// How contaminated a smoke detector's sensing chamber is: from a clean detector to one so
+// dirty it can no longer be trusted. Names and integers are Matter's ContaminationStateEnum
+// (Smoke CO Alarm cluster), so a Matter detector maps onto it without conversion.
+// Values are append-only: an existing integer never changes meaning, it is stored in device
+// states and hard-coded in users' scenes.
+const CONTAMINATION_STATE = {
+  NORMAL: 0,
+  LOW: 1,
+  WARNING: 2,
+  CRITICAL: 3,
+};
+
 // Operating modes of a domestic hot water appliance. This is the full generic set:
 // an appliance supporting only some of them declares its subset through the
 // supported_options of its `mode` feature, never by narrowing this enum.
@@ -1386,6 +1398,26 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
   },
+  // Smoke detectors. The detection itself stays on the generic sensor types the category
+  // has always used (`binary` for "smoke detected", `decimal` for the measured smoke level):
+  // this group only holds what is specific to a smoke chamber. Boundary with neighboring
+  // categories: a detector's battery, temperature or tamper contact are features of their own
+  // categories on the same device, and its siren is a `siren` feature.
+  SMOKE_SENSOR: {
+    // Dirt accumulated in the sensing chamber, CONTAMINATION_STATE (integer - sensor), named
+    // after Matter's ContaminationState attribute. A contaminated detector is blinded: the
+    // state tells the user to clean or replace it.
+    CONTAMINATION_STATE: 'contamination-state',
+    // The detector's own siren is silenced, 1 when muted, 0 when it can ring (binary - sensor).
+    // Boundary with the siren category: this is the detector muting itself (a user pressing its
+    // button, an alarm hushed after a false trigger), not a siren Gladys drives.
+    MUTED: 'muted',
+    // Silence the detector's siren for as long as it allows, 1 to hush, 0 to let it ring again
+    // (binary - command). It is the command counterpart of `muted`, which reports the result,
+    // and stays in this category on purpose: hushing an alarm is not a generic switch, and
+    // must not be reachable through "turn everything off" in a voice assistant or a scene.
+    TEMPORARY_MUTE: 'temporary-mute',
+  },
   // Domestic hot water appliances: electric storage tanks, heat-pump water heaters,
   // gas-fired water heaters. Scope is limited to producing and storing hot water.
   // Boundary with neighboring categories: the water temperature measured in the tank
@@ -2382,6 +2414,7 @@ module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
+module.exports.CONTAMINATION_STATE = CONTAMINATION_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

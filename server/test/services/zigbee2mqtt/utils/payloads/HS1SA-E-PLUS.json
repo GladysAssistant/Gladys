@@ -1,0 +1,431 @@
+{
+  "name": "HS1SA-E-PLUS device",
+  "mqttDevice": {
+    "definition": {
+      "model": "HS1SA-E-PLUS",
+      "exposes": [
+        {
+          "name": "battery",
+          "label": "Battery",
+          "access": 5,
+          "type": "numeric",
+          "property": "battery",
+          "description": "Remaining battery in %",
+          "category": "diagnostic",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "name": "identify",
+          "label": "Identify",
+          "access": 2,
+          "type": "enum",
+          "property": "identify",
+          "description": "Initiate device identification",
+          "category": "config",
+          "values": ["identify"]
+        },
+        {
+          "name": "temperature",
+          "label": "Temperature",
+          "access": 5,
+          "type": "numeric",
+          "property": "temperature",
+          "description": "Measured temperature value",
+          "unit": "°C"
+        },
+        {
+          "name": "smoke",
+          "label": "Smoke",
+          "access": 1,
+          "type": "binary",
+          "property": "smoke",
+          "description": "Indicates whether the device detected smoke",
+          "value_on": true,
+          "value_off": false
+        },
+        {
+          "name": "battery_low",
+          "label": "Battery low",
+          "access": 1,
+          "type": "binary",
+          "property": "battery_low",
+          "description": "Indicates whether the battery of the device is almost empty",
+          "category": "diagnostic",
+          "value_on": true,
+          "value_off": false
+        },
+        {
+          "name": "test",
+          "label": "Test",
+          "access": 1,
+          "type": "binary",
+          "property": "test",
+          "description": "Indicates whether the device is currently performing a test",
+          "category": "diagnostic",
+          "value_on": true,
+          "value_off": false
+        },
+        {
+          "name": "fault_state",
+          "label": "Fault state",
+          "access": 5,
+          "type": "text",
+          "property": "fault_state",
+          "description": "Device fault status (normal or fault types)."
+        },
+        {
+          "name": "muted",
+          "label": "Muted",
+          "access": 5,
+          "type": "text",
+          "property": "muted",
+          "description": "Device mute status (normal or mute types)."
+        },
+        {
+          "name": "trigger_selftest",
+          "label": "Trigger selftest",
+          "access": 2,
+          "type": "enum",
+          "property": "trigger_selftest",
+          "description": "Trigger alarm self-check.",
+          "values": ["test"]
+        },
+        {
+          "name": "temporary_mute",
+          "label": "Temporary mute",
+          "access": 7,
+          "type": "binary",
+          "property": "temporary_mute",
+          "description": "Silence the alarm temporarily",
+          "value_on": true,
+          "value_off": false
+        },
+        {
+          "name": "heartbeat_indicator",
+          "label": "Heartbeat indicator",
+          "access": 7,
+          "type": "binary",
+          "property": "heartbeat_indicator",
+          "description": "Enable/disable the indicator on product",
+          "value_on": true,
+          "value_off": false
+        },
+        {
+          "name": "interconnectable",
+          "label": "Interconnectable",
+          "access": 5,
+          "type": "binary",
+          "property": "interconnectable",
+          "description": "used for interconnection automation.",
+          "value_on": true,
+          "value_off": false
+        },
+        {
+          "name": "smoke_level",
+          "label": "Smoke level",
+          "access": 5,
+          "type": "numeric",
+          "property": "smoke_level",
+          "description": "smoke level",
+          "value_max": 20,
+          "value_min": 0
+        },
+        {
+          "name": "smoke_unit",
+          "label": "Smoke unit",
+          "access": 5,
+          "type": "enum",
+          "property": "smoke_unit",
+          "description": "smoke level unit",
+          "values": ["dB/m", "%ft OBS"]
+        },
+        {
+          "name": "chamber_contamination",
+          "label": "Chamber contamination",
+          "access": 5,
+          "type": "enum",
+          "property": "chamber_contamination",
+          "description": "it indicates that how serious the smoke chamber get contaminated.",
+          "values": ["normal", "light_contamination", "medium_contamination", "critical_contamination"]
+        },
+        {
+          "name": "link_available",
+          "label": "Link available",
+          "access": 5,
+          "type": "enum",
+          "property": "link_available",
+          "description": "used for interconnection automation.",
+          "values": ["inactive", "smoke_active", "co_active", "gas_active", "heat_active"]
+        },
+        {
+          "name": "siren_for_automation_only",
+          "label": "Siren for automation only",
+          "access": 7,
+          "type": "enum",
+          "property": "siren_for_automation_only",
+          "description": "siren effect",
+          "values": ["stop", "smoke_siren", "co_siren"]
+        },
+        {
+          "name": "temperature_offset",
+          "label": "Temperature offset",
+          "access": 7,
+          "type": "numeric",
+          "property": "temperature_offset",
+          "description": "used for temperature offset, unit: ℃",
+          "value_max": 15,
+          "value_min": -15,
+          "value_step": 0.1
+        },
+        {
+          "name": "reported_packages",
+          "label": "Reported packages",
+          "access": 5,
+          "type": "numeric",
+          "property": "reported_packages",
+          "description": "for diagnostic purpose, how many zigbee packages has the reported in a day.",
+          "value_max": 60000,
+          "value_min": 0
+        },
+        {
+          "name": "rejoin_count",
+          "label": "Rejoin count",
+          "access": 5,
+          "type": "numeric",
+          "property": "rejoin_count",
+          "description": "for diagnostic purpose, how many times has the product rejoined to zigbee network.",
+          "value_max": 60000,
+          "value_min": 0
+        },
+        {
+          "name": "reboot_count",
+          "label": "Reboot count",
+          "access": 5,
+          "type": "numeric",
+          "property": "reboot_count",
+          "description": "for diagnostic purpose, how many times has the product rebooted.",
+          "value_max": 60000,
+          "value_min": 0
+        }
+      ]
+    },
+    "friendly_name": "HS1SA-E-PLUS device"
+  },
+  "gladysDevice": {
+    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a",
+    "external_id": "zigbee2mqtt:HS1SA-E-PLUS device",
+    "name": "HS1SA-E-PLUS device",
+    "model": "HS1SA-E-PLUS",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:battery:integer:battery",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-battery-integer-battery"
+      },
+      {
+        "name": "Temperature",
+        "read_only": true,
+        "has_feedback": false,
+        "min": -100,
+        "max": 150,
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:temperature-sensor:decimal:temperature",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-temperature-sensor-decimal-temperature"
+      },
+      {
+        "name": "Smoke",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "smoke-sensor",
+        "type": "binary",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:binary:smoke",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-binary-smoke"
+      },
+      {
+        "name": "Battery low",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "battery-low",
+        "type": "binary",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:battery-low:binary:battery_low",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-battery-low-binary-battery-low"
+      },
+      {
+        "name": "Test",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "siren",
+        "type": "test-in-progress",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:siren:test-in-progress:test",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-siren-test-in-progress-test"
+      },
+      {
+        "name": "Fault state",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 0,
+        "category": "text",
+        "type": "text",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:text:text:fault_state",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-text-text-fault-state"
+      },
+      {
+        "name": "Muted",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "smoke-sensor",
+        "type": "muted",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:muted:muted",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-muted-muted"
+      },
+      {
+        "name": "Trigger selftest",
+        "read_only": false,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "button",
+        "type": "push",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:button:push:trigger_selftest",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-button-push-trigger-selftest"
+      },
+      {
+        "name": "Temporary mute",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 1,
+        "category": "smoke-sensor",
+        "type": "temporary-mute",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:temporary-mute:temporary_mute",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-temporary-mute-temporary-mute"
+      },
+      {
+        "name": "Smoke level",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 20,
+        "category": "smoke-sensor",
+        "type": "decimal",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:decimal:smoke_level",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-decimal-smoke-level"
+      },
+      {
+        "name": "Chamber contamination",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 3,
+        "category": "smoke-sensor",
+        "type": "contamination-state",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:smoke-sensor:contamination-state:chamber_contamination",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-smoke-sensor-contamination-state-chamber-contamination"
+      },
+      {
+        "name": "Siren for automation only",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 3,
+        "category": "siren",
+        "type": "binary",
+        "unit": null,
+        "external_id": "zigbee2mqtt:HS1SA-E-PLUS device:siren:binary:siren_for_automation_only",
+        "selector": "zigbee2mqtt-hs1sa-e-plus-device-siren-binary-siren-for-automation-only"
+      }
+    ]
+  },
+  "values": [
+    {
+      "internal": 0.5,
+      "external": 0.5,
+      "property": "smoke_level"
+    },
+    {
+      "internal": 0,
+      "external": "normal",
+      "property": "chamber_contamination"
+    },
+    {
+      "internal": 1,
+      "external": "light_contamination",
+      "property": "chamber_contamination"
+    },
+    {
+      "internal": 2,
+      "external": "medium_contamination",
+      "property": "chamber_contamination"
+    },
+    {
+      "internal": 3,
+      "external": "critical_contamination",
+      "property": "chamber_contamination"
+    },
+    {
+      "internal": "normal",
+      "external": "normal",
+      "property": "fault_state"
+    },
+    {
+      "internal": "fault | pollution_fault",
+      "external": "fault | pollution_fault",
+      "property": "fault_state"
+    },
+    {
+      "internal": 0,
+      "external": "normal",
+      "property": "muted"
+    },
+    {
+      "internal": 1,
+      "external": "alarm_muted | low_battery_muted",
+      "property": "muted"
+    },
+    {
+      "internal": 1,
+      "external": true,
+      "property": "smoke"
+    },
+    {
+      "internal": 1,
+      "external": true,
+      "property": "temporary_mute"
+    },
+    {
+      "internal": 0,
+      "external": false,
+      "property": "temporary_mute"
+    }
+  ]
+}

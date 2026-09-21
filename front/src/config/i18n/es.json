@@ -5534,6 +5534,21 @@
           "other": "No se recibió ningún valor",
           "zero": "Sin humo",
           "one": "Humo detectado"
+        },
+        "contamination-state": {
+          "0": "Limpia",
+          "1": "Ligeramente contaminada",
+          "2": "Moderadamente contaminada",
+          "3": "Críticamente contaminada",
+          "unknown": "{{value}} (desconocido)"
+        },
+        "muted": {
+          "0": "Puede sonar",
+          "1": "Silenciada"
+        },
+        "temporary-mute": {
+          "0": "Dejar sonar",
+          "1": "Silenciar la alarma"
         }
       },
       "co-sensor": {
@@ -5834,7 +5849,10 @@
     "smoke-sensor": {
       "shortCategoryName": "Sensor de humo",
       "binary": "Humo (encendido/apagado)",
-      "decimal": "Densidad (decimal)"
+      "decimal": "Densidad (decimal)",
+      "contamination-state": "Contaminación",
+      "muted": "Silenciada",
+      "temporary-mute": "Silenciar la alarma"
     },
     "co-sensor": {
       "shortCategoryName": "Sensor de monóxido de carbono (CO)",
