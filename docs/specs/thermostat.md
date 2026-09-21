@@ -55,6 +55,7 @@ Everything the control loop needs is a `THERMOSTAT_*` device param:
 | `THERMOSTAT_TEMPERATURE_FEATURE`                   | the sensor the loop regulates on (virtual); displayed only (external)                                                                                                             |
 | `THERMOSTAT_HUMIDITY_FEATURE`                      | optional, displayed only                                                                                                                                                          |
 | `THERMOSTAT_SWITCH_FEATURE`                        | **virtual only** — the actuator the loop drives                                                                                                                                   |
+| `THERMOSTAT_PILOT_WIRE_FEATURE`                    | **virtual only** — the other actuator: a `heater` / `pilot-wire-mode` feature, driven by an order rather than a contact (C.1.1)                                                   |
 | `THERMOSTAT_TARGET_FEATURE`                        | **external only** — the real device's setpoint, written by the loop. Required                                                                                                     |
 | `THERMOSTAT_STATE_FEATURE`                         | **external only**, optional — `operating-state` or a binary boiler contact, read to show whether the equipment runs                                                               |
 | `THERMOSTAT_MODE_FEATURE`                          | **external only**, optional — the real device's operating mode, if it has one                                                                                                     |
@@ -243,6 +244,29 @@ Schedules are wall-clock times **in the house**. `getCurrentDayAndMinutes` there
 The matching lives on the **server only**. The widget is handed `current` and `next` already computed (E.5) and never reads the timezone, so there is nothing to keep in agreement between two implementations — and no reason for a schedule helper to be importable from the frontend build. The interval algebra that used to be shared (`applySlotToDay`, `mergeIntoSlots`) does not survive the move to transition points (E.0); what is left is "the last point at or before now", which the loop does once per tick.
 
 This is also what removes the class of bug where a phone abroad, or a laptop left on another zone, displayed a preset other than the one actually heating the house.
+
+### C.1.1 Pilot-wire heaters
+
+A French pilot-wire heater is the most common case after the relay, and it is not a switch: it keeps its own thermostat and takes **one of six orders** on a command wire — off, frost protection, eco, comfort, and the two derived comforts a heater computes itself. Cutting its supply is not how it is stopped.
+
+It is therefore a second kind of actuator in the same slot, and a thermostat driving one stops at step 4 exactly like an external thermostat (C.0): no hysteresis, no TPI, no room sensor read, because the appliance regulates on the order it was given and a second loop would fight it.
+
+The presets map onto the orders almost one for one, which is no coincidence — both vocabularies come from the same French heating tradition:
+
+| Preset    | Order              |
+| --------- | ------------------ |
+| `off`     | `OFF`              |
+| `frost`   | `FROST_PROTECTION` |
+| `away`    | `ECO`              |
+| `eco`     | `ECO`              |
+| `night`   | `ECO`              |
+| `comfort` | `COMFORT`          |
+
+`away` and `night` have no order of their own: the wire offers no "nobody home" and no "night", and eco is what both actually ask for. `COMFORT_1` and `COMFORT_2` are orders a heater derives from comfort by itself — Gladys does not pick them.
+
+Like every other write, an order already carried is skipped: several of these heaters are Zigbee, and re-sending an unchanged order once a minute is traffic for nothing. A window opening, or a stop by hand, sends `OFF` rather than actuating a switch the thermostat does not hold.
+
+A heater is driven by one actuator or the other, never both — the edit form clears the pilot-wire param on an external thermostat, and the loop takes the pilot-wire branch first.
 
 ### C.2 Hysteresis and TPI
 
@@ -515,7 +539,6 @@ The dial bounds come from the target feature's own `min`/`max` when it declares 
 
 ## G. Out of scope
 
-- Fil pilote heaters (`heater` / `pilot-wire-mode`): the actuator picker is `switch` / `binary` only. Additive when it comes, and the most common French case after the relay.
 - **House modes**: away tied to presence, holiday until a date, a global frost setting. A schedule owned by a house (E.1) is what makes an active schedule per house — followed by thermostats that made no explicit choice — expressible later with no schema change.
 - **The gauge widget on any `thermostat` / `target-temperature` feature**, the schedule being an optional layer on top. Today, showing a Netatmo on a dashboard means creating an "external" thermostat device for it.
 - **An external thermostat that keeps its own vendor programme.** Gladys's hold and the device's programme then take turns writing the setpoint (C.0.1). Until that is handled, the edit form says to disable the programme on the vendor side.

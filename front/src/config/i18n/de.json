@@ -3544,6 +3544,8 @@
           "heating": "Der Schalter, der zum Heizen des Raums ein- und ausgeschaltet wird.",
           "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
         },
+        "pilotWireFeatureLabel": "Steuerleitung (Aktor)",
+        "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm den zur Voreinstellung passenden Befehl (Komfort, Eco, Frostschutz, Aus), statt die Stromzufuhr zu unterbrechen. Der Heizkörper behält sein eigenes Thermostat, daher gelten weder Schwelle noch Zyklus. Lassen Sie den Schalter leer, wenn Sie dies verwenden.",
         "windowFeatureLabel": "Fensterkontakt",
         "windowFeatureHelp": {
           "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",

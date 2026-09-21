@@ -391,6 +391,27 @@ const EditForm = ({ ...props }) => {
               </div>
             )}
 
+            {/* Fil pilote : l'autre façon de piloter un radiateur, par un ordre
+                sur son fil de commande plutôt que par une coupure. */}
+            {!isExternalThermostat && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.pilotWireFeatureLabel" />
+                </label>
+                <Localizer>
+                  <FeatureSelect
+                    value={props.thermostatEditPilotWireFeature || ''}
+                    features={props.pilotWireFeatures}
+                    onChange={e => props.updateThermostatField('thermostatEditPilotWireFeature', e.target.value)}
+                    emptyLabel={<Text id="global.emptySelectOption" />}
+                  />
+                </Localizer>
+                <small class="form-text text-muted">
+                  <Text id="integration.thermostat.edit.pilotWireFeatureHelp" />
+                </small>
+              </div>
+            )}
+
             {/* Capteur d'ouverture de fenêtre */}
             <div class="form-group">
               <label class="form-label">
