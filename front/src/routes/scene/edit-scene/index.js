@@ -455,12 +455,40 @@ class EditScene extends Component {
     // Serialize the scene before the request: the local state can change while it is in
     // flight (and the "active" switch patches the scene on its own), so snapshotting the
     // state afterwards would display "saved" for data this request never sent
-    const savedSceneSnapshot = JSON.stringify(this.state.scene);
-    const sceneToSave = JSON.parse(savedSceneSnapshot);
+    const sceneSnapshotBeforeSave = JSON.stringify(this.state.scene);
+    const sceneToSave = JSON.parse(sceneSnapshotBeforeSave);
+    // A "time-range" trigger starts with an empty range for the user to fill in. One left
+    // incomplete is dropped here rather than sent: the schema requires both times, so it
+    // would fail the whole save instead of just being ignored.
+    (sceneToSave.triggers || []).forEach(trigger => {
+      if (trigger.time_ranges) {
+        trigger.time_ranges = trigger.time_ranges.filter(range => range.start && range.end);
+      }
+    });
     this.setState({ saving: true, error: false, errorMessage: null });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
-      this.setState({ savedSceneSnapshot });
+      // The snapshot is the payload actually sent, not the state it was built from: an
+      // incomplete range was dropped on the way, and comparing against the unfiltered state
+      // would leave the editor thinking it has unsaved changes forever. The state itself is
+      // realigned on what was persisted, so the dropped range does not stay on screen until
+      // a reload — unless the user edited the scene while the request was in flight, in
+      // which case their edits win and only the snapshot moves.
+      this.setState(prevState => {
+        const savedScene = { ...sceneToSave };
+        // "active" has its own route: the switch may have been flipped, and persisted, while
+        // this request was in flight. Our payload then carries the value from before the
+        // flip, and writing it to the snapshot would show an unsaved change although both
+        // requests succeeded. The snapshot always holds what the server last acknowledged,
+        // so that value is the one kept.
+        if (prevState.savedSceneSnapshot) {
+          savedScene.active = JSON.parse(prevState.savedSceneSnapshot).active;
+        }
+        const savedSceneSnapshot = JSON.stringify(savedScene);
+        return JSON.stringify(prevState.scene) === sceneSnapshotBeforeSave
+          ? { scene: savedScene, savedSceneSnapshot }
+          : { savedSceneSnapshot };
+      });
     } catch (e) {
       console.error(e);
       let errorMessage = null;
