@@ -146,6 +146,44 @@ describe('energy-contract priceIntervals', () => {
       },
     ]);
   });
+  it('should send the energy to the fallback, never to a later rule, when the matching rule has no calendar price', () => {
+    const compiled = tariff(
+      [
+        consumption({
+          rules: [
+            { label: 'Spot', price_from_calendar: 'spot' },
+            { label: 'Later', price: 0.9 },
+          ],
+          fallback: { label: 'Backup', price: 0.25 },
+        }),
+      ],
+      ['spot'],
+    );
+    const { costs, warnings } = priceIntervals(compiled, { timezone: 'UTC' }, [
+      { starts_at: '2026-01-12T10:00:00Z', kwh: 2 },
+    ]);
+    expect(costs[0].cost).to.be.closeTo(0.5, 1e-9);
+    expect(costs[0].label).to.equal('Backup');
+    expect(warnings).to.have.lengthOf(1);
+    const tiered = tariff(
+      [
+        consumption({
+          rules: [
+            { label: 'Tier 1', when: { tier: { cumulative: 'day', from_kwh: 0, to_kwh: 1 } }, price: 0.1 },
+            { label: 'Tier 2 spot', when: { tier: { cumulative: 'day', from_kwh: 1 } }, price_from_calendar: 'spot' },
+            { label: 'Later', price: 0.9 },
+          ],
+          fallback: { label: 'Backup', price: 0.25 },
+        }),
+      ],
+      ['spot'],
+    );
+    const second = priceIntervals(tiered, { timezone: 'UTC' }, [{ starts_at: '2026-01-12T10:00:00Z', kwh: 2 }]);
+    // 1 kWh in tier 1, the missing tier 2 price sends the remaining kWh to the fallback
+    expect(second.costs[0].cost).to.be.closeTo(0.1 + 0.25, 1e-9);
+    expect(second.costs[0].label).to.equal('Backup');
+    expect(second.warnings).to.have.lengthOf(1);
+  });
   it('should warn and price nothing when even the last resort has no price', () => {
     const withoutFallback = tariff([consumption({ rules: [{ price_from_calendar: 'spot' }] })], ['spot']);
     const first = priceIntervals(withoutFallback, { timezone: 'UTC' }, [{ starts_at: '2026-01-12T10:00:00Z', kwh: 1 }]);

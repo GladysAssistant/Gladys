@@ -78,12 +78,12 @@ Levels 1 and 2 go through the same engine: the difference is the source of the d
 
 | Condition | Shape | Covers |
 | --- | --- | --- |
-| `time` | List of `["HH:MM","HH:MM"]` intervals in the contract timezone, start inclusive, end exclusive, crossing midnight allowed, `24:00` accepted as an end | Peak / off-peak, TOU |
+| `time` | List of `["HH:MM","HH:MM"]` intervals in the contract timezone, start inclusive, end exclusive; an end at or before the start crosses midnight (an end equal to the start therefore covers the whole day); `24:00` accepted as an end, never `24:xx` | Peak / off-peak, TOU |
 | `weekdays` | List `["mon","tue",…,"sun"]` | Weekends, weekday rates |
 | `months` or `season` | List of months (1–12), or a `{ "from": "MM-DD", "to": "MM-DD" }` range repeated every year, inclusive, crossing 1 January allowed | US summer / winter, Asian seasons |
 | `dates` | `{ "from": "YYYY-MM-DD", "to": "YYYY-MM-DD" }` absolute range, inclusive, `to` optional | Promotions, transition periods |
-| `calendar` | `{ "<key>": <value or list> }` on a daily or 30-minute calendar; true only when the calendar has a value for the interval and it is in the list | Tempo, public holidays, school holidays, critical peak days |
-| `not_calendar` | Same, negated: true when the calendar has no value for the interval or its value is not in the list | "Business day = not a holiday" |
+| `calendar` | `{ "<key>": <value or list> }` on a daily or 30-minute calendar; true only when the calendar has a value for the interval and it is in the list. A miss is an ordinary condition miss: the next rules and the `fallback` apply, **no warning** (a Tempo day without a colour yet is priced by the fallback silently) | Tempo, public holidays, school holidays, critical peak days |
+| `not_calendar` | Same, negated: true when the calendar has no value for the interval or its value is not in the list. Absence counts as "not in the list" by design: the calendars this condition is written for are sparse (a holiday calendar lists holidays only, a critical-peak calendar lists event days only), so an absent day **is** the ordinary day | "Business day = not a holiday" |
 | `tier` | `{ "cumulative": "day" \| "month" \| "billing_period", "from_kwh": 0, "to_kwh": 40 }` (`to_kwh` optional = open-ended); the rule prices the part of the interval's energy that falls in the tier and the following rules price the rest | Progressive tiers (Hydro-Québec, Japan, Korea, California baseline) |
 | `power_threshold` | `{ "above_kw": N }`: the interval's peak power is strictly above N kW | Power-threshold tariffs |
 
@@ -118,21 +118,32 @@ Two new tables (`t_energy_contract`, `t_tariff_calendar_entry`) and a `t_energy_
 | `tariff` | TEXT (JSON) | the tariff definition (§3), schema-validated on write; ignored in `delegated` mode except `components[].kind = fixed` |
 | `created_at`, `updated_at` | DATE | |
 
+**`t_tariff_calendar`** (the durable declaration of a calendar: what the engine needs to read its entries, kept whatever happens to its provider)
+
+| Column | Type | Rules |
+| --- | --- | --- |
+| `key` | STRING primary key | `^[a-z0-9][a-z0-9-]{0,63}$`; **global**: one calendar per key across the instance |
+| `provider_service_id` | UUID nullable → `t_service` | the integration or internal service that owns the key: the first installed integration declaring it (capability file, §1); `ON DELETE SET NULL`: the row, its metadata and its entries survive the uninstall, the calendar is `orphaned` until an integration declaring the same key with the same granularity is installed and claims it |
+| `granularity` | STRING | `day` or `thirty_minutes`, fixed for the life of the key (a redeclaration with another granularity is refused) |
+| `timezone` | STRING | IANA timezone of a daily calendar (the day boundaries), copied from the declaration; the contract timezone when the declaration has none |
+| `day_starts_at` | STRING | `HH:MM`, `00:00` by default (`06:00` for Tempo): the local time a daily value starts applying |
+| `values` | TEXT (JSON) nullable | the enum of accepted string values declared by the provider, `NULL` for a price calendar |
+| `currency` | STRING nullable | currency of a price calendar |
+| `first_at`, `last_at` | DATE nullable | coverage, maintained on every write for the diagnostic UI |
+| `updated_at` | DATE | |
+
 **`t_tariff_calendar_entry`** (the dated values of the calendars, one row per day or per 30-minute interval)
 
 | Column | Type | Rules |
 | --- | --- | --- |
 | `id` | UUID | primary key |
 | `calendar_key` | STRING | `tempo`, `holidays-fr`, `spot-fr`, `hq-critical-peaks`…; `^[a-z0-9][a-z0-9-]{0,63}$` |
-| `provider_service_id` | UUID nullable → `t_service` | who feeds this calendar; a calendar has one provider at a time |
-| `granularity` | STRING | `day` or `thirty_minutes` |
 | `starts_at` | DATE (UTC) | start of the period the value covers |
-| `value_string` | STRING nullable | `red`, `holiday`, `critical-peak`… (≤ 32 characters) |
-| `value_number` | DECIMAL nullable | price per kWh in the calendar currency (`price_from_calendar`) |
-| `currency` | STRING nullable | required when `value_number` is a price |
+| `value_string` | STRING nullable | `red`, `holiday`, `critical-peak`… (≤ 64 characters, within the declared `values`) |
+| `value_number` | DECIMAL nullable | price per kWh in the calendar currency (`price_from_calendar`); **may be negative** (a fuel-cost adjustment is a credit some months: the TEPCO family test prices it at −3 JPY/kWh), so a component priced from a calendar, and an interval cost, can be negative |
 | `updated_at` | DATE | |
 
-Unique index `(calendar_key, starts_at)`; index `(calendar_key, starts_at DESC)`. A daily calendar stores `starts_at` at local midnight of the calendar timezone converted to UTC; the engine always compares in the contract timezone. A calendar only keeps the useful window in the database: the core purges everything older than the oldest consumption state of the instance minus 1 day.
+Unique index `(calendar_key, starts_at)`, `calendar_key` → `t_tariff_calendar.key`; index `(calendar_key, starts_at DESC)`. A daily calendar stores `starts_at` at local midnight of the calendar timezone converted to UTC; the engine reads the entries through the metadata of `t_tariff_calendar` (timezone, `day_starts_at`) and evaluates the contract's own conditions in the contract timezone. A calendar only keeps the useful window in the database: the core purges everything older than the oldest consumption state of the instance minus 1 day.
 
 **What does not change**
 
@@ -165,7 +176,9 @@ Unique index `(calendar_key, starts_at)`; index `(calendar_key, starts_at DESC)`
 }
 ```
 
-Validation rules: at most 16 components, 64 rules per component, 8 referenced calendars, any unknown key rejected (`400`), finite amounts ≥ 0 except `offset`, a `consumption` component must have a `fallback` or a last rule without `when` (no interval is ever left without a price). The schema lives in `server/lib/energy-contract/tariff.schema.json` (the JSON Schema the ecosystem validates against: the `energy-contracts` catalogue tests, the store indexer, the SDK) and its canonical owner is the `energy-contracts` repository (same doctrine as `manifest.schema.json`); the core validates with the Joi mirror in `tariff.validate.js`, and a test keeps the two in sync on every enumerated value.
+Validation rules: at most 16 components, 64 rules per component, 8 referenced calendars, any unknown key rejected (`400`), finite amounts ≥ 0 in the tariff itself except `offset` (calendar numeric values, and therefore the amount of a component priced from a calendar, may be negative), a `consumption` component must have a `fallback` or a last rule without `when` (no interval is ever left without a price), `tier.to_kwh` greater than `tier.from_kwh`, unique component keys, a tax applying to components declared before it, every referenced calendar listed in `calendars`.
+
+The schema lives in `server/lib/energy-contract/tariff.schema.json` (the JSON Schema the ecosystem validates against: the `energy-contracts` catalogue tests, the store indexer, the SDK) and its canonical owner is the `energy-contracts` repository (same doctrine as `manifest.schema.json`). **It is the syntactic contract**: JSON Schema cannot express the last five rules above, so the core validates with the Joi mirror in `tariff.validate.js` plus its semantic checks, the schema `description` lists those semantic rules, and the catalogue and the indexer must run the core validator (a JS helper shipped with the SDK, PR 4) on top of the schema. The test `tariff.schema.test.js` keeps the two in sync: every enumerated value, pattern and limit, and a **shared fixture pack** (valid tariffs accepted by both, invalid tariffs rejected by both, and the semantic-only tariffs that the schema accepts and the core rejects, which must be exactly the documented list).
 
 **Inputs.** A template may carry `{{input:<key>}}` placeholders: a string that is exactly a placeholder is replaced by the input value whatever its JSON type (a number for a power, an array of time intervals for off-peak slots), a placeholder inside a longer string is replaced by its text. Substitution happens at compile time, before validation; a missing input is a validation error naming the key.
 
@@ -188,12 +201,12 @@ The rule engine is validated against the contract families below; each row becom
 | United Kingdom | Octopus Agile | Half-hourly price published the day before at 4 pm, capped | 30-min calendar published by the integration, or `delegated` mode | 2 or 3 |
 | United Kingdom | Economy 7 | Reduced night price, 7 hours per region, GMT all year | `time` with `timezone: "Etc/GMT"` on the contract (the slots do not follow daylight saving) | 1 |
 | United States | PG&E E-TOU-C (California) | Peak 4 pm - 9 pm, summer season (June - September) / winter, baseline credit on the first kWh | `time` + `season` + `tier` (`cumulative: billing_period`) | 1 |
-| United States | ConEd TOU (New York) | Peak on weekdays only, holidays excluded, summer / winter | `time` + `weekdays` + `not_calendar: { "holidays-us": "holiday" }` + `season` | 1 + core calendar |
-| United States | Residential rate with demand charge (Arizona SRP, Georgia Power) | kWh price + $ per kW of peak power over 15 or 30 min of the month | `demand` with `window: "thirty_minutes"` over `billing_period`; needs `max_power_kw` per interval (§7) | 1 |
+| United States | ConEd TOU (New York) | Peak on weekdays only, holidays excluded, summer / winter | `time` + `weekdays` + `not_calendar: { "holidays-us": "holiday" }` + `season`; the holiday calendar is published by an integration or shipped by the catalogue | 2 |
+| United States | Residential rate with demand charge (Arizona SRP, Georgia Power) | kWh price + $ per kW of the highest 30-minute demand of the month | `demand` over `billing_period`; the engine aggregates the `max_power_kw` of the intervals (§7), a 15-minute window is not modelled | 1 |
 | United States | Critical Peak Pricing (SDG&E, OG&E) | Event days announced the day before, very high price over a window | `calendar: { "cpp-events": "event" }` + `time`; daily calendar published by the integration | 2 |
 | Canada | Hydro-Québec Rate D | Two price tiers per day (first 40 kWh / day then the rest), daily subscription fee | `tier` with `cumulative: "day"` + `fixed` `per: "day"` | 1 |
 | Canada | Hydro-Québec Flex D | Rate D + winter critical peaks (off-peak credit, high price during the peak) | `tier` + `calendar: { "hq-critical-peaks" }` + `time` + `season` (December - March) | 2 |
-| Canada | Ontario TOU / ULO | Peak / mid-peak / off-peak, summer-winter inversion of the windows, weekends and holidays off-peak | `time` + `season` + `weekdays` + `not_calendar: { "holidays-ca-on" }` | 1 + core calendar |
+| Canada | Ontario TOU / ULO | Peak / mid-peak / off-peak, summer-winter inversion of the windows, weekends and holidays off-peak | `time` + `season` + `weekdays` + `not_calendar: { "holidays-ca-on" }`; holiday calendar from an integration or the catalogue | 2 |
 | Japan | TEPCO tiered (従量電灯 B) | Three monthly progressive tiers + base fee by amperage + fuel surcharge + renewable levy | `tier` `cumulative: billing_period` + `fixed` depending on `{{input:amperage}}` + additional `consumption` for the surcharge (monthly `tepco-fuel-adjustment` calendar) | 1 + calendar |
 | South Korea | KEPCO residential | Progressive tiers with different thresholds in summer (July - August) | `tier` + `season` (two sets of tiers) | 1 |
 | Australia | TOU tariff + solar feed-in | Peak / shoulder / off-peak, daily supply charge | `time` + `weekdays` + `fixed` `per: "day"`; the solar feed-in is `direction: production`, out of v1 | 1 |
@@ -208,8 +221,9 @@ The rule engine is validated against the contract families below; each row becom
 - The `season` condition must accept a range crossing 1 January (`"11-01"` to `"03-31"`).
 - `tier` must know three accumulations: `day`, `billing_period` and `month` (Hydro-Québec accumulates per day, TEPCO per billing period); the accumulation is recomputed on every job run from the start of the period, which sets the minimum recalculation window to the current billing period for a tiered contract.
 - `demand` requires keeping the peak power per interval: the engine derives it from `kwh × 2` (30-min average) when no `power` feature is available, and from the meter `power` feature when it exists and is historized. This is an approximation documented in the UI.
-- Public holidays are so common (United States, Canada, Australia, Japan) that the core provides them itself: `holidays-<country>[-<region>]` calendars generated by the `date-holidays` library (usable offline, ISC licence), materialised on demand in `t_tariff_calendar_entry` for the years covered by the data. An integration can publish its own holiday calendar under another key if the supplier's list differs.
-- School holidays and other regional calendars are not provided by the core: they are integration calendars.
+- Public holidays are needed by most TOU tariffs (United States, Canada, Australia, Japan), but **national calendars stay out of the core**, the line already taken on #2999 and PR #3099: the core ships no holiday dataset and reserves no `holidays-*` key. A holiday calendar is either published by an integration (the `energy-calendar` integration of #3099, reoriented as an integration declaring `energy_contracts.calendars` and publishing through the host API) or shipped as dated entries by the catalogue v2 (`calendars` section, static for the years it covers, refreshed with the catalogue releases). Its key is a convention (`holidays-<country>[-<region>]`) that templates reference; the wizard shows which provider supplies it.
+- School holidays and other regional calendars follow the same rule: integration or catalogue calendars, never core code.
+- **Relationship with PR #3099** (`energy-calendar` type + `day-type` contract, same field need): that PR must not land as a second energy contract model in parallel; its provider API becomes the calendar publication of the `energy_contracts` capability, its `day-type` contract becomes a `calendar` condition of this grammar, and its `t_energy_price.day_type` widening is superseded by `t_tariff_calendar_entry`.
 
 ## 7. Cost calculation: engine, timezones, recalculations
 
@@ -237,10 +251,10 @@ A consumption interval is priced by the active contract of the root meter at the
 | `local` | `starts_at` converted into `contract.timezone` | date, hour, weekday, month; this is where `time`, `weekdays`, `season` are evaluated |
 | `kwh` | value converted to kWh (`convertEnergyUnit`) | |
 | `max_power_kw` | meter `power` feature if historized (max over the interval), otherwise `kwh × 60 / duration_minutes` | required by `demand` and `power_threshold` |
-| `calendars[key]` | calendar value for the interval: `day` entry covering the local date (with `day_starts_at`, `06:00` for Tempo, declared by the calendar), or exact `thirty_minutes` entry | absent → component `fallback` + warning |
-| `cumulative[scope]` | kWh accumulated since the start of the day / month / billing period, **before** this interval | required by `tier`; computed in one ordered pass over the intervals given, starting from the caller's `cumulative_before` (zeros by default) |
+| `calendars[key]` | calendar value for the interval: `day` entry covering the local date (with `day_starts_at`, `06:00` for Tempo, declared by the calendar), or exact `thirty_minutes` entry | two distinct misses: a **condition** on an absent value is simply false (no warning, §3); a **price** (`price_from_calendar`) with no numeric value sends the energy to the component `fallback` **with a warning** |
+| `cumulative[scope]` | kWh accumulated since the start of the day / month / billing period, **before** this interval | required by `tier`; computed in one ordered pass over the intervals given, starting from the caller's `cumulative_before`. Zero is only correct when the run starts at the accumulation boundary: every caller of a tiered contract either starts its window at the boundary (the cost job recomputes from the start of the day / period, 7.4) or passes the real `cumulative_before` (the preview and `/current` compute it from the meter's stored consumption states) |
 
-**7.2 Evaluating a component**: `consumption`: first rule whose conditions are all true, otherwise `fallback`; price × kWh (for `tier`, the interval may straddle two tiers: it is split pro rata of the kWh, the rule prices its share and the following rules price the remainder). `fixed`: amount spread over the intervals of the local day (`per: day`) or of the calendar month (`per: month`): `amount × duration / period duration`, which replaces the current "monthly price ÷ days in the month" approximation of `calculateSubscriptionPrices` and allows storing the subscription **in the cost states** instead of recomputing it at display time. `tax`: percentage applied to the components listed in `applies_to`. `demand`: computed only over a closed period (see 7.4): the aggregate peak power of the period (`max`, or `top3_average` = mean of the three highest interval peaks on distinct days) × the price per kW, spread evenly over the period's intervals, never estimated mid-period.
+**7.2 Evaluating a component**: `consumption`: first rule whose conditions are all true, otherwise `fallback`; price × kWh (for `tier`, the interval may straddle two tiers: it is split pro rata of the kWh, the rule prices its share and the following rules price the remainder). When the matching rule's calendar price is missing, the energy it should have priced goes to the `fallback` with a warning, **never to a later rule**: a later rule was not meant to price this interval, and for tiers a later tier must not price kWh the missing tier already claimed. `fixed`: amount spread over the intervals of the local day (`per: day`) or of the calendar month (`per: month`): `amount × duration / period duration`, which replaces the current "monthly price ÷ days in the month" approximation of `calculateSubscriptionPrices` and allows storing the subscription **in the cost states** instead of recomputing it at display time. `tax`: percentage applied to the components listed in `applies_to`. `demand`: computed only over a closed period (see 7.4): the aggregate peak power of the period (`max`, or `top3_average` = mean of the three highest interval peaks on distinct days) × the price per kW, spread over the period's intervals pro rata of their duration, never estimated mid-period. Its period conditions (`when`: months, season, dates, weekdays) are evaluated **per interval**: the component applies to the intervals of the period that satisfy them, the peak is taken among those only and the charge is spread over those only (a billing period straddling 1 July with `months: [7, 8]` is charged on its July peak, over its July intervals).
 
 The cost of an interval is the sum of the components, rounded to 6 decimals; components are not stored individually in v1 (one state per interval, as today) but the engine returns them so the preview and a later per-component feature can use them. A "breakdown by component" UI is a possible extension that would add one cost feature per component.
 
@@ -263,7 +277,9 @@ The cost of an interval is the sum of the components, rounded to 6 decimals; com
 
 **7.5 Performance**: the engine precompiles each contract once per run (`compileTariff`: inputs substituted, rules validated, `time` intervals in minutes, weekdays and seasons as numbers; calendars loaded into a lookup by key for the run window, like `buildEdfTempoDayMap` today); measured target: 1 year of 30-min data (17,520 intervals) priced in under 2 s for a 6-rule `rules` contract on a Raspberry Pi 4. The in-memory calendar cache is invalidated by `changed_from` on every publication.
 
-**7.6 Errors**: an invalid definition is rejected on write, never discovered by the job. At run time, the only possible errors are "calendar without a value" (fallback + warning counted in the job) and "delegated integration unreachable or invalid payload" (intervals left without a cost, error visible on the Jobs page and on the contract page). A meter without an active contract on a date produces no cost state, as today.
+**7.6 Errors**: an invalid definition is rejected on write, never discovered by the job. At run time, the only possible errors are "calendar **price** without a value" (`price_from_calendar` unresolved: fallback + warning counted in the job; a calendar *condition* on an absent value is not an error, §3) and "delegated integration unreachable or invalid payload" (intervals left without a cost, error visible on the Jobs page and on the contract page). A meter without an active contract on a date produces no cost state, as today.
+
+**7.7 Current price** (`getCurrentPrice`, behind `/current`, the widget and the scene trigger): the unit price at an instant is the sum of the consumption components' matching rule prices (a tier rule matches when the next kWh falls in its tier, from the `cumulative` the caller passes) plus the taxes applying to them; fixed and demand components are not per-kWh and are left out. `power_threshold` rules are evaluated on the `max_power_kw` the caller passes (the peak of the meter's last interval), 0 when unknown. The next change is found by scanning the following 30-minute slot boundaries **of the contract's local clock** (a `:45` zone such as Asia/Kathmandu is not aligned on UTC) over a 48-hour horizon, comparing price and rule label.
 
 ## 8. REST API and user interface
 
@@ -277,10 +293,10 @@ The `energy_price` API is replaced by an object-oriented `energy_contract` API, 
 | `POST /api/v1/energy_contract` | Creation; rejects a date overlap on the same meter (`409`); validates `tariff` against the schema (`400` detailed: JSON path of the error) |
 | `PATCH /api/v1/energy_contract/:selector` | Update; a change of `tariff` or `valid_from` triggers a recalculation from the contract `valid_from` (bounded to the start of the data) |
 | `DELETE /api/v1/energy_contract/:selector` | Deletion; the cost states of the period are removed on the next recalculation |
-| `POST /api/v1/energy_contract/preview` | Body `{ tariff, timezone, currency, from, to, electric_meter_device_id }`: prices the meter's real intervals over the period without writing anything, returns the total per component and 48 sample intervals. This is what makes an exotic contract verifiable by the user before applying it |
+| `POST /api/v1/energy_contract/preview` | Body `{ tariff, timezone, currency, from, to, electric_meter_device_id }`: prices the meter's real intervals over the period without writing anything, returns the total per component and 48 sample intervals. For a tiered tariff the core computes `cumulative_before` from the meter's stored consumption states between the accumulation boundary and `from`, so a mid-period window is priced in the right tier. This is what makes an exotic contract verifiable by the user before applying it |
 | `GET /api/v1/energy_contract/template` | Available templates, merged (community catalogue, installed integrations, internal): `key`, `name`, `country`, `currency`, `pricing_mode`, `provider`, `inputs`, `version` |
 | `GET /api/v1/energy_contract/template/:provider/:key` | The full template (`tariff`) to instantiate it |
-| `GET /api/v1/energy_contract/:selector/current` | Current price, current tier and next change (`{ price, currency, valid_until, next_price, label }`) for the widget and the assistant; in delegated mode relays `energy-contract.current` with a 5-min cache |
+| `GET /api/v1/energy_contract/:selector/current` | Current price, current tier and next change (`{ price, currency, valid_until, next_price, label }`) for the widget and the assistant, computed with the real accumulations of the day / month / billing period and the peak of the last interval read from the stored states (7.7); in delegated mode relays `energy-contract.current` with the same state and a 5-min cache |
 | `GET /api/v1/energy_calendar` and `GET /api/v1/energy_calendar/:key?from=&to=` | Known calendars (key, provider, granularity, `first_at` / `last_at` coverage) and their values, for the diagnostic UI |
 | `GET /api/v1/energy_price*` | **Kept read-only** for 2 releases, answering from the migrated contracts so user scripts do not break; `POST` / `PATCH` / `DELETE` return `410` with a message pointing to the new API |
 | `GET /api/v1/service/energy-monitoring/contracts` | Kept: still serves the catalogue, now preferring `contracts-v2.json` (§9.4); `energy_contract/template` merges it with the integration templates |
@@ -336,7 +352,7 @@ Five independent PRs, each shippable and testable on its own, the first being th
 | --- | --- | --- | --- |
 | 0 | Spec | This document + `docs/specs/external-integrations/capabilities/energy-contracts.md` + `tariff.schema.json` | |
 | 1 | Engine | `server/lib/energy-contract/`: JSON schema and Joi validation, `compileTariff`, `priceIntervals`, `computeDemand`, `getCurrentPrice`, the calendar lookup, per-contract tests of section 6; no SQL schema change, module unused in production | 0 |
-| 2 | Model and migration | Tables, `energyContract` manager, migration 9.1 - 9.3, `legacy/` module, `energy_contract` routes + read-only `energy_price`, `energy-monitoring` switched to the engine, `edf-tempo` as provider of the `tempo` calendar, the core `holidays-*` calendars (`date-holidays`) materialised in the table | 1 |
+| 2 | Model and migration | Tables, `energyContract` manager, migration 9.1 - 9.3, `legacy/` module, `energy_contract` routes + read-only `energy_price`, `energy-monitoring` switched to the engine, `edf-tempo` as provider of the `tempo` calendar, `t_tariff_calendar` ownership and orphaning | 1 |
 | 3 | Interface | Contracts tab, 4-step wizard, preview, JSON editor with template export, calendars page, current price widget, translations, Cypress | 2 |
 | 4 | Integration capability | Manifest, `validateManifest`, host endpoints, WS messages, `normalizeEnergyCosts`, lifecycle; then SDK, template and indexer in their own repositories | 2 |
 | 5 | Catalogue v2 | `contracts-v2.json` in `energy-contracts` (v1 → v2 converter in `process.js`, schema validation in its tests), Gladys-side import preferring v2, conversion of the existing French contracts | 2 |
@@ -360,3 +376,4 @@ PRs 3, 4 and 5 can run in parallel. A pilot for PR 4 is an external "Octopus Ene
 - [ ] **`demand` in v1 or v1.1?** The engine computes it (PR 1); the end-of-period job that applies it is the only PR 2 piece that can be deferred without changing the contracts.
 - [ ] **Consent on a manifest update** that adds `energy_contracts`: same known limit as `location` and `webhooks` (C.3), to be handled globally, not here.
 - [x] **Where do contracts get published?** Decided (maintainer, 22 September 2026): both paths, split by need. Code-free contracts stay in the `energy-contracts` catalogue; anything needing code or live calendars is an external integration, which may also carry its own static templates.
+- [x] **Holiday calendars in the core?** Decided (review of PR #3130, 22 September 2026): no, the #2999 / #3099 line holds. Holidays are calendars published by an integration or shipped by the catalogue v2 (section 6); the core ships no dataset and reserves no key.

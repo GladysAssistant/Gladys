@@ -43,7 +43,8 @@ const CALENDAR_GRANULARITIES = {
 
 const CALENDAR_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const COMPONENT_KEY_REGEX = /^[a-z0-9][a-z0-9_-]{0,31}$/;
-const TIME_REGEX = /^([01][0-9]|2[0-4]):([0-5][0-9])$/;
+// "24:00" is accepted as the end of an interval, never "24:xx"
+const TIME_REGEX = /^(([01][0-9]|2[0-3]):[0-5][0-9]|24:00)$/;
 const MONTH_DAY_REGEX = /^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
 const DATE_REGEX = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
 const INPUT_PLACEHOLDER_REGEX = /\{\{input:([a-z0-9_]+)\}\}/g;

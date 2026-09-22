@@ -54,17 +54,20 @@ function computeDemandCharges(compiled, prepared) {
         groups.get(id).push(index);
       });
       groups.forEach((indexes) => {
-        const periodIntervals = indexes.map((index) => prepared[index]);
-        const first = periodIntervals[0];
-        if (
-          // period conditions (months, season, dates, weekdays) never read calendars nor power
-          !matchesConditions(component.when, { local: first.local, maxPowerKw: 0 })
-        ) {
+        // The component applies to the intervals of the period that satisfy its
+        // conditions: a billing period straddling the season boundary is charged on
+        // the peak of its in-season intervals only, spread over those intervals.
+        // Period conditions (months, season, dates, weekdays) never read calendars nor power.
+        const matching = indexes.filter((index) =>
+          matchesConditions(component.when, { local: prepared[index].local, maxPowerKw: 0 }),
+        );
+        if (matching.length === 0) {
           return;
         }
+        const periodIntervals = matching.map((index) => prepared[index]);
         const total = component.price * aggregatePeakPower(component.aggregation, periodIntervals);
         const totalMinutes = periodIntervals.reduce((sum, interval) => sum + interval.durationMinutes, 0);
-        indexes.forEach((index) => {
+        matching.forEach((index) => {
           result[index][component.key] = (total * prepared[index].durationMinutes) / totalMinutes;
         });
       });

@@ -49,6 +49,26 @@ describe('energy-contract tariff.demand', () => {
     expect(charges[1].billing).to.be.closeTo(8 / 3, 1e-9);
     expect(charges[2].billing).to.equal(3);
   });
+  it('should charge only the intervals of a period that satisfy the conditions', () => {
+    const compiled = compileTariff({
+      tariff_version: 1,
+      components: [
+        { key: 'energy', kind: 'consumption', fallback: { price: 0 } },
+        { key: 'summer', kind: 'demand', price: 10, per: 'billing_period', when: { months: [7, 8] } },
+      ],
+    });
+    // billing period 15 June - 15 July: the June intervals are out of season, the July peak is charged
+    const prepared = prepareIntervals(
+      [
+        { starts_at: Date.UTC(2026, 5, 20, 10), kwh: 4, max_power_kw: 8 },
+        { starts_at: Date.UTC(2026, 6, 2, 10), kwh: 1, max_power_kw: 2 },
+        { starts_at: Date.UTC(2026, 6, 3, 10), kwh: 2, max_power_kw: 4 },
+      ],
+      'UTC',
+      15,
+    );
+    expect(computeDemandCharges(compiled, prepared)).to.deep.equal([{}, { summer: 20 }, { summer: 20 }]);
+  });
   it('should skip the periods whose conditions do not hold', () => {
     const compiled = compileTariff({
       tariff_version: 1,

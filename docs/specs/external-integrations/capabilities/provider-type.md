@@ -20,6 +20,7 @@ Goal: a technical `type` for an integration that **manages no device and impleme
 | `widgets` | `capabilities/dashboard-widgets.md` |
 | `scene_triggers` | `capabilities/scene-triggers-and-actions.md` |
 | `scene_actions` | `capabilities/scene-triggers-and-actions.md` |
+| `energy_contracts` | `capabilities/energy-contracts.md` (contract templates, tariff calendars, delegated pricing; the code mirror lands with the capability's implementation) |
 
 The list grows with the folder; `CAPABILITY_MANIFEST_FIELDS` in `server/lib/external-integration/constants.js` is its code mirror. Every other manifest field keeps its own rules whatever the type (`config_schema`, `actions`, `containers`, `webhooks`…).
 

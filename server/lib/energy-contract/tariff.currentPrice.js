@@ -1,5 +1,5 @@
 const { TARIFF_COMPONENT_KINDS, COST_DECIMALS } = require('./tariff.constants');
-const { getLocalContext } = require('./tariff.time');
+const { getLocalContext, MS_PER_MINUTE } = require('./tariff.time');
 const { matchesConditions } = require('./tariff.conditions');
 const { resolvePrice } = require('./tariff.priceIntervals');
 const { createCalendarLookup } = require('./calendar.lookup');
@@ -17,14 +17,15 @@ const EMPTY_LOOKUP = createCalendarLookup();
  * @param {number} ms - Instant, milliseconds since the epoch.
  * @param {object} lookup - Calendar lookup.
  * @param {object} cumulative - The kWh accumulated so far per scope (for tier rules).
+ * @param {number} [maxPowerKw] - Peak power of the last interval, for power_threshold rules (0 by default).
  * @returns {object} The unit price { price, label }; `price` is null when a calendar value is missing.
  * @example
  * getUnitPriceAt(compiled, { timezone: 'Europe/Paris' }, Date.now(), lookup, { day: 0, month: 0, billing_period: 0 });
  */
-function getUnitPriceAt(compiled, contract, ms, lookup, cumulative) {
+function getUnitPriceAt(compiled, contract, ms, lookup, cumulative, maxPowerKw = 0) {
   const local = getLocalContext(ms, contract.timezone);
   const getCalendarValue = (key) => lookup.get(key, ms, local, contract.timezone);
-  const context = { local, getCalendarValue, maxPowerKw: 0 };
+  const context = { local, getCalendarValue, maxPowerKw };
   const byComponent = {};
   let label;
   let price = 0;
@@ -74,7 +75,8 @@ function getUnitPriceAt(compiled, contract, ms, lookup, cumulative) {
  * @param {object} compiled - Compiled tariff.
  * @param {object} contract - The contract, with its timezone.
  * @param {object} [options] - Options: `at` (Date or timestamp, now by default), `calendars` (lookup),
- * `cumulative` ({ day, month, billing_period } for tier rules), `horizon_hours` (48 by default).
+ * `cumulative` ({ day, month, billing_period } for tier rules), `max_power_kw` (peak of the last interval,
+ * for power_threshold rules), `horizon_hours` (48 by default).
  * @returns {object} The current price { price, label, valid_until, next_price, next_label };
  * `valid_until` is null when the price does not change within the horizon.
  * @example
@@ -84,8 +86,9 @@ function getCurrentPrice(compiled, contract, options = {}) {
   const at = options.at === undefined ? Date.now() : new Date(options.at).getTime();
   const lookup = options.calendars || EMPTY_LOOKUP;
   const cumulative = { day: 0, month: 0, billing_period: 0, ...(options.cumulative || {}) };
+  const maxPowerKw = options.max_power_kw || 0;
   const horizonMs = (options.horizon_hours || 48) * 60 * 60 * 1000;
-  const current = getUnitPriceAt(compiled, contract, at, lookup, cumulative);
+  const current = getUnitPriceAt(compiled, contract, at, lookup, cumulative, maxPowerKw);
   const result = {
     price: current.price,
     label: current.label,
@@ -93,10 +96,12 @@ function getCurrentPrice(compiled, contract, options = {}) {
     next_price: null,
     next_label: undefined,
   };
-  // Next change: scan the slot boundaries after `at`.
-  let slot = Math.floor(at / SLOT_MS) * SLOT_MS + SLOT_MS;
+  // Next change: scan the 30-minute slot boundaries after `at`, aligned on the
+  // contract's local clock (zones at :45 such as Asia/Kathmandu are not aligned on UTC).
+  const local = getLocalContext(at, contract.timezone);
+  let slot = at - (local.minutes % 30) * MS_PER_MINUTE - (at % MS_PER_MINUTE) + SLOT_MS;
   while (slot - at <= horizonMs) {
-    const next = getUnitPriceAt(compiled, contract, slot, lookup, cumulative);
+    const next = getUnitPriceAt(compiled, contract, slot, lookup, cumulative, maxPowerKw);
     if (next.price !== current.price || next.label !== current.label) {
       result.valid_until = new Date(slot).toISOString();
       result.next_price = next.price;

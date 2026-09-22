@@ -105,6 +105,30 @@ describe('energy-contract getCurrentPrice', () => {
       'Tier 2',
     );
   });
+  it('should use the peak power the caller knows for power_threshold rules', () => {
+    const compiled = compileTariff({
+      tariff_version: 1,
+      components: [
+        {
+          key: 'energy',
+          kind: 'consumption',
+          rules: [{ label: 'Above 6 kW', when: { power_threshold: { above_kw: 6 } }, price: 0.5 }],
+          fallback: { label: 'Normal', price: 0.2 },
+        },
+      ],
+    });
+    expect(getCurrentPrice(compiled, utc, { at: '2026-01-12T12:00:00Z', horizon_hours: 1 }).label).to.equal('Normal');
+    expect(
+      getCurrentPrice(compiled, utc, { at: '2026-01-12T12:00:00Z', horizon_hours: 1, max_power_kw: 7 }).label,
+    ).to.equal('Above 6 kW');
+  });
+  it('should scan the slot boundaries of the contract local clock', () => {
+    // Asia/Kathmandu is UTC+05:45: the local 22:00 boundary is 16:15 UTC
+    const kathmandu = { timezone: 'Asia/Kathmandu' };
+    const current = getCurrentPrice(peakOffPeak, kathmandu, { at: '2026-01-12T10:00:10Z' });
+    expect(current.label).to.equal('Peak');
+    expect(current.valid_until).to.equal('2026-01-12T16:15:00.000Z');
+  });
   it('should answer null when a calendar value is missing', () => {
     const spot = compileTariff({
       tariff_version: 1,

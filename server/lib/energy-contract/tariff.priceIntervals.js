@@ -84,7 +84,11 @@ function evaluateConsumption(component, interval, context, cumulative, warnings)
     });
   };
   const { rules } = component;
-  for (let i = 0; i < rules.length && remaining > 0; i += 1) {
+  // The first matching rule wins. When its calendar price is missing, the rest of
+  // the energy goes to the fallback (with a warning), never to a later rule: a
+  // later rule was never meant to price this interval.
+  let stopped = false;
+  for (let i = 0; i < rules.length && remaining > 0 && !stopped; i += 1) {
     const rule = rules[i];
     if (matchesConditions(rule.when, context)) {
       const tier = rule.when === undefined ? undefined : rule.when.tier;
@@ -92,6 +96,7 @@ function evaluateConsumption(component, interval, context, cumulative, warnings)
         const price = resolvePrice(rule, context.getCalendarValue);
         if (price === undefined) {
           warn(rule, CALENDAR_WARNING_REASONS.CALENDAR_MISSING);
+          stopped = true;
         } else {
           amount += price * remaining;
           remaining = 0;
@@ -105,6 +110,7 @@ function evaluateConsumption(component, interval, context, cumulative, warnings)
           const price = resolvePrice(rule, context.getCalendarValue);
           if (price === undefined) {
             warn(rule, CALENDAR_WARNING_REASONS.CALENDAR_MISSING);
+            stopped = true;
           } else {
             amount += price * share;
             offset += share;
