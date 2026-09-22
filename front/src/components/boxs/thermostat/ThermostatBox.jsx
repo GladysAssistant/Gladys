@@ -225,10 +225,11 @@ class ThermostatBox extends Component {
   // widget shows Off highlighted and the loop leaves the thermostat alone.
   isStopped = () => {
     const cfg = this.state.remoteConfig;
-    // A device with no mode feature carries no mode at all — an external
-    // thermostat never has one. `Number(null)` is 0, which is OFF, so the value
-    // has to be checked for being there before it is compared: otherwise every
-    // external thermostat reads as permanently stopped.
+    // A thermostat carries a mode, but it has no value until something writes
+    // one, and an older device may predate the feature entirely. `Number(null)`
+    // is 0, which is OFF, so the value has to be checked for being there before
+    // it is compared: otherwise a thermostat that was never stopped reads as
+    // permanently stopped.
     if (!cfg || cfg.mode === null || cfg.mode === undefined) {
       return false;
     }

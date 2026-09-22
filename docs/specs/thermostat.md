@@ -22,7 +22,7 @@ A virtual thermostat is a thermostat, and must be indistinguishable from a Netat
 
 Every feature is resolved **by category and type**, never by `device.features[0]`: feature order is not a contract, and with four features an index would be a silent mis-target of the regulation loop.
 
-An **external** thermostat carries **a `preset` feature and nothing else** (B.3): its setpoint, mode and state belong to the real device. The setpoint is a feature of the real device — a Netatmo, a Zigbee TRV, a Matter thermostat, an MQTT climate entity — named by `THERMOSTAT_TARGET_FEATURE`. Creating a mirror feature here would give the house two setpoints that drift apart, and the whole point is that the real device stays the authority on its own state. The widget's `thermostat_feature` therefore names that **external** selector, and a client writing a setpoint writes it on the real feature, through the same generic route as anywhere else (D).
+An **external** thermostat carries **two features of its own, `preset` and `mode`** (B.3), and nothing else: its setpoint and its operating state belong to the real device. The setpoint is a feature of the real device — a Netatmo, a Zigbee TRV, a Matter thermostat, an MQTT climate entity — named by `THERMOSTAT_TARGET_FEATURE`. Creating a mirror feature here would give the house two setpoints that drift apart, and the whole point is that the real device stays the authority on its own state. The widget's `thermostat_feature` therefore names that **external** selector, and a client writing a setpoint writes it on the real feature, through the same generic route as anywhere else (D).
 
 ### A.0.1 What real thermostats actually expose
 
@@ -73,7 +73,7 @@ Which schedule a thermostat follows is **not** in this list: it is a relation, h
 
 `createDevice` accepts only this list plus, on a virtual thermostat, its four features; anything else in the request body is dropped rather than persisted. Every field the edit form offers is in that list: a field the filter dropped would silently need a second store, which is exactly what this section forbids.
 
-On an external device `createDevice` keeps only the `preset` feature and refuses a payload with no `THERMOSTAT_TARGET_FEATURE`: a thermostat with nothing to drive would sit in the integration page doing nothing, with no way to tell why. Switching a device back to `virtual` clears the three external params, so a stale selector can never keep driving a real thermostat.
+On an external device `createDevice` keeps only the `preset` and `mode` features (B.3) and refuses a payload with no `THERMOSTAT_TARGET_FEATURE`: a thermostat with nothing to drive would sit in the integration page doing nothing, with no way to tell why. Switching a device back to `virtual` clears the three external params, so a stale selector can never keep driving a real thermostat.
 
 The hysteresis, TPI and switch params are meaningless on an external device — the real thermostat runs its own heuristic — and the edit form hides them there rather than offering settings that do nothing.
 
@@ -149,7 +149,14 @@ A virtual thermostat therefore carries **four** features, not one:
 
 `operating-state` replaces the widget's inference from the switch state: a virtual thermostat knows whether it is currently heating, and saying so on a standard feature makes it visible to HomeKit and to the rest of the house, not only to this widget.
 
-An **external** thermostat still carries **no feature of its own** (A.0): its setpoint, mode and state are features of the real device, and mirroring them here would give the house two sources that drift apart. Its _preset_ is the exception that proves the rule — no real thermostat publishes Gladys's preset vocabulary, and the preset is genuinely this integration's state, not the device's. It is carried by a `preset` feature on the Gladys device, and it is the only feature an external thermostat has.
+An **external** thermostat mirrors **none of the real device's features** (A.0): its setpoint and its operating state are features of the real device, and mirroring them here would give the house two sources that drift apart.
+
+Two exceptions prove the rule, and both are Gladys's own state rather than the appliance's:
+
+- its **`preset`** — no real thermostat publishes Gladys's preset vocabulary, and the preset is genuinely this integration's state, not the device's;
+- its **`mode`**, which carries one decision: whether Gladys has stopped this thermostat. "Stopped by Gladys" is not something the appliance knows — an external thermostat that heats on its own is doing what it was built to do, and `THERMOSTAT_MODE.OFF` here is what tells the loop to stop writing to it and the widget to show it stopped. It is distinct from `THERMOSTAT_MODE_FEATURE`, which names the **real device's** mode on the real device, and which this service writes when one exists (C.0). A device may have both, one, or neither.
+
+These two features, and no others, are what an external thermostat carries.
 
 ## C. Regulation loop
 
@@ -194,7 +201,9 @@ A setpoint change observed on a driven thermostat is therefore held exactly like
 
 Consuming **one** echo per write is not enough, and this is a real failure mode rather than a theoretical one. Zigbee2MQTT reports periodically and Netatmo is polled every two minutes, both re-emitting the value **unchanged**. The first report is consumed as the echo; the second, identical, is taken for a setting made on the device, which arms a hold and rewrites the same value to the equipment — a cloud call per poll — whose own echo is then consumed, and the next report starts again. The visible result is a thermostat stuck in "manual" for ever, schedule transitions delayed by the hold duration, and exactly the API burn C.0 exists to avoid.
 
-**A change is therefore what differs from the last value this service wrote**, not what arrives after it. The mark is kept rather than consumed, and compared against: an identical report is ours however many times it repeats, and only a different value is a genuine change made on the device. Comparing against the feature's `previous_value` is the same rule stated on the core's side.
+**A change is therefore what differs from the last value this service wrote**, not what arrives after it. The mark is kept rather than consumed, and compared against: an identical report is ours however many times it repeats, and only a different value is a genuine change made on the device.
+
+**Holding a change costs nothing on the wire.** The hold is armed directly — the param is written and the websocket sent — rather than routed through the setpoint write path. The device already carries this value, since it is what it just reported: writing it back would be a cloud call or a Zigbee message per turn of the dial, and the write path hands the running mode back first (C.0), kicking a thermostat that was in `auto`, `off` or its own vendor programme (C.0.3) into heating or cooling. The value is stored in the feature's own unit, which is the unit a hold on an external thermostat is stored in (C.3).
 
 This applies to external thermostats only. A virtual one has no second writer — Gladys owns its setpoint feature — so its own writes must never arm a hold.
 
@@ -327,7 +336,7 @@ The primary key on `device_id` alone is what enforces **one schedule per thermos
 
 **The column is a string although the feature is an integer** (B.2), and the two are not in conflict: a transition also accepts `off`, which is a mode and has no place in the preset enum, so the column's domain is "a preset name, or `off`" rather than the preset enum itself. Names also keep a hand-read schedule row meaningful, which matters more here than on a feature whose value is rendered through translations. The loop maps the name to its enum value when it writes the `preset` feature, and `off` to a mode write (B.1).
 
-This replaces the `t_thermostat_schedule_slot` table of migration `20260823000000`.
+Migration `20260823000000` creates these tables. It has never run in production — this integration has not shipped — so it carries this schema directly rather than a first one replaced by a second: a `t_thermostat_schedule_slot` table nobody ever had is not worth a migration to drop.
 
 ### E.3 Application
 
