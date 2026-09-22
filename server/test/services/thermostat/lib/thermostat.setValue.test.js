@@ -11,6 +11,7 @@ const {
   WEBSOCKET_MESSAGE_TYPES,
   THERMOSTAT_MODE,
   THERMOSTAT_PRESET,
+  DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 
@@ -53,7 +54,7 @@ const modeFeature = {
   last_value: THERMOSTAT_MODE.HEATING,
 };
 
-const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF) => {
+const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF, targetUnit = undefined) => {
   const { setValue } = load(follows);
   return {
     gladys: {
@@ -76,7 +77,11 @@ const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF) => {
             ]);
           }
           return Promise.resolve([
-            { selector: 'netatmo-device', service: { name: 'netatmo' }, features: [{ selector: 'netatmo-setpoint' }] },
+            {
+              selector: 'netatmo-device',
+              service: { name: 'netatmo' },
+              features: [{ selector: 'netatmo-setpoint', unit: targetUnit }],
+            },
           ]);
         }),
       },
@@ -98,6 +103,11 @@ const device = (params = [], features = [setpointFeature, presetFeature, modeFea
   params,
   features,
 });
+
+// An external thermostat: the setpoint it drives is a feature of the real
+// device, named by THERMOSTAT_TARGET_FEATURE.
+const externalDevice = (params = [{ name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' }]) =>
+  device([{ name: 'THERMOSTAT_TYPE', value: 'external' }, ...params], [presetFeature, modeFeature]);
 
 const paramCall = (handler, name) => handler.gladys.device.setParam.getCalls().find((call) => call.args[1] === name);
 
@@ -244,6 +254,53 @@ describe('thermostat.setValue', () => {
       expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('7');
     });
 
+    // A preset's temperature is configured in the thermostat's unit, but the
+    // hold is read back in the unit of the feature it is written on: the minute
+    // loop hands it to the real device untouched. Comfort at 21 °C on a
+    // Fahrenheit feature has to be held as 70 °F, or the device is commanded to
+    // 21 °F.
+    it('should convert a preset setpoint into the unit of the external feature', async () => {
+      const handler = buildHandler(true, THERMOSTAT_MODE.HEATING, DEVICE_FEATURE_UNITS.FAHRENHEIT);
+
+      await handler.setValue(externalDevice(), presetFeature, THERMOSTAT_PRESET.COMFORT);
+
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('69.8');
+    });
+
+    it('should leave a preset setpoint alone when both units agree', async () => {
+      const handler = buildHandler(true, THERMOSTAT_MODE.HEATING, DEVICE_FEATURE_UNITS.CELSIUS);
+
+      await handler.setValue(externalDevice(), presetFeature, THERMOSTAT_PRESET.COMFORT);
+
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('21');
+    });
+
+    it('should hold a preset setpoint as configured on a virtual thermostat', async () => {
+      const handler = buildHandler(true, THERMOSTAT_MODE.HEATING, DEVICE_FEATURE_UNITS.FAHRENHEIT);
+
+      await handler.setValue(device(), presetFeature, THERMOSTAT_PRESET.COMFORT);
+
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('21');
+    });
+
+    it('should hold the configured setpoint when the external feature is gone', async () => {
+      const handler = buildHandler(true, THERMOSTAT_MODE.HEATING, DEVICE_FEATURE_UNITS.FAHRENHEIT);
+      handler.gladys.device.get = fake.resolves([]);
+
+      await handler.setValue(externalDevice(), presetFeature, THERMOSTAT_PRESET.COMFORT);
+
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('21');
+    });
+
+    // Nothing to convert into: the device names no feature to write on.
+    it('should hold the configured setpoint when no target feature is named', async () => {
+      const handler = buildHandler(true, THERMOSTAT_MODE.HEATING, DEVICE_FEATURE_UNITS.FAHRENHEIT);
+
+      await handler.setValue(externalDevice([]), presetFeature, THERMOSTAT_PRESET.COMFORT);
+
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('21');
+    });
+
     it('should clear the hold when handing the thermostat back to its schedule', async () => {
       const handler = buildHandler();
 
@@ -328,14 +385,7 @@ describe('thermostat.setValue', () => {
   });
 
   describe('on an external thermostat', () => {
-    const external = () =>
-      device(
-        [
-          { name: 'THERMOSTAT_TYPE', value: 'external' },
-          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
-        ],
-        [presetFeature],
-      );
+    const external = () => externalDevice();
     const externalFeature = { selector: 'netatmo-setpoint' };
 
     it('should write through the owning integration, not saveState', async () => {

@@ -7,10 +7,39 @@ const {
   getRunningMode,
   stopExternalThermostat,
   getSetpointForPreset,
+  convertSetpointToFeatureUnit,
 } = require('./thermostat.applySchedules');
 const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
 const { presetName, savePreset, setManualHold, clearManualHold } = require('./thermostat.state');
+
+/**
+ * @description The setpoint a preset arms its hold on, in the unit the hold is
+ * read back in.
+ *
+ * A preset's temperature is configured in `THERMOSTAT_TEMP_UNIT`, but a hold is
+ * stored in the unit of the feature it will be written on — that is what the
+ * dial writes, what a change made on the device arrives in, and what the minute
+ * loop hands back untouched. On an external thermostat whose setpoint feature is
+ * in Fahrenheit, Comfort at 21 °C must be held as 70 °F: held as 21 it would
+ * command 21 °F.
+ * @param {object} config - The thermostat's params config.
+ * @param {string} name - The preset name.
+ * @returns {Promise<number>} The setpoint to hold.
+ * @example
+ * const setpoint = await presetHoldSetpoint.call(this, config, 'comfort');
+ */
+async function presetHoldSetpoint(config, name) {
+  const setpoint = getSetpointForPreset(name, config);
+  if (!isExternal(config) || setpoint === null || !config.target_feature) {
+    return setpoint;
+  }
+  const found = await getFeatureBySelector(this.gladys, config.target_feature);
+  if (!found) {
+    return setpoint;
+  }
+  return convertSetpointToFeatureUnit(setpoint, config.temp_unit, found.feature.unit);
+}
 
 /**
  * @description Write a setpoint where it belongs: on this service's own feature
@@ -143,7 +172,12 @@ async function setValue(device, deviceFeature, value, manual = true) {
       // hold, the very next regulation pass would resolve the schedule's preset
       // and overwrite the choice within the minute.
       const config = buildParamsConfig(device) || {};
-      await setManualHold.call(this, device, getSetpointForPreset(name, config), await holdExpiry(device));
+      await setManualHold.call(
+        this,
+        device,
+        await presetHoldSetpoint.call(this, config, name),
+        await holdExpiry(device),
+      );
     }
     logger.info(`Thermostat: preset ${name} set on ${device.selector}`);
     this.triggerApplySchedules();
@@ -187,4 +221,4 @@ async function setValue(device, deviceFeature, value, manual = true) {
   this.triggerApplySchedules();
 }
 
-module.exports = { setValue, writeSetpoint, holdExpiry };
+module.exports = { setValue, writeSetpoint, holdExpiry, presetHoldSetpoint };
