@@ -1,8 +1,5 @@
 const sinon = require('sinon').createSandbox();
-
-const { fake } = sinon;
 const { expect } = require('chai');
-const EventEmitter = require('events');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
@@ -11,726 +8,384 @@ const historicalTempoData = require('./data/tempo_mock');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const { fake } = sinon;
 const db = require('../../../models');
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
+const logger = require('../../../utils/logger');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
-  ENERGY_CONTRACT_TYPES,
-  ENERGY_PRICE_TYPES,
-  ENERGY_PRICE_DAY_TYPES,
-  SYSTEM_VARIABLE_NAMES,
-} = require('../../../utils/constants');
-const Device = require('../../../lib/device');
-const StateManager = require('../../../lib/state');
-const ServiceManager = require('../../../lib/service');
-const Job = require('../../../lib/job');
-const EnergyPrice = require('../../../lib/energy-price');
+  buildManager,
+  contractPayload,
+  insertConsumption,
+  TEMPO_TARIFF,
+  METER_DEVICE_ID,
+  METER_FEATURE_ID,
+  TEST_SERVICE_ID,
+} = require('../../lib/energy-contract/manager/helpers');
+const {
+  findConsumptionCostPairs,
+  getEffectiveStart,
+} = require('../../../services/energy-monitoring/lib/energy-monitoring.calculateCostFrom');
 
-const event = new EventEmitter();
-const job = new Job(event);
+const POWER_PLUG_ID = 'cf43f956-2f49-4cf9-a7e2-690a014de66e';
+const PLUG_CONSUMPTION_ID = '27488546-e1b8-4cb9-bd75-e20526a94a99';
+const PLUG_COST_ID = '1f4133be-b86c-4a97-9cc8-585fadb74006';
+const TEMPO_CALENDAR = {
+  key: 'tempo',
+  granularity: 'day',
+  timezone: 'Europe/Paris',
+  day_starts_at: '06:00',
+  values: ['blue', 'white', 'red'],
+};
 
-const brain = {
-  addNamedEntity: fake.returns(null),
-  removeNamedEntity: fake.returns(null),
-};
-const variable = {
-  getValue: (name) => {
-    if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
-      return 'Europe/Paris';
-    }
-    return null;
-  },
-};
+const feature = (overrides) => ({
+  read_only: true,
+  has_feedback: false,
+  min: 0,
+  max: 1000,
+  category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+  ...overrides,
+});
 
 describe('EnergyMonitoring.calculateCostFrom', () => {
-  let stateManager;
-  let serviceManager;
-  let device;
-  let energyPrice;
-  let electricalMeterDevice;
   let gladys;
+  let energyContract;
+  let device;
+  let energyMonitoring;
+  const costStates = (selector = 'power-plug-consumption-cost') =>
+    device.getDeviceFeatureStates(selector, new Date('2020-01-01T00:00:00.000Z'), new Date('2030-01-01T00:00:00.000Z'));
+
   beforeEach(async () => {
-    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
-    stateManager = new StateManager(event);
-    serviceManager = new ServiceManager({}, stateManager);
-    device = new Device(event, {}, stateManager, serviceManager, {}, variable, job, brain);
-    energyPrice = new EnergyPrice();
+    ({ energyContract, device } = await buildManager());
     gladys = {
-      variable,
       device,
-      energyPrice,
-      gateway: {
-        getEdfTempoHistorical: fake.resolves(historicalTempoData),
-      },
-      job: {
-        updateProgress: fake.returns(null),
-        wrapper: (name, func) => func,
-      },
+      energyContract,
+      event: { on: fake.returns(null) },
+      job: { updateProgress: fake.returns(null), wrapper: (name, func) => func },
     };
-    // We create a new electrical meter device
-    electricalMeterDevice = await device.create({
-      id: 'd1fe2ab9-8c50-4053-ac40-83421f899c59',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      name: 'Electrical Meter',
-      external_id: 'electrical-meter',
-      selector: 'electrical-meter',
-      features: [
-        {
-          id: '101d2306-b15e-4859-b403-a076167eadd9',
-          external_id: 'electrical-meter-feature',
-          selector: 'electrical-meter-feature',
-          name: 'Electrical Meter',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-        },
-      ],
-    });
-    // We create a new device with consumption & consumption cost
+    // a power plug whose consumption is a child of the meter
     await device.create({
-      id: 'cf43f956-2f49-4cf9-a7e2-690a014de66e',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      id: POWER_PLUG_ID,
+      service_id: TEST_SERVICE_ID,
       name: 'Power plug',
       external_id: 'power-plug',
       features: [
-        {
-          id: '17488546-e1b8-4cb9-bd75-e20526a94a99',
+        feature({
+          id: PLUG_CONSUMPTION_ID,
           selector: 'power-plug-consumption',
           external_id: 'power-plug-consumption',
           name: 'Power plug Consumption',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
-        },
-        {
-          id: '0f4133be-b86c-4a97-9cc8-585fadb74006',
+          energy_parent_id: METER_FEATURE_ID,
+        }),
+        feature({
+          id: PLUG_COST_ID,
           selector: 'power-plug-consumption-cost',
           external_id: 'power-plug-consumption-cost',
           name: 'Power plug Consumption Cost',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-          energy_parent_id: '17488546-e1b8-4cb9-bd75-e20526a94a99', // Links to the consumption feature
-        },
+          energy_parent_id: PLUG_CONSUMPTION_ID,
+        }),
       ],
     });
+    energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
   });
-  it('should calculate cost from a specific date for a base contract', async () => {
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.BASE,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      // 0,18€/kwh stored as integer with 4 decimals
-      price: 1800,
-    });
-    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
-      {
-        value: 10,
-        created_at: new Date('2025-08-28T15:00:00.000Z'),
-      },
-      {
-        value: 20,
-        created_at: new Date('2025-08-28T15:01:00.000Z'),
-      },
+  afterEach(() => sinon.restore());
+
+  it('should price the consumption of the meter and its children with the active contract', async () => {
+    await energyContract.create(contractPayload({ valid_from: '2025-01-01' }));
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 10, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 20, created_at: new Date('2025-08-28T15:30:00.000Z') },
     ]);
-    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
-    const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date);
-    const deviceFeatureState = await device.getDeviceFeatureStates(
-      'power-plug-consumption-cost',
-      new Date('2025-01-01T00:00:00.000Z'),
-      new Date('2025-12-01T00:00:00.000Z'),
-    );
-    expect(deviceFeatureState).to.have.lengthOf(2);
-    // Price should be equal to 0.18€/kwh * 10kwh
-    expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.18);
-    // Price should be equal to 0.18€/kwh * 20kwh
-    expect(deviceFeatureState[1]).to.have.property('value', 20 * 0.18);
+    await insertConsumption([{ value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') }]);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    const states = await costStates();
+    expect(states).to.have.lengthOf(2);
+    // 0.2 per kWh + the subscription of 12/month spread over August (31 days * 48 intervals)
+    expect(states[0].value).to.equal(10 * 0.2 + 0.008065);
+    expect(states[1].value).to.equal(20 * 0.2 + 0.008065);
+    const meterStates = await costStates('electrical-meter-cost');
+    expect(meterStates).to.have.lengthOf(1);
     expect(gladys.job.updateProgress.called).to.equal(false);
+    // a run with a job id reports its progress
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'), 'job-id');
+    expect(gladys.job.updateProgress.callCount).to.equal(2);
   });
-  it('should only recalculate cost for devices in options.deviceIds', async () => {
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.BASE,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      // 0,18€/kwh stored as integer with 4 decimals
-      price: 1800,
-    });
-    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
-      {
-        value: 10,
-        created_at: new Date('2025-08-28T15:00:00.000Z'),
-      },
+
+  it('should compute nothing for a meter without contract', async () => {
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 10, created_at: new Date('2025-08-28T15:00:00.000Z') },
     ]);
-    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
-    const date = new Date('2025-08-28T00:00:00.000Z');
-    // The power plug device is not in the list: its cost must not be recalculated
-    await energyMonitoring.calculateCostFrom(date, null, { deviceIds: ['d1fe2ab9-8c50-4053-ac40-83421f899c59'] });
-    const stateWithoutPowerPlug = await device.getDeviceFeatureStates(
-      'power-plug-consumption-cost',
-      new Date('2025-01-01T00:00:00.000Z'),
-      new Date('2025-12-01T00:00:00.000Z'),
-    );
-    expect(stateWithoutPowerPlug).to.have.lengthOf(0);
-    // The power plug device is in the list: its cost must be recalculated
-    await energyMonitoring.calculateCostFrom(date, null, { deviceIds: ['cf43f956-2f49-4cf9-a7e2-690a014de66e'] });
-    const stateWithPowerPlug = await device.getDeviceFeatureStates(
-      'power-plug-consumption-cost',
-      new Date('2025-01-01T00:00:00.000Z'),
-      new Date('2025-12-01T00:00:00.000Z'),
-    );
-    expect(stateWithPowerPlug).to.have.lengthOf(1);
-    expect(stateWithPowerPlug[0]).to.have.property('value', 10 * 0.18);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    expect(await costStates()).to.have.lengthOf(0);
   });
-  it('should not calculate cost when the only price expired before the state date', async () => {
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.BASE,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2020-01-01',
-      end_date: '2020-12-31',
-      // 0,18€/kwh stored as integer with 4 decimals
-      price: 1800,
-    });
-    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
-      {
-        value: 10,
-        created_at: new Date('2025-08-28T15:00:00.000Z'),
-      },
+
+  it('should only recalculate the devices in options.deviceIds or the meters in electricMeterDeviceIds', async () => {
+    await energyContract.create(contractPayload());
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 10, created_at: new Date('2025-08-28T15:00:00.000Z') },
     ]);
-    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date);
-    const deviceFeatureState = await device.getDeviceFeatureStates(
-      'power-plug-consumption-cost',
-      new Date('2025-01-01T00:00:00.000Z'),
-      new Date('2025-12-01T00:00:00.000Z'),
-    );
-    expect(deviceFeatureState).to.have.lengthOf(0);
+    await energyMonitoring.calculateCostFrom(date, null, { deviceIds: [METER_DEVICE_ID] });
+    expect(await costStates()).to.have.lengthOf(0);
+    await energyMonitoring.calculateCostFrom(date, null, { electricMeterDeviceIds: ['other-meter'] });
+    expect(await costStates()).to.have.lengthOf(0);
+    await energyMonitoring.calculateCostFrom(date, null, { electricMeterDeviceIds: [METER_DEVICE_ID] });
+    expect(await costStates()).to.have.lengthOf(1);
   });
-  it('should calculate cost from a specific date with Watt-hour unit conversion', async () => {
-    // Create a device with consumption in Watt-hour (not kWh)
+
+  it('should not price an interval outside every contract and pick the contract by date', async () => {
+    await energyContract.create(contractPayload({ valid_from: '2020-01-01', valid_to: '2020-12-31' }));
+    await energyContract.create(
+      contractPayload({
+        name: 'New',
+        valid_from: '2025-09-01',
+        tariff: {
+          tariff_version: 1,
+          components: [{ key: 'e', kind: 'consumption', rules: [], fallback: { price: 0.5 } }],
+        },
+      }),
+    );
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 10, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      // 2025-09-01 00:00 Paris is 2025-08-31 22:00 UTC: this interval starts at 22:30 Paris on the 31st
+      { value: 10, created_at: new Date('2025-08-31T21:00:00.000Z') },
+      { value: 10, created_at: new Date('2025-08-31T22:30:00.000Z') },
+    ]);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
+    const states = await costStates();
+    expect(states).to.have.lengthOf(1);
+    expect(states[0].value).to.equal(5);
+    expect(new Date(states[0].created_at).toISOString()).to.equal('2025-08-31T22:30:00.000Z');
+  });
+
+  it('should convert Watt-hour states and daily consumption features', async () => {
+    await energyContract.create(
+      contractPayload({
+        tariff: {
+          tariff_version: 1,
+          components: [{ key: 'e', kind: 'consumption', rules: [], fallback: { price: 0.18 } }],
+        },
+      }),
+    );
     await device.create({
       id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      name: 'Power plug with Wh',
-      external_id: 'power-plug-wh',
+      service_id: TEST_SERVICE_ID,
+      name: 'Daily meter',
+      external_id: 'daily-meter',
       features: [
-        {
+        feature({
           id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
-          selector: 'power-plug-consumption-wh',
-          external_id: 'power-plug-consumption-wh',
-          name: 'Power plug Consumption (Wh)',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          selector: 'daily-consumption',
+          external_id: 'daily-consumption',
+          name: 'Daily consumption (Wh)',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
           unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
-          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
-        },
-        {
+          energy_parent_id: METER_FEATURE_ID,
+        }),
+        feature({
           id: 'c3d4e5f6-a789-0123-cdef-234567890abc',
-          selector: 'power-plug-consumption-cost-wh',
-          external_id: 'power-plug-consumption-cost-wh',
-          name: 'Power plug Consumption Cost (Wh)',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          selector: 'daily-consumption-cost',
+          external_id: 'daily-consumption-cost',
+          name: 'Daily consumption cost',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
           energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
-        },
+        }),
       ],
-    });
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.BASE,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      // 0,18€/kwh stored as integer with 4 decimals
-      price: 1800,
     });
     await db.duckDbBatchInsertState('b2c3d4e5-f6a7-8901-bcde-f12345678901', [
-      {
-        value: 5000, // 5000 Wh = 5 kWh
-        created_at: new Date('2025-08-28T15:00:00.000Z'),
-      },
-      {
-        value: 10000, // 10000 Wh = 10 kWh
-        created_at: new Date('2025-08-28T15:30:00.000Z'),
-      },
+      { value: 5000, created_at: new Date('2025-08-28T15:00:00.000Z') },
     ]);
-    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
-    const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date);
-    const deviceFeatureState = await device.getDeviceFeatureStates(
-      'power-plug-consumption-cost-wh',
-      new Date('2025-01-01T00:00:00.000Z'),
-      new Date('2025-12-01T00:00:00.000Z'),
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    const states = await costStates('daily-consumption-cost');
+    expect(states).to.have.lengthOf(1);
+    expect(states[0].value).to.equal(0.9);
+  });
+
+  it('should price a Tempo contract with the calendar published by the internal provider', async () => {
+    await energyContract.declareCalendar(TEMPO_CALENDAR, TEST_SERVICE_ID);
+    await energyContract.publishCalendarEntries(
+      'tempo',
+      historicalTempoData
+        .filter((d) => d.created_at >= '2025-01-01')
+        .map((d) => ({ date: d.created_at, value: d.day_type })),
+      { provider_service_id: TEST_SERVICE_ID, skip_recalculation: true },
     );
-    expect(deviceFeatureState).to.have.lengthOf(2);
-    // Price should be equal to 0.18€/kwh * 5kwh (5000 Wh / 1000)
-    expect(deviceFeatureState[0]).to.have.property('value', 5 * 0.18);
-    // Price should be equal to 0.18€/kwh * 10kwh (10000 Wh / 1000)
-    expect(deviceFeatureState[1]).to.have.property('value', 10 * 0.18);
-  });
-  it('should calculate cost from a specific date for a peak/off peak contract', async () => {
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      end_date: '',
-      // 0,15€/kwh stored as integer with 4 decimals
-      price: 1500,
-      // Off peak time
-      hour_slots: '01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,06:00,06:30,22:00,22:30,23:00,23:30',
-    });
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      // 0,25€/kwh stored as integer with 4 decimals
-      price: 2500,
-      // Peak time
-      hour_slots:
-        '07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30',
-    });
-    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
-      {
-        value: 10,
-        // Create date in Paris timezone
-        created_at: dayjs.tz('2025-08-28T05:30:00.000Z', 'Europe/Paris').toDate(),
-      },
-      {
-        value: 20,
-        // Create date in Paris timezone
-        created_at: dayjs.tz('2025-08-28T15:30:00.000Z', 'Europe/Paris').toDate(),
-      },
+    await energyContract.create(contractPayload({ name: 'Tempo', tariff: TEMPO_TARIFF, valid_from: '2025-01-01' }));
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      // RED day (2025-01-03), off peak then peak
+      { value: 10, created_at: dayjs.tz('2025-01-03T05:30:00.000Z', 'Europe/Paris').toDate() },
+      { value: 10, created_at: dayjs.tz('2025-01-03T10:30:00.000Z', 'Europe/Paris').toDate() },
+      // BLUE day (2025-01-05), peak then off peak
+      { value: 10, created_at: dayjs.tz('2025-01-05T15:30:00.000Z', 'Europe/Paris').toDate() },
+      { value: 10, created_at: dayjs.tz('2025-01-05T22:30:00.000Z', 'Europe/Paris').toDate() },
     ]);
-    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
-    const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date);
-    const deviceFeatureState = await device.getDeviceFeatureStates(
-      'power-plug-consumption-cost',
-      dayjs.tz('2025-01-01T00:00:00.000Z', 'Europe/Paris').toDate(),
-      dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+    await energyMonitoring.calculateCostFrom(new Date('2025-01-01T00:00:00.000Z'));
+    const states = await costStates();
+    expect(states.map((s) => s.value)).to.deep.equal([1.568, 7.562, 1.609, 1.296]);
+  });
+
+  it('should recompute a tiered contract from the start of its accumulation period', async () => {
+    const contract = await energyContract.create(
+      contractPayload({
+        name: 'Tiered',
+        timezone: 'UTC',
+        tariff: {
+          tariff_version: 1,
+          components: [
+            {
+              key: 'e',
+              kind: 'consumption',
+              rules: [{ when: { tier: { cumulative: 'day', from_kwh: 0, to_kwh: 10 } }, price: 0.1 }],
+              fallback: { price: 1 },
+            },
+          ],
+        },
+      }),
     );
-    expect(deviceFeatureState).to.have.lengthOf(2);
-    // Price should be equal to 0.15€/kwh * 10kwh
-    expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.15);
-    // Price should be equal to 0.25€/kwh * 20kwh
-    expect(deviceFeatureState[1]).to.have.property('value', 20 * 0.25);
-  });
-  it('should calculate cost from a specific date for a edf-tempo contract', async () => {
-    // BLUE
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      price: 1288,
-      hour_slots: '01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,22:00,22:30,23:00,23:30',
-      day_type: ENERGY_PRICE_DAY_TYPES.BLUE,
-    });
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      price: 1552,
-      hour_slots:
-        '06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30',
-      day_type: ENERGY_PRICE_DAY_TYPES.BLUE,
-    });
-    // WHITE
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      price: 1447,
-      hour_slots: '01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,22:00,22:30,23:00,23:30',
-      day_type: ENERGY_PRICE_DAY_TYPES.WHITE,
-    });
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      price: 1792,
-      hour_slots:
-        '06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30',
-      day_type: ENERGY_PRICE_DAY_TYPES.WHITE,
-    });
-    // RED
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      price: 1518,
-      hour_slots: '01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,22:00,22:30,23:00,23:30',
-      day_type: ENERGY_PRICE_DAY_TYPES.RED,
-    });
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      price: 6586,
-      hour_slots:
-        '06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30',
-      day_type: ENERGY_PRICE_DAY_TYPES.RED,
-    });
-    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
-      {
-        value: 10,
-        // RED day, off peak
-        created_at: dayjs.tz('2025-01-03T05:30:00.000Z', 'Europe/Paris').toDate(),
-      },
-      {
-        value: 10,
-        // RED day, peak
-        created_at: dayjs.tz('2025-01-03T10:30:00.000Z', 'Europe/Paris').toDate(),
-      },
-      {
-        value: 10,
-        // WHITE day, peak
-        created_at: dayjs.tz('2025-01-04T15:30:00.000Z', 'Europe/Paris').toDate(),
-      },
-      {
-        value: 10,
-        // WHITE day, off peak
-        created_at: dayjs.tz('2025-01-04T22:30:00.000Z', 'Europe/Paris').toDate(),
-      },
-      {
-        value: 10,
-        // BLUE day, peak
-        created_at: dayjs.tz('2025-01-05T15:30:00.000Z', 'Europe/Paris').toDate(),
-      },
-      {
-        value: 10,
-        // BLUE day, off peak
-        created_at: dayjs.tz('2025-01-05T22:30:00.000Z', 'Europe/Paris').toDate(),
-      },
-    ]);
-    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
-    const date = new Date('2025-01-01T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date);
-    const deviceFeatureState = await device.getDeviceFeatureStates(
-      'power-plug-consumption-cost',
-      dayjs.tz('2025-01-01T00:00:00.000Z', 'Europe/Paris').toDate(),
-      dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+    const compiled = energyContract.getCompiledTariff(contract);
+    expect(getEffectiveStart(contract, compiled, new Date('2025-08-28T15:00:00.000Z')).toISOString()).to.equal(
+      '2025-08-28T00:00:00.000Z',
     );
-    expect(deviceFeatureState).to.have.lengthOf(6);
-    expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.1518);
-    expect(deviceFeatureState[1]).to.have.property('value', 10 * 0.6586);
-    expect(deviceFeatureState[2]).to.have.property('value', 10 * 0.1792);
-    expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1447);
-    expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1552);
-    expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1288);
-  });
-  it('should calculate cost from a specific date for a base contract on a daily consumption', async () => {
-    // We create a new device with consumption & consumption cost
-    await device.create({
-      id: '53e69a3d-b15f-4e6a-973d-9d815d02e507',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      name: 'Power plug 2',
-      external_id: 'power-plug-2',
-      features: [
-        {
-          id: '700ed79b-ebee-4501-8bbd-19e223f92fa5',
-          selector: 'power-plug-consumption-2',
-          external_id: 'power-plug-consumption-2',
-          name: 'Power plug Consumption 2',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
-        },
-        {
-          id: '351e7c5e-50e6-48f2-a197-b3b0104053d3',
-          selector: 'power-plug-consumption-cost-2',
-          external_id: 'power-plug-consumption-cost-2',
-          name: 'Power plug Consumption Cost 2',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
-          energy_parent_id: '700ed79b-ebee-4501-8bbd-19e223f92fa5', // Links to the daily consumption feature
-        },
-      ],
-    });
-    await energyPrice.create({
-      electric_meter_device_id: electricalMeterDevice.id,
-      contract: ENERGY_CONTRACT_TYPES.BASE,
-      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
-      currency: 'euro',
-      start_date: '2025-01-01',
-      // 0,18€/kwh stored as integer with 4 decimals
-      price: 1800,
-    });
-    await db.duckDbBatchInsertState('700ed79b-ebee-4501-8bbd-19e223f92fa5', [
-      {
-        value: 100,
-        created_at: new Date('2025-08-28T15:00:00.000Z'),
-      },
-      {
-        value: 200,
-        created_at: new Date('2025-08-28T15:01:00.000Z'),
-      },
+    expect(
+      getEffectiveStart(contract, { hasTier: false }, new Date('2025-08-28T15:00:00.000Z')).toISOString(),
+    ).to.equal('2025-08-28T15:00:00.000Z');
+    const monthly = { ...contract, billing_period_start_day: 5 };
+    expect(
+      getEffectiveStart(
+        monthly,
+        { hasTier: true, tierScopes: ['month', 'billing_period'] },
+        new Date('2025-08-28T15:00:00.000Z'),
+      ).toISOString(),
+    ).to.equal('2025-08-01T00:00:00.000Z');
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 8, created_at: new Date('2025-08-28T10:00:00.000Z') },
+      { value: 4, created_at: new Date('2025-08-28T15:00:00.000Z') },
     ]);
-    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
-    const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, '43732e67-6669-4a95-83d6-38c50b835387');
-    const deviceFeatureState = await device.getDeviceFeatureStates(
-      'power-plug-consumption-cost-2',
-      new Date('2025-01-01T00:00:00.000Z'),
-      new Date('2025-12-01T00:00:00.000Z'),
+    // asked from 14:00: the day is recomputed from midnight so the second interval is in tier 2
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T14:00:00.000Z'));
+    const states = await costStates();
+    expect(states.map((s) => s.value)).to.deep.equal([0.8, 0.2 + 2]);
+  });
+
+  it('should apply the demand charges of an elapsed billing period only', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Demand',
+        timezone: 'UTC',
+        valid_from: '2020-01-01',
+        tariff: {
+          tariff_version: 1,
+          components: [
+            { key: 'e', kind: 'consumption', rules: [], fallback: { price: 0 } },
+            { key: 'demand', kind: 'demand', price: 10, per: 'billing_period', aggregation: 'max' },
+          ],
+        },
+      }),
     );
-    expect(deviceFeatureState).to.have.lengthOf(2);
-    // Price should be equal to 0.18€/kwh * 100kwh
-    expect(deviceFeatureState[0]).to.have.property('value', 100 * 0.18);
-    // Price should be equal to 0.18€/kwh * 200kwh
-    expect(deviceFeatureState[1]).to.have.property('value', 200 * 0.18);
-    expect(gladys.job.updateProgress.called).to.equal(true);
-  });
-  it('should handle device with thirty minutes consumption but no cost feature (logs missing cost feature)', async () => {
-    // Create a device that only has the THIRTY_MINUTES_CONSUMPTION feature, without the corresponding COST feature
-    await device.create({
-      id: '7e1a1cf8-3f37-4a9f-b6ef-8f4f0a2f6a01',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      name: 'Partial Power Plug',
-      external_id: 'partial-power-plug',
-      features: [
-        {
-          id: '5c4a3c81-3d82-4b8e-9f78-0c2a92e2c7a1',
-          selector: 'partial-power-plug-consumption',
-          external_id: 'partial-power-plug-consumption',
-          name: 'Partial Power Plug Consumption',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
-        },
-      ],
-    });
-    const energyMonitoring = new EnergyMonitoring(gladys, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
-    const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
-    // No assertion needed; executing the branch covers the logger line.
-  });
-  it('should handle device with no daily consumption feature (logs missing daily feature)', async () => {
-    // Create a device with no ENERGY_SENSOR features so daily feature is missing
-    await device.create({
-      id: 'f8e2f7a0-0a2c-4c8c-9a6f-cc5a7cdeaa91',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      name: 'Device Without Energy Features',
-      external_id: 'no-energy-features-device',
-      features: [],
-    });
-    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
-    const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
-    // The code path logs the absence of a daily consumption feature.
-  });
-  it('should handle case where no energy price is found for the device at the given date (logs and returns)', async () => {
-    // Create a new electrical meter device with NO energy prices attached
-    await device.create({
-      id: '6a8a2a7e-0405-4c61-9d40-1d9c6aa9c0a1',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      name: 'Electrical Meter - No Price',
-      external_id: 'electrical-meter-no-price',
-      selector: 'electrical-meter-no-price',
-      features: [
-        {
-          id: '2c2b6f0d-e5f7-4d2b-bc16-1a5c2b39d9a1',
-          external_id: 'electrical-meter-no-price-feature',
-          selector: 'electrical-meter-no-price-feature',
-          name: 'Electrical Meter No Price',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-        },
-      ],
-    });
-    // Create a device linked to this meter with both consumption and cost features
-    await device.create({
-      id: 'f1a8d6c2-9c3d-4b9b-8e27-2d4d1c6a5b01',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      name: 'Plug Without Price',
-      external_id: 'plug-without-price',
-      features: [
-        {
-          id: '9e2b3a8c-8e9d-4f0a-92c4-5b6a2e1d3c01',
-          selector: 'plug-without-price-consumption',
-          external_id: 'plug-without-price-consumption',
-          name: 'Plug Without Price Consumption',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: '2c2b6f0d-e5f7-4d2b-bc16-1a5c2b39d9a1',
-        },
-        {
-          id: '0a1b2c3d-4e5f-6789-abcd-ef0123456789',
-          selector: 'plug-without-price-consumption-cost',
-          external_id: 'plug-without-price-consumption-cost',
-          name: 'Plug Without Price Consumption Cost',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-          energy_parent_id: '2c2b6f0d-e5f7-4d2b-bc16-1a5c2b39d9a1',
-        },
-      ],
-    });
-    // Insert a state for this consumption feature
-    await db.duckDbBatchInsertState('9e2b3a8c-8e9d-4f0a-92c4-5b6a2e1d3c01', [
-      {
-        value: 5,
-        created_at: new Date('2025-08-28T15:00:00.000Z'),
-      },
+    const now = Date.now();
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 2, created_at: new Date('2025-08-28T15:30:00.000Z') },
+      { value: 1, created_at: new Date(now - 30 * 60 * 1000) },
     ]);
-    const energyMonitoring = new EnergyMonitoring(gladys, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
-    const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
-    // This executes the branch where no energy price is found for the state timestamp.
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
+    const states = await costStates();
+    expect(states).to.have.lengthOf(3);
+    // August is closed: 4 kW peak * 10 spread pro rata over the two intervals
+    expect(states[0].value + states[1].value).to.equal(40);
+    // the current period is not charged
+    expect(states[2].value).to.equal(0);
   });
-  it('should catch and log an error during processing', async () => {
-    // Force an error by making getRootElectricMeterDevice throw
-    const original = gladys.device.energySensorManager.getRootElectricMeterDevice;
-    gladys.device.energySensorManager.getRootElectricMeterDevice = () => {
-      throw new Error('Forced test error');
+
+  it('should leave the intervals of an unavailable delegated integration without a cost', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Agile',
+        pricing_mode: 'delegated',
+        provider_service_id: TEST_SERVICE_ID,
+        tariff: { tariff_version: 1, components: [{ key: 's', kind: 'fixed', amount: 1, per: 'day' }] },
+      }),
+    );
+    energyContract.externalIntegration = {
+      priceEnergyContract: fake.rejects(new Error('EXTERNAL_INTEGRATION_NOT_CONNECTED')),
     };
-    try {
-      const energyMonitoring = new EnergyMonitoring(gladys, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
-      const date = new Date('2025-08-28T00:00:00.000Z');
-      await energyMonitoring.calculateCostFrom(date, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
-    } finally {
-      // Restore original function to avoid side effects on other tests
-      gladys.device.energySensorManager.getRootElectricMeterDevice = original;
-    }
+    const warn = sinon.stub(logger, 'warn');
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+    ]);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    expect(await costStates()).to.have.lengthOf(0);
+    expect(warn.args.some(([message]) => /left without a cost/.test(message))).to.equal(true);
   });
-  it('should skip consumption feature when getRootElectricMeterDevice returns null (broken hierarchy)', async () => {
-    // Create a device with a consumption feature that has a valid energy_parent_id in DB
-    // but we'll mock getRootElectricMeterDevice to return null to simulate a broken hierarchy
+
+  it('should count the fallback warnings of a calendar price', async () => {
+    await energyContract.declareCalendar({ key: 'spot', granularity: 'thirty_minutes' }, TEST_SERVICE_ID);
+    await energyContract.create(
+      contractPayload({
+        name: 'Spot',
+        tariff: {
+          tariff_version: 1,
+          calendars: ['spot'],
+          components: [
+            { key: 'e', kind: 'consumption', rules: [{ price_from_calendar: 'spot' }], fallback: { price: 0.3 } },
+          ],
+        },
+      }),
+    );
+    const warn = sinon.stub(logger, 'warn');
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+    ]);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    expect((await costStates())[0].value).to.equal(0.3);
+    expect(
+      warn.args.some(([message]) => /1 interval\(s\) priced by a fallback \(calendar_missing\)/.test(message)),
+    ).to.equal(true);
+  });
+
+  it('should skip the features without a cost feature, a broken hierarchy and log errors', async () => {
+    await energyContract.create(contractPayload());
     await device.create({
-      id: 'a1b2c3d4-e5f6-7890-abcd-000000000001',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      name: 'Device with Broken Hierarchy',
-      external_id: 'broken-hierarchy-device',
+      id: 'e1b2c3d4-e5f6-7890-abcd-ef1234567891',
+      service_id: TEST_SERVICE_ID,
+      name: 'No cost',
+      external_id: 'no-cost',
       features: [
-        {
-          id: 'a1b2c3d4-e5f6-7890-abcd-000000000002',
-          selector: 'broken-consumption-feature',
-          external_id: 'broken-consumption-feature',
-          name: 'Broken Consumption Feature',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        feature({
+          id: 'f2c3d4e5-f6a7-8901-bcde-f12345678902',
+          selector: 'no-cost-consumption',
+          external_id: 'no-cost-consumption',
+          name: 'Consumption',
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          // Points to the electrical meter feature which exists in DB
-          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
-        },
-        {
-          id: 'a1b2c3d4-e5f6-7890-abcd-000000000003',
-          selector: 'broken-cost-feature',
-          external_id: 'broken-cost-feature',
-          name: 'Broken Cost Feature',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 1000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-          energy_parent_id: 'a1b2c3d4-e5f6-7890-abcd-000000000002',
-        },
+          energy_parent_id: METER_FEATURE_ID,
+        }),
+        feature({
+          id: 'f2c3d4e5-f6a7-8901-bcde-f12345678903',
+          selector: 'no-cost-daily',
+          external_id: 'no-cost-daily',
+          name: 'Daily',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+          energy_parent_id: METER_FEATURE_ID,
+        }),
       ],
     });
-
-    // Insert consumption data that would normally be processed
-    await db.duckDbBatchInsertState('a1b2c3d4-e5f6-7890-abcd-000000000002', [
-      {
-        value: 50,
-        created_at: new Date('2025-08-28T15:00:00.000Z'),
-      },
-    ]);
-
-    // Mock getRootElectricMeterDevice to return null for this specific feature
-    const original = gladys.device.energySensorManager.getRootElectricMeterDevice;
-    gladys.device.energySensorManager.getRootElectricMeterDevice = (feature) => {
-      if (feature && feature.id === 'a1b2c3d4-e5f6-7890-abcd-000000000002') {
-        return null; // Simulate broken hierarchy
-      }
-      return original.call(gladys.device.energySensorManager, feature);
-    };
-
-    try {
-      const energyMonitoring = new EnergyMonitoring(gladys, 'a1b2c3d4-e5f6-7890-abcd-000000000004');
-      const date = new Date('2025-08-28T00:00:00.000Z');
-
-      // This should not throw - it should skip the broken feature and log a warning
-      await energyMonitoring.calculateCostFrom(date, 'a1b2c3d4-e5f6-7890-abcd-000000000004');
-
-      // Verify that no cost states were created for the broken feature
-      const costStates = await device.getDeviceFeatureStates(
-        'broken-cost-feature',
-        new Date('2025-01-01T00:00:00.000Z'),
-        new Date('2025-12-01T00:00:00.000Z'),
-      );
-      expect(costStates).to.have.lengthOf(0);
-    } finally {
-      // Restore original function
-      gladys.device.energySensorManager.getRootElectricMeterDevice = original;
-    }
+    const plug = device.stateManager.get('deviceById', POWER_PLUG_ID);
+    expect(findConsumptionCostPairs(plug)).to.have.lengthOf(1);
+    expect(
+      findConsumptionCostPairs(device.stateManager.get('deviceById', 'e1b2c3d4-e5f6-7890-abcd-ef1234567891')),
+    ).to.deep.equal([]);
+    // an error on one device does not stop the run
+    const error = sinon.stub(logger, 'error');
+    const getDeviceFeatureStates = sinon.stub(device, 'getDeviceFeatureStates').rejects(new Error('boom'));
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    expect(error.callCount).to.be.above(0);
+    getDeviceFeatureStates.restore();
+    // broken hierarchy: the meter feature the plug consumption points to is gone
+    const warn = sinon.stub(logger, 'warn');
+    device.stateManager.deleteState('deviceFeatureById', METER_FEATURE_ID);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    expect(warn.args.some(([message]) => /no valid root electric meter found/.test(message))).to.equal(true);
   });
 });

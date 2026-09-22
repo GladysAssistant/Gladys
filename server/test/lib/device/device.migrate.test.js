@@ -102,6 +102,7 @@ describe('Device.migrate', function Describe() {
 
   afterEach(async () => {
     await db.EnergyPrice.destroy({ where: { selector: 'migration-energy-price' } });
+    await db.EnergyContract.destroy({ where: { selector: 'migration-energy-contract' } });
     await db.Scene.destroy({ where: { selector: ['migration-scene', 'migration-scene-untouched'] } });
     await db.Dashboard.destroy({ where: { selector: 'migration-dashboard' } });
     await db.Device.destroy({ where: { selector: ['migration-source', 'migration-destination', 'migration-child'] } });
@@ -143,6 +144,19 @@ describe('Device.migrate', function Describe() {
       price_type: 'consumption',
       price: 2000,
       currency: 'EUR',
+      electric_meter_device_id: sourceDevice.id,
+    });
+    // Energy contract using the source device as electric meter
+    const energyContract = await db.EnergyContract.create({
+      name: 'Migration energy contract',
+      selector: 'migration-energy-contract',
+      valid_from: '2024-01-01',
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      tariff: {
+        tariff_version: 1,
+        components: [{ key: 'e', kind: 'consumption', rules: [], fallback: { price: 0.2 } }],
+      },
       electric_meter_device_id: sourceDevice.id,
     });
     const scene = await db.Scene.create({
@@ -252,6 +266,9 @@ describe('Device.migrate', function Describe() {
     // Energy price contract re-pointed to the destination device
     const refreshedEnergyPrice = await db.EnergyPrice.findOne({ where: { id: energyPrice.id } });
     expect(refreshedEnergyPrice.electric_meter_device_id).to.equal(destinationDevice.id);
+    // Energy contract re-pointed to the destination device (its FK cascades on delete)
+    const refreshedEnergyContract = await db.EnergyContract.findOne({ where: { id: energyContract.id } });
+    expect(refreshedEnergyContract.electric_meter_device_id).to.equal(destinationDevice.id);
     // Scene rewritten through the scene manager (RAM resync path)
     sinonAssert.calledOnceWithExactly(sceneManagerFake.update, 'migration-scene', {
       actions: [

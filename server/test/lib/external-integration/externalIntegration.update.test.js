@@ -24,11 +24,14 @@ describe('externalIntegration.update', () => {
     });
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
     const registerProxyService = sinon.spy(externalIntegration, 'registerProxyService');
+    const declareEnergyCalendars = sinon.spy(externalIntegration, 'declareEnergyCalendars');
     const integration = await externalIntegration.update(service.selector);
     // the proxy is re-registered on the updated row, never left on the
-    // boot-time snapshot of the manifest
+    // boot-time snapshot of the manifest; the energy calendars follow the new manifest
     sinonAssert.calledOnce(registerProxyService);
     expect(registerProxyService.firstCall.args[0].manifest.version).to.equal('2.0.0');
+    sinonAssert.calledOnce(declareEnergyCalendars);
+    expect(declareEnergyCalendars.firstCall.args[0].manifest.version).to.equal('2.0.0');
     expect(integration).to.have.property('version', '2.0.0');
     expect(integration).to.have.property('docker_image', 'ghcr.io/john/demo:2.0.0');
     expect(integration.manifest.version).to.equal('2.0.0');

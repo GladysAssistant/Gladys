@@ -49,6 +49,7 @@ describe('EnergyMonitoring.init', () => {
     gladys = {
       variable,
       device,
+      event: { on: fake.returns(null) },
       scheduler: mockScheduler,
       job: {
         updateProgress: fake.returns(null),
@@ -62,16 +63,21 @@ describe('EnergyMonitoring.init', () => {
   it('should schedule combined energy monitoring job on first init', async () => {
     await energyMonitoring.init();
 
-    // Verify both jobs are scheduled (30 min job + 24h job)
-    assert.calledThrice(mockScheduler.scheduleJob);
+    // Verify the jobs are scheduled (30 min job + billing period job + two 24h jobs)
+    expect(mockScheduler.scheduleJob.callCount).to.equal(4);
 
     // Verify combined job (at 00:00 and 00:30)
     const jobCall = mockScheduler.scheduleJob.getCall(0);
     expect(jobCall.args[0]).to.equal('0 0,30 * * * *');
     expect(typeof jobCall.args[1]).to.equal('function');
 
+    // Verify the billing period job runs at 02:00 in the system timezone
+    const billingPeriodJobCall = mockScheduler.scheduleJob.getCall(1);
+    expect(billingPeriodJobCall.args[0]).to.have.property('hour', 2);
+    expect(billingPeriodJobCall.args[0]).to.have.property('tz', 'Europe/Paris');
+
     // Verify 24h job uses RecurrenceRule with timezone
-    const dailyJobCall = mockScheduler.scheduleJob.getCall(1);
+    const dailyJobCall = mockScheduler.scheduleJob.getCall(2);
     const rule = dailyJobCall.args[0];
     expect(rule).to.have.property('recurs', true);
     expect(rule).to.have.property('hour', 11);
@@ -80,7 +86,7 @@ describe('EnergyMonitoring.init', () => {
     expect(typeof dailyJobCall.args[1]).to.equal('function');
 
     // Verify 24h job uses RecurrenceRule with timezone
-    const lastDailyJobCall = mockScheduler.scheduleJob.getCall(2);
+    const lastDailyJobCall = mockScheduler.scheduleJob.getCall(3);
     const rule2 = lastDailyJobCall.args[0];
     expect(rule2).to.have.property('recurs', true);
     expect(rule2).to.have.property('hour', 16);
@@ -98,6 +104,7 @@ describe('EnergyMonitoring.init', () => {
     energyMonitoring.calculateConsumptionAndCostEvery30MinutesJob = 'existing-job';
     energyMonitoring.calculateConsumptionAndCostEvery24HoursJob = 'existing-daily-job';
     energyMonitoring.calculateConsumptionAndCostEvery24HoursLastJob = 'existing-last-daily-job';
+    energyMonitoring.closeBillingPeriodsJob = 'existing-billing-period-job';
 
     await energyMonitoring.init();
 
@@ -118,7 +125,7 @@ describe('EnergyMonitoring.init', () => {
     await energyMonitoring.init();
 
     // Verify all jobs are scheduled
-    assert.calledThrice(mockScheduler.scheduleJob);
+    expect(mockScheduler.scheduleJob.callCount).to.equal(4);
 
     const jobCall = mockScheduler.scheduleJob.getCall(0);
     expect(jobCall.args[0]).to.equal('0 0,30 * * * *');
@@ -140,6 +147,7 @@ describe('EnergyMonitoring.init', () => {
       calculateProductionFromIndexThirtyMinutes = fake.returns(null);
       calculateCostFromYesterday = fake.returns(null);
 
+      energyMonitoring.delegatedCatchUp = fake.returns(null);
       energyMonitoring.calculateCostEveryThirtyMinutes = calculateCostEveryThirtyMinutes;
       energyMonitoring.calculateConsumptionFromIndexThirtyMinutes = calculateConsumptionFromIndexThirtyMinutes;
       energyMonitoring.calculateProductionFromIndexThirtyMinutes = calculateProductionFromIndexThirtyMinutes;
@@ -264,8 +272,8 @@ describe('EnergyMonitoring.init', () => {
       try {
         await energyMonitoring.init();
 
-        // Get the daily job function (second call)
-        const dailyJobFunction = mockScheduler.scheduleJob.getCall(1).args[1];
+        // Get the daily job function (third call, after the 30-minute and billing period jobs)
+        const dailyJobFunction = mockScheduler.scheduleJob.getCall(2).args[1];
 
         // Execute the daily job
         await dailyJobFunction();
@@ -297,8 +305,8 @@ describe('EnergyMonitoring.init', () => {
       try {
         await energyMonitoring.init();
 
-        // Get the 16:10 daily job function (third call)
-        const dailyJobFunction = mockScheduler.scheduleJob.getCall(2).args[1];
+        // Get the 16:10 daily job function (fourth call)
+        const dailyJobFunction = mockScheduler.scheduleJob.getCall(3).args[1];
 
         // Execute the daily job
         await dailyJobFunction();

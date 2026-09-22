@@ -4,7 +4,7 @@ const {
   priceIntervals,
   createCalendarLookup,
   CALENDAR_WARNING_REASONS,
-} = require('../../../lib/energy-contract');
+} = require('../../../lib/energy-contract/engine');
 const { prepareIntervals, roundCost, resolvePrice } = require('../../../lib/energy-contract/tariff.priceIntervals');
 
 const paris = { timezone: 'Europe/Paris' };

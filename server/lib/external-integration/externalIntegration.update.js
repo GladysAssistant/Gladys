@@ -231,6 +231,7 @@ async function update(selector) {
   // the proxy closes over the service object it was registered with: the
   // updated row (manifest, version, image) replaces the boot-time snapshot
   this.registerProxyService(service);
+  await this.declareEnergyCalendars(service);
   await this.createIntegrationContainer(service);
   const started = await this.start(selector);
   // only once start() has gone through: it resolves on LOADING, not RUNNING, so

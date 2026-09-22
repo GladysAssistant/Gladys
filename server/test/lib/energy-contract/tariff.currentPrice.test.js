@@ -4,7 +4,7 @@ const {
   getCurrentPrice,
   getUnitPriceAt,
   createCalendarLookup,
-} = require('../../../lib/energy-contract');
+} = require('../../../lib/energy-contract/engine');
 
 const utc = { timezone: 'UTC' };
 

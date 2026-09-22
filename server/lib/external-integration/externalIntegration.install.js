@@ -106,6 +106,8 @@ async function install({ dockerImage, manifest, storeSlug = null, grantedDevices
   }
   const service = createdService.get({ plain: true });
   this.registerProxyService(service);
+  // energy calendars declared by the manifest: owned by the first integration declaring them
+  await this.declareEnergyCalendars(service);
   try {
     await this.createIntegrationContainer(service);
     await this.start(selector);

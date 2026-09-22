@@ -453,6 +453,11 @@ async function executeMigration(selector, options, jobId) {
     { electric_meter_device_id: destination.id },
     { where: { electric_meter_device_id: source.id } },
   );
+  // Same for the energy contracts (FK ON DELETE CASCADE: they would vanish with the source).
+  await db.EnergyContract.update(
+    { electric_meter_device_id: destination.id },
+    { where: { electric_meter_device_id: source.id } },
+  );
 
   // The destination inherits the source's room only when it has none.
   const roomInherited = destination.room_id === null && source.room_id !== null;

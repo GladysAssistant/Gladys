@@ -1,0 +1,230 @@
+const db = require('../../models');
+const logger = require('../../utils/logger');
+const { buildUniqueSelector } = require('../../utils/addSelector');
+const {
+  SYSTEM_VARIABLE_NAMES,
+  ENERGY_CONTRACT_PROVIDER_KINDS,
+  ENERGY_CONTRACT_PRICING_MODES,
+  ENERGY_CONTRACT_TYPES,
+  EVENTS,
+} = require('../../utils/constants');
+const { convertPriceRows, normalizeContractType } = require('./legacy/convertPriceRows');
+const { legacyCost } = require('./legacy/calculateCost');
+const { compileTariff } = require('./tariff.compile');
+const { priceIntervals } = require('./tariff.priceIntervals');
+const { localToUtcMs } = require('./tariff.time');
+const { TEMPO_CALENDAR_KEY } = require('./templates/internal');
+
+const MIGRATION_DONE_VARIABLE = 'ENERGY_CONTRACT_MIGRATION_DONE';
+const VERIFICATION_DAYS = 7;
+const MAX_GAP_RATIO = 0.005;
+const CURRENCY_MAP = { euro: 'EUR', dollar: 'USD', pound: 'GBP', franc: 'CHF' };
+
+/**
+ * @description Map a legacy free currency value to an ISO 4217 code.
+ * @param {string} currency - Legacy value (`euro`, `dollar`, `EUR`…).
+ * @returns {string} ISO code.
+ * @example
+ * toIsoCurrency('euro'); // 'EUR'
+ */
+function toIsoCurrency(currency) {
+  const value = String(currency || 'EUR');
+  if (/^[A-Z]{3}$/.test(value)) {
+    return value;
+  }
+  return CURRENCY_MAP[value.toLowerCase()] || 'EUR';
+}
+
+/**
+ * @description Group legacy rows into contracts (section 9.1): one contract per
+ * (meter, contract name, contract type, subscribed power, start date).
+ * @param {Array<object>} rows - t_energy_price rows.
+ * @returns {Array<object>} Groups: { key, rows }.
+ * @example
+ * groupPriceRows(rows);
+ */
+function groupPriceRows(rows) {
+  const groups = new Map();
+  rows
+    .filter((row) => row.electric_meter_device_id)
+    .forEach((row) => {
+      const key = [
+        row.electric_meter_device_id,
+        row.contract_name || '',
+        normalizeContractType(row.contract),
+        row.subscribed_power || '',
+        row.start_date,
+      ].join('|');
+      if (!groups.has(key)) {
+        groups.set(key, { key, rows: [] });
+      }
+      groups.get(key).rows.push(row);
+    });
+  return Array.from(groups.values());
+}
+
+/**
+ * @description Compare the legacy and the engine calculation of a migrated contract
+ * over the last 7 days of stored consumption (section 9.3). Returns a warning object
+ * when the gap exceeds 0.5%, null otherwise.
+ * @param {object} contract - The created contract (plain).
+ * @param {Array<object>} rows - Its legacy rows.
+ * @param {string} systemTimezone - System timezone.
+ * @returns {Promise<object|null>} The warning or null.
+ * @example
+ * await this.verifyMigratedContract(contract, rows, 'Europe/Paris');
+ */
+async function verifyMigratedContract(contract, rows, systemTimezone) {
+  const to = new Date();
+  const from = new Date(to.getTime() - VERIFICATION_DAYS * 24 * 60 * 60 * 1000);
+  const intervals = await this.getMeterIntervals(contract.electric_meter_device_id, from, to);
+  if (intervals.length === 0) {
+    return null;
+  }
+  const compiled = compileTariff(contract.tariff, contract.inputs || {});
+  const calendars = await this.loadCalendarLookup(
+    compiled.calendars,
+    new Date(intervals[0].starts_at).getTime(),
+    to.getTime(),
+    contract.timezone,
+  );
+  const engine = priceIntervals(compiled, contract, intervals, { calendars });
+  const tempoDayMap = new Map();
+  if (compiled.calendars.includes(TEMPO_CALENDAR_KEY)) {
+    const entries = await this.getCalendarEntries(TEMPO_CALENDAR_KEY, { from, to });
+    entries.forEach((entry) => {
+      const date = new Date(entry.starts_at).toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' });
+      tempoDayMap.set(date, entry.value);
+    });
+  }
+  const perDay = new Map();
+  let legacyTotal = 0;
+  let engineTotal = 0;
+  intervals.forEach((interval, index) => {
+    const legacy = legacyCost(rows, new Date(interval.starts_at), interval.kwh, systemTimezone, tempoDayMap);
+    if (legacy === null) {
+      return;
+    }
+    // the engine stores the subscription in the states, the legacy code did not
+    const energy = engine.costs[index].components.energy || 0;
+    legacyTotal += legacy;
+    engineTotal += energy;
+    const day = interval.starts_at.slice(0, 10);
+    const entry = perDay.get(day) || { day, legacy: 0, engine: 0 };
+    entry.legacy += legacy;
+    entry.engine += energy;
+    perDay.set(day, entry);
+  });
+  if (legacyTotal === 0) {
+    return null;
+  }
+  const gap = Math.abs(engineTotal - legacyTotal) / legacyTotal;
+  if (gap <= MAX_GAP_RATIO) {
+    return null;
+  }
+  const warning = {
+    gap_ratio: Math.round(gap * 10000) / 10000,
+    legacy_total: Math.round(legacyTotal * 1e4) / 1e4,
+    engine_total: Math.round(engineTotal * 1e4) / 1e4,
+    days: Array.from(perDay.values()).map((d) => ({
+      day: d.day,
+      legacy: Math.round(d.legacy * 1e4) / 1e4,
+      engine: Math.round(d.engine * 1e4) / 1e4,
+    })),
+  };
+  logger.warn(
+    `Energy contract "${contract.name}": migrated calculation differs by ${(gap * 100).toFixed(
+      2,
+    )}% over the last ${VERIFICATION_DAYS} days`,
+  );
+  return warning;
+}
+
+/**
+ * @description Convert every group of t_energy_price rows into a contract (sections 9.1 to 9.3),
+ * once: a system variable marks the migration as done. The price rows are left untouched
+ * (read-only compatibility window). Every meter then gets one full cost recalculation so
+ * its stored costs carry the subscription like the new contracts do.
+ * @returns {Promise<Array<object>>} The created contracts.
+ * @example
+ * await migrateFromEnergyPrice();
+ */
+async function migrateFromEnergyPrice() {
+  const done = await this.variable.getValue(MIGRATION_DONE_VARIABLE);
+  if (done) {
+    return [];
+  }
+  const rows = (await db.EnergyPrice.findAll({ order: [['start_date', 'ASC']] })).map((r) => r.get({ plain: true }));
+  const systemTimezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || 'UTC';
+  const groups = groupPriceRows(rows);
+  const created = [];
+  const catalogueKeys = new Set();
+  try {
+    (await this.getCommunityTemplates()).forEach((t) => catalogueKeys.add(t.key));
+  } catch (e) {
+    logger.debug(`Energy contract migration: catalogue unavailable (${e.message}), provider set to user`);
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for (const group of groups) {
+    const first = group.rows[0];
+    const contractType = normalizeContractType(first.contract);
+    const { tariff } = convertPriceRows(group.rows);
+    const endDates = group.rows.map((r) => r.end_date).filter(Boolean);
+    const hasOpenEnd = group.rows.some((r) => !r.end_date);
+    const name =
+      first.contract_name || `${contractType}${first.subscribed_power ? ` ${first.subscribed_power} kVA` : ''}`;
+    const templateKey = first.contract_name && catalogueKeys.has(first.contract_name) ? first.contract_name : null;
+    const contract = {
+      name,
+      electric_meter_device_id: first.electric_meter_device_id,
+      valid_from: first.start_date,
+      valid_to: hasOpenEnd || endDates.length === 0 ? null : endDates.sort().pop(),
+      currency: toIsoCurrency(first.currency),
+      timezone: contractType === ENERGY_CONTRACT_TYPES.EDF_TEMPO ? 'Europe/Paris' : systemTimezone,
+      billing_period_start_day: 1,
+      subscribed_power: first.subscribed_power ? Number(first.subscribed_power) || null : null,
+      power_unit: first.subscribed_power ? 'kVA' : null,
+      provider_kind: templateKey ? ENERGY_CONTRACT_PROVIDER_KINDS.COMMUNITY : ENERGY_CONTRACT_PROVIDER_KINDS.USER,
+      template_key: templateKey,
+      pricing_mode: ENERGY_CONTRACT_PRICING_MODES.RULES,
+      tariff,
+      inputs: null,
+    };
+    try {
+      // several validity periods of one contract share its name: unique selectors
+      // eslint-disable-next-line no-await-in-loop
+      contract.selector = await buildUniqueSelector(db.EnergyContract, name);
+      // eslint-disable-next-line no-await-in-loop
+      const row = await db.EnergyContract.create(contract);
+      const plain = row.get({ plain: true });
+      // eslint-disable-next-line no-await-in-loop
+      const warning = await this.verifyMigratedContract(plain, group.rows, systemTimezone);
+      if (warning) {
+        // eslint-disable-next-line no-await-in-loop
+        await row.update({ migration_warning: warning });
+      }
+      created.push(plain);
+      logger.info(`Energy contract migration: "${name}" created from ${group.rows.length} price row(s)`);
+    } catch (e) {
+      logger.error(`Energy contract migration: unable to convert "${name}": ${e.message}`);
+    }
+  }
+  await this.variable.setValue(MIGRATION_DONE_VARIABLE, new Date().toISOString());
+  const meterIds = Array.from(new Set(created.map((c) => c.electric_meter_device_id)));
+  if (meterIds.length > 0) {
+    const earliest = created.map((c) => c.valid_from).sort()[0];
+    this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, {
+      from: new Date(localToUtcMs(earliest, systemTimezone)),
+      electric_meter_device_ids: meterIds,
+    });
+  }
+  return created;
+}
+
+module.exports = {
+  migrateFromEnergyPrice,
+  verifyMigratedContract,
+  groupPriceRows,
+  toIsoCurrency,
+  MIGRATION_DONE_VARIABLE,
+};

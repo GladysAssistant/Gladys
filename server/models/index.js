@@ -38,6 +38,7 @@ const DeviceFeatureModel = require('./device_feature');
 const DeviceFeatureSupportedOptionModel = require('./device_feature_supported_option');
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
+const EnergyContractModel = require('./energy_contract');
 const EnergyPriceModel = require('./energy_price');
 const HouseModel = require('./house');
 const JobModel = require('./job');
@@ -51,6 +52,8 @@ const ScriptModel = require('./script');
 const ServiceModel = require('./service');
 const SessionModel = require('./session');
 const TagScene = require('./tag_scene');
+const TariffCalendarModel = require('./tariff_calendar');
+const TariffCalendarEntryModel = require('./tariff_calendar_entry');
 const UserModel = require('./user');
 const VariableModel = require('./variable');
 
@@ -66,6 +69,7 @@ const models = {
   DeviceFeatureSupportedOption: DeviceFeatureSupportedOptionModel(sequelize, Sequelize),
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
+  EnergyContract: EnergyContractModel(sequelize, Sequelize),
   EnergyPrice: EnergyPriceModel(sequelize, Sequelize),
   House: HouseModel(sequelize, Sequelize),
   Job: JobModel(sequelize, Sequelize),
@@ -79,6 +83,8 @@ const models = {
   Service: ServiceModel(sequelize, Sequelize),
   Session: SessionModel(sequelize, Sequelize),
   TagScene: TagScene(sequelize, Sequelize),
+  TariffCalendar: TariffCalendarModel(sequelize, Sequelize),
+  TariffCalendarEntry: TariffCalendarEntryModel(sequelize, Sequelize),
   User: UserModel(sequelize, Sequelize),
   Variable: VariableModel(sequelize, Sequelize),
 };

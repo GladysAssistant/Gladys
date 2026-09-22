@@ -2,22 +2,22 @@ const db = require('../../models');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../utils/constants');
 
 /**
- * @description Get default electric meter device.
- * @returns {Promise<Array>} Default electric meter device.
+ * @description The energy feature of the meter of the most recent contract (section 9.4:
+ * unchanged signature, used by the integrations that derive energy features and by the digest).
+ * @returns {Promise<string|null>} Feature id or null.
  * @example
  * await getDefaultElectricMeterFeatureId();
  */
 async function getDefaultElectricMeterFeatureId() {
-  const energyPrice = await db.EnergyPrice.findAll({
+  const contracts = await db.EnergyContract.findAll({
     limit: 1,
     order: [['created_at', 'DESC']],
+    attributes: ['electric_meter_device_id'],
   });
-
-  if (!energyPrice.length) {
+  if (!contracts.length) {
     return null;
   }
-
-  const device = this.stateManager.get('deviceById', energyPrice[0].electric_meter_device_id);
+  const device = this.stateManager.get('deviceById', contracts[0].electric_meter_device_id);
   if (!device) {
     return null;
   }
@@ -25,7 +25,6 @@ async function getDefaultElectricMeterFeatureId() {
   if (!feature) {
     return null;
   }
-
   const featureInDb = await db.DeviceFeature.findByPk(feature.id);
   return featureInDb ? feature.id : null;
 }

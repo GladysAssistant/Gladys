@@ -17,9 +17,12 @@ describe('externalIntegration.init', () => {
       },
     });
     externalIntegration.refreshIndex = fake.rejects(new Error('offline'));
+    const declareEnergyCalendars = sinon.spy(externalIntegration, 'declareEnergyCalendars');
     await externalIntegration.init();
     expect(externalIntegration.available).to.equal(true);
     expect(stateManager.get('service', service.name)).to.not.equal(null);
+    // the energy calendars of every installed integration are re-declared at boot
+    sinonAssert.calledOnce(declareEnergyCalendars);
     const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
     expect(serviceInDb.container_id).to.equal('new-container-id');
     expect(externalIntegration.checkHealthInterval).to.not.equal(null);

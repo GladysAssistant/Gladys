@@ -1,4 +1,4 @@
-const { compileTariff, priceIntervals, createCalendarLookup } = require('../../../../lib/energy-contract');
+const { compileTariff, priceIntervals, createCalendarLookup } = require('../../../../lib/energy-contract/engine');
 
 /**
  * @description Compile a tariff with its inputs and price intervals with it.

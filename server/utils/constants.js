@@ -672,6 +672,13 @@ const EVENTS = {
     ALERT_RAISED: 'weather.alert-raised',
     ALERT_ENDED: 'weather.alert-ended',
   },
+  ENERGY_CONTRACT: {
+    // asks the energy-monitoring service to recompute the costs of some meters
+    // from a date (contract or calendar change), see docs/specs/energy-contracts.md 7.4
+    RECALCULATE: 'energy-contract.recalculate',
+    // scene trigger: the current unit price of the active contract changed
+    PRICE_CHANGED: 'energy-contract.price-changed',
+  },
   EXTERNAL_INTEGRATION: {
     STATUS_CHANGED: 'external-integration.status-changed',
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
@@ -2154,6 +2161,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     WIDGET_ACTION: 'external-integration.widget.action',
     WIDGET_REFRESH: 'external-integration.widget.refresh',
     WIDGET_UPDATED: 'external-integration.widget-updated',
+    // energy contracts capability (capabilities/energy-contracts.md)
+    ENERGY_CONTRACT_PRICE: 'external-integration.energy-contract.price',
+    ENERGY_CONTRACT_CURRENT: 'external-integration.energy-contract.current',
+    ENERGY_CALENDAR_REFRESH: 'external-integration.energy-calendar.refresh',
   },
 };
 
@@ -2271,6 +2282,10 @@ const JOB_TYPES = {
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING: 'energy-monitoring-consumption-from-index-beginning',
   ENERGY_MONITORING_PRODUCTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-production-from-index-thirty-minutes',
   ENERGY_MONITORING_PRODUCTION_FROM_INDEX_BEGINNING: 'energy-monitoring-production-from-index-beginning',
+  ENERGY_MONITORING_COST_CALCULATION_CALENDAR: 'energy-monitoring-cost-calculation-calendar',
+  ENERGY_MONITORING_COST_CALCULATION_CONTRACT: 'energy-monitoring-cost-calculation-contract',
+  ENERGY_MONITORING_BILLING_PERIOD_END: 'energy-monitoring-billing-period-end',
+  ENERGY_MONITORING_DELEGATED_CATCH_UP: 'energy-monitoring-delegated-catch-up',
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
   DEVICE_MIGRATE: 'device-migrate',
@@ -2322,6 +2337,47 @@ const ENERGY_PRICE_DAY_TYPES = {
   RED: 'red',
   BLUE: 'blue',
   WHITE: 'white',
+};
+
+// Energy contracts (docs/specs/energy-contracts.md, section 4)
+const ENERGY_CONTRACT_PROVIDER_KINDS = {
+  COMMUNITY: 'community',
+  INTEGRATION: 'integration',
+  INTERNAL: 'internal',
+  USER: 'user',
+};
+
+const ENERGY_CONTRACT_PRICING_MODES = {
+  RULES: 'rules',
+  DELEGATED: 'delegated',
+};
+
+const ENERGY_CONTRACT_STATUS = {
+  ACTIVE: 'active',
+  SCHEDULED: 'scheduled',
+  EXPIRED: 'expired',
+  ORPHANED: 'orphaned',
+};
+
+const ENERGY_CONTRACT_ENERGY_TYPES = {
+  ELECTRICITY: 'electricity',
+  GAS: 'gas',
+  WATER: 'water',
+};
+
+const ENERGY_CONTRACT_DIRECTIONS = {
+  CONSUMPTION: 'consumption',
+  PRODUCTION: 'production',
+};
+
+const ENERGY_CONTRACT_POWER_UNITS = {
+  KVA: 'kVA',
+  KW: 'kW',
+};
+
+const TARIFF_CALENDAR_GRANULARITIES = {
+  DAY: 'day',
+  THIRTY_MINUTES: 'thirty_minutes',
 };
 
 const AI_CHAT_TOOL_CATEGORIES = {
@@ -2385,6 +2441,12 @@ const AI_CHAT_TOOL_CATEGORIES_LIST = createList(AI_CHAT_TOOL_CATEGORIES);
 const ENERGY_CONTRACT_TYPES_LIST = createList(ENERGY_CONTRACT_TYPES);
 const ENERGY_PRICE_TYPES_LIST = createList(ENERGY_PRICE_TYPES);
 const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
+const ENERGY_CONTRACT_PROVIDER_KINDS_LIST = createList(ENERGY_CONTRACT_PROVIDER_KINDS);
+const ENERGY_CONTRACT_PRICING_MODES_LIST = createList(ENERGY_CONTRACT_PRICING_MODES);
+const ENERGY_CONTRACT_ENERGY_TYPES_LIST = createList(ENERGY_CONTRACT_ENERGY_TYPES);
+const ENERGY_CONTRACT_DIRECTIONS_LIST = createList(ENERGY_CONTRACT_DIRECTIONS);
+const ENERGY_CONTRACT_POWER_UNITS_LIST = createList(ENERGY_CONTRACT_POWER_UNITS);
+const TARIFF_CALENDAR_GRANULARITIES_LIST = createList(TARIFF_CALENDAR_GRANULARITIES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -2518,5 +2580,18 @@ module.exports.ENERGY_PRICE_TYPES = ENERGY_PRICE_TYPES;
 module.exports.ENERGY_PRICE_TYPES_LIST = ENERGY_PRICE_TYPES_LIST;
 module.exports.ENERGY_PRICE_DAY_TYPES = ENERGY_PRICE_DAY_TYPES;
 module.exports.ENERGY_PRICE_DAY_TYPES_LIST = ENERGY_PRICE_DAY_TYPES_LIST;
+module.exports.ENERGY_CONTRACT_PROVIDER_KINDS = ENERGY_CONTRACT_PROVIDER_KINDS;
+module.exports.ENERGY_CONTRACT_PROVIDER_KINDS_LIST = ENERGY_CONTRACT_PROVIDER_KINDS_LIST;
+module.exports.ENERGY_CONTRACT_PRICING_MODES = ENERGY_CONTRACT_PRICING_MODES;
+module.exports.ENERGY_CONTRACT_PRICING_MODES_LIST = ENERGY_CONTRACT_PRICING_MODES_LIST;
+module.exports.ENERGY_CONTRACT_STATUS = ENERGY_CONTRACT_STATUS;
+module.exports.ENERGY_CONTRACT_ENERGY_TYPES = ENERGY_CONTRACT_ENERGY_TYPES;
+module.exports.ENERGY_CONTRACT_ENERGY_TYPES_LIST = ENERGY_CONTRACT_ENERGY_TYPES_LIST;
+module.exports.ENERGY_CONTRACT_DIRECTIONS = ENERGY_CONTRACT_DIRECTIONS;
+module.exports.ENERGY_CONTRACT_DIRECTIONS_LIST = ENERGY_CONTRACT_DIRECTIONS_LIST;
+module.exports.ENERGY_CONTRACT_POWER_UNITS = ENERGY_CONTRACT_POWER_UNITS;
+module.exports.ENERGY_CONTRACT_POWER_UNITS_LIST = ENERGY_CONTRACT_POWER_UNITS_LIST;
+module.exports.TARIFF_CALENDAR_GRANULARITIES = TARIFF_CALENDAR_GRANULARITIES;
+module.exports.TARIFF_CALENDAR_GRANULARITIES_LIST = TARIFF_CALENDAR_GRANULARITIES_LIST;
 
 module.exports.LEVEL_MATTER_STATE = LEVEL_MATTER_STATE;

@@ -363,7 +363,26 @@ const MAX_WIDGET_SETTINGS_BYTES = 1024;
 // The type of an integration made only of capabilities (no device surface,
 // none of the core-consumed interfaces of the other types): it must declare
 // at least one of these manifest fields. The list grows with capabilities/.
-const CAPABILITY_MANIFEST_FIELDS = ['widgets', 'scene_triggers', 'scene_actions'];
+const CAPABILITY_MANIFEST_FIELDS = ['widgets', 'scene_triggers', 'scene_actions', 'energy_contracts'];
+
+// Energy contracts capability (capabilities/energy-contracts.md): contract templates,
+// tariff calendars and delegated pricing.
+const MAX_ENERGY_TEMPLATES = 20;
+const MAX_ENERGY_CALENDARS = 10;
+const MAX_ENERGY_TEMPLATE_INPUTS = 16;
+const ENERGY_TEMPLATE_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const ENERGY_INPUT_KEY_REGEX = /^[a-z0-9_]{1,64}$/;
+const ENERGY_INPUT_TYPES = ['number', 'select', 'string', 'time_intervals'];
+const ENERGY_PRICING_MODES = ['rules', 'delegated'];
+// delegated pricing of up to 31 days of 30-minute intervals: 30s ack deadline
+const ENERGY_CONTRACT_PRICE_TIMEOUT_MS = 30 * 1000;
+const ENERGY_CONTRACT_CURRENT_TIMEOUT_MS = 5 * 1000;
+const MAX_ENERGY_INTERVALS_PER_REQUEST = 1488;
+// a delegated cost above this many currency units per kWh is refused (normalizeEnergyCosts)
+const MAX_ENERGY_PRICE_PER_KWH = 10;
+const ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
+// the refresh nudge carries no date: the costs of the last two days are recomputed
+const ENERGY_CALENDAR_REFRESH_LOOKBACK_MS = 2 * 24 * 60 * 60 * 1000;
 // widget.get / widget.get-image typically call a third-party API: the same
 // exception to the 5s ack rule as camera.get-image and weather.get
 const WIDGET_GET_TIMEOUT_MS = 15 * 1000;
@@ -568,6 +587,19 @@ module.exports = {
   MAX_WIDGET_SETTING_STRING_LENGTH,
   MAX_WIDGET_SETTINGS_BYTES,
   CAPABILITY_MANIFEST_FIELDS,
+  MAX_ENERGY_TEMPLATES,
+  MAX_ENERGY_CALENDARS,
+  MAX_ENERGY_TEMPLATE_INPUTS,
+  ENERGY_TEMPLATE_KEY_REGEX,
+  ENERGY_INPUT_KEY_REGEX,
+  ENERGY_INPUT_TYPES,
+  ENERGY_PRICING_MODES,
+  ENERGY_CONTRACT_PRICE_TIMEOUT_MS,
+  ENERGY_CONTRACT_CURRENT_TIMEOUT_MS,
+  MAX_ENERGY_INTERVALS_PER_REQUEST,
+  MAX_ENERGY_PRICE_PER_KWH,
+  ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS,
+  ENERGY_CALENDAR_REFRESH_LOOKBACK_MS,
   WIDGET_GET_TIMEOUT_MS,
   WIDGET_CONTENT_TTL_MIN_SECONDS,
   WIDGET_CONTENT_TTL_MAX_SECONDS,
