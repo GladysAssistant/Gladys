@@ -818,6 +818,10 @@ const ACTIONS = {
   EDF_TEMPO: {
     CONDITION: 'edf-tempo.condition',
   },
+  ENERGY_CONTRACT: {
+    // condition: the current unit price of a contract compared with a threshold
+    CURRENT_PRICE: 'energy-contract.current-price',
+  },
   MQTT: {
     SEND: 'mqtt.send',
   },
@@ -849,6 +853,7 @@ const CONDITION_ACTIONS = [
   ACTIONS.CALENDAR.IS_EVENT_RUNNING,
   ACTIONS.CALENDAR.GET_EVENTS,
   ACTIONS.ECOWATT.CONDITION,
+  ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE,
   ACTIONS.HOUSE.IS_EMPTY,
   ACTIONS.HOUSE.IS_NOT_EMPTY,
 ];
@@ -2194,6 +2199,8 @@ const DASHBOARD_BOX_TYPE = {
   MUSIC: 'music',
   GAUGE: 'gauge',
   ENERGY_CONSUMPTION: 'energy-consumption',
+  // current electricity price of a contract (docs/specs/energy-contracts.md 8.2)
+  ENERGY_PRICE: 'energy-price',
   VOICE_ASSISTANT: 'voice-assistant',
   LINK: 'link',
   PHOTO: 'photo',
