@@ -42,6 +42,31 @@ const {
 const DEFAULT_TIMEZONE = 'Europe/Paris';
 
 /**
+ * @description Convert a setpoint written in the thermostat's own unit into the
+ * unit of the feature it will be written on.
+ *
+ * The two can differ on an external thermostat: `THERMOSTAT_TEMP_UNIT` is what
+ * the presets are configured in, while the real device's setpoint feature has a
+ * unit of its own. Picking Comfort at 21 °C on a Fahrenheit feature must write
+ * 70 °F, not 21 °F.
+ * @param {number} setpoint - The setpoint, in the thermostat's unit.
+ * @param {string} thermostatUnit - The thermostat's unit, 'C' or 'F'.
+ * @param {string} featureUnit - The unit of the feature written on.
+ * @returns {number} The setpoint in the feature's unit.
+ * @example
+ * convertSetpointToFeatureUnit(21, 'C', DEVICE_FEATURE_UNITS.FAHRENHEIT);
+ */
+function convertSetpointToFeatureUnit(setpoint, thermostatUnit, featureUnit) {
+  if (featureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && thermostatUnit === 'C') {
+    return celsiusToFahrenheit(setpoint);
+  }
+  if (featureUnit === DEVICE_FEATURE_UNITS.CELSIUS && thermostatUnit === 'F') {
+    return fahrenheitToCelsius(setpoint);
+  }
+  return setpoint;
+}
+
+/**
  * @description Write a setpoint on an external thermostat.
  *
  * The real device owns the feature, so the write goes through the core, which
@@ -78,11 +103,7 @@ async function writeExternalSetpoint(gladys, targetSelector, setpoint, thermosta
     // A null unit means the value is already in the feature's own: converting it
     // again would command 158 °F for a 70 °F hold, or -6 °C for a 21 °C one.
     if (thermostatUnit !== null) {
-      if (featureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && thermostatUnit === 'C') {
-        value = celsiusToFahrenheit(setpoint);
-      } else if (featureUnit === DEVICE_FEATURE_UNITS.CELSIUS && thermostatUnit === 'F') {
-        value = fahrenheitToCelsius(setpoint);
-      }
+      value = convertSetpointToFeatureUnit(setpoint, thermostatUnit, featureUnit);
     }
     // The real device advertises the range it accepts. Netatmo says 5-30,
     // Zigbee 5-40, Matter -100-200: writing outside it is rejected by the
@@ -794,6 +815,7 @@ module.exports = {
   applySchedules,
   getThermostatFeature,
   writeExternalSetpoint,
+  convertSetpointToFeatureUnit,
   writeExternalMode,
   stopExternalThermostat,
   getRunningMode,
