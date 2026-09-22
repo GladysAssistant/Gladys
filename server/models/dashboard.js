@@ -64,6 +64,8 @@ const boxSchema = Joi.object().keys({
   gauge_color_high: Joi.string(),
   colors: Joi.array().items(Joi.string()),
   show_subscription_prices: Joi.boolean(),
+  // energy-price box: the selector of the contract whose current price is shown
+  energy_contract: Joi.string(),
   period_start_day: Joi.number()
     .integer()
     .min(1)

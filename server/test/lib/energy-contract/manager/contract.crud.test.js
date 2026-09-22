@@ -186,6 +186,24 @@ describe('energyContract: contracts CRUD', () => {
     await expect(energyContract.destroy('edf-base')).to.be.rejectedWith('ENERGY_CONTRACT_NOT_FOUND');
   });
 
+  it('should request a recalculation of every meter from a date', async () => {
+    const emitted = sinon.fake();
+    event.on(EVENTS.ENERGY_CONTRACT.RECALCULATE, emitted);
+    expect(await energyContract.recalculate('2026-01-01')).to.deep.equal({
+      from: '2026-01-01T00:00:00.000Z',
+      electric_meter_device_ids: [],
+    });
+    expect(emitted.callCount).to.equal(0);
+    await energyContract.create(contractPayload());
+    emitted.resetHistory();
+    const result = await energyContract.recalculate(new Date('2026-01-01T00:00:00Z'));
+    expect(result.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID]);
+    expect(emitted.callCount).to.equal(1);
+    expect(emitted.firstCall.args[0].from.toISOString()).to.equal('2026-01-01T00:00:00.000Z');
+    await expect(energyContract.recalculate('nope')).to.be.rejectedWith('from: must be a date');
+    await expect(energyContract.recalculate()).to.be.rejectedWith('from: must be a date');
+  });
+
   it('should compute the status in the contract timezone', () => {
     const base = { timezone: 'Pacific/Kiritimati', valid_from: '2026-01-13', valid_to: null, pricing_mode: 'rules' };
     // 2026-01-12 23:00 UTC is already the 13th in Kiritimati (+14)

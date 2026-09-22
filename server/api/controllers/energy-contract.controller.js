@@ -62,6 +62,17 @@ module.exports = function EnergyContractController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/energy_contract/recalculate recalculate
+   * @apiName recalculate
+   * @apiGroup EnergyContract
+   * @apiDescription Recompute the costs of every meter carrying a contract from a date.
+   */
+  async function recalculate(req, res) {
+    const result = await gladys.energyContract.recalculate(req.body.from);
+    res.json({ success: true, ...result });
+  }
+
+  /**
    * @api {get} /api/v1/energy_contract/template getTemplates
    * @apiName getTemplates
    * @apiGroup EnergyContract
@@ -142,6 +153,7 @@ module.exports = function EnergyContractController(gladys) {
     update: asyncMiddleware(update),
     destroy: asyncMiddleware(destroy),
     preview: asyncMiddleware(preview),
+    recalculate: asyncMiddleware(recalculate),
     getTemplates: asyncMiddleware(getTemplates),
     getTemplate: asyncMiddleware(getTemplate),
     getCurrent: asyncMiddleware(getCurrent),

@@ -6,6 +6,7 @@ const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const logger = require('../../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES, EVENTS } = require('../../../utils/constants');
 const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 
@@ -35,6 +36,12 @@ async function init() {
         await this.calculateProductionFromIndexThirtyMinutes(now);
         await this.calculateCostEveryThirtyMinutes(now);
         await this.delegatedCatchUp();
+        // price-changed scene trigger (spec 8.2): never blocks the job
+        try {
+          await this.gladys.energyContract.checkPriceChanges();
+        } catch (e) {
+          logger.warn(`Energy monitoring: unable to check the contract price changes: ${e.message}`);
+        }
       },
     );
   }

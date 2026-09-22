@@ -9,6 +9,7 @@ const { destroy } = require('./contract.destroy');
 const { getStatus } = require('./contract.getStatus');
 const { preview } = require('./contract.preview');
 const { getCurrent } = require('./contract.getCurrent');
+const { checkPriceChanges } = require('./contract.checkPriceChanges');
 const { priceContractIntervals, getCompiledTariff } = require('./contract.price');
 const { getDefaultElectricMeterFeatureId } = require('./contract.getDefaultElectricMeterFeatureId');
 const { getMeterConsumptionFeature, getMeterIntervals, getMeterCumulative } = require('./meter.intervals');
@@ -26,6 +27,7 @@ const { getTemplates, getTemplate, getIntegrationTemplates, getInternalTemplates
 const { getLegacyPrices } = require('./energyPrice.project');
 const { migrateFromEnergyPrice, verifyMigratedContract } = require('./migration.fromEnergyPrice');
 const { init } = require('./contract.init');
+const { recalculate } = require('./contract.recalculate');
 
 /**
  * @description Energy contracts manager.
@@ -47,6 +49,8 @@ const EnergyContract = function EnergyContract(event, stateManager, serviceManag
   this.externalIntegration = null;
   this.compiledTariffs = new Map();
   this.currentPriceCache = new Map();
+  // last price / label observed per contract id, for the price-changed scene trigger (spec 8.2)
+  this.lastKnownPrices = new Map();
   this.calendarRecalculations = new Map();
   this.catalogueCache = null;
 };
@@ -60,8 +64,10 @@ EnergyContract.prototype.create = create;
 EnergyContract.prototype.update = update;
 EnergyContract.prototype.destroy = destroy;
 EnergyContract.prototype.requestRecalculation = requestRecalculation;
+EnergyContract.prototype.recalculate = recalculate;
 EnergyContract.prototype.preview = preview;
 EnergyContract.prototype.getCurrent = getCurrent;
+EnergyContract.prototype.checkPriceChanges = checkPriceChanges;
 EnergyContract.prototype.priceContractIntervals = priceContractIntervals;
 EnergyContract.prototype.getCompiledTariff = getCompiledTariff;
 EnergyContract.prototype.getDefaultElectricMeterFeatureId = getDefaultElectricMeterFeatureId;

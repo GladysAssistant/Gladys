@@ -140,6 +140,18 @@ describe('energy_contract API', () => {
     gladys.stateManager.deleteState('service', 'edf-tempo');
   });
 
+  it('should request a recalculation from a date', async () => {
+    await authenticatedRequest
+      .post('/api/v1/energy_contract/recalculate')
+      .send({ from: '2026-01-01' })
+      .expect(200)
+      .then((res) => expect(res.body).to.deep.include({ success: true, from: '2026-01-01T00:00:00.000Z' }));
+    await authenticatedRequest
+      .post('/api/v1/energy_contract/recalculate')
+      .send({})
+      .expect(400);
+  });
+
   it('should list the calendars and their entries', async () => {
     await gladys.energyContract.declareCalendar({ key: 'api-cal', granularity: 'day', values: ['a'] }, null);
     await gladys.energyContract.publishCalendarEntries('api-cal', [{ date: '2026-01-12', value: 'a' }], {

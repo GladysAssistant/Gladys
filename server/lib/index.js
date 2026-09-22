@@ -124,6 +124,9 @@ function Gladys(params = {}) {
   );
   gateway.scene = scene;
   gateway.energyPrice = energyContract;
+  // the energy-contract.current-price scene condition reads the current price of a
+  // contract: the manager is created before the scene manager, attached post-construction
+  scene.energyContract = energyContract;
   // The device migration (device.migrate) rewrites scenes: the scene manager
   // is created after the device manager, so it is attached post-construction
   // (same pattern as gateway.scene above). Dashboards have no RAM cache and

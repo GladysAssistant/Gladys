@@ -63,8 +63,10 @@ describe('EnergyMonitoring: contract jobs', () => {
     energyMonitoring.calculateProductionFromIndexThirtyMinutes = fake.resolves(null);
     energyMonitoring.calculateCostEveryThirtyMinutes = fake.resolves(null);
     energyMonitoring.delegatedCatchUp = fake.resolves(null);
+    energyContract.checkPriceChanges = fake.resolves([]);
     await thirtyMinutes();
     expect(energyMonitoring.delegatedCatchUp.callCount).to.equal(1);
+    expect(energyContract.checkPriceChanges.callCount).to.equal(1);
     const [rule, closeJob] = gladys.scheduler.scheduleJob.secondCall.args;
     expect(rule.hour).to.equal(2);
     energyMonitoring.closeBillingPeriods = fake.resolves(null);

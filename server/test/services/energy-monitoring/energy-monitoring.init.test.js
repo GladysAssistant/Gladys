@@ -49,6 +49,7 @@ describe('EnergyMonitoring.init', () => {
     gladys = {
       variable,
       device,
+      energyContract: { checkPriceChanges: fake.resolves([]) },
       event: { on: fake.returns(null) },
       scheduler: mockScheduler,
       job: {
@@ -167,6 +168,16 @@ describe('EnergyMonitoring.init', () => {
       assert.calledOnce(calculateConsumptionFromIndexThirtyMinutes);
       assert.calledOnce(calculateProductionFromIndexThirtyMinutes);
       assert.calledOnce(calculateCostEveryThirtyMinutes);
+      assert.calledOnce(gladys.energyContract.checkPriceChanges);
+    });
+
+    it('should not fail the job when the price change check fails', async () => {
+      gladys.energyContract.checkPriceChanges = fake.rejects(new Error('boom'));
+      await energyMonitoring.init();
+      const jobFunction = mockScheduler.scheduleJob.getCall(0).args[1];
+      await jobFunction();
+      assert.calledOnce(calculateCostEveryThirtyMinutes);
+      assert.calledOnce(gladys.energyContract.checkPriceChanges);
     });
 
     it('should pass current time to both calculation functions', async () => {

@@ -1,6 +1,6 @@
 const sinon = require('sinon').createSandbox();
 
-const { fake, assert } = sinon;
+const { fake } = sinon;
 const { expect } = require('chai');
 
 const EnergyMonitoringService = require('../../../services/energy-monitoring');
@@ -23,6 +23,12 @@ describe('EnergyMonitoring Service', () => {
       device: {
         get: fake.resolves([]),
       },
+      event: {
+        on: fake.returns(null),
+      },
+      energyContract: {
+        checkPriceChanges: fake.resolves([]),
+      },
       scheduler: mockScheduler,
       job: {
         updateProgress: fake.returns(null),
@@ -36,22 +42,25 @@ describe('EnergyMonitoring Service', () => {
   it('should start the energy monitoring service and initialize handler', async () => {
     await energyMonitoringService.start();
 
-    // Verify scheduler was called to schedule both jobs (30 min + 24h)
-    assert.calledThrice(mockScheduler.scheduleJob);
+    // Verify scheduler was called to schedule the jobs (30 min + billing period + two 24h)
+    expect(mockScheduler.scheduleJob.callCount).to.equal(4);
 
     // Verify that 30-minute job is scheduled
     const thirtyMinJobCall = mockScheduler.scheduleJob.getCall(0);
     expect(thirtyMinJobCall.args[0]).to.equal('0 0,30 * * * *');
 
+    // Verify that the billing period job is scheduled at 02:00
+    expect(mockScheduler.scheduleJob.getCall(1).args[0]).to.have.property('hour', 2);
+
     // Verify that 24h job is scheduled with RecurrenceRule
-    const dailyJobCall = mockScheduler.scheduleJob.getCall(1);
+    const dailyJobCall = mockScheduler.scheduleJob.getCall(2);
     const rule = dailyJobCall.args[0];
     expect(rule).to.have.property('hour', 11);
     expect(rule).to.have.property('minute', 10);
     expect(rule).to.have.property('tz', 'Europe/Paris');
 
     // Verify that 24h job is scheduled with RecurrenceRule
-    const dailyJobCall2 = mockScheduler.scheduleJob.getCall(2);
+    const dailyJobCall2 = mockScheduler.scheduleJob.getCall(3);
     const rule2 = dailyJobCall2.args[0];
     expect(rule2).to.have.property('hour', 16);
     expect(rule2).to.have.property('minute', 10);

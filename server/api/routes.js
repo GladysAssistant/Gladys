@@ -1071,6 +1071,11 @@ function getRoutes(gladys) {
       admin: true,
       controller: energyContractController.preview,
     },
+    'post /api/v1/energy_contract/recalculate': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.recalculate,
+    },
     'get /api/v1/energy_contract/template': {
       authenticated: true,
       controller: energyContractController.getTemplates,
