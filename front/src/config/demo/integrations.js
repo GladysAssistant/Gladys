@@ -1,5 +1,5 @@
 import { CAMERA_IMAGE } from './assets';
-import { minutesAgo } from './helpers';
+import { minutesAgo, uuid } from './helpers';
 
 // Demo fixtures for the integration pages: every "/api/v1/service/*" route
 // and the devices those pages display.
@@ -1765,20 +1765,168 @@ const integrations = {
     networkModeValid: true
   },
   'get /api/v1/service/telegram/link': { link: 'https://t.me/GladysAssistantBot?start=demo' },
-  // Contracts are downloaded from a GitHub release on a real instance: two
-  // French contracts are enough to show what the import page does
-  'get /api/v1/service/energy-monitoring/contracts': {
-    'edf-base': {
-      6: [{ start_date: '2024-02-01', price: 0.2516 }],
-      9: [{ start_date: '2024-02-01', price: 0.2516 }]
+  // The community catalogue is downloaded from a GitHub release on a real instance:
+  // the demo serves the merged template list of the contracts tab directly
+  'get /api/v1/energy_contract/template': [
+    {
+      key: 'edf-tempo',
+      name: { en: 'EDF Tempo', fr: 'EDF Tempo' },
+      country: 'FR',
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      pricing_mode: 'rules',
+      version: '2026-02-01',
+      calendars: ['tempo'],
+      inputs: [],
+      provider: { kind: 'internal', service_id: null, name: 'edf-tempo', selector: 'edf-tempo', running: true }
     },
-    'edf-peak-off-peak': {
-      6: [{ start_date: '2024-02-01', peak_price: 0.27, off_peak_price: 0.2068 }],
-      9: [{ start_date: '2024-02-01', peak_price: 0.27, off_peak_price: 0.2068 }]
+    {
+      key: 'edf-base',
+      variant: '6',
+      name: { en: 'EDF Base 6 kVA', fr: 'EDF Base 6 kVA' },
+      country: 'FR',
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      pricing_mode: 'rules',
+      version: 'v1',
+      subscribed_power: 6,
+      power_unit: 'kVA',
+      calendars: [],
+      inputs: [],
+      provider: { kind: 'community', name: 'energy-contracts', version: 'v1.4.0' }
+    },
+    {
+      key: 'edf-peak-off-peak',
+      variant: '9',
+      name: { en: 'EDF Peak / off-peak 9 kVA', fr: 'EDF Heures pleines / creuses 9 kVA' },
+      country: 'FR',
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      pricing_mode: 'rules',
+      version: 'v1',
+      subscribed_power: 9,
+      power_unit: 'kVA',
+      calendars: [],
+      inputs: [{ key: 'off_peak_slots', type: 'time_intervals', required: true }],
+      provider: { kind: 'community', name: 'energy-contracts', version: 'v1.4.0' }
     }
+  ],
+  'get /api/v1/energy_contract/community/edf-base': {
+    key: 'edf-base',
+    variant: '6',
+    name: { en: 'EDF Base 6 kVA', fr: 'EDF Base 6 kVA' },
+    country: 'FR',
+    currency: 'EUR',
+    timezone: 'Europe/Paris',
+    pricing_mode: 'rules',
+    version: 'v1',
+    subscribed_power: 6,
+    power_unit: 'kVA',
+    calendars: [],
+    inputs: [],
+    tariff: {
+      tariff_version: 1,
+      components: [
+        { key: 'energy', kind: 'consumption', rules: [], fallback: { price: 0.2516 } },
+        { key: 'subscription', kind: 'fixed', amount: 12.8, per: 'month' }
+      ]
+    },
+    provider: { kind: 'community', name: 'energy-contracts', version: 'v1.4.0' }
   },
-  'get /api/v1/energy_price': [],
-  'post /api/v1/energy_price': { success: true },
+  'get /api/v1/energy_contract': [
+    {
+      id: 'contract-1',
+      selector: 'edf-tempo-9-kva',
+      name: 'EDF Tempo 9 kVA',
+      electric_meter_device_id: uuid('electric-meter'),
+      valid_from: '2025-02-01',
+      valid_to: null,
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      billing_period_start_day: 1,
+      subscribed_power: 9,
+      power_unit: 'kVA',
+      provider_kind: 'internal',
+      provider_service_id: null,
+      provider_service: null,
+      template_key: 'edf-tempo',
+      template_version: '2026-02-01',
+      pricing_mode: 'rules',
+      status: 'active',
+      tariff: {
+        tariff_version: 1,
+        calendars: ['tempo'],
+        components: [
+          {
+            key: 'energy',
+            kind: 'consumption',
+            rules: [
+              { label: 'Red peak', when: { calendar: { tempo: 'red' }, time: [['06:00', '22:00']] }, price: 0.7562 },
+              { label: 'Red off-peak', when: { calendar: { tempo: 'red' } }, price: 0.1568 },
+              {
+                label: 'White peak',
+                when: { calendar: { tempo: 'white' }, time: [['06:00', '22:00']] },
+                price: 0.1894
+              },
+              { label: 'White off-peak', when: { calendar: { tempo: 'white' } }, price: 0.1486 },
+              { label: 'Blue peak', when: { calendar: { tempo: 'blue' }, time: [['06:00', '22:00']] }, price: 0.1609 }
+            ],
+            fallback: { label: 'Blue off-peak', price: 0.1296 }
+          },
+          { key: 'subscription', kind: 'fixed', amount: 17.11, per: 'month' }
+        ]
+      },
+      inputs: null,
+      migration_warning: null
+    }
+  ],
+  'post /api/v1/energy_contract': { success: true },
+  'post /api/v1/energy_contract/preview': {
+    from: '2026-09-15T12:00:00.000Z',
+    to: '2026-09-22T12:00:00.000Z',
+    currency: 'EUR',
+    intervals: 336,
+    kwh: 168,
+    total: 31.02,
+    components: { energy: 27.16, subscription: 3.86 },
+    samples: [
+      { starts_at: '2026-09-15T12:00:00.000Z', kwh: 0.5, unit_price: 0.1609, cost: 0.0805, label: 'Blue peak' },
+      { starts_at: '2026-09-15T22:00:00.000Z', kwh: 0.5, unit_price: 0.1296, cost: 0.0648, label: 'Blue off-peak' }
+    ],
+    warnings: {},
+    synthetic: false
+  },
+  'get /api/v1/energy_calendar': [
+    {
+      key: 'tempo',
+      granularity: 'day',
+      timezone: 'Europe/Paris',
+      day_starts_at: '06:00',
+      values: ['blue', 'white', 'red'],
+      first_at: '2023-09-01T04:00:00.000Z',
+      last_at: '2026-09-22T04:00:00.000Z',
+      orphaned: false,
+      provider_service: { name: 'edf-tempo', selector: 'edf-tempo', status: 'RUNNING', type: 'internal' }
+    }
+  ],
+  'get /api/v1/energy_calendar/tempo': [
+    { starts_at: '2026-09-20T04:00:00.000Z', value: 'blue' },
+    { starts_at: '2026-09-21T04:00:00.000Z', value: 'blue' },
+    { starts_at: '2026-09-22T04:00:00.000Z', value: 'blue' }
+  ],
+  // Current price of the demo contract, as the electricity price widget asks
+  // for it: a Tempo blue day, peak hours until 22:00 UTC
+  'get /api/v1/energy_contract/edf-tempo-9-kva/current': {
+    price: 0.1609,
+    currency: 'EUR',
+    unit: 'kWh',
+    label: 'Blue peak',
+    valid_until: '2026-09-22T22:00:00.000Z',
+    next_price: 0.1296,
+    next_label: 'Blue off-peak',
+    cumulative: { day: 6.2, month: 154, billing_period: 154 },
+    contract: { id: 'contract-1', selector: 'edf-tempo-9-kva', name: 'EDF Tempo 9 kVA' }
+  },
   // Gladys Plus AI quota, one bucket for text and one for images
   'get /api/v1/gateway/aichat/quota': {
     text: { remaining: 940, max: 1000, reset_in_seconds: 3600 * 9 },

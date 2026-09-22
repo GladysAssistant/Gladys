@@ -29,6 +29,7 @@ export const ACTION_ICON = {
   [ACTIONS.CALENDAR.GET_EVENTS]: 'fe fe-calendar',
   [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
   [ACTIONS.EDF_TEMPO.CONDITION]: 'fe fe-zap',
+  [ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE]: 'fe fe-dollar-sign',
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
@@ -68,6 +69,7 @@ export const TRIGGER_ICON = {
   [EVENTS.MQTT.RECEIVED]: 'fe fe-hash',
   [EVENTS.WEATHER.ALERT_RAISED]: 'fe fe-alert-triangle',
   [EVENTS.WEATHER.ALERT_ENDED]: 'fe fe-check-circle',
+  [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]: 'fe fe-dollar-sign',
   [EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT]: 'fe fe-box'
 };
 
@@ -108,7 +110,8 @@ export const ACTION_CATEGORIES = [
       ACTIONS.ALARM.CHECK_ALARM_MODE,
       ACTIONS.CALENDAR.IS_EVENT_RUNNING,
       ACTIONS.ECOWATT.CONDITION,
-      ACTIONS.EDF_TEMPO.CONDITION
+      ACTIONS.EDF_TEMPO.CONDITION,
+      ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE
     ]
   },
   {
@@ -197,6 +200,11 @@ export const TRIGGER_CATEGORIES = [
     key: 'weather',
     color: 'yellow',
     items: [EVENTS.WEATHER.ALERT_RAISED, EVENTS.WEATHER.ALERT_ENDED]
+  },
+  {
+    key: 'energy',
+    color: 'yellow',
+    items: [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]
   },
   {
     key: 'advanced',

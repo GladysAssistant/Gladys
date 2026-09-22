@@ -15,6 +15,7 @@ import CalendarEventIsComing from './triggers/CalendarEventIsComing';
 import AlarmModeTrigger from './triggers/AlarmModeTrigger';
 import MQTTReceivedTrigger from './triggers/MQTTReceivedTrigger';
 import WeatherAlert from './triggers/WeatherAlert';
+import EnergyPriceChangedTrigger from './triggers/EnergyPriceChangedTrigger';
 import ExternalIntegrationTrigger from './triggers/ExternalIntegrationTrigger';
 import { SCENE_DECLARATION_KINDS, getSceneDeclarationTitle } from './sceneIntegrations';
 
@@ -210,6 +211,13 @@ const TriggerCard = ({ children, ...props }) => {
         )}
         {WEATHER_ALERT_TRIGGERS.includes(props.trigger.type) && (
           <WeatherAlert
+            updateTriggerProperty={props.updateTriggerProperty}
+            index={props.index}
+            trigger={props.trigger}
+          />
+        )}
+        {props.trigger.type === EVENTS.ENERGY_CONTRACT.PRICE_CHANGED && (
+          <EnergyPriceChangedTrigger
             updateTriggerProperty={props.updateTriggerProperty}
             index={props.index}
             trigger={props.trigger}

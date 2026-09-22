@@ -391,7 +391,8 @@
       "chips": "Pastilles d'état",
       "actions": "Actions rapides",
       "house-view": "Vue de la maison",
-      "external-widget": "Widget d'intégration"
+      "external-widget": "Widget d'intégration",
+      "energy-price": "Prix de l'électricité"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -849,6 +850,18 @@
         "now": "Maintenant",
         "confirmAction": "Lancer « {{label}} » ?",
         "actionError": "L'action a échoué."
+      },
+      "energyPrice": {
+        "editName": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Nom affiché sur le dashboard",
+        "editContract": "Contrat d'électricité",
+        "noContract": "Aucun contrat d'électricité pour le moment.",
+        "noContractLink": "Créez-en un dans l'intégration de suivi énergétique.",
+        "notConfigured": "Sélectionnez un contrat dans les réglages du widget.",
+        "until": "Jusqu'à {{time}}",
+        "unknownPrice": "Prix inconnu",
+        "error": "Impossible de charger le prix de l'électricité. Vérifiez que le contrat existe toujours.",
+        "cumulativeToday": "Aujourd'hui : {{kwh}} kWh"
       }
     },
     "editDashboardBackgroundLabel": "Ambiance de fond",
@@ -1367,7 +1380,80 @@
       "circularReference": "référence circulaire",
       "selfReference": "auto-référence",
       "fixAutomatically": "Corriger",
-      "fixing": "Correction en cours..."
+      "fixing": "Correction en cours...",
+      "contracts": {
+        "tab": "Contrats",
+        "description": "Un contrat décrit comment la consommation d'un compteur est tarifée sur une période. Choisissez un modèle du catalogue communautaire ou d'une intégration installée, renseignez ses paramètres et vérifiez l'aperçu avant d'enregistrer.",
+        "empty": "Aucun contrat pour le moment. Créez-en un pour commencer à calculer le coût de votre consommation.",
+        "errorLoading": "Erreur lors du chargement des contrats.",
+        "confirmDelete": "Voulez-vous vraiment supprimer ce contrat ? Les coûts de sa période seront retirés au prochain calcul.",
+        "ongoing": "en cours",
+        "createTitle": "Nouveau contrat",
+        "editTitle": "Modifier le contrat",
+        "status": {
+          "active": "actif",
+          "scheduled": "à venir",
+          "expired": "expiré",
+          "orphaned": "orphelin"
+        },
+        "mode": {
+          "rules": "moteur de règles",
+          "delegated": "calculé par l'intégration"
+        },
+        "provider": {
+          "community": "communauté",
+          "integration": "intégration",
+          "internal": "Gladys",
+          "user": "manuel"
+        },
+        "providerStopped": "intégration arrêtée",
+        "orphanedHelp": "L'intégration qui calcule ce contrat n'est plus installée : ses coûts ne sont plus calculés. Réinstallez-la ou remplacez le contrat.",
+        "migrationWarning": "Ce contrat a été converti depuis vos anciens tarifs : le nouveau calcul diffère de {{gap}}% de l'ancien sur les 7 derniers jours. Vérifiez ses prix.",
+        "wizard": {
+          "meter": "Compteur",
+          "template": "Modèle",
+          "parameters": "Paramètres",
+          "preview": "Aperçu"
+        },
+        "allCountries": "Tous les pays",
+        "searchTemplate": "Rechercher un fournisseur ou un contrat…",
+        "noTemplate": "Aucun modèle ne correspond.",
+        "publishAsIntegration": "Ou publiez-le en intégration externe : une intégration peut déclarer des modèles de contrat, alimenter des calendriers tarifaires (couleurs de jour, prix spot, jours fériés) et même calculer le coût elle-même.",
+        "selectedTemplate": "Modèle :",
+        "parameters": "Paramètres du contrat",
+        "timezone": "Fuseau horaire",
+        "timezonePlaceholder": "Fuseau du système",
+        "billingPeriodStartDay": "Jour de début de la période de facturation",
+        "delegatedHelp": "Le coût de ce contrat est calculé par son intégration : seuls les frais fixes du tarif sont calculés par Gladys, et il n'y a pas d'aperçu.",
+        "jsonMode": "Avancé : éditer la définition du tarif (JSON)",
+        "tariffJson": "Définition du tarif",
+        "tariffJsonHelp": "La définition est validée à l'enregistrement. Le format est documenté dans le dépôt",
+        "exportTemplate": "Exporter comme modèle",
+        "previewDescription": "Votre consommation réelle des 7 derniers jours tarifée avec ce contrat, sans rien enregistrer.",
+        "previewSynthetic": "Ce compteur n'a pas encore de consommation : l'aperçu utilise un profil plat de 0,5 kWh par 30 minutes.",
+        "previewTotal": "Total sur 7 jours",
+        "previewWarnings": "Intervalles tarifés au prix de repli (valeur de calendrier manquante) :",
+        "intervals": "intervalles",
+        "sampleTime": "Heure",
+        "samplePrice": "Prix unitaire",
+        "sampleCost": "Coût",
+        "sampleLabel": "Tarif",
+        "calendars": {
+          "title": "Calendriers tarifaires",
+          "description": "Les valeurs datées utilisées par les contrats (couleurs de jour, prix spot, jours fériés), publiées par les intégrations. Un calendrier sans fournisseur conserve ses valeurs mais n'est plus mis à jour.",
+          "empty": "Aucun calendrier pour le moment.",
+          "key": "Clé",
+          "provider": "Fournisseur",
+          "granularity": "Granularité",
+          "coverage": "Couverture",
+          "orphaned": "sans fournisseur",
+          "lastValues": "Dernières valeurs",
+          "noValue": "Aucune valeur.",
+          "recalculateFrom": "Recalculer les coûts depuis le",
+          "recalculate": "Recalculer",
+          "recalculated": "Le recalcul a été lancé. Vous pouvez suivre sa progression dans les tâches de fond."
+        }
+      }
     },
     "caldav": {
       "title": "CalDAV",
@@ -3608,6 +3694,23 @@
         "computedExplanationText": "À la place d'un volume fixe, vous pouvez entrer ici un calcul basé sur une variable de scène, par exemple pour parler moins fort la nuit. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc.",
         "textLabel": "Message à dire sur l'enceinte",
         "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
+      },
+      "energyCurrentPrice": {
+        "description": "La scène ne continuera que si le prix actuel du kWh du contrat sélectionné respecte la condition ci-dessous.",
+        "contractLabel": "Contrat d'énergie",
+        "operatorLabel": "Continuer si le prix est",
+        "valueLabel": "Seuil (par kWh)",
+        "valuePlaceholder": "0.20",
+        "error": "Impossible de charger les contrats d'énergie.",
+        "noContract": "Aucun contrat d'énergie : créez-en un dans l'intégration Suivi d'énergie.",
+        "operators": {
+          "equal": "égal à",
+          "different": "différent de",
+          "superior": "supérieur à",
+          "superiorOrEqual": "supérieur ou égal à",
+          "inferior": "inférieur à",
+          "inferiorOrEqual": "inférieur ou égal à"
+        }
       }
     },
     "actions": {
@@ -3693,6 +3796,9 @@
       },
       "external-integration": {
         "scene-action": "Action d'intégration"
+      },
+      "energy-contract": {
+        "current-price": "Condition sur le prix de l'électricité"
       }
     },
     "actionsDescriptions": {
@@ -3774,6 +3880,9 @@
       },
       "external-integration": {
         "scene-action": "Une action déclarée par une intégration externe"
+      },
+      "energy-contract": {
+        "current-price": "Continuer seulement si le prix actuel d'un contrat d'énergie respecte un seuil"
       }
     },
     "actionCategories": {
@@ -3863,6 +3972,9 @@
       },
       "external-integration": {
         "scene-event": "Déclencheur d'intégration"
+      },
+      "energy-contract": {
+        "price-changed": "Changement de prix de l'électricité"
       }
     },
     "triggersDescriptions": {
@@ -3909,6 +4021,9 @@
       },
       "external-integration": {
         "scene-event": "Un déclencheur déclaré par une intégration externe"
+      },
+      "energy-contract": {
+        "price-changed": "Quand le prix ou la tranche tarifaire d'un contrat d'énergie change"
       }
     },
     "triggerCategories": {
@@ -3918,7 +4033,8 @@
       "alarm": "Alarme",
       "weather": "Météo",
       "advanced": "Avancé",
-      "integrations": "Intégrations"
+      "integrations": "Intégrations",
+      "energy": "Énergie"
     },
     "triggersCard": {
       "newState": {
@@ -4052,6 +4168,12 @@
           "severe": "Sévère (orange)",
           "extreme": "Extrême (rouge)"
         }
+      },
+      "energyPriceChanged": {
+        "description": "Ce déclencheur s'active quand le prix actuel du kWh (ou la tranche tarifaire) du contrat sélectionné change, par exemple au passage des heures creuses aux heures pleines.",
+        "contractLabel": "Contrat d'énergie",
+        "anyContract": "Tous les contrats",
+        "error": "Impossible de charger les contrats d'énergie."
       }
     },
     "searchActionsPlaceholder": "Rechercher une action…",

@@ -154,6 +154,13 @@ const getActionSummary = (action, dictionary) => {
           : null
       ]);
     }
+    case ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE:
+      return joinParts([
+        truncate(action.energy_contract),
+        action.operator && action.value !== undefined && action.value !== null && action.value !== ''
+          ? `${action.operator} ${action.value}`
+          : null
+      ]);
     case ACTIONS.CONDITION.CHECK_TIME: {
       const days = Array.isArray(action.days_of_the_week)
         ? action.days_of_the_week
@@ -220,6 +227,8 @@ const getTriggerSummary = (trigger, dictionary) => {
     case EVENTS.WEATHER.ALERT_RAISED:
     case EVENTS.WEATHER.ALERT_ENDED:
       return joinParts([trigger.house, trigger.weather_alert_type]);
+    case EVENTS.ENERGY_CONTRACT.PRICE_CHANGED:
+      return truncate(trigger.energy_contract);
     case EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT:
       return listDeclaredFields(trigger.fields);
     default:
