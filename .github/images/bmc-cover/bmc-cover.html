@@ -1,0 +1,197 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 1600px;
+    height: 400px;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: #1c2334;
+    position: relative;
+    /* Horizon glass scene: same recipe as the app's default dashboard theme */
+    background-image:
+      radial-gradient(46% 185% at 6% -25%, rgba(126, 166, 233, 0.62), transparent 62%),
+      radial-gradient(40% 165% at 68% -20%, rgba(244, 190, 148, 0.5), transparent 60%),
+      radial-gradient(44% 190% at 92% 125%, rgba(187, 160, 228, 0.48), transparent 62%),
+      radial-gradient(38% 175% at 22% 135%, rgba(150, 212, 195, 0.42), transparent 60%),
+      linear-gradient(160deg, #eef3fb 0%, #eeeaf7 48%, #f7efe6 100%);
+  }
+
+  /* ---------------- Left column ---------------- */
+  .copy {
+    position: absolute;
+    left: 78px;
+    top: 0;
+    height: 400px;
+    width: 640px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Buy Me a Coffee lays the round profile picture over the bottom-left of
+       the cover, so the copy sits a little above the optical centre. */
+    padding-bottom: 36px;
+    z-index: 2;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .brand img {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    box-shadow: 0 8px 22px rgba(44, 62, 118, 0.18);
+  }
+
+  .brand .name {
+    font-size: 29px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-size: 45px;
+    line-height: 1.13;
+    font-weight: 800;
+    letter-spacing: -0.033em;
+    margin-bottom: 24px;
+  }
+
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(100deg, #3d6df0 0%, #7a5af0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .chips {
+    display: flex;
+    gap: 9px;
+    flex-wrap: nowrap;
+  }
+
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px 9px 13px;
+    font-size: 15.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-radius: 999px;
+    color: #2a3348;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 16px rgba(44, 62, 118, 0.09);
+  }
+
+  .chip svg {
+    width: 17px;
+    height: 17px;
+    stroke: #3d6df0;
+    stroke-width: 2.2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ---------------- Right: the live demo dashboard ---------------- */
+  .stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1600px;
+    height: 400px;
+    perspective: 1900px;
+    z-index: 1;
+  }
+
+  .window {
+    position: absolute;
+    left: 788px;
+    top: 46px;
+    width: 1064px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    transform: rotateY(-15deg) rotateX(3deg) rotateZ(-1.2deg);
+    transform-origin: left center;
+    box-shadow:
+      0 44px 90px rgba(44, 62, 118, 0.28),
+      0 10px 26px rgba(44, 62, 118, 0.14);
+  }
+
+  .window img {
+    display: block;
+    width: 100%;
+  }
+
+  /* glass sheen over the screenshot */
+  .window::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 42%);
+  }
+
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="window">
+      <img id="shot" src="../gladys-demo-dashboard.webp" alt="">
+    </div>
+  </div>
+
+  <div class="copy">
+    <div class="brand">
+      <img src="../../../front/src/assets/icons/android-icon-512x512.png" alt="">
+      <span class="name">Gladys Assistant</span>
+    </div>
+    <h1 data-en="A smart home<br>that <em>stays yours.</em>"
+        data-fr="Une maison connectée<br>qui <em>reste la vôtre.</em>">A smart home<br>that <em>stays yours.</em></h1>
+    <div class="chips">
+      <div class="chip">
+        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <span data-en="Open source" data-fr="Open source">Open source</span>
+      </div>
+      <div class="chip">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></svg>
+        <span data-en="Self-hosted" data-fr="Auto-hébergé">Self-hosted</span>
+      </div>
+      <div class="chip">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span data-en="Privacy-first" data-fr="100&nbsp;% local">Privacy-first</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ?lang=fr renders the French copy; anything else keeps the English one.
+    var lang = new URLSearchParams(location.search).get('lang') === 'fr' ? 'fr' : 'en';
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(node) {
+      node.innerHTML = node.dataset[lang];
+    });
+    // The demo speaks the language of the browser, so each cover gets the
+    // screenshot captured in its own locale.
+    if (lang === 'fr') {
+      document.getElementById('shot').src = '../gladys-demo-dashboard-fr.webp';
+    }
+  </script>
+</body>
+</html>
