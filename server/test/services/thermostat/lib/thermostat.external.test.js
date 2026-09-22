@@ -523,8 +523,12 @@ describe('thermostat.onExternalSetpointChanged', () => {
     sinon.restore();
   });
 
+  // The hold is armed through the real `setManualHold`, so what the test asserts
+  // is the param actually written — and, just as importantly, that nothing is
+  // written back to the appliance.
   const loadListener = () =>
     proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
+      './thermostat.setValue': { holdExpiry: fake.resolves(null) },
       '../../../utils/logger': {
         debug: fake.returns(null),
         info: fake.returns(null),
@@ -541,12 +545,20 @@ describe('thermostat.onExternalSetpointChanged', () => {
   };
 
   const buildHandler = (devices = [externalThermostat]) => ({
-    gladys: { device: { get: fake.resolves(devices) } },
+    gladys: {
+      device: { get: fake.resolves(devices), setParam: fake.resolves(null), setValue: fake.resolves(null) },
+      event: { emit: fake.returns(null) },
+    },
     windowSelectorsCache: null,
     targetSelectorsCache: null,
     selfWrittenSetpoints: new Map(),
-    setValue: fake.resolves(null),
   });
+
+  // The setpoint a hold was armed on, or null when none was.
+  const heldSetpoint = (handler) => {
+    const call = handler.gladys.device.setParam.getCalls().find((c) => c.args[1] === 'THERMOSTAT_MANUAL_SETPOINT');
+    return call ? call.args[2] : null;
+  };
 
   it('should hold a setpoint changed on the device itself', async () => {
     const mod = loadListener();
@@ -554,8 +566,12 @@ describe('thermostat.onExternalSetpointChanged', () => {
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
 
-    assert.calledOnce(handler.setValue);
-    expect(handler.setValue.firstCall.args[2]).to.equal(19);
+    expect(heldSetpoint(handler)).to.equal('19');
+    // The device already carries this value — it is what it just reported.
+    // Writing it back would be a cloud call per turn of the dial, and would hand
+    // the running mode back to a thermostat that may be in AUTO or in its own
+    // vendor programme.
+    assert.notCalled(handler.gladys.device.setValue);
   });
 
   // Our own write is reported back as the very same event: taking it for a change
@@ -568,7 +584,7 @@ describe('thermostat.onExternalSetpointChanged', () => {
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
 
-    assert.notCalled(handler.setValue);
+    expect(heldSetpoint(handler)).to.equal(null);
     // The mark is KEPT, not consumed: a change is what differs from the last
     // value this service wrote.
     expect(handler.selfWrittenSetpoints.get('netatmo-setpoint')).to.equal(21);
@@ -588,7 +604,7 @@ describe('thermostat.onExternalSetpointChanged', () => {
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
 
-    assert.notCalled(handler.setValue);
+    expect(heldSetpoint(handler)).to.equal(null);
   });
 
   it('should hold a change made on the device after our own value was reported back', async () => {
@@ -600,7 +616,7 @@ describe('thermostat.onExternalSetpointChanged', () => {
     // Someone turns the dial: this one differs, so it is a real change.
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 23);
 
-    assert.calledOnce(handler.setValue);
+    expect(heldSetpoint(handler)).to.equal('23');
   });
 
   it('should hold a change to a different value than the one written', async () => {
@@ -610,7 +626,7 @@ describe('thermostat.onExternalSetpointChanged', () => {
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
 
-    assert.calledOnce(handler.setValue);
+    expect(heldSetpoint(handler)).to.equal('19');
   });
 
   it('should ignore a thermostat whose target param disappeared', async () => {
@@ -623,7 +639,7 @@ describe('thermostat.onExternalSetpointChanged', () => {
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
 
-    assert.notCalled(handler.setValue);
+    expect(heldSetpoint(handler)).to.equal(null);
   });
 
   it('should ignore a feature no thermostat drives', async () => {
@@ -632,7 +648,7 @@ describe('thermostat.onExternalSetpointChanged', () => {
 
     await mod.onExternalSetpointChanged.call(handler, 'some-other-feature', 19);
 
-    assert.notCalled(handler.setValue);
+    expect(heldSetpoint(handler)).to.equal(null);
   });
 
   // getTargetSelectors returns the warm cache without rebuilding it.
@@ -655,13 +671,13 @@ describe('thermostat.onExternalSetpointChanged', () => {
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', null);
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', undefined);
 
-    assert.notCalled(handler.setValue);
+    expect(heldSetpoint(handler)).to.equal(null);
   });
 
   it('should survive a failing hold', async () => {
     const mod = loadListener();
     const handler = buildHandler();
-    handler.setValue = fake.rejects(new Error('database down'));
+    handler.gladys.device.setParam = fake.rejects(new Error('database down'));
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
   });
@@ -679,6 +695,6 @@ describe('thermostat.onExternalSetpointChanged', () => {
 
     await mod.onExternalSetpointChanged.call(handler, 'thermostat-living-room', 19);
 
-    assert.notCalled(handler.setValue);
+    expect(heldSetpoint(handler)).to.equal(null);
   });
 });
