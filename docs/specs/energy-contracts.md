@@ -91,7 +91,7 @@ Levels 1 and 2 go through the same engine: the difference is the source of the d
 
 ## 4. Data model
 
-Two new tables (`t_energy_contract`, `t_tariff_calendar_entry`) and a `t_energy_price` table kept read-only during the migration window, then dropped in a later release.
+Three new tables (`t_energy_contract`, `t_tariff_calendar`, `t_tariff_calendar_entry`) and a `t_energy_price` table kept read-only during the migration window, then dropped in a later release.
 
 **`t_energy_contract`** (one row per contract, replaces the implicit grouping of `t_energy_price`)
 
@@ -279,7 +279,7 @@ The cost of an interval is the sum of the components, rounded to 6 decimals; com
 
 **7.6 Errors**: an invalid definition is rejected on write, never discovered by the job. At run time, the only possible errors are "calendar **price** without a value" (`price_from_calendar` unresolved: fallback + warning counted in the job; a calendar *condition* on an absent value is not an error, §3) and "delegated integration unreachable or invalid payload" (intervals left without a cost, error visible on the Jobs page and on the contract page). A meter without an active contract on a date produces no cost state, as today.
 
-**7.7 Current price** (`getCurrentPrice`, behind `/current`, the widget and the scene trigger): the unit price at an instant is the sum of the consumption components' matching rule prices (a tier rule matches when the next kWh falls in its tier, from the `cumulative` the caller passes) plus the taxes applying to them; fixed and demand components are not per-kWh and are left out. `power_threshold` rules are evaluated on the `max_power_kw` the caller passes (the peak of the meter's last interval), 0 when unknown. The next change is found by scanning the following 30-minute slot boundaries **of the contract's local clock** (a `:45` zone such as Asia/Kathmandu is not aligned on UTC) over a 48-hour horizon, comparing price and rule label.
+**7.7 Current price** (`getCurrentPrice`, behind `/current`, the widget and the scene trigger): the unit price at an instant is the sum of the consumption components' matching rule prices (a tier rule matches when the next kWh falls in its tier, from the `cumulative` the caller passes) plus the taxes applying to them; fixed and demand components are not per-kWh and are left out. `power_threshold` rules are evaluated on the `max_power_kw` the caller passes (the peak of the meter's last interval), 0 when unknown. The instant is first snapped to the **start of its 30-minute slot on the contract's local clock** (a `:45` zone such as Asia/Kathmandu is not aligned on UTC): 30-minute calendars are keyed by slot start and a live call never lands on an exact slot instant. A matching rule whose calendar price is missing yields the `fallback`, as in 7.2; when the fallback itself has no value the price is `null` ("unknown") rather than a guess. The next change is found by scanning the following slot boundaries over a 48-hour horizon, comparing price and rule label.
 
 ## 8. REST API and user interface
 
@@ -342,7 +342,7 @@ The migration converts each group of `t_energy_price` rows into an equivalent `r
 - The `ENERGY_CONTRACT_TYPES`, `ENERGY_PRICE_TYPES`, `ENERGY_PRICE_DAY_TYPES` constants are kept for the compatibility window, then removed with the table.
 - Existing external integrations are not affected: the core derivation of energy features (C.3) does not change, and an integration without an `energy_contracts` field sees no difference.
 
-**9.5 Rollback**: the `down` migration drops the two tables; since `t_energy_price` is not modified before its deferred removal, going back to the previous version finds the prices untouched.
+**9.5 Rollback**: the `down` migration drops the three tables (`t_energy_contract`, `t_tariff_calendar`, `t_tariff_calendar_entry`); since `t_energy_price` is not modified before its deferred removal, going back to the previous version finds the prices untouched.
 
 ## 10. Delivery plan, tests, open questions
 

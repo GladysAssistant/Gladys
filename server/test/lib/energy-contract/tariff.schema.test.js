@@ -75,6 +75,7 @@ const INVALID = {
   'multiplier without calendar price': base([consumption({ fallback: { price: 1, multiplier: 2 } })]),
   'offset without calendar price': base([consumption({ rules: [{ price: 1, offset: 0.1 }] })]),
   'negative price': base([consumption({ fallback: { price: -1 } })]),
+  'time 24:00 as a start': base([consumption({ rules: [{ when: { time: [['24:00', '06:00']] }, price: 1 }] })]),
   'time 24:30': base([consumption({ rules: [{ when: { time: [['24:30', '06:00']] }, price: 1 }] })]),
   'time 6:00': base([consumption({ rules: [{ when: { time: [['6:00', '22:00']] }, price: 1 }] })]),
   'time one bound': base([consumption({ rules: [{ when: { time: [['06:00']] }, price: 1 }] })]),
@@ -160,6 +161,7 @@ describe('energy-contract tariff.schema.json', () => {
     expect(definitions.calendarKey.pattern).to.equal(constants.CALENDAR_KEY_REGEX.source);
     expect(definitions.componentKey.pattern).to.equal(constants.COMPONENT_KEY_REGEX.source);
     expect(definitions.time.pattern).to.equal(constants.TIME_REGEX.source);
+    expect(definitions.timeStart.pattern).to.equal(constants.TIME_START_REGEX.source);
     expect(definitions.monthDay.pattern).to.equal(constants.MONTH_DAY_REGEX.source);
     expect(definitions.date.pattern).to.equal(constants.DATE_REGEX.source);
     expect(definitions.calendarCondition.propertyNames.pattern).to.equal(constants.CALENDAR_KEY_REGEX.source);

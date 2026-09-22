@@ -102,9 +102,14 @@
             "type": "array",
             "minItems": 2,
             "maxItems": 2,
-            "items": {
-              "$ref": "#/definitions/time"
-            }
+            "items": [
+              {
+                "$ref": "#/definitions/timeStart"
+              },
+              {
+                "$ref": "#/definitions/time"
+              }
+            ]
           },
           "description": "Intervals in the contract timezone, start inclusive, end exclusive; an end at or before the start crosses midnight (an end equal to the start covers the whole day); 24:00 is accepted as an end."
         },
@@ -410,6 +415,11 @@
           }
         }
       ]
+    },
+    "timeStart": {
+      "type": "string",
+      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+      "description": "Start of an interval: never 24:00."
     }
   }
 }

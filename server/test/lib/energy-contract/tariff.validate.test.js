@@ -126,6 +126,10 @@ describe('energy-contract validateTariff', () => {
     expect(() =>
       validateTariff(base([consumption({ rules: [{ when: { time: [['22:00', '24:00']] }, price: 1 }] })])),
     ).to.not.throw();
+    expectError(
+      base([consumption({ rules: [{ when: { time: [['24:00', '06:00']] }, price: 1 }] })]),
+      'when.time[0][0]',
+    );
     expectError(base([consumption({ rules: [{ when: { weekdays: ['monday'] }, price: 1 }] })]), 'when.weekdays[0]');
     expectError(base([consumption({ rules: [{ when: { weekdays: ['mon', 'mon'] }, price: 1 }] })]), 'when.weekdays[1]');
     expectError(base([consumption({ rules: [{ when: { months: [13] }, price: 1 }] })]), 'when.months[0]');

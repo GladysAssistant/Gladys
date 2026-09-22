@@ -79,7 +79,7 @@ When a `POST /energy/calendar` changes a value already used by a computed cost (
 
 ## 5. JS SDK (C.8)
 
-`gladys.energy.publishCalendar(key, entries)`, `gladys.energy.getCalendar(key, { from, to })`, `gladys.energy.getContracts()`, `gladys.energy.requestRecalculation()`; handlers `gladys.energy.onPrice(async ({ contract, intervals }) => costs)` and `gladys.energy.onCurrent(async ({ contract }) => current)`. The Node.js template gets an `energy-contracts` example with a `rules` template and a calendar.
+`gladys.energy.publishCalendar(key, entries)`, `gladys.energy.getCalendar(key, { from, to })`, `gladys.energy.getContracts()`, `gladys.energy.requestRecalculation()`; handlers `gladys.energy.onPrice(async ({ contract, billing_period, cumulative_before, intervals }) => costs)` and `gladys.energy.onCurrent(async ({ contract, billing_period, cumulative, max_power_kw }) => current)`: the SDK forwards the whole WebSocket payload of §3, field for field, so the state the core sends (billing period, accumulations, last peak) reaches the handler. The Node.js template gets an `energy-contracts` example with a `rules` template and a calendar.
 
 ## 6. Publishing a contract entirely as an external integration
 
@@ -87,7 +87,7 @@ Yes: a contract can live end to end in an external integration, with no PR on `e
 
 | Path | When | What the author ships | What the user does |
 | --- | --- | --- | --- |
-| **Community catalogue** (`energy-contracts`) | The tariff is static and fully expressible by the rule engine, with core calendars at most (`holidays-*`) | One PR adding a `tariff` JSON; the next release of the repository makes it appear in every Gladys, no Gladys release | Picks it in the wizard, fills the `inputs` |
+| **Community catalogue** (`energy-contracts`) | The tariff is static and fully expressible by the rule engine; any calendar it needs is static too and shipped by the catalogue v2 as dated entries (a country's public holidays) or already published by an installed integration, never by the core | One PR adding a `tariff` JSON; the next release of the repository makes it appear in every Gladys, no Gladys release | Picks it in the wizard, fills the `inputs` |
 | **External integration** | Anything else: a calendar to keep fed (day colours, spot prices, critical peak days), a delegated computation, a supplier API to poll, or simply a supplier who wants to own and version their own templates | A store integration (public repo + topic + manifest) whose `energy_contracts` field carries the templates and calendars (§1), plus the container code for the calendars or the delegated pricing | Installs the integration; its templates appear in the wizard next to the catalogue ones, tagged with the integration name |
 
 A running integration may also carry **static templates only** (a connected-meter integration that knows its supplier's tariffs): the `templates` field is enough, nothing else to implement. The reverse is not true: the catalogue never carries code, so a contract that needs a live calendar has to be an integration (or reference a calendar published by an installed one); static calendars (a country's public holidays for the coming years) can ship in the catalogue v2 as dated entries.

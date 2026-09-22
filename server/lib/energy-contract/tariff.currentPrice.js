@@ -42,9 +42,14 @@ function getUnitPriceAt(compiled, contract, ms, lookup, cumulative, maxPowerKw =
           (cumulative[tier.cumulative] >= tier.from_kwh && cumulative[tier.cumulative] < tier.to_kwh)
         );
       });
-      // a consumption component always has a fallback or a catch-all last rule (validated)
-      const spec = rule || component.fallback;
-      const unit = resolvePrice(spec, getCalendarValue);
+      // a consumption component always has a fallback or a catch-all last rule (validated);
+      // like priceIntervals, a matching rule whose calendar price is missing yields the fallback
+      let spec = rule || component.fallback;
+      let unit = resolvePrice(spec, getCalendarValue);
+      if (unit === undefined && rule !== undefined && component.fallback !== undefined) {
+        spec = component.fallback;
+        unit = resolvePrice(spec, getCalendarValue);
+      }
       if (unit === undefined) {
         missing = true;
         return;
@@ -83,11 +88,16 @@ function getUnitPriceAt(compiled, contract, ms, lookup, cumulative, maxPowerKw =
  * const current = getCurrentPrice(compiled, { timezone: 'Europe/Paris' }, { calendars: lookup });
  */
 function getCurrentPrice(compiled, contract, options = {}) {
-  const at = options.at === undefined ? Date.now() : new Date(options.at).getTime();
+  const requestedAt = options.at === undefined ? Date.now() : new Date(options.at).getTime();
   const lookup = options.calendars || EMPTY_LOOKUP;
   const cumulative = { day: 0, month: 0, billing_period: 0, ...(options.cumulative || {}) };
   const maxPowerKw = options.max_power_kw || 0;
   const horizonMs = (options.horizon_hours || 48) * 60 * 60 * 1000;
+  // Evaluate at the start of the current 30-minute slot of the contract's local clock
+  // (zones at :45 such as Asia/Kathmandu are not aligned on UTC): 30-minute calendars are
+  // keyed by slot start, and a live call never lands on an exact slot instant.
+  const local = getLocalContext(requestedAt, contract.timezone);
+  const at = requestedAt - (local.minutes % 30) * MS_PER_MINUTE - (requestedAt % MS_PER_MINUTE);
   const current = getUnitPriceAt(compiled, contract, at, lookup, cumulative, maxPowerKw);
   const result = {
     price: current.price,
@@ -96,11 +106,9 @@ function getCurrentPrice(compiled, contract, options = {}) {
     next_price: null,
     next_label: undefined,
   };
-  // Next change: scan the 30-minute slot boundaries after `at`, aligned on the
-  // contract's local clock (zones at :45 such as Asia/Kathmandu are not aligned on UTC).
-  const local = getLocalContext(at, contract.timezone);
-  let slot = at - (local.minutes % 30) * MS_PER_MINUTE - (at % MS_PER_MINUTE) + SLOT_MS;
-  while (slot - at <= horizonMs) {
+  // Next change: scan the following slot boundaries.
+  let slot = at + SLOT_MS;
+  while (slot - requestedAt <= horizonMs) {
     const next = getUnitPriceAt(compiled, contract, slot, lookup, cumulative, maxPowerKw);
     if (next.price !== current.price || next.label !== current.label) {
       result.valid_until = new Date(slot).toISOString();

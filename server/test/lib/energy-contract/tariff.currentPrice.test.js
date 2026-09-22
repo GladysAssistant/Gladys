@@ -129,6 +129,52 @@ describe('energy-contract getCurrentPrice', () => {
     expect(current.label).to.equal('Peak');
     expect(current.valid_until).to.equal('2026-01-12T16:15:00.000Z');
   });
+  it('should evaluate the current slot start, so a live instant reads its 30-minute calendar entry', () => {
+    const spot = compileTariff({
+      tariff_version: 1,
+      calendars: ['spot'],
+      components: [{ key: 'energy', kind: 'consumption', fallback: { price_from_calendar: 'spot' } }],
+    });
+    const calendars = createCalendarLookup({ spot: { granularity: 'thirty_minutes' } }, [
+      { calendar_key: 'spot', starts_at: '2026-01-12T12:00:00Z', value: 0.1 },
+      { calendar_key: 'spot', starts_at: '2026-01-12T12:30:00Z', value: 0.2 },
+    ]);
+    ['2026-01-12T12:00:00.500Z', '2026-01-12T12:10:00Z', '2026-01-12T12:29:59.999Z'].forEach((at) => {
+      const current = getCurrentPrice(spot, utc, { at, calendars });
+      expect(current.price, at).to.equal(0.1);
+      expect(current.valid_until, at).to.equal('2026-01-12T12:30:00.000Z');
+      expect(current.next_price, at).to.equal(0.2);
+    });
+    // Kathmandu (+05:45): 12:10Z is 17:55 local, whose slot started at 17:30 local = 11:45Z
+    const kathmanduCalendars = createCalendarLookup({ spot: { granularity: 'thirty_minutes' } }, [
+      { calendar_key: 'spot', starts_at: '2026-01-12T11:45:00Z', value: 0.3 },
+    ]);
+    expect(
+      getCurrentPrice(
+        spot,
+        { timezone: 'Asia/Kathmandu' },
+        { at: '2026-01-12T12:10:00Z', calendars: kathmanduCalendars },
+      ).price,
+    ).to.equal(0.3);
+  });
+  it('should fall back like the interval pricing when the matching rule has no calendar price', () => {
+    const compiled = compileTariff({
+      tariff_version: 1,
+      calendars: ['spot'],
+      components: [
+        {
+          key: 'energy',
+          kind: 'consumption',
+          rules: [{ label: 'Spot', price_from_calendar: 'spot' }],
+          fallback: { label: 'Backup', price: 0.25 },
+        },
+      ],
+    });
+    expect(getCurrentPrice(compiled, utc, { at: '2026-01-12T12:00:00Z', horizon_hours: 1 })).to.deep.include({
+      price: 0.25,
+      label: 'Backup',
+    });
+  });
   it('should answer null when a calendar value is missing', () => {
     const spot = compileTariff({
       tariff_version: 1,

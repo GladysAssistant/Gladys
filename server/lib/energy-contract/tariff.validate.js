@@ -11,6 +11,7 @@ const {
   CALENDAR_KEY_REGEX,
   COMPONENT_KEY_REGEX,
   TIME_REGEX,
+  TIME_START_REGEX,
   MONTH_DAY_REGEX,
   DATE_REGEX,
   TARIFF_LIMITS,
@@ -26,6 +27,7 @@ const label = Joi.string()
   .min(1)
   .max(TARIFF_LIMITS.MAX_LABEL_LENGTH);
 const time = Joi.string().pattern(TIME_REGEX);
+const timeStart = Joi.string().pattern(TIME_START_REGEX);
 const monthDay = Joi.string().pattern(MONTH_DAY_REGEX);
 const date = Joi.string().pattern(DATE_REGEX);
 const calendarValue = Joi.alternatives().try(Joi.string().max(64), Joi.number());
@@ -67,7 +69,7 @@ const conditions = Joi.object({
   time: Joi.array()
     .items(
       Joi.array()
-        .items(time)
+        .ordered(timeStart, time)
         .length(2),
     )
     .min(1)
