@@ -1,6 +1,8 @@
 const logger = require('../../../utils/logger');
 const { getThermostatFeature, stopExternalThermostat } = require('./thermostat.applySchedules');
 const { buildParamsConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
+const { holdExpiry } = require('./thermostat.setValue');
+const { setManualHold } = require('./thermostat.state');
 
 /**
  * @description Invalidate the caches derived from this service's devices: the
@@ -125,11 +127,15 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     if (this.selfWrittenSetpoints.get(changedSelector) === newValue) {
       return;
     }
-    const feature = { selector: changedSelector };
     logger.info(`Thermostat: setpoint ${newValue} changed on the device itself for ${changedSelector}, holding it`);
-    // saveState is a no-op here (the value is already stored, the event is what
-    // announced it), so setValue is called only for the hold it arms.
-    await this.setValue(device, feature, newValue);
+    // The hold is armed directly rather than through `setValue`: the device
+    // already carries this value — it is what it just reported — so writing it
+    // back would be a cloud call or a Zigbee message per report, and
+    // `writeSetpoint` hands the running mode back first, kicking a thermostat
+    // that was in AUTO, OFF or its own vendor programme into heating or cooling.
+    // The value is stored in the feature's own unit, which is what a hold on an
+    // external thermostat is stored in (C.3).
+    await setManualHold.call(this, device, newValue, await holdExpiry(device));
   } catch (e) {
     logger.warn(`Thermostat: could not hold an external setpoint change: ${e.message}`);
   }
