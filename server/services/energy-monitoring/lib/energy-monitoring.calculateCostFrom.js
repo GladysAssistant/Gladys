@@ -155,7 +155,7 @@ async function priceByBillingPeriod(energyContract, contract, intervals, nowMs) 
  * @param {object} [options] - Options.
  * @param {Array<string>} [options.deviceIds] - Only recalculate cost for these device ids.
  * @param {Array<string>} [options.electricMeterDeviceIds] - Only the devices of these root meters.
- * @returns {Promise<null>} Return null when finished.
+ * @returns {Promise<object>} { devices, failures }: the devices handled and those whose costs failed.
  * @example
  * calculateCostFrom(new Date(), '12345678-1234-1234-1234-1234567890ab');
  */
@@ -181,6 +181,7 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
   // Contracts are per root meter and don't change during the run: fetched once per meter.
   const contractsByMeter = new Map();
   const powerPeaksByMeter = new Map();
+  let failures = 0;
   const getContracts = async (meterDeviceId) => {
     if (!contractsByMeter.has(meterDeviceId)) {
       contractsByMeter.set(
@@ -306,6 +307,7 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
         await this.gladys.device.saveMultipleHistoricalStates(pair.consumptionCostFeature.id, statesToInsert);
       });
     } catch (e) {
+      failures += 1;
       logger.error(e);
     }
     if (jobId) {
@@ -315,7 +317,9 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
   Object.keys(warningsCount).forEach((reason) => {
     logger.warn(`Energy cost calculation: ${warningsCount[reason]} interval(s) priced by a fallback (${reason})`);
   });
-  return null;
+  // the callers that must not consider a failed device as done (the pending recalculation
+  // of the price migration) read the failures
+  return { devices: energyDevices.length, failures };
 }
 
 module.exports = {

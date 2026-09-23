@@ -107,7 +107,7 @@ describe('EnergyMonitoring.init', () => {
   it('should run the recalculation left by the price migration, and survive its failures', async () => {
     const pending = { from: new Date('2025-01-01T00:00:00.000Z'), electric_meter_device_ids: ['meter'] };
     gladys.energyContract.getPendingRecalculation = fake.resolves(pending);
-    energyMonitoring.recalculateForContracts = fake.resolves(null);
+    energyMonitoring.recalculateForContracts = fake.resolves({ devices: 1, failures: 0 });
     await energyMonitoring.init();
     assert.calledOnce(gladys.energyContract.getPendingRecalculation);
     assert.calledOnceWithExactly(energyMonitoring.recalculateForContracts, pending);
@@ -125,6 +125,15 @@ describe('EnergyMonitoring.init', () => {
       setImmediate(resolve);
     });
     assert.calledOnce(failing.recalculateForContracts);
+    assert.notCalled(gladys.energyContract.clearPendingRecalculation);
+    // a device whose costs failed keeps the recalculation for the next start too
+    const partial = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    partial.recalculateForContracts = fake.resolves({ devices: 2, failures: 1 });
+    await partial.init();
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    assert.calledOnce(partial.recalculateForContracts);
     assert.notCalled(gladys.energyContract.clearPendingRecalculation);
     // an unreadable pending recalculation too
     gladys.energyContract.getPendingRecalculation = fake.rejects(new Error('db down'));

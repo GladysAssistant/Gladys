@@ -29,8 +29,18 @@ async function init() {
       if (pending) {
         const runPendingRecalculation = async () => {
           try {
-            await this.recalculateForContracts(pending);
-            await this.gladys.energyContract.clearPendingRecalculation();
+            // a device whose costs failed is logged by the job, not thrown: the rewrite is
+            // only done when every device saved its costs
+            const result = await this.recalculateForContracts(pending);
+            if (result && result.failures === 0) {
+              await this.gladys.energyContract.clearPendingRecalculation();
+            } else {
+              logger.warn(
+                `Pending energy recalculation: ${
+                  result ? result.failures : 'some'
+                } device(s) failed, retried at the next start`,
+              );
+            }
           } catch (e) {
             logger.warn(`Pending energy recalculation failed, retried at the next start: ${e.message}`);
           }

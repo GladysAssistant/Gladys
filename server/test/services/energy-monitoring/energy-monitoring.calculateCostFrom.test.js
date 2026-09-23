@@ -367,8 +367,10 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     await db.duckDbBatchInsertState(PLUG_COST_ID, [{ value: 99, created_at: new Date('2025-08-28T15:00:00.000Z') }]);
     sinon.stub(energyContract, 'priceContractIntervals').rejects(new Error('integration down'));
     const error = sinon.stub(logger, 'error');
-    await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
+    const result = await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
     expect(error.callCount).to.equal(1);
+    // reported to the callers that must retry (the pending recalculation of the migration)
+    expect(result.failures).to.equal(1);
     const states = await costStates();
     expect(states.map((s) => s.value)).to.deep.equal([99]);
   });

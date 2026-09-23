@@ -7,7 +7,7 @@ const logger = require('../../../utils/logger');
  * calendar value changed, docs/specs/energy-contracts.md 7.4).
  * @param {object} payload - { from: Date, electric_meter_device_ids: [], calendar_key? }.
  * @param {string} [jobId] - The job id.
- * @returns {Promise<null>} Return when finished.
+ * @returns {Promise<object>} { devices, failures } of the cost calculation.
  * @example
  * await recalculateForContracts({ from: new Date(), electric_meter_device_ids: ['…'] });
  */
@@ -19,7 +19,7 @@ async function recalculateForContracts(payload, jobId) {
         payload.calendar_key ? ` (calendar ${payload.calendar_key})` : ''
       }`,
     );
-    await this.calculateCostFrom(from, jobId, { electricMeterDeviceIds: payload.electric_meter_device_ids });
+    return this.calculateCostFrom(from, jobId, { electricMeterDeviceIds: payload.electric_meter_device_ids });
   });
 }
 

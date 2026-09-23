@@ -747,7 +747,7 @@ class ContractWizard extends Component {
               class="custom-switch-input"
               checked={jsonMode}
               onChange={this.toggleJsonMode}
-              disabled={!template || !template.tariff}
+              disabled={!template || (!template.tariff && form.pricing_mode !== 'delegated')}
             />
             <span class="custom-switch-indicator" />
             <span class="custom-switch-description">
