@@ -9,6 +9,7 @@ const EnergyContract = require('../../../../lib/energy-contract');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
   SYSTEM_VARIABLE_NAMES,
 } = require('../../../../utils/constants');
 
@@ -17,6 +18,7 @@ const METER_FEATURE_ID = '101d2306-b15e-4859-b403-a076167eadd9';
 const METER_CONSUMPTION_FEATURE_ID = '17488546-e1b8-4cb9-bd75-e20526a94a99';
 const METER_COST_FEATURE_ID = '0f4133be-b86c-4a97-9cc8-585fadb74006';
 const TEST_SERVICE_ID = 'a810b8db-6d04-4697-bed3-c4b72c996279';
+const METER_POWER_FEATURE_ID = '3b2c8f1e-5d4a-4c6b-9e7f-0a1b2c3d4e5f';
 
 const BASE_TARIFF = {
   tariff_version: 1,
@@ -63,6 +65,10 @@ async function buildManager(options = {}) {
     getValue: sinon.fake((name) => Promise.resolve(variables[name] === undefined ? null : variables[name])),
     setValue: sinon.fake((name, value) => {
       variables[name] = value;
+      return Promise.resolve(null);
+    }),
+    destroy: sinon.fake((name) => {
+      delete variables[name];
       return Promise.resolve(null);
     }),
   };
@@ -120,6 +126,43 @@ async function buildManager(options = {}) {
 }
 
 /**
+ * @description Add a historized `power` feature (in watts) to the test meter, and insert its states.
+ * @param {object} device - The device manager of the test.
+ * @param {object} meter - The test meter returned by buildManager.
+ * @param {Array<object>} states - [{ value, created_at }] in watts.
+ * @returns {Promise<void>} Resolves when inserted.
+ * @example
+ * await addMeterPower(device, meter, [{ value: 6000, created_at: new Date() }]);
+ */
+async function addMeterPower(device, meter, states) {
+  await device.create({
+    id: meter.id,
+    service_id: meter.service_id,
+    name: meter.name,
+    external_id: meter.external_id,
+    selector: meter.selector,
+    features: [
+      ...meter.features,
+      {
+        id: METER_POWER_FEATURE_ID,
+        external_id: 'electrical-meter-power',
+        selector: 'electrical-meter-power',
+        name: 'Power',
+        read_only: true,
+        has_feedback: false,
+        keep_history: true,
+        min: 0,
+        max: 100000,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+      },
+    ],
+  });
+  await db.duckDbBatchInsertState(METER_POWER_FEATURE_ID, states);
+}
+
+/**
  * @description Insert 30-minute consumption states of the test meter.
  * @param {Array<object>} states - [{ value, created_at }].
  * @returns {Promise<void>} Resolves when inserted.
@@ -150,6 +193,7 @@ function contractPayload(overrides = {}) {
 
 module.exports = {
   buildManager,
+  addMeterPower,
   insertConsumption,
   contractPayload,
   BASE_TARIFF,
@@ -158,5 +202,6 @@ module.exports = {
   METER_FEATURE_ID,
   METER_CONSUMPTION_FEATURE_ID,
   METER_COST_FEATURE_ID,
+  METER_POWER_FEATURE_ID,
   TEST_SERVICE_ID,
 };

@@ -1811,7 +1811,7 @@ const integrations = {
       provider: { kind: 'community', name: 'energy-contracts', version: 'v1.4.0' }
     }
   ],
-  'get /api/v1/energy_contract/community/edf-base': {
+  'get /api/v1/energy_contract/template/community/edf-base': {
     key: 'edf-base',
     variant: '6',
     name: { en: 'EDF Base 6 kVA', fr: 'EDF Base 6 kVA' },
@@ -1829,6 +1829,64 @@ const integrations = {
       components: [
         { key: 'energy', kind: 'consumption', rules: [], fallback: { price: 0.2516 } },
         { key: 'subscription', kind: 'fixed', amount: 12.8, per: 'month' }
+      ]
+    },
+    provider: { kind: 'community', name: 'energy-contracts', version: 'v1.4.0' }
+  },
+  'get /api/v1/energy_contract/template/internal/edf-tempo': {
+    key: 'edf-tempo',
+    name: { en: 'EDF Tempo', fr: 'EDF Tempo' },
+    country: 'FR',
+    currency: 'EUR',
+    timezone: 'Europe/Paris',
+    pricing_mode: 'rules',
+    version: '2026-02-01',
+    calendars: ['tempo'],
+    inputs: [{ key: 'subscription', type: 'number', unit: 'EUR', default: 16.55 }],
+    tariff: {
+      tariff_version: 1,
+      calendars: ['tempo'],
+      components: [
+        {
+          key: 'energy',
+          kind: 'consumption',
+          rules: [
+            { label: 'Red peak', when: { calendar: { tempo: 'red' }, time: [['06:00', '22:00']] }, price: 0.7562 },
+            { label: 'Red off-peak', when: { calendar: { tempo: 'red' } }, price: 0.1568 },
+            { label: 'White peak', when: { calendar: { tempo: 'white' }, time: [['06:00', '22:00']] }, price: 0.1894 },
+            { label: 'White off-peak', when: { calendar: { tempo: 'white' } }, price: 0.1486 },
+            { label: 'Blue peak', when: { calendar: { tempo: 'blue' }, time: [['06:00', '22:00']] }, price: 0.1609 }
+          ],
+          fallback: { label: 'Blue off-peak', price: 0.1296 }
+        },
+        { key: 'subscription', kind: 'fixed', amount: '{{input:subscription}}', per: 'month' }
+      ]
+    },
+    provider: { kind: 'internal', service_id: null, name: 'edf-tempo', selector: 'edf-tempo', running: true }
+  },
+  'get /api/v1/energy_contract/template/community/edf-peak-off-peak': {
+    key: 'edf-peak-off-peak',
+    variant: '9',
+    name: { en: 'EDF Peak / off-peak 9 kVA', fr: 'EDF Heures pleines / creuses 9 kVA' },
+    country: 'FR',
+    currency: 'EUR',
+    timezone: 'Europe/Paris',
+    pricing_mode: 'rules',
+    version: 'v1',
+    subscribed_power: 9,
+    power_unit: 'kVA',
+    calendars: [],
+    inputs: [{ key: 'off_peak_slots', type: 'time_intervals', required: true }],
+    tariff: {
+      tariff_version: 1,
+      components: [
+        {
+          key: 'energy',
+          kind: 'consumption',
+          rules: [{ label: 'Off-peak', when: { time: '{{input:off_peak_slots}}' }, price: 0.2068 }],
+          fallback: { label: 'Peak', price: 0.27 }
+        },
+        { key: 'subscription', kind: 'fixed', amount: 16.3, per: 'month' }
       ]
     },
     provider: { kind: 'community', name: 'energy-contracts', version: 'v1.4.0' }

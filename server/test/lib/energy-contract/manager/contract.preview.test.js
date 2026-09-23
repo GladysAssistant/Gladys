@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const {
   buildManager,
+  addMeterPower,
   contractPayload,
   insertConsumption,
   BASE_TARIFF,
@@ -24,8 +25,10 @@ const TIER_TARIFF = {
 
 describe('energyContract: preview and current price', () => {
   let energyContract;
+  let device;
+  let meter;
   beforeEach(async () => {
-    ({ energyContract } = await buildManager({ timezone: 'UTC' }));
+    ({ energyContract, device, meter } = await buildManager({ timezone: 'UTC' }));
   });
 
   describe('preview', () => {
@@ -153,6 +156,33 @@ describe('energyContract: preview and current price', () => {
       // the accumulation is a snapshot: no time-based change ahead for a flat tiered tariff
       expect(current.valid_until).to.equal(null);
       expect(current.contract.selector).to.equal('tiered');
+    });
+
+    it('should read the peak of the last interval on the historized power feature', async () => {
+      await energyContract.create(
+        contractPayload({
+          name: 'Threshold',
+          timezone: 'UTC',
+          tariff: {
+            tariff_version: 1,
+            components: [
+              {
+                key: 'energy',
+                kind: 'consumption',
+                rules: [{ label: 'above 3 kW', when: { power_threshold: { above_kw: 3 } }, price: 0.5 }],
+                fallback: { label: 'flat', price: 0.2 },
+              },
+            ],
+          },
+        }),
+      );
+      const at = new Date('2026-01-12T12:40:00Z').getTime();
+      // 1 kWh on the last interval: 2 kW on average, below the threshold
+      await insertConsumption([{ value: 1, created_at: new Date('2026-01-12T12:30:00Z') }]);
+      expect(await energyContract.getCurrent('threshold', { at })).to.include({ price: 0.2, label: 'flat' });
+      // a 5 kW peak recorded during that interval (12:00 to 12:30)
+      await addMeterPower(device, meter, [{ value: 5000, created_at: new Date('2026-01-12T12:10:00Z') }]);
+      expect(await energyContract.getCurrent('threshold', { at })).to.include({ price: 0.5, label: 'above 3 kW' });
     });
 
     it('should relay a delegated contract to the integration and cache the answer 5 minutes', async () => {

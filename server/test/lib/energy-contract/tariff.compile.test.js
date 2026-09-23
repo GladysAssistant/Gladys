@@ -118,6 +118,8 @@ describe('energy-contract tariff.compile', () => {
       expect(vat).to.deep.equal({ key: 'vat', kind: 'tax', label: undefined, rate: 20, applies_to: ['energy'] });
       expect(peak.aggregation).to.equal('max');
       expect(peak.when).to.equal(undefined);
+      // a demand charge reads the peak power of the intervals
+      expect(compiled.needsPower).to.equal(true);
     });
     it('should report a tariff without tiers', () => {
       const compiled = compileTariff({
@@ -126,6 +128,21 @@ describe('energy-contract tariff.compile', () => {
       });
       expect(compiled.hasTier).to.equal(false);
       expect(compiled.tierScopes).to.deep.equal([]);
+      expect(compiled.needsPower).to.equal(false);
+    });
+    it('should need the power when a rule has a power threshold', () => {
+      const compiled = compileTariff({
+        tariff_version: 1,
+        components: [
+          {
+            key: 'energy',
+            kind: 'consumption',
+            rules: [{ when: { power_threshold: { above_kw: 3 } }, price: 0.5 }],
+            fallback: { price: 0.2 },
+          },
+        ],
+      });
+      expect(compiled.needsPower).to.equal(true);
     });
     it('should reject an invalid tariff after substitution', () => {
       expect(() =>

@@ -84,4 +84,67 @@ async function getMeterCumulative(electricMeterDeviceId, contract, atMs) {
   return cumulative;
 }
 
-module.exports = { getMeterConsumptionFeature, getMeterIntervals, getMeterCumulative, THIRTY_MINUTES_MS };
+/**
+ * @description Find the historized power feature of a root meter device.
+ * @param {string} electricMeterDeviceId - Root meter device id.
+ * @returns {object|null} The feature or null.
+ * @example
+ * this.getMeterPowerFeature('…');
+ */
+function getMeterPowerFeature(electricMeterDeviceId) {
+  const device = this.stateManager.get('deviceById', electricMeterDeviceId);
+  if (!device) {
+    return null;
+  }
+  return (
+    device.features.find(
+      (f) =>
+        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+        f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER &&
+        f.keep_history,
+    ) || null
+  );
+}
+
+/**
+ * @description The peak power of a meter per 30-minute interval, from its historized
+ * `power` feature (section 7.1): the max of the states of each interval, in kW. Empty when
+ * the meter has no such feature (the callers then fall back on `kwh × 2`).
+ * @param {string} electricMeterDeviceId - Root meter device id.
+ * @param {Date} from - Window start (interval starts).
+ * @param {Date} to - Window end.
+ * @returns {Promise<Map<number, number>>} interval start (ms) → peak in kW.
+ * @example
+ * const peaks = await this.getMeterPowerPeaks('…', new Date('2026-01-01'), new Date());
+ */
+async function getMeterPowerPeaks(electricMeterDeviceId, from, to) {
+  const peaks = new Map();
+  const feature = this.getMeterPowerFeature(electricMeterDeviceId);
+  if (feature === null) {
+    return peaks;
+  }
+  const factor = feature.unit === DEVICE_FEATURE_UNITS.KILOWATT ? 1 : 1 / 1000;
+  const states = await this.device.getDeviceFeatureStates(
+    feature.selector,
+    from,
+    new Date(to.getTime() + THIRTY_MINUTES_MS),
+  );
+  states.forEach((state) => {
+    const ms = new Date(state.created_at).getTime();
+    const slot = Math.floor(ms / THIRTY_MINUTES_MS) * THIRTY_MINUTES_MS;
+    const kw = Number(state.value) * factor;
+    if (!peaks.has(slot) || peaks.get(slot) < kw) {
+      peaks.set(slot, kw);
+    }
+  });
+  return peaks;
+}
+
+module.exports = {
+  getMeterConsumptionFeature,
+  getMeterPowerFeature,
+  getMeterIntervals,
+  getMeterPowerPeaks,
+  getMeterCumulative,
+  THIRTY_MINUTES_MS,
+};

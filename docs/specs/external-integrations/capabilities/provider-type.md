@@ -20,7 +20,7 @@ Goal: a technical `type` for an integration that **manages no device and impleme
 | `widgets` | `capabilities/dashboard-widgets.md` |
 | `scene_triggers` | `capabilities/scene-triggers-and-actions.md` |
 | `scene_actions` | `capabilities/scene-triggers-and-actions.md` |
-| `energy_contracts` | `capabilities/energy-contracts.md` (contract templates, tariff calendars, delegated pricing). **Specified, not yet accepted**: `validateManifest`, `CAPABILITY_MANIFEST_FIELDS` and the vendored schema learn the field with the capability's implementation PR; until then a `provider` manifest whose only capability field is `energy_contracts` is rejected |
+| `energy_contracts` | `capabilities/energy-contracts.md` (contract templates, tariff calendars, delegated pricing) |
 
 The list grows with the folder; `CAPABILITY_MANIFEST_FIELDS` in `server/lib/external-integration/constants.js` is its code mirror. Every other manifest field keeps its own rules whatever the type (`config_schema`, `actions`, `containers`, `webhooks`…).
 
@@ -31,7 +31,7 @@ All by transposition of what `communication` and `weather` already do:
 - **screens**: Configuration / Supervision / Logs only — `provider` joins the two types without device screens in the generic page (`hasDeviceScreens`, the shared `TYPES_WITHOUT_DEVICE_SCREENS` list of the frontend); like them, its catalog card and its direct URLs land on the configuration screen of the shared external integration page (`/dashboard/integration/device/external/:selector/config`);
 - **no device surface**: it never goes through discovered devices or states (the device screens do not exist for it; a per-type `403` on the device host API is a later hardening common to the three device-less types, not part of this file);
 - **catalog**: hidden from non-admins like `device` and `weather` (installing is an admin act; what the integration provides reaches the users through the capability's own surface — for widgets, the dashboard picker and the widget list route); browse placement comes from `categories` (`integration-catalog-categories.md` §2.2), the display axis decoupled from `type`;
-- **install screen**: an information line saying the integration manages no device and provides its capabilities, plus the disclosure line of each declared capability (for `widgets`: the list of widgets; for `scene_triggers` / `scene_actions`: the list of declared triggers and actions) — the whole of its contract description;
+- **install screen**: an information line saying the integration manages no device and provides its capabilities, plus the disclosure line of each declared capability (for `widgets`: the list of widgets; for `scene_triggers` / `scene_actions`: the list of declared triggers and actions; for `energy_contracts`: the list of contract templates and the calendars the integration feeds, with a warning when a template delegates its pricing to the integration) — the whole of its contract description;
 - **proxy service**: registered in the stateManager like every integration, with no `device.*`, `message.*` or `weather.*` capability attached — only what its declared capabilities add.
 
 ## Tests

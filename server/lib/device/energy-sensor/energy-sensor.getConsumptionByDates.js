@@ -209,7 +209,10 @@ async function getConsumptionByDates(selectors, options = {}) {
           currency_unit: currencyUnit,
           // the subscription of the contract is part of the stored costs
           // (docs/specs/energy-contracts.md 7.2): nothing is added at display time
-          subscription_included: currencyUnit !== null,
+          subscription_included:
+            originalCostFeature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+            (originalCostFeature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST ||
+              originalCostFeature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST),
         },
         values,
       };

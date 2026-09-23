@@ -12,7 +12,13 @@ const { getCurrent } = require('./contract.getCurrent');
 const { checkPriceChanges } = require('./contract.checkPriceChanges');
 const { priceContractIntervals, getCompiledTariff } = require('./contract.price');
 const { getDefaultElectricMeterFeatureId } = require('./contract.getDefaultElectricMeterFeatureId');
-const { getMeterConsumptionFeature, getMeterIntervals, getMeterCumulative } = require('./meter.intervals');
+const {
+  getMeterConsumptionFeature,
+  getMeterPowerFeature,
+  getMeterIntervals,
+  getMeterPowerPeaks,
+  getMeterCumulative,
+} = require('./meter.intervals');
 const { declareCalendar, releaseCalendars } = require('./calendar.declare');
 const { publishCalendarEntries, requestCalendarRecalculation } = require('./calendar.publish');
 const {
@@ -25,7 +31,11 @@ const {
 const { getCatalogue, getCommunityTemplates } = require('./template.catalogue');
 const { getTemplates, getTemplate, getIntegrationTemplates, getInternalTemplates } = require('./template.get');
 const { getLegacyPrices } = require('./energyPrice.project');
-const { migrateFromEnergyPrice, verifyMigratedContract } = require('./migration.fromEnergyPrice');
+const {
+  migrateFromEnergyPrice,
+  verifyMigratedContract,
+  takePendingRecalculation,
+} = require('./migration.fromEnergyPrice');
 const { init } = require('./contract.init');
 const { recalculate } = require('./contract.recalculate');
 
@@ -73,6 +83,8 @@ EnergyContract.prototype.getCompiledTariff = getCompiledTariff;
 EnergyContract.prototype.getDefaultElectricMeterFeatureId = getDefaultElectricMeterFeatureId;
 EnergyContract.prototype.getMeterConsumptionFeature = getMeterConsumptionFeature;
 EnergyContract.prototype.getMeterIntervals = getMeterIntervals;
+EnergyContract.prototype.getMeterPowerFeature = getMeterPowerFeature;
+EnergyContract.prototype.getMeterPowerPeaks = getMeterPowerPeaks;
 EnergyContract.prototype.getMeterCumulative = getMeterCumulative;
 EnergyContract.prototype.declareCalendar = declareCalendar;
 EnergyContract.prototype.releaseCalendars = releaseCalendars;
@@ -92,5 +104,6 @@ EnergyContract.prototype.getInternalTemplates = getInternalTemplates;
 EnergyContract.prototype.getLegacyPrices = getLegacyPrices;
 EnergyContract.prototype.migrateFromEnergyPrice = migrateFromEnergyPrice;
 EnergyContract.prototype.verifyMigratedContract = verifyMigratedContract;
+EnergyContract.prototype.takePendingRecalculation = takePendingRecalculation;
 
 module.exports = EnergyContract;

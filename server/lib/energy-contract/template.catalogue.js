@@ -8,6 +8,8 @@ const RELEASE_URL = 'https://api.github.com/repos/GladysAssistant/energy-contrac
 const V2_ASSET = 'contracts-v2.json';
 const V1_ASSET = 'contracts.json';
 const CATALOGUE_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+// the catalogue is fetched on the boot path (migration): a stalled connection must not block it
+const CATALOGUE_TIMEOUT_MS = 10 * 1000;
 
 /**
  * @description Build the tariff of one v1 catalogue variant (one contract key, one power):
@@ -121,14 +123,14 @@ async function getCatalogue(options = {}) {
   if (!options.force && this.catalogueCache && this.catalogueCache.expires_at > Date.now()) {
     return this.catalogueCache.value;
   }
-  const releaseResponse = await axios.get(RELEASE_URL);
+  const releaseResponse = await axios.get(RELEASE_URL, { timeout: CATALOGUE_TIMEOUT_MS });
   const release = releaseResponse.data;
   const assets = Array.isArray(release.assets) ? release.assets : [];
   const v2 = assets.find((asset) => asset.name === V2_ASSET);
   const v1 = assets.find((asset) => asset.name === V1_ASSET);
   let value;
   if (v2) {
-    const { data } = await axios.get(v2.browser_download_url);
+    const { data } = await axios.get(v2.browser_download_url, { timeout: CATALOGUE_TIMEOUT_MS });
     if (!data || typeof data !== 'object' || !Array.isArray(data.templates)) {
       throw new Error(`${V2_ASSET} must contain a templates array`);
     }
@@ -139,7 +141,7 @@ async function getCatalogue(options = {}) {
       format: 2,
     };
   } else if (v1) {
-    const { data } = await axios.get(v1.browser_download_url);
+    const { data } = await axios.get(v1.browser_download_url, { timeout: CATALOGUE_TIMEOUT_MS });
     if (!data || typeof data !== 'object') {
       throw new Error(`${V1_ASSET} must be a valid JSON object`);
     }
@@ -174,4 +176,5 @@ module.exports = {
   convertCatalogueV1,
   buildVariantTariff,
   CATALOGUE_CACHE_TTL_MS,
+  CATALOGUE_TIMEOUT_MS,
 };

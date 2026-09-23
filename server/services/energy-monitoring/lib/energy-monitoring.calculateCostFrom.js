@@ -116,10 +116,24 @@ async function priceByBillingPeriod(energyContract, contract, intervals, nowMs) 
     }
   });
   const result = { costs: [], warnings: [], unpriced: [] };
+  // The day and month accumulations carry over a billing period boundary that is not a
+  // day or month boundary (a billing day other than the 1st): the next group starts from
+  // what the previous one accumulated, the billing period itself restarts at 0.
+  let carried;
   await Promise.each(groups, async (group) => {
     const priced = await energyContract.priceContractIntervals(contract, group.intervals, {
       closed_period: group.endMs <= nowMs,
+      cumulative_before: carried,
     });
+    const lastInterval = group.intervals[group.intervals.length - 1];
+    const lastLocal = getLocalContext(new Date(lastInterval.starts_at).getTime(), contract.timezone);
+    const boundaryLocal = getLocalContext(group.endMs, contract.timezone);
+    carried = {
+      // a billing period starts at local midnight: the day accumulation always restarts
+      day: 0,
+      month: boundaryLocal.date.slice(0, 7) === lastLocal.date.slice(0, 7) ? priced.cumulative.month : 0,
+      billing_period: 0,
+    };
     result.costs.push(...priced.costs);
     result.warnings.push(...priced.warnings);
     result.unpriced.push(...priced.unpriced);
@@ -192,17 +206,28 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           logger.debug(`No energy contract for meter ${electricMeterFeature.device_id}: no cost computed`);
           return;
         }
-        // A tiered contract recomputes from the start of its accumulation period.
+        // A tiered contract recomputes from the start of its accumulation period: only the
+        // contracts covering the run window widen it, never an expired or a future one.
+        const nowDate = new Date(nowMs);
+        const coveringContracts = contracts.filter((contract) => {
+          const startDate = getLocalContext(startAt.getTime(), contract.timezone).date;
+          const endDate = getLocalContext(nowDate.getTime(), contract.timezone).date;
+          return contract.valid_from <= endDate && (contract.valid_to === null || contract.valid_to >= startDate);
+        });
         let effectiveStart = startAt;
-        contracts.forEach((contract) => {
+        let needsPower = false;
+        coveringContracts.forEach((contract) => {
           if (contract.pricing_mode === ENERGY_CONTRACT_PRICING_MODES.RULES) {
-            effectiveStart = getEffectiveStart(
-              contract,
-              this.gladys.energyContract.getCompiledTariff(contract),
-              effectiveStart,
-            );
+            const compiled = this.gladys.energyContract.getCompiledTariff(contract);
+            effectiveStart = getEffectiveStart(contract, compiled, effectiveStart);
+            needsPower = needsPower || compiled.needsPower;
           }
         });
+        // demand charges and power thresholds read the meter's historized power feature
+        // when it has one (section 7.1), the 30-minute average power otherwise
+        const powerPeaks = needsPower
+          ? await this.gladys.energyContract.getMeterPowerPeaks(electricMeterFeature.device_id, effectiveStart, nowDate)
+          : new Map();
         logger.debug(
           `Destroying states from ${pair.consumptionCostFeature.selector} from ${effectiveStart.toISOString()}`,
         );
@@ -228,12 +253,16 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           if (!intervalsByContract.has(contract.id)) {
             intervalsByContract.set(contract.id, { contract, intervals: [] });
           }
-          intervalsByContract.get(contract.id).intervals.push({
+          const interval = {
             starts_at: new Date(startsAtMs).toISOString(),
             created_at: state.created_at,
             kwh: convertEnergyUnit(state.value, pair.consumptionFeature.unit, DEVICE_FEATURE_UNITS.KILOWATT_HOUR),
             duration_minutes: pair.durationMinutes,
-          });
+          };
+          if (powerPeaks.has(startsAtMs)) {
+            interval.max_power_kw = powerPeaks.get(startsAtMs);
+          }
+          intervalsByContract.get(contract.id).intervals.push(interval);
         });
         const statesToInsert = [];
         await Promise.each(Array.from(intervalsByContract.values()), async ({ contract, intervals }) => {

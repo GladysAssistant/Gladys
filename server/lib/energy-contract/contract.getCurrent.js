@@ -32,7 +32,19 @@ async function getCurrent(selector, options = {}) {
     new Date(at),
   );
   const last = lastIntervals[lastIntervals.length - 1];
-  const maxPowerKw = last ? last.kwh * 2 : 0;
+  let maxPowerKw = last ? last.kwh * 2 : 0;
+  if (last) {
+    // the meter's historized power feature gives the real peak of the last interval
+    const peaks = await this.getMeterPowerPeaks(
+      contract.electric_meter_device_id,
+      new Date(last.starts_at),
+      new Date(new Date(last.starts_at).getTime() + THIRTY_MINUTES_MS),
+    );
+    const peak = peaks.get(new Date(last.starts_at).getTime());
+    if (peak !== undefined) {
+      maxPowerKw = peak;
+    }
+  }
   const base = {
     currency: contract.currency,
     unit: 'kWh',

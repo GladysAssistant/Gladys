@@ -628,6 +628,8 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       expect(results[0].deviceFeature.name).to.equal('Energy Consumption');
       // Should return the currency unit from the original cost feature
       expect(results[0].deviceFeature.currency_unit).to.equal('euro');
+      // the stored costs carry the subscription of the contract
+      expect(results[0].deviceFeature.subscription_included).to.equal(true);
       expect(results[0].values).to.be.an('array');
       expect(results[0].values.length).to.be.at.least(1);
     });
@@ -729,6 +731,7 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       expect(results[0].deviceFeature.name).to.equal('Energy Consumption');
       // Should return null for currency_unit since this is not a cost feature
       expect(results[0].deviceFeature.currency_unit).to.equal(null);
+      expect(results[0].deviceFeature.subscription_included).to.equal(false);
     });
 
     it('should convert Wh to kWh when display_mode is kwh and unit is watt-hour', async () => {

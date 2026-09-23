@@ -132,19 +132,27 @@ function compilePriceSpec(spec) {
  * engine evaluates thousands of intervals without parsing anything.
  * @param {object} tariff - Tariff definition (template or stored JSON).
  * @param {object} [inputs] - Values of the template inputs.
- * @returns {object} The compiled tariff: tariff, calendars, components, hasTier, tierScopes.
+ * @returns {object} The compiled tariff: tariff, calendars, components, hasTier, tierScopes, needsPower.
  * @example
  * const compiled = compileTariff(template.tariff, { subscribed_power: 9 });
  */
 function compileTariff(tariff, inputs = {}) {
   const normalized = validateTariff(substituteInputs(tariff, inputs));
   const tierScopes = new Set();
+  // demand charges and power thresholds read the peak power of the intervals
+  let needsPower = false;
   const components = normalized.components.map((component) => {
+    if (component.kind === TARIFF_COMPONENT_KINDS.DEMAND) {
+      needsPower = true;
+    }
     if (component.kind === TARIFF_COMPONENT_KINDS.CONSUMPTION) {
       const rules = component.rules.map((r) => {
         const when = compileConditions(r.when);
         if (when !== undefined && when.tier !== undefined) {
           tierScopes.add(when.tier.cumulative);
+        }
+        if (when !== undefined && when.power_threshold !== undefined) {
+          needsPower = true;
         }
         return { ...compilePriceSpec(r), when };
       });
@@ -174,6 +182,7 @@ function compileTariff(tariff, inputs = {}) {
     components,
     hasTier: tierScopes.size > 0,
     tierScopes: Array.from(tierScopes),
+    needsPower,
   };
 }
 

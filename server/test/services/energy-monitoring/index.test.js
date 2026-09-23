@@ -28,6 +28,7 @@ describe('EnergyMonitoring Service', () => {
       },
       energyContract: {
         checkPriceChanges: fake.resolves([]),
+        takePendingRecalculation: fake.resolves(null),
       },
       scheduler: mockScheduler,
       job: {

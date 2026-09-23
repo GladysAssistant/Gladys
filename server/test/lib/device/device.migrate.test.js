@@ -626,6 +626,55 @@ describe('Device.migrate', function Describe() {
     expect(deviceManager.migrationsInProgress.size).to.equal(0);
   });
 
+  it('should reject the migration when the energy contracts of both devices overlap', async () => {
+    await db.EnergyContract.create({
+      name: 'Migration energy contract',
+      selector: 'migration-energy-contract',
+      valid_from: '2024-01-01',
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      tariff: {
+        tariff_version: 1,
+        components: [{ key: 'e', kind: 'consumption', rules: [], fallback: { price: 0.2 } }],
+      },
+      electric_meter_device_id: sourceDevice.id,
+    });
+    await db.EnergyContract.create({
+      name: 'Destination energy contract',
+      selector: 'migration-energy-contract-destination',
+      valid_from: '2025-01-01',
+      currency: 'EUR',
+      timezone: 'Europe/Paris',
+      tariff: {
+        tariff_version: 1,
+        components: [{ key: 'e', kind: 'consumption', rules: [], fallback: { price: 0.2 } }],
+      },
+      electric_meter_device_id: destinationDevice.id,
+    });
+    try {
+      const promise = deviceManager.migrate('migration-source', {
+        destination_device_selector: 'migration-destination',
+      });
+      await assert.isRejected(
+        promise,
+        'Energy contract "Migration energy contract" overlaps "Destination energy contract" on the destination device',
+      );
+      // nothing moved
+      const sourceContracts = await db.EnergyContract.count({ where: { electric_meter_device_id: sourceDevice.id } });
+      expect(sourceContracts).to.equal(1);
+      // a destination contract ended before the source one starts is not an overlap
+      await db.EnergyContract.update(
+        { valid_from: '2023-01-01', valid_to: '2023-12-31' },
+        { where: { selector: 'migration-energy-contract-destination' } },
+      );
+      await deviceManager.migrate('migration-source', { destination_device_selector: 'migration-destination' });
+      const moved = await db.EnergyContract.count({ where: { electric_meter_device_id: destinationDevice.id } });
+      expect(moved).to.equal(2);
+    } finally {
+      await db.EnergyContract.destroy({ where: { selector: 'migration-energy-contract-destination' } });
+    }
+  });
+
   it('should reject a concurrent migration of the same source device', async () => {
     deviceManager.migrationsInProgress.add('migration-source');
     const promise = deviceManager.migrate('migration-source', {

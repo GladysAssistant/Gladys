@@ -454,6 +454,25 @@ async function executeMigration(selector, options, jobId) {
     { where: { electric_meter_device_id: source.id } },
   );
   // Same for the energy contracts (FK ON DELETE CASCADE: they would vanish with the source).
+  // A meter has one contract per date: the merge is refused when the source and the
+  // destination carry overlapping contracts, the user reconciles their validity first.
+  const sourceContracts = await db.EnergyContract.findAll({ where: { electric_meter_device_id: source.id } });
+  const destinationContracts = await db.EnergyContract.findAll({
+    where: { electric_meter_device_id: destination.id },
+  });
+  sourceContracts.forEach((sourceContract) => {
+    const overlapping = destinationContracts.find(
+      (destinationContract) =>
+        destinationContract.direction === sourceContract.direction &&
+        (sourceContract.valid_to === null || destinationContract.valid_from <= sourceContract.valid_to) &&
+        (destinationContract.valid_to === null || sourceContract.valid_from <= destinationContract.valid_to),
+    );
+    if (overlapping) {
+      throw new ConflictError(
+        `Energy contract "${sourceContract.name}" overlaps "${overlapping.name}" on the destination device`,
+      );
+    }
+  });
   await db.EnergyContract.update(
     { electric_meter_device_id: destination.id },
     { where: { electric_meter_device_id: source.id } },

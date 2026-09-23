@@ -8,7 +8,7 @@ It is a **capability**, not a type (doctrine of `capabilities/provider-type.md`)
 
 ## 1. Manifest (C.1)
 
-`energy_contracts` field (added to `CAPABILITY_MANIFEST_FIELDS`), shown on the install screen ("this integration can provide energy contracts and tariff calendars").
+`energy_contracts` field (added to `CAPABILITY_MANIFEST_FIELDS`), shown on the install screen as a disclosure block (`EnergyContractsSummary`, next to the widgets and scene declarations): the contract templates the integration offers (name, country, `delegated` templates flagged "priced by the integration") and the calendars it feeds.
 
 ```json
 {
@@ -80,7 +80,7 @@ When a `POST /energy/calendar` changes a value already used by a computed cost (
 
 ## 5. JS SDK (C.8)
 
-`gladys.energy.publishCalendar(key, entries)`, `gladys.energy.getCalendar(key, { from, to })`, `gladys.energy.getContracts()`, `gladys.energy.requestRecalculation()`; handlers `gladys.energy.onPrice(async ({ contract, billing_period, cumulative_before, intervals }) => costs)` and `gladys.energy.onCurrent(async ({ contract, billing_period, cumulative, max_power_kw }) => current)`: the SDK forwards the whole WebSocket payload of §3, field for field, so the state the core sends (billing period, accumulations, last peak) reaches the handler. The Node.js template gets an `energy-contracts` example with a `rules` template and a calendar.
+`gladys.energy.publishCalendar(key, entries)`, `gladys.energy.getCalendar(key, { from, to })`, `gladys.energy.getContracts()`, `gladys.energy.requestRecalculation()`. The reads keep the scopes of §2, and the dedicated SDK must preserve them when it implements these methods: `publishCalendar` and `getCalendar` only reach a calendar key declared in the manifest of **this** integration (`403` otherwise), `getContracts` only returns the users' contracts referencing one of **this** integration's templates, with the fields listed in §2 and never the meter nor the consumption. Handlers `gladys.energy.onPrice(async ({ contract, billing_period, cumulative_before, intervals }) => costs)` and `gladys.energy.onCurrent(async ({ contract, billing_period, cumulative, max_power_kw }) => current)`: the SDK forwards the whole WebSocket payload of §3, field for field, so the state the core sends (billing period, accumulations, last peak) reaches the handler. The Node.js template gets an `energy-contracts` example with a `rules` template and a calendar.
 
 ## 6. Publishing a contract entirely as an external integration
 

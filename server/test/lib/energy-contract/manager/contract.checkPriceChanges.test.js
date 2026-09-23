@@ -18,7 +18,10 @@ describe('energyContract.checkPriceChanges', () => {
 
   it('should only record the first observation, then emit a trigger check when the price changes', async () => {
     await energyContract.declareCalendar({ key: 'tempo', granularity: 'day' }, TEST_SERVICE_ID);
-    await energyContract.publishCalendarEntries('tempo', [{ date: '2026-01-12', value: 'blue' }], TEST_SERVICE_ID);
+    await energyContract.publishCalendarEntries('tempo', [{ date: '2026-01-12', value: 'blue' }], {
+      provider_service_id: TEST_SERVICE_ID,
+      skip_recalculation: true,
+    });
     const contract = await energyContract.create(
       contractPayload({ name: 'Tempo', tariff: TEMPO_TARIFF, timezone: 'UTC', valid_from: '2026-01-01' }),
     );

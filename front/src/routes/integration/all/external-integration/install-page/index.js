@@ -13,6 +13,7 @@ import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
 import WebhooksSummary from '../components/WebhooksSummary';
 import WidgetsSummary from '../components/WidgetsSummary';
+import EnergyContractsSummary from '../components/EnergyContractsSummary';
 import SceneDeclarationsSummary from '../components/SceneDeclarationsSummary';
 import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -284,6 +285,7 @@ class ExternalIntegrationInstallPage extends Component {
                             <WebhooksSummary webhooks={manifest.webhooks} language={language} />
 
                             <WidgetsSummary widgets={manifest.widgets} language={language} />
+                            <EnergyContractsSummary energyContracts={manifest.energy_contracts} language={language} />
                             <SceneDeclarationsSummary
                               sceneTriggers={manifest.scene_triggers}
                               sceneActions={manifest.scene_actions}

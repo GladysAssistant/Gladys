@@ -14,6 +14,7 @@ const {
   groupPriceRows,
   toIsoCurrency,
   MIGRATION_DONE_VARIABLE,
+  PENDING_RECALCULATION_VARIABLE,
 } = require('../../../../lib/energy-contract/migration.fromEnergyPrice');
 const { validateTariff } = require('../../../../lib/energy-contract/tariff.validate');
 
@@ -216,37 +217,40 @@ describe('energyContract: legacy prices', () => {
     });
 
     it('should flag a migrated contract whose calculation differs from the legacy one', async () => {
-      // a peak/off-peak contract whose peak slots miss 12:00: the legacy code prices nothing
-      // there while the engine prices it with the fallback
-      await db.EnergyPrice.bulkCreate([
-        row({
-          id: '11111111-1111-4111-8111-111111111121',
-          selector: 'q1',
-          contract: 'peak-off-peak',
-          price: 2500,
-          hour_slots: '06:00,06:30',
-        }),
-        row({
-          id: '11111111-1111-4111-8111-111111111122',
-          selector: 'q2',
-          contract: 'peak-off-peak',
-          price: 1000,
-          hour_slots: OFF_PEAK,
-        }),
-      ]);
-      const now = Date.now();
-      await insertConsumption([
-        { value: 1, created_at: new Date(now - 3 * 60 * 60 * 1000) },
-        { value: 1, created_at: new Date(now - 2 * 60 * 60 * 1000) },
-      ]);
-      energyContract.getCommunityTemplates = sinon.fake.rejects(new Error('offline'));
-      const [created] = await energyContract.migrateFromEnergyPrice();
-      const contract = await energyContract.getBySelector(created.selector);
-      expect(contract.provider_kind).to.equal('user');
-      // whatever the local hour, the engine and the legacy code disagree on at least one interval
-      // only when the legacy code can price it: verify the warning shape when it exists
-      if (contract.migration_warning) {
-        expect(contract.migration_warning).to.have.all.keys('gap_ratio', 'legacy_total', 'engine_total', 'days');
+      // the off-peak row uses legacy hour indexes ("22,23"): the engine reads them as 22:00-00:00
+      // while the legacy code compared them to "HH:MM" labels and priced 22:00 with the peak row
+      const clock = sinon.useFakeTimers({ now: new Date('2026-01-12T12:40:00Z'), toFake: ['Date'] });
+      try {
+        await db.EnergyPrice.bulkCreate([
+          row({
+            id: '11111111-1111-4111-8111-111111111121',
+            selector: 'q1',
+            contract: 'peak-off-peak',
+            price: 2500,
+            hour_slots: '22:00,06:00,06:30,07:00,07:30',
+          }),
+          row({
+            id: '11111111-1111-4111-8111-111111111122',
+            selector: 'q2',
+            contract: 'peak-off-peak',
+            price: 1000,
+            hour_slots: '22,23',
+          }),
+        ]);
+        // one interval starting at 22:00 Paris
+        await insertConsumption([{ value: 1, created_at: new Date('2026-01-11T21:30:00Z') }]);
+        energyContract.getCommunityTemplates = sinon.fake.rejects(new Error('offline'));
+        const [created] = await energyContract.migrateFromEnergyPrice();
+        const contract = await energyContract.getBySelector(created.selector);
+        expect(contract.provider_kind).to.equal('user');
+        expect(contract.migration_warning).to.deep.equal({
+          gap_ratio: 0.6,
+          legacy_total: 0.25,
+          engine_total: 0.1,
+          days: [{ day: '2026-01-11', legacy: 0.25, engine: 0.1 }],
+        });
+      } finally {
+        clock.restore();
       }
     });
 
@@ -335,7 +339,89 @@ describe('energyContract: legacy prices', () => {
       ]);
       const created = await energyContract.migrateFromEnergyPrice();
       expect(created).to.deep.equal([]);
+      // a failed group is retried at the next start: no done marker
+      expect(variables[MIGRATION_DONE_VARIABLE]).to.equal(undefined);
+      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
+    });
+
+    it('should keep the converted groups and retry only the failed one without duplicates', async () => {
+      await db.EnergyPrice.bulkCreate([
+        row({ id: '11111111-1111-4111-8111-111111111151', selector: 't1' }),
+        row({
+          id: '11111111-1111-4111-8111-111111111152',
+          selector: 't2',
+          currency: 'yen',
+          contract_name: 'x'.repeat(200),
+        }),
+      ]);
+      energyContract.getCommunityTemplates = sinon.fake.rejects(new Error('offline'));
+      const first = await energyContract.migrateFromEnergyPrice();
+      expect(first).to.have.lengthOf(1);
+      expect(variables[MIGRATION_DONE_VARIABLE]).to.equal(undefined);
+      // the recalculation of the converted contract is left for the energy-monitoring service
+      const pending = JSON.parse(variables[PENDING_RECALCULATION_VARIABLE]);
+      expect(pending.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID]);
+      expect(pending.from).to.equal('2024-12-31T23:00:00.000Z');
+      // second start: the converted group is reused, the broken one fails again
+      const second = await energyContract.migrateFromEnergyPrice();
+      expect(second).to.have.lengthOf(1);
+      expect(second[0].id).to.equal(first[0].id);
+      expect(await db.EnergyContract.count({ where: { electric_meter_device_id: METER_DEVICE_ID } })).to.equal(1);
+      expect(variables[MIGRATION_DONE_VARIABLE]).to.equal(undefined);
+    });
+
+    it('should keep a created contract when its verification fails', async () => {
+      await db.EnergyPrice.bulkCreate([row({ id: '11111111-1111-4111-8111-111111111161', selector: 'u1' })]);
+      energyContract.getCommunityTemplates = sinon.fake.rejects(new Error('offline'));
+      energyContract.verifyMigratedContract = sinon.fake.rejects(new Error('duckdb down'));
+      const created = await energyContract.migrateFromEnergyPrice();
+      expect(created).to.have.lengthOf(1);
+      const contract = await energyContract.getBySelector(created[0].selector);
+      expect(contract.migration_warning).to.equal(null);
       expect(variables[MIGRATION_DONE_VARIABLE]).to.be.a('string');
+    });
+
+    it('should skip the verification of a tempo contract when the calendar is not declared yet', async () => {
+      const contract = await energyContract.create(
+        contractPayload({
+          name: 'Legacy tempo',
+          timezone: 'Europe/Paris',
+          valid_from: '2020-01-01',
+          tariff: {
+            tariff_version: 1,
+            calendars: ['tempo'],
+            components: [{ key: 'energy', kind: 'consumption', rules: [], fallback: { price: 0.3 } }],
+          },
+        }),
+      );
+      await insertConsumption([{ value: 1, created_at: new Date(Date.now() - 60 * 60 * 1000) }]);
+      const tempoRows = [
+        row({ contract: 'edf-tempo', price: 3000, day_type: 'red', hour_slots: `${PEAK},${OFF_PEAK}` }),
+      ];
+      expect(await energyContract.verifyMigratedContract(contract, tempoRows, 'Europe/Paris')).to.equal(null);
+      // any other error of the calendar read is reported
+      energyContract.getCalendarEntries = sinon.fake.rejects(new Error('db down'));
+      await expect(energyContract.verifyMigratedContract(contract, tempoRows, 'Europe/Paris')).to.be.rejectedWith(
+        'db down',
+      );
+    });
+
+    it('should hand the pending recalculation over once', async () => {
+      expect(await energyContract.takePendingRecalculation()).to.equal(null);
+      variables[PENDING_RECALCULATION_VARIABLE] = JSON.stringify({
+        from: '2024-12-31T23:00:00.000Z',
+        electric_meter_device_ids: [METER_DEVICE_ID],
+      });
+      const pending = await energyContract.takePendingRecalculation();
+      expect(pending.from).to.be.instanceOf(Date);
+      expect(pending.from.toISOString()).to.equal('2024-12-31T23:00:00.000Z');
+      expect(pending.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID]);
+      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
+      expect(await energyContract.takePendingRecalculation()).to.equal(null);
+      // an unreadable value is dropped
+      variables[PENDING_RECALCULATION_VARIABLE] = '{not json';
+      expect(await energyContract.takePendingRecalculation()).to.equal(null);
+      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
     });
 
     it('should group rows and map currencies', () => {

@@ -27,9 +27,13 @@ describe('Energy monitoring contracts', () => {
   before(() => {
     cy.login();
     cy.createDevice(METER, 'example');
-    // the community catalogue is fetched from GitHub on a real instance: stub it out
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/energy_contract/template` }, { body: [] });
     cy.visit('/dashboard/integration/device/energy-monitoring/contracts');
+  });
+
+  beforeEach(() => {
+    // the community catalogue is fetched from GitHub on a real instance: stub it out
+    // (intercepts are cleared before every test, so the stub is declared here)
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/energy_contract/template` }, { body: [] });
   });
 
   after(() => {

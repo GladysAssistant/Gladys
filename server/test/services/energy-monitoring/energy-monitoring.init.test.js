@@ -49,7 +49,7 @@ describe('EnergyMonitoring.init', () => {
     gladys = {
       variable,
       device,
-      energyContract: { checkPriceChanges: fake.resolves([]) },
+      energyContract: { checkPriceChanges: fake.resolves([]), takePendingRecalculation: fake.resolves(null) },
       event: { on: fake.returns(null) },
       scheduler: mockScheduler,
       job: {
@@ -98,6 +98,26 @@ describe('EnergyMonitoring.init', () => {
     // Verify job IDs are stored
     expect(energyMonitoring.calculateConsumptionAndCostEvery30MinutesJob).to.equal('mock-job-id');
     expect(energyMonitoring.calculateConsumptionAndCostEvery24HoursJob).to.equal('mock-job-id');
+  });
+
+  it('should run the recalculation left by the price migration, and survive its failures', async () => {
+    const pending = { from: new Date('2025-01-01T00:00:00.000Z'), electric_meter_device_ids: ['meter'] };
+    gladys.energyContract.takePendingRecalculation = fake.resolves(pending);
+    energyMonitoring.recalculateForContracts = fake.resolves(null);
+    await energyMonitoring.init();
+    assert.calledOnce(gladys.energyContract.takePendingRecalculation);
+    assert.calledOnceWithExactly(energyMonitoring.recalculateForContracts, pending);
+    // a failing recalculation is logged, the service keeps starting
+    const failing = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    failing.recalculateForContracts = fake.rejects(new Error('boom'));
+    await failing.init();
+    assert.calledOnce(failing.recalculateForContracts);
+    // an unreadable pending recalculation too
+    gladys.energyContract.takePendingRecalculation = fake.rejects(new Error('db down'));
+    const unreadable = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    unreadable.recalculateForContracts = fake.resolves(null);
+    await unreadable.init();
+    assert.notCalled(unreadable.recalculateForContracts);
   });
 
   it('should not schedule job again if already scheduled', async () => {

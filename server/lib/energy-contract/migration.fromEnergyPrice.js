@@ -1,5 +1,6 @@
 const db = require('../../models');
 const logger = require('../../utils/logger');
+const { NotFoundError } = require('../../utils/coreErrors');
 const { buildUniqueSelector } = require('../../utils/addSelector');
 const {
   SYSTEM_VARIABLE_NAMES,
@@ -16,6 +17,9 @@ const { localToUtcMs } = require('./tariff.time');
 const { TEMPO_CALENDAR_KEY } = require('./templates/internal');
 
 const MIGRATION_DONE_VARIABLE = 'ENERGY_CONTRACT_MIGRATION_DONE';
+// the recalculation the migration asks for, picked up by the energy-monitoring service at
+// its start: the migration runs before the services listen to the recalculation event
+const PENDING_RECALCULATION_VARIABLE = 'ENERGY_CONTRACT_PENDING_RECALCULATION';
 const VERIFICATION_DAYS = 7;
 const MAX_GAP_RATIO = 0.005;
 const CURRENCY_MAP = { euro: 'EUR', dollar: 'USD', pound: 'GBP', franc: 'CHF' };
@@ -91,11 +95,21 @@ async function verifyMigratedContract(contract, rows, systemTimezone) {
   const engine = priceIntervals(compiled, contract, intervals, { calendars });
   const tempoDayMap = new Map();
   if (compiled.calendars.includes(TEMPO_CALENDAR_KEY)) {
-    const entries = await this.getCalendarEntries(TEMPO_CALENDAR_KEY, { from, to });
-    entries.forEach((entry) => {
-      const date = new Date(entry.starts_at).toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' });
-      tempoDayMap.set(date, entry.value);
-    });
+    try {
+      const entries = await this.getCalendarEntries(TEMPO_CALENDAR_KEY, { from, to });
+      entries.forEach((entry) => {
+        const date = new Date(entry.starts_at).toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' });
+        tempoDayMap.set(date, entry.value);
+      });
+    } catch (e) {
+      // the tempo calendar is declared by the edf-tempo service, which starts after the
+      // migration: without it the legacy code cannot price a Tempo day, nothing to compare
+      if (!(e instanceof NotFoundError)) {
+        throw e;
+      }
+      logger.debug(`Energy contract migration: tempo calendar not declared yet, verification skipped`);
+      return null;
+    }
   }
   const perDay = new Map();
   let legacyTotal = 0;
@@ -164,6 +178,7 @@ async function migrateFromEnergyPrice() {
   } catch (e) {
     logger.debug(`Energy contract migration: catalogue unavailable (${e.message}), provider set to user`);
   }
+  let failures = 0;
   // eslint-disable-next-line no-restricted-syntax
   for (const group of groups) {
     const first = group.rows[0];
@@ -190,39 +205,90 @@ async function migrateFromEnergyPrice() {
       tariff,
       inputs: null,
     };
+    let row;
     try {
+      // a previous attempt failed on another group: the groups already converted are kept
+      // eslint-disable-next-line no-await-in-loop
+      const existing = await db.EnergyContract.findOne({
+        where: { electric_meter_device_id: contract.electric_meter_device_id, valid_from: contract.valid_from, name },
+      });
+      if (existing) {
+        created.push(existing.get({ plain: true }));
+        // eslint-disable-next-line no-continue
+        continue;
+      }
       // several validity periods of one contract share its name: unique selectors
       // eslint-disable-next-line no-await-in-loop
       contract.selector = await buildUniqueSelector(db.EnergyContract, name);
       // eslint-disable-next-line no-await-in-loop
-      const row = await db.EnergyContract.create(contract);
-      const plain = row.get({ plain: true });
+      row = await db.EnergyContract.create(contract);
+    } catch (e) {
+      failures += 1;
+      logger.error(`Energy contract migration: unable to convert "${name}": ${e.message}`);
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    const plain = row.get({ plain: true });
+    created.push(plain);
+    logger.info(`Energy contract migration: "${name}" created from ${group.rows.length} price row(s)`);
+    // the verification never leaves a created contract outside the success path
+    try {
       // eslint-disable-next-line no-await-in-loop
       const warning = await this.verifyMigratedContract(plain, group.rows, systemTimezone);
       if (warning) {
         // eslint-disable-next-line no-await-in-loop
         await row.update({ migration_warning: warning });
       }
-      created.push(plain);
-      logger.info(`Energy contract migration: "${name}" created from ${group.rows.length} price row(s)`);
     } catch (e) {
-      logger.error(`Energy contract migration: unable to convert "${name}": ${e.message}`);
+      logger.warn(`Energy contract migration: unable to verify "${name}": ${e.message}`);
     }
   }
-  await this.variable.setValue(MIGRATION_DONE_VARIABLE, new Date().toISOString());
+  if (failures === 0) {
+    await this.variable.setValue(MIGRATION_DONE_VARIABLE, new Date().toISOString());
+  } else {
+    logger.warn(`Energy contract migration: ${failures} group(s) not converted, retried at the next start`);
+  }
   const meterIds = Array.from(new Set(created.map((c) => c.electric_meter_device_id)));
   if (meterIds.length > 0) {
     const earliest = created.map((c) => c.valid_from).sort()[0];
-    this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, {
-      from: new Date(localToUtcMs(earliest, systemTimezone)),
+    const payload = {
+      from: new Date(localToUtcMs(earliest, systemTimezone)).toISOString(),
       electric_meter_device_ids: meterIds,
-    });
+    };
+    // stored for the energy-monitoring service, which is not listening yet at this point of
+    // the boot; the event still serves a migration run while the service is up
+    await this.variable.setValue(PENDING_RECALCULATION_VARIABLE, JSON.stringify(payload));
+    this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, { ...payload, from: new Date(payload.from) });
   }
   return created;
 }
 
+/**
+ * @description The recalculation left by the migration for the energy-monitoring service
+ * (section 9.3): returned once, then cleared.
+ * @returns {Promise<object|null>} { from, electric_meter_device_ids } or null.
+ * @example
+ * const pending = await energyContract.takePendingRecalculation();
+ */
+async function takePendingRecalculation() {
+  const raw = await this.variable.getValue(PENDING_RECALCULATION_VARIABLE);
+  if (!raw) {
+    return null;
+  }
+  await this.variable.destroy(PENDING_RECALCULATION_VARIABLE);
+  try {
+    const payload = JSON.parse(raw);
+    return { ...payload, from: new Date(payload.from) };
+  } catch (e) {
+    logger.warn(`Energy contract migration: invalid pending recalculation ignored (${e.message})`);
+    return null;
+  }
+}
+
 module.exports = {
   migrateFromEnergyPrice,
+  takePendingRecalculation,
+  PENDING_RECALCULATION_VARIABLE,
   verifyMigratedContract,
   groupPriceRows,
   toIsoCurrency,
