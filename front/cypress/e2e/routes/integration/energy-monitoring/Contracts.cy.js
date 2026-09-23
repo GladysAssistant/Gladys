@@ -80,6 +80,8 @@ describe('Energy monitoring contracts', () => {
   });
 
   it('should delete the contract', () => {
+    // the local storage is cleared between tests: log in again before reloading the page
+    cy.login();
     cy.visit('/dashboard/integration/device/energy-monitoring/contracts');
     cy.on('window:confirm', () => true);
     cy.get('[data-cy=energy-contract-row]')
