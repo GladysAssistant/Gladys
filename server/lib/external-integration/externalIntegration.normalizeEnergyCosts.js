@@ -1,5 +1,5 @@
 const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
-const { MAX_ENERGY_PRICE_PER_KWH } = require('./constants');
+const { MAX_ENERGY_PRICE_PER_KWH, MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY } = require('./constants');
 const logger = require('../../utils/logger');
 
 const COST_DECIMALS = 6;
@@ -15,6 +15,18 @@ const MAX_LABEL_LENGTH = 64;
 function round(value) {
   const factor = 10 ** COST_DECIMALS;
   return Math.round(value * factor) / factor;
+}
+
+/**
+ * @description The bound per kWh of a delegated price in a currency (capability file,
+ * section 3): 10 units by default, raised for the currencies whose unit is small.
+ * @param {string} currency - ISO 4217 code of the contract.
+ * @returns {number} The bound in currency units per kWh.
+ * @example
+ * getMaxEnergyPricePerKwh('JPY'); // 2000
+ */
+function getMaxEnergyPricePerKwh(currency) {
+  return MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY[String(currency || '').toUpperCase()] || MAX_ENERGY_PRICE_PER_KWH;
 }
 
 /**
@@ -134,4 +146,8 @@ function normalizeEnergyCurrent(payload, maxPricePerKwh = MAX_ENERGY_PRICE_PER_K
   };
 }
 
-module.exports = { normalizeEnergyCosts, normalizeEnergyCurrent };
+module.exports = {
+  getMaxEnergyPricePerKwh,
+  normalizeEnergyCosts,
+  normalizeEnergyCurrent,
+};

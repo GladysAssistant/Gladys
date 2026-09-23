@@ -9,7 +9,6 @@ const logger = require('../../utils/logger');
 const MAX_ENTRIES_PER_CALL = 2000;
 const PAST_WINDOW_MS = 5 * 365 * 24 * 60 * 60 * 1000;
 const FUTURE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-const THIRTY_MINUTES_MS = 30 * 60 * 1000;
 // Bound of the recalculations a calendar can trigger (capability file, section 2)
 const RECALCULATION_MIN_INTERVAL_MS = 10 * 60 * 1000;
 
@@ -42,8 +41,14 @@ function resolveStartsAt(entry, calendar, index) {
     if (local.minutes !== 0 || ms % 60000 !== 0) {
       throw new BadParameters(`entries[${index}].starts_at: must be a local midnight of ${calendar.timezone}`);
     }
-  } else if (ms % THIRTY_MINUTES_MS !== 0) {
-    throw new BadParameters(`entries[${index}].starts_at: must be aligned on a 30-minute slot`);
+  } else {
+    // a 30-minute slot of the calendar's local clock (a :15 / :45 zone is not aligned on UTC)
+    const local = getLocalContext(ms, calendar.timezone);
+    if (local.minutes % 30 !== 0 || ms % 60000 !== 0) {
+      throw new BadParameters(
+        `entries[${index}].starts_at: must be aligned on a 30-minute slot of ${calendar.timezone}`,
+      );
+    }
   }
   return ms;
 }

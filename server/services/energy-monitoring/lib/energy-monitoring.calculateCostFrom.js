@@ -116,23 +116,28 @@ async function priceByBillingPeriod(energyContract, contract, intervals, nowMs) 
     }
   });
   const result = { costs: [], warnings: [], unpriced: [] };
-  // The day and month accumulations carry over a billing period boundary that is not a
-  // day or month boundary (a billing day other than the 1st): the next group starts from
-  // what the previous one accumulated, the billing period itself restarts at 0.
-  let carried;
+  // The month accumulation carries over a billing period boundary inside a calendar month
+  // (a billing day other than the 1st): the next group starts from what the previous one
+  // accumulated when its first interval is in the same local month as the previous last one
+  // (a skipped period or a new month restarts it); a billing period starts at local
+  // midnight so the day accumulation always restarts, the billing period itself too.
+  let previous = null;
   await Promise.each(groups, async (group) => {
+    const firstMonth = getLocalContext(new Date(group.intervals[0].starts_at).getTime(), contract.timezone).date.slice(
+      0,
+      7,
+    );
     const priced = await energyContract.priceContractIntervals(contract, group.intervals, {
       closed_period: group.endMs <= nowMs,
-      cumulative_before: carried,
+      cumulative_before:
+        previous !== null && previous.month === firstMonth
+          ? { day: 0, month: previous.cumulative, billing_period: 0 }
+          : undefined,
     });
     const lastInterval = group.intervals[group.intervals.length - 1];
-    const lastLocal = getLocalContext(new Date(lastInterval.starts_at).getTime(), contract.timezone);
-    const boundaryLocal = getLocalContext(group.endMs, contract.timezone);
-    carried = {
-      // a billing period starts at local midnight: the day accumulation always restarts
-      day: 0,
-      month: boundaryLocal.date.slice(0, 7) === lastLocal.date.slice(0, 7) ? priced.cumulative.month : 0,
-      billing_period: 0,
+    previous = {
+      month: getLocalContext(new Date(lastInterval.starts_at).getTime(), contract.timezone).date.slice(0, 7),
+      cumulative: priced.cumulative.month,
     };
     result.costs.push(...priced.costs);
     result.warnings.push(...priced.warnings);
@@ -175,6 +180,7 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
       : null;
   // Contracts are per root meter and don't change during the run: fetched once per meter.
   const contractsByMeter = new Map();
+  const powerPeaksByMeter = new Map();
   const getContracts = async (meterDeviceId) => {
     if (!contractsByMeter.has(meterDeviceId)) {
       contractsByMeter.set(
@@ -226,20 +232,24 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           }
         });
         // demand charges and power thresholds read the meter's historized power feature
-        // when it has one (section 7.1), the 30-minute average power otherwise
-        const powerPeaks =
-          powerTimezone !== null
-            ? await this.gladys.energyContract.getMeterPowerPeaks(
+        // when it has one (section 7.1), the 30-minute average power otherwise; the peaks
+        // of a meter are loaded once per run for all the devices it feeds
+        let powerPeaks = new Map();
+        if (powerTimezone !== null) {
+          const peaksKey = `${electricMeterFeature.device_id}|${effectiveStart.getTime()}|${powerTimezone}`;
+          if (!powerPeaksByMeter.has(peaksKey)) {
+            powerPeaksByMeter.set(
+              peaksKey,
+              await this.gladys.energyContract.getMeterPowerPeaks(
                 electricMeterFeature.device_id,
                 effectiveStart,
                 nowDate,
                 powerTimezone,
-              )
-            : new Map();
-        logger.debug(
-          `Destroying states from ${pair.consumptionCostFeature.selector} from ${effectiveStart.toISOString()}`,
-        );
-        await this.gladys.device.destroyStatesFrom(pair.consumptionCostFeature.selector, effectiveStart);
+              ),
+            );
+          }
+          powerPeaks = powerPeaksByMeter.get(peaksKey);
+        }
         const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
           pair.consumptionFeature.selector,
           effectiveStart,
@@ -288,6 +298,11 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
             );
           }
         });
+        // priced first, replaced then: a pricing failure leaves the previous costs in place
+        logger.debug(
+          `Replacing the costs of ${pair.consumptionCostFeature.selector} from ${effectiveStart.toISOString()}`,
+        );
+        await this.gladys.device.destroyStatesFrom(pair.consumptionCostFeature.selector, effectiveStart);
         await this.gladys.device.saveMultipleHistoricalStates(pair.consumptionCostFeature.id, statesToInsert);
       });
     } catch (e) {

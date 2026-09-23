@@ -367,12 +367,15 @@ describe('energyContract: legacy prices', () => {
       const pending = JSON.parse(variables[PENDING_RECALCULATION_VARIABLE]);
       expect(pending.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID]);
       expect(pending.from).to.equal('2024-12-31T23:00:00.000Z');
-      // second start: the converted group is reused, the broken one fails again
+      // second start: the converted group is reused, the broken one fails again, and the
+      // already converted meter is not recalculated again
+      await energyContract.clearPendingRecalculation();
       const second = await energyContract.migrateFromEnergyPrice();
       expect(second).to.have.lengthOf(1);
       expect(second[0].id).to.equal(first[0].id);
       expect(await db.EnergyContract.count({ where: { electric_meter_device_id: METER_DEVICE_ID } })).to.equal(1);
       expect(variables[MIGRATION_DONE_VARIABLE]).to.equal(undefined);
+      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
     });
 
     it('should keep a created contract when its verification fails', async () => {

@@ -378,8 +378,43 @@ const ENERGY_PRICING_MODES = ['rules', 'delegated'];
 const ENERGY_CONTRACT_PRICE_TIMEOUT_MS = 30 * 1000;
 const ENERGY_CONTRACT_CURRENT_TIMEOUT_MS = 5 * 1000;
 const MAX_ENERGY_INTERVALS_PER_REQUEST = 1488;
-// a delegated cost above this many currency units per kWh is refused (normalizeEnergyCosts)
+// a delegated cost above this many currency units per kWh is refused (normalizeEnergyCosts):
+// a hostile-payload guard, orders of magnitude above any tariff, raised for the currencies
+// whose unit is worth much less than a euro (JPY, KRW, HUF, IDR...)
 const MAX_ENERGY_PRICE_PER_KWH = 10;
+const MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY = {
+  JPY: 2000,
+  KRW: 20000,
+  HUF: 5000,
+  CZK: 500,
+  PLN: 100,
+  SEK: 200,
+  NOK: 200,
+  DKK: 200,
+  ISK: 2000,
+  TRY: 500,
+  RUB: 1000,
+  UAH: 500,
+  INR: 500,
+  PKR: 2000,
+  BDT: 1000,
+  LKR: 2000,
+  IDR: 200000,
+  VND: 300000,
+  PHP: 500,
+  THB: 500,
+  TWD: 500,
+  KZT: 5000,
+  MXN: 500,
+  BRL: 100,
+  ARS: 10000,
+  CLP: 20000,
+  COP: 50000,
+  ZAR: 500,
+  NGN: 10000,
+  EGP: 500,
+  CNY: 100,
+};
 const ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
 // the refresh nudge carries no date: the costs of the last two days are recomputed
 const ENERGY_CALENDAR_REFRESH_LOOKBACK_MS = 2 * 24 * 60 * 60 * 1000;
@@ -598,6 +633,7 @@ module.exports = {
   ENERGY_CONTRACT_CURRENT_TIMEOUT_MS,
   MAX_ENERGY_INTERVALS_PER_REQUEST,
   MAX_ENERGY_PRICE_PER_KWH,
+  MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY,
   ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS,
   ENERGY_CALENDAR_REFRESH_LOOKBACK_MS,
   WIDGET_GET_TIMEOUT_MS,

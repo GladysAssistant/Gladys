@@ -177,6 +177,7 @@ async function migrateFromEnergyPrice() {
   const systemTimezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || 'UTC';
   const groups = groupPriceRows(rows);
   const created = [];
+  const newlyCreated = [];
   const catalogueKeys = new Set();
   try {
     (await this.getCommunityTemplates()).forEach((t) => catalogueKeys.add(t.key));
@@ -235,6 +236,7 @@ async function migrateFromEnergyPrice() {
     }
     const plain = row.get({ plain: true });
     created.push(plain);
+    newlyCreated.push(plain);
     logger.info(`Energy contract migration: "${name}" created from ${group.rows.length} price row(s)`);
     // the verification never leaves a created contract outside the success path
     try {
@@ -248,10 +250,12 @@ async function migrateFromEnergyPrice() {
       logger.warn(`Energy contract migration: unable to verify "${name}": ${e.message}`);
     }
   }
-  const meterIds = Array.from(new Set(created.map((c) => c.electric_meter_device_id)));
+  // only the contracts created by this run need a recalculation: a retry after a failed
+  // group must not recompute the meters converted by a previous start again
+  const meterIds = Array.from(new Set(newlyCreated.map((c) => c.electric_meter_device_id)));
   if (meterIds.length > 0) {
     // the earliest start of the created contracts, each in its own timezone
-    const earliestMs = Math.min(...created.map((c) => localToUtcMs(c.valid_from, c.timezone)));
+    const earliestMs = Math.min(...newlyCreated.map((c) => localToUtcMs(c.valid_from, c.timezone)));
     const payload = {
       from: new Date(earliestMs).toISOString(),
       electric_meter_device_ids: meterIds,

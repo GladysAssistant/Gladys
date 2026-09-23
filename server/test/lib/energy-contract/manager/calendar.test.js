@@ -162,8 +162,17 @@ describe('energyContract: tariff calendars', () => {
         /local midnight of Europe\/Paris/,
       );
       await expect(publish('spot-fr', [{ starts_at: '2026-01-12T05:10:00Z', price: 1 }])).to.be.rejectedWith(
-        /aligned on a 30-minute slot/,
+        /aligned on a 30-minute slot of Europe\/Paris/,
       );
+      // the slots of a :45 zone start at :15 and :45 UTC
+      await energyContract.declareCalendar(
+        { key: 'spot-np', granularity: 'thirty_minutes', timezone: 'Asia/Kathmandu' },
+        TEST_SERVICE_ID,
+      );
+      await expect(publish('spot-np', [{ starts_at: '2026-01-12T05:00:00Z', price: 1 }])).to.be.rejectedWith(
+        /aligned on a 30-minute slot of Asia\/Kathmandu/,
+      );
+      expect((await publish('spot-np', [{ starts_at: '2026-01-12T05:15:00Z', price: 1 }])).count).to.equal(1);
       await expect(publish('tempo', [{ date: '2026-01-12' }])).to.be.rejectedWith(/exactly one of value or price/);
       await expect(publish('tempo', [{ date: '2026-01-12', value: 'red', price: 1 }])).to.be.rejectedWith(
         /exactly one of value or price/,

@@ -6,7 +6,11 @@ const {
   ENERGY_CONTRACT_CURRENT_TIMEOUT_MS,
   MAX_ENERGY_INTERVALS_PER_REQUEST,
 } = require('./constants');
-const { normalizeEnergyCosts, normalizeEnergyCurrent } = require('./externalIntegration.normalizeEnergyCosts');
+const {
+  normalizeEnergyCosts,
+  normalizeEnergyCurrent,
+  getMaxEnergyPricePerKwh,
+} = require('./externalIntegration.normalizeEnergyCosts');
 
 /**
  * @description The service row of the integration providing a delegated contract.
@@ -75,7 +79,7 @@ async function priceEnergyContract(contract, request) {
     },
     { timeoutMs: ENERGY_CONTRACT_PRICE_TIMEOUT_MS },
   );
-  return normalizeEnergyCosts(result && result.data, request.intervals);
+  return normalizeEnergyCosts(result && result.data, request.intervals, getMaxEnergyPricePerKwh(contract.currency));
 }
 
 /**
@@ -100,7 +104,7 @@ async function getEnergyContractCurrent(contract, request) {
     },
     { timeoutMs: ENERGY_CONTRACT_CURRENT_TIMEOUT_MS },
   );
-  return normalizeEnergyCurrent(result && result.data);
+  return normalizeEnergyCurrent(result && result.data, getMaxEnergyPricePerKwh(contract.currency));
 }
 
 module.exports = { priceEnergyContract, getEnergyContractCurrent, getEnergyContractProvider, contractPayload };

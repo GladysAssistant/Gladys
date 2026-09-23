@@ -326,10 +326,51 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       { value: 6000, created_at: new Date('2025-08-28T14:40:00.000Z') },
       { value: 1000, created_at: new Date('2025-08-28T14:50:00.000Z') },
     ]);
+    // a second device on the same meter: the peaks are loaded once per run
+    await device.create({
+      id: 'df43f956-2f49-4cf9-a7e2-690a014de66e',
+      service_id: TEST_SERVICE_ID,
+      name: 'Second plug',
+      external_id: 'second-plug',
+      features: [
+        feature({
+          id: '37488546-e1b8-4cb9-bd75-e20526a94a99',
+          selector: 'second-plug-consumption',
+          external_id: 'second-plug-consumption',
+          name: 'Second plug Consumption',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          energy_parent_id: METER_FEATURE_ID,
+        }),
+        feature({
+          id: '2f4133be-b86c-4a97-9cc8-585fadb74006',
+          selector: 'second-plug-consumption-cost',
+          external_id: 'second-plug-consumption-cost',
+          name: 'Second plug Consumption Cost',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          energy_parent_id: '37488546-e1b8-4cb9-bd75-e20526a94a99',
+        }),
+      ],
+    });
+    const getMeterPowerPeaks = sinon.spy(energyContract, 'getMeterPowerPeaks');
     await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
     const states = await costStates();
     expect(states).to.have.lengthOf(3);
     expect(states[0].value + states[1].value).to.equal(60);
+    expect(getMeterPowerPeaks.callCount).to.equal(1);
+  });
+
+  it('should keep the previous costs when the pricing fails', async () => {
+    await energyContract.create(contractPayload({ name: 'Flat', timezone: 'UTC', valid_from: '2020-01-01' }));
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+    ]);
+    await db.duckDbBatchInsertState(PLUG_COST_ID, [{ value: 99, created_at: new Date('2025-08-28T15:00:00.000Z') }]);
+    sinon.stub(energyContract, 'priceContractIntervals').rejects(new Error('integration down'));
+    const error = sinon.stub(logger, 'error');
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
+    expect(error.callCount).to.equal(1);
+    const states = await costStates();
+    expect(states.map((s) => s.value)).to.deep.equal([99]);
   });
 
   it('should not widen the run window for a tiered contract that is expired', async () => {
@@ -404,6 +445,36 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     // 8 kWh in tier 1, then 2 in tier 1 and 2 above: the billing period of the 15th does not
     // restart the month; the September interval starts a new month
     expect(states.map((s) => Math.round(s.value * 100) / 100)).to.deep.equal([0.8, 2.2, 0.4]);
+  });
+
+  it('should not carry the month accumulation over a skipped billing period', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Month tier',
+        timezone: 'UTC',
+        valid_from: '2020-01-01',
+        billing_period_start_day: 15,
+        tariff: {
+          tariff_version: 1,
+          components: [
+            {
+              key: 'e',
+              kind: 'consumption',
+              rules: [{ when: { tier: { cumulative: 'month', from_kwh: 0, to_kwh: 10 } }, price: 0.1 }],
+              fallback: { price: 1 },
+            },
+          ],
+        },
+      }),
+    );
+    // the Jul 15 - Aug 14 period, nothing in Aug 15 - Sep 14, then the Sep 15 - Oct 14 one
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 8, created_at: new Date('2025-08-14T10:00:00.000Z') },
+      { value: 4, created_at: new Date('2025-10-10T10:00:00.000Z') },
+    ]);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
+    const states = await costStates();
+    expect(states.map((s) => Math.round(s.value * 100) / 100)).to.deep.equal([0.8, 0.4]);
   });
 
   it('should leave the intervals of an unavailable delegated integration without a cost', async () => {

@@ -1,9 +1,20 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../utils/constants');
 const { convertEnergyUnit } = require('../../utils/units');
+const db = require('../../models');
 const { getLocalContext, getDayBounds, getMonthBounds, getBillingPeriodBounds } = require('./tariff.time');
 
 const THIRTY_MINUTES_MS = 30 * 60 * 1000;
-const MS_PER_MINUTE = 60 * 1000;
+const POWER_PEAKS_QUERY = `
+  SELECT
+      epoch_ms(time_bucket(INTERVAL 30 MINUTE, created_at, ?)) AS slot,
+      MAX(value) AS peak
+  FROM
+      t_device_feature_state
+  WHERE device_feature_id = ?
+  AND created_at >= CAST(? AS TIMESTAMPTZ)
+  AND created_at < CAST(? AS TIMESTAMPTZ)
+  GROUP BY slot
+`;
 // power units already in kilo: read as they are, the others are divided by 1000
 const KILO_POWER_UNITS = [DEVICE_FEATURE_UNITS.KILOWATT, DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE];
 
@@ -131,19 +142,17 @@ async function getMeterPowerPeaks(electricMeterDeviceId, from, to, timezone) {
   }
   // kW and kVA are read as they are, W and VA are divided by 1000
   const factor = KILO_POWER_UNITS.includes(feature.unit) ? 1 : 1 / 1000;
-  const states = await this.device.getDeviceFeatureStates(
-    feature.selector,
-    from,
-    new Date(to.getTime() + THIRTY_MINUTES_MS),
+  // the max per slot is computed by DuckDB (a power feature can hold a state every few
+  // seconds), the slots being the 30-minute buckets of the contract's local clock
+  const rows = await db.duckDbReadConnectionAllAsync(
+    POWER_PEAKS_QUERY,
+    timezone,
+    feature.id,
+    from.toISOString(),
+    new Date(to.getTime() + THIRTY_MINUTES_MS).toISOString(),
   );
-  states.forEach((state) => {
-    const ms = new Date(state.created_at).getTime();
-    const local = getLocalContext(ms, timezone);
-    const slot = ms - (local.minutes % 30) * MS_PER_MINUTE - (ms % MS_PER_MINUTE);
-    const kw = Number(state.value) * factor;
-    if (!peaks.has(slot) || peaks.get(slot) < kw) {
-      peaks.set(slot, kw);
-    }
+  rows.forEach((row) => {
+    peaks.set(Number(row.slot), Number(row.peak) * factor);
   });
   return peaks;
 }

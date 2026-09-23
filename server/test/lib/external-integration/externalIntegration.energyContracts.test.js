@@ -12,6 +12,7 @@ const {
 const {
   normalizeEnergyCosts,
   normalizeEnergyCurrent,
+  getMaxEnergyPricePerKwh,
 } = require('../../../lib/external-integration/externalIntegration.normalizeEnergyCosts');
 const { buildSupervisor, seedExternalService, TEST_ENERGY_MANIFEST } = require('./testUtils.test');
 
@@ -40,6 +41,19 @@ describe('externalIntegration: energy contracts capability', () => {
         ['2026-01-12T05:00:00.000Z', { cost: 0.2, components: { energy: 0.15, tax: 0.05 }, label: 'agile' }],
         ['2026-01-12T05:30:00.000Z', { cost: 0.123457, components: { energy: 0.123457 }, label: undefined }],
       ]);
+    });
+
+    it('should raise the bound for the currencies whose unit is small', () => {
+      expect(getMaxEnergyPricePerKwh('EUR')).to.equal(10);
+      expect(getMaxEnergyPricePerKwh('jpy')).to.equal(2000);
+      expect(getMaxEnergyPricePerKwh(undefined)).to.equal(10);
+      // 30 JPY/kWh is a normal Japanese price, refused by the default bound
+      const intervals = [{ starts_at: '2026-01-12T05:00:00.000Z', kwh: 1 }];
+      const payload = { costs: [{ starts_at: '2026-01-12T05:00:00.000Z', cost: 30 }] };
+      expect(() => normalizeEnergyCosts(payload, intervals)).to.throw('EXTERNAL_INTEGRATION_INVALID_ENERGY_COSTS');
+      expect(
+        normalizeEnergyCosts(payload, intervals, getMaxEnergyPricePerKwh('JPY')).get('2026-01-12T05:00:00.000Z').cost,
+      ).to.equal(30);
     });
 
     it('should reject an invalid payload', () => {
