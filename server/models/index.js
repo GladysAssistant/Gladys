@@ -360,23 +360,57 @@ const duckDbUpdateState = async (deviceFeatureId, value, createdAt) => {
   );
 };
 
+const buildInsertStatesStatement = (deviceFeatureId, states) => {
+  let queryString = `INSERT INTO t_device_feature_state (device_feature_id, value, created_at) VALUES `;
+  const queryParams = [];
+  states.forEach((state, index) => {
+    if (index > 0) {
+      queryString += `,`;
+    }
+    queryString += '(?, ?, ?)';
+    queryParams.push(deviceFeatureId);
+    queryParams.push(state.value);
+    queryParams.push(formatDateInUTC(state.created_at));
+  });
+  return { queryString, queryParams };
+};
+
 const duckDbBatchInsertState = async (deviceFeatureId, states) => {
   const chunks = chunk(states, 10000);
   await Promise.each(chunks, async (oneStatesChunk, chunkIndex) => {
-    let queryString = `INSERT INTO t_device_feature_state (device_feature_id, value, created_at) VALUES `;
-    const queryParams = [];
-    oneStatesChunk.forEach((state, index) => {
-      if (index > 0) {
-        queryString += `,`;
-      }
-      queryString += '(?, ?, ?)';
-      queryParams.push(deviceFeatureId);
-      queryParams.push(state.value);
-      queryParams.push(formatDateInUTC(state.created_at));
-    });
+    const { queryString, queryParams } = buildInsertStatesStatement(deviceFeatureId, oneStatesChunk);
     logger.info(`DuckDB : Inserting chunk ${chunkIndex} for deviceFeature = ${deviceFeatureId}.`);
     await duckDbWriteConnectionAllAsync(queryString, ...queryParams);
   });
+};
+
+// Replace the states of a feature from a date in ONE transaction, on a dedicated
+// connection: the previous states are kept when the insert fails or the process dies
+// between the delete and the insert (the energy cost history is rewritten this way).
+const duckDbReplaceStatesFrom = async (deviceFeatureId, from, states) => {
+  await ensureDuckDbInitialized();
+  const connection = await duckDbInstance.connect();
+  const run = async (query, params = []) => {
+    const mappedParams = normalizeParams(params).map(toDuckDbParam);
+    await connection.runAndReadAll(query, mappedParams);
+  };
+  try {
+    await run('BEGIN TRANSACTION');
+    await run('DELETE FROM t_device_feature_state WHERE device_feature_id = ? AND created_at >= ?::TIMESTAMPTZ', [
+      deviceFeatureId,
+      formatDateInUTC(from),
+    ]);
+    await Promise.each(chunk(states, 10000), async (oneStatesChunk) => {
+      const { queryString, queryParams } = buildInsertStatesStatement(deviceFeatureId, oneStatesChunk);
+      await run(queryString, queryParams);
+    });
+    await run('COMMIT');
+  } catch (e) {
+    await run('ROLLBACK').catch((rollbackError) => logger.warn(`DuckDB rollback failed: ${rollbackError.message}`));
+    throw e;
+  } finally {
+    connection.disconnectSync();
+  }
 };
 
 const duckDbShowVersion = async () => {
@@ -457,6 +491,7 @@ const db = {
   duckDbInsertState,
   duckDbUpdateState,
   duckDbBatchInsertState,
+  duckDbReplaceStatesFrom,
   duckDbShowVersion,
   duckDbSetTimezone,
   duckDbCreateBackupInstance,

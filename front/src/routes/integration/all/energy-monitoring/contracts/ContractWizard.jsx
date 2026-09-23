@@ -324,7 +324,7 @@ class ContractWizard extends Component {
         .replace(/^-+|-+$/g, '')
         .slice(0, 64),
       name: { en: form.name },
-      country: 'FR',
+      country: (template && template.country) || 'FR',
       currency: form.currency,
       timezone: form.timezone || undefined,
       pricing_mode: form.pricing_mode,
@@ -747,7 +747,7 @@ class ContractWizard extends Component {
               class="custom-switch-input"
               checked={jsonMode}
               onChange={this.toggleJsonMode}
-              disabled={!template || (!template.tariff && form.pricing_mode !== 'delegated')}
+              disabled={!template}
             />
             <span class="custom-switch-indicator" />
             <span class="custom-switch-description">

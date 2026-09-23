@@ -373,6 +373,13 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(result.failures).to.equal(1);
     const states = await costStates();
     expect(states.map((s) => s.value)).to.deep.equal([99]);
+    // a failed replacement is counted too (the replacement itself is atomic, models tests)
+    energyContract.priceContractIntervals.restore();
+    sinon.stub(device, 'replaceHistoricalStatesFrom').rejects(new Error('duckdb down'));
+    // the replacement runs for every pair, the meter's own cost feature included
+    const second = await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
+    expect(second.failures).to.equal(2);
+    expect((await costStates()).map((s) => s.value)).to.deep.equal([99]);
   });
 
   it('should not widen the run window for a tiered contract that is expired', async () => {

@@ -299,12 +299,16 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
             );
           }
         });
-        // priced first, replaced then: a pricing failure leaves the previous costs in place
+        // priced first, replaced then in one transaction: a pricing or a write failure
+        // leaves the previous costs in place
         logger.debug(
           `Replacing the costs of ${pair.consumptionCostFeature.selector} from ${effectiveStart.toISOString()}`,
         );
-        await this.gladys.device.destroyStatesFrom(pair.consumptionCostFeature.selector, effectiveStart);
-        await this.gladys.device.saveMultipleHistoricalStates(pair.consumptionCostFeature.id, statesToInsert);
+        await this.gladys.device.replaceHistoricalStatesFrom(
+          pair.consumptionCostFeature.id,
+          effectiveStart,
+          statesToInsert,
+        );
       });
     } catch (e) {
       failures += 1;
