@@ -73,6 +73,19 @@ describe('energyContract: contracts CRUD', () => {
     expect(contract.pricing_mode).to.equal('delegated');
     // no provider: a delegated contract is orphaned
     expect(contract.status).to.equal(ENERGY_CONTRACT_STATUS.ORPHANED);
+    // a delegated contract may carry no tariff at all (the integration prices everything)
+    await energyContract.destroy(contract.selector);
+    const { tariff, ...withoutTariff } = contractPayload({
+      name: 'Agile',
+      pricing_mode: 'delegated',
+      valid_from: '2026-01-01',
+    });
+    const bare = await energyContract.create(withoutTariff);
+    expect(bare.tariff).to.deep.equal({ tariff_version: 1, components: [] });
+    expect(bare.tariff_version).to.equal(undefined);
+    // a rules contract needs a tariff with at least one component
+    const { tariff: rulesTariff, ...rulesWithoutTariff } = contractPayload({ name: 'Bare', valid_from: '2027-01-01' });
+    await expect(energyContract.create(rulesWithoutTariff)).to.be.rejectedWith('tariff: is required');
   });
 
   it('should refuse a date overlap on the same meter and direction', async () => {

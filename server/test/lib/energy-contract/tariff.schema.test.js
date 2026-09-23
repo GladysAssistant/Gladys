@@ -63,11 +63,14 @@ const VALID = {
   ),
 };
 
+// an empty components list is a valid definition: a delegated contract without fixed fees
+// (the contract validation requires a component in rules mode)
+VALID['empty components'] = base([]);
+
 // Rejected by both validators.
 const INVALID = {
   'wrong version': { tariff_version: 2, components: [consumption()] },
   'no components': { tariff_version: 1 },
-  'empty components': base([]),
   'unknown kind': base([{ key: 'e', kind: 'magic' }]),
   'unknown key': base([consumption({ foo: 1 })]),
   'bad component key': base([consumption({ key: 'Energy!' })]),

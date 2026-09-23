@@ -49,7 +49,11 @@ describe('EnergyMonitoring.init', () => {
     gladys = {
       variable,
       device,
-      energyContract: { checkPriceChanges: fake.resolves([]), takePendingRecalculation: fake.resolves(null) },
+      energyContract: {
+        checkPriceChanges: fake.resolves([]),
+        getPendingRecalculation: fake.resolves(null),
+        clearPendingRecalculation: fake.resolves(null),
+      },
       event: { on: fake.returns(null) },
       scheduler: mockScheduler,
       job: {
@@ -102,18 +106,28 @@ describe('EnergyMonitoring.init', () => {
 
   it('should run the recalculation left by the price migration, and survive its failures', async () => {
     const pending = { from: new Date('2025-01-01T00:00:00.000Z'), electric_meter_device_ids: ['meter'] };
-    gladys.energyContract.takePendingRecalculation = fake.resolves(pending);
+    gladys.energyContract.getPendingRecalculation = fake.resolves(pending);
     energyMonitoring.recalculateForContracts = fake.resolves(null);
     await energyMonitoring.init();
-    assert.calledOnce(gladys.energyContract.takePendingRecalculation);
+    assert.calledOnce(gladys.energyContract.getPendingRecalculation);
     assert.calledOnceWithExactly(energyMonitoring.recalculateForContracts, pending);
-    // a failing recalculation is logged, the service keeps starting
+    // cleared once the recalculation succeeded
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    assert.calledOnce(gladys.energyContract.clearPendingRecalculation);
+    // a failing recalculation is logged and kept for the next start, the service keeps starting
+    gladys.energyContract.clearPendingRecalculation = fake.resolves(null);
     const failing = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     failing.recalculateForContracts = fake.rejects(new Error('boom'));
     await failing.init();
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
     assert.calledOnce(failing.recalculateForContracts);
+    assert.notCalled(gladys.energyContract.clearPendingRecalculation);
     // an unreadable pending recalculation too
-    gladys.energyContract.takePendingRecalculation = fake.rejects(new Error('db down'));
+    gladys.energyContract.getPendingRecalculation = fake.rejects(new Error('db down'));
     const unreadable = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     unreadable.recalculateForContracts = fake.resolves(null);
     await unreadable.init();

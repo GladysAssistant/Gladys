@@ -227,6 +227,13 @@ describe('energyContract: tariff calendars', () => {
         provider_service_id: TEST_SERVICE_ID,
       });
       expect(emitted.callCount).to.equal(2);
+      // an initial fill years before the first contract: recalculated from the contract start only
+      state.last_at = 0;
+      await energyContract.publishCalendarEntries('tempo', [{ date: '2022-01-01', value: 'blue' }], {
+        provider_service_id: TEST_SERVICE_ID,
+      });
+      expect(emitted.callCount).to.equal(3);
+      expect(emitted.thirdCall.args[0].from.toISOString()).to.equal('2024-12-31T23:00:00.000Z');
     });
 
     it('should log a failed deferred recalculation without throwing', async () => {

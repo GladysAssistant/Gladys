@@ -22,7 +22,7 @@ const MIGRATION_DONE_VARIABLE = 'ENERGY_CONTRACT_MIGRATION_DONE';
 const PENDING_RECALCULATION_VARIABLE = 'ENERGY_CONTRACT_PENDING_RECALCULATION';
 const VERIFICATION_DAYS = 7;
 const MAX_GAP_RATIO = 0.005;
-const CURRENCY_MAP = { euro: 'EUR', dollar: 'USD', pound: 'GBP', franc: 'CHF' };
+const CURRENCY_MAP = { euro: 'EUR', dollar: 'USD', pound: 'GBP', franc: 'CHF', yen: 'JPY' };
 
 /**
  * @description Map a legacy free currency value to an ISO 4217 code.
@@ -32,11 +32,16 @@ const CURRENCY_MAP = { euro: 'EUR', dollar: 'USD', pound: 'GBP', franc: 'CHF' };
  * toIsoCurrency('euro'); // 'EUR'
  */
 function toIsoCurrency(currency) {
-  const value = String(currency || 'EUR');
-  if (/^[A-Z]{3}$/.test(value)) {
-    return value;
+  const value = String(currency || 'EUR').trim();
+  const mapped = CURRENCY_MAP[value.toLowerCase()];
+  if (mapped) {
+    return mapped;
   }
-  return CURRENCY_MAP[value.toLowerCase()] || 'EUR';
+  if (/^[A-Za-z]{3}$/.test(value)) {
+    return value.toUpperCase();
+  }
+  logger.warn(`Energy contract migration: unknown currency "${value}" converted to EUR, edit the contract`);
+  return 'EUR';
 }
 
 /**
@@ -243,51 +248,65 @@ async function migrateFromEnergyPrice() {
       logger.warn(`Energy contract migration: unable to verify "${name}": ${e.message}`);
     }
   }
+  const meterIds = Array.from(new Set(created.map((c) => c.electric_meter_device_id)));
+  if (meterIds.length > 0) {
+    // the earliest start of the created contracts, each in its own timezone
+    const earliestMs = Math.min(...created.map((c) => localToUtcMs(c.valid_from, c.timezone)));
+    const payload = {
+      from: new Date(earliestMs).toISOString(),
+      electric_meter_device_ids: meterIds,
+    };
+    // stored before the done marker for the energy-monitoring service, which is not
+    // listening yet at this point of the boot and clears it once the recalculation
+    // succeeded; the event still serves a migration run while the service is up
+    await this.variable.setValue(PENDING_RECALCULATION_VARIABLE, JSON.stringify(payload));
+    this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, { ...payload, from: new Date(payload.from) });
+  }
   if (failures === 0) {
     await this.variable.setValue(MIGRATION_DONE_VARIABLE, new Date().toISOString());
   } else {
     logger.warn(`Energy contract migration: ${failures} group(s) not converted, retried at the next start`);
-  }
-  const meterIds = Array.from(new Set(created.map((c) => c.electric_meter_device_id)));
-  if (meterIds.length > 0) {
-    const earliest = created.map((c) => c.valid_from).sort()[0];
-    const payload = {
-      from: new Date(localToUtcMs(earliest, systemTimezone)).toISOString(),
-      electric_meter_device_ids: meterIds,
-    };
-    // stored for the energy-monitoring service, which is not listening yet at this point of
-    // the boot; the event still serves a migration run while the service is up
-    await this.variable.setValue(PENDING_RECALCULATION_VARIABLE, JSON.stringify(payload));
-    this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, { ...payload, from: new Date(payload.from) });
   }
   return created;
 }
 
 /**
  * @description The recalculation left by the migration for the energy-monitoring service
- * (section 9.3): returned once, then cleared.
+ * (section 9.3). It stays stored until `clearPendingRecalculation` is called after a
+ * successful run, so a failed or interrupted recalculation is retried at the next start.
  * @returns {Promise<object|null>} { from, electric_meter_device_ids } or null.
  * @example
- * const pending = await energyContract.takePendingRecalculation();
+ * const pending = await energyContract.getPendingRecalculation();
  */
-async function takePendingRecalculation() {
+async function getPendingRecalculation() {
   const raw = await this.variable.getValue(PENDING_RECALCULATION_VARIABLE);
   if (!raw) {
     return null;
   }
-  await this.variable.destroy(PENDING_RECALCULATION_VARIABLE);
   try {
     const payload = JSON.parse(raw);
     return { ...payload, from: new Date(payload.from) };
   } catch (e) {
-    logger.warn(`Energy contract migration: invalid pending recalculation ignored (${e.message})`);
+    logger.warn(`Energy contract migration: invalid pending recalculation dropped (${e.message})`);
+    await this.variable.destroy(PENDING_RECALCULATION_VARIABLE);
     return null;
   }
 }
 
+/**
+ * @description Clear the pending recalculation once it ran successfully.
+ * @returns {Promise<void>} Resolves when cleared.
+ * @example
+ * await energyContract.clearPendingRecalculation();
+ */
+async function clearPendingRecalculation() {
+  await this.variable.destroy(PENDING_RECALCULATION_VARIABLE);
+}
+
 module.exports = {
   migrateFromEnergyPrice,
-  takePendingRecalculation,
+  getPendingRecalculation,
+  clearPendingRecalculation,
   PENDING_RECALCULATION_VARIABLE,
   verifyMigratedContract,
   groupPriceRows,

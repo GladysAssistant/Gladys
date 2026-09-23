@@ -256,11 +256,18 @@ describe('externalIntegration: energy contracts capability', () => {
         'calendar_key',
       );
       energyContract.getCalendarEntries = fake.resolves(entries);
+      energyContract.getCalendar = fake.resolves({ key: 'agile-gb', provider_service_id: service.id });
       expect(await externalIntegration.getEnergyCalendar(service, 'agile-gb', { from: '2026-01-01' })).to.deep.equal(
         entries,
       );
       sinonAssert.calledWith(energyContract.getCalendarEntries, 'agile-gb', { from: '2026-01-01' });
       await expect(externalIntegration.getEnergyCalendar(service, 'tempo')).to.be.rejectedWith(ForbiddenError);
+      // declared but owned by another integration: read refused like the publication
+      energyContract.getCalendar = fake.resolves({ key: 'agile-gb', provider_service_id: 'other-service' });
+      await expect(externalIntegration.getEnergyCalendar(service, 'agile-gb')).to.be.rejectedWith(
+        ForbiddenError,
+        'calendar "agile-gb" is not provided by this integration',
+      );
     });
 
     it('should list the contracts of the integration without the meter', async () => {

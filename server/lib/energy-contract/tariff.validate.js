@@ -173,22 +173,20 @@ const demandComponent = Joi.object({
   when: periodConditions,
 });
 
-const component = Joi.alternatives()
-  .conditional('.kind', {
-    switch: [
-      { is: TARIFF_COMPONENT_KINDS.CONSUMPTION, then: consumptionComponent },
-      { is: TARIFF_COMPONENT_KINDS.FIXED, then: fixedComponent },
-      { is: TARIFF_COMPONENT_KINDS.TAX, then: taxComponent },
-      { is: TARIFF_COMPONENT_KINDS.DEMAND, then: demandComponent },
-    ],
-    otherwise: Joi.object({
-      key: componentKey.required(),
-      kind: Joi.string()
-        .valid(...Object.values(TARIFF_COMPONENT_KINDS))
-        .required(),
-    }).unknown(true),
-  })
-  .required();
+const component = Joi.alternatives().conditional('.kind', {
+  switch: [
+    { is: TARIFF_COMPONENT_KINDS.CONSUMPTION, then: consumptionComponent },
+    { is: TARIFF_COMPONENT_KINDS.FIXED, then: fixedComponent },
+    { is: TARIFF_COMPONENT_KINDS.TAX, then: taxComponent },
+    { is: TARIFF_COMPONENT_KINDS.DEMAND, then: demandComponent },
+  ],
+  otherwise: Joi.object({
+    key: componentKey.required(),
+    kind: Joi.string()
+      .valid(...Object.values(TARIFF_COMPONENT_KINDS))
+      .required(),
+  }).unknown(true),
+});
 
 const tariffSchema = Joi.object({
   tariff_version: Joi.number()
@@ -199,9 +197,10 @@ const tariffSchema = Joi.object({
     .unique()
     .max(TARIFF_LIMITS.MAX_CALENDARS)
     .default([]),
+  // empty only for a delegated contract without fixed fees (the contract validation
+  // requires at least one component in rules mode)
   components: Joi.array()
     .items(component)
-    .min(1)
     .max(TARIFF_LIMITS.MAX_COMPONENTS)
     .required(),
 }).required();

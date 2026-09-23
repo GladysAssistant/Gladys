@@ -39,6 +39,7 @@ async function getCurrent(selector, options = {}) {
       contract.electric_meter_device_id,
       new Date(last.starts_at),
       new Date(new Date(last.starts_at).getTime() + THIRTY_MINUTES_MS),
+      contract.timezone,
     );
     const peak = peaks.get(new Date(last.starts_at).getTime());
     if (peak !== undefined) {

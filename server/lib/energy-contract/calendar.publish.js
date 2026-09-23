@@ -195,18 +195,23 @@ async function requestCalendarRecalculation(key, from) {
     state.last_at = Date.now();
     const pendingFrom = state.from;
     state.from = null;
-    const contracts = await db.EnergyContract.findAll({ attributes: ['electric_meter_device_id', 'tariff'] });
-    const meterIds = contracts
-      .filter((c) => Array.isArray(c.tariff.calendars) && c.tariff.calendars.includes(key))
-      .map((c) => c.electric_meter_device_id);
+    const contracts = await db.EnergyContract.findAll({
+      attributes: ['electric_meter_device_id', 'tariff', 'valid_from', 'timezone'],
+    });
+    const referencing = contracts.filter((c) => Array.isArray(c.tariff.calendars) && c.tariff.calendars.includes(key));
+    const meterIds = referencing.map((c) => c.electric_meter_device_id);
     if (meterIds.length === 0) {
       return;
     }
+    // nothing to recompute before the first contract reading this calendar: the initial
+    // fill of a calendar (years of history) only recalculates from there
+    const earliestContractMs = Math.min(...referencing.map((c) => localToUtcMs(c.valid_from, c.timezone)));
+    const boundedFrom = pendingFrom.getTime() < earliestContractMs ? new Date(earliestContractMs) : pendingFrom;
     logger.info(
-      `Calendar "${key}" changed from ${pendingFrom.toISOString()}: recalculating ${meterIds.length} meter(s)`,
+      `Calendar "${key}" changed from ${boundedFrom.toISOString()}: recalculating ${meterIds.length} meter(s)`,
     );
     this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, {
-      from: pendingFrom,
+      from: boundedFrom,
       electric_meter_device_ids: Array.from(new Set(meterIds)),
       calendar_key: key,
     });

@@ -25,6 +25,9 @@ const DEFAULT_MANUAL_TARIFF = {
   ]
 };
 
+// the tariff of a delegated contract whose integration computes every cost (no fixed fee)
+const EMPTY_DELEGATED_TARIFF = { tariff_version: 1, components: [] };
+
 // The 4-step contract wizard (docs/specs/energy-contracts.md 8.2): meter, template,
 // parameters (or the JSON editor), preview over the last 7 days, then save.
 class ContractWizard extends Component {
@@ -162,7 +165,12 @@ class ContractWizard extends Component {
       this.setState(({ form }) => ({
         template,
         jsonMode: false,
-        tariffJson: JSON.stringify(template.tariff || DEFAULT_MANUAL_TARIFF, null, 2),
+        // a delegated template may carry no tariff at all: the integration prices everything
+        tariffJson: JSON.stringify(
+          template.tariff || (template.pricing_mode === 'delegated' ? EMPTY_DELEGATED_TARIFF : DEFAULT_MANUAL_TARIFF),
+          null,
+          2
+        ),
         step: 2,
         form: {
           ...form,

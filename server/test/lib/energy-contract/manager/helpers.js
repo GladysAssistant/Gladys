@@ -129,12 +129,13 @@ async function buildManager(options = {}) {
  * @description Add a historized `power` feature (in watts) to the test meter, and insert its states.
  * @param {object} device - The device manager of the test.
  * @param {object} meter - The test meter returned by buildManager.
- * @param {Array<object>} states - [{ value, created_at }] in watts.
+ * @param {Array<object>} states - [{ value, created_at }] in watts (or in `unit`).
+ * @param {string} [unit] - Unit of the feature, watts by default.
  * @returns {Promise<void>} Resolves when inserted.
  * @example
  * await addMeterPower(device, meter, [{ value: 6000, created_at: new Date() }]);
  */
-async function addMeterPower(device, meter, states) {
+async function addMeterPower(device, meter, states, unit = DEVICE_FEATURE_UNITS.WATT) {
   await device.create({
     id: meter.id,
     service_id: meter.service_id,
@@ -153,7 +154,7 @@ async function addMeterPower(device, meter, states) {
         keep_history: true,
         min: 0,
         max: 100000,
-        unit: DEVICE_FEATURE_UNITS.WATT,
+        unit,
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
       },

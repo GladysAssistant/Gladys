@@ -34,7 +34,8 @@ const { getLegacyPrices } = require('./energyPrice.project');
 const {
   migrateFromEnergyPrice,
   verifyMigratedContract,
-  takePendingRecalculation,
+  getPendingRecalculation,
+  clearPendingRecalculation,
 } = require('./migration.fromEnergyPrice');
 const { init } = require('./contract.init');
 const { recalculate } = require('./contract.recalculate');
@@ -104,6 +105,7 @@ EnergyContract.prototype.getInternalTemplates = getInternalTemplates;
 EnergyContract.prototype.getLegacyPrices = getLegacyPrices;
 EnergyContract.prototype.migrateFromEnergyPrice = migrateFromEnergyPrice;
 EnergyContract.prototype.verifyMigratedContract = verifyMigratedContract;
-EnergyContract.prototype.takePendingRecalculation = takePendingRecalculation;
+EnergyContract.prototype.getPendingRecalculation = getPendingRecalculation;
+EnergyContract.prototype.clearPendingRecalculation = clearPendingRecalculation;
 
 module.exports = EnergyContract;

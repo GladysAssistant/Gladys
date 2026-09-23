@@ -651,15 +651,22 @@ describe('Device.migrate', function Describe() {
       },
       electric_meter_device_id: destinationDevice.id,
     });
+    await db.duckDbBatchInsertState(sourceTempFeature.id, [
+      { value: 20, created_at: new Date('2024-01-01T00:00:00.000Z') },
+      { value: 21, created_at: new Date('2024-01-02T00:00:00.000Z') },
+    ]);
     try {
       const promise = deviceManager.migrate('migration-source', {
         destination_device_selector: 'migration-destination',
+        features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
       });
       await assert.isRejected(
         promise,
         'Energy contract "Migration energy contract" overlaps "Destination energy contract" on the destination device',
       );
-      // nothing moved
+      // refused before any write: the history and the contracts are untouched
+      expect(await countDuckDbStates(sourceTempFeature.id)).to.equal(2);
+      expect(await countDuckDbStates(destinationTempFeature.id)).to.equal(0);
       const sourceContracts = await db.EnergyContract.count({ where: { electric_meter_device_id: sourceDevice.id } });
       expect(sourceContracts).to.equal(1);
       // a destination contract ended before the source one starts is not an overlap

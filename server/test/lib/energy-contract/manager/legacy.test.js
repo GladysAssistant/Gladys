@@ -211,6 +211,11 @@ describe('energyContract: legacy prices', () => {
       expect(emitted.callCount).to.equal(1);
       expect(emitted.firstCall.args[0].from.toISOString()).to.equal('2024-12-31T23:00:00.000Z');
       expect(variables[MIGRATION_DONE_VARIABLE]).to.be.a('string');
+      // the recalculation is left for the energy-monitoring service, from the earliest contract
+      // start in its own timezone (the tempo contract starts at Paris midnight)
+      const pending = JSON.parse(variables[PENDING_RECALCULATION_VARIABLE]);
+      expect(pending.from).to.equal('2024-12-31T23:00:00.000Z');
+      expect(pending.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID]);
       // second run: nothing
       expect(await energyContract.migrateFromEnergyPrice()).to.deep.equal([]);
       expect(await db.EnergyPrice.count()).to.equal(4);
@@ -406,21 +411,25 @@ describe('energyContract: legacy prices', () => {
       );
     });
 
-    it('should hand the pending recalculation over once', async () => {
-      expect(await energyContract.takePendingRecalculation()).to.equal(null);
+    it('should keep the pending recalculation until it is cleared', async () => {
+      expect(await energyContract.getPendingRecalculation()).to.equal(null);
       variables[PENDING_RECALCULATION_VARIABLE] = JSON.stringify({
         from: '2024-12-31T23:00:00.000Z',
         electric_meter_device_ids: [METER_DEVICE_ID],
       });
-      const pending = await energyContract.takePendingRecalculation();
+      const pending = await energyContract.getPendingRecalculation();
       expect(pending.from).to.be.instanceOf(Date);
       expect(pending.from.toISOString()).to.equal('2024-12-31T23:00:00.000Z');
       expect(pending.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID]);
+      // still there for a retry after a failed run
+      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.be.a('string');
+      expect(await energyContract.getPendingRecalculation()).to.deep.equal(pending);
+      await energyContract.clearPendingRecalculation();
       expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
-      expect(await energyContract.takePendingRecalculation()).to.equal(null);
+      expect(await energyContract.getPendingRecalculation()).to.equal(null);
       // an unreadable value is dropped
       variables[PENDING_RECALCULATION_VARIABLE] = '{not json';
-      expect(await energyContract.takePendingRecalculation()).to.equal(null);
+      expect(await energyContract.getPendingRecalculation()).to.equal(null);
       expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
     });
 
@@ -435,7 +444,10 @@ describe('energyContract: legacy prices', () => {
       expect(toIsoCurrency('euro')).to.equal('EUR');
       expect(toIsoCurrency('dollar')).to.equal('USD');
       expect(toIsoCurrency('GBP')).to.equal('GBP');
-      expect(toIsoCurrency('yen')).to.equal('EUR');
+      expect(toIsoCurrency('usd')).to.equal('USD');
+      expect(toIsoCurrency('yen')).to.equal('JPY');
+      // unknown: EUR with a warning, the user edits the contract
+      expect(toIsoCurrency('bitcoin')).to.equal('EUR');
       expect(toIsoCurrency(undefined)).to.equal('EUR');
     });
   });

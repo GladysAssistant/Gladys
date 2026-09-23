@@ -215,19 +215,27 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           return contract.valid_from <= endDate && (contract.valid_to === null || contract.valid_to >= startDate);
         });
         let effectiveStart = startAt;
-        let needsPower = false;
+        let powerTimezone = null;
         coveringContracts.forEach((contract) => {
           if (contract.pricing_mode === ENERGY_CONTRACT_PRICING_MODES.RULES) {
             const compiled = this.gladys.energyContract.getCompiledTariff(contract);
             effectiveStart = getEffectiveStart(contract, compiled, effectiveStart);
-            needsPower = needsPower || compiled.needsPower;
+            if (compiled.needsPower && powerTimezone === null) {
+              powerTimezone = contract.timezone;
+            }
           }
         });
         // demand charges and power thresholds read the meter's historized power feature
         // when it has one (section 7.1), the 30-minute average power otherwise
-        const powerPeaks = needsPower
-          ? await this.gladys.energyContract.getMeterPowerPeaks(electricMeterFeature.device_id, effectiveStart, nowDate)
-          : new Map();
+        const powerPeaks =
+          powerTimezone !== null
+            ? await this.gladys.energyContract.getMeterPowerPeaks(
+                electricMeterFeature.device_id,
+                effectiveStart,
+                nowDate,
+                powerTimezone,
+              )
+            : new Map();
         logger.debug(
           `Destroying states from ${pair.consumptionCostFeature.selector} from ${effectiveStart.toISOString()}`,
         );

@@ -55,7 +55,9 @@ const contractSchema = Joi.object({
     .allow(null),
 });
 
-const requiredOnCreate = ['name', 'electric_meter_device_id', 'valid_from', 'currency', 'tariff'];
+const requiredOnCreate = ['name', 'electric_meter_device_id', 'valid_from', 'currency'];
+// a delegated contract may carry no tariff at all (the integration prices everything)
+const EMPTY_TARIFF = { tariff_version: 1, components: [] };
 
 /**
  * @description Check that a timezone name is known to the runtime.
@@ -86,15 +88,24 @@ function isValidTimezone(timezone) {
  * validateContractTariff({ tariff_version: 1, components: [] }, {}, 'delegated');
  */
 function validateContractTariff(tariff, inputs, pricingMode) {
+  const delegated = pricingMode === ENERGY_CONTRACT_PRICING_MODES.DELEGATED;
+  if (tariff === undefined || tariff === null) {
+    if (!delegated) {
+      throw new BadParameters('tariff: is required');
+    }
+    return { ...EMPTY_TARIFF };
+  }
   const substituted = substituteInputs(tariff, inputs || {});
-  if (pricingMode === ENERGY_CONTRACT_PRICING_MODES.DELEGATED) {
-    const components = Array.isArray(substituted.components) ? substituted.components : [];
+  const components = Array.isArray(substituted.components) ? substituted.components : [];
+  if (delegated) {
     const other = components.find((c) => c && c.kind !== TARIFF_COMPONENT_KINDS.FIXED);
     if (other) {
       throw new BadParameters(
         `tariff.components: a delegated contract only carries fixed components (found "${other.kind}")`,
       );
     }
+  } else if (components.length === 0) {
+    throw new BadParameters('tariff.components: at least one component is required in rules mode');
   }
   return validateTariff(substituted);
 }

@@ -81,6 +81,11 @@ async function getEnergyCalendar(service, key, options = {}) {
   if (!declared) {
     throw new ForbiddenError(`calendar "${key}" is not declared by this integration`);
   }
+  // "its own calendar" (capability file, section 2): the owner only, like the publication
+  const calendar = await this.energyContract.getCalendar(key);
+  if (calendar.provider_service_id !== service.id) {
+    throw new ForbiddenError(`calendar "${key}" is not provided by this integration`);
+  }
   return this.energyContract.getCalendarEntries(key, options);
 }
 

@@ -230,6 +230,10 @@ function validateTemplate(template, index, seenKeys, errors, validateMultiLangua
     errors.push(`${path}.${e.message}`);
     return;
   }
+  if (!isDelegated && (!Array.isArray(substituted.components) || substituted.components.length === 0)) {
+    errors.push(`${path}.tariff.components: at least one component is required in rules mode`);
+    return;
+  }
   if (isDelegated) {
     const other = substituted.components.find((component) => component.kind !== TARIFF_COMPONENT_KINDS.FIXED);
     if (other) {

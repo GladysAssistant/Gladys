@@ -184,8 +184,40 @@ describe('energyContract: preview and current price', () => {
       await addMeterPower(device, meter, [{ value: 5000, created_at: new Date('2026-01-12T12:10:00Z') }]);
       expect(await energyContract.getCurrent('threshold', { at })).to.include({ price: 0.5, label: 'above 3 kW' });
       // an unknown meter has no power feature: no peak
-      const none = await energyContract.getMeterPowerPeaks('unknown-device', new Date(at), new Date(at));
+      const none = await energyContract.getMeterPowerPeaks('unknown-device', new Date(at), new Date(at), 'UTC');
       expect(none.size).to.equal(0);
+    });
+
+    it('should key the power peaks on the local 30-minute slots and read kVA as kilo', async () => {
+      // Asia/Kathmandu is UTC+05:45: the local slots start at :15 and :45 UTC
+      await energyContract.create(
+        contractPayload({
+          name: 'Nepal',
+          timezone: 'Asia/Kathmandu',
+          tariff: {
+            tariff_version: 1,
+            components: [
+              {
+                key: 'energy',
+                kind: 'consumption',
+                rules: [{ label: 'above 3 kW', when: { power_threshold: { above_kw: 3 } }, price: 0.5 }],
+                fallback: { label: 'flat', price: 0.2 },
+              },
+            ],
+          },
+        }),
+      );
+      const at = new Date('2026-01-12T12:50:00Z').getTime();
+      // the last interval starts at 12:15 UTC (18:00 local)
+      await insertConsumption([{ value: 1, created_at: new Date('2026-01-12T12:45:00Z') }]);
+      // a 5 kVA peak at 12:20 UTC belongs to that interval, not to the UTC 12:00 slot
+      await addMeterPower(
+        device,
+        meter,
+        [{ value: 5, created_at: new Date('2026-01-12T12:20:00Z') }],
+        'kilovolt-ampere',
+      );
+      expect(await energyContract.getCurrent('nepal', { at })).to.include({ price: 0.5, label: 'above 3 kW' });
     });
 
     it('should relay a delegated contract to the integration and cache the answer 5 minutes', async () => {

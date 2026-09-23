@@ -3,6 +3,9 @@ const { convertEnergyUnit } = require('../../utils/units');
 const { getLocalContext, getDayBounds, getMonthBounds, getBillingPeriodBounds } = require('./tariff.time');
 
 const THIRTY_MINUTES_MS = 30 * 60 * 1000;
+const MS_PER_MINUTE = 60 * 1000;
+// power units already in kilo: read as they are, the others are divided by 1000
+const KILO_POWER_UNITS = [DEVICE_FEATURE_UNITS.KILOWATT, DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE];
 
 /**
  * @description Find the 30-minute consumption feature of a root meter device.
@@ -109,21 +112,25 @@ function getMeterPowerFeature(electricMeterDeviceId) {
 /**
  * @description The peak power of a meter per 30-minute interval, from its historized
  * `power` feature (section 7.1): the max of the states of each interval, in kW. Empty when
- * the meter has no such feature (the callers then fall back on `kwh × 2`).
+ * the meter has no such feature (the callers then fall back on `kwh × 2`). The slots are
+ * the 30-minute slots of the contract's local clock (a `:15` / `:45` zone such as
+ * Asia/Kathmandu is not aligned on UTC), like the intervals of the cost job.
  * @param {string} electricMeterDeviceId - Root meter device id.
  * @param {Date} from - Window start (interval starts).
  * @param {Date} to - Window end.
+ * @param {string} timezone - The contract timezone.
  * @returns {Promise<Map<number, number>>} interval start (ms) → peak in kW.
  * @example
- * const peaks = await this.getMeterPowerPeaks('…', new Date('2026-01-01'), new Date());
+ * const peaks = await this.getMeterPowerPeaks('…', new Date('2026-01-01'), new Date(), 'Europe/Paris');
  */
-async function getMeterPowerPeaks(electricMeterDeviceId, from, to) {
+async function getMeterPowerPeaks(electricMeterDeviceId, from, to, timezone) {
   const peaks = new Map();
   const feature = this.getMeterPowerFeature(electricMeterDeviceId);
   if (feature === null) {
     return peaks;
   }
-  const factor = feature.unit === DEVICE_FEATURE_UNITS.KILOWATT ? 1 : 1 / 1000;
+  // kW and kVA are read as they are, W and VA are divided by 1000
+  const factor = KILO_POWER_UNITS.includes(feature.unit) ? 1 : 1 / 1000;
   const states = await this.device.getDeviceFeatureStates(
     feature.selector,
     from,
@@ -131,7 +138,8 @@ async function getMeterPowerPeaks(electricMeterDeviceId, from, to) {
   );
   states.forEach((state) => {
     const ms = new Date(state.created_at).getTime();
-    const slot = Math.floor(ms / THIRTY_MINUTES_MS) * THIRTY_MINUTES_MS;
+    const local = getLocalContext(ms, timezone);
+    const slot = ms - (local.minutes % 30) * MS_PER_MINUTE - (ms % MS_PER_MINUTE);
     const kw = Number(state.value) * factor;
     if (!peaks.has(slot) || peaks.get(slot) < kw) {
       peaks.set(slot, kw);

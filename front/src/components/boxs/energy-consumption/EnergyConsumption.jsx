@@ -46,8 +46,6 @@ const PERIOD_LABELS = {
   [PERIODS.DAY]: 'dashboard.boxes.energyConsumption.day'
 };
 
-const SUBSCRIPTION_COLOR = '#b8c2cc';
-
 // The period field is only ever a button opening the calendar: a readonly
 // input keeps the mobile on-screen keyboard from popping over the picker.
 // It can't be `readOnly` on the customInput element itself — the DatePicker
@@ -70,10 +68,6 @@ const findDeviceFeatureBySelector = (devices, selector) => {
 };
 
 const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
-  if (deviceData.deviceFeature.is_subscription) {
-    return `${deviceData.device.name} - ${deviceData.deviceFeature.name}`;
-  }
-
   const found = findDeviceFeatureBySelector(devices, selector);
   if (found) {
     const { device, feature } = found;
@@ -209,19 +203,8 @@ class EnergyConsumption extends Component {
       const pendingSeries = [];
 
       data.forEach(deviceData => {
-        const isSubscription = deviceData.deviceFeature.is_subscription === true;
-
-        // Skip subscription data if show_subscription_prices is not enabled
-        if (isSubscription && !this.props.box.show_subscription_prices) {
-          return;
-        }
-
-        const selector = isSubscription
-          ? null
-          : deviceData.deviceFeature.selector || deviceFeatures[consumptionSelectorIndex];
-        if (!isSubscription) {
-          consumptionSelectorIndex += 1;
-        }
+        const selector = deviceData.deviceFeature.selector || deviceFeatures[consumptionSelectorIndex];
+        consumptionSelectorIndex += 1;
 
         // Create a map of timestamp -> value for this device feature
         const valueMap = new Map();
@@ -240,8 +223,7 @@ class EnergyConsumption extends Component {
 
         pendingSeries.push({
           displayName: getEnergyFeatureDisplayName(this.props.devices, selector, deviceData),
-          seriesData,
-          isSubscription
+          seriesData
         });
       });
 
@@ -254,12 +236,8 @@ class EnergyConsumption extends Component {
           data: item.seriesData
         });
 
-        if (item.isSubscription) {
-          seriesColors.push(SUBSCRIPTION_COLOR);
-        } else {
-          seriesColors.push(widgetColors[colorIndex % widgetColors.length]);
-          colorIndex++;
-        }
+        seriesColors.push(widgetColors[colorIndex % widgetColors.length]);
+        colorIndex++;
       });
 
       await this.setState({
