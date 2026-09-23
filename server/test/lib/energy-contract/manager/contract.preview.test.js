@@ -183,6 +183,9 @@ describe('energyContract: preview and current price', () => {
       // a 5 kW peak recorded during that interval (12:00 to 12:30)
       await addMeterPower(device, meter, [{ value: 5000, created_at: new Date('2026-01-12T12:10:00Z') }]);
       expect(await energyContract.getCurrent('threshold', { at })).to.include({ price: 0.5, label: 'above 3 kW' });
+      // an unknown meter has no power feature: no peak
+      const none = await energyContract.getMeterPowerPeaks('unknown-device', new Date(at), new Date(at));
+      expect(none.size).to.equal(0);
     });
 
     it('should relay a delegated contract to the integration and cache the answer 5 minutes', async () => {
