@@ -104,11 +104,12 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
     const states = await costStates();
     expect(states).to.have.lengthOf(2);
-    // 0.2 per kWh + the subscription of 12/month spread over August (31 days * 48 intervals)
-    expect(states[0].value).to.equal(10 * 0.2 + 0.008065);
-    expect(states[1].value).to.equal(20 * 0.2 + 0.008065);
+    // 0.2 per kWh, the subscription of 12/month is never stored (added at display time)
+    expect(states[0].value).to.equal(10 * 0.2);
+    expect(states[1].value).to.equal(20 * 0.2);
     const meterStates = await costStates('electrical-meter-cost');
     expect(meterStates).to.have.lengthOf(1);
+    expect(meterStates[0].value).to.equal(1 * 0.2);
     expect(gladys.job.updateProgress.called).to.equal(false);
     // a run with a job id reports its progress
     await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'), 'job-id');
@@ -287,18 +288,25 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       }),
     );
     const now = Date.now();
+    await insertConsumption([
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 2, created_at: new Date('2025-08-28T15:30:00.000Z') },
+      { value: 1, created_at: new Date(now - 30 * 60 * 1000) },
+    ]);
     await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
       { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
       { value: 2, created_at: new Date('2025-08-28T15:30:00.000Z') },
       { value: 1, created_at: new Date(now - 30 * 60 * 1000) },
     ]);
     await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
-    const states = await costStates();
+    const states = await costStates('electrical-meter-cost');
     expect(states).to.have.lengthOf(3);
     // August is closed: 4 kW peak * 10 spread pro rata over the two intervals
     expect(states[0].value + states[1].value).to.equal(40);
     // the current period is not charged
     expect(states[2].value).to.equal(0);
+    // the demand charge is the meter's: a child device never carries it
+    expect((await costStates()).map((s) => s.value)).to.deep.equal([0, 0, 0]);
   });
 
   it('should read the peaks of the demand charges on the historized power feature of the meter', async () => {
@@ -351,9 +359,14 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
         }),
       ],
     });
+    await insertConsumption([
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 2, created_at: new Date('2025-08-28T15:30:00.000Z') },
+      { value: 1, created_at: new Date(Date.now() - 30 * 60 * 1000) },
+    ]);
     const getMeterPowerPeaks = sinon.spy(energyContract, 'getMeterPowerPeaks');
     await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
-    const states = await costStates();
+    const states = await costStates('electrical-meter-cost');
     expect(states).to.have.lengthOf(3);
     expect(states[0].value + states[1].value).to.equal(60);
     expect(getMeterPowerPeaks.callCount).to.equal(1);

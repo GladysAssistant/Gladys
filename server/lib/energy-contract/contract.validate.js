@@ -79,7 +79,7 @@ function isValidTimezone(timezone) {
 /**
  * @description Validate the tariff of a contract according to its pricing mode: the
  * full grammar in `rules` mode, only `fixed` components in `delegated` mode (the
- * integration prices the energy, the core still spreads the subscription).
+ * integration prices the energy, the core adds the subscription at display time).
  * @param {object} tariff - Tariff definition.
  * @param {object} inputs - Template inputs to substitute.
  * @param {string} pricingMode - `rules` or `delegated`.

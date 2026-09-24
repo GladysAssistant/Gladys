@@ -224,6 +224,28 @@ describe('energy-contract priceIntervals', () => {
     expect(costs[0].components.vat).to.be.closeTo(0.04, 1e-9);
     expect(costs[0].components.vat_full).to.be.closeTo((0.2 + 0.03 + 0.04) * 0.055, 1e-6);
   });
+  it('should leave the excluded component kinds out of the costs, taxes included', () => {
+    const compiled = tariff([
+      consumption({ fallback: { price: 0.2 } }),
+      { key: 'sub', kind: 'fixed', amount: 44.64, per: 'month' },
+      { key: 'peak', kind: 'demand', price: 5, per: 'month' },
+      { key: 'vat', kind: 'tax', rate: 10, applies_to: ['energy', 'sub', 'peak'] },
+    ]);
+    const intervals = [{ starts_at: '2026-01-12T12:00:00Z', kwh: 1, max_power_kw: 2 }];
+    const energy = priceIntervals(compiled, { timezone: 'UTC' }, intervals, {
+      closed_period: true,
+      exclude_kinds: ['fixed', 'demand'],
+    });
+    // the tax only applies to what is priced
+    expect(energy.costs[0].components).to.deep.equal({ energy: 0.2, vat: 0.02 });
+    expect(energy.costs[0].cost).to.equal(0.22);
+    const fixed = priceIntervals(compiled, { timezone: 'UTC' }, intervals, {
+      closed_period: true,
+      exclude_kinds: ['consumption', 'demand'],
+    });
+    expect(fixed.costs[0].components).to.deep.equal({ sub: 0.03, vat: 0.003 });
+    expect(fixed.costs[0].cost).to.equal(0.033);
+  });
   it('should include demand charges only for closed periods', () => {
     const compiled = tariff([
       consumption({ fallback: { price: 0.1 } }),

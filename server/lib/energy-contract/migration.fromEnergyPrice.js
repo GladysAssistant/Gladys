@@ -7,19 +7,15 @@ const {
   ENERGY_CONTRACT_PROVIDER_KINDS,
   ENERGY_CONTRACT_PRICING_MODES,
   ENERGY_CONTRACT_TYPES,
-  EVENTS,
 } = require('../../utils/constants');
 const { convertPriceRows, normalizeContractType } = require('./legacy/convertPriceRows');
 const { legacyCost } = require('./legacy/calculateCost');
 const { compileTariff } = require('./tariff.compile');
 const { priceIntervals } = require('./tariff.priceIntervals');
-const { localToUtcMs } = require('./tariff.time');
+const { TARIFF_COMPONENT_KINDS } = require('./tariff.constants');
 const { TEMPO_CALENDAR_KEY } = require('./templates/internal');
 
 const MIGRATION_DONE_VARIABLE = 'ENERGY_CONTRACT_MIGRATION_DONE';
-// the recalculation the migration asks for, picked up by the energy-monitoring service at
-// its start: the migration runs before the services listen to the recalculation event
-const PENDING_RECALCULATION_VARIABLE = 'ENERGY_CONTRACT_PENDING_RECALCULATION';
 const VERIFICATION_DAYS = 7;
 const MAX_GAP_RATIO = 0.005;
 const CURRENCY_MAP = { euro: 'EUR', dollar: 'USD', pound: 'GBP', franc: 'CHF', yen: 'JPY' };
@@ -97,7 +93,11 @@ async function verifyMigratedContract(contract, rows, systemTimezone) {
     to.getTime(),
     contract.timezone,
   );
-  const engine = priceIntervals(compiled, contract, intervals, { calendars });
+  // like the cost job, the engine prices the energy only: neither stored the subscription
+  const engine = priceIntervals(compiled, contract, intervals, {
+    calendars,
+    exclude_kinds: [TARIFF_COMPONENT_KINDS.FIXED],
+  });
   const tempoDayMap = new Map();
   if (compiled.calendars.includes(TEMPO_CALENDAR_KEY)) {
     try {
@@ -124,8 +124,7 @@ async function verifyMigratedContract(contract, rows, systemTimezone) {
     if (legacy === null) {
       return;
     }
-    // the engine stores the subscription in the states, the legacy code did not
-    const energy = engine.costs[index].components.energy || 0;
+    const energy = engine.costs[index].cost;
     legacyTotal += legacy;
     engineTotal += energy;
     const day = interval.starts_at.slice(0, 10);
@@ -162,8 +161,8 @@ async function verifyMigratedContract(contract, rows, systemTimezone) {
 /**
  * @description Convert every group of t_energy_price rows into a contract (sections 9.1 to 9.3),
  * once: a system variable marks the migration as done. The price rows are left untouched
- * (read-only compatibility window). Every meter then gets one full cost recalculation so
- * its stored costs carry the subscription like the new contracts do.
+ * (read-only compatibility window). The stored costs are not recomputed: the legacy code
+ * and the engine both store the energy only (the subscription is added at display time).
  * @returns {Promise<Array<object>>} The created contracts.
  * @example
  * await migrateFromEnergyPrice();
@@ -177,7 +176,6 @@ async function migrateFromEnergyPrice() {
   const systemTimezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || 'UTC';
   const groups = groupPriceRows(rows);
   const created = [];
-  const newlyCreated = [];
   const catalogueKeys = new Set();
   try {
     (await this.getCommunityTemplates()).forEach((t) => catalogueKeys.add(t.key));
@@ -236,7 +234,6 @@ async function migrateFromEnergyPrice() {
     }
     const plain = row.get({ plain: true });
     created.push(plain);
-    newlyCreated.push(plain);
     logger.info(`Energy contract migration: "${name}" created from ${group.rows.length} price row(s)`);
     // the verification never leaves a created contract outside the success path
     try {
@@ -250,22 +247,6 @@ async function migrateFromEnergyPrice() {
       logger.warn(`Energy contract migration: unable to verify "${name}": ${e.message}`);
     }
   }
-  // only the contracts created by this run need a recalculation: a retry after a failed
-  // group must not recompute the meters converted by a previous start again
-  const meterIds = Array.from(new Set(newlyCreated.map((c) => c.electric_meter_device_id)));
-  if (meterIds.length > 0) {
-    // the earliest start of the created contracts, each in its own timezone
-    const earliestMs = Math.min(...newlyCreated.map((c) => localToUtcMs(c.valid_from, c.timezone)));
-    const payload = {
-      from: new Date(earliestMs).toISOString(),
-      electric_meter_device_ids: meterIds,
-    };
-    // stored before the done marker for the energy-monitoring service, which is not
-    // listening yet at this point of the boot and clears it once the recalculation
-    // succeeded; the event still serves a migration run while the service is up
-    await this.variable.setValue(PENDING_RECALCULATION_VARIABLE, JSON.stringify(payload));
-    this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, { ...payload, from: new Date(payload.from) });
-  }
   if (failures === 0) {
     await this.variable.setValue(MIGRATION_DONE_VARIABLE, new Date().toISOString());
   } else {
@@ -274,44 +255,8 @@ async function migrateFromEnergyPrice() {
   return created;
 }
 
-/**
- * @description The recalculation left by the migration for the energy-monitoring service
- * (section 9.3). It stays stored until `clearPendingRecalculation` is called after a
- * successful run, so a failed or interrupted recalculation is retried at the next start.
- * @returns {Promise<object|null>} { from, electric_meter_device_ids } or null.
- * @example
- * const pending = await energyContract.getPendingRecalculation();
- */
-async function getPendingRecalculation() {
-  const raw = await this.variable.getValue(PENDING_RECALCULATION_VARIABLE);
-  if (!raw) {
-    return null;
-  }
-  try {
-    const payload = JSON.parse(raw);
-    return { ...payload, from: new Date(payload.from) };
-  } catch (e) {
-    logger.warn(`Energy contract migration: invalid pending recalculation dropped (${e.message})`);
-    await this.variable.destroy(PENDING_RECALCULATION_VARIABLE);
-    return null;
-  }
-}
-
-/**
- * @description Clear the pending recalculation once it ran successfully.
- * @returns {Promise<void>} Resolves when cleared.
- * @example
- * await energyContract.clearPendingRecalculation();
- */
-async function clearPendingRecalculation() {
-  await this.variable.destroy(PENDING_RECALCULATION_VARIABLE);
-}
-
 module.exports = {
   migrateFromEnergyPrice,
-  getPendingRecalculation,
-  clearPendingRecalculation,
-  PENDING_RECALCULATION_VARIABLE,
   verifyMigratedContract,
   groupPriceRows,
   toIsoCurrency,

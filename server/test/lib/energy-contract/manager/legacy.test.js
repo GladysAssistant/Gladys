@@ -14,7 +14,6 @@ const {
   groupPriceRows,
   toIsoCurrency,
   MIGRATION_DONE_VARIABLE,
-  PENDING_RECALCULATION_VARIABLE,
 } = require('../../../../lib/energy-contract/migration.fromEnergyPrice');
 const { validateTariff } = require('../../../../lib/energy-contract/tariff.validate');
 
@@ -150,7 +149,7 @@ describe('energyContract: legacy prices', () => {
       energyContract.getCommunityTemplates = sinon.fake.resolves([{ key: 'edf-base' }]);
     });
 
-    it('should convert the price rows into contracts once and request a recalculation', async () => {
+    it('should convert the price rows into contracts once, without recomputing the costs', async () => {
       await db.EnergyPrice.bulkCreate([
         row({
           id: '11111111-1111-4111-8111-111111111111',
@@ -208,14 +207,9 @@ describe('energyContract: legacy prices', () => {
       expect(base.tariff.components[1]).to.deep.equal({ key: 'subscription', kind: 'fixed', amount: 12, per: 'month' });
       expect(tempo).to.include({ valid_to: null, provider_kind: 'user', template_key: null, subscribed_power: null });
       expect(tempo.tariff.calendars).to.deep.equal(['tempo']);
-      expect(emitted.callCount).to.equal(1);
-      expect(emitted.firstCall.args[0].from.toISOString()).to.equal('2024-12-31T23:00:00.000Z');
+      // the stored costs are the energy only on both sides: nothing to recompute
+      expect(emitted.callCount).to.equal(0);
       expect(variables[MIGRATION_DONE_VARIABLE]).to.be.a('string');
-      // the recalculation is left for the energy-monitoring service, from the earliest contract
-      // start in its own timezone (the tempo contract starts at Paris midnight)
-      const pending = JSON.parse(variables[PENDING_RECALCULATION_VARIABLE]);
-      expect(pending.from).to.equal('2024-12-31T23:00:00.000Z');
-      expect(pending.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID]);
       // second run: nothing
       expect(await energyContract.migrateFromEnergyPrice()).to.deep.equal([]);
       expect(await db.EnergyPrice.count()).to.equal(4);
@@ -346,7 +340,6 @@ describe('energyContract: legacy prices', () => {
       expect(created).to.deep.equal([]);
       // a failed group is retried at the next start: no done marker
       expect(variables[MIGRATION_DONE_VARIABLE]).to.equal(undefined);
-      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
     });
 
     it('should keep the converted groups and retry only the failed one without duplicates', async () => {
@@ -363,19 +356,12 @@ describe('energyContract: legacy prices', () => {
       const first = await energyContract.migrateFromEnergyPrice();
       expect(first).to.have.lengthOf(1);
       expect(variables[MIGRATION_DONE_VARIABLE]).to.equal(undefined);
-      // the recalculation of the converted contract is left for the energy-monitoring service
-      const pending = JSON.parse(variables[PENDING_RECALCULATION_VARIABLE]);
-      expect(pending.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID]);
-      expect(pending.from).to.equal('2024-12-31T23:00:00.000Z');
-      // second start: the converted group is reused, the broken one fails again, and the
-      // already converted meter is not recalculated again
-      await energyContract.clearPendingRecalculation();
+      // second start: the converted group is reused, the broken one fails again
       const second = await energyContract.migrateFromEnergyPrice();
       expect(second).to.have.lengthOf(1);
       expect(second[0].id).to.equal(first[0].id);
       expect(await db.EnergyContract.count({ where: { electric_meter_device_id: METER_DEVICE_ID } })).to.equal(1);
       expect(variables[MIGRATION_DONE_VARIABLE]).to.equal(undefined);
-      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
     });
 
     it('should keep a created contract when its verification fails', async () => {
@@ -412,28 +398,6 @@ describe('energyContract: legacy prices', () => {
       await expect(energyContract.verifyMigratedContract(contract, tempoRows, 'Europe/Paris')).to.be.rejectedWith(
         'db down',
       );
-    });
-
-    it('should keep the pending recalculation until it is cleared', async () => {
-      expect(await energyContract.getPendingRecalculation()).to.equal(null);
-      variables[PENDING_RECALCULATION_VARIABLE] = JSON.stringify({
-        from: '2024-12-31T23:00:00.000Z',
-        electric_meter_device_ids: [METER_DEVICE_ID],
-      });
-      const pending = await energyContract.getPendingRecalculation();
-      expect(pending.from).to.be.instanceOf(Date);
-      expect(pending.from.toISOString()).to.equal('2024-12-31T23:00:00.000Z');
-      expect(pending.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID]);
-      // still there for a retry after a failed run
-      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.be.a('string');
-      expect(await energyContract.getPendingRecalculation()).to.deep.equal(pending);
-      await energyContract.clearPendingRecalculation();
-      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
-      expect(await energyContract.getPendingRecalculation()).to.equal(null);
-      // an unreadable value is dropped
-      variables[PENDING_RECALCULATION_VARIABLE] = '{not json';
-      expect(await energyContract.getPendingRecalculation()).to.equal(null);
-      expect(variables[PENDING_RECALCULATION_VARIABLE]).to.equal(undefined);
     });
 
     it('should group rows and map currencies', () => {

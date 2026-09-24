@@ -96,7 +96,15 @@ describe('energyContract: priceContractIntervals', () => {
     expect(result.costs[0].cost).to.equal(0.220833);
     expect(result.costs[0].label).to.equal('agile');
     expect(result.unpriced).to.deep.equal([]);
-    expect(result.fixed_by_core).to.equal(true);
+    // the cost job stores the energy only: the fixed components are left out on request
+    const energyOnly = await energyContract.priceContractIntervals(
+      contract,
+      [{ starts_at: '2026-01-14T23:30:00Z', kwh: 2 }],
+      { exclude_kinds: ['fixed'] },
+    );
+    expect(energyOnly.costs).to.deep.equal([
+      { starts_at: '2026-01-14T23:30:00.000Z', cost: 0.2, components: { energy: 0.2 }, label: 'agile' },
+    ]);
   });
 
   it('should leave the intervals unpriced when the integration fails or answers partially', async () => {

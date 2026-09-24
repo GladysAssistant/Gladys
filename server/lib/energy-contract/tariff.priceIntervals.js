@@ -200,7 +200,8 @@ function prepareIntervals(intervals, tz, billingPeriodStartDay) {
  * @param {object} contract - The contract: `timezone`, `billing_period_start_day` (1 by default).
  * @param {Array<object>} intervals - The intervals: `starts_at`, `kwh`, optional `max_power_kw` and `duration_minutes`.
  * @param {object} [options] - Options: `calendars` (lookup), `cumulative_before` ({ day, month, billing_period }
- * kWh accumulated before the first interval), `closed_period` (boolean, include the demand charges).
+ * kWh accumulated before the first interval), `closed_period` (boolean, include the demand charges),
+ * `exclude_kinds` (component kinds left out of the costs: a tax only applies to what is priced).
  * @returns {object} The run result: costs (starts_at, cost, components, label per interval), warnings, cumulative.
  * @example
  * priceIntervals(compiled, { timezone: 'Europe/Paris' }, [{ starts_at: '2026-01-12T06:00:00Z', kwh: 1.2 }]);
@@ -209,11 +210,15 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
   const tz = contract.timezone;
   const billingPeriodStartDay = contract.billing_period_start_day || 1;
   const lookup = options.calendars || EMPTY_LOOKUP;
+  const excludedKinds = new Set(options.exclude_kinds || []);
   const prepared = prepareIntervals(intervals, tz, billingPeriodStartDay);
   const warnings = [];
   const cumulative = { day: 0, month: 0, billing_period: 0, ...(options.cumulative_before || {}) };
   const currentPeriodIds = {};
-  const demandByInterval = options.closed_period ? computeDemandCharges(compiled, prepared) : null;
+  const demandByInterval =
+    options.closed_period && !excludedKinds.has(TARIFF_COMPONENT_KINDS.DEMAND)
+      ? computeDemandCharges(compiled, prepared)
+      : null;
 
   const costs = prepared.map((interval, index) => {
     // Reset the accumulations whose period changed (the first interval keeps cumulative_before).
@@ -232,6 +237,9 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
     const components = {};
     let label;
     compiled.components.forEach((component) => {
+      if (excludedKinds.has(component.kind)) {
+        return;
+      }
       let amount = 0;
       if (component.kind === TARIFF_COMPONENT_KINDS.CONSUMPTION) {
         const result = evaluateConsumption(component, interval, context, cumulative, warnings);
@@ -242,8 +250,9 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
       } else if (component.kind === TARIFF_COMPONENT_KINDS.FIXED) {
         amount = evaluateFixed(component, interval, tz);
       } else if (component.kind === TARIFF_COMPONENT_KINDS.TAX) {
-        // applies_to only references components declared before this one (validated)
-        const base = component.applies_to.reduce((sum, key) => sum + components[key], 0);
+        // applies_to only references components declared before this one (validated);
+        // an excluded component has no amount to tax
+        const base = component.applies_to.reduce((sum, key) => sum + (components[key] || 0), 0);
         amount = (base * component.rate) / 100;
       } else if (demandByInterval !== null && demandByInterval[index][component.key] !== undefined) {
         amount = demandByInterval[index][component.key];

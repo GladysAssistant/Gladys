@@ -12,6 +12,7 @@ const EnergySensorManager = require('../../../../lib/device/energy-sensor');
 const {
   buildOffsetDateExpression,
   shouldOffsetPeriods,
+  buildDisplayPeriods,
 } = require('../../../../lib/device/energy-sensor/energy-sensor.getConsumptionByDates');
 
 // Extend Day.js with plugins
@@ -33,6 +34,53 @@ const insertConsumptionStates = async (deviceFeatureId, numberOfDays) => {
   await db.duckDbBatchInsertState(deviceFeatureId, deviceFeatureStateToInsert);
 };
 
+const TEST_SERVICE_ID = 'a810b8db-6d04-4697-bed3-c4b72c996279';
+
+const createdMeters = [];
+const createMeter = async (deviceId, name) => {
+  createdMeters.push(deviceId);
+  return db.Device.create({ id: deviceId, name, selector: name, external_id: name, service_id: TEST_SERVICE_ID });
+};
+
+// a contract of the meter with a monthly subscription (amount per month), energy at 0.2
+const createContract = (deviceId, overrides = {}) =>
+  db.EnergyContract.create({
+    selector: `contract-${deviceId}`,
+    name: 'Base',
+    electric_meter_device_id: deviceId,
+    valid_from: '2023-01-01',
+    valid_to: null,
+    currency: 'EUR',
+    timezone: 'UTC',
+    tariff: {
+      tariff_version: 1,
+      components: [
+        { key: 'energy', kind: 'consumption', rules: [], fallback: { price: 0.2 } },
+        { key: 'subscription', kind: 'fixed', amount: 15, per: 'month' },
+      ],
+    },
+    ...overrides,
+  });
+
+const costFeatureStateManager = (deviceFeatureId, deviceId) => ({
+  get: fake((type) => {
+    if (type === 'deviceFeature') {
+      return {
+        id: deviceFeatureId,
+        name: 'Energy Cost',
+        device_id: deviceId,
+        category: 'energy-sensor',
+        type: 'thirty-minutes-consumption-cost',
+        unit: 'euro',
+      };
+    }
+    if (type === 'deviceById') {
+      return { id: deviceId, name: 'Smart Meter' };
+    }
+    return null;
+  }),
+});
+
 describe('EnergySensorManager.getConsumptionByDates', function Describe() {
   this.timeout(15000);
 
@@ -40,6 +88,7 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
 
   beforeEach(async () => {
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.EnergyContract.destroy({ where: {} });
 
     clock = sinon.useFakeTimers({
       now: new Date('2023-10-15T12:00:00.000Z').getTime(),
@@ -628,8 +677,6 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       expect(results[0].deviceFeature.name).to.equal('Energy Consumption');
       // Should return the currency unit from the original cost feature
       expect(results[0].deviceFeature.currency_unit).to.equal('euro');
-      // the stored costs carry the subscription of the contract
-      expect(results[0].deviceFeature.subscription_included).to.equal(true);
       expect(results[0].values).to.be.an('array');
       expect(results[0].values.length).to.be.at.least(1);
     });
@@ -731,7 +778,6 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       expect(results[0].deviceFeature.name).to.equal('Energy Consumption');
       // Should return null for currency_unit since this is not a cost feature
       expect(results[0].deviceFeature.currency_unit).to.equal(null);
-      expect(results[0].deviceFeature.subscription_included).to.equal(false);
     });
 
     it('should convert Wh to kWh when display_mode is kwh and unit is watt-hour', async () => {
@@ -834,6 +880,248 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       // Values should NOT be converted (already in kWh)
       expect(results[0].values[0].sum_value).to.equal(1.5);
       expect(results[0].values[1].sum_value).to.equal(2);
+    });
+  });
+
+  describe('Subscription prices', () => {
+    const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+
+    const query = async (deviceId, options) => {
+      const energySensorManager = new EnergySensorManager(costFeatureStateManager(deviceFeatureId, deviceId));
+      energySensorManager.getRootElectricMeterDevice = () => ({ id: deviceFeatureId, device_id: deviceId });
+      return energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        display_mode: 'currency',
+        ...options,
+      });
+    };
+    const subscriptionOf = (results) => results.find((r) => r.deviceFeature.is_subscription === true);
+
+    afterEach(async () => {
+      await db.EnergyContract.destroy({ where: {} });
+      await db.Device.destroy({ where: { id: createdMeters.splice(0) } });
+    });
+
+    it('should add the subscription of the meter contract as a separate series, per day', async () => {
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e1';
+      await insertConsumptionStates(deviceFeatureId, 7);
+      await createMeter(deviceId, 'sub-meter-day');
+      await createContract(deviceId, { name: 'Blue contract' });
+      const results = await query(deviceId, {
+        from: new Date('2023-10-08T00:00:00.000Z'),
+        to: new Date('2023-10-15T00:00:00.000Z'),
+        group_by: 'day',
+      });
+      expect(results).to.have.lengthOf(2); // 1 subscription (first) + 1 consumption
+      const subscription = results[0];
+      expect(subscription.deviceFeature).to.deep.equal({
+        name: 'Blue contract',
+        currency_unit: 'euro',
+        is_subscription: true,
+      });
+      expect(subscription.device.name).to.equal('Smart Meter');
+      expect(subscription.values).to.have.lengthOf(7);
+      // 15 per month over the 31 days of October
+      subscription.values.forEach((value) => {
+        expect(value.sum_value).to.be.closeTo(15 / 31, 1e-6);
+        expect(value.value).to.equal(value.sum_value);
+        expect(value.contract_name).to.equal('Blue contract');
+      });
+      expect(subscription.values[0].created_at).to.equal('2023-10-08T00:00:00.000Z');
+      // the consumption series carries no subscription
+      expect(results[1].deviceFeature.is_subscription).to.equal(undefined);
+    });
+
+    it('should follow a contract change, a gap without contract and a foreign timezone', async () => {
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e2';
+      await insertConsumptionStates(deviceFeatureId, 30);
+      await createMeter(deviceId, 'sub-meter-change');
+      // 12 per month until Oct 10 (Paris), nothing on Oct 11, 18 per month from Oct 12 (Paris)
+      await createContract(deviceId, {
+        selector: 'old-contract',
+        name: 'Old contract',
+        timezone: 'Europe/Paris',
+        valid_to: '2023-10-10',
+        tariff: { tariff_version: 1, components: [{ key: 's', kind: 'fixed', amount: 12, per: 'month' }] },
+      });
+      await createContract(deviceId, {
+        selector: 'new-contract',
+        name: 'New contract',
+        timezone: 'Europe/Paris',
+        valid_from: '2023-10-12',
+        tariff: { tariff_version: 1, components: [{ key: 's', kind: 'fixed', amount: 18, per: 'month' }] },
+      });
+      const results = await query(deviceId, {
+        from: new Date('2023-10-09T00:00:00.000Z'),
+        to: new Date('2023-10-14T00:00:00.000Z'),
+        group_by: 'day',
+      });
+      const subscription = subscriptionOf(results);
+      expect(subscription.deviceFeature.name).to.equal('Old contract');
+      const byDay = Object.fromEntries(subscription.values.map((v) => [v.created_at.slice(0, 10), v]));
+      // the monthly amount is spread over the real duration of October in Paris: 745 hours (DST end)
+      const hourOfMonth = 1 / 745;
+      // a UTC day starts at 02:00 Paris: Oct 9 is fully in the old contract
+      expect(byDay['2023-10-09'].sum_value).to.be.closeTo(12 * 24 * hourOfMonth, 1e-5);
+      // Oct 10 UTC: the old contract until midnight Paris (22 h), nothing after
+      expect(byDay['2023-10-10'].sum_value).to.be.closeTo(12 * 22 * hourOfMonth, 1e-5);
+      expect(byDay['2023-10-10'].contract_name).to.equal('Old contract');
+      // Oct 11 UTC: nothing until 22:00 UTC, then the new contract
+      expect(byDay['2023-10-11'].sum_value).to.be.closeTo(18 * 2 * hourOfMonth, 1e-5);
+      expect(byDay['2023-10-11'].contract_name).to.equal('New contract');
+      expect(byDay['2023-10-12'].sum_value).to.be.closeTo(18 * 24 * hourOfMonth, 1e-5);
+    });
+
+    it('should return no subscription series without contract, without fixed component or in kwh mode', async () => {
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e3';
+      await insertConsumptionStates(deviceFeatureId, 7);
+      await createMeter(deviceId, 'sub-meter-none');
+      const options = {
+        from: new Date('2023-10-08T00:00:00.000Z'),
+        to: new Date('2023-10-15T00:00:00.000Z'),
+        group_by: 'day',
+      };
+      expect(subscriptionOf(await query(deviceId, options))).to.equal(undefined);
+      await createContract(deviceId, {
+        tariff: {
+          tariff_version: 1,
+          components: [{ key: 'energy', kind: 'consumption', rules: [], fallback: { price: 0.2 } }],
+        },
+      });
+      expect(subscriptionOf(await query(deviceId, options))).to.equal(undefined);
+      await db.EnergyContract.destroy({ where: {} });
+      await createContract(deviceId);
+      expect(subscriptionOf(await query(deviceId, { ...options, display_mode: 'kwh' }))).to.equal(undefined);
+    });
+
+    it('should show no subscription for the periods without consumption data', async () => {
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      await insertConsumptionStates(deviceFeatureId, 2);
+      await createMeter(deviceId, 'sub-meter-range');
+      await createContract(deviceId);
+      // data covers Oct 13 to Oct 15: the earlier days of the range get no subscription
+      const results = await query(deviceId, {
+        from: new Date('2023-10-08T00:00:00.000Z'),
+        to: new Date('2023-10-15T00:00:00.000Z'),
+        group_by: 'day',
+      });
+      const subscription = subscriptionOf(results);
+      expect(subscription.values.map((v) => v.created_at.slice(0, 10))).to.deep.equal(['2023-10-13', '2023-10-14']);
+      // no consumption at all: no subscription series
+      await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+      expect(
+        subscriptionOf(
+          await query(deviceId, {
+            from: new Date('2023-10-08T00:00:00.000Z'),
+            to: new Date('2023-10-15T00:00:00.000Z'),
+            group_by: 'day',
+          }),
+        ),
+      ).to.equal(undefined);
+    });
+
+    it('should use the meter of the feature when the root meter is unknown', async () => {
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e5';
+      await insertConsumptionStates(deviceFeatureId, 7);
+      await createMeter(deviceId, 'sub-meter-root');
+      await createContract(deviceId);
+      const energySensorManager = new EnergySensorManager(costFeatureStateManager(deviceFeatureId, deviceId));
+      energySensorManager.getRootElectricMeterDevice = () => null;
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from: new Date('2023-10-08T00:00:00.000Z'),
+        to: new Date('2023-10-15T00:00:00.000Z'),
+        group_by: 'day',
+      });
+      expect(subscriptionOf(results).values).to.have.lengthOf(7);
+    });
+
+    it('should spread the subscription per hour, week, month, year and billing period', async () => {
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e6';
+      await insertConsumptionStates(deviceFeatureId, 400);
+      await createMeter(deviceId, 'sub-meter-groups');
+      await createContract(deviceId, { valid_from: '2022-01-01' });
+      const hour = subscriptionOf(
+        await query(deviceId, {
+          from: new Date('2023-10-14T00:00:00.000Z'),
+          to: new Date('2023-10-14T06:00:00.000Z'),
+          group_by: 'hour',
+        }),
+      );
+      expect(hour.values).to.have.lengthOf(6);
+      expect(hour.values[0].sum_value).to.be.closeTo(15 / 31 / 24, 1e-6);
+      const week = subscriptionOf(
+        await query(deviceId, {
+          from: new Date('2023-10-01T00:00:00.000Z'),
+          to: new Date('2023-10-15T00:00:00.000Z'),
+          group_by: 'week',
+        }),
+      );
+      expect(week.values).to.have.lengthOf(2);
+      expect(week.values[0].sum_value).to.be.closeTo((15 / 31) * 7, 1e-6);
+      const month = subscriptionOf(
+        await query(deviceId, {
+          from: new Date('2023-08-01T00:00:00.000Z'),
+          to: new Date('2023-10-01T00:00:00.000Z'),
+          group_by: 'month',
+        }),
+      );
+      // each day is priced by the engine and rounded to 6 decimals: a month sums 30 of them
+      expect(month.values).to.have.lengthOf(2);
+      month.values.forEach((v) => expect(v.sum_value).to.be.closeTo(15, 1e-4));
+      const year = subscriptionOf(
+        await query(deviceId, {
+          from: new Date('2022-01-01T00:00:00.000Z'),
+          to: new Date('2023-01-01T00:00:00.000Z'),
+          group_by: 'year',
+        }),
+      );
+      expect(year.values).to.have.lengthOf(1);
+      expect(year.values[0].sum_value).to.be.closeTo(15 * 12, 1e-3);
+      // a billing period starting on the 5th: from the 5th to the 5th (Sep 5 to Oct 5 = 30 days)
+      const billingResults = await query(deviceId, {
+        from: new Date('2023-09-05T00:00:00.000Z'),
+        to: new Date('2023-10-05T00:00:00.000Z'),
+        group_by: 'month',
+        period_start_day: 5,
+      });
+      const billing = subscriptionOf(billingResults);
+      expect(billing.values).to.have.lengthOf(1);
+      expect(billing.values[0].created_at).to.equal('2023-09-05T00:00:00.000Z');
+      // 26 days of September (15/30 a day) and 4 days of October (15/31 a day)
+      expect(billing.values[0].sum_value).to.be.closeTo(26 * (15 / 30) + 4 * (15 / 31), 1e-4);
+      // without group_by: daily periods
+      // without group_by the consumption is one undated aggregate: nothing to align the subscription on
+      const ungrouped = await query(deviceId, {
+        from: new Date('2023-10-08T00:00:00.000Z'),
+        to: new Date('2023-10-15T00:00:00.000Z'),
+      });
+      expect(subscriptionOf(ungrouped)).to.equal(undefined);
+    });
+
+    describe('buildDisplayPeriods', () => {
+      it('should derive the offset periods from the range start, clamped like the SQL', () => {
+        const periods = buildDisplayPeriods(
+          new Date('2023-01-31T00:00:00.000Z'),
+          new Date('2023-04-30T00:00:00.000Z'),
+          'month',
+          31,
+        );
+        expect(periods.map((p) => p.starts_at)).to.deep.equal([
+          '2023-01-31T00:00:00.000Z',
+          '2023-02-28T00:00:00.000Z',
+          '2023-03-31T00:00:00.000Z',
+        ]);
+        expect(periods[1].ends_at).to.equal('2023-03-31T00:00:00.000Z');
+        expect(periods[0].created_at).to.equal(periods[0].starts_at);
+      });
+      it('should fall back to daily periods for an unknown grouping', () => {
+        const periods = buildDisplayPeriods(
+          new Date('2023-01-01T00:00:00.000Z'),
+          new Date('2023-01-03T00:00:00.000Z'),
+          null,
+          1,
+        );
+        expect(periods).to.have.lengthOf(2);
+      });
     });
   });
 

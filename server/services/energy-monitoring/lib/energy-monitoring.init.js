@@ -22,34 +22,6 @@ async function init() {
     // contract or calendar change: the core asks for a bounded recalculation (spec 7.4)
     this.recalculateForContractsListener = eventFunctionWrapper(this.recalculateForContracts);
     this.gladys.event.on(EVENTS.ENERGY_CONTRACT.RECALCULATE, this.recalculateForContractsListener);
-    // the migration of the legacy prices ran before this service listened: run its
-    // recalculation, cleared only once it succeeded (a failure is retried at the next start)
-    try {
-      const pending = await this.gladys.energyContract.getPendingRecalculation();
-      if (pending) {
-        const runPendingRecalculation = async () => {
-          try {
-            // a device whose costs failed is logged by the job, not thrown: the rewrite is
-            // only done when every device saved its costs
-            const result = await this.recalculateForContracts(pending);
-            if (result && result.failures === 0) {
-              await this.gladys.energyContract.clearPendingRecalculation();
-            } else {
-              logger.warn(
-                `Pending energy recalculation: ${
-                  result ? result.failures : 'some'
-                } device(s) failed, retried at the next start`,
-              );
-            }
-          } catch (e) {
-            logger.warn(`Pending energy recalculation failed, retried at the next start: ${e.message}`);
-          }
-        };
-        runPendingRecalculation();
-      }
-    } catch (e) {
-      logger.warn(`Unable to read the pending energy recalculation: ${e.message}`);
-    }
   }
   if (!this.calculateConsumptionAndCostEvery30MinutesJob) {
     // Scheduling consumption and cost calculation every 30 minutes

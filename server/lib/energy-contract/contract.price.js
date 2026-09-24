@@ -2,7 +2,6 @@ const { ENERGY_CONTRACT_PRICING_MODES } = require('../../utils/constants');
 const { compileTariff } = require('./tariff.compile');
 const { priceIntervals } = require('./tariff.priceIntervals');
 const { getBillingPeriodBounds, getLocalContext } = require('./tariff.time');
-const { TARIFF_COMPONENT_KINDS } = require('./tariff.constants');
 
 /**
  * @description Compile the tariff of a contract, cached per contract id and version: the
@@ -50,12 +49,14 @@ function splitByBillingPeriod(contract, intervals) {
 
 /**
  * @description Price the consumption intervals of a contract: with the core engine
- * (`rules`), or by the integration (`delegated`, the core still spreads the fixed
- * components). Loads the calendars of the run window once. Returns the engine result;
- * in delegated mode the intervals the integration did not price are absent from `costs`.
+ * (`rules`), or by the integration (`delegated`, the core still computes the fixed
+ * components unless they are excluded). Loads the calendars of the run window once.
+ * Returns the engine result; in delegated mode the intervals the integration did not
+ * price are absent from `costs`.
  * @param {object} contract - The contract (plain object).
  * @param {Array<object>} intervals - [{ starts_at, kwh, max_power_kw?, duration_minutes? }].
- * @param {object} [options] - `cumulative_before`, `closed_period`, `calendars` (preloaded lookup).
+ * @param {object} [options] - `cumulative_before`, `closed_period`, `calendars` (preloaded lookup)
+ * and `exclude_kinds` (component kinds left out, see `priceIntervals`).
  * @returns {Promise<object>} { costs, warnings, cumulative, unpriced }.
  * @example
  * await priceContractIntervals(contract, [{ starts_at: '2026-01-12T06:00:00Z', kwh: 1.2 }]);
@@ -74,12 +75,14 @@ async function priceContractIntervals(contract, intervals, options = {}) {
     calendars,
     cumulative_before: options.cumulative_before,
     closed_period: options.closed_period,
+    exclude_kinds: options.exclude_kinds,
   });
   if (contract.pricing_mode !== ENERGY_CONTRACT_PRICING_MODES.DELEGATED) {
     return { ...engineResult, unpriced: [] };
   }
   // Delegated: the integration prices the energy per billing period, the core adds the
-  // fixed components it computed above (a delegated tariff only carries fixed components).
+  // fixed components it computed above when they are not excluded (a delegated tariff
+  // only carries fixed components).
   const fixedByStart = new Map(engineResult.costs.map((c) => [c.starts_at, c]));
   const costs = [];
   const unpriced = [];
@@ -134,14 +137,7 @@ async function priceContractIntervals(contract, intervals, options = {}) {
     // the accumulations restart at the period boundary, the integration receives them per period
     cumulative.billing_period = 0;
   }
-  const hasFixed = compiled.components.some((c) => c.kind === TARIFF_COMPONENT_KINDS.FIXED);
-  return {
-    costs,
-    warnings: engineResult.warnings,
-    cumulative: engineResult.cumulative,
-    unpriced,
-    fixed_by_core: hasFixed,
-  };
+  return { costs, warnings: engineResult.warnings, cumulative: engineResult.cumulative, unpriced };
 }
 
 module.exports = { priceContractIntervals, getCompiledTariff, splitByBillingPeriod };

@@ -675,6 +675,8 @@
         "totalConsumptionKwh": "Consumo total",
         "error": "Error al cargar los datos de consumo de energía",
         "noData": "No hay datos de consumo de energía disponibles para este período",
+        "showSubscriptionPrices": "Mostrar precios de suscripción",
+        "showSubscriptionPricesDescription": "Muestra el costo de la suscripción del contrato del contador junto con los datos de consumo en el gráfico.",
         "periodStartDay": "Día de inicio del período de facturación",
         "periodStartDayDescription": "Día del mes en que comienza el período de su factura de energía. Las vistas mensual y anual van desde este día hasta el mismo día del período siguiente (por ejemplo, del 5 al 5), para que puedan compararse con su factura. Si un mes es más corto que este día, el período comienza el último día de ese mes."
       },

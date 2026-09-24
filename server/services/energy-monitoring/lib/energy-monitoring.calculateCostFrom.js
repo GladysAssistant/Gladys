@@ -7,6 +7,7 @@ const {
   ENERGY_CONTRACT_PRICING_MODES,
 } = require('../../../utils/constants');
 const { convertEnergyUnit } = require('../../../utils/units');
+const { TARIFF_COMPONENT_KINDS } = require('../../../lib/energy-contract/tariff.constants');
 const {
   getLocalContext,
   getDayBounds,
@@ -16,6 +17,11 @@ const {
 
 const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000;
 const DAILY_DURATION_MINUTES = 24 * 60;
+// The stored cost of a device is its energy: the fixed components (subscription) are
+// never stored, the display adds them once per meter (spec 8.1); the demand charges are
+// a charge of the meter's peak, stored on the meter's own features only.
+const METER_EXCLUDED_KINDS = [TARIFF_COMPONENT_KINDS.FIXED];
+const CHILD_EXCLUDED_KINDS = [TARIFF_COMPONENT_KINDS.FIXED, TARIFF_COMPONENT_KINDS.DEMAND];
 
 /**
  * @description Pair every consumption feature of a device with its cost feature
@@ -99,11 +105,12 @@ function getEffectiveStart(contract, compiled, startAt) {
  * @param {object} contract - The contract.
  * @param {Array<object>} intervals - Sorted intervals of this contract.
  * @param {number} nowMs - Current instant.
+ * @param {Array<string>} excludeKinds - Component kinds left out of the stored costs.
  * @returns {Promise<object>} { costs, warnings, unpriced }.
  * @example
- * await priceByBillingPeriod(gladys.energyContract, contract, intervals, Date.now());
+ * await priceByBillingPeriod(gladys.energyContract, contract, intervals, Date.now(), ['fixed']);
  */
-async function priceByBillingPeriod(energyContract, contract, intervals, nowMs) {
+async function priceByBillingPeriod(energyContract, contract, intervals, nowMs, excludeKinds) {
   const groups = [];
   intervals.forEach((interval) => {
     const { date } = getLocalContext(new Date(interval.starts_at).getTime(), contract.timezone);
@@ -129,6 +136,7 @@ async function priceByBillingPeriod(energyContract, contract, intervals, nowMs) 
     );
     const priced = await energyContract.priceContractIntervals(contract, group.intervals, {
       closed_period: group.endMs <= nowMs,
+      exclude_kinds: excludeKinds,
       cumulative_before:
         previous !== null && previous.month === firstMonth
           ? { day: 0, month: previous.cumulative, billing_period: 0 }
@@ -149,7 +157,9 @@ async function priceByBillingPeriod(energyContract, contract, intervals, nowMs) 
 /**
  * @description Calculate the energy costs from a date with the active contracts of the
  * root meters (docs/specs/energy-contracts.md, section 7): the consumption states of every
- * energy device are priced by the contract of their root meter at the interval start.
+ * energy device are priced by the contract of their root meter at the interval start. The
+ * stored cost is the energy only: the fixed components are added at display time, the demand
+ * charges are stored on the meter's own features and never on its children.
  * @param {Date} startAt - The start date.
  * @param {string} [jobId] - The job id.
  * @param {object} [options] - Options.
@@ -284,8 +294,16 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           intervalsByContract.get(contract.id).intervals.push(interval);
         });
         const statesToInsert = [];
+        const excludeKinds =
+          electricMeterFeature.device_id === energyDevice.id ? METER_EXCLUDED_KINDS : CHILD_EXCLUDED_KINDS;
         await Promise.each(Array.from(intervalsByContract.values()), async ({ contract, intervals }) => {
-          const priced = await priceByBillingPeriod(this.gladys.energyContract, contract, intervals, nowMs);
+          const priced = await priceByBillingPeriod(
+            this.gladys.energyContract,
+            contract,
+            intervals,
+            nowMs,
+            excludeKinds,
+          );
           const createdAtByStart = new Map(intervals.map((i) => [i.starts_at, i.created_at]));
           priced.costs.forEach((cost) => {
             statesToInsert.push({ value: cost.cost, created_at: createdAtByStart.get(cost.starts_at) });
@@ -321,8 +339,7 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
   Object.keys(warningsCount).forEach((reason) => {
     logger.warn(`Energy cost calculation: ${warningsCount[reason]} interval(s) priced by a fallback (${reason})`);
   });
-  // the callers that must not consider a failed device as done (the pending recalculation
-  // of the price migration) read the failures
+  // the callers read the failures: a failed device is logged, never thrown
   return { devices: energyDevices.length, failures };
 }
 
