@@ -16,6 +16,8 @@ jobs:
   build-front:
     name: Front build
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
@@ -42,6 +44,8 @@ jobs:
     needs: build-front
     name: Docker magic !
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}

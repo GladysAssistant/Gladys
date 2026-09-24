@@ -8,6 +8,8 @@ jobs:
   test-front:
     name: Front test
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
@@ -39,6 +41,8 @@ jobs:
   build-front:
     name: Front build
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
@@ -102,6 +106,8 @@ jobs:
   test-server:
     name: Server test
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3

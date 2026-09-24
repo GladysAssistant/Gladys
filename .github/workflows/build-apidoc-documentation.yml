@@ -9,6 +9,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     name: Build and publish apidoc documentation
     steps:
       - uses: actions/checkout@v3
