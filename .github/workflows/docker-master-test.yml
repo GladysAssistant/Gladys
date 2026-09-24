@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -46,6 +48,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -75,6 +79,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -112,6 +118,7 @@ jobs:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
         with:
+          persist-credentials: false
           fetch-depth: 2
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3

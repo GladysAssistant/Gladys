@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -53,6 +55,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 🐳 Docker meta
         id: docker_meta
         uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4.6.0

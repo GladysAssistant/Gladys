@@ -16,6 +16,8 @@ jobs:
     name: Build and publish demo website
     steps:
       - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
