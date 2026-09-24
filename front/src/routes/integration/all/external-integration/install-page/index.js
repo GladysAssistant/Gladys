@@ -246,7 +246,11 @@ class ExternalIntegrationInstallPage extends Component {
                             {manifest.type === 'provider' && (
                               <div class="alert alert-info">
                                 <i class="fe fe-grid mr-1" />
-                                <Text id="integration.externalIntegration.install.providerInfoText" />
+                                {manifest.energy_contracts && !(manifest.widgets && manifest.widgets.length > 0) ? (
+                                  <Text id="integration.externalIntegration.install.providerEnergyInfoText" />
+                                ) : (
+                                  <Text id="integration.externalIntegration.install.providerInfoText" />
+                                )}
                               </div>
                             )}
 

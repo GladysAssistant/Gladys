@@ -499,7 +499,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(states.map((s) => Math.round(s.value * 100) / 100)).to.deep.equal([0.8, 0.4]);
   });
 
-  it('should leave the intervals of an unavailable delegated integration without a cost', async () => {
+  it('should keep the previous costs of the intervals an unavailable delegated integration cannot price', async () => {
     await energyContract.create(
       contractPayload({
         name: 'Agile',
@@ -514,10 +514,69 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     const warn = sinon.stub(logger, 'warn');
     await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
       { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:30:00.000Z') },
     ]);
+    // the first interval was priced by a previous run, the second never was
+    await db.duckDbBatchInsertState(PLUG_COST_ID, [{ value: 0.42, created_at: new Date('2025-08-28T15:00:00.000Z') }]);
     await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
-    expect(await costStates()).to.have.lengthOf(0);
-    expect(warn.args.some(([message]) => /left without a cost/.test(message))).to.equal(true);
+    const states = await costStates();
+    expect(states.map((s) => [new Date(s.created_at).toISOString(), s.value])).to.deep.equal([
+      ['2025-08-28T15:00:00.000Z', 0.42],
+    ]);
+    expect(warn.args.some(([message]) => /left without a new cost/.test(message))).to.equal(true);
+    // a failed request is not a fallback pricing
+    expect(warn.args.some(([message]) => /priced by a fallback/.test(message))).to.equal(false);
+  });
+
+  it('should keep the costs of an orphaned delegated contract untouched and never price it', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Orphan',
+        pricing_mode: 'delegated',
+        tariff: { tariff_version: 1, components: [{ key: 's', kind: 'fixed', amount: 1, per: 'day' }] },
+      }),
+    );
+    const priceEnergyContract = fake.resolves(new Map());
+    energyContract.externalIntegration = { priceEnergyContract };
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:30:00.000Z') },
+    ]);
+    await db.duckDbBatchInsertState(PLUG_COST_ID, [{ value: 0.42, created_at: new Date('2025-08-28T15:00:00.000Z') }]);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
+    expect(priceEnergyContract.callCount).to.equal(0);
+    expect((await costStates()).map((s) => s.value)).to.deep.equal([0.42]);
+  });
+
+  it('should hand a delegated integration the real accumulation of a window starting mid-period', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Agile',
+        pricing_mode: 'delegated',
+        provider_service_id: TEST_SERVICE_ID,
+        timezone: 'UTC',
+        valid_from: '2020-01-01',
+        tariff: { tariff_version: 1, components: [{ key: 's', kind: 'fixed', amount: 1, per: 'day' }] },
+      }),
+    );
+    const priceEnergyContract = fake(async (c, payload) => {
+      const answers = new Map();
+      payload.intervals.forEach((i) => answers.set(i.starts_at, { cost: i.kwh * 0.1, components: {} }));
+      return answers;
+    });
+    energyContract.externalIntegration = { priceEnergyContract };
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 2, created_at: new Date('2025-08-27T23:00:00.000Z') }, // the day before
+      { value: 5, created_at: new Date('2025-08-28T09:30:00.000Z') }, // 09:00 interval, before the window
+      { value: 3, created_at: new Date('2025-08-28T10:30:00.000Z') }, // 10:00 interval, in the window
+    ]);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T10:00:00.000Z'));
+    expect(priceEnergyContract.callCount).to.equal(1);
+    const [, payload] = priceEnergyContract.firstCall.args;
+    expect(payload.intervals.map((i) => i.starts_at)).to.deep.equal(['2025-08-28T10:00:00.000Z']);
+    // the plug's own consumption before 10:00: 5 kWh today, 7 kWh this month and period
+    expect(payload.cumulative_before).to.deep.equal({ day: 5, month: 7, billing_period: 7 });
+    expect((await costStates()).map((s) => s.value)).to.deep.equal([0.3]);
   });
 
   it('should count the fallback warnings of a calendar price', async () => {

@@ -54,6 +54,20 @@ async function getMeterIntervals(electricMeterDeviceId, from, to) {
   if (feature === null) {
     return [];
   }
+  return this.getFeatureIntervals(feature, from, to);
+}
+
+/**
+ * @description Read the stored 30-minute consumption of a feature as engine intervals
+ * (`starts_at` = state `created_at` − 30 min, `kwh` converted).
+ * @param {object} feature - A 30-minute consumption feature (`selector`, `unit`).
+ * @param {Date} from - Window start (interval starts).
+ * @param {Date} to - Window end.
+ * @returns {Promise<Array<object>>} [{ starts_at, kwh }] sorted.
+ * @example
+ * await this.getFeatureIntervals(feature, new Date('2026-01-01'), new Date());
+ */
+async function getFeatureIntervals(feature, from, to) {
   const states = await this.device.getDeviceFeatureStates(
     feature.selector,
     new Date(from.getTime() + THIRTY_MINUTES_MS),
@@ -77,6 +91,26 @@ async function getMeterIntervals(electricMeterDeviceId, from, to) {
  * await this.getMeterCumulative('…', contract, Date.now());
  */
 async function getMeterCumulative(electricMeterDeviceId, contract, atMs) {
+  const feature = this.getMeterConsumptionFeature(electricMeterDeviceId);
+  if (feature === null) {
+    return { day: 0, month: 0, billing_period: 0 };
+  }
+  return this.getFeatureCumulative(feature, contract, atMs);
+}
+
+/**
+ * @description Compute the kWh accumulated by a consumption feature before an instant, per
+ * scope (day, month, billing period), from its stored states: the accumulation the cost job
+ * hands to a delegated integration for a window starting mid-period (section 7.1), the
+ * feature's own accumulation like the engine does for a rules contract.
+ * @param {object} feature - A 30-minute consumption feature.
+ * @param {object} contract - `timezone`, `billing_period_start_day`.
+ * @param {number} atMs - The instant (ms).
+ * @returns {Promise<object>} { day, month, billing_period } in kWh.
+ * @example
+ * await this.getFeatureCumulative(feature, contract, Date.now());
+ */
+async function getFeatureCumulative(feature, contract, atMs) {
   const tz = contract.timezone;
   const { date } = getLocalContext(atMs, tz);
   const bounds = {
@@ -85,7 +119,7 @@ async function getMeterCumulative(electricMeterDeviceId, contract, atMs) {
     billing_period: getBillingPeriodBounds(date, contract.billing_period_start_day || 1, tz).startMs,
   };
   const earliest = Math.min(bounds.day, bounds.month, bounds.billing_period);
-  const intervals = await this.getMeterIntervals(electricMeterDeviceId, new Date(earliest), new Date(atMs - 1));
+  const intervals = await this.getFeatureIntervals(feature, new Date(earliest), new Date(atMs - 1));
   const cumulative = { day: 0, month: 0, billing_period: 0 };
   intervals.forEach((interval) => {
     const ms = new Date(interval.starts_at).getTime();
@@ -161,6 +195,8 @@ module.exports = {
   getMeterConsumptionFeature,
   getMeterPowerFeature,
   getMeterIntervals,
+  getFeatureIntervals,
+  getFeatureCumulative,
   getMeterPowerPeaks,
   getMeterCumulative,
   THIRTY_MINUTES_MS,

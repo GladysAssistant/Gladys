@@ -1069,6 +1069,7 @@
         "containerStopped": "Detenido",
         "openButton": "Abrir",
         "uninstallWarning": "¿Está seguro de que desea desinstalar esta integración? Se eliminarán su contenedor y su configuración. Los dispositivos creados por esta integración permanecerán en Gladys hasta que usted los elimine.",
+        "uninstallEnergyWarning": "Esta integración calcula por sí misma el coste de contratos de energía: los contratos que tarifica dejarán de calcularse una vez desinstalada (sus costes existentes se conservan).",
         "confirmUninstallButton": "Sí, desinstalar",
         "cancelUninstallButton": "Cancelar",
         "startedAtLabel": "En ejecución desde"
@@ -1185,6 +1186,7 @@
         "energyContractsCalendars": "Calendarios tarifarios alimentados por esta integración:",
         "energyContractsDelegatedText": "Una plantilla calculada por la integración calcula por sí misma sus costes de energía: los costes de estos contratos solo se calculan mientras la integración está en funcionamiento, y dejan de calcularse si se desinstala.",
         "providerInfoText": "Esta integración no gestiona ningún dispositivo: proporciona widgets para el panel. Configúrela aquí y luego añada sus widgets desde el editor del panel.",
+        "providerEnergyInfoText": "Esta integración no gestiona ningún dispositivo: proporciona plantillas de contratos de energía y calendarios tarifarios. Configúrela aquí y luego elija sus contratos desde la página de seguimiento energético.",
         "sceneDeclarationsTitle": "Activadores y acciones de escenas",
         "sceneDeclarationsText": "Esta integración añade {{triggers}} activador(es) y {{actions}} acción(es) al editor de escenas.",
         "sceneTriggerPrefix": "Activador:",

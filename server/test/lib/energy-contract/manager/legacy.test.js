@@ -497,6 +497,11 @@ describe('energyContract: legacy prices', () => {
       expect(await energyContract.getDefaultElectricMeterFeatureId()).to.equal(null);
       expect(energyContract.getMeterConsumptionFeature(METER_DEVICE_ID)).to.equal(null);
       expect(await energyContract.getMeterIntervals(METER_DEVICE_ID, new Date(0), new Date())).to.deep.equal([]);
+      expect(await energyContract.getMeterCumulative(METER_DEVICE_ID, { timezone: 'UTC' }, Date.now())).to.deep.equal({
+        day: 0,
+        month: 0,
+        billing_period: 0,
+      });
       expect(energyContract.getMeterConsumptionFeature('unknown')).to.equal(null);
       stateManager.deleteState('deviceById', METER_DEVICE_ID);
       expect(await energyContract.getDefaultElectricMeterFeatureId()).to.equal(null);

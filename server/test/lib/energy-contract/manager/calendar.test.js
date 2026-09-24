@@ -124,6 +124,11 @@ describe('energyContract: tariff calendars', () => {
       expect(new Date(calendar.first_at).toISOString()).to.equal('2026-01-11T23:00:00.000Z');
       expect(new Date(calendar.last_at).toISOString()).to.equal('2026-01-13T23:00:00.000Z');
       expect(calendar.provider_service.selector).to.equal('test-service');
+      // a core service has no manifest: its name is shown; an integration shows its manifest name
+      expect(calendar.provider_service.display_name).to.equal(calendar.provider_service.name);
+      await db.Service.update({ manifest: { name: 'Tempo provider' } }, { where: { id: TEST_SERVICE_ID } });
+      expect((await energyContract.getCalendar('tempo')).provider_service.display_name).to.equal('Tempo provider');
+      await db.Service.update({ manifest: null }, { where: { id: TEST_SERVICE_ID } });
       const last = await energyContract.getCalendarEntries('tempo', { limit: 2 });
       expect(last.map((e) => e.value)).to.deep.equal(['blue', 'red']);
     });

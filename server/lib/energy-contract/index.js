@@ -18,6 +18,8 @@ const {
   getMeterIntervals,
   getMeterPowerPeaks,
   getMeterCumulative,
+  getFeatureIntervals,
+  getFeatureCumulative,
 } = require('./meter.intervals');
 const { declareCalendar, releaseCalendars } = require('./calendar.declare');
 const { publishCalendarEntries, requestCalendarRecalculation } = require('./calendar.publish');
@@ -82,6 +84,8 @@ EnergyContract.prototype.getMeterIntervals = getMeterIntervals;
 EnergyContract.prototype.getMeterPowerFeature = getMeterPowerFeature;
 EnergyContract.prototype.getMeterPowerPeaks = getMeterPowerPeaks;
 EnergyContract.prototype.getMeterCumulative = getMeterCumulative;
+EnergyContract.prototype.getFeatureIntervals = getFeatureIntervals;
+EnergyContract.prototype.getFeatureCumulative = getFeatureCumulative;
 EnergyContract.prototype.declareCalendar = declareCalendar;
 EnergyContract.prototype.releaseCalendars = releaseCalendars;
 EnergyContract.prototype.publishCalendarEntries = publishCalendarEntries;

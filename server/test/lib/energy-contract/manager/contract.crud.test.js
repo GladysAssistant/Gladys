@@ -202,8 +202,9 @@ describe('energyContract: contracts CRUD', () => {
   it('should request a recalculation of every meter from a date', async () => {
     const emitted = sinon.fake();
     event.on(EVENTS.ENERGY_CONTRACT.RECALCULATE, emitted);
+    // a date alone is its local midnight in the Gladys timezone (Europe/Paris here)
     expect(await energyContract.recalculate('2026-01-01')).to.deep.equal({
-      from: '2026-01-01T00:00:00.000Z',
+      from: '2025-12-31T23:00:00.000Z',
       electric_meter_device_ids: [],
     });
     expect(emitted.callCount).to.equal(0);

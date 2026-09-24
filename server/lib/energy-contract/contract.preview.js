@@ -3,6 +3,7 @@ const { SYSTEM_VARIABLE_NAMES, ENERGY_CONTRACT_PRICING_MODES } = require('../../
 const { validateContractTariff, isValidTimezone } = require('./contract.validate');
 const { compileTariff } = require('./tariff.compile');
 const { priceIntervals } = require('./tariff.priceIntervals');
+const { TARIFF_COMPONENT_KINDS } = require('./tariff.constants');
 const { THIRTY_MINUTES_MS } = require('./meter.intervals');
 
 const MAX_PREVIEW_DAYS = 31;
@@ -111,6 +112,13 @@ async function preview(params) {
   const toMs = new Date(intervals[intervals.length - 1].starts_at).getTime();
   const calendars = await this.loadCalendarLookup(compiled.calendars, fromMs, toMs, timezone);
   const result = priceIntervals(compiled, contract, intervals, { calendars, cumulative_before: cumulativeBefore });
+  // the unit price of a sample is its energy price: the fixed components, spread over the
+  // interval whatever its consumption, are not part of it (the stored costs leave them out too)
+  const energyOnly = priceIntervals(compiled, contract, intervals, {
+    calendars,
+    cumulative_before: cumulativeBefore,
+    exclude_kinds: [TARIFF_COMPONENT_KINDS.FIXED, TARIFF_COMPONENT_KINDS.DEMAND],
+  });
   const kwh = Math.round(intervals.reduce((sum, i) => sum + i.kwh, 0) * 1e6) / 1e6;
   const step = Math.max(1, Math.ceil(result.costs.length / SAMPLE_INTERVALS));
   const samples = result.costs
@@ -119,7 +127,9 @@ async function preview(params) {
       ...cost,
       kwh: intervals[index * step].kwh,
       unit_price:
-        intervals[index * step].kwh > 0 ? Math.round((cost.cost / intervals[index * step].kwh) * 1e6) / 1e6 : null,
+        intervals[index * step].kwh > 0
+          ? Math.round((energyOnly.costs[index * step].cost / intervals[index * step].kwh) * 1e6) / 1e6
+          : null,
     }));
   const warnings = {};
   result.warnings.forEach((warning) => {

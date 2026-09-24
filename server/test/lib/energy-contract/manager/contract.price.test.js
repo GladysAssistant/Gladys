@@ -90,6 +90,8 @@ describe('energyContract: priceContractIntervals', () => {
     expect(firstPayload.cumulative_before).to.deep.equal({ day: 0, month: 0, billing_period: 0 });
     const [, secondPayload] = priceEnergyContract.secondCall.args;
     expect(secondPayload.intervals).to.deep.equal([{ starts_at: '2026-01-15T00:00:00.000Z', kwh: 1, max_power_kw: 3 }]);
+    // the next period starts at local midnight: day and period restart, the month carries on
+    expect(secondPayload.cumulative_before).to.deep.equal({ day: 0, month: 2, billing_period: 0 });
     expect(result.costs).to.have.lengthOf(2);
     // 31 per month spread over January (31 days * 48 intervals): 0.020833 per interval
     expect(result.costs[0].components).to.deep.equal({ subscription: 0.020833, energy: 0.2 });
@@ -105,6 +107,26 @@ describe('energyContract: priceContractIntervals', () => {
     expect(energyOnly.costs).to.deep.equal([
       { starts_at: '2026-01-14T23:30:00.000Z', cost: 0.2, components: { energy: 0.2 }, label: 'agile' },
     ]);
+    // a caller's accumulation is handed to the first period, and a new month restarts it
+    priceEnergyContract.resetHistory();
+    await energyContract.priceContractIntervals(
+      contract,
+      [
+        { starts_at: '2026-01-31T23:30:00Z', kwh: 2 },
+        { starts_at: '2026-02-15T00:00:00Z', kwh: 1 },
+      ],
+      { cumulative_before: { day: 1, month: 10, billing_period: 5 } },
+    );
+    expect(priceEnergyContract.firstCall.args[1].cumulative_before).to.deep.equal({
+      day: 1,
+      month: 10,
+      billing_period: 5,
+    });
+    expect(priceEnergyContract.secondCall.args[1].cumulative_before).to.deep.equal({
+      day: 0,
+      month: 0,
+      billing_period: 0,
+    });
   });
 
   it('should leave the intervals unpriced when the integration fails or answers partially', async () => {

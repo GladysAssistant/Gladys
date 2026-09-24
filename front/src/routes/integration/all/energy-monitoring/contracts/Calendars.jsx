@@ -63,7 +63,14 @@ class CalendarsSection extends Component {
     }
   };
 
-  formatDate = value => (value ? new Date(value).toLocaleString() : '—');
+  // a daily calendar covers days: its bounds are shown as dates, a 30-minute one as instants
+  formatDate = (value, granularity) => {
+    if (!value) {
+      return '—';
+    }
+    const date = new Date(value);
+    return granularity === 'day' ? date.toLocaleDateString() : date.toLocaleString();
+  };
 
   render(props, { calendars, loading, error, expanded, entries, recalculateFrom, recalculating, recalculated }) {
     return (
@@ -118,7 +125,7 @@ class CalendarsSection extends Component {
                           </td>
                           <td>
                             {calendar.provider_service ? (
-                              calendar.provider_service.name
+                              calendar.provider_service.display_name || calendar.provider_service.name
                             ) : (
                               <span class="badge badge-warning">
                                 <Text id="integration.energyMonitoring.contracts.calendars.orphaned" />
@@ -127,7 +134,8 @@ class CalendarsSection extends Component {
                           </td>
                           <td>{calendar.granularity}</td>
                           <td>
-                            {this.formatDate(calendar.first_at)} → {this.formatDate(calendar.last_at)}
+                            {this.formatDate(calendar.first_at, calendar.granularity)} →{' '}
+                            {this.formatDate(calendar.last_at, calendar.granularity)}
                           </td>
                           <td class="text-right">
                             <button class="btn btn-sm btn-outline-secondary" onClick={() => this.toggle(calendar.key)}>

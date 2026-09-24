@@ -88,8 +88,21 @@ async function priceContractIntervals(contract, intervals, options = {}) {
   const unpriced = [];
   const groups = splitByBillingPeriod(contract, sorted);
   const cumulative = { day: 0, month: 0, billing_period: 0, ...(options.cumulative_before || {}) };
+  const localMonth = (interval) =>
+    getLocalContext(new Date(interval.starts_at).getTime(), contract.timezone).date.slice(0, 7);
+  // the local month of the last interval handed to the integration
+  let currentMonth = null;
   // eslint-disable-next-line no-restricted-syntax
   for (const group of groups) {
+    // a billing period starts at local midnight: the day and period accumulations restart,
+    // the month one carries on only inside the same local month
+    if (currentMonth !== null) {
+      cumulative.day = 0;
+      cumulative.billing_period = 0;
+      if (currentMonth !== localMonth(group.intervals[0])) {
+        cumulative.month = 0;
+      }
+    }
     let delegated;
     try {
       // eslint-disable-next-line no-await-in-loop
@@ -134,8 +147,16 @@ async function priceContractIntervals(contract, intervals, options = {}) {
       const cost = Math.round((fixed.cost + energy.cost) * 1e6) / 1e6;
       costs.push({ starts_at: startsAt, cost, components, label: energy.label });
     });
-    // the accumulations restart at the period boundary, the integration receives them per period
-    cumulative.billing_period = 0;
+    // what this period consumed feeds the next period's month accumulation
+    // eslint-disable-next-line no-restricted-syntax
+    for (const i of group.intervals) {
+      const month = localMonth(i);
+      if (currentMonth !== null && month !== currentMonth) {
+        cumulative.month = 0;
+      }
+      currentMonth = month;
+      cumulative.month += Number(i.kwh) || 0;
+    }
   }
   return { costs, warnings: engineResult.warnings, cumulative: engineResult.cumulative, unpriced };
 }

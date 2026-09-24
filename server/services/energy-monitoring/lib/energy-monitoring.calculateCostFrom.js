@@ -20,6 +20,7 @@ const DAILY_DURATION_MINUTES = 24 * 60;
 // The stored cost of a device is its energy: the fixed components (subscription) are
 // never stored, the display adds them once per meter (spec 8.1); the demand charges are
 // a charge of the meter's peak, stored on the meter's own features only.
+const DELEGATED_FAILED_REASON = 'delegated_failed';
 const METER_EXCLUDED_KINDS = [TARIFF_COMPONENT_KINDS.FIXED];
 const CHILD_EXCLUDED_KINDS = [TARIFF_COMPONENT_KINDS.FIXED, TARIFF_COMPONENT_KINDS.DEMAND];
 
@@ -106,11 +107,13 @@ function getEffectiveStart(contract, compiled, startAt) {
  * @param {Array<object>} intervals - Sorted intervals of this contract.
  * @param {number} nowMs - Current instant.
  * @param {Array<string>} excludeKinds - Component kinds left out of the stored costs.
+ * @param {object} [cumulativeBefore] - The kWh accumulated before the first interval, per scope
+ * (a delegated contract whose window starts mid-period, section 7.1).
  * @returns {Promise<object>} { costs, warnings, unpriced }.
  * @example
  * await priceByBillingPeriod(gladys.energyContract, contract, intervals, Date.now(), ['fixed']);
  */
-async function priceByBillingPeriod(energyContract, contract, intervals, nowMs, excludeKinds) {
+async function priceByBillingPeriod(energyContract, contract, intervals, nowMs, excludeKinds, cumulativeBefore) {
   const groups = [];
   intervals.forEach((interval) => {
     const { date } = getLocalContext(new Date(interval.starts_at).getTime(), contract.timezone);
@@ -140,7 +143,7 @@ async function priceByBillingPeriod(energyContract, contract, intervals, nowMs, 
       cumulative_before:
         previous !== null && previous.month === firstMonth
           ? { day: 0, month: previous.cumulative, billing_period: 0 }
-          : undefined,
+          : (previous === null && cumulativeBefore) || undefined,
     });
     const lastInterval = group.intervals[group.intervals.length - 1];
     previous = {
@@ -294,29 +297,66 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           intervalsByContract.get(contract.id).intervals.push(interval);
         });
         const statesToInsert = [];
+        // the intervals a delegated contract could not price: their previous cost, if any, is kept
+        const keptCreatedAt = [];
         const excludeKinds =
           electricMeterFeature.device_id === energyDevice.id ? METER_EXCLUDED_KINDS : CHILD_EXCLUDED_KINDS;
         await Promise.each(Array.from(intervalsByContract.values()), async ({ contract, intervals }) => {
+          const delegated = contract.pricing_mode === ENERGY_CONTRACT_PRICING_MODES.DELEGATED;
+          if (delegated && !contract.provider_service_id) {
+            // orphaned: nobody can price it, the costs its integration computed stay as they are
+            logger.debug(`Contract ${contract.selector} is orphaned: ${intervals.length} interval(s) kept as they are`);
+            intervals.forEach((i) => keptCreatedAt.push(i.created_at));
+            return;
+          }
+          // a delegated window starting mid-period carries the real accumulation of the feature
+          // (a rules contract widens its window to the period start instead, getEffectiveStart)
+          const cumulativeBefore = delegated
+            ? await this.gladys.energyContract.getFeatureCumulative(
+                pair.consumptionFeature,
+                contract,
+                new Date(intervals[0].starts_at).getTime(),
+              )
+            : undefined;
           const priced = await priceByBillingPeriod(
             this.gladys.energyContract,
             contract,
             intervals,
             nowMs,
             excludeKinds,
+            cumulativeBefore,
           );
           const createdAtByStart = new Map(intervals.map((i) => [i.starts_at, i.created_at]));
           priced.costs.forEach((cost) => {
             statesToInsert.push({ value: cost.cost, created_at: createdAtByStart.get(cost.starts_at) });
           });
           priced.warnings.forEach((warning) => {
-            warningsCount[warning.reason] = (warningsCount[warning.reason] || 0) + 1;
+            // a failed delegated request is logged below, it priced nothing by a fallback
+            if (warning.reason !== DELEGATED_FAILED_REASON) {
+              warningsCount[warning.reason] = (warningsCount[warning.reason] || 0) + 1;
+            }
           });
           if (priced.unpriced.length > 0) {
+            priced.unpriced.forEach((startsAt) => keptCreatedAt.push(createdAtByStart.get(startsAt)));
             logger.warn(
-              `Contract ${contract.selector}: ${priced.unpriced.length} interval(s) left without a cost (delegated integration unavailable), retried by the next run`,
+              `Contract ${contract.selector}: ${priced.unpriced.length} interval(s) left without a new cost (delegated integration unavailable), their previous cost is kept and the next run retries them`,
             );
           }
         });
+        if (keptCreatedAt.length > 0) {
+          const existing = await this.gladys.device.getDeviceFeatureStates(
+            pair.consumptionCostFeature.selector,
+            effectiveStart,
+            new Date(nowMs + THIRTY_MINUTES_IN_MS),
+          );
+          const existingByCreatedAt = new Map(existing.map((s) => [new Date(s.created_at).getTime(), s.value]));
+          keptCreatedAt.forEach((createdAt) => {
+            const value = existingByCreatedAt.get(new Date(createdAt).getTime());
+            if (value !== undefined) {
+              statesToInsert.push({ value, created_at: createdAt });
+            }
+          });
+        }
         // priced first, replaced then in one transaction: a pricing or a write failure
         // leaves the previous costs in place
         logger.debug(

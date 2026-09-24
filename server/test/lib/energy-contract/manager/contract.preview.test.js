@@ -49,7 +49,8 @@ describe('energyContract: preview and current price', () => {
       expect(result.components).to.deep.equal({ energy: 0.6, subscription: 0.01613 });
       expect(result.total).to.equal(0.61613);
       expect(result.samples).to.have.lengthOf(2);
-      expect(result.samples[0]).to.include({ starts_at: '2026-01-12T12:00:00.000Z', kwh: 1, unit_price: 0.208065 });
+      // the unit price is the energy price: the subscription share of the interval is not in it
+      expect(result.samples[0]).to.include({ starts_at: '2026-01-12T12:00:00.000Z', kwh: 1, unit_price: 0.2 });
       expect(result.warnings).to.deep.equal({});
     });
 

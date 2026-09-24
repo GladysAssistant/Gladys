@@ -29,15 +29,21 @@ const formatPrice = (price, currency, unit, language) => {
   }
 };
 
+// "Until 00:00" on a Thursday for a change on Saturday would mislead: a switch on
+// another day carries its weekday and date
 const formatTime = (isoDate, language) => {
   const date = new Date(isoDate);
   if (Number.isNaN(date.getTime())) {
     return null;
   }
+  const sameDay = date.toDateString() === new Date().toDateString();
+  const options = sameDay
+    ? { hour: '2-digit', minute: '2-digit' }
+    : { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
   try {
-    return new Intl.DateTimeFormat(language, { hour: '2-digit', minute: '2-digit' }).format(date);
+    return new Intl.DateTimeFormat(language, options).format(date);
   } catch (e) {
-    return date.toLocaleTimeString();
+    return sameDay ? date.toLocaleTimeString() : date.toLocaleString();
   }
 };
 

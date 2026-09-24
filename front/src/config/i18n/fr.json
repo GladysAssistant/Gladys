@@ -1069,6 +1069,7 @@
         "containerStopped": "Arrêté",
         "openButton": "Ouvrir",
         "uninstallWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés. Les appareils créés par cette intégration resteront dans Gladys jusqu’à ce que vous les supprimiez.",
+        "uninstallEnergyWarning": "Cette intégration calcule elle-même le coût de contrats d'énergie : les contrats qu'elle tarife ne seront plus calculés une fois désinstallée (leurs coûts existants sont conservés).",
         "confirmUninstallButton": "Oui, désinstaller",
         "cancelUninstallButton": "Annuler",
         "startedAtLabel": "En fonctionnement depuis"
@@ -1185,6 +1186,7 @@
         "energyContractsCalendars": "Calendriers tarifaires alimentés par cette intégration :",
         "energyContractsDelegatedText": "Un modèle calculé par l’intégration calcule lui-même vos coûts d’énergie : les coûts de ces contrats ne sont calculés que lorsque l’intégration fonctionne, et ne le sont plus si elle est désinstallée.",
         "providerInfoText": "Cette intégration ne gère aucun appareil : elle fournit des widgets de tableau de bord. Configurez-la ici, puis ajoutez ses widgets depuis l'éditeur de tableau de bord.",
+        "providerEnergyInfoText": "Cette intégration ne gère aucun appareil : elle fournit des modèles de contrats d'énergie et des calendriers tarifaires. Configurez-la ici, puis choisissez ses contrats depuis la page de suivi énergétique.",
         "sceneDeclarationsTitle": "Déclencheurs et actions de scènes",
         "sceneDeclarationsText": "Cette intégration ajoute {{triggers}} déclencheur(s) et {{actions}} action(s) à l'éditeur de scènes.",
         "sceneTriggerPrefix": "Déclencheur :",

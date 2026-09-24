@@ -1069,6 +1069,7 @@
         "containerStopped": "Gestoppt",
         "openButton": "Öffnen",
         "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
+        "uninstallEnergyWarning": "Diese Integration berechnet die Kosten von Energieverträgen selbst: Die von ihr berechneten Verträge werden nach der Deinstallation nicht mehr berechnet (ihre bestehenden Kosten bleiben erhalten).",
         "confirmUninstallButton": "Ja, deinstallieren",
         "cancelUninstallButton": "Abbrechen",
         "startedAtLabel": "In Betrieb seit"
@@ -1185,6 +1186,7 @@
         "energyContractsCalendars": "Von dieser Integration gepflegte Tarifkalender:",
         "energyContractsDelegatedText": "Eine von der Integration berechnete Vorlage berechnet Ihre Energiekosten selbst: Die Kosten dieser Verträge werden nur berechnet, solange die Integration läuft, und nicht mehr, wenn sie deinstalliert wird.",
         "providerInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Dashboard-Widgets bereit. Konfigurieren Sie sie hier und fügen Sie ihre Widgets dann im Dashboard-Editor hinzu.",
+        "providerEnergyInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Energievertragsvorlagen und Tarifkalender bereit. Konfigurieren Sie sie hier und wählen Sie ihre Verträge dann auf der Seite Energieüberwachung aus.",
         "sceneDeclarationsTitle": "Szenen-Auslöser und -Aktionen",
         "sceneDeclarationsText": "Diese Integration fügt dem Szenen-Editor {{triggers}} Auslöser und {{actions}} Aktion(en) hinzu.",
         "sceneTriggerPrefix": "Auslöser:",

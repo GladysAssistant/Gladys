@@ -96,7 +96,8 @@ export const CONTRACT_STATUS_BADGE = {
 
 export const PROVIDER_BADGE = {
   community: 'badge-primary',
-  integration: 'badge-purple',
+  // the theme has no purple badge: dark keeps an integration apart from the community (primary)
+  integration: 'badge-dark',
   internal: 'badge-info',
   user: 'badge-secondary'
 };

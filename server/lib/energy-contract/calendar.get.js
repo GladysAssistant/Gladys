@@ -18,9 +18,12 @@ function toPlainCalendar(row) {
   const calendar = row.get({ plain: true });
   calendar.orphaned = calendar.provider_service_id === null;
   if (calendar.provider_service) {
+    const { manifest } = calendar.provider_service;
     calendar.provider_service = {
       id: calendar.provider_service.id,
       name: calendar.provider_service.name,
+      // an external integration's service is named after its selector: its manifest holds the name
+      display_name: (manifest && manifest.name) || calendar.provider_service.name,
       selector: calendar.provider_service.selector,
       status: calendar.provider_service.status,
       type: calendar.provider_service.type,
@@ -37,7 +40,13 @@ function toPlainCalendar(row) {
  */
 async function getCalendars() {
   const rows = await db.TariffCalendar.findAll({
-    include: [{ model: db.Service, as: 'provider_service', attributes: ['id', 'name', 'selector', 'status', 'type'] }],
+    include: [
+      {
+        model: db.Service,
+        as: 'provider_service',
+        attributes: ['id', 'name', 'selector', 'status', 'type', 'manifest'],
+      },
+    ],
     order: [['key', 'ASC']],
   });
   return rows.map(toPlainCalendar);
@@ -52,7 +61,13 @@ async function getCalendars() {
  */
 async function getCalendar(key) {
   const row = await db.TariffCalendar.findByPk(key, {
-    include: [{ model: db.Service, as: 'provider_service', attributes: ['id', 'name', 'selector', 'status', 'type'] }],
+    include: [
+      {
+        model: db.Service,
+        as: 'provider_service',
+        attributes: ['id', 'name', 'selector', 'status', 'type', 'manifest'],
+      },
+    ],
   });
   if (row === null) {
     throw new NotFoundError(`calendar "${key}" is not declared`);
