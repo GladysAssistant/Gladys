@@ -1,71 +1,51 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 
+// The energy prices are read-only since the energy contracts (docs/specs/energy-contracts.md,
+// section 9.4): GET answers from the contracts for two releases, writes point to the new API.
+const GONE_MESSAGE = 'The energy_price API is read-only: use /api/v1/energy_contract';
+
 /**
- * @description Energy price REST controller.
+ * @description Energy price REST controller (compatibility window).
  * @param {object} gladys - Gladys service container.
- * @returns {object} Controller with CRUD handlers.
+ * @returns {object} Controller handlers.
+ * @example
+ * EnergyPriceController(gladys);
  */
 module.exports = function EnergyPriceController(gladys) {
   /**
-   * @description List energy prices.
-   * @param {object} req - Express request.
-   * @param {object} res - Express response.
-   * @returns {Promise<void>} Nothing.
+   * @api {get} /api/v1/energy_price get
+   * @apiName get
+   * @apiGroup EnergyPrice
+   * @apiDescription Legacy price rows projected from the energy contracts.
    */
   async function get(req, res) {
-    const prices = await gladys.energyPrice.get(req.query || {});
+    const prices = await gladys.energyContract.getLegacyPrices(req.query || {});
     res.json(prices);
   }
 
   /**
-   * @description Create a new energy price.
-   * @param {object} req - Express request.
-   * @param {object} res - Express response.
-   * @returns {Promise<void>} Nothing.
+   * @api {post} /api/v1/energy_price gone
+   * @apiName gone
+   * @apiGroup EnergyPrice
+   * @apiDescription 410: prices are managed through the energy contracts.
    */
-  async function create(req, res) {
-    const price = await gladys.energyPrice.create(req.body);
-    res.status(201).json(price);
+  async function gone(req, res) {
+    res.status(410).json({ status: 410, code: 'GONE', message: GONE_MESSAGE });
   }
 
   /**
-   * @description Update an existing energy price by selector.
-   * @param {object} req - Express request.
-   * @param {object} res - Express response.
-   * @returns {Promise<void>} Nothing.
-   */
-  async function update(req, res) {
-    const price = await gladys.energyPrice.update(req.params.selector, req.body);
-    res.json(price);
-  }
-
-  /**
-   * @description Delete an energy price by selector.
-   * @param {object} req - Express request.
-   * @param {object} res - Express response.
-   * @returns {Promise<void>} Nothing.
-   */
-  async function destroy(req, res) {
-    await gladys.energyPrice.destroy(req.params.selector);
-    res.json({ success: true });
-  }
-
-  /**
-   * @description Get default electric meter feature ID.
-   * @param {object} req - Express request.
-   * @param {object} res - Express response.
-   * @returns {Promise<void>} Nothing.
+   * @api {get} /api/v1/energy_price/default_electric_meter_feature_id getDefaultElectricMeterFeatureId
+   * @apiName getDefaultElectricMeterFeatureId
+   * @apiGroup EnergyPrice
    */
   async function getDefaultElectricMeterFeatureId(req, res) {
-    const featureId = await gladys.energyPrice.getDefaultElectricMeterFeatureId();
+    const featureId = await gladys.energyContract.getDefaultElectricMeterFeatureId();
     res.json({ feature_id: featureId });
   }
 
   return Object.freeze({
     get: asyncMiddleware(get),
-    create: asyncMiddleware(create),
-    update: asyncMiddleware(update),
-    destroy: asyncMiddleware(destroy),
+    gone: asyncMiddleware(gone),
     getDefaultElectricMeterFeatureId: asyncMiddleware(getDefaultElectricMeterFeatureId),
   });
 };

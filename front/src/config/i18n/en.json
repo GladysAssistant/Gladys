@@ -391,7 +391,8 @@
       "chips": "Status chips",
       "actions": "Quick actions",
       "house-view": "House view",
-      "external-widget": "Integration widget"
+      "external-widget": "Integration widget",
+      "energy-price": "Electricity price"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -675,7 +676,7 @@
         "error": "Error loading energy consumption data",
         "noData": "No energy consumption data available for this period",
         "showSubscriptionPrices": "Show subscription prices",
-        "showSubscriptionPricesDescription": "Display the monthly subscription cost alongside consumption data in the chart.",
+        "showSubscriptionPricesDescription": "Display the monthly subscription cost of the meter's contract alongside consumption data in the chart.",
         "periodStartDay": "Billing period start day",
         "periodStartDayDescription": "Day of the month your energy bill period starts on. The monthly and yearly views then run from this day to the same day of the next period (ex: from the 5th to the 5th), so they can be compared with your bill. If a month is shorter than this day, the period starts on the last day of that month."
       },
@@ -849,6 +850,18 @@
         "now": "Now",
         "confirmAction": "Run \"{{label}}\"?",
         "actionError": "The action failed."
+      },
+      "energyPrice": {
+        "editName": "Widget name (optional)",
+        "editNamePlaceholder": "Name displayed on the dashboard",
+        "editContract": "Electricity contract",
+        "noContract": "No electricity contract yet.",
+        "noContractLink": "Create one in the energy monitoring integration.",
+        "notConfigured": "Select a contract in the widget settings.",
+        "until": "Until {{time}}",
+        "unknownPrice": "Price unknown",
+        "error": "Unable to load the electricity price. Check that the contract still exists.",
+        "cumulativeToday": "Today: {{kwh}} kWh"
       }
     },
     "editDashboardBackgroundLabel": "Background mood",
@@ -1056,6 +1069,7 @@
         "containerStopped": "Stopped",
         "openButton": "Open",
         "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
+        "uninstallEnergyWarning": "This integration prices energy contracts itself: the contracts it prices will stop being priced once it is uninstalled (their existing costs are kept).",
         "confirmUninstallButton": "Yes, uninstall",
         "cancelUninstallButton": "Cancel",
         "startedAtLabel": "Running since"
@@ -1166,7 +1180,13 @@
         "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant).",
         "widgetsTitle": "Dashboard widgets",
         "widgetsText": "This integration provides the following widgets, available to every user in the dashboard editor:",
+        "energyContractsTitle": "Energy contracts",
+        "energyContractsText": "This integration provides the following energy contract templates, offered in the contract wizard of the energy monitoring page:",
+        "energyContractsDelegated": "priced by the integration",
+        "energyContractsCalendars": "Tariff calendars fed by this integration:",
+        "energyContractsDelegatedText": "A template priced by the integration computes your energy costs itself: the costs of these contracts are only computed while the integration is running, and stop being computed if it is uninstalled.",
         "providerInfoText": "This integration manages no device: it provides dashboard widgets. Configure it here, then add its widgets from the dashboard editor.",
+        "providerEnergyInfoText": "This integration manages no device: it provides energy contract templates and tariff calendars. Configure it here, then pick its contracts from the energy monitoring page.",
         "sceneDeclarationsTitle": "Scene triggers and actions",
         "sceneDeclarationsText": "This integration adds {{triggers}} trigger(s) and {{actions}} action(s) to the scene editor.",
         "sceneTriggerPrefix": "Trigger:",
@@ -2832,7 +2852,80 @@
       "circularReference": "circular reference",
       "selfReference": "self reference",
       "fixAutomatically": "Fix",
-      "fixing": "Fixing..."
+      "fixing": "Fixing...",
+      "contracts": {
+        "tab": "Contracts",
+        "description": "A contract describes how the consumption of a meter is priced over a period. Pick a template from the community catalogue or from an installed integration, fill in its parameters and check the preview before saving.",
+        "empty": "No contract yet. Create one to start computing the cost of your consumption.",
+        "errorLoading": "Error loading the contracts.",
+        "confirmDelete": "Are you sure you want to delete this contract? The costs of its period will be removed at the next calculation.",
+        "ongoing": "ongoing",
+        "createTitle": "New contract",
+        "editTitle": "Edit contract",
+        "status": {
+          "active": "active",
+          "scheduled": "scheduled",
+          "expired": "expired",
+          "orphaned": "orphaned"
+        },
+        "mode": {
+          "rules": "rule engine",
+          "delegated": "computed by the integration"
+        },
+        "provider": {
+          "community": "community",
+          "integration": "integration",
+          "internal": "Gladys",
+          "user": "manual"
+        },
+        "providerStopped": "integration stopped",
+        "orphanedHelp": "The integration computing this contract is no longer installed: its costs are not computed anymore. Reinstall it or replace the contract.",
+        "migrationWarning": "This contract was converted from your former energy rates: the new calculation differs by {{gap}}% from the previous one over the last 7 days. Please check its prices.",
+        "wizard": {
+          "meter": "Meter",
+          "template": "Template",
+          "parameters": "Parameters",
+          "preview": "Preview"
+        },
+        "allCountries": "All countries",
+        "searchTemplate": "Search a supplier or a contract…",
+        "noTemplate": "No template matches.",
+        "publishAsIntegration": "Or publish it as an external integration: an integration can declare contract templates, feed tariff calendars (day colours, spot prices, holidays) and even compute the cost itself.",
+        "selectedTemplate": "Template:",
+        "parameters": "Contract parameters",
+        "timezone": "Timezone",
+        "timezonePlaceholder": "System timezone",
+        "billingPeriodStartDay": "Billing period start day",
+        "delegatedHelp": "The cost of this contract is computed by its integration: only the fixed fees of the tariff are computed by Gladys, and there is no preview.",
+        "jsonMode": "Advanced: edit the tariff definition (JSON)",
+        "tariffJson": "Tariff definition",
+        "tariffJsonHelp": "The definition is validated when saving. The format is documented in the repository",
+        "exportTemplate": "Export as template",
+        "previewDescription": "Your real consumption of the last 7 days priced with this contract, without saving anything.",
+        "previewSynthetic": "This meter has no consumption yet: the preview uses a flat profile of 0.5 kWh per 30 minutes.",
+        "previewTotal": "Total over 7 days",
+        "previewWarnings": "Intervals priced by the fallback price (missing calendar value):",
+        "intervals": "intervals",
+        "sampleTime": "Time",
+        "samplePrice": "Unit price",
+        "sampleCost": "Cost",
+        "sampleLabel": "Rate",
+        "calendars": {
+          "title": "Tariff calendars",
+          "description": "The dated values used by the contracts (day colours, spot prices, holidays), published by the integrations. A calendar without a provider keeps its values but is no longer updated.",
+          "empty": "No calendar yet.",
+          "key": "Key",
+          "provider": "Provider",
+          "granularity": "Granularity",
+          "coverage": "Coverage",
+          "orphaned": "no provider",
+          "lastValues": "Last values",
+          "noValue": "No value.",
+          "recalculateFrom": "Recalculate the costs from",
+          "recalculate": "Recalculate",
+          "recalculated": "The recalculation has been started. You can follow its progress in the background tasks."
+        }
+      }
     },
     "caldav": {
       "title": "CalDAV",
@@ -3608,6 +3701,23 @@
         "computedExplanationText": "Instead of a fixed volume, you can enter here a calculation based on a scene variable, for example to speak quieter at night. To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "textLabel": "Message to speak on the speaker",
         "variablesExplanation": "To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
+      },
+      "energyCurrentPrice": {
+        "description": "The scene will continue only if the current price per kWh of the selected contract meets the condition below.",
+        "contractLabel": "Energy contract",
+        "operatorLabel": "Continue if the price is",
+        "valueLabel": "Threshold (per kWh)",
+        "valuePlaceholder": "0.20",
+        "error": "Unable to load the energy contracts.",
+        "noContract": "No energy contract yet: create one in the Energy Monitoring integration.",
+        "operators": {
+          "equal": "equal to",
+          "different": "different from",
+          "superior": "greater than",
+          "superiorOrEqual": "greater than or equal to",
+          "inferior": "lower than",
+          "inferiorOrEqual": "lower than or equal to"
+        }
       }
     },
     "actions": {
@@ -3693,6 +3803,9 @@
       },
       "external-integration": {
         "scene-action": "Integration action"
+      },
+      "energy-contract": {
+        "current-price": "Condition on electricity price"
       }
     },
     "actionsDescriptions": {
@@ -3774,6 +3887,9 @@
       },
       "external-integration": {
         "scene-action": "An action declared by an external integration"
+      },
+      "energy-contract": {
+        "current-price": "Continue only if the current price of an energy contract meets a threshold"
       }
     },
     "actionCategories": {
@@ -3863,6 +3979,9 @@
       },
       "external-integration": {
         "scene-event": "Integration trigger"
+      },
+      "energy-contract": {
+        "price-changed": "Electricity price changed"
       }
     },
     "triggersDescriptions": {
@@ -3909,6 +4028,9 @@
       },
       "external-integration": {
         "scene-event": "A trigger declared by an external integration"
+      },
+      "energy-contract": {
+        "price-changed": "When the current price or tier of an energy contract changes"
       }
     },
     "triggerCategories": {
@@ -3918,7 +4040,8 @@
       "alarm": "Alarm",
       "weather": "Weather",
       "advanced": "Advanced",
-      "integrations": "Integrations"
+      "integrations": "Integrations",
+      "energy": "Energy"
     },
     "triggersCard": {
       "newState": {
@@ -4052,6 +4175,12 @@
           "severe": "Severe (orange)",
           "extreme": "Extreme (red)"
         }
+      },
+      "energyPriceChanged": {
+        "description": "This will trigger when the current price per kWh (or the tariff tier) of the selected contract changes, for example when switching from off-peak to peak hours.",
+        "contractLabel": "Energy contract",
+        "anyContract": "Any contract",
+        "error": "Unable to load the energy contracts."
       }
     },
     "searchActionsPlaceholder": "Search for an action…",

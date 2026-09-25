@@ -343,8 +343,63 @@ module.exports = function IntegrationHostController(gladys) {
     res.json({ success: true });
   }
 
+  /**
+   * @api {post} /api/integration/v1/energy/calendar publishEnergyCalendar
+   * @apiName publishEnergyCalendar
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Upsert the entries of a tariff calendar declared in the manifest
+   * (energy_contracts.calendars[].key, 403 otherwise): at most 2,000 entries per call,
+   * values within the declared enum, starts_at aligned on the granularity, within
+   * 5 years back and 7 days ahead (400 otherwise). Queues a bounded cost recalculation.
+   * @apiParamExample {json} Request-Example
+   * { "calendar_key": "tempo", "entries": [{ "starts_at": "2026-01-11T23:00:00Z", "value": "red" }] }
+   */
+  async function publishEnergyCalendar(req, res) {
+    const result = await gladys.externalIntegration.publishEnergyCalendar(req.externalIntegrationService, req.body);
+    res.json({ success: true, count: result.count, changed_from: result.changed_from });
+  }
+
+  /**
+   * @api {get} /api/integration/v1/energy/calendar/:key getEnergyCalendar
+   * @apiName getEnergyCalendar
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Read back a calendar declared by this integration (from, to, limit).
+   */
+  async function getEnergyCalendar(req, res) {
+    const options = {};
+    ['from', 'to'].forEach((key) => {
+      if (req.query[key]) {
+        options[key] = req.query[key];
+      }
+    });
+    if (req.query.limit) {
+      options.limit = Number(req.query.limit);
+    }
+    const entries = await gladys.externalIntegration.getEnergyCalendar(
+      req.externalIntegrationService,
+      req.params.key,
+      options,
+    );
+    res.json(entries);
+  }
+
+  /**
+   * @api {get} /api/integration/v1/energy/contract getEnergyContracts
+   * @apiName getEnergyContracts
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The users' contracts referencing a template of this integration
+   * (identity, inputs, validity, timezone, currency): never the meter nor the consumption.
+   */
+  async function getEnergyContracts(req, res) {
+    const contracts = await gladys.externalIntegration.getEnergyContracts(req.externalIntegrationService);
+    res.json(contracts);
+  }
+
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
+    publishEnergyCalendar: asyncMiddleware(publishEnergyCalendar),
+    getEnergyCalendar: asyncMiddleware(getEnergyCalendar),
+    getEnergyContracts: asyncMiddleware(getEnergyContracts),
     heartbeat: asyncMiddleware(heartbeat),
     saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
     networkDiscoveryScan: asyncMiddleware(networkDiscoveryScan),

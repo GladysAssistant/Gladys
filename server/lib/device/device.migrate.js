@@ -324,6 +324,38 @@ async function moveDuckDbHistory(pairs, sourceFeatureIds, jobId) {
 }
 
 /**
+ * @description Refuse the migration when a source energy contract overlaps a destination
+ * one of the same direction (docs/specs/device-migration.md, section A).
+ * @param {string} sourceDeviceId - Source device id.
+ * @param {string} destinationDeviceId - Destination device id.
+ * @returns {Promise<void>} Resolves when no contract overlaps.
+ * @example
+ * await assertNoEnergyContractOverlap(source.id, destination.id);
+ */
+async function assertNoEnergyContractOverlap(sourceDeviceId, destinationDeviceId) {
+  const sourceContracts = await db.EnergyContract.findAll({ where: { electric_meter_device_id: sourceDeviceId } });
+  if (sourceContracts.length === 0) {
+    return;
+  }
+  const destinationContracts = await db.EnergyContract.findAll({
+    where: { electric_meter_device_id: destinationDeviceId },
+  });
+  sourceContracts.forEach((sourceContract) => {
+    const overlapping = destinationContracts.find(
+      (destinationContract) =>
+        destinationContract.direction === sourceContract.direction &&
+        (sourceContract.valid_to === null || destinationContract.valid_from <= sourceContract.valid_to) &&
+        (destinationContract.valid_to === null || sourceContract.valid_from <= destinationContract.valid_to),
+    );
+    if (overlapping) {
+      throw new ConflictError(
+        `Energy contract "${sourceContract.name}" overlaps "${overlapping.name}" on the destination device`,
+      );
+    }
+  });
+}
+
+/**
  * @description Migrate a device to another device: move the DuckDB state history,
  * rewrite scenes and dashboards, then delete the source device.
  * See docs/specs/device-migration.md for the full behavior contract.
@@ -386,6 +418,11 @@ async function executeMigration(selector, options, jobId) {
     usedDestinationSelectors.add(destinationFeatureSelector);
     return { sourceFeature, destinationFeature };
   });
+
+  // A meter has one contract per date and direction: the merge is refused, before any
+  // write, when the source and the destination carry overlapping energy contracts (the
+  // user reconciles their validity first).
+  await assertNoEnergyContractOverlap(source.id, destination.id);
 
   logger.info(`Migrating device ${selector} to ${destinationSelector}, ${pairs.length} features mapped`);
   await this.job.updateProgress(jobId, 5, {
@@ -450,6 +487,12 @@ async function executeMigration(selector, options, jobId) {
   // delete): re-point them, or destroying the source would silently detach
   // the meter from the contracts and cost charts would lose their data.
   await db.EnergyPrice.update(
+    { electric_meter_device_id: destination.id },
+    { where: { electric_meter_device_id: source.id } },
+  );
+  // Same for the energy contracts (FK ON DELETE CASCADE: they would vanish with the source);
+  // the overlap between both devices was refused above, before any write.
+  await db.EnergyContract.update(
     { electric_meter_device_id: destination.id },
     { where: { electric_meter_device_id: source.id } },
   );

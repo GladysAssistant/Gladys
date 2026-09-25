@@ -892,6 +892,24 @@ const actionsFunc = {
       throw new AbortScene(e.message);
     }
   },
+  [ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE]: async (self, action) => {
+    // current unit price of the contract (spec 8.2) compared with the threshold; an
+    // unknown price (null, spec 7.7) never validates the condition
+    const threshold = parseFloat(action.value);
+    if (Number.isNaN(threshold)) {
+      throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
+    }
+    let current;
+    try {
+      current = await self.energyContract.getCurrent(action.energy_contract);
+    } catch (e) {
+      // a contract that cannot be read (deleted, integration down) never validates
+      throw new AbortScene(e.message);
+    }
+    if (current.price === null || !compare(action.operator, current.price, threshold)) {
+      throw new AbortScene('ENERGY_PRICE_CONDITION_NOT_MET');
+    }
+  },
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {
     const house = await self.house.getBySelector(action.house);
     if (house.alarm_mode !== action.alarm_mode) {

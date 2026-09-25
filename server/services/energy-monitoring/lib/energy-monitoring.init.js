@@ -6,7 +6,9 @@ const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const logger = require('../../../utils/logger');
+const { SYSTEM_VARIABLE_NAMES, EVENTS } = require('../../../utils/constants');
+const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 
 /**
  * @description Init energy monitoring scheduled sync.
@@ -16,6 +18,11 @@ const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
  */
 async function init() {
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+  if (!this.recalculateForContractsListener) {
+    // contract or calendar change: the core asks for a bounded recalculation (spec 7.4)
+    this.recalculateForContractsListener = eventFunctionWrapper(this.recalculateForContracts);
+    this.gladys.event.on(EVENTS.ENERGY_CONTRACT.RECALCULATE, this.recalculateForContractsListener);
+  }
   if (!this.calculateConsumptionAndCostEvery30MinutesJob) {
     // Scheduling consumption and cost calculation every 30 minutes
     this.calculateConsumptionAndCostEvery30MinutesJob = this.gladys.scheduler.scheduleJob(
@@ -28,8 +35,25 @@ async function init() {
         await this.calculateConsumptionFromIndexThirtyMinutes(now);
         await this.calculateProductionFromIndexThirtyMinutes(now);
         await this.calculateCostEveryThirtyMinutes(now);
+        await this.delegatedCatchUp();
+        // price-changed scene trigger (spec 8.2): never blocks the job
+        try {
+          await this.gladys.energyContract.checkPriceChanges();
+        } catch (e) {
+          logger.warn(`Energy monitoring: unable to check the contract price changes: ${e.message}`);
+        }
       },
     );
+  }
+  // Billing period end: demand charges of the elapsed period, calendar retention (spec 7.4)
+  if (!this.closeBillingPeriodsJob) {
+    const rule = new schedule.RecurrenceRule();
+    rule.hour = 2;
+    rule.minute = 0;
+    rule.tz = systemTimezone;
+    this.closeBillingPeriodsJob = this.gladys.scheduler.scheduleJob(rule, async () => {
+      await this.closeBillingPeriods();
+    });
   }
   // Re-calculate yesterday at 11 AM (useful for enedis)
   if (!this.calculateConsumptionAndCostEvery24HoursJob) {

@@ -178,6 +178,26 @@
         "$ref": "#/definitions/sceneTrigger"
       }
     },
+    "energy_contracts": {
+      "type": "object",
+      "description": "Energy contracts capability (capabilities/energy-contracts.md): contract templates (a tariff definition of the core rule engine, validated against tariff.schema.json, or a delegated pricing computed by the integration over energy-contract.price) and tariff calendars the integration feeds through POST /api/integration/v1/energy/calendar (day colours, spot prices, critical peak days). Calendar keys are global per Gladys instance and owned by the first installed integration declaring them. Shown on the install screen. Declaring the field requires gladys_version >= the first release accepting it.",
+      "additionalProperties": false,
+      "anyOf": [{ "required": ["templates"] }, { "required": ["calendars"] }],
+      "properties": {
+        "templates": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": { "$ref": "#/definitions/energyContractTemplate" }
+        },
+        "calendars": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": { "$ref": "#/definitions/energyCalendar" }
+        }
+      }
+    },
     "scene_actions": {
       "type": "array",
       "minItems": 1,
@@ -241,12 +261,85 @@
           },
           {
             "required": ["scene_actions"]
+          },
+          {
+            "required": ["energy_contracts"]
           }
         ]
       }
     }
   ],
   "definitions": {
+    "energyContractTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "name", "country", "currency", "pricing_mode", "version"],
+      "description": "A contract template: a key never renamed once published (contracts store it), a tariff definition in rules mode (validated against tariff.schema.json after the {{input:<key>}} placeholders are substituted), optional in delegated mode where only fixed components are allowed. Every calendar the tariff references is listed in calendars.",
+      "properties": {
+        "key": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+        "name": { "$ref": "#/definitions/multiLanguageText" },
+        "description": { "$ref": "#/definitions/multiLanguageText" },
+        "country": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "timezone": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "pricing_mode": { "type": "string", "enum": ["rules", "delegated"] },
+        "version": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "calendars": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" }
+        },
+        "inputs": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "$ref": "#/definitions/energyTemplateInput" }
+        },
+        "tariff": { "type": "object" }
+      },
+      "if": { "properties": { "pricing_mode": { "const": "rules" } } },
+      "then": { "required": ["tariff"] }
+    },
+    "energyTemplateInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "type"],
+      "description": "A template parameter filled by the user and substituted into the tariff ({{input:<key>}}) or sent to the integration in delegated mode: number, select, string, or time_intervals (a list of [\"HH:MM\", \"HH:MM\"] slots picked on the 30-minute grid, for off-peak hours).",
+      "properties": {
+        "key": { "type": "string", "pattern": "^[a-z0-9_]{1,64}$" },
+        "type": { "type": "string", "enum": ["number", "select", "string", "time_intervals"] },
+        "label": { "$ref": "#/definitions/multiLanguageText" },
+        "description": { "$ref": "#/definitions/multiLanguageText" },
+        "unit": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": { "type": ["string", "number"] }
+        },
+        "default": {},
+        "required": { "type": "boolean" }
+      }
+    },
+    "energyCalendar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key"],
+      "description": "A tariff calendar the integration publishes: dated string values within the declared enum (day colours, holidays, event days) on a daily or 30-minute grid, or numeric prices per kWh (values omitted, currency set). A daily calendar may start its day at another local time (day_starts_at, 06:00 for the Tempo colour).",
+      "properties": {
+        "key": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+        "granularity": { "type": "string", "enum": ["day", "thirty_minutes"] },
+        "timezone": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "day_starts_at": { "type": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$" },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+        },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+      }
+    },
     "multiLanguageText": {
       "type": "object",
       "required": ["en"],

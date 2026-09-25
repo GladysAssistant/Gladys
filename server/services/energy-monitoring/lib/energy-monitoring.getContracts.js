@@ -1,46 +1,18 @@
-const axios = require('axios');
-const logger = require('../../../utils/logger');
-
 /**
- * @description Get energy contracts from GitHub releases.
- * @returns {Promise<Array>} Array of contracts.
+ * @description The community energy contracts catalogue (`GladysAssistant/energy-contracts`
+ * latest release): kept for compatibility, it now answers through the energy contract
+ * manager which prefers `contracts-v2.json` and converts `contracts.json` otherwise.
+ * The v1 file is returned in its original shape when it is the only one published.
+ * @returns {Promise<object>} The catalogue.
  * @example
  * const contracts = await energyMonitoring.getContracts();
  */
 async function getContracts() {
-  try {
-    logger.debug('Fetching energy contracts from GitHub releases');
-
-    // Get the latest release from GitHub API
-    const releaseResponse = await axios.get(
-      'https://api.github.com/repos/GladysAssistant/energy-contracts/releases/latest',
-    );
-    const release = releaseResponse.data;
-
-    // Find the contracts.json asset
-    const contractsAsset = release.assets.find((asset) => asset.name === 'contracts.json');
-
-    if (!contractsAsset) {
-      throw new Error('contracts.json not found in the latest release');
-    }
-
-    // Download the contracts.json file
-    const contractsResponse = await axios.get(contractsAsset.browser_download_url);
-    const contracts = contractsResponse.data;
-
-    // Validate that contracts is a valid JavaScript object
-    if (!contracts || typeof contracts !== 'object') {
-      throw new Error('contracts.json must be a valid JSON object');
-    }
-
-    const contractCount = Object.keys(contracts).length;
-    logger.debug(`Successfully fetched ${contractCount} energy contracts`);
-
-    return contracts;
-  } catch (error) {
-    logger.error('Error fetching energy contracts:', error);
-    throw error;
+  const catalogue = await this.gladys.energyContract.getCatalogue();
+  if (catalogue.format === 1) {
+    return catalogue.raw;
   }
+  return { templates: catalogue.templates, calendars: catalogue.calendars, version: catalogue.version };
 }
 
 module.exports = {

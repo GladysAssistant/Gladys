@@ -189,6 +189,10 @@ const triggersFunc = {
     event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
   [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,
   [EVENTS.WEATHER.ALERT_ENDED]: matchWeatherAlert,
+  // energy contract price change (spec 8.2): a trigger without a contract selector
+  // matches every contract, one with a selector only that contract
+  [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]: (self, sceneSelector, event, trigger) =>
+    !trigger.energy_contract || event.contract === trigger.energy_contract,
   [EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT]: matchExternalIntegrationSceneEvent,
 };
 

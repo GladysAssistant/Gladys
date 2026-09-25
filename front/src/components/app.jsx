@@ -343,10 +343,10 @@ const AppRouter = connect(
         <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
         <CallMeBotPage path="dashboard/integration/communication/callmebot" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/contracts" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/contracts/create" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/contracts/edit/:selector" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices" />
-        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/create" />
-        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/import" />
-        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/edit/:id" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/settings" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
