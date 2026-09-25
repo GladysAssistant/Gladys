@@ -1,0 +1,64 @@
+# Code owners of the Gladys repository.
+#
+# GitHub reads this file with "Require review from Code Owners" enabled on
+# master: a pull request can only be merged once a member of the owning team
+# of EVERY file it touches has approved it. The author of a pull request can
+# never approve it, so a maintainer's own PR still needs another maintainer.
+#
+# Review bots (cursor[bot], coderabbitai[bot]) are GitHub Apps, not members of
+# these teams: their approval never satisfies this file. Keep it that way.
+#
+# Last matching pattern wins, so the default comes first and the restricted
+# paths after it. Teams are referenced by slug, and a team only counts as a
+# code owner when it has explicit write access (or more) to this repository.
+#
+# The teams and the rules they enforce are described in MAINTAINERS.md.
+
+# ---------------------------------------------------------------------------
+# Default: any maintainer can approve
+# ---------------------------------------------------------------------------
+*                                        @GladysAssistant/core
+
+# ---------------------------------------------------------------------------
+# Release and build chain: release team only
+# ---------------------------------------------------------------------------
+# A version bump merged on master creates the release tag and ships production
+# images (see .github/workflows/create-release-tag.yml).
+/package.json                            @GladysAssistant/release
+/package-lock.json                       @GladysAssistant/release
+# Workflows run with the repository secrets, and this very file lives here.
+/.github/                                @GladysAssistant/release
+/docker/                                 @GladysAssistant/release
+/codecov.yml                             @GladysAssistant/release
+
+# ---------------------------------------------------------------------------
+# Dependencies (supply chain): release team only
+# ---------------------------------------------------------------------------
+/server/package.json                     @GladysAssistant/release
+/server/package-lock.json                @GladysAssistant/release
+/front/package.json                      @GladysAssistant/release
+/front/package-lock.json                 @GladysAssistant/release
+
+# ---------------------------------------------------------------------------
+# Data model, authentication, Gladys Plus, system: release team only
+# ---------------------------------------------------------------------------
+# Migrations run on every user install at upgrade and cannot be taken back.
+/server/migrations/                      @GladysAssistant/release
+/server/models/                          @GladysAssistant/release
+/server/lib/user/                        @GladysAssistant/release
+/server/lib/session/                     @GladysAssistant/release
+/server/api/middlewares/                 @GladysAssistant/release
+/server/lib/gateway/                     @GladysAssistant/release
+/server/lib/system/                      @GladysAssistant/release
+/server/config/                          @GladysAssistant/release
+
+# ---------------------------------------------------------------------------
+# Contracts and living specifications: release team only
+# ---------------------------------------------------------------------------
+# Device feature categories and types are a cross-integration contract, see
+# docs/specs/device-feature-categories.md.
+/server/utils/constants.js               @GladysAssistant/release
+/docs/specs/                             @GladysAssistant/release
+/AGENTS.md                               @GladysAssistant/release
+/SECURITY.md                             @GladysAssistant/release
+/LICENSE                                 @GladysAssistant/release

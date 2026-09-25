@@ -1,0 +1,72 @@
+name: Prepare minor / major release
+run-name: Prepare ${{ inputs.release_type }} release
+
+# Entry point for a MINOR or MAJOR release: new features, new integrations,
+# breaking changes. Only the release managers listed below may start it; the
+# patch entry point (prepare-release-patch.yml) is open to every member with
+# write access. See .github/MAINTAINERS.md.
+#
+# GitHub cannot restrict who may press "Run workflow" on a given workflow:
+# anyone with write access can. The gate job below is the whole access
+# control of this entry point, so keep the list short.
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type of version bump'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+# Shared with the patch entry point: two overlapping runs would bump from the
+# same tip and race on the same version.
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+
+env:
+  # WHO MAY START A MINOR/MAJOR RELEASE. Space-separated GitHub logins,
+  # matched case-insensitively.
+  RELEASE_MANAGERS: 'Pierre-Gilles'
+
+jobs:
+  gate:
+    name: Check the release manager
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: 🛑 Only release managers may cut a minor / major release
+        env:
+          # On a "Re-run", github.actor is still the person who started the
+          # first run while github.triggering_actor is the person re-running
+          # it, and the run keeps the privileges of github.actor. Both have to
+          # be allowed, otherwise a failed run started by a release manager
+          # could be re-run by anyone.
+          ACTOR: ${{ github.actor }}
+          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
+        run: |
+          for login in "${ACTOR}" "${TRIGGERING_ACTOR}"; do
+            case " ${RELEASE_MANAGERS,,} " in
+              *" ${login,,} "*) ;;
+              *)
+                echo "::error::${login} is not allowed to prepare a ${RELEASE_TYPE} release."
+                echo "::error::Only release managers may: ${RELEASE_MANAGERS}. A patch release can be prepared by any maintainer with the 'Prepare patch release' workflow."
+                exit 1
+                ;;
+            esac
+          done
+          echo "${ACTOR} may prepare a ${RELEASE_TYPE} release."
+
+  release:
+    name: ${{ inputs.release_type }} release
+    needs: gate
+    uses: ./.github/workflows/prepare-release.yml
+    with:
+      release_type: ${{ inputs.release_type }}

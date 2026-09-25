@@ -1,31 +1,27 @@
-name: Prepare release
-run-name: Prepare ${{ inputs.release_type }} release
+name: Prepare release (reusable)
 
+# Bumps the version on a `release/vX.Y.Z` branch, ready for a human to open
+# the release pull request. This workflow is not run directly: it is called
+# by the two entry points of the Actions tab, which decide who may start it.
+#
+#   prepare-release-patch.yml         patch release, any member with write
+#   prepare-release-minor-major.yml   minor/major release, release managers
+#
+# See .github/MAINTAINERS.md for the release process.
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       release_type:
-        description: 'Type of version bump'
+        description: 'Type of version bump: patch, minor or major'
         required: true
-        default: 'patch'
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-
-permissions:
-  contents: write
-
-# Two overlapping runs would bump from the same tip and race on the same version.
-concurrency:
-  group: prepare-release
-  cancel-in-progress: false
+        type: string
 
 jobs:
   prepare-release:
     name: Bump version on a release branch
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: 🛑 Ensure workflow runs on master
         if: github.ref != 'refs/heads/master'
@@ -34,6 +30,17 @@ jobs:
         run: |
           echo "::error::This workflow can only be run on master, got ${REF_NAME}."
           exit 1
+      - name: 🛑 Ensure the release type is valid
+        env:
+          RELEASE_TYPE: ${{ inputs.release_type }}
+        run: |
+          case "${RELEASE_TYPE}" in
+            patch | minor | major) ;;
+            *)
+              echo "::error::Unknown release type '${RELEASE_TYPE}', expected patch, minor or major."
+              exit 1
+              ;;
+          esac
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v4
         with:
@@ -95,6 +102,9 @@ jobs:
             echo "The pull request has to be opened by a human: GitHub does not run the"
             echo "required checks on a pull request opened by the \`GITHUB_TOKEN\`, so an"
             echo "automatically opened one would stay blocked on them forever."
+            echo ""
+            echo "The author of the pull request cannot approve it: a member of the"
+            echo "release team other than the author has to (see .github/CODEOWNERS)."
             echo ""
             echo "Once it is merged, the \`Create release tag\` workflow tags \`${TAG}\` on"
             echo "master and starts the production images, demo website and apidoc builds."

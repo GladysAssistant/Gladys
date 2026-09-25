@@ -9,7 +9,7 @@ Here’s how you can contribute to Gladys:
 - 💬 Discuss improvements or architecture
 - 🔧 Submit bug fixes or improvements
 - ✨ Propose new features
-- 🤝 Become a long-term contributor or maintainer
+- 🤝 Become a long-term contributor or maintainer (see [MAINTAINERS.md](MAINTAINERS.md) for what maintainers do and how releases are made)
 
 By participating, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
