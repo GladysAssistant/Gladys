@@ -87,6 +87,41 @@ describe('system.pull', () => {
     }
   });
 
+  it('should pass the abort signal to Docker', async () => {
+    const abortController = new AbortController();
+    const dockerPull = fake.resolves(true);
+    system.dockerode.pull = dockerPull;
+
+    await system.pull('gladysassistant/gladys:v4', undefined, { abortSignal: abortController.signal });
+
+    assert.calledOnceWithExactly(dockerPull, 'gladysassistant/gladys:v4', { abortSignal: abortController.signal });
+  });
+
+  it('should not send an abort signal to Docker when none is given', async () => {
+    const dockerPull = fake.resolves(true);
+    system.dockerode.pull = dockerPull;
+
+    await system.pull('gladysassistant/gladys:v4');
+
+    assert.calledOnceWithExactly(dockerPull, 'gladysassistant/gladys:v4', {});
+  });
+
+  it('should ignore empty progress events', async () => {
+    system.dockerode.modem.followProgress = (stream, onFinished) => onFinished(null, [null, { status: 'Done' }]);
+
+    const output = await system.pull('gladysassistant/gladys:v4');
+
+    expect(output).to.deep.equal([null, { status: 'Done' }]);
+  });
+
+  it('should resolve when the progress output is not a list', async () => {
+    system.dockerode.modem.followProgress = (stream, onFinished) => onFinished(null, undefined);
+
+    const output = await system.pull('gladysassistant/gladys:v4');
+
+    expect(output).to.equal(undefined);
+  });
+
   it('should fail when the progress stream breaks', async () => {
     system.dockerode.modem.followProgress = (stream, onFinished) => onFinished(new Error('SOCKET_CLOSED'), []);
 

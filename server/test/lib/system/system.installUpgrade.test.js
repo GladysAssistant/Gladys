@@ -90,7 +90,8 @@ describe('system.installUpgrade', () => {
 
     await system.installUpgrade();
 
-    expect(system.pull.firstCall.args).to.deep.equal(['gladysassistant/gladys:v4']);
+    expect(system.pull.firstCall.args[0]).to.equal('gladysassistant/gladys:v4');
+    expect(system.pull.firstCall.args[2].abortSignal.aborted).to.equal(false);
     expect(system.pull.secondCall.args).to.deep.equal(['nickfedor/watchtower:1.20.2']);
     assert.called(system.dockerode.createContainer);
     expect(getUpgradeErrors()).to.deep.equal([]);
@@ -124,30 +125,32 @@ describe('system.installUpgrade', () => {
     ]);
   });
 
-  it('should report an error when the Gladys image download never finishes', async () => {
+  it('should abort the Gladys image download when it never finishes', async () => {
     const clock = sandbox.useFakeTimers();
-    // the abandoned pull rejects after the timeout: it must be swallowed
-    system.pull = () =>
+    let abortSignal;
+    // like Docker, the pull rejects once aborted: it must be swallowed
+    system.pull = (image, onProgress, options) =>
       new Promise((resolve, reject) => {
-        setTimeout(() => reject(new Error('DAEMON_DIED')), 20 * 60 * 1000);
+        ({ abortSignal } = options);
+        abortSignal.addEventListener('abort', () => reject(new Error('The operation was aborted')));
       });
 
     const upgrade = system.installUpgrade();
     await clock.tickAsync(15 * 60 * 1000);
     await upgrade;
 
+    expect(abortSignal.aborted).to.equal(true);
     assert.notCalled(system.dockerode.createContainer);
-    expect(getUpgradeErrors()).to.deep.equal([{ code: SYSTEM_UPGRADE_ERROR_CODES.WATCHTOWER_TIMEOUT }]);
-
-    // deliver the late rejection while the swallowing catch is attached
-    await clock.tickAsync(5 * 60 * 1000);
+    expect(getUpgradeErrors()).to.deep.equal([
+      { code: SYSTEM_UPGRADE_ERROR_CODES.IMAGE_PULL_TIMEOUT, image: 'gladysassistant/gladys:v4' },
+    ]);
   });
 
   it('should only upgrade the Gladys container', async () => {
     await system.installUpgrade();
 
     const { Cmd } = system.dockerode.createContainer.firstCall.args[0];
-    expect(Cmd).to.deep.equal(['--run-once', '--cleanup', '--include-restarting', 'gladys']);
+    expect(Cmd).to.deep.equal(['--run-once', '--cleanup', '--include-restarting', '--no-pull', 'gladys']);
   });
 
   it('should not run Watchtower when the image is pinned', async () => {

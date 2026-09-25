@@ -149,10 +149,17 @@ async function installUpgrade() {
       type: WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG,
       payload: { message: `Downloading ${gladysImage.image}...` },
     });
-    const pullResult = await waitAtMost(this.pull(gladysImage.image), `Pull of ${gladysImage.image}`);
+    const pullAbortController = new AbortController();
+    const pullResult = await waitAtMost(
+      this.pull(gladysImage.image, undefined, { abortSignal: pullAbortController.signal }),
+      `Pull of ${gladysImage.image}`,
+    );
     if (pullResult === WATCHTOWER_TIMED_OUT) {
-      logger.warn(`The pull of ${gladysImage.image} is still running after ${WATCHTOWER_TIMEOUT_IN_MS}ms, giving up`);
-      sendUpgradeError({ code: SYSTEM_UPGRADE_ERROR_CODES.WATCHTOWER_TIMEOUT });
+      // Left running, the download would keep filling the disk, and a retry
+      // would start a second one on top of it.
+      pullAbortController.abort();
+      logger.warn(`The pull of ${gladysImage.image} is still running after ${WATCHTOWER_TIMEOUT_IN_MS}ms, aborting it`);
+      sendUpgradeError({ code: SYSTEM_UPGRADE_ERROR_CODES.IMAGE_PULL_TIMEOUT, image: gladysImage.image });
       return;
     }
   } catch (e) {
@@ -173,7 +180,9 @@ async function installUpgrade() {
 
     // Create and start Watchtower container. Passing the Gladys container name
     // restricts the run to Gladys: a manual upgrade must never recreate the
-    // other containers running on the user's machine.
+    // other containers running on the user's machine. `--no-pull` makes it
+    // compare Gladys with the image downloaded above instead of contacting the
+    // registry a second time, which could fail on its own.
     const container = await this.dockerode.createContainer({
       Image: WATCHTOWER_IMAGE,
       name: `gladys-watchtower-${Date.now()}`,
@@ -181,7 +190,7 @@ async function installUpgrade() {
         AutoRemove: true,
         Binds: ['/var/run/docker.sock:/var/run/docker.sock'],
       },
-      Cmd: ['--run-once', '--cleanup', '--include-restarting', gladysImage.container_name],
+      Cmd: ['--run-once', '--cleanup', '--include-restarting', '--no-pull', gladysImage.container_name],
     });
 
     // Start the container

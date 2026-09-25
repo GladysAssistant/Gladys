@@ -2241,6 +2241,8 @@ const SYSTEM_UPGRADE_ERROR_CODES = {
   IMAGE_TAG_PINNED: 'IMAGE_TAG_PINNED',
   // the new Gladys image could not be downloaded, Docker's error is attached
   IMAGE_PULL_FAILED: 'IMAGE_PULL_FAILED',
+  // the download of the new Gladys image did not finish in time and was stopped
+  IMAGE_PULL_TIMEOUT: 'IMAGE_PULL_TIMEOUT',
   // the new Gladys image could not be downloaded because the disk is full
   NOT_ENOUGH_DISK_SPACE: 'NOT_ENOUGH_DISK_SPACE',
   // Watchtower ran fine but found no new image to install

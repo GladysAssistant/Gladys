@@ -4402,6 +4402,7 @@
     "upgradeError": {
       "IMAGE_TAG_PINNED": "Mise à jour annulée : votre container utilise l'image figée « {{image}} ». Recréez-le avec « {{recommendedImage}} » pour pouvoir le mettre à jour.",
       "IMAGE_PULL_FAILED": "Mise à jour impossible : Gladys n'a pas pu télécharger l'image « {{image}} ». Erreur Docker : {{message}}. Vérifiez la connexion internet et l'espace disque libre de la machine qui fait tourner Gladys, puis réessayez.",
+      "IMAGE_PULL_TIMEOUT": "Mise à jour impossible : le téléchargement de l'image « {{image}} » ne s'est pas terminé en 15 minutes et a été arrêté, rien n'a été modifié. Vérifiez la connexion internet de la machine qui fait tourner Gladys, puis réessayez.",
       "NOT_ENOUGH_DISK_SPACE": "Mise à jour impossible : la machine qui fait tourner Gladys n'a plus assez d'espace disque pour télécharger l'image « {{image}} ». Libérez de la place, par exemple en supprimant les images Docker que vous n'utilisez plus (`docker image prune -a` supprime toutes les images qu'aucun container n'utilise), puis réessayez.",
       "NO_UPDATE_APPLIED": "Aucune mise à jour n'a été appliquée : Watchtower n'a trouvé aucune nouvelle image pour « {{image}} ». Réessayez dans quelques minutes, la nouvelle image n'est peut-être pas encore disponible pour votre architecture.",
       "WATCHTOWER_FAILED": "La mise à jour a échoué : le container Watchtower s'est arrêté avec le code d'erreur {{statusCode}}. Consultez les logs de Gladys pour en savoir plus.",
