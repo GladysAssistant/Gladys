@@ -25,7 +25,6 @@ describe('user.get', () => {
           id: '6295ad8b-b655-4422-9e6d-b4612da5d55f',
           name: 'Peppers house',
           selector: 'pepper-house',
-          alarm_code: null,
           alarm_delay_before_arming: 10,
           alarm_mode: 'disarmed',
           latitude: null,

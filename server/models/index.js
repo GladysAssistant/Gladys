@@ -27,6 +27,7 @@ const umzug = new Umzug({
   },
 });
 
+const AlarmCodeModel = require('./alarm_code');
 const AreaModel = require('./area');
 const CalendarModel = require('./calendar');
 const CalendarEventModel = require('./calendar_event');
@@ -55,6 +56,7 @@ const UserModel = require('./user');
 const VariableModel = require('./variable');
 
 const models = {
+  AlarmCode: AlarmCodeModel(sequelize, Sequelize),
   Area: AreaModel(sequelize, Sequelize),
   Calendar: CalendarModel(sequelize, Sequelize),
   CalendarEvent: CalendarEventModel(sequelize, Sequelize),

@@ -83,7 +83,7 @@ const scenes = [
     actions: [
       [{ type: 'light.turn-off', devices: ['living-room-ceiling-light', 'kitchen-spots', 'office-light'] }],
       [{ type: 'switch.turn-off', devices: ['office-plug'] }],
-      [{ type: 'alarm.set-alarm-mode', house: 'main-house', alarm_mode: 'armed' }]
+      [{ type: 'alarm.set-alarm-mode', house: 'main-house', alarm_mode: 'away-armed' }]
     ]
   }),
   scene({

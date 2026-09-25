@@ -10,9 +10,10 @@ const { unlockTabletMode } = require('./session.unlockTabletMode');
 const { getTabletMode } = require('./session.getTabletMode');
 const { setTabletMode } = require('./session.setTabletMode');
 
-const Session = function Session(jwtSecret, cache) {
+const Session = function Session(jwtSecret, cache, alarmCode) {
   this.jwtSecret = jwtSecret;
   this.cache = cache;
+  this.alarmCode = alarmCode;
 };
 
 Session.prototype.create = create;
