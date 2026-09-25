@@ -4,6 +4,7 @@ import { TONY_PICTURE, PEPPER_PICTURE, CAMERA_IMAGE, REFRESH_TOKEN, ACCESS_TOKEN
 import { house, rooms, devices, services, roomSummary, USERS } from './home';
 import { dashboards } from './dashboards';
 import { getWeather, getSunState } from './weather';
+import { getTideState } from './tide';
 import { scenes, sceneTags, calendars, calendarEvents, messages } from './scenes';
 import { getAggregatedStates, getEnergyConsumption, getStatesCsv, getStatesHistory } from './history';
 import { demoLanguage, uuid, hoursAgo, minutesAgo, solarPowerNow } from './helpers';
@@ -470,6 +471,7 @@ const home = {
   'post /api/v1/house/main-house/panic': { ...house, alarm_mode: 'panic' },
   'get /api/v1/house/main-house/weather': getWeather,
   'get /api/v1/house/main-house/sun': getSunState,
+  'get /api/v1/house/main-house/tide': getTideState,
   'get /api/v1/weather/provider': ['openweather'],
   'get /api/v1/service': serviceList,
   ...serviceVariables,
