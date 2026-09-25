@@ -47,6 +47,7 @@
 # Gladys Plus (gateway): server side.
 /server/lib/gateway/                                @GladysAssistant/maintainers
 /server/api/setupGateway.js                         @GladysAssistant/maintainers
+/server/api/controllers/gateway.controller.js       @GladysAssistant/maintainers
 # Gladys Plus: front side.
 /front/src/actions/gateway.js                       @GladysAssistant/maintainers
 /front/src/actions/gatewayLinkUser.js               @GladysAssistant/maintainers
@@ -57,19 +58,32 @@
 /front/src/routes/signup-gateway/                   @GladysAssistant/maintainers
 /front/src/routes/signup/2-create-account-gladys-gateway/ @GladysAssistant/maintainers
 /front/src/routes/settings/settings-gateway*/       @GladysAssistant/maintainers
+/front/src/routes/settings/settings-backup/         @GladysAssistant/maintainers
+/front/src/routes/settings/settings-billing/        @GladysAssistant/maintainers
 /front/src/utils/GatewayHttpClient.js               @GladysAssistant/maintainers
 /front/src/utils/GatewaySession.js                  @GladysAssistant/maintainers
 /front/src/utils/gatewayBinaryBody.js               @GladysAssistant/maintainers
 /front/src/utils/gladysPlusUrl.js                   @GladysAssistant/maintainers
-# Authentication, sessions, HTTP server and system (Docker) control.
+# Authentication, sessions, HTTP server and system (Docker) control: the
+# libs, their HTTP controllers, and the matching front.
 /server/lib/user/                                   @GladysAssistant/maintainers
 /server/lib/session/                                @GladysAssistant/maintainers
 /server/lib/http/                                   @GladysAssistant/maintainers
 /server/lib/system/                                 @GladysAssistant/maintainers
 /server/api/middlewares/                            @GladysAssistant/maintainers
+/server/api/controllers/user.controller.js          @GladysAssistant/maintainers
+/server/api/controllers/session.controller.js       @GladysAssistant/maintainers
+/server/api/controllers/http.controller.js          @GladysAssistant/maintainers
+/server/api/controllers/system.controller.js        @GladysAssistant/maintainers
+/server/api/controllers/system.controller.helpers.js @GladysAssistant/maintainers
 /server/config/                                     @GladysAssistant/maintainers
+/front/src/actions/session.js                       @GladysAssistant/maintainers
+/front/src/actions/system.js                        @GladysAssistant/maintainers
+/front/src/routes/settings/settings-system/         @GladysAssistant/maintainers
 # External integrations framework (supervisor, host API), spec-driven.
 /server/lib/external-integration/                   @GladysAssistant/maintainers
+/server/api/controllers/externalIntegration.controller.js @GladysAssistant/maintainers
+/server/api/controllers/integrationHost.controller.js @GladysAssistant/maintainers
 # Device feature categories and types are a cross-integration contract, see
 # docs/specs/device-feature-categories.md.
 /server/utils/constants.js                          @GladysAssistant/maintainers

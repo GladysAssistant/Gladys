@@ -18,7 +18,7 @@ organization. Nobody is added to the repository as an individual collaborator.
 
 | Team | Repository role | Who | Scope |
 | --- | --- | --- | --- |
-| `@GladysAssistant/maintainers` | Maintain | The lead maintainer | Everything: features, fixes, data model, Gladys Plus, dependencies, CI, releases of any kind. Default owner of every file. |
+| `@GladysAssistant/maintainers` | Maintain | The lead maintainer, and `gladys-maintainer-bot`, a machine account they operate (see [Automatic approval](#automatic-approval-of-the-maintainers-pull-requests)) | Everything: features, fixes, data model, Gladys Plus, dependencies, CI, releases of any kind. Default owner of every file. |
 | `@GladysAssistant/core` | Write | Trusted community maintainers | Fixes in the core, new devices and fixes in the internal integrations, translations, tests. No large feature, no data model change, no Gladys Plus, no dependency. |
 | `@GladysAssistant/release` | Write | The lead maintainer and a backup | Approve the release pull requests, so that a patch release can ship without the lead maintainer. |
 | `@GladysAssistant/triage` | Triage | Active community contributors | Label and close issues, request reviews, no push. |
@@ -41,12 +41,13 @@ of every file the pull request touches. The file is an allowlist:
    `server/api`, `server/services`, `server/utils`, `server/test`,
    `front/src`, `front/cypress`;
 3. inside those areas, the sensitive paths are closed again to
-   `maintainers`: migrations and models, Gladys Plus (server gateway and the
-   front gateway routes, components and utils), authentication and
-   sessions, HTTP server, system control, external integrations framework,
-   `server/utils/constants.js`, every `package.json` and lockfile including
-   the ones of the integrations, `docs/specs`, `AGENTS.md`, `.github`,
-   `docker`;
+   `maintainers`: migrations and models, Gladys Plus (server gateway, its
+   controller, and the front gateway routes, settings pages, components,
+   actions and utils), authentication and sessions, HTTP server, system
+   control (libs, controllers and the front settings pages), external
+   integrations framework and its controllers, `server/utils/constants.js`,
+   every `package.json` and lockfile including the ones of the
+   integrations, `docs/specs`, `AGENTS.md`, `.github`, `docker`;
 4. the root `package.json` and lockfile, which carry the version, are open
    to `release`.
 
@@ -57,7 +58,9 @@ A few consequences worth knowing:
 
 - **You can never approve your own pull request.** A core member's PR needs
   another core member (or a maintainer), and a release PR opened by the
-  backup needs the other member of `release`.
+  backup needs the other member of `release`. The lead maintainer's own
+  pull requests are approved by `gladys-maintainer-bot`, see
+  [Automatic approval](#automatic-approval-of-the-maintainers-pull-requests).
 - **A review bot's approval does not count.** `cursor[bot]` and
   `coderabbitai[bot]` review every pull request and may approve it; they are
   not code owners, so a human approval is still required. Their review is an
@@ -75,7 +78,8 @@ With another core member's approval, a member of `core` merges on their own:
   exposes inside an existing integration;
 - fixes and small improvements to an existing internal integration under
   `server/services/`;
-- translations and documentation;
+- translations, and documentation inside the areas open to `core` (the
+  `README.md` and `docs/` are maintainers-only);
 - tests, lint and small refactors that do not change behavior.
 
 `CODEOWNERS` cannot tell a fix from a feature on the same file, so the
@@ -124,7 +128,7 @@ Two entry points prepare a release, in the **Actions** tab:
 | Workflow | Bump | Who may start it |
 | --- | --- | --- |
 | **Prepare patch release** | `X.Y.Z` → `X.Y.Z+1`, fixes only | Anyone with write access |
-| **Prepare minor / major release** | `X.Y.Z` → `X.Y+1.0` or `X+1.0.0` | The maintainers listed in the workflow file (`RELEASE_MANAGERS`) |
+| **Prepare minor / major release** | `X.Y.Z` → `X.Y+1.0` or `X+1.0.0` | The logins listed in the workflow file (`RELEASE_MANAGERS`): the lead maintainer only, on purpose. This list is independent of the `release` team, which approves release pull requests but does not start minor or major releases. |
 
 Both create a `release/vX.Y.Z` branch with the version bump and stop there.
 Then:
@@ -148,6 +152,35 @@ therefore for a maintainer.
 
 ## Bots and automations
 
+### Automatic approval of the maintainer's pull requests
+
+The `maintainers` team is one person, and GitHub never lets an author
+approve their own pull request. The workflow
+`.github/workflows/auto-approve-maintainer-prs.yml` therefore approves, as
+`gladys-maintainer-bot`, every pull request that:
+
+- targets `master` from a branch of this repository, and is not a draft;
+- was opened by the lead maintainer;
+- was last pushed by the lead maintainer. A push by anyone else is never
+  approved, and the ruleset dismisses the previous approval ("dismiss stale
+  reviews", "require approval of the most recent reviewable push").
+
+The approval is pinned to the reviewed commit and does not merge anything:
+the merge queue, the required checks and the merge click are unchanged. The
+lead maintainer remains the only person who can land a change on a
+maintainers-only path, with or without the bot.
+
+The bot token is not a repository secret: it lives in the
+`maintainer-auto-approve` environment, whose deployment branch policy only
+allows `master`, so a workflow edited on a branch can never read it. That
+workflow never checks out the pull request and is the only one allowed to
+reference the environment. Pull requests pushed by Claude sessions under the
+lead maintainer's identity are approved too: read them before merging, and
+do not enable auto-merge on one that touches a maintainers-only path
+without having read it.
+
+### Review and fix bots
+
 - **Automated reviews** (`/cursor review`, CodeRabbit) run on every pull
   request, see `CONTRIBUTING.md`. Core members can trigger one with the
   `needs:cursor-review` label.
@@ -168,6 +201,10 @@ therefore for a maintainer.
 - **Broken release** (users cannot upgrade or Gladys does not start): revert
   the offending pull request on `master` through a normal pull request, then
   ship a patch release. Never rewrite `master` or delete a tag.
+- **Leaked or suspicious `gladys-maintainer-bot` activity** (an approval on
+  a pull request the lead maintainer did not push): revoke the token in the
+  bot account, delete the `MAINTAINER_BOT_TOKEN` secret of the environment,
+  and dismiss the approval. The workflow then fails closed.
 - **Nobody from `release` is reachable**: the fix waits. A wrong release
   hurts more users than a late one.
 

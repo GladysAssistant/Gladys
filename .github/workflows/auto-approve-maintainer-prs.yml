@@ -1,0 +1,119 @@
+name: Auto-approve maintainer pull requests
+
+# The maintainers team owns every file by default (see .github/CODEOWNERS) and
+# is one person plus a machine account. GitHub never lets an author approve
+# their own pull request, so a pull request opened by the lead maintainer on a
+# maintainers-only path would have no possible approver. This workflow
+# approves it as `gladys-maintainer-bot`, a member of the maintainers team
+# operated by the lead maintainer. The approval does not merge anything: the
+# merge queue, the required checks and the merge click stay as they are.
+#
+# A pull request is approved when ALL of the following hold:
+#   - it targets master and comes from a branch of this repository (not a fork),
+#   - it is not a draft,
+#   - its author is one of MAINTAINER_LOGINS,
+#   - the person who caused this event (the author on "opened", the pusher on
+#     "synchronize") is one of MAINTAINER_LOGINS: a push by anyone else is
+#     never approved, and it also dismisses the previous approval through the
+#     ruleset ("dismiss stale reviews", "require approval of the most recent
+#     reviewable push").
+#
+# SECURITY. The bot token is the most sensitive secret of this repository: a
+# leak would let anyone approve any pull request as a maintainer. It is
+# therefore NOT a repository secret but a secret of the `maintainer-auto-
+# approve` environment, whose deployment branch policy only allows `master`.
+# A job only obtains it when it runs on the master ref, which is the case for
+# this pull_request_target job (the run uses the workflow definition and the
+# ref of the BASE branch), and never for a workflow edited on a branch. This
+# workflow must never check out or execute code from the pull request, and
+# must remain the only one referencing that environment.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+# A burst of pushes only needs the approval of its last commit.
+concurrency:
+  group: auto-approve-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # WHOSE PULL REQUESTS ARE APPROVED. Space-separated GitHub logins, matched
+  # case-insensitively. Keep in sync with the members of the maintainers team.
+  MAINTAINER_LOGINS: 'Pierre-Gilles'
+  # The account expected behind the token, checked before approving.
+  BOT_LOGIN: 'gladys-maintainer-bot'
+
+jobs:
+  gate:
+    name: Check the author and the pusher
+    # Coarse filter so that a runner is not started for every pull request.
+    if: >-
+      !github.event.pull_request.draft &&
+      github.event.pull_request.base.ref == 'master' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor == github.event.pull_request.user.login
+    runs-on: ubuntu-latest
+    permissions: {}
+    timeout-minutes: 5
+    outputs:
+      approve: ${{ steps.check.outputs.approve }}
+    steps:
+      - name: Match the author and the pusher against the maintainers
+        id: check
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          for login in "${PR_AUTHOR}" "${ACTOR}"; do
+            case " ${MAINTAINER_LOGINS,,} " in
+              *" ${login,,} "*) ;;
+              *)
+                echo "${login} is not a maintainer, nothing to approve."
+                echo "approve=false" >> "$GITHUB_OUTPUT"
+                exit 0
+                ;;
+            esac
+          done
+          echo "Pull request opened and pushed by a maintainer (${PR_AUTHOR})."
+          echo "approve=true" >> "$GITHUB_OUTPUT"
+
+  approve:
+    name: Approve as the maintainer bot
+    needs: gate
+    if: needs.gate.outputs.approve == 'true'
+    runs-on: ubuntu-latest
+    # Holds the bot token, restricted to the master ref (see the header).
+    environment: maintainer-auto-approve
+    permissions: {}
+    timeout-minutes: 5
+    steps:
+      - name: Approve the pull request
+        env:
+          GH_TOKEN: ${{ secrets.MAINTAINER_BOT_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          set -euo pipefail
+          TOKEN_LOGIN=$(gh api user --jq .login)
+          if [ "${TOKEN_LOGIN,,}" != "${BOT_LOGIN,,}" ]; then
+            echo "::error::MAINTAINER_BOT_TOKEN belongs to ${TOKEN_LOGIN}, expected ${BOT_LOGIN}."
+            exit 1
+          fi
+          # Idempotent: a re-run must not stack approvals of the same commit.
+          ALREADY=$(gh api --paginate "repos/${GH_REPO}/pulls/${PR_NUMBER}/reviews" \
+            --jq "[.[] | select(.state == \"APPROVED\" and .commit_id == \"${HEAD_SHA}\" and (.user.login | ascii_downcase) == \"${BOT_LOGIN,,}\")] | length")
+          if [ "${ALREADY}" != "0" ]; then
+            echo "Commit ${HEAD_SHA} is already approved by ${BOT_LOGIN}."
+            exit 0
+          fi
+          # commit_id pins the approval to the reviewed commit: a push that
+          # lands in between is not covered by it.
+          gh api -X POST "repos/${GH_REPO}/pulls/${PR_NUMBER}/reviews" \
+            -f event=APPROVE \
+            -f commit_id="${HEAD_SHA}" \
+            -f body="Automatic approval: this pull request was opened and last pushed by a maintainer (${PR_AUTHOR}). See \`.github/MAINTAINERS.md\`." \
+            --jq '"Approved as " + .user.login + " (review " + (.id | tostring) + ")"'
