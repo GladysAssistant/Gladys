@@ -23,6 +23,7 @@ import ActionsBox from '../../components/boxs/actions/ActionsBox';
 import HouseViewBox from '../../components/boxs/house-view/HouseViewBox';
 import ExternalWidgetBox from '../../components/boxs/external-widget/ExternalWidgetBox';
 import ErrorBoundary from '../../components/ErrorBoundary';
+import ThermostatBox from '../../components/boxs/thermostat/ThermostatBox';
 
 const BoxContent = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -74,6 +75,8 @@ const BoxContent = ({ children, ...props }) => {
       return <ActionsBox {...props} />;
     case 'external-widget':
       return <ExternalWidgetBox {...props} />;
+    case 'thermostat':
+      return <ThermostatBox {...props} />;
   }
 };
 
