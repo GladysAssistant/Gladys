@@ -2239,6 +2239,12 @@ const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
 const SYSTEM_UPGRADE_ERROR_CODES = {
   // Gladys runs on an immutable image reference, no upgrade can ever be applied
   IMAGE_TAG_PINNED: 'IMAGE_TAG_PINNED',
+  // the new Gladys image could not be downloaded, Docker's error is attached
+  IMAGE_PULL_FAILED: 'IMAGE_PULL_FAILED',
+  // the download of the new Gladys image did not finish in time and was stopped
+  IMAGE_PULL_TIMEOUT: 'IMAGE_PULL_TIMEOUT',
+  // the new Gladys image could not be downloaded because the disk is full
+  NOT_ENOUGH_DISK_SPACE: 'NOT_ENOUGH_DISK_SPACE',
   // Watchtower ran fine but found no new image to install
   NO_UPDATE_APPLIED: 'NO_UPDATE_APPLIED',
   // the Watchtower container exited with a non-zero status code

@@ -4401,6 +4401,9 @@
     "pinnedImageRecommendation": "Para que las actualizaciones funcionen, vuelva a crear su contenedor con la imagen \"{{recommendedImage}}\", que sigue las nuevas versiones. Sus datos no se almacenan dentro del contenedor, por lo que no se perderá nada.",
     "upgradeError": {
       "IMAGE_TAG_PINNED": "Actualización cancelada: su contenedor utiliza la imagen fija \"{{image}}\". Vuelva a crearlo con \"{{recommendedImage}}\" para poder actualizarlo.",
+      "IMAGE_PULL_FAILED": "Actualización imposible: Gladys no pudo descargar la imagen \"{{image}}\". Error de Docker: {{message}}. Compruebe la conexión a internet y el espacio libre en disco de la máquina que ejecuta Gladys y vuelva a intentarlo.",
+      "IMAGE_PULL_TIMEOUT": "Actualización imposible: la descarga de la imagen \"{{image}}\" no terminó en 15 minutos y se detuvo, no se modificó nada. Compruebe la conexión a internet de la máquina que ejecuta Gladys y vuelva a intentarlo.",
+      "NOT_ENOUGH_DISK_SPACE": "Actualización imposible: la máquina que ejecuta Gladys se quedó sin espacio en disco al descargar la imagen \"{{image}}\". Libere espacio, por ejemplo eliminando las imágenes Docker que ya no utiliza (`docker image prune -a` elimina todas las imágenes que ningún contenedor utiliza) y vuelva a intentarlo.",
       "NO_UPDATE_APPLIED": "No se aplicó ninguna actualización: Watchtower no encontró ninguna imagen nueva para \"{{image}}\". Vuelva a intentarlo en unos minutos; es posible que la nueva imagen aún no esté publicada para su arquitectura.",
       "WATCHTOWER_FAILED": "La actualización falló: el contenedor de Watchtower finalizó con el código de error {{statusCode}}. Consulte los registros de Gladys para obtener más detalles.",
       "WATCHTOWER_TIMEOUT": "La actualización está tardando más de lo esperado y Gladys dejó de seguirla. Es posible que todavía se esté ejecutando: actualice esta página en unos minutos para comprobar la versión instalada.",
