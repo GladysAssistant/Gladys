@@ -319,9 +319,9 @@ function getRoutes(gladys) {
       controller: houseController.userSeen,
     },
     // House Alarm
-    'post /api/v1/house/:house_selector/arm': {
+    'post /api/v1/house/:house_selector/away_arm': {
       authenticated: true,
-      controller: houseController.arm,
+      controller: houseController.awayArm,
     },
     'post /api/v1/house/:house_selector/disarm': {
       authenticated: true,
@@ -331,9 +331,13 @@ function getRoutes(gladys) {
       alarmAuth: true,
       controller: houseController.disarmWithCode,
     },
-    'post /api/v1/house/:house_selector/partial_arm': {
+    'post /api/v1/house/:house_selector/presence_arm': {
       authenticated: true,
-      controller: houseController.partialArm,
+      controller: houseController.presenceArm,
+    },
+    'post /api/v1/house/:house_selector/night_arm': {
+      authenticated: true,
+      controller: houseController.nightArm,
     },
     'post /api/v1/house/:house_selector/panic': {
       authenticated: true,
