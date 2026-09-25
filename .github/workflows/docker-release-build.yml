@@ -13,9 +13,13 @@ jobs:
   test-front:
     name: Front test
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -44,10 +48,13 @@ jobs:
   test-server:
     name: Server test
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
         with:
+          persist-credentials: false
           fetch-depth: 2
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
@@ -82,7 +89,7 @@ jobs:
         working-directory: ./server
         run: npm audit --production --audit-level=critical || true
       - name: 📄 Codecov report upload
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
         with:
           fail_ci_if_error: true
           token: 08cd0d46-0291-42ed-b352-50924cb6cca6
@@ -99,9 +106,13 @@ jobs:
       - test-front
       - test-server
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -128,6 +139,9 @@ jobs:
     # branch a manual dispatch could have been started on.
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
@@ -135,9 +149,11 @@ jobs:
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 🐳 Docker meta
         id: docker_meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4.6.0
         with:
           images: ${{ secrets.DOCKERHUB_REPO }},ghcr.io/${{ secrets.DOCKERHUB_REPO }}
           labels: |
@@ -160,10 +176,10 @@ jobs:
             type=raw,value=v4,enable=${{ startsWith(github.ref, 'refs/tags/v5.') && !contains(github.ref, '-') }}
             type=sha
       - name: 💽 Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@2b82ce82d56a2a04d2637cd93a637ae1b359c0a7 # v2.2.0
       - name: 🐳 Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2.10.0
         with:
           version: v0.9.1
       - name: ↙️ Download build artifact
@@ -172,12 +188,12 @@ jobs:
           name: static
           path: static
       - name: 🔑 Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: 🔑 Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -187,7 +203,7 @@ jobs:
       # Gladys Assistant 5: they stay frozen on the last v4.x images, and the
       # remaining installations have to be recreated on the `v4` tag.
       - name: 🐳 Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # v3.3.1
         with:
           context: .
           file: ./docker/Dockerfile.buildx
@@ -201,6 +217,8 @@ jobs:
     name: Publish Gladys Plus front
     needs: docker
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Run Cloudflare Pages deploy hook
         run: curl -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}"
@@ -215,6 +233,8 @@ jobs:
     # invited to upgrade to.
     if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: 🚀 Create the version on Gladys Plus
         env:
