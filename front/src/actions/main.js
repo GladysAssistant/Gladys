@@ -7,6 +7,7 @@ import get from 'get-value';
 import config from '../config';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../server/utils/constants';
 import { isUrlInArray } from '../utils/url';
+import { setSidebarCollapsedPreference } from '../utils/sidebarPreference';
 import {
   isInstanceBehindFront,
   isInstanceVersionCheckSettled,
@@ -69,6 +70,26 @@ function createActions(store) {
     toggleCollapsedMenu(state) {
       store.setState({
         showCollapsedMenu: !state.showCollapsedMenu
+      });
+    },
+    closeCollapsedMenu() {
+      store.setState({
+        showCollapsedMenu: false
+      });
+    },
+    // Expanded rail ⇄ collapsed, at desktop widths (below them the rail is
+    // an on-demand drawer whatever this says). Both states are resting
+    // states: expanded is the docked rail with the content beside it, never
+    // an overlay.
+    toggleSidebarCollapsed(state) {
+      const sidebarCollapsed = !state.sidebarCollapsed;
+      setSidebarCollapsedPreference(sidebarCollapsed);
+      store.setState({
+        sidebarCollapsed,
+        // the button sits inside the footer dropdown's own container, so the
+        // click-outside handler never sees it: close the dropup here, or it
+        // would ride the rail off-screen still open
+        showDropDown: false
       });
     },
     redirectToLogin() {
