@@ -2,9 +2,9 @@ name: Prepare minor / major release
 run-name: Prepare ${{ inputs.release_type }} release
 
 # Entry point for a MINOR or MAJOR release: new features, new integrations,
-# breaking changes. Only the release managers listed below may start it; the
-# patch entry point (prepare-release-patch.yml) is open to every member with
-# write access. See .github/MAINTAINERS.md.
+# breaking changes. Only the maintainers listed below may start it; the patch
+# entry point (prepare-release-patch.yml) is open to every member with write
+# access. See .github/MAINTAINERS.md.
 #
 # GitHub cannot restrict who may press "Run workflow" on a given workflow:
 # anyone with write access can. The gate job below is the whole access
@@ -31,8 +31,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # WHO MAY START A MINOR/MAJOR RELEASE. Space-separated GitHub logins,
-  # matched case-insensitively.
+  # WHO MAY START A MINOR/MAJOR RELEASE: the maintainers. Space-separated
+  # GitHub logins, matched case-insensitively.
   RELEASE_MANAGERS: 'Pierre-Gilles'
 
 jobs:
@@ -57,7 +57,7 @@ jobs:
               *" ${login,,} "*) ;;
               *)
                 echo "::error::${login} is not allowed to prepare a ${RELEASE_TYPE} release."
-                echo "::error::Only release managers may: ${RELEASE_MANAGERS}. A patch release can be prepared by any maintainer with the 'Prepare patch release' workflow."
+                echo "::error::Only maintainers may: ${RELEASE_MANAGERS}. A patch release can be prepared by anyone with write access through the 'Prepare patch release' workflow."
                 exit 1
                 ;;
             esac

@@ -6,11 +6,11 @@ run-name: Prepare patch release
 #
 # Anyone with write access may start it: the version bump lands on a
 # `release/vX.Y.Z` branch and the release pull request still needs the
-# approval of a member of the release team (see .github/CODEOWNERS), who
-# cannot be the author of that pull request.
+# approval of a member of the release team or a maintainer (see
+# .github/CODEOWNERS), who cannot be the author of that pull request.
 #
 # Minor and major releases go through prepare-release-minor-major.yml, which
-# only release managers may start. See .github/MAINTAINERS.md.
+# only maintainers may start. See .github/MAINTAINERS.md.
 on:
   workflow_dispatch:
 

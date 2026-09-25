@@ -3,27 +3,25 @@
 This document describes who can merge what in this repository, and how a
 release is made. It exists so that the community can keep Gladys moving when
 the lead maintainer is away: trusted members can review and merge simple pull
-requests and ship patch releases on their own, while the riskier changes wait
-for the release team.
+requests (fixes, new devices, internal integrations) and ship patch releases
+on their own, while everything else waits for the maintainers.
 
 The rules below are enforced by GitHub wherever GitHub can enforce them
 (teams, `CODEOWNERS`, the `master` ruleset, the release workflows). The rest is
-a matter of trust between maintainers, and is written down here so that
-everyone applies the same rules.
+a matter of trust between the people holding an access, and is written down
+here so that everyone applies the same rules.
 
-## Teams and roles
+## Teams
 
 All access to the repository goes through teams of the GladysAssistant
 organization. Nobody is added to the repository as an individual collaborator.
 
-| Team | Repository role | Who | What it allows |
+| Team | Repository role | Who | Scope |
 | --- | --- | --- | --- |
+| `@GladysAssistant/maintainers` | Maintain | The lead maintainer | Everything: features, fixes, data model, Gladys Plus, dependencies, CI, releases of any kind. Default owner of every file. |
+| `@GladysAssistant/core` | Write | Trusted community maintainers | Fixes in the core, new devices and fixes in the internal integrations, translations, tests. No large feature, no data model change, no Gladys Plus, no dependency. |
+| `@GladysAssistant/release` | Write | The lead maintainer and a backup | Approve the release pull requests, so that a patch release can ship without the lead maintainer. |
 | `@GladysAssistant/triage` | Triage | Active community contributors | Label and close issues, request reviews, no push. |
-| `@GladysAssistant/core` | Write | Trusted maintainers | Push branches, approve and merge pull requests in the maintainer scope, start a patch release. |
-| `@GladysAssistant/release` | Maintain | The lead maintainer and a backup | Everything above, plus approve the pull requests that touch the restricted paths, and approve release pull requests. |
-
-Members of `release` are also members of `core`, so that one approval from
-them covers a pull request touching both scopes.
 
 Repository administration (rulesets, secrets, bypass) stays with the
 organization owners and is not delegated.
@@ -36,46 +34,58 @@ pushed, the required CI checks have to pass, and merges go through the merge
 queue as squash commits.
 
 On top of that, `.github/CODEOWNERS` requires the approval of a **code owner**
-of every file the pull request touches:
+of every file the pull request touches. The file is an allowlist:
 
-- by default, any member of `core`;
-- for the restricted paths listed in that file (release and build chain,
-  dependencies, migrations and models, authentication, Gladys Plus gateway,
-  system, device feature contract, living specs), a member of `release`.
+1. every file belongs to `maintainers`;
+2. the areas open to `core` are listed explicitly: `server/lib`,
+   `server/api`, `server/services`, `server/utils`, `server/test`,
+   `front/src`, `front/cypress`;
+3. inside those areas, the sensitive paths are closed again to
+   `maintainers`: migrations and models, Gladys Plus (server gateway and the
+   front gateway routes, components and utils), authentication and
+   sessions, HTTP server, system control, external integrations framework,
+   `server/utils/constants.js`, every `package.json` and lockfile including
+   the ones of the integrations, `docs/specs`, `AGENTS.md`, `.github`,
+   `docker`;
+4. the root `package.json` and lockfile, which carry the version, are open
+   to `release`.
+
+Anything not listed in step 2 (a new top-level directory, `docker`, the
+documentation specs...) is maintainers-only until it is opened there.
 
 A few consequences worth knowing:
 
-- **You can never approve your own pull request.** A maintainer's PR needs
-  another maintainer, and a release PR opened by the backup needs the lead
-  maintainer (or the other way round).
+- **You can never approve your own pull request.** A core member's PR needs
+  another core member (or a maintainer), and a release PR opened by the
+  backup needs the other member of `release`.
 - **A review bot's approval does not count.** `cursor[bot]` and
   `coderabbitai[bot]` review every pull request and may approve it; they are
   not code owners, so a human approval is still required. Their review is an
   input for your own review, not a replacement for it.
 - **A "changes requested" review blocks the merge** until its author
-  re-reviews or a member of `release` dismisses it. Do not leave one behind
-  when you go away: switch it to a comment or dismiss it yourself.
+  re-reviews or a maintainer dismisses it. Do not leave one behind when you
+  go away: switch it to a comment or dismiss it yourself.
 
-## What a maintainer can merge
+## What the core team can merge
 
-With another maintainer's approval, a member of `core` merges on their own:
+With another core member's approval, a member of `core` merges on their own:
 
-- bug fixes;
-- new Zigbee, Z-Wave, Matter, Tuya, Xiaomi... devices, mappings and exposes
-  inside an existing integration;
-- fixes and small improvements to an existing integration under
+- bug fixes in the server and the front;
+- new Zigbee2MQTT, Z-Wave, Matter, Tuya, Xiaomi... devices, mappings and
+  exposes inside an existing integration;
+- fixes and small improvements to an existing internal integration under
   `server/services/`;
 - translations and documentation;
 - tests, lint and small refactors that do not change behavior.
 
-The following wait for a member of `release`, even when `CODEOWNERS` does not
-catch them:
+`CODEOWNERS` cannot tell a fix from a feature on the same file, so the
+following wait for a maintainer even when the paths are open:
 
+- a new feature of any size in the core (dashboard, scenes, devices, chat,
+  calendar...), or a new integration;
 - a new device feature category or type (`DEVICE_FEATURE_CATEGORIES`,
-  `DEVICE_FEATURE_TYPES`), which is a contract for every integration: check it
-  against `docs/specs/device-feature-categories.md` first;
-- a new integration, or a new dependency in an existing one
-  (`server/services/*/package.json`);
+  `DEVICE_FEATURE_TYPES`), which is a contract for every integration and is
+  closed anyway through `server/utils/constants.js`;
 - a change in a behavior or a contract covered by a living spec in
   `docs/specs/` (the spec has to change in the same pull request);
 - a breaking change of any kind (API, database, dashboard boxes, scene
@@ -87,7 +97,7 @@ ask in the PR: a slower merge is always cheaper than a bad release.
 
 ## Review checklist
 
-Before approving a pull request in the maintainer scope:
+Before approving a pull request in the core scope:
 
 1. CI is green on the latest commit, including the Codecov patch coverage.
 2. The automated review (Cursor, CodeRabbit) has run on the latest commit and
@@ -97,7 +107,8 @@ Before approving a pull request in the maintainer scope:
 4. The description links the forum topic (`Forum: https://...`) or the
    issue (`Closes #...`) when one exists, so the release automations can
    notify and close it.
-5. Nothing in the diff belongs to the restricted list above.
+5. The change is a fix, a device or an integration change, not a feature in
+   disguise.
 
 Merge with the merge queue ("Merge when ready"), never by bypassing it.
 
@@ -113,7 +124,7 @@ Two entry points prepare a release, in the **Actions** tab:
 | Workflow | Bump | Who may start it |
 | --- | --- | --- |
 | **Prepare patch release** | `X.Y.Z` → `X.Y.Z+1`, fixes only | Anyone with write access |
-| **Prepare minor / major release** | `X.Y.Z` → `X.Y+1.0` or `X+1.0.0` | The release managers listed in the workflow file (`RELEASE_MANAGERS`) |
+| **Prepare minor / major release** | `X.Y.Z` → `X.Y+1.0` or `X+1.0.0` | The maintainers listed in the workflow file (`RELEASE_MANAGERS`) |
 
 Both create a `release/vX.Y.Z` branch with the version bump and stop there.
 Then:
@@ -121,8 +132,8 @@ Then:
 1. A human opens the release pull request from that branch (the link is in
    the workflow summary). GitHub does not run the required checks on a pull
    request opened by the workflow token, so it cannot be automated.
-2. A member of `release` who is **not** the author of that pull request
-   approves it (`package.json` is a restricted path).
+2. A member of `release` (or a maintainer) who is **not** the author of that
+   pull request approves it: the root `package.json` is owned by `release`.
 3. The pull request is merged through the merge queue. The tag, the
    production images, the demo website and the API documentation follow
    automatically.
@@ -133,12 +144,12 @@ member of `release` reviews and approves it.
 
 A patch release contains fixes only. Anything that adds a feature, a device
 category, an integration or a migration waits for a minor release, and
-therefore for a release manager.
+therefore for a maintainer.
 
 ## Bots and automations
 
 - **Automated reviews** (`/cursor review`, CodeRabbit) run on every pull
-  request, see `CONTRIBUTING.md`. Maintainers can trigger one with the
+  request, see `CONTRIBUTING.md`. Core members can trigger one with the
   `needs:cursor-review` label.
 - **Claude autofix** (`.github/CLAUDE_AUTOFIX.md`) runs on the lead
   maintainer's account and pushes to `claude/` branches under their identity.
@@ -152,13 +163,13 @@ therefore for a release manager.
 ## Emergencies
 
 - **Security report** received through the private channels of
-  `SECURITY.md`: acknowledge it, keep it private, and reach the release team
+  `SECURITY.md`: acknowledge it, keep it private, and reach a maintainer
   before any public fix. A fix for a vulnerability is a patch release.
 - **Broken release** (users cannot upgrade or Gladys does not start): revert
   the offending pull request on `master` through a normal pull request, then
   ship a patch release. Never rewrite `master` or delete a tag.
-- **A member of the release team is unreachable**: the other one decides. If
-  both are, the fix waits; a wrong release hurts more users than a late one.
+- **Nobody from `release` is reachable**: the fix waits. A wrong release
+  hurts more users than a late one.
 
 ## Onboarding and offboarding
 

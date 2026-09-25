@@ -5,7 +5,7 @@ name: Prepare release (reusable)
 # by the two entry points of the Actions tab, which decide who may start it.
 #
 #   prepare-release-patch.yml         patch release, any member with write
-#   prepare-release-minor-major.yml   minor/major release, release managers
+#   prepare-release-minor-major.yml   minor/major release, maintainers only
 #
 # See .github/MAINTAINERS.md for the release process.
 on:
@@ -104,7 +104,8 @@ jobs:
             echo "automatically opened one would stay blocked on them forever."
             echo ""
             echo "The author of the pull request cannot approve it: a member of the"
-            echo "release team other than the author has to (see .github/CODEOWNERS)."
+            echo "release team or a maintainer other than the author has to (see"
+            echo ".github/CODEOWNERS)."
             echo ""
             echo "Once it is merged, the \`Create release tag\` workflow tags \`${TAG}\` on"
             echo "master and starts the production images, demo website and apidoc builds."

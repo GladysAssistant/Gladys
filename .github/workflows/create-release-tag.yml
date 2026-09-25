@@ -4,7 +4,7 @@ name: Create release tag
 # came from the "Prepare patch release" / "Prepare minor / major release"
 # workflows or was pushed by hand. Editing the version field in an unrelated
 # pull request therefore ships a release: it is not a casually editable field,
-# and .github/CODEOWNERS reserves it to the release team.
+# and .github/CODEOWNERS reserves it to the release team and the maintainers.
 on:
   push:
     branches:

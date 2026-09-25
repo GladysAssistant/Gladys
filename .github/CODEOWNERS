@@ -1,64 +1,96 @@
 # Code owners of the Gladys repository.
 #
 # GitHub reads this file with "Require review from Code Owners" enabled on
-# master: a pull request can only be merged once a member of the owning team
+# master: a pull request can only be merged once a member of an owning team
 # of EVERY file it touches has approved it. The author of a pull request can
-# never approve it, so a maintainer's own PR still needs another maintainer.
+# never approve it.
 #
 # Review bots (cursor[bot], coderabbitai[bot]) are GitHub Apps, not members of
 # these teams: their approval never satisfies this file. Keep it that way.
 #
-# Last matching pattern wins, so the default comes first and the restricted
-# paths after it. Teams are referenced by slug, and a team only counts as a
-# code owner when it has explicit write access (or more) to this repository.
+# Last matching pattern wins. The file is built in four layers:
+#   1. everything belongs to the maintainers;
+#   2. the areas open to the core team are listed explicitly;
+#   3. inside those areas, the sensitive paths are closed again;
+#   4. the release files are opened to the release team.
+# A new directory is therefore maintainers-only until it is opened here.
 #
-# The teams and the rules they enforce are described in MAINTAINERS.md.
+# Teams are referenced by slug, and a team only counts as a code owner when it
+# has explicit write access (or more) to this repository. The teams and the
+# rules they enforce are described in MAINTAINERS.md.
 
 # ---------------------------------------------------------------------------
-# Default: any maintainer can approve
+# 1. Default: maintainers only
 # ---------------------------------------------------------------------------
-*                                        @GladysAssistant/core
+*                                                   @GladysAssistant/maintainers
 
 # ---------------------------------------------------------------------------
-# Release and build chain: release team only
+# 2. Core team scope: fixes, devices and internal integrations
 # ---------------------------------------------------------------------------
-# A version bump merged on master creates the release tag and ships production
-# images (see .github/workflows/create-release-tag.yml).
-/package.json                            @GladysAssistant/release
-/package-lock.json                       @GladysAssistant/release
-# Workflows run with the repository secrets, and this very file lives here.
-/.github/                                @GladysAssistant/release
-/docker/                                 @GladysAssistant/release
-/codecov.yml                             @GladysAssistant/release
+# Server code and its tests.
+/server/lib/                                        @GladysAssistant/core @GladysAssistant/maintainers
+/server/api/                                        @GladysAssistant/core @GladysAssistant/maintainers
+/server/services/                                   @GladysAssistant/core @GladysAssistant/maintainers
+/server/utils/                                      @GladysAssistant/core @GladysAssistant/maintainers
+/server/test/                                       @GladysAssistant/core @GladysAssistant/maintainers
+# Front code, translations and end-to-end tests.
+/front/src/                                         @GladysAssistant/core @GladysAssistant/maintainers
+/front/cypress/                                     @GladysAssistant/core @GladysAssistant/maintainers
 
 # ---------------------------------------------------------------------------
-# Dependencies (supply chain): release team only
+# 3. Closed again inside the core scope: maintainers only
 # ---------------------------------------------------------------------------
-/server/package.json                     @GladysAssistant/release
-/server/package-lock.json                @GladysAssistant/release
-/front/package.json                      @GladysAssistant/release
-/front/package-lock.json                 @GladysAssistant/release
-
-# ---------------------------------------------------------------------------
-# Data model, authentication, Gladys Plus, system: release team only
-# ---------------------------------------------------------------------------
-# Migrations run on every user install at upgrade and cannot be taken back.
-/server/migrations/                      @GladysAssistant/release
-/server/models/                          @GladysAssistant/release
-/server/lib/user/                        @GladysAssistant/release
-/server/lib/session/                     @GladysAssistant/release
-/server/api/middlewares/                 @GladysAssistant/release
-/server/lib/gateway/                     @GladysAssistant/release
-/server/lib/system/                      @GladysAssistant/release
-/server/config/                          @GladysAssistant/release
-
-# ---------------------------------------------------------------------------
-# Contracts and living specifications: release team only
-# ---------------------------------------------------------------------------
+# Data model. Migrations run on every user install at upgrade and cannot be
+# taken back. (Not in the core scope above, listed for clarity.)
+/server/migrations/                                 @GladysAssistant/maintainers
+/server/models/                                     @GladysAssistant/maintainers
+# Gladys Plus (gateway): server side.
+/server/lib/gateway/                                @GladysAssistant/maintainers
+/server/api/setupGateway.js                         @GladysAssistant/maintainers
+# Gladys Plus: front side.
+/front/src/actions/gateway.js                       @GladysAssistant/maintainers
+/front/src/actions/gatewayLinkUser.js               @GladysAssistant/maintainers
+/front/src/actions/login/loginGateway.js            @GladysAssistant/maintainers
+/front/src/components/gateway/                      @GladysAssistant/maintainers
+/front/src/routes/gateway-*/                        @GladysAssistant/maintainers
+/front/src/routes/login-gateway/                    @GladysAssistant/maintainers
+/front/src/routes/signup-gateway/                   @GladysAssistant/maintainers
+/front/src/routes/signup/2-create-account-gladys-gateway/ @GladysAssistant/maintainers
+/front/src/routes/settings/settings-gateway*/       @GladysAssistant/maintainers
+/front/src/utils/GatewayHttpClient.js               @GladysAssistant/maintainers
+/front/src/utils/GatewaySession.js                  @GladysAssistant/maintainers
+/front/src/utils/gatewayBinaryBody.js               @GladysAssistant/maintainers
+/front/src/utils/gladysPlusUrl.js                   @GladysAssistant/maintainers
+# Authentication, sessions, HTTP server and system (Docker) control.
+/server/lib/user/                                   @GladysAssistant/maintainers
+/server/lib/session/                                @GladysAssistant/maintainers
+/server/lib/http/                                   @GladysAssistant/maintainers
+/server/lib/system/                                 @GladysAssistant/maintainers
+/server/api/middlewares/                            @GladysAssistant/maintainers
+/server/config/                                     @GladysAssistant/maintainers
+# External integrations framework (supervisor, host API), spec-driven.
+/server/lib/external-integration/                   @GladysAssistant/maintainers
 # Device feature categories and types are a cross-integration contract, see
 # docs/specs/device-feature-categories.md.
-/server/utils/constants.js               @GladysAssistant/release
-/docs/specs/                             @GladysAssistant/release
-/AGENTS.md                               @GladysAssistant/release
-/SECURITY.md                             @GladysAssistant/release
-/LICENSE                                 @GladysAssistant/release
+/server/utils/constants.js                          @GladysAssistant/maintainers
+# Dependencies (supply chain), including a new dependency in an integration.
+/server/package.json                                @GladysAssistant/maintainers
+/server/package-lock.json                           @GladysAssistant/maintainers
+/server/services/*/package.json                     @GladysAssistant/maintainers
+/server/services/*/package-lock.json                @GladysAssistant/maintainers
+/front/package.json                                 @GladysAssistant/maintainers
+/front/package-lock.json                            @GladysAssistant/maintainers
+# Living specifications, agent instructions, CI, Docker images, this file.
+/docs/specs/                                        @GladysAssistant/maintainers
+/AGENTS.md                                          @GladysAssistant/maintainers
+/.github/                                           @GladysAssistant/maintainers
+/docker/                                            @GladysAssistant/maintainers
+/codecov.yml                                        @GladysAssistant/maintainers
+
+# ---------------------------------------------------------------------------
+# 4. Releases: release team and maintainers
+# ---------------------------------------------------------------------------
+# A version bump merged on master creates the release tag and ships the
+# production images (see .github/workflows/create-release-tag.yml).
+/package.json                                       @GladysAssistant/release @GladysAssistant/maintainers
+/package-lock.json                                  @GladysAssistant/release @GladysAssistant/maintainers
