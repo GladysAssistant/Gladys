@@ -8,15 +8,23 @@ name: Auto-approve maintainer pull requests
 # operated by the lead maintainer. The approval does not merge anything: the
 # merge queue, the required checks and the merge click stay as they are.
 #
-# A pull request is approved when ALL of the following hold:
-#   - it targets master and comes from a branch of this repository (not a fork),
-#   - it is not a draft,
+# A commit is approved when ALL of the following hold:
+#   - the pull request targets master from a branch of this repository (not
+#     a fork),
 #   - its author is one of MAINTAINER_LOGINS,
-#   - the person who caused this event (the author on "opened", the pusher on
-#     "synchronize") is one of MAINTAINER_LOGINS: a push by anyone else is
-#     never approved, and it also dismisses the previous approval through the
-#     ruleset ("dismiss stale reviews", "require approval of the most recent
-#     reviewable push").
+#   - the commit was pushed by one of MAINTAINER_LOGINS: the workflow only
+#     runs on "opened" and "synchronize", where github.actor is the person
+#     who pushed, and it approves drafts too. Marking a draft ready for
+#     review or reopening a pull request does not trigger it, on purpose: a
+#     head pushed by someone else must stay unapproved whatever the author
+#     does afterwards, and a head pushed by the maintainer already carries
+#     its approval from that push.
+#   - the commit is still the head of the pull request when the approval is
+#     posted.
+# A push by anyone else is never approved, and dismisses the previous
+# approval through the ruleset ("dismiss stale reviews"). The ruleset must
+# also require approval of the most recent reviewable push, so that an
+# approval of an older commit can never count for a newer one.
 #
 # SECURITY. The bot token is the most sensitive secret of this repository: a
 # leak would let anyone approve any pull request as a maintainer. It is
@@ -29,7 +37,7 @@ name: Auto-approve maintainer pull requests
 # must remain the only one referencing that environment.
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize]
 
 permissions: {}
 
@@ -48,9 +56,9 @@ env:
 jobs:
   gate:
     name: Check the author and the pusher
-    # Coarse filter so that a runner is not started for every pull request.
+    # Cheap conditions first: a runner still starts for a pull request whose
+    # author pushed to it, and the allowlist is checked in the step below.
     if: >-
-      !github.event.pull_request.draft &&
       github.event.pull_request.base.ref == 'master' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.actor == github.event.pull_request.user.login
@@ -103,17 +111,27 @@ jobs:
             echo "::error::MAINTAINER_BOT_TOKEN belongs to ${TOKEN_LOGIN}, expected ${BOT_LOGIN}."
             exit 1
           fi
+          # Fail closed if the head moved since this event: a push that
+          # landed in between (by anyone) has its own run, and this commit
+          # must not be approved on its behalf.
+          LIVE_SHA=$(gh api "repos/${GH_REPO}/pulls/${PR_NUMBER}" --jq .head.sha)
+          if [ "${LIVE_SHA}" != "${HEAD_SHA}" ]; then
+            echo "Head moved from ${HEAD_SHA} to ${LIVE_SHA}, not approving."
+            exit 0
+          fi
           # Idempotent: a re-run must not stack approvals of the same commit.
+          # --paginate runs the filter once per page, so list the matching
+          # review ids and test for an empty result instead of counting.
           ALREADY=$(gh api --paginate "repos/${GH_REPO}/pulls/${PR_NUMBER}/reviews" \
-            --jq "[.[] | select(.state == \"APPROVED\" and .commit_id == \"${HEAD_SHA}\" and (.user.login | ascii_downcase) == \"${BOT_LOGIN,,}\")] | length")
-          if [ "${ALREADY}" != "0" ]; then
-            echo "Commit ${HEAD_SHA} is already approved by ${BOT_LOGIN}."
+            --jq ".[] | select(.state == \"APPROVED\" and .commit_id == \"${HEAD_SHA}\" and (.user.login | ascii_downcase) == \"${BOT_LOGIN,,}\") | .id")
+          if [ -n "${ALREADY}" ]; then
+            echo "Commit ${HEAD_SHA} is already approved by ${BOT_LOGIN} (review ${ALREADY})."
             exit 0
           fi
           # commit_id pins the approval to the reviewed commit: a push that
-          # lands in between is not covered by it.
+          # lands after it is not covered by it.
           gh api -X POST "repos/${GH_REPO}/pulls/${PR_NUMBER}/reviews" \
             -f event=APPROVE \
             -f commit_id="${HEAD_SHA}" \
-            -f body="Automatic approval: this pull request was opened and last pushed by a maintainer (${PR_AUTHOR}). See \`.github/MAINTAINERS.md\`." \
+            -f body="Automatic approval: this commit was pushed by a maintainer (${PR_AUTHOR}) to their own pull request. See \`.github/MAINTAINERS.md\`." \
             --jq '"Approved as " + .user.login + " (review " + (.id | tostring) + ")"'

@@ -42,8 +42,9 @@ of every file the pull request touches. The file is an allowlist:
    `front/src`, `front/cypress`;
 3. inside those areas, the sensitive paths are closed again to
    `maintainers`: migrations and models, Gladys Plus (server gateway, its
-   controller, and the front gateway routes, settings pages, components,
-   actions and utils), authentication and sessions, HTTP server, system
+   controller, and the front gateway routes, the settings pages for Gladys
+   Plus, backups, billing and security, components, actions and utils),
+   authentication and sessions, HTTP server, system
    control (libs, controllers and the front settings pages), external
    integrations framework and its controllers, `server/utils/constants.js`,
    every `package.json` and lockfile including the ones of the
@@ -157,13 +158,23 @@ therefore for a maintainer.
 The `maintainers` team is one person, and GitHub never lets an author
 approve their own pull request. The workflow
 `.github/workflows/auto-approve-maintainer-prs.yml` therefore approves, as
-`gladys-maintainer-bot`, every pull request that:
+`gladys-maintainer-bot`, every commit that:
 
-- targets `master` from a branch of this repository, and is not a draft;
-- was opened by the lead maintainer;
-- was last pushed by the lead maintainer. A push by anyone else is never
-  approved, and the ruleset dismisses the previous approval ("dismiss stale
-  reviews", "require approval of the most recent reviewable push").
+- belongs to a pull request targeting `master` from a branch of this
+  repository (drafts included), opened by the lead maintainer;
+- was pushed by the lead maintainer. The workflow only runs when a pull
+  request is opened or receives a push, and only when the pusher is the
+  author: marking a draft ready or reopening a pull request never triggers
+  an approval, so a head pushed by someone else stays unapproved whatever
+  happens next;
+- is still the head of the pull request when the approval is posted.
+
+A push by anyone else is never approved, and the ruleset dismisses the
+previous approval ("dismiss stale reviews"). The ruleset also has to require
+approval of the most recent reviewable push (see the setup notes in the pull
+request that introduced this file): without that option, an approval of an
+older commit could still count after a later push, so it is part of the
+mechanism, not optional hygiene.
 
 The approval is pinned to the reviewed commit and does not merge anything:
 the merge queue, the required checks and the merge click are unchanged. The

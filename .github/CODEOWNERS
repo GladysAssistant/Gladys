@@ -60,6 +60,7 @@
 /front/src/routes/settings/settings-gateway*/       @GladysAssistant/maintainers
 /front/src/routes/settings/settings-backup/         @GladysAssistant/maintainers
 /front/src/routes/settings/settings-billing/        @GladysAssistant/maintainers
+/front/src/routes/settings/settings-security/       @GladysAssistant/maintainers
 /front/src/utils/GatewayHttpClient.js               @GladysAssistant/maintainers
 /front/src/utils/GatewaySession.js                  @GladysAssistant/maintainers
 /front/src/utils/gatewayBinaryBody.js               @GladysAssistant/maintainers
