@@ -94,7 +94,13 @@
     ],
     "name": "CCT5015 device",
     "model": "CCT5015",
-    "should_poll": false
+    "should_poll": false,
+    "params": [
+      {
+        "name": "IEEE_ADDRESS",
+        "value": "0x00124b0024329b96"
+      }
+    ]
   },
   "values": [
     {
