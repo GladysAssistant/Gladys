@@ -24,6 +24,13 @@ async function pull(repoTag, onProgress = logger.trace) {
         if (finishErr) {
           return reject(finishErr);
         }
+        // Docker answers 200 as soon as the download starts: a failure during
+        // it (full disk, lost connection...) only shows up as an `error` event
+        // in the progress stream, which followProgress does not reject on.
+        const failure = output.find((progressEvent) => progressEvent.error);
+        if (failure) {
+          return reject(new Error((failure.errorDetail && failure.errorDetail.message) || failure.error));
+        }
         return resolve(output);
       },
       onProgress,

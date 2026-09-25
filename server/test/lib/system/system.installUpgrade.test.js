@@ -85,6 +85,64 @@ describe('system.installUpgrade', () => {
     expect(getUpgradeErrors()).to.deep.equal([]);
   });
 
+  it('should download the Gladys image before running Watchtower', async () => {
+    system.pull = fake.resolves([]);
+
+    await system.installUpgrade();
+
+    expect(system.pull.firstCall.args).to.deep.equal(['gladysassistant/gladys:v4']);
+    expect(system.pull.secondCall.args).to.deep.equal(['nickfedor/watchtower:1.20.2']);
+    assert.called(system.dockerode.createContainer);
+    expect(getUpgradeErrors()).to.deep.equal([]);
+  });
+
+  it('should report the Docker error when the Gladys image cannot be downloaded', async () => {
+    system.pull = fake.rejects(new Error('toomanyrequests: You have reached your pull rate limit.'));
+
+    await system.installUpgrade();
+
+    assert.calledOnce(system.pull);
+    assert.notCalled(system.dockerode.createContainer);
+    expect(getUpgradeErrors()).to.deep.equal([
+      {
+        code: SYSTEM_UPGRADE_ERROR_CODES.IMAGE_PULL_FAILED,
+        image: 'gladysassistant/gladys:v4',
+        message: 'toomanyrequests: You have reached your pull rate limit.',
+      },
+    ]);
+  });
+
+  it('should report a full disk when the Gladys image cannot be written', async () => {
+    const message = 'failed to register layer: write /usr/lib/node_modules/foo: no space left on device';
+    system.pull = fake.rejects(new Error(message));
+
+    await system.installUpgrade();
+
+    assert.notCalled(system.dockerode.createContainer);
+    expect(getUpgradeErrors()).to.deep.equal([
+      { code: SYSTEM_UPGRADE_ERROR_CODES.NOT_ENOUGH_DISK_SPACE, image: 'gladysassistant/gladys:v4', message },
+    ]);
+  });
+
+  it('should report an error when the Gladys image download never finishes', async () => {
+    const clock = sandbox.useFakeTimers();
+    // the abandoned pull rejects after the timeout: it must be swallowed
+    system.pull = () =>
+      new Promise((resolve, reject) => {
+        setTimeout(() => reject(new Error('DAEMON_DIED')), 20 * 60 * 1000);
+      });
+
+    const upgrade = system.installUpgrade();
+    await clock.tickAsync(15 * 60 * 1000);
+    await upgrade;
+
+    assert.notCalled(system.dockerode.createContainer);
+    expect(getUpgradeErrors()).to.deep.equal([{ code: SYSTEM_UPGRADE_ERROR_CODES.WATCHTOWER_TIMEOUT }]);
+
+    // deliver the late rejection while the swallowing catch is attached
+    await clock.tickAsync(5 * 60 * 1000);
+  });
+
   it('should only upgrade the Gladys container', async () => {
     await system.installUpgrade();
 
@@ -140,7 +198,13 @@ describe('system.installUpgrade', () => {
   });
 
   it('should report an error when the Watchtower run throws', async () => {
-    system.pull = fake.rejects(new Error('UNABLE_TO_PULL_IMAGE'));
+    // the Gladys image downloads fine, the Watchtower one does not
+    system.pull = sinon
+      .stub()
+      .onFirstCall()
+      .resolves([])
+      .onSecondCall()
+      .rejects(new Error('UNABLE_TO_PULL_IMAGE'));
 
     await system.installUpgrade();
 

@@ -68,6 +68,47 @@ describe('system.pull', () => {
     assert.calledOnce(onProgress);
   });
 
+  it('should fail when Docker reports an error in the progress stream', async () => {
+    // Docker answers 200 then streams the failure: followProgress resolves
+    system.dockerode.modem.followProgress = (stream, onFinished) =>
+      onFinished(null, [
+        { status: 'Downloading' },
+        {
+          errorDetail: { message: 'write /var/lib/docker/tmp/GetImageBlob123: no space left on device' },
+          error: 'write /var/lib/docker/tmp/GetImageBlob123: no space left on device',
+        },
+      ]);
+
+    try {
+      await system.pull('gladysassistant/gladys:v4');
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e).to.have.property('message', 'write /var/lib/docker/tmp/GetImageBlob123: no space left on device');
+    }
+  });
+
+  it('should fail when the progress stream breaks', async () => {
+    system.dockerode.modem.followProgress = (stream, onFinished) => onFinished(new Error('SOCKET_CLOSED'), []);
+
+    try {
+      await system.pull('gladysassistant/gladys:v4');
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e).to.have.property('message', 'SOCKET_CLOSED');
+    }
+  });
+
+  it('should fail when the progress stream error has no detail', async () => {
+    system.dockerode.modem.followProgress = (stream, onFinished) => onFinished(null, [{ error: 'unexpected EOF' }]);
+
+    try {
+      await system.pull('gladysassistant/gladys:v4');
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e).to.have.property('message', 'unexpected EOF');
+    }
+  });
+
   it('should fail downloading upgrade', async () => {
     const tag = 'fail';
     const onProgress = fake.returns(null);
