@@ -19,7 +19,7 @@ organization. Nobody is added to the repository as an individual collaborator.
 | Team | Repository role | Who | Scope |
 | --- | --- | --- | --- |
 | `@GladysAssistant/maintainers` | Maintain | The lead maintainer, and `gladys-maintainer-bot`, a machine account they operate (see [Automatic approval](#automatic-approval-of-the-maintainers-pull-requests)) | Everything: features, fixes, data model, Gladys Plus, dependencies, CI, releases of any kind. Default owner of every file. |
-| `@GladysAssistant/core` | Write | Trusted community maintainers | Fixes in the core, new devices and fixes in the internal integrations, translations, tests. No large feature, no data model change, no Gladys Plus, no dependency. |
+| `@GladysAssistant/core` | Write | Trusted community maintainers | Fixes in the core, new devices and fixes in the internal integrations (their dependencies included), translations, tests. No large feature, no data model change, no Gladys Plus, no server or front dependency. |
 | `@GladysAssistant/release` | Write | The lead maintainer and a backup | Approve the release pull requests, so that a patch release can ship without the lead maintainer. |
 | `@GladysAssistant/triage` | Triage | Active community contributors | Label and close issues, request reviews, no push. |
 
@@ -44,11 +44,13 @@ of every file the pull request touches. The file is an allowlist:
    `maintainers`: migrations and models, Gladys Plus (server gateway, its
    controller, and the front gateway routes, the settings pages for Gladys
    Plus, backups, billing and security, components, actions and utils),
-   authentication and sessions, HTTP server, system
-   control (libs, controllers and the front settings pages), external
-   integrations framework and its controllers, `server/utils/constants.js`,
-   every `package.json` and lockfile including the ones of the
-   integrations, `docs/specs`, `AGENTS.md`, `.github`, `docker`;
+   authentication and sessions, HTTP server, route table and websockets,
+   system control (libs, controllers and the front settings pages),
+   external integrations framework and its controllers,
+   `server/utils/constants.js`, the `package.json` and lockfile of the
+   server and of the front (the ones of the integrations under
+   `server/services/*/` stay open), `docs/specs`, `AGENTS.md`, `.github`,
+   `docker`;
 4. the root `package.json` and lockfile, which carry the version, are open
    to `release`.
 
@@ -62,6 +64,11 @@ A few consequences worth knowing:
   backup needs the other member of `release`. The lead maintainer's own
   pull requests are approved by `gladys-maintainer-bot`, see
   [Automatic approval](#automatic-approval-of-the-maintainers-pull-requests).
+- **Never merge, nor mark ready, a pull request of the lead maintainer.**
+  GitHub lets anyone with write access merge an approved pull request, and
+  the bot approves the lead maintainer's own commits, drafts included. That
+  merge is theirs to click: leave their pull requests alone, whatever their
+  state, unless they asked you to.
 - **A review bot's approval does not count.** `cursor[bot]` and
   `coderabbitai[bot]` review every pull request and may approve it; they are
   not code owners, so a human approval is still required. Their review is an
@@ -78,7 +85,8 @@ With another core member's approval, a member of `core` merges on their own:
 - new Zigbee2MQTT, Z-Wave, Matter, Tuya, Xiaomi... devices, mappings and
   exposes inside an existing integration;
 - fixes and small improvements to an existing internal integration under
-  `server/services/`;
+  `server/services/`, including a dependency bump in its `package.json`
+  when that is the fix;
 - translations, and documentation inside the areas open to `core` (the
   `README.md` and `docs/` are maintainers-only);
 - tests, lint and small refactors that do not change behavior.
@@ -88,6 +96,8 @@ following wait for a maintainer even when the paths are open:
 
 - a new feature of any size in the core (dashboard, scenes, devices, chat,
   calendar...), or a new integration;
+- a new dependency in an integration, as opposed to a bump of an existing
+  one;
 - a new device feature category or type (`DEVICE_FEATURE_CATEGORIES`,
   `DEVICE_FEATURE_TYPES`), which is a contract for every integration and is
   closed anyway through `server/utils/constants.js`;
@@ -177,9 +187,18 @@ older commit could still count after a later push, so it is part of the
 mechanism, not optional hygiene.
 
 The approval is pinned to the reviewed commit and does not merge anything:
-the merge queue, the required checks and the merge click are unchanged. The
-lead maintainer remains the only person who can land a change on a
-maintainers-only path, with or without the bot.
+the merge queue, the required checks and the merge click are unchanged.
+What the bot guarantees is that only commits pushed by the lead maintainer
+can be approved on their pull requests: nobody can add code to them and get
+it approved. What it does not prevent is another member with write access
+merging such an approved pull request, or marking a draft ready: GitHub
+allows that for any approved pull request. That is the trust rule above,
+"never merge, nor mark ready, a pull request of the lead maintainer".
+
+Two rules for the lead maintainer, since the workflow trusts the event
+actor: never open a pull request from a branch you did not push yourself
+(on "opened", GitHub reports who opened the pull request, not who pushed
+the branch), and keep a pull request in draft until it is ready to land.
 
 The bot token is not a repository secret: it lives in the
 `maintainer-auto-approve` environment, whose deployment branch policy only

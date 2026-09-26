@@ -47,6 +47,7 @@
 # Gladys Plus (gateway): server side.
 /server/lib/gateway/                                @GladysAssistant/maintainers
 /server/api/setupGateway.js                         @GladysAssistant/maintainers
+/front/src/config.js                                @GladysAssistant/maintainers
 /server/api/controllers/gateway.controller.js       @GladysAssistant/maintainers
 # Gladys Plus: front side.
 /front/src/actions/gateway.js                       @GladysAssistant/maintainers
@@ -72,6 +73,12 @@
 /server/lib/http/                                   @GladysAssistant/maintainers
 /server/lib/system/                                 @GladysAssistant/maintainers
 /server/api/middlewares/                            @GladysAssistant/maintainers
+# The route table wires the auth middlewares on the controllers above, and
+# the websocket server authenticates its clients. Adding a route is a feature
+# anyway, so closing these costs core nothing.
+/server/api/routes.js                               @GladysAssistant/maintainers
+/server/api/setupRoutes.js                          @GladysAssistant/maintainers
+/server/api/websockets/                             @GladysAssistant/maintainers
 /server/api/controllers/user.controller.js          @GladysAssistant/maintainers
 /server/api/controllers/session.controller.js       @GladysAssistant/maintainers
 /server/api/controllers/http.controller.js          @GladysAssistant/maintainers
@@ -88,11 +95,11 @@
 # Device feature categories and types are a cross-integration contract, see
 # docs/specs/device-feature-categories.md.
 /server/utils/constants.js                          @GladysAssistant/maintainers
-# Dependencies (supply chain), including a new dependency in an integration.
+# Dependencies of the server and the front (supply chain). The package.json
+# of an internal integration (server/services/*/package.json) stays open to
+# core: bumping a dependency is sometimes the only fix for an integration.
 /server/package.json                                @GladysAssistant/maintainers
 /server/package-lock.json                           @GladysAssistant/maintainers
-/server/services/*/package.json                     @GladysAssistant/maintainers
-/server/services/*/package-lock.json                @GladysAssistant/maintainers
 /front/package.json                                 @GladysAssistant/maintainers
 /front/package-lock.json                            @GladysAssistant/maintainers
 # Living specifications, agent instructions, CI, Docker images, this file.
