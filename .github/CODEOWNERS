@@ -1,0 +1,118 @@
+# Code owners of the Gladys repository.
+#
+# GitHub reads this file with "Require review from Code Owners" enabled on
+# master: a pull request can only be merged once a member of an owning team
+# of EVERY file it touches has approved it. The author of a pull request can
+# never approve it.
+#
+# Review bots (cursor[bot], coderabbitai[bot]) are GitHub Apps, not members of
+# these teams: their approval never satisfies this file. Keep it that way.
+#
+# Last matching pattern wins. The file is built in four layers:
+#   1. everything belongs to the maintainers;
+#   2. the areas open to the core team are listed explicitly;
+#   3. inside those areas, the sensitive paths are closed again;
+#   4. the release files are opened to the release team.
+# A new directory is therefore maintainers-only until it is opened here.
+#
+# Teams are referenced by slug, and a team only counts as a code owner when it
+# has explicit write access (or more) to this repository. The teams and the
+# rules they enforce are described in MAINTAINERS.md.
+
+# ---------------------------------------------------------------------------
+# 1. Default: maintainers only
+# ---------------------------------------------------------------------------
+*                                                   @GladysAssistant/maintainers
+
+# ---------------------------------------------------------------------------
+# 2. Core team scope: fixes, devices and internal integrations
+# ---------------------------------------------------------------------------
+# Server code and its tests.
+/server/lib/                                        @GladysAssistant/core @GladysAssistant/maintainers
+/server/api/                                        @GladysAssistant/core @GladysAssistant/maintainers
+/server/services/                                   @GladysAssistant/core @GladysAssistant/maintainers
+/server/utils/                                      @GladysAssistant/core @GladysAssistant/maintainers
+/server/test/                                       @GladysAssistant/core @GladysAssistant/maintainers
+# Front code, translations and end-to-end tests.
+/front/src/                                         @GladysAssistant/core @GladysAssistant/maintainers
+/front/cypress/                                     @GladysAssistant/core @GladysAssistant/maintainers
+
+# ---------------------------------------------------------------------------
+# 3. Closed again inside the core scope: maintainers only
+# ---------------------------------------------------------------------------
+# Data model. Migrations run on every user install at upgrade and cannot be
+# taken back. (Not in the core scope above, listed for clarity.)
+/server/migrations/                                 @GladysAssistant/maintainers
+/server/models/                                     @GladysAssistant/maintainers
+# Gladys Plus (gateway): server side.
+/server/lib/gateway/                                @GladysAssistant/maintainers
+/server/api/setupGateway.js                         @GladysAssistant/maintainers
+/front/src/config.js                                @GladysAssistant/maintainers
+/server/api/controllers/gateway.controller.js       @GladysAssistant/maintainers
+# Gladys Plus: front side.
+/front/src/actions/gateway.js                       @GladysAssistant/maintainers
+/front/src/actions/gatewayLinkUser.js               @GladysAssistant/maintainers
+/front/src/actions/login/loginGateway.js            @GladysAssistant/maintainers
+/front/src/components/gateway/                      @GladysAssistant/maintainers
+/front/src/routes/gateway-*/                        @GladysAssistant/maintainers
+/front/src/routes/login-gateway/                    @GladysAssistant/maintainers
+/front/src/routes/signup-gateway/                   @GladysAssistant/maintainers
+/front/src/routes/signup/2-create-account-gladys-gateway/ @GladysAssistant/maintainers
+/front/src/routes/settings/settings-gateway*/       @GladysAssistant/maintainers
+/front/src/routes/settings/settings-backup/         @GladysAssistant/maintainers
+/front/src/routes/settings/settings-billing/        @GladysAssistant/maintainers
+/front/src/routes/settings/settings-security/       @GladysAssistant/maintainers
+/front/src/utils/GatewayHttpClient.js               @GladysAssistant/maintainers
+/front/src/utils/GatewaySession.js                  @GladysAssistant/maintainers
+/front/src/utils/gatewayBinaryBody.js               @GladysAssistant/maintainers
+/front/src/utils/gladysPlusUrl.js                   @GladysAssistant/maintainers
+# Authentication, sessions, HTTP server and system (Docker) control: the
+# libs, their HTTP controllers, and the matching front.
+/server/lib/user/                                   @GladysAssistant/maintainers
+/server/lib/session/                                @GladysAssistant/maintainers
+/server/lib/http/                                   @GladysAssistant/maintainers
+/server/lib/system/                                 @GladysAssistant/maintainers
+/server/api/middlewares/                            @GladysAssistant/maintainers
+# The route table wires the auth middlewares on the controllers above, and
+# the websocket server authenticates its clients. Adding a route is a feature
+# anyway, so closing these costs core nothing.
+/server/api/routes.js                               @GladysAssistant/maintainers
+/server/api/setupRoutes.js                          @GladysAssistant/maintainers
+/server/api/websockets/                             @GladysAssistant/maintainers
+/server/api/controllers/user.controller.js          @GladysAssistant/maintainers
+/server/api/controllers/session.controller.js       @GladysAssistant/maintainers
+/server/api/controllers/http.controller.js          @GladysAssistant/maintainers
+/server/api/controllers/system.controller.js        @GladysAssistant/maintainers
+/server/api/controllers/system.controller.helpers.js @GladysAssistant/maintainers
+/server/config/                                     @GladysAssistant/maintainers
+/front/src/actions/session.js                       @GladysAssistant/maintainers
+/front/src/actions/system.js                        @GladysAssistant/maintainers
+/front/src/routes/settings/settings-system/         @GladysAssistant/maintainers
+# External integrations framework (supervisor, host API), spec-driven.
+/server/lib/external-integration/                   @GladysAssistant/maintainers
+/server/api/controllers/externalIntegration.controller.js @GladysAssistant/maintainers
+/server/api/controllers/integrationHost.controller.js @GladysAssistant/maintainers
+# Device feature categories and types are a cross-integration contract, see
+# docs/specs/device-feature-categories.md.
+/server/utils/constants.js                          @GladysAssistant/maintainers
+# Dependencies of the server and the front (supply chain). The package.json
+# of an internal integration (server/services/*/package.json) stays open to
+# core: bumping a dependency is sometimes the only fix for an integration.
+/server/package.json                                @GladysAssistant/maintainers
+/server/package-lock.json                           @GladysAssistant/maintainers
+/front/package.json                                 @GladysAssistant/maintainers
+/front/package-lock.json                            @GladysAssistant/maintainers
+# Living specifications, agent instructions, CI, Docker images, this file.
+/docs/specs/                                        @GladysAssistant/maintainers
+/AGENTS.md                                          @GladysAssistant/maintainers
+/.github/                                           @GladysAssistant/maintainers
+/docker/                                            @GladysAssistant/maintainers
+/codecov.yml                                        @GladysAssistant/maintainers
+
+# ---------------------------------------------------------------------------
+# 4. Releases: release team and maintainers
+# ---------------------------------------------------------------------------
+# A version bump merged on master creates the release tag and ships the
+# production images (see .github/workflows/create-release-tag.yml).
+/package.json                                       @GladysAssistant/release @GladysAssistant/maintainers
+/package-lock.json                                  @GladysAssistant/release @GladysAssistant/maintainers
