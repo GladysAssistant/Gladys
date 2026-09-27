@@ -173,7 +173,7 @@ class SchedulePageComponent extends Component {
             rather than only what it is called — the editor has to be opened
             otherwise, and two schedules named "Semaine" look alike. Same points,
             same shared helper and same colours as the editor's own bars. */}
-          <div class="card-body py-2">
+          <div class="card-body">
             <div class={style.weekPreview}>
               {WEEK_DAYS.map(day => (
                 <div key={day} class={style.weekPreviewRow}>
@@ -228,14 +228,16 @@ class SchedulePageComponent extends Component {
                   </button>
                 </span>
               ))}
-              {/* Attaching from here is what removes the round trip: the schedule was
-            otherwise created here and attached from each thermostat's edit page.
-            Only shown when something is left to attach. */}
-              {this.attachableThermostats(schedule).length > 0 && (
-                <select
-                  class={`form-control form-control-sm ${style.attachSelect}`}
-                  onChange={e => this.attach(schedule.selector, e)}
-                >
+            </div>
+
+            {/* Attaching from here is what removes the round trip: the schedule
+                was otherwise created here and attached from each thermostat's
+                edit page. On its own line and full width, like the form controls
+                on a thermostat card — inline among the badges it read as one more
+                chip rather than as the way to add one. */}
+            {this.attachableThermostats(schedule).length > 0 && (
+              <div class="mt-3">
+                <select class="form-control" onChange={e => this.attach(schedule.selector, e)}>
                   <option value="">{attachLabel}</option>
                   {this.attachableThermostats(schedule).map(device => (
                     <option key={device.selector} value={device.selector}>
@@ -243,50 +245,56 @@ class SchedulePageComponent extends Component {
                     </option>
                   ))}
                 </select>
-              )}
-              {/* Said next to the select, because it is not obvious: the link's key is
-              the thermostat, so one thermostat follows one schedule and attaching
-              it here silently takes it off whatever it followed. */}
-              {this.attachableThermostats(schedule).length > 0 && (
+                {/* Not obvious, so it is said: the link's key is the thermostat,
+                    so one follows one schedule and attaching it here silently
+                    takes it off whatever it followed. */}
                 <small class="form-text text-muted">
                   <Text id="integration.thermostat.schedule.attachReplacesHelp" />
                 </small>
-              )}
-              {attachFailed === schedule.selector && (
-                <div class="text-danger mt-1">
-                  <Text id="integration.thermostat.schedule.attachError" />
-                </div>
-              )}
-            </div>
+              </div>
+            )}
+            {attachFailed === schedule.selector && (
+              <div class="text-danger mt-1">
+                <Text id="integration.thermostat.schedule.attachError" />
+              </div>
+            )}
 
             {/* At the foot and full width, like the thermostat cards: three
                 buttons beside the name in a half-width card crowd it out. They
                 stay inside this one card-body — stacked bodies draw a divider
                 between each, which is the line that ran above this row. */}
-            <div class={`${style.cardButtons} mt-3`}>
-              <button type="button" class="btn btn-secondary flex-fill" onClick={() => this.startDuplicate(schedule)}>
-                <i class="fe fe-copy mr-1" />
-                <Text id="integration.thermostat.schedule.duplicateButton" />
-              </button>
-              <button type="button" class="btn btn-primary flex-fill" onClick={() => this.startEdit(schedule)}>
-                <i class="fe fe-edit-2 mr-1" />
-                <Text id="integration.thermostat.schedule.editButton" />
-              </button>
-              {confirmDeleteSelector === schedule.selector ? (
-                <span class="d-inline-flex align-items-center">
+            {confirmDeleteSelector === schedule.selector ? (
+              /* The confirmation takes over the whole row, as it does on the
+                 thermostat cards: leaving the other two beside it would put four
+                 buttons in a half-width card and cut their labels. */
+              <div class={`${style.confirmDeleteRow} mt-3`}>
+                <span class={style.confirmDeleteText}>
                   <Text id="integration.thermostat.schedule.confirmDelete" />
+                </span>
+                <div class={style.cardButtons}>
                   <button
                     type="button"
-                    class={cx('btn', 'btn-danger', 'ml-2', 'flex-fill', { 'btn-loading': deleting })}
+                    class={cx('btn', 'btn-danger', 'flex-fill', { 'btn-loading': deleting })}
                     onClick={() => this.handleDelete(schedule.selector)}
                   >
                     <Text id="integration.thermostat.schedule.confirmYes" />
                   </button>
-                  <button type="button" class="btn btn-secondary ml-1 flex-fill" onClick={this.cancelDelete}>
+                  <button type="button" class="btn btn-secondary flex-fill" onClick={this.cancelDelete}>
                     <Text id="integration.thermostat.schedule.confirmNo" />
                   </button>
-                </span>
-              ) : (
+                </div>
+              </div>
+            ) : (
+              /* Delete in the middle, as on the thermostat cards: the same action
+                 in the same place on two lists one tab apart. */
+              <div class={`${style.cardButtons} mt-3`}>
+                {/* Green like the thermostat card's first button: btn-secondary
+                    is a grey that all but disappears against the dark theme, and
+                    duplicating creates a schedule rather than undoing anything. */}
+                <button type="button" class="btn btn-success flex-fill" onClick={() => this.startDuplicate(schedule)}>
+                  <i class="fe fe-copy mr-1" />
+                  <Text id="integration.thermostat.schedule.duplicateButton" />
+                </button>
                 <button
                   type="button"
                   class="btn btn-danger flex-fill"
@@ -295,8 +303,12 @@ class SchedulePageComponent extends Component {
                   <i class="fe fe-trash-2 mr-1" />
                   <Text id="integration.thermostat.schedule.deleteButton" />
                 </button>
-              )}
-            </div>
+                <button type="button" class="btn btn-primary flex-fill" onClick={() => this.startEdit(schedule)}>
+                  <i class="fe fe-edit-2 mr-1" />
+                  <Text id="integration.thermostat.schedule.editButton" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

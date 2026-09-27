@@ -433,15 +433,6 @@
   opacity: 1;
 }
 
-/* Inline with the badges rather than on its own line: it is one more chip in the
-   row, and a full-width select would read as the card's main control. */
-.attachSelect {
-  display: inline-block;
-  width: auto;
-  max-width: 220px;
-  vertical-align: middle;
-}
-
 /* The week at a glance on a schedule card: seven thin bars, one per day, each a
    24-hour track coloured by preset. Small enough that a list of schedules stays
    a list, readable enough to tell two programmes apart without opening them. */
@@ -524,4 +515,22 @@
   flex: 1;
   min-width: 160px;
   gap: 8px;
+}
+
+/* Same shape as the thermostat cards' confirmation: the question goes on its own
+   line on a narrow card, and the two answers keep a usable width. */
+.confirmDeleteRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.confirmDeleteRow .cardButtons {
+  flex: 1;
+  min-width: 160px;
+}
+
+.confirmDeleteText {
+  font-weight: 500;
 }
