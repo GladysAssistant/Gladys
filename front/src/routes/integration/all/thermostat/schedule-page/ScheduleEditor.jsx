@@ -24,6 +24,15 @@ function ensureKeys(ranges) {
   return ranges.map((r, i) => (r.key ? r : { ...r, key: Date.now() + i + Math.random() }));
 }
 
+// The thermostats an editor starts with. A schedule with no selector is being
+// created — a duplicate included — and follows nobody yet.
+function followersFromSchedule(schedule) {
+  if (!schedule || !schedule.selector) {
+    return [];
+  }
+  return (schedule.devices || []).map(device => device.selector);
+}
+
 // The ranges an editor holds, from the points a schedule stores.
 function rangesFromSchedule(schedule) {
   return ensureKeys(transitionsToRanges(schedule ? schedule.transitions || [] : []));
@@ -49,8 +58,14 @@ class ScheduleEditor extends Component {
       name: props.schedule ? props.schedule.name : '',
       house: props.house || null,
       ranges: rangesFromSchedule(props.schedule),
+      // Selectors rather than the device objects: what is saved is which
+      // thermostats follow this schedule, and a duplicate starts from none — it
+      // carries the source's followers in its payload but is a creation, and
+      // attaching them would silently take them off the schedule they follow.
+      followers: followersFromSchedule(props.schedule),
       saving: false,
       error: null,
+      emptyConfirmed: false,
       selectedDay: null,
       lastScheduleSelector: props.schedule ? props.schedule.selector : null,
       copySourceDay: null,
@@ -67,7 +82,9 @@ class ScheduleEditor extends Component {
         name: props.schedule ? props.schedule.name : '',
         house: props.house || null,
         ranges: rangesFromSchedule(props.schedule),
+        followers: followersFromSchedule(props.schedule),
         error: null,
+        emptyConfirmed: false,
         selectedDay: null,
         lastScheduleSelector: incomingSelector,
         newForms: {},
@@ -79,7 +96,18 @@ class ScheduleEditor extends Component {
 
   updateName = e => this.setState({ name: e.target.value });
 
-  updateHouse = e => this.setState({ house: e.target.value });
+  // Changing house drops the ticked thermostats: they belong to the house left
+  // behind, and the server refuses a thermostat from another one. The select is
+  // disabled once something follows the schedule, so this only ever runs while
+  // the choice is still free.
+  updateHouse = e => this.setState({ house: e.target.value, followers: [] });
+
+  toggleFollower = selector =>
+    this.setState(prev => ({
+      followers: prev.followers.includes(selector)
+        ? prev.followers.filter(candidate => candidate !== selector)
+        : [...prev.followers, selector]
+    }));
 
   selectDay = day => {
     this.setState(prev => ({ selectedDay: prev.selectedDay === day ? null : day }));
@@ -279,9 +307,35 @@ class ScheduleEditor extends Component {
     this.setState({ ranges: [...kept, ...copies], copySourceDay: null, copyTargetDays: [] });
   };
 
+  // Attach what was added and detach what was removed. Attaching replaces
+  // whatever a thermostat followed before — the link's key is the thermostat —
+  // which the help text under the checkboxes says.
+  saveFollowers = async selector => {
+    const { httpClient, schedule } = this.props;
+    const wanted = this.state.followers;
+    const before = followersFromSchedule(schedule);
+    const base = `/api/v1/service/thermostat/schedule/${selector}/device`;
+    const added = wanted.filter(device => !before.includes(device));
+    const removed = before.filter(device => !wanted.includes(device));
+    await Promise.all([
+      ...added.map(device => httpClient.post(`${base}/${device}`)),
+      ...removed.map(device => httpClient.delete(`${base}/${device}`))
+    ]);
+  };
+
   save = async () => {
-    const { name, ranges } = this.state;
+    const { name, ranges, emptyConfirmed } = this.state;
     if (!name.trim()) return;
+
+    // A schedule with no point resolves nothing, and the loop then leaves each
+    // thermostat on the preset it already carries (C.2) — so saving this and
+    // attaching a thermostat to it changes nothing, with nothing to show for it.
+    // Asked once rather than refused: an empty schedule is a legitimate step on
+    // the way to filling one in.
+    if (ranges.length === 0 && !emptyConfirmed) {
+      this.setState({ error: 'empty-schedule', emptyConfirmed: true });
+      return;
+    }
 
     this.setState({ saving: true, error: null });
     const scheduleData = {
@@ -299,16 +353,22 @@ class ScheduleEditor extends Component {
       const { house } = this.state;
       // A duplicate arrives as a schedule object with no selector: it is a
       // creation, so gating on the object alone would PATCH /schedule/null.
+      let saved;
       if (schedule && schedule.selector) {
-        await httpClient.patch(`/api/v1/service/thermostat/schedule/${schedule.selector}`, {
+        saved = await httpClient.patch(`/api/v1/service/thermostat/schedule/${schedule.selector}`, {
           ...scheduleData,
           house
         });
       } else {
         // A schedule belongs to a house: that is what makes its name unique per
         // house and keeps a thermostat from following another house's programme.
-        await httpClient.post('/api/v1/service/thermostat/schedule', { ...scheduleData, house });
+        saved = await httpClient.post('/api/v1/service/thermostat/schedule', { ...scheduleData, house });
       }
+      // The followers are a relation of their own, so they are saved after the
+      // schedule and against the selector it now has — a creation has none until
+      // here. Only the difference is sent: attaching a thermostat again would
+      // work, but detaching one that was never attached is an error.
+      await this.saveFollowers(saved ? saved.selector : schedule.selector);
       if (onSaved) onSaved();
     } catch (e) {
       const msg = (e && e.response && e.response.data && e.response.data.message) || true;
@@ -444,6 +504,13 @@ class ScheduleEditor extends Component {
     // source's followers in its payload, but is a creation too.
     const followers = schedule && schedule.selector ? schedule.devices || [] : [];
 
+    // The thermostats that may follow this schedule: those of its house, which a
+    // room places them in. The list is empty until a house is settled, which on a
+    // single-house installation it always is.
+    const currentHouse = (this.props.houses || []).find(candidate => candidate.selector === house);
+    const roomIds = currentHouse ? (currentHouse.rooms || []).map(room => room.id) : [];
+    const thermostatsOfHouse = (this.props.thermostatDevices || []).filter(device => roomIds.includes(device.room_id));
+
     // A range crossing midnight runs into the next morning, so that morning has
     // to be told about it: the week wraps, and Sunday night reaches Monday.
     const carriedByDay = {};
@@ -496,7 +563,41 @@ class ScheduleEditor extends Component {
           </div>
         )}
 
-        {error && (
+        {/* Which thermostats follow this programme, chosen while it is written
+            rather than from the list afterwards. Only the ones of its house: the
+            server refuses the rest (DEVICE_NOT_IN_HOUSE), so a thermostat with no
+            room — which is in no house — is in none of these lists. */}
+        {thermostatsOfHouse.length > 0 && (
+          <div class="form-group">
+            <label class="form-label">
+              <Text id="integration.thermostat.schedule.followersLabel" />
+            </label>
+            {thermostatsOfHouse.map(device => (
+              <label key={device.selector} class="form-check">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  checked={this.state.followers.includes(device.selector)}
+                  onChange={() => this.toggleFollower(device.selector)}
+                />
+                <span class="form-check-label">{device.name}</span>
+              </label>
+            ))}
+            <small class="form-text text-muted">
+              <Text id="integration.thermostat.schedule.followersHelp" />
+            </small>
+          </div>
+        )}
+
+        {/* Not an error: an empty schedule saves on the second press, and the
+            message says what it will do rather than refusing it. */}
+        {error === 'empty-schedule' && (
+          <div class="alert alert-info">
+            <Text id="integration.thermostat.schedule.emptySaveWarning" />
+          </div>
+        )}
+
+        {error && error !== 'empty-schedule' && (
           <div class="alert alert-warning">
             {error === 'overlap' && <Text id="integration.thermostat.schedule.overlapError" />}
             {error === 'duplicate-name' && <Text id="integration.thermostat.schedule.duplicateNameError" />}

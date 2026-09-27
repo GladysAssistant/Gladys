@@ -364,6 +364,7 @@ class SchedulePageComponent extends Component {
             schedule={editingSchedule}
             house={editingHouse}
             houses={houses}
+            thermostatDevices={props.thermostatDevices}
             httpClient={props.httpClient}
             onSaved={this.handleSaved}
             onCancel={this.cancelEditor}
