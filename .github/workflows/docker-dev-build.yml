@@ -42,10 +42,14 @@ jobs:
     needs: build-front
     name: Docker magic !
     runs-on: ubuntu-22.04
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
-      DOCKERHUB_REPO: ${{secrets.DOCKERHUB_REPO}}
+      # The image name is not a secret: an environment variable of `production`.
+      DOCKERHUB_REPO: ${{vars.DOCKERHUB_REPO}}
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
@@ -53,7 +57,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ secrets.DOCKERHUB_REPO }}
+          images: ${{ vars.DOCKERHUB_REPO }}
           labels: |
             org.opencontainers.image.title=Gladys Assistant Preprod Image
       - name: 💽 Set up QEMU
@@ -81,6 +85,6 @@ jobs:
           platforms: ${{ github.event.inputs.platforms }}
           push: true
           pull: true
-          tags: ${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
+          tags: ${{ vars.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
+          cache-from: type=registry,ref=${{ vars.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
           cache-to: type=inline

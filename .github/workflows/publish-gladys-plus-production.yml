@@ -5,6 +5,13 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: ubuntu-latest
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     steps:
       - name: Run Cloudflare Pages deploy hook
-        run: curl -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}"
+        env:
+          DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}
+        # --fail-with-body turns an error answer of Cloudflare (an invalid or
+        # deleted hook, for instance) into a failed job instead of a green one.
+        run: curl --silent --show-error --fail-with-body -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${DEPLOY_HOOK}"

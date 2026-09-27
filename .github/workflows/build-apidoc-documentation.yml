@@ -1,6 +1,8 @@
 name: Build and publish apidoc documentation
 
 on:
+  # Started by the push of the release tag; workflow_dispatch stays for
+  # re-running a failed build on an existing tag.
   workflow_dispatch:
   push:
     tags:
@@ -9,6 +11,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     name: Build and publish apidoc documentation
     steps:
       - uses: actions/checkout@v3
@@ -25,11 +30,8 @@ jobs:
         run: |
           npm run generate-apidoc
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_PUBLISH_TO_PAGES_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: gladysassistant-apidoc
-          directory: ./apidoc
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          command: pages deploy ./apidoc --project-name=gladysassistant-apidoc --branch=main

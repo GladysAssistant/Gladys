@@ -235,6 +235,13 @@ function registerProxyService(service) {
       },
     }),
   });
+  // registering must be idempotent: init() registers every installed
+  // integration at boot and update() registers the updated row again.
+  // stateManager.setState() MERGES into the existing Store, and the proxy is
+  // frozen, so a second registration would throw "Cannot assign to read only
+  // property 'start'" — the entry is dropped first, exactly as uninstall does.
+  this.stateManager.deleteState('service', service.name);
+  this.stateManager.deleteState('serviceById', service.id);
   this.stateManager.setState('service', service.name, proxyService);
   this.stateManager.setState('serviceById', service.id, proxyService);
 }
