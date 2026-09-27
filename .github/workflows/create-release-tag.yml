@@ -39,6 +39,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # The checkout fetches no tag by default: the existence check below
+          # needs them.
+          fetch-tags: true
       - name: 🔍 Read the version to tag
         id: version
         run: |
@@ -73,7 +76,9 @@ jobs:
           # GitHub's published SSH host key (docs.github.com, "GitHub's SSH key
           # fingerprints"), pinned rather than trusted on first use.
           echo 'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' > "${SSH_DIR}/known_hosts"
-          echo "GIT_SSH_COMMAND=ssh -i ${SSH_DIR}/key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=${SSH_DIR}/known_hosts" >> "$GITHUB_ENV"
+          # HostKeyAlgorithms restricts the negotiation to the pinned key type:
+          # GitHub also offers ECDSA and RSA keys, which are not in known_hosts.
+          echo "GIT_SSH_COMMAND=ssh -i ${SSH_DIR}/key -o IdentitiesOnly=yes -o HostKeyAlgorithms=ssh-ed25519 -o StrictHostKeyChecking=yes -o UserKnownHostsFile=${SSH_DIR}/known_hosts" >> "$GITHUB_ENV"
       - name: 🔧 Configure git
         if: steps.version.outputs.tag
         run: |

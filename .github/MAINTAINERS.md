@@ -166,12 +166,15 @@ Then:
    documentation builds. If one of them fails, re-run it on the tag from
    the Actions tab.
 
-The `v*` tags are protected by a ruleset: nobody with write access can
-create, move or delete one. GitHub Actions cannot bypass a ruleset, which is
-why the tag is pushed with a deploy key (`RELEASE_TAG_DEPLOY_KEY`, a secret
-of the `production` environment) rather than with the workflow token. The
-bypass list of that ruleset must stay "organization admins and deploy keys":
-a team added there could ship a release from any commit.
+The tags are protected by a ruleset (every tag, the `vX.Y.Z` release tags
+included): nobody with write access can create, move or delete one. GitHub
+Actions cannot bypass a ruleset, which is why the tag is pushed with a deploy
+key (`RELEASE_TAG_DEPLOY_KEY`, a secret of the `production` environment)
+rather than with the workflow token. The bypass list of that ruleset must
+stay "organization admins and deploy keys", and the deploy key must never be
+a bypass actor of the `master` ruleset: a team added to the tag ruleset could
+ship a release from any commit, and a deploy key bypassing `master` could
+push the branch itself.
 
 Practical rule for a patch release while the lead maintainer is away: a
 member of `core` starts the workflow and opens the pull request, the backup
@@ -243,7 +246,7 @@ member with write access cannot read them by opening a pull request that
 changes a workflow.
 
 That boundary holds because of two other rules: a change to a workflow only
-reaches `master` through a reviewed pull request, and the `v*` tags are
+reaches `master` through a reviewed pull request, and the tags are
 protected by a ruleset whose only bypass actors are the organization admins
 and the deploy keys, so nobody can push a tag from a branch of their own to
 get a workflow to run on it. Keep both.
