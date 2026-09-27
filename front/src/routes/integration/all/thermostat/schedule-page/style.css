@@ -441,3 +441,43 @@
   max-width: 220px;
   vertical-align: middle;
 }
+
+/* The week at a glance on a schedule card: seven thin bars, one per day, each a
+   24-hour track coloured by preset. Small enough that a list of schedules stays
+   a list, readable enough to tell two programmes apart without opening them. */
+.weekPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.weekPreviewRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weekPreviewDay {
+  flex: 0 0 2.2rem;
+  font-size: 0.7rem;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+
+.weekPreviewBar {
+  display: flex;
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+:global(.dark-mode) .weekPreviewBar {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.weekPreviewSegment {
+  width: var(--seg-width);
+  background: var(--seg-color);
+}

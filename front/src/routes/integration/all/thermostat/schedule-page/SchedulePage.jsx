@@ -8,6 +8,41 @@ import style from './style.css';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 import { RequestStatus } from '../../../../../utils/consts';
 import CardFilter from '../../../../../components/layout/CardFilter';
+import PRESET_COLORS from '../../../../../utils/thermostatPresetColors';
+import { timeToMinutes, DAY_MINUTES } from '../../../../../../../server/utils/thermostatSchedule';
+import { transitionsToRanges } from '../../../../../../../server/utils/thermostatRanges';
+
+// 0 is Monday here, as it is in the table and in the editor — not the JS Date
+// convention.
+const WEEK_DAYS = [0, 1, 2, 3, 4, 5, 6];
+
+// The ranges of one day, as coloured spans of the 24 hours. The same points the
+// editor draws, read the same way — through the shared ranges helper — so the
+// miniature and the editor can never disagree about what a schedule says.
+const daySegments = (ranges, day) => {
+  const ofDay = ranges
+    .filter(range => range.day_of_week === day)
+    .map(range => {
+      const start = timeToMinutes(range.start_time);
+      const rawEnd = timeToMinutes(range.end_time);
+      return { start, end: rawEnd <= start ? DAY_MINUTES : rawEnd, preset: range.preset };
+    })
+    .sort((a, b) => a.start - b.start);
+
+  const segments = [];
+  let cursor = 0;
+  ofDay.forEach(range => {
+    if (range.start > cursor) {
+      segments.push({ start: cursor, end: range.start, preset: null });
+    }
+    segments.push(range);
+    cursor = Math.max(cursor, range.end);
+  });
+  if (cursor < DAY_MINUTES) {
+    segments.push({ start: cursor, end: DAY_MINUTES, preset: null });
+  }
+  return segments;
+};
 
 class SchedulePageComponent extends Component {
   state = {
@@ -121,6 +156,8 @@ class SchedulePageComponent extends Component {
     const dict = (this.props.intl && this.props.intl.dictionary) || {};
     const attachLabel = get(dict, 'integration.thermostat.schedule.attachPlaceholder', { default: 'Add a thermostat' });
     const detachLabel = get(dict, 'integration.thermostat.schedule.detachButton', { default: 'Stop following' });
+    // Once per card, not once per day: the points are the same for all seven rows.
+    const ranges = transitionsToRanges(schedule.transitions || []);
     return (
       <div key={schedule.selector} class="card mb-3">
         <div class="card-header">
@@ -164,6 +201,33 @@ class SchedulePageComponent extends Component {
             )}
           </div>
         </div>
+        {/* The week at a glance, so the list says what each schedule *does*
+            rather than only what it is called — the editor has to be opened
+            otherwise, and two schedules named "Semaine" look alike. Same points,
+            same shared helper and same colours as the editor's own bars. */}
+        <div class="card-body py-2">
+          <div class={style.weekPreview}>
+            {WEEK_DAYS.map(day => (
+              <div key={day} class={style.weekPreviewRow}>
+                <span class={style.weekPreviewDay}>
+                  <Text id={`integration.thermostat.schedule.daysShort.${day}`} />
+                </span>
+                <div class={style.weekPreviewBar}>
+                  {daySegments(ranges, day).map(segment => (
+                    <div
+                      key={`${segment.start}-${segment.end}`}
+                      class={style.weekPreviewSegment}
+                      style={`--seg-width:${((segment.end - segment.start) / DAY_MINUTES) * 100}%;--seg-color:${
+                        segment.preset ? PRESET_COLORS[segment.preset] || PRESET_COLORS.comfort : 'transparent'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div class="card-body py-2">
           <span class="text-muted mr-2">
             <Text id="integration.thermostat.schedule.followedBy" />
