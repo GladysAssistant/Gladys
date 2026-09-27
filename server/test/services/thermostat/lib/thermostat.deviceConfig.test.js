@@ -102,13 +102,21 @@ describe('thermostat.deviceConfig - getDeviceConfig', () => {
     expect(config.manual_duration).to.equal(45);
   });
 
-  it('should default the min/max, unit and manual duration when unset', () => {
+  it('should default the min/max and the unit when unset', () => {
     const config = getDeviceConfig(deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }));
 
     expect(config.temp_min).to.equal(5);
     expect(config.temp_max).to.equal(35);
     expect(config.temp_unit).to.equal('C');
-    expect(config.manual_duration).to.equal(30);
+  });
+
+  it('should leave the manual duration null when unset', () => {
+    // An absent duration is the setting "hand the thermostat back at the next
+    // schedule point": filling in the default here made that unreachable, since
+    // holdExpiry could then never tell the two apart.
+    const config = getDeviceConfig(deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }));
+
+    expect(config.manual_duration).to.equal(null);
   });
 });
 

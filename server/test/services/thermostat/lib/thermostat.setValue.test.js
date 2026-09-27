@@ -134,8 +134,13 @@ describe('thermostat.setValue', () => {
       expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('21.5');
       // Until the next transition point, the Tado and Netatmo default: a
       // temperature set in the afternoon holds until the evening point rather
-      // than lapsing after an arbitrary half hour.
-      expect(Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2])).to.be.above(1_700_000_000_000);
+      // than lapsing after an arbitrary half hour. Asserting only "later than
+      // now" passed just as well on the fixed fallback, which is how this default
+      // stayed unreachable for a whole review round: the expiry has to be the
+      // schedule's next point, so it must NOT be the shared duration.
+      const until = Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2]);
+      expect(until).to.be.above(1_700_000_000_000);
+      expect(until).to.not.equal(1_700_000_000_000 + MANUAL_DURATION_MS);
     });
 
     it('should broadcast the hold to open dashboards', async () => {

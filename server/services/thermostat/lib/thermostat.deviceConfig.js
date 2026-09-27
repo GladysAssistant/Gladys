@@ -9,7 +9,6 @@ const {
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
   DEFAULT_TEMP_UNIT,
-  DEFAULT_MANUAL_DURATION_MINUTES,
   DEFAULT_THERMOSTAT_TYPE,
   THERMOSTAT_TYPES,
 } = require('../../../utils/thermostatConstants');
@@ -61,7 +60,12 @@ function buildParamsConfig(device) {
     temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),
     temp_max: toNumber(getParam('THERMOSTAT_MAX_TEMP'), DEFAULT_MAX_TEMP),
     temp_unit: getParam('THERMOSTAT_TEMP_UNIT') || DEFAULT_TEMP_UNIT,
-    manual_duration: toNumber(getParam('THERMOSTAT_MANUAL_DURATION'), DEFAULT_MANUAL_DURATION_MINUTES),
+    // Null rather than the default when the param is absent: an absent duration
+    // is a setting of its own — "hand the thermostat back at the next schedule
+    // point" (C.3), the Tado and Netatmo behaviour — and filling it in here made
+    // that unreachable, since `holdExpiry` can then never see the absence. The
+    // callers that need a number apply the default themselves.
+    manual_duration: toNumber(getParam('THERMOSTAT_MANUAL_DURATION'), null),
     preset_frost: toNumber(getParam('THERMOSTAT_PRESET_FROST'), DEFAULT_PRESET_TEMPS.frost),
     preset_away: toNumber(getParam('THERMOSTAT_PRESET_AWAY'), DEFAULT_PRESET_TEMPS.away),
     preset_eco: toNumber(getParam('THERMOSTAT_PRESET_ECO'), DEFAULT_PRESET_TEMPS.eco),
