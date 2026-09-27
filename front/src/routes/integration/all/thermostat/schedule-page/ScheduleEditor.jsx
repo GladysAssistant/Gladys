@@ -79,6 +79,8 @@ class ScheduleEditor extends Component {
 
   updateName = e => this.setState({ name: e.target.value });
 
+  updateHouse = e => this.setState({ house: e.target.value });
+
   selectDay = day => {
     this.setState(prev => ({ selectedDay: prev.selectedDay === day ? null : day }));
   };
@@ -290,7 +292,11 @@ class ScheduleEditor extends Component {
       transitions: rangesToTransitions(ranges.map(({ key, id, schedule_id, ...rest }) => rest))
     };
     try {
-      const { schedule, httpClient, onSaved, house } = this.props;
+      const { schedule, httpClient, onSaved } = this.props;
+      // The house comes from the state, not the props: the select above edits
+      // the state, and reading the prop back here would save the schedule into
+      // whichever house the page opened on, whatever the user picked.
+      const { house } = this.state;
       // A duplicate arrives as a schedule object with no selector: it is a
       // creation, so gating on the object alone would PATCH /schedule/null.
       if (schedule && schedule.selector) {
