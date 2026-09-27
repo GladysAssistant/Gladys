@@ -10,6 +10,7 @@ const {
   DEVICE_FEATURE_UNITS,
   EVENTS,
   THERMOSTAT_MODE,
+  THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
@@ -28,6 +29,13 @@ const presetFeature = (preset) => ({
   category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
   type: DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET,
   last_value: THERMOSTAT_PRESET[preset.toUpperCase()],
+});
+
+const operatingStateFeature = (state) => ({
+  selector: 'thermostat-living-room:operating-state',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+  last_value: state,
 });
 
 const modeFeature = (mode) => ({
@@ -217,6 +225,101 @@ describe('thermostat.regulateDevice', () => {
         THERMOSTAT_MANUAL_UNTIL: until === null ? '' : String(until),
         ...extraParams,
       }),
+    });
+
+    it('should publish the held setpoint and the operating state', async () => {
+      // Every preset the user picks arms a hold, so this is the ordinary case: a
+      // hold that actuated the switch but left the setpoint feature behind makes
+      // scenes, MQTT and HomeKit read a setpoint the thermostat is not regulating
+      // on, and an operating-state that was never written at all (B.3).
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+      const setpoint = setpointFeature({ last_value: 19 });
+
+      await regulate(mod, gladys, {
+        id: 'device-id',
+        selector: 'living-room',
+        features: [setpoint, operatingStateFeature(THERMOSTAT_OPERATING_STATE.IDLE)],
+        params: baseParams({
+          THERMOSTAT_MANUAL_SETPOINT: '22',
+          THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60000),
+        }),
+      });
+
+      assert.calledWith(gladys.device.saveState, setpoint, 22);
+      // 15 °C against a 22 °C hold: the heating runs, and the feature says so.
+      const states = gladys.device.saveState
+        .getCalls()
+        .filter((call) => call.args[0] && call.args[0].type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE)
+        .map((call) => call.args[1]);
+      expect(states).to.deep.equal([THERMOSTAT_OPERATING_STATE.HEATING]);
+    });
+
+    it('should still actuate when the held setpoint cannot be stored', async () => {
+      // Same rule as on the schedule path: a database that refuses the setpoint
+      // must not stop the heating from being driven.
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+      gladys.device.saveState = fake.rejects(new Error('db down'));
+
+      await regulate(mod, gladys, {
+        id: 'device-id',
+        selector: 'living-room',
+        features: [setpointFeature({ last_value: 19 })],
+        params: baseParams({
+          THERMOSTAT_MANUAL_SETPOINT: '22',
+          THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60000),
+        }),
+      });
+
+      assert.calledOnce(gladys.device.setValue);
+    });
+
+    it('should report a cooling hold as cooling', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      // Warm room, cooling mode: the compressor runs, and the state must say
+      // cooling rather than heating.
+      const gladys = buildGladys({ features: standardFeatures({ temp: 28 }) });
+
+      await regulate(mod, gladys, {
+        id: 'device-id',
+        selector: 'living-room',
+        features: [setpointFeature({ last_value: 22 }), operatingStateFeature(THERMOSTAT_OPERATING_STATE.IDLE)],
+        params: baseParams({
+          THERMOSTAT_MODE: 'cooling',
+          THERMOSTAT_MANUAL_SETPOINT: '22',
+          THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60000),
+        }),
+      });
+
+      const states = gladys.device.saveState
+        .getCalls()
+        .filter((call) => call.args[0] && call.args[0].type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE)
+        .map((call) => call.args[1]);
+      expect(states).to.deep.equal([THERMOSTAT_OPERATING_STATE.COOLING]);
+    });
+
+    it('should report a hold that is not heating as idle', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      // Room already warmer than the hold: nothing to do, and the feature has to
+      // say idle rather than keep the last value it was left on.
+      const gladys = buildGladys({ features: standardFeatures({ temp: 24 }) });
+
+      await regulate(mod, gladys, {
+        id: 'device-id',
+        selector: 'living-room',
+        features: [setpointFeature({ last_value: 22 }), operatingStateFeature(THERMOSTAT_OPERATING_STATE.HEATING)],
+        params: baseParams({
+          THERMOSTAT_MANUAL_SETPOINT: '22',
+          THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60000),
+        }),
+      });
+
+      const states = gladys.device.saveState
+        .getCalls()
+        .filter((call) => call.args[0] && call.args[0].type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE)
+        .map((call) => call.args[1]);
+      expect(states).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
     });
 
     it('should not actuate when the temperature sensor cannot be read', async () => {

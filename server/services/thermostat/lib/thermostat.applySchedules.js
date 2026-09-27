@@ -38,6 +38,7 @@ const {
   MAX_TPI_CYCLE_TIME,
   MIN_TPI_PROPORTIONAL_BAND,
   MAX_TPI_PROPORTIONAL_BAND,
+  DEFAULT_MANUAL_DURATION_MINUTES,
 } = require('../../../utils/thermostatConstants');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
@@ -553,7 +554,11 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     // no way to cancel. Arming the expiry here makes the device behave exactly
     // like one scheduled from the start.
     if (!manualUntil && (await followsSchedule(device.id))) {
-      manualUntil = Date.now() + config.manual_duration * 60 * 1000;
+      // No configured duration means "until the next schedule point", but this
+      // hold predates the schedule and has no point to aim at yet: the shared
+      // default is what arms it, and the next hold taken will follow the slots.
+      const duration = config.manual_duration === null ? DEFAULT_MANUAL_DURATION_MINUTES : config.manual_duration;
+      manualUntil = Date.now() + duration * 60 * 1000;
       await setManualHold.call({ gladys }, device, hold.setpoint, manualUntil);
       logger.info(
         `Thermostat schedule: permanent manual hold on ${selector} now follows a schedule, ` +
@@ -596,6 +601,17 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
         );
         return;
       }
+      // The setpoint the thermostat is aiming for, on its own feature. A hold is
+      // armed by every preset the user picks, so this is the ordinary case rather
+      // than an edge one: leaving the feature behind means scenes, MQTT and
+      // HomeKit read a setpoint the thermostat stopped regulating on (B.3).
+      if (manualSetpoint !== null && thermostatFeature.last_value !== manualSetpoint) {
+        try {
+          await gladys.device.saveState(thermostatFeature, manualSetpoint);
+        } catch (e) {
+          logger.warn(`Thermostat schedule: Failed to update setpoint: ${e.message}`);
+        }
+      }
       if (manualSetpoint !== null && config.switch_feature && config.temperature_feature) {
         const tmp = await getFeatureBySelector(gladys, config.temperature_feature);
         const sw = await getFeatureBySelector(gladys, config.switch_feature);
@@ -616,6 +632,13 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
             shouldBeActive,
             `manual, setpoint=${manualSetpoint}, temp=${manualTemp}, ${selector}`,
           );
+          // Same reason as on the schedule path: what the loop decided is said on
+          // a standard feature rather than left to be inferred from the switch.
+          let manualState = THERMOSTAT_OPERATING_STATE.IDLE;
+          if (shouldBeActive) {
+            manualState = mode === 'cooling' ? THERMOSTAT_OPERATING_STATE.COOLING : THERMOSTAT_OPERATING_STATE.HEATING;
+          }
+          await saveOperatingState.call({ gladys }, device, manualState);
         }
       }
       return;
