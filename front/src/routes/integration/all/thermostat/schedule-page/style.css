@@ -406,3 +406,38 @@
   font-size: 0.78rem;
   color: #6c757d;
 }
+
+/* The follower badge holds its detach button, so it lays its two children out
+   rather than being plain text. */
+.followerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* A glyph, not a button-looking button: inside a badge there is no room for a
+   border and a background, and the badge itself already reads as one chip. */
+.followerDetach {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.followerDetach:hover,
+.followerDetach:focus-visible {
+  opacity: 1;
+}
+
+/* Inline with the badges rather than on its own line: it is one more chip in the
+   row, and a full-width select would read as the card's main control. */
+.attachSelect {
+  display: inline-block;
+  width: auto;
+  max-width: 220px;
+  vertical-align: middle;
+}

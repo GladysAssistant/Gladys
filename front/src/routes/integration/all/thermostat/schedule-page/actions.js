@@ -56,6 +56,47 @@ function createActions(store) {
       }
     },
 
+    // The thermostats, so a schedule can be attached from here rather than by
+    // going back to each thermostat's edit page. Only their name, selector and
+    // room are used: the room is what places a thermostat in a house, and the
+    // server refuses a schedule from another house.
+    async getThermostats(state) {
+      try {
+        const devices = await state.httpClient.get('/api/v1/service/thermostat/device');
+        store.setState({ thermostatDevices: devices || [] });
+      } catch (e) {
+        store.setState({ thermostatDevices: [] });
+      }
+    },
+
+    // Attaching replaces whatever the thermostat followed before — one schedule
+    // per thermostat, which is what the link's primary key enforces server-side.
+    // The schedule list is reloaded rather than patched in place: the follower
+    // badges of the schedule it left have to lose it too.
+    async attachThermostat(state, scheduleSelector, deviceSelector) {
+      store.setState({ attachStatus: RequestStatus.Getting, attachError: null });
+      try {
+        await state.httpClient.post(`/api/v1/service/thermostat/schedule/${scheduleSelector}/device/${deviceSelector}`);
+        await actions.getSchedules(store.getState());
+        store.setState({ attachStatus: RequestStatus.Success });
+      } catch (e) {
+        store.setState({ attachStatus: RequestStatus.Error, attachError: scheduleSelector });
+      }
+    },
+
+    async detachThermostat(state, scheduleSelector, deviceSelector) {
+      store.setState({ attachStatus: RequestStatus.Getting, attachError: null });
+      try {
+        await state.httpClient.delete(
+          `/api/v1/service/thermostat/schedule/${scheduleSelector}/device/${deviceSelector}`
+        );
+        await actions.getSchedules(store.getState());
+        store.setState({ attachStatus: RequestStatus.Success });
+      } catch (e) {
+        store.setState({ attachStatus: RequestStatus.Error, attachError: scheduleSelector });
+      }
+    },
+
     updateScheduleField(state, field, value) {
       store.setState({ [field]: value });
     },

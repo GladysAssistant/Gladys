@@ -22,7 +22,35 @@ class SchedulePageComponent extends Component {
     if (this.props.getHouses) {
       this.props.getHouses();
     }
+    if (this.props.getThermostats) {
+      this.props.getThermostats();
+    }
   }
+
+  // The thermostats of a house that do not follow this schedule yet. A thermostat
+  // is placed in a house by its room, and the server refuses a schedule from
+  // another house, so one with no room appears nowhere — it has no house to be in.
+  attachableThermostats = schedule => {
+    const house = (this.props.houses || []).find(candidate => candidate.selector === schedule.house);
+    if (!house) {
+      return [];
+    }
+    const roomIds = (house.rooms || []).map(room => room.id);
+    const followers = (schedule.devices || []).map(device => device.selector);
+    return (this.props.thermostatDevices || []).filter(
+      device => roomIds.includes(device.room_id) && !followers.includes(device.selector)
+    );
+  };
+
+  attach = (scheduleSelector, e) => {
+    const deviceSelector = e.target.value;
+    // The select goes back to its placeholder: it is an action, not a value the
+    // card holds — what it did shows up in the badges next to it.
+    e.target.value = '';
+    if (deviceSelector) {
+      this.props.attachThermostat(scheduleSelector, deviceSelector);
+    }
+  };
 
   // A schedule belongs to a house: that is what makes its name unique per house
   // and keeps a thermostat from following another house's programme. Which house
@@ -87,63 +115,112 @@ class SchedulePageComponent extends Component {
 
   // One schedule card: its actions, and the thermostats that follow it — the
   // reverse query the link table makes possible.
-  renderSchedule = (schedule, confirmDeleteSelector, deleting) => (
-    <div key={schedule.selector} class="card mb-3">
-      <div class="card-header">
-        <h4 class="card-title">{schedule.name}</h4>
-        <div class="card-options">
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-secondary mr-2"
-            onClick={() => this.startDuplicate(schedule)}
-          >
-            <i class="fe fe-copy mr-1" />
-            <Text id="integration.thermostat.schedule.duplicateButton" />
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-primary mr-2" onClick={() => this.startEdit(schedule)}>
-            <i class="fe fe-edit-2 mr-1" />
-            <Text id="integration.thermostat.schedule.editButton" />
-          </button>
-          {confirmDeleteSelector === schedule.selector ? (
-            <span class="d-inline-flex align-items-center">
-              <Text id="integration.thermostat.schedule.confirmDelete" />
-              <button
-                type="button"
-                class={cx('btn', 'btn-sm', 'btn-danger', 'ml-2', { 'btn-loading': deleting })}
-                onClick={() => this.handleDelete(schedule.selector)}
-              >
-                <Text id="integration.thermostat.schedule.confirmYes" />
-              </button>
-              <button type="button" class="btn btn-sm btn-secondary ml-1" onClick={this.cancelDelete}>
-                <Text id="integration.thermostat.schedule.confirmNo" />
-              </button>
-            </span>
-          ) : (
+  // `title` on the detach button and the select's placeholder are plain strings,
+  // not <Text> nodes, so they are read from the dictionary here.
+  renderSchedule = (schedule, confirmDeleteSelector, deleting, attachFailed) => {
+    const dict = (this.props.intl && this.props.intl.dictionary) || {};
+    const attachLabel = get(dict, 'integration.thermostat.schedule.attachPlaceholder', { default: 'Add a thermostat' });
+    const detachLabel = get(dict, 'integration.thermostat.schedule.detachButton', { default: 'Stop following' });
+    return (
+      <div key={schedule.selector} class="card mb-3">
+        <div class="card-header">
+          <h4 class="card-title">{schedule.name}</h4>
+          <div class="card-options">
             <button
               type="button"
-              class="btn btn-sm btn-outline-danger"
-              onClick={() => this.askDelete(schedule.selector)}
+              class="btn btn-sm btn-outline-secondary mr-2"
+              onClick={() => this.startDuplicate(schedule)}
             >
-              <i class="fe fe-trash-2 mr-1" />
-              <Text id="integration.thermostat.schedule.deleteButton" />
+              <i class="fe fe-copy mr-1" />
+              <Text id="integration.thermostat.schedule.duplicateButton" />
             </button>
-          )}
+            <button type="button" class="btn btn-sm btn-outline-primary mr-2" onClick={() => this.startEdit(schedule)}>
+              <i class="fe fe-edit-2 mr-1" />
+              <Text id="integration.thermostat.schedule.editButton" />
+            </button>
+            {confirmDeleteSelector === schedule.selector ? (
+              <span class="d-inline-flex align-items-center">
+                <Text id="integration.thermostat.schedule.confirmDelete" />
+                <button
+                  type="button"
+                  class={cx('btn', 'btn-sm', 'btn-danger', 'ml-2', { 'btn-loading': deleting })}
+                  onClick={() => this.handleDelete(schedule.selector)}
+                >
+                  <Text id="integration.thermostat.schedule.confirmYes" />
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary ml-1" onClick={this.cancelDelete}>
+                  <Text id="integration.thermostat.schedule.confirmNo" />
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                onClick={() => this.askDelete(schedule.selector)}
+              >
+                <i class="fe fe-trash-2 mr-1" />
+                <Text id="integration.thermostat.schedule.deleteButton" />
+              </button>
+            )}
+          </div>
         </div>
-      </div>
-      {schedule.devices && schedule.devices.length > 0 && (
         <div class="card-body py-2">
           <span class="text-muted mr-2">
             <Text id="integration.thermostat.schedule.followedBy" />
           </span>
-          {schedule.devices.map(device => (
-            <span key={device.selector} class="badge badge-secondary mr-1">
+          {(schedule.devices || []).length === 0 && (
+            <span class="text-muted mr-2">
+              <Text id="integration.thermostat.schedule.followedByNobody" />
+            </span>
+          )}
+          {(schedule.devices || []).map(device => (
+            <span key={device.selector} class={`badge badge-secondary mr-1 ${style.followerBadge}`}>
               {device.name}
+              {/* Detaching from here too: a thermostat attached by mistake would
+                otherwise have to be detached from its own edit page. */}
+              <button
+                type="button"
+                class={style.followerDetach}
+                onClick={() => this.props.detachThermostat(schedule.selector, device.selector)}
+                title={detachLabel}
+              >
+                <i class="fe fe-x" />
+              </button>
             </span>
           ))}
+          {/* Attaching from here is what removes the round trip: the schedule was
+            otherwise created here and attached from each thermostat's edit page.
+            Only shown when something is left to attach. */}
+          {this.attachableThermostats(schedule).length > 0 && (
+            <select
+              class={`form-control form-control-sm ${style.attachSelect}`}
+              onChange={e => this.attach(schedule.selector, e)}
+            >
+              <option value="">{attachLabel}</option>
+              {this.attachableThermostats(schedule).map(device => (
+                <option key={device.selector} value={device.selector}>
+                  {device.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {/* Said next to the select, because it is not obvious: the link's key is
+              the thermostat, so one thermostat follows one schedule and attaching
+              it here silently takes it off whatever it followed. */}
+          {this.attachableThermostats(schedule).length > 0 && (
+            <small class="form-text text-muted">
+              <Text id="integration.thermostat.schedule.attachReplacesHelp" />
+            </small>
+          )}
+          {attachFailed === schedule.selector && (
+            <div class="text-danger mt-1">
+              <Text id="integration.thermostat.schedule.attachError" />
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  };
 
   render(props, { showEditor, editingSchedule, editingHouse, confirmDeleteSelector }) {
     const {
@@ -237,7 +314,9 @@ class SchedulePageComponent extends Component {
                   return (
                     <div key={house.selector}>
                       {(houses || []).length > 1 && <h3 class={style.houseTitle}>{house.name}</h3>}
-                      {houseSchedules.map(schedule => this.renderSchedule(schedule, confirmDeleteSelector, deleting))}
+                      {houseSchedules.map(schedule =>
+                        this.renderSchedule(schedule, confirmDeleteSelector, deleting, props.attachError)
+                      )}
                     </div>
                   );
                 })}
