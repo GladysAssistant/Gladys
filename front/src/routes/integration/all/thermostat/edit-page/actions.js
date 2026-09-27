@@ -142,6 +142,10 @@ function createActions(store) {
           thermostatEditTpiProportionalBand: getParam('THERMOSTAT_TPI_PROPORTIONAL_BAND') || '2',
           thermostatEditRoomId: device.room_id || '',
           thermostatEditManualDuration: getParam('THERMOSTAT_MANUAL_DURATION') || '30',
+          // No duration configured is how "hand it back at the next slot" is
+          // stored: the server falls back on the next transition point when the
+          // param is absent, so the param's absence *is* the setting.
+          thermostatEditManualExpiry: getParam('THERMOSTAT_MANUAL_DURATION') ? 'fixed' : 'next-transition',
           getThermostatDeviceStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -183,7 +187,7 @@ function createActions(store) {
     },
 
     async saveThermostatDevice(state) {
-      store.setState({ thermostatCreateStatus: RequestStatus.Getting });
+      store.setState({ thermostatCreateStatus: RequestStatus.Getting, thermostatEditError: null });
       try {
         // `parseFloat(x) || d` turns a legitimate 0 into the default, so a 0 °C
         // hysteresis band could never be saved. Fall back only when the input is
@@ -227,6 +231,23 @@ function createActions(store) {
 
         const thermostatType = state.thermostatEditType === 'external' ? 'external' : 'virtual';
         const isExternalThermostat = thermostatType === 'external';
+
+        // Saving an empty form used to create a thermostat with no room, no
+        // sensor and no actuator: it appeared in the list, regulated nothing, and
+        // nothing said why. What makes a thermostat is the pair it drives — a
+        // sensor to read and a switch to actuate, or the setpoint of a real
+        // thermostat — so that is what is required, named in the error rather
+        // than reported as a generic failure.
+        const missingConfig = isExternalThermostat
+          ? !state.thermostatEditTargetFeature
+          : !temperatureFeature || !switchFeature;
+        if (missingConfig) {
+          store.setState({
+            thermostatCreateStatus: RequestStatus.Error,
+            thermostatEditError: isExternalThermostat ? 'incompleteExternal' : 'incompleteVirtual'
+          });
+          return;
+        }
 
         const device = {
           name,
@@ -296,7 +317,12 @@ function createActions(store) {
             { name: 'THERMOSTAT_HYSTERESIS_STOP', value: String(hysteresisStop) },
             { name: 'THERMOSTAT_TPI_CYCLE_TIME', value: String(tpiCycleTime) },
             { name: 'THERMOSTAT_TPI_PROPORTIONAL_BAND', value: String(tpiProportionalBand) },
-            { name: 'THERMOSTAT_MANUAL_DURATION', value: String(manualDuration) }
+            // Left out on "next transition": createDevice deletes every param the
+            // payload omits, and an absent duration is what makes the server hold
+            // until the next schedule point rather than for a fixed time.
+            ...(state.thermostatEditManualExpiry === 'next-transition'
+              ? []
+              : [{ name: 'THERMOSTAT_MANUAL_DURATION', value: String(manualDuration) }])
           ]
         };
 
@@ -353,7 +379,8 @@ function createActions(store) {
           thermostatEditTpiCycleTime: '30',
           thermostatEditTpiProportionalBand: '2',
           thermostatEditRoomId: '',
-          thermostatEditManualDuration: '30'
+          thermostatEditManualDuration: '30',
+          thermostatEditManualExpiry: 'fixed'
         });
         route('/dashboard/integration/device/thermostat');
       } catch (e) {

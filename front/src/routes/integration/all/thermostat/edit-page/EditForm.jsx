@@ -61,7 +61,13 @@ const EditForm = ({ ...props }) => {
           <div class="dimmer-content">
             {props.thermostatCreateStatus === RequestStatus.Error && (
               <div class="alert alert-danger">
-                <Text id="integration.thermostat.edit.saveError" />
+                {props.thermostatEditError === 'incompleteVirtual' && (
+                  <Text id="integration.thermostat.edit.incompleteVirtualError" />
+                )}
+                {props.thermostatEditError === 'incompleteExternal' && (
+                  <Text id="integration.thermostat.edit.incompleteExternalError" />
+                )}
+                {!props.thermostatEditError && <Text id="integration.thermostat.edit.saveError" />}
               </div>
             )}
 
@@ -594,31 +600,58 @@ const EditForm = ({ ...props }) => {
               </small>
             </div>
 
-            {/* Durée mode manuel */}
+            {/* Fin du mode manuel : durée fixe, ou prochain créneau du planning.
+                Le serveur choisit le prochain créneau quand aucune durée n'est
+                configurée, donc « prochain créneau » s'exprime en n'écrivant
+                pas le paramètre. */}
             <div class="form-group">
               <label class="form-label">
-                <Text id="integration.thermostat.edit.manualDurationLabel" />
+                <Text id="integration.thermostat.edit.manualExpiryLabel" />
               </label>
-              <div class="input-group">
-                <input
-                  type="number"
-                  class="form-control"
-                  min="1"
-                  max="480"
-                  value={props.thermostatEditManualDuration || '30'}
-                  onInput={e => props.updateThermostatField('thermostatEditManualDuration', e.target.value)}
-                  step="1"
-                />
-                <div class="input-group-append">
-                  <span class="input-group-text">
-                    <Text id="integration.thermostat.edit.manualDurationUnit" />
-                  </span>
-                </div>
-              </div>
+              <select
+                class="form-control"
+                value={props.thermostatEditManualExpiry === 'next-transition' ? 'next-transition' : 'fixed'}
+                onChange={e => props.updateThermostatField('thermostatEditManualExpiry', e.target.value)}
+              >
+                <option value="fixed">
+                  <Text id="integration.thermostat.edit.manualExpiryFixed" />
+                </option>
+                <option value="next-transition">
+                  <Text id="integration.thermostat.edit.manualExpiryNextTransition" />
+                </option>
+              </select>
               <small class="form-text text-muted">
-                <Text id="integration.thermostat.edit.manualDurationHelp" />
+                <Text id="integration.thermostat.edit.manualExpiryHelp" />
               </small>
             </div>
+
+            {/* Durée mode manuel */}
+            {props.thermostatEditManualExpiry !== 'next-transition' && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.manualDurationLabel" />
+                </label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    min="1"
+                    max="480"
+                    value={props.thermostatEditManualDuration || '30'}
+                    onInput={e => props.updateThermostatField('thermostatEditManualDuration', e.target.value)}
+                    step="1"
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <Text id="integration.thermostat.edit.manualDurationUnit" />
+                    </span>
+                  </div>
+                </div>
+                <small class="form-text text-muted">
+                  <Text id="integration.thermostat.edit.manualDurationHelp" />
+                </small>
+              </div>
+            )}
 
             <div class="row mt-2">
               <div class="col">
