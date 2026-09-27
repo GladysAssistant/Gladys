@@ -16,6 +16,11 @@ import { transitionsToRanges } from '../../../../../../../server/utils/thermosta
 // convention.
 const WEEK_DAYS = [0, 1, 2, 3, 4, 5, 6];
 
+// The same three marks the editor puts under its own bars, so the two read
+// alike. Without them the miniature is seven coloured stripes with no way to
+// tell where the morning ends.
+const HOUR_MARKS = [6, 12, 18];
+
 // The ranges of one day, as coloured spans of the 24 hours. The same points the
 // editor draws, read the same way — through the shared ranges helper — so the
 // miniature and the editor can never disagree about what a schedule says.
@@ -159,128 +164,148 @@ class SchedulePageComponent extends Component {
     // Once per card, not once per day: the points are the same for all seven rows.
     const ranges = transitionsToRanges(schedule.transitions || []);
     return (
-      <div key={schedule.selector} class="card mb-3">
-        <div class="card-header">
-          <h4 class="card-title">{schedule.name}</h4>
-          <div class="card-options">
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-secondary mr-2"
-              onClick={() => this.startDuplicate(schedule)}
-            >
-              <i class="fe fe-copy mr-1" />
-              <Text id="integration.thermostat.schedule.duplicateButton" />
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-primary mr-2" onClick={() => this.startEdit(schedule)}>
-              <i class="fe fe-edit-2 mr-1" />
-              <Text id="integration.thermostat.schedule.editButton" />
-            </button>
-            {confirmDeleteSelector === schedule.selector ? (
-              <span class="d-inline-flex align-items-center">
-                <Text id="integration.thermostat.schedule.confirmDelete" />
-                <button
-                  type="button"
-                  class={cx('btn', 'btn-sm', 'btn-danger', 'ml-2', { 'btn-loading': deleting })}
-                  onClick={() => this.handleDelete(schedule.selector)}
-                >
-                  <Text id="integration.thermostat.schedule.confirmYes" />
-                </button>
-                <button type="button" class="btn btn-sm btn-secondary ml-1" onClick={this.cancelDelete}>
-                  <Text id="integration.thermostat.schedule.confirmNo" />
-                </button>
-              </span>
-            ) : (
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-danger"
-                onClick={() => this.askDelete(schedule.selector)}
-              >
-                <i class="fe fe-trash-2 mr-1" />
-                <Text id="integration.thermostat.schedule.deleteButton" />
-              </button>
-            )}
+      <div key={schedule.selector} class="col-md-6">
+        <div class="card mb-3">
+          <div class="card-header">
+            <h4 class="card-title">{schedule.name}</h4>
           </div>
-        </div>
-        {/* The week at a glance, so the list says what each schedule *does*
+          {/* The week at a glance, so the list says what each schedule *does*
             rather than only what it is called — the editor has to be opened
             otherwise, and two schedules named "Semaine" look alike. Same points,
             same shared helper and same colours as the editor's own bars. */}
-        <div class="card-body py-2">
-          <div class={style.weekPreview}>
-            {WEEK_DAYS.map(day => (
-              <div key={day} class={style.weekPreviewRow}>
-                <span class={style.weekPreviewDay}>
-                  <Text id={`integration.thermostat.schedule.daysShort.${day}`} />
-                </span>
-                <div class={style.weekPreviewBar}>
-                  {daySegments(ranges, day).map(segment => (
-                    <div
-                      key={`${segment.start}-${segment.end}`}
-                      class={style.weekPreviewSegment}
-                      style={`--seg-width:${((segment.end - segment.start) / DAY_MINUTES) * 100}%;--seg-color:${
-                        segment.preset ? PRESET_COLORS[segment.preset] || PRESET_COLORS.comfort : 'transparent'
-                      }`}
-                    />
-                  ))}
+          <div class="card-body py-2">
+            <div class={style.weekPreview}>
+              {WEEK_DAYS.map(day => (
+                <div key={day} class={style.weekPreviewRow}>
+                  <span class={style.weekPreviewDay}>
+                    <Text id={`integration.thermostat.schedule.daysShort.${day}`} />
+                  </span>
+                  <div class={style.weekPreviewBar}>
+                    {daySegments(ranges, day).map(segment => (
+                      <div
+                        key={`${segment.start}-${segment.end}`}
+                        class={style.weekPreviewSegment}
+                        style={`--seg-width:${((segment.end - segment.start) / DAY_MINUTES) * 100}%;--seg-color:${
+                          segment.preset ? PRESET_COLORS[segment.preset] || PRESET_COLORS.comfort : 'transparent'
+                        }`}
+                      />
+                    ))}
+                  </div>
                 </div>
+              ))}
+              {/* The scale, once under the seven days: the bars are gridlined at the
+                same three hours, so a slot can be placed by eye. */}
+              <div class={style.weekPreviewScale}>
+                {HOUR_MARKS.map(hour => (
+                  <span key={hour} class={style.weekPreviewMark} style={`--mark-left:${(hour / 24) * 100}%`}>
+                    {`${hour}h`}
+                  </span>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
 
-        <div class="card-body py-2">
-          <span class="text-muted mr-2">
-            <Text id="integration.thermostat.schedule.followedBy" />
-          </span>
-          {(schedule.devices || []).length === 0 && (
+          <div class="card-body py-2">
             <span class="text-muted mr-2">
-              <Text id="integration.thermostat.schedule.followedByNobody" />
+              <Text id="integration.thermostat.schedule.followedBy" />
             </span>
-          )}
-          {(schedule.devices || []).map(device => (
-            <span key={device.selector} class={`badge badge-secondary mr-1 ${style.followerBadge}`}>
-              {device.name}
-              {/* Detaching from here too: a thermostat attached by mistake would
+            {(schedule.devices || []).length === 0 && (
+              <span class="text-muted mr-2">
+                <Text id="integration.thermostat.schedule.followedByNobody" />
+              </span>
+            )}
+            {(schedule.devices || []).map(device => (
+              <span key={device.selector} class={`badge badge-secondary mr-1 ${style.followerBadge}`}>
+                {device.name}
+                {/* Detaching from here too: a thermostat attached by mistake would
                 otherwise have to be detached from its own edit page. */}
-              <button
-                type="button"
-                class={style.followerDetach}
-                onClick={() => this.props.detachThermostat(schedule.selector, device.selector)}
-                title={detachLabel}
-              >
-                <i class="fe fe-x" />
-              </button>
-            </span>
-          ))}
-          {/* Attaching from here is what removes the round trip: the schedule was
+                <button
+                  type="button"
+                  class={style.followerDetach}
+                  onClick={() => this.props.detachThermostat(schedule.selector, device.selector)}
+                  title={detachLabel}
+                >
+                  <i class="fe fe-x" />
+                </button>
+              </span>
+            ))}
+            {/* Attaching from here is what removes the round trip: the schedule was
             otherwise created here and attached from each thermostat's edit page.
             Only shown when something is left to attach. */}
-          {this.attachableThermostats(schedule).length > 0 && (
-            <select
-              class={`form-control form-control-sm ${style.attachSelect}`}
-              onChange={e => this.attach(schedule.selector, e)}
-            >
-              <option value="">{attachLabel}</option>
-              {this.attachableThermostats(schedule).map(device => (
-                <option key={device.selector} value={device.selector}>
-                  {device.name}
-                </option>
-              ))}
-            </select>
-          )}
-          {/* Said next to the select, because it is not obvious: the link's key is
+            {this.attachableThermostats(schedule).length > 0 && (
+              <select
+                class={`form-control form-control-sm ${style.attachSelect}`}
+                onChange={e => this.attach(schedule.selector, e)}
+              >
+                <option value="">{attachLabel}</option>
+                {this.attachableThermostats(schedule).map(device => (
+                  <option key={device.selector} value={device.selector}>
+                    {device.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            {/* Said next to the select, because it is not obvious: the link's key is
               the thermostat, so one thermostat follows one schedule and attaching
               it here silently takes it off whatever it followed. */}
-          {this.attachableThermostats(schedule).length > 0 && (
-            <small class="form-text text-muted">
-              <Text id="integration.thermostat.schedule.attachReplacesHelp" />
-            </small>
-          )}
-          {attachFailed === schedule.selector && (
-            <div class="text-danger mt-1">
-              <Text id="integration.thermostat.schedule.attachError" />
+            {this.attachableThermostats(schedule).length > 0 && (
+              <small class="form-text text-muted">
+                <Text id="integration.thermostat.schedule.attachReplacesHelp" />
+              </small>
+            )}
+            {attachFailed === schedule.selector && (
+              <div class="text-danger mt-1">
+                <Text id="integration.thermostat.schedule.attachError" />
+              </div>
+            )}
+          </div>
+
+          {/* At the foot and full width, like the thermostat cards: three buttons
+              beside the name in a half-width card crowd it out. */}
+          <div class="card-body pt-0">
+            <div class={style.cardButtons}>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary flex-fill"
+                onClick={() => this.startDuplicate(schedule)}
+              >
+                <i class="fe fe-copy mr-1" />
+                <Text id="integration.thermostat.schedule.duplicateButton" />
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary flex-fill"
+                onClick={() => this.startEdit(schedule)}
+              >
+                <i class="fe fe-edit-2 mr-1" />
+                <Text id="integration.thermostat.schedule.editButton" />
+              </button>
+              {confirmDeleteSelector === schedule.selector ? (
+                <span class="d-inline-flex align-items-center">
+                  <Text id="integration.thermostat.schedule.confirmDelete" />
+                  <button
+                    type="button"
+                    class={cx('btn', 'btn-sm', 'btn-danger', 'ml-2', 'flex-fill', { 'btn-loading': deleting })}
+                    onClick={() => this.handleDelete(schedule.selector)}
+                  >
+                    <Text id="integration.thermostat.schedule.confirmYes" />
+                  </button>
+                  <button type="button" class="btn btn-sm btn-secondary ml-1 flex-fill" onClick={this.cancelDelete}>
+                    <Text id="integration.thermostat.schedule.confirmNo" />
+                  </button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger flex-fill"
+                  onClick={() => this.askDelete(schedule.selector)}
+                >
+                  <i class="fe fe-trash-2 mr-1" />
+                  <Text id="integration.thermostat.schedule.deleteButton" />
+                </button>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     );
@@ -378,9 +403,14 @@ class SchedulePageComponent extends Component {
                   return (
                     <div key={house.selector}>
                       {(houses || []).length > 1 && <h3 class={style.houseTitle}>{house.name}</h3>}
-                      {houseSchedules.map(schedule =>
-                        this.renderSchedule(schedule, confirmDeleteSelector, deleting, props.attachError)
-                      )}
+                      {/* Same two-column grid as the thermostat list: a schedule
+                          card is about as wide as a thermostat one, and one per
+                          row left half the page empty. */}
+                      <div class="row">
+                        {houseSchedules.map(schedule =>
+                          this.renderSchedule(schedule, confirmDeleteSelector, deleting, props.attachError)
+                        )}
+                      </div>
                     </div>
                   );
                 })}
