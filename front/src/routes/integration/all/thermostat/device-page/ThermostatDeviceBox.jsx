@@ -178,20 +178,26 @@ class ThermostatDeviceBox extends Component {
                     </div>
                   </div>
                 ) : (
+                  /* Icons on the labels, the same ones the schedule cards use:
+                     the two lists sit one tab apart and read as the same kind of
+                     card, so one action should not look different on each. */
                   <div class={style.buttonGroup}>
                     <button
                       onClick={this.saveDevice}
                       class={cx('btn', 'btn-success', 'flex-fill', { 'btn-loading': saving })}
                     >
+                      <i class="fe fe-save mr-1" />
                       <Text id="integration.thermostat.device.saveButton" />
                     </button>
                     <button onClick={this.askDelete} class="btn btn-danger flex-fill">
+                      <i class="fe fe-trash-2 mr-1" />
                       <Text id="integration.thermostat.device.deleteButton" />
                     </button>
                     <Link
                       href={`/dashboard/integration/device/thermostat/edit/${device.selector}`}
                       class="btn btn-primary flex-fill"
                     >
+                      <i class="fe fe-edit-2 mr-1" />
                       <Text id="integration.thermostat.device.editButton" />
                     </Link>
                   </div>

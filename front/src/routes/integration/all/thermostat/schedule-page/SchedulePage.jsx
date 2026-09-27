@@ -203,80 +203,72 @@ class SchedulePageComponent extends Component {
                 ))}
               </div>
             </div>
-          </div>
 
-          <div class="card-body py-2">
-            <span class="text-muted mr-2">
-              <Text id="integration.thermostat.schedule.followedBy" />
-            </span>
-            {(schedule.devices || []).length === 0 && (
+            <div class="mt-3">
               <span class="text-muted mr-2">
-                <Text id="integration.thermostat.schedule.followedByNobody" />
+                <Text id="integration.thermostat.schedule.followedBy" />
               </span>
-            )}
-            {(schedule.devices || []).map(device => (
-              <span key={device.selector} class={`badge badge-secondary mr-1 ${style.followerBadge}`}>
-                {device.name}
-                {/* Detaching from here too: a thermostat attached by mistake would
+              {(schedule.devices || []).length === 0 && (
+                <span class="text-muted mr-2">
+                  <Text id="integration.thermostat.schedule.followedByNobody" />
+                </span>
+              )}
+              {(schedule.devices || []).map(device => (
+                <span key={device.selector} class={`badge badge-secondary mr-1 ${style.followerBadge}`}>
+                  {device.name}
+                  {/* Detaching from here too: a thermostat attached by mistake would
                 otherwise have to be detached from its own edit page. */}
-                <button
-                  type="button"
-                  class={style.followerDetach}
-                  onClick={() => this.props.detachThermostat(schedule.selector, device.selector)}
-                  title={detachLabel}
-                >
-                  <i class="fe fe-x" />
-                </button>
-              </span>
-            ))}
-            {/* Attaching from here is what removes the round trip: the schedule was
+                  <button
+                    type="button"
+                    class={style.followerDetach}
+                    onClick={() => this.props.detachThermostat(schedule.selector, device.selector)}
+                    title={detachLabel}
+                  >
+                    <i class="fe fe-x" />
+                  </button>
+                </span>
+              ))}
+              {/* Attaching from here is what removes the round trip: the schedule was
             otherwise created here and attached from each thermostat's edit page.
             Only shown when something is left to attach. */}
-            {this.attachableThermostats(schedule).length > 0 && (
-              <select
-                class={`form-control form-control-sm ${style.attachSelect}`}
-                onChange={e => this.attach(schedule.selector, e)}
-              >
-                <option value="">{attachLabel}</option>
-                {this.attachableThermostats(schedule).map(device => (
-                  <option key={device.selector} value={device.selector}>
-                    {device.name}
-                  </option>
-                ))}
-              </select>
-            )}
-            {/* Said next to the select, because it is not obvious: the link's key is
+              {this.attachableThermostats(schedule).length > 0 && (
+                <select
+                  class={`form-control form-control-sm ${style.attachSelect}`}
+                  onChange={e => this.attach(schedule.selector, e)}
+                >
+                  <option value="">{attachLabel}</option>
+                  {this.attachableThermostats(schedule).map(device => (
+                    <option key={device.selector} value={device.selector}>
+                      {device.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {/* Said next to the select, because it is not obvious: the link's key is
               the thermostat, so one thermostat follows one schedule and attaching
               it here silently takes it off whatever it followed. */}
-            {this.attachableThermostats(schedule).length > 0 && (
-              <small class="form-text text-muted">
-                <Text id="integration.thermostat.schedule.attachReplacesHelp" />
-              </small>
-            )}
-            {attachFailed === schedule.selector && (
-              <div class="text-danger mt-1">
-                <Text id="integration.thermostat.schedule.attachError" />
-              </div>
-            )}
-          </div>
+              {this.attachableThermostats(schedule).length > 0 && (
+                <small class="form-text text-muted">
+                  <Text id="integration.thermostat.schedule.attachReplacesHelp" />
+                </small>
+              )}
+              {attachFailed === schedule.selector && (
+                <div class="text-danger mt-1">
+                  <Text id="integration.thermostat.schedule.attachError" />
+                </div>
+              )}
+            </div>
 
-          {/* At the foot and full width, like the thermostat cards: three buttons
-              beside the name in a half-width card crowd it out. */}
-          <div class="card-body pt-0">
-            <div class={style.cardButtons}>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-secondary flex-fill"
-                onClick={() => this.startDuplicate(schedule)}
-              >
+            {/* At the foot and full width, like the thermostat cards: three
+                buttons beside the name in a half-width card crowd it out. They
+                stay inside this one card-body — stacked bodies draw a divider
+                between each, which is the line that ran above this row. */}
+            <div class={`${style.cardButtons} mt-3`}>
+              <button type="button" class="btn btn-secondary flex-fill" onClick={() => this.startDuplicate(schedule)}>
                 <i class="fe fe-copy mr-1" />
                 <Text id="integration.thermostat.schedule.duplicateButton" />
               </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-primary flex-fill"
-                onClick={() => this.startEdit(schedule)}
-              >
+              <button type="button" class="btn btn-primary flex-fill" onClick={() => this.startEdit(schedule)}>
                 <i class="fe fe-edit-2 mr-1" />
                 <Text id="integration.thermostat.schedule.editButton" />
               </button>
@@ -285,19 +277,19 @@ class SchedulePageComponent extends Component {
                   <Text id="integration.thermostat.schedule.confirmDelete" />
                   <button
                     type="button"
-                    class={cx('btn', 'btn-sm', 'btn-danger', 'ml-2', 'flex-fill', { 'btn-loading': deleting })}
+                    class={cx('btn', 'btn-danger', 'ml-2', 'flex-fill', { 'btn-loading': deleting })}
                     onClick={() => this.handleDelete(schedule.selector)}
                   >
                     <Text id="integration.thermostat.schedule.confirmYes" />
                   </button>
-                  <button type="button" class="btn btn-sm btn-secondary ml-1 flex-fill" onClick={this.cancelDelete}>
+                  <button type="button" class="btn btn-secondary ml-1 flex-fill" onClick={this.cancelDelete}>
                     <Text id="integration.thermostat.schedule.confirmNo" />
                   </button>
                 </span>
               ) : (
                 <button
                   type="button"
-                  class="btn btn-sm btn-outline-danger flex-fill"
+                  class="btn btn-danger flex-fill"
                   onClick={() => this.askDelete(schedule.selector)}
                 >
                   <i class="fe fe-trash-2 mr-1" />
