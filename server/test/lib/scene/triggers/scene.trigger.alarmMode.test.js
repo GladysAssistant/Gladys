@@ -45,7 +45,7 @@ describe('Scene.triggers.alarmMode', () => {
     sinon.reset();
   });
 
-  it('should execute scene with alarm.arm trigger', async () => {
+  it('should execute scene with alarm.away-arm trigger', async () => {
     await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -59,13 +59,13 @@ describe('Scene.triggers.alarmMode', () => {
       ],
       triggers: [
         {
-          type: EVENTS.ALARM.ARM,
+          type: EVENTS.ALARM.AWAY_ARM,
           house: 'house-1',
         },
       ],
     });
     sceneManager.checkTrigger({
-      type: EVENTS.ALARM.ARM,
+      type: EVENTS.ALARM.AWAY_ARM,
       house: 'house-1',
     });
     return new Promise((resolve, reject) => {
@@ -147,7 +147,7 @@ describe('Scene.triggers.alarmMode', () => {
       });
     });
   });
-  it('should execute scene with alarm.partial-arm trigger', async () => {
+  it('should execute scene with alarm.presence-arm trigger', async () => {
     await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -161,13 +161,47 @@ describe('Scene.triggers.alarmMode', () => {
       ],
       triggers: [
         {
-          type: EVENTS.ALARM.PARTIAL_ARM,
+          type: EVENTS.ALARM.PRESENCE_ARM,
           house: 'house-1',
         },
       ],
     });
     sceneManager.checkTrigger({
-      type: EVENTS.ALARM.PARTIAL_ARM,
+      type: EVENTS.ALARM.PRESENCE_ARM,
+      house: 'house-1',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute scene with alarm.night-arm trigger', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.ALARM.NIGHT_ARM,
+          house: 'house-1',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.ALARM.NIGHT_ARM,
       house: 'house-1',
     });
     return new Promise((resolve, reject) => {
@@ -263,13 +297,13 @@ describe('Scene.triggers.alarmMode', () => {
       ],
       triggers: [
         {
-          type: EVENTS.ALARM.ARM,
+          type: EVENTS.ALARM.AWAY_ARM,
           house: 'house-2',
         },
       ],
     });
     sceneManager.checkTrigger({
-      type: EVENTS.ALARM.ARM,
+      type: EVENTS.ALARM.AWAY_ARM,
       house: 'house-1',
     });
     return new Promise((resolve, reject) => {

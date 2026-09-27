@@ -53,7 +53,6 @@ describe('GET /api/v1/house/:selector/weather', () => {
             id: 'a741dfa6-24de-4b46-afc7-370772f068d5',
             name: 'Test house',
             selector: 'test-house',
-            alarm_code: null,
             alarm_delay_before_arming: 10,
             alarm_mode: 'disarmed',
             latitude: 12,

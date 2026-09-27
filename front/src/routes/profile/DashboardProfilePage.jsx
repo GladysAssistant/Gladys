@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import EditProfile from './EditProfile';
+import AlarmCode from './AlarmCode';
 
 import style from './style.css';
 import dashboardStyle from '../dashboard/style.css';
@@ -58,6 +59,7 @@ const DashboardProfile = ({ children, ...props }) => (
               </div>
             )}
             <EditProfile {...props} />
+            <AlarmCode />
           </div>
         </div>
       </div>

@@ -90,18 +90,6 @@ function createActions(store) {
       });
       store.setState(newState);
     },
-    updateHouseAlarmCode(state, code, houseIndex) {
-      const newState = update(state, {
-        houses: {
-          [houseIndex]: {
-            alarm_code: {
-              $set: code
-            }
-          }
-        }
-      });
-      store.setState(newState);
-    },
     updateHouseDelayBeforeArming(state, delayBeforeArming, houseIndex) {
       const newState = update(state, {
         houses: {

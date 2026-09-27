@@ -4,6 +4,7 @@ import get from 'get-value';
 import { RequestStatus } from '../../utils/consts';
 import Map from './Map';
 import AddressSearch from './AddressSearch';
+import AlarmCodes from './AlarmCodes';
 import EditRoom from './EditRoom';
 import style from './style.css';
 
@@ -132,47 +133,7 @@ const EditHouse = ({ children, ...props }) => {
           <p class={style.sectionHelp}>
             <Text id="signup.configureHouse.alarmDescription" />
           </p>
-          <div class="form-group">
-            <label class="form-label">
-              <Text id="signup.configureHouse.alarmCodeLabel" />
-            </label>
-            <div class="input-icon mb-3">
-              <Localizer>
-                <input
-                  type={props.showAlarmCode ? 'text' : 'password'}
-                  placeholder={<Text id="signup.configureHouse.alarmCodePlaceholder" />}
-                  value={props.house.alarm_code}
-                  class={cx('form-control', {
-                    'is-invalid': get(props, 'errors.alarm_code')
-                  })}
-                  onInput={props.updateHouseAlarmCode}
-                />
-              </Localizer>
-              <Localizer>
-                <button
-                  type="button"
-                  class="input-icon-addon cursor-pointer"
-                  onClick={props.toggleAlarmCodePassword}
-                  aria-pressed={props.showAlarmCode}
-                  aria-label={<Text id="housesSettings.toggleAlarmCodeVisibility" />}
-                >
-                  <i
-                    class={cx('fe', {
-                      'fe-eye': !props.showAlarmCode,
-                      'fe-eye-off': props.showAlarmCode
-                    })}
-                  />
-                </button>
-              </Localizer>
-            </div>
-            <div
-              class={cx('invalid-feedback', {
-                'd-block': get(props, 'errors.alarm_code')
-              })}
-            >
-              <Text id="signup.configureHouse.alarmCodeError" />
-            </div>
-          </div>
+          <AlarmCodes />
           <div class="form-group mb-0">
             <label class="form-label">
               <Text id="signup.configureHouse.alarmDelayBeforeArmingLabel" />
