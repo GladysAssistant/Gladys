@@ -224,6 +224,24 @@ function getBillingPeriodBounds(dateString, startDay, tz) {
 }
 
 /**
+ * @description The ids of the accumulation periods a local date belongs to: the day, the
+ * calendar month and the billing period (what the engine resets its accumulations on).
+ * @param {string} dateString - Local date.
+ * @param {number} billingPeriodStartDay - Billing period start day (1-31).
+ * @param {string} tz - IANA timezone.
+ * @returns {object} { day: "YYYY-MM-DD", month: "YYYY-MM", billing_period: start date of the period }.
+ * @example
+ * getPeriodIds('2026-02-03', 5, 'UTC'); // { day: '2026-02-03', month: '2026-02', billing_period: '2026-01-05' }
+ */
+function getPeriodIds(dateString, billingPeriodStartDay, tz) {
+  return {
+    day: dateString,
+    month: dateString.slice(0, 7),
+    billing_period: getBillingPeriodBounds(dateString, billingPeriodStartDay, tz).id,
+  };
+}
+
+/**
  * @description Tell whether a minute of the day falls in a compiled time range list.
  * @param {Array<object>} ranges - Compiled ranges [{ start, end }) in minutes.
  * @param {number} minutes - Minutes since local midnight.
@@ -273,6 +291,7 @@ module.exports = {
   getMonthBounds,
   getBillingPeriodStart,
   getBillingPeriodBounds,
+  getPeriodIds,
   isInTimeRanges,
   compileTimeIntervals,
 };

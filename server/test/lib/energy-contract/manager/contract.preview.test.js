@@ -145,6 +145,74 @@ describe('energyContract: preview and current price', () => {
         billing_period: 2.5,
         counters: { [compiled.counters[0].id]: { scope: 'day', kwh: 2.5 } },
       });
+      // at the start of a day the counter of the day is empty, the month one keeps yesterday
+      const midnight = await energyContract.getFeatureCumulative(
+        feature,
+        { timezone: 'UTC' },
+        new Date('2026-01-13T00:00:00Z').getTime(),
+        { compiled, calendars: createCalendarLookup() },
+      );
+      expect(midnight).to.deep.equal({
+        day: 0,
+        month: 4.5,
+        billing_period: 4.5,
+        counters: { [compiled.counters[0].id]: { scope: 'day', kwh: 0 } },
+      });
+      // nothing before the contract is counted, the cost job starts it at its first interval
+      const started = await energyContract.getFeatureCumulative(
+        feature,
+        { timezone: 'UTC', valid_from: '2026-01-12' },
+        new Date('2026-01-12T12:00:00Z').getTime(),
+      );
+      expect(started).to.deep.equal({ day: 2.5, month: 2.5, billing_period: 2.5 });
+      const later = await energyContract.getFeatureCumulative(
+        feature,
+        { timezone: 'UTC', valid_from: '2026-01-12' },
+        new Date('2026-01-13T00:00:00Z').getTime(),
+      );
+      expect(later).to.deep.equal({ day: 0, month: 4.5, billing_period: 4.5 });
+    });
+
+    it('should bound the preview accumulation and per-day tiers by the contract validity', async () => {
+      const perDay = {
+        tariff_version: 1,
+        components: [
+          {
+            key: 'energy',
+            kind: 'consumption',
+            rules: [
+              {
+                label: 'allowance',
+                when: { tier: { cumulative: 'month', from_kwh_per_day: 0, to_kwh_per_day: 1 } },
+                price: 0.1,
+              },
+            ],
+            fallback: { label: 'rest', price: 0.3 },
+          },
+        ],
+      };
+      await insertConsumption([
+        // before the contract: never counted
+        { value: 10, created_at: new Date('2026-01-15T12:30:00Z') },
+        { value: 10, created_at: new Date('2026-01-16T12:30:00Z') },
+        { value: 10, created_at: new Date('2026-01-20T12:30:00Z') },
+      ]);
+      const params = {
+        tariff: perDay,
+        from: '2026-01-20T12:00:00Z',
+        to: '2026-01-20T13:00:00Z',
+        electric_meter_device_id: METER_DEVICE_ID,
+        timezone: 'UTC',
+      };
+      // a contract starting on 16 January: 16 kWh allowed, 10 already counted
+      const started = await energyContract.preview({ ...params, valid_from: '2026-01-16', valid_to: '' });
+      expect(started.components.energy).to.equal(6 * 0.1 + 4 * 0.3);
+      // without validity: 31 kWh allowed, 20 counted
+      const whole = await energyContract.preview(params);
+      expect(whole.components.energy).to.equal(1);
+      await expect(energyContract.preview({ ...params, valid_from: '16/01/2026' })).to.be.rejectedWith(
+        'valid_from: must be a YYYY-MM-DD date',
+      );
     });
 
     it('should count the calendar warnings', async () => {
@@ -218,8 +286,9 @@ describe('energyContract: preview and current price', () => {
       const current = await energyContract.getCurrent('tiered', { at });
       expect(current).to.include({ currency: 'EUR', unit: 'kWh', price: 0.2, label: 'tier 2' });
       expect(current.cumulative).to.deep.equal({ day: 2.5, month: 2.5, billing_period: 2.5 });
-      // the accumulation is a snapshot: no time-based change ahead for a flat tiered tariff
-      expect(current.valid_until).to.equal(null);
+      // the daily allowance restarts at midnight: the next change is back to tier 1
+      expect(current.valid_until).to.equal('2026-01-13T00:00:00.000Z');
+      expect(current.next_label).to.equal('tier 1');
       expect(current.contract.selector).to.equal('tiered');
     });
 

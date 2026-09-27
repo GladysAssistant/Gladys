@@ -149,6 +149,43 @@ describe('energy-contract getCurrentPrice', () => {
       'Tier 1',
     );
   });
+  it('should restart the accumulations when the scan crosses a period boundary', () => {
+    // Rate D: 40 kWh per day of the billing period
+    const rateD = compileTariff({
+      tariff_version: 1,
+      components: [
+        {
+          key: 'energy',
+          kind: 'consumption',
+          rules: [
+            {
+              label: 'Tier 1',
+              when: { tier: { cumulative: 'billing_period', from_kwh_per_day: 0, to_kwh_per_day: 40 } },
+              price: 0.07,
+            },
+          ],
+          fallback: { label: 'Tier 2', price: 0.1 },
+        },
+      ],
+    });
+    // 31 January, 1,200 kWh used of the 1,240 allowed: the February allowance (1,120) is not
+    // judged on the January total, the period restarts at midnight
+    const stillTier1 = getCurrentPrice(rateD, utc, {
+      at: '2026-01-31T12:00:00Z',
+      cumulative: { billing_period: 1200 },
+    });
+    expect(stillTier1.label).to.equal('Tier 1');
+    expect(stillTier1.valid_until).to.equal(null);
+    // 1,300 kWh: in tier 2 today, back in tier 1 with the new period
+    const backToTier1 = getCurrentPrice(rateD, utc, {
+      at: '2026-01-31T12:00:00Z',
+      cumulative: { billing_period: 1300 },
+    });
+    expect(backToTier1.label).to.equal('Tier 2');
+    expect(backToTier1.valid_until).to.equal('2026-02-01T00:00:00.000Z');
+    expect(backToTier1.next_label).to.equal('Tier 1');
+    expect(backToTier1.next_price).to.equal(0.07);
+  });
   it('should use the peak power the caller knows for power_threshold rules', () => {
     const compiled = compileTariff({
       tariff_version: 1,

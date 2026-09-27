@@ -7,9 +7,10 @@ const {
   readTierCumulative,
   createAccumulation,
   carryMonthAccumulation,
+  resetChangedPeriods,
 } = require('../../../lib/energy-contract/tariff.tier');
 const { compileTariff } = require('../../../lib/energy-contract/tariff.compile');
-const { getLocalContext } = require('../../../lib/energy-contract/tariff.time');
+const { getLocalContext, getPeriodIds } = require('../../../lib/energy-contract/tariff.time');
 
 const toronto = { timezone: 'America/Toronto' };
 const context = (ms, extra = {}) => ({
@@ -159,6 +160,32 @@ describe('energy-contract tariff.tier', () => {
       accumulation.add({ kwh: 1 }, context(Date.UTC(2026, 0, 12, 12)));
       accumulation.reset('month');
       expect(accumulation.snapshot()).to.deep.equal({ day: 2, month: 0, billing_period: 1 });
+    });
+  });
+  it('should reset the accumulations of the periods that changed between two instants', () => {
+    const cumulative = {
+      day: 3,
+      month: 40,
+      billing_period: 50,
+      counters: { 'month:x': { scope: 'month', kwh: 30 }, 'day:x': { scope: 'day', kwh: 2 } },
+    };
+    const january = getPeriodIds('2026-01-31', 15, 'UTC');
+    // same instant: the very same object
+    expect(resetChangedPeriods(cumulative, january, getPeriodIds('2026-01-31', 15, 'UTC'))).to.equal(cumulative);
+    // the next day, same month and billing period
+    expect(resetChangedPeriods(cumulative, january, getPeriodIds('2026-02-01', 15, 'UTC'))).to.deep.equal({
+      day: 0,
+      month: 0,
+      billing_period: 50,
+      counters: { 'month:x': { scope: 'month', kwh: 0 }, 'day:x': { scope: 'day', kwh: 0 } },
+    });
+    // a new billing period on the 15th
+    expect(
+      resetChangedPeriods({ day: 3, month: 40, billing_period: 50 }, january, getPeriodIds('2026-02-15', 15, 'UTC')),
+    ).to.deep.equal({
+      day: 0,
+      month: 0,
+      billing_period: 0,
     });
   });
   it('should carry the month accumulation and counters to the next billing period', () => {

@@ -279,6 +279,9 @@ class ContractWizard extends Component {
         timezone: form.timezone || undefined,
         currency: form.currency,
         billing_period_start_day: Number(form.billing_period_start_day) || 1,
+        // the validity bounds the per-day tiers and the accumulations like the saved contract will
+        valid_from: form.valid_from || undefined,
+        valid_to: form.valid_to || undefined,
         from: from.toISOString(),
         to: to.toISOString(),
         electric_meter_device_id: form.electric_meter_device_id || undefined

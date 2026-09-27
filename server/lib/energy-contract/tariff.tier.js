@@ -217,6 +217,37 @@ function createAccumulation(compiled, cumulativeBefore = {}) {
 }
 
 /**
+ * @description The accumulations as they stand once the engine has crossed from one instant's
+ * periods to another's: the scopes whose period id changed restart at zero, their counters
+ * included, the others carry on (what `priceIntervals` does between two intervals; the current
+ * price scan needs the same reset when it crosses a day, month or billing period boundary).
+ * @param {object} cumulative - { day, month, billing_period, counters? }.
+ * @param {object} fromIds - Period ids of the instant the accumulations belong to (getPeriodIds).
+ * @param {object} toIds - Period ids of the evaluated instant.
+ * @returns {object} A copy of the accumulations with the changed periods reset.
+ * @example
+ * resetChangedPeriods(cumulative, getPeriodIds('2026-01-31', 1, 'UTC'), getPeriodIds('2026-02-01', 1, 'UTC'));
+ */
+function resetChangedPeriods(cumulative, fromIds, toIds) {
+  const changed = SCOPES.filter((scope) => fromIds[scope] !== toIds[scope]);
+  if (changed.length === 0) {
+    return cumulative;
+  }
+  const reset = { ...cumulative };
+  changed.forEach((scope) => {
+    reset[scope] = 0;
+  });
+  if (cumulative.counters !== undefined) {
+    reset.counters = {};
+    Object.keys(cumulative.counters).forEach((id) => {
+      const counter = cumulative.counters[id];
+      reset.counters[id] = { scope: counter.scope, kwh: changed.includes(counter.scope) ? 0 : counter.kwh };
+    });
+  }
+  return reset;
+}
+
+/**
  * @description The accumulations a billing period hands to the next one inside the same
  * local month (section 7.4): the month accumulation and the month counters carry on, the
  * day and billing period ones restart at the boundary.
@@ -244,6 +275,8 @@ module.exports = {
   canonicalJson,
   normalizeCountsWhen,
   getTierCounterId,
+  toLocalDate,
+  resetChangedPeriods,
   getAccumulationPeriodDays,
   getTierBounds,
   readTierCumulative,

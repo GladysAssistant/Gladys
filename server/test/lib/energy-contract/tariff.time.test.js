@@ -88,6 +88,13 @@ describe('energy-contract tariff.time', () => {
     expect(clamped.endMs).to.equal(Date.UTC(2026, 1, 28));
     expect(clamped.endDate).to.equal('2026-02-28');
   });
+  it('should give the period ids of a date', () => {
+    expect(time.getPeriodIds('2026-02-03', 5, 'Europe/Paris')).to.deep.equal({
+      day: '2026-02-03',
+      month: '2026-02',
+      billing_period: '2026-01-05',
+    });
+  });
   it('should compile time intervals and test minutes against them', () => {
     expect(time.compileTimeIntervals([['22:00', '06:00']])).to.deep.equal([
       { start: 1320, end: 1440 },

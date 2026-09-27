@@ -1,9 +1,9 @@
 const { TARIFF_COMPONENT_KINDS, COST_DECIMALS } = require('./tariff.constants');
-const { getLocalContext, MS_PER_MINUTE } = require('./tariff.time');
+const { getLocalContext, getPeriodIds, MS_PER_MINUTE } = require('./tariff.time');
 const { matchesConditions } = require('./tariff.conditions');
 const { resolvePrice } = require('./tariff.priceIntervals');
 const { createCalendarLookup } = require('./calendar.lookup');
-const { readTierCumulative, getTierBounds } = require('./tariff.tier');
+const { readTierCumulative, getTierBounds, resetChangedPeriods } = require('./tariff.tier');
 
 const SLOT_MS = 30 * 60 * 1000;
 const EMPTY_LOOKUP = createCalendarLookup();
@@ -109,10 +109,21 @@ function getCurrentPrice(compiled, contract, options = {}) {
     next_price: null,
     next_label: undefined,
   };
-  // Next change: scan the following slot boundaries.
+  // Next change: scan the following slot boundaries. The accumulations are a snapshot at
+  // `at`: a slot in another day, month or billing period reads them reset, as the engine
+  // resets them at that boundary (a Rate D allowance restarts with the period, it does not
+  // shrink to the next period's days with the old total).
+  const billingPeriodStartDay = contract.billing_period_start_day || 1;
+  const atIds = getPeriodIds(local.date, billingPeriodStartDay, contract.timezone);
   let slot = at + SLOT_MS;
   while (slot - requestedAt <= horizonMs) {
-    const next = getUnitPriceAt(compiled, contract, slot, lookup, cumulative, maxPowerKw);
+    const slotIds = getPeriodIds(
+      getLocalContext(slot, contract.timezone).date,
+      billingPeriodStartDay,
+      contract.timezone,
+    );
+    const slotCumulative = resetChangedPeriods(cumulative, atIds, slotIds);
+    const next = getUnitPriceAt(compiled, contract, slot, lookup, slotCumulative, maxPowerKw);
     if (next.price !== current.price || next.label !== current.label) {
       result.valid_until = new Date(slot).toISOString();
       result.next_price = next.price;

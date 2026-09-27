@@ -1,8 +1,15 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../utils/constants');
 const { convertEnergyUnit } = require('../../utils/units');
 const db = require('../../models');
-const { getLocalContext, getDayBounds, getMonthBounds, getBillingPeriodBounds } = require('./tariff.time');
+const {
+  getLocalContext,
+  getDayBounds,
+  getMonthBounds,
+  getBillingPeriodBounds,
+  localToUtcMs,
+} = require('./tariff.time');
 const { priceIntervals } = require('./tariff.priceIntervals');
+const { toLocalDate } = require('./tariff.tier');
 
 const THIRTY_MINUTES_MS = 30 * 60 * 1000;
 const POWER_PEAKS_QUERY = `
@@ -105,12 +112,14 @@ async function getMeterCumulative(electricMeterDeviceId, contract, atMs, options
  * @description Compute the kWh accumulated by a consumption feature before an instant, per
  * scope (day, month, billing period), from its stored states: the accumulation the cost job
  * hands to a delegated integration for a window starting mid-period (section 7.1), the
- * feature's own accumulation like the engine does for a rules contract. With the compiled
- * tariff of a `rules` contract, the filtered counters of its `counts_when` tiers are computed
- * too, by replaying the engine over the same window (the calendars those conditions read are
- * loaded for it).
+ * feature's own accumulation like the engine does for a rules contract. Nothing before the
+ * contract's `valid_from` is counted: the cost job starts a contract's accumulation at its
+ * first interval, so the current price and the preview must too (an earlier contract on the
+ * same meter had its own). With the compiled tariff of a `rules` contract, the filtered
+ * counters of its `counts_when` tiers are computed too, by replaying the engine over the same
+ * window (the calendars those conditions read are loaded for it).
  * @param {object} feature - A 30-minute consumption feature.
- * @param {object} contract - `timezone`, `billing_period_start_day`.
+ * @param {object} contract - `timezone`, `billing_period_start_day`, optional `valid_from`.
  * @param {number} atMs - The instant (ms).
  * @param {object} [options] - `compiled` (compiled tariff), `calendars` (lookup covering the window).
  * @returns {Promise<object>} { day, month, billing_period, counters? } in kWh.
@@ -125,7 +134,11 @@ async function getFeatureCumulative(feature, contract, atMs, options = {}) {
     month: getMonthBounds(date, tz).startMs,
     billing_period: getBillingPeriodBounds(date, contract.billing_period_start_day || 1, tz).startMs,
   };
-  const earliest = Math.min(bounds.day, bounds.month, bounds.billing_period);
+  const validFrom = toLocalDate(contract.valid_from, tz);
+  const earliest = Math.max(
+    Math.min(bounds.day, bounds.month, bounds.billing_period),
+    validFrom === undefined ? 0 : localToUtcMs(validFrom, tz),
+  );
   const intervals = await this.getFeatureIntervals(feature, new Date(earliest), new Date(atMs - 1));
   const cumulative = { day: 0, month: 0, billing_period: 0 };
   intervals.forEach((interval) => {
@@ -139,9 +152,16 @@ async function getFeatureCumulative(feature, contract, atMs, options = {}) {
   const { compiled } = options;
   if (compiled !== undefined && compiled.counters.length > 0) {
     // a filtered counter only counts the intervals matching its conditions: the engine
-    // replays the window from the earliest boundary, resetting each counter with its period
+    // replays the window from the earliest boundary, resetting each counter with its period;
+    // an empty interval at `atMs` makes it reset the counters of a period that starts there
+    // (the last stored interval can belong to the previous day or month)
     const calendars = options.calendars || (await this.loadCalendarLookup(compiled.calendars, earliest, atMs, tz));
-    const replay = priceIntervals(compiled, contract, intervals, { calendars });
+    const replay = priceIntervals(
+      compiled,
+      contract,
+      [...intervals, { starts_at: new Date(atMs).toISOString(), kwh: 0 }],
+      { calendars },
+    );
     cumulative.counters = replay.cumulative.counters;
   }
   return cumulative;

@@ -6,7 +6,7 @@ const {
   COST_DECIMALS,
   CALENDAR_WARNING_REASONS,
 } = require('./tariff.constants');
-const { getLocalContext, getDayBounds, getMonthBounds, getBillingPeriodBounds } = require('./tariff.time');
+const { getLocalContext, getDayBounds, getMonthBounds, getPeriodIds } = require('./tariff.time');
 const { matchesConditions } = require('./tariff.conditions');
 const { computeDemandCharges } = require('./tariff.demand');
 const { createCalendarLookup } = require('./calendar.lookup');
@@ -186,11 +186,7 @@ function prepareIntervals(intervals, tz, billingPeriodStartDay) {
             ? (kwh * 60) / durationMinutes
             : Number(interval.max_power_kw),
         local,
-        periodIds: {
-          day: local.date,
-          month: local.date.slice(0, 7),
-          billing_period: getBillingPeriodBounds(local.date, billingPeriodStartDay, tz).id,
-        },
+        periodIds: getPeriodIds(local.date, billingPeriodStartDay, tz),
       };
     })
     .sort((a, b) => a.ms - b.ms);
