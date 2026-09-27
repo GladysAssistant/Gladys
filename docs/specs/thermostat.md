@@ -73,6 +73,8 @@ Which schedule a thermostat follows is **not** in this list: it is a relation, h
 
 `createDevice` accepts only this list plus, on a virtual thermostat, its four features; anything else in the request body is dropped rather than persisted. Every field the edit form offers is in that list: a field the filter dropped would silently need a second store, which is exactly what this section forbids.
 
+**The state features are named after the device's `external_id`, never its selector.** `createDevice` is the same route for a create and for every later save, and the selector does not exist yet on the first one — it is derived from the payload afterwards. Keying these features on the selector renames them between the two, and since a save rebuilds the feature set, the renamed ones are deleted and recreated: the preset and the mode the user had set go back to `null`, their history is dropped, and a scene written against them breaks. The `external_id` is the one identifier the client carries unchanged across both saves.
+
 On an external device `createDevice` keeps only the `preset` and `mode` features (B.3) and refuses a payload with no `THERMOSTAT_TARGET_FEATURE`: a thermostat with nothing to drive would sit in the integration page doing nothing, with no way to tell why. Switching a device back to `virtual` clears the three external params, so a stale selector can never keep driving a real thermostat.
 
 The hysteresis, TPI and switch params are meaningless on an external device — the real thermostat runs its own heuristic — and the edit form hides them there rather than offering settings that do nothing.
@@ -166,7 +168,7 @@ A single `setInterval` in the service ticks every 60 s and calls `applySchedules
 
 1. **Window open** — if a window sensor is configured and reads `0`, the pass stops after suspending the heating: the switch is cut (virtual), or the device is stopped (external — `OFF` on its mode feature when it has one, then the frost-protection setpoint). A `NEW_STATE` listener applies the same cut immediately, without waiting for the next tick, and takes the **same external branch**: an external thermostat carries no switch and no local setpoint feature, so a listener that requires either skips it entirely and leaves the heating running until the next tick.
 2. **Manual hold** — if a hold is armed and has not expired, the loop regulates on the held setpoint. On expiry it clears the hold, writes `schedule` back on the `preset` feature and falls through to the schedule.
-3. **Target preset** — when the `preset` feature reads `schedule`, the last transition point at or before now (E.3); otherwise the preset the feature carries. A device following no schedule with the feature on `schedule` regulates on nothing.
+3. **Target preset** — when the `preset` feature reads `schedule`, the last transition point at or before now (E.3), which is broadcast to the dashboards without being written on the feature (E.3); otherwise the preset the feature carries. A device following no schedule with the feature on `schedule` regulates on nothing.
 4. **Setpoint** — on a virtual thermostat, saved on this service's own `target-temperature` feature when it changed, alongside `operating-state`. On an external one, **written onto the real device** through the core, which routes it to the owning integration, preceded by the **mode** when the device exposes one (section C.0).
 5. **Switch** — **virtual only**, actuated only when its state differs from the computed one.
 
@@ -341,6 +343,8 @@ Migration `20260823000000` creates these tables. It has never run in production 
 ### E.3 Application
 
 The loop reads the schedule of every thermostat whose `preset` feature reads `schedule`, takes the **last transition at or before now** — in the Gladys timezone (C.1) — and applies its preset. When no point of the week precedes now, the last point of the week applies: the programme wraps, which is what removes the gap.
+
+**A preset resolved from the programme is broadcast, never stored on the `preset` feature.** The feature keeps reading `schedule`, because that is the standing intention; the resolved point is what that intention currently means, and it is already served by `current` (E.5), which is what the widget reads. Storing it would make the next pass read a deliberate choice, take the thermostat off its programme (B.2) and freeze it on the first point it ever applied. The `preset` feature is written only when a preset is *chosen* — by the widget, a scene, or the loop handing the thermostat back to `schedule` when a hold expires.
 
 A `PATCH` on a schedule, or a thermostat newly attached to one, triggers a regulation pass through the existing debounce. There is no dedicated route for it (D).
 

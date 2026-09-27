@@ -15,6 +15,7 @@ const {
   isStopped,
   getPreset,
   savePreset,
+  announcePreset,
   saveOperatingState,
   getManualHold,
   setManualHold,
@@ -643,11 +644,13 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
   // no preset at all has never been driven: it follows its schedule if it has
   // one, which is what a freshly attached programme should do.
   const followsProgramme = currentPreset === 'schedule' || currentPreset === null;
+  let fromProgramme = false;
   if (followsProgramme && link && link.schedule) {
     // The last point at or before now, the week wrapping onto its last point:
     // there is no gap to fall through and no interval to reconstruct.
     const transition = findCurrentTransition(link.schedule.transitions, dayOfWeek, currentMinutes);
     targetPreset = transition ? transition.preset : null;
+    fromProgramme = targetPreset !== null;
   }
   if (!targetPreset) {
     targetPreset = currentPreset || null;
@@ -670,11 +673,22 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
     }
   }
 
-  // Persist + notify the preset when it changed, and also when leaving manual
-  // mode: dashboards then display the manual preset, so they need the schedule
-  // preset pushed back even though the stored value never moved.
+  // Notify the preset when it changed, and also when leaving manual mode:
+  // dashboards then display the manual preset, so they need the current one
+  // pushed back even though the stored value never moved.
+  //
+  // A preset the programme resolved is only announced, never stored: the feature
+  // has to keep reading `schedule`, or the next pass would take that resolved
+  // preset for a deliberate choice, `followsProgramme` would turn false and the
+  // thermostat would stay frozen on the first point it ever applied. What the
+  // programme currently means is already served by the schedule's `current`,
+  // which is what the widget reads.
   if (currentPreset !== targetPreset || manualJustExpired) {
-    await savePreset.call({ gladys }, device, targetPreset, manualJustExpired);
+    if (fromProgramme) {
+      announcePreset.call({ gladys }, device, targetPreset);
+    } else {
+      await savePreset.call({ gladys }, device, targetPreset, manualJustExpired);
+    }
     logger.info(`Thermostat schedule: preset "${targetPreset}" applied to ${selector}`);
   }
 

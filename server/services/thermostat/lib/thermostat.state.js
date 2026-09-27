@@ -153,6 +153,25 @@ async function savePreset(device, name, force = false) {
 }
 
 /**
+ * @description Tell the dashboards which preset is in force, without touching the
+ * preset feature. A preset resolved from the programme is not a choice the user
+ * made: storing it on the feature would read as one on the next pass, and the
+ * thermostat would stop following its programme for good. `schedule` stays on the
+ * feature — it is the standing intention — and this says what it currently means.
+ * @param {object} device - The thermostat device.
+ * @param {string} name - The preset the programme resolved to.
+ * @returns {void}
+ * @example
+ * announcePreset.call(this, device, 'eco');
+ */
+function announcePreset(device, name) {
+  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    type: WEBSOCKET_MESSAGE_TYPES.THERMOSTAT.PRESET_UPDATED,
+    payload: { device: device.selector, preset: name },
+  });
+}
+
+/**
  * @description Write the operating state of a virtual thermostat, so the house
  * can see whether it is heating without inferring it from a switch.
  * @param {object} device - The thermostat device.
@@ -274,6 +293,7 @@ module.exports = {
   isStopped,
   getPreset,
   savePreset,
+  announcePreset,
   saveOperatingState,
   getManualHold,
   setManualHold,

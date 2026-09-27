@@ -388,6 +388,32 @@ describe('thermostat.regulateDevice', () => {
   });
 
   describe('preset resolution', () => {
+    it('should push the schedule preset back when a hold expires on an empty programme', async () => {
+      // A hold ends on a thermostat whose programme has no point at this hour:
+      // nothing is resolved from the programme, so `schedule` has to be stored and
+      // broadcast as the preset in force — the widgets are still showing the held
+      // one and would keep its cancel banner otherwise.
+      const mod = load({ selector: 'my-schedule', transitions: [] });
+      const gladys = buildGladys({ features: standardFeatures({ temp: 18 }) });
+
+      await regulate(mod, gladys, {
+        id: 'device-id',
+        selector: 'living-room',
+        features: [setpointFeature(), presetFeature('schedule')],
+        params: baseParams({
+          THERMOSTAT_MANUAL_SETPOINT: '22',
+          THERMOSTAT_MANUAL_UNTIL: String(Date.now() - 1000),
+        }),
+      });
+
+      const presets = gladys.event.emit
+        .getCalls()
+        .map((call) => call.args[1])
+        .filter((payload) => payload && payload.payload && payload.payload.preset)
+        .map((payload) => payload.payload.preset);
+      expect(presets).to.include('schedule');
+    });
+
     it('should fall back to the preset the thermostat carries when the schedule is empty', async () => {
       const mod = load({ selector: 'my-schedule', transitions: [] });
       const gladys = buildGladys({ features: standardFeatures({ temp: 18 }) });
@@ -711,6 +737,71 @@ describe('thermostat.regulateDevice - resilience', () => {
       id: 'device-id',
       selector: 'living-room',
       features: [setpointFeature(), presetFeature('schedule')],
+      params: baseParams(),
+    });
+
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(1);
+  });
+
+  it('should not store the preset it resolved from the programme', async () => {
+    // The regression that stopped a thermostat following its programme after the
+    // very first pass: storing the resolved preset (`eco`) on the preset feature
+    // makes the next pass read a deliberate choice, `followsProgramme` turns
+    // false, and the thermostat stays on that first point for good. The feature
+    // has to keep reading `schedule`.
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const preset = presetFeature('schedule');
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature(), preset],
+      params: baseParams({ THERMOSTAT_PRESET_ECO: '18' }),
+    });
+
+    const presetWrites = gladys.device.saveState.getCalls().filter((call) => call.args[0] === preset);
+    expect(presetWrites).to.have.lengthOf(0);
+    // The dashboards still learn which preset is in force, through the event.
+    const events = gladys.event.emit
+      .getCalls()
+      .map((call) => call.args[1])
+      .filter((payload) => payload && payload.payload && payload.payload.preset);
+    expect(events.map((e) => e.payload.preset)).to.include('eco');
+  });
+
+  it('should keep following the programme over successive passes', async () => {
+    // The same device regulated twice: the second pass has to resolve the
+    // programme again rather than freeze on the first point.
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const device = {
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature(), presetFeature('schedule')],
+      params: baseParams({ THERMOSTAT_PRESET_ECO: '18' }),
+    };
+
+    await regulate(mod, gladys, device);
+    await regulate(mod, gladys, device);
+
+    // Both passes regulated on the programme's setpoint, so both turned the
+    // heating on: a frozen thermostat would have resolved nothing the second time.
+    const switchWrites = gladys.device.setValue.getCalls().map((call) => call.args[2]);
+    expect(switchWrites).to.deep.equal([1, 1]);
+  });
+
+  it('should store a preset that the user chose rather than the programme', async () => {
+    // The counterpart: with no programme point to resolve, the preset the device
+    // carries is a decision, and it is persisted as one.
+    const mod = load(null);
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature(), presetFeature('comfort')],
       params: baseParams(),
     });
 
