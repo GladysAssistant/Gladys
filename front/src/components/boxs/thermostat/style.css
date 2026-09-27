@@ -290,8 +290,10 @@
   max-width: 56px;
   height: 56px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   background: transparent;
   border: none;
   border-radius: 12px;
@@ -605,4 +607,16 @@
   .activeIconCooling {
     animation: none;
   }
+}
+
+/* The preset name under its icon. Small and clipped rather than wrapped: the bar
+   holds six of these across a card that is narrow on a phone, and a name that
+   wrapped would push the icons out of line. */
+.segmentBtnLabel {
+  font-size: 9px;
+  line-height: 1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

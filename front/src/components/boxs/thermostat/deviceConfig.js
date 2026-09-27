@@ -98,6 +98,7 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
   let paramsConfig = null;
   let deviceState = null;
   let deviceSelector = null;
+  let deviceName = null;
   try {
     // The config lives on this integration's own device, so it is looked up
     // among this service's thermostats — never by feature selector on
@@ -116,6 +117,7 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
     paramsConfig = device ? buildConfigFromParams(device) : null;
     deviceState = device ? buildStateFromFeatures(device) : null;
     deviceSelector = device ? device.selector : null;
+    deviceName = device ? device.name : null;
   } catch (e) {
     paramsConfig = null;
   }
@@ -125,7 +127,12 @@ export const loadDeviceConfig = async (httpClient, thermostatFeature) => {
   }
 
   // A param left empty falls back to the shared default rather than staying null.
-  const merged = { ...paramsConfig, ...(deviceState || {}), device_selector: deviceSelector };
+  const merged = {
+    ...paramsConfig,
+    ...(deviceState || {}),
+    device_selector: deviceSelector,
+    device_name: deviceName
+  };
   Object.keys(DEFAULTS).forEach(field => {
     if (merged[field] === null || merged[field] === undefined) {
       merged[field] = DEFAULTS[field];

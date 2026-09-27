@@ -1092,9 +1092,12 @@ class ThermostatBox extends Component {
 
     return (
       <div class="card">
-        {props.box.name && (
+        {/* The thermostat's own name when the box was not given one: two
+            thermostats side by side on a dashboard were otherwise two identical
+            cards with no way to tell which room each drove. */}
+        {(props.box.name || cfg.device_name) && (
           <div class="card-header">
-            <h3 class="card-title">{props.box.name}</h3>
+            <h3 class="card-title">{props.box.name || cfg.device_name}</h3>
           </div>
         )}
         <div class="card-body">
@@ -1283,8 +1286,13 @@ class ThermostatBox extends Component {
                                 style={isActive ? `--preset-color:${presetColor}` : undefined}
                                 onClick={() => this.selectPreset(preset)}
                                 title={presetTitle}
+                                aria-pressed={isActive ? 'true' : 'false'}
                               >
                                 <i class={`fe ${preset.icon}`} />
+                                {/* The name under the icon: `title` only shows on
+                                    hover, so on a wall tablet the bar was six
+                                    unlabelled pictograms. */}
+                                <span class={style.segmentBtnLabel}>{presetTitle}</span>
                               </button>
                             );
                           })}

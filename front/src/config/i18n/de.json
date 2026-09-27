@@ -3473,6 +3473,7 @@
         "confirmYes": "Ja",
         "confirmNo": "Nein",
         "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
+        "duplicateNameError": "Ein Zeitplan dieses Hauses trägt diesen Namen bereits. Zwei Häuser dürfen aber jeweils ihre eigene „Woche“ haben.",
         "gapWarning": "Einige Tage sind nicht vollständig abgedeckt. Das Thermostat bleibt in diesen Zeiträumen auf seinem aktuellen Preset:",
         "nextDay": "+1T",
         "fullDayHint": "00:00 → 00:00 deckt den ganzen Tag ab.",

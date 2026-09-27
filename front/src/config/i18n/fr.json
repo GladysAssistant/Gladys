@@ -759,7 +759,7 @@
         "preset": {
           "off": "Arrêt",
           "frost": "Hors-gel",
-          "away": "Absent",
+          "away": "Absence",
           "comfort": "Confort",
           "eco": "Éco",
           "night": "Nuit"
@@ -3473,6 +3473,7 @@
         "confirmYes": "Oui",
         "confirmNo": "Non",
         "saveError": "Erreur lors de la sauvegarde.",
+        "duplicateNameError": "Un planning porte déjà ce nom dans cette maison. Deux maisons peuvent en revanche avoir chacune leur « Semaine ».",
         "gapWarning": "Certains jours ne sont pas couverts en totalité. Le thermostat restera sur son preset courant pendant ces plages :",
         "nextDay": "+1j",
         "fullDayHint": "00:00 → 00:00 couvre la journée entière.",

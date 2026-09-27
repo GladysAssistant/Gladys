@@ -3473,6 +3473,7 @@
         "confirmYes": "Sí",
         "confirmNo": "No",
         "saveError": "Error al guardar.",
+        "duplicateNameError": "Una programación de esta casa ya tiene ese nombre. Sin embargo, dos casas pueden tener cada una su propia «Semana».",
         "gapWarning": "Algunos días no están totalmente cubiertos. El termostato mantendrá su preajuste actual durante estos intervalos:",
         "nextDay": "+1d",
         "fullDayHint": "00:00 → 00:00 cubre todo el día.",
