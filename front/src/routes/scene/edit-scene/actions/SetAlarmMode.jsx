@@ -5,11 +5,7 @@ import { Text } from 'preact-i18n';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import get from 'get-value';
 
-import { ALARM_MODES_LIST } from '../../../../../../server/utils/constants';
-
-const capitalizeFirstLetter = string => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
+import { ALARM_SETTABLE_MODES_LIST } from '../../../../../../server/utils/constants';
 
 class SetAlarmMode extends Component {
   getOptions = async () => {
@@ -64,10 +60,10 @@ class SetAlarmMode extends Component {
   constructor(props) {
     super(props);
     this.props = props;
-    const alarmModesOptions = ALARM_MODES_LIST.map(alarmMode => {
+    const alarmModesOptions = ALARM_SETTABLE_MODES_LIST.map(alarmMode => {
       return {
         value: alarmMode,
-        label: capitalizeFirstLetter(get(props.intl.dictionary, `alarmModes.${alarmMode}`, { default: alarmMode }))
+        label: get(props.intl.dictionary, `alarmModeNames.${alarmMode}`, { default: alarmMode })
       };
     });
     this.state = {
