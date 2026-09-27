@@ -48,12 +48,21 @@ describe('energy-contract tariff.time', () => {
     expect(bounds.startMs).to.equal(Date.UTC(2026, 0, 11, 23));
     expect(bounds.endMs).to.equal(Date.UTC(2026, 0, 12, 23));
   });
+  it('should count the days between two dates', () => {
+    expect(time.daysBetween('2026-01-01', '2026-02-01')).to.equal(31);
+    expect(time.daysBetween('2024-02-01', '2024-03-01')).to.equal(29);
+    expect(time.daysBetween('2026-01-15', '2026-01-15')).to.equal(0);
+    expect(time.daysBetween('2026-01-15', '2026-01-10')).to.equal(-5);
+  });
   it('should compute month bounds', () => {
     const february = time.getMonthBounds('2026-02-10', 'Europe/Paris');
     expect(february.durationMinutes).to.equal(28 * 1440);
     expect(february.id).to.equal('2026-02');
+    expect(february.startDate).to.equal('2026-02-01');
+    expect(february.endDate).to.equal('2026-03-01');
     const december = time.getMonthBounds('2026-12-05', 'UTC');
     expect(december.endMs).to.equal(Date.UTC(2027, 0, 1));
+    expect(december.endDate).to.equal('2027-01-01');
     expect(december.startMs).to.equal(Date.UTC(2026, 11, 1));
   });
   it('should find the start of a billing period, clamping short months', () => {
@@ -72,9 +81,12 @@ describe('energy-contract tariff.time', () => {
     expect(period.startMs).to.equal(Date.UTC(2026, 11, 15));
     expect(period.endMs).to.equal(Date.UTC(2027, 0, 15));
     expect(period.durationMinutes).to.equal(31 * 1440);
+    expect(period.startDate).to.equal('2026-12-15');
+    expect(period.endDate).to.equal('2027-01-15');
     const clamped = time.getBillingPeriodBounds('2026-01-31', 31, 'UTC');
     expect(clamped.id).to.equal('2026-01-31');
     expect(clamped.endMs).to.equal(Date.UTC(2026, 1, 28));
+    expect(clamped.endDate).to.equal('2026-02-28');
   });
   it('should compile time intervals and test minutes against them', () => {
     expect(time.compileTimeIntervals([['22:00', '06:00']])).to.deep.equal([

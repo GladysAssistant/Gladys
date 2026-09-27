@@ -116,6 +116,66 @@ describe('energy-contract validateTariff', () => {
       'tariff.components[0].rules[0].when.tier.cumulative',
     );
   });
+  it('should accept per-day tier bounds and counting conditions', () => {
+    const tariff = validateTariff(
+      base(
+        [
+          consumption({
+            rules: [
+              {
+                when: {
+                  tier: {
+                    cumulative: 'billing_period',
+                    from_kwh_per_day: 0,
+                    to_kwh_per_day: 40,
+                    counts_when: { not_calendar: { peaks: 'peak' }, time: [['06:00', '22:00']], weekdays: ['mon'] },
+                  },
+                },
+                price: 0.05,
+              },
+              { when: { tier: { cumulative: 'month', from_kwh_per_day: 40 } }, price: 0.09 },
+            ],
+          }),
+        ],
+        ['peaks'],
+      ),
+    );
+    expect(tariff.components[0].rules[0].when.tier.to_kwh_per_day).to.equal(40);
+  });
+  it('should reject inconsistent per-day tier bounds', () => {
+    const tier = (fields) =>
+      base([consumption({ rules: [{ when: { tier: { cumulative: 'day', ...fields } }, price: 1 }] })]);
+    expectError(tier({}), 'tariff.components[0].rules[0].when.tier: ');
+    expectError(tier({ from_kwh: 0, from_kwh_per_day: 0 }), 'tariff.components[0].rules[0].when.tier: ');
+    expectError(tier({ from_kwh_per_day: 0, to_kwh: 40 }), 'tariff.components[0].rules[0].when.tier.to_kwh: ');
+    expectError(tier({ from_kwh: 0, to_kwh_per_day: 40 }), 'tariff.components[0].rules[0].when.tier.to_kwh_per_day: ');
+    expectError(
+      tier({ from_kwh_per_day: 40, to_kwh_per_day: 20 }),
+      'tariff.components[0].rules[0].when.tier.to_kwh_per_day',
+    );
+  });
+  it('should reject counting conditions that are not about the interval', () => {
+    const tier = (countsWhen) =>
+      base(
+        [
+          consumption({
+            rules: [{ when: { tier: { cumulative: 'day', from_kwh: 0, counts_when: countsWhen } }, price: 1 }],
+          }),
+        ],
+        ['peaks'],
+      );
+    expectError(tier({}), 'tariff.components[0].rules[0].when.tier.counts_when: ');
+    expectError(tier({ tier: { cumulative: 'day', from_kwh: 0 } }), 'when.tier.counts_when.tier');
+    expectError(tier({ power_threshold: { above_kw: 6 } }), 'when.tier.counts_when.power_threshold');
+    expectError(
+      tier({ calendar: { holidays: 'holiday' } }),
+      'tariff.components[0].rules[0].when.tier.counts_when.calendar.holidays: calendar "holidays" is not declared',
+    );
+    expectError(
+      tier({ not_calendar: { holidays: 'holiday' } }),
+      'tariff.components[0].rules[0].when.tier.counts_when.not_calendar.holidays: calendar "holidays" is not declared',
+    );
+  });
   it('should reject malformed time, weekday, month, season and date conditions', () => {
     expectError(base([consumption({ rules: [{ when: { time: [['6:00', '22:00']] }, price: 1 }] })]), 'when.time[0][0]');
     expectError(base([consumption({ rules: [{ when: { time: [['06:00']] }, price: 1 }] })]), 'when.time[0]');

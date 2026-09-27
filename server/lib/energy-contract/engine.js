@@ -8,6 +8,7 @@ const { priceIntervals } = require('./tariff.priceIntervals');
 const { computeDemandCharges } = require('./tariff.demand');
 const { getCurrentPrice, getUnitPriceAt } = require('./tariff.currentPrice');
 const { createCalendarLookup } = require('./calendar.lookup');
+const { carryMonthAccumulation, getAccumulationPeriodDays } = require('./tariff.tier');
 const constants = require('./tariff.constants');
 
 module.exports = {
@@ -19,5 +20,7 @@ module.exports = {
   getCurrentPrice,
   getUnitPriceAt,
   createCalendarLookup,
+  carryMonthAccumulation,
+  getAccumulationPeriodDays,
   ...constants,
 };

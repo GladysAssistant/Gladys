@@ -10,6 +10,7 @@ const {
   TEST_SERVICE_ID,
 } = require('./helpers');
 const { buildSyntheticIntervals, sumCosts } = require('../../../../lib/energy-contract/contract.preview');
+const { compileTariff, createCalendarLookup } = require('../../../../lib/energy-contract/engine');
 
 const TIER_TARIFF = {
   tariff_version: 1,
@@ -18,6 +19,29 @@ const TIER_TARIFF = {
       key: 'energy',
       kind: 'consumption',
       rules: [{ label: 'tier 1', when: { tier: { cumulative: 'day', from_kwh: 0, to_kwh: 2 } }, price: 0.1 }],
+      fallback: { label: 'tier 2', price: 0.2 },
+    },
+  ],
+};
+
+// the allowance only counts the off-peak kWh: the peak slots are priced apart
+const COUNTED_TIER_TARIFF = {
+  tariff_version: 1,
+  calendars: ['peaks'],
+  components: [
+    {
+      key: 'energy',
+      kind: 'consumption',
+      rules: [
+        { label: 'peak', when: { calendar: { peaks: 'peak' } }, price: 0.5 },
+        {
+          label: 'tier 1',
+          when: {
+            tier: { cumulative: 'day', from_kwh: 0, to_kwh: 2, counts_when: { not_calendar: { peaks: 'peak' } } },
+          },
+          price: 0.1,
+        },
+      ],
       fallback: { label: 'tier 2', price: 0.2 },
     },
   ],
@@ -81,6 +105,46 @@ describe('energyContract: preview and current price', () => {
       expect(result.components.energy).to.equal(0.35);
       // the first interval straddles the two tiers: labelled by the last rule applied
       expect(result.samples.map((s) => s.label)).to.deep.equal(['tier 2', 'tier 2']);
+    });
+
+    it('should replay the counted accumulation of a counts_when tier from the stored states', async () => {
+      await energyContract.declareCalendar({ key: 'peaks', granularity: 'thirty_minutes' }, TEST_SERVICE_ID);
+      await energyContract.publishCalendarEntries('peaks', [{ starts_at: '2026-01-12T00:00:00Z', value: 'peak' }], {
+        provider_service_id: TEST_SERVICE_ID,
+        skip_recalculation: true,
+      });
+      await insertConsumption([
+        // a peak slot: priced apart, not counted in the allowance
+        { value: 1.5, created_at: new Date('2026-01-12T00:30:00Z') },
+        { value: 1, created_at: new Date('2026-01-12T01:00:00Z') },
+        { value: 1, created_at: new Date('2026-01-12T12:30:00Z') },
+        { value: 1, created_at: new Date('2026-01-12T13:00:00Z') },
+      ]);
+      const result = await energyContract.preview({
+        tariff: COUNTED_TIER_TARIFF,
+        from: '2026-01-12T12:00:00Z',
+        to: '2026-01-12T14:00:00Z',
+        electric_meter_device_id: METER_DEVICE_ID,
+        timezone: 'UTC',
+      });
+      // 1 kWh counted before the window (2.5 consumed): 1 kWh left in the allowance, then 1 kWh beyond
+      expect(result.components.energy).to.equal(0.3);
+      expect(result.samples.map((s) => s.label)).to.deep.equal(['tier 1', 'tier 2']);
+      // the counters follow the calendars the caller gives: without the peak, everything is counted
+      const compiled = compileTariff(COUNTED_TIER_TARIFF);
+      const feature = energyContract.getMeterConsumptionFeature(METER_DEVICE_ID);
+      const cumulative = await energyContract.getFeatureCumulative(
+        feature,
+        { timezone: 'UTC' },
+        new Date('2026-01-12T12:00:00Z').getTime(),
+        { compiled, calendars: createCalendarLookup() },
+      );
+      expect(cumulative).to.deep.equal({
+        day: 2.5,
+        month: 2.5,
+        billing_period: 2.5,
+        counters: { [compiled.counters[0].id]: { scope: 'day', kwh: 2.5 } },
+      });
     });
 
     it('should count the calendar warnings', async () => {
@@ -157,6 +221,23 @@ describe('energyContract: preview and current price', () => {
       // the accumulation is a snapshot: no time-based change ahead for a flat tiered tariff
       expect(current.valid_until).to.equal(null);
       expect(current.contract.selector).to.equal('tiered');
+    });
+
+    it('should judge a counts_when tier on its counter and keep the counters out of the answer', async () => {
+      await energyContract.declareCalendar({ key: 'peaks', granularity: 'thirty_minutes' }, TEST_SERVICE_ID);
+      await energyContract.publishCalendarEntries('peaks', [{ starts_at: '2026-01-12T00:00:00Z', value: 'peak' }], {
+        provider_service_id: TEST_SERVICE_ID,
+        skip_recalculation: true,
+      });
+      await energyContract.create(contractPayload({ name: 'Counted', tariff: COUNTED_TIER_TARIFF, timezone: 'UTC' }));
+      await insertConsumption([
+        { value: 1.5, created_at: new Date('2026-01-12T00:30:00Z') },
+        { value: 1, created_at: new Date('2026-01-12T01:00:00Z') },
+      ]);
+      const current = await energyContract.getCurrent('counted', { at: new Date('2026-01-12T12:40:00Z').getTime() });
+      // 2.5 kWh today but 1 counted: still in the allowance
+      expect(current).to.include({ price: 0.1, label: 'tier 1' });
+      expect(current.cumulative).to.deep.equal({ day: 2.5, month: 2.5, billing_period: 2.5 });
     });
 
     it('should read the peak of the last interval on the historized power feature', async () => {

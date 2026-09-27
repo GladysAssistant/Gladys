@@ -2,6 +2,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } 
 const { convertEnergyUnit } = require('../../utils/units');
 const db = require('../../models');
 const { getLocalContext, getDayBounds, getMonthBounds, getBillingPeriodBounds } = require('./tariff.time');
+const { priceIntervals } = require('./tariff.priceIntervals');
 
 const THIRTY_MINUTES_MS = 30 * 60 * 1000;
 const POWER_PEAKS_QUERY = `
@@ -86,31 +87,37 @@ async function getFeatureIntervals(feature, from, to) {
  * @param {string} electricMeterDeviceId - Root meter device id.
  * @param {object} contract - `timezone`, `billing_period_start_day`.
  * @param {number} atMs - The instant (ms).
- * @returns {Promise<object>} { day, month, billing_period } in kWh.
+ * @param {object} [options] - `compiled` (the contract's compiled tariff: its `counts_when` counters are
+ * computed too), `calendars` (a lookup covering the accumulation window, loaded otherwise).
+ * @returns {Promise<object>} { day, month, billing_period, counters? } in kWh.
  * @example
- * await this.getMeterCumulative('…', contract, Date.now());
+ * await this.getMeterCumulative('…', contract, Date.now(), { compiled });
  */
-async function getMeterCumulative(electricMeterDeviceId, contract, atMs) {
+async function getMeterCumulative(electricMeterDeviceId, contract, atMs, options = {}) {
   const feature = this.getMeterConsumptionFeature(electricMeterDeviceId);
   if (feature === null) {
     return { day: 0, month: 0, billing_period: 0 };
   }
-  return this.getFeatureCumulative(feature, contract, atMs);
+  return this.getFeatureCumulative(feature, contract, atMs, options);
 }
 
 /**
  * @description Compute the kWh accumulated by a consumption feature before an instant, per
  * scope (day, month, billing period), from its stored states: the accumulation the cost job
  * hands to a delegated integration for a window starting mid-period (section 7.1), the
- * feature's own accumulation like the engine does for a rules contract.
+ * feature's own accumulation like the engine does for a rules contract. With the compiled
+ * tariff of a `rules` contract, the filtered counters of its `counts_when` tiers are computed
+ * too, by replaying the engine over the same window (the calendars those conditions read are
+ * loaded for it).
  * @param {object} feature - A 30-minute consumption feature.
  * @param {object} contract - `timezone`, `billing_period_start_day`.
  * @param {number} atMs - The instant (ms).
- * @returns {Promise<object>} { day, month, billing_period } in kWh.
+ * @param {object} [options] - `compiled` (compiled tariff), `calendars` (lookup covering the window).
+ * @returns {Promise<object>} { day, month, billing_period, counters? } in kWh.
  * @example
- * await this.getFeatureCumulative(feature, contract, Date.now());
+ * await this.getFeatureCumulative(feature, contract, Date.now(), { compiled });
  */
-async function getFeatureCumulative(feature, contract, atMs) {
+async function getFeatureCumulative(feature, contract, atMs, options = {}) {
   const tz = contract.timezone;
   const { date } = getLocalContext(atMs, tz);
   const bounds = {
@@ -129,6 +136,14 @@ async function getFeatureCumulative(feature, contract, atMs) {
       }
     });
   });
+  const { compiled } = options;
+  if (compiled !== undefined && compiled.counters.length > 0) {
+    // a filtered counter only counts the intervals matching its conditions: the engine
+    // replays the window from the earliest boundary, resetting each counter with its period
+    const calendars = options.calendars || (await this.loadCalendarLookup(compiled.calendars, earliest, atMs, tz));
+    const replay = priceIntervals(compiled, contract, intervals, { calendars });
+    cumulative.counters = replay.cumulative.counters;
+  }
   return cumulative;
 }
 

@@ -10,6 +10,7 @@ const { getLocalContext, getDayBounds, getMonthBounds, getBillingPeriodBounds } 
 const { matchesConditions } = require('./tariff.conditions');
 const { computeDemandCharges } = require('./tariff.demand');
 const { createCalendarLookup } = require('./calendar.lookup');
+const { createAccumulation, readTierCumulative, getTierBounds } = require('./tariff.tier');
 
 const SCOPES = Object.values(TARIFF_CUMULATIVE_SCOPES);
 const EMPTY_LOOKUP = createCalendarLookup();
@@ -63,8 +64,9 @@ function resolvePrice(spec, getCalendarValue) {
  * left, the fallback prices whatever remains.
  * @param {object} component - Compiled consumption component.
  * @param {object} interval - Prepared interval.
- * @param {object} context - The interval context: local, getCalendarValue, maxPowerKw.
- * @param {object} cumulative - The kWh accumulated before this interval, per scope.
+ * @param {object} context - The interval context: local, getCalendarValue, maxPowerKw, and
+ * `tierBounds(tier)` (the kWh bounds of a tier for this interval).
+ * @param {object} cumulative - The kWh accumulated before this interval, per scope and counter.
  * @param {Array<object>} warnings - Collector of the run's warnings.
  * @returns {object} The amount and the label of the rule that priced the last share.
  * @example
@@ -103,9 +105,11 @@ function evaluateConsumption(component, interval, context, cumulative, warnings)
           label = rule.label;
         }
       } else {
-        const rangeStart = cumulative[tier.cumulative] + offset;
-        const rangeEnd = cumulative[tier.cumulative] + interval.kwh;
-        const share = Math.min(rangeEnd, tier.to_kwh) - Math.max(rangeStart, tier.from_kwh);
+        const before = readTierCumulative(tier, cumulative);
+        const bounds = context.tierBounds(tier);
+        const rangeStart = before + offset;
+        const rangeEnd = before + interval.kwh;
+        const share = Math.min(rangeEnd, bounds.to) - Math.max(rangeStart, bounds.from);
         if (share > 0) {
           const price = resolvePrice(rule, context.getCalendarValue);
           if (price === undefined) {
@@ -199,10 +203,12 @@ function prepareIntervals(intervals, tz, billingPeriodStartDay) {
  * @param {object} compiled - Output of compileTariff.
  * @param {object} contract - The contract: `timezone`, `billing_period_start_day` (1 by default).
  * @param {Array<object>} intervals - The intervals: `starts_at`, `kwh`, optional `max_power_kw` and `duration_minutes`.
- * @param {object} [options] - Options: `calendars` (lookup), `cumulative_before` ({ day, month, billing_period }
- * kWh accumulated before the first interval), `closed_period` (boolean, include the demand charges),
- * `exclude_kinds` (component kinds left out of the costs: a tax only applies to what is priced).
- * @returns {object} The run result: costs (starts_at, cost, components, label per interval), warnings, cumulative.
+ * @param {object} [options] - Options: `calendars` (lookup), `cumulative_before` ({ day, month, billing_period,
+ * counters? } kWh accumulated before the first interval, as a previous run returned it), `closed_period`
+ * (boolean, include the demand charges), `exclude_kinds` (component kinds left out of the costs: a tax only
+ * applies to what is priced).
+ * @returns {object} The run result: costs (starts_at, cost, components, label per interval), warnings,
+ * cumulative ({ day, month, billing_period } plus the `counters` of the `counts_when` tiers, if any).
  * @example
  * priceIntervals(compiled, { timezone: 'Europe/Paris' }, [{ starts_at: '2026-01-12T06:00:00Z', kwh: 1.2 }]);
  */
@@ -213,8 +219,17 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
   const excludedKinds = new Set(options.exclude_kinds || []);
   const prepared = prepareIntervals(intervals, tz, billingPeriodStartDay);
   const warnings = [];
-  const cumulative = { day: 0, month: 0, billing_period: 0, ...(options.cumulative_before || {}) };
+  const accumulation = createAccumulation(compiled, options.cumulative_before);
   const currentPeriodIds = {};
+  // the kWh bounds of a per-day tier depend on the days of the interval's period: computed once per period
+  const boundsCache = new Map();
+  const tierBoundsAt = (tier, interval) => {
+    const key = `${tier.counter}|${tier.from}|${tier.to}|${interval.periodIds[tier.cumulative]}`;
+    if (!boundsCache.has(key)) {
+      boundsCache.set(key, getTierBounds(tier, interval.local.date, contract));
+    }
+    return boundsCache.get(key);
+  };
   const demandByInterval =
     options.closed_period && !excludedKinds.has(TARIFF_COMPONENT_KINDS.DEMAND)
       ? computeDemandCharges(compiled, prepared)
@@ -225,7 +240,7 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
     SCOPES.forEach((scope) => {
       const id = interval.periodIds[scope];
       if (currentPeriodIds[scope] !== undefined && currentPeriodIds[scope] !== id) {
-        cumulative[scope] = 0;
+        accumulation.reset(scope);
       }
       currentPeriodIds[scope] = id;
     });
@@ -233,6 +248,7 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
       local: interval.local,
       getCalendarValue: (key) => lookup.get(key, interval.ms, interval.local, tz),
       maxPowerKw: interval.maxPowerKw,
+      tierBounds: (tier) => tierBoundsAt(tier, interval),
     };
     const components = {};
     let label;
@@ -242,7 +258,7 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
       }
       let amount = 0;
       if (component.kind === TARIFF_COMPONENT_KINDS.CONSUMPTION) {
-        const result = evaluateConsumption(component, interval, context, cumulative, warnings);
+        const result = evaluateConsumption(component, interval, context, accumulation.state, warnings);
         amount = result.amount;
         if (result.label !== undefined) {
           label = result.label;
@@ -259,14 +275,12 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
       }
       components[component.key] = roundCost(amount);
     });
-    SCOPES.forEach((scope) => {
-      cumulative[scope] += interval.kwh;
-    });
+    accumulation.add(interval, context);
     const cost = roundCost(Object.values(components).reduce((sum, amount) => sum + amount, 0));
     return { starts_at: interval.startsAt, cost, components, label };
   });
 
-  return { costs, warnings, cumulative };
+  return { costs, warnings, cumulative: accumulation.snapshot() };
 }
 
 module.exports = {

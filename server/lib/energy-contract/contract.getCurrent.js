@@ -25,7 +25,10 @@ async function getCurrent(selector, options = {}) {
   if (cached && cached.expires_at > Date.now()) {
     return cached.value;
   }
-  const cumulative = await this.getMeterCumulative(contract.electric_meter_device_id, contract, at);
+  const compiled = delegated ? undefined : this.getCompiledTariff(contract);
+  const cumulative = await this.getMeterCumulative(contract.electric_meter_device_id, contract, at, { compiled });
+  // the filtered counters of the `counts_when` tiers stay internal to the engine
+  const { counters, ...plainCumulative } = cumulative;
   const lastIntervals = await this.getMeterIntervals(
     contract.electric_meter_device_id,
     new Date(at - 2 * THIRTY_MINUTES_MS),
@@ -60,13 +63,12 @@ async function getCurrent(selector, options = {}) {
         starts_at: new Date(bounds.startMs).toISOString(),
         ends_at: new Date(bounds.endMs).toISOString(),
       },
-      cumulative,
+      cumulative: plainCumulative,
       max_power_kw: maxPowerKw,
     });
-    value = { ...base, ...answer, cumulative };
+    value = { ...base, ...answer, cumulative: plainCumulative };
     this.currentPriceCache.set(contract.id, { expires_at: Date.now() + CURRENT_CACHE_TTL_MS, value });
   } else {
-    const compiled = this.getCompiledTariff(contract);
     const calendars = await this.loadCalendarLookup(
       compiled.calendars,
       at - THIRTY_MINUTES_MS,
@@ -80,7 +82,7 @@ async function getCurrent(selector, options = {}) {
       max_power_kw: maxPowerKw,
       horizon_hours: HORIZON_HOURS,
     });
-    value = { ...base, ...current, cumulative };
+    value = { ...base, ...current, cumulative: plainCumulative };
   }
   return value;
 }

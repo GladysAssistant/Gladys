@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://gladysassistant.com/schemas/energy-contracts/tariff.schema.json",
   "title": "Gladys energy tariff definition",
-  "description": "Declarative tariff of an energy contract, interpreted by the Gladys rule engine (docs/specs/energy-contracts.md). Canonical owner: GladysAssistant/energy-contracts; the Gladys core embeds a copy and validates with its Joi mirror (server/lib/energy-contract/tariff.validate.js), which the sync test test/lib/energy-contract/tariff.schema.test.js checks on a shared fixture pack. This schema is the SYNTACTIC contract; the core validator additionally enforces the semantic rules JSON Schema cannot express, and the catalogue and the store indexer must run it (or its fixture pack) too: a consumption component needs a fallback or a last rule without `when`; tier.to_kwh must be greater than tier.from_kwh; component keys are unique; a tax only applies to components declared before it; every calendar referenced by a condition or a price_from_calendar is listed in tariff.calendars; template inputs ({{input:<key>}}) are substituted before validation.",
+  "description": "Declarative tariff of an energy contract, interpreted by the Gladys rule engine (docs/specs/energy-contracts.md). Canonical owner: GladysAssistant/energy-contracts; the Gladys core embeds a copy and validates with its Joi mirror (server/lib/energy-contract/tariff.validate.js), which the sync test test/lib/energy-contract/tariff.schema.test.js checks on a shared fixture pack. This schema is the SYNTACTIC contract; the core validator additionally enforces the semantic rules JSON Schema cannot express, and the catalogue and the store indexer must run it (or its fixture pack) too: a consumption component needs a fallback or a last rule without `when`; tier.to_kwh must be greater than tier.from_kwh and tier.to_kwh_per_day greater than tier.from_kwh_per_day; component keys are unique; a tax only applies to components declared before it; every calendar referenced by a condition (a tier counts_when included) or a price_from_calendar is listed in tariff.calendars; template inputs ({{input:<key>}}) are substituted before validation.",
   "type": "object",
   "additionalProperties": false,
   "required": ["tariff_version", "components"],
@@ -170,7 +170,7 @@
         "tier": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["cumulative", "from_kwh"],
+          "required": ["cumulative"],
           "properties": {
             "cumulative": {
               "enum": ["day", "month", "billing_period"]
@@ -183,8 +183,52 @@
               "type": "number",
               "exclusiveMinimum": 0,
               "description": "Open-ended when absent; must be greater than from_kwh (checked by the core validator)."
+            },
+            "from_kwh_per_day": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Bound per local day of the accumulation period: multiplied by the days of the day (1), of the month or of the billing period, intersected with the contract validity."
+            },
+            "to_kwh_per_day": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Open-ended when absent; must be greater than from_kwh_per_day (checked by the core validator)."
+            },
+            "counts_when": {
+              "$ref": "#/definitions/countingConditions",
+              "description": "The kWh of an interval feed this rule's accumulation only when these conditions match; rules with the same cumulative and counts_when share a counter."
             }
-          }
+          },
+          "oneOf": [
+            {
+              "required": ["from_kwh"],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": ["from_kwh_per_day"]
+                  },
+                  {
+                    "required": ["to_kwh_per_day"]
+                  }
+                ]
+              },
+              "description": "Fixed bounds."
+            },
+            {
+              "required": ["from_kwh_per_day"],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": ["from_kwh"]
+                  },
+                  {
+                    "required": ["to_kwh"]
+                  }
+                ]
+              },
+              "description": "Bounds per day of the accumulation period."
+            }
+          ]
         },
         "power_threshold": {
           "type": "object",
@@ -285,6 +329,35 @@
           "required": ["price_from_calendar"]
         }
       ]
+    },
+    "countingConditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "time": {
+          "$ref": "#/definitions/conditions/properties/time"
+        },
+        "weekdays": {
+          "$ref": "#/definitions/conditions/properties/weekdays"
+        },
+        "months": {
+          "$ref": "#/definitions/conditions/properties/months"
+        },
+        "season": {
+          "$ref": "#/definitions/conditions/properties/season"
+        },
+        "dates": {
+          "$ref": "#/definitions/conditions/properties/dates"
+        },
+        "calendar": {
+          "$ref": "#/definitions/calendarCondition"
+        },
+        "not_calendar": {
+          "$ref": "#/definitions/calendarCondition"
+        }
+      },
+      "description": "The conditions of a tier counts_when: every rule condition except tier and power_threshold."
     },
     "periodConditions": {
       "type": "object",

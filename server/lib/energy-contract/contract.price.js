@@ -111,7 +111,7 @@ async function priceContractIntervals(contract, intervals, options = {}) {
           starts_at: new Date(group.bounds.startMs).toISOString(),
           ends_at: new Date(group.bounds.endMs).toISOString(),
         },
-        cumulative_before: { ...cumulative },
+        cumulative_before: { day: cumulative.day, month: cumulative.month, billing_period: cumulative.billing_period },
         intervals: group.intervals.map((i) => {
           const prepared = fixedByStart.get(new Date(i.starts_at).toISOString());
           return {

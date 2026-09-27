@@ -66,6 +66,27 @@ const VALID = {
 // an empty components list is a valid definition: a delegated contract without fixed fees
 // (the contract validation requires a component in rules mode)
 VALID['empty components'] = base([]);
+VALID['per-day tier with counting conditions'] = base(
+  [
+    consumption({
+      rules: [
+        {
+          when: {
+            tier: {
+              cumulative: 'billing_period',
+              from_kwh_per_day: 0,
+              to_kwh_per_day: 40,
+              counts_when: { not_calendar: { peaks: 'peak' }, time: [['06:00', '22:00']], weekdays: ['mon'] },
+            },
+          },
+          price: 0.05,
+        },
+        { when: { tier: { cumulative: 'month', from_kwh_per_day: 40 } }, price: 0.09 },
+      ],
+    }),
+  ],
+  ['peaks'],
+);
 
 // Rejected by both validators.
 const INVALID = {
@@ -90,6 +111,39 @@ const INVALID = {
   'empty when': base([consumption({ rules: [{ when: {}, price: 1 }] })]),
   'bad cumulative': base([consumption({ rules: [{ when: { tier: { cumulative: 'week', from_kwh: 0 } }, price: 1 }] })]),
   'negative tier': base([consumption({ rules: [{ when: { tier: { cumulative: 'day', from_kwh: -1 } }, price: 1 }] })]),
+  'tier without bounds': base([consumption({ rules: [{ when: { tier: { cumulative: 'day' } }, price: 1 }] })]),
+  'tier with fixed and per-day bounds': base([
+    consumption({ rules: [{ when: { tier: { cumulative: 'day', from_kwh: 0, from_kwh_per_day: 0 } }, price: 1 }] }),
+  ]),
+  'tier to_kwh with per-day from': base([
+    consumption({ rules: [{ when: { tier: { cumulative: 'day', from_kwh_per_day: 0, to_kwh: 40 } }, price: 1 }] }),
+  ]),
+  'tier to_kwh_per_day with fixed from': base([
+    consumption({ rules: [{ when: { tier: { cumulative: 'day', from_kwh: 0, to_kwh_per_day: 40 } }, price: 1 }] }),
+  ]),
+  'tier empty counts_when': base([
+    consumption({ rules: [{ when: { tier: { cumulative: 'day', from_kwh: 0, counts_when: {} } }, price: 1 }] }),
+  ]),
+  'tier counts_when with a tier': base([
+    consumption({
+      rules: [
+        {
+          when: { tier: { cumulative: 'day', from_kwh: 0, counts_when: { tier: { cumulative: 'day', from_kwh: 0 } } } },
+          price: 1,
+        },
+      ],
+    }),
+  ]),
+  'tier counts_when with a power threshold': base([
+    consumption({
+      rules: [
+        {
+          when: { tier: { cumulative: 'day', from_kwh: 0, counts_when: { power_threshold: { above_kw: 6 } } } },
+          price: 1,
+        },
+      ],
+    }),
+  ]),
   'calendar value too long': base(
     [consumption({ rules: [{ when: { calendar: { tempo: 'x'.repeat(65) } }, price: 1 }] })],
     ['tempo'],
@@ -124,12 +178,24 @@ const SEMANTIC_ONLY = {
   'tier to_kwh below from_kwh': base([
     consumption({ rules: [{ when: { tier: { cumulative: 'day', from_kwh: 5, to_kwh: 2 } }, price: 1 }] }),
   ]),
+  'tier to_kwh_per_day below from_kwh_per_day': base([
+    consumption({
+      rules: [{ when: { tier: { cumulative: 'day', from_kwh_per_day: 5, to_kwh_per_day: 2 } }, price: 1 }],
+    }),
+  ]),
   'duplicate component keys': base([consumption(), { key: 'energy', kind: 'fixed', amount: 1, per: 'day' }]),
   'tax before its component': base([{ key: 'vat', kind: 'tax', rate: 20, applies_to: ['energy'] }, consumption()]),
   'undeclared calendar in a condition': base([
     consumption({ rules: [{ when: { calendar: { tempo: 'red' } }, price: 1 }] }),
   ]),
   'undeclared calendar price': base([consumption({ fallback: { price_from_calendar: 'spot' } })]),
+  'undeclared calendar in a counts_when': base([
+    consumption({
+      rules: [
+        { when: { tier: { cumulative: 'day', from_kwh: 0, counts_when: { calendar: { peaks: 'peak' } } } }, price: 1 },
+      ],
+    }),
+  ]),
 };
 
 describe('energy-contract tariff.schema.json', () => {

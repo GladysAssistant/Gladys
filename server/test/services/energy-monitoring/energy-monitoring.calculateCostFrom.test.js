@@ -469,6 +469,48 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(states.map((s) => Math.round(s.value * 100) / 100)).to.deep.equal([0.8, 2.2, 0.4]);
   });
 
+  it('should carry the counted accumulation of a counts_when tier over a billing period', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Counted month tier',
+        timezone: 'UTC',
+        valid_from: '2020-01-01',
+        billing_period_start_day: 15,
+        tariff: {
+          tariff_version: 1,
+          components: [
+            {
+              key: 'e',
+              kind: 'consumption',
+              rules: [
+                { when: { time: [['22:00', '06:00']] }, price: 0.5 },
+                {
+                  when: {
+                    tier: { cumulative: 'month', from_kwh: 0, to_kwh: 10, counts_when: { time: [['06:00', '22:00']] } },
+                  },
+                  price: 0.1,
+                },
+              ],
+              fallback: { price: 1 },
+            },
+          ],
+        },
+      }),
+    );
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 8, created_at: new Date('2025-08-14T10:00:00.000Z') },
+      // night: priced by the night rule, not counted in the allowance
+      { value: 5, created_at: new Date('2025-08-14T23:30:00.000Z') },
+      { value: 4, created_at: new Date('2025-08-16T10:00:00.000Z') },
+      { value: 4, created_at: new Date('2025-09-16T10:00:00.000Z') },
+    ]);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-01T00:00:00.000Z'));
+    const states = await costStates();
+    // 8 kWh counted in tier 1, the night kWh at the night price, then in the next billing
+    // period of the same month 2 kWh left in tier 1 and 2 above; September restarts
+    expect(states.map((s) => Math.round(s.value * 100) / 100)).to.deep.equal([0.8, 2.5, 2.2, 0.4]);
+  });
+
   it('should not carry the month accumulation over a skipped billing period', async () => {
     await energyContract.create(
       contractPayload({

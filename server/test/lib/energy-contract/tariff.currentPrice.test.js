@@ -105,6 +105,50 @@ describe('energy-contract getCurrentPrice', () => {
       'Tier 2',
     );
   });
+  it('should read the filtered counter and the per-day bounds of a tier', () => {
+    const compiled = compileTariff({
+      tariff_version: 1,
+      calendars: ['peaks'],
+      components: [
+        {
+          key: 'energy',
+          kind: 'consumption',
+          rules: [
+            { label: 'Peak', when: { calendar: { peaks: 'peak' } }, price: 0.5 },
+            {
+              label: 'Tier 1',
+              when: {
+                tier: {
+                  cumulative: 'billing_period',
+                  from_kwh_per_day: 0,
+                  to_kwh_per_day: 40,
+                  counts_when: { not_calendar: { peaks: 'peak' } },
+                },
+              },
+              price: 0.05,
+            },
+          ],
+          fallback: { label: 'Tier 2', price: 0.09 },
+        },
+      ],
+    });
+    const [counter] = compiled.counters;
+    const at = Date.UTC(2026, 0, 12, 12);
+    const lookup = createCalendarLookup();
+    // 31 days in January: 1,240 kWh in tier 1, judged on the off-peak counter, not on the total
+    const cumulative = { billing_period: 1300, counters: { [counter.id]: { scope: 'billing_period', kwh: 1239 } } };
+    expect(getUnitPriceAt(compiled, utc, at, lookup, cumulative).label).to.equal('Tier 1');
+    cumulative.counters[counter.id].kwh = 1240;
+    expect(getUnitPriceAt(compiled, utc, at, lookup, cumulative).label).to.equal('Tier 2');
+    // a contract that started on 12 January only counts 20 days: 800 kWh
+    expect(getUnitPriceAt(compiled, { ...utc, valid_from: '2026-01-12' }, at, lookup, cumulative).label).to.equal(
+      'Tier 2',
+    );
+    cumulative.counters[counter.id].kwh = 799;
+    expect(getUnitPriceAt(compiled, { ...utc, valid_from: '2026-01-12' }, at, lookup, cumulative).label).to.equal(
+      'Tier 1',
+    );
+  });
   it('should use the peak power the caller knows for power_threshold rules', () => {
     const compiled = compileTariff({
       tariff_version: 1,

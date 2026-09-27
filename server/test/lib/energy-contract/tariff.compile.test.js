@@ -62,14 +62,49 @@ describe('energy-contract tariff.compile', () => {
       expect(compiled.dates).to.deep.equal({ from: '2026-01-01', to: '2026-06-30' });
       expect(Array.from(compiled.calendar.tempo)).to.deep.equal(['red', 'white']);
       expect(Array.from(compiled.not_calendar.holidays)).to.deep.equal(['holiday']);
-      expect(compiled.tier).to.deep.equal({ cumulative: 'day', from_kwh: 0, to_kwh: Infinity });
+      expect(compiled.tier).to.deep.equal({
+        cumulative: 'day',
+        per_day: false,
+        from: 0,
+        to: Infinity,
+        counter: 'day',
+        counts_when: undefined,
+      });
       expect(compiled.power_threshold).to.deep.equal({ above_kw: 6 });
     });
     it('should keep a bounded tier', () => {
-      expect(compileConditions({ tier: { cumulative: 'month', from_kwh: 10, to_kwh: 40 } }).tier).to.deep.equal({
+      expect(compileConditions({ tier: { cumulative: 'month', from_kwh: 10, to_kwh: 40 } }).tier).to.deep.include({
         cumulative: 'month',
-        from_kwh: 10,
-        to_kwh: 40,
+        per_day: false,
+        from: 10,
+        to: 40,
+        counter: 'month',
+      });
+    });
+    it('should compile a per-day tier with counting conditions', () => {
+      const { tier } = compileConditions({
+        tier: {
+          cumulative: 'billing_period',
+          from_kwh_per_day: 0,
+          to_kwh_per_day: 40,
+          counts_when: { not_calendar: { peaks: 'peak' }, time: [['06:00', '22:00']] },
+        },
+      });
+      expect(tier).to.deep.include({
+        cumulative: 'billing_period',
+        per_day: true,
+        from: 0,
+        to: 40,
+        counter: 'billing_period:{"not_calendar":{"peaks":["peak"]},"time":[["06:00","22:00"]]}',
+      });
+      expect(Array.from(tier.counts_when.not_calendar.peaks)).to.deep.equal(['peak']);
+      expect(tier.counts_when.time).to.deep.equal([{ start: 360, end: 1320 }]);
+      // an open-ended per-day tier
+      expect(compileConditions({ tier: { cumulative: 'day', from_kwh_per_day: 40 } }).tier).to.deep.include({
+        per_day: true,
+        from: 40,
+        to: Infinity,
+        counter: 'day',
       });
     });
   });
@@ -105,7 +140,8 @@ describe('energy-contract tariff.compile', () => {
       const [energy, sub, vat, peak] = compiled.components;
       expect(energy.rules[0]).to.deep.include({ label: 'Off-peak', price: 0.1, multiplier: 1, offset: 0 });
       expect(energy.rules[0].when.time).to.have.lengthOf(2);
-      expect(energy.rules[1].when.tier.to_kwh).to.equal(100);
+      expect(energy.rules[1].when.tier.to).to.equal(100);
+      expect(compiled.counters).to.deep.equal([]);
       expect(energy.fallback).to.deep.equal({
         label: undefined,
         price: undefined,
@@ -121,6 +157,50 @@ describe('energy-contract tariff.compile', () => {
       // a demand charge reads the peak power of the intervals
       expect(compiled.needsPower).to.equal(true);
     });
+    it('should list the filtered counters of the counts_when tiers once per scope and conditions', () => {
+      const countsWhen = { not_calendar: { peaks: 'peak' } };
+      const compiled = compileTariff({
+        tariff_version: 1,
+        calendars: ['peaks'],
+        components: [
+          {
+            key: 'energy',
+            kind: 'consumption',
+            rules: [
+              { when: { calendar: { peaks: 'peak' } }, price: 0.5 },
+              {
+                when: {
+                  tier: { cumulative: 'month', from_kwh_per_day: 0, to_kwh_per_day: 40, counts_when: countsWhen },
+                },
+                price: 0.05,
+              },
+              // the same counter, written in another key order
+              {
+                when: {
+                  tier: {
+                    cumulative: 'month',
+                    from_kwh_per_day: 40,
+                    counts_when: { not_calendar: { peaks: ['peak'] } },
+                  },
+                },
+                price: 0.09,
+              },
+              { when: { tier: { cumulative: 'day', from_kwh: 0, counts_when: countsWhen } }, price: 0.1 },
+            ],
+            fallback: { price: 0.1 },
+          },
+        ],
+      });
+      expect(compiled.hasTier).to.equal(true);
+      expect(compiled.tierScopes).to.deep.equal(['month', 'day']);
+      expect(compiled.counters.map((c) => [c.id, c.scope])).to.deep.equal([
+        ['month:{"not_calendar":{"peaks":["peak"]}}', 'month'],
+        ['day:{"not_calendar":{"peaks":["peak"]}}', 'day'],
+      ]);
+      expect(Array.from(compiled.counters[0].when.not_calendar.peaks)).to.deep.equal(['peak']);
+      const [energy] = compiled.components;
+      expect(energy.rules[1].when.tier.counter).to.equal(energy.rules[2].when.tier.counter);
+    });
     it('should report a tariff without tiers', () => {
       const compiled = compileTariff({
         tariff_version: 1,
@@ -128,6 +208,7 @@ describe('energy-contract tariff.compile', () => {
       });
       expect(compiled.hasTier).to.equal(false);
       expect(compiled.tierScopes).to.deep.equal([]);
+      expect(compiled.counters).to.deep.equal([]);
       expect(compiled.needsPower).to.equal(false);
     });
     it('should need the power when a rule has a power threshold', () => {

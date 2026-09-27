@@ -7,6 +7,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const MS_PER_MINUTE = 60 * 1000;
+const MS_PER_DAY = 24 * 60 * MS_PER_MINUTE;
 
 /**
  * @description Parse a "HH:MM" label into minutes since midnight ("24:00" = 1440).
@@ -84,6 +85,22 @@ function addDays(dateString, days) {
 }
 
 /**
+ * @description Number of calendar days between two "YYYY-MM-DD" dates (end exclusive).
+ * @param {string} fromDate - Start date.
+ * @param {string} toDate - End date (excluded).
+ * @returns {number} The number of days, negative when `toDate` precedes `fromDate`.
+ * @example
+ * daysBetween('2026-01-01', '2026-02-01'); // 31
+ */
+function daysBetween(fromDate, toDate) {
+  const from = splitDate(fromDate);
+  const to = splitDate(toDate);
+  return Math.round(
+    (Date.UTC(to.year, to.month - 1, to.day) - Date.UTC(from.year, from.month - 1, from.day)) / MS_PER_DAY,
+  );
+}
+
+/**
  * @description The UTC instant of a local wall-clock time in a timezone.
  * @param {string} dateString - Local date "YYYY-MM-DD".
  * @param {string} tz - IANA timezone.
@@ -137,13 +154,15 @@ function getDayBounds(dateString, tz) {
  * @description Bounds of the calendar month of a local date.
  * @param {string} dateString - Local date.
  * @param {string} tz - IANA timezone.
- * @returns {object} { startMs, endMs, durationMinutes, id } (id = "YYYY-MM").
+ * @returns {object} { startMs, endMs, durationMinutes, id, startDate, endDate } (id = "YYYY-MM",
+ * `endDate` = first day of the next month, excluded).
  * @example
  * getMonthBounds('2026-02-10', 'Europe/Paris').durationMinutes; // 40320
  */
 function getMonthBounds(dateString, tz) {
   const { year, month } = splitDate(dateString);
-  const startMs = localToUtcMs(formatDate(year, month, 1), tz);
+  const startDate = formatDate(year, month, 1);
+  const startMs = localToUtcMs(startDate, tz);
   const nextMonth = month === 12 ? formatDate(year + 1, 1, 1) : formatDate(year, month + 1, 1);
   const endMs = localToUtcMs(nextMonth, tz);
   return {
@@ -151,6 +170,8 @@ function getMonthBounds(dateString, tz) {
     endMs,
     durationMinutes: (endMs - startMs) / MS_PER_MINUTE,
     id: `${year}-${String(month).padStart(2, '0')}`,
+    startDate,
+    endDate: nextMonth,
   };
 }
 
@@ -179,7 +200,8 @@ function getBillingPeriodStart(dateString, startDay) {
  * @param {string} dateString - Local date.
  * @param {number} startDay - Billing period start day (1-31).
  * @param {string} tz - IANA timezone.
- * @returns {object} { startMs, endMs, durationMinutes, id } (id = start date of the period).
+ * @returns {object} { startMs, endMs, durationMinutes, id, startDate, endDate } (id = start date of
+ * the period, `endDate` = start date of the next period, excluded).
  * @example
  * getBillingPeriodBounds('2026-02-03', 5, 'Europe/Paris').id; // '2026-01-05'
  */
@@ -191,7 +213,14 @@ function getBillingPeriodBounds(dateString, startDay, tz) {
   const next = formatDate(nextYear, nextMonth, Math.min(startDay, getDaysInMonth(nextYear, nextMonth)));
   const startMs = localToUtcMs(start, tz);
   const endMs = localToUtcMs(next, tz);
-  return { startMs, endMs, durationMinutes: (endMs - startMs) / MS_PER_MINUTE, id: start };
+  return {
+    startMs,
+    endMs,
+    durationMinutes: (endMs - startMs) / MS_PER_MINUTE,
+    id: start,
+    startDate: start,
+    endDate: next,
+  };
 }
 
 /**
@@ -237,6 +266,7 @@ module.exports = {
   formatDate,
   splitDate,
   addDays,
+  daysBetween,
   localToUtcMs,
   getLocalContext,
   getDayBounds,

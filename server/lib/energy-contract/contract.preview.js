@@ -106,6 +106,9 @@ async function preview(params) {
           params.electric_meter_device_id,
           contract,
           new Date(intervals[0].starts_at).getTime(),
+          {
+            compiled,
+          },
         )
       : undefined;
   const fromMs = new Date(intervals[0].starts_at).getTime();

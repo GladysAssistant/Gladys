@@ -3,6 +3,7 @@ const { getLocalContext, MS_PER_MINUTE } = require('./tariff.time');
 const { matchesConditions } = require('./tariff.conditions');
 const { resolvePrice } = require('./tariff.priceIntervals');
 const { createCalendarLookup } = require('./calendar.lookup');
+const { readTierCumulative, getTierBounds } = require('./tariff.tier');
 
 const SLOT_MS = 30 * 60 * 1000;
 const EMPTY_LOOKUP = createCalendarLookup();
@@ -16,7 +17,7 @@ const EMPTY_LOOKUP = createCalendarLookup();
  * @param {object} contract - The contract, with its timezone.
  * @param {number} ms - Instant, milliseconds since the epoch.
  * @param {object} lookup - Calendar lookup.
- * @param {object} cumulative - The kWh accumulated so far per scope (for tier rules).
+ * @param {object} cumulative - The kWh accumulated so far per scope and counter (for tier rules).
  * @param {number} [maxPowerKw] - Peak power of the last interval, for power_threshold rules (0 by default).
  * @returns {object} The unit price { price, label }; `price` is null when a calendar value is missing.
  * @example
@@ -37,10 +38,12 @@ function getUnitPriceAt(compiled, contract, ms, lookup, cumulative, maxPowerKw =
           return false;
         }
         const tier = r.when === undefined ? undefined : r.when.tier;
-        return (
-          tier === undefined ||
-          (cumulative[tier.cumulative] >= tier.from_kwh && cumulative[tier.cumulative] < tier.to_kwh)
-        );
+        if (tier === undefined) {
+          return true;
+        }
+        const before = readTierCumulative(tier, cumulative);
+        const bounds = getTierBounds(tier, local.date, contract);
+        return before >= bounds.from && before < bounds.to;
       });
       // a consumption component always has a fallback or a catch-all last rule (validated);
       // like priceIntervals, a matching rule whose calendar price is missing yields the fallback
@@ -80,7 +83,7 @@ function getUnitPriceAt(compiled, contract, ms, lookup, cumulative, maxPowerKw =
  * @param {object} compiled - Compiled tariff.
  * @param {object} contract - The contract, with its timezone.
  * @param {object} [options] - Options: `at` (Date or timestamp, now by default), `calendars` (lookup),
- * `cumulative` ({ day, month, billing_period } for tier rules), `max_power_kw` (peak of the last interval,
+ * `cumulative` ({ day, month, billing_period, counters? } for tier rules), `max_power_kw` (peak of the last interval,
  * for power_threshold rules), `horizon_hours` (48 by default).
  * @returns {object} The current price { price, label, valid_until, next_price, next_label };
  * `valid_until` is null when the price does not change within the horizon.

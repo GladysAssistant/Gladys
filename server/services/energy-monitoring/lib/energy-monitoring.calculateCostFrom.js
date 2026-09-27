@@ -8,6 +8,7 @@ const {
 } = require('../../../utils/constants');
 const { convertEnergyUnit } = require('../../../utils/units');
 const { TARIFF_COMPONENT_KINDS } = require('../../../lib/energy-contract/tariff.constants');
+const { carryMonthAccumulation } = require('../../../lib/energy-contract/tariff.tier');
 const {
   getLocalContext,
   getDayBounds,
@@ -126,11 +127,12 @@ async function priceByBillingPeriod(energyContract, contract, intervals, nowMs, 
     }
   });
   const result = { costs: [], warnings: [], unpriced: [] };
-  // The month accumulation carries over a billing period boundary inside a calendar month
-  // (a billing day other than the 1st): the next group starts from what the previous one
-  // accumulated when its first interval is in the same local month as the previous last one
-  // (a skipped period or a new month restarts it); a billing period starts at local
-  // midnight so the day accumulation always restarts, the billing period itself too.
+  // The month accumulation (and the month counters of the `counts_when` tiers) carries over
+  // a billing period boundary inside a calendar month (a billing day other than the 1st):
+  // the next group starts from what the previous one accumulated when its first interval
+  // is in the same local month as the previous last one (a skipped period or a new month
+  // restarts it); a billing period starts at local midnight so the day accumulation always
+  // restarts, the billing period itself too.
   let previous = null;
   await Promise.each(groups, async (group) => {
     const firstMonth = getLocalContext(new Date(group.intervals[0].starts_at).getTime(), contract.timezone).date.slice(
@@ -142,13 +144,13 @@ async function priceByBillingPeriod(energyContract, contract, intervals, nowMs, 
       exclude_kinds: excludeKinds,
       cumulative_before:
         previous !== null && previous.month === firstMonth
-          ? { day: 0, month: previous.cumulative, billing_period: 0 }
+          ? carryMonthAccumulation(previous.cumulative)
           : (previous === null && cumulativeBefore) || undefined,
     });
     const lastInterval = group.intervals[group.intervals.length - 1];
     previous = {
       month: getLocalContext(new Date(lastInterval.starts_at).getTime(), contract.timezone).date.slice(0, 7),
-      cumulative: priced.cumulative.month,
+      cumulative: priced.cumulative,
     };
     result.costs.push(...priced.costs);
     result.warnings.push(...priced.warnings);

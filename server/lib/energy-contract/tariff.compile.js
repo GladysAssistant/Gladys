@@ -2,6 +2,7 @@ const { BadParameters } = require('../../utils/coreErrors');
 const { validateTariff } = require('./tariff.validate');
 const { TARIFF_COMPONENT_KINDS, TARIFF_WEEKDAYS, INPUT_PLACEHOLDER_REGEX } = require('./tariff.constants');
 const { compileTimeIntervals, parseMonthDay } = require('./tariff.time');
+const { getTierCounterId } = require('./tariff.tier');
 
 const EXACT_PLACEHOLDER_REGEX = /^\{\{input:([a-z0-9_]+)\}\}$/;
 // JavaScript day index of each ISO weekday name (0 = Sunday).
@@ -64,6 +65,30 @@ function compileCalendarCondition(condition) {
 }
 
 /**
+ * @description Compile a tier condition: its bounds (fixed, or per day of the accumulation
+ * period), the counter it reads (section 7.1) and the compiled `counts_when` conditions
+ * deciding which intervals feed that counter.
+ * @param {object} tier - Validated tier condition.
+ * @returns {object} { cumulative, per_day, from, to, counter, counts_when }.
+ * @example
+ * compileTier({ cumulative: 'billing_period', from_kwh_per_day: 0, to_kwh_per_day: 40 });
+ */
+function compileTier(tier) {
+  const perDay = tier.from_kwh_per_day !== undefined;
+  const from = perDay ? tier.from_kwh_per_day : tier.from_kwh;
+  const to = perDay ? tier.to_kwh_per_day : tier.to_kwh;
+  return {
+    cumulative: tier.cumulative,
+    per_day: perDay,
+    from,
+    to: to === undefined ? Infinity : to,
+    counter: getTierCounterId(tier.cumulative, tier.counts_when),
+    // eslint-disable-next-line no-use-before-define
+    counts_when: tier.counts_when === undefined ? undefined : compileConditions(tier.counts_when),
+  };
+}
+
+/**
  * @description Precompute the conditions of a rule (minutes, day indexes, MMDD numbers, sets).
  * @param {object} when - Validated conditions.
  * @returns {object|undefined} The compiled conditions, undefined when there are none.
@@ -97,11 +122,7 @@ function compileConditions(when) {
     compiled.not_calendar = compileCalendarCondition(when.not_calendar);
   }
   if (when.tier !== undefined) {
-    compiled.tier = {
-      cumulative: when.tier.cumulative,
-      from_kwh: when.tier.from_kwh,
-      to_kwh: when.tier.to_kwh === undefined ? Infinity : when.tier.to_kwh,
-    };
+    compiled.tier = compileTier(when.tier);
   }
   if (when.power_threshold !== undefined) {
     compiled.power_threshold = { above_kw: when.power_threshold.above_kw };
@@ -132,13 +153,15 @@ function compilePriceSpec(spec) {
  * engine evaluates thousands of intervals without parsing anything.
  * @param {object} tariff - Tariff definition (template or stored JSON).
  * @param {object} [inputs] - Values of the template inputs.
- * @returns {object} The compiled tariff: tariff, calendars, components, hasTier, tierScopes, needsPower.
+ * @returns {object} The compiled tariff: tariff, calendars, components, hasTier, tierScopes, counters
+ * (the filtered accumulation counters of the `counts_when` tiers: { id, scope, when }), needsPower.
  * @example
  * const compiled = compileTariff(template.tariff, { subscribed_power: 9 });
  */
 function compileTariff(tariff, inputs = {}) {
   const normalized = validateTariff(substituteInputs(tariff, inputs));
   const tierScopes = new Set();
+  const counters = new Map();
   // demand charges and power thresholds read the peak power of the intervals
   let needsPower = false;
   const components = normalized.components.map((component) => {
@@ -150,6 +173,13 @@ function compileTariff(tariff, inputs = {}) {
         const when = compileConditions(r.when);
         if (when !== undefined && when.tier !== undefined) {
           tierScopes.add(when.tier.cumulative);
+          if (when.tier.counts_when !== undefined && !counters.has(when.tier.counter)) {
+            counters.set(when.tier.counter, {
+              id: when.tier.counter,
+              scope: when.tier.cumulative,
+              when: when.tier.counts_when,
+            });
+          }
         }
         if (when !== undefined && when.power_threshold !== undefined) {
           needsPower = true;
@@ -182,12 +212,14 @@ function compileTariff(tariff, inputs = {}) {
     components,
     hasTier: tierScopes.size > 0,
     tierScopes: Array.from(tierScopes),
+    counters: Array.from(counters.values()),
     needsPower,
   };
 }
 
 module.exports = {
   substituteInputs,
+  compileTier,
   compileConditions,
   compileTariff,
   WEEKDAY_INDEXES,

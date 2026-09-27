@@ -65,7 +65,9 @@ const periodConditionFields = {
   dates: Joi.object({ from: date.required(), to: date }),
 };
 
-const conditions = Joi.object({
+// the conditions a tier's `counts_when` can test: what decides whether an interval's kWh
+// feed the rule's accumulation, so neither `tier` nor `power_threshold`
+const countingConditionFields = {
   time: Joi.array()
     .items(
       Joi.array()
@@ -77,15 +79,34 @@ const conditions = Joi.object({
   ...periodConditionFields,
   calendar: calendarCondition,
   not_calendar: calendarCondition,
-  tier: Joi.object({
-    cumulative: Joi.string()
-      .valid(...Object.values(TARIFF_CUMULATIVE_SCOPES))
-      .required(),
-    from_kwh: Joi.number()
-      .min(0)
-      .required(),
-    to_kwh: Joi.number().greater(Joi.ref('from_kwh')),
-  }),
+};
+
+const countingConditions = Joi.object(countingConditionFields).min(1);
+
+// an upper bound goes with the lower bound of the same kind and exceeds it
+const upperBound = (lowerKey) =>
+  Joi.number().when(lowerKey, {
+    is: Joi.exist(),
+    then: Joi.number().greater(Joi.ref(lowerKey)),
+    otherwise: Joi.forbidden(),
+  });
+
+const tier = Joi.object({
+  cumulative: Joi.string()
+    .valid(...Object.values(TARIFF_CUMULATIVE_SCOPES))
+    .required(),
+  from_kwh: Joi.number().min(0),
+  to_kwh: upperBound('from_kwh'),
+  from_kwh_per_day: Joi.number().min(0),
+  to_kwh_per_day: upperBound('from_kwh_per_day'),
+  counts_when: countingConditions,
+})
+  // the bounds are either fixed (from_kwh / to_kwh) or per day of the accumulation period
+  .xor('from_kwh', 'from_kwh_per_day');
+
+const conditions = Joi.object({
+  ...countingConditionFields,
+  tier,
   power_threshold: Joi.object({
     above_kw: Joi.number()
       .min(0)
@@ -250,20 +271,24 @@ function checkCalendarReferences(rulePath, spec, declared) {
       `calendar "${spec.price_from_calendar}" is not declared in tariff.calendars`,
     );
   }
-  ['calendar', 'not_calendar'].forEach((conditionKey) => {
-    const condition = spec.when && spec.when[conditionKey];
-    if (!condition) {
-      return;
-    }
-    Object.keys(condition).forEach((key) => {
-      if (!declared.includes(key)) {
-        throw tariffError(
-          [...rulePath, 'when', conditionKey, key],
-          `calendar "${key}" is not declared in tariff.calendars`,
-        );
+  const checkConditions = (when, path) => {
+    ['calendar', 'not_calendar'].forEach((conditionKey) => {
+      const condition = when && when[conditionKey];
+      if (!condition) {
+        return;
       }
+      Object.keys(condition).forEach((key) => {
+        if (!declared.includes(key)) {
+          throw tariffError([...path, conditionKey, key], `calendar "${key}" is not declared in tariff.calendars`);
+        }
+      });
     });
-  });
+  };
+  checkConditions(spec.when, [...rulePath, 'when']);
+  // the conditions deciding what feeds a tier's accumulation read calendars too
+  if (spec.when && spec.when.tier && spec.when.tier.counts_when) {
+    checkConditions(spec.when.tier.counts_when, [...rulePath, 'when', 'tier', 'counts_when']);
+  }
 }
 
 /**

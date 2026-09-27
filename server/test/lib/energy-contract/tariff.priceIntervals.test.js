@@ -93,6 +93,72 @@ describe('energy-contract priceIntervals', () => {
     );
     expect(costs[0].cost).to.be.closeTo(0.2 * 0.1 + 0.3 * 0.3, 1e-9);
   });
+  it('should scale a per-day tier by the days of the period and the contract validity', () => {
+    const compiled = tariff([
+      consumption({
+        rules: [
+          {
+            label: 'Allowance',
+            when: { tier: { cumulative: 'month', from_kwh_per_day: 0, to_kwh_per_day: 1 } },
+            price: 0.1,
+          },
+        ],
+        fallback: { label: 'Rest', price: 0.3 },
+      }),
+    ]);
+    const intervals = [
+      { starts_at: '2026-01-20T10:00:00Z', kwh: 10 },
+      { starts_at: '2026-01-20T10:30:00Z', kwh: 10 },
+    ];
+    // 31 days of January: 31 kWh in the allowance
+    const whole = priceIntervals(compiled, paris, intervals);
+    expect(whole.costs.map((c) => c.cost)).to.deep.equal([1, 1]);
+    // a contract starting on 16 January: 16 days, 16 kWh in the allowance
+    const started = priceIntervals(compiled, { ...paris, valid_from: '2026-01-16' }, intervals);
+    expect(started.costs.map((c) => c.cost)).to.deep.equal([1, 1.8]);
+    expect(started.costs.map((c) => c.label)).to.deep.equal(['Allowance', 'Rest']);
+    expect(started.cumulative).to.deep.equal({ day: 20, month: 20, billing_period: 20 });
+  });
+  it('should feed a counts_when counter with the matching intervals only and hand it back', () => {
+    const compiled = tariff([
+      consumption({
+        rules: [
+          { label: 'Night', when: { time: [['22:00', '06:00']] }, price: 0.1 },
+          {
+            label: 'Day allowance',
+            when: { tier: { cumulative: 'day', from_kwh: 0, to_kwh: 2, counts_when: { time: [['06:00', '22:00']] } } },
+            price: 0.2,
+          },
+        ],
+        fallback: { label: 'Rest', price: 0.3 },
+      }),
+    ]);
+    const counterId = 'day:{"time":[["06:00","22:00"]]}';
+    expect(compiled.counters.map((c) => c.id)).to.deep.equal([counterId]);
+    const first = priceIntervals(compiled, { timezone: 'UTC' }, [
+      // night: priced by the night rule, not counted in the day allowance
+      { starts_at: '2026-01-12T03:00:00Z', kwh: 5 },
+      { starts_at: '2026-01-12T10:00:00Z', kwh: 1 },
+      // 1 kWh left in the allowance, 1 kWh at the rest price
+      { starts_at: '2026-01-12T10:30:00Z', kwh: 2 },
+      // the counter restarts with the day
+      { starts_at: '2026-01-13T10:00:00Z', kwh: 1 },
+    ]);
+    expect(first.costs.map((c) => c.cost)).to.deep.equal([0.5, 0.2, 0.5, 0.2]);
+    expect(first.costs.map((c) => c.label)).to.deep.equal(['Night', 'Day allowance', 'Rest', 'Day allowance']);
+    expect(first.cumulative).to.deep.equal({
+      day: 1,
+      month: 9,
+      billing_period: 9,
+      counters: { [counterId]: { scope: 'day', kwh: 1 } },
+    });
+    // the returned accumulation is what the next run starts from
+    const second = priceIntervals(compiled, { timezone: 'UTC' }, [{ starts_at: '2026-01-13T11:00:00Z', kwh: 2 }], {
+      cumulative_before: first.cumulative,
+    });
+    expect(second.costs[0].cost).to.equal(0.5);
+    expect(second.cumulative.counters[counterId]).to.deep.equal({ scope: 'day', kwh: 3 });
+  });
   it('should skip a tier rule that does not cover the interval energy', () => {
     const compiled = tariff([
       consumption({
