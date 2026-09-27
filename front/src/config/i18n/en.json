@@ -3516,7 +3516,9 @@
           "comfort": "Comfort"
         },
         "noSlots": "No time slots yet. Click \"Add time slot\" to get started.",
-        "followedBy": "Followed by:",
+        "followedBy": "Followed by",
+        "weekLabel": "Week",
+        "emptyScheduleWarning": "This schedule has no slot, so it drives nothing. The thermostats following it stay on their current preset.",
         "followedByNobody": "no thermostat yet",
         "attachPlaceholder": "Add a thermostat…",
         "attachReplacesHelp": "A thermostat follows one schedule: adding it here takes it off the one it followed.",

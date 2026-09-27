@@ -449,8 +449,8 @@
 }
 
 .weekPreviewDay {
-  flex: 0 0 2.2rem;
-  font-size: 0.7rem;
+  flex: 0 0 2.4rem;
+  font-size: 0.75rem;
   color: #6c757d;
   text-transform: uppercase;
 }
@@ -489,14 +489,14 @@
 .weekPreviewScale {
   position: relative;
   height: 14px;
-  margin-left: calc(2.2rem + 8px);
+  margin-left: calc(2.4rem + 8px);
 }
 
 .weekPreviewMark {
   position: absolute;
   left: var(--mark-left);
   transform: translateX(-50%);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   line-height: 14px;
   color: #868e96;
   white-space: nowrap;
@@ -533,4 +533,16 @@
 
 .confirmDeleteText {
   font-weight: 500;
+}
+
+/* A section heading with the weight and the spacing of .form-label, which is
+   what a thermostat card opens with: a smaller, lighter label took up less
+   height, and the first row then sat closer to the header than it does there.
+   0.875rem/600 and the same 0.375rem below, so the two cards breathe alike. */
+.sectionLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #9aa0ac;
+  margin-bottom: 0.375rem;
 }

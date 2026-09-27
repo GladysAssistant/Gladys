@@ -3516,7 +3516,9 @@
           "comfort": "Komfort"
         },
         "noSlots": "Noch keine Zeitfenster. Klicke auf \"Zeitfenster hinzufügen\", um zu beginnen.",
-        "followedBy": "Befolgt von:",
+        "followedBy": "Befolgt von",
+        "weekLabel": "Woche",
+        "emptyScheduleWarning": "Dieser Zeitplan hat kein Zeitfenster und steuert daher nichts. Die Thermostate, die ihm folgen, bleiben auf ihrem aktuellen Preset.",
         "followedByNobody": "noch kein Thermostat",
         "attachPlaceholder": "Thermostat hinzufügen…",
         "attachReplacesHelp": "Ein Thermostat folgt nur einem Zeitplan: Wird es hier hinzugefügt, verlässt es seinen bisherigen.",

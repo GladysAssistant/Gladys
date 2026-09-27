@@ -3516,7 +3516,9 @@
           "comfort": "Confort"
         },
         "noSlots": "Aucune plage horaire. Cliquez sur \"Ajouter une plage\" pour commencer.",
-        "followedBy": "Suivi par :",
+        "followedBy": "Suivi par",
+        "weekLabel": "Semaine",
+        "emptyScheduleWarning": "Ce planning n’a aucun créneau : il ne pilote rien. Les thermostats qui le suivent restent sur leur preset courant.",
         "followedByNobody": "aucun thermostat pour l’instant",
         "attachPlaceholder": "Ajouter un thermostat…",
         "attachReplacesHelp": "Un thermostat ne suit qu’un planning : l’ajouter ici le retire du sien.",

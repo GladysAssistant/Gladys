@@ -166,14 +166,30 @@ class SchedulePageComponent extends Component {
     return (
       <div key={schedule.selector} class="col-md-6">
         <div class="card mb-3">
-          <div class="card-header">
-            <h4 class="card-title">{schedule.name}</h4>
-          </div>
+          {/* The name straight in the header, with no card-title heading: that
+              is how a thermostat card renders its own, and a heading here made
+              the schedule names read heavier than the thermostat ones. */}
+          <div class="card-header">{schedule.name}</div>
           {/* The week at a glance, so the list says what each schedule *does*
             rather than only what it is called — the editor has to be opened
             otherwise, and two schedules named "Semaine" look alike. Same points,
             same shared helper and same colours as the editor's own bars. */}
           <div class="card-body">
+            {/* A schedule with no point resolves nothing, and the loop then falls
+                back on the preset each thermostat already carries (C.2) — so a
+                thermostat can follow this schedule and go on regulating as if it
+                had none. The seven empty bars do not say that on their own. */}
+            {(schedule.transitions || []).length === 0 && (
+              <div class="alert alert-info">
+                <Text id="integration.thermostat.schedule.emptyScheduleWarning" />
+              </div>
+            )}
+            {/* Labelled like the follower row below it, and like the fields of a
+                thermostat card: the bars started flush against the header, which
+                is what made this card look tighter than one of those. */}
+            <div class={style.sectionLabel}>
+              <Text id="integration.thermostat.schedule.weekLabel" />
+            </div>
             <div class={style.weekPreview}>
               {WEEK_DAYS.map(day => (
                 <div key={day} class={style.weekPreviewRow}>
@@ -204,12 +220,14 @@ class SchedulePageComponent extends Component {
               </div>
             </div>
 
+            {/* Label above its value, like the summary rows of a thermostat
+                card: the same information on the two lists, shaped the same. */}
             <div class="mt-3">
-              <span class="text-muted mr-2">
+              <div class={style.sectionLabel}>
                 <Text id="integration.thermostat.schedule.followedBy" />
-              </span>
+              </div>
               {(schedule.devices || []).length === 0 && (
-                <span class="text-muted mr-2">
+                <span class="text-muted">
                   <Text id="integration.thermostat.schedule.followedByNobody" />
                 </span>
               )}

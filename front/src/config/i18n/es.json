@@ -3516,7 +3516,9 @@
           "comfort": "Confort"
         },
         "noSlots": "Todavía no hay intervalos. Haz clic en «Añadir un intervalo» para empezar.",
-        "followedBy": "Seguida por:",
+        "followedBy": "Seguida por",
+        "weekLabel": "Semana",
+        "emptyScheduleWarning": "Esta programación no tiene ningún tramo, así que no controla nada. Los termostatos que la siguen se quedan en su preset actual.",
         "followedByNobody": "todavía ningún termostato",
         "attachPlaceholder": "Añadir un termostato…",
         "attachReplacesHelp": "Un termostato sigue una sola programación: añadirlo aquí lo saca de la suya.",
