@@ -3371,6 +3371,7 @@
         "roomLabel": "Habitación",
         "modeLabel": "Modo",
         "typeLabel": "Tipo de termostato",
+        "tuningSection": "Ajuste fino",
         "typeVirtual": "Termostato virtual (Gladys regula)",
         "typeExternal": "Termostato real (el dispositivo regula)",
         "typeHelp": {

@@ -3371,6 +3371,7 @@
         "roomLabel": "Pièce",
         "modeLabel": "Mode",
         "typeLabel": "Type de thermostat",
+        "tuningSection": "Réglage fin",
         "typeVirtual": "Thermostat virtuel (Gladys régule)",
         "typeExternal": "Thermostat réel (le device régule)",
         "typeHelp": {
