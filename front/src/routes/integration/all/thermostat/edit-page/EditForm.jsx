@@ -25,6 +25,18 @@ const EditForm = ({ ...props }) => {
   // heating text with the word swapped.
   const modeSuffix = mode === 'cooling' ? 'cooling' : 'heating';
 
+  // A schedule belongs to a house, and a thermostat may only follow one of its
+  // own house's: the server refuses the rest with DEVICE_NOT_IN_HOUSE. Offering
+  // them all showed two indistinguishable "Semaine" entries, and picking the
+  // wrong one failed at save time. The room is what places the thermostat in a
+  // house, so until one is chosen every schedule stays on offer.
+  const selectedHouse = (props.houses || []).find(house =>
+    (house.rooms || []).some(room => room.id === props.thermostatEditRoomId)
+  );
+  const schedulesOfHouse = selectedHouse
+    ? (props.thermostatSchedules || []).filter(schedule => schedule.house === selectedHouse.selector)
+    : props.thermostatSchedules || [];
+
   const heatingPresets = ['frost', 'away', 'eco', 'night', 'comfort'];
   const coolingPresets = ['comfort'];
   const activePresets = mode === 'cooling' ? coolingPresets : heatingPresets;
@@ -584,16 +596,15 @@ const EditForm = ({ ...props }) => {
                 <option value="">
                   <Text id="integration.thermostat.edit.noActiveSchedule" />
                 </option>
-                {props.thermostatSchedules &&
-                  props.thermostatSchedules.map(schedule => (
-                    <option
-                      key={schedule.selector}
-                      value={schedule.selector}
-                      selected={schedule.selector === props.thermostatEditActiveSchedule}
-                    >
-                      {schedule.name}
-                    </option>
-                  ))}
+                {schedulesOfHouse.map(schedule => (
+                  <option
+                    key={schedule.selector}
+                    value={schedule.selector}
+                    selected={schedule.selector === props.thermostatEditActiveSchedule}
+                  >
+                    {schedule.name}
+                  </option>
+                ))}
               </select>
               <small class="form-text text-muted">
                 <Text id="integration.thermostat.edit.activeScheduleHelp" />

@@ -312,7 +312,11 @@ class ScheduleEditor extends Component {
       if (onSaved) onSaved();
     } catch (e) {
       const msg = (e && e.response && e.response.data && e.response.data.message) || true;
-      this.setState({ saving: false, error: msg });
+      // The server phrases this one in English, and it reached the French UI
+      // verbatim. It is the one save error a user causes by hand, so it gets a
+      // translated sentence; anything else stays raw rather than being hidden.
+      const duplicate = typeof msg === 'string' && msg.indexOf('already exists') !== -1;
+      this.setState({ saving: false, error: duplicate ? 'duplicate-name' : msg });
     }
   };
 
@@ -494,9 +498,9 @@ class ScheduleEditor extends Component {
 
         {error && (
           <div class="alert alert-warning">
-            {error === 'overlap' ? (
-              <Text id="integration.thermostat.schedule.overlapError" />
-            ) : (
+            {error === 'overlap' && <Text id="integration.thermostat.schedule.overlapError" />}
+            {error === 'duplicate-name' && <Text id="integration.thermostat.schedule.duplicateNameError" />}
+            {error !== 'overlap' && error !== 'duplicate-name' && (
               <span>{typeof error === 'string' ? error : <Text id="integration.thermostat.schedule.saveError" />}</span>
             )}
           </div>

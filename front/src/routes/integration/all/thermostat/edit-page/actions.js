@@ -44,7 +44,13 @@ function createActions(store) {
               humidityFeatures.push(entry);
             }
             if (SWITCH_CATEGORIES.includes(feature.category) && feature.type === 'binary') {
-              switchFeatures.push(entry);
+              // The actuator has to be writable: a read-only switch — Netatmo's
+              // boiler contact, for one — was offered as something to drive, and
+              // every write onto it would be refused. It stays eligible as a
+              // *state* feature below, which is exactly what it is good for.
+              if (!feature.read_only) {
+                switchFeatures.push(entry);
+              }
               // No integration publishes thermostat/operating-state yet: Netatmo
               // reports its boiler contact as a read-only switch, and that is the
               // only "is it heating" signal most real thermostats expose.
