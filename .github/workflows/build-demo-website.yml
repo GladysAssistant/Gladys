@@ -11,6 +11,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     name: Build and publish demo website
     steps:
       - uses: actions/checkout@v3

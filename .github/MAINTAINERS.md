@@ -220,6 +220,30 @@ lead maintainer's identity are approved too: read them before merging, and
 do not enable auto-merge on one that touches a maintainers-only path
 without having read it.
 
+### Deployment secrets: the `production` environment
+
+The credentials that publish a release (Docker Hub, Cloudflare Pages, the
+Gladys Plus deploy hook and version API) are not repository secrets: they
+live in the `production` environment, together with the `DOCKERHUB_REPO`
+variable. A secret is never displayed by GitHub, to anyone; the only way to
+read one is to run a job that receives it. Only the jobs that declare
+`environment: production` receive these, and the environment's deployment
+policy only lets a job run on the `master` branch or on a `v*` tag. A
+workflow edited on any other branch is refused before it starts, so a
+member with write access cannot read them by opening a pull request that
+changes a workflow.
+
+That boundary holds because of two other rules: a change to a workflow only
+reaches `master` through a reviewed pull request, and the `v*` tags are
+protected by a ruleset, so nobody can push a tag from a branch of their own
+to get a workflow to run on it. Keep both.
+
+GitHub can additionally require a reviewer to approve every run that uses
+the environment. It is not needed for the secrets' safety, it only adds a
+manual click on every release, demo and documentation build. If it is
+enabled, the reviewers must include the `release` team, otherwise no patch
+release can ship without the lead maintainer.
+
 ### Review and fix bots
 
 - **Automated reviews** (`/cursor review`, CodeRabbit) run on every pull
