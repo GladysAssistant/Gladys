@@ -80,6 +80,44 @@ describe('thermostat.createDevice', () => {
     expect(created.name).to.equal('Salon');
   });
 
+  it('should name the state features after the external_id, not the selector', async () => {
+    // The regression that renamed preset, mode and operating-state on the first
+    // edit: keyed on the selector, they were built on the external_id at create
+    // time (no selector yet) and on the slug of it afterwards, so the first save
+    // deleted and recreated them — losing the preset and mode the user had set,
+    // their history, and breaking the scenes that pointed at them.
+    const handler = buildHandler();
+
+    const created = await handler.createDevice({
+      name: 'Salon',
+      external_id: 'thermostat:salon-1790516383228',
+      features: [setpointFeature],
+    });
+
+    const presetFeature = created.features.find((f) => f.type === DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET);
+    expect(presetFeature.external_id).to.equal('thermostat:salon-1790516383228:preset');
+  });
+
+  it('should keep the same state feature ids once the device has a selector', async () => {
+    // The second save of the same device: the selector now exists, and it must
+    // change nothing.
+    const handler = buildHandler();
+    const device = {
+      name: 'Salon',
+      external_id: 'thermostat:salon-1790516383228',
+      features: [setpointFeature],
+    };
+
+    const onCreate = await handler.createDevice(device);
+    // A save with a selector is an edit: it reads the device as it stands to
+    // carry the runtime params over.
+    handler.gladys.device.get = fake.resolves([{ selector: 'salon', params: [] }]);
+    const onEdit = await handler.createDevice({ ...device, selector: 'salon' });
+
+    const ids = (created) => created.features.map((feature) => feature.external_id);
+    expect(ids(onEdit)).to.deep.equal(ids(onCreate));
+  });
+
   it('should refuse a device without a setpoint feature', async () => {
     const handler = buildHandler();
 

@@ -51,14 +51,21 @@ const ALLOWED_PARAMS = [
  * is currently heating. They are features rather than service variables because
  * they are state of the device: on a feature, a scene can read and write them,
  * and MQTT, HomeKit and Gladys Plus see them.
- * @param {object} device - The device being created, for its selector.
+ * @param {object} device - The device being created, for its external_id.
  * @param {boolean} external - Whether the real thermostat runs itself.
  * @returns {Array} The features to create alongside the setpoint.
  * @example
- * buildStateFeatures({ selector: 'living-room' }, false);
+ * buildStateFeatures({ external_id: 'thermostat:living-room' }, false);
  */
 function buildStateFeatures(device, external) {
-  const base = device.selector || device.external_id;
+  // The external_id, never the selector: it is the same string on a create and
+  // on every later save, while the selector does not exist yet on the create and
+  // is a slug of it afterwards. Keying on the selector renamed these features on
+  // the first edit, which deletes and recreates them — losing the preset and the
+  // mode the user had set, their history, and breaking any scene that pointed at
+  // them. The setpoint feature is built on the external_id by the front for the
+  // same reason.
+  const base = device.external_id || device.selector;
   const preset = {
     name: 'Preset',
     external_id: `${base}:preset`,
