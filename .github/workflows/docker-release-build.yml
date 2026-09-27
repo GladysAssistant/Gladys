@@ -2,8 +2,9 @@ name: Release Gladys Production Images
 run-name: Release Gladys ${{ github.ref_name }} Production Image
 
 on:
-  # Dispatched on the new tag by the "Create release tag" workflow: a tag pushed
-  # with the default GITHUB_TOKEN does not trigger the `push` event below.
+  # Started by the push of the release tag (the "Create release tag" workflow
+  # pushes it with a deploy key, so the `push` event below does fire).
+  # workflow_dispatch stays for re-running a failed build on an existing tag.
   workflow_dispatch:
   push:
     tags:
@@ -128,10 +129,14 @@ jobs:
     # branch a manual dispatch could have been started on.
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-22.04
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
-      DOCKERHUB_REPO: ${{secrets.DOCKERHUB_REPO}}
+      # The image name is not a secret: an environment variable of `production`.
+      DOCKERHUB_REPO: ${{vars.DOCKERHUB_REPO}}
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
@@ -139,7 +144,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ secrets.DOCKERHUB_REPO }},ghcr.io/${{ secrets.DOCKERHUB_REPO }}
+          images: ${{ vars.DOCKERHUB_REPO }},ghcr.io/${{ vars.DOCKERHUB_REPO }}
           labels: |
             org.opencontainers.image.title=Gladys Assistant Production Image
           # `latest` is pushed on every release: the default `auto` flavor,
@@ -201,9 +206,16 @@ jobs:
     name: Publish Gladys Plus front
     needs: docker
     runs-on: ubuntu-latest
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     steps:
       - name: Run Cloudflare Pages deploy hook
-        run: curl -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}"
+        env:
+          DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}
+        # --fail-with-body turns an error answer of Cloudflare (an invalid or
+        # deleted hook, for instance) into a failed job instead of a green one.
+        run: curl --silent --show-error --fail-with-body -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${DEPLOY_HOOK}"
   publish-gladys-version:
     name: Publish the version to Gladys Plus
     # Runs once the production images are pushed: as soon as the version is
@@ -215,6 +227,9 @@ jobs:
     # invited to upgrade to.
     if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-')
     runs-on: ubuntu-latest
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     steps:
       - name: 🚀 Create the version on Gladys Plus
         env:
