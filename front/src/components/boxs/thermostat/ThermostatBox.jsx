@@ -707,7 +707,19 @@ class ThermostatBox extends Component {
     const hold = this.getHold();
     if (hold) {
       stateInit.setpoint = hold.setpoint;
-      stateInit.manualSetpointOverride = true;
+      // Every preset the user picks arms a hold, so a hold alone says nothing
+      // about where the setpoint came from. A hold sitting exactly on the
+      // preset's own setpoint is that preset being applied — keep it
+      // highlighted, or a reload (or a second device, or a wall tablet) would
+      // show no active preset at all on a thermostat that plainly has one. A
+      // hold on any other value is a setpoint of its own, which no preset
+      // represents.
+      const holdPreset = this.getPresets().find(
+        candidate => candidate.key === activePreset && candidate.temp === hold.setpoint
+      );
+      if (!holdPreset) {
+        stateInit.manualSetpointOverride = true;
+      }
       if (hold.until) {
         stateInit.manualUntil = hold.until;
       }
