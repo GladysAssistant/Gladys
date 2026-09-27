@@ -57,6 +57,17 @@ of every file the pull request touches. The file is an allowlist:
 Anything not listed in step 2 (a new top-level directory, `docker`, the
 documentation specs...) is maintainers-only until it is opened there.
 
+That closed list is a perimeter, not a sandbox. `CODEOWNERS` closes files,
+not behaviors: the code that stays open under `server/lib`, `server/utils`
+or `server/services` is imported and executed by the closed code (the
+gateway, the sessions, the system control), so a change in an open file can
+still affect a closed area. The list stops a mistake and the easy shortcut;
+what actually protects the project is the second human review on every pull
+request, the automated reviews, the CI, and the trust placed in the people
+holding a write access. Do not read a guarantee into the file that it does
+not give, and do not try to extend it until it covers everything: that
+would empty the `core` scope of any meaning.
+
 A few consequences worth knowing:
 
 - **You can never approve your own pull request.** A core member's PR needs

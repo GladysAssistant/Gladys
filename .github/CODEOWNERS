@@ -79,6 +79,9 @@
 /server/api/routes.js                               @GladysAssistant/maintainers
 /server/api/setupRoutes.js                          @GladysAssistant/maintainers
 /server/api/websockets/                             @GladysAssistant/maintainers
+# Builds the Express app: a middleware mounted here runs before the route
+# table and its authentication.
+/server/api/index.js                                @GladysAssistant/maintainers
 /server/api/controllers/user.controller.js          @GladysAssistant/maintainers
 /server/api/controllers/session.controller.js       @GladysAssistant/maintainers
 /server/api/controllers/http.controller.js          @GladysAssistant/maintainers
