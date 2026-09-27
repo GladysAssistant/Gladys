@@ -546,3 +546,12 @@
   color: #9aa0ac;
   margin-bottom: 0.375rem;
 }
+
+/* The chosen thermostats, above the select that adds one more. Wraps rather
+   than scrolling: a house has a handful of thermostats, not a list. */
+.followerList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}

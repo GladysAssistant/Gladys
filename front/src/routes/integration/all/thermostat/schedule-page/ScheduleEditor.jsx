@@ -109,6 +109,16 @@ class ScheduleEditor extends Component {
         : [...prev.followers, selector]
     }));
 
+  // The select is an action, not a value the form holds: it goes back to its
+  // placeholder once the thermostat it named has moved into the badges.
+  addFollower = e => {
+    const selector = e.target.value;
+    e.target.value = '';
+    if (selector) {
+      this.toggleFollower(selector);
+    }
+  };
+
   selectDay = day => {
     this.setState(prev => ({ selectedDay: prev.selectedDay === day ? null : day }));
   };
@@ -510,6 +520,8 @@ class ScheduleEditor extends Component {
     const currentHouse = (this.props.houses || []).find(candidate => candidate.selector === house);
     const roomIds = currentHouse ? (currentHouse.rooms || []).map(room => room.id) : [];
     const thermostatsOfHouse = (this.props.thermostatDevices || []).filter(device => roomIds.includes(device.room_id));
+    // What the select still has to offer: the badges hold the rest.
+    const available = thermostatsOfHouse.filter(device => !this.state.followers.includes(device.selector));
 
     // A range crossing midnight runs into the next morning, so that morning has
     // to be told about it: the week wraps, and Sunday night reaches Monday.
@@ -572,17 +584,40 @@ class ScheduleEditor extends Component {
             <label class="form-label">
               <Text id="integration.thermostat.schedule.followersLabel" />
             </label>
-            {thermostatsOfHouse.map(device => (
-              <label key={device.selector} class="form-check">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  checked={this.state.followers.includes(device.selector)}
-                  onChange={() => this.toggleFollower(device.selector)}
-                />
-                <span class="form-check-label">{device.name}</span>
-              </label>
-            ))}
+            {/* Chosen one at a time and shown as badges, the way the schedule
+                list does it: a schedule can be followed by several thermostats,
+                so the select adds rather than replaces, and each badge carries
+                the cross that takes one back out. */}
+            {this.state.followers.length > 0 && (
+              <div class={style.followerList}>
+                {this.state.followers.map(selector => {
+                  const device = thermostatsOfHouse.find(candidate => candidate.selector === selector);
+                  return (
+                    <span key={selector} class={`badge badge-secondary ${style.followerBadge}`}>
+                      {device ? device.name : selector}
+                      <button
+                        type="button"
+                        class={style.followerDetach}
+                        onClick={() => this.toggleFollower(selector)}
+                        title={dictionary.detachButton || ''}
+                      >
+                        <i class="fe fe-x" />
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+            {available.length > 0 && (
+              <select class="form-control" value="" onChange={this.addFollower}>
+                <option value="">{dictionary.attachPlaceholder || ''}</option>
+                {available.map(device => (
+                  <option key={device.selector} value={device.selector}>
+                    {device.name}
+                  </option>
+                ))}
+              </select>
+            )}
             <small class="form-text text-muted">
               <Text id="integration.thermostat.schedule.followersHelp" />
             </small>
