@@ -160,9 +160,18 @@ Then:
    request opened by the workflow token, so it cannot be automated.
 2. A member of `release` (or a maintainer) who is **not** the author of that
    pull request approves it: the root `package.json` is owned by `release`.
-3. The pull request is merged through the merge queue. The tag, the
-   production images, the demo website and the API documentation follow
-   automatically.
+3. The pull request is merged through the merge queue. The "Create release
+   tag" workflow pushes the `vX.Y.Z` tag with a deploy key, and that push
+   starts the production images, the demo website and the API
+   documentation builds. If one of them fails, re-run it on the tag from
+   the Actions tab.
+
+The `v*` tags are protected by a ruleset: nobody with write access can
+create, move or delete one. GitHub Actions cannot bypass a ruleset, which is
+why the tag is pushed with a deploy key (`RELEASE_TAG_DEPLOY_KEY`, a secret
+of the `production` environment) rather than with the workflow token. The
+bypass list of that ruleset must stay "organization admins and deploy keys":
+a team added there could ship a release from any commit.
 
 Practical rule for a patch release while the lead maintainer is away: a
 member of `core` starts the workflow and opens the pull request, the backup
@@ -223,9 +232,9 @@ without having read it.
 ### Deployment secrets: the `production` environment
 
 The credentials that publish a release (Docker Hub, Cloudflare Pages, the
-Gladys Plus deploy hook and version API) are not repository secrets: they
-live in the `production` environment, together with the `DOCKERHUB_REPO`
-variable. A secret is never displayed by GitHub, to anyone; the only way to
+Gladys Plus deploy hook and version API, the deploy key that pushes the
+release tag) are not repository secrets: they live in the `production`
+environment, together with the `DOCKERHUB_REPO` variable. A secret is never displayed by GitHub, to anyone; the only way to
 read one is to run a job that receives it. Only the jobs that declare
 `environment: production` receive these, and the environment's deployment
 policy only lets a job run on the `master` branch or on a `v*` tag. A
@@ -235,8 +244,9 @@ changes a workflow.
 
 That boundary holds because of two other rules: a change to a workflow only
 reaches `master` through a reviewed pull request, and the `v*` tags are
-protected by a ruleset, so nobody can push a tag from a branch of their own
-to get a workflow to run on it. Keep both.
+protected by a ruleset whose only bypass actors are the organization admins
+and the deploy keys, so nobody can push a tag from a branch of their own to
+get a workflow to run on it. Keep both.
 
 GitHub can additionally require a reviewer to approve every run that uses
 the environment. It is not needed for the secrets' safety, it only adds a

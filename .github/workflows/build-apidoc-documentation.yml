@@ -1,6 +1,8 @@
 name: Build and publish apidoc documentation
 
 on:
+  # Started by the push of the release tag; workflow_dispatch stays for
+  # re-running a failed build on an existing tag.
   workflow_dispatch:
   push:
     tags:
