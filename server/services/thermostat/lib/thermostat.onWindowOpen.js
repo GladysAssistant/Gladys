@@ -2,7 +2,7 @@ const logger = require('../../../utils/logger');
 const { getThermostatFeature, stopExternalThermostat } = require('./thermostat.applySchedules');
 const { buildParamsConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
 const { holdExpiry } = require('./thermostat.setValue');
-const { setManualHold } = require('./thermostat.state');
+const { getManualHold, setManualHold } = require('./thermostat.state');
 
 /**
  * @description Invalidate the caches derived from this service's devices: the
@@ -125,6 +125,18 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     // poll), and start the cycle again on the next report. The visible result is
     // a thermostat stuck in "manual" for ever.
     if (this.selfWrittenSetpoints.get(changedSelector) === newValue) {
+      return;
+    }
+    // Already held at this value, which is the same reasoning one step further:
+    // the first report of a setting made on the device arms the hold, and every
+    // periodic report after it carries that same value. Re-arming on those would
+    // push the expiry forward on every report — every 15 s on Zigbee2MQTT, every
+    // two minutes on a polled Netatmo — so a hold meant to last 30 minutes would
+    // never end and a thermostat with a programme would never get it back. The
+    // hold is stored in the feature's own unit (C.3), which is the unit this
+    // value arrives in, so the two compare directly.
+    const hold = getManualHold(device);
+    if (hold && hold.setpoint === newValue) {
       return;
     }
     logger.info(`Thermostat: setpoint ${newValue} changed on the device itself for ${changedSelector}, holding it`);

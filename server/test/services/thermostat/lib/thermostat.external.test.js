@@ -574,6 +574,40 @@ describe('thermostat.onExternalSetpointChanged', () => {
     assert.notCalled(handler.gladys.device.setValue);
   });
 
+  // A setting made on the device arms the hold on its first report; the periodic
+  // reports that follow carry that same value. Re-arming on those would push the
+  // expiry forward on every report — every 15 s on Zigbee2MQTT, every two minutes
+  // on a polled Netatmo — so a 30-minute hold would never end and a thermostat
+  // with a programme would never get it back.
+  it('should not re-arm a hold it is already holding at that value', async () => {
+    const mod = loadListener();
+    const handler = buildHandler([
+      {
+        ...externalThermostat,
+        params: [...externalThermostat.params, { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '22' }],
+      },
+    ]);
+
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 22);
+
+    expect(heldSetpoint(handler)).to.equal(null);
+  });
+
+  it('should hold a further change made on the device', async () => {
+    // The counterpart: a hold at 22 does not stop a move to 23 from being held.
+    const mod = loadListener();
+    const handler = buildHandler([
+      {
+        ...externalThermostat,
+        params: [...externalThermostat.params, { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '22' }],
+      },
+    ]);
+
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 23);
+
+    expect(heldSetpoint(handler)).to.equal('23');
+  });
+
   // Our own write is reported back as the very same event: taking it for a change
   // made on the device would arm a manual hold on every scheduled write, and the
   // schedule would suspend itself for ever.
