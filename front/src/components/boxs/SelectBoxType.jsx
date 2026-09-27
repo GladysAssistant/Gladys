@@ -37,6 +37,7 @@ const BOX_TYPE_ICONS = {
   link: 'link',
   photo: 'image',
   sun: 'sun',
+  tide: 'waves',
   chips: 'more-horizontal',
   'house-view': 'home',
   actions: 'zap'
