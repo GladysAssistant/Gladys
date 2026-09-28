@@ -55,13 +55,15 @@ describe('Device.getStatesStats', function Describe() {
   });
 
   it('should count the states of the period per device and per feature, most verbose first', async () => {
+    // one state per second from there: the verbose features stay within the period
+    const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
-    await db.duckDbBatchInsertState(VERBOSE_FEATURE_ID, buildStates(1440, oneHourAgo));
+    await db.duckDbBatchInsertState(VERBOSE_FEATURE_ID, buildStates(8640, threeHoursAgo));
     await db.duckDbBatchInsertState(QUIET_FEATURE_ID, buildStates(10, oneHourAgo));
     // states older than the period are not counted
     await db.duckDbBatchInsertState(QUIET_FEATURE_ID, buildStates(5000, twoDaysAgo));
-    await db.duckDbBatchInsertState(OTHER_DEVICE_FEATURE_ID, buildStates(1439, oneHourAgo));
+    await db.duckDbBatchInsertState(OTHER_DEVICE_FEATURE_ID, buildStates(8639, threeHoursAgo));
     await db.duckDbBatchInsertState(DELETED_FEATURE_ID, buildStates(3, oneHourAgo));
     await db.duckDbBatchInsertState(FEATURE_OF_DELETED_DEVICE_ID, buildStates(2, oneHourAgo));
 
@@ -70,24 +72,24 @@ describe('Device.getStatesStats', function Describe() {
 
     expect(statesStats).to.deep.equal({
       period_in_hours: 24,
-      verbose_device_feature_min_states: 1440,
+      verbose_device_feature_min_states: 8640,
       // the states of deleted features and devices are still in the database
-      total_states: 1440 + 10 + 1439 + 3 + 2,
+      total_states: 8640 + 10 + 8639 + 3 + 2,
       devices: [
         {
           device_id: 'device-1',
-          states: 1450,
+          states: 8650,
           is_verbose: true,
           features: [
-            { device_feature_id: VERBOSE_FEATURE_ID, states: 1440, is_verbose: true },
+            { device_feature_id: VERBOSE_FEATURE_ID, states: 8640, is_verbose: true },
             { device_feature_id: QUIET_FEATURE_ID, states: 10, is_verbose: false },
           ],
         },
         {
           device_id: 'device-2',
-          states: 1439,
+          states: 8639,
           is_verbose: false,
-          features: [{ device_feature_id: OTHER_DEVICE_FEATURE_ID, states: 1439, is_verbose: false }],
+          features: [{ device_feature_id: OTHER_DEVICE_FEATURE_ID, states: 8639, is_verbose: false }],
         },
       ],
     });
@@ -98,7 +100,7 @@ describe('Device.getStatesStats', function Describe() {
     const statesStats = await device.getStatesStats();
     expect(statesStats).to.deep.equal({
       period_in_hours: 24,
-      verbose_device_feature_min_states: 1440,
+      verbose_device_feature_min_states: 8640,
       total_states: 0,
       devices: [],
     });

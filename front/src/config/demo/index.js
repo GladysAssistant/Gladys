@@ -288,9 +288,9 @@ const getDevices = (query = {}) => {
  */
 const VERBOSE_DEMO_FEATURE_STATES = {
   'kitchen-dishwasher-power': 17280,
-  'kitchen-coffee-power': 2880
+  'kitchen-coffee-power': 10800
 };
-const VERBOSE_DEVICE_FEATURE_MIN_STATES = 1440;
+const VERBOSE_DEVICE_FEATURE_MIN_STATES = 8640;
 const getStatesStats = () => {
   const statsDevices = devices
     .map(device => {

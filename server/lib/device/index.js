@@ -118,9 +118,10 @@ const DeviceManager = function DeviceManager(
   this.featuresStatesSizeGeneration = 0;
   // The devices list flags the verbose devices from the states saved in their history
   // over this period. A feature is verbose when it saved at least this many states in
-  // the period: one per minute on average over 24 hours.
+  // the period: one every 10 seconds on average over 24 hours. One per minute is the
+  // normal pace of an energy meter (e.g. a Linky TIC module) and weighs little.
   this.STATES_STATS_PERIOD_IN_HOURS = 24;
-  this.VERBOSE_DEVICE_FEATURE_MIN_STATES = 24 * 60;
+  this.VERBOSE_DEVICE_FEATURE_MIN_STATES = 24 * 60 * 6;
   this.STATES_STATS_CACHE_DURATION_IN_MS = 5 * 60 * 1000;
   this.statesStatsCache = null;
   this.statesStatsInFlight = null;

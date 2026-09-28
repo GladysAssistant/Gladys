@@ -129,7 +129,12 @@ const DevicesPage = ({ children, ...props }) => (
                   />
                 </div>
               </div>
-              <button type="button" class="btn btn-sm btn-secondary" onClick={props.toggleOnlyVerbose}>
+              <button
+                type="button"
+                class={cx('btn', 'btn-sm', style.verboseAlertButton)}
+                onClick={props.toggleOnlyVerbose}
+              >
+                <i class={cx('fe', props.onlyVerbose ? 'fe-x' : 'fe-filter', 'mr-1')} />
                 {props.onlyVerbose ? (
                   <Text id="devicesList.verbose.showAll" />
                 ) : (

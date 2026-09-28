@@ -649,7 +649,7 @@ describe('GET /api/v1/device/states_stats', () => {
       .expect(200)
       .then((res) => {
         expect(res.body).to.have.property('period_in_hours', 24);
-        expect(res.body).to.have.property('verbose_device_feature_min_states', 1440);
+        expect(res.body).to.have.property('verbose_device_feature_min_states', 8640);
         expect(res.body)
           .to.have.property('total_states')
           .that.is.a('number');
