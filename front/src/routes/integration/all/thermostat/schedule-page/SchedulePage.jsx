@@ -34,14 +34,37 @@ const daySegments = (ranges, day) => {
     })
     .sort((a, b) => a.start - b.start);
 
+  // A night crossing midnight is stored on the day it starts, so the morning it
+  // runs into has to be told about it — the week wraps, and Sunday night reaches
+  // Monday. Without this the small hours drew as a gap, which reads as the
+  // heating being off when it is the night preset still running (the editor
+  // says "Nuit · depuis Dim" for the same slot).
+  const previousDay = (day + 6) % 7;
+  const carried = ranges
+    .filter(range => range.day_of_week === previousDay)
+    .find(range => timeToMinutes(range.end_time) <= timeToMinutes(range.start_time));
+
   const segments = [];
   let cursor = 0;
+  if (carried) {
+    const until = timeToMinutes(carried.end_time);
+    if (until > 0) {
+      segments.push({ start: 0, end: until, preset: carried.preset });
+      cursor = until;
+    }
+  }
   ofDay.forEach(range => {
     if (range.start > cursor) {
       segments.push({ start: cursor, end: range.start, preset: null });
     }
-    segments.push(range);
-    cursor = Math.max(cursor, range.end);
+    // Clipped to what is left of the day: the carried night may already cover
+    // this range's start, and segments whose widths overran 100% would push the
+    // rest of the bar off its track.
+    const start = Math.max(range.start, cursor);
+    if (range.end > start) {
+      segments.push({ ...range, start });
+      cursor = range.end;
+    }
   });
   if (cursor < DAY_MINUTES) {
     segments.push({ start: cursor, end: DAY_MINUTES, preset: null });

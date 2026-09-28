@@ -3374,6 +3374,7 @@
         "tuningSection": "Fine tuning",
         "typeVirtual": "Virtual thermostat (Gladys regulates)",
         "typeExternal": "Real thermostat (the device regulates)",
+        "vendorProgrammeWarning": "Turn the vendor programme off on this device (the Netatmo or Tado app…) before driving it from Gladys. Otherwise the device’s programme and Gladys’s take turns writing the setpoint, and the thermostat follows whichever wrote last.",
         "typeHelp": {
           "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) to reach the setpoint.",
           "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state."
@@ -3519,9 +3520,11 @@
         "followedBy": "Followed by",
         "weekLabel": "Week",
         "emptyScheduleWarning": "This schedule has no slot, so it drives nothing. The thermostats following it stay on their current preset.",
-        "emptySaveWarning": "This schedule has no slot: saved as is, it will drive nothing and the thermostats following it will stay on their current preset. Save again to confirm.",
+        "emptySaveWarning": "This schedule has no slot: it will drive nothing, and the thermostats following it will stay on their current preset.",
+        "saveEmptyButton": "Save anyway",
+        "backToEditingButton": "Add a slot",
         "followersLabel": "Thermostats following this schedule",
-        "followersHelp": "A thermostat follows one schedule: ticking it here takes it off its own. Only the thermostats of this house are offered.",
+        "followersHelp": "A thermostat follows one schedule: adding it here takes it off its own. Only the thermostats of this house are offered.",
         "followedByNobody": "no thermostat yet",
         "attachPlaceholder": "Add a thermostat…",
         "attachReplacesHelp": "A thermostat follows one schedule: adding it here takes it off the one it followed.",

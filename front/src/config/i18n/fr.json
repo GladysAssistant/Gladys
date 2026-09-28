@@ -3374,6 +3374,7 @@
         "tuningSection": "Réglage fin",
         "typeVirtual": "Thermostat virtuel (Gladys régule)",
         "typeExternal": "Thermostat réel (le device régule)",
+        "vendorProgrammeWarning": "Désactivez le programme du fabricant sur cet appareil (application Netatmo, Tado…) avant de le piloter depuis Gladys. Sinon le programme de l’appareil et celui de Gladys écrivent tour à tour la consigne, et le thermostat suit celui qui a écrit en dernier.",
         "typeHelp": {
           "virtual": "Gladys fait office de thermostat : elle lit un capteur de température et pilote un interrupteur (relais, prise, contact de chaudière) selon la consigne.",
           "external": "Le thermostat gère lui-même sa régulation et son chauffage. Gladys lui envoie seulement la consigne du planning et affiche son état."
@@ -3519,9 +3520,11 @@
         "followedBy": "Suivi par",
         "weekLabel": "Semaine",
         "emptyScheduleWarning": "Ce planning n’a aucun créneau : il ne pilote rien. Les thermostats qui le suivent restent sur leur preset courant.",
-        "emptySaveWarning": "Ce planning n’a aucun créneau : enregistré tel quel, il ne pilotera rien et les thermostats qui le suivent resteront sur leur preset courant. Enregistrez à nouveau pour confirmer.",
+        "emptySaveWarning": "Ce planning n’a aucun créneau : il ne pilotera rien, et les thermostats qui le suivent resteront sur leur preset courant.",
+        "saveEmptyButton": "Enregistrer quand même",
+        "backToEditingButton": "Ajouter un créneau",
         "followersLabel": "Thermostats qui suivent ce planning",
-        "followersHelp": "Un thermostat ne suit qu’un planning : le cocher ici le retire du sien. Seuls les thermostats de cette maison sont proposés.",
+        "followersHelp": "Un thermostat ne suit qu’un planning : l’ajouter ici le retire du sien. Seuls les thermostats de cette maison sont proposés.",
         "followedByNobody": "aucun thermostat pour l’instant",
         "attachPlaceholder": "Ajouter un thermostat…",
         "attachReplacesHelp": "Un thermostat ne suit qu’un planning : l’ajouter ici le retire du sien.",

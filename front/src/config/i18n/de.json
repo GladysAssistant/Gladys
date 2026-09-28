@@ -3374,6 +3374,7 @@
         "tuningSection": "Feineinstellung",
         "typeVirtual": "Virtuelles Thermostat (Gladys regelt)",
         "typeExternal": "Echtes Thermostat (das Gerät regelt)",
+        "vendorProgrammeWarning": "Schalten Sie das Herstellerprogramm auf diesem Gerät ab (Netatmo-, Tado-App…), bevor Sie es über Gladys steuern. Sonst schreiben das Programm des Geräts und das von Gladys abwechselnd den Sollwert, und der Thermostat folgt dem zuletzt geschriebenen.",
         "typeHelp": {
           "virtual": "Gladys arbeitet als Thermostat: Sie liest einen Temperatursensor und steuert einen Schalter (Relais, Steckdose, Kesselkontakt), um den Sollwert zu erreichen.",
           "external": "Das Thermostat regelt selbst und steuert seine Heizung selbst. Gladys schreibt nur den Sollwert aus dem Zeitplan und zeigt den Zustand des Geräts an."
@@ -3519,9 +3520,11 @@
         "followedBy": "Befolgt von",
         "weekLabel": "Woche",
         "emptyScheduleWarning": "Dieser Zeitplan hat kein Zeitfenster und steuert daher nichts. Die Thermostate, die ihm folgen, bleiben auf ihrem aktuellen Preset.",
-        "emptySaveWarning": "Dieser Zeitplan hat kein Zeitfenster: So gespeichert steuert er nichts, und die Thermostate, die ihm folgen, bleiben auf ihrem aktuellen Preset. Zum Bestätigen erneut speichern.",
+        "emptySaveWarning": "Dieser Zeitplan hat kein Zeitfenster: Er steuert nichts, und die Thermostate, die ihm folgen, bleiben auf ihrem aktuellen Preset.",
+        "saveEmptyButton": "Trotzdem speichern",
+        "backToEditingButton": "Zeitfenster hinzufügen",
         "followersLabel": "Thermostate, die diesem Zeitplan folgen",
-        "followersHelp": "Ein Thermostat folgt nur einem Zeitplan: Wird es hier angehakt, verlässt es seinen bisherigen. Angeboten werden nur die Thermostate dieses Hauses.",
+        "followersHelp": "Ein Thermostat folgt nur einem Zeitplan: Wird es hier hinzugefügt, verlässt es seinen bisherigen. Angeboten werden nur die Thermostate dieses Hauses.",
         "followedByNobody": "noch kein Thermostat",
         "attachPlaceholder": "Thermostat hinzufügen…",
         "attachReplacesHelp": "Ein Thermostat folgt nur einem Zeitplan: Wird es hier hinzugefügt, verlässt es seinen bisherigen.",

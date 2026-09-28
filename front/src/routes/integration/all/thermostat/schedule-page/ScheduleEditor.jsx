@@ -102,6 +102,11 @@ class ScheduleEditor extends Component {
   // the choice is still free.
   updateHouse = e => this.setState({ house: e.target.value, followers: [] });
 
+  // Take back the question and hand the editor over. The confirmation is dropped
+  // with it: this button says "no", so a later Save on a schedule that is still
+  // empty has to ask again rather than go straight through.
+  backToEditing = () => this.setState({ error: null, emptyConfirmed: false });
+
   toggleFollower = selector =>
     this.setState(prev => ({
       followers: prev.followers.includes(selector)
@@ -392,6 +397,32 @@ class ScheduleEditor extends Component {
 
   // ── Render helpers ────────────────────────────────────────────────────────
 
+  // Rendered by the Save button rather than at the top of the editor: it answers
+  // a press on that button, and the editor is several screens tall once the days
+  // are open. The empty-schedule one especially has to be seen, since saving it
+  // takes a second press.
+  renderError = error => {
+    if (!error) {
+      return null;
+    }
+    if (error === 'empty-schedule') {
+      return (
+        <div class="alert alert-info">
+          <Text id="integration.thermostat.schedule.emptySaveWarning" />
+        </div>
+      );
+    }
+    return (
+      <div class="alert alert-warning">
+        {error === 'overlap' && <Text id="integration.thermostat.schedule.overlapError" />}
+        {error === 'duplicate-name' && <Text id="integration.thermostat.schedule.duplicateNameError" />}
+        {error !== 'overlap' && error !== 'duplicate-name' && (
+          <span>{typeof error === 'string' ? error : <Text id="integration.thermostat.schedule.saveError" />}</span>
+        )}
+      </div>
+    );
+  };
+
   // Text equivalent of the coloured bar, for a collapsed day.
   describeDay = (dayRanges, dictionary) => {
     if (dayRanges.length === 0) {
@@ -624,24 +655,6 @@ class ScheduleEditor extends Component {
           </div>
         )}
 
-        {/* Not an error: an empty schedule saves on the second press, and the
-            message says what it will do rather than refusing it. */}
-        {error === 'empty-schedule' && (
-          <div class="alert alert-info">
-            <Text id="integration.thermostat.schedule.emptySaveWarning" />
-          </div>
-        )}
-
-        {error && error !== 'empty-schedule' && (
-          <div class="alert alert-warning">
-            {error === 'overlap' && <Text id="integration.thermostat.schedule.overlapError" />}
-            {error === 'duplicate-name' && <Text id="integration.thermostat.schedule.duplicateNameError" />}
-            {error !== 'overlap' && error !== 'duplicate-name' && (
-              <span>{typeof error === 'string' ? error : <Text id="integration.thermostat.schedule.saveError" />}</span>
-            )}
-          </div>
-        )}
-
         <div class={style.dayList}>
           {DAYS.map(day => {
             const dayPoints = this.dayRanges(ranges, day);
@@ -827,14 +840,31 @@ class ScheduleEditor extends Component {
           })}
         </div>
 
-        <div class={style.editorActions}>
-          <button type="button" class="btn btn-primary" onClick={this.save} disabled={saving || !name.trim()}>
-            <Text id="integration.thermostat.schedule.saveButton" />
-          </button>
-          <button type="button" class="btn btn-secondary ml-2" onClick={onCancel}>
-            <Text id="integration.thermostat.schedule.cancelButton" />
-          </button>
-        </div>
+        {this.renderError(error)}
+
+        {/* Saving an empty schedule turns this row into the question itself: the
+            button says what the second press will do, and the way out is to go
+            back and add a slot rather than to leave the editor. Repeating "Save"
+            gave no sign that the press meant something else this time. */}
+        {error === 'empty-schedule' ? (
+          <div class={style.editorActions}>
+            <button type="button" class="btn btn-warning" onClick={this.save} disabled={saving}>
+              <Text id="integration.thermostat.schedule.saveEmptyButton" />
+            </button>
+            <button type="button" class="btn btn-secondary ml-2" onClick={this.backToEditing}>
+              <Text id="integration.thermostat.schedule.backToEditingButton" />
+            </button>
+          </div>
+        ) : (
+          <div class={style.editorActions}>
+            <button type="button" class="btn btn-primary" onClick={this.save} disabled={saving || !name.trim()}>
+              <Text id="integration.thermostat.schedule.saveButton" />
+            </button>
+            <button type="button" class="btn btn-secondary ml-2" onClick={onCancel}>
+              <Text id="integration.thermostat.schedule.cancelButton" />
+            </button>
+          </div>
+        )}
       </div>
     );
   }
