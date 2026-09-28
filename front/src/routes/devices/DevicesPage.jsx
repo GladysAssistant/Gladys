@@ -146,7 +146,7 @@ const DevicesPage = ({ children, ...props }) => (
             <div class="loader" />
             <div class={cx('dimmer-content', style.devicesListContainer)}>
               {props.initialized && props.filteredDevices.length > 0 && (
-                <div class="card d-lg-none">
+                <div class="card d-xl-none">
                   <div class="list-group list-group-flush">
                     {props.filteredDevices.map(({ device, integration, statesStats }) => (
                       <DeviceMobileItem
@@ -161,7 +161,7 @@ const DevicesPage = ({ children, ...props }) => (
                 </div>
               )}
               {props.initialized && props.filteredDevices.length > 0 && (
-                <div class="card d-none d-lg-block">
+                <div class="card d-none d-xl-block">
                   <div class="table-responsive">
                     {/* device-list-table: same Horizon pill-row grammar as the
                         devices widgets on the dashboard */}

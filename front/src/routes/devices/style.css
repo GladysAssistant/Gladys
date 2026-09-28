@@ -63,12 +63,9 @@
   gap: 0.5rem;
 }
 
-.verboseInfo {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.25rem 0.5rem;
-  margin-top: 0.25rem;
+.verboseBadge {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .verboseAlert {
@@ -123,8 +120,9 @@
 
 .mobileItemDetails {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem 0.5rem;
 }
 
 .mobileItemChevron {

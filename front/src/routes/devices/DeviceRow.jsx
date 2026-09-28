@@ -2,7 +2,7 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
 import DeviceExportCsvButton from './DeviceExportCsvButton';
-import { DeviceStamp, FeatureIcons, IntegrationName, VerboseDeviceInfo } from './helpers';
+import { DeviceStamp, FeatureIcons, IntegrationName, VerboseBadge } from './helpers';
 import style from './style.css';
 
 const DeviceRow = ({ device, integration, statesStats, periodInHours }) => (
@@ -17,7 +17,7 @@ const DeviceRow = ({ device, integration, statesStats, periodInHours }) => (
         {integration && integration.deviceUrl ? <Link href={integration.deviceUrl}>{device.name}</Link> : device.name}
       </div>
       <div class="small text-muted">{device.selector}</div>
-      <VerboseDeviceInfo device={device} statesStats={statesStats} periodInHours={periodInHours} />
+      <VerboseBadge device={device} statesStats={statesStats} periodInHours={periodInHours} class="mt-1" />
     </td>
     <td class="text-nowrap">
       {device.room ? (

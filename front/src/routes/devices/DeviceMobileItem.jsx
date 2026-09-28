@@ -2,7 +2,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import DeviceExportCsvButton from './DeviceExportCsvButton';
-import { DeviceStamp, FeatureIcons, IntegrationName, VerboseDeviceInfo } from './helpers';
+import { DeviceStamp, FeatureIcons, IntegrationName, VerboseBadge } from './helpers';
 import style from './style.css';
 
 // One tappable list item: the whole row opens the device in its
@@ -16,9 +16,9 @@ const DeviceMobileItem = ({ device, integration, statesStats, periodInHours }) =
       <div class={cx('small', 'text-muted', style.mobileItemDetails)}>
         {device.room && <span class="tag">{device.room.name}</span>}
         <IntegrationName integration={integration} link={false} />
+        <VerboseBadge device={device} statesStats={statesStats} periodInHours={periodInHours} />
       </div>
       <FeatureIcons device={device} />
-      <VerboseDeviceInfo device={device} statesStats={statesStats} periodInHours={periodInHours} />
     </div>
   ];
 

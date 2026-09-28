@@ -74,10 +74,9 @@ export const FeatureIcons = ({ device }) => {
   );
 };
 
-// Written under the device name rather than in a tooltip, so it can also be
-// read on a phone: how many states the device saved in the period, and which
-// of its features saved them.
-export const VerboseDeviceInfo = ({ device, statesStats, periodInHours }) => {
+// Only a badge, to keep the list light: the numbers of the period are in its
+// tooltip, and the device page tells which features to act on.
+export const VerboseBadge = ({ device, statesStats, periodInHours, class: className }) => {
   if (!statesStats || !statesStats.is_verbose) {
     return null;
   }
@@ -93,19 +92,21 @@ export const VerboseDeviceInfo = ({ device, statesStats, periodInHours }) => {
     features: verboseFeatureNames.join(', ')
   };
   return (
-    <div class={style.verboseInfo}>
-      <span class="badge badge-warning">
+    <Localizer>
+      <span
+        class={cx('badge', 'badge-warning', style.verboseBadge, className)}
+        title={
+          verboseFeatureNames.length > 0 ? (
+            <Text id="devicesList.verbose.details" fields={fields} />
+          ) : (
+            <Text id="devicesList.verbose.detailsWithoutFeatures" fields={fields} />
+          )
+        }
+      >
         <i class="fe fe-activity mr-1" />
         <Text id="devicesList.verbose.badge" />
       </span>
-      <span class="small text-muted">
-        {verboseFeatureNames.length > 0 ? (
-          <Text id="devicesList.verbose.details" fields={fields} />
-        ) : (
-          <Text id="devicesList.verbose.detailsWithoutFeatures" fields={fields} />
-        )}
-      </span>
-    </div>
+    </Localizer>
   );
 };
 
