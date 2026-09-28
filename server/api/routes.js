@@ -245,6 +245,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDevicesByService,
     },
+    'get /api/v1/device/:device_selector/states_size': {
+      authenticated: true,
+      controller: deviceController.getDeviceStatesSize,
+    },
     'get /api/v1/device/:device_selector': {
       authenticated: true,
       controller: deviceController.getBySelector,

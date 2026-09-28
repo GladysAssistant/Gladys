@@ -295,6 +295,16 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/device/:device_selector/states_size getDeviceStatesSize
+   * @apiName getDeviceStatesSize
+   * @apiGroup Device
+   */
+  async function getDeviceStatesSize(req, res) {
+    const statesSize = await gladys.device.getDeviceStatesSize(req.params.device_selector);
+    res.json(statesSize);
+  }
+
+  /**
    * @api {get} /api/v1/device/states_stats getStatesStats
    * @apiName getStatesStats
    * @apiGroup Device
@@ -318,6 +328,7 @@ module.exports = function DeviceController(gladys) {
     getConsumptionByDates: asyncMiddleware(getConsumptionByDates),
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),
+    getDeviceStatesSize: asyncMiddleware(getDeviceStatesSize),
     getStatesStats: asyncMiddleware(getStatesStats),
     migrateFromSQLiteToDuckDb: asyncMiddleware(migrateFromSQLiteToDuckDb),
     migrate: asyncMiddleware(migrate),

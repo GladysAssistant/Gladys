@@ -599,4 +599,34 @@ const data = translate({
   ...system
 });
 
+// `GET /device/:selector/states_size`: the device pages show how much history
+// each feature holds, so every device the fixtures return gets one. The power
+// of a plug is reported every few seconds: it holds most of the history.
+const getDemoFeatureStates = feature => {
+  if (!feature.keep_history) {
+    return 0;
+  }
+  return feature.type === 'power' ? 518400 : 8640;
+};
+Object.values(data).forEach(response => {
+  (Array.isArray(response) ? response : [response]).forEach(device => {
+    if (!device || !device.selector || !Array.isArray(device.features)) {
+      return;
+    }
+    data[`get /api/v1/device/${device.selector}/states_size`] = {
+      device_selector: device.selector,
+      features: device.features
+        .filter(feature => feature && feature.selector)
+        .map(feature => {
+          const states = getDemoFeatureStates(feature);
+          return {
+            device_feature_selector: feature.selector,
+            states,
+            estimated_size_in_bytes: states * 6
+          };
+        })
+    };
+  });
+});
+
 export default data;

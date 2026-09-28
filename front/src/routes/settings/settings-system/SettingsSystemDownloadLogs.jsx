@@ -1,6 +1,9 @@
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
+
+import formatBytes from '../../../utils/formatBytes';
 
 // Per-request chunk size (bytes). Stays well below Gladys Plus per-request size limit.
 const CHUNK_SIZE = 256 * 1024;
@@ -13,20 +16,6 @@ const base64ToUint8Array = base64 => {
     bytes[i] = binary.charCodeAt(i);
   }
   return bytes;
-};
-
-const formatBytes = bytes => {
-  if (!bytes) {
-    return '0 B';
-  }
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let value = bytes;
-  let unitIndex = 0;
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024;
-    unitIndex += 1;
-  }
-  return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 };
 
 class SettingsSystemDownloadLogs extends Component {
@@ -147,7 +136,10 @@ class SettingsSystemDownloadLogs extends Component {
               <small class="text-muted">
                 <Text
                   id="systemSettings.downloadLogsProgress"
-                  fields={{ downloaded: formatBytes(bytesDownloaded), total: formatBytes(totalSize) }}
+                  fields={{
+                    downloaded: formatBytes(bytesDownloaded, get(this.props, 'user.language')),
+                    total: formatBytes(totalSize, get(this.props, 'user.language'))
+                  }}
                 />
               </small>
             </div>
@@ -162,4 +154,4 @@ class SettingsSystemDownloadLogs extends Component {
   }
 }
 
-export default connect('httpClient', null)(SettingsSystemDownloadLogs);
+export default connect('httpClient,user', null)(SettingsSystemDownloadLogs);

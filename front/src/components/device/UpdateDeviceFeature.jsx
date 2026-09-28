@@ -8,6 +8,7 @@ import {
 } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
+import FeatureHistorySize from './FeatureHistorySize';
 
 const DEVICE_FEATURE_COMPATIBLE_CATEGORY = {
   [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: [DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_CATEGORIES.SWITCH],
@@ -183,6 +184,7 @@ class UpdateDeviceFeature extends Component {
                     <Text id="editDeviceForm.keepHistorySmallDescription" />
                   </span>
                 </label>
+                <FeatureHistorySize device={device} feature={feature} class="mt-2" />
                 <p class="mt-2">
                   <small>
                     <MarkupText id="editDeviceForm.keepHistoryDescription" />

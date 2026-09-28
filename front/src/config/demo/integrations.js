@@ -726,6 +726,7 @@ const integrations = {
     ]
   },
   'get /api/v1/device/zigbee2mqtt-0x00158d0005828ece': {
+    id: 'd2e4f6a8-1b3c-4d5e-8f70-9a1b2c3d4e5f',
     name: 'Aqara Sensor',
     external_id: 'zigbee2mqtt-0x00158d0005828ece',
     selector: 'zigbee2mqtt-0x00158d0005828ece',
@@ -733,9 +734,12 @@ const integrations = {
     model: 'zigbee2mqtt-0x00158d0005828ece',
     features: [
       {
+        id: 'a3f1c2d4-5b6e-4f70-8a91-b2c3d4e5f607',
+        selector: 'zigbee2mqtt-0x00158d0005828ece-switch',
         category: 'switch',
         type: 'binary',
-        name: 'Switch'
+        name: 'Switch',
+        keep_history: true
       }
     ]
   },
