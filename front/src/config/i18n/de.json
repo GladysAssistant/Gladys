@@ -109,6 +109,19 @@
     "room": "Raum",
     "integration": "Integration",
     "features": "Funktionen",
+    "orderByStatesDesc": "Aktivste zuerst",
+    "verbose": {
+      "badge": "Sehr aktiv",
+      "details": "{{count}} Werte in {{hours}} Std. gespeichert ({{features}})",
+      "detailsWithoutFeatures": "{{count}} Werte in {{hours}} Std. gespeichert",
+      "summary": {
+        "one": "1 sehr aktives Gerät macht {{percent}} % der Werte aus, die in den letzten {{hours}} Stunden im Verlauf gespeichert wurden.",
+        "other": "{{count}} sehr aktive Geräte machen {{percent}} % der Werte aus, die in den letzten {{hours}} Stunden im Verlauf gespeichert wurden."
+      },
+      "explanation": "Ein Gerät wird markiert, wenn eine seiner Funktionen mindestens {{threshold}} Werte in {{hours}} Stunden speichert. Wenn du diesen Verlauf nicht brauchst, deaktiviere ihn auf der Geräteseite, um die Datenbank zu entlasten.",
+      "showOnlyVerbose": "Nur diese Geräte anzeigen",
+      "showAll": "Alle Geräte anzeigen"
+    },
     "emptyState": "Keine Geräte gefunden. Füge Geräte über die Integrationsseite hinzu oder passe deine Suche und Filter an.",
     "emptyStateButton": "Integrationen durchsuchen",
     "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut.",

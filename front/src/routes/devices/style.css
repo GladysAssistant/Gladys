@@ -63,6 +63,26 @@
   gap: 0.5rem;
 }
 
+.verboseInfo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.verboseAlert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.verboseAlertText {
+  flex: 1 1 24rem;
+}
+
 .mobileItem {
   display: flex;
   align-items: center;

@@ -74,6 +74,41 @@ export const FeatureIcons = ({ device }) => {
   );
 };
 
+// Written under the device name rather than in a tooltip, so it can also be
+// read on a phone: how many states the device saved in the period, and which
+// of its features saved them.
+export const VerboseDeviceInfo = ({ device, statesStats, periodInHours }) => {
+  if (!statesStats || !statesStats.is_verbose) {
+    return null;
+  }
+  const featuresById = new Map((device.features || []).map(feature => [feature.id, feature]));
+  const verboseFeatureNames = statesStats.features
+    .filter(featureStats => featureStats.is_verbose)
+    .map(featureStats => featuresById.get(featureStats.device_feature_id))
+    .filter(feature => feature)
+    .map(feature => feature.name);
+  const fields = {
+    count: statesStats.states.toLocaleString(),
+    hours: periodInHours,
+    features: verboseFeatureNames.join(', ')
+  };
+  return (
+    <div class={style.verboseInfo}>
+      <span class="badge badge-warning">
+        <i class="fe fe-activity mr-1" />
+        <Text id="devicesList.verbose.badge" />
+      </span>
+      <span class="small text-muted">
+        {verboseFeatureNames.length > 0 ? (
+          <Text id="devicesList.verbose.details" fields={fields} />
+        ) : (
+          <Text id="devicesList.verbose.detailsWithoutFeatures" fields={fields} />
+        )}
+      </span>
+    </div>
+  );
+};
+
 export const IntegrationName = ({ integration, link = true }) => {
   if (!integration) {
     return <span class="text-muted">-</span>;
