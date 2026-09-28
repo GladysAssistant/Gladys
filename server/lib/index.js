@@ -88,6 +88,7 @@ function Gladys(params = {}) {
     energyPrice,
     params.jwtSecret,
     cache,
+    calendar,
   );
   const gateway = new Gateway(
     variable,

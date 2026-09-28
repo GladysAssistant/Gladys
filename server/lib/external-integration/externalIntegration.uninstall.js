@@ -54,6 +54,23 @@ async function uninstall(selector) {
   }
   const devices = await db.Device.findAll({ where: { service_id: service.id } });
   await Promise.each(devices, (device) => this.device.destroy(device.selector));
+  // Calendars of a calendar-type integration are removed explicitly (all
+  // users), never left to the service_id FK cascade (capabilities/calendar-type.md) —
+  // and their viewers are notified, or a shared calendar would stay
+  // displayed on other users' calendar views until a manual refresh.
+  const calendars = await db.Calendar.findAll({
+    where: { service_id: service.id },
+    attributes: ['selector', 'shared', 'user_id'],
+  });
+  await db.Calendar.destroy({ where: { service_id: service.id } });
+  // partitioned by prior visibility, per owner: broadcasting a user's whole
+  // set as soon as one calendar is shared would leak the selectors of their
+  // private calendars to every connected user
+  const calendarsByUser = new Map();
+  calendars.forEach((calendar) => {
+    calendarsByUser.set(calendar.user_id, [...(calendarsByUser.get(calendar.user_id) || []), calendar]);
+  });
+  calendarsByUser.forEach((userCalendars, userId) => this.notifyCalendarsUpdated(userId, userCalendars));
   await db.Variable.destroy({ where: { service_id: service.id } });
   await db.Service.destroy({ where: { id: service.id } });
   this.stateManager.deleteState('service', service.name);
@@ -63,6 +80,7 @@ async function uninstall(selector) {
   this.clearWidgetCaches(service);
   this.startedAt.delete(service.id);
   this.stateRateLimits.delete(service.id);
+  this.calendarWriteRateLimits.delete(service.id);
   this.networkDiscoveryActiveScanTimes.delete(service.id);
   const externalIdPrefix = `ext:${service.selector}:`;
   [...this.cameraImageRateLimits.keys()]

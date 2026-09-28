@@ -6,7 +6,12 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 
-import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from '../utils';
+import {
+  getLocalizedText,
+  getGithubRepoUrl,
+  getRequestedHardwareClasses,
+  TYPES_WITHOUT_DEVICE_SCREENS
+} from '../utils';
 import BackToIntegrationsLink from '../../../../../components/integration/BackToIntegrationsLink';
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
@@ -106,12 +111,12 @@ class ExternalIntegrationInstallPage extends Component {
         body.granted_devices = this.state.grantedDevices || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      // communication and weather integrations have no device screens, and
-      // an integration with settings needs them filled before any device
-      // can be discovered: all land on the configuration screen after
-      // install
+      // integrations without device screens (communication, weather,
+      // calendar, provider), and an integration with settings needs them
+      // filled before any device can be discovered: all land on the
+      // configuration screen after install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (['communication', 'weather'].includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
+      if (TYPES_WITHOUT_DEVICE_SCREENS.includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -240,6 +245,12 @@ class ExternalIntegrationInstallPage extends Component {
                               <div class="alert alert-info">
                                 <i class="fe fe-cloud mr-1" />
                                 <Text id="integration.externalIntegration.install.weatherInfoText" />
+                              </div>
+                            )}
+                            {manifest.type === 'calendar' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-calendar mr-1" />
+                                <Text id="integration.externalIntegration.install.calendarInfoText" />
                               </div>
                             )}
                             {manifest.type === 'provider' && (
