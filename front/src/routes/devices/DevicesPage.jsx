@@ -92,7 +92,10 @@ const DevicesPage = ({ children, ...props }) => (
                   search={props.search}
                   searchValue={props.searchValue}
                   searchPlaceHolder={<Text id="devicesList.searchPlaceholder" />}
-                  extraOrderDirs={[{ value: 'states_desc', labelId: 'devicesList.orderByStatesDesc' }]}
+                  extraOrderDirs={
+                    // without the stats, this order would silently fall back to the names
+                    props.statesStats ? [{ value: 'states_desc', labelId: 'devicesList.orderByStatesDesc' }] : []
+                  }
                 />
               </Localizer>
             </div>

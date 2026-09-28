@@ -116,6 +116,7 @@ const DeviceManager = function DeviceManager(
   this.VERBOSE_DEVICE_FEATURE_MIN_STATES = 24 * 60;
   this.STATES_STATS_CACHE_DURATION_IN_MS = 5 * 60 * 1000;
   this.statesStatsCache = null;
+  this.statesStatsInFlight = null;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);

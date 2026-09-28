@@ -104,6 +104,63 @@ describe('Device.getStatesStats', function Describe() {
     });
   });
 
+  ['America/New_York', 'Europe/Paris'].forEach((timezone) => {
+    it(`should count exactly the last 24 hours with the ${timezone} timezone`, async () => {
+      const setTimezone = `SET timezone = '${timezone}';`;
+      await db.duckDbReadConnectionAllAsync(setTimezone);
+      await db.duckDbWriteConnectionAllAsync(setTimezone);
+      try {
+        await db.duckDbInsertState(VERBOSE_FEATURE_ID, 1, new Date(Date.now() - 23 * 60 * 60 * 1000));
+        await db.duckDbInsertState(VERBOSE_FEATURE_ID, 2, new Date(Date.now() - 25 * 60 * 60 * 1000));
+        const device = new Device(event, {}, buildStateManager(), {}, {}, variable, job);
+        const statesStats = await device.getStatesStats();
+        expect(statesStats.total_states).to.equal(1);
+      } finally {
+        await db.duckDbReadConnectionAllAsync('RESET timezone;');
+        await db.duckDbWriteConnectionAllAsync('RESET timezone;');
+      }
+    });
+  });
+
+  it('should share one count between callers asking at the same time', async () => {
+    const querySpy = sinon.spy(db, 'duckDbReadConnectionAllAsync');
+    const device = new Device(event, {}, buildStateManager(), {}, {}, variable, job);
+    const [firstStats, secondStats] = await Promise.all([device.getStatesStats(), device.getStatesStats()]);
+    sinon.assert.calledOnce(querySpy);
+    expect(secondStats).to.equal(firstStats);
+    expect(device.statesStatsInFlight).to.equal(null);
+  });
+
+  it('should count again after a failed count', async () => {
+    const queryStub = sinon.stub(db, 'duckDbReadConnectionAllAsync');
+    queryStub.onFirstCall().rejects(new Error('DuckDB error'));
+    queryStub.onSecondCall().resolves([{ device_feature_id: VERBOSE_FEATURE_ID, states: 3n }]);
+    const device = new Device(event, {}, buildStateManager(), {}, {}, variable, job);
+    let error;
+    try {
+      await device.getStatesStats();
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.instanceOf(Error);
+    expect(device.statesStatsInFlight).to.equal(null);
+    expect(device.statesStatsCache).to.equal(null);
+    const statesStats = await device.getStatesStats();
+    expect(statesStats.total_states).to.equal(3);
+  });
+
+  it('should start the cache duration once the count is done', async () => {
+    const clock = sinon.useFakeTimers({ now: 1000000, toFake: ['Date'] });
+    const countDuration = 10 * 60 * 1000;
+    sinon.stub(db, 'duckDbReadConnectionAllAsync').callsFake(async () => {
+      clock.tick(countDuration);
+      return [];
+    });
+    const device = new Device(event, {}, buildStateManager(), {}, {}, variable, job);
+    await device.getStatesStats();
+    expect(device.statesStatsCache.computedAt).to.equal(1000000 + countDuration);
+  });
+
   it('should serve a recent result from the cache, and count again once it expired', async () => {
     const device = new Device(event, {}, buildStateManager(), {}, {}, variable, job);
     const firstStats = await device.getStatesStats();
