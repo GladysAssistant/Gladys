@@ -223,6 +223,62 @@ describe('externalIntegration.updateUserCalendar', () => {
     expect(lastPayload.calendar_selectors.sort()).to.eql(['primary', 'work']);
   });
 
+  it('should push each calendar of a publication batch to its own audience', async () => {
+    await externalIntegration.updateUserCalendar(service.selector, JOHN_USER_ID, 'primary', { shared: true });
+    event.emit.resetHistory();
+    await externalIntegration.publishCalendars(service, {
+      user: 'john',
+      calendars: [
+        { external_id: `ext:${service.selector}:john:primary`, name: 'Primary' },
+        { external_id: `ext:${service.selector}:john:secret`, name: 'Secret' },
+      ],
+    });
+    const updatedCalls = (channel) =>
+      event.emit
+        .getCalls()
+        .filter((call) => call.args[0] === channel)
+        .filter((call) => call.args[1].type === WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED);
+    // a batch mixing a shared and a private calendar never broadcasts the
+    // private selector to the household
+    const sendAllCalls = updatedCalls('websocket.send-all');
+    expect(sendAllCalls).to.have.lengthOf(1);
+    expect(sendAllCalls[0].args[1].payload).to.deep.equal({ calendar_selectors: ['primary'] });
+    const sendCalls = updatedCalls('websocket.send');
+    expect(sendCalls).to.have.lengthOf(1);
+    expect(sendCalls[0].args[1].payload).to.deep.equal({ calendar_selectors: ['secret'] });
+    expect(sendCalls[0].args[1].userId).to.equal(JOHN_USER_ID);
+  });
+
+  it('should push the shared source of a moved event to everyone and the private destination to its owner', async () => {
+    await externalIntegration.updateUserCalendar(service.selector, JOHN_USER_ID, 'primary', { shared: true });
+    await externalIntegration.publishCalendars(service, {
+      user: 'john',
+      calendars: [{ external_id: `ext:${service.selector}:john:work`, name: 'Work' }],
+    });
+    event.emit.resetHistory();
+    await externalIntegration.publishCalendarEvents(service, {
+      calendar_external_id: `ext:${service.selector}:john:work`,
+      events: [
+        {
+          external_id: `ext:${service.selector}:john:uid-1`,
+          name: 'Dentist',
+          start: '2026-08-14T09:00:00.000Z',
+        },
+      ],
+    });
+    const updatedCalls = (channel) =>
+      event.emit
+        .getCalls()
+        .filter((call) => call.args[0] === channel)
+        .filter((call) => call.args[1].type === WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED);
+    const sendAllCalls = updatedCalls('websocket.send-all');
+    expect(sendAllCalls).to.have.lengthOf(1);
+    expect(sendAllCalls[0].args[1].payload).to.deep.equal({ calendar_selectors: ['primary'] });
+    const sendCalls = updatedCalls('websocket.send');
+    expect(sendCalls).to.have.lengthOf(1);
+    expect(sendCalls[0].args[1].payload).to.deep.equal({ calendar_selectors: ['work'] });
+  });
+
   it('should push calendar.updated to everyone when the calendar is shared', async () => {
     await externalIntegration.updateUserCalendar(service.selector, JOHN_USER_ID, 'primary', { shared: true });
     const sendAllCalls = event.emit

@@ -84,6 +84,7 @@ const { deleteContactProfile } = require('./externalIntegration.deleteContactPro
 const { getCalendarAccount, getCalendarAccountForUser } = require('./externalIntegration.getCalendarAccount');
 const {
   notifyCalendarUpdated,
+  notifyCalendarsUpdated,
   notifyCalendarAccountUpdated,
   assertCalendarWriteAllowed,
 } = require('./externalIntegration.calendarNotify');
@@ -150,7 +151,7 @@ const { getSceneDeclarations } = require('./externalIntegration.getSceneDeclarat
  * @param {object} energyPrice - Energy price manager (default electric meter).
  * @param {string} jwtSecret - Secret to sign integration JWTs.
  * @param {object} cache - In-memory cache (contact link codes).
- * @param {object} calendar - Calendar manager (calendar-type integrations, B.19).
+ * @param {object} calendar - Calendar manager (calendar-type integrations).
  * @example
  * const externalIntegration = new ExternalIntegration(event, system, service, state, device, variable, price, 's');
  */
@@ -345,6 +346,7 @@ ExternalIntegration.prototype.deleteContactProfile = deleteContactProfile;
 ExternalIntegration.prototype.getCalendarAccount = getCalendarAccount;
 ExternalIntegration.prototype.getCalendarAccountForUser = getCalendarAccountForUser;
 ExternalIntegration.prototype.notifyCalendarUpdated = notifyCalendarUpdated;
+ExternalIntegration.prototype.notifyCalendarsUpdated = notifyCalendarsUpdated;
 ExternalIntegration.prototype.notifyCalendarAccountUpdated = notifyCalendarAccountUpdated;
 ExternalIntegration.prototype.assertCalendarWriteAllowed = assertCalendarWriteAllowed;
 ExternalIntegration.prototype.saveCalendarAccount = saveCalendarAccount;

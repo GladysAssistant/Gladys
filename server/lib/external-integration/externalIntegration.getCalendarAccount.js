@@ -4,7 +4,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
 const { CALENDAR_ACCOUNT_VARIABLE } = require('./constants');
 
 /**
- * @description Whether a manifest declares a calendar integration (B.19).
+ * @description Whether a manifest declares a calendar integration (capabilities/calendar-type.md).
  * @param {object} manifest - The integration manifest.
  * @returns {boolean} True on a calendar integration.
  * @example

@@ -98,11 +98,9 @@ async function publishCalendars(service, body = {}) {
     service.id,
     normalized,
   );
-  this.notifyCalendarUpdated(
-    user.id,
-    upserted.map((calendar) => calendar.selector),
-    upserted.some((calendar) => calendar.shared),
-  );
+  // partitioned by visibility: a batch mixing shared and private calendars
+  // must not broadcast the private selectors to the whole household
+  this.notifyCalendarsUpdated(user.id, upserted);
   return { success: true, created, updated };
 }
 

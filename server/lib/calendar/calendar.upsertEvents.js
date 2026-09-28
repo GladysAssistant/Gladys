@@ -38,6 +38,44 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
     const movedFromCalendarIds = new Set();
     const taken = new Set();
     const pushedExternalIds = new Set(events.map((event) => event.external_id));
+    if (window) {
+      // without it, startsWith(undefined) tests against the string "undefined":
+      // the prune would silently match nothing instead of failing
+      if (typeof prunePrefix !== 'string' || prunePrefix.length === 0) {
+        throw new BadParameters('prunePrefix: is required when a window is provided');
+      }
+      // Overlap semantics: start < to, and end > from when end is set (the
+      // exclusive-end convention: a full-day event ending exactly at `from`
+      // does not overlap), else start >= from — a multi-day event straddling
+      // `from` stays prunable. The prefix filter runs in JS: a LIKE pattern
+      // would need escaping for % and _ in external_ids. The prune runs
+      // before the upsert (same final state, the pushed ids are never
+      // pruned): the events cap then applies to the resulting calendar, so
+      // a window republished at the cap is not refused for rows it replaces.
+      const candidates = await db.CalendarEvent.findAll({
+        where: {
+          calendar_id: calendarId,
+          start: { [Op.lt]: new Date(window.to) },
+          [Op.or]: [
+            { end: { [Op.gt]: new Date(window.from) } },
+            { end: null, start: { [Op.gte]: new Date(window.from) } },
+          ],
+        },
+        attributes: ['id', 'external_id'],
+        transaction,
+      });
+      const toDelete = candidates
+        .filter(
+          (event) =>
+            event.external_id !== null &&
+            event.external_id.startsWith(prunePrefix) &&
+            !pushedExternalIds.has(event.external_id),
+        )
+        .map((event) => event.id);
+      if (toDelete.length > 0) {
+        deleted = await db.CalendarEvent.destroy({ where: { id: toDelete }, transaction });
+      }
+    }
     const existingCount = await db.CalendarEvent.count({ where: { calendar_id: calendarId }, transaction });
     let count = existingCount;
     // eslint-disable-next-line no-restricted-syntax
@@ -107,41 +145,6 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
           { transaction },
         );
         created += 1;
-      }
-    }
-    if (window) {
-      // without it, startsWith(undefined) tests against the string "undefined":
-      // the prune would silently match nothing instead of failing
-      if (typeof prunePrefix !== 'string' || prunePrefix.length === 0) {
-        throw new BadParameters('prunePrefix: is required when a window is provided');
-      }
-      // Overlap semantics: start < to, and end > from when end is set (the
-      // exclusive-end convention: a full-day event ending exactly at `from`
-      // does not overlap), else start >= from — a multi-day event straddling
-      // `from` stays prunable. The prefix filter runs in JS: a LIKE pattern
-      // would need escaping for % and _ in external_ids.
-      const candidates = await db.CalendarEvent.findAll({
-        where: {
-          calendar_id: calendarId,
-          start: { [Op.lt]: new Date(window.to) },
-          [Op.or]: [
-            { end: { [Op.gt]: new Date(window.from) } },
-            { end: null, start: { [Op.gte]: new Date(window.from) } },
-          ],
-        },
-        attributes: ['id', 'external_id'],
-        transaction,
-      });
-      const toDelete = candidates
-        .filter(
-          (event) =>
-            event.external_id !== null &&
-            event.external_id.startsWith(prunePrefix) &&
-            !pushedExternalIds.has(event.external_id),
-        )
-        .map((event) => event.id);
-      if (toDelete.length > 0) {
-        deleted = await db.CalendarEvent.destroy({ where: { id: toDelete }, transaction });
       }
     }
     return { created, updated, deleted, movedFromCalendarIds: [...movedFromCalendarIds] };

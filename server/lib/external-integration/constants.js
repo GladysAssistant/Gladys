@@ -167,7 +167,7 @@ const LINK_CODE_TTL_MS = 15 * 60 * 1000;
 const LINK_CODE_LENGTH = 8;
 const MAX_MESSAGE_TEXT_LENGTH = 4096;
 
-// Calendar integrations (B.19): per-user account variable (one JSON object
+// Calendar integrations (capabilities/calendar-type.md): per-user account variable (one JSON object
 // per (service_id, user_id), the CONTACT_PROFILE pattern — its presence is
 // the enablement marker, so "enabled with zero fields" is a first-class
 // state), and the normalization bounds of the calendar host endpoints.

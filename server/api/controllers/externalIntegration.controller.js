@@ -7,7 +7,7 @@ const { MAX_WIDGET_SETTINGS_BYTES } = require('../../lib/external-integration/co
 // Manifest types of the integrations a non-admin user can act on: they link
 // their own account on a communication integration (exactly like on the
 // native Telegram/Nextcloud Talk services), or enable their own calendars
-// on a calendar integration (B.19).
+// on a calendar integration (capabilities/calendar-type.md).
 const NON_ADMIN_TYPES = ['communication', 'calendar'];
 
 /**
@@ -36,7 +36,8 @@ function isNonAdminVisibleIntegration(integration) {
 /**
  * @description Public view of an external integration, for a non-admin user.
  * A non-admin only needs to link their own account on a communication
- * integration: they get the display data (status + manifest, which is the
+ * integration, or to enable their own calendars on a calendar integration:
+ * they get the display data (status + manifest, which is the
  * public description published by the store), never the runtime fields of
  * the install — the resolved `docker_image`, the containers state, and above
  * all the webhook URLs, which embed the Gladys Plus Open API key. Note that

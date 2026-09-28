@@ -172,20 +172,17 @@ async function publishCalendarEvents(service, body = {}) {
   );
   // an event move empties a row out of its source calendar: the push targets
   // the union of the source and destination calendars (same user, enforced
-  // by the upsert), everyone when any of them is shared
-  const selectors = [calendar.selector];
-  let anyShared = calendar.shared;
+  // by the upsert), each one to its own audience — everyone for a shared
+  // calendar, the owner only for a private one
+  const touchedCalendars = [calendar];
   if (movedFromCalendarIds.length > 0) {
     const sourceCalendars = await db.Calendar.findAll({
       where: { id: movedFromCalendarIds },
       attributes: ['selector', 'shared'],
     });
-    sourceCalendars.forEach((sourceCalendar) => {
-      selectors.push(sourceCalendar.selector);
-      anyShared = anyShared || sourceCalendar.shared;
-    });
+    touchedCalendars.push(...sourceCalendars);
   }
-  this.notifyCalendarUpdated(calendar.user_id, selectors, anyShared);
+  this.notifyCalendarsUpdated(calendar.user_id, touchedCalendars);
   return { success: true, created, updated, deleted };
 }
 

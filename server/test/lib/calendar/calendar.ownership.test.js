@@ -52,6 +52,27 @@ describe('calendar ownership checks', () => {
     const promise = calendar.createEvent('test-calendar', { name: 'Event', start: '2026-08-14T09:00:00.000Z' }, USER_B);
     return assert.isRejected(promise, 'Calendar not found');
   });
+  it('should refuse a user-created event squatting an external integration id', async () => {
+    // the `ext:` namespace is reserved: a household member must not be able
+    // to take the user-scoped id another member's integration will push
+    const promise = calendar.createEvent(
+      'test-calendar',
+      { name: 'Event', start: '2026-08-14T09:00:00.000Z', external_id: 'ext:my-int:pepper:uid-1' },
+      USER_A,
+    );
+    await assert.isRejected(promise, 'the "ext:" prefix is reserved to the external integrations');
+    const count = await db.CalendarEvent.count({ where: { external_id: 'ext:my-int:pepper:uid-1' } });
+    expect(count).to.equal(0);
+  });
+  it('should refuse a calendar squatting an external integration id', async () => {
+    const promise = calendar.create({
+      name: 'Squatter',
+      description: 'Squatter',
+      user_id: USER_A,
+      external_id: 'ext:my-int:pepper:primary',
+    });
+    await assert.isRejected(promise, 'the "ext:" prefix is reserved to the external integrations');
+  });
   it('should update an event when the user owns the calendar', async () => {
     await calendar.updateEvent('test-calendar-event', { name: 'New name' }, USER_A);
   });

@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { assertNotReservedExternalId } = require('./calendar.reservedExternalId');
 
 /**
  * @description Create an event in a calendar.
@@ -14,6 +15,10 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * });
  */
 async function createEvent(calendarSelector, calendarEvent, userId) {
+  if (userId !== undefined) {
+    // a user-created event never squats an external integration's id
+    assertNotReservedExternalId(calendarEvent.external_id);
+  }
   const calendar = await db.Calendar.findOne({
     where: {
       selector: calendarSelector,

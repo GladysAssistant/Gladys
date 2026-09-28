@@ -1241,7 +1241,7 @@ function validateManifest(manifest) {
       const seenAccountKeys = new Set();
       manifest.account_schema.forEach((field, index) => {
         validateConfigField(field, index, seenAccountKeys, errors, 'account_schema', declaredPortNames);
-        if (field && (field.type === 'oauth2' || field.type === 'account_link')) {
+        if (field && ACCOUNT_FIELD_TYPES.includes(field.type)) {
           // the Connect relay (oauth2 / account_link) is integration-scoped,
           // never per user (milestone 1)
           errors.push(`account_schema[${index}].type: ${field.type} is not allowed in the per-user account schema`);

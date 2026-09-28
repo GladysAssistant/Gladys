@@ -659,7 +659,7 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.deleteOwnContactProfile,
     },
-    // calendar integrations (B.19): each user enables their OWN account and
+    // calendar integrations (capabilities/calendar-type.md): each user enables their OWN account and
     // manages their OWN calendars (sync/shared toggles, no admin flag either)
     'get /api/v1/external_integration/:selector/calendar/account': {
       authenticated: true,
@@ -820,7 +820,7 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.getContacts,
     },
-    // calendar integrations (B.19): the integration syncs, the core stores.
+    // calendar integrations (capabilities/calendar-type.md): the integration syncs, the core stores.
     // User-scoped external_id prefix enforced, 30 writes/min per integration.
     'get /api/integration/v1/calendar/account': {
       authenticated: false,

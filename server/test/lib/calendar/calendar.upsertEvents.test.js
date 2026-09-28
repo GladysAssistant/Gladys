@@ -177,5 +177,18 @@ describe('calendar.upsertEvents', () => {
       { external_id: `${PREFIX}mover`, name: 'Mover', start: '2026-08-14T09:00:00.000Z' },
     ]);
     await assert.isRejected(movePromise, 'cannot hold more than 10000 events');
+    // a window republished at the cap is measured on the resulting calendar:
+    // the rows it prunes free their slots before the new ones are counted
+    const republished = await calendar.upsertEvents(
+      calendarA.id,
+      [{ external_id: `${PREFIX}replacement`, name: 'Replacement', start: '2026-08-14T09:00:00.000Z' }],
+      {
+        window: { from: '2026-08-01T00:00:00.000Z', to: '2026-09-01T00:00:00.000Z' },
+        prunePrefix: PREFIX,
+      },
+    );
+    expect(republished).to.deep.include({ created: 1, updated: 0, deleted: 10000 });
+    const remaining = await db.CalendarEvent.count({ where: { calendar_id: calendarA.id } });
+    expect(remaining).to.equal(1);
   });
 });

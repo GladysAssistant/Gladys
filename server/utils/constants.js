@@ -2157,7 +2157,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
     WEBHOOK_REQUEST: 'external-integration.webhook.request',
     WEBHOOK_UPDATED: 'external-integration.webhook-updated',
     CALENDAR_ACCOUNT_UPDATED: 'external-integration.calendar.account-updated',
-
     SCENE_ACTION_RUN: 'external-integration.scene-action.run',
     // dashboard widgets declared by integrations (capabilities/dashboard-widgets.md)
     WIDGET_GET: 'external-integration.widget.get',

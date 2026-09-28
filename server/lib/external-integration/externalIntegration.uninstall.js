@@ -55,7 +55,7 @@ async function uninstall(selector) {
   const devices = await db.Device.findAll({ where: { service_id: service.id } });
   await Promise.each(devices, (device) => this.device.destroy(device.selector));
   // Calendars of a calendar-type integration are removed explicitly (all
-  // users), never left to the service_id FK cascade (see the spec, B.19) —
+  // users), never left to the service_id FK cascade (capabilities/calendar-type.md) —
   // and their viewers are notified, or a shared calendar would stay
   // displayed on other users' calendar views until a manual refresh.
   const calendars = await db.Calendar.findAll({
@@ -63,23 +63,14 @@ async function uninstall(selector) {
     attributes: ['selector', 'shared', 'user_id'],
   });
   await db.Calendar.destroy({ where: { service_id: service.id } });
-  // partitioned by prior visibility, like disableCalendarAccount: broadcasting
-  // a user's whole set as soon as one calendar is shared would leak the
-  // selectors of their private calendars to every connected user
+  // partitioned by prior visibility, per owner: broadcasting a user's whole
+  // set as soon as one calendar is shared would leak the selectors of their
+  // private calendars to every connected user
   const calendarsByUser = new Map();
   calendars.forEach((calendar) => {
-    const entry = calendarsByUser.get(calendar.user_id) || { sharedSelectors: [], privateSelectors: [] };
-    if (calendar.shared) {
-      entry.sharedSelectors.push(calendar.selector);
-    } else {
-      entry.privateSelectors.push(calendar.selector);
-    }
-    calendarsByUser.set(calendar.user_id, entry);
+    calendarsByUser.set(calendar.user_id, [...(calendarsByUser.get(calendar.user_id) || []), calendar]);
   });
-  calendarsByUser.forEach((entry, userId) => {
-    this.notifyCalendarUpdated(userId, entry.sharedSelectors, true);
-    this.notifyCalendarUpdated(userId, entry.privateSelectors, false);
-  });
+  calendarsByUser.forEach((userCalendars, userId) => this.notifyCalendarsUpdated(userId, userCalendars));
   await db.Variable.destroy({ where: { service_id: service.id } });
   await db.Service.destroy({ where: { id: service.id } });
   this.stateManager.deleteState('service', service.name);

@@ -29,6 +29,24 @@ function notifyCalendarUpdated(userId, calendarSelectors, anyShared) {
 }
 
 /**
+ * @description Push calendar.updated for a set of calendars of one user,
+ * partitioned by visibility: the shared ones go to every connected user, the
+ * private ones to their owner only. A single broadcast of a mixed list would
+ * leak the selectors of the private calendars to the whole household.
+ * @param {string} userId - Id of the user owning the calendars.
+ * @param {Array} calendars - The touched calendars ({ selector, shared }), shared
+ * meaning "visible to everyone before or after the change".
+ * @example
+ * this.notifyCalendarsUpdated(user.id, [{ selector: 'personal', shared: false }]);
+ */
+function notifyCalendarsUpdated(userId, calendars) {
+  const sharedSelectors = calendars.filter((calendar) => calendar.shared).map((calendar) => calendar.selector);
+  const privateSelectors = calendars.filter((calendar) => !calendar.shared).map((calendar) => calendar.selector);
+  this.notifyCalendarUpdated(userId, sharedSelectors, true);
+  this.notifyCalendarUpdated(userId, privateSelectors, false);
+}
+
+/**
  * @description Notify a calendar integration that a user enabled or disabled
  * it, changed their account values, or toggled a calendar (fire-and-forget:
  * on every (re)connection the integration re-reads its accounts anyway).
@@ -75,6 +93,7 @@ function assertCalendarWriteAllowed(service) {
 
 module.exports = {
   notifyCalendarUpdated,
+  notifyCalendarsUpdated,
   notifyCalendarAccountUpdated,
   assertCalendarWriteAllowed,
 };
