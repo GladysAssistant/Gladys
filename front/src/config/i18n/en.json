@@ -109,6 +109,19 @@
     "room": "Room",
     "integration": "Integration",
     "features": "Features",
+    "orderByStatesDesc": "Most verbose first",
+    "verbose": {
+      "badge": "Very verbose",
+      "details": "{{count}} states saved in {{hours}}h ({{features}})",
+      "detailsWithoutFeatures": "{{count}} states saved in {{hours}}h",
+      "summary": {
+        "one": "1 very verbose device accounts for {{percent}}% of the states saved in the history over the last {{hours}} hours.",
+        "other": "{{count}} very verbose devices account for {{percent}}% of the states saved in the history over the last {{hours}} hours."
+      },
+      "explanation": "A device is flagged when one of its features saves at least {{threshold}} states in {{hours}} hours. If you don't need this history, turn it off from the device page to keep the database lighter.",
+      "showOnlyVerbose": "Show only these devices",
+      "showAll": "Show all devices"
+    },
     "emptyState": "No device found. Add devices from the integrations page, or adjust your search and filters.",
     "emptyStateButton": "Browse integrations",
     "error": "There was an error loading the devices. Please try again later.",

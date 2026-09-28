@@ -281,6 +281,43 @@ const getDevices = (query = {}) => {
   return devices;
 };
 
+/**
+ * `GET /device/states_stats`: the states each device saved in its history over
+ * the last 24 hours. The two kitchen plugs report their power every few
+ * seconds, so the devices list has verbose devices to flag.
+ */
+const VERBOSE_DEMO_FEATURE_STATES = {
+  'kitchen-dishwasher-power': 17280,
+  'kitchen-coffee-power': 2880
+};
+const VERBOSE_DEVICE_FEATURE_MIN_STATES = 1440;
+const getStatesStats = () => {
+  const statsDevices = devices
+    .map(device => {
+      const features = device.features
+        .filter(feature => feature.keep_history)
+        .map(feature => {
+          const states = VERBOSE_DEMO_FEATURE_STATES[feature.selector] || 96;
+          return { device_feature_id: feature.id, states, is_verbose: states >= VERBOSE_DEVICE_FEATURE_MIN_STATES };
+        })
+        .sort((a, b) => b.states - a.states);
+      return {
+        device_id: device.id,
+        states: features.reduce((sum, feature) => sum + feature.states, 0),
+        is_verbose: features.some(feature => feature.is_verbose),
+        features
+      };
+    })
+    .filter(deviceStats => deviceStats.features.length > 0)
+    .sort((a, b) => b.states - a.states);
+  return {
+    period_in_hours: 24,
+    verbose_device_feature_min_states: VERBOSE_DEVICE_FEATURE_MIN_STATES,
+    total_states: statsDevices.reduce((sum, deviceStats) => sum + deviceStats.states, 0),
+    devices: statsDevices
+  };
+};
+
 /** `GET /scene`, with the filters of the scene list and of the scene widget. */
 const getScenes = (query = {}) => {
   let result = scenes;
@@ -510,6 +547,7 @@ const home = {
   'get /api/v1/room?expand=devices': roomsWithDevices,
   ...roomBySelector,
   'get /api/v1/device': getDevices,
+  'get /api/v1/device/states_stats': getStatesStats(),
   ...deviceBySelector,
   ...deviceFeatureValues,
   'post /api/v1/device': devices[0],
