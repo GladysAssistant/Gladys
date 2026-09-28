@@ -3,9 +3,10 @@ const { BadParameters } = require('../../utils/coreErrors');
 // The `ext:` namespace of external_id is reserved to the external
 // integrations (C.2), whose calendar and event ids are user-scoped
 // (`ext:<selector>:<user_selector>:`, capabilities/calendar-type.md). The
-// columns are globally UNIQUE: a calendar or an event created by hand must
-// never squat one of those ids, or the next push of the user it names would
-// hit a conflict on a row they do not own.
+// columns are globally UNIQUE: a calendar or an event created outside their
+// upsert path — by hand, or by the CalDAV/webcal sync whose UIDs a feed
+// controls — must never squat one of those ids, or the next push of the user
+// it names would hit a conflict on a row they do not own.
 const RESERVED_EXTERNAL_ID_PREFIX = 'ext:';
 
 /**

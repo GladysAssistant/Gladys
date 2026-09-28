@@ -75,4 +75,17 @@ describe('calendar.upsertCalendars', () => {
     ]);
     await assert.isRejected(promise, 'already belongs to another owner');
   });
+
+  it('should give a readable fallback selector to a name that slugifies to nothing', async () => {
+    // non-Latin scripts and emoji slugify to "": two such calendars must not
+    // collide on an empty selector, even across users
+    const { calendars: calendarsA } = await calendar.upsertCalendars(USER_A, SERVICE_ID, [
+      { external_id: 'ext:my-int:john:cn', name: '日历' },
+    ]);
+    const { calendars: calendarsB } = await calendar.upsertCalendars(USER_B, SERVICE_ID, [
+      { external_id: 'ext:my-int:pepper:ru', name: 'Календарь' },
+    ]);
+    expect(calendarsA[0].selector).to.equal('calendar');
+    expect(calendarsB[0].selector).to.equal('calendar-2');
+  });
 });

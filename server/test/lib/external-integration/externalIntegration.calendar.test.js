@@ -2,7 +2,7 @@ const { expect, assert } = require('chai');
 
 const db = require('../../../models');
 const { Error422 } = require('../../../utils/httpErrors');
-const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const { buildSupervisor, seedExternalService, TEST_CALENDAR_MANIFEST } = require('./testUtils.test');
 
 const JOHN_USER_ID = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
@@ -611,5 +611,125 @@ describe('externalIntegration calendar host API coverage', () => {
     const accounts = await externalIntegration.getCalendarAccounts(sectionService);
     expect(accounts).to.have.lengthOf(1);
     expect(accounts[0].user.selector).to.equal('john');
+  });
+});
+
+describe('externalIntegration calendar events normalization', () => {
+  let service;
+  let externalIntegration;
+  let variable;
+  const prefix = () => `ext:${service.selector}:john:`;
+  const publish = (events, window) =>
+    externalIntegration.publishCalendarEvents(service, {
+      calendar_external_id: `${prefix()}primary`,
+      events,
+      ...(window ? { window } : {}),
+    });
+  const findEvent = (uid) => db.CalendarEvent.findOne({ where: { external_id: `${prefix()}${uid}` } });
+
+  beforeEach(async () => {
+    service = await seedCalendarService();
+    ({ externalIntegration, variable } = buildSupervisor());
+    await externalIntegration.saveCalendarAccount(service.selector, JOHN_USER_ID, {});
+    await externalIntegration.publishCalendars(service, {
+      user: 'john',
+      calendars: [{ external_id: `${prefix()}primary`, name: 'Primary' }],
+    });
+  });
+
+  it('should store a full-day event at the local midnights of its calendar dates', async () => {
+    // no TIMEZONE configured: the scene engine default, Europe/Paris
+    await publish([
+      { external_id: `${prefix()}holiday`, name: 'Assomption', start: '2026-08-15', full_day: true },
+      // the date as written by the provider, whatever the offset
+      {
+        external_id: `${prefix()}trip`,
+        name: 'Trip',
+        start: '2026-08-20T00:00:00.000Z',
+        end: '2026-08-23T00:00:00+02:00',
+        full_day: true,
+      },
+      // an end on the start date still covers the start day
+      { external_id: `${prefix()}same-day`, name: 'Same day', start: '2026-08-25', end: '2026-08-25', full_day: true },
+    ]);
+    const holiday = await findEvent('holiday');
+    expect(holiday.full_day).to.equal(true);
+    expect(holiday.start.toISOString()).to.equal('2026-08-14T22:00:00.000Z');
+    // a missing end defaults to the next day, exclusive
+    expect(holiday.end.toISOString()).to.equal('2026-08-15T22:00:00.000Z');
+    const trip = await findEvent('trip');
+    expect(trip.start.toISOString()).to.equal('2026-08-19T22:00:00.000Z');
+    expect(trip.end.toISOString()).to.equal('2026-08-22T22:00:00.000Z');
+    const sameDay = await findEvent('same-day');
+    expect(sameDay.end.toISOString()).to.equal('2026-08-25T22:00:00.000Z');
+  });
+
+  it('should use the timezone of the instance for full-day events', async () => {
+    await variable.setValue(SYSTEM_VARIABLE_NAMES.TIMEZONE, 'America/New_York');
+    await publish([{ external_id: `${prefix()}holiday`, name: 'Holiday', start: '2026-08-15', full_day: true }]);
+    const holiday = await findEvent('holiday');
+    expect(holiday.start.toISOString()).to.equal('2026-08-15T04:00:00.000Z');
+    expect(holiday.end.toISOString()).to.equal('2026-08-16T04:00:00.000Z');
+  });
+
+  it('should reject the invalid dates of a full-day event', async () => {
+    await assert.isRejected(
+      publish([{ external_id: `${prefix()}a`, name: 'A', start: '2026-02-30', full_day: true }]),
+      'events[0].start: must be a calendar date (YYYY-MM-DD) on a full-day event',
+    );
+    await assert.isRejected(
+      publish([{ external_id: `${prefix()}a`, name: 'A', start: 'August 15, 2026', full_day: true }]),
+      'events[0].start: must be a calendar date (YYYY-MM-DD) on a full-day event',
+    );
+    await assert.isRejected(
+      publish([{ external_id: `${prefix()}a`, name: 'A', start: '2026-08-15', end: '2026-08-14', full_day: true }]),
+      'events[0].end: must not be before start',
+    );
+  });
+
+  it('should accept a zero-duration event starting at the window start, and prune it', async () => {
+    const window = { from: '2026-08-01T00:00:00.000Z', to: '2026-09-01T00:00:00.000Z' };
+    const point = {
+      external_id: `${prefix()}reminder`,
+      name: 'Reminder',
+      start: '2026-08-01T00:00:00.000Z',
+      end: '2026-08-01T00:00:00.000Z',
+    };
+    const { created } = await publish([point], window);
+    expect(created).to.equal(1);
+    // it belongs to that window: republishing the window without it prunes it
+    const { deleted } = await publish([], window);
+    expect(deleted).to.equal(1);
+    // and to no earlier one
+    await assert.isRejected(
+      publish([point], { from: '2026-07-01T00:00:00.000Z', to: '2026-08-01T00:00:00.000Z' }),
+      'events[0]: must overlap the window',
+    );
+  });
+
+  it('should refuse events on a calendar whose account is no longer enabled', async () => {
+    // a calendar left behind by a push racing the owner's disable
+    await variable.destroy('EXTERNAL_INTEGRATION_CALENDAR_ACCOUNT', service.id, JOHN_USER_ID);
+    await assert.isRejected(
+      publish([{ external_id: `${prefix()}a`, name: 'A', start: '2026-08-15T09:00:00.000Z' }]),
+      'CALENDAR_NOT_FOUND',
+    );
+  });
+
+  it('should derive the event selectors from their external_id', async () => {
+    await publish([
+      { external_id: `${prefix()}uid-1`, name: 'Weekly standup', start: '2026-08-03T09:00:00.000Z' },
+      { external_id: `${prefix()}uid-2`, name: 'Weekly standup', start: '2026-08-10T09:00:00.000Z' },
+      { external_id: `${prefix()}uid-3`, name: '会议', start: '2026-08-11T09:00:00.000Z' },
+    ]);
+    const events = await db.CalendarEvent.findAll({
+      where: { external_id: [`${prefix()}uid-1`, `${prefix()}uid-2`, `${prefix()}uid-3`] },
+      order: [['external_id', 'ASC']],
+    });
+    expect(events.map((event) => event.selector)).to.deep.equal([
+      'ext-ext-dev-nextcloud-calendar-john-uid-1',
+      'ext-ext-dev-nextcloud-calendar-john-uid-2',
+      'ext-ext-dev-nextcloud-calendar-john-uid-3',
+    ]);
   });
 });

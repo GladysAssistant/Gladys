@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { buildUniqueSelector } = require('../../utils/addSelector');
+const { slugify } = require('../../utils/slugify');
 const { ConflictError } = require('../../utils/coreErrors');
 const { CALENDAR_TYPES } = require('../../utils/constants');
 
@@ -49,8 +50,12 @@ async function upsertCalendars(userId, serviceId, calendars) {
         updated += 1;
         upsertedCalendars.push(existing.get({ plain: true }));
       } else {
+        // a name written in a non-Latin script (or only emoji) slugifies to
+        // nothing: an empty selector would collide on the UNIQUE column with
+        // the next such calendar, and could not be addressed in a URL either
+        const selectorBase = slugify(calendar.name) || 'calendar';
         // eslint-disable-next-line no-await-in-loop
-        const selector = await buildUniqueSelector(db.Calendar, calendar.name, { transaction, taken });
+        const selector = await buildUniqueSelector(db.Calendar, selectorBase, { transaction, taken });
         // eslint-disable-next-line no-await-in-loop
         const newCalendar = await db.Calendar.create(
           {

@@ -42,6 +42,26 @@ describe('calendar.upsertEvents', () => {
     await assert.isRejected(promise, 'prunePrefix: is required when a window is provided');
   });
 
+  it('should refuse a calendar whose synchronization is off', async () => {
+    // read in the transaction: the user may have turned sync off while the
+    // push was being validated
+    await db.Calendar.update({ sync: false }, { where: { id: calendarA.id } });
+    const promise = calendar.upsertEvents(calendarA.id, [
+      { external_id: `${PREFIX}uid-1`, name: 'Dentist', start: '2026-08-14T09:00:00.000Z' },
+    ]);
+    await assert.isRejected(promise, 'CALENDAR_SYNC_DISABLED');
+  });
+
+  it('should derive the selector from the external_id, and fall back to "event"', async () => {
+    await calendar.upsertEvents(calendarA.id, [
+      { external_id: `${PREFIX}uid-1`, name: 'Dentist', start: '2026-08-14T09:00:00.000Z' },
+      { external_id: '日历', name: 'Dentist', start: '2026-08-14T10:00:00.000Z' },
+      { external_id: '日程', name: '🎂', start: '2026-08-14T11:00:00.000Z' },
+    ]);
+    const rows = await db.CalendarEvent.findAll({ where: { calendar_id: calendarA.id }, order: [['start', 'ASC']] });
+    expect(rows.map((row) => row.selector)).to.deep.equal(['ext-my-int-john-uid-1', 'event', 'event-2']);
+  });
+
   it('should create, then update an event idempotently', async () => {
     const first = await calendar.upsertEvents(calendarA.id, [
       {

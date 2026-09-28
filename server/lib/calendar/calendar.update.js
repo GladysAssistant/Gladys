@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { CALENDAR_TYPES } = require('../../utils/constants');
 
 // A user-initiated update only touches the editable fields of a calendar: the
 // ownership columns (user_id, service_id, selector, external_id) stay out of
@@ -7,6 +8,11 @@ const { NotFoundError } = require('../../utils/coreErrors');
 // someone else. Internal callers (the CalDAV sync, the integration publish
 // path) pass no userId and keep writing the full row.
 const USER_EDITABLE_FIELDS = ['name', 'description', 'color', 'sync', 'shared', 'notify'];
+// The sync/shared toggles of an external integration's calendar carry side
+// effects this route does not apply (events emptied, audience pushes, the
+// integration notified): they go through the external integration route only
+// (PATCH /api/v1/external_integration/:selector/calendar/:calendar_selector).
+const EXTERNAL_USER_EDITABLE_FIELDS = USER_EDITABLE_FIELDS.filter((field) => field !== 'sync' && field !== 'shared');
 
 /**
  * @description Update a calendar.
@@ -32,7 +38,9 @@ async function update(selector, calendar, userId) {
     throw new NotFoundError('Calendar not found');
   }
 
-  await existingCalendar.update(calendar, userId !== undefined ? { fields: USER_EDITABLE_FIELDS } : undefined);
+  const editableFields =
+    existingCalendar.type === CALENDAR_TYPES.EXTERNAL ? EXTERNAL_USER_EDITABLE_FIELDS : USER_EDITABLE_FIELDS;
+  await existingCalendar.update(calendar, userId !== undefined ? { fields: editableFields } : undefined);
 
   return existingCalendar.get({ plain: true });
 }

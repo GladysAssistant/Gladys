@@ -37,6 +37,19 @@ describe('calendar ownership checks', () => {
     expect(row.selector).to.equal('test-calendar');
     expect(row.external_id).to.equal('750db5b7-233b-41d1-89eb-d3aa4e959295');
   });
+  it('should leave the sync and shared toggles of an integration calendar to the integration route', async () => {
+    // those toggles carry side effects (events emptied, pushes, integration
+    // notified) that only PATCH /api/v1/external_integration/... applies
+    const { calendars } = await calendar.upsertCalendars(USER_A, 'a810b8db-6d04-4697-bed3-c4b72c996279', [
+      { external_id: 'ext:my-int:john:primary', name: 'Primary' },
+    ]);
+    const updated = await calendar.update(
+      calendars[0].selector,
+      { name: 'Renamed', sync: false, shared: true },
+      USER_A,
+    );
+    expect(updated).to.include({ name: 'Renamed', sync: true, shared: false });
+  });
   it('should still write the full row of a calendar for an internal caller (no userId)', async () => {
     // the CalDAV sync republishes whole calendars, external_id included
     await calendar.update('test-calendar', { name: 'Synced', external_id: 'new-calendar-external-id' });
@@ -63,6 +76,15 @@ describe('calendar ownership checks', () => {
     await assert.isRejected(promise, 'the "ext:" prefix is reserved to the external integrations');
     const count = await db.CalendarEvent.count({ where: { external_id: 'ext:my-int:pepper:uid-1' } });
     expect(count).to.equal(0);
+  });
+  it('should refuse an event squatting an external integration id on the internal path too', async () => {
+    // the CalDAV and webcal syncs create events from UIDs the feed controls
+    const promise = calendar.createEvent('test-calendar', {
+      name: 'Event',
+      start: '2026-08-14T09:00:00.000Z',
+      external_id: 'ext:my-int:pepper:uid-1',
+    });
+    await assert.isRejected(promise, 'the "ext:" prefix is reserved to the external integrations');
   });
   it('should refuse a calendar squatting an external integration id', async () => {
     const promise = calendar.create({

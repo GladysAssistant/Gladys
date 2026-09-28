@@ -1,17 +1,18 @@
 const { Op } = require('sequelize');
 const db = require('../../models');
 const { buildUniqueSelector } = require('../../utils/addSelector');
-const { NotFoundError, ConflictError, BadParameters } = require('../../utils/coreErrors');
+const { slugify } = require('../../utils/slugify');
+const { NotFoundError, ConflictError, BadParameters, ForbiddenError } = require('../../utils/coreErrors');
 
 const MAX_EVENTS_PER_CALENDAR = 10000;
 
 /**
  * @description Upsert a batch of events in a calendar, keyed by external_id, and
  * optionally prune: with a window, events of the calendar overlapping the window
- * (start < to, and end > from when end is set — the exclusive-end convention —
- * else start >= from), whose external_id starts with prunePrefix, and absent
+ * (start < to, and end > from — the exclusive-end convention — or start >= from),
+ * whose external_id starts with prunePrefix, and absent
  * from the pushed list are deleted. Events without the prefix (manually created
- * ones) are never pruned.
+ * ones) are never pruned. A sync-disabled calendar is refused (403).
  * @param {string} calendarId - The calendar id.
  * @param {Array} events - Events to upsert ({ external_id, name, start, end, full_day, location, description, url }).
  * @param {object} [options] - Options.
@@ -32,6 +33,11 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
     if (calendar === null) {
       throw new NotFoundError('Calendar not found');
     }
+    // read in the transaction: a sync turned off while a push was being
+    // validated must not see its emptied calendar refilled by that push
+    if (calendar.sync === false) {
+      throw new ForbiddenError('CALENDAR_SYNC_DISABLED');
+    }
     let created = 0;
     let updated = 0;
     let deleted = 0;
@@ -44,22 +50,22 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
       if (typeof prunePrefix !== 'string' || prunePrefix.length === 0) {
         throw new BadParameters('prunePrefix: is required when a window is provided');
       }
-      // Overlap semantics: start < to, and end > from when end is set (the
+      // Overlap semantics: start < to, and either end > from (the
       // exclusive-end convention: a full-day event ending exactly at `from`
-      // does not overlap), else start >= from — a multi-day event straddling
-      // `from` stays prunable. The prefix filter runs in JS: a LIKE pattern
-      // would need escaping for % and _ in external_ids. The prune runs
-      // before the upsert (same final state, the pushed ids are never
-      // pruned): the events cap then applies to the resulting calendar, so
-      // a window republished at the cap is not refused for rows it replaces.
+      // does not overlap, and a multi-day event straddling `from` stays
+      // prunable) or start >= from (an event without end, and a zero-duration
+      // event starting exactly at `from`, which would otherwise fit no
+      // window). The prefix filter runs in JS: a LIKE pattern would need
+      // escaping for % and _ in external_ids. The prune runs before the
+      // upsert (same final state, the pushed ids are never pruned): the
+      // events cap then applies to the resulting calendar, so a window
+      // republished at the cap is not refused for rows it replaces.
+      const from = new Date(window.from);
       const candidates = await db.CalendarEvent.findAll({
         where: {
           calendar_id: calendarId,
           start: { [Op.lt]: new Date(window.to) },
-          [Op.or]: [
-            { end: { [Op.gt]: new Date(window.from) } },
-            { end: null, start: { [Op.gte]: new Date(window.from) } },
-          ],
+          [Op.or]: [{ end: { [Op.gt]: from } }, { start: { [Op.gte]: from } }],
         },
         attributes: ['id', 'external_id'],
         transaction,
@@ -132,8 +138,14 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
         if (count > MAX_EVENTS_PER_CALENDAR) {
           throw new BadParameters(`A calendar cannot hold more than ${MAX_EVENTS_PER_CALENDAR} events`);
         }
+        // The selector derives from the external_id, unique by construction
+        // (the CalDAV precedent derives it from the iCal UID): deriving it from
+        // the name would probe "name", "name-2"… for every occurrence of an
+        // expanded recurrence ("Weekly standup" × 52), inside the write
+        // transaction, and a name in a non-Latin script slugifies to nothing.
+        const selectorBase = slugify(event.external_id) || 'event';
         // eslint-disable-next-line no-await-in-loop
-        const selector = await buildUniqueSelector(db.CalendarEvent, event.name, { transaction, taken });
+        const selector = await buildUniqueSelector(db.CalendarEvent, selectorBase, { transaction, taken });
         // eslint-disable-next-line no-await-in-loop
         await db.CalendarEvent.create(
           {

@@ -15,10 +15,10 @@ const { assertNotReservedExternalId } = require('./calendar.reservedExternalId')
  * });
  */
 async function createEvent(calendarSelector, calendarEvent, userId) {
-  if (userId !== undefined) {
-    // a user-created event never squats an external integration's id
-    assertNotReservedExternalId(calendarEvent.external_id);
-  }
+  // the external integrations write through upsertEvents, never here: an
+  // event created by hand or by the CalDAV/webcal sync (whose UIDs the feed
+  // controls) never squats one of their ids
+  assertNotReservedExternalId(calendarEvent.external_id);
   const calendar = await db.Calendar.findOne({
     where: {
       selector: calendarSelector,

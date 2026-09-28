@@ -236,10 +236,24 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   loadCalendarAccount = async () => {
+    const { selector } = this.props;
+    // the block starts empty: an account of the previously opened integration
+    // must never stay on screen (and be saved) under this one, even when the
+    // request fails
+    this.setState({
+      calendarAccount: null,
+      calendarAccountValues: {},
+      calendarAccountTouchedSecrets: {},
+      calendarDisableConfirming: false
+    });
     try {
       const calendarAccount = await this.props.httpClient.get(
-        `/api/v1/external_integration/${this.props.selector}/calendar/account`
+        `/api/v1/external_integration/${selector}/calendar/account`
       );
+      if (selector !== this.props.selector) {
+        // the user opened another integration meanwhile: stale response
+        return;
+      }
       this.setState({
         calendarAccount,
         calendarAccountValues: Object.assign({}, calendarAccount.config),
@@ -286,11 +300,15 @@ class ExternalIntegrationConfigPage extends Component {
         config[field.key] = value;
       }
     });
+    const { selector } = this.props;
     try {
       const calendarAccount = await this.props.httpClient.post(
-        `/api/v1/external_integration/${this.props.selector}/calendar/account`,
+        `/api/v1/external_integration/${selector}/calendar/account`,
         { config }
       );
+      if (selector !== this.props.selector) {
+        return;
+      }
       this.setState({
         calendarAccount,
         calendarAccountValues: Object.assign({}, calendarAccount.config),
