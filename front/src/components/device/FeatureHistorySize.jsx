@@ -58,9 +58,17 @@ class FeatureHistorySize extends Component {
     this.getStatesSize();
   }
 
+  // A reused instance must not show the size of the feature it showed before
+  static getDerivedStateFromProps(props, state) {
+    const identity = getIdentity(props);
+    if (state.identity !== identity) {
+      return { identity, statesSize: null };
+    }
+    return null;
+  }
+
   componentDidUpdate(prevProps) {
     if (getIdentity(prevProps) !== getIdentity(this.props)) {
-      this.setState({ statesSize: null });
       this.getStatesSize();
     }
   }

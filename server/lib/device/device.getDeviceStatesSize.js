@@ -61,7 +61,7 @@ async function getDeviceStatesSize(selector) {
     // Callers arriving while a count runs share it, instead of each queuing another scan.
     if (!this.featuresStatesSizeInFlight) {
       const generation = this.featuresStatesSizeGeneration;
-      this.featuresStatesSizeInFlight = (async () => {
+      const inFlight = (async () => {
         try {
           const freshCounts = await countAllFeaturesStates();
           // A purge that ran during the count may have deleted states it saw: such a result
@@ -71,10 +71,14 @@ async function getDeviceStatesSize(selector) {
           }
           return freshCounts;
         } finally {
-          // On a failure too, so the next call retries.
-          this.featuresStatesSizeInFlight = null;
+          // On a failure too, so the next call retries. A purge may already have replaced
+          // this count by a fresh one, which must stay shared.
+          if (this.featuresStatesSizeInFlight === inFlight) {
+            this.featuresStatesSizeInFlight = null;
+          }
         }
       })();
+      this.featuresStatesSizeInFlight = inFlight;
     }
     // The result of the count itself, not the cache: a purge can empty the cache meanwhile.
     counts = await this.featuresStatesSizeInFlight;

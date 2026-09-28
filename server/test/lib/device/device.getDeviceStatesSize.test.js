@@ -171,6 +171,28 @@ describe('Device.getDeviceStatesSize', function Describe() {
     sinon.assert.notCalled(countSpy);
   });
 
+  it('should start a fresh count for the callers arriving after a purge', async () => {
+    const device = buildDevice();
+    const queryStub = sinon.stub(db, 'duckDbReadConnectionAllAsync');
+    queryStub.resolves([{ used_bytes: 600n }]);
+    let callAfterPurge;
+    queryStub.onCall(0).callsFake(async () => {
+      // a purge ends while the states are being counted, then a device page asks
+      device.featuresStatesSizeGeneration += 1;
+      device.featuresStatesSizeInFlight = null;
+      callAfterPurge = device.getDeviceStatesSize('plug');
+      return [{ device_feature_id: POWER_FEATURE_ID, states: 6n }];
+    });
+    queryStub.onCall(1).resolves([{ device_feature_id: POWER_FEATURE_ID, states: 2n }]);
+
+    const statesSizeBeforePurge = await device.getDeviceStatesSize('plug');
+    const statesSizeAfterPurge = await callAfterPurge;
+    expect(statesSizeBeforePurge.features[0].states).to.equal(6);
+    expect(statesSizeAfterPurge.features[0].states).to.equal(2);
+    expect(device.featuresStatesSizeCache.counts.statesByFeatureId.get(POWER_FEATURE_ID)).to.equal(2);
+    expect(device.featuresStatesSizeInFlight).to.equal(null);
+  });
+
   it('should answer with a count a purge overtook, without keeping it in cache', async () => {
     const device = buildDevice();
     const queryStub = sinon.stub(db, 'duckDbReadConnectionAllAsync');
