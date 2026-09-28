@@ -726,6 +726,7 @@ const integrations = {
     ]
   },
   'get /api/v1/device/zigbee2mqtt-0x00158d0005828ece': {
+    id: 'd2e4f6a8-1b3c-4d5e-8f70-9a1b2c3d4e5f',
     name: 'Aqara Sensor',
     external_id: 'zigbee2mqtt-0x00158d0005828ece',
     selector: 'zigbee2mqtt-0x00158d0005828ece',

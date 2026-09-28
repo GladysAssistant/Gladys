@@ -10,7 +10,7 @@ export const isHistorizableFeature = feature => feature.category !== DEVICE_FEAT
 // The definition of a feature belongs to the integration (name, category,
 // unit, bounds...): only the "keep history" choice is the user's, so it is
 // the only thing this row makes editable.
-const KeepHistoryFeature = ({ deviceIndex, feature, featureIndex, updateFeatureKeepHistory }) => {
+const KeepHistoryFeature = ({ device, deviceIndex, feature, featureIndex, updateFeatureKeepHistory }) => {
   // the visible feature name is what names the switch: it is tied to the
   // input so a screen reader announces which feature is toggled, and so a
   // click on the name flips it, as on the MQTT device screen
@@ -21,7 +21,7 @@ const KeepHistoryFeature = ({ deviceIndex, feature, featureIndex, updateFeatureK
         <label htmlFor={inputId} class="mb-0">
           {feature.name}
         </label>
-        <FeatureHistorySize feature={feature} />
+        <FeatureHistorySize device={device} feature={feature} />
       </div>
       <label class="custom-switch mb-0">
         <input

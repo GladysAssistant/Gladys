@@ -619,24 +619,25 @@ describe('GET /api/v1/device/duckdb_migration_state', () => {
   });
 });
 
-describe('GET /api/v1/device_feature/:device_feature_selector/states_size', () => {
-  it('should get the size of the history of a feature', async () => {
+describe('GET /api/v1/device/:device_selector/states_size', () => {
+  it('should get the size of the history of each feature of a device', async () => {
     await authenticatedRequest
-      .get('/api/v1/device_feature/test-camera-image/states_size')
+      .get('/api/v1/device/test-camera/states_size')
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.have.property('device_feature_selector', 'test-camera-image');
-        expect(res.body)
+        expect(res.body).to.have.property('device_selector', 'test-camera');
+        expect(res.body.features[0]).to.have.property('device_feature_selector', 'test-camera-image');
+        expect(res.body.features[0])
           .to.have.property('states')
           .that.is.a('number');
-        expect(res.body)
+        expect(res.body.features[0])
           .to.have.property('estimated_size_in_bytes')
           .that.is.a('number');
       });
   });
-  it('should return 404 on an unknown feature', async () => {
-    await authenticatedRequest.get('/api/v1/device_feature/unknown-feature/states_size').expect(404);
+  it('should return 404 on an unknown device', async () => {
+    await authenticatedRequest.get('/api/v1/device/unknown-device/states_size').expect(404);
   });
 });
 

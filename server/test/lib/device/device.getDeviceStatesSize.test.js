@@ -19,7 +19,7 @@ const variable = {
 
 const POWER_FEATURE_ID = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
 const SWITCH_FEATURE_ID = 'ce9dc798-b09f-4e51-8c16-311cdebf97cd';
-const EMPTY_FEATURE_ID = 'a6e5a6ec-2f2e-4b3b-9d6a-9c4f1f1b0e11';
+const SENSOR_FEATURE_ID = 'a6e5a6ec-2f2e-4b3b-9d6a-9c4f1f1b0e11';
 
 const buildStates = (count) =>
   Array.from({ length: count }, (value, index) => ({
@@ -29,9 +29,18 @@ const buildStates = (count) =>
 
 const buildDevice = () => {
   const stateManager = new StateManager(event);
-  stateManager.setState('deviceFeature', 'plug-power', { id: POWER_FEATURE_ID, selector: 'plug-power' });
-  stateManager.setState('deviceFeature', 'plug-switch', { id: SWITCH_FEATURE_ID, selector: 'plug-switch' });
-  stateManager.setState('deviceFeature', 'plug-empty', { id: EMPTY_FEATURE_ID, selector: 'plug-empty' });
+  stateManager.setState('device', 'plug', {
+    selector: 'plug',
+    features: [
+      { id: POWER_FEATURE_ID, selector: 'plug-power' },
+      { id: SWITCH_FEATURE_ID, selector: 'plug-switch' },
+    ],
+  });
+  stateManager.setState('device', 'sensor', {
+    selector: 'sensor',
+    features: [{ id: SENSOR_FEATURE_ID, selector: 'sensor-temperature' }],
+  });
+  stateManager.setState('device', 'no-feature', { selector: 'no-feature' });
   return new Device(event, {}, stateManager, {}, {}, variable, job);
 };
 
@@ -42,7 +51,7 @@ const getDatabaseSizeInBytes = async () => {
   return Number(usedBytes);
 };
 
-describe('Device.getFeatureStatesSize', function Describe() {
+describe('Device.getDeviceStatesSize', function Describe() {
   this.timeout(15000);
   beforeEach(async () => {
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
@@ -51,80 +60,85 @@ describe('Device.getFeatureStatesSize', function Describe() {
     sinon.restore();
   });
 
-  it('should return the states of the feature and its share of the database size', async () => {
+  it('should return the states of each feature of the device and their share of the database size', async () => {
     await db.duckDbBatchInsertState(POWER_FEATURE_ID, buildStates(300));
-    await db.duckDbBatchInsertState(SWITCH_FEATURE_ID, buildStates(100));
+    await db.duckDbBatchInsertState(SENSOR_FEATURE_ID, buildStates(100));
     const device = buildDevice();
 
-    const powerStatesSize = await device.getFeatureStatesSize('plug-power');
+    const statesSize = await device.getDeviceStatesSize('plug');
     const databaseSizeInBytes = await getDatabaseSizeInBytes();
-    expect(powerStatesSize).to.deep.equal({
-      device_feature_selector: 'plug-power',
-      states: 300,
-      estimated_size_in_bytes: Math.round(0.75 * databaseSizeInBytes),
-    });
-
-    const emptyStatesSize = await device.getFeatureStatesSize('plug-empty');
-    expect(emptyStatesSize).to.deep.equal({
-      device_feature_selector: 'plug-empty',
-      states: 0,
-      estimated_size_in_bytes: 0,
+    expect(statesSize).to.deep.equal({
+      device_selector: 'plug',
+      features: [
+        {
+          device_feature_selector: 'plug-power',
+          states: 300,
+          estimated_size_in_bytes: Math.round(0.75 * databaseSizeInBytes),
+        },
+        { device_feature_selector: 'plug-switch', states: 0, estimated_size_in_bytes: 0 },
+      ],
     });
   });
 
   it('should return an empty size when the history is empty', async () => {
     const device = buildDevice();
-    const statesSize = await device.getFeatureStatesSize('plug-power');
+    const statesSize = await device.getDeviceStatesSize('sensor');
     expect(statesSize).to.deep.equal({
-      device_feature_selector: 'plug-power',
-      states: 0,
-      estimated_size_in_bytes: 0,
+      device_selector: 'sensor',
+      features: [{ device_feature_selector: 'sensor-temperature', states: 0, estimated_size_in_bytes: 0 }],
     });
   });
 
-  it('should reject an unknown feature', async () => {
+  it('should return no feature for a device without features', async () => {
+    const device = buildDevice();
+    const statesSize = await device.getDeviceStatesSize('no-feature');
+    expect(statesSize).to.deep.equal({ device_selector: 'no-feature', features: [] });
+  });
+
+  it('should reject an unknown device', async () => {
     const device = buildDevice();
     let error;
     try {
-      await device.getFeatureStatesSize('unknown-feature');
+      await device.getDeviceStatesSize('unknown-device');
     } catch (e) {
       error = e;
     }
     expect(error).to.be.instanceOf(NotFoundError);
   });
 
-  it('should count all features in one scan, shared between callers and kept in cache', async () => {
+  it('should count all devices in one scan, shared between callers and kept in cache', async () => {
     await db.duckDbBatchInsertState(POWER_FEATURE_ID, buildStates(3));
+    await db.duckDbBatchInsertState(SENSOR_FEATURE_ID, buildStates(2));
     const querySpy = sinon.spy(db, 'duckDbReadConnectionAllAsync');
     const device = buildDevice();
 
-    const [powerStatesSize, switchStatesSize] = await Promise.all([
-      device.getFeatureStatesSize('plug-power'),
-      device.getFeatureStatesSize('plug-switch'),
+    const [plugStatesSize, sensorStatesSize] = await Promise.all([
+      device.getDeviceStatesSize('plug'),
+      device.getDeviceStatesSize('sensor'),
     ]);
-    expect(powerStatesSize.states).to.equal(3);
-    expect(switchStatesSize.states).to.equal(0);
+    expect(plugStatesSize.features[0].states).to.equal(3);
+    expect(sensorStatesSize.features[0].states).to.equal(2);
     // one count of the states and one read of the database size
     sinon.assert.calledTwice(querySpy);
     expect(device.featuresStatesSizeInFlight).to.equal(null);
 
-    await device.getFeatureStatesSize('plug-power');
+    await device.getDeviceStatesSize('plug');
     sinon.assert.calledTwice(querySpy);
 
     device.featuresStatesSizeCache.computedAt = Date.now() - device.FEATURES_STATES_SIZE_CACHE_DURATION_IN_MS - 1;
-    await device.getFeatureStatesSize('plug-power');
+    await device.getDeviceStatesSize('plug');
     expect(querySpy.callCount).to.equal(4);
   });
 
   it('should count again after a failed count', async () => {
     const queryStub = sinon.stub(db, 'duckDbReadConnectionAllAsync');
     queryStub.onCall(0).rejects(new Error('DuckDB error'));
-    queryStub.onCall(1).resolves([{ device_feature_id: POWER_FEATURE_ID, states: 4n }]);
+    queryStub.onCall(1).resolves([{ device_feature_id: SENSOR_FEATURE_ID, states: 4n }]);
     queryStub.onCall(2).resolves([{ used_bytes: 1000n }]);
     const device = buildDevice();
     let error;
     try {
-      await device.getFeatureStatesSize('plug-power');
+      await device.getDeviceStatesSize('sensor');
     } catch (e) {
       error = e;
     }
@@ -132,11 +146,10 @@ describe('Device.getFeatureStatesSize', function Describe() {
     expect(device.featuresStatesSizeInFlight).to.equal(null);
     expect(device.featuresStatesSizeCache).to.equal(null);
 
-    const statesSize = await device.getFeatureStatesSize('plug-power');
+    const statesSize = await device.getDeviceStatesSize('sensor');
     expect(statesSize).to.deep.equal({
-      device_feature_selector: 'plug-power',
-      states: 4,
-      estimated_size_in_bytes: 1000,
+      device_selector: 'sensor',
+      features: [{ device_feature_selector: 'sensor-temperature', states: 4, estimated_size_in_bytes: 1000 }],
     });
   });
 
@@ -144,11 +157,11 @@ describe('Device.getFeatureStatesSize', function Describe() {
     await db.duckDbBatchInsertState(POWER_FEATURE_ID, buildStates(5));
     const device = buildDevice();
     device.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 1;
-    expect((await device.getFeatureStatesSize('plug-power')).states).to.equal(5);
+    expect((await device.getDeviceStatesSize('plug')).features[0].states).to.equal(5);
 
     await device.purgeStatesByFeatureId(POWER_FEATURE_ID);
 
     expect(device.featuresStatesSizeCache).to.equal(null);
-    expect((await device.getFeatureStatesSize('plug-power')).states).to.equal(0);
+    expect((await device.getDeviceStatesSize('plug')).features[0].states).to.equal(0);
   });
 });

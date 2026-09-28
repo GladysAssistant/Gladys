@@ -1,6 +1,7 @@
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
 
 import formatBytes from '../../../utils/formatBytes';
 
@@ -135,7 +136,10 @@ class SettingsSystemDownloadLogs extends Component {
               <small class="text-muted">
                 <Text
                   id="systemSettings.downloadLogsProgress"
-                  fields={{ downloaded: formatBytes(bytesDownloaded), total: formatBytes(totalSize) }}
+                  fields={{
+                    downloaded: formatBytes(bytesDownloaded, get(this.props, 'user.language')),
+                    total: formatBytes(totalSize, get(this.props, 'user.language'))
+                  }}
                 />
               </small>
             </div>
@@ -150,4 +154,4 @@ class SettingsSystemDownloadLogs extends Component {
   }
 }
 
-export default connect('httpClient', null)(SettingsSystemDownloadLogs);
+export default connect('httpClient,user', null)(SettingsSystemDownloadLogs);

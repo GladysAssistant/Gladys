@@ -561,10 +561,9 @@ const data = translate({
   ...system
 });
 
-// `GET /device_feature/:selector/states_size`: the device pages show how much
-// history each feature holds, so every feature of a device the fixtures return
-// gets one. The power of a plug is reported every few seconds: it holds most
-// of the history.
+// `GET /device/:selector/states_size`: the device pages show how much history
+// each feature holds, so every device the fixtures return gets one. The power
+// of a plug is reported every few seconds: it holds most of the history.
 const getDemoFeatureStates = feature => {
   if (!feature.keep_history) {
     return 0;
@@ -573,19 +572,22 @@ const getDemoFeatureStates = feature => {
 };
 Object.values(data).forEach(response => {
   (Array.isArray(response) ? response : [response]).forEach(device => {
-    if (!device || !Array.isArray(device.features)) {
+    if (!device || !device.selector || !Array.isArray(device.features)) {
       return;
     }
-    device.features
-      .filter(feature => feature && feature.selector)
-      .forEach(feature => {
-        const states = getDemoFeatureStates(feature);
-        data[`get /api/v1/device_feature/${feature.selector}/states_size`] = {
-          device_feature_selector: feature.selector,
-          states,
-          estimated_size_in_bytes: states * 6
-        };
-      });
+    data[`get /api/v1/device/${device.selector}/states_size`] = {
+      device_selector: device.selector,
+      features: device.features
+        .filter(feature => feature && feature.selector)
+        .map(feature => {
+          const states = getDemoFeatureStates(feature);
+          return {
+            device_feature_selector: feature.selector,
+            states,
+            estimated_size_in_bytes: states * 6
+          };
+        })
+    };
   });
 });
 

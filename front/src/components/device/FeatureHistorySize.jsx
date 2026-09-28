@@ -5,19 +5,39 @@ import cx from 'classnames';
 
 import formatBytes from '../../utils/formatBytes';
 
+// All the features of a device page mount together: they share one request
+// for the whole device, forgotten once answered so a later visit asks again.
+const requestsByDeviceSelector = new Map();
+const getDeviceStatesSize = (httpClient, deviceSelector) => {
+  if (!requestsByDeviceSelector.has(deviceSelector)) {
+    const request = (async () => {
+      try {
+        return await httpClient.get(`/api/v1/device/${deviceSelector}/states_size`);
+      } finally {
+        requestsByDeviceSelector.delete(deviceSelector);
+      }
+    })();
+    requestsByDeviceSelector.set(deviceSelector, request);
+  }
+  return requestsByDeviceSelector.get(deviceSelector);
+};
+
 // How much history a feature holds, shown next to the "keep history" switch
 // that controls it, so the user can tell which features are worth keeping.
 // It is only an information: while it loads, or when it cannot be loaded,
 // nothing is displayed.
 class FeatureHistorySize extends Component {
   getStatesSize = async () => {
-    const { feature } = this.props;
-    // a feature that is not saved yet has no history
-    if (!feature.id || !feature.selector) {
+    const { device, feature } = this.props;
+    // a device or a feature that is not saved yet has no history
+    if (!device || !device.id || !device.selector || !feature.id) {
       return;
     }
     try {
-      const statesSize = await this.props.httpClient.get(`/api/v1/device_feature/${feature.selector}/states_size`);
+      const deviceStatesSize = await getDeviceStatesSize(this.props.httpClient, device.selector);
+      const statesSize = deviceStatesSize.features.find(
+        featureStatesSize => featureStatesSize.device_feature_selector === feature.selector
+      );
       this.setState({ statesSize });
     } catch (e) {
       console.error(e);
@@ -32,6 +52,7 @@ class FeatureHistorySize extends Component {
     if (!statesSize) {
       return null;
     }
+    const language = props.user && props.user.language;
     return (
       <small class={cx('d-block', 'text-muted', props.class)}>
         {statesSize.states > 0 ? (
@@ -39,8 +60,8 @@ class FeatureHistorySize extends Component {
             id="deviceFeatureHistorySize.size"
             plural={statesSize.states}
             fields={{
-              count: statesSize.states.toLocaleString(),
-              size: formatBytes(statesSize.estimated_size_in_bytes)
+              count: statesSize.states.toLocaleString(language),
+              size: formatBytes(statesSize.estimated_size_in_bytes, language)
             }}
           />
         ) : (
@@ -51,4 +72,4 @@ class FeatureHistorySize extends Component {
   }
 }
 
-export default connect('httpClient', {})(FeatureHistorySize);
+export default connect('httpClient,user', {})(FeatureHistorySize);

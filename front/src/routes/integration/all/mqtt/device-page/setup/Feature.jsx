@@ -205,7 +205,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
                       <Text id="editDeviceForm.keepHistorySmallDescription" />
                     </span>
                   </label>
-                  <FeatureHistorySize feature={feature} class="mt-2" />
+                  <FeatureHistorySize device={props.device} feature={feature} class="mt-2" />
                 </div>
               </div>
             )}

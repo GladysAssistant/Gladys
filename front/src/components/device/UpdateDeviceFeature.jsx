@@ -184,7 +184,7 @@ class UpdateDeviceFeature extends Component {
                     <Text id="editDeviceForm.keepHistorySmallDescription" />
                   </span>
                 </label>
-                <FeatureHistorySize feature={feature} class="mt-2" />
+                <FeatureHistorySize device={device} feature={feature} class="mt-2" />
                 <p class="mt-2">
                   <small>
                     <MarkupText id="editDeviceForm.keepHistoryDescription" />

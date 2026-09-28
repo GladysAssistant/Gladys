@@ -11,7 +11,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * const { statesByFeatureId, totalStates, databaseSizeInBytes } = await countAllFeaturesStates();
  */
 async function countAllFeaturesStates() {
-  logger.debug('Device : getFeatureStatesSize : counting the states of every feature');
+  logger.debug('Device : getDeviceStatesSize : counting the states of every feature');
   // The states of one feature are spread over the whole table: counting a single feature
   // reads it all anyway, so every feature is counted in the same pass.
   const rows = await db.duckDbReadConnectionAllAsync(`
@@ -35,21 +35,22 @@ async function countAllFeaturesStates() {
 }
 
 /**
- * @description Get how many states of a feature the history holds, and roughly how much space
- * they take on disk.
- * @param {string} selector - Selector of the device feature.
- * @returns {Promise<object>} Resolve with the number of states and their estimated size in bytes.
+ * @description Get how many states the history holds for each feature of a device, and roughly
+ * how much space they take on disk.
+ * @param {string} selector - Selector of the device.
+ * @returns {Promise<object>} Resolve with the number of states and their estimated size in bytes,
+ * per feature of the device.
  * @example
- * const { states, estimated_size_in_bytes } = await device.getFeatureStatesSize('kitchen-plug-power');
+ * const { features } = await device.getDeviceStatesSize('kitchen-plug');
  */
-async function getFeatureStatesSize(selector) {
-  const deviceFeature = this.stateManager.get('deviceFeature', selector);
-  if (deviceFeature === null) {
-    throw new NotFoundError('DEVICE_FEATURE_NOT_FOUND');
+async function getDeviceStatesSize(selector) {
+  const device = this.stateManager.get('device', selector);
+  if (device === null) {
+    throw new NotFoundError('DEVICE_NOT_FOUND');
   }
 
   // Counting the whole history is a full scan of the only DuckDB read connection: the result
-  // serves every feature and is kept a while, so opening device pages costs one scan at most.
+  // serves every device and is kept a while, so opening device pages costs one scan at most.
   const cacheIsFresh =
     this.featuresStatesSizeCache &&
     Date.now() - this.featuresStatesSizeCache.computedAt < this.FEATURES_STATES_SIZE_CACHE_DURATION_IN_MS;
@@ -70,17 +71,22 @@ async function getFeatureStatesSize(selector) {
   }
 
   const { statesByFeatureId, totalStates, databaseSizeInBytes } = this.featuresStatesSizeCache.counts;
-  const states = statesByFeatureId.get(deviceFeature.id) || 0;
   return {
-    device_feature_selector: selector,
-    states,
-    // The history is almost the only thing DuckDB stores, so the share of its states gives an
-    // estimate of the space a feature takes. Only an estimate: values that rarely change
-    // compress better than values that change all the time.
-    estimated_size_in_bytes: totalStates > 0 ? Math.round((states / totalStates) * databaseSizeInBytes) : 0,
+    device_selector: selector,
+    features: (device.features || []).map((deviceFeature) => {
+      const states = statesByFeatureId.get(deviceFeature.id) || 0;
+      return {
+        device_feature_selector: deviceFeature.selector,
+        states,
+        // The history is almost the only thing DuckDB stores, so the share of its states gives an
+        // estimate of the space a feature takes. Only an estimate: values that rarely change
+        // compress better than values that change all the time.
+        estimated_size_in_bytes: totalStates > 0 ? Math.round((states / totalStates) * databaseSizeInBytes) : 0,
+      };
+    }),
   };
 }
 
 module.exports = {
-  getFeatureStatesSize,
+  getDeviceStatesSize,
 };

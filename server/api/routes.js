@@ -241,6 +241,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDevicesByService,
     },
+    'get /api/v1/device/:device_selector/states_size': {
+      authenticated: true,
+      controller: deviceController.getDeviceStatesSize,
+    },
     'get /api/v1/device/:device_selector': {
       authenticated: true,
       controller: deviceController.getBySelector,
@@ -277,10 +281,6 @@ function getRoutes(gladys) {
     'get /api/v1/device_feature/states_csv': {
       authenticated: true,
       controller: deviceController.exportStatesToCsv,
-    },
-    'get /api/v1/device_feature/:device_feature_selector/states_size': {
-      authenticated: true,
-      controller: deviceController.getFeatureStatesSize,
     },
     'get /api/v1/device_feature/energy_consumption': {
       authenticated: true,
