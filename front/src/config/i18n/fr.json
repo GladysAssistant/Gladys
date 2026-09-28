@@ -6491,6 +6491,13 @@
     "manageBillingLink": "Gérer mon abonnement et mes factures",
     "logoutButton": "Se déconnecter"
   },
+  "deviceFeatureHistorySize": {
+    "size": {
+      "one": "1 état dans l'historique (≈ {{size}})",
+      "other": "{{count}} états dans l'historique (≈ {{size}})"
+    },
+    "empty": "Aucun état dans l'historique"
+  },
   "editDeviceForm": {
     "noName": "Pas de nom",
     "nameLabel": "Nom",

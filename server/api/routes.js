@@ -278,6 +278,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.exportStatesToCsv,
     },
+    'get /api/v1/device_feature/:device_feature_selector/states_size': {
+      authenticated: true,
+      controller: deviceController.getFeatureStatesSize,
+    },
     'get /api/v1/device_feature/energy_consumption': {
       authenticated: true,
       controller: deviceController.getConsumptionByDates,

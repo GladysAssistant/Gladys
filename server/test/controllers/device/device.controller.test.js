@@ -619,6 +619,27 @@ describe('GET /api/v1/device/duckdb_migration_state', () => {
   });
 });
 
+describe('GET /api/v1/device_feature/:device_feature_selector/states_size', () => {
+  it('should get the size of the history of a feature', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/test-camera-image/states_size')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('device_feature_selector', 'test-camera-image');
+        expect(res.body)
+          .to.have.property('states')
+          .that.is.a('number');
+        expect(res.body)
+          .to.have.property('estimated_size_in_bytes')
+          .that.is.a('number');
+      });
+  });
+  it('should return 404 on an unknown feature', async () => {
+    await authenticatedRequest.get('/api/v1/device_feature/unknown-feature/states_size').expect(404);
+  });
+});
+
 describe('POST /api/v1/device/purge_all_sqlite_state', () => {
   it('should delete all sqlite states', async () => {
     await authenticatedRequest

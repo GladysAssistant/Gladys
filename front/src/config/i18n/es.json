@@ -6491,6 +6491,13 @@
     "manageBillingLink": "Gestionar mi suscripción y facturas",
     "logoutButton": "Cerrar sesión"
   },
+  "deviceFeatureHistorySize": {
+    "size": {
+      "one": "1 estado en el historial (≈ {{size}})",
+      "other": "{{count}} estados en el historial (≈ {{size}})"
+    },
+    "empty": "Ningún estado en el historial"
+  },
   "editDeviceForm": {
     "noName": "Sin nombre",
     "nameLabel": "Nombre",

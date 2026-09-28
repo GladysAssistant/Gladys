@@ -1,4 +1,5 @@
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import FeatureHistorySize from '../../../../../components/device/FeatureHistorySize';
 
 // A text feature holds a string state, which is never historized (the core
 // only keeps its last value): offering the toggle there would promise a
@@ -16,9 +17,12 @@ const KeepHistoryFeature = ({ deviceIndex, feature, featureIndex, updateFeatureK
   const inputId = `keep_history_${deviceIndex}_${featureIndex}`;
   return (
     <div class="d-flex align-items-center justify-content-between mb-2">
-      <label htmlFor={inputId} class="mr-3 mb-0">
-        {feature.name}
-      </label>
+      <div class="mr-3">
+        <label htmlFor={inputId} class="mb-0">
+          {feature.name}
+        </label>
+        <FeatureHistorySize feature={feature} />
+      </div>
       <label class="custom-switch mb-0">
         <input
           id={inputId}

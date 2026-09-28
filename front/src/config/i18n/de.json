@@ -6491,6 +6491,13 @@
     "manageBillingLink": "Mein Abo und meine Rechnungen verwalten",
     "logoutButton": "Abmelden"
   },
+  "deviceFeatureHistorySize": {
+    "size": {
+      "one": "1 Wert im Verlauf (≈ {{size}})",
+      "other": "{{count}} Werte im Verlauf (≈ {{size}})"
+    },
+    "empty": "Keine Werte im Verlauf"
+  },
   "editDeviceForm": {
     "noName": "Kein Name",
     "nameLabel": "Name",

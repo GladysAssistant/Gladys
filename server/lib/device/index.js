@@ -40,6 +40,7 @@ const { notify } = require('./device.notify');
 const { checkBatteries } = require('./device.checkBatteries');
 const { migrateFromSQLiteToDuckDb } = require('./device.migrateFromSQLiteToDuckDb');
 const { getDuckDbMigrationState } = require('./device.getDuckDbMigrationState');
+const { getFeatureStatesSize } = require('./device.getFeatureStatesSize');
 const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
 const { purgeOrphanedDuckDbStates } = require('./device.purgeOrphanedDuckDbStates');
 const { updateFeature } = require('./device.updateFeature');
@@ -108,6 +109,11 @@ const DeviceManager = function DeviceManager(
   this.DUCKDB_STATES_MIGRATE_PAUSE_FACTOR = 1;
   this.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 100;
   this.DUCKDB_STATES_MIGRATE_MAX_PAUSE_IN_MS = 5000;
+  // The size of the history of each feature, shown on the device pages, needs a full
+  // scan of the history: its result is kept this long, and dropped on a purge.
+  this.FEATURES_STATES_SIZE_CACHE_DURATION_IN_MS = 60 * 60 * 1000;
+  this.featuresStatesSizeCache = null;
+  this.featuresStatesSizeInFlight = null;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);
@@ -199,6 +205,7 @@ DeviceManager.prototype.notify = notify;
 DeviceManager.prototype.checkBatteries = checkBatteries;
 DeviceManager.prototype.migrateFromSQLiteToDuckDb = migrateFromSQLiteToDuckDb;
 DeviceManager.prototype.getDuckDbMigrationState = getDuckDbMigrationState;
+DeviceManager.prototype.getFeatureStatesSize = getFeatureStatesSize;
 DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
 DeviceManager.prototype.purgeOrphanedDuckDbStates = purgeOrphanedDuckDbStates;
 DeviceManager.prototype.updateFeature = updateFeature;

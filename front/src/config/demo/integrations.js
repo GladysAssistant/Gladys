@@ -733,9 +733,12 @@ const integrations = {
     model: 'zigbee2mqtt-0x00158d0005828ece',
     features: [
       {
+        id: 'a3f1c2d4-5b6e-4f70-8a91-b2c3d4e5f607',
+        selector: 'zigbee2mqtt-0x00158d0005828ece-switch',
         category: 'switch',
         type: 'binary',
-        name: 'Switch'
+        name: 'Switch',
+        keep_history: true
       }
     ]
   },

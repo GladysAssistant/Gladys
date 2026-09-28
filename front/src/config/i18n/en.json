@@ -6491,6 +6491,13 @@
     "manageBillingLink": "Manage my subscription and invoices",
     "logoutButton": "Log out"
   },
+  "deviceFeatureHistorySize": {
+    "size": {
+      "one": "1 state in the history (≈ {{size}})",
+      "other": "{{count}} states in the history (≈ {{size}})"
+    },
+    "empty": "No state in the history"
+  },
   "editDeviceForm": {
     "noName": "No name",
     "nameLabel": "Name",

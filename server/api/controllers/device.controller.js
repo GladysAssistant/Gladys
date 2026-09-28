@@ -294,6 +294,16 @@ module.exports = function DeviceController(gladys) {
     res.json(migrationState);
   }
 
+  /**
+   * @api {get} /api/v1/device_feature/:device_feature_selector/states_size getFeatureStatesSize
+   * @apiName getFeatureStatesSize
+   * @apiGroup Device
+   */
+  async function getFeatureStatesSize(req, res) {
+    const statesSize = await gladys.device.getFeatureStatesSize(req.params.device_feature_selector);
+    res.json(statesSize);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     get: asyncMiddleware(get),
@@ -308,6 +318,7 @@ module.exports = function DeviceController(gladys) {
     getConsumptionByDates: asyncMiddleware(getConsumptionByDates),
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),
+    getFeatureStatesSize: asyncMiddleware(getFeatureStatesSize),
     migrateFromSQLiteToDuckDb: asyncMiddleware(migrateFromSQLiteToDuckDb),
     migrate: asyncMiddleware(migrate),
     updateDeviceFeature: asyncMiddleware(updateDeviceFeature),

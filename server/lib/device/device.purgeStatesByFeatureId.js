@@ -232,6 +232,9 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     await updateProgressIfNeeded();
     await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
   });
+  // The device page shows the size of each feature's history: it must not keep
+  // showing the states that were just deleted.
+  this.featuresStatesSizeCache = null;
   return {
     numberOfDeviceFeatureStateToDelete,
     numberOfDeviceFeatureStateAggregateToDelete,
