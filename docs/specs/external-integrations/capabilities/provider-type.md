@@ -6,9 +6,9 @@ Goal: a technical `type` for an integration that **manages no device and impleme
 
 ## Decision and rationale (maintainer, PR #3109)
 
-- **`type` names the primary contract**: the interface the core itself consumes — devices and states for `device`, `message.sendToUser` for `communication`, the `weather.get` provider loop for `weather`. Those three types keep their full meaning: they classify integrations by what they *are* for Gladys, and each may declare capability fields on top (a `device` vacuum with a widget, a `weather` provider with a richer forecast panel).
+- **`type` names the primary contract**: the interface the core itself consumes — devices and states for `device`, `message.sendToUser` for `communication`, the `weather.get` provider loop for `weather`, the core calendar store for `calendar` (`capabilities/calendar-type.md`). Those types keep their full meaning: they classify integrations by what they *are* for Gladys, and each may declare capability fields on top (a `device` vacuum with a widget, a `weather` provider with a richer forecast panel).
 - **An integration with no primary interface needs a home.** Two drafts were rejected: `type: "device"` with Devices/Discovery screens that can never fill (a declaration that lies to the user, and a device host-API surface the integration has no business with), and a `widget` type (a type named after one capability breaks on the first integration combining two — a widget *and* a scene trigger, no device). The type must name the **shape** (capabilities, no devices), not a capability: **`provider`**.
-- **The rule this fixes for good**: a new contract that the core does not consume through a dedicated interface is a **capability field usable by every type, never a type**. The bar for a fifth type is the one `weather` passed: a generic pivot interface the core itself consumes (dashboard, assistant, scenes), never a domain.
+- **The rule this fixes for good**: a new contract that the core does not consume through a dedicated interface is a **capability field usable by every type, never a type**. The bar for any further type is the one `weather` passed: a generic pivot interface the core itself consumes (dashboard, assistant, scenes), never a domain — `calendar` passed it the same way (the pivot is the core calendar store, consumed by the calendar view, the scene engine and the assistant; `capabilities/calendar-type.md` records the argument).
 - **Naming, recorded**: the word "provider" already appears in B.18 ("weather *provider*", `GET /api/v1/weather/provider`, the "provider loop"). The technical value `"provider"` is unrelated to that wording: a `type: "provider"` manifest never joins the `weather.get` loop (only `type: "weather"` does, section 1 of B.18), the indexer and the server enforce it, and the install screen says what the integration provides. Renaming a technical type after the first store manifests exist is the costly mistake (the `device-feature-categories.md` rule 7 doctrine), so the name is fixed here, once.
 
 ## Manifest (C.1)
@@ -27,8 +27,8 @@ The list grows with the folder; `CAPABILITY_MANIFEST_FIELDS` in `server/lib/exte
 
 All by transposition of what `communication` and `weather` already do:
 
-- **screens**: Configuration / Supervision / Logs only — `provider` joins the two types without device screens in the generic page (`hasDeviceScreens`, the shared `TYPES_WITHOUT_DEVICE_SCREENS` list of the frontend); like them, its catalog card and its direct URLs land on the configuration screen of the shared external integration page (`/dashboard/integration/device/external/:selector/config`);
-- **no device surface**: it never goes through discovered devices or states (the device screens do not exist for it; a per-type `403` on the device host API is a later hardening common to the three device-less types, not part of this file);
+- **screens**: Configuration / Supervision / Logs only — `provider` joins the other types without device screens in the generic page (`hasDeviceScreens`, the shared `TYPES_WITHOUT_DEVICE_SCREENS` list of the frontend); like them, its catalog card and its direct URLs land on the configuration screen of the shared external integration page (`/dashboard/integration/device/external/:selector/config`);
+- **no device surface**: it never goes through discovered devices or states (the device screens do not exist for it; a per-type `403` on the device host API is a later hardening common to the device-less types, not part of this file);
 - **catalog**: hidden from non-admins like `device` and `weather` (installing is an admin act; what the integration provides reaches the users through the capability's own surface — for widgets, the dashboard picker and the widget list route); browse placement comes from `categories` (`integration-catalog-categories.md` §2.2), the display axis decoupled from `type`;
 - **install screen**: an information line saying the integration manages no device and provides its capabilities, plus the disclosure line of each declared capability (for `widgets`: the list of widgets; for `scene_triggers` / `scene_actions`: the list of declared triggers and actions) — the whole of its contract description;
 - **proxy service**: registered in the stateManager like every integration, with no `device.*`, `message.*` or `weather.*` capability attached — only what its declared capabilities add.
@@ -44,5 +44,5 @@ Dev-install a `type: "provider"` manifest declaring one capability (a content-on
 
 ## Later leads
 
-- A per-type `403` on the device host API for the three device-less types (`communication`, `weather`, `provider`).
+- A per-type `403` on the device host API for the device-less types (`communication`, `weather`, `calendar`, `provider`).
 - The scene triggers and actions capability, the first field to join the table above.
