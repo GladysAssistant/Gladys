@@ -5,6 +5,8 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     # The deployment secrets live in the `production` environment, which only
     # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
     environment: production
