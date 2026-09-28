@@ -362,6 +362,12 @@
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
+/* The active label carries the preset colour too, so it needs the same
+   counter-inversion as the icon above it. */
+:global(.dark-mode) .segmentBtnActive .segmentBtnLabel {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
 :global(.dark-mode) .scheduleBanner {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
@@ -612,11 +618,20 @@
 /* The preset name under its icon. Small and clipped rather than wrapped: the bar
    holds six of these across a card that is narrow on a phone, and a name that
    wrapped would push the icons out of line. */
+/* 9px read as decoration rather than as a label, and the icon's own grey left
+   it barely visible on the widget's background. Bigger and darker: it is the
+   only thing naming these six pictograms on a touch screen, where the tooltip
+   never opens. The active one inherits its preset colour from the button. */
 .segmentBtnLabel {
-  font-size: 9px;
-  line-height: 1;
+  font-size: 11px;
+  line-height: 1.1;
+  color: #6c757d;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.segmentBtnActive .segmentBtnLabel {
+  color: var(--preset-color, #f59f00);
 }

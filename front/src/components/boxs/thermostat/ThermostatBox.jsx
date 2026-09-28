@@ -9,7 +9,6 @@ import {
 } from '../../../../../server/utils/constants';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
 import {
-  DEFAULT_MANUAL_DURATION_MINUTES,
   DEFAULT_PRESET_TEMPS,
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
@@ -570,11 +569,16 @@ class ThermostatBox extends Component {
       this.refreshFromDevice();
     } else if (isManual !== this.state.isManualMode && !this.savingPreset) {
       this.setState({ isManualMode: isManual });
-    } else if (isManual && payload.until && !this.state.manualUntil) {
-      // A hold taken with no schedule carries no expiry, so the banner falls back
-      // to the schedule one — which has no cancel button. The server arms the
-      // expiry once a schedule is attached and sends it here: adopting it swaps
-      // the banner back to the manual one, countdown and cancel button included.
+    } else if (isManual && payload.until) {
+      // The server's expiry always wins over the one shown meanwhile: it is the
+      // moment the loop will actually hand the thermostat back. The widget can
+      // only guess at a fixed duration, and a hold that runs to the next schedule
+      // point ends whenever that point is — which the widget cannot work out
+      // without the whole week in the right timezone.
+      //
+      // This also covers a hold taken with no schedule, which carries no expiry:
+      // the banner falls back to the schedule one, which has no cancel button,
+      // until the server arms the expiry and sends it here.
       if (payload.until > Date.now()) {
         this.setState({ manualUntil: payload.until });
       }
@@ -661,13 +665,22 @@ class ThermostatBox extends Component {
     }
   };
 
-  // The server arms the hold and its expiry; this only shows the countdown while
-  // the reload that carries the real expiry is in flight. Same fallback the
-  // server applies, so what the widget displays is what the loop enforces.
+  // The server arms the hold and its expiry; this only fills the countdown while
+  // the event that carries the real one is in flight, and only when the device
+  // configures a fixed duration — the same figure the server will apply.
+  //
+  // With no duration configured the hold runs to the schedule's next point
+  // instead, which is not a figure the widget can work out: it would need the
+  // whole week resolved in the Gladys timezone. Showing +30 min there displayed
+  // a time the thermostat never came back at, and replaced it on the next reload.
+  // Nothing is shown until the server says when.
   showManualCountdown = () => {
     const cfg = this.getConfig();
-    const durationMs = numOr(cfg.manual_duration, DEFAULT_MANUAL_DURATION_MINUTES) * 60 * 1000;
-    this.setState({ manualUntil: Date.now() + durationMs });
+    const duration = numOr(cfg.manual_duration, null);
+    if (duration === null) {
+      return;
+    }
+    this.setState({ manualUntil: Date.now() + duration * 60 * 1000 });
   };
 
   initData = async () => {
