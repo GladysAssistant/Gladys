@@ -23,7 +23,12 @@ describe('externalIntegration.update', () => {
       integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: newManifest }],
     });
     externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    const registerProxyService = sinon.spy(externalIntegration, 'registerProxyService');
     const integration = await externalIntegration.update(service.selector);
+    // the proxy is re-registered on the updated row, never left on the
+    // boot-time snapshot of the manifest
+    sinonAssert.calledOnce(registerProxyService);
+    expect(registerProxyService.firstCall.args[0].manifest.version).to.equal('2.0.0');
     expect(integration).to.have.property('version', '2.0.0');
     expect(integration).to.have.property('docker_image', 'ghcr.io/john/demo:2.0.0');
     expect(integration.manifest.version).to.equal('2.0.0');
@@ -32,6 +37,42 @@ describe('externalIntegration.update', () => {
     sinonAssert.calledWith(system.pull, 'ghcr.io/john/demo:2.0.0');
     sinonAssert.calledWith(system.removeContainer, 'container-1', { force: true });
     expect(integration.status).to.equal(SERVICE_STATUS.LOADING);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should update an integration whose proxy is already registered', async () => {
+    // what really happens in production: init() registered the proxy for every
+    // installed integration at boot, so update() registers it a SECOND time.
+    // The proxy is frozen and stateManager.setState() merges, so this used to
+    // throw "Cannot assign to read only property 'start'" at
+    // registerProxyService() — after the row was rewritten but BEFORE the
+    // container was recreated, leaving the new version in DB and the old image
+    // running.
+    const service = await seedExternalService({
+      store_slug: 'john/gladys-open-meteo-demo',
+      version: '1.2.0',
+    });
+    const newManifest = { ...TEST_MANIFEST, version: '2.0.0', docker_image: 'ghcr.io/john/demo:2.0.0' };
+    const { externalIntegration, system, stateManager } = buildSupervisor();
+    externalIntegration.registerProxyService(service);
+    const bootProxy = stateManager.get('service', service.name);
+    externalIntegration.refreshIndex = fake.resolves({
+      index_format: 1,
+      integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: newManifest }],
+    });
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration).to.have.property('version', '2.0.0');
+    // the container is recreated from the NEW image, which is the whole point
+    // of an update: everything after registerProxyService() must still run
+    sinonAssert.calledWith(system.pull, 'ghcr.io/john/demo:2.0.0');
+    sinonAssert.calledWith(system.removeContainer, 'container-1', { force: true });
+    sinonAssert.called(system.createContainer);
+    expect(integration.status).to.equal(SERVICE_STATUS.LOADING);
+    // and the proxy now closes over the updated row, not the boot snapshot
+    const updatedProxy = stateManager.get('service', service.name);
+    expect(updatedProxy).to.not.equal(bootProxy);
+    expect(stateManager.get('serviceById', service.id)).to.equal(updatedProxy);
     externalIntegration.clearTimers(service.id);
   });
 

@@ -25,6 +25,7 @@ const {
   LOW_BATTERY_THRESHOLD,
 } = require('./deviceMappings');
 const { buildThermostatService } = require('./buildThermostatService');
+const { buildHeaterCoolerService } = require('./buildHeaterCoolerService');
 const { sanitizeName } = require('./sanitizeName');
 
 const sleep = promisify(setTimeout);
@@ -51,6 +52,9 @@ function buildService(device, features, categoryMapping, subtype) {
   // cannot be wired one feature at a time like the others.
   if (categoryMapping.service === 'Thermostat') {
     return buildThermostatService.call(this, service, device, features);
+  }
+  if (categoryMapping.service === 'HeaterCooler') {
+    return buildHeaterCoolerService.call(this, service, device, features);
   }
 
   features.forEach((feature) => {

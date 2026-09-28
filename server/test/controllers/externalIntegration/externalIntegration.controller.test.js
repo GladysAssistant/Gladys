@@ -330,6 +330,64 @@ describe('External integration admin API', () => {
     });
   });
 
+  describe('GET /api/v1/external_integration/scene', () => {
+    const SCENE_MANIFEST = {
+      ...TEST_MANIFEST,
+      name: 'Frigate',
+      scene_triggers: [{ key: 'object_detected', label: { en: 'Object detected' } }],
+      scene_actions: [{ key: 'create_snapshot', label: { en: 'Take a snapshot' }, timeout_seconds: 20 }],
+      webhooks: [{ key: 'events', label: { en: 'Events' } }],
+    };
+
+    it('should return the declarations of the integrations declaring some, not the :selector handler (route order)', async () => {
+      const sceneService = await seedExternalService({
+        name: 'ext-dev-frigate',
+        selector: 'ext-dev-frigate',
+        manifest: SCENE_MANIFEST,
+      });
+      // a device integration without declarations is not listed
+      await seedExternalService();
+      const res = await authenticatedRequest
+        .get('/api/v1/external_integration/scene')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      // if the route order was broken, the :selector handler would 404
+      expect(res.body).to.deep.equal({
+        integrations: [
+          {
+            selector: sceneService.selector,
+            name: 'Frigate',
+            status: SERVICE_STATUS.RUNNING,
+            scene_triggers: SCENE_MANIFEST.scene_triggers,
+            scene_actions: SCENE_MANIFEST.scene_actions,
+          },
+        ],
+      });
+      // the reduced payload: nothing operational
+      expect(res.body.integrations[0]).to.not.have.property('docker_image');
+      expect(res.body.integrations[0]).to.not.have.property('webhooks');
+      expect(res.body.integrations[0]).to.not.have.property('containers');
+    });
+
+    it('should be open to every authenticated user, and to nobody else', async () => {
+      await db.User.create({
+        id: NON_ADMIN_USER_ID,
+        firstname: 'Pepper',
+        lastname: 'Potts',
+        selector: 'pepper-habitant',
+        email: 'pepper-habitant@pots.com',
+        password: 'mysuperpassword',
+        role: USER_ROLE.HABITANT,
+        language: 'en',
+        birthdate: '1990-12-12',
+      });
+      await seedExternalService({ name: 'ext-dev-frigate', selector: 'ext-dev-frigate', manifest: SCENE_MANIFEST });
+      const res = await nonAdminRequest.get('/api/v1/external_integration/scene').expect(200);
+      expect(res.body.integrations).to.have.lengthOf(1);
+      await unAuthenticatedRequest.get('/api/v1/external_integration/scene').expect(401);
+    });
+  });
+
   describe('POST /api/v1/external_integration/store/refresh', () => {
     it('should refresh the index and return the catalog', async () => {
       stubInstance(

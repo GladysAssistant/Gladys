@@ -1,0 +1,18 @@
+[
+  {
+    "label": "temperature-sensor.get-in-room.success",
+    "answers": ["Hace {{ temperature }} {{ unit }} en {{ roomName }}."]
+  },
+  {
+    "label": "temperature-sensor.get-in-room.fail.no-results",
+    "answers": ["No se han registrado valores de temperatura en las últimas 12 horas en esta habitación."]
+  },
+  {
+    "label": "temperature-sensor.get-in-room.fail.room-not-found",
+    "answers": ["No encuentro ninguna habitación con ese nombre."]
+  },
+  {
+    "label": "temperature-sensor.get-in-room.fail",
+    "answers": ["No he conseguido obtener la temperatura en esta habitación."]
+  }
+]

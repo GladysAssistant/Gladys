@@ -50,7 +50,9 @@ class DeviceSetValue extends Component {
         deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
         deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
         (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
-          deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST)
+          deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST) ||
+        (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR &&
+          deviceFeature.type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE)
       ) {
         this.props.updateActionProperty(this.props.path, 'value', 0);
         this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
@@ -194,7 +196,9 @@ class DeviceSetValue extends Component {
       this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
       this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
       (this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
-        this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST)
+        this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST) ||
+      (this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR &&
+        this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE)
     ) {
       return (
         <label class="custom-switch">

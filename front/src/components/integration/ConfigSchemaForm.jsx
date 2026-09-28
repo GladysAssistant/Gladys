@@ -2,11 +2,20 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-import { getLocalizedText, getUrlDomain, resolveManifestPlaceholders } from '../utils';
-import { RequestStatus } from '../../../../../utils/consts';
-import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../../../../utils/oauth';
-import { ACCOUNT_FIELD_TYPES } from '../../../../../../../server/lib/external-integration/constants';
-import integrationText from '../integrationText.css';
+import {
+  getLocalizedText,
+  getUrlDomain,
+  resolveManifestPlaceholders
+} from '../../routes/integration/all/external-integration/utils';
+import { RequestStatus } from '../../utils/consts';
+import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../utils/oauth';
+import { ACCOUNT_FIELD_TYPES } from '../../../../server/lib/external-integration/constants';
+import integrationText from '../../routes/integration/all/external-integration/integrationText.css';
+
+// The form engine of the manifest `config_schema` grammar, shared by the
+// integration Configuration screen (config, action mini forms, per-user
+// contact profile) and the dashboard editor of the integration widgets
+// (per-instance `settings`): one engine, one look, one set of rules.
 
 // the redirect URI is meant to be copied into the developer application of the
 // provider: a click should select all of it

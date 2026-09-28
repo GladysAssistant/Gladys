@@ -1,5 +1,7 @@
 import { Localizer, Text } from 'preact-i18n';
+import { connect } from 'unistore/preact';
 import cx from 'classnames';
+import get from 'get-value';
 import { useState, useCallback } from 'preact/hooks';
 
 import DeviceFeatureState from './triggers/DeviceFeatureState';
@@ -13,6 +15,8 @@ import CalendarEventIsComing from './triggers/CalendarEventIsComing';
 import AlarmModeTrigger from './triggers/AlarmModeTrigger';
 import MQTTReceivedTrigger from './triggers/MQTTReceivedTrigger';
 import WeatherAlert from './triggers/WeatherAlert';
+import ExternalIntegrationTrigger from './triggers/ExternalIntegrationTrigger';
+import { SCENE_DECLARATION_KINDS, getSceneDeclarationTitle } from './sceneIntegrations';
 
 import { EVENTS } from '../../../../../server/utils/constants';
 import { TRIGGER_ICON, TRIGGER_COLOR, COLOR_CLASS } from './typesCatalog';
@@ -44,6 +48,17 @@ const TriggerCard = ({ children, ...props }) => {
     setExpanded(previousExpanded => !previousExpanded);
   }, []);
   const summary = !expanded ? getTriggerSummary(props.trigger, props.intl.dictionary) : null;
+  // a trigger declared by an external integration is titled by its manifest
+  // label; an orphan one (uninstalled, key removed) keeps the generic label
+  const declarationTitle =
+    props.trigger.type === EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT
+      ? getSceneDeclarationTitle(
+          props.sceneIntegrations,
+          SCENE_DECLARATION_KINDS.trigger,
+          props.trigger,
+          get(props, 'user.language') || 'en'
+        )
+      : null;
 
   return (
     <div class={cx('card user-select-none', style.stepCard)}>
@@ -56,7 +71,7 @@ const TriggerCard = ({ children, ...props }) => {
         </span>
         <div class={style.stepText} onClick={toggleExpanded}>
           <span class={style.stepLabel}>
-            <Text id={`editScene.triggers.${props.trigger.type}`} />
+            {declarationTitle || <Text id={`editScene.triggers.${props.trigger.type}`} />}
             {props.trigger.type === null && <Text id="editScene.newTrigger" />}
           </span>
           {summary && <span class={style.stepSummary}>{summary}</span>}
@@ -87,7 +102,11 @@ const TriggerCard = ({ children, ...props }) => {
       </div>
       <div class={cx('card-body', { 'd-none': !expanded })}>
         {props.trigger.type === null && (
-          <ChooseTriggerType updateTriggerProperty={props.updateTriggerProperty} index={props.index} />
+          <ChooseTriggerType
+            updateTriggerProperty={props.updateTriggerProperty}
+            index={props.index}
+            sceneIntegrations={props.sceneIntegrations}
+          />
         )}
         {props.trigger.type === EVENTS.DEVICE.NEW_STATE && (
           <DeviceFeatureState
@@ -196,9 +215,18 @@ const TriggerCard = ({ children, ...props }) => {
             trigger={props.trigger}
           />
         )}
+        {props.trigger.type === EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT && (
+          <ExternalIntegrationTrigger
+            updateTriggerProperty={props.updateTriggerProperty}
+            index={props.index}
+            trigger={props.trigger}
+            sceneIntegrations={props.sceneIntegrations}
+            setVariablesTrigger={props.setVariablesTrigger}
+          />
+        )}
       </div>
     </div>
   );
 };
 
-export default withIntlAsProp(TriggerCard);
+export default connect('user', {})(withIntlAsProp(TriggerCard));

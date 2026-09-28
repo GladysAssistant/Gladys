@@ -82,6 +82,21 @@ describe('gateway.checkIfBackupNeeded', () => {
     assert.neverCalledWith(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
   });
 
+  it('should not backup when the Gladys Plus plan does not include backups', async () => {
+    gateway.connected = true;
+    const error = new Error();
+    error.response = { status: 403 };
+    gateway.gladysGatewayClient.getBackups = fake.rejects(error);
+
+    await gateway.checkIfBackupNeeded();
+
+    assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+    // a plan without backups is not an unpaid subscription: no lock
+    expect(gateway.subscriptionActive).to.equal(true);
+    clock.tick(gateway.backupRandomInterval * 10);
+    assert.neverCalledWith(event.emit, EVENTS.GATEWAY.CREATE_BACKUP);
+  });
+
   it('should forward errors other than payment required', async () => {
     gateway.connected = true;
     gateway.gladysGatewayClient.getBackups = fake.rejects(new Error('network'));

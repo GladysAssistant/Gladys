@@ -89,4 +89,26 @@ describe('externalIntegration.registerProxyService', () => {
       { device },
     );
   });
+
+  it('should be idempotent: registering twice replaces the frozen proxy', () => {
+    // init() registers every installed integration at boot and update()
+    // registers the updated row again: stateManager.setState() merges into the
+    // existing Store, so merging into the frozen proxy used to throw
+    // "Cannot assign to read only property 'start'" and abort the update
+    // before the container was recreated.
+    const updatedService = { ...service, version: '2.0.0', manifest: { ...service.manifest, version: '2.0.0' } };
+    expect(() => externalIntegration.registerProxyService(updatedService)).to.not.throw();
+    const reRegistered = stateManager.get('service', service.name);
+    expect(reRegistered).to.not.equal(proxyService);
+    expect(stateManager.get('serviceById', service.id)).to.equal(reRegistered);
+  });
+
+  it('should close the re-registered proxy over the updated service row', async () => {
+    const updatedService = { ...service, version: '2.0.0', manifest: { ...service.manifest, version: '2.0.0' } };
+    externalIntegration.registerProxyService(updatedService);
+    externalIntegration.sendMessage = fake.returns(true);
+    const device = { external_id: 'ext:x:switch' };
+    await stateManager.get('service', service.name).device.postCreate(device);
+    expect(externalIntegration.sendMessage.firstCall.args[0].version).to.equal('2.0.0');
+  });
 });

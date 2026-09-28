@@ -25,6 +25,51 @@ const matchWeatherAlert = (self, sceneSelector, event, trigger) =>
   WEATHER_ALERT_SEVERITY_RANK[event.alert.severity] >=
     (WEATHER_ALERT_SEVERITY_RANK[trigger.weather_alert_severity] || 1);
 
+// Filters left empty by the scene author are wildcards
+const isWildcardFilter = (expected) =>
+  expected === null || expected === undefined || expected === '' || (Array.isArray(expected) && expected.length === 0);
+
+// Scene trigger declared by an external integration: the integration fires a
+// typed event with data (POST /api/integration/v1/scene/event), the core
+// compares it with the filters the scene author configured. The matching
+// model is deliberately simple — equality and membership on the declared
+// fields — thresholds and durations belong to device features.
+// `event.filters` is complete by construction (every key currently declared,
+// null when absent from this event), so a stored key missing from it is a
+// filter removed by an update: stale, skipped without a manifest lookup.
+// On a match the checker returns the REDUCED trigger event the actions see
+// ({{triggerEvent.data.<key>}}): the matcher's filters never enter the scope.
+const matchExternalIntegrationSceneEvent = (self, sceneSelector, event, trigger) => {
+  if (event.integration !== trigger.integration || event.trigger_key !== trigger.trigger_key) {
+    return false;
+  }
+  const storedFields = trigger.fields || {};
+  const filters = event.filters || {};
+  const matched = Object.keys(storedFields).every((key) => {
+    const expected = storedFields[key];
+    const actual = filters[key];
+    if (actual === undefined || isWildcardFilter(expected)) {
+      return true;
+    }
+    if (actual === null) {
+      return false;
+    }
+    if (Array.isArray(expected)) {
+      return expected.includes(actual);
+    }
+    return actual === expected;
+  });
+  if (!matched) {
+    return false;
+  }
+  return {
+    type: event.type,
+    integration: event.integration,
+    trigger_key: event.trigger_key,
+    data: cloneDeep(event.data || {}),
+  };
+};
+
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
     // Multi-select triggers store their features in `device_features`, legacy triggers
@@ -144,6 +189,7 @@ const triggersFunc = {
     event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
   [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,
   [EVENTS.WEATHER.ALERT_ENDED]: matchWeatherAlert,
+  [EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT]: matchExternalIntegrationSceneEvent,
 };
 
 module.exports = {

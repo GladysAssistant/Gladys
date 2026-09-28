@@ -1,7 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-import { ConfigField } from './ConfigSchemaForm';
+import { ConfigField } from '../../../../../components/integration/ConfigSchemaForm';
 import { getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import integrationText from '../integrationText.css';

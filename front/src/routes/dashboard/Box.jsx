@@ -21,6 +21,7 @@ import SunBox from '../../components/boxs/sun/Sun';
 import ChipsBox from '../../components/boxs/chips/ChipsBox';
 import ActionsBox from '../../components/boxs/actions/ActionsBox';
 import HouseViewBox from '../../components/boxs/house-view/HouseViewBox';
+import ExternalWidgetBox from '../../components/boxs/external-widget/ExternalWidgetBox';
 import ErrorBoundary from '../../components/ErrorBoundary';
 
 const BoxContent = ({ children, ...props }) => {
@@ -71,6 +72,8 @@ const BoxContent = ({ children, ...props }) => {
       return <HouseViewBox {...props} />;
     case 'actions':
       return <ActionsBox {...props} />;
+    case 'external-widget':
+      return <ExternalWidgetBox {...props} />;
   }
 };
 

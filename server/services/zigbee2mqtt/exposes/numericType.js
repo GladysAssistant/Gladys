@@ -260,6 +260,19 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
       },
     },
+    // Smoke concentration measured in the detection chamber, e.g. Heiman HS1SA-E-PLUS.
+    // Its unit is not the same on every detector (dB/m, %ft OBS...) and is published by the
+    // device itself, in the "smoke_unit" expose: none of them is a Gladys unit, so the
+    // measurement is kept unit-less.
+    // https://www.zigbee2mqtt.io/devices/HS1SA-E-PLUS.html
+    smoke_level: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        min: 0,
+        max: 100,
+      },
+    },
     humidity: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
@@ -365,6 +378,18 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
       },
     },
+    // External probe of a temperature/humidity sensor, e.g. Excellux ZG-105NTH
+    // https://www.zigbee2mqtt.io/devices/ZG-105NTH.html
+    // Tuya spells the same capability `temperature_probe`: both map to the same feature.
+    probe_temperature: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.PROBE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        min: -100,
+        max: 150,
+      },
+    },
     rain_intensity: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
@@ -376,6 +401,17 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        min: -100,
+        max: 150,
+      },
+    },
+    // Tuya's spelling of `probe_temperature`, e.g. TZ-ZT01_GA4
+    // https://www.zigbee2mqtt.io/devices/TZ-ZT01_GA4.html
+    temperature_probe: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.PROBE,
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
         min: -100,
         max: 150,

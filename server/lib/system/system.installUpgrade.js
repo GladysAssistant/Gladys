@@ -13,6 +13,40 @@ const WATCHTOWER_TIMEOUT_IN_MS = 15 * 60 * 1000;
 
 const WATCHTOWER_TIMED_OUT = Symbol('WATCHTOWER_TIMED_OUT');
 
+// how Docker words a download that filled up the disk
+const NO_SPACE_LEFT_REGEX = /no space left on device/i;
+
+/**
+ * @description Wait for a Docker operation, but never longer than the upgrade timeout.
+ * @param {Promise} operation - The Docker operation to wait for.
+ * @param {string} name - Name of the operation, for the logs.
+ * @returns {Promise} Resolve with the operation result, or WATCHTOWER_TIMED_OUT.
+ * @example
+ * const result = await waitAtMost(container.wait(), 'Watchtower container wait');
+ */
+const waitAtMost = async (operation, name) => {
+  let timeoutId;
+  const timeout = new Promise((resolve) => {
+    timeoutId = setTimeout(() => resolve(WATCHTOWER_TIMED_OUT), WATCHTOWER_TIMEOUT_IN_MS);
+  });
+  let result;
+  try {
+    result = await Promise.race([operation, timeout]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  if (result === WATCHTOWER_TIMED_OUT) {
+    // The abandoned operation can still reject later — a dying Docker daemon
+    // is precisely the timeout scenario. Swallow it so it does not surface as
+    // an unhandled rejection long after the upgrade was reported failed.
+    // eslint-disable-next-line promise/prefer-await-to-then
+    operation.catch((lateError) => {
+      logger.warn(`${name} failed after the timeout`, lateError);
+    });
+  }
+  return result;
+};
+
 /**
  * @description Parse a Watchtower log message to extract relevant information and remove Docker stream prefixes.
  * @example
@@ -104,13 +138,51 @@ async function installUpgrade() {
     return;
   }
 
+  // Watchtower reads the pull response without decoding the errors Docker
+  // streams into it: a download that fails (full disk, lost connection...)
+  // ends exactly like "no new image", and the user is told to wait for an
+  // image that is already published. Downloading the image here first
+  // surfaces the real Docker error, and Watchtower then finds it on the disk.
+  try {
+    logger.info(`Pulling ${gladysImage.image} image...`);
+    this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG,
+      payload: { message: `Downloading ${gladysImage.image}...` },
+    });
+    const pullAbortController = new AbortController();
+    const pullResult = await waitAtMost(
+      this.pull(gladysImage.image, undefined, { abortSignal: pullAbortController.signal }),
+      `Pull of ${gladysImage.image}`,
+    );
+    if (pullResult === WATCHTOWER_TIMED_OUT) {
+      // Left running, the download would keep filling the disk, and a retry
+      // would start a second one on top of it.
+      pullAbortController.abort();
+      logger.warn(`The pull of ${gladysImage.image} is still running after ${WATCHTOWER_TIMEOUT_IN_MS}ms, aborting it`);
+      sendUpgradeError({ code: SYSTEM_UPGRADE_ERROR_CODES.IMAGE_PULL_TIMEOUT, image: gladysImage.image });
+      return;
+    }
+  } catch (e) {
+    logger.warn(`Unable to pull ${gladysImage.image}, aborting the upgrade`, e);
+    sendUpgradeError({
+      code: NO_SPACE_LEFT_REGEX.test(e.message)
+        ? SYSTEM_UPGRADE_ERROR_CODES.NOT_ENOUGH_DISK_SPACE
+        : SYSTEM_UPGRADE_ERROR_CODES.IMAGE_PULL_FAILED,
+      image: gladysImage.image,
+      message: e.message,
+    });
+    return;
+  }
+
   try {
     logger.info(`Pulling ${WATCHTOWER_IMAGE} image...`);
     await this.pull(WATCHTOWER_IMAGE);
 
     // Create and start Watchtower container. Passing the Gladys container name
     // restricts the run to Gladys: a manual upgrade must never recreate the
-    // other containers running on the user's machine.
+    // other containers running on the user's machine. `--no-pull` makes it
+    // compare Gladys with the image downloaded above instead of contacting the
+    // registry a second time, which could fail on its own.
     const container = await this.dockerode.createContainer({
       Image: WATCHTOWER_IMAGE,
       name: `gladys-watchtower-${Date.now()}`,
@@ -118,7 +190,7 @@ async function installUpgrade() {
         AutoRemove: true,
         Binds: ['/var/run/docker.sock:/var/run/docker.sock'],
       },
-      Cmd: ['--run-once', '--cleanup', '--include-restarting', gladysImage.container_name],
+      Cmd: ['--run-once', '--cleanup', '--include-restarting', '--no-pull', gladysImage.container_name],
     });
 
     // Start the container
@@ -174,26 +246,9 @@ async function installUpgrade() {
     // Wait for container to finish. A stalled Watchtower (hanging pull, frozen
     // Docker daemon) would otherwise leave the UI waiting forever, which is the
     // very failure this whole flow exists to avoid.
-    let timeoutId;
-    const timeout = new Promise((resolve) => {
-      timeoutId = setTimeout(() => resolve(WATCHTOWER_TIMED_OUT), WATCHTOWER_TIMEOUT_IN_MS);
-    });
-    const waitForContainer = container.wait();
-    let result;
-    try {
-      result = await Promise.race([waitForContainer, timeout]);
-    } finally {
-      clearTimeout(timeoutId);
-    }
+    const result = await waitAtMost(container.wait(), 'Watchtower container wait');
 
     if (result === WATCHTOWER_TIMED_OUT) {
-      // The abandoned wait can still reject later — a dying Docker daemon is
-      // precisely the timeout scenario. Swallow it so it does not surface as an
-      // unhandled rejection long after the upgrade was reported failed.
-      // eslint-disable-next-line promise/prefer-await-to-then
-      waitForContainer.catch((waitError) => {
-        logger.warn('Watchtower container wait failed after the timeout', waitError);
-      });
       logger.warn(`Watchtower is still running after ${WATCHTOWER_TIMEOUT_IN_MS}ms, giving up on watching it`);
       sendUpgradeError({ code: SYSTEM_UPGRADE_ERROR_CODES.WATCHTOWER_TIMEOUT });
       return;

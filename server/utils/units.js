@@ -107,6 +107,44 @@ function smartRound(value) {
 }
 
 /**
+ * @description Number of decimals a number carries, scientific notation included
+ * (`1e-7` has no dot, but seven decimals).
+ * @param {number} number - The number to inspect.
+ * @returns {number} The count of decimals.
+ * @example
+ * decimalsOf(0.0001); // returns 4
+ */
+function decimalsOf(number) {
+  const [mantissa, exponent] = `${number}`.toLowerCase().split('e');
+  const decimals = (mantissa.split('.')[1] || '').length;
+  return exponent ? Math.max(0, decimals - Number(exponent)) : decimals;
+}
+
+/**
+ * @description Display a value at the precision the feature's step declares.
+ * The smartRound display keeps 3 significant digits under 1, which is what a sensor
+ * reading needs but truncates a value the user typed themselves: a 0.1734 EUR/kWh tariff
+ * set on a 0.0001 step would show as 0.173, one digit short of what was sent to the
+ * device. A step finer than 1 therefore decides the number of decimals; anything else
+ * (no step, or a step of 1 and above) keeps the smartRound display of every other feature.
+ * @param {number} value - Value to display.
+ * @param {number} [step] - The step declared on the device feature.
+ * @returns {number|string} The value to display.
+ * @example
+ * formatValueWithStep(0.1734, 0.0001); // returns '0.1734'
+ * formatValueWithStep(0.1734, 1); // returns 0.173
+ */
+function formatValueWithStep(value, step) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return smartRound(value);
+  }
+  if (!step || !Number.isFinite(step) || step >= 1) {
+    return smartRound(value);
+  }
+  return value.toFixed(decimalsOf(step));
+}
+
+/**
  * @description Converts a value from one unit to another according to the user's preference.
  * @param {number} value - Value to convert.
  * @param {string} fromUnit - Original unit (e.g. 'km', 'mile', 'km/h', 'bar', 'psi', 'kPa', ...).
@@ -167,4 +205,6 @@ module.exports = {
   checkAndConvertUnit,
   convertEnergyUnit,
   smartRound,
+  decimalsOf,
+  formatValueWithStep,
 };

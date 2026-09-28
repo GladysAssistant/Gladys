@@ -1,0 +1,31 @@
+name: Prepare patch release
+run-name: Prepare patch release
+
+# Entry point for a PATCH release (X.Y.Z → X.Y.Z+1): bug fixes only, no new
+# feature, no breaking change, no new device category, no migration.
+#
+# Anyone with write access may start it: the version bump lands on a
+# `release/vX.Y.Z` branch and the release pull request still needs the
+# approval of a member of the release team or a maintainer (see
+# .github/CODEOWNERS), who cannot be the author of that pull request.
+#
+# Minor and major releases go through prepare-release-minor-major.yml, which
+# only maintainers may start. See .github/MAINTAINERS.md.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Shared with the minor/major entry point: two overlapping runs would bump
+# from the same tip and race on the same version.
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Patch release
+    uses: ./.github/workflows/prepare-release.yml
+    with:
+      release_type: patch

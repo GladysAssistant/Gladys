@@ -2,7 +2,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
 
-import ConfigSchemaForm from './ConfigSchemaForm';
+import ConfigSchemaForm from '../../../../../components/integration/ConfigSchemaForm';
 import DocsLink from '../components/DocsLink';
 import ActionsCard from './ActionsCard';
 import LinkAccountCard from './LinkAccountCard';

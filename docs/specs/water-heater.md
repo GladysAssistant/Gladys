@@ -86,9 +86,29 @@ The category covers only the metrics **intrinsic** to producing and storing hot 
 
 | Value the appliance reports | Category to use | Why not a water-heater type |
 |---|---|---|
-| Temperature of the water in the tank | `temperature-sensor` / `decimal` — the constant is `DEVICE_FEATURE_TYPES.SENSOR.DECIMAL`, not a `TEMPERATURE_SENSOR` type (that sub-object only holds `min`/`max`/`average`) | A temperature measurement is a temperature measurement whatever measures it (taxonomy rule 2). `server/services/matter/utils/convertToGladysDevice.js` already maps the Thermostat cluster's local temperature to exactly this pair; a tank probe is the same quantity. |
+| Temperature of the water in the tank | `temperature-sensor` / `decimal` — the constant is `DEVICE_FEATURE_TYPES.SENSOR.DECIMAL`, not `TEMPERATURE_SENSOR.PROBE` (see the `decimal` vs `probe` boundary below) | A temperature measurement is a temperature measurement whatever measures it (taxonomy rule 2). `server/services/matter/utils/convertToGladysDevice.js` already maps the Thermostat cluster's local temperature to exactly this pair; the water temperature is the appliance's primary reading, not an extra probe. |
 | Electrical consumption, power, index | `energy-sensor` (`power`, `energy`, `index`) | Reusing them links the appliance to the household meter through `energy_parent_id` (`server/utils/resolveEnergyParentId.js`) and to the whole energy pipeline: the `energy-consumption` dashboard box, cost computation, and the 30-minute consumption/cost children created by `server/services/energy-monitoring/utils/addEnergyFeatures.js`. A `water-heater.energy` twin would sit outside `ENERGY_INDEX_FEATURE_TYPES` and be invisible to all of it. |
 | Ambient / room temperature, humidity | `temperature-sensor`, `humidity-sensor` | Same rule: the quantity, not the device reporting it. |
+
+**`decimal` vs `probe` within `temperature-sensor`.** The category carries two read-only
+temperature types, and the tank temperature is the `decimal` one:
+
+- `decimal` — the temperature the device is *for*: the ambient reading of a room sensor, or
+  the primary quantity the appliance exists to measure and control (the water in the tank).
+- `probe` (`DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.PROBE`) — an **extra** wired probe on a
+  device that already reports its own temperature, measuring somewhere else entirely: a
+  fridge, a flow pipe, outdoors. Zigbee2MQTT spells it `probe_temperature` or
+  `temperature_probe` alongside a plain `temperature` expose.
+
+The split exists because `temperature-sensor.getTemperatureInRoom` averages every `decimal`
+feature in a room: a probe measuring a fridge must not drag that average down, so `probe` is
+excluded from it. A water heater's tank temperature stays `decimal` — it is the appliance's
+primary reading, and a heater in a utility room genuinely warms the room it sits in.
+
+Matter models a second probe as another `TemperatureMeasurement` cluster instance rather than
+a distinct cluster, so it carries no type distinction to align with here; Gladys needs one
+because its own room-average and labelling are keyed on the type (a device exposing both
+readings would otherwise show two features named "Temperature").
 
 ### A.5 Reference device A — a heat-pump water heater with a mode selector
 

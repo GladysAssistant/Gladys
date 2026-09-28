@@ -1,6 +1,6 @@
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
-const { Error402 } = require('../../utils/httpErrors');
+const { Error402, Error403 } = require('../../utils/httpErrors');
 
 /**
  * @description Generate a number between 0 and max included.
@@ -32,6 +32,12 @@ async function checkIfBackupNeeded() {
   } catch (e) {
     if (e instanceof Error402) {
       logger.info(`Gladys Plus subscription is not paid, not backing up.`);
+      return;
+    }
+    // Gladys Plus refused the list (403 for a plan without backups, the Lite
+    // plan): nothing to back up, and nothing to report every night
+    if (e instanceof Error403) {
+      logger.info(`Backups are not included in the Gladys Plus plan of this instance, not backing up.`);
       return;
     }
     throw e;

@@ -88,6 +88,7 @@ describe('Websockets external integrations', () => {
         handleCommandResult: fake.returns(null),
         handleHeartbeat: fake.resolves(null),
         handleWeatherRefresh: fake.returns(null),
+        handleWidgetRefresh: fake.returns(null),
       },
     };
     const websocketManager = new WebsocketManager(wss, gladys);
@@ -104,6 +105,13 @@ describe('Websockets external integrations', () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 20);
     });
+    ws.emit(
+      'message',
+      JSON.stringify({
+        type: WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WIDGET_REFRESH,
+        payload: { key: 'vacuum' },
+      }),
+    );
     ws.emit(
       'message',
       JSON.stringify({
@@ -131,6 +139,7 @@ describe('Websockets external integrations', () => {
     assert.calledWith(gladys.externalIntegration.handleCommandResult, service, { message_id: 'uuid', success: true });
     assert.calledWith(gladys.externalIntegration.handleHeartbeat, service);
     assert.calledWith(gladys.externalIntegration.handleWeatherRefresh, service);
+    assert.calledWith(gladys.externalIntegration.handleWidgetRefresh, service, { key: 'vacuum' });
     // close -> integrationDisconnected
     ws.emit('close');
     await new Promise((resolve) => {
