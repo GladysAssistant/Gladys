@@ -41,6 +41,7 @@ const { checkBatteries } = require('./device.checkBatteries');
 const { migrateFromSQLiteToDuckDb } = require('./device.migrateFromSQLiteToDuckDb');
 const { getDuckDbMigrationState } = require('./device.getDuckDbMigrationState');
 const { getDeviceStatesSize } = require('./device.getDeviceStatesSize');
+const { getStatesStats } = require('./device.getStatesStats');
 const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
 const { purgeOrphanedDuckDbStates } = require('./device.purgeOrphanedDuckDbStates');
 const { updateFeature } = require('./device.updateFeature');
@@ -115,6 +116,14 @@ const DeviceManager = function DeviceManager(
   this.featuresStatesSizeCache = null;
   this.featuresStatesSizeInFlight = null;
   this.featuresStatesSizeGeneration = 0;
+  // The devices list flags the verbose devices from the states saved in their history
+  // over this period. A feature is verbose when it saved at least this many states in
+  // the period: one per minute on average over 24 hours.
+  this.STATES_STATS_PERIOD_IN_HOURS = 24;
+  this.VERBOSE_DEVICE_FEATURE_MIN_STATES = 24 * 60;
+  this.STATES_STATS_CACHE_DURATION_IN_MS = 5 * 60 * 1000;
+  this.statesStatsCache = null;
+  this.statesStatsInFlight = null;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);
@@ -207,6 +216,7 @@ DeviceManager.prototype.checkBatteries = checkBatteries;
 DeviceManager.prototype.migrateFromSQLiteToDuckDb = migrateFromSQLiteToDuckDb;
 DeviceManager.prototype.getDuckDbMigrationState = getDuckDbMigrationState;
 DeviceManager.prototype.getDeviceStatesSize = getDeviceStatesSize;
+DeviceManager.prototype.getStatesStats = getStatesStats;
 DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
 DeviceManager.prototype.purgeOrphanedDuckDbStates = purgeOrphanedDuckDbStates;
 DeviceManager.prototype.updateFeature = updateFeature;

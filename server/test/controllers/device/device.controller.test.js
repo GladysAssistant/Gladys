@@ -641,6 +641,25 @@ describe('GET /api/v1/device/:device_selector/states_size', () => {
   });
 });
 
+describe('GET /api/v1/device/states_stats', () => {
+  it('should get the states saved per device over the last 24 hours', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device/states_stats')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('period_in_hours', 24);
+        expect(res.body).to.have.property('verbose_device_feature_min_states', 1440);
+        expect(res.body)
+          .to.have.property('total_states')
+          .that.is.a('number');
+        expect(res.body)
+          .to.have.property('devices')
+          .that.is.an('array');
+      });
+  });
+});
+
 describe('POST /api/v1/device/purge_all_sqlite_state', () => {
   it('should delete all sqlite states', async () => {
     await authenticatedRequest

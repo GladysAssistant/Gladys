@@ -229,6 +229,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDuckDbMigrationState,
     },
+    'get /api/v1/device/states_stats': {
+      authenticated: true,
+      controller: deviceController.getStatesStats,
+    },
     'post /api/v1/device/purge_all_sqlite_state': {
       authenticated: true,
       controller: deviceController.purgeAllSqliteStates,

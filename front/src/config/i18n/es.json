@@ -109,6 +109,19 @@
     "room": "Habitación",
     "integration": "Integración",
     "features": "Funciones",
+    "orderByStatesDesc": "Más activos primero",
+    "verbose": {
+      "badge": "Muy activo",
+      "details": "{{count}} estados guardados en {{hours}} h ({{features}})",
+      "detailsWithoutFeatures": "{{count}} estados guardados en {{hours}} h",
+      "summary": {
+        "one": "1 dispositivo muy activo representa el {{percent}} % de los estados guardados en el historial en las últimas {{hours}} horas.",
+        "other": "{{count}} dispositivos muy activos representan el {{percent}} % de los estados guardados en el historial en las últimas {{hours}} horas."
+      },
+      "explanation": "Un dispositivo se señala cuando una de sus funciones guarda al menos {{threshold}} estados en {{hours}} horas. Si no necesita este historial, desactívelo desde la página del dispositivo para aligerar la base de datos.",
+      "showOnlyVerbose": "Mostrar solo estos dispositivos",
+      "showAll": "Mostrar todos los dispositivos"
+    },
     "emptyState": "No se encontró ningún dispositivo. Agregue dispositivos desde la página de integraciones o ajuste su búsqueda y filtros.",
     "emptyStateButton": "Explorar integraciones",
     "error": "Ocurrió un error al cargar los dispositivos. Inténtelo de nuevo más tarde.",

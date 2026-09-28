@@ -109,6 +109,19 @@
     "room": "Pièce",
     "integration": "Intégration",
     "features": "Fonctionnalités",
+    "orderByStatesDesc": "Les plus bavards d'abord",
+    "verbose": {
+      "badge": "Très bavard",
+      "details": "{{count}} états enregistrés en {{hours}} h ({{features}})",
+      "detailsWithoutFeatures": "{{count}} états enregistrés en {{hours}} h",
+      "summary": {
+        "one": "1 appareil très bavard représente {{percent}} % des états enregistrés dans l'historique ces dernières {{hours}} heures.",
+        "other": "{{count}} appareils très bavards représentent {{percent}} % des états enregistrés dans l'historique ces dernières {{hours}} heures."
+      },
+      "explanation": "Un appareil est signalé quand l'une de ses fonctionnalités enregistre au moins {{threshold}} états en {{hours}} heures. Si cet historique ne vous sert pas, désactivez-le depuis la page de l'appareil pour alléger la base de données.",
+      "showOnlyVerbose": "Afficher uniquement ces appareils",
+      "showAll": "Afficher tous les appareils"
+    },
     "emptyState": "Aucun appareil trouvé. Ajoutez des appareils depuis la page des intégrations, ou modifiez votre recherche et vos filtres.",
     "emptyStateButton": "Parcourir les intégrations",
     "error": "Une erreur est survenue lors du chargement des appareils. Veuillez réessayer plus tard.",
