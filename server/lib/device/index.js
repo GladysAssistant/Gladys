@@ -110,10 +110,11 @@ const DeviceManager = function DeviceManager(
   this.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 100;
   this.DUCKDB_STATES_MIGRATE_MAX_PAUSE_IN_MS = 5000;
   // The size of the history of each feature, shown on the device pages, needs a full
-  // scan of the history: its result is kept this long, and dropped on a purge.
+  // scan of the history: its result is kept this long, and corrected on a purge.
   this.FEATURES_STATES_SIZE_CACHE_DURATION_IN_MS = 60 * 60 * 1000;
   this.featuresStatesSizeCache = null;
   this.featuresStatesSizeInFlight = null;
+  this.featuresStatesSizeGeneration = 0;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);

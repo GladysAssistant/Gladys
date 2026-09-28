@@ -22,6 +22,11 @@ const getDeviceStatesSize = (httpClient, deviceSelector) => {
   return requestsByDeviceSelector.get(deviceSelector);
 };
 
+// The lists of features have no keys, so the same instance can end up showing
+// another feature, or the same one once saved (it then gets its selector).
+const getIdentity = ({ device, feature }) =>
+  [device && device.id, device && device.selector, feature.id, feature.selector].join('|');
+
 // How much history a feature holds, shown next to the "keep history" switch
 // that controls it, so the user can tell which features are worth keeping.
 // It is only an information: while it loads, or when it cannot be loaded,
@@ -30,11 +35,16 @@ class FeatureHistorySize extends Component {
   getStatesSize = async () => {
     const { device, feature } = this.props;
     // a device or a feature that is not saved yet has no history
-    if (!device || !device.id || !device.selector || !feature.id) {
+    if (!device || !device.id || !device.selector || !feature.id || !feature.selector) {
       return;
     }
+    const identity = getIdentity(this.props);
     try {
       const deviceStatesSize = await getDeviceStatesSize(this.props.httpClient, device.selector);
+      // an answer for a feature this instance no longer shows is dropped
+      if (getIdentity(this.props) !== identity) {
+        return;
+      }
       const statesSize = deviceStatesSize.features.find(
         featureStatesSize => featureStatesSize.device_feature_selector === feature.selector
       );
@@ -46,6 +56,13 @@ class FeatureHistorySize extends Component {
 
   componentDidMount() {
     this.getStatesSize();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (getIdentity(prevProps) !== getIdentity(this.props)) {
+      this.setState({ statesSize: null });
+      this.getStatesSize();
+    }
   }
 
   render(props, { statesSize }) {

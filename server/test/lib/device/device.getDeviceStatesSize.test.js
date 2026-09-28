@@ -153,15 +153,40 @@ describe('Device.getDeviceStatesSize', function Describe() {
     });
   });
 
-  it('should not show the purged states of a feature', async () => {
+  it('should not show the purged states of a feature, without counting everything again', async () => {
     await db.duckDbBatchInsertState(POWER_FEATURE_ID, buildStates(5));
+    await db.duckDbBatchInsertState(SENSOR_FEATURE_ID, buildStates(3));
     const device = buildDevice();
     device.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 1;
     expect((await device.getDeviceStatesSize('plug')).features[0].states).to.equal(5);
 
     await device.purgeStatesByFeatureId(POWER_FEATURE_ID);
+    // a feature without any state leaves the counts as they are
+    await device.purgeStatesByFeatureId(SWITCH_FEATURE_ID);
 
-    expect(device.featuresStatesSizeCache).to.equal(null);
+    const countSpy = sinon.spy(db, 'duckDbReadConnectionAllAsync');
     expect((await device.getDeviceStatesSize('plug')).features[0].states).to.equal(0);
+    expect((await device.getDeviceStatesSize('sensor')).features[0].states).to.equal(3);
+    expect(device.featuresStatesSizeCache.counts.totalStates).to.equal(3);
+    sinon.assert.notCalled(countSpy);
+  });
+
+  it('should answer with a count a purge overtook, without keeping it in cache', async () => {
+    const device = buildDevice();
+    const queryStub = sinon.stub(db, 'duckDbReadConnectionAllAsync');
+    queryStub.onCall(0).callsFake(async () => {
+      // a purge ends while the states are being counted
+      device.featuresStatesSizeGeneration += 1;
+      return [{ device_feature_id: POWER_FEATURE_ID, states: 6n }];
+    });
+    queryStub.onCall(1).resolves([{ used_bytes: 600n }]);
+
+    const statesSize = await device.getDeviceStatesSize('plug');
+    expect(statesSize.features[0]).to.deep.equal({
+      device_feature_selector: 'plug-power',
+      states: 6,
+      estimated_size_in_bytes: 600,
+    });
+    expect(device.featuresStatesSizeCache).to.equal(null);
   });
 });
