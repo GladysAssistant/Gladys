@@ -1164,6 +1164,7 @@
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
         "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
         "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant).",
+        "calendarInfoText": "Cette intégration est un fournisseur de calendriers : une fois installée, elle créera des calendriers et des événements dans Gladys pour les utilisateurs qui l'activent avec leur propre compte.",
         "widgetsTitle": "Widgets de tableau de bord",
         "widgetsText": "Cette intégration fournit les widgets suivants, disponibles pour tous les utilisateurs dans l'éditeur de tableau de bord :",
         "providerInfoText": "Cette intégration ne gère aucun appareil : elle fournit des widgets de tableau de bord. Configurez-la ici, puis ajoutez ses widgets depuis l'éditeur de tableau de bord.",

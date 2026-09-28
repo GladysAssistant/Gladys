@@ -56,7 +56,7 @@ class ExternalIntegrationConfigPage extends Component {
         }
       }
       if (get(integration, 'manifest.type') === 'calendar') {
-        // the per-user "My calendars" block (B.19)
+        // the per-user "My calendars" block of a calendar integration
         await this.loadCalendarAccount();
       }
       if (isAdmin) {

@@ -1164,6 +1164,7 @@
         "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
         "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
         "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant).",
+        "calendarInfoText": "This integration is a calendar provider: once installed, it will create calendars and events in Gladys for the users who enable it with their own account.",
         "widgetsTitle": "Dashboard widgets",
         "widgetsText": "This integration provides the following widgets, available to every user in the dashboard editor:",
         "providerInfoText": "This integration manages no device: it provides dashboard widgets. Configure it here, then add its widgets from the dashboard editor.",

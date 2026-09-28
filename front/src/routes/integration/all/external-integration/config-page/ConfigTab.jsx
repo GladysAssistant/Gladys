@@ -32,7 +32,7 @@ const ConfigTab = props => {
   // notification channels expose the per-user "My account" block instead
   const isReceivingChannel = isCommunication && get(integration, 'manifest.messaging.receive') !== false;
   const contactSchema = get(integration, 'manifest.contact_schema') || [];
-  // calendar integrations (B.19): the per-user "My calendars" block, for
+  // calendar integrations: the per-user "My calendars" block, for
   // every user — enable/disable, account values, sync/shared toggles
   const isCalendar = get(integration, 'manifest.type') === 'calendar';
   const accountSchema = get(integration, 'manifest.account_schema') || [];

@@ -1164,6 +1164,7 @@
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
         "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "calendarInfoText": "Diese Integration ist ein Kalenderanbieter: Nach der Installation erstellt sie Kalender und Termine in Gladys für die Benutzer, die sie mit ihrem eigenen Konto aktivieren.",
         "widgetsTitle": "Dashboard-Widgets",
         "widgetsText": "Diese Integration stellt die folgenden Widgets bereit, die allen Benutzern im Dashboard-Editor zur Verfügung stehen:",
         "providerInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Dashboard-Widgets bereit. Konfigurieren Sie sie hier und fügen Sie ihre Widgets dann im Dashboard-Editor hinzu.",

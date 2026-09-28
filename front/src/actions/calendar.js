@@ -20,7 +20,9 @@ function createActions(store) {
           return {
             title: event.name,
             start: new Date(event.start),
-            end: new Date(event.end),
+            // `end` is optional (an external calendar integration may push
+            // point-in-time events): new Date(null) would render in 1970
+            end: new Date(event.end || event.start),
             allDay: event.full_day,
             color: (calendar && calendar.color) || null
           };

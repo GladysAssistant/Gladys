@@ -1,10 +1,10 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import { ConfigField } from './ConfigSchemaForm';
+import { ConfigField } from '../../../../../components/integration/ConfigSchemaForm';
 import { RequestStatus } from '../../../../../utils/consts';
 
-// The per-user block of a calendar integration (spec B.19): every user — not
+// The per-user block of a calendar integration (spec: external-integrations/capabilities/calendar-type.md): every user — not
 // only the admin — enables the integration for themselves, fills their own
 // account values (account_schema), then manages their calendars with the
 // sync/shared toggles. Disabling destroys their calendars, hence the
