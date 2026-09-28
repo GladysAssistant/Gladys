@@ -386,7 +386,11 @@ function createActions(store) {
           thermostatEditTpiProportionalBand: '2',
           thermostatEditRoomId: '',
           thermostatEditManualDuration: '30',
-          thermostatEditManualExpiry: 'fixed'
+          // The spec's default on a scheduled thermostat (F): a temperature set
+          // in the afternoon holds until the evening point rather than lapsing
+          // after an arbitrary half hour, which is the Tado and Netatmo
+          // behaviour. Without a schedule the hold is permanent either way.
+          thermostatEditManualExpiry: 'next-transition'
         });
         route('/dashboard/integration/device/thermostat');
       } catch (e) {

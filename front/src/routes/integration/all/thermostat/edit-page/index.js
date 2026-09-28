@@ -40,7 +40,7 @@ class ThermostatEditPage extends Component {
     this.props.updateThermostatField('thermostatEditTpiProportionalBand', '2');
     this.props.updateThermostatField('thermostatEditRoomId', '');
     this.props.updateThermostatField('thermostatEditManualDuration', '30');
-    this.props.updateThermostatField('thermostatEditManualExpiry', 'fixed');
+    this.props.updateThermostatField('thermostatEditManualExpiry', 'next-transition');
     this.props.updateThermostatField('thermostatCreateStatus', null);
     this.props.updateThermostatField('thermostatEditError', null);
   }

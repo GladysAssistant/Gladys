@@ -16,6 +16,18 @@ const FeatureSelect = ({ value, features, onChange, emptyLabel }) => (
   </select>
 );
 
+// Rendered by the Save button rather than at the top of the form: it answers a
+// press on that button, and the form runs to several screens — at the top it was
+// out of sight of the thing that caused it.
+const SaveError = ({ status, reason }) =>
+  status === RequestStatus.Error && (
+    <div class="alert alert-danger">
+      {reason === 'incompleteVirtual' && <Text id="integration.thermostat.edit.incompleteVirtualError" />}
+      {reason === 'incompleteExternal' && <Text id="integration.thermostat.edit.incompleteExternalError" />}
+      {!reason && <Text id="integration.thermostat.edit.saveError" />}
+    </div>
+  );
+
 const EditForm = ({ ...props }) => {
   const saving = props.thermostatCreateStatus === RequestStatus.Getting;
   const isEdit = !!(props.thermostatEditDevice && props.thermostatEditDevice.selector);
@@ -71,18 +83,6 @@ const EditForm = ({ ...props }) => {
         <div class={cx('dimmer', { active: saving })}>
           <div class="loader" />
           <div class="dimmer-content">
-            {props.thermostatCreateStatus === RequestStatus.Error && (
-              <div class="alert alert-danger">
-                {props.thermostatEditError === 'incompleteVirtual' && (
-                  <Text id="integration.thermostat.edit.incompleteVirtualError" />
-                )}
-                {props.thermostatEditError === 'incompleteExternal' && (
-                  <Text id="integration.thermostat.edit.incompleteExternalError" />
-                )}
-                {!props.thermostatEditError && <Text id="integration.thermostat.edit.saveError" />}
-              </div>
-            )}
-
             {/* Nom */}
             <div class="form-group">
               <label class="form-label">
@@ -150,6 +150,15 @@ const EditForm = ({ ...props }) => {
             {/* Thermostat réel piloté */}
             {isExternalThermostat && (
               <div>
+                {/* Promised by the spec (G) and owed to the user: while the
+                    appliance keeps its own programme, that programme and Gladys
+                    both write the setpoint, and the thermostat follows whichever
+                    wrote last. First thing in this section, before the setpoint
+                    it is about to drive. */}
+                <div class="alert alert-warning">
+                  <Text id="integration.thermostat.edit.vendorProgrammeWarning" />
+                </div>
+
                 <div class="form-group">
                   <label class="form-label">
                     <Text id="integration.thermostat.edit.targetFeatureLabel" />
@@ -676,6 +685,8 @@ const EditForm = ({ ...props }) => {
                 </small>
               </div>
             )}
+
+            <SaveError status={props.thermostatCreateStatus} reason={props.thermostatEditError} />
 
             <div class="row mt-2">
               <div class="col">
