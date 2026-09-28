@@ -54,7 +54,7 @@ const modeFeature = {
   last_value: THERMOSTAT_MODE.HEATING,
 };
 
-const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF, targetUnit = undefined) => {
+const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF, targetUnit = undefined, timezone = null) => {
   const { setValue } = load(follows);
   return {
     gladys: {
@@ -86,6 +86,8 @@ const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF, targetUn
         }),
       },
       event: { emit: fake.returns(null) },
+      // The Gladys timezone, which a schedule's wall-clock points are read in.
+      variable: { getValue: fake.resolves(timezone) },
     },
     serviceId: 'service-id',
     // The real handler always creates this map in its constructor.
@@ -160,6 +162,34 @@ describe('thermostat.setValue', () => {
       await handler.setValue(device(), setpointFeature, 21.5);
 
       assert.calledOnce(handler.triggerApplySchedules);
+    });
+
+    it('should find the next point in the Gladys timezone, not the process one', async () => {
+      // The process runs in UTC in the official image, while a schedule's points
+      // are wall-clock times in the house (C.1). Monday 2024-01-01 05:00 UTC is
+      // 06:00 in Paris, so the 06:30 point is half an hour away — read in UTC it
+      // would look like an hour and a half, and the hold would outlast it.
+      const mondayAt5Utc = Date.UTC(2024, 0, 1, 5, 0, 0);
+      sinon.useFakeTimers(mondayAt5Utc);
+      const handler = buildHandler(true, THERMOSTAT_MODE.OFF, undefined, 'Europe/Paris');
+
+      await handler.setValue(device(), setpointFeature, 20);
+
+      const until = Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2]);
+      expect(until).to.equal(mondayAt5Utc + 30 * 60 * 1000);
+    });
+
+    it('should fall back on the default timezone when none is configured', async () => {
+      // Same instant, no timezone variable: the shared Europe/Paris default
+      // applies rather than whatever the process runs in.
+      const mondayAt5Utc = Date.UTC(2024, 0, 1, 5, 0, 0);
+      sinon.useFakeTimers(mondayAt5Utc);
+      const handler = buildHandler();
+
+      await handler.setValue(device(), setpointFeature, 20);
+
+      const until = Number(paramCall(handler, 'THERMOSTAT_MANUAL_UNTIL').args[2]);
+      expect(until).to.equal(mondayAt5Utc + 30 * 60 * 1000);
     });
 
     it('should hold for the duration configured on the device', async () => {

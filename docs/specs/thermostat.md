@@ -350,7 +350,9 @@ A `PATCH` on a schedule, or a thermostat newly attached to one, triggers a regul
 
 Because a transition point has a known successor, a manual hold can offer **"until the next transition"** alongside the fixed `THERMOSTAT_MANUAL_DURATION`. That is the Tado and Netatmo default, and `next` (E.5) gives the widget the timestamp for free.
 
-**The choice is stored as the absence of the param**, not as a second one: `THERMOSTAT_MANUAL_DURATION` set asks for that fixed duration, and unset asks for the next transition. So `manual_duration` is `null` on a device that does not set it — the config must carry the absence through rather than filling in the default, or the next-transition branch becomes unreachable — and the callers that need a number apply `DEFAULT_MANUAL_DURATION_MINUTES` themselves. The edit form offers the two as a choice and omits the param on the second.
+**The choice is stored as the absence of the param**, not as a second one: `THERMOSTAT_MANUAL_DURATION` set asks for that fixed duration, and unset asks for the next transition. So `manual_duration` is `null` on a device that does not set it — the config must carry the absence through rather than filling in the default, or the next-transition branch becomes unreachable — and the callers that need a number apply `DEFAULT_MANUAL_DURATION_MINUTES` themselves. The edit form offers the two as a choice, defaults to the next transition, and omits the param on it.
+
+**Resolving that next point is subject to C.1 like every other read of the week**: the points are wall-clock times in the house, so `holdExpiry` reads them in the Gladys timezone rather than the one the process runs in — UTC in the official image. Reading them in the process timezone armed the expiry on the wrong point, an hour or two off, or on the other side of midnight.
 
 ### E.4 API
 

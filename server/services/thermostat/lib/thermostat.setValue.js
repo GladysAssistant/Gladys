@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { DEVICE_FEATURE_TYPES, THERMOSTAT_MODE } = require('../../../utils/constants');
+const { DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES, THERMOSTAT_MODE } = require('../../../utils/constants');
 const { DEFAULT_MANUAL_DURATION_MINUTES } = require('../../../utils/thermostatConstants');
 const { buildParamsConfig, toNumber, isExternal, getFeatureBySelector } = require('./thermostat.deviceConfig');
 const {
@@ -8,6 +8,7 @@ const {
   stopExternalThermostat,
   getSetpointForPreset,
   convertSetpointToFeatureUnit,
+  DEFAULT_TIMEZONE,
 } = require('./thermostat.applySchedules');
 const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
@@ -114,7 +115,7 @@ async function writeSetpoint(device, deviceFeature, value) {
  * @param {object} device - The thermostat device.
  * @returns {Promise<number|null>} The expiry timestamp, or null.
  * @example
- * await holdExpiry(device);
+ * await holdExpiry.call(this, device);
  */
 async function holdExpiry(device) {
   const link = await getScheduleOfDevice(device.id);
@@ -126,7 +127,14 @@ async function holdExpiry(device) {
   if (configuredDuration !== null) {
     return Date.now() + configuredDuration * 60 * 1000;
   }
-  const nextTransition = nextTransitionTimestamp(link.transitions);
+  // A schedule's points are wall-clock times in the house (C.1), so the next one
+  // has to be found in the Gladys timezone — not in the one the process happens
+  // to run in, which is UTC in the official image. Reading them there put the
+  // expiry two hours off in Paris, and on the wrong point entirely across
+  // midnight.
+  const timezone =
+    (await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE).catch(() => null)) || DEFAULT_TIMEZONE;
+  const nextTransition = nextTransitionTimestamp(link.transitions, new Date(), timezone);
   if (nextTransition !== null) {
     return nextTransition;
   }
@@ -176,7 +184,7 @@ async function setValue(device, deviceFeature, value, manual = true) {
         this,
         device,
         await presetHoldSetpoint.call(this, config, name),
-        await holdExpiry(device),
+        await holdExpiry.call(this, device),
       );
     }
     logger.info(`Thermostat: preset ${name} set on ${device.selector}`);
@@ -211,7 +219,7 @@ async function setValue(device, deviceFeature, value, manual = true) {
     return;
   }
 
-  const until = await holdExpiry(device);
+  const until = await holdExpiry.call(this, device);
   await setManualHold.call(this, device, value, until);
 
   logger.info(

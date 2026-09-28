@@ -850,6 +850,7 @@ async function applySchedules() {
 
 module.exports = {
   applySchedules,
+  DEFAULT_TIMEZONE,
   getThermostatFeature,
   writeExternalSetpoint,
   convertSetpointToFeatureUnit,

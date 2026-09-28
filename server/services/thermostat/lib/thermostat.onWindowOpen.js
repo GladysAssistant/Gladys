@@ -147,7 +147,7 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     // that was in AUTO, OFF or its own vendor programme into heating or cooling.
     // The value is stored in the feature's own unit, which is what a hold on an
     // external thermostat is stored in (C.3).
-    await setManualHold.call(this, device, newValue, await holdExpiry(device));
+    await setManualHold.call(this, device, newValue, await holdExpiry.call(this, device));
   } catch (e) {
     logger.warn(`Thermostat: could not hold an external setpoint change: ${e.message}`);
   }
