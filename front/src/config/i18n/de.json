@@ -3369,7 +3369,7 @@
         "nameLabel": "Name",
         "namePlaceholder": "z.B. Wohnzimmer Thermostat",
         "roomLabel": "Raum",
-        "modeLabel": "Modus",
+        "modeLabel": "Verwendung",
         "typeLabel": "Thermostattyp",
         "tuningSection": "Feineinstellung",
         "typeVirtual": "Virtuelles Thermostat (Gladys regelt)",
@@ -3459,7 +3459,11 @@
         "manualExpiryHelp": "„Beim nächsten Zeitfenster“ übergibt den Thermostat beim nächsten Wechsel des Zeitfensters wieder an seinen Zeitplan, so wie Tado und Netatmo es tun. Ohne Zeitplan bleibt der manuelle Modus aktiv, bis Sie ihn abbrechen.",
         "manualDurationLabel": "Dauer des manuellen Modus",
         "manualDurationUnit": "Min.",
-        "manualDurationHelp": "Dauer in Minuten, bis nach einer manuellen Aktion automatisch zum Zeitplan zurückgekehrt wird (Standard: 30 Min.)."
+        "manualDurationHelp": "Dauer in Minuten, bis nach einer manuellen Aktion automatisch zum Zeitplan zurückgekehrt wird.",
+        "modeHelp": "Was dieses Thermostat steuert: Heizung oder Kühlung.",
+        "sectionDevice": "Gerät",
+        "sectionHeating": "Heizung",
+        "sectionProgramming": "Programmierung"
       },
       "schedule": {
         "title": "Zeitpläne",
@@ -3518,7 +3522,7 @@
         },
         "noSlots": "Noch keine Zeitfenster. Klicke auf \"Zeitfenster hinzufügen\", um zu beginnen.",
         "followedBy": "Befolgt von",
-        "weekLabel": "Woche",
+        "weekLabel": "Wochenüberblick",
         "emptyScheduleWarning": "Dieser Zeitplan hat kein Zeitfenster und steuert daher nichts. Die Thermostate, die ihm folgen, bleiben auf ihrem aktuellen Preset.",
         "emptySaveWarning": "Dieser Zeitplan hat kein Zeitfenster: Er steuert nichts, und die Thermostate, die ihm folgen, bleiben auf ihrem aktuellen Preset.",
         "saveEmptyButton": "Trotzdem speichern",
@@ -3533,10 +3537,12 @@
         "houseLabel": "Haus",
         "carriedSince": "seit",
         "overlapError": "Dieser Zeitraum überschneidet sich mit einem anderen am selben Tag. Ein Thermostat folgt nur einer Voreinstellung: Passen Sie die Zeiten an oder bearbeiten Sie den vorhandenen Zeitraum.",
-        "stoppedLegend": "Außerhalb dieser Zeiträume ist das Thermostat ausgeschaltet.",
         "houseLockedByDevices": "Ein Zeitplan wechselt nur das Haus, solange ihm kein Thermostat folgt. Befolgt von:",
         "searchPlaceHolder": "Zeitplan suchen",
-        "noSearchResult": "Kein Zeitplan entspricht dieser Suche."
+        "noSearchResult": "Kein Zeitplan entspricht dieser Suche.",
+        "uncoveredLegend": "Außerhalb dieser Zeiträume behält das Thermostat das Preset des letzten Zeitfensters, bis zum nächsten.",
+        "editorTitleEdit": "Zeitplan bearbeiten",
+        "editorTitleNew": "Neuer Zeitplan"
       }
     }
   },

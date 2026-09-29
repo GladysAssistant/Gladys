@@ -3,7 +3,12 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import style from './style.css';
 import PRESET_COLORS from '../../../../../utils/thermostatPresetColors';
-import { timeToMinutes, minutesToTime, DAY_MINUTES } from '../../../../../../../server/utils/thermostatSchedule';
+import {
+  timeToMinutes,
+  minutesToTime,
+  carriedPresetByDay,
+  DAY_MINUTES
+} from '../../../../../../../server/utils/thermostatSchedule';
 // The schedule is stored as transition points — one row for a night, with no gap
 // and no overlap representable. It is edited as ranges, because that is how a
 // heating programme is thought about. The conversion lives here, at the two
@@ -166,10 +171,38 @@ class ScheduleEditor extends Component {
   // ── Adding a point ────────────────────────────────────────────────────────
 
   openNewForm = day => {
-    const existing = this.dayRanges(this.state.ranges, day);
-    // Start where the day's last range ends, so ranges chain rather than overlap.
-    const last = existing[existing.length - 1];
-    const startMins = last ? Math.min(timeToMinutes(last.end_time), DAY_MINUTES - 60) : 6 * 60;
+    // The first free stretch of the day, not the end of its last range: the last
+    // range of a full day is usually the night, whose end_time is the *next*
+    // morning (17:00 → 06:30). Reading it as a start proposed 06:30 → 09:30 on a
+    // day already covered from 06:30, so the form opened on a range the editor
+    // then refused as an overlap.
+    const occupied = this.dayRanges(this.state.ranges, day).map(range => {
+      const start = timeToMinutes(range.start_time);
+      const rawEnd = timeToMinutes(range.end_time);
+      // A range crossing midnight occupies this day to its very end; what it
+      // takes of the next morning belongs to that day's own gaps.
+      return { start, end: rawEnd <= start ? DAY_MINUTES : rawEnd };
+    });
+    // Plus what a range started on an earlier day still holds this morning.
+    const carried = carriedPresetByDay(rangesToTransitions(this.state.ranges))[day];
+    if (carried && carried.until > 0) {
+      occupied.push({ start: 0, end: carried.until });
+    }
+    occupied.sort((a, b) => a.start - b.start);
+    // Walk the day and stop at the first hole wide enough to hold a range.
+    const MIN_GAP = 30;
+    let startMins = 0;
+    for (let i = 0; i < occupied.length; i += 1) {
+      if (occupied[i].start - startMins >= MIN_GAP) {
+        break;
+      }
+      startMins = Math.max(startMins, occupied[i].end);
+    }
+    // A day with no hole left: fall back on 06:00, which the overlap check then
+    // refuses with its own message rather than the form opening on a lie.
+    if (startMins >= DAY_MINUTES) {
+      startMins = 6 * 60;
+    }
     const endMins = Math.min(startMins + 3 * 60, DAY_MINUTES);
     this.setState(prev => ({
       newForms: {
@@ -424,14 +457,24 @@ class ScheduleEditor extends Component {
   };
 
   // Text equivalent of the coloured bar, for a collapsed day.
-  describeDay = (dayRanges, dictionary) => {
+  describeDay = (dayRanges, dictionary, carriedInto) => {
+    const presetLabel = preset => (dictionary && dictionary.presets && dictionary.presets[preset]) || preset;
+    // A day with no range of its own is not a day the thermostat is stopped: it
+    // keeps the preset the last point set, whichever day that was. Announcing
+    // "Off" to a screen reader said the opposite of what the heating does.
+    const carried = carriedInto
+      ? `${presetLabel(carriedInto.preset)} ${(dictionary && dictionary.carriedSince) || ''} ${(dictionary &&
+          dictionary.daysShort &&
+          dictionary.daysShort[carriedInto.day]) ||
+          ''}`.trim()
+      : '';
     if (dayRanges.length === 0) {
-      // Not "nothing": a day with no range is a day the thermostat is stopped.
-      return (dictionary && dictionary.presets && dictionary.presets.off) || '';
+      // Nothing carried either: the schedule has no point at all, and a
+      // thermostat following it keeps whatever preset it is on.
+      return carried || (dictionary && dictionary.noSlots) || '';
     }
-    return dayRanges
-      .map(r => `${r.start_time} - ${r.end_time} ${(dictionary.presets && dictionary.presets[r.preset]) || r.preset}`)
-      .join(', ');
+    const ownRanges = dayRanges.map(r => `${r.start_time} - ${r.end_time} ${presetLabel(r.preset)}`).join(', ');
+    return carried ? `${carried}, ${ownRanges}` : ownRanges;
   };
 
   // The bar draws the day's ranges where they fall and leaves the rest blank: a
@@ -554,317 +597,350 @@ class ScheduleEditor extends Component {
     // What the select still has to offer: the badges hold the rest.
     const available = thermostatsOfHouse.filter(device => !this.state.followers.includes(device.selector));
 
-    // A range crossing midnight runs into the next morning, so that morning has
-    // to be told about it: the week wraps, and Sunday night reaches Monday.
-    const carriedByDay = {};
-    DAYS.forEach(day => {
-      const previousDay = (day + 6) % 7;
-      const overnight = this.dayRanges(ranges, previousDay).find(
-        range => timeToMinutes(range.end_time) <= timeToMinutes(range.start_time)
-      );
-      carriedByDay[day] = overnight
-        ? { preset: overnight.preset, until: timeToMinutes(overnight.end_time), day: previousDay }
-        : null;
-    });
+    // A day with no point of its own keeps what the last point before it set,
+    // and that point may be several days back — a schedule with a single
+    // Saturday point holds its preset all week. The server answers this from the
+    // transitions, so the same helper answers it here rather than a second
+    // reading of the ranges that could only see as far as yesterday.
+    const carriedByDay = carriedPresetByDay(rangesToTransitions(ranges));
+    // In the order the bars are read, not the order the ranges were entered.
+    const usedPresets = PRESETS.filter(preset => ranges.some(range => range.preset === preset));
 
     return (
-      <div class={style.scheduleEditor}>
-        <div class="form-group">
-          <label class="form-label">
-            <Text id="integration.thermostat.schedule.nameLabel" />
-          </label>
-          <input type="text" class="form-control" value={name} onChange={this.updateName} />
+      // In a card with a title, like every other page of this integration: the
+      // editor opened as a bare form in the middle of the page, with nothing
+      // saying which schedule was being edited.
+      <div class="card">
+        <div class="card-header">
+          <h1 class="card-title">
+            <Text
+              id={
+                schedule && schedule.selector
+                  ? 'integration.thermostat.schedule.editorTitleEdit'
+                  : 'integration.thermostat.schedule.editorTitleNew'
+              }
+            />
+          </h1>
         </div>
+        <div class={cx('card-body', style.scheduleEditor)}>
+          <div class="form-group">
+            <label class="form-label">
+              <Text id="integration.thermostat.schedule.nameLabel" />
+            </label>
+            <input type="text" class="form-control" value={name} onChange={this.updateName} />
+          </div>
 
-        {/* A schedule belongs to a house. It moves freely while nothing follows
+          {/* A schedule belongs to a house. It moves freely while nothing follows
             it; once a thermostat does, moving it would leave that thermostat
             following a programme from another house — which is what tying a
             schedule to a house prevents. With a single house, nothing to ask. */}
-        {(houses || []).length > 1 && (
-          <div class="form-group">
-            <label class="form-label">
-              <Text id="integration.thermostat.schedule.houseLabel" />
-            </label>
-            <select
-              class="form-control"
-              value={house || ''}
-              onChange={this.updateHouse}
-              disabled={followers.length > 0}
-            >
-              {(houses || []).map(candidate => (
-                <option key={candidate.selector} value={candidate.selector}>
-                  {candidate.name}
-                </option>
-              ))}
-            </select>
-            {followers.length > 0 && (
-              <small class="form-text text-muted">
-                <Text id="integration.thermostat.schedule.houseLockedByDevices" />{' '}
-                {followers.map(device => device.name).join(', ')}
-              </small>
-            )}
-          </div>
-        )}
-
-        {/* Which thermostats follow this programme, chosen while it is written
-            rather than from the list afterwards. Only the ones of its house: the
-            server refuses the rest (DEVICE_NOT_IN_HOUSE), so a thermostat with no
-            room — which is in no house — is in none of these lists. */}
-        {thermostatsOfHouse.length > 0 && (
-          <div class="form-group">
-            <label class="form-label">
-              <Text id="integration.thermostat.schedule.followersLabel" />
-            </label>
-            {/* Chosen one at a time and shown as badges, the way the schedule
-                list does it: a schedule can be followed by several thermostats,
-                so the select adds rather than replaces, and each badge carries
-                the cross that takes one back out. */}
-            {this.state.followers.length > 0 && (
-              <div class={style.followerList}>
-                {this.state.followers.map(selector => {
-                  const device = thermostatsOfHouse.find(candidate => candidate.selector === selector);
-                  return (
-                    <span key={selector} class={`badge badge-secondary ${style.followerBadge}`}>
-                      {device ? device.name : selector}
-                      <button
-                        type="button"
-                        class={style.followerDetach}
-                        onClick={() => this.toggleFollower(selector)}
-                        title={dictionary.detachButton || ''}
-                      >
-                        <i class="fe fe-x" />
-                      </button>
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-            {available.length > 0 && (
-              <select class="form-control" value="" onChange={this.addFollower}>
-                <option value="">{dictionary.attachPlaceholder || ''}</option>
-                {available.map(device => (
-                  <option key={device.selector} value={device.selector}>
-                    {device.name}
+          {(houses || []).length > 1 && (
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.thermostat.schedule.houseLabel" />
+              </label>
+              <select
+                class="form-control"
+                value={house || ''}
+                onChange={this.updateHouse}
+                disabled={followers.length > 0}
+              >
+                {(houses || []).map(candidate => (
+                  <option key={candidate.selector} value={candidate.selector}>
+                    {candidate.name}
                   </option>
                 ))}
               </select>
-            )}
-            <small class="form-text text-muted">
-              <Text id="integration.thermostat.schedule.followersHelp" />
-            </small>
-          </div>
-        )}
+              {followers.length > 0 && (
+                <small class="form-text text-muted">
+                  <Text id="integration.thermostat.schedule.houseLockedByDevices" />{' '}
+                  {followers.map(device => device.name).join(', ')}
+                </small>
+              )}
+            </div>
+          )}
 
-        <div class={style.dayList}>
-          {DAYS.map(day => {
-            const dayPoints = this.dayRanges(ranges, day);
-            const isOpen = selectedDay === day;
-            const newForm = newForms[day];
+          {/* Which thermostats follow this programme, chosen while it is written
+            rather than from the list afterwards. Only the ones of its house: the
+            server refuses the rest (DEVICE_NOT_IN_HOUSE), so a thermostat with no
+            room — which is in no house — is in none of these lists. */}
+          {thermostatsOfHouse.length > 0 && (
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.thermostat.schedule.followersLabel" />
+              </label>
+              {/* Chosen one at a time and shown as badges, the way the schedule
+                list does it: a schedule can be followed by several thermostats,
+                so the select adds rather than replaces, and each badge carries
+                the cross that takes one back out. */}
+              {this.state.followers.length > 0 && (
+                <div class={style.followerList}>
+                  {this.state.followers.map(selector => {
+                    const device = thermostatsOfHouse.find(candidate => candidate.selector === selector);
+                    return (
+                      <span key={selector} class={`badge ${style.followerBadge}`}>
+                        {device ? device.name : selector}
+                        <button
+                          type="button"
+                          class={style.followerDetach}
+                          onClick={() => this.toggleFollower(selector)}
+                          title={dictionary.detachButton || ''}
+                        >
+                          <i class="fe fe-x" />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+              {available.length > 0 && (
+                <select class="form-control" value="" onChange={this.addFollower}>
+                  <option value="">{dictionary.attachPlaceholder || ''}</option>
+                  {available.map(device => (
+                    <option key={device.selector} value={device.selector}>
+                      {device.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <small class="form-text text-muted">
+                <Text id="integration.thermostat.schedule.followersHelp" />
+              </small>
+            </div>
+          )}
 
-            return (
-              <div key={day} class={cx(style.dayRow, { [style.dayRowOpen]: isOpen })}>
-                <div
-                  class={style.dayClickZone}
-                  onClick={() => this.selectDay(day)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      this.selectDay(day);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  aria-expanded={isOpen}
-                >
-                  <div class={style.dayRowHeader}>
-                    <span class={style.dayLabel}>
-                      <Text id={`integration.thermostat.schedule.days.${day}`} />
-                    </span>
-                    <i class={`fe fe-chevron-${isOpen ? 'up' : 'down'} ${style.dayChevron}`} aria-hidden="true" />
-                  </div>
-                  {/* The bar is colour only, so it is summarised in words for
+          <div class={style.dayList}>
+            {DAYS.map(day => {
+              const dayPoints = this.dayRanges(ranges, day);
+              const isOpen = selectedDay === day;
+              const newForm = newForms[day];
+
+              return (
+                <div key={day} class={cx(style.dayRow, { [style.dayRowOpen]: isOpen })}>
+                  <div
+                    class={style.dayClickZone}
+                    onClick={() => this.selectDay(day)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.selectDay(day);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={isOpen}
+                  >
+                    <div class={style.dayRowHeader}>
+                      <span class={style.dayLabel}>
+                        <Text id={`integration.thermostat.schedule.days.${day}`} />
+                      </span>
+                      <i class={`fe fe-chevron-${isOpen ? 'up' : 'down'} ${style.dayChevron}`} aria-hidden="true" />
+                    </div>
+                    {/* The bar is colour only, so it is summarised in words for
                       anyone who cannot see it. */}
-                  <span class="sr-only">{this.describeDay(dayPoints, dictionary)}</span>
-                  {this.renderTimeBar(dayPoints, carriedByDay[day])}
-                  {/* A day with no point of its own is not empty: it keeps what
-                      the last point before it set, which may be days earlier.
-                      Saying so is what stops a whole blue week looking like a
-                      bug. */}
-                  {carriedByDay[day] && (
-                    <div class={style.carriedFrom}>
-                      <i class="fe fe-corner-down-right mr-1" />
-                      {(dictionary.presets && dictionary.presets[carriedByDay[day].preset]) || carriedByDay[day].preset}
-                      {' · '}
-                      <Text id="integration.thermostat.schedule.carriedSince" />{' '}
-                      <Text id={`integration.thermostat.schedule.daysShort.${carriedByDay[day].day}`} />
+                    <span class="sr-only">{this.describeDay(dayPoints, dictionary, carriedByDay[day])}</span>
+                    {this.renderTimeBar(dayPoints, carriedByDay[day])}
+                    {/* Only on a day with no point of its own, whose whole bar
+                      therefore comes from somewhere else: that is the day the
+                      caption explains. On a day that has its own ranges the carry
+                      covers the morning only, which the bar already shows — and
+                      a nightly slot made this line repeat under all seven days,
+                      saying nothing new six times. */}
+                    {carriedByDay[day] && dayPoints.length === 0 && (
+                      <div class={style.carriedFrom}>
+                        <i class="fe fe-corner-down-right mr-1" />
+                        {(dictionary.presets && dictionary.presets[carriedByDay[day].preset]) ||
+                          carriedByDay[day].preset}
+                        {' · '}
+                        <Text id="integration.thermostat.schedule.carriedSince" />{' '}
+                        <Text id={`integration.thermostat.schedule.daysShort.${carriedByDay[day].day}`} />
+                      </div>
+                    )}
+                  </div>
+
+                  {isOpen && (
+                    <div class={style.dayPanel}>
+                      {dayPoints.length === 0 && !newForm && (
+                        <p class={`text-muted mb-2 ${style.noSlotsText}`}>
+                          <Text id="integration.thermostat.schedule.noSlots" />
+                        </p>
+                      )}
+
+                      {/* What the hatching means, said once where the ranges are
+                        edited. Not "the thermostat is stopped": outside a range
+                        it keeps the preset the last point set, which is what the
+                        empty-schedule warning says too. */}
+                      <p class={style.stoppedLegend}>
+                        <span class={style.stoppedLegendSwatch} />
+                        <Text id="integration.thermostat.schedule.uncoveredLegend" />
+                      </p>
+
+                      {dayPoints.map((range, idx) => {
+                        const editForm = editForms[range.key];
+                        if (editForm) {
+                          return (
+                            <div key={range.key || `${day}-${idx}`}>
+                              {this.renderRangeForm(
+                                editForm,
+                                (field, value) => this.updateEditForm(range.key, field, value),
+                                () => this.confirmEdit(range.key),
+                                () => this.closeEditForm(range.key),
+                                () => this.removeRange(range.key),
+                                dictionary,
+                                true
+                              )}
+                            </div>
+                          );
+                        }
+                        // An end at or before the start runs past midnight.
+                        const crossesMidnight = timeToMinutes(range.end_time) <= timeToMinutes(range.start_time);
+                        return (
+                          <div
+                            key={range.key || `${day}-${idx}`}
+                            class={style.slotEditorRow}
+                            onClick={() => this.openEditForm(range)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                this.openEditForm(range);
+                              }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                          >
+                            <div
+                              class={style.slotColorDot}
+                              style={`--dot-color:${PRESET_COLORS[range.preset] || PRESET_COLORS.comfort}`}
+                            />
+                            <span class={style.slotTimeDisplay}>{range.start_time}</span>
+                            <span class={style.slotArrow}>→</span>
+                            <span class={style.slotTimeDisplay}>{range.end_time}</span>
+                            {crossesMidnight && (
+                              <span class={style.slotNextDay}>
+                                <Text id="integration.thermostat.schedule.nextDay" />
+                              </span>
+                            )}
+                            <span class={style.slotPresetLabel}>
+                              {(dictionary.presets && dictionary.presets[range.preset]) || range.preset}
+                            </span>
+                            <i class={`fe fe-edit-2 ${style.slotEditIcon}`} />
+                          </div>
+                        );
+                      })}
+
+                      {newForm &&
+                        this.renderRangeForm(
+                          newForm,
+                          (field, value) => this.updateNewForm(day, field, value),
+                          () => this.confirmNewForm(day),
+                          () => this.closeNewForm(day),
+                          null,
+                          dictionary,
+                          false
+                        )}
+
+                      <div class={style.dayPanelActions}>
+                        {!newForm && (
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            onClick={() => this.openNewForm(day)}
+                          >
+                            <i class="fe fe-plus mr-1" />
+                            <Text id="integration.thermostat.schedule.addSlot" />
+                          </button>
+                        )}
+                        {copySourceDay !== day && (
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-secondary"
+                            onClick={() => this.openCopyPicker(day)}
+                          >
+                            <i class="fe fe-copy mr-1" />
+                            <Text id="integration.thermostat.schedule.copyTo" />
+                          </button>
+                        )}
+
+                        {copySourceDay === day && (
+                          <div class={style.copyPicker}>
+                            <span class={style.copyPickerLabel}>
+                              <Text id="integration.thermostat.schedule.copyToLabel" />
+                            </span>
+                            {DAYS.filter(d => d !== day).map(d => (
+                              <label key={d} class={style.copyPickerDay}>
+                                <input
+                                  type="checkbox"
+                                  checked={(copyTargetDays || []).includes(d)}
+                                  onChange={() => this.toggleCopyTarget(d)}
+                                />{' '}
+                                <Text id={`integration.thermostat.schedule.daysShort.${d}`} />
+                              </label>
+                            ))}
+                            <button
+                              type="button"
+                              class="btn btn-xs btn-primary ml-2"
+                              onClick={this.applyCopy}
+                              disabled={!(copyTargetDays && copyTargetDays.length > 0)}
+                            >
+                              <Text id="integration.thermostat.schedule.applyButton" />
+                            </button>
+                            <button type="button" class="btn btn-xs btn-secondary ml-1" onClick={this.closeCopyPicker}>
+                              <Text id="integration.thermostat.schedule.cancelButton" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
+              );
+            })}
+          </div>
 
-                {isOpen && (
-                  <div class={style.dayPanel}>
-                    {dayPoints.length === 0 && !newForm && (
-                      <p class={`text-muted mb-2 ${style.noSlotsText}`}>
-                        <Text id="integration.thermostat.schedule.noSlots" />
-                      </p>
-                    )}
+          {/* The colour key for the seven bars, once under them. Without it the
+            only way to learn that blue is the night and orange the comfort was to
+            open a day and read a select. Only the presets this schedule uses are
+            listed. */}
+          {usedPresets.length > 0 && (
+            <div class={style.presetLegend}>
+              {usedPresets.map(preset => (
+                <span key={preset} class={style.presetLegendItem}>
+                  <span
+                    class={style.presetLegendSwatch}
+                    style={`--swatch-color:${PRESET_COLORS[preset] || PRESET_COLORS.comfort}`}
+                  />
+                  {(dictionary.presets && dictionary.presets[preset]) || preset}
+                </span>
+              ))}
+            </div>
+          )}
 
-                    {/* What the hatching means, said once where the ranges are
-                        edited: outside a range the thermostat is stopped, which
-                        is what makes a programme say the same thing whatever
-                        ran before it. */}
-                    <p class={style.stoppedLegend}>
-                      <span class={style.stoppedLegendSwatch} />
-                      <Text id="integration.thermostat.schedule.stoppedLegend" />
-                    </p>
+          {this.renderError(error)}
 
-                    {dayPoints.map((range, idx) => {
-                      const editForm = editForms[range.key];
-                      if (editForm) {
-                        return (
-                          <div key={range.key || `${day}-${idx}`}>
-                            {this.renderRangeForm(
-                              editForm,
-                              (field, value) => this.updateEditForm(range.key, field, value),
-                              () => this.confirmEdit(range.key),
-                              () => this.closeEditForm(range.key),
-                              () => this.removeRange(range.key),
-                              dictionary,
-                              true
-                            )}
-                          </div>
-                        );
-                      }
-                      // An end at or before the start runs past midnight.
-                      const crossesMidnight = timeToMinutes(range.end_time) <= timeToMinutes(range.start_time);
-                      return (
-                        <div
-                          key={range.key || `${day}-${idx}`}
-                          class={style.slotEditorRow}
-                          onClick={() => this.openEditForm(range)}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              this.openEditForm(range);
-                            }
-                          }}
-                          role="button"
-                          tabIndex={0}
-                        >
-                          <div
-                            class={style.slotColorDot}
-                            style={`--dot-color:${PRESET_COLORS[range.preset] || PRESET_COLORS.comfort}`}
-                          />
-                          <span class={style.slotTimeDisplay}>{range.start_time}</span>
-                          <span class={style.slotArrow}>→</span>
-                          <span class={style.slotTimeDisplay}>{range.end_time}</span>
-                          {crossesMidnight && (
-                            <span class={style.slotNextDay}>
-                              <Text id="integration.thermostat.schedule.nextDay" />
-                            </span>
-                          )}
-                          <span class={style.slotPresetLabel}>
-                            {(dictionary.presets && dictionary.presets[range.preset]) || range.preset}
-                          </span>
-                          <i class={`fe fe-edit-2 ${style.slotEditIcon}`} />
-                        </div>
-                      );
-                    })}
-
-                    {newForm &&
-                      this.renderRangeForm(
-                        newForm,
-                        (field, value) => this.updateNewForm(day, field, value),
-                        () => this.confirmNewForm(day),
-                        () => this.closeNewForm(day),
-                        null,
-                        dictionary,
-                        false
-                      )}
-
-                    <div class={style.dayPanelActions}>
-                      {!newForm && (
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-outline-primary"
-                          onClick={() => this.openNewForm(day)}
-                        >
-                          <i class="fe fe-plus mr-1" />
-                          <Text id="integration.thermostat.schedule.addSlot" />
-                        </button>
-                      )}
-                      {copySourceDay !== day && (
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-outline-secondary"
-                          onClick={() => this.openCopyPicker(day)}
-                        >
-                          <i class="fe fe-copy mr-1" />
-                          <Text id="integration.thermostat.schedule.copyTo" />
-                        </button>
-                      )}
-
-                      {copySourceDay === day && (
-                        <div class={style.copyPicker}>
-                          <span class={style.copyPickerLabel}>
-                            <Text id="integration.thermostat.schedule.copyToLabel" />
-                          </span>
-                          {DAYS.filter(d => d !== day).map(d => (
-                            <label key={d} class={style.copyPickerDay}>
-                              <input
-                                type="checkbox"
-                                checked={(copyTargetDays || []).includes(d)}
-                                onChange={() => this.toggleCopyTarget(d)}
-                              />{' '}
-                              <Text id={`integration.thermostat.schedule.daysShort.${d}`} />
-                            </label>
-                          ))}
-                          <button
-                            type="button"
-                            class="btn btn-xs btn-primary ml-2"
-                            onClick={this.applyCopy}
-                            disabled={!(copyTargetDays && copyTargetDays.length > 0)}
-                          >
-                            <Text id="integration.thermostat.schedule.applyButton" />
-                          </button>
-                          <button type="button" class="btn btn-xs btn-secondary ml-1" onClick={this.closeCopyPicker}>
-                            <Text id="integration.thermostat.schedule.cancelButton" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {this.renderError(error)}
-
-        {/* Saving an empty schedule turns this row into the question itself: the
+          {/* Saving an empty schedule turns this row into the question itself: the
             button says what the second press will do, and the way out is to go
             back and add a slot rather than to leave the editor. Repeating "Save"
             gave no sign that the press meant something else this time. */}
-        {error === 'empty-schedule' ? (
-          <div class={style.editorActions}>
-            <button type="button" class="btn btn-warning" onClick={this.save} disabled={saving}>
-              <Text id="integration.thermostat.schedule.saveEmptyButton" />
-            </button>
-            <button type="button" class="btn btn-secondary ml-2" onClick={this.backToEditing}>
-              <Text id="integration.thermostat.schedule.backToEditingButton" />
-            </button>
-          </div>
-        ) : (
-          <div class={style.editorActions}>
-            <button type="button" class="btn btn-primary" onClick={this.save} disabled={saving || !name.trim()}>
-              <Text id="integration.thermostat.schedule.saveButton" />
-            </button>
-            <button type="button" class="btn btn-secondary ml-2" onClick={onCancel}>
-              <Text id="integration.thermostat.schedule.cancelButton" />
-            </button>
-          </div>
-        )}
+          {error === 'empty-schedule' ? (
+            <div class={style.editorActions}>
+              <button type="button" class="btn btn-warning" onClick={this.save} disabled={saving}>
+                <Text id="integration.thermostat.schedule.saveEmptyButton" />
+              </button>
+              <button type="button" class="btn btn-secondary ml-2" onClick={this.backToEditing}>
+                <Text id="integration.thermostat.schedule.backToEditingButton" />
+              </button>
+            </div>
+          ) : (
+            <div class={style.editorActions}>
+              <button type="button" class="btn btn-primary" onClick={this.save} disabled={saving || !name.trim()}>
+                <Text id="integration.thermostat.schedule.saveButton" />
+              </button>
+              <button type="button" class="btn btn-secondary ml-2" onClick={onCancel}>
+                <Text id="integration.thermostat.schedule.cancelButton" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     );
   }

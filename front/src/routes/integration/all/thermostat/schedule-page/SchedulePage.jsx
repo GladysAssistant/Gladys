@@ -9,7 +9,7 @@ import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 import { RequestStatus } from '../../../../../utils/consts';
 import CardFilter from '../../../../../components/layout/CardFilter';
 import PRESET_COLORS from '../../../../../utils/thermostatPresetColors';
-import { timeToMinutes, DAY_MINUTES } from '../../../../../../../server/utils/thermostatSchedule';
+import { timeToMinutes, carriedPresetByDay, DAY_MINUTES } from '../../../../../../../server/utils/thermostatSchedule';
 import { transitionsToRanges } from '../../../../../../../server/utils/thermostatRanges';
 
 // 0 is Monday here, as it is in the table and in the editor — not the JS Date
@@ -24,7 +24,7 @@ const HOUR_MARKS = [6, 12, 18];
 // The ranges of one day, as coloured spans of the 24 hours. The same points the
 // editor draws, read the same way — through the shared ranges helper — so the
 // miniature and the editor can never disagree about what a schedule says.
-const daySegments = (ranges, day) => {
+const daySegments = (ranges, day, carriedInto) => {
   const ofDay = ranges
     .filter(range => range.day_of_week === day)
     .map(range => {
@@ -34,24 +34,19 @@ const daySegments = (ranges, day) => {
     })
     .sort((a, b) => a.start - b.start);
 
-  // A night crossing midnight is stored on the day it starts, so the morning it
-  // runs into has to be told about it — the week wraps, and Sunday night reaches
-  // Monday. Without this the small hours drew as a gap, which reads as the
-  // heating being off when it is the night preset still running (the editor
-  // says "Nuit · depuis Dim" for the same slot).
-  const previousDay = (day + 6) % 7;
-  const carried = ranges
-    .filter(range => range.day_of_week === previousDay)
-    .find(range => timeToMinutes(range.end_time) <= timeToMinutes(range.start_time));
-
+  // A day is not only its own points: it starts on whatever the last point
+  // before it set, and that point may be several days back. A night crossing
+  // midnight runs into the next morning, and a schedule whose only point is
+  // Saturday 08:00 holds that preset all week — the server regulates on exactly
+  // that (`findCurrentTransition` wraps onto the last point of the week), so a
+  // blank Monday to Friday said the opposite of what the heating does. Computed
+  // by the shared helper, which the editor reads too: the miniature and the
+  // editor can never disagree about what a schedule says.
   const segments = [];
   let cursor = 0;
-  if (carried) {
-    const until = timeToMinutes(carried.end_time);
-    if (until > 0) {
-      segments.push({ start: 0, end: until, preset: carried.preset });
-      cursor = until;
-    }
+  if (carriedInto && carriedInto.until > 0) {
+    segments.push({ start: 0, end: carriedInto.until, preset: carriedInto.preset });
+    cursor = carriedInto.until;
   }
   ofDay.forEach(range => {
     if (range.start > cursor) {
@@ -186,6 +181,12 @@ class SchedulePageComponent extends Component {
     const detachLabel = get(dict, 'integration.thermostat.schedule.detachButton', { default: 'Stop following' });
     // Once per card, not once per day: the points are the same for all seven rows.
     const ranges = transitionsToRanges(schedule.transitions || []);
+    const carriedByDay = carriedPresetByDay(schedule.transitions || []);
+    // In the order the bars are read, not the order the points were entered.
+    const PRESET_ORDER = ['off', 'frost', 'away', 'eco', 'night', 'comfort'];
+    const usedPresets = PRESET_ORDER.filter(preset =>
+      (schedule.transitions || []).some(transition => transition.preset === preset)
+    );
     return (
       <div key={schedule.selector} class="col-md-6">
         <div class="card mb-3">
@@ -220,7 +221,7 @@ class SchedulePageComponent extends Component {
                     <Text id={`integration.thermostat.schedule.daysShort.${day}`} />
                   </span>
                   <div class={style.weekPreviewBar}>
-                    {daySegments(ranges, day).map(segment => (
+                    {daySegments(ranges, day, carriedByDay[day]).map(segment => (
                       <div
                         key={`${segment.start}-${segment.end}`}
                         class={style.weekPreviewSegment}
@@ -241,6 +242,24 @@ class SchedulePageComponent extends Component {
                   </span>
                 ))}
               </div>
+              {/* What the colours mean. Seven coloured stripes say nothing on
+                  their own: the editor had to be opened to learn that blue is the
+                  night and orange the comfort. Only the presets this schedule
+                  actually uses are listed — a fixed legend of six would mostly
+                  name colours that are not on the bars. */}
+              {usedPresets.length > 0 && (
+                <div class={style.weekPreviewLegend}>
+                  {usedPresets.map(preset => (
+                    <span key={preset} class={style.weekPreviewLegendItem}>
+                      <span
+                        class={style.weekPreviewLegendSwatch}
+                        style={`--swatch-color:${PRESET_COLORS[preset] || PRESET_COLORS.comfort}`}
+                      />
+                      {get(dict, `dashboard.boxes.thermostat.preset.${preset}`, { default: preset })}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Label above its value, like the summary rows of a thermostat
@@ -255,7 +274,7 @@ class SchedulePageComponent extends Component {
                 </span>
               )}
               {(schedule.devices || []).map(device => (
-                <span key={device.selector} class={`badge badge-secondary mr-1 ${style.followerBadge}`}>
+                <span key={device.selector} class={`badge mr-1 ${style.followerBadge}`}>
                   {device.name}
                   {/* Detaching from here too: a thermostat attached by mistake would
                 otherwise have to be detached from its own edit page. */}
@@ -329,10 +348,16 @@ class SchedulePageComponent extends Component {
               /* Delete in the middle, as on the thermostat cards: the same action
                  in the same place on two lists one tab apart. */
               <div class={`${style.cardButtons} mt-3`}>
-                {/* Green like the thermostat card's first button: btn-secondary
-                    is a grey that all but disappears against the dark theme, and
-                    duplicating creates a schedule rather than undoing anything. */}
-                <button type="button" class="btn btn-success flex-fill" onClick={() => this.startDuplicate(schedule)}>
+                {/* Outlined, so Edit is the one filled button of the row:
+                    duplicating had the same weight as editing, and green is the
+                    colour of a confirmation elsewhere in Gladys. Outline-primary
+                    rather than outline-secondary, which the dark theme does not
+                    counter-invert and which all but disappears there. */}
+                <button
+                  type="button"
+                  class="btn btn-outline-primary flex-fill"
+                  onClick={() => this.startDuplicate(schedule)}
+                >
                   <i class="fe fe-copy mr-1" />
                   <Text id="integration.thermostat.schedule.duplicateButton" />
                 </button>
@@ -394,12 +419,12 @@ class SchedulePageComponent extends Component {
             intl={props.intl}
           />
         ) : (
-          <div class="card">
+          <div class={cx('card', style.schedulePage)}>
             <div class="card-header">
               <h1 class="card-title">
                 <Text id="integration.thermostat.schedule.title" />
               </h1>
-              <div class="page-options d-flex">
+              <div class="page-options d-flex flex-wrap justify-content-end">
                 <Localizer>
                   <CardFilter
                     changeOrderDir={props.changeOrderDir}

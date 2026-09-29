@@ -3369,7 +3369,7 @@
         "nameLabel": "Name",
         "namePlaceholder": "e.g. Living Room Thermostat",
         "roomLabel": "Room",
-        "modeLabel": "Mode",
+        "modeLabel": "Use",
         "typeLabel": "Thermostat type",
         "tuningSection": "Fine tuning",
         "typeVirtual": "Virtual thermostat (Gladys regulates)",
@@ -3459,7 +3459,11 @@
         "manualExpiryHelp": "\"At the next slot\" hands the thermostat back to its schedule at the next slot change, the way Tado and Netatmo do. With no schedule, manual mode stays on until you cancel it.",
         "manualDurationLabel": "Manual mode duration",
         "manualDurationUnit": "min",
-        "manualDurationHelp": "Duration in minutes before automatically returning to the schedule after a manual action (default: 30 min)."
+        "manualDurationHelp": "Duration in minutes before automatically returning to the schedule after a manual action.",
+        "modeHelp": "What this thermostat drives: heating or cooling.",
+        "sectionDevice": "Device",
+        "sectionHeating": "Heating",
+        "sectionProgramming": "Programming"
       },
       "schedule": {
         "title": "Schedules",
@@ -3518,7 +3522,7 @@
         },
         "noSlots": "No time slots yet. Click \"Add time slot\" to get started.",
         "followedBy": "Followed by",
-        "weekLabel": "Week",
+        "weekLabel": "Week at a glance",
         "emptyScheduleWarning": "This schedule has no slot, so it drives nothing. The thermostats following it stay on their current preset.",
         "emptySaveWarning": "This schedule has no slot: it will drive nothing, and the thermostats following it will stay on their current preset.",
         "saveEmptyButton": "Save anyway",
@@ -3533,10 +3537,12 @@
         "houseLabel": "House",
         "carriedSince": "since",
         "overlapError": "This range overlaps another one on the same day. A thermostat follows one preset at a time: adjust the times, or edit the existing range.",
-        "stoppedLegend": "Outside these ranges, the thermostat is stopped.",
         "houseLockedByDevices": "A schedule only moves house while no thermostat follows it. Followed by:",
         "searchPlaceHolder": "Search for a schedule",
-        "noSearchResult": "No schedule matches this search."
+        "noSearchResult": "No schedule matches this search.",
+        "uncoveredLegend": "Outside these ranges, the thermostat keeps the preset of the last slot, until the next one.",
+        "editorTitleEdit": "Edit the schedule",
+        "editorTitleNew": "New schedule"
       }
     }
   },

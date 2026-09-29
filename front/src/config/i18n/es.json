@@ -3369,7 +3369,7 @@
         "nameLabel": "Nombre",
         "namePlaceholder": "ej. Termostato del salón",
         "roomLabel": "Habitación",
-        "modeLabel": "Modo",
+        "modeLabel": "Uso",
         "typeLabel": "Tipo de termostato",
         "tuningSection": "Ajuste fino",
         "typeVirtual": "Termostato virtual (Gladys regula)",
@@ -3459,7 +3459,11 @@
         "manualExpiryHelp": "«En el siguiente tramo» devuelve el termostato a su programación en el siguiente cambio de tramo, como hacen Tado y Netatmo. Sin programación, el modo manual permanece activo hasta que lo canceles.",
         "manualDurationLabel": "Duración del modo manual",
         "manualDurationUnit": "min",
-        "manualDurationHelp": "Duración en minutos antes de volver automáticamente a la programación tras una acción manual (por defecto: 30 min)."
+        "manualDurationHelp": "Duración en minutos antes de volver automáticamente a la programación tras una acción manual.",
+        "modeHelp": "Lo que controla este termostato: calefacción o climatización.",
+        "sectionDevice": "Dispositivo",
+        "sectionHeating": "Calefacción",
+        "sectionProgramming": "Programación"
       },
       "schedule": {
         "title": "Programaciones",
@@ -3518,7 +3522,7 @@
         },
         "noSlots": "Todavía no hay intervalos. Haz clic en «Añadir un intervalo» para empezar.",
         "followedBy": "Seguida por",
-        "weekLabel": "Semana",
+        "weekLabel": "Vista de la semana",
         "emptyScheduleWarning": "Esta programación no tiene ningún tramo, así que no controla nada. Los termostatos que la siguen se quedan en su preset actual.",
         "emptySaveWarning": "Esta programación no tiene ningún tramo: no controlará nada y los termostatos que la siguen se quedarán en su preset actual.",
         "saveEmptyButton": "Guardar de todos modos",
@@ -3533,10 +3537,12 @@
         "houseLabel": "Casa",
         "carriedSince": "desde",
         "overlapError": "Este intervalo se solapa con otro del mismo día. Un termostato sigue un solo preajuste a la vez: ajusta los horarios o edita el intervalo existente.",
-        "stoppedLegend": "Fuera de estos intervalos, el termostato está apagado.",
         "houseLockedByDevices": "Una programación solo cambia de casa mientras ningún termostato la siga. Seguida por:",
         "searchPlaceHolder": "Buscar una programación",
-        "noSearchResult": "Ninguna programación coincide con esta búsqueda."
+        "noSearchResult": "Ninguna programación coincide con esta búsqueda.",
+        "uncoveredLegend": "Fuera de estos intervalos, el termostato conserva el preajuste del último intervalo, hasta el siguiente.",
+        "editorTitleEdit": "Modificar la programación",
+        "editorTitleNew": "Nueva programación"
       }
     }
   },

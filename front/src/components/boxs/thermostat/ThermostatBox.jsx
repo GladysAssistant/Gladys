@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 import {
   WEBSOCKET_MESSAGE_TYPES,
   DEVICE_FEATURE_UNITS,
@@ -697,13 +698,6 @@ class ThermostatBox extends Component {
     const stateInit = {};
     if (activePreset !== null) stateInit.activePreset = activePreset;
     if (isManualMode !== null) stateInit.isManualMode = isManualMode;
-    // A page reload restores the state from the database, where a hold taken on
-    // the real thermostat looks exactly like one taken on the dial: on an
-    // external device a manual setpoint never comes from the preset, so the
-    // preset must not come back highlighted.
-    if (isManualMode && this.isExternal()) {
-      stateInit.manualSetpointOverride = true;
-    }
 
     // If not in manual mode and a preset was resolved, apply its setpoint immediately
     // so the gauge shows the correct temperature without waiting for getDeviceData
@@ -727,6 +721,14 @@ class ThermostatBox extends Component {
       // show no active preset at all on a thermostat that plainly has one. A
       // hold on any other value is a setpoint of its own, which no preset
       // represents.
+      //
+      // This is the rule for an external thermostat too. It used to be skipped
+      // there, on the grounds that a manual setpoint never comes from a preset
+      // on a real device — but picking a preset in the widget arms a hold there
+      // exactly as it does on a virtual one, so no preset ever lit up on a
+      // Netatmo. A setpoint genuinely turned on the device lands on a value no
+      // preset carries and is still read as manual, which is the case that
+      // reasoning was actually about.
       const holdPreset = this.getPresets().find(
         candidate => candidate.key === activePreset && candidate.temp === hold.setpoint
       );
@@ -1172,147 +1174,171 @@ class ThermostatBox extends Component {
               {/* A thermostat that has never been driven has no stored preset.
                   Hiding the bar then removed the only way to pick one — the bar
                   is shown with nothing highlighted instead. */}
-              {isWindowOpen
-                ? null
-                : (() => {
-                    const hasSchedule = !!activeSchedule;
-                    // The banner says what the thermostat is following; the bar
-                    // below stays reachable whatever it says. Replacing the bar
-                    // with the banner meant "I am away for the weekend -> Frost"
-                    // required detaching the programme on the integration page.
-                    const banner = (() => {
-                      if (!hasSchedule || activePreset === null) {
-                        return null;
-                      }
-                      if (isManualMode && manualUntil) {
-                        // Manual mode banner: fe-user + Manuel + until time + delete button
-                        const untilDate = new Date(manualUntil);
-                        const untilTime = `${String(untilDate.getHours()).padStart(2, '0')}:${String(
-                          untilDate.getMinutes()
-                        ).padStart(2, '0')}`;
-                        const t =
-                          props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
-                        const manualLabel = (t && t.manualMode) || '';
-                        const manualUntilLabel = (t && t.manualUntil) || '';
-                        const cancelLabel = (t && t.cancelManual) || '';
-                        return (
-                          <div class={style.manualBanner}>
-                            <i class={`fe fe-user ${style.manualBannerIcon}`} />
-                            <span class={style.manualBannerText}>
-                              {manualLabel}
-                              <span class={style.manualBannerUntil}>
-                                {' '}
-                                {manualUntilLabel} {untilTime}
-                              </span>
-                            </span>
-                            <button
-                              class={style.manualBannerCancel}
-                              onClick={this.cancelManualMode}
-                              title={cancelLabel}
-                            >
-                              <i class="fe fe-x" />
-                            </button>
-                          </div>
-                        );
-                      }
-
-                      // Planning banner: preset icon + name + next transition time
-                      const knownPresetKeys = [...HEATING_PRESETS, ...COOLING_PRESETS];
-                      const resolvedPresetKey = knownPresetKeys.includes(activePreset) ? activePreset : 'comfort';
-                      const activePresetObj =
-                        presets.find(p => p.key === resolvedPresetKey) ||
-                        presets.find(p => p.key === 'comfort') ||
-                        presets[0];
-                      const presetIcon = activePresetObj ? activePresetObj.icon : 'fe-power';
-                      const i18nPresets =
-                        props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat.preset;
-                      const presetName =
-                        i18nPresets && i18nPresets[resolvedPresetKey]
-                          ? i18nPresets[resolvedPresetKey]
-                          : resolvedPresetKey;
-                      const bannerColor = this.getPresetColor(resolvedPresetKey);
-                      const t2 =
-                        props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
-                      const untilLabel = (t2 && t2.scheduleUntil) || '';
-
-                      // A stopped thermostat is not waiting for the next point:
-                      // the programme does not start it again, only a mode does.
-                      // Announcing an hour here promises a return that will not
-                      // happen — and the cross is the only way back to the
-                      // programme, since every preset arms a hold instead.
-                      const stopped = resolvedPresetKey === 'off';
-                      const backToScheduleLabel = (t2 && t2.backToSchedule) || '';
-
-                      return (
-                        <div class={style.scheduleBanner} style={`--banner-color:${bannerColor}`}>
-                          <i class={`fe ${presetIcon} ${style.scheduleBannerIcon}`} />
-                          <span class={style.scheduleBannerText}>
-                            {presetName}
-                            {!stopped && activeSchedule && activeSchedule.next && (
-                              <span class={style.scheduleBannerUntil}>
-                                {' '}
-                                {untilLabel} {activeSchedule.next.time}
-                              </span>
-                            )}
-                          </span>
-                          {stopped && (
-                            <button
-                              class={style.manualBannerCancel}
-                              onClick={this.cancelManualMode}
-                              title={backToScheduleLabel}
-                            >
-                              <i class="fe fe-x" />
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })();
-
-                    // A null preset means the user has not chosen one yet, so
-                    // nothing is highlighted — falling back to 'comfort' would
-                    // claim a setting that was never made, and the widget writes
-                    // none until it is clicked.
-                    const resolvedActivePreset = [...HEATING_PRESETS, ...COOLING_PRESETS].includes(activePreset)
-                      ? activePreset
-                      : null;
+              {(() => {
+                const hasSchedule = !!activeSchedule;
+                // The banner says what the thermostat is following; the bar
+                // below stays reachable whatever it says. Replacing the bar
+                // with the banner meant "I am away for the weekend -> Frost"
+                // required detaching the programme on the integration page.
+                const banner = (() => {
+                  // The window banner above already says what the thermostat
+                  // is doing, and it replaces this one.
+                  if (isWindowOpen || !hasSchedule || activePreset === null) {
+                    return null;
+                  }
+                  if (isManualMode && manualUntil) {
+                    const untilDate = new Date(manualUntil);
+                    const untilTime = `${String(untilDate.getHours()).padStart(2, '0')}:${String(
+                      untilDate.getMinutes()
+                    ).padStart(2, '0')}`;
+                    const t = props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
+                    const manualUntilLabel = (t && t.manualUntil) || '';
+                    const cancelLabel = (t && t.cancelManual) || '';
+                    // A hold is not always a hand-set temperature: picking a
+                    // preset arms one too. Saying "Manual mode" while the
+                    // Night button is lit told the user their choice had been
+                    // replaced by something else. `manualSetpointOverride` is
+                    // exactly the distinction — it is what un-highlights the
+                    // preset — so the banner names the preset whenever one is
+                    // still highlighted, and keeps "Manual mode" for a
+                    // setpoint that no preset carries.
+                    const heldPreset =
+                      !manualSetpointOverride && [...HEATING_PRESETS, ...COOLING_PRESETS].includes(activePreset)
+                        ? presets.find(candidate => candidate.key === activePreset)
+                        : null;
+                    const i18nHeldPresets =
+                      props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat.preset;
+                    const label = heldPreset
+                      ? (i18nHeldPresets && i18nHeldPresets[heldPreset.key]) || heldPreset.key
+                      : (t && t.manualMode) || '';
                     return (
-                      <div>
-                        {banner}
-                        <div class={style.segmentedControl}>
-                          {presets.map(preset => {
-                            const presetTitle =
-                              props.intl &&
-                              props.intl.dictionary &&
-                              props.intl.dictionary.dashboard &&
-                              props.intl.dictionary.dashboard.boxes &&
-                              props.intl.dictionary.dashboard.boxes.thermostat &&
-                              props.intl.dictionary.dashboard.boxes.thermostat.preset &&
-                              props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
-                                ? props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
-                                : preset.key;
-                            const isActive = resolvedActivePreset === preset.key && !manualSetpointOverride;
-                            const presetColor = this.getPresetColor(preset.key);
-                            return (
-                              <button
-                                key={preset.key}
-                                class={`${style.segmentBtn} ${isActive ? style.segmentBtnActive : ''}`}
-                                style={isActive ? `--preset-color:${presetColor}` : undefined}
-                                onClick={() => this.selectPreset(preset)}
-                                title={presetTitle}
-                                aria-pressed={isActive ? 'true' : 'false'}
-                              >
-                                <i class={`fe ${preset.icon}`} />
-                                {/* The name under the icon: `title` only shows on
-                                    hover, so on a wall tablet the bar was six
-                                    unlabelled pictograms. */}
-                                <span class={style.segmentBtnLabel}>{presetTitle}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
+                      <div
+                        class={cx(style.manualBanner, { [style.manualBannerPreset]: !!heldPreset })}
+                        style={heldPreset ? `--banner-color:${this.getPresetColor(heldPreset.key)}` : undefined}
+                      >
+                        <i class={`fe ${heldPreset ? heldPreset.icon : 'fe-user'} ${style.manualBannerIcon}`} />
+                        <span class={style.manualBannerText}>
+                          {label}
+                          <span class={style.manualBannerUntil}>
+                            {' '}
+                            {manualUntilLabel} {untilTime}
+                          </span>
+                        </span>
+                        <button class={style.manualBannerCancel} onClick={this.cancelManualMode} title={cancelLabel}>
+                          <i class="fe fe-x" />
+                        </button>
                       </div>
                     );
-                  })()}
+                  }
+
+                  // Planning banner: preset icon + name + next transition time
+                  const knownPresetKeys = [...HEATING_PRESETS, ...COOLING_PRESETS];
+                  const resolvedPresetKey = knownPresetKeys.includes(activePreset) ? activePreset : 'comfort';
+                  const activePresetObj =
+                    presets.find(p => p.key === resolvedPresetKey) ||
+                    presets.find(p => p.key === 'comfort') ||
+                    presets[0];
+                  const presetIcon = activePresetObj ? activePresetObj.icon : 'fe-power';
+                  const i18nPresets =
+                    props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat.preset;
+                  const presetName =
+                    i18nPresets && i18nPresets[resolvedPresetKey] ? i18nPresets[resolvedPresetKey] : resolvedPresetKey;
+                  const bannerColor = this.getPresetColor(resolvedPresetKey);
+                  const t2 = props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat;
+                  const untilLabel = (t2 && t2.scheduleUntil) || '';
+
+                  // A stopped thermostat is not waiting for the next point:
+                  // the programme does not start it again, only a mode does.
+                  // Announcing an hour here promises a return that will not
+                  // happen — and the cross is the only way back to the
+                  // programme, since every preset arms a hold instead.
+                  const stopped = resolvedPresetKey === 'off';
+                  const backToScheduleLabel = (t2 && t2.backToSchedule) || '';
+
+                  return (
+                    <div class={style.scheduleBanner} style={`--banner-color:${bannerColor}`}>
+                      <i class={`fe ${presetIcon} ${style.scheduleBannerIcon}`} />
+                      {/* A stopped thermostat already says so in the middle of
+                              the gauge, in the largest text on the card, and again
+                              under the Off button. Repeating the word a third time
+                              here said nothing the user had not read twice — but
+                              the banner still has to appear, because its cross is
+                              the only way back to the programme. */}
+                      <span class={style.scheduleBannerText}>
+                        {stopped ? backToScheduleLabel : presetName}
+                        {!stopped && activeSchedule && activeSchedule.next && (
+                          <span class={style.scheduleBannerUntil}>
+                            {' '}
+                            {untilLabel} {activeSchedule.next.time}
+                          </span>
+                        )}
+                      </span>
+                      {stopped && (
+                        <button
+                          class={style.manualBannerCancel}
+                          onClick={this.cancelManualMode}
+                          title={backToScheduleLabel}
+                        >
+                          <i class="fe fe-x" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })();
+
+                // A null preset means the user has not chosen one yet, so
+                // nothing is highlighted — falling back to 'comfort' would
+                // claim a setting that was never made, and the widget writes
+                // none until it is clicked.
+                const resolvedActivePreset = [...HEATING_PRESETS, ...COOLING_PRESETS].includes(activePreset)
+                  ? activePreset
+                  : null;
+                return (
+                  <div>
+                    {banner}
+                    {/* Dimmed rather than removed while a window is open: the
+                            bar used to disappear, and the card lost 56px of height
+                            — every widget beside it on the dashboard shifted, and
+                            came back when the window was shut. */}
+                    <div
+                      class={cx(style.segmentedControl, { [style.segmentedControlDisabled]: isWindowOpen })}
+                      aria-disabled={isWindowOpen ? 'true' : undefined}
+                    >
+                      {presets.map(preset => {
+                        const presetTitle =
+                          props.intl &&
+                          props.intl.dictionary &&
+                          props.intl.dictionary.dashboard &&
+                          props.intl.dictionary.dashboard.boxes &&
+                          props.intl.dictionary.dashboard.boxes.thermostat &&
+                          props.intl.dictionary.dashboard.boxes.thermostat.preset &&
+                          props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
+                            ? props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
+                            : preset.key;
+                        const isActive = resolvedActivePreset === preset.key && !manualSetpointOverride;
+                        const presetColor = this.getPresetColor(preset.key);
+                        return (
+                          <button
+                            key={preset.key}
+                            class={`${style.segmentBtn} ${isActive ? style.segmentBtnActive : ''}`}
+                            style={isActive ? `--preset-color:${presetColor}` : undefined}
+                            onClick={() => this.selectPreset(preset)}
+                            title={presetTitle}
+                            aria-pressed={isActive ? 'true' : 'false'}
+                            disabled={isWindowOpen}
+                          >
+                            <i class={`fe ${preset.icon}`} />
+                            {/* The name under the icon: `title` only shows on
+                                    hover, so on a wall tablet the bar was six
+                                    unlabelled pictograms. */}
+                            <span class={style.segmentBtnLabel}>{presetTitle}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>
