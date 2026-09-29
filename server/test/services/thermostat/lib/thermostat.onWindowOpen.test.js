@@ -179,6 +179,7 @@ describe('thermostat.onDeviceNewState (window open, external thermostat)', () =>
       },
       setValue,
       selfWrittenSetpoints: new Map(),
+      observedSetpoints: new Map(),
     };
   };
 

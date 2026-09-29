@@ -457,12 +457,73 @@ const nextTransitionTimestamp = (transitions, now = new Date(), timezone = null)
   // The next point may be earlier in the week than now: the programme wraps.
   const minutesAway =
     nextPosition > nowPosition ? nextPosition - nowPosition : 7 * DAY_MINUTES - nowPosition + nextPosition;
-  return now.getTime() + minutesAway * 60 * 1000;
+  // Measured from the top of the current minute, not from `now`: `nowPosition` is
+  // already whole minutes, so carrying the seconds of the instant the hold was
+  // taken pushed the expiry past the point it names — 08:30:47 for a point at
+  // 08:30. With a 60 s loop that delayed the return to the programme by up to
+  // another minute, and the widget displayed the point's own time all along.
+  const startOfMinute = now.getTime() - (now.getTime() % (60 * 1000));
+  return startOfMinute + minutesAway * 60 * 1000;
+};
+
+/**
+ * @description What each day of the week inherits at midnight: the preset in
+ * force then, which day set it, and the minute the day's own first point takes
+ * over — `DAY_MINUTES` when the day has no point of its own and the inherited
+ * preset runs through it.
+ *
+ * A day without a point of its own is not an idle day: the thermostat keeps what
+ * the last point before it set, and that point may be several days earlier. On a
+ * schedule whose only point is Saturday 08:00 Comfort, the server applies
+ * Comfort all week (`findCurrentTransition` wraps onto the last point of the
+ * week), so Monday to Friday inherit Comfort — showing them as empty said the
+ * opposite of what the heating does. Same for an office schedule with no point
+ * at the weekend.
+ *
+ * Shared with the front, which draws the editor's day bars and the week
+ * miniature from it: both used to look back a single day and so could only carry
+ * a night over into the next morning.
+ * @param {Array} transitions - Every transition of the schedule.
+ * @returns {object} Day index (0 = Monday) to `{ preset, day, until }`, or null for a day inheriting nothing.
+ * @example
+ * carriedPresetByDay([{ day_of_week: 5, time: '08:00', preset: 'comfort' }]);
+ */
+const carriedPresetByDay = (transitions) => {
+  const byDay = {};
+  for (let day = 0; day < 7; day += 1) {
+    byDay[day] = null;
+  }
+  if (!transitions || transitions.length === 0) {
+    return byDay;
+  }
+  for (let day = 0; day < 7; day += 1) {
+    const ownPoints = transitions
+      .filter((transition) => transition.day_of_week === day)
+      .map((transition) => timeToMinutes(transition.time))
+      .sort((a, b) => a - b);
+    // A point at midnight leaves nothing to inherit: the day states its own
+    // preset from its first minute. Otherwise, the last point at or before this
+    // midnight, wrapping onto the end of the week exactly as the server does when
+    // it regulates — a point of this same day means the wrap came back here, so
+    // there is nothing carried in either.
+    const startsOnItsOwnPoint = ownPoints.length > 0 && ownPoints[0] === 0;
+    const inherited = startsOnItsOwnPoint ? null : findCurrentTransition(transitions, day, 0);
+    byDay[day] =
+      inherited && inherited.day_of_week !== day
+        ? {
+            preset: inherited.preset,
+            day: inherited.day_of_week,
+            until: ownPoints.length > 0 ? ownPoints[0] : DAY_MINUTES,
+          }
+        : null;
+  }
+  return byDay;
 };
 
 module.exports = {
   findCurrentTransition,
   findNextTransition,
+  carriedPresetByDay,
   nextTransitionTimestamp,
   applySlotToDay,
   mergeIntoSlots,

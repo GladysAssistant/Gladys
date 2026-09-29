@@ -40,6 +40,14 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // scheduled write would suspend the very schedule that made it. The mark is
   // kept, not consumed: integrations re-report unchanged values.
   this.selfWrittenSetpoints = new Map();
+  // The last setpoint *observed* on each real thermostat, by selector, whatever
+  // wrote it. A hold must be armed on a change, and a change is a difference
+  // from the previous report — not merely a report whose value is not the last
+  // one this service wrote. That distinction only shows after a restart, where
+  // `selfWrittenSetpoints` is empty: the integration reconnects, re-reports the
+  // setpoint the schedule had already set, and without this map that unchanged
+  // value would be taken for someone turning the dial (section D).
+  this.observedSetpoints = new Map();
 };
 
 ThermostatHandler.prototype.createDevice = createDevice;

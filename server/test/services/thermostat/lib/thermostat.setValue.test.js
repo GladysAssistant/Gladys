@@ -92,6 +92,7 @@ const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF, targetUn
     serviceId: 'service-id',
     // The real handler always creates this map in its constructor.
     selfWrittenSetpoints: new Map(),
+    observedSetpoints: new Map(),
     triggerApplySchedules: fake.returns(null),
     setValue,
   };

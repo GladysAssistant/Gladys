@@ -142,6 +142,21 @@ describe('thermostat.writeExternalSetpoint', () => {
     assert.notCalled(gladys.device.setValue);
   });
 
+  // Nothing is written, but this is still the value the service stands behind. Not
+  // marking it let an integration re-reporting that untouched setpoint — on a
+  // reconnection or on its regular report — look like a change made on the device,
+  // which armed a manual hold nobody asked for.
+  it('should mark a value it did not need to write', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ features: { 'netatmo-setpoint': targetFeature({ last_value: 21 }) } });
+    const selfWritten = new Map();
+
+    await mod.writeExternalSetpoint(gladys, 'netatmo-setpoint', 21, 'C', 'test', selfWritten);
+
+    assert.notCalled(gladys.device.setValue);
+    expect(selfWritten.get('netatmo-setpoint')).to.equal(21);
+  });
+
   // The mark is what lets the NEW_STATE listener tell our own write apart from a
   // change made on the thermostat itself.
   it('should mark the value it writes', async () => {
@@ -552,7 +567,16 @@ describe('thermostat.onExternalSetpointChanged', () => {
     windowSelectorsCache: null,
     targetSelectorsCache: null,
     selfWrittenSetpoints: new Map(),
+    observedSetpoints: new Map(),
   });
+
+  // A hold is armed on a *change*, so a reference report has to exist first. The
+  // very first report after a start only records what the device carries — see
+  // the restart tests at the end of this block.
+  const withReference = (handler, selector, value) => {
+    handler.observedSetpoints.set(selector, value);
+    return handler;
+  };
 
   // The setpoint a hold was armed on, or null when none was.
   const heldSetpoint = (handler) => {
@@ -562,7 +586,8 @@ describe('thermostat.onExternalSetpointChanged', () => {
 
   it('should hold a setpoint changed on the device itself', async () => {
     const mod = loadListener();
-    const handler = buildHandler();
+    // The device was reporting 21; the dial is turned to 19.
+    const handler = withReference(buildHandler(), 'netatmo-setpoint', 21);
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
 
@@ -581,12 +606,18 @@ describe('thermostat.onExternalSetpointChanged', () => {
   // with a programme would never get it back.
   it('should not re-arm a hold it is already holding at that value', async () => {
     const mod = loadListener();
-    const handler = buildHandler([
-      {
-        ...externalThermostat,
-        params: [...externalThermostat.params, { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '22' }],
-      },
-    ]);
+    const handler = withReference(
+      buildHandler([
+        {
+          ...externalThermostat,
+          params: [...externalThermostat.params, { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '22' }],
+        },
+      ]),
+      // Anything but 22: the report has to be a change, or it stops at the
+      // previous guard and this branch is never reached.
+      'netatmo-setpoint',
+      20,
+    );
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 22);
 
@@ -596,12 +627,16 @@ describe('thermostat.onExternalSetpointChanged', () => {
   it('should hold a further change made on the device', async () => {
     // The counterpart: a hold at 22 does not stop a move to 23 from being held.
     const mod = loadListener();
-    const handler = buildHandler([
-      {
-        ...externalThermostat,
-        params: [...externalThermostat.params, { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '22' }],
-      },
-    ]);
+    const handler = withReference(
+      buildHandler([
+        {
+          ...externalThermostat,
+          params: [...externalThermostat.params, { name: 'THERMOSTAT_MANUAL_SETPOINT', value: '22' }],
+        },
+      ]),
+      'netatmo-setpoint',
+      22,
+    );
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 23);
 
@@ -655,7 +690,7 @@ describe('thermostat.onExternalSetpointChanged', () => {
 
   it('should hold a change to a different value than the one written', async () => {
     const mod = loadListener();
-    const handler = buildHandler();
+    const handler = withReference(buildHandler(), 'netatmo-setpoint', 21);
     handler.selfWrittenSetpoints.set('netatmo-setpoint', 21);
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
@@ -704,6 +739,73 @@ describe('thermostat.onExternalSetpointChanged', () => {
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', null);
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', undefined);
+
+    expect(heldSetpoint(handler)).to.equal(null);
+  });
+
+  // A restart empties `selfWrittenSetpoints`, which lives only in memory. The
+  // integration then reconnects and re-reports the setpoint the schedule had
+  // already applied — an unchanged value that used to be read as a turn of the
+  // dial, so every update, reboot or power cut left the thermostat in "manual"
+  // until the next slot, with nobody having touched anything.
+  it('should not hold the first report after a restart', async () => {
+    const mod = loadListener();
+    // Nothing observed and nothing written: a fresh process.
+    const handler = buildHandler();
+
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
+
+    expect(heldSetpoint(handler)).to.equal(null);
+    // The reference is recorded, so a later *change* is still caught.
+    expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(21);
+  });
+
+  it('should hold a change that follows the first report after a restart', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+
+    // The reconnection's report, then someone turns the dial.
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
+
+    expect(heldSetpoint(handler)).to.equal('19');
+  });
+
+  // The other half of the restart bug: the write at startup failed because the
+  // integration was not connected yet, so the appliance still carries the old
+  // value. Its first report used to be taken for a manual setting, and those 19
+  // degrees were then held in place of the scheduled comfort — for hours, a whole
+  // night in PG's test. Recording the reference instead lets the minute loop write
+  // the right setpoint on its next tick.
+  it('should not hold a stale value reported after a failed startup write', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
+
+    expect(heldSetpoint(handler)).to.equal(null);
+    assert.notCalled(handler.gladys.device.setValue);
+  });
+
+  // The observed value is recorded before the self-write check, not after: the echo
+  // of our own write is swallowed by that check but is still a report, and leaving
+  // the reference unset there made the next turn of the dial look like a first
+  // report and go unheld.
+  it('should record the reference even on a report it swallows as its own echo', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+    handler.selfWrittenSetpoints.set('netatmo-setpoint', 21);
+
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
+
+    expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(21);
+  });
+
+  it('should not hold an unchanged value reported again', async () => {
+    const mod = loadListener();
+    const handler = withReference(buildHandler(), 'netatmo-setpoint', 21);
+
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
 
     expect(heldSetpoint(handler)).to.equal(null);
   });

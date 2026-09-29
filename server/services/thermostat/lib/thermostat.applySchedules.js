@@ -121,6 +121,13 @@ async function writeExternalSetpoint(gladys, targetSelector, setpoint, thermosta
       value = max;
     }
     if (found.feature.last_value === value) {
+      // Nothing to write, but this *is* the value this service stands behind, so
+      // it is marked all the same. Without it, an integration that re-reports
+      // this untouched setpoint — on a reconnection, or on its regular report —
+      // would look like a change made on the device and arm a manual hold.
+      if (selfWritten) {
+        selfWritten.set(targetSelector, value);
+      }
       logger.debug(`Thermostat schedule: external setpoint already ${value} (${logContext})`);
       return;
     }

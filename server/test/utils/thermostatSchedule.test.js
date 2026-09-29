@@ -13,6 +13,7 @@ const {
   getCurrentDayAndMinutes,
   findMatchingSlot,
   findMatchingPreset,
+  carriedPresetByDay,
   DAY_MINUTES,
 } = require('../../utils/thermostatSchedule');
 
@@ -744,5 +745,80 @@ describe('thermostatSchedule transition points', () => {
       expect(nextTransitionTimestamp([], monday8am, 'UTC')).to.equal(null);
       expect(nextTransitionTimestamp(null, monday8am, 'UTC')).to.equal(null);
     });
+
+    // The expiry names a transition point, so it has to land on that point's own
+    // minute. Carrying the seconds of the instant the hold was taken put it at
+    // 08:30:47 for a point at 08:30, and with a 60 s loop the return to the
+    // programme arrived up to another minute late — while the widget displayed
+    // 08:30 all along.
+    it('should land on the point rather than carrying the seconds of the moment', () => {
+      const transitions = [{ day_of_week: 0, time: '08:30', preset: 'eco' }];
+      const monday8h0047 = new Date('2026-09-21T08:00:47.412Z');
+
+      const timestamp = nextTransitionTimestamp(transitions, monday8h0047, 'UTC');
+
+      expect(new Date(timestamp).toISOString()).to.equal('2026-09-21T08:30:00.000Z');
+    });
+  });
+});
+
+describe('thermostatSchedule.carriedPresetByDay', () => {
+  it('should carry a night into the next morning', () => {
+    const week = [
+      { day_of_week: 0, time: '06:30', preset: 'comfort' },
+      { day_of_week: 0, time: '22:00', preset: 'night' },
+      { day_of_week: 1, time: '06:30', preset: 'comfort' },
+    ];
+
+    const byDay = carriedPresetByDay(week);
+
+    // Tuesday starts on Monday's night, until its own 06:30 point.
+    expect(byDay[1]).to.deep.equal({ preset: 'night', day: 0, until: 6 * 60 + 30 });
+  });
+
+  it('should carry a single point across every day without one', () => {
+    // The "Weekend chalet" case: one point, Saturday 08:00. The server applies
+    // comfort all week (findCurrentTransition wraps onto the last point), so
+    // Monday to Friday inherit it and must not read as empty days.
+    const week = [{ day_of_week: 5, time: '08:00', preset: 'comfort' }];
+
+    const byDay = carriedPresetByDay(week);
+
+    [0, 1, 2, 3, 4].forEach((day) => {
+      expect(byDay[day]).to.deep.equal({ preset: 'comfort', day: 5, until: DAY_MINUTES });
+    });
+    // Saturday states its own preset from 08:00; before that it inherits the
+    // same point, wrapped from the end of the week.
+    expect(byDay[5]).to.equal(null);
+    expect(byDay[6]).to.deep.equal({ preset: 'comfort', day: 5, until: DAY_MINUTES });
+  });
+
+  it('should carry the last point of the week onto Monday', () => {
+    const week = [
+      { day_of_week: 0, time: '08:00', preset: 'comfort' },
+      { day_of_week: 6, time: '22:00', preset: 'night' },
+    ];
+
+    const byDay = carriedPresetByDay(week);
+
+    // Monday inherits Sunday's night until its own 08:00 point: the week wraps.
+    expect(byDay[0]).to.deep.equal({ preset: 'night', day: 6, until: 8 * 60 });
+  });
+
+  it('should inherit nothing on a day whose own point is at midnight', () => {
+    const week = [
+      { day_of_week: 0, time: '00:00', preset: 'eco' },
+      { day_of_week: 1, time: '07:00', preset: 'comfort' },
+    ];
+
+    const byDay = carriedPresetByDay(week);
+
+    // Monday's first minute is its own point's: there is nothing to carry into.
+    expect(byDay[0]).to.equal(null);
+  });
+
+  it('should inherit nothing from an empty schedule', () => {
+    expect(carriedPresetByDay([])[3]).to.equal(null);
+    expect(carriedPresetByDay(null)[3]).to.equal(null);
   });
 });

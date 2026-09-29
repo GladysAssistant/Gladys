@@ -124,7 +124,26 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     // made on the device, arm a hold, rewrite the same value (a cloud call per
     // poll), and start the cycle again on the next report. The visible result is
     // a thermostat stuck in "manual" for ever.
+    // A hold belongs to a *change*, and a change is a value that differs from the
+    // previous report. This is what a restart exposes: the marks of what this
+    // service wrote live in memory and are gone, the integration reconnects and
+    // re-reports the setpoint the schedule had already applied, and that
+    // unchanged value used to be read as a turn of the dial — every update,
+    // reboot or power cut left the thermostat in "manual" until the next slot.
+    // Worse, when the write at startup failed because the integration was not
+    // connected yet, the stale value the device still held was the one kept. The
+    // first report after a restart therefore only records the reference, and the
+    // minute loop writes the scheduled setpoint back on its next tick.
+    //
+    // Recorded before the self-write check below, not after: a report that check
+    // swallows is still a report, and leaving the reference unset there would
+    // make the next genuine change look like a first report and go unheld.
+    const previouslyObserved = this.observedSetpoints.get(changedSelector);
+    this.observedSetpoints.set(changedSelector, newValue);
     if (this.selfWrittenSetpoints.get(changedSelector) === newValue) {
+      return;
+    }
+    if (previouslyObserved === undefined || previouslyObserved === newValue) {
       return;
     }
     // Already held at this value, which is the same reasoning one step further:
