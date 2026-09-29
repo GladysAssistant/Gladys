@@ -31,6 +31,16 @@ describe('externalIntegration.validateManifest — energy_contracts', () => {
     expect(externalIntegration.validateManifest(provider)).to.deep.equal(provider);
     const calendarsOnly = withEnergy({ calendars: [AGILE_CALENDAR] }, { ...TEST_MANIFEST, type: 'provider' });
     expect(externalIntegration.validateManifest(calendarsOnly)).to.deep.equal(calendarsOnly);
+    // a spot price published every 15 minutes
+    const quarterHour = withEnergy(
+      { calendars: [{ key: 'spot-fi', granularity: 'fifteen_minutes', timezone: 'Europe/Helsinki', currency: 'EUR' }] },
+      { ...TEST_MANIFEST, type: 'provider' },
+    );
+    expect(externalIntegration.validateManifest(quarterHour)).to.deep.equal(quarterHour);
+    expect422(
+      withEnergy({ calendars: [{ key: 'spot-fi', granularity: 'five_minutes' }] }),
+      'energy_contracts.calendars[0]: calendar granularity',
+    );
   });
 
   it('should reject a malformed field', () => {

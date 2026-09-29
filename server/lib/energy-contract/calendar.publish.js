@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const db = require('../../models');
 const { BadParameters, ForbiddenError, NotFoundError } = require('../../utils/coreErrors');
 const { TARIFF_CALENDAR_GRANULARITIES, EVENTS } = require('../../utils/constants');
-const { DATE_REGEX } = require('./tariff.constants');
+const { DATE_REGEX, CALENDAR_SLOT_MINUTES } = require('./tariff.constants');
 const { localToUtcMs, getLocalContext } = require('./tariff.time');
 const logger = require('../../utils/logger');
 
@@ -28,7 +28,7 @@ function resolveStartsAt(entry, calendar, index) {
       throw new BadParameters(`entries[${index}].date: must be a YYYY-MM-DD date`);
     }
     if (calendar.granularity !== TARIFF_CALENDAR_GRANULARITIES.DAY) {
-      throw new BadParameters(`entries[${index}].date: a thirty_minutes calendar takes starts_at`);
+      throw new BadParameters(`entries[${index}].date: a ${calendar.granularity} calendar takes starts_at`);
     }
     return localToUtcMs(entry.date, calendar.timezone);
   }
@@ -42,11 +42,13 @@ function resolveStartsAt(entry, calendar, index) {
       throw new BadParameters(`entries[${index}].starts_at: must be a local midnight of ${calendar.timezone}`);
     }
   } else {
-    // a 30-minute slot of the calendar's local clock (a :15 / :45 zone is not aligned on UTC)
+    // a 30-minute or 15-minute slot of the calendar's local clock (a :15 / :45 zone is not
+    // aligned on UTC)
+    const slotMinutes = CALENDAR_SLOT_MINUTES[calendar.granularity];
     const local = getLocalContext(ms, calendar.timezone);
-    if (local.minutes % 30 !== 0 || ms % 60000 !== 0) {
+    if (local.minutes % slotMinutes !== 0 || ms % 60000 !== 0) {
       throw new BadParameters(
-        `entries[${index}].starts_at: must be aligned on a 30-minute slot of ${calendar.timezone}`,
+        `entries[${index}].starts_at: must be aligned on a ${slotMinutes}-minute slot of ${calendar.timezone}`,
       );
     }
   }

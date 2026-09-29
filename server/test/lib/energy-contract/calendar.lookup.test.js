@@ -59,4 +59,49 @@ describe('energy-contract createCalendarLookup', () => {
     expect(lookup.get('spot', Date.UTC(2026, 0, 12, 12, 30))).to.equal(0.15);
     expect(lookup.get('spot', Date.UTC(2026, 0, 12, 13))).to.equal(undefined);
   });
+  it('should read a 15-minute calendar by quarter and give the slot length of the sub-daily calendars', () => {
+    const lookup = createCalendarLookup(
+      {
+        'spot-fi': { granularity: 'fifteen_minutes', timezone: 'Europe/Helsinki' },
+        peaks: { granularity: 'thirty_minutes' },
+        holidays: { granularity: 'day' },
+      },
+      [
+        { calendar_key: 'spot-fi', starts_at: '2026-01-12T12:00:00Z', value: 0.04 },
+        { calendar_key: 'spot-fi', starts_at: '2026-01-12T12:15:00Z', value: 0.09 },
+      ],
+    );
+    expect(lookup.get('spot-fi', Date.UTC(2026, 0, 12, 12))).to.equal(0.04);
+    expect(lookup.get('spot-fi', Date.UTC(2026, 0, 12, 12, 15))).to.equal(0.09);
+    // an instant inside a quarter reads that quarter, a quarter without entry reads nothing
+    expect(lookup.get('spot-fi', Date.UTC(2026, 0, 12, 12, 20))).to.equal(0.09);
+    expect(lookup.get('spot-fi', Date.UTC(2026, 0, 12, 12, 30))).to.equal(undefined);
+    expect(lookup.slotMinutes('spot-fi')).to.equal(15);
+    expect(lookup.slotMinutes('peaks')).to.equal(30);
+    expect(lookup.slotMinutes('holidays')).to.equal(undefined);
+    expect(lookup.slotMinutes('unknown')).to.equal(undefined);
+  });
+  it('should read the second quarter of a 30-minute slot from that slot, on the calendar local clock', () => {
+    const lookup = createCalendarLookup(
+      {
+        peaks: { granularity: 'thirty_minutes', timezone: 'Europe/Paris' },
+        'peaks-np': { granularity: 'thirty_minutes', timezone: 'Asia/Kathmandu' },
+      },
+      [
+        { calendar_key: 'peaks', starts_at: '2026-01-12T12:00:00Z', value: 'critical-peak' },
+        // Asia/Kathmandu is UTC+05:45: the local 18:00 slot starts at 12:15Z
+        { calendar_key: 'peaks-np', starts_at: '2026-01-12T12:15:00Z', value: 'critical-peak' },
+      ],
+    );
+    const quarter = Date.UTC(2026, 0, 12, 12, 15);
+    expect(lookup.get('peaks', quarter)).to.equal('critical-peak');
+    // the local context of the caller is reused when it is in the calendar timezone
+    expect(lookup.get('peaks', quarter, getLocalContext(quarter, 'Europe/Paris'), 'Europe/Paris')).to.equal(
+      'critical-peak',
+    );
+    expect(lookup.get('peaks', Date.UTC(2026, 0, 12, 12, 30))).to.equal(undefined);
+    // 12:30Z is 18:15 in Kathmandu, inside the local 18:00 slot; 12:00Z is 17:45, in the previous one
+    expect(lookup.get('peaks-np', Date.UTC(2026, 0, 12, 12, 30))).to.equal('critical-peak');
+    expect(lookup.get('peaks-np', Date.UTC(2026, 0, 12, 12, 0))).to.equal(undefined);
+  });
 });

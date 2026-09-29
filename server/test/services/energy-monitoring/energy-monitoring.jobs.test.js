@@ -57,7 +57,7 @@ describe('EnergyMonitoring: contract jobs', () => {
 
   it('should schedule the billing period job and the catch-up in the 30-minute job', async () => {
     await energyMonitoring.init();
-    expect(gladys.scheduler.scheduleJob.callCount).to.equal(4);
+    expect(gladys.scheduler.scheduleJob.callCount).to.equal(5);
     const thirtyMinutes = gladys.scheduler.scheduleJob.firstCall.args[1];
     energyMonitoring.calculateConsumptionFromIndexThirtyMinutes = fake.resolves(null);
     energyMonitoring.calculateProductionFromIndexThirtyMinutes = fake.resolves(null);
@@ -74,7 +74,7 @@ describe('EnergyMonitoring: contract jobs', () => {
     expect(energyMonitoring.closeBillingPeriods.callCount).to.equal(1);
     // idempotent
     await energyMonitoring.init();
-    expect(gladys.scheduler.scheduleJob.callCount).to.equal(4);
+    expect(gladys.scheduler.scheduleJob.callCount).to.equal(5);
   });
 
   describe('closeBillingPeriods', () => {

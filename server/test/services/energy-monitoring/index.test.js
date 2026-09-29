@@ -42,8 +42,8 @@ describe('EnergyMonitoring Service', () => {
   it('should start the energy monitoring service and initialize handler', async () => {
     await energyMonitoringService.start();
 
-    // Verify scheduler was called to schedule the jobs (30 min + billing period + two 24h)
-    expect(mockScheduler.scheduleJob.callCount).to.equal(4);
+    // Verify scheduler was called to schedule the jobs (30 min + billing period + two 24h + 15 min price check)
+    expect(mockScheduler.scheduleJob.callCount).to.equal(5);
 
     // Verify that 30-minute job is scheduled
     const thirtyMinJobCall = mockScheduler.scheduleJob.getCall(0);
@@ -65,6 +65,9 @@ describe('EnergyMonitoring Service', () => {
     expect(rule2).to.have.property('hour', 16);
     expect(rule2).to.have.property('minute', 10);
     expect(rule2).to.have.property('tz', 'Europe/Paris');
+
+    // Verify that the quarter-hour price check is scheduled
+    expect(mockScheduler.scheduleJob.getCall(4).args[0]).to.equal('0 15,45 * * * *');
   });
 
   it('should not throw error when starting service', async () => {

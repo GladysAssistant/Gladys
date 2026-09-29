@@ -382,6 +382,130 @@ describe('energy-contract priceIntervals', () => {
     expect(costs[0].label).to.equal(undefined);
     expect(costs[1].label).to.equal('Night');
   });
+  describe('15-minute calendars', () => {
+    const utc = { timezone: 'UTC' };
+    it('should price each quarter with its own rule and feed the tiers and counters quarter by quarter', () => {
+      // a critical-peak event starting at 10:15, and an allowance that the event energy never eats
+      const compiled = tariff(
+        [
+          consumption({
+            rules: [
+              { label: 'Critical peak', when: { calendar: { cpp: 'critical-peak' } }, price: 0.5 },
+              {
+                label: 'Tier 1',
+                when: {
+                  tier: {
+                    cumulative: 'day',
+                    from_kwh: 0,
+                    to_kwh: 1,
+                    counts_when: { not_calendar: { cpp: 'critical-peak' } },
+                  },
+                },
+                price: 0.1,
+              },
+            ],
+            fallback: { label: 'Tier 2', price: 0.2 },
+          }),
+        ],
+        ['cpp'],
+      );
+      const calendars = createCalendarLookup({ cpp: { granularity: 'fifteen_minutes' } }, [
+        { calendar_key: 'cpp', starts_at: '2026-01-12T10:15:00Z', value: 'critical-peak' },
+      ]);
+      const { costs, cumulative } = priceIntervals(
+        compiled,
+        utc,
+        [
+          { starts_at: '2026-01-12T10:00:00Z', kwh: 1.2 },
+          { starts_at: '2026-01-12T10:30:00Z', kwh: 1.2 },
+        ],
+        { calendars },
+      );
+      // 10:00: 0.6 kWh in the first tier, then 0.6 kWh of event at the peak price
+      expect(costs[0].cost).to.be.closeTo(0.6 * 0.1 + 0.6 * 0.5, 1e-9);
+      expect(costs[0].label).to.equal('Critical peak');
+      // 10:30: 0.4 kWh left in the first tier, then the rest in the second
+      expect(costs[1].cost).to.be.closeTo(0.4 * 0.1 + 0.2 * 0.2 + 0.6 * 0.2, 1e-9);
+      expect(costs[1].label).to.equal('Tier 2');
+      expect(cumulative.day).to.be.closeTo(2.4, 1e-9);
+      // the event quarter never fed the allowance counter
+      expect(Object.values(cumulative.counters).map((counter) => counter.kwh)[0]).to.be.closeTo(1.8, 1e-9);
+    });
+    it('should read a 30-minute calendar on both quarters of its slot', () => {
+      const compiled = tariff(
+        [
+          consumption({
+            rules: [{ label: 'Event', when: { calendar: { peaks: 'critical-peak' } }, price: 1 }],
+            fallback: { label: 'Spot', price_from_calendar: 'spot' },
+          }),
+        ],
+        ['spot', 'peaks'],
+      );
+      const calendars = createCalendarLookup(
+        { spot: { granularity: 'fifteen_minutes' }, peaks: { granularity: 'thirty_minutes' } },
+        [
+          { calendar_key: 'peaks', starts_at: '2026-01-12T10:00:00Z', value: 'critical-peak' },
+          { calendar_key: 'spot', starts_at: '2026-01-12T10:30:00Z', value: 0.3 },
+          { calendar_key: 'spot', starts_at: '2026-01-12T10:45:00Z', value: 0.4 },
+        ],
+      );
+      const { costs, warnings } = priceIntervals(
+        compiled,
+        utc,
+        [
+          { starts_at: '2026-01-12T10:00:00Z', kwh: 2 },
+          { starts_at: '2026-01-12T10:30:00Z', kwh: 2 },
+        ],
+        { calendars },
+      );
+      expect(warnings).to.deep.equal([]);
+      expect(costs.map((c) => c.cost)).to.deep.equal([2, 0.7]);
+    });
+    it('should split neither an interval without energy nor a daily interval', () => {
+      const compiled = tariff(
+        [
+          consumption({
+            rules: [
+              {
+                label: 'Tier 1',
+                when: { tier: { cumulative: 'day', from_kwh: 0, to_kwh: 10 } },
+                price_from_calendar: 'spot',
+              },
+            ],
+            fallback: { price: 0.3 },
+          }),
+        ],
+        ['spot'],
+      );
+      const calendars = createCalendarLookup({ spot: { granularity: 'fifteen_minutes' } }, [
+        { calendar_key: 'spot', starts_at: '2026-01-12T00:00:00Z', value: 0.5 },
+        { calendar_key: 'spot', starts_at: '2026-01-12T00:15:00Z', value: 0.9 },
+        { calendar_key: 'spot', starts_at: '2026-01-12T23:30:00Z', value: 0.1 },
+        { calendar_key: 'spot', starts_at: '2026-01-12T23:45:00Z', value: 0.2 },
+      ]);
+      // the empty interval closing a counter replay at 23:50 does not step into the next day
+      const replay = priceIntervals(
+        compiled,
+        utc,
+        [
+          { starts_at: '2026-01-12T23:30:00Z', kwh: 2 },
+          { starts_at: '2026-01-12T23:50:00Z', kwh: 0 },
+        ],
+        { calendars },
+      );
+      expect(replay.costs[0].cost).to.be.closeTo(0.3, 1e-9);
+      expect(replay.cumulative.day).to.equal(2);
+      // a daily interval is priced at its start, as with a 30-minute calendar
+      const daily = priceIntervals(
+        compiled,
+        utc,
+        [{ starts_at: '2026-01-12T00:00:00Z', kwh: 4, duration_minutes: 1440 }],
+        { calendars },
+      );
+      expect(daily.costs[0].cost).to.equal(2);
+    });
+  });
+
   it('should round costs to 6 decimals', () => {
     expect(roundCost(0.1234567)).to.equal(0.123457);
     expect(roundCost(1 / 3)).to.equal(0.333333);

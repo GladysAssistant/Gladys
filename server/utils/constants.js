@@ -2391,6 +2391,7 @@ const ENERGY_CONTRACT_POWER_UNITS = {
 const TARIFF_CALENDAR_GRANULARITIES = {
   DAY: 'day',
   THIRTY_MINUTES: 'thirty_minutes',
+  FIFTEEN_MINUTES: 'fifteen_minutes',
 };
 
 const AI_CHAT_TOOL_CATEGORIES = {

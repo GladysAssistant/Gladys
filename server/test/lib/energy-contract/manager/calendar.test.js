@@ -147,6 +147,47 @@ describe('energyContract: tariff calendars', () => {
       expect(entries.map((e) => e.value)).to.deep.equal([0.1823, -0.01]);
     });
 
+    it('should upsert 15-minute prices on the quarters and refuse the other instants', async () => {
+      await energyContract.declareCalendar(
+        { key: 'spot-fi', granularity: 'fifteen_minutes', timezone: 'Europe/Helsinki', currency: 'EUR' },
+        TEST_SERVICE_ID,
+      );
+      const publish = (key, entries) =>
+        energyContract.publishCalendarEntries(key, entries, {
+          provider_service_id: TEST_SERVICE_ID,
+          skip_recalculation: true,
+        });
+      const result = await publish(
+        'spot-fi',
+        ['00', '15', '30', '45'].map((minutes, index) => ({
+          starts_at: `2026-01-12T05:${minutes}:00Z`,
+          price: 0.05 + index / 100,
+        })),
+      );
+      expect(result.count).to.equal(4);
+      const entries = await energyContract.getCalendarEntries('spot-fi', { from: '2026-01-12' });
+      expect(entries.map((e) => e.starts_at)).to.deep.equal([
+        '2026-01-12T05:00:00.000Z',
+        '2026-01-12T05:15:00.000Z',
+        '2026-01-12T05:30:00.000Z',
+        '2026-01-12T05:45:00.000Z',
+      ]);
+      await expect(publish('spot-fi', [{ starts_at: '2026-01-12T05:10:00Z', price: 1 }])).to.be.rejectedWith(
+        /aligned on a 15-minute slot of Europe\/Helsinki/,
+      );
+      await expect(publish('spot-fi', [{ date: '2026-01-12', price: 1 }])).to.be.rejectedWith(
+        /a fifteen_minutes calendar takes starts_at/,
+      );
+      // a quarter is not a slot of a 30-minute calendar
+      await expect(publish('spot-fr', [{ starts_at: '2026-01-12T05:15:00Z', price: 1 }])).to.be.rejectedWith(
+        /aligned on a 30-minute slot of Europe\/Paris/,
+      );
+      // the granularity of a key is fixed for its whole life
+      await expect(
+        energyContract.declareCalendar({ ...SPOT, granularity: 'fifteen_minutes' }, TEST_SERVICE_ID),
+      ).to.be.rejectedWith(/cannot become "fifteen_minutes"/);
+    });
+
     it('should refuse an unknown calendar, another owner and invalid entries', async () => {
       const publish = (key, entries, options = { provider_service_id: TEST_SERVICE_ID, skip_recalculation: true }) =>
         energyContract.publishCalendarEntries(key, entries, options);

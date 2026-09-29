@@ -39,6 +39,13 @@ const TARIFF_WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const CALENDAR_GRANULARITIES = {
   DAY: 'day',
   THIRTY_MINUTES: 'thirty_minutes',
+  FIFTEEN_MINUTES: 'fifteen_minutes',
+};
+
+// Length of a slot of the sub-daily calendars, on the calendar's local clock
+const CALENDAR_SLOT_MINUTES = {
+  [CALENDAR_GRANULARITIES.THIRTY_MINUTES]: 30,
+  [CALENDAR_GRANULARITIES.FIFTEEN_MINUTES]: 15,
 };
 
 const CALENDAR_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
@@ -78,6 +85,7 @@ module.exports = {
   TARIFF_DEMAND_AGGREGATIONS,
   TARIFF_WEEKDAYS,
   CALENDAR_GRANULARITIES,
+  CALENDAR_SLOT_MINUTES,
   CALENDAR_KEY_REGEX,
   COMPONENT_KEY_REGEX,
   TIME_REGEX,

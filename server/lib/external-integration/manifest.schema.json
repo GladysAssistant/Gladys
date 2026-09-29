@@ -324,10 +324,10 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["key"],
-      "description": "A tariff calendar the integration publishes: dated string values within the declared enum (day colours, holidays, event days) on a daily or 30-minute grid, or numeric prices per kWh (values omitted, currency set). A daily calendar may start its day at another local time (day_starts_at, 06:00 for the Tempo colour).",
+      "description": "A tariff calendar the integration publishes: dated string values within the declared enum (day colours, holidays, event days) on a daily, 30-minute or 15-minute grid, or numeric prices per kWh (values omitted, currency set). A daily calendar may start its day at another local time (day_starts_at, 06:00 for the Tempo colour).",
       "properties": {
         "key": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
-        "granularity": { "type": "string", "enum": ["day", "thirty_minutes"] },
+        "granularity": { "type": "string", "enum": ["day", "thirty_minutes", "fifteen_minutes"] },
         "timezone": { "type": "string", "minLength": 1, "maxLength": 64 },
         "day_starts_at": { "type": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$" },
         "values": {

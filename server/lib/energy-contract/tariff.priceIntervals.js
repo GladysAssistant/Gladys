@@ -6,7 +6,7 @@ const {
   COST_DECIMALS,
   CALENDAR_WARNING_REASONS,
 } = require('./tariff.constants');
-const { getLocalContext, getDayBounds, getMonthBounds, getPeriodIds } = require('./tariff.time');
+const { getLocalContext, getDayBounds, getMonthBounds, getPeriodIds, MS_PER_MINUTE } = require('./tariff.time');
 const { matchesConditions } = require('./tariff.conditions');
 const { computeDemandCharges } = require('./tariff.demand');
 const { createCalendarLookup } = require('./calendar.lookup');
@@ -193,6 +193,65 @@ function prepareIntervals(intervals, tz, billingPeriodStartDay) {
 }
 
 /**
+ * @description The length of the slots a tariff prices the energy on: 15 minutes when it reads
+ * a 15-minute calendar (section 7.1), 30 minutes (the interval itself) otherwise.
+ * @param {object} compiled - Compiled tariff.
+ * @param {object} lookup - Calendar lookup.
+ * @returns {number} The slot length in minutes.
+ * @example
+ * getEvaluationSlotMinutes(compiled, lookup); // 15 for a tariff reading a 15-minute spot calendar
+ */
+function getEvaluationSlotMinutes(compiled, lookup) {
+  return compiled.calendars.reduce((minutes, key) => {
+    const slotMinutes = lookup.slotMinutes(key);
+    return slotMinutes !== undefined && slotMinutes < minutes ? slotMinutes : minutes;
+  }, DEFAULT_INTERVAL_DURATION_MINUTES);
+}
+
+/**
+ * @description The slots the energy of a prepared interval is priced on: the interval itself,
+ * or, for a 30-minute interval of a tariff reading a 15-minute calendar, its two quarters with
+ * half of its energy each (consumption assumed uniform within the half-hour, the best the meter
+ * data allows), each with its own local context and periods. An interval without energy is
+ * never split: nothing to price, and the empty interval closing a counter replay at an instant
+ * must not step into the next day.
+ * @param {object} interval - Prepared interval.
+ * @param {number} slotMinutes - Evaluation slot length (getEvaluationSlotMinutes).
+ * @param {string} tz - Contract timezone.
+ * @param {number} billingPeriodStartDay - Billing period start day (1-31).
+ * @returns {Array<object>} The slots, shaped like prepared intervals.
+ * @example
+ * splitInterval(interval, 15, 'Europe/Helsinki', 1);
+ */
+function splitInterval(interval, slotMinutes, tz, billingPeriodStartDay) {
+  if (
+    interval.durationMinutes !== DEFAULT_INTERVAL_DURATION_MINUTES ||
+    slotMinutes >= interval.durationMinutes ||
+    !(interval.kwh > 0)
+  ) {
+    return [interval];
+  }
+  const count = interval.durationMinutes / slotMinutes;
+  const kwh = interval.kwh / count;
+  const slots = [{ ...interval, kwh, durationMinutes: slotMinutes }];
+  for (let index = 1; index < count; index += 1) {
+    const ms = interval.ms + index * slotMinutes * MS_PER_MINUTE;
+    const local = getLocalContext(ms, tz);
+    slots.push({
+      ms,
+      startsAt: new Date(ms).toISOString(),
+      kwh,
+      durationMinutes: slotMinutes,
+      // the peak of the interval is the only one known
+      maxPowerKw: interval.maxPowerKw,
+      local,
+      periodIds: getPeriodIds(local.date, billingPeriodStartDay, tz),
+    });
+  }
+  return slots;
+}
+
+/**
  * @description Price consumption intervals with a compiled tariff: the rule engine of
  * docs/specs/energy-contracts.md (section 7). Pure: knows neither suppliers nor
  * integrations, reads calendars through the lookup it is given.
@@ -230,35 +289,49 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
     options.closed_period && !excludedKinds.has(TARIFF_COMPONENT_KINDS.DEMAND)
       ? computeDemandCharges(compiled, prepared)
       : null;
+  const slotMinutes = getEvaluationSlotMinutes(compiled, lookup);
+  const pricesConsumption = !excludedKinds.has(TARIFF_COMPONENT_KINDS.CONSUMPTION);
 
   const costs = prepared.map((interval, index) => {
-    // Reset the accumulations whose period changed (the first interval keeps cumulative_before).
-    SCOPES.forEach((scope) => {
-      const id = interval.periodIds[scope];
-      if (currentPeriodIds[scope] !== undefined && currentPeriodIds[scope] !== id) {
-        accumulation.reset(scope);
-      }
-      currentPeriodIds[scope] = id;
-    });
-    const context = {
-      local: interval.local,
-      getCalendarValue: (key) => lookup.get(key, interval.ms, interval.local, tz),
-      maxPowerKw: interval.maxPowerKw,
-      tierBounds: (tier) => tierBoundsAt(tier, interval),
-    };
-    const components = {};
+    // The energy is priced slot by slot (the quarters of the interval for a tariff reading a
+    // 15-minute calendar): the tiers and the counters see the slots in order.
+    const consumptionAmounts = {};
     let label;
+    splitInterval(interval, slotMinutes, tz, billingPeriodStartDay).forEach((slot) => {
+      // Reset the accumulations whose period changed (the first interval keeps cumulative_before).
+      SCOPES.forEach((scope) => {
+        const id = slot.periodIds[scope];
+        if (currentPeriodIds[scope] !== undefined && currentPeriodIds[scope] !== id) {
+          accumulation.reset(scope);
+        }
+        currentPeriodIds[scope] = id;
+      });
+      const context = {
+        local: slot.local,
+        getCalendarValue: (key) => lookup.get(key, slot.ms, slot.local, tz),
+        maxPowerKw: slot.maxPowerKw,
+        tierBounds: (tier) => tierBoundsAt(tier, slot),
+      };
+      compiled.components.forEach((component) => {
+        if (component.kind !== TARIFF_COMPONENT_KINDS.CONSUMPTION || !pricesConsumption) {
+          return;
+        }
+        const result = evaluateConsumption(component, slot, context, accumulation.state, warnings);
+        consumptionAmounts[component.key] = (consumptionAmounts[component.key] || 0) + result.amount;
+        if (result.label !== undefined) {
+          label = result.label;
+        }
+      });
+      accumulation.add(slot, context);
+    });
+    const components = {};
     compiled.components.forEach((component) => {
       if (excludedKinds.has(component.kind)) {
         return;
       }
       let amount = 0;
       if (component.kind === TARIFF_COMPONENT_KINDS.CONSUMPTION) {
-        const result = evaluateConsumption(component, interval, context, accumulation.state, warnings);
-        amount = result.amount;
-        if (result.label !== undefined) {
-          label = result.label;
-        }
+        amount = consumptionAmounts[component.key];
       } else if (component.kind === TARIFF_COMPONENT_KINDS.FIXED) {
         amount = evaluateFixed(component, interval, tz);
       } else if (component.kind === TARIFF_COMPONENT_KINDS.TAX) {
@@ -271,7 +344,6 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
       }
       components[component.key] = roundCost(amount);
     });
-    accumulation.add(interval, context);
     const cost = roundCost(Object.values(components).reduce((sum, amount) => sum + amount, 0));
     return { starts_at: interval.startsAt, cost, components, label };
   });
@@ -282,6 +354,8 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
 module.exports = {
   priceIntervals,
   prepareIntervals,
+  getEvaluationSlotMinutes,
+  splitInterval,
   evaluateConsumption,
   evaluateFixed,
   resolvePrice,

@@ -7,7 +7,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const logger = require('../../../utils/logger');
-const { SYSTEM_VARIABLE_NAMES, EVENTS } = require('../../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, EVENTS, TARIFF_CALENDAR_GRANULARITIES } = require('../../../utils/constants');
 const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 
 /**
@@ -90,6 +90,21 @@ async function init() {
 
       // Add to queue
       await this.calculateCostFromYesterday(yesterdayDate);
+    });
+  }
+
+  // price-changed scene trigger at :15 / :45 (spec 8.2), for the contracts reading a 15-minute
+  // calendar only (a spot price changing every quarter hour): kept out of the 30-minute job,
+  // which checks every contract at :00 / :30 once the costs are written
+  if (!this.checkPriceChangesEveryFifteenMinutesJob) {
+    this.checkPriceChangesEveryFifteenMinutesJob = this.gladys.scheduler.scheduleJob(`0 15,45 * * * *`, async () => {
+      try {
+        await this.gladys.energyContract.checkPriceChanges({
+          calendar_granularity: TARIFF_CALENDAR_GRANULARITIES.FIFTEEN_MINUTES,
+        });
+      } catch (e) {
+        logger.warn(`Energy monitoring: unable to check the contract price changes: ${e.message}`);
+      }
     });
   }
 

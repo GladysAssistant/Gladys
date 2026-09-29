@@ -1,11 +1,10 @@
 const { TARIFF_COMPONENT_KINDS, COST_DECIMALS } = require('./tariff.constants');
 const { getLocalContext, getPeriodIds, MS_PER_MINUTE } = require('./tariff.time');
 const { matchesConditions } = require('./tariff.conditions');
-const { resolvePrice } = require('./tariff.priceIntervals');
+const { resolvePrice, getEvaluationSlotMinutes } = require('./tariff.priceIntervals');
 const { createCalendarLookup } = require('./calendar.lookup');
 const { readTierCumulative, getTierBounds, resetChangedPeriods } = require('./tariff.tier');
 
-const SLOT_MS = 30 * 60 * 1000;
 const EMPTY_LOOKUP = createCalendarLookup();
 
 /**
@@ -79,7 +78,8 @@ function getUnitPriceAt(compiled, contract, ms, lookup, cumulative, maxPowerKw =
 /**
  * @description Current unit price of a contract and its next change, for the price widget,
  * the assistant and the scene trigger: the price at `at`, then a scan of the following
- * 30-minute slots until the price or the rule label changes.
+ * slots (15 minutes when the tariff reads a 15-minute calendar, 30 minutes otherwise) until
+ * the price or the rule label changes.
  * @param {object} compiled - Compiled tariff.
  * @param {object} contract - The contract, with its timezone.
  * @param {object} [options] - Options: `at` (Date or timestamp, now by default), `calendars` (lookup),
@@ -96,11 +96,14 @@ function getCurrentPrice(compiled, contract, options = {}) {
   const cumulative = { day: 0, month: 0, billing_period: 0, ...(options.cumulative || {}) };
   const maxPowerKw = options.max_power_kw || 0;
   const horizonMs = (options.horizon_hours || 48) * 60 * 60 * 1000;
-  // Evaluate at the start of the current 30-minute slot of the contract's local clock
-  // (zones at :45 such as Asia/Kathmandu are not aligned on UTC): 30-minute calendars are
-  // keyed by slot start, and a live call never lands on an exact slot instant.
+  // Evaluate at the start of the current slot of the contract's local clock (zones at :45
+  // such as Asia/Kathmandu are not aligned on UTC): a 15-minute slot when the tariff reads a
+  // 15-minute calendar (a spot price changing at :15), a 30-minute one otherwise. Sub-daily
+  // calendars are keyed by slot start, and a live call never lands on an exact slot instant.
+  const slotMinutes = getEvaluationSlotMinutes(compiled, lookup);
+  const slotMs = slotMinutes * MS_PER_MINUTE;
   const local = getLocalContext(requestedAt, contract.timezone);
-  const at = requestedAt - (local.minutes % 30) * MS_PER_MINUTE - (requestedAt % MS_PER_MINUTE);
+  const at = requestedAt - (local.minutes % slotMinutes) * MS_PER_MINUTE - (requestedAt % MS_PER_MINUTE);
   const current = getUnitPriceAt(compiled, contract, at, lookup, cumulative, maxPowerKw);
   const result = {
     price: current.price,
@@ -115,7 +118,7 @@ function getCurrentPrice(compiled, contract, options = {}) {
   // shrink to the next period's days with the old total).
   const billingPeriodStartDay = contract.billing_period_start_day || 1;
   const atIds = getPeriodIds(local.date, billingPeriodStartDay, contract.timezone);
-  let slot = at + SLOT_MS;
+  let slot = at + slotMs;
   while (slot - requestedAt <= horizonMs) {
     const slotIds = getPeriodIds(
       getLocalContext(slot, contract.timezone).date,
@@ -130,7 +133,7 @@ function getCurrentPrice(compiled, contract, options = {}) {
       result.next_label = next.label;
       break;
     }
-    slot += SLOT_MS;
+    slot += slotMs;
   }
   return result;
 }

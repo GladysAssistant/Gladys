@@ -238,6 +238,34 @@ describe('energy-contract getCurrentPrice', () => {
       ).price,
     ).to.equal(0.3);
   });
+  it('should snap to the quarter and announce a change at :15 when the tariff reads a 15-minute calendar', () => {
+    const spot = compileTariff({
+      tariff_version: 1,
+      calendars: ['spot-fi'],
+      components: [{ key: 'energy', kind: 'consumption', fallback: { price_from_calendar: 'spot-fi' } }],
+    });
+    const calendars = createCalendarLookup({ 'spot-fi': { granularity: 'fifteen_minutes' } }, [
+      { calendar_key: 'spot-fi', starts_at: '2026-01-12T12:00:00Z', value: 0.1 },
+      { calendar_key: 'spot-fi', starts_at: '2026-01-12T12:15:00Z', value: 0.2 },
+      { calendar_key: 'spot-fi', starts_at: '2026-01-12T12:30:00Z', value: 0.2 },
+      { calendar_key: 'spot-fi', starts_at: '2026-01-12T12:45:00Z', value: 0.25 },
+    ]);
+    expect(getCurrentPrice(spot, utc, { at: '2026-01-12T12:05:00Z', calendars })).to.deep.include({
+      price: 0.1,
+      valid_until: '2026-01-12T12:15:00.000Z',
+      next_price: 0.2,
+    });
+    // 12:20 is in the 12:15 quarter; the 12:30 quarter has the same price, the change is at 12:45
+    expect(getCurrentPrice(spot, utc, { at: '2026-01-12T12:20:00Z', calendars })).to.deep.include({
+      price: 0.2,
+      valid_until: '2026-01-12T12:45:00.000Z',
+      next_price: 0.25,
+    });
+    // Kathmandu (+05:45): 12:10Z is 17:55 local, whose quarter started at 17:45 local = 12:00Z
+    expect(
+      getCurrentPrice(spot, { timezone: 'Asia/Kathmandu' }, { at: '2026-01-12T12:10:00Z', calendars }),
+    ).to.deep.include({ price: 0.1, valid_until: '2026-01-12T12:15:00.000Z' });
+  });
   it('should fall back like the interval pricing when the matching rule has no calendar price', () => {
     const compiled = compileTariff({
       tariff_version: 1,

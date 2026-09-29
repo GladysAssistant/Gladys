@@ -71,6 +71,65 @@ describe('energyContract.checkPriceChanges', () => {
     expect(priceUnknown[0]).to.include({ price: null, previous_price: 0.2, label: 'peak', previous_label: 'peak' });
   });
 
+  it('should fire the trigger at a quarter hour for a spot price changing every 15 minutes', async () => {
+    await energyContract.declareCalendar(
+      { key: 'spot-fi', granularity: 'fifteen_minutes', timezone: 'UTC', currency: 'EUR' },
+      TEST_SERVICE_ID,
+    );
+    await energyContract.publishCalendarEntries(
+      'spot-fi',
+      [
+        { starts_at: '2026-01-12T12:30:00Z', price: 0.1 },
+        { starts_at: '2026-01-12T12:45:00Z', price: 0.3 },
+      ],
+      { provider_service_id: TEST_SERVICE_ID, skip_recalculation: true },
+    );
+    await energyContract.create(
+      contractPayload({
+        name: 'Spot FI',
+        timezone: 'UTC',
+        valid_from: '2026-01-01',
+        tariff: {
+          tariff_version: 1,
+          calendars: ['spot-fi'],
+          components: [
+            {
+              key: 'energy',
+              kind: 'consumption',
+              rules: [{ label: 'Spot', price_from_calendar: 'spot-fi' }],
+              fallback: { label: 'Backup', price: 0.2 },
+            },
+          ],
+        },
+      }),
+    );
+    const quarterHour = { calendar_granularity: 'fifteen_minutes' };
+    expect(await energyContract.checkPriceChanges(quarterHour)).to.deep.equal([]);
+    // 12:45: the next quarter, between two runs of the 30-minute job
+    clock.setSystemTime(new Date('2026-01-12T12:45:00Z'));
+    const changed = await energyContract.checkPriceChanges(quarterHour);
+    expect(changed).to.have.lengthOf(1);
+    expect(changed[0]).to.include({ contract: 'spot-fi', price: 0.3, previous_price: 0.1, label: 'Spot' });
+  });
+
+  it('should only check the contracts reading a calendar of the requested granularity', async () => {
+    await energyContract.declareCalendar({ key: 'spot-fi', granularity: 'fifteen_minutes' }, TEST_SERVICE_ID);
+    await energyContract.declareCalendar({ key: 'spot-fr', granularity: 'thirty_minutes' }, TEST_SERVICE_ID);
+    // several active contracts (a meter carries only one at a time: listed through a stub)
+    sinon.stub(energyContract, 'get').resolves([
+      { id: 'quarter-id', selector: 'quarter', status: 'active', tariff: { calendars: ['tempo', 'spot-fi'] } },
+      { id: 'half-hour-id', selector: 'half-hour', status: 'active', tariff: { calendars: ['spot-fr'] } },
+      // a delegated contract without fixed fees stores a tariff without calendars
+      { id: 'delegated-id', selector: 'delegated', status: 'active', tariff: { tariff_version: 1, components: [] } },
+    ]);
+    const getCurrent = sinon.stub(energyContract, 'getCurrent').resolves({ price: 0.1, label: 'a', currency: 'EUR' });
+    await energyContract.checkPriceChanges({ calendar_granularity: 'fifteen_minutes' });
+    expect(getCurrent.args).to.deep.equal([['quarter']]);
+    // the 30-minute job checks them all
+    await energyContract.checkPriceChanges();
+    expect(getCurrent.callCount).to.equal(4);
+  });
+
   it('should skip the contracts that are not active', async () => {
     await energyContract.create(contractPayload({ name: 'Expired', valid_from: '2020-01-01', valid_to: '2020-12-31' }));
     await energyContract.create(contractPayload({ name: 'Scheduled', valid_from: '2030-01-01' }));

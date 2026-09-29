@@ -1,8 +1,8 @@
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const { CALENDAR_GRANULARITIES } = require('./tariff.constants');
-const { parseTimeToMinutes, getLocalContext, addDays } = require('./tariff.time');
+const { CALENDAR_GRANULARITIES, CALENDAR_SLOT_MINUTES } = require('./tariff.constants');
+const { parseTimeToMinutes, getLocalContext, addDays, MS_PER_MINUTE } = require('./tariff.time');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -21,12 +21,12 @@ function toMs(value) {
 /**
  * @description Build the in-memory lookup the pricing engine reads calendar values from.
  * Daily calendars are keyed by local date (in the calendar timezone, shifted by
- * `day_starts_at`: the Tempo colour runs from 06:00 to 06:00), 30-minute calendars
- * by the exact start instant.
+ * `day_starts_at`: the Tempo colour runs from 06:00 to 06:00), 30-minute and 15-minute
+ * calendars by the start instant of their slots.
  * @param {object} definitions - { [key]: { granularity, timezone?, day_starts_at? } }.
  * @param {Array<object>} entries - [{ calendar_key, starts_at?, date?, value }] (`date` = local day of a daily entry).
- * @param {string} defaultTimezone - Timezone of daily calendars that declare none (the contract's).
- * @returns {object} The lookup: get(key, ms, local, localTimezone), has(key), keys().
+ * @param {string} defaultTimezone - Timezone of the calendars that declare none (the contract's).
+ * @returns {object} The lookup: get(key, ms, local, localTimezone), has(key), keys(), slotMinutes(key).
  * @example
  * const lookup = createCalendarLookup(
  *   { tempo: { granularity: 'day', timezone: 'Europe/Paris', day_starts_at: '06:00' } },
@@ -39,8 +39,11 @@ function createCalendarLookup(definitions = {}, entries = [], defaultTimezone = 
   const calendars = new Map();
   Object.keys(definitions).forEach((key) => {
     const definition = definitions[key];
+    const granularity = definition.granularity || CALENDAR_GRANULARITIES.DAY;
     calendars.set(key, {
-      granularity: definition.granularity || CALENDAR_GRANULARITIES.DAY,
+      granularity,
+      // undefined for a daily calendar
+      slotMinutes: CALENDAR_SLOT_MINUTES[granularity],
       timezone: definition.timezone || defaultTimezone,
       dayStartsAtMinutes: definition.day_starts_at ? parseTimeToMinutes(definition.day_starts_at) : 0,
       values: new Map(),
@@ -60,9 +63,12 @@ function createCalendarLookup(definitions = {}, entries = [], defaultTimezone = 
   });
 
   /**
-   * @description Read the value of a calendar for an interval start.
+   * @description Read the value of a calendar for an instant: the entry of its local day for
+   * a daily calendar, the entry of the slot containing it for a 30-minute or 15-minute one (the
+   * second quarter of a 30-minute slot reads that slot, when the engine evaluates the quarters
+   * of an interval for a tariff that also reads a 15-minute calendar).
    * @param {string} key - Calendar key.
-   * @param {number} ms - Interval start, milliseconds since the epoch.
+   * @param {number} ms - The instant (an interval start), milliseconds since the epoch.
    * @param {object} [local] - Local context already computed in `localTimezone` (reused when it matches).
    * @param {string} [localTimezone] - Timezone of `local`.
    * @returns {string|number|undefined} The value, undefined when the calendar has none.
@@ -74,18 +80,39 @@ function createCalendarLookup(definitions = {}, entries = [], defaultTimezone = 
     if (!calendar) {
       return undefined;
     }
-    if (calendar.granularity !== CALENDAR_GRANULARITIES.DAY) {
-      return calendar.values.get(ms);
+    const getContext = () =>
+      local && localTimezone === calendar.timezone ? local : getLocalContext(ms, calendar.timezone);
+    if (calendar.slotMinutes !== undefined) {
+      const exact = calendar.values.get(ms);
+      if (exact !== undefined) {
+        return exact;
+      }
+      // the start of the slot on the calendar's local clock (a :15 / :45 zone is not aligned on UTC)
+      const offsetMs = (getContext().minutes % calendar.slotMinutes) * MS_PER_MINUTE + (ms % MS_PER_MINUTE);
+      return offsetMs === 0 ? undefined : calendar.values.get(ms - offsetMs);
     }
-    const context = local && localTimezone === calendar.timezone ? local : getLocalContext(ms, calendar.timezone);
+    const context = getContext();
     const date = context.minutes < calendar.dayStartsAtMinutes ? addDays(context.date, -1) : context.date;
     return calendar.values.get(date);
+  }
+
+  /**
+   * @description The slot length of a sub-daily calendar.
+   * @param {string} key - Calendar key.
+   * @returns {number|undefined} 30 or 15 (minutes), undefined for a daily or an unknown calendar.
+   * @example
+   * lookup.slotMinutes('spot-fi'); // 15
+   */
+  function slotMinutes(key) {
+    const calendar = calendars.get(key);
+    return calendar === undefined ? undefined : calendar.slotMinutes;
   }
 
   return {
     get,
     has: (key) => calendars.has(key),
     keys: () => Array.from(calendars.keys()),
+    slotMinutes,
   };
 }
 

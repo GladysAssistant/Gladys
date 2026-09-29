@@ -66,8 +66,8 @@ describe('EnergyMonitoring.init', () => {
   it('should schedule combined energy monitoring job on first init', async () => {
     await energyMonitoring.init();
 
-    // Verify the jobs are scheduled (30 min job + billing period job + two 24h jobs)
-    expect(mockScheduler.scheduleJob.callCount).to.equal(4);
+    // Verify the jobs are scheduled (30 min job + billing period job + two 24h jobs + 15 min price check)
+    expect(mockScheduler.scheduleJob.callCount).to.equal(5);
 
     // Verify combined job (at 00:00 and 00:30)
     const jobCall = mockScheduler.scheduleJob.getCall(0);
@@ -97,6 +97,11 @@ describe('EnergyMonitoring.init', () => {
     expect(rule2).to.have.property('tz', 'Europe/Paris');
     expect(typeof lastDailyJobCall.args[1]).to.equal('function');
 
+    // Verify the price check of the 15-minute calendars runs at :15 and :45
+    const quarterJobCall = mockScheduler.scheduleJob.getCall(4);
+    expect(quarterJobCall.args[0]).to.equal('0 15,45 * * * *');
+    expect(typeof quarterJobCall.args[1]).to.equal('function');
+
     // Verify job IDs are stored
     expect(energyMonitoring.calculateConsumptionAndCostEvery30MinutesJob).to.equal('mock-job-id');
     expect(energyMonitoring.calculateConsumptionAndCostEvery24HoursJob).to.equal('mock-job-id');
@@ -108,6 +113,7 @@ describe('EnergyMonitoring.init', () => {
     energyMonitoring.calculateConsumptionAndCostEvery24HoursJob = 'existing-daily-job';
     energyMonitoring.calculateConsumptionAndCostEvery24HoursLastJob = 'existing-last-daily-job';
     energyMonitoring.closeBillingPeriodsJob = 'existing-billing-period-job';
+    energyMonitoring.checkPriceChangesEveryFifteenMinutesJob = 'existing-quarter-hour-job';
 
     await energyMonitoring.init();
 
@@ -128,7 +134,7 @@ describe('EnergyMonitoring.init', () => {
     await energyMonitoring.init();
 
     // Verify all jobs are scheduled
-    expect(mockScheduler.scheduleJob.callCount).to.equal(4);
+    expect(mockScheduler.scheduleJob.callCount).to.equal(5);
 
     const jobCall = mockScheduler.scheduleJob.getCall(0);
     expect(jobCall.args[0]).to.equal('0 0,30 * * * *');
@@ -179,6 +185,26 @@ describe('EnergyMonitoring.init', () => {
       const jobFunction = mockScheduler.scheduleJob.getCall(0).args[1];
       await jobFunction();
       assert.calledOnce(calculateCostEveryThirtyMinutes);
+      assert.calledOnce(gladys.energyContract.checkPriceChanges);
+    });
+
+    it('should check the price changes of the contracts reading a 15-minute calendar at :15 and :45', async () => {
+      await energyMonitoring.init();
+      const quarterJobFunction = mockScheduler.scheduleJob.getCall(4).args[1];
+      await quarterJobFunction();
+      assert.calledOnceWithExactly(gladys.energyContract.checkPriceChanges, {
+        calendar_granularity: 'fifteen_minutes',
+      });
+      // the cost calculation stays in the 30-minute job
+      assert.notCalled(calculateCostEveryThirtyMinutes);
+      assert.notCalled(calculateConsumptionFromIndexThirtyMinutes);
+    });
+
+    it('should not fail the quarter-hour job when the price change check fails', async () => {
+      gladys.energyContract.checkPriceChanges = fake.rejects(new Error('boom'));
+      await energyMonitoring.init();
+      const quarterJobFunction = mockScheduler.scheduleJob.getCall(4).args[1];
+      await quarterJobFunction();
       assert.calledOnce(gladys.energyContract.checkPriceChanges);
     });
 
