@@ -4,14 +4,15 @@ import { Link } from 'preact-router/match';
 import { RequestStatus } from '../../../../../utils/consts';
 import ThermostatDeviceBox from './ThermostatDeviceBox';
 import CardFilter from '../../../../../components/layout/CardFilter';
+import style from './style.css';
 
 const DeviceTab = ({ ...props }) => (
-  <div class="card">
+  <div class={cx('card', style.devicePage)}>
     <div class="card-header">
       <h1 class="card-title">
         <Text id="integration.thermostat.device.title" />
       </h1>
-      <div class="page-options d-flex">
+      <div class="page-options d-flex flex-wrap justify-content-end">
         <Localizer>
           <CardFilter
             changeOrderDir={props.changeOrderDir}

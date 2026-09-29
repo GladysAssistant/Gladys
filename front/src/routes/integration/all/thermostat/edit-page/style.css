@@ -22,3 +22,53 @@
 :global(.dark-mode) .presetColorDot {
   filter: invert(100%) hue-rotate(180deg);
 }
+
+/* ─── Form sections ─── */
+
+/* Three titled sections rather than one run of fifteen fields. Sized between the
+   card title and a form-label, so the groups read as groups without competing
+   with the page title. */
+.formSection {
+  margin: 1.75rem 0 0.75rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid rgba(0, 40, 100, 0.12);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* The first one opens the card body, where the card header already provides the
+   separation. */
+.formSection:first-child {
+  margin-top: 0;
+}
+
+/* ─── Fine tuning fold ─── */
+
+.tuningSummary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  /* A summary renders its own marker, which would sit next to the chevron. */
+  list-style: none;
+}
+
+.tuningSummary::-webkit-details-marker {
+  display: none;
+}
+
+.tuningChevron {
+  transition: transform 0.15s ease;
+}
+
+.tuningDetails[open] .tuningChevron {
+  transform: rotate(90deg);
+}
+
+/* A two-digit field. Left at the card's full width it asked for something long. */
+.shortNumberField {
+  max-width: 10rem;
+}

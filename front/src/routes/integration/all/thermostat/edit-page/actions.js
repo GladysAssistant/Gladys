@@ -36,7 +36,17 @@ function createActions(store) {
           // write its own setpoint back to itself.
           const isOwnThermostat = device.service && device.service.name === 'thermostat';
           device.features.forEach(feature => {
-            const entry = { selector: feature.selector, label: `${device.name} - ${feature.name}` };
+            // min/max come along: a real thermostat advertises the range it
+            // accepts (Netatmo 5-30, Zigbee 5-40), and picking it as the setpoint
+            // feature adopts those bounds rather than leaving the 5-35 default,
+            // which promised a setpoint the device would refuse or clamp.
+            const entry = {
+              selector: feature.selector,
+              label: `${device.name} - ${feature.name}`,
+              min: feature.min,
+              max: feature.max,
+              unit: feature.unit
+            };
             if (TEMPERATURE_CATEGORIES.includes(feature.category)) {
               temperatureFeatures.push(entry);
             }

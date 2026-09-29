@@ -3,6 +3,7 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import { getPresetColor } from '../../../../../utils/thermostatPresetColors';
+import { DEVICE_FEATURE_UNITS } from '../../../../../../../server/utils/constants';
 
 const FeatureSelect = ({ value, features, onChange, emptyLabel }) => (
   <select class="form-control" value={value} onChange={onChange}>
@@ -68,6 +69,41 @@ const EditForm = ({ ...props }) => {
   // a device that regulates itself.
   const isExternalThermostat = props.thermostatEditType === 'external';
 
+  // Picking the real thermostat's setpoint feature adopts the range it
+  // advertises. A Netatmo says 5-30, and the 5-35 default then offered the user
+  // two degrees the device would refuse or silently clamp. Only the untouched
+  // defaults are replaced: a range the user has already narrowed is theirs.
+  const chooseTargetFeature = event => {
+    const selector = event.target.value;
+    props.updateThermostatField('thermostatEditTargetFeature', selector);
+    const picked = (props.targetFeatures || []).find(feature => feature.selector === selector);
+    if (!picked) {
+      return;
+    }
+    // Only when the device reports in the unit this form is in: a Fahrenheit
+    // feature's 41-86 written into a Celsius field would read as a range no house
+    // ever heats to.
+    const featureUnit = picked.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? 'F' : 'C';
+    if (picked.unit && featureUnit !== (props.thermostatEditTempUnit || 'C')) {
+      return;
+    }
+    const defaults = { thermostatEditMinTemp: '5', thermostatEditMaxTemp: '35' };
+    if (
+      picked.min !== null &&
+      picked.min !== undefined &&
+      props.thermostatEditMinTemp === defaults.thermostatEditMinTemp
+    ) {
+      props.updateThermostatField('thermostatEditMinTemp', String(picked.min));
+    }
+    if (
+      picked.max !== null &&
+      picked.max !== undefined &&
+      props.thermostatEditMaxTemp === defaults.thermostatEditMaxTemp
+    ) {
+      props.updateThermostatField('thermostatEditMaxTemp', String(picked.max));
+    }
+  };
+
   return (
     <div class="card">
       <div class="card-header">
@@ -83,6 +119,14 @@ const EditForm = ({ ...props }) => {
         <div class={cx('dimmer', { active: saving })}>
           <div class="loader" />
           <div class="dimmer-content">
+            {/* Three sections rather than one run of fifteen fields: what the
+                appliance is, how it heats, and when. A single block buried
+                "Active schedule" — the setting that makes the feature work — in
+                next-to-last place, after the min/max temperatures. */}
+            <h4 class={style.formSection}>
+              <Text id="integration.thermostat.edit.sectionDevice" />
+            </h4>
+
             {/* Nom */}
             <div class="form-group">
               <label class="form-label">
@@ -147,6 +191,37 @@ const EditForm = ({ ...props }) => {
               </small>
             </div>
 
+            {/* Usage: what this thermostat drives. Directly under the type,
+                and no longer called "Mode": it used to sit right after the
+                device's own "Operating mode (optional)", and two fields named
+                Mode in a row read as the same question asked twice. */}
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.thermostat.edit.modeLabel" />
+              </label>
+              <select
+                class="form-control"
+                value={mode}
+                onChange={e => {
+                  props.updateThermostatField('thermostatEditMode', e.target.value);
+                  // TPI is heating-only: switching to cooling falls back to hysteresis
+                  if (e.target.value === 'cooling' && controlType === 'tpi') {
+                    props.updateThermostatField('thermostatEditControlType', 'hysteresis');
+                  }
+                }}
+              >
+                <option value="heating">
+                  <Text id="integration.thermostat.edit.mode.heating" />
+                </option>
+                <option value="cooling">
+                  <Text id="integration.thermostat.edit.mode.cooling" />
+                </option>
+              </select>
+              <small class="form-text text-muted">
+                <Text id="integration.thermostat.edit.modeHelp" />
+              </small>
+            </div>
+
             {/* Thermostat réel piloté */}
             {isExternalThermostat && (
               <div>
@@ -167,7 +242,7 @@ const EditForm = ({ ...props }) => {
                     <FeatureSelect
                       value={props.thermostatEditTargetFeature || ''}
                       features={props.targetFeatures}
-                      onChange={e => props.updateThermostatField('thermostatEditTargetFeature', e.target.value)}
+                      onChange={chooseTargetFeature}
                       emptyLabel={<Text id="global.emptySelectOption" />}
                     />
                   </Localizer>
@@ -212,30 +287,9 @@ const EditForm = ({ ...props }) => {
               </div>
             )}
 
-            {/* Mode */}
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="integration.thermostat.edit.modeLabel" />
-              </label>
-              <select
-                class="form-control"
-                value={mode}
-                onChange={e => {
-                  props.updateThermostatField('thermostatEditMode', e.target.value);
-                  // TPI is heating-only: switching to cooling falls back to hysteresis
-                  if (e.target.value === 'cooling' && controlType === 'tpi') {
-                    props.updateThermostatField('thermostatEditControlType', 'hysteresis');
-                  }
-                }}
-              >
-                <option value="heating">
-                  <Text id="integration.thermostat.edit.mode.heating" />
-                </option>
-                <option value="cooling">
-                  <Text id="integration.thermostat.edit.mode.cooling" />
-                </option>
-              </select>
-            </div>
+            <h4 class={style.formSection}>
+              <Text id="integration.thermostat.edit.sectionHeating" />
+            </h4>
 
             {/* Capteur de température */}
             <div class="form-group">
@@ -320,8 +374,11 @@ const EditForm = ({ ...props }) => {
                 The unit and the bounds stay out of the fold below: they are the
                 thermostat's own, external ones included. */}
             {!isExternalThermostat && (
-              <details class="mb-3">
-                <summary class="form-label">
+              <details class={cx('mb-3', style.tuningDetails)}>
+                {/* With a chevron: styled as a form-label alone, the summary
+                    looked like a plain heading and nothing said it opened. */}
+                <summary class={cx('form-label', style.tuningSummary)}>
+                  <i class={`fe fe-chevron-right ${style.tuningChevron}`} aria-hidden="true" />
                   <Text id="integration.thermostat.edit.tuningSection" />
                 </summary>
                 <div>
@@ -605,6 +662,10 @@ const EditForm = ({ ...props }) => {
               </table>
             </div>
 
+            <h4 class={style.formSection}>
+              <Text id="integration.thermostat.edit.sectionProgramming" />
+            </h4>
+
             {/* Planning actif */}
             <div class="form-group">
               <label class="form-label">
@@ -664,7 +725,9 @@ const EditForm = ({ ...props }) => {
                 <label class="form-label">
                   <Text id="integration.thermostat.edit.manualDurationLabel" />
                 </label>
-                <div class="input-group">
+                {/* Not full width: the field holds two digits, and a control
+                    stretched across the card suggested a long value was wanted. */}
+                <div class={cx('input-group', style.shortNumberField)}>
                   <input
                     type="number"
                     class="form-control"

@@ -51,3 +51,28 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ─── Mobile header ─── */
+
+/* Same as the schedule list: the theme's `.page-options` never wraps, so the
+   sort select, the search field and "New thermostat" overran a 390px screen and
+   the page scrolled sideways. */
+.devicePage {
+  position: relative;
+}
+
+@media (max-width: 575px) {
+  .devicePage :global(.card-header) {
+    flex-wrap: wrap;
+  }
+
+  .devicePage :global(.page-options) {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .devicePage :global(.page-options) :global(.input-icon) {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+}

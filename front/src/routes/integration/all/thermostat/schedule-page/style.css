@@ -85,6 +85,37 @@
   );
 }
 
+/* The colour key for the seven day bars, once under them. */
+.presetLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 10px 0 1.25rem;
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.presetLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.presetLegendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: var(--swatch-color, #adb5bd);
+}
+
+/* The dark theme inverts the whole page, so a preset colour would come back as
+   its opposite: inverted once more to land back on the colour the bars show. */
+:global(.dark-mode) .presetLegendSwatch {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
 /* Says what the hatching means, next to a sample of it. */
 .stoppedLegend {
   display: flex;
@@ -215,9 +246,12 @@
   font-size: 0.88rem;
 }
 
+/* #adb5bd is a 2.3:1 grey: the pencil is the only sign that a range can be
+   edited at all, and it was barely visible. #6c757d reaches 4.7:1 and still
+   stays quieter than the times it sits beside. */
 .slotEditIcon {
-  color: #adb5bd;
-  font-size: 0.8rem;
+  color: #6c757d;
+  font-size: 0.85rem;
   margin-left: auto;
 }
 
@@ -273,6 +307,29 @@
 .slotPresetSelect {
   flex: 1;
   min-width: 80px;
+}
+
+/* On a phone the row has to wrap. Laid out on one line, the two time inputs
+   (90px floor each), the arrow and a preset select taking every remaining pixel
+   pushed the confirm and cancel buttons past x = 409 on a 390px screen — off an
+   edge the page does not scroll to, so a range could be neither validated nor
+   dismissed. The times keep the first row, the preset and the buttons take the
+   second, and the select gives up `flex: 1` so it stops eating the width and
+   truncating its own options ("Confor"). */
+@media (max-width: 575px) {
+  .newSlotForm,
+  .editSlotForm {
+    flex-wrap: wrap;
+  }
+
+  /* The two times fill the first row, so a select asking for 8rem cannot join
+     them and wraps; the buttons then follow it on that second row, where it
+     takes only what they leave. `flex: 1 1 100%` would instead claim the whole
+     row and push them onto a third. */
+  .slotPresetSelect {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
 }
 
 .dayPanelActions {
@@ -409,10 +466,18 @@
 
 /* The follower badge holds its detach button, so it lays its two children out
    rather than being plain text. */
+/* Its own colours rather than badge-secondary's. The dark theme inverts the page
+   and then counter-inverts `.badge`, which landed the chip on a washed-out grey
+   with near-black text — PG read it as having no background at all. A blue tint
+   with a border reads as a chip in both themes, and says these are the thermostats
+   following this schedule rather than a neutral tag. */
 .followerBadge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  background: rgba(32, 107, 196, 0.12);
+  border: 1px solid rgba(32, 107, 196, 0.28);
+  color: #1c5fa8;
 }
 
 /* A glyph, not a button-looking button: inside a badge there is no room for a
@@ -508,6 +573,39 @@
   white-space: nowrap;
 }
 
+/* The colour key for the bars above. Aligned on the bars rather than on the day
+   names, so the swatches sit under the stripes they describe. */
+.weekPreviewLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 6px 0 0 calc(2.4rem + 8px);
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.weekPreviewLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.weekPreviewLegendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: var(--swatch-color, #adb5bd);
+}
+
+/* The dark theme inverts the whole page, so a preset colour would come back as
+   its opposite: the swatches have to be inverted once more to land back on the
+   colour the bars show. Same counter-inversion as the bars themselves. */
+:global(.dark-mode) .weekPreviewLegendSwatch {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
 /* The card's actions, at its foot and sharing its width — the same shape the
    thermostat cards use, since these cards now sit in the same two-column grid.
    Wraps rather than squeezing the labels when the confirmation takes over. */
@@ -560,4 +658,48 @@
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 8px;
+}
+
+/* ─── Mobile header ─── */
+
+.schedulePage {
+  /* Hook for the mobile header rules below; no styling of its own. */
+  position: relative;
+}
+
+/* The theme's `.page-options` is `margin-left: auto` and nothing else, so the
+   sort select, the search field and the "New schedule" button laid themselves out
+   on one 520px line: on a 390px screen the button left the card and the page
+   scrolled sideways. Wrapping is added on the element; these two make the wrap
+   effective, since a search field with an intrinsic width would otherwise
+   overflow the row it wrapped onto. */
+@media (max-width: 575px) {
+  .schedulePage :global(.card-header) {
+    flex-wrap: wrap;
+  }
+
+  .schedulePage :global(.page-options) {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .schedulePage :global(.page-options) :global(.input-icon) {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+}
+
+/* ─── House grouping ─── */
+
+/* A bare h3 rendered at 1.75rem, larger than the card's own 1.125rem title: the
+   house names read as the page's headline and "Plannings" as a subtitle. Sized
+   below the card title, since a house groups the cards rather than titling the
+   page. */
+.houseTitle {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }

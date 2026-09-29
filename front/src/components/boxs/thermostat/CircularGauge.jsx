@@ -12,7 +12,8 @@ export const ARC_START_ANGLE = 150;
 const ICONS = {
   droplet: '\ue0b4',
   flame: '\ue0d2',
-  snowflake: '\ue165'
+  snowflake: '\ue165',
+  thermometer: '\ue186'
 };
 
 /**
@@ -131,7 +132,10 @@ const CircularGauge = ({
       aria-valuenow={interactive ? roundedSetpoint : undefined}
       aria-valuetext={interactive ? (isOff ? offLabel : `${roundedSetpoint} ${unit}`) : undefined}
     >
-      <path class={style.gaugeArc} d={bgPath} fill="none" stroke="#e9ecef" strokeWidth={sw} strokeLinecap="round" />
+      {/* The track's colour lives in the stylesheet rather than here: inverted by
+          the dark theme, #e9ecef came back as a near-black that vanished into the
+          card, so it needs a value of its own there. */}
+      <path class={style.gaugeTrack} d={bgPath} fill="none" strokeWidth={sw} strokeLinecap="round" />
       {/* The glow marks "running right now", which is just as true of a running
           air conditioner as of a running heater, so it applies in both modes.
           It is a drop-shadow rather than a feGaussianBlur/feMerge filter: merging
@@ -160,7 +164,12 @@ const CircularGauge = ({
           dominantBaseline="middle"
           class={style.currentTempText}
         >
-          {Number(currentTemp).toFixed(1)} °{tempUnit || 'C'}
+          {/* A thermometer in front of it: two bare numbers, the room and the
+              setpoint, could be read for one another. The humidity below already
+              carries its droplet, so this makes all three readings self-labelling
+              without a word of text in a gauge that has no room for one. */}
+          <tspan class={`${style.gaugeIconGlyph} ${style.currentTempIcon}`}>{ICONS.thermometer}</tspan>
+          {` ${Number(currentTemp).toFixed(1)} °${tempUnit || 'C'}`}
         </text>
       )}
       {hasHumidity && (

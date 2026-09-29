@@ -1,5 +1,10 @@
 const PRESET_COLORS = {
-  off: '#fa5252',
+  // Grey, not a red: #fa5252 sat right next to Away's #e03131, and the two
+  // swatches read as the same colour in the form and on the schedule bars. Off is
+  // also the only entry here that is not a temperature to reach — it is the
+  // heating not running — so a neutral says what it is as well as telling it
+  // apart.
+  off: '#868e96',
   frost: '#74c0fc',
   away: '#e03131',
   eco: '#74b816',
