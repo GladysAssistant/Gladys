@@ -9,6 +9,7 @@ const { applySchedules } = require('./thermostat.applySchedules');
 const {
   onDeviceNewState,
   onExternalSetpointChanged,
+  primeObservedSetpoints,
   getTargetSelectors,
   getWindowSelectors,
   invalidateDeviceCaches,
@@ -62,6 +63,7 @@ ThermostatHandler.prototype.detachScheduleFromDevice = detachScheduleFromDevice;
 ThermostatHandler.prototype.applySchedules = applySchedules;
 ThermostatHandler.prototype.onDeviceNewState = onDeviceNewState;
 ThermostatHandler.prototype.onExternalSetpointChanged = onExternalSetpointChanged;
+ThermostatHandler.prototype.primeObservedSetpoints = primeObservedSetpoints;
 ThermostatHandler.prototype.getTargetSelectors = getTargetSelectors;
 ThermostatHandler.prototype.getWindowSelectors = getWindowSelectors;
 ThermostatHandler.prototype.invalidateDeviceCaches = invalidateDeviceCaches;

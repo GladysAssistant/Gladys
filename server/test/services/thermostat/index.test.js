@@ -15,6 +15,7 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
   const handler = {
     applySchedules: applySchedulesFails ? fake.rejects(new Error('boom')) : fake.resolves(null),
     onDeviceNewState: fake.resolves(null),
+    primeObservedSetpoints: fake.resolves(null),
     applyTimer: null,
   };
   const controllers = { 'get /api/v1/service/thermostat/device': {} };
@@ -71,6 +72,18 @@ describe('ThermostatService', () => {
     await service.start();
 
     assert.calledWith(gladys.event.on, EVENTS.DEVICE.NEW_STATE);
+  });
+
+  it('should seed the observed setpoints before attaching the listener', async () => {
+    const { service, gladys, handler } = buildService();
+
+    await service.start();
+
+    assert.calledOnce(handler.primeObservedSetpoints);
+    // Order matters: a setpoint turned on the device right after a restart would
+    // otherwise arrive before the reference exists, be read as the report that
+    // merely establishes it, and be overwritten by the next regulation pass.
+    expect(handler.primeObservedSetpoints.calledBefore(gladys.event.on)).to.equal(true);
   });
 
   it('should forward a device new state to the handler', async () => {

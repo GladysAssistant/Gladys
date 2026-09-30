@@ -83,6 +83,60 @@ async function getTargetSelectors() {
 }
 
 /**
+ * @description Seed the observed setpoints from what the database already knows,
+ * before any report can arrive.
+ *
+ * A hold is armed on a value that differs from the previous report, and both
+ * marks this service keeps live in memory: they are empty on a start. Treating
+ * an absent reference as "record this one and arm nothing" lost the first
+ * genuine change after every restart — and lost it *permanently* on a device
+ * that only reports its changes, as Zigbee ones do, since no further report
+ * would ever come to establish the reference.
+ *
+ * The setpoint feature's own `last_value` is exactly the missing reference: it
+ * is what Gladys last knew the device to be at. Seeding from it keeps both
+ * restart cases covered — an appliance still at the scheduled value reports that
+ * same value and arms nothing, and one left on an older value while Gladys was
+ * down reports the value the database also holds, so nothing is held and the
+ * minute loop writes the scheduled setpoint back. A change made *during* the
+ * downtime does differ from the stored value and is adopted as a hold, which is
+ * the right answer: nobody else asked for it.
+ *
+ * Seeded here rather than read when a report arrives: `device.saveState`
+ * persists that report on the same event, so a read from the listener races the
+ * write and may come back already carrying the new value.
+ * @returns {Promise<void>}
+ * @example
+ * await thermostatHandler.primeObservedSetpoints();
+ */
+async function primeObservedSetpoints() {
+  try {
+    const targetSelectors = await getTargetSelectors.call(this);
+    await Promise.all(
+      [...targetSelectors].map(async (selector) => {
+        // A thermostat driven since the service started already has a reference,
+        // which is fresher than the database's.
+        if (this.observedSetpoints.has(selector)) {
+          return;
+        }
+        const owner = await getFeatureBySelector(this.gladys, selector);
+        const lastValue = owner ? owner.feature.last_value : null;
+        // A feature that never reported has no reference to offer: the first
+        // report will establish it.
+        if (lastValue !== null && lastValue !== undefined) {
+          this.observedSetpoints.set(selector, lastValue);
+        }
+      }),
+    );
+  } catch (e) {
+    // Never block the service from starting: without a reference the listener
+    // simply establishes one on the first report, which is the previous
+    // behaviour rather than a failure.
+    logger.warn(`Thermostat: could not prime the observed setpoints: ${e.message}`);
+  }
+}
+
+/**
  * @description Hold a setpoint changed on the real thermostat itself.
  *
  * Only for external thermostats: a virtual one has no second source of truth,
@@ -131,18 +185,26 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
     // unchanged value used to be read as a turn of the dial — every update,
     // reboot or power cut left the thermostat in "manual" until the next slot.
     // Worse, when the write at startup failed because the integration was not
-    // connected yet, the stale value the device still held was the one kept. The
-    // first report after a restart therefore only records the reference, and the
-    // minute loop writes the scheduled setpoint back on its next tick.
+    // connected yet, the stale value the device still held was the one kept.
     //
-    // Recorded before the self-write check below, not after: a report that check
+    // The reference is seeded at service start from what the database already
+    // knows (`primeObservedSetpoints`), so it exists before the first report. It
+    // deliberately is NOT read from the database here: `device.saveState`
+    // persists this very report on the same event, and by this point — two awaits
+    // in, one of them a SQL query — the row may already carry the new value,
+    // which would compare equal to itself and never arm a hold.
+    //
+    // Read before the self-write check below, not after: a report that check
     // swallows is still a report, and leaving the reference unset there would
-    // make the next genuine change look like a first report and go unheld.
+    // make the next genuine change look like a first one and go unheld.
     const previouslyObserved = this.observedSetpoints.get(changedSelector);
     this.observedSetpoints.set(changedSelector, newValue);
     if (this.selfWrittenSetpoints.get(changedSelector) === newValue) {
       return;
     }
+    // No reference at all: a setpoint Gladys has never known, on a thermostat
+    // added since the service started. There is nothing to call a change
+    // against, so this report only establishes the reference.
     if (previouslyObserved === undefined || previouslyObserved === newValue) {
       return;
     }
@@ -272,6 +334,7 @@ async function onDeviceNewState(event) {
 module.exports = {
   onDeviceNewState,
   onExternalSetpointChanged,
+  primeObservedSetpoints,
   getTargetSelectors,
   getWindowSelectors,
   invalidateDeviceCaches,

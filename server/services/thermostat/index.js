@@ -46,6 +46,12 @@ module.exports = function ThermostatService(gladys, serviceId) {
     scheduleInterval = setInterval(async () => {
       await thermostatHandler.applySchedules();
     }, 60 * 1000);
+    // The reference for "a setpoint changed on the device" comes from what the
+    // database already knows, and has to be in place before the listener can
+    // receive anything: a setpoint turned on the thermostat seconds after a
+    // restart would otherwise be read as the report that merely establishes the
+    // reference, and the next regulation pass would overwrite it.
+    await thermostatHandler.primeObservedSetpoints();
     // React immediately when a device feature changes (e.g. window opens)
     newStateListener = (event) => thermostatHandler.onDeviceNewState(event);
     gladys.event.on(EVENTS.DEVICE.NEW_STATE, newStateListener);

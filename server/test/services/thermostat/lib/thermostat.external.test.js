@@ -747,44 +747,48 @@ describe('thermostat.onExternalSetpointChanged', () => {
   // integration then reconnects and re-reports the setpoint the schedule had
   // already applied — an unchanged value that used to be read as a turn of the
   // dial, so every update, reboot or power cut left the thermostat in "manual"
-  // until the next slot, with nobody having touched anything.
-  it('should not hold the first report after a restart', async () => {
+  // until the next slot, with nobody having touched anything. The reference is
+  // seeded from the database at start, so that report matches it.
+  it('should not hold the reconnection report of an unchanged setpoint', async () => {
     const mod = loadListener();
-    // Nothing observed and nothing written: a fresh process.
-    const handler = buildHandler();
+    const handler = withReference(buildHandler(), 'netatmo-setpoint', 21);
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
 
     expect(heldSetpoint(handler)).to.equal(null);
-    // The reference is recorded, so a later *change* is still caught.
-    expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(21);
-  });
-
-  it('should hold a change that follows the first report after a restart', async () => {
-    const mod = loadListener();
-    const handler = buildHandler();
-
-    // The reconnection's report, then someone turns the dial.
-    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
-    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
-
-    expect(heldSetpoint(handler)).to.equal('19');
   });
 
   // The other half of the restart bug: the write at startup failed because the
   // integration was not connected yet, so the appliance still carries the old
   // value. Its first report used to be taken for a manual setting, and those 19
   // degrees were then held in place of the scheduled comfort — for hours, a whole
-  // night in PG's test. Recording the reference instead lets the minute loop write
-  // the right setpoint on its next tick.
+  // night in PG's test. The database holds that same old value, so the report
+  // matches the seeded reference and the minute loop writes the right setpoint on
+  // its next tick.
   it('should not hold a stale value reported after a failed startup write', async () => {
     const mod = loadListener();
-    const handler = buildHandler();
+    const handler = withReference(buildHandler(), 'netatmo-setpoint', 19);
 
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 19);
 
     expect(heldSetpoint(handler)).to.equal(null);
     assert.notCalled(handler.gladys.device.setValue);
+  });
+
+  // The regression PG found: a setpoint set on the thermostat seconds after a
+  // restart was silently dropped. With "the first report only records the
+  // reference", that genuine change *was* the first report — and on a device that
+  // only reports its changes, as Zigbee ones do, no further report would ever come
+  // to establish one, so the first change after every restart was lost for good.
+  it('should hold a setpoint set on the device right after a restart', async () => {
+    const mod = loadListener();
+    // Seeded from the database at service start: the device was at 18.
+    const handler = withReference(buildHandler(), 'netatmo-setpoint', 18);
+
+    // Nothing else has reported yet — this is the very first event.
+    await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 20);
+
+    expect(heldSetpoint(handler)).to.equal('20');
   });
 
   // The observed value is recorded before the self-write check, not after: the echo
@@ -799,6 +803,87 @@ describe('thermostat.onExternalSetpointChanged', () => {
     await mod.onExternalSetpointChanged.call(handler, 'netatmo-setpoint', 21);
 
     expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(21);
+  });
+
+  // Seeding the reference from the database at service start, so it is in place
+  // before any report can arrive. It cannot be read when the report lands:
+  // `device.saveState` persists that same report on the same event, and the
+  // listener would race the write.
+  describe('primeObservedSetpoints', () => {
+    const buildPrimeHandler = (lastValue) => ({
+      gladys: {
+        device: {
+          get: fake(async (options) => {
+            // The lookup by selector resolves the owning device of the external
+            // setpoint feature; the unfiltered call builds the selector cache.
+            if (options && options.device_feature_selectors) {
+              return [{ selector: 'netatmo', features: [{ selector: 'netatmo-setpoint', last_value: lastValue }] }];
+            }
+            return [externalThermostat];
+          }),
+        },
+      },
+      windowSelectorsCache: null,
+      targetSelectorsCache: null,
+      selfWrittenSetpoints: new Map(),
+      observedSetpoints: new Map(),
+    });
+
+    it('should seed the reference from the stored value', async () => {
+      const mod = loadListener();
+      const handler = buildPrimeHandler(18);
+
+      await mod.primeObservedSetpoints.call(handler);
+
+      expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(18);
+    });
+
+    it('should leave a feature that never reported without a reference', async () => {
+      const mod = loadListener();
+      const handler = buildPrimeHandler(null);
+
+      await mod.primeObservedSetpoints.call(handler);
+
+      expect(handler.observedSetpoints.has('netatmo-setpoint')).to.equal(false);
+    });
+
+    it('should leave a selector whose feature no longer exists without a reference', async () => {
+      const mod = loadListener();
+      const handler = buildPrimeHandler(18);
+      handler.gladys.device.get = fake(async (options) => {
+        if (options && options.device_feature_selectors) {
+          return [];
+        }
+        return [externalThermostat];
+      });
+
+      await mod.primeObservedSetpoints.call(handler);
+
+      expect(handler.observedSetpoints.has('netatmo-setpoint')).to.equal(false);
+    });
+
+    it('should not overwrite a reference already in memory', async () => {
+      const mod = loadListener();
+      const handler = buildPrimeHandler(18);
+      // Fresher than the database's: this thermostat has reported since.
+      handler.observedSetpoints.set('netatmo-setpoint', 21);
+
+      await mod.primeObservedSetpoints.call(handler);
+
+      expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(21);
+    });
+
+    // Priming must never stop the service from starting: without a reference the
+    // listener simply establishes one on the first report.
+    it('should swallow a failure to read the devices', async () => {
+      const mod = loadListener();
+      const handler = buildPrimeHandler(18);
+      handler.gladys.device.get = fake.rejects(new Error('database down'));
+
+      await mod.primeObservedSetpoints.call(handler);
+
+      expect(handler.observedSetpoints.size).to.equal(0);
+    });
   });
 
   it('should not hold an unchanged value reported again', async () => {

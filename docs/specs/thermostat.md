@@ -212,7 +212,13 @@ The second is what a restart needs. Both maps live in memory and are empty when 
 
 The observed value is recorded **before** the written-value check, not after: a report that check swallows is still a report, and leaving the reference unset there would make the next genuine turn of the dial look like a first report and go unheld.
 
-**The first report after a start therefore only records the reference**, and arms nothing. Nothing is lost: the minute loop writes the scheduled setpoint on its next tick, so a genuine change made while Gladys was down is corrected rather than adopted, and a change made afterwards differs from the reference and is held as usual.
+**The reference is seeded at service start from the setpoint feature's own `last_value`**, before the `NEW_STATE` listener is attached. That stored value is what Gladys last knew the device to be at, which is exactly what a report has to be compared against.
+
+Treating an absent reference as "record this report and arm nothing" is not enough, and is a bug of its own: the first genuine change after a restart *is* that first report. A setpoint turned on the thermostat seconds after a restart was then dropped, and the next regulation pass overwrote it. On a device that only reports its changes — as Zigbee ones do — no further report would ever come to establish the reference, so the first change after **every** restart was lost.
+
+Seeding covers both restart cases the marks exist for: an appliance still at the scheduled value reports that same value and arms nothing, and one left on an older value while Gladys was down reports the value the database also holds, so nothing is held and the minute loop writes the scheduled setpoint back. A change made *during* the downtime does differ from the stored value and is adopted as a hold, which is the right answer — nobody else asked for it.
+
+It has to be seeded rather than read when a report arrives: `device.saveState` persists that report on the same event, so a read from the listener races the write and may come back already carrying the new value, which would compare equal to itself and never arm a hold. A thermostat added after the service started has no seeded reference, and its first report establishes one.
 
 **Holding a change costs nothing on the wire.** The hold is armed directly — the param is written and the websocket sent — rather than routed through the setpoint write path. The device already carries this value, since it is what it just reported: writing it back would be a cloud call or a Zigbee message per turn of the dial, and the write path hands the running mode back first (C.0), kicking a thermostat that was in `auto`, `off` or its own vendor programme (C.0.3) into heating or cooling. The value is stored in the feature's own unit, which is the unit a hold on an external thermostat is stored in (C.3).
 
@@ -416,6 +422,10 @@ Returned by every route that returns a schedule:
 
 `transitions` is sorted by day then time. `current` and `next` are computed **by the server**, in the Gladys timezone, read-only, and are `null` on a schedule with no point. The widget therefore no longer reads the timezone, and no longer recomputes the active point: it renders "Éco until 08:30" straight from `next`. That removes the last reason for the schedule-matching helper to be shared between the server and the frontend build (C.1).
 
+**Adding a range trims what it covers; it is not refused.** On a real schedule every minute of every day is already covered — the night runs into the next morning — so an overlap is the normal case, not an error. Refusing it made adding a range a dead end: "comfort from 12 to 14" had to be preceded by shortening the eco range by hand, and the editor's own default proposal fell on covered time and was rejected.
+
+What the new range covers gives way: a range it sits inside is split in two, one it merely clips is shortened on that side, and one it swallows entirely disappears. A range crossing midnight is trimmed through the same day/minute spans the rest of the editor reasons in, so a night is cut on the day it is stored on. The range being edited never trims itself.
+
 ### E.6 Validation
 
 In Joi, shared between the API and the model:
@@ -453,7 +463,9 @@ That hold offers **"until the next transition"** as well as the fixed duration, 
 
 **A hold un-highlights the preset only when the setpoint left it.** The preset bar shows which preset the setpoint comes from. A hold alone does not answer that, on either kind of thermostat: picking a preset arms one too. The test is the value — a hold sitting on the preset's own setpoint _is_ that preset being applied and stays highlighted, and a hold on any other value is a setpoint of its own, which no preset represents. That covers a turn of the dial and a setpoint set on the real thermostat, since neither lands on a preset's temperature.
 
-The same rule applies to external thermostats. An earlier revision exempted them — reasoning that a manual setpoint never comes from a preset on a real device — and the result was that **no preset ever lit up on a Netatmo**, whether the button had just been pressed or the page had been reloaded, while the banner read "Manual mode". The rule holds on the live event and on a page reload, which restores the same state from the database.
+The same rule applies to external thermostats. An earlier revision exempted them — reasoning that a manual setpoint never comes from a preset on a real device — and the result was that **no preset ever lit up on a Netatmo**, whether the button had just been pressed or the page had been reloaded, while the banner read "Manual mode".
+
+**The rule is one rule, and both paths have to ask it the same question**: the live `MANUAL_MODE_UPDATED` event and the state restored on a page reload. Fixing only the reload left a preset picked on a real thermostat dark until the page was refreshed, since the live handler still forced the override on every external hold.
 
 **And a hold armed by a preset is named as that preset, not as "Manual mode".** The banner says what the thermostat is doing: "Night until 11:30", with the preset's icon and colour. "Manual mode" is for a setpoint that no preset carries — a hand-set temperature, or one set on the device. Saying "Manual mode" while the Night button was lit told the user their choice had been replaced by something else.
 
