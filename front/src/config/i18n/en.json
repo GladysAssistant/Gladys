@@ -3536,7 +3536,6 @@
         "attachError": "Could not change the thermostats following this schedule.",
         "houseLabel": "House",
         "carriedSince": "since",
-        "overlapError": "This range overlaps another one on the same day. A thermostat follows one preset at a time: adjust the times, or edit the existing range.",
         "houseLockedByDevices": "A schedule only moves house while no thermostat follows it. Followed by:",
         "searchPlaceHolder": "Search for a schedule",
         "noSearchResult": "No schedule matches this search.",

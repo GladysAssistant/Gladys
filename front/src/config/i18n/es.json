@@ -3536,7 +3536,6 @@
         "attachError": "No se han podido cambiar los termostatos que siguen esta programación.",
         "houseLabel": "Casa",
         "carriedSince": "desde",
-        "overlapError": "Este intervalo se solapa con otro del mismo día. Un termostato sigue un solo preajuste a la vez: ajusta los horarios o edita el intervalo existente.",
         "houseLockedByDevices": "Una programación solo cambia de casa mientras ningún termostato la siga. Seguida por:",
         "searchPlaceHolder": "Buscar una programación",
         "noSearchResult": "Ninguna programación coincide con esta búsqueda.",

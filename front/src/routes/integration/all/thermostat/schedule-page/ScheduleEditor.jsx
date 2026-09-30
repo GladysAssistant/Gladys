@@ -137,35 +137,82 @@ class ScheduleEditor extends Component {
 
   // Two ranges covering the same minute have no meaning: only one preset can be
   // in force at a time, and the points they convert to would silently drop the
-  // overlap rather than honour it. They are refused at entry instead.
+  // overlap rather than honour it. The one being added wins, and what it covers
+  // is trimmed around it (`trimForRange`).
   //
-  // A range whose end is at or before its start runs past midnight, so it
-  // occupies the end of its day and the start of the next: both stretches are
-  // checked, which is what catches a night overlapping the following morning.
-  overlaps = (ranges, candidate, ignoredKey = null) => {
-    const spansOf = range => {
-      const start = timeToMinutes(range.start_time);
-      const end = timeToMinutes(range.end_time);
-      if (end > start) {
-        return [{ day: range.day_of_week, start, end }];
-      }
-      // Past midnight: the tail of this day, then the head of the next.
-      const spans = [{ day: range.day_of_week, start, end: DAY_MINUTES }];
-      if (end > 0) {
-        spans.push({ day: (range.day_of_week + 1) % 7, start: 0, end });
-      }
-      return spans;
-    };
+  // The day/minute stretches a range occupies. One for a range inside its day, two
+  // for one crossing midnight: the tail of its own day, then the head of the next.
+  rangeSpans = range => {
+    const start = timeToMinutes(range.start_time);
+    const end = timeToMinutes(range.end_time);
+    if (end > start) {
+      return [{ day: range.day_of_week, start, end }];
+    }
+    const spans = [{ day: range.day_of_week, start, end: DAY_MINUTES }];
+    if (end > 0) {
+      spans.push({ day: (range.day_of_week + 1) % 7, start: 0, end });
+    }
+    return spans;
+  };
 
-    const candidateSpans = spansOf(candidate);
-    return ranges.some(range => {
+  // Make room for a new range by trimming what it covers, rather than refusing it.
+  //
+  // On a real schedule every day is already covered — the night runs to the next
+  // morning — so there is no free gap to add into, and "comfort from 12 to 14"
+  // was refused as an overlap. The user had to shorten the eco range first, then
+  // add. Trimming is the gesture they meant: what the new range covers gives way.
+  //
+  // A range the new one sits inside is split in two; one it merely clips is
+  // shortened on that side; one it swallows entirely disappears. A range crossing
+  // midnight is handled through the same day/minute spans as the overlap check,
+  // so a night is trimmed on the day it is stored on.
+  trimForRange = (ranges, candidate, ignoredKey = null) => {
+    const candidateSpans = this.rangeSpans(candidate);
+    const covers = (day, start, end) =>
+      candidateSpans.some(span => span.day === day && span.start < end && start < span.end);
+
+    const result = [];
+    ranges.forEach(range => {
       if (range.key === ignoredKey) {
-        return false;
+        result.push(range);
+        return;
       }
-      return spansOf(range).some(span =>
-        candidateSpans.some(other => other.day === span.day && other.start < span.end && span.start < other.end)
-      );
+      const start = timeToMinutes(range.start_time);
+      const rawEnd = timeToMinutes(range.end_time);
+      // An overnight range is measured past midnight, so a single interval
+      // describes it; the covering test below maps it back onto its days.
+      const end = rawEnd <= start ? rawEnd + DAY_MINUTES : rawEnd;
+      const spans = this.rangeSpans(range);
+      if (!spans.some(span => covers(span.day, span.start, span.end))) {
+        result.push(range);
+        return;
+      }
+      // Where the new range falls inside this one's own timeline.
+      const cutStart = candidateSpans.reduce((acc, span) => {
+        const absolute = span.day === range.day_of_week ? span.start : span.start + DAY_MINUTES;
+        return absolute > start && absolute < end ? Math.min(acc, absolute) : acc;
+      }, Infinity);
+      const cutEnd = candidateSpans.reduce((acc, span) => {
+        const absolute = span.day === range.day_of_week ? span.end : span.end + DAY_MINUTES;
+        return absolute > start && absolute < end ? Math.max(acc, absolute) : acc;
+      }, -Infinity);
+
+      const keepsHead = cutStart !== Infinity && cutStart > start;
+      const keepsTail = cutEnd !== -Infinity && cutEnd < end;
+      if (keepsHead) {
+        result.push({ ...range, end_time: minutesToTime(cutStart) });
+      }
+      if (keepsTail) {
+        result.push({
+          ...range,
+          key: `${range.key}-tail-${cutEnd}`,
+          start_time: minutesToTime(cutEnd),
+          end_time: range.end_time
+        });
+      }
+      // Neither head nor tail survives: the new range swallows this one whole.
     });
+    return result;
   };
 
   // ── Adding a point ────────────────────────────────────────────────────────
@@ -173,9 +220,8 @@ class ScheduleEditor extends Component {
   openNewForm = day => {
     // The first free stretch of the day, not the end of its last range: the last
     // range of a full day is usually the night, whose end_time is the *next*
-    // morning (17:00 → 06:30). Reading it as a start proposed 06:30 → 09:30 on a
-    // day already covered from 06:30, so the form opened on a range the editor
-    // then refused as an overlap.
+    // morning (17:00 → 06:30), and reading it as a start proposed a range over
+    // the morning that was already covered.
     const occupied = this.dayRanges(this.state.ranges, day).map(range => {
       const start = timeToMinutes(range.start_time);
       const rawEnd = timeToMinutes(range.end_time);
@@ -198,10 +244,12 @@ class ScheduleEditor extends Component {
       }
       startMins = Math.max(startMins, occupied[i].end);
     }
-    // A day with no hole left: fall back on 06:00, which the overlap check then
-    // refuses with its own message rather than the form opening on a lie.
+    // A day with no hole left is the normal case on a real schedule, not an edge
+    // one: every minute is covered because the night runs into the next morning.
+    // The middle of the afternoon is where an exception is usually wanted, and
+    // what it covers is trimmed around it rather than refused.
     if (startMins >= DAY_MINUTES) {
-      startMins = 6 * 60;
+      startMins = 14 * 60;
     }
     const endMins = Math.min(startMins + 3 * 60, DAY_MINUTES);
     this.setState(prev => ({
@@ -234,13 +282,9 @@ class ScheduleEditor extends Component {
     const form = this.state.newForms[day];
     if (!form || !form.start_time || !form.end_time) return;
     const candidate = { day_of_week: day, start_time: form.start_time, end_time: form.end_time };
-    if (this.overlaps(this.state.ranges, candidate)) {
-      this.setState({ error: 'overlap' });
-      return;
-    }
     // Two ranges starting at the same moment would give one point: replace
     // rather than add, so the second entry is the one that stands.
-    const withoutSameStart = this.state.ranges.filter(
+    const withoutSameStart = this.trimForRange(this.state.ranges, candidate).filter(
       r => !(r.day_of_week === day && r.start_time === form.start_time)
     );
     this.setState(prev => ({
@@ -293,14 +337,9 @@ class ScheduleEditor extends Component {
     if (!form || !form.start_time || !form.end_time) return;
     const edited = this.state.ranges.find(r => r.key === key);
     const candidate = { day_of_week: edited.day_of_week, start_time: form.start_time, end_time: form.end_time };
-    // The range being edited does not overlap itself.
-    if (this.overlaps(this.state.ranges, candidate, key)) {
-      this.setState({ error: 'overlap' });
-      return;
-    }
     this.setState(prev => {
       const edited = prev.ranges.find(r => r.key === key);
-      const ranges = prev.ranges
+      const ranges = this.trimForRange(prev.ranges, candidate, key)
         // A move onto another range's start replaces it: two ranges starting at
         // the same moment would collapse into one point anyway.
         .filter(r => r.key === key || !(r.day_of_week === edited.day_of_week && r.start_time === form.start_time))
@@ -447,9 +486,8 @@ class ScheduleEditor extends Component {
     }
     return (
       <div class="alert alert-warning">
-        {error === 'overlap' && <Text id="integration.thermostat.schedule.overlapError" />}
         {error === 'duplicate-name' && <Text id="integration.thermostat.schedule.duplicateNameError" />}
-        {error !== 'overlap' && error !== 'duplicate-name' && (
+        {error !== 'duplicate-name' && (
           <span>{typeof error === 'string' ? error : <Text id="integration.thermostat.schedule.saveError" />}</span>
         )}
       </div>

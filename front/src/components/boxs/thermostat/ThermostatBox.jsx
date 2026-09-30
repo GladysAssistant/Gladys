@@ -559,7 +559,18 @@ class ThermostatBox extends Component {
     // This cannot hang off a *change* of isManualMode: without a schedule the
     // hold is permanent, so a thermostat already in manual mode stays in it, and
     // every later change on the device re-emits `true` with nothing to compare.
-    if (isManual && !this.savingPreset && !this.pickingPreset && this.isExternal()) {
+    // Same rule as on a reload: a hold landing on the active preset's own setpoint
+    // is that preset being applied, and the button stays lit. Forcing the override
+    // for every external hold — on the grounds that a manual setpoint never comes
+    // from a preset on a real device — left a preset picked on a Netatmo dark
+    // until the page was reloaded, while the banner read "Manual mode".
+    if (
+      isManual &&
+      !this.savingPreset &&
+      !this.pickingPreset &&
+      this.isExternal() &&
+      !this.holdMatchesPreset(payload.setpoint, this.state.activePreset)
+    ) {
       this.setState({ manualSetpointOverride: true });
     }
     if (!isManual && this.state.isManualMode) {
@@ -684,6 +695,25 @@ class ThermostatBox extends Component {
     this.setState({ manualUntil: Date.now() + duration * 60 * 1000 });
   };
 
+  // Whether a hold is a preset being applied, rather than a setpoint of its own.
+  // A hold alone says nothing: picking a preset arms one exactly as turning the
+  // dial does. A hold sitting on the preset's own setpoint *is* that preset and
+  // keeps it highlighted; any other value is a setpoint no preset represents —
+  // which is what a temperature set on the real thermostat looks like.
+  //
+  // Extracted because the reload path and the live event have to answer this the
+  // same way. They did not: `initData` applied the rule and the websocket handler
+  // still forced the override on every external hold, so a preset picked on a
+  // Netatmo stayed dark until the page was reloaded.
+  holdMatchesPreset = (setpoint, presetKey) => {
+    if (setpoint === null || setpoint === undefined || !presetKey) {
+      return false;
+    }
+    return this.getPresets().some(
+      candidate => candidate.key === presetKey && candidate.temp !== null && candidate.temp === setpoint
+    );
+  };
+
   initData = async () => {
     await this.loadConfig();
     // The schedule before the state that reads it: a thermostat following its
@@ -729,10 +759,7 @@ class ThermostatBox extends Component {
       // Netatmo. A setpoint genuinely turned on the device lands on a value no
       // preset carries and is still read as manual, which is the case that
       // reasoning was actually about.
-      const holdPreset = this.getPresets().find(
-        candidate => candidate.key === activePreset && candidate.temp === hold.setpoint
-      );
-      if (!holdPreset) {
+      if (!this.holdMatchesPreset(hold.setpoint, activePreset)) {
         stateInit.manualSetpointOverride = true;
       }
       if (hold.until) {
