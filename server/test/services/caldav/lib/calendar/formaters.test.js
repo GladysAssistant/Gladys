@@ -455,4 +455,56 @@ describe('CalDAV formaters', () => {
     clock.restore();
     expect(formattedEvents).to.eql(expectedRecurrEvents[3]);
   });
+  it('should format events with property parameters', () => {
+    const formattedEvents = formatter.formatEvents(
+      [
+        {
+          type: 'VEVENT',
+          uid: 'a1b2c3',
+          summary: { params: { LANGUAGE: 'en-US' }, val: 'Entretien visio' },
+          location: { params: { LANGUAGE: 'en-US' }, val: 'Paris' },
+          description: { params: { LANGUAGE: 'en-US' }, val: 'Description' },
+          start: new Date('2019-06-01T09:00:00Z'),
+          end: new Date('2019-06-01T10:00:00Z'),
+          href: 'https://caldav.host.com/home/event-params',
+        },
+      ],
+      { id: '1fe8f557-2685-4b6b-8f05-238184f6b701' },
+    );
+    expect(formattedEvents).to.have.lengthOf(1);
+    expect(formattedEvents[0]).to.include({
+      name: 'Entretien visio',
+      location: 'Paris',
+      description: 'Description',
+    });
+  });
+
+  it('should format recurr events with property parameters', () => {
+    const clock = sinon.useFakeTimers(new Date('2019-05-01T00:00:00Z').getTime());
+    const start = new Date('2019-06-01T09:00:00Z');
+    Object.defineProperty(start, 'tz', { value: 'Europe/Paris' });
+    const formattedEvents = formatter.formatRecurringEvents(
+      {
+        uid: 'd4e5f6',
+        start,
+        end: new Date('2019-06-01T10:00:00Z'),
+        summary: { params: { LANGUAGE: 'en-US' }, val: 'Entretien visio' },
+        location: { params: { LANGUAGE: 'en-US' }, val: 'Paris' },
+        description: { params: { LANGUAGE: 'en-US' }, val: 'Description' },
+        rrule: {
+          between: sinon.stub().returns([new Date('2019-06-01T09:00:00Z')]),
+          after: sinon.stub().returns(new Date('2019-06-01T09:00:00Z')),
+        },
+        href: 'https://caldav.host.com/home/recur-event-params',
+      },
+      { id: '1fe8f557-2685-4b6b-8f05-238184f6b701' },
+    );
+    clock.restore();
+    expect(formattedEvents).to.have.lengthOf(1);
+    expect(formattedEvents[0]).to.include({
+      name: 'Entretien visio',
+      location: 'Paris',
+      description: 'Description',
+    });
+  });
 });

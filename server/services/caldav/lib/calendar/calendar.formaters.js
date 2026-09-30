@@ -1,3 +1,18 @@
+/**
+ * @description Get the text value of an iCal property. When a property has parameters
+ * (e.g. SUMMARY;LANGUAGE=en-US:My event), ical returns an object { params, val }.
+ * @param {string|object} property - The iCal property.
+ * @returns {string} The property value.
+ * @example
+ * getPropertyValue({ params: { LANGUAGE: 'en-US' }, val: 'My event' })
+ */
+function getPropertyValue(property) {
+  if (property !== null && typeof property === 'object') {
+    return property.val;
+  }
+  return property;
+}
+
 // From : https://github.com/peterbraden/ical.js/blob/master/example_rrule.js
 /**
  * @description Format recurring events.
@@ -80,7 +95,7 @@ function formatRecurringEvents(event, gladysCalendar) {
     }
 
     // Set the the title and the end date from either the regular event or the recurrence override.
-    const recurrenceTitle = curEvent.summary;
+    const recurrenceTitle = getPropertyValue(curEvent.summary);
     endDate = this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x');
     endDate = this.dayjs.tz(
       this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x').format('YYYY-MM-DDTHH:mm:ss'),
@@ -98,8 +113,8 @@ function formatRecurringEvents(event, gladysCalendar) {
         external_id: `${event.uid}${startDate.format('YYYY-MM-DD-HH-mm')}`,
         selector: `${event.uid}${startDate.format('YYYY-MM-DD-HH-mm')}`,
         name: recurrenceTitle,
-        location: event.location,
-        description: event.description,
+        location: getPropertyValue(event.location),
+        description: getPropertyValue(event.description),
         url: event.href,
         calendar_id: gladysCalendar.id,
       };
@@ -147,9 +162,9 @@ function formatEvents(caldavEvents, gladysCalendar) {
       const newEvent = {
         external_id: caldavEvent.uid,
         selector: caldavEvent.uid,
-        name: caldavEvent.summary,
-        location: caldavEvent.location,
-        description: caldavEvent.description,
+        name: getPropertyValue(caldavEvent.summary),
+        location: getPropertyValue(caldavEvent.location),
+        description: getPropertyValue(caldavEvent.description),
         url: caldavEvent.href,
         calendar_id: gladysCalendar.id,
       };
