@@ -6,12 +6,10 @@ import cx from 'classnames';
 
 import style from './style.css';
 
-// First-run checklist replacing the bare "your dashboard is empty" message:
-// a gamified getting-started panel whose steps reflect the real state of the
-// instance (devices paired, dashboard composed, scenes created, household
-// invited) and link straight to the place where each step gets done.
+// First-run checklist replacing the bare "your dashboard is empty" message.
+// Integrations stay available from the main navigation, but are optional: a
+// household can choose which devices it wants to connect at any time.
 const STEP_TINTS = {
-  devices: 'getStartedTintBlue',
   dashboard: 'getStartedTintAmber',
   scenes: 'getStartedTintGreen',
   users: 'getStartedTintPurple'
@@ -19,20 +17,15 @@ const STEP_TINTS = {
 
 class GetStarted extends Component {
   state = {
-    devicesDone: false,
     scenesDone: false,
     usersDone: false
   };
 
   loadProgress = async () => {
-    // each probe fails soft: an unreachable endpoint only leaves its step
-    // unchecked, it never breaks the dashboard. Each one only asks "is there
-    // at least one?": the device list is feature-expanded server-side and is
-    // unbounded without `take`, and this panel shows on every widget-less
-    // dashboard — not only on first run — so an established house would pull
-    // its whole device graph just to tick a checkbox
-    const [devices, scenes, users] = await Promise.all([
-      this.props.httpClient.get('/api/v1/device', { take: 1, skip: 0 }).catch(() => []),
+    // Each probe fails soft: an unreachable endpoint leaves its step unchecked
+    // without breaking the dashboard. Bound the scene query because this panel
+    // can appear on every widget-less dashboard, not only on first run.
+    const [scenes, users] = await Promise.all([
       this.props.httpClient.get('/api/v1/scene', { take: 1, skip: 0 }).catch(() => []),
       this.props.httpClient.get('/api/v1/user').catch(() => [])
     ]);
@@ -40,7 +33,6 @@ class GetStarted extends Component {
       return;
     }
     this.setState({
-      devicesDone: Array.isArray(devices) && devices.length > 0,
       scenesDone: Array.isArray(scenes) && scenes.length > 0,
       usersDone: Array.isArray(users) && users.length > 1
     });
@@ -56,18 +48,10 @@ class GetStarted extends Component {
     this.unmounted = true;
   }
 
-  render({ dashboardListEmpty, editDashboard }, { devicesDone, scenesDone, usersDone }) {
+  render({ dashboardListEmpty, editDashboard }, { scenesDone, usersDone }) {
     // the panel only shows while the current dashboard has no widget, so the
     // dashboard step is always the pending one — create it, or fill it
     const steps = [
-      {
-        key: 'devices',
-        icon: 'fe-cpu',
-        done: devicesDone,
-        href: '/dashboard/integration',
-        titleId: 'dashboard.getStarted.devicesTitle',
-        textId: 'dashboard.getStarted.devicesText'
-      },
       dashboardListEmpty
         ? {
             key: 'dashboard',
