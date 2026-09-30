@@ -504,12 +504,22 @@ const carriedPresetByDay = (transitions) => {
     // A point at midnight leaves nothing to inherit: the day states its own
     // preset from its first minute. Otherwise, the last point at or before this
     // midnight, wrapping onto the end of the week exactly as the server does when
-    // it regulates — a point of this same day means the wrap came back here, so
-    // there is nothing carried in either.
+    // it regulates.
     const startsOnItsOwnPoint = ownPoints.length > 0 && ownPoints[0] === 0;
     const inherited = startsOnItsOwnPoint ? null : findCurrentTransition(transitions, day, 0);
+    // A point of this same day normally carries nothing in: the day opens on
+    // nothing and that point starts it. The exception is the wrap — when the
+    // inherited point is the last of the whole week, midnight inherits it from
+    // the week before. On a schedule whose only point is Saturday 08:00 that is
+    // what the server applies at Saturday 03:00, and rejecting it on the day
+    // number alone drew Saturday 00:00-08:00 as empty.
+    const lastOfWeek = [...transitions].sort(
+      (a, b) => a.day_of_week - b.day_of_week || timeToMinutes(a.time) - timeToMinutes(b.time),
+    )[transitions.length - 1];
+    const wrapsOntoItself =
+      inherited && inherited.day_of_week === lastOfWeek.day_of_week && inherited.time === lastOfWeek.time;
     byDay[day] =
-      inherited && inherited.day_of_week !== day
+      inherited && (inherited.day_of_week !== day || wrapsOntoItself)
         ? {
             preset: inherited.preset,
             day: inherited.day_of_week,

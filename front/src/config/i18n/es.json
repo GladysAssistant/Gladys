@@ -3463,7 +3463,9 @@
         "modeHelp": "Lo que controla este termostato: calefacción o climatización.",
         "sectionDevice": "Dispositivo",
         "sectionHeating": "Calefacción",
-        "sectionProgramming": "Programación"
+        "sectionProgramming": "Programación",
+        "deviceRangeHint": "El aparato indica {{min}} – {{max}} °{{unit}}.",
+        "deviceRangeApply": "Usar estos valores"
       },
       "schedule": {
         "title": "Programaciones",

@@ -73,6 +73,34 @@ const EditForm = ({ ...props }) => {
   // advertises. A Netatmo says 5-30, and the 5-35 default then offered the user
   // two degrees the device would refuse or silently clamp. Only the untouched
   // defaults are replaced: a range the user has already narrowed is theirs.
+  // The range the chosen real thermostat advertises, when it declares one in the
+  // unit this form is in. Adopting it automatically covers the common path, but
+  // only while the bounds are still untouched: this hint covers the rest — a
+  // thermostat edited later, a setpoint picked before the unit was set, a range
+  // the user changed and wants back.
+  const pickedTarget = isExternalThermostat
+    ? (props.targetFeatures || []).find(feature => feature.selector === props.thermostatEditTargetFeature)
+    : null;
+  const formUnit = props.thermostatEditTempUnit || 'C';
+  const targetRange =
+    pickedTarget &&
+    pickedTarget.min !== null &&
+    pickedTarget.min !== undefined &&
+    pickedTarget.max !== null &&
+    pickedTarget.max !== undefined &&
+    (!pickedTarget.unit || (pickedTarget.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? 'F' : 'C') === formUnit)
+      ? { min: String(pickedTarget.min), max: String(pickedTarget.max) }
+      : null;
+  // Shown only when the form does not already say the same thing.
+  const rangeDiffers =
+    targetRange &&
+    (targetRange.min !== String(props.thermostatEditMinTemp) ||
+      targetRange.max !== String(props.thermostatEditMaxTemp));
+  const applyDeviceRange = () => {
+    props.updateThermostatField('thermostatEditMinTemp', targetRange.min);
+    props.updateThermostatField('thermostatEditMaxTemp', targetRange.max);
+  };
+
   const chooseTargetFeature = event => {
     const selector = event.target.value;
     props.updateThermostatField('thermostatEditTargetFeature', selector);
@@ -612,6 +640,24 @@ const EditForm = ({ ...props }) => {
                 </div>
               </div>
             </div>
+            {/* What the appliance says it accepts. Adopting it on picking the
+                setpoint feature covers the usual path, but not a thermostat
+                edited later or a setpoint chosen before the unit was settled —
+                and a Netatmo left at 5-35 promises two degrees it will refuse or
+                silently clamp. */}
+            {rangeDiffers && (
+              <div class="form-group">
+                <small class="form-text text-muted">
+                  <Text
+                    id="integration.thermostat.edit.deviceRangeHint"
+                    fields={{ min: targetRange.min, max: targetRange.max, unit: formUnit }}
+                  />{' '}
+                  <button type="button" class="btn btn-link btn-sm p-0 align-baseline" onClick={applyDeviceRange}>
+                    <Text id="integration.thermostat.edit.deviceRangeApply" />
+                  </button>
+                </small>
+              </div>
+            )}
 
             {/* Presets : nom + couleur fixe + température */}
             <div class="form-group">

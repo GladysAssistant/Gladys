@@ -3463,7 +3463,9 @@
         "modeHelp": "Ce que ce thermostat commande : le chauffage ou la climatisation.",
         "sectionDevice": "Appareil",
         "sectionHeating": "Chauffage",
-        "sectionProgramming": "Programmation"
+        "sectionProgramming": "Programmation",
+        "deviceRangeHint": "L’appareil annonce {{min}} – {{max}} °{{unit}}.",
+        "deviceRangeApply": "Utiliser ces valeurs"
       },
       "schedule": {
         "title": "Plannings",

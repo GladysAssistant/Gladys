@@ -787,10 +787,26 @@ describe('thermostatSchedule.carriedPresetByDay', () => {
     [0, 1, 2, 3, 4].forEach((day) => {
       expect(byDay[day]).to.deep.equal({ preset: 'comfort', day: 5, until: DAY_MINUTES });
     });
-    // Saturday states its own preset from 08:00; before that it inherits the
-    // same point, wrapped from the end of the week.
-    expect(byDay[5]).to.equal(null);
+    // Saturday inherits that same point, wrapped from the end of the week, until
+    // its own 08:00. Saying null here drew Saturday 00:00-08:00 as empty while the
+    // server applied comfort: findCurrentTransition(week, 5, 180) returns the point.
+    expect(byDay[5]).to.deep.equal({ preset: 'comfort', day: 5, until: 8 * 60 });
     expect(byDay[6]).to.deep.equal({ preset: 'comfort', day: 5, until: DAY_MINUTES });
+  });
+
+  // The wrap can land on the day's own point, which is still an inheritance: it
+  // comes from the week before. Rejecting it because the day numbers matched was
+  // what left the first hours of that day blank.
+  it('should carry a day own point onto its own morning when the week wraps onto it', () => {
+    const week = [
+      { day_of_week: 5, time: '08:00', preset: 'comfort' },
+      { day_of_week: 5, time: '23:00', preset: 'night' },
+    ];
+
+    const byDay = carriedPresetByDay(week);
+
+    // Saturday midnight runs on the last point of the week — its own 23:00 night.
+    expect(byDay[5]).to.deep.equal({ preset: 'night', day: 5, until: 8 * 60 });
   });
 
   it('should carry the last point of the week onto Monday', () => {

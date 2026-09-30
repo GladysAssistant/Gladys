@@ -804,12 +804,10 @@ class ScheduleEditor extends Component {
                         </p>
                       )}
 
-                      {/* What the hatching means, said once where the ranges are
-                        edited. Not "the thermostat is stopped": outside a range
-                        it keeps the preset the last point set, which is what the
-                        empty-schedule warning says too. */}
-                      <p class={style.stoppedLegend}>
-                        <span class={style.stoppedLegendSwatch} />
+                      {/* Said once where the ranges are edited: outside a range
+                        the thermostat keeps the preset the last point set, which
+                        is what the empty-schedule warning says too. */}
+                      <p class={style.uncoveredLegend}>
                         <Text id="integration.thermostat.schedule.uncoveredLegend" />
                       </p>
 

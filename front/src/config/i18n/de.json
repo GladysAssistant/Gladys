@@ -3463,7 +3463,9 @@
         "modeHelp": "Was dieses Thermostat steuert: Heizung oder Kühlung.",
         "sectionDevice": "Gerät",
         "sectionHeating": "Heizung",
-        "sectionProgramming": "Programmierung"
+        "sectionProgramming": "Programmierung",
+        "deviceRangeHint": "Das Gerät meldet {{min}} – {{max}} °{{unit}}.",
+        "deviceRangeApply": "Diese Werte übernehmen"
       },
       "schedule": {
         "title": "Zeitpläne",

@@ -116,30 +116,11 @@
   filter: invert(100%) hue-rotate(180deg);
 }
 
-/* Says what the hatching means, next to a sample of it. */
-.stoppedLegend {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+/* Says what happens between the ranges, under the day being edited. */
+.uncoveredLegend {
   margin: 4px 0 0 0;
   font-size: 0.75rem;
   color: #868e96;
-}
-
-.stoppedLegendSwatch {
-  display: inline-block;
-  width: 22px;
-  height: 10px;
-  border-radius: 2px;
-  outline: 1px solid rgba(0, 0, 0, 0.06);
-  outline-offset: -1px;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(0, 0, 0, 0.07),
-    rgba(0, 0, 0, 0.07) 3px,
-    transparent 3px,
-    transparent 6px
-  );
 }
 
 /* Where a day with no point of its own gets its colour from. */

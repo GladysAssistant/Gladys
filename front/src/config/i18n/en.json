@@ -3463,7 +3463,9 @@
         "modeHelp": "What this thermostat drives: heating or cooling.",
         "sectionDevice": "Device",
         "sectionHeating": "Heating",
-        "sectionProgramming": "Programming"
+        "sectionProgramming": "Programming",
+        "deviceRangeHint": "The device advertises {{min}} – {{max}} °{{unit}}.",
+        "deviceRangeApply": "Use these values"
       },
       "schedule": {
         "title": "Schedules",
