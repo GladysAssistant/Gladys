@@ -11,6 +11,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const THIRTY_MINUTES_MS = 30 * 60 * 1000;
 // A billing period that ended in the last 3 days is (re)priced as closed: the demand
 // charges are applied and the tier accumulations are final (section 7.4).
 const CLOSED_PERIOD_LOOKBACK_DAYS = 3;
@@ -51,7 +52,10 @@ async function closeBillingPeriods(jobId) {
       }
     });
     if (meters.size > 0) {
-      const from = new Date(Math.min(...Array.from(meters.values())));
+      // calculateCostFrom takes the creation instant of the first state to reprice: the end of
+      // the first interval of the elapsed period (the state created at its start belongs to the
+      // period before, which is not repriced)
+      const from = new Date(Math.min(...Array.from(meters.values())) + THIRTY_MINUTES_MS);
       logger.info(`Closing the billing periods of ${meters.size} meter(s) from ${from.toISOString()}`);
       await this.calculateCostFrom(from, jobId, { electricMeterDeviceIds: Array.from(meters.keys()) });
     }

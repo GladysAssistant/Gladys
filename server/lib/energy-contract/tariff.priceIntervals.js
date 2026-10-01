@@ -262,7 +262,8 @@ function splitInterval(interval, slotMinutes, tz, billingPeriodStartDay) {
  * counters? } kWh accumulated before the first interval, as a previous run returned it), `closed_period`
  * (boolean, include the demand charges), `exclude_kinds` (component kinds left out of the costs: a tax only
  * applies to what is priced).
- * @returns {object} The run result: costs (starts_at, cost, components, label per interval), warnings,
+ * @returns {object} The run result: costs (starts_at, cost, components, label per interval: the label of the first
+ * consumption component that has one), warnings,
  * cumulative ({ day, month, billing_period } plus the `counters` of the `counts_when` tiers, if any).
  * @example
  * priceIntervals(compiled, { timezone: 'Europe/Paris' }, [{ starts_at: '2026-01-12T06:00:00Z', kwh: 1.2 }]);
@@ -312,16 +313,22 @@ function priceIntervals(compiled, contract, intervals, options = {}) {
         maxPowerKw: slot.maxPowerKw,
         tierBounds: (tier) => tierBoundsAt(tier, slot),
       };
+      // the label of the first consumption component that has one: the energy price, declared
+      // first, is never hidden by a per-kWh levy declared after it
+      let slotLabel;
       compiled.components.forEach((component) => {
         if (component.kind !== TARIFF_COMPONENT_KINDS.CONSUMPTION || !pricesConsumption) {
           return;
         }
         const result = evaluateConsumption(component, slot, context, accumulation.state, warnings);
         consumptionAmounts[component.key] = (consumptionAmounts[component.key] || 0) + result.amount;
-        if (result.label !== undefined) {
-          label = result.label;
+        if (slotLabel === undefined) {
+          slotLabel = result.label;
         }
       });
+      if (slotLabel !== undefined) {
+        label = slotLabel;
+      }
       accumulation.add(slot, context);
     });
     const components = {};

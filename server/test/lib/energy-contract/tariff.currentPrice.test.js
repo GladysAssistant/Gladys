@@ -266,6 +266,27 @@ describe('energy-contract getCurrentPrice', () => {
       getCurrentPrice(spot, { timezone: 'Asia/Kathmandu' }, { at: '2026-01-12T12:10:00Z', calendars }),
     ).to.deep.include({ price: 0.1, valid_until: '2026-01-12T12:15:00.000Z' });
   });
+  it('should name the rule of the first consumption component, never a levy declared after it', () => {
+    const withLevy = compileTariff({
+      tariff_version: 1,
+      components: [
+        {
+          key: 'energy',
+          kind: 'consumption',
+          rules: [{ label: 'Peak', when: { time: [['06:00', '22:00']] }, price: 0.2 }],
+          fallback: { label: 'Off-peak', price: 0.1 },
+        },
+        { key: 'levy', kind: 'consumption', fallback: { label: 'Electricity tax', price: 0.02 } },
+      ],
+    });
+    expect(getCurrentPrice(withLevy, utc, { at: '2026-01-12T12:00:00Z' })).to.deep.equal({
+      price: 0.22,
+      label: 'Peak',
+      valid_until: '2026-01-12T22:00:00.000Z',
+      next_price: 0.12,
+      next_label: 'Off-peak',
+    });
+  });
   it('should fall back like the interval pricing when the matching rule has no calendar price', () => {
     const compiled = compileTariff({
       tariff_version: 1,

@@ -79,7 +79,13 @@ function normalizeEntry(entry, calendar, index) {
     if (typeof entry.value !== 'string' || entry.value.length === 0 || entry.value.length > 64) {
       throw new BadParameters(`entries[${index}].value: must be a string of 1 to 64 characters`);
     }
-    if (calendar.values && !calendar.values.includes(entry.value)) {
+    // a calendar declaring no enum is a price calendar: a string would erase its price (section 4)
+    if (!calendar.values) {
+      throw new BadParameters(
+        `entries[${index}].value: calendar "${calendar.key}" is a price calendar, it takes prices`,
+      );
+    }
+    if (!calendar.values.includes(entry.value)) {
       throw new BadParameters(`entries[${index}].value: "${entry.value}" is not in [${calendar.values.join(', ')}]`);
     }
     return { starts_at: startsAt, value_string: entry.value, value_number: null };

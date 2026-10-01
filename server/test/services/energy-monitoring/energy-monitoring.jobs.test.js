@@ -109,6 +109,9 @@ describe('EnergyMonitoring: contract jobs', () => {
       expect(energyMonitoring.calculateCostFrom.callCount).to.equal(1);
       const [from, jobId, options] = energyMonitoring.calculateCostFrom.firstCall.args;
       expect(from.getTime()).to.be.below(Date.now() - 27 * 24 * 60 * 60 * 1000);
+      // the creation instant of the first interval of the elapsed period (it starts at local midnight)
+      expect(from.getUTCHours()).to.equal(0);
+      expect(from.getUTCMinutes()).to.equal(30);
       expect(jobId).to.equal('job-2');
       expect(options).to.deep.equal({ electricMeterDeviceIds: [METER_DEVICE_ID] });
       // retention: the oldest state minus one day

@@ -2917,6 +2917,11 @@
           "key": "Key",
           "provider": "Provider",
           "granularity": "Granularity",
+          "granularities": {
+            "day": "Day",
+            "thirty_minutes": "30 minutes",
+            "fifteen_minutes": "15 minutes"
+          },
           "coverage": "Coverage",
           "orphaned": "no provider",
           "lastValues": "Last values",
@@ -4473,6 +4478,7 @@
       },
       "statesMigrated": "History states moved: {{count}}",
       "orphanedStates": "Orphaned states: {{count}}",
+      "fallbackPrices": "Prices taken from the fallback price (missing calendar value): {{count}}",
       "duration": "Duration: {{duration}}"
     },
     "jobTypes": {
@@ -4496,6 +4502,9 @@
       "energy-monitoring-consumption-from-index-beginning": "Energy consumption calculation from index (from beginning)",
       "energy-monitoring-production-from-index-thirty-minutes": "Energy production calculation from index (30 minutes)",
       "energy-monitoring-production-from-index-beginning": "Energy production calculation from index (from beginning)",
+      "energy-monitoring-cost-calculation-contract": "Energy cost recalculation (contract or calendar change)",
+      "energy-monitoring-billing-period-end": "Energy cost calculation (end of billing period)",
+      "energy-monitoring-delegated-catch-up": "Energy cost catch-up (contracts priced by an integration)",
       "service-enedis-sync": "Enedis data synchronization",
       "ai-weekly-digest": "AI weekly digest"
     },

@@ -154,7 +154,7 @@ function compilePriceSpec(spec) {
  * @param {object} tariff - Tariff definition (template or stored JSON).
  * @param {object} [inputs] - Values of the template inputs.
  * @returns {object} The compiled tariff: tariff, calendars, components, hasTier, tierScopes, counters
- * (the filtered accumulation counters of the `counts_when` tiers: { id, scope, when }), needsPower.
+ * (the filtered accumulation counters of the `counts_when` tiers: { id, scope, when }), hasDemand, needsPower.
  * @example
  * const compiled = compileTariff(template.tariff, { subscribed_power: 9 });
  */
@@ -164,8 +164,10 @@ function compileTariff(tariff, inputs = {}) {
   const counters = new Map();
   // demand charges and power thresholds read the peak power of the intervals
   let needsPower = false;
+  let hasDemand = false;
   const components = normalized.components.map((component) => {
     if (component.kind === TARIFF_COMPONENT_KINDS.DEMAND) {
+      hasDemand = true;
       needsPower = true;
     }
     if (component.kind === TARIFF_COMPONENT_KINDS.CONSUMPTION) {
@@ -213,6 +215,7 @@ function compileTariff(tariff, inputs = {}) {
     hasTier: tierScopes.size > 0,
     tierScopes: Array.from(tierScopes),
     counters: Array.from(counters.values()),
+    hasDemand,
     needsPower,
   };
 }

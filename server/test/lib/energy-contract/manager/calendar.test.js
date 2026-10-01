@@ -240,12 +240,18 @@ describe('energyContract: tariff calendars', () => {
       await expect(publish('tempo', [{ date: '2099-01-12', value: 'red' }])).to.be.rejectedWith(/7 days ahead/);
     });
 
-    it('should accept a string value on a calendar without a declared enum', async () => {
-      await energyContract.declareCalendar({ key: 'free', granularity: 'day' }, null);
-      const result = await energyContract.publishCalendarEntries('free', [{ date: '2026-01-12', value: 'anything' }], {
-        skip_recalculation: true,
-      });
-      expect(result.count).to.equal(1);
+    it('should refuse a string value on a price calendar, which declares no enum', async () => {
+      await energyContract.declareCalendar({ key: 'spot-fi', granularity: 'fifteen_minutes', currency: 'EUR' }, null);
+      const publish = (entries) =>
+        energyContract.publishCalendarEntries('spot-fi', entries, { skip_recalculation: true });
+      await publish([{ starts_at: '2026-01-12T09:15:00Z', price: 0.08 }]);
+      // the quarter keeps its price: a string would have erased it
+      await expect(publish([{ starts_at: '2026-01-12T09:15:00Z', value: 'peak' }])).to.be.rejectedWith(
+        'entries[0].value: calendar "spot-fi" is a price calendar, it takes prices',
+      );
+      expect(await energyContract.getCalendarEntries('spot-fi', { from: '2026-01-12' })).to.deep.equal([
+        { starts_at: '2026-01-12T09:15:00.000Z', value: 0.08 },
+      ]);
     });
 
     it('should queue a recalculation of the meters referencing the calendar, bounded to one per 10 minutes', async () => {

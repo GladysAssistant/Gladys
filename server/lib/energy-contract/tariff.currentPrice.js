@@ -58,7 +58,8 @@ function getUnitPriceAt(compiled, contract, ms, lookup, cumulative, maxPowerKw =
       }
       byComponent[component.key] = unit;
       price += unit;
-      if (spec.label !== undefined) {
+      // the label of the first consumption component that has one, as in priceIntervals
+      if (label === undefined) {
         label = spec.label;
       }
     } else if (component.kind === TARIFF_COMPONENT_KINDS.TAX) {

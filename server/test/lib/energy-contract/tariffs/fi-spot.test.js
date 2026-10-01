@@ -3,7 +3,8 @@ const { price, interval, createCalendarLookup } = require('./helpers');
 
 // Finland, spot contract: the day-ahead price changes every 15 minutes (the Nordic market
 // moved to 15-minute products in October 2025), published the day before by an integration in
-// a 15-minute calendar; the supplier adds a margin, VAT applies, and a monthly fee.
+// a 15-minute calendar; the supplier adds a margin, the electricity tax is a separate per-kWh
+// component, VAT applies to both, and a monthly fee.
 const tariff = {
   tariff_version: 1,
   calendars: ['spot-fi'],
@@ -14,7 +15,8 @@ const tariff = {
       rules: [{ label: 'Spot', price_from_calendar: 'spot-fi', offset: 0.005 }],
       fallback: { label: 'Backup', price: 0.12 },
     },
-    { key: 'vat', kind: 'tax', rate: 25.5, applies_to: ['energy'] },
+    { key: 'electricity_tax', kind: 'consumption', fallback: { label: 'Electricity tax', price: 0.0224 } },
+    { key: 'vat', kind: 'tax', rate: 25.5, applies_to: ['energy', 'electricity_tax'] },
     { key: 'subscription', kind: 'fixed', amount: 3.99, per: 'month' },
   ],
 };
@@ -44,8 +46,10 @@ describe('tariffs: Finland spot (15-minute prices)', () => {
     expect(warnings).to.deep.equal([]);
     // 1 kWh at each quarter: the mean of the two quarter prices, plus the margin
     expect(costs[0].components.energy).to.be.closeTo(1 * (0.04 + 0.005) + 1 * (0.1 + 0.005), 1e-9);
-    expect(costs[0].components.vat).to.be.closeTo(0.15 * 0.255, 1e-6);
+    expect(costs[0].components.electricity_tax).to.be.closeTo(2 * 0.0224, 1e-9);
+    expect(costs[0].components.vat).to.be.closeTo((0.15 + 2 * 0.0224) * 0.255, 1e-6);
     expect(costs[0].components).to.not.have.property('subscription');
+    // the label is the energy price's: the tax component declared after it never hides it
     expect(costs[0].label).to.equal('Spot');
     expect(costs[1].components.energy).to.be.closeTo(0.5 * (-0.002 + 0.005) + 0.5 * (0.006 + 0.005), 1e-9);
     // the stored cost stays one amount per 30-minute interval

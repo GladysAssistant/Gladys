@@ -2917,6 +2917,11 @@
           "key": "Clave",
           "provider": "Proveedor",
           "granularity": "Granularidad",
+          "granularities": {
+            "day": "Día",
+            "thirty_minutes": "30 minutos",
+            "fifteen_minutes": "15 minutos"
+          },
           "coverage": "Cobertura",
           "orphaned": "sin proveedor",
           "lastValues": "Últimos valores",
@@ -4473,6 +4478,7 @@
       },
       "statesMigrated": "Estados de historial movidos: {{count}}",
       "orphanedStates": "Estados huérfanos: {{count}}",
+      "fallbackPrices": "Precios tomados del precio de reserva (valor de calendario ausente): {{count}}",
       "duration": "Duración: {{duration}}"
     },
     "jobTypes": {
@@ -4496,6 +4502,9 @@
       "energy-monitoring-consumption-from-index-beginning": "Cálculo del consumo de energía a partir del índice (desde el inicio)",
       "energy-monitoring-production-from-index-thirty-minutes": "Cálculo de la producción de energía a partir del índice (30 minutos)",
       "energy-monitoring-production-from-index-beginning": "Cálculo de la producción de energía a partir del índice (desde el inicio)",
+      "energy-monitoring-cost-calculation-contract": "Recálculo del coste de energía (cambio de contrato o de calendario)",
+      "energy-monitoring-billing-period-end": "Cálculo del coste de energía (fin del periodo de facturación)",
+      "energy-monitoring-delegated-catch-up": "Recuperación del coste de energía (contratos calculados por una integración)",
       "service-enedis-sync": "Sincronización de datos de Enedis",
       "ai-weekly-digest": "Resumen semanal de IA"
     },

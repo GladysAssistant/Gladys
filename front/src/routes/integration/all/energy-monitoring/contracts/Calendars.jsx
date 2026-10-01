@@ -132,7 +132,13 @@ class CalendarsSection extends Component {
                               </span>
                             )}
                           </td>
-                          <td>{calendar.granularity}</td>
+                          <td>
+                            <Text
+                              id={`integration.energyMonitoring.contracts.calendars.granularities.${calendar.granularity}`}
+                            >
+                              {calendar.granularity}
+                            </Text>
+                          </td>
                           <td>
                             {this.formatDate(calendar.first_at, calendar.granularity)} →{' '}
                             {this.formatDate(calendar.last_at, calendar.granularity)}

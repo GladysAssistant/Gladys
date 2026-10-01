@@ -108,7 +108,10 @@ describe('energyContract: preview and current price', () => {
     });
 
     it('should replay the counted accumulation of a counts_when tier from the stored states', async () => {
-      await energyContract.declareCalendar({ key: 'peaks', granularity: 'thirty_minutes' }, TEST_SERVICE_ID);
+      await energyContract.declareCalendar(
+        { key: 'peaks', granularity: 'thirty_minutes', values: ['peak'] },
+        TEST_SERVICE_ID,
+      );
       await energyContract.publishCalendarEntries('peaks', [{ starts_at: '2026-01-12T00:00:00Z', value: 'peak' }], {
         provider_service_id: TEST_SERVICE_ID,
         skip_recalculation: true,
@@ -258,6 +261,16 @@ describe('energyContract: preview and current price', () => {
       await expect(energyContract.preview({ tariff: { tariff_version: 1, components: [] } })).to.be.rejectedWith(
         /tariff\.components/,
       );
+      // the billing day follows the contract rule (a decimal broke the period bounds with a 500)
+      await Promise.all(
+        [1.5, 0, 32, '5'].map((day) =>
+          expect(energyContract.preview({ tariff: BASE_TARIFF, billing_period_start_day: day })).to.be.rejectedWith(
+            'billing_period_start_day: must be an integer from 1 to 31',
+          ),
+        ),
+      );
+      const withBillingDay = await energyContract.preview({ tariff: BASE_TARIFF, billing_period_start_day: 31 });
+      expect(withBillingDay.synthetic).to.equal(true);
     });
 
     it('should build synthetic intervals aligned on slots and sum costs', () => {
@@ -293,7 +306,10 @@ describe('energyContract: preview and current price', () => {
     });
 
     it('should judge a counts_when tier on its counter and keep the counters out of the answer', async () => {
-      await energyContract.declareCalendar({ key: 'peaks', granularity: 'thirty_minutes' }, TEST_SERVICE_ID);
+      await energyContract.declareCalendar(
+        { key: 'peaks', granularity: 'thirty_minutes', values: ['peak'] },
+        TEST_SERVICE_ID,
+      );
       await energyContract.publishCalendarEntries('peaks', [{ starts_at: '2026-01-12T00:00:00Z', value: 'peak' }], {
         provider_service_id: TEST_SERVICE_ID,
         skip_recalculation: true,

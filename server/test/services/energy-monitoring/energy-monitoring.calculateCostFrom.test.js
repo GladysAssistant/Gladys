@@ -248,11 +248,12 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       }),
     );
     const compiled = energyContract.getCompiledTariff(contract);
-    expect(getEffectiveStart(contract, compiled, new Date('2025-08-28T15:00:00.000Z')).toISOString()).to.equal(
+    const now = Date.now();
+    expect(getEffectiveStart(contract, compiled, new Date('2025-08-28T15:00:00.000Z'), now).toISOString()).to.equal(
       '2025-08-28T00:00:00.000Z',
     );
     expect(
-      getEffectiveStart(contract, { hasTier: false }, new Date('2025-08-28T15:00:00.000Z')).toISOString(),
+      getEffectiveStart(contract, { hasTier: false }, new Date('2025-08-28T15:00:00.000Z'), now).toISOString(),
     ).to.equal('2025-08-28T15:00:00.000Z');
     const monthly = { ...contract, billing_period_start_day: 5 };
     expect(
@@ -260,8 +261,29 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
         monthly,
         { hasTier: true, tierScopes: ['month', 'billing_period'] },
         new Date('2025-08-28T15:00:00.000Z'),
+        now,
       ).toISOString(),
     ).to.equal('2025-08-01T00:00:00.000Z');
+    // demand charges: an elapsed billing period is repriced whole, the current one is left as it is
+    expect(
+      getEffectiveStart(
+        { timezone: 'UTC' },
+        { hasDemand: true },
+        new Date('2025-08-28T15:00:00.000Z'),
+        now,
+      ).toISOString(),
+    ).to.equal('2025-08-01T00:00:00.000Z');
+    expect(
+      getEffectiveStart(monthly, { hasDemand: true }, new Date('2025-08-28T15:00:00.000Z'), now).toISOString(),
+    ).to.equal('2025-08-05T00:00:00.000Z');
+    expect(
+      getEffectiveStart(
+        monthly,
+        { hasDemand: true },
+        new Date('2025-08-28T15:00:00.000Z'),
+        Date.parse('2025-08-30T00:00:00.000Z'),
+      ).toISOString(),
+    ).to.equal('2025-08-28T15:00:00.000Z');
     await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
       { value: 8, created_at: new Date('2025-08-28T10:00:00.000Z') },
       { value: 4, created_at: new Date('2025-08-28T15:00:00.000Z') },
@@ -270,6 +292,68 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     await energyMonitoring.calculateCostFrom(new Date('2025-08-28T14:00:00.000Z'));
     const states = await costStates();
     expect(states.map((s) => s.value)).to.deep.equal([0.8, 0.2 + 2]);
+  });
+
+  it('should never reprice the last interval of the previous day with an empty day accumulation', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Daily allowance',
+        timezone: 'UTC',
+        valid_from: '2020-01-01',
+        tariff: {
+          tariff_version: 1,
+          components: [
+            {
+              key: 'e',
+              kind: 'consumption',
+              rules: [{ when: { tier: { cumulative: 'day', from_kwh: 0, to_kwh: 10 } }, price: 0.1 }],
+              fallback: { price: 1 },
+            },
+          ],
+        },
+      }),
+    );
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 8, created_at: new Date('2025-08-27T23:30:00.000Z') },
+      // the 23:30 - 00:00 interval of the 27th: its state is created at midnight
+      { value: 4, created_at: new Date('2025-08-28T00:00:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+    ]);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-27T00:00:00.000Z'));
+    expect((await costStates()).map((s) => s.value)).to.deep.equal([0.8, 0.2 + 2, 0.1]);
+    // a run widened to the start of the 28th (a 30-minute job, a calendar recalculation) leaves
+    // the last interval of the 27th as it was priced with the 27th's accumulation
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T14:00:00.000Z'));
+    expect((await costStates()).map((s) => s.value)).to.deep.equal([0.8, 0.2 + 2, 0.1]);
+  });
+
+  it('should reprice a whole elapsed billing period when a run starts at its end', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Demand',
+        timezone: 'UTC',
+        valid_from: '2020-01-01',
+        tariff: {
+          tariff_version: 1,
+          components: [
+            { key: 'e', kind: 'consumption', rules: [], fallback: { price: 0 } },
+            { key: 'demand', kind: 'demand', price: 10, per: 'billing_period', aggregation: 'max' },
+          ],
+        },
+      }),
+    );
+    await insertConsumption([
+      // 4 kW over 14:30 - 15:00, 1 kW over the last half-hour of August
+      { value: 2, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 0.5, created_at: new Date('2025-09-01T00:00:00.000Z') },
+      { value: 0.5, created_at: new Date('2025-09-01T00:30:00.000Z') },
+    ]);
+    // the first run of September, at 00:00: August is repriced whole, its peak is 4 kW (charged
+    // on the last half-hour of August alone, it would have been 1 kW); September 2025 has ended
+    // too, on its own 1 kW peak
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-31T23:30:00.000Z'));
+    const states = await costStates('electrical-meter-cost');
+    expect(states.map((s) => s.value)).to.deep.equal([20, 20, 10]);
   });
 
   it('should apply the demand charges of an elapsed billing period only', async () => {
@@ -639,11 +723,13 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
       { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
     ]);
-    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'), 'job-id');
     expect((await costStates())[0].value).to.equal(0.3);
     expect(
       warn.args.some(([message]) => /1 interval\(s\) priced by a fallback \(calendar_missing\)/.test(message)),
     ).to.equal(true);
+    // counted on the job for the Jobs page
+    sinon.assert.calledWith(gladys.job.updateProgress, 'job-id', 100, { fallback_prices_count: 1 });
   });
 
   it('should skip the features without a cost feature, a broken hierarchy and log errors', async () => {

@@ -255,7 +255,13 @@ describe('energyContract: legacy prices', () => {
 
     it('should verify a migrated contract against the stored consumption', async () => {
       await energyContract.declareCalendar(
-        { key: 'tempo', granularity: 'day', timezone: 'Europe/Paris', day_starts_at: '06:00' },
+        {
+          key: 'tempo',
+          granularity: 'day',
+          timezone: 'Europe/Paris',
+          day_starts_at: '06:00',
+          values: ['blue', 'white', 'red'],
+        },
         TEST_SERVICE_ID,
       );
       const contract = await energyContract.create(

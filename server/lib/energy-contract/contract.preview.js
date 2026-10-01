@@ -89,9 +89,17 @@ async function preview(params) {
       throw new BadParameters(`${key}: must be a YYYY-MM-DD date`);
     }
   });
+  const billingPeriodStartDay =
+    params.billing_period_start_day === undefined || params.billing_period_start_day === null
+      ? 1
+      : params.billing_period_start_day;
+  // the same rule as the contract itself: a billing day out of range breaks the period bounds
+  if (!Number.isInteger(billingPeriodStartDay) || billingPeriodStartDay < 1 || billingPeriodStartDay > 31) {
+    throw new BadParameters('billing_period_start_day: must be an integer from 1 to 31');
+  }
   const contract = {
     timezone,
-    billing_period_start_day: params.billing_period_start_day || 1,
+    billing_period_start_day: billingPeriodStartDay,
     currency: params.currency,
     valid_from: params.valid_from || undefined,
     valid_to: params.valid_to || undefined,
