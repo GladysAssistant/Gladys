@@ -264,6 +264,24 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
         now,
       ).toISOString(),
     ).to.equal('2025-08-01T00:00:00.000Z');
+    // never before the contract's local valid_from midnight: a contract starting inside the window
+    // does not widen it, one starting mid-period widens to its own start only
+    expect(
+      getEffectiveStart(
+        { ...contract, valid_from: '2025-08-28' },
+        compiled,
+        new Date('2025-08-27T23:30:00.000Z'),
+        now,
+      ).toISOString(),
+    ).to.equal('2025-08-27T23:30:00.000Z');
+    expect(
+      getEffectiveStart(
+        { ...contract, valid_from: '2025-08-10' },
+        { hasTier: true, tierScopes: ['month'] },
+        new Date('2025-08-28T15:00:00.000Z'),
+        now,
+      ).toISOString(),
+    ).to.equal('2025-08-10T00:00:00.000Z');
     // demand charges: an elapsed billing period is repriced whole, the current one is left as it is
     expect(
       getEffectiveStart(
@@ -325,6 +343,91 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     // the last interval of the 27th as it was priced with the 27th's accumulation
     await energyMonitoring.calculateCostFrom(new Date('2025-08-28T14:00:00.000Z'));
     expect((await costStates()).map((s) => s.value)).to.deep.equal([0.8, 0.2 + 2, 0.1]);
+  });
+
+  it('should never widen a contract starting today to the costs of yesterday', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Starts today',
+        timezone: 'UTC',
+        valid_from: '2025-08-28',
+        tariff: {
+          tariff_version: 1,
+          components: [
+            {
+              key: 'e',
+              kind: 'consumption',
+              rules: [{ when: { tier: { cumulative: 'day', from_kwh: 0, to_kwh: 10 } }, price: 0.1 }],
+              fallback: { price: 1 },
+            },
+          ],
+        },
+      }),
+    );
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
+      { value: 1, created_at: new Date('2025-08-27T10:00:00.000Z') },
+      { value: 2, created_at: new Date('2025-08-28T00:30:00.000Z') },
+    ]);
+    // costs stored before this contract, by another one since deleted: none is this contract's
+    await db.duckDbBatchInsertState(PLUG_COST_ID, [
+      { value: 99, created_at: new Date('2025-08-27T10:00:00.000Z') },
+      { value: 98, created_at: new Date('2025-08-27T23:30:00.000Z') },
+    ]);
+    // the 00:30 job of the contract's first day: its window starts at 23:30 the day before
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    expect((await costStates()).map((s) => s.value)).to.deep.equal([99, 98, 0.2]);
+  });
+
+  it('should price the daily state stamped at the start of its day after a per-day tier widening', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Daily allowance',
+        timezone: 'UTC',
+        tariff: {
+          tariff_version: 1,
+          components: [
+            {
+              key: 'e',
+              kind: 'consumption',
+              rules: [{ when: { tier: { cumulative: 'day', from_kwh_per_day: 0, to_kwh_per_day: 40 } }, price: 0.1 }],
+              fallback: { price: 1 },
+            },
+          ],
+        },
+      }),
+    );
+    await device.create({
+      id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      service_id: TEST_SERVICE_ID,
+      name: 'Daily meter',
+      external_id: 'daily-meter',
+      features: [
+        feature({
+          id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          selector: 'daily-consumption',
+          external_id: 'daily-consumption',
+          name: 'Daily consumption',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          energy_parent_id: METER_FEATURE_ID,
+        }),
+        feature({
+          id: 'c3d4e5f6-a789-0123-cdef-234567890abc',
+          selector: 'daily-consumption-cost',
+          external_id: 'daily-consumption-cost',
+          name: 'Daily consumption cost',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+          energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+        }),
+      ],
+    });
+    // one state per day, stamped at the start of its day
+    await db.duckDbBatchInsertState('b2c3d4e5-f6a7-8901-bcde-f12345678901', [
+      { value: 5, created_at: new Date('2025-08-28T00:00:00.000Z') },
+    ]);
+    // a run during the day widens to its midnight: the day's state is in the window
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T12:00:00.000Z'));
+    expect((await costStates('daily-consumption-cost')).map((s) => s.value)).to.deep.equal([0.5]);
   });
 
   it('should reprice a whole elapsed billing period when a run starts at its end', async () => {

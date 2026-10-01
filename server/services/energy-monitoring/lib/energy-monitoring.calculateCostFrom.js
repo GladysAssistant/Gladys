@@ -8,12 +8,13 @@ const {
 } = require('../../../utils/constants');
 const { convertEnergyUnit } = require('../../../utils/units');
 const { TARIFF_COMPONENT_KINDS } = require('../../../lib/energy-contract/tariff.constants');
-const { carryMonthAccumulation } = require('../../../lib/energy-contract/tariff.tier');
+const { carryMonthAccumulation, toLocalDate } = require('../../../lib/energy-contract/tariff.tier');
 const {
   getLocalContext,
   getDayBounds,
   getMonthBounds,
   getBillingPeriodBounds,
+  localToUtcMs,
 } = require('../../../lib/energy-contract/tariff.time');
 
 const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000;
@@ -76,7 +77,9 @@ function findConsumptionCostPairs(energyDevice) {
  * earliest accumulation period containing it (the accumulations are recomputed from the start of
  * the period); for a contract with demand charges, the start of its billing period when that
  * period has ended (an elapsed period is priced as closed, its demand charges over all its
- * intervals, never over the part of it a window happens to cover).
+ * intervals, never over the part of it a window happens to cover). Never before the contract's
+ * local `valid_from` midnight: its accumulations start with its first interval, and the days
+ * before belong to another contract, or to none (their costs are not this contract's to rewrite).
  * @param {object} contract - The contract.
  * @param {object} compiled - Its compiled tariff.
  * @param {Date} windowStart - Start of the first interval of the run window.
@@ -87,6 +90,12 @@ function findConsumptionCostPairs(energyDevice) {
  */
 function getEffectiveStart(contract, compiled, windowStart, nowMs) {
   const tz = contract.timezone;
+  const validFrom = toLocalDate(contract.valid_from, tz);
+  const validFromMs = validFrom === undefined ? -Infinity : localToUtcMs(validFrom, tz);
+  if (validFromMs >= windowStart.getTime()) {
+    // the contract starts inside the window: all its intervals are in it already
+    return windowStart;
+  }
   const { date } = getLocalContext(windowStart.getTime(), tz);
   const billingPeriodStartDay = contract.billing_period_start_day || 1;
   const starts = compiled.hasTier
@@ -106,7 +115,7 @@ function getEffectiveStart(contract, compiled, windowStart, nowMs) {
       starts.push(billingPeriod.startMs);
     }
   }
-  return new Date(Math.min(windowStart.getTime(), ...starts));
+  return new Date(Math.min(windowStart.getTime(), ...starts.map((start) => Math.max(start, validFromMs))));
 }
 
 /**
@@ -238,13 +247,15 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           logger.debug(`No energy contract for meter ${electricMeterFeature.device_id}: no cost computed`);
           return;
         }
-        // `startAt` bounds the states by their creation instant, the end of their interval: the
-        // run covers the intervals ending at or after it, the first one starting 30 minutes before.
+        // `startAt` bounds the states by their creation instant: a 30-minute state is stamped at
+        // the end of its interval (the run covers the intervals ending at or after `startAt`, the
+        // first one starting 30 minutes before), a daily state at the start of its day.
         // A tiered contract recomputes from the start of its accumulation period and a contract
         // with demand charges from the start of an elapsed billing period: only the contracts
         // covering the run window widen it, never an expired or a future one.
         const nowDate = new Date(nowMs);
-        const windowStart = new Date(startAt.getTime() - THIRTY_MINUTES_IN_MS);
+        const stampOffsetMs = pair.durationMinutes === DAILY_DURATION_MINUTES ? 0 : THIRTY_MINUTES_IN_MS;
+        const windowStart = new Date(startAt.getTime() - stampOffsetMs);
         const coveringContracts = contracts.filter((contract) => {
           const startDate = getLocalContext(windowStart.getTime(), contract.timezone).date;
           const endDate = getLocalContext(nowDate.getTime(), contract.timezone).date;
@@ -280,10 +291,11 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
           }
           powerPeaks = powerPeaksByMeter.get(peaksKey);
         }
-        // the states of the intervals starting at or after the effective start: the state created
-        // at that instant ends the last interval of the previous period (the previous day of a
-        // daily tier, an elapsed billing period), which is neither repriced nor replaced
-        const statesFrom = new Date(effectiveStart.getTime() + THIRTY_MINUTES_IN_MS);
+        // the states of the intervals starting at or after the effective start: the 30-minute
+        // state created at that instant ends the last interval of the previous period (the
+        // previous day of a daily tier, an elapsed billing period), which is neither repriced nor
+        // replaced; the daily state created at that instant is the first day of the window
+        const statesFrom = new Date(effectiveStart.getTime() + stampOffsetMs);
         const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
           pair.consumptionFeature.selector,
           statesFrom,
