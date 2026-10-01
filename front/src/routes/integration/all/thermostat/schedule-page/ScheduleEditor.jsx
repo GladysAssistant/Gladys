@@ -39,8 +39,50 @@ function followersFromSchedule(schedule) {
 }
 
 // The ranges an editor holds, from the points a schedule stores.
+// Ranges of the same preset that touch are one range. Two of them show as two
+// identical lines — 06:30-17:00 Comfort, then 17:00-22:30 Comfort — while the
+// points model stores a single stretch, so the editor would be saying something
+// the schedule does not. Applied after every operation, not only after a
+// deletion: an edit can bring two together just as well, and a schedule loaded
+// from the server may already hold a pair.
+//
+// Walks the week in order so a chain of three merges in one pass, and follows a
+// range across midnight onto the next day — the night and the morning that
+// continue it are one stretch.
+function mergeTouching(ranges) {
+  const openAt = range => range.day_of_week * DAY_MINUTES + timeToMinutes(range.start_time);
+  const closeAt = range => {
+    const start = openAt(range);
+    const end = range.day_of_week * DAY_MINUTES + timeToMinutes(range.end_time);
+    return end <= start ? end + DAY_MINUTES : end;
+  };
+  const sorted = [...ranges].sort((a, b) => openAt(a) - openAt(b));
+  const merged = [];
+  sorted.forEach(range => {
+    const previous = merged[merged.length - 1];
+    // The week wraps, so a range opening exactly where the previous one closes
+    // is its continuation — including the one that closes past midnight.
+    if (previous && previous.preset === range.preset && closeAt(previous) === openAt(range)) {
+      merged[merged.length - 1] = { ...previous, end_time: range.end_time };
+      return;
+    }
+    merged.push(range);
+  });
+  // The last range of the week may run into the first, which the pass above
+  // cannot see: they are at the two ends of the list.
+  if (merged.length > 1) {
+    const last = merged[merged.length - 1];
+    const first = merged[0];
+    if (last.preset === first.preset && closeAt(last) % (7 * DAY_MINUTES) === openAt(first)) {
+      merged[0] = { ...last, end_time: first.end_time };
+      merged.pop();
+    }
+  }
+  return merged;
+}
+
 function rangesFromSchedule(schedule) {
-  return ensureKeys(transitionsToRanges(schedule ? schedule.transitions || [] : []));
+  return ensureKeys(mergeTouching(transitionsToRanges(schedule ? schedule.transitions || [] : [])));
 }
 
 const byStart = (a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time);
@@ -274,13 +316,19 @@ class ScheduleEditor extends Component {
 
   updateNewForm = (day, field, value) => {
     this.setState(prev => ({
-      newForms: { ...prev.newForms, [day]: { ...prev.newForms[day], [field]: value } }
+      newForms: { ...prev.newForms, [day]: { ...prev.newForms[day], [field]: value, rowError: null } }
     }));
   };
 
   confirmNewForm = day => {
     const form = this.state.newForms[day];
     if (!form || !form.start_time || !form.end_time) return;
+    if (form.start_time === form.end_time) {
+      this.setState(prev => ({
+        newForms: { ...prev.newForms, [day]: { ...prev.newForms[day], rowError: 'same-time' } }
+      }));
+      return;
+    }
     const candidate = { day_of_week: day, start_time: form.start_time, end_time: form.end_time };
     // Two ranges starting at the same moment would give one point: replace
     // rather than add, so the second entry is the one that stands.
@@ -289,7 +337,7 @@ class ScheduleEditor extends Component {
     );
     this.setState(prev => ({
       error: null,
-      ranges: [
+      ranges: mergeTouching([
         ...withoutSameStart,
         {
           key: Date.now() + Math.random(),
@@ -298,7 +346,7 @@ class ScheduleEditor extends Component {
           end_time: form.end_time,
           preset: form.preset
         }
-      ],
+      ]),
       newForms: (() => {
         const forms = { ...prev.newForms };
         delete forms[day];
@@ -328,13 +376,19 @@ class ScheduleEditor extends Component {
 
   updateEditForm = (key, field, value) => {
     this.setState(prev => ({
-      editForms: { ...prev.editForms, [key]: { ...prev.editForms[key], [field]: value } }
+      editForms: { ...prev.editForms, [key]: { ...prev.editForms[key], [field]: value, rowError: null } }
     }));
   };
 
   confirmEdit = key => {
     const form = this.state.editForms[key];
     if (!form || !form.start_time || !form.end_time) return;
+    if (form.start_time === form.end_time) {
+      this.setState(prev => ({
+        editForms: { ...prev.editForms, [key]: { ...prev.editForms[key], rowError: 'same-time' } }
+      }));
+      return;
+    }
     const edited = this.state.ranges.find(r => r.key === key);
     const candidate = { day_of_week: edited.day_of_week, start_time: form.start_time, end_time: form.end_time };
     this.setState(prev => {
@@ -348,18 +402,66 @@ class ScheduleEditor extends Component {
         );
       const forms = { ...prev.editForms };
       delete forms[key];
-      return { ranges, editForms: forms, error: null };
+      return { ranges: mergeTouching(ranges), editForms: forms, error: null };
     });
   };
 
   // Deleting a range leaves nothing running in its place: the points it opened
   // and closed both go, and the thermostat keeps whatever the range before it
   // set — exactly what the stored programme then says.
+  // Deleting a range hands its time to the range before it, rather than leaving a
+  // gap. A gap is not nothing: `rangesToTransitions` stores it as an Off point, so
+  // deleting the 08:30-17:00 eco range used to write `08:30 off` and cut the
+  // heating until 17:00 — while the editor drew hatching and the legend promised
+  // the previous preset carried on. Stopping the heating is something the user
+  // asks for with the Off preset; it is never a side effect of a deletion.
+  //
+  // The predecessor is found on the week's own timeline, so it may sit on an
+  // earlier day — the night before, or Sunday for a Monday morning range. When
+  // there is none (the only range of the week), the gap stands and the schedule
+  // is simply empty.
   removeRange = key => {
     this.setState(prev => {
       const forms = { ...prev.editForms };
       delete forms[key];
-      return { ranges: prev.ranges.filter(r => r.key !== key), editForms: forms };
+      const removed = prev.ranges.find(r => r.key === key);
+      const remaining = prev.ranges.filter(r => r.key !== key);
+      if (!removed || remaining.length === 0) {
+        return { ranges: remaining, editForms: forms };
+      }
+      // Minutes of the week each range opens and closes at, the end carried past
+      // the week's end when it wraps so "ends where the removed one starts" can be
+      // compared on one line.
+      const WEEK = 7 * DAY_MINUTES;
+      const openAt = range => range.day_of_week * DAY_MINUTES + timeToMinutes(range.start_time);
+      const closeAt = range => {
+        const start = openAt(range);
+        const rawEnd = timeToMinutes(range.end_time);
+        const end = range.day_of_week * DAY_MINUTES + rawEnd;
+        return end <= start ? end + DAY_MINUTES : end;
+      };
+      const removedStart = openAt(removed);
+      // The range that ends where this one starts, or the closest one ending
+      // before it — measured round the week, so Sunday night precedes Monday.
+      let predecessor = null;
+      let smallestDistance = Infinity;
+      remaining.forEach(range => {
+        const distance = (removedStart - closeAt(range) + WEEK) % WEEK;
+        if (distance < smallestDistance) {
+          smallestDistance = distance;
+          predecessor = range;
+        }
+      });
+      if (!predecessor) {
+        return { ranges: remaining, editForms: forms };
+      }
+      // It now runs to where the removed range ended. Its own end_time is written
+      // as typed: the ranges model reads an end at or before the start as running
+      // past midnight, which is exactly what a stretched range may now do.
+      let stretched = remaining.map(range =>
+        range.key === predecessor.key ? { ...range, end_time: removed.end_time } : range
+      );
+      return { ranges: mergeTouching(stretched), editForms: forms };
     });
   };
 
@@ -391,7 +493,11 @@ class ScheduleEditor extends Component {
         preset: r.preset
       }))
     );
-    this.setState({ ranges: [...kept, ...copies], copySourceDay: null, copyTargetDays: [] });
+    this.setState({
+      ranges: mergeTouching([...kept, ...copies]),
+      copySourceDay: null,
+      copyTargetDays: []
+    });
   };
 
   // Attach what was added and detach what was removed. Attaching replaces
@@ -511,14 +617,16 @@ class ScheduleEditor extends Component {
       // thermostat following it keeps whatever preset it is on.
       return carried || (dictionary && dictionary.noSlots) || '';
     }
-    const ownRanges = dayRanges.map(r => `${r.start_time} - ${r.end_time} ${presetLabel(r.preset)}`).join(', ');
+    const ownRanges = dayRanges
+      .map(range => `${range.start_time} - ${range.end_time} ${presetLabel(range.preset)}`)
+      .join(', ');
     return carried ? `${carried}, ${ownRanges}` : ownRanges;
   };
 
-  // The bar draws the day's ranges where they fall and leaves the rest blank: a
-  // stretch with no range is one where nothing is scheduled, which is exactly
-  // what the stored programme says. A range crossing midnight is drawn to the
-  // edge here; its remainder belongs to the next day's bar.
+  // The bar draws the day's ranges where they fall. Every minute is covered: a
+  // stop is a range carrying the `off` preset, drawn in its own grey rather than
+  // left as a hole. A range crossing midnight is drawn to the edge here; its
+  // remainder belongs to the next day's bar.
   renderTimeBar = (dayRanges, carriedInto) => {
     const segments = [];
     let cursor = 0;
@@ -553,9 +661,9 @@ class ScheduleEditor extends Component {
           {segments.map(segment => (
             <div
               key={`${segment.start}-${segment.end}`}
-              class={cx(style.timeBarSegment, { [style.timeBarSegmentEmpty]: !segment.preset })}
+              class={style.timeBarSegment}
               style={`--seg-width:${((segment.end - segment.start) / DAY_MINUTES) * 100}%;--seg-color:${
-                segment.preset ? PRESET_COLORS[segment.preset] || PRESET_COLORS.comfort : 'transparent'
+                segment.preset ? PRESET_COLORS[segment.preset] || PRESET_COLORS.comfort : PRESET_COLORS.off
               }`}
             />
           ))}
@@ -611,6 +719,13 @@ class ScheduleEditor extends Component {
           </button>
         )}
       </div>
+      {/* On the row itself: this answers the tick that was just clicked, and the
+          Save button can be most of a screen below it. */}
+      {form.rowError === 'same-time' && (
+        <p class={style.slotRowError}>
+          <Text id="integration.thermostat.schedule.sameTimeError" />
+        </p>
+      )}
     </div>
   );
 
@@ -640,7 +755,8 @@ class ScheduleEditor extends Component {
     // Saturday point holds its preset all week. The server answers this from the
     // transitions, so the same helper answers it here rather than a second
     // reading of the ranges that could only see as far as yesterday.
-    const carriedByDay = carriedPresetByDay(rangesToTransitions(ranges));
+    const transitions = rangesToTransitions(ranges);
+    const carriedByDay = carriedPresetByDay(transitions);
     // In the order the bars are read, not the order the ranges were entered.
     const usedPresets = PRESETS.filter(preset => ranges.some(range => range.preset === preset));
 
@@ -803,13 +919,6 @@ class ScheduleEditor extends Component {
                           <Text id="integration.thermostat.schedule.noSlots" />
                         </p>
                       )}
-
-                      {/* Said once where the ranges are edited: outside a range
-                        the thermostat keeps the preset the last point set, which
-                        is what the empty-schedule warning says too. */}
-                      <p class={style.uncoveredLegend}>
-                        <Text id="integration.thermostat.schedule.uncoveredLegend" />
-                      </p>
 
                       {dayPoints.map((range, idx) => {
                         const editForm = editForms[range.key];

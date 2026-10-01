@@ -3541,9 +3541,9 @@
         "houseLockedByDevices": "Ein Zeitplan wechselt nur das Haus, solange ihm kein Thermostat folgt. Befolgt von:",
         "searchPlaceHolder": "Zeitplan suchen",
         "noSearchResult": "Kein Zeitplan entspricht dieser Suche.",
-        "uncoveredLegend": "Außerhalb dieser Zeiträume behält das Thermostat das Preset des letzten Zeitfensters, bis zum nächsten.",
         "editorTitleEdit": "Zeitplan bearbeiten",
-        "editorTitleNew": "Neuer Zeitplan"
+        "editorTitleNew": "Neuer Zeitplan",
+        "sameTimeError": "Die Endzeit muss sich von der Startzeit unterscheiden: Ein Zeitfenster, das zu seiner Startzeit endet, würde 24 Stunden abdecken."
       }
     }
   },

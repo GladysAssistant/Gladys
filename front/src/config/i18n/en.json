@@ -3541,9 +3541,9 @@
         "houseLockedByDevices": "A schedule only moves house while no thermostat follows it. Followed by:",
         "searchPlaceHolder": "Search for a schedule",
         "noSearchResult": "No schedule matches this search.",
-        "uncoveredLegend": "Outside these ranges, the thermostat keeps the preset of the last slot, until the next one.",
         "editorTitleEdit": "Edit the schedule",
-        "editorTitleNew": "New schedule"
+        "editorTitleNew": "New schedule",
+        "sameTimeError": "The end time must differ from the start time: a range ending where it starts would cover a full 24 hours."
       }
     }
   },

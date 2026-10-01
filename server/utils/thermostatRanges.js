@@ -8,8 +8,12 @@ const STOP_PRESET = 'off';
 /**
  * @description Turn a schedule's transition points into the ranges an editor
  * shows: a start, an end and a preset. A point holds until the next one, so the
- * end of a range is simply where the following point begins; a point that stops
- * the thermostat closes the range before it and opens none.
+ * end of a range is simply where the following point begins.
+ *
+ * A point that stops the thermostat is a range too, carrying the `off` preset.
+ * Dropping it left a hole the editor could only draw as hatching, which read as
+ * "nothing is set here" when it meant "the heating is off here" — the one state
+ * the programme imposes that nobody could see in a list or edit.
  *
  * Ranges are a *view*. They are never stored: the database holds points, which
  * is what keeps a night one row rather than two halves cut at midnight, and what
@@ -33,10 +37,6 @@ function transitionsToRanges(transitions) {
 
   const ranges = [];
   sorted.forEach((transition, index) => {
-    if (transition.preset === STOP_PRESET) {
-      // A stop closes whatever ran before it. It is not a range.
-      return;
-    }
     const next = sorted[(index + 1) % sorted.length];
     const startMinutes = timeToMinutes(transition.time);
     const endMinutes = timeToMinutes(next.time);
@@ -86,6 +86,12 @@ function rangesToTransitions(ranges) {
     const startKey = key(range.day_of_week, range.start_time);
     opens.set(startKey, { day_of_week: range.day_of_week, time: range.start_time, preset: range.preset });
 
+    // An off range is already the stop: closing it would add a second `off`
+    // point, which the next read turns into another range, and the schedule grows
+    // by one row on every edit. Whatever follows it opens its own point.
+    if (range.preset === STOP_PRESET) {
+      return;
+    }
     // Where the range ends. An end at or before its start runs past midnight, so
     // the stop belongs to the following day — the same wrap the points model
     // already has, expressed once here instead of in every editor operation.

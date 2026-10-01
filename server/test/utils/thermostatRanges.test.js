@@ -128,9 +128,15 @@ describe('thermostatRanges: transitions to ranges', () => {
       { day_of_week: 0, time: '09:00', preset: 'off' },
     ]);
 
-    expect(ranges).to.deep.equal([
-      { day_of_week: 0, start_time: '06:00', end_time: '09:00', preset: 'comfort', ends_next_day: false },
-    ]);
+    // The stop is a range too: it wraps the week back onto the comfort point.
+    expect(ranges[0]).to.deep.equal({
+      day_of_week: 0,
+      start_time: '06:00',
+      end_time: '09:00',
+      preset: 'comfort',
+      ends_next_day: false,
+    });
+    expect(ranges[1]).to.include({ start_time: '09:00', end_time: '06:00', preset: 'off' });
   });
 
   it('should read back-to-back ranges', () => {
@@ -140,9 +146,11 @@ describe('thermostatRanges: transitions to ranges', () => {
       { day_of_week: 0, time: '22:00', preset: 'off' },
     ]);
 
-    expect(ranges).to.have.lengthOf(2);
+    expect(ranges).to.have.lengthOf(3);
     expect(ranges[0]).to.include({ start_time: '06:00', end_time: '09:00', preset: 'comfort' });
     expect(ranges[1]).to.include({ start_time: '09:00', end_time: '22:00', preset: 'eco' });
+    // The stop closing the day is shown as the range it is.
+    expect(ranges[2]).to.include({ start_time: '22:00', preset: 'off' });
   });
 
   it('should read a night as one range that ends the next day', () => {
@@ -151,9 +159,14 @@ describe('thermostatRanges: transitions to ranges', () => {
       { day_of_week: 1, time: '06:30', preset: 'off' },
     ]);
 
-    expect(ranges).to.deep.equal([
-      { day_of_week: 0, start_time: '22:30', end_time: '06:30', preset: 'night', ends_next_day: true },
-    ]);
+    expect(ranges[0]).to.deep.equal({
+      day_of_week: 0,
+      start_time: '22:30',
+      end_time: '06:30',
+      preset: 'night',
+      ends_next_day: true,
+    });
+    expect(ranges[1]).to.include({ day_of_week: 1, start_time: '06:30', preset: 'off' });
   });
 
   it('should read a lone point as a range that runs the whole week', () => {
@@ -165,8 +178,12 @@ describe('thermostatRanges: transitions to ranges', () => {
     ]);
   });
 
-  it('should show no range where the thermostat is stopped', () => {
-    expect(transitionsToRanges([{ day_of_week: 0, time: '09:00', preset: 'off' }])).to.deep.equal([]);
+  it('should show a stop as a range of its own', () => {
+    // A schedule that only stops the thermostat is a setting, not an empty one:
+    // returning [] said it did nothing, and the editor drew an empty week.
+    expect(transitionsToRanges([{ day_of_week: 0, time: '09:00', preset: 'off' }])).to.deep.equal([
+      { day_of_week: 0, start_time: '09:00', end_time: '09:00', preset: 'off', ends_next_day: true },
+    ]);
   });
 
   it('should return nothing for no point', () => {
@@ -178,7 +195,13 @@ describe('thermostatRanges: transitions to ranges', () => {
 describe('thermostatRanges: round trip', () => {
   // What the editor does on every save and every reload: what comes back must be
   // what was typed, or a schedule would drift a little each time it is opened.
-  const roundTrip = (ranges) => transitionsToRanges(rangesToTransitions(ranges));
+  //
+  // The off ranges are set aside: they are the uncovered stretches, which the
+  // editor now shows as ranges of their own instead of drawing them as hatching.
+  // What the user typed is what has to survive, and the tests below this one
+  // cover the stops and the stability of the stored points.
+  const roundTrip = (ranges) =>
+    transitionsToRanges(rangesToTransitions(ranges)).filter((range) => range.preset !== 'off');
 
   it('should keep a weekday morning', () => {
     const ranges = [{ day_of_week: 0, start_time: '06:00', end_time: '09:00', preset: 'comfort' }];
@@ -223,5 +246,32 @@ describe('thermostatRanges: round trip', () => {
     }));
 
     expect(roundTrip(ranges)).to.have.lengthOf(7);
+  });
+
+  it('should show an uncovered stretch as an off range', () => {
+    const ranges = [
+      { day_of_week: 0, start_time: '06:00', end_time: '09:00', preset: 'comfort' },
+      { day_of_week: 0, start_time: '18:00', end_time: '22:00', preset: 'comfort' },
+    ];
+
+    const back = transitionsToRanges(rangesToTransitions(ranges));
+
+    // The gap 09:00-18:00 is a stop, and the editor says so in a row of its own
+    // rather than leaving a hole that reads as "nothing is set here".
+    expect(back.some((range) => range.preset === 'off' && range.start_time === '09:00')).to.equal(true);
+  });
+
+  it('should not grow the schedule when it is edited again', () => {
+    // A stop used to be closed by a stop of its own, which the next read turned
+    // into another range: the schedule gained a row on every save.
+    const transitions = [
+      { day_of_week: 0, time: '06:00', preset: 'comfort' },
+      { day_of_week: 0, time: '09:00', preset: 'off' },
+    ];
+
+    const once = rangesToTransitions(transitionsToRanges(transitions));
+    const twice = rangesToTransitions(transitionsToRanges(once));
+
+    expect(twice).to.deep.equal(once);
   });
 });

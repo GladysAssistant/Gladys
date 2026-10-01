@@ -3541,9 +3541,9 @@
         "houseLockedByDevices": "Una programación solo cambia de casa mientras ningún termostato la siga. Seguida por:",
         "searchPlaceHolder": "Buscar una programación",
         "noSearchResult": "Ninguna programación coincide con esta búsqueda.",
-        "uncoveredLegend": "Fuera de estos intervalos, el termostato conserva el preajuste del último intervalo, hasta el siguiente.",
         "editorTitleEdit": "Modificar la programación",
-        "editorTitleNew": "Nueva programación"
+        "editorTitleNew": "Nueva programación",
+        "sameTimeError": "La hora de fin debe ser distinta de la de inicio: un intervalo que termina a su hora de inicio cubriría 24 h."
       }
     }
   },

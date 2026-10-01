@@ -73,18 +73,6 @@
   flex-shrink: 0;
 }
 
-/* A stretch with no range is not a temperature: hatching it says "nothing is
-   scheduled here" where a flat colour would read as one more preset. */
-.timeBarSegmentEmpty {
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(0, 0, 0, 0.07),
-    rgba(0, 0, 0, 0.07) 3px,
-    transparent 3px,
-    transparent 6px
-  );
-}
-
 /* The colour key for the seven day bars, once under them. */
 .presetLegend {
   display: flex;
@@ -114,13 +102,6 @@
    its opposite: inverted once more to land back on the colour the bars show. */
 :global(.dark-mode) .presetLegendSwatch {
   filter: invert(100%) hue-rotate(180deg);
-}
-
-/* Says what happens between the ranges, under the day being edited. */
-.uncoveredLegend {
-  margin: 4px 0 0 0;
-  font-size: 0.75rem;
-  color: #868e96;
 }
 
 /* Where a day with no point of its own gets its colour from. */
@@ -683,4 +664,11 @@
   color: #6c757d;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* A refusal that belongs to one row of the editor, shown under it. */
+.slotRowError {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: #c0392b;
 }

@@ -3541,9 +3541,9 @@
         "houseLockedByDevices": "Un planning ne change de maison que si aucun thermostat ne le suit. Suivi par :",
         "searchPlaceHolder": "Chercher un planning",
         "noSearchResult": "Aucun planning ne correspond à cette recherche.",
-        "uncoveredLegend": "En dehors de ces plages, le thermostat garde le preset du dernier créneau, jusqu’au créneau suivant.",
         "editorTitleEdit": "Modifier le planning",
-        "editorTitleNew": "Nouveau planning"
+        "editorTitleNew": "Nouveau planning",
+        "sameTimeError": "L’heure de fin doit être différente de l’heure de début : une plage qui finit à son heure de départ couvrirait 24 h."
       }
     }
   },

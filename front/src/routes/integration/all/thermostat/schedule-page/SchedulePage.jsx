@@ -226,7 +226,7 @@ class SchedulePageComponent extends Component {
                         key={`${segment.start}-${segment.end}`}
                         class={style.weekPreviewSegment}
                         style={`--seg-width:${((segment.end - segment.start) / DAY_MINUTES) * 100}%;--seg-color:${
-                          segment.preset ? PRESET_COLORS[segment.preset] || PRESET_COLORS.comfort : 'transparent'
+                          segment.preset ? PRESET_COLORS[segment.preset] || PRESET_COLORS.comfort : PRESET_COLORS.off
                         }`}
                       />
                     ))}
