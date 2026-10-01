@@ -12,7 +12,13 @@ const { fake } = sinon;
 const db = require('../../../models');
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const logger = require('../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  JOB_TYPES,
+} = require('../../../utils/constants');
+const Job = require('../../../lib/job');
 const {
   buildManager,
   addMeterPower,
@@ -826,13 +832,17 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, [
       { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
     ]);
-    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'), 'job-id');
+    // the real job manager: the count must pass the data schema of the job type
+    const jobManager = new Job({ emit: fake(), on: fake() });
+    const costJob = await jobManager.start(JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_CONTRACT);
+    gladys.job.updateProgress = (...args) => jobManager.updateProgress(...args);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'), costJob.id);
     expect((await costStates())[0].value).to.equal(0.3);
     expect(
       warn.args.some(([message]) => /1 interval\(s\) priced by a fallback \(calendar_missing\)/.test(message)),
     ).to.equal(true);
     // counted on the job for the Jobs page
-    sinon.assert.calledWith(gladys.job.updateProgress, 'job-id', 100, { fallback_prices_count: 1 });
+    expect((await db.Job.findByPk(costJob.id)).data).to.deep.equal({ fallback_prices_count: 1 });
   });
 
   it('should skip the features without a cost feature, a broken hierarchy and log errors', async () => {

@@ -212,7 +212,8 @@ async function requestCalendarRecalculation(key, from) {
       attributes: ['electric_meter_device_id', 'tariff', 'valid_from', 'timezone'],
     });
     const referencing = contracts.filter((c) => Array.isArray(c.tariff.calendars) && c.tariff.calendars.includes(key));
-    const meterIds = referencing.map((c) => c.electric_meter_device_id);
+    // a meter can carry several contracts reading the calendar (a contract succession)
+    const meterIds = Array.from(new Set(referencing.map((c) => c.electric_meter_device_id)));
     if (meterIds.length === 0) {
       return;
     }
@@ -225,7 +226,7 @@ async function requestCalendarRecalculation(key, from) {
     );
     this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, {
       from: boundedFrom,
-      electric_meter_device_ids: Array.from(new Set(meterIds)),
+      electric_meter_device_ids: meterIds,
       calendar_key: key,
     });
   };
