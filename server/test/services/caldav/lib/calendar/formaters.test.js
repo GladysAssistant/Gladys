@@ -5,6 +5,7 @@ const originalDuration = require('dayjs/plugin/duration');
 const advancedFormat = require('dayjs/plugin/advancedFormat');
 const isBetween = require('dayjs/plugin/isBetween');
 const utc = require('dayjs/plugin/utc');
+const logger = require('../../../../../utils/logger');
 const {
   formatEvents,
   formatRecurringEvents,
@@ -32,6 +33,10 @@ dayjsUTCOverride.duration = function duration(number) {
 };
 
 dayjsUTCOverride.tz = function tz(date, timezoneValue) {
+  // The dayjs timezone plugin relies on Intl.DateTimeFormat, which throws a
+  // RangeError when the timezone is not a valid IANA name. We reproduce that
+  // behaviour here so tests exercise the real failure mode.
+  Intl.DateTimeFormat(undefined, { timeZone: timezoneValue });
   return dayjs.utc(date);
 };
 
@@ -418,6 +423,202 @@ describe('CalDAV formaters', () => {
     });
     clock.restore();
     expect(formattedEvents).to.eql(expectedEvents);
+  });
+
+  it('should format events with a fixed offset timezone', () => {
+    const start = new Date('2026-02-25T10:00:00Z');
+    Object.defineProperty(start, 'tz', { value: 'GMT+1100' });
+    const end = new Date('2026-02-25T12:00:00Z');
+    Object.defineProperty(end, 'tz', { value: 'GMT+1100' });
+
+    const formattedEvents = formatter.formatEvents(
+      [
+        {
+          type: 'VEVENT',
+          uid: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a01',
+          summary: 'Event with GMT offset',
+          location: 'Sydney',
+          description: 'Description event with GMT offset',
+          start,
+          end,
+          href: 'https://caldav.host/home/event-gmt.ics',
+        },
+      ],
+      { id: '1fe8f557-2685-4b6b-8f05-238184f6b701' },
+    );
+
+    expect(formattedEvents).to.eql([
+      {
+        external_id: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a01',
+        selector: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a01',
+        name: 'Event with GMT offset',
+        location: 'Sydney',
+        description: 'Description event with GMT offset',
+        calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+        start: '2026-02-24T23:00:00+00:00',
+        end: '2026-02-25T01:00:00+00:00',
+        url: 'https://caldav.host/home/event-gmt.ics',
+      },
+    ]);
+  });
+
+  it('should format an event with a UTC offset timezone and a duration', () => {
+    const clock = sinon.useFakeTimers(new Date('2020-05-01T00:00:00Z').getTime());
+    const start = new Date('2026-03-01T08:30:00Z');
+    Object.defineProperty(start, 'tz', { value: 'UTC-02:00' });
+
+    const formattedEvents = formatter.formatEvents(
+      [
+        {
+          type: 'VEVENT',
+          uid: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a02',
+          summary: 'Event with UTC offset',
+          location: 'Fernando de Noronha',
+          description: 'Description event with UTC offset',
+          start,
+          duration: 5400000,
+          href: 'https://caldav.host/home/event-utc.ics',
+        },
+      ],
+      { id: '1fe8f557-2685-4b6b-8f05-238184f6b701' },
+    );
+    clock.restore();
+
+    expect(formattedEvents).to.eql([
+      {
+        external_id: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a02',
+        selector: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a02',
+        name: 'Event with UTC offset',
+        location: 'Fernando de Noronha',
+        description: 'Description event with UTC offset',
+        calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+        start: '2026-03-01T10:30:00+00:00',
+        end: '2026-03-01T12:00:00+00:00',
+        url: 'https://caldav.host/home/event-utc.ics',
+      },
+    ]);
+  });
+
+  it('should format a full day event without end date', () => {
+    const clock = sinon.useFakeTimers(new Date('2020-05-01T00:00:00Z').getTime());
+
+    const formattedEvents = formatter.formatEvents(
+      [
+        {
+          type: 'VEVENT',
+          uid: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a03',
+          summary: 'Full day event',
+          location: 'Paris',
+          description: 'Description full day event',
+          start: new Date('2026-01-01T00:00:00Z'),
+          href: 'https://caldav.host/home/event-full-day.ics',
+        },
+      ],
+      { id: '1fe8f557-2685-4b6b-8f05-238184f6b701' },
+    );
+    clock.restore();
+
+    expect(formattedEvents).to.eql([
+      {
+        external_id: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a03',
+        selector: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a03',
+        name: 'Full day event',
+        location: 'Paris',
+        description: 'Description full day event',
+        calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+        full_day: true,
+        start: '2026-01-01T00:00:00+00:00',
+        end: '2026-01-02T00:00:00+00:00',
+        url: 'https://caldav.host/home/event-full-day.ics',
+      },
+    ]);
+  });
+
+  it('should fallback to the server timezone when the timezone is unknown', () => {
+    const warnStub = sinon.stub(logger, 'warn');
+    const start = new Date('2026-02-25T10:00:00Z');
+    Object.defineProperty(start, 'tz', { value: 'Unknown/Timezone' });
+    const end = new Date('2026-02-25T12:00:00Z');
+    Object.defineProperty(end, 'tz', { value: 'Unknown/Timezone' });
+
+    const formattedEvents = formatter.formatEvents(
+      [
+        {
+          type: 'VEVENT',
+          uid: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a04',
+          summary: 'Event with unknown timezone',
+          location: 'Nowhere',
+          description: 'Description event with unknown timezone',
+          start,
+          end,
+          href: 'https://caldav.host/home/event-unknown.ics',
+        },
+      ],
+      { id: '1fe8f557-2685-4b6b-8f05-238184f6b701' },
+    );
+
+    expect(formattedEvents).to.eql([
+      {
+        external_id: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a04',
+        selector: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a04',
+        name: 'Event with unknown timezone',
+        location: 'Nowhere',
+        description: 'Description event with unknown timezone',
+        calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+        start: '2026-02-25T10:00:00+00:00',
+        end: '2026-02-25T12:00:00+00:00',
+        url: 'https://caldav.host/home/event-unknown.ics',
+      },
+    ]);
+    expect(warnStub.called).to.equal(true);
+    warnStub.restore();
+  });
+
+  it('should skip an event which cannot be formatted and keep the other ones', () => {
+    const warnStub = sinon.stub(logger, 'warn');
+
+    const formattedEvents = formatter.formatEvents(
+      [
+        {
+          type: 'VEVENT',
+          uid: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a05',
+          summary: 'Broken recurring event',
+          start: new Date('2026-04-01T10:00:00Z'),
+          rrule: {
+            between: sinon.stub().throws(new Error('Invalid recurrence rule')),
+            after: sinon.stub().returns(new Date('2026-04-01T10:00:00Z')),
+          },
+          href: 'https://caldav.host/home/event-broken.ics',
+        },
+        {
+          type: 'VEVENT',
+          uid: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a06',
+          summary: 'Valid event',
+          location: 'Paris',
+          description: 'Description valid event',
+          start: new Date('2026-04-02T10:00:00Z'),
+          end: new Date('2026-04-02T11:00:00Z'),
+          href: 'https://caldav.host/home/event-valid.ics',
+        },
+      ],
+      { id: '1fe8f557-2685-4b6b-8f05-238184f6b701' },
+    );
+
+    expect(formattedEvents).to.eql([
+      {
+        external_id: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a06',
+        selector: 'c1f0a2d6-5c3f-4b5e-9a1e-0f4f8c5f1a06',
+        name: 'Valid event',
+        location: 'Paris',
+        description: 'Description valid event',
+        calendar_id: '1fe8f557-2685-4b6b-8f05-238184f6b701',
+        start: '2026-04-02T10:00:00+00:00',
+        end: '2026-04-02T11:00:00+00:00',
+        url: 'https://caldav.host/home/event-valid.ics',
+      },
+    ]);
+    expect(warnStub.called).to.equal(true);
+    warnStub.restore();
   });
 
   it('should format recurr events', () => {

@@ -1,3 +1,33 @@
+const logger = require('../../../../utils/logger');
+
+// Some CalDAV servers (iCloud for instance) send fixed offset timezones such as
+// "GMT+1100" or "UTC+02:00" instead of an IANA timezone name. Intl.DateTimeFormat
+// (used under the hood by dayjs.tz) only accepts IANA names and throws on those.
+const FIXED_OFFSET_TIMEZONE_REGEX = /^(?:GMT|UTC)([+-])(\d{2}):?(\d{2})$/;
+
+/**
+ * @description Convert a CalDAV date to a dayjs date in the event timezone.
+ * @param {object} dayjs - Dayjs instance to use.
+ * @param {object} date - Date to convert.
+ * @param {string} tz - Timezone of the date, as sent by the CalDAV server.
+ * @returns {object} The dayjs date.
+ * @example
+ * toTimezone(dayjs, new Date(), 'GMT+1100')
+ */
+function toTimezone(dayjs, date, tz) {
+  const localDate = dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
+  const fixedOffset = FIXED_OFFSET_TIMEZONE_REGEX.exec(tz || '');
+  if (fixedOffset) {
+    return dayjs(`${localDate}${fixedOffset[1]}${fixedOffset[2]}:${fixedOffset[3]}`);
+  }
+  try {
+    return dayjs.tz(localDate, tz);
+  } catch (e) {
+    logger.warn(`CalDAV: unknown timezone "${tz}", falling back to the server timezone. ${e.message}`);
+    return dayjs(localDate);
+  }
+}
+
 // From : https://github.com/peterbraden/ical.js/blob/master/example_rrule.js
 /**
  * @description Format recurring events.
@@ -9,17 +39,15 @@
  */
 function formatRecurringEvents(event, gladysCalendar) {
   const { tz } = event.start;
-  let startDate = this.dayjs.tz(this.dayjs(event.start).format('YYYY-MM-DDTHH:mm:ss'), tz);
+  let startDate = toTimezone(this.dayjs, event.start, tz);
   let endDate;
 
   if (event.end) {
-    endDate = this.dayjs.tz(this.dayjs(event.end).format('YYYY-MM-DDTHH:mm:ss'), tz);
+    endDate = toTimezone(this.dayjs, event.end, tz);
   } else if (event.duration) {
-    endDate = this.dayjs
-      .tz(this.dayjs(event.start).format('YYYY-MM-DDTHH:mm:ss'), tz)
-      .add(this.dayjs.duration(event.duration));
+    endDate = toTimezone(this.dayjs, event.start, tz).add(this.dayjs.duration(event.duration));
   } else {
-    endDate = this.dayjs.tz(this.dayjs(event.start).format('YYYY-MM-DDTHH:mm:ss'), tz).add(1, 'days');
+    endDate = toTimezone(this.dayjs, event.start, tz).add(1, 'days');
   }
 
   // Calculate the duration of the event for use with recurring events.
@@ -57,7 +85,7 @@ function formatRecurringEvents(event, gladysCalendar) {
     let curEvent = event;
     let showRecurrence = true;
     let curDuration = duration;
-    startDate = this.dayjs.tz(this.dayjs(date).format('YYYY-MM-DDTHH:mm:ss'), tz);
+    startDate = toTimezone(this.dayjs, date, tz);
 
     // Use just the date of the recurrence to look up overrides and exceptions (i.e. chop off time information)
     const dateLookupKey = date.toISOString().substring(0, 10);
@@ -67,7 +95,7 @@ function formatRecurringEvents(event, gladysCalendar) {
       // We found an override, so for this recurrence, use a potentially different title,
       // start date, and duration.
       curEvent = curEvent.recurrences[dateLookupKey];
-      startDate = this.dayjs.tz(this.dayjs(curEvent.start).format('YYYY-MM-DDTHH:mm:ss'), tz);
+      startDate = toTimezone(this.dayjs, curEvent.start, tz);
       curDuration = parseInt(this.dayjs(curEvent.end).format('x'), 10) - parseInt(startDate.format('x'), 10);
       if (curEvent.status === 'CANCELLED') {
         showRecurrence = false;
@@ -81,11 +109,7 @@ function formatRecurringEvents(event, gladysCalendar) {
 
     // Set the the title and the end date from either the regular event or the recurrence override.
     const recurrenceTitle = curEvent.summary;
-    endDate = this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x');
-    endDate = this.dayjs.tz(
-      this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x').format('YYYY-MM-DDTHH:mm:ss'),
-      tz,
-    );
+    endDate = toTimezone(this.dayjs, this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x'), tz);
 
     // If this recurrence ends before the start of the date range, or starts after the end of the date range,
     // don't process it.
@@ -143,57 +167,53 @@ function formatEvents(caldavEvents, gladysCalendar) {
       return;
     }
 
-    if (typeof caldavEvent.rrule === 'undefined') {
-      const newEvent = {
-        external_id: caldavEvent.uid,
-        selector: caldavEvent.uid,
-        name: caldavEvent.summary,
-        location: caldavEvent.location,
-        description: caldavEvent.description,
-        url: caldavEvent.href,
-        calendar_id: gladysCalendar.id,
-      };
+    try {
+      if (typeof caldavEvent.rrule === 'undefined') {
+        const newEvent = {
+          external_id: caldavEvent.uid,
+          selector: caldavEvent.uid,
+          name: caldavEvent.summary,
+          location: caldavEvent.location,
+          description: caldavEvent.description,
+          url: caldavEvent.href,
+          calendar_id: gladysCalendar.id,
+        };
 
-      if (caldavEvent.start) {
-        newEvent.start = this.dayjs
-          .tz(this.dayjs(caldavEvent.start).format('YYYY-MM-DDTHH:mm:ss'), caldavEvent.start.tz)
-          .format();
-      }
+        if (caldavEvent.start) {
+          newEvent.start = toTimezone(this.dayjs, caldavEvent.start, caldavEvent.start.tz).format();
+        }
 
-      if (caldavEvent.end) {
-        newEvent.end = this.dayjs
-          .tz(this.dayjs(caldavEvent.end).format('YYYY-MM-DDTHH:mm:ss'), caldavEvent.end.tz)
-          .format();
-      } else if (caldavEvent.start && caldavEvent.duration) {
-        newEvent.end = this.dayjs
-          .tz(this.dayjs(caldavEvent.start).format('YYYY-MM-DDTHH:mm:ss'), caldavEvent.start.tz)
-          .add(this.dayjs.duration(caldavEvent.duration))
-          .format();
-      }
+        if (caldavEvent.end) {
+          newEvent.end = toTimezone(this.dayjs, caldavEvent.end, caldavEvent.end.tz).format();
+        } else if (caldavEvent.start && caldavEvent.duration) {
+          newEvent.end = toTimezone(this.dayjs, caldavEvent.start, caldavEvent.start.tz)
+            .add(this.dayjs.duration(caldavEvent.duration))
+            .format();
+        }
 
-      if (
-        caldavEvent.start &&
-        caldavEvent.start.tz === undefined &&
-        (Number.isInteger(this.dayjs(caldavEvent.end).diff(this.dayjs(caldavEvent.start), 'days', true)) ||
-          (!caldavEvent.end && !caldavEvent.duration))
-      ) {
-        newEvent.full_day = true;
-      }
+        if (
+          caldavEvent.start &&
+          caldavEvent.start.tz === undefined &&
+          (Number.isInteger(this.dayjs(caldavEvent.end).diff(this.dayjs(caldavEvent.start), 'days', true)) ||
+            (!caldavEvent.end && !caldavEvent.duration))
+        ) {
+          newEvent.full_day = true;
+        }
 
-      if (newEvent.full_day && !caldavEvent.end) {
-        newEvent.end = this.dayjs
-          .tz(
-            this.dayjs(caldavEvent.start)
-              .add(1, 'day')
-              .format('YYYY-MM-DDTHH:mm:ss'),
+        if (newEvent.full_day && !caldavEvent.end) {
+          newEvent.end = toTimezone(
+            this.dayjs,
+            this.dayjs(caldavEvent.start).add(1, 'day'),
             caldavEvent.start.tz,
-          )
-          .format();
-      }
+          ).format();
+        }
 
-      events.push(newEvent);
-    } else {
-      events = events.concat(this.formatRecurringEvents(caldavEvent, gladysCalendar).filter((e) => e !== null));
+        events.push(newEvent);
+      } else {
+        events = events.concat(this.formatRecurringEvents(caldavEvent, gladysCalendar).filter((e) => e !== null));
+      }
+    } catch (e) {
+      logger.warn(`CalDAV: unable to format event "${caldavEvent.uid}", skipping it. ${e.message}`);
     }
   });
 
