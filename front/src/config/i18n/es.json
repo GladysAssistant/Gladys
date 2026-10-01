@@ -3543,7 +3543,11 @@
         "noSearchResult": "Ninguna programación coincide con esta búsqueda.",
         "editorTitleEdit": "Modificar la programación",
         "editorTitleNew": "Nueva programación",
-        "sameTimeError": "La hora de fin debe ser distinta de la de inicio: un intervalo que termina a su hora de inicio cubriría 24 h."
+        "sameTimeError": "La hora de fin debe ser distinta de la de inicio: un intervalo que termina a su hora de inicio cubriría 24 h.",
+        "startLabel": "Inicio",
+        "endLabel": "Fin",
+        "confirmSlotButton": "Añadir",
+        "confirmEditButton": "Aplicar"
       }
     }
   },

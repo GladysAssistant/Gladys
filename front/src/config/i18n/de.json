@@ -3543,7 +3543,11 @@
         "noSearchResult": "Kein Zeitplan entspricht dieser Suche.",
         "editorTitleEdit": "Zeitplan bearbeiten",
         "editorTitleNew": "Neuer Zeitplan",
-        "sameTimeError": "Die Endzeit muss sich von der Startzeit unterscheiden: Ein Zeitfenster, das zu seiner Startzeit endet, würde 24 Stunden abdecken."
+        "sameTimeError": "Die Endzeit muss sich von der Startzeit unterscheiden: Ein Zeitfenster, das zu seiner Startzeit endet, würde 24 Stunden abdecken.",
+        "startLabel": "Beginn",
+        "endLabel": "Ende",
+        "confirmSlotButton": "Hinzufügen",
+        "confirmEditButton": "Übernehmen"
       }
     }
   },

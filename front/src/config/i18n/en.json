@@ -3543,7 +3543,11 @@
         "noSearchResult": "No schedule matches this search.",
         "editorTitleEdit": "Edit the schedule",
         "editorTitleNew": "New schedule",
-        "sameTimeError": "The end time must differ from the start time: a range ending where it starts would cover a full 24 hours."
+        "sameTimeError": "The end time must differ from the start time: a range ending where it starts would cover a full 24 hours.",
+        "startLabel": "Start",
+        "endLabel": "End",
+        "confirmSlotButton": "Add",
+        "confirmEditButton": "Apply"
       }
     }
   },

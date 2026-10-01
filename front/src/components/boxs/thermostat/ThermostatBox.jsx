@@ -17,7 +17,7 @@ import {
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
-import { getPresetColor as presetColorForMode } from '../../../utils/thermostatPresetColors';
+import { getPresetColor as presetColorForMode, readableTextOn } from '../../../utils/thermostatPresetColors';
 import CircularGauge from './CircularGauge';
 import { angleToTemp as angleToSetpoint, getAngleFromPointer, isAngleInArc } from './gaugeGeometry';
 import { loadDeviceConfig } from './deviceConfig';
@@ -1348,7 +1348,11 @@ class ThermostatBox extends Component {
                           <button
                             key={preset.key}
                             class={`${style.segmentBtn} ${isActive ? style.segmentBtnActive : ''}`}
-                            style={isActive ? `--preset-color:${presetColor}` : undefined}
+                            style={
+                              isActive
+                                ? `--preset-color:${presetColor};--preset-text:${readableTextOn(presetColor)}`
+                                : undefined
+                            }
                             onClick={() => this.selectPreset(preset)}
                             title={presetTitle}
                             aria-pressed={isActive ? 'true' : 'false'}

@@ -160,19 +160,16 @@ class ThermostatDeviceBox extends Component {
                 {confirmDelete ? (
                   // The confirmation takes over the whole row: keeping Save and
                   // Edit alongside it would put four buttons in a col-md-6 card,
-                  // where flex-fill shrinks them until the labels are cut off.
+                  // which on a phone is two wrapped rows for one question.
                   <div class={style.confirmDeleteRow}>
                     <span class={style.confirmDeleteText}>
                       <Text id="integration.thermostat.device.confirmDelete" />
                     </span>
                     <div class={style.buttonGroup}>
-                      <button
-                        onClick={this.deleteDevice}
-                        class={cx('btn', 'btn-danger', 'flex-fill', { 'btn-loading': deleting })}
-                      >
+                      <button onClick={this.deleteDevice} class={cx('btn', 'btn-danger', { 'btn-loading': deleting })}>
                         <Text id="integration.thermostat.device.confirmYes" />
                       </button>
-                      <button onClick={this.cancelDelete} class="btn btn-secondary flex-fill">
+                      <button onClick={this.cancelDelete} class="btn btn-secondary">
                         <Text id="integration.thermostat.device.confirmNo" />
                       </button>
                     </div>
@@ -182,20 +179,17 @@ class ThermostatDeviceBox extends Component {
                      the two lists sit one tab apart and read as the same kind of
                      card, so one action should not look different on each. */
                   <div class={style.buttonGroup}>
-                    <button
-                      onClick={this.saveDevice}
-                      class={cx('btn', 'btn-success', 'flex-fill', { 'btn-loading': saving })}
-                    >
+                    <button onClick={this.saveDevice} class={cx('btn', 'btn-success', { 'btn-loading': saving })}>
                       <i class="fe fe-save mr-1" />
                       <Text id="integration.thermostat.device.saveButton" />
                     </button>
-                    <button onClick={this.askDelete} class="btn btn-danger flex-fill">
+                    <button onClick={this.askDelete} class="btn btn-danger">
                       <i class="fe fe-trash-2 mr-1" />
                       <Text id="integration.thermostat.device.deleteButton" />
                     </button>
                     <Link
                       href={`/dashboard/integration/device/thermostat/edit/${device.selector}`}
-                      class="btn btn-primary flex-fill"
+                      class="btn btn-primary"
                     >
                       <i class="fe fe-edit-2 mr-1" />
                       <Text id="integration.thermostat.device.editButton" />

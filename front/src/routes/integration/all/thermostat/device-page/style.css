@@ -1,6 +1,14 @@
 .buttonGroup {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+}
+
+/* Each button keeps a width its label fits in, and the row wraps rather than
+   shaving all three: on one line a third of a 390px card cut them to
+   "Sauvegar / Supprime / Édite", and at 360px Delete landed on top of Edit. */
+.buttonGroup > * {
+  flex: 1 1 8.5rem;
 }
 
 /* Wraps on a narrow card: the question goes on its own line and the two

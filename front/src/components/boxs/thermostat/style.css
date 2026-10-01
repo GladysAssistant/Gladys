@@ -320,8 +320,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 6px 2px 0;
-  gap: 2px;
+  padding: 6px 1px 0;
+  gap: 6px;
   background: transparent;
   border: none;
   border-radius: 12px;
@@ -390,8 +390,9 @@
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
-/* The active label carries the preset colour too, so it needs the same
-   counter-inversion as the icon above it. */
+/* The pill carries a preset colour, so it takes the same counter-inversion as the
+   icons: without it the dark theme would show the night's blue as orange. The text
+   on it inverts along with its background, so the pair stays readable. */
 :global(.dark-mode) .segmentBtnActive .segmentBtnLabel {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
@@ -674,19 +675,50 @@
    it barely visible on the widget's background. Bigger and darker: it is the
    only thing naming these six pictograms on a touch screen, where the tooltip
    never opens. The active one inherits its preset colour from the button. */
+/* The active label is bold, so it is the widest the row ever gets: a hair of
+   letter-spacing back keeps "Hors-gel" on one line in its 57px column, where the
+   plain weight already fits. */
 /* 12px and a darker grey: at 11px in #6c757d these were the smallest, palest
    text on the card, and they name the six buttons a thermostat is driven by.
-   #495057 on the card's white is about 7.5:1, against 4.7:1 before. The button
-   is 56px wide, so the ellipsis still catches a long label. */
+   #495057 on the card's white is about 7.5:1, against 4.7:1 before. A label too
+   long for its column wraps between words rather than being cut. */
 .segmentBtnLabel {
   font-size: 12px;
   line-height: 1.15;
   color: #495057;
   max-width: 100%;
   text-align: center;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
 }
 
+/* Under 380px the row has six columns of about 55px: a notch smaller keeps
+   "Hors-gel" and "Absence" on one line each. */
+@media (max-width: 379px) {
+  .segmentBtnLabel {
+    font-size: 11px;
+  }
+}
+
+/* The pill carries the preset's colour behind the label. An earlier attempt
+   sized it around the word, so its padding was added to the label's width: that
+   pushed "Hors-gel" onto a second line, and only on the active button, so the row
+   jumped as presets were picked. It also clipped the background short of the ends
+   of "Absence", and at 18% opacity the night (#0d3b8e) came out a flat grey on a
+   dark card. The pill now fills the column, padding included, and carries the
+   colour at full strength.
+
+   The label itself is bold and takes whichever of black or white reads on that
+   colour — at least 4.5:1 on every preset, where the preset's own colour as text
+   sat between 1.8 and 2.4:1. */
 .segmentBtnActive .segmentBtnLabel {
-  color: var(--preset-color, #f59f00);
+  color: var(--preset-text, #212529);
+  font-weight: 600;
+  /* The bold weight is the widest the row ever gets: a hair back keeps "Hors-gel"
+     on one line in its 57px column, where the plain weight already fits. */
+  letter-spacing: -0.2px;
+  background: var(--preset-color, #f59f00);
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1px 2px;
 }

@@ -683,19 +683,29 @@ class ScheduleEditor extends Component {
     <div class={style.slotFormWrapper}>
       <div class={isEdit ? style.editSlotForm : style.newSlotForm}>
         <div class={style.slotColorDot} style={`--dot-color:${PRESET_COLORS[form.preset] || PRESET_COLORS.comfort}`} />
-        <input
-          type="time"
-          class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
-          value={form.start_time}
-          onChange={e => onChange('start_time', e.target.value)}
-        />
+        <label class={style.slotTimeField}>
+          <span class={style.slotFieldLabel}>
+            <Text id="integration.thermostat.schedule.startLabel" />
+          </span>
+          <input
+            type="time"
+            class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
+            value={form.start_time}
+            onChange={e => onChange('start_time', e.target.value)}
+          />
+        </label>
         <span class={style.slotArrow}>→</span>
-        <input
-          type="time"
-          class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
-          value={form.end_time}
-          onChange={e => onChange('end_time', e.target.value)}
-        />
+        <label class={style.slotTimeField}>
+          <span class={style.slotFieldLabel}>
+            <Text id="integration.thermostat.schedule.endLabel" />
+          </span>
+          <input
+            type="time"
+            class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
+            value={form.end_time}
+            onChange={e => onChange('end_time', e.target.value)}
+          />
+        </label>
         <select
           class={cx('form-control', 'form-control-sm', style.slotPresetSelect)}
           value={form.preset}
@@ -707,11 +717,17 @@ class ScheduleEditor extends Component {
             </option>
           ))}
         </select>
-        <button type="button" class="btn btn-sm btn-primary" onClick={onConfirm}>
+        <button type="button" class={cx('btn', 'btn-sm', 'btn-primary', style.slotAction)} onClick={onConfirm}>
           <i class="fe fe-check" />
+          <span class={style.slotActionLabel}>
+            <Text id={`integration.thermostat.schedule.${isEdit ? 'confirmEditButton' : 'confirmSlotButton'}`} />
+          </span>
         </button>
-        <button type="button" class="btn btn-sm btn-secondary" onClick={onCancel}>
+        <button type="button" class={cx('btn', 'btn-sm', 'btn-secondary', style.slotAction)} onClick={onCancel}>
           <i class="fe fe-x" />
+          <span class={style.slotActionLabel}>
+            <Text id="integration.thermostat.schedule.cancelButton" />
+          </span>
         </button>
         {onRemove && (
           <button type="button" class="btn btn-sm btn-outline-danger" onClick={onRemove}>

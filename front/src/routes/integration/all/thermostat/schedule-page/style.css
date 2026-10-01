@@ -284,14 +284,76 @@
     flex-wrap: wrap;
   }
 
-  /* The two times fill the first row, so a select asking for 8rem cannot join
-     them and wraps; the buttons then follow it on that second row, where it
-     takes only what they leave. `flex: 1 1 100%` would instead claim the whole
-     row and push them onto a third. */
+  /* The preset takes its own full row, under the two times. */
   .slotPresetSelect {
-    flex: 1 1 8rem;
+    flex: 1 1 100%;
     min-width: 0;
   }
+
+  /* 16px, because iOS zooms the page in on focusing a field smaller than that —
+     the card then sits half off the screen and has to be pinched back. */
+  .newSlotForm :global(.form-control),
+  .editSlotForm :global(.form-control) {
+    font-size: 16px;
+    height: auto;
+    padding: 8px 10px;
+  }
+
+  /* Named and thumb-sized: the two 32x26px glyphs were the only way to confirm or
+     dismiss a range, under the 44px a thumb needs and with nothing saying what
+     they did. */
+  .slotAction {
+    flex: 1 1 8rem;
+    min-height: 44px;
+  }
+
+  .slotActionLabel {
+    display: inline;
+    margin-left: 6px;
+  }
+
+  /* Each time keeps its own named field, side by side on the first row. */
+  .slotTimeField {
+    flex: 1 1 7rem;
+    margin-bottom: 0;
+  }
+
+  .slotFieldLabel {
+    display: block;
+  }
+
+  /* The arrow sat alone on a line of its own once the row wrapped. */
+  .slotArrow {
+    display: none;
+  }
+
+  /* Sized by its field rather than by its content: `width: auto` with a 90px
+     floor overflowed a 7rem column at 360px. */
+  .slotTimeInput {
+    width: 100% !important;
+    min-width: 0;
+  }
+}
+
+/* A time and its name, as one field. Side by side on a phone, and on a desktop row
+   the name is hidden and this is just the input. */
+.slotTimeField {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.slotFieldLabel {
+  display: none;
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 2px;
+}
+
+/* The glyph alone carries the desktop row, where the buttons sit in a line of
+   controls that reads left to right. */
+.slotActionLabel {
+  display: none;
 }
 
 .dayPanelActions {

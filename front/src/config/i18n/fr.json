@@ -3543,7 +3543,11 @@
         "noSearchResult": "Aucun planning ne correspond à cette recherche.",
         "editorTitleEdit": "Modifier le planning",
         "editorTitleNew": "Nouveau planning",
-        "sameTimeError": "L’heure de fin doit être différente de l’heure de début : une plage qui finit à son heure de départ couvrirait 24 h."
+        "sameTimeError": "L’heure de fin doit être différente de l’heure de début : une plage qui finit à son heure de départ couvrirait 24 h.",
+        "startLabel": "Début",
+        "endLabel": "Fin",
+        "confirmSlotButton": "Ajouter",
+        "confirmEditButton": "Valider"
       }
     }
   },
