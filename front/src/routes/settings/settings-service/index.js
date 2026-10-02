@@ -1,7 +1,12 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import ServicesPage from './ServicesPage';
+import get from 'get-value';
 import update from 'immutability-helper';
+
+import withIntlAsProp from '../../../utils/withIntlAsProp';
+import disambiguateIntegrationNames from '../../../utils/integrationNames';
+import ServicesPage from './ServicesPage';
+import getServiceIntegration from './serviceIntegration';
 
 class SettingsServices extends Component {
   getServices = async (podId = null) => {
@@ -10,7 +15,6 @@ class SettingsServices extends Component {
         pod_id: podId
       };
       const services = await this.props.httpClient.get(`/api/v1/service`, query);
-      services.sort((s1, s2) => s1.name.localeCompare(s2.name));
       this.setState({
         services
       });
@@ -44,10 +48,31 @@ class SettingsServices extends Component {
   }
 
   render(props, { services }) {
+    const integrations = (services || []).map(service => getServiceIntegration(service));
+    // names are resolved on the whole list: whether an integration needs its
+    // technical identity displayed depends on the other integrations present
+    const nameBySlug = disambiguateIntegrationNames(integrations);
+    // sorted on the label the row actually displays: a built-in integration is
+    // listed under its translated title, which its service name does not always
+    // match (in French, the "rtsp-camera" service reads "Caméras"), and a
+    // community integration under its manifest name, not its docker image tag
+    const getDisplayedName = integration =>
+      (integration.i18nKey && get(props.intl.dictionary, integration.i18nKey)) || nameBySlug.get(integration.slug);
+    const servicesWithIntegration = (services || [])
+      .map((service, index) => ({
+        service,
+        integration: { ...integrations[index], name: nameBySlug.get(integrations[index].slug) }
+      }))
+      .sort((a, b) =>
+        getDisplayedName(a.integration).localeCompare(getDisplayedName(b.integration), undefined, {
+          sensitivity: 'base'
+        })
+      );
+
     return (
       <ServicesPage
         {...props}
-        services={services}
+        services={services && servicesWithIntegration}
         startService={this.startService}
         stopService={this.stopService}
         actionOnService={this.actionOnService}
@@ -56,4 +81,4 @@ class SettingsServices extends Component {
   }
 }
 
-export default connect('httpClient', {})(SettingsServices);
+export default withIntlAsProp(connect('httpClient', {})(SettingsServices));
