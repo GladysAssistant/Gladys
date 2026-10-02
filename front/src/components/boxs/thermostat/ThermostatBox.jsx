@@ -247,8 +247,17 @@ class ThermostatBox extends Component {
     if (!this.isStopped()) {
       return;
     }
+    await this.writeMode(this.getRunningMode());
+  };
+
+  // The widget's own mode writes come back as a NEW_STATE on the mode feature.
+  // Remembering the value lets that echo be told apart from a stop or a start
+  // made elsewhere (a scene, the API, a second dashboard), which has to reload
+  // the whole card.
+  writeMode = async value => {
     const cfg = this.state.remoteConfig;
-    await this.writeFeature(cfg && cfg.modeFeature, this.getRunningMode());
+    this.expectedMode = value;
+    await this.writeFeature(cfg && cfg.modeFeature, value);
   };
 
   // The manual hold, as the device carries it. `until` is null on a permanent
@@ -483,12 +492,28 @@ class ThermostatBox extends Component {
       // The server (onDeviceNewState) cuts the switch; the widget only reflects the state
       this.setState({ isWindowOpen: payload.last_value === 0 });
     }
+    const modeFeature = this.state.remoteConfig && this.state.remoteConfig.modeFeature;
+    if (modeFeature && payload.device_feature_selector === modeFeature.selector) {
+      this.handleModeChanged(payload.last_value);
+    }
     const switchFeature = this.getRunningStateFeature();
     if (switchFeature && payload.device_feature_selector === switchFeature) {
       // NEW_STATE carries no category/type, so the shape cached from the initial
       // GET /api/v1/device is what the value is normalised against.
       this.setState({ isSwitchOn: isRunningFromStateFeature(this.stateFeature, payload.last_value) });
     }
+  };
+
+  // A stop or a start made outside this card changes everything it shows: the
+  // gauge, the lit preset, the banner. The card is rebuilt the way a reload
+  // builds it, rather than patched. Its own writes are skipped: the click that
+  // made them already put the card in the right state.
+  handleModeChanged = value => {
+    if (this.expectedMode !== null && this.expectedMode !== undefined && Number(value) === this.expectedMode) {
+      this.expectedMode = null;
+      return;
+    }
+    this.initData();
   };
 
   handleWebsocketConnected = ({ connected }) => {
@@ -524,6 +549,15 @@ class ThermostatBox extends Component {
 
   handleThermostatPresetUpdated = payload => {
     if (!this.isOurDevice(payload) || this.savingPreset) return;
+    // A preset set by a scene or the API on a stopped thermostat is stored, not
+    // applied: the loop skips a stopped thermostat. Taking the event as is drew
+    // the preset's setpoint and lit its button, as if the heater were running.
+    // Reloading the device keeps Off and shows the preset as the one it will
+    // start back on.
+    if (this.isStopped()) {
+      this.refreshFromDevice();
+      return;
+    }
     const knownPresets = [...HEATING_PRESETS, ...COOLING_PRESETS];
     if (!payload.preset || !knownPresets.includes(payload.preset)) return;
     const resolvedPreset = payload.preset;
@@ -548,6 +582,9 @@ class ThermostatBox extends Component {
 
   handleThermostatManualModeUpdated = payload => {
     if (!this.isOurDevice(payload)) return;
+    // The same preset write also arms a hold, which only takes effect once the
+    // thermostat starts again: a stopped one is in no manual mode.
+    if (this.isStopped()) return;
     // A hold with no setpoint is a cleared hold.
     const isManual = payload.setpoint !== null && payload.setpoint !== undefined;
     // On an external thermostat this event also announces a setpoint changed on
@@ -645,12 +682,14 @@ class ThermostatBox extends Component {
   // Start it again, without touching the preset. `cancelManualMode` hands the
   // thermostat back to its programme, which a thermostat following none does not
   // have: it would store a `schedule` preset nothing can act on.
+  //
+  // The card is rebuilt the way a reload builds it: the thermostat starts on the
+  // preset and the hold it carried while stopped, and only initData works out
+  // which button that lights and which banner it shows. Reloading the preset
+  // alone left every button dark until the page was reloaded.
   resumeFromStopped = async () => {
     await this.resumeIfStopped();
-    await this.loadConfig();
-    const { activePreset } = this.loadMode();
-    this.setState({ activePreset });
-    await this.refreshFromDevice();
+    await this.initData();
   };
 
   cancelManualMode = async () => {
@@ -736,7 +775,10 @@ class ThermostatBox extends Component {
     // Build initial state update: apply preset and manual mode atomically,
     // then restore the manual setpoint if it is still active.
     // This must be committed BEFORE getDeviceData() so the setpoint guard works.
-    const stateInit = {};
+    // Reset rather than left as they were: initData also rebuilds a card that is
+    // already on screen (a stop or a start made elsewhere), and a stale override
+    // would keep every preset dark.
+    const stateInit = { manualSetpointOverride: false, manualUntil: null };
     if (activePreset !== null) stateInit.activePreset = activePreset;
     if (isManualMode !== null) stateInit.isManualMode = isManualMode;
 
@@ -752,7 +794,10 @@ class ThermostatBox extends Component {
     }
 
     // The hold came with the device, so there is nothing left to fetch here.
-    const hold = this.getHold();
+    // A stopped thermostat can carry a hold — a preset written while it was off
+    // arms one — but it only takes effect once it starts again. Reading it here
+    // marked the setpoint as manual, and Off was no longer lit.
+    const hold = this.isStopped() ? null : this.getHold();
     if (hold) {
       stateInit.setpoint = hold.setpoint;
       // Every preset the user picks arms a hold, so a hold alone says nothing
@@ -779,9 +824,7 @@ class ThermostatBox extends Component {
     }
 
     // Commit everything atomically and wait for the state to be applied
-    if (Object.keys(stateInit).length > 0) {
-      await new Promise(resolve => this.setState(stateInit, resolve));
-    }
+    await new Promise(resolve => this.setState(stateInit, resolve));
     await this.getDeviceData();
     this.applyFallbackSetpoint();
   };
@@ -1039,14 +1082,13 @@ class ThermostatBox extends Component {
     // must not un-highlight the preset that was just picked.
     this.pickingPreset = true;
     try {
-      const cfg = this.state.remoteConfig;
       if (preset.key === 'off') {
         // Stopping is a mode, not a preset: it switches the machine off, and the
         // regulation loop then leaves it alone whatever the programme says.
         // External thermostats carry this mode feature too — it is Gladys's own
         // stop, and the server turns it into the real device's stop (its mode
         // when it has one, plus the frost setpoint).
-        await this.writeFeature(cfg && cfg.modeFeature, THERMOSTAT_MODE.OFF);
+        await this.writeMode(THERMOSTAT_MODE.OFF);
       } else {
         await this.resumeIfStopped();
         await this.savePreset(preset.key);
@@ -1324,7 +1366,9 @@ class ThermostatBox extends Component {
                           onClick={hasSchedule ? this.cancelManualMode : this.resumeFromStopped}
                           title={exitStoppedLabel}
                         >
-                          <i class="fe fe-x" />
+                          {/* A cross reads as "dismiss": this one starts the
+                              thermostat, so it carries the play glyph. */}
+                          <i class="fe fe-play" />
                         </button>
                       )}
                     </div>

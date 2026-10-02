@@ -310,18 +310,27 @@
    starts again, and nothing used to say so — the bar was six dark buttons and a
    scene that had set one looked as though it had done nothing.
 
-   The active pill at a third of its strength: enough to say which preset, not
-   enough to claim the thermostat is running it. */
+   An outline of the active pill rather than the pill at a third of its
+   strength: dimming the whole label dimmed its text too, down to 1.8:1 (white on
+   pale amber, brown on brown in the dark theme). The text keeps the bar's own
+   dark grey, readable in both themes; only the dashed outline carries the preset
+   colour, and says the thermostat is not running it yet. */
 .segmentBtnPending .segmentBtnLabel {
-  color: var(--preset-text, #212529);
+  position: relative;
+  color: #495057;
   font-weight: 600;
   letter-spacing: -0.2px;
-  background: var(--preset-color, #f59f00);
-  border-radius: 8px;
   width: 100%;
   box-sizing: border-box;
   padding: 1px 2px;
-  opacity: 0.35;
+}
+
+.segmentBtnPending .segmentBtnLabel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1.5px dashed var(--preset-color, #f59f00);
+  border-radius: 8px;
 }
 
 .segmentBtnPending i {
@@ -329,9 +338,9 @@
   opacity: 0.45;
 }
 
-/* Same counter-inversion as the active pill, for the same reason: the tint is a
-   real preset colour. */
-:global(.dark-mode) .segmentBtnPending .segmentBtnLabel,
+/* Only the outline and the icon take the counter-inversion: the tint is a real
+   preset colour. The text follows the theme's inversion like the rest of the bar. */
+:global(.dark-mode) .segmentBtnPending .segmentBtnLabel::before,
 :global(.dark-mode) .segmentBtnPending i {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
