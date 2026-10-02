@@ -6,7 +6,44 @@ const { assert, fake } = sinon;
 const switchDevice = require('../../../../../../services/broadlink/lib/commands/features/broadlink.switch');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../../../utils/constants');
 
-const SP4_TYPES = ['SP4', 'SP4B'];
+// node-broadlink classes of the SP4 family, by device TYPE
+const SP4_CLASSES = { SP4: 'Sp4', SP4B: 'Sp4b' };
+
+/**
+ * @description Builds a real node-broadlink device whose requests are answered as a device does
+ * (0x38 bytes header + encrypted payload).
+ * @param {string} className - Name of the node-broadlink class.
+ * @param {Function} buildAnswer - Builds the clear answer payload from the device.
+ * @returns {object} The node-broadlink device, with a fake `sendPacket`.
+ * @example
+ * buildRealDevice('Sp4', (device) => device.encode(2, { pwr: true }));
+ */
+const buildRealDevice = (className, buildAnswer) => {
+  const broadlinkDevice = new switchDevice.deviceClasses[className](
+    { address: '127.0.0.1', port: 80 },
+    [1, 2, 3, 4, 5, 6],
+    0x7579,
+  );
+  broadlinkDevice.socket.close();
+  const answer = buildAnswer(broadlinkDevice);
+  const padding = Buffer.alloc((16 - (answer.length % 16)) % 16);
+  const response = Buffer.concat([Buffer.alloc(0x38), broadlinkDevice.encrypt(Buffer.concat([answer, padding]))]);
+  broadlinkDevice.sendPacket = fake.resolves(response);
+  return broadlinkDevice;
+};
+
+/**
+ * @description Builds the clear answer of a SP3 device to a state request.
+ * @param {number} state - Power (bit 0x01) and nightlight (bit 0x02) state.
+ * @returns {Buffer} The answer payload.
+ * @example
+ * buildSp3Answer(0x01);
+ */
+const buildSp3Answer = (state) => {
+  const answer = Buffer.alloc(16);
+  answer[0x4] = state;
+  return answer;
+};
 
 describe('broadlink.switch', () => {
   afterEach(() => {
@@ -169,43 +206,28 @@ describe('broadlink.switch', () => {
       assert.calledOnceWithExactly(broadlinkDevice.setPower, 2, true);
     });
 
-    SP4_TYPES.forEach((type) => {
-      it(`should power on a ${type} device decrypting the response`, async () => {
-        const broadlinkDevice = {
-          TYPE: type,
-          setPower: fake.resolves(null),
-          encode: fake.returns('packet'),
-          sendPacket: fake.resolves('encrypted-response'),
-          decrypt: fake.returns('decrypted-response'),
-          decode: fake.returns({ pwr: true }),
-        };
+    Object.entries(SP4_CLASSES).forEach(([type, className]) => {
+      // node-broadlink Sp4.setState decodes the encrypted answer, and throws "Unexpected end of JSON input"
+      it(`should power on a ${type} device and decode its encrypted answer`, async () => {
+        const broadlinkDevice = buildRealDevice(className, (device) => device.encode(2, { pwr: true }));
         const gladysDevice = { external_id: 'broadlink:mac:switch:1' };
 
         await switchDevice.setValue(broadlinkDevice, null, gladysDevice, 1);
 
-        assert.calledOnceWithExactly(broadlinkDevice.encode, 2, { pwr: true });
-        assert.calledOnceWithExactly(broadlinkDevice.sendPacket, 'packet');
-        assert.calledOnceWithExactly(broadlinkDevice.decrypt, 'encrypted-response');
-        assert.calledOnceWithExactly(broadlinkDevice.decode, 'decrypted-response');
-        // the broken node-broadlink shortcut is not used
-        assert.notCalled(broadlinkDevice.setPower);
+        assert.calledOnce(broadlinkDevice.sendPacket);
+        const [packet] = broadlinkDevice.sendPacket.firstCall.args;
+        expect(broadlinkDevice.decode(packet)).to.include({ pwr: true });
       });
 
-      it(`should power off a ${type} device`, async () => {
-        const broadlinkDevice = {
-          TYPE: type,
-          setPower: fake.resolves(null),
-          encode: fake.returns('packet'),
-          sendPacket: fake.resolves('encrypted-response'),
-          decrypt: fake.returns('decrypted-response'),
-          decode: fake.returns({ pwr: false }),
-        };
+      it(`should power off a ${type} device and decode its encrypted answer`, async () => {
+        const broadlinkDevice = buildRealDevice(className, (device) => device.encode(2, { pwr: false }));
         const gladysDevice = { external_id: 'broadlink:mac:switch:1' };
 
         await switchDevice.setValue(broadlinkDevice, null, gladysDevice, 0);
 
-        assert.calledOnceWithExactly(broadlinkDevice.encode, 2, { pwr: false });
-        assert.notCalled(broadlinkDevice.setPower);
+        assert.calledOnce(broadlinkDevice.sendPacket);
+        const [packet] = broadlinkDevice.sendPacket.firstCall.args;
+        expect(broadlinkDevice.decode(packet)).to.include({ pwr: false });
       });
     });
   });
@@ -355,6 +377,101 @@ describe('broadlink.switch', () => {
         { device_feature_external_id: 'broadlink:mac:switch:1', state: 1 },
         { device_feature_external_id: 'broadlink:mac:energy-sensor', state: 12 },
       ]);
+    });
+
+    it('should not prepare switch state event when state did not change', async () => {
+      const broadlinkDevice = {
+        TYPE: 'MP1',
+        checkPower: fake.resolves({ s1: true, s2: false, s3: false, s4: true }),
+      };
+      const gladysDevice = {
+        features: [
+          { external_id: 'broadlink:mac:switch:1', category: 'switch', last_value: 1 },
+          { external_id: 'broadlink:mac:switch:2', category: 'switch', last_value: 1 },
+          { external_id: 'broadlink:mac:switch:3', category: 'switch', last_value: 0 },
+          { external_id: 'broadlink:mac:switch:4', category: 'switch', last_value: null },
+        ],
+      };
+
+      const messages = await switchDevice.poll(broadlinkDevice, gladysDevice);
+
+      expect(messages).to.deep.eq([
+        { device_feature_external_id: 'broadlink:mac:switch:2', state: 0 },
+        { device_feature_external_id: 'broadlink:mac:switch:4', state: 1 },
+      ]);
+    });
+
+    it('should still prepare energy event when switch state cannot be read', async () => {
+      const broadlinkDevice = {
+        checkPower: fake.rejects(new Error('switch error')),
+        getEnergy: fake.resolves(12),
+      };
+      const gladysDevice = {
+        external_id: 'broadlink:mac',
+        features: [
+          { external_id: 'broadlink:mac:switch:1', category: 'switch' },
+          { external_id: 'broadlink:mac:energy-sensor', category: 'energy-sensor' },
+        ],
+      };
+
+      const messages = await switchDevice.poll(broadlinkDevice, gladysDevice);
+
+      expect(messages).to.deep.eq([{ device_feature_external_id: 'broadlink:mac:energy-sensor', state: 12 }]);
+    });
+
+    it('should still prepare switch state event when energy cannot be read', async () => {
+      const broadlinkDevice = {
+        checkPower: fake.resolves(true),
+        getEnergy: fake.rejects(new Error('energy error')),
+      };
+      const gladysDevice = {
+        external_id: 'broadlink:mac',
+        features: [
+          { external_id: 'broadlink:mac:switch:1', category: 'switch' },
+          { external_id: 'broadlink:mac:energy-sensor', category: 'energy-sensor' },
+        ],
+      };
+
+      const messages = await switchDevice.poll(broadlinkDevice, gladysDevice);
+
+      expect(messages).to.deep.eq([{ device_feature_external_id: 'broadlink:mac:switch:1', state: 1 }]);
+    });
+
+    // node-broadlink Sp3.checkPower reads the nightlight bit (0x02) instead of the power bit (0x01)
+    it('should read SP3 power on while nightlight is off', async () => {
+      const broadlinkDevice = buildRealDevice('Sp3', () => buildSp3Answer(0x01));
+      const gladysDevice = {
+        features: [{ external_id: 'broadlink:mac:switch:1', category: 'switch' }],
+      };
+
+      const messages = await switchDevice.poll(broadlinkDevice, gladysDevice);
+
+      expect(messages).to.deep.eq([{ device_feature_external_id: 'broadlink:mac:switch:1', state: 1 }]);
+      assert.calledOnce(broadlinkDevice.sendPacket);
+      const [packet] = broadlinkDevice.sendPacket.firstCall.args;
+      expect(packet[0]).to.eq(1);
+    });
+
+    it('should read SP3 power off while nightlight is on', async () => {
+      const broadlinkDevice = buildRealDevice('Sp3', () => buildSp3Answer(0x02));
+      const gladysDevice = {
+        features: [{ external_id: 'broadlink:mac:switch:1', category: 'switch' }],
+      };
+
+      const messages = await switchDevice.poll(broadlinkDevice, gladysDevice);
+
+      expect(messages).to.deep.eq([{ device_feature_external_id: 'broadlink:mac:switch:1', state: 0 }]);
+    });
+
+    it('should read SP4 power state from its encrypted answer', async () => {
+      const broadlinkDevice = buildRealDevice('Sp4', (device) => device.encode(1, { pwr: true, ntlight: false }));
+      const gladysDevice = {
+        features: [{ external_id: 'broadlink:mac:switch:1', category: 'switch' }],
+      };
+
+      const messages = await switchDevice.poll(broadlinkDevice, gladysDevice);
+
+      expect(messages).to.deep.eq([{ device_feature_external_id: 'broadlink:mac:switch:1', state: 1 }]);
     });
   });
 });

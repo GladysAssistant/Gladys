@@ -1,7 +1,8 @@
+const Promise = require('bluebird');
 const { EVENTS } = require('../../../../utils/constants');
 const { BadParameters } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
-const { PARAMS } = require('../utils/broadlink.constants');
+const { PARAMS, POLL_TIMEOUT } = require('../utils/broadlink.constants');
 
 /**
  * @description Poll device feature values.
@@ -31,7 +32,11 @@ async function poll(device) {
   }
 
   logger.debug(`Broadlink polling ${device.external_id}...`);
-  const messages = await deviceMapper.poll(broadlinkDevice, device);
+  // an unreachable device must not block the devices polled after it
+  const messages = await Promise.resolve(deviceMapper.poll(broadlinkDevice, device)).timeout(
+    POLL_TIMEOUT,
+    `Broadlink device ${device.external_id} did not answer to polling`,
+  );
 
   messages.forEach((message) => {
     logger.debug(`Broadlink polled ${message.device_feature_external_id}, new value = ${message.state}`);
