@@ -765,7 +765,8 @@
           "night": "Nuit"
         },
         "backToSchedule": "Revenir au planning",
-        "resumeFromStopped": "Redémarrer le thermostat"
+        "resumeFromStopped": "Redémarrer le thermostat",
+        "presetPending": "{{preset}} (appliqué au redémarrage)"
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",

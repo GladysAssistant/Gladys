@@ -1338,6 +1338,28 @@ class ThermostatBox extends Component {
                 const resolvedActivePreset = [...HEATING_PRESETS, ...COOLING_PRESETS].includes(activePreset)
                   ? activePreset
                   : null;
+                // Stopping is a mode, and a mode leaves the preset feature alone:
+                // a preset set by a scene on a stopped thermostat is stored, and
+                // is what it will run on when it starts again. Nothing said so —
+                // no button was lit — so the scene looked as though it had done
+                // nothing. Shown dimmed: the shape says which preset, the dimming
+                // says the machine is not running it yet.
+                // The dimming says it visually; this says it in words, for a
+                // screen reader and for a hover.
+                const pendingTitle = label => {
+                  const template =
+                    props.intl &&
+                    props.intl.dictionary &&
+                    props.intl.dictionary.dashboard.boxes.thermostat.presetPending;
+                  return template ? template.replace('{{preset}}', label) : label;
+                };
+                const storedPreset = this.state.remoteConfig && PRESET_NAMES[this.state.remoteConfig.preset];
+                const pendingPreset =
+                  activePreset === 'off' &&
+                  storedPreset !== 'off' &&
+                  [...HEATING_PRESETS, ...COOLING_PRESETS].includes(storedPreset)
+                    ? storedPreset
+                    : null;
                 return (
                   <div>
                     {banner}
@@ -1361,18 +1383,22 @@ class ThermostatBox extends Component {
                             ? props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
                             : preset.key;
                         const isActive = resolvedActivePreset === preset.key && !manualSetpointOverride;
+                        const isPending = pendingPreset === preset.key;
                         const presetColor = this.getPresetColor(preset.key);
                         return (
                           <button
                             key={preset.key}
-                            class={`${style.segmentBtn} ${isActive ? style.segmentBtnActive : ''}`}
+                            class={cx(style.segmentBtn, {
+                              [style.segmentBtnActive]: isActive,
+                              [style.segmentBtnPending]: isPending
+                            })}
                             style={
-                              isActive
+                              isActive || isPending
                                 ? `--preset-color:${presetColor};--preset-text:${readableTextOn(presetColor)}`
                                 : undefined
                             }
                             onClick={() => this.selectPreset(preset)}
-                            title={presetTitle}
+                            title={isPending ? pendingTitle(presetTitle) : presetTitle}
                             aria-pressed={isActive ? 'true' : 'false'}
                             disabled={isWindowOpen}
                           >

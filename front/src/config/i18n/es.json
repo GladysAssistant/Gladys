@@ -897,7 +897,8 @@
           "night": "Noche"
         },
         "backToSchedule": "Volver a la programación",
-        "resumeFromStopped": "Encender el termostato"
+        "resumeFromStopped": "Encender el termostato",
+        "presetPending": "{{preset}} (se aplicará al encender)"
       }
     },
     "editDashboardBackgroundLabel": "Ambiente de fondo",

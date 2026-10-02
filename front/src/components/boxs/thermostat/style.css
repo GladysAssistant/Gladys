@@ -306,6 +306,36 @@
   padding: 0 4px;
 }
 
+/* The preset a stopped thermostat carries: it is what it will run on when it
+   starts again, and nothing used to say so — the bar was six dark buttons and a
+   scene that had set one looked as though it had done nothing.
+
+   The active pill at a third of its strength: enough to say which preset, not
+   enough to claim the thermostat is running it. */
+.segmentBtnPending .segmentBtnLabel {
+  color: var(--preset-text, #212529);
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  background: var(--preset-color, #f59f00);
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1px 2px;
+  opacity: 0.35;
+}
+
+.segmentBtnPending i {
+  color: var(--preset-color, #f59f00);
+  opacity: 0.45;
+}
+
+/* Same counter-inversion as the active pill, for the same reason: the tint is a
+   real preset colour. */
+:global(.dark-mode) .segmentBtnPending .segmentBtnLabel,
+:global(.dark-mode) .segmentBtnPending i {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
 /* While a window is open the bar stays in place, dimmed and inert: removing it
    made the card shrink by its own height and every widget beside it move. */
 .segmentedControlDisabled {

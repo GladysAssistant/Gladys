@@ -897,7 +897,8 @@
           "night": "Night"
         },
         "backToSchedule": "Back to the schedule",
-        "resumeFromStopped": "Start the thermostat"
+        "resumeFromStopped": "Start the thermostat",
+        "presetPending": "{{preset}} (applied when it starts again)"
       }
     },
     "editDashboardBackgroundLabel": "Background mood",

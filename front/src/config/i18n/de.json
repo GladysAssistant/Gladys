@@ -765,7 +765,8 @@
           "night": "Nacht"
         },
         "backToSchedule": "Zurück zum Zeitplan",
-        "resumeFromStopped": "Thermostat starten"
+        "resumeFromStopped": "Thermostat starten",
+        "presetPending": "{{preset}} (wird beim Neustart angewendet)"
       },
       "energyConsumption": {
         "editName": "Widget-Name (optional)",
