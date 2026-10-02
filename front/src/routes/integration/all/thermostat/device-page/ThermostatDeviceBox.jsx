@@ -3,6 +3,7 @@ import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
+import { THERMOSTAT_MODE } from '../../../../../../../server/utils/constants';
 import style from './style.css';
 
 class ThermostatDeviceBox extends Component {
@@ -75,6 +76,12 @@ class ThermostatDeviceBox extends Component {
       setpointFeature && setpointFeature.last_value !== null && setpointFeature.last_value !== undefined
         ? setpointFeature.last_value
         : null;
+    // A stopped thermostat holds its frost setpoint, so the card read
+    // "Setpoint 7 °C" on a machine that is doing nothing. The mode says what it
+    // is actually up to, and this feature is this service's own on both kinds of
+    // thermostat.
+    const modeFeature = (device.features || []).find(f => f.category === 'thermostat' && f.type === 'mode');
+    const isStopped = modeFeature && Number(modeFeature.last_value) === THERMOSTAT_MODE.OFF;
     const unitParam = (device.params || []).find(p => p.name === 'THERMOSTAT_TEMP_UNIT');
     // The real device declares the unit it works in, and it is the one the value
     // read above is expressed in: a celsius thermostat pointing at a fahrenheit
@@ -148,7 +155,9 @@ class ThermostatDeviceBox extends Component {
                       <Text id="integration.thermostat.device.setpointLabel" />
                     </span>
                     <span class={style.summaryValue}>
-                      {setpoint === null ? (
+                      {isStopped ? (
+                        <Text id="integration.thermostat.device.stoppedState" />
+                      ) : setpoint === null ? (
                         <Text id="integration.thermostat.device.noSetpoint" />
                       ) : (
                         `${setpoint} °${tempUnitValue}`

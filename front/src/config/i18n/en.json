@@ -896,7 +896,8 @@
           "eco": "Eco",
           "night": "Night"
         },
-        "backToSchedule": "Back to the schedule"
+        "backToSchedule": "Back to the schedule",
+        "resumeFromStopped": "Start the thermostat"
       }
     },
     "editDashboardBackgroundLabel": "Background mood",
@@ -3361,7 +3362,8 @@
         "confirmYes": "Yes",
         "confirmNo": "No",
         "saveError": "Error while saving.",
-        "deleteError": "Error while deleting."
+        "deleteError": "Error while deleting.",
+        "stoppedState": "Stopped"
       },
       "edit": {
         "titleNew": "New Thermostat",
@@ -3465,7 +3467,8 @@
         "sectionHeating": "Heating",
         "sectionProgramming": "Programming",
         "deviceRangeHint": "The device advertises {{min}} – {{max}} °{{unit}}.",
-        "deviceRangeApply": "Use these values"
+        "deviceRangeApply": "Use these values",
+        "rangeSection": "Temperature range"
       },
       "schedule": {
         "title": "Schedules",

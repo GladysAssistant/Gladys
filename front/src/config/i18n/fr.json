@@ -764,7 +764,8 @@
           "eco": "Éco",
           "night": "Nuit"
         },
-        "backToSchedule": "Revenir au planning"
+        "backToSchedule": "Revenir au planning",
+        "resumeFromStopped": "Redémarrer le thermostat"
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",
@@ -3361,7 +3362,8 @@
         "confirmYes": "Oui",
         "confirmNo": "Non",
         "saveError": "Erreur lors de la sauvegarde.",
-        "deleteError": "Erreur lors de la suppression."
+        "deleteError": "Erreur lors de la suppression.",
+        "stoppedState": "Arrêté"
       },
       "edit": {
         "titleNew": "Nouveau thermostat",
@@ -3465,7 +3467,8 @@
         "sectionHeating": "Chauffage",
         "sectionProgramming": "Programmation",
         "deviceRangeHint": "L’appareil annonce {{min}} – {{max}} °{{unit}}.",
-        "deviceRangeApply": "Utiliser ces valeurs"
+        "deviceRangeApply": "Utiliser ces valeurs",
+        "rangeSection": "Plage de températures"
       },
       "schedule": {
         "title": "Plannings",

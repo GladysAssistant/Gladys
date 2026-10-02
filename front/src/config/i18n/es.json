@@ -896,7 +896,8 @@
           "eco": "Eco",
           "night": "Noche"
         },
-        "backToSchedule": "Volver a la programación"
+        "backToSchedule": "Volver a la programación",
+        "resumeFromStopped": "Encender el termostato"
       }
     },
     "editDashboardBackgroundLabel": "Ambiente de fondo",
@@ -3361,7 +3362,8 @@
         "confirmYes": "Sí",
         "confirmNo": "No",
         "saveError": "Error al guardar.",
-        "deleteError": "Error al eliminar."
+        "deleteError": "Error al eliminar.",
+        "stoppedState": "Apagado"
       },
       "edit": {
         "titleNew": "Nuevo termostato",
@@ -3465,7 +3467,8 @@
         "sectionHeating": "Calefacción",
         "sectionProgramming": "Programación",
         "deviceRangeHint": "El aparato indica {{min}} – {{max}} °{{unit}}.",
-        "deviceRangeApply": "Usar estos valores"
+        "deviceRangeApply": "Usar estos valores",
+        "rangeSection": "Rango de temperaturas"
       },
       "schedule": {
         "title": "Programaciones",

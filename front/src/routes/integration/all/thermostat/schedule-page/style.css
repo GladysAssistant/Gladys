@@ -125,8 +125,11 @@
   position: absolute;
   left: var(--marker-left);
   transform: translateX(-50%);
-  font-size: 0.68rem;
-  color: #868e96;
+  /* 0.68rem was 10.9px, the smallest text on the page; 0.75rem is what the week
+     miniature's own scale uses, so the two read alike. The darker grey takes
+     them from 2.9:1 to 4.7:1 — they are what places a range on the day. */
+  font-size: 0.75rem;
+  color: #6c757d;
   white-space: nowrap;
   line-height: 18px;
 }
@@ -153,7 +156,11 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 6px;
-  padding: 6px 8px;
+  /* The whole row opens the range for editing, so it is a touch target: 35px was
+     under the 44px a thumb needs. Carried by the padding rather than a fixed
+     height, so a row that wraps on a narrow card still grows with its content. */
+  min-height: 44px;
+  padding: 10px 8px;
   border-radius: 6px;
   cursor: pointer;
   border: 1px solid transparent;
@@ -362,6 +369,12 @@
   margin-top: 10px;
 }
 
+/* The two buttons a day is filled in with, at 28px as btn-sm: brought to the
+   44px a thumb needs, like every other control here. */
+.dayPanelActions :global(.btn) {
+  min-height: 44px;
+}
+
 /* ─── Copy to days picker ─── */
 
 .copyPicker {
@@ -507,6 +520,7 @@
 /* A glyph, not a button-looking button: inside a badge there is no room for a
    border and a background, and the badge itself already reads as one chip. */
 .followerDetach {
+  position: relative;
   background: none;
   border: none;
   padding: 0;
@@ -515,6 +529,26 @@
   color: inherit;
   cursor: pointer;
   opacity: 0.65;
+}
+
+/* The glyph stays badge-sized, the target does not: 12x14px is well under the
+   24px of WCAG 2.5.8, and this is what stops a thermostat following a schedule.
+   28px rather than the widget's 44 — the badges are 4px apart, so a wider square
+   would reach well across the gap; the z-index keeps the cross being aimed at
+   above the couple of pixels it does overlap. */
+.followerDetach::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+}
+
+.followerDetach:hover,
+.followerDetach:focus {
+  z-index: 1;
 }
 
 .followerDetach:hover,
@@ -593,7 +627,7 @@
   transform: translateX(-50%);
   font-size: 0.75rem;
   line-height: 14px;
-  color: #868e96;
+  color: #6c757d;
   white-space: nowrap;
 }
 

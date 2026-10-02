@@ -642,6 +642,17 @@ class ThermostatBox extends Component {
   // Hand the thermostat back to its programme, from a hold or from a stop. A
   // stopped thermostat is skipped by the regulation loop, so the mode has to be
   // written back first or the preset would be stored and never applied.
+  // Start it again, without touching the preset. `cancelManualMode` hands the
+  // thermostat back to its programme, which a thermostat following none does not
+  // have: it would store a `schedule` preset nothing can act on.
+  resumeFromStopped = async () => {
+    await this.resumeIfStopped();
+    await this.loadConfig();
+    const { activePreset } = this.loadMode();
+    this.setState({ activePreset });
+    await this.refreshFromDevice();
+  };
+
   cancelManualMode = async () => {
     this.holdSetpointUntilApplied();
     this.setState({ isManualMode: false, manualUntil: null, manualSetpointOverride: false });
@@ -1210,7 +1221,12 @@ class ThermostatBox extends Component {
                 const banner = (() => {
                   // The window banner above already says what the thermostat
                   // is doing, and it replaces this one.
-                  if (isWindowOpen || !hasSchedule || activePreset === null) {
+                  // A stopped thermostat keeps its banner whatever else is
+                  // true: the cross in it is the only way to start it again, and
+                  // on one following no schedule there was none at all — the
+                  // gauge read "Off", no preset was lit, and nothing on the card
+                  // turned it back on.
+                  if (isWindowOpen || (activePreset !== 'off' && (!hasSchedule || activePreset === null))) {
                     return null;
                   }
                   if (isManualMode && manualUntil) {
@@ -1280,7 +1296,9 @@ class ThermostatBox extends Component {
                   // happen — and the cross is the only way back to the
                   // programme, since every preset arms a hold instead.
                   const stopped = resolvedPresetKey === 'off';
-                  const backToScheduleLabel = (t2 && t2.backToSchedule) || '';
+                  const exitStoppedLabel = hasSchedule
+                    ? (t2 && t2.backToSchedule) || ''
+                    : (t2 && t2.resumeFromStopped) || '';
 
                   return (
                     <div class={style.scheduleBanner} style={`--banner-color:${bannerColor}`}>
@@ -1292,7 +1310,7 @@ class ThermostatBox extends Component {
                               the banner still has to appear, because its cross is
                               the only way back to the programme. */}
                       <span class={style.scheduleBannerText}>
-                        {stopped ? backToScheduleLabel : presetName}
+                        {stopped ? exitStoppedLabel : presetName}
                         {!stopped && activeSchedule && activeSchedule.next && (
                           <span class={style.scheduleBannerUntil}>
                             {' '}
@@ -1303,8 +1321,8 @@ class ThermostatBox extends Component {
                       {stopped && (
                         <button
                           class={style.manualBannerCancel}
-                          onClick={this.cancelManualMode}
-                          title={backToScheduleLabel}
+                          onClick={hasSchedule ? this.cancelManualMode : this.resumeFromStopped}
+                          title={exitStoppedLabel}
                         >
                           <i class="fe fe-x" />
                         </button>

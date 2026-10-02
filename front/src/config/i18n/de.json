@@ -764,7 +764,8 @@
           "eco": "Eco",
           "night": "Nacht"
         },
-        "backToSchedule": "Zurück zum Zeitplan"
+        "backToSchedule": "Zurück zum Zeitplan",
+        "resumeFromStopped": "Thermostat starten"
       },
       "energyConsumption": {
         "editName": "Widget-Name (optional)",
@@ -3361,7 +3362,8 @@
         "confirmYes": "Ja",
         "confirmNo": "Nein",
         "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
-        "deleteError": "Beim Löschen ist ein Fehler aufgetreten."
+        "deleteError": "Beim Löschen ist ein Fehler aufgetreten.",
+        "stoppedState": "Ausgeschaltet"
       },
       "edit": {
         "titleNew": "Neues Thermostat",
@@ -3465,7 +3467,8 @@
         "sectionHeating": "Heizung",
         "sectionProgramming": "Programmierung",
         "deviceRangeHint": "Das Gerät meldet {{min}} – {{max}} °{{unit}}.",
-        "deviceRangeApply": "Diese Werte übernehmen"
+        "deviceRangeApply": "Diese Werte übernehmen",
+        "rangeSection": "Temperaturbereich"
       },
       "schedule": {
         "title": "Zeitpläne",

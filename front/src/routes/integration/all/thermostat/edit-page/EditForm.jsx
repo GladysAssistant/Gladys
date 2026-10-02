@@ -258,7 +258,7 @@ const EditForm = ({ ...props }) => {
                     both write the setpoint, and the thermostat follows whichever
                     wrote last. First thing in this section, before the setpoint
                     it is about to drive. */}
-                <div class="alert alert-warning">
+                <div class={cx('alert', 'alert-warning', style.vendorWarning)}>
                   <Text id="integration.thermostat.edit.vendorProgrammeWarning" />
                 </div>
 
@@ -572,7 +572,8 @@ const EditForm = ({ ...props }) => {
               </details>
             )}
 
-            {/* Unité + Plage de température */}
+            {/* Unité : elle décide comment lire tous les autres champs, donc elle
+                reste visible. */}
             <div class="row">
               <div class="col-md-4">
                 <div class="form-group">
@@ -593,77 +594,94 @@ const EditForm = ({ ...props }) => {
                   </select>
                 </div>
               </div>
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="integration.thermostat.edit.minTempLabel" />
-                  </label>
-                  <div class="input-group">
-                    <Localizer>
-                      <input
-                        type="number"
-                        class="form-control"
-                        placeholder={<Text id="integration.thermostat.edit.minTempPlaceholder" />}
-                        value={props.thermostatEditMinTemp}
-                        onInput={e => props.updateThermostatField('thermostatEditMinTemp', e.target.value)}
-                      />
-                    </Localizer>
-                    <div class="input-group-append">
-                      <span class="input-group-text">
-                        {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="integration.thermostat.edit.maxTempLabel" />
-                  </label>
-                  <div class="input-group">
-                    <Localizer>
-                      <input
-                        type="number"
-                        class="form-control"
-                        placeholder={<Text id="integration.thermostat.edit.maxTempPlaceholder" />}
-                        value={props.thermostatEditMaxTemp}
-                        onInput={e => props.updateThermostatField('thermostatEditMaxTemp', e.target.value)}
-                      />
-                    </Localizer>
-                    <div class="input-group-append">
-                      <span class="input-group-text">
-                        {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
-            {/* What the appliance says it accepts. Adopting it on picking the
-                setpoint feature covers the usual path, but not a thermostat
-                edited later or a setpoint chosen before the unit was settled —
-                and a Netatmo left at 5-35 promises two degrees it will refuse or
-                silently clamp. */}
-            {rangeDiffers && (
-              <div class="form-group">
-                <small class="form-text text-muted">
-                  <Text
-                    id="integration.thermostat.edit.deviceRangeHint"
-                    fields={{ min: targetRange.min, max: targetRange.max, unit: formUnit }}
-                  />{' '}
-                  <button type="button" class="btn btn-link btn-sm p-0 align-baseline" onClick={applyDeviceRange}>
-                    <Text id="integration.thermostat.edit.deviceRangeApply" />
-                  </button>
-                </small>
-              </div>
-            )}
 
-            {/* Presets : nom + couleur fixe + température */}
-            <div class="form-group">
-              <label class="form-label">
+            {/* Folded: the bounds have working defaults, and on a real thermostat
+                they are adopted from the range the device advertises. The form ran
+                about three and a half screens before Save on a phone, and these are
+                the two fields least often touched. The unit stays out of the fold:
+                it decides how every other temperature on the page reads. */}
+            <details class={cx('mb-3', style.tuningDetails)}>
+              <summary class={cx('form-label', style.tuningSummary)}>
+                <i class={`fe fe-chevron-right ${style.tuningChevron}`} aria-hidden="true" />
+                <Text id="integration.thermostat.edit.rangeSection" />
+              </summary>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.thermostat.edit.minTempLabel" />
+                    </label>
+                    <div class="input-group">
+                      <Localizer>
+                        <input
+                          type="number"
+                          class="form-control"
+                          placeholder={<Text id="integration.thermostat.edit.minTempPlaceholder" />}
+                          value={props.thermostatEditMinTemp}
+                          onInput={e => props.updateThermostatField('thermostatEditMinTemp', e.target.value)}
+                        />
+                      </Localizer>
+                      <div class="input-group-append">
+                        <span class="input-group-text">
+                          {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.thermostat.edit.maxTempLabel" />
+                    </label>
+                    <div class="input-group">
+                      <Localizer>
+                        <input
+                          type="number"
+                          class="form-control"
+                          placeholder={<Text id="integration.thermostat.edit.maxTempPlaceholder" />}
+                          value={props.thermostatEditMaxTemp}
+                          onInput={e => props.updateThermostatField('thermostatEditMaxTemp', e.target.value)}
+                        />
+                      </Localizer>
+                      <div class="input-group-append">
+                        <span class="input-group-text">
+                          {(props.thermostatEditTempUnit || 'C') === 'F' ? '°F' : '°C'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* What the appliance says it accepts, inside the fold with the two
+                  fields it is about. Adopting it on picking the setpoint feature
+                  covers the usual path, but not a thermostat edited later or a
+                  setpoint chosen before the unit was settled — and a Netatmo left
+                  at 5-35 promises two degrees it will refuse or silently clamp. */}
+              {rangeDiffers && (
+                <div class="form-group">
+                  <small class="form-text text-muted">
+                    <Text
+                      id="integration.thermostat.edit.deviceRangeHint"
+                      fields={{ min: targetRange.min, max: targetRange.max, unit: formUnit }}
+                    />{' '}
+                    <button type="button" class="btn btn-link btn-sm p-0 align-baseline" onClick={applyDeviceRange}>
+                      <Text id="integration.thermostat.edit.deviceRangeApply" />
+                    </button>
+                  </small>
+                </div>
+              )}
+            </details>
+
+            {/* Folded like the range above: six rows of temperatures with working
+                defaults, and the longest block on a form that already runs about
+                three and a half screens on a phone. */}
+            <details class={cx('mb-3', style.tuningDetails)}>
+              <summary class={cx('form-label', style.tuningSummary)}>
+                <i class={`fe fe-chevron-right ${style.tuningChevron}`} aria-hidden="true" />
                 <Text id="integration.thermostat.edit.presetsLabel" />
-              </label>
+              </summary>
               <table class="table table-sm table-borderless mb-0">
                 <thead>
                   <tr>
@@ -684,7 +702,7 @@ const EditForm = ({ ...props }) => {
                       </td>
                       <td class="align-middle">
                         {presetFields[key] ? (
-                          <div class="input-group input-group-sm">
+                          <div class={cx('input-group', 'input-group-sm', style.presetTempGroup)}>
                             <input
                               type="number"
                               class={`form-control ${style.presetTempInput}`}
@@ -706,7 +724,7 @@ const EditForm = ({ ...props }) => {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </details>
 
             <h4 class={style.formSection}>
               <Text id="integration.thermostat.edit.sectionProgramming" />
@@ -796,22 +814,27 @@ const EditForm = ({ ...props }) => {
             )}
 
             <SaveError status={props.thermostatCreateStatus} reason={props.thermostatEditError} />
-
-            <div class="row mt-2">
-              <div class="col">
-                <button
-                  onClick={props.saveThermostatDevice}
-                  class={cx('btn', 'btn-success', { 'btn-loading': saving })}
-                >
-                  <Text id="integration.thermostat.edit.saveButton" />
-                </button>
-                <a href="/dashboard/integration/device/thermostat" class="btn btn-secondary ml-2">
-                  <Text id="integration.thermostat.edit.cancelButton" />
-                </a>
-              </div>
-            </div>
           </div>
         </div>
+      </div>
+      {/* Sticky, not `fixed-bottom`: the dark theme puts `filter: invert(100%)` on
+          <html>, which makes it the containing block of every fixed element — the
+          bar then measures against the document rather than the viewport and
+          parks at the foot of the page. Sticky ignores an ancestor's filter, keeps
+          the card's own width, and settles into place at the end of the form.
+
+          A real thermostat's form runs about three and a half screens, so Save sat
+          below the fold the whole time it was being filled in. */}
+      <div class={style.formActions}>
+        <a href="/dashboard/integration/device/thermostat" class="btn btn-secondary">
+          <Text id="integration.thermostat.edit.cancelButton" /> <i class="fe fe-slash" />
+        </a>
+        <button
+          onClick={props.saveThermostatDevice}
+          class={cx('btn', 'btn-success', 'ml-2', { 'btn-loading': saving })}
+        >
+          <Text id="integration.thermostat.edit.saveButton" /> <i class="fe fe-save" />
+        </button>
       </div>
     </div>
   );
