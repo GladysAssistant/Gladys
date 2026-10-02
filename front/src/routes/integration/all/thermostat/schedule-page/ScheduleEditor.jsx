@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import style from './style.css';
+import stickyStyle from '../stickyActions.css';
 import PRESET_COLORS from '../../../../../utils/thermostatPresetColors';
 import {
   timeToMinutes,
@@ -1077,31 +1078,36 @@ class ScheduleEditor extends Component {
           )}
 
           {this.renderError(error)}
+        </div>
 
-          {/* Saving an empty schedule turns this row into the question itself: the
+        {/* The same bar as the thermostat form: seven foldable days push Save well
+            below the fold, so it follows the page down and settles at the end of
+            the editor. Outside the card body, which is what the sticky position
+            sticks to.
+
+            Saving an empty schedule turns the row into the question itself: the
             button says what the second press will do, and the way out is to go
             back and add a slot rather than to leave the editor. Repeating "Save"
             gave no sign that the press meant something else this time. */}
-          {error === 'empty-schedule' ? (
-            <div class={style.editorActions}>
-              <button type="button" class="btn btn-warning" onClick={this.save} disabled={saving}>
-                <Text id="integration.thermostat.schedule.saveEmptyButton" />
-              </button>
-              <button type="button" class="btn btn-secondary ml-2" onClick={this.backToEditing}>
-                <Text id="integration.thermostat.schedule.backToEditingButton" />
-              </button>
-            </div>
-          ) : (
-            <div class={style.editorActions}>
-              <button type="button" class="btn btn-primary" onClick={this.save} disabled={saving || !name.trim()}>
-                <Text id="integration.thermostat.schedule.saveButton" />
-              </button>
-              <button type="button" class="btn btn-secondary ml-2" onClick={onCancel}>
-                <Text id="integration.thermostat.schedule.cancelButton" />
-              </button>
-            </div>
-          )}
-        </div>
+        {error === 'empty-schedule' ? (
+          <div class={stickyStyle.stickyActions}>
+            <button type="button" class="btn btn-secondary" onClick={this.backToEditing}>
+              <Text id="integration.thermostat.schedule.backToEditingButton" /> <i class="fe fe-corner-up-left" />
+            </button>
+            <button type="button" class="btn btn-warning ml-2" onClick={this.save} disabled={saving}>
+              <Text id="integration.thermostat.schedule.saveEmptyButton" /> <i class="fe fe-save" />
+            </button>
+          </div>
+        ) : (
+          <div class={stickyStyle.stickyActions}>
+            <button type="button" class="btn btn-secondary" onClick={onCancel}>
+              <Text id="integration.thermostat.schedule.cancelButton" /> <i class="fe fe-slash" />
+            </button>
+            <button type="button" class="btn btn-primary ml-2" onClick={this.save} disabled={saving || !name.trim()}>
+              <Text id="integration.thermostat.schedule.saveButton" /> <i class="fe fe-save" />
+            </button>
+          </div>
+        )}
       </div>
     );
   }

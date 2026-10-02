@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
+import stickyStyle from '../stickyActions.css';
 import { getPresetColor } from '../../../../../utils/thermostatPresetColors';
 import { DEVICE_FEATURE_UNITS } from '../../../../../../../server/utils/constants';
 
@@ -825,7 +826,7 @@ const EditForm = ({ ...props }) => {
 
           A real thermostat's form runs about three and a half screens, so Save sat
           below the fold the whole time it was being filled in. */}
-      <div class={style.formActions}>
+      <div class={stickyStyle.stickyActions}>
         <a href="/dashboard/integration/device/thermostat" class="btn btn-secondary">
           <Text id="integration.thermostat.edit.cancelButton" /> <i class="fe fe-slash" />
         </a>
