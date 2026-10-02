@@ -16,6 +16,7 @@ const { userLeft } = require('./house.userLeft');
 const { userSeen } = require('./house.userSeen');
 const { getBySelector } = require('./house.getBySelector');
 const { getSunState } = require('./house.getSunState');
+const { getMoonState } = require('./house.getMoonState');
 
 const House = function House(event, stateManager, session, variable) {
   this.event = event;
@@ -45,5 +46,6 @@ House.prototype.userLeft = userLeft;
 House.prototype.userSeen = userSeen;
 House.prototype.getBySelector = getBySelector;
 House.prototype.getSunState = getSunState;
+House.prototype.getMoonState = getMoonState;
 
 module.exports = House;
