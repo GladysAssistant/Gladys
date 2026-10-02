@@ -1,3 +1,4 @@
+const { EventEmitter } = require('events');
 const { expect } = require('chai');
 const Promise = require('bluebird');
 const sinon = require('sinon').createSandbox();
@@ -124,11 +125,16 @@ describe('broadlink.poll', () => {
 
   it('should stop waiting for a device which does not answer', async () => {
     const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    // node-broadlink requests wait for the device answer on the device socket, forever
+    const socket = new EventEmitter();
+    const broadlinkDevice = { name: 'device', socket };
     const deviceMapper = {
-      // node-broadlink requests never settle when the device does not answer
-      poll: fake.returns(new Promise(() => {})),
+      poll: fake(() => {
+        socket.once('message', () => {});
+        return new Promise(() => {});
+      }),
     };
-    broadlinkHandler.getDevice = fake.resolves({ name: 'device' });
+    broadlinkHandler.getDevice = fake.resolves(broadlinkDevice);
     broadlinkHandler.loadMapper = fake.returns(deviceMapper);
 
     const device = {
@@ -148,7 +154,36 @@ describe('broadlink.poll', () => {
     await clock.tickAsync(POLL_TIMEOUT);
     await polling;
 
-    assert.calledOnceWithExactly(deviceMapper.poll, { name: 'device' }, device);
+    assert.calledOnceWithExactly(deviceMapper.poll, broadlinkDevice, device);
+    expect(socket.listenerCount('message')).to.eq(0);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should keep pending requests on polling error', async () => {
+    const socket = new EventEmitter();
+    const broadlinkDevice = { name: 'device', socket };
+    const deviceMapper = {
+      poll: fake(() => {
+        socket.once('message', () => {});
+        return Promise.reject(new Error('polling error'));
+      }),
+    };
+    broadlinkHandler.getDevice = fake.resolves(broadlinkDevice);
+    broadlinkHandler.loadMapper = fake.returns(deviceMapper);
+
+    const device = {
+      external_id: 'externalId',
+      params: [
+        {
+          name: 'peripheral',
+          value: 'mac',
+        },
+      ],
+    };
+
+    await expect(broadlinkHandler.poll(device)).to.be.rejectedWith(Error, 'polling error');
+
+    expect(socket.listenerCount('message')).to.eq(1);
     assert.notCalled(gladys.event.emit);
   });
 });

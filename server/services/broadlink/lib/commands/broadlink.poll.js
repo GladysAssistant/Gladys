@@ -32,11 +32,21 @@ async function poll(device) {
   }
 
   logger.debug(`Broadlink polling ${device.external_id}...`);
-  // an unreachable device must not block the devices polled after it
-  const messages = await Promise.resolve(deviceMapper.poll(broadlinkDevice, device)).timeout(
-    POLL_TIMEOUT,
-    `Broadlink device ${device.external_id} did not answer to polling`,
-  );
+  let messages;
+  try {
+    // an unreachable device must not block the devices polled after it
+    messages = await Promise.resolve(deviceMapper.poll(broadlinkDevice, device)).timeout(
+      POLL_TIMEOUT,
+      `Broadlink device ${device.external_id} did not answer to polling`,
+    );
+  } catch (e) {
+    if (e instanceof Promise.TimeoutError) {
+      // node-broadlink waits for the answer forever: drop the requests left pending on the device socket,
+      // otherwise each poll of an unreachable device adds one more listener
+      broadlinkDevice.socket.removeAllListeners('message');
+    }
+    throw e;
+  }
 
   messages.forEach((message) => {
     logger.debug(`Broadlink polled ${message.device_feature_external_id}, new value = ${message.state}`);
