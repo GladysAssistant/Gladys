@@ -27,7 +27,8 @@ const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
-const EnergyPrice = require('../../../lib/energy-price');
+const EnergyContract = require('../../../lib/energy-contract');
+const { TEMPO_CALENDAR } = require('../../../lib/energy-contract/templates/internal');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -36,13 +37,18 @@ const brain = {
   addNamedEntity: fake.returns(null),
   removeNamedEntity: fake.returns(null),
 };
+const variables = { [SYSTEM_VARIABLE_NAMES.TIMEZONE]: 'Europe/Paris' };
 const variable = {
-  getValue: (name) => {
-    if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
-      return 'Europe/Paris';
-    }
+  getValue: async (name) => (variables[name] === undefined ? null : variables[name]),
+  setValue: async (name, value) => {
+    variables[name] = value;
     return null;
   },
+};
+// The legacy price rows of this test are written directly, as the previous versions of
+// Gladys stored them: the migration of section 9 converts them into a contract.
+const legacyPrices = {
+  create: async (data) => db.EnergyPrice.create(data),
 };
 
 describe('EnergyMonitoring.calculateCostFrom', function Describe() {
@@ -50,7 +56,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
   let stateManager;
   let serviceManager;
   let device;
-  let energyPrice;
+  let energyContract;
   let electricalMeterDevice;
   let gladys;
 
@@ -281,11 +287,14 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
     device = new Device(event, {}, stateManager, serviceManager, {}, variable, job, brain);
-    energyPrice = new EnergyPrice();
+    delete variables.ENERGY_CONTRACT_MIGRATION_DONE;
+    energyContract = new EnergyContract(event, stateManager, serviceManager, device, variable);
+    energyContract.getCommunityTemplates = fake.rejects(new Error('offline'));
     gladys = {
       variable,
       device,
-      energyPrice,
+      energyContract,
+      event,
       gateway: {
         getEdfTempoHistorical: fake.resolves(historicalTempoData),
       },
@@ -294,6 +303,15 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
         wrapper: (name, func) => func,
       },
     };
+    // the tempo calendar, as the edf-tempo service publishes it
+    await energyContract.declareCalendar(TEMPO_CALENDAR, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await energyContract.publishCalendarEntries(
+      'tempo',
+      historicalTempoData
+        .filter((day) => day.created_at >= '2024-01-01')
+        .map((day) => ({ date: day.created_at, value: day.day_type })),
+      { provider_service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279', skip_recalculation: true },
+    );
     // We create a new electrical meter device
     electricalMeterDevice = await device.create({
       id: 'd1fe2ab9-8c50-4053-ac40-83421f899c59',
@@ -331,8 +349,15 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
       ],
     });
   });
-  it('should calculate cost from a specific date for a edf-tempo contract', async () => {
-    await importAllTempoPricesFromCsv(electricalMeterDevice.id, energyPrice);
+  it('should calculate cost from a specific date for a migrated edf-tempo contract', async () => {
+    await importAllTempoPricesFromCsv(electricalMeterDevice.id, legacyPrices);
+    const migrated = await energyContract.migrateFromEnergyPrice();
+    // one contract per validity period of the price rows
+    expect(migrated.length).to.be.at.least(1);
+    migrated.forEach((contract) => {
+      expect(contract.tariff.calendars).to.deep.equal(['tempo']);
+      expect(contract.timezone).to.equal('Europe/Paris');
+    });
     await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
       {
         value: 10,
@@ -375,16 +400,13 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
       dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
     );
     expect(deviceFeatureState).to.have.lengthOf(6);
-    expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.1568);
-    expect(deviceFeatureState[1]).to.have.property('value', 10 * 0.7562);
-    expect(deviceFeatureState[2]).to.have.property('value', 10 * 0.1894);
-    expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1486);
-    expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1609);
-    expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1296);
+    // the engine rounds every cost to 6 decimals
+    expect(deviceFeatureState.map((s) => s.value)).to.deep.equal([1.568, 7.562, 1.894, 1.486, 1.609, 1.296]);
   });
 
   it.skip('should calculate cost from Pierre-Gilles dataset', async () => {
-    await importAllTempoPricesFromCsv(electricalMeterDevice.id, energyPrice);
+    await importAllTempoPricesFromCsv(electricalMeterDevice.id, legacyPrices);
+    await energyContract.migrateFromEnergyPrice();
     // Load real user data from CSV and insert ALL states
     const csvPathPg = path.join(__dirname, 'data', 'consumption_tempo_test.csv');
     const csvContentPg = fs.readFileSync(csvPathPg, 'utf8');
