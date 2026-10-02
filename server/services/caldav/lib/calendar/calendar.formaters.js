@@ -18,7 +18,7 @@ function getPropertyValue(property) {
 // Some CalDAV servers (iCloud for instance) send fixed offset timezones such as
 // "GMT+1100" or "UTC+02:00" instead of an IANA timezone name. Intl.DateTimeFormat
 // (used under the hood by dayjs.tz) only accepts IANA names and throws on those.
-const FIXED_OFFSET_TIMEZONE_REGEX = /^(?:GMT|UTC)([+-])(\d{2}):?(\d{2})$/;
+const FIXED_OFFSET_TIMEZONE_REGEX = /^(?:GMT|UTC)([+-]\d{2}):?(\d{2})$/;
 
 /**
  * @description Convert a CalDAV date to a dayjs date in the event timezone.
@@ -30,10 +30,17 @@ const FIXED_OFFSET_TIMEZONE_REGEX = /^(?:GMT|UTC)([+-])(\d{2}):?(\d{2})$/;
  * toTimezone(dayjs, new Date(), 'GMT+1100')
  */
 function toTimezone(dayjs, date, tz) {
-  const localDate = dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
+  const parsedDate = dayjs(date);
+  // An unparseable date must not be saved as "Invalid Date": throw so that the event is skipped.
+  if (!parsedDate.isValid()) {
+    throw new Error(`Invalid date "${date}"`);
+  }
+  const localDate = parsedDate.format('YYYY-MM-DDTHH:mm:ss');
   const fixedOffset = FIXED_OFFSET_TIMEZONE_REGEX.exec(tz || '');
   if (fixedOffset) {
-    return dayjs(`${localDate}${fixedOffset[1]}${fixedOffset[2]}:${fixedOffset[3]}`);
+    // Keep the wall clock time and only set the offset, exactly like dayjs.tz() does:
+    // formatRecurringEvents relies on that to compute the occurrences.
+    return dayjs(localDate).utcOffset(`${fixedOffset[1]}:${fixedOffset[2]}`, true);
   }
   try {
     return dayjs.tz(localDate, tz);
@@ -170,11 +177,12 @@ function formatRecurringEvents(event, gladysCalendar) {
  * @description Format events for Gladys calendar compatibility.
  * @param {Array} caldavEvents - Events to format.
  * @param {object} gladysCalendar - Gladys calendar where events are saved.
+ * @param {Array} [failedEvents] - Filled with the CalDAV events that could not be formatted and were skipped.
  * @returns {Array} All events formatted.
  * @example
  * formatEvents(caldavEvents, gladysCalendar)
  */
-function formatEvents(caldavEvents, gladysCalendar) {
+function formatEvents(caldavEvents, gladysCalendar, failedEvents = []) {
   let events = [];
 
   caldavEvents.forEach((caldavEvent) => {
@@ -229,6 +237,7 @@ function formatEvents(caldavEvents, gladysCalendar) {
       }
     } catch (e) {
       logger.warn(`CalDAV: unable to format event "${caldavEvent.uid}", skipping it. ${e.message}`);
+      failedEvents.push(caldavEvent);
     }
   });
 
