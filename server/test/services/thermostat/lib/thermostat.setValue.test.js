@@ -300,7 +300,8 @@ describe('thermostat.setValue', () => {
 
       await handler.setValue(externalDevice(), presetFeature, THERMOSTAT_PRESET.COMFORT);
 
-      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('69.8');
+      // 69.8 rounded to the whole degree a Fahrenheit device displays.
+      expect(paramCall(handler, 'THERMOSTAT_MANUAL_SETPOINT').args[2]).to.equal('70');
     });
 
     it('should leave a preset setpoint alone when both units agree', async () => {

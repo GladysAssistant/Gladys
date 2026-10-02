@@ -51,6 +51,11 @@ const DEFAULT_TIMEZONE = 'Europe/Paris';
  * the presets are configured in, while the real device's setpoint feature has a
  * unit of its own. Picking Comfort at 21 °C on a Fahrenheit feature must write
  * 70 °F, not 21 °F.
+ *
+ * The result is rounded to what a device in that unit displays: a whole degree
+ * Fahrenheit, half a degree Celsius. 21 °C is 69.8 °F, and a device that echoes
+ * back 70 would never equal it: every pass would re-write the setpoint, and the
+ * echo would look like a change made on the device and arm a hold.
  * @param {number} setpoint - The setpoint, in the thermostat's unit.
  * @param {string} thermostatUnit - The thermostat's unit, 'C' or 'F'.
  * @param {string} featureUnit - The unit of the feature written on.
@@ -60,10 +65,10 @@ const DEFAULT_TIMEZONE = 'Europe/Paris';
  */
 function convertSetpointToFeatureUnit(setpoint, thermostatUnit, featureUnit) {
   if (featureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && thermostatUnit === 'C') {
-    return celsiusToFahrenheit(setpoint);
+    return Math.round(celsiusToFahrenheit(setpoint));
   }
   if (featureUnit === DEVICE_FEATURE_UNITS.CELSIUS && thermostatUnit === 'F') {
-    return fahrenheitToCelsius(setpoint);
+    return Math.round(fahrenheitToCelsius(setpoint) * 2) / 2;
   }
   return setpoint;
 }
@@ -106,6 +111,14 @@ async function writeExternalSetpoint(gladys, targetSelector, setpoint, thermosta
     // again would command 158 °F for a 70 °F hold, or -6 °C for a 21 °C one.
     if (thermostatUnit !== null) {
       value = convertSetpointToFeatureUnit(setpoint, thermostatUnit, featureUnit);
+    }
+    // A device that declares a step only takes multiples of it, and echoes back
+    // the multiple it settled on: the value is snapped first, or the comparison
+    // below would never match and the setpoint would be re-written every pass.
+    // Rounded again after the division, which leaves 20.000000000000004 behind.
+    const step = toNumber(found.feature.step, null);
+    if (step !== null && step > 0) {
+      value = Number((Math.round(value / step) * step).toFixed(6));
     }
     // The real device advertises the range it accepts. Netatmo says 5-30,
     // Zigbee 5-40, Matter -100-200: writing outside it is rejected by the
@@ -479,11 +492,20 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext)
  * @param {number} currentMinutes - Current time in minutes since midnight.
  * @param {string} [serviceId] - This service's id, used to scope the runtime variables.
  * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote.
+ * @param {Map<string, string>} [announced] - The programme preset last announced for each thermostat.
  * @returns {Promise<void>}
  * @example
  * await regulateDevice(gladys, device, 0, 480, serviceId);
  */
-async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, serviceId = null, selfWritten = null) {
+async function regulateDevice(
+  gladys,
+  device,
+  dayOfWeek,
+  currentMinutes,
+  serviceId = null,
+  selfWritten = null,
+  announced = null,
+) {
   const config = getDeviceConfig(device);
   if (!config) {
     logger.warn(`Thermostat schedule: no config found for device "${device && device.name}"`);
@@ -713,13 +735,29 @@ async function regulateDevice(gladys, device, dayOfWeek, currentMinutes, service
   // thermostat would stay frozen on the first point it ever applied. What the
   // programme currently means is already served by the schedule's `current`,
   // which is what the widget reads.
-  if (currentPreset !== targetPreset || manualJustExpired) {
-    if (fromProgramme) {
+  //
+  // While the feature reads `schedule`, it never equals the resolved preset, so
+  // that comparison alone announced — and logged — the same preset every minute
+  // for every thermostat on a programme. What was last announced is kept per
+  // thermostat instead, and only a change of the point in force is pushed.
+  if (fromProgramme) {
+    const alreadyAnnounced = announced && announced.get(device.selector) === targetPreset;
+    if (!alreadyAnnounced || manualJustExpired) {
       announcePreset.call({ gladys }, device, targetPreset);
-    } else {
-      await savePreset.call({ gladys }, device, targetPreset, manualJustExpired);
+      if (announced) {
+        announced.set(device.selector, targetPreset);
+      }
+      logger.info(`Thermostat schedule: preset "${targetPreset}" applied to ${selector}`);
     }
-    logger.info(`Thermostat schedule: preset "${targetPreset}" applied to ${selector}`);
+  } else {
+    // Off the programme: the next time it is followed, its point is new again.
+    if (announced) {
+      announced.delete(device.selector);
+    }
+    if (currentPreset !== targetPreset || manualJustExpired) {
+      await savePreset.call({ gladys }, device, targetPreset, manualJustExpired);
+      logger.info(`Thermostat schedule: preset "${targetPreset}" applied to ${selector}`);
+    }
   }
 
   if (external) {
@@ -843,8 +881,16 @@ async function applySchedules() {
     await Promise.all(
       thermostatDevices.map(async (device) => {
         try {
-          const { serviceId, selfWrittenSetpoints } = this;
-          await regulateDevice(this.gladys, device, dayOfWeek, currentMinutes, serviceId, selfWrittenSetpoints);
+          const { serviceId, selfWrittenSetpoints, announcedPresets } = this;
+          await regulateDevice(
+            this.gladys,
+            device,
+            dayOfWeek,
+            currentMinutes,
+            serviceId,
+            selfWrittenSetpoints,
+            announcedPresets,
+          );
         } catch (e) {
           logger.warn(`Thermostat schedule: Failed to regulate device: ${e.message}`);
         }

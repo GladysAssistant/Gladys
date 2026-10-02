@@ -49,6 +49,9 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // setpoint the schedule had already set, and without this map that unchanged
   // value would be taken for someone turning the dial (section D).
   this.observedSetpoints = new Map();
+  // The programme preset last announced to the dashboards, by thermostat
+  // selector: the minute loop pushes one only when the point in force changes.
+  this.announcedPresets = new Map();
 };
 
 ThermostatHandler.prototype.createDevice = createDevice;

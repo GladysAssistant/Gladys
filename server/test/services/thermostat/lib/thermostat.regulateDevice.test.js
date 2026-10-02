@@ -895,6 +895,56 @@ describe('thermostat.regulateDevice - resilience', () => {
     expect(switchWrites).to.deep.equal([1, 1]);
   });
 
+  // While the feature reads `schedule` it never equals the resolved preset, so
+  // without a memory of what was announced, every pass pushed — and logged — the
+  // same preset for every thermostat on a programme.
+  const presetEvents = (gladys) =>
+    gladys.event.emit
+      .getCalls()
+      .map((call) => call.args[1])
+      .filter((payload) => payload && payload.payload && payload.payload.preset)
+      .map((payload) => payload.payload.preset);
+
+  const programmeDevice = (preset = 'schedule') => ({
+    id: 'device-id',
+    selector: 'living-room',
+    features: [setpointFeature(), presetFeature(preset)],
+    params: baseParams({ THERMOSTAT_PRESET_ECO: '18' }),
+  });
+
+  it('should announce the programme preset once, not on every pass', async () => {
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const announced = new Map();
+    const device = programmeDevice();
+
+    await mod.regulateDevice(gladys, device, todayDow, 12 * 60, null, null, announced);
+    await mod.regulateDevice(gladys, device, todayDow, 12 * 60, null, null, announced);
+
+    expect(presetEvents(gladys)).to.deep.equal(['eco']);
+    expect(announced.get('living-room')).to.equal('eco');
+  });
+
+  it('should announce again when the point in force changes', async () => {
+    const mod = load(fullDaySchedule('eco'));
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const announced = new Map([['living-room', 'comfort']]);
+
+    await mod.regulateDevice(gladys, programmeDevice(), todayDow, 12 * 60, null, null, announced);
+
+    expect(presetEvents(gladys)).to.deep.equal(['eco']);
+  });
+
+  it('should forget the announced preset once the thermostat leaves its programme', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
+    const announced = new Map([['living-room', 'eco']]);
+
+    await mod.regulateDevice(gladys, programmeDevice('comfort'), todayDow, 12 * 60, null, null, announced);
+
+    expect(announced.has('living-room')).to.equal(false);
+  });
+
   it('should store a preset that the user chose rather than the programme', async () => {
     // The counterpart: with no programme point to resolve, the preset the device
     // carries is a decision, and it is persisted as one.

@@ -221,6 +221,51 @@ describe('thermostat.writeExternalSetpoint', () => {
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(20);
   });
 
+  // 21 °C is 69.8 °F: a device echoing back 70 would never equal it, and the
+  // setpoint would be re-written — and its echo taken for a hold — every pass.
+  it('should round a celsius setpoint to a whole fahrenheit degree', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({
+      features: { 'netatmo-setpoint': targetFeature({ unit: DEVICE_FEATURE_UNITS.FAHRENHEIT }) },
+    });
+
+    await mod.writeExternalSetpoint(gladys, 'netatmo-setpoint', 21, 'C', 'test');
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(70);
+  });
+
+  it('should round a fahrenheit setpoint to half a celsius degree', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({
+      features: { 'netatmo-setpoint': targetFeature({ unit: DEVICE_FEATURE_UNITS.CELSIUS }) },
+    });
+
+    // 70 °F is 21.11 °C.
+    await mod.writeExternalSetpoint(gladys, 'netatmo-setpoint', 70, 'F', 'test');
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(21);
+  });
+
+  it('should snap the setpoint to the step the device declares', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ features: { 'netatmo-setpoint': targetFeature({ step: 0.5 }) } });
+
+    await mod.writeExternalSetpoint(gladys, 'netatmo-setpoint', 19.3, null, 'test');
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(19.5);
+  });
+
+  it('should skip the write once the snapped value is what the device reports', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({
+      features: { 'netatmo-setpoint': targetFeature({ step: 1, last_value: 20 }) },
+    });
+
+    await mod.writeExternalSetpoint(gladys, 'netatmo-setpoint', 20.2, null, 'test');
+
+    expect(gladys.device.setValue.called).to.equal(false);
+  });
+
   // The real device advertises the range it accepts: Netatmo says 5-30, Zigbee
   // 5-40, Matter -100-200. Writing outside it is rejected or silently clamped.
   it('should clamp to the device minimum', async () => {
