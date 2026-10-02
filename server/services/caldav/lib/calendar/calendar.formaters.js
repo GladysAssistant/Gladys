@@ -1,5 +1,20 @@
 const logger = require('../../../../utils/logger');
 
+/**
+ * @description Get the text value of an iCal property. When a property has parameters
+ * (e.g. SUMMARY;LANGUAGE=en-US:My event), ical returns an object { params, val }.
+ * @param {string|object} property - The iCal property.
+ * @returns {string} The property value.
+ * @example
+ * getPropertyValue({ params: { LANGUAGE: 'en-US' }, val: 'My event' })
+ */
+function getPropertyValue(property) {
+  if (property !== null && typeof property === 'object') {
+    return property.val;
+  }
+  return property;
+}
+
 // Some CalDAV servers (iCloud for instance) send fixed offset timezones such as
 // "GMT+1100" or "UTC+02:00" instead of an IANA timezone name. Intl.DateTimeFormat
 // (used under the hood by dayjs.tz) only accepts IANA names and throws on those.
@@ -108,7 +123,7 @@ function formatRecurringEvents(event, gladysCalendar) {
     }
 
     // Set the the title and the end date from either the regular event or the recurrence override.
-    const recurrenceTitle = curEvent.summary;
+    const recurrenceTitle = getPropertyValue(curEvent.summary);
     endDate = toTimezone(this.dayjs, this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x'), tz);
 
     // If this recurrence ends before the start of the date range, or starts after the end of the date range,
@@ -122,8 +137,8 @@ function formatRecurringEvents(event, gladysCalendar) {
         external_id: `${event.uid}${startDate.format('YYYY-MM-DD-HH-mm')}`,
         selector: `${event.uid}${startDate.format('YYYY-MM-DD-HH-mm')}`,
         name: recurrenceTitle,
-        location: event.location,
-        description: event.description,
+        location: getPropertyValue(event.location),
+        description: getPropertyValue(event.description),
         url: event.href,
         calendar_id: gladysCalendar.id,
       };
@@ -172,9 +187,9 @@ function formatEvents(caldavEvents, gladysCalendar) {
         const newEvent = {
           external_id: caldavEvent.uid,
           selector: caldavEvent.uid,
-          name: caldavEvent.summary,
-          location: caldavEvent.location,
-          description: caldavEvent.description,
+          name: getPropertyValue(caldavEvent.summary),
+          location: getPropertyValue(caldavEvent.location),
+          description: getPropertyValue(caldavEvent.description),
           url: caldavEvent.href,
           calendar_id: gladysCalendar.id,
         };
