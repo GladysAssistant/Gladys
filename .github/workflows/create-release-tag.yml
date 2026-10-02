@@ -11,8 +11,8 @@ name: Create release tag
 #     create, move or delete one), and GitHub Actions cannot be a bypass actor
 #     of a ruleset, while a deploy key can;
 #   - a tag pushed by a deploy key triggers the workflows listening on
-#     `push: tags` (the production images, the demo website, the apidoc),
-#     which a tag pushed by GITHUB_TOKEN never does.
+#     `push: tags` (the production images and the GitHub release, the demo
+#     website, the apidoc), which a tag pushed by GITHUB_TOKEN never does.
 # The private key lives in the `production` environment: only a job running on
 # master or on a v* tag can read it (see .github/MAINTAINERS.md).
 on:
@@ -107,5 +107,5 @@ jobs:
             echo "### 🚀 Release ${TAG} created"
             echo ""
             echo "- Tag: [\`${TAG}\`](${REPO_URL}/releases/tag/${TAG})"
-            echo "- The push of the tag started the release workflows: production images, demo website, apidoc"
+            echo "- The push of the tag started the release workflows: production images, then the GitHub release, demo website, apidoc"
           } >> "$GITHUB_STEP_SUMMARY"

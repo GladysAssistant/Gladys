@@ -234,12 +234,60 @@ jobs:
         # --fail-with-body turns an error answer of Cloudflare (an invalid or
         # deleted hook, for instance) into a failed job instead of a green one.
         run: curl --silent --show-error --fail-with-body -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${DEPLOY_HOOK}"
+  github-release:
+    name: Create the GitHub release
+    # Published once the production images are pushed: whoever is notified of
+    # the release (the watchers of the repository, the version published to
+    # Gladys Plus below) must be able to upgrade right away.
+    needs: docker
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    # Creating a release on the existing tag does not touch the tag itself, so
+    # the GITHUB_TOKEN is enough despite the tag ruleset. A release created by
+    # the GITHUB_TOKEN starts no workflow listening on `release` (there is
+    # none in this repository), but the repository webhooks still fire.
+    permissions:
+      contents: write
+    steps:
+      - name: 📝 Create the release with generated notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # A re-run on the same tag, or a release already written by hand,
+          # is left untouched.
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "Release ${TAG} already exists, nothing to do."
+            echo "- GitHub release [\`${TAG}\`](${GITHUB_SERVER_URL}/${GH_REPO}/releases/tag/${TAG}) already existed" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # Pre-release tags (v5.1.0-rc.1) are published as pre-releases, which
+          # never become the "Latest" release, just as they never move the
+          # `latest` image.
+          PRERELEASE=false
+          case "${TAG}" in
+            *-*) PRERELEASE=true ;;
+          esac
+          # Same result as "Generate release notes" in the GitHub interface:
+          # the merged pull requests since the previous release, their
+          # authors, the new contributors and the full changelog link.
+          gh release create "${TAG}" \
+            --verify-tag \
+            --title "${TAG}" \
+            --generate-notes \
+            --prerelease="${PRERELEASE}"
+          echo "- GitHub release [\`${TAG}\`](${GITHUB_SERVER_URL}/${GH_REPO}/releases/tag/${TAG}) created" >> "$GITHUB_STEP_SUMMARY"
   publish-gladys-version:
     name: Publish the version to Gladys Plus
     # Runs once the production images are pushed: as soon as the version is
     # published, the Gladys Plus backend tells every instance that it is the
-    # latest one, so the images it points to must already be available.
-    needs: docker
+    # latest one, so the images it points to must already be available, and
+    # so must the GitHub release its release note link points to.
+    needs:
+      - docker
+      - github-release
     # Pre-release tags (v5.1.0-rc.1) are built above, but they never move
     # `latest`, so they must not become the version every instance is
     # invited to upgrade to.

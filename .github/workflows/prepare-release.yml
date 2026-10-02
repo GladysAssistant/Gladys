@@ -109,4 +109,6 @@ jobs:
             echo ""
             echo "Once it is merged, the \`Create release tag\` workflow tags \`${TAG}\` on"
             echo "master and starts the production images, demo website and apidoc builds."
+            echo "The GitHub release, with its generated notes, is created as soon as the"
+            echo "production images are pushed."
           } >> "$GITHUB_STEP_SUMMARY"
