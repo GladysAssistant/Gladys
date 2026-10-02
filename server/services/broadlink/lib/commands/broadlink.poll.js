@@ -5,6 +5,46 @@ const logger = require('../../../../utils/logger');
 const { PARAMS, POLL_TIMEOUT } = require('../utils/broadlink.constants');
 
 /**
+ * @description Runs the device mapper poll, with a timeout.
+ * The node-broadlink library waits for a device answer forever, with a listener on the device socket. When the poll
+ * times out, only the listeners of the requests sent by this poll are removed: a switch command sent at the same time
+ * keeps waiting for its answer.
+ * @param {object} deviceMapper - Device mapper.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @param {object} device - Gladys device.
+ * @returns {Promise<Array>} Resolve with messages to emit.
+ * @example
+ * await pollWithTimeout(deviceMapper, broadlinkDevice, device);
+ */
+async function pollWithTimeout(deviceMapper, broadlinkDevice, device) {
+  const { socket } = broadlinkDevice;
+  const pollListeners = [];
+  // the same device, keeping track of the socket listener added by each request of this poll
+  const polledDevice = Object.create(broadlinkDevice, {
+    sendPacket: {
+      value: (...args) => {
+        const request = broadlinkDevice.sendPacket(...args);
+        pollListeners.push(socket.rawListeners('message').pop());
+        return request;
+      },
+    },
+  });
+
+  try {
+    // an unreachable device must not block the devices polled after it
+    return await Promise.resolve(deviceMapper.poll(polledDevice, device)).timeout(
+      POLL_TIMEOUT,
+      `Broadlink device ${device.external_id} did not answer to polling`,
+    );
+  } catch (e) {
+    if (e instanceof Promise.TimeoutError) {
+      pollListeners.forEach((listener) => socket.removeListener('message', listener));
+    }
+    throw e;
+  }
+}
+
+/**
  * @description Poll device feature values.
  * @param {object} device - Gladys device.
  * @example
@@ -32,21 +72,7 @@ async function poll(device) {
   }
 
   logger.debug(`Broadlink polling ${device.external_id}...`);
-  let messages;
-  try {
-    // an unreachable device must not block the devices polled after it
-    messages = await Promise.resolve(deviceMapper.poll(broadlinkDevice, device)).timeout(
-      POLL_TIMEOUT,
-      `Broadlink device ${device.external_id} did not answer to polling`,
-    );
-  } catch (e) {
-    if (e instanceof Promise.TimeoutError) {
-      // node-broadlink waits for the answer forever: drop the requests left pending on the device socket,
-      // otherwise each poll of an unreachable device adds one more listener
-      broadlinkDevice.socket.removeAllListeners('message');
-    }
-    throw e;
-  }
+  const messages = await pollWithTimeout(deviceMapper, broadlinkDevice, device);
 
   messages.forEach((message) => {
     logger.debug(`Broadlink polled ${message.device_feature_external_id}, new value = ${message.state}`);

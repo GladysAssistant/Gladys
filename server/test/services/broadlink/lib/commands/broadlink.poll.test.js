@@ -5,6 +5,7 @@ const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 const BroadlinkHandler = require('../../../../../services/broadlink/lib');
+const switchMapper = require('../../../../../services/broadlink/lib/commands/features/broadlink.switch');
 const { BadParameters } = require('../../../../../utils/coreErrors');
 const { POLL_TIMEOUT } = require('../../../../../services/broadlink/lib/utils/broadlink.constants');
 
@@ -119,24 +120,28 @@ describe('broadlink.poll', () => {
 
     assert.calledOnceWithExactly(broadlinkHandler.getDevice, 'mac');
     assert.calledOnceWithExactly(broadlinkHandler.loadMapper, { name: 'device' });
-    assert.calledOnceWithExactly(deviceMapper.poll, { name: 'device' }, device);
+    assert.calledOnce(deviceMapper.poll);
+    const [polledDevice, polledGladysDevice] = deviceMapper.poll.firstCall.args;
+    expect(polledDevice.name).to.eq('device');
+    expect(polledGladysDevice).to.eq(device);
     assert.calledOnceWithExactly(gladys.event.emit, 'device.new-state', message);
   });
 
-  it('should stop waiting for a device which does not answer', async () => {
+  it('should stop waiting for a device which does not answer, keeping concurrent commands', async () => {
     const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const broadlinkDevice = new switchMapper.deviceClasses.Sp4(
+      { address: '127.0.0.1', port: 80 },
+      [1, 2, 3, 4, 5, 6],
+      0x7579,
+    );
+    broadlinkDevice.socket.close();
     // node-broadlink requests wait for the device answer on the device socket, forever
-    const socket = new EventEmitter();
-    const broadlinkDevice = { name: 'device', socket };
-    const deviceMapper = {
-      poll: fake(() => {
-        socket.once('message', () => {});
-        return new Promise(() => {});
-      }),
-    };
+    broadlinkDevice.socket = new EventEmitter();
+    broadlinkDevice.socket.send = fake.returns(null);
     broadlinkHandler.getDevice = fake.resolves(broadlinkDevice);
-    broadlinkHandler.loadMapper = fake.returns(deviceMapper);
+    broadlinkHandler.loadMapper = fake.returns(switchMapper);
 
+    const switchFeature = { external_id: 'broadlink:mac:switch:1', category: 'switch' };
     const device = {
       external_id: 'externalId',
       params: [
@@ -145,26 +150,48 @@ describe('broadlink.poll', () => {
           value: 'mac',
         },
       ],
+      features: [switchFeature],
     };
 
     const polling = expect(broadlinkHandler.poll(device)).to.be.rejectedWith(
       Promise.TimeoutError,
       'Broadlink device externalId did not answer to polling',
     );
-    await clock.tickAsync(POLL_TIMEOUT);
+    await clock.tickAsync(POLL_TIMEOUT - 1);
+    // a switch command is sent just before the poll times out
+    const command = switchMapper.setValue(broadlinkDevice, device, switchFeature, 1);
+    expect(broadlinkDevice.socket.listenerCount('message')).to.eq(2);
+    await clock.tickAsync(1);
     await polling;
 
-    assert.calledOnceWithExactly(deviceMapper.poll, broadlinkDevice, device);
-    expect(socket.listenerCount('message')).to.eq(0);
+    // only the request of the poll is dropped
+    expect(broadlinkDevice.socket.listenerCount('message')).to.eq(1);
+    // the plug answers the command
+    const answer = broadlinkDevice.encode(2, { pwr: true });
+    const padding = Buffer.alloc((16 - (answer.length % 16)) % 16);
+    broadlinkDevice.socket.emit(
+      'message',
+      Buffer.concat([Buffer.alloc(0x38), broadlinkDevice.encrypt(Buffer.concat([answer, padding]))]),
+    );
+    await command;
+
+    expect(broadlinkDevice.socket.listenerCount('message')).to.eq(0);
     assert.notCalled(gladys.event.emit);
   });
 
   it('should keep pending requests on polling error', async () => {
     const socket = new EventEmitter();
-    const broadlinkDevice = { name: 'device', socket };
-    const deviceMapper = {
-      poll: fake(() => {
+    const broadlinkDevice = {
+      name: 'device',
+      socket,
+      sendPacket: fake(() => {
         socket.once('message', () => {});
+        return new Promise(() => {});
+      }),
+    };
+    const deviceMapper = {
+      poll: fake((polledDevice) => {
+        polledDevice.sendPacket(Buffer.alloc(16));
         return Promise.reject(new Error('polling error'));
       }),
     };
@@ -183,6 +210,7 @@ describe('broadlink.poll', () => {
 
     await expect(broadlinkHandler.poll(device)).to.be.rejectedWith(Error, 'polling error');
 
+    assert.calledOnce(broadlinkDevice.sendPacket);
     expect(socket.listenerCount('message')).to.eq(1);
     assert.notCalled(gladys.event.emit);
   });
