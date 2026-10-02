@@ -731,8 +731,11 @@ class ScheduleEditor extends Component {
           </span>
         </button>
         {onRemove && (
-          <button type="button" class="btn btn-sm btn-outline-danger" onClick={onRemove}>
+          <button type="button" class={cx('btn', 'btn-sm', 'btn-outline-danger', style.slotAction)} onClick={onRemove}>
             <i class="fe fe-trash-2" />
+            <span class={style.slotActionLabel}>
+              <Text id="integration.thermostat.schedule.deleteButton" />
+            </span>
           </button>
         )}
       </div>
@@ -1022,36 +1025,43 @@ class ScheduleEditor extends Component {
                             <Text id="integration.thermostat.schedule.copyTo" />
                           </button>
                         )}
+                      </div>
 
-                        {copySourceDay === day && (
-                          <div class={style.copyPicker}>
-                            <span class={style.copyPickerLabel}>
-                              <Text id="integration.thermostat.schedule.copyToLabel" />
-                            </span>
+                      {/* Under the two buttons, not beside them: opened in the same
+                          flex row, the picker squeezed "Add a slot" into a narrow
+                          pill whose label spilled out of it on a phone. */}
+                      {copySourceDay === day && (
+                        <div class={style.copyPicker}>
+                          <span class={style.copyPickerLabel}>
+                            <Text id="integration.thermostat.schedule.copyToLabel" />
+                          </span>
+                          <div class={style.copyPickerDays}>
                             {DAYS.filter(d => d !== day).map(d => (
                               <label key={d} class={style.copyPickerDay}>
                                 <input
                                   type="checkbox"
                                   checked={(copyTargetDays || []).includes(d)}
                                   onChange={() => this.toggleCopyTarget(d)}
-                                />{' '}
+                                />
                                 <Text id={`integration.thermostat.schedule.daysShort.${d}`} />
                               </label>
                             ))}
+                          </div>
+                          <div class={style.copyPickerActions}>
+                            <button type="button" class="btn btn-secondary" onClick={this.closeCopyPicker}>
+                              <Text id="integration.thermostat.schedule.cancelButton" />
+                            </button>
                             <button
                               type="button"
-                              class="btn btn-xs btn-primary ml-2"
+                              class="btn btn-primary"
                               onClick={this.applyCopy}
                               disabled={!(copyTargetDays && copyTargetDays.length > 0)}
                             >
                               <Text id="integration.thermostat.schedule.applyButton" />
                             </button>
-                            <button type="button" class="btn btn-xs btn-secondary ml-1" onClick={this.closeCopyPicker}>
-                              <Text id="integration.thermostat.schedule.cancelButton" />
-                            </button>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1103,7 +1113,7 @@ class ScheduleEditor extends Component {
             <button type="button" class="btn btn-secondary" onClick={onCancel}>
               <Text id="integration.thermostat.schedule.cancelButton" /> <i class="fe fe-slash" />
             </button>
-            <button type="button" class="btn btn-primary ml-2" onClick={this.save} disabled={saving || !name.trim()}>
+            <button type="button" class="btn btn-success ml-2" onClick={this.save} disabled={saving || !name.trim()}>
               <Text id="integration.thermostat.schedule.saveButton" /> <i class="fe fe-save" />
             </button>
           </div>

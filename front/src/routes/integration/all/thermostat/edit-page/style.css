@@ -93,7 +93,10 @@
    reaches 5.0:1 and stays the same amber.
 
    Scoped to this alert rather than fixed in the theme: that palette colours every
-   alert in Gladys, and repainting them all is not this PR's to do. */
-.vendorWarning.vendorWarning {
+   alert in Gladys, and repainting them all is not this PR's to do.
+   Matched against `.glass-theme .page .alert-warning` (0,3,0) with one class
+   more, or the theme keeps winning and the fix never reaches the screen. */
+.vendorWarning.vendorWarning,
+:global(.glass-theme .page .alert).vendorWarning {
   color: #8a5c17;
 }

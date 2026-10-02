@@ -278,6 +278,29 @@
   min-width: 80px;
 }
 
+/* Declared before the phone block below on purpose: at equal specificity the
+   later rule wins, and these `display: none` once overrode the phone layout.
+   A time and its name, as one field. Side by side on a phone, and on a desktop row
+   the name is hidden and this is just the input. */
+.slotTimeField {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.slotFieldLabel {
+  display: none;
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 2px;
+}
+
+/* The glyph alone carries the desktop row, where the buttons sit in a line of
+   controls that reads left to right. */
+.slotActionLabel {
+  display: none;
+}
+
 /* On a phone the row has to wrap. Laid out on one line, the two time inputs
    (90px floor each), the arrow and a preset select taking every remaining pixel
    pushed the confirm and cancel buttons past x = 409 on a 390px screen — off an
@@ -319,9 +342,12 @@
     margin-left: 6px;
   }
 
-  /* Each time keeps its own named field, side by side on the first row. */
+  /* Each time keeps its own named field, side by side on the first row. A zero
+     basis shares the row between the two whatever its width: a 7rem basis
+     wrapped the end time under the start inside the narrow day panel. */
   .slotTimeField {
-    flex: 1 1 7rem;
+    flex: 1 1 0;
+    min-width: 0;
     margin-bottom: 0;
   }
 
@@ -329,9 +355,19 @@
     display: block;
   }
 
-  /* The arrow sat alone on a line of its own once the row wrapped. */
-  .slotArrow {
+  /* The arrow sat alone on a line of its own once the form wrapped. Only in the
+     form: a read-only row still reads 06:30 → 08:30. */
+  .newSlotForm .slotArrow,
+  .editSlotForm .slotArrow {
     display: none;
+  }
+
+  /* Bootstrap sizes `select.form-control-sm:not([size]):not([multiple])` at
+     31px, a selector that outranks the 16px rule above: the text was cut
+     ("Confort"). Matched here so the select is as tall as the two times. */
+  .newSlotForm select.slotPresetSelect:not([size]):not([multiple]),
+  .editSlotForm select.slotPresetSelect:not([size]):not([multiple]) {
+    height: auto;
   }
 
   /* Sized by its field rather than by its content: `width: auto` with a 90px
@@ -340,27 +376,6 @@
     width: 100% !important;
     min-width: 0;
   }
-}
-
-/* A time and its name, as one field. Side by side on a phone, and on a desktop row
-   the name is hidden and this is just the input. */
-.slotTimeField {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0;
-}
-
-.slotFieldLabel {
-  display: none;
-  font-size: 0.75rem;
-  color: #6c757d;
-  margin-bottom: 2px;
-}
-
-/* The glyph alone carries the desktop row, where the buttons sit in a line of
-   controls that reads left to right. */
-.slotActionLabel {
-  display: none;
 }
 
 .dayPanelActions {
@@ -377,30 +392,84 @@
 
 /* ─── Copy to days picker ─── */
 
+/* One line on a desktop: the label, the days, and the two actions pushed to the
+   right end. Stacked, the actions sat alone on a third row under a short line of
+   days, with most of the card left empty. */
 .copyPicker {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding: 8px 10px;
+  gap: 8px 12px;
+  margin-top: 10px;
+  padding: 10px 12px;
   border: 1px solid rgba(0, 40, 100, 0.12);
-  border-radius: 4px;
-  font-size: 0.82rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
 }
 
 .copyPickerLabel {
   font-weight: 600;
-  margin-right: 4px;
+}
+
+/* Each day is a whole tappable chip rather than a bare 13px checkbox: on a
+   phone the box alone was the only target, well under the 44px a thumb needs. */
+.copyPickerDays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .copyPickerDay {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 40, 100, 0.16);
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
   margin: 0;
+}
+
+/* Cancel then the action, like the form's sticky bar, at the full button size
+   of that bar: the small variant read as secondary text next to 44px chips. */
+.copyPickerActions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.copyPickerActions :global(.btn) {
+  min-height: 44px;
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+/* On a phone: the label above, the days in rows of three, and the two buttons
+   sharing the last row, each half of it. */
+@media (max-width: 575px) {
+  .copyPickerLabel {
+    flex: 1 1 100%;
+  }
+
+  .copyPickerDays {
+    flex: 1 1 100%;
+  }
+
+  .copyPickerDay {
+    flex: 1 1 calc(33% - 6px);
+    justify-content: center;
+  }
+
+  .copyPickerActions {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  .copyPickerActions :global(.btn) {
+    flex: 1 1 0;
+  }
 }
 
 /* ─── Save row ─── */
