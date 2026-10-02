@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { buildUniqueSelector } = require('../../utils/addSelector');
 
 /**
  * @description Create a room in a house.
@@ -23,6 +24,10 @@ async function create(selector, room) {
   }
 
   room.house_id = house.id;
+  // the name is only unique per house: a second "Living room" in another house
+  // gets a free selector ("living-room-2"), the selector being the room
+  // identifier instance-wide
+  room.selector = await buildUniqueSelector(db.Room, room.selector || room.name);
   const roomCreated = await db.Room.create(room);
   return roomCreated.get({ plain: true });
 }

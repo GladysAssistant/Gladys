@@ -17,9 +17,10 @@ module.exports = (sequelize, DataTypes) => {
           key: 'id',
         },
       },
+      // unique per house (see the t_room_house_id_name index below): two
+      // houses can each have a "Living room"
       name: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING,
         validate: {
           len: [1, 40],
@@ -31,7 +32,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
     },
-    {},
+    {
+      indexes: [
+        {
+          unique: true,
+          fields: ['house_id', 'name'],
+        },
+      ],
+    },
   );
 
   room.beforeValidate(addSelectorBeforeValidateHook);

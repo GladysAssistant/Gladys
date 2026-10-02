@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
+const { UniqueConstraintError } = require('sequelize');
 
 const Room = require('../../../lib/room');
 
@@ -11,6 +12,20 @@ describe('room.create', () => {
     });
     expect(newRoom).to.have.property('name', 'My test room');
     expect(newRoom).to.have.property('selector', 'my-test-room');
+  });
+  it('should create a room with the same name in another house', async () => {
+    const newRoom = await room.create('pepper-house', {
+      name: 'Test room',
+    });
+    expect(newRoom).to.have.property('name', 'Test room');
+    expect(newRoom).to.have.property('house_id', '6295ad8b-b655-4422-9e6d-b4612da5d55f');
+    expect(newRoom).to.have.property('selector', 'test-room-2');
+  });
+  it('should not create a room with the same name in the same house', async () => {
+    const promise = room.create('test-house', {
+      name: 'Test room',
+    });
+    return assertChai.isRejected(promise, UniqueConstraintError);
   });
   it('should not create a room (empty name)', async () => {
     const promise = room.create('test-house', {
