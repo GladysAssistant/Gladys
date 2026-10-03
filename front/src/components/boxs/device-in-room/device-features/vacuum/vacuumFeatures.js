@@ -42,10 +42,20 @@ export const isVacuumFeature = feature => feature.category === DEVICE_FEATURE_CA
 export const getVacuumFeature = (features, category, type) =>
   features.find(feature => feature.category === category && feature.type === type);
 
+// A command button takes a feature Gladys may write: a read-only run mode or dock feature stays a
+// plain row of the panel, which shows its value without offering to change it.
+const getWritableVacuumFeature = (features, type) =>
+  getVacuumFeature(
+    features.filter(feature => !feature.read_only),
+    DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+    type
+  );
+
 /**
  * @description Picks the features the robot row itself shows or controls: its state, its battery
- * level, its run mode (start / stop) and its dock button — the first of each, a duplicate is left
- * to the panel like any other feature.
+ * level, its run mode (start / stop) and its dock button — the first of each, the first writable
+ * one for a button. A duplicate, or a read-only run mode or dock, is left to the panel like any
+ * other feature.
  * @param {Array} features - The features of one robot, in display order.
  * @returns {object} The features found, each one possibly undefined.
  * @example getVacuumRowFeatures(features);
@@ -56,12 +66,8 @@ export const getVacuumRowFeatures = features => ({
     DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
     DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE
   ),
-  runMode: getVacuumFeature(
-    features,
-    DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
-    DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE
-  ),
-  dock: getVacuumFeature(features, DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER, DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK),
+  runMode: getWritableVacuumFeature(features, DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE),
+  dock: getWritableVacuumFeature(features, DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK),
   // The charge level only: a battery category also carries the binary "charging" feature.
   battery: getVacuumFeature(features, DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_TYPES.BATTERY.INTEGER)
 });
