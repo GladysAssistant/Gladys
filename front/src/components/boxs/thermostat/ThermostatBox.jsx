@@ -1434,7 +1434,8 @@ class ThermostatBox extends Component {
                             key={preset.key}
                             class={cx(style.segmentBtn, {
                               [style.segmentBtnActive]: isActive,
-                              [style.segmentBtnPending]: isPending
+                              [style.segmentBtnPending]: isPending,
+                              [style.segmentBtnOff]: preset.key === 'off'
                             })}
                             style={
                               isActive || isPending

@@ -429,6 +429,20 @@
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
+/* Off, when active, is the one preset whose colour (#868e96) is a paler grey than
+   the inactive icons' #6c757d: with its glow it read as the most faded icon of the
+   bar. It takes a dark grey and no glow instead. In the dark theme it follows the
+   theme's inversion rather than the counter-inversion of the coloured presets, so
+   it comes out light on the dark card, again the most marked icon of the row. */
+.segmentBtnActive.segmentBtnOff i {
+  color: #343a40;
+  filter: none;
+}
+
+:global(.dark-mode) .segmentBtnActive.segmentBtnOff i {
+  filter: none !important;
+}
+
 /* The pill carries a preset colour, so it takes the same counter-inversion as the
    icons: without it the dark theme would show the night's blue as orange. The text
    on it inverts along with its background, so the pair stays readable. */

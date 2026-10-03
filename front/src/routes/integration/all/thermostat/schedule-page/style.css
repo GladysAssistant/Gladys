@@ -392,10 +392,16 @@
 
 /* ─── Copy to days picker ─── */
 
-/* One line on a desktop: the label, the days, and the two actions pushed to the
-   right end. Stacked, the actions sat alone on a third row under a short line of
-   days, with most of the card left empty. */
+/* Two layouts and nothing in between. Left to wrap freely, the chips broke 5 + 1
+   or 3 + 2 + 1 depending on the width, with "Sun" stretched alone across a line.
+   By default: the label, then the days in two rows of three, then the two actions
+   on their own row, flush right so Sunday ends above the right edge of the last
+   button. Only when the picker is wide enough for the whole of it on one line
+   (see the container query below) do the label, the six days and the actions sit
+   side by side. The width is the picker's, not the window's: the editor's card is
+   much narrower than the screen on a desktop. */
 .copyPicker {
+  container: copy-picker / inline-size;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -408,19 +414,22 @@
 }
 
 .copyPickerLabel {
+  flex: 1 1 100%;
   font-weight: 600;
 }
 
 /* Each day is a whole tappable chip rather than a bare 13px checkbox: on a
    phone the box alone was the only target, well under the 44px a thumb needs. */
 .copyPickerDays {
-  display: flex;
-  flex-wrap: wrap;
+  flex: 1 1 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
 
 .copyPickerDay {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 6px;
   min-height: 44px;
@@ -433,42 +442,48 @@
 }
 
 /* Cancel then the action, like the form's sticky bar, at the full button size
-   of that bar: the small variant read as secondary text next to 44px chips. */
+   of that bar: the small variant read as secondary text next to 44px chips. On
+   their own row they share its whole width, each half of it, like the days above. */
 .copyPickerActions {
+  flex: 1 1 100%;
   display: flex;
+  justify-content: flex-end;
   gap: 8px;
-  margin-left: auto;
 }
 
 .copyPickerActions :global(.btn) {
   min-height: 44px;
   padding-left: 18px;
   padding-right: 18px;
+  flex: 1 1 0;
 }
 
-/* On a phone: the label above, the days in rows of three, and the two buttons
-   sharing the last row, each half of it. */
-@media (max-width: 575px) {
+/* One line once it all fits. 840px covers the longest translation (German: the
+   label "Kopieren nach:" and "Abbrechen" / "Anwenden") with some margin; under it
+   the picker keeps the two rows of three. */
+@container copy-picker (min-width: 840px) {
   .copyPickerLabel {
-    flex: 1 1 100%;
+    flex: 0 0 auto;
   }
 
   .copyPickerDays {
-    flex: 1 1 100%;
-  }
-
-  .copyPickerDay {
-    flex: 1 1 calc(33% - 6px);
-    justify-content: center;
+    flex: 1 1 0;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
   .copyPickerActions {
-    flex: 1 1 100%;
-    margin-left: 0;
+    flex: 0 0 auto;
   }
 
   .copyPickerActions :global(.btn) {
-    flex: 1 1 0;
+    flex: 0 0 auto;
+  }
+}
+
+/* On a phone: tighter chips so three fit a row at 360px. */
+@media (max-width: 575px) {
+  .copyPickerDay {
+    padding: 0 6px;
   }
 }
 
