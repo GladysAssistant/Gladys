@@ -8,6 +8,7 @@ const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');
 const Brain = require('../../../lib/brain');
+const Variable = require('../../../lib/variable');
 const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
 const db = require('../../../models');
 
@@ -24,23 +25,65 @@ describe('Device check batteries', () => {
     brain = new Brain();
     await brain.load();
   });
-  it('should do nothing if is not enabled', async () => {
+  [false, '0', 'false', null].forEach((disabledValue) => {
+    it(`should do nothing if is not enabled (value = ${JSON.stringify(disabledValue)})`, async () => {
+      const stateManager = new StateManager(event);
+      const service = {
+        getService: () => null,
+      };
+      const variables = {
+        getValue: () => disabledValue,
+      };
+      const messageManager = {
+        sendToUser: stub().returns(null),
+      };
+      const device = new Device(event, messageManager, stateManager, service, {}, variables, job, {}, user);
+
+      await device.checkBatteries();
+
+      assert.notCalled(user.getByRole);
+      assert.notCalled(messageManager.sendToUser);
+    });
+  });
+  it('should do nothing if disabled in the settings (value stored as text)', async () => {
+    const variables = new Variable(event);
+    // the settings page saves a JSON boolean, stored as '0' in the TEXT column
+    await variables.setValue(SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_ENABLED, false);
+    await variables.setValue(SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD, '30');
     const stateManager = new StateManager(event);
     const service = {
       getService: () => null,
     };
-    const variables = {
-      getValue: () => false,
+    const messageManager = {
+      sendToUser: stub().returns(null),
+    };
+    const device = new Device(event, messageManager, stateManager, service, {}, variables, job, brain, user);
+
+    await device.checkBatteries();
+
+    assert.notCalled(messageManager.sendToUser);
+  });
+  it('should send a message if enabled in the settings (value stored as text)', async () => {
+    const variables = new Variable(event);
+    // the settings page saves a JSON boolean, stored as '1' in the TEXT column
+    await variables.setValue(SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_ENABLED, true);
+    await variables.setValue(SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD, '30');
+    const stateManager = new StateManager(event);
+    const service = {
+      getService: () => null,
     };
     const messageManager = {
       sendToUser: stub().returns(null),
     };
-    const device = new Device(event, messageManager, stateManager, service, {}, variables, job, {}, user);
+    const device = new Device(event, messageManager, stateManager, service, {}, variables, job, brain, user);
 
     await device.checkBatteries();
 
-    assert.notCalled(user.getByRole);
-    assert.notCalled(messageManager.sendToUser);
+    assert.calledWith(
+      messageManager.sendToUser,
+      'admin',
+      'Avertissement ! Le niveau de la batterie de Test device est inférieur à 30% (actuel : 20%)',
+    );
   });
   it('should do nothing if the threshold is not set', async () => {
     const stateManager = new StateManager(event);

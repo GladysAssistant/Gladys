@@ -5,11 +5,7 @@ const { fake, assert } = sinon;
 
 const { Error429 } = require('../../../utils/httpErrors');
 const { USER_ROLE, AI_CHAT_PURPOSES } = require('../../../utils/constants');
-const {
-  sendWeeklyDigest,
-  isSystemVariableEnabled,
-  extractAssistantText,
-} = require('../../../lib/gateway/gateway.sendWeeklyDigest');
+const { sendWeeklyDigest, extractAssistantText } = require('../../../lib/gateway/gateway.sendWeeklyDigest');
 
 describe('gateway.sendWeeklyDigest', () => {
   let gateway;
@@ -152,17 +148,6 @@ describe('gateway.sendWeeklyDigest', () => {
     assert.calledOnceWithExactly(gateway.message.sendToUser, 'pierre', 'Digest OK', null, {
       messageType: 'notification',
     });
-  });
-});
-
-describe('isSystemVariableEnabled', () => {
-  it('should detect enabled values', () => {
-    expect(isSystemVariableEnabled('1')).to.equal(true);
-    expect(isSystemVariableEnabled(true)).to.equal(true);
-    expect(isSystemVariableEnabled(1)).to.equal(true);
-    expect(isSystemVariableEnabled('true')).to.equal(true);
-    expect(isSystemVariableEnabled('0')).to.equal(false);
-    expect(isSystemVariableEnabled(false)).to.equal(false);
   });
 });
 
