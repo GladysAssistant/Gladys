@@ -129,10 +129,12 @@ describe('Device check batteries', () => {
 
     await device.checkBatteries();
 
-    assert.calledWith(
+    assert.calledOnceWithExactly(
       messageManager.sendSystemMessage,
       'admin',
       'Avertissement ! Le niveau de la batterie de Test device est inférieur à 30% (actuel : 20%)',
+      null,
+      { messageType: 'notification' },
     );
   });
   it('should send a message if battery is low', async () => {
@@ -166,10 +168,12 @@ describe('Device check batteries', () => {
 
     await device.checkBatteries();
 
-    assert.calledWith(
+    assert.calledOnceWithExactly(
       messageManager.sendSystemMessage,
       'admin',
       'Avertissement ! Le niveau de la batterie de Test device est faible !',
+      null,
+      { messageType: 'notification' },
     );
   });
   describe('when sending the message to one admin fails', () => {

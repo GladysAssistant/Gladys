@@ -131,8 +131,12 @@ describe('gateway.backup', async function describe() {
     assert.calledWith(brain.getReply, 'en', 'backup.fail', {
       errorMessage: 'Error: error',
     });
-    assert.calledWith(message.sendSystemMessage, 'toto-fr', 'Backup failed!');
-    assert.calledWith(message.sendSystemMessage, 'toto-en', 'Backup failed!');
+    assert.calledWithExactly(message.sendSystemMessage, 'toto-fr', 'Backup failed!', null, {
+      messageType: 'notification',
+    });
+    assert.calledWithExactly(message.sendSystemMessage, 'toto-en', 'Backup failed!', null, {
+      messageType: 'notification',
+    });
   });
 
   it('should rethrow the backup error when warning one admin fails', async () => {

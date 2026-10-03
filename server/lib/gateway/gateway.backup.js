@@ -215,7 +215,7 @@ async function backup(jobId) {
       });
       // a failing notification must not replace the backup error rethrown below
       try {
-        await this.message.sendSystemMessage(admin.selector, message);
+        await this.message.sendSystemMessage(admin.selector, message, null, { messageType: 'notification' });
       } catch (sendError) {
         logger.error(`Unable to send the backup failure message to ${admin.selector}`, sendError);
       }
