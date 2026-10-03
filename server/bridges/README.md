@@ -15,7 +15,8 @@ already connected to it.
    on Windows (use `.venv/bin/python` on Linux/macOS).
 3. In this directory's ignored `.env`, set `OMNIROUTE_API_KEY` to that endpoint
    key, `OMNIROUTE_URL=http://127.0.0.1:20128/v1`, and
-   `OMNIROUTE_MODEL=auto`. Set a separate private
+   `OMNIROUTE_MODEL=auto` (or a tested provider/model ID when `auto` selects an
+   unsupported model). Set a separate private
    `BOBS_HOME_OPENJARVIS_KEY` for the bridge. Start it with
    `.venv/Scripts/python.exe -m uvicorn openjarvis_omniroute:app --host 127.0.0.1 --port 8788`.
 4. In the Bobs Home server's ignored `.env`, set `BOBS_HOME_AI_PROVIDER=openjarvis`,
@@ -25,7 +26,9 @@ already connected to it.
 For Docker, use service hostnames on a private network in both URLs. Keep keys
 in environment or secret storage, never in the repository. The bridge only
 handles non-streaming chat completions. Use an OmniRoute route whose model
-supports tool calling; camera image analysis also requires vision support.
+supports tool calling; camera image analysis also requires vision support. If
+OmniRoute rejects a request, the bridge returns an error rather than retrying
+without tools.
 
 Test the bridge with `GET /health`, then ask Bobs Home to read a device state
 and change a device. Check the Bobs Home chat's tool trace to confirm the

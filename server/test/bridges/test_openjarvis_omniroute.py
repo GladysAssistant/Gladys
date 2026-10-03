@@ -14,7 +14,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 import httpx  # noqa: E402
 from openjarvis.engine.openai_compat_engines import OpenAICompatEngine  # noqa: E402
 from openjarvis.engine._base import EngineConnectionError  # noqa: E402
-from openjarvis_omniroute import build_app  # noqa: E402
+from openjarvis_omniroute import build_app, guard_engine_bad_requests  # noqa: E402
 
 
 class FakeEngine:
@@ -28,6 +28,35 @@ class FakeEngine:
 
 
 class BridgeTests(unittest.TestCase):
+    def test_bad_tool_request_does_not_retry_without_tools(self):
+        requests = []
+
+        def handle_request(request):
+            requests.append(json.loads(request.content))
+            return httpx.Response(400, json={"error": "unsupported model"})
+
+        engine = OpenAICompatEngine(host="http://omni.local", api_key="omni-test")
+        engine._client.close()
+        engine._client = httpx.Client(
+            base_url="http://omni.local",
+            transport=httpx.MockTransport(handle_request),
+        )
+        guard_engine_bad_requests(engine)
+        client = TestClient(build_app(engine))
+        response = client.post(
+            "/v1/chat/completions",
+            headers={"Authorization": "Bearer test-bridge-key"},
+            json={
+                "messages": [{"role": "user", "content": "turn on the light"}],
+                "tools": [{"type": "function", "function": {"name": "device_turn_on"}}],
+                "tool_choice": "auto",
+            },
+        )
+        engine.close()
+        self.assertEqual(response.status_code, 502)
+        self.assertEqual(len(requests), 1)
+        self.assertIn("tools", requests[0])
+
     def test_openjarvis_engine_forwards_tools_images_and_omniroute_key(self):
         captured = []
 

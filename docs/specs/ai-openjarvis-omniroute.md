@@ -43,7 +43,8 @@ user's context. A requested home action must produce a tool call before Bobs
 Home can claim it was completed. OmniRoute must route to a model/provider that
 supports the requested tool calling and, for camera images, vision. Network
 errors surface as chat failures; they do not cause a hidden fallback to another
-paid provider.
+paid provider or a retry with the tool definitions removed. Pin a tested
+tool-capable model when OmniRoute's automatic route selects an unsupported one.
 
 ## Deployment
 

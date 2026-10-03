@@ -7,6 +7,7 @@ import time
 import uuid
 from pathlib import Path
 
+import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException
 from openjarvis.core.types import Message, Role, ToolCall
@@ -17,6 +18,18 @@ from openjarvis.engine.openai_compat_engines import (
 )
 
 load_dotenv(Path(__file__).with_name(".env"))
+
+
+def reject_bad_request(response: httpx.Response):
+    """Keep OpenJarvis from retrying a rejected tool request without tools."""
+    if response.status_code == 400:
+        response.read()
+        response.raise_for_status()
+
+
+def guard_engine_bad_requests(engine):
+    """Preserve upstream 400 errors instead of silently dropping tool definitions."""
+    engine._client.event_hooks["response"].append(reject_bad_request)
 
 
 def build_app(engine=None):
@@ -33,6 +46,7 @@ def build_app(engine=None):
             ),
             api_key=omni_key,
         )
+        guard_engine_bad_requests(engine)
 
     app = FastAPI(title="Bobs Home OpenJarvis bridge")
 
