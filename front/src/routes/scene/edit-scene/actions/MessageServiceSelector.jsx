@@ -27,8 +27,9 @@ const toI18nKey = name => name.replace(/-([a-z])/g, (match, letter) => letter.to
 /**
  * Channel selector of the "send message" scene actions and of the system
  * messages setting. Controlled: `value` is the channel (null when none is
- * set), `onChange` receives the new one, and the help text below the select
- * is passed as children.
+ * set), `onChange` receives the new one. The caller owns the copy around the
+ * select: the optional `label` above it and the optional help text below it
+ * (children), so the settings card can rely on its own title instead.
  *
  * An empty value keeps the historical behaviour: the message is broadcast to
  * every messaging channel the user configured. That case is represented by
@@ -123,7 +124,7 @@ class MessageServiceSelector extends Component {
       this.setState({ selectedService: nextProps.value || null });
     }
   }
-  render({ value, children }, { serviceOptions, selectedService }) {
+  render({ value, label, children }, { serviceOptions, selectedService }) {
     const currentService = value || selectedService;
     const allServicesOption = {
       label: <Text id="editScene.actionsCard.messageSend.allServicesLabel" />,
@@ -151,9 +152,7 @@ class MessageServiceSelector extends Component {
     }
     return (
       <div class="form-group">
-        <label class="form-label">
-          <Text id="editScene.actionsCard.messageSend.serviceLabel" />
-        </label>
+        {label && <label class="form-label">{label}</label>}
         <Select
           styles={{
             // Fixes the overlapping problem of the component
@@ -165,7 +164,7 @@ class MessageServiceSelector extends Component {
           className="react-select-container"
           classNamePrefix="react-select"
         />
-        <div class="mt-1 small text-muted">{children}</div>
+        {children && <div class="mt-1 small text-muted">{children}</div>}
       </div>
     );
   }

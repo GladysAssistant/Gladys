@@ -91,6 +91,7 @@ class SendMessageParams extends Component {
         </div>
         <MessageServiceSelector
           value={props.action.service}
+          label={<Text id="editScene.actionsCard.messageSend.serviceLabel" />}
           onChange={service => props.updateActionProperty(props.path, 'service', service)}
         >
           <Text id="editScene.actionsCard.messageSend.serviceExplanation" />

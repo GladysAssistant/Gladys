@@ -98,7 +98,9 @@ describe('gateway subscription lock', () => {
       assert.calledWith(brain.getReply, 'en', 'gateway.payment-required');
       assert.calledWith(brain.getReply, 'fr', 'gateway.payment-required');
       assert.calledWith(message.sendSystemMessage, 'tony', 'Payment required!', null, { messageType: 'notification' });
-      assert.calledWith(message.sendSystemMessage, 'pepper', 'Payment required!', null, { messageType: 'notification' });
+      assert.calledWith(message.sendSystemMessage, 'pepper', 'Payment required!', null, {
+        messageType: 'notification',
+      });
     });
 
     it('should do nothing when the state does not change', async () => {
