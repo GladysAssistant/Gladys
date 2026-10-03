@@ -1,5 +1,6 @@
 const logger = require('../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES, USER_ROLE } = require('../../utils/constants');
+const { isSystemVariableEnabled } = require('../../utils/systemVariable');
 
 /**
  * @description Check battery level and warn if needed.
@@ -9,7 +10,8 @@ const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES, USER_ROLE } = require(
  */
 async function checkBatteries() {
   const enabled = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_ENABLED);
-  if (!enabled) {
+  // variables are stored as text: once disabled, the value is '0', which is truthy
+  if (!isSystemVariableEnabled(enabled)) {
     return;
   }
   logger.debug('Checking batteries ...');
