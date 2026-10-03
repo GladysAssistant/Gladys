@@ -14,7 +14,8 @@ calls `BOBS_HOME_OPENJARVIS_URL` (default `http://127.0.0.1:8788`) with optional
 `BOBS_HOME_OPENJARVIS_KEY`. The bridge requires `OMNIROUTE_API_KEY`, and accepts
 `OMNIROUTE_URL` (default `http://127.0.0.1:20128/v1`) and `OMNIROUTE_MODEL`
 (default `auto`). Keys are supplied through environment variables and must not
-be committed. The bridge listens on loopback by default.
+be committed. The bridge loads its own ignored `.env` file and listens on
+loopback by default.
 
 Without `BOBS_HOME_AI_PROVIDER=openjarvis`, the existing Gladys Gateway path
 continues to work. With OpenJarvis selected, chat does not require a Gladys

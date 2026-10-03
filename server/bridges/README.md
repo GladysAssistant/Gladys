@@ -6,16 +6,19 @@ user's permissions. OmniRoute selects a model from the provider accounts you
 already connected to it.
 
 1. Start OmniRoute and connect a provider in its dashboard. Copy the endpoint
-   key from **Dashboard → Endpoints**.
+   key from **Dashboard → Endpoints**. The provider must accept external
+   OpenAI-compatible chat requests; OpenCode Free rejected requests outside
+   OpenCode during validation of this integration.
 2. Install Python 3.11+ and, from this directory, run
    `uv venv --python 3.11 .venv` and
    `uv pip install --python .venv/Scripts/python.exe -r requirements.txt`
    on Windows (use `.venv/bin/python` on Linux/macOS).
-3. Set `OMNIROUTE_API_KEY` to that endpoint key. Optionally set
-   `OMNIROUTE_URL=http://127.0.0.1:20128/v1` and `OMNIROUTE_MODEL=auto`.
-   Set a private `BOBS_HOME_OPENJARVIS_KEY` for the bridge. Start it with
+3. In this directory's ignored `.env`, set `OMNIROUTE_API_KEY` to that endpoint
+   key, `OMNIROUTE_URL=http://127.0.0.1:20128/v1`, and
+   `OMNIROUTE_MODEL=auto`. Set a separate private
+   `BOBS_HOME_OPENJARVIS_KEY` for the bridge. Start it with
    `.venv/Scripts/python.exe -m uvicorn openjarvis_omniroute:app --host 127.0.0.1 --port 8788`.
-4. In the Bobs Home server environment set `BOBS_HOME_AI_PROVIDER=openjarvis`,
+4. In the Bobs Home server's ignored `.env`, set `BOBS_HOME_AI_PROVIDER=openjarvis`,
    `BOBS_HOME_OPENJARVIS_URL=http://127.0.0.1:8788`, and the same
    `BOBS_HOME_OPENJARVIS_KEY`. Restart the Bobs Home server.
 

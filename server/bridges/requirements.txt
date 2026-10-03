@@ -1,1 +1,2 @@
-openjarvis[server] @ git+https://github.com/open-jarvis/OpenJarvis.git@792131fe
+openjarvis[server] @ git+https://github.com/open-jarvis/OpenJarvis.git@792131feb3948aca0b54a94e0344f6827ff3129d
+python-dotenv>=1,<2

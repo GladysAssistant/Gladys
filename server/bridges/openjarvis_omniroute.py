@@ -5,13 +5,18 @@ import hmac
 import os
 import time
 import uuid
+from pathlib import Path
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException
 from openjarvis.core.types import Message, Role, ToolCall
+from openjarvis.engine._base import EngineConnectionError
 from openjarvis.engine.openai_compat_engines import (
     OpenAICompatEngine,
     normalize_openai_base_url,
 )
+
+load_dotenv(Path(__file__).with_name(".env"))
 
 
 def build_app(engine=None):
@@ -71,14 +76,17 @@ def build_app(engine=None):
         if body.get("tools"):
             kwargs["tools"] = body["tools"]
             kwargs["tool_choice"] = body.get("tool_choice", "auto")
-        result = await asyncio.to_thread(
-            engine.generate,
-            messages,
-            model=model,
-            temperature=body.get("temperature", 0.7),
-            max_tokens=body.get("max_tokens", 1024),
-            **kwargs,
-        )
+        try:
+            result = await asyncio.to_thread(
+                engine.generate,
+                messages,
+                model=model,
+                temperature=body.get("temperature", 0.7),
+                max_tokens=body.get("max_tokens", 1024),
+                **kwargs,
+            )
+        except EngineConnectionError as exc:
+            raise HTTPException(status_code=502, detail="OmniRoute provider rejected or failed the request") from exc
         if kwargs.get("tool_choice") == "required" and not result.get("tool_calls"):
             raise HTTPException(status_code=502, detail="The selected model did not return a required tool call")
         tool_calls = [

@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "bridges"))
 from fastapi.testclient import TestClient  # noqa: E402
 import httpx  # noqa: E402
 from openjarvis.engine.openai_compat_engines import OpenAICompatEngine  # noqa: E402
+from openjarvis.engine._base import EngineConnectionError  # noqa: E402
 from openjarvis_omniroute import build_app  # noqa: E402
 
 
@@ -133,6 +134,20 @@ class BridgeTests(unittest.TestCase):
             },
         )
         self.assertEqual(response.status_code, 502)
+
+    def test_reports_upstream_failure_as_bad_gateway(self):
+        class FailingEngine:
+            def generate(self, messages, **kwargs):
+                raise EngineConnectionError("upstream details")
+
+        client = TestClient(build_app(FailingEngine()))
+        response = client.post(
+            "/v1/chat/completions",
+            headers={"Authorization": "Bearer test-bridge-key"},
+            json={"messages": [{"role": "user", "content": "hello"}]},
+        )
+        self.assertEqual(response.status_code, 502)
+        self.assertNotIn("upstream details", response.text)
 
 
 if __name__ == "__main__":
