@@ -46,7 +46,7 @@ async function checkBatteries() {
         });
         // one failing admin must not prevent the others from being warned
         try {
-          await this.messageManager.sendToUser(admin.selector, message);
+          await this.messageManager.sendToUser(admin.selector, message, null, { messageType: 'notification' });
         } catch (e) {
           logger.error(`Unable to send the battery warning of device ${device.name} to ${admin.selector}`, e);
         }
@@ -72,7 +72,7 @@ async function checkBatteries() {
         });
         // one failing admin must not prevent the others from being warned
         try {
-          await this.messageManager.sendToUser(admin.selector, message);
+          await this.messageManager.sendToUser(admin.selector, message, null, { messageType: 'notification' });
         } catch (e) {
           logger.error(`Unable to send the battery warning of device ${device.name} to ${admin.selector}`, e);
         }
