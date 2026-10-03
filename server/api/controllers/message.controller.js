@@ -2,6 +2,7 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS } = require('../../utils/constants');
 const { resolveAiChatModel } = require('../../utils/aiChatModels');
 const { Error400 } = require('../../utils/httpErrors');
+const { isOpenJarvisSelected } = require('../../utils/localAiProvider');
 
 module.exports = function MessageController(gladys) {
   /**
@@ -20,7 +21,7 @@ module.exports = function MessageController(gladys) {
    */
   async function create(req, res) {
     const resolvedModel = resolveAiChatModel(req.body.model);
-    if (req.body.model && resolvedModel === null) {
+    if (!isOpenJarvisSelected() && req.body.model && resolvedModel === null) {
       throw new Error400('INVALID_AI_MODEL');
     }
 
@@ -33,7 +34,7 @@ module.exports = function MessageController(gladys) {
       created_at: req.body.created_at || new Date(),
       id: req.body.id,
     };
-    if (resolvedModel) {
+    if (resolvedModel && !isOpenJarvisSelected()) {
       messageToSend.model = resolvedModel;
     }
     gladys.event.emit(EVENTS.MESSAGE.NEW, messageToSend);

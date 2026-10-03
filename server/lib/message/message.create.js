@@ -1,6 +1,7 @@
 const db = require('../../models');
 const { EVENTS } = require('../../utils/constants');
 const { getPreviousQuestionsForUser } = require('./message.getPreviousQuestionsForUser');
+const { isOpenJarvisSelected } = require('../../utils/localAiProvider');
 
 /**
  * @description Check if Gladys Plus gateway is configured on this instance.
@@ -30,7 +31,7 @@ async function create(message) {
   const context = {
     user: message.user,
   };
-  const gladysPlusConfigured = await isGladysPlusConfigured.call(this);
+  const aiConfigured = isOpenJarvisSelected() || (await isGladysPlusConfigured.call(this));
 
   const messageToInsert = {
     text: message.text,
@@ -40,14 +41,14 @@ async function create(message) {
     id: message.id,
   };
 
-  if (gladysPlusConfigured) {
+  if (aiConfigured) {
     const previousQuestions = await getPreviousQuestionsForUser(message.user.id);
     this.event.emit(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, { message, previousQuestions, context });
   }
 
   await db.Message.create(messageToInsert);
 
-  if (!gladysPlusConfigured) {
+  if (!aiConfigured) {
     await this.replyByIntent(message, 'openai.plus-required', context);
   }
 

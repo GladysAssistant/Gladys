@@ -287,15 +287,27 @@ describe('gateway subscription lock', () => {
   });
 
   describe('getStatus', () => {
+    afterEach(() => {
+      delete process.env.BOBS_HOME_AI_PROVIDER;
+    });
+
     it('should expose the subscription state', async () => {
       await gateway.setSubscriptionActive(false);
       const status = await gateway.getStatus();
       expect(status).to.deep.equal({
         configured: false,
+        ai_chat_configured: false,
         connected: true,
         subscription_active: false,
         payment_required_since: gateway.subscriptionPaymentRequiredSince,
       });
+    });
+
+    it('should expose local AI chat without marking Gladys Plus configured', async () => {
+      process.env.BOBS_HOME_AI_PROVIDER = 'openjarvis';
+      const status = await gateway.getStatus();
+      expect(status.configured).to.equal(false);
+      expect(status.ai_chat_configured).to.equal(true);
     });
   });
 

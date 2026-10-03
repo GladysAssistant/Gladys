@@ -32,6 +32,7 @@ const IntegrationPage = connect(
     const voiceInputRef = useRef(null);
     const [selectedModel, setSelectedModel] = useState('auto');
     const [gladysPlusConfigured, setGladysPlusConfigured] = useState(null);
+    const [aiChatConfigured, setAiChatConfigured] = useState(null);
     const [voiceInputError, setVoiceInputError] = useState(null);
     // While a dictation is running, the transcription is appended to what was
     // in the input when it started: the textarea is read-only so an edit made
@@ -50,8 +51,10 @@ const IntegrationPage = connect(
         try {
           const gatewayStatus = await httpClient.get('/api/v1/gateway/status');
           setGladysPlusConfigured(gatewayStatus.configured === true);
+          setAiChatConfigured(gatewayStatus.ai_chat_configured === true || gatewayStatus.configured === true);
         } catch (e) {
           setGladysPlusConfigured(false);
+          setAiChatConfigured(false);
         }
       };
       fetchGatewayStatus();
@@ -122,7 +125,7 @@ const IntegrationPage = connect(
                         )}
                       </div>
                       <div class={cx('card-footer', style.chatComposer)}>
-                        {gladysPlusConfigured === true && (
+                        {aiChatConfigured === true && (
                           <AiModelSelector value={selectedModel} onChange={setSelectedModel} />
                         )}
                         <div class={style.composerInputWrap}>

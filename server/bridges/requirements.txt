@@ -1,0 +1,1 @@
+openjarvis[server] @ git+https://github.com/open-jarvis/OpenJarvis.git@792131fe

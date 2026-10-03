@@ -21,7 +21,7 @@ class EmptyChat extends Component {
     try {
       const gatewayStatus = await this.props.httpClient.get('/api/v1/gateway/status');
       this.setState({
-        gladysPlusConfigured: gatewayStatus.configured === true
+        gladysPlusConfigured: gatewayStatus.ai_chat_configured === true || gatewayStatus.configured === true
       });
     } catch (e) {
       // A failed call doesn't mean the instance has no Gladys Plus: it can
