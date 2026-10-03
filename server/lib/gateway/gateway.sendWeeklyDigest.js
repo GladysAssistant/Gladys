@@ -4,21 +4,11 @@ const path = require('path');
 const logger = require('../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES, USER_ROLE, AI_CHAT_PURPOSES } = require('../../utils/constants');
 const { Error429 } = require('../../utils/httpErrors');
+const { isSystemVariableEnabled } = require('../../utils/systemVariable');
 const { extractAssistantMessage } = require('./gateway.forwardMessageToAiChat');
 
 const promptPath = path.join(__dirname, '../../config/prompts/weeklyDigest.prompt.txt');
 const WEEKLY_DIGEST_PROMPT = fs.readFileSync(promptPath, 'utf8');
-
-/**
- * @description Check if a system variable value means enabled.
- * @param {any} value - Variable value.
- * @returns {boolean} True when enabled.
- * @example
- * isSystemVariableEnabled('1');
- */
-function isSystemVariableEnabled(value) {
-  return value === true || value === 1 || value === '1' || value === 'true';
-}
 
 /**
  * @description Extract assistant text from AI chat response.
@@ -111,6 +101,5 @@ async function sendWeeklyDigest({ force = false } = {}) {
 
 module.exports = {
   sendWeeklyDigest,
-  isSystemVariableEnabled,
   extractAssistantText,
 };
