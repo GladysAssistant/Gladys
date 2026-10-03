@@ -213,7 +213,7 @@ async function backup(jobId) {
       const message = this.brain.getReply(admin.language, 'backup.fail', {
         errorMessage: e.toString(),
       });
-      this.message.sendToUser(admin.selector, message);
+      this.message.sendSystemMessage(admin.selector, message);
     });
     throw e;
   }
