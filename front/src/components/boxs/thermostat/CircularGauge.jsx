@@ -168,8 +168,12 @@ const CircularGauge = ({
               setpoint, could be read for one another. The humidity below already
               carries its droplet, so this makes all three readings self-labelling
               without a word of text in a gauge that has no room for one. */}
-          <tspan class={`${style.gaugeIconGlyph} ${style.currentTempIcon}`}>{ICONS.thermometer}</tspan>
-          {` ${Number(currentTemp).toFixed(1)} °${tempUnit || 'C'}`}
+          {/* Raised like the droplet below, by its own measured offset: the glyph
+              sits about 1.3px low at 16px. */}
+          <tspan class={`${style.gaugeIconGlyph} ${style.currentTempIcon}`} dy="-0.08em">
+            {ICONS.thermometer}
+          </tspan>
+          <tspan dy="0.08em">{` ${Number(currentTemp).toFixed(1)} °${tempUnit || 'C'}`}</tspan>
         </text>
       )}
       {hasHumidity && (
@@ -181,8 +185,13 @@ const CircularGauge = ({
           dominantBaseline="middle"
           class={style.humidityText}
         >
-          <tspan class={`${style.gaugeIconGlyph} ${style.humidityIcon}`}>{ICONS.droplet}</tspan>
-          {` ${Math.round(humidity)} %`}
+          {/* The lucide droplet sits low on the text's baseline, its middle about
+              2px under the middle of "62 %" at 13px: raised by that much, and the
+              reading brought back down to where it was. */}
+          <tspan class={`${style.gaugeIconGlyph} ${style.humidityIcon}`} dy="-0.15em">
+            {ICONS.droplet}
+          </tspan>
+          <tspan dy="0.15em">{` ${Math.round(humidity)} %`}</tspan>
         </text>
       )}
 
