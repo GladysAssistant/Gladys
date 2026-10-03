@@ -39,6 +39,7 @@ describe('POST /api/v1/gateway/subscription/refresh', () => {
       .then((res) => {
         expect(res.body).to.deep.equal({
           configured: true,
+          ai_chat_configured: true,
           connected: false,
           subscription_active: false,
           payment_required_since: '2026-09-01T00:00:00.000Z',
@@ -57,6 +58,7 @@ describe('POST /api/v1/gateway/subscription/refresh', () => {
       .then((res) => {
         expect(res.body).to.deep.equal({
           configured: true,
+          ai_chat_configured: true,
           connected: false,
           subscription_active: true,
           payment_required_since: null,

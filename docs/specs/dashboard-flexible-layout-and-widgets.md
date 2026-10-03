@@ -201,7 +201,7 @@ Generating the `house-view` illustration is the one step that cannot be beautifu
 
 ### F.1 Existing plumbing (verified)
 
-- `server/lib/gateway/gateway.aiChat.js`: the local instance forwards an OpenAI-compatible body through `gladysGatewayClient`, maps gateway 403/429 into local HTTP errors. The provider account, prompt policy, and billing live server-side in Gladys Plus.
+- `server/lib/gateway/gateway.aiChat.js`: the local instance normally forwards an OpenAI-compatible body through `gladysGatewayClient`, mapping gateway 403/429 into local HTTP errors. With `BOBS_HOME_AI_PROVIDER=openjarvis`, chat instead uses the local OpenJarvis bridge described in [the AI provider spec](ai-openjarvis-omniroute.md). House-view **image generation** still uses Gladys Plus; its provider account, prompt policy, and billing remain server-side there.
 - `server/lib/gateway/gateway.getOpenAIQuota.js`: the Plus quota endpoint **already models text and image quotas** separately.
 
 ### F.2 New contract

@@ -1,3 +1,4 @@
+const axios = require('axios');
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
@@ -8,6 +9,52 @@ const { aiChat, normalizeAiChatRequestBody } = require('../../../lib/gateway/gat
 const { DEFAULT_TEXT_MODEL } = require('../../../utils/aiChatModels');
 
 describe('gateway.aiChat unit', () => {
+  afterEach(() => {
+    delete process.env.BOBS_HOME_AI_PROVIDER;
+    delete process.env.BOBS_HOME_OPENJARVIS_URL;
+    delete process.env.BOBS_HOME_OPENJARVIS_KEY;
+    sinon.restore();
+  });
+
+  it('should forward home tool calls to OpenJarvis without Gateway metadata or legacy model', async () => {
+    process.env.BOBS_HOME_AI_PROVIDER = 'openjarvis';
+    process.env.BOBS_HOME_OPENJARVIS_URL = 'http://127.0.0.1:8788/';
+    process.env.BOBS_HOME_OPENJARVIS_KEY = 'private-key';
+    const post = sinon.stub(axios, 'post').resolves({ data: { choices: [{ message: { tool_calls: [] } }] } });
+    const request = {
+      messages: [{ role: 'user', content: 'Turn on the lights' }],
+      tools: [{ type: 'function' }],
+      tool_choice: 'required',
+      purpose: 'chat',
+      categories: ['device'],
+      model: DEFAULT_TEXT_MODEL,
+    };
+    const response = await aiChat.call({}, request);
+    expect(response.choices).to.have.length(1);
+    expect(post.calledOnce).to.equal(true);
+    expect(post.firstCall.args[0]).to.equal('http://127.0.0.1:8788/v1/chat/completions');
+    expect(post.firstCall.args[1]).to.deep.equal({
+      messages: request.messages,
+      tools: request.tools,
+      tool_choice: 'required',
+      temperature: undefined,
+      max_tokens: undefined,
+    });
+    expect(post.firstCall.args[2].headers).to.deep.equal({ Authorization: 'Bearer private-key' });
+  });
+
+  it('should hide bridge credentials when the local request fails', async () => {
+    process.env.BOBS_HOME_AI_PROVIDER = 'openjarvis';
+    sinon.stub(axios, 'post').rejects(new Error('connection refused'));
+    let failure;
+    try {
+      await aiChat.call({}, { messages: [] });
+    } catch (e) {
+      failure = e;
+    }
+    expect(failure.message).to.equal('OpenJarvis bridge request failed');
+  });
+
   it('should return gateway response on success', async () => {
     const ctx = {
       callPlanGatedApi: (call) => call(),

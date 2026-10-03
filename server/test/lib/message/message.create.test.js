@@ -15,6 +15,10 @@ const service = {
 const userId = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
 
 describe('message.create', () => {
+  afterEach(() => {
+    delete process.env.BOBS_HOME_AI_PROVIDER;
+  });
+
   beforeEach(async () => {
     await db.Message.destroy({
       where: {
@@ -46,6 +50,20 @@ describe('message.create', () => {
     const newMessage = await messageHandler.create(message);
     expect(newMessage).to.have.property('message');
     assert.neverCalledWith(event.emit, 'message.new-for-open-ai');
+  });
+  it('should forward a home command without Gladys Plus when OpenJarvis is selected', async () => {
+    process.env.BOBS_HOME_AI_PROVIDER = 'openjarvis';
+    const variable = { getValue: fake.resolves(null) };
+    const event = { on: fake.returns(null), emit: fake.returns(null) };
+    const messageHandler = new MessageHandler(event, brain, service, {}, variable);
+    const message = {
+      text: 'Turn on the kitchen light',
+      user: { id: userId, language: 'en' },
+      id: '80d58145-b944-4acf-8d8d-8fd82c3b31db',
+    };
+    await messageHandler.create(message);
+    assert.calledOnce(event.emit);
+    assert.calledWith(event.emit, 'message.new-for-open-ai');
   });
   it('should forward message to OpenAI when Gladys Plus is configured', async () => {
     const variable = {

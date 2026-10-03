@@ -1,3 +1,5 @@
+const { isOpenJarvisSelected } = require('../../utils/localAiProvider');
+
 /**
  * @description Return if gateway is connected.
  * @returns {Promise} Return status.
@@ -14,6 +16,7 @@ async function getStatus() {
 
   return {
     configured,
+    ai_chat_configured: configured || isOpenJarvisSelected(),
     connected: this.connected,
     subscription_active: this.subscriptionActive,
     payment_required_since: this.subscriptionPaymentRequiredSince,
