@@ -49,6 +49,6 @@ paid provider.
 
 Run OmniRoute with the user's connected provider accounts, then run the bridge
 with its endpoint key. Point the Bobs Home server to the bridge and set the
-same endpoint key there. In containers, use the bridge service hostname rather
-than `127.0.0.1`. Keep both services on a trusted network; only the Bobs Home
-server needs access to the bridge.
+same `BOBS_HOME_OPENJARVIS_KEY` on both sides of that connection. In containers,
+use the bridge service hostname rather than `127.0.0.1`. Keep both services on a
+trusted network; only the Bobs Home server needs access to the bridge.
