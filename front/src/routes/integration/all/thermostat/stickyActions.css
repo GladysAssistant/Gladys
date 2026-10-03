@@ -1,0 +1,117 @@
+/* The sticky action bar shared by the thermostat form and the schedule editor.
+   Both run several screens long, so Save has to follow the page down rather than
+   waiting at the bottom of it; keeping one definition is what stops the two bars
+   drifting apart the next time either is adjusted. */
+
+/* A real thermostat's form runs about three and a half screens, and the schedule
+   editor has seven foldable days: Save sat below the fold the whole time either
+   was being filled in. The bar follows the page down and settles at the end.
+
+   Sticky rather than the theme's `fixed-bottom`, which the scene editor uses: the
+   dark theme puts `filter: invert(100%)` on <html>, and an ancestor with a filter
+   becomes the containing block of every fixed element inside it — the bar then
+   measures against the document instead of the viewport and parks at the foot of
+   the page, out of sight until you scroll all the way down. Sticky is not affected
+   by that, and it keeps the card's own width at every window size. */
+.stickyActions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid rgba(0, 40, 100, 0.12);
+  /* The card's own radius, not a hard 3px: the Horizon theme rounds its cards by
+     26px, and a square bar spilled past those corners. */
+  border-bottom-left-radius: var(--gl-radius-lg, 3px);
+  border-bottom-right-radius: var(--gl-radius-lg, 3px);
+  background: #fff;
+}
+
+/* Cancel is the quiet one and Save the confirming action, as in the scene editor's
+   own footer: pills, with Save in solid ink. */
+.stickyActions :global(.btn) {
+  min-height: 44px;
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+}
+
+/* The Horizon theme's footer grammar, taken from the scene editor so the two bars
+   read as one component: frosted glass over the page, Save as the solid ink CTA
+   and Cancel as a quiet neutral. */
+/* No pane of its own here. The scene editor's footer floats over the page, so it
+   frosts what passes under it; this bar sits inside a card that is already
+   frosted, and a second pane over the first made the strip lighter than the card
+   around it — a visible frame across the bottom of the form. The card's own
+   surface shows through, and only the separating line is kept. */
+/* Frosted like the scene editor's footer, but at the opacity the theme itself
+   falls back on where backdrop-filter is unavailable (92-95%). At 72% over a card
+   that is already frosted, two panes stacked and the strip came out lighter than
+   the card around it — the frame across the bottom of the form. It cannot be
+   translucent either: the bar has to hide the fields passing under it. */
+:global(.glass-theme) .stickyActions,
+:global(.dark-mode .glass-theme) .stickyActions {
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+:global(.glass-theme) .stickyActions :global(.btn) {
+  border: none;
+}
+
+:global(.glass-theme) .stickyActions :global(.btn-success) {
+  background-color: var(--gl-ink);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
+}
+
+:global(.glass-theme) .stickyActions :global(.btn-success:hover) {
+  background-color: #2a3550;
+  color: #fff;
+}
+
+/* `.glass-theme .card .btn-secondary` in the dashboard stylesheet paints every
+   secondary button inside a card with `rgba(28,35,52,0.07) !important` - a 7%
+   black written for the translucent widget cards (music transport, camera, energy
+   nav). Our bar has an opaque background, and in the dark theme that near-black
+   landed on a near-black card: the cancel button disappeared into it.
+
+   That rule carries !important, so it can only be answered in kind. */
+:global(.glass-theme) .stickyActions :global(.btn-secondary) {
+  background-color: rgba(28, 35, 52, 0.07) !important;
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .stickyActions :global(.btn-secondary:hover) {
+  background-color: rgba(28, 35, 52, 0.13) !important;
+  color: var(--gl-ink);
+}
+
+/* The dark theme inverts the whole page, so a colour is authored here as what it
+   has to look like *before* that inversion: this light grey comes back as a mid
+   grey on the dark card, where the 7% black above came back as a 7% white and
+   vanished. */
+:global(.dark-mode .glass-theme) .stickyActions :global(.btn-secondary) {
+  background-color: #d2d9e4 !important;
+  color: #2a3550 !important;
+}
+
+:global(.dark-mode .glass-theme) .stickyActions :global(.btn-secondary:hover) {
+  background-color: #c2cbda !important;
+  color: #2a3550 !important;
+}
+
+/* btn-success carries an authored colour that would otherwise go through the
+   double-inversion list of dark-mode.css, so it is pinned here as the scene
+   footer pins its own.
+
+   btn-secondary is deliberately left out: the theme paints it #e1e8f7 and lets
+   the page-wide invert turn it into a readable grey. Pinning it stopped that
+   inversion and the cancel button came out near-black on a dark card. */
+:global(.dark-mode .glass-theme) .stickyActions :global(.btn-success) {
+  filter: none;
+}

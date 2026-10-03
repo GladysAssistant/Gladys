@@ -39,6 +39,9 @@ const DeviceFeatureSupportedOptionModel = require('./device_feature_supported_op
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
 const EnergyPriceModel = require('./energy_price');
+const ThermostatScheduleModel = require('./thermostat_schedule');
+const ThermostatScheduleTransitionModel = require('./thermostat_schedule_transition');
+const ThermostatScheduleDeviceModel = require('./thermostat_schedule_device');
 const HouseModel = require('./house');
 const JobModel = require('./job');
 const LifeEventModel = require('./life_event');
@@ -67,6 +70,9 @@ const models = {
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
   EnergyPrice: EnergyPriceModel(sequelize, Sequelize),
+  ThermostatSchedule: ThermostatScheduleModel(sequelize, Sequelize),
+  ThermostatScheduleTransition: ThermostatScheduleTransitionModel(sequelize, Sequelize),
+  ThermostatScheduleDevice: ThermostatScheduleDeviceModel(sequelize, Sequelize),
   House: HouseModel(sequelize, Sequelize),
   Job: JobModel(sequelize, Sequelize),
   LifeEvent: LifeEventModel(sequelize, Sequelize),

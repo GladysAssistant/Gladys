@@ -1,0 +1,86 @@
+.buttonGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Each button keeps a width its label fits in, and the row wraps rather than
+   shaving all three: on one line a third of a 390px card cut them to
+   "Sauvegar / Supprime / Édite", and at 360px Delete landed on top of Edit. */
+.buttonGroup > * {
+  flex: 1 1 8.5rem;
+}
+
+/* Wraps on a narrow card: the question goes on its own line and the two
+   answers keep a usable width instead of being squeezed beside it. */
+.confirmDeleteRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.confirmDeleteRow .buttonGroup {
+  flex: 1;
+  min-width: 160px;
+}
+
+.confirmDeleteText {
+  font-weight: 500;
+}
+
+/* Read-only summary of what the thermostat is set to, so the card answers the
+   two questions that used to require opening the edit page. */
+.summaryRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-bottom: 16px;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summaryLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9aa0ac;
+}
+
+.summaryValue {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Mobile header ─── */
+
+/* Same as the schedule list: the theme's `.page-options` never wraps, so the
+   sort select, the search field and "New thermostat" overran a 390px screen and
+   the page scrolled sideways. */
+.devicePage {
+  position: relative;
+}
+
+@media (max-width: 575px) {
+  .devicePage :global(.card-header) {
+    flex-wrap: wrap;
+  }
+
+  .devicePage :global(.page-options) {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .devicePage :global(.page-options) :global(.input-icon) {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+}
