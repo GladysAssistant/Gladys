@@ -168,7 +168,13 @@ const HOME_SECTIONS = [
           'living-room-tv-lamp-color',
           'living-room-shutter-state',
           'living-room-ac-binary',
-          'living-room-ac-target'
+          'living-room-ac-target',
+          'living-room-robot-vacuum-state',
+          'living-room-robot-vacuum-run-mode',
+          'living-room-robot-vacuum-dock',
+          'living-room-robot-vacuum-clean-mode',
+          'living-room-robot-vacuum-battery',
+          'living-room-robot-vacuum-main-brush'
         ],
         device_feature_names: [
           'Ceiling light',
@@ -178,7 +184,13 @@ const HOME_SECTIONS = [
           'Color',
           'Shutter',
           'Air conditioning',
-          'Setpoint'
+          'Setpoint',
+          'Robot vacuum',
+          'Run mode',
+          'Return to dock',
+          'Clean mode',
+          'Battery',
+          'Main brush'
         ]
       }
     ],

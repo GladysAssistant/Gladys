@@ -5066,6 +5066,14 @@
     "turnOff": "Turn off",
     "close": "Close"
   },
+  "vacuumControl": {
+    "openPanel": "Open the robot controls",
+    "start": "Start",
+    "stop": "Stop",
+    "dock": "Return to dock",
+    "battery": "Battery",
+    "close": "Close"
+  },
   "deviceFeatureAction": {
     "category": {
       "camera": {
