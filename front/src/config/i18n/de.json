@@ -4479,6 +4479,8 @@
     },
     "batteryLevel": "Batteriestandswarnung",
     "batteryLevelDescription": "Jeden Samstag um 9:00 Uhr wird eine Nachricht an alle Administratoren gesendet, wenn der Batteriestand eines Geräts unter den gewählten Schwellenwert fällt.",
+    "systemMessageService": "Kanal für Systemnachrichten",
+    "systemMessageServiceDescription": "Wähle, wohin Gladys seine Systemnachrichten an die Administratoren sendet (Gladys-Update, fehlgeschlagene Sicherung, schwache Batterien, Gladys Plus-Abonnement, wöchentliche KI-Zusammenfassung). Sie bleiben immer in der Gladys-Unterhaltung sichtbar.",
     "duckDbMigrationTitle": "Migration zu DuckDB",
     "duckDbMigrationDescription": "Wir migrieren zu einem neuen Datenbanksystem für Sensordaten. Gladys wird Ihre Daten automatisch migrieren, aber Ihre Daten in Ihrer SQLite-Datenbank nicht löschen, um Datenverlust zu vermeiden.",
     "duckDbMigrationProgressTitle": "Migrationsfortschritt",

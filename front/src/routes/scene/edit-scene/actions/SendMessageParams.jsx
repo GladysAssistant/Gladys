@@ -90,10 +90,11 @@ class SendMessageParams extends Component {
           />
         </div>
         <MessageServiceSelector
-          action={props.action}
-          path={props.path}
-          updateActionProperty={props.updateActionProperty}
-        />
+          value={props.action.service}
+          onChange={service => props.updateActionProperty(props.path, 'service', service)}
+        >
+          <Text id="editScene.actionsCard.messageSend.serviceExplanation" />
+        </MessageServiceSelector>
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.messageSend.textLabel" />{' '}

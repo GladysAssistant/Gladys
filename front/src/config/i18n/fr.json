@@ -4479,6 +4479,8 @@
     },
     "batteryLevel": "Alerte sur le niveau de batterie",
     "batteryLevelDescription": "Tous les samedis à 9h00, un message sera envoyé à tous les administrateurs si le niveau de batterie d'un appareil passe en dessous du seuil choisi.",
+    "systemMessageService": "Canal des messages système",
+    "systemMessageServiceDescription": "Choisissez où Gladys envoie ses messages système aux administrateurs (mise à jour de Gladys, échec de sauvegarde, batteries faibles, abonnement Gladys Plus, résumé hebdomadaire IA). Ils restent toujours visibles dans la conversation Gladys.",
     "duckDbMigrationTitle": "Migration vers DuckDB",
     "duckDbMigrationDescription": "Nous migrons vers un nouveau système de base de donnée pour les données de capteurs. Gladys va effectuer une migration de vos données automatiquement, mais ne supprimera pas vos données de votre base SQLite afin d'éviter les pertes de données.",
     "duckDbMigrationProgressTitle": "Avancement de la migration",
