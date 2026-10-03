@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const logger = require('../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES, USER_ROLE } = require('../../utils/constants');
 const { isSystemVariableEnabled } = require('../../utils/systemVariable');
@@ -27,48 +28,56 @@ async function checkBatteries() {
   // Handle battery features
   const devices = await this.get({ device_feature_category: DEVICE_FEATURE_CATEGORIES.BATTERY });
 
-  devices.forEach((device) => {
-    device.features
-      .filter((feature) => {
-        // We only take device with battery level < threshold
-        return feature.last_value !== null && feature.last_value < minPercentBattery;
-      })
-      .forEach((feature) => {
-        admins.forEach((admin) => {
-          const message = this.brain.getReply(admin.language, 'battery-threshold.success', {
-            device: {
-              name: device.name,
-            },
-            value: {
-              min: minPercentBattery,
-              current: feature.last_value,
-            },
-          });
-          this.messageManager.sendToUser(admin.selector, message);
+  await Promise.each(devices, async (device) => {
+    const lowBatteryFeatures = device.features.filter((feature) => {
+      // We only take device with battery level < threshold
+      return feature.last_value !== null && feature.last_value < minPercentBattery;
+    });
+    await Promise.each(lowBatteryFeatures, async (feature) => {
+      await Promise.each(admins, async (admin) => {
+        const message = this.brain.getReply(admin.language, 'battery-threshold.success', {
+          device: {
+            name: device.name,
+          },
+          value: {
+            min: minPercentBattery,
+            current: feature.last_value,
+          },
         });
+        // one failing admin must not prevent the others from being warned
+        try {
+          await this.messageManager.sendToUser(admin.selector, message);
+        } catch (e) {
+          logger.error(`Unable to send the battery warning of device ${device.name} to ${admin.selector}`, e);
+        }
       });
+    });
   });
 
   const devicesWithBatteryLowFeatures = await this.get({
     device_feature_category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
   });
 
-  devicesWithBatteryLowFeatures.forEach((device) => {
-    device.features
-      .filter((feature) => {
-        // We only take devices with battery low === true
-        return feature.last_value === 1;
-      })
-      .forEach((feature) => {
-        admins.forEach((admin) => {
-          const message = this.brain.getReply(admin.language, 'battery-level-is-low.success', {
-            device: {
-              name: device.name,
-            },
-          });
-          this.messageManager.sendToUser(admin.selector, message);
+  await Promise.each(devicesWithBatteryLowFeatures, async (device) => {
+    const batteryLowFeatures = device.features.filter((feature) => {
+      // We only take devices with battery low === true
+      return feature.last_value === 1;
+    });
+    await Promise.each(batteryLowFeatures, async () => {
+      await Promise.each(admins, async (admin) => {
+        const message = this.brain.getReply(admin.language, 'battery-level-is-low.success', {
+          device: {
+            name: device.name,
+          },
         });
+        // one failing admin must not prevent the others from being warned
+        try {
+          await this.messageManager.sendToUser(admin.selector, message);
+        } catch (e) {
+          logger.error(`Unable to send the battery warning of device ${device.name} to ${admin.selector}`, e);
+        }
       });
+    });
   });
 }
 
