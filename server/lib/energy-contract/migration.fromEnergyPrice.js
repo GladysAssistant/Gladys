@@ -11,6 +11,7 @@ const {
 const { convertPriceRows, normalizeContractType } = require('./legacy/convertPriceRows');
 const { legacyCost } = require('./legacy/calculateCost');
 const { compileTariff } = require('./tariff.compile');
+const { validateTariff } = require('./tariff.validate');
 const { priceIntervals } = require('./tariff.priceIntervals');
 const { TARIFF_COMPONENT_KINDS } = require('./tariff.constants');
 const { TEMPO_CALENDAR_KEY } = require('./templates/internal');
@@ -187,7 +188,6 @@ async function migrateFromEnergyPrice() {
   for (const group of groups) {
     const first = group.rows[0];
     const contractType = normalizeContractType(first.contract);
-    const { tariff } = convertPriceRows(group.rows);
     const endDates = group.rows.map((r) => r.end_date).filter(Boolean);
     const hasOpenEnd = group.rows.some((r) => !r.end_date);
     const name =
@@ -206,11 +206,13 @@ async function migrateFromEnergyPrice() {
       provider_kind: templateKey ? ENERGY_CONTRACT_PROVIDER_KINDS.COMMUNITY : ENERGY_CONTRACT_PROVIDER_KINDS.USER,
       template_key: templateKey,
       pricing_mode: ENERGY_CONTRACT_PRICING_MODES.RULES,
-      tariff,
       inputs: null,
     };
     let row;
     try {
+      // a group whose rows don't make a valid tariff fails alone, the next groups are migrated
+      contract.tariff = convertPriceRows(group.rows).tariff;
+      validateTariff(contract.tariff);
       // a previous attempt failed on another group: the groups already converted are kept
       // eslint-disable-next-line no-await-in-loop
       const existing = await db.EnergyContract.findOne({

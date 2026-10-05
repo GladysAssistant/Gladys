@@ -158,7 +158,12 @@ async function publishCalendarEntries(key, entries, options = {}) {
       if (!existing) {
         // eslint-disable-next-line no-await-in-loop
         await db.TariffCalendarEntry.create(
-          { calendar_key: key, starts_at: new Date(entry.starts_at), ...entry, starts_at_ms: undefined },
+          {
+            calendar_key: key,
+            starts_at: new Date(entry.starts_at),
+            value_string: entry.value_string,
+            value_number: entry.value_number,
+          },
           { transaction },
         );
       } else if (changed) {

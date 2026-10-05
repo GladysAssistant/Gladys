@@ -99,6 +99,34 @@ describe('energyContract: legacy prices', () => {
       expect(generic.tariff.components[0].fallback.price).to.equal(0.27);
     });
 
+    it('should price the remaining hours with a row without slots and leave out the rows without a colour', () => {
+      // the old form saved a peak row without slots: it is the fallback, never a `time: []` rule
+      const peak = convertPriceRows([
+        row({ contract: 'peak-off-peak', price: 2500, hour_slots: '' }),
+        row({ contract: 'peak-off-peak', price: 1500, hour_slots: OFF_PEAK }),
+        row({ contract: 'peak-off-peak', price: 1000, hour_slots: 'bad' }),
+      ]);
+      expect(peak.tariff.components[0]).to.deep.equal({
+        key: 'energy',
+        kind: 'consumption',
+        rules: [{ label: 'off-peak', when: { time: [['22:00', '06:00']] }, price: 0.15 }],
+        fallback: { label: 'peak', price: 0.25 },
+      });
+      validateTariff(peak.tariff);
+      // a Tempo row without a colour matched no day in the old calculation
+      const tempo = convertPriceRows([
+        row({ contract: 'edf-tempo', price: 1296, day_type: 'blue', hour_slots: OFF_PEAK }),
+        row({ contract: 'edf-tempo', price: 9999, day_type: 'any', hour_slots: PEAK }),
+      ]);
+      expect(tempo.tariff.components[0].rules.map((r) => r.label)).to.deep.equal(['blue off-peak']);
+      expect(() =>
+        convertPriceRows([
+          row({ contract: 'edf-tempo', price: 1296, day_type: null, hour_slots: OFF_PEAK }),
+          row({ contract: 'edf-tempo', price: 1609, day_type: 'any', hour_slots: PEAK }),
+        ]),
+      ).to.throw('no Tempo colour on the consumption prices');
+    });
+
     it('should convert hour slots into merged intervals', () => {
       expect(hourSlotsToTimeIntervals(OFF_PEAK)).to.deep.equal([['22:00', '06:00']]);
       expect(hourSlotsToTimeIntervals('12:00,12:30, 13:00')).to.deep.equal([['12:00', '13:30']]);
@@ -345,6 +373,45 @@ describe('energyContract: legacy prices', () => {
       const created = await energyContract.migrateFromEnergyPrice();
       expect(created).to.deep.equal([]);
       // a failed group is retried at the next start: no done marker
+      expect(variables[MIGRATION_DONE_VARIABLE]).to.equal(undefined);
+    });
+
+    it('should fail a group that does not convert to a valid tariff alone and migrate the next ones', async () => {
+      await db.EnergyPrice.bulkCreate([
+        // a Tempo contract saved without colours: nothing to convert
+        row({
+          id: '11111111-1111-4111-8111-111111111141',
+          selector: 'v1',
+          contract_name: 'Tempo',
+          contract: 'edf-tempo',
+          start_date: '2024-01-01',
+          day_type: null,
+          hour_slots: OFF_PEAK,
+        }),
+        // a placeholder never replaced: the tariff would not compile
+        row({
+          id: '11111111-1111-4111-8111-111111111142',
+          selector: 'v2',
+          contract_name: 'HPHC',
+          contract: 'peak-off-peak',
+          start_date: '2024-06-01',
+          hour_slots: 'TO_REPLACE_OFF_PEAK',
+        }),
+        row({
+          id: '11111111-1111-4111-8111-111111111144',
+          selector: 'v4',
+          contract_name: 'HPHC',
+          contract: 'peak-off-peak',
+          start_date: '2024-06-01',
+          price: 2500,
+          hour_slots: PEAK,
+        }),
+        row({ id: '11111111-1111-4111-8111-111111111143', selector: 'v3', start_date: '2025-01-01' }),
+      ]);
+      const created = await energyContract.migrateFromEnergyPrice();
+      expect(created.map((c) => c.name)).to.deep.equal(['edf-base']);
+      expect(await db.EnergyContract.count()).to.equal(1);
+      // the failed groups are retried at the next start
       expect(variables[MIGRATION_DONE_VARIABLE]).to.equal(undefined);
     });
 

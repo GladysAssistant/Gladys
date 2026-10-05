@@ -129,6 +129,55 @@ describe('energyContract: priceContractIntervals', () => {
     });
   });
 
+  it('should split a billing period longer than one request and carry the accumulations', async () => {
+    const contract = await energyContract.create(
+      contractPayload({
+        name: 'Agile',
+        pricing_mode: 'delegated',
+        provider_service_id: TEST_SERVICE_ID,
+        tariff: DELEGATED_TARIFF,
+        timezone: 'Europe/Paris',
+      }),
+    );
+    const priceEnergyContract = sinon.fake(async (c, payload) => {
+      const answers = new Map();
+      payload.intervals.forEach((interval) => {
+        answers.set(interval.starts_at, { cost: interval.kwh * 0.1, components: { energy: interval.kwh * 0.1 } });
+      });
+      return answers;
+    });
+    energyContract.externalIntegration = { priceEnergyContract };
+    // October 2026 in Paris: 31 days and the autumn DST change, 1,490 intervals
+    const startMs = Date.parse('2026-09-30T22:00:00Z');
+    const endMs = Date.parse('2026-10-31T23:00:00Z');
+    const intervals = [];
+    for (let ms = startMs; ms < endMs; ms += 30 * 60 * 1000) {
+      intervals.push({ starts_at: new Date(ms).toISOString(), kwh: 0.5 });
+    }
+    expect(intervals).to.have.lengthOf(1490);
+    const result = await energyContract.priceContractIntervals(contract, intervals);
+    expect(priceEnergyContract.callCount).to.equal(2);
+    const [, first] = priceEnergyContract.firstCall.args;
+    const [, second] = priceEnergyContract.secondCall.args;
+    expect(first.intervals).to.have.lengthOf(1488);
+    expect(second.intervals).to.have.lengthOf(2);
+    expect(second.billing_period).to.deep.equal(first.billing_period);
+    // the second request starts at 23:00 on 31 October: 46 intervals of that day before it
+    expect(second.cumulative_before).to.deep.equal({ day: 23, month: 744, billing_period: 744 });
+    expect(result.costs).to.have.lengthOf(1490);
+    expect(result.unpriced).to.deep.equal([]);
+    // an interval without energy counts for nothing, its power comes from its own duration
+    priceEnergyContract.resetHistory();
+    await energyContract.priceContractIntervals(contract, [
+      { starts_at: '2026-11-02T10:00:00Z', kwh: null, duration_minutes: 60 },
+      { starts_at: '2026-11-02T11:00:00Z', kwh: 3, duration_minutes: 60 },
+    ]);
+    expect(priceEnergyContract.firstCall.args[1].intervals).to.deep.equal([
+      { starts_at: '2026-11-02T10:00:00.000Z', kwh: 0, max_power_kw: 0 },
+      { starts_at: '2026-11-02T11:00:00.000Z', kwh: 3, max_power_kw: 3 },
+    ]);
+  });
+
   it('should leave the intervals unpriced when the integration fails or answers partially', async () => {
     const contract = await energyContract.create(
       contractPayload({

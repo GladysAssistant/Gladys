@@ -163,13 +163,20 @@ function buildConsumptionComponent(rows, contractType) {
         blueOffPeak = rowPrice(offPeak);
       }
     });
+    if (component.rules.length === 0) {
+      // the legacy calculation only matched rows of the day's colour: nothing to convert
+      throw new Error('no Tempo colour on the consumption prices');
+    }
     const lastRule = component.rules[component.rules.length - 1];
     component.fallback = { label: 'off-peak', price: blueOffPeak === undefined ? lastRule.price : blueOffPeak };
     return { component, inputs, calendars: ['tempo'] };
   }
   if (contractType === ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK) {
     const timed = rows.map((row) => ({ row, ...rowTime(row) }));
-    const placeholderPeak = timed.find((t) => t.isPeakPlaceholder);
+    // a row without slots matched no slot in the legacy calculation: like a peak placeholder,
+    // it is the price of the remaining hours, never a rule of its own
+    const isEmpty = (t) => Array.isArray(t.time) && t.time.length === 0;
+    const placeholderPeak = timed.find((t) => t.isPeakPlaceholder) || timed.find(isEmpty);
     const sorted = timed
       .filter((t) => !t.isPeakPlaceholder)
       .sort((a, b) => (Array.isArray(a.time) ? a.time.length : 1) - (Array.isArray(b.time) ? b.time.length : 1));
@@ -182,7 +189,7 @@ function buildConsumptionComponent(rows, contractType) {
       fallbackRow = bySlots[0].row;
     }
     sorted
-      .filter((t) => t.row !== fallbackRow)
+      .filter((t) => t.row !== fallbackRow && !isEmpty(t))
       .forEach((t) => {
         if (t.isPlaceholder) {
           inputs.push({ key: OFF_PEAK_INPUT, type: 'time_intervals', required: true });

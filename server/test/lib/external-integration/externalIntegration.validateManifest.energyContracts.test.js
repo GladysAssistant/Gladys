@@ -167,6 +167,20 @@ describe('externalIntegration.validateManifest — energy_contracts', () => {
       off_peak_slots: [['00:30', '07:30']],
       note: 'sample',
     });
+    // a select without a default is sampled with its first option, a number feeding an amount here
+    expect(sampleInputValues([{ key: 'power', type: 'select', options: [6, 9, 12] }])).to.deep.equal({ power: 6 });
+    const numericSelect = withTemplate({
+      ...ECONOMY_7,
+      inputs: [...ECONOMY_7.inputs, { key: 'power', type: 'select', options: [6, 9, 12] }],
+      tariff: {
+        ...ECONOMY_7.tariff,
+        components: [
+          ...ECONOMY_7.tariff.components,
+          { key: 'power', kind: 'fixed', amount: '{{input:power}}', per: 'month' },
+        ],
+      },
+    });
+    expect(externalIntegration.validateManifest(numericSelect)).to.be.an('object');
     expect(sampleInputValues(undefined)).to.deep.equal({});
     expect(sampleInputValues([null, { type: 'number' }])).to.deep.equal({});
   });

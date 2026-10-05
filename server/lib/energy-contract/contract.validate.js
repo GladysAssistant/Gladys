@@ -4,8 +4,8 @@ const {
   ENERGY_CONTRACT_PROVIDER_KINDS_LIST,
   ENERGY_CONTRACT_PRICING_MODES,
   ENERGY_CONTRACT_PRICING_MODES_LIST,
-  ENERGY_CONTRACT_ENERGY_TYPES_LIST,
-  ENERGY_CONTRACT_DIRECTIONS_LIST,
+  ENERGY_CONTRACT_ENERGY_TYPES,
+  ENERGY_CONTRACT_DIRECTIONS,
   ENERGY_CONTRACT_POWER_UNITS_LIST,
 } = require('../../utils/constants');
 const { validateTariff } = require('./tariff.validate');
@@ -19,8 +19,10 @@ const contractSchema = Joi.object({
     .min(1)
     .max(128),
   electric_meter_device_id: Joi.string().guid(),
-  energy_type: Joi.string().valid(...ENERGY_CONTRACT_ENERGY_TYPES_LIST),
-  direction: Joi.string().valid(...ENERGY_CONTRACT_DIRECTIONS_LIST),
+  // gas, water and production contracts are reserved by the model, nothing computes them in v1:
+  // accepted, they would price the meter's consumed electricity (section 2)
+  energy_type: Joi.string().valid(ENERGY_CONTRACT_ENERGY_TYPES.ELECTRICITY),
+  direction: Joi.string().valid(ENERGY_CONTRACT_DIRECTIONS.CONSUMPTION),
   valid_from: Joi.string().pattern(DATE_REGEX),
   valid_to: Joi.string()
     .pattern(DATE_REGEX)

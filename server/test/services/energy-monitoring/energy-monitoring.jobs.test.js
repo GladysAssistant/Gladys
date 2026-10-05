@@ -14,6 +14,41 @@ const {
 
 const { fake } = sinon;
 
+// another meter, with its own consumption and cost features
+const OTHER_METER = {
+  id: 'e1fe2ab9-8c50-4053-ac40-83421f899c60',
+  service_id: TEST_SERVICE_ID,
+  name: 'Other meter',
+  external_id: 'other-meter',
+  features: [
+    {
+      id: '201d2306-b15e-4859-b403-a076167eadd9',
+      external_id: 'other-consumption',
+      selector: 'other-consumption',
+      name: 'Consumption',
+      read_only: true,
+      has_feedback: false,
+      min: 0,
+      max: 1000,
+      category: 'energy-sensor',
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+    },
+    {
+      id: '2f4133be-b86c-4a97-9cc8-585fadb74006',
+      external_id: 'other-cost',
+      selector: 'other-cost',
+      name: 'Cost',
+      read_only: true,
+      has_feedback: false,
+      min: 0,
+      max: 1000,
+      category: 'energy-sensor',
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+      energy_parent_id: '201d2306-b15e-4859-b403-a076167eadd9',
+    },
+  ],
+};
+
 describe('EnergyMonitoring: contract jobs', () => {
   let gladys;
   let energyContract;
@@ -178,16 +213,86 @@ describe('EnergyMonitoring: contract jobs', () => {
         { value: 0.1, created_at: new Date(now - 1 * hour) },
       ]);
       energyMonitoring.calculateCostFrom = fake.resolves(null);
-      await energyMonitoring.delegatedCatchUp('job-3');
+      await energyMonitoring.delegatedCatchUp();
       expect(energyMonitoring.calculateCostFrom.callCount).to.equal(1);
       const [from, jobId, options] = energyMonitoring.calculateCostFrom.firstCall.args;
       expect(from.getTime()).to.equal(new Date(now - 2 * hour).getTime() - 30 * 60 * 1000);
-      expect(jobId).to.equal('job-3');
+      expect(jobId).to.equal(undefined);
       expect(options).to.deep.equal({ electricMeterDeviceIds: [METER_DEVICE_ID] });
+      // the job part receives the job id of its own job
+      await energyMonitoring.catchUpDelegatedFrom(new Date(now), [METER_DEVICE_ID], 'job-3');
+      expect(energyMonitoring.calculateCostFrom.secondCall.args[1]).to.equal('job-3');
+      energyMonitoring.calculateCostFrom = fake.resolves(null);
       // everything priced: nothing to do
       await db.duckDbBatchInsertState(METER_COST_FEATURE_ID, [{ value: 0.1, created_at: new Date(now - 2 * hour) }]);
       await energyMonitoring.delegatedCatchUp();
-      expect(energyMonitoring.calculateCostFrom.callCount).to.equal(1);
+      expect(energyMonitoring.calculateCostFrom.callCount).to.equal(0);
+    });
+
+    it('should only catch up the intervals a delegated contract covers', async () => {
+      const now = Date.now();
+      const hour = 60 * 60 * 1000;
+      const today = new Date(now).toISOString().slice(0, 10);
+      const yesterday = new Date(now - 24 * hour).toISOString().slice(0, 10);
+      // a previous delegated contract until 10 days ago, the active one from today
+      await energyContract.create(
+        contractPayload({
+          name: 'Old agile',
+          pricing_mode: 'delegated',
+          provider_service_id: TEST_SERVICE_ID,
+          timezone: 'UTC',
+          valid_from: '2020-01-01',
+          valid_to: new Date(now - 10 * 24 * hour).toISOString().slice(0, 10),
+          tariff: { tariff_version: 1, components: [{ key: 's', kind: 'fixed', amount: 1, per: 'day' }] },
+        }),
+      );
+      await energyContract.create(
+        contractPayload({
+          name: 'Agile',
+          pricing_mode: 'delegated',
+          provider_service_id: TEST_SERVICE_ID,
+          timezone: 'UTC',
+          valid_from: today,
+          tariff: { tariff_version: 1, components: [{ key: 's', kind: 'fixed', amount: 1, per: 'day' }] },
+        }),
+      );
+      // a delegated contract of another meter never covers this meter's intervals
+      await device.create(OTHER_METER);
+      await energyContract.create(
+        contractPayload({
+          name: 'Other agile',
+          electric_meter_device_id: OTHER_METER.id,
+          pricing_mode: 'delegated',
+          provider_service_id: TEST_SERVICE_ID,
+          timezone: 'UTC',
+          valid_from: '2099-01-01',
+          tariff: { tariff_version: 1, components: [{ key: 's', kind: 'fixed', amount: 1, per: 'day' }] },
+        }),
+      );
+      // uncosted intervals between the two contracts (no delegated contract covers them)
+      await insertConsumption([
+        { value: 1, created_at: new Date(`${yesterday}T12:00:00.000Z`) },
+        { value: 1, created_at: new Date(`${yesterday}T12:30:00.000Z`) },
+      ]);
+      energyMonitoring.catchUpDelegatedFrom = fake.resolves(null);
+      await energyMonitoring.delegatedCatchUp();
+      // nothing to catch up: not even a job
+      expect(energyMonitoring.catchUpDelegatedFrom.callCount).to.equal(0);
+      // an uncosted interval of the old contract is caught up
+      const old = new Date(now - 12 * 24 * hour);
+      old.setUTCHours(12, 0, 0, 0);
+      await insertConsumption([{ value: 1, created_at: old }]);
+      await energyMonitoring.delegatedCatchUp();
+      expect(energyMonitoring.catchUpDelegatedFrom.callCount).to.equal(1);
+      expect(energyMonitoring.catchUpDelegatedFrom.firstCall.args[0].getTime()).to.equal(
+        old.getTime() - 30 * 60 * 1000,
+      );
+    });
+
+    it('should not create a job when no delegated contract is active', async () => {
+      energyMonitoring.catchUpDelegatedFrom = fake.resolves(null);
+      await energyMonitoring.delegatedCatchUp();
+      expect(energyMonitoring.catchUpDelegatedFrom.callCount).to.equal(0);
     });
 
     it('should ignore rules contracts, orphaned contracts and devices of other meters', async () => {
@@ -210,39 +315,7 @@ describe('EnergyMonitoring: contract jobs', () => {
       await energyMonitoring.delegatedCatchUp();
       expect(energyMonitoring.calculateCostFrom.callCount).to.equal(0);
       // an active delegated contract on another meter: the test meter's features are not scanned
-      await device.create({
-        id: 'e1fe2ab9-8c50-4053-ac40-83421f899c60',
-        service_id: TEST_SERVICE_ID,
-        name: 'Other meter',
-        external_id: 'other-meter',
-        features: [
-          {
-            id: '201d2306-b15e-4859-b403-a076167eadd9',
-            external_id: 'other-consumption',
-            selector: 'other-consumption',
-            name: 'Consumption',
-            read_only: true,
-            has_feedback: false,
-            min: 0,
-            max: 1000,
-            category: 'energy-sensor',
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          },
-          {
-            id: '2f4133be-b86c-4a97-9cc8-585fadb74006',
-            external_id: 'other-cost',
-            selector: 'other-cost',
-            name: 'Cost',
-            read_only: true,
-            has_feedback: false,
-            min: 0,
-            max: 1000,
-            category: 'energy-sensor',
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-            energy_parent_id: '201d2306-b15e-4859-b403-a076167eadd9',
-          },
-        ],
-      });
+      await device.create(OTHER_METER);
       await energyContract.create(
         contractPayload({
           name: 'Other agile',

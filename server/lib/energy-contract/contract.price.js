@@ -2,6 +2,7 @@ const { ENERGY_CONTRACT_PRICING_MODES } = require('../../utils/constants');
 const { compileTariff } = require('./tariff.compile');
 const { priceIntervals } = require('./tariff.priceIntervals');
 const { getBillingPeriodBounds, getLocalContext } = require('./tariff.time');
+const { MAX_ENERGY_INTERVALS_PER_REQUEST } = require('../external-integration/constants');
 
 /**
  * @description Compile the tariff of a contract, cached per contract id and version: the
@@ -88,74 +89,88 @@ async function priceContractIntervals(contract, intervals, options = {}) {
   const unpriced = [];
   const groups = splitByBillingPeriod(contract, sorted);
   const cumulative = { day: 0, month: 0, billing_period: 0, ...(options.cumulative_before || {}) };
-  const localMonth = (interval) =>
-    getLocalContext(new Date(interval.starts_at).getTime(), contract.timezone).date.slice(0, 7);
-  // the local month of the last interval handed to the integration
-  let currentMonth = null;
+  const localDate = (interval) => getLocalContext(new Date(interval.starts_at).getTime(), contract.timezone).date;
+  // the local date of the last interval handed to the integration
+  let currentDate = null;
   // eslint-disable-next-line no-restricted-syntax
   for (const group of groups) {
     // a billing period starts at local midnight: the day and period accumulations restart,
     // the month one carries on only inside the same local month
-    if (currentMonth !== null) {
+    if (currentDate !== null) {
       cumulative.day = 0;
       cumulative.billing_period = 0;
-      if (currentMonth !== localMonth(group.intervals[0])) {
+      if (currentDate.slice(0, 7) !== localDate(group.intervals[0]).slice(0, 7)) {
         cumulative.month = 0;
       }
     }
-    let delegated;
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      delegated = await this.externalIntegration.priceEnergyContract(contract, {
-        billing_period: {
-          starts_at: new Date(group.bounds.startMs).toISOString(),
-          ends_at: new Date(group.bounds.endMs).toISOString(),
-        },
-        cumulative_before: { day: cumulative.day, month: cumulative.month, billing_period: cumulative.billing_period },
-        intervals: group.intervals.map((i) => {
-          const prepared = fixedByStart.get(new Date(i.starts_at).toISOString());
-          return {
-            starts_at: prepared.starts_at,
-            kwh: Number(i.kwh) || 0,
-            max_power_kw:
-              i.max_power_kw === undefined || i.max_power_kw === null
-                ? ((Number(i.kwh) || 0) * 60) / (i.duration_minutes || 30)
-                : Number(i.max_power_kw),
-          };
-        }),
-      });
-    } catch (e) {
-      engineResult.warnings.push({
-        reason: 'delegated_failed',
-        message: e.message,
-        from: group.intervals[0].starts_at,
-      });
-      group.intervals.forEach((i) => unpriced.push(new Date(i.starts_at).toISOString()));
-      delegated = new Map();
-    }
-    group.intervals.forEach((i) => {
-      const startsAt = new Date(i.starts_at).toISOString();
-      const fixed = fixedByStart.get(startsAt);
-      const energy = delegated.get(startsAt);
-      if (energy === undefined) {
-        if (delegated.size > 0) {
-          unpriced.push(startsAt);
+    // a period longer than one request (a 31-day period with the autumn DST change has 1,490
+    // intervals) is sent in several requests, each with the accumulations before its first interval
+    for (let offset = 0; offset < group.intervals.length; offset += MAX_ENERGY_INTERVALS_PER_REQUEST) {
+      const chunk = group.intervals.slice(offset, offset + MAX_ENERGY_INTERVALS_PER_REQUEST);
+      let delegated;
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        delegated = await this.externalIntegration.priceEnergyContract(contract, {
+          billing_period: {
+            starts_at: new Date(group.bounds.startMs).toISOString(),
+            ends_at: new Date(group.bounds.endMs).toISOString(),
+          },
+          cumulative_before: {
+            day: cumulative.day,
+            month: cumulative.month,
+            billing_period: cumulative.billing_period,
+          },
+          intervals: chunk.map((i) => {
+            const prepared = fixedByStart.get(new Date(i.starts_at).toISOString());
+            return {
+              starts_at: prepared.starts_at,
+              kwh: Number(i.kwh) || 0,
+              max_power_kw:
+                i.max_power_kw === undefined || i.max_power_kw === null
+                  ? ((Number(i.kwh) || 0) * 60) / (i.duration_minutes || 30)
+                  : Number(i.max_power_kw),
+            };
+          }),
+        });
+      } catch (e) {
+        engineResult.warnings.push({
+          reason: 'delegated_failed',
+          message: e.message,
+          from: chunk[0].starts_at,
+        });
+        chunk.forEach((i) => unpriced.push(new Date(i.starts_at).toISOString()));
+        delegated = new Map();
+      }
+      chunk.forEach((i) => {
+        const startsAt = new Date(i.starts_at).toISOString();
+        const fixed = fixedByStart.get(startsAt);
+        const energy = delegated.get(startsAt);
+        if (energy === undefined) {
+          if (delegated.size > 0) {
+            unpriced.push(startsAt);
+          }
+          return;
         }
-        return;
+        const components = { ...fixed.components, ...energy.components };
+        const cost = Math.round((fixed.cost + energy.cost) * 1e6) / 1e6;
+        costs.push({ starts_at: startsAt, cost, components, label: energy.label });
+      });
+      // what this request consumed feeds the accumulations of the next one
+      // eslint-disable-next-line no-restricted-syntax
+      for (const i of chunk) {
+        const date = localDate(i);
+        if (currentDate !== null && date !== currentDate) {
+          cumulative.day = 0;
+          if (date.slice(0, 7) !== currentDate.slice(0, 7)) {
+            cumulative.month = 0;
+          }
+        }
+        currentDate = date;
+        const kwh = Number(i.kwh) || 0;
+        cumulative.day += kwh;
+        cumulative.month += kwh;
+        cumulative.billing_period += kwh;
       }
-      const components = { ...fixed.components, ...energy.components };
-      const cost = Math.round((fixed.cost + energy.cost) * 1e6) / 1e6;
-      costs.push({ starts_at: startsAt, cost, components, label: energy.label });
-    });
-    // what this period consumed feeds the next period's month accumulation
-    // eslint-disable-next-line no-restricted-syntax
-    for (const i of group.intervals) {
-      const month = localMonth(i);
-      if (currentMonth !== null && month !== currentMonth) {
-        cumulative.month = 0;
-      }
-      currentMonth = month;
-      cumulative.month += Number(i.kwh) || 0;
     }
   }
   return { costs, warnings: engineResult.warnings, cumulative: engineResult.cumulative, unpriced };

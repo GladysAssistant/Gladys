@@ -1,11 +1,12 @@
 const db = require('../../models');
-const { NotFoundError } = require('../../utils/coreErrors');
+const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
 const { validateContract, validateContractTariff } = require('./contract.validate');
 const { assertNoOverlap } = require('./contract.create');
 
 // A change of one of these fields changes the computed costs (section 8.1):
-// the costs are recomputed from the earliest valid_from involved.
-const RECALCULATION_FIELDS = ['tariff', 'inputs', 'valid_from', 'valid_to', 'timezone', 'billing_period_start_day'];
+// the costs are recomputed from the earliest valid_from involved. The `inputs` are not one of
+// them: the stored tariff is already substituted, a new tariff comes with its own change.
+const RECALCULATION_FIELDS = ['tariff', 'valid_from', 'valid_to', 'timezone', 'billing_period_start_day'];
 
 /**
  * @description Update a contract by selector. The tariff is re-validated in the contract's
@@ -30,6 +31,10 @@ async function update(selector, data) {
     ...value,
     valid_to: value.valid_to === undefined ? before.valid_to : value.valid_to || null,
   };
+  // a partial update is checked against the stored dates too
+  if (next.valid_to !== null && next.valid_to < next.valid_from) {
+    throw new BadParameters('valid_to: must be on or after valid_from');
+  }
   next.tariff = validateContractTariff(next.tariff, next.inputs, next.pricing_mode);
   await assertNoOverlap(next, before.id);
   const { id, selector: keptSelector, created_at: createdAt, updated_at: updatedAt, ...fields } = next;

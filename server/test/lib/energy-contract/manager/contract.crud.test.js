@@ -96,13 +96,16 @@ describe('energyContract: contracts CRUD', () => {
     await expect(
       energyContract.create(contractPayload({ name: 'Other', valid_from: '2024-01-01', valid_to: '2025-01-01' })),
     ).to.be.rejectedWith(/already covers this meter/);
-    // the day after the end is fine, and so is a production contract on the same dates
+    // the day after the end is fine
     const next = await energyContract.create(contractPayload({ name: 'Next', valid_from: '2025-07-01' }));
     expect(next.selector).to.equal('next');
-    const production = await energyContract.create(
-      contractPayload({ name: 'Solar', direction: 'production', valid_from: '2025-01-01' }),
-    );
-    expect(production.direction).to.equal('production');
+    // production, gas and water are reserved: nothing computes them in v1
+    await expect(
+      energyContract.create(contractPayload({ name: 'Solar', direction: 'production', valid_from: '2025-01-01' })),
+    ).to.be.rejectedWith('direction: must be [consumption]');
+    await expect(
+      energyContract.create(contractPayload({ name: 'Gas', energy_type: 'gas', valid_from: '2025-01-01' })),
+    ).to.be.rejectedWith('energy_type: must be [electricity]');
     await expect(
       energyContract.create(contractPayload({ name: 'Third', valid_from: '2020-01-01' })),
     ).to.be.rejectedWith(/already covers this meter from 2025-01-01 to 2025-06-30/);
@@ -164,6 +167,10 @@ describe('energyContract: contracts CRUD', () => {
     expect(renamed.name).to.equal('Renamed');
     expect(renamed.selector).to.equal('edf-base');
     expect(emitted.callCount).to.equal(0);
+    // the stored tariff is already substituted: new inputs alone change no cost
+    const withInputs = await energyContract.update('edf-base', { inputs: { margin: 0.01 } });
+    expect(withInputs.inputs).to.deep.equal({ margin: 0.01 });
+    expect(emitted.callCount).to.equal(0);
     const changed = await energyContract.update('edf-base', {
       tariff: {
         ...BASE_TARIFF,
@@ -181,6 +188,24 @@ describe('energyContract: contracts CRUD', () => {
     expect(created.id).to.equal(later.id);
     await expect(energyContract.update('nope', { name: 'x' })).to.be.rejectedWith('ENERGY_CONTRACT_NOT_FOUND');
     await expect(energyContract.update('edf-base', { currency: 'nope' })).to.be.rejectedWith(/currency/);
+  });
+
+  it('should check a partial update of the dates against the stored ones', async () => {
+    await energyContract.create(contractPayload({ valid_from: '2025-01-01', valid_to: '2025-06-30' }));
+    const emitted = sinon.fake();
+    event.on(EVENTS.ENERGY_CONTRACT.RECALCULATE, emitted);
+    await expect(energyContract.update('edf-base', { valid_to: '2024-12-31' })).to.be.rejectedWith(
+      'valid_to: must be on or after valid_from',
+    );
+    await expect(energyContract.update('edf-base', { valid_from: '2025-07-01' })).to.be.rejectedWith(
+      'valid_to: must be on or after valid_from',
+    );
+    expect(emitted.callCount).to.equal(0);
+    const contract = await energyContract.getBySelector('edf-base');
+    expect([contract.valid_from, contract.valid_to]).to.deep.equal(['2025-01-01', '2025-06-30']);
+    // a one-day contract is fine
+    const oneDay = await energyContract.update('edf-base', { valid_to: '2025-01-01' });
+    expect(oneDay.valid_to).to.equal('2025-01-01');
   });
 
   it('should refuse an update creating an overlap', async () => {

@@ -9,7 +9,7 @@ const { calculateCostFromBeginning } = require('./energy-monitoring.calculateCos
 const { getContracts } = require('./energy-monitoring.getContracts');
 const { recalculateForContracts } = require('./energy-monitoring.recalculateForContracts');
 const { closeBillingPeriods } = require('./energy-monitoring.closeBillingPeriods');
-const { delegatedCatchUp } = require('./energy-monitoring.delegatedCatchUp');
+const { delegatedCatchUp, catchUpDelegatedFrom } = require('./energy-monitoring.delegatedCatchUp');
 const { calculateEnergyFromIndex } = require('./energy-monitoring.calculateEnergyFromIndex');
 const { calculateEnergyFromIndexFromBeginning } = require('./energy-monitoring.calculateEnergyFromIndexFromBeginning');
 const { calculateEnergyFromIndexThirtyMinutes } = require('./energy-monitoring.calculateEnergyFromIndexThirtyMinutes');
@@ -74,9 +74,10 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
     JOB_TYPES.ENERGY_MONITORING_BILLING_PERIOD_END,
     this.closeBillingPeriods.bind(this),
   );
-  this.delegatedCatchUp = this.gladys.job.wrapper(
+  // the catch-up scan runs every 30 minutes, the job only exists when it has something to recompute
+  this.catchUpDelegatedFrom = this.gladys.job.wrapper(
     JOB_TYPES.ENERGY_MONITORING_DELEGATED_CATCH_UP,
-    this.delegatedCatchUp.bind(this),
+    this.catchUpDelegatedFrom.bind(this),
   );
 };
 
@@ -90,6 +91,7 @@ EnergyMonitoringHandler.prototype.getContracts = getContracts;
 EnergyMonitoringHandler.prototype.recalculateForContracts = recalculateForContracts;
 EnergyMonitoringHandler.prototype.closeBillingPeriods = closeBillingPeriods;
 EnergyMonitoringHandler.prototype.delegatedCatchUp = delegatedCatchUp;
+EnergyMonitoringHandler.prototype.catchUpDelegatedFrom = catchUpDelegatedFrom;
 EnergyMonitoringHandler.prototype.calculateEnergyFromIndex = calculateEnergyFromIndex;
 EnergyMonitoringHandler.prototype.calculateEnergyFromIndexFromBeginning = calculateEnergyFromIndexFromBeginning;
 EnergyMonitoringHandler.prototype.calculateEnergyFromIndexThirtyMinutes = calculateEnergyFromIndexThirtyMinutes;

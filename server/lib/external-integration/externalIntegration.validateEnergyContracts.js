@@ -122,7 +122,7 @@ function validateInput(input, path, seenKeys, errors, validateMultiLanguageText)
 
 /**
  * @description The input values used to check a template tariff: the declared defaults,
- * a sample of the right type otherwise.
+ * the first option of a select, a sample of the right type otherwise.
  * @param {Array<object>} inputs - The template inputs.
  * @returns {object} Values by key.
  * @example
@@ -132,7 +132,14 @@ function sampleInputValues(inputs) {
   const values = {};
   (Array.isArray(inputs) ? inputs : []).forEach((input) => {
     if (input && typeof input === 'object' && typeof input.key === 'string') {
-      values[input.key] = input.default !== undefined ? input.default : SAMPLE_INPUT_VALUES[input.type];
+      if (input.default !== undefined) {
+        values[input.key] = input.default;
+      } else if (input.type === 'select' && Array.isArray(input.options) && input.options.length > 0) {
+        // a real value of the select: its options may be numbers feeding a price or an amount
+        [values[input.key]] = input.options;
+      } else {
+        values[input.key] = SAMPLE_INPUT_VALUES[input.type];
+      }
     }
   });
   return values;
