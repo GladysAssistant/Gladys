@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const { assert, stub } = sinon;
@@ -10,6 +11,7 @@ const Job = require('../../../lib/job');
 const Brain = require('../../../lib/brain');
 const Variable = require('../../../lib/variable');
 const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
+const { NotFoundError } = require('../../../utils/coreErrors');
 const db = require('../../../models');
 
 const event = new EventEmitter();
@@ -169,6 +171,73 @@ describe('Device check batteries', () => {
       'admin',
       'Avertissement ! Le niveau de la batterie de Test device est faible !',
     );
+  });
+  describe('when sending the message to one admin fails', () => {
+    const twoAdmins = {
+      getByRole: stub().resolves([
+        { selector: 'admin-1', language: 'fr' },
+        { selector: 'admin-2', language: 'fr' },
+      ]),
+    };
+    const variables = {
+      getValue: (key) => {
+        if (key === SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_ENABLED) {
+          return '1';
+        }
+        return 30;
+      },
+    };
+    const createMessageManager = (sentTo) => ({
+      // resolves later: sentTo is only filled when checkBatteries waits for the sends
+      sendSystemMessage: stub().callsFake(async (selector) => {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 10);
+        });
+        if (selector === 'admin-1') {
+          throw new NotFoundError(`User ${selector} not found`);
+        }
+        sentTo.push(selector);
+      }),
+    });
+    it('should still warn the other admins when the battery is lower than threshold', async () => {
+      const sentTo = [];
+      const messageManager = createMessageManager(sentTo);
+      const stateManager = new StateManager(event);
+      const service = {
+        getService: () => null,
+      };
+      const device = new Device(event, messageManager, stateManager, service, {}, variables, job, brain, twoAdmins);
+
+      await device.checkBatteries();
+
+      assert.calledTwice(messageManager.sendSystemMessage);
+      expect(sentTo).to.deep.equal(['admin-2']);
+    });
+    it('should still warn the other admins when the battery is low', async () => {
+      // Update the feature to be a "battery low" feature
+      const feature = await db.DeviceFeature.findOne({
+        where: {
+          selector: 'test-device-feature-battery',
+        },
+      });
+      await feature.update({
+        last_value: 1,
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+        type: DEVICE_FEATURE_TYPES.BINARY,
+      });
+      const sentTo = [];
+      const messageManager = createMessageManager(sentTo);
+      const stateManager = new StateManager(event);
+      const service = {
+        getService: () => null,
+      };
+      const device = new Device(event, messageManager, stateManager, service, {}, variables, job, brain, twoAdmins);
+
+      await device.checkBatteries();
+
+      assert.calledTwice(messageManager.sendSystemMessage);
+      expect(sentTo).to.deep.equal(['admin-2']);
+    });
   });
   it('should do nothing is battery level is null', async () => {
     // set the battery to null

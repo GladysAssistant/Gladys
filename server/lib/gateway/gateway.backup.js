@@ -209,11 +209,16 @@ async function backup(jobId) {
     }
     // If the backup fails, we need to warn the admins of this installation
     const admins = await this.user.getByRole(USER_ROLE.ADMIN);
-    admins.forEach((admin) => {
+    await Promise.each(admins, async (admin) => {
       const message = this.brain.getReply(admin.language, 'backup.fail', {
         errorMessage: e.toString(),
       });
-      this.message.sendSystemMessage(admin.selector, message);
+      // a failing notification must not replace the backup error rethrown below
+      try {
+        await this.message.sendSystemMessage(admin.selector, message);
+      } catch (sendError) {
+        logger.error(`Unable to send the backup failure message to ${admin.selector}`, sendError);
+      }
     });
     throw e;
   }
