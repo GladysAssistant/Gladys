@@ -39,11 +39,15 @@ describe('Device check batteries', () => {
       const messageManager = {
         sendSystemMessage: stub().returns(null),
       };
-      const device = new Device(event, messageManager, stateManager, service, {}, variables, job, {}, user);
+      // own stub: the module-level one is called by the other tests, whatever their order
+      const userManager = {
+        getByRole: stub().returns([{ selector: 'admin', language: 'fr' }]),
+      };
+      const device = new Device(event, messageManager, stateManager, service, {}, variables, job, {}, userManager);
 
       await device.checkBatteries();
 
-      assert.notCalled(user.getByRole);
+      assert.notCalled(userManager.getByRole);
       assert.notCalled(messageManager.sendSystemMessage);
     });
   });
