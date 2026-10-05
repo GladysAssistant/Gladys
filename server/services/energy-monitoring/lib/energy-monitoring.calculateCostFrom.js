@@ -84,11 +84,13 @@ function findConsumptionCostPairs(energyDevice) {
  * @param {object} compiled - Its compiled tariff.
  * @param {Date} windowStart - Start of the first interval of the run window.
  * @param {number} nowMs - Current instant.
+ * @param {object} [options] - `widenTiers` (false: the caller carries the real accumulation into
+ * the window as `cumulative_before` instead of recomputing it from the period start).
  * @returns {Date} The effective start, an interval start.
  * @example
  * getEffectiveStart(contract, compiled, new Date(), Date.now());
  */
-function getEffectiveStart(contract, compiled, windowStart, nowMs) {
+function getEffectiveStart(contract, compiled, windowStart, nowMs, options = {}) {
   const tz = contract.timezone;
   const validFrom = toLocalDate(contract.valid_from, tz);
   const validFromMs = validFrom === undefined ? -Infinity : localToUtcMs(validFrom, tz);
@@ -98,17 +100,19 @@ function getEffectiveStart(contract, compiled, windowStart, nowMs) {
   }
   const { date } = getLocalContext(windowStart.getTime(), tz);
   const billingPeriodStartDay = contract.billing_period_start_day || 1;
-  const starts = compiled.hasTier
-    ? compiled.tierScopes.map((scope) => {
-        if (scope === 'day') {
-          return getDayBounds(date, tz).startMs;
-        }
-        if (scope === 'month') {
-          return getMonthBounds(date, tz).startMs;
-        }
-        return getBillingPeriodBounds(date, billingPeriodStartDay, tz).startMs;
-      })
-    : [];
+  const widenTiers = options.widenTiers !== false;
+  const starts =
+    compiled.hasTier && widenTiers
+      ? compiled.tierScopes.map((scope) => {
+          if (scope === 'day') {
+            return getDayBounds(date, tz).startMs;
+          }
+          if (scope === 'month') {
+            return getMonthBounds(date, tz).startMs;
+          }
+          return getBillingPeriodBounds(date, billingPeriodStartDay, tz).startMs;
+        })
+      : [];
   if (compiled.hasDemand) {
     const billingPeriod = getBillingPeriodBounds(date, billingPeriodStartDay, tz);
     if (billingPeriod.endMs <= nowMs) {
@@ -250,9 +254,9 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
         // `startAt` bounds the states by their creation instant: a 30-minute state is stamped at
         // the end of its interval (the run covers the intervals ending at or after `startAt`, the
         // first one starting 30 minutes before), a daily state at the start of its day.
-        // A tiered contract recomputes from the start of its accumulation period and a contract
-        // with demand charges from the start of an elapsed billing period: only the contracts
-        // covering the run window widen it, never an expired or a future one.
+        // A contract with demand charges recomputes from the start of an elapsed billing period,
+        // and a tiered one over daily states from the start of its accumulation period: only the
+        // contracts covering the run window widen it, never an expired or a future one.
         const nowDate = new Date(nowMs);
         const stampOffsetMs = pair.durationMinutes === DAILY_DURATION_MINUTES ? 0 : THIRTY_MINUTES_IN_MS;
         const windowStart = new Date(startAt.getTime() - stampOffsetMs);
@@ -263,10 +267,15 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
         });
         let effectiveStart = windowStart;
         let powerTimezone = null;
+        // a 30-minute feature carries its real accumulation into the window (cumulative_before
+        // below): only a daily feature recomputes its tiers from the period start
+        const carriesAccumulation = pair.durationMinutes !== DAILY_DURATION_MINUTES;
         coveringContracts.forEach((contract) => {
           if (contract.pricing_mode === ENERGY_CONTRACT_PRICING_MODES.RULES) {
             const compiled = this.gladys.energyContract.getCompiledTariff(contract);
-            effectiveStart = getEffectiveStart(contract, compiled, effectiveStart, nowMs);
+            effectiveStart = getEffectiveStart(contract, compiled, effectiveStart, nowMs, {
+              widenTiers: !carriesAccumulation,
+            });
             if (compiled.needsPower && powerTimezone === null) {
               powerTimezone = contract.timezone;
             }
@@ -342,15 +351,19 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
             intervals.forEach((i) => keptCreatedAt.push(i.created_at));
             return;
           }
-          // a delegated window starting mid-period carries the real accumulation of the feature
-          // (a rules contract widens its window to the period start instead, getEffectiveStart)
-          const cumulativeBefore = delegated
-            ? await this.gladys.energyContract.getFeatureCumulative(
-                pair.consumptionFeature,
-                contract,
-                new Date(intervals[0].starts_at).getTime(),
-              )
-            : undefined;
+          // a window starting mid-period carries the real accumulation of the feature: a delegated
+          // contract's, and a tiered rules contract's with its `counts_when` counters (rather than
+          // repricing and rewriting the whole period at every run); a daily feature widens instead
+          const compiledTariff = delegated ? undefined : this.gladys.energyContract.getCompiledTariff(contract);
+          const cumulativeBefore =
+            delegated || (carriesAccumulation && compiledTariff.hasTier)
+              ? await this.gladys.energyContract.getFeatureCumulative(
+                  pair.consumptionFeature,
+                  contract,
+                  new Date(intervals[0].starts_at).getTime(),
+                  { compiled: compiledTariff },
+                )
+              : undefined;
           const priced = await priceByBillingPeriod(
             this.gladys.energyContract,
             contract,
@@ -407,6 +420,8 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
       await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / energyDevices.length) * 100));
     }
   });
+  // the current prices read the accumulations of the stored consumption: recomputed on next call
+  this.gladys.energyContract.clearCurrentPriceCache();
   Object.keys(warningsCount).forEach((reason) => {
     logger.warn(`Energy cost calculation: ${warningsCount[reason]} interval(s) priced by a fallback (${reason})`);
   });

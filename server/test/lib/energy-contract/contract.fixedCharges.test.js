@@ -1,5 +1,9 @@
 const { expect } = require('chai');
-const { computeFixedCharges, findContractAt } = require('../../../lib/energy-contract/contract.fixedCharges');
+const {
+  computeFixedCharges,
+  findContractAt,
+  compileContract,
+} = require('../../../lib/energy-contract/contract.fixedCharges');
 
 const contract = (overrides = {}) => ({
   id: 'c1',
@@ -121,6 +125,18 @@ describe('energy-contract computeFixedCharges', () => {
     );
     // January: sub 1 + winter 1, plus 10 % on them; March: sub 1 only, plus 10 %
     expect(results.map((r) => r.value)).to.deep.equal([2.2, 1.1]);
+  });
+
+  it('should compile a stored contract once per version', () => {
+    const stored = contract({ id: 'cache-test', updated_at: '2026-01-01T00:00:00.000Z' });
+    const compiled = compileContract(stored);
+    expect(compileContract({ ...stored })).to.equal(compiled);
+    // a new version, or a contract that is not stored, is compiled again
+    const updated = { ...stored, updated_at: '2026-01-02T00:00:00.000Z' };
+    expect(compileContract(updated)).to.not.equal(compiled);
+    const unsaved = contract({ id: undefined });
+    expect(compileContract(unsaved)).to.not.equal(compileContract(unsaved));
+    expect(compileContract(contract())).to.not.equal(compileContract(contract()));
   });
 
   it('should find the contract active at an instant in its own timezone', () => {

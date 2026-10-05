@@ -5,6 +5,10 @@ const { THIRTY_MINUTES_MS } = require('./meter.intervals');
 
 const CURRENT_CACHE_TTL_MS = 5 * 60 * 1000;
 const HORIZON_HOURS = 48;
+// a rules contract's live price is cached until the end of its 15-minute slot on the contract's
+// local clock: the price, the label and the next change can only move at a slot boundary, or when
+// the stored consumption, a calendar or the contract change (the cache is cleared then)
+const RULES_CACHE_SLOT_MINUTES = 15;
 
 /**
  * @description Current unit price, current tier label and next change of a contract
@@ -21,8 +25,11 @@ async function getCurrent(selector, options = {}) {
   const contract = await this.getBySelector(selector);
   const at = options.at === undefined ? Date.now() : new Date(options.at).getTime();
   const delegated = contract.pricing_mode === ENERGY_CONTRACT_PRICING_MODES.DELEGATED;
-  const cached = delegated ? this.currentPriceCache.get(contract.id) : undefined;
-  if (cached && cached.expires_at > Date.now()) {
+  const version = new Date(contract.updated_at).getTime();
+  // the delegated answer is cached whatever the instant asked, a rules price only for a live call
+  const cacheable = delegated || options.at === undefined;
+  const cached = cacheable ? this.currentPriceCache.get(contract.id) : undefined;
+  if (cached && cached.version === version && cached.expires_at > Date.now()) {
     return cached.value;
   }
   const compiled = delegated ? undefined : this.getCompiledTariff(contract);
@@ -67,7 +74,7 @@ async function getCurrent(selector, options = {}) {
       max_power_kw: maxPowerKw,
     });
     value = { ...base, ...answer, cumulative: plainCumulative };
-    this.currentPriceCache.set(contract.id, { expires_at: Date.now() + CURRENT_CACHE_TTL_MS, value });
+    this.currentPriceCache.set(contract.id, { version, expires_at: Date.now() + CURRENT_CACHE_TTL_MS, value });
   } else {
     const calendars = await this.loadCalendarLookup(
       compiled.calendars,
@@ -83,8 +90,24 @@ async function getCurrent(selector, options = {}) {
       horizon_hours: HORIZON_HOURS,
     });
     value = { ...base, ...current, cumulative: plainCumulative };
+    if (cacheable) {
+      const { minutes } = getLocalContext(at, contract.timezone);
+      const slotStartMs = at - (minutes % RULES_CACHE_SLOT_MINUTES) * 60 * 1000 - (at % (60 * 1000));
+      const expiresAt = slotStartMs + RULES_CACHE_SLOT_MINUTES * 60 * 1000;
+      this.currentPriceCache.set(contract.id, { version, expires_at: expiresAt, value });
+    }
   }
   return value;
 }
 
-module.exports = { getCurrent, CURRENT_CACHE_TTL_MS };
+/**
+ * @description Forget the cached current prices: called when what they read changes (a cost
+ * run stored new consumption costs, a calendar published new values).
+ * @example
+ * this.clearCurrentPriceCache();
+ */
+function clearCurrentPriceCache() {
+  this.currentPriceCache.clear();
+}
+
+module.exports = { getCurrent, clearCurrentPriceCache, CURRENT_CACHE_TTL_MS };

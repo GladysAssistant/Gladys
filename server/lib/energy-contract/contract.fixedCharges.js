@@ -1,9 +1,33 @@
 const { compileTariff } = require('./tariff.compile');
 const { priceIntervals, roundCost } = require('./tariff.priceIntervals');
-const { getLocalContext, getDayBounds, localToUtcMs } = require('./tariff.time');
+const { getLocalContext, getDayBounds, localToUtcMs, createBoundedCache } = require('./tariff.time');
 const { TARIFF_COMPONENT_KINDS } = require('./tariff.constants');
 
 const MS_PER_MINUTE = 60 * 1000;
+// compiled tariffs per stored contract version: the widgets ask for the fixed charges on every
+// refresh, a compilation (schema validation included) per contract each time is wasted work
+const compiledByVersion = createBoundedCache(200);
+
+/**
+ * @description Compile the tariff of a contract, cached per contract id and version (`updated_at`)
+ * like `getCompiledTariff`; a contract without a stored version is compiled each time.
+ * @param {object} contract - The contract.
+ * @returns {object} The compiled tariff.
+ * @example
+ * compileContract(contract);
+ */
+function compileContract(contract) {
+  if (!contract.id || !contract.updated_at) {
+    return compileTariff(contract.tariff, contract.inputs || {});
+  }
+  const key = `${contract.id}:${new Date(contract.updated_at).getTime()}`;
+  let compiled = compiledByVersion.get(key);
+  if (compiled === undefined) {
+    compiled = compileTariff(contract.tariff, contract.inputs || {});
+    compiledByVersion.set(key, compiled);
+  }
+  return compiled;
+}
 // only the fixed components (and the taxes on them) are charged here
 const DISPLAY_EXCLUDED_KINDS = [TARIFF_COMPONENT_KINDS.CONSUMPTION, TARIFF_COMPONENT_KINDS.DEMAND];
 
@@ -55,7 +79,7 @@ function nextContractStart(startsMs, afterMs, endMs) {
  */
 function computeFixedCharges(contracts, periods) {
   const sorted = [...contracts]
-    .map((contract) => ({ contract, compiled: compileTariff(contract.tariff, contract.inputs || {}) }))
+    .map((contract) => ({ contract, compiled: compileContract(contract) }))
     .sort((a, b) => (a.contract.valid_from < b.contract.valid_from ? 1 : -1));
   const hasFixed = sorted.some(({ compiled }) =>
     compiled.components.some((c) => c.kind === TARIFF_COMPONENT_KINDS.FIXED),
@@ -122,4 +146,4 @@ function computeFixedCharges(contracts, periods) {
   return results.map((result) => ({ ...result, value: roundCost(result.value) }));
 }
 
-module.exports = { computeFixedCharges, findContractAt };
+module.exports = { computeFixedCharges, findContractAt, compileContract };

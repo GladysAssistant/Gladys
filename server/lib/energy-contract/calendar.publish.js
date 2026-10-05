@@ -188,6 +188,10 @@ async function publishCalendarEntries(key, entries, options = {}) {
     );
   });
   const result = { count: normalized.length, changed_from: changedFrom === null ? null : new Date(changedFrom) };
+  if (changedFrom !== null) {
+    // a cached current price may read the values that changed
+    this.clearCurrentPriceCache();
+  }
   if (changedFrom !== null && !options.skip_recalculation) {
     await this.requestCalendarRecalculation(key, result.changed_from);
   }

@@ -422,6 +422,43 @@ describe('energyContract: preview and current price', () => {
       expect(getEnergyContractCurrent.callCount).to.equal(2);
     });
 
+    it('should cache the live price of a rules contract until the end of its 15-minute slot', async () => {
+      const clock = sinon.useFakeTimers({ now: new Date('2026-01-12T12:40:30Z').getTime(), toFake: ['Date'] });
+      try {
+        await energyContract.create(contractPayload({ timezone: 'UTC', valid_from: '2020-01-01' }));
+        const cumulative = sinon.spy(energyContract, 'getMeterCumulative');
+        expect((await energyContract.getCurrent('edf-base')).price).to.equal(0.2);
+        await energyContract.getCurrent('edf-base');
+        expect(cumulative.callCount).to.equal(1);
+        // an instant asked explicitly is never cached
+        await energyContract.getCurrent('edf-base', { at: Date.now() });
+        expect(cumulative.callCount).to.equal(2);
+        // the slot ends at 12:45
+        expect(
+          energyContract.currentPriceCache.get((await energyContract.getBySelector('edf-base')).id).expires_at,
+        ).to.equal(new Date('2026-01-12T12:45:00Z').getTime());
+        clock.tick(5 * 60 * 1000);
+        await energyContract.getCurrent('edf-base');
+        expect(cumulative.callCount).to.equal(3);
+        // a contract update gives the new tariff at once
+        clock.tick(1000);
+        await energyContract.update('edf-base', {
+          tariff: {
+            tariff_version: 1,
+            components: [{ key: 'energy', kind: 'consumption', rules: [], fallback: { price: 0.3 } }],
+          },
+        });
+        expect((await energyContract.getCurrent('edf-base')).price).to.equal(0.3);
+        expect(cumulative.callCount).to.equal(4);
+        // a cost run or a calendar publication clears it
+        energyContract.clearCurrentPriceCache();
+        await energyContract.getCurrent('edf-base');
+        expect(cumulative.callCount).to.equal(5);
+      } finally {
+        clock.restore();
+      }
+    });
+
     it('should default to now', async () => {
       await energyContract.create(contractPayload({ timezone: 'UTC', valid_from: '2020-01-01' }));
       const current = await energyContract.getCurrent('edf-base');

@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const dayjs = require('dayjs');
 const time = require('../../../lib/energy-contract/tariff.time');
 
 describe('energy-contract tariff.time', () => {
@@ -40,6 +41,42 @@ describe('energy-contract tariff.time', () => {
     expect(tokyo.weekday).to.equal(0);
     expect(tokyo.minutes).to.equal(510);
   });
+  it('should read the local clock of a clock-change day exactly, minute by minute', () => {
+    // a day without a change has one offset, a clock-change day has none (exact conversion)
+    expect(time.getDayOffsetMinutes(Date.UTC(2026, 0, 12, 7), 'Europe/Paris')).to.equal(60);
+    expect(time.getDayOffsetMinutes(Date.UTC(2026, 2, 29, 7), 'Europe/Paris')).to.equal(null);
+    // Paris, Lord Howe (30-minute change) and Kathmandu (+05:45) around their clock changes
+    [
+      ['Europe/Paris', Date.UTC(2026, 2, 29, 0, 0), Date.UTC(2026, 2, 29, 2, 0)],
+      ['Europe/Paris', Date.UTC(2026, 9, 25, 0, 0), Date.UTC(2026, 9, 25, 2, 0)],
+      ['Australia/Lord_Howe', Date.UTC(2026, 9, 3, 14, 30), Date.UTC(2026, 9, 3, 16, 30)],
+      ['Asia/Kathmandu', Date.UTC(2026, 0, 12, 18, 0), Date.UTC(2026, 0, 12, 18, 30)],
+    ].forEach(([tz, fromMs, toMs]) => {
+      for (let ms = fromMs; ms <= toMs; ms += 60 * 1000) {
+        const local = dayjs(ms).tz(tz);
+        const context = time.getLocalContext(ms, tz);
+        expect([context.date, context.minutes, context.weekday]).to.deep.equal([
+          local.format('YYYY-MM-DD'),
+          local.hour() * 60 + local.minute(),
+          local.day(),
+        ]);
+      }
+    });
+  });
+
+  it('should keep a bounded cache', () => {
+    const cache = time.createBoundedCache(2);
+    cache.set('a', 1);
+    cache.set('b', 2);
+    expect(cache.get('a')).to.equal(1);
+    expect(cache.size()).to.equal(2);
+    // full: emptied before the next entry
+    cache.set('c', 3);
+    expect(cache.get('a')).to.equal(undefined);
+    expect(cache.get('c')).to.equal(3);
+    expect(cache.size()).to.equal(1);
+  });
+
   it('should compute day bounds, clock-change days included', () => {
     expect(time.getDayBounds('2026-01-12', 'Europe/Paris').durationMinutes).to.equal(1440);
     expect(time.getDayBounds('2026-03-29', 'Europe/Paris').durationMinutes).to.equal(1380);

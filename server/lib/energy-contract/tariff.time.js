@@ -8,6 +8,34 @@ dayjs.extend(timezone);
 
 const MS_PER_MINUTE = 60 * 1000;
 const MS_PER_DAY = 24 * 60 * MS_PER_MINUTE;
+const MAX_CACHE_ENTRIES = 50000;
+
+/**
+ * @description A Map that forgets everything once it holds `maxEntries` entries: memory stays
+ * bounded whatever the number of distinct keys, the hot keys come back on the next calls.
+ * @param {number} maxEntries - Entries kept before the cache is emptied.
+ * @returns {object} { get(key), set(key, value), size() }.
+ * @example
+ * const cache = createBoundedCache(1000);
+ */
+function createBoundedCache(maxEntries) {
+  const map = new Map();
+  return {
+    get: (key) => map.get(key),
+    set: (key, value) => {
+      if (map.size >= maxEntries) {
+        map.clear();
+      }
+      map.set(key, value);
+    },
+    size: () => map.size,
+  };
+}
+
+// the timezone conversions are the bulk of a cost run (several per interval): both caches are
+// pure (a timezone's rules don't change while Gladys runs) and bounded
+const localToUtcCache = createBoundedCache(MAX_CACHE_ENTRIES);
+const dayOffsetCache = createBoundedCache(MAX_CACHE_ENTRIES);
 
 /**
  * @description Parse a "HH:MM" label into minutes since midnight ("24:00" = 1440).
@@ -110,7 +138,41 @@ function daysBetween(fromDate, toDate) {
  * localToUtcMs('2026-01-05', 'Europe/Paris'); // 1767567600000
  */
 function localToUtcMs(dateString, tz, time = '00:00') {
-  return dayjs.tz(`${dateString} ${time}:00`, tz).valueOf();
+  // a pure function called for every interval (day, month and billing-period bounds): memoised
+  const key = `${tz}|${dateString}|${time}`;
+  let ms = localToUtcCache.get(key);
+  if (ms === undefined) {
+    ms = dayjs.tz(`${dateString} ${time}:00`, tz).valueOf();
+    localToUtcCache.set(key, ms);
+  }
+  return ms;
+}
+
+/**
+ * @description The UTC offset of a timezone, in minutes, valid for a whole UTC day: the offset at
+ * both ends of the day when they match, `null` on a day with a clock change (the caller then
+ * converts the instant itself). Cached per timezone and UTC day.
+ * @param {number} ms - Milliseconds since the epoch.
+ * @param {string} tz - IANA timezone.
+ * @returns {number|null} Offset in minutes, or null on a clock-change day.
+ * @example
+ * getDayOffsetMinutes(Date.UTC(2026, 0, 12), 'Europe/Paris'); // 60
+ */
+function getDayOffsetMinutes(ms, tz) {
+  const dayStartMs = Math.floor(ms / MS_PER_DAY) * MS_PER_DAY;
+  const key = `${tz}|${dayStartMs}`;
+  let offset = dayOffsetCache.get(key);
+  if (offset === undefined) {
+    const startOffset = dayjs(dayStartMs)
+      .tz(tz)
+      .utcOffset();
+    const endOffset = dayjs(dayStartMs + MS_PER_DAY - 1)
+      .tz(tz)
+      .utcOffset();
+    offset = startOffset === endOffset ? startOffset : null;
+    dayOffsetCache.set(key, offset);
+  }
+  return offset;
 }
 
 /**
@@ -122,17 +184,37 @@ function localToUtcMs(dateString, tz, time = '00:00') {
  * getLocalContext(Date.UTC(2026, 0, 12, 7), 'Europe/Paris'); // { date: '2026-01-12', minutes: 480, weekday: 1, ... }
  */
 function getLocalContext(ms, tz) {
-  const local = dayjs(ms).tz(tz);
-  const month = local.month() + 1;
-  const day = local.date();
+  const offset = getDayOffsetMinutes(ms, tz);
+  let year;
+  let month;
+  let day;
+  let minutes;
+  let weekday;
+  if (offset === null) {
+    // a clock-change day: the exact conversion
+    const local = dayjs(ms).tz(tz);
+    year = local.year();
+    month = local.month() + 1;
+    day = local.date();
+    minutes = local.hour() * 60 + local.minute();
+    weekday = local.day();
+  } else {
+    // the local wall clock read in UTC once shifted by the day's offset
+    const local = new Date(ms + offset * MS_PER_MINUTE);
+    year = local.getUTCFullYear();
+    month = local.getUTCMonth() + 1;
+    day = local.getUTCDate();
+    minutes = local.getUTCHours() * 60 + local.getUTCMinutes();
+    weekday = local.getUTCDay();
+  }
   return {
-    date: formatDate(local.year(), month, day),
-    year: local.year(),
+    date: formatDate(year, month, day),
+    year,
     month,
     day,
     monthDay: month * 100 + day,
-    minutes: local.hour() * 60 + local.minute(),
-    weekday: local.day(),
+    minutes,
+    weekday,
   };
 }
 
@@ -286,7 +368,9 @@ module.exports = {
   addDays,
   daysBetween,
   localToUtcMs,
+  getDayOffsetMinutes,
   getLocalContext,
+  createBoundedCache,
   getDayBounds,
   getMonthBounds,
   getBillingPeriodStart,

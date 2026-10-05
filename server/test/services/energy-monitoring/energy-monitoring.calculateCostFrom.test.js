@@ -258,6 +258,12 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(getEffectiveStart(contract, compiled, new Date('2025-08-28T15:00:00.000Z'), now).toISOString()).to.equal(
       '2025-08-28T00:00:00.000Z',
     );
+    // a 30-minute feature carries its accumulation into the window instead
+    expect(
+      getEffectiveStart(contract, compiled, new Date('2025-08-28T15:00:00.000Z'), now, {
+        widenTiers: false,
+      }).toISOString(),
+    ).to.equal('2025-08-28T15:00:00.000Z');
     expect(
       getEffectiveStart(contract, { hasTier: false }, new Date('2025-08-28T15:00:00.000Z'), now).toISOString(),
     ).to.equal('2025-08-28T15:00:00.000Z');
@@ -312,10 +318,71 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       { value: 8, created_at: new Date('2025-08-28T10:00:00.000Z') },
       { value: 4, created_at: new Date('2025-08-28T15:00:00.000Z') },
     ]);
-    // asked from 14:00: the day is recomputed from midnight so the second interval is in tier 2
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    expect((await costStates()).map((s) => s.value)).to.deep.equal([0.8, 0.2 + 2]);
+    // asked from 14:00: the 8 kWh of the morning are carried into the window, so the second
+    // interval stays in tier 2, and the morning is neither repriced nor rewritten
+    const replace = sinon.spy(device, 'replaceHistoricalStatesFrom');
     await energyMonitoring.calculateCostFrom(new Date('2025-08-28T14:00:00.000Z'));
+    const plugReplace = replace.getCalls().find((call) => call.args[0] === PLUG_COST_ID);
+    expect(plugReplace.args[1].toISOString()).to.equal('2025-08-28T14:00:00.000Z');
+    expect(plugReplace.args[2].map((state) => state.value)).to.deep.equal([0.2 + 2]);
     const states = await costStates();
     expect(states.map((s) => s.value)).to.deep.equal([0.8, 0.2 + 2]);
+  });
+
+  it('should give a run starting mid-period the costs of a full recalculation (filtered counters)', async () => {
+    await energyContract.create(
+      contractPayload({
+        name: 'Allowance',
+        timezone: 'Europe/Paris',
+        valid_from: '2020-01-01',
+        billing_period_start_day: 3,
+        tariff: {
+          tariff_version: 1,
+          components: [
+            {
+              key: 'e',
+              kind: 'consumption',
+              rules: [
+                // the off-peak allowance only counts the off-peak energy
+                {
+                  label: 'off-peak allowance',
+                  when: {
+                    time: [['22:00', '06:00']],
+                    tier: {
+                      cumulative: 'billing_period',
+                      from_kwh_per_day: 0,
+                      to_kwh_per_day: 0.1,
+                      counts_when: { time: [['22:00', '06:00']] },
+                    },
+                  },
+                  price: 0.05,
+                },
+                { label: 'month', when: { tier: { cumulative: 'month', from_kwh: 0, to_kwh: 30 } }, price: 0.1 },
+              ],
+              fallback: { price: 0.3 },
+            },
+          ],
+        },
+      }),
+    );
+    const states = [];
+    // 1 to 4 September 2025, a billing period starting on the 3rd
+    for (let ms = Date.parse('2025-08-31T22:30:00.000Z'); ms <= Date.parse('2025-09-04T22:00:00.000Z'); ms += 1800000) {
+      states.push({ value: 0.2 + ((ms / 1800000) % 5) / 10, created_at: new Date(ms) });
+    }
+    await db.duckDbBatchInsertState(PLUG_CONSUMPTION_ID, states);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-31T22:30:00.000Z'));
+    const full = (await costStates()).map((s) => s.value);
+    expect(full).to.have.lengthOf(states.length);
+    // runs starting in the middle of a day, of the billing period and of the month
+    await energyMonitoring.calculateCostFrom(new Date('2025-09-03T13:00:00.000Z'));
+    expect((await costStates()).map((s) => s.value)).to.deep.equal(full);
+    await energyMonitoring.calculateCostFrom(new Date('2025-09-04T03:30:00.000Z'));
+    expect((await costStates()).map((s) => s.value)).to.deep.equal(full);
+    await energyMonitoring.calculateCostFrom(new Date('2025-09-02T08:00:00.000Z'));
+    expect((await costStates()).map((s) => s.value)).to.deep.equal(full);
   });
 
   it('should never reprice the last interval of the previous day with an empty day accumulation', async () => {
