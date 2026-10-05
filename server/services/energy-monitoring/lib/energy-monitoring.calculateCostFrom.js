@@ -306,7 +306,8 @@ async function calculateCostFrom(startAt, jobId, options = {}) {
         // by valid_from DESC: the first match is the most recent one covering the date).
         const intervalsByContract = new Map();
         deviceFeatureStates.forEach((state) => {
-          const startsAtMs = new Date(state.created_at).getTime() - THIRTY_MINUTES_IN_MS;
+          // a 30-minute state ends its interval, a daily state starts its day (section 7.1)
+          const startsAtMs = new Date(state.created_at).getTime() - stampOffsetMs;
           const contract = contracts.find((c) => {
             const { date } = getLocalContext(startsAtMs, c.timezone);
             return c.valid_from <= date && (c.valid_to === null || c.valid_to >= date);

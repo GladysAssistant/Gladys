@@ -436,6 +436,75 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect((await costStates('daily-consumption-cost')).map((s) => s.value)).to.deep.equal([0.5]);
   });
 
+  it('should price a daily state on its own local date', async () => {
+    // contract A until Monday 12 January, contract B from Tuesday 13 January (Paris)
+    await energyContract.create(
+      contractPayload({
+        name: 'Before',
+        timezone: 'Europe/Paris',
+        valid_from: '2026-01-01',
+        valid_to: '2026-01-12',
+        tariff: {
+          tariff_version: 1,
+          components: [{ key: 'e', kind: 'consumption', rules: [], fallback: { price: 1 } }],
+        },
+      }),
+    );
+    await energyContract.create(
+      contractPayload({
+        name: 'After',
+        timezone: 'Europe/Paris',
+        valid_from: '2026-01-13',
+        tariff: {
+          tariff_version: 1,
+          components: [
+            {
+              key: 'e',
+              kind: 'consumption',
+              rules: [{ when: { weekdays: ['tue'] }, price: 0.3 }],
+              fallback: { price: 0.2 },
+            },
+          ],
+        },
+      }),
+    );
+    await device.create({
+      id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      service_id: TEST_SERVICE_ID,
+      name: 'Daily meter',
+      external_id: 'daily-meter',
+      features: [
+        feature({
+          id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          selector: 'daily-consumption',
+          external_id: 'daily-consumption',
+          name: 'Daily consumption',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          energy_parent_id: METER_FEATURE_ID,
+        }),
+        feature({
+          id: 'c3d4e5f6-a789-0123-cdef-234567890abc',
+          selector: 'daily-consumption-cost',
+          external_id: 'daily-consumption-cost',
+          name: 'Daily consumption cost',
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+          energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+        }),
+      ],
+    });
+    // stamped at local midnight: Monday 12, Tuesday 13 and Wednesday 14 January in Paris
+    await db.duckDbBatchInsertState('b2c3d4e5-f6a7-8901-bcde-f12345678901', [
+      { value: 10, created_at: new Date('2026-01-11T23:00:00.000Z') },
+      { value: 10, created_at: new Date('2026-01-12T23:00:00.000Z') },
+      { value: 10, created_at: new Date('2026-01-13T23:00:00.000Z') },
+    ]);
+    await energyMonitoring.calculateCostFrom(new Date('2026-01-11T23:00:00.000Z'));
+    // shifted by 30 minutes, Tuesday would be priced as Monday by contract A (10) and
+    // Wednesday as Tuesday (3)
+    expect((await costStates('daily-consumption-cost')).map((s) => s.value)).to.deep.equal([10, 3, 2]);
+  });
+
   it('should reprice a whole elapsed billing period when a run starts at its end', async () => {
     await energyContract.create(
       contractPayload({
