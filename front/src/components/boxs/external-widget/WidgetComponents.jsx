@@ -7,7 +7,14 @@ import DeviceFeatureValueText from '../../device/DeviceFeatureValueText';
 import ApexChartComponent from '../chart/ApexChartComponent';
 import Modal from '../../../routes/integration/all/external-integration/components/Modal';
 import { ConfigField } from '../../integration/ConfigSchemaForm';
-import { text, formatNumber, formatDate, getUrlDomain, CHART_INTERVAL_MINUTES } from './widgetContentUtils';
+import {
+  text,
+  formatNumber,
+  formatDate,
+  getUrlDomain,
+  CHART_INTERVAL_MINUTES,
+  findRefusedField
+} from './widgetContentUtils';
 import style from './style.css';
 
 // semantic colors of the vocabulary -> the accent class of the theme
@@ -596,7 +603,9 @@ export const WidgetButtons = ({
 // The form behind a widget action button (spec section 7): opened by a tap,
 // never shown on the card at rest, rendered by the config_schema engine and
 // pre-filled with the defaults the integration put in the content. The core
-// validates the values against the same declaration: its 422 is shown here.
+// validates the values against the same declaration: its 422 outlines the
+// refused field and names it by its label — the core's own wording is not
+// meant for the user.
 export const WidgetActionForm = ({
   component,
   values,
@@ -607,36 +616,48 @@ export const WidgetActionForm = ({
   onChange,
   onSubmit,
   onCancel
-}) => (
-  <form class={style.actionForm} onSubmit={onSubmit} data-cy={`external-widget-action-form-${component.action.key}`}>
-    <div class={style.actionFormTitle}>
-      <i class={`fe fe-${component.icon || 'play'}`} />
-      <span>{text(component.label, language)}</span>
-    </div>
-    {component.action.fields.map(field => (
-      <ConfigField
-        key={field.key}
-        field={field}
-        language={language}
-        values={values}
-        configuredSecrets={[]}
-        touchedSecrets={{}}
-        updateConfigValue={onChange}
-        idPrefix={idPrefix}
-      />
-    ))}
-    {error && (
-      <div class="text-danger small" role="alert" data-cy="external-widget-action-form-error">
-        <Text id="dashboard.boxes.external-widget.actionFormInvalid" /> — {error}
+}) => {
+  const { fields } = component.action;
+  const refusedField = error ? findRefusedField(fields, error) : null;
+  return (
+    <form class={style.actionForm} onSubmit={onSubmit} data-cy={`external-widget-action-form-${component.action.key}`}>
+      <div class={style.actionFormTitle}>
+        <i class={`fe fe-${component.icon || 'play'}`} />
+        <span>{text(component.label, language)}</span>
       </div>
-    )}
-    <div class={style.actionFormButtons}>
-      <button type="button" class="btn btn-secondary btn-sm" onClick={onCancel} disabled={pending}>
-        <Text id="global.cancel" />
-      </button>
-      <button type="submit" class={cx('btn btn-primary btn-sm', { 'btn-loading': pending })} disabled={pending}>
-        <Text id="dashboard.boxes.external-widget.actionFormSend" />
-      </button>
-    </div>
-  </form>
-);
+      {fields.map(field => (
+        <div key={field.key} class={cx({ [style.actionFormFieldRefused]: refusedField === field })}>
+          <ConfigField
+            field={field}
+            language={language}
+            values={values}
+            configuredSecrets={[]}
+            touchedSecrets={{}}
+            updateConfigValue={onChange}
+            idPrefix={idPrefix}
+          />
+        </div>
+      ))}
+      {error && (
+        <div class="text-danger small" role="alert" data-cy="external-widget-action-form-error">
+          {refusedField ? (
+            <Text
+              id="dashboard.boxes.external-widget.actionFormInvalidField"
+              fields={{ label: text(refusedField.label, language) || refusedField.key }}
+            />
+          ) : (
+            <Text id="dashboard.boxes.external-widget.actionFormInvalid" />
+          )}
+        </div>
+      )}
+      <div class={style.actionFormButtons}>
+        <button type="button" class="btn btn-secondary" onClick={onCancel} disabled={pending}>
+          <Text id="dashboard.boxes.external-widget.actionFormClose" />
+        </button>
+        <button type="submit" class={cx('btn btn-primary', { 'btn-loading': pending })} disabled={pending}>
+          <Text id="dashboard.boxes.external-widget.actionFormSend" />
+        </button>
+      </div>
+    </form>
+  );
+};

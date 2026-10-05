@@ -863,7 +863,9 @@
         "confirmAction": "Lancer « {{label}} » ?",
         "actionError": "L'action a échoué.",
         "actionFormSend": "Envoyer",
-        "actionFormInvalid": "Valeur invalide"
+        "actionFormInvalid": "Valeur invalide",
+        "actionFormClose": "Fermer",
+        "actionFormInvalidField": "Valeur refusée : {{label}}"
       }
     },
     "editDashboardBackgroundLabel": "Ambiance de fond",

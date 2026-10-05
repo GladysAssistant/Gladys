@@ -248,7 +248,8 @@ describe('Dashboard integration widget box', () => {
       .its('request.body')
       .should('deep.equal', { settings: {}, values: { bags: 72, price_per_bag: 60 } });
     // the refusal of the core stays in the open form
-    cy.get('[data-cy="external-widget-action-form-error"]').should('contain', 'values.price_per_bag: must be <= 50');
+    cy.get('[data-cy="external-widget-action-form-error"]').should('contain', 'Price per bag');
+    cy.get('[data-cy="external-widget-action-form-error"]').should('not.contain', 'values.price_per_bag');
     cy.intercept('POST', actionUrl, { message: { en: '72 bags recorded' } }).as('runAction');
     // a decimal value is accepted by the number input
     cy.get('[data-cy="external-widget-action-form-delivery"] input[id$="_price_per_bag"]').clear();

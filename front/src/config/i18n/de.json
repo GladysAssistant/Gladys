@@ -863,7 +863,9 @@
         "confirmAction": "„{{label}}“ ausführen?",
         "actionError": "Die Aktion ist fehlgeschlagen.",
         "actionFormSend": "Senden",
-        "actionFormInvalid": "Ungültiger Wert"
+        "actionFormInvalid": "Ungültiger Wert",
+        "actionFormClose": "Schließen",
+        "actionFormInvalidField": "Ungültiger Wert: {{label}}"
       }
     },
     "editDashboardBackgroundLabel": "Hintergrundstimmung",

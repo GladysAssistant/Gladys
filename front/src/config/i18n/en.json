@@ -863,7 +863,9 @@
         "confirmAction": "Run \"{{label}}\"?",
         "actionError": "The action failed.",
         "actionFormSend": "Send",
-        "actionFormInvalid": "Invalid value"
+        "actionFormInvalid": "Invalid value",
+        "actionFormClose": "Close",
+        "actionFormInvalidField": "Invalid value: {{label}}"
       }
     },
     "editDashboardBackgroundLabel": "Background mood",

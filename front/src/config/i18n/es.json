@@ -863,7 +863,9 @@
         "confirmAction": "¿Ejecutar \"{{label}}\"?",
         "actionError": "La acción ha fallado.",
         "actionFormSend": "Enviar",
-        "actionFormInvalid": "Valor no válido"
+        "actionFormInvalid": "Valor no válido",
+        "actionFormClose": "Cerrar",
+        "actionFormInvalidField": "Valor no válido: {{label}}"
       }
     },
     "editDashboardBackgroundLabel": "Ambiente de fondo",

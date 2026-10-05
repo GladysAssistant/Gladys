@@ -470,6 +470,11 @@
   color: #467fcf;
 }
 
+.actionFormFieldRefused :global(.form-control) {
+  border-color: #cd201f;
+  box-shadow: 0 0 0 1px #cd201f;
+}
+
 .actionFormButtons {
   display: flex;
   flex-wrap: wrap;

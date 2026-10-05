@@ -118,3 +118,10 @@ export const toActionValues = (fields, rawValues) =>
     }
     return values;
   }, {});
+
+// The field a 422 of the core names (`values.<key>: …`, spec section 7), or
+// null when the refusal is not about one declared field
+export const findRefusedField = (fields, error) => {
+  const match = typeof error === 'string' ? error.match(/^values\.([a-z0-9_]+):/) : null;
+  return (match && fields.find(field => field.key === match[1])) || null;
+};
