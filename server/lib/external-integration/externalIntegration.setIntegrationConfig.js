@@ -23,7 +23,7 @@ async function setIntegrationConfig(service, config) {
   }
   const configSchema = (service.manifest && service.manifest.config_schema) || [];
   // a select/multi_select can take its options from a core-defined source
-  // ("devices"): the valid values are only known at runtime
+  // ("devices", "houses"): the valid values are only known at runtime
   const dynamicOptions = await getDynamicOptions(service, configSchema);
   const keys = Object.keys(config);
   keys.forEach((key) => {

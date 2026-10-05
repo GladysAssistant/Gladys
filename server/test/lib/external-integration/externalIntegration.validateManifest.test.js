@@ -515,11 +515,27 @@ describe('externalIntegration.validateManifest', () => {
     expect(validated).to.deep.equal(manifest);
   });
 
+  it('should accept select and multi_select fields with the houses dynamic source', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [{ key: 'home', type: 'select', label: { en: 'House' }, source: 'houses' }],
+      actions: [
+        {
+          key: 'sync_houses',
+          label: { en: 'Sync houses' },
+          fields: [{ key: 'houses', type: 'multi_select', label: { en: 'Houses' }, source: 'houses' }],
+        },
+      ],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+  });
+
   it('should reject invalid dynamic source usages', () => {
     // unknown source: the enum is reserved and defined by the core
     expect422(
       { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'select', label: { en: 'L' }, source: 'rooms' }] },
-      'config_schema[0].source: must be one of devices',
+      'config_schema[0].source: must be one of devices, houses',
     );
     expect422(
       { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'string', label: { en: 'L' }, source: 'devices' }] },

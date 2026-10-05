@@ -37,7 +37,7 @@ async function runAction(selector, actionKey, fields = {}) {
   }
   const declaredFields = action.fields || [];
   // a select/multi_select of the mini form can take its options from a
-  // core-defined source ("devices"), exactly like a config_schema field
+  // core-defined source ("devices", "houses"), exactly like a config_schema field
   const dynamicOptions = await getDynamicOptions(service, declaredFields);
   Object.keys(fields).forEach((key) => {
     const field = declaredFields.find((declaredField) => declaredField.key === key);

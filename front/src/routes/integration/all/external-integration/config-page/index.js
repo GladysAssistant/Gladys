@@ -5,6 +5,7 @@ import get from 'get-value';
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
 import { getRequestedHardwareClasses } from '../utils';
+import { hasDynamicSource, fetchDynamicOptions } from '../../../../../components/integration/dynamicOptions';
 import { RequestStatus } from '../../../../../utils/consts';
 import {
   OAUTH_REDIRECT_URI,
@@ -291,24 +292,19 @@ class ExternalIntegrationConfigPage extends Component {
 
   loadDynamicOptions = async integration => {
     // a select/multi_select of the config_schema (or of an action mini
-    // form) can use the core-defined source "devices": its options are
-    // the already-created devices of the integration (label = device
-    // name, value = external_id), naturally scoped to its t_service
+    // form) can take its options from a core-defined source: the
+    // already-created devices of the integration, or the houses of Gladys
     const actionFields = (get(integration, 'manifest.actions') || []).reduce(
       (fields, action) => fields.concat(action.fields || []),
       []
     );
     const allFields = (get(integration, 'manifest.config_schema') || []).concat(actionFields);
-    if (!allFields.some(field => field.source === 'devices')) {
+    if (!hasDynamicSource(allFields)) {
       return;
     }
     try {
-      const devices = await this.props.httpClient.get(`/api/v1/service/${this.props.selector}/device`);
-      this.setState({
-        dynamicOptions: {
-          devices: devices.map(device => ({ value: device.external_id, label: device.name }))
-        }
-      });
+      const dynamicOptions = await fetchDynamicOptions(this.props.httpClient, this.props.selector, allFields);
+      this.setState({ dynamicOptions });
     } catch (e) {
       console.error(e);
     }
