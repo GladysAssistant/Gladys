@@ -508,36 +508,54 @@ describe('externalIntegration config', () => {
       it('should refuse any house the user did not choose, existing or not, without location: true', async () => {
         // the same answer for an existing and an unknown house: POST /config
         // is never an oracle on the houses of the instance
-        const refused = 'config.home: only a house chosen by the user can be set without location: true';
+        const refused = 'config.home: only the house chosen by the user can be written back without location: true';
         await expect403(externalIntegration.setIntegrationConfig(housesService, { home: HOUSE }), refused);
         await expect403(externalIntegration.setIntegrationConfig(housesService, { home: 'unknown-house' }), refused);
         expect(await externalIntegration.getIntegrationConfig(housesService)).to.deep.equal({});
       });
 
-      it('should let the integration write back the houses the user chose', async () => {
+      it('should let the integration write back the houses the user chose, unchanged only', async () => {
         await externalIntegration.saveConfigFromFront(housesService.selector, {
           home: HOUSE,
           homes: [HOUSE, OTHER_HOUSE],
         });
+        // the write-back of the whole config, next to the keys it does change
         await externalIntegration.setIntegrationConfig(housesService, {
           home: HOUSE,
-          homes: [OTHER_HOUSE],
+          homes: [HOUSE, OTHER_HOUSE],
           meter_id: 'meter-1',
           internal_state: 'synced',
         });
         expect(await externalIntegration.getIntegrationConfig(housesService)).to.deep.equal({
           home: HOUSE,
-          homes: [OTHER_HOUSE],
+          homes: [HOUSE, OTHER_HOUSE],
           meter_id: 'meter-1',
           internal_state: 'synced',
         });
         await expect403(
           externalIntegration.setIntegrationConfig(housesService, { home: OTHER_HOUSE }),
-          'config.home: only a house chosen by the user can be set without location: true',
+          'config.home: only the house chosen by the user can be written back without location: true',
         );
         await expect403(
-          externalIntegration.setIntegrationConfig(housesService, { homes: [HOUSE, OTHER_HOUSE] }),
-          'config.homes: only a house chosen by the user can be set without location: true',
+          externalIntegration.setIntegrationConfig(housesService, { homes: [OTHER_HOUSE] }),
+          'config.homes: only the house chosen by the user can be written back without location: true',
+        );
+      });
+
+      it('should not let a value the integration stored itself probe the houses after a manifest update', async () => {
+        // version 1: `home` is free internal storage, any value is accepted
+        const { config_schema: configSchema, ...manifestV1 } = housesService.manifest;
+        const serviceV1 = { ...housesService, manifest: { ...manifestV1, config_schema: [] } };
+        await externalIntegration.setIntegrationConfig(serviceV1, { home: HOUSE, homes: ['unknown-house'] });
+        // version 2 turns both keys into houses fields: writing the stored
+        // guesses back is a no-op that answers the same whether the house
+        // exists or not, and nothing else can be written
+        const serviceV2 = { ...housesService, manifest: { ...manifestV1, config_schema: configSchema } };
+        await externalIntegration.setIntegrationConfig(serviceV2, { home: HOUSE });
+        await externalIntegration.setIntegrationConfig(serviceV2, { homes: ['unknown-house'] });
+        await expect403(
+          externalIntegration.setIntegrationConfig(serviceV2, { homes: [OTHER_HOUSE] }),
+          'config.homes: only the house chosen by the user can be written back without location: true',
         );
       });
 

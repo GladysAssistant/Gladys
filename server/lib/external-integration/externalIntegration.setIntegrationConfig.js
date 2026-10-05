@@ -6,22 +6,19 @@ const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions')
 const CONFIG_KEY_REGEX = /^[a-z0-9_]+$/;
 
 /**
- * @description Tell if every house of a value is one the user already chose
- * for this field (the stored value). Checked before the existence check, so
- * the answer never depends on whether a guessed house exists.
- * @param {any} value - The select/multi_select value written by the integration.
+ * @description Tell if a value leaves the stored value of its field
+ * unchanged (a write-back of the whole config). The stored value may itself
+ * have been written by the integration (a key outside the schema of an older
+ * manifest), so it is never trusted as a user choice: an unchanged value is
+ * simply a no-op that is not re-validated.
+ * @param {any} value - The value written by the integration.
  * @param {any} storedValue - The value currently stored for the field.
- * @returns {boolean} True when the value only holds houses already chosen.
+ * @returns {boolean} True when the value equals the stored one.
  * @example
- * isChosenHouseValue('main-house', 'main-house');
+ * isUnchangedValue('main-house', 'main-house');
  */
-function isChosenHouseValue(value, storedValue) {
-  if (storedValue === undefined) {
-    return false;
-  }
-  const chosenHouses = Array.isArray(storedValue) ? storedValue : [storedValue];
-  const houses = Array.isArray(value) ? value : [value];
-  return houses.every((house) => chosenHouses.includes(house));
+function isUnchangedValue(value, storedValue) {
+  return storedValue !== undefined && JSON.stringify(value) === JSON.stringify(storedValue);
 }
 
 /**
@@ -47,8 +44,10 @@ async function setIntegrationConfig(service, config) {
   const keys = Object.keys(config);
   // a `houses` field is chosen by the user. Without `location: true` (the
   // right to read the houses, GET /house), the integration may only write
-  // back a house already chosen: accepting any other selector would turn
-  // the 200/422 answer into an oracle on the houses of the instance
+  // its stored value back unchanged, and that write is not re-validated: the
+  // answer then only depends on values the integration already holds (what
+  // it posts, what GET /config returns), never on which houses exist —
+  // otherwise 200 versus 422 would be an oracle on the houses of the instance
   const writesHouseField = keys.some((key) =>
     configSchema.some((field) => field.key === key && field.source === 'houses'),
   );
@@ -65,13 +64,13 @@ async function setIntegrationConfig(service, config) {
       throw new BadParameters(`config.${key}: ${RESERVED_PARAM_PREFIX}* keys are reserved`);
     }
     const field = configSchema.find((schemaField) => schemaField.key === key);
-    if (
-      checkChosenHouses &&
-      field &&
-      field.source === 'houses' &&
-      !isChosenHouseValue(config[key], storedConfig[key])
-    ) {
-      throw new ForbiddenError(`config.${key}: only a house chosen by the user can be set without location: true`);
+    if (checkChosenHouses && field && field.source === 'houses') {
+      if (!isUnchangedValue(config[key], storedConfig[key])) {
+        throw new ForbiddenError(
+          `config.${key}: only the house chosen by the user can be written back without location: true`,
+        );
+      }
+      return;
     }
     if (field) {
       validateConfigValue(field, config[key], dynamicOptions);
