@@ -488,7 +488,7 @@ module.exports = function ExternalIntegrationController(gladys) {
       req.params.action_key,
       settings,
       getUserPreferences(req),
-      req.body ? req.body.values : undefined,
+      req.body.values,
     );
     res.json(result);
   }
