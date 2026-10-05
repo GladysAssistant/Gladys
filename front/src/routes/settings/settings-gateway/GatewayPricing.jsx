@@ -81,9 +81,11 @@ const GatewayPricing = ({ children, ...props }) => {
               </p>
               <ul class={`list-unstyled mb-0 ${style.planFeatureList}`}>
                 {OFFLINE_ALERT_POINTS.map(k => (
-                  <li class="mb-1">
+                  <li class="d-flex align-items-baseline mb-1">
                     <i class="fe fe-check text-success mr-2" />
-                    <Text id={`gatewayPricing.offlineAlert.${k}`} />
+                    <span>
+                      <Text id={`gatewayPricing.offlineAlert.${k}`} />
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -157,14 +159,16 @@ const GatewayPricing = ({ children, ...props }) => {
               </p>
               <ul class={`list-unstyled mb-4 ${style.planFeatureList}`}>
                 {LITE_FEATURES.map(k => (
-                  <li class="mb-2">
+                  <li class="d-flex align-items-baseline mb-2">
                     <i class="fe fe-check text-success mr-2" />
-                    <Text id={`gatewayPricing.litePlan.features.${k}`} />
-                    {NEW_FEATURES.includes(k) && (
-                      <span class="badge badge-success ml-2">
-                        <Text id="gatewayPricing.newBadge" />
-                      </span>
-                    )}
+                    <span>
+                      <Text id={`gatewayPricing.litePlan.features.${k}`} />
+                      {NEW_FEATURES.includes(k) && (
+                        <span class="badge badge-success ml-2">
+                          <Text id="gatewayPricing.newBadge" />
+                        </span>
+                      )}
+                    </span>
                   </li>
                 ))}
               </ul>
