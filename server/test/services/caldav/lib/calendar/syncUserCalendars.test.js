@@ -26,6 +26,7 @@ describe('CalDAV sync', () => {
       requestCalendars: sinon.stub(),
       requestChanges: sinon.stub(),
       requestEventsData: sinon.stub(),
+      requestRecurringEvents: sinon.stub(),
       gladys: {
         calendar: {
           create: sinon.stub(),
@@ -118,6 +119,8 @@ describe('CalDAV sync', () => {
           sync_token: 'syncToken21',
           external_id: 'https://caldav.host.com/home/professional',
           type: 'CALDAV',
+          // Recurring events refreshed recently, only the changes are synchronized
+          last_sync: dayjs().format(),
         },
       ])
       .withArgs(userId, { externalId: 'https://caldav.host.com/home/avengers' })
@@ -471,6 +474,7 @@ describe('CalDAV sync of a calendar with recurring events', () => {
     ]),
     requestChanges: sinon.stub(),
     requestEventsData: sinon.stub(),
+    requestRecurringEvents: sinon.stub(),
     gladys: {
       calendar: {
         create: sinon.stub(),
@@ -486,6 +490,7 @@ describe('CalDAV sync of a calendar with recurring events', () => {
             sync_token: 'old-sync-token',
             external_id: 'https://caldav.host.com/home/heating',
             type: 'CALDAV',
+            last_sync: dayjs().format(),
           },
         ]),
         update: sinon.stub().resolves(),
@@ -643,5 +648,209 @@ describe('CalDAV sync of a calendar with recurring events', () => {
       .and.eventually.have.nested.property('message.message', 'CALDAV_FAILED_REQUEST_CHANGES');
 
     expect(sync.gladys.calendar.update.callCount).to.equal(0);
+  });
+
+  it('should only update a subscribed calendar whose ctag changed', async () => {
+    sync.requestCalendars.resolves([
+      {
+        data: {},
+        url: 'https://caldav.host.com/home/holidays',
+        ctag: 'new-ctag',
+        displayName: 'Holidays',
+        type: 'WEBCAL',
+      },
+      {
+        data: {},
+        url: 'https://caldav.host.com/home/moon',
+        ctag: 'same-ctag',
+        displayName: 'Moon',
+        type: 'WEBCAL',
+      },
+    ]);
+    sync.gladys.calendar.get
+      .withArgs(userId, { externalId: 'https://caldav.host.com/home/holidays' })
+      .resolves([{ selector: 'holidays', sync: '1', ctag: 'old-ctag', type: 'WEBCAL' }])
+      .withArgs(userId, { externalId: 'https://caldav.host.com/home/moon' })
+      .resolves([{ selector: 'moon', sync: '1', ctag: 'same-ctag', type: 'WEBCAL' }]);
+
+    await sync.syncUserCalendars(userId);
+
+    // Webcal events are synchronized by syncUserWebcals
+    expect(sync.requestChanges.callCount).to.equal(0);
+    expect(sync.requestRecurringEvents.callCount).to.equal(0);
+    expect(sync.gladys.calendar.update.callCount).to.equal(1);
+    expect(sync.gladys.calendar.update.args[0][0]).to.equal('holidays');
+    expect(sync.gladys.calendar.update.args[0][1]).to.include({ ctag: 'new-ctag', type: 'WEBCAL' });
+    expect(sync.gladys.calendar.update.args[0][1]).to.not.have.property('sync');
+  });
+
+  describe('refresh of the recurring events', () => {
+    const heatingCalendar = {
+      id: calendarId,
+      selector: 'chauffage',
+      name: 'Chauffage',
+      sync: '1',
+      ctag: 'new-ctag',
+      sync_token: 'old-sync-token',
+      external_id: 'https://caldav.host.com/home/heating',
+      type: 'CALDAV',
+    };
+
+    it('should not refresh the recurring events of a calendar refreshed less than 30 days ago', async () => {
+      sync.gladys.calendar.get.resolves([
+        {
+          ...heatingCalendar,
+          last_sync: dayjs()
+            .subtract(29, 'days')
+            .format(),
+        },
+      ]);
+
+      await sync.syncUserCalendars(userId);
+
+      expect(sync.requestChanges.callCount).to.equal(0);
+      expect(sync.requestRecurringEvents.callCount).to.equal(0);
+      expect(sync.gladys.calendar.update.callCount).to.equal(0);
+    });
+
+    it('should refresh the recurring events of a calendar refreshed more than 30 days ago', async () => {
+      sync.gladys.calendar.get.resolves([
+        {
+          ...heatingCalendar,
+          last_sync: dayjs()
+            .subtract(31, 'days')
+            .format(),
+        },
+      ]);
+      sync.requestRecurringEvents.resolves([
+        {
+          type: 'VEVENT',
+          uid: 'birthday',
+          summary: 'Birthday',
+          start: new Date('2020-10-05 00:00:00.000 +00:00'),
+          rrule: {},
+          href: '/home/heating/birthday.ics',
+        },
+        // Returned by a server which does not support the RRULE filter
+        {
+          type: 'VEVENT',
+          uid: 'single',
+          summary: 'Single event',
+          start: new Date('2026-10-05 08:00:00.000 +00:00'),
+          end: new Date('2026-10-05 09:00:00.000 +00:00'),
+          href: '/home/heating/single.ics',
+        },
+      ]);
+      sync.formatRecurringEvents.returns([
+        {
+          external_id: 'birthday2028-10-05-00-00',
+          selector: 'birthday2028-10-05-00-00',
+          name: 'Birthday',
+          url: '/home/heating/birthday.ics',
+          calendar_id: calendarId,
+        },
+      ]);
+      sync.gladys.calendar.getEvents.withArgs(userId, { calendarId }).resolves([
+        // Occurrence now out of the synchronized time range
+        {
+          selector: 'birthday-2024-10-05-00-00',
+          external_id: 'birthday2024-10-05-00-00',
+          url: '/home/heating/birthday.ics',
+        },
+        { selector: 'single', external_id: 'single', url: '/home/heating/single.ics' },
+      ]);
+
+      await sync.syncUserCalendars(userId);
+
+      expect(sync.requestChanges.callCount).to.equal(0);
+      expect(sync.requestRecurringEvents.callCount).to.equal(1);
+      expect(sync.requestRecurringEvents.args[0][1]).to.equal('https://caldav.host.com/home/heating');
+      // Only the recurring event is formatted & saved
+      expect(sync.formatRecurringEvents.callCount).to.equal(1);
+      expect(sync.gladys.calendar.createEvent.args).to.eql([
+        [
+          'chauffage',
+          {
+            external_id: 'birthday2028-10-05-00-00',
+            selector: 'birthday2028-10-05-00-00',
+            name: 'Birthday',
+            url: '/home/heating/birthday.ics',
+            calendar_id: calendarId,
+          },
+        ],
+      ]);
+      expect(sync.gladys.calendar.destroyEvent.args).to.eql([['birthday-2024-10-05-00-00']]);
+      // Only the refresh date is saved, the ctag did not change
+      expect(sync.gladys.calendar.update.callCount).to.equal(1);
+      expect(sync.gladys.calendar.update.args[0][0]).to.equal('chauffage');
+      expect(Object.keys(sync.gladys.calendar.update.args[0][1])).to.eql(['last_sync']);
+      expect(dayjs(sync.gladys.calendar.update.args[0][1].last_sync).isAfter(dayjs().subtract(1, 'minute'))).to.equal(
+        true,
+      );
+    });
+
+    it('should refresh the recurring events of a calendar never refreshed', async () => {
+      sync.gladys.calendar.get.resolves([{ ...heatingCalendar, last_sync: null }]);
+      sync.requestRecurringEvents.resolves([]);
+
+      await sync.syncUserCalendars(userId);
+
+      expect(sync.requestRecurringEvents.callCount).to.equal(1);
+      expect(sync.gladys.calendar.getEvents.callCount).to.equal(0);
+      expect(Object.keys(sync.gladys.calendar.update.args[0][1])).to.eql(['last_sync']);
+    });
+
+    it('should synchronize the changes and refresh the recurring events of a calendar', async () => {
+      sync.gladys.calendar.get.resolves([{ ...heatingCalendar, ctag: 'old-ctag', last_sync: null }]);
+      sync.requestChanges.resolves([]);
+      sync.requestRecurringEvents.resolves([]);
+
+      await sync.syncUserCalendars(userId);
+
+      expect(sync.requestChanges.args[0][1].sync_token).to.equal('old-sync-token');
+      expect(sync.requestRecurringEvents.callCount).to.equal(1);
+      expect(sync.gladys.calendar.update.args[0][1]).to.include({
+        ctag: 'new-ctag',
+        sync_token: 'new-sync-token',
+      });
+      expect(sync.gladys.calendar.update.args[0][1]).to.have.property('last_sync');
+    });
+
+    it('should not refresh the recurring events of a fully synchronized calendar', async () => {
+      // Calendar disabled then enabled again: every event is synchronized
+      sync.gladys.calendar.get.resolves([{ ...heatingCalendar, ctag: null, sync_token: null, last_sync: null }]);
+      sync.requestChanges.resolves([]);
+
+      await sync.syncUserCalendars(userId);
+
+      expect(sync.requestChanges.args[0][1].sync_token).to.equal(null);
+      expect(sync.requestRecurringEvents.callCount).to.equal(0);
+      expect(sync.gladys.calendar.update.args[0][1]).to.include({ ctag: 'new-ctag' });
+      expect(sync.gladys.calendar.update.args[0][1]).to.have.property('last_sync');
+    });
+
+    it('should synchronize all the events if the recurring events cannot be requested', async () => {
+      sync.gladys.calendar.get.resolves([{ ...heatingCalendar, last_sync: null }]);
+      sync.requestRecurringEvents.rejects(new Error('Bad status: 400'));
+      sync.requestChanges.resolves([]);
+
+      await sync.syncUserCalendars(userId);
+
+      // Full synchronization, without sync token
+      expect(sync.requestChanges.args[0][1].sync_token).to.equal(null);
+      expect(Object.keys(sync.gladys.calendar.update.args[0][1])).to.eql(['last_sync']);
+    });
+
+    it('should not save the refresh date if the recurring events refresh failed', async () => {
+      sync.gladys.calendar.get.resolves([{ ...heatingCalendar, last_sync: null }]);
+      sync.requestRecurringEvents.rejects(new Error('Bad status: 400'));
+      sync.requestChanges.rejects();
+
+      await expect(sync.syncUserCalendars(userId))
+        .to.be.rejectedWith(Error)
+        .and.eventually.have.nested.property('message.message', 'CALDAV_FAILED_REQUEST_CHANGES');
+
+      expect(sync.gladys.calendar.update.callCount).to.equal(0);
+    });
   });
 });
