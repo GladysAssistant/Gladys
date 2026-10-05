@@ -4,9 +4,10 @@ const sinon = require('sinon').createSandbox();
 const { assert: sinonAssert, fake } = sinon;
 
 const db = require('../../../models');
-const { BadParameters } = require('../../../utils/coreErrors');
+const { BadParameters, ForbiddenError } = require('../../../utils/coreErrors');
 const { Error422 } = require('../../../utils/httpErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { DYNAMIC_SOURCES } = require('../../../lib/external-integration/constants');
 const { validateConfigValue } = require('../../../lib/external-integration/externalIntegration.validateConfigValue');
 const { getDynamicOptions } = require('../../../lib/external-integration/externalIntegration.getDynamicOptions');
 const { buildSupervisor, seedExternalService, TEST_NOTIFICATION_MANIFEST } = require('./testUtils.test');
@@ -458,6 +459,7 @@ describe('externalIntegration config', () => {
           config_schema: [
             { key: 'home', type: 'select', source: 'houses', label: { en: 'House' } },
             { key: 'homes', type: 'multi_select', source: 'houses', label: { en: 'Houses' } },
+            { key: 'meter_id', type: 'string', label: { en: 'Meter' } },
           ],
           actions: [
             {
@@ -476,7 +478,9 @@ describe('externalIntegration config', () => {
         home: HOUSE,
         homes: [HOUSE, OTHER_HOUSE],
       });
-      expect(result.config).to.deep.equal({ home: HOUSE, homes: [HOUSE, OTHER_HOUSE] });
+      expect(result.config)
+        .to.include({ home: HOUSE })
+        .and.to.deep.include({ homes: [HOUSE, OTHER_HOUSE] });
     });
 
     it('should reject an unknown house without listing the houses', async () => {
@@ -488,17 +492,69 @@ describe('externalIntegration config', () => {
         externalIntegration.saveConfigFromFront(housesService.selector, { homes: [HOUSE, 'unknown-house'] }),
         'config.homes: must be an array of unique values among the selectors of the houses of Gladys',
       );
-      // the integration without `location: true` never learns the houses
-      // through a refused POST /config
-      await expect422(
-        externalIntegration.setIntegrationConfig(housesService, { home: 'unknown-house' }),
-        'config.home: must be one of the selectors of the houses of Gladys',
-      );
     });
 
-    it('should accept the selector of an existing house from the integration itself', async () => {
-      await externalIntegration.setIntegrationConfig(housesService, { home: OTHER_HOUSE });
-      expect(await externalIntegration.getIntegrationConfig(housesService)).to.deep.equal({ home: OTHER_HOUSE });
+    describe('config from the integration itself', () => {
+      const expect403 = async (promise, message) => {
+        try {
+          await promise;
+          throw new Error('should have thrown');
+        } catch (e) {
+          expect(e).to.be.instanceOf(ForbiddenError);
+          expect(e.message).to.equal(message);
+        }
+      };
+
+      it('should refuse any house the user did not choose, existing or not, without location: true', async () => {
+        // the same answer for an existing and an unknown house: POST /config
+        // is never an oracle on the houses of the instance
+        const refused = 'config.home: only a house chosen by the user can be set without location: true';
+        await expect403(externalIntegration.setIntegrationConfig(housesService, { home: HOUSE }), refused);
+        await expect403(externalIntegration.setIntegrationConfig(housesService, { home: 'unknown-house' }), refused);
+        expect(await externalIntegration.getIntegrationConfig(housesService)).to.deep.equal({});
+      });
+
+      it('should let the integration write back the houses the user chose', async () => {
+        await externalIntegration.saveConfigFromFront(housesService.selector, {
+          home: HOUSE,
+          homes: [HOUSE, OTHER_HOUSE],
+        });
+        await externalIntegration.setIntegrationConfig(housesService, {
+          home: HOUSE,
+          homes: [OTHER_HOUSE],
+          meter_id: 'meter-1',
+          internal_state: 'synced',
+        });
+        expect(await externalIntegration.getIntegrationConfig(housesService)).to.deep.equal({
+          home: HOUSE,
+          homes: [OTHER_HOUSE],
+          meter_id: 'meter-1',
+          internal_state: 'synced',
+        });
+        await expect403(
+          externalIntegration.setIntegrationConfig(housesService, { home: OTHER_HOUSE }),
+          'config.home: only a house chosen by the user can be set without location: true',
+        );
+        await expect403(
+          externalIntegration.setIntegrationConfig(housesService, { homes: [HOUSE, OTHER_HOUSE] }),
+          'config.homes: only a house chosen by the user can be set without location: true',
+        );
+      });
+
+      it('should validate the houses like the front when the integration declares location: true', async () => {
+        // it reads the houses through GET /house anyway: nothing to hide
+        const locatedService = await seedExternalService({
+          name: 'ext-dev-energy-located',
+          selector: 'ext-dev-energy-located',
+          manifest: { ...housesService.manifest, location: true },
+        });
+        await externalIntegration.setIntegrationConfig(locatedService, { home: OTHER_HOUSE });
+        expect(await externalIntegration.getIntegrationConfig(locatedService)).to.deep.equal({ home: OTHER_HOUSE });
+        await expect422(
+          externalIntegration.setIntegrationConfig(locatedService, { home: 'unknown-house' }),
+          'config.home: must be one of the selectors of the houses of Gladys',
+        );
+      });
     });
 
     it('should relay the chosen house of an action and refuse an unknown one', async () => {
@@ -524,6 +580,15 @@ describe('externalIntegration config', () => {
         } finally {
           findAll.restore();
         }
+      });
+
+      it('should have a resolver for every source the manifest accepts', async () => {
+        await Promise.all(
+          DYNAMIC_SOURCES.map(async (source) => {
+            const dynamicOptions = await getDynamicOptions(housesService, [{ key: 'k', type: 'select', source }]);
+            expect(dynamicOptions[source]).to.be.an('array');
+          }),
+        );
       });
 
       it('should resolve each declared source once when a schema mixes them', async () => {
