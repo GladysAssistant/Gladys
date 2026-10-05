@@ -6,6 +6,17 @@ import { getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import integrationText from '../integrationText.css';
 
+// An action form has no stored secret to mask (unlike the config_schema,
+// whose stored secrets never come back to the front): every `secret` field
+// is "touched" so its password input shows what the user types.
+const getActionTouchedSecrets = action =>
+  (action.fields || []).reduce((touched, field) => {
+    if (field.type === 'secret') {
+      touched[field.key] = true;
+    }
+    return touched;
+  }, {});
+
 // On-demand actions declared in the manifest (connection test, protocol
 // detection, re-pairing...): a button per action, an optional mini form
 // rendered by the same engine as the config_schema, and the result
@@ -31,6 +42,7 @@ const ActionsCard = ({
         const actionState = actionStates[action.key] || {};
         const running = actionState.status === RequestStatus.Getting;
         const description = getLocalizedText(action.description, language);
+        const touchedSecrets = getActionTouchedSecrets(action);
         return (
           <div class={cx({ 'mb-5': index < actions.length - 1 })}>
             <h4>{getLocalizedText(action.label, language) || action.key}</h4>
@@ -42,7 +54,7 @@ const ActionsCard = ({
                 language={language}
                 values={actionFieldValues[action.key] || {}}
                 configuredSecrets={[]}
-                touchedSecrets={{}}
+                touchedSecrets={touchedSecrets}
                 updateConfigValue={(updatedField, value) => updateActionFieldValue(action.key, updatedField, value)}
                 dynamicOptions={dynamicOptions}
                 placeholderPorts={placeholderPorts}
