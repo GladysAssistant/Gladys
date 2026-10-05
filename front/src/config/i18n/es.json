@@ -4617,6 +4617,14 @@
     "heroReassurance": "1 mes de prueba gratuita · Sin tarjeta de crédito · Sin compromiso",
     "startFreeTrialButton": "Comenzar mi prueba gratuita",
     "alreadySubscriberButton": "Ya tengo una cuenta",
+    "newBadge": "Nuevo",
+    "offlineAlert": {
+      "title": "Reciba un correo cuando su Gladys deje de funcionar",
+      "description": "Corte de corriente, router de Internet caído, tarjeta SD dañada, una actualización de Docker que salió mal: cuando su instancia permanece inaccesible, Gladys Plus le envía un correo. Se entera el mismo día, no por la noche al volver a casa.",
+      "delay": "Usted elige el plazo, de 10 minutos a 24 horas",
+      "backOnline": "Un segundo correo cuando su Gladys vuelve a estar en línea",
+      "onByDefault": "Activada por defecto, incluida en ambos planes: nada que configurar"
+    },
     "featuresTitle": "Todo lo que incluye",
     "featuresSubtitle": "Un conjunto completo para hacer que su hogar inteligente sea verdaderamente útil, cada día.",
     "features": {
@@ -4663,6 +4671,7 @@
       "priceDetail": "Facturado a 69,99 € al año (ahorre un 17 %)",
       "features": {
         "remoteAccess": "Acceso remoto cifrado de extremo a extremo",
+        "offlineAlert": "Aviso por correo si su Gladys está fuera de línea",
         "voiceAssistants": "Google Home y Amazon Alexa",
         "openApi": "API REST abierta",
         "familyAccounts": "Cuentas para toda la familia"

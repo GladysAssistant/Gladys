@@ -2,11 +2,19 @@ import { LoginStatus, RequestStatus } from '../../utils/consts';
 import { validateEmail } from '../../utils/validator';
 import createActionsProfilePicture from '../profilePicture';
 import { route } from 'preact-router';
+import { isSafeReturnUrl } from '../../utils/url';
 
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
 
   const actions = {
+    init(state, returnUrl) {
+      // Only keep return URLs relative to this domain
+      // (we want to avoid redirecting to another domain for security issues)
+      store.setState({
+        loginReturnUrl: isSafeReturnUrl(returnUrl) ? returnUrl : null
+      });
+    },
     async login(state, e) {
       if (e) {
         e.preventDefault();
@@ -36,8 +44,8 @@ function createActions(store) {
           loginFormPasswordValue: ''
         });
         actionsProfilePicture.loadProfilePicture(state);
-        // redirect to dashboard
-        route('/dashboard');
+        // redirect to the page the user asked for, or to the dashboard
+        route(state.loginReturnUrl || '/dashboard');
       } catch (e) {
         store.setState({
           loginStatus: LoginStatus.WrongCredentialsError

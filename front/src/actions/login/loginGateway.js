@@ -4,6 +4,7 @@ import { validateEmail } from '../../utils/validator';
 import { ERROR_MESSAGES } from '../../../../server/utils/constants';
 import createActionsProfilePicture from '../profilePicture';
 import { route } from 'preact-router';
+import { isSafeReturnUrl } from '../../utils/url';
 
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
@@ -16,7 +17,7 @@ function createActions(store) {
         const preservedState = {
           gatewayLoginPreserveStateOnce: false
         };
-        if (returnUrl && returnUrl.startsWith('/')) {
+        if (isSafeReturnUrl(returnUrl)) {
           preservedState.gatewayLoginReturnUrl = returnUrl;
         }
         store.setState(preservedState);
@@ -38,7 +39,7 @@ function createActions(store) {
       };
       // If there is a return URL and the URL is relative to this domain
       // (we want to avoid redirecting to another domain for security issues)
-      if (returnUrl && returnUrl.startsWith('/')) {
+      if (isSafeReturnUrl(returnUrl)) {
         newState.gatewayLoginReturnUrl = returnUrl;
       }
       store.setState(newState);

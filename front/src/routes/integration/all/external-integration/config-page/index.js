@@ -44,6 +44,7 @@ class ExternalIntegrationConfigPage extends Component {
         configValues,
         configuredSecrets: configResponse.configured_secrets || [],
         touchedSecrets: {},
+        actionFieldValues: this.buildActionFieldValues(integration),
         grantedDevices: integration.granted_devices || [],
         loadStatus: RequestStatus.Success
       });
@@ -90,6 +91,22 @@ class ExternalIntegrationConfigPage extends Component {
       }
     });
     return configValues;
+  };
+
+  // the action forms start from the declared defaults, like the config form
+  // (an action field without a default stays empty)
+  buildActionFieldValues = integration => {
+    const actionFieldValues = {};
+    (get(integration, 'manifest.actions') || []).forEach(action => {
+      const values = {};
+      (action.fields || []).forEach(field => {
+        if (field.default !== undefined) {
+          values[field.key] = field.default;
+        }
+      });
+      actionFieldValues[action.key] = values;
+    });
+    return actionFieldValues;
   };
 
   updateConfigValue = (field, value) => {

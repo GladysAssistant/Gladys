@@ -43,6 +43,11 @@
   font-size: 1.4rem;
 }
 
+/* In the row layout, a long description must not squeeze the icon */
+.newFeatureCard .featureIcon {
+  flex-shrink: 0;
+}
+
 .planCard {
   position: relative;
   border: 1px solid #e9ecef;

@@ -4617,6 +4617,14 @@
     "heroReassurance": "1 mois d'essai gratuit · Sans carte bancaire · Sans engagement",
     "startFreeTrialButton": "Démarrer mon essai gratuit",
     "alreadySubscriberButton": "J'ai déjà un compte",
+    "newBadge": "Nouveau",
+    "offlineAlert": {
+      "title": "Sois prévenu par email quand ta Gladys tombe",
+      "description": "Coupure de courant, box internet plantée, carte SD morte, mise à jour Docker qui a mal tourné : quand ton instance reste injoignable, Gladys Plus t'envoie un email. Tu le sais le jour même, pas le soir en rentrant.",
+      "delay": "Tu choisis le délai, de 10 minutes à 24 heures",
+      "backOnline": "Un second email quand ta Gladys revient en ligne",
+      "onByDefault": "Activée par défaut, dans les deux formules : rien à configurer"
+    },
     "featuresTitle": "Tout ce qui est inclus",
     "featuresSubtitle": "Une suite complète pour rendre ta domotique vraiment utile au quotidien.",
     "features": {
@@ -4663,6 +4671,7 @@
       "priceDetail": "Facturé 69,99 € par an (économise 17 %)",
       "features": {
         "remoteAccess": "Accès à distance chiffré de bout en bout",
+        "offlineAlert": "Alerte email si ta Gladys est hors ligne",
         "voiceAssistants": "Google Home & Amazon Alexa",
         "openApi": "API REST ouverte",
         "familyAccounts": "Comptes pour toute la famille"
