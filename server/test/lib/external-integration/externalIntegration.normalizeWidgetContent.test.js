@@ -530,6 +530,7 @@ describe('externalIntegration.normalizeWidgetContent', () => {
             withFields([{ key: 'intro', type: 'section', label: { en: 'Intro' } }]),
             withFields([{ ...field('device', 'select'), source: 'devices' }]),
             withFields([{ ...price, default: 'cheap' }]),
+            withFields([{ ...field('note', 'string'), default: 'n'.repeat(1001) }]),
             withFields([price, price]),
             withFields([{ ...price, unknown: true }]),
             withFields(['price']),
@@ -541,6 +542,7 @@ describe('externalIntegration.normalizeWidgetContent', () => {
         const warned = (text) => warn.getCalls().some((call) => call.args[0].includes(text));
         expect(warned('fields[0].type: must be one of string, number, boolean, select')).to.equal(true);
         expect(warned('fields[0].source: not allowed')).to.equal(true);
+        expect(warned('fields[0].default: must be at most 1000 characters')).to.equal(true);
       });
     });
   });

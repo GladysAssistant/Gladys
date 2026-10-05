@@ -20,6 +20,7 @@ const {
   MAX_WIDGET_ACTION_PARAMS_BYTES,
   MAX_WIDGET_ACTION_FIELDS,
   WIDGET_ACTION_FIELD_TYPES,
+  MAX_WIDGET_ACTION_VALUE_LENGTH,
   MAX_WIDGET_URL_LENGTH,
   WIDGET_CONTENT_BUDGET,
 } = require('./constants');
@@ -673,6 +674,10 @@ function normalizeActionFields(rawFields, actionKey) {
         }
         if (field.source !== undefined) {
           errors.push(`fields[${index}].source: not allowed in a widget action, list the options in the content`);
+        }
+        // a default is relayed as a value: it obeys the bound of a typed one
+        if (typeof field.default === 'string' && field.default.length > MAX_WIDGET_ACTION_VALUE_LENGTH) {
+          errors.push(`fields[${index}].default: must be at most ${MAX_WIDGET_ACTION_VALUE_LENGTH} characters`);
         }
       }
     });
