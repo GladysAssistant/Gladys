@@ -12,7 +12,8 @@ const TRANSPORT_ERRORS = ['EXTERNAL_INTEGRATION_NOT_CONNECTED', 'EXTERNAL_INTEGR
 /**
  * @description Run an on-demand action declared in the manifest (a button of
  * the Configuration screen): validate the form values against the action
- * fields (same engine as the config_schema), relay over WebSocket
+ * fields (same engine as the config_schema), apply the declared default of
+ * every absent field, relay over WebSocket
  * (action.run) and wait for the ack within the timeout DECLARED BY THE
  * ACTION (these operations can be long — protocol detection, re-pairing —
  * this is the one exception to the 5s ack rule). The integration answers
@@ -45,8 +46,15 @@ async function runAction(selector, actionKey, fields = {}) {
     }
     validateConfigValue(field, fields[key], dynamicOptions);
   });
+  // an absent field takes its declared default (validated with the
+  // manifest), like a config_schema or scene action field, before the
+  // required check: the API behaves the same whatever the caller sends
+  const resolvedFields = { ...fields };
   declaredFields.forEach((field) => {
-    if (field.required && fields[field.key] === undefined) {
+    if (resolvedFields[field.key] === undefined && field.default !== undefined) {
+      resolvedFields[field.key] = field.default;
+    }
+    if (field.required && resolvedFields[field.key] === undefined) {
       throw new Error422(`fields.${field.key}: required`);
     }
   });
@@ -56,7 +64,7 @@ async function runAction(selector, actionKey, fields = {}) {
     result = await this.sendCommand(
       service,
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.ACTION_RUN,
-      { key: actionKey, fields },
+      { key: actionKey, fields: resolvedFields },
       { timeoutMs: timeoutSeconds * 1000 },
     );
   } catch (e) {
