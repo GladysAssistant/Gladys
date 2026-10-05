@@ -1,4 +1,5 @@
 const { NotFoundError, TooManyRequests } = require('../../utils/coreErrors');
+const { Error422 } = require('../../utils/httpErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const {
   ACTION_DEFAULT_TIMEOUT_SECONDS,
@@ -8,6 +9,7 @@ const {
 const { findWidgetAction } = require('./externalIntegration.normalizeWidgetContent');
 const { findDeclaredWidget, validateWidgetSettings } = require('./externalIntegration.validateWidgetSettings');
 const { countPerMinute } = require('./externalIntegration.widgetCache');
+const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 const { toWidgetHttpError } = require('./externalIntegration.widgetErrors');
 
 const LANGUAGE_KEY_REGEX = /^[a-z]{2}(-[A-Z]{2})?$/;
@@ -38,14 +40,60 @@ function boundMessage(message) {
 }
 
 /**
+ * @description Validate the values typed in the form of a widget action
+ * against the `fields` the action declares in the integration's own content
+ * (section 7) — the allowlist of the action key, extended to its inputs:
+ * unknown key or invalid value → 422 naming `values.<key>`, absent keys take
+ * their declared default, a required field still missing → 422. An action
+ * declaring no fields accepts no value.
+ * @param {object} action - The action of the button, from the normalized content.
+ * @param {object} [rawValues] - The values typed in the form.
+ * @returns {object} The validated values, defaults applied.
+ * @example
+ * validateActionValues({ key: 'delivery', fields }, { price_per_bag: 6.95 });
+ */
+function validateActionValues(action, rawValues = {}) {
+  if (rawValues === null || typeof rawValues !== 'object' || Array.isArray(rawValues)) {
+    throw new Error422('values: must be an object');
+  }
+  const declaredFields = action.fields || [];
+  const values = {};
+  Object.keys(rawValues).forEach((key) => {
+    const field = declaredFields.find((declaredField) => declaredField.key === key);
+    if (!field) {
+      throw new Error422(`values.${key}: unknown field`);
+    }
+    try {
+      validateConfigValue(field, rawValues[key]);
+    } catch (e) {
+      // the shared engine names the config form (`config.<key>`); here it
+      // is a value of the action form — validateConfigValue only ever throws an Error422
+      throw new Error422(`${e.properties}`.replace(/^config\./, 'values.'));
+    }
+    values[key] = rawValues[key];
+  });
+  declaredFields.forEach((field) => {
+    if (values[field.key] === undefined && field.default !== undefined) {
+      values[field.key] = field.default;
+    }
+    if (field.required && values[field.key] === undefined) {
+      throw new Error422(`values.${field.key}: required`);
+    }
+  });
+  return values;
+}
+
+/**
  * @description Run a widget action (the `button` component, section 7 of
  * capabilities/dashboard-widgets.md): rate-limited per integration (30 per
  * minute → 429), allowlisted from the integration's own last normalized
  * content — the content of that (integration, widget, settings) is re-pulled
  * when nothing is cached, an action key absent from it 404s without reaching
  * the integration, and the `params` relayed are the ones declared in that
- * content, never taken from the request. Relayed over widget.action within
- * the widget's declared `action_timeout_seconds`; a success drops the cached
+ * content, never taken from the request. The values typed in the form of an
+ * action declaring `fields` are validated against those fields and relayed
+ * as `values`, next to the params, never merged into them. Relayed over
+ * widget.action within the widget's declared `action_timeout_seconds`; a success drops the cached
  * contents of the widget and broadcasts widget-updated so the tile reflects
  * the new state without a nudge.
  * @param {string} selector - The selector of the external integration.
@@ -55,12 +103,13 @@ function boundMessage(message) {
  * @param {object} options - The requesting user's preferences (session-derived).
  * @param {string} options.language - ISO 639-1 language.
  * @param {string} options.units - 'metric' or 'us'.
+ * @param {object} [rawValues] - The values typed in the form of the action.
  * @returns {Promise<object>} Resolve with { message } (null when the integration returned none).
  * @example
  * const preferences = { language: 'fr', units: 'metric' };
  * await gladys.externalIntegration.runWidgetAction('ext-roborock', 'vacuum', 'start', {}, preferences);
  */
-async function runWidgetAction(selector, widgetKey, actionKey, rawSettings, { language, units }) {
+async function runWidgetAction(selector, widgetKey, actionKey, rawSettings, { language, units }, rawValues) {
   const service = await this.getBySelector(selector);
   const widget = findDeclaredWidget(service, widgetKey);
   if (!widget) {
@@ -76,6 +125,8 @@ async function runWidgetAction(selector, widgetKey, actionKey, rawSettings, { la
   if (!action) {
     throw new NotFoundError('EXTERNAL_INTEGRATION_WIDGET_ACTION_NOT_FOUND');
   }
+  // nothing typed reaches the integration before this validation passed
+  const values = validateActionValues(action, rawValues);
   const timeoutSeconds = widget.action_timeout_seconds || ACTION_DEFAULT_TIMEOUT_SECONDS;
   let result;
   try {
@@ -88,6 +139,8 @@ async function runWidgetAction(selector, widgetKey, actionKey, rawSettings, { la
         params: action.params,
         // the validated settings with defaults applied, as sent to widget.get
         settings: await validateWidgetSettings(service, widget, rawSettings),
+        // absent for an action without fields: older integrations see no change
+        ...(action.fields ? { values } : {}),
       },
       { timeoutMs: timeoutSeconds * 1000 },
     );

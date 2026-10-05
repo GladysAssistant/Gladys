@@ -458,6 +458,71 @@ describe('externalIntegration.normalizeWidgetContent', () => {
         ]),
       ).to.deep.equal([]);
     });
+
+    describe('action fields', () => {
+      const price = {
+        key: 'price_per_bag',
+        type: 'number',
+        required: true,
+        min: 0,
+        max: 50,
+        default: 7.3,
+        label: { en: 'Price per bag', fr: 'Prix par sac' },
+      };
+      const withFields = (fields) => ({ type: 'button', label: 'Delivered', action: { key: 'delivery', fields } });
+
+      it('should keep a valid form declaration of the config_schema grammar', () => {
+        const fields = [
+          price,
+          { key: 'note', type: 'string', label: { en: 'Note' }, placeholder: { en: 'Supplier' } },
+          { key: 'paid', type: 'boolean', label: { en: 'Paid' }, default: false },
+          {
+            key: 'supplier',
+            type: 'select',
+            display: 'radio',
+            label: { en: 'Supplier' },
+            options: [{ value: 'a', label: { en: 'A' } }],
+          },
+        ];
+        expect(normalize([withFields(fields)])).to.deep.equal([
+          {
+            type: 'button',
+            label: 'Delivered',
+            style: 'secondary',
+            action: { key: 'delivery', params: {}, confirm: false, fields },
+          },
+        ]);
+      });
+
+      it('should treat an empty list as no form', () => {
+        expect(normalize([withFields([])])[0].action).to.deep.equal({ key: 'delivery', params: {}, confirm: false });
+      });
+
+      it('should drop the button on an invalid declaration, with a warning naming the action', () => {
+        const warn = sinon.stub(logger, 'warn');
+        const field = (key, type) => ({ key, type, label: { en: key } });
+        expect(
+          normalize([
+            withFields('price'),
+            withFields([price, field('b', 'number'), field('c', 'number'), field('d', 'number'), field('e', 'number')]),
+            withFields([field('secret', 'secret')]),
+            withFields([field('many', 'multi_select')]),
+            withFields([{ key: 'intro', type: 'section', label: { en: 'Intro' } }]),
+            withFields([{ ...field('device', 'select'), source: 'devices' }]),
+            withFields([{ ...price, default: 'cheap' }]),
+            withFields([price, price]),
+            withFields([{ ...price, unknown: true }]),
+            withFields(['price']),
+          ]),
+        ).to.deep.equal([]);
+        expect(warn.firstCall.args[0]).to.equal(
+          'Widget content: invalid fields on action "delivery": fields: must be an array of at most 4 fields',
+        );
+        const warned = (text) => warn.getCalls().some((call) => call.args[0].includes(text));
+        expect(warned('fields[0].type: must be one of string, number, boolean, select')).to.equal(true);
+        expect(warned('fields[0].source: not allowed')).to.equal(true);
+      });
+    });
   });
 
   describe('content budget', () => {

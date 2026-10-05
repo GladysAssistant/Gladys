@@ -195,4 +195,59 @@ describe('Dashboard integration widget box', () => {
       .should('deep.equal', { settings: {} });
     cy.get('[data-cy="external-widget-action-message"]').should('contain', 'Cleaning started');
   });
+
+  it('opens the form of an action declaring fields, posts the typed values and shows a refused value', () => {
+    const delivery = {
+      type: 'button',
+      label: 'Pallet delivered',
+      icon: 'truck',
+      action: {
+        key: 'delivery',
+        params: {},
+        confirm: false,
+        fields: [
+          { key: 'bags', type: 'number', required: true, min: 1, max: 200, default: 72, label: { en: 'Bags' } },
+          { key: 'price_per_bag', type: 'number', required: true, min: 0, default: 7.3, label: { en: 'Price per bag' } }
+        ]
+      }
+    };
+    const formContent = { ...CONTENT, content: { version: 1, components: [delivery] } };
+    const actionUrl = `**/api/v1/external_integration/${SELECTOR}/widget/${WIDGET_KEY}/action/delivery`;
+    cy.intercept('GET', '**/api/v1/external_integration/widget', [buildWidget('RUNNING')]).as('getWidgets');
+    cy.intercept('GET', CONTENT_URL, formContent).as('getContent');
+    cy.intercept('POST', actionUrl, {
+      statusCode: 422,
+      body: { properties: 'values.price_per_bag: must be <= 50' }
+    }).as('refusedAction');
+    createDashboard([{ type: 'external-widget', integration: SELECTOR, widget: WIDGET_KEY }]).then(selector => {
+      dashboardSelector = selector;
+      cy.visit(`/dashboard/${selector}`);
+    });
+    cy.wait('@getWidgets');
+    cy.wait('@getContent');
+    // nothing to type on the card at rest: the form opens on a tap, pre-filled
+    cy.get('[data-cy="external-widget-action-form-delivery"]').should('not.exist');
+    cy.get('[data-cy="external-widget-action-delivery"]').click();
+    cy.get('[data-cy="external-widget-action-delivery"]').should('have.attr', 'aria-expanded', 'true');
+    cy.get('[data-cy="external-widget-action-form-delivery"] input[id$="_bags"]').should('have.value', '72');
+    cy.get('[data-cy="external-widget-action-form-delivery"] input[id$="_price_per_bag"]').should('have.value', '7.3');
+    cy.get('[data-cy="external-widget-action-form-delivery"] input[id$="_price_per_bag"]').clear();
+    cy.get('[data-cy="external-widget-action-form-delivery"] input[id$="_price_per_bag"]').type('60');
+    cy.get('[data-cy="external-widget-action-form-delivery"] button[type="submit"]').click();
+    cy.wait('@refusedAction')
+      .its('request.body')
+      .should('deep.equal', { settings: {}, values: { bags: 72, price_per_bag: 60 } });
+    // the refusal of the core stays in the open form
+    cy.get('[data-cy="external-widget-action-form-error"]').should('contain', 'values.price_per_bag: must be <= 50');
+    cy.intercept('POST', actionUrl, { message: { en: '72 bags recorded' } }).as('runAction');
+    // a decimal value is accepted by the number input
+    cy.get('[data-cy="external-widget-action-form-delivery"] input[id$="_price_per_bag"]').clear();
+    cy.get('[data-cy="external-widget-action-form-delivery"] input[id$="_price_per_bag"]').type('6.95');
+    cy.get('[data-cy="external-widget-action-form-delivery"] button[type="submit"]').click();
+    cy.wait('@runAction')
+      .its('request.body')
+      .should('deep.equal', { settings: {}, values: { bags: 72, price_per_bag: 6.95 } });
+    cy.get('[data-cy="external-widget-action-form-delivery"]').should('not.exist');
+    cy.get('[data-cy="external-widget-action-message"]').should('contain', '72 bags recorded');
+  });
 });

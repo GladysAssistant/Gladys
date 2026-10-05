@@ -471,8 +471,10 @@ module.exports = function ExternalIntegrationController(gladys) {
    * @apiName runWidgetAction
    * @apiGroup ExternalIntegration
    * @apiParam {object} [settings] The settings of the box instance.
+   * @apiParam {object} [values] The values typed in the form of an action declaring `fields`.
    * @apiDescription Run an action declared by a button of the widget's own
-   * content. 404 on an action absent from that content (nothing is sent to
+   * content. The typed values are validated against the action's `fields`
+   * (422 naming `values.<key>`). 404 on an action absent from that content (nothing is sent to
    * the integration), 429 beyond 30 actions per minute per integration, 400
    * REQUEST_TO_THIRD_PARTY_FAILED on timeout, refusal or disconnection.
    * @apiSuccessExample {json} Success-Example
@@ -486,6 +488,7 @@ module.exports = function ExternalIntegrationController(gladys) {
       req.params.action_key,
       settings,
       getUserPreferences(req),
+      req.body ? req.body.values : undefined,
     );
     res.json(result);
   }

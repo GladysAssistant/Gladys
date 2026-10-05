@@ -861,7 +861,9 @@
         "emptyChart": "Todavía no hay datos para este período.",
         "now": "Ahora",
         "confirmAction": "¿Ejecutar \"{{label}}\"?",
-        "actionError": "La acción ha fallado."
+        "actionError": "La acción ha fallado.",
+        "actionFormSend": "Enviar",
+        "actionFormInvalid": "Valor no válido"
       }
     },
     "editDashboardBackgroundLabel": "Ambiente de fondo",

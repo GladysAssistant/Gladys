@@ -6,6 +6,7 @@ import get from 'get-value';
 import DeviceFeatureValueText from '../../device/DeviceFeatureValueText';
 import ApexChartComponent from '../chart/ApexChartComponent';
 import Modal from '../../../routes/integration/all/external-integration/components/Modal';
+import { ConfigField } from '../../integration/ConfigSchemaForm';
 import { text, formatNumber, formatDate, getUrlDomain, CHART_INTERVAL_MINUTES } from './widgetContentUtils';
 import style from './style.css';
 
@@ -524,7 +525,15 @@ export class WidgetChart extends Component {
 
 // --- buttons -------------------------------------------------------------
 
-export const WidgetButtons = ({ components, featuresBySelector, pending, onAction, onDeviceFeature, language }) => (
+export const WidgetButtons = ({
+  components,
+  featuresBySelector,
+  pending,
+  openFormIndex,
+  onAction,
+  onDeviceFeature,
+  language
+}) => (
   <div class={style.buttons}>
     {components.map((component, index) => {
       const icon = component.icon;
@@ -561,12 +570,15 @@ export const WidgetButtons = ({ components, featuresBySelector, pending, onActio
           </button>
         );
       }
+      // a button declaring `fields` toggles its form instead of posting
+      const hasForm = Boolean(component.action.fields);
       return (
         <button
           type="button"
-          class={buttonClass}
+          class={cx(buttonClass, { [style.buttonOpen]: hasForm && openFormIndex === index })}
           disabled={pending[index]}
           onClick={() => onAction(component, index)}
+          aria-expanded={hasForm ? String(openFormIndex === index) : undefined}
           data-cy={`external-widget-action-${component.action.key}`}
         >
           <span class={style.buttonIcon}>
@@ -577,4 +589,54 @@ export const WidgetButtons = ({ components, featuresBySelector, pending, onActio
       );
     })}
   </div>
+);
+
+// --- action form ---------------------------------------------------------
+
+// The form behind a widget action button (spec section 7): opened by a tap,
+// never shown on the card at rest, rendered by the config_schema engine and
+// pre-filled with the defaults the integration put in the content. The core
+// validates the values against the same declaration: its 422 is shown here.
+export const WidgetActionForm = ({
+  component,
+  values,
+  error,
+  pending,
+  idPrefix,
+  language,
+  onChange,
+  onSubmit,
+  onCancel
+}) => (
+  <form class={style.actionForm} onSubmit={onSubmit} data-cy={`external-widget-action-form-${component.action.key}`}>
+    <div class={style.actionFormTitle}>
+      <i class={`fe fe-${component.icon || 'play'}`} />
+      <span>{text(component.label, language)}</span>
+    </div>
+    {component.action.fields.map(field => (
+      <ConfigField
+        key={field.key}
+        field={field}
+        language={language}
+        values={values}
+        configuredSecrets={[]}
+        touchedSecrets={{}}
+        updateConfigValue={onChange}
+        idPrefix={idPrefix}
+      />
+    ))}
+    {error && (
+      <div class="text-danger small" role="alert" data-cy="external-widget-action-form-error">
+        <Text id="dashboard.boxes.external-widget.actionFormInvalid" /> — {error}
+      </div>
+    )}
+    <div class={style.actionFormButtons}>
+      <button type="button" class="btn btn-secondary btn-sm" onClick={onCancel} disabled={pending}>
+        <Text id="global.cancel" />
+      </button>
+      <button type="submit" class={cx('btn btn-primary btn-sm', { 'btn-loading': pending })} disabled={pending}>
+        <Text id="dashboard.boxes.external-widget.actionFormSend" />
+      </button>
+    </div>
+  </form>
 );

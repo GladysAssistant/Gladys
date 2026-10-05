@@ -861,7 +861,9 @@
         "emptyChart": "Pas encore de données sur cette période.",
         "now": "Maintenant",
         "confirmAction": "Lancer « {{label}} » ?",
-        "actionError": "L'action a échoué."
+        "actionError": "L'action a échoué.",
+        "actionFormSend": "Envoyer",
+        "actionFormInvalid": "Valeur invalide"
       }
     },
     "editDashboardBackgroundLabel": "Ambiance de fond",

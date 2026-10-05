@@ -1319,4 +1319,5 @@ function validateManifest(manifest) {
 
 module.exports = {
   validateManifest,
+  validateConfigField,
 };

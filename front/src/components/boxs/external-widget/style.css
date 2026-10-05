@@ -438,6 +438,45 @@
   color: #667081;
 }
 
+/* the button whose form is open, and the form itself (section 7): a short
+   form under the button row, framed by the accent like the open button */
+.buttonOpen {
+  border-color: #467fcf;
+  box-shadow: inset 0 0 0 1px #467fcf;
+}
+
+.actionForm {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid #467fcf;
+  border-radius: 12px;
+}
+
+.actionForm :global(.form-group) {
+  margin-bottom: 8px;
+}
+
+.actionFormTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.actionFormTitle :global(.fe) {
+  color: #467fcf;
+}
+
+.actionFormButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 /* --- states --- */
 .stateBox {
   display: flex;
@@ -473,6 +512,7 @@
 
 :global(.glass-theme) .tileIcon,
 :global(.glass-theme) .buttonIcon,
+:global(.glass-theme) .actionFormTitle :global(.fe),
 :global(.glass-theme) .colorPrimary {
   color: var(--gl-accent);
 }
@@ -570,4 +610,19 @@
 :global(.dark-mode) .badgeColorDanger,
 :global(.dark-mode) .badgeColorInfo {
   color: #1c2334;
+}
+
+:global(.glass-theme) .buttonOpen,
+:global(.glass-theme) .actionForm {
+  border-color: var(--gl-accent);
+}
+
+:global(.glass-theme) .buttonOpen {
+  box-shadow: inset 0 0 0 1px var(--gl-accent);
+}
+
+/* the button whose form is open keeps its accent ring through the neutral
+   repaint above (which would otherwise beat .buttonOpen on specificity) */
+:global(.dark-mode) .button.buttonOpen:not(.buttonPrimary):not(.buttonDanger):not(.buttonActive) {
+  border-color: #467fcf;
 }
