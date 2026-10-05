@@ -209,7 +209,8 @@ const ConfigTab = props => {
         />
       )}
 
-      {isAdmin && integration && actions.length > 0 && (
+      {/* hidden while another integration loads: its forms would post to the new selector */}
+      {isAdmin && integration && loadStatus === RequestStatus.Success && actions.length > 0 && (
         <ActionsCard
           actions={actions}
           language={language}

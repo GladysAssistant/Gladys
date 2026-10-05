@@ -24,7 +24,9 @@ class ExternalIntegrationConfigPage extends Component {
   isAdmin = () => get(this.props, 'user.role') === USER_ROLE.ADMIN;
 
   loadData = async () => {
-    this.setState({ loadStatus: RequestStatus.Getting });
+    // action values and results belong to the integration they were typed
+    // for: a secret typed for one integration is never sent to another
+    this.setState({ loadStatus: RequestStatus.Getting, actionFieldValues: {}, actionStates: {} });
     const { selector } = this.props;
     const isAdmin = this.isAdmin();
     try {
@@ -390,6 +392,7 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   runAction = async action => {
+    const { selector } = this.props;
     const actionStates = Object.assign({}, this.state.actionStates, {
       [action.key]: { status: RequestStatus.Getting }
     });
@@ -410,10 +413,13 @@ class ExternalIntegrationConfigPage extends Component {
       }
     });
     try {
-      const result = await this.props.httpClient.post(
-        `/api/v1/external_integration/${this.props.selector}/action/${action.key}`,
-        { fields }
-      );
+      const result = await this.props.httpClient.post(`/api/v1/external_integration/${selector}/action/${action.key}`, {
+        fields
+      });
+      if (selector !== this.props.selector) {
+        // the page moved to another integration meanwhile, discard this result
+        return;
+      }
       this.setState({
         actionStates: Object.assign({}, this.state.actionStates, {
           [action.key]: { status: RequestStatus.Success, message: result.message }
@@ -421,6 +427,9 @@ class ExternalIntegrationConfigPage extends Component {
       });
     } catch (e) {
       console.error(e);
+      if (selector !== this.props.selector) {
+        return;
+      }
       // an explicit refusal of the integration is a 422 carrying its message
       const message = get(e, 'response.data.properties');
       this.setState({
