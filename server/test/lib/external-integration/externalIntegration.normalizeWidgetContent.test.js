@@ -494,6 +494,26 @@ describe('externalIntegration.normalizeWidgetContent', () => {
         ]);
       });
 
+      it('should bound and clean the texts of a valid declaration', () => {
+        const [button] = normalize([
+          withFields([
+            {
+              key: 'supplier',
+              type: 'select',
+              label: { en: `Supplier\u0007${'x'.repeat(60)}` },
+              description: { en: 'd'.repeat(300) },
+              options: [{ value: 'a', label: { en: 'o'.repeat(50) } }],
+            },
+            { key: 'note', type: 'string', label: { en: 'Note' }, placeholder: { en: 'p'.repeat(50) } },
+          ]),
+        ]);
+        const [supplier, note] = button.action.fields;
+        expect(supplier.label.en).to.equal(`Supplier${'x'.repeat(31)}…`);
+        expect(supplier.description.en).to.have.lengthOf(200);
+        expect(supplier.options).to.deep.equal([{ value: 'a', label: { en: `${'o'.repeat(39)}…` } }]);
+        expect(note.placeholder.en).to.have.lengthOf(40);
+      });
+
       it('should treat an empty list as no form', () => {
         expect(normalize([withFields([])])[0].action).to.deep.equal({ key: 'delivery', params: {}, confirm: false });
       });

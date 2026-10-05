@@ -211,7 +211,8 @@ describe('Dashboard integration widget box', () => {
         ]
       }
     };
-    const formContent = { ...CONTENT, content: { version: 1, components: [delivery] } };
+    const start = { type: 'button', label: 'Start', action: { key: 'start', params: {}, confirm: false } };
+    const formContent = { ...CONTENT, content: { version: 1, components: [delivery, start] } };
     const actionUrl = `**/api/v1/external_integration/${SELECTOR}/widget/${WIDGET_KEY}/action/delivery`;
     cy.intercept('GET', '**/api/v1/external_integration/widget', [buildWidget('RUNNING')]).as('getWidgets');
     cy.intercept('GET', CONTENT_URL, formContent).as('getContent');
@@ -225,7 +226,16 @@ describe('Dashboard integration widget box', () => {
     });
     cy.wait('@getWidgets');
     cy.wait('@getContent');
+    cy.intercept('POST', `**/api/v1/external_integration/${SELECTOR}/widget/${WIDGET_KEY}/action/start`, {
+      message: null
+    }).as('runStart');
     // nothing to type on the card at rest: the form opens on a tap, pre-filled
+    cy.get('[data-cy="external-widget-action-form-delivery"]').should('not.exist');
+    cy.get('[data-cy="external-widget-action-delivery"]').click();
+    cy.get('[data-cy="external-widget-action-form-delivery"]').should('exist');
+    // another action runs right away and closes the unrelated form
+    cy.get('[data-cy="external-widget-action-start"]').click();
+    cy.wait('@runStart');
     cy.get('[data-cy="external-widget-action-form-delivery"]').should('not.exist');
     cy.get('[data-cy="external-widget-action-delivery"]').click();
     cy.get('[data-cy="external-widget-action-delivery"]').should('have.attr', 'aria-expanded', 'true');

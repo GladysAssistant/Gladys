@@ -51,6 +51,10 @@ const TEXT_BOUNDS = {
   badgeText: 16,
   cardDescription: 2000,
   linkLabel: 24,
+  fieldLabel: 40,
+  fieldDescription: 200,
+  fieldPlaceholder: 40,
+  fieldOptionLabel: 40,
   imageAlt: 100,
   buttonLabel: 24,
 };
@@ -649,7 +653,7 @@ function normalizeImageComponent(raw) {
  * produced at runtime, so its options and defaults are too.
  * @param {any} rawFields - The raw `fields` of the action.
  * @param {string} actionKey - The action key, for the warning.
- * @returns {Array|null} The validated fields, or null when the declaration is invalid.
+ * @returns {Array|null} The validated fields with bounded texts, or null when the declaration is invalid.
  * @example
  * normalizeActionFields([{ key: 'price', type: 'number', label: { en: 'Price' } }], 'delivery');
  */
@@ -677,7 +681,24 @@ function normalizeActionFields(rawFields, actionKey) {
     logger.warn(`Widget content: invalid fields on action "${actionKey}": ${errors.join('; ')}`);
     return null;
   }
-  return rawFields;
+  // a valid declaration is still unaudited text shown on the card: bounded
+  // and stripped of control characters like every other widget string
+  return rawFields.map((rawField) => {
+    const field = { ...rawField, label: normalizeText(rawField.label, TEXT_BOUNDS.fieldLabel) };
+    if (rawField.description !== undefined) {
+      field.description = normalizeText(rawField.description, TEXT_BOUNDS.fieldDescription, { multiline: true });
+    }
+    if (rawField.placeholder !== undefined) {
+      field.placeholder = normalizeText(rawField.placeholder, TEXT_BOUNDS.fieldPlaceholder);
+    }
+    if (rawField.options !== undefined) {
+      field.options = rawField.options.map((option) => ({
+        value: option.value,
+        label: normalizeText(option.label, TEXT_BOUNDS.fieldOptionLabel),
+      }));
+    }
+    return field;
+  });
 }
 
 /**

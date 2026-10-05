@@ -408,6 +408,9 @@ const MAX_WIDGET_ACTIONS_PER_MINUTE = 30;
 // the content is produced at runtime, so the options and defaults are too
 const MAX_WIDGET_ACTION_FIELDS = 4;
 const WIDGET_ACTION_FIELD_TYPES = ['string', 'number', 'boolean', 'select'];
+// a typed string value of an action form (a delivery note): the route is open
+// to every authenticated user, so what they type is bounded like the rest
+const MAX_WIDGET_ACTION_VALUE_LENGTH = 1000;
 // bounded free-form texts an integration hands back outside the content
 // vocabulary: the action result message and the `error` of a failed command
 const MAX_WIDGET_MESSAGE_LENGTH = 200;
@@ -594,6 +597,7 @@ module.exports = {
   MAX_WIDGET_ACTIONS_PER_MINUTE,
   MAX_WIDGET_ACTION_FIELDS,
   WIDGET_ACTION_FIELD_TYPES,
+  MAX_WIDGET_ACTION_VALUE_LENGTH,
   MAX_WIDGET_MESSAGE_LENGTH,
   WIDGET_COLORS,
   WIDGET_TEXT_VARIANTS,

@@ -124,7 +124,12 @@ class ExternalWidgetBox extends Component {
       if (this.unmounted || generation !== this.fetchGeneration) {
         return;
       }
-      this.setState({ content: response.content, error: null, errorDetail: null });
+      this.setState(({ form }) => ({
+        content: response.content,
+        error: null,
+        errorDetail: null,
+        form: this.rebindForm(form, response.content)
+      }));
       this.scheduleRefresh(new Date(response.expires_at).getTime() - Date.now());
       this.loadFeatures(response.content.components);
     } catch (e) {
@@ -263,6 +268,8 @@ class ExternalWidgetBox extends Component {
       this.toggleForm(component, index);
       return;
     }
+    // another action runs right away: an open form would be left unrelated
+    this.closeForm();
     if (component.action.confirm) {
       const label = text(component.label, user.language);
       const question = get(intl.dictionary, 'dashboard.boxes.external-widget.confirmAction', {
@@ -332,6 +339,20 @@ class ExternalWidgetBox extends Component {
 
   closeForm = () => {
     this.setState({ form: null });
+  };
+
+  // a refreshed content (TTL, widget-updated) re-renders the button row from
+  // the new tree: the open form follows the button carrying the same action
+  // key, typed values kept, and closes when that button is gone
+  rebindForm = (form, content) => {
+    if (!form) {
+      return null;
+    }
+    const buttons = splitIntoSlots(content.components).buttons;
+    const index = buttons.findIndex(
+      button => button.action && button.action.fields && button.action.key === form.component.action.key
+    );
+    return index === -1 ? null : { ...form, index, component: buttons[index] };
   };
 
   updateFormValue = (field, value) => {

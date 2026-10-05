@@ -295,6 +295,13 @@ describe('External integration widgets API', () => {
         .post(`/api/v1/external_integration/${service.selector}/widget/vacuum/action/start`)
         .expect(200);
       expect(empty.body).to.deep.equal({ message: null });
+      // a body that is not JSON is left unparsed: the action runs as if empty
+      const unparsed = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/widget/vacuum/action/start`)
+        .set('Content-Type', 'text/plain')
+        .send('values')
+        .expect(200);
+      expect(unparsed.body).to.deep.equal({ message: null });
     });
 
     it('should relay the values typed in the form of an action, 422 on an invalid one', async () => {

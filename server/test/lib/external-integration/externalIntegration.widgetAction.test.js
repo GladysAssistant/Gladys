@@ -233,6 +233,11 @@ describe('externalIntegration widgets — runWidgetAction', () => {
       await expect422('delivery', { price_per_bag: '6.95' }, 'values.price_per_bag: must be a number');
       await expect422('delivery', { bags: 10 }, 'values.price_per_bag: required');
       await expect422('delivery', { price_per_bag: 6, color: 'red' }, 'values.color: unknown field');
+      await expect422(
+        'delivery',
+        { price_per_bag: 6, note: 'n'.repeat(1001) },
+        'values.note: must be at most 1000 characters',
+      );
       await expect422('delivery', ['nope'], 'values: must be an object');
       await expect422('delivery', null, 'values: must be an object');
       // an action without fields accepts no value

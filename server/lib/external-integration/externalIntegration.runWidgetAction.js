@@ -4,6 +4,7 @@ const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const {
   ACTION_DEFAULT_TIMEOUT_SECONDS,
   MAX_WIDGET_ACTIONS_PER_MINUTE,
+  MAX_WIDGET_ACTION_VALUE_LENGTH,
   MAX_WIDGET_MESSAGE_LENGTH,
 } = require('./constants');
 const { findWidgetAction } = require('./externalIntegration.normalizeWidgetContent');
@@ -43,9 +44,9 @@ function boundMessage(message) {
  * @description Validate the values typed in the form of a widget action
  * against the `fields` the action declares in the integration's own content
  * (section 7) — the allowlist of the action key, extended to its inputs:
- * unknown key or invalid value → 422 naming `values.<key>`, absent keys take
- * their declared default, a required field still missing → 422. An action
- * declaring no fields accepts no value.
+ * unknown key, invalid value or string over 1000 characters → 422 naming
+ * `values.<key>`, absent keys take their declared default, a required field
+ * still missing → 422. An action declaring no fields accepts no value.
  * @param {object} action - The action of the button, from the normalized content.
  * @param {object} [rawValues] - The values typed in the form.
  * @returns {object} The validated values, defaults applied.
@@ -69,6 +70,9 @@ function validateActionValues(action, rawValues = {}) {
       // the shared engine names the config form (`config.<key>`); here it
       // is a value of the action form — validateConfigValue only ever throws an Error422
       throw new Error422(`${e.properties}`.replace(/^config\./, 'values.'));
+    }
+    if (typeof rawValues[key] === 'string' && rawValues[key].length > MAX_WIDGET_ACTION_VALUE_LENGTH) {
+      throw new Error422(`values.${key}: must be at most ${MAX_WIDGET_ACTION_VALUE_LENGTH} characters`);
     }
     values[key] = rawValues[key];
   });
