@@ -33,14 +33,14 @@ describe('Device check batteries', () => {
       getValue: () => false,
     };
     const messageManager = {
-      sendToUser: stub().returns(null),
+      sendSystemMessage: stub().returns(null),
     };
     const device = new Device(event, messageManager, stateManager, service, {}, variables, job, {}, user);
 
     await device.checkBatteries();
 
     assert.notCalled(user.getByRole);
-    assert.notCalled(messageManager.sendToUser);
+    assert.notCalled(messageManager.sendSystemMessage);
   });
   it('should do nothing if the threshold is not set', async () => {
     const stateManager = new StateManager(event);
@@ -56,13 +56,13 @@ describe('Device check batteries', () => {
       },
     };
     const messageManager = {
-      sendToUser: stub().returns(null),
+      sendSystemMessage: stub().returns(null),
     };
     const device = new Device(event, messageManager, stateManager, service, {}, variables, job, {}, user);
 
     await device.checkBatteries();
 
-    assert.notCalled(messageManager.sendToUser);
+    assert.notCalled(messageManager.sendSystemMessage);
   });
   it('should send a message if battery is lower than threshold', async () => {
     const stateManager = new StateManager(event);
@@ -78,14 +78,14 @@ describe('Device check batteries', () => {
       },
     };
     const messageManager = {
-      sendToUser: stub().returns(null),
+      sendSystemMessage: stub().returns(null),
     };
     const device = new Device(event, messageManager, stateManager, service, {}, variables, job, brain, user);
 
     await device.checkBatteries();
 
     assert.calledWith(
-      messageManager.sendToUser,
+      messageManager.sendSystemMessage,
       'admin',
       'Avertissement ! Le niveau de la batterie de Test device est inférieur à 30% (actuel : 20%)',
     );
@@ -115,14 +115,14 @@ describe('Device check batteries', () => {
       },
     };
     const messageManager = {
-      sendToUser: stub().returns(null),
+      sendSystemMessage: stub().returns(null),
     };
     const device = new Device(event, messageManager, stateManager, service, {}, variables, job, brain, user);
 
     await device.checkBatteries();
 
     assert.calledWith(
-      messageManager.sendToUser,
+      messageManager.sendSystemMessage,
       'admin',
       'Avertissement ! Le niveau de la batterie de Test device est faible !',
     );
@@ -143,7 +143,7 @@ describe('Device check batteries', () => {
       getService: () => null,
     };
     const messageManager = {
-      sendToUser: stub().returns(null),
+      sendSystemMessage: stub().returns(null),
     };
     const variables = {
       getValue: (key) => {
@@ -157,6 +157,6 @@ describe('Device check batteries', () => {
 
     await device.checkBatteries();
 
-    assert.notCalled(messageManager.sendToUser);
+    assert.notCalled(messageManager.sendSystemMessage);
   });
 });

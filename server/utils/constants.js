@@ -486,6 +486,10 @@ const SYSTEM_VARIABLE_NAMES = {
   AI_WEEKLY_DIGEST_ENABLED: 'AI_WEEKLY_DIGEST_ENABLED',
   AI_WEEKLY_DIGEST_DAY: 'AI_WEEKLY_DIGEST_DAY',
   AI_WEEKLY_DIGEST_HOUR: 'AI_WEEKLY_DIGEST_HOUR',
+  // channel of the system messages sent to the admins (upgrade, backup,
+  // batteries…): the `service` option of message.sendToUser — empty or absent
+  // means every channel, MESSAGE_GLADYS_ONLY_SERVICE no channel at all
+  SYSTEM_MESSAGE_SERVICE: 'SYSTEM_MESSAGE_SERVICE',
   DUCKDB_MIGRATED: 'DUCKDB_MIGRATED',
   DUCKDB_ORPHANED_STATES_PURGED: 'DUCKDB_ORPHANED_STATES_PURGED',
   GLADYS_VERSION: 'GLADYS_VERSION',
