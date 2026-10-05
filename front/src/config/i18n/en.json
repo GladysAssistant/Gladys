@@ -4617,6 +4617,14 @@
     "heroReassurance": "1-month free trial · No credit card · No commitment",
     "startFreeTrialButton": "Start my free trial",
     "alreadySubscriberButton": "I already have an account",
+    "newBadge": "New",
+    "offlineAlert": {
+      "title": "Get an email when your Gladys goes down",
+      "description": "Power cut, internet box down, dead SD card, a Docker update gone wrong: when your instance stays unreachable, Gladys Plus emails you. You find out the same day, not in the evening when you get home.",
+      "delay": "You pick the delay, from 10 minutes to 24 hours",
+      "backOnline": "A second email once your Gladys is back online",
+      "onByDefault": "On by default, included in both plans: nothing to set up"
+    },
     "featuresTitle": "Everything that's included",
     "featuresSubtitle": "A complete suite to make your smart home truly useful, every day.",
     "features": {
@@ -4663,6 +4671,7 @@
       "priceDetail": "Billed €69.99 per year (save 17%)",
       "features": {
         "remoteAccess": "End-to-end encrypted remote access",
+        "offlineAlert": "Email alert when your Gladys goes offline",
         "voiceAssistants": "Google Home & Amazon Alexa",
         "openApi": "Open REST API",
         "familyAccounts": "Accounts for the whole family"

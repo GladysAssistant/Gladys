@@ -4617,6 +4617,14 @@
     "heroReassurance": "1 Monat kostenlos testen · Ohne Kreditkarte · Jederzeit kündbar",
     "startFreeTrialButton": "Kostenlose Testphase starten",
     "alreadySubscriberButton": "Ich habe bereits ein Konto",
+    "newBadge": "Neu",
+    "offlineAlert": {
+      "title": "Erhalte eine E-Mail, wenn deine Gladys ausfällt",
+      "description": "Stromausfall, abgestürzter Internetrouter, defekte SD-Karte, ein missglücktes Docker-Update: Bleibt deine Instanz unerreichbar, schickt dir Gladys Plus eine E-Mail. So erfährst du es noch am selben Tag und nicht erst abends, wenn du nach Hause kommst.",
+      "delay": "Du wählst die Wartezeit, von 10 Minuten bis 24 Stunden",
+      "backOnline": "Eine zweite E-Mail, sobald deine Gladys wieder online ist",
+      "onByDefault": "Standardmäßig aktiviert, in beiden Tarifen enthalten: nichts einzurichten"
+    },
     "featuresTitle": "Alles, was enthalten ist",
     "featuresSubtitle": "Ein komplettes Paket, um dein Smart Home wirklich nützlich zu machen.",
     "features": {
@@ -4663,6 +4671,7 @@
       "priceDetail": "69,99 € jährlich (17 % sparen)",
       "features": {
         "remoteAccess": "Ende-zu-Ende-verschlüsselter Fernzugriff",
+        "offlineAlert": "E-Mail-Benachrichtigung, wenn deine Gladys offline ist",
         "voiceAssistants": "Google Home & Amazon Alexa",
         "openApi": "Offene REST-API",
         "familyAccounts": "Konten für die ganze Familie"

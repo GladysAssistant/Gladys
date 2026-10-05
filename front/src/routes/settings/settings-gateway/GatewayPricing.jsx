@@ -17,7 +17,12 @@ const FEATURES = [
   { key: 'openApi', icon: 'fe-code' }
 ];
 
-const LITE_FEATURES = ['remoteAccess', 'voiceAssistants', 'openApi', 'familyAccounts'];
+// Features shipped recently, flagged with a "New" badge in the plan lists
+const NEW_FEATURES = ['offlineAlert'];
+
+const OFFLINE_ALERT_POINTS = ['delay', 'backOnline', 'onByDefault'];
+
+const LITE_FEATURES = ['remoteAccess', 'offlineAlert', 'voiceAssistants', 'openApi', 'familyAccounts'];
 const PLUS_FEATURES = ['everythingInLite', 'backups', 'cameraStreaming', 'ai', 'enedis', 'mcp'];
 
 const GatewayPricing = ({ children, ...props }) => {
@@ -54,6 +59,36 @@ const GatewayPricing = ({ children, ...props }) => {
             <i class="fe fe-check mr-1" />
             <Text id="gatewayPricing.heroReassurance" />
           </p>
+        </div>
+      </div>
+
+      {/* NEW FEATURE: OFFLINE ALERT (on by default, in both plans) */}
+      <div class={`card mt-4 ${style.newFeatureCard}`}>
+        <div class="card-body">
+          <div class="d-flex flex-column flex-md-row align-items-md-center">
+            <div class={`mr-md-4 mb-3 mb-md-0 ${style.featureIcon}`}>
+              <i class="fe fe-bell" />
+            </div>
+            <div>
+              <span class="badge badge-success mb-2">
+                <Text id="gatewayPricing.newBadge" />
+              </span>
+              <h3 class="mb-2">
+                <Text id="gatewayPricing.offlineAlert.title" />
+              </h3>
+              <p class="text-muted mb-3">
+                <Text id="gatewayPricing.offlineAlert.description" />
+              </p>
+              <ul class={`list-unstyled mb-0 ${style.planFeatureList}`}>
+                {OFFLINE_ALERT_POINTS.map(k => (
+                  <li class="mb-1">
+                    <i class="fe fe-check text-success mr-2" />
+                    <Text id={`gatewayPricing.offlineAlert.${k}`} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -125,6 +160,11 @@ const GatewayPricing = ({ children, ...props }) => {
                   <li class="mb-2">
                     <i class="fe fe-check text-success mr-2" />
                     <Text id={`gatewayPricing.litePlan.features.${k}`} />
+                    {NEW_FEATURES.includes(k) && (
+                      <span class="badge badge-success ml-2">
+                        <Text id="gatewayPricing.newBadge" />
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
