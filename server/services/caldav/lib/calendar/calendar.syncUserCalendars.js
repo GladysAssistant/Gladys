@@ -66,6 +66,8 @@ async function saveEvents(userId, calendar, jsonEvents, savedEvents) {
 
   const failedEvents = [];
   const formatedEvents = this.formatEvents(jsonEvents, calendar, failedEvents);
+  // URLs of the events which could not be formatted or saved: their occurrences already saved in Gladys are kept
+  const failedUrls = new Set(failedEvents.map((failedEvent) => failedEvent.href));
 
   await Promise.map(
     formatedEvents,
@@ -85,6 +87,7 @@ async function saveEvents(userId, calendar, jsonEvents, savedEvents) {
         insertedOrUpdatedEvent += 1;
       } catch (e) {
         logger.error(e);
+        failedUrls.add(formatedEvent.url);
       }
     },
     { concurrency: 1 },
@@ -96,8 +99,9 @@ async function saveEvents(userId, calendar, jsonEvents, savedEvents) {
   // they must be removed here.
   // Events that could not be formatted were skipped: they are missing from formatedEvents although
   // they still exist on the CalDAV server, so the version already saved in Gladys is kept.
+  // Likewise, when an occurrence could not be saved (an occurrence moved to another time gets a new external id),
+  // the occurrences already saved for this event are kept rather than deleted without replacement.
   const upToDateExternalIds = new Set(formatedEvents.map((formatedEvent) => formatedEvent.external_id));
-  const failedUrls = new Set(failedEvents.map((failedEvent) => failedEvent.href));
   const updatedUrls = new Set(
     jsonEvents.map((jsonEvent) => jsonEvent.href).filter((href) => href && !failedUrls.has(href)),
   );

@@ -640,6 +640,63 @@ describe('CalDAV sync of a calendar with recurring events', () => {
     expect(sync.gladys.calendar.update.callCount).to.equal(1);
   });
 
+  it('should keep the saved occurrences of an event whose new occurrence could not be saved', async () => {
+    sync.requestChanges.resolves([
+      { href: '/home/heating/recurring-event.ics', props: { etag: '91ca3c10' } },
+      { href: '/home/heating/other-event.ics', props: { etag: '91ca3c12' } },
+    ]);
+
+    sync.requestEventsData.resolves([
+      {
+        type: 'VEVENT',
+        uid: 'heating',
+        summary: 'Chauffage',
+        start: new Date('2026-01-01 08:00:00.000 +00:00'),
+        rrule: {},
+        href: '/home/heating/recurring-event.ics',
+      },
+      {
+        type: 'VEVENT',
+        uid: 'other',
+        summary: 'Other',
+        start: new Date('2026-01-01 08:00:00.000 +00:00'),
+        rrule: {},
+        href: '/home/heating/other-event.ics',
+      },
+    ]);
+    sync.formatRecurringEvents.callsFake((event) => [
+      {
+        // Occurrence moved from 08:00 to 10:00: it gets a new external id
+        external_id: `${event.uid}2026-01-02-10-00`,
+        selector: `${event.uid}-2026-01-02-10-00`,
+        url: event.href,
+      },
+    ]);
+    sync.gladys.calendar.createEvent
+      .withArgs('chauffage', sinon.match({ external_id: 'heating2026-01-02-10-00' }))
+      .rejects(new Error('SQLITE_BUSY'));
+
+    sync.gladys.calendar.getEvents.withArgs(userId, { calendarId }).resolves([
+      {
+        selector: 'heating-2026-01-02-08-00',
+        external_id: 'heating2026-01-02-08-00',
+        url: '/home/heating/recurring-event.ics',
+      },
+      {
+        selector: 'other-2026-01-02-08-00',
+        external_id: 'other2026-01-02-08-00',
+        url: '/home/heating/other-event.ics',
+      },
+    ]);
+
+    await sync.syncUserCalendars(userId);
+
+    expect(sync.gladys.calendar.createEvent.callCount).to.equal(2);
+    // The previous occurrence of the event which could not be saved is kept,
+    // the one of the event saved successfully is replaced
+    expect(sync.gladys.calendar.destroyEvent.args).to.eql([['other-2026-01-02-08-00']]);
+  });
+
   it('should not save the new ctag if the events synchronization failed', async () => {
     sync.requestChanges.rejects();
 
