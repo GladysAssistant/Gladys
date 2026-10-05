@@ -319,6 +319,9 @@ class ConfigField extends Component {
             value={value === undefined || value === null ? '' : value}
             min={field.min}
             max={field.max}
+            // the HTML default step is 1: without "any", the browser refuses to
+            // submit a decimal value (a price, a latitude) as a step mismatch
+            step="any"
             placeholder={placeholder}
             onInput={this.onInput}
             required={field.required}
