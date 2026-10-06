@@ -741,6 +741,46 @@ describe('CalDAV sync of a calendar with recurring events', () => {
     expect(sync.gladys.calendar.update.args[0][1]).to.not.have.property('sync');
   });
 
+  it('should create a new subscribed calendar without synchronizing its events with CalDAV requests', async () => {
+    sync.requestCalendars.resolves([
+      {
+        data: {},
+        url: 'https://calendars.icloud.com/holidays/fr_fr.ics',
+        ctag: 'holidays-ctag',
+        displayName: 'Holidays',
+        type: 'WEBCAL',
+      },
+      {
+        data: {},
+        url: 'https://caldav.host.com/home/heating',
+        ctag: 'new-ctag',
+        displayName: 'Chauffage',
+        type: 'CALDAV',
+        syncToken: 'new-sync-token',
+      },
+    ]);
+    sync.gladys.calendar.get
+      .withArgs(userId, { externalId: 'https://calendars.icloud.com/holidays/fr_fr.ics' })
+      .resolves([]);
+    sync.requestChanges.resolves([]);
+
+    await sync.syncUserCalendars(userId);
+
+    expect(sync.gladys.calendar.create.callCount).to.equal(1);
+    expect(sync.gladys.calendar.create.args[0][0]).to.include({
+      external_id: 'https://calendars.icloud.com/holidays/fr_fr.ics',
+      ctag: 'holidays-ctag',
+      type: 'WEBCAL',
+      sync: false,
+    });
+    // Only the CalDAV calendar is synchronized with CalDAV requests
+    expect(sync.requestChanges.callCount).to.equal(1);
+    expect(sync.requestChanges.args[0][1].external_id).to.equal('https://caldav.host.com/home/heating');
+    expect(sync.requestRecurringEvents.callCount).to.equal(0);
+    expect(sync.gladys.calendar.update.args).to.have.lengthOf(1);
+    expect(sync.gladys.calendar.update.args[0][0]).to.equal('chauffage');
+  });
+
   describe('refresh of the recurring events', () => {
     const heatingCalendar = {
       id: calendarId,

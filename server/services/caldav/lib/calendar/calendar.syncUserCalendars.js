@@ -283,6 +283,10 @@ async function syncUserCalendars(userId) {
       const gladysCalendar = await this.gladys.calendar.get(userId, { externalId: formatedCalendar.external_id });
       // Create calendar if it does not already exist in database
       if (gladysCalendar.length === 0) {
+        if (formatedCalendar.type !== 'CALDAV') {
+          await this.gladys.calendar.create(formatedCalendar);
+          return null;
+        }
         // The calendar is created without ctag & sync token, so a full sync is done.
         // They are saved only once the events have been successfully synchronized.
         const savedCalendar = await this.gladys.calendar.create({
