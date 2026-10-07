@@ -182,8 +182,20 @@ class CameraBoxComponent extends Component {
     }
   };
 
+  // A camera can have other string features (a text status, a select...): only its image feature
+  // carries the frame to display. While the device is not loaded yet, every string state of the
+  // camera is taken as before.
+  isImageFeatureState = payload => {
+    const features = get(this.state.device, 'features') || [];
+    const imageFeature = features.find(
+      feature =>
+        feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.IMAGE
+    );
+    return !imageFeature || imageFeature.selector === payload.device_feature;
+  };
+
   updateDeviceStateWebsocket = payload => {
-    if (this.props.box.camera === payload.device && !this.state.cameraDisabled) {
+    if (this.props.box.camera === payload.device && !this.state.cameraDisabled && this.isImageFeatureState(payload)) {
       this.setState({
         image: payload.last_value_string,
         error: false
