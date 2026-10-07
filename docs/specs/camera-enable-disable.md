@@ -123,8 +123,10 @@ The state itself is stored by the standard path: `device.setValue` calls the own
   is cleared, since both would otherwise survive a camera disabled while nobody was listening.
   The frames pushed live arrive as `device.new-string-state` events: the widget only displays the
   ones of the camera's `camera`/`image` feature, since a camera may have other string features
-  (a text status, a select) whose values are not images. Until the device is loaded, every
-  string state of the camera is taken as a frame.
+  (a text status, a select) whose values are not images. Until the device of the current camera
+  is loaded (none yet, or still the previous camera's right after a camera change), every string
+  state of the camera is taken as a frame; once it is loaded, a camera without an `image` feature
+  displays none.
 - **Device rows** (`device-in-room`): `camera`/`enabled` joins the supported-types allowlist and
   routes to `BinaryDeviceFeature` — a plain on/off toggle.
 - **MQTT device page**: the type appears in the feature catalog with `min`/`max` 0/1, `read_only`

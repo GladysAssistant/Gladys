@@ -183,15 +183,20 @@ class CameraBoxComponent extends Component {
   };
 
   // A camera can have other string features (a text status, a select...): only its image feature
-  // carries the frame to display. While the device is not loaded yet, every string state of the
-  // camera is taken as before.
+  // carries the frame to display. While the device of the current camera is not loaded yet, every
+  // string state of the camera is taken as before. On a camera change, the state still holds the
+  // previous camera's device until refreshDevice's reset is flushed: it counts as not loaded.
   isImageFeatureState = payload => {
-    const features = get(this.state.device, 'features') || [];
+    const { device } = this.state;
+    if (!device || device.selector !== this.props.box.camera) {
+      return true;
+    }
+    const features = device.features || [];
     const imageFeature = features.find(
       feature =>
         feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.IMAGE
     );
-    return !imageFeature || imageFeature.selector === payload.device_feature;
+    return imageFeature !== undefined && imageFeature.selector === payload.device_feature;
   };
 
   updateDeviceStateWebsocket = payload => {
