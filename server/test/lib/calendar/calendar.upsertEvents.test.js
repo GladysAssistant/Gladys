@@ -62,6 +62,30 @@ describe('calendar.upsertEvents', () => {
     expect(rows.map((row) => row.selector)).to.deep.equal(['ext-my-int-john-uid-1', 'event', 'event-2']);
   });
 
+  it('should suffix a derived selector already taken by another event', async () => {
+    // a manual event holding the selector the external_id slugifies to
+    await calendar.createEvent(calendarA.selector, {
+      name: 'Manual',
+      selector: 'ext-my-int-john-uid-9',
+      start: '2026-08-14T09:00:00.000Z',
+    });
+    await calendar.upsertEvents(calendarA.id, [
+      { external_id: `${PREFIX}uid-9`, name: 'Pushed', start: '2026-08-14T10:00:00.000Z' },
+    ]);
+    const row = await db.CalendarEvent.findOne({ where: { external_id: `${PREFIX}uid-9` } });
+    expect(row.selector).to.equal('ext-my-int-john-uid-9-2');
+  });
+
+  it('should update the row just created when an id is repeated in the batch', async () => {
+    const result = await calendar.upsertEvents(calendarA.id, [
+      { external_id: `${PREFIX}uid-twice`, name: 'First', start: '2026-08-14T09:00:00.000Z' },
+      { external_id: `${PREFIX}uid-twice`, name: 'Second', start: '2026-08-14T09:00:00.000Z' },
+    ]);
+    expect(result).to.deep.include({ created: 1, updated: 1, deleted: 0 });
+    const rows = await db.CalendarEvent.findAll({ where: { external_id: `${PREFIX}uid-twice` } });
+    expect(rows.map((row) => row.name)).to.deep.equal(['Second']);
+  });
+
   it('should create, then update an event idempotently', async () => {
     const first = await calendar.upsertEvents(calendarA.id, [
       {
@@ -81,9 +105,19 @@ describe('calendar.upsertEvents', () => {
     expect(second).to.deep.include({ created: 0, updated: 1, deleted: 0 });
     const row = await db.CalendarEvent.findOne({ where: { external_id: `${PREFIX}uid-1` } });
     expect(row.name).to.equal('Dentist (moved)');
-    expect(row.end).to.equal(null);
+    // no end: a zero-duration event (RFC 5545), never a NULL end the scene
+    // trigger and is-event-running would choke on
+    expect(row.end.toISOString()).to.equal('2026-08-14T10:00:00.000Z');
     expect(row.location).to.equal(null);
     expect(row.full_day).to.equal(false);
+  });
+
+  it('should store a null end as the start of the event', async () => {
+    await calendar.upsertEvents(calendarA.id, [
+      { external_id: `${PREFIX}uid-null-end`, name: 'Call', start: '2026-08-14T11:00:00.000Z', end: null },
+    ]);
+    const row = await db.CalendarEvent.findOne({ where: { external_id: `${PREFIX}uid-null-end` } });
+    expect(row.end.toISOString()).to.equal('2026-08-14T11:00:00.000Z');
   });
 
   it('should move an event republished under another calendar of the same user', async () => {

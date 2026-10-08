@@ -1,7 +1,8 @@
+const { Op } = require('sequelize');
 const db = require('../../models');
 const { buildUniqueSelector } = require('../../utils/addSelector');
 const { slugify } = require('../../utils/slugify');
-const { ConflictError } = require('../../utils/coreErrors');
+const { BadParameters, ConflictError } = require('../../utils/coreErrors');
 const { CALENDAR_TYPES } = require('../../utils/constants');
 
 const DEFAULT_COLOR = '#3174ad';
@@ -13,14 +14,32 @@ const DEFAULT_COLOR = '#3174ad';
  * @param {string} userId - The user owning the calendars.
  * @param {string} serviceId - The service owning the calendars.
  * @param {Array} calendars - Calendars to upsert ({ external_id, name, description, color }).
+ * @param {object} [options] - Options.
+ * @param {number} [options.maxCalendars] - Cap on the calendars this owner (user and service) holds after the upsert.
  * @returns {Promise<object>} Resolve with { created, updated, calendars }.
  * @example
  * const { created, updated } = await gladys.calendar.upsertCalendars(userId, serviceId, [
  *   { external_id: 'ext:my-integration:pepper:primary', name: 'Personal' },
- * ]);
+ * ], { maxCalendars: 50 });
  */
-async function upsertCalendars(userId, serviceId, calendars) {
+async function upsertCalendars(userId, serviceId, calendars, { maxCalendars } = {}) {
   return db.sequelize.transaction(async (transaction) => {
+    if (maxCalendars !== undefined) {
+      // counted in the transaction, like the events cap of upsertEvents: two
+      // concurrent publishes (a retry racing the original) cannot both pass it.
+      // The owner's calendars outside this batch + the batch.
+      const existingOthers = await db.Calendar.count({
+        where: {
+          service_id: serviceId,
+          user_id: userId,
+          external_id: { [Op.notIn]: calendars.map((calendar) => calendar.external_id) },
+        },
+        transaction,
+      });
+      if (existingOthers + calendars.length > maxCalendars) {
+        throw new BadParameters(`calendars: a user cannot hold more than ${maxCalendars} calendars`);
+      }
+    }
     let created = 0;
     let updated = 0;
     const upsertedCalendars = [];

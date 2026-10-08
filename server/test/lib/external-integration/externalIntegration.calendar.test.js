@@ -450,6 +450,14 @@ describe('externalIntegration calendar host API coverage', () => {
     const calendarRow = await db.Calendar.findOne({ where: { external_id: `${prefix()}primary` } });
     expect(calendarRow.description).to.equal('My main calendar');
     expect(calendarRow.color).to.equal('#aabbcc');
+    // a null description is an absent one (the events' convention): the
+    // stored value is kept, the batch is not refused
+    await externalIntegration.publishCalendars(service, {
+      user: 'john',
+      calendars: [{ external_id: `${prefix()}primary`, name: 'Primary', description: null }],
+    });
+    await calendarRow.reload();
+    expect(calendarRow.description).to.equal('My main calendar');
     const result = await externalIntegration.publishCalendarEvents(service, {
       calendar_external_id: `${prefix()}primary`,
       window: { from: '2026-08-01T00:00:00.000Z', to: '2026-09-01T00:00:00.000Z' },
@@ -466,14 +474,18 @@ describe('externalIntegration calendar host API coverage', () => {
         },
         // no end: membership falls back to start >= from
         { external_id: `${prefix()}uid-2`, name: 'Standup', start: '2026-08-15T08:00:00.000Z', full_day: true },
+        // a timed event without end: stored as a zero-duration event
+        { external_id: `${prefix()}uid-3`, name: 'Call', start: '2026-08-16T08:00:00.000Z' },
       ],
     });
-    expect(result).to.deep.equal({ success: true, created: 2, updated: 0, deleted: 0 });
+    expect(result).to.deep.equal({ success: true, created: 3, updated: 0, deleted: 0 });
     const eventRow = await db.CalendarEvent.findOne({ where: { external_id: `${prefix()}uid-1` } });
     expect(eventRow.location).to.equal('Paris');
     expect(eventRow.description).to.equal('Yearly check');
     expect(eventRow.url).to.equal('https://example.com/event');
     expect(eventRow.full_day).to.equal(false);
+    const noEndRow = await db.CalendarEvent.findOne({ where: { external_id: `${prefix()}uid-3` } });
+    expect(noEndRow.end.toISOString()).to.equal('2026-08-16T08:00:00.000Z');
   });
 
   it('should reject the malformed entries of a published event batch', async () => {
@@ -670,6 +682,15 @@ describe('externalIntegration calendar events normalization', () => {
     const holiday = await findEvent('holiday');
     expect(holiday.start.toISOString()).to.equal('2026-08-15T04:00:00.000Z');
     expect(holiday.end.toISOString()).to.equal('2026-08-16T04:00:00.000Z');
+  });
+
+  it('should fall back to the default timezone when the setting is unknown to the runtime', async () => {
+    // a stale or mistyped setting must not turn every full-day push into a 500
+    await variable.setValue(SYSTEM_VARIABLE_NAMES.TIMEZONE, 'Europe/Pariss');
+    await publish([{ external_id: `${prefix()}holiday`, name: 'Holiday', start: '2026-08-15', full_day: true }]);
+    const holiday = await findEvent('holiday');
+    expect(holiday.start.toISOString()).to.equal('2026-08-14T22:00:00.000Z');
+    expect(holiday.end.toISOString()).to.equal('2026-08-15T22:00:00.000Z');
   });
 
   it('should reject the invalid dates of a full-day event', async () => {

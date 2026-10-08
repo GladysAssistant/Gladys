@@ -2,8 +2,10 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezonePlugin = require('dayjs/plugin/timezone');
 const db = require('../../models');
+const logger = require('../../utils/logger');
 const { BadParameters, ForbiddenError, NotFoundError } = require('../../utils/coreErrors');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, DEFAULT_TIMEZONE } = require('../../utils/constants');
+const { isValidTimezone } = require('../energy-contract/contract.validate');
 const { isCalendarIntegration } = require('./externalIntegration.getCalendarAccount');
 const {
   MAX_CALENDAR_EVENTS_PER_REQUEST,
@@ -19,9 +21,6 @@ dayjs.extend(timezonePlugin);
 
 const URL_REGEX = /^https?:\/\//;
 const CALENDAR_DATE_REGEX = /^\d{4}-\d{2}-\d{2}/;
-// the scene engine's default: full-day events must line up with the
-// timezone the calendar triggers are evaluated in
-const DEFAULT_TIMEZONE = 'Europe/Paris';
 
 /**
  * @description Parse an ISO 8601 date field, throwing a 400 naming the entry.
@@ -121,7 +120,14 @@ async function publishCalendarEvents(service, body = {}) {
     parsedWindow = { from, to };
   }
   const prefix = `ext:${service.selector}:${calendar.creator.selector}:`;
-  const timezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || DEFAULT_TIMEZONE;
+  // full-day events must line up with the timezone the calendar triggers are
+  // evaluated in. A stale or mistyped setting would make dayjs.tz throw on
+  // every full-day push, and the integration retry forever: the default instead
+  let timezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || DEFAULT_TIMEZONE;
+  if (!isValidTimezone(timezone)) {
+    logger.warn(`Calendar integration: unknown timezone "${timezone}", full-day events stored in ${DEFAULT_TIMEZONE}`);
+    timezone = DEFAULT_TIMEZONE;
+  }
   const seenExternalIds = new Set();
   const normalized = events.map((event, index) => {
     if (event === null || typeof event !== 'object' || Array.isArray(event)) {

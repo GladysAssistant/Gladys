@@ -1,4 +1,3 @@
-const { Op } = require('sequelize');
 const db = require('../../models');
 const { BadParameters, ForbiddenError, NotFoundError } = require('../../utils/coreErrors');
 const { isCalendarIntegration } = require('./externalIntegration.getCalendarAccount');
@@ -68,7 +67,9 @@ async function publishCalendars(service, body = {}) {
       throw new BadParameters(`calendars[${index}].name: must be a string of 1-${MAX_CALENDAR_NAME_LENGTH} characters`);
     }
     const result = { external_id: externalId, name };
-    if (description !== undefined) {
+    // null is absent, like the optional fields of the events endpoint (SDKs
+    // serialize an empty description as null)
+    if (description !== undefined && description !== null) {
       if (typeof description !== 'string' || description.length > MAX_CALENDAR_DESCRIPTION_LENGTH) {
         throw new BadParameters(
           `calendars[${index}].description: must be a string of at most ${MAX_CALENDAR_DESCRIPTION_LENGTH} characters`,
@@ -82,21 +83,12 @@ async function publishCalendars(service, body = {}) {
     }
     return result;
   });
-  // hard cap per user: existing calendars outside this batch + the batch
-  const existingOthers = await db.Calendar.count({
-    where: {
-      service_id: service.id,
-      user_id: user.id,
-      external_id: { [Op.notIn]: [...seenExternalIds] },
-    },
-  });
-  if (existingOthers + normalized.length > MAX_CALENDARS_PER_USER) {
-    throw new BadParameters(`calendars: a user cannot hold more than ${MAX_CALENDARS_PER_USER} calendars`);
-  }
+  // hard cap per user, counted inside the upsert transaction
   const { created, updated, calendars: upserted } = await this.calendar.upsertCalendars(
     user.id,
     service.id,
     normalized,
+    { maxCalendars: MAX_CALENDARS_PER_USER },
   );
   // partitioned by visibility: a batch mixing shared and private calendars
   // must not broadcast the private selectors to the whole household

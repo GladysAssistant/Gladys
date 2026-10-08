@@ -28,6 +28,9 @@ const CalendarAccountCard = ({
   const working = accountStatus === RequestStatus.Getting;
   const enabled = Boolean(account && account.enabled);
   const calendars = (account && account.calendars) || [];
+  // with nothing to fill in (a public feed, or sections only), an enabled
+  // account has nothing to save: only the Enable button makes sense
+  const hasEditableField = accountSchema.some(field => field.type !== 'section');
   return (
     <div class="card">
       <div class="card-header">
@@ -62,15 +65,17 @@ const CalendarAccountCard = ({
               updateConfigValue={updateValue}
             />
           ))}
-          <div class="form-footer">
-            <button type="submit" class={cx('btn btn-success', { 'btn-loading': working })} disabled={working}>
-              {enabled ? (
-                <Text id="integration.externalIntegration.myCalendars.saveButton" />
-              ) : (
-                <Text id="integration.externalIntegration.myCalendars.enableButton" />
-              )}
-            </button>
-          </div>
+          {(!enabled || hasEditableField) && (
+            <div class="form-footer">
+              <button type="submit" class={cx('btn btn-success', { 'btn-loading': working })} disabled={working}>
+                {enabled ? (
+                  <Text id="integration.externalIntegration.myCalendars.saveButton" />
+                ) : (
+                  <Text id="integration.externalIntegration.myCalendars.enableButton" />
+                )}
+              </button>
+            </div>
+          )}
         </form>
 
         {enabled && (

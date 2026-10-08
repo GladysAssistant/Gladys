@@ -1082,6 +1082,7 @@
         "containerStopped": "Stopped",
         "openButton": "Open",
         "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
+        "uninstallCalendarWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed, and the calendars it created will be deleted, with their events, for every user of the household — not only yours.",
         "uninstallEnergyWarning": "This integration prices energy contracts itself: the contracts it prices will stop being priced once it is uninstalled (their existing costs are kept).",
         "confirmUninstallButton": "Yes, uninstall",
         "cancelUninstallButton": "Cancel",

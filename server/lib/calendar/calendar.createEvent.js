@@ -1,12 +1,12 @@
 const db = require('../../models');
-const { NotFoundError } = require('../../utils/coreErrors');
 const { assertNotReservedExternalId } = require('./calendar.reservedExternalId');
+const { assertCalendarWritable } = require('./calendar.assertWritable');
 
 /**
  * @description Create an event in a calendar.
  * @param {string} calendarSelector - The selector of the calendar.
  * @param {object} calendarEvent - The event to create.
- * @param {string} [userId] - When provided, the calendar must belong to this user.
+ * @param {string} [userId] - When provided, the calendar must be writable by this user (assertCalendarWritable).
  * @returns {Promise<object>} Resolve with new event.
  * @example
  * gladys.calendar.createEvent('my-calendar', {
@@ -25,9 +25,7 @@ async function createEvent(calendarSelector, calendarEvent, userId) {
     },
   });
 
-  if (calendar === null || (userId !== undefined && calendar.user_id !== userId)) {
-    throw new NotFoundError('Calendar not found');
-  }
+  assertCalendarWritable(calendar, userId, 'Calendar not found');
 
   calendarEvent.calendar_id = calendar.id;
   const createdCalendarEvent = await db.CalendarEvent.create(calendarEvent);

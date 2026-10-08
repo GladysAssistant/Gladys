@@ -88,4 +88,38 @@ describe('calendar.upsertCalendars', () => {
     expect(calendarsA[0].selector).to.equal('calendar');
     expect(calendarsB[0].selector).to.equal('calendar-2');
   });
+
+  it('should cap the calendars of an owner, counting the existing ones outside the batch', async () => {
+    // USER_B owns no seeded calendar; USER_A's (the seeded one included)
+    // never count against USER_B's cap
+    await calendar.upsertCalendars(USER_A, SERVICE_ID, [{ external_id: 'ext:my-int:john:one', name: 'One' }]);
+    await calendar.upsertCalendars(USER_B, SERVICE_ID, [
+      { external_id: 'ext:my-int:pepper:one', name: 'One' },
+      { external_id: 'ext:my-int:pepper:two', name: 'Two' },
+    ]);
+    // republishing the existing calendars stays within the cap
+    const republished = await calendar.upsertCalendars(
+      USER_B,
+      SERVICE_ID,
+      [
+        { external_id: 'ext:my-int:pepper:one', name: 'One' },
+        { external_id: 'ext:my-int:pepper:two', name: 'Two' },
+      ],
+      { maxCalendars: 2 },
+    );
+    expect(republished.updated).to.equal(2);
+    // one existing calendar outside the batch + a batch of two: three > 2
+    const promise = calendar.upsertCalendars(
+      USER_B,
+      SERVICE_ID,
+      [
+        { external_id: 'ext:my-int:pepper:two', name: 'Two' },
+        { external_id: 'ext:my-int:pepper:three', name: 'Three' },
+      ],
+      { maxCalendars: 2 },
+    );
+    await assert.isRejected(promise, 'calendars: a user cannot hold more than 2 calendars');
+    const count = await db.Calendar.count({ where: { user_id: USER_B, service_id: SERVICE_ID } });
+    expect(count).to.equal(2);
+  });
 });

@@ -60,7 +60,7 @@ class ExternalIntegrationConfigPage extends Component {
       }
       if (get(integration, 'manifest.type') === 'calendar') {
         // the per-user "My calendars" block of a calendar integration
-        await this.loadCalendarAccount();
+        await this.loadCalendarAccount(integration);
       }
       if (isAdmin) {
         await this.loadGatewayStatus(integration);
@@ -83,19 +83,29 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  buildConfigValues = (integration, configResponse) => {
-    const schema = get(integration, 'manifest.config_schema') || [];
-    const configValues = Object.assign({}, configResponse.config);
+  // the stored values, completed with the declared defaults of the fields
+  // that have none (never for a secret, whose value never comes back)
+  applySchemaDefaults = (schema, storedValues) => {
+    const values = Object.assign({}, storedValues);
     schema.forEach(field => {
-      const currentValue = configValues[field.key];
+      const currentValue = values[field.key];
       if ((currentValue === undefined || currentValue === null) && field.type !== 'secret') {
         if (field.default !== undefined) {
-          configValues[field.key] = field.default;
+          values[field.key] = field.default;
         }
       }
     });
-    return configValues;
+    return values;
   };
+
+  buildConfigValues = (integration, configResponse) =>
+    this.applySchemaDefaults(get(integration, 'manifest.config_schema') || [], configResponse.config);
+
+  // the "My calendars" form starts from the account_schema defaults too: a
+  // boolean declared `default: true` is on before the first Enable, and after
+  // a disable
+  buildCalendarAccountValues = (integration, calendarAccount) =>
+    this.applySchemaDefaults(get(integration, 'manifest.account_schema') || [], calendarAccount.config);
 
   // the action forms start from the declared defaults, like the config form
   // (an action field without a default stays empty)
@@ -254,7 +264,7 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  loadCalendarAccount = async () => {
+  loadCalendarAccount = async (integration = this.state.integration) => {
     const { selector } = this.props;
     // the block starts empty: an account of the previously opened integration
     // must never stay on screen (and be saved) under this one, even when the
@@ -275,10 +285,33 @@ class ExternalIntegrationConfigPage extends Component {
       }
       this.setState({
         calendarAccount,
-        calendarAccountValues: Object.assign({}, calendarAccount.config),
+        calendarAccountValues: this.buildCalendarAccountValues(integration, calendarAccount),
         calendarAccountTouchedSecrets: {},
         calendarDisableConfirming: false
       });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // The integration pushes the user's calendars right after they enable it,
+  // then at each of its synchronizations: the block refreshes its calendar
+  // list on calendar.updated (a push already scoped to its audience), without
+  // touching the account values the user may be typing. Before the account is
+  // enabled, the user has no calendar of this integration to list.
+  refreshCalendarAccount = async () => {
+    const { selector } = this.props;
+    if (get(this.state, 'integration.manifest.type') !== 'calendar' || !get(this.state, 'calendarAccount.enabled')) {
+      return;
+    }
+    try {
+      const calendarAccount = await this.props.httpClient.get(
+        `/api/v1/external_integration/${selector}/calendar/account`
+      );
+      if (selector !== this.props.selector) {
+        return;
+      }
+      this.setState({ calendarAccount });
     } catch (e) {
       console.error(e);
     }
@@ -330,7 +363,7 @@ class ExternalIntegrationConfigPage extends Component {
       }
       this.setState({
         calendarAccount,
-        calendarAccountValues: Object.assign({}, calendarAccount.config),
+        calendarAccountValues: this.buildCalendarAccountValues(integration, calendarAccount),
         calendarAccountTouchedSecrets: {},
         calendarAccountStatus: RequestStatus.Success
       });
@@ -362,9 +395,11 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   toggleUserCalendar = async (calendarSelector, key, checked) => {
-    // optimistic toggle, rolled back on failure (the preferLocal pattern).
-    // Both the patch and the rollback derive from the previous state and touch
-    // only this calendar: two toggles fired back to back never drop each other.
+    // optimistic toggle, rolled back on failure (the preferLocal pattern),
+    // then reloaded from the server, the authority on the stored value. Both
+    // the patch and the rollback derive from the previous state and touch only
+    // this calendar; the toggles stay disabled while a request is in flight,
+    // so two requests on the same calendar never race.
     const patch = value => state => ({
       calendarAccount: Object.assign({}, state.calendarAccount, {
         calendars: (get(state, 'calendarAccount.calendars') || []).map(calendar =>
@@ -382,6 +417,7 @@ class ExternalIntegrationConfigPage extends Component {
     } catch (err) {
       console.error(err);
       this.setState(state => Object.assign({ calendarToggleStatus: RequestStatus.Error }, patch(!checked)(state)));
+      await this.refreshCalendarAccount();
     }
   };
 
@@ -695,6 +731,7 @@ class ExternalIntegrationConfigPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
       this.onConnectionStatusUpdated
     );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.refreshCalendarAccount);
     this.loadData();
   }
 
@@ -713,6 +750,7 @@ class ExternalIntegrationConfigPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
       this.onConnectionStatusUpdated
     );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.refreshCalendarAccount);
   }
 
   render(props, state) {

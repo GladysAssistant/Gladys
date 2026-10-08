@@ -1082,6 +1082,7 @@
         "containerStopped": "Arrêté",
         "openButton": "Ouvrir",
         "uninstallWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés. Les appareils créés par cette intégration resteront dans Gladys jusqu’à ce que vous les supprimiez.",
+        "uninstallCalendarWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés, et les calendriers qu’elle a créés seront supprimés avec leurs événements, pour tous les utilisateurs du foyer — pas seulement les vôtres.",
         "uninstallEnergyWarning": "Cette intégration calcule elle-même le coût de contrats d'énergie : les contrats qu'elle tarife ne seront plus calculés une fois désinstallée (leurs coûts existants sont conservés).",
         "confirmUninstallButton": "Oui, désinstaller",
         "cancelUninstallButton": "Annuler",

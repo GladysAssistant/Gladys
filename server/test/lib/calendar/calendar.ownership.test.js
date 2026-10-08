@@ -6,17 +6,39 @@ const db = require('../../../models');
 const USER_A = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
 const USER_B = '7a137a56-069e-4996-8816-36558174b727';
 
-// The seeded 'test-calendar' (and its events) belongs to USER_A: with another
-// userId every write must answer exactly like an unknown selector.
+// The seeded 'test-calendar' (and its events) belongs to USER_A and is shared:
+// another member sees it but cannot write it (403). A private calendar of
+// another user answers exactly like an unknown selector (404).
 describe('calendar ownership checks', () => {
   const calendar = new Calendar();
+  let privateCalendar;
+  let privateEvent;
+
+  beforeEach(async () => {
+    privateCalendar = await calendar.create({
+      name: 'Private calendar',
+      selector: 'private-calendar-of-a',
+      description: 'Private calendar of USER_A',
+      user_id: USER_A,
+      shared: false,
+    });
+    privateEvent = await calendar.createEvent(privateCalendar.selector, {
+      name: 'Private event',
+      selector: 'private-event-of-a',
+      start: '2026-08-14T09:00:00.000Z',
+    });
+  });
 
   it('should update a calendar when the user owns it', async () => {
     await calendar.update('test-calendar', { name: 'New name' }, USER_A);
   });
   it('should refuse to update a calendar of another user', async () => {
-    const promise = calendar.update('test-calendar', { name: 'New name' }, USER_B);
+    const promise = calendar.update(privateCalendar.selector, { name: 'New name' }, USER_B);
     return assert.isRejected(promise, 'Calendar not found');
+  });
+  it('should refuse to update a calendar another user shares, as forbidden', async () => {
+    const promise = calendar.update('test-calendar', { name: 'New name' }, USER_B);
+    return assert.isRejected(promise, 'CALENDAR_OWNED_BY_ANOTHER_USER');
   });
   it('should ignore the ownership columns of a user-initiated calendar update', async () => {
     // owning a calendar must not be a way to hand it — and its events — over
@@ -39,15 +61,19 @@ describe('calendar ownership checks', () => {
   });
   it('should leave the sync and shared toggles of an integration calendar to the integration route', async () => {
     // those toggles carry side effects (events emptied, pushes, integration
-    // notified) that only PATCH /api/v1/external_integration/... applies
+    // notified) that only PATCH /api/v1/external_integration/... applies:
+    // changing them here is refused, never silently dropped
     const { calendars } = await calendar.upsertCalendars(USER_A, 'a810b8db-6d04-4697-bed3-c4b72c996279', [
       { external_id: 'ext:my-int:john:primary', name: 'Primary' },
     ]);
-    const updated = await calendar.update(
-      calendars[0].selector,
-      { name: 'Renamed', sync: false, shared: true },
-      USER_A,
+    const { selector } = calendars[0];
+    await assert.isRejected(
+      calendar.update(selector, { name: 'Renamed', sync: false, shared: true }, USER_A),
+      'sync, shared: the toggles of an integration calendar go through PATCH /api/v1/external_integration/',
     );
+    await assert.isRejected(calendar.update(selector, { shared: true }, USER_A), 'shared: the toggles');
+    // the unchanged values sent back with the row are no write
+    const updated = await calendar.update(selector, { name: 'Renamed', sync: true, shared: false }, USER_A);
     expect(updated).to.include({ name: 'Renamed', sync: true, shared: false });
   });
   it('should still write the full row of a calendar for an internal caller (no userId)', async () => {
@@ -58,12 +84,26 @@ describe('calendar ownership checks', () => {
     expect(row.external_id).to.equal('new-calendar-external-id');
   });
   it('should refuse to destroy a calendar of another user', async () => {
-    const promise = calendar.destroy('test-calendar', USER_B);
+    const promise = calendar.destroy(privateCalendar.selector, USER_B);
     return assert.isRejected(promise, 'Calendar not found');
   });
+  it('should refuse to destroy a calendar another user shares, as forbidden', async () => {
+    const promise = calendar.destroy('test-calendar', USER_B);
+    return assert.isRejected(promise, 'CALENDAR_OWNED_BY_ANOTHER_USER');
+  });
   it('should refuse to create an event in a calendar of another user', async () => {
-    const promise = calendar.createEvent('test-calendar', { name: 'Event', start: '2026-08-14T09:00:00.000Z' }, USER_B);
+    const promise = calendar.createEvent(
+      privateCalendar.selector,
+      { name: 'Event', start: '2026-08-14T09:00:00.000Z' },
+      USER_B,
+    );
     return assert.isRejected(promise, 'Calendar not found');
+  });
+  it('should refuse to create an event in a calendar another user shares, as forbidden', async () => {
+    // a shared calendar is visible to the household, read-only for everyone
+    // but its owner
+    const promise = calendar.createEvent('test-calendar', { name: 'Event', start: '2026-08-14T09:00:00.000Z' }, USER_B);
+    return assert.isRejected(promise, 'CALENDAR_OWNED_BY_ANOTHER_USER');
   });
   it('should refuse a user-created event squatting an external integration id', async () => {
     // the `ext:` namespace is reserved: a household member must not be able
@@ -99,8 +139,16 @@ describe('calendar ownership checks', () => {
     await calendar.updateEvent('test-calendar-event', { name: 'New name' }, USER_A);
   });
   it('should refuse to update an event of another user', async () => {
-    const promise = calendar.updateEvent('test-calendar-event', { name: 'New name' }, USER_B);
+    const promise = calendar.updateEvent(privateEvent.selector, { name: 'New name' }, USER_B);
     return assert.isRejected(promise, 'CalendarEvent not found');
+  });
+  it('should refuse to update an event of a calendar another user shares, as forbidden', async () => {
+    const promise = calendar.updateEvent('test-calendar-event', { name: 'New name' }, USER_B);
+    return assert.isRejected(promise, 'CALENDAR_OWNED_BY_ANOTHER_USER');
+  });
+  it('should answer not found on an unknown event', async () => {
+    await assert.isRejected(calendar.updateEvent('unknown-event', { name: 'x' }, USER_A), 'CalendarEvent not found');
+    await assert.isRejected(calendar.destroyEvent('unknown-event', USER_A), 'CalendarEvent not found');
   });
   it('should ignore the ownership columns of a user-initiated event update', async () => {
     // owning an event must not be a way to push it onto someone else's agenda
@@ -136,7 +184,11 @@ describe('calendar ownership checks', () => {
     await calendar.destroyEvent('test-calendar-event', USER_A);
   });
   it('should refuse to destroy an event of another user', async () => {
-    const promise = calendar.destroyEvent('test-calendar-event', USER_B);
+    const promise = calendar.destroyEvent(privateEvent.selector, USER_B);
     return assert.isRejected(promise, 'CalendarEvent not found');
+  });
+  it('should refuse to destroy an event of a calendar another user shares, as forbidden', async () => {
+    const promise = calendar.destroyEvent('test-calendar-event', USER_B);
+    return assert.isRejected(promise, 'CALENDAR_OWNED_BY_ANOTHER_USER');
   });
 });

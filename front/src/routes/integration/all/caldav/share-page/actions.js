@@ -26,7 +26,9 @@ const actions = store => ({
       const calendars = await state.httpClient.get('/api/v1/calendar', {
         serviceName: 'caldav'
       });
-      caldavCalendars = calendars;
+      // the route also lists the calendars other members share: only the
+      // owner can change the sharing of a calendar (the PATCH answers 403)
+      caldavCalendars = calendars.filter(calendar => calendar.user_id === state.session.user.id);
 
       const users = await state.httpClient.get('/api/v1/user');
       gladysUsers = users

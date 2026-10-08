@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { assertCalendarWritable } = require('./calendar.assertWritable');
 
 // A user-initiated update only touches the editable fields of an event: the
 // ownership columns (calendar_id, external_id, selector) stay out of reach, an
@@ -11,7 +12,8 @@ const USER_EDITABLE_FIELDS = ['name', 'start', 'end', 'full_day', 'location', 'd
  * @description Update a calendar event.
  * @param {string} selector - CalendarEvent selector.
  * @param {object} calendarEvent - The new event.
- * @param {string} [userId] - When set, the calendar must belong to this user and only the editable fields are written.
+ * @param {string} [userId] - When set, the calendar must be writable by this user (assertCalendarWritable)
+ * and only the editable fields are written.
  * @returns {Promise<object>} Resolve with updated event.
  * @example
  * gladys.calendar.updateEvent('my-event', {
@@ -27,7 +29,7 @@ async function updateEvent(selector, calendarEvent, userId) {
       {
         model: db.Calendar,
         as: 'calendar',
-        attributes: ['user_id'],
+        attributes: ['user_id', 'shared'],
         // INNER JOIN: an event without its calendar is "not found", never a
         // dereference of a missing association below
         required: true,
@@ -35,9 +37,10 @@ async function updateEvent(selector, calendarEvent, userId) {
     ],
   });
 
-  if (existingCalendarEvent === null || (userId !== undefined && existingCalendarEvent.calendar.user_id !== userId)) {
+  if (existingCalendarEvent === null) {
     throw new NotFoundError('CalendarEvent not found');
   }
+  assertCalendarWritable(existingCalendarEvent.calendar, userId, 'CalendarEvent not found');
 
   await existingCalendarEvent.update(
     calendarEvent,

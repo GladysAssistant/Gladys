@@ -1,10 +1,11 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { assertCalendarWritable } = require('./calendar.assertWritable');
 
 /**
  * @description Delete a calendar event.
  * @param {string} selector - CalendarEvent selector.
- * @param {string} [userId] - When provided, the event's calendar must belong to this user.
+ * @param {string} [userId] - When provided, the event's calendar must be writable by this user.
  * @example
  * gladys.calendar.destroyEvent('my-event');
  */
@@ -17,14 +18,18 @@ async function destroyEvent(selector, userId) {
       {
         model: db.Calendar,
         as: 'calendar',
-        attributes: ['user_id'],
+        attributes: ['user_id', 'shared'],
+        // INNER JOIN: an event without its calendar is "not found", never a
+        // dereference of a missing association below
+        required: true,
       },
     ],
   });
 
-  if (calendarEvent === null || (userId !== undefined && calendarEvent.calendar.user_id !== userId)) {
+  if (calendarEvent === null) {
     throw new NotFoundError('CalendarEvent not found');
   }
+  assertCalendarWritable(calendarEvent.calendar, userId, 'CalendarEvent not found');
 
   await calendarEvent.destroy();
 }

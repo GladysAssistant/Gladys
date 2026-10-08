@@ -471,6 +471,12 @@ const INTEGRATION_CATALOG_CATEGORIES = [
   'services',
 ];
 
+// The timezone of the instance when the TIMEZONE system setting is not set: the
+// scene engine evaluates its triggers in it, and the full-day events of the
+// calendar integrations are stored at its midnights — one constant, so that
+// both stay aligned.
+const DEFAULT_TIMEZONE = 'Europe/Paris';
+
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS: 'DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS',
@@ -2557,6 +2563,7 @@ module.exports.CALENDAR_TYPES = CALENDAR_TYPES;
 module.exports.INTEGRATION_CATALOG_CATEGORIES = INTEGRATION_CATALOG_CATEGORIES;
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
+module.exports.DEFAULT_TIMEZONE = DEFAULT_TIMEZONE;
 
 module.exports.MDNS = MDNS;
 module.exports.normalizeMdnsHostname = normalizeMdnsHostname;

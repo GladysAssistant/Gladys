@@ -14,7 +14,8 @@ const MAX_EVENTS_PER_CALENDAR = 10000;
  * from the pushed list are deleted. Events without the prefix (manually created
  * ones) are never pruned. A sync-disabled calendar is refused (403).
  * @param {string} calendarId - The calendar id.
- * @param {Array} events - Events to upsert ({ external_id, name, start, end, full_day, location, description, url }).
+ * @param {Array} events - Events to upsert ({ external_id, name, start, end, full_day, location, description,
+ * url }); a missing end is stored as the start.
  * @param {object} [options] - Options.
  * @param {object} [options.window] - Replace window ({ from, to } dates).
  * @param {string} [options.prunePrefix] - The external_id prefix owning the prune (required with window).
@@ -84,22 +85,54 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
     }
     const existingCount = await db.CalendarEvent.count({ where: { calendar_id: calendarId }, transaction });
     let count = existingCount;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const event of events) {
-      // the lookup below is keyed by external_id: a missing one would match the
-      // manually created events (external_id NULL) and silently overwrite them
+    events.forEach((event) => {
+      // the lookups below are keyed by external_id: a missing one would match
+      // the manually created events (external_id NULL) and overwrite them
       if (typeof event.external_id !== 'string' || event.external_id.length === 0) {
         throw new BadParameters('external_id: must be a non-empty string');
       }
-      // eslint-disable-next-line no-await-in-loop
-      const existing = await db.CalendarEvent.findOne({
-        where: { external_id: event.external_id },
-        transaction,
-      });
+    });
+    // One query per kind of row the batch reads, indexed in Maps, instead of
+    // lookups per event inside the write transaction (which blocks every other
+    // writer meanwhile): the loop below only inserts and updates. The event
+    // selector derives from the external_id (the CalDAV precedent derives it
+    // from the iCal UID): deriving it from the name would collide for every
+    // occurrence of an expanded recurrence ("Weekly standup" × 52), and a name
+    // in a non-Latin script slugifies to nothing. Two external_ids may still
+    // slugify alike (uid-1, uid_1): a taken base falls back to the probing
+    // buildUniqueSelector.
+    const existingEvents = await db.CalendarEvent.findAll({
+      where: { external_id: { [Op.in]: [...pushedExternalIds] } },
+      transaction,
+    });
+    const existingByExternalId = new Map(existingEvents.map((row) => [row.external_id, row]));
+    const sourceCalendars = await db.Calendar.findAll({
+      where: {
+        id: {
+          [Op.in]: existingEvents.filter((row) => row.calendar_id !== calendarId).map((row) => row.calendar_id),
+        },
+      },
+      attributes: ['id', 'user_id', 'service_id'],
+      transaction,
+    });
+    const sourceCalendarById = new Map(sourceCalendars.map((row) => [row.id, row]));
+    const selectorBase = (event) => slugify(event.external_id) || 'event';
+    const selectorBases = events.filter((event) => !existingByExternalId.has(event.external_id)).map(selectorBase);
+    const takenSelectorRows = await db.CalendarEvent.findAll({
+      where: { selector: { [Op.in]: selectorBases } },
+      attributes: ['selector'],
+      transaction,
+    });
+    const takenInDb = new Set(takenSelectorRows.map((row) => row.selector));
+    // eslint-disable-next-line no-restricted-syntax
+    for (const event of events) {
+      const existing = existingByExternalId.get(event.external_id);
       const fields = {
         name: event.name,
         start: event.start,
-        end: event.end !== undefined ? event.end : null,
+        // a timed event without end is a zero-duration event: the consumers
+        // (the calendar scene trigger, is-event-running) read a non-null end
+        end: event.end !== undefined && event.end !== null ? event.end : event.start,
         full_day: event.full_day !== undefined ? event.full_day : false,
         location: event.location !== undefined ? event.location : null,
         description: event.description !== undefined ? event.description : null,
@@ -110,13 +143,9 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
           // The event exists under another calendar: it is a move only within the
           // same owner (same user, same service) — the external_id column is
           // globally UNIQUE and a row of another owner is never stolen.
-          // eslint-disable-next-line no-await-in-loop
-          const existingCalendar = await db.Calendar.findOne({
-            where: { id: existing.calendar_id },
-            transaction,
-          });
+          const existingCalendar = sourceCalendarById.get(existing.calendar_id);
           if (
-            existingCalendar === null ||
+            existingCalendar === undefined ||
             existingCalendar.user_id !== calendar.user_id ||
             existingCalendar.service_id !== calendar.service_id
           ) {
@@ -138,16 +167,16 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
         if (count > MAX_EVENTS_PER_CALENDAR) {
           throw new BadParameters(`A calendar cannot hold more than ${MAX_EVENTS_PER_CALENDAR} events`);
         }
-        // The selector derives from the external_id, unique by construction
-        // (the CalDAV precedent derives it from the iCal UID): deriving it from
-        // the name would probe "name", "name-2"… for every occurrence of an
-        // expanded recurrence ("Weekly standup" × 52), inside the write
-        // transaction, and a name in a non-Latin script slugifies to nothing.
-        const selectorBase = slugify(event.external_id) || 'event';
+        const base = selectorBase(event);
+        let selector = base;
+        if (takenInDb.has(base) || taken.has(base)) {
+          // eslint-disable-next-line no-await-in-loop
+          selector = await buildUniqueSelector(db.CalendarEvent, base, { transaction, taken });
+        } else {
+          taken.add(base);
+        }
         // eslint-disable-next-line no-await-in-loop
-        const selector = await buildUniqueSelector(db.CalendarEvent, selectorBase, { transaction, taken });
-        // eslint-disable-next-line no-await-in-loop
-        await db.CalendarEvent.create(
+        const createdEvent = await db.CalendarEvent.create(
           {
             ...fields,
             calendar_id: calendarId,
@@ -156,6 +185,8 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
           },
           { transaction },
         );
+        // an id repeated in the batch updates the row just created
+        existingByExternalId.set(event.external_id, createdEvent);
         created += 1;
       }
     }

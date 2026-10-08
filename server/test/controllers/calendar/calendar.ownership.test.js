@@ -3,8 +3,9 @@ const db = require('../../../models');
 
 const USER_B = '7a137a56-069e-4996-8816-36558174b727';
 
-// authenticatedRequest carries USER_A's session: another user's calendar must
-// answer 404 on every write, indistinguishable from an unknown selector.
+// authenticatedRequest carries USER_A's session: another user's private calendar
+// must answer 404 on every write, indistinguishable from an unknown selector; a
+// calendar they share is visible, and read-only (403).
 describe('calendar routes ownership', () => {
   let otherCalendar;
   let otherEvent;
@@ -60,5 +61,15 @@ describe('calendar routes ownership', () => {
       .delete(`/api/v1/calendar/event/${otherEvent.selector}`)
       .expect('Content-Type', /json/)
       .expect(404);
+  });
+
+  it('should return 403 when creating an event in a calendar another user shares', async () => {
+    // the requester sees a shared calendar: a 404 would contradict their list
+    await otherCalendar.update({ shared: true });
+    await authenticatedRequest
+      .post(`/api/v1/calendar/${otherCalendar.selector}/event`)
+      .send({ name: 'hacked', start: '2026-08-14T09:00:00.000Z' })
+      .expect('Content-Type', /json/)
+      .expect(403);
   });
 });
