@@ -19,6 +19,12 @@ From the repo root: `npm start` (runs `run-p start-server:dev start-front:dev`).
 - **Service dependencies:** the server has ~38 integration services under `server/services/*`, each with its own `package.json`. `cd server && npm install` runs a `postinstall` (`cli/install_service_dependencies.js`) that installs deps for every service. Set `INSTALL_SERVICES_SILENT_FAIL=true` so a single flaky service install does not abort the whole install.
 - **Native modules** (`sqlite3`, `bcrypt`, `sharp`, USB/bluetooth services) compile from source; they need build tools (`gcc/g++/make/python3`) and `libudev-dev` on the system. DuckDB (`@duckdb/node-api`) ships prebuilt platform binaries and does not compile from source.
 
+## Gladys Plus version check — official release images only
+
+- The latest-version check sent to Gladys Plus also carries usage statistics, so it only runs on **official release images**: `system.isOfficialReleaseImage()` (`server/lib/system/system.isOfficialReleaseImage.js`) requires `NODE_ENV=production` **and** `GLADYS_OFFICIAL_RELEASE_IMAGE=true`. That variable is only set by `docker/Dockerfile.buildx` when `.github/workflows/docker-release-build.yml` passes it as a build arg.
+- **Never set `GLADYS_OFFICIAL_RELEASE_IMAGE`, and never pass it as a build arg** — not in local dev, `docker run -e`, docker-compose, a `.env` file, CI, tests, the pull request or dev image workflows, or a documentation example — even "to test like in production". Otherwise a non-production instance counts as a real installation and pollutes the statistics.
+- It is expected that the dev server, Cypress and pull request / dev images never call Gladys Plus for the version check (the "new version available" info stays empty there). To test code around the version check, stub `system.isOfficialReleaseImage()` (see `server/test/lib/gateway/gateway.getLatestGladysVersion.test.js`).
+
 ## Feature specs (spec-first process)
 
 Living specifications live in `docs/specs/`. They are the source of truth for the behavior and cross-repo contracts of the features they cover.
