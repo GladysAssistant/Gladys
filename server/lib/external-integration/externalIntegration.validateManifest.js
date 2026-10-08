@@ -46,6 +46,7 @@ const {
   SCENE_ACTION_FIELD_TYPES,
   SCENE_VARIABLE_TYPES,
 } = require('./constants');
+const { validateEnergyContractsField } = require('./externalIntegration.validateEnergyContracts');
 
 // These rules are the exact mirror of the canonical manifest schema owned by
 // GladysAssistant/integration-store (vendored copy in manifest.schema.json):
@@ -79,6 +80,7 @@ const MANIFEST_FIELDS = [
   'widgets',
   'scene_triggers',
   'scene_actions',
+  'energy_contracts',
 ];
 // Browse categories of the catalog (docs/specs/integration-catalog-
 // categories.md §6.2), validated in two ordered stages: the SHAPE (1..3
@@ -1260,6 +1262,9 @@ function validateManifest(manifest) {
       validateSceneDeclaration(entry, index, seenKeys, errors, declaredPortNames, kind),
     );
   });
+  if (manifest.energy_contracts !== undefined) {
+    validateEnergyContractsField(manifest.energy_contracts, errors, validateMultiLanguageText);
+  }
   if (manifest.type === PROVIDER_TYPE) {
     // a provider providing nothing has no contract at all: explicit error
     const declaresCapability = CAPABILITY_MANIFEST_FIELDS.some((field) => manifest[field] !== undefined);

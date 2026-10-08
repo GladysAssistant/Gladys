@@ -17,6 +17,7 @@ import EditAlarmBox from '../../../components/boxs/alarm/EditAlarm';
 import EditEdfTempoBox from '../../../components/boxs/edf-tempo/EditEdfTempo';
 import EditGaugeBox from '../../../components/boxs/gauge/EditGaugeBox';
 import EditEnergyConsumptionBox from '../../../components/boxs/energy-consumption/EditEnergyConsumption';
+import EditEnergyPriceBox from '../../../components/boxs/energy-price/EditEnergyPrice';
 import EditVoiceAssistantBox from '../../../components/boxs/voice-assistant/EditVoiceAssistantBox';
 import EditLinkBox from '../../../components/boxs/link/EditLinkBox';
 import EditPhotoBox from '../../../components/boxs/photo/EditPhotoBox';
@@ -60,6 +61,8 @@ const Box = ({ children, ...props }) => {
       return <EditGaugeBox {...props} />;
     case 'energy-consumption':
       return <EditEnergyConsumptionBox {...props} />;
+    case 'energy-price':
+      return <EditEnergyPriceBox {...props} />;
     case 'voice-assistant':
       return <EditVoiceAssistantBox {...props} />;
     case 'link':
