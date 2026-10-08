@@ -51,6 +51,24 @@ COPY . /src
 ENV NODE_ENV production
 ENV SERVER_PORT 80
 
+# ⚠️ DO NOT SET THIS ANYWHERE ELSE — this applies to humans and AI agents alike.
+#
+# Marks the official release images. Only the "🐳 Build and push" step of
+# .github/workflows/docker-release-build.yml passes this build arg: every other
+# image (pull request, dev, local build) keeps the default "false".
+#
+# It is the only thing that allows an instance to call Gladys Plus to check the
+# latest Gladys version, a call that also sends usage statistics (see
+# server/lib/system/system.isOfficialReleaseImage.js). Setting it anywhere else
+# — local development, `docker run -e`, docker-compose, a .env file, CI, tests,
+# pull request or dev images — makes a non-production instance count as a real
+# installation and pollutes those statistics, even "just to test like in
+# production". Never pass it outside the release workflow, never add it to a
+# documentation example. To work on the version check, stub
+# system.isOfficialReleaseImage() in the tests instead.
+ARG GLADYS_OFFICIAL_RELEASE_IMAGE=false
+ENV GLADYS_OFFICIAL_RELEASE_IMAGE ${GLADYS_OFFICIAL_RELEASE_IMAGE}
+
 # Export listening port
 EXPOSE 80
 

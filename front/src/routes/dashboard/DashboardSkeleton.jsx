@@ -14,6 +14,7 @@ const DEFAULT_BOX_HEIGHT = 140;
 const BOX_SKELETON_HEIGHTS = {
   chart: 300,
   'energy-consumption': 320,
+  'energy-price': 120,
   gauge: 240,
   ecowatt: 200,
   weather: 180,

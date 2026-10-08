@@ -6,6 +6,7 @@ const {
   EVENT_LIST,
   ALARM_MODES_LIST,
   TRIGGER_OPERATORS,
+  COMPARISON_OPERATORS,
   ANY_CHANGE_OPERATOR,
 } = require('../utils/constants');
 const {
@@ -93,6 +94,10 @@ const actionSchema = Joi.object()
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
     edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
     edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
+    // energy-contract.current-price condition: the contract selector, the comparison
+    // operator and the threshold (`value`, above)
+    energy_contract: Joi.string(),
+    operator: Joi.string().valid(...COMPARISON_OPERATORS),
     headers: Joi.alternatives().conditional('type', {
       is: ACTIONS.HTTP.REQUEST,
       then: Joi.array()
@@ -210,6 +215,8 @@ const triggerSchema = Joi.object()
     integration: Joi.string(),
     trigger_key: sceneDeclarationKeySchema,
     fields: sceneDeclarationFieldsSchema,
+    // energy-contract.price-changed trigger: the contract selector, empty for any contract
+    energy_contract: Joi.string().allow(''),
   })
   // A "changed" trigger fires on `last_value !== previous_value`: it matches no value, and
   // neither `threshold_only` (which de-duplicates a condition staying true) nor `for_duration`

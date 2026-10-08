@@ -42,6 +42,18 @@ const { saveConfigFromFront } = require('./externalIntegration.saveConfigFromFro
 const { setRunning } = require('./externalIntegration.setRunning');
 const { handleHeartbeat } = require('./externalIntegration.handleHeartbeat');
 const { handleWeatherRefresh } = require('./externalIntegration.handleWeatherRefresh');
+const {
+  priceEnergyContract,
+  getEnergyContractCurrent,
+  getEnergyContractProvider,
+} = require('./externalIntegration.priceEnergyContract');
+const {
+  declareEnergyCalendars,
+  publishEnergyCalendar,
+  getEnergyCalendar,
+  getEnergyContracts,
+  handleEnergyCalendarRefresh,
+} = require('./externalIntegration.energyCalendar');
 const { getWidgets } = require('./externalIntegration.getWidgets');
 const { getWidgetContent } = require('./externalIntegration.getWidgetContent');
 const { getWidgetImage } = require('./externalIntegration.getWidgetImage');
@@ -133,7 +145,7 @@ const { getSceneDeclarations } = require('./externalIntegration.getSceneDeclarat
  * @param {object} stateManager - State manager.
  * @param {object} device - Device manager.
  * @param {object} variable - Variable manager.
- * @param {object} energyPrice - Energy price manager (default electric meter).
+ * @param {object} energyContract - Energy contract manager (default electric meter, calendars, delegated pricing).
  * @param {string} jwtSecret - Secret to sign integration JWTs.
  * @param {object} cache - In-memory cache (contact link codes).
  * @example
@@ -146,7 +158,7 @@ const ExternalIntegration = function ExternalIntegration(
   stateManager,
   device,
   variable,
-  energyPrice,
+  energyContract,
   jwtSecret,
   cache,
 ) {
@@ -156,7 +168,7 @@ const ExternalIntegration = function ExternalIntegration(
   this.stateManager = stateManager;
   this.device = device;
   this.variable = variable;
-  this.energyPrice = energyPrice;
+  this.energyContract = energyContract;
   this.jwtSecret = jwtSecret;
   this.cache = cache;
   this.available = false;
@@ -192,6 +204,8 @@ const ExternalIntegration = function ExternalIntegration(
   this.cameraImageRateLimits = new Map();
   // serviceId -> timestamp of the last accepted weather freshness nudge
   this.weatherRefreshTimes = new Map();
+  // serviceId -> last energy-calendar.refresh nudge (capabilities/energy-contracts.md)
+  this.energyCalendarRefreshTimes = new Map();
   // serviceId -> { count, resetAt } rate limit on POST /scene/event, a
   // counter separate from the states'
   this.sceneEventRateLimits = new Map();
@@ -285,6 +299,14 @@ ExternalIntegration.prototype.saveConfigFromFront = saveConfigFromFront;
 ExternalIntegration.prototype.setRunning = setRunning;
 ExternalIntegration.prototype.handleHeartbeat = handleHeartbeat;
 ExternalIntegration.prototype.handleWeatherRefresh = handleWeatherRefresh;
+ExternalIntegration.prototype.priceEnergyContract = priceEnergyContract;
+ExternalIntegration.prototype.getEnergyContractCurrent = getEnergyContractCurrent;
+ExternalIntegration.prototype.getEnergyContractProvider = getEnergyContractProvider;
+ExternalIntegration.prototype.declareEnergyCalendars = declareEnergyCalendars;
+ExternalIntegration.prototype.publishEnergyCalendar = publishEnergyCalendar;
+ExternalIntegration.prototype.getEnergyCalendar = getEnergyCalendar;
+ExternalIntegration.prototype.getEnergyContracts = getEnergyContracts;
+ExternalIntegration.prototype.handleEnergyCalendarRefresh = handleEnergyCalendarRefresh;
 ExternalIntegration.prototype.getWidgets = getWidgets;
 ExternalIntegration.prototype.getWidgetContent = getWidgetContent;
 ExternalIntegration.prototype.getWidgetImage = getWidgetImage;

@@ -216,6 +216,14 @@ jobs:
           push: true
           pull: true
           tags: ${{ steps.docker_meta.outputs.tags }}
+          # ⚠️ The ONLY place where this build arg may be set, humans and AI
+          # agents alike: it marks the official release images, the only
+          # instances allowed to call Gladys Plus for the latest version
+          # check (which also sends usage statistics). Never copy it to
+          # another workflow (pull request or dev images), a docker run, a
+          # docker-compose or a .env file — see docker/Dockerfile.buildx.
+          build-args: |
+            GLADYS_OFFICIAL_RELEASE_IMAGE=true
           cache-from: type=registry,ref=${{ env.DOCKERHUB_REPO }}:latest
           cache-to: type=inline
   publish-gladys-plus:
