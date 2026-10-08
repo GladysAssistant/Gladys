@@ -136,6 +136,7 @@ class DeviceBox extends Component {
                     {historizableFeatures.map(({ feature, featureIndex }) => (
                       <KeepHistoryFeature
                         key={feature.id || feature.external_id}
+                        device={device}
                         deviceIndex={deviceIndex}
                         feature={feature}
                         featureIndex={featureIndex}

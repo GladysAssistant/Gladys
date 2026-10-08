@@ -22,6 +22,7 @@ const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
 const EnergyPriceController = require('./controllers/energy-price.controller');
+const EnergyContractController = require('./controllers/energy-contract.controller');
 
 /**
  * @description Return object of routes.
@@ -55,6 +56,7 @@ function getRoutes(gladys) {
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
   const energyPriceController = EnergyPriceController(gladys);
+  const energyContractController = EnergyContractController(gladys);
 
   const routes = {};
 
@@ -229,6 +231,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDuckDbMigrationState,
     },
+    'get /api/v1/device/states_stats': {
+      authenticated: true,
+      controller: deviceController.getStatesStats,
+    },
     'post /api/v1/device/purge_all_sqlite_state': {
       authenticated: true,
       controller: deviceController.purgeAllSqliteStates,
@@ -240,6 +246,10 @@ function getRoutes(gladys) {
     'get /api/v1/service/:service_name/device': {
       authenticated: true,
       controller: deviceController.getDevicesByService,
+    },
+    'get /api/v1/device/:device_selector/states_size': {
+      authenticated: true,
+      controller: deviceController.getDeviceStatesSize,
     },
     'get /api/v1/device/:device_selector': {
       authenticated: true,
@@ -795,6 +805,22 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.publishSceneEvent,
     },
+    // energy contracts capability (capabilities/energy-contracts.md, section 2)
+    'post /api/integration/v1/energy/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishEnergyCalendar,
+    },
+    'get /api/integration/v1/energy/calendar/:key': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getEnergyCalendar,
+    },
+    'get /api/integration/v1/energy/contract': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getEnergyContracts,
+    },
     'get /api/integration/v1/config': {
       authenticated: false,
       externalIntegrationAuth: true,
@@ -1083,22 +1109,76 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: weatherController.getImage,
     },
-    // energy price
+    // energy contracts (docs/specs/energy-contracts.md, section 8.1)
+    'get /api/v1/energy_contract': {
+      authenticated: true,
+      controller: energyContractController.get,
+    },
+    'post /api/v1/energy_contract': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.create,
+    },
+    'post /api/v1/energy_contract/preview': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.preview,
+    },
+    'post /api/v1/energy_contract/recalculate': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.recalculate,
+    },
+    'get /api/v1/energy_contract/template': {
+      authenticated: true,
+      controller: energyContractController.getTemplates,
+    },
+    'get /api/v1/energy_contract/template/:provider/:key': {
+      authenticated: true,
+      controller: energyContractController.getTemplate,
+    },
+    'get /api/v1/energy_contract/:selector': {
+      authenticated: true,
+      controller: energyContractController.getBySelector,
+    },
+    'get /api/v1/energy_contract/:selector/current': {
+      authenticated: true,
+      controller: energyContractController.getCurrent,
+    },
+    'patch /api/v1/energy_contract/:selector': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.update,
+    },
+    'delete /api/v1/energy_contract/:selector': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.destroy,
+    },
+    'get /api/v1/energy_calendar': {
+      authenticated: true,
+      controller: energyContractController.getCalendars,
+    },
+    'get /api/v1/energy_calendar/:key': {
+      authenticated: true,
+      controller: energyContractController.getCalendarEntries,
+    },
+    // energy price: read-only compatibility window (section 9.4)
     'get /api/v1/energy_price': {
       authenticated: true,
       controller: energyPriceController.get,
     },
     'post /api/v1/energy_price': {
       authenticated: true,
-      controller: energyPriceController.create,
+      controller: energyPriceController.gone,
     },
     'patch /api/v1/energy_price/:selector': {
       authenticated: true,
-      controller: energyPriceController.update,
+      controller: energyPriceController.gone,
     },
     'delete /api/v1/energy_price/:selector': {
       authenticated: true,
-      controller: energyPriceController.destroy,
+      controller: energyPriceController.gone,
     },
     'get /api/v1/energy_price/default_electric_meter_feature_id': {
       authenticated: true,

@@ -82,6 +82,8 @@ async function uninstall(selector) {
   this.stateRateLimits.delete(service.id);
   this.calendarWriteRateLimits.delete(service.id);
   this.networkDiscoveryActiveScanTimes.delete(service.id);
+  // its contracts stay (provider_service_id nulled by the FK), its calendars are orphaned
+  this.energyCalendarRefreshTimes.delete(service.id);
   const externalIdPrefix = `ext:${service.selector}:`;
   [...this.cameraImageRateLimits.keys()]
     .filter((externalId) => externalId.startsWith(externalIdPrefix))

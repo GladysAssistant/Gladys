@@ -50,7 +50,7 @@ describe('gateway subscription lock', () => {
       { selector: 'tony', language: 'en' },
       { selector: 'pepper', language: 'fr' },
     ]);
-    message.sendToUser = fake.resolves(null);
+    message.sendSystemMessage = fake.resolves(null);
     brain.getReply = fake.returns('Payment required!');
 
     const config = getConfig();
@@ -97,8 +97,10 @@ describe('gateway subscription lock', () => {
       });
       assert.calledWith(brain.getReply, 'en', 'gateway.payment-required');
       assert.calledWith(brain.getReply, 'fr', 'gateway.payment-required');
-      assert.calledWith(message.sendToUser, 'tony', 'Payment required!', null, { messageType: 'notification' });
-      assert.calledWith(message.sendToUser, 'pepper', 'Payment required!', null, { messageType: 'notification' });
+      assert.calledWith(message.sendSystemMessage, 'tony', 'Payment required!', null, { messageType: 'notification' });
+      assert.calledWith(message.sendSystemMessage, 'pepper', 'Payment required!', null, {
+        messageType: 'notification',
+      });
     });
 
     it('should do nothing when the state does not change', async () => {
@@ -108,14 +110,14 @@ describe('gateway subscription lock', () => {
       assert.notCalled(variable.setValue);
       assert.notCalled(variable.destroy);
       assert.notCalled(event.emit);
-      assert.notCalled(message.sendToUser);
+      assert.notCalled(message.sendSystemMessage);
     });
 
     it('should lock only once when several calls fail at the same time', async () => {
       await Promise.all([gateway.setSubscriptionActive(false), gateway.setSubscriptionActive(false)]);
 
       assert.calledOnce(variable.setValue);
-      assert.calledTwice(message.sendToUser);
+      assert.calledTwice(message.sendSystemMessage);
     });
 
     it('should run transitions one at a time, whatever the order their persistence completes in', async () => {

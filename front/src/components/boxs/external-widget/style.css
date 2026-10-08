@@ -528,10 +528,32 @@
   border-color: rgba(255, 255, 255, 0.08);
 }
 
-:global(.dark-mode) .button {
+/* only the neutral button is repainted: the primary, danger and active
+   variants keep their own colors (this two-class rule would otherwise beat
+   their one-class rules and blank them) */
+:global(.dark-mode) .button:not(.buttonPrimary):not(.buttonDanger):not(.buttonActive) {
   background-color: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.1);
   color: inherit;
+}
+
+/* the primary button keeps its accent fill and white label and icon through
+   the page inversion: the double inversion dark-mode.css applies to
+   .btn-primary (the `.glass-theme .fe` rule there already keeps its icon from
+   being inverted again). Unlike the Horizon .btn-primary ink pills, it is not
+   restyled, so it must not drop this filter: the accent would invert into a
+   light blue with a black label. Danger and active pastels simply invert with
+   the page into dark tints. The Horizon button border (white, lost on the
+   light card) would come back as a white ring on the dark card: drop it. */
+:global(.dark-mode) .buttonPrimary {
+  filter: invert(100%) hue-rotate(180deg);
+  border-color: transparent;
+}
+
+/* an active primary device button is painted as active, so it inverts with
+   the page like one */
+:global(.dark-mode) .buttonPrimary.buttonActive {
+  filter: none;
 }
 
 :global(.dark-mode) .imageFrame {

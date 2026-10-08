@@ -358,6 +358,61 @@ function buildFakeSystem(overrides = {}) {
   };
 }
 
+// energy contracts capability: a rules template with inputs, a delegated one, a calendar
+const TEST_ENERGY_MANIFEST = {
+  ...TEST_MANIFEST,
+  name: 'Octopus Energy Demo',
+  energy_contracts: {
+    templates: [
+      {
+        key: 'economy-7',
+        name: { en: 'Economy 7', fr: 'Economy 7' },
+        country: 'GB',
+        currency: 'GBP',
+        timezone: 'Etc/GMT',
+        pricing_mode: 'rules',
+        version: '2026-01-01',
+        calendars: ['agile-gb'],
+        inputs: [
+          { key: 'night_price', type: 'number', unit: 'GBP/kWh', default: 0.12, label: { en: 'Night price' } },
+          { key: 'region', type: 'select', options: ['A', 'B'], default: 'A' },
+          { key: 'off_peak_slots', type: 'time_intervals', default: [['00:30', '07:30']] },
+          { key: 'note', type: 'string' },
+        ],
+        tariff: {
+          tariff_version: 1,
+          calendars: ['agile-gb'],
+          components: [
+            {
+              key: 'energy',
+              kind: 'consumption',
+              rules: [
+                { label: 'night', when: { time: '{{input:off_peak_slots}}' }, price: '{{input:night_price}}' },
+                { when: { calendar: { 'agile-gb': 'cap' } }, price: 0.3 },
+              ],
+              fallback: { price: 0.28 },
+            },
+          ],
+        },
+      },
+      {
+        key: 'agile',
+        name: { en: 'Octopus Agile' },
+        country: 'GB',
+        currency: 'GBP',
+        pricing_mode: 'delegated',
+        version: '1',
+        inputs: [{ key: 'region', type: 'select', options: ['A', 'B'] }],
+        tariff: {
+          tariff_version: 1,
+          components: [{ key: 'standing', kind: 'fixed', amount: 0.5, per: 'day' }],
+        },
+      },
+    ],
+    calendars: [{ key: 'agile-gb', granularity: 'day', values: ['cap', 'normal'], timezone: 'Europe/London' }],
+  },
+};
+
 /**
  * @description Build a supervisor wired with fakes for tests.
  * @param {object} [options] - Options.
@@ -375,9 +430,17 @@ function buildSupervisor({ system: systemOverrides } = {}) {
   const serviceManager = {};
   const cache = new Cache();
   const calendar = new Calendar();
-  // no energy price configured by default: a discovered energy index then gets
-  // its derived features with no parent meter (see getDiscoveredDevices)
-  const energyPrice = { getDefaultElectricMeterFeatureId: fake.resolves(null) };
+  // no energy contract configured by default: a discovered energy index then gets
+  // its derived features with no parent meter (see getDiscoveredDevices); the
+  // calendar and contract functions are fakes the capability tests override
+  const energyContract = {
+    getDefaultElectricMeterFeatureId: fake.resolves(null),
+    declareCalendar: fake.resolves({ accepted: true, calendar: {} }),
+    publishCalendarEntries: fake.resolves({ count: 0, changed_from: null }),
+    getCalendarEntries: fake.resolves([]),
+    get: fake.resolves([]),
+    requestCalendarRecalculation: fake.resolves(null),
+  };
   const externalIntegration = new ExternalIntegration(
     event,
     system,
@@ -385,13 +448,25 @@ function buildSupervisor({ system: systemOverrides } = {}) {
     stateManager,
     device,
     variable,
-    energyPrice,
+    energyContract,
     TEST_JWT_SECRET,
     cache,
     calendar,
   );
   externalIntegration.available = true;
-  return { externalIntegration, event, system, stateManager, device, variable, cache, energyPrice, calendar };
+  return {
+    externalIntegration,
+    event,
+    system,
+    stateManager,
+    device,
+    variable,
+    cache,
+    energyContract,
+    // kept under its former name for the tests written against it
+    energyPrice: energyContract,
+    calendar,
+  };
 }
 
 /**
@@ -430,6 +505,7 @@ module.exports = {
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_SCENE_MANIFEST,
+  TEST_ENERGY_MANIFEST,
   TEST_DETECTED_CLASSES,
   buildFakeSystem,
   buildSupervisor,

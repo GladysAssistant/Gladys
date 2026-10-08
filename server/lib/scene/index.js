@@ -49,6 +49,8 @@ const SceneManager = function SceneManager(
   this.http = http;
   this.gateway = gateway;
   this.service = service;
+  // attached after construction by lib/index.js (energy-contract.current-price condition)
+  this.energyContract = null;
   this.scenes = {};
   // in-memory registry of scene executions currently running, keyed by executionId
   this.runningScenes = new Map();

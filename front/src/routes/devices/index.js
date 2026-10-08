@@ -21,6 +21,18 @@ class Devices extends Component {
     }
   };
 
+  // The states saved per device over the last hours, to flag the verbose
+  // devices. It scans the history, so it is loaded next to the list and never
+  // delays it: when it fails, the page simply shows no verbosity information.
+  getStatesStats = async () => {
+    try {
+      const statesStats = await this.props.httpClient.get('/api/v1/device/states_stats');
+      this.setState({ statesStats });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   getRooms = async () => {
     try {
       const rooms = await this.props.httpClient.get('/api/v1/room');
@@ -44,6 +56,10 @@ class Devices extends Component {
 
   selectIntegration = e => {
     this.setState({ selectedIntegration: e.target.value || null });
+  };
+
+  toggleOnlyVerbose = () => {
+    this.setState(prevState => ({ onlyVerbose: !prevState.onlyVerbose }));
   };
 
   matchSearch = device => {
@@ -76,6 +92,8 @@ class Devices extends Component {
       orderDir: 'asc',
       selectedRoomId: null,
       selectedIntegration: null,
+      statesStats: null,
+      onlyVerbose: false,
       loading: true,
       error: false
     };
@@ -84,6 +102,7 @@ class Devices extends Component {
   componentDidMount() {
     this.getDevices();
     this.getRooms();
+    this.getStatesStats();
   }
 
   render(props, state) {
@@ -91,13 +110,33 @@ class Devices extends Component {
     // names are resolved on the whole list: whether an integration needs its
     // technical identity displayed depends on the other integrations present
     const nameBySlug = disambiguateIntegrationNames(integrations);
+    const statesStatsByDeviceId = new Map(
+      (state.statesStats ? state.statesStats.devices : []).map(deviceStats => [deviceStats.device_id, deviceStats])
+    );
     const devicesWithIntegration = (state.devices || []).map((device, index) => {
       const integration = integrations[index];
       return {
         device,
-        integration: integration ? { ...integration, name: nameBySlug.get(integration.slug) } : null
+        integration: integration ? { ...integration, name: nameBySlug.get(integration.slug) } : null,
+        statesStats: statesStatsByDeviceId.get(device.id) || null
       };
     });
+
+    // Computed on the whole list, like the integration options: the banner
+    // tells how much of the history the verbose devices weigh, whatever the
+    // filters currently applied
+    const verboseDevices = devicesWithIntegration.filter(({ statesStats }) => statesStats && statesStats.is_verbose);
+    let verboseSummary = null;
+    if (verboseDevices.length > 0) {
+      const verboseStates = verboseDevices.reduce((sum, { statesStats }) => sum + statesStats.states, 0);
+      verboseSummary = {
+        count: verboseDevices.length,
+        // never "0 %": a verbose device always weighs something
+        percent: Math.max(1, Math.round((verboseStates * 100) / state.statesStats.total_states)),
+        periodInHours: state.statesStats.period_in_hours,
+        threshold: state.statesStats.verbose_device_feature_min_states
+      };
+    }
 
     // The integration filter options are built from the full device list, so
     // it only shows integrations the user actually has devices in, and a
@@ -131,10 +170,16 @@ class Devices extends Component {
         ({ integration }) =>
           !state.selectedIntegration || (integration && integration.slug === state.selectedIntegration)
       )
+      .filter(({ statesStats }) => !state.onlyVerbose || (statesStats && statesStats.is_verbose))
       .sort((a, b) => {
         const comparison = (a.device.name || '').localeCompare(b.device.name || '', undefined, {
           sensitivity: 'base'
         });
+        if (state.orderDir === 'states_desc') {
+          const statesDifference =
+            (b.statesStats ? b.statesStats.states : 0) - (a.statesStats ? a.statesStats.states : 0);
+          return statesDifference || comparison;
+        }
         return state.orderDir === 'desc' ? -comparison : comparison;
       });
 
@@ -143,6 +188,8 @@ class Devices extends Component {
         {...state}
         initialized={state.devices !== null}
         filteredDevices={filteredDevices}
+        verboseSummary={verboseSummary}
+        toggleOnlyVerbose={this.toggleOnlyVerbose}
         nativeIntegrationOptions={nativeIntegrationOptions}
         communityIntegrationOptions={communityIntegrationOptions}
         searchValue={state.search}

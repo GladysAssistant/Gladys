@@ -1,4 +1,5 @@
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import FeatureHistorySize from '../../../../../components/device/FeatureHistorySize';
 
 // A text feature holds a string state, which is never historized (the core
 // only keeps its last value): offering the toggle there would promise a
@@ -9,16 +10,19 @@ export const isHistorizableFeature = feature => feature.category !== DEVICE_FEAT
 // The definition of a feature belongs to the integration (name, category,
 // unit, bounds...): only the "keep history" choice is the user's, so it is
 // the only thing this row makes editable.
-const KeepHistoryFeature = ({ deviceIndex, feature, featureIndex, updateFeatureKeepHistory }) => {
+const KeepHistoryFeature = ({ device, deviceIndex, feature, featureIndex, updateFeatureKeepHistory }) => {
   // the visible feature name is what names the switch: it is tied to the
   // input so a screen reader announces which feature is toggled, and so a
   // click on the name flips it, as on the MQTT device screen
   const inputId = `keep_history_${deviceIndex}_${featureIndex}`;
   return (
     <div class="d-flex align-items-center justify-content-between mb-2">
-      <label htmlFor={inputId} class="mr-3 mb-0">
-        {feature.name}
-      </label>
+      <div class="mr-3">
+        <label htmlFor={inputId} class="mb-0">
+          {feature.name}
+        </label>
+        <FeatureHistorySize device={device} feature={feature} />
+      </div>
       <label class="custom-switch mb-0">
         <input
           id={inputId}

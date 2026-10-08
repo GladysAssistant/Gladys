@@ -97,6 +97,30 @@ describe('Job', () => {
       });
       expect(secondUpdate).to.have.property('progress', 50);
     });
+    it('should attach the count of fallback prices to every energy cost job', async () => {
+      const energyCostJobTypes = [
+        JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES,
+        JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_YESTERDAY,
+        JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_BEGINNING,
+        JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_CONTRACT,
+        JOB_TYPES.ENERGY_MONITORING_BILLING_PERIOD_END,
+        JOB_TYPES.ENERGY_MONITORING_DELEGATED_CATCH_UP,
+      ];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const type of energyCostJobTypes) {
+        // eslint-disable-next-line no-await-in-loop
+        const newJob = await job.start(type);
+        // eslint-disable-next-line no-await-in-loop
+        const updated = await job.updateProgress(newJob.id, 100, { fallback_prices_count: 3 });
+        expect(updated.data, type).to.deep.equal({ fallback_prices_count: 3 });
+      }
+      // an energy key, refused on the other job types
+      const backup = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
+      await chaiAssert.isRejected(
+        job.updateProgress(backup.id, 10, { fallback_prices_count: 3 }),
+        '"fallback_prices_count" is not allowed',
+      );
+    });
     it('should not update job data, invalid dataPatch key', async () => {
       const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
       const promise = job.updateProgress(newJob.id, 10, { not_a_valid_key: true });

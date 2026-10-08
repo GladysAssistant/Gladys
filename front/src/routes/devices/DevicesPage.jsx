@@ -92,6 +92,10 @@ const DevicesPage = ({ children, ...props }) => (
                   search={props.search}
                   searchValue={props.searchValue}
                   searchPlaceHolder={<Text id="devicesList.searchPlaceholder" />}
+                  extraOrderDirs={
+                    // without the stats, this order would silently fall back to the names
+                    props.statesStats ? [{ value: 'states_desc', labelId: 'devicesList.orderByStatesDesc' }] : []
+                  }
                 />
               </Localizer>
             </div>
@@ -99,6 +103,44 @@ const DevicesPage = ({ children, ...props }) => (
           {props.error && (
             <div class="alert alert-danger">
               <Text id="devicesList.error" />
+            </div>
+          )}
+          {props.initialized && props.verboseSummary && (
+            <div class={cx('alert', 'alert-warning', style.verboseAlert)}>
+              <div class={style.verboseAlertText}>
+                <div>
+                  <Text
+                    id="devicesList.verbose.summary"
+                    plural={props.verboseSummary.count}
+                    fields={{
+                      count: props.verboseSummary.count,
+                      percent: props.verboseSummary.percent,
+                      hours: props.verboseSummary.periodInHours
+                    }}
+                  />
+                </div>
+                <div class="small">
+                  <Text
+                    id="devicesList.verbose.explanation"
+                    fields={{
+                      threshold: props.verboseSummary.threshold.toLocaleString(),
+                      hours: props.verboseSummary.periodInHours
+                    }}
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                class={cx('btn', 'btn-sm', style.verboseAlertButton)}
+                onClick={props.toggleOnlyVerbose}
+              >
+                <i class={cx('fe', props.onlyVerbose ? 'fe-x' : 'fe-filter', 'mr-1')} />
+                {props.onlyVerbose ? (
+                  <Text id="devicesList.verbose.showAll" />
+                ) : (
+                  <Text id="devicesList.verbose.showOnlyVerbose" />
+                )}
+              </button>
             </div>
           )}
           <div
@@ -109,16 +151,22 @@ const DevicesPage = ({ children, ...props }) => (
             <div class="loader" />
             <div class={cx('dimmer-content', style.devicesListContainer)}>
               {props.initialized && props.filteredDevices.length > 0 && (
-                <div class="card d-lg-none">
+                <div class="card d-xl-none">
                   <div class="list-group list-group-flush">
-                    {props.filteredDevices.map(({ device, integration }) => (
-                      <DeviceMobileItem key={device.id} device={device} integration={integration} />
+                    {props.filteredDevices.map(({ device, integration, statesStats }) => (
+                      <DeviceMobileItem
+                        key={device.id}
+                        device={device}
+                        integration={integration}
+                        statesStats={statesStats}
+                        periodInHours={props.statesStats && props.statesStats.period_in_hours}
+                      />
                     ))}
                   </div>
                 </div>
               )}
               {props.initialized && props.filteredDevices.length > 0 && (
-                <div class="card d-none d-lg-block">
+                <div class="card d-none d-xl-block">
                   <div class="table-responsive">
                     {/* device-list-table: same Horizon pill-row grammar as the
                         devices widgets on the dashboard */}
@@ -142,8 +190,14 @@ const DevicesPage = ({ children, ...props }) => (
                         </tr>
                       </thead>
                       <tbody>
-                        {props.filteredDevices.map(({ device, integration }) => (
-                          <DeviceRow key={device.id} device={device} integration={integration} />
+                        {props.filteredDevices.map(({ device, integration, statesStats }) => (
+                          <DeviceRow
+                            key={device.id}
+                            device={device}
+                            integration={integration}
+                            statesStats={statesStats}
+                            periodInHours={props.statesStats && props.statesStats.period_in_hours}
+                          />
                         ))}
                       </tbody>
                     </table>

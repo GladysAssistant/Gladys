@@ -13,6 +13,7 @@ import { ENERGY_INDEX_FEATURE_TYPES } from '../../../../../../../../server/servi
 import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import { getDeviceParam } from '../../../../../../utils/device';
 import { CAMERA_MOVE_OPTIONS } from '../../../../../../utils/cameraMove';
+import FeatureHistorySize from '../../../../../../components/device/FeatureHistorySize';
 import { buildCameraMoveSupportedOptions, featureNeedsMinMax, isFeatureFieldErrored, isSelectFeature } from '../utils';
 import style from '../style.css';
 
@@ -204,6 +205,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
                       <Text id="editDeviceForm.keepHistorySmallDescription" />
                     </span>
                   </label>
+                  <FeatureHistorySize device={props.device} feature={feature} class="mt-2" />
                 </div>
               </div>
             )}

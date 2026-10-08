@@ -91,6 +91,7 @@ describe('broadlink.device.createDevice', () => {
 
     const deviceMapper = {
       buildFeatures: fake.returns([{ read_only: true }]),
+      poll: fake.resolves([]),
     };
     broadlinkHandler.loadMapper = fake.returns(deviceMapper);
 
@@ -114,5 +115,24 @@ describe('broadlink.device.createDevice', () => {
 
     assert.calledOnceWithExactly(deviceMapper.buildFeatures, 'model', 'broadlink:0b16', broadlinkDevice);
     assert.calledOnce(gladys.stateManager.get);
+  });
+
+  it('device with only writable features is polled when its mapper can poll', () => {
+    const broadlinkDevice = {
+      mac: [11, 22],
+      model: 'model',
+      manufacturer: 'Broadlink',
+    };
+
+    const deviceMapper = {
+      buildFeatures: fake.returns([{ read_only: false }]),
+      poll: fake.resolves([]),
+    };
+    broadlinkHandler.loadMapper = fake.returns(deviceMapper);
+
+    const peripheral = broadlinkHandler.buildPeripheral(broadlinkDevice);
+
+    expect(peripheral.device.should_poll).to.eq(true);
+    expect(peripheral.device.poll_frequency).to.eq(60000);
   });
 });

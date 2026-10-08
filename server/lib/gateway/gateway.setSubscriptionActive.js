@@ -16,7 +16,7 @@ async function notifyAdmins(gateway, intent) {
     await Promise.all(
       admins.map(async (admin) => {
         const text = gateway.brain.getReply(admin.language, intent);
-        await gateway.message.sendToUser(admin.selector, text, null, { messageType: 'notification' });
+        await gateway.message.sendSystemMessage(admin.selector, text, null, { messageType: 'notification' });
       }),
     );
   } catch (e) {

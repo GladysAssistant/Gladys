@@ -19,7 +19,11 @@ const PARAMS = {
   REMOTE_TYPE: 'remote_type',
 };
 
+// node-broadlink requests never time out: an unreachable device would keep a poll pending forever
+const POLL_TIMEOUT = 10 * 1000;
+
 module.exports = {
   ACTIONS,
   PARAMS,
+  POLL_TIMEOUT,
 };

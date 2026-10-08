@@ -117,6 +117,19 @@ describe('models/scene', () => {
     await assert.isRejected(actionPromise, '"[0][0].action_key"');
   });
 
+  it('should validate an energy contract price trigger and condition', async () => {
+    await buildScene({ type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED, energy_contract: 'edf-tempo' }).validate();
+    // an empty selector means "any contract"
+    await buildScene({ type: EVENTS.ENERGY_CONTRACT.PRICE_CHANGED, energy_contract: '' }).validate();
+    await buildSceneWithActions([
+      [{ type: ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE, energy_contract: 'edf-tempo', operator: '<', value: 0.2 }],
+    ]).validate();
+    const promise = buildSceneWithActions([
+      [{ type: ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE, energy_contract: 'edf-tempo', operator: 'changed', value: 1 }],
+    ]).validate();
+    await assert.isRejected(promise, /operator/);
+  });
+
   it('should validate an "any state change" trigger', async () => {
     await buildScene({
       type: EVENTS.DEVICE.NEW_STATE,

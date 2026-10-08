@@ -30,6 +30,25 @@ const TEST_ACTIONS_MANIFEST = {
       key: 'test_connection',
       label: { en: 'Test connection' },
     },
+    {
+      key: 'clean',
+      label: { en: 'Clean' },
+      fields: [
+        {
+          key: 'mode',
+          type: 'select',
+          label: { en: 'Mode' },
+          required: true,
+          default: 'a',
+          options: [
+            { value: 'a', label: { en: 'A' } },
+            { value: 'b', label: { en: 'B' } },
+          ],
+        },
+        { key: 'force', type: 'boolean', label: { en: 'Force' }, default: true },
+        { key: 'note', type: 'string', label: { en: 'Note' } },
+      ],
+    },
   ],
 };
 
@@ -79,6 +98,30 @@ describe('externalIntegration.runAction', () => {
     const result = await externalIntegration.runAction(service.selector, 'test_connection');
     expect(result).to.deep.equal({ success: true, message: null });
     expect(externalIntegration.sendCommand.firstCall.args[3]).to.deep.equal({ timeoutMs: 30000 });
+  });
+
+  it('should apply the declared default of every absent field before the required check', async () => {
+    const service = await seedActionsService();
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.getBySelector = fake.resolves(service);
+    externalIntegration.sendCommand = fake.resolves({ success: true });
+    await externalIntegration.runAction(service.selector, 'clean', {});
+    expect(externalIntegration.sendCommand.firstCall.args[2]).to.deep.equal({
+      key: 'clean',
+      fields: { mode: 'a', force: true },
+    });
+  });
+
+  it('should keep the values sent over the declared defaults', async () => {
+    const service = await seedActionsService();
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.getBySelector = fake.resolves(service);
+    externalIntegration.sendCommand = fake.resolves({ success: true });
+    await externalIntegration.runAction(service.selector, 'clean', { mode: 'b', force: false, note: 'hi' });
+    expect(externalIntegration.sendCommand.firstCall.args[2]).to.deep.equal({
+      key: 'clean',
+      fields: { mode: 'b', force: false, note: 'hi' },
+    });
   });
 
   it('should return 404 on an action key not declared in the manifest', async () => {
