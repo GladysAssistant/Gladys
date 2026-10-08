@@ -49,10 +49,6 @@ describe('system.installUpgrade', () => {
 
   beforeEach(async () => {
     system = new System(sequelize, event, config, job);
-    // init() fires the host power detection in the background: on Linux it
-    // creates helper containers through the Dockerode mock, which could land
-    // in the middle of a test and break its createContainer assertions
-    system.detectHostPowerManagement = fake.resolves(null);
     await system.init();
     system.getGladysContainerId = fake.resolves('fb8251117cc4');
     // Reset all fakes invoked within init call
