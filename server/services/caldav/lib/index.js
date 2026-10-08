@@ -1,5 +1,10 @@
 const { formatRecurringEvents, formatEvents, formatCalendars } = require('./calendar/calendar.formaters');
-const { requestCalendars, requestChanges, requestEventsData } = require('./calendar/calendar.requests');
+const {
+  requestCalendars,
+  requestChanges,
+  requestEventsData,
+  requestRecurringEvents,
+} = require('./calendar/calendar.requests');
 const { syncUserCalendars } = require('./calendar/calendar.syncUserCalendars');
 const { syncUserWebcals } = require('./calendar/calendar.syncUserWebcals');
 const { enableCalendar } = require('./calendar/calendar.enableCalendar');
@@ -22,6 +27,7 @@ CalDAVHandler.prototype.formatCalendars = formatCalendars;
 CalDAVHandler.prototype.requestCalendars = requestCalendars;
 CalDAVHandler.prototype.requestChanges = requestChanges;
 CalDAVHandler.prototype.requestEventsData = requestEventsData;
+CalDAVHandler.prototype.requestRecurringEvents = requestRecurringEvents;
 CalDAVHandler.prototype.syncUserCalendars = syncUserCalendars;
 CalDAVHandler.prototype.syncUserWebcals = syncUserWebcals;
 CalDAVHandler.prototype.enableCalendar = enableCalendar;

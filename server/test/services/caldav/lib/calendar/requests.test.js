@@ -6,6 +6,7 @@ const {
   requestCalendars,
   requestChanges,
   requestEventsData,
+  requestRecurringEvents,
 } = require('../../../../../services/caldav/lib/calendar/calendar.requests');
 
 chai.use(chaiAsPromised);
@@ -330,6 +331,71 @@ describe('CalDAV requests', () => {
         summary: 'Evenement 1',
         start: new Date('2018-06-08T00:00:00.000Z'),
         end: new Date('2018-06-09T00:00:00.000Z'),
+      },
+    ]);
+  });
+});
+
+describe('CalDAV recurring events request', () => {
+  it('should request the recurring events only', async () => {
+    const requests = {
+      requestRecurringEvents,
+      dav: {
+        Request: sinon.stub().returns({ request: 'calendar-query' }),
+      },
+      ical: {
+        parseICS: sinon.stub().returns({
+          birthday: {
+            type: 'VEVENT',
+            uid: 'birthday',
+            summary: 'Birthday',
+            start: new Date('2020-10-05'),
+            rrule: 'FREQ=YEARLY',
+          },
+        }),
+      },
+      xmlDom: {
+        DOMParser: sinon.stub().returns({
+          parseFromString: sinon.stub().returns({
+            getElementsByTagName: sinon.stub().returns([
+              {
+                tagName: 'd:response',
+                getElementsByTagName: sinon.stub().returns([
+                  { tagName: 'd:href', childNodes: [{ data: '/home/personal/birthday.ics' }] },
+                  { tagName: 'cal:calendar-data', childNodes: [{ data: 'BEGIN:VCALENDAR' }] },
+                ]),
+              },
+            ]),
+          }),
+        }),
+      },
+    };
+    const xhr = {
+      send: sinon.stub().resolves({ request: { responseText: '<d:multistatus></d:multistatus>' } }),
+    };
+    const setRequestHeader = sinon.stub();
+
+    const events = await requests.requestRecurringEvents(xhr, 'https://caldav.host.com/home/personal');
+
+    const { method, requestData, transformRequest } = requests.dav.Request.args[0][0];
+    expect(method).to.equal('REPORT');
+    expect(requestData).to.contain('<c:calendar-query');
+    expect(requestData).to.contain('<c:prop-filter name="RRULE" />');
+    transformRequest({ setRequestHeader });
+    expect(setRequestHeader.args).to.eql([
+      ['Content-Type', 'application/xml;charset=utf-8'],
+      ['Depth', '1'],
+    ]);
+    expect(xhr.send.args[0]).to.eql([{ request: 'calendar-query' }, 'https://caldav.host.com/home/personal']);
+    expect(requests.ical.parseICS.args[0]).to.eql(['BEGIN:VCALENDAR']);
+    expect(events).to.eql([
+      {
+        href: '/home/personal/birthday.ics',
+        type: 'VEVENT',
+        uid: 'birthday',
+        summary: 'Birthday',
+        start: new Date('2020-10-05'),
+        rrule: 'FREQ=YEARLY',
       },
     ]);
   });

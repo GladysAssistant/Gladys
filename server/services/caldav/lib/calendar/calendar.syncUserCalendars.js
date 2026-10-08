@@ -2,6 +2,10 @@ const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
 const { ServiceNotConfiguredError, NotFoundError } = require('../../../../utils/coreErrors');
 
+// Recurring events are expanded over [now - 1 year, now + 2 years]: refreshing them once a month
+// keeps their future occurrences synchronized long before this time range runs out.
+const RECURRING_EVENTS_REFRESH_INTERVAL_DAYS = 30;
+
 /**
  * @description Return the different URLs an event can be saved with in Gladys.
  * Depending on the CalDAV server, the href returned by the sync-collection report
@@ -26,6 +30,208 @@ function getEventUrls(href) {
  */
 function isDeletedEvent(event) {
   return Object.keys(event.props).length === 0;
+}
+
+/**
+ * @description Tell if the occurrences of the recurring events of a calendar must be computed again.
+ * Recurring events are expanded over a limited time range when they are synchronized: an event that is never
+ * modified on the CalDAV server is never synchronized again, so its occurrences must be refreshed periodically.
+ * @param {object} dayjs - Dayjs instance to use.
+ * @param {object} calendar - Gladys calendar.
+ * @returns {boolean} True if the recurring events of the calendar must be refreshed.
+ * @example
+ * isRecurringEventsRefreshDue(dayjs, { last_sync: '2026-01-01T00:00:00+01:00' })
+ */
+function isRecurringEventsRefreshDue(dayjs, calendar) {
+  return (
+    !calendar.last_sync ||
+    dayjs(calendar.last_sync).isBefore(dayjs().subtract(RECURRING_EVENTS_REFRESH_INTERVAL_DAYS, 'days'))
+  );
+}
+
+/**
+ * @description Save CalDAV events in a Gladys calendar: create or update them, and delete the
+ * occurrences of their recurring events which do not exist anymore.
+ * @param {string} userId - Gladys user, calendar owner.
+ * @param {object} calendar - Gladys calendar where events are saved.
+ * @param {Array} jsonEvents - Events returned by the CalDAV server.
+ * @param {Array} savedEvents - Events already saved in Gladys for this calendar.
+ * @returns {Promise<object>} Resolving with the number of inserted or updated events and of deleted events.
+ * @example
+ * saveEvents.call(caldavHandler, userId, calendar, jsonEvents, savedEvents)
+ */
+async function saveEvents(userId, calendar, jsonEvents, savedEvents) {
+  let insertedOrUpdatedEvent = 0;
+  let deletedEventCount = 0;
+
+  const failedEvents = [];
+  const formatedEvents = this.formatEvents(jsonEvents, calendar, failedEvents);
+  // URLs of the events which could not be formatted or saved: their occurrences already saved in Gladys are kept
+  const failedUrls = new Set(failedEvents.map((failedEvent) => failedEvent.href));
+
+  await Promise.map(
+    formatedEvents,
+    async (formatedEvent) => {
+      const gladysEvents = await this.gladys.calendar.getEvents(userId, {
+        externalId: formatedEvent.external_id,
+      });
+      try {
+        // Create event if it does not already exist in database
+        if (gladysEvents.length === 0) {
+          await this.gladys.calendar.createEvent(calendar.selector, formatedEvent);
+        } else {
+          // Else update existing event
+          await this.gladys.calendar.updateEvent(gladysEvents[0].selector, formatedEvent);
+        }
+
+        insertedOrUpdatedEvent += 1;
+      } catch (e) {
+        logger.error(e);
+        failedUrls.add(formatedEvent.url);
+      }
+    },
+    { concurrency: 1 },
+  );
+
+  // Occurrences of a recurring event that do not exist anymore on the CalDAV server
+  // (recurrence rule shortened, occurrence deleted, exception date added, occurrence now out of
+  // the synchronized time range...) are still saved in Gladys: as events are only created or updated above,
+  // they must be removed here.
+  // Events that could not be formatted were skipped: they are missing from formatedEvents although
+  // they still exist on the CalDAV server, so the version already saved in Gladys is kept.
+  // Likewise, when an occurrence could not be saved (an occurrence moved to another time gets a new external id),
+  // the occurrences already saved for this event are kept rather than deleted without replacement.
+  const upToDateExternalIds = new Set(formatedEvents.map((formatedEvent) => formatedEvent.external_id));
+  const updatedUrls = new Set(
+    jsonEvents.map((jsonEvent) => jsonEvent.href).filter((href) => href && !failedUrls.has(href)),
+  );
+  const outdatedEvents = savedEvents.filter(
+    (savedEvent) => updatedUrls.has(savedEvent.url) && !upToDateExternalIds.has(savedEvent.external_id),
+  );
+
+  await Promise.map(
+    outdatedEvents,
+    async (outdatedEvent) => {
+      await this.gladys.calendar.destroyEvent(outdatedEvent.selector);
+      deletedEventCount += 1;
+    },
+    { concurrency: 1 },
+  );
+
+  return { insertedOrUpdatedEvent, deletedEventCount };
+}
+
+/**
+ * @description Synchronize the events of a CalDAV calendar that changed since a sync token.
+ * Without sync token, every event of the calendar is synchronized.
+ * @param {string} userId - Gladys user, calendar owner.
+ * @param {object} xhr - Request with dav credentials.
+ * @param {string} calDavHost - CalDAV server host.
+ * @param {object} calendar - Gladys calendar to synchronize.
+ * @param {string} syncToken - Sync token of the last synchronization.
+ * @returns {Promise} Resolving once the events are synchronized.
+ * @example
+ * syncEvents.call(caldavHandler, userId, xhr, CALDAV_HOST, calendar, calendar.sync_token)
+ */
+async function syncEvents(userId, xhr, calDavHost, calendar, syncToken) {
+  // Get events that have changed
+  let eventsToUpdate;
+  try {
+    eventsToUpdate = await this.requestChanges(xhr, { ...calendar, sync_token: syncToken });
+  } catch (e) {
+    logger.error(e);
+    throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_CHANGES', log: e.stack });
+  }
+
+  const deletedEvents = eventsToUpdate.filter((eventToUpdate) => isDeletedEvent(eventToUpdate));
+  const updatedEvents = eventsToUpdate.filter((eventToUpdate) => !isDeletedEvent(eventToUpdate));
+
+  // Events already saved in Gladys for this calendar, so they can be compared
+  // with what the CalDAV server returns without querying the database for each of them.
+  const savedEvents =
+    eventsToUpdate.length > 0 ? await this.gladys.calendar.getEvents(userId, { calendarId: calendar.id }) : [];
+
+  // Delete events removed on the CalDAV server.
+  // A recurring event is saved as one Gladys event per occurrence, all sharing the same
+  // URL, so every event matching this URL must be deleted, not only one.
+  const deletedUrls = new Set(deletedEvents.reduce((urls, event) => urls.concat(getEventUrls(event.href)), []));
+  const eventsToDelete = savedEvents.filter((savedEvent) => deletedUrls.has(savedEvent.url));
+
+  let deletedEventCount = 0;
+
+  await Promise.map(
+    eventsToDelete,
+    async (eventToDelete) => {
+      await this.gladys.calendar.destroyEvent(eventToDelete.selector);
+      deletedEventCount += 1;
+    },
+    { concurrency: 1 },
+  );
+
+  let insertedOrUpdatedEvent = 0;
+
+  if (updatedEvents.length > 0) {
+    // Get event updates
+    let jsonEvents;
+    try {
+      jsonEvents = await this.requestEventsData(xhr, calendar.external_id, updatedEvents, calDavHost);
+    } catch (e) {
+      logger.error(e);
+      throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_EVENTS', log: e.stack });
+    }
+
+    const savedCount = await saveEvents.call(this, userId, calendar, jsonEvents, savedEvents);
+    insertedOrUpdatedEvent += savedCount.insertedOrUpdatedEvent;
+    deletedEventCount += savedCount.deletedEventCount;
+  }
+
+  logger.info(
+    `CalDAV : ${insertedOrUpdatedEvent} events updated, ${deletedEventCount} events deleted for calendar ${calendar.name}.`,
+  );
+}
+
+/**
+ * @description Compute again the occurrences of the recurring events of a CalDAV calendar,
+ * so that they keep covering the synchronized time range even if they are never modified.
+ * Only the recurring events are requested to the CalDAV server. If the server does not support
+ * this request, every event of the calendar is synchronized instead.
+ * @param {string} userId - Gladys user, calendar owner.
+ * @param {object} xhr - Request with dav credentials.
+ * @param {string} calDavHost - CalDAV server host.
+ * @param {object} calendar - Gladys calendar to refresh.
+ * @returns {Promise} Resolving once the recurring events are refreshed.
+ * @example
+ * refreshRecurringEvents.call(caldavHandler, userId, xhr, CALDAV_HOST, calendar)
+ */
+async function refreshRecurringEvents(userId, xhr, calDavHost, calendar) {
+  let jsonEvents;
+  try {
+    jsonEvents = await this.requestRecurringEvents(xhr, calendar.external_id);
+  } catch (e) {
+    logger.warn(
+      `CalDAV : unable to request the recurring events of calendar ${calendar.name}, synchronizing all its events instead. ${e.message}`,
+    );
+    await syncEvents.call(this, userId, xhr, calDavHost, calendar, null);
+    return;
+  }
+
+  // A server which does not support the RRULE filter can return every event of the calendar
+  const recurringEvents = jsonEvents.filter((jsonEvent) => jsonEvent.rrule !== undefined);
+
+  const savedEvents =
+    recurringEvents.length > 0 ? await this.gladys.calendar.getEvents(userId, { calendarId: calendar.id }) : [];
+
+  const { insertedOrUpdatedEvent, deletedEventCount } = await saveEvents.call(
+    this,
+    userId,
+    calendar,
+    recurringEvents,
+    savedEvents,
+  );
+
+  logger.info(
+    `CalDAV : ${recurringEvents.length} recurring events refreshed (${insertedOrUpdatedEvent} occurrences updated, ${deletedEventCount} occurrences deleted) for calendar ${calendar.name}.`,
+  );
 }
 
 /**
@@ -77,6 +283,10 @@ async function syncUserCalendars(userId) {
       const gladysCalendar = await this.gladys.calendar.get(userId, { externalId: formatedCalendar.external_id });
       // Create calendar if it does not already exist in database
       if (gladysCalendar.length === 0) {
+        if (formatedCalendar.type !== 'CALDAV') {
+          await this.gladys.calendar.create(formatedCalendar);
+          return null;
+        }
         // The calendar is created without ctag & sync token, so a full sync is done.
         // They are saved only once the events have been successfully synchronized.
         const savedCalendar = await this.gladys.calendar.create({
@@ -88,20 +298,36 @@ async function syncUserCalendars(userId) {
           ctag: formatedCalendar.ctag,
           sync_token: formatedCalendar.sync_token,
         };
+        savedCalendar.syncChanges = true;
         return savedCalendar;
       }
 
-      // Else update it if sync is enable on calendar & events change
-      if (gladysCalendar[0].sync && formatedCalendar.ctag !== gladysCalendar[0].ctag) {
-        delete formatedCalendar.sync;
-        // For a CalDAV calendar, the new ctag & sync token are saved only once the events
-        // have been synchronized: if this sync fails, Gladys would otherwise consider the
-        // calendar up to date and never fetch those changes again.
-        if (gladysCalendar[0].type === 'CALDAV') {
-          return { ...gladysCalendar[0], newProperties: formatedCalendar };
+      if (!gladysCalendar[0].sync) {
+        return null;
+      }
+
+      const ctagChanged = formatedCalendar.ctag !== gladysCalendar[0].ctag;
+      delete formatedCalendar.sync;
+
+      // For a CalDAV calendar, the new ctag & sync token are saved only once the events
+      // have been synchronized: if this sync fails, Gladys would otherwise consider the
+      // calendar up to date and never fetch those changes again.
+      if (gladysCalendar[0].type === 'CALDAV') {
+        const refreshDue = isRecurringEventsRefreshDue(this.dayjs, gladysCalendar[0]);
+        if (!ctagChanged && !refreshDue) {
+          return null;
         }
+        return {
+          ...gladysCalendar[0],
+          newProperties: ctagChanged ? formatedCalendar : {},
+          syncChanges: ctagChanged,
+          refreshRecurringEvents: refreshDue,
+        };
+      }
+
+      // Else update it if events change
+      if (ctagChanged) {
         await this.gladys.calendar.update(gladysCalendar[0].selector, formatedCalendar);
-        return gladysCalendar[0];
       }
       return null;
     },
@@ -109,115 +335,28 @@ async function syncUserCalendars(userId) {
   );
 
   await Promise.map(
-    calendarsToUpdate.filter((updatedCalendar) => updatedCalendar !== null && updatedCalendar.type === 'CALDAV'),
+    calendarsToUpdate.filter((calendarToUpdate) => calendarToUpdate !== null),
     async (calendarToUpdate) => {
-      // Get events that have changed
-      let eventsToUpdate;
-      try {
-        eventsToUpdate = await this.requestChanges(xhr, calendarToUpdate);
-      } catch (e) {
-        logger.error(e);
-        throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_CHANGES', log: e.stack });
+      const { newProperties } = calendarToUpdate;
+      // Without sync token, every event of the calendar is synchronized, so the occurrences
+      // of all its recurring events are computed again.
+      const fullSync = calendarToUpdate.syncChanges && !calendarToUpdate.sync_token;
+
+      if (calendarToUpdate.syncChanges) {
+        await syncEvents.call(this, userId, xhr, CALDAV_HOST, calendarToUpdate, calendarToUpdate.sync_token);
       }
 
-      const deletedEvents = eventsToUpdate.filter((eventToUpdate) => isDeletedEvent(eventToUpdate));
-      const updatedEvents = eventsToUpdate.filter((eventToUpdate) => !isDeletedEvent(eventToUpdate));
-
-      // Events already saved in Gladys for this calendar, so they can be compared
-      // with what the CalDAV server returns without querying the database for each of them.
-      const savedEvents =
-        eventsToUpdate.length > 0
-          ? await this.gladys.calendar.getEvents(userId, { calendarId: calendarToUpdate.id })
-          : [];
-
-      // Delete events removed on the CalDAV server.
-      // A recurring event is saved as one Gladys event per occurrence, all sharing the same
-      // URL, so every event matching this URL must be deleted, not only one.
-      const deletedUrls = new Set(deletedEvents.reduce((urls, event) => urls.concat(getEventUrls(event.href)), []));
-      const eventsToDelete = savedEvents.filter((savedEvent) => deletedUrls.has(savedEvent.url));
-
-      let deletedEventCount = 0;
-
-      await Promise.map(
-        eventsToDelete,
-        async (eventToDelete) => {
-          await this.gladys.calendar.destroyEvent(eventToDelete.selector);
-          deletedEventCount += 1;
-        },
-        { concurrency: 1 },
-      );
-
-      let insertedOrUpdatedEvent = 0;
-
-      if (updatedEvents.length > 0) {
-        // Get event updates
-        let jsonEvents;
-        try {
-          jsonEvents = await this.requestEventsData(xhr, calendarToUpdate.external_id, updatedEvents, CALDAV_HOST);
-        } catch (e) {
-          logger.error(e);
-          throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_EVENTS', log: e.stack });
-        }
-
-        const failedEvents = [];
-        const formatedEvents = this.formatEvents(jsonEvents, calendarToUpdate, failedEvents);
-
-        await Promise.map(
-          formatedEvents,
-          async (formatedEvent) => {
-            const gladysEvents = await this.gladys.calendar.getEvents(userId, {
-              externalId: formatedEvent.external_id,
-            });
-            try {
-              // Create event if it does not already exist in database
-              if (gladysEvents.length === 0) {
-                await this.gladys.calendar.createEvent(calendarToUpdate.selector, formatedEvent);
-              } else {
-                // Else update existing event
-                await this.gladys.calendar.updateEvent(gladysEvents[0].selector, formatedEvent);
-              }
-
-              insertedOrUpdatedEvent += 1;
-            } catch (e) {
-              logger.error(e);
-            }
-          },
-          { concurrency: 1 },
-        );
-
-        // Occurrences of a recurring event that do not exist anymore on the CalDAV server
-        // (recurrence rule shortened, occurrence deleted, exception date added...) are still
-        // saved in Gladys: as events are only created or updated above, they must be removed here.
-        // Events that could not be formatted were skipped: they are missing from formatedEvents although
-        // they still exist on the CalDAV server, so the version already saved in Gladys is kept.
-        const upToDateExternalIds = new Set(formatedEvents.map((formatedEvent) => formatedEvent.external_id));
-        const failedUrls = new Set(failedEvents.map((failedEvent) => failedEvent.href));
-        const updatedUrls = new Set(
-          jsonEvents.map((jsonEvent) => jsonEvent.href).filter((href) => href && !failedUrls.has(href)),
-        );
-        const outdatedEvents = savedEvents.filter(
-          (savedEvent) => updatedUrls.has(savedEvent.url) && !upToDateExternalIds.has(savedEvent.external_id),
-        );
-
-        await Promise.map(
-          outdatedEvents,
-          async (outdatedEvent) => {
-            await this.gladys.calendar.destroyEvent(outdatedEvent.selector);
-            deletedEventCount += 1;
-          },
-          { concurrency: 1 },
-        );
+      if (calendarToUpdate.refreshRecurringEvents && !fullSync) {
+        await refreshRecurringEvents.call(this, userId, xhr, CALDAV_HOST, calendarToUpdate);
       }
 
-      logger.info(
-        `CalDAV : ${insertedOrUpdatedEvent} events updated, ${deletedEventCount} events deleted for calendar ${calendarToUpdate.name}.`,
-      );
+      if (fullSync || calendarToUpdate.refreshRecurringEvents) {
+        newProperties.last_sync = this.dayjs().format();
+      }
 
       // Every change was applied, the calendar can now be marked as up to date. Events that could not be
       // formatted keep their previous version: fetching them again at each synchronization would not fix them.
-      if (calendarToUpdate.newProperties) {
-        await this.gladys.calendar.update(calendarToUpdate.selector, calendarToUpdate.newProperties);
-      }
+      await this.gladys.calendar.update(calendarToUpdate.selector, newProperties);
     },
     { concurrency: 1 },
   );
