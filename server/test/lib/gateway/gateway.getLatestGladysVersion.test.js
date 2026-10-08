@@ -52,6 +52,7 @@ describe('gateway.getLatestGladysVersion', () => {
       is_docker: false,
     });
     system.isDocker = fake.resolves(true);
+    system.isOfficialReleaseImage = fake.returns(true);
     system.saveLatestGladysVersion = fake.returns(null);
     system.shutdown = fake.resolves(true);
 
@@ -70,5 +71,15 @@ describe('gateway.getLatestGladysVersion', () => {
     expect(version).to.have.property('created_at');
     assert.calledOnce(system.saveLatestGladysVersion);
     assert.calledOnceWithExactly(service.getUsage);
+  });
+
+  it('should not call Gladys Plus when the instance is not an official release image', async () => {
+    system.isOfficialReleaseImage = fake.returns(false);
+    const version = await gateway.getLatestGladysVersion();
+    expect(version).to.equal(null);
+    assert.notCalled(gateway.gladysGatewayClient.getLatestGladysVersion);
+    assert.notCalled(system.getInfos);
+    assert.notCalled(service.getUsage);
+    assert.notCalled(system.saveLatestGladysVersion);
   });
 });

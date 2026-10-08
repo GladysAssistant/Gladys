@@ -30,7 +30,8 @@ async function checkIfGladysUpgraded(gateway, waitTimeBetweenMessages = 300) {
         }
         await Promise.delay(waitTimeBetweenMessages);
         const gladysVersionInfos = await gateway.getLatestGladysVersion();
-        if (gladysVersionInfos.name === this.gladysVersion) {
+        // null when this instance is not an official release image: no release note to send
+        if (gladysVersionInfos && gladysVersionInfos.name === this.gladysVersion) {
           try {
             // If the user is french && there is a french release note link
             if (admin.language === 'fr' && gladysVersionInfos.fr_release_note_link) {
