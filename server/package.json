@@ -102,7 +102,7 @@
     "lodash.clonedeep": "^4.5.0",
     "lodash.intersection": "^4.4.0",
     "lru-cache": "^11.2.2",
-    "mathjs": "^11.8.0",
+    "mathjs": "^11.12.0",
     "multicast-dns": "^7.2.5",
     "node-schedule": "^2.1.0",
     "path-to-regexp": "^6.2.1",

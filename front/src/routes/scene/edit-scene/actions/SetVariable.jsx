@@ -6,6 +6,7 @@ import get from 'get-value';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
+import FormulaFunctionsHelp from '../../../../components/scene/FormulaFunctionsHelp';
 import style from './DeviceSetValue.css';
 
 class SetVariable extends Component {
@@ -71,6 +72,7 @@ class SetVariable extends Component {
           <div className={style.explanationText}>
             <Text id="editScene.actionsCard.setVariable.computedExplanationText" />
           </div>
+          <FormulaFunctionsHelp />
           <div className="tags-input">
             <Localizer>
               <TextWithVariablesInjected

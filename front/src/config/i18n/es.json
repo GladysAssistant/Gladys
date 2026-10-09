@@ -3452,6 +3452,14 @@
     "addNewTriggerButton": "Añadir activador",
     "saveSceneError": "Se produjo un error al guardar su escena. Compruebe que todas las acciones/activadores estén completos y sean correctos.",
     "actionsCard": {
+      "formulaHelp": {
+        "toggle": "Funciones disponibles y sintaxis",
+        "operators": "Operadores disponibles:",
+        "functions": "Funciones disponibles:",
+        "constants": "Constantes disponibles:",
+        "example": "Una función recibe sus argumentos entre paréntesis, separados por comas. Ej.: round(min(100, 3 * 45) / 2)",
+        "caveats": "Atención: las funciones trigonométricas trabajan en radianes (sin(pi/2), no sin(90)), log es el logaritmo natural (use log10 para la base 10), randomInt(min, max) nunca devuelve max, y las constantes deben multiplicarse explícitamente (2*pi, no 2 pi)."
+      },
       "delay": {
         "label": " Este bloque esperará la duración especificada.",
         "inputPlaceholder": "Duración",
