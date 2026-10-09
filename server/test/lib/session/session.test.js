@@ -279,6 +279,11 @@ describe('session.setTabletMode', () => {
     );
     await assert.isRejected(promise, 'House not found');
   });
+  it('should reject when there is no local session', async () => {
+    const session = new Session('secret', cache);
+    const promise = session.setTabletMode('0cd30aef-9c4e-4a23-88e3-3547971296e5', undefined, true, 'test-house');
+    await assert.isRejected(promise, 'Tablet mode requires a local session');
+  });
 });
 
 describe('session.getTabletMode', () => {
@@ -344,5 +349,15 @@ describe('session.getTabletMode', () => {
       'eb260700-26d5-49ec-910f-aca90b42f585',
     );
     await assert.isRejected(promise, 'Session not found');
+  });
+  it('should return tablet mode disabled when there is no local session', async () => {
+    const session = new Session('secret', cache);
+    const oneSession = await session.getTabletMode('0cd30aef-9c4e-4a23-88e3-3547971296e5', undefined);
+    expect(oneSession).to.deep.equal({
+      id: null,
+      tablet_mode: false,
+      current_house_id: null,
+      has_alarm_code: false,
+    });
   });
 });
