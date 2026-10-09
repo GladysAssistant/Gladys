@@ -1,6 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { Error400 } = require('../../utils/httpErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
+const { ensureSelfOrAdmin } = require('../utils/ensureSelfOrAdmin');
 
 /**
  * @apiDefine HouseParam
@@ -103,6 +104,7 @@ module.exports = function HouseController(gladys) {
    * @apiName userSeen
    * @apiGroup House
    * @apiDescription Call this API if a user is seen in a house.
+   * Only the user themselves or an admin can mark a user as seen.
    * @apiSuccessExample {json} Success-Example
    * {
    *   "id": "e4e3f03e-60b9-485e-bc0a-c582b69089bd",
@@ -115,6 +117,7 @@ module.exports = function HouseController(gladys) {
    * }
    */
   async function userSeen(req, res) {
+    ensureSelfOrAdmin(req, req.params.user_selector);
     const user = await gladys.house.userSeen(req.params.house_selector, req.params.user_selector);
     res.json(user);
   }
@@ -170,8 +173,8 @@ module.exports = function HouseController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/house/:house_selector/disarm Disarm
-   * @apiName Disarm
+   * @api {post} /api/v1/house/:house_selector/panic Panic
+   * @apiName Panic
    * @apiGroup Alarm
    */
   async function panic(req, res) {

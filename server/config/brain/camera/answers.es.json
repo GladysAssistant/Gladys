@@ -1,0 +1,15 @@
+[
+  {
+    "label": "camera.get-image.success",
+    "answers": ["Aquí está lo que veo:"]
+  },
+
+  {
+    "label": "camera.get-image.no-image-found",
+    "answers": ["Lo siento, no puedo obtener una imagen reciente."]
+  },
+  {
+    "label": "camera.get-image.fail",
+    "answers": ["Lo siento, ha ocurrido un error al acceder a la cámara"]
+  }
+]

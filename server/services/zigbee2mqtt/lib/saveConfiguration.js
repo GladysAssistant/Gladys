@@ -13,6 +13,9 @@ async function saveConfiguration(config) {
 
   const keyValueMap = {
     [CONFIGURATION.Z2M_TCP_PORT]: config.z2mTcpPort,
+    [CONFIGURATION.Z2M_ADAPTER_MODE]: config.z2mAdapterMode,
+    [CONFIGURATION.Z2M_NETWORK_ADAPTER_URL]: config.z2mNetworkAdapterUrl,
+    [CONFIGURATION.Z2M_NETWORK_ADAPTER_TYPE]: config.z2mNetworkAdapterType,
     [CONFIGURATION.Z2M_MQTT_USERNAME_KEY]: config.z2mMqttUsername,
     [CONFIGURATION.Z2M_MQTT_PASSWORD_KEY]: config.z2mMqttPassword,
     [CONFIGURATION.MQTT_URL_KEY]: config.mqttUrl,

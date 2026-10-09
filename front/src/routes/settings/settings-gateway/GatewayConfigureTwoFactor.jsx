@@ -1,6 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus, LoginStatus } from '../../../utils/consts';
+import TwoFactorAppList from '../../../components/gateway/TwoFactorAppList';
 
 const GatewayConfigureTwoFactor = ({ children, ...props }) => (
   <form onSubmit={props.enableTwoFactor} class="card">
@@ -33,6 +34,7 @@ const GatewayConfigureTwoFactor = ({ children, ...props }) => (
               <Text id="gatewayLogin.unknownError" />
             </div>
           )}
+          <TwoFactorAppList />
           <p>
             <Text id="gatewayConfigureTwoFactor.scanInstructions" />
           </p>

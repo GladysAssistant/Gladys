@@ -5,6 +5,7 @@
     "new": "Neu",
     "orderDirAsc": "A - Z",
     "orderDirDesc": "Z - A",
+    "orderDirLabel": "Sortierreihenfolge",
     "emptySelectOption": "---------",
     "backButton": "◀️️ Zurück",
     "requiredField": "*",
@@ -34,6 +35,9 @@
     "expand": "Ausklappen",
     "loading": "Lädt...",
     "preview": "Vorschau"
+  },
+  "errorBoundary": {
+    "message": "Beim Anzeigen ist ein Fehler aufgetreten. Lade die Seite neu und überprüfe die Konfiguration, falls es erneut auftritt."
   },
   "color": {
     "aqua": "Aqua",
@@ -72,11 +76,13 @@
       "modalTitle": "„{{name}}“ migrieren",
       "description": "Migriere dieses Gerät zu einem Gerät einer anderen Integration: sein <b>Zustandsverlauf</b>, die <b>Szenen</b> und die <b>Dashboards</b>, die es verwenden, werden auf das Zielgerät übertragen, danach wird <b>dieses Gerät gelöscht</b>. Haben beide Geräte im selben Zeitraum Zustände aufgezeichnet, wird nur der Verlauf vor dem ersten Zustand des Zielgeräts übernommen, damit nichts doppelt gezählt wird.",
       "destinationLabel": "Zielgerät",
+      "unknownIntegration": "Unbekannte Integration",
       "featuresTitle": "Zuordnung der Funktionen",
       "doNotMigrate": "Nicht migrieren",
       "typeMismatchWarning": "Diese Funktion hat einen anderen Typ als die Quellfunktion: ihr Verlauf ergibt nach der Migration möglicherweise keinen Sinn mehr.",
       "unitMismatchWarning": "Diese Funktion hat eine andere Einheit als die Quellfunktion: die Werte werden ohne Umrechnung übernommen, die Diagramme können dadurch inkonsistent werden.",
       "unmappedWarning": "Einige Funktionen sind nicht zugeordnet: ihr Verlauf wird gelöscht, und die Szenen und Dashboards, die sie verwenden, werden nicht aktualisiert.",
+      "playNotificationWarning": "Das Zielgerät kann keine Benachrichtigungen abspielen: die Szenen, die über diesen Lautsprecher „sprechen“, werden auf das Zielgerät umgeleitet und schlagen bei der Ausführung fehl. Wähle ein kompatibles Zielgerät oder passe diese Szenen nach der Migration an.",
       "noDestinationAvailable": "Es wurde kein Gerät einer anderen Integration gefunden. Erstelle zuerst das Zielgerät in seiner neuen Integration und komme dann hierher zurück, um zu migrieren.",
       "loadError": "Die Geräteliste konnte nicht geladen werden. Bitte versuche es erneut.",
       "migrateError": "Die Migration ist fehlgeschlagen. Das alte Gerät wurde nicht gelöscht, aber ein Teil des Verlaufs wurde möglicherweise bereits zum Zielgerät verschoben. Überprüfe die Aufgaben-Seite und deine Geräteliste und versuche es dann erneut: ein neuer Versuch migriert nur, was noch übrig ist.",
@@ -97,14 +103,44 @@
     "allRooms": "Alle Räume",
     "noRoom": "Kein Raum",
     "allIntegrations": "Alle Integrationen",
+    "nativeIntegrations": "Native Integrationen",
+    "communityIntegrations": "Community-Integrationen",
     "device": "Gerät",
     "room": "Raum",
     "integration": "Integration",
     "features": "Funktionen",
-    "openInIntegration": "In der Integration öffnen",
+    "orderByStatesDesc": "Aktivste zuerst",
+    "verbose": {
+      "badge": "Sehr aktiv",
+      "details": "{{count}} Werte in {{hours}} Std. gespeichert ({{features}})",
+      "detailsWithoutFeatures": "{{count}} Werte in {{hours}} Std. gespeichert",
+      "summary": {
+        "one": "1 sehr aktives Gerät macht {{percent}} % der Werte aus, die in den letzten {{hours}} Stunden im Verlauf gespeichert wurden.",
+        "other": "{{count}} sehr aktive Geräte machen {{percent}} % der Werte aus, die in den letzten {{hours}} Stunden im Verlauf gespeichert wurden."
+      },
+      "explanation": "Ein Gerät wird markiert, wenn eine seiner Funktionen mindestens {{threshold}} Werte in {{hours}} Stunden speichert. Wenn du diesen Verlauf nicht brauchst, deaktiviere ihn auf der Geräteseite, um die Datenbank zu entlasten.",
+      "showOnlyVerbose": "Nur diese Geräte anzeigen",
+      "showAll": "Alle Geräte anzeigen"
+    },
     "emptyState": "Keine Geräte gefunden. Füge Geräte über die Integrationsseite hinzu oder passe deine Suche und Filter an.",
     "emptyStateButton": "Integrationen durchsuchen",
-    "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut."
+    "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
+    "exportCsv": "Als CSV exportieren",
+    "export": {
+      "modalTitle": "Verlauf von {{name}} exportieren",
+      "description": "Lade den Verlauf dieses Geräts als CSV-Datei herunter, um ihn in einer Tabellenkalkulation auszuwerten.",
+      "featuresLabel": "Zu exportierende Funktionen",
+      "periodLabel": "Zeitraum",
+      "startLabel": "Von",
+      "endLabel": "Bis",
+      "invalidPeriod": "Das Enddatum darf nicht vor dem Startdatum liegen.",
+      "noFeatureSelected": "Wähle mindestens eine Funktion zum Exportieren aus.",
+      "progress": "{{count}} Messwerte exportiert …",
+      "error": "Der CSV-Export ist fehlgeschlagen. Bitte versuche es erneut.",
+      "cancelButton": "Abbrechen",
+      "exportButton": "Exportieren",
+      "closeButton": "Schließen"
+    }
   },
   "login": {
     "title": "Gladys Assistant",
@@ -156,6 +192,7 @@
       "english": "English",
       "french": "Français",
       "german": "Deutsch",
+      "spanish": "Español",
       "birthdateLabel": "Geburtsdatum",
       "birthdatePlaceHolder": "Gib dein Geburtsdatum ein",
       "january": "Januar",
@@ -276,17 +313,22 @@
       }
     },
     "success": {
-      "title": "Vielen Dank!",
-      "introduction": "Ich bin <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\">Pierre-Gilles Leymarie</a> und habe 2013 mit der Arbeit an Gladys Assistant begonnen.",
-      "thanksForChoosingOpenSource": "Ich möchte dir dafür danken, dass du dich für Gladys entschieden hast. Ich hoffe, du wirst genauso viel Freude beim Verwenden dieser Software haben, wie ich beim Entwickeln hatte.",
-      "ifYouWantToSupportThisSoftware": "Ich bin auf Unterstützungen angewiesen, um an diesem Projekt nachhaltig arbeiten zu können. Wenn du Gladys unterstützen und Zugang zu zusätzlichen Funktionen erhalten möchtest, dann kannst du dies mittels <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a> tun.",
+      "title": "Willkommen bei Gladys!",
+      "subtitle": "Dein Assistent ist bereit. Alles läuft bei dir zu Hause – und deine Daten bleiben dort.",
+      "integrationsTitle": "Verbinde dein ganzes Zuhause",
+      "integrationsText": "Zigbee, Matter, Z-Wave, MQTT, Philips Hue, Sonos … Gladys funktioniert mit Tausenden Geräten, und dank externer Integrationen kommen laufend neue dazu – ganz ohne neue Gladys-Version.",
+      "scenesTitle": "Automatisiere deinen Alltag",
+      "scenesText": "Erstelle Szenen, die auf dein Zuhause reagieren: Licht bei Sonnenuntergang, smarte Heizung, Benachrichtigungen, Morgenroutinen … Dein Zuhause arbeitet für dich, auch wenn du gerade nicht daran denkst.",
+      "openSourceTitle": "Ein völlig offenes Projekt",
+      "openSourceText": "Gladys ist 100 % <a href=\"https://github.com/GladysAssistant/Gladys\" target=\"_blank\" rel=\"noopener noreferrer\">Open Source</a> und offen für Entwicklungen: Baue eigene Integrationen, bring deine Ideen ein, werde Teil der <a href=\"https://community.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">Community</a>.",
+      "closing": "Wir sind gespannt, was du mit Gladys machen wirst!",
       "goToDashboardButton": "Zum Dashboard gehen"
     }
   },
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Bearbeiten",
-    "newDashboardButton": "Hinzufügen",
+    "allDashboardsButton": "Alle Dashboards",
     "enableFullScreen": "Vollbild",
     "disableFullScreen": "Vollbild beenden",
     "editDashboardTitle": "Dashboard bearbeiten",
@@ -305,9 +347,8 @@
     },
     "duckDbMigrationInProgress": "Ihre Instanz Gladys ist dabei, ihre Datenbank auf DuckDB umzustellen, ein neues, leistungsfähigeres Datenbanksystem für Zeitseriendaten. Diese Aufgabe kann einige Zeit in Anspruch nehmen, und während dieser Zeit werden nicht alle Ihre Grafiken verfügbar sein. Fortschritt der Migration = {{progress}}%",
     "editDashboardSaveButton": "Sichern",
-    "emptyDashboardSentenceTop": "Dein Dashboard wurde noch nicht konfiguriert.",
-    "emptyDashboardSentenceBottom": "Klicke auf \"Bearbeiten\", um dein Dashboard zu gestalten.",
-    "noDashboardSentenceBottom": "Klicke auf \"Hinzufügen\", um ein neues Dashboard zu erstellen.",
+    "editDashboardSavedButton": "Gesichert",
+    "editDashboardDoneButton": "Fertig",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Sichtbarkeit",
@@ -318,14 +359,27 @@
       "public": "öffentlich"
     },
     "editDashboardAddColumnButton": "Eine Spalte zum Dashboard hinzufügen",
+    "editDashboardAddSectionButton": "Einen Abschnitt hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
-    "editDashboardExplanation": "Jedes Dashboard hat 3 Spalten, die du nach Belieben füllen kannst. Klicke auf \"+\", um ein neues Widget hinzuzufügen. Du kannst dieses Widget bewegen, indem du es greifst und verschiebst.",
+    "editDashboardExplanation": "Das ist dein echtes Dashboard: Tippe auf ein Widget, um es zu bearbeiten, nutze die +-Buttons für Widgets, Spalten oder Abschnitte. Ziehe Widgets zum Verschieben — auf dem Handy nutze die Pfeile.",
+    "editorDashboardSettingsButton": "Dashboard-Einstellungen",
+    "editorDashboardSettings": "Dashboard-Einstellungen",
+    "editorMoveSectionUp": "Abschnitt nach oben verschieben",
+    "editorColumnWidthWide": "Spalte verbreitern (doppelte Breite)",
+    "editorColumnWidthNormal": "Zurück zur normalen Spaltenbreite",
+    "editorMoveSectionDown": "Abschnitt nach unten verschieben",
+    "editorNewWidget": "Neues Widget",
+    "editorNewWidgetPlaceholder": "Wähle ein Widget im Panel",
     "reorderDashboardButton": "Dashboards neu anordnen",
     "stopReorderingDashboardButton": "Anordnen der Dashboards beenden",
     "addBoxButton": "Hinzufügen",
     "selectBoxType": "Typ auswählen",
     "selectBoxTypeLabel": "Wähle aus, welches Widget hier angezeigt werden soll",
+    "selectBoxTypeSearchPlaceholder": "Widget suchen (Uhr, Kamera…)",
+    "selectBoxTypeNoResult": "Kein Widget entspricht \"{{search}}\"",
+    "selectBoxTypeCoreSection": "Gladys-Widgets",
+    "selectBoxTypeIntegrationSection": "Integrations-Widgets",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Wetter",
@@ -346,10 +400,16 @@
       "voice-assistant": "Sprachassistent",
       "link": "Link",
       "photo": "Foto",
-      "sun": "Sonne"
+      "sun": "Sonne",
+      "chips": "Status-Chips",
+      "actions": "Schnellaktionen",
+      "house-view": "Hausansicht",
+      "external-widget": "Integrations-Widget",
+      "energy-price": "Strompreis"
     },
     "boxes": {
       "column": "Spalte {{index}}",
+      "section": "Abschnitt {{index}}",
       "deleteButton": "Löschen",
       "weather": {
         "editHouseLabel": "Wähle ein Zuhause aus. Ich werde seine Breiten- und Längengrade verwenden, um das Wetter abzurufen.",
@@ -401,6 +461,12 @@
           "thunderstorm": "Gewitter",
           "wind": "Windig",
           "night": "Nacht",
+          "freezing-rain": "Gefrierender Regen",
+          "freezing-fog": "Gefrierender Nebel",
+          "snow-thunderstorm": "Gewittrige Schneeschauer",
+          "sandstorm": "Sandsturm",
+          "tornado": "Tornado",
+          "hurricane": "Hurrikan",
           "unknown": "Nicht verfügbar"
         },
         "moonPhases": {
@@ -466,6 +532,7 @@
       "camera": {
         "editCameraLabel": "Wähle die Kamera aus, die du hier anzeigen möchtest.",
         "noImageToShow": "Kein Bild zum Anzeigen. Bist du sicher, dass deine Kamera verbunden und für Gladys zugänglich ist?",
+        "cameraDisabled": "Diese Kamera ist deaktiviert. Du kannst sie über die Geräteseite, ein Dashboard-Steuerelement oder eine Szene wieder einschalten.",
         "editBoxNameLabel": "Gib den Namen für die Box ein:",
         "editBoxNamePlaceholder": "Name der Box",
         "latencyBoxName": "Latenz",
@@ -491,6 +558,7 @@
         "lastHour": "Letzte Stunde",
         "lastTwelveHours": "Letzte 12 Stunden",
         "lastDay": "Letzte 24 Stunden",
+        "lastThreeDays": "Letzte 3 Tage",
         "lastSevenDays": "Letzte 7 Tage",
         "lastThirtyDays": "Letzte 30 Tage",
         "lastThreeMonths": "Letzte 3 Monate",
@@ -498,7 +566,6 @@
         "showAdvancedOptions": "Erweiterte Optionen anzeigen",
         "hideAdvancedOptions": "Erweiterte Optionen verbergen",
         "noValue": "Keine Werte in diesem Intervall aufgezeichnet.",
-        "noValueWarning": "Warnung: Wenn du dieses Gerät gerade konfiguriert hast, kann es einige Zeit dauern, bis hier etwas angezeigt wird: Gladys benötigt etwas Zeit, um genügend Daten zu sammeln. Bei Intervallen über 24 Stunden kann es bis zu 24 Stunden dauern, bis hier etwas angezeigt wird.",
         "noChartType": "Kein Diagrammtyp ausgewählt",
         "noChartTypeWarning": "Wenn du dieses Gerät gerade konfiguriert hast, bitte gehe zurück zur Seite der Box-Bearbeitung und wähle einen Diagrammtyp aus.",
         "editNameLabel": "Gib den Namen dieser Widget ein",
@@ -579,7 +646,8 @@
         "currentHourState": "Aktuell",
         "peakHour": "Hochtarifstunde",
         "offPeakHour": "Niedrigtarifstunde",
-        "dayPeakTitle": "Tempo-Tage"
+        "dayPeakTitle": "Tempo-Tage",
+        "error": "EDF-Tempo-Daten konnten nicht geladen werden. Prüfe, ob der EDF-Tempo-Dienst eingerichtet ist."
       },
       "clock": {
         "analog": "Analog",
@@ -609,7 +677,9 @@
       "scene": {
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
-        "editSceneLabel": "Wähle die Szene aus, die hier angezeigt werden soll."
+        "editSceneLabel": "Wähle die Szene aus, die hier angezeigt werden soll.",
+        "editStatusFeatureLabel": "Live-Status unter jeder Schaltfläche (optional)",
+        "editStatusFeatureDescription": "Wählen Sie eine Gerätefunktion, um ihren Status unter der Szenen-Schaltfläche anzuzeigen, z. B. Rollladenposition oder Staubsauger-Status."
       },
       "link": {
         "editTitleLabel": "Titel",
@@ -677,7 +747,9 @@
         "error": "Fehler beim Laden der Energieverbrauchsdaten",
         "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar",
         "showSubscriptionPrices": "Abonnementpreise anzeigen",
-        "showSubscriptionPricesDescription": "Zeigt die monatlichen Abonnementkosten zusammen mit den Verbrauchsdaten im Diagramm an."
+        "showSubscriptionPricesDescription": "Zeigt die Abonnementkosten des Zählervertrags zusammen mit den Verbrauchsdaten im Diagramm an.",
+        "periodStartDay": "Starttag des Abrechnungszeitraums",
+        "periodStartDayDescription": "Tag des Monats, an dem der Abrechnungszeitraum Ihres Energieversorgers beginnt. Die Monats- und Jahresansicht laufen dann von diesem Tag bis zum gleichen Tag des nächsten Zeitraums (z. B. vom 5. bis zum 5.), damit sie mit Ihrer Rechnung verglichen werden können. Ist ein Monat kürzer als dieser Tag, beginnt der Zeitraum am letzten Tag dieses Monats."
       },
       "voice-assistant": {
         "speak": "Sprechen",
@@ -696,9 +768,152 @@
         "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfen Sie, ob es von einer anderen App verwendet wird.",
         "errorNoSpeech": "Keine Stimme erkannt. Prüfen Sie, ob Ihr Mikrofon aktiviert ist, und versuchen Sie es erneut.",
         "errorNoTranscription": "Ich habe Ihre Nachricht nicht verstanden. Sprechen Sie näher ans Mikrofon und versuchen Sie es erneut.",
+        "errorPaymentRequired": "Dein Gladys-Plus-Abonnement ist ausgesetzt: Eine Zahlung ist erforderlich. Der Sprachassistent ist bis zur Zahlung pausiert.",
         "configDescription": "Dieses Widget nutzt Gladys Plus für Spracherkennung, KI und Sprachausgabe. Verbinden Sie Ihre Instanz mit Gladys Plus, um es zu nutzen.",
         "plusRequiredHint": "Gladys Plus verbinden, um das Mikrofon zu aktivieren."
+      },
+      "chips": {
+        "editDescription": "Eine kompakte Leiste mit Status-Chips. Chips hinzufügen und auswählen, was jeder anzeigt.",
+        "editChipLabel": "Chip {{index}}",
+        "removeChipButton": "Chip {{index}} entfernen",
+        "editChipTypeLabel": "Was soll dieser Chip anzeigen?",
+        "chipTypes": {
+          "device-feature": "Ein Gerätestatus",
+          "openings": "Übersicht der Öffnungen (Türen/Fenster)",
+          "alarm": "Alarmstatus",
+          "calendar-next-event": "Nächster Kalendertermin"
+        },
+        "editDeviceFeatureLabel": "Gerätefunktion",
+        "editHouseLabel": "Haus",
+        "editRoomLabel": "Raum (optional, zur Eingrenzung)",
+        "editCalendarLabel": "Kalender",
+        "allCalendars": "Alle Kalender",
+        "editEventNameFilterLabel": "Nur Termine mit (optional)",
+        "editEventNameFilterPlaceholder": "z. B. Müll",
+        "editLabelLabel": "Beschriftung (optional)",
+        "editLabelPlaceholder": "z. B. Garage",
+        "addChipButton": "Chip hinzufügen",
+        "openings": "{{count}} offen",
+        "allClosed": "Alles geschlossen",
+        "noEvent": "Kein anstehender Termin",
+        "error": "Fehler",
+        "alarmModes": {
+          "disarmed": "Deaktiviert",
+          "armed": "Aktiviert",
+          "partially-armed": "Teilweise aktiviert",
+          "panic": "Panik"
+        }
+      },
+      "actions": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Rollläden, Lichter…",
+        "actionLabel": "Aktion {{index}}",
+        "removeActionButton": "Aktion {{index}} entfernen",
+        "actionTypeLabel": "Aktionstyp",
+        "actionTypes": {
+          "scene": "Szene starten",
+          "device-feature": "Gerät steuern"
+        },
+        "sceneLabel": "Szene",
+        "deviceFeatureLabel": "Gerätefunktion",
+        "commandLabel": "Befehl",
+        "commands": {
+          "open": "Öffnen",
+          "stop": "Stopp",
+          "close": "Schließen"
+        },
+        "labelLabel": "Button-Beschriftung (optional)",
+        "labelPlaceholder": "EG öffnen…",
+        "addActionButton": "Aktion hinzufügen",
+        "noActions": "Noch keine Aktion konfiguriert. Bearbeite das Dashboard, um welche hinzuzufügen."
+      },
+      "house-view": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "z. B. Mein Haus",
+        "editGalleryLabel": "Illustration auswählen",
+        "editUploadLabel": "Oder eigenes Bild hochladen",
+        "uploading": "Wird hochgeladen...",
+        "uploadError": "Das Bild konnte nicht hochgeladen werden. Versuchen Sie ein kleineres Bild.",
+        "editPinsLabel": "Live-Werte auf dem Bild",
+        "editPinsDescription": "Klicken Sie auf das Bild, um einen Pin zu setzen, und wählen Sie dann die Gerätefunktion aus. Ziehen Sie einen Pin, um ihn zu verschieben, oder wählen Sie ihn aus und nutzen Sie die Pfeiltasten.",
+        "editPinMoveHelp": "Ziehen Sie diesen Pin, um ihn zu verschieben, oder nutzen Sie die Pfeiltasten",
+        "editPinLabel": "Pin {{index}}",
+        "editPinFeatureLabel": "Gerätefunktion",
+        "editPinLabelLabel": "Beschriftung (optional)",
+        "editPinLabelPlaceholder": "z. B. Solar",
+        "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
+        "error": "Das Bild konnte nicht geladen werden."
+      },
+      "external-widget": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Standardmäßig der Name des Widgets",
+        "editSettingsLabel": "Widget-Einstellungen",
+        "editIntegrationNotInstalled": "Die Integration, die dieses Widget bereitstellt, ist nicht mehr installiert. Entfernen Sie das Widget oder installieren Sie die Integration erneut.",
+        "notInstalled": "Diese Integration ist nicht mehr installiert.",
+        "notInstalledHint": "Bearbeiten Sie das Dashboard, um dieses Widget zu entfernen, oder installieren Sie die Integration erneut.",
+        "stopped": "Die Integration ist gestoppt.",
+        "openIntegrationLink": "Integration öffnen",
+        "unavailable": "Die Widget-Daten sind nicht verfügbar.",
+        "retryButton": "Erneut versuchen",
+        "checkSettings": "Prüfen Sie die Einstellungen dieses Widgets.",
+        "checkSettingsHint": "Bearbeiten Sie das Dashboard, um die Widget-Einstellungen zu korrigieren.",
+        "needsNewerGladys": "Dieses Widget benötigt eine neuere Gladys-Version.",
+        "empty": "Derzeit nichts anzuzeigen.",
+        "emptyChart": "Noch keine Daten für diesen Zeitraum.",
+        "now": "Jetzt",
+        "confirmAction": "„{{label}}“ ausführen?",
+        "actionError": "Die Aktion ist fehlgeschlagen.",
+        "actionFormSend": "Senden",
+        "actionFormInvalid": "Ungültiger Wert",
+        "actionFormClose": "Schließen",
+        "actionFormInvalidField": "Ungültiger Wert: {{label}}"
+      },
+      "energyPrice": {
+        "editName": "Widget-Name (optional)",
+        "editNamePlaceholder": "Auf dem Dashboard angezeigter Name",
+        "editContract": "Stromvertrag",
+        "noContract": "Noch kein Stromvertrag vorhanden.",
+        "noContractLink": "Legen Sie einen in der Energieüberwachungs-Integration an.",
+        "notConfigured": "Wählen Sie in den Widget-Einstellungen einen Vertrag aus.",
+        "until": "Bis {{time}}",
+        "unknownPrice": "Preis unbekannt",
+        "error": "Der Strompreis konnte nicht geladen werden. Prüfen Sie, ob der Vertrag noch existiert.",
+        "cumulativeToday": "Heute: {{kwh}} kWh"
       }
+    },
+    "editDashboardBackgroundLabel": "Hintergrundstimmung",
+    "editDashboardBackgroundDescription": "Integrierte Szenen, leichtgewichtig und immer verfügbar, auch ohne Internet.",
+    "scenes": {
+      "horizon": "Horizont",
+      "aurora": "Aurora",
+      "dusk": "Abenddämmerung",
+      "forest": "Wald",
+      "lagoon": "Lagune",
+      "sand": "Sand",
+      "lavender": "Lavendel",
+      "mist": "Nebel"
+    },
+    "editDashboardIconLabel": "Symbol (optional)",
+    "editDashboardIconDescription": "Wird in der Dashboard-Tab-Leiste angezeigt. Ohne Symbol wird nach Möglichkeit ein zum Emoji am Anfang des Namens passendes Symbol verwendet, sonst ein generisches Haus.",
+    "editDashboardWidthLabel": "Dashboard-Breite",
+    "widths": {
+      "standard": "Standard (empfohlen)",
+      "full": "Volle Breite"
+    },
+    "getStarted": {
+      "title": "Willkommen zu Hause!",
+      "subtitle": "Noch ein paar Schritte und dein Zuhause erwacht zum Leben.",
+      "progress": "{{done}} von {{total}}",
+      "devicesTitle": "Verbinde deine Geräte",
+      "devicesText": "Entdecke die Integrationen: Zigbee, Matter, MQTT, Kameras … Tausende kompatible Geräte.",
+      "dashboardCreateTitle": "Erstelle dein Dashboard",
+      "dashboardCreateText": "Gestalte die Ansicht deines Zuhauses: Temperatur, Licht, Kameras, Wetter …",
+      "dashboardFillTitle": "Füge deine ersten Widgets hinzu",
+      "dashboardFillText": "Dieses Dashboard ist leer: Öffne den Editor und gestalte die Ansicht deines Zuhauses.",
+      "scenesTitle": "Automatisiere mit Szenen",
+      "scenesText": "Licht bei Sonnenuntergang, Morgenroutinen: Dein Zuhause handelt für dich.",
+      "usersTitle": "Lade deinen Haushalt ein",
+      "usersText": "Erstelle ein Konto für jedes Familienmitglied."
     }
   },
   "newDashboard": {
@@ -708,6 +923,8 @@
     "dashboardAlreadyExist": "Ein Dashboard mit diesem Namen existiert bereits.",
     "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut!",
     "validationError": "Das hinzuzufügende Dashboard ist ungültig. Hast du alle Felder korrekt ausgefüllt?",
+    "iconLabel": "Symbol",
+    "iconDescription": "Wird in der Dashboard-Tab-Leiste angezeigt. Auf dem Smartphone und im Tablet-Modus ist es oft das einzige Erkennungsmerkmal des Dashboards.",
     "createDashboardButton": "Hinzufügen"
   },
   "integration": {
@@ -727,6 +944,13 @@
       "searchPlaceholder": "Integration suchen",
       "noIntegrations": "Keine Integrationen gefunden",
       "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
+      "noInstalledIntegrations": "Auf dieser Instanz ist noch keine Community-Integration installiert.",
+      "installedSummary": {
+        "title": {
+          "one": "1 Community-Integration auf dieser Instanz installiert.",
+          "other": "{{count}} Community-Integrationen auf dieser Instanz installiert."
+        }
+      },
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Dein Gerät wird vielleicht von einer externen <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">Community-Integration</a> unterstützt – dem empfohlenen Weg, neue Kompatibilitäten hinzuzufügen. Und wenn es sie noch nicht gibt, kannst du ganz einfach <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">deine eigene erstellen</a>!",
       "refreshStore": {
@@ -746,6 +970,7 @@
       "menu": {
         "all": "Alle Integrationen",
         "favorites": "Favoriten",
+        "installed": "Installiert",
         "updates": "Zu aktualisieren",
         "climate": "Heizung & Klima",
         "lighting": "Beleuchtung, Steckdosen & Rollläden",
@@ -840,10 +1065,12 @@
         "actionError": "Beim Ausführen dieser Aktion ist ein Fehler aufgetreten.",
         "uninstallError": "Beim Deinstallieren dieser Integration ist ein Fehler aufgetreten.",
         "updateAvailableText": "Eine neue Version dieser Integration ist verfügbar.",
+        "updateAvailableVersionText": "Eine neue Version dieser Integration ist verfügbar: v{{latestVersion}} (installiert: v{{currentVersion}}).",
         "updateSuccessText": "Integration auf Version {{version}} aktualisiert.",
         "alreadyUpToDateText": "Die Integration ist bereits aktuell (Version {{version}}): Das Docker-Image wurde erneut heruntergeladen und der Container neu erstellt.",
         "statusLabel": "Status",
         "versionLabel": "Version",
+        "changelogTitle": "Changelog dieser Version anzeigen",
         "dockerImageLabel": "Docker-Image",
         "repoLabel": "Repository",
         "startButton": "Starten",
@@ -859,6 +1086,8 @@
         "containerStopped": "Gestoppt",
         "openButton": "Öffnen",
         "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
+        "uninstallCalendarWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt, und die von ihr erstellten Kalender werden mit ihren Terminen gelöscht, für alle Benutzer des Haushalts – nicht nur deine.",
+        "uninstallEnergyWarning": "Diese Integration berechnet die Kosten von Energieverträgen selbst: Die von ihr berechneten Verträge werden nach der Deinstallation nicht mehr berechnet (ihre bestehenden Kosten bleiben erhalten).",
         "confirmUninstallButton": "Ja, deinstallieren",
         "cancelUninstallButton": "Abbrechen",
         "startedAtLabel": "In Betrieb seit"
@@ -966,7 +1195,21 @@
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
-        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent)."
+        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "calendarInfoText": "Diese Integration ist ein Kalenderanbieter: Nach der Installation erstellt sie Kalender und Termine in Gladys für die Benutzer, die sie mit ihrem eigenen Konto aktivieren.",
+        "widgetsTitle": "Dashboard-Widgets",
+        "widgetsText": "Diese Integration stellt die folgenden Widgets bereit, die allen Benutzern im Dashboard-Editor zur Verfügung stehen:",
+        "energyContractsTitle": "Energieverträge",
+        "energyContractsText": "Diese Integration stellt die folgenden Energievertragsvorlagen bereit, die im Vertragsassistenten der Energieüberwachungsseite angeboten werden:",
+        "energyContractsDelegated": "von der Integration berechnet",
+        "energyContractsCalendars": "Von dieser Integration gepflegte Tarifkalender:",
+        "energyContractsDelegatedText": "Eine von der Integration berechnete Vorlage berechnet Ihre Energiekosten selbst: Die Kosten dieser Verträge werden nur berechnet, solange die Integration läuft, und nicht mehr, wenn sie deinstalliert wird.",
+        "providerInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Dashboard-Widgets bereit. Konfigurieren Sie sie hier und fügen Sie ihre Widgets dann im Dashboard-Editor hinzu.",
+        "providerEnergyInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Energievertragsvorlagen und Tarifkalender bereit. Konfigurieren Sie sie hier und wählen Sie ihre Verträge dann auf der Seite Energieüberwachung aus.",
+        "sceneDeclarationsTitle": "Szenen-Auslöser und -Aktionen",
+        "sceneDeclarationsText": "Diese Integration fügt dem Szenen-Editor {{triggers}} Auslöser und {{actions}} Aktion(en) hinzu.",
+        "sceneTriggerPrefix": "Auslöser:",
+        "sceneActionPrefix": "Aktion:"
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
@@ -1045,6 +1288,22 @@
         "notAvailableText": "Die Webhooks sind noch nicht aktiv: Speichern Sie Ihren Open-API-Schlüssel, um sie zu aktivieren.",
         "urlsText": "Webhook-URLs (die Integration registriert sie automatisch, wenn möglich; manche Dienste verlangen das Einfügen in die Anbieterkonsole). Diese URLs enthalten Ihren Schlüssel: Teilen Sie sie nur mit dem Drittanbieterdienst."
       },
+      "myCalendars": {
+        "title": "Meine Kalender",
+        "description": "Diese Integration erstellt Kalender und Termine in Gladys für die Benutzer, die sie aktivieren. Aktivieren Sie sie mit Ihrem eigenen Konto, um ihre Kalender in Ihrer Kalenderansicht zu sehen; das Deaktivieren löscht Ihre Kalender aus Gladys (beim Anbieter bleiben sie unberührt).",
+        "enableButton": "Für mich aktivieren",
+        "saveButton": "Speichern",
+        "disableButton": "Deaktivieren und meine Kalender löschen",
+        "disableConfirmText": "Ihre Kalender aus dieser Integration und deren Termine werden aus Gladys gelöscht. Die Kalender beim Anbieter bleiben unberührt, und eine erneute Aktivierung stellt bei der nächsten Synchronisierung alles wieder her.",
+        "disableConfirmButton": "Meine Kalender löschen",
+        "cancelButton": "Abbrechen",
+        "saveError": "Beim Speichern Ihres Kontos ist ein Fehler aufgetreten.",
+        "saveSuccess": "Ihr Konto wurde gespeichert.",
+        "noCalendars": "Noch kein Kalender: die Integration überträgt Ihre Kalender bei der nächsten Synchronisierung.",
+        "syncLabel": "Diesen Kalender synchronisieren",
+        "sharedLabel": "Mit dem Haushalt teilen",
+        "sharedHelp": "Ein geteilter Kalender ist für den ganzen Haushalt sichtbar und kann Szenen auslösen."
+      },
       "contactProfile": {
         "title": "Mein Konto",
         "description": "Dieser Kanal sendet Nachrichten mit Ihren persönlichen Zugangsdaten. Jeder Benutzer trägt seine eigenen Werte ein; leer lassen, um nichts zu erhalten. Das Löschen Ihrer Werte stoppt die Nachrichten.",
@@ -1095,6 +1354,10 @@
     "free-mobile": {
       "title": "Free Mobile",
       "description": "SMS von Gladys über Free Mobile senden.",
+      "deprecatedWarning": {
+        "title": "Integration bald veraltet",
+        "description": "Diese native Integration wird in einer künftigen Gladys-Version entfernt. Sie wird durch die Community-Integration <b>Free Mobile SMS</b> ersetzt, die dieselben Funktionen bietet und weiterhin gepflegt wird. Installiere sie über den <a href=\"/dashboard/integration/notifications\">Integrationskatalog</a> und hinterlege anschließend deine Free-Mobile-Zugangsdaten im Bereich <b>Mein Konto</b> im Tab <b>Konfiguration</b> dieser Integration — jeder Gladys-Benutzer trägt seine eigenen ein. In deinen Szenen nutzt die Aktion <b>SMS senden</b> weiterhin diese native Integration: Ersetze sie durch eine Aktion <b>Nachricht senden</b>, die den Kanal Free Mobile SMS und den Gladys-Benutzer anspricht, dessen Konto konfiguriert ist."
+      },
       "documentation": "Free Mobile Dokumentation",
       "introduction": "Dieses Plugin ermöglicht es Ihnen, SMS an Ihr Free-Handy über den Benachrichtigungsdienst von Free zu senden. Geben Sie Ihre Kundennummer und den Identifizierungsschlüssel unten ein, den Sie auf der <a href=\"https://mobile.free.fr\"> FreeMobile</a>-Website finden.",
       "username": "Free Mobile Kundennummer",
@@ -1256,6 +1519,12 @@
       "importPricesButton": "Tarife importieren",
       "importSuccess": "Tarife erfolgreich importiert!",
       "errorLoadingContracts": "Fehler beim Laden der Verträge",
+      "contractNotListedTitle": "Ihr Vertrag ist nicht in der Liste?",
+      "contractNotListedDescription": "Diese Vertragsliste wird von der Gladys-Community gepflegt. Wenn Ihr Energieanbieter oder Ihr Vertrag fehlt, haben Sie zwei Möglichkeiten:",
+      "contractNotListedShare": "Schlagen Sie Ihren Vertrag der Community im Repository der Energieverträge vor. Gladys lädt diese Liste direkt aus diesem Repository herunter: Sobald Ihr Vertrag dort hinzugefügt wurde, erscheint er hier, ohne dass Gladys aktualisiert werden muss.",
+      "contractNotListedShareButton": "Einen Vertrag auf GitHub vorschlagen",
+      "contractNotListedCreate": "Oder erstellen Sie Ihren Vertrag selbst in Gladys mit der Schaltfläche „Erstellen“. Er existiert nur in Ihrer Gladys-Installation und Sie können ihn jederzeit ändern.",
+      "contractNotListedCreateButton": "Einen Vertrag manuell erstellen",
       "availablePowers": "Verfügbare Leistungen",
       "contractId": "Vertrags-ID",
       "hourSlotsRequiredInfo": "Dieser Vertrag erfordert die Angabe der Hauptzeiten für Ihren Standort. Die verbleibenden Stunden werden als Nebenzeiten betrachtet.",
@@ -1269,7 +1538,85 @@
       "circularReference": "zirkuläre Referenz",
       "selfReference": "Selbstreferenz",
       "fixAutomatically": "beheben",
-      "fixing": "Behebung läuft..."
+      "fixing": "Behebung läuft...",
+      "contracts": {
+        "tab": "Verträge",
+        "description": "Ein Vertrag beschreibt, wie der Verbrauch eines Zählers über einen Zeitraum bepreist wird. Wählen Sie eine Vorlage aus dem Community-Katalog oder einer installierten Integration, füllen Sie die Parameter aus und prüfen Sie die Vorschau vor dem Speichern.",
+        "empty": "Noch kein Vertrag. Legen Sie einen an, um die Kosten Ihres Verbrauchs zu berechnen.",
+        "errorLoading": "Fehler beim Laden der Verträge.",
+        "confirmDelete": "Möchten Sie diesen Vertrag wirklich löschen? Die Kosten seines Zeitraums werden bei der nächsten Berechnung entfernt.",
+        "ongoing": "laufend",
+        "createTitle": "Neuer Vertrag",
+        "editTitle": "Vertrag bearbeiten",
+        "status": {
+          "active": "aktiv",
+          "scheduled": "geplant",
+          "expired": "abgelaufen",
+          "orphaned": "verwaist"
+        },
+        "mode": {
+          "rules": "Regelwerk",
+          "delegated": "von der Integration berechnet"
+        },
+        "provider": {
+          "community": "Community",
+          "integration": "Integration",
+          "internal": "Gladys",
+          "user": "manuell"
+        },
+        "providerStopped": "Integration gestoppt",
+        "orphanedHelp": "Die Integration, die diesen Vertrag berechnet, ist nicht mehr installiert: seine Kosten werden nicht mehr berechnet. Installieren Sie sie erneut oder ersetzen Sie den Vertrag.",
+        "migrationWarning": "Dieser Vertrag wurde aus Ihren früheren Tarifen umgewandelt: die neue Berechnung weicht über die letzten 7 Tage um {{gap}}% von der alten ab. Bitte prüfen Sie seine Preise.",
+        "wizard": {
+          "meter": "Zähler",
+          "template": "Vorlage",
+          "parameters": "Parameter",
+          "preview": "Vorschau"
+        },
+        "allCountries": "Alle Länder",
+        "searchTemplate": "Anbieter oder Vertrag suchen…",
+        "noTemplate": "Keine passende Vorlage.",
+        "publishAsIntegration": "Oder veröffentlichen Sie ihn als externe Integration: eine Integration kann Vertragsvorlagen deklarieren, Tarifkalender (Tagesfarben, Spotpreise, Feiertage) liefern und die Kosten sogar selbst berechnen.",
+        "selectedTemplate": "Vorlage:",
+        "parameters": "Vertragsparameter",
+        "timezone": "Zeitzone",
+        "timezonePlaceholder": "Systemzeitzone",
+        "billingPeriodStartDay": "Starttag der Abrechnungsperiode",
+        "delegatedHelp": "Die Kosten dieses Vertrags berechnet seine Integration: nur die Fixgebühren des Tarifs berechnet Gladys, und es gibt keine Vorschau.",
+        "jsonMode": "Erweitert: Tarifdefinition bearbeiten (JSON)",
+        "tariffJson": "Tarifdefinition",
+        "tariffJsonHelp": "Die Definition wird beim Speichern geprüft. Das Format ist im Repository dokumentiert",
+        "exportTemplate": "Als Vorlage exportieren",
+        "previewDescription": "Ihr realer Verbrauch der letzten 7 Tage, mit diesem Vertrag bepreist, ohne etwas zu speichern.",
+        "previewSynthetic": "Dieser Zähler hat noch keinen Verbrauch: die Vorschau verwendet ein flaches Profil von 0,5 kWh pro 30 Minuten.",
+        "previewTotal": "Summe über 7 Tage",
+        "previewWarnings": "Intervalle mit dem Ersatzpreis bepreist (fehlender Kalenderwert):",
+        "intervals": "Intervalle",
+        "sampleTime": "Zeit",
+        "samplePrice": "Einheitspreis",
+        "sampleCost": "Kosten",
+        "sampleLabel": "Tarif",
+        "calendars": {
+          "title": "Tarifkalender",
+          "description": "Die datierten Werte der Verträge (Tagesfarben, Spotpreise, Feiertage), von den Integrationen veröffentlicht. Ein Kalender ohne Anbieter behält seine Werte, wird aber nicht mehr aktualisiert.",
+          "empty": "Noch kein Kalender.",
+          "key": "Schlüssel",
+          "provider": "Anbieter",
+          "granularity": "Granularität",
+          "granularities": {
+            "day": "Tag",
+            "thirty_minutes": "30 Minuten",
+            "fifteen_minutes": "15 Minuten"
+          },
+          "coverage": "Abdeckung",
+          "orphaned": "kein Anbieter",
+          "lastValues": "Letzte Werte",
+          "noValue": "Kein Wert.",
+          "recalculateFrom": "Kosten neu berechnen ab",
+          "recalculate": "Neu berechnen",
+          "recalculated": "Die Neuberechnung wurde gestartet. Sie können den Fortschritt in den Hintergrundaufgaben verfolgen."
+        }
+      }
     },
     "netatmo": {
       "title": "Netatmo",
@@ -1461,18 +1808,29 @@
             "description": "Gladys wird zwei Docker-Container konfigurieren: MQTT und Zigbee2mqtt.",
             "dockerInstallationRequirementLabel": "Gladys muss unter Docker ausgeführt werden",
             "dockerNetworkHostRequirementLabel": "Der Docker-Container von Gladys muss mit der Option \"network=host\" gestartet werden",
-            "usbDongleRequirementLabel": "Der Zigbee-USB-Dongle muss angeschlossen sein",
-            "detailsDescription": "Um Zigbee2mqtt mit Gladys zu verwenden, muss ein Zigbee-USB-Dongle eingesteckt werden.",
+            "coordinatorRequirementLabel": "Ein Zigbee-Koordinator muss verbunden sein (USB-Dongle oder Netzwerk-Gateway)",
+            "detailsDescription": "Um Zigbee2mqtt mit Gladys zu verwenden, wird ein Zigbee-Koordinator benötigt: entweder ein an diesem Rechner eingesteckter USB-Dongle oder ein im lokalen Netzwerk erreichbarer Netzwerk-Koordinator (SMLIGHT SLZB-06/SLZB-07, ZigStar…).",
+            "adapterModeLabel": "Wie ist der Zigbee-Koordinator angeschlossen?",
+            "adapterModeUsbLabel": "USB-Dongle",
+            "adapterModeNetworkLabel": "Netzwerk-Koordinator (Ethernet/WLAN)",
             "usbDriverPathLabel": "Wählen Sie den USB-Port, an dem der Zigbee-Dongle eingesteckt ist",
             "usbDriverPathPlaceholder": "USB-Port",
             "usbDongleNameLabel": "Wählen Sie das Modell des verwendeten Zigbee-Dongles",
             "usbDongleNamePlaceholder": "Modell des Zigbee-Dongles",
+            "networkAdapterUrlLabel": "Geben Sie die Adresse des Netzwerk-Koordinators ein",
+            "networkAdapterUrlPlaceholder": "tcp://192.168.1.20:6638",
+            "networkAdapterUrlDescription": "IP-Adresse (oder Hostname) und TCP-Port des Koordinators, zum Beispiel tcp://192.168.1.20:6638. Das Präfix \"tcp://\" ist optional.",
+            "networkAdapterTypeLabel": "Wählen Sie den Zigbee2mqtt-Adaptertyp des Koordinators",
+            "networkAdapterTypePlaceholder": "Adaptertyp",
+            "networkAdapterTypeDescription": "Siehe die Dokumentation Ihres Koordinators: Der SMLIGHT SLZB-06 verwendet \"zstack\", der SLZB-06M und der SLZB-07 verwenden \"ember\".",
             "z2mTcpPortLabel": "Geben Sie den vom Zigbee2Mqtt-Webanwendungsport freigegebenen TCP-Port ein",
             "z2mTcpPortDescription": "Wenn leer gelassen, wird ein zufälliger Port verwendet.",
             "summary": {
               "title": "Konfiguration",
               "usbPort": "USB-Port",
+              "networkAdapterUrl": "Netzwerk-Koordinator",
               "dongleName": "Dongle",
+              "networkAdapterType": "Adaptertyp",
               "unknownDongle": "Nicht definiert",
               "tcpPort": "TCP-Port"
             },
@@ -1513,6 +1871,12 @@
         "enableLabel": "Dienst aktivieren oder deaktivieren",
         "enableDescription": "Beim nächsten Neustart von Gladys wird der Dienst wieder gestartet. Abhängig von der Leistung Ihres Computers und der Geschwindigkeit Ihres Netzwerks kann das Starten dieses Dienstes im Modus \"Installation von Gladys aus\" zwischen 2 Minuten und 1 Stunde dauern. Sie können den Dienst dauerhaft von dieser Seite deaktivieren: <a href=\"/dashboard/settings/service\">Einstellungen > Dienste</a>.",
         "toggleError": "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Konfiguration des Dienstes.",
+        "mqttConnectionErrors": {
+          "BAD_CREDENTIALS": "Gladys konnte keine Verbindung zum MQTT-Broker herstellen: Der Benutzername oder das Passwort ist falsch. Überprüfen Sie die Zugangsdaten Ihres MQTT-Brokers und speichern Sie die Konfiguration erneut.",
+          "NOT_AUTHORIZED": "Der MQTT-Broker hat die Verbindung abgelehnt: nicht autorisiert. Überprüfen Sie den Benutzernamen und das Passwort Ihres MQTT-Brokers sowie die Zugriffsrechte dieses Clients und speichern Sie die Konfiguration erneut.",
+          "BROKER_UNREACHABLE": "Gladys konnte den MQTT-Broker nicht erreichen. Überprüfen Sie, ob die URL und der Port des Brokers korrekt sind und ob der Broker läuft und von Gladys aus erreichbar ist.",
+          "unknownErrorPrefix": "MQTT-Verbindungsfehler: "
+        },
         "serviceStatus": "Dienststatus",
         "description": "Dieser Dienst verwendet zwei Docker-Container (MQTT-Broker und Zigbee2mqtt). Aktivieren Sie Zigbee2mqtt, um diese Container bereitzustellen. Weitere Informationen finden Sie auf der Zigbee2mqtt-Dokumentationsseite.",
         "nonDockerEnv": "Gladys wird derzeit nicht in Docker ausgeführt. Es ist unmöglich, Zigbee2mqtt von Gladys aus zu aktivieren.",
@@ -3055,6 +3419,8 @@
       "registeredLabel": "Registriert am:"
     },
     "backToIntegrations": "Zurück zu den Integrationen",
+    "menuScrollLeft": "Menü nach links scrollen",
+    "menuScrollRight": "Menü nach rechts scrollen",
     "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden."
   },
   "editScene": {
@@ -3082,12 +3448,7 @@
     "newCondition": "Neue Bedingung",
     "selectActionType": "Wähle einen Aktionstyp aus",
     "selectConditionType": "Wähle eine Bedingungstyp aus",
-    "addActionButton": "Aktion hinzufügen",
-    "addActionGroupButton": "Neues Aktionengruppe",
     "noTriggersYet": "Du hast noch keine Auslöser hinzugefügt. Eine Szene muss nicht zwingend einen Auslöser haben.",
-    "noActionsYet": "Du hast noch keine Aktionen hinzugefügt. Klicke auf \"+\", um eine Aktion zu dieser Szene hinzuzufügen.",
-    "triggersDescription": "Auslöser sind unabhängig voneinander. Wenn du mehrere Auslöser festgelegt hast, reicht es, wenn einer ausgelöst wird, um die Szene auszuführen.",
-    "actionsDescription": "Alle Aktionen in diesem Block werden parallel ausgeführt. Um eine Abfolge von Aktionen zu erstellen, füge Aktionen zum næchsten Block hinzu.",
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
@@ -3114,8 +3475,11 @@
         "userLabel": "Benutzer",
         "serviceLabel": "Senden über",
         "allServicesLabel": "Alle konfigurierten Dienste",
-        "serviceExplanation": "Wähle den Nachrichtendienst, der diese Nachricht sendet. Standardmäßig wird die Nachricht an alle vom Benutzer konfigurierten Dienste gesendet.",
+        "gladysOnlyLabel": "Nur Gladys-Konversation",
+        "serviceExplanation": "Wähle, wo diese Nachricht zugestellt wird. Die Nachricht bleibt immer in der Gladys-Konversation: standardmäßig wird sie zusätzlich an alle vom Benutzer konfigurierten Nachrichtendienste gesendet.",
         "serviceUnavailable": "nicht verfügbar",
+        "serviceIntegrationExternal": "externe Integration",
+        "serviceIntegrationInternal": "native Integration",
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
@@ -3136,6 +3500,8 @@
         "explanationText": "Um eine Variable einzufügen, geben Sie '{{' ein. Achten Sie darauf, dass Sie zuvor eine Variable in einer Aktion 'Letzten Zustand abrufen' definiert haben, die vor diesem Nachrichtenblock platziert wurde."
       },
       "smsSend": {
+        "deprecatedTitle": "Aktion bald veraltet",
+        "deprecatedDescription": "Diese Aktion nutzt die native Free-Mobile-Integration, die in einer künftigen Gladys-Version entfernt wird. Installiere die Community-Integration <b>Free Mobile SMS</b>, hinterlege deine Free-Mobile-Zugangsdaten im Bereich <b>Mein Konto</b> im Tab <b>Konfiguration</b> dieser Integration und ersetze diese Aktion anschließend durch eine Aktion <b>Nachricht senden</b>, die den Kanal Free Mobile SMS und den Gladys-Benutzer anspricht, dessen Konto konfiguriert ist.",
         "textLabel": "Nachricht",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
@@ -3188,6 +3554,14 @@
         "textPlaceholder": "Wert der Variable",
         "computedExplanationText": "Gib hier eine Berechnung ein, ihr Ergebnis wird in der Variable gespeichert. Um eine Variable in die Berechnung einzufügen, drücke '{{'.",
         "computedPlaceholder": "Z.B.: 2 * 3"
+      },
+      "getDate": {
+        "description": "Diese Aktion ruft das aktuelle Datum und die aktuelle Uhrzeit ab, damit du sie in den nächsten Aktionen der Szene verwenden kannst. Alle 4 Variablen, einschließlich des Zeitstempels, werden auf die gewählte Genauigkeit abgeschnitten: Wähle „Sekunde“, wenn du für eine Berechnung einen exakten Zeitstempel benötigst.",
+        "precisionLabel": "Genauigkeit",
+        "precisionSecond": "Sekunde",
+        "precisionMinute": "Minute",
+        "precisionHour": "Stunde",
+        "precisionDay": "Tag"
       },
       "deviceSetValue": {
         "description": "Diese Aktion ermöglicht es, ein Gerät zu steuern.",
@@ -3306,7 +3680,7 @@
         "continueScene": "Szene fortsetzen"
       },
       "calendarGetEvents": {
-        "description": "Diese Aktion ruft die Liste der Ereignisse ab, die im ausgewählten Zeitraum beginnen (ein Ereignis, das vor dem Beginn des Zeitraums begonnen hat, wird nicht zurückgegeben), und stellt sie als Variablen (ein fertiger Satz, die Anzahl der Ereignisse und die Liste der Ereignisse) für die nächsten Aktionen der Szene bereit. Es werden nur freigegebene Kalender angezeigt.",
+        "description": "Diese Aktion ruft die Liste der Ereignisse ab, die im ausgewählten Zeitraum beginnen (ein Ereignis, das vor dem Beginn des Zeitraums begonnen hat, wird nicht zurückgegeben), und stellt sie als Variablen (ein fertiger Satz, eine detaillierte Liste mit einer Zeile pro Ereignis, die Anzahl der Ereignisse und die Rohliste der Ereignisse) für die nächsten Aktionen der Szene bereit. Es werden nur freigegebene Kalender angezeigt.",
         "calendarLabel": "Suche in den folgenden freigegebenen Kalendern",
         "timeRangeLabel": "Ereignisse abrufen",
         "today": "Heute",
@@ -3370,8 +3744,28 @@
         "description": "Diese Aktion lässt Gladys auf dem ausgewählten Lautsprecher sprechen.",
         "deviceLabel": "Lautsprecher",
         "volumeLabel": "Volumen",
+        "valueTypeSimple": "Einfach",
+        "valueTypeComputed": "Berechnet",
+        "computedExplanationText": "Anstelle einer festen Lautstärke kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben, zum Beispiel um nachts leiser zu sprechen. Um eine Variable einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Block das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "textLabel": "Nachricht zum Sprechen auf dem Lautsprecher",
         "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Hinweis: Du musst vor diesem Block eine Variable in einer \"Letzten Zustand abrufen\"-Aktion definiert haben."
+      },
+      "energyCurrentPrice": {
+        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle kWh-Preis des ausgewählten Vertrags die folgende Bedingung erfüllt.",
+        "contractLabel": "Energievertrag",
+        "operatorLabel": "Fortfahren, wenn der Preis",
+        "valueLabel": "Schwellenwert (pro kWh)",
+        "valuePlaceholder": "0.20",
+        "error": "Die Energieverträge konnten nicht geladen werden.",
+        "noContract": "Noch kein Energievertrag: Legen Sie einen in der Integration Energieüberwachung an.",
+        "operators": {
+          "equal": "gleich",
+          "different": "ungleich",
+          "superior": "größer als",
+          "superiorOrEqual": "größer oder gleich",
+          "inferior": "kleiner als",
+          "inferiorOrEqual": "kleiner oder gleich"
+        }
       }
     },
     "actions": {
@@ -3451,7 +3845,109 @@
       },
       "variable": {
         "set": "Eine Variable definieren"
+      },
+      "time": {
+        "get-date": "Datum und Uhrzeit abrufen"
+      },
+      "external-integration": {
+        "scene-action": "Integrations-Aktion"
+      },
+      "energy-contract": {
+        "current-price": "Bedingung zum Strompreis"
       }
+    },
+    "actionsDescriptions": {
+      "light": {
+        "turn-on": "Eine oder mehrere Lampen einschalten",
+        "turn-off": "Eine oder mehrere Lampen ausschalten",
+        "toggle": "Den aktuellen Zustand der Lampen umkehren",
+        "blink": "Lampen blinken lassen, um Aufmerksamkeit zu erregen"
+      },
+      "switch": {
+        "turn-on": "Eine Steckdose oder einen Schalter einschalten",
+        "turn-off": "Eine Steckdose oder einen Schalter ausschalten",
+        "toggle": "Den aktuellen Zustand der Steckdosen umkehren"
+      },
+      "device": {
+        "set-value": "Einen Befehl an ein beliebiges Gerät senden",
+        "get-value": "Den letzten Wert eines Sensors abrufen, um ihn später zu verwenden"
+      },
+      "message": {
+        "send": "Eine Benachrichtigung senden (Telegram, App…)",
+        "send-camera": "Das letzte Bild einer Kamera senden"
+      },
+      "sms": {
+        "send": "Eine SMS an ein Telefon senden"
+      },
+      "music": {
+        "play-notification": "Einen Text über einen Lautsprecher vorlesen lassen"
+      },
+      "condition": {
+        "if-then-else": "Je nach Bedingung einem anderen Pfad folgen",
+        "only-continue-if": "Die Szene hier stoppen, wenn die Bedingung nicht erfüllt ist",
+        "while": "Aktionen wiederholen, solange eine Bedingung erfüllt ist",
+        "check-time": "Nur zu bestimmten Uhrzeiten oder Tagen fortfahren"
+      },
+      "user": {
+        "check-presence": "Einen Benutzer als abwesend markieren, wenn er länger nicht gesehen wurde",
+        "set-seen-at-home": "Gladys mitteilen, dass ein Benutzer zu Hause ist",
+        "set-out-of-home": "Gladys mitteilen, dass ein Benutzer das Haus verlassen hat"
+      },
+      "house": {
+        "is-empty": "Nur fortfahren, wenn niemand zu Hause ist",
+        "is-not-empty": "Nur fortfahren, wenn jemand zu Hause ist"
+      },
+      "alarm": {
+        "check-alarm-mode": "Nur fortfahren, wenn sich der Alarm in einem bestimmten Modus befindet",
+        "set-alarm-mode": "Die Alarmanlage eines Hauses scharf oder unscharf schalten"
+      },
+      "calendar": {
+        "is-event-running": "Fortfahren, je nachdem ob gerade ein Kalendertermin läuft",
+        "get-events": "Kalendertermine abrufen, um sie später zu verwenden"
+      },
+      "ecowatt": {
+        "condition": "Fortfahren je nach Ecowatt-Signal des französischen Stromnetzes"
+      },
+      "edf-tempo": {
+        "condition": "Fortfahren je nach EDF-Tempo-Tagesfarbe (Frankreich)"
+      },
+      "delay": "Vor dem nächsten Schritt eine Pause einlegen",
+      "scene": {
+        "start": "Eine andere Szene starten"
+      },
+      "http": {
+        "request": "Eine externe API oder einen Dienst aufrufen"
+      },
+      "mqtt": {
+        "send": "Eine Nachricht auf dem MQTT-Broker veröffentlichen"
+      },
+      "zigbee2mqtt": {
+        "send": "Eine Nachricht an ein Zigbee2MQTT-Gerät senden"
+      },
+      "ai": {
+        "ask": "Der KI eine Frage stellen und ihre Antwort verwenden"
+      },
+      "variable": {
+        "set": "Einen Wert speichern, um ihn in der Szene wiederzuverwenden"
+      },
+      "time": {
+        "get-date": "Das aktuelle Datum und die Uhrzeit abrufen, um sie in der Szene wiederzuverwenden"
+      },
+      "external-integration": {
+        "scene-action": "Eine von einer externen Integration deklarierte Aktion"
+      },
+      "energy-contract": {
+        "current-price": "Nur fortfahren, wenn der aktuelle Preis eines Energievertrags einen Schwellenwert erfüllt"
+      }
+    },
+    "actionCategories": {
+      "devices": "Geräte & Lichter",
+      "messages": "Nachrichten & Benachrichtigungen",
+      "conditions": "Bedingungen",
+      "flow": "Ablauf",
+      "homeSecurity": "Zuhause & Sicherheit",
+      "advanced": "Erweitert",
+      "integrations": "Integrationen"
     },
     "variables": {
       "device": {
@@ -3468,8 +3964,9 @@
       },
       "calendarEvents": {
         "text": "Satz mit der Zusammenfassung der Ereignisse",
+        "textDetailed": "Detaillierte Liste der Ereignisse (eine Zeile pro Ereignis)",
         "count": "Anzahl der Ereignisse",
-        "events": "Liste der Ereignisse"
+        "events": "Rohe Liste der Ereignisse (fortgeschritten, in einer Nachricht nicht lesbar)"
       },
       "askAi": {
         "answer": "AI Antwort"
@@ -3478,6 +3975,12 @@
         "set": {
           "value": "Variable"
         }
+      },
+      "getDate": {
+        "datetime": "Aktuelles Datum und Uhrzeit",
+        "date": "Aktuelles Datum",
+        "time": "Aktuelle Uhrzeit",
+        "timestamp": "Aktueller Zeitstempel (in Sekunden, in einer Berechnung verwendbar)"
       }
     },
     "triggers": {
@@ -3521,7 +4024,72 @@
       "weather": {
         "alert-raised": "Wetterwarnung ausgelöst",
         "alert-ended": "Wetterwarnung beendet"
+      },
+      "external-integration": {
+        "scene-event": "Integrations-Auslöser"
+      },
+      "energy-contract": {
+        "price-changed": "Strompreis geändert"
       }
+    },
+    "triggersDescriptions": {
+      "device": {
+        "new-state": "Wenn ein Sensor oder Gerät seinen Zustand ändert"
+      },
+      "time": {
+        "changed": "Zu einer bestimmten Uhrzeit, einmalig oder wiederkehrend",
+        "sunrise": "Jeden Morgen bei Sonnenaufgang",
+        "sunset": "Jeden Abend bei Sonnenuntergang"
+      },
+      "calendar": {
+        "event-is-coming": "Kurz vor, zu Beginn oder am Ende eines Kalendertermins"
+      },
+      "user": {
+        "back-home": "Wenn jemand nach Hause kommt",
+        "left-home": "Wenn jemand das Haus verlässt"
+      },
+      "house": {
+        "empty": "Wenn die letzte Person das Haus verlässt",
+        "no-longer-empty": "Wenn jemand in ein leeres Haus kommt"
+      },
+      "area": {
+        "user-entered": "Wenn ein Benutzer einen Bereich der Karte betritt",
+        "user-left": "Wenn ein Benutzer einen Bereich der Karte verlässt"
+      },
+      "alarm": {
+        "arm": "Wenn die Alarmanlage gerade scharf geschaltet wurde",
+        "arming": "Während der Verzögerung vor dem Scharfschalten",
+        "partial-arm": "Wenn die Alarmanlage in den Teilmodus (Nacht) wechselt",
+        "disarm": "Wenn die Alarmanlage unscharf geschaltet wird",
+        "panic": "Wenn der Panikmodus ausgelöst wird",
+        "too-many-codes-tests": "Wenn zu oft ein ungültiger Code eingegeben wurde"
+      },
+      "system": {
+        "start": "Wenn Gladys startet oder neu startet"
+      },
+      "mqtt": {
+        "received": "Wenn eine Nachricht zu einem MQTT-Thema eintrifft"
+      },
+      "weather": {
+        "alert-raised": "Wenn eine Wetterwarnung beginnt (Wind, Regen…)",
+        "alert-ended": "Wenn eine Wetterwarnung endet"
+      },
+      "external-integration": {
+        "scene-event": "Ein von einer externen Integration deklarierter Auslöser"
+      },
+      "energy-contract": {
+        "price-changed": "Wenn sich der aktuelle Preis oder Tarif eines Energievertrags ändert"
+      }
+    },
+    "triggerCategories": {
+      "devices": "Geräte & Sensoren",
+      "time": "Zeit & Kalender",
+      "presence": "Anwesenheit",
+      "alarm": "Alarmanlage",
+      "weather": "Wetter",
+      "advanced": "Erweitert",
+      "integrations": "Integrationen",
+      "energy": "Energie"
     },
     "triggersCard": {
       "newState": {
@@ -3538,6 +4106,8 @@
         "off": "Aus",
         "deviceSeen": "Wenn das Gerät erkannt wird",
         "doorbellRang": "Wenn die Türklingel klingelt",
+        "anyStateChange": "Die Szene bei jeder Zustandsänderung starten, unabhängig vom Wert",
+        "anyStateChangeNote": "Die Szene wird gestartet, wenn das Gerät seinen ersten Wert oder einen vom vorherigen abweichenden Wert meldet, einschließlich kleiner Schwankungen eines Sensors.",
         "onlyExecuteAtThreshold": "Nur ausführen, wenn der Schwellenwert überschritten wird (und nicht bei jedem vom Gerät gesendeten Wert)",
         "activateOrDeactivateForDuration": "Szene ausführen, nachdem die Bedingung für die Dauer gültig war:",
         "multipleFeaturesNote": "Sie können mehrere Funktionen desselben Typs auswählen: die Szene startet, sobald eine davon die Bedingung erfüllt."
@@ -3653,7 +4223,53 @@
           "severe": "Schwer (orange)",
           "extreme": "Extrem (rot)"
         }
+      },
+      "energyPriceChanged": {
+        "description": "Dieser Auslöser wird aktiviert, wenn sich der aktuelle kWh-Preis (oder die Tarifstufe) des ausgewählten Vertrags ändert, zum Beispiel beim Wechsel von Niedertarif zu Hochtarif.",
+        "contractLabel": "Energievertrag",
+        "anyContract": "Jeder Vertrag",
+        "error": "Die Energieverträge konnten nicht geladen werden."
       }
+    },
+    "searchActionsPlaceholder": "Aktion suchen…",
+    "searchTriggersPlaceholder": "Auslöser suchen…",
+    "deprecatedActionBadge": "Bald veraltet",
+    "noResultsFound": "Keine Ergebnisse",
+    "whenSectionTitle": "Wenn",
+    "whenSectionSubtitle": "die Szene startet, sobald eines dieser Ereignisse eintritt",
+    "thenSectionTitle": "Dann",
+    "thenSectionSubtitle": "diese Schritte werden der Reihe nach ausgeführt",
+    "addStepButton": "Schritt hinzufügen",
+    "parallelBlockTitle": "Gleichzeitig",
+    "addParallelActionButton": "Parallele Aktion hinzufügen",
+    "unsavedChanges": "Nicht gespeicherte Änderungen",
+    "savedLabel": "Gespeichert",
+    "orSeparator": "ODER",
+    "triggersIndependentHint": "Jeder Auslöser startet die Szene unabhängig von den anderen, einer genügt. Um mehrere Bedingungen gleichzeitig zu verlangen, füge der Szene einen Bedingungsschritt hinzu.",
+    "backButton": "Zurück zur Szenenliste",
+    "insertStepButton": "Hier einen Schritt einfügen",
+    "closeSettingsButton": "Einstellungen schließen",
+    "deleteActionButton": "Diese Aktion löschen",
+    "deleteConditionButton": "Diese Bedingung löschen",
+    "deleteStepButton": "Diesen Schritt löschen",
+    "moveHandleLabel": "Neu anordnen (ziehen, oder Pfeiltasten hoch und runter)",
+    "deleteTriggerButton": "Diesen Auslöser löschen",
+    "expandStepButton": "Details anzeigen",
+    "collapseStepButton": "Details ausblenden",
+    "externalIntegration": {
+      "triggerNotInstalled": "Dieser Auslöser stammt von einer Integration, die nicht mehr installiert ist. Er kann erst wieder auslösen, wenn die Integration erneut installiert wird.",
+      "triggerNotDeclared": "Dieser Auslöser wird von der installierten Version der Integration nicht mehr deklariert. Er wird nicht mehr auslösen.",
+      "triggerInactive": "Die Integration ist gestoppt: dieser Auslöser kann erst auslösen, wenn sie läuft.",
+      "actionNotInstalled": "Diese Aktion stammt von einer Integration, die nicht mehr installiert ist. Sie schlägt fehl, bis die Integration erneut installiert wird.",
+      "actionNotDeclared": "Diese Aktion wird von der installierten Version der Integration nicht mehr deklariert. Sie schlägt beim Ausführen der Szene fehl.",
+      "actionInactive": "Die Integration ist gestoppt: diese Aktion schlägt fehl, bis sie läuft.",
+      "catalogLoading": "Auslöser und Aktionen der Integration werden geladen…",
+      "catalogUnavailableError": "Die Auslöser und Aktionen der Integrationen konnten nicht geladen werden, die Szene wurde daher nicht gespeichert. Versuche es gleich noch einmal.",
+      "wildcardHint": "Ein leer gelassenes Feld akzeptiert jeden Wert.",
+      "variablesAvailable": "Informationen, die an die Aktionen der Szene weitergegeben werden:",
+      "outputsAvailable": "Ergebnisse, die in den folgenden Schritten verwendbar sind:",
+      "variablesHint": "Tippe '{{', um Informationen der Szene einzufügen, zum Beispiel die vom Auslöser übermittelten.",
+      "requiredFieldError": "Das Feld „{{field}}“ von „{{title}}“ ist erforderlich: es darf nicht leer bleiben."
     }
   },
   "profile": {
@@ -3687,6 +4303,7 @@
     "english": "English",
     "french": "Français",
     "german": "Deutsch",
+    "spanish": "Español",
     "roleLabel": "Rolle",
     "passwordLabel": "Passwort (mindestens 8 Zeichen)",
     "passwordPlaceholder": "Gib dein Passwort ein",
@@ -3713,6 +4330,7 @@
     "housesTab": "Zuhause",
     "usersTab": "Benutzer",
     "sessionsTab": "Sitzungen",
+    "securityTab": "Sicherheit",
     "systemTab": "System",
     "gatewayTab": "Gladys Plus",
     "backupTab": "Backups",
@@ -3720,13 +4338,47 @@
     "billingTab": "Abrechnung",
     "gatewayUsersTab": "Plus-Benutzer",
     "gatewayOpenApiTab": "Open API",
-    "jobsTab": "Aufgaben"
+    "jobsTab": "Aufgaben",
+    "scrollLeft": "Menü nach links scrollen",
+    "scrollRight": "Menü nach rechts scrollen"
   },
   "housesSettings": {
+    "title": "Zuhause",
+    "subtitle": "Ein Zuhause enthält Räume, und jedes Gerät gehört zu einem Raum. Öffne ein Zuhause, um es zu bearbeiten.",
     "searchPlaceholder": "Zuhause durchsuchen",
     "newButton": "Neu",
+    "newButtonLabel": "Zuhause erstellen",
     "defaultNewHouseName": "Neues Zuhause",
-    "noHouseFound": "Keine Zuhause gefunden."
+    "noHouseFound": "Keine Zuhause gefunden.",
+    "houseCount": "{{count}} Zuhause",
+    "oneHouseCount": "1 Zuhause",
+    "saved": "Gespeichert",
+    "removeRoom": "Raum entfernen",
+    "toggleAlarmCodeVisibility": "Alarmcode anzeigen oder ausblenden",
+    "deleteConfirmTitle": "„{{name}}“ löschen?",
+    "deleteConfirmDescription": "Das Zuhause und alle seine Räume werden gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "summary": {
+      "rooms": "{{count}} Räume",
+      "oneRoom": "1 Raum",
+      "noRoom": "Kein Raum",
+      "located": "Verortet",
+      "notLocated": "Nicht verortet",
+      "alarmSet": "Alarmcode festgelegt",
+      "alarmNotSet": "Kein Alarmcode",
+      "neverSaved": "Noch nicht gespeichert",
+      "unsavedChanges": "Nicht gespeicherte Änderungen"
+    },
+    "sections": {
+      "identity": "Identität",
+      "location": "Standort",
+      "rooms": "Räume",
+      "noRoomYet": "Noch kein Raum. Füge unten einen hinzu."
+    },
+    "empty": {
+      "title": "Noch kein Zuhause",
+      "description": "Erstelle dein erstes Zuhause, um Räume hinzuzufügen und deine Geräte zu organisieren.",
+      "button": "Zuhause erstellen"
+    }
   },
   "usersSettings": {
     "title": "Benutzer",
@@ -3804,8 +4456,13 @@
     "wrongEmailError": "This is not a valid email",
     "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
     "unknownError": "An unknown error occurred. Please try again or contact Gladys community.",
-    "success": "Success! I sent you a reset password link by Telegram or Nextcloud Talk. If you haven't configured these services, the reset password link will be in Gladys logs.",
+    "success": "Success! I sent you a reset password link by Telegram or Nextcloud Talk, or a one-time code instead of a link if this address has never been used to log in to your Gladys instance. If you haven't configured these services, it will be in Gladys logs. If you received a code, enter it below to choose a new password.",
     "howToAccessLogs": "To access Gladys logs, go to the command line and type `docker logs gladys --tail=1000` to display the last 1000 lines.",
+    "codeLabel": "One-time code",
+    "codePlaceholder": "XXXX-XXXX",
+    "codeButton": "Continue",
+    "codeInvalid": "This code is invalid or has expired. Request a new one below.",
+    "sendCodeAgain": "Send a new code",
     "userNotFound": "There is no account linked to this email.",
     "rateLimitError": "You have tried this form too many times. Please retry in 30 minutes or restart your Gladys instance now.",
     "invalidEmail": "We are unable to verify your email address.",
@@ -3864,6 +4521,7 @@
       },
       "statesMigrated": "Verschobene Verlaufszustände: {{count}}",
       "orphanedStates": "Verwaiste Zustände: {{count}}",
+      "fallbackPrices": "Mit dem Ersatzpreis bepreist (fehlender Kalenderwert): {{count}}",
       "duration": "Dauer: {{duration}}"
     },
     "jobTypes": {
@@ -3887,6 +4545,9 @@
       "energy-monitoring-consumption-from-index-beginning": "Energieverbrauchsberechnung aus Index (von Anfang an)",
       "energy-monitoring-production-from-index-thirty-minutes": "Energieerzeugungsberechnung aus Index (30 Minuten)",
       "energy-monitoring-production-from-index-beginning": "Energieerzeugungsberechnung aus Index (von Anfang an)",
+      "energy-monitoring-cost-calculation-contract": "Neuberechnung der Energiekosten (Vertrags- oder Kalenderänderung)",
+      "energy-monitoring-billing-period-end": "Energiekostenberechnung (Ende des Abrechnungszeitraums)",
+      "energy-monitoring-delegated-catch-up": "Nachholen der Energiekosten (von einer Integration berechnete Verträge)",
       "service-enedis-sync": "Enedis-Datensynchronisation",
       "ai-weekly-digest": "KI-Wochenzusammenfassung"
     },
@@ -3902,6 +4563,7 @@
     "connected": "Verbunden",
     "ping": "{{time}} ms Ping",
     "disk": "Speicher",
+    "localIp": "Host-IP",
     "uptime": "Betriebszeit",
     "gladysVersion": "Version",
     "gladysVersionValue": "Gladys {{version}}",
@@ -3920,6 +4582,9 @@
     "pinnedImageRecommendation": "Damit die Aktualisierung funktioniert, erstelle deinen Container mit dem Image „{{recommendedImage}}“ neu, das neuen Versionen folgt. Deine Daten liegen nicht im Container und gehen daher nicht verloren.",
     "upgradeError": {
       "IMAGE_TAG_PINNED": "Aktualisierung abgebrochen: Dein Container verwendet das feste Image „{{image}}“. Erstelle ihn mit „{{recommendedImage}}“ neu, um ihn aktualisieren zu können.",
+      "IMAGE_PULL_FAILED": "Aktualisierung nicht möglich: Gladys konnte das Image „{{image}}“ nicht herunterladen. Docker-Fehler: {{message}}. Überprüfe die Internetverbindung und den freien Speicherplatz des Geräts, auf dem Gladys läuft, und versuche es dann erneut.",
+      "IMAGE_PULL_TIMEOUT": "Aktualisierung nicht möglich: Der Download des Images „{{image}}“ wurde nicht innerhalb von 15 Minuten abgeschlossen und abgebrochen, es wurde nichts geändert. Überprüfe die Internetverbindung des Geräts, auf dem Gladys läuft, und versuche es dann erneut.",
+      "NOT_ENOUGH_DISK_SPACE": "Aktualisierung nicht möglich: Auf dem Gerät, auf dem Gladys läuft, ist beim Herunterladen des Images „{{image}}“ der Speicherplatz ausgegangen. Gib Speicherplatz frei, zum Beispiel indem du nicht mehr verwendete Docker-Images entfernst (`docker image prune -a` entfernt alle Images, die von keinem Container verwendet werden), und versuche es dann erneut.",
       "NO_UPDATE_APPLIED": "Es wurde keine Aktualisierung durchgeführt: Watchtower hat kein neues Image für „{{image}}“ gefunden. Versuche es in einigen Minuten erneut, das neue Image ist für deine Architektur möglicherweise noch nicht verfügbar.",
       "WATCHTOWER_FAILED": "Die Aktualisierung ist fehlgeschlagen: Der Watchtower-Container wurde mit dem Fehlercode {{statusCode}} beendet. Weitere Informationen findest du in den Gladys-Logs.",
       "WATCHTOWER_TIMEOUT": "Die Aktualisierung dauert länger als erwartet und Gladys verfolgt sie nicht mehr. Sie läuft möglicherweise noch: Aktualisiere diese Seite in einigen Minuten, um die installierte Version zu prüfen.",
@@ -3941,6 +4606,13 @@
     "configurationTitle": "Konfiguration",
     "timezone": "Zeitzone",
     "timezoneText": "Die Zeitzone wird für zeitabhängige Szenen verwendet.",
+    "mdns": "Lokale Adresse (mDNS)",
+    "mdnsText": "Gladys macht sich im lokalen Netzwerk bekannt und ist unter der folgenden Adresse erreichbar. Ändere den Namen, wenn mehrere Gladys-Instanzen in deinem Netzwerk laufen. Die Änderung wird sofort übernommen, ein Neustart ist nicht nötig.",
+    "mdnsSaved": "Gespeichert!",
+    "mdnsInvalidName": "Ungültiger Name: Verwende nur Kleinbuchstaben, Ziffern und Bindestriche, beginne und ende nicht mit einem Bindestrich und bleibe unter 64 Zeichen.",
+    "mdnsError": "Beim Speichern ist ein Fehler aufgetreten.",
+    "mdnsCurrentUrl": "Gladys ist erreichbar unter:",
+    "mdnsNotAdvertised": "Gladys macht sich im lokalen Netzwerk nicht bekannt: Sie läuft in einem Docker-Container im Bridge-Modus oder es wurde keine lokale Netzwerkschnittstelle erkannt.",
     "deviceStateRetentionTime": "Gerätestatusverlauf behalten",
     "deviceStateRetentionTimeDescription": "Lege fest, wie lange Gladys die Status deiner Geräte in der Datenbank aufbewahren soll.",
     "deviceAggregatesStateRetentionTime": "Aggregierte Zustände behalten",
@@ -3953,6 +4625,17 @@
     "vacuumDatabaseButton": "Datenbankreinigung starten",
     "vacuumDatabaseStarted": "Die Datenbankreinigung wurde gestartet. Gladys wird erst wieder verfügbar sein, wenn dieser Vorgang abgeschlossen ist.",
     "vacuumDatabaseFinished": "Die Datenbankreinigung wurde abgeschlossen. Gladys ist wieder verfügbar. Zeit für die Reinigung: {{duration}}.",
+    "hostPowerTitle": "Host neu starten / herunterfahren",
+    "hostPowerDescription": "Starten Sie den Rechner, auf dem Gladys läuft (z. B. Ihren Raspberry Pi), neu oder fahren Sie ihn herunter. Dies verwendet systemd-logind über DBus: Bei einer Docker-Installation nutzt Gladys einen kurzlebigen Helfer-Container, der über den Docker-Socket gestartet wird, sodass am Gladys-Container selbst nichts eingehängt werden muss. Gladys und alle Ihre Automatisierungen werden angehalten, bis der Rechner wieder eingeschaltet wird.",
+    "hostRebootButton": "Host neu starten",
+    "hostShutdownButton": "Host herunterfahren",
+    "hostRebootConfirm": "Möchten Sie den Host-Rechner wirklich neu starten? Gladys ist während des Neustarts nicht verfügbar.",
+    "hostShutdownConfirm": "Möchten Sie den Host-Rechner wirklich herunterfahren? Gladys bleibt aus, bis Sie den Rechner manuell wieder einschalten.",
+    "hostRebootSent": "Neustartbefehl gesendet. Der Host startet neu, Gladys ist in Kürze wieder verfügbar.",
+    "hostShutdownSent": "Herunterfahren-Befehl gesendet. Der Host wird ausgeschaltet.",
+    "hostPowerError": "Befehl konnte nicht gesendet werden: Der Host hat ihn abgelehnt oder systemd-logind war nicht erreichbar. Details finden Sie in den Gladys-Logs.",
+    "hostPowerUnavailable": "Neustart und Herunterfahren sind bei dieser Installation nicht verfügbar: Dieser Host erlaubt Gladys nicht, ihn über systemd-logind neu zu starten oder auszuschalten.",
+    "hostPowerUnavailableTooltip": "Nicht verfügbar: Dieser Host erlaubt Gladys nicht, ihn über systemd-logind neu zu starten oder auszuschalten.",
     "containerState": {
       "created": "Erstellt",
       "restarting": "Startet neu",
@@ -3964,11 +4647,14 @@
     },
     "batteryLevel": "Batteriestandswarnung",
     "batteryLevelDescription": "Jeden Samstag um 9:00 Uhr wird eine Nachricht an alle Administratoren gesendet, wenn der Batteriestand eines Geräts unter den gewählten Schwellenwert fällt.",
+    "systemMessageService": "Kanal für Systemnachrichten",
+    "systemMessageServiceDescription": "Wähle, wohin Gladys seine Systemnachrichten an die Administratoren sendet (Gladys-Update, fehlgeschlagene Sicherung, schwache Batterien, Gladys Plus-Abonnement, wöchentliche KI-Zusammenfassung). Sie bleiben immer in der Gladys-Unterhaltung sichtbar.",
     "duckDbMigrationTitle": "Migration zu DuckDB",
     "duckDbMigrationDescription": "Wir migrieren zu einem neuen Datenbanksystem für Sensordaten. Gladys wird Ihre Daten automatisch migrieren, aber Ihre Daten in Ihrer SQLite-Datenbank nicht löschen, um Datenverlust zu vermeiden.",
     "duckDbMigrationProgressTitle": "Migrationsfortschritt",
     "duckDbMigrationMigrationDone": "Migration abgeschlossen:",
     "duckDbNumberOfStatesinSQlite": "Anzahl der Zustände in SQLite",
+    "duckDbNumberOfAggregatesinSQlite": "Anzahl der Aggregate in SQLite",
     "duckDbNumberOfStatesinDuckDb": "Anzahl der Zustände in DuckDB",
     "restartMigrationTitle": "Migration neu starten",
     "confirm": "Bestätigen",
@@ -4006,6 +4692,7 @@
     "noResult": "Kein Symbol entspricht \"{{search}}\"."
   },
   "newScene": {
+    "backButton": "Zurück zur Szenenliste",
     "cardTitle": "Neue Szene",
     "nameLabel": "Name",
     "namePlaceholder": "Gib den Namen deiner Szene ein",
@@ -4016,6 +4703,7 @@
     "sceneAlreadyExist": "Eine Szene mit diesem Namen existiert bereits."
   },
   "duplicateScene": {
+    "backButton": "Zurück zur Szene",
     "cardTitle": "Szene \"{{name}}\" duplizieren",
     "nameLabel": "Name",
     "namePlaceholder": "Gib einen neuen Namen ein",
@@ -4028,13 +4716,22 @@
   },
   "scene": {
     "title": "Szenen",
-    "emptySceneSentenceTop": "Es wurden keine Szenen gefunden.",
+    "emptyState": {
+      "missionChip": "Erste Mission",
+      "title": "Erstellen Sie Ihre erste Szene",
+      "text": "Ihr Zuhause wartet nur auf ein Signal: das Licht bei Sonnenuntergang einschalten, die Heizung nachts herunterdrehen, Musik beim Aufwachen abspielen... Sie sind dran!",
+      "createButton": "Meine erste Szene erstellen",
+      "noResultsTitle": "Keine Szene stimmt überein",
+      "noResultsText": "Versuchen Sie ein anderes Stichwort oder löschen Sie die Filter, um Ihre Szenen wiederzufinden."
+    },
     "newButton": "Neu",
     "editButton": "Bearbeiten",
     "startButton": "Starten",
     "searchPlaceholder": "Szene suchen",
     "filterTagsName": "Nach Tags filtern",
-    "unselectTags": "Alle Tags abwählen"
+    "unselectTags": "Alle Tags abwählen",
+    "running": "Läuft",
+    "stopButton": "Stoppen"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -4047,6 +4744,7 @@
     "backupKeyDescription": "Dein Backup-Schlüssel wird verwendet, um deine Gladys-Backups sicher zu verschlüsseln. Bitte bewahre diesen Schlüssel außerhalb von Gladys auf, um Gladys wiederherstellen zu können. Wir empfehlen dafür die Verwendung eines Passwortmanagers.",
     "backupKeyLabel": "Dein Backup-Schlüssel",
     "backupKeyPlaceholder": "Backup-Schlüssel eingeben/wiederherstellen",
+    "toggleBackupKeyVisibility": "Backup-Schlüssel anzeigen oder verbergen",
     "saveBackupKeyButton": "Speichern",
     "usersListTitle": "Remote-Benutzer",
     "userColumn": "Benutzer",
@@ -4062,7 +4760,24 @@
     "gatewayConnectedSuccessDescription": "Dein Gladys wurde erfolgreich verbunden.",
     "gatewayConnectedSuccessBackupKey": "Es wird täglich automatisch ein Backup erstellt, verschlüsselt mit dem folgenden Schlüssel. Damit du dein Gladys später wiederherstellen kannst, bewahre bitte diesen Verschlüsselungsschlüssel an einem sicheren Ort außerhalb von Gladys auf. Ohne diesen Schlüssel kannst du Gladys nicht wiederherstellen.",
     "gatewayConnectedSuccessButton": "Ich habe den Backup-Schlüssel sicher aufbewahrt!",
-    "accountExpired": "Dein Gladys-Plus-Account ist abgelaufen. Um dein Abonnement zu verlängern, gehe zum Tab \"<a href=\"/dashboard/settings/billing\">Abrechnung</a>\"."
+    "accountExpired": "Dein Gladys-Plus-Account ist abgelaufen. Um dein Abonnement zu verlängern, gehe zum Tab \"<a href=\"/dashboard/settings/billing\">Abrechnung</a>\".",
+    "subscriptionPaymentRequiredTitle": "Gladys-Plus-Abonnement ausgesetzt: Zahlung erforderlich",
+    "subscriptionPaymentRequiredText": "Gladys Plus hat die letzten Anfragen deiner Instanz abgelehnt, weil dein Abonnement nicht bezahlt ist. Backups, die Enedis-Synchronisation und die KI-Funktionen sind so lange pausiert. Es geht nichts verloren: Aktualisiere deine Zahlungsmethode in deinem Gladys-Plus-Konto und prüfe dann hier erneut. Deine Instanz prüft außerdem einmal täglich von selbst.",
+    "subscriptionOpenBilling": "Zahlungsmethode aktualisieren",
+    "subscriptionCheckAgain": "Erneut prüfen",
+    "subscriptionStillNotPaid": "Gladys Plus meldet weiterhin, dass eine Zahlung erforderlich ist. Nach Zahlungseingang kann es einige Minuten dauern, bis sie berücksichtigt wird.",
+    "subscriptionCheckError": "Das Abonnement konnte bei Gladys Plus nicht geprüft werden: Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+    "instanceOfflineAlertTitle": "Benachrichtigung, wenn Gladys offline ist",
+    "instanceOfflineAlertDescription": "Gladys Plus sieht, wann sich deine Instanz verbindet und trennt: Bleibt sie länger als die gewählte Zeit unerreichbar (Stromausfall, abgestürzter Internetrouter, defekte SD-Karte …), schickt Gladys Plus den Administratoren deines Gladys-Plus-Kontos eine E-Mail und eine weitere, sobald sie wieder online ist.",
+    "instanceOfflineAlertLocalModeNotice": "Diese Einstellung gehört zu deinem Gladys-Plus-Konto: Öffne diese Seite über Gladys Plus, um sie zu ändern.",
+    "instanceOfflineAlertOpenGladysPlus": "Gladys Plus öffnen",
+    "instanceOfflineAlertLoadError": "Deine Gladys-Plus-Einstellungen konnten nicht geladen werden: Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+    "instanceOfflineAlertEnabledLabel": "Den Administratoren meines Gladys-Plus-Kontos eine E-Mail schicken, wenn meine Gladys offline ist",
+    "instanceOfflineAlertAdminOnly": "Nur ein Administrator des Gladys-Plus-Kontos kann diese Einstellung ändern.",
+    "instanceOfflineAlertDelayLabel": "Benachrichtigen nach",
+    "instanceOfflineAlertDelayHelp": "Kurz genug, um nützlich zu sein, lang genug, um nicht von einem neu startenden Router geweckt zu werden. Gladys Plus prüft alle paar Minuten, die E-Mail kann also einige Minuten nach dieser Zeit verschickt werden.",
+    "instanceOfflineAlertSaved": "Gespeichert.",
+    "instanceOfflineAlertSaveError": "Diese Einstellung konnte nicht gespeichert werden: Bitte überprüfe deine Internetverbindung und versuche es erneut."
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
@@ -4072,6 +4787,14 @@
     "heroReassurance": "1 Monat kostenlos testen · Ohne Kreditkarte · Jederzeit kündbar",
     "startFreeTrialButton": "Kostenlose Testphase starten",
     "alreadySubscriberButton": "Ich habe bereits ein Konto",
+    "newBadge": "Neu",
+    "offlineAlert": {
+      "title": "Erhalte eine E-Mail, wenn deine Gladys ausfällt",
+      "description": "Stromausfall, abgestürzter Internetrouter, defekte SD-Karte, ein missglücktes Docker-Update: Bleibt deine Instanz unerreichbar, schickt dir Gladys Plus eine E-Mail. So erfährst du es noch am selben Tag und nicht erst abends, wenn du nach Hause kommst.",
+      "delay": "Du wählst die Wartezeit, von 10 Minuten bis 24 Stunden",
+      "backOnline": "Eine zweite E-Mail, sobald deine Gladys wieder online ist",
+      "onByDefault": "Standardmäßig aktiviert, in beiden Tarifen enthalten: nichts einzurichten"
+    },
     "featuresTitle": "Alles, was enthalten ist",
     "featuresSubtitle": "Ein komplettes Paket, um dein Smart Home wirklich nützlich zu machen.",
     "features": {
@@ -4118,6 +4841,7 @@
       "priceDetail": "69,99 € jährlich (17 % sparen)",
       "features": {
         "remoteAccess": "Ende-zu-Ende-verschlüsselter Fernzugriff",
+        "offlineAlert": "E-Mail-Benachrichtigung, wenn deine Gladys offline ist",
         "voiceAssistants": "Google Home & Amazon Alexa",
         "openApi": "Offene REST-API",
         "familyAccounts": "Konten für die ganze Familie"
@@ -4175,6 +4899,14 @@
       "feature1": "Licht an, Ventilator aus, per Nachricht im Chat",
       "feature2": "Proaktive KI in Szenen: führt regelmäßig Smart-Home-Abfragen aus (Kennzeichen lesen, CO₂-Wert prüfen, eine Kamera überwachen…)",
       "feature3": "Open-Weight-KI-Modelle · keine weiterverkauften Daten"
+    },
+    "chat": {
+      "title": "Chatte mit deinem Zuhause dank Gladys-Plus-KI",
+      "description": "Gladys Plus schaltet den Chat frei: Stelle Fragen in natürlicher Sprache, steuere deine Geräte und erfahre, was bei dir zu Hause los ist. Open-Weight-KI-Modelle, in Frankreich gehostet.",
+      "feature1": "„Mach das Licht im Wohnzimmer aus“, „Ist das Garagentor zu?“ – einfach eine Nachricht senden",
+      "feature2": "In deinen Szenen analysiert die KI, was deine Kameras sehen, und antwortet dir",
+      "feature3": "Erhalte eine wöchentliche Übersicht deines Zuhauses: Temperaturen, Verbrauch, eingeschaltete Geräte",
+      "feature4": "Open-Weight-KI-Modelle · keine weiterverkauften Daten"
     },
     "enedis": {
       "title": "Verfolge deinen Stromverbrauch mit Enedis",
@@ -4245,13 +4977,34 @@
     "twoFactorCodePlaceholder": "6-stelliger Code",
     "loginTwoFactorButtonText": "Login abschließen",
     "invalidTwoFactorCode": "Der Zwei-Faktor-Code ist ungültig. Versuche es erneut mit einem neuen Code aus deiner App.",
-    "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> und wir setzen sie zurück.",
+    "invalidRecoveryCode": "Dieser Wiederherstellungscode ist ungültig oder wurde bereits verwendet.",
+    "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren?",
+    "useRecoveryCodeLink": "Einen Wiederherstellungscode verwenden",
+    "noRecoveryCode": "Keinen Wiederherstellungscode? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> und wir setzen sie zurück.",
+    "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
+    "recoveryCodeLabel": "Wiederherstellungscode",
+    "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",
     "twoFactorEnabledSuccess": "Die Zwei-Faktor-Authentifizierung ist jetzt aktiviert! Gib einen neuen Code aus deiner App ein, um den Login abzuschließen."
+  },
+  "gatewayRecoveryCodes": {
+    "cardTitle": "Deine Wiederherstellungscodes",
+    "description": "Wenn du den Zugriff auf deine Zwei-Faktor-App verlierst, kannst du dich mit einem dieser Einmal-Codes bei deinem Gladys Plus Konto anmelden.",
+    "saveThemNow": "Speichere diese Codes jetzt an einem sicheren Ort: Sie werden nie wieder angezeigt.",
+    "downloadButton": "Herunterladen",
+    "copyButton": "Kopieren",
+    "copiedButton": "Kopiert!",
+    "generationError": "Wir konnten deine Wiederherstellungscodes nicht erzeugen. Ohne sie kannst du dich nicht anmelden, wenn du deine Zwei-Faktor-App verlierst.",
+    "retryButton": "Erneut versuchen",
+    "generateButton": "Wiederherstellungscodes erzeugen",
+    "confirmGenerateButton": "Neue Codes erzeugen",
+    "rotationWarning": "Ein neuer Satz macht die Wiederherstellungscodes, die du eventuell schon hast, sofort ungültig. Nur die neuen funktionieren.",
+    "continueButton": "Weiter",
+    "twoFactorCodeRequired": "Gib einen Code aus deiner Zwei-Faktor-App ein: Das Gateway verlangt ihn, um Wiederherstellungscodes zu erzeugen."
   },
   "gatewayConfigureTwoFactor": {
     "cardTitle": "Zwei-Faktor-Authentifizierung (2FA) konfigurieren",
     "twoFactorNotConfigured": "Die Zwei-Faktor-Authentifizierung (2FA) ist auf deinem Gladys-Plus-Account noch nicht konfiguriert. Sie ist erforderlich, um deine Instanz zu verbinden.",
-    "scanInstructions": "Scanne diesen QR-Code mit einer Zwei-Faktor-App (Authy, Google Authenticator...) oder kopiere das Secret manuell in deine App.",
+    "scanInstructions": "Scanne diesen QR-Code mit deiner Zwei-Faktor-App oder kopiere das Secret manuell in deine App.",
     "secretLabel": "Secret",
     "copy": "Kopieren",
     "confirmCodeLabel": "Gib den in deiner App angezeigten Code ein",
@@ -4301,6 +5054,7 @@
     "watt-hour": "Wattstunde (Wh)",
     "kilowatt-hour": "Kilowattstunde (kWh)",
     "megawatt-hour": "Megawattstunde (MWh)",
+    "gram-co2eq-per-kilowatt-hour": "Gramm CO₂-Äquivalent pro Kilowattstunde (gCO₂eq/kWh)",
     "ampere": "Ampere (A)",
     "milliampere": "Milliampere (mA)",
     "millivolt": "Millivolt (mV)",
@@ -4398,6 +5152,7 @@
     "watt-hour": "Wh",
     "kilowatt-hour": "kWh",
     "megawatt-hour": "MWh",
+    "gram-co2eq-per-kilowatt-hour": "gCO₂eq/kWh",
     "ampere": "A",
     "milliampere": "mA",
     "millivolt": "mV",
@@ -4474,6 +5229,21 @@
     "square-meter": "m²",
     "square-kilometer": "km²",
     "decibel": "dB"
+  },
+  "lightControl": {
+    "openPanel": "Lichteinstellungen öffnen",
+    "brightness": "Helligkeit",
+    "color": "Farbe",
+    "temperature": "Farbtemperatur",
+    "hue": "Farbton",
+    "saturation": "Sättigung",
+    "warm": "Warm",
+    "cold": "Kalt",
+    "on": "An",
+    "off": "Aus",
+    "turnOn": "Einschalten",
+    "turnOff": "Ausschalten",
+    "close": "Schließen"
   },
   "deviceFeatureAction": {
     "category": {
@@ -4607,6 +5377,12 @@
           "low": "Niedrig",
           "medium": "Mittel",
           "high": "Hoch"
+        },
+        "alarm-mode": {
+          "idle": "Kein Alarm",
+          "sound": "Ton",
+          "light": "Licht",
+          "sound_and_light": "Ton und Licht"
         }
       },
       "vacuum-cleaner": {
@@ -4900,6 +5676,25 @@
         "test-in-progress": {
           "0": "Nein",
           "1": "Ja"
+        },
+        "alarm-mode": {
+          "0": "Kein Alarm",
+          "1": "Ton",
+          "2": "Licht",
+          "3": "Ton und Licht"
+        },
+        "alarm-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Inaktiv",
+          "1": "Ton",
+          "2": "Licht",
+          "3": "Ton und Licht"
+        }
+      },
+      "battery": {
+        "charging": {
+          "0": "Lädt nicht",
+          "1": "Lädt"
         }
       },
       "music": {
@@ -4934,6 +5729,21 @@
           "other": "Kein Wert empfangen",
           "zero": "Kein Rauch",
           "one": "Rauch erkannt"
+        },
+        "contamination-state": {
+          "0": "Sauber",
+          "1": "Leicht verschmutzt",
+          "2": "Mittel verschmutzt",
+          "3": "Stark verschmutzt",
+          "unknown": "{{value}} (unbekannt)"
+        },
+        "muted": {
+          "0": "Kann auslösen",
+          "1": "Stummgeschaltet"
+        },
+        "temporary-mute": {
+          "0": "Auslösen lassen",
+          "1": "Alarm stummschalten"
         }
       },
       "co-sensor": {
@@ -5132,7 +5942,8 @@
     },
     "battery": {
       "shortCategoryName": "Batterie",
-      "integer": "Batterie"
+      "integer": "Batterie",
+      "charging": "Lädt"
     },
     "battery-low": {
       "shortCategoryName": "Niedriger Batteriestand",
@@ -5143,7 +5954,8 @@
       "decimal": "Temperatur",
       "min": "Minimale Temperatur",
       "max": "Maximale Temperatur",
-      "average": "Mitteltemperatur Temperatur"
+      "average": "Mitteltemperatur Temperatur",
+      "probe": "Fühlertemperatur"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Gerätetemperatursensor",
@@ -5205,6 +6017,7 @@
     "camera": {
       "shortCategoryName": "Kamera",
       "image": "Kamera",
+      "enabled": "Kamera aktiviert",
       "move": "Kamerabewegung (PTZ)",
       "preset": "Kamera-Preset",
       "pan-position": "Kamera-Schwenkposition",
@@ -5231,7 +6044,10 @@
     "smoke-sensor": {
       "shortCategoryName": "Rauchsensor",
       "binary": "Rauch (an/aus)",
-      "decimal": "Dichte (dezimal)"
+      "decimal": "Dichte (dezimal)",
+      "contamination-state": "Verschmutzung",
+      "muted": "Stummgeschaltet",
+      "temporary-mute": "Alarm stummschalten"
     },
     "co-sensor": {
       "shortCategoryName": "Kohlenmonoxid (CO)-Sensor",
@@ -5258,7 +6074,9 @@
       "binary": "Sirene",
       "lmh_volume": "Lautstärke der Sirene",
       "melody": "Melodie",
-      "test-in-progress": "Test läuft"
+      "test-in-progress": "Test läuft",
+      "alarm-mode": "Alarmmodus",
+      "alarm-state": "Alarmzustand"
     },
     "cube": {
       "shortCategoryName": "Würfel",
@@ -5457,6 +6275,12 @@
       "thirty-minutes-production": "Produktion 30 Minuten",
       "thirty-minutes-production-revenue": "Ertrag 30 Minuten"
     },
+    "grid-carbon-sensor": {
+      "shortCategoryName": "Netz-CO₂-Sensor",
+      "carbon-intensity": "CO₂-Intensität des Netzes",
+      "carbon-free-percentage": "CO₂-freier Strom",
+      "renewable-percentage": "Erneuerbarer Strom"
+    },
     "grid-sensor": {
       "shortCategoryName": "Netzsensor",
       "input-power": "Netzbezugsleistung",
@@ -5525,16 +6349,20 @@
       "smaxin": "Max. eingespeiste Scheinleistung n (SMAXIN)",
       "smaxin_1": "Max. eingespeiste Scheinleistung n-1 (SMAXIN-1)",
       "smaxn": "Max. abgegebene Scheinleistung (SMAXN)",
+      "smaxn1": "Max. abgegebene Scheinleistung (SMAXN1)",
       "smaxn2": "Max. abgegebene Scheinleistung (SMAXN2)",
       "smaxn3": "Max. abgegebene Scheinleistung (SMAXN3)",
       "sinsts": "Momentane abgegebene Scheinleistung (SINSTS)",
+      "sinsts1": "Momentane abgegebene Scheinleistung (SINSTS1)",
       "sinsts2": "Momentane abgegebene Scheinleistung (SINSTS2)",
       "sinsts3": "Momentane abgegebene Scheinleistung (SINSTS3)",
       "smaxn_1": "Max. entnommene Scheinleistung n-1 (SMAXN-1)",
+      "smaxn1_1": "Max. entnommene Scheinleistung n-1 (SMAXN1-1)",
       "smaxn2_1": "Max. entnommene Scheinleistung n-1 (SMAXN2-1)",
       "smaxn3_1": "Max. entnommene Scheinleistung n-1 (SMAXN3-1)",
       "hhphc": "HPHC-Programm (HHPHC)",
       "imax": "Spitzenstrom (IMAX)",
+      "imax1": "Spitzenstrom (IMAX1)",
       "adps": "Warnung bei Überschreitung der Vertragsleistung (ADPS)",
       "imax2": "Spitzenstrom (IMAX2)",
       "imax3": "Spitzenstrom (IMAX3)",
@@ -5700,7 +6528,6 @@
   },
   "chat": {
     "emptyStateMessage": "Schick mir eine Nachricht!",
-    "emptyStateMessageNoPlus": "Der Gladys-Chat nutzt Gladys-Plus-KI. Verbinde deine Instanz mit Gladys Plus, um mit deinem Zuhause zu chatten.",
     "messagePlaceholder": "Tippe deine Nachricht …",
     "sendingInProgress": "Senden …",
     "typingInProgress": "Tippt …",
@@ -5716,17 +6543,17 @@
       "auto": "Auto",
       "priceLegend": "€ günstig · €€ mittel · €€€ premium"
     },
-    "sidebar": {
-      "title": "Wie funktioniert der Chat?",
-      "intro": "Der Gladys-Chat nutzt die Gladys-Plus-Künstliche Intelligenz, damit du natürlich mit deinem vernetzten Zuhause kommunizieren kannst.",
-      "plusNotConfigured": "Verbinde Gladys Plus, um den KI-Chat zu nutzen.",
-      "plusActive": "Gladys-Plus-KI ist in diesem Chat aktiv.",
-      "upsellTitle": "Erweiterte KI freischalten",
-      "upsellCompactDescription": "Gladys Plus gibt dir Zugang zu Open-Weight-KI-Modellen in diesem Chat: offene Fragen, Kameranalyse und mehr.",
-      "upsellDescription": "Chatte natürlich mit deinem vernetzten Zuhause dank Gladys-Plus-Künstlicher Intelligenz.",
-      "upsellFeature1": "Stelle deinem Zuhause offene Fragen",
-      "upsellFeature2": "Analysiere, was deine Kameras sehen",
-      "upsellFeature3": "Open-Weight-KI-Modelle in Frankreich gehostet"
+    "voiceInput": {
+      "startListening": "Nachricht diktieren",
+      "stopListening": "Diktat beenden",
+      "error": "Das Diktat ist fehlgeschlagen. Prüfe, ob Gladys Plus verbunden ist, und versuche es erneut.",
+      "errorNoSpeech": "Keine Stimme erkannt. Prüfe, ob dein Mikrofon aktiviert ist, und versuche es erneut.",
+      "errorPermissionDenied": "Der Mikrofonzugriff wurde verweigert. Erlaube ihn in den Einstellungen deines Browsers, um eine Nachricht zu diktieren.",
+      "errorNoMicrophone": "Kein Mikrofon erkannt. Schließe eines an oder aktiviere es in den Systemeinstellungen.",
+      "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfe, ob es von einer anderen App verwendet wird.",
+      "errorNoTranscription": "Ich habe deine Nachricht nicht verstanden. Sprich näher ans Mikrofon und versuche es erneut.",
+      "errorPaymentRequired": "Dein Gladys-Plus-Abonnement ist ausgesetzt: Eine Zahlung ist erforderlich. Der Sprachassistent ist bis zur Zahlung pausiert.",
+      "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar."
     }
   },
   "history": {
@@ -5818,6 +6645,21 @@
     "scenes": "Szenen",
     "profile": "Profil",
     "settings": "Einstellungen",
+    "trialDaysLeft": {
+      "zero": "Gladys-Plus-Testphase endet heute",
+      "one": "Gladys-Plus-Testphase: noch 1 Tag",
+      "other": "Gladys-Plus-Testphase: noch {{count}} Tage"
+    },
+    "trialAddPaymentMethod": "Zahlungsmethode hinzufügen",
+    "subscriptionNoticeTitle": "Gladys Plus ausgesetzt",
+    "subscriptionNoticeText": "Eine Zahlung ist erforderlich: Backups, die Enedis-Synchronisation und die KI-Funktionen sind pausiert, bis das Abonnement bezahlt ist.",
+    "subscriptionNoticeButton": "Zahlungsmethode aktualisieren",
+    "subscriptionNoticeCheck": "Abonnement prüfen",
+    "subscriptionNoticeContactAdmin": "Bitte wende dich an den Administrator deines Gladys-Plus-Kontos.",
+    "instanceUpdateNoticeTitle": "Update verfügbar",
+    "instanceUpdateNoticeText": "Gladys Plus wurde auf {{latestVersion}} aktualisiert, deine Instanz ist aber noch auf {{instanceVersion}}. Einige Funktionen können fehlerhaft sein, bis deine Instanz aktualisiert ist.",
+    "instanceUpdateNoticeButton": "Meine Instanz aktualisieren",
+    "instanceUpdateNoticeDismiss": "Diese Meldung ausblenden",
     "needHelp": "Hilfe benötigt",
     "signOut": "Abmelden"
   },
@@ -5840,6 +6682,13 @@
     "saveButton": "Speichern",
     "manageBillingLink": "Mein Abo und meine Rechnungen verwalten",
     "logoutButton": "Abmelden"
+  },
+  "deviceFeatureHistorySize": {
+    "size": {
+      "one": "1 Wert im Verlauf (≈ {{size}})",
+      "other": "{{count}} Werte im Verlauf (≈ {{size}})"
+    },
+    "empty": "Keine Werte im Verlauf"
   },
   "editDeviceForm": {
     "noName": "Kein Name",
@@ -5915,6 +6764,7 @@
     "formTitle": "Gladys Plus - Passwort zurücksetzen",
     "incompatibleBrowserLabel": "Dein Browser ist leider nicht mit dem Gladys Gateway kompatibel. Dein Browser muss die WebCrypto-API sowie IndexedDB-Datenbanken unterstützen.",
     "errorLinkLabel": "Wir können deinen Link zum Zurücksetzen des Passworts nicht abrufen. Vielleicht wurde er bereits verwendet oder ist abgelaufen.",
+    "invalidRecoveryCodeLabel": "Dieser Wiederherstellungscode ist ungültig oder wurde bereits verwendet. Dein Link zum Zurücksetzen des Passworts ist weiterhin gültig, versuche es mit einem anderen Wiederherstellungscode.",
     "passwordNotMatchingLabel": "Passwörter stimmen nicht überein.",
     "passwordLabel": "Passwort (mindestens 8 Zeichen)",
     "passwordPlaceholder": "Passwort",
@@ -5922,6 +6772,11 @@
     "repeatPasswordLabel": "Passwort wiederholen",
     "twoFactorCodeLabel": "Zwei-Faktor-Code",
     "twoFactorCodePlaceholder": "6-stelliger Zwei-Faktor-Code",
+    "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren?",
+    "useRecoveryCodeLink": "Einen Wiederherstellungscode verwenden",
+    "useTwoFactorCodeLink": "Stattdessen einen Code aus deiner Zwei-Faktor-App verwenden",
+    "recoveryCodeLabel": "Wiederherstellungscode",
+    "recoveryCodePlaceholder": "Gib einen deiner Wiederherstellungscodes ein",
     "resetPasswordButton": "Passwort zurücksetzen"
   },
   "gatewayOpenApi": {
@@ -5938,6 +6793,9 @@
     "registeredLabel": "Registriert:",
     "neverUsed": "Nie"
   },
+  "twoFactorApps": {
+    "description": "Jede App, die 6-stellige Codes erzeugt, funktioniert. Falls du noch keine hast, hier ein paar kostenlose Apps, die einfach zu installieren sind:"
+  },
   "gatewayTwoFactorAuth": {
     "title": "Gladys Plus",
     "configureTitle": "Zwei-Faktor-Authentifizierung konfigurieren",
@@ -5945,7 +6803,7 @@
     "secretLabel": "Geheimschlüssel",
     "copy": "Kopieren",
     "securityIsImportant": "Die Sicherheit deines Gladys Gateway-Accounts ist uns sehr wichtig.",
-    "securityApps": "Um sicherzustellen, dass dein Account sicher bleibt, aktiviere bitte die Zwei-Faktor-Authentifizierung mit einer Zwei-Faktor-App wie Authy für <a href=\"https://itunes.apple.com/us/app/authy/id494168017?mt=8\">iOS</a> oder <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
+    "securityApps": "Um sicherzustellen, dass dein Account sicher bleibt, aktiviere bitte die Zwei-Faktor-Authentifizierung mit einer Authenticator-App auf deinem Smartphone.",
     "invalidCode": "Der von dir eingegebene Zwei-Faktor-Code ist ungültig.",
     "confirmCode": "Bestätige die Zwei-Faktor-Authentifizierung",
     "enterCode": "Gib den 6-stelligen Code ein",
@@ -5997,5 +6855,12 @@
     "cancelUpgradeToYearly": "Abbrechen",
     "upgradeYearlyError": "Beim Wechsel in das jährliche Abomodell ist ein Fehler aufgetreten. Bitte kontaktiere uns per E-Mail.",
     "upgradeYearlySuccess": "Vielen Dank, dass du in das jährliche Abmodell gewechselt bist!"
+  },
+  "deviceFeatureValueText": {
+    "noValue": "Kein Wert",
+    "open": "Offen",
+    "closed": "Geschlossen",
+    "on": "An",
+    "off": "Aus"
   }
 }

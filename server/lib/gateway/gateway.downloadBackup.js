@@ -3,10 +3,14 @@ const fse = require('fs-extra');
 const fs = require('fs');
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
-const { exec, execFile } = require('../../utils/childProcess');
+const { execFile, spawnToFile } = require('../../utils/childProcess');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { assertSafeBackupName, isSafeArchiveEntry } = require('../../utils/backupSafety');
 
 const RESTORE_FOLDER = 'restore';
+// thrown by the checks that must never fall back to the old restore strategy:
+// a rejected archive is a rejected backup, not a backup to try another way
+const UNSAFE_BACKUP_ERRORS = ['BACKUP_CONTAINS_UNSAFE_PATHS', 'BACKUP_UNSAFE_FILE_NAME'];
 
 /**
  * @description Restore a backup.
@@ -28,7 +32,10 @@ async function downloadBackup(fileUrl) {
   // we empty the restore backup folder
   await fse.emptyDir(restoreFolderPath);
 
-  const encryptedBackupName = path.basename(fileWithoutSignedParams, '.enc');
+  // the name comes from a URL the caller chose: `path.basename` stops a path
+  // traversal but keeps every shell and SQL metacharacter, and this name ends up
+  // building the paths handed to gzip, sqlite3 and DuckDB below
+  const encryptedBackupName = assertSafeBackupName(path.basename(fileWithoutSignedParams, '.enc'));
   const encryptedBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.enc`);
   const compressedBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.gz`);
 
@@ -58,13 +65,13 @@ async function downloadBackup(fileUrl) {
     logger.info(`Trying to restore the backup new style (DuckDB)`);
     // Check archive for path traversal attempts and symlinks
     const tarEntries = await execFile('tar', ['-tzf', compressedBackupFilePath]);
+    // every entry must be a plain relative name: this rejects path traversal and
+    // absolute paths, and also the quotes, `$`, backticks and semicolons that
+    // would otherwise reach sqlite3 and DuckDB through the extracted file names
     const hasUnsafePath = tarEntries
       .split('\n')
       .filter(Boolean)
-      .some((entry) => {
-        const normalized = path.posix.normalize(entry);
-        return path.posix.isAbsolute(entry) || normalized === '..' || normalized.startsWith('../');
-      });
+      .some((entry) => !isSafeArchiveEntry(entry));
     const tarList = await execFile('tar', ['-tzvf', compressedBackupFilePath]);
     const hasSymlink = tarList.split('\n').some((line) => line.startsWith('l'));
     if (hasUnsafePath || hasSymlink) {
@@ -83,13 +90,15 @@ async function downloadBackup(fileUrl) {
     );
   } catch (e) {
     // Re-throw security errors - don't fall back to old strategy
-    if (e.message === 'BACKUP_CONTAINS_UNSAFE_PATHS') {
+    if (UNSAFE_BACKUP_ERRORS.includes(e.message)) {
       throw e;
     }
     logger.info(`Extracting failed using new strategy (Error: ${e})`);
     logger.info(`Restoring using old backup strategy (SQLite only)`);
     sqliteBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.db`);
-    await exec(`gzip -dc ${compressedBackupFilePath} > ${sqliteBackupFilePath}`);
+    // no shell here: the redirection is a write stream, so the backup name can
+    // never be read as a command
+    await spawnToFile('gzip', ['-dc', compressedBackupFilePath], sqliteBackupFilePath);
   }
   // done!
   logger.info(`Gladys backup downloaded with success.`);

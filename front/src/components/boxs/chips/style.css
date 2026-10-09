@@ -1,0 +1,68 @@
+.chipsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  /* Same bottom spacing as a card, so the gap between a chips section and
+     the next section matches the gap between two card sections */
+  margin-bottom: 1.5rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background-color: #fff;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.chipIcon {
+  display: inline-flex;
+  color: #467fcf;
+}
+
+.chipWarning .chipIcon {
+  color: #e74c3c;
+}
+
+.chipLabel {
+  /* ≥ 4.5:1 on the white chip background (WCAG AA normal text) */
+  color: #667081;
+}
+
+.chipValue {
+  font-weight: 600;
+}
+
+/* Horizon glass theme */
+:global(.glass-theme) .chip {
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border-color: var(--gl-border);
+  box-shadow: var(--gl-shadow-soft);
+  padding: 6px 14px;
+}
+
+:global(.glass-theme) .chipLabel {
+  /* darker than --gl-muted: the label is normal-size text and must keep
+     AA contrast on the frosted chip */
+  color: #5b6373;
+  font-weight: 500;
+}
+
+:global(.glass-theme) .chipValue {
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .chip .chipIcon {
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .chipWarning .chipIcon {
+  color: #e74c3c;
+}

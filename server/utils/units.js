@@ -70,10 +70,15 @@ function hslToRgb(h, s, l) {
 
 /**
  * @description Smart rounding for display:
- * - No rounding if value < 1 (keep full precision)
+ * - 3 significant digits if value < 1 — NOT a fixed number of decimals: a
+ *   fixed cut would collapse a meaningful 0.005 to 0, while full precision
+ *   would keep float noise like 0.10000000149. Significant digits keep the
+ *   magnitude readable whatever it is (0.005 stays 0.005, 0.00123 stays
+ *   0.00123, 0.10000000149 becomes 0.1)
  * - 2 decimals if value < 10
  * - 1 decimal if value < 1000
  * - No decimals (integer) if value >= 1000.
+ * Anything that is not a finite number (null, strings…) is returned untouched.
  * @param {number} value - Value to round.
  * @returns {number} Rounded value.
  * @example
@@ -83,8 +88,14 @@ function hslToRgb(h, s, l) {
  * smartRound(1234.56); // returns 1235
  */
 function smartRound(value) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return value;
+  }
+  if (value === 0) {
+    return 0;
+  }
   if (Math.abs(value) < 1) {
-    return value; // No rounding for very small values
+    return Number(value.toPrecision(3)); // 3 significant digits
   }
   if (Math.abs(value) < 10) {
     return Math.round(value * 100) / 100; // 2 decimals
@@ -93,6 +104,44 @@ function smartRound(value) {
     return Math.round(value * 10) / 10; // 1 decimal
   }
   return Math.round(value); // Integer for large values
+}
+
+/**
+ * @description Number of decimals a number carries, scientific notation included
+ * (`1e-7` has no dot, but seven decimals).
+ * @param {number} number - The number to inspect.
+ * @returns {number} The count of decimals.
+ * @example
+ * decimalsOf(0.0001); // returns 4
+ */
+function decimalsOf(number) {
+  const [mantissa, exponent] = `${number}`.toLowerCase().split('e');
+  const decimals = (mantissa.split('.')[1] || '').length;
+  return exponent ? Math.max(0, decimals - Number(exponent)) : decimals;
+}
+
+/**
+ * @description Display a value at the precision the feature's step declares.
+ * The smartRound display keeps 3 significant digits under 1, which is what a sensor
+ * reading needs but truncates a value the user typed themselves: a 0.1734 EUR/kWh tariff
+ * set on a 0.0001 step would show as 0.173, one digit short of what was sent to the
+ * device. A step finer than 1 therefore decides the number of decimals; anything else
+ * (no step, or a step of 1 and above) keeps the smartRound display of every other feature.
+ * @param {number} value - Value to display.
+ * @param {number} [step] - The step declared on the device feature.
+ * @returns {number|string} The value to display.
+ * @example
+ * formatValueWithStep(0.1734, 0.0001); // returns '0.1734'
+ * formatValueWithStep(0.1734, 1); // returns 0.173
+ */
+function formatValueWithStep(value, step) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return smartRound(value);
+  }
+  if (!step || !Number.isFinite(step) || step >= 1) {
+    return smartRound(value);
+  }
+  return value.toFixed(decimalsOf(step));
 }
 
 /**
@@ -156,4 +205,6 @@ module.exports = {
   checkAndConvertUnit,
   convertEnergyUnit,
   smartRound,
+  decimalsOf,
+  formatValueWithStep,
 };

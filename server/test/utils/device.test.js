@@ -8,7 +8,9 @@ const {
   mergeFeatures,
   mergeDevices,
   normalize,
+  isCameraEnabled,
 } = require('../../utils/device');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 
 const buildObject = (prefix, attributes) => {
   const feature = {};
@@ -384,5 +386,41 @@ describe('normalize', () => {
 
   it('should return target min when source min equals source max', async () => {
     expect(normalize(42, 10, 10, 140, 500)).to.equal(140);
+  });
+});
+
+describe('isCameraEnabled', () => {
+  const buildCamera = (lastValue) => ({
+    features: [
+      {
+        category: DEVICE_FEATURE_CATEGORIES.CAMERA,
+        type: DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
+        last_value: null,
+      },
+      {
+        category: DEVICE_FEATURE_CATEGORIES.CAMERA,
+        type: DEVICE_FEATURE_TYPES.CAMERA.ENABLED,
+        last_value: lastValue,
+      },
+    ],
+  });
+
+  it('should return true when the camera has no enabled feature', () => {
+    const device = {
+      features: [{ category: DEVICE_FEATURE_CATEGORIES.CAMERA, type: DEVICE_FEATURE_TYPES.CAMERA.IMAGE }],
+    };
+    expect(isCameraEnabled(device)).to.equal(true);
+  });
+  it('should return true on a device without any feature', () => {
+    expect(isCameraEnabled({})).to.equal(true);
+  });
+  it('should return true when the enabled feature is 1', () => {
+    expect(isCameraEnabled(buildCamera(1))).to.equal(true);
+  });
+  it('should return true when the enabled feature has no value yet', () => {
+    expect(isCameraEnabled(buildCamera(null))).to.equal(true);
+  });
+  it('should return false when the enabled feature is 0', () => {
+    expect(isCameraEnabled(buildCamera(0))).to.equal(false);
   });
 });

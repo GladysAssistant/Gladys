@@ -1,10 +1,18 @@
 const z = require('zod/v4');
 const iconList = require('../../../config/icons.json');
-const { ACTIONS, EVENTS, ALARM_MODES_LIST } = require('../../../utils/constants');
+const {
+  ACTIONS,
+  EVENTS,
+  ALARM_MODES_LIST,
+  COMPARISON_OPERATORS,
+  ANY_CHANGE_OPERATOR,
+  MESSAGE_GLADYS_ONLY_SERVICE,
+} = require('../../../utils/constants');
+const { MAX_SCENE_DECLARATION_FIELDS } = require('../../../lib/external-integration/constants');
 
 const hhmmPattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const weekDaysSchema = z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
-const comparisonOperatorSchema = z.enum(['=', '!=', '>', '>=', '<', '<=']);
+const comparisonOperatorSchema = z.enum(COMPARISON_OPERATORS);
 const calendarComparatorSchema = z.enum(['is-exactly', 'contains', 'starts-with', 'ends-with', 'has-any-name']);
 const triggerCalendarEventAttributeSchema = z.enum(['start', 'end']);
 
@@ -28,7 +36,23 @@ const SCENE_TRIGGER_TYPES = new Set([
   EVENTS.SYSTEM.START,
   EVENTS.MQTT.RECEIVED,
   EVENTS.CALENDAR.EVENT_IS_COMING,
+  EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT,
 ]);
+
+// Integration-declared scene triggers and actions: the declared key and the
+// values of the filters (trigger) / parameters (action), the exact shape
+// rules of the scene model (models/scene.js) so the assistant never builds a
+// scene the persistence rejects
+const sceneDeclarationKeySchema = z.string().regex(/^[a-z0-9_]+$/);
+const sceneDeclarationFieldsSchema = z
+  .record(
+    sceneDeclarationKeySchema,
+    z.union([z.string(), z.number(), z.boolean(), z.null(), z.array(z.union([z.string(), z.number()]))]),
+  )
+  .refine((fields) => Object.keys(fields).length <= MAX_SCENE_DECLARATION_FIELDS, {
+    message: `at most ${MAX_SCENE_DECLARATION_FIELDS} fields`,
+  })
+  .optional();
 
 /**
  * @description Flatten nested scene actions into a single list.
@@ -152,7 +176,10 @@ function createSceneCreateInputSchema(
     .string()
     .nullish()
     .describe(
-      'Name of the messaging service to send through (example: "telegram"). Omit or set to null to send to every messaging channel the user configured.',
+      'Where the message is delivered. It always appears in the Gladys conversation; this field only decides which external messaging channels also receive it. ' +
+        'Name of a messaging service (example: "telegram") to use that channel only, ' +
+        `"${MESSAGE_GLADYS_ONLY_SERVICE}" to keep the message in the Gladys conversation and send it to no external channel at all, ` +
+        'or omit/set to null to send it to every messaging channel the user configured.',
     );
   const sceneActionSchema = z.lazy(() =>
     z.discriminatedUnion('type', [
@@ -214,9 +241,18 @@ function createSceneCreateInputSchema(
             'Prompt text for AI (required). To inject values from previous "device.get-value" actions, use Handlebars variables with action coordinates, for example {{1.1.last_value}} (or {{0.0.last_value}}) and {{1.1.last_value_string}}.',
           ),
         camera: z.string().optional(),
+        service: messageServiceSchema,
       }),
       actionSchemaByType(ACTIONS.DEVICE.GET_VALUE, {
         device_feature: deviceFeatureSelectorSchema,
+      }),
+      actionSchemaByType(ACTIONS.TIME.GET_DATE, {
+        precision: z
+          .enum(['second', 'minute', 'hour', 'day'])
+          .optional()
+          .describe(
+            'Precision the current date/time is truncated to. Defaults to "minute". The result is available in the next actions as {{<action coordinates>.datetime}}, {{<action coordinates>.date}}, {{<action coordinates>.time}} and {{<action coordinates>.timestamp}} (unix timestamp in seconds, usable in a formula). The timestamp is truncated to the same precision, so use "second" when a formula needs an exact date.',
+          ),
       }),
       actionSchemaByType(ACTIONS.VARIABLE.SET, {
         name: z
@@ -328,6 +364,11 @@ function createSceneCreateInputSchema(
         topic: z.string(),
         message: z.string(),
       }),
+      actionSchemaByType(ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, {
+        integration: z.string(),
+        action_key: sceneDeclarationKeySchema,
+        fields: sceneDeclarationFieldsSchema,
+      }),
       actionSchemaByType(ACTIONS.MUSIC.PLAY_NOTIFICATION, {
         device: musicNotificationDevicesSchema,
         text: z.string(),
@@ -337,6 +378,12 @@ function createSceneCreateInputSchema(
           .min(0)
           .max(100)
           .optional(),
+        evaluate_volume: z
+          .string()
+          .optional()
+          .describe(
+            'Formula evaluated to a volume in percent, for example {{0.0.value}} * 10. Used instead of volume, and clamped between 0 and 100.',
+          ),
       }),
       actionSchemaByType(ACTIONS.SMS.SEND, {
         text: z.string(),
@@ -386,6 +433,16 @@ function createSceneCreateInputSchema(
         'Delay in milliseconds after the condition becomes true before the trigger fires. Example: 45 minutes = 2700000.',
       ),
   };
+  // "any change" mode: the trigger fires on every state change of the feature, whatever the
+  // new value. There is no value to compare against, and neither `threshold_only` nor
+  // `for_duration` applies to an instantaneous change, so they are not part of this shape.
+  const deviceNewStateAnyChangeShape = {
+    operator: z
+      .literal(ANY_CHANGE_OPERATOR)
+      .describe(
+        'Fires on any state change of the device feature, whatever the new value. Use it instead of one trigger per possible value. No "value", "threshold_only" or "for_duration" is accepted with this operator.',
+      ),
+  };
   const sceneTriggerSchema = z.union([
     triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
       device_feature: deviceFeatureSelectorSchema,
@@ -399,6 +456,17 @@ function createSceneCreateInputSchema(
           'Several device features of the same type sharing one condition: the trigger fires as soon as any of them matches.',
         ),
       ...deviceNewStateConditionShape,
+    }),
+    triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
+      device_feature: deviceFeatureSelectorSchema,
+      ...deviceNewStateAnyChangeShape,
+    }),
+    triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
+      device_features: z
+        .array(deviceFeatureSelectorSchema)
+        .min(1)
+        .describe('Several device features: the trigger fires as soon as one of them changes state.'),
+      ...deviceNewStateAnyChangeShape,
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
       scheduler_type: z.literal('every-month'),
@@ -533,6 +601,11 @@ function createSceneCreateInputSchema(
       topic: z.string(),
       message: z.string().optional(),
     }),
+    triggerSchemaByType(EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT, {
+      integration: z.string(),
+      trigger_key: sceneDeclarationKeySchema,
+      fields: sceneDeclarationFieldsSchema,
+    }),
     triggerSchemaByType(EVENTS.CALENDAR.EVENT_IS_COMING, {
       calendar_event_attribute: triggerCalendarEventAttributeSchema,
       calendar_event_name_comparator: calendarComparatorSchema,
@@ -552,7 +625,7 @@ function createSceneCreateInputSchema(
       .array(sceneTriggerSchema)
       .min(1)
       .describe(
-        'Required. Top-level array of when the scene starts. Put device.new-state, time.changed, time.sunrise and all other trigger types here only. Example: [{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}]. Never put these types in actions.',
+        'Required. Top-level array of when the scene starts. Put device.new-state, time.changed, time.sunrise and all other trigger types here only. Example: [{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}]. To react to any state change of a feature, use the "changed" operator without value: [{"type":"device.new-state","device_feature":"mqtt-thermostat","operator":"changed"}]. Never put these types in actions.',
       ),
     actions: z
       .array(z.array(sceneActionSchema))
@@ -580,7 +653,7 @@ function createSceneCreateInputSchema(
         }),
       )
       .default([])
-      .describe('Optional scene tags.'),
+      .describe('Optional scene tags. Do not add a tag saying the scene was created by an AI, Gladys adds it itself.'),
   });
 }
 

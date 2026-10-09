@@ -1,0 +1,300 @@
+/* ==================================================================
+   Calendar page on the Horizon glass theme: the page reuses the
+   dashboard scene + glass card, and react-big-calendar is restyled
+   with the theme tokens (--gl-*, defined on .glass-theme in
+   routes/dashboard/style.css). Everything is gated on .glass-theme,
+   authored light-only: dark mode comes from the global inversion
+   filter (style/dark-mode.css), like the rest of the theme.
+   ================================================================== */
+
+/* No mobile dock clearance to counter here: the scene's bottom-dock padding
+   is opt-in (.withBottomDock, set by the dashboard page alone). */
+
+/* The calendar fills the viewport below the chrome on desktop instead of
+   the historical fixed 550px card; on mobile stacked heights stay natural */
+.horizonCalendar {
+  height: 550px;
+}
+
+@media (min-width: 992px) {
+  .horizonCalendar {
+    height: calc(100vh - 11rem);
+    min-height: 550px;
+  }
+}
+
+/* ---------- Toolbar: the theme's segmented-control family ---------- */
+
+:global(.glass-theme .rbc-toolbar) {
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+:global(.glass-theme .rbc-toolbar .rbc-btn-group) {
+  background-color: rgba(28, 35, 52, 0.07);
+  border-radius: 999px;
+  padding: 3px;
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+
+:global(.glass-theme .rbc-toolbar button) {
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  color: var(--gl-muted);
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: none;
+}
+
+/* rbc squares off the outer corners of grouped buttons and overlaps their
+   borders — inside a segmented track every segment stays a full pill */
+:global(.glass-theme .rbc-btn-group > button:first-child:not(:last-child)),
+:global(.glass-theme .rbc-btn-group > button:last-child:not(:first-child)),
+:global(.glass-theme .rbc-btn-group > button:not(:first-child):not(:last-child)) {
+  border-radius: 999px;
+}
+
+:global(.glass-theme .rbc-btn-group button + button) {
+  margin-left: 0;
+}
+
+:global(.glass-theme .rbc-toolbar button:hover),
+:global(.glass-theme .rbc-toolbar button:focus) {
+  background: transparent;
+  color: var(--gl-ink);
+}
+
+/* no browser ring on click-focus; keyboard focus keeps a visible accent ring */
+:global(.glass-theme .rbc-toolbar button:focus) {
+  outline: none;
+}
+
+:global(.glass-theme .rbc-toolbar button:focus-visible) {
+  outline: 2px solid var(--gl-accent);
+  outline-offset: 2px;
+}
+
+:global(.glass-theme .rbc-toolbar button:active),
+:global(.glass-theme .rbc-toolbar button.rbc-active),
+:global(.glass-theme .rbc-toolbar button.rbc-active:hover),
+:global(.glass-theme .rbc-toolbar button.rbc-active:focus) {
+  background-color: #fff;
+  color: var(--gl-ink);
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.18);
+}
+
+/* the whole track is the touch zone: iOS segmented height on touch devices */
+@media (pointer: coarse) {
+  :global(.glass-theme .rbc-toolbar button) {
+    min-height: 2.25rem;
+  }
+}
+
+/* dayjs month/weekday labels are lowercase in some locales (fr…) */
+:global(.glass-theme .rbc-toolbar .rbc-toolbar-label) {
+  color: var(--gl-ink);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+:global(.glass-theme .rbc-toolbar .rbc-toolbar-label)::first-letter {
+  text-transform: uppercase;
+}
+
+/* ---------- Shared grid: soft hairlines, rounded outer frame ---------- */
+
+:global(.glass-theme .rbc-month-view),
+:global(.glass-theme .rbc-time-view),
+:global(.glass-theme .rbc-agenda-view table.rbc-agenda-table) {
+  border: 1px solid var(--gl-row-border);
+  border-radius: var(--gl-radius-md);
+  /* safe: the "+N more" popup overlay attaches to .rbc-calendar, not here */
+  overflow: hidden;
+}
+
+:global(.glass-theme .rbc-header) {
+  border-bottom: 1px solid var(--gl-row-border);
+  padding: 0.5rem 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme .rbc-header + .rbc-header),
+:global(.glass-theme .rbc-day-bg + .rbc-day-bg),
+:global(.glass-theme .rbc-month-row + .rbc-month-row) {
+  border-color: var(--gl-row-border);
+}
+
+:global(.glass-theme .rbc-off-range-bg) {
+  background: rgba(28, 35, 52, 0.05);
+}
+
+:global(.glass-theme .rbc-today) {
+  background-color: rgba(61, 109, 240, 0.09);
+}
+
+:global(.glass-theme .rbc-date-cell) {
+  padding: 0.25rem 0.4rem 0;
+}
+
+:global(.glass-theme .rbc-button-link) {
+  color: var(--gl-ink);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+:global(.glass-theme .rbc-off-range .rbc-button-link) {
+  color: var(--gl-muted);
+}
+
+/* today's date is an accent disc, iOS style */
+:global(.glass-theme .rbc-date-cell.rbc-now .rbc-button-link) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--gl-accent);
+  color: #fff;
+}
+
+/* ---------- Events: soft rounded pills ---------- */
+
+:global(.glass-theme .rbc-event),
+:global(.glass-theme .rbc-day-slot .rbc-background-event) {
+  border: none;
+  border-radius: 8px;
+  background-color: var(--gl-accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  box-shadow: 0 2px 8px rgba(44, 62, 118, 0.14);
+}
+
+:global(.glass-theme .rbc-day-slot .rbc-event) {
+  border: none;
+}
+
+:global(.glass-theme .rbc-event-label) {
+  font-weight: 500;
+  font-size: 0.7rem;
+}
+
+:global(.glass-theme .rbc-show-more) {
+  background: transparent;
+  color: var(--gl-muted);
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 0 0.4rem;
+}
+
+:global(.glass-theme .rbc-show-more:hover) {
+  color: var(--gl-ink);
+}
+
+/* ---------- Week/day time grid ---------- */
+
+:global(.glass-theme .rbc-time-view .rbc-allday-cell + .rbc-allday-cell),
+:global(.glass-theme .rbc-time-header-content),
+:global(.glass-theme .rbc-time-content),
+:global(.glass-theme .rbc-time-content > * + * > *),
+:global(.glass-theme .rbc-time-header.rbc-overflowing),
+:global(.glass-theme .rbc-time-header-content > .rbc-row.rbc-row-resource),
+:global(.glass-theme .rbc-time-header > .rbc-row:first-child),
+:global(.glass-theme .rbc-timeslot-group) {
+  border-color: var(--gl-row-border);
+}
+
+/* the half-hour hairline inside each hour group reads as noise on glass */
+:global(.glass-theme .rbc-day-slot .rbc-time-slot) {
+  border-top: none;
+}
+
+:global(.glass-theme .rbc-time-gutter .rbc-label) {
+  color: var(--gl-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+:global(.glass-theme .rbc-current-time-indicator) {
+  background-color: var(--gl-accent);
+  height: 2px;
+}
+
+/* ---------- Agenda view ---------- */
+
+:global(.glass-theme .rbc-agenda-view table.rbc-agenda-table thead > tr > th) {
+  border-bottom: 1px solid var(--gl-row-border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme .rbc-agenda-view table.rbc-agenda-table tbody > tr > td) {
+  border-color: var(--gl-row-border);
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme .rbc-agenda-view table.rbc-agenda-table tbody > tr + tr) {
+  border-top: 1px solid var(--gl-row-border);
+}
+
+/* eventPropGetter paints the whole <tr> with the calendar color: keep the
+   date/time columns on a quiet surface so the color reads as a band behind
+   the event name only, not a full-width stripe (the rowspanned date cell
+   would otherwise bleed the first event's color over the next row too) */
+:global(.glass-theme .rbc-agenda-time-cell),
+:global(.glass-theme .rbc-agenda-date-cell) {
+  background-color: var(--gl-surface-strong);
+  color: var(--gl-muted);
+  font-weight: 600;
+}
+
+:global(.glass-theme .rbc-agenda-empty) {
+  color: var(--gl-muted);
+  padding: 1rem;
+}
+
+/* ---------- "+N more" popup: a glass surface like the overflow menus ---------- */
+
+:global(.glass-theme .rbc-overlay) {
+  background: var(--gl-surface-strong);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-md);
+  box-shadow: var(--gl-shadow);
+  padding: 8px;
+}
+
+:global(.glass-theme .rbc-overlay-header) {
+  border-bottom: 1px solid var(--gl-row-border);
+  color: var(--gl-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin: -8px -8px 8px;
+  padding: 8px 12px;
+}
+
+:global(.glass-theme .rbc-overlay .rbc-event + .rbc-event) {
+  margin-top: 4px;
+}
+
+/* dark-mode.css has no solid override for .rbc-overlay, but keep the glass
+   surface weight consistent with the dashboard menus if one appears later */
+:global(.dark-mode .glass-theme .rbc-overlay) {
+  background-color: var(--gl-surface-strong) !important;
+}

@@ -2,7 +2,7 @@ import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import get from 'get-value';
-import Select from 'react-select';
+import Select from '../../form/Select';
 import BaseEditBox from '../baseEditBox';
 
 const UserPresenceBox = ({ children, ...props }) => (

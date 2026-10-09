@@ -1,0 +1,446 @@
+import { Component } from 'preact';
+import { Text, Localizer } from 'preact-i18n';
+import cx from 'classnames';
+
+import {
+  getLocalizedText,
+  getUrlDomain,
+  resolveManifestPlaceholders
+} from '../../routes/integration/all/external-integration/utils';
+import { RequestStatus } from '../../utils/consts';
+import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../utils/oauth';
+import { ACCOUNT_FIELD_TYPES } from '../../../../server/lib/external-integration/constants';
+import integrationText from '../../routes/integration/all/external-integration/integrationText.css';
+
+// The form engine of the manifest `config_schema` grammar, shared by the
+// integration Configuration screen (config, action mini forms, per-user
+// contact profile) and the dashboard editor of the integration widgets
+// (per-instance `settings`): one engine, one look, one set of rules.
+
+// the redirect URI is meant to be copied into the developer application of the
+// provider: a click should select all of it
+const selectOnFocus = e => e.target.select();
+
+class ConfigField extends Component {
+  onInput = e => {
+    this.props.updateConfigValue(this.props.field, e.target.value);
+  };
+
+  onCheck = e => {
+    this.props.updateConfigValue(this.props.field, e.target.checked);
+  };
+
+  onMultiSelectToggle = e => {
+    const { field, values } = this.props;
+    const currentValues = Array.isArray(values[field.key]) ? values[field.key] : [];
+    const newValues = e.target.checked
+      ? [...currentValues, e.target.value]
+      : currentValues.filter(value => value !== e.target.value);
+    this.props.updateConfigValue(field, newValues);
+  };
+
+  onOAuthConnect = e => {
+    e.preventDefault();
+    this.props.connectOAuth(this.props.field);
+  };
+
+  copyRedirectUri = async value => {
+    let copied = false;
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(value);
+        copied = true;
+      } catch (error) {
+        copied = false;
+      }
+    }
+    // navigator.clipboard only exists in a secure context, and the users this
+    // whole flow unblocks are precisely the ones on a plain-HTTP local
+    // address: fall back to the legacy selection-based copy, as the Tuya
+    // screen already does
+    if (!copied && this.redirectUriInput) {
+      try {
+        this.redirectUriInput.focus();
+        this.redirectUriInput.select();
+        this.redirectUriInput.setSelectionRange(0, this.redirectUriInput.value.length);
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      }
+    }
+    if (!copied) {
+      return;
+    }
+    this.setState({ redirectUriCopied: true });
+    if (this.copyTimer) {
+      clearTimeout(this.copyTimer);
+    }
+    this.copyTimer = setTimeout(() => this.setState({ redirectUriCopied: false }), 2000);
+  };
+
+  componentWillUnmount() {
+    if (this.copyTimer) {
+      clearTimeout(this.copyTimer);
+      this.copyTimer = null;
+    }
+  }
+
+  render({
+    field,
+    language,
+    values,
+    configuredSecrets,
+    touchedSecrets,
+    oauthStatus,
+    selector,
+    dynamicOptions,
+    placeholderPorts,
+    idPrefix
+  }) {
+    const label = getLocalizedText(field.label, language) || field.key;
+    const description = getLocalizedText(field.description, language);
+    const placeholder = getLocalizedText(field.placeholder, language) || '';
+    const value = values[field.key];
+    // a dashboard can show several widget action forms at once: their
+    // inputs need ids of their own for the labels to point at them
+    const fieldId = `${idPrefix || 'config'}_${field.key}`;
+    // a select/multi_select can replace its static options with a
+    // core-defined source, loaded by the screen (see dynamicOptions.js):
+    // "devices" (the already-created devices of the integration, value =
+    // external_id) or "houses" (the houses of Gladys, value = selector)
+    const options = field.source ? (dynamicOptions && dynamicOptions[field.source]) || [] : field.options || [];
+
+    if (field.type === 'section') {
+      // purely presentational intro block splitting the form: title,
+      // plain text and typed links opened in a new tab with the target
+      // domain displayed (no value, no input). The {{gladys_host}} and
+      // {{port:<name>}} placeholders are substituted here — only the
+      // browser knows the address the user reaches Gladys by
+      return (
+        <div class="form-group mt-4">
+          <h4 class="mb-1">{resolveManifestPlaceholders(label, placeholderPorts)}</h4>
+          {description && (
+            <p class={cx('text-muted small mb-2', integrationText.integrationText)}>
+              {resolveManifestPlaceholders(description, placeholderPorts)}
+            </p>
+          )}
+          {(field.links || []).map(link => (
+            <div>
+              <a href={link.url} target="_blank" rel="noopener noreferrer">
+                <i class="fe fe-external-link mr-1" />
+                {getLocalizedText(link.label, language) || link.url}
+              </a>{' '}
+              <span class="text-muted small">({getUrlDomain(link.url)})</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (ACCOUNT_FIELD_TYPES.includes(field.type)) {
+      // Both link a provider account and hold no value: the integration builds
+      // the sign-in URL and the credentials never transit through the frontend.
+      //
+      // They differ on the way back. `oauth2` is the redirect-based flow: the
+      // provider returns to a redirect URI with an authorization code, so that
+      // URI has to be declared in the developer application and an anti-CSRF
+      // state is mandatory. `account_link` never comes back: the user approves
+      // the provider somewhere else — a QR sign-in validated in the vendor app,
+      // a pairing confirmed on a device — and the integration notices on its own
+      // side, then reports it through the connection status. Showing a redirect
+      // URI to declare, or requiring a state, would be meaningless there.
+      const usesRedirect = field.type === 'oauth2';
+      const canUseInstanceRedirect =
+        usesRedirect && typeof window !== 'undefined' && window.location.protocol === 'https:';
+      const useInstanceRedirect = canUseInstanceRedirect && this.props.oauthUseInstanceRedirect;
+      const redirectUri =
+        useInstanceRedirect && selector
+          ? `${window.location.origin}${getOAuthCallbackPath(selector)}`
+          : OAUTH_REDIRECT_URI;
+      return (
+        <div class="form-group">
+          <label class="form-label">{label}</label>
+          {oauthStatus === RequestStatus.Error && (
+            <div class="alert alert-danger">
+              {this.props.oauthInvalidState && (
+                <Text id="integration.externalIntegration.config.oauthInvalidStateError" />
+              )}
+              {this.props.oauthInvalidUrl && <Text id="integration.externalIntegration.config.oauthInvalidUrlError" />}
+              {!this.props.oauthInvalidState && !this.props.oauthInvalidUrl && (
+                <Text id="integration.externalIntegration.config.oauthConnectError" />
+              )}
+            </div>
+          )}
+          {usesRedirect && (
+            <div class="mb-3">
+              <small class="form-text text-muted mb-1">
+                <Text id="integration.externalIntegration.config.oauthRedirectUriLabel" />
+              </small>
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  value={redirectUri}
+                  readOnly
+                  onFocus={selectOnFocus}
+                  ref={element => {
+                    this.redirectUriInput = element;
+                  }}
+                />
+                <span class="input-group-append">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    onClick={() => this.copyRedirectUri(redirectUri)}
+                  >
+                    <i class="fe fe-copy" />
+                  </button>
+                </span>
+              </div>
+              {this.state.redirectUriCopied && (
+                <small class="text-success d-block mt-1">
+                  <Text id="integration.externalIntegration.config.oauthRedirectUriCopied" />
+                </small>
+              )}
+              <small class="form-text text-muted">
+                {useInstanceRedirect ? (
+                  <Text id="integration.externalIntegration.config.oauthRedirectUriInstanceDescription" />
+                ) : (
+                  <Text id="integration.externalIntegration.config.oauthRedirectUriDescription" />
+                )}
+              </small>
+            </div>
+          )}
+          <div>
+            <button
+              type="button"
+              class={cx('btn btn-primary', {
+                'btn-loading': oauthStatus === RequestStatus.Getting
+              })}
+              disabled={oauthStatus === RequestStatus.Getting}
+              onClick={this.onOAuthConnect}
+            >
+              <i class="fe fe-link mr-1" />
+              <Text id="integration.externalIntegration.config.oauthConnectButton" />
+            </button>
+          </div>
+          {canUseInstanceRedirect && (
+            <label class="custom-control custom-checkbox mt-3">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                checked={useInstanceRedirect}
+                onClick={this.props.toggleOAuthUseInstanceRedirect}
+              />
+              <span class="custom-control-label">
+                <Text id="integration.externalIntegration.config.oauthUseInstanceRedirectLabel" />
+              </span>
+            </label>
+          )}
+          {/* the message that goes with the badge is integration-level, not
+              field-level: it is rendered once for the whole screen (see
+              ConfigTab), because an integration may well link more than one
+              account and a message glued here would look like it described THIS
+              one */}
+          {description && (
+            <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
+          )}
+        </div>
+      );
+    }
+
+    if (field.type === 'boolean') {
+      return (
+        <div class="form-group">
+          <label class="custom-switch">
+            <input type="checkbox" id={fieldId} class="custom-switch-input" checked={!!value} onClick={this.onCheck} />
+            <span class="custom-switch-indicator" />
+            <span class="custom-switch-description">{label}</span>
+          </label>
+          {description && (
+            <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div class="form-group">
+        <label class="form-label" for={fieldId}>
+          {label}
+          {field.required && <span class="form-required">*</span>}
+        </label>
+        {field.type === 'select' && field.display !== 'radio' && (
+          <select id={fieldId} class="form-control" onChange={this.onInput}>
+            <option value="" selected={value === undefined || value === null || value === ''}>
+              <Text id="global.emptySelectOption" />
+            </option>
+            {options.map(option => (
+              <option key={option.value} value={option.value} selected={`${value}` === `${option.value}`}>
+                {getLocalizedText(option.label, language) || option.value}
+              </option>
+            ))}
+          </select>
+        )}
+        {field.type === 'select' && field.display === 'radio' && (
+          <div>
+            {options.map(option => (
+              <label key={option.value} class="custom-control custom-radio">
+                <input
+                  type="radio"
+                  class="custom-control-input"
+                  name={fieldId}
+                  value={option.value}
+                  checked={value === option.value}
+                  onChange={this.onInput}
+                />
+                <span class="custom-control-label">{getLocalizedText(option.label, language) || option.value}</span>
+              </label>
+            ))}
+          </div>
+        )}
+        {field.type === 'multi_select' && (
+          <div>
+            {options.map(option => (
+              <label key={option.value} class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  value={option.value}
+                  checked={Array.isArray(value) && value.includes(option.value)}
+                  onChange={this.onMultiSelectToggle}
+                />
+                <span class="custom-control-label">{getLocalizedText(option.label, language) || option.value}</span>
+              </label>
+            ))}
+          </div>
+        )}
+        {field.type === 'number' && (
+          <input
+            id={fieldId}
+            type="number"
+            class="form-control"
+            value={value === undefined || value === null ? '' : value}
+            min={field.min}
+            max={field.max}
+            // the HTML default step is 1: without "any", the browser refuses to
+            // submit a decimal value (a price, a latitude) as a step mismatch
+            step="any"
+            placeholder={placeholder}
+            onInput={this.onInput}
+            required={field.required}
+          />
+        )}
+        {field.type === 'secret' && (
+          <Localizer>
+            <input
+              id={fieldId}
+              type="password"
+              class="form-control"
+              autocomplete="new-password"
+              value={touchedSecrets[field.key] ? value : ''}
+              placeholder={
+                configuredSecrets.includes(field.key) && !touchedSecrets[field.key] ? (
+                  <Text id="integration.externalIntegration.config.secretConfiguredPlaceholder" />
+                ) : (
+                  placeholder
+                )
+              }
+              onInput={this.onInput}
+            />
+          </Localizer>
+        )}
+        {(field.type === 'string' ||
+          !['boolean', 'select', 'multi_select', 'number', 'secret', 'oauth2'].includes(field.type)) && (
+          <input
+            id={fieldId}
+            type="text"
+            class="form-control"
+            value={value === undefined || value === null ? '' : value}
+            placeholder={placeholder}
+            onInput={this.onInput}
+            required={field.required}
+          />
+        )}
+        {description && (
+          <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
+        )}
+      </div>
+    );
+  }
+}
+
+export { ConfigField };
+
+const ConfigSchemaForm = ({
+  schema,
+  language,
+  values,
+  configuredSecrets,
+  touchedSecrets,
+  saveConfigStatus,
+  updateConfigValue,
+  saveConfig,
+  oauthStatus,
+  oauthInvalidState,
+  oauthInvalidUrl,
+  oauthUseInstanceRedirect,
+  toggleOAuthUseInstanceRedirect,
+  connectOAuth,
+  selector,
+  dynamicOptions,
+  placeholderPorts
+}) => {
+  // sections are presentational and the account fields have their own Connect
+  // button: a schema made only of those has nothing to save, hide the save button
+  const hasSavableField = schema.some(field => field.type !== 'section' && !ACCOUNT_FIELD_TYPES.includes(field.type));
+  return (
+    <form onSubmit={saveConfig}>
+      {saveConfigStatus === RequestStatus.Success && (
+        <div class="alert alert-success">
+          <Text id="integration.externalIntegration.config.saveSuccess" />
+        </div>
+      )}
+      {saveConfigStatus === RequestStatus.Error && (
+        <div class="alert alert-danger">
+          <Text id="integration.externalIntegration.config.saveError" />
+        </div>
+      )}
+      {schema.map(field => (
+        <ConfigField
+          key={field.key}
+          field={field}
+          language={language}
+          values={values}
+          configuredSecrets={configuredSecrets}
+          touchedSecrets={touchedSecrets}
+          updateConfigValue={updateConfigValue}
+          oauthStatus={oauthStatus}
+          oauthInvalidState={oauthInvalidState}
+          oauthInvalidUrl={oauthInvalidUrl}
+          oauthUseInstanceRedirect={oauthUseInstanceRedirect}
+          toggleOAuthUseInstanceRedirect={toggleOAuthUseInstanceRedirect}
+          connectOAuth={connectOAuth}
+          selector={selector}
+          dynamicOptions={dynamicOptions}
+          placeholderPorts={placeholderPorts}
+        />
+      ))}
+      {hasSavableField && (
+        <div class="form-footer">
+          <button
+            type="submit"
+            class={cx('btn btn-success', {
+              'btn-loading': saveConfigStatus === RequestStatus.Getting
+            })}
+            disabled={saveConfigStatus === RequestStatus.Getting}
+          >
+            <Text id="integration.externalIntegration.config.saveButton" />
+          </button>
+        </div>
+      )}
+    </form>
+  );
+};
+
+export default ConfigSchemaForm;

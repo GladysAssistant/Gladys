@@ -1,8 +1,42 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
-const { ACTION_LIST, ACTIONS, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
-const { WEATHER_ALERT_TYPES, WEATHER_ALERT_SEVERITIES } = require('../lib/external-integration/constants');
+const {
+  ACTION_LIST,
+  ACTIONS,
+  EVENTS,
+  EVENT_LIST,
+  ALARM_MODES_LIST,
+  TRIGGER_OPERATORS,
+  COMPARISON_OPERATORS,
+  ANY_CHANGE_OPERATOR,
+} = require('../utils/constants');
+const {
+  WEATHER_ALERT_TYPES,
+  WEATHER_ALERT_SEVERITIES,
+  MAX_SCENE_DECLARATION_FIELDS,
+} = require('../lib/external-integration/constants');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
+
+// Values of the trigger filters / action parameters of an integration-declared
+// scene trigger or action (external-integration.scene-event / scene-action).
+// Validated for their SHAPE only: the manifest is consulted at execution
+// time, never at save time, so a scene still loads and saves when its
+// integration is uninstalled or stopped — exactly like a scene referencing a
+// deleted device. Nested under `fields` to stay out of the flat trigger/action
+// namespace (cancelTriggers reacts to a top-level `topic`, for one).
+const sceneDeclarationKeySchema = Joi.string().regex(/^[a-z0-9_]+$/);
+const sceneDeclarationFieldsSchema = Joi.object()
+  .pattern(
+    /^[a-z0-9_]+$/,
+    Joi.alternatives().try(
+      Joi.string().allow(''),
+      Joi.number(),
+      Joi.boolean(),
+      Joi.valid(null),
+      Joi.array().items(Joi.string(), Joi.number()),
+    ),
+  )
+  .max(MAX_SCENE_DECLARATION_FIELDS);
 
 const actionSchema = Joi.object()
   .keys({
@@ -53,11 +87,17 @@ const actionSchema = Joi.object()
       .integer()
       .min(1)
       .allow(null),
+    // Precision the "time.get-date" action truncates the current date/time to.
+    precision: Joi.string().valid('second', 'minute', 'hour', 'day'),
     request_response_keys: Joi.array().items(Joi.string()),
     ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
     edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
     edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
+    // energy-contract.current-price condition: the contract selector, the comparison
+    // operator and the threshold (`value`, above)
+    energy_contract: Joi.string(),
+    operator: Joi.string().valid(...COMPARISON_OPERATORS),
     headers: Joi.alternatives().conditional('type', {
       is: ACTIONS.HTTP.REQUEST,
       then: Joi.array()
@@ -87,6 +127,9 @@ const actionSchema = Joi.object()
       .integer()
       .max(100)
       .min(0),
+    // Volume of a "play notification" action calculated from a formula, instead of the
+    // fixed "volume" above.
+    evaluate_volume: Joi.string(),
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
@@ -94,18 +137,28 @@ const actionSchema = Joi.object()
       .integer()
       .min(1)
       .max(10000),
+    // scene action declared by an external integration: its selector, the
+    // declared key (not `key`, see the trigger note) and the parameters
+    integration: Joi.string(),
+    action_key: sceneDeclarationKeySchema,
+    fields: sceneDeclarationFieldsSchema,
   })
   // A "variable.set" action holds either a text or a formula, never both: the runtime
   // would only evaluate the formula and silently drop the text.
   .when(Joi.object({ type: Joi.valid(ACTIONS.VARIABLE.SET) }).unknown(), {
     then: Joi.object().oxor('text', 'evaluate_value'),
   })
+  // An integration-declared action without its target is unrunnable: the
+  // selector and the declared key are the only way to resolve it at execution
+  .when(Joi.object({ type: Joi.valid(ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION) }).unknown(), {
+    then: Joi.object({ integration: Joi.required(), action_key: Joi.required() }),
+  })
   .id('action');
 
 const actionsSchema = Joi.array().items(Joi.array().items(actionSchema));
 
-const triggersSchema = Joi.array().items(
-  Joi.object().keys({
+const triggerSchema = Joi.object()
+  .keys({
     type: Joi.string()
       .valid(...EVENT_LIST)
       .required(),
@@ -115,7 +168,8 @@ const triggersSchema = Joi.array().items(
     device_features: Joi.array()
       .items(Joi.string())
       .min(1),
-    operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
+    // `changed` fires on any state change of the device feature, no value is needed
+    operator: Joi.string().valid(...TRIGGER_OPERATORS),
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),
     area: Joi.string(),
@@ -154,8 +208,35 @@ const triggersSchema = Joi.array().items(
     // weather-alert triggers (B.18): phenomenon type filter and minimal severity
     weather_alert_type: Joi.string().valid(...WEATHER_ALERT_TYPES, 'any'),
     weather_alert_severity: Joi.string().valid(...WEATHER_ALERT_SEVERITIES),
-  }),
-);
+    // scene trigger declared by an external integration: its selector, the
+    // declared key and the filters. `trigger_key`, not `key`: addScene stamps a
+    // runtime uuid `key` on every trigger in RAM (matched by the time.changed
+    // checker), a persisted `key` would be overwritten
+    integration: Joi.string(),
+    trigger_key: sceneDeclarationKeySchema,
+    fields: sceneDeclarationFieldsSchema,
+    // energy-contract.price-changed trigger: the contract selector, empty for any contract
+    energy_contract: Joi.string().allow(''),
+  })
+  // A "changed" trigger fires on `last_value !== previous_value`: it matches no value, and
+  // neither `threshold_only` (which de-duplicates a condition staying true) nor `for_duration`
+  // (which waits for it to stay true) applies to a change, which is instantaneous. Refusing
+  // them here keeps a stored trigger consistent with what the runtime does, and matches the
+  // MCP schemas.
+  .when(Joi.object({ operator: Joi.valid(ANY_CHANGE_OPERATOR) }).unknown(), {
+    then: Joi.object().keys({
+      value: Joi.forbidden(),
+      threshold_only: Joi.forbidden(),
+      for_duration: Joi.forbidden(),
+    }),
+  })
+  // An integration-declared trigger without its target could never match:
+  // the selector and the declared key are what the matcher compares first
+  .when(Joi.object({ type: Joi.valid(EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT) }).unknown(), {
+    then: Joi.object({ integration: Joi.required(), trigger_key: Joi.required() }),
+  });
+
+const triggersSchema = Joi.array().items(triggerSchema);
 
 /**
  * @description Build a flat validation message from Joi details.

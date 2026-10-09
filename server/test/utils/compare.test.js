@@ -75,6 +75,17 @@ describe('compare.>=', () => {
   });
 });
 
+describe('compare.changed', () => {
+  it('should return false', () => {
+    const value = compare('changed', 21, 21);
+    expect(value).to.equal(false);
+  });
+  it('should return true', () => {
+    const value = compare('changed', 21, 18);
+    expect(value).to.equal(true);
+  });
+});
+
 describe('compare.unknown', () => {
   it('should throw an error', () => {
     expect(() => {

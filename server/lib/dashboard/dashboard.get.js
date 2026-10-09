@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const db = require('../../models');
 
-const DEFAULT_FIELDS = ['id', 'name', 'selector', 'type', 'updated_at'];
+const DEFAULT_FIELDS = ['id', 'name', 'selector', 'type', 'icon', 'updated_at'];
 
 /**
  * @description Get list of dashboard.

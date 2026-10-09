@@ -1,4 +1,6 @@
 import DeviceRow from './DeviceRow';
+import LightDeviceFeature from './device-features/light/LightDeviceFeature';
+import { buildDeviceRows } from './device-features/light/lightFeatures';
 import style from './style.css';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
@@ -24,6 +26,10 @@ const DeviceCard = ({ children, ...props }) => {
   // Create placeholder rows based on the number of expected features
   const placeholderRows = Array(featureSelectors.length).fill(0);
 
+  // Every light feature of a same device is merged into one row opening the light panel; every
+  // other feature keeps the row it has always had.
+  const rows = buildDeviceRows(deviceFeatures);
+
   return (
     <div class="card">
       {boxTitle && (
@@ -48,8 +54,13 @@ const DeviceCard = ({ children, ...props }) => {
       )}
       <div>
         <div class="loader py-3" />
-        <div class="table-responsive">
-          <table class="table card-table table-vcenter">
+        <div class={`table-responsive ${style.deviceWidgetContainer}`}>
+          {/* device-list-table: Horizon restyle hook — the glass theme turns
+              these rows into soft pills (see routes/dashboard/style.css).
+              device-widget-table narrows the rules that only make sense for
+              the widget's icon/name/control triplet: the devices page shares
+              device-list-table but lays its rows out on six columns. */}
+          <table class="table card-table table-vcenter device-list-table device-widget-table">
             <tbody>
               {loading
                 ? placeholderRows.map((_, index) => (
@@ -62,21 +73,34 @@ const DeviceCard = ({ children, ...props }) => {
                       </td>
                     </tr>
                   ))
-                : deviceFeatures.map((deviceFeature, deviceFeatureIndex) => (
-                    <DeviceRow
-                      key={deviceFeatureIndex}
-                      user={props.user}
-                      x={props.x}
-                      y={props.y}
-                      device={deviceFeature.device}
-                      deviceFeature={deviceFeature}
-                      roomIndex={props.roomIndex}
-                      deviceFeatureIndex={deviceFeatureIndex}
-                      updateValue={props.updateValue}
-                      updateValueWithDebounce={props.updateValueWithDebounce}
-                      intl={props.intl}
-                    />
-                  ))}
+                : rows.map(row =>
+                    row.features ? (
+                      <LightDeviceFeature
+                        key={row.key}
+                        x={props.x}
+                        y={props.y}
+                        device={row.device}
+                        features={row.features}
+                        updateValue={props.updateValue}
+                        updateValueWithDebounce={props.updateValueWithDebounce}
+                        intl={props.intl}
+                      />
+                    ) : (
+                      <DeviceRow
+                        key={row.key}
+                        user={props.user}
+                        x={props.x}
+                        y={props.y}
+                        device={row.deviceFeature.device}
+                        deviceFeature={row.deviceFeature}
+                        roomIndex={props.roomIndex}
+                        deviceFeatureIndex={row.index}
+                        updateValue={props.updateValue}
+                        updateValueWithDebounce={props.updateValueWithDebounce}
+                        intl={props.intl}
+                      />
+                    )
+                  )}
             </tbody>
           </table>
         </div>

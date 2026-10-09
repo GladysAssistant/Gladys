@@ -1,6 +1,6 @@
 const { NotFoundError } = require('../../../utils/coreErrors');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
-const { isNumeric } = require('../../../utils/device');
+const { isNumeric, isCameraEnabled } = require('../../../utils/device');
 
 const CAMERA_IMAGE_EXPIRATION_TIME_IN_HOURS = 1;
 
@@ -15,6 +15,11 @@ async function getImage(selector) {
   const device = this.stateManager.get('device', selector);
   if (device === null) {
     throw new NotFoundError('Camera not found');
+  }
+  // A disabled camera must not serve its last known image: keeping it would defeat the
+  // purpose of the "private mode" (spec docs/specs/camera-enable-disable.md).
+  if (!isCameraEnabled(device)) {
+    throw new NotFoundError('Camera is disabled');
   }
   const deviceFeature = device.features.find(
     (dF) => dF.category === DEVICE_FEATURE_CATEGORIES.CAMERA && dF.type === DEVICE_FEATURE_TYPES.CAMERA.IMAGE,

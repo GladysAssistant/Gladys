@@ -1,9 +1,42 @@
 .containerWithMargin {
-  margin-top: 3rem;
+  /* padding, not margin: a margin would collapse through the glass
+     page-main and leave a white band above the scene */
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 
 /* The scene form borrowed Tabler's .col-login (24rem), which is too narrow for
    the labelled icon grid. Scoped here so the login pages keep their width. */
 .sceneFormCol {
   max-width: 42rem;
+}
+
+/* Horizon: the back link is a frosted pill, like the editor header controls,
+   instead of Tabler's grey .btn-secondary. Both selectors carry the dark-mode
+   counter-weight: dark-mode.css paints .btn-secondary and .btn with solid
+   !important backgrounds, so the glass must invert WITH the theme. */
+.backButton,
+:global(.dark-mode) .backButton {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85)) !important;
+  background: var(--gl-card-bg, rgba(255, 255, 255, 0.52)) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 999px;
+  padding: 0.4rem 1.1rem;
+  color: var(--gl-ink, #1c2334) !important;
+  font-weight: 600;
+  box-shadow: var(--gl-shadow-soft, 0 4px 16px rgba(44, 62, 118, 0.09));
+  margin-bottom: 1.25rem;
+}
+
+:global(.dark-mode) .backButton {
+  filter: none;
+}
+
+.backButton:hover,
+.backButton:focus {
+  background: var(--gl-surface-strong, rgba(255, 255, 255, 0.75)) !important;
+  color: var(--gl-ink, #1c2334) !important;
 }

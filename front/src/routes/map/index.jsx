@@ -1,8 +1,10 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import cx from 'classnames';
 import actions from '../../actions/map';
 import update from 'immutability-helper';
 import Map from './Map';
+import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 
 class MapPage extends Component {
@@ -85,14 +87,15 @@ class MapPage extends Component {
   }
 
   render(props, { housesWithLocation, usersWithLocation, areas }) {
+    // No wrapper margins (the tabler .map-header helper carries a negative
+    // top margin meant for banner maps): the map fills everything below the
+    // chrome, sizing itself to the viewport minus that chrome.
+    // glass-theme provides the Horizon tokens the floating map chrome
+    // (create-zone pill, Leaflet controls, tooltips) composes on.
     return (
       <div class="page">
-        <div class="page-main">
-          <div class="my-3 my-md-5">
-            <div class="map-header">
-              <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} />
-            </div>
-          </div>
+        <div class={cx('page-main', 'glass-theme', style.mapPage)}>
+          <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} />
         </div>
       </div>
     );

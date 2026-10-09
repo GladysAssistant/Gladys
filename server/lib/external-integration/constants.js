@@ -124,6 +124,34 @@ const ACTION_DEFAULT_TIMEOUT_SECONDS = 30;
 const MAX_DISCOVERED_DEVICES = 2000;
 const MAX_STATES_PER_REQUEST = 100;
 const MAX_STATES_PER_MINUTE = 300;
+// Scene triggers and actions declared by the manifest (scene_triggers /
+// scene_actions): the scene editor renders them with the config_schema
+// form engine, the core matches the events and relays the actions. One
+// trigger type and one action type in the scene engine, nothing per
+// integration.
+const MAX_SCENE_DECLARATIONS = 20;
+const MAX_SCENE_DECLARATION_KEY_LENGTH = 40;
+const MAX_SCENE_DECLARATION_FIELDS = 10;
+const MAX_SCENE_DECLARATION_VARIABLES = 20;
+// a trigger filter must be able to express "any": a boolean toggle has no
+// empty state, so it is an action parameter only
+const SCENE_TRIGGER_FIELD_TYPES = ['string', 'number', 'select', 'multi_select', 'section'];
+const SCENE_ACTION_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'section'];
+// the data an event exposes to the scene (variables) and the values an
+// action returns to it (outputs): scalars only, never an image or a file
+const SCENE_VARIABLE_TYPES = ['string', 'number', 'boolean'];
+// POST /scene/event payload bounds: flat, one primitive per key
+const MAX_SCENE_EVENT_DATA_KEYS = 30;
+const MAX_SCENE_EVENT_STRING_LENGTH = 1000;
+// same constant and window as the states, on a SEPARATE counter (an
+// integration publishing both never sees them compete)
+const MAX_SCENE_EVENTS_PER_MINUTE = MAX_STATES_PER_MINUTE;
+// scene actions pending on one integration, counted from the slot
+// reservation (before any connection wait) to the terminal outcome: a slow
+// or disconnected container never accumulates 120s commands
+const MAX_PENDING_SCENE_ACTIONS = 10;
+// bound of a string output returned by a scene action
+const MAX_SCENE_ACTION_OUTPUT_LENGTH = 10000;
 // Communication integrations: user <-> contact link. The link itself is a
 // variable scoped (service_id, user_id) — no migration needed; the short
 // link codes live in the in-memory cache with a 15 minutes TTL.
@@ -138,6 +166,23 @@ const LINK_CODE_CACHE_PREFIX = 'external-integration-link-code';
 const LINK_CODE_TTL_MS = 15 * 60 * 1000;
 const LINK_CODE_LENGTH = 8;
 const MAX_MESSAGE_TEXT_LENGTH = 4096;
+
+// Calendar integrations (capabilities/calendar-type.md): per-user account variable (one JSON object
+// per (service_id, user_id), the CONTACT_PROFILE pattern — its presence is
+// the enablement marker, so "enabled with zero fields" is a first-class
+// state), and the normalization bounds of the calendar host endpoints.
+const CALENDAR_ACCOUNT_VARIABLE = 'EXTERNAL_INTEGRATION_CALENDAR_ACCOUNT';
+const MAX_CALENDARS_PER_USER = 50;
+const MAX_CALENDAR_EVENTS_PER_REQUEST = 500;
+const MAX_CALENDAR_WRITES_PER_MINUTE = 30;
+const MAX_CALENDAR_NAME_LENGTH = 100;
+const MAX_CALENDAR_DESCRIPTION_LENGTH = 500;
+const CALENDAR_COLOR_REGEX = /^#[0-9a-f]{6}$/;
+const MAX_CALENDAR_EVENT_NAME_LENGTH = 200;
+const MAX_CALENDAR_EVENT_LOCATION_LENGTH = 500;
+const MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH = 1000;
+const MAX_CALENDAR_EVENT_URL_LENGTH = 500;
+const MAX_CALENDAR_EXTERNAL_ID_LENGTH = 255;
 // Mediated network discovery (B.16): the core captures and emits from
 // its network=host position, the integration interprets and forges (it
 // knows the protocol, the core never parses nor builds a payload).
@@ -200,6 +245,23 @@ const WEATHER_IMAGE_CACHE_PREFIX = 'weather-image';
 // coerced to 'unknown' (the frontend renders a neutral icon).
 // 'night' is deprecated for providers: send the real condition plus
 // is_day: false instead (a rainy night stays 'rain').
+//
+// The conditions after 'unknown' are extensions: phenomena several providers
+// distinguish but the original enum flattened into a neighbour. They stay
+// GENERIC -- each is encoded separately by Meteo France, OpenWeather and the
+// NWS alike, never one provider's private code:
+//   - freezing-rain / freezing-fog: MF signs them with a dedicated pictogram
+//     ('p10' and 'p11' carry a black-ice road sign, 'p8' a "GIV." badge) and
+//     OpenWeather has codes 511 and 741; folding them into 'rain' and 'fog'
+//     dropped the very warning that makes them worth showing.
+//   - snow-thunderstorm: a thundery snow shower (MF 'p30'), which is neither
+//     plain 'snow' nor plain 'thunderstorm'.
+//   - sandstorm: MF 'p31', OpenWeather Dust/Sand/Ash -- a real forecast
+//     overseas, where the Saharan haze reaches the French West Indies.
+//   - tornado / hurricane: MF 'p32'-'p34' (waterspout, tornado, cyclone),
+//     OpenWeather Tornado and Squall. 'wind' said nothing of the danger.
+// A provider that cannot tell them apart keeps sending the broader condition:
+// the extension is additive, so every payload that worked before still does.
 const WEATHER_CONDITIONS = [
   'clear',
   'partly-cloudy',
@@ -215,6 +277,12 @@ const WEATHER_CONDITIONS = [
   'wind',
   'night',
   'unknown',
+  'freezing-rain',
+  'freezing-fog',
+  'snow-thunderstorm',
+  'sandstorm',
+  'tornado',
+  'hurricane',
 ];
 // CAP-style severities (Common Alerting Protocol) — generic, never one
 // provider's scale (Météo France vigilance: yellow -> moderate,
@@ -265,6 +333,14 @@ const PREFER_LOCAL_CONFIG_KEY = 'GLADYS_PREFER_LOCAL';
 // app, a pairing confirmed on a device — so it has no redirect URI, no anti-CSRF
 // state and no callback, and the integration reports the approval itself.
 const ACCOUNT_FIELD_TYPES = ['oauth2', 'account_link'];
+// Dynamic options of a select/multi_select field (`source`): a reserved enum
+// defined by the core — never a URL nor an expression, nothing arbitrary
+// enters the rendering — whose options, and therefore valid values, are only
+// known at runtime. "devices": the already-created devices of the integration
+// (label = device name, value = external_id), scoped to its t_service.
+// "houses": the houses of Gladys (label = house name, value = selector, the
+// identifier GET /house returns).
+const DYNAMIC_SOURCES = ['devices', 'houses'];
 // Optional `categories` manifest field: browse categories of the integration
 // catalog (docs/specs/integration-catalog-categories.md). More than 3 means
 // the assignment is lazy, not the vocabulary too narrow.
@@ -288,6 +364,167 @@ const MAX_WEBHOOK_RESPONSE_BODY_BYTES = 64 * 1024;
 // (5xx would let the integration make Gladys Plus look broken)
 const WEBHOOK_RESPONSE_MIN_STATUS = 200;
 const WEBHOOK_RESPONSE_MAX_STATUS = 499;
+
+// Dashboard widgets declared by integrations (capabilities/dashboard-widgets.md).
+// The `widgets` manifest field: identity of each widget (key, label, icon,
+// per-instance settings), validated by the indexer and the server alike.
+const MAX_WIDGETS = 5;
+const WIDGET_KEY_REGEX = /^[a-z0-9_]{2,32}$/;
+const WIDGET_LABEL_MIN_LENGTH = 3;
+const WIDGET_LABEL_MAX_LENGTH = 30;
+const WIDGET_DESCRIPTION_MAX_LENGTH = 100;
+// a Feather icon name (the set the box picker already uses); an unknown
+// name renders the generic widget icon, never an error
+const WIDGET_ICON_REGEX = /^[a-z0-9-]{1,40}$/;
+// widget settings live in the dashboard JSON, readable by every user of a
+// public dashboard: nothing sensitive (secret / oauth2 / account_link) and no
+// {{port:<name>}} placeholder (the editor is reachable by non-admins)
+const MAX_WIDGET_SETTINGS = 10;
+const WIDGET_SETTINGS_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'section'];
+// the settings of one box instance travel URL-encoded in the content route
+// query string: an HTTP request-line budget as much as a storage one
+const MAX_WIDGET_SETTING_STRING_LENGTH = 100;
+const MAX_WIDGET_SETTINGS_BYTES = 1024;
+// The type of an integration made only of capabilities (no device surface,
+// none of the core-consumed interfaces of the other types): it must declare
+// at least one of these manifest fields. The list grows with capabilities/.
+const CAPABILITY_MANIFEST_FIELDS = ['widgets', 'scene_triggers', 'scene_actions', 'energy_contracts'];
+
+// Energy contracts capability (capabilities/energy-contracts.md): contract templates,
+// tariff calendars and delegated pricing.
+const MAX_ENERGY_TEMPLATES = 20;
+const MAX_ENERGY_CALENDARS = 10;
+const MAX_ENERGY_TEMPLATE_INPUTS = 16;
+const ENERGY_TEMPLATE_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const ENERGY_INPUT_KEY_REGEX = /^[a-z0-9_]{1,64}$/;
+const ENERGY_INPUT_TYPES = ['number', 'select', 'string', 'time_intervals'];
+const ENERGY_PRICING_MODES = ['rules', 'delegated'];
+// delegated pricing of up to 31 days of 30-minute intervals: 30s ack deadline
+const ENERGY_CONTRACT_PRICE_TIMEOUT_MS = 30 * 1000;
+const ENERGY_CONTRACT_CURRENT_TIMEOUT_MS = 5 * 1000;
+const MAX_ENERGY_INTERVALS_PER_REQUEST = 1488;
+// a delegated cost above this many currency units per kWh is refused (normalizeEnergyCosts):
+// a hostile-payload guard, orders of magnitude above any tariff, raised for the currencies
+// whose unit is worth much less than a euro (JPY, KRW, HUF, IDR...)
+const MAX_ENERGY_PRICE_PER_KWH = 10;
+const MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY = {
+  JPY: 2000,
+  KRW: 20000,
+  HUF: 5000,
+  CZK: 500,
+  PLN: 100,
+  SEK: 200,
+  NOK: 200,
+  DKK: 200,
+  ISK: 2000,
+  TRY: 500,
+  RUB: 1000,
+  UAH: 500,
+  INR: 500,
+  PKR: 2000,
+  BDT: 1000,
+  LKR: 2000,
+  IDR: 200000,
+  VND: 300000,
+  PHP: 500,
+  THB: 500,
+  TWD: 500,
+  KZT: 5000,
+  MXN: 500,
+  BRL: 100,
+  ARS: 10000,
+  CLP: 20000,
+  COP: 50000,
+  ZAR: 500,
+  NGN: 10000,
+  EGP: 500,
+  CNY: 100,
+};
+const ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
+// the refresh nudge carries no date: the costs of the last two days are recomputed
+const ENERGY_CALENDAR_REFRESH_LOOKBACK_MS = 2 * 24 * 60 * 60 * 1000;
+// widget.get / widget.get-image typically call a third-party API: the same
+// exception to the 5s ack rule as camera.get-image and weather.get
+const WIDGET_GET_TIMEOUT_MS = 15 * 1000;
+// content freshness declared by the integration (ttl_seconds), clamped
+const WIDGET_CONTENT_TTL_MIN_SECONDS = 10;
+const WIDGET_CONTENT_TTL_MAX_SECONDS = 3600;
+const WIDGET_CONTENT_TTL_DEFAULT_SECONDS = 60;
+// a raw content above this size is an invalid payload, never parsed further
+const MAX_WIDGET_CONTENT_BYTES = 256 * 1024;
+// highest content `version` this Gladys renders; a higher one is refused as a
+// whole with the dedicated WIDGET_CONTENT_VERSION_UNSUPPORTED code
+const SUPPORTED_WIDGET_CONTENT_VERSION = 1;
+// in-memory content cache: per integration, LRU, one entry per
+// (widget, settings, language, units); dropped in full on stop/update/uninstall
+const MAX_WIDGET_CONTENT_CACHE_ENTRIES = 50;
+// bounded pulls: at most this many widget.get commands in flight per
+// integration (further misses queue), and this many cache-miss commands per
+// minute per integration beyond which the route answers 429
+const MAX_WIDGET_GET_IN_FLIGHT = 2;
+const MAX_WIDGET_GET_MISSES_PER_MINUTE = 30;
+// freshness nudge (widget.refresh): 1 per 10 s per (integration, widget key),
+// silently dropped beyond — fire-and-forget has no error path
+const WIDGET_REFRESH_MIN_INTERVAL_MS = 10 * 1000;
+// images: keys declared in the content, bytes served by the integration on
+// demand (never a third-party URL loaded by the browser, never fetched by the
+// core), validated by magic numbers, cached 1 h per (integration, key)
+const WIDGET_IMAGE_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const MAX_WIDGET_IMAGE_BYTES = 300 * 1024;
+// the pixel bound, read from the image header before the bytes are cached or
+// served: a 300 KB file can decode to a gigantic bitmap in the browser
+const MAX_WIDGET_IMAGE_DIMENSION = 4096;
+const WIDGET_IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
+const MAX_WIDGET_IMAGE_CACHE_ENTRIES = 100;
+const MAX_WIDGET_IMAGE_IN_FLIGHT = 4;
+// widget actions (button component): allowlisted from the integration's own
+// last normalized content, rate-limited per integration
+const WIDGET_ACTION_KEY_REGEX = /^[a-z0-9_]{2,32}$/;
+const MAX_WIDGET_ACTION_PARAMS_BYTES = 1024;
+const MAX_WIDGET_ACTIONS_PER_MINUTE = 30;
+// the form behind a widget action button (section 7): a short form of the
+// config_schema grammar, without sections, sensitive types or core sources —
+// the content is produced at runtime, so the options and defaults are too
+const MAX_WIDGET_ACTION_FIELDS = 4;
+const WIDGET_ACTION_FIELD_TYPES = ['string', 'number', 'boolean', 'select'];
+// a typed string value of an action form (a delivery note): the route is open
+// to every authenticated user, so what they type is bounded like the rest
+const MAX_WIDGET_ACTION_VALUE_LENGTH = 1000;
+// bounded free-form texts an integration hands back outside the content
+// vocabulary: the action result message and the `error` of a failed command
+const MAX_WIDGET_MESSAGE_LENGTH = 200;
+// the content vocabulary enums (section 4 of the capability spec) — the
+// frontend maps them to theme colors, icons and layouts, never a free value
+const WIDGET_COLORS = ['neutral', 'primary', 'success', 'warning', 'danger', 'info'];
+const WIDGET_TEXT_VARIANTS = ['heading', 'body', 'caption'];
+const WIDGET_CHART_TYPES = ['line', 'area', 'bar', 'stepline'];
+// the chart box's interval enum, reused as-is for live device_features series
+const WIDGET_CHART_INTERVALS = [
+  'last-hour',
+  'last-twelve-hours',
+  'last-day',
+  'last-three-days',
+  'last-week',
+  'last-month',
+  'last-three-months',
+  'last-year',
+];
+const WIDGET_CARD_LIST_DISPLAYS = ['grid', 'list'];
+const WIDGET_IMAGE_FITS = ['cover', 'contain'];
+const WIDGET_BUTTON_STYLES = ['primary', 'secondary', 'danger'];
+const MAX_WIDGET_URL_LENGTH = 2048;
+// The content budget (section 5): components beyond a cap are dropped in
+// content order, never the whole content. Tiles = value/gauge; focal =
+// chart/card-list/image; the budget is what keeps every widget card-shaped.
+const WIDGET_CONTENT_BUDGET = {
+  components: 8,
+  focal: 1,
+  tiles: 6,
+  texts: 2,
+  bodyTexts: 1,
+  status: 1,
+  buttons: 4,
+};
 
 module.exports = {
   EXTERNAL_INTEGRATION_LABEL,
@@ -342,8 +579,32 @@ module.exports = {
   MAX_DISCOVERED_DEVICES,
   MAX_STATES_PER_REQUEST,
   MAX_STATES_PER_MINUTE,
+  MAX_SCENE_DECLARATIONS,
+  MAX_SCENE_DECLARATION_KEY_LENGTH,
+  MAX_SCENE_DECLARATION_FIELDS,
+  MAX_SCENE_DECLARATION_VARIABLES,
+  SCENE_TRIGGER_FIELD_TYPES,
+  SCENE_ACTION_FIELD_TYPES,
+  SCENE_VARIABLE_TYPES,
+  MAX_SCENE_EVENT_DATA_KEYS,
+  MAX_SCENE_EVENT_STRING_LENGTH,
+  MAX_SCENE_EVENTS_PER_MINUTE,
+  MAX_PENDING_SCENE_ACTIONS,
+  MAX_SCENE_ACTION_OUTPUT_LENGTH,
   CONTACT_VARIABLE,
   CONTACT_PROFILE_VARIABLE,
+  CALENDAR_ACCOUNT_VARIABLE,
+  MAX_CALENDARS_PER_USER,
+  MAX_CALENDAR_EVENTS_PER_REQUEST,
+  MAX_CALENDAR_WRITES_PER_MINUTE,
+  MAX_CALENDAR_NAME_LENGTH,
+  MAX_CALENDAR_DESCRIPTION_LENGTH,
+  CALENDAR_COLOR_REGEX,
+  MAX_CALENDAR_EVENT_NAME_LENGTH,
+  MAX_CALENDAR_EVENT_LOCATION_LENGTH,
+  MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH,
+  MAX_CALENDAR_EVENT_URL_LENGTH,
+  MAX_CALENDAR_EXTERNAL_ID_LENGTH,
   LINK_CODE_CACHE_PREFIX,
   LINK_CODE_TTL_MS,
   LINK_CODE_LENGTH,
@@ -386,6 +647,7 @@ module.exports = {
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
   ACCOUNT_FIELD_TYPES,
+  DYNAMIC_SOURCES,
   MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
@@ -395,4 +657,61 @@ module.exports = {
   MAX_WEBHOOK_RESPONSE_BODY_BYTES,
   WEBHOOK_RESPONSE_MIN_STATUS,
   WEBHOOK_RESPONSE_MAX_STATUS,
+  MAX_WIDGETS,
+  WIDGET_KEY_REGEX,
+  WIDGET_LABEL_MIN_LENGTH,
+  WIDGET_LABEL_MAX_LENGTH,
+  WIDGET_DESCRIPTION_MAX_LENGTH,
+  WIDGET_ICON_REGEX,
+  MAX_WIDGET_SETTINGS,
+  WIDGET_SETTINGS_FIELD_TYPES,
+  MAX_WIDGET_SETTING_STRING_LENGTH,
+  MAX_WIDGET_SETTINGS_BYTES,
+  CAPABILITY_MANIFEST_FIELDS,
+  MAX_ENERGY_TEMPLATES,
+  MAX_ENERGY_CALENDARS,
+  MAX_ENERGY_TEMPLATE_INPUTS,
+  ENERGY_TEMPLATE_KEY_REGEX,
+  ENERGY_INPUT_KEY_REGEX,
+  ENERGY_INPUT_TYPES,
+  ENERGY_PRICING_MODES,
+  ENERGY_CONTRACT_PRICE_TIMEOUT_MS,
+  ENERGY_CONTRACT_CURRENT_TIMEOUT_MS,
+  MAX_ENERGY_INTERVALS_PER_REQUEST,
+  MAX_ENERGY_PRICE_PER_KWH,
+  MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY,
+  ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS,
+  ENERGY_CALENDAR_REFRESH_LOOKBACK_MS,
+  WIDGET_GET_TIMEOUT_MS,
+  WIDGET_CONTENT_TTL_MIN_SECONDS,
+  WIDGET_CONTENT_TTL_MAX_SECONDS,
+  WIDGET_CONTENT_TTL_DEFAULT_SECONDS,
+  MAX_WIDGET_CONTENT_BYTES,
+  SUPPORTED_WIDGET_CONTENT_VERSION,
+  MAX_WIDGET_CONTENT_CACHE_ENTRIES,
+  MAX_WIDGET_GET_IN_FLIGHT,
+  MAX_WIDGET_GET_MISSES_PER_MINUTE,
+  WIDGET_REFRESH_MIN_INTERVAL_MS,
+  WIDGET_IMAGE_KEY_REGEX,
+  MAX_WIDGET_IMAGE_BYTES,
+  MAX_WIDGET_IMAGE_DIMENSION,
+  WIDGET_IMAGE_CACHE_TTL_MS,
+  MAX_WIDGET_IMAGE_CACHE_ENTRIES,
+  MAX_WIDGET_IMAGE_IN_FLIGHT,
+  WIDGET_ACTION_KEY_REGEX,
+  MAX_WIDGET_ACTION_PARAMS_BYTES,
+  MAX_WIDGET_ACTIONS_PER_MINUTE,
+  MAX_WIDGET_ACTION_FIELDS,
+  WIDGET_ACTION_FIELD_TYPES,
+  MAX_WIDGET_ACTION_VALUE_LENGTH,
+  MAX_WIDGET_MESSAGE_LENGTH,
+  WIDGET_COLORS,
+  WIDGET_TEXT_VARIANTS,
+  WIDGET_CHART_TYPES,
+  WIDGET_CHART_INTERVALS,
+  WIDGET_CARD_LIST_DISPLAYS,
+  WIDGET_IMAGE_FITS,
+  WIDGET_BUTTON_STYLES,
+  MAX_WIDGET_URL_LENGTH,
+  WIDGET_CONTENT_BUDGET,
 };

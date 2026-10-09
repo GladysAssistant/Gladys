@@ -1,4 +1,4 @@
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';

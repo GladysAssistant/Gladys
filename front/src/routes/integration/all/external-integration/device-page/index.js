@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { TYPES_WITHOUT_DEVICE_SCREENS } from '../utils';
 import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import update from 'immutability-helper';
@@ -13,9 +14,9 @@ class ExternalIntegrationDevicePage extends Component {
   getIntegration = async () => {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
-      // communication and weather integrations have no device screens:
+      // communication, weather, calendar and provider integrations have no device screens:
       // direct URL access lands on the configuration screen instead
-      if (['communication', 'weather'].includes(get(integration, 'manifest.type'))) {
+      if (TYPES_WITHOUT_DEVICE_SCREENS.includes(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
         return false;
       }
@@ -53,6 +54,21 @@ class ExternalIntegrationDevicePage extends Component {
       [index]: {
         [field]: {
           $set: value
+        }
+      }
+    });
+    this.setState({ devices });
+  };
+
+  updateFeatureProperty = (deviceIndex, featureIndex, property, value) => {
+    const devices = update(this.state.devices, {
+      [deviceIndex]: {
+        features: {
+          [featureIndex]: {
+            [property]: {
+              $set: value
+            }
+          }
         }
       }
     });
@@ -151,6 +167,7 @@ class ExternalIntegrationDevicePage extends Component {
           language={(props.user && props.user.language) || 'en'}
           getDevices={this.getDevices}
           updateDeviceField={this.updateDeviceField}
+          updateFeatureProperty={this.updateFeatureProperty}
           saveDevice={this.saveDevice}
           deleteDevice={this.deleteDevice}
         />

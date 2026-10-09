@@ -2,8 +2,10 @@ import { Component } from 'preact';
 import leaflet from 'leaflet';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
+import cx from 'classnames';
 
 import 'leaflet/dist/leaflet.css';
+import { addMapTileLayer } from '../../utils/mapTileLayer';
 import style from './style.css';
 import { route } from 'preact-router';
 
@@ -17,24 +19,7 @@ class MapComponent extends Component {
     this.leafletMap = leaflet.map(this.map).setView(DEFAULT_COORDS, 2);
 
     // Use the global dark mode state from props
-    const isDarkMode = this.props.darkMode;
-
-    // Use dark tiles if dark mode is active, otherwise use light tiles
-    // Force new tile layer by adding timestamp to URL to prevent caching
-    const tileStyle = isDarkMode ? 'dark_all' : 'light_all';
-    const timestamp = new Date().getTime();
-
-    const tileUrl = `https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}.png?_=${timestamp}`;
-
-    leaflet
-      .tileLayer(tileUrl, {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-        subdomains: 'abcd',
-        maxZoom: 19,
-        noCache: true
-      })
-      .addTo(this.leafletMap);
+    addMapTileLayer(this.leafletMap, this.props.darkMode);
     this.displayAll(this.props);
   };
 
@@ -96,21 +81,38 @@ class MapComponent extends Component {
 
   displayAreas = async props => {
     if (props.areas) {
+      // The handles below live above the marker pane (z-index 600), so a
+      // user avatar sitting at a zone's center cannot cover them and
+      // swallow their clicks. 620 stays below the tooltip pane (650).
+      if (!this.leafletMap.getPane('areaHandles')) {
+        this.leafletMap.createPane('areaHandles').style.zIndex = 620;
+      }
       props.areas.forEach(area => {
         if (this.areaMarkers[area.id]) {
           this.areaMarkers[area.id].remove();
         }
-        this.areaMarkers[area.id] = leaflet
-          .circle([area.latitude, area.longitude], {
-            radius: area.radius,
-            color: area.color,
-            fillColor: area.color,
-            fillOpacity: 0.2
-          })
-          .addTo(this.leafletMap);
+        const areaCircle = leaflet.circle([area.latitude, area.longitude], {
+          radius: area.radius,
+          color: area.color,
+          fillColor: area.color,
+          fillOpacity: 0.2
+        });
+        // The circle above has a geographic size: a small zone is sub-pixel
+        // as soon as the map is zoomed out, so it cannot be seen or clicked
+        // to be edited or deleted. This fixed screen-size handle keeps every
+        // zone visible and clickable at any zoom level.
+        const areaHandle = leaflet.circleMarker([area.latitude, area.longitude], {
+          radius: 9,
+          color: area.color,
+          weight: 2,
+          fillColor: area.color,
+          fillOpacity: 0.4,
+          pane: 'areaHandles'
+        });
+        this.areaMarkers[area.id] = leaflet.featureGroup([areaCircle, areaHandle]).addTo(this.leafletMap);
         this.markerArray.push(this.areaMarkers[area.id]);
 
-        this.areaMarkers[area.id].bindTooltip(area.name).openTooltip();
+        areaHandle.bindTooltip(area.name, { permanent: true });
 
         this.areaMarkers[area.id].on('click', () => {
           route(`/dashboard/maps/area/edit/${area.selector}`);
@@ -127,8 +129,10 @@ class MapComponent extends Component {
     this.map = map;
   };
   updateDimensions = () => {
-    const largeWindowOffset = 120;
-    const smallWindowOffset = 65;
+    // The map fills everything below the chrome: nothing on desktop (the nav
+    // is the left sidebar), the 3.25rem fixed top bar on mobile
+    const largeWindowOffset = 0;
+    const smallWindowOffset = 52;
     const height =
       window.innerWidth >= 992 ? window.innerHeight - largeWindowOffset : window.innerHeight - smallWindowOffset;
     this.setState({ height });
@@ -173,14 +177,15 @@ class MapComponent extends Component {
     return (
       <div ref={this.setMapRef} style={{ height: `${height}px` }}>
         <div class="leaflet-top leaflet-right">
-          <button
-            href="/dashboard/maps/area/new"
-            class="btn btn-primary"
-            onClick={this.openNewAreaView}
-            style={{ marginTop: '10px', marginRight: '10px', pointerEvents: 'auto' }}
-          >
-            <Text id="newArea.createNewZoneButton" />
-          </button>
+          {/* .leaflet-control restores pointer events and the corner margins;
+              btn-primary stays for behavior and the e2e tests, the Horizon
+              frosted pill wins the styling */}
+          <div class="leaflet-control">
+            <button class={cx('btn', 'btn-primary', style.pillButton)} onClick={this.openNewAreaView}>
+              <i class="fe fe-plus" />
+              <Text id="newArea.createNewZoneButton" />
+            </button>
+          </div>
         </div>
       </div>
     );

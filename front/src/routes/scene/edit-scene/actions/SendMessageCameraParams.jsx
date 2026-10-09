@@ -1,4 +1,4 @@
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
@@ -139,10 +139,12 @@ class SendMessageCameraParams extends Component {
           />
         </div>
         <MessageServiceSelector
-          action={props.action}
-          path={props.path}
-          updateActionProperty={props.updateActionProperty}
-        />
+          value={props.action.service}
+          label={<Text id="editScene.actionsCard.messageSend.serviceLabel" />}
+          onChange={service => props.updateActionProperty(props.path, 'service', service)}
+        >
+          <Text id="editScene.actionsCard.messageSend.serviceExplanation" />
+        </MessageServiceSelector>
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.messageCameraSend.textLabel" />{' '}

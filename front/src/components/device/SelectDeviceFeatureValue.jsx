@@ -1,5 +1,5 @@
 import { Text } from 'preact-i18n';
-import Select from 'react-select';
+import Select from '../form/Select';
 
 import { isValueInOptions } from '../../utils/deviceFeatureValueOptions';
 

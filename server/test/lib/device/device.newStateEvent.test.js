@@ -208,6 +208,59 @@ describe('Device.newStateEvent', () => {
     expect(newDeviceFeature).to.have.property('last_value_changed');
     expect(newDeviceFeature.last_value_changed).to.deep.equal(dateInTheFuture);
   });
+  it('should not save a camera image when the camera is disabled', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeatureByExternalId', 'mqtt:camera:image', {
+      id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e6',
+      name: 'Camera image',
+      selector: 'test-camera-image',
+      external_id: 'mqtt:camera:image',
+      category: 'camera',
+      type: 'image',
+      read_only: true,
+      has_feedback: false,
+      last_value_string: 'image/png;base64,old-image',
+      last_value_changed: '2019-02-12 07:49:07.556 +00:00',
+      device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+    });
+    stateManager.setState('deviceById', '7f85c2f8-86cc-4600-84db-6c074dadb4e8', {
+      selector: 'test-camera',
+      features: [{ category: 'camera', type: 'enabled', last_value: 0 }],
+    });
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    await device.newStateEvent({ device_feature_external_id: 'mqtt:camera:image', text: 'image/png;base64,new-image' });
+    const newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'mqtt:camera:image');
+    // The image received while the camera was off is dropped, the old one is left untouched
+    expect(newDeviceFeature).to.have.property('last_value_string', 'image/png;base64,old-image');
+  });
+  it('should save a camera image when the camera is enabled', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeatureByExternalId', 'mqtt:camera:image', {
+      id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e6',
+      name: 'Camera image',
+      selector: 'test-camera-image',
+      external_id: 'mqtt:camera:image',
+      category: 'camera',
+      type: 'image',
+      read_only: true,
+      has_feedback: false,
+      last_value_string: null,
+      last_value_changed: '2019-02-12 07:49:07.556 +00:00',
+      device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+    });
+    stateManager.setState('deviceById', '7f85c2f8-86cc-4600-84db-6c074dadb4e8', {
+      selector: 'test-camera',
+      features: [{ category: 'camera', type: 'enabled', last_value: 1 }],
+    });
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    await device.newStateEvent({ device_feature_external_id: 'mqtt:camera:image', text: 'image/png;base64,new-image' });
+    const newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'mqtt:camera:image');
+    expect(newDeviceFeature).to.have.property('last_value_string', 'image/png;base64,new-image');
+  });
   it('should not save state missing device feature', async () => {
     const stateManager = new StateManager(event);
     const device = new Device(event, {}, stateManager, {}, {}, {}, job);

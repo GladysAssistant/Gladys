@@ -3,8 +3,10 @@ const { expect } = require('chai');
 const {
   buildByParentType,
   buildByName,
+  buildSupportedOptions,
   buildFeatures,
 } = require('../../../../../services/zigbee2mqtt/utils/features/buildFeatures');
+const enumType = require('../../../../../services/zigbee2mqtt/exposes/enumType');
 
 describe('zigbee2mqtt buildByParentType', () => {
   it(`no type map`, () => {
@@ -272,5 +274,37 @@ describe('zigbee2mqtt buildFeature', () => {
     };
 
     expect(result).deep.eq([expectedResult1, expectedResult2, expectedResult3]);
+  });
+});
+
+describe('zigbee2mqtt buildSupportedOptions', () => {
+  it(`build the options a siren supports`, () => {
+    const expose = {
+      name: 'alarm_mode',
+      type: 'enum',
+      values: ['alarm_sound', 'alarm_light', 'alarm_sound_light'],
+    };
+
+    const result = buildSupportedOptions(enumType, expose);
+
+    expect(result).deep.eq([
+      { value: 1, label: 'alarm_sound', sort_order: 0 },
+      { value: 2, label: 'alarm_light', sort_order: 1 },
+      { value: 3, label: 'alarm_sound_light', sort_order: 2 },
+    ]);
+  });
+
+  it(`no option when the expose lists no value`, () => {
+    const result = buildSupportedOptions(enumType, { name: 'alarm_mode', type: 'enum' });
+
+    expect(result).eq(undefined);
+  });
+
+  it(`no option when none of the exposed values is mapped`, () => {
+    const expose = { name: 'alarm_mode', type: 'enum', values: ['whatever'] };
+
+    const result = buildSupportedOptions(enumType, expose);
+
+    expect(result).eq(undefined);
   });
 });

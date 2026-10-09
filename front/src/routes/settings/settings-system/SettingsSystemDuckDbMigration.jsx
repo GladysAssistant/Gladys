@@ -9,7 +9,8 @@ class SettingsSystemDuckDbMigration extends Component {
     super(props);
     this.state = {
       confirmRestartingMigration: false,
-      confirmPurgingSQlite: false
+      confirmPurgingSQlite: false,
+      migrationStateLoaded: false
     };
   }
 
@@ -23,6 +24,9 @@ class SettingsSystemDuckDbMigration extends Component {
       migrationState.sqlite_db_device_state_count = new Intl.NumberFormat(this.props.user.language).format(
         migrationState.sqlite_db_device_state_count
       );
+      migrationState.sqlite_db_device_state_aggregate_count = new Intl.NumberFormat(this.props.user.language).format(
+        migrationState.sqlite_db_device_state_aggregate_count
+      );
       migrationState.duck_db_device_count = new Intl.NumberFormat(this.props.user.language).format(
         migrationState.duck_db_device_count
       );
@@ -31,7 +35,8 @@ class SettingsSystemDuckDbMigration extends Component {
       console.error(e);
     }
     this.setState({
-      loading: false
+      loading: false,
+      migrationStateLoaded: true
     });
   };
 
@@ -83,7 +88,13 @@ class SettingsSystemDuckDbMigration extends Component {
     this.getDuckDbMigrationState();
   }
 
-  render({}, { loading, migrationState, confirmRestartingMigration, confirmPurgingSQlite }) {
+  render({}, { loading, migrationState, migrationStateLoaded, confirmRestartingMigration, confirmPurgingSQlite }) {
+    // Nothing is displayed until we know if there is still something to migrate,
+    // and the card is hidden for good once the legacy SQLite states are all gone.
+    // If the request failed, migrationState is unset: the card stays hidden as well.
+    if (!migrationStateLoaded || !migrationState || !migrationState.is_migration_needed) {
+      return null;
+    }
     return (
       <div class="card">
         <h4 class="card-header">
@@ -125,6 +136,12 @@ class SettingsSystemDuckDbMigration extends Component {
                       <Text id="systemSettings.duckDbNumberOfStatesinSQlite" />
                     </b>{' '}
                     : {migrationState.sqlite_db_device_state_count}
+                  </li>
+                  <li>
+                    <b>
+                      <Text id="systemSettings.duckDbNumberOfAggregatesinSQlite" />
+                    </b>{' '}
+                    : {migrationState.sqlite_db_device_state_aggregate_count}
                   </li>
                   <li>
                     <b>

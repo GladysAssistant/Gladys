@@ -20,6 +20,6 @@ class LANManagerDevicePage extends Component {
 }
 
 export default connect(
-  'session,httpClient,user,lanManagerDevices,houses,getLANManagerDevicesStatus',
+  'session,httpClient,user,lanManagerDevices,houses,getLANManagerDevicesStatus,getLANManagerDeviceOrderDir',
   actions
 )(LANManagerDevicePage);

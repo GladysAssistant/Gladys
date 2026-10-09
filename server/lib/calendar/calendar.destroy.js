@@ -1,22 +1,21 @@
 const db = require('../../models');
-const { NotFoundError } = require('../../utils/coreErrors');
+const { assertCalendarWritable } = require('./calendar.assertWritable');
 
 /**
  * @description Delete a calendar.
  * @param {string} selector - Calendar selector.
+ * @param {string} [userId] - When provided, the calendar must be writable by this user (assertCalendarWritable).
  * @example
  * gladys.calendar.destroy('my-calendar');
  */
-async function destroy(selector) {
+async function destroy(selector, userId) {
   const calendar = await db.Calendar.findOne({
     where: {
       selector,
     },
   });
 
-  if (calendar === null) {
-    throw new NotFoundError('Calendar not found');
-  }
+  assertCalendarWritable(calendar, userId, 'Calendar not found');
 
   await calendar.destroy();
 }

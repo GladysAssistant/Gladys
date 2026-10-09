@@ -22,6 +22,7 @@ const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
 const EnergyPriceController = require('./controllers/energy-price.controller');
+const EnergyContractController = require('./controllers/energy-contract.controller');
 
 /**
  * @description Return object of routes.
@@ -55,6 +56,7 @@ function getRoutes(gladys) {
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
   const energyPriceController = EnergyPriceController(gladys);
+  const energyContractController = EnergyContractController(gladys);
 
   const routes = {};
 
@@ -88,6 +90,11 @@ function getRoutes(gladys) {
       authenticated: false,
       rateLimit: true,
       controller: userController.forgotPassword,
+    },
+    'post /api/v1/forgot_password/code': {
+      authenticated: false,
+      rateLimit: true,
+      controller: userController.verifyForgotPasswordCode,
     },
     'post /api/v1/reset_password': {
       authenticated: false,
@@ -184,6 +191,16 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dashboardController.updateOrder,
     },
+    'post /api/v1/dashboard_asset/:dashboard_selector': {
+      authenticated: true,
+      largeJsonBody: true,
+      rateLimit: true,
+      controller: dashboardController.createAsset,
+    },
+    'get /api/v1/dashboard_asset/:dashboard_asset_id': {
+      authenticated: true,
+      controller: dashboardController.getAsset,
+    },
     'get /api/v1/dashboard/photo/proxy': {
       authenticated: true,
       rateLimit: true,
@@ -214,6 +231,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDuckDbMigrationState,
     },
+    'get /api/v1/device/states_stats': {
+      authenticated: true,
+      controller: deviceController.getStatesStats,
+    },
     'post /api/v1/device/purge_all_sqlite_state': {
       authenticated: true,
       controller: deviceController.purgeAllSqliteStates,
@@ -225,6 +246,10 @@ function getRoutes(gladys) {
     'get /api/v1/service/:service_name/device': {
       authenticated: true,
       controller: deviceController.getDevicesByService,
+    },
+    'get /api/v1/device/:device_selector/states_size': {
+      authenticated: true,
+      controller: deviceController.getDeviceStatesSize,
     },
     'get /api/v1/device/:device_selector': {
       authenticated: true,
@@ -258,6 +283,10 @@ function getRoutes(gladys) {
     'get /api/v1/device_feature/states_history': {
       authenticated: true,
       controller: deviceController.getDeviceStatesHistory,
+    },
+    'get /api/v1/device_feature/states_csv': {
+      authenticated: true,
+      controller: deviceController.exportStatesToCsv,
     },
     'get /api/v1/device_feature/energy_consumption': {
       authenticated: true,
@@ -338,10 +367,20 @@ function getRoutes(gladys) {
     // flow can restore a Gladys Plus backup without creating a local account.
     // The "admin" flag is kept on those routes because it is also used by
     // setupGateway to protect API calls done through the Gladys Plus tunnel.
+    // The status route is the exception: it only returns two booleans (is the
+    // instance linked to Gladys Plus, is it currently connected), and every
+    // user needs it, not just admins. The front-end uses it to know whether a
+    // Gladys Plus feature (AI chat, voice assistant, camera live) is available:
+    // when it is denied, a user invited on the Plus account is wrongly invited
+    // to start a free trial for a subscription the instance already has.
     'get /api/v1/gateway/status': {
       authenticatedOrNotConfigured: true,
-      admin: true,
       controller: gatewayController.getStatus,
+    },
+    'post /api/v1/gateway/subscription/refresh': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.refreshSubscriptionStatus,
     },
     'post /api/v1/gateway/login': {
       authenticatedOrNotConfigured: true,
@@ -395,9 +434,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.createBackup,
     },
+    // reachable without authentication while the instance has no user (signup
+    // restore flow), and it makes the server download and unpack a remote file:
+    // rate limited like the other pre-authentication routes
     'post /api/v1/gateway/backup/restore': {
       authenticatedOrNotConfigured: true,
       admin: true,
+      rateLimit: true,
       controller: gatewayController.restoreBackup,
     },
     'get /api/v1/gateway/backup/restore/status': {
@@ -547,10 +590,22 @@ function getRoutes(gladys) {
       admin: true,
       controller: externalIntegrationController.refreshStore,
     },
+    // dashboard widgets declared by integrations: every authenticated user
+    // (the dashboard's audience) — the literal `widget` route before `:selector`
+    'get /api/v1/external_integration/widget': {
+      authenticated: true,
+      controller: externalIntegrationController.getWidgets,
+    },
     'post /api/v1/external_integration': {
       authenticated: true,
       admin: true,
       controller: externalIntegrationController.install,
+    },
+    // scene editor catalog, every authenticated user (a literal route, before
+    // `:selector` like `store`)
+    'get /api/v1/external_integration/scene': {
+      authenticated: true,
+      controller: externalIntegrationController.getSceneDeclarations,
     },
     'get /api/v1/external_integration/:selector': {
       authenticated: true,
@@ -614,6 +669,24 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.deleteOwnContactProfile,
     },
+    // calendar integrations (capabilities/calendar-type.md): each user enables their OWN account and
+    // manages their OWN calendars (sync/shared toggles, no admin flag either)
+    'get /api/v1/external_integration/:selector/calendar/account': {
+      authenticated: true,
+      controller: externalIntegrationController.getOwnCalendarAccount,
+    },
+    'post /api/v1/external_integration/:selector/calendar/account': {
+      authenticated: true,
+      controller: externalIntegrationController.saveOwnCalendarAccount,
+    },
+    'delete /api/v1/external_integration/:selector/calendar/account': {
+      authenticated: true,
+      controller: externalIntegrationController.disableOwnCalendarAccount,
+    },
+    'patch /api/v1/external_integration/:selector/calendar/:calendar_selector': {
+      authenticated: true,
+      controller: externalIntegrationController.updateOwnCalendar,
+    },
     'get /api/v1/external_integration/:selector/discovered_device': {
       authenticated: true,
       admin: true,
@@ -648,6 +721,21 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: externalIntegrationController.runAction,
+    },
+    'get /api/v1/external_integration/:selector/widget/:key/content': {
+      authenticated: true,
+      controller: externalIntegrationController.getWidgetContent,
+    },
+    // images are integration-scoped and sit directly under `:selector`: a
+    // nested `widget/image/:image_key` would share its shape with
+    // `widget/:key/content` (`image` is a reserved widget key for the same reason)
+    'get /api/v1/external_integration/:selector/image/:image_key': {
+      authenticated: true,
+      controller: externalIntegrationController.getWidgetImage,
+    },
+    'post /api/v1/external_integration/:selector/widget/:key/action/:action_key': {
+      authenticated: true,
+      controller: externalIntegrationController.runWidgetAction,
     },
     'delete /api/v1/external_integration/:selector': {
       authenticated: true,
@@ -712,6 +800,27 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.publishStates,
     },
+    'post /api/integration/v1/scene/event': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishSceneEvent,
+    },
+    // energy contracts capability (capabilities/energy-contracts.md, section 2)
+    'post /api/integration/v1/energy/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishEnergyCalendar,
+    },
+    'get /api/integration/v1/energy/calendar/:key': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getEnergyCalendar,
+    },
+    'get /api/integration/v1/energy/contract': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getEnergyContracts,
+    },
     'get /api/integration/v1/config': {
       authenticated: false,
       externalIntegrationAuth: true,
@@ -736,6 +845,33 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.getContacts,
+    },
+    // calendar integrations (capabilities/calendar-type.md): the integration syncs, the core stores.
+    // User-scoped external_id prefix enforced, 30 writes/min per integration.
+    'get /api/integration/v1/calendar/account': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getCalendarAccounts,
+    },
+    'get /api/integration/v1/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getIntegrationCalendars,
+    },
+    'post /api/integration/v1/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishCalendars,
+    },
+    'delete /api/integration/v1/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.deleteIntegrationCalendar,
+    },
+    'post /api/integration/v1/calendar/event': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishCalendarEvents,
     },
     'get /api/integration/v1/webhook': {
       authenticated: false,
@@ -811,12 +947,18 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: variableController.getByLocalService,
     },
+    // global variables hold instance-wide secrets (Gladys Plus keys, backup
+    // keys...): reading and writing them is reserved to admins. Per-user
+    // settings go through /api/v1/user/variable below, which stays open to
+    // every authenticated user.
     'post /api/v1/variable/:variable_key': {
       authenticated: true,
+      admin: true,
       controller: variableController.setValue,
     },
     'get /api/v1/variable/:variable_key': {
       authenticated: true,
+      admin: true,
       controller: variableController.getValue,
     },
     'post /api/v1/user/variable/:variable_key': {
@@ -863,6 +1005,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: sceneController.get,
     },
+    'get /api/v1/scene/running': {
+      authenticated: true,
+      controller: sceneController.getRunning,
+    },
     'get /api/v1/scene/:scene_selector': {
       authenticated: true,
       controller: sceneController.getBySelector,
@@ -880,6 +1026,14 @@ function getRoutes(gladys) {
     'post /api/v1/scene/:scene_selector/start': {
       authenticated: true,
       controller: sceneController.start,
+    },
+    'post /api/v1/scene/execution/:execution_id/stop': {
+      authenticated: true,
+      controller: sceneController.stopExecution,
+    },
+    'post /api/v1/scene/:scene_selector/stop': {
+      authenticated: true,
+      controller: sceneController.stop,
     },
     'post /api/v1/scene/:scene_selector/duplicate': {
       authenticated: true,
@@ -911,6 +1065,16 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: systemController.installUpgrade,
+    },
+    'post /api/v1/system/reboot': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.rebootHost,
+    },
+    'post /api/v1/system/shutdown-host': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.shutdownHost,
     },
     'post /api/v1/system/vacuum': {
       authenticated: true,
@@ -945,22 +1109,76 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: weatherController.getImage,
     },
-    // energy price
+    // energy contracts (docs/specs/energy-contracts.md, section 8.1)
+    'get /api/v1/energy_contract': {
+      authenticated: true,
+      controller: energyContractController.get,
+    },
+    'post /api/v1/energy_contract': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.create,
+    },
+    'post /api/v1/energy_contract/preview': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.preview,
+    },
+    'post /api/v1/energy_contract/recalculate': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.recalculate,
+    },
+    'get /api/v1/energy_contract/template': {
+      authenticated: true,
+      controller: energyContractController.getTemplates,
+    },
+    'get /api/v1/energy_contract/template/:provider/:key': {
+      authenticated: true,
+      controller: energyContractController.getTemplate,
+    },
+    'get /api/v1/energy_contract/:selector': {
+      authenticated: true,
+      controller: energyContractController.getBySelector,
+    },
+    'get /api/v1/energy_contract/:selector/current': {
+      authenticated: true,
+      controller: energyContractController.getCurrent,
+    },
+    'patch /api/v1/energy_contract/:selector': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.update,
+    },
+    'delete /api/v1/energy_contract/:selector': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.destroy,
+    },
+    'get /api/v1/energy_calendar': {
+      authenticated: true,
+      controller: energyContractController.getCalendars,
+    },
+    'get /api/v1/energy_calendar/:key': {
+      authenticated: true,
+      controller: energyContractController.getCalendarEntries,
+    },
+    // energy price: read-only compatibility window (section 9.4)
     'get /api/v1/energy_price': {
       authenticated: true,
       controller: energyPriceController.get,
     },
     'post /api/v1/energy_price': {
       authenticated: true,
-      controller: energyPriceController.create,
+      controller: energyPriceController.gone,
     },
     'patch /api/v1/energy_price/:selector': {
       authenticated: true,
-      controller: energyPriceController.update,
+      controller: energyPriceController.gone,
     },
     'delete /api/v1/energy_price/:selector': {
       authenticated: true,
-      controller: energyPriceController.destroy,
+      controller: energyPriceController.gone,
     },
     'get /api/v1/energy_price/default_electric_meter_feature_id': {
       authenticated: true,

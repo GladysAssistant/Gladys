@@ -10,6 +10,32 @@ describe('session.create', () => {
     expect(res).to.have.property('refresh_token');
     expect(res).to.have.property('access_token');
     expect(res).to.have.property('session_id');
+    const sessionInDb = await db.Session.findOne({ where: { id: res.session_id } });
+    expect(sessionInDb.origin).to.equal(null);
+  });
+  it('should store the canonical origin of an authenticated session', async () => {
+    const session = new Session('secret');
+    const res = await session.create(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      ['dashboard:read'],
+      60,
+      'android',
+      'HTTP://Gladys.local:80/',
+    );
+    const sessionInDb = await db.Session.findOne({ where: { id: res.session_id } });
+    expect(sessionInDb.origin).to.equal('http://gladys.local');
+  });
+  it('should not store an invalid origin', async () => {
+    const session = new Session('secret');
+    const res = await session.create(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      ['dashboard:read'],
+      60,
+      'android',
+      'http://gladys.local/some/path',
+    );
+    const sessionInDb = await db.Session.findOne({ where: { id: res.session_id } });
+    expect(sessionInDb.origin).to.equal(null);
   });
 });
 

@@ -1,8 +1,102 @@
-.alarmActionButton {
-  height: 6rem;
-  line-height: 16px;
+/* Horizon alarm controls: soft tinted tiles with an icon disc, the active
+   mode takes its tint fully. Light colors only — dark mode is the app-wide
+   inversion filter. */
+
+.alarmGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
 }
 
-.alarmActionIcon {
-  font-size: 30px !important;
+.alarmTile {
+  border: none;
+  border-radius: 16px;
+  padding: 0.85rem 0.5rem;
+  min-height: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  text-align: center;
+  background-color: rgba(28, 35, 52, 0.05);
+  color: var(--gl-ink, #1c2334);
+  cursor: pointer;
+}
+
+.alarmTile:disabled {
+  cursor: default;
+}
+
+/* a disabled tile that is NOT the active mode is just unavailable; the
+   active mode is also disabled but must read as selected, not washed out */
+.alarmTile:disabled:not(.alarmTileActive) {
+  opacity: 0.55;
+}
+
+.alarmTileIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  background-color: rgba(28, 35, 52, 0.07);
+  color: #414b5e;
+}
+
+.alarmTileArm .alarmTileIcon {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+.alarmTileDisarm .alarmTileIcon {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+.alarmTilePanic .alarmTileIcon {
+  background-color: #fbe3de;
+  color: #c24a33;
+}
+
+/* active mode: the whole tile takes the tint, the disc goes white */
+.alarmTileActive .alarmTileIcon {
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+.alarmTileActive.alarmTileArm {
+  background-color: #dde9fb;
+  color: #2f5bd7;
+}
+
+.alarmTileActive.alarmTileDisarm {
+  background-color: #def0e2;
+  color: #2e8f5b;
+}
+
+.alarmTileActive.alarmTilePartial {
+  background-color: var(--gl-ink, #1c2334);
+  color: #fff;
+}
+
+.alarmTileActive.alarmTilePartial .alarmTileIcon {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+/* panic is the one loud state: the alarm is blaring */
+.alarmTileActive.alarmTilePanic {
+  background-color: #d4593f;
+  color: #fff;
+}
+
+.alarmTileActive.alarmTilePanic .alarmTileIcon {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }

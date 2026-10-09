@@ -5,7 +5,7 @@ import cx from 'classnames';
 import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import { RequestStatus } from '../../../../utils/consts';
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import style from './style.css';

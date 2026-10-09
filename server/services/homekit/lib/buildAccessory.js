@@ -1,5 +1,6 @@
 const { mappings, mergedServiceCategories } = require('./deviceMappings');
 const { indexFeatureService } = require('./featureServices');
+const { sanitizeName } = require('./sanitizeName');
 
 /**
  * @description Move the features of categories HomeKit models as a single service into their host
@@ -68,7 +69,28 @@ function buildAccessory(device) {
 
   const categories = mergeCategories(featuresByCategory);
 
-  const accessory = new this.hap.Accessory(device.name.substring(0, 64), device.id);
+  const accessory = new this.hap.Accessory(sanitizeName(device.name), device.id);
+
+  // Two Gladys categories can land on the same HomeKit service: a siren and a switch are both a
+  // `Switch`, a curtain and a shutter both a `WindowCovering`. HAP refuses two services of one type
+  // on an accessory unless each carries a subtype, so what has to be counted here is the HomeKit
+  // service, not the Gladys category — counting categories is how a device carrying both used to
+  // throw and take the whole bridge down with it.
+  //
+  // When a service type is shared, *neither* category keeps the bare service, and the subtype is the
+  // category name rather than a position. Both points are about what HAP persists: the subtype takes
+  // part in the service identifiers of a paired bridge, so handing the bare identity to one of the
+  // two would silently give it whatever the other used to be — a switch that became a siren would
+  // keep its tile in the Home app and set off the alarm when pressed. Letting both identities change
+  // instead costs the user a service to re-add, which is at least visible.
+  const categoriesPerService = new Map();
+
+  Object.keys(categories).forEach((category) => {
+    const { service: serviceName } = mappings[category];
+
+    categoriesPerService.set(serviceName, (categoriesPerService.get(serviceName) || 0) + 1);
+  });
+
   Object.keys(categories).forEach((category) => {
     const serviceConfigs = [];
     // Features dropped by the read-only twin merge below, per service config. They build no
@@ -114,12 +136,18 @@ function buildAccessory(device) {
     });
 
     serviceConfigs.forEach((config, i) => {
-      const service = this.buildService(
-        device,
-        config,
-        mappings[category],
-        serviceConfigs.length > 1 ? `${category} ${i + 1}` : undefined,
-      );
+      const { service: serviceName } = mappings[category];
+      // A category giving several services numbers them as it always has; that subtype already
+      // carries the category name, so it cannot collide with another category's.
+      let subtype;
+
+      if (serviceConfigs.length > 1) {
+        subtype = `${category} ${i + 1}`;
+      } else if (categoriesPerService.get(serviceName) > 1) {
+        subtype = category;
+      }
+
+      const service = this.buildService(device, config, mappings[category], subtype);
       // Which features went into which service is only known here. sendState reads it back to
       // update the service the feature belongs to instead of the first one of its type.
       indexFeatureService(accessory, service, [...config, ...(droppedTwins.get(config) || [])]);

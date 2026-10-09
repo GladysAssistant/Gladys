@@ -7,18 +7,28 @@ on:
     # instead of master) run the same CI as regular pull requests
     branches: [master, 'claude/**']
     types: [opened, synchronize, reopened, ready_for_review]
+  # Merge queue builds: the queue only merges a group once the required
+  # checks of this workflow have passed on the merge_group ref.
+  merge_group:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  # github.head_ref is empty on merge_group events, so fall back to
+  # github.ref (unique per queue entry): without the fallback every queue
+  # build would share one concurrency group and cancel the others.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
   test-front:
     name: Front test
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -54,6 +64,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         id: setup-node
         uses: actions/setup-node@v3
@@ -97,10 +109,13 @@ jobs:
   test-server:
     name: Server test
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
         with:
+          persist-credentials: false
           fetch-depth: 2
       - name: 💽 Setup nodejs
         id: setup-node
@@ -141,9 +156,13 @@ jobs:
         run: |
           npm run coverage
       - name: 📄 Codecov report upload
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
         with:
-          fail_ci_if_error: true
+          # Codecov uploads are flaky (rate limits, see below). Failing the
+          # job is fine on a pull request, but in the merge queue it would
+          # block every group behind an external service, so only enforce
+          # the upload on pull_request builds.
+          fail_ci_if_error: ${{ github.event_name != 'merge_group' }}
           token: 08cd0d46-0291-42ed-b352-50924cb6cca6
 
           ## Yes, we are storing the CODECOV token in plain text here and not as a secret.
@@ -155,9 +174,13 @@ jobs:
   cypress-run:
     name: Cypress run
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         id: setup-node
         uses: actions/setup-node@v3
@@ -192,7 +215,7 @@ jobs:
         run: |
           npm ci && npm run install-server:dev
       - name: ✅ Cypress run
-        uses: cypress-io/github-action@v3.1.0
+        uses: cypress-io/github-action@c662a784116e1a26360c4e1fc0a90feedb4b5ed3 # v3.1.0
         with:
           install: false
           start: npm run start:cypress
@@ -203,12 +226,21 @@ jobs:
           project: ./front
           command: npm run cypress:run
   build-front:
-    if: github.event.pull_request.draft == false
+    # Runs on merge queue builds (the front must build before merging) and on
+    # non-draft pull requests. The event check must be explicit: on
+    # merge_group there is no pull_request payload and GitHub expressions
+    # coerce null == false to TRUE, so the old draft-only condition would
+    # silently match every non-PR event.
+    if: github.event_name == 'merge_group' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     name: Front build
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -229,7 +261,12 @@ jobs:
           name: static
           path: front/build
   docker:
-    if: github.event.pull_request.draft == false
+    # Preview images only make sense for pull requests: on merge_group there
+    # is no branch to tag the image with and nobody to comment to. The
+    # explicit event check matters (null == false is TRUE in GitHub
+    # expressions, see build-front above), otherwise this job would run on
+    # queue builds with an empty, invalid image tag.
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
     needs: build-front
     name: Docker magic !
     runs-on: ubuntu-22.04
@@ -242,6 +279,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 🏷️ Compute image tag from branch name
         id: image_tag
         # github.head_ref is attacker-controlled (any branch name), so we pass it
@@ -260,10 +299,10 @@ jobs:
           echo "tag=${BRANCH_TAG}" >> "$GITHUB_OUTPUT"
           echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
       - name: 💽 Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@2b82ce82d56a2a04d2637cd93a637ae1b359c0a7 # v2.2.0
       - name: 🐳 Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2.10.0
         with:
           version: latest
       - name: ↙️ Download build artifact
@@ -276,13 +315,13 @@ jobs:
       # GITHUB_TOKEN and cannot push packages nor comment.
       - name: 🔑 Login to GitHub Container Registry
         if: github.event.pull_request.head.repo.full_name == github.repository
-        uses: docker/login-action@v2
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: 🐳 Build AMD64 image and push it to ghcr.io
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # v3.3.1
         with:
           context: .
           file: ./docker/Dockerfile.buildx
@@ -291,7 +330,7 @@ jobs:
           tags: ${{ steps.image_tag.outputs.image }}
       - name: 💬 Comment the image on the pull request
         if: github.event.pull_request.head.repo.full_name == github.repository
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405 # v2.9.4
         with:
           header: docker-preview-image
           message: |

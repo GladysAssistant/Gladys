@@ -33,7 +33,7 @@ describe('externalIntegration.upsertFeatureSupportedOptions', () => {
     await externalIntegration.upsertFeatureSupportedOptions(createdDevice, [
       { external_id: 'ext:demo:cam:preset', supported_options: publishedOptions },
     ]);
-    sinonAssert.calledWith(device.syncFeatureSupportedOptions, 'feature-id', publishedOptions);
+    sinonAssert.calledWith(device.syncFeatureSupportedOptions, sinon.match({ id: 'feature-id' }), publishedOptions);
     expect(createdDevice.features[0].supported_options).to.deep.equal([{ value: 1, label: 'Entrance', sort_order: 0 }]);
   });
 

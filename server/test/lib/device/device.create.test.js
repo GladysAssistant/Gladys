@@ -248,7 +248,9 @@ describe('Device', () => {
         last_daily_aggregate: null,
         last_hourly_aggregate: null,
         last_monthly_aggregate: null,
-        last_value_changed: null,
+        // The current state of a feature is not part of what a device save writes:
+        // the seeded last_value_changed survives the update.
+        last_value_changed: new Date('2019-02-12T07:49:07.556Z'),
         last_value_string: null,
         unit: null,
         supported_options: [],
@@ -358,7 +360,9 @@ describe('Device', () => {
         last_daily_aggregate: null,
         last_hourly_aggregate: null,
         last_monthly_aggregate: null,
-        last_value_changed: null,
+        // The current state of a feature is not part of what a device save writes:
+        // the seeded last_value_changed survives the update.
+        last_value_changed: new Date('2019-02-12T07:49:07.556Z'),
         last_value_string: null,
         unit: null,
         supported_options: [],
@@ -366,6 +370,76 @@ describe('Device', () => {
         updated_at: newDevice.features[0] && newDevice.features[0].updated_at,
       },
     ]);
+  });
+  it('should keep the last value of existing features when a new feature is added', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    // Every state column gets a distinct persisted value, so an overwrite of any one of
+    // them fails here instead of silently passing on a column that is null on both sides.
+    const persistedLastValueChanged = new Date('2019-02-12T07:49:07.556Z');
+    const persistedHourlyAggregate = new Date('2020-03-01T10:00:00.000Z');
+    const persistedDailyAggregate = new Date('2020-03-01T00:00:00.000Z');
+    const persistedMonthlyAggregate = new Date('2020-03-01T00:00:00.000Z');
+    await db.DeviceFeature.update(
+      {
+        last_value_string: 'persisted-string',
+        last_hourly_aggregate: persistedHourlyAggregate,
+        last_daily_aggregate: persistedDailyAggregate,
+        last_monthly_aggregate: persistedMonthlyAggregate,
+      },
+      { where: { id: 'ce9dc798-b09f-4e51-8c16-311cdebf97cd' } },
+    );
+    // The MQTT device page posts the whole device back just to append one feature, and the
+    // existing features it carries hold whatever the page had in hand when it was loaded:
+    // stale, or null for a feature that had not received any value yet.
+    const newDevice = await device.create({
+      name: 'Test device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      features: [
+        {
+          id: 'ce9dc798-b09f-4e51-8c16-311cdebf97cd',
+          name: 'Test device feature 2',
+          external_id: 'hue:brightness:1',
+          category: 'light',
+          type: 'brightness',
+          read_only: false,
+          has_feedback: false,
+          min: 0,
+          max: 100,
+          last_value: null,
+          last_value_string: 'stale-string',
+          last_value_changed: null,
+          last_hourly_aggregate: new Date('2019-01-01T00:00:00.000Z'),
+          last_daily_aggregate: new Date('2019-01-01T00:00:00.000Z'),
+          last_monthly_aggregate: new Date('2019-01-01T00:00:00.000Z'),
+        },
+        {
+          name: 'Brand new feature',
+          external_id: 'hue:brand-new-feature:1',
+          category: 'light',
+          type: 'binary',
+          read_only: false,
+          has_feedback: false,
+          min: 0,
+          max: 1,
+          // A first value declared along with a brand new feature is still accepted
+          last_value: 1,
+        },
+      ],
+    });
+
+    const existingFeature = newDevice.features.find((feature) => feature.external_id === 'hue:brightness:1');
+    expect(existingFeature).to.have.property('last_value', 20);
+    expect(existingFeature).to.have.property('last_value_string', 'persisted-string');
+    expect(existingFeature.last_value_changed).to.deep.equal(persistedLastValueChanged);
+    expect(existingFeature.last_hourly_aggregate).to.deep.equal(persistedHourlyAggregate);
+    expect(existingFeature.last_daily_aggregate).to.deep.equal(persistedDailyAggregate);
+    expect(existingFeature.last_monthly_aggregate).to.deep.equal(persistedMonthlyAggregate);
+
+    const createdFeature = newDevice.features.find((feature) => feature.external_id === 'hue:brand-new-feature:1');
+    expect(createdFeature).to.have.property('last_value', 1);
   });
   it('should update device which already exist with a new poll frequency', async () => {
     const stateManager = new StateManager(event);
@@ -724,6 +798,49 @@ describe('Device', () => {
       EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
       'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
     );
+  });
+  it('should not re-purge the states of a feature already saved with keep_history = false', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const fakeEvent = {
+      emit: fake.returns(null),
+      on: fake.returns(null),
+    };
+    const device = new Device(fakeEvent, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const deviceToSave = {
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'Test device',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      features: [
+        {
+          name: 'New device feature',
+          selector: 'new-device-feature',
+          external_id: 'hue:binary:1',
+          category: 'temperature',
+          type: 'decimal',
+          keep_history: false,
+          read_only: false,
+          has_feedback: false,
+          min: 0,
+          max: 100,
+        },
+      ],
+    };
+    // First save: the feature switches from keep_history = true to false, its
+    // states must be purged.
+    await device.create({ ...deviceToSave });
+    assert.calledWith(
+      fakeEvent.emit,
+      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
+      'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    );
+    fakeEvent.emit.resetHistory();
+    // Second save (assigning a room, renaming...): nothing changed on the
+    // feature, no purge job should be queued again.
+    await device.create({ ...deviceToSave, room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5' });
+    assert.neverCalledWith(fakeEvent.emit, EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE);
   });
   it('should ignore invalid energy_parent_id when updating a device', async () => {
     const stateManager = new StateManager(event);

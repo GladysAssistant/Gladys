@@ -1,5 +1,5 @@
 import { Component, Fragment } from 'preact';
-import Select from 'react-select';
+import Select from '../../../../../components/form/Select';
 import get from 'get-value';
 
 import { LEVEL_MATTER_STATE } from '../../../../../../../server/utils/constants';

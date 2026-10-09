@@ -162,12 +162,16 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
       authenticated: true,
       controller: asyncMiddleware(status),
     },
+    // the setup holds the MQTT broker credentials Zigbee2mqtt connects with
+    // (GLADYS_MQTT_PASSWORD among them) and hands them straight to res.json()
     'get /api/v1/service/zigbee2mqtt/setup': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(getCurrentSetup),
     },
     'post /api/v1/service/zigbee2mqtt/setup': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(setup),
     },
     'post /api/v1/service/zigbee2mqtt/connect': {

@@ -1,6 +1,7 @@
 const get = require('get-value');
 const { NotFoundError } = require('../../utils/coreErrors');
 const logger = require('../../utils/logger');
+const { isCameraEnabled } = require('../../utils/device');
 
 /**
  * @description Poll a device to get new value.
@@ -10,6 +11,12 @@ const logger = require('../../utils/logger');
  */
 async function poll(device) {
   logger.debug(`Polling device ${device.selector}`);
+  // A disabled camera must not be polled at all: this is the whole point of the "enabled"
+  // gate (a camera unplugged for the winter otherwise floods the logs with poll errors).
+  if (!isCameraEnabled(device)) {
+    logger.debug(`Device ${device.selector} is a disabled camera, skipping poll`);
+    return;
+  }
   const service = this.serviceManager.getService(device.service.name);
   if (service === null) {
     throw new NotFoundError(`Service ${device.service.name} was not found.`);

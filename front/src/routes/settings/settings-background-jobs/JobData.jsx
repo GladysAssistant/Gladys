@@ -88,13 +88,31 @@ const PurgeOrphanedJobData = ({ job, user }) => (
   </Fragment>
 );
 
+// Energy cost calculation: the prices taken from a contract's fallback because a calendar
+// value was missing (a spot price published late, for instance)
+const EnergyCostJobData = ({ job, user }) =>
+  job.data.fallback_prices_count !== undefined && (
+    <div class="text-muted small">
+      <Text
+        id="jobsSettings.jobData.fallbackPrices"
+        fields={{ count: job.data.fallback_prices_count.toLocaleString(user.language) }}
+      />
+    </div>
+  );
+
 // One renderer per job type: a new job type plugs its own renderer here instead of
 // adding type-specific conditions to the generic job list.
 const JOB_DATA_RENDERERS = {
   [JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE]: PurgeSingleFeatureJobData,
   [JOB_TYPES.DEVICE_STATES_PURGE_ALL_SQLITE_STATES]: PurgeAllSqliteJobData,
   [JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES]: PurgeOrphanedJobData,
-  [JOB_TYPES.DEVICE_MIGRATE]: DeviceMigrateJobData
+  [JOB_TYPES.DEVICE_MIGRATE]: DeviceMigrateJobData,
+  [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES]: EnergyCostJobData,
+  [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_YESTERDAY]: EnergyCostJobData,
+  [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_BEGINNING]: EnergyCostJobData,
+  [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_CONTRACT]: EnergyCostJobData,
+  [JOB_TYPES.ENERGY_MONITORING_BILLING_PERIOD_END]: EnergyCostJobData,
+  [JOB_TYPES.ENERGY_MONITORING_DELEGATED_CATCH_UP]: EnergyCostJobData
 };
 
 // Structured facts attached by the job (job.data), rendered by the job type's own renderer

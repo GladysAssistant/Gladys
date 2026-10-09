@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { request } = require('../request.test');
+const db = require('../../../models');
 
 describe('POST /api/v1/login', () => {
   it('should login user', async () => {
@@ -27,6 +28,22 @@ describe('POST /api/v1/login', () => {
           session_id: res.body.session_id,
         });
       });
+  });
+  it('should record the origin the user logs in from', async () => {
+    let sessionId;
+    await request
+      .post('/api/v1/login')
+      .set('Origin', 'http://gladys.local:1443')
+      .send({
+        email: 'demo@demo.com',
+        password: 'mysuperpassword',
+      })
+      .expect(200)
+      .then((res) => {
+        sessionId = res.body.session_id;
+      });
+    const session = await db.Session.findOne({ where: { id: sessionId } });
+    expect(session.origin).to.equal('http://gladys.local:1443');
   });
   it('should not login user (email not found)', async () => {
     await request

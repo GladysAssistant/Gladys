@@ -24,24 +24,25 @@ async function checkIfGladysUpgraded(gateway, waitTimeBetweenMessages = 300) {
           gladysVersion: this.gladysVersion,
         });
         try {
-          await this.message.sendToUser(admin.selector, message, null, { messageType: 'notification' });
+          await this.message.sendSystemMessage(admin.selector, message, null, { messageType: 'notification' });
         } catch (e) {
           logger.error(e);
         }
         await Promise.delay(waitTimeBetweenMessages);
         const gladysVersionInfos = await gateway.getLatestGladysVersion();
-        if (gladysVersionInfos.name === this.gladysVersion) {
+        // null when this instance is not an official release image: no release note to send
+        if (gladysVersionInfos && gladysVersionInfos.name === this.gladysVersion) {
           try {
             // If the user is french && there is a french release note link
             if (admin.language === 'fr' && gladysVersionInfos.fr_release_note_link) {
               // Send the release note to the user
-              await this.message.sendToUser(admin.selector, gladysVersionInfos.fr_release_note_link, null, {
+              await this.message.sendSystemMessage(admin.selector, gladysVersionInfos.fr_release_note_link, null, {
                 messageType: 'notification',
               });
             } else if (gladysVersionInfos.default_release_note_link) {
               // If there is no release note in french / or the user is not french, send the default one (english)
 
-              await this.message.sendToUser(admin.selector, gladysVersionInfos.default_release_note_link, null, {
+              await this.message.sendSystemMessage(admin.selector, gladysVersionInfos.default_release_note_link, null, {
                 messageType: 'notification',
               });
             }

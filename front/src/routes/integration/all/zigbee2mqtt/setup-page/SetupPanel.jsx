@@ -65,7 +65,7 @@ class SetupPanel extends Component {
   }
 
   render({ zigbee2mqttStatus = {}, httpClient, disabled, setupZigee2mqttStatus }, { setupMode, configuration }) {
-    const { dockerBased, networkModeValid, usbConfigured } = zigbee2mqttStatus;
+    const { dockerBased, networkModeValid, usbConfigured, networkAdapterConfigured } = zigbee2mqttStatus;
 
     return (
       <Fragment>
@@ -74,6 +74,7 @@ class SetupPanel extends Component {
             dockerBased={dockerBased}
             networkModeValid={networkModeValid}
             usbConfigured={usbConfigured}
+            networkAdapterConfigured={networkAdapterConfigured}
             setupMode={setupMode}
             selectSetupMode={this.selectSetupMode}
             resetSetupMode={this.resetSetupMode}

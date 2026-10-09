@@ -38,7 +38,7 @@ describe('gateway.sendWeeklyDigest', () => {
         choices: [{ message: { content: 'Bonjour, voici votre bilan.' } }],
       }),
       message: {
-        sendToUser: fake.resolves({}),
+        sendSystemMessage: fake.resolves({}),
       },
     };
   });
@@ -61,6 +61,16 @@ describe('gateway.sendWeeklyDigest', () => {
     assert.notCalled(gateway.buildWeeklyDigestData);
   });
 
+  it('should skip when the Gladys Plus subscription is not paid', async () => {
+    gateway.getStatus = fake.resolves({ configured: true, subscription_active: false });
+
+    const result = await sendWeeklyDigest.call(gateway);
+
+    expect(result).to.deep.equal({ sent: 0 });
+    assert.notCalled(gateway.buildWeeklyDigestData);
+    assert.notCalled(gateway.aiChat);
+  });
+
   it('should send digest to admins', async () => {
     const result = await sendWeeklyDigest.call(gateway);
 
@@ -68,7 +78,7 @@ describe('gateway.sendWeeklyDigest', () => {
     assert.calledOnceWithExactly(gateway.user.getByRole, USER_ROLE.ADMIN);
     assert.calledOnce(gateway.aiChat);
     expect(gateway.aiChat.getCall(0).args[0].purpose).to.equal(AI_CHAT_PURPOSES.WEEKLY_DIGEST);
-    assert.calledOnceWithExactly(gateway.message.sendToUser, 'tony', 'Bonjour, voici votre bilan.', null, {
+    assert.calledOnceWithExactly(gateway.message.sendSystemMessage, 'tony', 'Bonjour, voici votre bilan.', null, {
       messageType: 'notification',
     });
   });
@@ -108,7 +118,7 @@ describe('gateway.sendWeeklyDigest', () => {
     const result = await sendWeeklyDigest.call(gateway);
 
     expect(result).to.deep.equal({ sent: 0 });
-    assert.notCalled(gateway.message.sendToUser);
+    assert.notCalled(gateway.message.sendSystemMessage);
   });
 
   it('should skip when AI rate limit is reached', async () => {
@@ -117,7 +127,7 @@ describe('gateway.sendWeeklyDigest', () => {
     const result = await sendWeeklyDigest.call(gateway);
 
     expect(result).to.deep.equal({ sent: 0 });
-    assert.notCalled(gateway.message.sendToUser);
+    assert.notCalled(gateway.message.sendSystemMessage);
   });
 
   it('should continue when digest fails for one admin', async () => {
@@ -139,7 +149,7 @@ describe('gateway.sendWeeklyDigest', () => {
     const result = await sendWeeklyDigest.call(gateway);
 
     expect(result).to.deep.equal({ sent: 1 });
-    assert.calledOnceWithExactly(gateway.message.sendToUser, 'pierre', 'Digest OK', null, {
+    assert.calledOnceWithExactly(gateway.message.sendSystemMessage, 'pierre', 'Digest OK', null, {
       messageType: 'notification',
     });
   });

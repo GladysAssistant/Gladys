@@ -31,12 +31,14 @@ const AreaModel = require('./area');
 const CalendarModel = require('./calendar');
 const CalendarEventModel = require('./calendar_event');
 const DashboardModel = require('./dashboard');
+const DashboardAssetModel = require('./dashboard_asset');
 const DeviceFeatureStateModel = require('./device_feature_state');
 const DeviceFeatureAggregateModel = require('./device_feature_state_aggregate');
 const DeviceFeatureModel = require('./device_feature');
 const DeviceFeatureSupportedOptionModel = require('./device_feature_supported_option');
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
+const EnergyContractModel = require('./energy_contract');
 const EnergyPriceModel = require('./energy_price');
 const HouseModel = require('./house');
 const JobModel = require('./job');
@@ -50,6 +52,8 @@ const ScriptModel = require('./script');
 const ServiceModel = require('./service');
 const SessionModel = require('./session');
 const TagScene = require('./tag_scene');
+const TariffCalendarModel = require('./tariff_calendar');
+const TariffCalendarEntryModel = require('./tariff_calendar_entry');
 const UserModel = require('./user');
 const VariableModel = require('./variable');
 
@@ -58,12 +62,14 @@ const models = {
   Calendar: CalendarModel(sequelize, Sequelize),
   CalendarEvent: CalendarEventModel(sequelize, Sequelize),
   Dashboard: DashboardModel(sequelize, Sequelize),
+  DashboardAsset: DashboardAssetModel(sequelize, Sequelize),
   DeviceFeatureState: DeviceFeatureStateModel(sequelize, Sequelize),
   DeviceFeatureStateAggregate: DeviceFeatureAggregateModel(sequelize, Sequelize),
   DeviceFeature: DeviceFeatureModel(sequelize, Sequelize),
   DeviceFeatureSupportedOption: DeviceFeatureSupportedOptionModel(sequelize, Sequelize),
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
+  EnergyContract: EnergyContractModel(sequelize, Sequelize),
   EnergyPrice: EnergyPriceModel(sequelize, Sequelize),
   House: HouseModel(sequelize, Sequelize),
   Job: JobModel(sequelize, Sequelize),
@@ -77,6 +83,8 @@ const models = {
   Service: ServiceModel(sequelize, Sequelize),
   Session: SessionModel(sequelize, Sequelize),
   TagScene: TagScene(sequelize, Sequelize),
+  TariffCalendar: TariffCalendarModel(sequelize, Sequelize),
+  TariffCalendarEntry: TariffCalendarEntryModel(sequelize, Sequelize),
   User: UserModel(sequelize, Sequelize),
   Variable: VariableModel(sequelize, Sequelize),
 };
@@ -352,22 +360,58 @@ const duckDbUpdateState = async (deviceFeatureId, value, createdAt) => {
   );
 };
 
+const buildInsertStatesStatement = (deviceFeatureId, states) => {
+  let queryString = `INSERT INTO t_device_feature_state (device_feature_id, value, created_at) VALUES `;
+  const queryParams = [];
+  states.forEach((state, index) => {
+    if (index > 0) {
+      queryString += `,`;
+    }
+    queryString += '(?, ?, ?)';
+    queryParams.push(deviceFeatureId);
+    queryParams.push(state.value);
+    queryParams.push(formatDateInUTC(state.created_at));
+  });
+  return { queryString, queryParams };
+};
+
 const duckDbBatchInsertState = async (deviceFeatureId, states) => {
   const chunks = chunk(states, 10000);
   await Promise.each(chunks, async (oneStatesChunk, chunkIndex) => {
-    let queryString = `INSERT INTO t_device_feature_state (device_feature_id, value, created_at) VALUES `;
-    const queryParams = [];
-    oneStatesChunk.forEach((state, index) => {
-      if (index > 0) {
-        queryString += `,`;
-      }
-      queryString += '(?, ?, ?)';
-      queryParams.push(deviceFeatureId);
-      queryParams.push(state.value);
-      queryParams.push(formatDateInUTC(state.created_at));
-    });
+    const { queryString, queryParams } = buildInsertStatesStatement(deviceFeatureId, oneStatesChunk);
     logger.info(`DuckDB : Inserting chunk ${chunkIndex} for deviceFeature = ${deviceFeatureId}.`);
     await duckDbWriteConnectionAllAsync(queryString, ...queryParams);
+  });
+};
+
+// Replace the states of a feature from a date in ONE transaction: the previous states are
+// kept when the insert fails or the process dies between the delete and the insert (the
+// energy cost history is rewritten this way). The statements run back to back on the
+// write connection as a single queued task, so no other write interleaves in the
+// transaction (a dedicated connection is not an option: the instance may have been
+// closed by a backup restore while the existing connections keep working).
+const duckDbReplaceStatesFrom = async (deviceFeatureId, from, states) => {
+  await ensureDuckDbInitialized();
+  return duckDbWriteQueue(async () => {
+    const run = async (query, params = []) => {
+      const mappedParams = normalizeParams(params).map(toDuckDbParam);
+      await duckDbWriteConnection.runAndReadAll(query, mappedParams);
+    };
+    try {
+      await run('BEGIN TRANSACTION');
+      await run('DELETE FROM t_device_feature_state WHERE device_feature_id = ? AND created_at >= ?::TIMESTAMPTZ', [
+        deviceFeatureId,
+        formatDateInUTC(from),
+      ]);
+      await Promise.each(chunk(states, 10000), async (oneStatesChunk) => {
+        const { queryString, queryParams } = buildInsertStatesStatement(deviceFeatureId, oneStatesChunk);
+        await run(queryString, queryParams);
+      });
+      await run('COMMIT');
+    } catch (e) {
+      await run('ROLLBACK').catch((rollbackError) => logger.warn(`DuckDB rollback failed: ${rollbackError.message}`));
+      throw e;
+    }
   });
 };
 
@@ -449,6 +493,7 @@ const db = {
   duckDbInsertState,
   duckDbUpdateState,
   duckDbBatchInsertState,
+  duckDbReplaceStatesFrom,
   duckDbShowVersion,
   duckDbSetTimezone,
   duckDbCreateBackupInstance,

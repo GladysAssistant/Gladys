@@ -14,12 +14,18 @@ import MusicBox from '../../components/boxs/music/MusicBox';
 import EdfTempoBox from '../../components/boxs/edf-tempo/EdfTempo';
 import GaugeBox from '../../components/boxs/gauge/GaugeBox';
 import EnergyConsumptionBox from '../../components/boxs/energy-consumption/EnergyConsumption';
+import EnergyPriceBox from '../../components/boxs/energy-price/EnergyPrice';
 import VoiceAssistantBox from '../../components/boxs/voice-assistant/VoiceAssistantBox';
 import LinkBox from '../../components/boxs/link/LinkBox';
 import PhotoBox from '../../components/boxs/photo/PhotoBox';
 import SunBox from '../../components/boxs/sun/Sun';
+import ChipsBox from '../../components/boxs/chips/ChipsBox';
+import ActionsBox from '../../components/boxs/actions/ActionsBox';
+import HouseViewBox from '../../components/boxs/house-view/HouseViewBox';
+import ExternalWidgetBox from '../../components/boxs/external-widget/ExternalWidgetBox';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
-const Box = ({ children, ...props }) => {
+const BoxContent = ({ children, ...props }) => {
   switch (props.box.type) {
     case 'weather':
       return <WeatherBox {...props} />;
@@ -53,6 +59,8 @@ const Box = ({ children, ...props }) => {
       return <GaugeBox {...props} />;
     case 'energy-consumption':
       return <EnergyConsumptionBox {...props} />;
+    case 'energy-price':
+      return <EnergyPriceBox {...props} />;
     case 'voice-assistant':
       return <VoiceAssistantBox {...props} />;
     case 'link':
@@ -61,7 +69,26 @@ const Box = ({ children, ...props }) => {
       return <PhotoBox {...props} />;
     case 'sun':
       return <SunBox {...props} />;
+    case 'chips':
+      return <ChipsBox {...props} />;
+    case 'house-view':
+      return <HouseViewBox {...props} />;
+    case 'actions':
+      return <ActionsBox {...props} />;
+    case 'external-widget':
+      return <ExternalWidgetBox {...props} />;
   }
 };
+
+// Every widget renders user-supplied configuration, and a dashboard is a wall
+// of them: a single widget throwing while it renders used to take the whole
+// app down with it (see ErrorBoundary), including the editor the user needs
+// to fix that very widget. Contain it to its own card instead — the rest of
+// the dashboard keeps working, and re-picking a type clears the message.
+const Box = ({ children, ...props }) => (
+  <ErrorBoundary resetKey={props.box.type} compact>
+    <BoxContent {...props} />
+  </ErrorBoundary>
+);
 
 export default Box;

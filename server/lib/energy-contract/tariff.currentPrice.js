@@ -1,0 +1,145 @@
+const { TARIFF_COMPONENT_KINDS, COST_DECIMALS } = require('./tariff.constants');
+const { getLocalContext, getPeriodIds, MS_PER_MINUTE } = require('./tariff.time');
+const { matchesConditions } = require('./tariff.conditions');
+const { resolvePrice, getEvaluationSlotMinutes } = require('./tariff.priceIntervals');
+const { createCalendarLookup } = require('./calendar.lookup');
+const { readTierCumulative, getTierBounds, resetChangedPeriods } = require('./tariff.tier');
+
+const EMPTY_LOOKUP = createCalendarLookup();
+
+/**
+ * @description The unit price (per kWh) a contract charges at an instant: the sum of the
+ * consumption components' matching rule prices (a tier rule matches when the next kWh
+ * falls in its tier), plus the taxes that apply to them. Fixed and demand components are
+ * not per-kWh and are left out.
+ * @param {object} compiled - Compiled tariff.
+ * @param {object} contract - The contract, with its timezone.
+ * @param {number} ms - Instant, milliseconds since the epoch.
+ * @param {object} lookup - Calendar lookup.
+ * @param {object} cumulative - The kWh accumulated so far per scope and counter (for tier rules).
+ * @param {number} [maxPowerKw] - Peak power of the last interval, for power_threshold rules (0 by default).
+ * @returns {object} The unit price { price, label }; `price` is null when a calendar value is missing.
+ * @example
+ * getUnitPriceAt(compiled, { timezone: 'Europe/Paris' }, Date.now(), lookup, { day: 0, month: 0, billing_period: 0 });
+ */
+function getUnitPriceAt(compiled, contract, ms, lookup, cumulative, maxPowerKw = 0) {
+  const local = getLocalContext(ms, contract.timezone);
+  const getCalendarValue = (key) => lookup.get(key, ms, local, contract.timezone);
+  const context = { local, getCalendarValue, maxPowerKw };
+  const byComponent = {};
+  let label;
+  let price = 0;
+  let missing = false;
+  compiled.components.forEach((component) => {
+    if (component.kind === TARIFF_COMPONENT_KINDS.CONSUMPTION) {
+      const rule = component.rules.find((r) => {
+        if (!matchesConditions(r.when, context)) {
+          return false;
+        }
+        const tier = r.when === undefined ? undefined : r.when.tier;
+        if (tier === undefined) {
+          return true;
+        }
+        const before = readTierCumulative(tier, cumulative);
+        const bounds = getTierBounds(tier, local.date, contract);
+        return before >= bounds.from && before < bounds.to;
+      });
+      // a consumption component always has a fallback or a catch-all last rule (validated);
+      // like priceIntervals, a matching rule whose calendar price is missing yields the fallback
+      let spec = rule || component.fallback;
+      let unit = resolvePrice(spec, getCalendarValue);
+      if (unit === undefined && rule !== undefined && component.fallback !== undefined) {
+        spec = component.fallback;
+        unit = resolvePrice(spec, getCalendarValue);
+      }
+      if (unit === undefined) {
+        missing = true;
+        return;
+      }
+      byComponent[component.key] = unit;
+      price += unit;
+      // the label of the first consumption component that has one, as in priceIntervals
+      if (label === undefined) {
+        label = spec.label;
+      }
+    } else if (component.kind === TARIFF_COMPONENT_KINDS.TAX) {
+      const base = component.applies_to.reduce((sum, key) => sum + (byComponent[key] || 0), 0);
+      const tax = (base * component.rate) / 100;
+      byComponent[component.key] = tax;
+      price += tax;
+    }
+  });
+  if (missing) {
+    return { price: null, label: undefined };
+  }
+  const factor = 10 ** COST_DECIMALS;
+  return { price: Math.round(price * factor) / factor, label };
+}
+
+/**
+ * @description Current unit price of a contract and its next change, for the price widget,
+ * the assistant and the scene trigger: the price at `at`, then a scan of the following
+ * slots (15 minutes when the tariff reads a 15-minute calendar, 30 minutes otherwise) until
+ * the price or the rule label changes.
+ * @param {object} compiled - Compiled tariff.
+ * @param {object} contract - The contract, with its timezone.
+ * @param {object} [options] - Options: `at` (Date or timestamp, now by default), `calendars` (lookup),
+ * `cumulative` ({ day, month, billing_period, counters? } for tier rules), `max_power_kw` (peak of the last interval,
+ * for power_threshold rules), `horizon_hours` (48 by default).
+ * @returns {object} The current price { price, label, valid_until, next_price, next_label };
+ * `valid_until` is null when the price does not change within the horizon.
+ * @example
+ * const current = getCurrentPrice(compiled, { timezone: 'Europe/Paris' }, { calendars: lookup });
+ */
+function getCurrentPrice(compiled, contract, options = {}) {
+  const requestedAt = options.at === undefined ? Date.now() : new Date(options.at).getTime();
+  const lookup = options.calendars || EMPTY_LOOKUP;
+  const cumulative = { day: 0, month: 0, billing_period: 0, ...(options.cumulative || {}) };
+  const maxPowerKw = options.max_power_kw || 0;
+  const horizonMs = (options.horizon_hours || 48) * 60 * 60 * 1000;
+  // Evaluate at the start of the current slot of the contract's local clock (zones at :45
+  // such as Asia/Kathmandu are not aligned on UTC): a 15-minute slot when the tariff reads a
+  // 15-minute calendar (a spot price changing at :15), a 30-minute one otherwise. Sub-daily
+  // calendars are keyed by slot start, and a live call never lands on an exact slot instant.
+  const slotMinutes = getEvaluationSlotMinutes(compiled, lookup);
+  const slotMs = slotMinutes * MS_PER_MINUTE;
+  const local = getLocalContext(requestedAt, contract.timezone);
+  const at = requestedAt - (local.minutes % slotMinutes) * MS_PER_MINUTE - (requestedAt % MS_PER_MINUTE);
+  const current = getUnitPriceAt(compiled, contract, at, lookup, cumulative, maxPowerKw);
+  const result = {
+    price: current.price,
+    label: current.label,
+    valid_until: null,
+    next_price: null,
+    next_label: undefined,
+  };
+  // Next change: scan the following slot boundaries. The accumulations are a snapshot at
+  // `at`: a slot in another day, month or billing period reads them reset, as the engine
+  // resets them at that boundary (a Rate D allowance restarts with the period, it does not
+  // shrink to the next period's days with the old total).
+  const billingPeriodStartDay = contract.billing_period_start_day || 1;
+  const atIds = getPeriodIds(local.date, billingPeriodStartDay, contract.timezone);
+  let slot = at + slotMs;
+  while (slot - requestedAt <= horizonMs) {
+    const slotIds = getPeriodIds(
+      getLocalContext(slot, contract.timezone).date,
+      billingPeriodStartDay,
+      contract.timezone,
+    );
+    const slotCumulative = resetChangedPeriods(cumulative, atIds, slotIds);
+    const next = getUnitPriceAt(compiled, contract, slot, lookup, slotCumulative, maxPowerKw);
+    if (next.price !== current.price || next.label !== current.label) {
+      result.valid_until = new Date(slot).toISOString();
+      result.next_price = next.price;
+      result.next_label = next.label;
+      break;
+    }
+    slot += slotMs;
+  }
+  return result;
+}
+
+module.exports = {
+  getUnitPriceAt,
+  getCurrentPrice,
+};

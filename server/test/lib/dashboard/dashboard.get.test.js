@@ -34,6 +34,7 @@ describe('dashboard.get', () => {
         name: 'Test dashboard',
         selector: 'test-dashboard',
         type: 'main',
+        icon: null,
         updated_at: '2019-02-12 07:49:07.556 +00:00',
       },
       {
@@ -41,6 +42,7 @@ describe('dashboard.get', () => {
         name: 'My new public dashboard',
         selector: 'my-new-public-dashoard',
         type: 'main',
+        icon: null,
         updated_at: dashboards[1].updated_at,
       },
     ]);

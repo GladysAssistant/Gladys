@@ -1,0 +1,143 @@
+{
+  "name": "HS2WD-E device",
+  "mqttDevice": {
+    "definition": {
+      "description": "Smart siren",
+      "exposes": [
+        {
+          "name": "battery",
+          "label": "Battery",
+          "access": 1,
+          "type": "numeric",
+          "property": "battery",
+          "description": "Remaining battery in %, can take up to 24 hours before reported",
+          "category": "diagnostic",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "name": "max_duration",
+          "label": "Max duration",
+          "access": 7,
+          "type": "numeric",
+          "property": "max_duration",
+          "description": "Max duration of Siren",
+          "category": "config",
+          "unit": "s",
+          "value_max": 600,
+          "value_min": 0
+        },
+        {
+          "name": "warning",
+          "label": "Warning",
+          "access": 2,
+          "type": "composite",
+          "property": "warning",
+          "features": [
+            {
+              "name": "strobe",
+              "label": "Strobe",
+              "access": 2,
+              "type": "binary",
+              "property": "strobe",
+              "description": "Turn on/off the strobe (light) during warning",
+              "value_on": true,
+              "value_off": false
+            },
+            {
+              "name": "strobe_duty_cycle",
+              "label": "Strobe duty cycle",
+              "access": 2,
+              "type": "numeric",
+              "property": "strobe_duty_cycle",
+              "description": "Length of the flash cycle",
+              "value_max": 10,
+              "value_min": 0
+            },
+            {
+              "name": "duration",
+              "label": "Duration",
+              "access": 2,
+              "type": "numeric",
+              "property": "duration",
+              "description": "Duration in seconds of the alarm",
+              "unit": "s"
+            },
+            {
+              "name": "mode",
+              "label": "Mode",
+              "access": 2,
+              "type": "enum",
+              "property": "mode",
+              "description": "Mode of the warning (sound effect)",
+              "values": ["stop", "emergency"]
+            }
+          ]
+        }
+      ],
+      "model": "HS2WD-E",
+      "options": [],
+      "supports_ota": false,
+      "vendor": "Heiman"
+    },
+    "friendly_name": "HS2WD-E device"
+  },
+  "gladysDevice": {
+    "name": "HS2WD-E device",
+    "model": "HS2WD-E",
+    "external_id": "zigbee2mqtt:HS2WD-E device",
+    "features": [
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "name": "Battery",
+        "external_id": "zigbee2mqtt:HS2WD-E device:battery:integer:battery",
+        "selector": "zigbee2mqtt-hs2wd-e-device-battery-integer-battery"
+      },
+      {
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 600,
+        "category": "duration",
+        "type": "decimal",
+        "unit": "seconds",
+        "name": "Max duration",
+        "external_id": "zigbee2mqtt:HS2WD-E device:duration:decimal:max_duration",
+        "selector": "zigbee2mqtt-hs2wd-e-device-duration-decimal-max-duration"
+      },
+      {
+        "read_only": false,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "siren",
+        "type": "binary",
+        "unit": null,
+        "name": "Warning",
+        "external_id": "zigbee2mqtt:HS2WD-E device:siren:binary:warning",
+        "selector": "zigbee2mqtt-hs2wd-e-device-siren-binary-warning"
+      }
+    ],
+    "should_poll": false,
+    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a"
+  },
+  "values": [
+    {
+      "internal": 92,
+      "external": 92,
+      "property": "battery"
+    },
+    {
+      "internal": 240,
+      "external": 240,
+      "property": "max_duration"
+    }
+  ]
+}

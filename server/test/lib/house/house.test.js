@@ -17,6 +17,8 @@ const event = {
   emit: fake.returns(null),
 };
 
+const HOUSE_ID = 'a741dfa6-24de-4b46-afc7-370772f068d5';
+
 describe('House', () => {
   afterEach(() => {
     sinon.reset();
@@ -130,6 +132,16 @@ describe('House', () => {
           .to.have.property('rooms')
           .and.to.be.instanceOf(Array);
       });
+    });
+    it('should get rooms sorted by name, not in creation order', async () => {
+      // Created in an order that is neither alphabetical nor its reverse, so a house
+      // returning them untouched cannot pass by chance.
+      await db.Room.create({ name: 'Kitchen', selector: 'kitchen', house_id: HOUSE_ID });
+      await db.Room.create({ name: 'Attic', selector: 'attic', house_id: HOUSE_ID });
+      await db.Room.create({ name: 'Bedroom', selector: 'bedroom', house_id: HOUSE_ID });
+      const houses = await house.get({ expand: ['rooms'] });
+      const testHouse = houses.find((oneHouse) => oneHouse.id === HOUSE_ID);
+      expect(testHouse.rooms.map((room) => room.name)).to.deep.equal(['Attic', 'Bedroom', 'Kitchen', 'Test room']);
     });
   });
 

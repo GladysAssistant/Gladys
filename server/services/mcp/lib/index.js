@@ -9,6 +9,7 @@ const {
   isLightControlFeature,
   isShutterFeature,
   isHistoryFeature,
+  isBatteryFeature,
   isWritableSensorFeature,
 } = require('./selectFeature');
 const { findBySimilarity } = require('./findBySimilarity');
@@ -45,6 +46,7 @@ MCPHandler.prototype.isSwitchableFeature = isSwitchableFeature;
 MCPHandler.prototype.isLightControlFeature = isLightControlFeature;
 MCPHandler.prototype.isShutterFeature = isShutterFeature;
 MCPHandler.prototype.isHistoryFeature = isHistoryFeature;
+MCPHandler.prototype.isBatteryFeature = isBatteryFeature;
 MCPHandler.prototype.isWritableSensorFeature = isWritableSensorFeature;
 MCPHandler.prototype.findBySimilarity = findBySimilarity;
 MCPHandler.prototype.formatValue = formatValue;

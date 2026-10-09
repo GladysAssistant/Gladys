@@ -43,6 +43,11 @@ module.exports = (sequelize, DataTypes) => {
       useragent: {
         type: DataTypes.TEXT,
       },
+      // origin the browser was on when the session was opened, only set for
+      // authenticated sessions (login, signup, token refresh)
+      origin: {
+        type: DataTypes.TEXT,
+      },
       tablet_mode: {
         allowNull: false,
         type: DataTypes.BOOLEAN,

@@ -65,12 +65,14 @@ describe('zigbee2mqtt disconnect', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
@@ -93,12 +95,14 @@ describe('zigbee2mqtt disconnect', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
@@ -127,12 +131,14 @@ describe('zigbee2mqtt disconnect', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
   });

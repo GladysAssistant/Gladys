@@ -20,6 +20,7 @@ const { registerProxyService } = require('./externalIntegration.registerProxySer
 const { clearTimers } = require('./externalIntegration.clearTimers');
 const { handleStartupTimeout } = require('./externalIntegration.handleStartupTimeout');
 const { isUpdateAvailable } = require('./externalIntegration.isUpdateAvailable');
+const { getLatestVersion } = require('./externalIntegration.getLatestVersion');
 const { getDocsUrls } = require('./externalIntegration.getDocsUrls');
 const { update } = require('./externalIntegration.update');
 const { validateToken } = require('./externalIntegration.validateToken');
@@ -41,6 +42,28 @@ const { saveConfigFromFront } = require('./externalIntegration.saveConfigFromFro
 const { setRunning } = require('./externalIntegration.setRunning');
 const { handleHeartbeat } = require('./externalIntegration.handleHeartbeat');
 const { handleWeatherRefresh } = require('./externalIntegration.handleWeatherRefresh');
+const {
+  priceEnergyContract,
+  getEnergyContractCurrent,
+  getEnergyContractProvider,
+} = require('./externalIntegration.priceEnergyContract');
+const {
+  declareEnergyCalendars,
+  publishEnergyCalendar,
+  getEnergyCalendar,
+  getEnergyContracts,
+  handleEnergyCalendarRefresh,
+} = require('./externalIntegration.energyCalendar');
+const { getWidgets } = require('./externalIntegration.getWidgets');
+const { getWidgetContent } = require('./externalIntegration.getWidgetContent');
+const { getWidgetImage } = require('./externalIntegration.getWidgetImage');
+const { runWidgetAction } = require('./externalIntegration.runWidgetAction');
+const { handleWidgetRefresh } = require('./externalIntegration.handleWidgetRefresh');
+const {
+  getWidgetGeneration,
+  invalidateWidgetContent,
+  clearWidgetCaches,
+} = require('./externalIntegration.widgetCache');
 const { integrationConnected } = require('./externalIntegration.integrationConnected');
 const { integrationDisconnected } = require('./externalIntegration.integrationDisconnected');
 const { sendCommand } = require('./externalIntegration.sendCommand');
@@ -70,6 +93,21 @@ const { getContactProfile } = require('./externalIntegration.getContactProfile')
 const { getContactProfileForFront } = require('./externalIntegration.getContactProfileForFront');
 const { saveContactProfile } = require('./externalIntegration.saveContactProfile');
 const { deleteContactProfile } = require('./externalIntegration.deleteContactProfile');
+const { getCalendarAccount, getCalendarAccountForUser } = require('./externalIntegration.getCalendarAccount');
+const {
+  notifyCalendarUpdated,
+  notifyCalendarsUpdated,
+  notifyCalendarAccountUpdated,
+  assertCalendarWriteAllowed,
+} = require('./externalIntegration.calendarNotify');
+const { saveCalendarAccount } = require('./externalIntegration.saveCalendarAccount');
+const { disableCalendarAccount } = require('./externalIntegration.disableCalendarAccount');
+const { updateUserCalendar } = require('./externalIntegration.updateUserCalendar');
+const { getCalendarAccounts } = require('./externalIntegration.getCalendarAccounts');
+const { getIntegrationCalendars } = require('./externalIntegration.getIntegrationCalendars');
+const { publishCalendars } = require('./externalIntegration.publishCalendars');
+const { deleteIntegrationCalendar } = require('./externalIntegration.deleteIntegrationCalendar');
+const { publishCalendarEvents } = require('./externalIntegration.publishCalendarEvents');
 const { handleIncomingMessage } = require('./externalIntegration.handleIncomingMessage');
 const { getWebhooks } = require('./externalIntegration.getWebhooks');
 const { handleGatewayWebhook } = require('./externalIntegration.handleGatewayWebhook');
@@ -107,6 +145,9 @@ const { installFromRepoUrl } = require('./store/store.installFromRepoUrl');
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 const { wakeOnLan } = require('./externalIntegration.wakeOnLan');
+const { publishSceneEvent } = require('./externalIntegration.publishSceneEvent');
+const { runSceneAction } = require('./externalIntegration.runSceneAction');
+const { getSceneDeclarations } = require('./externalIntegration.getSceneDeclarations');
 
 /**
  * @description External integration supervisor: complete lifecycle of the
@@ -119,10 +160,12 @@ const { wakeOnLan } = require('./externalIntegration.wakeOnLan');
  * @param {object} stateManager - State manager.
  * @param {object} device - Device manager.
  * @param {object} variable - Variable manager.
+ * @param {object} energyContract - Energy contract manager (default electric meter, calendars, delegated pricing).
  * @param {string} jwtSecret - Secret to sign integration JWTs.
  * @param {object} cache - In-memory cache (contact link codes).
+ * @param {object} calendar - Calendar manager (calendar-type integrations).
  * @example
- * const externalIntegration = new ExternalIntegration(event, system, service, stateManager, device, variable, 's');
+ * const externalIntegration = new ExternalIntegration(event, system, service, state, device, variable, price, 's');
  */
 const ExternalIntegration = function ExternalIntegration(
   event,
@@ -131,8 +174,10 @@ const ExternalIntegration = function ExternalIntegration(
   stateManager,
   device,
   variable,
+  energyContract,
   jwtSecret,
   cache,
+  calendar,
 ) {
   this.event = event;
   this.system = system;
@@ -140,8 +185,10 @@ const ExternalIntegration = function ExternalIntegration(
   this.stateManager = stateManager;
   this.device = device;
   this.variable = variable;
+  this.energyContract = energyContract;
   this.jwtSecret = jwtSecret;
   this.cache = cache;
+  this.calendar = calendar;
   this.available = false;
   // serviceId -> WebSocket connection of the integration
   this.connections = new Map();
@@ -160,6 +207,9 @@ const ExternalIntegration = function ExternalIntegration(
   this.networkDiscoveryScans = new Set();
   // serviceId -> timestamp of the last active broadcast scan (1/10s)
   this.networkDiscoveryActiveScanTimes = new Map();
+  // serviceId -> { count, resetAt } fixed one-minute window rate limit on
+  // the calendar write endpoints (POST/DELETE /calendar*)
+  this.calendarWriteRateLimits = new Map();
   // serviceId -> timestamp of the last Wake-on-LAN emission (1/2s)
   this.networkWakeTimes = new Map();
   // supervision timers
@@ -175,6 +225,37 @@ const ExternalIntegration = function ExternalIntegration(
   this.cameraImageRateLimits = new Map();
   // serviceId -> timestamp of the last accepted weather freshness nudge
   this.weatherRefreshTimes = new Map();
+  // serviceId -> last energy-calendar.refresh nudge (capabilities/energy-contracts.md)
+  this.energyCalendarRefreshTimes = new Map();
+  // serviceId -> { count, resetAt } rate limit on POST /scene/event, a
+  // counter separate from the states'
+  this.sceneEventRateLimits = new Map();
+  // serviceId -> number of scene actions in flight (reserved before any
+  // connection wait, released on every terminal outcome)
+  this.pendingSceneActions = new Map();
+  // dashboard widgets declared by integrations (capabilities/dashboard-
+  // widgets.md): per-integration caches and counters, all keyed by service
+  // id and dropped in full on stop / update / uninstall (clearWidgetCaches)
+  // serviceId -> LRU Map of cacheKey -> normalized content entry
+  this.widgetContentCache = new Map();
+  // serviceId -> Map of cacheKey -> { promise, generation } of the widget.get in flight
+  this.widgetInFlight = new Map();
+  // `${serviceId}:${widgetKey}` -> generation counter (bumped by every invalidation)
+  this.widgetGenerations = new Map();
+  // serviceId -> { active, queue } concurrency limit of widget.get commands
+  this.widgetPullSlots = new Map();
+  // serviceId -> { count, resetAt } cache-miss rate limit per minute
+  this.widgetPullRates = new Map();
+  // `${serviceId}:${widgetKey}` -> timestamp of the last accepted widget nudge
+  this.widgetRefreshTimes = new Map();
+  // serviceId -> LRU Map of imageKey -> { image, expiresAt }
+  this.widgetImageCache = new Map();
+  // serviceId -> Map of imageKey -> promise of the widget.get-image in flight
+  this.widgetImageInFlight = new Map();
+  // serviceId -> { active, queue } concurrency limit of widget.get-image commands
+  this.widgetImageSlots = new Map();
+  // serviceId -> { count, resetAt } widget action rate limit per minute
+  this.widgetActionRates = new Map();
   this.checkHealthInterval = null;
   // store index cache (see store/ sub-folder)
   this.storeIndex = null;
@@ -217,6 +298,7 @@ ExternalIntegration.prototype.registerProxyService = registerProxyService;
 ExternalIntegration.prototype.clearTimers = clearTimers;
 ExternalIntegration.prototype.handleStartupTimeout = handleStartupTimeout;
 ExternalIntegration.prototype.isUpdateAvailable = isUpdateAvailable;
+ExternalIntegration.prototype.getLatestVersion = getLatestVersion;
 ExternalIntegration.prototype.getDocsUrls = getDocsUrls;
 ExternalIntegration.prototype.update = update;
 ExternalIntegration.prototype.validateToken = validateToken;
@@ -238,6 +320,22 @@ ExternalIntegration.prototype.saveConfigFromFront = saveConfigFromFront;
 ExternalIntegration.prototype.setRunning = setRunning;
 ExternalIntegration.prototype.handleHeartbeat = handleHeartbeat;
 ExternalIntegration.prototype.handleWeatherRefresh = handleWeatherRefresh;
+ExternalIntegration.prototype.priceEnergyContract = priceEnergyContract;
+ExternalIntegration.prototype.getEnergyContractCurrent = getEnergyContractCurrent;
+ExternalIntegration.prototype.getEnergyContractProvider = getEnergyContractProvider;
+ExternalIntegration.prototype.declareEnergyCalendars = declareEnergyCalendars;
+ExternalIntegration.prototype.publishEnergyCalendar = publishEnergyCalendar;
+ExternalIntegration.prototype.getEnergyCalendar = getEnergyCalendar;
+ExternalIntegration.prototype.getEnergyContracts = getEnergyContracts;
+ExternalIntegration.prototype.handleEnergyCalendarRefresh = handleEnergyCalendarRefresh;
+ExternalIntegration.prototype.getWidgets = getWidgets;
+ExternalIntegration.prototype.getWidgetContent = getWidgetContent;
+ExternalIntegration.prototype.getWidgetImage = getWidgetImage;
+ExternalIntegration.prototype.runWidgetAction = runWidgetAction;
+ExternalIntegration.prototype.handleWidgetRefresh = handleWidgetRefresh;
+ExternalIntegration.prototype.getWidgetGeneration = getWidgetGeneration;
+ExternalIntegration.prototype.invalidateWidgetContent = invalidateWidgetContent;
+ExternalIntegration.prototype.clearWidgetCaches = clearWidgetCaches;
 ExternalIntegration.prototype.integrationConnected = integrationConnected;
 ExternalIntegration.prototype.integrationDisconnected = integrationDisconnected;
 ExternalIntegration.prototype.sendCommand = sendCommand;
@@ -267,6 +365,20 @@ ExternalIntegration.prototype.getContactProfile = getContactProfile;
 ExternalIntegration.prototype.getContactProfileForFront = getContactProfileForFront;
 ExternalIntegration.prototype.saveContactProfile = saveContactProfile;
 ExternalIntegration.prototype.deleteContactProfile = deleteContactProfile;
+ExternalIntegration.prototype.getCalendarAccount = getCalendarAccount;
+ExternalIntegration.prototype.getCalendarAccountForUser = getCalendarAccountForUser;
+ExternalIntegration.prototype.notifyCalendarUpdated = notifyCalendarUpdated;
+ExternalIntegration.prototype.notifyCalendarsUpdated = notifyCalendarsUpdated;
+ExternalIntegration.prototype.notifyCalendarAccountUpdated = notifyCalendarAccountUpdated;
+ExternalIntegration.prototype.assertCalendarWriteAllowed = assertCalendarWriteAllowed;
+ExternalIntegration.prototype.saveCalendarAccount = saveCalendarAccount;
+ExternalIntegration.prototype.disableCalendarAccount = disableCalendarAccount;
+ExternalIntegration.prototype.updateUserCalendar = updateUserCalendar;
+ExternalIntegration.prototype.getCalendarAccounts = getCalendarAccounts;
+ExternalIntegration.prototype.getIntegrationCalendars = getIntegrationCalendars;
+ExternalIntegration.prototype.publishCalendars = publishCalendars;
+ExternalIntegration.prototype.deleteIntegrationCalendar = deleteIntegrationCalendar;
+ExternalIntegration.prototype.publishCalendarEvents = publishCalendarEvents;
 ExternalIntegration.prototype.handleIncomingMessage = handleIncomingMessage;
 ExternalIntegration.prototype.getWebhooks = getWebhooks;
 ExternalIntegration.prototype.handleGatewayWebhook = handleGatewayWebhook;
@@ -302,5 +414,8 @@ ExternalIntegration.prototype.fetchManifestFromRepo = fetchManifestFromRepo;
 ExternalIntegration.prototype.installFromStore = installFromStore;
 ExternalIntegration.prototype.installFromRepoUrl = installFromRepoUrl;
 ExternalIntegration.prototype.wakeOnLan = wakeOnLan;
+ExternalIntegration.prototype.publishSceneEvent = publishSceneEvent;
+ExternalIntegration.prototype.runSceneAction = runSceneAction;
+ExternalIntegration.prototype.getSceneDeclarations = getSceneDeclarations;
 
 module.exports = ExternalIntegration;

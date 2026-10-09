@@ -1,4 +1,7 @@
 const get = require('get-value');
+
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('./constants');
+
 /**
  * @description Get Device param by name.
  * @param {object} device - Device Object to parse.
@@ -67,6 +70,28 @@ function getDeviceFeature(device, category, type) {
     return feature;
   }
   return null;
+}
+
+/**
+ * @description Tell if a camera is enabled (spec docs/specs/camera-enable-disable.md).
+ * A camera is enabled unless it exposes a `camera`/`enabled` feature whose last value is 0.
+ * Cameras without that feature — created before it existed, or by an integration that does not
+ * expose it — are always considered enabled, and so is every non-camera device.
+ * @param {object} device - The device to check.
+ * @returns {boolean} Return false only when the device is a camera explicitly disabled.
+ * @example
+ * isCameraEnabled({ features: [{ category: 'camera', type: 'enabled', last_value: 0 }] });
+ */
+function isCameraEnabled(device) {
+  const enabledFeature = getDeviceFeature(
+    device,
+    DEVICE_FEATURE_CATEGORIES.CAMERA,
+    DEVICE_FEATURE_TYPES.CAMERA.ENABLED,
+  );
+  if (enabledFeature === null) {
+    return true;
+  }
+  return enabledFeature.last_value !== 0;
 }
 
 /**
@@ -259,6 +284,7 @@ module.exports = {
   getDeviceParam,
   setDeviceParam,
   getDeviceFeature,
+  isCameraEnabled,
   setDeviceFeature,
   hasDeviceChanged,
   mergeFeatures,

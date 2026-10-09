@@ -1,14 +1,6 @@
-.equal {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.equal > [class*='col-'] {
-  display: flex;
-  flex-direction: column;
+.signupTitle {
+  color: var(--gl-ink);
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {
@@ -17,12 +9,178 @@
   }
 }
 
-.navLinkWithoutCursor {
+/* ---------- step pills (layout.jsx) ----------
+   Same pill grammar as the settings tabs (routes/settings/style.css), but
+   these are progress markers, not links: numbered discs, current step inked */
+
+.signupSteps {
+  justify-content: center;
+}
+
+.stepPill {
   cursor: default;
 }
 
-@media (max-width: 768px) {
-  .navResponsive .nav-item {
+.stepIndex {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: rgba(28, 35, 52, 0.08);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.stepPillActive .stepIndex {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* below the desktop breakpoint the passive steps collapse to their number
+   disc; only the current step keeps its label */
+@media (max-width: 991.98px) {
+  .stepPill:not(.stepPillActive) {
+    padding: 0 0.55rem;
+  }
+
+  .stepPill:not(.stepPillActive) .stepLabel {
     display: none;
   }
+}
+
+/* ---------- success page (5-success) ----------
+   Centered celebration of the platform: three tinted feature panels
+   (nested-glass grammar), a closing line, the dashboard CTA */
+
+.successTab {
+  text-align: center;
+}
+
+.successSubtitle {
+  max-width: 36rem;
+  margin: 0 auto 1.5rem;
+  color: var(--gl-muted);
+}
+
+.successFeatures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+@media (max-width: 991.98px) {
+  .successFeatures {
+    grid-template-columns: 1fr;
+  }
+}
+
+.successFeature {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  padding: 1.1rem 1.2rem;
+}
+
+.successFeature h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gl-ink);
+}
+
+.successFeature p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--gl-muted);
+}
+
+.successFeatureIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+/* the theme's pastel stamp palette; inverts WITH the theme in dark mode
+   like the other module-scoped tinted discs (e.g. the containers card) */
+.successFeatureBlue {
+  background: #dde9fb;
+  color: #2f5bd7;
+}
+
+.successFeatureAmber {
+  background: #f9eeda;
+  color: #a5701e;
+}
+
+.successFeatureGreen {
+  background: #def0e2;
+  color: #2e8f5b;
+}
+
+.successClosing {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--gl-ink);
+}
+
+/* ---------- backup restore rows (2-create-account-gladys-gateway) ----------
+   Same pill-row grammar as the settings containers card */
+
+.backupList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.backupRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.backupIcon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  background: #e3ebfb;
+  color: #3d6df0;
+}
+
+.backupInfo {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.backupDate {
+  color: var(--gl-ink);
+  font-weight: 600;
+}
+
+.backupSize {
+  color: var(--gl-muted);
+  font-size: 0.75rem;
+}
+
+.backupActions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 6px;
 }

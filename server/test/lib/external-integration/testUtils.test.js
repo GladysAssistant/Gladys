@@ -8,6 +8,7 @@
 const { fake } = require('sinon');
 
 const ExternalIntegration = require('../../../lib/external-integration');
+const Calendar = require('../../../lib/calendar');
 const StateManager = require('../../../lib/state');
 const Variable = require('../../../lib/variable');
 const { Cache } = require('../../../utils/cache');
@@ -104,6 +105,23 @@ const TEST_NOTIFICATION_MANIFEST = {
 
 // Weather-provider fixture (B.18): a dedicated provider API — answers the
 // core's weather requests over WebSocket, no device screens.
+const TEST_CALENDAR_MANIFEST = {
+  manifest_version: 1,
+  type: 'calendar',
+  name: 'Nextcloud Calendar',
+  description: {
+    en: 'Nextcloud calendar provider demo integration.',
+    fr: 'Intégration démo : fournisseur de calendrier Nextcloud.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-nextcloud-calendar:1.0.0',
+  gladys_version: '>=4.62.0',
+  account_schema: [
+    { key: 'server_url', type: 'string', label: { en: 'Server URL' }, required: true },
+    { key: 'app_password', type: 'secret', label: { en: 'App password' } },
+  ],
+};
+
 const TEST_WEATHER_MANIFEST = {
   manifest_version: 1,
   type: 'weather',
@@ -115,6 +133,56 @@ const TEST_WEATHER_MANIFEST = {
   version: '1.0.0',
   docker_image: 'ghcr.io/john/gladys-meteo-france:1.0.0',
   gladys_version: '>=4.62.0',
+};
+
+// Device integration declaring dashboard widgets (capabilities/dashboard-
+// widgets.md): a cinema-like widget with static settings and a vacuum widget
+// bound to one of the integration's devices through `source: "devices"`.
+const TEST_WIDGET_MANIFEST = {
+  ...TEST_MANIFEST,
+  widgets: [
+    {
+      key: 'upcoming_releases',
+      label: { en: 'Upcoming releases', fr: 'Prochaines sorties' },
+      description: { en: 'Movies coming to theaters in your region.' },
+      icon: 'film',
+      settings: [
+        {
+          key: 'period_days',
+          type: 'select',
+          label: { en: 'Period' },
+          default: '30',
+          options: [
+            { value: '15', label: { en: '15 days' } },
+            { value: '30', label: { en: '1 month' } },
+          ],
+        },
+        { key: 'region', type: 'string', label: { en: 'Country code' } },
+      ],
+      action_timeout_seconds: 15,
+    },
+    {
+      key: 'vacuum',
+      label: { en: 'Vacuum' },
+      settings: [{ key: 'device', type: 'select', label: { en: 'Vacuum' }, source: 'devices', required: true }],
+    },
+  ],
+};
+
+// Provider fixture: an integration made only of capabilities (no device
+// surface) — its whole contract is the widget it declares.
+const TEST_PROVIDER_MANIFEST = {
+  manifest_version: 1,
+  type: 'provider',
+  name: 'TMDB Demo',
+  description: {
+    en: 'Upcoming movie releases demo integration.',
+    fr: 'Intégration démo : prochaines sorties cinéma.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-tmdb-demo:1.0.0',
+  gladys_version: '>=4.62.0',
+  widgets: [TEST_WIDGET_MANIFEST.widgets[0]],
 };
 
 // Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
@@ -154,6 +222,74 @@ const TEST_CONTAINERS_MANIFEST = {
       ports: [{ container_port: 5000, name: 'frigate_ui', label: { en: 'Frigate UI', fr: 'Interface Frigate' } }],
       devices: ['coral-usb', 'gpu'],
     },
+  ],
+};
+
+// Frigate-like fixture declaring one scene trigger (filters on a device and
+// on an enum, an optional free text, three exposed variables — `camera` is
+// deliberately NOT a variable, so the whitelist rule is visible) and one
+// scene action (a device parameter, a templated caption, a boolean, a
+// select, a defaulted number, one scalar output).
+const TEST_SCENE_MANIFEST = {
+  ...TEST_MANIFEST,
+  name: 'Frigate Demo',
+  scene_triggers: [
+    {
+      key: 'object_detected',
+      label: { en: 'Object detected', fr: 'Objet détecté' },
+      description: { en: 'Frigate detected an object on a camera.' },
+      fields: [
+        { key: 'intro', type: 'section', label: { en: 'Zones are the names configured in Frigate' } },
+        { key: 'camera', type: 'select', source: 'devices', label: { en: 'Camera' }, required: true },
+        {
+          key: 'label',
+          type: 'multi_select',
+          label: { en: 'Object types' },
+          options: [
+            { value: 'person', label: { en: 'Person' } },
+            { value: 'car', label: { en: 'Car' } },
+          ],
+        },
+        { key: 'zone', type: 'string', label: { en: 'Zone' } },
+        { key: 'min_score', type: 'number', label: { en: 'Minimal score' } },
+      ],
+      variables: [
+        { key: 'label', type: 'string', label: { en: 'Object type' } },
+        { key: 'zone', type: 'string', label: { en: 'Zone' } },
+        { key: 'score', type: 'number', label: { en: 'Confidence' } },
+        { key: 'moving', type: 'boolean', label: { en: 'Moving' } },
+      ],
+    },
+    { key: 'doorbell_pressed', label: { en: 'Doorbell pressed' } },
+  ],
+  scene_actions: [
+    {
+      key: 'create_snapshot',
+      label: { en: 'Take a snapshot', fr: 'Prendre un instantané' },
+      timeout_seconds: 20,
+      fields: [
+        { key: 'intro', type: 'section', label: { en: 'Snapshot options' } },
+        { key: 'camera', type: 'select', source: 'devices', label: { en: 'Camera' }, required: true },
+        { key: 'caption', type: 'string', label: { en: 'Caption' } },
+        { key: 'hd', type: 'boolean', label: { en: 'HD' } },
+        {
+          key: 'format',
+          type: 'select',
+          label: { en: 'Format' },
+          options: [
+            { value: 'jpg', label: { en: 'JPEG' } },
+            { value: '{{png}}', label: { en: 'Odd value' } },
+          ],
+        },
+        { key: 'quality', type: 'number', label: { en: 'Quality' }, default: 80, min: 1, max: 100 },
+      ],
+      outputs: [
+        { key: 'clip_id', type: 'string', label: { en: 'Clip identifier' } },
+        { key: 'count', type: 'number', label: { en: 'Objects count' } },
+        { key: 'ok', type: 'boolean', label: { en: 'Success' } },
+      ],
+    },
+    { key: 'echo', label: { en: 'Echo' } },
   ],
 };
 
@@ -222,11 +358,66 @@ function buildFakeSystem(overrides = {}) {
   };
 }
 
+// energy contracts capability: a rules template with inputs, a delegated one, a calendar
+const TEST_ENERGY_MANIFEST = {
+  ...TEST_MANIFEST,
+  name: 'Octopus Energy Demo',
+  energy_contracts: {
+    templates: [
+      {
+        key: 'economy-7',
+        name: { en: 'Economy 7', fr: 'Economy 7' },
+        country: 'GB',
+        currency: 'GBP',
+        timezone: 'Etc/GMT',
+        pricing_mode: 'rules',
+        version: '2026-01-01',
+        calendars: ['agile-gb'],
+        inputs: [
+          { key: 'night_price', type: 'number', unit: 'GBP/kWh', default: 0.12, label: { en: 'Night price' } },
+          { key: 'region', type: 'select', options: ['A', 'B'], default: 'A' },
+          { key: 'off_peak_slots', type: 'time_intervals', default: [['00:30', '07:30']] },
+          { key: 'note', type: 'string' },
+        ],
+        tariff: {
+          tariff_version: 1,
+          calendars: ['agile-gb'],
+          components: [
+            {
+              key: 'energy',
+              kind: 'consumption',
+              rules: [
+                { label: 'night', when: { time: '{{input:off_peak_slots}}' }, price: '{{input:night_price}}' },
+                { when: { calendar: { 'agile-gb': 'cap' } }, price: 0.3 },
+              ],
+              fallback: { price: 0.28 },
+            },
+          ],
+        },
+      },
+      {
+        key: 'agile',
+        name: { en: 'Octopus Agile' },
+        country: 'GB',
+        currency: 'GBP',
+        pricing_mode: 'delegated',
+        version: '1',
+        inputs: [{ key: 'region', type: 'select', options: ['A', 'B'] }],
+        tariff: {
+          tariff_version: 1,
+          components: [{ key: 'standing', kind: 'fixed', amount: 0.5, per: 'day' }],
+        },
+      },
+    ],
+    calendars: [{ key: 'agile-gb', granularity: 'day', values: ['cap', 'normal'], timezone: 'Europe/London' }],
+  },
+};
+
 /**
  * @description Build a supervisor wired with fakes for tests.
  * @param {object} [options] - Options.
  * @param {object} [options.system] - System fakes overrides.
- * @returns {object} { externalIntegration, event, system, stateManager, device, variable }.
+ * @returns {object} { externalIntegration, event, system, stateManager, device, variable, energyPrice }.
  * @example
  * const { externalIntegration } = buildSupervisor();
  */
@@ -238,6 +429,18 @@ function buildSupervisor({ system: systemOverrides } = {}) {
   const variable = new Variable(event);
   const serviceManager = {};
   const cache = new Cache();
+  const calendar = new Calendar();
+  // no energy contract configured by default: a discovered energy index then gets
+  // its derived features with no parent meter (see getDiscoveredDevices); the
+  // calendar and contract functions are fakes the capability tests override
+  const energyContract = {
+    getDefaultElectricMeterFeatureId: fake.resolves(null),
+    declareCalendar: fake.resolves({ accepted: true, calendar: {} }),
+    publishCalendarEntries: fake.resolves({ count: 0, changed_from: null }),
+    getCalendarEntries: fake.resolves([]),
+    get: fake.resolves([]),
+    requestCalendarRecalculation: fake.resolves(null),
+  };
   const externalIntegration = new ExternalIntegration(
     event,
     system,
@@ -245,11 +448,25 @@ function buildSupervisor({ system: systemOverrides } = {}) {
     stateManager,
     device,
     variable,
+    energyContract,
     TEST_JWT_SECRET,
     cache,
+    calendar,
   );
   externalIntegration.available = true;
-  return { externalIntegration, event, system, stateManager, device, variable, cache };
+  return {
+    externalIntegration,
+    event,
+    system,
+    stateManager,
+    device,
+    variable,
+    cache,
+    energyContract,
+    // kept under its former name for the tests written against it
+    energyPrice: energyContract,
+    calendar,
+  };
 }
 
 /**
@@ -282,8 +499,13 @@ module.exports = {
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
   TEST_WEATHER_MANIFEST,
+  TEST_CALENDAR_MANIFEST,
+  TEST_WIDGET_MANIFEST,
+  TEST_PROVIDER_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
+  TEST_SCENE_MANIFEST,
+  TEST_ENERGY_MANIFEST,
   TEST_DETECTED_CLASSES,
   buildFakeSystem,
   buildSupervisor,

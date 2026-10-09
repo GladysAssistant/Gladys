@@ -45,6 +45,21 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
       Object.keys(this.topicBinds).forEach((topic) => {
         this.subscribe(topic, this.topicBinds[topic]);
       });
+      // The custom MQTT topics of the devices are not part of topicBinds: they are
+      // registered when the devices are loaded in RAM (device.init), which happens
+      // before the services are started, so the MQTT client did not exist yet and
+      // no SUBSCRIBE was ever sent to the broker. Without this, a device with a
+      // custom topic stopped receiving anything after a restart, until the user
+      // opened it and clicked "save" again.
+      const customTopicsAlreadyListened = new Set();
+      this.deviceFeatureCustomMqttTopics.forEach(({ topic }) => {
+        if (!topic || customTopicsAlreadyListened.has(topic)) {
+          return;
+        }
+        customTopicsAlreadyListened.add(topic);
+        logger.info(`Subscribing to MQTT custom topic ${topic}`);
+        this.mqttClient.subscribe(topic);
+      });
       this.defaultTopicsAlreadySubscribed = true;
     } else {
       logger.info('Already subscribed to default topics');

@@ -139,6 +139,20 @@ const SIREN_LMH_VOLUME = {
   HIGH: 2,
 };
 
+// Which effect a siren produces while it is alarming. Shared by the two siren enum feature types:
+// SIREN.ALARM_MODE (command: the effect the siren must produce the next time it is triggered) and
+// SIREN.ALARM_STATE (read-only: the effect it is producing right now, IDLE when it is silent).
+// Zigbee's IAS WD cluster splits the same information over two fields (warning mode + strobe), but
+// the sirens exposing it publish a single combined value, which this enum mirrors so the mapping
+// stays lossless. A siren supporting only part of the list declares its subset with
+// supported_options; IDLE stays meaningful on ALARM_MODE for sirens that can be set to stay quiet.
+const SIREN_MODE = {
+  IDLE: 0,
+  SOUND: 1,
+  LIGHT: 2,
+  SOUND_AND_LIGHT: 3,
+};
+
 const AC_MODE = {
   AUTO: 0,
   COOLING: 1,
@@ -272,6 +286,18 @@ const WATER_VALVE_CURRENT_DEVICE_STATUS = {
   WATER_SHORTAGE_AND_WATER_LEAKAGE: 3,
 };
 
+// How contaminated a smoke detector's sensing chamber is: from a clean detector to one so
+// dirty it can no longer be trusted. Names and integers are Matter's ContaminationStateEnum
+// (Smoke CO Alarm cluster), so a Matter detector maps onto it without conversion.
+// Values are append-only: an existing integer never changes meaning, it is stored in device
+// states and hard-coded in users' scenes.
+const CONTAMINATION_STATE = {
+  NORMAL: 0,
+  LOW: 1,
+  WARNING: 2,
+  CRITICAL: 3,
+};
+
 // Operating modes of a domestic hot water appliance. This is the full generic set:
 // an appliance supporting only some of them declares its subset through the
 // supported_options of its `mode` feature, never by narrowing this enum.
@@ -383,6 +409,7 @@ const AVAILABLE_LANGUAGES = {
   EN: 'en',
   FR: 'fr',
   DE: 'de',
+  ES: 'es',
 };
 
 const SESSION_TOKEN_TYPES = {
@@ -407,6 +434,21 @@ const SERVICE_TYPES = {
   EXTERNAL: 'external',
 };
 
+const CALENDAR_TYPES = {
+  CALDAV: 'CALDAV',
+  WEBCAL: 'WEBCAL',
+  EXTERNAL: 'EXTERNAL',
+};
+
+// Sentinel value of the `service` property of the message scene actions
+// ("send message", "send message with camera", "ask the AI"): keep the
+// message in the Gladys conversation only, without forwarding it to a single
+// external messaging channel. A service name is a slug, so a real service can
+// never collide with this value. The other two cases of that property are a
+// service name (send through this channel only) and its absence, the
+// historical behaviour: broadcast to every channel the user configured.
+const MESSAGE_GLADYS_ONLY_SERVICE = '__gladys_only__';
+
 // Browse categories of the integration catalog (docs/specs/
 // integration-catalog-categories.md): display metadata describing the domain
 // of use, fully decoupled from the technical `type` of an integration. The
@@ -429,6 +471,12 @@ const INTEGRATION_CATALOG_CATEGORIES = [
   'services',
 ];
 
+// The timezone of the instance when the TIMEZONE system setting is not set: the
+// scene engine evaluates its triggers in it, and the full-day events of the
+// calendar integrations are stored at its midnights — one constant, so that
+// both stay aligned.
+const DEFAULT_TIMEZONE = 'Europe/Paris';
+
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS: 'DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS',
@@ -441,16 +489,52 @@ const SYSTEM_VARIABLE_NAMES = {
   GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY:
     'GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY',
   GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY: 'GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY',
+  // ISO date of the moment Gladys Plus answered "payment required": while it is
+  // set, the plan-gated features (backups, Enedis, AI) stay off locally
+  GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE: 'GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE',
   TIMEZONE: 'TIMEZONE',
   DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: 'DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD',
   DEVICE_BATTERY_LEVEL_WARNING_ENABLED: 'DEVICE_BATTERY_LEVEL_WARNING_ENABLED',
   AI_WEEKLY_DIGEST_ENABLED: 'AI_WEEKLY_DIGEST_ENABLED',
   AI_WEEKLY_DIGEST_DAY: 'AI_WEEKLY_DIGEST_DAY',
   AI_WEEKLY_DIGEST_HOUR: 'AI_WEEKLY_DIGEST_HOUR',
+  // channel of the system messages sent to the admins (upgrade, backup,
+  // batteries…): the `service` option of message.sendToUser — empty or absent
+  // means every channel, MESSAGE_GLADYS_ONLY_SERVICE no channel at all
+  SYSTEM_MESSAGE_SERVICE: 'SYSTEM_MESSAGE_SERVICE',
   DUCKDB_MIGRATED: 'DUCKDB_MIGRATED',
   DUCKDB_ORPHANED_STATES_PURGED: 'DUCKDB_ORPHANED_STATES_PURGED',
   GLADYS_VERSION: 'GLADYS_VERSION',
+  MDNS_HOSTNAME: 'MDNS_HOSTNAME',
 };
+
+const MDNS = {
+  DEFAULT_HOSTNAME: 'gladysassistant',
+  // a DNS label: lowercase letters, digits and hyphens, 63 characters max,
+  // and it can neither start nor end with a hyphen
+  HOSTNAME_REGEX: /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/,
+};
+
+/**
+ * @description Normalize the mDNS hostname configured by the user.
+ * @param {string} rawValue - The raw hostname, as typed by the user.
+ * @returns {string|null} The normalized hostname, without the ".local" suffix, or null if invalid.
+ * @example
+ * normalizeMdnsHostname('Gladys-Garage.local'); // 'gladys-garage'
+ */
+function normalizeMdnsHostname(rawValue) {
+  if (typeof rawValue !== 'string') {
+    return null;
+  }
+  let hostname = rawValue.trim().toLowerCase();
+  if (hostname.endsWith('.local')) {
+    hostname = hostname.slice(0, -'.local'.length);
+  }
+  if (!MDNS.HOSTNAME_REGEX.test(hostname)) {
+    return null;
+  }
+  return hostname;
+}
 
 const EVENTS = {
   ALARM: {
@@ -491,6 +575,7 @@ const EVENTS = {
     LINK_STATUS_CHANGED: 'gateway.link-status-changed',
     USER_KEYS_CHANGED: 'gateway.user-keys-changed',
     SEND_WEEKLY_DIGEST: 'gateway.send-weekly-digest',
+    SUBSCRIPTION_STATUS_CHANGED: 'gateway.subscription-status-changed',
   },
   USER_SLEEP: {
     TIME_TO_WAKE_UP: 'user.time-to-wake-up',
@@ -569,6 +654,7 @@ const EVENTS = {
     UPGRADE_CONTAINERS: 'system.upgrade-containers',
     CHECK_UPGRADE: 'system.check-upgrade',
     TIMEZONE_CHANGED: 'system.timezone-changed',
+    MDNS_HOSTNAME_CHANGED: 'system.mdns-hostname-changed',
     VACUUM: 'system.vacuum',
     START: 'system.start',
     WATCHTOWER_LOG: 'system.watchtower-log',
@@ -602,12 +688,23 @@ const EVENTS = {
     ALERT_RAISED: 'weather.alert-raised',
     ALERT_ENDED: 'weather.alert-ended',
   },
+  ENERGY_CONTRACT: {
+    // asks the energy-monitoring service to recompute the costs of some meters
+    // from a date (contract or calendar change), see docs/specs/energy-contracts.md 7.4
+    RECALCULATE: 'energy-contract.recalculate',
+    // scene trigger: the current unit price of the active contract changed
+    PRICE_CHANGED: 'energy-contract.price-changed',
+  },
   EXTERNAL_INTEGRATION: {
     STATUS_CHANGED: 'external-integration.status-changed',
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
     CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     CLEAN_IMAGES: 'external-integration.clean-images',
+    // scene trigger declared by an external integration (scene_triggers of
+    // the manifest): the integration selector and the declared key travel
+    // as fields, one generic type for every integration
+    SCENE_EVENT: 'external-integration.scene-event',
   },
 };
 
@@ -669,6 +766,12 @@ const CONDITIONS = {
   },
 };
 
+// Operators available on a "device.new-state" scene trigger. `changed` is specific to
+// triggers: it fires on any state change of the device feature, so no value is configured.
+const COMPARISON_OPERATORS = ['=', '!=', '>', '>=', '<', '<='];
+const ANY_CHANGE_OPERATOR = 'changed';
+const TRIGGER_OPERATORS = [...COMPARISON_OPERATORS, ANY_CHANGE_OPERATOR];
+
 const ACTIONS = {
   AI: {
     ASK: 'ai.ask',
@@ -698,6 +801,7 @@ const ACTIONS = {
   },
   TIME: {
     DELAY: 'delay',
+    GET_DATE: 'time.get-date',
   },
   SCENE: {
     START: 'scene.start',
@@ -730,6 +834,10 @@ const ACTIONS = {
   EDF_TEMPO: {
     CONDITION: 'edf-tempo.condition',
   },
+  ENERGY_CONTRACT: {
+    // condition: the current unit price of a contract compared with a threshold
+    CURRENT_PRICE: 'energy-contract.current-price',
+  },
   MQTT: {
     SEND: 'mqtt.send',
   },
@@ -741,6 +849,11 @@ const ACTIONS = {
   },
   SMS: {
     SEND: 'sms.send',
+  },
+  EXTERNAL_INTEGRATION: {
+    // scene action declared by an external integration (scene_actions of
+    // the manifest), relayed to its container over WebSocket
+    SCENE_ACTION: 'external-integration.scene-action',
   },
   VARIABLE: {
     SET: 'variable.set',
@@ -756,6 +869,7 @@ const CONDITION_ACTIONS = [
   ACTIONS.CALENDAR.IS_EVENT_RUNNING,
   ACTIONS.CALENDAR.GET_EVENTS,
   ACTIONS.ECOWATT.CONDITION,
+  ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE,
   ACTIONS.HOUSE.IS_EMPTY,
   ACTIONS.HOUSE.IS_NOT_EMPTY,
 ];
@@ -822,6 +936,16 @@ const DEVICE_FEATURE_CATEGORIES = {
   ENERGY_SENSOR: 'energy-sensor',
   ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
   FAN: 'fan',
+  // Carbon content of the electricity DELIVERED BY THE GRID of a zone, as published by a grid data
+  // provider (national TSO, Electricity Maps, WattTime...) or broadcast in the premises by a device
+  // implementing the Matter Electrical Grid Conditions cluster. It describes the electricity, not
+  // the appliance: the energy a device imports or exports stays in `grid-sensor`.
+  // Behind-the-meter ("local") carbon intensity - the grid mix blended with the local generation -
+  // is a different quantity, not published yet because no integration reports it. When one does, it
+  // becomes a `local-carbon-intensity` TYPE of this category, never a separate category: Matter
+  // carries both in the same struct (GridCarbonIntensity and LocalCarbonIntensity), and the
+  // category name mirrors that cluster's own grid-first naming, so adding it renames nothing.
+  GRID_CARBON_SENSOR: 'grid-carbon-sensor',
   GRID_SENSOR: 'grid-sensor',
   HEATER: 'heater',
   HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
@@ -917,6 +1041,10 @@ const DEVICE_FEATURE_TYPES = {
     MIN: 'min',
     MAX: 'max',
     AVERAGE: 'average',
+    // Temperature read by an external probe wired to the device (fridge, tank, outdoor
+    // probe...), as opposed to `decimal`, the ambient temperature at the device itself.
+    // Kept out of the room average on purpose: see temperature-sensor.getTemperatureInRoom.
+    PROBE: 'probe',
   },
   SWITCH: {
     BINARY: 'binary',
@@ -935,6 +1063,15 @@ const DEVICE_FEATURE_TYPES = {
   },
   CAMERA: {
     IMAGE: 'image',
+    // ENABLED (spec docs/specs/camera-enable-disable.md): binary read/write gate telling Gladys
+    // whether it may use this camera. 1 = enabled (default), 0 = disabled: Gladys stops polling
+    // the camera, refuses to start a live stream and stops serving its image (dashboard, chat,
+    // scenes) — a "private mode" that does not delete the camera. A camera without this feature
+    // is always considered enabled, so cameras created before it existed keep working.
+    // Boundary: this is a Gladys-side gate, not the camera's power supply (that stays a `switch`
+    // feature on the plug feeding it); integrations able to mute the sensor itself (Matter soft
+    // privacy mode, vendor "privacy mode" APIs) map their control onto this feature.
+    ENABLED: 'enabled',
     // PTZ control (spec docs/specs/camera-ptz-control.md). MOVE: one command feature for all
     // movements, values from CAMERA_MOVE, per-camera subset declared via supported_options.
     // PRESET: recall a saved position; the labeled list lives in supported_options, the value
@@ -959,6 +1096,8 @@ const DEVICE_FEATURE_TYPES = {
     LMH_VOLUME: 'lmh_volume',
     MELODY: 'melody',
     TEST_IN_PROGRESS: 'test-in-progress', // Alarm testing status (binary - sensor)
+    ALARM_MODE: 'alarm-mode', // Effect played when the siren is triggered (SIREN_MODE - command)
+    ALARM_STATE: 'alarm-state', // Effect the siren is currently playing (SIREN_MODE - sensor)
   },
   CHILD_LOCK: {
     BINARY: 'binary',
@@ -969,6 +1108,10 @@ const DEVICE_FEATURE_TYPES = {
   },
   BATTERY: {
     INTEGER: 'integer',
+    // Whether the device battery is currently being recharged (binary - sensor). Intrinsic to the
+    // battery of the device itself: a charging station's session state belongs to
+    // CHARGING_STATION.CHARGING_STATE, and the charge level stays on BATTERY.INTEGER.
+    CHARGING: 'charging',
   },
   BATTERY_LOW: {
     BINARY: 'binary',
@@ -1079,6 +1222,30 @@ const DEVICE_FEATURE_TYPES = {
     THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
     THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
   },
+  // Carbon content of the grid electricity of a zone. `carbon-intensity` mirrors the Matter
+  // Electrical Grid Conditions cluster (0x00A0) GridCarbonIntensity attribute, in grams of CO2
+  // equivalent per kWh consumed. The two shares describe the generation mix behind it: Matter has
+  // NO equivalent attribute for them (the cluster carries the intensity and a Low/Medium/High
+  // level, nothing else), they are a deliberate addition, published alongside the intensity by
+  // every grid data provider (Electricity Maps, the UK Carbon Intensity API, RTE eCO2mix...) -
+  // the contract is the providers' common denominator, not one provider's API.
+  // `carbon-intensity` is the AVERAGE intensity of the electricity consumed in the zone, which is
+  // what Matter models. A MARGINAL rate (the emissions of the next kWh, e.g. the WattTime MOER) is
+  // a different quantity and must not be published here - mixing the two would make charts and
+  // scene thresholds meaningless; a provider exposing both publishes its average here, and a
+  // marginal rate gets its own type the day an integration needs it.
+  // Matter's GridCarbonLevel (Low/Medium/High) is deliberately left out: it is a banding of the
+  // same intensity, which the room badge already colors from the value itself.
+  // Value conventions: the intensity is >= 0 (gCO2eq/kWh), both shares are percentages of the
+  // consumed electricity (0-100). `carbon-free-percentage` counts every non-fossil source
+  // (renewables AND nuclear), `renewable-percentage` only the renewable ones, so renewable is
+  // always <= carbon-free. A provider publishing the FOSSIL share reports its complement here,
+  // rather than a fourth type holding the same measurement upside down.
+  GRID_CARBON_SENSOR: {
+    CARBON_INTENSITY: 'carbon-intensity', // gCO2eq per kWh consumed in the zone (>= 0)
+    CARBON_FREE_PERCENTAGE: 'carbon-free-percentage', // share of renewables + nuclear, % (0-100)
+    RENEWABLE_PERCENTAGE: 'renewable-percentage', // share of renewables only, % (0-100)
+  },
   // Exchange with the public grid (the connection point), whatever the
   // measuring device: a plug-in battery's grid port, an EM clamp or a
   // whole-home meter all publish here, so the same physical quantity never
@@ -1156,16 +1323,20 @@ const DEVICE_FEATURE_TYPES = {
     SMAXIN: 'smaxin',
     SMAXIN_1: 'smaxin_1',
     SMAXN: 'smaxn',
+    SMAXN1: 'smaxn1',
     SMAXN2: 'smaxn2',
     SMAXN3: 'smaxn3',
     SINSTS: 'sinsts',
+    SINSTS1: 'sinsts1',
     SINSTS2: 'sinsts2',
     SINSTS3: 'sinsts3',
     SMAXN_1: 'smaxn_1',
+    SMAXN1_1: 'smaxn1_1',
     SMAXN2_1: 'smaxn2_1',
     SMAXN3_1: 'smaxn3_1',
     HHPHC: 'hhphc',
     IMAX: 'imax',
+    IMAX1: 'imax1',
     ADPS: 'adps',
     IMAX2: 'imax2',
     IMAX3: 'imax3',
@@ -1254,6 +1425,26 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_STATE: 'liquid-state',
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
+  },
+  // Smoke detectors. The detection itself stays on the generic sensor types the category
+  // has always used (`binary` for "smoke detected", `decimal` for the measured smoke level):
+  // this group only holds what is specific to a smoke chamber. Boundary with neighboring
+  // categories: a detector's battery, temperature or tamper contact are features of their own
+  // categories on the same device, and its siren is a `siren` feature.
+  SMOKE_SENSOR: {
+    // Dirt accumulated in the sensing chamber, CONTAMINATION_STATE (integer - sensor), named
+    // after Matter's ContaminationState attribute. A contaminated detector is blinded: the
+    // state tells the user to clean or replace it.
+    CONTAMINATION_STATE: 'contamination-state',
+    // The detector's own siren is silenced, 1 when muted, 0 when it can ring (binary - sensor).
+    // Boundary with the siren category: this is the detector muting itself (a user pressing its
+    // button, an alarm hushed after a false trigger), not a siren Gladys drives.
+    MUTED: 'muted',
+    // Silence the detector's siren for as long as it allows, 1 to hush, 0 to let it ring again
+    // (binary - command). It is the command counterpart of `muted`, which reports the result,
+    // and stays in this category on purpose: hushing an alarm is not a generic switch, and
+    // must not be reachable through "turn everything off" in a voice assistant or a scene.
+    TEMPORARY_MUTE: 'temporary-mute',
   },
   // Domestic hot water appliances: electric storage tanks, heat-pump water heaters,
   // gas-fired water heaters. Scope is limited to producing and storing hot water.
@@ -1416,6 +1607,9 @@ const DEVICE_FEATURE_UNITS = {
   KILOWATT_HOUR_PER_100_KM: 'kilowatt-hour-per-100-km',
   WATT_HOUR_PER_MILE: 'watt-hour-per-mile',
   KILOWATT_HOUR_PER_100_MILE: 'kilowatt-hour-per-100-mile',
+  // Carbon intensity units (grams of CO2 equivalent per kWh, the unit of the Matter
+  // Electrical Grid Conditions cluster)
+  GRAM_CO2_EQ_PER_KILOWATT_HOUR: 'gram-co2eq-per-kilowatt-hour',
   // Efficiency units
   KM_PER_KILOWATT_HOUR: 'km-per-kilowatt-hour',
   MILE_PER_KILOWATT_HOUR: 'mile-per-kilowatt-hour',
@@ -1580,6 +1774,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: [
+    DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.PERCENT,
   ],
   [DEVICE_FEATURE_CATEGORIES.GRID_SENSOR]: [
     DEVICE_FEATURE_UNITS.WATT,
@@ -1761,6 +1959,18 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
 // when the category-level list mixes units of different dimensions.
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: {
+    // The intensity is a mass per energy, the two shares are percentages: without this entry
+    // both would offer the whole category list.
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY]: [DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR],
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
+    [DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.RENEWABLE_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
+  },
+  [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
+    // The whole BATTERY category is a percent (the charge level), but a charging flag is a
+    // binary and carries no unit: without this entry it would inherit the category percent.
+    [DEVICE_FEATURE_TYPES.BATTERY.CHARGING]: [],
+  },
   [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
     [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: [],
     [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: [],
@@ -1821,6 +2031,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   BACKUP: {
     DOWNLOADED: 'backup.downloaded',
   },
+  CALENDAR: {
+    UPDATED: 'calendar.updated',
+  },
   DEVICE: {
     NEW_STATE: 'device.new-state',
     NEW_STRING_STATE: 'device.new-string-state',
@@ -1848,10 +2061,13 @@ const WEBSOCKET_MESSAGE_TYPES = {
   GATEWAY: {
     BACKUP_UPLOAD_PROGRESS: 'gateway.backup-upload-progress',
     BACKUP_DOWNLOAD_PROGRESS: 'gateway.backup-download-progress',
+    SUBSCRIPTION_STATUS_CHANGED: 'gateway.subscription-status-changed',
   },
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+    STARTED: 'scene.started',
+    STOPPED: 'scene.stopped',
   },
   SYSTEM: {
     VACUUM_FINISHED: 'system.vacuum-finished',
@@ -1962,6 +2178,18 @@ const WEBSOCKET_MESSAGE_TYPES = {
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
     WEBHOOK_REQUEST: 'external-integration.webhook.request',
     WEBHOOK_UPDATED: 'external-integration.webhook-updated',
+    CALENDAR_ACCOUNT_UPDATED: 'external-integration.calendar.account-updated',
+    SCENE_ACTION_RUN: 'external-integration.scene-action.run',
+    // dashboard widgets declared by integrations (capabilities/dashboard-widgets.md)
+    WIDGET_GET: 'external-integration.widget.get',
+    WIDGET_GET_IMAGE: 'external-integration.widget.get-image',
+    WIDGET_ACTION: 'external-integration.widget.action',
+    WIDGET_REFRESH: 'external-integration.widget.refresh',
+    WIDGET_UPDATED: 'external-integration.widget-updated',
+    // energy contracts capability (capabilities/energy-contracts.md)
+    ENERGY_CONTRACT_PRICE: 'external-integration.energy-contract.price',
+    ENERGY_CONTRACT_CURRENT: 'external-integration.energy-contract.current',
+    ENERGY_CALENDAR_REFRESH: 'external-integration.energy-calendar.refresh',
   },
 };
 
@@ -1991,10 +2219,35 @@ const DASHBOARD_BOX_TYPE = {
   MUSIC: 'music',
   GAUGE: 'gauge',
   ENERGY_CONSUMPTION: 'energy-consumption',
+  // current electricity price of a contract (docs/specs/energy-contracts.md 8.2)
+  ENERGY_PRICE: 'energy-price',
   VOICE_ASSISTANT: 'voice-assistant',
   LINK: 'link',
   PHOTO: 'photo',
   SUN: 'sun',
+  CHIPS: 'chips',
+  HOUSE_VIEW: 'house-view',
+  ACTIONS: 'actions',
+  // one core box type serving every widget declared by an external integration
+  EXTERNAL_WIDGET: 'external-widget',
+};
+
+const DASHBOARD_WIDTH = {
+  STANDARD: 'standard',
+  FULL: 'full',
+};
+
+// Built-in CSS background scenes of the Horizon theme (no external images:
+// they weigh nothing, stay crisp at any resolution and work offline)
+const DASHBOARD_BACKGROUND_SCENE = {
+  HORIZON: 'horizon',
+  AURORA: 'aurora',
+  DUSK: 'dusk',
+  FOREST: 'forest',
+  LAGOON: 'lagoon',
+  SAND: 'sand',
+  LAVENDER: 'lavender',
+  MIST: 'mist',
 };
 
 const ERROR_MESSAGES = {
@@ -2003,6 +2256,10 @@ const ERROR_MESSAGES = {
   REQUEST_TO_THIRD_PARTY_FAILED: 'REQUEST_TO_THIRD_PARTY_FAILED',
   INVALID_ACCESS_TOKEN: 'INVALID_ACCESS_TOKEN',
   NO_CONNECTED_TO_THE_INTERNET: 'NO_CONNECTED_TO_THE_INTERNET',
+  GLADYS_PLUS_PAYMENT_REQUIRED: 'GLADYS_PLUS_PAYMENT_REQUIRED',
+  // an integration widget answered with a content version this Gladys does
+  // not render: the remedy is on the user's side (upgrade), not the integration's
+  WIDGET_CONTENT_VERSION_UNSUPPORTED: 'WIDGET_CONTENT_VERSION_UNSUPPORTED',
 };
 
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES = {
@@ -2020,6 +2277,12 @@ const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
 const SYSTEM_UPGRADE_ERROR_CODES = {
   // Gladys runs on an immutable image reference, no upgrade can ever be applied
   IMAGE_TAG_PINNED: 'IMAGE_TAG_PINNED',
+  // the new Gladys image could not be downloaded, Docker's error is attached
+  IMAGE_PULL_FAILED: 'IMAGE_PULL_FAILED',
+  // the download of the new Gladys image did not finish in time and was stopped
+  IMAGE_PULL_TIMEOUT: 'IMAGE_PULL_TIMEOUT',
+  // the new Gladys image could not be downloaded because the disk is full
+  NOT_ENOUGH_DISK_SPACE: 'NOT_ENOUGH_DISK_SPACE',
   // Watchtower ran fine but found no new image to install
   NO_UPDATE_APPLIED: 'NO_UPDATE_APPLIED',
   // the Watchtower container exited with a non-zero status code
@@ -2052,6 +2315,10 @@ const JOB_TYPES = {
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING: 'energy-monitoring-consumption-from-index-beginning',
   ENERGY_MONITORING_PRODUCTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-production-from-index-thirty-minutes',
   ENERGY_MONITORING_PRODUCTION_FROM_INDEX_BEGINNING: 'energy-monitoring-production-from-index-beginning',
+  ENERGY_MONITORING_COST_CALCULATION_CALENDAR: 'energy-monitoring-cost-calculation-calendar',
+  ENERGY_MONITORING_COST_CALCULATION_CONTRACT: 'energy-monitoring-cost-calculation-contract',
+  ENERGY_MONITORING_BILLING_PERIOD_END: 'energy-monitoring-billing-period-end',
+  ENERGY_MONITORING_DELEGATED_CATCH_UP: 'energy-monitoring-delegated-catch-up',
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
   DEVICE_MIGRATE: 'device-migrate',
@@ -2105,6 +2372,48 @@ const ENERGY_PRICE_DAY_TYPES = {
   WHITE: 'white',
 };
 
+// Energy contracts (docs/specs/energy-contracts.md, section 4)
+const ENERGY_CONTRACT_PROVIDER_KINDS = {
+  COMMUNITY: 'community',
+  INTEGRATION: 'integration',
+  INTERNAL: 'internal',
+  USER: 'user',
+};
+
+const ENERGY_CONTRACT_PRICING_MODES = {
+  RULES: 'rules',
+  DELEGATED: 'delegated',
+};
+
+const ENERGY_CONTRACT_STATUS = {
+  ACTIVE: 'active',
+  SCHEDULED: 'scheduled',
+  EXPIRED: 'expired',
+  ORPHANED: 'orphaned',
+};
+
+const ENERGY_CONTRACT_ENERGY_TYPES = {
+  ELECTRICITY: 'electricity',
+  GAS: 'gas',
+  WATER: 'water',
+};
+
+const ENERGY_CONTRACT_DIRECTIONS = {
+  CONSUMPTION: 'consumption',
+  PRODUCTION: 'production',
+};
+
+const ENERGY_CONTRACT_POWER_UNITS = {
+  KVA: 'kVA',
+  KW: 'kW',
+};
+
+const TARIFF_CALENDAR_GRANULARITIES = {
+  DAY: 'day',
+  THIRTY_MINUTES: 'thirty_minutes',
+  FIFTEEN_MINUTES: 'fifteen_minutes',
+};
+
 const AI_CHAT_TOOL_CATEGORIES = {
   SCENES: 'scenes',
   DEVICE_CONTROL: 'device_control',
@@ -2122,6 +2431,10 @@ const AI_CHAT_PURPOSES = {
   INTENT_CLASSIFICATION: 'intent-classification',
   WEEKLY_DIGEST: 'weekly-digest',
 };
+
+// Tag automatically added to every scene created by the AI through the
+// scene.create tool, so those scenes can be found back in the scene list.
+const AI_GENERATED_SCENE_TAG = 'AI';
 
 const createList = (obj) => {
   const list = [];
@@ -2151,6 +2464,8 @@ const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_VISIBILITY_LIST = createList(DASHBOARD_VISIBILITY);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
+const DASHBOARD_WIDTH_LIST = createList(DASHBOARD_WIDTH);
+const DASHBOARD_BACKGROUND_SCENE_LIST = createList(DASHBOARD_BACKGROUND_SCENE);
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
 const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
@@ -2160,6 +2475,12 @@ const AI_CHAT_TOOL_CATEGORIES_LIST = createList(AI_CHAT_TOOL_CATEGORIES);
 const ENERGY_CONTRACT_TYPES_LIST = createList(ENERGY_CONTRACT_TYPES);
 const ENERGY_PRICE_TYPES_LIST = createList(ENERGY_PRICE_TYPES);
 const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
+const ENERGY_CONTRACT_PROVIDER_KINDS_LIST = createList(ENERGY_CONTRACT_PROVIDER_KINDS);
+const ENERGY_CONTRACT_PRICING_MODES_LIST = createList(ENERGY_CONTRACT_PRICING_MODES);
+const ENERGY_CONTRACT_ENERGY_TYPES_LIST = createList(ENERGY_CONTRACT_ENERGY_TYPES);
+const ENERGY_CONTRACT_DIRECTIONS_LIST = createList(ENERGY_CONTRACT_DIRECTIONS);
+const ENERGY_CONTRACT_POWER_UNITS_LIST = createList(ENERGY_CONTRACT_POWER_UNITS);
+const TARIFF_CALENDAR_GRANULARITIES_LIST = createList(TARIFF_CALENDAR_GRANULARITIES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -2167,6 +2488,7 @@ module.exports.BUTTON_PUSH = BUTTON_PUSH;
 module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
+module.exports.SIREN_MODE = SIREN_MODE;
 module.exports.AC_MODE = AC_MODE;
 module.exports.CAMERA_MOVE = CAMERA_MOVE;
 module.exports.THERMOSTAT_MODE = THERMOSTAT_MODE;
@@ -2188,10 +2510,14 @@ module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
+module.exports.CONTAMINATION_STATE = CONTAMINATION_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
 module.exports.CONDITIONS = CONDITIONS;
+module.exports.COMPARISON_OPERATORS = COMPARISON_OPERATORS;
+module.exports.ANY_CHANGE_OPERATOR = ANY_CHANGE_OPERATOR;
+module.exports.TRIGGER_OPERATORS = TRIGGER_OPERATORS;
 module.exports.ACTIONS = ACTIONS;
 module.exports.CONDITION_ACTIONS = CONDITION_ACTIONS;
 module.exports.INTENTS = INTENTS;
@@ -2230,11 +2556,17 @@ module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 
 module.exports.SERVICE_TYPES = SERVICE_TYPES;
+module.exports.MESSAGE_GLADYS_ONLY_SERVICE = MESSAGE_GLADYS_ONLY_SERVICE;
 module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
+module.exports.CALENDAR_TYPES = CALENDAR_TYPES;
 
 module.exports.INTEGRATION_CATALOG_CATEGORIES = INTEGRATION_CATALOG_CATEGORIES;
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
+module.exports.DEFAULT_TIMEZONE = DEFAULT_TIMEZONE;
+
+module.exports.MDNS = MDNS;
+module.exports.normalizeMdnsHostname = normalizeMdnsHostname;
 
 module.exports.DASHBOARD_TYPE = DASHBOARD_TYPE;
 module.exports.DASHBOARD_VISIBILITY = DASHBOARD_VISIBILITY;
@@ -2242,6 +2574,10 @@ module.exports.DASHBOARD_VISIBILITY_LIST = DASHBOARD_VISIBILITY_LIST;
 module.exports.DASHBOARD_TYPE_LIST = DASHBOARD_TYPE_LIST;
 module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
+module.exports.DASHBOARD_WIDTH = DASHBOARD_WIDTH;
+module.exports.DASHBOARD_WIDTH_LIST = DASHBOARD_WIDTH_LIST;
+module.exports.DASHBOARD_BACKGROUND_SCENE = DASHBOARD_BACKGROUND_SCENE;
+module.exports.DASHBOARD_BACKGROUND_SCENE_LIST = DASHBOARD_BACKGROUND_SCENE_LIST;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
 
@@ -2269,6 +2605,7 @@ module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
 module.exports.AI_CHAT_TOOL_CATEGORIES = AI_CHAT_TOOL_CATEGORIES;
 module.exports.AI_CHAT_TOOL_CATEGORIES_LIST = AI_CHAT_TOOL_CATEGORIES_LIST;
 module.exports.AI_CHAT_PURPOSES = AI_CHAT_PURPOSES;
+module.exports.AI_GENERATED_SCENE_TAG = AI_GENERATED_SCENE_TAG;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;
@@ -2279,5 +2616,18 @@ module.exports.ENERGY_PRICE_TYPES = ENERGY_PRICE_TYPES;
 module.exports.ENERGY_PRICE_TYPES_LIST = ENERGY_PRICE_TYPES_LIST;
 module.exports.ENERGY_PRICE_DAY_TYPES = ENERGY_PRICE_DAY_TYPES;
 module.exports.ENERGY_PRICE_DAY_TYPES_LIST = ENERGY_PRICE_DAY_TYPES_LIST;
+module.exports.ENERGY_CONTRACT_PROVIDER_KINDS = ENERGY_CONTRACT_PROVIDER_KINDS;
+module.exports.ENERGY_CONTRACT_PROVIDER_KINDS_LIST = ENERGY_CONTRACT_PROVIDER_KINDS_LIST;
+module.exports.ENERGY_CONTRACT_PRICING_MODES = ENERGY_CONTRACT_PRICING_MODES;
+module.exports.ENERGY_CONTRACT_PRICING_MODES_LIST = ENERGY_CONTRACT_PRICING_MODES_LIST;
+module.exports.ENERGY_CONTRACT_STATUS = ENERGY_CONTRACT_STATUS;
+module.exports.ENERGY_CONTRACT_ENERGY_TYPES = ENERGY_CONTRACT_ENERGY_TYPES;
+module.exports.ENERGY_CONTRACT_ENERGY_TYPES_LIST = ENERGY_CONTRACT_ENERGY_TYPES_LIST;
+module.exports.ENERGY_CONTRACT_DIRECTIONS = ENERGY_CONTRACT_DIRECTIONS;
+module.exports.ENERGY_CONTRACT_DIRECTIONS_LIST = ENERGY_CONTRACT_DIRECTIONS_LIST;
+module.exports.ENERGY_CONTRACT_POWER_UNITS = ENERGY_CONTRACT_POWER_UNITS;
+module.exports.ENERGY_CONTRACT_POWER_UNITS_LIST = ENERGY_CONTRACT_POWER_UNITS_LIST;
+module.exports.TARIFF_CALENDAR_GRANULARITIES = TARIFF_CALENDAR_GRANULARITIES;
+module.exports.TARIFF_CALENDAR_GRANULARITIES_LIST = TARIFF_CALENDAR_GRANULARITIES_LIST;
 
 module.exports.LEVEL_MATTER_STATE = LEVEL_MATTER_STATE;

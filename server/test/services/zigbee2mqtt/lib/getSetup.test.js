@@ -38,10 +38,13 @@ describe('zigbee2mqtt getSetup', () => {
     // EXECUTE
     const config = await zigbee2MqttManager.getSetup();
     // ASSERT
-    assert.callCount(gladys.variable.getValue, 8);
+    assert.callCount(gladys.variable.getValue, 11);
     assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE_DONGLE_NAME', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_TCP_PORT', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'Z2M_ADAPTER_MODE', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'Z2M_NETWORK_ADAPTER_URL', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'Z2M_NETWORK_ADAPTER_TYPE', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_URL', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'GLADYS_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'GLADYS_MQTT_PASSWORD', serviceId);
@@ -53,6 +56,9 @@ describe('zigbee2mqtt getSetup', () => {
       ZIGBEE2MQTT_DRIVER_PATH: 'fake',
       ZIGBEE_DONGLE_NAME: 'fake',
       Z2M_TCP_PORT: 'fake',
+      Z2M_ADAPTER_MODE: 'fake',
+      Z2M_NETWORK_ADAPTER_URL: 'fake',
+      Z2M_NETWORK_ADAPTER_TYPE: 'fake',
       Z2M_MQTT_MODE: 'fake',
       GLADYS_MQTT_PASSWORD: 'fake',
       Z2M_MQTT_URL: 'fake',

@@ -1,4 +1,5 @@
 const db = require('../../models');
+const { slugify } = require('../../utils/slugify');
 
 /**
  * @description Create a new dashboard.
@@ -26,7 +27,18 @@ async function create(userId, dashboard) {
   if (dashboardWithTheHighestPosition.length > 0) {
     dashboard.position = dashboardWithTheHighestPosition[0].position + 1;
   }
-  return db.Dashboard.create({ ...dashboard, user_id: userId });
+  let dashboardWithSelector = dashboard;
+  // Like scenes, the selector of a new dashboard gets random characters at the
+  // end so two dashboards with names sharing the same slug don't collide.
+  // A selector explicitly given by the caller is always kept as is, and
+  // existing dashboards keep the selector they were created with.
+  if (!dashboard.selector && dashboard.name) {
+    dashboardWithSelector = {
+      ...dashboard,
+      selector: slugify(dashboard.name, true),
+    };
+  }
+  return db.Dashboard.create({ ...dashboardWithSelector, user_id: userId });
 }
 
 module.exports = {

@@ -22,6 +22,7 @@ const { getDeviceFeaturesAggregates } = require('./device.getDeviceFeaturesAggre
 const { getDeviceFeaturesAggregatesMulti } = require('./device.getDeviceFeaturesAggregatesMulti');
 const { getDeviceFeatureStates } = require('./device.getDeviceFeatureStates');
 const { getDeviceStatesHistory } = require('./device.getDeviceStatesHistory');
+const { exportStatesToCsv } = require('./device.exportStatesToCsv');
 const { onPurgeStatesEvent } = require('./device.onPurgeStatesEvent');
 const { purgeStates } = require('./device.purgeStates');
 const { purgeStatesByFeatureId } = require('./device.purgeStatesByFeatureId');
@@ -32,16 +33,20 @@ const { saveHistoricalState } = require('./device.saveHistoricalState');
 const { saveStringState } = require('./device.saveStringState');
 const { setParam } = require('./device.setParam');
 const { setValue } = require('./device.setValue');
+const { syncFeatureSupportedOptions } = require('./device.syncFeatureSupportedOptions');
 const { setupPoll } = require('./device.setupPoll');
 const { newStateEvent } = require('./device.newStateEvent');
 const { notify } = require('./device.notify');
 const { checkBatteries } = require('./device.checkBatteries');
 const { migrateFromSQLiteToDuckDb } = require('./device.migrateFromSQLiteToDuckDb');
 const { getDuckDbMigrationState } = require('./device.getDuckDbMigrationState');
+const { getDeviceStatesSize } = require('./device.getDeviceStatesSize');
+const { getStatesStats } = require('./device.getStatesStats');
 const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
 const { purgeOrphanedDuckDbStates } = require('./device.purgeOrphanedDuckDbStates');
 const { updateFeature } = require('./device.updateFeature');
 const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistoricalStates');
+const { replaceHistoricalStatesFrom } = require('./device.replaceHistoricalStatesFrom');
 const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
 const { destroyParam } = require('./device.destroyParam');
 const { destroyStatesFrom } = require('./device.destroyStatesFrom');
@@ -72,6 +77,22 @@ const DeviceManager = function DeviceManager(
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
   this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 200;
+  // A CSV export has no size limit, but it is read and written chunk by chunk:
+  // this is the most states one chunk can hold, whatever the caller asks. At
+  // roughly 60 bytes per line, a chunk stays around 1.5 MB, which a low-power
+  // machine like a Raspberry Pi can build and send without trouble — however
+  // long the exported period is.
+  this.MAX_STATES_PER_CSV_EXPORT_CHUNK = 25000;
+  // Between two streamed chunks of a whole-file export, the route pauses this long
+  // so the other readers (charts, history…) get their turn on the serialized DuckDB
+  // read connection: a multi-year export must not freeze the rest of the instance.
+  this.CSV_EXPORT_PAUSE_BETWEEN_CHUNKS_IN_MS = 25;
+  // When a NON-paginated export goes through Gladys Plus, the whole answer travels
+  // over the encrypted websocket in one message, which cannot carry an arbitrarily
+  // large payload: the same limit as the log download is applied, and a bigger
+  // export is told to use the max_states pagination instead (which the web client
+  // always does).
+  this.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES = 256 * 1024;
   // Also the target size of a purge slice: a single DELETE of a million states on a
   // multi-GB history holds the write connection for minutes and inflates the file.
   this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD = 200000;
@@ -90,6 +111,21 @@ const DeviceManager = function DeviceManager(
   this.DUCKDB_STATES_MIGRATE_PAUSE_FACTOR = 1;
   this.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 100;
   this.DUCKDB_STATES_MIGRATE_MAX_PAUSE_IN_MS = 5000;
+  // The size of the history of each feature, shown on the device pages, needs a full
+  // scan of the history: its result is kept this long, and corrected on a purge.
+  this.FEATURES_STATES_SIZE_CACHE_DURATION_IN_MS = 60 * 60 * 1000;
+  this.featuresStatesSizeCache = null;
+  this.featuresStatesSizeInFlight = null;
+  this.featuresStatesSizeGeneration = 0;
+  // The devices list flags the verbose devices from the states saved in their history
+  // over this period. A feature is verbose when it saved at least this many states in
+  // the period: one every 10 seconds on average over 24 hours. One per minute is the
+  // normal pace of an energy meter (e.g. a Linky TIC module) and weighs little.
+  this.STATES_STATS_PERIOD_IN_HOURS = 24;
+  this.VERBOSE_DEVICE_FEATURE_MIN_STATES = 24 * 60 * 6;
+  this.STATES_STATS_CACHE_DURATION_IN_MS = 5 * 60 * 1000;
+  this.statesStatsCache = null;
+  this.statesStatsInFlight = null;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);
@@ -163,6 +199,7 @@ DeviceManager.prototype.getDeviceFeaturesAggregates = getDeviceFeaturesAggregate
 DeviceManager.prototype.getDeviceFeaturesAggregatesMulti = getDeviceFeaturesAggregatesMulti;
 DeviceManager.prototype.getDeviceFeatureStates = getDeviceFeatureStates;
 DeviceManager.prototype.getDeviceStatesHistory = getDeviceStatesHistory;
+DeviceManager.prototype.exportStatesToCsv = exportStatesToCsv;
 DeviceManager.prototype.onPurgeStatesEvent = onPurgeStatesEvent;
 DeviceManager.prototype.purgeStates = purgeStates;
 DeviceManager.prototype.purgeStatesByFeatureId = purgeStatesByFeatureId;
@@ -175,14 +212,18 @@ DeviceManager.prototype.saveStringState = saveStringState;
 DeviceManager.prototype.setParam = setParam;
 DeviceManager.prototype.setupPoll = setupPoll;
 DeviceManager.prototype.setValue = setValue;
+DeviceManager.prototype.syncFeatureSupportedOptions = syncFeatureSupportedOptions;
 DeviceManager.prototype.notify = notify;
 DeviceManager.prototype.checkBatteries = checkBatteries;
 DeviceManager.prototype.migrateFromSQLiteToDuckDb = migrateFromSQLiteToDuckDb;
 DeviceManager.prototype.getDuckDbMigrationState = getDuckDbMigrationState;
+DeviceManager.prototype.getDeviceStatesSize = getDeviceStatesSize;
+DeviceManager.prototype.getStatesStats = getStatesStats;
 DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
 DeviceManager.prototype.purgeOrphanedDuckDbStates = purgeOrphanedDuckDbStates;
 DeviceManager.prototype.updateFeature = updateFeature;
 DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalStates;
+DeviceManager.prototype.replaceHistoricalStatesFrom = replaceHistoricalStatesFrom;
 DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;
 DeviceManager.prototype.destroyParam = destroyParam;
 DeviceManager.prototype.destroyStatesFrom = destroyStatesFrom;

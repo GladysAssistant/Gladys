@@ -1,0 +1,160 @@
+import { connect } from 'unistore/preact';
+import { Component } from 'preact';
+import { Text } from 'preact-i18n';
+import { SYSTEM_VARIABLE_NAMES, MDNS, normalizeMdnsHostname } from '../../../../../server/utils/constants';
+
+class SettingsSystemMdns extends Component {
+  // the initial read can come back after the user saved a new name: what was read
+  // before the save must never overwrite what the server now stores
+  saveStarted = false;
+
+  getMdnsHostname = async () => {
+    try {
+      const { value } = await this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME}`);
+      if (value && !this.saveStarted) {
+        this.setState({
+          mdnsHostname: value,
+          advertisedHostname: value
+        });
+      }
+    } catch (e) {
+      // variable doesn't exist yet, keep the default hostname
+      console.error(e);
+    }
+  };
+
+  updateMdnsHostname = e => {
+    this.setState({
+      mdnsHostname: e.target.value.trim().toLowerCase(),
+      invalidName: false,
+      saved: false,
+      error: false
+    });
+  };
+
+  saveMdnsHostname = async e => {
+    e.preventDefault();
+    // the server stores the normalized hostname, the input must show the same value
+    const hostname = normalizeMdnsHostname(this.state.mdnsHostname);
+    if (hostname === null) {
+      this.setState({
+        invalidName: true,
+        saved: false
+      });
+      return;
+    }
+    this.saveStarted = true;
+    this.setState({
+      mdnsHostname: hostname,
+      saving: true,
+      invalidName: false,
+      saved: false,
+      error: false
+    });
+    try {
+      await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME}`, {
+        value: hostname
+      });
+      // only the saved value is actually advertised on the network
+      this.setState({
+        advertisedHostname: hostname,
+        saved: true
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({
+        error: true
+      });
+    }
+    this.setState({
+      saving: false
+    });
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      mdnsHostname: MDNS.DEFAULT_HOSTNAME,
+      advertisedHostname: MDNS.DEFAULT_HOSTNAME
+    };
+  }
+
+  componentDidMount() {
+    this.getMdnsHostname();
+  }
+
+  render({ systemInfos }, { mdnsHostname, advertisedHostname, saving, saved, error, invalidName }) {
+    const serverPort = systemInfos && systemInfos.server_port;
+    const portSuffix = serverPort && serverPort !== 80 ? `:${serverPort}` : '';
+    // the URL must reflect what Gladys advertises, not what is being typed
+    const mdnsUrl = `http://${advertisedHostname}.local${portSuffix}`;
+    // without a local IP the server has nothing to advertise: Gladys is either behind
+    // a Docker bridge or has no local network interface
+    const advertising = Boolean(systemInfos && systemInfos.local_ip);
+    return (
+      <div class="card">
+        <h4 class="card-header">
+          <Text id="systemSettings.mdns" />
+        </h4>
+
+        <div class="card-body">
+          <form onSubmit={this.saveMdnsHostname}>
+            <p>
+              <Text id="systemSettings.mdnsText" />
+            </p>
+            {invalidName && (
+              <div class="alert alert-warning">
+                <Text id="systemSettings.mdnsInvalidName" />
+              </div>
+            )}
+            {error && (
+              <div class="alert alert-warning">
+                <Text id="systemSettings.mdnsError" />
+              </div>
+            )}
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">http://</span>
+              </div>
+              <input
+                class="form-control"
+                type="text"
+                value={mdnsHostname}
+                onInput={this.updateMdnsHostname}
+                disabled={saving}
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">.local</span>
+              </div>
+              <div class="input-group-append">
+                <button type="submit" class="btn btn-primary" disabled={saving}>
+                  <Text id="global.save" />
+                </button>
+              </div>
+            </div>
+            {saved && (
+              <div class="text-success mt-2">
+                <Text id="systemSettings.mdnsSaved" />
+              </div>
+            )}
+            {systemInfos &&
+              (advertising ? (
+                <p class="mt-2 mb-0">
+                  <Text id="systemSettings.mdnsCurrentUrl" />{' '}
+                  <a href={mdnsUrl} target="_blank" rel="noopener noreferrer">
+                    {mdnsUrl}
+                  </a>
+                </p>
+              ) : (
+                <p class="mt-2 mb-0 text-muted">
+                  <Text id="systemSettings.mdnsNotAdvertised" />
+                </p>
+              ))}
+          </form>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default connect('httpClient', null)(SettingsSystemMdns);

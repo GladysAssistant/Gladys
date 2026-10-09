@@ -1,0 +1,404 @@
+/* HomeKit-like light controls: one row per light in the devices widget, and a panel holding
+   brightness, color and color temperature on controls sized for a finger.
+   Authored light only, like the whole Horizon theme — dark mode comes from the global inversion
+   filter (style/dark-mode.css). The only exceptions are the layers that carry the color of the
+   light itself: they are inverted back at the bottom of this file so a warm white stays warm. */
+
+/* ============================================================
+   The light row in the devices widget
+   ============================================================ */
+
+.lightRow {
+  cursor: pointer;
+}
+
+.rowSummary {
+  margin-top: 0.05rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--gl-muted, #7c8396);
+}
+
+.rowControls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.openPanelButton {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  color: var(--gl-ink, #1c2334);
+  background-color: rgba(28, 35, 52, 0.07);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.openPanelButton:hover {
+  background-color: rgba(28, 35, 52, 0.12);
+}
+
+/* The whole row opens the panel, but the button is the keyboard and screen-reader entry point:
+   on a touch screen it also gets the ~44px target the rest of the dashboard uses. */
+@media (pointer: coarse) {
+  .openPanelButton {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+/* ============================================================
+   The panel: bottom sheet on a phone, centered dialog above
+   ============================================================ */
+
+/* Anchored at the BOTTOM and sized in dvh, not with top/bottom: 0. On iOS the viewport of a fixed
+   element is the tall one (toolbars retracted), so a sheet measured in vh was taller than what the
+   phone actually shows and spilled past the bottom of the screen. dvh follows the toolbars, and
+   anchoring at the bottom keeps the sheet on screen while the browser chrome animates. */
+.overlay {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 1060;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background-color: rgba(16, 22, 36, 0.45);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (min-width: 576px) {
+  .overlay {
+    align-items: center;
+    padding: 1.5rem;
+  }
+}
+
+/* Edge to edge on a phone — a bottom sheet with side margins reads as a card that happens to touch
+   the bottom of the screen. It becomes a centered dialog at the tablet/desktop breakpoint below. */
+.sheet {
+  width: 100%;
+  max-height: 92vh;
+  max-height: 92dvh;
+  padding: 0.5rem 1.25rem calc(1.75rem + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  color: var(--gl-ink, #1c2334);
+  background-color: #fff;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -18px 50px rgba(16, 22, 36, 0.28);
+  outline: none;
+}
+
+@media (min-width: 576px) {
+  .sheet {
+    max-width: 25rem;
+    max-height: 88vh;
+    max-height: 88dvh;
+    padding-top: 1rem;
+    border-radius: 28px;
+  }
+}
+
+/* the grab bar that tells a phone user the sheet is a sheet */
+.sheetHandle {
+  width: 2.5rem;
+  height: 0.25rem;
+  margin: 0.25rem auto 0;
+  background-color: rgba(28, 35, 52, 0.18);
+  border-radius: 999px;
+}
+
+@media (min-width: 576px) {
+  .sheetHandle {
+    display: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0 0.25rem;
+}
+
+.headerTitles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.subtitle {
+  font-size: 0.8125rem;
+  color: var(--gl-muted, #7c8396);
+}
+
+.closeButton {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  color: var(--gl-ink, #1c2334);
+  background-color: rgba(28, 35, 52, 0.07);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background-color: rgba(28, 35, 52, 0.12);
+}
+
+/* ============================================================
+   Brightness: the tall dimmer bar
+   ============================================================ */
+
+.brightnessBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.brightnessValue {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.brightnessValueOff {
+  color: var(--gl-muted, #7c8396);
+}
+
+.brightnessIcon {
+  font-size: 1.35rem;
+  color: rgba(28, 35, 52, 0.4);
+}
+
+/* ============================================================
+   Sliders
+   ============================================================ */
+
+.sliderTrack {
+  position: relative;
+  background-color: rgba(28, 35, 52, 0.09);
+  box-shadow: inset 0 1px 3px rgba(28, 35, 52, 0.12);
+  cursor: pointer;
+  outline: none;
+  /* the finger drives the slider, it must never scroll the sheet */
+  touch-action: none;
+  user-select: none;
+}
+
+.sliderTrack:focus-visible {
+  box-shadow: inset 0 1px 3px rgba(28, 35, 52, 0.12), 0 0 0 3px rgba(61, 109, 240, 0.45);
+}
+
+/* The bar is the tallest thing in the sheet: sizing it against the visible viewport is what keeps
+   the whole panel inside the screen of a phone (and of a phone in landscape) instead of making it
+   scroll. */
+.sliderTrackVertical {
+  width: 6.5rem;
+  height: 15rem;
+  height: min(15rem, 30dvh);
+  overflow: hidden;
+  border-radius: 2rem;
+}
+
+.sliderTrackHorizontal {
+  width: 100%;
+  height: 3rem;
+  border-radius: 999px;
+}
+
+.sliderTrackBackground {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: inherit;
+}
+
+.sliderFill {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #ffb648;
+}
+
+.sliderThumb {
+  position: absolute;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(16, 22, 36, 0.35);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.sliderDragging .sliderThumb {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.sliderContent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 1rem;
+  pointer-events: none;
+}
+
+.sliderLegend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--gl-muted, #7c8396);
+}
+
+/* The bar of a light that is off shows the brightness it will come back to, not the light it is
+   giving: it drops the color of the lamp. It is therefore NOT restored in dark mode either — it
+   inverts into a quiet dark gray like the rest of the sheet. */
+.sliderFillNeutral {
+  background-color: #c7ccd8;
+  background-image: none;
+}
+
+/* ============================================================
+   Power, tabs, color
+   ============================================================ */
+
+.powerButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.8rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--gl-ink, #1c2334);
+  background-color: rgba(28, 35, 52, 0.07);
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+}
+
+.powerButtonOn {
+  color: #a35c00;
+  background-color: rgba(255, 178, 72, 0.2);
+}
+
+.tabs {
+  display: flex;
+  width: 100%;
+  margin: 1rem 0 0.25rem;
+}
+
+.tabs :global(.btn) {
+  flex: 1 1 0;
+}
+
+.tabPanel {
+  padding: 0.5rem 0 0.25rem;
+}
+
+.controlHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.controlLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.controlValue {
+  font-size: 0.875rem;
+  color: var(--gl-muted, #7c8396);
+}
+
+.colorWheel {
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 0 0.25rem;
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0 0.25rem;
+}
+
+.presetSwatch {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(28, 35, 52, 0.22);
+  cursor: pointer;
+}
+
+/* ============================================================
+   Dark mode: the app inverts globally, so the layers that carry the real color of the light are
+   inverted back — otherwise a red lamp would show as cyan on the wheel and in the row.
+   ============================================================ */
+
+:global(.dark-mode) .colorWheel,
+:global(.dark-mode) .presetSwatch,
+:global(.dark-mode) .sliderFill:not(.sliderFillNeutral),
+:global(.dark-mode) .sliderTrackBackground,
+/* the thumb rides on a restored track, so it has to be restored with it */
+:global(.dark-mode) .sliderThumb {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* The bulb icon of the row is tinted with the color the lamp is showing: same rule, and it has to
+   out-weigh `.dark-mode .glass-theme .fe { filter: none }`. Only set when a color is displayed. */
+:global(.dark-mode) .rowLightIcon {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+/* The sheet is a white surface, which the global inversion turns into pure black — harsher than
+   the rest of the app. Same counter-weight the cards use in dark-mode.css: a light gray that
+   inverts into the dark surface of the other cards. */
+:global(.dark-mode) .sheet {
+  background-color: #ced8e6;
+}

@@ -60,12 +60,14 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: true,
         zigbee2mqttExist: true,
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
   });
@@ -308,6 +310,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         mqttRunning: false,
         networkModeValid: true,
         usbConfigured: false,
+        networkAdapterConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: true,
         zigbee2mqttExist: false,
@@ -320,6 +323,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
           type: 'EmberZNet',
         },
         z2mContainerError: null,
+        mqttConnectionError: null,
       },
     });
   });

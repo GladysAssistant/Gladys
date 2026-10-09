@@ -28,6 +28,10 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
       });
     },
     loginInstance: fake.resolves({}),
+    loginInstanceWithRecoveryCode: fake.resolves({}),
+    generateTwoFactorRecoveryCodes: fake.resolves({
+      recovery_codes: ['1a2b-3c4d-5e6f-7a8b-9c0d-1e2f-3a4b-5c6d'],
+    }),
     configureTwoFactor: fake.resolves({
       otpauth_url: 'otpauth://totp/Gladys%20Gateway?secret=THISISMYSECRET',
     }),

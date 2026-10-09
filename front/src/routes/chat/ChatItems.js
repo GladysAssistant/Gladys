@@ -114,7 +114,7 @@ const Messages = ({ children, ...props }) => (
             })}
 
           {props.gladysIsTyping && (
-            <p>
+            <p class={style.typingIndicator}>
               <Text id="chat.typingInProgress" />
             </p>
           )}

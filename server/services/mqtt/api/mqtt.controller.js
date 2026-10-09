@@ -78,8 +78,10 @@ module.exports = function MqttController(mqttManager) {
       admin: true,
       controller: asyncMiddleware(setDebugMode),
     },
+    // returns the broker URL, username and password in clear
     'get /api/v1/service/mqtt/config': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(getConfiguration),
     },
     'post /api/v1/service/mqtt/config/docker': {

@@ -6,7 +6,8 @@ import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
-  WATER_HEATER_MODE
+  WATER_HEATER_MODE,
+  SIREN_MODE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { CAMERA_MOVE_OPTIONS } from '../../../../../utils/cameraMove';
@@ -81,6 +82,8 @@ export const isMqttCatalogFeatureVisible = (category, type) =>
   !MQTT_CATALOG_EXCLUDED_FEATURES.has(categoryTypeKey(category, type));
 
 const CATEGORIES_WITHOUT_UNIT = new Set([
+  // The battery charge level is a percentage, but knowing whether it is charging is a binary
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_TYPES.BATTERY.CHARGING),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.MODE),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING),
@@ -163,6 +166,18 @@ const FEATURE_UNIT_BY_CATEGORY_TYPE = {
   [categoryTypeKey(
     DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
     DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR,
+    DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY
+  )]: DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR,
+    DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR,
+    DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.RENEWABLE_PERCENTAGE
   )]: DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.PPM,
@@ -279,12 +294,15 @@ const TELEINFORMATION_POWER_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN_1,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3
 ]);
@@ -303,6 +321,7 @@ const TELEINFORMATION_CURRENT_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS3,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX3
 ]);
@@ -629,6 +648,19 @@ export const getFeatureDefaultValues = (category, type) => {
     return { ...defaults, min: 1, max: 1, read_only: false, keep_history: false };
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.ENABLED) {
+    // On/off gate: Gladys stops polling, streaming and displaying the camera when it is 0
+    return { ...defaults, min: 0, max: 1, read_only: false, keep_history: false };
+  }
+
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR &&
+    type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE
+  ) {
+    // Command silencing the detector's siren: written, not measured
+    return { ...defaults, min: 0, max: 1, read_only: false, keep_history: false };
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.MOVE) {
     // min/max cover the CAMERA_MOVE canonical values (STOP=0 .. ZOOM_OUT=6)
     return { ...defaults, min: 0, max: 6, read_only: false, keep_history: false };
@@ -753,12 +785,34 @@ export const getFeatureDefaultValues = (category, type) => {
     );
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY && type === DEVICE_FEATURE_TYPES.BATTERY.CHARGING) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.BATTERY && type === DEVICE_FEATURE_TYPES.BATTERY.INTEGER) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, unit: DEVICE_FEATURE_UNITS.PERCENT }, category, type);
   }
 
+  // Siren enums: the alarm mode is a command, the alarm state is what the siren plays right now
+  if (category === DEVICE_FEATURE_CATEGORIES.SIREN && type === DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.SIREN && type === DEVICE_FEATURE_TYPES.SIREN.ALARM_STATE) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: true }, category, type);
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR) {
     return { ...defaults, min: 0, max: 1000000, read_only: true };
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY) {
+      // The dirtiest grids sit around 900 gCO2eq/kWh: 1500 leaves headroom without
+      // flattening the usual range on a chart.
+      return applyDefaultUnit({ ...defaults, min: 0, max: 1500, read_only: true }, category, type);
+    }
+    return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: true }, category, type);
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
@@ -875,7 +929,19 @@ export const getCatalogPreviewLabelKey = (category, type) => {
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
       DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE
-    )]: `deviceFeatureValue.category.charging-station.charging-state.${CHARGING_STATION_CHARGING_STATE.CHARGING}`
+    )]: `deviceFeatureValue.category.charging-station.charging-state.${CHARGING_STATION_CHARGING_STATE.CHARGING}`,
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.SIREN,
+      DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE
+    )]: `deviceFeatureValue.category.siren.alarm-mode.${SIREN_MODE.SOUND_AND_LIGHT}`,
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.SIREN,
+      DEVICE_FEATURE_TYPES.SIREN.ALARM_STATE
+    )]: `deviceFeatureValue.category.siren.alarm-state.${SIREN_MODE.SOUND_AND_LIGHT}`,
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.BATTERY,
+      DEVICE_FEATURE_TYPES.BATTERY.CHARGING
+    )]: 'deviceFeatureValue.category.battery.charging.1'
   };
 
   return labeledPreviewKeys[key] || null;
@@ -884,6 +950,11 @@ export const getCatalogPreviewLabelKey = (category, type) => {
 export const getFeaturePreviewValue = (category, type) => {
   // Category-specific blocks first: some of their types ('power', 'index', 'target-temperature',
   // 'mode') also exist in other categories matched below by type only.
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.ENABLED) {
+    // A camera is enabled by default, the preview shows the toggle in that position
+    return 1;
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
       return WATER_HEATER_MODE.ECO;
@@ -1036,6 +1107,16 @@ export const getFeaturePreviewValue = (category, type) => {
     return 42;
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY) {
+      return 57;
+    }
+    if (type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE) {
+      return 92;
+    }
+    return 28;
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
     return 850;
   }
@@ -1057,7 +1138,16 @@ export const getFeaturePreviewValue = (category, type) => {
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.BATTERY) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY.CHARGING) {
+      return 1;
+    }
     return 85;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.SIREN) {
+    if (type === DEVICE_FEATURE_TYPES.SIREN.ALARM_MODE || type === DEVICE_FEATURE_TYPES.SIREN.ALARM_STATE) {
+      return SIREN_MODE.SOUND_AND_LIGHT;
+    }
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR) {

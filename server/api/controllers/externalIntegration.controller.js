@@ -1,11 +1,14 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { BadParameters, NotFoundError } = require('../../utils/coreErrors');
+const { Error422 } = require('../../utils/httpErrors');
 const { USER_ROLE } = require('../../utils/constants');
+const { MAX_WIDGET_SETTINGS_BYTES } = require('../../lib/external-integration/constants');
 
-// Manifest type of the integrations a non-admin user can act on: they link
-// their own account on a communication integration, exactly like on the
-// native Telegram/Nextcloud Talk services.
-const COMMUNICATION_TYPE = 'communication';
+// Manifest types of the integrations a non-admin user can act on: they link
+// their own account on a communication integration (exactly like on the
+// native Telegram/Nextcloud Talk services), or enable their own calendars
+// on a calendar integration (capabilities/calendar-type.md).
+const NON_ADMIN_TYPES = ['communication', 'calendar'];
 
 /**
  * @description True when the request is made by an admin user.
@@ -19,21 +22,22 @@ function isAdmin(req) {
 }
 
 /**
- * @description True when the integration is a communication integration, the
- * only family a non-admin user has access to.
+ * @description True when the integration belongs to a family a non-admin
+ * user has access to (communication and calendar integrations).
  * @param {object} integration - The external integration.
- * @returns {boolean} True for a communication integration.
+ * @returns {boolean} True on a non-admin-visible integration.
  * @example
- * if (isCommunicationIntegration(integration)) { ... }
+ * if (isNonAdminVisibleIntegration(integration)) { ... }
  */
-function isCommunicationIntegration(integration) {
-  return Boolean(integration.manifest) && integration.manifest.type === COMMUNICATION_TYPE;
+function isNonAdminVisibleIntegration(integration) {
+  return Boolean(integration.manifest) && NON_ADMIN_TYPES.includes(integration.manifest.type);
 }
 
 /**
  * @description Public view of an external integration, for a non-admin user.
  * A non-admin only needs to link their own account on a communication
- * integration: they get the display data (status + manifest, which is the
+ * integration, or to enable their own calendars on a calendar integration:
+ * they get the display data (status + manifest, which is the
  * public description published by the store), never the runtime fields of
  * the install — the resolved `docker_image`, the containers state, and above
  * all the webhook URLs, which embed the Gladys Plus Open API key. Note that
@@ -55,6 +59,45 @@ function toNonAdminView(integration) {
   };
 }
 
+/**
+ * @description Parse the `settings` of a widget instance out of the query
+ * string (URL-encoded JSON object). Absent → no settings; malformed or above
+ * the 1 KB budget → 422, like any other invalid setting.
+ * @param {object} query - The Express query.
+ * @returns {object} The raw settings object.
+ * @example
+ * const settings = parseWidgetSettings(req.query);
+ */
+function parseWidgetSettings(query) {
+  if (query.settings === undefined) {
+    return {};
+  }
+  if (typeof query.settings !== 'string' || query.settings.length > MAX_WIDGET_SETTINGS_BYTES) {
+    throw new Error422(`settings: must be a JSON object of at most ${MAX_WIDGET_SETTINGS_BYTES} bytes`);
+  }
+  try {
+    return JSON.parse(query.settings);
+  } catch (e) {
+    throw new Error422('settings: must be valid JSON');
+  }
+}
+
+/**
+ * @description The preferences of the requesting user that the widget path
+ * sends to the integration — server-derived from the session, never taken
+ * from the query.
+ * @param {object} req - The Express request.
+ * @returns {object} { language, units }.
+ * @example
+ * const preferences = getUserPreferences(req);
+ */
+function getUserPreferences(req) {
+  return {
+    language: req.user.language,
+    units: req.user.distance_unit_preference,
+  };
+}
+
 module.exports = function ExternalIntegrationController(gladys) {
   /**
    * @api {get} /api/v1/external_integration getAll
@@ -71,7 +114,8 @@ module.exports = function ExternalIntegrationController(gladys) {
    *     "docker_image": "ghcr.io/john/gladys-open-meteo-demo:1.2.0",
    *     "store_slug": null,
    *     "manifest": {},
-   *     "update_available": false
+   *     "update_available": false,
+   *     "latest_version": null
    *   }
    * ]
    * @apiDescription A non-admin user only gets the installed communication
@@ -81,10 +125,31 @@ module.exports = function ExternalIntegrationController(gladys) {
   async function getAll(req, res) {
     const integrations = await gladys.externalIntegration.get();
     if (!isAdmin(req)) {
-      res.json(integrations.filter(isCommunicationIntegration).map(toNonAdminView));
+      res.json(integrations.filter(isNonAdminVisibleIntegration).map(toNonAdminView));
       return;
     }
     res.json(integrations);
+  }
+
+  /**
+   * @api {get} /api/v1/external_integration/scene getSceneDeclarations
+   * @apiName getSceneDeclarations
+   * @apiGroup ExternalIntegration
+   * @apiDescription The scene triggers and actions declared by the installed
+   * integrations, for the scene editor. Open to every authenticated user:
+   * the editor is reachable by every role (only saving is admin) and the
+   * payload carries nothing operational.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "integrations": [
+   *     { "selector": "ext-frigate", "name": "Frigate",
+   *       "status": "RUNNING", "scene_triggers": [ ], "scene_actions": [ ] }
+   *   ]
+   * }
+   */
+  async function getSceneDeclarations(req, res) {
+    const integrations = await gladys.externalIntegration.getSceneDeclarations();
+    res.json({ integrations });
   }
 
   /**
@@ -101,7 +166,7 @@ module.exports = function ExternalIntegrationController(gladys) {
   async function getBySelector(req, res) {
     const integration = await gladys.externalIntegration.getBySelector(req.params.selector);
     if (!isAdmin(req)) {
-      if (!isCommunicationIntegration(integration)) {
+      if (!isNonAdminVisibleIntegration(integration)) {
         // the exact error of an unknown selector: a non-admin cannot tell
         // "it exists but it is not for you" from "it does not exist"
         throw new NotFoundError('EXTERNAL_INTEGRATION_NOT_FOUND');
@@ -113,6 +178,7 @@ module.exports = function ExternalIntegrationController(gladys) {
     res.json({
       ...integration,
       update_available: gladys.externalIntegration.isUpdateAvailable(integration),
+      latest_version: gladys.externalIntegration.getLatestVersion(integration),
       connection_status: gladys.externalIntegration.getConnectionStatus(integration.id),
       started_at: await gladys.externalIntegration.getContainerStartedAt(integration),
       docs: gladys.externalIntegration.getDocsUrls(integration),
@@ -335,6 +401,101 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/external_integration/widget getWidgets
+   * @apiName getWidgets
+   * @apiGroup ExternalIntegration
+   * @apiDescription The dashboard widgets declared by every installed
+   * integration, for the box picker: open to every authenticated user, the
+   * declaration plus the integration status (the one operational field a
+   * dashboard needs to show a stopped integration as stopped).
+   * @apiSuccessExample {json} Success-Example
+   * [
+   *   {
+   *     "integration_selector": "ext-tmdb",
+   *     "integration_name": "TMDB",
+   *     "integration_status": "RUNNING",
+   *     "key": "upcoming_releases",
+   *     "label": { "en": "Upcoming releases" },
+   *     "description": { "en": "Movies coming to theaters." },
+   *     "icon": "film",
+   *     "settings": []
+   *   }
+   * ]
+   */
+  async function getWidgets(req, res) {
+    res.json(await gladys.externalIntegration.getWidgets());
+  }
+
+  /**
+   * @api {get} /api/v1/external_integration/:selector/widget/:key/content getWidgetContent
+   * @apiName getWidgetContent
+   * @apiGroup ExternalIntegration
+   * @apiParam {string} [settings] URL-encoded JSON object, the settings of the box instance.
+   * @apiDescription The normalized content of one widget instance, pulled
+   * from the integration and cached. 404 unknown integration or widget, 422
+   * on an invalid setting (naming the key), 400 REQUEST_TO_THIRD_PARTY_FAILED
+   * when the integration is unavailable or answered an invalid payload, 400
+   * WIDGET_CONTENT_VERSION_UNSUPPORTED on a content version this Gladys does
+   * not render, 429 beyond the per-integration pull bound.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "expires_at": "2026-09-18T09:12:30.000Z",
+   *   "content": { "version": 1, "components": [{ "type": "text", "variant": "heading", "text": "Hello" }] }
+   * }
+   */
+  async function getWidgetContent(req, res) {
+    const content = await gladys.externalIntegration.getWidgetContent(
+      req.params.selector,
+      req.params.key,
+      parseWidgetSettings(req.query),
+      getUserPreferences(req),
+    );
+    res.json(content);
+  }
+
+  /**
+   * @api {get} /api/v1/external_integration/:selector/image/:image_key getWidgetImage
+   * @apiName getWidgetImage
+   * @apiGroup ExternalIntegration
+   * @apiDescription An image declared by a widget content of the
+   * integration, served from the Gladys origin. 404 on a key declared in no
+   * cached content (nothing is sent to the integration).
+   * @apiSuccessExample {json} Success-Example
+   * { "image": "data:image/png;base64,iVBORw0KGgo..." }
+   */
+  async function getWidgetImage(req, res) {
+    const image = await gladys.externalIntegration.getWidgetImage(req.params.selector, req.params.image_key);
+    res.json({ image });
+  }
+
+  /**
+   * @api {post} /api/v1/external_integration/:selector/widget/:key/action/:action_key runWidgetAction
+   * @apiName runWidgetAction
+   * @apiGroup ExternalIntegration
+   * @apiParam {object} [settings] The settings of the box instance.
+   * @apiParam {object} [values] The values typed in the form of an action declaring `fields`.
+   * @apiDescription Run an action declared by a button of the widget's own
+   * content. The typed values are validated against the action's `fields`
+   * (422 naming `values.<key>`). 404 on an action absent from that content (nothing is sent to
+   * the integration), 429 beyond 30 actions per minute per integration, 400
+   * REQUEST_TO_THIRD_PARTY_FAILED on timeout, refusal or disconnection.
+   * @apiSuccessExample {json} Success-Example
+   * { "message": { "en": "Cleaning started" } }
+   */
+  async function runWidgetAction(req, res) {
+    const settings = req.body && req.body.settings !== undefined ? req.body.settings : {};
+    const result = await gladys.externalIntegration.runWidgetAction(
+      req.params.selector,
+      req.params.key,
+      req.params.action_key,
+      settings,
+      getUserPreferences(req),
+      req.body.values,
+    );
+    res.json(result);
+  }
+
+  /**
    * @api {post} /api/v1/external_integration/:selector/start start
    * @apiName start
    * @apiGroup ExternalIntegration
@@ -459,11 +620,72 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/external_integration/:selector/calendar/account getOwnCalendarAccount
+   * @apiName getOwnCalendarAccount
+   * @apiGroup ExternalIntegration
+   * @apiDescription The "My calendars" view of the CURRENT user on a
+   * calendar integration: enablement, account values (secrets never echoed
+   * back) and their calendars with the sync/shared toggles.
+   */
+  async function getOwnCalendarAccount(req, res) {
+    const view = await gladys.externalIntegration.getCalendarAccountForUser(req.params.selector, req.user.id);
+    res.json(view);
+  }
+
+  /**
+   * @api {post} /api/v1/external_integration/:selector/calendar/account saveOwnCalendarAccount
+   * @apiName saveOwnCalendarAccount
+   * @apiGroup ExternalIntegration
+   * @apiDescription Enable the integration for the CURRENT user and save
+   * their account values (partial merge validated against the
+   * account_schema; without one, config must be empty or omitted).
+   * Idempotent: also how account values are edited.
+   */
+  async function saveOwnCalendarAccount(req, res) {
+    const view = await gladys.externalIntegration.saveCalendarAccount(
+      req.params.selector,
+      req.user.id,
+      req.body.config,
+    );
+    res.json(view);
+  }
+
+  /**
+   * @api {delete} /api/v1/external_integration/:selector/calendar/account disableOwnCalendarAccount
+   * @apiName disableOwnCalendarAccount
+   * @apiGroup ExternalIntegration
+   * @apiDescription Disable the integration for the CURRENT user and
+   * destroy their calendars of this integration (explicit UI confirmation).
+   */
+  async function disableOwnCalendarAccount(req, res) {
+    const result = await gladys.externalIntegration.disableCalendarAccount(req.params.selector, req.user.id);
+    res.json(result);
+  }
+
+  /**
+   * @api {patch} /api/v1/external_integration/:selector/calendar/:calendar_selector updateOwnCalendar
+   * @apiName updateOwnCalendar
+   * @apiGroup ExternalIntegration
+   * @apiDescription Update the user-owned toggles (sync, shared — these two
+   * keys only) of one of the CURRENT user's calendars; sync false empties
+   * the events. Another user's calendar answers like an unknown one.
+   */
+  async function updateOwnCalendar(req, res) {
+    const calendar = await gladys.externalIntegration.updateUserCalendar(
+      req.params.selector,
+      req.user.id,
+      req.params.calendar_selector,
+      req.body,
+    );
+    res.json(calendar);
+  }
+
+  /**
    * @api {delete} /api/v1/external_integration/:selector destroy
    * @apiName destroy
    * @apiGroup ExternalIntegration
-   * @apiDescription Removes everything: container, devices, config
-   * variables and the t_service row.
+   * @apiDescription Removes everything: container, devices, calendars,
+   * config variables and the t_service row.
    */
   async function destroy(req, res) {
     await gladys.externalIntegration.uninstall(req.params.selector);
@@ -473,6 +695,7 @@ module.exports = function ExternalIntegrationController(gladys) {
   return Object.freeze({
     getAll: asyncMiddleware(getAll),
     getBySelector: asyncMiddleware(getBySelector),
+    getSceneDeclarations: asyncMiddleware(getSceneDeclarations),
     getHardware: asyncMiddleware(getHardware),
     setHardware: asyncMiddleware(setHardware),
     getStore: asyncMiddleware(getStore),
@@ -487,6 +710,10 @@ module.exports = function ExternalIntegrationController(gladys) {
     getOAuthAuthorizeUrl: asyncMiddleware(getOAuthAuthorizeUrl),
     oauthCallback: asyncMiddleware(oauthCallback),
     runAction: asyncMiddleware(runAction),
+    getWidgets: asyncMiddleware(getWidgets),
+    getWidgetContent: asyncMiddleware(getWidgetContent),
+    getWidgetImage: asyncMiddleware(getWidgetImage),
+    runWidgetAction: asyncMiddleware(runWidgetAction),
     start: asyncMiddleware(start),
     stop: asyncMiddleware(stop),
     restart: asyncMiddleware(restart),
@@ -497,6 +724,10 @@ module.exports = function ExternalIntegrationController(gladys) {
     getOwnContactProfile: asyncMiddleware(getOwnContactProfile),
     saveOwnContactProfile: asyncMiddleware(saveOwnContactProfile),
     deleteOwnContactProfile: asyncMiddleware(deleteOwnContactProfile),
+    getOwnCalendarAccount: asyncMiddleware(getOwnCalendarAccount),
+    saveOwnCalendarAccount: asyncMiddleware(saveOwnCalendarAccount),
+    disableOwnCalendarAccount: asyncMiddleware(disableOwnCalendarAccount),
+    updateOwnCalendar: asyncMiddleware(updateOwnCalendar),
     destroy: asyncMiddleware(destroy),
   });
 };

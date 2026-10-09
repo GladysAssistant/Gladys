@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 
 import { RequestStatus } from '../../../../../../utils/consts';
+import { ADAPTER_MODE } from '../constants';
 
 import SetupLocalOptions from './SetupLocalOptions';
 import SetupLocalSummary from './SetupLocalSummary';
@@ -28,8 +29,13 @@ class SetupLocalMode extends Component {
 
     const { configuration = {} } = props;
 
+    const coordinatorConfigured =
+      configuration.z2mAdapterMode === ADAPTER_MODE.NETWORK
+        ? Boolean(configuration.z2mNetworkAdapterUrl)
+        : Boolean(configuration.z2mDriverPath);
+
     this.state = {
-      editionMode: !configuration.z2mDriverPath
+      editionMode: !coordinatorConfigured
     };
   }
 

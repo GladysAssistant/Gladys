@@ -1,4 +1,4 @@
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 import { Component } from 'preact';
 import DatePicker from 'react-datepicker';
 import { connect } from 'unistore/preact';
@@ -7,11 +7,14 @@ import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import datePickerStyle from '../../../../components/datePicker.css';
 import style from './CheckTime.css';
 
-import fr from 'date-fns/locale/fr';
+import { fr, de, es } from 'date-fns/locale';
 
 const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+const LOCALES = { fr, de, es };
 
 class CheckTime extends Component {
   handleBeforeTimeChange = time => {
@@ -30,7 +33,7 @@ class CheckTime extends Component {
   render() {
     const language = get(this.props, 'user.language');
     const { path } = this.props;
-    const localeSet = language === 'fr' ? fr : 'en';
+    const localeSet = LOCALES[language] || 'en';
     const before = this.props.action.before
       ? new Date().setHours(this.props.action.before.substr(0, 2), this.props.action.before.substr(3, 2))
       : null;
@@ -63,6 +66,8 @@ class CheckTime extends Component {
                 <DatePicker
                   selected={after}
                   className="form-control"
+                  popperClassName={datePickerStyle.datePickerPopper}
+                  portalId="scene-editor-datepicker"
                   clearButtonClassName={style.clearButtonCustom}
                   locale={localeSet}
                   onChange={this.handleBeforeAfterChange}
@@ -86,6 +91,8 @@ class CheckTime extends Component {
                 <DatePicker
                   selected={before}
                   className="form-control"
+                  popperClassName={datePickerStyle.datePickerPopper}
+                  portalId="scene-editor-datepicker"
                   clearButtonClassName={style.clearButtonCustom}
                   locale={localeSet}
                   onChange={this.handleBeforeTimeChange}

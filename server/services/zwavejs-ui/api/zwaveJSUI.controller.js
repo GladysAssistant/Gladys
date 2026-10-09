@@ -67,10 +67,13 @@ module.exports = function ZwaveJSUIController(zwaveJSUIHandler) {
     },
     'post /api/v1/service/zwavejs-ui/configuration': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(saveConfiguration),
     },
+    // returns the Z-Wave JS UI broker URL, username and password in clear
     'get /api/v1/service/zwavejs-ui/configuration': {
       authenticated: true,
+      admin: true,
       controller: asyncMiddleware(getConfiguration),
     },
     'post /api/v1/service/zwavejs-ui/connect': {

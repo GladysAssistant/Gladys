@@ -2,7 +2,8 @@ const db = require('../../models');
 const { SERVICE_TYPES } = require('../../utils/constants');
 
 /**
- * @description Get all external integrations, with the "update available" flag.
+ * @description Get all external integrations, with the "update available" flag
+ * and the latest version known for each of them.
  * @returns {Promise<Array>} Resolve with the list of external integrations.
  * @example
  * const integrations = await gladys.externalIntegration.get();
@@ -20,6 +21,7 @@ async function get() {
     return {
       ...plainService,
       update_available: this.isUpdateAvailable(plainService),
+      latest_version: this.getLatestVersion(plainService),
     };
   });
 }

@@ -1,158 +1,108 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import config from '../../config';
+import { USER_ROLE } from '../../../../server/utils/constants';
 
+import ChipsScroll from '../../components/chips-scroll';
+import style from './style.css';
+import dashboardStyle from '../dashboard/style.css';
+
+const MENU_ITEMS = [
+  { href: '/dashboard/settings/house', icon: 'home', textId: 'settings.housesTab' },
+  { href: '/dashboard/settings/user', icon: 'user', textId: 'settings.usersTab', matchPrefix: true },
+  { href: '/dashboard/settings/session', icon: 'smartphone', textId: 'settings.sessionsTab' },
+  { href: '/dashboard/settings/security', icon: 'shield', textId: 'settings.securityTab', gatewayOnly: true },
+  { href: '/dashboard/settings/gateway', icon: 'globe', textId: 'settings.gatewayTab', adminOnly: true },
+  { href: '/dashboard/settings/gateway-users', icon: 'user', textId: 'settings.gatewayUsersTab', gatewayOnly: true },
+  {
+    href: '/dashboard/settings/gateway-open-api',
+    icon: 'globe',
+    textId: 'settings.gatewayOpenApiTab',
+    gatewayOnly: true
+  },
+  { href: '/dashboard/settings/billing', icon: 'credit-card', textId: 'settings.billingTab', gatewayOnly: true },
+  { href: '/dashboard/settings/backup', icon: 'database', textId: 'settings.backupTab', adminOnly: true },
+  { href: '/dashboard/settings/jobs', icon: 'cpu', textId: 'settings.jobsTab', adminOnly: true },
+  { href: '/dashboard/settings/service', icon: 'grid', textId: 'settings.serviceTab' },
+  { href: '/dashboard/settings/system', icon: 'power', textId: 'settings.systemTab', adminOnly: true }
+];
+
+// `adminOnly` marks the tabs whose API is reserved to admins: the system
+// settings and the backup key are instance-wide, the Gladys Plus status and the
+// background jobs are admin routes of their own. A non-admin used to reach them
+// and land on error states. Hiding the entry mirrors the app nav
+// (components/header), the server stays the authority on a deep link.
+// The settings live on the same Horizon glass scene as the dashboard: the
+// global .glass-theme class gates the shared theme layer (cards, alerts,
+// badges, buttons), .settings-page scopes the settings-only pass (style.css
+// next to this file), and the wallpaper reuses the dashboard's default scene.
+// Navigation is a horizontal frosted pill row (the dashboard switcher's
+// grammar) — with the app nav in the left rail, a second vertical menu was
+// redundant and cost a quarter of the content width. Labels are kept at
+// every width (several entries share an icon); instead of wrapping into a
+// tall block on phones, the row rides the shared Horizon chips scroller
+// (history filters' pattern): sideways scroll, an arrow on each side only
+// while entries remain past that edge. The scroller is opted into through
+// the extra .settingsTabsScroller class — .settingsTabs alone stays the
+// plain wrapping pill grammar the signup progress row also composes on.
 const DashboardSettings = ({ children, ...props }) => (
   <div class="page">
-    <div class="page-main">
-      <div class="my-3 my-md-5">
+    <div
+      class={cx(
+        'page-main',
+        'glass-theme',
+        'settings-page',
+        dashboardStyle.dashboardBackground,
+        dashboardStyle.glassScene
+      )}
+    >
+      {/* padding, not margin: a top margin collapses through the glass
+          page-main and shifts the scene down (same move as new-dashboard) */}
+      <div class="py-3 py-md-5">
         <div class="container">
-          <div class="row">
-            <div class="col-lg-3">
-              <h3 class="page-title mb-5">
-                <Text id="settings.title" />
-              </h3>
-              <div>
-                <div class="list-group list-group-transparent mb-0">
-                  <Link
-                    href="/dashboard/settings/house"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-home" />
-                    </span>
-                    <Text id="settings.housesTab" />
-                  </Link>
+          <h3 class={cx('page-title', 'mb-3', style.settingsTitle)}>
+            <Text id="settings.title" />
+          </h3>
+          <ChipsScroll
+            wrapperClass={style.settingsTabsWrapper}
+            scrollerClass={cx(style.settingsTabs, style.settingsTabsScroller)}
+            leftButtonClass={cx(style.tabsScrollBtn, style.tabsScrollBtnLeft)}
+            rightButtonClass={cx(style.tabsScrollBtn, style.tabsScrollBtnRight)}
+            scrollLeftLabel={<Text id="settings.scrollLeft" />}
+            scrollRightLabel={<Text id="settings.scrollRight" />}
+            activeSelector={`.${style.tabLinkActive}`}
+            activeKey={props.currentUrl}
+          >
+            {MENU_ITEMS.filter(
+              item =>
+                (!item.gatewayOnly || config.gatewayMode) &&
+                (!item.adminOnly || (props.user && props.user.role === USER_ROLE.ADMIN))
+            ).map(item => (
+              <Link
+                key={item.href}
+                href={item.href}
+                activeClassName={style.tabLinkActive}
+                class={cx(style.tabLink, {
+                  [style.tabLinkActive]: item.matchPrefix && props.currentUrl && props.currentUrl.startsWith(item.href)
+                })}
+              >
+                <i class={`fe fe-${item.icon}`} />
+                <span>
+                  <Text id={item.textId} />
+                </span>
+              </Link>
+            ))}
+          </ChipsScroll>
 
-                  <Link
-                    href="/dashboard/settings/user"
-                    activeClassName="active"
-                    class={cx('list-group-item list-group-item-action d-flex align-items-center', {
-                      active: props.currentUrl && props.currentUrl.startsWith('/dashboard/settings/user')
-                    })}
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-user" />
-                    </span>
-                    <Text id="settings.usersTab" />
-                  </Link>
-
-                  <Link
-                    href="/dashboard/settings/session"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-smartphone" />
-                    </span>
-                    <Text id="settings.sessionsTab" />
-                  </Link>
-
-                  <Link
-                    href="/dashboard/settings/gateway"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-globe" />
-                    </span>
-                    <Text id="settings.gatewayTab" />
-                  </Link>
-
-                  {config.gatewayMode && (
-                    <Link
-                      href="/dashboard/settings/gateway-users"
-                      activeClassName="active"
-                      class="list-group-item list-group-item-action d-flex align-items-center"
-                    >
-                      <span class="icon mr-3">
-                        <i class="fe fe-user" />
-                      </span>
-                      <Text id="settings.gatewayUsersTab" />
-                    </Link>
-                  )}
-
-                  {config.gatewayMode && (
-                    <Link
-                      href="/dashboard/settings/gateway-open-api"
-                      activeClassName="active"
-                      class="list-group-item list-group-item-action d-flex align-items-center"
-                    >
-                      <span class="icon mr-3">
-                        <i class="fe fe-globe" />
-                      </span>
-                      <Text id="settings.gatewayOpenApiTab" />
-                    </Link>
-                  )}
-
-                  {config.gatewayMode && (
-                    <Link
-                      href="/dashboard/settings/billing"
-                      activeClassName="active"
-                      class="list-group-item list-group-item-action d-flex align-items-center"
-                    >
-                      <span class="icon mr-3">
-                        <i class="fe fe-credit-card" />
-                      </span>
-                      <Text id="settings.billingTab" />
-                    </Link>
-                  )}
-
-                  <Link
-                    href="/dashboard/settings/backup"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-database" />
-                    </span>
-                    <Text id="settings.backupTab" />
-                  </Link>
-
-                  <Link
-                    href="/dashboard/settings/jobs"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-cpu" />
-                    </span>
-                    <Text id="settings.jobsTab" />
-                  </Link>
-
-                  <Link
-                    href="/dashboard/settings/service"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-grid" />
-                    </span>
-                    <Text id="settings.serviceTab" />
-                  </Link>
-
-                  <Link
-                    href="/dashboard/settings/system"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-power" />
-                    </span>
-                    <Text id="settings.systemTab" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-9">{children}</div>
-          </div>
+          {children}
         </div>
       </div>
     </div>
   </div>
 );
 
-export default DashboardSettings;
+// connected rather than fed by its callers: the layout is rendered from sixteen
+// settings pages, none of which pass the user down
+export default connect('user', {})(DashboardSettings);

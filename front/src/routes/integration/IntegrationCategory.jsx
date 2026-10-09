@@ -9,7 +9,7 @@ const getImgClass = integration =>
     integration.whiteBackground ? 'white-bg' : ''
   }`.trim();
 
-const IntegrationTags = ({ integration }) => (
+const IntegrationTags = ({ integration, alwaysShowStatus }) => (
   <div class="integration-tags mt-2">
     {/* first weeks of a community integration in the store index: the badge
         answers "what's new?" at a glance, the "Newest first" sort gathers them */}
@@ -31,7 +31,7 @@ const IntegrationTags = ({ integration }) => (
         <Text id="integration.tags.external" />
       </span>
     )}
-    {integration.external && isNoteworthyExternalIntegrationStatus(integration.status) && (
+    {integration.external && (alwaysShowStatus || isNoteworthyExternalIntegrationStatus(integration.status)) && (
       <StatusBadge status={integration.status} className="integration-tag" />
     )}
     {/* icon only: the label is the longest of the whole row, and the catalog
@@ -111,7 +111,7 @@ const IntegrationDescription = ({ integration }) =>
     <Text id={`integration.${integration.key}.description`} />
   );
 
-export const IntegrationListItem = ({ integration, toggleFavorite }) => (
+export const IntegrationListItem = ({ integration, toggleFavorite, alwaysShowStatus }) => (
   <div class={`list-group-item ${style.integrationListItem}`}>
     <div class={style.integrationListRow}>
       <ScrollToTopLink href={integration.url}>
@@ -138,7 +138,7 @@ export const IntegrationListItem = ({ integration, toggleFavorite }) => (
         <div class={`text-muted small ${style.integrationListDescription}`}>
           <IntegrationDescription integration={integration} />
         </div>
-        <IntegrationTags integration={integration} />
+        <IntegrationTags integration={integration} alwaysShowStatus={alwaysShowStatus} />
       </ScrollToTopLink>
       <div class={style.integrationListFavorite}>
         <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />
@@ -147,7 +147,7 @@ export const IntegrationListItem = ({ integration, toggleFavorite }) => (
   </div>
 );
 
-const IntegrationCategory = ({ integration, toggleFavorite }) => (
+const IntegrationCategory = ({ integration, toggleFavorite, alwaysShowStatus }) => (
   <div class="col-sm-6 col-lg-4">
     <div class="card">
       <div class="card-img-container">
@@ -177,7 +177,7 @@ const IntegrationCategory = ({ integration, toggleFavorite }) => (
         <div class="text-muted">
           <IntegrationDescription integration={integration} />
         </div>
-        <IntegrationTags integration={integration} />
+        <IntegrationTags integration={integration} alwaysShowStatus={alwaysShowStatus} />
       </div>
     </div>
   </div>

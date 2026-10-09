@@ -39,6 +39,8 @@ function mapUnit(deviceUnit, featureUnit) {
       return DEVICE_FEATURE_UNITS.LITER;
     case 's':
       return DEVICE_FEATURE_UNITS.SECONDS;
+    case 'min':
+      return DEVICE_FEATURE_UNITS.MINUTES;
     default:
       return featureUnit || null;
   }

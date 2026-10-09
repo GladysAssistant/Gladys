@@ -3,6 +3,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import StatusBadge from '../components/StatusBadge';
+import VersionLink, { VersionSentence } from '../components/VersionLink';
 import { getGithubRepoUrl, getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import integrationText from '../integrationText.css';
@@ -68,6 +69,14 @@ const SupervisionCard = ({
   onCancelUninstall,
   onUninstall
 }) => {
+  // a contract priced by this integration stops being priced once it is uninstalled
+  const hasDelegatedContracts = ((integration && integration.manifest && integration.manifest.energy_contracts) || {})
+    .templates
+    ? integration.manifest.energy_contracts.templates.some(template => template.pricing_mode === 'delegated')
+    : false;
+  // uninstalling a calendar integration deletes the calendars of every user,
+  // a wider effect than the per-user disable: the warning says so
+  const isCalendar = Boolean(integration && integration.manifest && integration.manifest.type === 'calendar');
   const repoUrl = getGithubRepoUrl(integration.store_slug);
   const actionInProgress = actionStatus === RequestStatus.Getting;
   const subContainers = integration.containers || [];
@@ -101,19 +110,35 @@ const SupervisionCard = ({
             )}
             {updateResult && (
               <div class={cx('alert', updateResult.upToDate ? 'alert-info' : 'alert-success')}>
-                <Text
+                <VersionSentence
                   id={
                     updateResult.upToDate
                       ? 'integration.externalIntegration.supervision.alreadyUpToDateText'
                       : 'integration.externalIntegration.supervision.updateSuccessText'
                   }
                   fields={{ version: updateResult.version }}
+                  storeSlug={integration.store_slug}
+                  version={updateResult.version}
                 />
               </div>
             )}
             {integration.update_available && (
               <div class="alert alert-info">
-                <Text id="integration.externalIntegration.supervision.updateAvailableText" />
+                {/* the version number is what tells the user what the update actually brings; it is
+                    unknown only when the store index has not been read yet, hence the plain fallback */}
+                {integration.latest_version ? (
+                  // the offered version is the one "what changed?" is asked about, so it is the one
+                  // linked to its changelog here; the installed number repeated in the sentence stays
+                  // plain text, it is already a link in the details list below
+                  <VersionSentence
+                    id="integration.externalIntegration.supervision.updateAvailableVersionText"
+                    fields={{ latestVersion: integration.latest_version, currentVersion: integration.version }}
+                    storeSlug={integration.store_slug}
+                    version={integration.latest_version}
+                  />
+                ) : (
+                  <Text id="integration.externalIntegration.supervision.updateAvailableText" />
+                )}
               </div>
             )}
             <dl class="row">
@@ -152,7 +177,9 @@ const SupervisionCard = ({
                 <dt class="col-5 col-sm-4">
                   <Text id="integration.externalIntegration.supervision.versionLabel" />
                 </dt>,
-                <dd class="col-7 col-sm-8">{integration.version}</dd>
+                <dd class="col-7 col-sm-8">
+                  <VersionLink storeSlug={integration.store_slug} version={integration.version} />
+                </dd>
               ]}
               {integration.docker_image && [
                 <dt class="col-5 col-sm-4">
@@ -249,8 +276,17 @@ const SupervisionCard = ({
             {askingUninstall && (
               <div class="alert alert-danger mt-4">
                 <p>
-                  <Text id="integration.externalIntegration.supervision.uninstallWarning" />
+                  {isCalendar ? (
+                    <Text id="integration.externalIntegration.supervision.uninstallCalendarWarning" />
+                  ) : (
+                    <Text id="integration.externalIntegration.supervision.uninstallWarning" />
+                  )}
                 </p>
+                {hasDelegatedContracts && (
+                  <p>
+                    <Text id="integration.externalIntegration.supervision.uninstallEnergyWarning" />
+                  </p>
+                )}
                 <div class="btn-list mb-0">
                   <button class="btn btn-danger" onClick={onUninstall}>
                     <i class="fe fe-trash-2 mr-1" />

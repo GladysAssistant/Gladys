@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
-import Select from 'react-select';
+import Select from '../../form/Select';
 import { connect } from 'unistore/preact';
 
 import BaseEditBox from '../baseEditBox';

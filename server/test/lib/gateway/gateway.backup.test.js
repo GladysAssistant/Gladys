@@ -8,6 +8,7 @@ const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 const db = require('../../../models');
 const getConfig = require('../../../utils/getConfig');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { Error402 } = require('../../../utils/httpErrors');
 
 const { fake, assert } = sinon;
 const Gateway = proxyquire('../../../lib/gateway', {
@@ -73,7 +74,7 @@ describe('gateway.backup', async function describe() {
       { language: 'en', selector: 'toto-en' },
     ]);
 
-    message.sendToUser = fake.returns(null);
+    message.sendSystemMessage = fake.returns(null);
     brain.getReply = fake.returns('Backup failed!');
 
     gateway = new Gateway(variable, event, system, sequelize, config, user, {}, {}, job, scheduler, message, brain);
@@ -130,8 +131,8 @@ describe('gateway.backup', async function describe() {
     assert.calledWith(brain.getReply, 'en', 'backup.fail', {
       errorMessage: 'Error: error',
     });
-    assert.calledWith(message.sendToUser, 'toto-fr', 'Backup failed!');
-    assert.calledWith(message.sendToUser, 'toto-en', 'Backup failed!');
+    assert.calledWith(message.sendSystemMessage, 'toto-fr', 'Backup failed!');
+    assert.calledWith(message.sendSystemMessage, 'toto-en', 'Backup failed!');
   });
 
   it('should backup gladys with lots of insert at the same time', async () => {
@@ -164,6 +165,19 @@ describe('gateway.backup', async function describe() {
     assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
     assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
     assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
+  });
+
+  it('should not backup while the Gladys Plus subscription is not paid', async () => {
+    gateway.subscriptionActive = false;
+
+    try {
+      await gateway.backup();
+      assert.fail();
+    } catch (e) {
+      expect(e).instanceOf(Error402);
+    }
+    assert.notCalled(gateway.gladysGatewayClient.initializeMultiPartBackup);
+    assert.notCalled(message.sendSystemMessage);
   });
 
   it('should not backup, no backup key found', async () => {

@@ -9,6 +9,8 @@ describe('dashboard.getBySelector', () => {
     const testDashboard = await dashboard.getBySelector('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard');
     expect(testDashboard).to.have.property('name', 'Test dashboard');
     expect(testDashboard).to.have.property('selector', 'test-dashboard');
+    // the dashboard is stored with the legacy column-based shape, it is normalized on read
+    expect(testDashboard.boxes).to.deep.equal([{ columns: [[{ type: 'weather' }]] }]);
   });
   it('should return public dashboard (not created by me)', async () => {
     const publicDashboard = await dashboard.create('7a137a56-069e-4996-8816-36558174b727', {

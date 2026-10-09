@@ -13,11 +13,13 @@ const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 /**
  * @description Queue an energy cost calculation from a date.
  * @param {Date|string} startAt - Start date or ISO date string.
+ * @param {object} [options] - Options forwarded to calculateCostFrom.
+ * @param {Array<string>} [options.deviceIds] - Only recalculate cost for these device ids.
  * @returns {Promise<null>} Return when finished.
  * @example
  * calculateCostFromDate('2026-07-19');
  */
-async function calculateCostFromDate(startAt) {
+async function calculateCostFromDate(startAt, options = {}) {
   return queueWrapper(this.queue, async () => {
     let normalizedStartAt = new Date(startAt);
 
@@ -29,7 +31,7 @@ async function calculateCostFromDate(startAt) {
         .toDate();
     }
 
-    await this.calculateCostFrom(normalizedStartAt);
+    await this.calculateCostFrom(normalizedStartAt, null, options);
   });
 }
 

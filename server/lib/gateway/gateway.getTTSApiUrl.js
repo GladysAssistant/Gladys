@@ -13,7 +13,7 @@ const { Error403, Error429 } = require('../../utils/httpErrors');
  */
 async function getTTSApiUrl(body) {
   try {
-    const response = await this.gladysGatewayClient.ttsGetToken(body);
+    const response = await this.callPlanGatedApi(() => this.gladysGatewayClient.ttsGetToken(body));
     return response;
   } catch (e) {
     logger.warn(e);

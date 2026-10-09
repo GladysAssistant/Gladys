@@ -35,6 +35,9 @@ async function destroy(selector) {
   await existingScene.destroy();
   // check if scene had sunrise/sunset triggers before deleting from RAM
   const hadSunriseSunset = this.scenes[selector] && hasSunriseSunsetTrigger(this.scenes[selector]);
+  // in-flight executions hold their own copy of the scene, so deleting it is
+  // not enough to interrupt them
+  this.stopBySelector(selector);
   // we cancel triggers linked to the scene
   this.cancelTriggers(selector);
   // then we delete the scene in RAM

@@ -12,7 +12,7 @@ const {
   AI_CHAT_PURPOSES,
   AI_CHAT_TOOL_CATEGORIES,
 } = require('../../utils/constants');
-const { Error429 } = require('../../utils/httpErrors');
+const { Error402, Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
 const { exchangesToApiMessages } = require('../message/message.getPreviousQuestionsForUser');
@@ -805,6 +805,11 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     const requestErrorMessage = e && e.message ? e.message : e;
     logger.warn(`[AI_CHAT] Request failed: ${requestErrorMessage}`);
     logger.warn(e);
+    if (e instanceof Error402) {
+      await this.message.replyByIntent(message, 'gateway.payment-required', context);
+      // the voice assistant needs the signal too, on top of the chat reply
+      return { answer: '', imagesSent: 0, paymentRequired: true };
+    }
     if (e instanceof Error429) {
       await this.message.replyByIntent(message, 'openai.request.tooManyRequests', context);
     } else {

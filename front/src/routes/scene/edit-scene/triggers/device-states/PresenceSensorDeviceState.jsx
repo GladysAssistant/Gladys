@@ -1,5 +1,8 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
+
+import style from '../style.css';
 
 class PresenceSensorDeviceState extends Component {
   componentWillMount() {
@@ -22,8 +25,8 @@ class PresenceSensorDeviceState extends Component {
 
   render() {
     return (
-      <div class="col-6">
-        <button class="btn btn-block btn-secondary" disabled>
+      <div class="col-6 d-flex">
+        <button class={cx('btn', 'btn-block', 'btn-secondary', style.deviceStateButton)} disabled>
           <Text id="editScene.triggersCard.newState.deviceSeen" />
         </button>
       </div>

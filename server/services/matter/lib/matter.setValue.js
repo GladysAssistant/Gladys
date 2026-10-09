@@ -8,9 +8,10 @@ const {
   RvcOperationalState,
   RvcRunMode,
   RvcCleanMode,
+  DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
-const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
+const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE, LOCK } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
 const logger = require('../../../utils/logger');
 const {
@@ -102,7 +103,11 @@ async function setValue(gladysDevice, gladysFeature, value) {
   }
 
   // Handle binary device
-  if (gladysFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
+  // Locks share the same "binary" type, but they are controlled through the DoorLock cluster below
+  if (
+    gladysFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
+    gladysFeature.category !== DEVICE_FEATURE_CATEGORIES.LOCK
+  ) {
     const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
 
     if (!onOff) {
@@ -135,6 +140,28 @@ async function setValue(gladysDevice, gladysFeature, value) {
       } else if (value === COVER_STATE.STOP) {
         await windowCovering.stopMotion();
       }
+    }
+  }
+
+  // Handle door locks
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.LOCK &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.LOCK.BINARY
+  ) {
+    const doorLock = targetDevice.getClusterClientById(DoorLock.Complete.id);
+    if (!doorLock) {
+      throw new Error('Device does not support DoorLock cluster');
+    }
+    // Number(null), Number('') and Number(false) all return 0, which would unlock the door:
+    // only a real number or the exact "0"/"1" strings are accepted as a lock command
+    const isBinaryCommandString = typeof value === 'string' && /^[01]$/.test(value);
+    const lockValue = typeof value === 'number' || isBinaryCommandString ? Number(value) : Number.NaN;
+    if (lockValue === LOCK.ACTION.LOCK) {
+      await doorLock.lockDoor({});
+    } else if (lockValue === LOCK.ACTION.UNLOCK) {
+      await doorLock.unlockDoor({});
+    } else {
+      throw new Error(`Unsupported lock command value: ${value}. Only 0 (unlock) and 1 (lock) are supported.`);
     }
   }
 

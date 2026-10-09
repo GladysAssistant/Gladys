@@ -80,4 +80,29 @@ describe('Camera.setImage', () => {
     const promise = deviceManager.camera.setImage('test-camera', bigImage);
     return assert.isRejected(promise, 'Image is too big');
   });
+  it('should not store the image of a disabled camera', async () => {
+    const stateManager = new StateManager(event);
+    const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('device', 'test-camera-disabled', {
+      features: [
+        {
+          id: '565d05fc-1736-4b76-99ca-581232901d96',
+          selector: 'test-camera-disabled',
+          category: 'camera',
+          type: 'enabled',
+          last_value: 0,
+        },
+        {
+          id: '0eb6a0f0-8c4b-4c4a-8c5d-6cd0f2b6ac3d',
+          selector: 'test-camera-disabled-image',
+          category: 'camera',
+          type: 'image',
+        },
+      ],
+    });
+    const promise = deviceManager.camera.setImage('test-camera-disabled', RANDOM_IMAGE);
+    await assert.isRejected(promise, 'Camera is disabled');
+    // The image was not stored, so turning the camera back on cannot reveal it
+    expect(stateManager.get('deviceFeature', 'test-camera-disabled-image')).to.equal(null);
+  });
 });

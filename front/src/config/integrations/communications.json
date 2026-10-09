@@ -48,6 +48,7 @@
     "img": "/assets/integrations/cover/free-mobile.jpg",
     "whiteBackground": true,
     "cloud": true,
+    "deprecated": true,
     "categories": ["notifications"]
   },
   {

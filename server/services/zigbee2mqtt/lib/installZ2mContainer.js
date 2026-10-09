@@ -2,10 +2,41 @@ const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 
 const logger = require('../../../utils/logger');
+const { ADAPTER_MODE } = require('./constants');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
 const sleep = promisify(setTimeout);
+
+// Fallback when the user has not set a timezone yet: this is the timezone the container would
+// have used anyway, so it never makes the clock of a device worse than it already is.
+const DEFAULT_TIMEZONE = 'UTC';
+
+/**
+ * @description Build the Zigbee2mqtt container descriptor to create.
+ * @param {string} containerPath - Path of the Z2M data folder on the host.
+ * @param {string} z2mDriverPath - Path of the Zigbee USB dongle on the host.
+ * @param {boolean} networkAdapter - Is the Zigbee coordinator reached over the network?
+ * @param {string} timezone - Timezone of the Gladys instance, as configured by the user.
+ * @returns {object} The container descriptor.
+ * @example
+ * const descriptor = buildContainerDescriptor('/data/z2m', '/dev/ttyUSB0', false, 'Europe/Paris');
+ */
+function buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter, timezone) {
+  const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+  containerDescriptorToMutate.HostConfig.Binds.push(`${containerPath}:/app/data`);
+  // The container shares neither /etc/localtime nor the TZ of the host, so without this it runs in
+  // UTC. Zigbee2mqtt answers the time requests of the devices with its own local time, so a clock
+  // displaying device (a Tuya sensor with a LCD, a thermostat...) would be off by the UTC offset.
+  containerDescriptorToMutate.Env.push(`TZ=${timezone || DEFAULT_TIMEZONE}`);
+  if (networkAdapter) {
+    // A network coordinator is reached over TCP, there is no USB device to pass through
+    containerDescriptorToMutate.HostConfig.Devices = [];
+  } else {
+    containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = z2mDriverPath;
+  }
+  return containerDescriptorToMutate;
+}
 
 /**
  * @description Install and starts Zigbee2mqtt container.
@@ -15,7 +46,9 @@ const sleep = promisify(setTimeout);
  * await z2m.installZ2mContainer(config);
  */
 async function installZ2mContainer(config, setupMode = false) {
-  const { z2mDriverPath } = config;
+  const { z2mDriverPath, z2mAdapterMode, timezone } = config;
+  const networkAdapter = z2mAdapterMode === ADAPTER_MODE.NETWORK;
+  const expectedDevicePath = networkAdapter ? null : z2mDriverPath;
   let creationNeeded = false;
 
   let dockerContainers = await this.gladys.system.getContainers({
@@ -25,14 +58,17 @@ async function installZ2mContainer(config, setupMode = false) {
   let [container] = dockerContainers;
 
   /*
-   * Manage case where Zigbee USB Dongle Path has changed by removing the container.
-   * It will be created with good config later
+   * Manage case where Zigbee coordinator has changed (USB dongle path, or switch from/to a network
+   * coordinator) by removing the container. It will be created with good config later
    */
   if (dockerContainers.length > 0) {
     const containerDescription = await this.gladys.system.inspectContainer(container.id);
-    if (containerDescription.HostConfig.Devices[0].PathOnHost !== z2mDriverPath) {
+    const [currentDevice] = containerDescription.HostConfig.Devices || [];
+    const currentDevicePath = currentDevice ? currentDevice.PathOnHost : null;
+    if (currentDevicePath !== expectedDevicePath) {
+      const newCoordinator = networkAdapter ? config.z2mNetworkAdapterUrl : z2mDriverPath;
       logger.info(
-        `Zigbee2mqtt container with USB dongle path ${containerDescription.HostConfig.Devices[0].PathOnHost} should be removed (new USB dongle path ${z2mDriverPath} configured)...`,
+        `Zigbee2mqtt container with USB dongle path ${currentDevicePath} should be removed (new Zigbee coordinator ${newCoordinator} configured)...`,
       );
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
@@ -72,10 +108,13 @@ async function installZ2mContainer(config, setupMode = false) {
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
       await this.gladys.system.pull(containerDescriptor.Image);
 
-      logger.info(`Configuration of Device ${z2mDriverPath}`);
-      const containerDescriptorToMutate = cloneDeep(containerDescriptor);
-      containerDescriptorToMutate.HostConfig.Binds.push(`${containerPath}:/app/data`);
-      containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = z2mDriverPath;
+      logger.info(`Configuration of Device ${networkAdapter ? config.z2mNetworkAdapterUrl : z2mDriverPath}`);
+      const containerDescriptorToMutate = buildContainerDescriptor(
+        containerPath,
+        z2mDriverPath,
+        networkAdapter,
+        timezone,
+      );
 
       logger.info(`Creation of container...`);
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
@@ -106,9 +145,12 @@ async function installZ2mContainer(config, setupMode = false) {
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
 
-      const containerDescriptorToMutate = cloneDeep(containerDescriptor);
-      containerDescriptorToMutate.HostConfig.Binds.push(`${containerPath}:/app/data`);
-      containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = z2mDriverPath;
+      const containerDescriptorToMutate = buildContainerDescriptor(
+        containerPath,
+        z2mDriverPath,
+        networkAdapter,
+        timezone,
+      );
       await this.gladys.system.createContainer(containerDescriptorToMutate);
 
       dockerContainers = await this.gladys.system.getContainers({

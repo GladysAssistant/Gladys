@@ -2,8 +2,9 @@ name: Release Gladys Production Images
 run-name: Release Gladys ${{ github.ref_name }} Production Image
 
 on:
-  # Dispatched on the new tag by the "Create release tag" workflow: a tag pushed
-  # with the default GITHUB_TOKEN does not trigger the `push` event below.
+  # Started by the push of the release tag (the "Create release tag" workflow
+  # pushes it with a deploy key, so the `push` event below does fire).
+  # workflow_dispatch stays for re-running a failed build on an existing tag.
   workflow_dispatch:
   push:
     tags:
@@ -13,9 +14,13 @@ jobs:
   test-front:
     name: Front test
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -44,10 +49,13 @@ jobs:
   test-server:
     name: Server test
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
         with:
+          persist-credentials: false
           fetch-depth: 2
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
@@ -82,7 +90,7 @@ jobs:
         working-directory: ./server
         run: npm audit --production --audit-level=critical || true
       - name: 📄 Codecov report upload
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
         with:
           fail_ci_if_error: true
           token: 08cd0d46-0291-42ed-b352-50924cb6cca6
@@ -99,9 +107,13 @@ jobs:
       - test-front
       - test-server
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -128,29 +140,51 @@ jobs:
     # branch a manual dispatch could have been started on.
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
-      DOCKERHUB_REPO: ${{secrets.DOCKERHUB_REPO}}
+      # The image name is not a secret: an environment variable of `production`.
+      DOCKERHUB_REPO: ${{vars.DOCKERHUB_REPO}}
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 🐳 Docker meta
         id: docker_meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4.6.0
         with:
-          images: ${{ secrets.DOCKERHUB_REPO }},ghcr.io/${{ secrets.DOCKERHUB_REPO }}
+          images: ${{ vars.DOCKERHUB_REPO }},ghcr.io/${{ vars.DOCKERHUB_REPO }}
           labels: |
             org.opencontainers.image.title=Gladys Assistant Production Image
+          # `latest` is pushed on every release: the default `auto` flavor,
+          # made explicit here, adds it on semver tags — and unlike
+          # `latest=true` it skips pre-release tags (v5.0.0-rc.1), just as the
+          # semver patterns below never move `v5` or `v4` on a pre-release.
+          flavor: |
+            latest=auto
+          # Every stable v5 release also feeds the moving `v4` tag: Gladys
+          # Assistant 5 is backward compatible, so v4 installations following
+          # that tag (Watchtower and the in-app upgrade both do) are upgraded
+          # to v5 automatically. The raw entry is guarded on v5 tags so a
+          # future breaking major stops feeding `v4` without needing to
+          # remember this, and excludes pre-release tags, which contain a `-`.
           tags: |
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}
+            type=raw,value=v4,enable=${{ startsWith(github.ref, 'refs/tags/v5.') && !contains(github.ref, '-') }}
             type=sha
       - name: 💽 Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@2b82ce82d56a2a04d2637cd93a637ae1b359c0a7 # v2.2.0
       - name: 🐳 Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2.10.0
         with:
           version: v0.9.1
       - name: ↙️ Download build artifact
@@ -159,18 +193,22 @@ jobs:
           name: static
           path: static
       - name: 🔑 Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: 🔑 Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      # The single-arch `v4-arm64v8` and `v4-amd64` tags, kept for
+      # installations predating multi-arch manifests, are abandoned with
+      # Gladys Assistant 5: they stay frozen on the last v4.x images, and the
+      # remaining installations have to be recreated on the `v4` tag.
       - name: 🐳 Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # v3.3.1
         with:
           context: .
           file: ./docker/Dockerfile.buildx
@@ -178,22 +216,138 @@ jobs:
           push: true
           pull: true
           tags: ${{ steps.docker_meta.outputs.tags }}
+          # ⚠️ The ONLY place where this build arg may be set, humans and AI
+          # agents alike: it marks the official release images, the only
+          # instances allowed to call Gladys Plus for the latest version
+          # check (which also sends usage statistics). Never copy it to
+          # another workflow (pull request or dev images), a docker run, a
+          # docker-compose or a .env file — see docker/Dockerfile.buildx.
+          build-args: |
+            GLADYS_OFFICIAL_RELEASE_IMAGE=true
           cache-from: type=registry,ref=${{ env.DOCKERHUB_REPO }}:latest
           cache-to: type=inline
-      - name: 🐳 Legacy Tags
-        run: |
-          export DIGESTARM64=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm64").value | .digest')
-          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64
-          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64 ${{ env.DOCKERHUB_REPO }}:v4-arm64v8
-          docker push ${{ env.DOCKERHUB_REPO }}:v4-arm64v8
-          export DIGESTAMD64=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "amd64").value | .digest')
-          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64
-          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64 ${{ env.DOCKERHUB_REPO }}:v4-amd64
-          docker push ${{ env.DOCKERHUB_REPO }}:v4-amd64
   publish-gladys-plus:
     name: Publish Gladys Plus front
     needs: docker
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     steps:
       - name: Run Cloudflare Pages deploy hook
-        run: curl -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}"
+        env:
+          DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}
+        # --fail-with-body turns an error answer of Cloudflare (an invalid or
+        # deleted hook, for instance) into a failed job instead of a green one.
+        run: curl --silent --show-error --fail-with-body -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${DEPLOY_HOOK}"
+  github-release:
+    name: Create the GitHub release
+    # Published once the production images are pushed: whoever is notified of
+    # the release (the watchers of the repository, the version published to
+    # Gladys Plus below) must be able to upgrade right away.
+    needs: docker
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    # Creating a release on the existing tag does not touch the tag itself, so
+    # the GITHUB_TOKEN is enough despite the tag ruleset. A release created by
+    # the GITHUB_TOKEN starts no workflow listening on `release` (there is
+    # none in this repository), but the repository webhooks still fire.
+    permissions:
+      contents: write
+    steps:
+      - name: 📝 Create the release with generated notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # A re-run on the same tag, or a release already written by hand,
+          # is left untouched.
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "Release ${TAG} already exists, nothing to do."
+            echo "- GitHub release [\`${TAG}\`](${GITHUB_SERVER_URL}/${GH_REPO}/releases/tag/${TAG}) already existed" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # Pre-release tags (v5.1.0-rc.1) are published as pre-releases, which
+          # never become the "Latest" release, just as they never move the
+          # `latest` image.
+          PRERELEASE=false
+          case "${TAG}" in
+            *-*) PRERELEASE=true ;;
+          esac
+          # Same result as "Generate release notes" in the GitHub interface:
+          # the merged pull requests since the previous release, their
+          # authors, the new contributors and the full changelog link.
+          gh release create "${TAG}" \
+            --verify-tag \
+            --title "${TAG}" \
+            --generate-notes \
+            --prerelease="${PRERELEASE}"
+          echo "- GitHub release [\`${TAG}\`](${GITHUB_SERVER_URL}/${GH_REPO}/releases/tag/${TAG}) created" >> "$GITHUB_STEP_SUMMARY"
+  publish-gladys-version:
+    name: Publish the version to Gladys Plus
+    # Runs once the production images are pushed: as soon as the version is
+    # published, the Gladys Plus backend tells every instance that it is the
+    # latest one, so the images it points to must already be available, and
+    # so must the GitHub release its release note link points to.
+    needs:
+      - docker
+      - github-release
+    # Pre-release tags (v5.1.0-rc.1) are built above, but they never move
+    # `latest`, so they must not become the version every instance is
+    # invited to upgrade to.
+    if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
+    steps:
+      - name: 🚀 Create the version on Gladys Plus
+        env:
+          # Base URL of the Gladys Plus backend (Gladys Gateway), without a
+          # trailing slash, e.g. https://api.gladysgateway.com
+          GLADYS_PLUS_BACKEND_URL: ${{ secrets.GLADYS_PLUS_BACKEND_URL }}
+          # Restricted admin API key of the Gladys Gateway, only allowed on
+          # POST /admin/api/gladys/versions
+          GLADYS_VERSION_API_KEY: ${{ secrets.GLADYS_VERSION_API_KEY }}
+          VERSION: ${{ github.ref_name }}
+          RELEASE_NOTE_LINK: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GLADYS_PLUS_BACKEND_URL}" ] || [ -z "${GLADYS_VERSION_API_KEY}" ]; then
+            echo "::error::The GLADYS_PLUS_BACKEND_URL and GLADYS_VERSION_API_KEY secrets are required to publish the version to Gladys Plus."
+            exit 1
+          fi
+          # The release note links can be changed afterwards from the Gladys
+          # Plus admin (PATCH /admin/api/gladys/versions/:id), for instance to
+          # point to the forum topic of the release once it is written.
+          BODY=$(jq -n --arg name "${VERSION}" --arg link "${RELEASE_NOTE_LINK}" \
+            '{ name: $name, default_release_note_link: $link }')
+          STATUS=$(curl --silent --show-error --output response.json --write-out "%{http_code}" \
+            --retry 3 --retry-connrefused --max-time 30 \
+            -X POST "${GLADYS_PLUS_BACKEND_URL%/}/admin/api/gladys/versions" \
+            -H "Content-Type: application/json" \
+            -H "X-Admin-Api-Key: ${GLADYS_VERSION_API_KEY}" \
+            --data "${BODY}")
+          cat response.json
+          echo
+          case "${STATUS}" in
+            201)
+              echo "Version ${VERSION} published to Gladys Plus."
+              echo "- Version \`${VERSION}\` published to Gladys Plus" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            409)
+              # Already published by a previous run of this workflow on the same tag.
+              echo "Version ${VERSION} was already published to Gladys Plus, nothing to do."
+              echo "- Version \`${VERSION}\` was already published to Gladys Plus" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            *)
+              echo "::error::Gladys Plus answered ${STATUS} while publishing version ${VERSION}."
+              exit 1
+              ;;
+          esac

@@ -60,6 +60,7 @@ describe('zigbee2mqtt reset', () => {
     zigbee2MqttManager.dockerBased = true;
     zigbee2MqttManager.networkModeValid = true;
     zigbee2MqttManager.usbConfigured = true;
+    zigbee2MqttManager.networkAdapterConfigured = true;
     zigbee2MqttManager.mqttExist = true;
     zigbee2MqttManager.mqttRunning = true;
     zigbee2MqttManager.zigbee2mqttExist = true;
@@ -69,6 +70,7 @@ describe('zigbee2mqtt reset', () => {
     zigbee2MqttManager.z2mPermitJoin = true;
     zigbee2MqttManager.coordinatorFirmware = '20240101';
     zigbee2MqttManager.z2mContainerError = { message: 'some error' };
+    zigbee2MqttManager.mqttConnectionError = { code: 'BAD_CREDENTIALS', message: null };
     zigbee2MqttManager.discoveredDevices = { '0x1234': { friendly_name: 'lamp' } };
     zigbee2MqttManager.topicBinds = { 'zigbee2mqtt/#': () => {} };
   });
@@ -84,13 +86,16 @@ describe('zigbee2mqtt reset', () => {
     assert.calledTwice(gladys.system.stopContainer);
     assert.calledTwice(gladys.system.removeContainer);
 
-    // Should destroy all 12 configuration variables
-    assert.callCount(gladys.variable.destroy, 12);
+    // Should destroy all 15 configuration variables
+    assert.callCount(gladys.variable.destroy, 15);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_BACKUP', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_MODE', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_TCP_PORT', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_ADAPTER_MODE', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_NETWORK_ADAPTER_URL', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_NETWORK_ADAPTER_TYPE', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_URL', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_PASSWORD', serviceId);
@@ -108,6 +113,7 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.discoveredDevices).to.deep.equal({});
     expect(zigbee2MqttManager.topicBinds).to.deep.equal({});
     expect(zigbee2MqttManager.usbConfigured).to.equal(false);
+    expect(zigbee2MqttManager.networkAdapterConfigured).to.equal(false);
     expect(zigbee2MqttManager.mqttExist).to.equal(false);
     expect(zigbee2MqttManager.mqttRunning).to.equal(false);
     expect(zigbee2MqttManager.mqttContainerRunning).to.equal(false);
@@ -118,6 +124,7 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
     expect(zigbee2MqttManager.coordinatorFirmware).to.equal(null);
     expect(zigbee2MqttManager.z2mContainerError).to.equal(null);
+    expect(zigbee2MqttManager.mqttConnectionError).to.equal(null);
 
     // Host environment properties should be preserved
     expect(zigbee2MqttManager.dockerBased).to.equal(true);
@@ -159,7 +166,7 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.mqttClient).to.equal(null);
 
     // Should destroy all variables
-    assert.callCount(gladys.variable.destroy, 12);
+    assert.callCount(gladys.variable.destroy, 15);
     assert.calledOnce(fsRmStub);
   });
 
@@ -172,7 +179,7 @@ describe('zigbee2mqtt reset', () => {
     await zigbee2MqttManager.reset();
 
     assert.calledOnce(cancelFake);
-    assert.callCount(gladys.variable.destroy, 12);
+    assert.callCount(gladys.variable.destroy, 15);
     assert.calledOnce(fsRmStub);
   });
 });

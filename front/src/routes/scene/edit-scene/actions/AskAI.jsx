@@ -1,4 +1,4 @@
-import Select from 'react-select';
+import Select from '../../../../components/form/Select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Localizer, Text } from 'preact-i18n';
@@ -7,6 +7,7 @@ import get from 'get-value';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
+import MessageServiceSelector from './MessageServiceSelector';
 
 class AskAI extends Component {
   getOptions = async () => {
@@ -165,6 +166,13 @@ class AskAI extends Component {
             classNamePrefix="react-select"
           />
         </div>
+        <MessageServiceSelector
+          value={props.action.service}
+          label={<Text id="editScene.actionsCard.messageSend.serviceLabel" />}
+          onChange={service => props.updateActionProperty(props.path, 'service', service)}
+        >
+          <Text id="editScene.actionsCard.messageSend.serviceExplanation" />
+        </MessageServiceSelector>
         <div class="form-group">
           <label className="form-label">
             <Text id="editScene.actionsCard.askAi.cameraLabel" />

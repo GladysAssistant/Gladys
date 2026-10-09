@@ -3,9 +3,11 @@ import { Text } from 'preact-i18n';
 
 import SettingsLayout from '../SettingsLayout';
 import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
+import GatewayRecoveryCodes from '../../../components/gateway/GatewayRecoveryCodes';
 import GatewayConfigureTwoFactor from './GatewayConfigureTwoFactor';
 import GatewayPricing from './GatewayPricing';
 import GatewayConfigured from './GatewayConfigured';
+import GatewayInstanceOfflineAlert from './GatewayInstanceOfflineAlert';
 import GatewayBackupKey from './GatewayBackupKey';
 import GatewayUsersList from './GatewayUsersList';
 import GatewayDisconnect from './GatewayDisconnect';
@@ -34,6 +36,11 @@ const GatewayPage = ({ children, ...props }) => (
     )}
     {props.displayConnectedSuccess && (
       <div class="row">
+        {props.gatewayLoginRecoveryCodes && (
+          <div class="col-md-6 offset-md-3">
+            <GatewayRecoveryCodes recoveryCodes={props.gatewayLoginRecoveryCodes} />
+          </div>
+        )}
         <div class="col-md-12">
           <GatewayConnectedSuccess
             gatewayBackupKey={props.gatewayBackupKey}
@@ -46,6 +53,9 @@ const GatewayPage = ({ children, ...props }) => (
       <div class="row">
         <div class="col-md-12">
           <GatewayConfigured {...props} />
+        </div>
+        <div class="col-md-12">
+          <GatewayInstanceOfflineAlert session={props.session} />
         </div>
         <div class="col-md-12">
           <GatewayUsersList {...props} />

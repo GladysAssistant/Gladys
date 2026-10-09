@@ -1,7 +1,7 @@
 const cloneDeep = require('lodash.clonedeep');
 
 const logger = require('../../utils/logger');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, ANY_CHANGE_OPERATOR } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
 
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
@@ -25,6 +25,51 @@ const matchWeatherAlert = (self, sceneSelector, event, trigger) =>
   WEATHER_ALERT_SEVERITY_RANK[event.alert.severity] >=
     (WEATHER_ALERT_SEVERITY_RANK[trigger.weather_alert_severity] || 1);
 
+// Filters left empty by the scene author are wildcards
+const isWildcardFilter = (expected) =>
+  expected === null || expected === undefined || expected === '' || (Array.isArray(expected) && expected.length === 0);
+
+// Scene trigger declared by an external integration: the integration fires a
+// typed event with data (POST /api/integration/v1/scene/event), the core
+// compares it with the filters the scene author configured. The matching
+// model is deliberately simple — equality and membership on the declared
+// fields — thresholds and durations belong to device features.
+// `event.filters` is complete by construction (every key currently declared,
+// null when absent from this event), so a stored key missing from it is a
+// filter removed by an update: stale, skipped without a manifest lookup.
+// On a match the checker returns the REDUCED trigger event the actions see
+// ({{triggerEvent.data.<key>}}): the matcher's filters never enter the scope.
+const matchExternalIntegrationSceneEvent = (self, sceneSelector, event, trigger) => {
+  if (event.integration !== trigger.integration || event.trigger_key !== trigger.trigger_key) {
+    return false;
+  }
+  const storedFields = trigger.fields || {};
+  const filters = event.filters || {};
+  const matched = Object.keys(storedFields).every((key) => {
+    const expected = storedFields[key];
+    const actual = filters[key];
+    if (actual === undefined || isWildcardFilter(expected)) {
+      return true;
+    }
+    if (actual === null) {
+      return false;
+    }
+    if (Array.isArray(expected)) {
+      return expected.includes(actual);
+    }
+    return actual === expected;
+  });
+  if (!matched) {
+    return false;
+  }
+  return {
+    type: event.type,
+    integration: event.integration,
+    trigger_key: event.trigger_key,
+    data: cloneDeep(event.data || {}),
+  };
+};
+
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
     // Multi-select triggers store their features in `device_features`, legacy triggers
@@ -39,6 +84,16 @@ const triggersFunc = {
         : [trigger.device_feature];
     if (!triggerDeviceFeatures.includes(event.device_feature)) {
       return false;
+    }
+
+    // "any change" trigger: no value is configured, the trigger fires as soon as the feature
+    // reports a value different from the previous one (a device re-sending the same value
+    // is not a state change). A change is instantaneous, so `threshold_only` (which only
+    // exists to de-duplicate a condition staying true) and `for_duration` (which waits for a
+    // condition to hold) have nothing to hold on to: they are ignored, and no timer is
+    // scheduled. The UI hides both options in that mode.
+    if (trigger.operator === ANY_CHANGE_OPERATOR) {
+      return compare(trigger.operator, event.last_value, event.previous_value);
     }
 
     // We verify if both old value and new value validate the rule
@@ -134,6 +189,11 @@ const triggersFunc = {
     event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
   [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,
   [EVENTS.WEATHER.ALERT_ENDED]: matchWeatherAlert,
+  // energy contract price change (spec 8.2): a trigger without a contract selector
+  // matches every contract, one with a selector only that contract
+  [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]: (self, sceneSelector, event, trigger) =>
+    !trigger.energy_contract || event.contract === trigger.energy_contract,
+  [EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT]: matchExternalIntegrationSceneEvent,
 };
 
 module.exports = {

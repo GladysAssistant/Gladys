@@ -82,7 +82,12 @@ function listSupportedModes(modeFeature, modeToHeatingCoolingState) {
   // a Matter cooling-only air conditioner reports cool, dry and fan — 1, 3 and 4 — so walking
   // min..max would offer HomeKit a heat mode the device cannot honour, and SET would write it.
   // min/max are only a fallback for integrations that declare no options.
-  if (modeFeature.supported_options) {
+  //
+  // The length matters: a device loaded from the database always carries the association, so a
+  // feature with no declared option arrives as an empty array rather than undefined. Treating that
+  // as a declaration of "no mode at all" left an air conditioner with an on/off command — MELCloud,
+  // among others — with Off as its only valid HomeKit state, so the Home app could not turn it on.
+  if (modeFeature.supported_options && modeFeature.supported_options.length > 0) {
     return modeFeature.supported_options.map(({ value }) => value);
   }
   return Object.keys(modeToHeatingCoolingState)
@@ -174,6 +179,10 @@ function bindThresholdCharacteristic(service, characteristicType, feature, helpe
  * Unlike the other categories, a thermostat is built from features of several Gladys categories at
  * once (the setpoints, the mode, the on/off command and the temperature sensor of the same device),
  * so the whole service is wired here instead of feature by feature.
+ * The air conditioning features are handled here only on a device carrying thermostat features next
+ * to them, such as a Matter heat pump. An air conditioner on its own is a HeaterCooler, see
+ * buildHeaterCoolerService: a Thermostat is only ever on by being in a mode, and the mode Siri picks
+ * for "turn on" is Auto, which on an air conditioner can mean heating.
  * @param {object} service - HomeKit Thermostat service to fill.
  * @param {object} device - Gladys device exposed as this thermostat.
  * @param {object} features - Device features merged into the thermostat service.
@@ -435,6 +444,7 @@ function buildThermostatService(service, device, features) {
 module.exports = {
   buildThermostatService,
   buildValidTargetStates,
+  listSupportedModes,
   toCelsius,
   fromCelsius,
 };

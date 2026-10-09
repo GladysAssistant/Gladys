@@ -19,8 +19,8 @@ const HOME_ASSISTANT = {
 };
 
 // MQTT wildcards. They are only valid in a subscription filter, never in a concrete topic, so a
-// discovery payload advertising one as a state or command topic is malformed: subscribing to it
-// would pull in unrelated traffic, and publishing to it is rejected by the broker anyway
+// discovery payload advertising one as a command topic is malformed: publishing to it is rejected
+// by the broker anyway. A state topic is a filter, so it accepts "+" (see isSubscribableStateTopic)
 const MQTT_WILDCARD_REGEX = /[+#]/;
 
 // Components of the Home Assistant discovery protocol handled by Gladys

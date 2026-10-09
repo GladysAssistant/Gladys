@@ -5,6 +5,7 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 import actions from '../../../actions/gateway';
 import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
+import AuthLayout from '../../../components/auth/AuthLayout';
 import RestoreBackup from './RestoreBackup';
 import SetRestoreKey from './SetRestoreKey';
 import RestoreInProgress from './RestoreInProgress';
@@ -99,64 +100,56 @@ class CreateAccountGladysGateway extends Component {
   render() {
     const { step, backupKey, loading, error, gatewayRestoreErrored } = this.state;
     return (
-      <div class="page">
-        <div class="page-single mt-6">
-          <div class="container">
-            <div class="row">
-              {step === 1 && (
-                <div class="col col-login mx-auto">
-                  <Link href="/signup" class="btn btn-secondary btn-sm mb-4 mt-6">
-                    <Text id="global.backButton" />
-                  </Link>
+      <AuthLayout size={step === 3 ? 'medium' : undefined}>
+        {step === 1 && (
+          <div>
+            <Link href="/signup" class="btn btn-secondary btn-sm mb-4">
+              <Text id="global.backButton" />
+            </Link>
 
-                  <GatewayLoginForm {...this.props} external_forgot_password />
-                </div>
-              )}
-              {step === 2 && (
-                <div class="col col-login mx-auto">
-                  <Link href="/signup" class="btn btn-secondary btn-sm mb-4 mt-6">
-                    <Text id="global.backButton" />
-                  </Link>
-                  <SetRestoreKey
-                    {...this.props}
-                    backupKey={backupKey}
-                    loading={loading}
-                    error={error}
-                    updateBackupKey={linkState(this, 'backupKey')}
-                    saveBackupKey={this.saveBackupKey}
-                  />
-                  <div class="mt-4">
-                    <LocalAccountAlternative />
-                  </div>
-                </div>
-              )}
-              {step === 3 && !this.props.gatewayRestoreInProgress && (
-                <div class="col-md-6 mx-auto">
-                  <Link href="/signup" class="btn btn-secondary btn-sm mb-4 mt-6">
-                    <Text id="global.backButton" />
-                  </Link>
-                  <RestoreBackup
-                    {...this.props}
-                    restoreBackup={this.restoreBackup}
-                    changeStepToUpdateRestoreKey={this.changeStepToUpdateRestoreKey}
-                  />
-                  <div class="mt-4">
-                    <LocalAccountAlternative />
-                  </div>
-                </div>
-              )}
-              {step === 4 && (
-                <div class="col-md-4 mx-auto">
-                  <RestoreInProgress
-                    gatewayRestoreErrored={gatewayRestoreErrored}
-                    changeStepToUpdateRestoreKey={this.changeStepToUpdateRestoreKey}
-                  />
-                </div>
-              )}
+            <GatewayLoginForm {...this.props} external_forgot_password />
+          </div>
+        )}
+        {step === 2 && (
+          <div>
+            <Link href="/signup" class="btn btn-secondary btn-sm mb-4">
+              <Text id="global.backButton" />
+            </Link>
+            <SetRestoreKey
+              {...this.props}
+              backupKey={backupKey}
+              loading={loading}
+              error={error}
+              updateBackupKey={linkState(this, 'backupKey')}
+              saveBackupKey={this.saveBackupKey}
+            />
+            <div class="mt-4">
+              <LocalAccountAlternative />
             </div>
           </div>
-        </div>
-      </div>
+        )}
+        {step === 3 && !this.props.gatewayRestoreInProgress && (
+          <div>
+            <Link href="/signup" class="btn btn-secondary btn-sm mb-4">
+              <Text id="global.backButton" />
+            </Link>
+            <RestoreBackup
+              {...this.props}
+              restoreBackup={this.restoreBackup}
+              changeStepToUpdateRestoreKey={this.changeStepToUpdateRestoreKey}
+            />
+            <div class="mt-4">
+              <LocalAccountAlternative />
+            </div>
+          </div>
+        )}
+        {step === 4 && (
+          <RestoreInProgress
+            gatewayRestoreErrored={gatewayRestoreErrored}
+            changeStepToUpdateRestoreKey={this.changeStepToUpdateRestoreKey}
+          />
+        )}
+      </AuthLayout>
     );
   }
 }

@@ -26,14 +26,14 @@ describe('EnergyMonitoring.calculateCostFromDate', () => {
     await energyMonitoring.calculateCostFromDate('2026-07-19');
 
     assert.calledOnce(calculateCostFrom);
-    assert.calledWithExactly(calculateCostFrom, new Date('2026-07-18T22:00:00.000Z'));
+    assert.calledWithExactly(calculateCostFrom, new Date('2026-07-18T22:00:00.000Z'), null, {});
   });
 
   it('should preserve the instant from a complete ISO date', async () => {
     await energyMonitoring.calculateCostFromDate('2026-07-19T00:30:00.000Z');
 
     assert.calledOnce(calculateCostFrom);
-    assert.calledWithExactly(calculateCostFrom, new Date('2026-07-19T00:30:00.000Z'));
+    assert.calledWithExactly(calculateCostFrom, new Date('2026-07-19T00:30:00.000Z'), null, {});
   });
 
   it('should preserve the instant from a Date object', async () => {
@@ -42,7 +42,7 @@ describe('EnergyMonitoring.calculateCostFromDate', () => {
     await energyMonitoring.calculateCostFromDate(date);
 
     assert.calledOnce(calculateCostFrom);
-    assert.calledWithExactly(calculateCostFrom, date);
+    assert.calledWithExactly(calculateCostFrom, date, null, {});
   });
 
   it('should serialize calculations', async () => {

@@ -1,6 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
+import SortSelect from '../../../../../components/layout/SortSelect';
 import { RequestStatus } from '../../../../../utils/consts';
 import LANManagerDevice from './LANManagerDevice';
 import EmptyState from '../EmptyState';
@@ -13,14 +14,14 @@ const LANManagerDeviceTab = ({ children, getLANManagerDevicesStatus, lanManagerD
         <Text id="integration.lanManager.device.title" />
       </h1>
       <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
+        <SortSelect
+          value={props.getLANManagerDeviceOrderDir || 'asc'}
+          onChange={props.changeOrderDir}
+          options={[
+            { value: 'asc', labelId: 'global.orderDirAsc' },
+            { value: 'desc', labelId: 'global.orderDirDesc' }
+          ]}
+        />
         <div class="input-icon ml-2">
           <span class="input-icon-addon">
             <i class="fe fe-search" />

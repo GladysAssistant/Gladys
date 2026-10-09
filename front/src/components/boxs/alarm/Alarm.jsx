@@ -124,81 +124,65 @@ class AlarmComponent extends Component {
                   </p>
                 )}
                 {!isCurrentlyArmingWithCoutdown && (
-                  <div>
-                    <div class="row">
-                      <div class="col-6">
-                        <button
-                          onClick={this.arm}
-                          disabled={armingDisabled}
-                          class={cx('btn btn-block', style.alarmActionButton, {
-                            'btn-outline-primary': house.alarm_mode !== ALARM_MODES.ARMED,
-                            'btn-primary': house.alarm_mode === ALARM_MODES.ARMED
-                          })}
-                        >
-                          <div class="pb-2">
-                            <i class={cx('fe fe-bell', style.alarmActionIcon)} />
-                          </div>
-                          <div>
-                            <Text id="dashboard.boxes.alarm.armButton" />
-                          </div>
-                        </button>
-                      </div>
-                      <div class="col-6">
-                        <button
-                          onClick={this.disarm}
-                          disabled={house.alarm_mode === ALARM_MODES.DISARMED}
-                          class={cx('btn btn-block', style.alarmActionButton, {
-                            'btn-outline-success': house.alarm_mode !== ALARM_MODES.DISARMED,
-                            'btn-success': house.alarm_mode === ALARM_MODES.DISARMED
-                          })}
-                        >
-                          <div class="pb-2">
-                            <i class={cx('fe fe-home', style.alarmActionIcon)} />
-                          </div>
-                          <div>
-                            <Text id="dashboard.boxes.alarm.disarmButton" />
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-                    <div class="row mt-4">
-                      <div class="col-6">
-                        <button
-                          onClick={this.partialArm}
-                          disabled={partialArmDisabled}
-                          class={cx('btn btn-block', style.alarmActionButton, {
-                            'btn-outline-dark': house.alarm_mode !== ALARM_MODES.PARTIALLY_ARMED,
-                            'btn-dark': house.alarm_mode === ALARM_MODES.PARTIALLY_ARMED
-                          })}
-                        >
-                          <div class="pb-2">
-                            <i class={cx('fe fe-shield', style.alarmActionIcon)} />
-                          </div>
-                          <div>
-                            <Text id="dashboard.boxes.alarm.partiallyArmedButton" />
-                            <br />
-                            <Text id="dashboard.boxes.alarm.partiallyArmedButtonSecondLine" />
-                          </div>
-                        </button>
-                      </div>
-                      <div class="col-6">
-                        <button
-                          onClick={this.panic}
-                          disabled={house.alarm_mode === ALARM_MODES.PANIC}
-                          class={cx('btn btn-block', style.alarmActionButton, {
-                            'btn-outline-danger': house.alarm_mode !== ALARM_MODES.PANIC,
-                            'btn-danger': house.alarm_mode === ALARM_MODES.PANIC
-                          })}
-                        >
-                          <div class="pb-2">
-                            <i class={cx('fe fe-alert-circle', style.alarmActionIcon)} />
-                          </div>
-                          <div>
-                            <Text id="dashboard.boxes.alarm.panicButton" />
-                          </div>
-                        </button>
-                      </div>
-                    </div>
+                  <div class={style.alarmGrid}>
+                    <button
+                      onClick={this.arm}
+                      disabled={armingDisabled}
+                      class={cx(style.alarmTile, style.alarmTileArm, {
+                        [style.alarmTileActive]: house.alarm_mode === ALARM_MODES.ARMED
+                      })}
+                    >
+                      <span class={style.alarmTileIcon}>
+                        <i class="fe fe-bell" />
+                      </span>
+                      <span>
+                        <Text id="dashboard.boxes.alarm.armButton" />
+                      </span>
+                    </button>
+                    <button
+                      onClick={this.disarm}
+                      disabled={house.alarm_mode === ALARM_MODES.DISARMED}
+                      class={cx(style.alarmTile, style.alarmTileDisarm, {
+                        [style.alarmTileActive]: house.alarm_mode === ALARM_MODES.DISARMED
+                      })}
+                    >
+                      <span class={style.alarmTileIcon}>
+                        <i class="fe fe-home" />
+                      </span>
+                      <span>
+                        <Text id="dashboard.boxes.alarm.disarmButton" />
+                      </span>
+                    </button>
+                    <button
+                      onClick={this.partialArm}
+                      disabled={partialArmDisabled}
+                      class={cx(style.alarmTile, style.alarmTilePartial, {
+                        [style.alarmTileActive]: house.alarm_mode === ALARM_MODES.PARTIALLY_ARMED
+                      })}
+                    >
+                      <span class={style.alarmTileIcon}>
+                        <i class="fe fe-shield" />
+                      </span>
+                      <span>
+                        <Text id="dashboard.boxes.alarm.partiallyArmedButton" />
+                        <br />
+                        <Text id="dashboard.boxes.alarm.partiallyArmedButtonSecondLine" />
+                      </span>
+                    </button>
+                    <button
+                      onClick={this.panic}
+                      disabled={house.alarm_mode === ALARM_MODES.PANIC}
+                      class={cx(style.alarmTile, style.alarmTilePanic, {
+                        [style.alarmTileActive]: house.alarm_mode === ALARM_MODES.PANIC
+                      })}
+                    >
+                      <span class={style.alarmTileIcon}>
+                        <i class="fe fe-alert-circle" />
+                      </span>
+                      <span>
+                        <Text id="dashboard.boxes.alarm.panicButton" />
+                      </span>
+                    </button>
                   </div>
                 )}
               </div>

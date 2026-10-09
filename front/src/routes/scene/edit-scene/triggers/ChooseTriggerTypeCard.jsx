@@ -1,76 +1,60 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import Select from 'react-select';
-
-import { EVENTS } from '../../../../../../server/utils/constants';
-import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import get from 'get-value';
 
-const TRIGGER_LIST = [
-  EVENTS.DEVICE.NEW_STATE,
-  EVENTS.TIME.CHANGED,
-  EVENTS.TIME.SUNRISE,
-  EVENTS.TIME.SUNSET,
-  EVENTS.USER_PRESENCE.BACK_HOME,
-  EVENTS.USER_PRESENCE.LEFT_HOME,
-  EVENTS.HOUSE.EMPTY,
-  EVENTS.HOUSE.NO_LONGER_EMPTY,
-  EVENTS.AREA.USER_ENTERED,
-  EVENTS.AREA.USER_LEFT,
-  EVENTS.CALENDAR.EVENT_IS_COMING,
-  EVENTS.ALARM.ARM,
-  EVENTS.ALARM.ARMING,
-  EVENTS.ALARM.DISARM,
-  EVENTS.ALARM.PANIC,
-  EVENTS.ALARM.PARTIAL_ARM,
-  EVENTS.ALARM.TOO_MANY_CODES_TESTS,
-  EVENTS.SYSTEM.START,
-  EVENTS.MQTT.RECEIVED,
-  EVENTS.WEATHER.ALERT_RAISED,
-  EVENTS.WEATHER.ALERT_ENDED
-];
+import TypePicker from '../TypePicker';
+import { TRIGGER_CATEGORIES, TRIGGER_ICON } from '../typesCatalog';
+import {
+  SCENE_DECLARATION_KINDS,
+  buildIntegrationsCategory,
+  parsePickerValue,
+  resolveSceneDeclaration,
+  getDeclarationDefaults
+} from '../sceneIntegrations';
 
 class ChooseTriggerType extends Component {
-  handleChange = selectedOption => {
-    if (selectedOption) {
-      this.setState({
-        currentTrigger: selectedOption
-      });
-      this.props.updateTriggerProperty(this.props.index, 'type', selectedOption.value);
+  selectTriggerType = value => {
+    const declared = parsePickerValue(value);
+    if (!declared) {
+      this.props.updateTriggerProperty(this.props.index, 'type', value);
+      return;
     }
+    // a trigger declared by an external integration: the generic type, the
+    // integration selector and the declared key are set at once, the filters
+    // initialized from the declared defaults
+    const { declaration } = resolveSceneDeclaration(this.props.sceneIntegrations, SCENE_DECLARATION_KINDS.trigger, {
+      integration: declared.selector,
+      trigger_key: declared.key
+    });
+    this.props.updateTriggerProperty(this.props.index, 'integration', declared.selector);
+    this.props.updateTriggerProperty(this.props.index, 'trigger_key', declared.key);
+    this.props.updateTriggerProperty(this.props.index, 'fields', getDeclarationDefaults(declaration));
+    this.props.updateTriggerProperty(this.props.index, 'type', declared.type);
   };
 
-  constructor(props) {
-    super(props);
-
-    const options = TRIGGER_LIST.map(trigger => {
-      return {
-        value: trigger,
-        label: get(props.intl.dictionary, `editScene.triggers.${trigger}`, { default: trigger })
-      };
-    }).sort((a, b) => a.label.localeCompare(b.label));
-
-    this.state = {
-      options,
-      currentTrigger: null
-    };
-  }
-
-  render(props, { currentTrigger, options }) {
+  render(props) {
+    const language = get(props, 'user.language') || 'en';
+    const integrationsCategory = buildIntegrationsCategory(
+      props.sceneIntegrations,
+      SCENE_DECLARATION_KINDS.trigger,
+      language
+    );
+    const categories = integrationsCategory ? [...TRIGGER_CATEGORIES, integrationsCategory] : TRIGGER_CATEGORIES;
     return (
       <div>
-        <div class="form-group">
+        <div class="form-group mb-0">
           <label class="form-label">
             <Text id="editScene.selectTriggerLabel" />
           </label>
-          <Select
-            class="choose-scene-trigger-type"
-            value={currentTrigger}
-            options={options}
-            onChange={this.handleChange}
-            className="react-select-container"
-            classNamePrefix="react-select"
+          <TypePicker
+            categories={categories}
+            icons={TRIGGER_ICON}
+            labelPrefix="editScene.triggers"
+            descriptionPrefix="editScene.triggersDescriptions"
+            categoryPrefix="editScene.triggerCategories"
+            searchPlaceholderId="editScene.searchTriggersPlaceholder"
+            onSelect={this.selectTriggerType}
           />
         </div>
       </div>
@@ -78,4 +62,4 @@ class ChooseTriggerType extends Component {
   }
 }
 
-export default withIntlAsProp(connect('httpClient', {})(ChooseTriggerType));
+export default connect('user', {})(ChooseTriggerType);

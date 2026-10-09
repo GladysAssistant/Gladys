@@ -1,0 +1,14 @@
+[
+  {
+    "label": "gateway.payment-required",
+    "answers": [
+      "Your Gladys Plus subscription is suspended: a payment is required. Backups, Enedis synchronization and AI features are paused on this instance. To fix it, update your payment method in your Gladys Plus account (https://plus.gladysassistant.com/dashboard/settings/billing), then click \"Check again\" in \"Settings\" => \"Gladys Plus\". Everything resumes automatically once the payment is received, nothing is lost."
+    ]
+  },
+  {
+    "label": "gateway.subscription-active",
+    "answers": [
+      "Your Gladys Plus subscription is active again. Backups, Enedis synchronization and AI features are back on."
+    ]
+  }
+]

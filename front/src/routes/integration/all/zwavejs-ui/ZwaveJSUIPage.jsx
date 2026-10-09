@@ -1,75 +1,51 @@
+import { Fragment } from 'preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
-import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
+import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 
 const ZwaveJSUIPage = ({ children, user }) => (
-  <div class="page">
-    <div class="page-main">
-      <div class="my-3 my-md-5">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-3">
-              <BackToIntegrationsLink />
-              <h3 class="page-title mb-5">
-                <Text id="integration.zwavejs-ui.title" />
-              </h3>
-              <div>
-                <div class="list-group list-group-transparent mb-0">
-                  <Link
-                    href="/dashboard/integration/device/zwavejs-ui"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-link" />
-                    </span>
-                    <Text id="integration.zwavejs-ui.deviceTab" />
-                  </Link>
+  <IntegrationSubPageLayout
+    title={<Text id="integration.zwavejs-ui.title" />}
+    tabs={
+      <Fragment>
+        <Link href="/dashboard/integration/device/zwavejs-ui" activeClassName="active" class="hz-tab-link">
+          <i class="fe fe-link" />
+          <span>
+            <Text id="integration.zwavejs-ui.deviceTab" />
+          </span>
+        </Link>
 
-                  <Link
-                    href="/dashboard/integration/device/zwavejs-ui/discover"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-radio" />
-                    </span>
-                    <Text id="integration.zwavejs-ui.discoverTab" />
-                  </Link>
+        <Link href="/dashboard/integration/device/zwavejs-ui/discover" activeClassName="active" class="hz-tab-link">
+          <i class="fe fe-radio" />
+          <span>
+            <Text id="integration.zwavejs-ui.discoverTab" />
+          </span>
+        </Link>
 
-                  <Link
-                    href="/dashboard/integration/device/zwavejs-ui/setup"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-sliders" />
-                    </span>
-                    <Text id="integration.zwavejs-ui.setupTab" />
-                  </Link>
+        <Link href="/dashboard/integration/device/zwavejs-ui/setup" activeClassName="active" class="hz-tab-link">
+          <i class="fe fe-sliders" />
+          <span>
+            <Text id="integration.zwavejs-ui.setupTab" />
+          </span>
+        </Link>
 
-                  <DeviceConfigurationLink
-                    user={user}
-                    documentKey="zwavejs-ui"
-                    configurationKey="integrations"
-                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
-                    </span>
-                    <Text id="integration.zwavejs-ui.documentation" />
-                  </DeviceConfigurationLink>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-9">{children}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <DeviceConfigurationLink
+          user={user}
+          documentKey="zwavejs-ui"
+          configurationKey="integrations"
+          linkClass="hz-tab-link"
+        >
+          <i class="fe fe-book-open" />
+          <span>
+            <Text id="integration.zwavejs-ui.documentation" />
+          </span>
+        </DeviceConfigurationLink>
+      </Fragment>
+    }
+  >
+    {children}
+  </IntegrationSubPageLayout>
 );
 
 export default ZwaveJSUIPage;

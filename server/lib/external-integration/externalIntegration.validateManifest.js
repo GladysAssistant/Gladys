@@ -29,12 +29,35 @@ const {
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   ACCOUNT_FIELD_TYPES,
+  DYNAMIC_SOURCES,
+  MAX_WIDGETS,
+  WIDGET_KEY_REGEX,
+  WIDGET_LABEL_MIN_LENGTH,
+  WIDGET_LABEL_MAX_LENGTH,
+  WIDGET_DESCRIPTION_MAX_LENGTH,
+  WIDGET_ICON_REGEX,
+  MAX_WIDGET_SETTINGS,
+  WIDGET_SETTINGS_FIELD_TYPES,
+  CAPABILITY_MANIFEST_FIELDS,
+  MAX_SCENE_DECLARATIONS,
+  MAX_SCENE_DECLARATION_KEY_LENGTH,
+  MAX_SCENE_DECLARATION_FIELDS,
+  MAX_SCENE_DECLARATION_VARIABLES,
+  SCENE_TRIGGER_FIELD_TYPES,
+  SCENE_ACTION_FIELD_TYPES,
+  SCENE_VARIABLE_TYPES,
 } = require('./constants');
+const { validateEnergyContractsField } = require('./externalIntegration.validateEnergyContracts');
 
 // These rules are the exact mirror of the canonical manifest schema owned by
 // GladysAssistant/integration-store (vendored copy in manifest.schema.json):
 // a manifest accepted by the indexer must always install here, and vice versa.
-const MANIFEST_TYPES = ['device', 'communication', 'weather'];
+// `provider`: an integration made only of capabilities (widgets today, scene
+// triggers and actions tomorrow) — no device surface, none of the
+// core-consumed interfaces of the other types, at least one capability field
+// required (capabilities/dashboard-widgets.md, section 1).
+const MANIFEST_TYPES = ['device', 'communication', 'weather', 'calendar', 'provider'];
+const PROVIDER_TYPE = 'provider';
 const MANIFEST_FIELDS = [
   'manifest_version',
   'type',
@@ -55,6 +78,11 @@ const MANIFEST_FIELDS = [
   'webhooks',
   'messaging',
   'contact_schema',
+  'account_schema',
+  'widgets',
+  'scene_triggers',
+  'scene_actions',
+  'energy_contracts',
 ];
 // Browse categories of the catalog (docs/specs/integration-catalog-
 // categories.md §6.2), validated in two ordered stages: the SHAPE (1..3
@@ -87,6 +115,30 @@ const PORT_PROTOCOLS = ['tcp', 'udp'];
 // Strict syntax, no spaces inside the braces.
 const PORT_PLACEHOLDER_REGEX = /\{\{port:([a-z0-9_]+)\}\}/g;
 const ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields'];
+// dashboard widgets declared by the integration (capabilities/dashboard-
+// widgets.md, section 1): identity + per-instance settings, the content
+// itself is produced at runtime over widget.get
+const WIDGET_FIELDS = ['key', 'label', 'description', 'icon', 'settings', 'action_timeout_seconds'];
+// scene triggers and actions declared for the scene editor: the filters /
+// parameters reuse the config_schema field format with a restricted type
+// list, the variables / outputs are the only data exchanged with a scene
+const SCENE_TRIGGER_FIELDS = ['key', 'label', 'description', 'fields', 'variables'];
+const SCENE_ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields', 'outputs'];
+const SCENE_VARIABLE_FIELDS = ['key', 'type', 'label', 'description'];
+const SCENE_DECLARATION_KINDS = {
+  trigger: {
+    listName: 'scene_triggers',
+    entryFields: SCENE_TRIGGER_FIELDS,
+    fieldTypes: SCENE_TRIGGER_FIELD_TYPES,
+    variablesName: 'variables',
+  },
+  action: {
+    listName: 'scene_actions',
+    entryFields: SCENE_ACTION_FIELDS,
+    fieldTypes: SCENE_ACTION_FIELD_TYPES,
+    variablesName: 'outputs',
+  },
+};
 // inbound webhooks via Gladys Plus (B.17): shown on the install screen
 // ("will be able to receive events from the Internet via Gladys Plus")
 const WEBHOOK_FIELDS = ['key', 'label', 'mode'];
@@ -121,11 +173,6 @@ const SECTION_DESCRIPTION_MAX_LENGTH = 1000;
 const MAX_SECTION_LINKS = 5;
 const SECTION_LINK_FIELDS = ['url', 'label'];
 const SELECT_DISPLAYS = ['dropdown', 'radio'];
-// Dynamic options of a select/multi_select: a reserved enum defined by the
-// core — never a URL nor an expression, nothing arbitrary enters the
-// rendering. "devices": the UI populates the options with the
-// already-created devices of the integration (value = external_id).
-const SELECT_SOURCES = ['devices'];
 const CONFIG_FIELD_FIELDS = [
   'key',
   'type',
@@ -316,12 +363,13 @@ function validateSectionPortPlaceholders(value, path, declaredPortNames, errors)
  * @param {object} value - The multi-language text to scan.
  * @param {string} path - The path of the field, for error messages.
  * @param {Array} errors - The array of errors to push to.
+ * @param {string} schemaLabel - The per-user schema name, for error messages.
  * @example
- * rejectContactSchemaPortPlaceholders({ en: '{{port:ocpp}}' }, 'contact_schema[0].label', errors);
+ * rejectPerUserSchemaPortPlaceholders({ en: '{{port:ocpp}}' }, 'contact_schema[0].label', errors, 'contact');
  */
-function rejectContactSchemaPortPlaceholders(value, path, errors) {
+function rejectPerUserSchemaPortPlaceholders(value, path, errors, schemaLabel) {
   forEachPortPlaceholder(value, (name, language) => {
-    errors.push(`${path}.${language}: {{port:${name}}} is not available in the per-user contact schema`);
+    errors.push(`${path}.${language}: {{port:${name}}} is not available in the per-user ${schemaLabel} schema`);
   });
 }
 
@@ -440,8 +488,8 @@ function validateConfigField(field, index, seenKeys, errors, basePath, declaredP
   if (field.source !== undefined) {
     if (!OPTION_FIELD_TYPES.includes(field.type)) {
       errors.push(`${path}.source: only allowed on select and multi_select fields`);
-    } else if (!SELECT_SOURCES.includes(field.source)) {
-      errors.push(`${path}.source: must be one of ${SELECT_SOURCES.join(', ')}`);
+    } else if (!DYNAMIC_SOURCES.includes(field.source)) {
+      errors.push(`${path}.source: must be one of ${DYNAMIC_SOURCES.join(', ')}`);
     }
     if (field.options !== undefined) {
       errors.push(`${path}.options: mutually exclusive with source`);
@@ -528,6 +576,239 @@ function validateAction(action, index, seenKeys, errors, declaredPortNames) {
       action.fields.forEach((field, fieldIndex) => {
         validateConfigField(field, fieldIndex, seenFieldKeys, errors, `${path}.fields`, declaredPortNames);
       });
+    }
+  }
+}
+
+/**
+ * @description Reject the {{port:<name>}} placeholders of a widget settings
+ * section: the dashboard editor is reachable by non-admins, whose reduced view
+ * carries no container state (the contact_schema rule, C.1). `{{gladys_host}}`
+ * stays allowed.
+ * @param {object} value - The multi-language text to scan.
+ * @param {string} path - The path of the field, for error messages.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * rejectWidgetSettingsPortPlaceholders({ en: '{{port:ocpp}}' }, 'widgets[0].settings[0].label', errors);
+ */
+function rejectWidgetSettingsPortPlaceholders(value, path, errors) {
+  forEachPortPlaceholder(value, (name, language) => {
+    errors.push(`${path}.${language}: {{port:${name}}} is not available in widget settings`);
+  });
+}
+
+/**
+ * @description Reject the {{port:<name>}} placeholders of a scene trigger /
+ * action section: the scene editor never loads the container detail that
+ * resolves them (the same reason the contact_schema refuses them).
+ * @param {object} value - The multi-language text to scan.
+ * @param {string} path - The path of the field, for error messages.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * rejectScenePortPlaceholders({ en: '{{port:ocpp}}' }, 'scene_triggers[0].fields[0].label', errors);
+ */
+function rejectScenePortPlaceholders(value, path, errors) {
+  forEachPortPlaceholder(value, (name, language) => {
+    errors.push(`${path}.${language}: {{port:${name}}} is not available in the scene editor`);
+  });
+}
+
+/**
+ * @description Validate one entry of the manifest widgets list: a dashboard
+ * widget declared by the integration. The manifest holds its identity (key,
+ * label, description, icon), its per-instance settings (the config_schema
+ * grammar restricted to non-sensitive types) and the ack delay of its
+ * actions; the content is produced at runtime (widget.get).
+ * @param {object} widget - The widget to validate.
+ * @param {number} index - Index of the widget in the list.
+ * @param {Set} seenKeys - Widget keys already seen, to detect duplicates.
+ * @param {Array} errors - The array of errors to push to.
+ * @param {Set} declaredPortNames - Port names declared in the manifest.
+ * @example
+ * validateWidget({ key: 'upcoming_releases', label: { en: 'Upcoming releases' } }, 0, seenKeys, errors, ports);
+ */
+function validateWidget(widget, index, seenKeys, errors, declaredPortNames) {
+  const path = `widgets[${index}]`;
+  if (widget === null || typeof widget !== 'object' || Array.isArray(widget)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  Object.keys(widget).forEach((key) => {
+    if (!WIDGET_FIELDS.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
+  if (typeof widget.key !== 'string' || !WIDGET_KEY_REGEX.test(widget.key)) {
+    errors.push(`${path}.key: must be a string matching [a-z0-9_]{2,32}`);
+  } else if (seenKeys.has(widget.key)) {
+    errors.push(`${path}.key: duplicate key "${widget.key}"`);
+  } else {
+    seenKeys.add(widget.key);
+  }
+  validateMultiLanguageText(widget.label, `${path}.label`, errors, WIDGET_LABEL_MIN_LENGTH, WIDGET_LABEL_MAX_LENGTH);
+  if (widget.description !== undefined) {
+    validateMultiLanguageText(widget.description, `${path}.description`, errors, 1, WIDGET_DESCRIPTION_MAX_LENGTH);
+  }
+  if (widget.icon !== undefined && (typeof widget.icon !== 'string' || !WIDGET_ICON_REGEX.test(widget.icon))) {
+    errors.push(`${path}.icon: must be a Feather icon name matching [a-z0-9-]{1,40}`);
+  }
+  if (widget.settings !== undefined) {
+    if (!Array.isArray(widget.settings) || widget.settings.length > MAX_WIDGET_SETTINGS) {
+      errors.push(`${path}.settings: must be an array of at most ${MAX_WIDGET_SETTINGS} fields`);
+    } else {
+      // the config_schema grammar, rendered and validated by the same engine,
+      // minus what cannot live in a dashboard JSON readable by every user
+      const seenSettingKeys = new Set();
+      widget.settings.forEach((field, fieldIndex) => {
+        const fieldPath = `${path}.settings[${fieldIndex}]`;
+        validateConfigField(field, fieldIndex, seenSettingKeys, errors, `${path}.settings`, declaredPortNames);
+        if (field && typeof field === 'object' && !Array.isArray(field)) {
+          if (CONFIG_FIELD_TYPES.includes(field.type) && !WIDGET_SETTINGS_FIELD_TYPES.includes(field.type)) {
+            errors.push(`${fieldPath}.type: ${field.type} is not allowed in widget settings`);
+          }
+          if (field.type === 'section') {
+            rejectWidgetSettingsPortPlaceholders(field.label, `${fieldPath}.label`, errors);
+            rejectWidgetSettingsPortPlaceholders(field.description, `${fieldPath}.description`, errors);
+          }
+        }
+      });
+    }
+  }
+  if (widget.action_timeout_seconds !== undefined) {
+    if (
+      !Number.isInteger(widget.action_timeout_seconds) ||
+      widget.action_timeout_seconds < ACTION_MIN_TIMEOUT_SECONDS ||
+      widget.action_timeout_seconds > ACTION_MAX_TIMEOUT_SECONDS
+    ) {
+      errors.push(
+        `${path}.action_timeout_seconds: must be an integer between ${ACTION_MIN_TIMEOUT_SECONDS} and ${ACTION_MAX_TIMEOUT_SECONDS}`,
+      );
+    }
+  }
+}
+
+/**
+ * @description Validate one variable (of a scene trigger) or output (of a
+ * scene action): the only data a scene reads from an integration, scalars
+ * only — an identifier, a count, a short text; never an image or a file.
+ * @param {object} variable - The variable to validate.
+ * @param {string} path - The path of the entry, for error messages.
+ * @param {Set} seenKeys - Keys already seen in the list, to detect duplicates.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateSceneVariable({ key: 'label', type: 'string', label: { en: 'Object' } }, 'scene_triggers[0]', seen, errors);
+ */
+function validateSceneVariable(variable, path, seenKeys, errors) {
+  if (variable === null || typeof variable !== 'object' || Array.isArray(variable)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  Object.keys(variable).forEach((key) => {
+    if (!SCENE_VARIABLE_FIELDS.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
+  if (typeof variable.key !== 'string' || !CONFIG_KEY_REGEX.test(variable.key)) {
+    errors.push(`${path}.key: must be a non-empty string matching [a-z0-9_]`);
+  } else if (seenKeys.has(variable.key)) {
+    errors.push(`${path}.key: duplicate key "${variable.key}"`);
+  } else {
+    seenKeys.add(variable.key);
+  }
+  if (!SCENE_VARIABLE_TYPES.includes(variable.type)) {
+    errors.push(`${path}.type: must be one of ${SCENE_VARIABLE_TYPES.join(', ')}`);
+  }
+  validateMultiLanguageText(variable.label, `${path}.label`, errors);
+  if (variable.description !== undefined) {
+    validateMultiLanguageText(variable.description, `${path}.description`, errors);
+  }
+}
+
+/**
+ * @description Validate one entry of the scene_triggers / scene_actions
+ * lists: a trigger or an action of the scene editor, declared once in the
+ * manifest and rendered by the core. The filters (trigger) / parameters
+ * (action) reuse the config_schema field format with a restricted type list:
+ * no secret (a scene JSON is readable by every user), no account linking
+ * (integration-scoped), no boolean trigger filter (it could never express
+ * "any"), no {{port:<name>}} in sections. A published key is never renamed:
+ * the scenes store it.
+ * @param {object} entry - The declaration to validate.
+ * @param {number} index - Index of the entry in the list.
+ * @param {Set} seenKeys - Keys already seen in the list, to detect duplicates.
+ * @param {Array} errors - The array of errors to push to.
+ * @param {Set} declaredPortNames - Port names declared in the manifest.
+ * @param {string} kind - 'trigger' or 'action'.
+ * @example
+ * validateSceneDeclaration({ key: 'object_detected', label: { en: 'Detected' } }, 0, seen, errors, ports, 'trigger');
+ */
+function validateSceneDeclaration(entry, index, seenKeys, errors, declaredPortNames, kind) {
+  const { listName, entryFields, fieldTypes, variablesName } = SCENE_DECLARATION_KINDS[kind];
+  const path = `${listName}[${index}]`;
+  if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  Object.keys(entry).forEach((key) => {
+    if (!entryFields.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
+  if (
+    typeof entry.key !== 'string' ||
+    !CONFIG_KEY_REGEX.test(entry.key) ||
+    entry.key.length > MAX_SCENE_DECLARATION_KEY_LENGTH
+  ) {
+    errors.push(`${path}.key: must be a string of 1-${MAX_SCENE_DECLARATION_KEY_LENGTH} characters matching [a-z0-9_]`);
+  } else if (seenKeys.has(entry.key)) {
+    errors.push(`${path}.key: duplicate key "${entry.key}"`);
+  } else {
+    seenKeys.add(entry.key);
+  }
+  validateMultiLanguageText(entry.label, `${path}.label`, errors);
+  if (entry.description !== undefined) {
+    validateMultiLanguageText(entry.description, `${path}.description`, errors);
+  }
+  if (entry.timeout_seconds !== undefined) {
+    if (
+      !Number.isInteger(entry.timeout_seconds) ||
+      entry.timeout_seconds < ACTION_MIN_TIMEOUT_SECONDS ||
+      entry.timeout_seconds > ACTION_MAX_TIMEOUT_SECONDS
+    ) {
+      errors.push(
+        `${path}.timeout_seconds: must be an integer between ${ACTION_MIN_TIMEOUT_SECONDS} and ${ACTION_MAX_TIMEOUT_SECONDS}`,
+      );
+    }
+  }
+  if (entry.fields !== undefined) {
+    if (!Array.isArray(entry.fields) || entry.fields.length > MAX_SCENE_DECLARATION_FIELDS) {
+      errors.push(`${path}.fields: must be an array of at most ${MAX_SCENE_DECLARATION_FIELDS} fields`);
+    } else {
+      const seenFieldKeys = new Set();
+      entry.fields.forEach((field, fieldIndex) => {
+        const fieldPath = `${path}.fields[${fieldIndex}]`;
+        // same format and rules as the config_schema, the type restriction on
+        // top — no second engine
+        validateConfigField(field, fieldIndex, seenFieldKeys, errors, `${path}.fields`, declaredPortNames);
+        if (field && CONFIG_FIELD_TYPES.includes(field.type) && !fieldTypes.includes(field.type)) {
+          errors.push(`${fieldPath}.type: must be one of ${fieldTypes.join(', ')} in a scene ${kind}`);
+        }
+        if (field && field.type === 'section') {
+          rejectScenePortPlaceholders(field.label, `${fieldPath}.label`, errors);
+          rejectScenePortPlaceholders(field.description, `${fieldPath}.description`, errors);
+        }
+      });
+    }
+  }
+  const variables = entry[variablesName];
+  if (variables !== undefined) {
+    if (!Array.isArray(variables) || variables.length > MAX_SCENE_DECLARATION_VARIABLES) {
+      errors.push(`${path}.${variablesName}: must be an array of at most ${MAX_SCENE_DECLARATION_VARIABLES} entries`);
+    } else {
+      const seenVariableKeys = new Set();
+      variables.forEach((variable, variableIndex) =>
+        validateSceneVariable(variable, `${path}.${variablesName}[${variableIndex}]`, seenVariableKeys, errors),
+      );
     }
   }
 }
@@ -937,8 +1218,42 @@ function validateManifest(manifest) {
         if (field && field.type === 'section') {
           // the per-user block is the one screen a non-admin reaches, and
           // their reduced view carries no container state
-          rejectContactSchemaPortPlaceholders(field.label, `contact_schema[${index}].label`, errors);
-          rejectContactSchemaPortPlaceholders(field.description, `contact_schema[${index}].description`, errors);
+          rejectPerUserSchemaPortPlaceholders(field.label, `contact_schema[${index}].label`, errors, 'contact');
+          rejectPerUserSchemaPortPlaceholders(
+            field.description,
+            `contact_schema[${index}].description`,
+            errors,
+            'contact',
+          );
+        }
+      });
+    }
+  }
+  if (manifest.account_schema !== undefined) {
+    // the per-user account form only makes sense on a calendar integration
+    if (manifest.type !== 'calendar') {
+      errors.push('account_schema: only allowed on calendar integrations');
+    } else if (!Array.isArray(manifest.account_schema)) {
+      errors.push('account_schema: must be an array');
+    } else {
+      const seenAccountKeys = new Set();
+      manifest.account_schema.forEach((field, index) => {
+        validateConfigField(field, index, seenAccountKeys, errors, 'account_schema', declaredPortNames);
+        if (field && ACCOUNT_FIELD_TYPES.includes(field.type)) {
+          // the Connect relay (oauth2 / account_link) is integration-scoped,
+          // never per user (milestone 1)
+          errors.push(`account_schema[${index}].type: ${field.type} is not allowed in the per-user account schema`);
+        }
+        if (field && field.type === 'section') {
+          // the per-user block is the one screen a non-admin reaches, and
+          // their reduced view carries no container state
+          rejectPerUserSchemaPortPlaceholders(field.label, `account_schema[${index}].label`, errors, 'account');
+          rejectPerUserSchemaPortPlaceholders(
+            field.description,
+            `account_schema[${index}].description`,
+            errors,
+            'account',
+          );
         }
       });
     }
@@ -951,6 +1266,46 @@ function validateManifest(manifest) {
     } else {
       const seenWebhookKeys = new Set();
       manifest.webhooks.forEach((webhook, index) => validateWebhook(webhook, index, seenWebhookKeys, errors));
+    }
+  }
+  if (manifest.widgets !== undefined) {
+    if (!Array.isArray(manifest.widgets) || manifest.widgets.length === 0 || manifest.widgets.length > MAX_WIDGETS) {
+      errors.push(`widgets: must be a list of 1-${MAX_WIDGETS} widgets`);
+    } else {
+      const seenWidgetKeys = new Set();
+      manifest.widgets.forEach((widget, index) =>
+        validateWidget(widget, index, seenWidgetKeys, errors, declaredPortNames),
+      );
+    }
+  }
+  ['trigger', 'action'].forEach((kind) => {
+    const { listName } = SCENE_DECLARATION_KINDS[kind];
+    const declarations = manifest[listName];
+    if (declarations === undefined) {
+      return;
+    }
+    if (!Array.isArray(declarations) || declarations.length === 0 || declarations.length > MAX_SCENE_DECLARATIONS) {
+      errors.push(`${listName}: must be a list of 1-${MAX_SCENE_DECLARATIONS} entries`);
+      return;
+    }
+    // triggers and actions are two namespaces: a key may exist in both
+    const seenKeys = new Set();
+    declarations.forEach((entry, index) =>
+      validateSceneDeclaration(entry, index, seenKeys, errors, declaredPortNames, kind),
+    );
+  });
+  if (manifest.energy_contracts !== undefined) {
+    validateEnergyContractsField(manifest.energy_contracts, errors, validateMultiLanguageText);
+  }
+  if (manifest.type === PROVIDER_TYPE) {
+    // a provider providing nothing has no contract at all: explicit error
+    const declaresCapability = CAPABILITY_MANIFEST_FIELDS.some((field) => manifest[field] !== undefined);
+    if (!declaresCapability) {
+      errors.push(
+        `type: a provider integration must declare at least one capability field (${CAPABILITY_MANIFEST_FIELDS.join(
+          ', ',
+        )})`,
+      );
     }
   }
   if (manifest.transports !== undefined) {
@@ -1001,4 +1356,5 @@ function validateManifest(manifest) {
 
 module.exports = {
   validateManifest,
+  validateConfigField,
 };

@@ -50,7 +50,7 @@ async function upsertFeatureSupportedOptions(createdDevice, publishedFeatures) {
       `External integration: syncing ${publishedFeature.supported_options.length} supported options of feature ${existingFeature.selector}`,
     );
     const savedOptions = await this.device.syncFeatureSupportedOptions(
-      existingFeature.id,
+      existingFeature,
       publishedFeature.supported_options,
     );
     // the in-memory device is the same object across every stateManager

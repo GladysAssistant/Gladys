@@ -107,7 +107,12 @@ Docker.prototype.getImage = fake.returns({
 });
 
 Docker.prototype.pull = (repoTag) => {
-  if (repoTag.endsWith('latest') || repoTag.startsWith('nickfedor/watchtower:')) {
+  // the Gladys image is re-downloaded by the upgrade before Watchtower runs
+  if (
+    repoTag.endsWith('latest') ||
+    repoTag.startsWith('nickfedor/watchtower:') ||
+    repoTag.startsWith('gladysassistant/gladys:')
+  ) {
     return fake.resolves(true)();
   }
   return fake.rejects('ERROR')();
@@ -115,7 +120,7 @@ Docker.prototype.pull = (repoTag) => {
 
 Docker.prototype.followProgress = (onStream, onFinished, onProgress) => {
   onProgress({});
-  onFinished(null, {});
+  onFinished(null, [{}]);
 };
 
 // Consumers that boot System in their beforeEach (init() calls the Docker

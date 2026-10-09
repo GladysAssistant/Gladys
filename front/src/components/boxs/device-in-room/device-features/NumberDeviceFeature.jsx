@@ -3,6 +3,10 @@ import get from 'get-value';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
 const NumberDeviceFeature = ({ children, ...props }) => {
+  // Same granularity rule as the other editable rows: a feature declaring a step
+  // finer than 1 can be typed at that precision, the rest stay whole numbers.
+  const step = props.deviceFeature.step || 1;
+
   function updateValue(e) {
     props.updateValueWithDebounce(props.deviceFeature, e.target.value);
   }
@@ -27,7 +31,7 @@ const NumberDeviceFeature = ({ children, ...props }) => {
             value={props.deviceFeature.last_value}
             class="form-control col-5 text-center px-1"
             onChange={updateValue}
-            step={1}
+            step={step}
             min={props.deviceFeature.min}
             max={props.deviceFeature.max}
           />

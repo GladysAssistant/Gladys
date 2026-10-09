@@ -106,6 +106,16 @@ describe('Mqtt handle message', () => {
 
     assert.notCalled(gladys.event.emit);
   });
+  it('should forward messages to a bind with several "+" wildcards', () => {
+    const callback = fake.returns(null);
+    mqttHandler.subscribe('+/+/BTtoMQTT/A4C138800021', callback);
+
+    mqttHandler.handleNewMessage('blegateway/office/BTtoMQTT/A4C138800021', '{"tempc": 21.5}');
+    assert.calledWith(callback, 'blegateway/office/BTtoMQTT/A4C138800021', '{"tempc": 21.5}');
+
+    mqttHandler.handleNewMessage('blegateway/office/BTtoMQTT/FFFFFFFFFFFF', '{"tempc": 21.5}');
+    assert.calledOnce(callback);
+  });
   it('handle device with custom topic and debug mode', () => {
     mqttHandler.debugMode = true;
     mqttHandler.deviceFeatureCustomMqttTopics = [];

@@ -28,11 +28,12 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  DoorLock,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const MatterHandler = require('../../../../services/matter/lib');
-const { EVENTS, STATE, FAN_MODE, AC_MODE } = require('../../../../utils/constants');
+const { EVENTS, STATE, FAN_MODE, AC_MODE, LOCK } = require('../../../../utils/constants');
 
 describe('Matter.readInitialDeviceStates', () => {
   let matterHandler;
@@ -659,6 +660,55 @@ describe('Matter.readInitialDeviceStates', () => {
       device_feature_external_id: `matter:1234:1:${OccupancySensing.Complete.id}`,
       state: STATE.OFF,
     });
+  });
+
+  it('should read the initial DoorLock state', async () => {
+    const doorLock = {
+      getLockStateAttribute: fake.resolves(DoorLock.LockState.Locked),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === DoorLock.Complete.id ? doorLock : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DoorLock.Complete.id}:state`,
+      state: LOCK.STATE.LOCKED,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DoorLock.Complete.id}:lock`,
+      state: LOCK.ACTION.LOCK,
+    });
+  });
+
+  it('should only emit the detailed DoorLock state when the lock is not fully locked', async () => {
+    const doorLock = {
+      getLockStateAttribute: fake.resolves(DoorLock.LockState.NotFullyLocked),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === DoorLock.Complete.id ? doorLock : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${DoorLock.Complete.id}:state`,
+      state: LOCK.STATE.ACTIVITY,
+    });
+  });
+
+  it('should skip the DoorLock state when the attribute is not readable', async () => {
+    const doorLock = {
+      getLockStateAttribute: fake.rejects(new Error('read failed')),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === DoorLock.Complete.id ? doorLock : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
   });
 
   it('should skip occupancy when attribute read returns null', async () => {

@@ -11,7 +11,7 @@ const adminMiddleware = require('./middlewares/adminMiddleware');
 const ExternalIntegrationAuthMiddleware = require('./middlewares/externalIntegrationAuthMiddleware');
 const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
 const audioRawBodyMiddleware = require('./middlewares/audioRawBodyMiddleware');
-const { integrationHostJsonBodyMiddleware } = require('./middlewares/jsonBodyMiddleware');
+const { integrationHostJsonBodyMiddleware, largeJsonBodyMiddleware } = require('./middlewares/jsonBodyMiddleware');
 
 // routes
 const getRoutes = require('./routes');
@@ -29,6 +29,11 @@ function setupRoutes(gladys) {
   const routes = getRoutes(gladys);
   const authMiddleware = AuthMiddleware('dashboard:write', gladys);
   const authenticatedOrNotConfiguredMiddleware = AuthenticatedOrNotConfiguredMiddleware('dashboard:write', gladys);
+  const authenticatedOrNotConfiguredNonAdminMiddleware = AuthenticatedOrNotConfiguredMiddleware(
+    'dashboard:write',
+    gladys,
+    false,
+  );
   const isInstanceConfiguredMiddleware = IsInstanceConfiguredMiddleware(gladys);
   const resetPasswordAuthMiddleware = AuthMiddleware('reset-password:write', gladys);
   const alarmMiddleware = AuthMiddleware('alarm:write', gladys);
@@ -57,9 +62,14 @@ function setupRoutes(gladys) {
     if (routes[routeKey].admin && !routes[routeKey].authenticatedOrNotConfigured) {
       routerParams.push(adminMiddleware);
     }
-    // if the route requires an authenticated admin user only once the instance is configured
+    // if the route requires an authenticated user only once the instance is configured
+    // (an admin one, unless the route is not marked as admin)
     if (routes[routeKey].authenticatedOrNotConfigured) {
-      routerParams.push(authenticatedOrNotConfiguredMiddleware);
+      routerParams.push(
+        routes[routeKey].admin
+          ? authenticatedOrNotConfiguredMiddleware
+          : authenticatedOrNotConfiguredNonAdminMiddleware,
+      );
     }
     // if the route need rate limit
     if (routes[routeKey].rateLimit) {
@@ -88,6 +98,11 @@ function setupRoutes(gladys) {
     }
     if (routes[routeKey].audioRawBody) {
       routerParams.push(audioRawBodyMiddleware);
+    }
+    // routes carrying one base64 image (dashboard asset uploads): the bigger
+    // JSON bound is mounted here, after authentication, not globally
+    if (routes[routeKey].largeJsonBody) {
+      routerParams.push(largeJsonBodyMiddleware);
     }
     // add the controller at the end of the array
     routerParams.push(routes[routeKey].controller);

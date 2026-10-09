@@ -1,6 +1,7 @@
 import get from 'get-value';
 import { Text } from 'preact-i18n';
 import CardFilter from '../../components/layout/CardFilter';
+import SortSelect from '../../components/layout/SortSelect';
 import InstallFromGithubCard from './all/external-integration/install-from-github/InstallFromGithubCard';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import style from './style.css';
@@ -75,17 +76,16 @@ const IntegrationPageHeader = ({
           <h1 class={style.mobileTitle}>
             <Text id="integration.root.title" />
           </h1>
-          <select onChange={changeOrderDir} class={`form-control custom-select ${style.mobileSort}`} value={orderDir}>
-            <option value="asc">
-              <Text id="global.orderDirAsc" />
-            </option>
-            <option value="desc">
-              <Text id="global.orderDirDesc" />
-            </option>
-            <option value="newest">
-              <Text id="integration.root.orderDirNewest" />
-            </option>
-          </select>
+          <SortSelect
+            value={orderDir}
+            onChange={changeOrderDir}
+            selectClass={style.mobileSort}
+            options={[
+              { value: 'asc', labelId: 'global.orderDirAsc' },
+              { value: 'desc', labelId: 'global.orderDirDesc' },
+              { value: 'newest', labelId: 'integration.root.orderDirNewest' }
+            ]}
+          />
         </div>
         <div class={style.mobileSearch}>
           <div class="input-icon">

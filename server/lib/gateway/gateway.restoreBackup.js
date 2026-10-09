@@ -7,8 +7,9 @@ const { promisify } = require('util');
 
 const db = require('../../models');
 const logger = require('../../utils/logger');
-const { exec } = require('../../utils/childProcess');
+const { execFile } = require('../../utils/childProcess');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { escapeSqlStringLiteral } = require('../../utils/backupSafety');
 
 /**
  * @description Replace the local sqlite database with a backup.
@@ -39,8 +40,10 @@ async function restoreBackup(sqliteBackupFilePath, duckDbBackupFolderPath) {
   logger.info('Backup seems to be a valid file. Restoring.');
   // shutting down the current DB
   await this.sequelize.close();
-  // copy the backupFile to the new DB
-  await exec(`sqlite3 ${this.config.storage} ".restore '${sqliteBackupFilePath}'"`);
+  // copy the backupFile to the new DB. The dot command is passed as a single
+  // argument to sqlite3, with no shell in between: a backup file name can no
+  // longer be read as a command.
+  await execFile('sqlite3', [this.config.storage, `.restore '${sqliteBackupFilePath}'`]);
   // done!
   logger.info(`SQLite backup restored`);
   if (duckDbBackupFolderPath) {
@@ -62,7 +65,9 @@ async function restoreBackup(sqliteBackupFilePath, duckDbBackupFolderPath) {
       .replace('CREATE SCHEMA information_schema;', '')
       .replace('CREATE SCHEMA pg_catalog;', '');
     await fse.writeFile(schemaFilePath, schemaCleaned);
-    await duckDbWriteConnection.run(`IMPORT DATABASE '${duckDbBackupFolderPath}'`);
+    // the folder name comes from the restored archive: DuckDB can read and write
+    // files from SQL, so the path is escaped before being inlined in the statement
+    await duckDbWriteConnection.run(`IMPORT DATABASE '${escapeSqlStringLiteral(duckDbBackupFolderPath)}'`);
     logger.info(`DuckDB restored with success`);
     duckDbWriteConnection.disconnectSync();
     duckDbInstance.closeSync();

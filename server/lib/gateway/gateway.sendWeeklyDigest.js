@@ -55,6 +55,11 @@ async function sendWeeklyDigest({ force = false } = {}) {
     return { sent: 0 };
   }
 
+  if (status.subscription_active === false) {
+    logger.info('Weekly digest skipped: Gladys Plus subscription is not paid.');
+    return { sent: 0 };
+  }
+
   if (!this.device || !this.scene) {
     logger.warn('Weekly digest skipped: device or scene manager is not available.');
     return { sent: 0 };
@@ -89,7 +94,7 @@ async function sendWeeklyDigest({ force = false } = {}) {
           return;
         }
 
-        await this.message.sendToUser(admin.selector, digestText, null, { messageType: 'notification' });
+        await this.message.sendSystemMessage(admin.selector, digestText, null, { messageType: 'notification' });
         sent += 1;
       } catch (e) {
         if (e instanceof Error429) {

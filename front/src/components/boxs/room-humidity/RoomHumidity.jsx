@@ -1,9 +1,11 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 import get from 'get-value';
 
 import actions from '../../../actions/dashboard/boxes/humidityInRoom';
+import tileStyle from '../roomTile.css';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
 import { DEFAULT_VALUE_HUMIDITY, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
@@ -11,7 +13,7 @@ const isNotNullOrUndefined = value => value !== undefined && value !== null;
 
 const RoomHumidityBox = ({ children, ...props }) => (
   <div class="card p-3">
-    <div class="d-flex align-items-center">
+    <div class={cx('d-flex align-items-center', tileStyle.tileContent)}>
       {isNotNullOrUndefined(props.humidity) &&
         props.humidity >= props.humidityMin &&
         props.humidity <= props.humidityMax && (
@@ -36,7 +38,7 @@ const RoomHumidityBox = ({ children, ...props }) => (
       )}
       <div>
         {isNotNullOrUndefined(props.humidity) && (
-          <h4 class="m-0">
+          <h4 class={cx('m-0', tileStyle.tileValue)}>
             <Text id="global.percentValue" fields={{ value: Math.round(props.humidity) }} />
           </h4>
         )}
@@ -45,7 +47,7 @@ const RoomHumidityBox = ({ children, ...props }) => (
             <Text id="dashboard.boxes.humidityInRoom.noHumidityRecorded" />
           </p>
         )}
-        <small class="text-muted">{props.roomName}</small>
+        <small class={cx('text-muted', tileStyle.tileLabel)}>{props.roomName}</small>
       </div>
     </div>
   </div>

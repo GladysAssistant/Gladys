@@ -34,6 +34,9 @@ const DEVICE_EDIT_LINKS = {
  * - slug: identifier used to filter devices by integration
  * - i18nKey: translation key of the integration name (built-in integrations)
  * - name: raw name to display when there is no translation
+ * - external: true for a community integration (own group in the filter)
+ * - discriminant: technical identity, displayed only when two integrations
+ *   share the same name (see disambiguateIntegrationNames)
  * - url: integration page listing the devices
  * - deviceUrl: most specific page for this device in its integration
  */
@@ -46,7 +49,19 @@ export function getDeviceIntegration(device) {
     // External integrations (Docker containers) all share the same routes,
     // parameterized by the service selector (which is also its name)
     const url = `/dashboard/integration/device/external/${service.selector || service.name}`;
-    return { slug: service.name, name: service.name, url, deviceUrl: url };
+    // The service name is the technical selector (ext-<owner>-<repo>): display
+    // the manifest name, the same title as the integration card in the catalog
+    const name = (service.manifest && service.manifest.name) || service.name;
+    return {
+      slug: service.name,
+      name,
+      external: true,
+      // the store slug (owner/repo) reads better than the selector built from
+      // it; dev installs have none, their selector is the only identity
+      discriminant: service.store_slug || service.selector || service.name,
+      url,
+      deviceUrl: url
+    };
   }
   const slug = service.name.toLowerCase();
   const integration = integrationBySlug[slug];
@@ -63,4 +78,40 @@ export function getDeviceIntegration(device) {
     url,
     deviceUrl: buildDeviceLink ? buildDeviceLink(device.selector) : url
   };
+}
+
+/**
+ * Two community integrations can display the same name (two repositories
+ * publishing a manifest with the same name, or two dev installs of the same
+ * integration): those are the only ones that carry their technical identity
+ * next to their name, so the common case stays readable. Built-in integrations
+ * have unique names, and are told apart from community ones by their own group
+ * in the filter and by the "community" tag in the list.
+ * @param {Array} integrations - Integrations of the listed devices, with duplicates.
+ * @returns {Map} Name to display, by integration slug.
+ */
+export function disambiguateIntegrationNames(integrations) {
+  // names are compared lowercased: two manifests differing only by case read
+  // as the same name in the list
+  const slugsByName = new Map();
+  integrations.forEach(integration => {
+    if (integration && integration.external) {
+      const key = integration.name.toLowerCase();
+      const slugs = slugsByName.get(key) || new Set();
+      slugs.add(integration.slug);
+      slugsByName.set(key, slugs);
+    }
+  });
+  const nameBySlug = new Map();
+  integrations.forEach(integration => {
+    if (!integration || nameBySlug.has(integration.slug)) {
+      return;
+    }
+    const isDuplicated = integration.external && slugsByName.get(integration.name.toLowerCase()).size > 1;
+    nameBySlug.set(
+      integration.slug,
+      isDuplicated ? `${integration.name} (${integration.discriminant})` : integration.name
+    );
+  });
+  return nameBySlug;
 }

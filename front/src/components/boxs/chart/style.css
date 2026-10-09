@@ -31,6 +31,10 @@
   margin-right: auto !important;
 }
 
+/* Same soft Horizon surface as the dashboard switcher's overflow menu.
+   Solid background on purpose: the menu opens inside the card's own
+   backdrop root, where a nested backdrop-filter makes Chrome misrender
+   the panel — the dark-mode inversion filter still derives its dark look. */
 .dropdownMenuChart {
   position: absolute;
   cursor: pointer;
@@ -39,17 +43,17 @@
   z-index: 1000;
   display: none;
   min-width: 11rem;
-  padding: 0.25rem 0;
+  padding: 6px;
   margin: 0;
   font-size: 0.875rem;
-  color: #232e3c;
+  color: var(--gl-ink, #1c2334);
   text-align: left;
   list-style: none;
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid rgba(101, 109, 119, 0.16);
-  border-radius: 8px;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  border-radius: var(--gl-radius-md, 18px);
+  box-shadow: var(--gl-shadow, 0 18px 50px rgba(44, 62, 118, 0.13));
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -71,12 +75,13 @@
   width: 100%;
   padding: 0.5rem 0.75rem;
   clear: both;
-  font-weight: 400;
+  font-weight: 500;
   color: inherit;
   text-align: inherit;
   white-space: nowrap;
   background-color: transparent;
   border: 0;
+  border-radius: 10px;
   text-decoration: none;
 }
 
@@ -84,14 +89,28 @@
 .dropdownItemChart:hover {
   color: inherit;
   text-decoration: none;
-  background-color: rgba(101, 109, 119, 0.06);
+  background-color: rgba(28, 35, 52, 0.06);
 }
 
-.dropdownItemChart.active,
-.dropdownItemChart:active {
-  color: #206bc4;
+/* The `a` prefix is doing real work: these items are href-less <a>s, and
+   the framework's `a:not([href]):not([tabindex]) { color: inherit }` is one
+   type selector more specific than the classes alone — without it the
+   selected row keeps the ink text over the accent background */
+a.dropdownItemChart.active,
+a.dropdownItemChart:active {
+  color: #fff;
+  font-weight: 600;
   text-decoration: none;
-  background-color: rgba(32, 107, 196, 0.06);
+  background-color: var(--gl-accent, #3d6df0);
+}
+
+/* Dark mode: the app-wide inversion filter would turn this accent pill into
+   a somber navy with BLACK text. Double-inverting the row (the same trick
+   dark-mode.css uses for media) cancels the global filter, so it keeps the
+   authored accent background and white text in both modes. */
+:global(.dark-mode) a.dropdownItemChart.active,
+:global(.dark-mode) a.dropdownItemChart:active {
+  filter: invert(100%) hue-rotate(180deg);
 }
 
 .textGreen {
@@ -136,14 +155,32 @@
   margin-bottom: 0.75rem;
 }
 
+/* The chart lives on the Horizon dashboard: every .card there is a glass
+   surface whose backdrop-filter makes it a stacking context, so the open
+   period menu — whatever its z-index — paints UNDER the next card in the
+   document. Raising the whole card (position: relative in the framework)
+   while the menu is open lifts it above its (z-index: auto) siblings, and
+   stays under the pinned switcher bar (z-index: 100). */
+.cardMenuOpen {
+  z-index: 60;
+}
+
+/* The period toolbar follows the theme's segmented-control grammar (see
+   .hz-segmented): a soft rounded track where the touchable parts light up
+   as white floating segments. Everything sits on ONE slim line — period
+   label, then live dot or back-to-the-past pill — so the control stays a
+   caption above the chart instead of a block competing with it.
+   var() fallbacks: the box only renders inside .glass-theme, but the
+   values must survive a standalone render. */
 .chartToolbar {
   display: flex;
   align-items: stretch;
   width: 100%;
-  margin-top: 0.65rem;
-  background: rgba(101, 109, 119, 0.05);
-  border: 1px solid rgba(101, 109, 119, 0.12);
-  border-radius: 10px;
+  margin-top: 0.5rem;
+  background: rgba(28, 35, 52, 0.07);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
   overflow: visible;
 }
 
@@ -151,18 +188,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
+  width: 2.25rem;
   flex-shrink: 0;
   border: none;
+  border-radius: 999px;
   background: transparent;
-  color: #656d77;
+  color: var(--gl-muted, #7c8396);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.navButton:hover:not(:disabled) {
-  background: rgba(32, 107, 196, 0.08);
-  color: #206bc4;
+.navButton:hover:not(:disabled),
+.navButton:active:not(:disabled) {
+  background: #fff;
+  color: var(--gl-ink, #1c2334);
+  box-shadow: 0 2px 8px rgba(28, 35, 52, 0.18);
 }
 
 .navButton:disabled {
@@ -174,14 +214,12 @@
   position: relative;
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.15rem;
-  padding: 0.45rem 0.75rem;
+  gap: 0.7rem;
+  padding: 0.2rem 0.5rem;
   min-width: 0;
-  border-left: 1px solid rgba(101, 109, 119, 0.1);
-  border-right: 1px solid rgba(101, 109, 119, 0.1);
+  min-height: 2.25rem;
 }
 
 .intervalButton {
@@ -192,19 +230,23 @@
   background: transparent;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #232e3c;
+  color: var(--gl-ink, #1c2334);
   cursor: pointer;
   padding: 0;
   line-height: 1.2;
+  /* the label never wraps to a second line: on narrow phones the range
+     pill next to it is the part that gives way (ellipsis) */
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .intervalButton:hover {
-  color: #206bc4;
+  color: var(--gl-accent, #3d6df0);
 }
 
 .intervalChevron {
   font-size: 0.75rem;
-  color: #656d77;
+  color: var(--gl-muted, #7c8396);
   transition: transform 0.15s ease;
 }
 
@@ -218,7 +260,7 @@
   gap: 0.35rem;
   font-size: 0.6875rem;
   font-weight: 500;
-  color: #656d77;
+  color: var(--gl-muted, #7c8396);
   line-height: 1.2;
 }
 
@@ -226,30 +268,38 @@
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
-  background: #2fb344;
-  box-shadow: 0 0 0 2px rgba(47, 179, 68, 0.2);
+  background: #2e8f5b;
+  box-shadow: 0 0 0 2px rgba(56, 158, 90, 0.2);
   flex-shrink: 0;
 }
 
+/* Browsing the past: an accent-tinted pill showing the displayed range —
+   the one colored surface of the track, so the off-live state is readable
+   at a glance. The whole pill is the "back to now" button, said by its
+   return icon (and title/aria-label) rather than by a second line of text. */
 .periodRangeButton {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
-  gap: 0.1rem;
+  gap: 0.4rem;
   border: none;
-  background: transparent;
-  padding: 0;
+  border-radius: 999px;
+  background: rgba(61, 109, 240, 0.12);
+  color: var(--gl-accent, #3d6df0);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
   cursor: pointer;
-  max-width: 100%;
+  min-width: 0;
+  transition: background-color 0.15s ease;
 }
 
-.periodRangeButton:hover .backToNow {
-  color: #206bc4;
+.periodRangeButton:hover {
+  background: rgba(61, 109, 240, 0.2);
 }
 
 .periodRange {
   font-size: 0.6875rem;
-  color: #656d77;
+  font-weight: 500;
+  color: var(--gl-ink, #1c2334);
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -257,12 +307,16 @@
   max-width: 100%;
 }
 
-.backToNow {
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: #656d77;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  line-height: 1.2;
-  transition: color 0.15s ease;
+/* Touch targets: the toolbar deliberately stays one slim line (it was
+   reading as a block as tall as the chart), so instead of growing every
+   control to the 44px floor, the whole ~40px track row is the touch zone
+   and the individual controls get wider rather than taller */
+@media (pointer: coarse) {
+  .intervalButton {
+    min-height: 2.25rem;
+  }
+
+  .navButton {
+    width: 2.5rem;
+  }
 }
