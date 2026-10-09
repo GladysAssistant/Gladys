@@ -5,15 +5,16 @@ import get from 'get-value';
 
 import BaseEditBox from '../baseEditBox';
 import { ConfigField } from '../../integration/ConfigSchemaForm';
+import { hasDynamicSource, fetchDynamicOptions } from '../../integration/dynamicOptions';
 import StatusBadge from '../../../routes/integration/all/external-integration/components/StatusBadge';
 import { getLocalizedText } from '../../../routes/integration/all/external-integration/utils';
 import { loadWidgetList, findWidgetDeclaration } from './widgetList';
 
 // The edit form of an integration widget: the card title, then the
 // per-instance `settings` declared by the widget, rendered by the shared
-// config_schema engine (one engine, one look). `source: "devices"` options
-// are the integration's own devices, loaded from the standard device route
-// every user can read.
+// config_schema engine (one engine, one look). Dynamic `source` options (the
+// integration's own devices, the houses of Gladys) are loaded from standard
+// routes every user can read.
 const DISCRETE_SETTING_TYPES = ['boolean', 'select', 'multi_select'];
 
 class EditExternalWidgetBox extends Component {
@@ -35,14 +36,12 @@ class EditExternalWidgetBox extends Component {
         return;
       }
       this.setState({ declaration });
-      if (declaration && (declaration.settings || []).some(field => field.source === 'devices')) {
-        const devices = await httpClient.get(`/api/v1/service/${encodeURIComponent(box.integration)}/device`);
+      if (declaration && hasDynamicSource(declaration.settings)) {
+        const dynamicOptions = await fetchDynamicOptions(httpClient, box.integration, declaration.settings);
         if (requestId !== this.loadRequestId) {
           return;
         }
-        this.setState({
-          dynamicOptions: { devices: devices.map(device => ({ value: device.external_id, label: device.name })) }
-        });
+        this.setState({ dynamicOptions });
       }
     } catch (e) {
       console.error(e);

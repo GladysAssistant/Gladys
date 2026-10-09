@@ -29,6 +29,7 @@ const {
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   ACCOUNT_FIELD_TYPES,
+  DYNAMIC_SOURCES,
   MAX_WIDGETS,
   WIDGET_KEY_REGEX,
   WIDGET_LABEL_MIN_LENGTH,
@@ -172,11 +173,6 @@ const SECTION_DESCRIPTION_MAX_LENGTH = 1000;
 const MAX_SECTION_LINKS = 5;
 const SECTION_LINK_FIELDS = ['url', 'label'];
 const SELECT_DISPLAYS = ['dropdown', 'radio'];
-// Dynamic options of a select/multi_select: a reserved enum defined by the
-// core — never a URL nor an expression, nothing arbitrary enters the
-// rendering. "devices": the UI populates the options with the
-// already-created devices of the integration (value = external_id).
-const SELECT_SOURCES = ['devices'];
 const CONFIG_FIELD_FIELDS = [
   'key',
   'type',
@@ -492,8 +488,8 @@ function validateConfigField(field, index, seenKeys, errors, basePath, declaredP
   if (field.source !== undefined) {
     if (!OPTION_FIELD_TYPES.includes(field.type)) {
       errors.push(`${path}.source: only allowed on select and multi_select fields`);
-    } else if (!SELECT_SOURCES.includes(field.source)) {
-      errors.push(`${path}.source: must be one of ${SELECT_SOURCES.join(', ')}`);
+    } else if (!DYNAMIC_SOURCES.includes(field.source)) {
+      errors.push(`${path}.source: must be one of ${DYNAMIC_SOURCES.join(', ')}`);
     }
     if (field.options !== undefined) {
       errors.push(`${path}.options: mutually exclusive with source`);

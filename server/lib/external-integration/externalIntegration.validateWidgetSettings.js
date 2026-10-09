@@ -68,9 +68,10 @@ function checkSettingsBounds(settings) {
  * @description Validate the settings of one widget instance against the
  * `settings` declared by the widget, with the shared config_schema engine:
  * defaults applied to missing keys, `source: "devices"` resolved against the
- * integration's own devices, unknown key or invalid value → 422 naming the
- * key. Render-time validation is the one that must exist: a manifest can
- * change under a saved box on every integration update.
+ * integration's own devices and `source: "houses"` against the houses of
+ * Gladys, unknown key or invalid value → 422 naming the key. Render-time
+ * validation is the one that must exist: a manifest can change under a
+ * saved box on every integration update.
  * @param {object} service - The external integration service.
  * @param {object} widget - The declared widget.
  * @param {object} [rawSettings] - The settings of the box instance.

@@ -19,6 +19,7 @@ const CalendarAccountCard = ({
   disableConfirming,
   calendarToggleStatus,
   updateValue,
+  dynamicOptions,
   onSave,
   onDisable,
   onDisableConfirm,
@@ -63,6 +64,7 @@ const CalendarAccountCard = ({
               configuredSecrets={(account && account.configured_secrets) || []}
               touchedSecrets={touchedSecrets || {}}
               updateConfigValue={updateValue}
+              dynamicOptions={dynamicOptions}
             />
           ))}
           {(!enabled || hasEditableField) && (

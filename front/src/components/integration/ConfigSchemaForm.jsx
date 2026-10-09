@@ -105,8 +105,9 @@ class ConfigField extends Component {
     // inputs need ids of their own for the labels to point at them
     const fieldId = `${idPrefix || 'config'}_${field.key}`;
     // a select/multi_select can replace its static options with a
-    // core-defined source ("devices": the already-created devices of the
-    // integration, label = device name, value = external_id)
+    // core-defined source, loaded by the screen (see dynamicOptions.js):
+    // "devices" (the already-created devices of the integration, value =
+    // external_id) or "houses" (the houses of Gladys, value = selector)
     const options = field.source ? (dynamicOptions && dynamicOptions[field.source]) || [] : field.options || [];
 
     if (field.type === 'section') {

@@ -182,6 +182,14 @@ describe('externalIntegration.validateManifest — widgets and provider type', (
     expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
   });
 
+  it('should accept a source: "houses" setting', () => {
+    const manifest = withWidget({
+      ...CINEMA_WIDGET,
+      settings: [{ key: 'house', type: 'select', label: { en: 'House' }, source: 'houses', required: true }],
+    });
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
   it('should validate action_timeout_seconds bounds', () => {
     expect422(
       withWidget({ ...CINEMA_WIDGET, action_timeout_seconds: 4 }),

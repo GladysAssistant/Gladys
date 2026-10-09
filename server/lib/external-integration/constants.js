@@ -333,6 +333,14 @@ const PREFER_LOCAL_CONFIG_KEY = 'GLADYS_PREFER_LOCAL';
 // app, a pairing confirmed on a device — so it has no redirect URI, no anti-CSRF
 // state and no callback, and the integration reports the approval itself.
 const ACCOUNT_FIELD_TYPES = ['oauth2', 'account_link'];
+// Dynamic options of a select/multi_select field (`source`): a reserved enum
+// defined by the core — never a URL nor an expression, nothing arbitrary
+// enters the rendering — whose options, and therefore valid values, are only
+// known at runtime. "devices": the already-created devices of the integration
+// (label = device name, value = external_id), scoped to its t_service.
+// "houses": the houses of Gladys (label = house name, value = selector, the
+// identifier GET /house returns).
+const DYNAMIC_SOURCES = ['devices', 'houses'];
 // Optional `categories` manifest field: browse categories of the integration
 // catalog (docs/specs/integration-catalog-categories.md). More than 3 means
 // the assignment is lazy, not the vocabulary too narrow.
@@ -639,6 +647,7 @@ module.exports = {
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
   ACCOUNT_FIELD_TYPES,
+  DYNAMIC_SOURCES,
   MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
