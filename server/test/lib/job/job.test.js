@@ -8,6 +8,7 @@ const { fake, assert } = sinon;
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES, JOB_TYPES, JOB_STATUS } = require('../../../utils/constants');
 
 const Job = require('../../../lib/job');
+const { MAX_JOBS_TO_KEEP } = require('../../../lib/job/job.purge');
 
 const event = {
   emit: fake.returns(null),
@@ -192,13 +193,36 @@ describe('Job', () => {
   });
   describe('job.purge', () => {
     const job = new Job(event);
-    it('should purge old jobs', async () => {
+    it('should keep only the most recent jobs', async () => {
+      const now = Date.now();
+      const jobsToCreate = [];
+      for (let i = 0; i < MAX_JOBS_TO_KEEP + 5; i += 1) {
+        jobsToCreate.push({
+          type: JOB_TYPES.GLADYS_GATEWAY_BACKUP,
+          status: JOB_STATUS.SUCCESS,
+          progress: 100,
+          data: {},
+          // job i is i minutes old, so the 5 oldest have i >= MAX_JOBS_TO_KEEP
+          created_at: new Date(now - i * 60 * 1000),
+          updated_at: new Date(now - i * 60 * 1000),
+        });
+      }
+      await db.Job.bulkCreate(jobsToCreate);
+      await job.purge();
+      const remainingJobs = await db.Job.findAll({ attributes: ['created_at'], raw: true });
+      expect(remainingJobs).to.have.lengthOf(MAX_JOBS_TO_KEEP);
+      const oldestKeptDate = new Date(now - (MAX_JOBS_TO_KEEP - 1) * 60 * 1000);
+      remainingJobs.forEach((remainingJob) => {
+        expect(new Date(remainingJob.created_at).getTime()).to.be.at.least(oldestKeptDate.getTime());
+      });
+    });
+    it('should not delete anything when there are fewer jobs than the limit', async () => {
       await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
-      const dateInThePast = new Date(new Date().getTime() - 10 * 24 * 60 * 60 * 1000);
+      const dateInThePast = new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000);
       await db.Job.update({ created_at: dateInThePast }, { where: {} });
       await job.purge();
       const jobs = await job.get();
-      expect(jobs).to.deep.equal([]);
+      expect(jobs).to.have.lengthOf(1);
     });
   });
   describe('job.wrapper', () => {
