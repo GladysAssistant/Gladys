@@ -34,10 +34,27 @@ async function loadThermostat(deviceId) {
 }
 
 /**
+ * @description Clear the mark of a stop the programme made, read and written in
+ * the database. The device a mode write hands the service is the in-memory one,
+ * whose params the core's `setParam` never refreshes: reading the mark there
+ * missed it, and a stop a person made later was still taken for the
+ * programme's — and lifted by the next attach.
+ * @param {string} deviceId - The thermostat's id.
+ * @returns {Promise<void>}
+ * @example
+ * await clearScheduleStop(device.id);
+ */
+async function clearScheduleStop(deviceId) {
+  await db.DeviceParam.update(
+    { value: '' },
+    { where: { device_id: deviceId, name: SCHEDULE_STOP_PARAM, value: 'true' } },
+  );
+}
+
+/**
  * @description Stop a thermostat on behalf of the programme it was on, whose
  * point in force was Off — and record that the stop is the programme's, so the
  * next programme to take the thermostat over lifts it (see liftScheduleStop).
- * A hold running over that Off point ends with it.
  * @param {object} device - The thermostat, features and params included.
  * @returns {Promise<void>}
  * @example
@@ -47,9 +64,6 @@ async function stopForProgramme(device) {
   const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
   if (!modeFeature) {
     return;
-  }
-  if (getManualHold(device)) {
-    await clearManualHold.call(this, device);
   }
   await this.gladys.device.saveState(modeFeature, THERMOSTAT_MODE.OFF);
   await this.gladys.device.setParam(device, SCHEDULE_STOP_PARAM, 'true');
@@ -107,11 +121,15 @@ async function releaseFromProgramme(deviceId, current) {
 
 /**
  * @description Stop a thermostat whose programme was emptied of its points while
- * the point in force was Off. It still follows that programme, so unlike a
- * detach a hold over the Off point does not become permanent — on a programme
- * with no point left it would have been re-armed, expired, and left the heating
- * running on the held setpoint for good. Stopped, it is started again by the
- * programme once it has points again, or by a person.
+ * the point in force was Off. Stopped, it is started again by the programme once
+ * it has points again, or by a person.
+ *
+ * Unlike a detach, a hold over the Off point ends here, a named preset's
+ * included. On a thermostat that follows a schedule every hold, a preset's too,
+ * runs to the programme's next point — and an emptied programme has none: kept,
+ * or made permanent as a detach does, the hold was re-armed, expired into
+ * `schedule` with no point in force, and left the heating running on its
+ * setpoint for good, while the programme it follows said Off.
  * @param {string} deviceId - The thermostat's id.
  * @returns {Promise<void>}
  * @example
@@ -121,6 +139,9 @@ async function stopForEmptiedProgramme(deviceId) {
   const device = await loadThermostat(deviceId);
   if (isStopped(device)) {
     return;
+  }
+  if (getManualHold(device)) {
+    await clearManualHold.call(this, device);
   }
   await stopForProgramme.call(this, device);
 }
@@ -139,10 +160,13 @@ async function liftScheduleStop(device) {
   if (!isStopped(device) || !isScheduleStop(device)) {
     return;
   }
-  // The same write as the widget's start button, so the stop marker goes, an
-  // external appliance gets its mode back, and a pass is triggered.
+  // Gladys's own mode only: the regulation pass the caller triggers then
+  // applies the programme's point to the appliance, mode then setpoint (C.0).
+  // Starting the appliance here, as the widget's start button does, switched it
+  // on for the two seconds before that pass whenever the new point was Off.
   const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
-  await this.setValue(device, modeFeature, getRunningMode(buildParamsConfig(device)));
+  await this.gladys.device.saveState(modeFeature, getRunningMode(buildParamsConfig(device)));
+  await clearScheduleStop(device.id);
   logger.info(`Thermostat: "${device.selector}" started again, its stop was its previous programme's`);
 }
 
@@ -330,6 +354,7 @@ module.exports = {
   releaseFromProgramme,
   stopForEmptiedProgramme,
   liftScheduleStop,
+  clearScheduleStop,
   loadThermostat,
   forEachFollower,
   resolveScheduleAndDevice,

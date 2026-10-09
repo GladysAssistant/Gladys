@@ -681,6 +681,20 @@ class ThermostatBox extends Component {
     ) {
       this.setState({ manualSetpointOverride: true });
     }
+    // And the other way round, on any thermostat: a hold landing on the active
+    // preset's own setpoint is that preset applied. A scene picking the preset
+    // the thermostat already carries sends no preset event, only this one, and
+    // the card kept "21.5 · Manual mode" from its own dial until a reload.
+    if (
+      isManual &&
+      !this.savingPreset &&
+      !this.pickingPreset &&
+      !this.state.isDragging &&
+      this.state.manualSetpointOverride &&
+      this.holdMatchesPreset(payload.setpoint, this.state.activePreset)
+    ) {
+      this.setState({ manualSetpointOverride: false, setpoint: payload.setpoint });
+    }
     if (!isManual && this.state.isManualMode) {
       // The server let the hold expire — the schedule takes the thermostat back.
       // Hold the setpoint first: see cancelManualMode for why.
@@ -896,11 +910,13 @@ class ThermostatBox extends Component {
 
     // If not in manual mode and a preset was resolved, apply its setpoint immediately
     // so the gauge shows the correct temperature without waiting for getDeviceData
+    let scheduledTemp = null;
     if (!isManualMode && activePreset && activePreset !== 'off') {
       const presets = this.getPresets();
       const presetObj = presets.find(p => p.key === activePreset);
       if (presetObj && presetObj.temp !== null && presetObj.temp !== undefined) {
-        stateInit.setpoint = this.toSetpointFeatureUnit(presetObj.temp);
+        scheduledTemp = presetObj.temp;
+        stateInit.setpoint = this.toSetpointFeatureUnit(scheduledTemp);
         this._scheduleSetpointSet = true;
       }
     }
@@ -939,9 +955,14 @@ class ThermostatBox extends Component {
     await new Promise(resolve => this.setState(stateInit, resolve));
     await this.getDeviceData();
     // The setpoint feature's unit is only known once its device is read: on the
-    // first load the hold was compared with the preset in the thermostat's unit.
+    // first load the hold was compared with the preset, and the programme's
+    // setpoint converted, in the thermostat's unit — and the feature's own value
+    // was skipped for the latter, so 21 stayed on screen under °F.
     if (hold && stateInit.manualSetpointOverride && this.holdMatchesPreset(hold.setpoint, activePreset)) {
       this.setState({ manualSetpointOverride: false });
+    }
+    if (!hold && scheduledTemp !== null && this.state.setpoint !== this.toSetpointFeatureUnit(scheduledTemp)) {
+      this.setState({ setpoint: this.toSetpointFeatureUnit(scheduledTemp) });
     }
     this.applyFallbackSetpoint();
   };

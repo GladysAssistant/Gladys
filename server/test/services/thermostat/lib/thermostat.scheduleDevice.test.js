@@ -409,7 +409,7 @@ describe('thermostat schedule <-> device link', () => {
       const programme = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Programme', transitions: [] });
       await handler.attachScheduleToDevice(programme.selector, thermostat.selector);
       await modeFeature.update({ last_value: THERMOSTAT_MODE.OFF });
-      await addParam('THERMOSTAT_SCHEDULE_STOP', 'true');
+      const mark = await addParam('THERMOSTAT_SCHEDULE_STOP', 'true');
       resetFakes();
 
       await handler.updateSchedule(programme.selector, { transitions: allDay('eco') });
@@ -419,13 +419,40 @@ describe('thermostat schedule <-> device link', () => {
         sinonMatchSelector(modeFeature.selector),
         THERMOSTAT_MODE.HEATING,
       );
-      assert.calledWith(
-        handler.gladys.device.setParam,
-        sinonMatchSelector(thermostat.selector),
-        'THERMOSTAT_SCHEDULE_STOP',
-        '',
-      );
+      expect((await mark.reload()).value).to.equal('');
       assert.called(handler.triggerApplySchedules);
+    });
+
+    it('should stop a follower on a preset of its own over the Off point of an emptied programme', async () => {
+      // On a programme that preset is a hold to its next point, and an emptied
+      // programme has none: kept, it expired into `schedule` with no point in
+      // force and heated on the preset's setpoint for good.
+      const programme = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Programme', transitions: allDay('off') });
+      await handler.attachScheduleToDevice(programme.selector, thermostat.selector);
+      await presetFeature.update({ last_value: THERMOSTAT_PRESET.COMFORT });
+      await addParam('THERMOSTAT_MANUAL_SETPOINT', '21');
+      await addParam('THERMOSTAT_MANUAL_UNTIL', String(Date.now() + 3600000));
+      resetFakes();
+
+      await handler.updateSchedule(programme.selector, { transitions: [] });
+
+      assert.calledWith(handler.gladys.device.saveState, sinonMatchSelector(modeFeature.selector), THERMOSTAT_MODE.OFF);
+    });
+
+    it('should clear the mark on a mode written by hand, though the device handed over lacks it', async () => {
+      // A mode write gets the in-memory device, whose params the core's
+      // setParam never refreshes: the mark has to be cleared in the database.
+      const mark = await addParam('THERMOSTAT_SCHEDULE_STOP', 'true');
+      const inMemory = {
+        id: thermostat.id,
+        selector: thermostat.selector,
+        params: [],
+        features: [modeFeature.get({ plain: true })],
+      };
+
+      await handler.setValue(inMemory, modeFeature.get({ plain: true }), THERMOSTAT_MODE.HEATING);
+
+      expect((await mark.reload()).value).to.equal('');
     });
 
     it('should leave a follower stopped by hand stopped when the programme has points again', async () => {
@@ -583,7 +610,7 @@ describe('thermostat schedule <-> device link', () => {
       // Deleted or detached on an Off point, then attached to a new programme:
       // the new programme's next point must apply, not a stop nobody chose.
       await modeFeature.update({ last_value: THERMOSTAT_MODE.OFF });
-      await addParam('THERMOSTAT_SCHEDULE_STOP', 'true');
+      const mark = await addParam('THERMOSTAT_SCHEDULE_STOP', 'true');
 
       await handler.attachScheduleToDevice(schedule.selector, thermostat.selector);
 
@@ -592,12 +619,25 @@ describe('thermostat schedule <-> device link', () => {
         sinonMatchSelector(modeFeature.selector),
         THERMOSTAT_MODE.HEATING,
       );
-      assert.calledWith(
-        handler.gladys.device.setParam,
-        sinonMatchSelector(thermostat.selector),
-        'THERMOSTAT_SCHEDULE_STOP',
-        '',
-      );
+      expect((await mark.reload()).value).to.equal('');
+    });
+
+    it('should leave the appliance of a thermostat started this way to the pass', async () => {
+      // Gladys's mode only: the pass applies the new point to the appliance, so
+      // one whose new point is Off is never switched on in between.
+      await modeFeature.update({ last_value: THERMOSTAT_MODE.OFF });
+      await addParam('THERMOSTAT_SCHEDULE_STOP', 'true');
+      await addParam('THERMOSTAT_TYPE', 'external');
+      await addParam('THERMOSTAT_TARGET_FEATURE', 'netatmo-setpoint');
+      await addParam('THERMOSTAT_MODE_FEATURE', 'netatmo-mode');
+      handler.gladys.device.setValue = fake.resolves(null);
+      handler.gladys.device.get = fake.resolves([]);
+
+      await handler.attachScheduleToDevice(schedule.selector, thermostat.selector);
+
+      assert.notCalled(handler.gladys.device.setValue);
+      assert.notCalled(handler.gladys.device.get);
+      assert.called(handler.triggerApplySchedules);
     });
 
     it('should start a cooling thermostat its previous programme stopped in cooling', async () => {

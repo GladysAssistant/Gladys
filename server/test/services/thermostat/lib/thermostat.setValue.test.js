@@ -21,9 +21,13 @@ const { MANUAL_DURATION_MS } = require('../../../../utils/thermostatConstants');
 // A hold ends on the next transition point by default, so the schedule the
 // thermostat follows is what decides the expiry. `follows: false` describes a
 // thermostat that follows none, whose hold is permanent.
+// Cleared in the database, which the scheduleDevice tests exercise for real.
+const clearScheduleStop = fake.resolves(null);
+
 const load = (follows = true) =>
   proxyquire('../../../../services/thermostat/lib/thermostat.setValue', {
     './thermostat.scheduleDevice': {
+      clearScheduleStop,
       followsSchedule: fake.resolves(follows),
       getScheduleOfDevice: fake.resolves(
         follows ? { transitions: [{ day_of_week: 0, time: '06:30', preset: 'comfort' }] } : null,
@@ -503,16 +507,15 @@ describe('thermostat.setValue', () => {
 
     it("should make a stop the programme left behind the writer's own", async () => {
       // Whoever writes the mode now owns the stop or the start: the next
-      // programme attached must not lift a stop a person confirmed.
+      // programme attached must not lift a stop a person confirmed. Cleared
+      // whatever the device object says: the one a mode write hands over is the
+      // in-memory one, whose params do not carry the mark.
       const handler = buildHandler();
+      clearScheduleStop.resetHistory();
 
-      await handler.setValue(
-        device([{ name: 'THERMOSTAT_SCHEDULE_STOP', value: 'true' }]),
-        modeFeature,
-        THERMOSTAT_MODE.OFF,
-      );
+      await handler.setValue(device(), modeFeature, THERMOSTAT_MODE.OFF);
 
-      expect(paramCall(handler, 'THERMOSTAT_SCHEDULE_STOP').args[2]).to.equal('');
+      assert.calledOnceWithExactly(clearScheduleStop, 'device-id');
     });
   });
 

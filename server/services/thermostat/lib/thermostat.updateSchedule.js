@@ -1,6 +1,7 @@
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const { validateSchedule } = require('../../../utils/thermostatValidateSchedule');
+const { SCHEDULE_STOP_PARAM } = require('./thermostat.state');
 const { getScheduleBySelector, getCurrentPoint } = require('./thermostat.getSchedules');
 const {
   stopForEmptiedProgramme,
@@ -125,9 +126,16 @@ async function updateSchedule(selector, scheduleData) {
       }
     } else {
       // Points again: the stops the programme left behind are its own to lift.
+      // Only the followers carrying the mark are loaded, not every one of them
+      // on every save of the points.
+      const marked = await db.DeviceParam.findAll({
+        where: { device_id: followerIds, name: SCHEDULE_STOP_PARAM, value: 'true' },
+        attributes: ['device_id'],
+        raw: true,
+      });
       await forEachFollower.call(
         this,
-        followerIds,
+        marked.map((param) => param.device_id),
         async (deviceId) => liftScheduleStop.call(this, await loadThermostat(deviceId)),
         'start a follower of the programme again',
       );

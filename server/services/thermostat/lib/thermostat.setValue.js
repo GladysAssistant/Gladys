@@ -15,17 +15,9 @@ const {
   convertSetpointToFeatureUnit,
   DEFAULT_TIMEZONE,
 } = require('./thermostat.applySchedules');
-const { getScheduleOfDevice } = require('./thermostat.scheduleDevice');
+const { getScheduleOfDevice, clearScheduleStop } = require('./thermostat.scheduleDevice');
 const { nextTransitionTimestamp } = require('../../../utils/thermostatSchedule');
-const {
-  presetName,
-  savePreset,
-  setManualHold,
-  clearManualHold,
-  isStopped,
-  isScheduleStop,
-  SCHEDULE_STOP_PARAM,
-} = require('./thermostat.state');
+const { presetName, savePreset, setManualHold, clearManualHold, isStopped } = require('./thermostat.state');
 
 /**
  * @description The setpoint a preset arms its hold on, in the unit the hold is
@@ -211,9 +203,7 @@ async function setValue(device, deviceFeature, value, manual = true) {
     await this.gladys.device.saveState(deviceFeature, value);
     // Whoever writes the mode now owns the stop, or the start: a stop the
     // programme left behind is no longer the programme's to lift.
-    if (isScheduleStop(device)) {
-      await this.gladys.device.setParam(device, SCHEDULE_STOP_PARAM, '');
-    }
+    await clearScheduleStop(device.id);
     const config = buildParamsConfig(device) || {};
     if (Number(value) === THERMOSTAT_MODE.OFF) {
       // Stopping is not a preset with a setpoint: it cuts the switch on a
