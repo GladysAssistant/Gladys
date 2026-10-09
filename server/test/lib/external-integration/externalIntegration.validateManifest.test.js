@@ -349,6 +349,91 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept the credential_keys of an account field', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [
+        ...TEST_MANIFEST.config_schema,
+        {
+          key: 'xiaomi_account',
+          type: 'account_link',
+          label: { en: 'Xiaomi account' },
+          credential_keys: ['session_pass_token', 'session_ssecurity'],
+        },
+        { key: 'netatmo_account', type: 'oauth2', label: { en: 'Netatmo account' }, credential_keys: ['access_token'] },
+      ],
+    };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should reject invalid credential_keys', () => {
+    const accountField = (credentialKeys) => ({
+      key: 'account',
+      type: 'oauth2',
+      label: { en: 'Account' },
+      credential_keys: credentialKeys,
+    });
+    // only an account field holds credentials
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'string', label: { en: 'L' }, credential_keys: ['a'] }] },
+      'config_schema[0].credential_keys: only allowed on oauth2, account_link fields',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [accountField([])] },
+      'config_schema[0].credential_keys: must be a list of 1-20 keys',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [accountField('access_token')] },
+      'config_schema[0].credential_keys: must be a list of 1-20 keys',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [accountField(Array.from({ length: 21 }, (_, index) => `key_${index}`))] },
+      'config_schema[0].credential_keys: must be a list of 1-20 keys',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [accountField(['Access-Token'])] },
+      'config_schema[0].credential_keys[0]: must be a non-empty string matching [a-z0-9_]',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [accountField(['token', 'token'])] },
+      'config_schema[0].credential_keys[1]: duplicate key "token"',
+    );
+    // never the user preferences nor the core's own service variables
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [accountField(['gladys_prefer_local'])] },
+      'config_schema[0].credential_keys[0]: "gladys_prefer_local" is reserved',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [accountField(['external_integration_container_ports'])] },
+      'config_schema[0].credential_keys[0]: "external_integration_container_ports" is reserved',
+    );
+  });
+
+  it('should reject a credential key that is a setting or owned by another account field', () => {
+    // a key the user fills in the form is a setting, never a credential
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [
+          ...TEST_MANIFEST.config_schema,
+          { key: 'account', type: 'oauth2', label: { en: 'Account' }, credential_keys: ['latitude'] },
+        ],
+      },
+      `config_schema[${TEST_MANIFEST.config_schema.length}].credential_keys[0]: "latitude" is a config_schema key`,
+    );
+    // one disconnect must never log another account out
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [
+          { key: 'first', type: 'oauth2', label: { en: 'First' }, credential_keys: ['token'] },
+          { key: 'second', type: 'account_link', label: { en: 'Second' }, credential_keys: ['token'] },
+        ],
+      },
+      'config_schema[1].credential_keys[0]: "token" is already a credential key of first',
+    );
+  });
+
   it('should accept a valid network_discovery capture list', () => {
     const manifest = {
       ...TEST_MANIFEST,

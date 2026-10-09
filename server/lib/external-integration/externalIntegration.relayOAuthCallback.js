@@ -1,6 +1,7 @@
 const { BadParameters, ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { Error422 } = require('../../utils/httpErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { getAccountField } = require('./externalIntegration.getAccountField');
 
 // transport-level failures stay a 400 (integration unreachable), only an
 // explicit refusal of the integration (success: false) becomes a 422
@@ -42,11 +43,8 @@ async function relayOAuthCallback(selector, { key, code, state, redirect_uri: re
     throw new BadParameters('redirect_uri: must be a non-empty string');
   }
   const service = await this.getBySelector(selector);
-  const configSchema = (service.manifest && service.manifest.config_schema) || [];
-  const field = configSchema.find((schemaField) => schemaField.key === key);
-  if (!field || field.type !== 'oauth2') {
-    throw new BadParameters(`config.${key}: not an oauth2 field`);
-  }
+  // only the redirect-based flow comes back to Gladys
+  getAccountField(service, key, ['oauth2']);
   try {
     await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.OAUTH_CALLBACK, {
       key,

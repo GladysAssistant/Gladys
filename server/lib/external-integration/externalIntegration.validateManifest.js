@@ -29,6 +29,9 @@ const {
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   ACCOUNT_FIELD_TYPES,
+  CORE_SERVICE_VARIABLES,
+  MAX_CREDENTIAL_KEYS,
+  RESERVED_PARAM_PREFIX,
   DYNAMIC_SOURCES,
   MAX_WIDGETS,
   WIDGET_KEY_REGEX,
@@ -187,6 +190,7 @@ const CONFIG_FIELD_FIELDS = [
   'source',
   'display',
   'links',
+  'credential_keys',
 ];
 // boolean has no input to hint, select shows its options
 const PLACEHOLDER_FIELD_TYPES = ['string', 'number', 'secret'];
@@ -374,6 +378,74 @@ function rejectPerUserSchemaPortPlaceholders(value, path, errors, schemaLabel) {
 }
 
 /**
+ * @description Validate the `credential_keys` of an account field: the
+ * off-schema keys holding its credentials, the only ones a disconnect deletes.
+ * The cross-field rules (no collision with a config_schema key, no key owned
+ * by two fields) are checked on the whole schema, see
+ * validateCredentialKeysOwnership.
+ * @param {object} field - The config field.
+ * @param {string} path - The path of the field, for error messages.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateCredentialKeys({ type: 'oauth2', credential_keys: ['access_token'] }, 'config_schema[0]', errors);
+ */
+function validateCredentialKeys(field, path, errors) {
+  if (!ACCOUNT_FIELD_TYPES.includes(field.type)) {
+    errors.push(`${path}.credential_keys: only allowed on ${ACCOUNT_FIELD_TYPES.join(', ')} fields`);
+    return;
+  }
+  const keys = field.credential_keys;
+  if (!Array.isArray(keys) || keys.length === 0 || keys.length > MAX_CREDENTIAL_KEYS) {
+    errors.push(`${path}.credential_keys: must be a list of 1-${MAX_CREDENTIAL_KEYS} keys`);
+    return;
+  }
+  keys.forEach((key, keyIndex) => {
+    const keyPath = `${path}.credential_keys[${keyIndex}]`;
+    if (typeof key !== 'string' || !CONFIG_KEY_REGEX.test(key)) {
+      errors.push(`${keyPath}: must be a non-empty string matching [a-z0-9_]`);
+    } else if (keys.indexOf(key) !== keyIndex) {
+      errors.push(`${keyPath}: duplicate key "${key}"`);
+    } else if (
+      key.toUpperCase().startsWith(RESERVED_PARAM_PREFIX) ||
+      CORE_SERVICE_VARIABLES.includes(key.toUpperCase())
+    ) {
+      // stored uppercase next to the user preferences and the core's own
+      // service variables: a disconnect must never reach those
+      errors.push(`${keyPath}: "${key}" is reserved`);
+    }
+  });
+}
+
+/**
+ * @description Check the credential keys against the whole config_schema: a
+ * key the user fills in the form is a setting, never a credential, and a key
+ * owned by two account fields would let one disconnect log the other out.
+ * @param {Array} configSchema - The config_schema list.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateCredentialKeysOwnership(manifest.config_schema, errors);
+ */
+function validateCredentialKeysOwnership(configSchema, errors) {
+  const schemaKeys = configSchema.map((field) => field && field.key);
+  const owners = new Map();
+  configSchema.forEach((field, index) => {
+    if (!field || !Array.isArray(field.credential_keys)) {
+      return;
+    }
+    field.credential_keys.forEach((key, keyIndex) => {
+      const keyPath = `config_schema[${index}].credential_keys[${keyIndex}]`;
+      if (schemaKeys.includes(key)) {
+        errors.push(`${keyPath}: "${key}" is a config_schema key`);
+      } else if (owners.has(key) && owners.get(key) !== field.key) {
+        errors.push(`${keyPath}: "${key}" is already a credential key of ${owners.get(key)}`);
+      } else {
+        owners.set(key, field.key);
+      }
+    });
+  });
+}
+
+/**
  * @description Validate one entry of the config_schema flat list.
  * @param {object} field - The field to validate.
  * @param {number} index - Index of the field in the list.
@@ -516,6 +588,9 @@ function validateConfigField(field, index, seenKeys, errors, basePath, declaredP
     }
   } else if (field.options !== undefined) {
     errors.push(`${path}.options: only allowed on select and multi_select fields`);
+  }
+  if (field.credential_keys !== undefined) {
+    validateCredentialKeys(field, path, errors);
   }
 }
 
@@ -1138,6 +1213,7 @@ function validateManifest(manifest) {
       manifest.config_schema.forEach((field, index) =>
         validateConfigField(field, index, seenKeys, errors, 'config_schema', declaredPortNames),
       );
+      validateCredentialKeysOwnership(manifest.config_schema, errors);
     }
   }
   if (manifest.containers !== undefined) {

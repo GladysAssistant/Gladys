@@ -1073,6 +1073,7 @@
       },
       "actions": {
         "title": "Aktionen",
+        "runButton": "Ausführen",
         "error": "Die Aktion ist fehlgeschlagen. Prüfen Sie, ob die Integration läuft.",
         "resultRegionLabel": "Ergebnis der Aktion"
       },
