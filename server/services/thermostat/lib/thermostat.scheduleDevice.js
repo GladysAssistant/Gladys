@@ -1,8 +1,24 @@
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
-const { DEVICE_FEATURE_TYPES, THERMOSTAT_MODE } = require('../../../utils/constants');
-const { getFeature, getPreset, isStopped, getManualHold, setManualHold, savePreset } = require('./thermostat.state');
+const { DEVICE_FEATURE_TYPES, THERMOSTAT_MODE, THERMOSTAT_PRESET } = require('../../../utils/constants');
+const { buildParamsConfig, getRunningMode } = require('./thermostat.deviceConfig');
+const {
+  getFeature,
+  getPreset,
+  isStopped,
+  isScheduleStop,
+  getManualHold,
+  setManualHold,
+  clearManualHold,
+  savePreset,
+  SCHEDULE_STOP_PARAM,
+} = require('./thermostat.state');
 const { getCurrentPoint } = require('./thermostat.getSchedules');
+
+const THERMOSTAT_INCLUDE = [
+  { model: db.DeviceFeature, as: 'features' },
+  { model: db.DeviceParam, as: 'params' },
+];
 
 /**
  * @description A thermostat with its features and params, as the state helpers
@@ -13,14 +29,32 @@ const { getCurrentPoint } = require('./thermostat.getSchedules');
  * await loadThermostat(device.id);
  */
 async function loadThermostat(deviceId) {
-  const row = await db.Device.findOne({
-    where: { id: deviceId },
-    include: [
-      { model: db.DeviceFeature, as: 'features' },
-      { model: db.DeviceParam, as: 'params' },
-    ],
-  });
+  const row = await db.Device.findOne({ where: { id: deviceId }, include: THERMOSTAT_INCLUDE });
   return row.get({ plain: true });
+}
+
+/**
+ * @description Stop a thermostat on behalf of the programme it was on, whose
+ * point in force was Off — and record that the stop is the programme's, so the
+ * next programme to take the thermostat over lifts it (see liftScheduleStop).
+ * A hold running over that Off point ends with it.
+ * @param {object} device - The thermostat, features and params included.
+ * @returns {Promise<void>}
+ * @example
+ * await stopForProgramme.call(thermostatHandler, device);
+ */
+async function stopForProgramme(device) {
+  const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
+  if (!modeFeature) {
+    return;
+  }
+  if (getManualHold(device)) {
+    await clearManualHold.call(this, device);
+  }
+  await this.gladys.device.saveState(modeFeature, THERMOSTAT_MODE.OFF);
+  await this.gladys.device.setParam(device, SCHEDULE_STOP_PARAM, 'true');
+  logger.info(`Thermostat: "${device.selector}" stopped, the point its programme was on is Off`);
+  this.triggerApplySchedules();
 }
 
 /**
@@ -33,7 +67,8 @@ async function loadThermostat(deviceId) {
  * - On a point naming a preset, that preset is written on the feature: the
  *   widget lights it, and it stays tied to the preset's temperature.
  * - On an Off point, the thermostat is stopped: the widget shows it, with the
- *   button that starts it again.
+ *   button that starts it again. The stop is recorded as the programme's, and
+ *   the next schedule attached lifts it.
  * - A hold running to the programme's next point has no point left to run to:
  *   like any hold taken on a thermostat with no schedule, it now lasts.
  *
@@ -62,16 +97,77 @@ async function releaseFromProgramme(deviceId, current) {
     return;
   }
   if (current.preset === 'off') {
-    const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
-    if (!modeFeature) {
-      return;
-    }
-    await this.gladys.device.saveState(modeFeature, THERMOSTAT_MODE.OFF);
-  } else {
-    await savePreset.call(this, device, current.preset);
+    await stopForProgramme.call(this, device);
+    return;
   }
+  await savePreset.call(this, device, current.preset);
   logger.info(`Thermostat: "${device.selector}" left on "${current.preset}", the point its programme was on`);
   this.triggerApplySchedules();
+}
+
+/**
+ * @description Stop a thermostat whose programme was emptied of its points while
+ * the point in force was Off. It still follows that programme, so unlike a
+ * detach a hold over the Off point does not become permanent — on a programme
+ * with no point left it would have been re-armed, expired, and left the heating
+ * running on the held setpoint for good. Stopped, it is started again by the
+ * programme once it has points again, or by a person.
+ * @param {string} deviceId - The thermostat's id.
+ * @returns {Promise<void>}
+ * @example
+ * await stopForEmptiedProgramme.call(thermostatHandler, device.id);
+ */
+async function stopForEmptiedProgramme(deviceId) {
+  const device = await loadThermostat(deviceId);
+  if (isStopped(device)) {
+    return;
+  }
+  await stopForProgramme.call(this, device);
+}
+
+/**
+ * @description Start a thermostat again when its stop was a programme's (see
+ * stopForProgramme): a programme taking the thermostat over is what that stop
+ * was waiting for. A stop made by hand is left alone — a thermostat stopped for
+ * the summer stays stopped when its programme is changed.
+ * @param {object} device - The thermostat, features and params included.
+ * @returns {Promise<void>}
+ * @example
+ * await liftScheduleStop.call(thermostatHandler, device);
+ */
+async function liftScheduleStop(device) {
+  if (!isStopped(device) || !isScheduleStop(device)) {
+    return;
+  }
+  // The same write as the widget's start button, so the stop marker goes, an
+  // external appliance gets its mode back, and a pass is triggered.
+  const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
+  await this.setValue(device, modeFeature, getRunningMode(buildParamsConfig(device)));
+  logger.info(`Thermostat: "${device.selector}" started again, its stop was its previous programme's`);
+}
+
+/**
+ * @description Run an action on every thermostat of a programme, one failure
+ * leaving the others and the caller unaffected. The programme change that calls
+ * it has already happened by then: failing the request answered an error for a
+ * change that had been made, and skipped what comes after it.
+ * @param {Array<string>} deviceIds - The thermostats' ids.
+ * @param {Function} action - Called with each id, bound to the handler.
+ * @param {string} what - What the action does, for the log line.
+ * @returns {Promise<void>}
+ * @example
+ * await forEachFollower.call(thermostatHandler, ids, stopForEmptiedProgramme, 'stop a follower');
+ */
+async function forEachFollower(deviceIds, action, what) {
+  await Promise.all(
+    deviceIds.map(async (deviceId) => {
+      try {
+        await action.call(this, deviceId);
+      } catch (e) {
+        logger.warn(`Thermostat: could not ${what} (${deviceId}): ${e.message}`);
+      }
+    }),
+  );
 }
 
 /**
@@ -97,6 +193,7 @@ async function resolveScheduleAndDevice(scheduleSelector, deviceSelector, { chec
     include: [
       { model: db.Service, as: 'service', attributes: ['name'] },
       { model: db.Room, as: 'room', attributes: ['house_id'] },
+      ...THERMOSTAT_INCLUDE,
     ],
   });
   if (!device) {
@@ -118,8 +215,13 @@ async function resolveScheduleAndDevice(scheduleSelector, deviceSelector, { chec
 
 /**
  * @description Make a thermostat follow a schedule, replacing the one it
- * followed. Idempotent: attaching a thermostat to the schedule it already
- * follows is a no-op rather than an error.
+ * followed, and hand the thermostat over to it: its preset goes back to
+ * `schedule`, which ends a hold, and a stop the previous programme left behind
+ * is lifted. A stop made by hand stays: it outranks any programme, and the
+ * widget offers the way back.
+ *
+ * Attaching a thermostat to the schedule it already follows changes nothing —
+ * neither an error, nor a reset of a preset picked since.
  * @param {string} scheduleSelector - Schedule selector.
  * @param {string} deviceSelector - Thermostat selector.
  * @returns {Promise<void>}
@@ -128,6 +230,10 @@ async function resolveScheduleAndDevice(scheduleSelector, deviceSelector, { chec
  */
 async function attachScheduleToDevice(scheduleSelector, deviceSelector) {
   const { schedule, device } = await resolveScheduleAndDevice(scheduleSelector, deviceSelector);
+  const link = await db.ThermostatScheduleDevice.findOne({ where: { device_id: device.id } });
+  if (link && link.schedule_id === schedule.id) {
+    return;
+  }
 
   logger.info(`Thermostat: "${deviceSelector}" now follows schedule "${scheduleSelector}"`);
   // The primary key on device_id is what makes this a replacement rather than a
@@ -137,9 +243,15 @@ async function attachScheduleToDevice(scheduleSelector, deviceSelector) {
   // Following a programme is what the `schedule` preset says, and the loop only
   // reads the programme while the feature carries it. A thermostat left on a
   // named preset — by a detach, a deleted schedule, or a choice made while it
-  // followed none — ignored the schedule just attached, for good. A stop is left
-  // as it is: it outranks any programme, and the widget offers the way back.
-  await savePreset.call(this, await loadThermostat(device.id), 'schedule');
+  // followed none — ignored the schedule just attached, for good. Written like a
+  // person picking it, so a hold goes too: one taken before the attach kept the
+  // thermostat off the programme for another half hour.
+  const thermostat = device.get({ plain: true });
+  const presetFeature = getFeature(thermostat, DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET);
+  if (presetFeature) {
+    await this.setValue(thermostat, presetFeature, THERMOSTAT_PRESET.SCHEDULE);
+  }
+  await liftScheduleStop.call(this, thermostat);
   // The widgets read which schedule a thermostat follows from the schedule list,
   // and the new point applies now rather than at the next minute tick.
   this.broadcastConfigUpdated();
@@ -216,6 +328,10 @@ module.exports = {
   attachScheduleToDevice,
   detachScheduleFromDevice,
   releaseFromProgramme,
+  stopForEmptiedProgramme,
+  liftScheduleStop,
+  loadThermostat,
+  forEachFollower,
   resolveScheduleAndDevice,
   followsSchedule,
   getScheduleOfDevice,

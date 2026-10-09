@@ -2,6 +2,7 @@ const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const {
   SYSTEM_VARIABLE_NAMES,
+  DEFAULT_TIMEZONE,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
@@ -9,7 +10,13 @@ const {
   THERMOSTAT_OPERATING_STATE,
 } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
-const { toNumber, getDeviceConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
+const {
+  toNumber,
+  getDeviceConfig,
+  getFeatureBySelector,
+  isExternal,
+  getRunningMode,
+} = require('./thermostat.deviceConfig');
 const { followsSchedule } = require('./thermostat.scheduleDevice');
 const {
   isStopped,
@@ -40,8 +47,6 @@ const {
   MAX_TPI_PROPORTIONAL_BAND,
   DEFAULT_MANUAL_DURATION_MINUTES,
 } = require('../../../utils/thermostatConstants');
-
-const DEFAULT_TIMEZONE = 'Europe/Paris';
 
 /**
  * @description Convert a setpoint written in the thermostat's own unit into the
@@ -220,20 +225,6 @@ async function writeExternalMode(gladys, modeSelector, mode, logContext) {
 }
 
 /**
- * @description The THERMOSTAT_MODE value a running external thermostat should carry.
- * The thermostat's own `default_mode` param is the intent the user configured
- * ("this device heats" / "this device cools"), and it is what the mode feature
- * has to be handed back to once the heating resumes after an `off` slot.
- * @param {object} config - Thermostat config object.
- * @returns {number} A value from the THERMOSTAT_MODE enum.
- * @example
- * getRunningMode({ default_mode: 'cooling' }); // THERMOSTAT_MODE.COOLING
- */
-function getRunningMode(config) {
-  return config && config.default_mode === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
-}
-
-/**
  * @description Resolve the setpoint feature of a thermostat device.
  * Feature order is not a contract, so the feature is matched on its category
  * and type rather than taken from index 0.
@@ -313,6 +304,10 @@ function getSetpointForPreset(preset, config) {
  * understands. Both are written when both are configured — the mode is what
  * actually stops it, and the setpoint keeps the frost protection in place for a
  * device that would otherwise be left on its comfort target.
+ *
+ * A cooling thermostat is stopped from the other end of its range: the frost
+ * setpoint asked an air conditioner to cool as hard as it can, which is what it
+ * did whenever it had no mode feature or the mode write failed.
  * @param {object} gladys - Gladys instance.
  * @param {object} config - Thermostat config object.
  * @param {string} logContext - Context for the log lines.
@@ -330,19 +325,12 @@ async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
   if (config.mode_feature) {
     await writeExternalMode(gladys, config.mode_feature, THERMOSTAT_MODE.OFF, logContext);
   }
-  // Then the frost setpoint, which is the fallback for a device with no mode
-  // feature and the only "stop heating" every thermostat understands.
-  const frostSetpoint = getSetpointForPreset('frost', config);
-  if (frostSetpoint !== null) {
-    await writeExternalSetpoint(
-      gladys,
-      config.target_feature,
-      frostSetpoint,
-      config.temp_unit,
-      logContext,
-      selfWritten,
-    );
-  }
+  // Then the setpoint, which is the fallback for a device with no mode feature
+  // and the only "stop" every thermostat understands: frost protection when it
+  // heats, the top of its range when it cools — clamped to the device's own.
+  const stopSetpoint =
+    getRunningMode(config) === THERMOSTAT_MODE.COOLING ? config.temp_max : getSetpointForPreset('frost', config);
+  await writeExternalSetpoint(gladys, config.target_feature, stopSetpoint, config.temp_unit, logContext, selfWritten);
 }
 
 /**

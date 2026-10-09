@@ -921,6 +921,24 @@ describe('thermostat.onExternalSetpointChanged', () => {
       expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(18);
     });
 
+    it('should not overwrite a report that arrived while the stored value was read', async () => {
+      const mod = loadListener();
+      const handler = buildPrimeHandler(18);
+      // Primed again from postUpdate, with the listener live: a report lands
+      // between the check and the read, and is fresher than the database.
+      const { get } = handler.gladys.device;
+      handler.gladys.device.get = fake(async (options) => {
+        if (options && options.device_feature_selectors) {
+          handler.observedSetpoints.set('netatmo-setpoint', 22);
+        }
+        return get(options);
+      });
+
+      await mod.primeObservedSetpoints.call(handler);
+
+      expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(22);
+    });
+
     it('should not overwrite a reference already in memory', async () => {
       const mod = loadListener();
       const handler = buildPrimeHandler(18);

@@ -1,5 +1,5 @@
 const db = require('../../../models');
-const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, DEFAULT_TIMEZONE } = require('../../../utils/constants');
 const {
   findCurrentTransition,
   findNextTransition,
@@ -69,10 +69,13 @@ function formatSchedule(schedule, timezone) {
 }
 
 /**
- * @description The timezone the house's wall-clock times are resolved in, like
- * the regulation loop reads it. Null when it cannot be read, which leaves the
- * shared helper on its own default.
- * @returns {Promise<string|null>} The Gladys timezone.
+ * @description The timezone the house's wall-clock times are resolved in, with
+ * the same fallback as the regulation loop. The setting only exists once it is
+ * saved in Settings › System — onboarding does not create it — and falling back
+ * on the process's own timezone instead resolved another point than the loop on
+ * any server not running in Europe/Paris: the widget showed one point while the
+ * thermostat applied another, and a detach left the thermostat on the wrong one.
+ * @returns {Promise<string>} The Gladys timezone.
  * @example
  * await getTimezone();
  */
@@ -81,9 +84,9 @@ async function getTimezone() {
     const timezone = await db.Variable.findOne({
       where: { name: SYSTEM_VARIABLE_NAMES.TIMEZONE, service_id: null },
     });
-    return timezone ? timezone.value : null;
+    return (timezone && timezone.value) || DEFAULT_TIMEZONE;
   } catch (e) {
-    return null;
+    return DEFAULT_TIMEZONE;
   }
 }
 

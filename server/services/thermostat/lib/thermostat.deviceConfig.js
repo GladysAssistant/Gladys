@@ -12,6 +12,7 @@ const {
   DEFAULT_THERMOSTAT_TYPE,
   THERMOSTAT_TYPES,
 } = require('../../../utils/thermostatConstants');
+const { THERMOSTAT_MODE } = require('../../../utils/constants');
 
 /**
  * @description Parse a value as a finite number, falling back to a default.
@@ -118,9 +119,25 @@ async function getFeatureBySelector(gladys, selector) {
   return device && feature ? { device, feature } : null;
 }
 
+/**
+ * @description The THERMOSTAT_MODE value a running thermostat carries.
+ * The thermostat's own `default_mode` param is the intent the user configured
+ * ("this device heats" / "this device cools"), and it is what the mode is handed
+ * back to when the thermostat starts again — after a stop, or after an `off`
+ * slot on an external thermostat.
+ * @param {object} config - Thermostat config object.
+ * @returns {number} A value from the THERMOSTAT_MODE enum.
+ * @example
+ * getRunningMode({ default_mode: 'cooling' }); // THERMOSTAT_MODE.COOLING
+ */
+function getRunningMode(config) {
+  return config && config.default_mode === 'cooling' ? THERMOSTAT_MODE.COOLING : THERMOSTAT_MODE.HEATING;
+}
+
 module.exports = {
   toNumber,
   buildParamsConfig,
+  getRunningMode,
   getDeviceConfig,
   getFeatureBySelector,
   isExternal,

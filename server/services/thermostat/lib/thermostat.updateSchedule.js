@@ -2,7 +2,12 @@ const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const { validateSchedule } = require('../../../utils/thermostatValidateSchedule');
 const { getScheduleBySelector, getCurrentPoint } = require('./thermostat.getSchedules');
-const { releaseFromProgramme } = require('./thermostat.scheduleDevice');
+const {
+  stopForEmptiedProgramme,
+  liftScheduleStop,
+  loadThermostat,
+  forEachFollower,
+} = require('./thermostat.scheduleDevice');
 
 /**
  * @description Update a thermostat schedule: rename it, replace its transition
@@ -103,15 +108,30 @@ async function updateSchedule(selector, scheduleData) {
     throw e;
   }
 
-  // Its followers stay on it, so an Off point stops them, visibly, as a detach
-  // does; the preset still reads `schedule`, and the widget's way back hands
-  // them to the programme once it has points again. Any other point already left
-  // its temperature on the setpoint feature.
-  if (pointBefore && pointBefore.preset === 'off') {
-    const followers = await db.ThermostatScheduleDevice.findAll({ where: { schedule_id: schedule.id }, raw: true });
-    await Promise.all(followers.map((link) => releaseFromProgramme.call(this, link.device_id, pointBefore)));
-  }
   if (replaceTransitions) {
+    const followers = await db.ThermostatScheduleDevice.findAll({ where: { schedule_id: schedule.id }, raw: true });
+    const followerIds = followers.map((link) => link.device_id);
+    if (emptied) {
+      // Its followers stay on it, so an Off point stops them, visibly, as a
+      // detach does — a hold over that point included. Any other point already
+      // left its temperature on the setpoint feature.
+      if (pointBefore && pointBefore.preset === 'off') {
+        await forEachFollower.call(
+          this,
+          followerIds,
+          stopForEmptiedProgramme,
+          'stop a follower of the emptied programme',
+        );
+      }
+    } else {
+      // Points again: the stops the programme left behind are its own to lift.
+      await forEachFollower.call(
+        this,
+        followerIds,
+        async (deviceId) => liftScheduleStop.call(this, await loadThermostat(deviceId)),
+        'start a follower of the programme again',
+      );
+    }
     this.triggerApplySchedules();
   }
 

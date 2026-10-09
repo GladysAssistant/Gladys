@@ -71,6 +71,10 @@ ThermostatHandler.prototype.getTargetSelectors = getTargetSelectors;
 ThermostatHandler.prototype.getWindowSelectors = getWindowSelectors;
 ThermostatHandler.prototype.invalidateDeviceCaches = invalidateDeviceCaches;
 ThermostatHandler.prototype.postUpdate = postUpdate;
+// A thermostat just created targets a selector no reference was seeded for:
+// without it, the first turn of the appliance's own dial was only taken as the
+// reference, and the next pass wrote the scheduled setpoint back over it.
+ThermostatHandler.prototype.postCreate = postUpdate;
 ThermostatHandler.prototype.setValue = setValue;
 ThermostatHandler.prototype.postDelete = postDelete;
 ThermostatHandler.prototype.getPreset = getPreset;

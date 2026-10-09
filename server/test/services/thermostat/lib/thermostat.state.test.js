@@ -108,6 +108,18 @@ describe('thermostat.state isStopped', () => {
   });
 });
 
+describe('thermostat.state isScheduleStop', () => {
+  it('should read a stop the programme made', () => {
+    expect(state.isScheduleStop({ params: [{ name: state.SCHEDULE_STOP_PARAM, value: 'true' }] })).to.equal(true);
+  });
+
+  it('should read a stop made by hand, or a marker cleared since, as no programme stop', () => {
+    expect(state.isScheduleStop({ params: [{ name: state.SCHEDULE_STOP_PARAM, value: '' }] })).to.equal(false);
+    expect(state.isScheduleStop({ params: [] })).to.equal(false);
+    expect(state.isScheduleStop({})).to.equal(false);
+  });
+});
+
 describe('thermostat.state savePreset', () => {
   afterEach(() => sinon.restore());
 
@@ -174,6 +186,16 @@ describe('thermostat.state operating state', () => {
     await state.saveOperatingState.call(handler, device, THERMOSTAT_OPERATING_STATE.HEATING);
 
     assert.calledWith(handler.gladys.device.saveState, device.features[0], THERMOSTAT_OPERATING_STATE.HEATING);
+  });
+
+  it('should write idle on a feature never written', async () => {
+    // `Number(null)` is idle: the first idle was taken for the stored value.
+    const handler = buildHandler();
+    const device = { features: [operatingStateFeature(null)] };
+
+    await state.saveOperatingState.call(handler, device, THERMOSTAT_OPERATING_STATE.IDLE);
+
+    assert.calledWith(handler.gladys.device.saveState, device.features[0], THERMOSTAT_OPERATING_STATE.IDLE);
   });
 
   it('should skip a state the device already carries', async () => {

@@ -419,6 +419,101 @@ describe('thermostat.setValue', () => {
       const writes = handler.gladys.device.setValue.getCalls().map((call) => call.args[2]);
       expect(writes).to.deep.equal([THERMOSTAT_MODE.OFF, 7]);
     });
+
+    it('should stop a cooling thermostat from the top of its range', async () => {
+      // The frost setpoint asked an air conditioner to cool as hard as it can,
+      // which it did whenever the mode write did not land.
+      const handler = buildHandler(true, THERMOSTAT_MODE.COOLING);
+
+      await handler.setValue(
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+          { name: 'THERMOSTAT_MODE', value: 'cooling' },
+          { name: 'THERMOSTAT_MAX_TEMP', value: '30' },
+        ]),
+        modeFeature,
+        THERMOSTAT_MODE.OFF,
+      );
+
+      const writes = handler.gladys.device.setValue.getCalls().map((call) => call.args[2]);
+      expect(writes).to.deep.equal([THERMOSTAT_MODE.OFF, 30]);
+    });
+
+    it('should start a real thermostat at once, before a setpoint follows', async () => {
+      // Left to the next pass, the mode reached the appliance after the
+      // setpoint the widget sends right behind the start.
+      const handler = buildHandler(true, THERMOSTAT_MODE.OFF);
+      const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
+
+      await handler.setValue(
+        device(
+          [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+            { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+          ],
+          [presetFeature, stoppedMode],
+        ),
+        stoppedMode,
+        THERMOSTAT_MODE.HEATING,
+      );
+
+      const writes = handler.gladys.device.setValue.getCalls().map((call) => call.args[2]);
+      expect(writes).to.deep.equal([THERMOSTAT_MODE.HEATING]);
+    });
+
+    it('should leave a running real thermostat to the next pass when its mode is written again', async () => {
+      // Not a start: on a programme point on Off, writing the running mode at
+      // once would turn the appliance on for the two seconds before the pass.
+      const handler = buildHandler(true, THERMOSTAT_MODE.OFF);
+
+      await handler.setValue(
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'external' },
+          { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+          { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+        ]),
+        modeFeature,
+        THERMOSTAT_MODE.HEATING,
+      );
+
+      assert.notCalled(handler.gladys.device.setValue);
+    });
+
+    it('should leave a real thermostat with no mode feature to the next pass', async () => {
+      const handler = buildHandler();
+      const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
+
+      await handler.setValue(
+        device(
+          [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+          ],
+          [presetFeature, stoppedMode],
+        ),
+        stoppedMode,
+        THERMOSTAT_MODE.HEATING,
+      );
+
+      assert.notCalled(handler.gladys.device.setValue);
+    });
+
+    it("should make a stop the programme left behind the writer's own", async () => {
+      // Whoever writes the mode now owns the stop or the start: the next
+      // programme attached must not lift a stop a person confirmed.
+      const handler = buildHandler();
+
+      await handler.setValue(
+        device([{ name: 'THERMOSTAT_SCHEDULE_STOP', value: 'true' }]),
+        modeFeature,
+        THERMOSTAT_MODE.OFF,
+      );
+
+      expect(paramCall(handler, 'THERMOSTAT_SCHEDULE_STOP').args[2]).to.equal('');
+    });
   });
 
   describe('on an external thermostat', () => {

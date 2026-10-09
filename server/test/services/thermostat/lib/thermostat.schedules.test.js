@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const sinon = require('sinon').createSandbox();
 
 const db = require('../../../../models');
 const ThermostatHandler = require('../../../../services/thermostat/lib');
@@ -228,6 +229,30 @@ describe('thermostat schedules CRUD', () => {
 
       expect(schedule.current.preset).to.equal('comfort');
       await db.Variable.destroy({ where: { name: 'TIMEZONE' } });
+    });
+
+    it('should resolve the points in the default timezone, like the loop, when none is set', async () => {
+      // Onboarding does not create the setting. Falling back on the process's own
+      // timezone resolved another point than the loop on a server not running
+      // in Europe/Paris, and a detach left the thermostat on the wrong one.
+      const clock = sinon.useFakeTimers({ now: new Date('2026-08-24T05:00:00Z'), toFake: ['Date'] });
+      try {
+        const { selector } = await handler.createSchedule(HOUSE_SELECTOR, {
+          name: 'Untimezoned',
+          transitions: [
+            { day_of_week: 0, time: '06:30', preset: 'comfort' },
+            { day_of_week: 0, time: '07:30', preset: 'eco' },
+          ],
+        });
+
+        const schedule = await handler.getScheduleBySelector(selector);
+
+        // 05:00 UTC is 07:00 in Paris, on Monday.
+        expect(schedule.current.preset).to.equal('comfort');
+        expect(schedule.next.time).to.equal('07:30');
+      } finally {
+        clock.restore();
+      }
     });
 
     it('should fall back on the default timezone when it cannot be read', async () => {

@@ -17,6 +17,14 @@ const APPLY_DEBOUNCE_MS = 2000;
 const MANUAL_SETPOINT_PARAM = 'THERMOSTAT_MANUAL_SETPOINT';
 const MANUAL_UNTIL_PARAM = 'THERMOSTAT_MANUAL_UNTIL';
 
+// A stop this service made itself: a thermostat left on the Off point of a
+// programme it no longer follows, or of one emptied of its points (E.6). It is
+// the programme's Off carried over, not a person's choice, so the next programme
+// that takes the thermostat over lifts it — while a stop made by hand stays
+// until a person lifts it. Any mode written on the thermostat afterwards makes
+// the stop, or the start, the writer's own.
+const SCHEDULE_STOP_PARAM = 'THERMOSTAT_SCHEDULE_STOP';
+
 // THERMOSTAT_PRESET is an integer enum on the feature, while a schedule
 // transition and the THERMOSTAT_PRESET_* params name their preset. This is the
 // one place that maps between the two.
@@ -123,6 +131,34 @@ function isStopped(device) {
 }
 
 /**
+ * @description Whether a feature already carries a value. A feature never written
+ * carries null, and `Number(null)` is 0 — which is `schedule` on the preset and
+ * idle on the operating state — so comparing without checking it first skipped
+ * the very first write of those values.
+ * @param {object} feature - The feature.
+ * @param {number} value - The value about to be written.
+ * @returns {boolean} True when the feature already holds that value.
+ * @example
+ * alreadyHolds(presetFeature, THERMOSTAT_PRESET.SCHEDULE);
+ */
+function alreadyHolds(feature, value) {
+  return feature.last_value !== null && feature.last_value !== undefined && Number(feature.last_value) === value;
+}
+
+/**
+ * @description Whether a thermostat's stop is one this service made when the
+ * thermostat was left on a programme's Off point, rather than a person's.
+ * @param {object} device - The thermostat device.
+ * @returns {boolean} True when the stop was the programme's.
+ * @example
+ * isScheduleStop(device);
+ */
+function isScheduleStop(device) {
+  const params = (device && device.params) || [];
+  return params.some((param) => param.name === SCHEDULE_STOP_PARAM && param.value === 'true');
+}
+
+/**
  * @description Write a preset on the thermostat's preset feature.
  * @param {object} device - The thermostat device.
  * @param {string} name - A preset name, `schedule` included.
@@ -137,7 +173,7 @@ async function savePreset(device, name, force = false) {
   if (!feature || value === null) {
     return false;
   }
-  if (Number(feature.last_value) === value && !force) {
+  if (alreadyHolds(feature, value) && !force) {
     // Saving an unchanged state would emit a NEW_STATE and, through it, tell
     // every open widget to redraw for nothing. `force` is the exception: when a
     // hold ends, the widgets are displaying the held preset while the stored one
@@ -182,7 +218,7 @@ function announcePreset(device, name) {
  */
 async function saveOperatingState(device, state) {
   const feature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE);
-  if (!feature || Number(feature.last_value) === state) {
+  if (!feature || alreadyHolds(feature, state)) {
     return;
   }
   await this.gladys.device.saveState(feature, state);
@@ -291,6 +327,7 @@ function triggerApplySchedules() {
 module.exports = {
   getFeature,
   isStopped,
+  isScheduleStop,
   getPreset,
   savePreset,
   announcePreset,
@@ -305,4 +342,5 @@ module.exports = {
   PRESETS,
   MANUAL_SETPOINT_PARAM,
   MANUAL_UNTIL_PARAM,
+  SCHEDULE_STOP_PARAM,
 };

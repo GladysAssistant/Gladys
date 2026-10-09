@@ -5,6 +5,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const { fake, assert } = sinon;
 
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const ThermostatHandler = require('../../../../services/thermostat/lib');
 
 const loadModule = () =>
   proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
@@ -490,6 +491,13 @@ describe('thermostat.onDeviceNewState - window selector cache', () => {
     expect(handler.windowSelectorsCache).to.equal(null);
     // A re-pointed target gets its setpoint reference, as at service start.
     assert.calledOnce(handler.primeObservedSetpoints);
+  });
+
+  it('should seed the setpoint references of a thermostat just created', () => {
+    // The core calls postCreate on a creation: the new target had no reference,
+    // and the first turn of the appliance's own dial was only taken as one.
+
+    expect(ThermostatHandler.prototype.postCreate).to.equal(ThermostatHandler.prototype.postUpdate);
   });
 
   it('should expose the configured window selectors', async () => {

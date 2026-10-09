@@ -136,8 +136,9 @@ async function primeObservedSetpoints() {
         const owner = await getFeatureBySelector(this.gladys, selector);
         const lastValue = owner ? owner.feature.last_value : null;
         // A feature that never reported has no reference to offer: the first
-        // report will establish it.
-        if (lastValue !== null && lastValue !== undefined) {
+        // report will establish it. Nor does one that reported while it was being
+        // read: that report is fresher than the database's value.
+        if (lastValue !== null && lastValue !== undefined && !this.observedSetpoints.has(selector)) {
           this.observedSetpoints.set(selector, lastValue);
         }
       }),
