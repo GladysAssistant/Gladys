@@ -371,7 +371,7 @@ describe('scene.formula', () => {
           {
             type: ACTIONS.TIME.DELAY,
             unit: 'seconds',
-            // log(0) is -Infinity: waiting for it would hang the scene instead of failing it.
+            // log(0) is -Infinity: Node would skip such a wait instead of failing the scene.
             evaluate_value: 'log(0)',
           },
         ],

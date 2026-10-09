@@ -278,8 +278,8 @@ const actionsFunc = {
     }
 
     // Infinity is rejected like NaN: a formula can overflow to it (exp(1000)) or reach it
-    // through a logarithm of zero (log(0)), and waiting for an infinite delay would hang
-    // the scene instead of failing it.
+    // through a logarithm of zero (log(0)), and Node fires a timer of an infinite delay after
+    // 1 ms, so the wait would be silently skipped instead of failing the scene.
     if (!Number.isFinite(Number(value))) {
       logger.warn(`Delay: Value is not a number: ${value}`);
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
