@@ -661,7 +661,7 @@ class ExternalIntegrationConfigPage extends Component {
   connectOAuth = async field => {
     this.setState({
       oauthStatus: RequestStatus.Getting,
-      oauthDisconnectStatus: null,
+      oauthDisconnectStatuses: {},
       oauthInvalidState: false,
       oauthInvalidUrl: false
     });
@@ -724,7 +724,12 @@ class ExternalIntegrationConfigPage extends Component {
     // a status of its own: the connect error tells the user to check that the
     // integration is running, which says nothing here — the disconnect is done
     // by the core and works with the integration stopped
-    this.setState({ oauthDisconnectStatus: RequestStatus.Getting, oauthStatus: null });
+    const setDisconnectStatus = status =>
+      this.setState(prevState => ({
+        oauthDisconnectStatuses: Object.assign({}, prevState.oauthDisconnectStatuses, { [field.key]: status })
+      }));
+    setDisconnectStatus(RequestStatus.Getting);
+    this.setState({ oauthStatus: null });
     try {
       await this.props.httpClient.post(`/api/v1/external_integration/${this.props.selector}/oauth/disconnect`, {
         key: field.key
@@ -732,7 +737,9 @@ class ExternalIntegrationConfigPage extends Component {
       // the server always ends on { connected: false }: apply it right away
       // instead of depending on the connection-status-updated push to arrive
       this.setState(prevState => ({
-        oauthDisconnectStatus: RequestStatus.Success,
+        oauthDisconnectStatuses: Object.assign({}, prevState.oauthDisconnectStatuses, {
+          [field.key]: RequestStatus.Success
+        }),
         integration:
           prevState.integration &&
           Object.assign({}, prevState.integration, {
@@ -741,7 +748,7 @@ class ExternalIntegrationConfigPage extends Component {
       }));
     } catch (e) {
       console.error(e);
-      this.setState({ oauthDisconnectStatus: RequestStatus.Error });
+      setDisconnectStatus(RequestStatus.Error);
     }
   };
 

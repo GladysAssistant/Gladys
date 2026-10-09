@@ -96,6 +96,16 @@ class ConfigField extends Component {
     this.copyTimer = setTimeout(() => this.setState({ redirectUriCopied: false }), 2000);
   };
 
+  componentDidUpdate() {
+    // an armed confirmation must not survive the account going disconnected:
+    // when it comes back connected, the destructive button would be shown
+    // without the user having clicked Disconnect
+    const { connectionStatus } = this.props;
+    if (this.state.disconnectConfirming && !(connectionStatus && connectionStatus.connected)) {
+      this.setState({ disconnectConfirming: false });
+    }
+  }
+
   componentWillUnmount() {
     if (this.copyTimer) {
       clearTimeout(this.copyTimer);
@@ -110,7 +120,7 @@ class ConfigField extends Component {
     configuredSecrets,
     touchedSecrets,
     oauthStatus,
-    oauthDisconnectStatus,
+    oauthDisconnectStatuses,
     connectionStatus,
     disconnectOAuth,
     selector,
@@ -181,8 +191,14 @@ class ConfigField extends Component {
       // once linked, the way back: the connection status is integration-level
       // (see ConfigTab), and so is the disconnect, which forgets every
       // credential the integration stored (see disconnectOAuth on the server)
-      const canDisconnect = Boolean(disconnectOAuth && connectionStatus && connectionStatus.connected);
-      const disconnecting = oauthDisconnectStatus === RequestStatus.Getting;
+      // only a field that declares its credential_keys can be disconnected: the
+      // core deletes those keys and nothing else
+      const canDisconnect = Boolean(
+        disconnectOAuth && (field.credential_keys || []).length > 0 && connectionStatus && connectionStatus.connected
+      );
+      // keyed by field: an integration may link several accounts
+      const disconnectStatus = (oauthDisconnectStatuses || {})[field.key];
+      const disconnecting = disconnectStatus === RequestStatus.Getting;
       return (
         <div class="form-group">
           <label class="form-label">{label}</label>
@@ -197,7 +213,7 @@ class ConfigField extends Component {
               )}
             </div>
           )}
-          {oauthDisconnectStatus === RequestStatus.Error && (
+          {disconnectStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
               <Text id="integration.externalIntegration.config.oauthDisconnectError" />
             </div>
@@ -450,7 +466,7 @@ const ConfigSchemaForm = ({
   toggleOAuthUseInstanceRedirect,
   connectOAuth,
   disconnectOAuth,
-  oauthDisconnectStatus,
+  oauthDisconnectStatuses,
   connectionStatus,
   selector,
   dynamicOptions,
@@ -487,7 +503,7 @@ const ConfigSchemaForm = ({
           toggleOAuthUseInstanceRedirect={toggleOAuthUseInstanceRedirect}
           connectOAuth={connectOAuth}
           disconnectOAuth={disconnectOAuth}
-          oauthDisconnectStatus={oauthDisconnectStatus}
+          oauthDisconnectStatuses={oauthDisconnectStatuses}
           connectionStatus={connectionStatus}
           selector={selector}
           dynamicOptions={dynamicOptions}

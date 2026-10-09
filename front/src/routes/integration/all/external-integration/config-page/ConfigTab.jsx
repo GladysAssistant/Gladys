@@ -165,7 +165,7 @@ const ConfigTab = props => {
                     toggleOAuthUseInstanceRedirect={props.toggleOAuthUseInstanceRedirect}
                     connectOAuth={props.connectOAuth}
                     disconnectOAuth={props.disconnectOAuth}
-                    oauthDisconnectStatus={props.oauthDisconnectStatus}
+                    oauthDisconnectStatuses={props.oauthDisconnectStatuses}
                     connectionStatus={connectionStatus}
                     selector={props.selector || get(integration, 'selector')}
                     dynamicOptions={props.dynamicOptions}

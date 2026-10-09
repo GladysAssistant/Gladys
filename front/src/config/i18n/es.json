@@ -1034,6 +1034,7 @@
       },
       "actions": {
         "title": "Acciones",
+        "runButton": "Ejecutar",
         "error": "La acción falló. Verifique que la integración esté en ejecución.",
         "resultRegionLabel": "Resultado de la acción"
       },

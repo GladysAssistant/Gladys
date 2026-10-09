@@ -68,8 +68,8 @@ const SUB_CONTAINER_PORTS_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINER_PORTS';
 const SUB_CONTAINER_DESIRED_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_DESIRED';
 const SUB_CONTAINER_ENV_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_ENV';
 // The service-scoped variables the core writes for its own needs, next to the
-// config of the integration (same service_id, no user_id): never the
-// integration's to lose, e.g. when an account is disconnected.
+// config of the integration (same service_id, no user_id): an account field
+// may not declare them as credential_keys, a disconnect must never reach them.
 const CORE_SERVICE_VARIABLES = [
   SUB_CONTAINER_PORTS_VARIABLE,
   SUB_CONTAINER_DESIRED_VARIABLE,
@@ -341,6 +341,9 @@ const PREFER_LOCAL_CONFIG_KEY = 'GLADYS_PREFER_LOCAL';
 // app, a pairing confirmed on a device — so it has no redirect URI, no anti-CSRF
 // state and no callback, and the integration reports the approval itself.
 const ACCOUNT_FIELD_TYPES = ['oauth2', 'account_link'];
+// The off-schema keys an account field declares as its credentials
+// (`credential_keys`): the only ones a disconnect deletes.
+const MAX_CREDENTIAL_KEYS = 20;
 // Dynamic options of a select/multi_select field (`source`): a reserved enum
 // defined by the core — never a URL nor an expression, nothing arbitrary
 // enters the rendering — whose options, and therefore valid values, are only
@@ -656,6 +659,7 @@ module.exports = {
   PREFER_LOCAL_CONFIG_KEY,
   ACCOUNT_FIELD_TYPES,
   CORE_SERVICE_VARIABLES,
+  MAX_CREDENTIAL_KEYS,
   DYNAMIC_SOURCES,
   MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
