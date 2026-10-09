@@ -1026,7 +1026,7 @@
         "oauthRedirectUriCopied": "Kopiert!",
         "oauthUseInstanceRedirectLabel": "Stattdessen die Adresse meiner Instanz verwenden (ich erreiche Gladys bereits per HTTPS)",
         "oauthDisconnectButton": "Trennen",
-        "oauthDisconnectConfirmText": "Die von der Integration gespeicherten Zugriffstoken werden gelöscht und sie meldet sich ab. Die obigen Einstellungen bleiben erhalten, und Sie können jederzeit wieder ein Konto verknüpfen.",
+        "oauthDisconnectConfirmText": "Die von der Integration gespeicherten Zugriffstoken werden gelöscht und sie meldet sich ab. Die übrigen Einstellungen bleiben erhalten, und Sie können jederzeit wieder ein Konto verknüpfen.",
         "oauthDisconnectConfirmButton": "Ja, trennen",
         "oauthDisconnectCancelButton": "Abbrechen",
         "oauthDisconnectError": "Beim Trennen des Kontos ist ein Fehler aufgetreten.",

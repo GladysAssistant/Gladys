@@ -1026,7 +1026,7 @@
         "oauthRedirectUriCopied": "Copied!",
         "oauthUseInstanceRedirectLabel": "Use the address of my instance instead (I already access Gladys over HTTPS)",
         "oauthDisconnectButton": "Disconnect",
-        "oauthDisconnectConfirmText": "The access tokens the integration stored will be forgotten and it will log out. The settings above are kept, and you can link an account again at any time.",
+        "oauthDisconnectConfirmText": "The access tokens the integration stored will be forgotten and it will log out. The other settings are kept, and you can link an account again at any time.",
         "oauthDisconnectConfirmButton": "Yes, disconnect",
         "oauthDisconnectCancelButton": "Cancel",
         "oauthDisconnectError": "There was an error disconnecting the account.",

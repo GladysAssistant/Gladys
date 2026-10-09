@@ -1026,7 +1026,7 @@
         "oauthRedirectUriCopied": "¡Copiado!",
         "oauthUseInstanceRedirectLabel": "Usar en su lugar la dirección de mi instancia (ya accedo a Gladys mediante HTTPS)",
         "oauthDisconnectButton": "Desconectar",
-        "oauthDisconnectConfirmText": "Los tokens de acceso guardados por la integración se olvidarán y se cerrará la sesión. Los ajustes de arriba se conservan y podrá vincular una cuenta de nuevo en cualquier momento.",
+        "oauthDisconnectConfirmText": "Los tokens de acceso guardados por la integración se olvidarán y se cerrará la sesión. Los demás ajustes se conservan y podrá vincular una cuenta de nuevo en cualquier momento.",
         "oauthDisconnectConfirmButton": "Sí, desconectar",
         "oauthDisconnectCancelButton": "Cancelar",
         "oauthDisconnectError": "Se produjo un error al desconectar la cuenta.",
