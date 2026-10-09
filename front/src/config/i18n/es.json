@@ -3530,7 +3530,7 @@
         "maxTempLabel": "Temp. máx.",
         "maxTempPlaceholder": "ej. 35",
         "temperatureFeatureLabel": "Sensor de temperatura",
-        "temperatureFeatureHelp": "Select the sensor that measures the ambient temperature.",
+        "temperatureFeatureHelp": "Selecciona el sensor que mide la temperatura ambiente. Un sensor que informa en una unidad distinta a la del termostato se convierte automáticamente; para un sensor sin unidad declarada se asume la del termostato.",
         "humidityFeatureLabel": "Sensor de humedad",
         "humidityFeatureHelp": "Opcional. Se muestra en el widget del termostato.",
         "switchFeatureLabel": "Interruptor (actuador)",

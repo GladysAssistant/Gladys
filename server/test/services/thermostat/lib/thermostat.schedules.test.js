@@ -126,6 +126,31 @@ describe('thermostat schedules CRUD', () => {
         db.ThermostatSchedule.create = original;
       }
     });
+
+    it('should leave no schedule behind when one of its points fails to insert', async () => {
+      // The schedule row is inserted first, then each point: a point failing used
+      // to leave the schedule with part of its week, and its name taken.
+      const originalSave = db.ThermostatScheduleTransition.prototype.save;
+      db.ThermostatScheduleTransition.prototype.save = async () => {
+        throw new Error('disk I/O error');
+      };
+
+      try {
+        await expectRejected(
+          handler.createSchedule(HOUSE_SELECTOR, {
+            name: 'Half written',
+            transitions: [{ day_of_week: 1, time: '07:00', preset: 'comfort' }],
+          }),
+          'disk I/O error',
+        );
+      } finally {
+        db.ThermostatScheduleTransition.prototype.save = originalSave;
+      }
+
+      expect(await db.ThermostatSchedule.count({ where: { name: 'Half written' } })).to.equal(0);
+      const retried = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Half written' });
+      expect(retried.name).to.equal('Half written');
+    });
   });
 
   describe('getSchedules', () => {

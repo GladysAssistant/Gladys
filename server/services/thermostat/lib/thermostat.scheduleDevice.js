@@ -3,14 +3,17 @@ const logger = require('../../../utils/logger');
 
 /**
  * @description Resolve a schedule and a thermostat by selector, checking the
- * device is one this service owns and that it lives in the schedule's house.
+ * device is one this service owns and, unless told otherwise, that it lives in
+ * the schedule's house.
  * @param {string} scheduleSelector - Schedule selector.
  * @param {string} deviceSelector - Thermostat selector.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.checkHouse] - Require the device to be in the schedule's house.
  * @returns {Promise<{ schedule: object, device: object }>} The resolved rows.
  * @example
  * const { schedule, device } = await resolveScheduleAndDevice('week', 'living-room');
  */
-async function resolveScheduleAndDevice(scheduleSelector, deviceSelector) {
+async function resolveScheduleAndDevice(scheduleSelector, deviceSelector, { checkHouse = true } = {}) {
   const schedule = await db.ThermostatSchedule.findOne({ where: { selector: scheduleSelector } });
   if (!schedule) {
     throw new Error(`Schedule not found: ${scheduleSelector}`);
@@ -33,7 +36,7 @@ async function resolveScheduleAndDevice(scheduleSelector, deviceSelector) {
   }
   // A schedule belongs to a house, and a thermostat belongs to one through its
   // room. A thermostat with no room has no house, so it cannot be placed.
-  if (!device.room || device.room.house_id !== schedule.house_id) {
+  if (checkHouse && (!device.room || device.room.house_id !== schedule.house_id)) {
     throw new Error(`Device is not in the house of schedule "${scheduleSelector}": ${deviceSelector}`);
   }
 
@@ -68,7 +71,12 @@ async function attachScheduleToDevice(scheduleSelector, deviceSelector) {
  * await thermostatHandler.detachScheduleFromDevice('week', 'living-room');
  */
 async function detachScheduleFromDevice(scheduleSelector, deviceSelector) {
-  const { schedule, device } = await resolveScheduleAndDevice(scheduleSelector, deviceSelector);
+  // The house is checked when a link is made, not when it is removed: a
+  // thermostat moved to a room of another house, or left with no room, keeps the
+  // link it had, and refusing to remove it left that link with no way out.
+  const { schedule, device } = await resolveScheduleAndDevice(scheduleSelector, deviceSelector, {
+    checkHouse: false,
+  });
 
   logger.info(`Thermostat: "${deviceSelector}" no longer follows schedule "${scheduleSelector}"`);
   await db.ThermostatScheduleDevice.destroy({ where: { device_id: device.id, schedule_id: schedule.id } });

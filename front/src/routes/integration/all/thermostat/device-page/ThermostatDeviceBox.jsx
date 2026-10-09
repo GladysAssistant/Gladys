@@ -81,7 +81,14 @@ class ThermostatDeviceBox extends Component {
     // is actually up to, and this feature is this service's own on both kinds of
     // thermostat.
     const modeFeature = (device.features || []).find(f => f.category === 'thermostat' && f.type === 'mode');
-    const isStopped = modeFeature && Number(modeFeature.last_value) === THERMOSTAT_MODE.OFF;
+    // A mode that was never written carries null, and `Number(null)` is 0 — OFF:
+    // a thermostat just created read "Stopped" while it regulated. Same guard as
+    // the widget and the server.
+    const isStopped =
+      !!modeFeature &&
+      modeFeature.last_value !== null &&
+      modeFeature.last_value !== undefined &&
+      Number(modeFeature.last_value) === THERMOSTAT_MODE.OFF;
     const unitParam = (device.params || []).find(p => p.name === 'THERMOSTAT_TEMP_UNIT');
     // The real device declares the unit it works in, and it is the one the value
     // read above is expressed in: a celsius thermostat pointing at a fahrenheit

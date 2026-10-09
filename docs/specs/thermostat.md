@@ -394,7 +394,7 @@ Every route is authenticated, under `/api/v1/service/thermostat`. The schedule's
 | ---------------------------------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------- |
 | `GET /schedule?house=:house_selector`                |                                | All schedules, filtered by house when the parameter is given.                                      |
 | `GET /schedule/:selector`                            |                                | One schedule.                                                                                      |
-| `POST /schedule`                                     | `{ house, name, transitions }` | Creates a schedule in that house. `transitions` is optional, empty by default.                     |
+| `POST /schedule`                                     | `{ house, name, transitions }` | Creates a schedule in that house, with its points, in a transaction. `transitions` may be empty.   |
 | `PATCH /schedule/:selector`                          | `{ name?, transitions? }`      | Renames and/or **replaces the points wholesale**, in a transaction. An absent field is left alone. |
 | `DELETE /schedule/:selector`                         |                                | Deletes the schedule; the links go by cascade.                                                     |
 | `POST /schedule/:selector/device/:device_selector`   |                                | Makes that thermostat follow this schedule, replacing the one it followed. Idempotent.             |
@@ -461,6 +461,8 @@ In Joi, shared between the API and the model:
 | no two points share a day and a time                                                                                          | `400 DUPLICATE_TRANSITION`         |
 | an attached device belongs to the thermostat service                                                                          | `400 NOT_A_THERMOSTAT`             |
 | an attached device has a room, and that room is in the schedule's house                                                       | `400 DEVICE_NOT_IN_HOUSE`          |
+
+The house is checked when a thermostat is **attached**, never when it is detached. A thermostat can be moved to a room of another house, or left with no room, while it follows a schedule; refusing to remove that link left it with no way out short of attaching another schedule or deleting this one.
 
 Name uniqueness is carried by the database as well, and the constraint violation returns the same `409`: two clients creating the same name at once must not depend on which one checked first.
 

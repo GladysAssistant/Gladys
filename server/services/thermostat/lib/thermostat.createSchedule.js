@@ -35,17 +35,22 @@ async function createSchedule(houseSelector, scheduleData) {
 
   let created;
   try {
-    created = await db.ThermostatSchedule.create(
-      {
-        house_id: house.id,
-        name: validated.name,
-        transitions: validated.transitions.map(({ day_of_week: dayOfWeek, time, preset }) => ({
-          day_of_week: dayOfWeek,
-          time,
-          preset,
-        })),
-      },
-      { include: [{ model: db.ThermostatScheduleTransition, as: 'transitions' }] },
+    // One transaction for the schedule and its points, as updateSchedule does: a
+    // point failing to insert otherwise left the schedule row behind with part of
+    // its week, and its name taken for the retry.
+    created = await db.sequelize.transaction((transaction) =>
+      db.ThermostatSchedule.create(
+        {
+          house_id: house.id,
+          name: validated.name,
+          transitions: validated.transitions.map(({ day_of_week: dayOfWeek, time, preset }) => ({
+            day_of_week: dayOfWeek,
+            time,
+            preset,
+          })),
+        },
+        { include: [{ model: db.ThermostatScheduleTransition, as: 'transitions' }], transaction },
+      ),
     );
   } catch (e) {
     // The precheck above is not atomic: two concurrent creates can both find no

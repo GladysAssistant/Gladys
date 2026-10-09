@@ -93,6 +93,28 @@ describe('thermostat schedule <-> device link', () => {
     expect((await handler.getScheduleBySelector(schedule.selector)).devices).to.deep.equal([]);
   });
 
+  it('should detach a thermostat moved to a room of another house', async () => {
+    await handler.attachScheduleToDevice(schedule.selector, thermostat.selector);
+    const otherHouse = await db.House.findOne({ where: { selector: OTHER_HOUSE_SELECTOR } });
+    const chalet = await db.Room.create({ name: 'Chalet', selector: 'chalet-room', house_id: otherHouse.id });
+    await thermostat.update({ room_id: chalet.id });
+
+    await handler.detachScheduleFromDevice(schedule.selector, thermostat.selector);
+
+    expect(await db.ThermostatScheduleDevice.count({ where: { device_id: thermostat.id } })).to.equal(0);
+    await thermostat.update({ room_id: ROOM_ID });
+    await chalet.destroy();
+  });
+
+  it('should detach a thermostat left with no room', async () => {
+    await handler.attachScheduleToDevice(schedule.selector, thermostat.selector);
+    await thermostat.update({ room_id: null });
+
+    await handler.detachScheduleFromDevice(schedule.selector, thermostat.selector);
+
+    expect(await db.ThermostatScheduleDevice.count({ where: { device_id: thermostat.id } })).to.equal(0);
+  });
+
   it('should ignore a detach of a thermostat that was not following', async () => {
     await handler.detachScheduleFromDevice(schedule.selector, thermostat.selector);
 

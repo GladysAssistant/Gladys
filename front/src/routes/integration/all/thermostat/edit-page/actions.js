@@ -347,6 +347,12 @@ function createActions(store) {
         // reintroduce two sources of truth for the same settings, and a failure
         // between the two writes would leave them disagreeing.
         const savedDevice = await state.httpClient.post('/api/v1/service/thermostat/device', device);
+        // From here on the thermostat exists. If the schedule link below is
+        // refused, the next Save must edit it: left as a creation, it built a new
+        // external_id and added a second thermostat on every retry.
+        if (!isEdit && savedDevice && savedDevice.selector) {
+          store.setState({ thermostatEditDevice: savedDevice });
+        }
 
         // The schedule link is written through the schedule's own routes, which
         // also check the thermostat belongs to that schedule's house.
