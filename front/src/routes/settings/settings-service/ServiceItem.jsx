@@ -1,11 +1,10 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router';
-import get from 'get-value';
 
 import { RequestStatus } from '../../../utils/consts';
 import { SERVICE_STATUS } from '../../../../../server/utils/constants';
-import { integrations } from '../../../config/integrations';
+import style from './style.css';
 
 const STARTED_STATUS = [SERVICE_STATUS.RUNNING];
 const HIDDEN_ACTION_STATUS = [SERVICE_STATUS.UNKNOWN, SERVICE_STATUS.DISABLED];
@@ -31,24 +30,27 @@ class ServiceItem extends Component {
     }
   };
 
-  render({ service }, { changeStatus }) {
+  render({ service, integration }, { changeStatus }) {
     const started = STARTED_STATUS.includes(service.status);
     const displayAction = !HIDDEN_ACTION_STATUS.includes(service.status);
-    const integrationPage = integrations.find(
-      integration => get(integration, 'link', { default: integration.key }).toLowerCase() === service.selector
-    );
-    const integrationLink =
-      integrationPage &&
-      `/dashboard/integration/${integrationPage.type}/${(integrationPage.link || integrationPage.key).toLowerCase()}`;
-    const integrationKey = integrationPage && integrationPage.key;
 
     const changingStatus = changeStatus === RequestStatus.Getting;
 
     return (
       <tr>
         <td>
-          <div style="max-width: 400px; overflow: hidden">
-            <Text id={`integration.${integrationKey}.title`}>{service.name}</Text>
+          <div class={style.serviceName}>
+            <span class={style.serviceNameLabel}>
+              {integration.i18nKey ? <Text id={integration.i18nKey}>{integration.name}</Text> : integration.name}
+            </span>
+            {integration.external && (
+              // same tag as in the integration catalog: the list mixes both
+              // families, and a community integration can be named like a
+              // built-in one
+              <span class={`badge badge-secondary ${style.serviceNameTag}`}>
+                <Text id="integration.tags.external" />
+              </span>
+            )}
           </div>
           <div class="small text-muted">
             <Text id="servicesSettings.selector" fields={{ key: service.selector }} />
@@ -78,10 +80,10 @@ class ServiceItem extends Component {
           )}
         </td>
         <td>
-          {integrationPage && (
+          {integration.url && (
             <Localizer>
               <Link
-                href={integrationLink}
+                href={integration.url}
                 class="btn btn-outline-secondary border-0"
                 title={<Text id="servicesSettings.integrationLinkTitle" />}
               >
