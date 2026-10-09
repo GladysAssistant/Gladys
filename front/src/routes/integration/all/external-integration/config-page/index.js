@@ -65,7 +65,7 @@ class ExternalIntegrationConfigPage extends Component {
         // the per-user "My calendars" block of a calendar integration
         await this.loadCalendarAccount(integration);
       }
-      await this.loadDynamicOptions(integration, isAdmin);
+      await this.loadDynamicOptions(integration, isAdmin, selector);
       if (isAdmin) {
         await this.loadGatewayStatus(integration);
         await this.loadHardwareDetection(integration);
@@ -463,13 +463,17 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  loadDynamicOptions = async (integration, isAdmin) => {
+  loadDynamicOptions = async (integration, isAdmin, selector) => {
     // a select/multi_select of the config_schema, of an action mini form or
     // of a per-user form (contact_schema, account_schema) can take its
     // options from a core-defined source: the already-created devices of the
     // integration, or the houses of Gladys. A non-admin only sees the
-    // per-user forms.
-    const { selector } = this.props;
+    // per-user forms. `selector` is the one loadData started with: the
+    // fields belong to that integration, so a newer integration opened in
+    // the meantime must never receive them, nor their options.
+    if (selector !== this.props.selector) {
+      return;
+    }
     const perUserFields = (get(integration, 'manifest.contact_schema') || []).concat(
       get(integration, 'manifest.account_schema') || []
     );
