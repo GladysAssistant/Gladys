@@ -729,7 +729,16 @@ class ExternalIntegrationConfigPage extends Component {
       await this.props.httpClient.post(`/api/v1/external_integration/${this.props.selector}/oauth/disconnect`, {
         key: field.key
       });
-      this.setState({ oauthDisconnectStatus: RequestStatus.Success });
+      // the server always ends on { connected: false }: apply it right away
+      // instead of depending on the connection-status-updated push to arrive
+      this.setState(prevState => ({
+        oauthDisconnectStatus: RequestStatus.Success,
+        integration:
+          prevState.integration &&
+          Object.assign({}, prevState.integration, {
+            connection_status: { connected: false, message: null }
+          })
+      }));
     } catch (e) {
       console.error(e);
       this.setState({ oauthDisconnectStatus: RequestStatus.Error });
