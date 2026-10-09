@@ -316,7 +316,7 @@ async function getDiscoveredDevices(selector) {
   const devices = this.discoveredDevices.get(service.id) || [];
   // a single lookup for the whole list, and only when a device needs it
   const defaultElectricMeterDeviceFeatureId = devices.some(hasEnergyIndexFeature)
-    ? await this.energyPrice.getDefaultElectricMeterFeatureId()
+    ? await this.energyContract.getDefaultElectricMeterFeatureId()
     : null;
   return devices.map((device) => {
     const createdDevice = this.stateManager.get('deviceByExternalId', device.external_id);

@@ -7,6 +7,7 @@ import DocsLink from '../components/DocsLink';
 import ActionsCard from './ActionsCard';
 import LinkAccountCard from './LinkAccountCard';
 import ContactProfileCard from './ContactProfileCard';
+import CalendarAccountCard from './CalendarAccountCard';
 import WebhooksCard from './WebhooksCard';
 import HardwareCard from './HardwareCard';
 import { getAssignedPortsByName, getLocalizedText, getRequestedHardwareClasses } from '../utils';
@@ -31,6 +32,10 @@ const ConfigTab = props => {
   // notification channels expose the per-user "My account" block instead
   const isReceivingChannel = isCommunication && get(integration, 'manifest.messaging.receive') !== false;
   const contactSchema = get(integration, 'manifest.contact_schema') || [];
+  // calendar integrations: the per-user "My calendars" block, for
+  // every user — enable/disable, account values, sync/shared toggles
+  const isCalendar = get(integration, 'manifest.type') === 'calendar';
+  const accountSchema = get(integration, 'manifest.account_schema') || [];
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
   // host ports assigned to the manifest-named declared ports, for the
   // {{port:<name>}} placeholders of the section texts
@@ -190,8 +195,29 @@ const ConfigTab = props => {
           touchedSecrets={props.contactProfileTouchedSecrets}
           profileStatus={props.contactProfileStatus}
           updateValue={props.updateContactProfileValue}
+          dynamicOptions={props.dynamicOptions}
           onSave={props.saveContactProfile}
           onClear={props.clearContactProfile}
+        />
+      )}
+
+      {isCalendar && integration && (
+        <CalendarAccountCard
+          accountSchema={accountSchema}
+          language={language}
+          account={props.calendarAccount}
+          values={props.calendarAccountValues}
+          touchedSecrets={props.calendarAccountTouchedSecrets}
+          accountStatus={props.calendarAccountStatus}
+          disableConfirming={props.calendarDisableConfirming}
+          calendarToggleStatus={props.calendarToggleStatus}
+          updateValue={props.updateCalendarAccountValue}
+          dynamicOptions={props.dynamicOptions}
+          onSave={props.saveCalendarAccount}
+          onDisable={props.armDisableCalendarAccount}
+          onDisableConfirm={props.disableCalendarAccount}
+          onDisableCancel={props.cancelDisableCalendarAccount}
+          onToggleCalendar={props.toggleUserCalendar}
         />
       )}
 
@@ -209,7 +235,8 @@ const ConfigTab = props => {
         />
       )}
 
-      {isAdmin && integration && actions.length > 0 && (
+      {/* hidden while another integration loads: its forms would post to the new selector */}
+      {isAdmin && integration && loadStatus === RequestStatus.Success && actions.length > 0 && (
         <ActionsCard
           actions={actions}
           language={language}

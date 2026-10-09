@@ -56,7 +56,7 @@ describe('externalIntegration.validateManifest — widgets and provider type', (
     const { widgets, ...manifest } = TEST_PROVIDER_MANIFEST;
     expect422(
       manifest,
-      'type: a provider integration must declare at least one capability field (widgets, scene_triggers, scene_actions)',
+      'type: a provider integration must declare at least one capability field (widgets, scene_triggers, scene_actions, energy_contracts)',
     );
   });
 
@@ -179,6 +179,14 @@ describe('externalIntegration.validateManifest — widgets and provider type', (
 
   it('should accept a source: "devices" setting', () => {
     const manifest = withWidget(TEST_WIDGET_MANIFEST.widgets[1]);
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should accept a source: "houses" setting', () => {
+    const manifest = withWidget({
+      ...CINEMA_WIDGET,
+      settings: [{ key: 'house', type: 'select', label: { en: 'House' }, source: 'houses', required: true }],
+    });
     expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
   });
 

@@ -167,10 +167,12 @@ class AskAI extends Component {
           />
         </div>
         <MessageServiceSelector
-          action={props.action}
-          path={props.path}
-          updateActionProperty={props.updateActionProperty}
-        />
+          value={props.action.service}
+          label={<Text id="editScene.actionsCard.messageSend.serviceLabel" />}
+          onChange={service => props.updateActionProperty(props.path, 'service', service)}
+        >
+          <Text id="editScene.actionsCard.messageSend.serviceExplanation" />
+        </MessageServiceSelector>
         <div class="form-group">
           <label className="form-label">
             <Text id="editScene.actionsCard.askAi.cameraLabel" />

@@ -4,6 +4,7 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import { ConfigField } from '../../../../components/integration/ConfigSchemaForm';
+import { hasDynamicSource, fetchDynamicOptions } from '../../../../components/integration/dynamicOptions';
 import ExternalIntegrationDeclarationState from '../ExternalIntegrationDeclarationState';
 import { getLocalizedText } from '../../../../utils/getLocalizedText';
 import {
@@ -26,22 +27,21 @@ class ExternalIntegrationTrigger extends Component {
     resolveSceneDeclaration(props.sceneIntegrations, SCENE_DECLARATION_KINDS.trigger, props.trigger);
 
   loadDynamicOptions = async declaration => {
-    // a select/multi_select filter can take its options from the devices of
-    // the integration (source: "devices", value = external_id)
-    if (!declaration || !(declaration.fields || []).some(field => field.source === 'devices')) {
+    // a select/multi_select filter can take its options from a core-defined
+    // source: the devices of the integration (value = external_id) or the
+    // houses of Gladys (value = selector)
+    if (!declaration || !hasDynamicSource(declaration.fields)) {
       return;
     }
     // the response is bound to the declaration it was requested for: a
     // slower answer of a previous integration must not overwrite the current one
     const { integration, trigger_key: key } = this.props.trigger;
     try {
-      const devices = await this.props.httpClient.get(`/api/v1/service/${integration}/device`);
+      const dynamicOptions = await fetchDynamicOptions(this.props.httpClient, integration, declaration.fields);
       if (this.props.trigger.integration !== integration || this.props.trigger.trigger_key !== key) {
         return;
       }
-      this.setState({
-        dynamicOptions: { devices: devices.map(device => ({ value: device.external_id, label: device.name })) }
-      });
+      this.setState({ dynamicOptions });
     } catch (e) {
       console.error(e);
     }

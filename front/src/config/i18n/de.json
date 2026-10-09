@@ -405,7 +405,8 @@
       "actions": "Schnellaktionen",
       "house-view": "Hausansicht",
       "external-widget": "Integrations-Widget",
-      "thermostat": "Thermostat"
+      "thermostat": "Thermostat",
+      "energy-price": "Strompreis"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -783,7 +784,7 @@
         "error": "Fehler beim Laden der Energieverbrauchsdaten",
         "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar",
         "showSubscriptionPrices": "Abonnementpreise anzeigen",
-        "showSubscriptionPricesDescription": "Zeigt die monatlichen Abonnementkosten zusammen mit den Verbrauchsdaten im Diagramm an.",
+        "showSubscriptionPricesDescription": "Zeigt die Abonnementkosten des Zählervertrags zusammen mit den Verbrauchsdaten im Diagramm an.",
         "periodStartDay": "Starttag des Abrechnungszeitraums",
         "periodStartDayDescription": "Tag des Monats, an dem der Abrechnungszeitraum Ihres Energieversorgers beginnt. Die Monats- und Jahresansicht laufen dann von diesem Tag bis zum gleichen Tag des nächsten Zeitraums (z. B. vom 5. bis zum 5.), damit sie mit Ihrer Rechnung verglichen werden können. Ist ein Monat kürzer als dieser Tag, beginnt der Zeitraum am letzten Tag dieses Monats."
       },
@@ -898,7 +899,23 @@
         "emptyChart": "Noch keine Daten für diesen Zeitraum.",
         "now": "Jetzt",
         "confirmAction": "„{{label}}“ ausführen?",
-        "actionError": "Die Aktion ist fehlgeschlagen."
+        "actionError": "Die Aktion ist fehlgeschlagen.",
+        "actionFormSend": "Senden",
+        "actionFormInvalid": "Ungültiger Wert",
+        "actionFormClose": "Schließen",
+        "actionFormInvalidField": "Ungültiger Wert: {{label}}"
+      },
+      "energyPrice": {
+        "editName": "Widget-Name (optional)",
+        "editNamePlaceholder": "Auf dem Dashboard angezeigter Name",
+        "editContract": "Stromvertrag",
+        "noContract": "Noch kein Stromvertrag vorhanden.",
+        "noContractLink": "Legen Sie einen in der Energieüberwachungs-Integration an.",
+        "notConfigured": "Wählen Sie in den Widget-Einstellungen einen Vertrag aus.",
+        "until": "Bis {{time}}",
+        "unknownPrice": "Preis unbekannt",
+        "error": "Der Strompreis konnte nicht geladen werden. Prüfen Sie, ob der Vertrag noch existiert.",
+        "cumulativeToday": "Heute: {{kwh}} kWh"
       }
     },
     "editDashboardBackgroundLabel": "Hintergrundstimmung",
@@ -1106,6 +1123,8 @@
         "containerStopped": "Gestoppt",
         "openButton": "Öffnen",
         "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
+        "uninstallCalendarWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt, und die von ihr erstellten Kalender werden mit ihren Terminen gelöscht, für alle Benutzer des Haushalts – nicht nur deine.",
+        "uninstallEnergyWarning": "Diese Integration berechnet die Kosten von Energieverträgen selbst: Die von ihr berechneten Verträge werden nach der Deinstallation nicht mehr berechnet (ihre bestehenden Kosten bleiben erhalten).",
         "confirmUninstallButton": "Ja, deinstallieren",
         "cancelUninstallButton": "Abbrechen",
         "startedAtLabel": "In Betrieb seit"
@@ -1214,9 +1233,16 @@
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
         "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "calendarInfoText": "Diese Integration ist ein Kalenderanbieter: Nach der Installation erstellt sie Kalender und Termine in Gladys für die Benutzer, die sie mit ihrem eigenen Konto aktivieren.",
         "widgetsTitle": "Dashboard-Widgets",
         "widgetsText": "Diese Integration stellt die folgenden Widgets bereit, die allen Benutzern im Dashboard-Editor zur Verfügung stehen:",
+        "energyContractsTitle": "Energieverträge",
+        "energyContractsText": "Diese Integration stellt die folgenden Energievertragsvorlagen bereit, die im Vertragsassistenten der Energieüberwachungsseite angeboten werden:",
+        "energyContractsDelegated": "von der Integration berechnet",
+        "energyContractsCalendars": "Von dieser Integration gepflegte Tarifkalender:",
+        "energyContractsDelegatedText": "Eine von der Integration berechnete Vorlage berechnet Ihre Energiekosten selbst: Die Kosten dieser Verträge werden nur berechnet, solange die Integration läuft, und nicht mehr, wenn sie deinstalliert wird.",
         "providerInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Dashboard-Widgets bereit. Konfigurieren Sie sie hier und fügen Sie ihre Widgets dann im Dashboard-Editor hinzu.",
+        "providerEnergyInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Energievertragsvorlagen und Tarifkalender bereit. Konfigurieren Sie sie hier und wählen Sie ihre Verträge dann auf der Seite Energieüberwachung aus.",
         "sceneDeclarationsTitle": "Szenen-Auslöser und -Aktionen",
         "sceneDeclarationsText": "Diese Integration fügt dem Szenen-Editor {{triggers}} Auslöser und {{actions}} Aktion(en) hinzu.",
         "sceneTriggerPrefix": "Auslöser:",
@@ -1298,6 +1324,22 @@
         "saveKeyError": "Beim Speichern des Open-API-Schlüssels ist ein Fehler aufgetreten.",
         "notAvailableText": "Die Webhooks sind noch nicht aktiv: Speichern Sie Ihren Open-API-Schlüssel, um sie zu aktivieren.",
         "urlsText": "Webhook-URLs (die Integration registriert sie automatisch, wenn möglich; manche Dienste verlangen das Einfügen in die Anbieterkonsole). Diese URLs enthalten Ihren Schlüssel: Teilen Sie sie nur mit dem Drittanbieterdienst."
+      },
+      "myCalendars": {
+        "title": "Meine Kalender",
+        "description": "Diese Integration erstellt Kalender und Termine in Gladys für die Benutzer, die sie aktivieren. Aktivieren Sie sie mit Ihrem eigenen Konto, um ihre Kalender in Ihrer Kalenderansicht zu sehen; das Deaktivieren löscht Ihre Kalender aus Gladys (beim Anbieter bleiben sie unberührt).",
+        "enableButton": "Für mich aktivieren",
+        "saveButton": "Speichern",
+        "disableButton": "Deaktivieren und meine Kalender löschen",
+        "disableConfirmText": "Ihre Kalender aus dieser Integration und deren Termine werden aus Gladys gelöscht. Die Kalender beim Anbieter bleiben unberührt, und eine erneute Aktivierung stellt bei der nächsten Synchronisierung alles wieder her.",
+        "disableConfirmButton": "Meine Kalender löschen",
+        "cancelButton": "Abbrechen",
+        "saveError": "Beim Speichern Ihres Kontos ist ein Fehler aufgetreten.",
+        "saveSuccess": "Ihr Konto wurde gespeichert.",
+        "noCalendars": "Noch kein Kalender: die Integration überträgt Ihre Kalender bei der nächsten Synchronisierung.",
+        "syncLabel": "Diesen Kalender synchronisieren",
+        "sharedLabel": "Mit dem Haushalt teilen",
+        "sharedHelp": "Ein geteilter Kalender ist für den ganzen Haushalt sichtbar und kann Szenen auslösen."
       },
       "contactProfile": {
         "title": "Mein Konto",
@@ -1533,7 +1575,85 @@
       "circularReference": "zirkuläre Referenz",
       "selfReference": "Selbstreferenz",
       "fixAutomatically": "beheben",
-      "fixing": "Behebung läuft..."
+      "fixing": "Behebung läuft...",
+      "contracts": {
+        "tab": "Verträge",
+        "description": "Ein Vertrag beschreibt, wie der Verbrauch eines Zählers über einen Zeitraum bepreist wird. Wählen Sie eine Vorlage aus dem Community-Katalog oder einer installierten Integration, füllen Sie die Parameter aus und prüfen Sie die Vorschau vor dem Speichern.",
+        "empty": "Noch kein Vertrag. Legen Sie einen an, um die Kosten Ihres Verbrauchs zu berechnen.",
+        "errorLoading": "Fehler beim Laden der Verträge.",
+        "confirmDelete": "Möchten Sie diesen Vertrag wirklich löschen? Die Kosten seines Zeitraums werden bei der nächsten Berechnung entfernt.",
+        "ongoing": "laufend",
+        "createTitle": "Neuer Vertrag",
+        "editTitle": "Vertrag bearbeiten",
+        "status": {
+          "active": "aktiv",
+          "scheduled": "geplant",
+          "expired": "abgelaufen",
+          "orphaned": "verwaist"
+        },
+        "mode": {
+          "rules": "Regelwerk",
+          "delegated": "von der Integration berechnet"
+        },
+        "provider": {
+          "community": "Community",
+          "integration": "Integration",
+          "internal": "Gladys",
+          "user": "manuell"
+        },
+        "providerStopped": "Integration gestoppt",
+        "orphanedHelp": "Die Integration, die diesen Vertrag berechnet, ist nicht mehr installiert: seine Kosten werden nicht mehr berechnet. Installieren Sie sie erneut oder ersetzen Sie den Vertrag.",
+        "migrationWarning": "Dieser Vertrag wurde aus Ihren früheren Tarifen umgewandelt: die neue Berechnung weicht über die letzten 7 Tage um {{gap}}% von der alten ab. Bitte prüfen Sie seine Preise.",
+        "wizard": {
+          "meter": "Zähler",
+          "template": "Vorlage",
+          "parameters": "Parameter",
+          "preview": "Vorschau"
+        },
+        "allCountries": "Alle Länder",
+        "searchTemplate": "Anbieter oder Vertrag suchen…",
+        "noTemplate": "Keine passende Vorlage.",
+        "publishAsIntegration": "Oder veröffentlichen Sie ihn als externe Integration: eine Integration kann Vertragsvorlagen deklarieren, Tarifkalender (Tagesfarben, Spotpreise, Feiertage) liefern und die Kosten sogar selbst berechnen.",
+        "selectedTemplate": "Vorlage:",
+        "parameters": "Vertragsparameter",
+        "timezone": "Zeitzone",
+        "timezonePlaceholder": "Systemzeitzone",
+        "billingPeriodStartDay": "Starttag der Abrechnungsperiode",
+        "delegatedHelp": "Die Kosten dieses Vertrags berechnet seine Integration: nur die Fixgebühren des Tarifs berechnet Gladys, und es gibt keine Vorschau.",
+        "jsonMode": "Erweitert: Tarifdefinition bearbeiten (JSON)",
+        "tariffJson": "Tarifdefinition",
+        "tariffJsonHelp": "Die Definition wird beim Speichern geprüft. Das Format ist im Repository dokumentiert",
+        "exportTemplate": "Als Vorlage exportieren",
+        "previewDescription": "Ihr realer Verbrauch der letzten 7 Tage, mit diesem Vertrag bepreist, ohne etwas zu speichern.",
+        "previewSynthetic": "Dieser Zähler hat noch keinen Verbrauch: die Vorschau verwendet ein flaches Profil von 0,5 kWh pro 30 Minuten.",
+        "previewTotal": "Summe über 7 Tage",
+        "previewWarnings": "Intervalle mit dem Ersatzpreis bepreist (fehlender Kalenderwert):",
+        "intervals": "Intervalle",
+        "sampleTime": "Zeit",
+        "samplePrice": "Einheitspreis",
+        "sampleCost": "Kosten",
+        "sampleLabel": "Tarif",
+        "calendars": {
+          "title": "Tarifkalender",
+          "description": "Die datierten Werte der Verträge (Tagesfarben, Spotpreise, Feiertage), von den Integrationen veröffentlicht. Ein Kalender ohne Anbieter behält seine Werte, wird aber nicht mehr aktualisiert.",
+          "empty": "Noch kein Kalender.",
+          "key": "Schlüssel",
+          "provider": "Anbieter",
+          "granularity": "Granularität",
+          "granularities": {
+            "day": "Tag",
+            "thirty_minutes": "30 Minuten",
+            "fifteen_minutes": "15 Minuten"
+          },
+          "coverage": "Abdeckung",
+          "orphaned": "kein Anbieter",
+          "lastValues": "Letzte Werte",
+          "noValue": "Kein Wert.",
+          "recalculateFrom": "Kosten neu berechnen ab",
+          "recalculate": "Neu berechnen",
+          "recalculated": "Die Neuberechnung wurde gestartet. Sie können den Fortschritt in den Hintergrundaufgaben verfolgen."
+        }
+      }
     },
     "netatmo": {
       "title": "Netatmo",
@@ -3873,6 +3993,23 @@
         "computedExplanationText": "Anstelle einer festen Lautstärke kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben, zum Beispiel um nachts leiser zu sprechen. Um eine Variable einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Block das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "textLabel": "Nachricht zum Sprechen auf dem Lautsprecher",
         "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Hinweis: Du musst vor diesem Block eine Variable in einer \"Letzten Zustand abrufen\"-Aktion definiert haben."
+      },
+      "energyCurrentPrice": {
+        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle kWh-Preis des ausgewählten Vertrags die folgende Bedingung erfüllt.",
+        "contractLabel": "Energievertrag",
+        "operatorLabel": "Fortfahren, wenn der Preis",
+        "valueLabel": "Schwellenwert (pro kWh)",
+        "valuePlaceholder": "0.20",
+        "error": "Die Energieverträge konnten nicht geladen werden.",
+        "noContract": "Noch kein Energievertrag: Legen Sie einen in der Integration Energieüberwachung an.",
+        "operators": {
+          "equal": "gleich",
+          "different": "ungleich",
+          "superior": "größer als",
+          "superiorOrEqual": "größer oder gleich",
+          "inferior": "kleiner als",
+          "inferiorOrEqual": "kleiner oder gleich"
+        }
       }
     },
     "actions": {
@@ -3958,6 +4095,9 @@
       },
       "external-integration": {
         "scene-action": "Integrations-Aktion"
+      },
+      "energy-contract": {
+        "current-price": "Bedingung zum Strompreis"
       }
     },
     "actionsDescriptions": {
@@ -4039,6 +4179,9 @@
       },
       "external-integration": {
         "scene-action": "Eine von einer externen Integration deklarierte Aktion"
+      },
+      "energy-contract": {
+        "current-price": "Nur fortfahren, wenn der aktuelle Preis eines Energievertrags einen Schwellenwert erfüllt"
       }
     },
     "actionCategories": {
@@ -4128,6 +4271,9 @@
       },
       "external-integration": {
         "scene-event": "Integrations-Auslöser"
+      },
+      "energy-contract": {
+        "price-changed": "Strompreis geändert"
       }
     },
     "triggersDescriptions": {
@@ -4174,6 +4320,9 @@
       },
       "external-integration": {
         "scene-event": "Ein von einer externen Integration deklarierter Auslöser"
+      },
+      "energy-contract": {
+        "price-changed": "Wenn sich der aktuelle Preis oder Tarif eines Energievertrags ändert"
       }
     },
     "triggerCategories": {
@@ -4183,7 +4332,8 @@
       "alarm": "Alarmanlage",
       "weather": "Wetter",
       "advanced": "Erweitert",
-      "integrations": "Integrationen"
+      "integrations": "Integrationen",
+      "energy": "Energie"
     },
     "triggersCard": {
       "newState": {
@@ -4317,6 +4467,12 @@
           "severe": "Schwer (orange)",
           "extreme": "Extrem (rot)"
         }
+      },
+      "energyPriceChanged": {
+        "description": "Dieser Auslöser wird aktiviert, wenn sich der aktuelle kWh-Preis (oder die Tarifstufe) des ausgewählten Vertrags ändert, zum Beispiel beim Wechsel von Niedertarif zu Hochtarif.",
+        "contractLabel": "Energievertrag",
+        "anyContract": "Jeder Vertrag",
+        "error": "Die Energieverträge konnten nicht geladen werden."
       }
     },
     "searchActionsPlaceholder": "Aktion suchen…",
@@ -4609,6 +4765,7 @@
       },
       "statesMigrated": "Verschobene Verlaufszustände: {{count}}",
       "orphanedStates": "Verwaiste Zustände: {{count}}",
+      "fallbackPrices": "Mit dem Ersatzpreis bepreist (fehlender Kalenderwert): {{count}}",
       "duration": "Dauer: {{duration}}"
     },
     "jobTypes": {
@@ -4632,6 +4789,9 @@
       "energy-monitoring-consumption-from-index-beginning": "Energieverbrauchsberechnung aus Index (von Anfang an)",
       "energy-monitoring-production-from-index-thirty-minutes": "Energieerzeugungsberechnung aus Index (30 Minuten)",
       "energy-monitoring-production-from-index-beginning": "Energieerzeugungsberechnung aus Index (von Anfang an)",
+      "energy-monitoring-cost-calculation-contract": "Neuberechnung der Energiekosten (Vertrags- oder Kalenderänderung)",
+      "energy-monitoring-billing-period-end": "Energiekostenberechnung (Ende des Abrechnungszeitraums)",
+      "energy-monitoring-delegated-catch-up": "Nachholen der Energiekosten (von einer Integration berechnete Verträge)",
       "service-enedis-sync": "Enedis-Datensynchronisation",
       "ai-weekly-digest": "KI-Wochenzusammenfassung"
     },
@@ -4731,6 +4891,8 @@
     },
     "batteryLevel": "Batteriestandswarnung",
     "batteryLevelDescription": "Jeden Samstag um 9:00 Uhr wird eine Nachricht an alle Administratoren gesendet, wenn der Batteriestand eines Geräts unter den gewählten Schwellenwert fällt.",
+    "systemMessageService": "Kanal für Systemnachrichten",
+    "systemMessageServiceDescription": "Wähle, wohin Gladys seine Systemnachrichten an die Administratoren sendet (Gladys-Update, fehlgeschlagene Sicherung, schwache Batterien, Gladys Plus-Abonnement, wöchentliche KI-Zusammenfassung). Sie bleiben immer in der Gladys-Unterhaltung sichtbar.",
     "duckDbMigrationTitle": "Migration zu DuckDB",
     "duckDbMigrationDescription": "Wir migrieren zu einem neuen Datenbanksystem für Sensordaten. Gladys wird Ihre Daten automatisch migrieren, aber Ihre Daten in Ihrer SQLite-Datenbank nicht löschen, um Datenverlust zu vermeiden.",
     "duckDbMigrationProgressTitle": "Migrationsfortschritt",
@@ -4869,6 +5031,14 @@
     "heroReassurance": "1 Monat kostenlos testen · Ohne Kreditkarte · Jederzeit kündbar",
     "startFreeTrialButton": "Kostenlose Testphase starten",
     "alreadySubscriberButton": "Ich habe bereits ein Konto",
+    "newBadge": "Neu",
+    "offlineAlert": {
+      "title": "Erhalte eine E-Mail, wenn deine Gladys ausfällt",
+      "description": "Stromausfall, abgestürzter Internetrouter, defekte SD-Karte, ein missglücktes Docker-Update: Bleibt deine Instanz unerreichbar, schickt dir Gladys Plus eine E-Mail. So erfährst du es noch am selben Tag und nicht erst abends, wenn du nach Hause kommst.",
+      "delay": "Du wählst die Wartezeit, von 10 Minuten bis 24 Stunden",
+      "backOnline": "Eine zweite E-Mail, sobald deine Gladys wieder online ist",
+      "onByDefault": "Standardmäßig aktiviert, in beiden Tarifen enthalten: nichts einzurichten"
+    },
     "featuresTitle": "Alles, was enthalten ist",
     "featuresSubtitle": "Ein komplettes Paket, um dein Smart Home wirklich nützlich zu machen.",
     "features": {
@@ -4915,6 +5085,7 @@
       "priceDetail": "69,99 € jährlich (17 % sparen)",
       "features": {
         "remoteAccess": "Ende-zu-Ende-verschlüsselter Fernzugriff",
+        "offlineAlert": "E-Mail-Benachrichtigung, wenn deine Gladys offline ist",
         "voiceAssistants": "Google Home & Amazon Alexa",
         "openApi": "Offene REST-API",
         "familyAccounts": "Konten für die ganze Familie"

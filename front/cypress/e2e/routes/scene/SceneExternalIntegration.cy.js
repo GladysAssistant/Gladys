@@ -31,6 +31,7 @@ const SCENE_INTEGRATIONS = {
           label: { en: 'Take a snapshot' },
           fields: [
             { key: 'camera', type: 'select', source: 'devices', label: { en: 'Camera' }, required: true },
+            { key: 'house', type: 'select', source: 'houses', label: { en: 'House' } },
             { key: 'caption', type: 'string', label: { en: 'Caption' } }
           ],
           outputs: [{ key: 'clip_id', type: 'string', label: { en: 'Clip identifier' } }]
@@ -90,6 +91,8 @@ describe('Scene - external integration triggers and actions', () => {
   });
 
   it('Should add a declared trigger and a declared action, then save the declared shapes', () => {
+    // the house created by the account setup
+    const house = Cypress.env('house');
     cy.intercept('GET', '**/api/v1/external_integration/scene', SCENE_INTEGRATIONS).as('getSceneIntegrations');
     cy.intercept('GET', `**/api/v1/service/${SELECTOR}/device`, DEVICES).as('getDevices');
 
@@ -132,11 +135,14 @@ describe('Scene - external integration triggers and actions', () => {
       .click();
     cy.wait('@getDevices');
 
-    // the device parameter, the variables-aware string parameter and the
+    // the device parameter, the house parameter (the real houses of Gladys,
+    // stored by selector), the variables-aware string parameter and the
     // results of the action, named by label
     cy.get('select#config_camera')
       .last()
       .select(CAMERA_EXTERNAL_ID);
+    cy.get(`select#config_house option[value="${house.selector}"]`).should('contain', house.name);
+    cy.get('select#config_house').select(house.selector);
     cy.get('.tagify__input').type('Visitor detected');
     cy.contains('editScene.externalIntegration.outputsAvailable').should('exist');
     cy.contains('.badge', 'Clip identifier').should('exist');
@@ -151,7 +157,11 @@ describe('Scene - external integration triggers and actions', () => {
       expect(trigger.fields).to.include({ camera: CAMERA_EXTERNAL_ID });
       const action = scene.actions.flat().find(candidate => candidate.type === 'external-integration.scene-action');
       expect(action).to.include({ integration: SELECTOR, action_key: 'create_snapshot' });
-      expect(action.fields).to.include({ camera: CAMERA_EXTERNAL_ID, caption: 'Visitor detected' });
+      expect(action.fields).to.include({
+        camera: CAMERA_EXTERNAL_ID,
+        house: house.selector,
+        caption: 'Visitor detected'
+      });
     });
   });
 

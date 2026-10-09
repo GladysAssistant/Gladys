@@ -82,11 +82,10 @@ async function init() {
 
   // Get latest Gladys version in 5 minutes
   // To let the system initialize
+  // (only official release images actually call Gladys Plus, see getLatestGladysVersion)
   setTimeout(async () => {
     try {
-      if (process.env.NODE_ENV === 'production') {
-        await this.getLatestGladysVersion();
-      }
+      await this.getLatestGladysVersion();
     } catch (e) {
       logger.debug(e);
     }

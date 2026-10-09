@@ -58,7 +58,7 @@ describe('system.checkIfGladysUpgraded', () => {
   let variableSetValueStub;
   let userGetByRoleStub;
   let brainGetReplyStub;
-  let messageSendToUserStub;
+  let messageSendSystemMessageStub;
   let gatewayGetLatestGladysVersionStub;
 
   beforeEach(() => {
@@ -67,7 +67,7 @@ describe('system.checkIfGladysUpgraded', () => {
     variableSetValueStub = sinon.stub().resolves(null);
     userGetByRoleStub = sinon.stub();
     brainGetReplyStub = sinon.stub();
-    messageSendToUserStub = sinon.stub().resolves(null);
+    messageSendSystemMessageStub = sinon.stub().resolves(null);
     gatewayGetLatestGladysVersionStub = sinon.stub().resolves(releaseNotes);
 
     // Initialize system
@@ -85,7 +85,7 @@ describe('system.checkIfGladysUpgraded', () => {
       getReply: brainGetReplyStub,
     };
     system.message = {
-      sendToUser: messageSendToUserStub,
+      sendSystemMessage: messageSendSystemMessageStub,
     };
   });
 
@@ -111,7 +111,7 @@ describe('system.checkIfGladysUpgraded', () => {
     assert.calledOnceWithExactly(userGetByRoleStub, USER_ROLE.ADMIN);
 
     // Verify messages were sent to each admin
-    assert.callCount(messageSendToUserStub, 6); // 3 admins × 2 messages each (upgrade message + release note)
+    assert.callCount(messageSendSystemMessageStub, 6); // 3 admins × 2 messages each (upgrade message + release note)
 
     // Verify brain.getReply was called for each admin with correct language
     assert.calledWith(brainGetReplyStub, 'fr', 'gladys-upgraded.success', {
@@ -128,11 +128,34 @@ describe('system.checkIfGladysUpgraded', () => {
     });
 
     // Verify French admin received French release notes
-    assert.calledWith(messageSendToUserStub, frenchAdmin.selector, releaseNotes.fr_release_note_link);
+    assert.calledWith(messageSendSystemMessageStub, frenchAdmin.selector, releaseNotes.fr_release_note_link);
 
     // Verify English and German admins received default (English) release notes
-    assert.calledWith(messageSendToUserStub, englishAdmin.selector, releaseNotes.default_release_note_link);
-    assert.calledWith(messageSendToUserStub, germanAdmin.selector, releaseNotes.default_release_note_link);
+    assert.calledWith(messageSendSystemMessageStub, englishAdmin.selector, releaseNotes.default_release_note_link);
+    assert.calledWith(messageSendSystemMessageStub, germanAdmin.selector, releaseNotes.default_release_note_link);
+  });
+
+  it('should only send the upgrade message and save the version when the version check is skipped', async () => {
+    // getLatestGladysVersion resolves null when the instance is not an official release image
+    variableGetValueStub.resolves(previousVersion);
+    userGetByRoleStub.resolves([frenchAdmin, englishAdmin]);
+    brainGetReplyStub.returns('Upgrade message');
+    system.gladysVersion = currentVersion;
+    gatewayGetLatestGladysVersionStub.resolves(null);
+
+    const gateway = {
+      getLatestGladysVersion: gatewayGetLatestGladysVersionStub,
+    };
+
+    await system.checkIfGladysUpgraded(gateway, 0);
+
+    // Only the upgrade message, no release note
+    assert.calledTwice(messageSendSystemMessageStub);
+    assert.calledWith(messageSendSystemMessageStub.firstCall, frenchAdmin.selector, 'Upgrade message');
+    assert.calledWith(messageSendSystemMessageStub.secondCall, englishAdmin.selector, 'Upgrade message');
+
+    // The version is still saved, so the upgrade message is not sent again at the next start
+    assert.calledOnceWithExactly(variableSetValueStub, SYSTEM_VARIABLE_NAMES.GLADYS_VERSION, currentVersion);
   });
 
   it('should not send notifications when no upgrade detected', async () => {
@@ -154,7 +177,7 @@ describe('system.checkIfGladysUpgraded', () => {
     // Verify no messages were sent
     assert.notCalled(userGetByRoleStub);
     assert.notCalled(brainGetReplyStub);
-    assert.notCalled(messageSendToUserStub);
+    assert.notCalled(messageSendSystemMessageStub);
   });
 
   it('should only send notifications once when called multiple times', async () => {
@@ -175,7 +198,7 @@ describe('system.checkIfGladysUpgraded', () => {
     variableGetValueStub.reset();
     userGetByRoleStub.reset();
     brainGetReplyStub.reset();
-    messageSendToUserStub.reset();
+    messageSendSystemMessageStub.reset();
     gatewayGetLatestGladysVersionStub.reset();
 
     // Second call - version now matches (no upgrade)
@@ -188,7 +211,7 @@ describe('system.checkIfGladysUpgraded', () => {
     assert.calledOnce(variableGetValueStub);
     assert.notCalled(userGetByRoleStub);
     assert.notCalled(brainGetReplyStub);
-    assert.notCalled(messageSendToUserStub);
+    assert.notCalled(messageSendSystemMessageStub);
   });
 
   it('should handle errors gracefully', async () => {
@@ -205,19 +228,19 @@ describe('system.checkIfGladysUpgraded', () => {
     // Verify no messages were sent
     assert.notCalled(userGetByRoleStub);
     assert.notCalled(brainGetReplyStub);
-    assert.notCalled(messageSendToUserStub);
+    assert.notCalled(messageSendSystemMessageStub);
   });
 
-  it('should continue processing when sendToUser fails for upgrade message', async () => {
+  it('should continue processing when sendSystemMessage fails for upgrade message', async () => {
     // Setup stubs
     variableGetValueStub.resolves(previousVersion);
     userGetByRoleStub.resolves([frenchAdmin, englishAdmin]);
     brainGetReplyStub.returns('Upgrade message');
     system.gladysVersion = currentVersion;
 
-    // First call to sendToUser fails, subsequent calls succeed
-    messageSendToUserStub.onFirstCall().rejects(new Error('Message service unavailable'));
-    messageSendToUserStub.resolves(null);
+    // First call to sendSystemMessage fails, subsequent calls succeed
+    messageSendSystemMessageStub.onFirstCall().rejects(new Error('Message service unavailable'));
+    messageSendSystemMessageStub.resolves(null);
 
     const gateway = {
       getLatestGladysVersion: gatewayGetLatestGladysVersionStub,
@@ -228,14 +251,14 @@ describe('system.checkIfGladysUpgraded', () => {
 
     // Verify that processing continued despite the error
     // Should have attempted to send messages to both admins
-    assert.calledWith(messageSendToUserStub, frenchAdmin.selector);
-    assert.calledWith(messageSendToUserStub, englishAdmin.selector);
+    assert.calledWith(messageSendSystemMessageStub, frenchAdmin.selector);
+    assert.calledWith(messageSendSystemMessageStub, englishAdmin.selector);
 
     // Verify version was still saved
     assert.calledOnceWithExactly(variableSetValueStub, SYSTEM_VARIABLE_NAMES.GLADYS_VERSION, currentVersion);
   });
 
-  it('should continue processing when sendToUser fails for release note message', async () => {
+  it('should continue processing when sendSystemMessage fails for release note message', async () => {
     // Setup stubs
     variableGetValueStub.resolves(previousVersion);
     userGetByRoleStub.resolves([frenchAdmin]);
@@ -243,8 +266,8 @@ describe('system.checkIfGladysUpgraded', () => {
     system.gladysVersion = currentVersion;
 
     // First call succeeds (upgrade message), second call fails (release note)
-    messageSendToUserStub.onFirstCall().resolves(null);
-    messageSendToUserStub.onSecondCall().rejects(new Error('Message service unavailable'));
+    messageSendSystemMessageStub.onFirstCall().resolves(null);
+    messageSendSystemMessageStub.onSecondCall().rejects(new Error('Message service unavailable'));
 
     const gateway = {
       getLatestGladysVersion: gatewayGetLatestGladysVersionStub,
@@ -254,9 +277,9 @@ describe('system.checkIfGladysUpgraded', () => {
     await system.checkIfGladysUpgraded(gateway, 0);
 
     // Verify that both messages were attempted
-    assert.calledTwice(messageSendToUserStub);
-    assert.calledWith(messageSendToUserStub.firstCall, frenchAdmin.selector, 'Upgrade message');
-    assert.calledWith(messageSendToUserStub.secondCall, frenchAdmin.selector, releaseNotes.fr_release_note_link);
+    assert.calledTwice(messageSendSystemMessageStub);
+    assert.calledWith(messageSendSystemMessageStub.firstCall, frenchAdmin.selector, 'Upgrade message');
+    assert.calledWith(messageSendSystemMessageStub.secondCall, frenchAdmin.selector, releaseNotes.fr_release_note_link);
 
     // Verify version was still saved despite the error
     assert.calledOnceWithExactly(variableSetValueStub, SYSTEM_VARIABLE_NAMES.GLADYS_VERSION, currentVersion);

@@ -18,6 +18,7 @@ const ContactProfileCard = ({
   touchedSecrets,
   profileStatus,
   updateValue,
+  dynamicOptions,
   onSave,
   onClear
 }) => {
@@ -55,6 +56,7 @@ const ContactProfileCard = ({
               configuredSecrets={configuredSecrets || []}
               touchedSecrets={touchedSecrets || {}}
               updateConfigValue={updateValue}
+              dynamicOptions={dynamicOptions}
             />
           ))}
           <div class="form-footer">

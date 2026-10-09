@@ -9,7 +9,7 @@ import { WEBSOCKET_MESSAGE_TYPES, USER_ROLE, ERROR_MESSAGES } from '../../../../
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import StatusBadge from '../../../routes/integration/all/external-integration/components/StatusBadge';
 import { loadWidgetList, invalidateWidgetList, findWidgetDeclaration } from './widgetList';
-import { splitIntoSlots, text, collectFeatureSelectors } from './widgetContentUtils';
+import { splitIntoSlots, text, collectFeatureSelectors, toActionValues } from './widgetContentUtils';
 import {
   WidgetHeader,
   WidgetBody,
@@ -18,7 +18,8 @@ import {
   WidgetCardList,
   WidgetChart,
   LazyWidgetImage,
-  WidgetButtons
+  WidgetButtons,
+  WidgetActionForm
 } from './WidgetComponents';
 import style from './style.css';
 
@@ -32,6 +33,9 @@ const SERVING_STATUSES = ['RUNNING', 'DEGRADED'];
 const RATE_LIMITED_RETRY_MS = 60 * 1000;
 const ACTION_MESSAGE_MS = 4000;
 
+// the inputs of an action form need ids unique on the dashboard
+let widgetInstanceCount = 0;
+
 class ExternalWidgetBox extends Component {
   state = {
     declaration: undefined,
@@ -42,8 +46,12 @@ class ExternalWidgetBox extends Component {
     featuresBySelector: {},
     deviceNamesBySelector: {},
     pending: {},
-    actionMessage: null
+    actionMessage: null,
+    // the open action form: { index, component, values, error }
+    form: null
   };
+
+  formIdPrefix = `external_widget_${(widgetInstanceCount += 1)}`;
 
   // --- declaration and status ---------------------------------------------
 
@@ -116,7 +124,12 @@ class ExternalWidgetBox extends Component {
       if (this.unmounted || generation !== this.fetchGeneration) {
         return;
       }
-      this.setState({ content: response.content, error: null, errorDetail: null });
+      this.setState(({ form }) => ({
+        content: response.content,
+        error: null,
+        errorDetail: null,
+        form: this.rebindForm(form, response.content)
+      }));
       this.scheduleRefresh(new Date(response.expires_at).getTime() - Date.now());
       this.loadFeatures(response.content.components);
     } catch (e) {
@@ -247,10 +260,16 @@ class ExternalWidgetBox extends Component {
   };
 
   runAction = async (component, index) => {
-    const { box, httpClient, intl, user } = this.props;
+    const { intl, user } = this.props;
     if (this.state.pending[index]) {
       return;
     }
+    if (component.action.fields) {
+      this.toggleForm(component, index);
+      return;
+    }
+    // another action runs right away: an open form would be left unrelated
+    this.closeForm();
     if (component.action.confirm) {
       const label = text(component.label, user.language);
       const question = get(intl.dictionary, 'dashboard.boxes.external-widget.confirmAction', {
@@ -261,25 +280,94 @@ class ExternalWidgetBox extends Component {
         return;
       }
     }
+    await this.postAction(component, index);
+  };
+
+  // POST the action; `values` only for an action declaring `fields`, whose
+  // form closes on success and shows the 422 of the core when a value is refused
+  postAction = async (component, index, values) => {
+    const { box, httpClient, user } = this.props;
     this.setPending(index, true);
     try {
+      const body = { settings: box.settings || {} };
+      if (values) {
+        body.values = values;
+      }
       const { message } = await httpClient.post(
         `/api/v1/external_integration/${encodeURIComponent(box.integration)}/widget/${encodeURIComponent(
           box.widget
         )}/action/${encodeURIComponent(component.action.key)}`,
-        { settings: box.settings || {} }
+        body
       );
+      if (values) {
+        this.setState({ form: null });
+      }
       if (message) {
         this.showActionMessage({ text: text(message, user.language) });
       }
     } catch (e) {
       console.error(e);
-      this.showActionMessage({
-        error: true,
-        text: get(e, 'response.data.error') || null
-      });
+      if (values && get(e, 'response.status') === 422) {
+        const error = get(e, 'response.data.properties') || null;
+        this.setState(({ form }) => ({ form: form && { ...form, error } }));
+      } else {
+        this.showActionMessage({
+          error: true,
+          text: get(e, 'response.data.error') || null
+        });
+      }
     }
     this.setPending(index, false);
+  };
+
+  // --- action forms (spec section 7) -------------------------------------------
+
+  toggleForm = (component, index) => {
+    if (this.state.form && this.state.form.index === index) {
+      this.closeForm();
+      return;
+    }
+    // pre-filled with the defaults the integration put in the content
+    const values = {};
+    component.action.fields.forEach(field => {
+      if (field.default !== undefined) {
+        values[field.key] = field.default;
+      }
+    });
+    this.setState({ form: { index, component, values, error: null } });
+  };
+
+  closeForm = () => {
+    this.setState({ form: null });
+  };
+
+  // a refreshed content (TTL, widget-updated) re-renders the button row from
+  // the new tree: the open form follows the button carrying the same action
+  // key, typed values kept, and closes when that button is gone
+  rebindForm = (form, content) => {
+    if (!form) {
+      return null;
+    }
+    const buttons = splitIntoSlots(content.components).buttons;
+    const index = buttons.findIndex(
+      button => button.action && button.action.fields && button.action.key === form.component.action.key
+    );
+    return index === -1 ? null : { ...form, index, component: buttons[index] };
+  };
+
+  updateFormValue = (field, value) => {
+    this.setState(({ form }) => ({
+      form: form && { ...form, values: { ...form.values, [field.key]: value }, error: null }
+    }));
+  };
+
+  submitForm = async e => {
+    e.preventDefault();
+    const { form, pending } = this.state;
+    if (!form || pending[form.index]) {
+      return;
+    }
+    await this.postAction(form.component, form.index, toActionValues(form.component.action.fields, form.values));
   };
 
   runDeviceFeature = async (component, index) => {
@@ -316,7 +404,7 @@ class ExternalWidgetBox extends Component {
   // another widget picked in the editor: nothing of the previous one survives
   resetAndReload = () => {
     this.clearRefreshTimer();
-    this.setState({ content: null, error: null, errorDetail: null, integrationStatus: null });
+    this.setState({ content: null, error: null, errorDetail: null, integrationStatus: null, form: null });
     this.loadDeclaration();
   };
 
@@ -370,7 +458,7 @@ class ExternalWidgetBox extends Component {
 
   renderContent() {
     const { box, httpClient, user, intl } = this.props;
-    const { content, featuresBySelector, deviceNamesBySelector, pending, actionMessage } = this.state;
+    const { content, featuresBySelector, deviceNamesBySelector, pending, actionMessage, form } = this.state;
     const language = user.language || 'en';
     const slots = splitIntoSlots(content.components);
     if (content.components.length === 0) {
@@ -422,9 +510,23 @@ class ExternalWidgetBox extends Component {
             components={slots.buttons}
             featuresBySelector={featuresBySelector}
             pending={pending}
+            openFormIndex={form ? form.index : null}
             onAction={this.runAction}
             onDeviceFeature={this.runDeviceFeature}
             language={language}
+          />
+        )}
+        {form && (
+          <WidgetActionForm
+            component={form.component}
+            values={form.values}
+            error={form.error}
+            pending={Boolean(pending[form.index])}
+            idPrefix={this.formIdPrefix}
+            language={language}
+            onChange={this.updateFormValue}
+            onSubmit={this.submitForm}
+            onCancel={this.closeForm}
           />
         )}
         {actionMessage && (

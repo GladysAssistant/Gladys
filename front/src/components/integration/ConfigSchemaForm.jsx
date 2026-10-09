@@ -94,16 +94,20 @@ class ConfigField extends Component {
     oauthStatus,
     selector,
     dynamicOptions,
-    placeholderPorts
+    placeholderPorts,
+    idPrefix
   }) {
     const label = getLocalizedText(field.label, language) || field.key;
     const description = getLocalizedText(field.description, language);
     const placeholder = getLocalizedText(field.placeholder, language) || '';
     const value = values[field.key];
-    const fieldId = `config_${field.key}`;
+    // a dashboard can show several widget action forms at once: their
+    // inputs need ids of their own for the labels to point at them
+    const fieldId = `${idPrefix || 'config'}_${field.key}`;
     // a select/multi_select can replace its static options with a
-    // core-defined source ("devices": the already-created devices of the
-    // integration, label = device name, value = external_id)
+    // core-defined source, loaded by the screen (see dynamicOptions.js):
+    // "devices" (the already-created devices of the integration, value =
+    // external_id) or "houses" (the houses of Gladys, value = selector)
     const options = field.source ? (dynamicOptions && dynamicOptions[field.source]) || [] : field.options || [];
 
     if (field.type === 'section') {
@@ -319,6 +323,9 @@ class ConfigField extends Component {
             value={value === undefined || value === null ? '' : value}
             min={field.min}
             max={field.max}
+            // the HTML default step is 1: without "any", the browser refuses to
+            // submit a decimal value (a price, a latitude) as a step mismatch
+            step="any"
             placeholder={placeholder}
             onInput={this.onInput}
             required={field.required}
