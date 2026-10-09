@@ -22,6 +22,7 @@ import EditVoiceAssistantBox from '../../../components/boxs/voice-assistant/Edit
 import EditLinkBox from '../../../components/boxs/link/EditLinkBox';
 import EditPhotoBox from '../../../components/boxs/photo/EditPhotoBox';
 import EditSunBox from '../../../components/boxs/sun/EditSun';
+import EditMoonBox from '../../../components/boxs/moon/EditMoon';
 import EditChipsBox from '../../../components/boxs/chips/EditChipsBox';
 import EditActionsBox from '../../../components/boxs/actions/EditActionsBox';
 import EditHouseViewBox from '../../../components/boxs/house-view/EditHouseViewBox';
@@ -71,6 +72,8 @@ const Box = ({ children, ...props }) => {
       return <EditPhotoBox {...props} />;
     case 'sun':
       return <EditSunBox {...props} />;
+    case 'moon':
+      return <EditMoonBox {...props} />;
     case 'chips':
       return <EditChipsBox {...props} />;
     case 'house-view':
