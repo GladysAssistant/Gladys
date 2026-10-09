@@ -94,5 +94,8 @@ jobs:
           push: true
           pull: true
           tags: ${{ vars.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
+          # No GLADYS_OFFICIAL_RELEASE_IMAGE build arg on purpose: dev images
+          # must not count as production installations (no Gladys Plus
+          # version check), only the release workflow sets it.
           cache-from: type=registry,ref=${{ vars.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
           cache-to: type=inline

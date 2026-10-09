@@ -33,6 +33,7 @@ const BOX_TYPE_ICONS = {
   music: 'music',
   gauge: 'activity',
   'energy-consumption': 'trending-up',
+  'energy-price': 'dollar-sign',
   'voice-assistant': 'mic',
   link: 'link',
   photo: 'image',

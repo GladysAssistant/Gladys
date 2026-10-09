@@ -135,6 +135,29 @@ describe('system.checkIfGladysUpgraded', () => {
     assert.calledWith(messageSendSystemMessageStub, germanAdmin.selector, releaseNotes.default_release_note_link);
   });
 
+  it('should only send the upgrade message and save the version when the version check is skipped', async () => {
+    // getLatestGladysVersion resolves null when the instance is not an official release image
+    variableGetValueStub.resolves(previousVersion);
+    userGetByRoleStub.resolves([frenchAdmin, englishAdmin]);
+    brainGetReplyStub.returns('Upgrade message');
+    system.gladysVersion = currentVersion;
+    gatewayGetLatestGladysVersionStub.resolves(null);
+
+    const gateway = {
+      getLatestGladysVersion: gatewayGetLatestGladysVersionStub,
+    };
+
+    await system.checkIfGladysUpgraded(gateway, 0);
+
+    // Only the upgrade message, no release note
+    assert.calledTwice(messageSendSystemMessageStub);
+    assert.calledWith(messageSendSystemMessageStub.firstCall, frenchAdmin.selector, 'Upgrade message');
+    assert.calledWith(messageSendSystemMessageStub.secondCall, englishAdmin.selector, 'Upgrade message');
+
+    // The version is still saved, so the upgrade message is not sent again at the next start
+    assert.calledOnceWithExactly(variableSetValueStub, SYSTEM_VARIABLE_NAMES.GLADYS_VERSION, currentVersion);
+  });
+
   it('should not send notifications when no upgrade detected', async () => {
     // Setup stubs for no upgrade scenario
     variableGetValueStub.resolves(currentVersion);

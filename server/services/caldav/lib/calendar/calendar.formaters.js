@@ -1,3 +1,4 @@
+const { CALENDAR_TYPES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -265,7 +266,7 @@ function formatCalendars(caldavCalendars, userId) {
       ctag: caldavCalendar.ctag,
       sync_token: caldavCalendar.syncToken,
       type: caldavCalendar.type,
-      sync: caldavCalendar.type === 'CALDAV',
+      sync: caldavCalendar.type === CALENDAR_TYPES.CALDAV,
     };
 
     calendars.push(newCalendar);
