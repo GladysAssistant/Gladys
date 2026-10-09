@@ -18,9 +18,13 @@ const {
   WIDGET_BUTTON_STYLES,
   WIDGET_ACTION_KEY_REGEX,
   MAX_WIDGET_ACTION_PARAMS_BYTES,
+  MAX_WIDGET_ACTION_FIELDS,
+  WIDGET_ACTION_FIELD_TYPES,
+  MAX_WIDGET_ACTION_VALUE_LENGTH,
   MAX_WIDGET_URL_LENGTH,
   WIDGET_CONTENT_BUDGET,
 } = require('./constants');
+const { validateConfigField } = require('./externalIntegration.validateManifest');
 
 // The content vocabulary of the integration dashboard widgets
 // (capabilities/dashboard-widgets.md, sections 4 and 5). The payload comes
@@ -48,6 +52,10 @@ const TEXT_BOUNDS = {
   badgeText: 16,
   cardDescription: 2000,
   linkLabel: 24,
+  fieldLabel: 40,
+  fieldDescription: 200,
+  fieldPlaceholder: 40,
+  fieldOptionLabel: 40,
   imageAlt: 100,
   buttonLabel: 24,
 };
@@ -639,6 +647,66 @@ function normalizeImageComponent(raw) {
 }
 
 /**
+ * @description Normalize the `fields` of a widget action (section 7): the
+ * form behind the button, at most 4 entries of the config_schema grammar
+ * checked by the manifest's own field validator, restricted to
+ * string/number/boolean/select and without `source` — the content is
+ * produced at runtime, so its options and defaults are too.
+ * @param {any} rawFields - The raw `fields` of the action.
+ * @param {string} actionKey - The action key, for the warning.
+ * @returns {Array|null} The validated fields with bounded texts, or null when the declaration is invalid.
+ * @example
+ * normalizeActionFields([{ key: 'price', type: 'number', label: { en: 'Price' } }], 'delivery');
+ */
+function normalizeActionFields(rawFields, actionKey) {
+  const errors = [];
+  if (!Array.isArray(rawFields) || rawFields.length > MAX_WIDGET_ACTION_FIELDS) {
+    errors.push(`fields: must be an array of at most ${MAX_WIDGET_ACTION_FIELDS} fields`);
+  } else {
+    const seenKeys = new Set();
+    rawFields.forEach((field, index) => {
+      // no port name to resolve: sections, the only texts carrying
+      // {{port:<name>}} placeholders, are refused below
+      validateConfigField(field, index, seenKeys, errors, 'fields', new Set());
+      if (isPlainObject(field)) {
+        if (!WIDGET_ACTION_FIELD_TYPES.includes(field.type)) {
+          errors.push(`fields[${index}].type: must be one of ${WIDGET_ACTION_FIELD_TYPES.join(', ')}`);
+        }
+        if (field.source !== undefined) {
+          errors.push(`fields[${index}].source: not allowed in a widget action, list the options in the content`);
+        }
+        // a default is relayed as a value: it obeys the bound of a typed one
+        if (typeof field.default === 'string' && field.default.length > MAX_WIDGET_ACTION_VALUE_LENGTH) {
+          errors.push(`fields[${index}].default: must be at most ${MAX_WIDGET_ACTION_VALUE_LENGTH} characters`);
+        }
+      }
+    });
+  }
+  if (errors.length > 0) {
+    logger.warn(`Widget content: invalid fields on action "${actionKey}": ${errors.join('; ')}`);
+    return null;
+  }
+  // a valid declaration is still unaudited text shown on the card: bounded
+  // and stripped of control characters like every other widget string
+  return rawFields.map((rawField) => {
+    const field = { ...rawField, label: normalizeText(rawField.label, TEXT_BOUNDS.fieldLabel) };
+    if (rawField.description !== undefined) {
+      field.description = normalizeText(rawField.description, TEXT_BOUNDS.fieldDescription, { multiline: true });
+    }
+    if (rawField.placeholder !== undefined) {
+      field.placeholder = normalizeText(rawField.placeholder, TEXT_BOUNDS.fieldPlaceholder);
+    }
+    if (rawField.options !== undefined) {
+      field.options = rawField.options.map((option) => ({
+        value: option.value,
+        label: normalizeText(option.label, TEXT_BOUNDS.fieldOptionLabel),
+      }));
+    }
+    return field;
+  });
+}
+
+/**
  * @description Normalize a `button` component: exactly one of a widget
  * action, a device feature command or a link.
  * @param {object} raw - The raw component.
@@ -674,6 +742,14 @@ function normalizeButtonComponent(raw) {
       return null;
     }
     component.action = { key: raw.action.key, params, confirm: raw.action.confirm === true };
+    // an empty list is no form at all
+    if (raw.action.fields !== undefined && !(Array.isArray(raw.action.fields) && raw.action.fields.length === 0)) {
+      const fields = normalizeActionFields(raw.action.fields, raw.action.key);
+      if (fields === null) {
+        return null;
+      }
+      component.action.fields = fields;
+    }
     return component;
   }
   if (kind === 'device_feature') {

@@ -862,7 +862,11 @@
         "emptyChart": "Noch keine Daten für diesen Zeitraum.",
         "now": "Jetzt",
         "confirmAction": "„{{label}}“ ausführen?",
-        "actionError": "Die Aktion ist fehlgeschlagen."
+        "actionError": "Die Aktion ist fehlgeschlagen.",
+        "actionFormSend": "Senden",
+        "actionFormInvalid": "Ungültiger Wert",
+        "actionFormClose": "Schließen",
+        "actionFormInvalidField": "Ungültiger Wert: {{label}}"
       },
       "energyPrice": {
         "editName": "Widget-Name (optional)",

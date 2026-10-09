@@ -104,3 +104,24 @@ export const collectFeatureSelectors = components => {
 // Domain of an https URL, displayed next to a link label: unmoderated
 // third-party content, the user sees where they click
 export const getUrlDomain = url => (url || '').split('/')[2] || '';
+
+// The values of a widget action form as the core validates them (spec
+// section 7): a number typed as text becomes a number, an empty input is not
+// sent at all — the declared default or the required check applies core-side
+export const toActionValues = (fields, rawValues) =>
+  fields.reduce((values, field) => {
+    const value = rawValues[field.key];
+    if (field.type === 'boolean') {
+      values[field.key] = !!value;
+    } else if (value !== undefined && value !== null && value !== '') {
+      values[field.key] = field.type === 'number' ? Number(value) : value;
+    }
+    return values;
+  }, {});
+
+// The field a 422 of the core names (`values.<key>: …`, spec section 7), or
+// null when the refusal is not about one declared field
+export const findRefusedField = (fields, error) => {
+  const match = typeof error === 'string' ? error.match(/^values\.([a-z0-9_]+):/) : null;
+  return (match && fields.find(field => field.key === match[1])) || null;
+};

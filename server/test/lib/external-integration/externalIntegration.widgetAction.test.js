@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { assert: sinonAssert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES, ERROR_MESSAGES } = require('../../../utils/constants');
-const { Error400 } = require('../../../utils/httpErrors');
+const { Error400, Error422 } = require('../../../utils/httpErrors');
 const { NotFoundError, TooManyRequests, ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 const { buildSupervisor, seedExternalService, TEST_WIDGET_MANIFEST } = require('./testUtils.test');
 
@@ -19,10 +19,13 @@ const CONTENT = {
 const seedWidgetService = (overrides = {}) => seedExternalService({ manifest: TEST_WIDGET_MANIFEST, ...overrides });
 
 // the content pull (first command) then the action ack (second command)
-const contentThenAction = (actionResult = { success: true, data: { message: 'Cleaning started' } }) => {
+const contentThenAction = (
+  actionResult = { success: true, data: { message: 'Cleaning started' } },
+  content = CONTENT,
+) => {
   const sendCommand = fake((service, type) => {
     if (type === WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WIDGET_GET) {
-      return Promise.resolve({ success: true, data: { content: CONTENT } });
+      return Promise.resolve({ success: true, data: { content } });
     }
     return actionResult instanceof Error ? Promise.reject(actionResult) : Promise.resolve(actionResult);
   });
@@ -167,5 +170,80 @@ describe('externalIntegration widgets — runWidgetAction', () => {
     // a failed action keeps the cached content and broadcasts nothing
     expect(externalIntegration.widgetContentCache.get(service.id).size).to.equal(1);
     sinonAssert.notCalled(event.emit);
+  });
+
+  describe('action fields', () => {
+    const FORM_CONTENT = {
+      components: [
+        { type: 'button', label: 'Start', action: { key: 'start', params: { mode: 'full' } } },
+        {
+          type: 'button',
+          label: 'Delivered',
+          action: {
+            key: 'delivery',
+            params: { lot: 'pellets' },
+            fields: [
+              { key: 'bags', type: 'number', required: true, min: 1, max: 200, default: 72, label: { en: 'Bags' } },
+              { key: 'price_per_bag', type: 'number', required: true, min: 0, max: 50, label: { en: 'Price' } },
+              { key: 'note', type: 'string', label: { en: 'Note' } },
+            ],
+          },
+        },
+      ],
+    };
+    const run = (externalIntegration, service, actionKey, values) =>
+      externalIntegration.runWidgetAction(service.selector, 'upcoming_releases', actionKey, {}, PREFERENCES, values);
+
+    it('should relay the validated values next to the declared params, defaults applied', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const service = await seedWidgetService();
+      externalIntegration.sendCommand = contentThenAction(undefined, FORM_CONTENT);
+      await run(externalIntegration, service, 'delivery', { price_per_bag: 6.95 });
+      expect(externalIntegration.sendCommand.secondCall.args[2]).to.deep.equal({
+        key: 'upcoming_releases',
+        action_key: 'delivery',
+        params: { lot: 'pellets' },
+        settings: { period_days: '30' },
+        values: { bags: 72, price_per_bag: 6.95 },
+      });
+    });
+
+    it('should not add values to the payload of an action without fields', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const service = await seedWidgetService();
+      externalIntegration.sendCommand = contentThenAction(undefined, FORM_CONTENT);
+      await run(externalIntegration, service, 'start', undefined);
+      expect(externalIntegration.sendCommand.secondCall.args[2]).to.not.have.property('values');
+    });
+
+    it('should answer 422 naming the value, without sending the action', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const service = await seedWidgetService();
+      externalIntegration.sendCommand = contentThenAction(undefined, FORM_CONTENT);
+      const expect422 = async (actionKey, values, message) => {
+        try {
+          await run(externalIntegration, service, actionKey, values);
+          throw new Error('should have thrown');
+        } catch (e) {
+          expect(e).to.be.instanceOf(Error422);
+          expect(e.properties).to.equal(message);
+        }
+      };
+      await expect422('delivery', { price_per_bag: 60 }, 'values.price_per_bag: must be <= 50');
+      await expect422('delivery', { price_per_bag: '6.95' }, 'values.price_per_bag: must be a number');
+      await expect422('delivery', { bags: 10 }, 'values.price_per_bag: required');
+      await expect422('delivery', { price_per_bag: 6, color: 'red' }, 'values.color: unknown field');
+      await expect422(
+        'delivery',
+        { price_per_bag: 6, note: 'n'.repeat(1001) },
+        'values.note: must be at most 1000 characters',
+      );
+      await expect422('delivery', ['nope'], 'values: must be an object');
+      await expect422('delivery', null, 'values: must be an object');
+      // an action without fields accepts no value
+      await expect422('start', { mode: 'eco' }, 'values.mode: unknown field');
+      // the content pull only: no action reached the integration
+      sinonAssert.calledOnce(externalIntegration.sendCommand);
+    });
   });
 });

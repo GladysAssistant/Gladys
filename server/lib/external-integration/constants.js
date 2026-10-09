@@ -474,6 +474,14 @@ const MAX_WIDGET_IMAGE_IN_FLIGHT = 4;
 const WIDGET_ACTION_KEY_REGEX = /^[a-z0-9_]{2,32}$/;
 const MAX_WIDGET_ACTION_PARAMS_BYTES = 1024;
 const MAX_WIDGET_ACTIONS_PER_MINUTE = 30;
+// the form behind a widget action button (section 7): a short form of the
+// config_schema grammar, without sections, sensitive types or core sources —
+// the content is produced at runtime, so the options and defaults are too
+const MAX_WIDGET_ACTION_FIELDS = 4;
+const WIDGET_ACTION_FIELD_TYPES = ['string', 'number', 'boolean', 'select'];
+// a typed string value of an action form (a delivery note): the route is open
+// to every authenticated user, so what they type is bounded like the rest
+const MAX_WIDGET_ACTION_VALUE_LENGTH = 1000;
 // bounded free-form texts an integration hands back outside the content
 // vocabulary: the action result message and the `error` of a failed command
 const MAX_WIDGET_MESSAGE_LENGTH = 200;
@@ -684,6 +692,9 @@ module.exports = {
   WIDGET_ACTION_KEY_REGEX,
   MAX_WIDGET_ACTION_PARAMS_BYTES,
   MAX_WIDGET_ACTIONS_PER_MINUTE,
+  MAX_WIDGET_ACTION_FIELDS,
+  WIDGET_ACTION_FIELD_TYPES,
+  MAX_WIDGET_ACTION_VALUE_LENGTH,
   MAX_WIDGET_MESSAGE_LENGTH,
   WIDGET_COLORS,
   WIDGET_TEXT_VARIANTS,

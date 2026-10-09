@@ -862,7 +862,11 @@
         "emptyChart": "No data for this period yet.",
         "now": "Now",
         "confirmAction": "Run \"{{label}}\"?",
-        "actionError": "The action failed."
+        "actionError": "The action failed.",
+        "actionFormSend": "Send",
+        "actionFormInvalid": "Invalid value",
+        "actionFormClose": "Close",
+        "actionFormInvalidField": "Invalid value: {{label}}"
       },
       "energyPrice": {
         "editName": "Widget name (optional)",

@@ -94,13 +94,16 @@ class ConfigField extends Component {
     oauthStatus,
     selector,
     dynamicOptions,
-    placeholderPorts
+    placeholderPorts,
+    idPrefix
   }) {
     const label = getLocalizedText(field.label, language) || field.key;
     const description = getLocalizedText(field.description, language);
     const placeholder = getLocalizedText(field.placeholder, language) || '';
     const value = values[field.key];
-    const fieldId = `config_${field.key}`;
+    // a dashboard can show several widget action forms at once: their
+    // inputs need ids of their own for the labels to point at them
+    const fieldId = `${idPrefix || 'config'}_${field.key}`;
     // a select/multi_select can replace its static options with a
     // core-defined source ("devices": the already-created devices of the
     // integration, label = device name, value = external_id)

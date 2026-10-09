@@ -295,6 +295,50 @@ describe('External integration widgets API', () => {
         .post(`/api/v1/external_integration/${service.selector}/widget/vacuum/action/start`)
         .expect(200);
       expect(empty.body).to.deep.equal({ message: null });
+      // a body that is not JSON is left unparsed: the action runs as if empty
+      const unparsed = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/widget/vacuum/action/start`)
+        .set('Content-Type', 'text/plain')
+        .send('values')
+        .expect(200);
+      expect(unparsed.body).to.deep.equal({ message: null });
+    });
+
+    it('should relay the values typed in the form of an action, 422 on an invalid one', async () => {
+      const service = await seedWidgetService();
+      const formContent = {
+        components: [
+          {
+            type: 'button',
+            label: 'Delivered',
+            action: {
+              key: 'delivery',
+              fields: [{ key: 'price_per_bag', type: 'number', required: true, max: 50, label: { en: 'Price' } }],
+            },
+          },
+        ],
+      };
+      const sendCommand = fake((target, type) =>
+        Promise.resolve(
+          type === WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WIDGET_GET
+            ? { success: true, data: { content: formContent } }
+            : { success: true },
+        ),
+      );
+      stubInstance(gladys.externalIntegration, 'sendCommand', sendCommand);
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/widget/vacuum/action/delivery`)
+        .send({ settings: {}, values: { price_per_bag: 6.95 } })
+        .expect(200);
+      expect(sendCommand.secondCall.args[2].values).to.deep.equal({ price_per_bag: 6.95 });
+      const res = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/widget/vacuum/action/delivery`)
+        .send({ values: { price_per_bag: 60 } })
+        .expect(422);
+      expect(res.body.properties).to.equal('values.price_per_bag: must be <= 50');
+      // the success above dropped the cache: the content is pulled again, and nothing else is sent
+      expect(sendCommand.callCount).to.equal(3);
+      expect(sendCommand.thirdCall.args[1]).to.equal(WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WIDGET_GET);
     });
 
     it('should 404 on an undeclared action, 429 beyond the rate limit, 400 when disconnected', async () => {

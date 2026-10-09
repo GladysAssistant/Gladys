@@ -862,7 +862,11 @@
         "emptyChart": "Pas encore de données sur cette période.",
         "now": "Maintenant",
         "confirmAction": "Lancer « {{label}} » ?",
-        "actionError": "L'action a échoué."
+        "actionError": "L'action a échoué.",
+        "actionFormSend": "Envoyer",
+        "actionFormInvalid": "Valeur invalide",
+        "actionFormClose": "Fermer",
+        "actionFormInvalidField": "Valeur refusée : {{label}}"
       },
       "energyPrice": {
         "editName": "Nom du widget (optionnel)",
