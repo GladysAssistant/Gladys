@@ -1,7 +1,8 @@
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const { validateSchedule } = require('../../../utils/thermostatValidateSchedule');
-const { getScheduleBySelector } = require('./thermostat.getSchedules');
+const { getScheduleBySelector, getCurrentPoint } = require('./thermostat.getSchedules');
+const { releaseFromProgramme } = require('./thermostat.scheduleDevice');
 
 /**
  * @description Update a thermostat schedule: rename it, replace its transition
@@ -63,6 +64,13 @@ async function updateSchedule(selector, scheduleData) {
     throw new Error(`A schedule with the name "${validated.name}" already exists`);
   }
 
+  // Emptied, the programme leaves its followers with no point in force, and they
+  // keep their setpoint (C, step 3). On an Off point that setpoint is the one
+  // the previous point left — an Off point writes none — so the heating started
+  // again. The point in force is read before the points go.
+  const emptied = replaceTransitions && validated.transitions.length === 0;
+  const pointBefore = emptied ? await getCurrentPoint(schedule.id) : null;
+
   // Replace name + points atomically: a failure mid-way must not lose the
   // existing programme.
   try {
@@ -93,6 +101,18 @@ async function updateSchedule(selector, scheduleData) {
       throw new Error(`A schedule with the name "${validated.name}" already exists`);
     }
     throw e;
+  }
+
+  // Its followers stay on it, so an Off point stops them, visibly, as a detach
+  // does; the preset still reads `schedule`, and the widget's way back hands
+  // them to the programme once it has points again. Any other point already left
+  // its temperature on the setpoint feature.
+  if (pointBefore && pointBefore.preset === 'off') {
+    const followers = await db.ThermostatScheduleDevice.findAll({ where: { schedule_id: schedule.id }, raw: true });
+    await Promise.all(followers.map((link) => releaseFromProgramme.call(this, link.device_id, pointBefore)));
+  }
+  if (replaceTransitions) {
+    this.triggerApplySchedules();
   }
 
   return getScheduleBySelector(selector);

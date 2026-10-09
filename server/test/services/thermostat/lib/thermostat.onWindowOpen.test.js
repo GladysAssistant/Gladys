@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 
-const { fake } = sinon;
+const { fake, assert } = sinon;
 
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
@@ -478,15 +478,18 @@ describe('thermostat.onDeviceNewState - window selector cache', () => {
       gladys,
       windowSelectorsCache: null,
       invalidateDeviceCaches: mod.invalidateDeviceCaches,
+      primeObservedSetpoints: fake.resolves(null),
       postUpdate: mod.postUpdate,
     };
 
     await mod.onDeviceNewState.call(handler, { device_feature: 'some-other-sensor', last_value: 0 });
     expect(handler.windowSelectorsCache).to.not.equal(null);
 
-    handler.postUpdate();
+    await handler.postUpdate();
 
     expect(handler.windowSelectorsCache).to.equal(null);
+    // A re-pointed target gets its setpoint reference, as at service start.
+    assert.calledOnce(handler.primeObservedSetpoints);
   });
 
   it('should expose the configured window selectors', async () => {

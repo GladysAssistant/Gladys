@@ -1,6 +1,6 @@
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
-const { getScheduleBySelector } = require('./thermostat.getSchedules');
+const { getCurrentPoint } = require('./thermostat.getSchedules');
 const { releaseFromProgramme } = require('./thermostat.scheduleDevice');
 
 /**
@@ -22,10 +22,23 @@ async function deleteSchedule(selector) {
     throw new Error(`Schedule not found: ${selector}`);
   }
 
-  const { current } = await getScheduleBySelector(selector);
+  const current = await getCurrentPoint(schedule.id);
   const followers = await db.ThermostatScheduleDevice.findAll({ where: { schedule_id: schedule.id }, raw: true });
   await schedule.destroy();
-  await Promise.all(followers.map((link) => releaseFromProgramme.call(this, link.device_id, current)));
+  // The schedule is gone whatever happens next. A follower that could not be
+  // left on its point is logged: failing the request answered an error for a
+  // deletion that had happened, and skipped telling the widgets.
+  await Promise.all(
+    followers.map(async (link) => {
+      try {
+        await releaseFromProgramme.call(this, link.device_id, current);
+      } catch (e) {
+        logger.warn(
+          `Thermostat: could not leave ${link.device_id} on the point of schedule "${selector}": ${e.message}`,
+        );
+      }
+    }),
+  );
   if (followers.length > 0) {
     this.broadcastConfigUpdated();
   }

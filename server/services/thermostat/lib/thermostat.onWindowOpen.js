@@ -25,12 +25,18 @@ function invalidateDeviceCaches() {
  * next create or delete: the immediate cut-off on window opening would ignore
  * the new sensor entirely (the minute loop re-reads the params on every tick and
  * is not affected).
- * @returns {undefined}
+ *
+ * The setpoint references are seeded again for the same reason: a target
+ * re-pointed — in the edit form, or by a device migration — has none, and the
+ * first turn of the new appliance's dial would only establish one, leaving the
+ * next pass to write the scheduled setpoint back over it.
+ * @returns {Promise<void>}
  * @example
- * thermostatHandler.postUpdate();
+ * await thermostatHandler.postUpdate();
  */
-function postUpdate() {
+async function postUpdate() {
   this.invalidateDeviceCaches();
+  await this.primeObservedSetpoints();
 }
 
 /**
@@ -112,6 +118,14 @@ async function getTargetSelectors() {
 async function primeObservedSetpoints() {
   try {
     const targetSelectors = await getTargetSelectors.call(this);
+    // A selector no thermostat targets any more has nothing left to compare
+    // against, and its marks would only accumulate.
+    [...this.observedSetpoints.keys()]
+      .filter((selector) => !targetSelectors.has(selector))
+      .forEach((selector) => {
+        this.observedSetpoints.delete(selector);
+        this.selfWrittenSetpoints.delete(selector);
+      });
     await Promise.all(
       [...targetSelectors].map(async (selector) => {
         // A thermostat driven since the service started already has a reference,

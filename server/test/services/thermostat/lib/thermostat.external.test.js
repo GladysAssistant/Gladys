@@ -907,6 +907,20 @@ describe('thermostat.onExternalSetpointChanged', () => {
       expect(handler.observedSetpoints.has('netatmo-setpoint')).to.equal(false);
     });
 
+    it('should forget the references of a selector no thermostat targets any more', async () => {
+      const mod = loadListener();
+      const handler = buildPrimeHandler(18);
+      // A target re-pointed by a migration: the old selector is no longer configured.
+      handler.observedSetpoints.set('old-netatmo-setpoint', 20);
+      handler.selfWrittenSetpoints.set('old-netatmo-setpoint', 20);
+
+      await mod.primeObservedSetpoints.call(handler);
+
+      expect(handler.observedSetpoints.has('old-netatmo-setpoint')).to.equal(false);
+      expect(handler.selfWrittenSetpoints.has('old-netatmo-setpoint')).to.equal(false);
+      expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(18);
+    });
+
     it('should not overwrite a reference already in memory', async () => {
       const mod = loadListener();
       const handler = buildPrimeHandler(18);

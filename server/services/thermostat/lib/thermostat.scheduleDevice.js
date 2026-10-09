@@ -2,7 +2,26 @@ const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_TYPES, THERMOSTAT_MODE } = require('../../../utils/constants');
 const { getFeature, getPreset, isStopped, getManualHold, setManualHold, savePreset } = require('./thermostat.state');
-const { getScheduleBySelector } = require('./thermostat.getSchedules');
+const { getCurrentPoint } = require('./thermostat.getSchedules');
+
+/**
+ * @description A thermostat with its features and params, as the state helpers
+ * read them.
+ * @param {string} deviceId - The thermostat's id.
+ * @returns {Promise<object>} The device, as a plain object.
+ * @example
+ * await loadThermostat(device.id);
+ */
+async function loadThermostat(deviceId) {
+  const row = await db.Device.findOne({
+    where: { id: deviceId },
+    include: [
+      { model: db.DeviceFeature, as: 'features' },
+      { model: db.DeviceParam, as: 'params' },
+    ],
+  });
+  return row.get({ plain: true });
+}
 
 /**
  * @description Leave a thermostat that no longer follows a programme doing what
@@ -27,14 +46,7 @@ const { getScheduleBySelector } = require('./thermostat.getSchedules');
  * await releaseFromProgramme.call(thermostatHandler, device.id, { preset: 'eco' });
  */
 async function releaseFromProgramme(deviceId, current) {
-  const row = await db.Device.findOne({
-    where: { id: deviceId },
-    include: [
-      { model: db.DeviceFeature, as: 'features' },
-      { model: db.DeviceParam, as: 'params' },
-    ],
-  });
-  const device = row.get({ plain: true });
+  const device = await loadThermostat(deviceId);
   if (isStopped(device)) {
     return;
   }
@@ -121,6 +133,17 @@ async function attachScheduleToDevice(scheduleSelector, deviceSelector) {
   // The primary key on device_id is what makes this a replacement rather than a
   // second schedule: one row per thermostat, whatever it followed before.
   await db.ThermostatScheduleDevice.upsert({ device_id: device.id, schedule_id: schedule.id });
+
+  // Following a programme is what the `schedule` preset says, and the loop only
+  // reads the programme while the feature carries it. A thermostat left on a
+  // named preset — by a detach, a deleted schedule, or a choice made while it
+  // followed none — ignored the schedule just attached, for good. A stop is left
+  // as it is: it outranks any programme, and the widget offers the way back.
+  await savePreset.call(this, await loadThermostat(device.id), 'schedule');
+  // The widgets read which schedule a thermostat follows from the schedule list,
+  // and the new point applies now rather than at the next minute tick.
+  this.broadcastConfigUpdated();
+  this.triggerApplySchedules();
 }
 
 /**
@@ -144,8 +167,7 @@ async function detachScheduleFromDevice(scheduleSelector, deviceSelector) {
     where: { device_id: device.id, schedule_id: schedule.id },
   });
   if (removed > 0) {
-    const { current } = await getScheduleBySelector(scheduleSelector);
-    await releaseFromProgramme.call(this, device.id, current);
+    await releaseFromProgramme.call(this, device.id, await getCurrentPoint(schedule.id));
     // The widgets read which schedule a thermostat follows from the schedule
     // list: without a reload they kept the banner of the one just left.
     this.broadcastConfigUpdated();

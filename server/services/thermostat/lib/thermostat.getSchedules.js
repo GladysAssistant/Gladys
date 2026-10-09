@@ -131,4 +131,29 @@ async function getScheduleBySelector(selector) {
   return formatSchedule(schedule, await getTimezone());
 }
 
-module.exports = { getSchedules, getScheduleBySelector, formatSchedule, SCHEDULE_INCLUDE, TRANSITION_ORDER };
+/**
+ * @description The point in force on a schedule now, resolved in the Gladys
+ * timezone like the `current` getSchedules returns — but from the points alone,
+ * without loading the thermostats, their devices and their rooms.
+ * @param {string} scheduleId - The schedule's id.
+ * @returns {Promise<object|null>} The point in force, or null on a schedule with no point.
+ * @example
+ * await getCurrentPoint(schedule.id); // { day_of_week: 1, time: '06:30', preset: 'comfort' }
+ */
+async function getCurrentPoint(scheduleId) {
+  const [transitions, timezone] = await Promise.all([
+    db.ThermostatScheduleTransition.findAll({ where: { schedule_id: scheduleId }, raw: true }),
+    getTimezone(),
+  ]);
+  const { dayOfWeek, currentMinutes } = getCurrentDayAndMinutes(new Date(), timezone);
+  return findCurrentTransition(transitions, dayOfWeek, currentMinutes);
+}
+
+module.exports = {
+  getSchedules,
+  getScheduleBySelector,
+  getCurrentPoint,
+  formatSchedule,
+  SCHEDULE_INCLUDE,
+  TRANSITION_ORDER,
+};

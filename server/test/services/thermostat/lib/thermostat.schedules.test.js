@@ -24,7 +24,9 @@ describe('thermostat schedules CRUD', () => {
   let handler;
 
   beforeEach(() => {
-    handler = new ThermostatHandler({}, 'service-id');
+    handler = new ThermostatHandler({ event: { emit: () => null } }, 'service-id');
+    // No regulation pass from these tests: the handler has no Gladys to regulate with.
+    handler.triggerApplySchedules = () => {};
   });
 
   afterEach(async () => {

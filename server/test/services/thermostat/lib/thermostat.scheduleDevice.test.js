@@ -227,9 +227,20 @@ describe('thermostat schedule <-> device link', () => {
       await db.DeviceFeature.destroy({ where: { device_id: thermostat.id } });
     });
 
-    const followAndDetach = async (transitions) => {
+    const resetFakes = () => {
+      handler.gladys.device.saveState.resetHistory();
+      handler.gladys.device.setParam.resetHistory();
+      handler.gladys.event.emit.resetHistory();
+      handler.triggerApplySchedules.resetHistory();
+    };
+
+    // Attached first, then put in the state under test: attaching hands the
+    // thermostat to the programme, which is what a detach starts from.
+    const followAndDetach = async (transitions, whileFollowing = async () => {}) => {
       const programme = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Programme', transitions });
       await handler.attachScheduleToDevice(programme.selector, thermostat.selector);
+      await whileFollowing();
+      resetFakes();
       await handler.detachScheduleFromDevice(programme.selector, thermostat.selector);
     };
 
@@ -257,19 +268,17 @@ describe('thermostat schedule <-> device link', () => {
     });
 
     it('should leave a thermostat with no mode feature alone on an Off point', async () => {
-      await modeFeature.destroy();
-
-      await followAndDetach(allDay('off'));
+      await followAndDetach(allDay('off'), () => modeFeature.destroy());
 
       assert.notCalled(handler.gladys.device.saveState);
       assert.notCalled(handler.triggerApplySchedules);
     });
 
     it('should make a hold running to the next point permanent', async () => {
-      await addParam('THERMOSTAT_MANUAL_SETPOINT', '22.5');
-      await addParam('THERMOSTAT_MANUAL_UNTIL', String(Date.now() + 3600000));
-
-      await followAndDetach(allDay('eco'));
+      await followAndDetach(allDay('eco'), async () => {
+        await addParam('THERMOSTAT_MANUAL_SETPOINT', '22.5');
+        await addParam('THERMOSTAT_MANUAL_UNTIL', String(Date.now() + 3600000));
+      });
 
       assert.calledWith(
         handler.gladys.device.setParam,
@@ -281,26 +290,20 @@ describe('thermostat schedule <-> device link', () => {
     });
 
     it('should leave a permanent hold as it is', async () => {
-      await addParam('THERMOSTAT_MANUAL_SETPOINT', '22.5');
-
-      await followAndDetach(allDay('eco'));
+      await followAndDetach(allDay('eco'), () => addParam('THERMOSTAT_MANUAL_SETPOINT', '22.5'));
 
       assert.notCalled(handler.gladys.device.setParam);
       assert.notCalled(handler.gladys.device.saveState);
     });
 
     it('should leave a stopped thermostat alone', async () => {
-      await modeFeature.update({ last_value: THERMOSTAT_MODE.OFF });
-
-      await followAndDetach(allDay('eco'));
+      await followAndDetach(allDay('eco'), () => modeFeature.update({ last_value: THERMOSTAT_MODE.OFF }));
 
       assert.notCalled(handler.gladys.device.saveState);
     });
 
     it('should leave a thermostat on a preset of its own alone', async () => {
-      await presetFeature.update({ last_value: THERMOSTAT_PRESET.COMFORT });
-
-      await followAndDetach(allDay('eco'));
+      await followAndDetach(allDay('eco'), () => presetFeature.update({ last_value: THERMOSTAT_PRESET.COMFORT }));
 
       assert.notCalled(handler.gladys.device.saveState);
     });
@@ -317,6 +320,7 @@ describe('thermostat schedule <-> device link', () => {
         transitions: allDay('night'),
       });
       await handler.attachScheduleToDevice(programme.selector, thermostat.selector);
+      resetFakes();
 
       await handler.deleteSchedule(programme.selector);
 
@@ -328,12 +332,116 @@ describe('thermostat schedule <-> device link', () => {
       assert.calledWith(handler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, configUpdated);
     });
 
+    it('should delete the schedule even when a follower cannot be left on its point', async () => {
+      const programme = await handler.createSchedule(HOUSE_SELECTOR, {
+        name: 'Programme',
+        transitions: allDay('night'),
+      });
+      await handler.attachScheduleToDevice(programme.selector, thermostat.selector);
+      resetFakes();
+      handler.gladys.device.saveState = fake.rejects(new Error('integration unreachable'));
+
+      await handler.deleteSchedule(programme.selector);
+
+      expect(await db.ThermostatSchedule.count({ where: { selector: programme.selector } })).to.equal(0);
+      assert.calledWith(handler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, configUpdated);
+    });
+
+    it('should stop the followers of a programme emptied on an Off point', async () => {
+      const programme = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Programme', transitions: allDay('off') });
+      await handler.attachScheduleToDevice(programme.selector, thermostat.selector);
+      resetFakes();
+
+      await handler.updateSchedule(programme.selector, { transitions: [] });
+
+      assert.calledOnceWithExactly(
+        handler.gladys.device.saveState,
+        sinonMatchSelector(modeFeature.selector),
+        THERMOSTAT_MODE.OFF,
+      );
+      assert.called(handler.triggerApplySchedules);
+    });
+
+    it('should leave the followers of a programme emptied on another point alone', async () => {
+      // That point's temperature is already on the setpoint feature, which a
+      // thermostat with no point in force keeps.
+      const programme = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Programme', transitions: allDay('eco') });
+      await handler.attachScheduleToDevice(programme.selector, thermostat.selector);
+      resetFakes();
+
+      await handler.updateSchedule(programme.selector, { transitions: [] });
+
+      assert.notCalled(handler.gladys.device.saveState);
+    });
+
     it('should tell no widget anything when a schedule nobody followed is deleted', async () => {
       const programme = await handler.createSchedule(HOUSE_SELECTOR, { name: 'Programme', transitions: allDay('eco') });
 
       await handler.deleteSchedule(programme.selector);
 
       assert.notCalled(handler.gladys.event.emit);
+    });
+  });
+
+  describe('attaching hands the thermostat to the programme', () => {
+    let presetFeature;
+    let modeFeature;
+
+    const addFeature = (type, lastValue) =>
+      db.DeviceFeature.create({
+        device_id: thermostat.id,
+        name: type,
+        selector: `living-room-thermostat-${type}`,
+        external_id: `thermostat:living-room:${type}`,
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type,
+        read_only: false,
+        has_feedback: false,
+        keep_history: false,
+        min: 0,
+        max: 10,
+        last_value: lastValue,
+      });
+
+    beforeEach(async () => {
+      presetFeature = await addFeature(DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET, THERMOSTAT_PRESET.NIGHT);
+      modeFeature = await addFeature(DEVICE_FEATURE_TYPES.THERMOSTAT.MODE, THERMOSTAT_MODE.HEATING);
+    });
+
+    afterEach(async () => {
+      await db.DeviceFeature.destroy({ where: { device_id: thermostat.id } });
+    });
+
+    it('should write `schedule` on a thermostat left on a named preset', async () => {
+      // A detach or a deleted schedule leaves it there; the loop only reads a
+      // programme while the feature carries `schedule`.
+      await handler.attachScheduleToDevice(schedule.selector, thermostat.selector);
+
+      assert.calledOnceWithExactly(
+        handler.gladys.device.saveState,
+        sinonMatchSelector(presetFeature.selector),
+        THERMOSTAT_PRESET.SCHEDULE,
+      );
+      assert.calledWith(handler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, configUpdated);
+      assert.calledOnce(handler.triggerApplySchedules);
+    });
+
+    it('should not rewrite `schedule` on a thermostat already following a programme', async () => {
+      await presetFeature.update({ last_value: THERMOSTAT_PRESET.SCHEDULE });
+
+      await handler.attachScheduleToDevice(schedule.selector, thermostat.selector);
+
+      assert.notCalled(handler.gladys.device.saveState);
+      assert.calledOnce(handler.triggerApplySchedules);
+    });
+
+    it('should leave a stop as it is', async () => {
+      await modeFeature.update({ last_value: THERMOSTAT_MODE.OFF });
+
+      await handler.attachScheduleToDevice(schedule.selector, thermostat.selector);
+
+      // The preset is handed over, the mode is not: a stop outranks any programme.
+      assert.neverCalledWith(handler.gladys.device.saveState, sinonMatchSelector(modeFeature.selector), match.any);
     });
   });
 
