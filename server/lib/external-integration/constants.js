@@ -70,7 +70,11 @@ const SUB_CONTAINER_ENV_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_ENV';
 // The service-scoped variables the core writes for its own needs, next to the
 // config of the integration (same service_id, no user_id): never the
 // integration's to lose, e.g. when an account is disconnected.
-const CORE_SERVICE_VARIABLES = [SUB_CONTAINER_PORTS_VARIABLE, SUB_CONTAINER_DESIRED_VARIABLE, SUB_CONTAINER_ENV_VARIABLE];
+const CORE_SERVICE_VARIABLES = [
+  SUB_CONTAINER_PORTS_VARIABLE,
+  SUB_CONTAINER_DESIRED_VARIABLE,
+  SUB_CONTAINER_ENV_VARIABLE,
+];
 // The secret signing the integration JWTs, generated once and persisted:
 // without a JWT_SECRET env var the process-level secret is regenerated at
 // every boot, which used to invalidate every token baked in the container

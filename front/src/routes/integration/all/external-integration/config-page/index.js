@@ -659,11 +659,12 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   connectOAuth = async field => {
-    this.setState({ oauthStatus: RequestStatus.Getting,
+    this.setState({
+      oauthStatus: RequestStatus.Getting,
       oauthDisconnectStatus: null,
       oauthInvalidState: false,
       oauthInvalidUrl: false
-     });
+    });
     const { selector } = this.props;
     const callbackPath = getOAuthCallbackPath(selector);
     // an account_link provider never comes back to Gladys: the user approves it

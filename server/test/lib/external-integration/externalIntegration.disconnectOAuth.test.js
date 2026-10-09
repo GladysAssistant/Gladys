@@ -1,11 +1,14 @@
 const EventEmitter = require('events');
 const { expect } = require('chai');
 const WebSocket = require('ws');
-const { assert: sinonAssert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert, fake } = sinon;
 
 const db = require('../../../models');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { CORE_SERVICE_VARIABLES } = require('../../../lib/external-integration/constants');
 const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('./testUtils.test');
 
 // manifest of a cloud integration with an oauth2 config field: the linked
@@ -21,6 +24,9 @@ const TEST_OAUTH_MANIFEST = {
     },
   ],
 };
+
+// John, seeded by the test database
+const JOHN_USER_ID = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
 
 const seedOAuthService = (overrides = {}) => seedExternalService({ manifest: TEST_OAUTH_MANIFEST, ...overrides });
 
@@ -44,6 +50,10 @@ async function storedVariableNames(serviceId) {
 }
 
 describe('externalIntegration.disconnectOAuth', () => {
+  afterEach(() => {
+    sinon.reset();
+  });
+
   it('should forget the off-schema credentials and keep the settings', async () => {
     const service = await seedOAuthService();
     const { externalIntegration, variable } = buildSupervisor();
@@ -59,6 +69,54 @@ describe('externalIntegration.disconnectOAuth', () => {
 
     expect(result).to.deep.equal({ success: true });
     expect(await storedVariableNames(service.id)).to.deep.equal(['GLADYS_PREFER_LOCAL', 'LATITUDE']);
+  });
+
+  it('should disconnect an account_link field the same way', async () => {
+    const service = await seedOAuthService({
+      manifest: {
+        ...TEST_MANIFEST,
+        config_schema: [
+          ...TEST_MANIFEST.config_schema,
+          { key: 'xiaomi_account', type: 'account_link', label: { en: 'Xiaomi account' } },
+        ],
+      },
+    });
+    const { externalIntegration, variable } = buildSupervisor();
+    externalIntegration.getBySelector = fake.resolves(service);
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+    await variable.setValue('LATITUDE', JSON.stringify(48.85), service.id);
+
+    const result = await externalIntegration.disconnectOAuth(service.selector, { key: 'xiaomi_account' });
+
+    expect(result).to.deep.equal({ success: true });
+    expect(await storedVariableNames(service.id)).to.deep.equal(['LATITUDE']);
+  });
+
+  it('should keep the variables the core stores for the service', async () => {
+    const service = await seedOAuthService();
+    const { externalIntegration, variable } = buildSupervisor();
+    externalIntegration.getBySelector = fake.resolves(service);
+    // the sub-container runtime state lives next to the config, same scope
+    await Promise.all(CORE_SERVICE_VARIABLES.map((name) => variable.setValue(name, JSON.stringify({}), service.id)));
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+
+    await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+
+    expect(await storedVariableNames(service.id)).to.deep.equal([...CORE_SERVICE_VARIABLES].sort());
+  });
+
+  it('should keep the per-user variables', async () => {
+    const service = await seedOAuthService();
+    const { externalIntegration, variable } = buildSupervisor();
+    externalIntegration.getBySelector = fake.resolves(service);
+    await variable.setValue('EXTERNAL_INTEGRATION_CONTACT_PROFILE', JSON.stringify({}), service.id, JOHN_USER_ID);
+
+    await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+
+    const perUser = await db.Variable.findAll({ where: { service_id: service.id, user_id: JOHN_USER_ID } });
+    expect(perUser.map((perUserVariable) => perUserVariable.name)).to.deep.equal([
+      'EXTERNAL_INTEGRATION_CONTACT_PROFILE',
+    ]);
   });
 
   it('should push the emptied config to the integration', async () => {
@@ -125,7 +183,7 @@ describe('externalIntegration.disconnectOAuth', () => {
     }
   });
 
-  it('should reject a key that is not an oauth2 field', async () => {
+  it('should reject a key that is not an account field (oauth2, account_link)', async () => {
     const service = await seedOAuthService();
     const { externalIntegration } = buildSupervisor();
     externalIntegration.getBySelector = fake.resolves(service);
@@ -134,7 +192,7 @@ describe('externalIntegration.disconnectOAuth', () => {
       throw new Error('should have thrown');
     } catch (e) {
       expect(e).to.be.instanceOf(BadParameters);
-      expect(e.message).to.equal('config.latitude: not an oauth2 field');
+      expect(e.message).to.equal('config.latitude: not an account field (oauth2, account_link)');
     }
   });
 
@@ -147,7 +205,7 @@ describe('externalIntegration.disconnectOAuth', () => {
       throw new Error('should have thrown');
     } catch (e) {
       expect(e).to.be.instanceOf(BadParameters);
-      expect(e.message).to.equal('config.nope: not an oauth2 field');
+      expect(e.message).to.equal('config.nope: not an account field (oauth2, account_link)');
     }
   });
 
@@ -162,7 +220,7 @@ describe('externalIntegration.disconnectOAuth', () => {
       throw new Error('should have thrown');
     } catch (e) {
       expect(e).to.be.instanceOf(BadParameters);
-      expect(e.message).to.equal('config.netatmo_account: not an oauth2 field');
+      expect(e.message).to.equal('config.netatmo_account: not an account field (oauth2, account_link)');
     }
   });
 });
