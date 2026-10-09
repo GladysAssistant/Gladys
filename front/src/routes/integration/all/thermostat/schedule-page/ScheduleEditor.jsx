@@ -4,6 +4,7 @@ import cx from 'classnames';
 import style from './style.css';
 import stickyStyle from '../stickyActions.css';
 import PRESET_COLORS from '../../../../../utils/thermostatPresetColors';
+import { openNativePicker } from '../../../../../utils/openNativePicker';
 import {
   timeToMinutes,
   minutesToTime,
@@ -680,22 +681,6 @@ class ScheduleEditor extends Component {
     );
   };
 
-  // Chrome on Android opens the time picker from the clock icon only: a tap on
-  // the time itself selects the hour and brings up neither the picker nor a
-  // keyboard. Open the picker from anywhere on the field — on touch screens
-  // only, so a keyboard and a mouse can still type the time in.
-  openTimePicker = e => {
-    const input = e.currentTarget;
-    if (typeof input.showPicker !== 'function' || !window.matchMedia('(pointer: coarse)').matches) {
-      return;
-    }
-    try {
-      input.showPicker();
-    } catch (err) {
-      // Already open, or refused by the browser: the clock icon still opens it.
-    }
-  };
-
   renderRangeForm = (form, onChange, onConfirm, onCancel, onRemove, dictionary, isEdit) => (
     <div class={style.slotFormWrapper}>
       <div class={isEdit ? style.editSlotForm : style.newSlotForm}>
@@ -708,7 +693,7 @@ class ScheduleEditor extends Component {
             type="time"
             class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
             value={form.start_time}
-            onClick={this.openTimePicker}
+            onClick={openNativePicker}
             onChange={e => onChange('start_time', e.target.value)}
           />
         </label>
@@ -721,7 +706,7 @@ class ScheduleEditor extends Component {
             type="time"
             class={cx('form-control', 'form-control-sm', style.slotTimeInput)}
             value={form.end_time}
-            onClick={this.openTimePicker}
+            onClick={openNativePicker}
             onChange={e => onChange('end_time', e.target.value)}
           />
         </label>

@@ -267,14 +267,6 @@
   flex-shrink: 0;
 }
 
-/* Dark mode inverts inputs back to their real dark colours, and the browser
-   still draws its clock icon for a light field: black on dark, next to
-   invisible. A dark colour scheme draws it light, and the picker it opens
-   dark. */
-:global(.dark-mode) .slotTimeInput {
-  color-scheme: dark;
-}
-
 .slotArrow {
   color: #6c757d;
   font-size: 0.85rem;
