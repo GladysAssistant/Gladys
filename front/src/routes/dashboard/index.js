@@ -82,6 +82,23 @@ class Dashboard extends Component {
     }
   };
 
+  // Gladys Plus: without recovery codes, a user who loses their two-factor app
+  // is locked out of their account. The banner stays on the dashboard until
+  // the Gateway reports a set of codes for this user: fetched on every mount,
+  // so it is gone as soon as the user comes back from generating them.
+  getGatewayRecoveryCodesState = async () => {
+    if (!this.state.isGladysPlus) {
+      return;
+    }
+    try {
+      const gatewayUser = await this.props.session.getGatewayUser();
+      // strict check: a Gateway that does not return the field shows nothing
+      this.setState({ gatewayRecoveryCodesMissing: gatewayUser.has_recovery_codes === false });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   jobUpdated = payload => {
     const { duckDbMigrationJob } = this.state;
     if (payload.id === duckDbMigrationJob.id) {
@@ -295,6 +312,7 @@ class Dashboard extends Component {
 
   componentDidMount() {
     this.init();
+    this.getGatewayRecoveryCodesState();
     document.addEventListener('fullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('mozfullscreenchange', this.onFullScreenChange, false);
@@ -378,6 +396,7 @@ class Dashboard extends Component {
       currentDashboardSelector,
       dashboardEditMode,
       gatewayInstanceNotFound,
+      gatewayRecoveryCodesMissing,
       loading,
       currentDashboardLoadFailed,
       browserFullScreenCompatible,
@@ -415,6 +434,7 @@ class Dashboard extends Component {
         currentDashboard={currentDashboard}
         currentDashboardSelector={currentDashboardSelector}
         gatewayInstanceNotFound={gatewayInstanceNotFound}
+        gatewayRecoveryCodesMissing={gatewayRecoveryCodesMissing}
         loading={loading}
         dashboardNotConfigured={dashboardNotConfigured}
         browserFullScreenCompatible={browserFullScreenCompatible}

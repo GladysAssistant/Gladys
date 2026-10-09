@@ -620,6 +620,26 @@
   color: #2e8f5b;
 }
 
+/* Call-to-action of the Gladys Plus recovery codes banner: a solid pill in
+   the amber ink of the warning notice it sits in (Tabler's btn-warning is a
+   white-on-yellow that clashes with the pastel). Never shrinks: the notice
+   text wraps instead. */
+.recoveryCodesBannerButton {
+  flex-shrink: 0;
+  background-color: #a5701e;
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.recoveryCodesBannerButton:hover,
+.recoveryCodesBannerButton:focus {
+  background-color: #8a5d17;
+  color: #fff;
+}
+
 /* Bootstrap badges become the color-dot pill family's plain cousins */
 :global(.glass-theme .card .badge) {
   border-radius: 999px;

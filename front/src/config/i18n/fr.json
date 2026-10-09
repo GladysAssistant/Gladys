@@ -350,6 +350,8 @@
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Éditer le tableau de bord",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
+    "gatewayRecoveryCodesMissing": "Votre compte Gladys Plus n'a pas de codes de récupération : si vous perdez l'accès à votre application 2FA, vous ne pourrez plus vous connecter. Générez-les et conservez-les en lieu sûr.",
+    "gatewayRecoveryCodesMissingButton": "Obtenir mes codes de récupération",
     "editDashboardNameLabel": "Nom",
     "editDashboardVisibility": "Visibilité",
     "editDashboardVisibilityDescription": "Les tableaux de bord publics seront visibles par tous les membres de l'installation Gladys.",

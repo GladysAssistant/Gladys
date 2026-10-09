@@ -350,6 +350,8 @@
     "editDashboardSavedButton": "Saved",
     "editDashboardDoneButton": "Done",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
+    "gatewayRecoveryCodesMissing": "Your Gladys Plus account has no recovery codes: if you lose access to your two-factor app, you will no longer be able to log in. Generate them and keep them in a safe place.",
+    "gatewayRecoveryCodesMissingButton": "Get my recovery codes",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Visibility",
     "editDashboardVisibilityDescription": "Public dashboards will be visible to all members of the Gladys installation.",
