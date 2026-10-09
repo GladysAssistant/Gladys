@@ -6,13 +6,19 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 
-import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from '../utils';
+import {
+  getLocalizedText,
+  getGithubRepoUrl,
+  getRequestedHardwareClasses,
+  TYPES_WITHOUT_DEVICE_SCREENS
+} from '../utils';
 import BackToIntegrationsLink from '../../../../../components/integration/BackToIntegrationsLink';
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
 import WebhooksSummary from '../components/WebhooksSummary';
 import WidgetsSummary from '../components/WidgetsSummary';
+import EnergyContractsSummary from '../components/EnergyContractsSummary';
 import SceneDeclarationsSummary from '../components/SceneDeclarationsSummary';
 import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -106,12 +112,12 @@ class ExternalIntegrationInstallPage extends Component {
         body.granted_devices = this.state.grantedDevices || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      // communication and weather integrations have no device screens, and
-      // an integration with settings needs them filled before any device
-      // can be discovered: all land on the configuration screen after
-      // install
+      // integrations without device screens (communication, weather,
+      // calendar, provider), and an integration with settings needs them
+      // filled before any device can be discovered: all land on the
+      // configuration screen after install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (['communication', 'weather'].includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
+      if (TYPES_WITHOUT_DEVICE_SCREENS.includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -242,10 +248,20 @@ class ExternalIntegrationInstallPage extends Component {
                                 <Text id="integration.externalIntegration.install.weatherInfoText" />
                               </div>
                             )}
+                            {manifest.type === 'calendar' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-calendar mr-1" />
+                                <Text id="integration.externalIntegration.install.calendarInfoText" />
+                              </div>
+                            )}
                             {manifest.type === 'provider' && (
                               <div class="alert alert-info">
                                 <i class="fe fe-grid mr-1" />
-                                <Text id="integration.externalIntegration.install.providerInfoText" />
+                                {manifest.energy_contracts && !(manifest.widgets && manifest.widgets.length > 0) ? (
+                                  <Text id="integration.externalIntegration.install.providerEnergyInfoText" />
+                                ) : (
+                                  <Text id="integration.externalIntegration.install.providerInfoText" />
+                                )}
                               </div>
                             )}
 
@@ -284,6 +300,7 @@ class ExternalIntegrationInstallPage extends Component {
                             <WebhooksSummary webhooks={manifest.webhooks} language={language} />
 
                             <WidgetsSummary widgets={manifest.widgets} language={language} />
+                            <EnergyContractsSummary energyContracts={manifest.energy_contracts} language={language} />
                             <SceneDeclarationsSummary
                               sceneTriggers={manifest.scene_triggers}
                               sceneActions={manifest.scene_actions}

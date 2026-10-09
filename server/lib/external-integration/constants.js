@@ -166,6 +166,23 @@ const LINK_CODE_CACHE_PREFIX = 'external-integration-link-code';
 const LINK_CODE_TTL_MS = 15 * 60 * 1000;
 const LINK_CODE_LENGTH = 8;
 const MAX_MESSAGE_TEXT_LENGTH = 4096;
+
+// Calendar integrations (capabilities/calendar-type.md): per-user account variable (one JSON object
+// per (service_id, user_id), the CONTACT_PROFILE pattern — its presence is
+// the enablement marker, so "enabled with zero fields" is a first-class
+// state), and the normalization bounds of the calendar host endpoints.
+const CALENDAR_ACCOUNT_VARIABLE = 'EXTERNAL_INTEGRATION_CALENDAR_ACCOUNT';
+const MAX_CALENDARS_PER_USER = 50;
+const MAX_CALENDAR_EVENTS_PER_REQUEST = 500;
+const MAX_CALENDAR_WRITES_PER_MINUTE = 30;
+const MAX_CALENDAR_NAME_LENGTH = 100;
+const MAX_CALENDAR_DESCRIPTION_LENGTH = 500;
+const CALENDAR_COLOR_REGEX = /^#[0-9a-f]{6}$/;
+const MAX_CALENDAR_EVENT_NAME_LENGTH = 200;
+const MAX_CALENDAR_EVENT_LOCATION_LENGTH = 500;
+const MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH = 1000;
+const MAX_CALENDAR_EVENT_URL_LENGTH = 500;
+const MAX_CALENDAR_EXTERNAL_ID_LENGTH = 255;
 // Mediated network discovery (B.16): the core captures and emits from
 // its network=host position, the integration interprets and forges (it
 // knows the protocol, the core never parses nor builds a payload).
@@ -363,7 +380,61 @@ const MAX_WIDGET_SETTINGS_BYTES = 1024;
 // The type of an integration made only of capabilities (no device surface,
 // none of the core-consumed interfaces of the other types): it must declare
 // at least one of these manifest fields. The list grows with capabilities/.
-const CAPABILITY_MANIFEST_FIELDS = ['widgets', 'scene_triggers', 'scene_actions'];
+const CAPABILITY_MANIFEST_FIELDS = ['widgets', 'scene_triggers', 'scene_actions', 'energy_contracts'];
+
+// Energy contracts capability (capabilities/energy-contracts.md): contract templates,
+// tariff calendars and delegated pricing.
+const MAX_ENERGY_TEMPLATES = 20;
+const MAX_ENERGY_CALENDARS = 10;
+const MAX_ENERGY_TEMPLATE_INPUTS = 16;
+const ENERGY_TEMPLATE_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const ENERGY_INPUT_KEY_REGEX = /^[a-z0-9_]{1,64}$/;
+const ENERGY_INPUT_TYPES = ['number', 'select', 'string', 'time_intervals'];
+const ENERGY_PRICING_MODES = ['rules', 'delegated'];
+// delegated pricing of up to 31 days of 30-minute intervals: 30s ack deadline
+const ENERGY_CONTRACT_PRICE_TIMEOUT_MS = 30 * 1000;
+const ENERGY_CONTRACT_CURRENT_TIMEOUT_MS = 5 * 1000;
+const MAX_ENERGY_INTERVALS_PER_REQUEST = 1488;
+// a delegated cost above this many currency units per kWh is refused (normalizeEnergyCosts):
+// a hostile-payload guard, orders of magnitude above any tariff, raised for the currencies
+// whose unit is worth much less than a euro (JPY, KRW, HUF, IDR...)
+const MAX_ENERGY_PRICE_PER_KWH = 10;
+const MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY = {
+  JPY: 2000,
+  KRW: 20000,
+  HUF: 5000,
+  CZK: 500,
+  PLN: 100,
+  SEK: 200,
+  NOK: 200,
+  DKK: 200,
+  ISK: 2000,
+  TRY: 500,
+  RUB: 1000,
+  UAH: 500,
+  INR: 500,
+  PKR: 2000,
+  BDT: 1000,
+  LKR: 2000,
+  IDR: 200000,
+  VND: 300000,
+  PHP: 500,
+  THB: 500,
+  TWD: 500,
+  KZT: 5000,
+  MXN: 500,
+  BRL: 100,
+  ARS: 10000,
+  CLP: 20000,
+  COP: 50000,
+  ZAR: 500,
+  NGN: 10000,
+  EGP: 500,
+  CNY: 100,
+};
+const ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
+// the refresh nudge carries no date: the costs of the last two days are recomputed
+const ENERGY_CALENDAR_REFRESH_LOOKBACK_MS = 2 * 24 * 60 * 60 * 1000;
 // widget.get / widget.get-image typically call a third-party API: the same
 // exception to the 5s ack rule as camera.get-image and weather.get
 const WIDGET_GET_TIMEOUT_MS = 15 * 1000;
@@ -514,6 +585,18 @@ module.exports = {
   MAX_SCENE_ACTION_OUTPUT_LENGTH,
   CONTACT_VARIABLE,
   CONTACT_PROFILE_VARIABLE,
+  CALENDAR_ACCOUNT_VARIABLE,
+  MAX_CALENDARS_PER_USER,
+  MAX_CALENDAR_EVENTS_PER_REQUEST,
+  MAX_CALENDAR_WRITES_PER_MINUTE,
+  MAX_CALENDAR_NAME_LENGTH,
+  MAX_CALENDAR_DESCRIPTION_LENGTH,
+  CALENDAR_COLOR_REGEX,
+  MAX_CALENDAR_EVENT_NAME_LENGTH,
+  MAX_CALENDAR_EVENT_LOCATION_LENGTH,
+  MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH,
+  MAX_CALENDAR_EVENT_URL_LENGTH,
+  MAX_CALENDAR_EXTERNAL_ID_LENGTH,
   LINK_CODE_CACHE_PREFIX,
   LINK_CODE_TTL_MS,
   LINK_CODE_LENGTH,
@@ -576,6 +659,20 @@ module.exports = {
   MAX_WIDGET_SETTING_STRING_LENGTH,
   MAX_WIDGET_SETTINGS_BYTES,
   CAPABILITY_MANIFEST_FIELDS,
+  MAX_ENERGY_TEMPLATES,
+  MAX_ENERGY_CALENDARS,
+  MAX_ENERGY_TEMPLATE_INPUTS,
+  ENERGY_TEMPLATE_KEY_REGEX,
+  ENERGY_INPUT_KEY_REGEX,
+  ENERGY_INPUT_TYPES,
+  ENERGY_PRICING_MODES,
+  ENERGY_CONTRACT_PRICE_TIMEOUT_MS,
+  ENERGY_CONTRACT_CURRENT_TIMEOUT_MS,
+  MAX_ENERGY_INTERVALS_PER_REQUEST,
+  MAX_ENERGY_PRICE_PER_KWH,
+  MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY,
+  ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS,
+  ENERGY_CALENDAR_REFRESH_LOOKBACK_MS,
   WIDGET_GET_TIMEOUT_MS,
   WIDGET_CONTENT_TTL_MIN_SECONDS,
   WIDGET_CONTENT_TTL_MAX_SECONDS,

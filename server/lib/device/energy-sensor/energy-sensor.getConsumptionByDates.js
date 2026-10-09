@@ -3,13 +3,9 @@ const dayjs = require('dayjs');
 const db = require('../../../models');
 
 const { NotFoundError, BadParameters } = require('../../../utils/coreErrors');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
-  ENERGY_PRICE_TYPES,
-} = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { DEFAULT_ENERGY_PERIOD_START_DAY, parseEnergyPeriodStartDay } = require('../../../utils/energyPeriod');
+const { computeFixedCharges } = require('../../energy-contract/contract.fixedCharges');
 
 /**
  * @description Build the query grouping device feature states by a date expression.
@@ -88,142 +84,74 @@ const shouldOffsetPeriods = (groupBy, periodStartDay) =>
   periodStartDay !== DEFAULT_ENERGY_PERIOD_START_DAY && (groupBy === 'month' || groupBy === 'year');
 
 /**
- * @description Return the start of the nth offset billing period of a date range.
- * Periods are always derived from the start of the range, never from the previous period, so that
- * a month shorter than the configured start day (ex: the 31st in February) does not shift all the
- * following periods: Day.js clamps to the last day of the target month exactly like the `LEAST()`
- * of the SQL expression. Deriving from the range start also keeps the time of day of the range
- * start on every boundary, which is what keeps these labels aligned with the buckets returned by
- * DuckDB: the range start is the local midnight of the billing day, and DuckDB truncates in the
- * Gladys timezone, so both sides move together instead of being re-anchored on the timezone of the
- * Node process.
- * @param {object} rangeStart - Start of the date range, as a Day.js object.
- * @param {number} periodIndex - Index of the wanted period (0 being the start of the range).
- * @param {string} groupBy - Grouping period: 'month' or 'year'.
- * @returns {object} Start of the period, as a Day.js object.
- * @example
- * getOffsetPeriodStart(dayjs('2023-01-31'), 1, 'month'); // 2023-02-28
- */
-const getOffsetPeriodStart = (rangeStart, periodIndex, groupBy) => rangeStart.add(periodIndex, groupBy);
-
-/**
- * @description Calculate subscription prices for each time period.
- * @param {Array} subscriptionPrices - Array of subscription price entries from DB.
+ * @description The display periods of a date range, aligned with the buckets DuckDB returns
+ * for the consumption. Periods are always derived from the start of the range, never from
+ * the previous period, so that a month shorter than the configured start day (ex: the 31st in
+ * February) does not shift all the following periods: Day.js clamps to the last day of the
+ * target month exactly like the `LEAST()` of the SQL expression. Deriving from the range start
+ * also keeps the time of day of the range start on every boundary: the range start is the
+ * local midnight of the billing day, and DuckDB truncates in the Gladys timezone, so both
+ * sides move together instead of being re-anchored on the timezone of the Node process.
  * @param {Date} fromDate - Start date of the range.
  * @param {Date} toDate - End date of the range.
- * @param {string} groupBy - Grouping period ('hour', 'day', 'month', 'year').
- * @param {number} [periodStartDay] - Day of the month the billing period starts on (1-31).
- * @returns {Array} Array of subscription values per period.
+ * @param {string} groupBy - Grouping period ('hour', 'day', 'week', 'month', 'year').
+ * @param {number} periodStartDay - Day of the month the billing period starts on (1-31).
+ * @returns {Array<object>} [{ created_at, starts_at, ends_at }] (label and bounds of each period).
  * @example
- * calculateSubscriptionPrices(prices, new Date('2023-01-01'), new Date('2023-01-31'), 'day');
+ * buildDisplayPeriods(new Date('2023-01-01'), new Date('2023-01-31'), 'day', 1);
  */
-function calculateSubscriptionPrices(
-  subscriptionPrices,
-  fromDate,
-  toDate,
-  groupBy,
-  periodStartDay = DEFAULT_ENERGY_PERIOD_START_DAY,
-) {
-  const subscriptionValues = [];
+function buildDisplayPeriods(fromDate, toDate, groupBy, periodStartDay) {
+  const periods = [];
   const rangeStart = dayjs(fromDate);
-  let currentDate = rangeStart;
   const endDate = dayjs(toDate);
   // Monthly/yearly periods must follow the same boundaries as the consumption buckets.
   const useOffsetPeriods = shouldOffsetPeriods(groupBy, periodStartDay);
+  const unit = ['hour', 'day', 'week', 'month', 'year'].includes(groupBy) ? groupBy : 'day';
+  let currentDate = rangeStart;
   let periodIndex = 0;
-
   while (currentDate.isBefore(endDate)) {
-    let nextDate;
-    let periodLabel;
-
-    switch (groupBy) {
-      case 'hour':
-        nextDate = currentDate.add(1, 'hour');
-        periodLabel = currentDate.toISOString();
-        break;
-      case 'day':
-        nextDate = currentDate.add(1, 'day');
-        periodLabel = currentDate.toISOString();
-        break;
-      case 'week':
-        nextDate = currentDate.add(1, 'week');
-        periodLabel = currentDate.toISOString();
-        break;
-      case 'month':
-        nextDate = useOffsetPeriods
-          ? getOffsetPeriodStart(rangeStart, periodIndex + 1, 'month')
-          : currentDate.add(1, 'month');
-        periodLabel = currentDate.toISOString();
-        break;
-      case 'year':
-        nextDate = useOffsetPeriods
-          ? getOffsetPeriodStart(rangeStart, periodIndex + 1, 'year')
-          : currentDate.add(1, 'year');
-        periodLabel = currentDate.toISOString();
-        break;
-      default:
-        // Default to day grouping
-        nextDate = currentDate.add(1, 'day');
-        periodLabel = currentDate.toISOString();
-    }
-
-    // Find the subscription price valid for this period
-    const currentDateStr = currentDate.format('YYYY-MM-DD');
-    const validPrice = subscriptionPrices.find((price) => {
-      const startDate = price.start_date;
-      const endDatePrice = price.end_date;
-      return startDate <= currentDateStr && (endDatePrice === null || endDatePrice >= currentDateStr);
+    const nextDate = useOffsetPeriods ? rangeStart.add(periodIndex + 1, unit) : currentDate.add(1, unit);
+    periods.push({
+      created_at: currentDate.toISOString(),
+      starts_at: currentDate.toISOString(),
+      ends_at: nextDate.toISOString(),
     });
-
-    if (validPrice) {
-      // Price is stored as integer, divide by 10000 to get float
-      // The price is monthly, so we need to calculate the price for the period
-      const monthlyPrice = validPrice.price / 10000;
-
-      let periodPrice;
-      switch (groupBy) {
-        case 'hour': {
-          // Divide monthly price by days in month, then by 24 hours
-          const daysInMonth = currentDate.daysInMonth();
-          periodPrice = monthlyPrice / daysInMonth / 24;
-          break;
-        }
-        case 'day': {
-          // Divide monthly price by days in month
-          const daysInMonth = currentDate.daysInMonth();
-          periodPrice = monthlyPrice / daysInMonth;
-          break;
-        }
-        case 'week': {
-          // Approximate: divide monthly price by ~4.33 weeks per month
-          const daysInMonth = currentDate.daysInMonth();
-          periodPrice = (monthlyPrice / daysInMonth) * 7;
-          break;
-        }
-        case 'month':
-          periodPrice = monthlyPrice;
-          break;
-        case 'year':
-          periodPrice = monthlyPrice * 12;
-          break;
-        default:
-          // Default to day pricing
-          periodPrice = monthlyPrice / currentDate.daysInMonth();
-      }
-
-      subscriptionValues.push({
-        created_at: periodLabel,
-        value: periodPrice,
-        sum_value: periodPrice,
-        contract_name: validPrice.contract_name,
-      });
-    }
-
     currentDate = nextDate;
     periodIndex += 1;
   }
+  return periods;
+}
 
-  return subscriptionValues;
+/**
+ * @description The subscription series of a meter over a date range: the fixed charges of
+ * its contracts per display period (docs/specs/energy-contracts.md, section 8.1), computed
+ * at display time and never stored, so a widget can show the energy alone.
+ * @param {string} electricMeterDeviceId - The root meter.
+ * @param {Date} fromDate - Start date of the range.
+ * @param {Date} toDate - End date of the range.
+ * @param {string} groupBy - Grouping period.
+ * @param {number} periodStartDay - Day of the month the billing period starts on (1-31).
+ * @returns {Promise<Array<object>>} [{ created_at, value, sum_value, contract_name }], empty without fixed charges.
+ * @example
+ * await getSubscriptionValues('meter-id', new Date('2023-01-01'), new Date('2023-01-31'), 'day', 1);
+ */
+async function getSubscriptionValues(electricMeterDeviceId, fromDate, toDate, groupBy, periodStartDay) {
+  const contracts = (
+    await db.EnergyContract.findAll({
+      where: { electric_meter_device_id: electricMeterDeviceId },
+      order: [['valid_from', 'DESC']],
+    })
+  ).map((r) => r.get({ plain: true }));
+  if (contracts.length === 0) {
+    return [];
+  }
+  const periods = buildDisplayPeriods(fromDate, toDate, groupBy, periodStartDay);
+  return computeFixedCharges(contracts, periods).map((charge, index) => ({
+    created_at: periods[index].created_at,
+    value: charge.value,
+    sum_value: charge.value,
+    contract_name: charge.contract_name,
+  }));
 }
 
 /**
@@ -359,7 +287,8 @@ async function getConsumptionByDates(selectors, options = {}) {
     { concurrency: 4 },
   );
 
-  // Add subscription prices if in currency mode
+  // Add the subscription of the meter's contract if in currency mode: the stored costs are
+  // the energy only, the fixed charges are computed here, once per meter, as a separate series
   if (selectors.length > 0 && displayMode === 'currency') {
     const firstSelector = selectors[0];
     const firstFeature = this.stateManager.get('deviceFeature', firstSelector);
@@ -368,64 +297,48 @@ async function getConsumptionByDates(selectors, options = {}) {
       // Get the root electric meter device
       const rootFeature = this.getRootElectricMeterDevice(firstFeature);
       const electricMeterDeviceId = rootFeature ? rootFeature.device_id : firstFeature.device_id;
+      const { from, to, group_by: groupBy = 'day' } = options;
+      let subscriptionValues = await getSubscriptionValues(
+        electricMeterDeviceId,
+        new Date(from),
+        new Date(to),
+        groupBy,
+        periodStartDay,
+      );
 
-      // Fetch subscription prices for this electric meter device
-      const allPrices = await db.EnergyPrice.findAll({
-        where: {
-          electric_meter_device_id: electricMeterDeviceId,
-          price_type: ENERGY_PRICE_TYPES.SUBSCRIPTION,
-        },
-        order: [['start_date', 'ASC']],
-      });
+      // Filter subscription values to only include dates within the range of actual consumption data
+      // This prevents showing subscription prices for future dates or dates without data
+      if (consumptionResults.length > 0 && consumptionResults[0].values.length > 0) {
+        const consumptionValues = consumptionResults[0].values;
+        const firstConsumptionDate = new Date(consumptionValues[0].created_at);
+        const lastConsumptionDate = new Date(consumptionValues[consumptionValues.length - 1].created_at);
 
-      const subscriptionPrices = allPrices.map((r) => r.get({ plain: true }));
+        subscriptionValues = subscriptionValues.filter((sv) => {
+          const subscriptionDate = new Date(sv.created_at);
+          return subscriptionDate >= firstConsumptionDate && subscriptionDate <= lastConsumptionDate;
+        });
+      } else {
+        // No consumption data - don't show any subscription prices
+        subscriptionValues = [];
+      }
 
-      if (subscriptionPrices.length > 0) {
-        const { from, to, group_by: groupBy = 'day' } = options;
-        const fromDate = new Date(from);
-        const toDate = new Date(to);
-        let subscriptionValues = calculateSubscriptionPrices(
-          subscriptionPrices,
-          fromDate,
-          toDate,
-          groupBy,
-          periodStartDay,
-        );
+      if (subscriptionValues.length > 0) {
+        const device = this.stateManager.get('deviceById', firstFeature.device_id);
 
-        // Filter subscription values to only include dates within the range of actual consumption data
-        // This prevents showing subscription prices for future dates or dates without data
-        if (consumptionResults.length > 0 && consumptionResults[0].values.length > 0) {
-          const consumptionValues = consumptionResults[0].values;
-          const firstConsumptionDate = new Date(consumptionValues[0].created_at);
-          const lastConsumptionDate = new Date(consumptionValues[consumptionValues.length - 1].created_at);
+        // Get the contract name from the first subscription value
+        const contractName = subscriptionValues[0].contract_name || firstFeature.name;
 
-          subscriptionValues = subscriptionValues.filter((sv) => {
-            const subscriptionDate = new Date(sv.created_at);
-            return subscriptionDate >= firstConsumptionDate && subscriptionDate <= lastConsumptionDate;
-          });
-        } else {
-          // No consumption data - don't show any subscription prices
-          subscriptionValues = [];
-        }
-
-        if (subscriptionValues.length > 0) {
-          const device = this.stateManager.get('deviceById', firstFeature.device_id);
-
-          // Get the contract name from the first subscription value
-          const contractName = subscriptionValues[0].contract_name || firstFeature.name;
-
-          consumptionResults.unshift({
-            device: {
-              name: device.name,
-            },
-            deviceFeature: {
-              name: contractName,
-              currency_unit: firstFeature.unit,
-              is_subscription: true,
-            },
-            values: subscriptionValues,
-          });
-        }
+        consumptionResults.unshift({
+          device: {
+            name: device.name,
+          },
+          deviceFeature: {
+            name: contractName,
+            currency_unit: firstFeature.unit,
+            is_subscription: true,
+          },
+          values: subscriptionValues,
+        });
       }
     }
   }
@@ -435,7 +348,8 @@ async function getConsumptionByDates(selectors, options = {}) {
 
 module.exports = {
   getConsumptionByDates,
-  calculateSubscriptionPrices,
+  getSubscriptionValues,
+  buildDisplayPeriods,
   buildOffsetDateExpression,
   shouldOffsetPeriods,
 };
