@@ -131,8 +131,39 @@ describe('gateway.backup', async function describe() {
     assert.calledWith(brain.getReply, 'en', 'backup.fail', {
       errorMessage: 'Error: error',
     });
-    assert.calledWith(message.sendSystemMessage, 'toto-fr', 'Backup failed!');
-    assert.calledWith(message.sendSystemMessage, 'toto-en', 'Backup failed!');
+    assert.calledWithExactly(message.sendSystemMessage, 'toto-fr', 'Backup failed!', null, {
+      messageType: 'notification',
+    });
+    assert.calledWithExactly(message.sendSystemMessage, 'toto-en', 'Backup failed!', null, {
+      messageType: 'notification',
+    });
+  });
+
+  it('should rethrow the backup error when warning one admin fails', async () => {
+    const backupError = new Error('upload failed');
+    gateway.gladysGatewayClient.uploadOneBackupChunk = fake.rejects(backupError);
+    const sentTo = [];
+    // resolves later: sentTo is only filled when backup waits for the sends
+    message.sendSystemMessage = sinon.stub().callsFake(async (selector) => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10);
+      });
+      if (selector === 'toto-fr') {
+        throw new NotFoundError(`User ${selector} not found`);
+      }
+      sentTo.push(selector);
+    });
+
+    let thrownError;
+    try {
+      await gateway.backup();
+    } catch (e) {
+      thrownError = e;
+    }
+
+    expect(thrownError).to.equal(backupError);
+    assert.calledTwice(message.sendSystemMessage);
+    expect(sentTo).to.deep.equal(['toto-en']);
   });
 
   it('should backup gladys with lots of insert at the same time', async () => {
