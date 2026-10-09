@@ -1076,7 +1076,13 @@ class ThermostatBox extends Component {
       activePreset: preset.key,
       setpoint: newSetpoint,
       isManualMode: hasSchedule,
-      manualSetpointOverride: false
+      manualSetpointOverride: false,
+      // The banner reads a stop from the mode, which is only reloaded once the
+      // write has landed. Carried with the preset, or the card announces the
+      // programme's "Off until…" for the length of the round trip.
+      ...(preset.key === 'off' && this.state.remoteConfig
+        ? { remoteConfig: { ...this.state.remoteConfig, mode: THERMOSTAT_MODE.OFF } }
+        : {})
     });
     // The hold the server arms is the widget's own, so the event it echoes back
     // must not un-highlight the preset that was just picked.
