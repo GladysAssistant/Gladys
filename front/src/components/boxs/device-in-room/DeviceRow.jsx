@@ -15,6 +15,7 @@ import CoverDeviceFeature from './device-features/CoverDeviceFeature';
 import SetpointDeviceFeature from './device-features/SetpointDeviceFeature';
 import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
 import ThermostatModeDeviceFeature from './device-features/ThermostatModeDeviceFeature';
+import ThermostatPresetDeviceFeature from './device-features/ThermostatPresetDeviceFeature';
 import FanModeDeviceFeature from './device-features/FanModeDeviceFeature';
 import FanLabeledSelectDeviceFeature from './device-features/FanLabeledSelectDeviceFeature';
 import AirConditioningFanSpeedDeviceFeature from './device-features/AirConditioningFanSpeedDeviceFeature';
@@ -123,7 +124,8 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
     {}
   ),
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
-    [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: ThermostatModeDeviceFeature
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: ThermostatModeDeviceFeature,
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET]: ThermostatPresetDeviceFeature
   },
   // A dynamic select: its options are string values discovered on the appliance by the
   // integration (installed TV apps, HDMI sources...), declared through supported_options

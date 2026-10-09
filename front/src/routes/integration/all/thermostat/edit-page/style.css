@@ -1,0 +1,102 @@
+.presetColName {
+  width: 30%;
+}
+
+/* The width is capped on the group, not on the input: capped on the input alone,
+   the group kept the whole cell and the °C drifted away from the field it
+   belongs to, reading as a separate chip. */
+.presetTempGroup {
+  max-width: 7.5rem;
+}
+
+.presetTempGroup :global(.form-control),
+.presetTempGroup :global(.input-group-text) {
+  /* 26px as an input-group-sm, in a table of six rows that are all touch
+     targets. */
+  height: 38px;
+}
+
+.presetTempInput {
+  max-width: 90px;
+}
+
+/* Preset colour swatch: only the colour itself is dynamic, passed as a CSS
+   variable. The dark theme inverts the whole page, so re-invert the dot to
+   keep its real colour — same handling as the schedule editor dot. */
+.presetColorDot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+  background: var(--dot-color, #adb5bd);
+}
+
+:global(.dark-mode) .presetColorDot {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* ─── Form sections ─── */
+
+/* Three titled sections rather than one run of fifteen fields. Sized between the
+   card title and a form-label, so the groups read as groups without competing
+   with the page title. */
+.formSection {
+  margin: 1.75rem 0 0.75rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid rgba(0, 40, 100, 0.12);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* The first one opens the card body, where the card header already provides the
+   separation. */
+.formSection:first-child {
+  margin-top: 0;
+}
+
+/* ─── Fine tuning fold ─── */
+
+.tuningSummary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  /* A summary renders its own marker, which would sit next to the chevron. */
+  list-style: none;
+}
+
+.tuningSummary::-webkit-details-marker {
+  display: none;
+}
+
+.tuningChevron {
+  transition: transform 0.15s ease;
+}
+
+.tuningDetails[open] .tuningChevron {
+  transform: rotate(90deg);
+}
+
+/* A two-digit field. Left at the card's full width it asked for something long. */
+.shortNumberField {
+  max-width: 10rem;
+}
+
+/* The vendor-programme warning, darkened where the Horizon theme puts it at
+   3.7:1 (#a5701e on #f9eeda) — under the 4.5:1 of WCAG 1.4.3, on the one notice
+   that tells the user to turn their thermostat's own programme off. #8a5c17
+   reaches 5.0:1 and stays the same amber.
+
+   Scoped to this alert rather than fixed in the theme: that palette colours every
+   alert in Gladys, and repainting them all is not this PR's to do.
+   Matched against `.glass-theme .page .alert-warning` (0,3,0) with one class
+   more, or the theme keeps winning and the fix never reaches the screen. */
+.vendorWarning.vendorWarning,
+:global(.glass-theme .page .alert).vendorWarning {
+  color: #8a5c17;
+}

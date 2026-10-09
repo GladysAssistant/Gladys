@@ -40,6 +40,9 @@ const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
 const EnergyContractModel = require('./energy_contract');
 const EnergyPriceModel = require('./energy_price');
+const ThermostatScheduleModel = require('./thermostat_schedule');
+const ThermostatScheduleTransitionModel = require('./thermostat_schedule_transition');
+const ThermostatScheduleDeviceModel = require('./thermostat_schedule_device');
 const HouseModel = require('./house');
 const JobModel = require('./job');
 const LifeEventModel = require('./life_event');
@@ -71,6 +74,9 @@ const models = {
   Device: DeviceModel(sequelize, Sequelize),
   EnergyContract: EnergyContractModel(sequelize, Sequelize),
   EnergyPrice: EnergyPriceModel(sequelize, Sequelize),
+  ThermostatSchedule: ThermostatScheduleModel(sequelize, Sequelize),
+  ThermostatScheduleTransition: ThermostatScheduleTransitionModel(sequelize, Sequelize),
+  ThermostatScheduleDevice: ThermostatScheduleDeviceModel(sequelize, Sequelize),
   House: HouseModel(sequelize, Sequelize),
   Job: JobModel(sequelize, Sequelize),
   LifeEvent: LifeEventModel(sequelize, Sequelize),

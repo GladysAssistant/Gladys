@@ -26,6 +26,7 @@ import EditChipsBox from '../../../components/boxs/chips/EditChipsBox';
 import EditActionsBox from '../../../components/boxs/actions/EditActionsBox';
 import EditHouseViewBox from '../../../components/boxs/house-view/EditHouseViewBox';
 import EditExternalWidgetBox from '../../../components/boxs/external-widget/EditExternalWidgetBox';
+import EditThermostatBox from '../../../components/boxs/thermostat/EditThermostatBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -79,6 +80,8 @@ const Box = ({ children, ...props }) => {
       return <EditActionsBox {...props} />;
     case 'external-widget':
       return <EditExternalWidgetBox {...props} />;
+    case 'thermostat':
+      return <EditThermostatBox {...props} />;
     default:
       return <SelectBoxType {...props} />;
   }
