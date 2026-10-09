@@ -3461,7 +3461,7 @@
     "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now.",
     "thermostat": {
       "title": "Thermostat",
-      "description": "Create and manage your virtual thermostats",
+      "description": "Create virtual thermostats, or programme the ones you already have",
       "deviceTab": "My Thermostats",
       "scheduleTab": "Schedules",
       "documentationTab": "Documentation",
@@ -3496,7 +3496,7 @@
         "typeLabel": "Thermostat type",
         "tuningSection": "Fine tuning",
         "typeVirtual": "Virtual thermostat (Gladys regulates)",
-        "typeExternal": "Real thermostat (the device regulates)",
+        "typeExternal": "Real thermostat (the appliance regulates itself)",
         "vendorProgrammeWarning": "Turn the vendor programme off on this device (the Netatmo or Tado app…) before driving it from Gladys. Otherwise the device’s programme and Gladys’s take turns writing the setpoint, and the thermostat follows whichever wrote last.",
         "typeHelp": {
           "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) to reach the setpoint.",
@@ -3507,7 +3507,7 @@
         "stateFeatureLabel": "Heating state (optional)",
         "stateFeatureHelp": "Used to show whether the device is currently running. Accepted either as an operating state or as a boiler contact. Leave empty if your thermostat does not report it.",
         "modeFeatureLabel": "Operating mode (optional)",
-        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one. Gladys switches it to Off when the Off preset applies, and hands it back as soon as a setpoint takes over again.",
+        "modeFeatureHelp": "The real thermostat's mode (off, heating, cooling, auto), if it exposes one. Gladys switches it to Off when the thermostat is stopped or an Off slot applies, and hands it back as soon as a setpoint takes over again.",
         "mode": {
           "heating": "Heating",
           "cooling": "Cooling"
@@ -3601,7 +3601,7 @@
         "cancelButton": "Cancel",
         "deleteButton": "Delete",
         "editButton": "Edit",
-        "confirmDelete": "Confirm deletion?",
+        "confirmDelete": "Delete this schedule? The thermostats following it stay on its current slot, and are stopped if that slot is Off.",
         "confirmYes": "Yes",
         "confirmNo": "No",
         "saveError": "Error while saving.",
@@ -3649,8 +3649,8 @@
         "noSlots": "No time slots yet. Click \"Add time slot\" to get started.",
         "followedBy": "Followed by",
         "weekLabel": "Week at a glance",
-        "emptyScheduleWarning": "This schedule has no slot, so it drives nothing. The thermostats following it keep their current setpoint.",
-        "emptySaveWarning": "This schedule has no slot: it will drive nothing, and the thermostats following it will keep their current setpoint.",
+        "emptyScheduleWarning": "This schedule has no slot, so it drives nothing. The thermostats following it keep their current setpoint, or stay stopped if it was on Off when it was emptied.",
+        "emptySaveWarning": "This schedule has no slot: it will drive nothing. The thermostats following it will keep their current setpoint, or be stopped if it is on Off right now; those it stops start again once it has slots again.",
         "saveEmptyButton": "Save anyway",
         "backToEditingButton": "Add a slot",
         "followersLabel": "Thermostats following this schedule",

@@ -781,7 +781,10 @@ class ScheduleEditor extends Component {
     const transitions = rangesToTransitions(ranges);
     const carriedByDay = carriedPresetByDay(transitions);
     // In the order the bars are read, not the order the ranges were entered.
-    const usedPresets = PRESETS.filter(preset => ranges.some(range => range.preset === preset));
+    // Read from the points rather than the ranges: a gap is stored as an Off
+    // point and drawn grey, and the legend left that grey unexplained unless an
+    // Off range had been entered on purpose.
+    const usedPresets = PRESETS.filter(preset => transitions.some(transition => transition.preset === preset));
 
     return (
       // In a card with a title, like every other page of this integration: the

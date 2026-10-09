@@ -3461,7 +3461,7 @@
     "deprecationWarning": "Esta integración incorporada quedará pronto <b>obsoleta</b> en favor de una integración externa de la comunidad equivalente. Ambas versiones coexistirán en el catálogo durante la transición; puede seguir utilizando esta por ahora.",
     "thermostat": {
       "title": "Termostato",
-      "description": "Crea y gestiona tus termostatos virtuales",
+      "description": "Crea termostatos virtuales o programa los que ya tienes",
       "deviceTab": "Mis termostatos",
       "scheduleTab": "Programaciones",
       "documentationTab": "Documentación",
@@ -3496,7 +3496,7 @@
         "typeLabel": "Tipo de termostato",
         "tuningSection": "Ajuste fino",
         "typeVirtual": "Termostato virtual (Gladys regula)",
-        "typeExternal": "Termostato real (el dispositivo regula)",
+        "typeExternal": "Termostato real (el aparato regula por sí mismo)",
         "vendorProgrammeWarning": "Desactiva el programa del fabricante en este aparato (aplicación Netatmo, Tado…) antes de controlarlo desde Gladys. Si no, el programa del aparato y el de Gladys escriben la consigna por turnos, y el termostato sigue al que haya escrito el último.",
         "typeHelp": {
           "virtual": "Gladys actúa como termostato: lee un sensor de temperatura y acciona un interruptor (un relé, un enchufe, un contacto de caldera) para alcanzar la consigna.",
@@ -3507,7 +3507,7 @@
         "stateFeatureLabel": "Estado de calefacción (opcional)",
         "stateFeatureHelp": "Se usa para mostrar si el dispositivo está funcionando. Se acepta como estado de funcionamiento o como contacto de caldera. Déjalo vacío si tu termostato no lo informa.",
         "modeFeatureLabel": "Modo de funcionamiento (opcional)",
-        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno. Gladys lo pone en Apagado cuando se aplica el preajuste Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo.",
+        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno. Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo.",
         "mode": {
           "heating": "Calefacción",
           "cooling": "Refrigeración"
@@ -3601,7 +3601,7 @@
         "cancelButton": "Cancelar",
         "deleteButton": "Eliminar",
         "editButton": "Editar",
-        "confirmDelete": "¿Confirmar la eliminación?",
+        "confirmDelete": "¿Eliminar esta programación? Los termostatos que la siguen se quedan en su tramo actual, y se detienen si es un tramo Apagado.",
         "confirmYes": "Sí",
         "confirmNo": "No",
         "saveError": "Error al guardar.",
@@ -3649,8 +3649,8 @@
         "noSlots": "Todavía no hay intervalos. Haz clic en «Añadir un intervalo» para empezar.",
         "followedBy": "Seguida por",
         "weekLabel": "Vista de la semana",
-        "emptyScheduleWarning": "Esta programación no tiene ningún tramo, así que no controla nada. Los termostatos que la siguen mantienen su consigna actual.",
-        "emptySaveWarning": "Esta programación no tiene ningún tramo: no controlará nada y los termostatos que la siguen mantendrán su consigna actual.",
+        "emptyScheduleWarning": "Esta programación no tiene ningún tramo, así que no controla nada. Los termostatos que la siguen mantienen su consigna actual, o siguen detenidos si estaba en Apagado cuando se vació.",
+        "emptySaveWarning": "Esta programación no tiene ningún tramo: no controlará nada. Los termostatos que la siguen mantendrán su consigna actual, o se detendrán si ahora está en Apagado; los que detenga volverán a arrancar en cuanto tenga tramos de nuevo.",
         "saveEmptyButton": "Guardar de todos modos",
         "backToEditingButton": "Añadir un tramo",
         "followersLabel": "Termostatos que siguen esta programación",

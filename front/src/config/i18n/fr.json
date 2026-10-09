@@ -3461,7 +3461,7 @@
     "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment.",
     "thermostat": {
       "title": "Thermostat",
-      "description": "Créez et gérez vos thermostats virtuels",
+      "description": "Créez des thermostats virtuels, ou programmez ceux que vous avez déjà",
       "deviceTab": "Mes thermostats",
       "scheduleTab": "Plannings",
       "documentationTab": "Documentation",
@@ -3496,7 +3496,7 @@
         "typeLabel": "Type de thermostat",
         "tuningSection": "Réglage fin",
         "typeVirtual": "Thermostat virtuel (Gladys régule)",
-        "typeExternal": "Thermostat réel (le device régule)",
+        "typeExternal": "Thermostat réel (l’appareil régule lui-même)",
         "vendorProgrammeWarning": "Désactivez le programme du fabricant sur cet appareil (application Netatmo, Tado…) avant de le piloter depuis Gladys. Sinon le programme de l’appareil et celui de Gladys écrivent tour à tour la consigne, et le thermostat suit celui qui a écrit en dernier.",
         "typeHelp": {
           "virtual": "Gladys fait office de thermostat : elle lit un capteur de température et pilote un interrupteur (relais, prise, contact de chaudière) selon la consigne.",
@@ -3507,7 +3507,7 @@
         "stateFeatureLabel": "État de chauffe (facultatif)",
         "stateFeatureHelp": "Permet d'afficher si l'appareil est en train de chauffer. Acceptée aussi bien sous forme d'état de fonctionnement que de contact de chaudière. Laissez vide si votre thermostat ne remonte pas cette information.",
         "modeFeatureLabel": "Mode de fonctionnement (facultatif)",
-        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un. Gladys le bascule sur Arrêt lorsque le préréglage Arrêt s'applique, et le rétablit dès qu'une consigne reprend la main.",
+        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un. Gladys le bascule sur Arrêt lorsque le thermostat est arrêté ou qu'un créneau Arrêt s'applique, et le rétablit dès qu'une consigne reprend la main.",
         "mode": {
           "heating": "Chauffage",
           "cooling": "Climatisation"
@@ -3601,7 +3601,7 @@
         "cancelButton": "Annuler",
         "deleteButton": "Supprimer",
         "editButton": "Éditer",
-        "confirmDelete": "Confirmer la suppression ?",
+        "confirmDelete": "Supprimer ce planning ? Les thermostats qui le suivent restent sur son créneau en cours, et s’arrêtent si c’est un créneau Arrêt.",
         "confirmYes": "Oui",
         "confirmNo": "Non",
         "saveError": "Erreur lors de la sauvegarde.",
@@ -3649,8 +3649,8 @@
         "noSlots": "Aucune plage horaire. Cliquez sur \"Ajouter une plage\" pour commencer.",
         "followedBy": "Suivi par",
         "weekLabel": "Aperçu de la semaine",
-        "emptyScheduleWarning": "Ce planning n’a aucun créneau : il ne pilote rien. Les thermostats qui le suivent gardent leur consigne actuelle.",
-        "emptySaveWarning": "Ce planning n’a aucun créneau : il ne pilotera rien, et les thermostats qui le suivent garderont leur consigne actuelle.",
+        "emptyScheduleWarning": "Ce planning n’a aucun créneau : il ne pilote rien. Les thermostats qui le suivent gardent leur consigne actuelle, ou restent arrêtés s’il était sur Arrêt quand il a été vidé.",
+        "emptySaveWarning": "Ce planning n’a aucun créneau : il ne pilotera rien. Les thermostats qui le suivent garderont leur consigne actuelle, ou seront arrêtés s’il est sur Arrêt en ce moment ; ceux qu’il arrête repartiront dès qu’il aura de nouveau des créneaux.",
         "saveEmptyButton": "Enregistrer quand même",
         "backToEditingButton": "Ajouter un créneau",
         "followersLabel": "Thermostats qui suivent ce planning",

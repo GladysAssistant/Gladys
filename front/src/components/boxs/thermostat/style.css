@@ -297,10 +297,13 @@
 }
 
 /* Segmented Control */
+/* Columns capped rather than stretched: a cooling thermostat has three buttons,
+   and in a third of the card each the active pill ran across half of it. */
 .segmentedControl {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-auto-columns: minmax(0, 4.5rem);
+  justify-content: center;
   max-width: 22rem;
   margin: 0 auto;
   padding: 0 4px;
@@ -771,7 +774,12 @@
   letter-spacing: -0.2px;
   background: var(--preset-color, #f59f00);
   border-radius: 8px;
-  width: 100%;
+  /* At least the column, and as wide as the word when the word is wider: in a
+     55px column the bold "Absence" ran past the pill, or was cut short of its
+     last letter. The gap between columns takes the few pixels it needs. */
+  min-width: 100%;
+  max-width: none;
+  white-space: nowrap;
   box-sizing: border-box;
-  padding: 1px 2px;
+  padding: 1px 3px;
 }

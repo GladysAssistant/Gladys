@@ -96,6 +96,7 @@ class ThermostatBox extends Component {
   // the preset it just lit must not be un-highlighted by the server's echo.
   pickingPreset = false;
   lastActivePreset = null;
+  lastPresetWrite = null;
   expectedSetpoint = null;
   expectedSetpointTimer = null;
   // The mode values this card has just written, each with the timer that forgets it.
@@ -368,6 +369,9 @@ class ThermostatBox extends Component {
       return;
     }
     this.savingPreset = true;
+    // Remembered past the write: its echo can land after the response, and in
+    // manual mode it must not be taken for a preset picked elsewhere.
+    this.lastPresetWrite = { preset, at: Date.now() };
     try {
       await this.writeFeature(cfg.presetFeature, value);
     } finally {
@@ -621,21 +625,29 @@ class ThermostatBox extends Component {
     if (!payload.preset || !knownPresets.includes(payload.preset)) return;
     const resolvedPreset = payload.preset;
     // A preset event never clears an active hold: the server only pushes a preset
-    // while none is armed, or just as one expires — in which case the hold event
-    // arrives too and does the clearing.
-    if (this.state.isManualMode) {
+    // while none is armed, just as one expires — the hold event then does the
+    // clearing — or when a scene or the API picks one, which arms that preset's
+    // own hold in the same write. The card then shows that preset on its
+    // temperature: keeping the override of a setpoint held here left it on
+    // "21.5 · Manual mode", swallowing the preset's setpoint, until a reload.
+    const manual = this.state.isManualMode;
+    const own = this.lastPresetWrite;
+    if (manual && own && own.preset === resolvedPreset && Date.now() - own.at < 5000) {
+      // This card's own pick, whose hold it already shows.
       this.setState({ activePreset: resolvedPreset });
       return;
     }
-    const newState = { activePreset: resolvedPreset, isManualMode: false, manualSetpointOverride: false };
+    const newState = manual
+      ? { activePreset: resolvedPreset, manualSetpointOverride: false }
+      : { activePreset: resolvedPreset, isManualMode: false, manualSetpointOverride: false };
     if (resolvedPreset !== 'off') {
       const presets = this.getPresets();
       const preset = presets.find(p => p.key === resolvedPreset);
       if (preset && preset.temp !== null && preset.temp !== undefined) {
-        newState.setpoint = preset.temp;
+        newState.setpoint = this.toSetpointFeatureUnit(preset.temp);
       }
     }
-    this.loadSchedule();
+    if (!manual) this.loadSchedule();
     this.setState(newState);
   };
 
@@ -831,13 +843,37 @@ class ThermostatBox extends Component {
   // same way. They did not: `initData` applied the rule and the websocket handler
   // still forced the override on every external hold, so a preset picked on a
   // Netatmo stayed dark until the page was reloaded.
+  //
+  // The hold is stored in the unit of the setpoint feature (C.3), the preset in
+  // the thermostat's: Comfort at 21 °C is held as 70 on a Fahrenheit appliance.
+  // The preset's temperature is converted the way the server converts it before
+  // the two are compared, or a preset picked on such a device never lit.
   holdMatchesPreset = (setpoint, presetKey) => {
     if (setpoint === null || setpoint === undefined || !presetKey) {
       return false;
     }
     return this.getPresets().some(
-      candidate => candidate.key === presetKey && candidate.temp !== null && candidate.temp === setpoint
+      candidate =>
+        candidate.key === presetKey &&
+        candidate.temp !== null &&
+        this.toSetpointFeatureUnit(candidate.temp) === setpoint
     );
+  };
+
+  // Same rounding as the server's convertSetpointToFeatureUnit: a whole degree
+  // Fahrenheit, half a degree Celsius. Only an external thermostat's hold is
+  // converted there: a virtual one's setpoint feature is in its own unit.
+  toSetpointFeatureUnit = temp => {
+    if (!this.isExternal()) return temp;
+    const { featureUnit } = this.state;
+    const thermostatUnit = this.getConfig().temp_unit || 'C';
+    if (featureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && thermostatUnit === 'C') {
+      return Math.round(celsiusToFahrenheit(temp));
+    }
+    if (featureUnit === DEVICE_FEATURE_UNITS.CELSIUS && thermostatUnit === 'F') {
+      return Math.round(fahrenheitToCelsius(temp) * 2) / 2;
+    }
+    return temp;
   };
 
   initData = async () => {
@@ -864,7 +900,7 @@ class ThermostatBox extends Component {
       const presets = this.getPresets();
       const presetObj = presets.find(p => p.key === activePreset);
       if (presetObj && presetObj.temp !== null && presetObj.temp !== undefined) {
-        stateInit.setpoint = presetObj.temp;
+        stateInit.setpoint = this.toSetpointFeatureUnit(presetObj.temp);
         this._scheduleSetpointSet = true;
       }
     }
@@ -902,6 +938,11 @@ class ThermostatBox extends Component {
     // Commit everything atomically and wait for the state to be applied
     await new Promise(resolve => this.setState(stateInit, resolve));
     await this.getDeviceData();
+    // The setpoint feature's unit is only known once its device is read: on the
+    // first load the hold was compared with the preset in the thermostat's unit.
+    if (hold && stateInit.manualSetpointOverride && this.holdMatchesPreset(hold.setpoint, activePreset)) {
+      this.setState({ manualSetpointOverride: false });
+    }
     this.applyFallbackSetpoint();
   };
 
@@ -1173,7 +1214,8 @@ class ThermostatBox extends Component {
   selectPreset = async preset => {
     this.saveLastActivePreset(this.state.activePreset);
     const hasSchedule = !!this.state.activeSchedule;
-    const newSetpoint = preset.temp !== null && preset.temp !== undefined ? preset.temp : this.state.setpoint;
+    const newSetpoint =
+      preset.temp !== null && preset.temp !== undefined ? this.toSetpointFeatureUnit(preset.temp) : this.state.setpoint;
     this.setState({
       activePreset: preset.key,
       setpoint: newSetpoint,

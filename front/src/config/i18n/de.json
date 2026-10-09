@@ -3461,7 +3461,7 @@
     "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden.",
     "thermostat": {
       "title": "Thermostat",
-      "description": "Erstelle und verwalte deine virtuellen Thermostate",
+      "description": "Erstelle virtuelle Thermostate oder programmiere deine vorhandenen",
       "deviceTab": "Meine Thermostate",
       "scheduleTab": "Zeitpläne",
       "documentationTab": "Dokumentation",
@@ -3496,7 +3496,7 @@
         "typeLabel": "Thermostattyp",
         "tuningSection": "Feineinstellung",
         "typeVirtual": "Virtuelles Thermostat (Gladys regelt)",
-        "typeExternal": "Echtes Thermostat (das Gerät regelt)",
+        "typeExternal": "Echtes Thermostat (das Gerät regelt selbst)",
         "vendorProgrammeWarning": "Schalten Sie das Herstellerprogramm auf diesem Gerät ab (Netatmo-, Tado-App…), bevor Sie es über Gladys steuern. Sonst schreiben das Programm des Geräts und das von Gladys abwechselnd den Sollwert, und der Thermostat folgt dem zuletzt geschriebenen.",
         "typeHelp": {
           "virtual": "Gladys arbeitet als Thermostat: Sie liest einen Temperatursensor und steuert einen Schalter (Relais, Steckdose, Kesselkontakt), um den Sollwert zu erreichen.",
@@ -3507,7 +3507,7 @@
         "stateFeatureLabel": "Heizzustand (optional)",
         "stateFeatureHelp": "Zeigt an, ob das Gerät gerade läuft. Wird sowohl als Betriebszustand als auch als Kesselkontakt akzeptiert. Leer lassen, wenn Ihr Thermostat diese Information nicht liefert.",
         "modeFeatureLabel": "Betriebsmodus (optional)",
-        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden. Gladys schaltet ihn auf Aus, sobald die Voreinstellung Aus greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt.",
+        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden. Gladys schaltet ihn auf Aus, wenn das Thermostat gestoppt wird oder ein Aus-Zeitfenster greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt.",
         "mode": {
           "heating": "Heizen",
           "cooling": "Kühlen"
@@ -3601,7 +3601,7 @@
         "cancelButton": "Abbrechen",
         "deleteButton": "Löschen",
         "editButton": "Bearbeiten",
-        "confirmDelete": "Löschen bestätigen?",
+        "confirmDelete": "Diesen Zeitplan löschen? Die Thermostate, die ihm folgen, bleiben auf seinem aktuellen Zeitfenster und werden gestoppt, wenn es ein Aus-Zeitfenster ist.",
         "confirmYes": "Ja",
         "confirmNo": "Nein",
         "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
@@ -3649,8 +3649,8 @@
         "noSlots": "Noch keine Zeitfenster. Klicke auf \"Zeitfenster hinzufügen\", um zu beginnen.",
         "followedBy": "Befolgt von",
         "weekLabel": "Wochenüberblick",
-        "emptyScheduleWarning": "Dieser Zeitplan hat kein Zeitfenster und steuert daher nichts. Die Thermostate, die ihm folgen, behalten ihre aktuelle Solltemperatur.",
-        "emptySaveWarning": "Dieser Zeitplan hat kein Zeitfenster: Er steuert nichts, und die Thermostate, die ihm folgen, behalten ihre aktuelle Solltemperatur.",
+        "emptyScheduleWarning": "Dieser Zeitplan hat kein Zeitfenster und steuert daher nichts. Die Thermostate, die ihm folgen, behalten ihre aktuelle Solltemperatur oder bleiben gestoppt, wenn er beim Leeren auf Aus stand.",
+        "emptySaveWarning": "Dieser Zeitplan hat kein Zeitfenster: Er steuert nichts. Die Thermostate, die ihm folgen, behalten ihre aktuelle Solltemperatur oder werden gestoppt, wenn er gerade auf Aus steht; die gestoppten starten wieder, sobald er wieder Zeitfenster hat.",
         "saveEmptyButton": "Trotzdem speichern",
         "backToEditingButton": "Zeitfenster hinzufügen",
         "followersLabel": "Thermostate, die diesem Zeitplan folgen",
