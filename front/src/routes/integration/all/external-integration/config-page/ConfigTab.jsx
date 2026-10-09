@@ -195,6 +195,7 @@ const ConfigTab = props => {
           touchedSecrets={props.contactProfileTouchedSecrets}
           profileStatus={props.contactProfileStatus}
           updateValue={props.updateContactProfileValue}
+          dynamicOptions={props.dynamicOptions}
           onSave={props.saveContactProfile}
           onClear={props.clearContactProfile}
         />
@@ -211,6 +212,7 @@ const ConfigTab = props => {
           disableConfirming={props.calendarDisableConfirming}
           calendarToggleStatus={props.calendarToggleStatus}
           updateValue={props.updateCalendarAccountValue}
+          dynamicOptions={props.dynamicOptions}
           onSave={props.saveCalendarAccount}
           onDisable={props.armDisableCalendarAccount}
           onDisableConfirm={props.disableCalendarAccount}

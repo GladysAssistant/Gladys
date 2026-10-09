@@ -542,6 +542,23 @@ describe('externalIntegration config', () => {
         );
       });
 
+      it('should never persist an unchanged write-back over a house the user chose in between', async () => {
+        await externalIntegration.saveConfigFromFront(housesService.selector, { home: OTHER_HOUSE });
+        // the integration compared its write-back against HOUSE, read just
+        // before the user picked OTHER_HOUSE
+        const getIntegrationConfig = externalIntegration.getIntegrationConfig.bind(externalIntegration);
+        externalIntegration.getIntegrationConfig = fake.resolves({ home: HOUSE });
+        try {
+          await externalIntegration.setIntegrationConfig(housesService, { home: HOUSE, meter_id: 'meter-1' });
+        } finally {
+          externalIntegration.getIntegrationConfig = getIntegrationConfig;
+        }
+        expect(await externalIntegration.getIntegrationConfig(housesService)).to.deep.equal({
+          home: OTHER_HOUSE,
+          meter_id: 'meter-1',
+        });
+      });
+
       it('should not let a value the integration stored itself probe the houses after a manifest update', async () => {
         // version 1: `home` is free internal storage, any value is accepted
         const { config_schema: configSchema, ...manifestV1 } = housesService.manifest;

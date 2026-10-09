@@ -27,7 +27,9 @@ class ExternalIntegrationConfigPage extends Component {
   loadData = async () => {
     // action values and results belong to the integration they were typed
     // for: a secret typed for one integration is never sent to another
-    this.setState({ loadStatus: RequestStatus.Getting, actionFieldValues: {}, actionStates: {} });
+    // the dynamic options of the previous integration must never fill the
+    // selects of the new one
+    this.setState({ loadStatus: RequestStatus.Getting, actionFieldValues: {}, actionStates: {}, dynamicOptions: {} });
     const { selector } = this.props;
     const isAdmin = this.isAdmin();
     try {
@@ -63,9 +65,9 @@ class ExternalIntegrationConfigPage extends Component {
         // the per-user "My calendars" block of a calendar integration
         await this.loadCalendarAccount(integration);
       }
+      await this.loadDynamicOptions(integration, isAdmin);
       if (isAdmin) {
         await this.loadGatewayStatus(integration);
-        await this.loadDynamicOptions(integration);
         await this.loadHardwareDetection(integration);
       }
     } catch (e) {
@@ -461,20 +463,32 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  loadDynamicOptions = async integration => {
-    // a select/multi_select of the config_schema (or of an action mini
-    // form) can take its options from a core-defined source: the
-    // already-created devices of the integration, or the houses of Gladys
-    const actionFields = (get(integration, 'manifest.actions') || []).reduce(
-      (fields, action) => fields.concat(action.fields || []),
-      []
+  loadDynamicOptions = async (integration, isAdmin) => {
+    // a select/multi_select of the config_schema, of an action mini form or
+    // of a per-user form (contact_schema, account_schema) can take its
+    // options from a core-defined source: the already-created devices of the
+    // integration, or the houses of Gladys. A non-admin only sees the
+    // per-user forms.
+    const { selector } = this.props;
+    const perUserFields = (get(integration, 'manifest.contact_schema') || []).concat(
+      get(integration, 'manifest.account_schema') || []
     );
-    const allFields = (get(integration, 'manifest.config_schema') || []).concat(actionFields);
+    const adminFields = isAdmin
+      ? (get(integration, 'manifest.actions') || []).reduce(
+          (fields, action) => fields.concat(action.fields || []),
+          get(integration, 'manifest.config_schema') || []
+        )
+      : [];
+    const allFields = adminFields.concat(perUserFields);
     if (!hasDynamicSource(allFields)) {
       return;
     }
     try {
-      const dynamicOptions = await fetchDynamicOptions(this.props.httpClient, this.props.selector, allFields);
+      const dynamicOptions = await fetchDynamicOptions(this.props.httpClient, selector, allFields);
+      if (selector !== this.props.selector) {
+        // a newer integration has been opened since, discard this stale result
+        return;
+      }
       this.setState({ dynamicOptions });
     } catch (e) {
       console.error(e);

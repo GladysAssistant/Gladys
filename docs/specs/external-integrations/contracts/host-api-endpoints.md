@@ -89,7 +89,7 @@ Consequences of this derivation:
 
 **`GET /api/integration/v1/config`** → `200 { "config": { "latitude": 48.85, "unit": "celsius", "api_key": "s3cr3t" } }` — all values, secrets included (it is the integration, not the frontend).
 
-**`POST /api/integration/v1/config`** — body `{ "config": { "<key>": <value> } }`, partial merge → `200 { "success": true }`. Keys present in the `config_schema` are validated against it; keys outside the schema are the integration's **free internal storage** (pairing state, third-party tokens…), never displayed in the UI. Unless the manifest declares `location: true`, a `source: "houses"` field only takes its stored value back unchanged (not re-validated) — any other value → `403 FORBIDDEN` (C.1).
+**`POST /api/integration/v1/config`** — body `{ "config": { "<key>": <value> } }`, partial merge → `200 { "success": true }`. Keys present in the `config_schema` are validated against it; keys outside the schema are the integration's **free internal storage** (pairing state, third-party tokens…), never displayed in the UI. Unless the manifest declares `location: true`, a `source: "houses"` field only takes its stored value back unchanged (a no-op: not re-validated, not persisted) — any other value → `403 FORBIDDEN` (C.1).
 
 **Sub-container lifecycle** — all these routes only know the `containers[]` entries of **this** integration's manifest (the JWT sets the perimeter, as everywhere): `404 NOT_FOUND` for any other `:name`. No route allows creating an undeclared container. None of these deliberate gestures increments `failure_count`.
 

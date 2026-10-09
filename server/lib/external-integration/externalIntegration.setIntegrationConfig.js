@@ -53,6 +53,10 @@ async function setIntegrationConfig(service, config) {
   );
   const checkChosenHouses = writesHouseField && service.manifest.location !== true;
   const storedConfig = checkChosenHouses ? await this.getIntegrationConfig(service) : {};
+  // the unchanged write-backs of a `houses` field are never persisted: a
+  // real no-op, which cannot restore a stale value over a choice the user
+  // saved in between
+  const keysToSave = [];
   keys.forEach((key) => {
     if (!CONFIG_KEY_REGEX.test(key)) {
       throw new BadParameters(`config.${key}: keys must match [a-z0-9_]`);
@@ -75,11 +79,12 @@ async function setIntegrationConfig(service, config) {
     if (field) {
       validateConfigValue(field, config[key], dynamicOptions);
     }
+    keysToSave.push(key);
   });
   // t_variable names must be uppercase: keys are uppercased at write time
   // and lowercased back at read time (see getIntegrationConfig)
   await Promise.all(
-    keys.map((key) => this.variable.setValue(key.toUpperCase(), JSON.stringify(config[key]), service.id)),
+    keysToSave.map((key) => this.variable.setValue(key.toUpperCase(), JSON.stringify(config[key]), service.id)),
   );
 }
 
