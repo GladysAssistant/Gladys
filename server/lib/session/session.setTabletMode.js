@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { NotFoundError } = require('../../utils/coreErrors');
+const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
 
 /**
  * @description Set tablet model.
@@ -12,6 +12,11 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * setTabletMode('375223b3-71c6-4b61-a346-0a9d5baf12b4', '0a5f7305-4faf-42b3-aeb2-fbc0217c4855');
  */
 async function setTabletMode(userId, sessionId, tabletMode, houseSelector) {
+  // requests coming through Gladys Plus or an API key have no local session
+  if (!sessionId) {
+    throw new BadParameters('Tablet mode requires a local session');
+  }
+
   const session = await db.Session.findOne({
     attributes: ['id'],
     where: {
