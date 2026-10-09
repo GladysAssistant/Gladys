@@ -1,3 +1,5 @@
+const { SERVICE_STATUS } = require('../../utils/constants');
+
 // Docker label used to find back integration containers (reconciliation
 // at boot and after a backup restore).
 const EXTERNAL_INTEGRATION_LABEL = 'io.gladysassistant.external-integration';
@@ -70,6 +72,10 @@ const SUB_CONTAINER_ENV_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_ENV';
 // The service-scoped variables the core writes for its own needs, next to the
 // config of the integration (same service_id, no user_id): an account field
 // may not declare them as credential_keys, a disconnect must never reach them.
+// The statuses of an integration whose container is meant to be alive: the
+// health check supervises them, and a disconnect stops and restarts them so
+// the session the integration holds in memory does not outlive its tokens.
+const SUPERVISED_STATUSES = [SERVICE_STATUS.LOADING, SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
 const CORE_SERVICE_VARIABLES = [
   SUB_CONTAINER_PORTS_VARIABLE,
   SUB_CONTAINER_DESIRED_VARIABLE,
@@ -660,6 +666,7 @@ module.exports = {
   ACCOUNT_FIELD_TYPES,
   CORE_SERVICE_VARIABLES,
   MAX_CREDENTIAL_KEYS,
+  SUPERVISED_STATUSES,
   DYNAMIC_SOURCES,
   MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
