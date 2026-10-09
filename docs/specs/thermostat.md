@@ -307,6 +307,8 @@ A single `NEW_STATE` per feature tells the widget what happened, whoever caused 
 
 **A stopped thermostat stays drawn as stopped, whatever is written on its other features.** A preset written while it is off — by a scene or the API — is stored, and arms a hold, but the loop skips a stopped thermostat: nothing is applied until its mode is handed back. The widget therefore does not take that preset's event, nor the hold's, as a change of what the machine does: it re-reads the device, keeps Off lit, and shows the stored preset outlined as the one it will start back on. A hold carried by a stopped thermostat is likewise ignored on a reload. A `NEW_STATE` on the `mode` feature made outside the card — a scene, the API, another dashboard — rebuilds the card the way a reload does; the card's own mode writes are recognised by their value and skipped. Starting a stopped thermostat from its banner rebuilds it the same way, so the preset and hold it starts on light up without a reload.
 
+**Stopped is read from the mode, never from the preset.** A programme point on `off` lights Off too, but the thermostat is following its programme: the server cuts the switch, or stops the real device, and leaves the thermostat's own `mode` alone. The banner names that point like any other — "Off until 06:30" — and offers no way back to a programme it never left. Deriving the stopped banner from the preset showed "Back to the schedule" on every `off` point, the gaps of a new schedule included, and the button then did nothing.
+
 ## E. Weekly schedules: transition points, owned by a house
 
 ### E.0 Why not intervals

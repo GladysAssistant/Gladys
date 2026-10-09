@@ -1337,7 +1337,14 @@ class ThermostatBox extends Component {
                   // Announcing an hour here promises a return that will not
                   // happen — and the cross is the only way back to the
                   // programme, since every preset arms a hold instead.
-                  const stopped = resolvedPresetKey === 'off';
+                  //
+                  // Stopped is the mode, not the preset: a programme point on
+                  // `off` lights Off too, yet the thermostat is following the
+                  // programme, and that point ends at the next one like any
+                  // other ("Off until 06:30"). Reading it from the preset
+                  // offered "Back to the schedule" on a thermostat already
+                  // back on it, and the button then did nothing.
+                  const stopped = this.isStopped();
                   const exitStoppedLabel = hasSchedule
                     ? (t2 && t2.backToSchedule) || ''
                     : (t2 && t2.resumeFromStopped) || '';
