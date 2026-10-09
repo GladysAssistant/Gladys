@@ -25,7 +25,7 @@ const getDisplayName = (selector, integration) => {
 };
 
 const ExternalIntegrationPage = ({ selector, integration, user, children }) => {
-  // communication, weather and provider integrations have no device screens
+  // communication, weather, calendar and provider integrations have no device screens
   // (dedicated provider APIs or capability-only contracts, not device
   // controllers): the generic page branches by type and only shows
   // Configuration, Supervision and Logs. An unknown type (metadata still

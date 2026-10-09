@@ -1082,6 +1082,7 @@
         "containerStopped": "Stopped",
         "openButton": "Open",
         "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
+        "uninstallCalendarWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed, and the calendars it created will be deleted, with their events, for every user of the household — not only yours.",
         "uninstallEnergyWarning": "This integration prices energy contracts itself: the contracts it prices will stop being priced once it is uninstalled (their existing costs are kept).",
         "confirmUninstallButton": "Yes, uninstall",
         "cancelUninstallButton": "Cancel",
@@ -1191,6 +1192,7 @@
         "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
         "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
         "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant).",
+        "calendarInfoText": "This integration is a calendar provider: once installed, it will create calendars and events in Gladys for the users who enable it with their own account.",
         "widgetsTitle": "Dashboard widgets",
         "widgetsText": "This integration provides the following widgets, available to every user in the dashboard editor:",
         "energyContractsTitle": "Energy contracts",
@@ -1281,6 +1283,22 @@
         "saveKeyError": "There was an error saving the Open API key.",
         "notAvailableText": "Webhooks are not active yet: save your Open API key to activate them.",
         "urlsText": "Webhook URLs (the integration registers them automatically when possible; some services require pasting them in the vendor console). These URLs contain your key: share them only with the third-party service."
+      },
+      "myCalendars": {
+        "title": "My calendars",
+        "description": "This integration creates calendars and events in Gladys for the users who enable it. Enable it with your own account to see its calendars in your calendar view; disabling it deletes your calendars from Gladys (they stay untouched at the provider).",
+        "enableButton": "Enable for me",
+        "saveButton": "Save",
+        "disableButton": "Disable and delete my calendars",
+        "disableConfirmText": "Your calendars from this integration and their events will be deleted from Gladys. The provider-side calendars are not touched, and re-enabling restores everything at the next sync.",
+        "disableConfirmButton": "Delete my calendars",
+        "cancelButton": "Cancel",
+        "saveError": "There was an error saving your account.",
+        "saveSuccess": "Your account was saved.",
+        "noCalendars": "No calendar yet: the integration will push your calendars after its next synchronization.",
+        "syncLabel": "Synchronize this calendar",
+        "sharedLabel": "Share with the household",
+        "sharedHelp": "A shared calendar is visible to the whole household and can trigger scenes."
       },
       "contactProfile": {
         "title": "My account",

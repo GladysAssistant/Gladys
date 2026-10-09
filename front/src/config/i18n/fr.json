@@ -1082,6 +1082,7 @@
         "containerStopped": "Arrêté",
         "openButton": "Ouvrir",
         "uninstallWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés. Les appareils créés par cette intégration resteront dans Gladys jusqu’à ce que vous les supprimiez.",
+        "uninstallCalendarWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés, et les calendriers qu’elle a créés seront supprimés avec leurs événements, pour tous les utilisateurs du foyer — pas seulement les vôtres.",
         "uninstallEnergyWarning": "Cette intégration calcule elle-même le coût de contrats d'énergie : les contrats qu'elle tarife ne seront plus calculés une fois désinstallée (leurs coûts existants sont conservés).",
         "confirmUninstallButton": "Oui, désinstaller",
         "cancelUninstallButton": "Annuler",
@@ -1191,6 +1192,7 @@
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
         "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
         "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant).",
+        "calendarInfoText": "Cette intégration est un fournisseur de calendriers : une fois installée, elle créera des calendriers et des événements dans Gladys pour les utilisateurs qui l'activent avec leur propre compte.",
         "widgetsTitle": "Widgets de tableau de bord",
         "widgetsText": "Cette intégration fournit les widgets suivants, disponibles pour tous les utilisateurs dans l'éditeur de tableau de bord :",
         "energyContractsTitle": "Contrats d’énergie",
@@ -1281,6 +1283,22 @@
         "saveKeyError": "Une erreur est survenue lors de l'enregistrement de la clé Open API.",
         "notAvailableText": "Les webhooks ne sont pas encore actifs : enregistrez votre clé Open API pour les activer.",
         "urlsText": "URLs de webhook (l'intégration les enregistre automatiquement quand c'est possible ; certains services demandent de les coller dans la console du fabricant). Ces URLs contiennent votre clé : ne les partagez qu'avec le service tiers."
+      },
+      "myCalendars": {
+        "title": "Mes calendriers",
+        "description": "Cette intégration crée des calendriers et des événements dans Gladys pour les utilisateurs qui l'activent. Activez-la avec votre propre compte pour voir ses calendriers dans votre vue calendrier ; la désactiver supprime vos calendriers de Gladys (ils restent intacts chez le fournisseur).",
+        "enableButton": "Activer pour moi",
+        "saveButton": "Enregistrer",
+        "disableButton": "Désactiver et supprimer mes calendriers",
+        "disableConfirmText": "Vos calendriers issus de cette intégration et leurs événements seront supprimés de Gladys. Les calendriers chez le fournisseur ne sont pas touchés, et une réactivation restaure tout à la prochaine synchronisation.",
+        "disableConfirmButton": "Supprimer mes calendriers",
+        "cancelButton": "Annuler",
+        "saveError": "Une erreur est survenue lors de l'enregistrement de votre compte.",
+        "saveSuccess": "Votre compte a été enregistré.",
+        "noCalendars": "Aucun calendrier pour le moment : l'intégration poussera vos calendriers à sa prochaine synchronisation.",
+        "syncLabel": "Synchroniser ce calendrier",
+        "sharedLabel": "Partager avec le foyer",
+        "sharedHelp": "Un calendrier partagé est visible par tout le foyer et peut déclencher des scènes."
       },
       "contactProfile": {
         "title": "Mon compte",

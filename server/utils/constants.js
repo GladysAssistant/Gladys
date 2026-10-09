@@ -434,6 +434,12 @@ const SERVICE_TYPES = {
   EXTERNAL: 'external',
 };
 
+const CALENDAR_TYPES = {
+  CALDAV: 'CALDAV',
+  WEBCAL: 'WEBCAL',
+  EXTERNAL: 'EXTERNAL',
+};
+
 // Sentinel value of the `service` property of the message scene actions
 // ("send message", "send message with camera", "ask the AI"): keep the
 // message in the Gladys conversation only, without forwarding it to a single
@@ -464,6 +470,12 @@ const INTEGRATION_CATALOG_CATEGORIES = [
   'assistants',
   'services',
 ];
+
+// The timezone of the instance when the TIMEZONE system setting is not set: the
+// scene engine evaluates its triggers in it, and the full-day events of the
+// calendar integrations are stored at its midnights — one constant, so that
+// both stay aligned.
+const DEFAULT_TIMEZONE = 'Europe/Paris';
 
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
@@ -2019,6 +2031,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   BACKUP: {
     DOWNLOADED: 'backup.downloaded',
   },
+  CALENDAR: {
+    UPDATED: 'calendar.updated',
+  },
   DEVICE: {
     NEW_STATE: 'device.new-state',
     NEW_STRING_STATE: 'device.new-string-state',
@@ -2163,6 +2178,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
     WEBHOOK_REQUEST: 'external-integration.webhook.request',
     WEBHOOK_UPDATED: 'external-integration.webhook-updated',
+    CALENDAR_ACCOUNT_UPDATED: 'external-integration.calendar.account-updated',
     SCENE_ACTION_RUN: 'external-integration.scene-action.run',
     // dashboard widgets declared by integrations (capabilities/dashboard-widgets.md)
     WIDGET_GET: 'external-integration.widget.get',
@@ -2542,10 +2558,12 @@ module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 module.exports.SERVICE_TYPES = SERVICE_TYPES;
 module.exports.MESSAGE_GLADYS_ONLY_SERVICE = MESSAGE_GLADYS_ONLY_SERVICE;
 module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
+module.exports.CALENDAR_TYPES = CALENDAR_TYPES;
 
 module.exports.INTEGRATION_CATALOG_CATEGORIES = INTEGRATION_CATALOG_CATEGORIES;
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
+module.exports.DEFAULT_TIMEZONE = DEFAULT_TIMEZONE;
 
 module.exports.MDNS = MDNS;
 module.exports.normalizeMdnsHostname = normalizeMdnsHostname;

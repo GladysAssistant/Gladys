@@ -1082,6 +1082,7 @@
         "containerStopped": "Gestoppt",
         "openButton": "Öffnen",
         "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
+        "uninstallCalendarWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt, und die von ihr erstellten Kalender werden mit ihren Terminen gelöscht, für alle Benutzer des Haushalts – nicht nur deine.",
         "uninstallEnergyWarning": "Diese Integration berechnet die Kosten von Energieverträgen selbst: Die von ihr berechneten Verträge werden nach der Deinstallation nicht mehr berechnet (ihre bestehenden Kosten bleiben erhalten).",
         "confirmUninstallButton": "Ja, deinstallieren",
         "cancelUninstallButton": "Abbrechen",
@@ -1191,6 +1192,7 @@
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
         "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "calendarInfoText": "Diese Integration ist ein Kalenderanbieter: Nach der Installation erstellt sie Kalender und Termine in Gladys für die Benutzer, die sie mit ihrem eigenen Konto aktivieren.",
         "widgetsTitle": "Dashboard-Widgets",
         "widgetsText": "Diese Integration stellt die folgenden Widgets bereit, die allen Benutzern im Dashboard-Editor zur Verfügung stehen:",
         "energyContractsTitle": "Energieverträge",
@@ -1281,6 +1283,22 @@
         "saveKeyError": "Beim Speichern des Open-API-Schlüssels ist ein Fehler aufgetreten.",
         "notAvailableText": "Die Webhooks sind noch nicht aktiv: Speichern Sie Ihren Open-API-Schlüssel, um sie zu aktivieren.",
         "urlsText": "Webhook-URLs (die Integration registriert sie automatisch, wenn möglich; manche Dienste verlangen das Einfügen in die Anbieterkonsole). Diese URLs enthalten Ihren Schlüssel: Teilen Sie sie nur mit dem Drittanbieterdienst."
+      },
+      "myCalendars": {
+        "title": "Meine Kalender",
+        "description": "Diese Integration erstellt Kalender und Termine in Gladys für die Benutzer, die sie aktivieren. Aktivieren Sie sie mit Ihrem eigenen Konto, um ihre Kalender in Ihrer Kalenderansicht zu sehen; das Deaktivieren löscht Ihre Kalender aus Gladys (beim Anbieter bleiben sie unberührt).",
+        "enableButton": "Für mich aktivieren",
+        "saveButton": "Speichern",
+        "disableButton": "Deaktivieren und meine Kalender löschen",
+        "disableConfirmText": "Ihre Kalender aus dieser Integration und deren Termine werden aus Gladys gelöscht. Die Kalender beim Anbieter bleiben unberührt, und eine erneute Aktivierung stellt bei der nächsten Synchronisierung alles wieder her.",
+        "disableConfirmButton": "Meine Kalender löschen",
+        "cancelButton": "Abbrechen",
+        "saveError": "Beim Speichern Ihres Kontos ist ein Fehler aufgetreten.",
+        "saveSuccess": "Ihr Konto wurde gespeichert.",
+        "noCalendars": "Noch kein Kalender: die Integration überträgt Ihre Kalender bei der nächsten Synchronisierung.",
+        "syncLabel": "Diesen Kalender synchronisieren",
+        "sharedLabel": "Mit dem Haushalt teilen",
+        "sharedHelp": "Ein geteilter Kalender ist für den ganzen Haushalt sichtbar und kann Szenen auslösen."
       },
       "contactProfile": {
         "title": "Mein Konto",

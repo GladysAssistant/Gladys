@@ -237,11 +237,12 @@ class Integration extends Component {
     const { user = {}, category } = this.props;
     const isAdmin = user.role === USER_ROLE.ADMIN;
     const language = user.language || 'en';
-    // a non-admin user only sees the installed communication integrations:
-    // the device screens and the store are admin-only (the server already
-    // returns nothing else, this is the same rule on the display side)
+    // a non-admin user only sees the installed communication and calendar
+    // integrations: the device screens and the store are admin-only (the
+    // server already returns nothing else, this is the same rule on the
+    // display side)
     const installed = (this.state.externalInstalled || []).filter(
-      integration => isAdmin || get(integration, 'manifest.type') === 'communication'
+      integration => isAdmin || ['communication', 'calendar'].includes(get(integration, 'manifest.type'))
     );
     const store = isAdmin ? this.state.externalStore || [] : [];
 
@@ -280,7 +281,7 @@ class Integration extends Component {
       return manifestCategories.filter(key => KNOWN_CATEGORY_KEYS.has(key));
     };
 
-    // communication, weather and provider integrations have no device
+    // communication, weather, calendar and provider integrations have no device
     // screens: their card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
       TYPES_WITHOUT_DEVICE_SCREENS.includes(manifest.type)

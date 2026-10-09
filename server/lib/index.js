@@ -91,6 +91,7 @@ function Gladys(params = {}) {
     energyContract,
     params.jwtSecret,
     cache,
+    calendar,
   );
   energyContract.externalIntegration = externalIntegration;
   const gateway = new Gateway(

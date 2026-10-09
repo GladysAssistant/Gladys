@@ -20,10 +20,8 @@ const { duplicate } = require('./scene.duplicate');
 const { command } = require('./scene.command');
 const { getTag } = require('./scene.getTag');
 
-const { EVENTS, INTENTS } = require('../../utils/constants');
+const { EVENTS, INTENTS, DEFAULT_TIMEZONE } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
-
-const DEFAULT_TIMEZONE = 'Europe/Paris';
 
 const SceneManager = function SceneManager(
   stateManager,
