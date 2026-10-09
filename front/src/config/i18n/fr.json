@@ -3649,7 +3649,7 @@
         "noSlots": "Aucune plage horaire. Cliquez sur \"Ajouter une plage\" pour commencer.",
         "followedBy": "Suivi par",
         "weekLabel": "Aperçu de la semaine",
-        "emptyScheduleWarning": "Ce planning n’a aucun créneau : il ne pilote rien. Les thermostats qui le suivent restent sur leur preset courant.",
+        "emptyScheduleWarning": "Ce planning n’a aucun créneau : il ne pilote rien. Les thermostats qui le suivent gardent leur consigne actuelle.",
         "emptySaveWarning": "Ce planning n’a aucun créneau : il ne pilotera rien, et les thermostats qui le suivent resteront sur leur preset courant.",
         "saveEmptyButton": "Enregistrer quand même",
         "backToEditingButton": "Ajouter un créneau",

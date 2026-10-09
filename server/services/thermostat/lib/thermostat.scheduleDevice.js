@@ -1,5 +1,66 @@
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
+const { DEVICE_FEATURE_TYPES, THERMOSTAT_MODE } = require('../../../utils/constants');
+const { getFeature, getPreset, isStopped, getManualHold, setManualHold, savePreset } = require('./thermostat.state');
+const { getScheduleBySelector } = require('./thermostat.getSchedules');
+
+/**
+ * @description Leave a thermostat that no longer follows a programme doing what
+ * the programme had it do. Without it the thermostat kept `schedule` on its
+ * preset feature with no point to resolve: what it would do then was nothing the
+ * user could see — and at night, on an Off point, it started heating again on
+ * the setpoint of the previous point.
+ *
+ * - On a point naming a preset, that preset is written on the feature: the
+ *   widget lights it, and it stays tied to the preset's temperature.
+ * - On an Off point, the thermostat is stopped: the widget shows it, with the
+ *   button that starts it again.
+ * - A hold running to the programme's next point has no point left to run to:
+ *   like any hold taken on a thermostat with no schedule, it now lasts.
+ *
+ * A stopped thermostat, or one on a preset of its own, already does what it
+ * shows, and is left alone. So is one whose schedule had no point in force.
+ * @param {string} deviceId - The thermostat's id.
+ * @param {object|null} current - The point that was in force, as getSchedules resolves it.
+ * @returns {Promise<void>}
+ * @example
+ * await releaseFromProgramme.call(thermostatHandler, device.id, { preset: 'eco' });
+ */
+async function releaseFromProgramme(deviceId, current) {
+  const row = await db.Device.findOne({
+    where: { id: deviceId },
+    include: [
+      { model: db.DeviceFeature, as: 'features' },
+      { model: db.DeviceParam, as: 'params' },
+    ],
+  });
+  const device = row.get({ plain: true });
+  if (isStopped(device)) {
+    return;
+  }
+  const hold = getManualHold(device);
+  if (hold) {
+    if (hold.until) {
+      await setManualHold.call(this, device, hold.setpoint, null);
+    }
+    return;
+  }
+  const preset = getPreset(device);
+  if ((preset !== 'schedule' && preset !== null) || !current) {
+    return;
+  }
+  if (current.preset === 'off') {
+    const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
+    if (!modeFeature) {
+      return;
+    }
+    await this.gladys.device.saveState(modeFeature, THERMOSTAT_MODE.OFF);
+  } else {
+    await savePreset.call(this, device, current.preset);
+  }
+  logger.info(`Thermostat: "${device.selector}" left on "${current.preset}", the point its programme was on`);
+  this.triggerApplySchedules();
+}
 
 /**
  * @description Resolve a schedule and a thermostat by selector, checking the
@@ -79,7 +140,16 @@ async function detachScheduleFromDevice(scheduleSelector, deviceSelector) {
   });
 
   logger.info(`Thermostat: "${deviceSelector}" no longer follows schedule "${scheduleSelector}"`);
-  await db.ThermostatScheduleDevice.destroy({ where: { device_id: device.id, schedule_id: schedule.id } });
+  const removed = await db.ThermostatScheduleDevice.destroy({
+    where: { device_id: device.id, schedule_id: schedule.id },
+  });
+  if (removed > 0) {
+    const { current } = await getScheduleBySelector(scheduleSelector);
+    await releaseFromProgramme.call(this, device.id, current);
+    // The widgets read which schedule a thermostat follows from the schedule
+    // list: without a reload they kept the banner of the one just left.
+    this.broadcastConfigUpdated();
+  }
 }
 
 /**
@@ -123,6 +193,7 @@ async function getScheduleOfDevice(deviceId) {
 module.exports = {
   attachScheduleToDevice,
   detachScheduleFromDevice,
+  releaseFromProgramme,
   resolveScheduleAndDevice,
   followsSchedule,
   getScheduleOfDevice,

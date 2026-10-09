@@ -796,23 +796,60 @@ describe('thermostat.regulateDevice - resilience', () => {
     expect(gladys.device.setValue.firstCall.args[2]).to.equal(7);
   });
 
-  it('should fall back on the preset it carries when the schedule has no point', async () => {
-    // A schedule with no transition resolves to nothing, so the preset the
-    // thermostat carries applies — here `schedule` itself, whose setpoint is the
-    // shared fallback rather than a temperature of its own.
+  it('should keep regulating on its setpoint when the schedule has no point', async () => {
+    // A schedule with no transition resolves to nothing, and `schedule` names no
+    // temperature: the thermostat keeps the setpoint it has. It used to resolve
+    // `schedule` as a preset and fall back on 20 °C — which, at 18 °C in the room
+    // and a setpoint of 17, started the heating.
+    const mod = load({ selector: 'my-schedule', transitions: [] });
+    const gladys = buildGladys({ features: standardFeatures({ temp: 18, switchOn: true }) });
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'living-room',
+      features: [setpointFeature({ last_value: 17 }), presetFeature('schedule')],
+      params: baseParams(),
+    });
+
+    assert.notCalled(gladys.device.saveState);
+    const [, , value] = gladys.device.setValue.firstCall.args;
+    expect(value).to.equal(0);
+  });
+
+  it('should leave the switch alone when the schedule has no point and there is no setpoint', async () => {
     const mod = load({ selector: 'my-schedule', transitions: [] });
     const gladys = buildGladys({ features: standardFeatures({ temp: 15 }) });
 
     await regulate(mod, gladys, {
       id: 'device-id',
       selector: 'living-room',
-      features: [setpointFeature(), presetFeature('schedule')],
+      features: [setpointFeature({ last_value: null }), presetFeature('schedule')],
       params: baseParams(),
     });
 
-    // 15 °C against the fallback setpoint: the heating runs.
-    const [, , value] = gladys.device.setValue.firstCall.args;
-    expect(value).to.equal(1);
+    assert.notCalled(gladys.device.setValue);
+    assert.notCalled(gladys.device.saveState);
+  });
+
+  it('should write nothing to an external thermostat when the schedule has no point', async () => {
+    // The real thermostat keeps regulating on the setpoint it has: nothing to
+    // hand it, and no 20 °C to invent.
+    const mod = load({ selector: 'my-schedule', transitions: [] });
+    const gladys = buildGladys();
+
+    await regulate(mod, gladys, {
+      id: 'device-id',
+      selector: 'netatmo',
+      features: [presetFeature('schedule')],
+      params: baseParams({
+        THERMOSTAT_TYPE: 'external',
+        THERMOSTAT_TARGET_FEATURE: 'netatmo-setpoint',
+        THERMOSTAT_MODE_FEATURE: 'netatmo-mode',
+        THERMOSTAT_SWITCH_FEATURE: '',
+      }),
+    });
+
+    assert.notCalled(gladys.device.setValue);
   });
 
   it('should report a running cooling thermostat as cooling', async () => {

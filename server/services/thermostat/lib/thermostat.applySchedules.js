@@ -712,11 +712,28 @@ async function regulateDevice(
     return;
   }
 
+  // `schedule` with no point in force: a schedule with no point, or none followed
+  // any more — an empty programme, a scene writing Schedule, a hold expiring on
+  // either. The programme names no temperature, so the thermostat keeps the one
+  // it has: the real one keeps regulating on its own, and a virtual one on its
+  // setpoint feature. Resolving `schedule` as a preset fell back on 20 °C, and
+  // heated a room nobody had asked to heat. Detaching or deleting a schedule
+  // goes further, and leaves the point that was in force (see scheduleDevice).
+  // The preset is still pushed below: a hold expiring here has to tell the
+  // widgets it is over.
+  const keepsItsSetpoint = targetPreset === 'schedule';
+  const hasSetpoint = !external && thermostatFeature.last_value !== null && thermostatFeature.last_value !== undefined;
+
   // Enforce the target setpoint, only when it changed. On a virtual thermostat
   // the setpoint is this service's own feature, so it is persisted directly; on
   // an external one it belongs to the real device, and the write is routed
   // through the core to the owning integration.
-  const newSetpoint = getSetpointForPreset(targetPreset, config);
+  let newSetpoint = null;
+  if (!keepsItsSetpoint) {
+    newSetpoint = getSetpointForPreset(targetPreset, config);
+  } else if (hasSetpoint) {
+    newSetpoint = thermostatFeature.last_value;
+  }
   if (newSetpoint !== null && !external && thermostatFeature.last_value !== newSetpoint) {
     try {
       await gladys.device.saveState(thermostatFeature, newSetpoint);
@@ -758,6 +775,11 @@ async function regulateDevice(
       await savePreset.call({ gladys }, device, targetPreset, manualJustExpired);
       logger.info(`Thermostat schedule: preset "${targetPreset}" applied to ${selector}`);
     }
+  }
+
+  if (keepsItsSetpoint && !hasSetpoint) {
+    logger.debug(`Thermostat schedule: no point in force for ${selector}, it keeps its setpoint`);
+    return;
   }
 
   if (external) {
