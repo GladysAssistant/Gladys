@@ -98,6 +98,8 @@ class ThermostatBox extends Component {
   lastActivePreset = null;
   expectedSetpoint = null;
   expectedSetpointTimer = null;
+  // The mode values this card has just written, each with the timer that forgets it.
+  expectedModes = new Map();
 
   getConfig = () => ({ ...this.props.box, ...(this.state.remoteConfig || {}) });
 
@@ -277,7 +279,10 @@ class ThermostatBox extends Component {
   // core, which saves it itself for a feature without feedback. The value is
   // therefore remembered for a few seconds rather than for one event: the second
   // echo rebuilt the card from a device read taken before the preset and the
-  // setpoint written next had landed, and the card ended on neither.
+  // setpoint written next had landed, and the card ended on neither. Every value
+  // written is remembered on its own: tapping Off then Comfort before the Off
+  // echoes arrived took them for a stop made elsewhere, and the reload they
+  // started left the card on Off while the thermostat heated.
   //
   // The mode is also held as pending from the tap, in the same render as
   // whatever the tap lit: the banner, the gauge and the event handlers read a
@@ -285,27 +290,28 @@ class ThermostatBox extends Component {
   // A failed write lets it go, and the device's mode shows again.
   writeMode = async value => {
     const cfg = this.state.remoteConfig;
-    this.expectedMode = value;
-    if (this.expectedModeTimer) {
-      clearTimeout(this.expectedModeTimer);
-    }
-    this.expectedModeTimer = setTimeout(this.forgetExpectedMode, 5000);
+    this.forgetExpectedMode(value);
+    this.expectedModes.set(
+      value,
+      setTimeout(() => this.forgetExpectedMode(value), 5000)
+    );
     this.setState({ pendingMode: value });
     const written = await this.writeFeature(cfg && cfg.modeFeature, value);
     if (!written) {
       // No echo is coming: a stop or a start made elsewhere must not be skipped.
-      this.forgetExpectedMode();
+      this.forgetExpectedMode(value);
       this.setState({ pendingMode: null });
     }
     return written;
   };
 
-  forgetExpectedMode = () => {
-    this.expectedMode = null;
-    if (this.expectedModeTimer) {
-      clearTimeout(this.expectedModeTimer);
-      this.expectedModeTimer = null;
-    }
+  // Forget one value the card wrote, or all of them.
+  forgetExpectedMode = (value = undefined) => {
+    const values = value === undefined ? [...this.expectedModes.keys()] : [value];
+    values.forEach(candidate => {
+      clearTimeout(this.expectedModes.get(candidate));
+      this.expectedModes.delete(candidate);
+    });
   };
 
   // The manual hold, as the device carries it. `until` is null on a permanent
@@ -562,7 +568,7 @@ class ThermostatBox extends Component {
   // them (see writeMode): the click that made them already put the card in the
   // right state.
   handleModeChanged = value => {
-    if (this.expectedMode !== null && this.expectedMode !== undefined && Number(value) === this.expectedMode) {
+    if (this.expectedModes.has(Number(value))) {
       return;
     }
     this.setState({ pendingMode: null });
@@ -1059,9 +1065,9 @@ class ThermostatBox extends Component {
     this._onUp = async () => {
       this.stopDrag();
       if (presetOnRelease) {
-        await this.startOnPreset(presetOnRelease);
+        this.startingFromOff = this.startOnPreset(presetOnRelease);
       }
-      await this.sendSetpoint(lastDragSetpoint);
+      await this.sendSetpointOnceStarted(lastDragSetpoint);
       // A hold only expires when a schedule would otherwise take it over.
       if (this.state.activeSchedule) this.showManualCountdown();
     };
@@ -1133,12 +1139,20 @@ class ThermostatBox extends Component {
       this.setState({ setpoint: newSetpoint, isManualMode: true, manualSetpointOverride: true });
     }
     if (this.state.activeSchedule) this.showManualCountdown();
+    await this.sendSetpointOnceStarted(newSetpoint);
+  };
+
+  // A setpoint from + / − or the dial goes out once a start from a stop in
+  // flight — this gesture's or an earlier one's — has landed its preset. The dial
+  // used to send at once: after a tap on + from a stop, a drag released before
+  // the preset landed was replaced by the preset's own hold.
+  sendSetpointOnceStarted = async value => {
     const startingFromOff = this.startingFromOff;
     if (startingFromOff) {
       await startingFromOff;
       if (this.startingFromOff === startingFromOff) this.startingFromOff = null;
     }
-    await this.sendSetpoint(newSetpoint);
+    await this.sendSetpoint(value);
   };
 
   // Leaving a stop from the dial or the + and − buttons: start the thermostat

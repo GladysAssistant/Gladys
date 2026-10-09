@@ -3650,7 +3650,7 @@
         "followedBy": "Suivi par",
         "weekLabel": "Aperçu de la semaine",
         "emptyScheduleWarning": "Ce planning n’a aucun créneau : il ne pilote rien. Les thermostats qui le suivent gardent leur consigne actuelle.",
-        "emptySaveWarning": "Ce planning n’a aucun créneau : il ne pilotera rien, et les thermostats qui le suivent resteront sur leur preset courant.",
+        "emptySaveWarning": "Ce planning n’a aucun créneau : il ne pilotera rien, et les thermostats qui le suivent garderont leur consigne actuelle.",
         "saveEmptyButton": "Enregistrer quand même",
         "backToEditingButton": "Ajouter un créneau",
         "followersLabel": "Thermostats qui suivent ce planning",

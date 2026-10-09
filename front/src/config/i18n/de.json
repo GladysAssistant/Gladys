@@ -3650,7 +3650,7 @@
         "followedBy": "Befolgt von",
         "weekLabel": "Wochenüberblick",
         "emptyScheduleWarning": "Dieser Zeitplan hat kein Zeitfenster und steuert daher nichts. Die Thermostate, die ihm folgen, behalten ihre aktuelle Solltemperatur.",
-        "emptySaveWarning": "Dieser Zeitplan hat kein Zeitfenster: Er steuert nichts, und die Thermostate, die ihm folgen, bleiben auf ihrem aktuellen Preset.",
+        "emptySaveWarning": "Dieser Zeitplan hat kein Zeitfenster: Er steuert nichts, und die Thermostate, die ihm folgen, behalten ihre aktuelle Solltemperatur.",
         "saveEmptyButton": "Trotzdem speichern",
         "backToEditingButton": "Zeitfenster hinzufügen",
         "followersLabel": "Thermostate, die diesem Zeitplan folgen",

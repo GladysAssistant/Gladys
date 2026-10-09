@@ -3650,7 +3650,7 @@
         "followedBy": "Seguida por",
         "weekLabel": "Vista de la semana",
         "emptyScheduleWarning": "Esta programación no tiene ningún tramo, así que no controla nada. Los termostatos que la siguen mantienen su consigna actual.",
-        "emptySaveWarning": "Esta programación no tiene ningún tramo: no controlará nada y los termostatos que la siguen se quedarán en su preset actual.",
+        "emptySaveWarning": "Esta programación no tiene ningún tramo: no controlará nada y los termostatos que la siguen mantendrán su consigna actual.",
         "saveEmptyButton": "Guardar de todos modos",
         "backToEditingButton": "Añadir un tramo",
         "followersLabel": "Termostatos que siguen esta programación",

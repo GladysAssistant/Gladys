@@ -3650,7 +3650,7 @@
         "followedBy": "Followed by",
         "weekLabel": "Week at a glance",
         "emptyScheduleWarning": "This schedule has no slot, so it drives nothing. The thermostats following it keep their current setpoint.",
-        "emptySaveWarning": "This schedule has no slot: it will drive nothing, and the thermostats following it will stay on their current preset.",
+        "emptySaveWarning": "This schedule has no slot: it will drive nothing, and the thermostats following it will keep their current setpoint.",
         "saveEmptyButton": "Save anyway",
         "backToEditingButton": "Add a slot",
         "followersLabel": "Thermostats following this schedule",
