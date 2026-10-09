@@ -45,21 +45,24 @@ class ConfigField extends Component {
   };
 
   // dropping the tokens is not undone by a click: re-linking means going
-  // through the provider again, so the button asks for a confirmation first
+  // through the provider again, so the button asks for a confirmation first.
+  // The confirmation is armed for the connection status it was clicked on: a
+  // status update replaces that object, so a confirmation armed before the
+  // account went disconnected is never shown again once it comes back
   armOAuthDisconnect = e => {
     e.preventDefault();
-    this.setState({ disconnectConfirming: true });
+    this.setState({ disconnectArmedFor: this.props.connectionStatus });
   };
 
   cancelOAuthDisconnect = e => {
     e.preventDefault();
-    this.setState({ disconnectConfirming: false });
+    this.setState({ disconnectArmedFor: null });
   };
 
   onOAuthDisconnect = async e => {
     e.preventDefault();
     await this.props.disconnectOAuth(this.props.field);
-    this.setState({ disconnectConfirming: false });
+    this.setState({ disconnectArmedFor: null });
   };
 
   copyRedirectUri = async value => {
@@ -95,16 +98,6 @@ class ConfigField extends Component {
     }
     this.copyTimer = setTimeout(() => this.setState({ redirectUriCopied: false }), 2000);
   };
-
-  componentDidUpdate() {
-    // an armed confirmation must not survive the account going disconnected:
-    // when it comes back connected, the destructive button would be shown
-    // without the user having clicked Disconnect
-    const { connectionStatus } = this.props;
-    if (this.state.disconnectConfirming && !(connectionStatus && connectionStatus.connected)) {
-      this.setState({ disconnectConfirming: false });
-    }
-  }
 
   componentWillUnmount() {
     if (this.copyTimer) {
@@ -199,6 +192,7 @@ class ConfigField extends Component {
       // keyed by field: an integration may link several accounts
       const disconnectStatus = (oauthDisconnectStatuses || {})[field.key];
       const disconnecting = disconnectStatus === RequestStatus.Getting;
+      const confirming = canDisconnect && this.state.disconnectArmedFor === connectionStatus;
       return (
         <div class="form-group">
           <label class="form-label">{label}</label>
@@ -272,13 +266,13 @@ class ConfigField extends Component {
                 <Text id="integration.externalIntegration.config.oauthConnectButton" />
               </button>
             )}
-            {canDisconnect && !this.state.disconnectConfirming && (
+            {canDisconnect && !confirming && (
               <button type="button" class="btn btn-outline-danger" onClick={this.armOAuthDisconnect}>
                 <i class="fe fe-link-2 mr-1" />
                 <Text id="integration.externalIntegration.config.oauthDisconnectButton" />
               </button>
             )}
-            {canDisconnect && this.state.disconnectConfirming && (
+            {confirming && (
               <div>
                 <p class="text-muted small mb-2">
                   <Text id="integration.externalIntegration.config.oauthDisconnectConfirmText" />
