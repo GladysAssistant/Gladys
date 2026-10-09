@@ -5233,6 +5233,14 @@
     "turnOff": "Apagar",
     "close": "Cerrar"
   },
+  "vacuumControl": {
+    "openPanel": "Abrir los controles del robot",
+    "start": "Iniciar",
+    "stop": "Detener",
+    "dock": "Volver a la base",
+    "battery": "Batería",
+    "close": "Cerrar"
+  },
   "deviceFeatureAction": {
     "category": {
       "camera": {

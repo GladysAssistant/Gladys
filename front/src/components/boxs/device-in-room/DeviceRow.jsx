@@ -134,7 +134,9 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
 
 const DeviceRow = ({ children, ...props }) => {
   const { device, deviceFeature } = props;
-  const rowName = deviceFeature.new_label || getDeviceName(device, deviceFeature);
+  // A caller may name the row itself: inside the panel of a robot vacuum, the rows of its features
+  // are labelled with the feature, the panel being already titled with the robot.
+  const rowName = props.rowName || deviceFeature.new_label || getDeviceName(device, deviceFeature);
 
   // if device is a sensor, we display the sensor deviceFeature
   if (props.deviceFeature.read_only) {

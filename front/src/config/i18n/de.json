@@ -5233,6 +5233,14 @@
     "turnOff": "Ausschalten",
     "close": "Schließen"
   },
+  "vacuumControl": {
+    "openPanel": "Robotersteuerung öffnen",
+    "start": "Starten",
+    "stop": "Stoppen",
+    "dock": "Zur Ladestation",
+    "battery": "Akku",
+    "close": "Schließen"
+  },
   "deviceFeatureAction": {
     "category": {
       "camera": {
