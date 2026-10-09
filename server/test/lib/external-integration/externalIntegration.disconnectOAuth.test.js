@@ -140,6 +140,22 @@ describe('externalIntegration.disconnectOAuth', () => {
     expect(seenByStart).to.deep.equal([]);
   });
 
+  [SERVICE_STATUS.LOADING, SERVICE_STATUS.DEGRADED].forEach((status) => {
+    it(`should stop and start again an integration in the ${status} status`, async () => {
+      // its container is alive: the health check supervises it, and the
+      // process may still hold the session in memory
+      const service = await seedAccountService({ status });
+      const { externalIntegration, variable } = buildDisconnectSupervisor(service);
+      await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+
+      await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+
+      sinonAssert.calledOnceWithExactly(externalIntegration.stop, service.selector);
+      sinonAssert.calledOnceWithExactly(externalIntegration.start, service.selector);
+      expect(await storedVariableNames(service.id)).to.deep.equal([]);
+    });
+  });
+
   it('should leave a stopped integration stopped', async () => {
     const service = await seedAccountService();
     const { externalIntegration, variable } = buildDisconnectSupervisor(service);

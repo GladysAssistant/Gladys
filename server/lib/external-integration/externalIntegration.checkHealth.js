@@ -4,9 +4,7 @@ const get = require('get-value');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { SERVICE_STATUS, SERVICE_TYPES } = require('../../utils/constants');
-const { HEARTBEAT_TIMEOUT_MS } = require('./constants');
-
-const SUPERVISED_STATUSES = [SERVICE_STATUS.LOADING, SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
+const { HEARTBEAT_TIMEOUT_MS, SUPERVISED_STATUSES } = require('./constants');
 
 /**
  * @description Health check of every external integration, every 30s:

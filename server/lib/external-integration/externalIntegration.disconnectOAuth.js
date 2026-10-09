@@ -1,7 +1,7 @@
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { BadParameters } = require('../../utils/coreErrors');
-const { SERVICE_STATUS } = require('../../utils/constants');
+const { SUPERVISED_STATUSES } = require('./constants');
 const { getAccountField } = require('./externalIntegration.getAccountField');
 
 /**
@@ -11,8 +11,9 @@ const { getAccountField } = require('./externalIntegration.getAccountField');
  * form, the other off-schema state of the integration (a stable device id,
  * pairing state, caches) and the reserved GLADYS_* keys are kept.
  *
- * A running integration holds its session in memory and would write its
- * tokens back on its next refresh: it is stopped before the deletion and
+ * A live integration (LOADING, RUNNING or DEGRADED: its container is up, the
+ * health check supervises it) holds its session in memory and would write
+ * its tokens back on its next refresh: it is stopped before the deletion and
  * started again after it, so it comes back without credentials. Stopping
  * first also closes the window where a POST /config would land between the
  * read and the delete. A stopped integration is left stopped: it reads the
@@ -36,7 +37,9 @@ async function disconnectOAuth(selector, { key } = {}) {
     throw new BadParameters(`config.${key}: declares no credential_keys, it cannot be disconnected`);
   }
 
-  const wasRunning = service.status === SERVICE_STATUS.RUNNING;
+  // DEGRADED counts too: a silent WebSocket does not mean a stopped process,
+  // and the last connection status it published may still say connected
+  const wasRunning = SUPERVISED_STATUSES.includes(service.status);
   if (wasRunning) {
     await this.stop(selector);
   }
