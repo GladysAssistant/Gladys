@@ -79,6 +79,8 @@ On an external device `createDevice` keeps only the `preset` and `mode` features
 
 The hysteresis, TPI and switch params are meaningless on an external device — the real thermostat runs its own heuristic — and the edit form hides them there rather than offering settings that do nothing.
 
+The `*_FEATURE` params name a feature of another device by its selector. Migrating that device to a replacement integration rewrites them to the destination feature (`device-migration.md` B.3), as it rewrites the scenes and the dashboards: left on the source selector, the loop would find no sensor, no switch or no target once the source is deleted.
+
 The defaults for all of these live in `server/utils/thermostatConstants.js`, imported by the regulation loop, the widget and the edit form alike, so a device saved without a param is regulated exactly as the form displayed it.
 
 ### A.2 Runtime state is on the features

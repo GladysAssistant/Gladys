@@ -105,7 +105,9 @@ describe('Device.migrate', function Describe() {
     await db.EnergyContract.destroy({ where: { selector: 'migration-energy-contract' } });
     await db.Scene.destroy({ where: { selector: ['migration-scene', 'migration-scene-untouched'] } });
     await db.Dashboard.destroy({ where: { selector: 'migration-dashboard' } });
-    await db.Device.destroy({ where: { selector: ['migration-source', 'migration-destination', 'migration-child'] } });
+    await db.Device.destroy({
+      where: { selector: ['migration-source', 'migration-destination', 'migration-child', 'migration-thermostat'] },
+    });
     await db.Service.destroy({ where: { id: destinationService.id } });
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
   });
@@ -606,6 +608,45 @@ describe('Device.migrate', function Describe() {
     // than nothing at all when the history move returns early.
     const migrationJob = await db.Job.findOne({ where: { type: 'device-migrate' }, order: [['created_at', 'DESC']] });
     expect(migrationJob.data.states_migrated).to.equal(0);
+  });
+
+  it('should re-point the thermostat params naming a migrated feature', async () => {
+    // A thermostat regulating on the source sensor, and switching a feature the
+    // mapping leaves out.
+    const thermostat = await db.Device.create(
+      {
+        name: 'Migration thermostat',
+        selector: 'migration-thermostat',
+        external_id: 'thermostat:migration',
+        service_id: SEEDED_SERVICE_ID,
+        params: [
+          { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: 'migration-source-temp' },
+          { name: 'THERMOSTAT_SWITCH_FEATURE', value: 'migration-source-binary' },
+          // Same value under a name that does not reference a feature: left alone.
+          { name: 'THERMOSTAT_MODE', value: 'migration-source-temp' },
+        ],
+      },
+      { include: [{ model: db.DeviceParam, as: 'params' }] },
+    );
+    const notify = sinon.spy(deviceManager, 'notify');
+
+    await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+    });
+
+    const params = await db.DeviceParam.findAll({ where: { device_id: thermostat.id }, raw: true });
+    const valueOf = (name) => params.find((param) => param.name === name).value;
+    expect(valueOf('THERMOSTAT_TEMPERATURE_FEATURE')).to.equal('migration-destination-temp');
+    expect(valueOf('THERMOSTAT_SWITCH_FEATURE')).to.equal('migration-source-binary');
+    expect(valueOf('THERMOSTAT_MODE')).to.equal('migration-source-temp');
+    // Refreshed in the cache, and its service told, so it drops what it cached.
+    const cached = deviceManager.stateManager.get('device', 'migration-thermostat');
+    expect(cached.params.find((param) => param.name === 'THERMOSTAT_TEMPERATURE_FEATURE').value).to.equal(
+      'migration-destination-temp',
+    );
+    sinonAssert.calledWith(notify, sinon.match({ selector: 'migration-thermostat' }), 'device.update');
+    notify.restore();
   });
 
   it('should migrate a device without features and with an empty mapping', async () => {

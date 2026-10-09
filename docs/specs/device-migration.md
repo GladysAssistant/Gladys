@@ -27,7 +27,8 @@ Scoping decisions validated with the maintainer:
 | Energy price contracts (`t_energy_price.electric_meter_device_id`, device FK, `ON DELETE SET NULL`) | **Re-pointed** to the destination device, unconditionally: without it, deleting the source meter would silently detach the contracts and cost charts would lose their meter. |
 | Energy contracts (`t_energy_contract.electric_meter_device_id`, device FK, `ON DELETE CASCADE`) | **Re-pointed** to the destination device: without it, deleting the source meter would delete the user's contracts with it. A meter has one contract per date and direction (`energy-contracts.md` §4), so the migration is **refused** (`409`, before any write) when a source contract overlaps a destination contract of the same direction: the user reconciles the validity dates first. |
 | `last_value` / `last_value_string` / `last_value_changed` | **Copied only if fresher**: for each mapped pair, if the destination's `last_value_changed` is null or older than the source's, the source's three fields are copied so dashboards show a current value until the new integration publishes one. Otherwise untouched. |
-| Device params, `external_id`, selectors, names | **Never touched.** The destination device keeps its identity entirely; the migration moves data *about* the device, not the device definition. |
+| Params of **other** devices naming a mapped feature (`THERMOSTAT_*_FEATURE`, list in B.3) | **Rewritten** to the destination feature selector. A thermostat keeps its configuration as device params (`thermostat.md` A.1), including the sensors it reads and the switch it drives: left on the source selector, the regulation loop finds none of them once the source is deleted. The devices carrying them are refreshed in the caches and notified (`EVENTS.DEVICE.UPDATE`). |
+| Device params, `external_id`, selectors, names **of the source and the destination** | **Never touched.** The destination device keeps its identity entirely; the migration moves data *about* the device, not the device definition. |
 | Source device | **Deleted** at the end via the standard `device.destroy` path (service `postDelete` hooks, cache eviction, poll deregistration, `EVENTS.DEVICE.DELETE` all fire normally). |
 
 ## B. Detailed design
@@ -76,7 +77,7 @@ Response 200 (the request is awaited end-to-end; the run is also wrapped as a jo
 }
 ```
 
-### B.3 Selector rewriting (scenes and dashboards)
+### B.3 Selector rewriting (scenes, dashboards, device params)
 
 Two replacement maps are built once: `featureReplacements` (mapped source feature selector → destination feature selector) and `deviceReplacements` (source device selector → destination device selector).
 
@@ -84,6 +85,8 @@ Fields rewritten — this list is **exhaustive and must stay in sync with the Jo
 - **Scene actions** (`t_scene.actions`, array of arrays, recursing into `condition.if-then-else`'s `if` / `then` / `else`): `device_feature` (feature), `device_features[]` (features), `device` (device), `devices[]` (devices), `camera` (device).
 - **Scene triggers** (`t_scene.triggers`, flat array): `device_feature` (feature), `device_features[]` (features), `device` (device — schema-declared legacy field, rewritten for safety).
 - **Dashboard boxes** (`t_dashboard.boxes`, array of *sections* `{ columns: [[box]] }` since the flexible layout — legacy arrays of arrays are still walked): `device_feature` (feature), `device_features[]` (features), `device` (device), `camera` (device); plus the nested selector holders introduced by the wall-panel widgets — `chips[].device_feature` (feature), `pins[].device_feature` (feature), `actions[].device_feature` (feature, quick-actions box), `thermostat_feature` (feature, thermostat box — the only device-referencing key that box carries, every regulation setting living on the device instead), and the **values** of `scene_status_features` (scene selector → feature selector map; keys are scene selectors and are not rewritten). Values are replaced **in place**; array length and order never change, keeping `device_feature_names` / `units` / `colors` index-aligned.
+
+- **Device params** (`t_device_param`, any device), by name — `FEATURE_PARAM_NAMES` in `device.migrate.js`: `THERMOSTAT_TEMPERATURE_FEATURE`, `THERMOSTAT_HUMIDITY_FEATURE`, `THERMOSTAT_SWITCH_FEATURE`, `THERMOSTAT_WINDOW_FEATURE`, `THERMOSTAT_TARGET_FEATURE`, `THERMOSTAT_STATE_FEATURE`, `THERMOSTAT_MODE_FEATURE` (feature, each). Only the value of a listed param equal to a mapped source feature selector is replaced; a param of another name is never read, whatever its value. A new param naming a feature by selector lands in this list in the same diff.
 
 Only scenes/dashboards that actually changed are saved. Rewritten scenes go through `SceneManager.addScene` so the RAM copy (`this.scenes`, the one `checkTrigger` iterates) and its scheduled triggers are replaced atomically with the DB copy — the same path as `scene.update`. Dashboards have no RAM cache. References to **unmapped** source features are intentionally left dangling (existing deletion semantics; the UI warned).
 
@@ -112,7 +115,7 @@ Ordered steps (order is a contract — history first, then references, deletion 
 3. One `CHECKPOINT` after all DuckDB writes (flushes the WAL, releases delete-tracking memory — same rationale as the purge).
 4. **SQLite leftovers**: single `DELETE` per source feature on `t_device_feature_state` and `t_device_feature_state_aggregate` (no batching: one-off migration gesture, indexed column; this also guarantees step 8 passes the destroy count check).
 5. **`last_value` copy** (freshness rule of section A) + **`energy_parent_id` re-point** for mapped pairs; refresh the affected feature rows in the state manager caches.
-6. **`t_energy_price.electric_meter_device_id` re-point** and **`t_energy_contract.electric_meter_device_id` re-point** (section A; the overlap was refused in step 1) then **room inheritance** (rule of section A); on room change, refresh the destination device in caches and `notify(EVENTS.DEVICE.UPDATE)`.
+6. **`t_energy_price.electric_meter_device_id` re-point** and **`t_energy_contract.electric_meter_device_id` re-point** (section A; the overlap was refused in step 1), then the **device params naming a mapped feature** (B.3), then **room inheritance** (rule of section A); refresh the touched devices in caches, and `notify(EVENTS.DEVICE.UPDATE)` the destination on room change and every device whose params were rewritten.
 7. **Rewrite scenes then dashboards** (B.3).
 8. **Destroy the source device** via `this.destroy(source.selector)` — standard semantics (hooks, caches, poll, notify).
 
