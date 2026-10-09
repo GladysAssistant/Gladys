@@ -47,9 +47,24 @@ const EditForm = ({ ...props }) => {
   const selectedHouse = (props.houses || []).find(house =>
     (house.rooms || []).some(room => room.id === props.thermostatEditRoomId)
   );
+  // The schedule the thermostat already follows stays on offer even when its room
+  // is now in another house: it keeps following it — the house is checked when a
+  // link is made, not afterwards — and leaving it out showed "No schedule" on a
+  // thermostat following one, with no change left to pick to detach it. It is
+  // named with its house, the one thing that sets it apart from this house's.
+  const followedSchedule = (props.thermostatEditDevice && props.thermostatEditDeviceSchedule) || '';
   const schedulesOfHouse = selectedHouse
-    ? (props.thermostatSchedules || []).filter(schedule => schedule.house === selectedHouse.selector)
+    ? (props.thermostatSchedules || []).filter(
+        schedule => schedule.house === selectedHouse.selector || schedule.selector === followedSchedule
+      )
     : props.thermostatSchedules || [];
+  const scheduleLabel = schedule => {
+    if (!selectedHouse || schedule.house === selectedHouse.selector) {
+      return schedule.name;
+    }
+    const house = (props.houses || []).find(candidate => candidate.selector === schedule.house);
+    return house ? `${schedule.name} (${house.name})` : schedule.name;
+  };
 
   const heatingPresets = ['frost', 'away', 'eco', 'night', 'comfort'];
   const coolingPresets = ['comfort'];
@@ -750,7 +765,7 @@ const EditForm = ({ ...props }) => {
                     value={schedule.selector}
                     selected={schedule.selector === props.thermostatEditActiveSchedule}
                   >
-                    {schedule.name}
+                    {scheduleLabel(schedule)}
                   </option>
                 ))}
               </select>
