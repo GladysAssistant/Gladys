@@ -1025,6 +1025,11 @@
         "oauthRedirectUriInstanceDescription": "You chose to use the address of your instance: declare this exact URL in your developer application. The provider will come back to your Gladys directly, without going through the Gladys redirect page.",
         "oauthRedirectUriCopied": "Copied!",
         "oauthUseInstanceRedirectLabel": "Use the address of my instance instead (I already access Gladys over HTTPS)",
+        "oauthDisconnectButton": "Disconnect",
+        "oauthDisconnectConfirmText": "The access tokens the integration stored will be forgotten and it will log out. The other settings are kept, and you can link an account again at any time.",
+        "oauthDisconnectConfirmButton": "Yes, disconnect",
+        "oauthDisconnectCancelButton": "Cancel",
+        "oauthDisconnectError": "There was an error disconnecting the account.",
         "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
       },
       "actions": {

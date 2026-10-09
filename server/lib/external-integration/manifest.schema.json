@@ -463,6 +463,17 @@
           "enum": ["dropdown", "radio"],
           "description": "Rendering of a `select` field: dropdown (default) or radio buttons."
         },
+        "credential_keys": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
+          "description": "`oauth2` and `account_link` fields only: the off-schema keys (POST /config) holding the credentials of this account, the only ones the core deletes when the user disconnects it. Without it, no Disconnect button is offered. A key may not be a config_schema key, be owned by two fields, start with `gladys_` or name a core variable (code-enforced).",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          }
+        },
         "links": {
           "type": "array",
           "minItems": 1,
@@ -606,6 +617,22 @@
           "then": {
             "not": {
               "required": ["display"]
+            }
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "type": {
+                  "enum": ["oauth2", "account_link"]
+                }
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": ["credential_keys"]
             }
           }
         }

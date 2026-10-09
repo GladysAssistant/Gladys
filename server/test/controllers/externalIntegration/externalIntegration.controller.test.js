@@ -304,6 +304,73 @@ describe('External integration admin API', () => {
     });
   });
 
+  describe('POST /api/v1/external_integration/:selector/oauth/disconnect', () => {
+    const OAUTH_MANIFEST = {
+      ...TEST_MANIFEST,
+      config_schema: [
+        ...TEST_MANIFEST.config_schema,
+        { key: 'account', type: 'oauth2', label: { en: 'Account' }, credential_keys: ['access_token'] },
+        { key: 'legacy_account', type: 'oauth2', label: { en: 'Legacy account' } },
+      ],
+    };
+
+    it('should delete the declared credentials and restart the running integration', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      stubInstance(gladys.externalIntegration, 'stop', fake.resolves(null));
+      stubInstance(gladys.externalIntegration, 'start', fake.resolves(null));
+      await gladys.variable.setValue('ACCESS_TOKEN', JSON.stringify('token'), service.id);
+      await gladys.variable.setValue('DEVICE_ID', JSON.stringify('stable'), service.id);
+      await gladys.variable.setValue('LATITUDE', JSON.stringify(48.85), service.id);
+      const res = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/disconnect`)
+        .send({ key: 'account' })
+        .expect(200);
+      expect(res.body).to.deep.equal({ success: true });
+      const variables = await db.Variable.findAll({ where: { service_id: service.id } });
+      expect(variables.map((variable) => variable.name).sort()).to.deep.equal(['DEVICE_ID', 'LATITUDE']);
+      expect(gladys.externalIntegration.stop.calledOnce).to.equal(true);
+      expect(gladys.externalIntegration.start.calledOnce).to.equal(true);
+    });
+
+    it('should return 400 when the account field declares no credential_keys', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/disconnect`)
+        .send({ key: 'legacy_account' })
+        .expect(400);
+    });
+
+    it('should return 400 when the field is not an account field', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/disconnect`)
+        .send({ key: 'latitude' })
+        .expect(400);
+    });
+
+    it('should return 400 without a key', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/disconnect`)
+        .send({})
+        .expect(400);
+    });
+
+    it('should return 404 for an unknown integration', async () => {
+      await authenticatedRequest
+        .post('/api/v1/external_integration/ext-dev-unknown/oauth/disconnect')
+        .send({ key: 'account' })
+        .expect(404);
+    });
+
+    it('should refuse an unauthenticated request', async () => {
+      await unAuthenticatedRequest
+        .post('/api/v1/external_integration/ext-dev-open-meteo-demo/oauth/disconnect')
+        .send({ key: 'account' })
+        .expect(401);
+    });
+  });
+
   describe('GET /api/v1/external_integration/store', () => {
     it('should return the store catalog, not the :selector handler (route order)', async () => {
       gladys.externalIntegration.storeIndex = {
@@ -942,6 +1009,10 @@ describe('External integration admin API', () => {
       await nonAdminRequest.get('/api/v1/external_integration/hardware').expect(403);
       await nonAdminRequest.get(`/api/v1/external_integration/${service.selector}/discovered_device`).expect(403);
       await nonAdminRequest.post(`/api/v1/external_integration/${service.selector}/scan`).expect(403);
+      await nonAdminRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/disconnect`)
+        .send({ key: 'account' })
+        .expect(403);
     });
 
     it('should still allow linking their own account', async () => {

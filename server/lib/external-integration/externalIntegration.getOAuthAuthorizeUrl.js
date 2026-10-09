@@ -1,6 +1,6 @@
 const { BadParameters, ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
-const { ACCOUNT_FIELD_TYPES } = require('./constants');
+const { getAccountField } = require('./externalIntegration.getAccountField');
 
 /**
  * @description Relay a sign-in URL request to an integration (the user clicked
@@ -30,11 +30,7 @@ async function getOAuthAuthorizeUrl(selector, { key, redirect_uri: redirectUri }
     throw new BadParameters('key: must be a non-empty string');
   }
   const service = await this.getBySelector(selector);
-  const configSchema = (service.manifest && service.manifest.config_schema) || [];
-  const field = configSchema.find((schemaField) => schemaField.key === key);
-  if (!field || !ACCOUNT_FIELD_TYPES.includes(field.type)) {
-    throw new BadParameters(`config.${key}: not an oauth2 or account_link field`);
-  }
+  const field = getAccountField(service, key);
   if (field.type === 'oauth2' && (typeof redirectUri !== 'string' || redirectUri.length === 0)) {
     throw new BadParameters('redirect_uri: must be a non-empty string');
   }

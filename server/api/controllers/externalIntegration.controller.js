@@ -386,6 +386,21 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/external_integration/:selector/oauth/disconnect oauthDisconnect
+   * @apiName oauthDisconnect
+   * @apiGroup ExternalIntegration
+   * @apiDescription Disconnect an account field (oauth2 or account_link): delete
+   * the off-schema keys the field declares in `credential_keys`, and nothing
+   * else. A running integration is stopped before and started again after, so
+   * it drops its session.
+   * @apiParam {string} key The config_schema key of the account field.
+   */
+  async function oauthDisconnect(req, res) {
+    const result = await gladys.externalIntegration.disconnectOAuth(req.params.selector, req.body);
+    res.json(result);
+  }
+
+  /**
    * @api {post} /api/v1/external_integration/:selector/action/:key runAction
    * @apiName runAction
    * @apiGroup ExternalIntegration
@@ -708,6 +723,7 @@ module.exports = function ExternalIntegrationController(gladys) {
     getConfig: asyncMiddleware(getConfig),
     saveConfig: asyncMiddleware(saveConfig),
     getOAuthAuthorizeUrl: asyncMiddleware(getOAuthAuthorizeUrl),
+    oauthDisconnect: asyncMiddleware(oauthDisconnect),
     oauthCallback: asyncMiddleware(oauthCallback),
     runAction: asyncMiddleware(runAction),
     getWidgets: asyncMiddleware(getWidgets),
