@@ -464,6 +464,8 @@ Name uniqueness is carried by the database as well, and the constraint violation
 
 The page lists schedules **by house**, and under each schedule the thermostats that follow it — the reverse query the link table makes possible. The editor's coloured bars are drawn exactly as before, and the form may keep showing a start and an end: the end is simply the next point.
 
+The times are the browser's native time inputs. On a touch screen a tap anywhere on the field opens the picker — Chrome on Android otherwise opens it from the clock icon only, and a tap on the time selects the hour without a picker or a keyboard. In dark mode the fields carry a dark colour scheme: the app inverts inputs back to their real dark colours, and the browser's clock icon, drawn for a light field, was black on dark.
+
 ## F. The widget, on an external thermostat
 
 The dashboard widget is the same in both cases; three details differ.
