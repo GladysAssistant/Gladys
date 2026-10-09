@@ -67,7 +67,7 @@ const {
 // through round, for example) is not guaranteed to stay available across mathjs releases.
 // Every entry below is covered by a test in test/lib/scene/actions/scene.action.formula.test.js
 // so that a mathjs upgrade dropping one fails CI instead of failing silently in production.
-const { evaluate } = create({
+const math = create({
   addDependencies,
   subtractDependencies,
   multiplyDependencies,
@@ -118,6 +118,11 @@ const { evaluate } = create({
   evaluateDependencies,
 });
 
+// create() always exposes config() to the expression parser, whatever the factories passed to it.
+// This instance is shared by every scene, so a formula calling config({number: "BigNumber"}) would
+// change how numbers are handled in all the formulas evaluated afterwards, until the next restart.
+delete math.expression.mathWithTransform.config;
+
 module.exports = {
-  evaluate,
+  evaluate: math.evaluate,
 };

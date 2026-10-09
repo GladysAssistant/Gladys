@@ -31,6 +31,13 @@ describe('scene.formula sandbox', () => {
     expect(() => evaluate('compareText("a","b")')).to.throw(/Undefined function/);
   });
 
+  it('should not let a formula change the configuration of the shared instance', () => {
+    expect(() => evaluate('config({number:"BigNumber"})')).to.throw(/Undefined function config/);
+    expect(() => evaluate('config')).to.throw(/Undefined symbol config/);
+    // numbers are still plain numbers for the formulas evaluated afterwards
+    expect(evaluate('1/4')).to.equal(0.25);
+  });
+
   it('should still evaluate a legitimate formula', () => {
     expect(evaluate('round(min(15, sqrt(400)) * 60)')).to.equal(900);
   });
