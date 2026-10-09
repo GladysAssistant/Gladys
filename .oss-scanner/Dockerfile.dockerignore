@@ -1,0 +1,17 @@
+# Used instead of the root .dockerignore when building .oss-scanner/Dockerfile (BuildKit picks up
+# <Dockerfile>.dockerignore next to the Dockerfile). Unlike the production image, the scanner needs the tests.
+**/node_modules
+**/.nyc_output
+**/coverage
+**/*.lcov
+server/*.db
+server/*.db-*
+server/*.duckdb
+server/*.duckdb.wal
+server/gladys-backups*
+server/static
+front/build
+.git
+.env
+**/.env
+*.log
