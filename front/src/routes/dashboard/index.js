@@ -4,9 +4,16 @@ import { route } from 'preact-router';
 
 import DashboardPage from './DashboardPage';
 import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
-import actions from '../../actions/dashboard';
+import dashboardActions from '../../actions/dashboard';
+import mainActions from '../../actions/main';
 import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
+
+// dashboard actions plus the shared setTabletMode (main.js), used by the
+// ?tablet_mode_house=<house_selector> URL param below to activate tablet mode
+// the same way the "Tablet Mode" menu (SetTabletMode.jsx) does. Only that one
+// action is pulled in, not the whole main factory.
+const actions = store => ({ ...dashboardActions(store), setTabletMode: mainActions(store).setTabletMode });
 
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
@@ -180,6 +187,48 @@ class Dashboard extends Component {
     }
   };
 
+  // Mirrors checkIfFullScreenParameterIsHere: ?tablet_mode_house=<house_selector>
+  // in the URL activates tablet mode for that house directly, the same way the
+  // "Tablet Mode" menu (SetTabletMode.jsx) does, without going through its UI.
+  // The value is the house selector (a URL-safe slug, already unique), matched
+  // exactly - not the house name, which can carry spaces, accents or quotes
+  // that make a fragile URL, and could even collide with another house's
+  // selector. The menu builds this exact URL for the selected house behind a
+  // copy button, so nobody has to type or know a selector. Unlike
+  // ?fullscreen=force, this persists server-side on the session, so it is
+  // ignored on Gladys Plus: the "Tablet Mode" menu is hidden there
+  // (isGladysPlus in DashboardPage.jsx), which would leave a Plus browser
+  // locked by the house alarm with no UI to turn tablet mode back off.
+  checkIfTabletModeParameterIsHere = async () => {
+    const houseSelector = this.props.tablet_mode_house;
+    if (!houseSelector || this.state.isGladysPlus) {
+      return;
+    }
+    // A wall tablet keeps this parameter in its URL for good (/locked and the
+    // login return_url both preserve window.location.search), so this runs on
+    // every reload and every lock/unlock cycle. Skip the house fetch, the POST
+    // and the session DB write when the session already is in tablet mode for
+    // exactly this house.
+    if (this.props.tabletMode && this.props.session.getTabletModeCurrentHouseSelector() === houseSelector) {
+      return;
+    }
+    try {
+      const houses = await this.props.httpClient.get('/api/v1/house');
+      const house = houses && houses.find(h => h.selector === houseSelector);
+      if (!house) {
+        // The person configuring a wall tablet never opens the console, and a
+        // silent no-op would leave them believing the tablet is in tablet mode
+        // (so locked when the alarm arms) when it is not. Surface it on screen.
+        console.error(`?tablet_mode_house=${houseSelector} does not match any house`);
+        this.setState({ tabletModeParamError: houseSelector });
+        return;
+      }
+      await this.props.setTabletMode(house.selector);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   init = async () => {
     await this.getDashboards();
     // fire and forget, concurrent with the current dashboard's own fetch:
@@ -289,7 +338,9 @@ class Dashboard extends Component {
       dashboards: [],
       dashboardConfigsBySelector: {},
       newSelectedBoxType: {},
-      askDeleteDashboard: false
+      askDeleteDashboard: false,
+      // the ?tablet_mode_house= selector that matched no house, surfaced on screen
+      tabletModeParamError: null
     };
   }
 
@@ -307,6 +358,7 @@ class Dashboard extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
     this.checkIfFullScreenParameterIsHere();
+    this.checkIfTabletModeParameterIsHere();
   }
 
   // Client-side dashboard switch: the dashboard list is already loaded, and
@@ -381,7 +433,8 @@ class Dashboard extends Component {
       loading,
       currentDashboardLoadFailed,
       browserFullScreenCompatible,
-      duckDbMigrationJob
+      duckDbMigrationJob,
+      tabletModeParamError
     }
   ) {
     const dashboardConfigured =
@@ -427,6 +480,7 @@ class Dashboard extends Component {
         hideExitFullScreenButton={props.fullscreen === 'force'}
         isGladysPlus={isGladysPlus}
         duckDbMigrationJob={duckDbMigrationJob}
+        tabletModeParamError={tabletModeParamError}
       />
     );
   }

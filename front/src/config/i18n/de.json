@@ -341,6 +341,9 @@
       "description": "Der Tablet-Modus wird für die Alarmfunktion verwendet. Wenn du den Alarm scharf schaltest, werden alle Tablets in deinem Zuhause gesperrt und zeigen eine Bildschirmtastatur an, um den Alarm zu deaktivieren.",
       "currentBrowserOnly": "<strong>Diese Einstellung gilt nur für dieses Gerät.</strong> Mit dem Speichern legst du fest, dass der Browser, den du gerade verwendest, ein Tablet ist. Jedes Gerät wird separat konfiguriert: Aktiviere den Tablet-Modus nur auf Geräten, die bei scharf geschaltetem Alarm gesperrt werden dürfen.",
       "fullScreenForce": "Wenn du ein Tablet dazu zwingen möchtest, im Vollbildmodus zu bleiben, füge der URL <code>?fullscreen=force</code> hinzu.",
+      "tabletModeForce": "Damit ein Wandtablet direkt im Tablet-Modus für dieses Zuhause öffnet, rufe diese URL auf:",
+      "copyUrl": "Kopieren",
+      "urlCopied": "Kopiert!",
       "houseLabel": "Zuhause dieses Tablets",
       "howToDisable": "Um den Tablet-Modus auf einem Gerät zu deaktivieren, öffne dieses Menü auf dem betreffenden Gerät und wähle „Tablet-Modus deaktiviert“.",
       "tabletModeDisabled": "Tablet-Modus deaktiviert"
@@ -350,6 +353,7 @@
     "editDashboardSavedButton": "Gesichert",
     "editDashboardDoneButton": "Fertig",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
+    "tabletModeParamError": "Der Tablet-Modus konnte nicht aktiviert werden: Kein Zuhause entspricht „{{value}}“ im URL-Parameter ?tablet_mode_house=. Verwende die im Menü „Tablet-Modus“ angezeigte URL.",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Sichtbarkeit",
     "editDashboardVisibilityDescription": "Öffentliche Dashboards sind für alle Mitglieder der Gladys-Installation sichtbar.",

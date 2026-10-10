@@ -341,6 +341,9 @@
       "description": "Tablet mode is used for the alarm functionality. If you arm the alarm, all house tablets will be locked and display a virtual keyboard to deactivate the alarm.",
       "currentBrowserOnly": "<strong>This setting only applies to this device.</strong> By saving, you declare that the browser you are currently using is a tablet. Each device is configured separately: only enable tablet mode on the devices you are happy to see locked when the alarm is armed.",
       "fullScreenForce": "If you want to force a tablet to stay in full-screen mode, you can add <code>?fullscreen=force</code> to the URL.",
+      "tabletModeForce": "To make a wall tablet open directly in tablet mode for this house, point it at this URL:",
+      "copyUrl": "Copy",
+      "urlCopied": "Copied!",
       "houseLabel": "House of this tablet",
       "howToDisable": "To turn tablet mode off on a device, open this menu from that device and select \"Tablet mode disabled\".",
       "tabletModeDisabled": "Tablet Mode Disabled"
@@ -350,6 +353,7 @@
     "editDashboardSavedButton": "Saved",
     "editDashboardDoneButton": "Done",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
+    "tabletModeParamError": "Tablet mode could not be activated: no house matches \"{{value}}\" in the ?tablet_mode_house= URL parameter. Use the URL shown in the Tablet Mode menu.",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Visibility",
     "editDashboardVisibilityDescription": "Public dashboards will be visible to all members of the Gladys installation.",
