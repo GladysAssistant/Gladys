@@ -32,15 +32,68 @@
   margin: 0;
 }
 
-/* --- tiles: one wrapping row of value / gauge tiles --- */
+/* --- tiles: a grid of value / gauge tiles ---
+   The core picks the column count from the tile count (--tile-count class)
+   and from the width of the tile area (a container query on .tilesBox), so a
+   wrapped tile keeps the width of the tile above it instead of stretching. */
+.tilesBox {
+  container-type: inline-size;
+  container-name: widget-tiles;
+}
+
 .tiles {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(var(--tile-columns, 3), minmax(0, 1fr));
   gap: 8px;
 }
 
+.tilesCount1 {
+  --tile-columns: 1;
+}
+.tilesCount2 {
+  --tile-columns: 2;
+}
+.tilesCount3 {
+  --tile-columns: 3;
+}
+.tilesCount4 {
+  --tile-columns: 4;
+}
+.tilesCount5,
+.tilesCount6 {
+  --tile-columns: 3;
+}
+
+/* 4 tiles: 4 columns need 4 x 96px + gaps, otherwise 2 x 2 */
+@container widget-tiles (max-width: 407px) {
+  .tilesCount4 {
+    --tile-columns: 2;
+  }
+}
+
+/* 5 or 6 tiles: rows of 3 need 3 x 96px + gaps, otherwise rows of 2 */
+@container widget-tiles (max-width: 303px) {
+  .tilesCount5,
+  .tilesCount6 {
+    --tile-columns: 2;
+  }
+  /* 3 tiles stay on one row: tighter padding, font and gauge */
+  .tilesCount3 .tile {
+    padding: 8px 4px;
+  }
+  .tilesCount3 .tileValue {
+    font-size: 1.0625rem;
+  }
+  .tilesCount3 .gauge {
+    width: 64px;
+    height: 52px;
+  }
+  .tilesCount3 .gaugeValue {
+    margin-top: -26px;
+  }
+}
+
 .tile {
-  flex: 1 1 96px;
   min-width: 0;
   max-width: 100%;
   display: flex;
@@ -111,7 +164,9 @@
 /* --- gauge tile: a 270° SVG arc, value in the middle --- */
 .gauge {
   width: 88px;
-  height: 72px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 88 / 72;
   display: block;
 }
 
