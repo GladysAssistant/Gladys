@@ -8,6 +8,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   PILOT_WIRE_MODE,
+  THERMOSTAT_OPERATING_STATE,
   THERMOSTAT_PRESET,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
@@ -43,6 +44,12 @@ const setpointFeature = () => ({
   selector: 'thermostat-living-room',
   category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
   type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+});
+const operatingStateFeature = () => ({
+  selector: 'thermostat-living-room:operating-state',
+  category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  type: DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+  last_value: null,
 });
 const presetFeature = (preset) => ({
   selector: 'thermostat-living-room:preset',
@@ -86,7 +93,7 @@ const params = (map) => Object.keys(map).map((name) => ({ name, value: map[name]
 const pilotWireDevice = (preset, extra = {}) => ({
   id: 'device-id',
   selector: 'living-room',
-  features: [setpointFeature(), presetFeature(preset)],
+  features: [setpointFeature(), presetFeature(preset), operatingStateFeature()],
   params: params({
     THERMOSTAT_PILOT_WIRE_FEATURE: 'heater-pilot-wire',
     THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor',
@@ -94,6 +101,16 @@ const pilotWireDevice = (preset, extra = {}) => ({
     ...extra,
   }),
 });
+
+// A manual hold, as setValue arms it: picking a preset by hand holds that
+// preset's setpoint, and a turn of the dial holds any value.
+const held = (setpoint) => ({ THERMOSTAT_MANUAL_SETPOINT: String(setpoint), THERMOSTAT_MANUAL_UNTIL: '' });
+
+const savedOperatingStates = (gladys) =>
+  gladys.device.saveState
+    .getCalls()
+    .filter((call) => call.args[0].type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE)
+    .map((call) => call.args[1]);
 
 const regulate = async (mod, gladys, device) => mod.regulateDevice(gladys, device, todayDow, 12 * 60);
 
@@ -216,12 +233,125 @@ describe('thermostat pilot wire', () => {
     assert.notCalled(gladys.device.setValue);
   });
 
-  it('should survive a write that fails', async () => {
+  it('should survive a write that fails, and report the order the heater kept', async () => {
     const mod = load(null);
-    const gladys = buildGladys();
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.OFF });
     gladys.device.setValue = fake.rejects(new Error('offline'));
 
     // One unreachable heater must not stop the pass for the others.
     await regulate(mod, gladys, pilotWireDevice('comfort'));
+
+    assert.calledOnce(gladys.device.setValue);
+    // Comfort never reached it: it is still off, not heating.
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+  });
+
+  it('should leave the operating state alone when the order cannot be read', async () => {
+    const mod = load(null);
+    const gladys = buildGladys();
+    gladys.device.get = fake.resolves([{ selector: 'heater', features: [{ selector: 'heater-pilot-wire' }] }]);
+    gladys.device.setValue = fake.rejects(new Error('offline'));
+
+    await regulate(mod, gladys, pilotWireDevice('comfort'));
+
+    expect(savedOperatingStates(gladys)).to.deep.equal([]);
+  });
+
+  it('should survive a heater that cannot be looked up', async () => {
+    const mod = load(null);
+    const gladys = buildGladys();
+    gladys.device.get = fake.rejects(new Error('database locked'));
+
+    await regulate(mod, gladys, pilotWireDevice('comfort'));
+
+    assert.notCalled(gladys.device.setValue);
+    expect(savedOperatingStates(gladys)).to.deep.equal([]);
+  });
+
+  it('should not report a state for a heater whose feature is gone', async () => {
+    const mod = load(null);
+    const gladys = buildGladys();
+    gladys.device.get = fake.resolves([]);
+
+    await regulate(mod, gladys, pilotWireDevice('comfort'));
+
+    expect(savedOperatingStates(gladys)).to.deep.equal([]);
+  });
+
+  it('should report heating on eco and comfort, idle on frost and off', async () => {
+    // The wire gives no feedback: the order is what says whether the heater may
+    // heat for comfort. Frost protection is a standby, like off.
+    const cases = [
+      ['comfort', THERMOSTAT_OPERATING_STATE.HEATING],
+      ['eco', THERMOSTAT_OPERATING_STATE.HEATING],
+      ['frost', THERMOSTAT_OPERATING_STATE.IDLE],
+    ];
+    await Promise.all(
+      cases.map(async ([preset, state]) => {
+        const mod = load(null);
+        const gladys = buildGladys();
+
+        await regulate(mod, gladys, pilotWireDevice(preset));
+
+        expect(savedOperatingStates(gladys), preset).to.deep.equal([state]);
+      }),
+    );
+  });
+
+  it('should send the order of a preset picked by hand', async () => {
+    // Picking a preset in the widget arms a hold on its setpoint: that hold has
+    // to reach the heater, or no preset chosen by hand would ever apply.
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT });
+
+    await regulate(mod, gladys, pilotWireDevice('eco', held(18)));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.HEATING]);
+  });
+
+  it('should keep the preset picked by hand when another one shares its setpoint', async () => {
+    // Eco and comfort both set to 18 °C: the nearest order would be comfort (a
+    // tie goes warmer), but the preset carried is what was asked for.
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT });
+
+    await regulate(mod, gladys, pilotWireDevice('eco', { ...held(18), THERMOSTAT_PRESET_COMFORT: '18' }));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.ECO);
+  });
+
+  it('should turn a setpoint held from the dial into the nearest order, a tie going warmer', async () => {
+    // 19.5 °C sits half-way between eco (18) and comfort (21).
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.OFF });
+
+    await regulate(mod, gladys, pilotWireDevice('schedule', held(19.5)));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.COMFORT);
+  });
+
+  it('should turn a low setpoint held from the dial into frost protection', async () => {
+    const mod = load(null);
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.COMFORT });
+
+    await regulate(mod, gladys, pilotWireDevice('schedule', held(8)));
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(PILOT_WIRE_MODE.FROST_PROTECTION);
+    expect(savedOperatingStates(gladys)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+  });
+
+  it('should keep the order it carries when the programme has no point in force', async () => {
+    // `schedule` names no order, just as it names no temperature: nothing is
+    // sent, and no state is made up.
+    const mod = load({ selector: 'my-schedule', transitions: [] });
+    const gladys = buildGladys({ order: PILOT_WIRE_MODE.ECO });
+    const device = pilotWireDevice('schedule');
+    device.features[0].last_value = 20;
+
+    await regulate(mod, gladys, device);
+
+    assert.notCalled(gladys.device.setValue);
+    expect(savedOperatingStates(gladys)).to.deep.equal([]);
   });
 });

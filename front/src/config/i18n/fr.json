@@ -3545,7 +3545,7 @@
           "cooling": "Interrupteur qui sera allumé et éteint pour rafraîchir la pièce."
         },
         "pilotWireFeatureLabel": "Fil pilote (actionneur)",
-        "pilotWireFeatureHelp": "Un radiateur à fil pilote : Gladys lui envoie l’ordre correspondant au preset (confort, éco, hors-gel, arrêt) au lieu de couper son alimentation. Le radiateur garde son propre thermostat, donc ni seuil ni cycle ne s’appliquent. Laissez l’interrupteur vide si vous utilisez ce mode.",
+        "pilotWireFeatureHelp": "Un radiateur à fil pilote : Gladys lui envoie l’ordre correspondant au preset (confort, éco, hors-gel, arrêt) au lieu de couper son alimentation. Le radiateur garde son propre thermostat, donc ni seuil ni cycle ne s’appliquent. Le choisir vide le commutateur, et inversement : un radiateur se pilote d’une façon ou de l’autre.",
         "windowFeatureLabel": "Capteur d'ouverture de fenêtre",
         "windowFeatureHelp": {
           "heating": "Optionnel. Si une fenêtre est ouverte, le chauffage est automatiquement coupé.",
@@ -3579,7 +3579,7 @@
         "saveButton": "Sauvegarder",
         "cancelButton": "Annuler",
         "saveError": "Erreur lors de la sauvegarde.",
-        "incompleteVirtualError": "Un thermostat virtuel a besoin d’un capteur de température et d’un commutateur : c’est en lisant l’un et en actionnant l’autre qu’il régule.",
+        "incompleteVirtualError": "Un thermostat virtuel a besoin d’un capteur de température et d’un commutateur — c’est en lisant l’un et en actionnant l’autre qu’il régule — ou d’un fil pilote, qui se passe de capteur.",
         "incompleteExternalError": "Un thermostat existant a besoin de la consigne du thermostat à piloter.",
         "activeScheduleLabel": "Planning actif",
         "activeScheduleHelp": "Sélectionnez le planning à appliquer automatiquement à ce thermostat.",

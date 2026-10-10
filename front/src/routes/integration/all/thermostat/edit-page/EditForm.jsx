@@ -381,7 +381,7 @@ const EditForm = ({ ...props }) => {
                   <FeatureSelect
                     value={props.thermostatEditSwitchFeature || ''}
                     features={props.switchFeatures}
-                    onChange={e => props.updateThermostatField('thermostatEditSwitchFeature', e.target.value)}
+                    onChange={e => props.updateThermostatActuator('thermostatEditSwitchFeature', e.target.value)}
                     emptyLabel={<Text id="global.emptySelectOption" />}
                   />
                 </Localizer>
@@ -402,7 +402,7 @@ const EditForm = ({ ...props }) => {
                   <FeatureSelect
                     value={props.thermostatEditPilotWireFeature || ''}
                     features={props.pilotWireFeatures}
-                    onChange={e => props.updateThermostatField('thermostatEditPilotWireFeature', e.target.value)}
+                    onChange={e => props.updateThermostatActuator('thermostatEditPilotWireFeature', e.target.value)}
                     emptyLabel={<Text id="global.emptySelectOption" />}
                   />
                 </Localizer>

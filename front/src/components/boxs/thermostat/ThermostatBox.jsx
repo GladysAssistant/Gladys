@@ -113,10 +113,16 @@ class ThermostatBox extends Component {
   // drives on a virtual thermostat, the real device's state feature on an
   // external one. An external thermostat that exposes neither returns null, and
   // the widget estimates the state from the setpoint instead.
+  //
+  // A pilot-wire heater has no contact to read and runs no hysteresis: the
+  // estimate would light the flame on a threshold the server never applies.
+  // What the server decided is on the thermostat's own operating-state feature.
   getRunningStateFeature = () => {
     const cfg = this.state.remoteConfig;
     if (!cfg) return null;
-    return (this.isExternal() ? cfg.state_feature : cfg.switch_feature) || null;
+    if (this.isExternal()) return cfg.state_feature || null;
+    if (cfg.pilot_wire_feature) return cfg.operatingStateFeature || null;
+    return cfg.switch_feature || null;
   };
   getMinTemp = () => {
     // Device feature native min has top priority
