@@ -40,12 +40,7 @@ class SetTabletMode extends Component {
       loading: true
     });
     try {
-      await this.props.httpClient.post('/api/v1/session/tablet_mode', {
-        tablet_mode: this.state.selectedHouse !== null,
-        house: this.state.selectedHouse
-      });
-      await this.props.refreshTabletMode();
-      this.props.session.setTabletModeCurrentHouseSelector(this.state.selectedHouse);
+      await this.props.setTabletMode(this.state.selectedHouse);
       this.props.toggleDefineTabletMode();
     } catch (e) {
       console.error(e);
@@ -67,7 +62,26 @@ class SetTabletMode extends Component {
   };
 
   onHouseChange = e => {
-    this.setState({ selectedHouse: e.target.value || null });
+    this.setState({ selectedHouse: e.target.value || null, tabletModeUrlCopied: false });
+  };
+
+  // The ready-to-use URL for a wall tablet: opens this dashboard already in
+  // tablet mode for the selected house, and forced full-screen. The value is
+  // the house selector (a URL-safe slug), so no encoding or name typing is
+  // needed - this is what frees the user from ever knowing what a selector is.
+  tabletModeUrl = () =>
+    `${window.location.origin}/dashboard?tablet_mode_house=${this.state.selectedHouse}&fullscreen=force`;
+
+  copyTabletModeUrl = async () => {
+    try {
+      // A local Gladys is often served over plain http on the LAN, which is not
+      // a secure context: navigator.clipboard may then be undefined and this
+      // throws. That is fine - the URL field stays selectable for a manual copy.
+      await navigator.clipboard.writeText(this.tabletModeUrl());
+      this.setState({ tabletModeUrlCopied: true });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   constructor(props) {
@@ -81,7 +95,21 @@ class SetTabletMode extends Component {
     this.refreshData();
   }
 
-  render({ defineTabletModeOpened }, { houses, selectedHouse, loading }) {
+  // The menu stays mounted at all times (its open/close is only a CSS slide),
+  // so its data is fetched once on mount - before anything else can change the
+  // session's tablet mode, e.g. the ?tablet_mode_house= URL param handled in
+  // routes/dashboard/index.js, which runs after this child has mounted.
+  // Re-fetch each time the menu opens so the select always reflects the real
+  // session state, and a Save never silently turns a URL-forced tablet mode
+  // back off.
+  componentDidUpdate(prevProps) {
+    if (!prevProps.defineTabletModeOpened && this.props.defineTabletModeOpened) {
+      this.refreshData();
+    }
+  }
+
+  render({ defineTabletModeOpened }, { houses, selectedHouse, loading, tabletModeUrlCopied }) {
+    const copyUrlLabel = tabletModeUrlCopied ? 'dashboard.tabletMode.urlCopied' : 'dashboard.tabletMode.copyUrl';
     return (
       <div
         class={cx(style.tabletModeDiv, {
@@ -122,9 +150,25 @@ class SetTabletMode extends Component {
                   <p>
                     <MarkupText id="dashboard.tabletMode.fullScreenForce" />
                   </p>
-                  <p>
-                    <MarkupText id="dashboard.tabletMode.tabletModeForce" />
-                  </p>
+                  {selectedHouse && (
+                    <div className="form-group">
+                      <p>
+                        <Text id="dashboard.tabletMode.tabletModeForce" />
+                      </p>
+                      <div className="input-group">
+                        <input
+                          type="text"
+                          readOnly
+                          className="form-control"
+                          value={this.tabletModeUrl()}
+                          onFocus={e => e.target.select()}
+                        />
+                        <button class="btn btn-secondary" type="button" onClick={this.copyTabletModeUrl}>
+                          <Text id={copyUrlLabel} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   <div className="form-group">
                     <button class="btn btn-success" onClick={this.saveTabletMode}>
                       <Text id="global.save" />

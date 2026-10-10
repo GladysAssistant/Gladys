@@ -9,10 +9,11 @@ import mainActions from '../../actions/main';
 import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
 
-// dashboard actions plus refreshTabletMode (main.js), needed to sync the
-// store's tabletMode after the ?tabletmode=<house_selector> URL param below
-// activates it server-side
-const actions = store => ({ ...dashboardActions(store), ...mainActions(store) });
+// dashboard actions plus the shared setTabletMode (main.js), used by the
+// ?tablet_mode_house=<house_selector> URL param below to activate tablet mode
+// the same way the "Tablet Mode" menu (SetTabletMode.jsx) does. Only that one
+// action is pulled in, not the whole main factory.
+const actions = store => ({ ...dashboardActions(store), setTabletMode: mainActions(store).setTabletMode });
 
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
@@ -186,41 +187,43 @@ class Dashboard extends Component {
     }
   };
 
-  // Mirrors checkIfFullScreenParameterIsHere: ?tabletmode=<house_name_or_selector>
-  // in the URL activates tablet mode for that house directly, the same way
-  // the "Tablet Mode" menu (SetTabletMode.jsx) does, without going through
-  // its UI. The selector is an internal slug never shown in the UI (the
-  // menu's dropdown only displays house.name), so the selector and the name
-  // are each matched exactly, in their own pass - selector first, since it's
-  // the more precise identifier - rather than combined in one predicate:
-  // both columns are unique, so neither pass alone can ever be ambiguous,
-  // and a house's selector can never be mistaken for a different house's
-  // name. No case-insensitive fallback: two houses may legitimately have
-  // names that differ only by case. Unlike ?fullscreen=force, this persists
-  // server-side on the session, so it is ignored on Gladys Plus: the
-  // "Tablet Mode" menu is hidden there (isGladysPlus in DashboardPage.jsx),
-  // which would leave a Plus browser locked by the house alarm with no UI
-  // to turn tablet mode back off.
+  // Mirrors checkIfFullScreenParameterIsHere: ?tablet_mode_house=<house_selector>
+  // in the URL activates tablet mode for that house directly, the same way the
+  // "Tablet Mode" menu (SetTabletMode.jsx) does, without going through its UI.
+  // The value is the house selector (a URL-safe slug, already unique), matched
+  // exactly - not the house name, which can carry spaces, accents or quotes
+  // that make a fragile URL, and could even collide with another house's
+  // selector. The menu builds this exact URL for the selected house behind a
+  // copy button, so nobody has to type or know a selector. Unlike
+  // ?fullscreen=force, this persists server-side on the session, so it is
+  // ignored on Gladys Plus: the "Tablet Mode" menu is hidden there
+  // (isGladysPlus in DashboardPage.jsx), which would leave a Plus browser
+  // locked by the house alarm with no UI to turn tablet mode back off.
   checkIfTabletModeParameterIsHere = async () => {
-    const houseNameOrSelector = this.props.tabletmode;
-    if (!houseNameOrSelector || this.state.isGladysPlus) {
+    const houseSelector = this.props.tablet_mode_house;
+    if (!houseSelector || this.state.isGladysPlus) {
+      return;
+    }
+    // A wall tablet keeps this parameter in its URL for good (/locked and the
+    // login return_url both preserve window.location.search), so this runs on
+    // every reload and every lock/unlock cycle. Skip the house fetch, the POST
+    // and the session DB write when the session already is in tablet mode for
+    // exactly this house.
+    if (this.props.tabletMode && this.props.session.getTabletModeCurrentHouseSelector() === houseSelector) {
       return;
     }
     try {
       const houses = await this.props.httpClient.get('/api/v1/house');
-      const house =
-        houses &&
-        (houses.find(h => h.selector === houseNameOrSelector) || houses.find(h => h.name === houseNameOrSelector));
+      const house = houses && houses.find(h => h.selector === houseSelector);
       if (!house) {
-        console.error(`?tabletmode=${houseNameOrSelector} does not match any house`);
+        // The person configuring a wall tablet never opens the console, and a
+        // silent no-op would leave them believing the tablet is in tablet mode
+        // (so locked when the alarm arms) when it is not. Surface it on screen.
+        console.error(`?tablet_mode_house=${houseSelector} does not match any house`);
+        this.setState({ tabletModeParamError: houseSelector });
         return;
       }
-      await this.props.httpClient.post('/api/v1/session/tablet_mode', {
-        tablet_mode: true,
-        house: house.selector
-      });
-      await this.props.refreshTabletMode();
-      this.props.session.setTabletModeCurrentHouseSelector(house.selector);
+      await this.props.setTabletMode(house.selector);
     } catch (e) {
       console.error(e);
     }
@@ -335,7 +338,9 @@ class Dashboard extends Component {
       dashboards: [],
       dashboardConfigsBySelector: {},
       newSelectedBoxType: {},
-      askDeleteDashboard: false
+      askDeleteDashboard: false,
+      // the ?tablet_mode_house= selector that matched no house, surfaced on screen
+      tabletModeParamError: null
     };
   }
 
@@ -428,7 +433,8 @@ class Dashboard extends Component {
       loading,
       currentDashboardLoadFailed,
       browserFullScreenCompatible,
-      duckDbMigrationJob
+      duckDbMigrationJob,
+      tabletModeParamError
     }
   ) {
     const dashboardConfigured =
@@ -474,6 +480,7 @@ class Dashboard extends Component {
         hideExitFullScreenButton={props.fullscreen === 'force'}
         isGladysPlus={isGladysPlus}
         duckDbMigrationJob={duckDbMigrationJob}
+        tabletModeParamError={tabletModeParamError}
       />
     );
   }

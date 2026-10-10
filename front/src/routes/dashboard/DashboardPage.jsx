@@ -150,6 +150,11 @@ const DashboardPage = ({ children, ...props }) => {
                     <Text id="dashboard.gatewayInstanceNotFoundError" />
                   </div>
                 )}
+                {props.tabletModeParamError && (
+                  <div class="alert alert-danger">
+                    <Text id="dashboard.tabletModeParamError" fields={{ value: props.tabletModeParamError }} />
+                  </div>
+                )}
                 <SetTabletMode
                   toggleDefineTabletMode={props.toggleDefineTabletMode}
                   defineTabletModeOpened={props.defineTabletModeOpened}
