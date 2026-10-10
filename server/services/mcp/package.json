@@ -13,7 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.25.3",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@toon-format/toon": "^2.1.0",
     "axios": "^1.7.9",
     "dayjs": "^1.11.6",
