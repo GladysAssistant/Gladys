@@ -3676,7 +3676,7 @@
           "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
         },
         "pilotWireFeatureLabel": "Steuerleitung (Aktor)",
-        "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm den zur Voreinstellung passenden Befehl (Komfort, Eco, Frostschutz, Aus), statt die Stromzufuhr zu unterbrechen. Der Heizkörper behält sein eigenes Thermostat, daher gelten weder Schwelle noch Zyklus. Lassen Sie den Schalter leer, wenn Sie dies verwenden.",
+        "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm den zur Voreinstellung passenden Befehl (Komfort, Eco, Frostschutz, Aus), statt die Stromzufuhr zu unterbrechen. Der Heizkörper behält sein eigenes Thermostat, daher gelten weder Schwelle noch Zyklus. Die Auswahl leert den Schalter und umgekehrt: Ein Heizkörper wird auf die eine oder die andere Weise gesteuert.",
         "windowFeatureLabel": "Fensterkontakt",
         "windowFeatureHelp": {
           "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",
@@ -3710,7 +3710,7 @@
         "saveButton": "Speichern",
         "cancelButton": "Abbrechen",
         "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
-        "incompleteVirtualError": "Ein virtueller Thermostat braucht einen Temperatursensor und einen Schalter: Er regelt, indem er den einen liest und den anderen schaltet.",
+        "incompleteVirtualError": "Ein virtueller Thermostat braucht einen Temperatursensor und einen Schalter – er regelt, indem er den einen liest und den anderen schaltet – oder eine Steuerleitung, die ohne Sensor auskommt.",
         "incompleteExternalError": "Ein vorhandener Thermostat braucht den Sollwert des Thermostats, den er steuert.",
         "activeScheduleLabel": "Aktiver Zeitplan",
         "activeScheduleHelp": "Wähle den Zeitplan, der automatisch auf dieses Thermostat angewendet wird.",

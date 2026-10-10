@@ -3676,7 +3676,7 @@
           "cooling": "El interruptor que se encenderá y apagará para enfriar la habitación."
         },
         "pilotWireFeatureLabel": "Hilo piloto (actuador)",
-        "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía la orden correspondiente al preajuste (confort, eco, antihielo, apagado) en lugar de cortar su alimentación. El radiador conserva su propio termostato, así que no se aplican ni umbral ni ciclo. Deja el interruptor vacío si usas este modo.",
+        "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía la orden correspondiente al preajuste (confort, eco, antihielo, apagado) en lugar de cortar su alimentación. El radiador conserva su propio termostato, así que no se aplican ni umbral ni ciclo. Elegirlo vacía el conmutador, y al revés: un radiador se controla de una forma o de la otra.",
         "windowFeatureLabel": "Sensor de apertura de ventana",
         "windowFeatureHelp": {
           "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",
@@ -3710,7 +3710,7 @@
         "saveButton": "Guardar",
         "cancelButton": "Cancelar",
         "saveError": "Error al guardar.",
-        "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un conmutador: regula leyendo uno y accionando el otro.",
+        "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un conmutador —regula leyendo uno y accionando el otro— o un hilo piloto, que no necesita sensor.",
         "incompleteExternalError": "Un termostato existente necesita la consigna del termostato que controla.",
         "activeScheduleLabel": "Programación activa",
         "activeScheduleHelp": "Selecciona la programación que se aplicará automáticamente a este termostato.",

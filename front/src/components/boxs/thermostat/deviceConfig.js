@@ -5,6 +5,7 @@ const PARAM_FIELDS = [
   ['temperature_feature', 'THERMOSTAT_TEMPERATURE_FEATURE'],
   ['humidity_feature', 'THERMOSTAT_HUMIDITY_FEATURE'],
   ['switch_feature', 'THERMOSTAT_SWITCH_FEATURE'],
+  ['pilot_wire_feature', 'THERMOSTAT_PILOT_WIRE_FEATURE'],
   // External thermostats: the real device regulates itself, and these point at
   // features owned by another integration (Netatmo, Zigbee, Matter, MQTT...).
   ['thermostat_type', 'THERMOSTAT_TYPE'],
@@ -80,7 +81,8 @@ export const buildStateFromFeatures = device => {
     modeFeature: mode,
     preset: preset ? preset.last_value : null,
     mode: mode ? mode.last_value : null,
-    operatingState: operatingState ? operatingState.last_value : null
+    operatingState: operatingState ? operatingState.last_value : null,
+    operatingStateFeature: operatingState ? operatingState.selector : null
   };
 };
 

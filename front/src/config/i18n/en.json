@@ -3676,7 +3676,7 @@
           "cooling": "The switch that will be turned on and off to cool the room."
         },
         "pilotWireFeatureLabel": "Pilot wire (actuator)",
-        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it the order its preset maps to (comfort, eco, frost protection, off) instead of cutting its supply. The heater keeps its own thermostat, so no threshold or cycle applies. Leave the switch empty when you use this.",
+        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it the order its preset maps to (comfort, eco, frost protection, off) instead of cutting its supply. The heater keeps its own thermostat, so no threshold or cycle applies. Picking it empties the switch, and the reverse: a heater is driven one way or the other.",
         "windowFeatureLabel": "Window opening sensor",
         "windowFeatureHelp": {
           "heating": "Optional. If a window is open, the heating is automatically cut off.",
@@ -3710,7 +3710,7 @@
         "saveButton": "Save",
         "cancelButton": "Cancel",
         "saveError": "Error while saving.",
-        "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and a switch: reading one and actuating the other is how it regulates.",
+        "incompleteVirtualError": "A virtual thermostat needs a temperature sensor and a switch — reading one and actuating the other is how it regulates — or a pilot wire, which needs no sensor.",
         "incompleteExternalError": "An existing thermostat needs the setpoint of the thermostat it drives.",
         "activeScheduleLabel": "Active schedule",
         "activeScheduleHelp": "Select the schedule to automatically apply to this thermostat.",

@@ -183,6 +183,15 @@ function createActions(store) {
       store.setState({ [field]: value });
     },
 
+    // The switch and the pilot wire are the same actuator slot: picking one
+    // empties the other, so the form can never describe a heater driven both
+    // ways at once.
+    updateThermostatActuator(state, field, value) {
+      const other =
+        field === 'thermostatEditPilotWireFeature' ? 'thermostatEditSwitchFeature' : 'thermostatEditPilotWireFeature';
+      store.setState(value ? { [field]: value, [other]: '' } : { [field]: value });
+    },
+
     updateThermostatUnit(state, newUnit) {
       const oldUnit = state.thermostatEditTempUnit || 'C';
       if (oldUnit === newUnit) return;
@@ -235,7 +244,11 @@ function createActions(store) {
         const controlType = state.thermostatEditControlType || 'hysteresis';
         const temperatureFeature = state.thermostatEditTemperatureFeature || '';
         const humidityFeature = state.thermostatEditHumidityFeature || '';
-        const switchFeature = state.thermostatEditSwitchFeature || '';
+        const pilotWireFeature = state.thermostatEditPilotWireFeature || '';
+        // A heater is driven by one actuator or the other, never both: the form
+        // clears one when the other is picked, and the save holds to it for a
+        // device that already carried both.
+        const switchFeature = pilotWireFeature ? '' : state.thermostatEditSwitchFeature || '';
         const windowFeature = state.thermostatEditWindowFeature || '';
         // `|| default` would discard an explicitly entered 0, which the preset
         // inputs accept: toNumber only falls back when the value is not a number.
@@ -263,10 +276,11 @@ function createActions(store) {
         // nothing said why. What makes a thermostat is the pair it drives — a
         // sensor to read and a switch to actuate, or the setpoint of a real
         // thermostat — so that is what is required, named in the error rather
-        // than reported as a generic failure.
+        // than reported as a generic failure. A pilot-wire heater keeps its own
+        // thermostat and is handed an order, not a contact: it needs no sensor.
         const missingConfig = isExternalThermostat
           ? !state.thermostatEditTargetFeature
-          : !temperatureFeature || !switchFeature;
+          : !pilotWireFeature && (!temperatureFeature || !switchFeature);
         if (missingConfig) {
           store.setState({
             thermostatCreateStatus: RequestStatus.Error,
@@ -317,12 +331,7 @@ function createActions(store) {
             { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: temperatureFeature },
             { name: 'THERMOSTAT_HUMIDITY_FEATURE', value: humidityFeature },
             { name: 'THERMOSTAT_SWITCH_FEATURE', value: isExternalThermostat ? '' : switchFeature },
-            // A heater is driven by one actuator or the other, never both: the
-            // loop would send an order and cut the supply at the same time.
-            {
-              name: 'THERMOSTAT_PILOT_WIRE_FEATURE',
-              value: isExternalThermostat ? '' : state.thermostatEditPilotWireFeature || ''
-            },
+            { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: isExternalThermostat ? '' : pilotWireFeature },
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
             // Only meaningful on an external thermostat, and cleared otherwise so
             // switching a device back to virtual cannot leave it driving a real
