@@ -47,6 +47,7 @@ const boxSchema = Joi.object().keys({
   clock_display_second: Joi.boolean(),
   camera_latency: Joi.string(),
   camera_live_auto_start: Joi.boolean(),
+  camera_ptz_controls: Joi.boolean(),
   scenes: Joi.array().items(Joi.string()),
   // scene box: optional live status subtitle per scene button (scene selector -> device feature selector)
   scene_status_features: Joi.object().pattern(Joi.string(), Joi.string()),
