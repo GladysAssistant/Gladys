@@ -112,27 +112,31 @@ const Gauge = ({ component, feature, language }) => {
 };
 
 export const WidgetTiles = ({ components, featuresBySelector, deviceNamesBySelector, language }) => (
-  <div class={style.tiles}>
-    {components.map(component => {
-      const feature = component.device_feature_selector ? featuresBySelector[component.device_feature_selector] : null;
-      const label =
-        text(component.label, language) ||
-        (component.device_feature_selector && deviceNamesBySelector[component.device_feature_selector]) ||
-        '';
-      return (
-        <div class={style.tile}>
-          {component.icon && component.type === 'value' && (
-            <i class={cx(`fe fe-${component.icon}`, style.tileIcon, colorClass(component.color))} />
-          )}
-          {component.type === 'gauge' ? (
-            <Gauge component={component} feature={feature} language={language} />
-          ) : (
-            <TileValue component={component} feature={feature} language={language} />
-          )}
-          {label && <span class={style.tileLabel}>{label}</span>}
-        </div>
-      );
-    })}
+  <div class={style.tilesBox}>
+    <div class={cx(style.tiles, style[`tilesCount${Math.min(components.length, 6)}`])}>
+      {components.map(component => {
+        const feature = component.device_feature_selector
+          ? featuresBySelector[component.device_feature_selector]
+          : null;
+        const label =
+          text(component.label, language) ||
+          (component.device_feature_selector && deviceNamesBySelector[component.device_feature_selector]) ||
+          '';
+        return (
+          <div class={style.tile}>
+            {component.icon && component.type === 'value' && (
+              <i class={cx(`fe fe-${component.icon}`, style.tileIcon, colorClass(component.color))} />
+            )}
+            {component.type === 'gauge' ? (
+              <Gauge component={component} feature={feature} language={language} />
+            ) : (
+              <TileValue component={component} feature={feature} language={language} />
+            )}
+            {label && <span class={style.tileLabel}>{label}</span>}
+          </div>
+        );
+      })}
+    </div>
   </div>
 );
 
