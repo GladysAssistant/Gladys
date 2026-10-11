@@ -34,13 +34,12 @@
 
 /* --- tiles: one wrapping row of value / gauge tiles --- */
 .tiles {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
   gap: 8px;
 }
 
 .tile {
-  flex: 1 1 96px;
   min-width: 0;
   max-width: 100%;
   display: flex;
