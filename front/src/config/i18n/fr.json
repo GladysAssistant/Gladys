@@ -354,6 +354,7 @@
     "editDashboardTitle": "Éditer le tableau de bord",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "tabletModeParamError": "Le mode tablette n'a pas pu être activé : aucune maison ne correspond à « {{value}} » dans le paramètre d'URL ?tablet_mode_house=. Utilisez l'URL affichée dans le menu Mode tablette.",
+    "tabletModeActivationError": "Le mode tablette n'a pas pu être activé en raison d'une erreur réseau ou serveur. Rechargez la page pour réessayer.",
     "editDashboardNameLabel": "Nom",
     "editDashboardVisibility": "Visibilité",
     "editDashboardVisibilityDescription": "Les tableaux de bord publics seront visibles par tous les membres de l'installation Gladys.",

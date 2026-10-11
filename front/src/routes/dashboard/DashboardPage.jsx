@@ -155,6 +155,11 @@ const DashboardPage = ({ children, ...props }) => {
                     <Text id="dashboard.tabletModeParamError" fields={{ value: props.tabletModeParamError }} />
                   </div>
                 )}
+                {props.tabletModeActivationFailed && (
+                  <div class="alert alert-danger">
+                    <Text id="dashboard.tabletModeActivationError" />
+                  </div>
+                )}
                 <SetTabletMode
                   toggleDefineTabletMode={props.toggleDefineTabletMode}
                   defineTabletModeOpened={props.defineTabletModeOpened}

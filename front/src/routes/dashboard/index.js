@@ -225,7 +225,12 @@ class Dashboard extends Component {
       }
       await this.props.setTabletMode(house.selector);
     } catch (e) {
+      // Same kiosk trap as an unknown selector: a failed GET /house or POST
+      // leaves the tablet looking normal but NOT in tablet mode, so it will not
+      // lock when the alarm arms. Surface it too, with its own message - this
+      // is a network/server error, not a "no house matches".
       console.error(e);
+      this.setState({ tabletModeActivationFailed: true });
     }
   };
 
@@ -340,7 +345,9 @@ class Dashboard extends Component {
       newSelectedBoxType: {},
       askDeleteDashboard: false,
       // the ?tablet_mode_house= selector that matched no house, surfaced on screen
-      tabletModeParamError: null
+      tabletModeParamError: null,
+      // a network/server error while activating tablet mode from the URL param
+      tabletModeActivationFailed: false
     };
   }
 
@@ -434,7 +441,8 @@ class Dashboard extends Component {
       currentDashboardLoadFailed,
       browserFullScreenCompatible,
       duckDbMigrationJob,
-      tabletModeParamError
+      tabletModeParamError,
+      tabletModeActivationFailed
     }
   ) {
     const dashboardConfigured =
@@ -481,6 +489,7 @@ class Dashboard extends Component {
         isGladysPlus={isGladysPlus}
         duckDbMigrationJob={duckDbMigrationJob}
         tabletModeParamError={tabletModeParamError}
+        tabletModeActivationFailed={tabletModeActivationFailed}
       />
     );
   }

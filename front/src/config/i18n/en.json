@@ -354,6 +354,7 @@
     "editDashboardDoneButton": "Done",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
     "tabletModeParamError": "Tablet mode could not be activated: no house matches \"{{value}}\" in the ?tablet_mode_house= URL parameter. Use the URL shown in the Tablet Mode menu.",
+    "tabletModeActivationError": "Tablet mode could not be activated because of a network or server error. Reload the page to try again.",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Visibility",
     "editDashboardVisibilityDescription": "Public dashboards will be visible to all members of the Gladys installation.",

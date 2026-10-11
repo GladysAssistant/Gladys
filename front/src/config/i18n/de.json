@@ -354,6 +354,7 @@
     "editDashboardDoneButton": "Fertig",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
     "tabletModeParamError": "Der Tablet-Modus konnte nicht aktiviert werden: Kein Zuhause entspricht „{{value}}“ im URL-Parameter ?tablet_mode_house=. Verwende die im Menü „Tablet-Modus“ angezeigte URL.",
+    "tabletModeActivationError": "Der Tablet-Modus konnte wegen eines Netzwerk- oder Serverfehlers nicht aktiviert werden. Lade die Seite neu, um es erneut zu versuchen.",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Sichtbarkeit",
     "editDashboardVisibilityDescription": "Öffentliche Dashboards sind für alle Mitglieder der Gladys-Installation sichtbar.",

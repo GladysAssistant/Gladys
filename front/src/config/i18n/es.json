@@ -354,6 +354,7 @@
     "editDashboardDoneButton": "Listo",
     "gatewayInstanceNotFoundError": "Su instancia de Gladys no está conectada a Gladys Gateway",
     "tabletModeParamError": "No se pudo activar el modo tableta: ninguna casa coincide con «{{value}}» en el parámetro de URL ?tablet_mode_house=. Utilice la URL que se muestra en el menú Modo tableta.",
+    "tabletModeActivationError": "No se pudo activar el modo tableta debido a un error de red o del servidor. Recargue la página para volver a intentarlo.",
     "editDashboardNameLabel": "Nombre",
     "editDashboardVisibility": "Visibilidad",
     "editDashboardVisibilityDescription": "Los paneles públicos serán visibles para todos los miembros de la instalación de Gladys.",

@@ -163,9 +163,11 @@ class SetTabletMode extends Component {
                           value={this.tabletModeUrl()}
                           onFocus={e => e.target.select()}
                         />
-                        <button class="btn btn-secondary" type="button" onClick={this.copyTabletModeUrl}>
-                          <Text id={copyUrlLabel} />
-                        </button>
+                        <span class="input-group-append">
+                          <button class="btn btn-secondary" type="button" onClick={this.copyTabletModeUrl}>
+                            <Text id={copyUrlLabel} />
+                          </button>
+                        </span>
                       </div>
                     </div>
                   )}
