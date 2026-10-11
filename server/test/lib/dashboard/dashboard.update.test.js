@@ -321,6 +321,25 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('period_start_day', 5);
   });
 
+  it('should save an energy price box carrying a contract selector', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        [
+          {
+            type: DASHBOARD_BOX_TYPE.ENERGY_PRICE,
+            energy_contract: 'edf-tempo-9-kva',
+            name: 'Electricity price',
+          },
+        ],
+      ],
+    });
+    expect(updatedDashboard.boxes[0].columns[0][0]).to.deep.equal({
+      type: DASHBOARD_BOX_TYPE.ENERGY_PRICE,
+      energy_contract: 'edf-tempo-9-kva',
+      name: 'Electricity price',
+    });
+  });
+
   it('should return not found', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'not-found-dashboard', {
       name: 'new name',

@@ -7,6 +7,7 @@ import cx from 'classnames';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
+import FormulaFunctionsHelp from '../../../../components/scene/FormulaFunctionsHelp';
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
 import style from './PlayNotification.css';
 // The Simple/Computed selector is the one already used by the other actions.
@@ -130,6 +131,7 @@ class PlayNotification extends Component {
           <div className={valueTypeStyle.explanationText}>
             <Text id="editScene.actionsCard.playNotification.computedExplanationText" />
           </div>
+          <FormulaFunctionsHelp />
           <div class="input-group">
             <TextWithVariablesInjected
               text={this.props.action.evaluate_volume || ''}

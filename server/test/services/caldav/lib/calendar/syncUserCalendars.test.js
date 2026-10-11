@@ -580,6 +580,61 @@ describe('CalDAV sync of a calendar with recurring events', () => {
     expect(sync.gladys.calendar.destroyEvent.args).to.eql([['heating-2026-01-02-08-00']]);
   });
 
+  it('should keep the saved occurrences of an event which could not be formatted', async () => {
+    sync.requestChanges.resolves([
+      { href: '/home/heating/broken-event.ics', props: { etag: '91ca3c11' } },
+      { href: '/home/heating/recurring-event.ics', props: { etag: '91ca3c10' } },
+    ]);
+    sync.formatRecurringEvents.throws(new Error('Invalid recurrence rule'));
+
+    sync.requestEventsData.resolves([
+      {
+        type: 'VEVENT',
+        uid: 'broken',
+        summary: 'Broken',
+        start: new Date('2026-01-01 08:00:00.000 +00:00'),
+        end: new Date('2026-01-01 09:00:00.000 +00:00'),
+        rrule: {},
+        href: '/home/heating/broken-event.ics',
+      },
+      {
+        type: 'VEVENT',
+        uid: 'heating',
+        summary: 'Chauffage',
+        start: new Date('2026-01-01 08:00:00.000 +00:00'),
+        end: new Date('2026-01-01 09:00:00.000 +00:00'),
+        href: '/home/heating/recurring-event.ics',
+      },
+    ]);
+
+    sync.gladys.calendar.getEvents.withArgs(userId, { calendarId }).resolves([
+      // Occurrences of the event which could not be formatted, they still exist on the CalDAV server
+      {
+        selector: 'broken-2026-01-01-08-00',
+        external_id: 'broken2026-01-01-08-00',
+        url: '/home/heating/broken-event.ics',
+      },
+      {
+        selector: 'broken-2026-01-02-08-00',
+        external_id: 'broken2026-01-02-08-00',
+        url: '/home/heating/broken-event.ics',
+      },
+      { selector: 'heating', external_id: 'heating', url: '/home/heating/recurring-event.ics' },
+      {
+        selector: 'heating-2026-01-02-08-00',
+        external_id: 'heating2026-01-02-08-00',
+        url: '/home/heating/recurring-event.ics',
+      },
+    ]);
+
+    await sync.syncUserCalendars(userId);
+
+    expect(sync.gladys.calendar.createEvent.callCount).to.equal(1);
+    expect(sync.gladys.calendar.destroyEvent.args).to.eql([['heating-2026-01-02-08-00']]);
+    // The other changes were applied, the calendar is marked as up to date
+    expect(sync.gladys.calendar.update.callCount).to.equal(1);
+  });
+
   it('should not save the new ctag if the events synchronization failed', async () => {
     sync.requestChanges.rejects();
 

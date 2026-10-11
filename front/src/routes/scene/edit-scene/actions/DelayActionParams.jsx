@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
+import FormulaFunctionsHelp from '../../../../components/scene/FormulaFunctionsHelp';
 import style from './DeviceSetValue.css';
 
 class WaitActionParams extends Component {
@@ -43,6 +44,7 @@ class WaitActionParams extends Component {
           <div className={style.explanationText}>
             <Text id="editScene.actionsCard.delay.computedExplanationText" />
           </div>
+          <FormulaFunctionsHelp />
           <div class="input-group">
             <Localizer>
               <TextWithVariablesInjected

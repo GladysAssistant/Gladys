@@ -134,6 +134,16 @@ body.dark-mode {
   filter: invert(100%) hue-rotate(180deg); /* Double inversion cancels out, preserving original colors */
 }
 
+/* The double inversion above hands native date and time fields their real dark
+   colours, but the browser still draws their calendar or clock icon for a light
+   field: black on dark, next to invisible. A dark colour scheme draws it light,
+   and the picker it opens dark. */
+.dark-mode input[type='date'],
+.dark-mode input[type='time'],
+.dark-mode input[type='datetime-local'] {
+  color-scheme: dark;
+}
+
 .dark-mode input::placeholder,
 .dark-mode .form-control::placeholder,
 .dark-mode .input-group-text::placeholder {

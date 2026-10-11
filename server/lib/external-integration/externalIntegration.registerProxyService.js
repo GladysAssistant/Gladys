@@ -146,6 +146,18 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // every external integration exposes the generic scene capability, like
+  // device.setValue: the scene engine relays a reached action through it
+  // (scene.actions.js, the exact path mqtt.send takes) and the supervisor
+  // reads the CURRENT manifest on every run (runSceneAction) — gating the
+  // capability on the manifest known here would freeze the declarations at
+  // registration time, and a scene action added by an update would fail
+  // until the next restart
+  const sceneCapability = {
+    scene: Object.freeze({
+      runAction: async (actionKey, fields, options) => this.runSceneAction(service, actionKey, fields, options),
+    }),
+  };
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -155,6 +167,7 @@ function registerProxyService(service) {
     },
     ...messageCapability,
     ...weatherCapability,
+    ...sceneCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {
@@ -222,6 +235,13 @@ function registerProxyService(service) {
       },
     }),
   });
+  // registering must be idempotent: init() registers every installed
+  // integration at boot and update() registers the updated row again.
+  // stateManager.setState() MERGES into the existing Store, and the proxy is
+  // frozen, so a second registration would throw "Cannot assign to read only
+  // property 'start'" — the entry is dropped first, exactly as uninstall does.
+  this.stateManager.deleteState('service', service.name);
+  this.stateManager.deleteState('serviceById', service.id);
   this.stateManager.setState('service', service.name, proxyService);
   this.stateManager.setState('serviceById', service.id, proxyService);
 }

@@ -2,7 +2,7 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
 
 module.exports = function HttpController(gladys) {
   /**
-   * @api {post} /api/v1/http/request
+   * @api {post} /api/v1/http/request Send an HTTP request from Gladys
    * @apiName httpRequest
    * @apiGroup Http
    * @apiParam {String} method Method of the request

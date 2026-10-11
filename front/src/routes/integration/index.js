@@ -9,14 +9,17 @@ import normalizeSearchText from '../../utils/normalizeSearchText';
 import { SERVICE_STATUS, USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import debounce from 'debounce';
 import { integrations, catalogCategories } from '../../config/integrations';
-import { getLocalizedText } from './all/external-integration/utils';
+import { getLocalizedText, TYPES_WITHOUT_DEVICE_SCREENS } from './all/external-integration/utils';
 import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog, rememberCatalogUrl } from './catalog-url';
 import createActionsExternalIntegrationUpdates from '../../actions/externalIntegrationUpdates';
 import { RequestStatus } from '../../utils/consts';
 
 // the role rules stay expressed on the technical `type` (spec §2.2): the
 // browse categories are display metadata and play no part in visibility
-const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
+// `provider` (capability-only external integrations) joins device and weather:
+// installing is an admin act, the widgets themselves reach every user through
+// the dashboard picker
+const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'provider'];
 // homekit exposes the whole house to a hub; free-mobile is a single global SMS
 // account whose page reads service-wide credentials. Neither has anything
 // per-user, so a non-admin has no business on those pages.
@@ -234,11 +237,12 @@ class Integration extends Component {
     const { user = {}, category } = this.props;
     const isAdmin = user.role === USER_ROLE.ADMIN;
     const language = user.language || 'en';
-    // a non-admin user only sees the installed communication integrations:
-    // the device screens and the store are admin-only (the server already
-    // returns nothing else, this is the same rule on the display side)
+    // a non-admin user only sees the installed communication and calendar
+    // integrations: the device screens and the store are admin-only (the
+    // server already returns nothing else, this is the same rule on the
+    // display side)
     const installed = (this.state.externalInstalled || []).filter(
-      integration => isAdmin || get(integration, 'manifest.type') === 'communication'
+      integration => isAdmin || ['communication', 'calendar'].includes(get(integration, 'manifest.type'))
     );
     const store = isAdmin ? this.state.externalStore || [] : [];
 
@@ -277,10 +281,10 @@ class Integration extends Component {
       return manifestCategories.filter(key => KNOWN_CATEGORY_KEYS.has(key));
     };
 
-    // communication and weather integrations have no device screens: their
-    // card lands straight on the configuration screen
+    // communication, weather, calendar and provider integrations have no device
+    // screens: their card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      ['communication', 'weather'].includes(manifest.type)
+      TYPES_WITHOUT_DEVICE_SCREENS.includes(manifest.type)
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
 
@@ -294,7 +298,7 @@ class Integration extends Component {
         key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: TYPES_WITHOUT_DEVICE_SCREENS.includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: getInstalledUrl(integration.selector, manifest),
@@ -318,7 +322,7 @@ class Integration extends Component {
         key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: TYPES_WITHOUT_DEVICE_SCREENS.includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled

@@ -232,6 +232,18 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     await updateProgressIfNeeded();
     await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
   });
+  // The device pages show the size of each feature's history: the next one opened
+  // must not show the states that were just deleted. Only this feature changed, so
+  // the cached counts are corrected rather than dropped, which would cost another
+  // full scan; a count running meanwhile is kept out of the cache, and the next
+  // callers start a fresh one instead of joining it.
+  this.featuresStatesSizeGeneration += 1;
+  this.featuresStatesSizeInFlight = null;
+  if (this.featuresStatesSizeCache) {
+    const { counts } = this.featuresStatesSizeCache;
+    counts.totalStates -= counts.statesByFeatureId.get(deviceFeatureId) || 0;
+    counts.statesByFeatureId.delete(deviceFeatureId);
+  }
   return {
     numberOfDeviceFeatureStateToDelete,
     numberOfDeviceFeatureStateAggregateToDelete,

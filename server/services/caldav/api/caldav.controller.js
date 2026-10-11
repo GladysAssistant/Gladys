@@ -45,7 +45,7 @@ module.exports = function CalDAVController(caldavHandler) {
    * @apiGroup CalDAV
    */
   async function enable(req, res) {
-    const calendar = await caldavHandler.enableCalendar(req.body.selector, req.body.sync);
+    const calendar = await caldavHandler.enableCalendar(req.body.selector, req.user.id);
     res.status(200).json(calendar);
   }
 
@@ -55,7 +55,7 @@ module.exports = function CalDAVController(caldavHandler) {
    * @apiGroup CalDAV
    */
   async function disable(req, res) {
-    const calendar = await caldavHandler.disableCalendar(req.body.selector, req.body.sync);
+    const calendar = await caldavHandler.disableCalendar(req.body.selector, req.user.id);
     res.status(200).json(calendar);
   }
 

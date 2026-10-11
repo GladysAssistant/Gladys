@@ -2,6 +2,7 @@ import { Fragment } from 'preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 
 const SonosPage = ({ children, user }) => (
@@ -37,6 +38,7 @@ const SonosPage = ({ children, user }) => (
       </Fragment>
     }
   >
+    <DeprecationWarning />
     {children}
   </IntegrationSubPageLayout>
 );

@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
+import { connect } from 'unistore/preact';
 import cx from 'classnames';
+import get from 'get-value';
 import { useCallback, useState } from 'preact/hooks';
 
 import style from './style.css';
@@ -44,12 +46,15 @@ import SendMqttMessage from './actions/SendMqttMessage';
 import SendZigbee2MqttMessage from './actions/SendZigbee2MqttMessage';
 import PlayNotification from './actions/PlayNotification';
 import EdfTempoCondition from './actions/EdfTempoCondition';
+import EnergyCurrentPriceCondition from './actions/EnergyCurrentPriceCondition';
 import AskAI from './actions/AskAI';
 import SendSms from './actions/SendSms';
 import ConditionIfElseThen from './actions/ConditionIfElseThen';
 import ConditionWhile from './actions/ConditionWhile';
 import SetVariable from './actions/SetVariable';
 import GetDate from './actions/GetDate';
+import ExternalIntegrationAction from './actions/ExternalIntegrationAction';
+import { SCENE_DECLARATION_KINDS, getSceneDeclarationTitle } from './sceneIntegrations';
 
 const ACTION_COMPONENTS = {
   [null]: ChooseActionTypeParams,
@@ -78,6 +83,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.CALENDAR.GET_EVENTS]: CalendarGetEvents,
   [ACTIONS.ECOWATT.CONDITION]: EcowattCondition,
   [ACTIONS.EDF_TEMPO.CONDITION]: EdfTempoCondition,
+  [ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE]: EnergyCurrentPriceCondition,
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: CheckAlarmMode,
   [ACTIONS.ALARM.SET_ALARM_MODE]: SetAlarmMode,
   [ACTIONS.MQTT.SEND]: SendMqttMessage,
@@ -88,7 +94,8 @@ const ACTION_COMPONENTS = {
   [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
   [ACTIONS.CONDITION.WHILE]: ConditionWhile,
   [ACTIONS.VARIABLE.SET]: SetVariable,
-  [ACTIONS.TIME.GET_DATE]: GetDate
+  [ACTIONS.TIME.GET_DATE]: GetDate,
+  [ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION]: ExternalIntegrationAction
 };
 
 const ActionCard = ({ children, ...props }) => {
@@ -155,6 +162,17 @@ const ActionCard = ({ children, ...props }) => {
   );
 
   const summary = !isExpanded ? getActionSummary(props.action, props.intl.dictionary) : null;
+  // an action declared by an external integration is titled by its manifest
+  // label; an orphan one (uninstalled, key removed) keeps the generic label
+  const declarationTitle =
+    props.action.type === ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION
+      ? getSceneDeclarationTitle(
+          props.sceneIntegrations,
+          SCENE_DECLARATION_KINDS.action,
+          props.action,
+          get(props, 'user.language') || 'en'
+        )
+      : null;
 
   // A card of a parallel block and a condition are slots of their list, so
   // the drop placement can be computed from the pointer position alone
@@ -186,7 +204,7 @@ const ActionCard = ({ children, ...props }) => {
           </span>
           <div class={style.stepText} onClick={toggleExpanded}>
             <span class={style.stepLabel} data-step-label>
-              <Text id={`editScene.actions.${props.action.type}`} />
+              {declarationTitle || <Text id={`editScene.actions.${props.action.type}`} />}
               {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
               {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
             </span>
@@ -254,7 +272,8 @@ const ActionCard = ({ children, ...props }) => {
               addAction: props.addAction,
               moveCard: props.moveCard,
               moveCardGroup: props.moveCardGroup,
-              scene: props.scene
+              scene: props.scene,
+              sceneIntegrations: props.sceneIntegrations
             };
 
             return <Component {...commonProps} />;
@@ -276,4 +295,4 @@ const ActionCard = ({ children, ...props }) => {
   );
 };
 
-export default withIntlAsProp(ActionCard);
+export default connect('user', {})(withIntlAsProp(ActionCard));

@@ -16,7 +16,19 @@ const countKey = () =>
 // Each job type declares its own keys here: a key owned by one domain is rejected on
 // every other job type, so the generic job model never becomes a flat catalogue of
 // all domains and two types can never collide on a same-named key.
+// Energy cost calculations: the prices taken from a contract's fallback because a calendar
+// value was missing (docs/specs/energy-contracts.md, 7.6)
+const energyCostDataKeys = {
+  fallback_prices_count: countKey(),
+};
+
 const dataKeysByJobType = {
+  [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES]: energyCostDataKeys,
+  [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_YESTERDAY]: energyCostDataKeys,
+  [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_BEGINNING]: energyCostDataKeys,
+  [JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_CONTRACT]: energyCostDataKeys,
+  [JOB_TYPES.ENERGY_MONITORING_BILLING_PERIOD_END]: energyCostDataKeys,
+  [JOB_TYPES.ENERGY_MONITORING_DELEGATED_CATCH_UP]: energyCostDataKeys,
   [JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE]: {
     step: Joi.string().valid('waiting_database', 'counting', 'deleting_states', 'deleting_aggregates'),
     device_name: Joi.string(),

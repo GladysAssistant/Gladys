@@ -1,16 +1,19 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
+const { ensureSelfOrAdmin } = require('../utils/ensureSelfOrAdmin');
 
 module.exports = function LocationController(gladys) {
   /**
    * @api {post} /api/v1/user/:user_selector/location create
    * @apiName create
    * @apiGroup Location
+   * @apiDescription Only the user themselves or an admin can save a user's location.
    * @apiParam {Number} latitude Latitude of the user
    * @apiParam {Number} longitude Longitude of the user
    * @apiParam {Number} altitude Altitude of the user
    * @apiParam {Number} accuracy Accuracy of the geolocation
    */
   async function create(req, res) {
+    ensureSelfOrAdmin(req, req.params.user_selector);
     const newLocation = await gladys.location.create(req.params.user_selector, req.body);
     res.status(201).json(newLocation);
   }
@@ -19,6 +22,7 @@ module.exports = function LocationController(gladys) {
    * @api {get} /api/v1/user/:user_selector/location get user locations
    * @apiName getLocationsUser
    * @apiGroup Location
+   * @apiDescription Only the user themselves or an admin can read a user's location history.
    * @apiParam {string} [from="1 week ago"] - Start date
    * @apiParam {string} [to="now"] - End date
    * @apiSuccessExample {json} Success-Response
@@ -36,6 +40,7 @@ module.exports = function LocationController(gladys) {
    * ]
    */
   async function getLocationsUser(req, res) {
+    ensureSelfOrAdmin(req, req.params.user_selector);
     const locations = await gladys.location.get(req.params.user_selector, req.query.from, req.query.to);
     res.json(locations);
   }

@@ -220,6 +220,7 @@ class ConditionWhile extends Component {
                   triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
                   scene={props.scene}
+                  sceneIntegrations={props.sceneIntegrations}
                   lastActionGroup={index === props.action.then.length - 1}
                 />
               ))}

@@ -1,22 +1,18 @@
 const { Error422 } = require('../../utils/httpErrors');
-
-// Dynamic options of a select/multi_select field: a reserved enum defined
-// by the core (see validateManifest). "devices": the options are the
-// already-created devices of the integration (value = external_id), so the
-// valid values are only known at runtime and are passed in by the caller.
-const DYNAMIC_SOURCES = ['devices'];
+const { DYNAMIC_SOURCES } = require('./constants');
 
 /**
- * @description Tell if a schema contains at least one field whose options
- * come from a core-defined dynamic source (the valid values must then be
- * resolved before validating).
+ * @description List the core-defined dynamic sources declared by the fields
+ * of a schema, without duplicates: each one must be resolved before
+ * validating (see getDynamicOptions).
  * @param {Array} fields - The config_schema/contact_schema/action fields.
- * @returns {boolean} True if a field has a dynamic source.
+ * @returns {Array} The declared dynamic sources, ex: ['devices', 'houses'].
  * @example
- * if (schemaHasDynamicSource(manifest.config_schema)) { ... }
+ * const sources = getDynamicSources(manifest.config_schema);
  */
-function schemaHasDynamicSource(fields) {
-  return (fields || []).some((field) => DYNAMIC_SOURCES.includes(field.source));
+function getDynamicSources(fields) {
+  const sources = (fields || []).map((field) => field.source).filter((source) => DYNAMIC_SOURCES.includes(source));
+  return [...new Set(sources)];
 }
 
 /**
@@ -39,6 +35,10 @@ function getValidValues(field, dynamicOptions) {
 /**
  * @description Build the "must be one of ..." error suffix, so a field with
  * a dynamic source and nothing to choose from does not end on an empty list.
+ * The houses are never listed: the integration itself posts config values
+ * (POST /config), and reading the houses of Gladys is the `location`
+ * authorization contract of GET /house, not something an error message may
+ * leak.
  * @param {object} field - The config_schema field.
  * @param {Array} validValues - The valid values of the field.
  * @returns {string} The human readable list of valid values.
@@ -46,6 +46,9 @@ function getValidValues(field, dynamicOptions) {
  * describeValidValues({ source: 'devices' }, []);
  */
 function describeValidValues(field, validValues) {
+  if (field.source === 'houses') {
+    return 'the selectors of the houses of Gladys';
+  }
   if (validValues.length === 0 && DYNAMIC_SOURCES.includes(field.source)) {
     return `the ${field.source} of the integration (none available yet)`;
   }
@@ -123,6 +126,5 @@ function validateConfigValue(field, value, dynamicOptions = {}) {
 
 module.exports = {
   validateConfigValue,
-  schemaHasDynamicSource,
-  DYNAMIC_SOURCES,
+  getDynamicSources,
 };

@@ -94,7 +94,7 @@ async function sendWeeklyDigest({ force = false } = {}) {
           return;
         }
 
-        await this.message.sendToUser(admin.selector, digestText, null, { messageType: 'notification' });
+        await this.message.sendSystemMessage(admin.selector, digestText, null, { messageType: 'notification' });
         sent += 1;
       } catch (e) {
         if (e instanceof Error429) {

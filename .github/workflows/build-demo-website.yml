@@ -1,8 +1,9 @@
 name: Build and publish demo website
 
 on:
-  # Dispatched on the new tag by the "Create release tag" workflow: a tag pushed
-  # with the default GITHUB_TOKEN does not trigger the `push` event below.
+  # Started by the push of the release tag (the "Create release tag" workflow
+  # pushes it with a deploy key, so the `push` event below does fire).
+  # workflow_dispatch stays for re-running a failed build on an existing tag.
   workflow_dispatch:
   push:
     tags:
@@ -11,9 +12,16 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # The deployment secrets live in the `production` environment, which only
+    # jobs running on master or on a v* tag can read (see .github/MAINTAINERS.md).
+    environment: production
     name: Build and publish demo website
     steps:
       - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -31,11 +39,8 @@ jobs:
         run: |
           npm run build
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@1
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_PUBLISH_TO_PAGES_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: gladysassistant-demo
-          directory: ./front/build
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          command: pages deploy ./front/build --project-name=gladysassistant-demo --branch=main

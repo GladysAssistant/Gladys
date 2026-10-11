@@ -1,0 +1,854 @@
+/* ─── Schedule Editor : vertical day list ─── */
+
+.dayList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.dayRow {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.dayRow:last-child {
+  border-bottom: none;
+}
+
+.dayRowOpen {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.dayClickZone {
+  cursor: pointer;
+  user-select: none;
+}
+
+.dayClickZone:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.dayRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 6px 16px;
+}
+
+.dayLabel {
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+}
+
+.dayChevron {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+/* ─── 24h time bar ─── */
+
+.timeBarWrapper {
+  padding: 2px 16px 12px 16px;
+}
+
+.timeBar {
+  display: flex;
+  height: 14px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: transparent;
+  outline: 1px solid rgba(0, 0, 0, 0.06);
+  outline-offset: -1px;
+}
+
+.timeBarSegment {
+  height: 100%;
+  width: var(--seg-width);
+  background: var(--seg-color);
+  flex-shrink: 0;
+}
+
+/* The colour key for the seven day bars, once under them. */
+.presetLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 10px 0 1.25rem;
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.presetLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.presetLegendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: var(--swatch-color, #adb5bd);
+}
+
+/* The dark theme inverts the whole page, so a preset colour would come back as
+   its opposite: inverted once more to land back on the colour the bars show. */
+:global(.dark-mode) .presetLegendSwatch {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* Where a day with no point of its own gets its colour from. */
+.carriedFrom {
+  padding: 0 16px 8px 16px;
+  font-size: 0.78rem;
+  color: #868e96;
+}
+
+:global(.dark-mode) .timeBarWrapper {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+.timeBarMarkers {
+  position: relative;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.timeMarker {
+  position: absolute;
+  left: var(--marker-left);
+  transform: translateX(-50%);
+  /* 0.68rem was 10.9px, the smallest text on the page; 0.75rem is what the week
+     miniature's own scale uses, so the two read alike. The darker grey takes
+     them from 2.9:1 to 4.7:1 — they are what places a range on the day. */
+  font-size: 0.75rem;
+  color: #6c757d;
+  white-space: nowrap;
+  line-height: 18px;
+}
+
+.timeMarkerFixed {
+  color: #adb5bd;
+  font-size: 0.65rem;
+  opacity: 0.8;
+}
+
+/* ─── Day edit panel ─── */
+
+.dayPanel {
+  padding: 10px 16px 14px 16px;
+  border-top: 1px dashed #dee2e6;
+}
+
+.noSlotsText {
+  font-size: 0.85rem;
+}
+
+.slotEditorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  /* The whole row opens the range for editing, so it is a touch target: 35px was
+     under the 44px a thumb needs. Carried by the padding rather than a fixed
+     height, so a row that wraps on a narrow card still grows with its content. */
+  min-height: 44px;
+  padding: 10px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.slotEditorRow:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: #dee2e6;
+}
+
+.slotTimeDisplay {
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  color: #212529;
+  min-width: 42px;
+}
+
+.slotPresetLabel {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+/* Marks the end time of a slot that runs past midnight, so the row reads
+   22:30 → 06:30 +1d instead of losing the morning the user typed. */
+/* The end of a point is read, not set: it is the next point's time. Greying it
+   says so without a second input that would mean intervals again. */
+.slotEndTime {
+  color: #868e96;
+}
+
+.slotNextDay {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  padding: 1px 4px;
+  flex-shrink: 0;
+}
+
+.gapWarningTitle {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.gapWarningList {
+  margin: 4px 0 0;
+  padding-left: 24px;
+  font-size: 0.88rem;
+}
+
+/* #adb5bd is a 2.3:1 grey: the pencil is the only sign that a range can be
+   edited at all, and it was barely visible. #6c757d reaches 4.7:1 and still
+   stays quieter than the times it sits beside. */
+.slotEditIcon {
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-left: auto;
+}
+
+.newSlotForm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: rgba(32, 107, 196, 0.07);
+  border: 1px dashed #74c0fc;
+  border-radius: 6px;
+}
+
+.editSlotForm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: rgba(240, 173, 78, 0.08);
+  border: 1px dashed #f59f00;
+  border-radius: 6px;
+}
+
+.slotColorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--dot-color, #adb5bd);
+}
+
+:global(.dark-mode) .slotColorDot {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* Not a fixed width: in a 12-hour locale the input also renders an AM/PM
+   indicator, which a hard 90px cut off. The field sizes itself to its content
+   and only takes 90px as a floor. */
+.slotTimeInput {
+  width: auto !important;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.slotArrow {
+  color: #6c757d;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.slotPresetSelect {
+  flex: 1;
+  min-width: 80px;
+}
+
+/* Declared before the phone block below on purpose: at equal specificity the
+   later rule wins, and these `display: none` once overrode the phone layout.
+   A time and its name, as one field. Side by side on a phone, and on a desktop row
+   the name is hidden and this is just the input. */
+.slotTimeField {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.slotFieldLabel {
+  display: none;
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 2px;
+}
+
+/* The glyph alone carries the desktop row, where the buttons sit in a line of
+   controls that reads left to right. */
+.slotActionLabel {
+  display: none;
+}
+
+/* On a phone the row has to wrap. Laid out on one line, the two time inputs
+   (90px floor each), the arrow and a preset select taking every remaining pixel
+   pushed the confirm and cancel buttons past x = 409 on a 390px screen — off an
+   edge the page does not scroll to, so a range could be neither validated nor
+   dismissed. The times keep the first row, the preset and the buttons take the
+   second, and the select gives up `flex: 1` so it stops eating the width and
+   truncating its own options ("Confor"). */
+@media (max-width: 575px) {
+  .newSlotForm,
+  .editSlotForm {
+    flex-wrap: wrap;
+  }
+
+  /* The preset takes its own full row, under the two times. */
+  .slotPresetSelect {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  /* 16px, because iOS zooms the page in on focusing a field smaller than that —
+     the card then sits half off the screen and has to be pinched back. */
+  .newSlotForm :global(.form-control),
+  .editSlotForm :global(.form-control) {
+    font-size: 16px;
+    height: auto;
+    padding: 8px 10px;
+  }
+
+  /* Named and thumb-sized: the two 32x26px glyphs were the only way to confirm or
+     dismiss a range, under the 44px a thumb needs and with nothing saying what
+     they did. */
+  .slotAction {
+    flex: 1 1 8rem;
+    min-height: 44px;
+  }
+
+  .slotActionLabel {
+    display: inline;
+    margin-left: 6px;
+  }
+
+  /* Each time keeps its own named field, side by side on the first row. A zero
+     basis shares the row between the two whatever its width: a 7rem basis
+     wrapped the end time under the start inside the narrow day panel. */
+  .slotTimeField {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-bottom: 0;
+  }
+
+  .slotFieldLabel {
+    display: block;
+  }
+
+  /* The arrow sat alone on a line of its own once the form wrapped. Only in the
+     form: a read-only row still reads 06:30 → 08:30. */
+  .newSlotForm .slotArrow,
+  .editSlotForm .slotArrow {
+    display: none;
+  }
+
+  /* Bootstrap sizes `select.form-control-sm:not([size]):not([multiple])` at
+     31px, a selector that outranks the 16px rule above: the text was cut
+     ("Confort"). Matched here so the select is as tall as the two times. */
+  .newSlotForm select.slotPresetSelect:not([size]):not([multiple]),
+  .editSlotForm select.slotPresetSelect:not([size]):not([multiple]) {
+    height: auto;
+  }
+
+  /* Sized by its field rather than by its content: `width: auto` with a 90px
+     floor overflowed a 7rem column at 360px. */
+  .slotTimeInput {
+    width: 100% !important;
+    min-width: 0;
+  }
+}
+
+.dayPanelActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* The two buttons a day is filled in with, at 28px as btn-sm: brought to the
+   44px a thumb needs, like every other control here. */
+.dayPanelActions :global(.btn) {
+  min-height: 44px;
+}
+
+/* ─── Copy to days picker ─── */
+
+/* Two layouts and nothing in between. Left to wrap freely, the chips broke 5 + 1
+   or 3 + 2 + 1 depending on the width, with "Sun" stretched alone across a line.
+   By default: the label, then the days in two rows of three, then the two actions
+   on their own row, flush right so Sunday ends above the right edge of the last
+   button. Only when the picker is wide enough for the whole of it on one line
+   (see the container query below) do the label, the six days and the actions sit
+   side by side. The width is the picker's, not the window's: the editor's card is
+   much narrower than the screen on a desktop. */
+.copyPicker {
+  container: copy-picker / inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.copyPickerLabel {
+  flex: 1 1 100%;
+  font-weight: 600;
+}
+
+/* Each day is a whole tappable chip rather than a bare 13px checkbox: on a
+   phone the box alone was the only target, well under the 44px a thumb needs. */
+.copyPickerDays {
+  flex: 1 1 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.copyPickerDay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 40, 100, 0.16);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Cancel then the action, like the form's sticky bar, at the full button size
+   of that bar: the small variant read as secondary text next to 44px chips. On
+   their own row they share its whole width, each half of it, like the days above. */
+.copyPickerActions {
+  flex: 1 1 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.copyPickerActions :global(.btn) {
+  min-height: 44px;
+  padding-left: 18px;
+  padding-right: 18px;
+  flex: 1 1 0;
+}
+
+/* One line once it all fits. 840px covers the longest translation (German: the
+   label "Kopieren nach:" and "Abbrechen" / "Anwenden") with some margin; under it
+   the picker keeps the two rows of three. */
+@container copy-picker (min-width: 840px) {
+  .copyPickerLabel {
+    flex: 0 0 auto;
+  }
+
+  .copyPickerDays {
+    flex: 1 1 0;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .copyPickerActions {
+    flex: 0 0 auto;
+  }
+
+  .copyPickerActions :global(.btn) {
+    flex: 0 0 auto;
+  }
+}
+
+/* On a phone: tighter chips so three fit a row at 360px. */
+@media (max-width: 575px) {
+  .copyPickerDay {
+    padding: 0 6px;
+  }
+}
+
+/* ─── Save row ─── */
+
+.saveRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ─── Schedule list cards ─── */
+
+.scheduleCard {
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  border-radius: 3px;
+  margin-bottom: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.scheduleCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 40, 100, 0.06);
+}
+
+.scheduleCardTitle {
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0;
+  color: #495057;
+}
+
+.scheduleCardActions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ─── Summary mini-bars in schedule list ─── */
+
+.scheduleSummaryBars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summaryDayRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summaryDayName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.summaryBar {
+  flex: 1;
+  height: 8px;
+  border-radius: 3px;
+  background: #e9ecef;
+  display: flex;
+  overflow: hidden;
+}
+
+.summaryBarSegment {
+  height: 100%;
+  width: var(--seg-width);
+  background: var(--seg-color);
+  flex-shrink: 0;
+}
+
+.emptyIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.slotFormWrapper {
+  margin-bottom: 8px;
+}
+
+.slotFormWrapper .newSlotForm,
+.slotFormWrapper .editSlotForm {
+  margin-bottom: 0;
+}
+
+.fullDayHint {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: #6c757d;
+}
+
+/* The follower badge holds its detach button, so it lays its two children out
+   rather than being plain text. */
+/* Its own colours rather than badge-secondary's. The dark theme inverts the page
+   and then counter-inverts `.badge`, which landed the chip on a washed-out grey
+   with near-black text — PG read it as having no background at all. A blue tint
+   with a border reads as a chip in both themes, and says these are the thermostats
+   following this schedule rather than a neutral tag. */
+.followerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(32, 107, 196, 0.12);
+  border: 1px solid rgba(32, 107, 196, 0.28);
+  color: #1c5fa8;
+}
+
+/* A glyph, not a button-looking button: inside a badge there is no room for a
+   border and a background, and the badge itself already reads as one chip. */
+.followerDetach {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+/* The glyph stays badge-sized, the target does not: 12x14px is well under the
+   24px of WCAG 2.5.8, and this is what stops a thermostat following a schedule.
+   28px rather than the widget's 44 — the badges are 4px apart, so a wider square
+   would reach well across the gap; the z-index keeps the cross being aimed at
+   above the couple of pixels it does overlap. */
+.followerDetach::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+}
+
+.followerDetach:hover,
+.followerDetach:focus {
+  z-index: 1;
+}
+
+.followerDetach:hover,
+.followerDetach:focus-visible {
+  opacity: 1;
+}
+
+/* The week at a glance on a schedule card: seven thin bars, one per day, each a
+   24-hour track coloured by preset. Small enough that a list of schedules stays
+   a list, readable enough to tell two programmes apart without opening them. */
+.weekPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.weekPreviewRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weekPreviewDay {
+  flex: 0 0 2.4rem;
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+
+/* Gridlines at 6h, 12h and 18h, drawn on the track itself rather than as
+   elements: they have to sit *under* the coloured segments, and the same three
+   hours are labelled once below the week. */
+/* No gridlines on the track: drawn as its background they sat under the
+   segments, so they showed through on an empty schedule — where there is nothing
+   to place — and vanished on a filled one, where the hours actually matter. The
+   scale below the week carries them instead, as it does in the editor. */
+.weekPreviewBar {
+  display: flex;
+  flex: 1;
+  height: 10px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+/* The dark theme inverts the whole page, which turned the night blue into the
+   frost blue and the other way round. Counter-inverted like the editor's own
+   bars (.timeBarWrapper above), so a preset keeps its colour in both themes —
+   the track is then written in light-theme values, since the global filter flips
+   it back. */
+:global(.dark-mode) .weekPreviewBar {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* Opaque, like the editor's own segments: translucency washed the colours out
+   once the bar is counter-inverted for the dark theme, and a preset has to read
+   as the same colour in both views. `flex-shrink: 0` keeps a narrow slot from
+   being squeezed to nothing by its neighbours. */
+.weekPreviewSegment {
+  width: var(--seg-width);
+  background: var(--seg-color);
+  flex-shrink: 0;
+}
+
+/* Aligned with the bars, not the row: the day column above is 2.2rem plus the
+   8px gap, and the scale has to start where the tracks start. */
+.weekPreviewScale {
+  position: relative;
+  height: 14px;
+  margin-left: calc(2.4rem + 8px);
+}
+
+.weekPreviewMark {
+  position: absolute;
+  left: var(--mark-left);
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  line-height: 14px;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+/* The colour key for the bars above. Aligned on the bars rather than on the day
+   names, so the swatches sit under the stripes they describe. */
+.weekPreviewLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 6px 0 0 calc(2.4rem + 8px);
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.weekPreviewLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.weekPreviewLegendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: var(--swatch-color, #adb5bd);
+}
+
+/* The dark theme inverts the whole page, so a preset colour would come back as
+   its opposite: the swatches have to be inverted once more to land back on the
+   colour the bars show. Same counter-inversion as the bars themselves. */
+:global(.dark-mode) .weekPreviewLegendSwatch {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* The card's actions, at its foot and sharing its width — the same shape the
+   thermostat cards use, since these cards now sit in the same two-column grid.
+   Wraps rather than squeezing the labels when the confirmation takes over. */
+.cardButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cardButtons > span {
+  flex: 1;
+  min-width: 160px;
+  gap: 8px;
+}
+
+/* Same shape as the thermostat cards' confirmation: the question goes on its own
+   line on a narrow card, and the two answers keep a usable width. */
+.confirmDeleteRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.confirmDeleteRow .cardButtons {
+  flex: 1;
+  min-width: 160px;
+}
+
+.confirmDeleteText {
+  font-weight: 500;
+}
+
+/* A section heading with the weight and the spacing of .form-label, which is
+   what a thermostat card opens with: a smaller, lighter label took up less
+   height, and the first row then sat closer to the header than it does there.
+   0.875rem/600 and the same 0.375rem below, so the two cards breathe alike. */
+.sectionLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #9aa0ac;
+  margin-bottom: 0.375rem;
+}
+
+/* The chosen thermostats, above the select that adds one more. Wraps rather
+   than scrolling: a house has a handful of thermostats, not a list. */
+.followerList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+/* ─── Mobile header ─── */
+
+.schedulePage {
+  /* Hook for the mobile header rules below; no styling of its own. */
+  position: relative;
+}
+
+/* The theme's `.page-options` is `margin-left: auto` and nothing else, so the
+   sort select, the search field and the "New schedule" button laid themselves out
+   on one 520px line: on a 390px screen the button left the card and the page
+   scrolled sideways. Wrapping is added on the element; these two make the wrap
+   effective, since a search field with an intrinsic width would otherwise
+   overflow the row it wrapped onto. */
+@media (max-width: 575px) {
+  .schedulePage :global(.card-header) {
+    flex-wrap: wrap;
+  }
+
+  .schedulePage :global(.page-options) {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .schedulePage :global(.page-options) :global(.input-icon) {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+}
+
+/* ─── House grouping ─── */
+
+/* A bare h3 rendered at 1.75rem, larger than the card's own 1.125rem title: the
+   house names read as the page's headline and "Plannings" as a subtitle. Sized
+   below the card title, since a house groups the cards rather than titling the
+   page. */
+.houseTitle {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* A refusal that belongs to one row of the editor, shown under it. */
+.slotRowError {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: #c0392b;
+}

@@ -23,12 +23,14 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
 .removeNumberArrow::-webkit-outer-spin-button,
 .removeNumberArrow::-webkit-inner-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 
 /* Firefox */
 .removeNumberArrow {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .setpointHorizontalControls {

@@ -167,6 +167,18 @@ const FEATURE_UNIT_BY_CATEGORY_TYPE = {
     DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
     DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER
   )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR,
+    DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY
+  )]: DEVICE_FEATURE_UNITS.GRAM_CO2_EQ_PER_KILOWATT_HOUR,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR,
+    DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR,
+    DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.RENEWABLE_PERCENTAGE
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.NO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
@@ -282,12 +294,15 @@ const TELEINFORMATION_POWER_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN_1,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN1_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3
 ]);
@@ -306,6 +321,7 @@ const TELEINFORMATION_CURRENT_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS3,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX3
 ]);
@@ -637,6 +653,14 @@ export const getFeatureDefaultValues = (category, type) => {
     return { ...defaults, min: 0, max: 1, read_only: false, keep_history: false };
   }
 
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR &&
+    type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE
+  ) {
+    // Command silencing the detector's siren: written, not measured
+    return { ...defaults, min: 0, max: 1, read_only: false, keep_history: false };
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.MOVE) {
     // min/max cover the CAMERA_MOVE canonical values (STOP=0 .. ZOOM_OUT=6)
     return { ...defaults, min: 0, max: 6, read_only: false, keep_history: false };
@@ -694,6 +718,11 @@ export const getFeatureDefaultValues = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) {
     // THERMOSTAT_MODE: OFF/HEATING/COOLING/AUTO
     return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET) {
+    // THERMOSTAT_PRESET: SCHEDULE/FROST/AWAY/ECO/NIGHT/COMFORT
+    return applyDefaultUnit({ ...defaults, min: 0, max: 5, read_only: false }, category, type);
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE) {
@@ -780,6 +809,15 @@ export const getFeatureDefaultValues = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR) {
     return { ...defaults, min: 0, max: 1000000, read_only: true };
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY) {
+      // The dirtiest grids sit around 900 gCO2eq/kWh: 1500 leaves headroom without
+      // flattening the usual range on a chart.
+      return applyDefaultUnit({ ...defaults, min: 0, max: 1500, read_only: true }, category, type);
+    }
+    return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: true }, category, type);
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
@@ -1072,6 +1110,16 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR) {
     return 42;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_INTENSITY) {
+      return 57;
+    }
+    if (type === DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.CARBON_FREE_PERCENTAGE) {
+      return 92;
+    }
+    return 28;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {

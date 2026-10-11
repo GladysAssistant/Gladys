@@ -15,6 +15,7 @@ import CoverDeviceFeature from './device-features/CoverDeviceFeature';
 import SetpointDeviceFeature from './device-features/SetpointDeviceFeature';
 import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
 import ThermostatModeDeviceFeature from './device-features/ThermostatModeDeviceFeature';
+import ThermostatPresetDeviceFeature from './device-features/ThermostatPresetDeviceFeature';
 import FanModeDeviceFeature from './device-features/FanModeDeviceFeature';
 import FanLabeledSelectDeviceFeature from './device-features/FanLabeledSelectDeviceFeature';
 import AirConditioningFanSpeedDeviceFeature from './device-features/AirConditioningFanSpeedDeviceFeature';
@@ -96,6 +97,10 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.FAN]: {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
   },
+  [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: {
+    // Hushing the detector's siren is a plain on/off control
+    [DEVICE_FEATURE_TYPES.SMOKE_SENSOR.TEMPORARY_MUTE]: BinaryDeviceFeature
+  },
   [DEVICE_FEATURE_CATEGORIES.CAMERA]: {
     // The "enabled" gate is a plain on/off control (docs/specs/camera-enable-disable.md)
     [DEVICE_FEATURE_TYPES.CAMERA.ENABLED]: BinaryDeviceFeature,
@@ -119,7 +124,8 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
     {}
   ),
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
-    [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: ThermostatModeDeviceFeature
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: ThermostatModeDeviceFeature,
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.PRESET]: ThermostatPresetDeviceFeature
   },
   // A dynamic select: its options are string values discovered on the appliance by the
   // integration (installed TV apps, HDMI sources...), declared through supported_options

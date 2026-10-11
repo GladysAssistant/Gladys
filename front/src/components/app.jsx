@@ -205,6 +205,10 @@ import ExternalIntegrationSupervisionPage from '../routes/integration/all/extern
 import ExternalIntegrationLogsPage from '../routes/integration/all/external-integration/logs-page';
 import ExternalIntegrationInstallPage from '../routes/integration/all/external-integration/install-page';
 import ExternalIntegrationOAuthCallbackPage from '../routes/integration/all/external-integration/oauth-callback-page';
+// Thermostat integration
+import ThermostatDevicePage from '../routes/integration/all/thermostat/device-page';
+import ThermostatEditPage from '../routes/integration/all/thermostat/edit-page';
+import ThermostatSchedulePage from '../routes/integration/all/thermostat/schedule-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -343,10 +347,10 @@ const AppRouter = connect(
         <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
         <CallMeBotPage path="dashboard/integration/communication/callmebot" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/contracts" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/contracts/create" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/contracts/edit/:selector" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices" />
-        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/create" />
-        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/import" />
-        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/edit/:id" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/settings" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
@@ -393,6 +397,11 @@ const AppRouter = connect(
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />
         <MELCloudDiscoverPage path="/dashboard/integration/device/melcloud/discover" />
         <MELCloudSetupPage path="/dashboard/integration/device/melcloud/setup" />
+
+        <ThermostatDevicePage path="/dashboard/integration/device/thermostat" />
+        <ThermostatSchedulePage path="/dashboard/integration/device/thermostat/schedule" />
+        <ThermostatEditPage path="/dashboard/integration/device/thermostat/new" />
+        <ThermostatEditPage path="/dashboard/integration/device/thermostat/edit/:deviceSelector" />
 
         <NukiPage path="/dashboard/integration/device/nuki" />
         <NukiSetupPage path="/dashboard/integration/device/nuki/setup" />

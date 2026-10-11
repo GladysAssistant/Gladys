@@ -619,6 +619,47 @@ describe('GET /api/v1/device/duckdb_migration_state', () => {
   });
 });
 
+describe('GET /api/v1/device/:device_selector/states_size', () => {
+  it('should get the size of the history of each feature of a device', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device/test-camera/states_size')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('device_selector', 'test-camera');
+        expect(res.body.features[0]).to.have.property('device_feature_selector', 'test-camera-image');
+        expect(res.body.features[0])
+          .to.have.property('states')
+          .that.is.a('number');
+        expect(res.body.features[0])
+          .to.have.property('estimated_size_in_bytes')
+          .that.is.a('number');
+      });
+  });
+  it('should return 404 on an unknown device', async () => {
+    await authenticatedRequest.get('/api/v1/device/unknown-device/states_size').expect(404);
+  });
+});
+
+describe('GET /api/v1/device/states_stats', () => {
+  it('should get the states saved per device over the last 24 hours', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device/states_stats')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('period_in_hours', 24);
+        expect(res.body).to.have.property('verbose_device_feature_min_states', 8640);
+        expect(res.body)
+          .to.have.property('total_states')
+          .that.is.a('number');
+        expect(res.body)
+          .to.have.property('devices')
+          .that.is.an('array');
+      });
+  });
+});
+
 describe('POST /api/v1/device/purge_all_sqlite_state', () => {
   it('should delete all sqlite states', async () => {
     await authenticatedRequest

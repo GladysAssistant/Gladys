@@ -3,15 +3,21 @@ import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
 import style from './style.css';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 // Refresh EDF Tempo data every 1 hour
 const BOX_REFRESH_INTERVAL_MS = 1 * 60 * 60 * 1000;
+
+// Tempo peak hours are defined in French local time, whatever timezone the
+// browser sits in. Read the Paris hour with Intl rather than dayjs's timezone
+// plugin: `dayjs.extend()` mutates the shared dayjs singleton, and
+// react-big-calendar then switches its own date maths over to `dayjs.tz`,
+// which shifted the calendar's time grid and duplicated days around DST.
+const parisHourFormatter = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Europe/Paris',
+  hour: 'numeric',
+  hourCycle: 'h23'
+});
 
 // The Tempo color IS the information: a tinted pill with a color dot, from
 // the same family as the theme's stamps (soft background, saturated ink)
@@ -130,8 +136,7 @@ class EdfTempo extends Component {
   };
 
   refreshPeakHourState = () => {
-    const today = dayjs();
-    const todayHour = today.tz('Europe/Paris').hour();
+    const todayHour = Number(parisHourFormatter.format(new Date()));
     const currentHourPeakState = todayHour >= 6 && todayHour < 22 ? 'peak-hour' : 'off-peak-hour';
     this.setState({ currentHourPeakState });
   };

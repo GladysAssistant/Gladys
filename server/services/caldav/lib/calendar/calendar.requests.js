@@ -1,5 +1,6 @@
 const url = require('url');
 const logger = require('../../../../utils/logger');
+const { CALENDAR_TYPES } = require('../../../../utils/constants');
 
 /**
  * @description Search elements as getElementsByTagName with regex instead of string.
@@ -61,7 +62,7 @@ async function requestCalendars(xhr, homeUrl) {
         ctag: res.props.getctag,
         displayName: res.props.displayname,
         components: res.props.supportedCalendarComponentSet,
-        type: res.props.resourcetype.includes('calendar') ? 'CALDAV' : 'WEBCAL',
+        type: res.props.resourcetype.includes('calendar') ? CALENDAR_TYPES.CALDAV : CALENDAR_TYPES.WEBCAL,
         syncToken: res.props.syncToken,
       };
     });

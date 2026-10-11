@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { authenticatedRequest } = require('../request.test');
+const { authenticatedRequest, nonAdminRequest, NON_ADMIN_USER_ID } = require('../request.test');
+const db = require('../../../models');
+const { USER_ROLE } = require('../../../utils/constants');
 
 describe('POST /api/v1/house', () => {
   it('should create house', async () => {
@@ -180,6 +182,55 @@ describe('POST /api/v1/house/:user_selector/user/:user_selector/seen', () => {
       .then((res) => {
         expect(res.body).to.have.property('current_house_id', 'a741dfa6-24de-4b46-afc7-370772f068d5');
       });
+  });
+
+  // Marking a user as seen changes their presence and can start presence
+  // scenes: a non-admin user can only do it for themselves, while an admin can
+  // still do it for the whole household.
+  describe('access control', () => {
+    beforeEach(async () => {
+      await db.User.create({
+        id: NON_ADMIN_USER_ID,
+        firstname: 'Pepper',
+        lastname: 'Potts',
+        selector: 'pepper-habitant',
+        email: 'pepper-habitant@pots.com',
+        password: 'mysuperpassword',
+        role: USER_ROLE.HABITANT,
+        language: 'en',
+        birthdate: '1990-12-12',
+      });
+    });
+
+    it('should let a non-admin mark themselves as seen', async () => {
+      await nonAdminRequest
+        .post('/api/v1/house/test-house/user/pepper-habitant/seen')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.have.property('current_house_id', 'a741dfa6-24de-4b46-afc7-370772f068d5');
+        });
+    });
+
+    it('should not let a non-admin mark another user as seen', async () => {
+      const johnBefore = await db.User.findOne({ where: { selector: 'john' } });
+      await nonAdminRequest
+        .post('/api/v1/house/test-house/user/john/seen')
+        .expect('Content-Type', /json/)
+        .expect(403);
+      const johnAfter = await db.User.findOne({ where: { selector: 'john' } });
+      expect(johnAfter.current_house_id).to.equal(johnBefore.current_house_id);
+    });
+
+    it('should let an admin mark another user as seen', async () => {
+      await authenticatedRequest
+        .post('/api/v1/house/test-house/user/pepper-habitant/seen')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.have.property('current_house_id', 'a741dfa6-24de-4b46-afc7-370772f068d5');
+        });
+    });
   });
 });
 

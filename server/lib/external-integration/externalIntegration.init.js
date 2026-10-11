@@ -44,6 +44,8 @@ async function init() {
   });
   const plainServices = services.map((service) => service.get({ plain: true }));
   plainServices.forEach((service) => this.registerProxyService(service));
+  // energy calendars: re-declare at boot so a restored database gets its metadata back
+  await Promise.all(plainServices.map((service) => this.declareEnergyCalendars(service)));
 
   // store index: periodic refresh every 30 min; the first fetch is lazy (first
   // catalog access, see getIndex) so the boot never depends on the network.

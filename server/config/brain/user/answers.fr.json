@@ -2,5 +2,11 @@
   {
     "label": "user.forgot-password.success",
     "answers": ["Vous avez demandé à réinitialiser votre mot de passe. Voici le lien :"]
+  },
+  {
+    "label": "user.forgot-password.code",
+    "answers": [
+      "Vous avez demandé à réinitialiser votre mot de passe. Voici votre code à usage unique, valable 15 minutes, à saisir dans le formulaire de réinitialisation :"
+    ]
   }
 ]

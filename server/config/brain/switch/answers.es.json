@@ -1,0 +1,22 @@
+[
+  {
+    "label": "switch.turn-on.success",
+    "answers": ["¡El interruptor está encendido!"]
+  },
+  {
+    "label": "switch.turn-on.fail",
+    "answers": ["No he podido encender el interruptor."]
+  },
+  {
+    "label": "switch.turn-off.success",
+    "answers": ["¡El interruptor está apagado!"]
+  },
+  {
+    "label": "switch.turn-off.fail",
+    "answers": ["No he podido apagar el interruptor."]
+  },
+  {
+    "label": "switch.not-found",
+    "answers": ["No he encontrado ningún interruptor con ese nombre."]
+  }
+]

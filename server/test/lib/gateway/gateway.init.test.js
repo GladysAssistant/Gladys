@@ -217,6 +217,25 @@ describe('gateway.init', () => {
     });
   });
 
+  it('should check the latest Gladys version 5 minutes after init', async () => {
+    gateway.getLatestGladysVersion = fake.resolves(null);
+
+    await gateway.init();
+
+    assert.notCalled(gateway.getLatestGladysVersion);
+    await clock.tickAsync(5 * 60 * 1000);
+    assert.calledOnceWithExactly(gateway.getLatestGladysVersion);
+  });
+
+  it('should not crash when the latest Gladys version check fails after init', async () => {
+    gateway.getLatestGladysVersion = fake.rejects(new Error('Gladys Plus unreachable'));
+
+    await gateway.init();
+
+    await clock.tickAsync(5 * 60 * 1000);
+    assert.calledOnceWithExactly(gateway.getLatestGladysVersion);
+  });
+
   it('check init cancel pending job', async () => {
     // Store job
     const cancel = fake.returns(null);

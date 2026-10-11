@@ -42,7 +42,7 @@ async function checkBatteries() {
               current: feature.last_value,
             },
           });
-          this.messageManager.sendToUser(admin.selector, message);
+          this.messageManager.sendSystemMessage(admin.selector, message);
         });
       });
   });
@@ -64,7 +64,7 @@ async function checkBatteries() {
               name: device.name,
             },
           });
-          this.messageManager.sendToUser(admin.selector, message);
+          this.messageManager.sendSystemMessage(admin.selector, message);
         });
       });
   });

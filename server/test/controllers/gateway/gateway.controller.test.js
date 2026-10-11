@@ -1,5 +1,6 @@
 const nock = require('nock');
 const { expect } = require('chai');
+const sinon = require('sinon').createSandbox();
 const getConfig = require('../../../utils/getConfig');
 const db = require('../../../models');
 const { authenticatedRequest, nonAdminRequest, NON_ADMIN_USER_ID } = require('../request.test');
@@ -349,7 +350,19 @@ describe('POST /api/v1/gateway/voice', () => {
 });
 
 describe('POST /api/v1/gateway/refresh-latest-gladys-version', () => {
+  let isOfficialReleaseImageStub;
+
+  beforeEach(() => {
+    isOfficialReleaseImageStub = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'isOfficialReleaseImage');
+  });
+
+  afterEach(() => {
+    isOfficialReleaseImageStub.restore();
+    nock.cleanAll();
+  });
+
   it('should refresh latest gladys version', async () => {
+    isOfficialReleaseImageStub.returns(true);
     nock(config.gladysGatewayServerUrl)
       .post('/v1/api/gladys/version', (body) => true)
       .reply(200, {
@@ -361,5 +374,21 @@ describe('POST /api/v1/gateway/refresh-latest-gladys-version', () => {
       .expect('Content-Type', /json/)
       .expect(200);
     expect(response.body).to.have.property('message', 'Refresh finished');
+  });
+
+  it('should not call Gladys Plus when the instance is not an official release image', async () => {
+    isOfficialReleaseImageStub.returns(false);
+    const gladysPlusCall = nock(config.gladysGatewayServerUrl)
+      .post('/v1/api/gladys/version', (body) => true)
+      .reply(200, {
+        name: 'v4.56.1',
+        created_at: '2025-03-31T08:17:48.202Z',
+      });
+    const response = await authenticatedRequest
+      .post('/api/v1/gateway/refresh-latest-gladys-version')
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(response.body).to.have.property('message', 'Refresh finished');
+    expect(gladysPlusCall.isDone()).to.equal(false);
   });
 });

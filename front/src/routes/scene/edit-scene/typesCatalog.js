@@ -29,6 +29,7 @@ export const ACTION_ICON = {
   [ACTIONS.CALENDAR.GET_EVENTS]: 'fe fe-calendar',
   [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
   [ACTIONS.EDF_TEMPO.CONDITION]: 'fe fe-zap',
+  [ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE]: 'fe fe-dollar-sign',
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
@@ -37,7 +38,8 @@ export const ACTION_ICON = {
   [ACTIONS.AI.ASK]: 'fe fe-cpu',
   [ACTIONS.SMS.SEND]: 'fe fe-message-circle',
   [ACTIONS.VARIABLE.SET]: 'fe fe-hash',
-  [ACTIONS.TIME.GET_DATE]: 'fe fe-clock'
+  [ACTIONS.TIME.GET_DATE]: 'fe fe-clock',
+  [ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION]: 'fe fe-box'
 };
 
 // Action types on their way out. They stay in the picker because existing scenes
@@ -66,7 +68,9 @@ export const TRIGGER_ICON = {
   [EVENTS.SYSTEM.START]: 'fe fe-activity',
   [EVENTS.MQTT.RECEIVED]: 'fe fe-hash',
   [EVENTS.WEATHER.ALERT_RAISED]: 'fe fe-alert-triangle',
-  [EVENTS.WEATHER.ALERT_ENDED]: 'fe fe-check-circle'
+  [EVENTS.WEATHER.ALERT_ENDED]: 'fe fe-check-circle',
+  [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]: 'fe fe-dollar-sign',
+  [EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT]: 'fe fe-box'
 };
 
 // Actions grouped by category, in the order they are displayed in the picker.
@@ -106,7 +110,8 @@ export const ACTION_CATEGORIES = [
       ACTIONS.ALARM.CHECK_ALARM_MODE,
       ACTIONS.CALENDAR.IS_EVENT_RUNNING,
       ACTIONS.ECOWATT.CONDITION,
-      ACTIONS.EDF_TEMPO.CONDITION
+      ACTIONS.EDF_TEMPO.CONDITION,
+      ACTIONS.ENERGY_CONTRACT.CURRENT_PRICE
     ]
   },
   {
@@ -143,7 +148,8 @@ export const COLOR_CLASS = {
   orange: 'typePickerIconOrange',
   red: 'typePickerIconRed',
   yellow: 'typePickerIconYellow',
-  gray: 'typePickerIconGray'
+  gray: 'typePickerIconGray',
+  teal: 'typePickerIconTeal'
 };
 
 const buildColorMap = categories =>
@@ -196,12 +202,27 @@ export const TRIGGER_CATEGORIES = [
     items: [EVENTS.WEATHER.ALERT_RAISED, EVENTS.WEATHER.ALERT_ENDED]
   },
   {
+    key: 'energy',
+    color: 'yellow',
+    items: [EVENTS.ENERGY_CONTRACT.PRICE_CHANGED]
+  },
+  {
     key: 'advanced',
     color: 'gray',
     items: [EVENTS.SYSTEM.START, EVENTS.MQTT.RECEIVED]
   }
 ];
 
-// Category color of each action / trigger type, for the card icon tiles
-export const ACTION_COLOR = buildColorMap(ACTION_CATEGORIES);
-export const TRIGGER_COLOR = buildColorMap(TRIGGER_CATEGORIES);
+// Category color of each action / trigger type, for the card icon tiles.
+// The triggers and actions declared by the external integrations form a
+// dynamic "Integrations" category, built by the pickers from the installed
+// declarations (sceneIntegrations.js): their generic types are not listed in
+// the static categories above, only colored here.
+export const ACTION_COLOR = {
+  ...buildColorMap(ACTION_CATEGORIES),
+  [ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION]: 'teal'
+};
+export const TRIGGER_COLOR = {
+  ...buildColorMap(TRIGGER_CATEGORIES),
+  [EVENTS.EXTERNAL_INTEGRATION.SCENE_EVENT]: 'teal'
+};

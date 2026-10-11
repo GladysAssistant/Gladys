@@ -40,6 +40,8 @@ async function stop(selector) {
   } catch (e) {
     logger.warn(`Unable to stop sub-containers of integration ${selector}`, e);
   }
+  // a stopped integration serves no widget: its cached contents go too
+  this.clearWidgetCaches(service);
   await this.saveStatus(service, SERVICE_STATUS.STOPPED);
   return this.getBySelector(selector);
 }

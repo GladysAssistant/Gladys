@@ -119,9 +119,57 @@ describe('scene.continue-only-if', () => {
               {
                 variable: '0.0.last_value',
                 operator: '=',
-                // "sqrt" is not part of the restricted formula engine namespace,
-                // so evaluating this condition throws.
-                evaluate_value: 'sqrt(400)',
+                // "unknownFunction" is not part of the restricted formula engine namespace,
+                // so evaluating this condition throws. It is deliberately a name mathjs will
+                // never define, so extending the namespace cannot make this formula valid.
+                evaluate_value: 'unknownFunction(400)',
+              },
+            ],
+          },
+        ],
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-device-feature',
+            value: 99,
+          },
+        ],
+      ],
+      scope,
+    );
+    await chaiAssert.isRejected(promise, AbortScene, 'CONDITION_VALUE_NOT_A_NUMBER');
+    // The guard must fail closed: the action after it must not have been executed.
+    assert.notCalled(device.setValue);
+  });
+  it('should abort scene when the condition formula returns a non-finite number', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value',
+                operator: '<',
+                // exp() overflows to Infinity without throwing: comparing against it would
+                // silently always be true instead of surfacing the broken formula.
+                evaluate_value: 'exp(1000)',
               },
             ],
           },

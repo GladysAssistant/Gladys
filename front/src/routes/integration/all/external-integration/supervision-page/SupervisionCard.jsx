@@ -69,6 +69,14 @@ const SupervisionCard = ({
   onCancelUninstall,
   onUninstall
 }) => {
+  // a contract priced by this integration stops being priced once it is uninstalled
+  const hasDelegatedContracts = ((integration && integration.manifest && integration.manifest.energy_contracts) || {})
+    .templates
+    ? integration.manifest.energy_contracts.templates.some(template => template.pricing_mode === 'delegated')
+    : false;
+  // uninstalling a calendar integration deletes the calendars of every user,
+  // a wider effect than the per-user disable: the warning says so
+  const isCalendar = Boolean(integration && integration.manifest && integration.manifest.type === 'calendar');
   const repoUrl = getGithubRepoUrl(integration.store_slug);
   const actionInProgress = actionStatus === RequestStatus.Getting;
   const subContainers = integration.containers || [];
@@ -268,8 +276,17 @@ const SupervisionCard = ({
             {askingUninstall && (
               <div class="alert alert-danger mt-4">
                 <p>
-                  <Text id="integration.externalIntegration.supervision.uninstallWarning" />
+                  {isCalendar ? (
+                    <Text id="integration.externalIntegration.supervision.uninstallCalendarWarning" />
+                  ) : (
+                    <Text id="integration.externalIntegration.supervision.uninstallWarning" />
+                  )}
                 </p>
+                {hasDelegatedContracts && (
+                  <p>
+                    <Text id="integration.externalIntegration.supervision.uninstallEnergyWarning" />
+                  </p>
+                )}
                 <div class="btn-list mb-0">
                   <button class="btn btn-danger" onClick={onUninstall}>
                     <i class="fe fe-trash-2 mr-1" />

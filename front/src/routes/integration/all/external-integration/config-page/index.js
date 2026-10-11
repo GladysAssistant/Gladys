@@ -5,6 +5,7 @@ import get from 'get-value';
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
 import { getRequestedHardwareClasses } from '../utils';
+import { hasDynamicSource, fetchDynamicOptions } from '../../../../../components/integration/dynamicOptions';
 import { RequestStatus } from '../../../../../utils/consts';
 import {
   OAUTH_REDIRECT_URI,
@@ -24,7 +25,11 @@ class ExternalIntegrationConfigPage extends Component {
   isAdmin = () => get(this.props, 'user.role') === USER_ROLE.ADMIN;
 
   loadData = async () => {
-    this.setState({ loadStatus: RequestStatus.Getting });
+    // action values and results belong to the integration they were typed
+    // for: a secret typed for one integration is never sent to another
+    // the dynamic options of the previous integration must never fill the
+    // selects of the new one
+    this.setState({ loadStatus: RequestStatus.Getting, actionFieldValues: {}, actionStates: {}, dynamicOptions: {} });
     const { selector } = this.props;
     const isAdmin = this.isAdmin();
     try {
@@ -42,6 +47,7 @@ class ExternalIntegrationConfigPage extends Component {
         configValues,
         configuredSecrets: configResponse.configured_secrets || [],
         touchedSecrets: {},
+        actionFieldValues: this.buildActionFieldValues(integration),
         grantedDevices: integration.granted_devices || [],
         loadStatus: RequestStatus.Success
       });
@@ -55,9 +61,13 @@ class ExternalIntegrationConfigPage extends Component {
           await this.loadContactProfile();
         }
       }
+      if (get(integration, 'manifest.type') === 'calendar') {
+        // the per-user "My calendars" block of a calendar integration
+        await this.loadCalendarAccount(integration);
+      }
+      await this.loadDynamicOptions(integration, isAdmin, selector);
       if (isAdmin) {
         await this.loadGatewayStatus(integration);
-        await this.loadDynamicOptions(integration);
         await this.loadHardwareDetection(integration);
       }
     } catch (e) {
@@ -76,18 +86,44 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  buildConfigValues = (integration, configResponse) => {
-    const schema = get(integration, 'manifest.config_schema') || [];
-    const configValues = Object.assign({}, configResponse.config);
+  // the stored values, completed with the declared defaults of the fields
+  // that have none (never for a secret, whose value never comes back)
+  applySchemaDefaults = (schema, storedValues) => {
+    const values = Object.assign({}, storedValues);
     schema.forEach(field => {
-      const currentValue = configValues[field.key];
+      const currentValue = values[field.key];
       if ((currentValue === undefined || currentValue === null) && field.type !== 'secret') {
         if (field.default !== undefined) {
-          configValues[field.key] = field.default;
+          values[field.key] = field.default;
         }
       }
     });
-    return configValues;
+    return values;
+  };
+
+  buildConfigValues = (integration, configResponse) =>
+    this.applySchemaDefaults(get(integration, 'manifest.config_schema') || [], configResponse.config);
+
+  // the "My calendars" form starts from the account_schema defaults too: a
+  // boolean declared `default: true` is on before the first Enable, and after
+  // a disable
+  buildCalendarAccountValues = (integration, calendarAccount) =>
+    this.applySchemaDefaults(get(integration, 'manifest.account_schema') || [], calendarAccount.config);
+
+  // the action forms start from the declared defaults, like the config form
+  // (an action field without a default stays empty)
+  buildActionFieldValues = integration => {
+    const actionFieldValues = {};
+    (get(integration, 'manifest.actions') || []).forEach(action => {
+      const values = {};
+      (action.fields || []).forEach(field => {
+        if (field.default !== undefined) {
+          values[field.key] = field.default;
+        }
+      });
+      actionFieldValues[action.key] = values;
+    });
+    return actionFieldValues;
   };
 
   updateConfigValue = (field, value) => {
@@ -231,6 +267,163 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  loadCalendarAccount = async (integration = this.state.integration) => {
+    const { selector } = this.props;
+    // the block starts empty: an account of the previously opened integration
+    // must never stay on screen (and be saved) under this one, even when the
+    // request fails
+    this.setState({
+      calendarAccount: null,
+      calendarAccountValues: {},
+      calendarAccountTouchedSecrets: {},
+      calendarDisableConfirming: false
+    });
+    try {
+      const calendarAccount = await this.props.httpClient.get(
+        `/api/v1/external_integration/${selector}/calendar/account`
+      );
+      if (selector !== this.props.selector) {
+        // the user opened another integration meanwhile: stale response
+        return;
+      }
+      this.setState({
+        calendarAccount,
+        calendarAccountValues: this.buildCalendarAccountValues(integration, calendarAccount),
+        calendarAccountTouchedSecrets: {},
+        calendarDisableConfirming: false
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // The integration pushes the user's calendars right after they enable it,
+  // then at each of its synchronizations: the block refreshes its calendar
+  // list on calendar.updated (a push already scoped to its audience), without
+  // touching the account values the user may be typing. Before the account is
+  // enabled, the user has no calendar of this integration to list.
+  refreshCalendarAccount = async () => {
+    const { selector } = this.props;
+    if (get(this.state, 'integration.manifest.type') !== 'calendar' || !get(this.state, 'calendarAccount.enabled')) {
+      return;
+    }
+    try {
+      const calendarAccount = await this.props.httpClient.get(
+        `/api/v1/external_integration/${selector}/calendar/account`
+      );
+      if (selector !== this.props.selector) {
+        return;
+      }
+      this.setState({ calendarAccount });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  updateCalendarAccountValue = (field, value) => {
+    const calendarAccountValues = Object.assign({}, this.state.calendarAccountValues, { [field.key]: value });
+    const newState = { calendarAccountValues, calendarAccountStatus: null };
+    if (field.type === 'secret') {
+      newState.calendarAccountTouchedSecrets = Object.assign({}, this.state.calendarAccountTouchedSecrets, {
+        [field.key]: true
+      });
+    }
+    this.setState(newState);
+  };
+
+  saveCalendarAccount = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState({ calendarAccountStatus: RequestStatus.Getting });
+    const { integration, calendarAccountValues = {}, calendarAccountTouchedSecrets = {} } = this.state;
+    const accountSchema = get(integration, 'manifest.account_schema') || [];
+    const config = {};
+    accountSchema.forEach(field => {
+      const value = calendarAccountValues[field.key];
+      if (field.type === 'secret') {
+        // a secret set to null means "unchanged" on the server side
+        config[field.key] = calendarAccountTouchedSecrets[field.key] ? value : null;
+      } else if (field.type === 'number') {
+        const numericValue = value === '' || value === undefined || value === null ? NaN : Number(value);
+        if (!Number.isNaN(numericValue)) {
+          config[field.key] = numericValue;
+        }
+      } else if (field.type === 'boolean') {
+        config[field.key] = !!value;
+      } else if (value !== undefined && value !== null) {
+        config[field.key] = value;
+      }
+    });
+    const { selector } = this.props;
+    try {
+      const calendarAccount = await this.props.httpClient.post(
+        `/api/v1/external_integration/${selector}/calendar/account`,
+        { config }
+      );
+      if (selector !== this.props.selector) {
+        return;
+      }
+      this.setState({
+        calendarAccount,
+        calendarAccountValues: this.buildCalendarAccountValues(integration, calendarAccount),
+        calendarAccountTouchedSecrets: {},
+        calendarAccountStatus: RequestStatus.Success
+      });
+    } catch (err) {
+      console.error(err);
+      this.setState({ calendarAccountStatus: RequestStatus.Error });
+    }
+  };
+
+  armDisableCalendarAccount = () => {
+    // disabling destroys the user's calendars: explicit confirmation first
+    this.setState({ calendarDisableConfirming: true, calendarAccountStatus: null });
+  };
+
+  cancelDisableCalendarAccount = () => {
+    this.setState({ calendarDisableConfirming: false });
+  };
+
+  disableCalendarAccount = async () => {
+    this.setState({ calendarAccountStatus: RequestStatus.Getting });
+    try {
+      await this.props.httpClient.delete(`/api/v1/external_integration/${this.props.selector}/calendar/account`);
+      this.setState({ calendarAccountStatus: null, calendarDisableConfirming: false });
+      await this.loadCalendarAccount();
+    } catch (e) {
+      console.error(e);
+      this.setState({ calendarAccountStatus: RequestStatus.Error });
+    }
+  };
+
+  toggleUserCalendar = async (calendarSelector, key, checked) => {
+    // optimistic toggle, rolled back on failure (the preferLocal pattern),
+    // then reloaded from the server, the authority on the stored value. Both
+    // the patch and the rollback derive from the previous state and touch only
+    // this calendar; the toggles stay disabled while a request is in flight,
+    // so two requests on the same calendar never race.
+    const patch = value => state => ({
+      calendarAccount: Object.assign({}, state.calendarAccount, {
+        calendars: (get(state, 'calendarAccount.calendars') || []).map(calendar =>
+          calendar.selector === calendarSelector ? Object.assign({}, calendar, { [key]: value }) : calendar
+        )
+      })
+    });
+    this.setState(state => Object.assign({ calendarToggleStatus: RequestStatus.Getting }, patch(checked)(state)));
+    try {
+      await this.props.httpClient.patch(
+        `/api/v1/external_integration/${this.props.selector}/calendar/${calendarSelector}`,
+        { [key]: checked }
+      );
+      this.setState({ calendarToggleStatus: RequestStatus.Success });
+    } catch (err) {
+      console.error(err);
+      this.setState(state => Object.assign({ calendarToggleStatus: RequestStatus.Error }, patch(!checked)(state)));
+      await this.refreshCalendarAccount();
+    }
+  };
+
   loadGatewayStatus = async integration => {
     // the webhooks block needs to know whether Gladys Plus is linked:
     // without it, an explanatory message replaces the key input
@@ -270,26 +463,37 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  loadDynamicOptions = async integration => {
-    // a select/multi_select of the config_schema (or of an action mini
-    // form) can use the core-defined source "devices": its options are
-    // the already-created devices of the integration (label = device
-    // name, value = external_id), naturally scoped to its t_service
-    const actionFields = (get(integration, 'manifest.actions') || []).reduce(
-      (fields, action) => fields.concat(action.fields || []),
-      []
+  loadDynamicOptions = async (integration, isAdmin, selector) => {
+    // a select/multi_select of the config_schema, of an action mini form or
+    // of a per-user form (contact_schema, account_schema) can take its
+    // options from a core-defined source: the already-created devices of the
+    // integration, or the houses of Gladys. A non-admin only sees the
+    // per-user forms. `selector` is the one loadData started with: the
+    // fields belong to that integration, so a newer integration opened in
+    // the meantime must never receive them, nor their options.
+    if (selector !== this.props.selector) {
+      return;
+    }
+    const perUserFields = (get(integration, 'manifest.contact_schema') || []).concat(
+      get(integration, 'manifest.account_schema') || []
     );
-    const allFields = (get(integration, 'manifest.config_schema') || []).concat(actionFields);
-    if (!allFields.some(field => field.source === 'devices')) {
+    const adminFields = isAdmin
+      ? (get(integration, 'manifest.actions') || []).reduce(
+          (fields, action) => fields.concat(action.fields || []),
+          get(integration, 'manifest.config_schema') || []
+        )
+      : [];
+    const allFields = adminFields.concat(perUserFields);
+    if (!hasDynamicSource(allFields)) {
       return;
     }
     try {
-      const devices = await this.props.httpClient.get(`/api/v1/service/${this.props.selector}/device`);
-      this.setState({
-        dynamicOptions: {
-          devices: devices.map(device => ({ value: device.external_id, label: device.name }))
-        }
-      });
+      const dynamicOptions = await fetchDynamicOptions(this.props.httpClient, selector, allFields);
+      if (selector !== this.props.selector) {
+        // a newer integration has been opened since, discard this stale result
+        return;
+      }
+      this.setState({ dynamicOptions });
     } catch (e) {
       console.error(e);
     }
@@ -373,6 +577,7 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   runAction = async action => {
+    const { selector } = this.props;
     const actionStates = Object.assign({}, this.state.actionStates, {
       [action.key]: { status: RequestStatus.Getting }
     });
@@ -393,10 +598,13 @@ class ExternalIntegrationConfigPage extends Component {
       }
     });
     try {
-      const result = await this.props.httpClient.post(
-        `/api/v1/external_integration/${this.props.selector}/action/${action.key}`,
-        { fields }
-      );
+      const result = await this.props.httpClient.post(`/api/v1/external_integration/${selector}/action/${action.key}`, {
+        fields
+      });
+      if (selector !== this.props.selector) {
+        // the page moved to another integration meanwhile, discard this result
+        return;
+      }
       this.setState({
         actionStates: Object.assign({}, this.state.actionStates, {
           [action.key]: { status: RequestStatus.Success, message: result.message }
@@ -404,6 +612,9 @@ class ExternalIntegrationConfigPage extends Component {
       });
     } catch (e) {
       console.error(e);
+      if (selector !== this.props.selector) {
+        return;
+      }
       // an explicit refusal of the integration is a 422 carrying its message
       const message = get(e, 'response.data.properties');
       this.setState({
@@ -534,6 +745,7 @@ class ExternalIntegrationConfigPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
       this.onConnectionStatusUpdated
     );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.refreshCalendarAccount);
     this.loadData();
   }
 
@@ -552,6 +764,7 @@ class ExternalIntegrationConfigPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
       this.onConnectionStatusUpdated
     );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.refreshCalendarAccount);
   }
 
   render(props, state) {
@@ -576,6 +789,12 @@ class ExternalIntegrationConfigPage extends Component {
           updateContactProfileValue={this.updateContactProfileValue}
           saveContactProfile={this.saveContactProfile}
           clearContactProfile={this.clearContactProfile}
+          updateCalendarAccountValue={this.updateCalendarAccountValue}
+          saveCalendarAccount={this.saveCalendarAccount}
+          armDisableCalendarAccount={this.armDisableCalendarAccount}
+          cancelDisableCalendarAccount={this.cancelDisableCalendarAccount}
+          disableCalendarAccount={this.disableCalendarAccount}
+          toggleUserCalendar={this.toggleUserCalendar}
           toggleHardwareClass={this.toggleHardwareClass}
           saveHardware={this.saveHardware}
         />

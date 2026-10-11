@@ -3,11 +3,15 @@ import get from 'get-value';
 import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import { smartRound } from '../../../../../../server/utils/units';
+import { formatValueWithStep } from '../../../../../../server/utils/units';
 
 import style from './style.css';
 
 const MultiLevelDeviceType = ({ children, ...props }) => {
+  // A feature can declare its own granularity (a tariff moves by 0.0001, not by 1).
+  // Without it, the slider keeps the whole-number step every level control used to have.
+  const step = props.deviceFeature.step || 1;
+
   function updateValue(e) {
     props.updateValueWithDebounce(props.deviceFeature, e.target.value);
   }
@@ -32,18 +36,18 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
             value={props.deviceFeature.last_value}
             onChange={updateValue}
             class={cx('custom-range', style.rangeInput)}
-            step="1"
+            step={step}
             min={props.deviceFeature.min}
             max={props.deviceFeature.max}
           />
           <span class="ml-2 text-right">
             {props.deviceFeature.unit ? (
               <span>
-                {`${smartRound(props.deviceFeature.last_value)} `}
+                {`${formatValueWithStep(props.deviceFeature.last_value, step)} `}
                 <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
               </span>
             ) : (
-              <span>{smartRound(props.deviceFeature.last_value)}</span>
+              <span>{formatValueWithStep(props.deviceFeature.last_value, step)}</span>
             )}
           </span>
         </div>

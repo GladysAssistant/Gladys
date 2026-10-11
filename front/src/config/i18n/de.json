@@ -82,6 +82,7 @@
       "typeMismatchWarning": "Diese Funktion hat einen anderen Typ als die Quellfunktion: ihr Verlauf ergibt nach der Migration möglicherweise keinen Sinn mehr.",
       "unitMismatchWarning": "Diese Funktion hat eine andere Einheit als die Quellfunktion: die Werte werden ohne Umrechnung übernommen, die Diagramme können dadurch inkonsistent werden.",
       "unmappedWarning": "Einige Funktionen sind nicht zugeordnet: ihr Verlauf wird gelöscht, und die Szenen und Dashboards, die sie verwenden, werden nicht aktualisiert.",
+      "playNotificationWarning": "Das Zielgerät kann keine Benachrichtigungen abspielen: die Szenen, die über diesen Lautsprecher „sprechen“, werden auf das Zielgerät umgeleitet und schlagen bei der Ausführung fehl. Wähle ein kompatibles Zielgerät oder passe diese Szenen nach der Migration an.",
       "noDestinationAvailable": "Es wurde kein Gerät einer anderen Integration gefunden. Erstelle zuerst das Zielgerät in seiner neuen Integration und komme dann hierher zurück, um zu migrieren.",
       "loadError": "Die Geräteliste konnte nicht geladen werden. Bitte versuche es erneut.",
       "migrateError": "Die Migration ist fehlgeschlagen. Das alte Gerät wurde nicht gelöscht, aber ein Teil des Verlaufs wurde möglicherweise bereits zum Zielgerät verschoben. Überprüfe die Aufgaben-Seite und deine Geräteliste und versuche es dann erneut: ein neuer Versuch migriert nur, was noch übrig ist.",
@@ -108,6 +109,19 @@
     "room": "Raum",
     "integration": "Integration",
     "features": "Funktionen",
+    "orderByStatesDesc": "Aktivste zuerst",
+    "verbose": {
+      "badge": "Sehr aktiv",
+      "details": "{{count}} Werte in {{hours}} Std. gespeichert ({{features}})",
+      "detailsWithoutFeatures": "{{count}} Werte in {{hours}} Std. gespeichert",
+      "summary": {
+        "one": "1 sehr aktives Gerät macht {{percent}} % der Werte aus, die in den letzten {{hours}} Stunden im Verlauf gespeichert wurden.",
+        "other": "{{count}} sehr aktive Geräte machen {{percent}} % der Werte aus, die in den letzten {{hours}} Stunden im Verlauf gespeichert wurden."
+      },
+      "explanation": "Ein Gerät wird markiert, wenn eine seiner Funktionen mindestens {{threshold}} Werte in {{hours}} Stunden speichert. Wenn du diesen Verlauf nicht brauchst, deaktiviere ihn auf der Geräteseite, um die Datenbank zu entlasten.",
+      "showOnlyVerbose": "Nur diese Geräte anzeigen",
+      "showAll": "Alle Geräte anzeigen"
+    },
     "emptyState": "Keine Geräte gefunden. Füge Geräte über die Integrationsseite hinzu oder passe deine Suche und Filter an.",
     "emptyStateButton": "Integrationen durchsuchen",
     "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
@@ -178,6 +192,7 @@
       "english": "English",
       "french": "Français",
       "german": "Deutsch",
+      "spanish": "Español",
       "birthdateLabel": "Geburtsdatum",
       "birthdatePlaceHolder": "Gib dein Geburtsdatum ein",
       "january": "Januar",
@@ -367,6 +382,8 @@
     "selectBoxTypeLabel": "Wähle aus, welches Widget hier angezeigt werden soll",
     "selectBoxTypeSearchPlaceholder": "Widget suchen (Uhr, Kamera…)",
     "selectBoxTypeNoResult": "Kein Widget entspricht \"{{search}}\"",
+    "selectBoxTypeCoreSection": "Gladys-Widgets",
+    "selectBoxTypeIntegrationSection": "Integrations-Widgets",
     "boxTitle": {
       "alarm": "Alarm",
       "weather": "Wetter",
@@ -390,7 +407,10 @@
       "sun": "Sonne",
       "chips": "Status-Chips",
       "actions": "Schnellaktionen",
-      "house-view": "Hausansicht"
+      "house-view": "Hausansicht",
+      "external-widget": "Integrations-Widget",
+      "thermostat": "Thermostat",
+      "energy-price": "Strompreis"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -717,6 +737,42 @@
       "music": {
         "selectDeviceLabel": "Wähle das zu steuernde Gerät aus"
       },
+      "thermostat": {
+        "defaultTitle": "Thermostat",
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "z.B. Wohnzimmer Thermostat",
+        "thermostatFeatureLabel": "Thermostat-Funktion (Sollwert)",
+        "thermostatFeatureHelp": "Wähle die Funktion, die die Zieltemperatur steuert.",
+        "selectPlaceholder": "Auswählen...",
+        "inactive": "Inaktiv",
+        "current": "Aktuell",
+        "modeHeating": "Heizmodus",
+        "modeCooling": "Kühlmodus",
+        "modeOff": "Aus-Modus",
+        "noConfig": "Bitte konfiguriere das Widget über den Bearbeiten-Button.",
+        "manualMode": "Manueller Modus",
+        "scheduleLabel": "Zeitplan:",
+        "scheduleUntil": "bis",
+        "manualUntil": "bis",
+        "cancelManual": "Manuellen Modus beenden",
+        "windowOpen": "Fenster offen — Heizung ausgesetzt",
+        "windowOpenCooling": "Fenster offen — Kühlung ausgesetzt",
+        "a11ySetpoint": "Sollwert",
+        "a11yCurrentTemp": "Gemessene Temperatur",
+        "a11yHumidity": "Luftfeuchtigkeit",
+        "error": "Fehler beim Laden der Thermostat-Daten.",
+        "preset": {
+          "off": "Aus",
+          "frost": "Frostschutz",
+          "away": "Abwesend",
+          "comfort": "Komfort",
+          "eco": "Eco",
+          "night": "Nacht"
+        },
+        "backToSchedule": "Zurück zum Zeitplan",
+        "resumeFromStopped": "Thermostat starten",
+        "presetPending": "{{preset}} (wird beim Neustart angewendet)"
+      },
       "energyConsumption": {
         "editName": "Widget-Name (optional)",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
@@ -732,7 +788,7 @@
         "error": "Fehler beim Laden der Energieverbrauchsdaten",
         "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar",
         "showSubscriptionPrices": "Abonnementpreise anzeigen",
-        "showSubscriptionPricesDescription": "Zeigt die monatlichen Abonnementkosten zusammen mit den Verbrauchsdaten im Diagramm an.",
+        "showSubscriptionPricesDescription": "Zeigt die Abonnementkosten des Zählervertrags zusammen mit den Verbrauchsdaten im Diagramm an.",
         "periodStartDay": "Starttag des Abrechnungszeitraums",
         "periodStartDayDescription": "Tag des Monats, an dem der Abrechnungszeitraum Ihres Energieversorgers beginnt. Die Monats- und Jahresansicht laufen dann von diesem Tag bis zum gleichen Tag des nächsten Zeitraums (z. B. vom 5. bis zum 5.), damit sie mit Ihrer Rechnung verglichen werden können. Ist ein Monat kürzer als dieser Tag, beginnt der Zeitraum am letzten Tag dieses Monats."
       },
@@ -828,6 +884,42 @@
         "editPinLabelPlaceholder": "z. B. Solar",
         "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
         "error": "Das Bild konnte nicht geladen werden."
+      },
+      "external-widget": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Standardmäßig der Name des Widgets",
+        "editSettingsLabel": "Widget-Einstellungen",
+        "editIntegrationNotInstalled": "Die Integration, die dieses Widget bereitstellt, ist nicht mehr installiert. Entfernen Sie das Widget oder installieren Sie die Integration erneut.",
+        "notInstalled": "Diese Integration ist nicht mehr installiert.",
+        "notInstalledHint": "Bearbeiten Sie das Dashboard, um dieses Widget zu entfernen, oder installieren Sie die Integration erneut.",
+        "stopped": "Die Integration ist gestoppt.",
+        "openIntegrationLink": "Integration öffnen",
+        "unavailable": "Die Widget-Daten sind nicht verfügbar.",
+        "retryButton": "Erneut versuchen",
+        "checkSettings": "Prüfen Sie die Einstellungen dieses Widgets.",
+        "checkSettingsHint": "Bearbeiten Sie das Dashboard, um die Widget-Einstellungen zu korrigieren.",
+        "needsNewerGladys": "Dieses Widget benötigt eine neuere Gladys-Version.",
+        "empty": "Derzeit nichts anzuzeigen.",
+        "emptyChart": "Noch keine Daten für diesen Zeitraum.",
+        "now": "Jetzt",
+        "confirmAction": "„{{label}}“ ausführen?",
+        "actionError": "Die Aktion ist fehlgeschlagen.",
+        "actionFormSend": "Senden",
+        "actionFormInvalid": "Ungültiger Wert",
+        "actionFormClose": "Schließen",
+        "actionFormInvalidField": "Ungültiger Wert: {{label}}"
+      },
+      "energyPrice": {
+        "editName": "Widget-Name (optional)",
+        "editNamePlaceholder": "Auf dem Dashboard angezeigter Name",
+        "editContract": "Stromvertrag",
+        "noContract": "Noch kein Stromvertrag vorhanden.",
+        "noContractLink": "Legen Sie einen in der Energieüberwachungs-Integration an.",
+        "notConfigured": "Wählen Sie in den Widget-Einstellungen einen Vertrag aus.",
+        "until": "Bis {{time}}",
+        "unknownPrice": "Preis unbekannt",
+        "error": "Der Strompreis konnte nicht geladen werden. Prüfen Sie, ob der Vertrag noch existiert.",
+        "cumulativeToday": "Heute: {{kwh}} kWh"
       }
     },
     "editDashboardBackgroundLabel": "Hintergrundstimmung",
@@ -1035,6 +1127,8 @@
         "containerStopped": "Gestoppt",
         "openButton": "Öffnen",
         "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
+        "uninstallCalendarWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt, und die von ihr erstellten Kalender werden mit ihren Terminen gelöscht, für alle Benutzer des Haushalts – nicht nur deine.",
+        "uninstallEnergyWarning": "Diese Integration berechnet die Kosten von Energieverträgen selbst: Die von ihr berechneten Verträge werden nach der Deinstallation nicht mehr berechnet (ihre bestehenden Kosten bleiben erhalten).",
         "confirmUninstallButton": "Ja, deinstallieren",
         "cancelUninstallButton": "Abbrechen",
         "startedAtLabel": "In Betrieb seit"
@@ -1142,7 +1236,21 @@
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
-        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent)."
+        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
+        "calendarInfoText": "Diese Integration ist ein Kalenderanbieter: Nach der Installation erstellt sie Kalender und Termine in Gladys für die Benutzer, die sie mit ihrem eigenen Konto aktivieren.",
+        "widgetsTitle": "Dashboard-Widgets",
+        "widgetsText": "Diese Integration stellt die folgenden Widgets bereit, die allen Benutzern im Dashboard-Editor zur Verfügung stehen:",
+        "energyContractsTitle": "Energieverträge",
+        "energyContractsText": "Diese Integration stellt die folgenden Energievertragsvorlagen bereit, die im Vertragsassistenten der Energieüberwachungsseite angeboten werden:",
+        "energyContractsDelegated": "von der Integration berechnet",
+        "energyContractsCalendars": "Von dieser Integration gepflegte Tarifkalender:",
+        "energyContractsDelegatedText": "Eine von der Integration berechnete Vorlage berechnet Ihre Energiekosten selbst: Die Kosten dieser Verträge werden nur berechnet, solange die Integration läuft, und nicht mehr, wenn sie deinstalliert wird.",
+        "providerInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Dashboard-Widgets bereit. Konfigurieren Sie sie hier und fügen Sie ihre Widgets dann im Dashboard-Editor hinzu.",
+        "providerEnergyInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Energievertragsvorlagen und Tarifkalender bereit. Konfigurieren Sie sie hier und wählen Sie ihre Verträge dann auf der Seite Energieüberwachung aus.",
+        "sceneDeclarationsTitle": "Szenen-Auslöser und -Aktionen",
+        "sceneDeclarationsText": "Diese Integration fügt dem Szenen-Editor {{triggers}} Auslöser und {{actions}} Aktion(en) hinzu.",
+        "sceneTriggerPrefix": "Auslöser:",
+        "sceneActionPrefix": "Aktion:"
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
@@ -1220,6 +1328,22 @@
         "saveKeyError": "Beim Speichern des Open-API-Schlüssels ist ein Fehler aufgetreten.",
         "notAvailableText": "Die Webhooks sind noch nicht aktiv: Speichern Sie Ihren Open-API-Schlüssel, um sie zu aktivieren.",
         "urlsText": "Webhook-URLs (die Integration registriert sie automatisch, wenn möglich; manche Dienste verlangen das Einfügen in die Anbieterkonsole). Diese URLs enthalten Ihren Schlüssel: Teilen Sie sie nur mit dem Drittanbieterdienst."
+      },
+      "myCalendars": {
+        "title": "Meine Kalender",
+        "description": "Diese Integration erstellt Kalender und Termine in Gladys für die Benutzer, die sie aktivieren. Aktivieren Sie sie mit Ihrem eigenen Konto, um ihre Kalender in Ihrer Kalenderansicht zu sehen; das Deaktivieren löscht Ihre Kalender aus Gladys (beim Anbieter bleiben sie unberührt).",
+        "enableButton": "Für mich aktivieren",
+        "saveButton": "Speichern",
+        "disableButton": "Deaktivieren und meine Kalender löschen",
+        "disableConfirmText": "Ihre Kalender aus dieser Integration und deren Termine werden aus Gladys gelöscht. Die Kalender beim Anbieter bleiben unberührt, und eine erneute Aktivierung stellt bei der nächsten Synchronisierung alles wieder her.",
+        "disableConfirmButton": "Meine Kalender löschen",
+        "cancelButton": "Abbrechen",
+        "saveError": "Beim Speichern Ihres Kontos ist ein Fehler aufgetreten.",
+        "saveSuccess": "Ihr Konto wurde gespeichert.",
+        "noCalendars": "Noch kein Kalender: die Integration überträgt Ihre Kalender bei der nächsten Synchronisierung.",
+        "syncLabel": "Diesen Kalender synchronisieren",
+        "sharedLabel": "Mit dem Haushalt teilen",
+        "sharedHelp": "Ein geteilter Kalender ist für den ganzen Haushalt sichtbar und kann Szenen auslösen."
       },
       "contactProfile": {
         "title": "Mein Konto",
@@ -1455,7 +1579,85 @@
       "circularReference": "zirkuläre Referenz",
       "selfReference": "Selbstreferenz",
       "fixAutomatically": "beheben",
-      "fixing": "Behebung läuft..."
+      "fixing": "Behebung läuft...",
+      "contracts": {
+        "tab": "Verträge",
+        "description": "Ein Vertrag beschreibt, wie der Verbrauch eines Zählers über einen Zeitraum bepreist wird. Wählen Sie eine Vorlage aus dem Community-Katalog oder einer installierten Integration, füllen Sie die Parameter aus und prüfen Sie die Vorschau vor dem Speichern.",
+        "empty": "Noch kein Vertrag. Legen Sie einen an, um die Kosten Ihres Verbrauchs zu berechnen.",
+        "errorLoading": "Fehler beim Laden der Verträge.",
+        "confirmDelete": "Möchten Sie diesen Vertrag wirklich löschen? Die Kosten seines Zeitraums werden bei der nächsten Berechnung entfernt.",
+        "ongoing": "laufend",
+        "createTitle": "Neuer Vertrag",
+        "editTitle": "Vertrag bearbeiten",
+        "status": {
+          "active": "aktiv",
+          "scheduled": "geplant",
+          "expired": "abgelaufen",
+          "orphaned": "verwaist"
+        },
+        "mode": {
+          "rules": "Regelwerk",
+          "delegated": "von der Integration berechnet"
+        },
+        "provider": {
+          "community": "Community",
+          "integration": "Integration",
+          "internal": "Gladys",
+          "user": "manuell"
+        },
+        "providerStopped": "Integration gestoppt",
+        "orphanedHelp": "Die Integration, die diesen Vertrag berechnet, ist nicht mehr installiert: seine Kosten werden nicht mehr berechnet. Installieren Sie sie erneut oder ersetzen Sie den Vertrag.",
+        "migrationWarning": "Dieser Vertrag wurde aus Ihren früheren Tarifen umgewandelt: die neue Berechnung weicht über die letzten 7 Tage um {{gap}}% von der alten ab. Bitte prüfen Sie seine Preise.",
+        "wizard": {
+          "meter": "Zähler",
+          "template": "Vorlage",
+          "parameters": "Parameter",
+          "preview": "Vorschau"
+        },
+        "allCountries": "Alle Länder",
+        "searchTemplate": "Anbieter oder Vertrag suchen…",
+        "noTemplate": "Keine passende Vorlage.",
+        "publishAsIntegration": "Oder veröffentlichen Sie ihn als externe Integration: eine Integration kann Vertragsvorlagen deklarieren, Tarifkalender (Tagesfarben, Spotpreise, Feiertage) liefern und die Kosten sogar selbst berechnen.",
+        "selectedTemplate": "Vorlage:",
+        "parameters": "Vertragsparameter",
+        "timezone": "Zeitzone",
+        "timezonePlaceholder": "Systemzeitzone",
+        "billingPeriodStartDay": "Starttag der Abrechnungsperiode",
+        "delegatedHelp": "Die Kosten dieses Vertrags berechnet seine Integration: nur die Fixgebühren des Tarifs berechnet Gladys, und es gibt keine Vorschau.",
+        "jsonMode": "Erweitert: Tarifdefinition bearbeiten (JSON)",
+        "tariffJson": "Tarifdefinition",
+        "tariffJsonHelp": "Die Definition wird beim Speichern geprüft. Das Format ist im Repository dokumentiert",
+        "exportTemplate": "Als Vorlage exportieren",
+        "previewDescription": "Ihr realer Verbrauch der letzten 7 Tage, mit diesem Vertrag bepreist, ohne etwas zu speichern.",
+        "previewSynthetic": "Dieser Zähler hat noch keinen Verbrauch: die Vorschau verwendet ein flaches Profil von 0,5 kWh pro 30 Minuten.",
+        "previewTotal": "Summe über 7 Tage",
+        "previewWarnings": "Intervalle mit dem Ersatzpreis bepreist (fehlender Kalenderwert):",
+        "intervals": "Intervalle",
+        "sampleTime": "Zeit",
+        "samplePrice": "Einheitspreis",
+        "sampleCost": "Kosten",
+        "sampleLabel": "Tarif",
+        "calendars": {
+          "title": "Tarifkalender",
+          "description": "Die datierten Werte der Verträge (Tagesfarben, Spotpreise, Feiertage), von den Integrationen veröffentlicht. Ein Kalender ohne Anbieter behält seine Werte, wird aber nicht mehr aktualisiert.",
+          "empty": "Noch kein Kalender.",
+          "key": "Schlüssel",
+          "provider": "Anbieter",
+          "granularity": "Granularität",
+          "granularities": {
+            "day": "Tag",
+            "thirty_minutes": "30 Minuten",
+            "fifteen_minutes": "15 Minuten"
+          },
+          "coverage": "Abdeckung",
+          "orphaned": "kein Anbieter",
+          "lastValues": "Letzte Werte",
+          "noValue": "Kein Wert.",
+          "recalculateFrom": "Kosten neu berechnen ab",
+          "recalculate": "Neu berechnen",
+          "recalculated": "Die Neuberechnung wurde gestartet. Sie können den Fortschritt in den Hintergrundaufgaben verfolgen."
+        }
+      }
     },
     "netatmo": {
       "title": "Netatmo",
@@ -3260,7 +3462,222 @@
     "backToIntegrations": "Zurück zu den Integrationen",
     "menuScrollLeft": "Menü nach links scrollen",
     "menuScrollRight": "Menü nach rechts scrollen",
-    "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden."
+    "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden.",
+    "thermostat": {
+      "title": "Thermostat",
+      "description": "Erstelle virtuelle Thermostate oder programmiere deine vorhandenen",
+      "deviceTab": "Meine Thermostate",
+      "scheduleTab": "Zeitpläne",
+      "documentationTab": "Dokumentation",
+      "device": {
+        "title": "Meine Thermostate",
+        "newButton": "Neu",
+        "noNameLabel": "Ohne Namen",
+        "noDevices": "Noch kein Thermostat erstellt. Klicke auf \"Neu\", um zu beginnen.",
+        "nameLabel": "Name",
+        "roomLabel": "Raum",
+        "activeScheduleLabel": "Aktiver Zeitplan",
+        "noSchedule": "Kein Zeitplan",
+        "setpointLabel": "Sollwert",
+        "noSetpoint": "—",
+        "saveButton": "Speichern",
+        "editButton": "Bearbeiten",
+        "deleteButton": "Löschen",
+        "confirmDelete": "Dieses Thermostat löschen?",
+        "confirmYes": "Ja",
+        "confirmNo": "Nein",
+        "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
+        "deleteError": "Beim Löschen ist ein Fehler aufgetreten.",
+        "stoppedState": "Ausgeschaltet"
+      },
+      "edit": {
+        "titleNew": "Neues Thermostat",
+        "titleEdit": "Thermostat bearbeiten",
+        "nameLabel": "Name",
+        "namePlaceholder": "z.B. Wohnzimmer Thermostat",
+        "roomLabel": "Raum",
+        "modeLabel": "Verwendung",
+        "typeLabel": "Thermostattyp",
+        "tuningSection": "Feineinstellung",
+        "typeVirtual": "Virtuelles Thermostat (Gladys regelt)",
+        "typeExternal": "Echtes Thermostat (das Gerät regelt selbst)",
+        "vendorProgrammeWarning": "Schalten Sie das Herstellerprogramm auf diesem Gerät ab (Netatmo-, Tado-App…), bevor Sie es über Gladys steuern. Sonst schreiben das Programm des Geräts und das von Gladys abwechselnd den Sollwert, und der Thermostat folgt dem zuletzt geschriebenen.",
+        "typeHelp": {
+          "virtual": "Gladys arbeitet als Thermostat: Sie liest einen Temperatursensor und steuert einen Schalter (Relais, Steckdose, Kesselkontakt), um den Sollwert zu erreichen.",
+          "external": "Das Thermostat regelt selbst und steuert seine Heizung selbst. Gladys schreibt nur den Sollwert aus dem Zeitplan und zeigt den Zustand des Geräts an."
+        },
+        "targetFeatureLabel": "Sollwert des echten Thermostats",
+        "targetFeatureHelp": "Die Funktion, auf die Gladys die Zieltemperatur schreibt. Manche Geräte bieten mehrere an (Heizen/Kühlen, anwesend/abwesend): Wählen Sie diejenige, die Ihre Heizung tatsächlich steuert.",
+        "stateFeatureLabel": "Heizzustand (optional)",
+        "stateFeatureHelp": "Zeigt an, ob das Gerät gerade läuft. Wird sowohl als Betriebszustand als auch als Kesselkontakt akzeptiert. Leer lassen, wenn Ihr Thermostat diese Information nicht liefert.",
+        "modeFeatureLabel": "Betriebsmodus (optional)",
+        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden. Gladys schaltet ihn auf Aus, wenn das Thermostat gestoppt wird oder ein Aus-Zeitfenster greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt.",
+        "mode": {
+          "heating": "Heizen",
+          "cooling": "Kühlen"
+        },
+        "controlTypeLabel": "Regelungsart",
+        "hysteresisExplain": {
+          "heating": "Das Thermostat schaltet die Heizung ein, wenn die Temperatur unter den Sollwert minus die Einschaltschwelle fällt, und aus, wenn sie über den Sollwert plus die Ausschaltschwelle steigt. Einfach und robust.",
+          "cooling": "Das Thermostat schaltet die Kühlung ein, wenn die Temperatur über den Sollwert plus die Einschaltschwelle steigt, und aus, wenn sie unter den Sollwert minus die Ausschaltschwelle fällt. Einfach und robust."
+        },
+        "tpiExplain": "Berechnet ein ON/OFF-Verhältnis über einen festen Zyklus anhand der Abweichung zwischen aktueller Temperatur und Sollwert. Je größer die Abweichung, desto länger heizt das System innerhalb des Zyklus. Empfohlen für Fußbodenheizungen oder Systeme mit hoher Trägheit.",
+        "controlType": {
+          "hysteresis": "Hysterese",
+          "tpi": "TPI (Time Proportional Integral)"
+        },
+        "tempUnitLabel": "Einheit",
+        "celsius": "Celsius (°C)",
+        "fahrenheit": "Fahrenheit (°F)",
+        "minTempLabel": "Min. Temperatur",
+        "minTempPlaceholder": "z.B. 5",
+        "maxTempLabel": "Max. Temperatur",
+        "maxTempPlaceholder": "z.B. 35",
+        "temperatureFeatureLabel": "Temperatursensor",
+        "temperatureFeatureHelp": "Wähle den Sensor, der die Umgebungstemperatur misst. Ein Sensor, der eine andere Einheit als das Thermostat meldet, wird automatisch umgerechnet; bei einem Sensor ohne angegebene Einheit wird die Einheit des Thermostats angenommen.",
+        "humidityFeatureLabel": "Feuchtigkeitssensor",
+        "humidityFeatureHelp": "Optional. Wird im Thermostat-Widget angezeigt.",
+        "switchFeatureLabel": "Schalter (Aktor)",
+        "switchFeatureHelp": {
+          "heating": "Der Schalter, der zum Heizen des Raums ein- und ausgeschaltet wird.",
+          "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
+        },
+        "windowFeatureLabel": "Fensterkontakt",
+        "windowFeatureHelp": {
+          "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",
+          "cooling": "Optional. Wenn ein Fenster geöffnet ist, wird die Kühlung automatisch abgeschaltet."
+        },
+        "hysteresisStartLabel": "Einschaltschwelle",
+        "hysteresisStartHelp": {
+          "heating": "Die Heizung schaltet ein, wenn die Temperatur unter (Sollwert − Einschaltschwelle) liegt. Z. B. Sollwert 21 °C, Schwelle 0,5 °C → schaltet unter 20,5 °C ein.",
+          "cooling": "Die Kühlung schaltet ein, wenn die Temperatur über (Sollwert + Einschaltschwelle) liegt. Z. B. Sollwert 24 °C, Schwelle 0,5 °C → schaltet über 24,5 °C ein."
+        },
+        "hysteresisStopLabel": "Ausschaltschwelle",
+        "hysteresisStopHelp": {
+          "heating": "Die Heizung schaltet aus, wenn die Temperatur über (Sollwert + Ausschaltschwelle) steigt. Z. B. Sollwert 21 °C, Schwelle 0,5 °C → schaltet über 21,5 °C aus.",
+          "cooling": "Die Kühlung schaltet aus, wenn die Temperatur unter (Sollwert − Ausschaltschwelle) fällt. Z. B. Sollwert 24 °C, Schwelle 0,5 °C → schaltet unter 23,5 °C aus."
+        },
+        "tpiCycleTimeLabel": "TPI-Zykluszeit",
+        "tpiCycleTimeHelp": "Gesamtdauer eines ON/OFF-Zyklus in Minuten. Z.B. 30 Min. → bei einem Bedarf von 50% heizt das System 15 Min. und pausiert 15 Min.",
+        "tpiProportionalBandLabel": "TPI-Proportionalband",
+        "tpiProportionalBandHelp": "Temperaturabweichung (in °C), die 100% Heizleistung entspricht. Z.B. Band = 2°C, aktuelle Abweichung = 1°C → 50% des Zyklus ON.",
+        "presetsLabel": "Temperatur-Voreinstellungen",
+        "presetColNameLabel": "Voreinstellung",
+        "presetColTempLabel": "Sollwert",
+        "preset": {
+          "off": "Aus",
+          "frost": "Frostschutz",
+          "away": "Abwesend",
+          "eco": "Eco",
+          "night": "Nacht",
+          "comfort": "Komfort"
+        },
+        "saveButton": "Speichern",
+        "cancelButton": "Abbrechen",
+        "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
+        "incompleteVirtualError": "Ein virtueller Thermostat braucht einen Temperatursensor und einen Schalter: Er regelt, indem er den einen liest und den anderen schaltet.",
+        "incompleteExternalError": "Ein vorhandener Thermostat braucht den Sollwert des Thermostats, den er steuert.",
+        "activeScheduleLabel": "Aktiver Zeitplan",
+        "activeScheduleHelp": "Wähle den Zeitplan, der automatisch auf dieses Thermostat angewendet wird.",
+        "noActiveSchedule": "Kein Zeitplan (manuelle Steuerung)",
+        "manualExpiryLabel": "Ende des manuellen Modus",
+        "manualExpiryFixed": "Nach einer festen Dauer",
+        "manualExpiryNextTransition": "Beim nächsten Zeitfenster des Zeitplans",
+        "manualExpiryHelp": "„Beim nächsten Zeitfenster“ übergibt den Thermostat beim nächsten Wechsel des Zeitfensters wieder an seinen Zeitplan, so wie Tado und Netatmo es tun. Ohne Zeitplan bleibt der manuelle Modus aktiv, bis Sie ihn abbrechen.",
+        "manualDurationLabel": "Dauer des manuellen Modus",
+        "manualDurationUnit": "Min.",
+        "manualDurationHelp": "Dauer in Minuten, bis nach einer manuellen Aktion automatisch zum Zeitplan zurückgekehrt wird.",
+        "modeHelp": "Was dieses Thermostat steuert: Heizung oder Kühlung.",
+        "sectionDevice": "Gerät",
+        "sectionHeating": "Heizung",
+        "sectionProgramming": "Programmierung",
+        "deviceRangeHint": "Das Gerät meldet {{min}} – {{max}} °{{unit}}.",
+        "deviceRangeApply": "Diese Werte übernehmen",
+        "rangeSection": "Temperaturbereich"
+      },
+      "schedule": {
+        "title": "Zeitpläne",
+        "newButton": "Neuer Zeitplan",
+        "noSchedules": "Noch kein Zeitplan erstellt. Klicke auf \"Neuer Zeitplan\", um zu beginnen.",
+        "nameLabel": "Name des Zeitplans",
+        "namePlaceholder": "z.B. Arbeitswoche",
+        "saveButton": "Speichern",
+        "cancelButton": "Abbrechen",
+        "deleteButton": "Löschen",
+        "editButton": "Bearbeiten",
+        "confirmDelete": "Diesen Zeitplan löschen? Die Thermostate, die ihm folgen, bleiben auf seinem aktuellen Zeitfenster und werden gestoppt, wenn es ein Aus-Zeitfenster ist.",
+        "confirmYes": "Ja",
+        "confirmNo": "Nein",
+        "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
+        "duplicateNameError": "Ein Zeitplan dieses Hauses trägt diesen Namen bereits. Zwei Häuser dürfen aber jeweils ihre eigene „Woche“ haben.",
+        "gapWarning": "Einige Tage sind nicht vollständig abgedeckt. Das Thermostat bleibt in diesen Zeiträumen auf seinem aktuellen Preset:",
+        "nextDay": "+1T",
+        "fullDayHint": "00:00 → 00:00 deckt den ganzen Tag ab.",
+        "duplicateButton": "Duplizieren",
+        "duplicateSuffix": "(Kopie)",
+        "deleteError": "Beim Löschen ist ein Fehler aufgetreten.",
+        "days": {
+          "0": "Montag",
+          "1": "Dienstag",
+          "2": "Mittwoch",
+          "3": "Donnerstag",
+          "4": "Freitag",
+          "5": "Samstag",
+          "6": "Sonntag"
+        },
+        "daysShort": {
+          "0": "Mo",
+          "1": "Di",
+          "2": "Mi",
+          "3": "Do",
+          "4": "Fr",
+          "5": "Sa",
+          "6": "So"
+        },
+        "addSlot": "Zeitfenster hinzufügen",
+        "copyTo": "Kopieren nach...",
+        "copyToLabel": "Kopieren nach:",
+        "applyButton": "Anwenden",
+        "removeSlot": "Entfernen",
+        "startTime": "Beginn",
+        "endTime": "Ende",
+        "preset": "Voreinstellung",
+        "presets": {
+          "off": "Aus",
+          "frost": "Frostschutz",
+          "away": "Abwesend",
+          "eco": "Eco",
+          "night": "Nacht",
+          "comfort": "Komfort"
+        },
+        "noSlots": "Noch keine Zeitfenster. Klicke auf \"Zeitfenster hinzufügen\", um zu beginnen.",
+        "followedBy": "Befolgt von",
+        "weekLabel": "Wochenüberblick",
+        "emptyScheduleWarning": "Dieser Zeitplan hat kein Zeitfenster und steuert daher nichts. Die Thermostate, die ihm folgen, behalten ihre aktuelle Solltemperatur oder bleiben gestoppt, wenn er beim Leeren auf Aus stand.",
+        "emptySaveWarning": "Dieser Zeitplan hat kein Zeitfenster: Er steuert nichts. Die Thermostate, die ihm folgen, behalten ihre aktuelle Solltemperatur oder werden gestoppt, wenn er gerade auf Aus steht; die gestoppten starten wieder, sobald er wieder Zeitfenster hat.",
+        "saveEmptyButton": "Trotzdem speichern",
+        "backToEditingButton": "Zeitfenster hinzufügen",
+        "followersLabel": "Thermostate, die diesem Zeitplan folgen",
+        "followersHelp": "Ein Thermostat folgt nur einem Zeitplan: Wird es hier hinzugefügt, verlässt es seinen bisherigen. Angeboten werden nur die Thermostate dieses Hauses.",
+        "followedByNobody": "noch kein Thermostat",
+        "attachPlaceholder": "Thermostat hinzufügen…",
+        "attachReplacesHelp": "Ein Thermostat folgt nur einem Zeitplan: Wird es hier hinzugefügt, verlässt es seinen bisherigen.",
+        "detachButton": "Diesem Zeitplan nicht mehr folgen",
+        "attachError": "Die Thermostate dieses Zeitplans konnten nicht geändert werden.",
+        "houseLabel": "Haus",
+        "carriedSince": "seit",
+        "houseLockedByDevices": "Ein Zeitplan wechselt nur das Haus, solange ihm kein Thermostat folgt. Befolgt von:",
+        "searchPlaceHolder": "Zeitplan suchen",
+        "noSearchResult": "Kein Zeitplan entspricht dieser Suche.",
+        "editorTitleEdit": "Zeitplan bearbeiten",
+        "editorTitleNew": "Neuer Zeitplan",
+        "sameTimeError": "Die Endzeit muss sich von der Startzeit unterscheiden: Ein Zeitfenster, das zu seiner Startzeit endet, würde 24 Stunden abdecken.",
+        "startLabel": "Beginn",
+        "endLabel": "Ende",
+        "confirmSlotButton": "Hinzufügen",
+        "confirmEditButton": "Übernehmen"
+      }
+    }
   },
   "editScene": {
     "settings": "Einstellungen",
@@ -3291,6 +3708,14 @@
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
+      "formulaHelp": {
+        "toggle": "Verfügbare Funktionen und Syntax",
+        "operators": "Verfügbare Operatoren:",
+        "functions": "Verfügbare Funktionen:",
+        "constants": "Verfügbare Konstanten:",
+        "example": "Eine Funktion nimmt ihre Argumente in Klammern, durch Kommas getrennt. Z.B.: round(min(100, 3 * 45) / 2)",
+        "caveats": "Achtung: Trigonometrische Funktionen arbeiten im Bogenmaß (sin(pi/2), nicht sin(90)), log ist der natürliche Logarithmus (nutze log10 für Basis 10), randomInt(min, max) gibt nie max zurück, und Konstanten müssen explizit multipliziert werden (2*pi, nicht 2 pi)."
+      },
       "delay": {
         "label": " Dieser Block wartet für die angegebene Dauer.",
         "inputPlaceholder": "Dauer",
@@ -3306,7 +3731,8 @@
         "userLabel": "Benutzer",
         "serviceLabel": "Senden über",
         "allServicesLabel": "Alle konfigurierten Dienste",
-        "serviceExplanation": "Wähle den Nachrichtendienst, der diese Nachricht sendet. Standardmäßig wird die Nachricht an alle vom Benutzer konfigurierten Dienste gesendet.",
+        "gladysOnlyLabel": "Nur Gladys-Konversation",
+        "serviceExplanation": "Wähle, wo diese Nachricht zugestellt wird. Die Nachricht bleibt immer in der Gladys-Konversation: standardmäßig wird sie zusätzlich an alle vom Benutzer konfigurierten Nachrichtendienste gesendet.",
         "serviceUnavailable": "nicht verfügbar",
         "serviceIntegrationExternal": "externe Integration",
         "serviceIntegrationInternal": "native Integration",
@@ -3579,6 +4005,23 @@
         "computedExplanationText": "Anstelle einer festen Lautstärke kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben, zum Beispiel um nachts leiser zu sprechen. Um eine Variable einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Block das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "textLabel": "Nachricht zum Sprechen auf dem Lautsprecher",
         "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Hinweis: Du musst vor diesem Block eine Variable in einer \"Letzten Zustand abrufen\"-Aktion definiert haben."
+      },
+      "energyCurrentPrice": {
+        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle kWh-Preis des ausgewählten Vertrags die folgende Bedingung erfüllt.",
+        "contractLabel": "Energievertrag",
+        "operatorLabel": "Fortfahren, wenn der Preis",
+        "valueLabel": "Schwellenwert (pro kWh)",
+        "valuePlaceholder": "0.20",
+        "error": "Die Energieverträge konnten nicht geladen werden.",
+        "noContract": "Noch kein Energievertrag: Legen Sie einen in der Integration Energieüberwachung an.",
+        "operators": {
+          "equal": "gleich",
+          "different": "ungleich",
+          "superior": "größer als",
+          "superiorOrEqual": "größer oder gleich",
+          "inferior": "kleiner als",
+          "inferiorOrEqual": "kleiner oder gleich"
+        }
       }
     },
     "actions": {
@@ -3661,6 +4104,12 @@
       },
       "time": {
         "get-date": "Datum und Uhrzeit abrufen"
+      },
+      "external-integration": {
+        "scene-action": "Integrations-Aktion"
+      },
+      "energy-contract": {
+        "current-price": "Bedingung zum Strompreis"
       }
     },
     "actionsDescriptions": {
@@ -3739,6 +4188,12 @@
       },
       "time": {
         "get-date": "Das aktuelle Datum und die Uhrzeit abrufen, um sie in der Szene wiederzuverwenden"
+      },
+      "external-integration": {
+        "scene-action": "Eine von einer externen Integration deklarierte Aktion"
+      },
+      "energy-contract": {
+        "current-price": "Nur fortfahren, wenn der aktuelle Preis eines Energievertrags einen Schwellenwert erfüllt"
       }
     },
     "actionCategories": {
@@ -3747,7 +4202,8 @@
       "conditions": "Bedingungen",
       "flow": "Ablauf",
       "homeSecurity": "Zuhause & Sicherheit",
-      "advanced": "Erweitert"
+      "advanced": "Erweitert",
+      "integrations": "Integrationen"
     },
     "variables": {
       "device": {
@@ -3824,6 +4280,12 @@
       "weather": {
         "alert-raised": "Wetterwarnung ausgelöst",
         "alert-ended": "Wetterwarnung beendet"
+      },
+      "external-integration": {
+        "scene-event": "Integrations-Auslöser"
+      },
+      "energy-contract": {
+        "price-changed": "Strompreis geändert"
       }
     },
     "triggersDescriptions": {
@@ -3867,6 +4329,12 @@
       "weather": {
         "alert-raised": "Wenn eine Wetterwarnung beginnt (Wind, Regen…)",
         "alert-ended": "Wenn eine Wetterwarnung endet"
+      },
+      "external-integration": {
+        "scene-event": "Ein von einer externen Integration deklarierter Auslöser"
+      },
+      "energy-contract": {
+        "price-changed": "Wenn sich der aktuelle Preis oder Tarif eines Energievertrags ändert"
       }
     },
     "triggerCategories": {
@@ -3875,7 +4343,9 @@
       "presence": "Anwesenheit",
       "alarm": "Alarmanlage",
       "weather": "Wetter",
-      "advanced": "Erweitert"
+      "advanced": "Erweitert",
+      "integrations": "Integrationen",
+      "energy": "Energie"
     },
     "triggersCard": {
       "newState": {
@@ -4009,6 +4479,12 @@
           "severe": "Schwer (orange)",
           "extreme": "Extrem (rot)"
         }
+      },
+      "energyPriceChanged": {
+        "description": "Dieser Auslöser wird aktiviert, wenn sich der aktuelle kWh-Preis (oder die Tarifstufe) des ausgewählten Vertrags ändert, zum Beispiel beim Wechsel von Niedertarif zu Hochtarif.",
+        "contractLabel": "Energievertrag",
+        "anyContract": "Jeder Vertrag",
+        "error": "Die Energieverträge konnten nicht geladen werden."
       }
     },
     "searchActionsPlaceholder": "Aktion suchen…",
@@ -4035,7 +4511,22 @@
     "moveHandleLabel": "Neu anordnen (ziehen, oder Pfeiltasten hoch und runter)",
     "deleteTriggerButton": "Diesen Auslöser löschen",
     "expandStepButton": "Details anzeigen",
-    "collapseStepButton": "Details ausblenden"
+    "collapseStepButton": "Details ausblenden",
+    "externalIntegration": {
+      "triggerNotInstalled": "Dieser Auslöser stammt von einer Integration, die nicht mehr installiert ist. Er kann erst wieder auslösen, wenn die Integration erneut installiert wird.",
+      "triggerNotDeclared": "Dieser Auslöser wird von der installierten Version der Integration nicht mehr deklariert. Er wird nicht mehr auslösen.",
+      "triggerInactive": "Die Integration ist gestoppt: dieser Auslöser kann erst auslösen, wenn sie läuft.",
+      "actionNotInstalled": "Diese Aktion stammt von einer Integration, die nicht mehr installiert ist. Sie schlägt fehl, bis die Integration erneut installiert wird.",
+      "actionNotDeclared": "Diese Aktion wird von der installierten Version der Integration nicht mehr deklariert. Sie schlägt beim Ausführen der Szene fehl.",
+      "actionInactive": "Die Integration ist gestoppt: diese Aktion schlägt fehl, bis sie läuft.",
+      "catalogLoading": "Auslöser und Aktionen der Integration werden geladen…",
+      "catalogUnavailableError": "Die Auslöser und Aktionen der Integrationen konnten nicht geladen werden, die Szene wurde daher nicht gespeichert. Versuche es gleich noch einmal.",
+      "wildcardHint": "Ein leer gelassenes Feld akzeptiert jeden Wert.",
+      "variablesAvailable": "Informationen, die an die Aktionen der Szene weitergegeben werden:",
+      "outputsAvailable": "Ergebnisse, die in den folgenden Schritten verwendbar sind:",
+      "variablesHint": "Tippe '{{', um Informationen der Szene einzufügen, zum Beispiel die vom Auslöser übermittelten.",
+      "requiredFieldError": "Das Feld „{{field}}“ von „{{title}}“ ist erforderlich: es darf nicht leer bleiben."
+    }
   },
   "profile": {
     "title": "Profil",
@@ -4068,6 +4559,7 @@
     "english": "English",
     "french": "Français",
     "german": "Deutsch",
+    "spanish": "Español",
     "roleLabel": "Rolle",
     "passwordLabel": "Passwort (mindestens 8 Zeichen)",
     "passwordPlaceholder": "Gib dein Passwort ein",
@@ -4220,8 +4712,13 @@
     "wrongEmailError": "This is not a valid email",
     "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
     "unknownError": "An unknown error occurred. Please try again or contact Gladys community.",
-    "success": "Success! I sent you a reset password link by Telegram or Nextcloud Talk. If you haven't configured these services, the reset password link will be in Gladys logs.",
+    "success": "Success! I sent you a reset password link by Telegram or Nextcloud Talk, or a one-time code instead of a link if this address has never been used to log in to your Gladys instance. If you haven't configured these services, it will be in Gladys logs. If you received a code, enter it below to choose a new password.",
     "howToAccessLogs": "To access Gladys logs, go to the command line and type `docker logs gladys --tail=1000` to display the last 1000 lines.",
+    "codeLabel": "One-time code",
+    "codePlaceholder": "XXXX-XXXX",
+    "codeButton": "Continue",
+    "codeInvalid": "This code is invalid or has expired. Request a new one below.",
+    "sendCodeAgain": "Send a new code",
     "userNotFound": "There is no account linked to this email.",
     "rateLimitError": "You have tried this form too many times. Please retry in 30 minutes or restart your Gladys instance now.",
     "invalidEmail": "We are unable to verify your email address.",
@@ -4280,6 +4777,7 @@
       },
       "statesMigrated": "Verschobene Verlaufszustände: {{count}}",
       "orphanedStates": "Verwaiste Zustände: {{count}}",
+      "fallbackPrices": "Mit dem Ersatzpreis bepreist (fehlender Kalenderwert): {{count}}",
       "duration": "Dauer: {{duration}}"
     },
     "jobTypes": {
@@ -4303,6 +4801,9 @@
       "energy-monitoring-consumption-from-index-beginning": "Energieverbrauchsberechnung aus Index (von Anfang an)",
       "energy-monitoring-production-from-index-thirty-minutes": "Energieerzeugungsberechnung aus Index (30 Minuten)",
       "energy-monitoring-production-from-index-beginning": "Energieerzeugungsberechnung aus Index (von Anfang an)",
+      "energy-monitoring-cost-calculation-contract": "Neuberechnung der Energiekosten (Vertrags- oder Kalenderänderung)",
+      "energy-monitoring-billing-period-end": "Energiekostenberechnung (Ende des Abrechnungszeitraums)",
+      "energy-monitoring-delegated-catch-up": "Nachholen der Energiekosten (von einer Integration berechnete Verträge)",
       "service-enedis-sync": "Enedis-Datensynchronisation",
       "ai-weekly-digest": "KI-Wochenzusammenfassung"
     },
@@ -4337,6 +4838,9 @@
     "pinnedImageRecommendation": "Damit die Aktualisierung funktioniert, erstelle deinen Container mit dem Image „{{recommendedImage}}“ neu, das neuen Versionen folgt. Deine Daten liegen nicht im Container und gehen daher nicht verloren.",
     "upgradeError": {
       "IMAGE_TAG_PINNED": "Aktualisierung abgebrochen: Dein Container verwendet das feste Image „{{image}}“. Erstelle ihn mit „{{recommendedImage}}“ neu, um ihn aktualisieren zu können.",
+      "IMAGE_PULL_FAILED": "Aktualisierung nicht möglich: Gladys konnte das Image „{{image}}“ nicht herunterladen. Docker-Fehler: {{message}}. Überprüfe die Internetverbindung und den freien Speicherplatz des Geräts, auf dem Gladys läuft, und versuche es dann erneut.",
+      "IMAGE_PULL_TIMEOUT": "Aktualisierung nicht möglich: Der Download des Images „{{image}}“ wurde nicht innerhalb von 15 Minuten abgeschlossen und abgebrochen, es wurde nichts geändert. Überprüfe die Internetverbindung des Geräts, auf dem Gladys läuft, und versuche es dann erneut.",
+      "NOT_ENOUGH_DISK_SPACE": "Aktualisierung nicht möglich: Auf dem Gerät, auf dem Gladys läuft, ist beim Herunterladen des Images „{{image}}“ der Speicherplatz ausgegangen. Gib Speicherplatz frei, zum Beispiel indem du nicht mehr verwendete Docker-Images entfernst (`docker image prune -a` entfernt alle Images, die von keinem Container verwendet werden), und versuche es dann erneut.",
       "NO_UPDATE_APPLIED": "Es wurde keine Aktualisierung durchgeführt: Watchtower hat kein neues Image für „{{image}}“ gefunden. Versuche es in einigen Minuten erneut, das neue Image ist für deine Architektur möglicherweise noch nicht verfügbar.",
       "WATCHTOWER_FAILED": "Die Aktualisierung ist fehlgeschlagen: Der Watchtower-Container wurde mit dem Fehlercode {{statusCode}} beendet. Weitere Informationen findest du in den Gladys-Logs.",
       "WATCHTOWER_TIMEOUT": "Die Aktualisierung dauert länger als erwartet und Gladys verfolgt sie nicht mehr. Sie läuft möglicherweise noch: Aktualisiere diese Seite in einigen Minuten, um die installierte Version zu prüfen.",
@@ -4399,6 +4903,8 @@
     },
     "batteryLevel": "Batteriestandswarnung",
     "batteryLevelDescription": "Jeden Samstag um 9:00 Uhr wird eine Nachricht an alle Administratoren gesendet, wenn der Batteriestand eines Geräts unter den gewählten Schwellenwert fällt.",
+    "systemMessageService": "Kanal für Systemnachrichten",
+    "systemMessageServiceDescription": "Wähle, wohin Gladys seine Systemnachrichten an die Administratoren sendet (Gladys-Update, fehlgeschlagene Sicherung, schwache Batterien, Gladys Plus-Abonnement, wöchentliche KI-Zusammenfassung). Sie bleiben immer in der Gladys-Unterhaltung sichtbar.",
     "duckDbMigrationTitle": "Migration zu DuckDB",
     "duckDbMigrationDescription": "Wir migrieren zu einem neuen Datenbanksystem für Sensordaten. Gladys wird Ihre Daten automatisch migrieren, aber Ihre Daten in Ihrer SQLite-Datenbank nicht löschen, um Datenverlust zu vermeiden.",
     "duckDbMigrationProgressTitle": "Migrationsfortschritt",
@@ -4516,7 +5022,18 @@
     "subscriptionOpenBilling": "Zahlungsmethode aktualisieren",
     "subscriptionCheckAgain": "Erneut prüfen",
     "subscriptionStillNotPaid": "Gladys Plus meldet weiterhin, dass eine Zahlung erforderlich ist. Nach Zahlungseingang kann es einige Minuten dauern, bis sie berücksichtigt wird.",
-    "subscriptionCheckError": "Das Abonnement konnte bei Gladys Plus nicht geprüft werden: Bitte überprüfe deine Internetverbindung und versuche es erneut."
+    "subscriptionCheckError": "Das Abonnement konnte bei Gladys Plus nicht geprüft werden: Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+    "instanceOfflineAlertTitle": "Benachrichtigung, wenn Gladys offline ist",
+    "instanceOfflineAlertDescription": "Gladys Plus sieht, wann sich deine Instanz verbindet und trennt: Bleibt sie länger als die gewählte Zeit unerreichbar (Stromausfall, abgestürzter Internetrouter, defekte SD-Karte …), schickt Gladys Plus den Administratoren deines Gladys-Plus-Kontos eine E-Mail und eine weitere, sobald sie wieder online ist.",
+    "instanceOfflineAlertLocalModeNotice": "Diese Einstellung gehört zu deinem Gladys-Plus-Konto: Öffne diese Seite über Gladys Plus, um sie zu ändern.",
+    "instanceOfflineAlertOpenGladysPlus": "Gladys Plus öffnen",
+    "instanceOfflineAlertLoadError": "Deine Gladys-Plus-Einstellungen konnten nicht geladen werden: Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+    "instanceOfflineAlertEnabledLabel": "Den Administratoren meines Gladys-Plus-Kontos eine E-Mail schicken, wenn meine Gladys offline ist",
+    "instanceOfflineAlertAdminOnly": "Nur ein Administrator des Gladys-Plus-Kontos kann diese Einstellung ändern.",
+    "instanceOfflineAlertDelayLabel": "Benachrichtigen nach",
+    "instanceOfflineAlertDelayHelp": "Kurz genug, um nützlich zu sein, lang genug, um nicht von einem neu startenden Router geweckt zu werden. Gladys Plus prüft alle paar Minuten, die E-Mail kann also einige Minuten nach dieser Zeit verschickt werden.",
+    "instanceOfflineAlertSaved": "Gespeichert.",
+    "instanceOfflineAlertSaveError": "Diese Einstellung konnte nicht gespeichert werden: Bitte überprüfe deine Internetverbindung und versuche es erneut."
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
@@ -4526,6 +5043,14 @@
     "heroReassurance": "1 Monat kostenlos testen · Ohne Kreditkarte · Jederzeit kündbar",
     "startFreeTrialButton": "Kostenlose Testphase starten",
     "alreadySubscriberButton": "Ich habe bereits ein Konto",
+    "newBadge": "Neu",
+    "offlineAlert": {
+      "title": "Erhalte eine E-Mail, wenn deine Gladys ausfällt",
+      "description": "Stromausfall, abgestürzter Internetrouter, defekte SD-Karte, ein missglücktes Docker-Update: Bleibt deine Instanz unerreichbar, schickt dir Gladys Plus eine E-Mail. So erfährst du es noch am selben Tag und nicht erst abends, wenn du nach Hause kommst.",
+      "delay": "Du wählst die Wartezeit, von 10 Minuten bis 24 Stunden",
+      "backOnline": "Eine zweite E-Mail, sobald deine Gladys wieder online ist",
+      "onByDefault": "Standardmäßig aktiviert, in beiden Tarifen enthalten: nichts einzurichten"
+    },
     "featuresTitle": "Alles, was enthalten ist",
     "featuresSubtitle": "Ein komplettes Paket, um dein Smart Home wirklich nützlich zu machen.",
     "features": {
@@ -4572,6 +5097,7 @@
       "priceDetail": "69,99 € jährlich (17 % sparen)",
       "features": {
         "remoteAccess": "Ende-zu-Ende-verschlüsselter Fernzugriff",
+        "offlineAlert": "E-Mail-Benachrichtigung, wenn deine Gladys offline ist",
         "voiceAssistants": "Google Home & Amazon Alexa",
         "openApi": "Offene REST-API",
         "familyAccounts": "Konten für die ganze Familie"
@@ -4784,6 +5310,7 @@
     "watt-hour": "Wattstunde (Wh)",
     "kilowatt-hour": "Kilowattstunde (kWh)",
     "megawatt-hour": "Megawattstunde (MWh)",
+    "gram-co2eq-per-kilowatt-hour": "Gramm CO₂-Äquivalent pro Kilowattstunde (gCO₂eq/kWh)",
     "ampere": "Ampere (A)",
     "milliampere": "Milliampere (mA)",
     "millivolt": "Millivolt (mV)",
@@ -4881,6 +5408,7 @@
     "watt-hour": "Wh",
     "kilowatt-hour": "kWh",
     "megawatt-hour": "MWh",
+    "gram-co2eq-per-kilowatt-hour": "gCO₂eq/kWh",
     "ampere": "A",
     "milliampere": "mA",
     "millivolt": "mV",
@@ -5088,6 +5616,14 @@
           "heating": "Heizen",
           "cooling": "Kühlen",
           "auto": "Automatisch"
+        },
+        "preset": {
+          "schedule": "Zeitplan",
+          "frost": "Frostschutz",
+          "away": "Abwesend",
+          "eco": "Eco",
+          "night": "Nacht",
+          "comfort": "Komfort"
         }
       },
       "heater": {
@@ -5388,6 +5924,14 @@
           "2": "Kühlen",
           "3": "Automatisch"
         },
+        "preset": {
+          "0": "Zeitplan",
+          "1": "Frostschutz",
+          "2": "Abwesend",
+          "3": "Eco",
+          "4": "Nacht",
+          "5": "Komfort"
+        },
         "operating-state": {
           "unknown": "{{value}} (unbekannt)",
           "0": "Inaktiv",
@@ -5457,6 +6001,21 @@
           "other": "Kein Wert empfangen",
           "zero": "Kein Rauch",
           "one": "Rauch erkannt"
+        },
+        "contamination-state": {
+          "0": "Sauber",
+          "1": "Leicht verschmutzt",
+          "2": "Mittel verschmutzt",
+          "3": "Stark verschmutzt",
+          "unknown": "{{value}} (unbekannt)"
+        },
+        "muted": {
+          "0": "Kann auslösen",
+          "1": "Stummgeschaltet"
+        },
+        "temporary-mute": {
+          "0": "Auslösen lassen",
+          "1": "Alarm stummschalten"
         }
       },
       "co-sensor": {
@@ -5667,7 +6226,8 @@
       "decimal": "Temperatur",
       "min": "Minimale Temperatur",
       "max": "Maximale Temperatur",
-      "average": "Mitteltemperatur Temperatur"
+      "average": "Mitteltemperatur Temperatur",
+      "probe": "Fühlertemperatur"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Gerätetemperatursensor",
@@ -5756,7 +6316,10 @@
     "smoke-sensor": {
       "shortCategoryName": "Rauchsensor",
       "binary": "Rauch (an/aus)",
-      "decimal": "Dichte (dezimal)"
+      "decimal": "Dichte (dezimal)",
+      "contamination-state": "Verschmutzung",
+      "muted": "Stummgeschaltet",
+      "temporary-mute": "Alarm stummschalten"
     },
     "co-sensor": {
       "shortCategoryName": "Kohlenmonoxid (CO)-Sensor",
@@ -5984,6 +6547,12 @@
       "thirty-minutes-production": "Produktion 30 Minuten",
       "thirty-minutes-production-revenue": "Ertrag 30 Minuten"
     },
+    "grid-carbon-sensor": {
+      "shortCategoryName": "Netz-CO₂-Sensor",
+      "carbon-intensity": "CO₂-Intensität des Netzes",
+      "carbon-free-percentage": "CO₂-freier Strom",
+      "renewable-percentage": "Erneuerbarer Strom"
+    },
     "grid-sensor": {
       "shortCategoryName": "Netzsensor",
       "input-power": "Netzbezugsleistung",
@@ -6052,16 +6621,20 @@
       "smaxin": "Max. eingespeiste Scheinleistung n (SMAXIN)",
       "smaxin_1": "Max. eingespeiste Scheinleistung n-1 (SMAXIN-1)",
       "smaxn": "Max. abgegebene Scheinleistung (SMAXN)",
+      "smaxn1": "Max. abgegebene Scheinleistung (SMAXN1)",
       "smaxn2": "Max. abgegebene Scheinleistung (SMAXN2)",
       "smaxn3": "Max. abgegebene Scheinleistung (SMAXN3)",
       "sinsts": "Momentane abgegebene Scheinleistung (SINSTS)",
+      "sinsts1": "Momentane abgegebene Scheinleistung (SINSTS1)",
       "sinsts2": "Momentane abgegebene Scheinleistung (SINSTS2)",
       "sinsts3": "Momentane abgegebene Scheinleistung (SINSTS3)",
       "smaxn_1": "Max. entnommene Scheinleistung n-1 (SMAXN-1)",
+      "smaxn1_1": "Max. entnommene Scheinleistung n-1 (SMAXN1-1)",
       "smaxn2_1": "Max. entnommene Scheinleistung n-1 (SMAXN2-1)",
       "smaxn3_1": "Max. entnommene Scheinleistung n-1 (SMAXN3-1)",
       "hhphc": "HPHC-Programm (HHPHC)",
       "imax": "Spitzenstrom (IMAX)",
+      "imax1": "Spitzenstrom (IMAX1)",
       "adps": "Warnung bei Überschreitung der Vertragsleistung (ADPS)",
       "imax2": "Spitzenstrom (IMAX2)",
       "imax3": "Spitzenstrom (IMAX3)",
@@ -6152,6 +6725,7 @@
       "shortCategoryName": "Thermostat",
       "target-temperature": "Thermostat: Temperatur",
       "mode": "Thermostat: Modus",
+      "preset": "Thermostat: Voreinstellung",
       "operating-state": "Thermostat: Betriebszustand"
     },
     "airquality-sensor": {
@@ -6381,6 +6955,13 @@
     "saveButton": "Speichern",
     "manageBillingLink": "Mein Abo und meine Rechnungen verwalten",
     "logoutButton": "Abmelden"
+  },
+  "deviceFeatureHistorySize": {
+    "size": {
+      "one": "1 Wert im Verlauf (≈ {{size}})",
+      "other": "{{count}} Werte im Verlauf (≈ {{size}})"
+    },
+    "empty": "Keine Werte im Verlauf"
   },
   "editDeviceForm": {
     "noName": "Kein Name",

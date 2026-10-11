@@ -1,10 +1,47 @@
 const deviceClasses = require('node-broadlink/dist/switch');
 
+const logger = require('../../../../../utils/logger');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
 } = require('../../../../../utils/constants');
+
+// Broadlink devices handled by the "SP4" node-broadlink class (SP4, SP4L-*, SP4M, MCB1, SCB1E...).
+const SP4_TYPES = ['SP4', 'SP4B'];
+
+/**
+ * @description Sends a new state to a SP4-like Broadlink device.
+ * `Sp4.setState` from node-broadlink decodes the raw (still encrypted) response, which always
+ * throws "SyntaxError: Unexpected end of JSON input" even though the command reached the device.
+ * The payload is decrypted here before being decoded, as `Sp4.getState` already does.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @param {object} state - State to send to the device.
+ * @returns {Promise<object>} Resolve with the device state.
+ * @example
+ * await setSp4State(broadlinkDevice, { pwr: true });
+ */
+async function setSp4State(broadlinkDevice, state) {
+  const payload = await broadlinkDevice.sendPacketAndDecrypt(broadlinkDevice.encode(2, state));
+  return broadlinkDevice.decode(payload);
+}
+
+/**
+ * @description Reads the power state of a SP3 Broadlink device.
+ * `Sp3.checkPower` from node-broadlink reads the nightlight bit (0x02) instead of the power bit (0x01),
+ * the one `Sp3.setPower` writes.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @returns {Promise<boolean>} Resolve with the power state.
+ * @example
+ * await checkSp3Power(broadlinkDevice);
+ */
+async function checkSp3Power(broadlinkDevice) {
+  const packet = Buffer.alloc(16);
+  packet[0] = 1;
+  const payload = await broadlinkDevice.sendPacketAndDecrypt(packet);
+  // eslint-disable-next-line no-bitwise
+  return (payload[0x4] & 0x01) === 0x01;
+}
 
 /**
  * @description Builds switch Broadlink features.
@@ -75,6 +112,8 @@ async function setValue(broadlinkDevice, gladysDevice, gladysFeature, value) {
     const { external_id: externalId } = gladysFeature;
     const [, , , switchNb] = externalId.split(':');
     await broadlinkDevice.setPower(Number.parseInt(switchNb, 10), valueTosend);
+  } else if (SP4_TYPES.includes(TYPE)) {
+    await setSp4State(broadlinkDevice, { pwr: valueTosend });
   } else {
     await broadlinkDevice.setPower(valueTosend);
   }
@@ -89,17 +128,44 @@ async function setValue(broadlinkDevice, gladysDevice, gladysFeature, value) {
  * await poll(broadlinkDevice, device);
  */
 async function poll(broadlinkDevice, gladysDevice) {
+  const { TYPE, checkPower } = broadlinkDevice;
   const { features } = gladysDevice;
   const messages = [];
+
+  // switches
+  const switchFeatures = features.filter((feature) => feature.category === DEVICE_FEATURE_CATEGORIES.SWITCH);
+  if (switchFeatures.length > 0 && typeof checkPower === 'function') {
+    try {
+      // MP1 devices return the state of all their 4 switches at once
+      const power = TYPE === 'SP3' ? await checkSp3Power(broadlinkDevice) : await broadlinkDevice.checkPower();
+      switchFeatures.forEach((feature) => {
+        const [, , , switchNb] = feature.external_id.split(':');
+        const state = (TYPE === 'MP1' ? power[`s${switchNb}`] : power) ? 1 : 0;
+        // only send changes, to not store the same state every minute
+        if (feature.last_value !== state) {
+          messages.push({
+            device_feature_external_id: feature.external_id,
+            state,
+          });
+        }
+      });
+    } catch (e) {
+      logger.warn(`Broadlink: unable to read switch state of ${gladysDevice.external_id}`, e);
+    }
+  }
 
   // energy
   const energyFeature = features.find((feature) => feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR);
   if (energyFeature) {
-    const state = await broadlinkDevice.getEnergy();
-    messages.push({
-      device_feature_external_id: energyFeature.external_id,
-      state,
-    });
+    try {
+      const state = await broadlinkDevice.getEnergy();
+      messages.push({
+        device_feature_external_id: energyFeature.external_id,
+        state,
+      });
+    } catch (e) {
+      logger.warn(`Broadlink: unable to read energy of ${gladysDevice.external_id}`, e);
+    }
   }
 
   return messages;

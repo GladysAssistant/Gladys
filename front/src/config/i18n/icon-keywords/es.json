@@ -1,0 +1,1890 @@
+{
+  "activity": {
+    "keywords": "pulso latido gráfico",
+    "label": "Actividad"
+  },
+  "air-vent": {
+    "keywords": "ventilación climatización vmc conducto",
+    "label": "Rejilla de ventilación"
+  },
+  "airplay": {
+    "keywords": "transmitir pantalla espejo",
+    "label": "Airplay"
+  },
+  "alarm-clock": {
+    "keywords": "despertar mañana",
+    "label": "Despertador"
+  },
+  "alarm-clock-check": {
+    "keywords": "hecho confirmado",
+    "label": "Despertador confirmado"
+  },
+  "alarm-smoke": {
+    "keywords": "fuego detector",
+    "label": "Alarma de humo"
+  },
+  "alert-circle": {
+    "keywords": "advertencia error",
+    "label": "Alerta (círculo)"
+  },
+  "alert-octagon": {
+    "keywords": "advertencia detener peligro",
+    "label": "Alerta (octágono)"
+  },
+  "alert-triangle": {
+    "keywords": "advertencia precaución peligro",
+    "label": "Alerta (triángulo)"
+  },
+  "align-center": {
+    "keywords": "texto",
+    "label": "Alinear al centro"
+  },
+  "align-justify": {
+    "keywords": "texto",
+    "label": "Justificar"
+  },
+  "align-left": {
+    "keywords": "texto",
+    "label": "Alinear a la izquierda"
+  },
+  "align-right": {
+    "keywords": "texto",
+    "label": "Alinear a la derecha"
+  },
+  "anchor": {
+    "keywords": "barco puerto",
+    "label": "Ancla"
+  },
+  "antenna": {
+    "keywords": "señal radio recepción",
+    "label": "Antena"
+  },
+  "aperture": {
+    "keywords": "cámara lente foto",
+    "label": "Apertura"
+  },
+  "apple": {
+    "keywords": "fruta comida saludable",
+    "label": "Manzana"
+  },
+  "armchair": {
+    "keywords": "sala de estar asiento",
+    "label": "Sillón"
+  },
+  "arrow-down": {
+    "keywords": "descender bajar",
+    "label": "Flecha abajo"
+  },
+  "arrow-down-circle": {
+    "keywords": "descender bajar",
+    "label": "Flecha abajo (círculo)"
+  },
+  "arrow-down-left": {
+    "keywords": "descender",
+    "label": "Flecha abajo izquierda"
+  },
+  "arrow-down-right": {
+    "keywords": "descender",
+    "label": "Flecha abajo derecha"
+  },
+  "arrow-left": {
+    "keywords": "atrás",
+    "label": "Flecha izquierda"
+  },
+  "arrow-left-circle": {
+    "keywords": "atrás anterior",
+    "label": "Flecha izquierda (círculo)"
+  },
+  "arrow-right": {
+    "keywords": "siguiente adelante",
+    "label": "Flecha derecha"
+  },
+  "arrow-right-circle": {
+    "keywords": "siguiente adelante",
+    "label": "Flecha derecha (círculo)"
+  },
+  "arrow-up": {
+    "keywords": "ascender subir",
+    "label": "Flecha arriba"
+  },
+  "arrow-up-circle": {
+    "keywords": "ascender subir",
+    "label": "Flecha arriba (círculo)"
+  },
+  "arrow-up-left": {
+    "keywords": "ascender",
+    "label": "Flecha arriba izquierda"
+  },
+  "arrow-up-right": {
+    "keywords": "ascender",
+    "label": "Flecha arriba derecha"
+  },
+  "at-sign": {
+    "keywords": "correo mención",
+    "label": "Arroba"
+  },
+  "audio-lines": {
+    "keywords": "forma de onda sonido",
+    "label": "Líneas de audio"
+  },
+  "award": {
+    "keywords": "premio medalla trofeo",
+    "label": "Premio"
+  },
+  "baby": {
+    "keywords": "niño guardería infante",
+    "label": "Bebé"
+  },
+  "backpack": {
+    "keywords": "escuela bolso viaje",
+    "label": "Mochila"
+  },
+  "badge-check": {
+    "keywords": "verificado certificado confiable",
+    "label": "Insignia verificada"
+  },
+  "ban": {
+    "keywords": "prohibido bloqueado no",
+    "label": "Prohibido"
+  },
+  "banknote": {
+    "keywords": "dinero efectivo pago",
+    "label": "Billete"
+  },
+  "bar-chart": {
+    "keywords": "gráfico estadísticas",
+    "label": "Gráfico de barras"
+  },
+  "bar-chart-2": {
+    "keywords": "gráfico estadísticas",
+    "label": "Gráfico de barras (2)"
+  },
+  "bath": {
+    "keywords": "baño",
+    "label": "Bañera"
+  },
+  "battery": {
+    "keywords": "energía carga",
+    "label": "Batería"
+  },
+  "battery-charging": {
+    "keywords": "energía carga",
+    "label": "Batería cargando"
+  },
+  "battery-full": {
+    "keywords": "nivel de carga energía",
+    "label": "Batería llena"
+  },
+  "battery-low": {
+    "keywords": "nivel de carga vacío",
+    "label": "Batería baja"
+  },
+  "battery-medium": {
+    "keywords": "nivel de carga medio",
+    "label": "Batería media"
+  },
+  "battery-warning": {
+    "keywords": "nivel de carga falla",
+    "label": "Batería con advertencia"
+  },
+  "bed": {
+    "keywords": "dormitorio dormir noche",
+    "label": "Cama"
+  },
+  "bed-double": {
+    "keywords": "dormitorio pareja",
+    "label": "Cama doble"
+  },
+  "bed-single": {
+    "keywords": "dormitorio niño",
+    "label": "Cama individual"
+  },
+  "beer": {
+    "keywords": "bebida alcohol jarra",
+    "label": "Cerveza"
+  },
+  "bell": {
+    "keywords": "notificación alarma sonar",
+    "label": "Campana"
+  },
+  "bell-dot": {
+    "keywords": "no leído alerta insignia",
+    "label": "Campana con punto"
+  },
+  "bell-off": {
+    "keywords": "notificación silencio",
+    "label": "Campana silenciada"
+  },
+  "bell-ring": {
+    "keywords": "alarma timbre notificación",
+    "label": "Campana sonando"
+  },
+  "bike": {
+    "keywords": "bicicleta ciclismo",
+    "label": "Bicicleta"
+  },
+  "bird": {
+    "keywords": "mascota animal",
+    "label": "Ave"
+  },
+  "blinds": {
+    "keywords": "persiana enrollable veneciana ventana",
+    "label": "Persianas"
+  },
+  "bluetooth": {
+    "keywords": "inalámbrico",
+    "label": "Bluetooth"
+  },
+  "bluetooth-connected": {
+    "keywords": "emparejado inalámbrico",
+    "label": "Bluetooth conectado"
+  },
+  "bold": {
+    "keywords": "texto formato",
+    "label": "Negrita"
+  },
+  "bone": {
+    "keywords": "perro mascota premio",
+    "label": "Hueso"
+  },
+  "book": {
+    "keywords": "leer",
+    "label": "Libro"
+  },
+  "book-open": {
+    "keywords": "leer",
+    "label": "Libro abierto"
+  },
+  "bookmark": {
+    "keywords": "favorito guardar",
+    "label": "Marcador"
+  },
+  "bot": {
+    "keywords": "ia asistente automatización",
+    "label": "Bot"
+  },
+  "box": {
+    "keywords": "paquete cubo",
+    "label": "Caja"
+  },
+  "brain": {
+    "keywords": "ia inteligencia pensar",
+    "label": "Cerebro"
+  },
+  "brick-wall": {
+    "keywords": "muro albañilería cerca ladrillo",
+    "label": "Muro de ladrillo"
+  },
+  "briefcase": {
+    "keywords": "trabajo bolso",
+    "label": "Maletín"
+  },
+  "brush-cleaning": {
+    "keywords": "aspiradora limpieza del hogar",
+    "label": "Limpieza"
+  },
+  "building": {
+    "keywords": "oficina bloque",
+    "label": "Edificio"
+  },
+  "bus": {
+    "keywords": "transporte público autobús",
+    "label": "Autobús"
+  },
+  "cable": {
+    "keywords": "cable conector enchufe",
+    "label": "Cable"
+  },
+  "cake": {
+    "keywords": "cumpleaños postre comida",
+    "label": "Pastel"
+  },
+  "cake-slice": {
+    "keywords": "postre comida",
+    "label": "Rebanada de pastel"
+  },
+  "calendar": {
+    "keywords": "fecha agenda",
+    "label": "Calendario"
+  },
+  "calendar-check": {
+    "keywords": "hecho confirmado agenda",
+    "label": "Calendario confirmado"
+  },
+  "calendar-clock": {
+    "keywords": "agenda hora cita",
+    "label": "Calendario y hora"
+  },
+  "calendar-days": {
+    "keywords": "mes agenda fechas",
+    "label": "Días del calendario"
+  },
+  "camera": {
+    "keywords": "foto imagen",
+    "label": "Cámara"
+  },
+  "camera-off": {
+    "keywords": "foto desactivada",
+    "label": "Cámara desactivada"
+  },
+  "car": {
+    "keywords": "vehículo conducir garaje",
+    "label": "Automóvil"
+  },
+  "car-front": {
+    "keywords": "vehículo conducir garaje",
+    "label": "Automóvil (frontal)"
+  },
+  "caravan": {
+    "keywords": "casa rodante remolque vacaciones",
+    "label": "Caravana"
+  },
+  "carrot": {
+    "keywords": "vegetal comida jardín",
+    "label": "Zanahoria"
+  },
+  "cast": {
+    "keywords": "pantalla transmitir tv",
+    "label": "Transmitir"
+  },
+  "cat": {
+    "keywords": "mascota animal",
+    "label": "Gato"
+  },
+  "cctv": {
+    "keywords": "seguridad cámara vigilancia",
+    "label": "CCTV"
+  },
+  "check": {
+    "keywords": "hecho válido correcto sí",
+    "label": "Marca de verificación"
+  },
+  "check-circle": {
+    "keywords": "hecho válido correcto éxito",
+    "label": "Verificación (círculo)"
+  },
+  "check-square": {
+    "keywords": "hecho válido casilla",
+    "label": "Verificación (casilla)"
+  },
+  "chef-hat": {
+    "keywords": "cocina cocinar",
+    "label": "Gorro de chef"
+  },
+  "chevron-down": {
+    "keywords": "expandir menú abrir",
+    "label": "Chevron abajo"
+  },
+  "chevron-left": {
+    "keywords": "anterior atrás",
+    "label": "Chevron izquierda"
+  },
+  "chevron-right": {
+    "keywords": "siguiente adelante",
+    "label": "Chevron derecha"
+  },
+  "chevron-up": {
+    "keywords": "contraer cerrar",
+    "label": "Chevron arriba"
+  },
+  "chevrons-down": {
+    "keywords": "doble",
+    "label": "Chevrons abajo"
+  },
+  "chevrons-left": {
+    "keywords": "doble",
+    "label": "Chevrons izquierda"
+  },
+  "chevrons-right": {
+    "keywords": "doble",
+    "label": "Chevrons derecha"
+  },
+  "chevrons-up": {
+    "keywords": "doble",
+    "label": "Chevrons arriba"
+  },
+  "chrome": {
+    "keywords": "navegador google",
+    "label": "Chrome"
+  },
+  "circle": {
+    "keywords": "redondo forma",
+    "label": "Círculo"
+  },
+  "clapperboard": {
+    "keywords": "película cine video",
+    "label": "Claqueta"
+  },
+  "clipboard": {
+    "keywords": "pegar copiar",
+    "label": "Portapapeles"
+  },
+  "clock": {
+    "keywords": "hora reloj",
+    "label": "Reloj"
+  },
+  "cloud": {
+    "keywords": "clima cielo",
+    "label": "Nube"
+  },
+  "cloud-drizzle": {
+    "keywords": "clima lluvia",
+    "label": "Nube con llovizna"
+  },
+  "cloud-fog": {
+    "keywords": "neblina clima",
+    "label": "Nube con niebla"
+  },
+  "cloud-hail": {
+    "keywords": "clima tormenta",
+    "label": "Nube con granizo"
+  },
+  "cloud-lightning": {
+    "keywords": "clima tormenta trueno",
+    "label": "Nube con rayos"
+  },
+  "cloud-moon": {
+    "keywords": "nublado noche clima",
+    "label": "Nube y luna"
+  },
+  "cloud-moon-rain": {
+    "keywords": "noche clima",
+    "label": "Nube, luna y lluvia"
+  },
+  "cloud-off": {
+    "keywords": "desconectado",
+    "label": "Nube desconectada"
+  },
+  "cloud-rain": {
+    "keywords": "clima",
+    "label": "Nube con lluvia"
+  },
+  "cloud-snow": {
+    "keywords": "clima invierno",
+    "label": "Nube con nieve"
+  },
+  "cloud-sun": {
+    "keywords": "parcialmente nublado clima",
+    "label": "Nube y sol"
+  },
+  "cloud-sun-rain": {
+    "keywords": "chubascos clima",
+    "label": "Nube, sol y lluvia"
+  },
+  "code": {
+    "keywords": "desarrollador programación",
+    "label": "Código"
+  },
+  "codepen": {
+    "keywords": "desarrollador",
+    "label": "CodePen"
+  },
+  "coffee": {
+    "keywords": "bebida caliente taza mañana",
+    "label": "Café"
+  },
+  "command": {
+    "keywords": "tecla mac atajo",
+    "label": "Comando"
+  },
+  "compass": {
+    "keywords": "dirección navegación",
+    "label": "Brújula"
+  },
+  "cooking-pot": {
+    "keywords": "cocina cocinar sartén",
+    "label": "Olla de cocina"
+  },
+  "copy": {
+    "keywords": "duplicar",
+    "label": "Copiar"
+  },
+  "corner-down-left": {
+    "keywords": "retorno enter rama",
+    "label": "Esquina abajo izquierda"
+  },
+  "corner-down-right": {
+    "keywords": "rama",
+    "label": "Esquina abajo derecha"
+  },
+  "corner-left-down": {
+    "keywords": "rama",
+    "label": "Esquina izquierda abajo"
+  },
+  "corner-left-up": {
+    "keywords": "rama",
+    "label": "Esquina izquierda arriba"
+  },
+  "corner-right-down": {
+    "keywords": "rama",
+    "label": "Esquina derecha abajo"
+  },
+  "corner-right-up": {
+    "keywords": "rama",
+    "label": "Esquina derecha arriba"
+  },
+  "corner-up-left": {
+    "keywords": "rama",
+    "label": "Esquina arriba izquierda"
+  },
+  "corner-up-right": {
+    "keywords": "rama",
+    "label": "Esquina arriba derecha"
+  },
+  "cpu": {
+    "keywords": "procesador chip computadora",
+    "label": "CPU"
+  },
+  "credit-card": {
+    "keywords": "pago banco dinero",
+    "label": "Tarjeta de crédito"
+  },
+  "croissant": {
+    "keywords": "desayuno panadería comida",
+    "label": "Croissant"
+  },
+  "crop": {
+    "keywords": "imagen cortar",
+    "label": "Recortar"
+  },
+  "crosshair": {
+    "keywords": "objetivo puntería precisión",
+    "label": "Mira"
+  },
+  "cup-soda": {
+    "keywords": "bebida fría vaso",
+    "label": "Vaso con bebida"
+  },
+  "database": {
+    "keywords": "almacenamiento datos servidor",
+    "label": "Base de datos"
+  },
+  "delete": {
+    "keywords": "retroceso quitar borrar",
+    "label": "Eliminar"
+  },
+  "disc": {
+    "keywords": "cd dvd música álbum",
+    "label": "Disco"
+  },
+  "disc-3": {
+    "keywords": "música álbum tocadiscos",
+    "label": "Disco de vinilo"
+  },
+  "dog": {
+    "keywords": "mascota animal",
+    "label": "Perro"
+  },
+  "dollar-sign": {
+    "keywords": "dinero moneda precio",
+    "label": "Signo de dólar"
+  },
+  "door-closed": {
+    "keywords": "entrada",
+    "label": "Puerta cerrada"
+  },
+  "door-closed-locked": {
+    "keywords": "seguro entrada",
+    "label": "Puerta con seguro"
+  },
+  "door-open": {
+    "keywords": "entrada",
+    "label": "Puerta abierta"
+  },
+  "download": {
+    "keywords": "guardar",
+    "label": "Descargar"
+  },
+  "download-cloud": {
+    "keywords": "guardar",
+    "label": "Descargar de la nube"
+  },
+  "drill": {
+    "keywords": "herramienta bricolaje tornillo",
+    "label": "Taladro"
+  },
+  "droplet": {
+    "keywords": "agua humedad lluvia",
+    "label": "Gota"
+  },
+  "droplets": {
+    "keywords": "agua humedad lluvia",
+    "label": "Gotas"
+  },
+  "dumbbell": {
+    "keywords": "gimnasio deporte ejercicio",
+    "label": "Mancuerna"
+  },
+  "edit": {
+    "keywords": "modificar escribir",
+    "label": "Editar"
+  },
+  "edit-2": {
+    "keywords": "lápiz escribir modificar",
+    "label": "Editar (2)"
+  },
+  "edit-3": {
+    "keywords": "pluma escribir modificar",
+    "label": "Editar (3)"
+  },
+  "egg": {
+    "keywords": "comida desayuno cocinar",
+    "label": "Huevo"
+  },
+  "euro": {
+    "keywords": "dinero moneda precio",
+    "label": "Euro"
+  },
+  "external-link": {
+    "keywords": "abrir nueva pestaña",
+    "label": "Enlace externo"
+  },
+  "eye": {
+    "keywords": "ver visible mirar",
+    "label": "Ojo"
+  },
+  "eye-off": {
+    "keywords": "ocultar invisible oculto",
+    "label": "Ojo (oculto)"
+  },
+  "facebook": {
+    "keywords": "red social",
+    "label": "Facebook"
+  },
+  "fan": {
+    "keywords": "enfriamiento aire soplar",
+    "label": "Ventilador"
+  },
+  "fast-forward": {
+    "keywords": "multimedia siguiente velocidad",
+    "label": "Avance rápido"
+  },
+  "feather": {
+    "keywords": "pluma liviano escribir",
+    "label": "Pluma"
+  },
+  "fence": {
+    "keywords": "jardín barrera",
+    "label": "Cerca"
+  },
+  "file": {
+    "keywords": "documento",
+    "label": "Archivo"
+  },
+  "file-minus": {
+    "keywords": "documento quitar",
+    "label": "Archivo (quitar)"
+  },
+  "file-plus": {
+    "keywords": "documento agregar nuevo",
+    "label": "Archivo (agregar)"
+  },
+  "file-text": {
+    "keywords": "documento",
+    "label": "Archivo de texto"
+  },
+  "film": {
+    "keywords": "película video cine",
+    "label": "Película"
+  },
+  "filter": {
+    "keywords": "ordenar embudo",
+    "label": "Filtro"
+  },
+  "fingerprint": {
+    "keywords": "biométrico identidad tocar",
+    "label": "Huella digital"
+  },
+  "fish": {
+    "keywords": "mascota acuario animal",
+    "label": "Pez"
+  },
+  "flag": {
+    "keywords": "país marcar reportar",
+    "label": "Bandera"
+  },
+  "flame": {
+    "keywords": "fuego calefacción caldera quemar",
+    "label": "Llama"
+  },
+  "flame-kindling": {
+    "keywords": "chimenea leña",
+    "label": "Fogata"
+  },
+  "flashlight": {
+    "keywords": "antorcha luz haz",
+    "label": "Linterna"
+  },
+  "flower": {
+    "keywords": "jardín planta flor",
+    "label": "Flor"
+  },
+  "flower-2": {
+    "keywords": "jardín planta flor",
+    "label": "Flor (2)"
+  },
+  "folder": {
+    "keywords": "directorio",
+    "label": "Carpeta"
+  },
+  "folder-minus": {
+    "keywords": "directorio quitar",
+    "label": "Carpeta (quitar)"
+  },
+  "folder-plus": {
+    "keywords": "directorio agregar nuevo",
+    "label": "Carpeta (agregar)"
+  },
+  "footprints": {
+    "keywords": "presencia caminar movimiento pasos",
+    "label": "Huellas"
+  },
+  "fuel": {
+    "keywords": "gasolina gasolinera tanque",
+    "label": "Combustible"
+  },
+  "gamepad": {
+    "keywords": "videojuegos consola control",
+    "label": "Control de videojuegos"
+  },
+  "gamepad-2": {
+    "keywords": "videojuegos consola control",
+    "label": "Control de videojuegos (2)"
+  },
+  "gauge": {
+    "keywords": "medidor presión nivel",
+    "label": "Medidor"
+  },
+  "gift": {
+    "keywords": "regalo cumpleaños navidad oferta",
+    "label": "Regalo"
+  },
+  "git-branch": {
+    "keywords": "desarrollador versión",
+    "label": "Rama Git"
+  },
+  "git-commit": {
+    "keywords": "desarrollador versión",
+    "label": "Commit de Git"
+  },
+  "git-merge": {
+    "keywords": "desarrollador versión",
+    "label": "Fusión de Git"
+  },
+  "git-pull-request": {
+    "keywords": "desarrollador versión",
+    "label": "Solicitud de extracción"
+  },
+  "github": {
+    "keywords": "desarrollador código",
+    "label": "GitHub"
+  },
+  "gitlab": {
+    "keywords": "desarrollador código",
+    "label": "GitLab"
+  },
+  "glass-water": {
+    "keywords": "bebida",
+    "label": "Vaso de agua"
+  },
+  "glasses": {
+    "keywords": "lentes leer visión",
+    "label": "Gafas"
+  },
+  "globe": {
+    "keywords": "mundo tierra internet idioma",
+    "label": "Globo terráqueo"
+  },
+  "graduation-cap": {
+    "keywords": "escuela estudio universidad",
+    "label": "Birrete de graduación"
+  },
+  "grid": {
+    "keywords": "diseño tabla cuadros",
+    "label": "Cuadrícula"
+  },
+  "hammer": {
+    "keywords": "herramienta bricolaje construir",
+    "label": "Martillo"
+  },
+  "hand": {
+    "keywords": "saludo tocar detener",
+    "label": "Mano"
+  },
+  "hard-drive": {
+    "keywords": "disco almacenamiento",
+    "label": "Disco duro"
+  },
+  "hash": {
+    "keywords": "numeral número etiqueta",
+    "label": "Numeral"
+  },
+  "haze": {
+    "keywords": "niebla neblina clima",
+    "label": "Neblina"
+  },
+  "headphones": {
+    "keywords": "audio música escuchar",
+    "label": "Audífonos"
+  },
+  "heart": {
+    "keywords": "amor favorito me gusta",
+    "label": "Corazón"
+  },
+  "heart-pulse": {
+    "keywords": "salud latido médico",
+    "label": "Pulso cardíaco"
+  },
+  "heater": {
+    "keywords": "calefacción radiador cálido termostato",
+    "label": "Calefactor"
+  },
+  "help-circle": {
+    "keywords": "pregunta soporte faq",
+    "label": "Ayuda (círculo)"
+  },
+  "history": {
+    "keywords": "pasado registro deshacer reciente",
+    "label": "Historial"
+  },
+  "home": {
+    "keywords": "casa principal panel vivienda edificio",
+    "label": "Casa"
+  },
+  "hourglass": {
+    "keywords": "esperar tiempo duración",
+    "label": "Reloj de arena"
+  },
+  "ice-cream-cone": {
+    "keywords": "postre verano frío",
+    "label": "Barquillo de helado"
+  },
+  "image": {
+    "keywords": "imagen foto",
+    "label": "Imagen"
+  },
+  "inbox": {
+    "keywords": "correo mensajes recibidos",
+    "label": "Bandeja de entrada"
+  },
+  "info": {
+    "keywords": "información acerca detalles",
+    "label": "Información"
+  },
+  "instagram": {
+    "keywords": "red social foto",
+    "label": "Instagram"
+  },
+  "italic": {
+    "keywords": "texto formato",
+    "label": "Cursiva"
+  },
+  "key": {
+    "keywords": "desbloquear acceso puerta",
+    "label": "Llave"
+  },
+  "key-round": {
+    "keywords": "desbloquear acceso puerta",
+    "label": "Llave (redonda)"
+  },
+  "keyboard": {
+    "keywords": "escribir entrada teclas",
+    "label": "Teclado"
+  },
+  "lamp": {
+    "keywords": "luz iluminación",
+    "label": "Lámpara"
+  },
+  "lamp-ceiling": {
+    "keywords": "luz colgante",
+    "label": "Lámpara de techo"
+  },
+  "lamp-desk": {
+    "keywords": "luz",
+    "label": "Lámpara de escritorio"
+  },
+  "lamp-floor": {
+    "keywords": "luz de pie",
+    "label": "Lámpara de pie"
+  },
+  "lamp-wall-up": {
+    "keywords": "luz aplique",
+    "label": "Lámpara de pared"
+  },
+  "languages": {
+    "keywords": "traducir idioma i18n",
+    "label": "Idiomas"
+  },
+  "laptop": {
+    "keywords": "computadora pc portátil",
+    "label": "Computadora portátil"
+  },
+  "layers": {
+    "keywords": "pila niveles",
+    "label": "Capas"
+  },
+  "layout": {
+    "keywords": "cuadrícula página diseño",
+    "label": "Diseño"
+  },
+  "leaf": {
+    "keywords": "planta naturaleza ecológico verde",
+    "label": "Hoja"
+  },
+  "life-buoy": {
+    "keywords": "ayuda soporte rescate",
+    "label": "Salvavidas"
+  },
+  "lightbulb": {
+    "keywords": "luz lámpara bombilla encendido",
+    "label": "Bombilla"
+  },
+  "lightbulb-off": {
+    "keywords": "luz apagado",
+    "label": "Bombilla apagada"
+  },
+  "link": {
+    "keywords": "url enlace",
+    "label": "Enlace"
+  },
+  "link-2": {
+    "keywords": "url enlace",
+    "label": "Enlace (2)"
+  },
+  "linkedin": {
+    "keywords": "red social trabajo",
+    "label": "LinkedIn"
+  },
+  "list": {
+    "keywords": "elementos enumeración",
+    "label": "Lista"
+  },
+  "list-music": {
+    "keywords": "cola canciones",
+    "label": "Lista de reproducción"
+  },
+  "loader": {
+    "keywords": "cargando espera",
+    "label": "Cargando"
+  },
+  "locate-fixed": {
+    "keywords": "gps geolocalización objetivo",
+    "label": "Ubicación precisa"
+  },
+  "lock": {
+    "keywords": "seguro contraseña cerrado",
+    "label": "Candado"
+  },
+  "lock-keyhole": {
+    "keywords": "bloqueado seguro llave",
+    "label": "Candado (ojo de cerradura)"
+  },
+  "log-in": {
+    "keywords": "iniciar sesión conectar",
+    "label": "Iniciar sesión"
+  },
+  "log-out": {
+    "keywords": "salir desconectar",
+    "label": "Cerrar sesión"
+  },
+  "mail": {
+    "keywords": "correo sobre mensaje",
+    "label": "Correo"
+  },
+  "mailbox": {
+    "keywords": "buzón correo",
+    "label": "Buzón"
+  },
+  "map": {
+    "keywords": "ubicación navegación",
+    "label": "Mapa"
+  },
+  "map-pin": {
+    "keywords": "ubicación marcador lugar gps",
+    "label": "Marcador de mapa"
+  },
+  "map-pinned": {
+    "keywords": "ubicación lugar gps",
+    "label": "Mapa con marcador"
+  },
+  "maximize": {
+    "keywords": "pantalla completa expandir",
+    "label": "Maximizar"
+  },
+  "maximize-2": {
+    "keywords": "expandir pantalla completa agrandar",
+    "label": "Maximizar (2)"
+  },
+  "menu": {
+    "keywords": "hamburguesa navegación",
+    "label": "Menú"
+  },
+  "message-circle": {
+    "keywords": "chat comentario burbuja",
+    "label": "Mensaje (círculo)"
+  },
+  "message-square": {
+    "keywords": "chat comentario burbuja",
+    "label": "Mensaje (cuadrado)"
+  },
+  "mic": {
+    "keywords": "micrófono voz grabar",
+    "label": "Micrófono"
+  },
+  "mic-off": {
+    "keywords": "micrófono silenciado",
+    "label": "Micrófono silenciado"
+  },
+  "mic-vocal": {
+    "keywords": "karaoke voz cantar",
+    "label": "Micrófono vocal"
+  },
+  "microwave": {
+    "keywords": "cocina horno calor",
+    "label": "Microondas"
+  },
+  "milestone": {
+    "keywords": "señal dirección paso",
+    "label": "Hito"
+  },
+  "milk": {
+    "keywords": "bebida lácteo botella",
+    "label": "Leche"
+  },
+  "minimize": {
+    "keywords": "reducir",
+    "label": "Minimizar"
+  },
+  "minimize-2": {
+    "keywords": "reducir contraer",
+    "label": "Minimizar (2)"
+  },
+  "minus": {
+    "keywords": "quitar restar menos",
+    "label": "Menos"
+  },
+  "minus-circle": {
+    "keywords": "quitar restar",
+    "label": "Menos (círculo)"
+  },
+  "minus-square": {
+    "keywords": "quitar restar",
+    "label": "Menos (cuadrado)"
+  },
+  "monitor": {
+    "keywords": "pantalla display computadora",
+    "label": "Monitor"
+  },
+  "moon": {
+    "keywords": "noche oscuro dormir",
+    "label": "Luna"
+  },
+  "moon-star": {
+    "keywords": "noche dormir despejado",
+    "label": "Luna y estrella"
+  },
+  "more-horizontal": {
+    "keywords": "menú opciones puntos",
+    "label": "Más opciones (horizontal)"
+  },
+  "more-vertical": {
+    "keywords": "menú opciones puntos",
+    "label": "Más opciones (vertical)"
+  },
+  "move": {
+    "keywords": "arrastrar flechas",
+    "label": "Mover"
+  },
+  "music": {
+    "keywords": "canción audio nota",
+    "label": "Música"
+  },
+  "music-2": {
+    "keywords": "canción audio nota",
+    "label": "Música (2)"
+  },
+  "music-4": {
+    "keywords": "canción audio notas",
+    "label": "Música (4)"
+  },
+  "navigation": {
+    "keywords": "dirección gps flecha",
+    "label": "Navegación"
+  },
+  "navigation-2": {
+    "keywords": "dirección gps flecha",
+    "label": "Navegación (2)"
+  },
+  "network": {
+    "keywords": "red topología nodos",
+    "label": "Red"
+  },
+  "octagon": {
+    "keywords": "forma detener",
+    "label": "Octágono"
+  },
+  "package": {
+    "keywords": "caja entrega paquete",
+    "label": "Paquete"
+  },
+  "package-open": {
+    "keywords": "entrega paquete desempaquetar",
+    "label": "Paquete abierto"
+  },
+  "paint-roller": {
+    "keywords": "decorar pared",
+    "label": "Rodillo de pintura"
+  },
+  "paintbrush": {
+    "keywords": "pintar decorar color",
+    "label": "Pincel"
+  },
+  "paperclip": {
+    "keywords": "adjunto archivo",
+    "label": "Clip"
+  },
+  "parking-meter": {
+    "keywords": "automóvil",
+    "label": "Parquímetro"
+  },
+  "party-popper": {
+    "keywords": "celebración confeti",
+    "label": "Cotillón"
+  },
+  "pause": {
+    "keywords": "multimedia detener",
+    "label": "Pausar"
+  },
+  "pause-circle": {
+    "keywords": "multimedia detener",
+    "label": "Pausar (círculo)"
+  },
+  "paw-print": {
+    "keywords": "mascota animal",
+    "label": "Huella de mascota"
+  },
+  "percent": {
+    "keywords": "porcentaje descuento",
+    "label": "Porcentaje"
+  },
+  "person-standing": {
+    "keywords": "presencia humano alguien",
+    "label": "Persona de pie"
+  },
+  "phone": {
+    "keywords": "teléfono llamada",
+    "label": "Teléfono"
+  },
+  "phone-call": {
+    "keywords": "sonar teléfono",
+    "label": "Llamada telefónica"
+  },
+  "phone-forwarded": {
+    "keywords": "transferir",
+    "label": "Llamada transferida"
+  },
+  "phone-incoming": {
+    "keywords": "llamada recibida",
+    "label": "Llamada entrante"
+  },
+  "phone-missed": {
+    "keywords": "llamada perdida",
+    "label": "Llamada perdida"
+  },
+  "phone-off": {
+    "keywords": "desactivado",
+    "label": "Teléfono desactivado"
+  },
+  "phone-outgoing": {
+    "keywords": "llamada enviada",
+    "label": "Llamada saliente"
+  },
+  "pie-chart": {
+    "keywords": "gráfico estadísticas",
+    "label": "Gráfico circular"
+  },
+  "piggy-bank": {
+    "keywords": "ahorros dinero economía",
+    "label": "Alcancía"
+  },
+  "pill": {
+    "keywords": "medicina salud fármaco",
+    "label": "Pastilla"
+  },
+  "pipette": {
+    "keywords": "selector de color muestra",
+    "label": "Pipeta"
+  },
+  "pizza": {
+    "keywords": "comida italiana",
+    "label": "Pizza"
+  },
+  "plane": {
+    "keywords": "vuelo viaje aeropuerto vacaciones",
+    "label": "Avión"
+  },
+  "play": {
+    "keywords": "multimedia iniciar video ejecutar",
+    "label": "Reproducir"
+  },
+  "play-circle": {
+    "keywords": "multimedia iniciar video",
+    "label": "Reproducir (círculo)"
+  },
+  "plug": {
+    "keywords": "toma corriente energía electricidad",
+    "label": "Enchufe"
+  },
+  "plug-2": {
+    "keywords": "toma corriente energía electricidad",
+    "label": "Enchufe (2)"
+  },
+  "plug-zap": {
+    "keywords": "inteligente energía interruptor",
+    "label": "Enchufe inteligente"
+  },
+  "plus": {
+    "keywords": "agregar nuevo crear más",
+    "label": "Más"
+  },
+  "plus-circle": {
+    "keywords": "agregar nuevo crear",
+    "label": "Más (círculo)"
+  },
+  "plus-square": {
+    "keywords": "agregar nuevo crear",
+    "label": "Más (cuadrado)"
+  },
+  "pocket": {
+    "keywords": "guardar leer más tarde",
+    "label": "Pocket"
+  },
+  "podcast": {
+    "keywords": "radio transmisión audio",
+    "label": "Podcast"
+  },
+  "popcorn": {
+    "keywords": "cine merienda película",
+    "label": "Palomitas de maíz"
+  },
+  "power": {
+    "keywords": "encendido apagado apagar espera",
+    "label": "Encendido/apagado"
+  },
+  "printer": {
+    "keywords": "imprimir papel",
+    "label": "Impresora"
+  },
+  "projector": {
+    "keywords": "proyección cine pantalla",
+    "label": "Proyector"
+  },
+  "qr-code": {
+    "keywords": "escanear código de barras enlace",
+    "label": "Código QR"
+  },
+  "rabbit": {
+    "keywords": "mascota animal",
+    "label": "Conejo"
+  },
+  "radio": {
+    "keywords": "transmisión fm señal",
+    "label": "Radio"
+  },
+  "radio-tower": {
+    "keywords": "transmisión emisor señal",
+    "label": "Torre de radio"
+  },
+  "rainbow": {
+    "keywords": "colores clima",
+    "label": "Arcoíris"
+  },
+  "receipt": {
+    "keywords": "factura cuenta boleto",
+    "label": "Recibo"
+  },
+  "recycle": {
+    "keywords": "desecho ecológico papelera clasificación",
+    "label": "Reciclar"
+  },
+  "refresh-ccw": {
+    "keywords": "recargar sincronizar deshacer",
+    "label": "Actualizar (antihorario)"
+  },
+  "refresh-cw": {
+    "keywords": "recargar sincronizar",
+    "label": "Actualizar (horario)"
+  },
+  "refrigerator": {
+    "keywords": "nevera cocina frío",
+    "label": "Refrigerador"
+  },
+  "repeat": {
+    "keywords": "bucle ciclo otra vez",
+    "label": "Repetir"
+  },
+  "rewind": {
+    "keywords": "multimedia atrás anterior",
+    "label": "Retroceder"
+  },
+  "rotate-ccw": {
+    "keywords": "girar izquierda deshacer",
+    "label": "Girar (antihorario)"
+  },
+  "rotate-cw": {
+    "keywords": "girar derecha rehacer",
+    "label": "Girar (horario)"
+  },
+  "route": {
+    "keywords": "ruta viaje navegación",
+    "label": "Ruta"
+  },
+  "router": {
+    "keywords": "caja módem red pasarela",
+    "label": "Router"
+  },
+  "rss": {
+    "keywords": "noticias suscribir",
+    "label": "Canal RSS"
+  },
+  "ruler": {
+    "keywords": "medir tamaño longitud",
+    "label": "Regla"
+  },
+  "salad": {
+    "keywords": "comida saludable vegetal",
+    "label": "Ensalada"
+  },
+  "sandwich": {
+    "keywords": "comida almuerzo merienda",
+    "label": "Sándwich"
+  },
+  "satellite-dish": {
+    "keywords": "tv recepción",
+    "label": "Antena satelital"
+  },
+  "save": {
+    "keywords": "disco disquete guardar",
+    "label": "Guardar"
+  },
+  "scan": {
+    "keywords": "detectar analizar",
+    "label": "Escanear"
+  },
+  "scan-barcode": {
+    "keywords": "producto",
+    "label": "Escanear código de barras"
+  },
+  "scan-face": {
+    "keywords": "identificación biométrico",
+    "label": "Escanear rostro"
+  },
+  "scissors": {
+    "keywords": "cortar",
+    "label": "Tijeras"
+  },
+  "search": {
+    "keywords": "buscar lupa mirar",
+    "label": "Buscar"
+  },
+  "send": {
+    "keywords": "correo mensaje avión",
+    "label": "Enviar"
+  },
+  "server": {
+    "keywords": "datos alojamiento rack",
+    "label": "Servidor"
+  },
+  "settings": {
+    "keywords": "engranaje preferencias configuración opciones",
+    "label": "Configuración"
+  },
+  "settings-2": {
+    "keywords": "engranaje preferencias configuración",
+    "label": "Configuración (2)"
+  },
+  "share": {
+    "keywords": "enviar exportar",
+    "label": "Compartir"
+  },
+  "share-2": {
+    "keywords": "enviar red",
+    "label": "Compartir (2)"
+  },
+  "shield": {
+    "keywords": "seguridad protección seguro",
+    "label": "Escudo"
+  },
+  "shield-alert": {
+    "keywords": "seguridad advertencia brecha",
+    "label": "Escudo con alerta"
+  },
+  "shield-check": {
+    "keywords": "seguro protegido correcto",
+    "label": "Escudo verificado"
+  },
+  "shield-off": {
+    "keywords": "seguridad desactivada",
+    "label": "Escudo desactivado"
+  },
+  "ship": {
+    "keywords": "barco mar puerto",
+    "label": "Barco"
+  },
+  "shirt": {
+    "keywords": "ropa lavandería vestir",
+    "label": "Camisa"
+  },
+  "shopping-bag": {
+    "keywords": "comprar tienda compra",
+    "label": "Bolsa de compras"
+  },
+  "shopping-basket": {
+    "keywords": "tienda comprar víveres",
+    "label": "Canasta de compras"
+  },
+  "shopping-cart": {
+    "keywords": "comprar tienda canasta",
+    "label": "Carrito de compras"
+  },
+  "shovel": {
+    "keywords": "jardín cavar herramienta",
+    "label": "Pala"
+  },
+  "shower-head": {
+    "keywords": "baño agua",
+    "label": "Ducha"
+  },
+  "shuffle": {
+    "keywords": "aleatorio mezclar",
+    "label": "Aleatorio"
+  },
+  "sidebar": {
+    "keywords": "panel diseño",
+    "label": "Panel lateral"
+  },
+  "siren": {
+    "keywords": "alarma alerta emergencia",
+    "label": "Sirena"
+  },
+  "skip-back": {
+    "keywords": "multimedia anterior",
+    "label": "Retroceder pista"
+  },
+  "skip-forward": {
+    "keywords": "multimedia siguiente",
+    "label": "Avanzar pista"
+  },
+  "slack": {
+    "keywords": "chat equipo trabajo",
+    "label": "Slack"
+  },
+  "slash": {
+    "keywords": "prohibido ninguno desactivado",
+    "label": "Diagonal"
+  },
+  "sliders": {
+    "keywords": "configuración ecualizador ajustar",
+    "label": "Controles deslizantes"
+  },
+  "sliders-horizontal": {
+    "keywords": "configuración ajustar filtro ecualizador",
+    "label": "Controles deslizantes (horizontal)"
+  },
+  "smartphone": {
+    "keywords": "móvil teléfono celular",
+    "label": "Teléfono inteligente"
+  },
+  "smartphone-charging": {
+    "keywords": "móvil batería cargar",
+    "label": "Teléfono inteligente cargando"
+  },
+  "snowflake": {
+    "keywords": "nieve frío congelar escarcha aire acondicionado enfriamiento",
+    "label": "Copo de nieve"
+  },
+  "sofa": {
+    "keywords": "sala de estar salón sillón",
+    "label": "Sofá"
+  },
+  "solar-panel": {
+    "keywords": "fotovoltaico energía producción",
+    "label": "Panel solar"
+  },
+  "sparkles": {
+    "keywords": "magia brillo nuevo ia",
+    "label": "Destellos"
+  },
+  "speaker": {
+    "keywords": "audio sonido altavoz",
+    "label": "Altavoz"
+  },
+  "sprout": {
+    "keywords": "planta crecer jardín brote",
+    "label": "Brote"
+  },
+  "square": {
+    "keywords": "forma caja",
+    "label": "Cuadrado"
+  },
+  "squirrel": {
+    "keywords": "animal fauna jardín",
+    "label": "Ardilla"
+  },
+  "star": {
+    "keywords": "favorito calificación me gusta",
+    "label": "Estrella"
+  },
+  "stethoscope": {
+    "keywords": "médico salud médica",
+    "label": "Estetoscopio"
+  },
+  "stop-circle": {
+    "keywords": "multimedia detener",
+    "label": "Detener (círculo)"
+  },
+  "sun": {
+    "keywords": "día luz clima brillante",
+    "label": "Sol"
+  },
+  "sun-dim": {
+    "keywords": "luz tenue",
+    "label": "Brillo bajo"
+  },
+  "sun-medium": {
+    "keywords": "nivel de luz",
+    "label": "Brillo"
+  },
+  "sun-moon": {
+    "keywords": "cambiar tema",
+    "label": "Claro / oscuro"
+  },
+  "sun-snow": {
+    "keywords": "climatización",
+    "label": "Calefacción y refrigeración"
+  },
+  "sunrise": {
+    "keywords": "mañana amanecer",
+    "label": "Amanecer"
+  },
+  "sunset": {
+    "keywords": "tarde atardecer",
+    "label": "Atardecer"
+  },
+  "tablet": {
+    "keywords": "ipad dispositivo",
+    "label": "Tableta"
+  },
+  "tablet-smartphone": {
+    "keywords": "dispositivos móviles pantallas",
+    "label": "Tableta y teléfono"
+  },
+  "tag": {
+    "keywords": "etiqueta precio",
+    "label": "Etiqueta"
+  },
+  "target": {
+    "keywords": "apuntar objetivo meta",
+    "label": "Objetivo"
+  },
+  "terminal": {
+    "keywords": "consola comando shell",
+    "label": "Terminal"
+  },
+  "thermometer": {
+    "keywords": "temperatura calor grados",
+    "label": "Termómetro"
+  },
+  "thermometer-snowflake": {
+    "keywords": "congelar invierno frío",
+    "label": "Temperatura fría"
+  },
+  "thermometer-sun": {
+    "keywords": "calor caliente verano",
+    "label": "Temperatura cálida"
+  },
+  "thumbs-down": {
+    "keywords": "no me gusta malo desaprobar",
+    "label": "Pulgar hacia abajo"
+  },
+  "thumbs-up": {
+    "keywords": "me gusta bueno sí ok",
+    "label": "Pulgar hacia arriba"
+  },
+  "ticket": {
+    "keywords": "evento cine boleto",
+    "label": "Boleto"
+  },
+  "timer": {
+    "keywords": "cuenta regresiva cronómetro retraso",
+    "label": "Temporizador"
+  },
+  "toggle-left": {
+    "keywords": "interruptor apagado",
+    "label": "Interruptor (izquierda)"
+  },
+  "toggle-right": {
+    "keywords": "interruptor encendido",
+    "label": "Interruptor (derecha)"
+  },
+  "toilet": {
+    "keywords": "baño servicio",
+    "label": "Inodoro"
+  },
+  "toolbox": {
+    "keywords": "herramientas bricolaje mantenimiento",
+    "label": "Caja de herramientas"
+  },
+  "tornado": {
+    "keywords": "tormenta viento clima",
+    "label": "Tornado"
+  },
+  "tractor": {
+    "keywords": "granja agricultura",
+    "label": "Tractor"
+  },
+  "train-front": {
+    "keywords": "ferrocarril transporte estación",
+    "label": "Tren (frontal)"
+  },
+  "trash": {
+    "keywords": "eliminar papelera quitar basura",
+    "label": "Papelera"
+  },
+  "trash-2": {
+    "keywords": "eliminar papelera quitar basura",
+    "label": "Papelera (2)"
+  },
+  "tree-deciduous": {
+    "keywords": "jardín naturaleza bosque",
+    "label": "Árbol caducifolio"
+  },
+  "tree-pine": {
+    "keywords": "conífera bosque navidad",
+    "label": "Pino"
+  },
+  "trees": {
+    "keywords": "bosque naturaleza parque",
+    "label": "Árboles"
+  },
+  "trending-down": {
+    "keywords": "disminuir gráfico caída",
+    "label": "Tendencia a la baja"
+  },
+  "trending-up": {
+    "keywords": "aumentar gráfico crecimiento",
+    "label": "Tendencia al alza"
+  },
+  "triangle": {
+    "keywords": "forma",
+    "label": "Triángulo"
+  },
+  "truck": {
+    "keywords": "entrega transporte camión",
+    "label": "Camión"
+  },
+  "turtle": {
+    "keywords": "mascota animal lento",
+    "label": "Tortuga"
+  },
+  "tv": {
+    "keywords": "televisión pantalla",
+    "label": "Televisor"
+  },
+  "tv-minimal": {
+    "keywords": "televisión pantalla multimedia",
+    "label": "Televisor (minimalista)"
+  },
+  "twitter": {
+    "keywords": "red social ave",
+    "label": "Twitter"
+  },
+  "type": {
+    "keywords": "texto fuente letra",
+    "label": "Tipografía"
+  },
+  "umbrella": {
+    "keywords": "lluvia clima protección",
+    "label": "Paraguas"
+  },
+  "underline": {
+    "keywords": "texto formato",
+    "label": "Subrayado"
+  },
+  "unlock": {
+    "keywords": "abrir inseguro bloqueo desbloqueado",
+    "label": "Desbloqueado"
+  },
+  "unplug": {
+    "keywords": "desenchufado desconectar apagado",
+    "label": "Desconectado"
+  },
+  "upload": {
+    "keywords": "enviar importar",
+    "label": "Subir"
+  },
+  "upload-cloud": {
+    "keywords": "enviar",
+    "label": "Subir a la nube"
+  },
+  "usb": {
+    "keywords": "puerto conector llave",
+    "label": "USB"
+  },
+  "user": {
+    "keywords": "persona perfil cuenta",
+    "label": "Usuario"
+  },
+  "user-check": {
+    "keywords": "validado aprobado",
+    "label": "Usuario verificado"
+  },
+  "user-minus": {
+    "keywords": "quitar eliminar",
+    "label": "Usuario (quitar)"
+  },
+  "user-plus": {
+    "keywords": "agregar nuevo invitar",
+    "label": "Usuario (agregar)"
+  },
+  "user-round": {
+    "keywords": "perfil cuenta alguien",
+    "label": "Persona"
+  },
+  "user-x": {
+    "keywords": "quitar bloqueado",
+    "label": "Usuario (bloqueado)"
+  },
+  "users": {
+    "keywords": "personas grupo equipo familia",
+    "label": "Usuarios"
+  },
+  "users-round": {
+    "keywords": "personas familia equipo",
+    "label": "Grupo"
+  },
+  "utensils": {
+    "keywords": "cocina cubiertos comer comida",
+    "label": "Cubiertos"
+  },
+  "utensils-crossed": {
+    "keywords": "cocina restaurante comer",
+    "label": "Cubiertos cruzados"
+  },
+  "utility-pole": {
+    "keywords": "red eléctrica línea electricidad",
+    "label": "Poste eléctrico"
+  },
+  "video": {
+    "keywords": "cámara película grabar",
+    "label": "Video"
+  },
+  "video-off": {
+    "keywords": "cámara desactivada",
+    "label": "Video desactivado"
+  },
+  "voicemail": {
+    "keywords": "mensaje contestador",
+    "label": "Buzón de voz"
+  },
+  "volume": {
+    "keywords": "sonido audio",
+    "label": "Volumen"
+  },
+  "volume-1": {
+    "keywords": "sonido bajo audio",
+    "label": "Volumen (1)"
+  },
+  "volume-2": {
+    "keywords": "sonido alto audio fuerte",
+    "label": "Volumen (2)"
+  },
+  "volume-off": {
+    "keywords": "silencio sin sonido",
+    "label": "Volumen desactivado"
+  },
+  "volume-x": {
+    "keywords": "silencio sonido apagado",
+    "label": "Volumen (silenciado)"
+  },
+  "wallet": {
+    "keywords": "dinero pagar presupuesto",
+    "label": "Billetera"
+  },
+  "wand-sparkles": {
+    "keywords": "magia automático ia generar",
+    "label": "Varita mágica"
+  },
+  "warehouse": {
+    "keywords": "garaje almacenamiento cobertizo",
+    "label": "Bodega"
+  },
+  "washing-machine": {
+    "keywords": "lavandería lavadora",
+    "label": "Lavadora"
+  },
+  "watch": {
+    "keywords": "hora reloj muñeca",
+    "label": "Reloj de pulsera"
+  },
+  "waves": {
+    "keywords": "agua mar humedad",
+    "label": "Olas"
+  },
+  "wifi": {
+    "keywords": "red inalámbrico internet",
+    "label": "Wi-Fi"
+  },
+  "wifi-high": {
+    "keywords": "red señal",
+    "label": "Wi-Fi fuerte"
+  },
+  "wifi-low": {
+    "keywords": "red señal",
+    "label": "Wi-Fi débil"
+  },
+  "wifi-off": {
+    "keywords": "red desactivada",
+    "label": "Wi-Fi desactivado"
+  },
+  "wind": {
+    "keywords": "aire brisa clima ventilador",
+    "label": "Viento"
+  },
+  "wine": {
+    "keywords": "bebida alcohol copa",
+    "label": "Vino"
+  },
+  "wrench": {
+    "keywords": "herramienta arreglar mantenimiento configuración",
+    "label": "Llave inglesa"
+  },
+  "x": {
+    "keywords": "cancelar cruz no",
+    "label": "Cerrar"
+  },
+  "x-circle": {
+    "keywords": "cancelar error",
+    "label": "Cerrar (círculo)"
+  },
+  "x-square": {
+    "keywords": "cancelar",
+    "label": "Cerrar (cuadrado)"
+  },
+  "zap": {
+    "keywords": "destello rayo energía electricidad",
+    "label": "Rayo"
+  },
+  "zap-off": {
+    "keywords": "destello desactivado",
+    "label": "Rayo desactivado"
+  },
+  "zoom-in": {
+    "keywords": "ampliar agrandar",
+    "label": "Acercar"
+  },
+  "zoom-out": {
+    "keywords": "reducir achicar",
+    "label": "Alejar"
+  }
+}

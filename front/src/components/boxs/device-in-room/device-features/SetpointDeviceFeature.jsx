@@ -4,18 +4,11 @@ import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import { decimalsOf } from '../../../../../../server/utils/units';
 
 import style from './style.css';
 
 const isNullOrUndefined = val => val === null || val === undefined;
-
-// how many decimals a number carries, scientific notation included (`1e-7`
-// has no dot, but seven decimals)
-const decimalsOf = number => {
-  const [mantissa, exponent] = `${number}`.toLowerCase().split('e');
-  const decimals = (mantissa.split('.')[1] || '').length;
-  return exponent ? Math.max(0, decimals - Number(exponent)) : decimals;
-};
 
 // adding a decimal step in binary floating point drifts (20.1 + 0.1 =
 // 20.200000000000003), so the sum is rounded on the finest grid of its two

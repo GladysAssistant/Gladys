@@ -9,7 +9,7 @@ Here’s how you can contribute to Gladys:
 - 💬 Discuss improvements or architecture
 - 🔧 Submit bug fixes or improvements
 - ✨ Propose new features
-- 🤝 Become a long-term contributor or maintainer
+- 🤝 Become a long-term contributor or maintainer (see [MAINTAINERS.md](MAINTAINERS.md) for what maintainers do and how releases are made)
 
 By participating, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
@@ -61,7 +61,12 @@ Most labels are applied automatically, you don't need to set them yourself:
 
 Labels for contributors: look for [`good first issue`](https://github.com/gladysassistant/Gladys/labels/good%20first%20issue) and [`help wanted`](https://github.com/gladysassistant/Gladys/labels/help%20wanted) to find issues to work on.
 
-If your PR implements a forum request, add a line `Forum: https://community.gladysassistant.com/t/...` in the PR description (see the PR template): the release pipeline uses it to notify the forum topic when the feature ships.
+If your PR answers a forum topic or a GitHub issue, we strongly recommend linking it in the PR description (see the PR template):
+
+- a forum request: add a line `Forum: https://community.gladysassistant.com/t/...` — the release pipeline uses it to notify the forum topic when the feature ships and to close the topic;
+- a GitHub issue: add a line `Closes #1234` — GitHub links the issue and closes it when the PR is merged.
+
+Without this link we cannot tie the PR to its topic, and those automations cannot run.
 
 ---
 

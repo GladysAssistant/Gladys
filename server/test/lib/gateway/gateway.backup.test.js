@@ -74,7 +74,7 @@ describe('gateway.backup', async function describe() {
       { language: 'en', selector: 'toto-en' },
     ]);
 
-    message.sendToUser = fake.returns(null);
+    message.sendSystemMessage = fake.returns(null);
     brain.getReply = fake.returns('Backup failed!');
 
     gateway = new Gateway(variable, event, system, sequelize, config, user, {}, {}, job, scheduler, message, brain);
@@ -131,8 +131,8 @@ describe('gateway.backup', async function describe() {
     assert.calledWith(brain.getReply, 'en', 'backup.fail', {
       errorMessage: 'Error: error',
     });
-    assert.calledWith(message.sendToUser, 'toto-fr', 'Backup failed!');
-    assert.calledWith(message.sendToUser, 'toto-en', 'Backup failed!');
+    assert.calledWith(message.sendSystemMessage, 'toto-fr', 'Backup failed!');
+    assert.calledWith(message.sendSystemMessage, 'toto-en', 'Backup failed!');
   });
 
   it('should backup gladys with lots of insert at the same time', async () => {
@@ -177,7 +177,7 @@ describe('gateway.backup', async function describe() {
       expect(e).instanceOf(Error402);
     }
     assert.notCalled(gateway.gladysGatewayClient.initializeMultiPartBackup);
-    assert.notCalled(message.sendToUser);
+    assert.notCalled(message.sendSystemMessage);
   });
 
   it('should not backup, no backup key found', async () => {

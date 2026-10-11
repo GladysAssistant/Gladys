@@ -2,9 +2,35 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const logger = require('../../utils/logger');
 const { BadParameters } = require('../../utils/coreErrors');
 
+const { FORGOT_PASSWORD_METHODS } = require('../../lib/user/user.forgotPassword');
+
 const LOGIN_SESSION_VALIDITY_IN_SECONDS = 365 * 24 * 60 * 60;
 
+const FORGOT_PASSWORD_REPLIES = {
+  [FORGOT_PASSWORD_METHODS.LINK]: 'user.forgot-password.success',
+  [FORGOT_PASSWORD_METHODS.CODE]: 'user.forgot-password.code',
+};
+
 module.exports = function UserController(gladys) {
+  /**
+   * @description Get the sentence introducing the reset link or code, in the
+   * language of the user, falling back to English for a language the brain
+   * has no answers in.
+   * @param {string} language - Language of the user.
+   * @param {string} method - "link" or "code".
+   * @returns {string} The sentence.
+   * @example
+   * getForgotPasswordReply('fr', 'code');
+   */
+  function getForgotPasswordReply(language, method) {
+    const intent = FORGOT_PASSWORD_REPLIES[method];
+    try {
+      return gladys.brain.getReply(language, intent, {});
+    } catch (e) {
+      return gladys.brain.getReply('en', intent, {});
+    }
+  }
+
   /**
    * @api {post} /api/v1/user Create
    * @apiName CreateUser
@@ -15,7 +41,7 @@ module.exports = function UserController(gladys) {
    * @apiParam {String} password Password of the user
    * @apiParam {string="admin","habitant", "guest"} role role of the user
    * @apiParam {date} birthdate Birthdate of the user
-   * @apiParam {string="en", "fr", "de"} language Language of the user
+   * @apiParam {string="en", "fr", "de", "es"} language Language of the user
    * @apiSuccess {String} id id of the created user
    */
   async function create(req, res, next) {
@@ -26,6 +52,7 @@ module.exports = function UserController(gladys) {
       scope,
       LOGIN_SESSION_VALIDITY_IN_SECONDS,
       req.headers['user-agent'],
+      req.headers.origin,
     );
     const response = { ...user, ...session };
     res.status(201).json(response);
@@ -48,6 +75,7 @@ module.exports = function UserController(gladys) {
       scope,
       LOGIN_SESSION_VALIDITY_IN_SECONDS,
       req.headers['user-agent'],
+      req.headers.origin,
     );
     const response = { ...user, ...session };
     res.json(response);
@@ -152,27 +180,52 @@ module.exports = function UserController(gladys) {
    * @apiName forgotPassword
    * @apiGroup User
    * @apiParam {string} email Email of the user
+   * @apiParam {string} origin Origin the front is served from (window.location.origin)
    * @apiSuccessExample {json} Success-Example
    * {
    *   "success": true
    * }
+   * @apiDescription Sends the user a reset link when the origin is used by a live
+   * session of this user, a one-time code otherwise. The answer does not tell which,
+   * so the origins the user works from cannot be enumerated from this route.
    */
   async function forgotPassword(req, res) {
-    const { session, user } = await gladys.user.forgotPassword(req.body.email, req.headers['user-agent']);
-    const link = `${req.body.origin}/reset-password?token=${session.access_token}`;
-    // Try to send the link to the user if he has configured an external service like Telegram
-    const text = gladys.brain.getReply(user.language, 'user.forgot-password.success', {});
+    const { method, link, code, user } = await gladys.user.forgotPassword(
+      req.body.email,
+      req.headers['user-agent'],
+      req.body.origin,
+    );
+    const secret = method === FORGOT_PASSWORD_METHODS.LINK ? link : code;
+    const text = getForgotPasswordReply(user.language, method);
+    // Try to send the link or the code to the user if he has configured an external service like Telegram
     try {
       await gladys.message.sendToUser(user.selector, text);
-      await gladys.message.sendToUser(user.selector, link);
+      await gladys.message.sendToUser(user.selector, secret);
     } catch (e) {
       logger.error(`Error while sending forgot password message to user ${req.body.email}:`, e);
     }
-    // Always log the link so an admin can still recover the reset URL if messaging fails.
-    logger.info(`Forgot password initiated for user ${req.body.email}, link = ${link}`);
+    // Always log the secret so an admin can still recover it if messaging fails.
+    logger.info(`Forgot password initiated for user ${req.body.email}, ${method} = ${secret}`);
     res.json({
       success: true,
     });
+  }
+
+  /**
+   * @api {post} /api/v1/forgot_password/code verifyForgotPasswordCode
+   * @apiName verifyForgotPasswordCode
+   * @apiGroup User
+   * @apiParam {string} email Email of the user
+   * @apiParam {string} code The one-time code received after forgotPassword
+   * @apiSuccess {string} access_token Short-lived token allowed to reset the password
+   */
+  async function verifyForgotPasswordCode(req, res) {
+    const session = await gladys.user.verifyForgotPasswordCode(
+      req.body.email,
+      req.body.code,
+      req.headers['user-agent'],
+    );
+    res.json(session);
   }
 
   /**
@@ -211,6 +264,7 @@ module.exports = function UserController(gladys) {
     updateMySelf: asyncMiddleware(updateMySelf),
     getAccessToken: asyncMiddleware(getAccessToken),
     forgotPassword: asyncMiddleware(forgotPassword),
+    verifyForgotPasswordCode: asyncMiddleware(verifyForgotPasswordCode),
     resetPassword: asyncMiddleware(resetPassword),
     getSetupState: asyncMiddleware(getSetupState),
   });

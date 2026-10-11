@@ -8,18 +8,27 @@ const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.
 
 const sleep = promisify(setTimeout);
 
+// Fallback when the user has not set a timezone yet: this is the timezone the container would
+// have used anyway, so it never makes the clock of a device worse than it already is.
+const DEFAULT_TIMEZONE = 'UTC';
+
 /**
  * @description Build the Zigbee2mqtt container descriptor to create.
  * @param {string} containerPath - Path of the Z2M data folder on the host.
  * @param {string} z2mDriverPath - Path of the Zigbee USB dongle on the host.
  * @param {boolean} networkAdapter - Is the Zigbee coordinator reached over the network?
+ * @param {string} timezone - Timezone of the Gladys instance, as configured by the user.
  * @returns {object} The container descriptor.
  * @example
- * const descriptor = buildContainerDescriptor('/var/lib/gladysassistant/zigbee2mqtt/z2m', '/dev/ttyUSB0', false);
+ * const descriptor = buildContainerDescriptor('/data/z2m', '/dev/ttyUSB0', false, 'Europe/Paris');
  */
-function buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter) {
+function buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter, timezone) {
   const containerDescriptorToMutate = cloneDeep(containerDescriptor);
   containerDescriptorToMutate.HostConfig.Binds.push(`${containerPath}:/app/data`);
+  // The container shares neither /etc/localtime nor the TZ of the host, so without this it runs in
+  // UTC. Zigbee2mqtt answers the time requests of the devices with its own local time, so a clock
+  // displaying device (a Tuya sensor with a LCD, a thermostat...) would be off by the UTC offset.
+  containerDescriptorToMutate.Env.push(`TZ=${timezone || DEFAULT_TIMEZONE}`);
   if (networkAdapter) {
     // A network coordinator is reached over TCP, there is no USB device to pass through
     containerDescriptorToMutate.HostConfig.Devices = [];
@@ -37,7 +46,7 @@ function buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter) 
  * await z2m.installZ2mContainer(config);
  */
 async function installZ2mContainer(config, setupMode = false) {
-  const { z2mDriverPath, z2mAdapterMode } = config;
+  const { z2mDriverPath, z2mAdapterMode, timezone } = config;
   const networkAdapter = z2mAdapterMode === ADAPTER_MODE.NETWORK;
   const expectedDevicePath = networkAdapter ? null : z2mDriverPath;
   let creationNeeded = false;
@@ -100,7 +109,12 @@ async function installZ2mContainer(config, setupMode = false) {
       await this.gladys.system.pull(containerDescriptor.Image);
 
       logger.info(`Configuration of Device ${networkAdapter ? config.z2mNetworkAdapterUrl : z2mDriverPath}`);
-      const containerDescriptorToMutate = buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter);
+      const containerDescriptorToMutate = buildContainerDescriptor(
+        containerPath,
+        z2mDriverPath,
+        networkAdapter,
+        timezone,
+      );
 
       logger.info(`Creation of container...`);
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
@@ -131,7 +145,12 @@ async function installZ2mContainer(config, setupMode = false) {
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
 
-      const containerDescriptorToMutate = buildContainerDescriptor(containerPath, z2mDriverPath, networkAdapter);
+      const containerDescriptorToMutate = buildContainerDescriptor(
+        containerPath,
+        z2mDriverPath,
+        networkAdapter,
+        timezone,
+      );
       await this.gladys.system.createContainer(containerDescriptorToMutate);
 
       dockerContainers = await this.gladys.system.getContainers({

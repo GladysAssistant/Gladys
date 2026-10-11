@@ -9,6 +9,7 @@ import EditScenePage from './EditScenePage';
 import { computeRunningInfo, mergeRunningScenes } from '../runningInfo';
 
 import { ACTIONS, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import { findMissingRequiredField, hasIntegrationSteps } from './sceneIntegrations';
 
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
@@ -23,6 +24,23 @@ const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.VARIABLE.SET]: ['text', 'evaluate_value'],
   [ACTIONS.HTTP.REQUEST]: ['body'],
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
+};
+
+// The parameters of an action declared by an external integration live under
+// `fields`, keyed by the declaration: the string ones may hold variables
+// ({{triggerEvent.data.…}}, {{0.0.…}}), so every string value is rewritten
+// on a reorder — the rule above only knows fixed attributes
+const replaceVariablePathsInDeclaredFields = (action, replacements) => {
+  if (!action.fields || typeof action.fields !== 'object') {
+    return;
+  }
+  Object.keys(action.fields).forEach(key => {
+    if (typeof action.fields[key] === 'string') {
+      replacements.forEach(({ prevPath, newPath }) => {
+        action.fields[key] = replaceVariablePathInText(action.fields[key], prevPath, newPath);
+      });
+    }
+  });
 };
 
 // Replaces, in a text containing variables (e.g. "The temperature is {{1.0.last_value}}°C"),
@@ -88,6 +106,10 @@ const replaceVariablePathsInActions = (actions, replacements) => {
             });
           }
         });
+      }
+
+      if (action.type === ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION) {
+        replaceVariablePathsInDeclaredFields(action, replacements);
       }
 
       // Check for nested actions in if/then/else blocks
@@ -457,7 +479,44 @@ class EditScene extends Component {
     // state afterwards would display "saved" for data this request never sent
     const savedSceneSnapshot = JSON.stringify(this.state.scene);
     const sceneToSave = JSON.parse(savedSceneSnapshot);
-    this.setState({ saving: true, error: false, errorMessage: null });
+    // the declaration catalog is still unknown (request pending or failed):
+    // an integration card cannot be validated, so the save retries the
+    // request once and refuses rather than persisting an unchecked required
+    // filter — a successfully loaded EMPTY catalog is another thing (nothing
+    // installed: the orphan cards save as they are)
+    // (setState is asynchronous: the retried value is read from the return
+    // value, never from this.state)
+    let { sceneIntegrations } = this.state;
+    if (sceneIntegrations === null && hasIntegrationSteps(sceneToSave)) {
+      sceneIntegrations = await this.getSceneIntegrations();
+      if (sceneIntegrations === null) {
+        this.setState({
+          error: true,
+          errorMessage: null,
+          errorMessageId: 'editScene.externalIntegration.catalogUnavailableError',
+          errorMessageFields: {}
+        });
+        return;
+      }
+    }
+    // a required filter of an integration trigger left empty would match any
+    // value: the editor is the only place it can be refused (the matcher never
+    // consults the manifest), so the save stops here with the field named
+    const missingRequiredField = findMissingRequiredField(
+      sceneIntegrations,
+      sceneToSave,
+      get(this.props, 'user.language') || 'en'
+    );
+    if (missingRequiredField) {
+      this.setState({
+        error: true,
+        errorMessage: null,
+        errorMessageId: 'editScene.externalIntegration.requiredFieldError',
+        errorMessageFields: missingRequiredField
+      });
+      return;
+    }
+    this.setState({ saving: true, error: false, errorMessage: null, errorMessageId: null });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
       this.setState({ savedSceneSnapshot });
@@ -1379,6 +1438,26 @@ class EditScene extends Component {
     });
   };
 
+  getSceneIntegrations = async () => {
+    // the scene triggers and actions declared by the installed external
+    // integrations: the "Integrations" category of both pickers, and what a
+    // stored integration card is resolved against. Fetched when the editor
+    // opens, and again by a save attempted before it answered. Null until it
+    // succeeds: the cards then wait instead of posing as orphans, and the
+    // save of a scene holding one is refused (saveScene). Returns the list,
+    // or null when the request failed, for a caller that cannot wait for the
+    // asynchronous setState.
+    try {
+      const { integrations } = await this.props.httpClient.get('/api/v1/external_integration/scene');
+      const sceneIntegrations = integrations || [];
+      this.setState({ sceneIntegrations });
+      return sceneIntegrations;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  };
+
   getTags = async () => {
     try {
       const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
@@ -1396,6 +1475,7 @@ class EditScene extends Component {
       scene: null,
       variables: {},
       triggersVariables: [],
+      sceneIntegrations: null,
       runningScenes: [],
       now: Date.now()
     };
@@ -1404,6 +1484,7 @@ class EditScene extends Component {
 
   componentDidMount() {
     this.getSceneBySelector();
+    this.getSceneIntegrations();
     this.getTags();
     this.getRunningScenes();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
@@ -1437,9 +1518,12 @@ class EditScene extends Component {
       saving,
       error,
       errorMessage,
+      errorMessageId,
+      errorMessageFields,
       variables,
       scene,
       triggersVariables,
+      sceneIntegrations,
       tags,
       askDeleteScene,
       runningScenes,
@@ -1469,8 +1553,11 @@ class EditScene extends Component {
             saving={saving}
             error={error}
             errorMessage={errorMessage}
+            errorMessageId={errorMessageId}
+            errorMessageFields={errorMessageFields}
             variables={variables}
             triggersVariables={triggersVariables}
+            sceneIntegrations={sceneIntegrations}
             setVariables={this.setVariables}
             setVariablesTrigger={this.setVariablesTrigger}
             switchActiveScene={this.switchActiveScene}
@@ -1496,4 +1583,4 @@ class EditScene extends Component {
   }
 }
 
-export default connect('session,httpClient', {})(EditScene);
+export default connect('session,httpClient,user', {})(EditScene);

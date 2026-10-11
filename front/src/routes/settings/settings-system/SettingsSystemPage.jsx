@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import SettingsLayout from '../SettingsLayout';
 import SettingsSystemBatteryLevelWarning from './SettingsSystemBatteryLevelWarning';
+import SettingsSystemMessageService from './SettingsSystemMessageService';
 import SettingsSystemContainers from './SettingsSystemContainers';
 import SettingsSystemOperations from './SettingsSystemOperations';
 import SettingsSystemTimezone from './SettingsSystemTimezone';
@@ -159,6 +160,7 @@ const SystemPage = ({ children, ...props }) => (
         <SettingsSystemTimezone />
         <SettingsSystemMdns systemInfos={props.systemInfos} />
         <SettingsSystemBatteryLevelWarning />
+        <SettingsSystemMessageService />
         <SettingsSystemKeepDeviceHistory />
         <SettingsSystemTimeExpiryState />
       </div>

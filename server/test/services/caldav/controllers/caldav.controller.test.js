@@ -68,12 +68,15 @@ describe('patch /api/v1/service/caldav/enable', () => {
   it('should enable caldav calendar synchronization', async () => {
     const caldavController = CaldavController(caldavService);
     const req = {
+      user: {
+        id: userId,
+      },
       body: {
         selector: 'personnal',
       },
     };
     await caldavController['patch /api/v1/service/caldav/enable'].controller(req, res);
-    assert.calledWith(caldavService.enableCalendar, 'personnal');
+    assert.calledWith(caldavService.enableCalendar, 'personnal', userId);
   });
 });
 
@@ -81,11 +84,14 @@ describe('patch /api/v1/service/caldav/disable', () => {
   it('should disable caldav calendar synchronization', async () => {
     const caldavController = CaldavController(caldavService);
     const req = {
+      user: {
+        id: userId,
+      },
       body: {
         selector: 'personnal',
       },
     };
     await caldavController['patch /api/v1/service/caldav/disable'].controller(req, res);
-    assert.calledWith(caldavService.disableCalendar, 'personnal');
+    assert.calledWith(caldavService.disableCalendar, 'personnal', userId);
   });
 });

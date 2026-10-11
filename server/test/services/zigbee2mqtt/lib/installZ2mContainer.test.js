@@ -208,6 +208,46 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
   });
 
+  it('should create the z2m container with the timezone of the user', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0', timezone: 'Europe/Paris' };
+    const getContainersStub = stub();
+    getContainersStub
+      .onFirstCall()
+      .resolves([])
+      .onSecondCall()
+      .resolves([containerStopped]);
+    gladys.system.getContainers = getContainersStub;
+    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    // Without TZ the container runs in UTC and Zigbee2mqtt gives the wrong local time to the
+    // devices displaying a clock
+    assert.calledOnce(gladys.system.createContainer);
+    const [createdDescriptor] = gladys.system.createContainer.firstCall.args;
+    expect(createdDescriptor.Env).to.deep.equal(['TZ=Europe/Paris']);
+  });
+
+  it('should create the z2m container with UTC when no timezone is configured', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    const getContainersStub = stub();
+    getContainersStub
+      .onFirstCall()
+      .resolves([])
+      .onSecondCall()
+      .resolves([containerStopped]);
+    gladys.system.getContainers = getContainersStub;
+    zigbee2mqttManager.restoreZ2mBackup = fake.resolves(true);
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnce(gladys.system.createContainer);
+    const [createdDescriptor] = gladys.system.createContainer.firstCall.args;
+    expect(createdDescriptor.Env).to.deep.equal(['TZ=UTC']);
+  });
+
   it('should recreate the z2m container when switching from USB to a network coordinator', async () => {
     // PREPARE
     const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };

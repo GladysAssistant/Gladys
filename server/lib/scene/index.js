@@ -20,10 +20,8 @@ const { duplicate } = require('./scene.duplicate');
 const { command } = require('./scene.command');
 const { getTag } = require('./scene.getTag');
 
-const { EVENTS, INTENTS } = require('../../utils/constants');
+const { EVENTS, INTENTS, DEFAULT_TIMEZONE } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
-
-const DEFAULT_TIMEZONE = 'Europe/Paris';
 
 const SceneManager = function SceneManager(
   stateManager,
@@ -49,6 +47,8 @@ const SceneManager = function SceneManager(
   this.http = http;
   this.gateway = gateway;
   this.service = service;
+  // attached after construction by lib/index.js (energy-contract.current-price condition)
+  this.energyContract = null;
   this.scenes = {};
   // in-memory registry of scene executions currently running, keyed by executionId
   this.runningScenes = new Map();
