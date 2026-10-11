@@ -182,7 +182,7 @@ A card has a size; so does what fits in it well. The budget below is enforced by
 |---|---|---|
 | **Components per widget** | **8** | a card is read at a glance; beyond, it is a page |
 | **Focal component** — `chart`, `card-list`, `image` | **at most one** | one card, one subject: a chart *and* a poster grid are two widgets (an integration may declare five). Two `status` lists count as one focal component too: the second is dropped |
-| **Tiles** — `value`, `gauge` | **≤ 6**, rendered as one wrapping row | a stats banner (three values), a battery next to a state; six tiles already fill two rows on a phone |
+| **Tiles** — `value`, `gauge` | **≤ 6**, rendered as a grid whose column count the core picks from the tile count and the card width (3 tiles stay on one row, 4 as 4 or 2 × 2, 5 or 6 as rows of 3 or 2); a wrapped tile keeps the width of the tile above, never stretching to the full row. No field in the content: the integration does not know the screen width | a stats banner (three values), a battery next to a state; six tiles already fill two rows on a phone |
 | `text` | **≤ 2**, of which at most one `body` | a heading or caption sets the context, a body explains an empty or degraded state; a widget is not prose |
 | `status` | **≤ 1** (10 rows, section 4) | one list of states per card |
 | `button` | **≤ 4**, rendered as one wrapping row | one tap = one action; four is a full row on a phone |
