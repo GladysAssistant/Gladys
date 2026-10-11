@@ -811,6 +811,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.publishEnergyCalendar,
     },
+    'post /api/integration/v1/energy/consumption': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishEnergyConsumption,
+    },
     'get /api/integration/v1/energy/calendar/:key': {
       authenticated: false,
       externalIntegrationAuth: true,
