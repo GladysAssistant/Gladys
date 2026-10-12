@@ -299,6 +299,9 @@ class MatterDevices extends Component {
           }
           f.id = gladysFeature.id;
           f.selector = gladysFeature.selector;
+          // the server could not see the existing device (new node id): its index fell back on the
+          // main meter, the meter the user chose (or none, for a root) is kept
+          f.energy_parent_id = gladysFeature.energy_parent_id || null;
         }
         return f;
       });

@@ -1,7 +1,7 @@
 const db = require('../../models');
 const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
-const { isEnergySourceFeature } = require('../../utils/energyHierarchy');
+const { isEnergySourceFeature, findCycle } = require('../../utils/energyHierarchy');
 const { isElectricMeter } = require('../../utils/enforceEnergyHierarchy');
 
 /**
@@ -11,7 +11,8 @@ const { isElectricMeter } = require('../../utils/enforceEnergyHierarchy');
  * stays a root.
  * @param {object} feature - The feature to update.
  * @param {string|null} newParentId - The requested parent.
- * @returns {Promise<void>} Rejects with BadParameters or NotFoundError.
+ * @returns {Promise<object|null>} The new parent (null for a root); rejects with BadParameters or
+ * NotFoundError.
  * @example
  * await assertAttachmentChange(feature, 'uuid-of-parent');
  */
@@ -24,7 +25,7 @@ async function assertAttachmentChange(feature, newParentId) {
     throw new BadParameters('energy_parent_id: this link is derived and maintained by Gladys');
   }
   if (!newParentId) {
-    return;
+    return null;
   }
   const newParent = await db.DeviceFeature.findByPk(newParentId);
   if (!newParent) {
@@ -36,6 +37,7 @@ async function assertAttachmentChange(feature, newParentId) {
   if (await isElectricMeter(feature.device_id)) {
     throw new BadParameters('energy_parent_id: an electric meter is a root');
   }
+  return newParent;
 }
 
 /**
@@ -67,24 +69,14 @@ async function updateFeature(selector, updates) {
   }
 
   const newParentId = allowed.energy_parent_id;
-  await assertAttachmentChange(feature, newParentId);
+  const newParent = await assertAttachmentChange(feature, newParentId);
 
   // Prevent circular dependency: walk up the ancestry of the proposed parent
-  if (newParentId) {
-    let cursor = await db.DeviceFeature.findByPk(newParentId);
-    // a cycle above the new parent (not involving this feature) must not loop forever
-    const visited = new Set();
-    while (cursor) {
-      if (cursor.id === feature.id) {
-        throw new BadParameters('Circular energy_parent_id not allowed');
-      }
-      if (!cursor.energy_parent_id || visited.has(cursor.id)) {
-        break;
-      }
-      visited.add(cursor.id);
-      // move to next ancestor
-      // eslint-disable-next-line no-await-in-loop
-      cursor = await db.DeviceFeature.findByPk(cursor.energy_parent_id);
+  if (newParent) {
+    const getFeature = (id) => (id === newParent.id ? newParent : db.DeviceFeature.findByPk(id));
+    const cycle = await findCycle({ id: feature.id, energy_parent_id: newParent.id }, getFeature);
+    if (cycle !== null) {
+      throw new BadParameters('Circular energy_parent_id not allowed');
     }
   }
 

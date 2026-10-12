@@ -3,14 +3,15 @@ const sinon = require('sinon').createSandbox();
 const db = require('../../../../models');
 const logger = require('../../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } = require('../../../../utils/constants');
-const { enforceEnergyHierarchy } = require('../../../../utils/enforceEnergyHierarchy');
 const {
   buildManager,
+  addMeterPower,
   contractPayload,
   METER_DEVICE_ID,
   METER_FEATURE_ID,
   METER_CONSUMPTION_FEATURE_ID,
   METER_COST_FEATURE_ID,
+  METER_POWER_FEATURE_ID,
   TEST_SERVICE_ID,
 } = require('./helpers');
 
@@ -111,9 +112,10 @@ describe('EnergyContract energy hierarchy (docs/specs/energy-hierarchy.md)', () 
   let event;
   let device;
   let stateManager;
+  let meter;
 
   beforeEach(async () => {
-    ({ energyContract, event, device, stateManager } = await buildManager());
+    ({ energyContract, event, device, stateManager, meter } = await buildManager());
     sinon.spy(event, 'emit');
   });
 
@@ -148,13 +150,6 @@ describe('EnergyContract energy hierarchy (docs/specs/energy-hierarchy.md)', () 
       await resaveMeter(device, stateManager, PLUG_INDEX_ID);
       expect(await parentOf(METER_FEATURE_ID)).to.equal(null);
       expect(await parentOf(METER_CONSUMPTION_FEATURE_ID)).to.equal(METER_FEATURE_ID);
-    });
-
-    it('should ignore a parent that disappeared', async () => {
-      const features = [{ id: 'a', category: 'light', type: 'binary', energy_parent_id: 'unknown-feature' }];
-      await enforceEnergyHierarchy('unknown-device', features);
-      expect(features[0].energy_parent_id).to.equal('unknown-feature');
-      await enforceEnergyHierarchy('unknown-device', [{ id: 'b', energy_parent_id: null }]);
     });
   });
 
@@ -226,6 +221,24 @@ describe('EnergyContract energy hierarchy (docs/specs/energy-hierarchy.md)', () 
       expect(await parentOf(METER_FEATURE_ID)).to.equal(PLUG_INDEX_ID);
       await energyContract.detachElectricMeter({ direction: 'consumption', electric_meter_device_id: 'unknown' });
     });
+
+    it('should recompute the former and the new meter when a contract changes meter', async () => {
+      await savePlug(device, { index: { energy_parent_id: METER_FEATURE_ID } });
+      const created = await energyContract.create(contractPayload());
+      event.emit.resetHistory();
+      await energyContract.update(created.selector, { electric_meter_device_id: PLUG_DEVICE_ID });
+      // the plug is the meter of the contract now: a root
+      expect(await parentOf(PLUG_INDEX_ID)).to.equal(null);
+      const [name, payload] = event.emit.firstCall.args;
+      expect(name).to.equal(EVENTS.ENERGY_CONTRACT.RECALCULATE);
+      expect(payload.electric_meter_device_ids).to.deep.equal([METER_DEVICE_ID, PLUG_DEVICE_ID]);
+    });
+
+    it('should write no contract when its meter cannot be detached', async () => {
+      sinon.stub(energyContract, 'detachElectricMeter').rejects(new Error('stale feature'));
+      await assert.isRejected(energyContract.create(contractPayload()), 'stale feature');
+      expect(await db.EnergyContract.count()).to.equal(0);
+    });
   });
 
   describe('setDeviceElectricMeter (D.1)', () => {
@@ -252,6 +265,44 @@ describe('EnergyContract energy hierarchy (docs/specs/energy-hierarchy.md)', () 
       event.emit.resetHistory();
       await energyContract.setDeviceElectricMeter('plug', METER_DEVICE_ID);
       expect(event.emit.called).to.equal(false);
+    });
+
+    it('should recompute the devices hanging under a moved sub-meter', async () => {
+      await savePlug(device);
+      // a lamp attached under the plug (a sub-meter)
+      const lamp = await device.create({
+        service_id: TEST_SERVICE_ID,
+        name: 'Lamp',
+        external_id: 'lamp',
+        selector: 'lamp',
+        features: [
+          (({ id, ...f }) => f)(
+            energyFeature(null, 'lamp-index', DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX, {
+              energy_parent_id: PLUG_INDEX_ID,
+            }),
+          ),
+        ],
+      });
+      // devices whose parents lead nowhere, or loop among themselves, are not under the plug
+      const indexOf = (id, parentId, deviceId) => ({
+        id,
+        device_id: deviceId,
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+        energy_parent_id: parentId,
+      });
+      const ghost = indexOf('ghost-index', 'missing-feature', 'ghost');
+      const loopA = indexOf('loop-a-index', 'loop-b-index', 'loop-a');
+      const loopB = indexOf('loop-b-index', 'loop-a-index', 'loop-b');
+      stateManager.setState('deviceById', 'ghost', { id: 'ghost', features: [ghost] });
+      stateManager.setState('deviceById', 'loop-a', { id: 'loop-a', features: [loopA] });
+      stateManager.setState('deviceFeatureById', 'loop-a-index', loopA);
+      stateManager.setState('deviceFeatureById', 'loop-b-index', loopB);
+      await energyContract.create(contractPayload());
+      event.emit.resetHistory();
+      await energyContract.setDeviceElectricMeter('plug', METER_DEVICE_ID);
+      const [, payload] = event.emit.firstCall.args;
+      expect(payload.device_ids).to.deep.equal([PLUG_DEVICE_ID, lamp.id]);
     });
 
     it('should refuse what is not the attachment of a device to an electric meter', async () => {
@@ -321,13 +372,52 @@ describe('EnergyContract energy hierarchy (docs/specs/energy-hierarchy.md)', () 
       await db.DeviceFeature.update({ energy_parent_id: PLUG_CONSUMPTION_ID }, { where: { id: PLUG_INDEX_ID } });
       const light = await db.DeviceFeature.findOne({ where: { selector: 'test-device-feature' } });
       await db.DeviceFeature.update({ energy_parent_id: light.id }, { where: { id: METER_FEATURE_ID } });
-      // a sub-meter of the meter is not detached
+      // a parent outside the energy features is walked through without a cycle
+      await db.DeviceFeature.update({ energy_parent_id: light.id }, { where: { id: PLUG_COST_ID } });
       await device.init(false);
       expect(await energyContract.repairHierarchy()).to.equal(2);
       expect(await parentOf(PLUG_INDEX_ID)).to.equal(null);
       expect(await parentOf(PLUG_CONSUMPTION_ID)).to.equal(PLUG_INDEX_ID);
       expect(await parentOf(METER_FEATURE_ID)).to.equal(null);
       expect(stateManager.get('deviceFeatureById', PLUG_INDEX_ID).energy_parent_id).to.equal(null);
+    });
+
+    it('should cut the link of the meter in a cycle with a plug of the same rank', async () => {
+      await savePlug(device);
+      await energyContract.create(contractPayload());
+      // the plug comes first: cutting the cycles first would have detached it
+      await db.DeviceFeature.update({ energy_parent_id: METER_FEATURE_ID }, { where: { id: PLUG_INDEX_ID } });
+      await db.DeviceFeature.update({ energy_parent_id: PLUG_INDEX_ID }, { where: { id: METER_FEATURE_ID } });
+      expect(await energyContract.repairHierarchy()).to.equal(1);
+      expect(await parentOf(METER_FEATURE_ID)).to.equal(null);
+      expect(await parentOf(PLUG_INDEX_ID)).to.equal(METER_FEATURE_ID);
+    });
+
+    it('should give a root to a meter whose features all hang off one another', async () => {
+      await addMeterPower(device, meter, []);
+      await energyContract.create(contractPayload());
+      // the index under the power feature of its own device: no cycle, but no root either
+      await db.DeviceFeature.update({ energy_parent_id: METER_POWER_FEATURE_ID }, { where: { id: METER_FEATURE_ID } });
+      // a meter with no energy feature at all has nothing to repair
+      const thermometer = await device.create({
+        service_id: TEST_SERVICE_ID,
+        name: 'Thermometer',
+        external_id: 'thermometer',
+        selector: 'thermometer',
+        features: [
+          (({ id, ...f }) => ({ ...f, category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR }))(
+            energyFeature(null, 'thermometer-temperature', 'decimal'),
+          ),
+        ],
+      });
+      await db.EnergyContract.create({
+        ...contractPayload({ name: 'Thermometer contract', electric_meter_device_id: thermometer.id }),
+        direction: 'consumption',
+        timezone: 'Europe/Paris',
+      });
+      expect(await energyContract.repairHierarchy()).to.equal(1);
+      expect(await parentOf(METER_FEATURE_ID)).to.equal(null);
+      expect(await parentOf(METER_CONSUMPTION_FEATURE_ID)).to.equal(METER_FEATURE_ID);
     });
 
     it('should make a meter attached under another energy device a root', async () => {

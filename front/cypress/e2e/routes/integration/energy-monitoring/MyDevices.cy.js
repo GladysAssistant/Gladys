@@ -63,6 +63,14 @@ describe('Energy monitoring devices', () => {
     cy.get('[data-cy=energy-device-meter-select]').should('not.exist');
   });
 
+  it('should say so when the contracts cannot be loaded, instead of showing every device unattached', () => {
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/energy_contract` }, { statusCode: 500, body: {} });
+    cy.visit('/dashboard/integration/device/energy-monitoring');
+    cy.get('[data-cy=energy-hierarchy-contracts-error]').should('exist');
+    cy.get('[data-cy=energy-hierarchy-no-meter]').should('not.exist');
+    cy.get('[data-cy=energy-unattached-card]').should('not.exist');
+  });
+
   it('should attach a device to the meter of a contract', () => {
     createContract('Cypress house contract', 'cypress-house-meter');
     cy.visit('/dashboard/integration/device/energy-monitoring');

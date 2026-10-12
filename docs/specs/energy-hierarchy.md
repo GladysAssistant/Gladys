@@ -96,17 +96,25 @@ they send.
 
 ### C.2 Contract creation and update
 
-When a contract of direction `consumption` is created, or its `electric_meter_device_id` changes,
-the attachment features of the meter are detached (parent `null`) before the recalculation is
-requested, so the recalculation prices the meter with its own contract.
+When a contract of direction `consumption` is created or updated, the attachment features of its
+meter are detached (parent `null`) **before the contract row is written** (a detach that fails
+leaves no half-created contract a retry would conflict with), so the recalculation prices the
+meter with its own contract. When the update moves the contract to another meter
+(`electric_meter_device_id` changes), a recalculation is requested even if no pricing field
+changed, for the former and the new meter (`electric_meter_device_ids: [old, new]`): the new meter
+and what hangs under it are priced by this contract from now on, the former one no longer is.
 
 ### C.3 Repair at start-up (`energyContract.repairHierarchy`, called by `energyContract.init`)
 
 Installations broken before this specification are repaired once per start, idempotently (nothing
 is written when the hierarchy is sound), each change logged:
 
-1. cycles and self-references are cut per invariant 1;
-2. electric meters are made roots per invariant 2;
+1. electric meters are made roots per invariant 2, **before** the cycles are cut: in a cycle across
+   a meter and a plug of equal ranks, the meter's link is the one to go and the plug stays
+   attached. A meter whose energy source features all hang off one another on its own device
+   (left by the former free editor, without closing a cycle) has nothing to attach the devices
+   to: its best index (else consumption, the order of the root feature) becomes its root;
+2. cycles and self-references are cut per invariant 1;
 3. derived links lost to the former "Fix" button are restored on the same device, only for a
    feature without a parent:
    - a 30-minute consumption whose `external_id` is `<index external_id>_consumption` gets that
@@ -135,10 +143,12 @@ Body `{ "electric_meter_device_id": "<meter device id>" }` → `200` with the up
   (`DEVICE_HAS_NO_ENERGY_FEATURE`);
 - admin only, like the contracts;
 - every attachment feature of the device gets the root feature of the meter as parent;
-- when a parent changed, the costs of this device are recomputed from the earliest `valid_from`
-  of the meter's contracts (`energy-contract.recalculate` with `device_ids: [device.id]`, the
-  energy-monitoring service restricting `calculateCostFrom` to that device); attaching a device to
-  the meter it is already on writes and recomputes nothing.
+- when a parent changed, the costs of this device **and of the devices hanging under it** (a
+  sub-meter moved with its plugs: their root meter changed too) are recomputed from the earliest
+  `valid_from` of the meter's contracts (`energy-contract.recalculate` with `device_ids`, the
+  energy-monitoring service restricting `calculateCostFrom` to those devices; the work is
+  proportional to the states read, a window before a device's first state reads nothing);
+  attaching a device to the meter it is already on writes and recomputes nothing.
 
 There is no "detach": a device always belongs to a meter once attached, an unattached device is
 simply not priced.
@@ -168,11 +178,17 @@ the new parent would close a cycle (as before).
 - Zigbee2mqtt, Tasmota, MQTT, Enedis and the external integrations keep their derivation.
 - **Matter** derives the energy features of a published cumulative index at discovery (the
   paired devices of `GET /api/v1/service/matter/paired-device`), like Zigbee2mqtt: the features
-  already in Gladys keep their id and their parent, the derived features already in Gladys are
-  re-injected while their index is still published, then `addEnergyFeatures` adds what is
-  missing; a derived feature carries no selector when its index has none (the core builds it).
-  When a re-paired device replaces an existing one (new node id), the front remaps the parents of
-  the payload onto the ids of the existing features.
+  already in Gladys keep their id and their parent — **a root included**: `addEnergyFeatures`
+  only knows "no parent" and would otherwise propose the main meter for a second meter or a
+  device the user left unattached — the derived features already in Gladys are re-injected while
+  their index is still published, then `addEnergyFeatures` adds what is missing (a new device
+  falls back on the main meter). When a re-paired device replaces an existing one (new node id),
+  the server cannot see the existing device: the front gives every matched feature the id and the
+  parent of the existing one (the meter the user chose, or a root), and remaps the parents of the
+  newly derived features onto those ids.
+- The `<index>_consumption` / `<index>_cost` naming is owned by `addEnergyFeatures.js`
+  (`DERIVED_CONSUMPTION_SUFFIX`, `DERIVED_COST_SUFFIX`, with `CONSUMPTION_COST_TYPES`): the repair
+  and Matter import it.
 - The other internal integrations publishing an index without derivation (Tuya, Xiaomi, Z-Wave JS
   UI, Broadlink) are deprecated in favour of external integrations and are not changed.
 

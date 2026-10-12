@@ -105,7 +105,22 @@ describe('Matter.getPairedDevices', () => {
       'consumption-in-db',
       'cost-in-db',
     ]);
-    expect(device.features[0]).to.not.have.property('energy_parent_id');
+    expect(device.features[0].energy_parent_id).to.equal(null);
     expect(device.features[1].energy_parent_id).to.equal('sub-meter-feature-id');
+  });
+
+  it('should keep a root already in Gladys a root, instead of the main meter', async () => {
+    // a second meter, or a device the user left unattached
+    existingDevices[PLUG_EXTERNAL_ID] = {
+      external_id: PLUG_EXTERNAL_ID,
+      features: [{ id: 'index-in-db', external_id: INDEX_EXTERNAL_ID, energy_parent_id: null }],
+    };
+    matterHandler.devices.push(pairedPlug());
+    const [device] = await matterHandler.getPairedDevices();
+    const index = device.features.find((f) => f.external_id === INDEX_EXTERNAL_ID);
+    expect(index).to.deep.include({ id: 'index-in-db', energy_parent_id: null });
+    // its derived features are still added, under it
+    const consumption = device.features.find((f) => f.external_id === `${INDEX_EXTERNAL_ID}_consumption`);
+    expect(consumption.energy_parent_id).to.equal('index-in-db');
   });
 });

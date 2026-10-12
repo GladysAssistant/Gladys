@@ -1,15 +1,19 @@
-const { addEnergyFeatures } = require('../../energy-monitoring/utils/addEnergyFeatures');
+const {
+  addEnergyFeatures,
+  DERIVED_CONSUMPTION_SUFFIX,
+  DERIVED_COST_SUFFIX,
+} = require('../../energy-monitoring/utils/addEnergyFeatures');
 const { isEnergyIndexFeature } = require('../../../utils/energyHierarchy');
 
 // the features the core derives from a cumulative index (addEnergyFeatures naming)
-const DERIVED_SUFFIXES = ['_consumption', '_cost'];
+const DERIVED_SUFFIXES = [DERIVED_CONSUMPTION_SUFFIX, DERIVED_COST_SUFFIX];
 
 /**
  * @description Add the energy-tracking features of a paired device carrying a cumulative index
  * (docs/specs/energy-hierarchy.md, section F), like Zigbee2mqtt: the features already in Gladys
- * keep their id and their parent, the derived features already in Gladys are re-injected while
- * their index is still published, then addEnergyFeatures adds the missing ones. The device held
- * in memory by the handler is left untouched: a copy is returned.
+ * keep their id and their parent (a root stays a root), the derived features already in Gladys
+ * are re-injected while their index is still published, then addEnergyFeatures adds the missing
+ * ones. The device held in memory by the handler is left untouched: a copy is returned.
  * @param {object} device - The paired device.
  * @param {object|null} existingDevice - The device already in Gladys, if any.
  * @param {string|null} defaultElectricMeterFeatureId - The main meter feature.
@@ -29,13 +33,13 @@ function withEnergyFeatures(device, existingDevice, defaultElectricMeterFeatureI
     if (!existing) {
       return { ...feature };
     }
-    // the "Update" gesture posts this object back: the existing row is updated, its parent kept
-    return {
-      ...feature,
-      id: existing.id,
-      ...(existing.energy_parent_id ? { energy_parent_id: existing.energy_parent_id } : {}),
-    };
+    // the "Update" gesture posts this object back: the existing row is updated, its parent kept,
+    // a root (null) included
+    return { ...feature, id: existing.id, energy_parent_id: existing.energy_parent_id ?? null };
   });
+  // addEnergyFeatures only knows "no parent": a feature known as a root must not fall back on
+  // the main meter (a second meter, a device the user left unattached)
+  const rootIds = new Set(features.filter((feature) => feature.energy_parent_id === null).map((f) => f.id));
   existingFeatures
     .filter((existing) =>
       DERIVED_SUFFIXES.some(
@@ -44,7 +48,13 @@ function withEnergyFeatures(device, existingDevice, defaultElectricMeterFeatureI
       ),
     )
     .forEach((existing) => features.push({ ...existing }));
-  return addEnergyFeatures({ ...device, features }, defaultElectricMeterFeatureId);
+  const withDerived = addEnergyFeatures({ ...device, features }, defaultElectricMeterFeatureId);
+  withDerived.features.forEach((feature) => {
+    if (rootIds.has(feature.id)) {
+      feature.energy_parent_id = null;
+    }
+  });
+  return withDerived;
 }
 
 /**

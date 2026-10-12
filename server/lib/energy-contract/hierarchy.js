@@ -19,6 +19,11 @@ const {
 } = require('../../utils/energyHierarchy');
 const { isElectricMeter } = require('../../utils/enforceEnergyHierarchy');
 const { localToUtcMs } = require('./tariff.time');
+const {
+  CONSUMPTION_COST_TYPES,
+  DERIVED_CONSUMPTION_SUFFIX,
+  DERIVED_COST_SUFFIX,
+} = require('../../services/energy-monitoring/utils/addEnergyFeatures');
 
 // the categories the integrations and the former "My devices" page ever linked
 const ENERGY_CATEGORIES = [
@@ -26,13 +31,10 @@ const ENERGY_CATEGORIES = [
   DEVICE_FEATURE_CATEGORIES.SWITCH,
   DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
 ];
-const CONSUMPTION_TYPE_OF_COST = {
-  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST]:
-    DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST]: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-};
-const CONSUMPTION_SUFFIX = '_consumption';
-const COST_SUFFIX = '_cost';
+// the consumption type a cost type is derived from (the inverse of the derivation's own map)
+const CONSUMPTION_TYPE_OF_COST = Object.fromEntries(
+  Object.entries(CONSUMPTION_COST_TYPES).map(([consumptionType, costType]) => [costType, consumptionType]),
+);
 
 /**
  * @description The feature the devices of a meter are attached to (docs/specs/energy-hierarchy.md,
@@ -78,9 +80,40 @@ async function detachElectricMeter(contract) {
 }
 
 /**
+ * @description The devices hanging under a device (a plug attached to a sub-meter): the ones whose
+ * attachment features reach a feature of this device when walking up their parents.
+ * @param {object} stateManager - The state manager.
+ * @param {object} device - The device.
+ * @returns {Array<string>} Their ids.
+ * @example
+ * getDescendantDeviceIds(stateManager, subMeter);
+ */
+function getDescendantDeviceIds(stateManager, device) {
+  const ownIds = new Set(device.features.map((feature) => feature.id));
+  const reachesDevice = (feature) => {
+    const visited = new Set();
+    let parentId = feature.energy_parent_id;
+    while (parentId && !visited.has(parentId)) {
+      if (ownIds.has(parentId)) {
+        return true;
+      }
+      visited.add(parentId);
+      const parent = stateManager.get('deviceFeatureById', parentId);
+      parentId = parent ? parent.energy_parent_id : null;
+    }
+    return false;
+  };
+  return stateManager
+    .getAllKeys('deviceById')
+    .filter((deviceId) => deviceId !== device.id)
+    .filter((deviceId) => getAttachmentFeatures(stateManager.get('deviceById', deviceId)).some(reachesDevice));
+}
+
+/**
  * @description Attach a device to an electric meter (section D.1): every attachment feature of
- * the device gets the root feature of the meter as parent, and the costs of the device are
- * recomputed from the earliest start of the meter's contracts.
+ * the device gets the root feature of the meter as parent, and the costs of the device, and of
+ * the devices hanging under it (a sub-meter moved with its plugs), are recomputed from the
+ * earliest start of the meter's contracts.
  * @param {string} deviceSelector - The device selector.
  * @param {string} meterDeviceId - The electric meter device id.
  * @returns {Promise<object>} The updated device.
@@ -129,7 +162,8 @@ async function setDeviceElectricMeter(deviceSelector, meterDeviceId) {
     this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, {
       from,
       electric_meter_device_ids: [meter.id],
-      device_ids: [device.id],
+      // the root meter of the devices hanging under this one changed too
+      device_ids: [device.id, ...getDescendantDeviceIds(this.stateManager, device)],
     });
   }
   return this.stateManager.get('deviceById', device.id);
@@ -150,9 +184,9 @@ function findLostDerivedParent(feature, deviceFeatures) {
   if (
     feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
     feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION &&
-    externalId.endsWith(CONSUMPTION_SUFFIX)
+    externalId.endsWith(DERIVED_CONSUMPTION_SUFFIX)
   ) {
-    const indexExternalId = externalId.slice(0, -CONSUMPTION_SUFFIX.length);
+    const indexExternalId = externalId.slice(0, -DERIVED_CONSUMPTION_SUFFIX.length);
     return deviceFeatures.find((f) => isEnergyIndexFeature(f) && f.external_id === indexExternalId) || null;
   }
   if (!isEnergyCostFeature(feature)) {
@@ -162,10 +196,10 @@ function findLostDerivedParent(feature, deviceFeatures) {
   const consumptions = deviceFeatures.filter(
     (f) => f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR && f.type === consumptionType,
   );
-  if (externalId.endsWith(COST_SUFFIX)) {
-    const base = externalId.slice(0, -COST_SUFFIX.length);
+  if (externalId.endsWith(DERIVED_COST_SUFFIX)) {
+    const base = externalId.slice(0, -DERIVED_COST_SUFFIX.length);
     const byName =
-      consumptions.find((f) => f.external_id === `${base}${CONSUMPTION_SUFFIX}`) ||
+      consumptions.find((f) => f.external_id === `${base}${DERIVED_CONSUMPTION_SUFFIX}`) ||
       consumptions.find((f) => f.external_id === base);
     if (byName) {
       return byName;
@@ -197,17 +231,16 @@ async function repairHierarchy() {
     changes.set(feature.id, feature);
   };
 
-  // 1. no cycle
-  // eslint-disable-next-line no-restricted-syntax
-  for (const feature of features) {
-    // eslint-disable-next-line no-await-in-loop
-    const cycle = await findCycle(feature, getFeature);
-    if (cycle !== null) {
-      setParent(findLinkToCut(cycle), null, 'detached (circular energy hierarchy)');
+  const featuresByDevice = new Map();
+  features.forEach((feature) => {
+    if (!featuresByDevice.has(feature.device_id)) {
+      featuresByDevice.set(feature.device_id, []);
     }
-  }
+    featuresByDevice.get(feature.device_id).push(feature);
+  });
 
-  // 2. an electric meter is a root
+  // 1. an electric meter is a root (first: in a cycle across a meter and a plug of equal ranks,
+  // the meter's link is the one to cut, the plug stays attached)
   const contracts = await db.EnergyContract.findAll({
     where: { direction: ENERGY_CONTRACT_DIRECTIONS.CONSUMPTION },
     attributes: ['electric_meter_device_id'],
@@ -220,15 +253,30 @@ async function repairHierarchy() {
       return !parent || parent.device_id !== feature.device_id;
     })
     .forEach((feature) => setParent(feature, null, 'detached (an electric meter is a root)'));
+  // a meter whose energy features all hang off one another on the device (left by the former
+  // free editor) has nothing to attach the devices to: its best index becomes its root
+  meterIds.forEach((meterId) => {
+    const meterFeatures = featuresByDevice.get(meterId) || [];
+    if (getAttachmentFeatures({ features: meterFeatures }).length === 0) {
+      const sources = meterFeatures.filter(isEnergySourceFeature);
+      const best = getMeterRootFeature({ features: sources.map((f) => ({ ...f, energy_parent_id: null })) });
+      if (best !== null) {
+        setParent(byId.get(best.id), null, 'detached (an electric meter needs a root)');
+      }
+    }
+  });
+
+  // 2. no cycle
+  // eslint-disable-next-line no-restricted-syntax
+  for (const feature of features) {
+    // eslint-disable-next-line no-await-in-loop
+    const cycle = await findCycle(feature, getFeature);
+    if (cycle !== null) {
+      setParent(findLinkToCut(cycle), null, 'detached (circular energy hierarchy)');
+    }
+  }
 
   // 3. the derived links lost to the former "Fix" button
-  const featuresByDevice = new Map();
-  features.forEach((feature) => {
-    if (!featuresByDevice.has(feature.device_id)) {
-      featuresByDevice.set(feature.device_id, []);
-    }
-    featuresByDevice.get(feature.device_id).push(feature);
-  });
   // eslint-disable-next-line no-restricted-syntax
   for (const feature of features.filter((f) => !f.energy_parent_id)) {
     const parent = findLostDerivedParent(feature, featuresByDevice.get(feature.device_id));
@@ -257,6 +305,7 @@ async function repairHierarchy() {
 }
 
 module.exports = {
+  getDescendantDeviceIds,
   getMeterRootFeatureId,
   detachElectricMeter,
   setDeviceElectricMeter,

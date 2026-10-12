@@ -35,6 +35,7 @@ const getRootDeviceId = (device, featureById) => {
 class MyDevices extends Component {
   state = {
     contracts: [],
+    contractsError: false,
     attaching: null,
     error: null
   };
@@ -46,9 +47,10 @@ class MyDevices extends Component {
   loadContracts = async () => {
     try {
       const contracts = await this.props.httpClient.get('/api/v1/energy_contract');
-      this.setState({ contracts: Array.isArray(contracts) ? contracts : [] });
+      this.setState({ contracts: Array.isArray(contracts) ? contracts : [], contractsError: false });
     } catch (e) {
-      this.setState({ contracts: [] });
+      // without the contracts, every device would look unattached: say so instead
+      this.setState({ contracts: [], contractsError: true });
     }
   };
 
@@ -121,7 +123,7 @@ class MyDevices extends Component {
     );
   };
 
-  render({ devices, loading, error }, { contracts }) {
+  render({ devices, loading, error }, { contracts, contractsError }) {
     const meterIds = new Set(
       contracts
         .filter(
@@ -157,10 +159,15 @@ class MyDevices extends Component {
                   <Text id="integration.energyMonitoring.errorLoadingDevices" />
                 </div>
               )}
+              {contractsError && (
+                <div class="alert alert-danger" role="alert" data-cy="energy-hierarchy-contracts-error">
+                  <Text id="integration.energyMonitoring.contracts.errorLoading" />
+                </div>
+              )}
               <p class="text-muted">
                 <Text id="integration.energyMonitoring.hierarchy.description" />
               </p>
-              {meters.length === 0 && (
+              {!contractsError && meters.length === 0 && (
                 <div class="alert alert-info" data-cy="energy-hierarchy-no-meter">
                   <Text id="integration.energyMonitoring.hierarchy.noMeter" />{' '}
                   <Link href="/dashboard/integration/device/energy-monitoring/contracts/create">
@@ -181,7 +188,7 @@ class MyDevices extends Component {
                   </div>
                 </div>
               ))}
-              {unattached.length > 0 && (
+              {!contractsError && unattached.length > 0 && (
                 <div class="card mb-3" data-cy="energy-unattached-card">
                   <div class="card-header">
                     <h3 class="card-title">
@@ -196,7 +203,7 @@ class MyDevices extends Component {
                   </div>
                 </div>
               )}
-              {meters.length === 0 && unattached.length === 0 && !loading && (
+              {!contractsError && meters.length === 0 && unattached.length === 0 && !loading && (
                 <div class="text-muted">
                   <Text id="integration.energyMonitoring.hierarchy.noDevice" />
                 </div>

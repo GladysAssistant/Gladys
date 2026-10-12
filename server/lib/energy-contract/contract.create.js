@@ -41,15 +41,17 @@ async function assertNoOverlap(contract, excludeId) {
  * from a date (a contract was created, changed or deleted).
  * @param {object} contract - The contract.
  * @param {string} fromDate - Local date `YYYY-MM-DD` to recompute from.
+ * @param {Array<string>} [electricMeterDeviceIds] - The meters to recompute, the contract's one by
+ * default (a contract moved to another meter recomputes the former one too).
  * @example
  * this.requestRecalculation(contract, '2026-01-01');
  */
-function requestRecalculation(contract, fromDate) {
+function requestRecalculation(contract, fromDate, electricMeterDeviceIds = [contract.electric_meter_device_id]) {
   const from = new Date(localToUtcMs(fromDate, contract.timezone));
   logger.info(`Energy contract ${contract.selector}: requesting cost recalculation from ${from.toISOString()}`);
   this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, {
     from,
-    electric_meter_device_ids: [contract.electric_meter_device_id],
+    electric_meter_device_ids: electricMeterDeviceIds,
   });
 }
 
@@ -78,10 +80,11 @@ async function create(data) {
   };
   contract.tariff = validateContractTariff(contract.tariff, contract.inputs, contract.pricing_mode);
   await assertNoOverlap(contract);
+  // the meter of a consumption contract is a root, priced by it (energy-hierarchy.md, section C.2):
+  // detached before the row is written, so a failure leaves no contract a retry would conflict with
+  await this.detachElectricMeter(contract);
   const row = await db.EnergyContract.create(contract);
   const created = await this.getBySelector(row.selector);
-  // the meter of a consumption contract is a root, priced by it (energy-hierarchy.md, section C.2)
-  await this.detachElectricMeter(created);
   this.requestRecalculation(created, created.valid_from);
   return created;
 }
