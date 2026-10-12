@@ -612,6 +612,23 @@
   color: var(--gl-accent);
 }
 
+/* `.glass-theme .tileIcon` above outweighs a single color class: a tile
+   icon the integration colored (`value` + `color`) kept the theme accent.
+   Same weight, declared after: the semantic accent wins, as in the default
+   theme. */
+:global(.glass-theme) .colorSuccess {
+  color: #2e8f5b;
+}
+:global(.glass-theme) .colorWarning {
+  color: #f68f00;
+}
+:global(.glass-theme) .colorDanger {
+  color: #d63939;
+}
+:global(.glass-theme) .colorInfo {
+  color: #45aaf2;
+}
+
 :global(.glass-theme) .caption,
 :global(.glass-theme) .tileLabel,
 :global(.glass-theme) .tileUnit,
