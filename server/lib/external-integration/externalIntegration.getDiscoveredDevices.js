@@ -2,6 +2,7 @@ const {
   addEnergyFeatures,
   addConsumptionCostFeatures,
   isConsumptionFeature,
+  CONSUMPTION_COST_TYPES,
 } = require('../../services/energy-monitoring/utils/addEnergyFeatures');
 const {
   ENERGY_INDEX_FEATURE_TYPES,
@@ -57,24 +58,24 @@ function isEnergyIndexFeature(feature) {
 }
 
 /**
- * @description The external ids of the consumption features an integration
- * feeds itself (30-minutes or daily consumption published as such, fed through
- * POST /energy/consumption): the core derives their cost. A consumption named
- * like the one derived from a published index is the index pipeline's, not one
- * of them.
+ * @description The consumption features an integration feeds itself
+ * (30-minutes or daily consumption published as such, fed through
+ * POST /energy/consumption), by external id, with the type of the cost
+ * feature the core derives from each. A consumption named like the one
+ * derived from a published index is the index pipeline's, not one of them.
  * @param {object} device - The device published by the integration.
- * @returns {Set<string>} The external ids of the published consumption features.
+ * @returns {Map<string, string>} external id -> derived cost feature type.
  * @example
- * const externalIds = getPublishedConsumptionExternalIds(device);
+ * const costTypes = getPublishedConsumptionCostTypes(device);
  */
-function getPublishedConsumptionExternalIds(device) {
+function getPublishedConsumptionCostTypes(device) {
   const indexConsumptionExternalIds = new Set(
     device.features.filter(isEnergyIndexFeature).map((feature) => `${feature.external_id}_consumption`),
   );
-  return new Set(
+  return new Map(
     device.features
       .filter((feature) => isConsumptionFeature(feature) && !indexConsumptionExternalIds.has(feature.external_id))
-      .map((feature) => feature.external_id),
+      .map((feature) => [feature.external_id, CONSUMPTION_COST_TYPES[feature.type]]),
   );
 }
 
@@ -88,7 +89,7 @@ function getPublishedConsumptionExternalIds(device) {
  * const hasSource = hasEnergySourceFeature(device);
  */
 function hasEnergySourceFeature(device) {
-  return device.features.some(isEnergyIndexFeature) || getPublishedConsumptionExternalIds(device).size > 0;
+  return device.features.some(isEnergyIndexFeature) || getPublishedConsumptionCostTypes(device).size > 0;
 }
 
 /**
@@ -104,7 +105,7 @@ function hasEnergySourceFeature(device) {
  * @param {object} derived - Its derived feature descriptor.
  * @param {object} lookups - The lookups shared by the whole device.
  * @param {Set} lookups.publishedIndexExternalIds - External ids of the published index features.
- * @param {Set} lookups.publishedConsumptionExternalIds - External ids of the published consumption features.
+ * @param {Map} lookups.publishedConsumptionCostTypes - External id -> cost type of the published consumption features.
  * @param {Map} lookups.createdFeatureById - The features already in DB, by id.
  * @returns {object|null} The source external_id and how it was matched, if any.
  * @example
@@ -113,18 +114,19 @@ function hasEnergySourceFeature(device) {
 function matchPublishedSource(
   createdFeature,
   derived,
-  { publishedIndexExternalIds, publishedConsumptionExternalIds, createdFeatureById },
+  { publishedIndexExternalIds, publishedConsumptionCostTypes, createdFeatureById },
 ) {
-  const isCost = derived.suffix === COST_SUFFIX;
+  // a cost feature only matches a published consumption of its own duration:
+  // a consumption republished as daily instead of 30-minutes (or the reverse)
+  // drops its old cost, like an index that stopped being an index
+  const matchesConsumption = (externalId) =>
+    derived.suffix === COST_SUFFIX && publishedConsumptionCostTypes.get(externalId) === createdFeature.type;
   if (createdFeature.external_id.endsWith(derived.suffix)) {
     const sourceExternalId = createdFeature.external_id.slice(0, -derived.suffix.length);
     // the source feature must STILL be a cumulative index (or a published
-    // consumption): one that changed type keeps no energy tracking, its
-    // derived features are obsolete
-    if (
-      publishedIndexExternalIds.has(sourceExternalId) ||
-      (isCost && publishedConsumptionExternalIds.has(sourceExternalId))
-    ) {
+    // consumption of the same duration): one that changed type keeps no
+    // energy tracking, its derived features are obsolete
+    if (publishedIndexExternalIds.has(sourceExternalId) || matchesConsumption(sourceExternalId)) {
       return { sourceExternalId, viaSuffix: true };
     }
   }
@@ -135,7 +137,7 @@ function matchPublishedSource(
   if (publishedIndexExternalIds.has(parent.external_id)) {
     return { sourceExternalId: parent.external_id, viaSuffix: false };
   }
-  if (isCost && publishedConsumptionExternalIds.has(parent.external_id)) {
+  if (matchesConsumption(parent.external_id)) {
     return { sourceExternalId: parent.external_id, viaSuffix: false };
   }
   const grandParent = createdFeatureById.get(parent.energy_parent_id);
@@ -188,7 +190,7 @@ function withEnergyFeatures(device, createdDevice, defaultElectricMeterDeviceFea
     publishedIndexExternalIds: new Set(
       device.features.filter(isEnergyIndexFeature).map((feature) => feature.external_id),
     ),
-    publishedConsumptionExternalIds: getPublishedConsumptionExternalIds(device),
+    publishedConsumptionCostTypes: getPublishedConsumptionCostTypes(device),
     createdFeatureById: new Map(createdFeatures.map((createdFeature) => [createdFeature.id, createdFeature])),
   };
   const featuresToReinject = [];

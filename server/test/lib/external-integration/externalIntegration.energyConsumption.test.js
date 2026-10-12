@@ -185,8 +185,10 @@ describe('externalIntegration.publishEnergyConsumption', () => {
     await expect(
       publish({ device_feature_external_id: 'ext:ext-dev-open-meteo-demo:temperature', intervals: [] }),
     ).to.be.rejectedWith(BadParameters, 'must be a 30-minute or daily consumption feature');
+    // the core's `_consumption` feature hangs off an index of the SAME device
     stateManager.setState('deviceFeatureById', 'index-id', {
       id: 'index-id',
+      device_id: 'device-id',
       category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
       type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
     });
@@ -198,6 +200,63 @@ describe('externalIntegration.publishEnergyConsumption', () => {
     await expect(
       publish({ device_feature_external_id: 'ext:ext-dev-open-meteo-demo:index_consumption', intervals: [] }),
     ).to.be.rejectedWith(BadParameters, 'derived from a cumulative index');
+  });
+
+  it('should accept a consumption attached to the index of the main meter, on another device', async () => {
+    // what the discovery does: the published consumption hangs off the main meter's energy
+    // feature, which is usually a cumulative index
+    stateManager.setState('deviceFeatureById', 'main-meter-index-id', {
+      id: 'main-meter-index-id',
+      device_id: 'main-meter-device-id',
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+    });
+    stateManager.setState(
+      'deviceFeatureByExternalId',
+      CONSUMPTION_EXTERNAL_ID,
+      buildFeature({ energy_parent_id: 'main-meter-index-id' }),
+    );
+    const result = await publish({
+      device_feature_external_id: CONSUMPTION_EXTERNAL_ID,
+      intervals: [{ starts_at: '2026-01-12T05:00:00Z', kwh: 0.42 }],
+    });
+    expect(result).to.deep.equal({ count: 1, changed_from: new Date('2026-01-12T05:30:00Z') });
+    expect(device.saveHistoricalState.callCount).to.equal(1);
+    sinonAssert.calledWith(
+      energyContract.requestMeterRecalculation,
+      'meter-device-id',
+      new Date('2026-01-12T05:30:00Z'),
+    );
+  });
+
+  it('should recompute the states written before a failed write, and report the write error', async () => {
+    device.saveHistoricalState = fake((feature, value) =>
+      value === 0.38 ? Promise.reject(new Error('duckdb write failed')) : Promise.resolve(null),
+    );
+    const intervals = [
+      { starts_at: '2026-01-12T05:00:00Z', kwh: 0.42 },
+      { starts_at: '2026-01-12T05:30:00Z', kwh: 0.38 },
+    ];
+    await expect(publish({ device_feature_external_id: CONSUMPTION_EXTERNAL_ID, intervals })).to.be.rejectedWith(
+      'duckdb write failed',
+    );
+    sinonAssert.calledOnceWithExactly(
+      energyContract.requestMeterRecalculation,
+      'meter-device-id',
+      new Date('2026-01-12T05:30:00Z'),
+    );
+    // the recalculation failing too never hides the write error
+    energyContract.requestMeterRecalculation = fake.rejects(new Error('scheduler down'));
+    await expect(publish({ device_feature_external_id: CONSUMPTION_EXTERNAL_ID, intervals })).to.be.rejectedWith(
+      'duckdb write failed',
+    );
+    // nothing written before the failure: nothing to recompute
+    device.saveHistoricalState = fake.rejects(new Error('duckdb write failed'));
+    energyContract.requestMeterRecalculation = fake.resolves(null);
+    await expect(publish({ device_feature_external_id: CONSUMPTION_EXTERNAL_ID, intervals })).to.be.rejectedWith(
+      'duckdb write failed',
+    );
+    expect(energyContract.requestMeterRecalculation.callCount).to.equal(0);
   });
 
   it('should validate the intervals', async () => {

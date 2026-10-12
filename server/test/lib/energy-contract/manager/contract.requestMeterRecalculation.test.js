@@ -37,6 +37,8 @@ describe('energyContract.requestMeterRecalculation', () => {
     await energyContract.requestMeterRecalculation(METER_DEVICE_ID, new Date('2026-01-10T05:30:00Z'));
     expect(emitted.callCount).to.equal(1);
     expect(state.timer).to.not.equal(null);
+    // the current price cache is cleared on every request, not when the deferred run starts
+    expect(clearCache.callCount).to.equal(4);
     await new Promise((resolve) => {
       setTimeout(resolve, 150);
     });

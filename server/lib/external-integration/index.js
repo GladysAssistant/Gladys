@@ -54,7 +54,7 @@ const {
   getEnergyContracts,
   handleEnergyCalendarRefresh,
 } = require('./externalIntegration.energyCalendar');
-const { publishEnergyConsumption } = require('./externalIntegration.energyConsumption');
+const { publishEnergyConsumption, recalculateConsumptionCosts } = require('./externalIntegration.energyConsumption');
 const { getWidgets } = require('./externalIntegration.getWidgets');
 const { getWidgetContent } = require('./externalIntegration.getWidgetContent');
 const { getWidgetImage } = require('./externalIntegration.getWidgetImage');
@@ -330,6 +330,7 @@ ExternalIntegration.prototype.getEnergyCalendar = getEnergyCalendar;
 ExternalIntegration.prototype.getEnergyContracts = getEnergyContracts;
 ExternalIntegration.prototype.handleEnergyCalendarRefresh = handleEnergyCalendarRefresh;
 ExternalIntegration.prototype.publishEnergyConsumption = publishEnergyConsumption;
+ExternalIntegration.prototype.recalculateConsumptionCosts = recalculateConsumptionCosts;
 ExternalIntegration.prototype.getWidgets = getWidgets;
 ExternalIntegration.prototype.getWidgetContent = getWidgetContent;
 ExternalIntegration.prototype.getWidgetImage = getWidgetImage;

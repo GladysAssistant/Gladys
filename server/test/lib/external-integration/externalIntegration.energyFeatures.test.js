@@ -548,5 +548,44 @@ describe('externalIntegration.getDiscoveredDevices energy features', () => {
       ]);
       expect(devices[0]).to.have.property('structure_changed', true);
     });
+
+    it('should drop the cost feature of a consumption republished with another duration', async () => {
+      const publishedDevice = buildConsumptionDevice(
+        service.selector,
+        DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+      );
+      const consumptionExternalId = publishedDevice.features[0].external_id;
+      stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+        id: 'device-id',
+        features: [
+          {
+            ...publishedDevice.features[0],
+            id: 'consumption-in-db',
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          },
+          {
+            id: 'cost-in-db',
+            name: 'Consumption (cost)',
+            external_id: `${consumptionExternalId}_cost`,
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+            unit: DEVICE_FEATURE_UNITS.EURO,
+            energy_parent_id: 'consumption-in-db',
+          },
+        ],
+      });
+      await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+      const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+      // one cost feature only, of the new duration, under the same deterministic name
+      const costFeatures = devices[0].features.filter((feature) => feature.external_id.endsWith('_cost'));
+      expect(costFeatures).to.have.lengthOf(1);
+      expect(costFeatures[0]).to.deep.include({
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+        external_id: `${consumptionExternalId}_cost`,
+        energy_parent_id: 'consumption-in-db',
+      });
+      expect(costFeatures[0].id).to.not.equal('cost-in-db');
+      expect(devices[0]).to.have.property('structure_changed', true);
+    });
   });
 });

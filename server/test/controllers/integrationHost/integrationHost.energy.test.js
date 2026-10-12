@@ -150,6 +150,29 @@ describe('Integration host API: energy contracts', () => {
   describe('POST /api/integration/v1/energy/consumption', () => {
     const consumptionExternalId = `ext:${TEST_ENERGY_MANIFEST_SELECTOR}:meter:consumption`;
     beforeEach(async () => {
+      // the main electric meter of the house, with the cumulative index the discovery attaches
+      // a published consumption to
+      const mainMeter = await gladys.device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Main meter',
+        external_id: 'main-meter',
+        selector: 'main-meter',
+        features: [
+          {
+            name: 'Index',
+            external_id: 'main-meter-index',
+            selector: 'main-meter-index',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            read_only: true,
+            has_feedback: false,
+            keep_history: true,
+            min: 0,
+            max: 100000000000,
+          },
+        ],
+      });
       await gladys.device.create({
         service_id: service.id,
         name: 'Hydro meter',
@@ -168,12 +191,14 @@ describe('Integration host API: energy contracts', () => {
             keep_history: true,
             min: 0,
             max: 100000000000,
+            energy_parent_id: mainMeter.features[0].id,
           },
         ],
       });
     });
     afterEach(async () => {
       await gladys.device.destroy('hydro-meter');
+      await gladys.device.destroy('main-meter');
     });
 
     it('should upsert the published intervals and answer their count and the earliest change', async () => {

@@ -32,13 +32,14 @@ async function requestMeterRecalculation(meterDeviceId, from) {
     const earliestContractMs = Math.min(...contracts.map((c) => localToUtcMs(c.valid_from, c.timezone)));
     const boundedFrom = pendingFrom.getTime() < earliestContractMs ? new Date(earliestContractMs) : pendingFrom;
     logger.info(`Meter ${meterDeviceId}: consumption changed from ${boundedFrom.toISOString()}, recalculating`);
-    // a cached current price reads the accumulations of the stored states (tiers)
-    this.clearCurrentPriceCache();
     this.event.emit(EVENTS.ENERGY_CONTRACT.RECALCULATE, {
       from: boundedFrom,
       electric_meter_device_ids: [meterDeviceId],
     });
   };
+  // a cached current price reads the accumulations of the stored states (a tiered tariff):
+  // they changed now, not when the deferred run starts
+  this.clearCurrentPriceCache();
   await scheduleBoundedRecalculation(this.meterRecalculations, meterDeviceId, from, run);
 }
 

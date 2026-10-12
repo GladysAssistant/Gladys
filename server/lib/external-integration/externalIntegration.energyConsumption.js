@@ -95,11 +95,14 @@ async function publishEnergyConsumption(service, body) {
   if (!isConsumptionFeature(feature)) {
     throw new BadParameters('device_feature_external_id: must be a 30-minute or daily consumption feature');
   }
-  // a consumption hanging off a cumulative index is computed by the core from the index deltas:
-  // feeding it too would mix the two pipelines on the same states
+  // a consumption hanging off a cumulative index OF THE SAME DEVICE is computed by the core from
+  // the index deltas (addEnergyFeatures): feeding it too would mix the two pipelines on the same
+  // states. A parent on another device is the meter the consumption is attached to (the main
+  // meter's index, a sub-meter), the intended hierarchy
   const parent = this.stateManager.get('deviceFeatureById', feature.energy_parent_id);
   if (
     parent !== null &&
+    parent.device_id === feature.device_id &&
     ENERGY_INDEX_FEATURE_TYPES[parent.category] &&
     ENERGY_INDEX_FEATURE_TYPES[parent.category].includes(parent.type)
   ) {
@@ -133,34 +136,65 @@ async function publishEnergyConsumption(service, body) {
   );
   const existingByInstant = new Map(existingStates.map((state) => [new Date(state.created_at).getTime(), state.value]));
   let changedFrom = null;
-  // Sequential on purpose: one upsert per state, the writes are serialized anyway
-  // eslint-disable-next-line no-restricted-syntax
-  for (const instant of instants) {
-    const value = convertEnergyUnit(kwhByInstant.get(instant), DEVICE_FEATURE_UNITS.KILOWATT_HOUR, feature.unit);
-    if (existingByInstant.get(instant) !== value) {
-      // eslint-disable-next-line no-await-in-loop
-      await this.device.saveHistoricalState(feature, value, new Date(instant));
-      if (changedFrom === null) {
-        changedFrom = instant;
+  try {
+    // Sequential on purpose: one upsert per state, the writes are serialized anyway
+    // eslint-disable-next-line no-restricted-syntax
+    for (const instant of instants) {
+      const value = convertEnergyUnit(kwhByInstant.get(instant), DEVICE_FEATURE_UNITS.KILOWATT_HOUR, feature.unit);
+      if (existingByInstant.get(instant) !== value) {
+        // eslint-disable-next-line no-await-in-loop
+        await this.device.saveHistoricalState(feature, value, new Date(instant));
+        if (changedFrom === null) {
+          changedFrom = instant;
+        }
       }
     }
+  } catch (e) {
+    // the states written before the failure are in the database and a retry of the batch will
+    // skip them as unchanged: their costs are recomputed now, and the write error is the one
+    // reported to the integration
+    if (changedFrom !== null) {
+      try {
+        await this.recalculateConsumptionCosts(service, feature, new Date(changedFrom));
+      } catch (recalculationError) {
+        logger.warn(
+          `Integration ${service.selector}: recalculation after a failed write: ${recalculationError.message}`,
+        );
+      }
+    }
+    throw e;
   }
   const result = { count: instants.length, changed_from: changedFrom === null ? null : new Date(changedFrom) };
-  if (changedFrom === null) {
-    return result;
+  if (changedFrom !== null) {
+    await this.recalculateConsumptionCosts(service, feature, result.changed_from);
   }
+  return result;
+}
+
+/**
+ * @description Queue the bounded cost recalculation of the root meter of a consumption feature
+ * whose states changed from an instant; a feature without a valid root meter (broken
+ * hierarchy) is written but not priced, with a warning.
+ * @param {object} service - The calling integration (for the log).
+ * @param {object} feature - The consumption feature.
+ * @param {Date} changedFrom - The creation instant of the earliest state that changed.
+ * @returns {Promise<void>} Resolves when queued.
+ * @example
+ * await this.recalculateConsumptionCosts(service, feature, new Date('2026-01-12T05:30:00Z'));
+ */
+async function recalculateConsumptionCosts(service, feature, changedFrom) {
   const rootMeterFeature = this.device.energySensorManager.getRootElectricMeterDevice(feature);
   if (rootMeterFeature === null) {
     logger.warn(
       `Integration ${service.selector}: consumption ${feature.external_id} has no valid root meter, costs not recomputed`,
     );
-    return result;
+    return;
   }
-  await this.energyContract.requestMeterRecalculation(rootMeterFeature.device_id, result.changed_from);
-  return result;
+  await this.energyContract.requestMeterRecalculation(rootMeterFeature.device_id, changedFrom);
 }
 
 module.exports = {
   publishEnergyConsumption,
+  recalculateConsumptionCosts,
   resolveInterval,
 };
