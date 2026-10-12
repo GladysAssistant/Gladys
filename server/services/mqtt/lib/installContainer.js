@@ -3,6 +3,7 @@ const logger = require('../../../utils/logger');
 const { generate } = require('../../../utils/password');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
 
 const { DEFAULT } = require('./constants');
 const containerDescriptor = require('../docker/eclipse-mosquitto-container.json');
@@ -24,6 +25,9 @@ async function installContainer(saveConfiguration = true) {
     if (!networkModeValid) {
       throw new PlatformNotCompatible('Gladys should be on host network');
     }
+
+    // Fail early, with a clear message, if the name is taken by a container that is not ours
+    await findManagedContainer(this.gladys.system, containerDescriptor);
 
     logger.info(`Pulling ${containerDescriptor.Image} image...`);
     await this.gladys.system.pull(containerDescriptor.Image);

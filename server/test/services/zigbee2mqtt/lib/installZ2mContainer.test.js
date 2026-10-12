@@ -7,6 +7,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const { assert, fake, stub } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ConflictError } = require('../../../../utils/coreErrors');
 
 const configureContainer = fake.resolves({ configChanged: false, adapterChanged: false });
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
@@ -15,12 +16,16 @@ const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
 
 const container = {
   id: 'docker-test',
+  name: '/gladys-z2m-zigbee2mqtt',
   state: 'running',
+  labels: { 'io.gladysassistant.service': 'zigbee2mqtt' },
 };
 
 const containerStopped = {
   id: 'docker-test',
+  name: '/gladys-z2m-zigbee2mqtt',
   state: 'stopped',
+  labels: { 'io.gladysassistant.service': 'zigbee2mqtt' },
 };
 
 const containerDescription = {
@@ -163,7 +168,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
   it('should remove and recreate z2m container when adapter type changes', async () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0' };
-    const newContainer = { id: 'docker-test-new', state: 'stopped' };
+    const newContainer = { ...containerStopped, id: 'docker-test-new' };
     const getContainersStub = stub();
     getContainersStub
       .onFirstCall()
@@ -597,5 +602,27 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // ASSERT
     expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+  });
+
+  it('should not adopt nor remove a user container carrying our name', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([
+      { id: 'user-container', name: '/gladys-z2m-zigbee2mqtt', image: 'nginx:alpine' },
+    ]);
+    gladys.system.inspectContainer = fake.resolves({ Config: { Image: 'nginx:alpine' } });
+    // EXECUTE
+    let error;
+    try {
+      await zigbee2mqttManager.installZ2mContainer(config);
+    } catch (e) {
+      error = e;
+    }
+    // ASSERT
+    expect(error).to.be.instanceOf(ConflictError);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(gladys.system.createContainer);
+    assert.notCalled(gladys.system.restartContainer);
   });
 });

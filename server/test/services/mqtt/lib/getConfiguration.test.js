@@ -96,7 +96,9 @@ describe('mqttHandler.getConfiguration', () => {
         isDocker: fake.resolves(true),
         getContainers: fake.resolves([
           {
+            name: '/eclipse-mosquitto',
             image: 'eclipse-mosquitto:any-tag',
+            labels: { 'io.gladysassistant.service': 'mqtt' },
           },
         ]),
         getNetworkMode: fake.resolves('bridge'),
@@ -139,7 +141,9 @@ describe('mqttHandler.getConfiguration', () => {
         isDocker: fake.resolves(true),
         getContainers: fake.resolves([
           {
+            name: '/eclipse-mosquitto',
             image: 'eclipse-mosquitto:any-tag',
+            labels: { 'io.gladysassistant.service': 'mqtt' },
           },
         ]),
         getNetworkMode: fake.resolves('host'),
@@ -295,5 +299,60 @@ describe('mqttHandler.getConfiguration', () => {
     assert.callCount(gladys.variable.getValue, 5);
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getNetworkMode);
+  });
+
+  it('should getConfiguration: a user broker carrying our name is not our embedded broker', async () => {
+    const gladys = {
+      variable: {
+        getValue: fake.resolves(null),
+      },
+      system: {
+        isDocker: fake.resolves(true),
+        getContainers: fake.resolves([
+          {
+            id: 'user-broker',
+            name: '/eclipse-mosquitto',
+            image: 'eclipse-mosquitto:2',
+          },
+        ]),
+        inspectContainer: fake.resolves({ Config: { Image: 'eclipse-mosquitto:2' } }),
+        getNetworkMode: fake.resolves('host'),
+      },
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    const config = await mqttHandler.getConfiguration();
+
+    // Without the label, a mosquitto created from the public image is indistinguishable from ours
+    expect(config.brokerContainerAvailable).to.equal(true);
+    assert.calledOnceWithExactly(gladys.system.inspectContainer, 'user-broker');
+
+    gladys.system.inspectContainer = fake.resolves({ Config: { Image: 'nginx:alpine' } });
+    const configWithForeignBroker = await mqttHandler.getConfiguration();
+    expect(configWithForeignBroker.brokerContainerAvailable).to.equal(false);
+  });
+
+  it('should getConfiguration: a container whose name only contains ours is ignored', async () => {
+    const gladys = {
+      variable: {
+        getValue: fake.resolves(null),
+      },
+      system: {
+        isDocker: fake.resolves(true),
+        getContainers: fake.resolves([
+          {
+            name: '/eclipse-mosquitto-teslamate',
+            image: 'eclipse-mosquitto:2',
+            labels: { 'io.gladysassistant.service': 'mqtt' },
+          },
+        ]),
+        getNetworkMode: fake.resolves('host'),
+      },
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    const config = await mqttHandler.getConfiguration();
+
+    expect(config.brokerContainerAvailable).to.equal(false);
   });
 });

@@ -2,6 +2,7 @@ const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 
 const logger = require('../../../utils/logger');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { ADAPTER_MODE } = require('./constants');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -51,17 +52,14 @@ async function installZ2mContainer(config, setupMode = false) {
   const expectedDevicePath = networkAdapter ? null : z2mDriverPath;
   let creationNeeded = false;
 
-  let dockerContainers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [containerDescriptor.name] },
-  });
-  let [container] = dockerContainers;
+  // Throws if the name is taken by a container that is not ours: it is never adopted nor removed
+  let container = await findManagedContainer(this.gladys.system, containerDescriptor);
 
   /*
    * Manage case where Zigbee coordinator has changed (USB dongle path, or switch from/to a network
    * coordinator) by removing the container. It will be created with good config later
    */
-  if (dockerContainers.length > 0) {
+  if (container) {
     const containerDescription = await this.gladys.system.inspectContainer(container.id);
     const [currentDevice] = containerDescription.HostConfig.Devices || [];
     const currentDevicePath = currentDevice ? currentDevice.PathOnHost : null;
@@ -99,7 +97,7 @@ async function installZ2mContainer(config, setupMode = false) {
 
   const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
   const containerPath = `${basePathOnHost}/zigbee2mqtt/z2m`;
-  if (dockerContainers.length === 0 || creationNeeded) {
+  if (!container || creationNeeded) {
     // Restore backup only in case of new installation
     await this.restoreZ2mBackup(containerPath);
 
@@ -133,14 +131,10 @@ async function installZ2mContainer(config, setupMode = false) {
   const { configChanged, adapterChanged } = await this.configureContainer(basePathOnContainer, config, setupMode);
 
   try {
-    dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerDescriptor.name] },
-    });
-    [container] = dockerContainers;
+    container = await findManagedContainer(this.gladys.system, containerDescriptor);
 
     // If adapter type changed, remove and recreate container for clean state and fresh logs
-    if (adapterChanged && !creationNeeded && dockerContainers.length > 0) {
+    if (adapterChanged && !creationNeeded && container) {
       logger.info('Zigbee2mqtt adapter type changed, recreating container...');
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
@@ -153,11 +147,7 @@ async function installZ2mContainer(config, setupMode = false) {
       );
       await this.gladys.system.createContainer(containerDescriptorToMutate);
 
-      dockerContainers = await this.gladys.system.getContainers({
-        all: true,
-        filters: { name: [containerDescriptor.name] },
-      });
-      [container] = dockerContainers;
+      container = await findManagedContainer(this.gladys.system, containerDescriptor);
     }
 
     // Check if we need to restart the container (container is not running / config changed)

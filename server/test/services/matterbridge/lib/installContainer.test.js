@@ -4,18 +4,23 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ConflictError } = require('../../../../utils/coreErrors');
 const MatterbridgeManager = require('../../../../services/matterbridge/lib');
 
 const container = {
   id: 'docker-test',
+  name: '/gladys-matterbridge',
   state: 'running',
+  labels: { 'io.gladysassistant.service': 'matterbridge' },
 };
 
 const config = {};
 
 const containerStopped = {
   id: 'docker-test',
+  name: '/gladys-matterbridge',
   state: 'stopped',
+  labels: { 'io.gladysassistant.service': 'matterbridge' },
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -78,6 +83,7 @@ describe('Matterbridge installContainer', () => {
     const createContainerCall = gladys.system.createContainer.firstCall.args[0];
     expect(createContainerCall.name).to.equal('gladys-matterbridge');
     expect(createContainerCall.Image).to.equal('luligu/matterbridge:latest');
+    expect(createContainerCall.Labels).to.deep.equal({ 'io.gladysassistant.service': 'matterbridge' });
     expect(createContainerCall.HostConfig.Binds).to.deep.equal([
       `${TEMP_GLADYS_FOLDER}/matterbridge/Matterbridge:/root/Matterbridge`,
       `${TEMP_GLADYS_FOLDER}/matterbridge/.matterbridge:/root/.matterbridge`,
@@ -199,6 +205,27 @@ describe('Matterbridge installContainer', () => {
     assert.notCalled(gladys.system.createContainer);
     assert.notCalled(gladys.system.restartContainer);
 
+    expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
+    expect(matterbridgeManager.matterbridgeExist).to.equal(false);
+  });
+
+  it('should not adopt a user container carrying our name', async () => {
+    gladys.system.getContainers = fake.resolves([
+      { id: 'user-container', name: '/gladys-matterbridge', image: 'nginx' },
+    ]);
+    gladys.system.inspectContainer = fake.resolves({ Config: { Image: 'nginx:alpine' } });
+
+    let error;
+    try {
+      await matterbridgeManager.installContainer(config);
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(ConflictError);
+    assert.notCalled(gladys.system.pull);
+    assert.notCalled(gladys.system.createContainer);
+    assert.notCalled(gladys.system.restartContainer);
     expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
     expect(matterbridgeManager.matterbridgeExist).to.equal(false);
   });

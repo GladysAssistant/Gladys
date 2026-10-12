@@ -6,9 +6,15 @@ const { assert, fake } = sinon;
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
-const container = {
-  id: 'docker-test',
-};
+// Our own container, named after the requested filter
+const ownContainer = (options) =>
+  Promise.resolve([
+    {
+      id: 'docker-test',
+      name: `/${options.filters.name[0]}`,
+      labels: { 'io.gladysassistant.service': 'zigbee2mqtt' },
+    },
+  ]);
 
 const mqtt = {
   end: fake.resolves(true),
@@ -43,7 +49,7 @@ describe('zigbee2mqtt reset', () => {
         emit: fake.resolves(null),
       },
       system: {
-        getContainers: fake.resolves([container]),
+        getContainers: fake(ownContainer),
         stopContainer: fake.resolves(true),
         removeContainer: fake.resolves(true),
         getGladysBasePath: fake.resolves({

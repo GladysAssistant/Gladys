@@ -2,6 +2,7 @@ const { promisify } = require('util');
 const { CONFIGURATION, DEFAULT } = require('./constants');
 const { SERVICE_STATUS } = require('../../../utils/constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
 const containerParams = require('../docker/eclipse-mosquitto-container.json');
 
 const sleep = promisify(setTimeout);
@@ -34,16 +35,13 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_PASSWORD_KEY, mqttPassword, this.serviceId);
 
   if (useEmbeddedBroker) {
-    const dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerParams.name] },
-    });
+    // Throws if the name is taken by a container that is not ours: it is never reconfigured
+    const container = await findManagedContainer(this.gladys.system, containerParams);
 
-    if (dockerContainers.length === 0) {
+    if (!container) {
       throw new NotFoundError(`${containerParams.name} container not found`);
     }
 
-    const [container] = dockerContainers;
     if (container.state !== 'running') {
       await this.gladys.system.restartContainer(container.id);
       // wait 5 seconds for the container to restart

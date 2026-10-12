@@ -1,4 +1,5 @@
 const logger = require('../../../utils/logger');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { DEFAULT } = require('./constants');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
@@ -17,16 +18,13 @@ async function checkForContainerUpdates(config) {
   if (config.dockerMqttVersion !== DEFAULT.DOCKER_MQTT_VERSION) {
     logger.info(`MQTT container: update #${DEFAULT.DOCKER_MQTT_VERSION} of the container required...`);
 
-    const containers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [mqttContainerDescriptor.name] },
-    });
+    // Only our own container is removed: a user container carrying the same name is left alone
+    const container = await findManagedContainer(this.gladys.system, mqttContainerDescriptor);
 
-    if (containers.length !== 0) {
+    if (container) {
       logger.debug('Removing current installed MQTT container...');
       // If container is present, we remove it
       // The init process will create it again
-      const [container] = containers;
       await this.gladys.system.removeContainer(container.id, { force: true });
     }
 
@@ -39,16 +37,12 @@ async function checkForContainerUpdates(config) {
   if (config.dockerZ2mVersion !== DEFAULT.DOCKER_Z2M_VERSION) {
     logger.info(`Z2M container: update #${DEFAULT.DOCKER_Z2M_VERSION} of the container required...`);
 
-    const containers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [z2mContainerDescriptor.name] },
-    });
+    const container = await findManagedContainer(this.gladys.system, z2mContainerDescriptor);
 
-    if (containers.length !== 0) {
+    if (container) {
       logger.debug('Removing current installed Z2M container...');
       // If container is present, we remove it
       // The init process will create it again
-      const [container] = containers;
       await this.gladys.system.removeContainer(container.id, { force: true });
     }
 

@@ -6,6 +6,7 @@ const { assert, fake } = sinon;
 
 const proxyquire = require('proxyquire').noCallThru();
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ConflictError } = require('../../../../utils/coreErrors');
 
 const { installMqttContainer } = proxyquire('../../../../services/zigbee2mqtt/lib/installMqttContainer', {});
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
@@ -14,12 +15,16 @@ const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
 
 const container = {
   id: 'docker-test',
+  name: '/gladys-z2m-mqtt',
   state: 'running',
+  labels: { 'io.gladysassistant.service': 'zigbee2mqtt' },
 };
 
 const containerStopped = {
   id: 'docker-test',
+  name: '/gladys-z2m-mqtt',
   state: 'stopped',
+  labels: { 'io.gladysassistant.service': 'zigbee2mqtt' },
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -320,5 +325,26 @@ describe('zigbee2mqtt installMqttContainer', () => {
     assert.calledOnce(gladys.system.restartContainer);
     expect(zigbee2mqttManager.mqttRunning).to.equal(false);
     expect(zigbee2mqttManager.mqttExist).to.equal(true);
+  });
+
+  it('should not adopt a user container carrying our name', async () => {
+    // PREPARE
+    const config = {};
+    gladys.system.getContainers = fake.resolves([{ id: 'user-container', name: '/gladys-z2m-mqtt', image: 'nginx' }]);
+    gladys.system.inspectContainer = fake.resolves({ Config: { Image: 'nginx:alpine' } });
+    // EXECUTE
+    let error;
+    try {
+      await zigbee2mqttManager.installMqttContainer(config);
+    } catch (e) {
+      error = e;
+    }
+    // ASSERT
+    expect(error).to.be.instanceOf(ConflictError);
+    assert.notCalled(gladys.system.pull);
+    assert.notCalled(gladys.system.createContainer);
+    assert.notCalled(gladys.system.restartContainer);
+    assert.notCalled(gladys.system.exec);
+    expect(zigbee2mqttManager.mqttExist).to.equal(false);
   });
 });

@@ -4,11 +4,14 @@ const sinon = require('sinon').createSandbox();
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ConflictError } = require('../../../../utils/coreErrors');
 const NodeRedManager = require('../../../../services/node-red/lib');
 
 const container = {
   id: 'docker-test',
+  name: '/gladys-node-red',
   state: 'running',
+  labels: { 'io.gladysassistant.service': 'node-red' },
 };
 
 const config = {
@@ -17,7 +20,9 @@ const config = {
 
 const containerStopped = {
   id: 'docker-test',
+  name: '/gladys-node-red',
   state: 'stopped',
+  labels: { 'io.gladysassistant.service': 'node-red' },
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -94,6 +99,7 @@ describe('NodeRed installContainer', () => {
         RestartPolicy: { Name: 'always' },
       },
       Image: 'nodered/node-red:3.1',
+      Labels: { 'io.gladysassistant.service': 'node-red' },
       NetworkDisabled: false,
       Tty: false,
       name: 'gladys-node-red',
@@ -213,6 +219,25 @@ describe('NodeRed installContainer', () => {
     assert.notCalled(gladys.system.createContainer);
     assert.notCalled(gladys.system.restartContainer);
 
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
+    expect(nodeRedManager.nodeRedExist).to.equal(false);
+  });
+
+  it('should not adopt a user container carrying our name', async () => {
+    gladys.system.getContainers = fake.resolves([{ id: 'user-container', name: '/gladys-node-red', image: 'nginx' }]);
+    gladys.system.inspectContainer = fake.resolves({ Config: { Image: 'nginx:alpine' } });
+
+    let error;
+    try {
+      await nodeRedManager.installContainer(config);
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(ConflictError);
+    assert.notCalled(gladys.system.pull);
+    assert.notCalled(gladys.system.createContainer);
+    assert.notCalled(gladys.system.restartContainer);
     expect(nodeRedManager.nodeRedRunning).to.equal(false);
     expect(nodeRedManager.nodeRedExist).to.equal(false);
   });

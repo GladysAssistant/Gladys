@@ -3,6 +3,7 @@ const { promisify } = require('util');
 
 const path = require('path');
 const logger = require('../../../utils/logger');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const containerDescriptor = require('../docker/gladys-matterbridge-container.json');
@@ -37,13 +38,10 @@ async function installContainer(config) {
 
   const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
 
-  let dockerContainers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [containerDescriptor.name] },
-  });
-  let [container] = dockerContainers;
+  // Throws if the name is taken by a container that is not ours: it is never adopted
+  let container = await findManagedContainer(this.gladys.system, containerDescriptor);
 
-  if (dockerContainers.length === 0) {
+  if (!container) {
     try {
       logger.info('Matterbridge: is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
@@ -82,11 +80,7 @@ async function installContainer(config) {
   await this.configureContainer(config);
 
   try {
-    dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerDescriptor.name] },
-    });
-    [container] = dockerContainers;
+    container = await findManagedContainer(this.gladys.system, containerDescriptor);
 
     // Check if we need to restart the container (container is not running)
     if (container.state !== 'running') {

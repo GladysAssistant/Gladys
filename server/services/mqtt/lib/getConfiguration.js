@@ -1,5 +1,6 @@
 const { CONFIGURATION } = require('./constants');
 const logger = require('../../../utils/logger');
+const { findContainerByName, isManagedByGladys } = require('../../../utils/dockerContainers');
 const containerDescriptor = require('../docker/eclipse-mosquitto-container.json');
 
 /**
@@ -26,13 +27,15 @@ async function getConfiguration() {
       // In case the docker socket is not available
       // It's ok, we don't crash
       networkModeValid = await this.checkDockerNetwork();
-      const dockerImages = await this.gladys.system.getContainers({
-        all: true,
-        filters: {
-          name: [containerDescriptor.name],
-        },
-      });
-      brokerContainerAvailable = dockerImages.length > 0;
+      const container = await findContainerByName(this.gladys.system, containerDescriptor.name);
+      brokerContainerAvailable =
+        container !== null && (await isManagedByGladys(this.gladys.system, container, containerDescriptor));
+      if (container && !brokerContainerAvailable) {
+        // A user broker carrying our name is not ours: it is neither reconfigured nor replaced
+        logger.warn(
+          `MQTT: container "${containerDescriptor.name}" was not created by Gladys, the embedded broker is not available`,
+        );
+      }
     } catch (e) {
       logger.debug(e);
     }
