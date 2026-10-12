@@ -52,10 +52,10 @@ const getWritableVacuumFeature = (features, type) =>
   );
 
 /**
- * @description Picks the features the robot row itself shows or controls: its state, its battery
- * level, its run mode (start / stop) and its dock button — the first of each, the first writable
- * one for a button. A duplicate, or a read-only run mode or dock, is left to the panel like any
- * other feature.
+ * @description Picks the features the robot row and the head of its panel show or control: its
+ * state, its battery level, its run mode (start / stop, on the row and in the panel) and its dock
+ * button (in the panel only) — the first of each, the first writable one for a button. A duplicate,
+ * or a read-only run mode or dock, is left to the panel rows like any other feature.
  * @param {Array} features - The features of one robot, in display order.
  * @returns {object} The features found, each one possibly undefined.
  * @example getVacuumRowFeatures(features);

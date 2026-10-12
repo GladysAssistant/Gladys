@@ -17,9 +17,10 @@ import lightStyle from '../light/style.css';
 import style from './style.css';
 
 /**
- * One row for a whole robot vacuum: its live state and battery, the start / stop and dock buttons
- * people use every day, and the panel holding everything else the widget shows for that robot —
- * clean mode, settings, maintenance — with the regular controls of each feature.
+ * One row for a whole robot vacuum: its live state and battery, the start / stop button people use
+ * every day, and the panel holding everything else the widget shows for that robot — the dock
+ * button, clean mode, settings, maintenance — with the regular controls of each feature. The row
+ * keeps two buttons, like the light row: a third one next to the name overflowed a phone-width card.
  */
 class VacuumDeviceFeature extends Component {
   state = { panelOpened: false };
@@ -40,12 +41,6 @@ class VacuumDeviceFeature extends Component {
       rowFeatures.runMode,
       isVacuumCleaning(rowFeatures) ? VACUUM_CLEANER_MODE.IDLE : VACUUM_CLEANER_MODE.CLEANING
     );
-  };
-
-  dock = event => {
-    event.stopPropagation();
-    const { dock } = getVacuumRowFeatures(this.props.entries.map(entry => entry.deviceFeature));
-    this.props.updateValue(dock, 1);
   };
 
   render(props, { panelOpened }) {
@@ -89,17 +84,6 @@ class VacuumDeviceFeature extends Component {
                   title={get(dictionary, cleaning ? 'vacuumControl.stop' : 'vacuumControl.start')}
                 >
                   <i class={cx('fe', cleaning ? 'fe-square' : 'fe-play')} />
-                </button>
-              )}
-              {rowFeatures.dock && (
-                <button
-                  type="button"
-                  class={lightStyle.openPanelButton}
-                  onClick={this.dock}
-                  aria-label={get(dictionary, 'vacuumControl.dock')}
-                  title={get(dictionary, 'vacuumControl.dock')}
-                >
-                  <i class="fe fe-home" />
                 </button>
               )}
               <button
