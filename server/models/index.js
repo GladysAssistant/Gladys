@@ -167,6 +167,17 @@ if (mainMemoryLimitMB === null) {
 }
 const duckDbBackupMemoryLimit = process.env.DUCKDB_BACKUP_MEMORY_LIMIT || defaultBackupMemoryLimit;
 
+// The main buffer pool fills up to its memory_limit on the first big scans and
+// DuckDB keeps it as a cache: it never hands that memory back on its own, so
+// the backup instance pool comes on top of a full main pool. While the export
+// runs, the main limit is lowered to this value (see duckDbRunWithReducedMemoryLimit):
+// DuckDB evicts the cached blocks down to it and gives the memory back to the
+// OS, which makes room for the export. Only done when the main limit is
+// parseable and above this value, so the limit is never raised.
+const DUCKDB_MEMORY_LIMIT_DURING_BACKUP = '512MB';
+const reduceMemoryLimitDuringBackup =
+  mainMemoryLimitMB !== null && mainMemoryLimitMB > parseMemoryLimitMB(DUCKDB_MEMORY_LIMIT_DURING_BACKUP);
+
 // An explicit DUCKDB_MEMORY_LIMIT is applied as-is: warn when it exceeds the
 // memory this process can actually use (as far as it is detectable), because
 // the OOM protection above cannot help in that case.
@@ -477,6 +488,59 @@ const duckDbCreateBackupInstance = async () => {
   return { allAsync, close };
 };
 
+/**
+ * @description Run a task with the memory limit of the main DuckDB instance lowered,
+ * then restore it. Lowering the limit evicts the cached blocks of the main buffer
+ * pool, so the memory the task needs (the backup export) does not add up to it.
+ * When the limit cannot be lowered (the blocks are pinned by running queries), the
+ * task still runs, with the full limit.
+ * @param {Function} task - Async function to run with the lowered limit.
+ * @returns {Promise<any>} Resolve with the task result.
+ * @example
+ * await duckDbRunWithReducedMemoryLimit(async () => {
+ *   const backupDb = await duckDbCreateBackupInstance();
+ *   try {
+ *     await backupDb.allAsync('EXPORT DATABASE ...');
+ *   } finally {
+ *     await backupDb.close();
+ *   }
+ * });
+ */
+const duckDbRunWithReducedMemoryLimit = async (task) => {
+  let reduced = false;
+  if (reduceMemoryLimitDuringBackup) {
+    try {
+      // A running query pins the buffer pool blocks it reads, and DuckDB refuses
+      // to lower the limit below the pinned memory. So the SET runs while both
+      // connections are idle: queued on the write connection, it then waits for
+      // the queries already queued on the read connection.
+      await ensureDuckDbInitialized();
+      await duckDbWriteQueue(() =>
+        duckDbReadQueue(() =>
+          duckDbWriteConnection.runAndReadAll(`SET memory_limit='${DUCKDB_MEMORY_LIMIT_DURING_BACKUP}'`),
+        ),
+      );
+      reduced = true;
+      logger.info(`DuckDB: memory_limit lowered from ${duckDbMemoryLimit} to ${DUCKDB_MEMORY_LIMIT_DURING_BACKUP}`);
+    } catch (e) {
+      logger.warn(`DuckDB: unable to lower memory_limit to ${DUCKDB_MEMORY_LIMIT_DURING_BACKUP}: ${e.message}`);
+    }
+  }
+  try {
+    return await task();
+  } finally {
+    if (reduced) {
+      try {
+        // Only reached with a parseable limit, which cannot contain a quote.
+        await duckDbWriteConnectionAllAsync(`SET memory_limit='${duckDbMemoryLimit}'`);
+        logger.info(`DuckDB: memory_limit restored to ${duckDbMemoryLimit}`);
+      } catch (e) {
+        logger.error(`DuckDB: unable to restore memory_limit to ${duckDbMemoryLimit}: ${e.message}`);
+      }
+    }
+  }
+};
+
 const db = {
   ...models,
   sequelize,
@@ -503,6 +567,7 @@ const db = {
   duckDbShowVersion,
   duckDbSetTimezone,
   duckDbCreateBackupInstance,
+  duckDbRunWithReducedMemoryLimit,
 };
 
 // Start opening the DuckDB database right away so it is ready as soon as possible.

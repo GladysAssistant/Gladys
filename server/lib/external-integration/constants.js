@@ -443,6 +443,10 @@ const MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY = {
 const ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
 // the refresh nudge carries no date: the costs of the last two days are recomputed
 const ENERGY_CALENDAR_REFRESH_LOOKBACK_MS = 2 * 24 * 60 * 60 * 1000;
+// POST /energy/consumption: dated consumption intervals published after the fact, the same
+// batch size as a calendar publication (contracts/host-api-endpoints.md)
+const MAX_ENERGY_CONSUMPTION_INTERVALS_PER_CALL = 2000;
+const ENERGY_CONSUMPTION_PAST_WINDOW_MS = 5 * 365 * 24 * 60 * 60 * 1000;
 // widget.get / widget.get-image typically call a third-party API: the same
 // exception to the 5s ack rule as camera.get-image and weather.get
 const WIDGET_GET_TIMEOUT_MS = 15 * 1000;
@@ -682,6 +686,8 @@ module.exports = {
   MAX_ENERGY_PRICE_PER_KWH_BY_CURRENCY,
   ENERGY_CALENDAR_REFRESH_MIN_INTERVAL_MS,
   ENERGY_CALENDAR_REFRESH_LOOKBACK_MS,
+  MAX_ENERGY_CONSUMPTION_INTERVALS_PER_CALL,
+  ENERGY_CONSUMPTION_PAST_WINDOW_MS,
   WIDGET_GET_TIMEOUT_MS,
   WIDGET_CONTENT_TTL_MIN_SECONDS,
   WIDGET_CONTENT_TTL_MAX_SECONDS,

@@ -18,6 +18,7 @@ const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/
 const { exchangesToApiMessages } = require('../message/message.getPreviousQuestionsForUser');
 const { resolveAiChatModel } = require('../../utils/aiChatModels');
 const { filterMcpToolsByCategories } = require('./gateway.classifyAiChatToolCategories');
+const { describeAiChatError } = require('./gateway.aiChat');
 
 const MAX_TOOL_CALL_ITERATIONS = 5;
 const MAX_TOOL_RESULT_CHARS = 4000;
@@ -802,9 +803,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
     return { answer: finalAnswer || '', imagesSent: imagesSentToUser.length };
   } catch (e) {
-    const requestErrorMessage = e && e.message ? e.message : e;
-    logger.warn(`[AI_CHAT] Request failed: ${requestErrorMessage}`);
-    logger.warn(e);
+    logger.warn(`[AI_CHAT] Request failed: ${describeAiChatError(e)}`);
     if (e instanceof Error402) {
       await this.message.replyByIntent(message, 'gateway.payment-required', context);
       // the voice assistant needs the signal too, on top of the chat reply

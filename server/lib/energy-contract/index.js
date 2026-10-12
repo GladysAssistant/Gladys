@@ -37,6 +37,7 @@ const { getLegacyPrices } = require('./energyPrice.project');
 const { migrateFromEnergyPrice, verifyMigratedContract } = require('./migration.fromEnergyPrice');
 const { init } = require('./contract.init');
 const { recalculate } = require('./contract.recalculate');
+const { requestMeterRecalculation } = require('./contract.requestMeterRecalculation');
 
 /**
  * @description Energy contracts manager.
@@ -61,6 +62,8 @@ const EnergyContract = function EnergyContract(event, stateManager, serviceManag
   // last price / label observed per contract id, for the price-changed scene trigger (spec 8.2)
   this.lastKnownPrices = new Map();
   this.calendarRecalculations = new Map();
+  // meter device id -> bounded recalculation state (consumption published after the fact)
+  this.meterRecalculations = new Map();
   this.catalogueCache = null;
 };
 
@@ -75,6 +78,7 @@ EnergyContract.prototype.update = update;
 EnergyContract.prototype.destroy = destroy;
 EnergyContract.prototype.requestRecalculation = requestRecalculation;
 EnergyContract.prototype.recalculate = recalculate;
+EnergyContract.prototype.requestMeterRecalculation = requestMeterRecalculation;
 EnergyContract.prototype.preview = preview;
 EnergyContract.prototype.getCurrent = getCurrent;
 EnergyContract.prototype.checkPriceChanges = checkPriceChanges;

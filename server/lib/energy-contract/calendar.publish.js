@@ -4,13 +4,12 @@ const { BadParameters, ForbiddenError, NotFoundError } = require('../../utils/co
 const { TARIFF_CALENDAR_GRANULARITIES, EVENTS } = require('../../utils/constants');
 const { DATE_REGEX, CALENDAR_SLOT_MINUTES } = require('./tariff.constants');
 const { localToUtcMs, getLocalContext } = require('./tariff.time');
+const { scheduleBoundedRecalculation, RECALCULATION_MIN_INTERVAL_MS } = require('./recalculation.schedule');
 const logger = require('../../utils/logger');
 
 const MAX_ENTRIES_PER_CALL = 2000;
 const PAST_WINDOW_MS = 5 * 365 * 24 * 60 * 60 * 1000;
 const FUTURE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-// Bound of the recalculations a calendar can trigger (capability file, section 2)
-const RECALCULATION_MIN_INTERVAL_MS = 10 * 60 * 1000;
 
 /**
  * @description Resolve the start instant of an entry: `starts_at` (ISO), or `date`
@@ -209,14 +208,7 @@ async function publishCalendarEntries(key, entries, options = {}) {
  * await requestCalendarRecalculation('tempo', new Date('2026-01-12T05:00:00Z'));
  */
 async function requestCalendarRecalculation(key, from) {
-  const state = this.calendarRecalculations.get(key) || { last_at: 0, timer: null, from: null };
-  state.from = state.from === null || from < state.from ? from : state.from;
-  this.calendarRecalculations.set(key, state);
-  const run = async () => {
-    state.timer = null;
-    state.last_at = Date.now();
-    const pendingFrom = state.from;
-    state.from = null;
+  const run = async (pendingFrom) => {
     const contracts = await db.EnergyContract.findAll({
       attributes: ['electric_meter_device_id', 'tariff', 'valid_from', 'timezone'],
     });
@@ -239,14 +231,7 @@ async function requestCalendarRecalculation(key, from) {
       calendar_key: key,
     });
   };
-  const elapsed = Date.now() - state.last_at;
-  if (elapsed >= RECALCULATION_MIN_INTERVAL_MS) {
-    await run();
-  } else if (state.timer === null) {
-    state.timer = setTimeout(() => {
-      run().catch((e) => logger.warn(`Calendar "${key}" recalculation failed: ${e.message}`));
-    }, RECALCULATION_MIN_INTERVAL_MS - elapsed);
-  }
+  await scheduleBoundedRecalculation(this.calendarRecalculations, key, from, run);
 }
 
 module.exports = {
