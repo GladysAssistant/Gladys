@@ -414,4 +414,197 @@ describe('externalIntegration.getDiscoveredDevices energy features', () => {
     expect(externalIds).to.not.include(`ext:${service.selector}:altherma:old-index_consumption`);
     expect(devices[0].features).to.have.lengthOf(3);
   });
+
+  describe('consumption the integration feeds itself', () => {
+    const buildConsumptionDevice = (
+      selector,
+      type = DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+    ) => ({
+      name: 'Hydro-Québec meter',
+      external_id: `ext:${selector}:meter`,
+      features: [
+        {
+          name: 'Consumption',
+          external_id: `ext:${selector}:meter:consumption`,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          min: 0,
+          max: 100000000000,
+          read_only: true,
+          has_feedback: false,
+          keep_history: true,
+        },
+      ],
+      params: [],
+    });
+
+    it('should derive the cost feature of a published 30-minutes consumption and attach it to the main meter', async () => {
+      energyPrice.getDefaultElectricMeterFeatureId = async () => 'main-meter-feature-id';
+      await externalIntegration.setDiscoveredDevices(service, [buildConsumptionDevice(service.selector)]);
+      const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+      expect(devices[0].features).to.have.lengthOf(2);
+      const consumption = findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION);
+      const cost = findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST);
+      expect(consumption.id).to.be.a('string');
+      expect(consumption.energy_parent_id).to.equal('main-meter-feature-id');
+      expect(cost).to.deep.include({
+        external_id: `ext:${service.selector}:meter:consumption_cost`,
+        energy_parent_id: consumption.id,
+        unit: DEVICE_FEATURE_UNITS.EURO,
+      });
+      expect(cost).to.not.have.property('selector');
+      // the published list is untouched
+      const published = externalIntegration.discoveredDevices.get(service.id)[0];
+      expect(published.features).to.have.lengthOf(1);
+      expect(published.features[0]).to.not.have.property('energy_parent_id');
+    });
+
+    it('should keep the supplier meter a root when its consumption is the main meter feature', async () => {
+      // the contract is attached to this very meter: the main meter feature is its consumption
+      energyPrice.getDefaultElectricMeterFeatureId = async () => 'consumption-in-db';
+      const publishedDevice = buildConsumptionDevice(service.selector);
+      stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+        id: 'device-id',
+        features: [{ ...publishedDevice.features[0], id: 'consumption-in-db', energy_parent_id: null }],
+      });
+      await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+      const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+      const consumption = findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION);
+      expect(consumption.id).to.equal('consumption-in-db');
+      // attached to itself, the "Update" gesture would save a circular hierarchy
+      expect(consumption).to.not.have.property('energy_parent_id');
+      expect(
+        findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST).energy_parent_id,
+      ).to.equal('consumption-in-db');
+    });
+
+    it('should derive a daily cost from a published daily consumption', async () => {
+      await externalIntegration.setDiscoveredDevices(service, [
+        buildConsumptionDevice(service.selector, DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION),
+      ]);
+      const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+      expect(devices[0].features).to.have.lengthOf(2);
+      const cost = findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST);
+      expect(cost.external_id).to.equal(`ext:${service.selector}:meter:consumption_cost`);
+    });
+
+    it('should reuse the cost feature already in DB, found by its name or by its parent link', async () => {
+      const publishedDevice = buildConsumptionDevice(service.selector);
+      const consumptionExternalId = publishedDevice.features[0].external_id;
+      const costInDb = {
+        id: 'cost-in-db',
+        name: 'Consumption (cost)',
+        external_id: `${consumptionExternalId}_cost`,
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+        unit: DEVICE_FEATURE_UNITS.EURO,
+        read_only: true,
+        has_feedback: false,
+        keep_history: true,
+        min: 0,
+        max: 100000000000,
+        energy_parent_id: 'consumption-in-db',
+      };
+      stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+        id: 'device-id',
+        features: [
+          { ...publishedDevice.features[0], id: 'consumption-in-db', energy_parent_id: 'sub-meter-feature-id' },
+          costInDb,
+        ],
+      });
+      await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+      let devices = await externalIntegration.getDiscoveredDevices(service.selector);
+      expect(devices[0].features).to.have.lengthOf(2);
+      expect(devices[0]).to.have.property('structure_changed', false);
+      expect(findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION)).to.deep.include({
+        id: 'consumption-in-db',
+        energy_parent_id: 'sub-meter-feature-id',
+      });
+      expect(findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST).id).to.equal(
+        'cost-in-db',
+      );
+      // a cost feature an integration named itself is found through its parent link and
+      // re-injected under the deterministic name, keeping its row
+      stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+        id: 'device-id',
+        features: [
+          { ...publishedDevice.features[0], id: 'consumption-in-db' },
+          { ...costInDb, external_id: `ext:${service.selector}:meter:my-cost` },
+        ],
+      });
+      devices = await externalIntegration.getDiscoveredDevices(service.selector);
+      expect(devices[0].features).to.have.lengthOf(2);
+      expect(
+        findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST),
+      ).to.deep.include({
+        id: 'cost-in-db',
+        external_id: `${consumptionExternalId}_cost`,
+      });
+    });
+
+    it('should drop the cost feature of a consumption gone from the publication', async () => {
+      const publishedDevice = buildConsumptionDevice(service.selector);
+      stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+        id: 'device-id',
+        features: [
+          {
+            id: 'cost-in-db',
+            name: 'Old (cost)',
+            external_id: `ext:${service.selector}:meter:old_cost`,
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+            unit: DEVICE_FEATURE_UNITS.EURO,
+            energy_parent_id: null,
+          },
+        ],
+      });
+      await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+      const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+      expect(devices[0].features.map((feature) => feature.external_id)).to.deep.equal([
+        `ext:${service.selector}:meter:consumption`,
+        `ext:${service.selector}:meter:consumption_cost`,
+      ]);
+      expect(devices[0]).to.have.property('structure_changed', true);
+    });
+
+    it('should drop the cost feature of a consumption republished with another duration', async () => {
+      const publishedDevice = buildConsumptionDevice(
+        service.selector,
+        DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+      );
+      const consumptionExternalId = publishedDevice.features[0].external_id;
+      stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+        id: 'device-id',
+        features: [
+          {
+            ...publishedDevice.features[0],
+            id: 'consumption-in-db',
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          },
+          {
+            id: 'cost-in-db',
+            name: 'Consumption (cost)',
+            external_id: `${consumptionExternalId}_cost`,
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+            unit: DEVICE_FEATURE_UNITS.EURO,
+            energy_parent_id: 'consumption-in-db',
+          },
+        ],
+      });
+      await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+      const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+      // one cost feature only, of the new duration, under the same deterministic name
+      const costFeatures = devices[0].features.filter((feature) => feature.external_id.endsWith('_cost'));
+      expect(costFeatures).to.have.lengthOf(1);
+      expect(costFeatures[0]).to.deep.include({
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+        external_id: `${consumptionExternalId}_cost`,
+        energy_parent_id: 'consumption-in-db',
+      });
+      expect(costFeatures[0].id).to.not.equal('cost-in-db');
+      expect(devices[0]).to.have.property('structure_changed', true);
+    });
+  });
 });

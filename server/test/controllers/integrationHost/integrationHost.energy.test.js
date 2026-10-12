@@ -2,14 +2,22 @@ const { expect } = require('chai');
 const request = require('supertest');
 const db = require('../../../models');
 const { generateIntegrationToken } = require('../../../utils/integrationToken');
-const { SERVICE_STATUS, SERVICE_TYPES } = require('../../../utils/constants');
+const {
+  SERVICE_STATUS,
+  SERVICE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../utils/constants');
 const { TEST_ENERGY_MANIFEST } = require('../../lib/external-integration/testUtils.test');
+
+const TEST_ENERGY_MANIFEST_SELECTOR = 'ext-dev-octopus-energy-demo';
 
 const seedEnergyService = async (overrides = {}) =>
   (
     await db.Service.create({
-      name: 'ext-dev-octopus-energy-demo',
-      selector: 'ext-dev-octopus-energy-demo',
+      name: TEST_ENERGY_MANIFEST_SELECTOR,
+      selector: TEST_ENERGY_MANIFEST_SELECTOR,
       version: '1.2.0',
       status: SERVICE_STATUS.RUNNING,
       type: SERVICE_TYPES.EXTERNAL,
@@ -50,6 +58,8 @@ describe('Integration host API: energy contracts', () => {
     gladys.externalIntegration.energyCalendarRefreshTimes.clear();
     gladys.energyContract.calendarRecalculations.forEach((state) => clearTimeout(state.timer));
     gladys.energyContract.calendarRecalculations.clear();
+    gladys.energyContract.meterRecalculations.forEach((state) => clearTimeout(state.timer));
+    gladys.energyContract.meterRecalculations.clear();
     await db.TariffCalendar.destroy({ where: {} });
     await db.EnergyContract.destroy({ where: {} });
   });
@@ -135,5 +145,130 @@ describe('Integration host API: energy contracts', () => {
     });
     expect(contracts[0]).to.not.have.property('electric_meter_device_id');
     await gladys.device.destroy('host-meter');
+  });
+
+  describe('POST /api/integration/v1/energy/consumption', () => {
+    const consumptionExternalId = `ext:${TEST_ENERGY_MANIFEST_SELECTOR}:meter:consumption`;
+    beforeEach(async () => {
+      // the main electric meter of the house, with the cumulative index the discovery attaches
+      // a published consumption to
+      const mainMeter = await gladys.device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Main meter',
+        external_id: 'main-meter',
+        selector: 'main-meter',
+        features: [
+          {
+            name: 'Index',
+            external_id: 'main-meter-index',
+            selector: 'main-meter-index',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            read_only: true,
+            has_feedback: false,
+            keep_history: true,
+            min: 0,
+            max: 100000000000,
+          },
+        ],
+      });
+      await gladys.device.create({
+        service_id: service.id,
+        name: 'Hydro meter',
+        external_id: `ext:${TEST_ENERGY_MANIFEST_SELECTOR}:meter`,
+        selector: 'hydro-meter',
+        features: [
+          {
+            name: 'Consumption',
+            external_id: consumptionExternalId,
+            selector: 'hydro-meter-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            read_only: true,
+            has_feedback: false,
+            keep_history: true,
+            min: 0,
+            max: 100000000000,
+            energy_parent_id: mainMeter.features[0].id,
+          },
+        ],
+      });
+    });
+    afterEach(async () => {
+      await gladys.device.destroy('hydro-meter');
+      await gladys.device.destroy('main-meter');
+    });
+
+    it('should upsert the published intervals and answer their count and the earliest change', async () => {
+      const published = await api()
+        .post('/api/integration/v1/energy/consumption')
+        .send({
+          device_feature_external_id: consumptionExternalId,
+          intervals: [
+            { starts_at: '2026-01-12T05:00:00Z', kwh: 0.42 },
+            { starts_at: '2026-01-12T05:30:00Z', kwh: 0.38 },
+          ],
+        })
+        .expect(200)
+        .then((res) => res.body);
+      expect(published).to.deep.equal({ success: true, count: 2, changed_from: '2026-01-12T05:30:00.000Z' });
+      const states = await gladys.device.getDeviceFeatureStates(
+        'hydro-meter-consumption',
+        new Date('2026-01-12T00:00:00Z'),
+        new Date('2026-01-13T00:00:00Z'),
+      );
+      expect(states.map((state) => [new Date(state.created_at).toISOString(), state.value])).to.deep.equal([
+        ['2026-01-12T05:30:00.000Z', 0.42],
+        ['2026-01-12T06:00:00.000Z', 0.38],
+      ]);
+      // a correction replaces the stored value, a republication of the rest writes nothing
+      const corrected = await api()
+        .post('/api/integration/v1/energy/consumption')
+        .send({
+          device_feature_external_id: consumptionExternalId,
+          intervals: [
+            { starts_at: '2026-01-12T05:00:00Z', kwh: 0.42 },
+            { starts_at: '2026-01-12T05:30:00Z', kwh: 0.5 },
+          ],
+        })
+        .expect(200)
+        .then((res) => res.body);
+      expect(corrected).to.deep.equal({ success: true, count: 2, changed_from: '2026-01-12T06:00:00.000Z' });
+      const unchanged = await api()
+        .post('/api/integration/v1/energy/consumption')
+        .send({
+          device_feature_external_id: consumptionExternalId,
+          intervals: [{ starts_at: '2026-01-12T05:30:00Z', kwh: 0.5 }],
+        })
+        .expect(200)
+        .then((res) => res.body);
+      expect(unchanged).to.deep.equal({ success: true, count: 1, changed_from: null });
+    });
+
+    it('should answer 400 outside the integration or on an invalid interval, 404 on a device not created', async () => {
+      await api()
+        .post('/api/integration/v1/energy/consumption')
+        .send({
+          device_feature_external_id: 'ext:other:meter',
+          intervals: [{ starts_at: '2026-01-12T05:00:00Z', kwh: 1 }],
+        })
+        .expect(400);
+      await api()
+        .post('/api/integration/v1/energy/consumption')
+        .send({
+          device_feature_external_id: `ext:${TEST_ENERGY_MANIFEST_SELECTOR}:unknown`,
+          intervals: [{ starts_at: '2026-01-12T05:00:00Z', kwh: 1 }],
+        })
+        .expect(404);
+      await api()
+        .post('/api/integration/v1/energy/consumption')
+        .send({
+          device_feature_external_id: consumptionExternalId,
+          intervals: [{ starts_at: '2026-01-12T05:15:00Z', kwh: 1 }],
+        })
+        .expect(400);
+    });
   });
 });
