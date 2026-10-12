@@ -497,13 +497,29 @@ const duckDbCreateBackupInstance = async () => {
  * @param {Function} task - Async function to run with the lowered limit.
  * @returns {Promise<any>} Resolve with the task result.
  * @example
- * await duckDbRunWithReducedMemoryLimit(() => backupDb.allAsync('EXPORT DATABASE ...'));
+ * await duckDbRunWithReducedMemoryLimit(async () => {
+ *   const backupDb = await duckDbCreateBackupInstance();
+ *   try {
+ *     await backupDb.allAsync('EXPORT DATABASE ...');
+ *   } finally {
+ *     await backupDb.close();
+ *   }
+ * });
  */
 const duckDbRunWithReducedMemoryLimit = async (task) => {
   let reduced = false;
   if (reduceMemoryLimitDuringBackup) {
     try {
-      await duckDbWriteConnectionAllAsync(`SET memory_limit='${DUCKDB_MEMORY_LIMIT_DURING_BACKUP}'`);
+      // A running query pins the buffer pool blocks it reads, and DuckDB refuses
+      // to lower the limit below the pinned memory. So the SET runs while both
+      // connections are idle: queued on the write connection, it then waits for
+      // the queries already queued on the read connection.
+      await ensureDuckDbInitialized();
+      await duckDbWriteQueue(() =>
+        duckDbReadQueue(() =>
+          duckDbWriteConnection.runAndReadAll(`SET memory_limit='${DUCKDB_MEMORY_LIMIT_DURING_BACKUP}'`),
+        ),
+      );
       reduced = true;
       logger.info(`DuckDB: memory_limit lowered from ${duckDbMemoryLimit} to ${DUCKDB_MEMORY_LIMIT_DURING_BACKUP}`);
     } catch (e) {
@@ -515,7 +531,8 @@ const duckDbRunWithReducedMemoryLimit = async (task) => {
   } finally {
     if (reduced) {
       try {
-        await duckDbWriteConnectionAllAsync(`SET memory_limit='${duckDbMemoryLimit.replace(/'/g, "''")}'`);
+        // Only reached with a parseable limit, which cannot contain a quote.
+        await duckDbWriteConnectionAllAsync(`SET memory_limit='${duckDbMemoryLimit}'`);
         logger.info(`DuckDB: memory_limit restored to ${duckDbMemoryLimit}`);
       } catch (e) {
         logger.error(`DuckDB: unable to restore memory_limit to ${duckDbMemoryLimit}: ${e.message}`);

@@ -356,6 +356,43 @@ describe('models/index', () => {
       expect(task.calledBefore(restoreCall)).to.equal(true);
     });
 
+    it('should wait for the queries running on both connections before lowering the limit', async () => {
+      const { connection, db } = loadDbWithMemoryLimit('2GB');
+      let releaseRead;
+      let releaseWrite;
+      const readResult = { getRowObjectsJS: () => [] };
+      connection.runAndReadAll.withArgs('SLOW READ').returns(
+        new Promise((resolve) => {
+          releaseRead = () => resolve(readResult);
+        }),
+      );
+      connection.runAndReadAll.withArgs('SLOW WRITE').returns(
+        new Promise((resolve) => {
+          releaseWrite = () => resolve(readResult);
+        }),
+      );
+      const flush = () =>
+        new Promise((resolve) => {
+          setImmediate(resolve);
+        });
+      const slowRead = db.duckDbReadConnectionAllAsync('SLOW READ');
+      const slowWrite = db.duckDbWriteConnectionAllAsync('SLOW WRITE');
+      const run = db.duckDbRunWithReducedMemoryLimit(sinon.stub().resolves());
+      const lowerCall = connection.runAndReadAll.withArgs(LOWER_QUERY);
+
+      await flush();
+      expect(lowerCall.called).to.equal(false);
+      releaseRead();
+      await slowRead;
+      await flush();
+      // The read connection is idle, but the write connection still runs a query.
+      expect(lowerCall.called).to.equal(false);
+      releaseWrite();
+      await slowWrite;
+      await run;
+      expect(lowerCall.calledOnce).to.equal(true);
+    });
+
     it('should restore the memory limit and rethrow when the task fails', async () => {
       const { connection, db } = loadDbWithMemoryLimit('2GB');
       const task = sinon.stub().rejects(new Error('export failed'));
