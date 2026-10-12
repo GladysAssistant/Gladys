@@ -460,6 +460,25 @@ describe('externalIntegration.getDiscoveredDevices energy features', () => {
       expect(published.features[0]).to.not.have.property('energy_parent_id');
     });
 
+    it('should keep the supplier meter a root when its consumption is the main meter feature', async () => {
+      // the contract is attached to this very meter: the main meter feature is its consumption
+      energyPrice.getDefaultElectricMeterFeatureId = async () => 'consumption-in-db';
+      const publishedDevice = buildConsumptionDevice(service.selector);
+      stateManager.setState('deviceByExternalId', publishedDevice.external_id, {
+        id: 'device-id',
+        features: [{ ...publishedDevice.features[0], id: 'consumption-in-db', energy_parent_id: null }],
+      });
+      await externalIntegration.setDiscoveredDevices(service, [publishedDevice]);
+      const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+      const consumption = findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION);
+      expect(consumption.id).to.equal('consumption-in-db');
+      // attached to itself, the "Update" gesture would save a circular hierarchy
+      expect(consumption).to.not.have.property('energy_parent_id');
+      expect(
+        findFeature(devices[0], DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST).energy_parent_id,
+      ).to.equal('consumption-in-db');
+    });
+
     it('should derive a daily cost from a published daily consumption', async () => {
       await externalIntegration.setDiscoveredDevices(service, [
         buildConsumptionDevice(service.selector, DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION),
