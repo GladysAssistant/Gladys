@@ -2,10 +2,11 @@ const cloneDeep = require('lodash.clonedeep');
 const logger = require('../../../utils/logger');
 const { generate } = require('../../../utils/password');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const { PlatformNotCompatible } = require('../../../utils/coreErrors');
+const { ConflictError, PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
 
-const { DEFAULT } = require('./constants');
+const { CONFIGURATION, DEFAULT } = require('./constants');
+const { isBrokerConfiguredByGladys } = require('./isBrokerConfiguredByGladys');
 const containerDescriptor = require('../docker/eclipse-mosquitto-container.json');
 
 /**
@@ -27,7 +28,19 @@ async function installContainer(saveConfiguration = true) {
     }
 
     // Fail early, with a clear message, if the name is taken by a container that is not ours
-    await findManagedContainer(this.gladys.system, containerDescriptor);
+    const existingContainer = await findManagedContainer(this.gladys.system, containerDescriptor);
+    if (existingContainer) {
+      // A broker Gladys never configured (no label, no stored version) is a user one as well
+      const mosquittoVersion = await this.gladys.variable.getValue(
+        CONFIGURATION.MQTT_MOSQUITTO_VERSION,
+        this.serviceId,
+      );
+      if (!isBrokerConfiguredByGladys(existingContainer, mosquittoVersion)) {
+        throw new ConflictError(
+          `Container "${containerDescriptor.name}" already exists but was not configured by Gladys: rename or remove it`,
+        );
+      }
+    }
 
     logger.info(`Pulling ${containerDescriptor.Image} image...`);
     await this.gladys.system.pull(containerDescriptor.Image);

@@ -48,5 +48,4 @@ async function getGladysImage() {
 
 module.exports = {
   getGladysImage,
-  parseImageReference,
 };

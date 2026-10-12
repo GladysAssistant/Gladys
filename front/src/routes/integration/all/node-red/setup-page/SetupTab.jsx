@@ -125,7 +125,7 @@ class SetupTab extends Component {
       error = error | get(e, 'response.status');
       // A container that is not ours carries our name: the server says which one to rename
       if (get(e, 'response.status') === 409) {
-        this.setState({ containerConflictMessage: get(e, 'response.data.message') });
+        this.setState({ containerConflictMessage: get(e, 'response.data.error') });
       }
     }
 
