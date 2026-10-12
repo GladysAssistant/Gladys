@@ -28,10 +28,13 @@ function normalizeAiChatRequestBody(body) {
   return requestBody;
 }
 
+const MAX_LOGGED_GATEWAY_ERROR_MESSAGE_LENGTH = 500;
+
 /**
  * @description Describe an AI chat request error for the logs. A request error carries the
  * whole HTTP request (authorization header with the Gladys Plus instance token, body with the
- * user messages and the home description): only its message and the gateway response are kept.
+ * user messages and the home description): only its message, its status and the error code and
+ * message of the gateway response are kept.
  * @param {Error} e - Error thrown while asking the AI.
  * @returns {string} Description of the error, safe to log.
  * @example
@@ -42,7 +45,16 @@ function describeAiChatError(e) {
   if (status === undefined) {
     return (e && (e.stack || e.message)) || String(e);
   }
-  return `${e.message} (status=${status}, response=${JSON.stringify(get(e, 'response.data'))})`;
+  const errorCode = get(e, 'response.data.error_code');
+  const errorMessage = get(e, 'response.data.error_message');
+  const details = [`status=${status}`];
+  if (errorCode !== undefined) {
+    details.push(`error_code=${errorCode}`);
+  }
+  if (errorMessage !== undefined) {
+    details.push(`error_message=${String(errorMessage).slice(0, MAX_LOGGED_GATEWAY_ERROR_MESSAGE_LENGTH)}`);
+  }
+  return `${e.message} (${details.join(', ')})`;
 }
 
 /**

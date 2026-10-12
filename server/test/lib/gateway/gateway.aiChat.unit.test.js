@@ -101,18 +101,40 @@ describe('gateway.aiChat unit', () => {
   });
 
   describe('describeAiChatError', () => {
-    it('should keep only the message and the gateway response of a request error', () => {
+    it('should keep only the message, the status and the gateway error of a request error', () => {
       const error = new Error('Request failed with status code 502');
       error.config = { headers: { authorization: 'secret-instance-token' }, data: '{"messages":[]}' };
       error.response = {
         status: 502,
-        data: { status: 502, error_code: 'BAD_GATEWAY', error_message: 'AI service returned an error' },
+        data: {
+          status: 502,
+          error_code: 'BAD_GATEWAY',
+          error_message: 'AI service returned an error',
+          details: { prompt: 'user message' },
+        },
       };
       const description = describeAiChatError(error);
       expect(description).to.equal(
-        'Request failed with status code 502 (status=502, response={"status":502,"error_code":"BAD_GATEWAY","error_message":"AI service returned an error"})',
+        'Request failed with status code 502 (status=502, error_code=BAD_GATEWAY, error_message=AI service returned an error)',
       );
       expect(description).not.to.include('secret-instance-token');
+      expect(description).not.to.include('user message');
+    });
+
+    it('should truncate a long gateway error message', () => {
+      const error = new Error('Request failed with status code 502');
+      error.response = { status: 502, data: { error_message: 'x'.repeat(1000) } };
+      expect(describeAiChatError(error)).to.equal(
+        `Request failed with status code 502 (status=502, error_message=${'x'.repeat(500)})`,
+      );
+    });
+
+    it('should only keep the status of a response without gateway error', () => {
+      const error = new Error('Request failed with status code 500');
+      const data = {};
+      data.self = data;
+      error.response = { status: 500, data };
+      expect(describeAiChatError(error)).to.equal('Request failed with status code 500 (status=500)');
     });
 
     it('should return the stack of an error without response', () => {
