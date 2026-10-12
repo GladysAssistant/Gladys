@@ -32,15 +32,87 @@
   margin: 0;
 }
 
-/* --- tiles: one wrapping row of value / gauge tiles --- */
+/* --- tiles: a grid of value / gauge tiles ---
+   The core picks the column count from the tile count (tilesCountN class)
+   and from the width of the tile area (a container query on .tilesBox), so a
+   wrapped tile keeps the width of the tile above it instead of stretching. */
+.tilesBox {
+  container-type: inline-size;
+  container-name: widget-tiles;
+}
+
 .tiles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(var(--tile-columns, 3), minmax(0, 1fr));
+  gap: var(--tile-gap, 8px);
+}
+
+.tilesCount1 {
+  --tile-columns: 1;
+}
+.tilesCount2 {
+  --tile-columns: 2;
+}
+.tilesCount3 {
+  --tile-columns: 3;
+}
+.tilesCount4 {
+  --tile-columns: 4;
+}
+.tilesCount5,
+.tilesCount6 {
+  --tile-columns: 3;
+}
+
+/* 4 tiles: 4 columns need 4 x 96px + gaps, otherwise 2 x 2 */
+@container widget-tiles (max-width: 407px) {
+  .tilesCount4 {
+    --tile-columns: 2;
+  }
+}
+
+/* 5 or 6 tiles: rows of 3 need 3 x 96px + gaps, otherwise rows of 2 */
+@container widget-tiles (max-width: 303px) {
+  .tilesCount5,
+  .tilesCount6 {
+    --tile-columns: 2;
+  }
+}
+
+/* A tile narrower than 96px gets a tighter padding, value font and gauge:
+   3 tiles (they stay on one row) below 304px, 2 columns below 200px (the
+   narrowest dashboard columns) */
+@container widget-tiles (max-width: 303px) {
+  .tilesCount3 {
+    --tile-padding: 8px 4px;
+    --tile-value-size: 1.0625rem;
+    --gauge-width: 64px;
+  }
+}
+
+@container widget-tiles (max-width: 199px) {
+  .tilesCount2,
+  .tilesCount4,
+  .tilesCount5,
+  .tilesCount6 {
+    --tile-padding: 8px 4px;
+    --tile-value-size: 1.0625rem;
+    --gauge-width: 64px;
+  }
+}
+
+/* 3 tiles narrower than 72px (down to the ~180px tile area of a 14rem
+   dashboard column): tighter still, so a value of 6 characters with its unit
+   ("1 250 W", "1,589 €") is not cut */
+@container widget-tiles (max-width: 231px) {
+  .tilesCount3 {
+    --tile-gap: 6px;
+    --tile-padding: 6px 2px;
+    --tile-value-size: 0.875rem;
+  }
 }
 
 .tile {
-  flex: 1 1 96px;
   min-width: 0;
   max-width: 100%;
   display: flex;
@@ -48,7 +120,7 @@
   align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 10px 8px;
+  padding: var(--tile-padding, 10px 8px);
   border-radius: 12px;
   background-color: rgba(0, 40, 100, 0.04);
   border: 1px solid rgba(0, 40, 100, 0.08);
@@ -62,7 +134,7 @@
 }
 
 .tileValue {
-  font-size: 1.25rem;
+  font-size: var(--tile-value-size, 1.25rem);
   font-weight: 600;
   line-height: 1.2;
   max-width: 100%;
@@ -108,11 +180,23 @@
   color: #667081;
 }
 
-/* --- gauge tile: a 270° SVG arc, value in the middle --- */
+/* --- gauge tile: a 270° SVG arc, value in the middle ---
+   The SVG keeps its aspect ratio when it shrinks to a narrow tile, and the
+   value is placed on the arc in percent of the SVG height, so it follows the
+   arc at any size. The box spans the tile so a long value is not cut to the
+   arc width. */
+.gaugeBox {
+  position: relative;
+  align-self: stretch;
+}
+
 .gauge {
-  width: 88px;
-  height: 72px;
+  width: var(--gauge-width, 88px);
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 88 / 66;
   display: block;
+  margin: 0 auto;
 }
 
 .gaugeTrack {
@@ -130,8 +214,14 @@
   transition: stroke-dasharray 0.4s ease;
 }
 
+/* centered on y = 50 of the viewBox (which ends at the round caps of the
+   arc, y = 66), between the two arc ends */
 .gaugeValue {
-  margin-top: -34px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 75.75%;
+  transform: translateY(-50%);
 }
 
 /* --- status list --- */
