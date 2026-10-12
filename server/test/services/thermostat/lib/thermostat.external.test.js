@@ -9,6 +9,7 @@ const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   THERMOSTAT_MODE,
+  AC_MODE,
 } = require('../../../../utils/constants');
 const { getCurrentDayAndMinutes } = require('../../../../utils/thermostatSchedule');
 
@@ -394,6 +395,53 @@ describe('thermostat.regulateDevice - external', () => {
 
       expect(gladys.device.setValue.firstCall.args[2]).to.equal(21);
     });
+
+    // An open-plan salon and kitchen are heated as one: the kitchen door open is
+    // enough to stop the heating, whatever the salon's window says (A.1.1).
+    it('should stop the thermostat when any of several windows is open', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: {
+          'netatmo-setpoint': targetFeature(),
+          'salon-window': { selector: 'salon-window', last_value: 1 },
+          'kitchen-door': { selector: 'kitchen-door', last_value: 0 },
+        },
+      });
+
+      await regulate(mod, gladys, withWindow({ THERMOSTAT_WINDOW_FEATURE: '["salon-window","kitchen-door"]' }));
+
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(7);
+    });
+
+    it('should regulate normally when all the windows are closed', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: {
+          'netatmo-setpoint': targetFeature(),
+          'salon-window': { selector: 'salon-window', last_value: 1 },
+          'kitchen-door': { selector: 'kitchen-door', last_value: 1 },
+        },
+      });
+
+      await regulate(mod, gladys, withWindow({ THERMOSTAT_WINDOW_FEATURE: '["salon-window","kitchen-door"]' }));
+
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(21);
+    });
+
+    // A sensor with a flat battery, or one whose read fails, is not an open window:
+    // taking it as one would stop the heating for good.
+    it('should not take a sensor it cannot read for an open window', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: { 'netatmo-setpoint': targetFeature() } });
+      const { get } = gladys.device;
+      gladys.device.get = fake((query) =>
+        query && query.device_feature_selectors === 'broken-window' ? Promise.reject(new Error('db')) : get(query),
+      );
+
+      await regulate(mod, gladys, withWindow({ THERMOSTAT_WINDOW_FEATURE: '["broken-window","missing-window"]' }));
+
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(21);
+    });
   });
 
   describe('manual hold', () => {
@@ -571,6 +619,137 @@ describe('thermostat.regulateDevice - external', () => {
       gladys.device.setValue = fake.rejects(new Error('cloud down'));
 
       await regulate(mod, gladys, withMode());
+    });
+  });
+
+  // A heat pump publishes its setpoint, its mode and its power in the
+  // air-conditioning category: its mode speaks AC_MODE and has no off, and its
+  // power is what stops it (A.0.3).
+  describe('air conditioner', () => {
+    const acDevice = (overrides = {}) =>
+      externalDevice({
+        THERMOSTAT_TARGET_FEATURE: 'ac-setpoint',
+        THERMOSTAT_MODE_FEATURE: 'ac-mode',
+        THERMOSTAT_POWER_FEATURE: 'ac-power',
+        ...overrides,
+      });
+    const acFeatures = ({ mode = AC_MODE.HEATING, power = 1, setpoint = 18 } = {}) => ({
+      'ac-setpoint': {
+        selector: 'ac-setpoint',
+        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+        min: 16,
+        max: 31,
+        last_value: setpoint,
+      },
+      'ac-mode': {
+        selector: 'ac-mode',
+        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+        min: 0,
+        max: 4,
+        last_value: mode,
+      },
+      'ac-power': {
+        selector: 'ac-power',
+        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
+        last_value: power,
+      },
+    });
+
+    it('should power the unit on, put it in heating, then write the setpoint', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: acFeatures({ mode: AC_MODE.COOLING, power: 0 }) });
+
+      await regulate(mod, gladys, acDevice());
+
+      const writes = gladys.device.setValue.getCalls().map((call) => [call.args[1].selector, call.args[2]]);
+      // AC_MODE.HEATING is 2, where THERMOSTAT_MODE.HEATING is 1: written as 1, the
+      // unit would be put in cooling.
+      expect(writes).to.deep.equal([
+        ['ac-power', 1],
+        ['ac-mode', AC_MODE.HEATING],
+        ['ac-setpoint', 21],
+      ]);
+    });
+
+    it('should translate the cooling mode', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: acFeatures({ mode: AC_MODE.HEATING }) });
+
+      await regulate(mod, gladys, acDevice({ THERMOSTAT_MODE: 'cooling' }));
+
+      expect(writtenOn(gladys, 'ac-mode')).to.equal(AC_MODE.COOLING);
+    });
+
+    it('should leave a unit already running in the right mode alone', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: acFeatures({ setpoint: 21 }) });
+
+      await regulate(mod, gladys, acDevice());
+
+      assert.notCalled(gladys.device.setValue);
+    });
+
+    // AC_MODE has no off, and 0 is AUTO: writing THERMOSTAT_MODE.OFF there would
+    // start the unit. The power is what stops it.
+    it('should stop the unit through its power, never through its mode', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: acFeatures() });
+
+      await regulate(mod, gladys, acDevice());
+
+      expect(writtenOn(gladys, 'ac-mode')).to.equal(undefined);
+      expect(writtenOn(gladys, 'ac-power')).to.equal(0);
+      // The frost setpoint, clamped to the unit's own minimum.
+      expect(writtenOn(gladys, 'ac-setpoint')).to.equal(16);
+    });
+
+    it('should power the unit off when a window opens', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({
+        features: { ...acFeatures(), 'window-sensor': { selector: 'window-sensor', last_value: 0 } },
+      });
+
+      await regulate(mod, gladys, acDevice({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }));
+
+      expect(writtenOn(gladys, 'ac-power')).to.equal(0);
+    });
+
+    it('should power the unit back on for a manual hold', async () => {
+      const mod = load(fullDaySchedule('comfort'));
+      const gladys = buildGladys({ features: acFeatures({ power: 0 }) });
+
+      await regulate(
+        mod,
+        gladys,
+        heldExternalDevice(23, {
+          THERMOSTAT_TARGET_FEATURE: 'ac-setpoint',
+          THERMOSTAT_MODE_FEATURE: 'ac-mode',
+          THERMOSTAT_POWER_FEATURE: 'ac-power',
+        }),
+      );
+
+      expect(writtenOn(gladys, 'ac-power')).to.equal(1);
+      expect(writtenOn(gladys, 'ac-setpoint')).to.equal(23);
+    });
+
+    // The power is optional and not tied to the category: any external
+    // thermostat with a power switch is stopped by it.
+    it('should stop a thermostat through a power switch alone', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({
+        features: {
+          'netatmo-setpoint': targetFeature(),
+          'boiler-power': { selector: 'boiler-power', last_value: 1 },
+        },
+      });
+
+      await regulate(mod, gladys, externalDevice({ THERMOSTAT_POWER_FEATURE: 'boiler-power' }));
+
+      const order = gladys.device.setValue.getCalls().map((call) => call.args[1].selector);
+      expect(order).to.deep.equal(['boiler-power', 'netatmo-setpoint']);
     });
   });
 });
