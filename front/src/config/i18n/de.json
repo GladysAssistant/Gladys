@@ -350,6 +350,8 @@
     "editDashboardSavedButton": "Gesichert",
     "editDashboardDoneButton": "Fertig",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
+    "gatewayRecoveryCodesMissing": "Dein Gladys Plus Konto hat keine Wiederherstellungscodes: Wenn du den Zugriff auf deine Zwei-Faktor-App verlierst, kannst du dich nicht mehr anmelden. Erzeuge sie und bewahre sie an einem sicheren Ort auf.",
+    "gatewayRecoveryCodesMissingButton": "Meine Wiederherstellungscodes erhalten",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Sichtbarkeit",
     "editDashboardVisibilityDescription": "Öffentliche Dashboards sind für alle Mitglieder der Gladys-Installation sichtbar.",

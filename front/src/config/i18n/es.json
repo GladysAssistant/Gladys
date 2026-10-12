@@ -350,6 +350,8 @@
     "editDashboardSavedButton": "Guardado",
     "editDashboardDoneButton": "Listo",
     "gatewayInstanceNotFoundError": "Su instancia de Gladys no está conectada a Gladys Gateway",
+    "gatewayRecoveryCodesMissing": "Su cuenta de Gladys Plus no tiene códigos de recuperación: si pierde el acceso a su aplicación de doble factor, ya no podrá iniciar sesión. Genérelos y guárdelos en un lugar seguro.",
+    "gatewayRecoveryCodesMissingButton": "Obtener mis códigos de recuperación",
     "editDashboardNameLabel": "Nombre",
     "editDashboardVisibility": "Visibilidad",
     "editDashboardVisibilityDescription": "Los paneles públicos serán visibles para todos los miembros de la instalación de Gladys.",
