@@ -74,16 +74,22 @@ export const getVacuumRowFeatures = features => ({
 
 /**
  * @description Tells if a robot is cleaning, so its row offers to stop it rather than to start it.
- * The run mode says what was asked, the state what the robot does: either one is enough.
+ * The run mode says what was asked, the state what the robot does: either one is enough — except
+ * for a paused robot. Matter (and the Dreame robots) keep the run mode at `cleaning` while the state
+ * is `paused`: such a robot is offered start, which resumes it, not stop, which would cancel its job.
  * @param {object} rowFeatures - The result of getVacuumRowFeatures.
  * @returns {boolean} True while the robot cleans.
  * @example isVacuumCleaning(getVacuumRowFeatures(features));
  */
-export const isVacuumCleaning = ({ state, runMode }) =>
-  Boolean(
+export const isVacuumCleaning = ({ state, runMode }) => {
+  if (state && state.last_value === VACUUM_CLEANER_STATE.PAUSED) {
+    return false;
+  }
+  return Boolean(
     (runMode && runMode.last_value === VACUUM_CLEANER_MODE.CLEANING) ||
       (state && state.last_value === VACUUM_CLEANER_STATE.RUNNING)
   );
+};
 
 /**
  * @description Gives the color of the state icon of a robot, if its state calls for one.
