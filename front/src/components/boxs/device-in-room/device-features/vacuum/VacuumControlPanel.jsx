@@ -4,14 +4,15 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
 
-import { VACUUM_CLEANER_MODE } from '../../../../../../../server/utils/constants';
 import DeviceRow from '../../DeviceRow';
 import {
+  canVacuumMap,
   getVacuumName,
   getVacuumPanelLabel,
   getVacuumRowFeatures,
   getVacuumStateColor,
   getVacuumStateText,
+  getVacuumToggleMode,
   isVacuumCleaning
 } from './vacuumFeatures';
 // The sheet is the one of the light panel: every panel of the devices widget opens, sits and closes
@@ -63,10 +64,7 @@ class VacuumControlPanel extends Component {
 
   toggleCleaning = () => {
     const rowFeatures = this.rowFeatures();
-    this.props.updateValue(
-      rowFeatures.runMode,
-      isVacuumCleaning(rowFeatures) ? VACUUM_CLEANER_MODE.IDLE : VACUUM_CLEANER_MODE.CLEANING
-    );
+    this.props.updateValue(rowFeatures.runMode, getVacuumToggleMode(rowFeatures));
   };
 
   dock = () => this.props.updateValue(this.rowFeatures().dock, 1);
@@ -81,8 +79,11 @@ class VacuumControlPanel extends Component {
     const stateColor = getVacuumStateColor(rowFeatures.state);
     const { battery } = rowFeatures;
     const hasBattery = battery && Number.isFinite(battery.last_value);
-    // What the head of the panel already shows is not repeated below it.
-    const shownAbove = [rowFeatures.state, rowFeatures.runMode, rowFeatures.dock, battery].filter(Boolean);
+    // What the head of the panel already shows is not repeated below it — except a run mode that
+    // can start a mapping pass, which the start button never does from an idle robot: its select
+    // stays below the buttons.
+    const runModeAbove = canVacuumMap(rowFeatures.runMode) ? undefined : rowFeatures.runMode;
+    const shownAbove = [rowFeatures.state, runModeAbove, rowFeatures.dock, battery].filter(Boolean);
     const otherEntries = entries.filter(entry => !shownAbove.includes(entry.deviceFeature));
 
     // The panel is rendered on <body>: the widget cards carry backdrop filters, which would turn a

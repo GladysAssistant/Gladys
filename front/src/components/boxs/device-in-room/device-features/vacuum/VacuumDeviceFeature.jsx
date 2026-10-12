@@ -2,12 +2,12 @@ import { Component, Fragment } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
 
-import { VACUUM_CLEANER_MODE } from '../../../../../../../server/utils/constants';
 import {
   getVacuumName,
   getVacuumRowFeatures,
   getVacuumStateColor,
   getVacuumStateText,
+  getVacuumToggleMode,
   isVacuumCleaning
 } from './vacuumFeatures';
 import VacuumControlPanel from './VacuumControlPanel';
@@ -37,10 +37,7 @@ class VacuumDeviceFeature extends Component {
   toggleCleaning = event => {
     event.stopPropagation();
     const rowFeatures = getVacuumRowFeatures(this.props.entries.map(entry => entry.deviceFeature));
-    this.props.updateValue(
-      rowFeatures.runMode,
-      isVacuumCleaning(rowFeatures) ? VACUUM_CLEANER_MODE.IDLE : VACUUM_CLEANER_MODE.CLEANING
-    );
+    this.props.updateValue(rowFeatures.runMode, getVacuumToggleMode(rowFeatures));
   };
 
   render(props, { panelOpened }) {

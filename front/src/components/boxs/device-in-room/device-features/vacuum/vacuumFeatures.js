@@ -55,7 +55,8 @@ const getWritableVacuumFeature = (features, type) =>
  * @description Picks the features the robot row and the head of its panel show or control: its
  * state, its battery level, its run mode (start / stop, on the row and in the panel) and its dock
  * button (in the panel only) — the first of each, the first writable one for a button. A duplicate,
- * or a read-only run mode or dock, is left to the panel rows like any other feature.
+ * or a read-only run mode or dock, is left to the panel rows like any other feature; a read-only run
+ * mode still gives the state in words (`statusRunMode`) when the widget shows no state feature.
  * @param {Array} features - The features of one robot, in display order.
  * @returns {object} The features found, each one possibly undefined.
  * @example getVacuumRowFeatures(features);
@@ -67,18 +68,27 @@ export const getVacuumRowFeatures = features => ({
     DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE
   ),
   runMode: getWritableVacuumFeature(features, DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE),
+  statusRunMode: getVacuumFeature(
+    features,
+    DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+    DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE
+  ),
   dock: getWritableVacuumFeature(features, DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK),
   // The charge level only: a battery category also carries the binary "charging" feature.
   battery: getVacuumFeature(features, DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_TYPES.BATTERY.INTEGER)
 });
 
+// The run modes of a robot at work: a mapping pass is a job too, which stop ends.
+const ACTIVE_MODES = [VACUUM_CLEANER_MODE.CLEANING, VACUUM_CLEANER_MODE.MAPPING];
+
 /**
- * @description Tells if a robot is cleaning, so its row offers to stop it rather than to start it.
- * The run mode says what was asked, the state what the robot does: either one is enough — except
- * for a paused robot. Matter (and the Dreame robots) keep the run mode at `cleaning` while the state
- * is `paused`: such a robot is offered start, which resumes it, not stop, which would cancel its job.
+ * @description Tells if a robot is at work (cleaning or mapping), so its row offers to stop it
+ * rather than to start it. The run mode says what was asked, the state what the robot does: either
+ * one is enough — except for a paused robot. Matter (and the Dreame robots) keep the run mode at
+ * `cleaning` (or `mapping`) while the state is `paused`: such a robot is offered start, which
+ * resumes it, not stop, which would cancel its job.
  * @param {object} rowFeatures - The result of getVacuumRowFeatures.
- * @returns {boolean} True while the robot cleans.
+ * @returns {boolean} True while the robot works.
  * @example isVacuumCleaning(getVacuumRowFeatures(features));
  */
 export const isVacuumCleaning = ({ state, runMode }) => {
@@ -86,8 +96,45 @@ export const isVacuumCleaning = ({ state, runMode }) => {
     return false;
   }
   return Boolean(
-    (runMode && runMode.last_value === VACUUM_CLEANER_MODE.CLEANING) ||
+    (runMode && ACTIVE_MODES.includes(runMode.last_value)) ||
       (state && state.last_value === VACUUM_CLEANER_STATE.RUNNING)
+  );
+};
+
+/**
+ * @description Gives the run mode the start / stop button writes: `idle` to stop a robot at work;
+ * to start one, `cleaning` — or `mapping` for a robot paused during a mapping pass, so a pause then
+ * start resumes the job it had rather than turning it into a clean.
+ * @param {object} rowFeatures - The result of getVacuumRowFeatures.
+ * @returns {number} The run mode to write.
+ * @example getVacuumToggleMode(getVacuumRowFeatures(features));
+ */
+export const getVacuumToggleMode = rowFeatures => {
+  if (isVacuumCleaning(rowFeatures)) {
+    return VACUUM_CLEANER_MODE.IDLE;
+  }
+  const { runMode } = rowFeatures;
+  return runMode && runMode.last_value === VACUUM_CLEANER_MODE.MAPPING
+    ? VACUUM_CLEANER_MODE.MAPPING
+    : VACUUM_CLEANER_MODE.CLEANING;
+};
+
+/**
+ * @description Tells if a run mode offers more than start / stop — a mapping pass, which the
+ * button never starts from an idle robot. The panel then keeps its regular select below the
+ * buttons. A run mode without supported options takes the whole catalog, mapping included.
+ * @param {object} runMode - The run mode feature of the robot.
+ * @returns {boolean} True when the run mode can start a mapping pass.
+ * @example canVacuumMap(runMode);
+ */
+export const canVacuumMap = runMode => {
+  if (!runMode) {
+    return false;
+  }
+  const supportedOptions = Array.isArray(runMode.supported_options) ? runMode.supported_options : [];
+  return (
+    supportedOptions.length === 0 ||
+    supportedOptions.some(option => Number(option.value) === VACUUM_CLEANER_MODE.MAPPING)
   );
 };
 
@@ -101,14 +148,14 @@ export const getVacuumStateColor = stateFeature => (stateFeature ? STATE_COLORS[
 
 /**
  * @description Gives the state of a robot in words, from the translated values of its state
- * feature — or of its run mode when no state feature was picked in the widget.
+ * feature — or of its run mode, writable or not, when no state feature was picked in the widget.
  * @param {object} dictionary - The i18n dictionary.
  * @param {object} rowFeatures - The result of getVacuumRowFeatures.
  * @returns {string} The state, or undefined when the widget shows neither feature.
  * @example getVacuumStateText(dictionary, getVacuumRowFeatures(features));
  */
-export const getVacuumStateText = (dictionary, { state, runMode }) => {
-  const feature = state || runMode;
+export const getVacuumStateText = (dictionary, { state, statusRunMode }) => {
+  const feature = state || statusRunMode;
   if (!feature || feature.last_value === null || feature.last_value === undefined) {
     return undefined;
   }
