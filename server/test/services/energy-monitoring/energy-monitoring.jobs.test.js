@@ -82,12 +82,22 @@ describe('EnergyMonitoring: contract jobs', () => {
     const [from, jobId, options] = energyMonitoring.calculateCostFrom.firstCall.args;
     expect(from.toISOString()).to.equal('2026-01-12T00:00:00.000Z');
     expect(jobId).to.equal('job-1');
-    expect(options).to.deep.equal({ electricMeterDeviceIds: [METER_DEVICE_ID] });
+    expect(options).to.deep.equal({ electricMeterDeviceIds: [METER_DEVICE_ID], deviceIds: undefined });
     // the handler is registered on the event manager (through the job wrapper)
     const listeners = event.listeners(EVENTS.ENERGY_CONTRACT.RECALCULATE);
     expect(listeners).to.have.lengthOf(1);
     await listeners[0]({ from: new Date(), electric_meter_device_ids: [] });
     expect(energyMonitoring.calculateCostFrom.callCount).to.equal(2);
+  });
+
+  it('should restrict the recalculation to the devices attached to a meter', async () => {
+    await energyMonitoring.init();
+    await energyMonitoring.recalculateForContracts(
+      { from: '2026-01-12T00:00:00.000Z', electric_meter_device_ids: [METER_DEVICE_ID], device_ids: ['plug-id'] },
+      'job-2',
+    );
+    const [, , options] = energyMonitoring.calculateCostFrom.firstCall.args;
+    expect(options).to.deep.equal({ electricMeterDeviceIds: [METER_DEVICE_ID], deviceIds: ['plug-id'] });
   });
 
   it('should schedule the billing period job and the catch-up in the 30-minute job', async () => {

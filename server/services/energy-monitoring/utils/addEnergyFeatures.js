@@ -3,6 +3,11 @@ const uuid = require('uuid');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { ENERGY_INDEX_FEATURE_TYPES } = require('./constants');
 
+// The deterministic naming of the features derived from a source feature: `<index>_consumption`
+// and `<index>_cost` for an index, `<consumption>_cost` for a consumption fed by a service.
+const DERIVED_CONSUMPTION_SUFFIX = '_consumption';
+const DERIVED_COST_SUFFIX = '_cost';
+
 const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
   const featuresToAdd = [];
   const indexFeatures = device.features.filter(
@@ -21,7 +26,7 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
       indexFeature.energy_parent_id = defaultElectricMeterDeviceFeatureId;
     }
 
-    const consumptionFeatureExternalId = `${indexFeature.external_id}_consumption`;
+    const consumptionFeatureExternalId = `${indexFeature.external_id}${DERIVED_CONSUMPTION_SUFFIX}`;
     const consumptionFeature = device.features.find(
       (f) =>
         f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
@@ -46,13 +51,13 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
         max: 100000000000,
         external_id: consumptionFeatureExternalId,
         name: `${indexFeature.name} (consumption)`,
-        selector: `${indexFeature.selector}_consumption`,
+        selector: `${indexFeature.selector}${DERIVED_CONSUMPTION_SUFFIX}`,
       });
     } else {
       consumptionFeatureId = consumptionFeature.id;
     }
 
-    const costFeatureExternalId = `${indexFeature.external_id}_cost`;
+    const costFeatureExternalId = `${indexFeature.external_id}${DERIVED_COST_SUFFIX}`;
     const costFeature = device.features.find(
       (f) =>
         f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
@@ -74,7 +79,7 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
         max: 100000000000,
         external_id: costFeatureExternalId,
         name: `${indexFeature.name} (cost)`,
-        selector: `${indexFeature.selector}_cost`,
+        selector: `${indexFeature.selector}${DERIVED_COST_SUFFIX}`,
       });
     }
   });
@@ -122,7 +127,9 @@ const addConsumptionCostFeatures = (device, defaultElectricMeterDeviceFeatureId)
     (f) => ENERGY_INDEX_FEATURE_TYPES[f.category] && ENERGY_INDEX_FEATURE_TYPES[f.category].includes(f.type),
   );
   const indexFeatureIds = new Set(indexFeatures.map((f) => f.id));
-  const indexConsumptionExternalIds = new Set(indexFeatures.map((f) => `${f.external_id}_consumption`));
+  const indexConsumptionExternalIds = new Set(
+    indexFeatures.map((f) => `${f.external_id}${DERIVED_CONSUMPTION_SUFFIX}`),
+  );
   const featuresToAdd = [];
   device.features.filter(isConsumptionFeature).forEach((consumptionFeature) => {
     // a consumption hanging off an index of the same device, or carrying the name
@@ -144,7 +151,7 @@ const addConsumptionCostFeatures = (device, defaultElectricMeterDeviceFeatureId)
       consumptionFeature.energy_parent_id = defaultElectricMeterDeviceFeatureId;
     }
     const costType = CONSUMPTION_COST_TYPES[consumptionFeature.type];
-    const costFeatureExternalId = `${consumptionFeature.external_id}_cost`;
+    const costFeatureExternalId = `${consumptionFeature.external_id}${DERIVED_COST_SUFFIX}`;
     const existingCostFeature = device.features.find(
       (f) =>
         f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
@@ -167,7 +174,7 @@ const addConsumptionCostFeatures = (device, defaultElectricMeterDeviceFeatureId)
       max: 100000000000,
       external_id: costFeatureExternalId,
       name: `${consumptionFeature.name} (cost)`,
-      ...(consumptionFeature.selector ? { selector: `${consumptionFeature.selector}_cost` } : {}),
+      ...(consumptionFeature.selector ? { selector: `${consumptionFeature.selector}${DERIVED_COST_SUFFIX}` } : {}),
     });
   });
 
@@ -181,4 +188,6 @@ module.exports = {
   addConsumptionCostFeatures,
   isConsumptionFeature,
   CONSUMPTION_COST_TYPES,
+  DERIVED_CONSUMPTION_SUFFIX,
+  DERIVED_COST_SUFFIX,
 };

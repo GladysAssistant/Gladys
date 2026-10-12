@@ -4,6 +4,7 @@ const db = require('../../models');
 const { EVENTS } = require('../../utils/constants');
 const { buildUniqueSelector } = require('../../utils/addSelector');
 const { resolveEnergyParentId } = require('../../utils/resolveEnergyParentId');
+const { enforceEnergyHierarchy } = require('../../utils/enforceEnergyHierarchy');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 const logger = require('../../utils/logger');
 const { syncFeatureSupportedOptions } = require('./device.syncFeatureSupportedOptions');
@@ -262,6 +263,10 @@ async function create(device) {
       );
       savedFeature.energy_parent_id = validParentId;
     });
+
+    // whatever the integration sent: no cycle, an electric meter stays a root
+    // (docs/specs/energy-hierarchy.md, section C.1)
+    await enforceEnergyHierarchy(deviceToReturn.id, newFeatures, { transaction });
 
     deviceToReturn.features = await Promise.map(newFeatures, async (savedFeature) => {
       const payloadFeature = matchFeatureInList(savedFeature, features);

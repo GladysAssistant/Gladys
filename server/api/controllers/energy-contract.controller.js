@@ -147,6 +147,23 @@ module.exports = function EnergyContractController(gladys) {
     res.json(entries);
   }
 
+  /**
+   * @api {patch} /api/v1/device/:device_selector/electric_meter setDeviceElectricMeter
+   * @apiName setDeviceElectricMeter
+   * @apiGroup EnergyContract
+   * @apiDescription Attach a device to an electric meter (docs/specs/energy-hierarchy.md, D.1):
+   * 404 on an unknown device or meter, 400 when the target has no consumption contract, is the
+   * device itself, or when the device is a meter itself or has no energy feature.
+   * @apiParam {string} electric_meter_device_id The meter device id.
+   */
+  async function setDeviceElectricMeter(req, res) {
+    const device = await gladys.energyContract.setDeviceElectricMeter(
+      req.params.device_selector,
+      req.body.electric_meter_device_id,
+    );
+    res.json(device);
+  }
+
   return Object.freeze({
     get: asyncMiddleware(get),
     create: asyncMiddleware(create),
@@ -160,5 +177,6 @@ module.exports = function EnergyContractController(gladys) {
     getBySelector: asyncMiddleware(getBySelector),
     getCalendars: asyncMiddleware(getCalendars),
     getCalendarEntries: asyncMiddleware(getCalendarEntries),
+    setDeviceElectricMeter: asyncMiddleware(setDeviceElectricMeter),
   });
 };

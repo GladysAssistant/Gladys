@@ -12,6 +12,7 @@ const { getCurrent, clearCurrentPriceCache } = require('./contract.getCurrent');
 const { checkPriceChanges } = require('./contract.checkPriceChanges');
 const { priceContractIntervals, getCompiledTariff } = require('./contract.price');
 const { getDefaultElectricMeterFeatureId } = require('./contract.getDefaultElectricMeterFeatureId');
+const { getMeterRootFeatureId, detachElectricMeter, setDeviceElectricMeter, repairHierarchy } = require('./hierarchy');
 const {
   getMeterConsumptionFeature,
   getMeterPowerFeature,
@@ -84,6 +85,10 @@ EnergyContract.prototype.checkPriceChanges = checkPriceChanges;
 EnergyContract.prototype.priceContractIntervals = priceContractIntervals;
 EnergyContract.prototype.getCompiledTariff = getCompiledTariff;
 EnergyContract.prototype.getDefaultElectricMeterFeatureId = getDefaultElectricMeterFeatureId;
+EnergyContract.prototype.getMeterRootFeatureId = getMeterRootFeatureId;
+EnergyContract.prototype.detachElectricMeter = detachElectricMeter;
+EnergyContract.prototype.setDeviceElectricMeter = setDeviceElectricMeter;
+EnergyContract.prototype.repairHierarchy = repairHierarchy;
 EnergyContract.prototype.getMeterConsumptionFeature = getMeterConsumptionFeature;
 EnergyContract.prototype.getMeterIntervals = getMeterIntervals;
 EnergyContract.prototype.getMeterPowerFeature = getMeterPowerFeature;

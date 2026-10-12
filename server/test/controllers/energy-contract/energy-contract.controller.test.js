@@ -171,3 +171,69 @@ describe('energy_contract API', () => {
     await authenticatedRequest.get('/api/v1/energy_calendar/nope').expect(404);
   });
 });
+
+describe('PATCH /api/v1/device/:device_selector/electric_meter', () => {
+  let gladys;
+  beforeEach(async () => {
+    gladys = global.TEST_GLADYS_INSTANCE;
+    const saveDevice = (name, type) =>
+      gladys.device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name,
+        external_id: name,
+        selector: name,
+        features: [
+          {
+            external_id: `${name}-energy`,
+            selector: `${name}-energy`,
+            name: 'Energy',
+            read_only: true,
+            has_feedback: false,
+            min: 0,
+            max: 100000,
+            category: 'energy-sensor',
+            type,
+          },
+        ],
+      });
+    await saveDevice('hierarchy-meter', 'index');
+    await saveDevice('hierarchy-plug', 'thirty-minutes-consumption');
+  });
+  afterEach(async () => {
+    await db.EnergyContract.destroy({ where: {} });
+    await gladys.device.destroy('hierarchy-meter');
+    await gladys.device.destroy('hierarchy-plug');
+  });
+
+  it('should attach a device to an electric meter', async () => {
+    const meter = gladys.stateManager.get('device', 'hierarchy-meter');
+    await authenticatedRequest
+      .post('/api/v1/energy_contract')
+      .send({
+        name: 'Hierarchy contract',
+        electric_meter_device_id: meter.id,
+        valid_from: '2025-01-01',
+        currency: 'EUR',
+        tariff: TARIFF,
+      })
+      .expect(201);
+    const res = await authenticatedRequest
+      .patch('/api/v1/device/hierarchy-plug/electric_meter')
+      .send({ electric_meter_device_id: meter.id })
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(res.body.features[0]).to.have.property('energy_parent_id', meter.features[0].id);
+  });
+
+  it('should return 400 when the target is not an electric meter, 404 on an unknown device', async () => {
+    const meter = gladys.stateManager.get('device', 'hierarchy-meter');
+    await authenticatedRequest
+      .patch('/api/v1/device/hierarchy-plug/electric_meter')
+      .send({ electric_meter_device_id: meter.id })
+      .expect(400);
+    await authenticatedRequest
+      .patch('/api/v1/device/unknown-device/electric_meter')
+      .send({ electric_meter_device_id: meter.id })
+      .expect(404);
+  });
+});

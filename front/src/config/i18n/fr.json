@@ -1358,9 +1358,6 @@
       "myDevicesTab": "Mes appareils",
       "energyPriceTab": "Tarifs d'énergie",
       "documentation": "Documentation",
-      "hierarchicalListDescription": "Voici la liste hiérarchique des capteurs d'énergie. Vous pouvez définir les relations parent/enfant pour agréger la consommation.",
-      "rootNotParent": "Aucun parent (racine)",
-      "level": "Niv {{depth}}",
       "wizard": {
         "basics": "Informations",
         "periodScope": "Période & périmètre",
@@ -1415,7 +1412,6 @@
       },
       "errorLoadingPrices": "Erreur lors du chargement des tarifs.",
       "errorLoadingDevices": "Erreur lors du chargement des appareils.",
-      "noDeviceFeaturesFound": "Aucune fonctionnalité d'appareil trouvée.",
       "settings": "Paramètres",
       "calculateConsumptionFromIndexDescription": "Ceci re-calculera la consommation d'énergie (en kWh) par tranche de 30 minutes à partir des fonctionnalités \"index\", depuis le début de votre installation Gladys.",
       "calculateConsumptionFromIndexFromBeginning": "Recalculer la consommation",
@@ -1455,13 +1451,6 @@
       "selectPeakHoursHelp": "Cliquez sur les créneaux horaires où le tarif heures pleines s'applique. Les créneaux non sélectionnés seront en heures creuses.",
       "peakHours": "Heures pleines",
       "offPeakHours": "Heures creuses",
-      "circularDependencyDetected": "Dépendances circulaires ou cassées détectées",
-      "circularDependencyDescription": "Les fonctionnalités suivantes ont des références parent invalides qui peuvent causer des problèmes de performance. Cliquez sur le bouton pour les corriger automatiquement.",
-      "brokenReference": "référence cassée",
-      "circularReference": "référence circulaire",
-      "selfReference": "auto-référence",
-      "fixAutomatically": "Corriger",
-      "fixing": "Correction en cours...",
       "contracts": {
         "tab": "Contrats",
         "description": "Un contrat décrit comment la consommation d'un compteur est tarifée sur une période. Choisissez un modèle du catalogue communautaire ou d'une intégration installée, renseignez ses paramètres et vérifiez l'aperçu avant d'enregistrer.",
@@ -1539,6 +1528,19 @@
           "recalculate": "Recalculer",
           "recalculated": "Le recalcul a été lancé. Vous pouvez suivre sa progression dans les tâches de fond."
         }
+      },
+      "hierarchy": {
+        "description": "Chaque appareil d'énergie est tarifé par le contrat du compteur électrique auquel il est rattaché. Gladys gère les liens entre les fonctionnalités d'énergie de vos appareils : vous choisissez seulement le compteur d'un appareil quand vous en avez plusieurs.",
+        "meterBadge": "Compteur électrique",
+        "meterSelectLabel": "Compteur",
+        "chooseMeter": "Choisir un compteur",
+        "noAttachedDevice": "Aucun appareil rattaché à ce compteur pour l'instant.",
+        "unattachedTitle": "Non rattachés à un compteur",
+        "unattachedDescription": "Ces appareils ne sont pas tarifés : choisissez le compteur sur lequel ils sont branchés.",
+        "noMeter": "Aucun compteur électrique pour l'instant : créez un contrat d'énergie pour tarifer la consommation de vos appareils.",
+        "noMeterLink": "Créer un contrat",
+        "noDevice": "Aucun appareil d'énergie trouvé.",
+        "attachError": "L'appareil n'a pas pu être rattaché à ce compteur."
       }
     },
     "caldav": {

@@ -2823,9 +2823,6 @@
       "myDevicesTab": "My Devices",
       "energyPriceTab": "Energy Rates",
       "documentation": "Documentation",
-      "hierarchicalListDescription": "Here is the hierarchical list of energy sensors. You can define parent/child relationships to aggregate consumption.",
-      "rootNotParent": "No parent (root)",
-      "level": "Level {{depth}}",
       "wizard": {
         "basics": "Information",
         "periodScope": "Period & Scope",
@@ -2880,7 +2877,6 @@
       },
       "errorLoadingPrices": "Error loading rates.",
       "errorLoadingDevices": "Error loading devices.",
-      "noDeviceFeaturesFound": "No device features found.",
       "settings": "Settings",
       "calculateConsumptionFromIndexDescription": "This will recalculate the energy consumption (in kWh) in 30-minute intervals from the \"index\" features, since the beginning of your Gladys installation.",
       "calculateConsumptionFromIndexFromBeginning": "Recalculate consumption",
@@ -2920,13 +2916,6 @@
       "selectPeakHoursHelp": "Click on the time slots when peak pricing applies. Unselected slots will be off-peak.",
       "peakHours": "Peak hours",
       "offPeakHours": "Off-peak hours",
-      "circularDependencyDetected": "Circular or broken dependencies detected",
-      "circularDependencyDescription": "The following device features have invalid parent references that could cause performance issues. Click the button to fix them automatically.",
-      "brokenReference": "broken reference",
-      "circularReference": "circular reference",
-      "selfReference": "self reference",
-      "fixAutomatically": "Fix",
-      "fixing": "Fixing...",
       "contracts": {
         "tab": "Contracts",
         "description": "A contract describes how the consumption of a meter is priced over a period. Pick a template from the community catalogue or from an installed integration, fill in its parameters and check the preview before saving.",
@@ -3004,6 +2993,19 @@
           "recalculate": "Recalculate",
           "recalculated": "The recalculation has been started. You can follow its progress in the background tasks."
         }
+      },
+      "hierarchy": {
+        "description": "Each energy device is priced by the contract of the electric meter it is attached to. Gladys maintains the links between the energy features of your devices: you only choose the meter of a device when you have several.",
+        "meterBadge": "Electric meter",
+        "meterSelectLabel": "Meter",
+        "chooseMeter": "Choose a meter",
+        "noAttachedDevice": "No device attached to this meter yet.",
+        "unattachedTitle": "Not attached to a meter",
+        "unattachedDescription": "These devices are not priced: choose the meter they are on.",
+        "noMeter": "No electric meter yet: create an energy contract to price the consumption of your devices.",
+        "noMeterLink": "Create a contract",
+        "noDevice": "No energy device found.",
+        "attachError": "The device could not be attached to this meter."
       }
     },
     "caldav": {

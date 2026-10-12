@@ -5,7 +5,7 @@ const logger = require('../../../utils/logger');
  * @description Recompute the costs of some root meters from a date: the handler of the
  * `energy-contract.recalculate` event (a contract created, changed or deleted, or a
  * calendar value changed, docs/specs/energy-contracts.md 7.4).
- * @param {object} payload - { from: Date, electric_meter_device_ids: [], calendar_key? }.
+ * @param {object} payload - { from: Date, electric_meter_device_ids: [], device_ids?, calendar_key? }.
  * @param {string} [jobId] - The job id.
  * @returns {Promise<object>} { devices, failures } of the cost calculation.
  * @example
@@ -19,7 +19,11 @@ async function recalculateForContracts(payload, jobId) {
         payload.calendar_key ? ` (calendar ${payload.calendar_key})` : ''
       }`,
     );
-    return this.calculateCostFrom(from, jobId, { electricMeterDeviceIds: payload.electric_meter_device_ids });
+    return this.calculateCostFrom(from, jobId, {
+      electricMeterDeviceIds: payload.electric_meter_device_ids,
+      // a device attached to a meter: only its own costs (docs/specs/energy-hierarchy.md, D.1)
+      deviceIds: payload.device_ids,
+    });
   });
 }
 

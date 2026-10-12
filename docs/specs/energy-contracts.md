@@ -148,7 +148,7 @@ Unique index `(calendar_key, starts_at)`, `calendar_key` → `t_tariff_calendar.
 **What does not change**
 
 - Costs stay states of the `thirty-minutes-consumption-cost` feature (and `daily-consumption-cost`) in `t_device_feature_state` / DuckDB: no history migration, the widgets and the aggregation API keep reading the same thing.
-- The `energy_parent_id` hierarchy (index → 30-min consumption → cost) and the root meter resolution (`getRootElectricMeterDevice`).
+- The `energy_parent_id` hierarchy (index → 30-min consumption → cost) and the root meter resolution (`getRootElectricMeterDevice`). Who maintains that hierarchy (derived links, attachment of a device to a meter, a contract meter always a root) is specified in `docs/specs/energy-hierarchy.md`.
 - Prices are stored as decimals in the `tariff` JSON (`0.2516`), no longer as ×10,000 integers: the conversion is done once by the migration.
 
 **JSON schema of `tariff` (summary, version 1)**

@@ -1160,6 +1160,12 @@ function getRoutes(gladys) {
       admin: true,
       controller: energyContractController.destroy,
     },
+    // energy hierarchy: attach a device to an electric meter (docs/specs/energy-hierarchy.md, D.1)
+    'patch /api/v1/device/:device_selector/electric_meter': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.setDeviceElectricMeter,
+    },
     'get /api/v1/energy_calendar': {
       authenticated: true,
       controller: energyContractController.getCalendars,
