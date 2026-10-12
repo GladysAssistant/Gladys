@@ -81,6 +81,15 @@ describe('addConsumptionCostFeatures', () => {
     expect(result.features[0].energy_parent_id).to.equal('sub-meter-feature-id');
   });
 
+  it('should never attach the main meter feature to itself', () => {
+    // the supplier meter the contract is attached to: its consumption IS the main meter feature
+    const device = { features: [buildConsumptionFeature({ id: DEFAULT_METER_FEATURE_ID })] };
+    const result = addConsumptionCostFeatures(device, DEFAULT_METER_FEATURE_ID);
+    expect(result.features).to.have.lengthOf(2);
+    expect(result.features[0]).to.not.have.property('energy_parent_id');
+    expect(result.features[1].energy_parent_id).to.equal(DEFAULT_METER_FEATURE_ID);
+  });
+
   it('should leave the consumption derived from an index of the same device to the index pipeline', () => {
     const index = {
       id: 'index-id',

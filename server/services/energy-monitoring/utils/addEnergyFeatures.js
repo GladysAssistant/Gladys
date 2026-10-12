@@ -15,8 +15,9 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
       indexFeature.id = uuid.v4();
     }
 
-    // Set the default energy parent id if it's not set
-    if (!indexFeature.energy_parent_id) {
+    // Set the default energy parent id if it's not set (the main meter's own feature
+    // stays a root: attached to itself, the hierarchy would be circular)
+    if (!indexFeature.energy_parent_id && indexFeature.id !== defaultElectricMeterDeviceFeatureId) {
       indexFeature.energy_parent_id = defaultElectricMeterDeviceFeatureId;
     }
 
@@ -136,8 +137,10 @@ const addConsumptionCostFeatures = (device, defaultElectricMeterDeviceFeatureId)
       consumptionFeature.id = uuid.v4();
     }
     // a parent the user or the integration chose (a sub-meter) is kept, an absent one falls
-    // back to the main meter, like an index
-    if (!consumptionFeature.energy_parent_id) {
+    // back to the main meter, like an index; the main meter's own feature (a supplier meter
+    // the contract is attached to) stays a root: attached to itself, the hierarchy would be
+    // circular and its costs never computed
+    if (!consumptionFeature.energy_parent_id && consumptionFeature.id !== defaultElectricMeterDeviceFeatureId) {
       consumptionFeature.energy_parent_id = defaultElectricMeterDeviceFeatureId;
     }
     const costType = CONSUMPTION_COST_TYPES[consumptionFeature.type];
