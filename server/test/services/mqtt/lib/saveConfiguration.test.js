@@ -419,4 +419,47 @@ describe('mqttHandler.saveConfiguration', () => {
       assert.notCalled(serviceInDb.save);
     }
   });
+
+  it('should saveConfiguration: never reconfigure an unlabeled broker Gladys never configured', async () => {
+    const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
+      variable: {
+        destroy: fake.resolves('value'),
+        setValue: fake.resolves('value'),
+        // no stored Mosquitto version: Gladys never configured a broker
+        getValue: fake.resolves(null),
+      },
+      system: {
+        getContainers: fake.resolves([
+          {
+            id: 'user-broker',
+            name: '/eclipse-mosquitto',
+            image: 'eclipse-mosquitto:2',
+          },
+        ]),
+        inspectContainer: fake.resolves({ Config: { Image: 'eclipse-mosquitto:2' } }),
+        exec: fake.resolves(true),
+        restartContainer: fake.resolves(true),
+      },
+    };
+
+    const config = {
+      mqttUrl: 'mqttUrl',
+      useEmbeddedBroker: true,
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    try {
+      await mqttHandler.saveConfiguration(config);
+      assert.fail('Should have fail');
+    } catch (e) {
+      expect(e).to.be.instanceOf(ConflictError);
+      assert.notCalled(gladys.system.exec);
+      assert.notCalled(gladys.system.restartContainer);
+      assert.notCalled(gladys.variable.destroy);
+      assert.notCalled(gladys.variable.setValue);
+    }
+  });
 });

@@ -1,6 +1,6 @@
 const logger = require('./logger');
 const { ConflictError } = require('./coreErrors');
-const { parseImageReference } = require('../lib/system/system.getGladysImage');
+const { parseImageReference } = require('./dockerImage');
 
 // Docker label set on every container created by a core service (see the
 // `Labels` field of the container descriptors in `services/*/docker/`). A

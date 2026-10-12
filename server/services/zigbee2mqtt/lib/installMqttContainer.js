@@ -23,6 +23,8 @@ async function installMqttContainer(config) {
     container = await findManagedContainer(this.gladys.system, containerDescriptor);
   } catch (e) {
     this.mqttExist = false;
+    // Shown as is by the setup page, so the user reads which container to rename
+    this.z2mContainerError = { code: null, message: e.message };
     logger.error('MQTT broker: failed to look up its Docker container:', e);
     this.emitStatusEvent();
     throw e;

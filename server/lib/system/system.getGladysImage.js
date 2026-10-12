@@ -1,5 +1,6 @@
 const semver = require('semver');
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
+const { parseImageReference } = require('../../utils/dockerImage');
 
 // Watchtower updates a container by re-pulling the exact reference it was
 // created with. A reference pointing at a single immutable build (`v4.83.0`,
@@ -7,32 +8,6 @@ const { PlatformNotCompatible } = require('../../utils/coreErrors');
 // finds nothing, and exits successfully without doing anything. Only moving
 // tags (`v4`, `latest`) follow new releases.
 const IMMUTABLE_TAG_REGEX = /^v?\d+\.\d+\.\d+/;
-
-const DIGEST_PREFIX = 'sha256:';
-
-/**
- * @description Split a Docker image reference into its repository, tag and digest.
- * @param {string} image - A Docker image reference.
- * @returns {object} The repository, the tag and the digest of the reference.
- * @example
- * parseImageReference('gladysassistant/gladys:v4');
- */
-function parseImageReference(image) {
-  // a container started from an image id has the raw digest as reference
-  if (image.startsWith(DIGEST_PREFIX)) {
-    return { repository: null, tag: null, digest: image.substring(DIGEST_PREFIX.length) };
-  }
-  const [reference, digest] = image.split('@');
-  const lastColonIndex = reference.lastIndexOf(':');
-  const lastSlashIndex = reference.lastIndexOf('/');
-  // a colon placed before the last slash belongs to the registry port, not to a tag
-  const hasTag = lastColonIndex > lastSlashIndex;
-  return {
-    repository: hasTag ? reference.substring(0, lastColonIndex) : reference,
-    tag: hasTag ? reference.substring(lastColonIndex + 1) : 'latest',
-    digest,
-  };
-}
 
 /**
  * @description Describe the Docker image the running Gladys container was created from,

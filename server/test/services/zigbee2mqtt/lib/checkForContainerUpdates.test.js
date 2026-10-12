@@ -33,6 +33,9 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
           };
         },
       },
+      event: {
+        emit: fake.resolves(null),
+      },
       system: {
         getContainers: fake.resolves([]),
         removeContainer: fake.resolves(true),
@@ -159,6 +162,9 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
     expect(error).to.be.instanceOf(ConflictError);
     assert.notCalled(gladys.system.removeContainer);
     expect(config.dockerMqttVersion).to.equal('BAD_REVISION');
+    // the message is shown as is by the setup page, so the user reads which container to rename
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: null, message: error.message });
+    assert.calledOnce(gladys.event.emit);
   });
 
   it('not updated, z2m name taken by a user container -> nothing is removed, not even our MQTT', async () => {
@@ -192,5 +198,7 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
       dockerMqttVersion: 'BAD_REVISION',
       dockerZ2mVersion: 'BAD_REVISION',
     });
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: null, message: error.message });
+    assert.calledOnce(gladys.event.emit);
   });
 });

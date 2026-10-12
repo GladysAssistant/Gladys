@@ -1,8 +1,9 @@
 const { promisify } = require('util');
 const { CONFIGURATION, DEFAULT } = require('./constants');
 const { SERVICE_STATUS } = require('../../../utils/constants');
-const { NotFoundError } = require('../../../utils/coreErrors');
+const { ConflictError, NotFoundError } = require('../../../utils/coreErrors');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
+const { isBrokerConfiguredByGladys } = require('./isBrokerConfiguredByGladys');
 const containerParams = require('../docker/eclipse-mosquitto-container.json');
 
 const sleep = promisify(setTimeout);
@@ -37,6 +38,14 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
 
     if (!container) {
       throw new NotFoundError(`${containerParams.name} container not found`);
+    }
+
+    // A broker Gladys never configured (no label, no stored version) is a user one: never reconfigured
+    const mosquittoVersion = await variable.getValue(CONFIGURATION.MQTT_MOSQUITTO_VERSION, this.serviceId);
+    if (!isBrokerConfiguredByGladys(container, mosquittoVersion)) {
+      throw new ConflictError(
+        `Container "${containerParams.name}" already exists but was not configured by Gladys: rename or remove it`,
+      );
     }
   }
 

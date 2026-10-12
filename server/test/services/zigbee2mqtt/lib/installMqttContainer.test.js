@@ -346,6 +346,8 @@ describe('zigbee2mqtt installMqttContainer', () => {
     assert.notCalled(gladys.system.restartContainer);
     assert.notCalled(gladys.system.exec);
     expect(zigbee2mqttManager.mqttExist).to.equal(false);
+    // the message is shown as is by the setup page, so the user reads which container to rename
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: null, message: error.message });
     assert.calledOnce(gladys.event.emit);
   });
 });

@@ -323,9 +323,15 @@ describe('mqttHandler.getConfiguration', () => {
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
     const config = await mqttHandler.getConfiguration();
 
-    // Without the label, a mosquitto created from the public image is indistinguishable from ours
-    expect(config.brokerContainerAvailable).to.equal(true);
+    // Without the label, a mosquitto created from the public image is only ours if Gladys
+    // stored a version for it, which happens on every install: here it is a user one
+    expect(config.brokerContainerAvailable).to.equal(false);
     assert.calledOnceWithExactly(gladys.system.inspectContainer, 'user-broker');
+
+    // A broker created before the label existed, but configured by Gladys, is ours
+    gladys.variable.getValue = fake.resolves('2');
+    const configWithLegacyBroker = await mqttHandler.getConfiguration();
+    expect(configWithLegacyBroker.brokerContainerAvailable).to.equal(true);
 
     gladys.system.inspectContainer = fake.resolves({ Config: { Image: 'nginx:alpine' } });
     const configWithForeignBroker = await mqttHandler.getConfiguration();

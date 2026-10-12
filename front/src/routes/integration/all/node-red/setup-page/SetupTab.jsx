@@ -94,7 +94,8 @@ class SetupTab extends Component {
     const { selectedMajorVersion, dockerNodeRedVersion } = this.state;
 
     this.setState({
-      nodeRedStatus: RequestStatus.Getting
+      nodeRedStatus: RequestStatus.Getting,
+      containerConflictMessage: null
     });
 
     if (selectedMajorVersion && selectedMajorVersion !== dockerNodeRedVersion) {
@@ -122,6 +123,10 @@ class SetupTab extends Component {
       await this.props.httpClient.post('/api/v1/service/node-red/connect');
     } catch (e) {
       error = error | get(e, 'response.status');
+      // A container that is not ours carries our name: the server says which one to rename
+      if (get(e, 'response.status') === 409) {
+        this.setState({ containerConflictMessage: get(e, 'response.data.message') });
+      }
     }
 
     if (error) {
@@ -257,7 +262,8 @@ class SetupTab extends Component {
       showConfirmDelete,
       dockerNodeRedVersion,
       availableMajorVersions,
-      selectedMajorVersion
+      selectedMajorVersion,
+      containerConflictMessage
     }
   ) {
     const hasMajorVersionChanged =
@@ -290,6 +296,13 @@ class SetupTab extends Component {
             networkModeValid={networkModeValid}
             nodeRedStatus={nodeRedStatus}
           />
+
+          {containerConflictMessage && (
+            <div class="alert alert-danger">
+              <Text id="integration.nodeRed.setup.containerConflictPrefix" />
+              <code>{containerConflictMessage}</code>
+            </div>
+          )}
 
           {dockerBased && networkModeValid && availableMajorVersions && (
             <div class="form-group">

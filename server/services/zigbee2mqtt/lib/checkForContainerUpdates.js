@@ -19,12 +19,17 @@ async function checkForContainerUpdates(config) {
 
   // Resolve every container before removing any: a user container carrying one of our
   // names aborts the whole update (ConflictError) before anything is destroyed
-  const mqttContainer = mqttUpdateRequired
-    ? await findManagedContainer(this.gladys.system, mqttContainerDescriptor)
-    : null;
-  const z2mContainer = z2mUpdateRequired
-    ? await findManagedContainer(this.gladys.system, z2mContainerDescriptor)
-    : null;
+  let mqttContainer = null;
+  let z2mContainer = null;
+  try {
+    mqttContainer = mqttUpdateRequired ? await findManagedContainer(this.gladys.system, mqttContainerDescriptor) : null;
+    z2mContainer = z2mUpdateRequired ? await findManagedContainer(this.gladys.system, z2mContainerDescriptor) : null;
+  } catch (e) {
+    // Shown as is by the setup page, so the user reads which container to rename
+    this.z2mContainerError = { code: null, message: e.message };
+    this.emitStatusEvent();
+    throw e;
+  }
 
   // Check for MQTT container version
   if (mqttUpdateRequired) {
