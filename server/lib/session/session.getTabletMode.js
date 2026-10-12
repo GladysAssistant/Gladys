@@ -10,6 +10,12 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * getTabletMode('375223b3-71c6-4b61-a346-0a9d5baf12b4', '0a5f7305-4faf-42b3-aeb2-fbc0217c4855');
  */
 async function getTabletMode(userId, sessionId) {
+  // requests coming through Gladys Plus or an API key have no local session,
+  // so tablet mode can't be enabled for them
+  if (!sessionId) {
+    return { id: null, tablet_mode: false, current_house_id: null, has_alarm_code: false };
+  }
+
   const session = await db.Session.findOne({
     attributes: ['id', 'tablet_mode', 'current_house_id'],
     where: {
