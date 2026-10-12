@@ -29,6 +29,23 @@ function normalizeAiChatRequestBody(body) {
 }
 
 /**
+ * @description Describe an AI chat request error for the logs. A request error carries the
+ * whole HTTP request (authorization header with the Gladys Plus instance token, body with the
+ * user messages and the home description): only its message and the gateway response are kept.
+ * @param {Error} e - Error thrown while asking the AI.
+ * @returns {string} Description of the error, safe to log.
+ * @example
+ * describeAiChatError(new Error('Request failed with status code 502'));
+ */
+function describeAiChatError(e) {
+  const status = get(e, 'response.status');
+  if (status === undefined) {
+    return (e && (e.stack || e.message)) || String(e);
+  }
+  return `${e.message} (status=${status}, response=${JSON.stringify(get(e, 'response.data'))})`;
+}
+
+/**
  * @public
  * @description Ask the Gladys Gateway AI endpoint.
  * @param {object} body - OpenAI-compatible chat request body.
@@ -42,7 +59,7 @@ async function aiChat(body) {
     const response = await this.callPlanGatedApi(() => this.gladysGatewayClient.openAIAsk(requestBody));
     return response;
   } catch (e) {
-    logger.debug(e);
+    logger.debug(`[AI_CHAT] Gateway request failed: ${describeAiChatError(e)}`);
     const status = get(e, 'response.status');
     const message = get(e, 'response.data.error_message');
     if (status === 403) {
@@ -58,4 +75,5 @@ async function aiChat(body) {
 module.exports = {
   aiChat,
   normalizeAiChatRequestBody,
+  describeAiChatError,
 };

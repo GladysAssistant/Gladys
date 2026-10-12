@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { fake } = sinon;
 
 const { Error400, Error402, Error403, Error429 } = require('../../../utils/httpErrors');
-const { aiChat, normalizeAiChatRequestBody } = require('../../../lib/gateway/gateway.aiChat');
+const { aiChat, normalizeAiChatRequestBody, describeAiChatError } = require('../../../lib/gateway/gateway.aiChat');
 const { DEFAULT_TEXT_MODEL } = require('../../../utils/aiChatModels');
 
 describe('gateway.aiChat unit', () => {
@@ -98,5 +98,34 @@ describe('gateway.aiChat unit', () => {
       error429 = e;
     }
     expect(error429).to.be.instanceOf(Error429);
+  });
+
+  describe('describeAiChatError', () => {
+    it('should keep only the message and the gateway response of a request error', () => {
+      const error = new Error('Request failed with status code 502');
+      error.config = { headers: { authorization: 'secret-instance-token' }, data: '{"messages":[]}' };
+      error.response = {
+        status: 502,
+        data: { status: 502, error_code: 'BAD_GATEWAY', error_message: 'AI service returned an error' },
+      };
+      const description = describeAiChatError(error);
+      expect(description).to.equal(
+        'Request failed with status code 502 (status=502, response={"status":502,"error_code":"BAD_GATEWAY","error_message":"AI service returned an error"})',
+      );
+      expect(description).not.to.include('secret-instance-token');
+    });
+
+    it('should return the stack of an error without response', () => {
+      const error = new Error('boom');
+      expect(describeAiChatError(error)).to.equal(error.stack);
+    });
+
+    it('should return the message of an error without stack', () => {
+      expect(describeAiChatError({ message: 'boom' })).to.equal('boom');
+    });
+
+    it('should describe a non-error value', () => {
+      expect(describeAiChatError(undefined)).to.equal('undefined');
+    });
   });
 });
