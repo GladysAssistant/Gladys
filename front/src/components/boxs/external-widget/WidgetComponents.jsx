@@ -90,8 +90,8 @@ const Gauge = ({ component, feature, language }) => {
   const ratio = hasValue && max > min ? Math.min(1, Math.max(0, (rawValue - min) / (max - min))) : 0;
   const unit = component.device_feature_selector ? null : component.unit;
   return (
-    <div>
-      <svg class={cx(style.gauge, colorClass(component.color || 'primary'))} viewBox="0 0 88 72" aria-hidden="true">
+    <div class={style.gaugeBox}>
+      <svg class={cx(style.gauge, colorClass(component.color || 'primary'))} viewBox="0 0 88 66" aria-hidden="true">
         <path
           class={style.gaugeTrack}
           d="M 20 62 A 34 34 0 1 1 68 62"
