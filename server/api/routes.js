@@ -414,8 +414,11 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getUsersKeys,
     },
+    // the list of Gladys Plus users allowed to control the instance remotely:
+    // only an admin can accept, revoke or replace it
     'patch /api/v1/gateway/key': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.saveUsersKeys,
     },
     'get /api/v1/gateway/backup': {
