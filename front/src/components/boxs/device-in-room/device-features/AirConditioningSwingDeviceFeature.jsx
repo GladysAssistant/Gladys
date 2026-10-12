@@ -13,7 +13,8 @@ const SWING_HORIZONTAL_OPTIONS = [
   { value: AC_SWING_HORIZONTAL.POSITION_3, i18nKey: 'position-3' },
   { value: AC_SWING_HORIZONTAL.POSITION_4, i18nKey: 'position-4' },
   { value: AC_SWING_HORIZONTAL.POSITION_5, i18nKey: 'position-5' },
-  { value: AC_SWING_HORIZONTAL.SWING_OPPOSITE, i18nKey: 'swing-opposite' }
+  { value: AC_SWING_HORIZONTAL.SWING_OPPOSITE, i18nKey: 'swing-opposite' },
+  { value: AC_SWING_HORIZONTAL.AUTO, i18nKey: 'auto', onlyWhenSupported: true }
 ];
 
 const SWING_VERTICAL_OPTIONS = [
@@ -23,7 +24,8 @@ const SWING_VERTICAL_OPTIONS = [
   { value: AC_SWING_VERTICAL.POSITION_2, i18nKey: 'position-2' },
   { value: AC_SWING_VERTICAL.POSITION_3, i18nKey: 'position-3' },
   { value: AC_SWING_VERTICAL.POSITION_4, i18nKey: 'position-4' },
-  { value: AC_SWING_VERTICAL.POSITION_5, i18nKey: 'position-5' }
+  { value: AC_SWING_VERTICAL.POSITION_5, i18nKey: 'position-5' },
+  { value: AC_SWING_VERTICAL.AUTO, i18nKey: 'auto', onlyWhenSupported: true }
 ];
 
 const AirConditioningSwingDeviceFeature = props => {

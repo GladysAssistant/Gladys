@@ -259,6 +259,8 @@ const AC_SWING_HORIZONTAL = {
   POSITION_4: 5,
   POSITION_5: 6,
   SWING_OPPOSITE: 7,
+  // The unit picks the vane direction itself: distinct from OFF, where the vane is stopped
+  AUTO: 8,
 };
 
 const AC_SWING_VERTICAL = {
@@ -269,6 +271,8 @@ const AC_SWING_VERTICAL = {
   POSITION_3: 4,
   POSITION_4: 5,
   POSITION_5: 6,
+  // Same value as the horizontal AUTO, 7 stays free for a vertical opposite swing
+  AUTO: 8,
 };
 
 const PILOT_WIRE_MODE = {

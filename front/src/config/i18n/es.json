@@ -5588,6 +5588,7 @@
         },
         "swing-horizontal": {
           "off": "Apagado",
+          "auto": "Automático",
           "swing": "Oscilante",
           "position-1": "Posición 1 (Izquierda)",
           "position-2": "Posición 2",
@@ -5598,6 +5599,7 @@
         },
         "swing-vertical": {
           "off": "Apagado",
+          "auto": "Automático",
           "swing": "Oscilante",
           "position-1": "Posición 1 (Arriba)",
           "position-2": "Posición 2",
@@ -5901,7 +5903,8 @@
           "4": "Posición 3 (Centro)",
           "5": "Posición 4",
           "6": "Posición 5 (Derecha)",
-          "7": "Oscilación opuesta"
+          "7": "Oscilación opuesta",
+          "8": "Automático"
         },
         "swing-vertical": {
           "0": "Apagado",
@@ -5910,7 +5913,8 @@
           "3": "Posición 2",
           "4": "Posición 3",
           "5": "Posición 4",
-          "6": "Posición 5 (Abajo)"
+          "6": "Posición 5 (Abajo)",
+          "8": "Automático"
         }
       },
       "thermostat": {

@@ -5588,16 +5588,18 @@
         },
         "swing-horizontal": {
           "off": "Arrêt",
-          "swing": "Balancement",
+          "auto": "Auto",
+          "swing": "Balayage",
           "position-1": "Position 1 (Gauche)",
           "position-2": "Position 2",
           "position-3": "Position 3 (Centre)",
           "position-4": "Position 4",
           "position-5": "Position 5 (Droite)",
-          "swing-opposite": "Balancement inversé"
+          "swing-opposite": "Balayage inversé"
         },
         "swing-vertical": {
           "off": "Arrêt",
+          "auto": "Auto",
           "swing": "Balayage",
           "position-1": "Position 1 (Haut)",
           "position-2": "Position 2",
@@ -5895,13 +5897,14 @@
         },
         "swing-horizontal": {
           "0": "Arrêt",
-          "1": "Balancement",
+          "1": "Balayage",
           "2": "Position 1 (Gauche)",
           "3": "Position 2",
           "4": "Position 3 (Centre)",
           "5": "Position 4",
           "6": "Position 5 (Droite)",
-          "7": "Balancement inversé"
+          "7": "Balayage inversé",
+          "8": "Auto"
         },
         "swing-vertical": {
           "0": "Arrêt",
@@ -5910,7 +5913,8 @@
           "3": "Position 2",
           "4": "Position 3",
           "5": "Position 4",
-          "6": "Position 5 (Bas)"
+          "6": "Position 5 (Bas)",
+          "8": "Auto"
         }
       },
       "thermostat": {
