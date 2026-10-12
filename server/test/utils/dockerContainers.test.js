@@ -103,12 +103,28 @@ describe('dockerContainers', () => {
       sinon.assert.calledOnceWithExactly(system.inspectContainer, 'legacy');
     });
 
-    it('should recognize a legacy container created from a mirror of the image', async () => {
-      const system = {
-        inspectContainer: fake.resolves({ Config: { Image: 'docker.io/nodered/node-red:3.1' } }),
+    it('should refuse a legacy container created from a prefixed copy of the image', async () => {
+      // Gladys creates from the bare reference of the descriptor: a registry or
+      // namespace prefix means a container we did not create
+      const mosquittoDescriptor = {
+        name: 'eclipse-mosquitto',
+        Image: 'eclipse-mosquitto:2.0.15',
+        Labels: { [GLADYS_SERVICE_LABEL]: 'mqtt' },
       };
-      const container = { id: 'legacy', image: 'docker.io/nodered/node-red:3.1' };
-      expect(await isManagedByGladys(system, container, descriptor)).to.equal(true);
+      const container = { id: 'foreign', image: 'eclipse-mosquitto:2' };
+      const prefixedImages = [
+        'docker.io/library/eclipse-mosquitto:2',
+        'myregistry/eclipse-mosquitto:2',
+        'docker.io/nodered/node-red:3.1',
+      ];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const image of prefixedImages) {
+        const system = { inspectContainer: fake.resolves({ Config: { Image: image } }) };
+        // eslint-disable-next-line no-await-in-loop
+        expect(await isManagedByGladys(system, container, mosquittoDescriptor), image).to.equal(false);
+        // eslint-disable-next-line no-await-in-loop
+        expect(await isManagedByGladys(system, container, descriptor), image).to.equal(false);
+      }
     });
 
     it('should refuse a legacy container created from another image', async () => {
@@ -121,6 +137,12 @@ describe('dockerContainers', () => {
       const system = { inspectContainer: fake.resolves({ Config: { Image: 'evil-nodered/node-red:3.1' } }) };
       const container = { id: 'foreign', image: 'evil-nodered/node-red:3.1' };
       expect(await isManagedByGladys(system, container, descriptor)).to.equal(false);
+    });
+
+    it('should ignore the tag of a legacy container', async () => {
+      const system = { inspectContainer: fake.resolves({ Config: { Image: 'nodered/node-red:4.0' } }) };
+      const container = { id: 'legacy', image: 'nodered/node-red:4.0' };
+      expect(await isManagedByGladys(system, container, descriptor)).to.equal(true);
     });
   });
 

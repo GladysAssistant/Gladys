@@ -41,9 +41,11 @@ async function findContainerByName(system, name) {
  * @description Check that a container was created by the service owning this
  * descriptor. A container carrying the Gladys service label is ours only if
  * the label names this service. A container without the label was created
- * before the label existed: it is ours if it was created from the image of
- * the descriptor (read with inspect, as the listing shows an image id once the
- * tag has been re-pulled). A user container created from the same public
+ * before the label existed: it is ours if it was created from the exact image
+ * repository of the descriptor (read with inspect, as the listing shows an
+ * image id once the tag has been re-pulled). Gladys always creates from the
+ * bare reference of the descriptor, so a registry or namespace prefix is a
+ * container we did not create. A user container created from the same public
  * image under our exact name is indistinguishable in that legacy case; it is
  * labeled as ours at its next recreation.
  * @param {object} system - Gladys system module.
@@ -60,9 +62,7 @@ async function isManagedByGladys(system, container, descriptor) {
     return labels[GLADYS_SERVICE_LABEL] === service;
   }
   const { Config } = await system.inspectContainer(container.id);
-  const expected = getImageRepository(descriptor.Image);
-  const actual = getImageRepository(Config.Image);
-  return actual === expected || actual.endsWith(`/${expected}`);
+  return getImageRepository(Config.Image) === getImageRepository(descriptor.Image);
 }
 
 /**
