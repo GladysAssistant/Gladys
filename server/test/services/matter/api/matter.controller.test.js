@@ -12,6 +12,7 @@ describe('MatterController', () => {
       pairDevice: fake.resolves(null),
       refreshDevices: fake.resolves(null),
       getDevices: fake.returns([{ name: 'toto' }]),
+      getPairedDevices: fake.resolves([{ name: 'toto' }]),
       getNodes: fake.returns([{ name: 'toto' }]),
       checkIpv6: fake.returns({
         hasIpv6: true,
@@ -74,7 +75,7 @@ describe('MatterController', () => {
     };
 
     await controller['get /api/v1/service/matter/paired-device'].controller(req, res);
-    assert.calledOnce(matterHandler.getDevices);
+    assert.calledOnce(matterHandler.getPairedDevices);
     assert.calledWith(res.json, [{ name: 'toto' }]);
   });
   it('should get nodes', async () => {

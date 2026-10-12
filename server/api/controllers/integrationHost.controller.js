@@ -432,6 +432,25 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/energy/consumption publishEnergyConsumption
+   * @apiName publishEnergyConsumption
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Publish dated consumption intervals on a 30-minute or daily consumption
+   * feature of this integration (a supplier whose data arrives after the fact): at most 2,000
+   * intervals per call, starts_at aligned on the 30-minute slot (or the local midnight) of the
+   * Gladys timezone, elapsed and at most 5 years old, kwh finite and positive (400 otherwise);
+   * 404 when the device is not created, 400 on a consumption the core derives from an index.
+   * Upserts the states and queues a bounded cost recalculation of the meter from the earliest
+   * interval whose value changed.
+   * @apiParamExample {json} Request-Example
+   * { "device_feature_external_id": "ext:hq:m:c", "intervals": [{ "starts_at": "2026-01-12T05:00:00Z", "kwh": 0.4 }] }
+   */
+  async function publishEnergyConsumption(req, res) {
+    const result = await gladys.externalIntegration.publishEnergyConsumption(req.externalIntegrationService, req.body);
+    res.json({ success: true, count: result.count, changed_from: result.changed_from });
+  }
+
+  /**
    * @api {get} /api/integration/v1/energy/calendar/:key getEnergyCalendar
    * @apiName getEnergyCalendar
    * @apiGroup IntegrationHostApi
@@ -470,6 +489,7 @@ module.exports = function IntegrationHostController(gladys) {
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     publishEnergyCalendar: asyncMiddleware(publishEnergyCalendar),
+    publishEnergyConsumption: asyncMiddleware(publishEnergyConsumption),
     getEnergyCalendar: asyncMiddleware(getEnergyCalendar),
     getEnergyContracts: asyncMiddleware(getEnergyContracts),
     heartbeat: asyncMiddleware(heartbeat),

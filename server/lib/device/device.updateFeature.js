@@ -1,6 +1,44 @@
 const db = require('../../models');
 const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
+const { isEnergySourceFeature, findCycle } = require('../../utils/energyHierarchy');
+const { isElectricMeter } = require('../../utils/enforceEnergyHierarchy');
+
+/**
+ * @description Check that a parent change is the attachment of a device to another device, the
+ * only link the user may change (docs/specs/energy-hierarchy.md, section D.2): the derived links
+ * (index -> consumption -> cost, on one device) are maintained by Gladys, and an electric meter
+ * stays a root.
+ * @param {object} feature - The feature to update.
+ * @param {string|null} newParentId - The requested parent.
+ * @returns {Promise<object|null>} The new parent (null for a root); rejects with BadParameters or
+ * NotFoundError.
+ * @example
+ * await assertAttachmentChange(feature, 'uuid-of-parent');
+ */
+async function assertAttachmentChange(feature, newParentId) {
+  if (!isEnergySourceFeature(feature)) {
+    throw new BadParameters('energy_parent_id: only an energy index or consumption is attached to a meter');
+  }
+  const currentParent = feature.energy_parent_id ? await db.DeviceFeature.findByPk(feature.energy_parent_id) : null;
+  if (currentParent && currentParent.device_id === feature.device_id) {
+    throw new BadParameters('energy_parent_id: this link is derived and maintained by Gladys');
+  }
+  if (!newParentId) {
+    return null;
+  }
+  const newParent = await db.DeviceFeature.findByPk(newParentId);
+  if (!newParent) {
+    throw new NotFoundError('Parent DeviceFeature not found');
+  }
+  if (newParent.device_id === feature.device_id) {
+    throw new BadParameters('energy_parent_id: a device is attached to another device');
+  }
+  if (await isElectricMeter(feature.device_id)) {
+    throw new BadParameters('energy_parent_id: an electric meter is a root');
+  }
+  return newParent;
+}
 
 /**
  * @description Update a device feature (by selector).
@@ -30,21 +68,15 @@ async function updateFeature(selector, updates) {
     throw new NotFoundError('DeviceFeature not found');
   }
 
-  // Prevent circular dependency: walk up the ancestry of the proposed parent
   const newParentId = allowed.energy_parent_id;
-  if (newParentId) {
-    let cursor = await db.DeviceFeature.findByPk(newParentId);
-    // If parent doesn't exist, allow null-like behavior? We'll let DB constraint fail if invalid
-    while (cursor) {
-      if (cursor.id === feature.id) {
-        throw new BadParameters('Circular energy_parent_id not allowed');
-      }
-      if (!cursor.energy_parent_id) {
-        break;
-      }
-      // move to next ancestor
-      // eslint-disable-next-line no-await-in-loop
-      cursor = await db.DeviceFeature.findByPk(cursor.energy_parent_id);
+  const newParent = await assertAttachmentChange(feature, newParentId);
+
+  // Prevent circular dependency: walk up the ancestry of the proposed parent
+  if (newParent) {
+    const getFeature = (id) => (id === newParent.id ? newParent : db.DeviceFeature.findByPk(id));
+    const cycle = await findCycle({ id: feature.id, energy_parent_id: newParent.id }, getFeature);
+    if (cycle !== null) {
+      throw new BadParameters('Circular energy_parent_id not allowed');
     }
   }
 

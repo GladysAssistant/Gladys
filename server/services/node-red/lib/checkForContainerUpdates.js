@@ -1,4 +1,5 @@
 const logger = require('../../../utils/logger');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
 
 const nodeRedContainerDescriptor = require('../docker/gladys-node-red-container.json');
 const { containerMatchesMajorVersion, resolveNodeRedMajorVersion } = require('./nodeRedVersion');
@@ -14,16 +15,12 @@ async function checkForContainerUpdates(config = {}) {
 
   const selectedMajorVersion = resolveNodeRedMajorVersion(config);
 
-  const containers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [nodeRedContainerDescriptor.name] },
-  });
+  // Only our own container is removed: a user container carrying the same name is left alone
+  const container = await findManagedContainer(this.gladys.system, nodeRedContainerDescriptor);
 
-  if (containers.length === 0) {
+  if (!container) {
     return;
   }
-
-  const [container] = containers;
 
   if (containerMatchesMajorVersion(container.image, selectedMajorVersion)) {
     return;

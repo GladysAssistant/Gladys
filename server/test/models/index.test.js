@@ -311,6 +311,149 @@ describe('models/index', () => {
     });
   });
 
+  describe('duckDbRunWithReducedMemoryLimit', () => {
+    const savedMemoryLimitEnv = process.env.DUCKDB_MEMORY_LIMIT;
+
+    afterEach(() => {
+      if (savedMemoryLimitEnv === undefined) {
+        delete process.env.DUCKDB_MEMORY_LIMIT;
+      } else {
+        process.env.DUCKDB_MEMORY_LIMIT = savedMemoryLimitEnv;
+      }
+    });
+
+    const loadDbWithMemoryLimit = (memoryLimit) => {
+      process.env.DUCKDB_MEMORY_LIMIT = memoryLimit;
+      const { api, connection } = buildMockDuckDbApi();
+      const mockLogger = {
+        info: sinon.stub(),
+        warn: sinon.stub(),
+        debug: sinon.stub(),
+        error: sinon.stub(),
+      };
+      const db = proxyquire('../../models', {
+        '@duckdb/node-api': api,
+        '../utils/logger': mockLogger,
+      });
+      return { connection, db, mockLogger };
+    };
+
+    const LOWER_QUERY = "SET memory_limit='512MB'";
+    const RESTORE_QUERY = "SET memory_limit='2GB'";
+
+    it('should lower the main memory limit while the task runs, then restore it', async () => {
+      const { connection, db } = loadDbWithMemoryLimit('2GB');
+      const task = sinon.stub().resolves('task result');
+
+      const result = await db.duckDbRunWithReducedMemoryLimit(task);
+
+      expect(result).to.equal('task result');
+      const lowerCall = connection.runAndReadAll.withArgs(LOWER_QUERY);
+      const restoreCall = connection.runAndReadAll.withArgs(RESTORE_QUERY);
+      expect(lowerCall.calledOnce).to.equal(true);
+      expect(restoreCall.calledOnce).to.equal(true);
+      expect(lowerCall.calledBefore(task)).to.equal(true);
+      expect(task.calledBefore(restoreCall)).to.equal(true);
+    });
+
+    it('should wait for the queries running on both connections before lowering the limit', async () => {
+      const { connection, db } = loadDbWithMemoryLimit('2GB');
+      let releaseRead;
+      let releaseWrite;
+      const readResult = { getRowObjectsJS: () => [] };
+      connection.runAndReadAll.withArgs('SLOW READ').returns(
+        new Promise((resolve) => {
+          releaseRead = () => resolve(readResult);
+        }),
+      );
+      connection.runAndReadAll.withArgs('SLOW WRITE').returns(
+        new Promise((resolve) => {
+          releaseWrite = () => resolve(readResult);
+        }),
+      );
+      const flush = () =>
+        new Promise((resolve) => {
+          setImmediate(resolve);
+        });
+      const slowRead = db.duckDbReadConnectionAllAsync('SLOW READ');
+      const slowWrite = db.duckDbWriteConnectionAllAsync('SLOW WRITE');
+      const run = db.duckDbRunWithReducedMemoryLimit(sinon.stub().resolves());
+      const lowerCall = connection.runAndReadAll.withArgs(LOWER_QUERY);
+
+      await flush();
+      expect(lowerCall.called).to.equal(false);
+      releaseRead();
+      await slowRead;
+      await flush();
+      // The read connection is idle, but the write connection still runs a query.
+      expect(lowerCall.called).to.equal(false);
+      releaseWrite();
+      await slowWrite;
+      await run;
+      expect(lowerCall.calledOnce).to.equal(true);
+    });
+
+    it('should restore the memory limit and rethrow when the task fails', async () => {
+      const { connection, db } = loadDbWithMemoryLimit('2GB');
+      const task = sinon.stub().rejects(new Error('export failed'));
+
+      try {
+        await db.duckDbRunWithReducedMemoryLimit(task);
+        expect.fail('Should have thrown an error');
+      } catch (err) {
+        expect(err.message).to.equal('export failed');
+      }
+
+      expect(connection.runAndReadAll.calledWith(RESTORE_QUERY)).to.equal(true);
+    });
+
+    it('should still run the task with the full limit when the limit cannot be lowered', async () => {
+      const { connection, db, mockLogger } = loadDbWithMemoryLimit('2GB');
+      connection.runAndReadAll.withArgs(LOWER_QUERY).rejects(new Error('could not free up enough memory'));
+      const task = sinon.stub().resolves('task result');
+
+      const result = await db.duckDbRunWithReducedMemoryLimit(task);
+
+      expect(result).to.equal('task result');
+      expect(mockLogger.warn.calledWithMatch(/unable to lower memory_limit to 512MB: could not free up/)).to.equal(
+        true,
+      );
+      // The limit was never lowered, there is nothing to restore.
+      expect(connection.runAndReadAll.calledWith(RESTORE_QUERY)).to.equal(false);
+    });
+
+    it('should log an error and keep the task result when the limit cannot be restored', async () => {
+      const { connection, db, mockLogger } = loadDbWithMemoryLimit('2GB');
+      connection.runAndReadAll.withArgs(RESTORE_QUERY).rejects(new Error('database closed'));
+      const task = sinon.stub().resolves('task result');
+
+      const result = await db.duckDbRunWithReducedMemoryLimit(task);
+
+      expect(result).to.equal('task result');
+      expect(mockLogger.error.calledWithMatch(/unable to restore memory_limit to 2GB: database closed/)).to.equal(true);
+    });
+
+    it('should not touch a main memory limit already at or below the reduced limit', async () => {
+      const { connection, db } = loadDbWithMemoryLimit('512MB');
+      const task = sinon.stub().resolves('task result');
+
+      const result = await db.duckDbRunWithReducedMemoryLimit(task);
+
+      expect(result).to.equal('task result');
+      expect(connection.runAndReadAll.calledWithMatch(/SET memory_limit/)).to.equal(false);
+    });
+
+    it('should not touch a main memory limit that cannot be parsed', async () => {
+      const { connection, db } = loadDbWithMemoryLimit('25% of RAM');
+      const task = sinon.stub().resolves('task result');
+
+      await db.duckDbRunWithReducedMemoryLimit(task);
+
+      expect(task.calledOnce).to.equal(true);
+      expect(connection.runAndReadAll.calledWithMatch(/SET memory_limit/)).to.equal(false);
+    });
+  });
+
   describe('duckDbClose', () => {
     it('should disconnect the connections and close the instance', async () => {
       const { api, connection, instance } = buildMockDuckDbApi();

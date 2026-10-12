@@ -1,6 +1,9 @@
 {
   "name": "gladys-z2m-zigbee2mqtt",
   "Image": "koenkk/zigbee2mqtt:2.14.2",
+  "Labels": {
+    "io.gladysassistant.service": "zigbee2mqtt"
+  },
   "ExposedPorts": {},
   "Env": [],
   "HostConfig": {

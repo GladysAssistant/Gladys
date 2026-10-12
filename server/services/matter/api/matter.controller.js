@@ -22,7 +22,8 @@ module.exports = function MatterController(matterHandler) {
    */
   async function getPairedDevices(req, res) {
     await matterHandler.refreshDevices();
-    const devices = matterHandler.getDevices();
+    // with the energy-tracking features of the devices carrying an index (energy-hierarchy.md, F)
+    const devices = await matterHandler.getPairedDevices();
     res.json(devices);
   }
 

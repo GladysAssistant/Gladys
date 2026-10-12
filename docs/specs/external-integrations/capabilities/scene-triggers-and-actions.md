@@ -208,7 +208,7 @@ Follows the `<domain>.<action>` convention of C.4 and the standard `command-resu
 
 **Install screen** (B.8): one informational line when either field is declared — "adds N triggers and N actions to the scene editor" —, next to the other declarations. Not a permission (§2).
 
-**MCP service** (`services/mcp/lib/sceneSchemas.js`): the two new types are accepted by the AI's scene schemas (`integration`, `trigger_key` / `action_key`, `fields` as a permissive record) so a scene containing them can be read and rewritten by the assistant; exposing the catalog of declarations to the assistant (so it can *author* such a step) is a later, additive improvement.
+**MCP service** (`services/mcp/lib/sceneSchemas.js`): the two new types are accepted by the AI's scene schemas (`integration`, `trigger_key` / `action_key`, `fields` as a permissive record) so a scene containing them can be read and rewritten by the assistant. In the tool definitions sent to the Gladys Plus AI chat (`mcpToolsToChatApiFormat.js`), the key constraint of that record (`propertyNames`) is dropped, because the provider's tool-call grammar does not implement that keyword and rejects the whole request; the key format is still enforced when the tool call is parsed and by the scene model. Exposing the catalog of declarations to the assistant (so it can *author* such a step) is a later, additive improvement.
 
 ## 8. Lifecycle: update, stop, uninstall
 

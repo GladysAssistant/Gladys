@@ -7,9 +7,15 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
-const container = {
-  id: 'docker-test',
-};
+// Our own container, named after the requested filter
+const ownContainer = (options) =>
+  Promise.resolve([
+    {
+      id: 'docker-test',
+      name: `/${options.filters.name[0]}`,
+      labels: { 'io.gladysassistant.service': 'zigbee2mqtt' },
+    },
+  ]);
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
@@ -36,7 +42,8 @@ describe('zigbee2mqtt disconnect', () => {
         emit: fake.resolves(null),
       },
       system: {
-        getContainers: fake.resolves([container]),
+        getContainers: fake(ownContainer),
+        inspectContainer: fake.resolves({ Config: { Image: 'nginx:alpine' } }),
         stopContainer: fake.resolves(true),
         removeContainer: fake.resolves(true),
       },
@@ -141,5 +148,33 @@ describe('zigbee2mqtt disconnect', () => {
         mqttConnectionError: null,
       },
     });
+  });
+
+  it('no container -> nothing to stop', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake.resolves([]);
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    assert.calledTwice(gladys.system.getContainers);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    expect(zigbee2MqttManager.mqttRunning).to.equal(false);
+    expect(zigbee2MqttManager.zigbee2mqttRunning).to.equal(false);
+  });
+
+  it('our names are taken by user containers -> they are left untouched', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake((options) =>
+      Promise.resolve([{ id: 'user-container', name: `/${options.filters.name[0]}`, image: 'nginx:alpine' }]),
+    );
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    assert.calledTwice(gladys.system.inspectContainer);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    expect(zigbee2MqttManager.mqttRunning).to.equal(false);
+    expect(zigbee2MqttManager.zigbee2mqttRunning).to.equal(false);
   });
 });
