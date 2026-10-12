@@ -110,6 +110,38 @@ describe('gateway.backup', async function describe() {
     expect(compressions.every((compression) => compression === 'ZSTD')).to.equal(true);
   });
 
+  it('should export DuckDB while the main memory limit is reduced, then restore it', async () => {
+    const getMemoryLimit = async () => {
+      const [row] = await db.duckDbReadConnectionAllAsync("SELECT current_setting('memory_limit') AS memory_limit");
+      return row.memory_limit;
+    };
+    const memoryLimitBefore = await getMemoryLimit();
+    const steps = [];
+    const runWithReducedMemoryLimit = db.duckDbRunWithReducedMemoryLimit;
+    const createBackupInstance = db.duckDbCreateBackupInstance;
+    const runStub = sinon.stub(db, 'duckDbRunWithReducedMemoryLimit').callsFake(async (task) => {
+      steps.push('reduce');
+      try {
+        return await runWithReducedMemoryLimit(task);
+      } finally {
+        steps.push('restore');
+      }
+    });
+    const createStub = sinon.stub(db, 'duckDbCreateBackupInstance').callsFake(() => {
+      steps.push('create backup instance');
+      return createBackupInstance();
+    });
+    try {
+      await gateway.backup();
+    } finally {
+      runStub.restore();
+      createStub.restore();
+    }
+
+    expect(steps).to.deep.equal(['reduce', 'create backup instance', 'restore']);
+    expect(await getMemoryLimit()).to.equal(memoryLimitBefore);
+  });
+
   it('should start and abort backup', async () => {
     gateway.gladysGatewayClient.uploadOneBackupChunk = fake.rejects(new Error('error'));
 
