@@ -38,7 +38,8 @@ class SetupTab extends Component {
     let error = false;
 
     this.setState({
-      matterbridgeStatus: RequestStatus.Getting
+      matterbridgeStatus: RequestStatus.Getting,
+      containerConflictMessage: null
     });
 
     await this.props.httpClient.post('/api/v1/service/matterbridge/variable/MATTERBRIDGE_ENABLED', {
@@ -49,6 +50,10 @@ class SetupTab extends Component {
       await this.props.httpClient.post('/api/v1/service/matterbridge/connect');
     } catch (e) {
       error = error | get(e, 'response.status');
+      // A container that is not ours carries our name: the server says which one to rename
+      if (get(e, 'response.status') === 409) {
+        this.setState({ containerConflictMessage: get(e, 'response.data.error') });
+      }
     }
 
     if (error) {
@@ -143,7 +148,8 @@ class SetupTab extends Component {
       matterbridgeRunning,
       matterbridgeUrl,
       matterbridgeStatus,
-      showConfirmDelete
+      showConfirmDelete,
+      containerConflictMessage
     }
   ) {
     return (
@@ -166,6 +172,13 @@ class SetupTab extends Component {
             networkModeValid={networkModeValid}
             matterbridgeStatus={matterbridgeStatus}
           />
+
+          {containerConflictMessage && (
+            <div class="alert alert-danger">
+              <Text id="integration.matterbridge.setup.containerConflictPrefix" />
+              <code>{containerConflictMessage}</code>
+            </div>
+          )}
 
           {matterbridgeRunning && matterbridgeUrl && (
             <div>

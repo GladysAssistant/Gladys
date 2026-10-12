@@ -20,6 +20,8 @@ const NodeRedManager = proxiquire('../../../../services/node-red/lib', {
 
 const container = {
   id: 'docker-test',
+  name: '/gladys-node-red',
+  labels: { 'io.gladysassistant.service': 'node-red' },
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -42,6 +44,7 @@ describe('NodeRed disconnect', () => {
       },
       system: {
         getContainers: fake.resolves([container]),
+        inspectContainer: fake.resolves({ Config: { Image: 'nginx:alpine' } }),
         stopContainer: fake.resolves(true),
         removeContainer: fake.resolves(true),
         getGladysBasePath: fake.resolves({
@@ -107,5 +110,39 @@ describe('NodeRed disconnect', () => {
     expect(nodeRedManager.gladysConnected).to.equal(true);
     expect(nodeRedManager.nodeRedRunning).to.equal(true);
     expect(nodeRedManager.nodeRedExist).to.equal(true);
+  });
+
+  it('no container to stop', async () => {
+    gladys.system.getContainers = fake.resolves([]);
+
+    await nodeRedManager.disconnect();
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
+    });
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(fsMock.rm);
+
+    // our Node-RED is not running anymore, whether a container was found or not
+    expect(nodeRedManager.gladysConnected).to.equal(false);
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
+  });
+
+  it('our name is taken by a user container -> it is left untouched', async () => {
+    gladys.system.getContainers = fake.resolves([{ id: 'user-container', name: '/gladys-node-red', image: 'nginx' }]);
+
+    await nodeRedManager.disconnect();
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
+    });
+    assert.calledOnceWithExactly(gladys.system.inspectContainer, 'user-container');
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(fsMock.rm);
+
+    expect(nodeRedManager.gladysConnected).to.equal(false);
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
   });
 });

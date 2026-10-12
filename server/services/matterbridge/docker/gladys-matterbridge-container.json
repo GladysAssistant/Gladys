@@ -1,6 +1,9 @@
 {
   "name": "gladys-matterbridge",
   "Image": "luligu/matterbridge:latest",
+  "Labels": {
+    "io.gladysassistant.service": "matterbridge"
+  },
   "HostConfig": {
     "Binds": [
       "/var/lib/gladysassistant/matterbridge/Matterbridge:/root/Matterbridge",

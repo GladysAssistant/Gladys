@@ -1,4 +1,6 @@
 const logger = require('../../../utils/logger');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
+const { isBrokerConfiguredByGladys } = require('./isBrokerConfiguredByGladys');
 const { CONFIGURATION, DEFAULT } = require('./constants');
 const containerParams = require('../docker/eclipse-mosquitto-container.json');
 
@@ -16,14 +18,19 @@ async function updateContainer(configuration) {
   const { brokerContainerAvailable, mosquittoVersion } = configuration;
   if (brokerContainerAvailable && mosquittoVersion !== DEFAULT.MOSQUITTO_VERSION) {
     logger.info(`MQTT: update #${DEFAULT.MOSQUITTO_VERSION} of mosquitto container required...`);
-    const dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerParams.name] },
-    });
+    // Only our own container is removed: a user container carrying the same name is left alone
+    const container = await findManagedContainer(this.gladys.system, containerParams);
+
+    // A user broker carrying our name, never configured by Gladys, is left untouched
+    if (container && !isBrokerConfiguredByGladys(container, mosquittoVersion)) {
+      logger.warn(
+        `MQTT: container "${containerParams.name}" was not configured by Gladys (no label and no stored version), leaving it untouched`,
+      );
+      return configuration;
+    }
 
     // Remove old container
-    if (dockerContainers.length !== 0) {
-      const [container] = dockerContainers;
+    if (container) {
       await this.gladys.system.removeContainer(container.id, { force: true });
     }
 

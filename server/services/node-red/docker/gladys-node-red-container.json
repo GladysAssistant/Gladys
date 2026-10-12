@@ -1,6 +1,9 @@
 {
   "name": "gladys-node-red",
   "Image": "nodered/node-red:3.1",
+  "Labels": {
+    "io.gladysassistant.service": "node-red"
+  },
   "ExposedPorts": {
     "1880/tcp": {}
   },
