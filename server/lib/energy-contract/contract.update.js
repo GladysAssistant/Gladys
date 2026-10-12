@@ -40,6 +40,8 @@ async function update(selector, data) {
   const { id, selector: keptSelector, created_at: createdAt, updated_at: updatedAt, ...fields } = next;
   await row.update(fields);
   const updated = await this.getBySelector(selector);
+  // the meter of a consumption contract is a root, priced by it (energy-hierarchy.md, section C.2)
+  await this.detachElectricMeter(updated);
   const changed = RECALCULATION_FIELDS.some((key) => JSON.stringify(before[key]) !== JSON.stringify(updated[key]));
   if (changed) {
     this.requestRecalculation(updated, before.valid_from < updated.valid_from ? before.valid_from : updated.valid_from);

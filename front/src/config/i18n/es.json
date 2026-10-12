@@ -2823,9 +2823,6 @@
       "myDevicesTab": "Mis dispositivos",
       "energyPriceTab": "Tarifas de energía",
       "documentation": "Documentación",
-      "hierarchicalListDescription": "Aquí está la lista jerárquica de sensores de energía. Puede definir relaciones padre/hijo para agregar el consumo.",
-      "rootNotParent": "Sin padre (raíz)",
-      "level": "Nivel {{depth}}",
       "wizard": {
         "basics": "Información",
         "periodScope": "Periodo y alcance",
@@ -2880,7 +2877,6 @@
       },
       "errorLoadingPrices": "Error al cargar las tarifas.",
       "errorLoadingDevices": "Error al cargar los dispositivos.",
-      "noDeviceFeaturesFound": "No se encontraron funciones de dispositivo.",
       "settings": "Configuración",
       "calculateConsumptionFromIndexDescription": "Esto recalculará el consumo de energía (en kWh) en intervalos de 30 minutos a partir de las funciones \"índice\", desde el inicio de su instalación de Gladys.",
       "calculateConsumptionFromIndexFromBeginning": "Recalcular consumo",
@@ -2920,13 +2916,6 @@
       "selectPeakHoursHelp": "Haga clic en las franjas horarias en las que se aplica la tarifa punta. Las franjas no seleccionadas serán horas valle.",
       "peakHours": "Horas punta",
       "offPeakHours": "Horas valle",
-      "circularDependencyDetected": "Se detectaron dependencias circulares o rotas",
-      "circularDependencyDescription": "Las siguientes funciones de dispositivo tienen referencias de padre no válidas que podrían causar problemas de rendimiento. Haga clic en el botón para corregirlas automáticamente.",
-      "brokenReference": "referencia rota",
-      "circularReference": "referencia circular",
-      "selfReference": "autorreferencia",
-      "fixAutomatically": "Corregir",
-      "fixing": "Corrigiendo...",
       "contracts": {
         "tab": "Contratos",
         "description": "Un contrato describe cómo se tarifica el consumo de un contador durante un periodo. Elija una plantilla del catálogo comunitario o de una integración instalada, rellene sus parámetros y compruebe la vista previa antes de guardar.",
@@ -3004,6 +2993,19 @@
           "recalculate": "Recalcular",
           "recalculated": "El recálculo se ha iniciado. Puede seguir su progreso en las tareas en segundo plano."
         }
+      },
+      "hierarchy": {
+        "description": "Cada dispositivo de energía se factura según el contrato del contador eléctrico al que está vinculado. Gladys gestiona los vínculos entre las funciones de energía de tus dispositivos: solo eliges el contador de un dispositivo cuando tienes varios.",
+        "meterBadge": "Contador eléctrico",
+        "meterSelectLabel": "Contador",
+        "chooseMeter": "Elegir un contador",
+        "noAttachedDevice": "Todavía no hay ningún dispositivo vinculado a este contador.",
+        "unattachedTitle": "No vinculados a un contador",
+        "unattachedDescription": "Estos dispositivos no se facturan: elige el contador al que están conectados.",
+        "noMeter": "Todavía no hay contador eléctrico: crea un contrato de energía para facturar el consumo de tus dispositivos.",
+        "noMeterLink": "Crear un contrato",
+        "noDevice": "No se ha encontrado ningún dispositivo de energía.",
+        "attachError": "No se ha podido vincular el dispositivo a este contador."
       }
     },
     "caldav": {

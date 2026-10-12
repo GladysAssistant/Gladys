@@ -80,6 +80,8 @@ async function create(data) {
   await assertNoOverlap(contract);
   const row = await db.EnergyContract.create(contract);
   const created = await this.getBySelector(row.selector);
+  // the meter of a consumption contract is a root, priced by it (energy-hierarchy.md, section C.2)
+  await this.detachElectricMeter(created);
   this.requestRecalculation(created, created.valid_from);
   return created;
 }
