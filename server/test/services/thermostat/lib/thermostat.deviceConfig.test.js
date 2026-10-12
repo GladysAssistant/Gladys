@@ -36,6 +36,28 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
     expect(buildParamsConfig({})).to.equal(null);
   });
 
+  it('should read several window and temperature sensors, and the power feature', () => {
+    const config = buildParamsConfig(
+      deviceWithParams({
+        THERMOSTAT_TEMPERATURE_FEATURE: '["salon-temp","kitchen-temp"]',
+        THERMOSTAT_WINDOW_FEATURE: '["salon-window","kitchen-door"]',
+        THERMOSTAT_POWER_FEATURE: 'ac-power',
+      }),
+    );
+
+    expect(config.temperature_features).to.deep.equal(['salon-temp', 'kitchen-temp']);
+    expect(config.window_features).to.deep.equal(['salon-window', 'kitchen-door']);
+    expect(config.power_feature).to.equal('ac-power');
+  });
+
+  it('should read no sensor and no power when the params are absent', () => {
+    const config = buildParamsConfig(deviceWithParams({ THERMOSTAT_MODE: 'heating' }));
+
+    expect(config.temperature_features).to.deep.equal([]);
+    expect(config.window_features).to.deep.equal([]);
+    expect(config.power_feature).to.equal(null);
+  });
+
   it('should read features and mode from params', () => {
     const config = buildParamsConfig(
       deviceWithParams({
@@ -46,7 +68,7 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
       }),
     );
 
-    expect(config.temperature_feature).to.equal('temp-sensor');
+    expect(config.temperature_features).to.deep.equal(['temp-sensor']);
     expect(config.switch_feature).to.equal('heater-switch');
     expect(config.default_mode).to.equal('cooling');
     expect(config.control_type).to.equal('tpi');
@@ -77,7 +99,7 @@ describe('thermostat.deviceConfig - getDeviceConfig', () => {
 
     const config = getDeviceConfig(device);
 
-    expect(config.temperature_feature).to.equal('temp-sensor');
+    expect(config.temperature_features).to.deep.equal(['temp-sensor']);
   });
 
   it('should return null when the device carries no params', () => {

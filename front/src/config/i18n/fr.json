@@ -3629,6 +3629,8 @@
         "nameLabel": "Nom",
         "namePlaceholder": "Ex: Thermostat Salon",
         "roomLabel": "Pièce",
+        "showAllRoomsLabel": "Afficher les appareils de toutes les pièces",
+        "showAllRoomsHelp": "Les listes ci-dessous ne proposent que les appareils de cette pièce. Élargissez-les quand la zone chauffée couvre plusieurs pièces, comme un salon et une cuisine ouverts.",
         "modeLabel": "Usage",
         "typeLabel": "Type de thermostat",
         "tuningSection": "Réglage fin",
@@ -3644,7 +3646,9 @@
         "stateFeatureLabel": "État de chauffe (facultatif)",
         "stateFeatureHelp": "Permet d'afficher si l'appareil est en train de chauffer. Acceptée aussi bien sous forme d'état de fonctionnement que de contact de chaudière. Laissez vide si votre thermostat ne remonte pas cette information.",
         "modeFeatureLabel": "Mode de fonctionnement (facultatif)",
-        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un. Gladys le bascule sur Arrêt lorsque le thermostat est arrêté ou qu'un créneau Arrêt s'applique, et le rétablit dès qu'une consigne reprend la main.",
+        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un — le mode d'une climatisation convient aussi. Gladys le bascule sur Arrêt lorsque le thermostat est arrêté ou qu'un créneau Arrêt s'applique, et le rétablit dès qu'une consigne reprend la main.",
+        "powerFeatureLabel": "Alimentation (facultatif)",
+        "powerFeatureHelp": "L'interrupteur qui allume et éteint l'appareil réel, comme l'alimentation d'une climatisation ou d'une pompe à chaleur. Gladys l'éteint quand le thermostat est arrêté, qu'une fenêtre s'ouvre ou qu'un créneau Arrêt s'applique, et le rallume dès qu'une consigne reprend la main. Nécessaire pour une climatisation, dont le mode n'a pas d'arrêt.",
         "mode": {
           "heating": "Chauffage",
           "cooling": "Climatisation"
@@ -3666,8 +3670,9 @@
         "minTempPlaceholder": "Ex: 5",
         "maxTempLabel": "Temp. max",
         "maxTempPlaceholder": "Ex: 35",
-        "temperatureFeatureLabel": "Capteur de température",
-        "temperatureFeatureHelp": "Sélectionnez le capteur qui mesure la température ambiante. Un capteur qui remonte une unité différente de celle du thermostat est converti automatiquement ; un capteur sans unité déclarée est supposé utiliser celle du thermostat.",
+        "temperatureFeatureLabel": "Capteurs de température",
+        "temperatureFeatureHelp": "Sélectionnez le capteur qui mesure la température ambiante, ou plusieurs : le thermostat utilise alors leur moyenne. Un capteur qui remonte une unité différente de celle du thermostat est converti automatiquement ; un capteur sans unité déclarée est supposé utiliser celle du thermostat.",
+        "addTemperatureFeature": "Ajouter un capteur de température",
         "humidityFeatureLabel": "Capteur d'humidité",
         "humidityFeatureHelp": "Optionnel. Affiché dans le widget thermostat.",
         "switchFeatureLabel": "Commutateur (actionneur)",
@@ -3675,11 +3680,13 @@
           "heating": "Interrupteur qui sera allumé et éteint pour chauffer la pièce.",
           "cooling": "Interrupteur qui sera allumé et éteint pour rafraîchir la pièce."
         },
-        "windowFeatureLabel": "Capteur d'ouverture de fenêtre",
+        "windowFeatureLabel": "Capteurs d'ouverture de fenêtre",
         "windowFeatureHelp": {
-          "heating": "Optionnel. Si une fenêtre est ouverte, le chauffage est automatiquement coupé.",
-          "cooling": "Optionnel. Si une fenêtre est ouverte, la climatisation est automatiquement coupée."
+          "heating": "Optionnel. Dès qu'une des fenêtres sélectionnées est ouverte, le chauffage est automatiquement coupé.",
+          "cooling": "Optionnel. Dès qu'une des fenêtres sélectionnées est ouverte, la climatisation est automatiquement coupée."
         },
+        "addWindowFeature": "Ajouter un capteur d'ouverture",
+        "removeFeature": "Retirer",
         "hysteresisStartLabel": "Seuil de démarrage",
         "hysteresisStartHelp": {
           "heating": "Le chauffage démarre lorsque la température est inférieure à (consigne − seuil de démarrage). Ex. : consigne 21 °C, seuil 0,5 °C → démarre sous 20,5 °C.",

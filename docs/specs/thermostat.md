@@ -34,16 +34,29 @@ The design is constrained by what integrations publish today, which is much less
 | Zigbee2MQTT           | yes, **up to five** (heating/cooling, occupied/unoccupied) | no                                         | no     |
 | Matter                | yes, **two** (heating, cooling)                            | no                                         | no     |
 | MQTT / Home Assistant | yes, when the discovery declares it                        | no                                         | no     |
+| Air conditioners      | yes, as `air-conditioning`/`target-temperature`            | no                                         | yes, as `air-conditioning`/`mode` (`AC_MODE`) — no `off` value; the unit is stopped by its `air-conditioning`/`binary` power feature |
+
+Air conditioners and heat pumps (MELCloud, Tuya, Sensibo, external integrations…) do not publish the `thermostat` category at all: their setpoint, their mode and their power live in `air-conditioning` (A.0.3). Offering only `thermostat`/`target-temperature` as a target left every heat pump out of the picker, with nothing to tell the user why.
 
 Three consequences, each of which is a rule the code follows:
 
-- **No auto-discovery of the target.** A Matter or Zigbee device exposes several setpoints and only the user knows which one drives their heating, so the three selectors are picked by hand in the edit form, out of _every_ device in the house.
+- **No auto-discovery of the target.** A Matter or Zigbee device exposes several setpoints and only the user knows which one drives their heating, so the selectors are picked by hand in the edit form, out of _every_ device in the house (A.3 narrows the list to the thermostat's room by default, it never hides the rest).
 - **The state feature accepts two shapes.** `thermostat`/`operating-state` (0 idle / 1 heating / 2 cooling) _and_ a read-only `switch`/`binary` boiler contact. Accepting only the standard type would leave every thermostat available today with no heating indication at all. It also accepts **nothing**: the widget then shows the setpoint without a heating halo.
 - **The mode feature is optional.** No integration produces one. Requiring it would make the feature unusable for everybody.
 
 ### A.0.2 No loops
 
 The feature pickers exclude devices owned by this service. Pointing an external thermostat at a virtual one would make Gladys write its own setpoint back to itself, once a minute, for ever.
+
+### A.0.3 Air conditioners as external thermostats
+
+An `air-conditioning` device is driven like any external thermostat — Gladys writes its setpoint and leaves the regulation to it — with three differences, all of them in what the features accept:
+
+- **The target** may be an `air-conditioning`/`target-temperature` feature as well as a `thermostat` one. Nothing else in the loop changes: the unit conversion, the step snap, the clamp to the feature's `min`/`max` and the echo handling (C.0.1) apply as they are.
+- **The mode** may be an `air-conditioning`/`mode` feature. Its values are `AC_MODE`, not `THERMOSTAT_MODE` — `HEATING` is `2` there and `1` here — so the value is **translated** on write: heating → `AC_MODE.HEATING`, cooling → `AC_MODE.COOLING`, auto → `AC_MODE.AUTO`. `AC_MODE` has no `off`: an `OFF` write on such a feature is skipped, never sent as `0`, which is `AC_MODE.AUTO` and would start the unit instead. The `max` clamp of C.0 is a `THERMOSTAT_MODE` rule and does not apply to an `AC_MODE` feature, whose `max` describes another enum.
+- **The stop** goes through the unit's power, `THERMOSTAT_POWER_FEATURE` (A.1): a writable `binary` of the `air-conditioning` or `switch` category. Stopping writes `0` on it, starting writes `1` — see C.0 for the order. It is optional and may name the power of any external thermostat, not only an air conditioner, but an air conditioner without it can only be "stopped" by the setpoint, which a heat pump in heating mode clamps to its own minimum (often 16 °C) and keeps heating to.
+
+Picking an `air-conditioning` target in the edit form pre-fills the mode and the power with the `air-conditioning`/`mode` and `air-conditioning`/`binary` features **of the same device**, when the fields are empty. This is a suggestion, not discovery: the fields stay editable, and a device has only one of each, so there is nothing for the user to disambiguate — unlike the several setpoints of A.0.1.
 
 ### A.1 Configuration lives on the device
 
@@ -52,13 +65,14 @@ Everything the control loop needs is a `THERMOSTAT_*` device param:
 | Param                                              | Meaning                                                                                                                                                                           |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `THERMOSTAT_TYPE`                                  | `virtual` or `external`; absent means `virtual`                                                                                                                                   |
-| `THERMOSTAT_TEMPERATURE_FEATURE`                   | the sensor the loop regulates on (virtual); displayed only (external)                                                                                                             |
+| `THERMOSTAT_TEMPERATURE_FEATURE`                   | the sensor(s) the loop regulates on (virtual); displayed only (external). One or several (A.1.1): the loop uses their **average**                                                  |
 | `THERMOSTAT_HUMIDITY_FEATURE`                      | optional, displayed only                                                                                                                                                          |
 | `THERMOSTAT_SWITCH_FEATURE`                        | **virtual only** — the actuator the loop drives                                                                                                                                   |
 | `THERMOSTAT_TARGET_FEATURE`                        | **external only** — the real device's setpoint, written by the loop. Required                                                                                                     |
 | `THERMOSTAT_STATE_FEATURE`                         | **external only**, optional — `operating-state` or a binary boiler contact, read to show whether the equipment runs                                                               |
-| `THERMOSTAT_MODE_FEATURE`                          | **external only**, optional — the real device's operating mode, if it has one                                                                                                     |
-| `THERMOSTAT_WINDOW_FEATURE`                        | optional opening sensor; cuts the switch when open (virtual) or stops the real thermostat (external) — whatever the mode, so a running air conditioner is suspended like a heater |
+| `THERMOSTAT_MODE_FEATURE`                          | **external only**, optional — the real device's operating mode, if it has one: `thermostat`/`mode` or `air-conditioning`/`mode` (A.0.3)                                           |
+| `THERMOSTAT_POWER_FEATURE`                         | **external only**, optional — the real device's power, a writable `air-conditioning` or `switch` `binary`: `0` to stop it, `1` to start it (A.0.3, C.0)                           |
+| `THERMOSTAT_WINDOW_FEATURE`                        | optional opening sensor(s); one or several (A.1.1). **Any** of them open cuts the switch (virtual) or stops the real thermostat (external) — whatever the mode, so a running air conditioner is suspended like a heater |
 | `THERMOSTAT_MODE`                                  | `heating` or `cooling`                                                                                                                                                            |
 | `THERMOSTAT_CONTROL_TYPE`                          | `hysteresis` or `tpi`                                                                                                                                                             |
 | `THERMOSTAT_MIN_TEMP` / `_MAX_TEMP`                | bounds of the setpoint feature and of the widget dial                                                                                                                             |
@@ -70,17 +84,27 @@ Everything the control loop needs is a `THERMOSTAT_*` device param:
 | `THERMOSTAT_HYSTERESIS_START` / `_STOP`            | hysteresis band, in degrees of **difference**                                                                                                                                     |
 | `THERMOSTAT_TPI_CYCLE_TIME` / `_PROPORTIONAL_BAND` | TPI tuning, clamped by the regulation loop to 5-120 min and 0.5-10 degrees                                                                                                        |
 
+#### A.1.1 Several sensors in one param
+
+A living room has several windows, and an open-plan ground floor is one volume for two rooms: the salon's French window and the kitchen's door both have to stop the heating. A large room has several temperature probes, and regulating on one corner of it is regulating on the wrong number. `THERMOSTAT_WINDOW_FEATURE` and `THERMOSTAT_TEMPERATURE_FEATURE` therefore name **one or several** features.
+
+**Format.** The value is either a single selector — the format every device saved so far carries — or a JSON array of selectors, `["salon-window","kitchen-door"]`. A single sensor is always written as a plain selector, so a device with one sensor is byte-for-byte what it was, and **no migration is needed**. Every reader goes through one parser (`parseSelectorList`, server and front alike), which accepts both and drops empty and duplicate entries; a value that starts with `[` but is not valid JSON is read as a single selector rather than throwing, so a malformed param degrades into "sensor not found" instead of stopping the loop. No other `*_FEATURE` param takes a list: the switch, the target, the state, the mode and the power each name one feature of one appliance.
+
+**Windows: any open stops.** The loop checks every listed sensor and suspends the heating as soon as one reads `0`; the `NEW_STATE` listener reacts to any of them. It resumes only when all are closed. A sensor that cannot be read is ignored — it is not taken as open, which would stop the heating for good on a sensor with a flat battery.
+
+**Temperature: the average.** The loop regulates on the arithmetic mean of the listed sensors that carry a value, each converted into the thermostat's unit first (C.3), so a Celsius probe and a Fahrenheit one average correctly. A sensor with no value is left out of the mean rather than counted as 0; when none has a value, the pass behaves as it did for one silent sensor — no switch decision. The widget displays the same mean, rounded for display only. A min/max choice was considered and left out: an average needs no setting, and a house that wants the coldest corner picks that one sensor.
+
 Which schedule a thermostat follows is **not** in this list: it is a relation, held by `t_thermostat_schedule_device` (E.1).
 
 `createDevice` accepts only this list plus, on a virtual thermostat, its four features; anything else in the request body is dropped rather than persisted. Every field the edit form offers is in that list: a field the filter dropped would silently need a second store, which is exactly what this section forbids.
 
 **The state features are named after the device's `external_id`, never its selector.** `createDevice` is the same route for a create and for every later save, and the selector does not exist yet on the first one — it is derived from the payload afterwards. Keying these features on the selector renames them between the two, and since a save rebuilds the feature set, the renamed ones are deleted and recreated: the preset and the mode the user had set go back to `null`, their history is dropped, and a scene written against them breaks. The `external_id` is the one identifier the client carries unchanged across both saves.
 
-On an external device `createDevice` keeps only the `preset` and `mode` features (B.3) and refuses a payload with no `THERMOSTAT_TARGET_FEATURE`: a thermostat with nothing to drive would sit in the integration page doing nothing, with no way to tell why. Switching a device back to `virtual` clears the three external params, so a stale selector can never keep driving a real thermostat.
+On an external device `createDevice` keeps only the `preset` and `mode` features (B.3) and refuses a payload with no `THERMOSTAT_TARGET_FEATURE`: a thermostat with nothing to drive would sit in the integration page doing nothing, with no way to tell why. Switching a device back to `virtual` clears the external params (target, state, mode, power), so a stale selector can never keep driving a real thermostat.
 
 The hysteresis, TPI and switch params are meaningless on an external device — the real thermostat runs its own heuristic — and the edit form hides them there rather than offering settings that do nothing.
 
-The `*_FEATURE` params name a feature of another device by its selector. Migrating that device to a replacement integration rewrites them to the destination feature (`device-migration.md` B.3), as it rewrites the scenes and the dashboards: left on the source selector, the loop would find no sensor, no switch or no target once the source is deleted.
+The `*_FEATURE` params name a feature of another device by its selector. Migrating that device to a replacement integration rewrites them to the destination feature (`device-migration.md` B.3), as it rewrites the scenes and the dashboards: left on the source selector, the loop would find no sensor, no switch or no target once the source is deleted. Inside a list (A.1.1) only the migrated entry is replaced, in place.
 
 The defaults for all of these live in `server/utils/thermostatConstants.js`, imported by the regulation loop, the widget and the edit form alike, so a device saved without a param is regulated exactly as the form displayed it.
 
@@ -91,6 +115,12 @@ The current preset, the current mode and the heating state are the `last_value` 
 The previous revision kept all of it in `t_variable` under `THERMOSTAT_<FEATURE_KEY>_<SUFFIX>`, with the ownership check, the `postDelete` cleanup and the `/state/:variable_key` route that came with it. All of that goes: a feature is deleted with its device, and read by everything that reads devices.
 
 **Not on the dashboard.** See `docs/specs/dashboard-flexible-layout-and-widgets.md` E2: the widget carries `thermostat_feature` and nothing else. A control loop that actuates real heaters must not read its settings from a per-user dashboard document.
+
+### A.3 The feature pickers start from the thermostat's room
+
+A house has hundreds of features, and the pickers listed every one of them: choosing the salon's sensor meant scrolling past the bedrooms' and the garage's. Each picker therefore lists, by default, **the features of the devices in the room chosen for the thermostat**. A "Show the devices of every room" switch widens all of them at once, for the cases where the room is not the boundary — an open-plan salon and kitchen heated as one, a boiler contact in the cellar, a heat pump whose device sits in another room. Widening is a display choice, not a setting: it is not saved.
+
+Narrowing never hides a choice already made. A feature saved on the thermostat that lives in another room is still listed, so opening a thermostat configured with the kitchen's door does not silently blank that field. Once widened, every entry carries its room in its label (`Room - Device - Feature`), since two rooms often have devices of the same name. With no room chosen yet, nothing narrows the lists.
 
 ## B. Presets and modes are features of the device
 
@@ -169,7 +199,7 @@ A single `setInterval` in the service ticks every 60 s and calls `applySchedules
 
 **Order of decisions**, per device. Steps 1 to 3 are identical for both device types — that is the whole point of the design; only steps 4 and 5 differ.
 
-1. **Window open** — if a window sensor is configured and reads `0`, the pass stops after suspending the heating: the switch is cut (virtual), or the device is stopped (external — `OFF` on its mode feature when it has one, then the frost-protection setpoint). A `NEW_STATE` listener applies the same cut immediately, without waiting for the next tick, and takes the **same external branch**: an external thermostat carries no switch and no local setpoint feature, so a listener that requires either skips it entirely and leaves the heating running until the next tick.
+1. **Window open** — if window sensors are configured and **any** of them reads `0` (A.1.1), the pass stops after suspending the heating: the switch is cut (virtual), or the device is stopped (external — `OFF` on its mode feature when it has one, its power off when it has one, then the frost-protection setpoint). A `NEW_STATE` listener applies the same cut immediately, without waiting for the next tick, and takes the **same external branch**: an external thermostat carries no switch and no local setpoint feature, so a listener that requires either skips it entirely and leaves the heating running until the next tick.
 2. **Manual hold** — if a hold is armed and has not expired, the loop regulates on the held setpoint. On expiry it clears the hold, writes `schedule` back on the `preset` feature and falls through to the schedule.
 3. **Target preset** — when the `preset` feature reads `schedule`, the last transition point at or before now (E.3), which is broadcast to the dashboards without being written on the feature (E.3); otherwise the preset the feature carries. With the feature on `schedule` and **no point in force** — no schedule followed, or one with no point — the thermostat keeps the setpoint it has: a virtual one regulates on its setpoint feature, nothing is written to an external one, and the preset is still pushed to the widgets when a hold has just ended. Resolving `schedule` as a preset fell back on the 20 °C default and heated a room nobody had asked to heat.
 4. **Setpoint** — on a virtual thermostat, saved on this service's own `target-temperature` feature when it changed, alongside `operating-state`. On an external one, **written onto the real device** through the core, which routes it to the owning integration, preceded by the **mode** when the device exposes one (section C.0).
@@ -181,12 +211,13 @@ There is no step 5, and no hysteresis or TPI computation at all: the real thermo
 
 Stopping has no setpoint of its own. On an external device it is expressed two ways at once, and which one the thermostat actually obeys depends on the device:
 
-- **`THERMOSTAT_MODE.OFF` on `THERMOSTAT_MODE_FEATURE`**, when the real device exposes a mode. This is the actual stop, and it is written **first**. The setpoint alone leaves such a thermostat in `heating`: it stops aiming at 21 °C, but it fires again as soon as the room drops below 7 °C, and its own screen still reads "heating";
+- **`THERMOSTAT_MODE.OFF` on `THERMOSTAT_MODE_FEATURE`**, when the real device exposes a mode. This is the actual stop, and it is written **first**. The setpoint alone leaves such a thermostat in `heating`: it stops aiming at 21 °C, but it fires again as soon as the room drops below 7 °C, and its own screen still reads "heating". An `air-conditioning` mode has no `off` and is left untouched here (A.0.3);
+- **`0` on `THERMOSTAT_POWER_FEATURE`**, when one is configured — the stop of a device whose mode cannot say `off`, an air conditioner first of all (A.0.3). Written right after the mode;
 - then the **frost-protection setpoint**, always written — the fallback for a device with no mode feature, and the only way to say "stop heating" that every thermostat understands. A **cooling** thermostat is given the top of its range instead (`THERMOSTAT_MAX_TEMP`, clamped to the device's own maximum): the frost setpoint asked an air conditioner to cool as hard as it could, which it did whenever it had no mode feature or the mode write failed.
 
-**The order matters in both directions.** Stopping writes the mode then the setpoint; starting writes the mode then the setpoint too. Writing the frost setpoint first to a thermostat still in `COOLING` asks it to cool the room to 7 °C until the mode write lands — and to keep doing so if that write fails on an expired token or the 5 s budget, which is the opposite of suspending it. Symmetrically, a device still switched off takes a new setpoint and does nothing with it. In both cases the mode goes first because the mode is what the machine obeys.
+**The order matters in both directions.** Stopping writes the mode, the power, then the setpoint; starting writes the power, the mode, then the setpoint — a unit that is powered off ignores a mode as surely as a setpoint. Writing the frost setpoint first to a thermostat still in `COOLING` asks it to cool the room to 7 °C until the mode write lands — and to keep doing so if that write fails on an expired token or the 5 s budget, which is the opposite of suspending it. Symmetrically, a device still switched off takes a new setpoint and does nothing with it. In both cases the mode goes first because the mode is what the machine obeys.
 
-The mode is handed back to `heating` (or `cooling`, from `THERMOSTAT_MODE`) as soon as a heating preset takes over. The same applies to a manual setpoint, whether it comes from the widget dial, a scene or the device API, and to a start written on the thermostat's own `mode` feature, which writes the real device's mode at once (D.0) rather than at the next pass: the widget sends its setpoint right behind the start, straight to the real device's feature, and left to the pass the mode reached the appliance two seconds after it. Like the setpoint, a mode write is skipped when the device already carries it, and clamped to the feature's `max`: a heating-only thermostat declares `max = 1` and would reject `COOLING`.
+The mode is handed back to `heating` (or `cooling`, from `THERMOSTAT_MODE`) as soon as a heating preset takes over. The same applies to a manual setpoint, whether it comes from the widget dial, a scene or the device API, and to a start written on the thermostat's own `mode` feature, which writes the real device's mode at once (D.0) rather than at the next pass: the widget sends its setpoint right behind the start, straight to the real device's feature, and left to the pass the mode reached the appliance two seconds after it. Like the setpoint, a mode write is skipped when the device already carries it, and clamped to the feature's `max`: a heating-only thermostat declares `max = 1` and would reject `COOLING`. An `air-conditioning` mode is translated into `AC_MODE` instead of clamped (A.0.3). The power is handed back (`1`) at the same moments as the mode, right before it, and skipped the same way when the device already reads `1`.
 
 Four properties of that write, each one required by a different vendor:
 

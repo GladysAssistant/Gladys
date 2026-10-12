@@ -20,7 +20,7 @@ function invalidateDeviceCaches() {
 
 /**
  * @description Called after a thermostat device is updated. A device saved
- * through the generic device route can carry a new THERMOSTAT_WINDOW_FEATURE,
+ * through the generic device route can carry new THERMOSTAT_WINDOW_FEATURE sensors,
  * and the cached selectors would keep pointing at the previous sensor until the
  * next create or delete: the immediate cut-off on window opening would ignore
  * the new sensor entirely (the minute loop re-reads the params on every tick and
@@ -59,8 +59,8 @@ async function getWindowSelectors() {
   const targets = new Set();
   (devices || []).forEach((device) => {
     const config = buildParamsConfig(device);
-    if (config && config.window_feature) {
-      selectors.add(config.window_feature);
+    if (config) {
+      config.window_features.forEach((selector) => selectors.add(selector));
     }
     if (config && config.target_feature) {
       targets.add(config.target_feature);
@@ -301,8 +301,10 @@ async function onDeviceNewState(event) {
         // buildParamsConfig already returns null fields for the params it misses,
         // so the checks below cover both an unconfigured and an absent config.
         const paramsConfig = buildParamsConfig(device) || {};
-        const { window_feature: windowFeature, switch_feature: switchFeature } = paramsConfig;
-        if (windowFeature !== changedSelector) {
+        // Several opening sensors may stop one thermostat (A.1.1): any of them
+        // opening is enough.
+        const { window_features: windowFeatures = [], switch_feature: switchFeature } = paramsConfig;
+        if (!windowFeatures.includes(changedSelector)) {
           return;
         }
         // An external thermostat carries no setpoint feature and no switch: it is

@@ -71,6 +71,15 @@ const buildHandler = (follows = true, deviceMode = THERMOSTAT_MODE.OFF, targetUn
         // The mode lives on that same device, and is looked up the same way.
         get: fake((query) => {
           const selector = query && query.device_feature_selectors;
+          if (selector === 'netatmo-power') {
+            return Promise.resolve([
+              {
+                selector: 'netatmo-device',
+                service: { name: 'netatmo' },
+                features: [{ selector: 'netatmo-power', last_value: 0 }],
+              },
+            ]);
+          }
           if (selector === 'netatmo-mode') {
             return Promise.resolve([
               {
@@ -468,6 +477,33 @@ describe('thermostat.setValue', () => {
       expect(writes).to.deep.equal([THERMOSTAT_MODE.HEATING]);
     });
 
+    // A unit powered off ignores its mode as surely as a setpoint: an air
+    // conditioner is started by its power first (A.0.3).
+    it('should power a real thermostat on before its mode when it is started', async () => {
+      const handler = buildHandler(true, THERMOSTAT_MODE.OFF);
+      const stoppedMode = { ...modeFeature, last_value: THERMOSTAT_MODE.OFF };
+
+      await handler.setValue(
+        device(
+          [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+            { name: 'THERMOSTAT_MODE_FEATURE', value: 'netatmo-mode' },
+            { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
+          ],
+          [presetFeature, stoppedMode],
+        ),
+        stoppedMode,
+        THERMOSTAT_MODE.HEATING,
+      );
+
+      const writes = handler.gladys.device.setValue.getCalls().map((call) => [call.args[1].selector, call.args[2]]);
+      expect(writes).to.deep.equal([
+        ['netatmo-power', 1],
+        ['netatmo-mode', THERMOSTAT_MODE.HEATING],
+      ]);
+    });
+
     it('should leave a running real thermostat to the next pass when its mode is written again', async () => {
       // Not a start: on a programme point on Off, writing the running mode at
       // once would turn the appliance on for the two seconds before the pass.
@@ -578,6 +614,29 @@ describe('thermostat.setValue', () => {
       // A thermostat left switched off ignores a setpoint.
       const writes = handler.gladys.device.setValue.getCalls().map((call) => call.args[2]);
       expect(writes).to.deep.equal([THERMOSTAT_MODE.HEATING, 21]);
+    });
+
+    it('should power the unit on before writing the setpoint', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(
+        device(
+          [
+            { name: 'THERMOSTAT_TYPE', value: 'external' },
+            { name: 'THERMOSTAT_TARGET_FEATURE', value: 'netatmo-setpoint' },
+            { name: 'THERMOSTAT_POWER_FEATURE', value: 'netatmo-power' },
+          ],
+          [presetFeature],
+        ),
+        externalFeature,
+        21,
+      );
+
+      const writes = handler.gladys.device.setValue.getCalls().map((call) => [call.args[1].selector, call.args[2]]);
+      expect(writes).to.deep.equal([
+        ['netatmo-power', 1],
+        ['netatmo-setpoint', 21],
+      ]);
     });
 
     it('should write only the setpoint when no mode feature is configured', async () => {
