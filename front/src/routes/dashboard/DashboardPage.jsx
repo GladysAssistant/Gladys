@@ -147,22 +147,30 @@ const DashboardPage = ({ children, ...props }) => {
                   </div>
                 </div>
                 {/* Gladys Plus only: not dismissible, it stays as long as the
-                    Gateway reports no recovery codes for this user */}
-                {props.gatewayRecoveryCodesMissing && (
-                  <div class="alert alert-warning d-md-flex align-items-center" data-cy="gateway-recovery-codes-banner">
-                    <div class="flex-fill">
-                      <i class="fe fe-shield mr-2" />
-                      <Text id="dashboard.gatewayRecoveryCodesMissing" />
-                    </div>
-                    {/* stacked under the text on phones, at its right from tablet width */}
-                    <Link
-                      href="/dashboard/settings/security"
-                      class={cx('btn btn-sm mt-2 mt-md-0 ml-md-3', style.recoveryCodesBannerButton)}
+                    Gateway reports no recovery codes for this user. The banner
+                    lands after the Gateway answers, so it is announced through a
+                    live region rendered from the start (screen readers ignore a
+                    live region inserted together with its content) */}
+                <div aria-live="polite">
+                  {props.gatewayRecoveryCodesMissing && (
+                    <div
+                      class="alert alert-warning d-md-flex align-items-center"
+                      data-cy="gateway-recovery-codes-banner"
                     >
-                      <Text id="dashboard.gatewayRecoveryCodesMissingButton" />
-                    </Link>
-                  </div>
-                )}
+                      <div class="flex-fill">
+                        <i class="fe fe-shield mr-2" />
+                        <Text id="dashboard.gatewayRecoveryCodesMissing" />
+                      </div>
+                      {/* stacked under the text on phones, at its right from tablet width */}
+                      <Link
+                        href="/dashboard/settings/security"
+                        class={cx('btn btn-sm mt-2 mt-md-0 ml-md-3', style.recoveryCodesBannerButton)}
+                      >
+                        <Text id="dashboard.gatewayRecoveryCodesMissingButton" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
                 {props.gatewayInstanceNotFound && (
                   <div class="alert alert-warning">
                     <Text id="dashboard.gatewayInstanceNotFoundError" />
