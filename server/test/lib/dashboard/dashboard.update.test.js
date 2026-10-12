@@ -59,6 +59,26 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[0].columns[1][0]).to.have.property('provider', '');
   });
 
+  it('should save a camera box with its PTZ controls toggle', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [
+            [
+              {
+                type: DASHBOARD_BOX_TYPE.CAMERA,
+                camera: 'test-camera',
+                camera_latency: 'low',
+                camera_ptz_controls: false,
+              },
+            ],
+          ],
+        },
+      ],
+    });
+    expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('camera_ptz_controls', false);
+  });
+
   it('should save section-based boxes as-is', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [
