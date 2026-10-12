@@ -17,8 +17,16 @@ const sleep = promisify(setTimeout);
  * await z2m.installMqttContainer(config);
  */
 async function installMqttContainer(config) {
-  // Throws if the name is taken by a container that is not ours: it is never adopted
-  const container = await findManagedContainer(this.gladys.system, containerDescriptor);
+  let container;
+  try {
+    // Throws if the name is taken by a container that is not ours: it is never adopted
+    container = await findManagedContainer(this.gladys.system, containerDescriptor);
+  } catch (e) {
+    this.mqttExist = false;
+    logger.error('MQTT broker: failed to look up its Docker container:', e);
+    this.emitStatusEvent();
+    throw e;
+  }
 
   if (!container) {
     let containerMqtt;

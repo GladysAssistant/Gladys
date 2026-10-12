@@ -52,8 +52,18 @@ async function installZ2mContainer(config, setupMode = false) {
   const expectedDevicePath = networkAdapter ? null : z2mDriverPath;
   let creationNeeded = false;
 
-  // Throws if the name is taken by a container that is not ours: it is never adopted nor removed
-  let container = await findManagedContainer(this.gladys.system, containerDescriptor);
+  let container;
+  try {
+    // Throws if the name is taken by a container that is not ours: it is never adopted nor removed
+    container = await findManagedContainer(this.gladys.system, containerDescriptor);
+  } catch (e) {
+    this.zigbee2mqttExist = false;
+    // Shown as is by the setup page, so the user reads which container to rename
+    this.z2mContainerError = { code: null, message: e.message };
+    logger.error('Zigbee2mqtt: failed to look up its Docker container:', e);
+    this.emitStatusEvent();
+    throw e;
+  }
 
   /*
    * Manage case where Zigbee coordinator has changed (USB dongle path, or switch from/to a network

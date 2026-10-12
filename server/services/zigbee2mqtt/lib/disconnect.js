@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { findContainerByName, isManagedByGladys } = require('../../../utils/dockerContainers');
+const { findOwnContainer } = require('../../../utils/dockerContainers');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -13,16 +13,11 @@ const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt
  * await removeOwnContainer(gladys.system, mqttContainerDescriptor);
  */
 async function removeOwnContainer(system, descriptor) {
-  const container = await findContainerByName(system, descriptor.name);
-  if (!container) {
-    return;
+  const container = await findOwnContainer(system, descriptor);
+  if (container) {
+    await system.stopContainer(container.id);
+    await system.removeContainer(container.id);
   }
-  if (!(await isManagedByGladys(system, container, descriptor))) {
-    logger.warn(`Zigbee2mqtt: container "${descriptor.name}" was not created by Gladys, leaving it untouched`);
-    return;
-  }
-  await system.stopContainer(container.id);
-  await system.removeContainer(container.id);
 }
 
 /**

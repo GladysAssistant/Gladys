@@ -160,4 +160,37 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
     assert.notCalled(gladys.system.removeContainer);
     expect(config.dockerMqttVersion).to.equal('BAD_REVISION');
   });
+
+  it('not updated, z2m name taken by a user container -> nothing is removed, not even our MQTT', async () => {
+    // PREPARE
+    gladys.system.getContainers = fake((options) => {
+      const [name] = options.filters.name;
+      if (name === 'gladys-z2m-mqtt') {
+        return Promise.resolve([
+          { id: 'our-mqtt', name: '/gladys-z2m-mqtt', labels: { 'io.gladysassistant.service': 'zigbee2mqtt' } },
+        ]);
+      }
+      return Promise.resolve([{ id: 'user-container', name: `/${name}`, image: 'nginx:alpine' }]);
+    });
+    gladys.system.inspectContainer = fake.resolves({ Config: { Image: 'nginx:alpine' } });
+    const config = {
+      dockerMqttVersion: 'BAD_REVISION',
+      dockerZ2mVersion: 'BAD_REVISION',
+    };
+    // EXECUTE
+    let error;
+    try {
+      await zigbee2mqttManager.checkForContainerUpdates(config);
+    } catch (e) {
+      error = e;
+    }
+    // ASSERT
+    expect(error).to.be.instanceOf(ConflictError);
+    assert.calledTwice(gladys.system.getContainers);
+    assert.notCalled(gladys.system.removeContainer);
+    expect(config).deep.equal({
+      dockerMqttVersion: 'BAD_REVISION',
+      dockerZ2mVersion: 'BAD_REVISION',
+    });
+  });
 });

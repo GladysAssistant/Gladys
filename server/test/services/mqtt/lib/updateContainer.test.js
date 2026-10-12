@@ -138,4 +138,41 @@ describe('mqttHandler.updateContainer', () => {
     assert.notCalled(installContainerMock.installContainer);
     assert.notCalled(gladys.variable.setValue);
   });
+
+  it('should updateContainer: leave alone an unlabeled broker Gladys never configured', async () => {
+    // no stored version: Gladys never configured a broker, and the container has no label,
+    // so it is a user broker created from the public image under our name
+    const config = {
+      brokerContainerAvailable: true,
+      mosquittoVersion: null,
+    };
+    gladys.system.getContainers = fake.resolves([
+      { id: 'user-broker', name: '/eclipse-mosquitto', image: 'eclipse-mosquitto:2' },
+    ]);
+    gladys.system.inspectContainer = fake.resolves({ Config: { Image: 'eclipse-mosquitto:2' } });
+
+    const result = await mqttHandler.updateContainer(config);
+
+    expect(result).to.equal(config);
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(installContainerMock.installContainer);
+    assert.notCalled(gladys.system.restartContainer);
+    assert.notCalled(gladys.variable.setValue);
+  });
+
+  it('should updateContainer: still upgrade an unlabeled broker Gladys configured', async () => {
+    const config = {
+      brokerContainerAvailable: true,
+      mosquittoVersion: '2',
+    };
+    gladys.system.getContainers = fake.resolves([
+      { id: 'legacy', name: '/eclipse-mosquitto', image: 'eclipse-mosquitto:2' },
+    ]);
+    gladys.system.inspectContainer = fake.resolves({ Config: { Image: 'eclipse-mosquitto:2' } });
+
+    await mqttHandler.updateContainer(config);
+
+    assert.calledOnceWithExactly(gladys.system.removeContainer, 'legacy', { force: true });
+    assert.calledOnce(installContainerMock.installContainer);
+  });
 });

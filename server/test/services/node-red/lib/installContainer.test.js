@@ -238,6 +238,10 @@ describe('NodeRed installContainer', () => {
     assert.notCalled(gladys.system.pull);
     assert.notCalled(gladys.system.createContainer);
     assert.notCalled(gladys.system.restartContainer);
+    // the failure is surfaced like a failed install
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
+    });
     expect(nodeRedManager.nodeRedRunning).to.equal(false);
     expect(nodeRedManager.nodeRedExist).to.equal(false);
   });

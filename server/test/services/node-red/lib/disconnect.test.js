@@ -124,8 +124,9 @@ describe('NodeRed disconnect', () => {
     assert.notCalled(gladys.system.removeContainer);
     assert.notCalled(fsMock.rm);
 
-    expect(nodeRedManager.gladysConnected).to.equal(true);
-    expect(nodeRedManager.nodeRedRunning).to.equal(true);
+    // our Node-RED is not running anymore, whether a container was found or not
+    expect(nodeRedManager.gladysConnected).to.equal(false);
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
   });
 
   it('our name is taken by a user container -> it is left untouched', async () => {
@@ -141,7 +142,7 @@ describe('NodeRed disconnect', () => {
     assert.notCalled(gladys.system.removeContainer);
     assert.notCalled(fsMock.rm);
 
-    expect(nodeRedManager.gladysConnected).to.equal(true);
-    expect(nodeRedManager.nodeRedRunning).to.equal(true);
+    expect(nodeRedManager.gladysConnected).to.equal(false);
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
   });
 });

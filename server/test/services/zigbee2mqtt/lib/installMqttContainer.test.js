@@ -346,5 +346,6 @@ describe('zigbee2mqtt installMqttContainer', () => {
     assert.notCalled(gladys.system.restartContainer);
     assert.notCalled(gladys.system.exec);
     expect(zigbee2mqttManager.mqttExist).to.equal(false);
+    assert.calledOnce(gladys.event.emit);
   });
 });

@@ -113,14 +113,9 @@ describe('mqttHandler.saveConfiguration', () => {
       assert.fail('Should have fail');
     } catch (e) {
       expect(e).to.be.instanceOf(NotFoundError);
-      assert.callCount(gladys.variable.destroy, 2);
-      assert.callCount(gladys.variable.setValue, 2);
-      assert.calledWith(
-        gladys.variable.setValue,
-        CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY,
-        config.useEmbeddedBroker,
-        serviceId,
-      );
+      // a configuration that cannot be applied is not persisted
+      assert.notCalled(gladys.variable.destroy);
+      assert.notCalled(gladys.variable.setValue);
 
       assert.calledOnce(gladys.system.getContainers);
       assert.notCalled(gladys.system.exec);
@@ -166,6 +161,9 @@ describe('mqttHandler.saveConfiguration', () => {
       assert.calledOnce(gladys.system.getContainers);
       assert.notCalled(gladys.system.exec);
       assert.notCalled(gladys.system.restartContainer);
+      // the embedded-broker configuration is not persisted against a foreign broker
+      assert.notCalled(gladys.variable.destroy);
+      assert.notCalled(gladys.variable.setValue);
     }
   });
 

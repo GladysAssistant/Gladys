@@ -115,7 +115,8 @@ describe('Matterbridge disconnect', () => {
     assert.notCalled(gladys.system.removeContainer);
     assert.notCalled(fsMock.rm);
 
-    expect(matterbridgeManager.matterbridgeRunning).to.equal(true);
+    // our Matterbridge is not running anymore, whether a container was found or not
+    expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
   });
 
   it('our name is taken by a user container -> it is left untouched', async () => {
@@ -133,6 +134,6 @@ describe('Matterbridge disconnect', () => {
     assert.notCalled(gladys.system.removeContainer);
     assert.notCalled(fsMock.rm);
 
-    expect(matterbridgeManager.matterbridgeRunning).to.equal(true);
+    expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
   });
 });

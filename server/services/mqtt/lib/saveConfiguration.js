@@ -28,6 +28,18 @@ const updateOrDestroyVariable = async (variable, key, value, serviceId) => {
  */
 async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker }) {
   const { variable } = this.gladys;
+
+  let container = null;
+  if (useEmbeddedBroker) {
+    // Before persisting anything: a configuration that cannot be applied must not be stored.
+    // Throws if the name is taken by a container that is not ours: it is never reconfigured
+    container = await findManagedContainer(this.gladys.system, containerParams);
+
+    if (!container) {
+      throw new NotFoundError(`${containerParams.name} container not found`);
+    }
+  }
+
   const oldUser = await variable.getValue(CONFIGURATION.MQTT_USERNAME_KEY, this.serviceId);
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY, useEmbeddedBroker, this.serviceId);
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_URL_KEY, mqttUrl, this.serviceId);
@@ -35,13 +47,6 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_PASSWORD_KEY, mqttPassword, this.serviceId);
 
   if (useEmbeddedBroker) {
-    // Throws if the name is taken by a container that is not ours: it is never reconfigured
-    const container = await findManagedContainer(this.gladys.system, containerParams);
-
-    if (!container) {
-      throw new NotFoundError(`${containerParams.name} container not found`);
-    }
-
     if (container.state !== 'running') {
       await this.gladys.system.restartContainer(container.id);
       // wait 5 seconds for the container to restart

@@ -38,8 +38,18 @@ async function installContainer(config) {
 
   const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
 
-  // Throws if the name is taken by a container that is not ours: it is never adopted
-  let container = await findManagedContainer(this.gladys.system, containerDescriptor);
+  let container;
+  try {
+    // Throws if the name is taken by a container that is not ours: it is never adopted
+    container = await findManagedContainer(this.gladys.system, containerDescriptor);
+  } catch (e) {
+    this.matterbridgeExist = false;
+    logger.error('Matterbridge: failed to look up its Docker container:', e);
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MATTERBRIDGE.STATUS_CHANGE,
+    });
+    throw e;
+  }
 
   if (!container) {
     try {
