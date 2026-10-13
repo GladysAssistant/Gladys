@@ -751,6 +751,63 @@ describe('thermostat.regulateDevice - external', () => {
       const order = gladys.device.setValue.getCalls().map((call) => call.args[1].selector);
       expect(order).to.deep.equal(['boiler-power']);
     });
+
+    // A power that could not be cut is no stop: the setpoint fallback applies
+    // again, except on an air conditioner, which a setpoint could switch on.
+    const failingOn = (gladys, failing) => {
+      gladys.device.setValue = fake((device, feature) =>
+        feature.selector === failing ? Promise.reject(new Error('offline')) : Promise.resolve(null),
+      );
+    };
+
+    it('should fall back on the frost setpoint when the power cannot be cut', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({
+        features: {
+          'netatmo-setpoint': targetFeature(),
+          'boiler-power': { selector: 'boiler-power', last_value: 1 },
+        },
+      });
+      failingOn(gladys, 'boiler-power');
+
+      await regulate(mod, gladys, externalDevice({ THERMOSTAT_POWER_FEATURE: 'boiler-power' }));
+
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(7);
+    });
+
+    it('should fall back on the frost setpoint when the power feature is gone', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: { 'netatmo-setpoint': targetFeature() } });
+
+      await regulate(mod, gladys, externalDevice({ THERMOSTAT_POWER_FEATURE: 'boiler-power' }));
+
+      expect(writtenOn(gladys, 'netatmo-setpoint')).to.equal(7);
+    });
+
+    it('should write no setpoint to an air conditioner whose power cannot be cut', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: acFeatures() });
+      failingOn(gladys, 'ac-power');
+
+      await regulate(mod, gladys, acDevice());
+
+      expect(writtenOn(gladys, 'ac-setpoint')).to.equal(undefined);
+    });
+
+    it('should write no setpoint when neither the power nor the setpoint can be read', async () => {
+      const mod = load(fullDaySchedule('off'));
+      const gladys = buildGladys({ features: {} });
+      const { get } = gladys.device;
+      gladys.device.get = fake((query) =>
+        query && query.device_feature_selectors === 'netatmo-setpoint'
+          ? Promise.reject(new Error('locked'))
+          : get(query),
+      );
+
+      await regulate(mod, gladys, externalDevice({ THERMOSTAT_POWER_FEATURE: 'boiler-power' }));
+
+      assert.notCalled(gladys.device.setValue);
+    });
   });
 });
 

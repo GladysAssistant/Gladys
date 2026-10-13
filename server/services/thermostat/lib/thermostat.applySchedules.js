@@ -384,7 +384,7 @@ function getSetpointForPreset(preset, config) {
  * @param {string} switchSelector - Switch feature selector.
  * @param {boolean} shouldBeActive - Desired state.
  * @param {string} logContext - Context string for logs.
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>} True when the switch is in the desired state afterwards.
  * @example
  * await actuateSwitch(gladys, 'heater-switch', true, 'preset=comfort');
  */
@@ -393,7 +393,7 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext)
     const found = await getFeatureBySelector(gladys, switchSelector);
     if (!found) {
       logger.warn(`Thermostat schedule: switch device/feature not found for selector="${switchSelector}"`);
-      return;
+      return false;
     }
     const currentSwitchOn = found.feature.last_value === 1;
     if (currentSwitchOn !== shouldBeActive) {
@@ -402,8 +402,10 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext)
     } else {
       logger.debug(`Thermostat schedule: switch already ${shouldBeActive ? 'ON' : 'OFF'} (${logContext})`);
     }
+    return true;
   } catch (e) {
     logger.warn(`Thermostat schedule: Failed to actuate switch: ${e.message}`);
+    return false;
   }
 }
 
@@ -445,11 +447,26 @@ async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
   // "turn on and aim at this", and MELCloud rebuilds each write from a snapshot
   // of the unit that may still read powered — the setpoint would undo the stop.
   if (config.power_feature) {
-    await actuateSwitch(gladys, config.power_feature, false, logContext);
-    return;
+    if (await actuateSwitch(gladys, config.power_feature, false, logContext)) {
+      return;
+    }
+    // The power could not be cut. An air conditioner still gets no setpoint, for
+    // the reason above: the stop is retried on the next pass, which writes the
+    // power again. Any other device falls back on the setpoint below, so that a
+    // boiler is not left on its comfort target while a window is open.
+    let target = null;
+    try {
+      target = await getFeatureBySelector(gladys, config.target_feature);
+    } catch (e) {
+      logger.warn(`Thermostat schedule: Failed to read the setpoint feature: ${e.message}`);
+    }
+    if (!target || target.feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING) {
+      logger.warn(`Thermostat schedule: the unit could not be powered off, retried on the next pass (${logContext})`);
+      return;
+    }
   }
   // Otherwise the setpoint, which is the fallback for a device with no mode or
-  // power feature and the only "stop" every thermostat understands: frost
+  // working power feature and the only "stop" every thermostat understands: frost
   // protection when it heats, the top of its range when it cools — clamped to
   // the device's own.
   const stopSetpoint =
