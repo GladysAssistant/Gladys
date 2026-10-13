@@ -24,6 +24,7 @@ class ThermostatEditPage extends Component {
     this.props.updateThermostatField('thermostatEditTemperatureFeature', '');
     this.props.updateThermostatField('thermostatEditHumidityFeature', '');
     this.props.updateThermostatField('thermostatEditSwitchFeature', '');
+    this.props.updateThermostatField('thermostatEditPilotWireFeature', '');
     this.props.updateThermostatField('thermostatEditType', 'virtual');
     this.props.updateThermostatField('thermostatEditTargetFeature', '');
     this.props.updateThermostatField('thermostatEditStateFeature', '');

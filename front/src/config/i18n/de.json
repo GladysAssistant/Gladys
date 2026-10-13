@@ -3505,7 +3505,7 @@
         "typeExternal": "Echtes Thermostat (das Gerät regelt selbst)",
         "vendorProgrammeWarning": "Schalten Sie das Herstellerprogramm auf diesem Gerät ab (Netatmo-, Tado-App…), bevor Sie es über Gladys steuern. Sonst schreiben das Programm des Geräts und das von Gladys abwechselnd den Sollwert, und der Thermostat folgt dem zuletzt geschriebenen.",
         "typeHelp": {
-          "virtual": "Gladys arbeitet als Thermostat: Sie liest einen Temperatursensor und steuert einen Schalter (Relais, Steckdose, Kesselkontakt), um den Sollwert zu erreichen.",
+          "virtual": "Gladys arbeitet als Thermostat: Sie liest einen Temperatursensor und steuert einen Schalter (Relais, Steckdose, Kesselkontakt) oder einen Heizkörper mit Steuerleitung, um den Sollwert zu erreichen.",
           "external": "Das Thermostat regelt selbst und steuert seine Heizung selbst. Gladys schreibt nur den Sollwert aus dem Zeitplan und zeigt den Zustand des Geräts an."
         },
         "targetFeatureLabel": "Sollwert des echten Thermostats",
@@ -3545,7 +3545,8 @@
           "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
         },
         "pilotWireFeatureLabel": "Steuerleitung (Aktor)",
-        "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm einen Befehl (Komfort, Eco, Frostschutz, Aus), statt die Stromzufuhr zu unterbrechen. Mit einem Temperatursensor regelt Gladys selbst: unter dem Sollwert den Befehl der Voreinstellung, darüber Frostschutz, mit den Hysterese-Schwellen. Ohne Sensor erhält der Heizkörper den Befehl der Voreinstellung und regelt allein auf seinen eigenen Sollwert. Die Auswahl leert den Schalter und umgekehrt: Ein Heizkörper wird auf die eine oder die andere Weise gesteuert.",
+        "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm einen Befehl (Komfort, Eco, Frostschutz, Aus), statt die Stromzufuhr zu unterbrechen. Mit einem Temperatursensor regelt Gladys selbst: unter dem Sollwert den Befehl der Voreinstellung, darüber Frostschutz, mit den Hysterese-Schwellen. Ohne Sensor erhält der Heizkörper den Befehl der Voreinstellung und regelt allein auf seinen eigenen Sollwert. Die Auswahl leert den Schalter und umgekehrt: Ein Heizkörper wird auf die eine oder die andere Weise gesteuert. TPI wird mit einer Steuerleitung nicht angeboten: Die Befehle werden nie innerhalb eines Zyklus getaktet. Schalten Sie zuerst das eigene Programm des Moduls aus.",
+        "pilotWireProgrammeWarning": "Schalten Sie das eigene Programm oder den Thermostatmodus des Moduls aus (Heatzy-Zeitplan, Tuya-Programm…), bevor Sie es mit Gladys steuern. Sonst wird jeder vom Programm geschriebene Befehl als Änderung am Modul gewertet, und Modul und Gladys schreiben den Befehl abwechselnd.",
         "windowFeatureLabel": "Fensterkontakt",
         "windowFeatureHelp": {
           "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",

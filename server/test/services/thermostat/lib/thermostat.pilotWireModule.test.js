@@ -56,12 +56,17 @@ describe('thermostat pilot wire: an order changed on the module', () => {
     })),
   });
 
-  const buildHandler = (device, { window = null } = {}) => ({
+  const buildHandler = (device, { window = null, carried = null } = {}) => ({
     gladys: {
       device: {
         get: fake((query) => {
           if (query && query.service === 'thermostat') {
             return Promise.resolve([device]);
+          }
+          if (query && query.device_feature_selectors === 'heater-pilot-wire' && carried !== null) {
+            return Promise.resolve([
+              { selector: 'heater', features: [{ selector: 'heater-pilot-wire', last_value: carried }] },
+            ]);
           }
           if (query && query.device_feature_selectors === 'window-sensor' && window !== null) {
             return Promise.resolve([
@@ -165,26 +170,38 @@ describe('thermostat pilot wire: an order changed on the module', () => {
     expect(handler.observedSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.COMFORT);
   });
 
-  it('should take nothing while the thermostat is stopped', async () => {
-    // The stop outranks a hold: the next pass writes off back, and a hold armed
-    // behind it would resurface later as a manual mode nobody remembers.
+  // The module already carries the order pressed: OFF is written back at once
+  // rather than at the next pass, and marked so its echo is not another press.
+  const offWritten = (handler) => {
+    const [, feature, value] = handler.gladys.device.setValue.firstCall.args;
+    expect(feature.selector).to.equal('heater-pilot-wire');
+    expect(value).to.equal(PILOT_WIRE_MODE.OFF);
+    expect(handler.selfWrittenSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.OFF);
+  };
+
+  it('should take nothing while the thermostat is stopped, and write off back at once', async () => {
+    // The stop outranks a hold, and a hold armed behind it would resurface later
+    // as a manual mode nobody remembers.
     const mod = loadListener();
-    const handler = buildHandler(thermostat({ mode: THERMOSTAT_MODE.OFF }));
+    const handler = buildHandler(thermostat({ mode: THERMOSTAT_MODE.OFF }), { carried: PILOT_WIRE_MODE.ECO });
 
     await press(mod, handler, PILOT_WIRE_MODE.ECO);
 
     assert.notCalled(handler.setValue);
+    offWritten(handler);
   });
 
-  it('should take nothing while a window is open', async () => {
+  it('should take nothing while a window is open, and write off back at once', async () => {
     const mod = loadListener();
     const handler = buildHandler(thermostat({ params: { THERMOSTAT_WINDOW_FEATURE: 'window-sensor' } }), {
       window: 0,
+      carried: PILOT_WIRE_MODE.ECO,
     });
 
     await press(mod, handler, PILOT_WIRE_MODE.ECO);
 
     assert.notCalled(handler.setValue);
+    offWritten(handler);
   });
 
   it('should take the order once the window is closed', async () => {

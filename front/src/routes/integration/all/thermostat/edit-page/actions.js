@@ -56,8 +56,13 @@ function createActions(store) {
             }
             // A pilot-wire heater takes one of six orders on its command wire
             // rather than a contact: the same actuator slot, a different way of
-            // driving it.
-            if (feature.category === 'heater' && feature.type === 'pilot-wire-mode') {
+            // driving it. Like the switch, it has to be writable — a module
+            // that only publishes its status would refuse every order.
+            if (
+              feature.category === DEVICE_FEATURE_CATEGORIES.HEATER &&
+              feature.type === DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE &&
+              !feature.read_only
+            ) {
               pilotWireFeatures.push(entry);
             }
             if (SWITCH_CATEGORIES.includes(feature.category) && feature.type === 'binary') {
@@ -185,11 +190,16 @@ function createActions(store) {
 
     // The switch and the pilot wire are the same actuator slot: picking one
     // empties the other, so the form can never describe a heater driven both
-    // ways at once.
+    // ways at once. A pilot wire also leaves TPI: the loop never pulses its
+    // orders within a cycle (spec C.1.1).
     updateThermostatActuator(state, field, value) {
-      const other =
-        field === 'thermostatEditPilotWireFeature' ? 'thermostatEditSwitchFeature' : 'thermostatEditPilotWireFeature';
-      store.setState(value ? { [field]: value, [other]: '' } : { [field]: value });
+      const pilotWire = field === 'thermostatEditPilotWireFeature';
+      const other = pilotWire ? 'thermostatEditSwitchFeature' : 'thermostatEditPilotWireFeature';
+      const next = value ? { [field]: value, [other]: '' } : { [field]: value };
+      if (pilotWire && value && state.thermostatEditControlType === 'tpi') {
+        next.thermostatEditControlType = 'hysteresis';
+      }
+      store.setState(next);
     },
 
     updateThermostatUnit(state, newUnit) {
@@ -241,10 +251,13 @@ function createActions(store) {
         const minTemp = toNumber(state.thermostatEditMinTemp, 5);
         const maxTemp = toNumber(state.thermostatEditMaxTemp, 35);
         const tempUnit = state.thermostatEditTempUnit || 'C';
-        const controlType = state.thermostatEditControlType || 'hysteresis';
         const temperatureFeature = state.thermostatEditTemperatureFeature || '';
         const humidityFeature = state.thermostatEditHumidityFeature || '';
         const pilotWireFeature = state.thermostatEditPilotWireFeature || '';
+        // A pilot wire is regulated on hysteresis only: a TPI saved before it was
+        // picked would be offered nowhere in the form and ignored by the loop.
+        const pickedControlType = state.thermostatEditControlType || 'hysteresis';
+        const controlType = pilotWireFeature && pickedControlType === 'tpi' ? 'hysteresis' : pickedControlType;
         // A heater is driven by one actuator or the other, never both: the form
         // clears one when the other is picked, and the save holds to it for a
         // device that already carried both.
