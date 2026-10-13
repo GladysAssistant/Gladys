@@ -3545,7 +3545,7 @@
           "cooling": "El interruptor que se encenderá y apagará para enfriar la habitación."
         },
         "pilotWireFeatureLabel": "Hilo piloto (actuador)",
-        "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía la orden correspondiente al preajuste (confort, eco, antihielo, apagado) en lugar de cortar su alimentación. El radiador conserva su propio termostato, así que no se aplican ni umbral ni ciclo. Elegirlo vacía el conmutador, y al revés: un radiador se controla de una forma o de la otra.",
+        "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado) en lugar de cortar su alimentación. Con un sensor de temperatura, Gladys regula ella misma: la orden del preajuste por debajo de la consigna, antihielo por encima, con los umbrales de histéresis. Sin sensor, el radiador recibe la orden del preajuste y regula solo con su propia consigna. Elegirlo vacía el conmutador, y al revés: un radiador se controla de una forma o de la otra.",
         "windowFeatureLabel": "Sensor de apertura de ventana",
         "windowFeatureHelp": {
           "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",

@@ -249,7 +249,17 @@ This is also what removes the class of bug where a phone abroad, or a laptop lef
 
 A French pilot-wire heater is the most common case after the relay, and it is not a switch: it keeps its own thermostat and takes **one of six orders** on a command wire — off, frost protection, eco, comfort, and the two derived comforts a heater computes itself. Cutting its supply is not how it is stopped.
 
-It is therefore a second kind of actuator in the same slot, and a thermostat driving one stops at step 4 exactly like an external thermostat (C.0): no hysteresis, no TPI, no room sensor read, because the appliance regulates on the order it was given and a second loop would fight it.
+It is therefore a second kind of actuator in the same slot. An order carries no temperature: on eco or comfort the heater regulates on a setpoint of its own, set on its body, and ignores the one Gladys shows. Handed `ECO` for `away` at 16 °C, a heater whose comfort is 22 °C still heats a room at 19.4 °C up to its own eco temperature.
+
+**With a temperature sensor, Gladys regulates the heater itself**, at step 5 like a switch, on the setpoint the thermostat carries (or the held one, below):
+
+- below `setpoint − THERMOSTAT_HYSTERESIS_START`, the preset's order is sent;
+- above `setpoint + THERMOSTAT_HYSTERESIS_STOP`, `FROST_PROTECTION` is sent — the standby that still guards the room against frost;
+- in between, the heater keeps doing what it does: it counts as heating when it carries an order other than `OFF` or `FROST_PROTECTION`.
+
+The heater's own thermostat then only caps the temperature. A pilot-wire heater only heats, so the bands are always the heating ones, whatever `THERMOSTAT_MODE` says. TPI is not used even when configured: switching orders within a cycle is Zigbee traffic for a heater whose own thermostat already smooths the output. A sensor that is gone, cannot be read or has no reading falls back on the case below for that pass.
+
+**Without a sensor**, the thermostat stops at step 4 like an external thermostat (C.0): the heater is handed the preset's order and regulates alone on its own setpoint.
 
 The presets map onto the orders almost one for one, which is no coincidence — both vocabularies come from the same French heating tradition:
 
@@ -266,7 +276,7 @@ The presets map onto the orders almost one for one, which is no coincidence — 
 
 Like every other write, an order already carried is skipped: several of these heaters are Zigbee, and re-sending an unchanged order once a minute is traffic for nothing. A window opening, or a stop by hand, sends `OFF` rather than actuating a switch the thermostat does not hold — on a window, at once from the `NEW_STATE` listener as well as on the next pass, like the switch and external paths.
 
-**A manual hold** (D) is a setpoint, and the wire takes no temperature: the hold is turned into an order. Picking a preset by hand holds that preset's own setpoint, so the preset the thermostat carries is the answer whenever its setpoint equals the held one — even when another preset shares that value. A setpoint held from the dial becomes the order of the nearest of `frost`, `eco` and `comfort`, a tie going to the warmer one: 19.5 °C between eco at 18 and comfort at 21 asks for warmth. `off` is never held (it stores no setpoint), so it goes through the preset path.
+**A manual hold** (D) is a setpoint, and the wire takes no temperature: the hold is turned into an order. With a sensor, that order is then regulated on the held setpoint itself, so a turn of the dial to 19.5 °C means 19.5 °C rather than the nearest preset's. Picking a preset by hand holds that preset's own setpoint, so the preset the thermostat carries is the answer whenever its setpoint equals the held one — even when another preset shares that value. A setpoint held from the dial becomes the order of the nearest of `frost`, `eco` and `comfort`, a tie going to the warmer one: 19.5 °C between eco at 18 and comfort at 21 asks for warmth. `off` is never held (it stores no setpoint), so it goes through the preset path.
 
 **A derived comfort the heater carries is kept while comfort is held.** `COMFORT_1` and `COMFORT_2` are comfort chosen on the module itself (below). Writing plain `COMFORT` over them would undo that choice within a minute.
 
@@ -290,9 +300,9 @@ A report that takes a preset the thermostat already carries, with a hold already
 
 **`schedule` with no point in force** names no order, just as it names no temperature (C.1): the heater keeps the order it carries, and nothing is written.
 
-**The operating state** follows the order the heater actually carries, not the one asked for. The wire gives no feedback on whether the heater draws current, so the order is what is reported: `OFF` and `FROST_PROTECTION` — the two standbys — read `idle`, `ECO` and the comforts read `heating`, whatever the thermostat's mode (a pilot-wire heater only heats). A write that fails leaves the previous order in force, and that is what is reported; an order that cannot be read leaves the state untouched rather than guessed. The widget's heating halo reads this `operating-state` for a pilot-wire thermostat — the hysteresis estimate would light the flame on a threshold the server never applies.
+**The operating state** says what Gladys decided. With a sensor it reads `heating` when the loop asks for heat, `idle` otherwise. Without one it always reads `idle`: the wire gives no feedback, the heater regulates on a temperature Gladys does not know, and reading `ECO` as heating lit the flame in a room already 3 °C above the setpoint. The state follows the order the heater carries afterwards. A write that fails leaves the previous order in force, so the heater is said to heat only if the loop asks for heat **and** that order is neither `OFF` nor `FROST_PROTECTION`; otherwise it reads `idle`, which also clears a state left by an earlier pass. An order that cannot be read leaves the state untouched. The widget's heating halo reads this `operating-state` for a pilot-wire thermostat.
 
-A heater is driven by one actuator or the other, never both. The edit form empties the switch when a pilot wire is picked and the reverse, saves the switch empty whenever a pilot wire is set, and clears the pilot-wire param on an external thermostat; the loop, the window listener and the hold all take the pilot-wire branch first. A pilot-wire thermostat needs no temperature sensor to be saved: the form requires a sensor and a switch, **or** a pilot wire.
+A heater is driven by one actuator or the other, never both. The edit form empties the switch when a pilot wire is picked and the reverse, saves the switch empty whenever a pilot wire is set, and clears the pilot-wire param on an external thermostat; the loop, the window listener and the hold all take the pilot-wire branch first. A pilot-wire thermostat needs no temperature sensor to be saved — the form requires a sensor and a switch, **or** a pilot wire — but only a sensor lets Gladys regulate it.
 
 `THERMOSTAT_PILOT_WIRE_FEATURE` names another device's feature, so a device migration rewrites it like the other `THERMOSTAT_*_FEATURE` params (`device-migration.md` B.3).
 

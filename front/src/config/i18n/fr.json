@@ -3545,7 +3545,7 @@
           "cooling": "Interrupteur qui sera allumé et éteint pour rafraîchir la pièce."
         },
         "pilotWireFeatureLabel": "Fil pilote (actionneur)",
-        "pilotWireFeatureHelp": "Un radiateur à fil pilote : Gladys lui envoie l’ordre correspondant au preset (confort, éco, hors-gel, arrêt) au lieu de couper son alimentation. Le radiateur garde son propre thermostat, donc ni seuil ni cycle ne s’appliquent. Le choisir vide le commutateur, et inversement : un radiateur se pilote d’une façon ou de l’autre.",
+        "pilotWireFeatureHelp": "Un radiateur à fil pilote : Gladys lui envoie un ordre (confort, éco, hors-gel, arrêt) au lieu de couper son alimentation. Avec un capteur de température, Gladys régule elle-même : l’ordre du preset sous la consigne, hors-gel au-dessus, avec les seuils d’hystérésis. Sans capteur, le radiateur reçoit l’ordre du preset et régule seul sur sa propre consigne. Le choisir vide le commutateur, et inversement : un radiateur se pilote d’une façon ou de l’autre.",
         "windowFeatureLabel": "Capteur d'ouverture de fenêtre",
         "windowFeatureHelp": {
           "heating": "Optionnel. Si une fenêtre est ouverte, le chauffage est automatiquement coupé.",

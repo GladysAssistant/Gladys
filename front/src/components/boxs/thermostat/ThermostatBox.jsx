@@ -114,9 +114,10 @@ class ThermostatBox extends Component {
   // external one. An external thermostat that exposes neither returns null, and
   // the widget estimates the state from the setpoint instead.
   //
-  // A pilot-wire heater has no contact to read and runs no hysteresis: the
-  // estimate would light the flame on a threshold the server never applies.
-  // What the server decided is on the thermostat's own operating-state feature.
+  // A pilot-wire heater has no contact to read, and the order it carries says
+  // nothing of whether it draws current: the server decides, on the room sensor
+  // when there is one, and says so on the thermostat's own operating-state
+  // feature. Without a sensor it reads idle rather than guess.
   getRunningStateFeature = () => {
     const cfg = this.state.remoteConfig;
     if (!cfg) return null;

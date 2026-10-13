@@ -373,7 +373,8 @@ describe('thermostat pilot wire: holds and marks in the regulation loop', () => 
         await regulate(mod, gladys, device('comfort', 21), new Map());
 
         assert.notCalled(gladys.device.setValue);
-        expect(savedOperatingStates(gladys), String(order)).to.deep.equal([THERMOSTAT_OPERATING_STATE.HEATING]);
+        // No room sensor here: the heater decides alone, and the state does not guess.
+        expect(savedOperatingStates(gladys), String(order)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
       }),
     );
   });
