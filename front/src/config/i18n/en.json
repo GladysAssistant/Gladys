@@ -4536,6 +4536,7 @@
     "userRole": "User",
     "adminRole": "Administrator",
     "roleDescription": "An admin has all rights in the Gladys instance. A user can just edit his dashboard, talk to Gladys, see his calendars & map. He cannot create scenes, edit preferences or modify an integration configuration.",
+    "ownRoleLocked": "You cannot change your own role. Another administrator can do it for you.",
     "invitationPending": "Pending",
     "invitationSuccess": "Accepted",
     "firstnameLabel": "First Name",
