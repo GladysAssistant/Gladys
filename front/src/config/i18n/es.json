@@ -3636,7 +3636,7 @@
         "typeExternal": "Termostato real (el aparato regula por sí mismo)",
         "vendorProgrammeWarning": "Desactiva el programa del fabricante en este aparato (aplicación Netatmo, Tado…) antes de controlarlo desde Gladys. Si no, el programa del aparato y el de Gladys escriben la consigna por turnos, y el termostato sigue al que haya escrito el último.",
         "typeHelp": {
-          "virtual": "Gladys actúa como termostato: lee un sensor de temperatura y acciona un interruptor (un relé, un enchufe, un contacto de caldera) para alcanzar la consigna.",
+          "virtual": "Gladys actúa como termostato: lee un sensor de temperatura y acciona un interruptor (un relé, un enchufe, un contacto de caldera) o un radiador con hilo piloto para alcanzar la consigna.",
           "external": "El termostato gestiona su propia regulación y su propio calefactor. Gladys solo escribe la consigna que resuelve su programación y muestra el estado del dispositivo."
         },
         "targetFeatureLabel": "Consigna del termostato real",
@@ -3676,7 +3676,8 @@
           "cooling": "El interruptor que se encenderá y apagará para enfriar la habitación."
         },
         "pilotWireFeatureLabel": "Hilo piloto (actuador)",
-        "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado) en lugar de cortar su alimentación. Con un sensor de temperatura, Gladys regula ella misma: la orden del preajuste por debajo de la consigna, antihielo por encima, con los umbrales de histéresis. Sin sensor, el radiador recibe la orden del preajuste y regula solo con su propia consigna. Elegirlo vacía el conmutador, y al revés: un radiador se controla de una forma o de la otra.",
+        "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado) en lugar de cortar su alimentación. Con un sensor de temperatura, Gladys regula ella misma: la orden del preajuste por debajo de la consigna, antihielo por encima, con los umbrales de histéresis. Sin sensor, el radiador recibe la orden del preajuste y regula solo con su propia consigna. Elegirlo vacía el conmutador, y al revés: un radiador se controla de una forma o de la otra. El TPI no se ofrece con un hilo piloto: las órdenes nunca se envían por impulsos dentro de un ciclo. Desactive primero el programa propio del módulo.",
+        "pilotWireProgrammeWarning": "Desactive el programa o el modo termostato propio del módulo (programación de Heatzy, programa de Tuya…) antes de controlarlo desde Gladys. Si no, cada orden que escribe ese programa se toma por un cambio hecho en el módulo, y el módulo y Gladys escriben la orden por turnos.",
         "windowFeatureLabel": "Sensor de apertura de ventana",
         "windowFeatureHelp": {
           "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",

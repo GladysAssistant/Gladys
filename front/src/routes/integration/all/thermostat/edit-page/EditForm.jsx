@@ -78,7 +78,11 @@ const EditForm = ({ ...props }) => {
     comfort: 'thermostatEditPresetComfort'
   };
 
-  const controlType = props.thermostatEditControlType || 'hysteresis';
+  // A pilot wire is regulated on hysteresis only (spec C.1.1): TPI is neither
+  // offered nor shown while one is picked.
+  const hasPilotWire = !!props.thermostatEditPilotWireFeature;
+  const pickedControlType = props.thermostatEditControlType || 'hysteresis';
+  const controlType = hasPilotWire && pickedControlType === 'tpi' ? 'hysteresis' : pickedControlType;
   // A real thermostat runs its own heuristic and drives its own heater: Gladys
   // only writes the setpoint its schedule resolves. Hysteresis, TPI and the
   // switch are therefore hidden — offering them would suggest Gladys regulates
@@ -409,6 +413,14 @@ const EditForm = ({ ...props }) => {
                 <small class="form-text text-muted">
                   <Text id="integration.thermostat.edit.pilotWireFeatureHelp" />
                 </small>
+                {/* Promised by the spec (G): a module that keeps its own
+                    programme writes orders that are taken as presses of its
+                    button, and Gladys and the programme take turns. */}
+                {hasPilotWire && (
+                  <div class={cx('alert', 'alert-warning', 'mt-2', style.vendorWarning)}>
+                    <Text id="integration.thermostat.edit.pilotWireProgrammeWarning" />
+                  </div>
+                )}
               </div>
             )}
 
@@ -461,7 +473,7 @@ const EditForm = ({ ...props }) => {
                       </option>
                       {/* TPI modulates the on-time over a cycle, which only makes sense
                     for heating: a compressor cannot be pulsed that way */}
-                      {mode !== 'cooling' && (
+                      {mode !== 'cooling' && !hasPilotWire && (
                         <option value="tpi">
                           <Text id="integration.thermostat.edit.controlType.tpi" />
                         </option>

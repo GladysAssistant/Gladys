@@ -3636,7 +3636,7 @@
         "typeExternal": "Real thermostat (the appliance regulates itself)",
         "vendorProgrammeWarning": "Turn the vendor programme off on this device (the Netatmo or Tado app…) before driving it from Gladys. Otherwise the device’s programme and Gladys’s take turns writing the setpoint, and the thermostat follows whichever wrote last.",
         "typeHelp": {
-          "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) to reach the setpoint.",
+          "virtual": "Gladys acts as the thermostat: it reads a temperature sensor and drives a switch (a relay, a plug, a boiler contact) or a pilot-wire heater to reach the setpoint.",
           "external": "The thermostat handles its own regulation and its own heater. Gladys only writes the setpoint its schedule resolves, and displays the device's state."
         },
         "targetFeatureLabel": "Setpoint of the real thermostat",
@@ -3676,7 +3676,8 @@
           "cooling": "The switch that will be turned on and off to cool the room."
         },
         "pilotWireFeatureLabel": "Pilot wire (actuator)",
-        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off) instead of cutting its supply. With a temperature sensor, Gladys regulates itself: the preset's order below the setpoint, frost protection above it, with the hysteresis thresholds. Without a sensor, the heater is sent the preset's order and regulates alone on its own setpoint. Picking it empties the switch, and the reverse: a heater is driven one way or the other.",
+        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off) instead of cutting its supply. With a temperature sensor, Gladys regulates itself: the preset's order below the setpoint, frost protection above it, with the hysteresis thresholds. Without a sensor, the heater is sent the preset's order and regulates alone on its own setpoint. Picking it empties the switch, and the reverse: a heater is driven one way or the other. TPI is not offered with a pilot wire: the orders are never pulsed within a cycle. Turn the module's own programme off first.",
+        "pilotWireProgrammeWarning": "Turn the module's own programme or thermostat mode off (Heatzy schedule, Tuya programme…) before driving it from Gladys. Otherwise every order the programme writes is taken as a change made on the module, and the module and Gladys take turns writing the order.",
         "windowFeatureLabel": "Window opening sensor",
         "windowFeatureHelp": {
           "heating": "Optional. If a window is open, the heating is automatically cut off.",

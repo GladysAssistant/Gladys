@@ -177,8 +177,8 @@ async function primeObservedSetpoints() {
  * widget's stop button.
  *
  * Nothing is taken while the thermostat is stopped or a window is open: both
- * outrank a hold, so the order is written over at once, and a hold armed behind
- * them would resurface later as a manual mode nobody remembers.
+ * outrank a hold, so OFF is written over the order at once, and a hold armed
+ * behind them would resurface later as a manual mode nobody remembers.
  * @param {object} device - The thermostat device.
  * @param {object} config - Its params config.
  * @param {number} order - The PILOT_WIRE_MODE value the module now carries.
@@ -187,14 +187,26 @@ async function primeObservedSetpoints() {
  * await onPilotWireOrderChanged.call(handler, device, config, PILOT_WIRE_MODE.ECO);
  */
 async function onPilotWireOrderChanged(device, config, order) {
+  // The module already carries the order it was given: waiting for the next
+  // pass would let it heat for up to a minute. OFF is written back at once,
+  // marked as this service's own so its echo is not taken for another press.
   if (isStopped(device)) {
-    logger.debug(`Thermostat: order ${order} pressed on a stopped heater (${device.selector}), not taken`);
+    logger.info(`Thermostat: order ${order} pressed on a stopped heater (${device.selector}), sending OFF`);
+    await drivePilotWire(this.gladys, device, config, 'off', `stopped, ${device.selector}`, this.selfWrittenSetpoints);
     return;
   }
   if (config.window_feature) {
     const win = await getFeatureBySelector(this.gladys, config.window_feature);
     if (win && win.feature.last_value === 0) {
-      logger.debug(`Thermostat: order ${order} pressed with the window open (${device.selector}), not taken`);
+      logger.info(`Thermostat: order ${order} pressed with the window open (${device.selector}), sending OFF`);
+      await drivePilotWire(
+        this.gladys,
+        device,
+        config,
+        'off',
+        `window open, ${device.selector}`,
+        this.selfWrittenSetpoints,
+      );
       return;
     }
   }
