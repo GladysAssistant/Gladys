@@ -4536,6 +4536,7 @@
     "userRole": "Usuario",
     "adminRole": "Administrador",
     "roleDescription": "Un administrador tiene todos los derechos en la instancia de Gladys. Un usuario solo puede editar su panel, hablar con Gladys, ver sus calendarios y el mapa. No puede crear escenas, editar preferencias ni modificar la configuración de una integración.",
+    "ownRoleLocked": "No puede cambiar su propio rol. Otro administrador puede hacerlo por usted.",
     "invitationPending": "Pendiente",
     "invitationSuccess": "Aceptada",
     "firstnameLabel": "Nombre",

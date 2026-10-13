@@ -4536,6 +4536,7 @@
     "userRole": "Benutzer",
     "adminRole": "Administrator",
     "roleDescription": "Ein Administrator hat alle Rechte in Gladys. Benutzer können nur Dashboards bearbeiten, mit Gladys sprechen, und eigene Kalender sowie Karten ansehen. Benutzer können keine Szenen erstellen, Einstellungen bearbeiten oder Konfigurationen von Integrationen ändern.",
+    "ownRoleLocked": "Du kannst deine eigene Rolle nicht ändern. Ein anderer Administrator kann das für dich tun.",
     "invitationPending": "Ausstehend",
     "invitationSuccess": "Akzeptiert",
     "firstnameLabel": "Vorname",
