@@ -33,7 +33,11 @@ const SaveError = ({ status, reason }) =>
 const EditForm = ({ ...props }) => {
   const saving = props.thermostatCreateStatus === RequestStatus.Getting;
   const isEdit = !!(props.thermostatEditDevice && props.thermostatEditDevice.selector);
-  const mode = props.thermostatEditMode || 'heating';
+  // A pilot-wire heater only heats (spec C.1.1): cooling is neither offered nor
+  // shown while one is picked on a virtual thermostat.
+  const hasPilotWire = props.thermostatEditType !== 'external' && !!props.thermostatEditPilotWireFeature;
+  const pickedMode = props.thermostatEditMode || 'heating';
+  const mode = hasPilotWire ? 'heating' : pickedMode;
   // The control rules read the other way round in cooling: the switch turns on
   // when the room is too warm. The help texts are therefore per-mode, not a
   // heating text with the word swapped.
@@ -80,7 +84,6 @@ const EditForm = ({ ...props }) => {
 
   // A pilot wire is regulated on hysteresis only (spec C.1.1): TPI is neither
   // offered nor shown while one is picked.
-  const hasPilotWire = !!props.thermostatEditPilotWireFeature;
   const pickedControlType = props.thermostatEditControlType || 'hysteresis';
   const controlType = hasPilotWire && pickedControlType === 'tpi' ? 'hysteresis' : pickedControlType;
   // A real thermostat runs its own heuristic and drives its own heater: Gladys
@@ -261,9 +264,11 @@ const EditForm = ({ ...props }) => {
                 <option value="heating">
                   <Text id="integration.thermostat.edit.mode.heating" />
                 </option>
-                <option value="cooling">
-                  <Text id="integration.thermostat.edit.mode.cooling" />
-                </option>
+                {!hasPilotWire && (
+                  <option value="cooling">
+                    <Text id="integration.thermostat.edit.mode.cooling" />
+                  </option>
+                )}
               </select>
               <small class="form-text text-muted">
                 <Text id="integration.thermostat.edit.modeHelp" />

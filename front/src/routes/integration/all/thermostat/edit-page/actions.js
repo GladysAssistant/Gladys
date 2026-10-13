@@ -199,6 +199,10 @@ function createActions(store) {
       if (pilotWire && value && state.thermostatEditControlType === 'tpi') {
         next.thermostatEditControlType = 'hysteresis';
       }
+      // A pilot-wire heater only heats.
+      if (pilotWire && value && state.thermostatEditMode === 'cooling') {
+        next.thermostatEditMode = 'heating';
+      }
       store.setState(next);
     },
 
@@ -283,6 +287,9 @@ function createActions(store) {
 
         const thermostatType = state.thermostatEditType === 'external' ? 'external' : 'virtual';
         const isExternalThermostat = thermostatType === 'external';
+        // A pilot-wire heater only heats: a cooling mode picked before it would
+        // show cooling while the loop heats (spec C.1.1).
+        const savedMode = !isExternalThermostat && pilotWireFeature ? 'heating' : mode;
 
         // Saving an empty form used to create a thermostat with no room, no
         // sensor and no actuator: it appeared in the list, regulated nothing, and
@@ -336,7 +343,7 @@ function createActions(store) {
           params: [
             // The active schedule is device-owned: the dashboard widget only
             // chooses which thermostat to display, it never drives regulation.
-            { name: 'THERMOSTAT_MODE', value: mode },
+            { name: 'THERMOSTAT_MODE', value: savedMode },
             { name: 'THERMOSTAT_MIN_TEMP', value: String(minTemp) },
             { name: 'THERMOSTAT_MAX_TEMP', value: String(maxTemp) },
             { name: 'THERMOSTAT_TEMP_UNIT', value: tempUnit },

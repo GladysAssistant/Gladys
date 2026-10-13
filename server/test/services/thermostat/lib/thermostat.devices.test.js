@@ -299,6 +299,61 @@ describe('thermostat.createDevice', () => {
     ]);
   });
 
+  // A pilot-wire heater only heats and is never pulsed within a cycle (C.1.1):
+  // a client writing the params directly cannot save it otherwise.
+  const paramValue = (created, name) => created.params.find((param) => param.name === name).value;
+
+  it('should save a pilot-wire thermostat on heating and hysteresis', async () => {
+    const handler = buildHandler();
+
+    const created = await handler.createDevice({
+      name: 'Bureau',
+      features: [setpointFeature],
+      params: [
+        { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+        { name: 'THERMOSTAT_MODE', value: 'cooling' },
+        { name: 'THERMOSTAT_CONTROL_TYPE', value: 'tpi' },
+      ],
+    });
+
+    expect(paramValue(created, 'THERMOSTAT_MODE')).to.equal('heating');
+    expect(paramValue(created, 'THERMOSTAT_CONTROL_TYPE')).to.equal('hysteresis');
+  });
+
+  it('should leave the mode and control type alone without a pilot wire', async () => {
+    const handler = buildHandler();
+
+    const created = await handler.createDevice({
+      name: 'Bureau',
+      features: [setpointFeature],
+      params: [
+        { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: '' },
+        { name: 'THERMOSTAT_MODE', value: 'cooling' },
+        { name: 'THERMOSTAT_CONTROL_TYPE', value: 'tpi' },
+      ],
+    });
+
+    expect(paramValue(created, 'THERMOSTAT_MODE')).to.equal('cooling');
+    expect(paramValue(created, 'THERMOSTAT_CONTROL_TYPE')).to.equal('tpi');
+  });
+
+  it('should keep a heating pilot-wire thermostat as it is', async () => {
+    const handler = buildHandler();
+
+    const created = await handler.createDevice({
+      name: 'Bureau',
+      features: [setpointFeature],
+      params: [
+        { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+        { name: 'THERMOSTAT_MODE', value: 'heating' },
+        { name: 'THERMOSTAT_CONTROL_TYPE', value: 'hysteresis' },
+      ],
+    });
+
+    expect(paramValue(created, 'THERMOSTAT_MODE')).to.equal('heating');
+    expect(paramValue(created, 'THERMOSTAT_CONTROL_TYPE')).to.equal('hysteresis');
+  });
+
   it('should drop the cached window selectors', async () => {
     const handler = buildHandler();
 
@@ -347,6 +402,23 @@ describe('thermostat.createDevice - external', () => {
     });
 
     expect(featureTypes(created)).to.deep.equal(['preset', 'mode']);
+  });
+
+  it('should ignore a pilot-wire param on an external thermostat', async () => {
+    // The loop never takes the pilot-wire branch on an external thermostat, so
+    // its mode is not the pilot wire's to change.
+    const handler = buildHandler();
+
+    const created = await handler.createDevice({
+      name: 'Clim',
+      params: [
+        ...externalParams,
+        { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+        { name: 'THERMOSTAT_MODE', value: 'cooling' },
+      ],
+    });
+
+    expect(created.params.find((param) => param.name === 'THERMOSTAT_MODE').value).to.equal('cooling');
   });
 
   it('should keep the external params', async () => {
