@@ -1236,13 +1236,13 @@ describe('thermostat.regulateDevice - several sensors', () => {
 
   it('should convert each probe into the thermostat unit before averaging', async () => {
     // 68 °F is 20 °C: with a 22 °C probe the average is 21, inside the band, so
-    // the switch keeps its state. Averaged raw, 45 would heat.
+    // the heater keeps running. Averaged raw, 45 would turn it off.
     const mod = load(fullDaySchedule('comfort'));
     const gladys = buildGladys({
       features: {
         'salon-temp': { selector: 'salon-temp', last_value: 22, unit: DEVICE_FEATURE_UNITS.CELSIUS },
         'kitchen-temp': { selector: 'kitchen-temp', last_value: 68, unit: DEVICE_FEATURE_UNITS.FAHRENHEIT },
-        'heater-switch': { selector: 'heater-switch', last_value: 0 },
+        'heater-switch': { selector: 'heater-switch', last_value: 1 },
       },
     });
 
@@ -1260,9 +1260,25 @@ describe('thermostat.regulateDevice - several sensors', () => {
     assert.notCalled(gladys.device.setValue);
   });
 
-  it('should regulate a manual hold on the average too', async () => {
+  it('should leave a probe that cannot be read out of the average', async () => {
+    // The salon probe cannot be looked up: the kitchen alone still regulates.
     const mod = load(fullDaySchedule('comfort'));
-    const gladys = buildGladys({ features: twoProbes(22, 18) });
+    const gladys = buildGladys({
+      features: twoProbes(22, 18),
+      getOverride: (query) =>
+        query && query.device_feature_selectors === 'salon-temp' ? Promise.reject(new Error('locked')) : undefined,
+    });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+  });
+
+  it('should regulate a manual hold on the average too', async () => {
+    // 24 and 18 average to 21, below 23 minus the band: heat, although the
+    // first probe alone reads warm enough.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: twoProbes(24, 18) });
 
     await regulate(mod, gladys, {
       features: [setpointFeature({ last_value: 23 })],

@@ -3646,7 +3646,7 @@
         "stateFeatureLabel": "État de chauffe (facultatif)",
         "stateFeatureHelp": "Permet d'afficher si l'appareil est en train de chauffer. Acceptée aussi bien sous forme d'état de fonctionnement que de contact de chaudière. Laissez vide si votre thermostat ne remonte pas cette information.",
         "modeFeatureLabel": "Mode de fonctionnement (facultatif)",
-        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un — le mode d'une climatisation convient aussi. Gladys le bascule sur Arrêt lorsque le thermostat est arrêté ou qu'un créneau Arrêt s'applique, et le rétablit dès qu'une consigne reprend la main.",
+        "modeFeatureHelp": "Le mode du thermostat réel (arrêt, chauffage, refroidissement, automatique), s'il en expose un — le mode d'une climatisation convient aussi. Sur un thermostat, Gladys le bascule sur Arrêt lorsque le thermostat est arrêté ou qu'un créneau Arrêt s'applique, et le rétablit dès qu'une consigne reprend la main. Le mode d'une climatisation n'a pas d'Arrêt : elle s'arrête par son Alimentation, qu'il faut alors renseigner.",
         "powerFeatureLabel": "Alimentation (facultatif)",
         "powerFeatureHelp": "L'interrupteur qui allume et éteint l'appareil réel, comme l'alimentation d'une climatisation ou d'une pompe à chaleur. Gladys l'éteint quand le thermostat est arrêté, qu'une fenêtre s'ouvre ou qu'un créneau Arrêt s'applique, et le rallume dès qu'une consigne reprend la main. Nécessaire pour une climatisation, dont le mode n'a pas d'arrêt.",
         "mode": {

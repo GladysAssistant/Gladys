@@ -1,5 +1,4 @@
 const Promise = require('bluebird');
-const { Op } = require('sequelize');
 const cloneDeep = require('lodash.clonedeep');
 const db = require('../../models');
 const logger = require('../../utils/logger');
@@ -528,10 +527,12 @@ async function executeMigration(selector, options, jobId) {
   const paramsToRewrite = await db.DeviceParam.findAll({
     where: { name: FEATURE_PARAM_NAMES, value: Object.keys(featureReplacements) },
   });
-  // A list param holds a JSON array, which never equals a single selector: those
-  // are read by name and rewritten entry by entry, in place.
+  // A list param can hold a JSON array, which never equals a single selector:
+  // those are read by name and parsed — not filtered on their text, which an
+  // API write may have padded — then rewritten entry by entry, in place. One
+  // holding a single selector is already in the batch above.
   const listParams = await db.DeviceParam.findAll({
-    where: { name: FEATURE_LIST_PARAM_NAMES, value: { [Op.like]: '[%' } },
+    where: { name: FEATURE_LIST_PARAM_NAMES },
   });
   const devicesWithParamsUpdated = new Set();
   await Promise.each(paramsToRewrite, async (param) => {
@@ -540,6 +541,9 @@ async function executeMigration(selector, options, jobId) {
     deviceIdsToRefresh.add(param.device_id);
   });
   await Promise.each(listParams, async (param) => {
+    if (featureReplacements[param.value] !== undefined) {
+      return;
+    }
     const selectors = parseSelectorList(param.value);
     if (!selectors.some((entry) => featureReplacements[entry] !== undefined)) {
       return;

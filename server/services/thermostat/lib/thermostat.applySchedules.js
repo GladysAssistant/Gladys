@@ -301,7 +301,8 @@ function readTemperatureInThermostatUnit(feature, thermostatUnit) {
  * A large room, or two rooms heated as one, has several probes: regulating on
  * one corner is regulating on the wrong number, so the loop uses their average
  * (A.1.1). Each reading is converted into the thermostat's unit before it is
- * averaged, and a sensor with no value is left out rather than counted as 0.
+ * averaged, and a sensor with no value, or that cannot be read, is left out
+ * rather than counted as 0.
  * @param {object} gladys - Gladys instance.
  * @param {Array<string>} selectors - Temperature feature selectors.
  * @param {string} thermostatUnit - Thermostat unit param, 'C' or 'F'.
@@ -310,7 +311,18 @@ function readTemperatureInThermostatUnit(feature, thermostatUnit) {
  * const temp = await readAverageTemperature(gladys, ['salon-temp', 'kitchen-temp'], 'C');
  */
 async function readAverageTemperature(gladys, selectors, thermostatUnit) {
-  const found = await Promise.all(selectors.map((selector) => getFeatureBySelector(gladys, selector)));
+  // Each probe is read on its own, like the windows: one that cannot be looked
+  // up is left out of the average rather than silencing the others.
+  const found = await Promise.all(
+    selectors.map(async (selector) => {
+      try {
+        return await getFeatureBySelector(gladys, selector);
+      } catch (e) {
+        logger.warn(`Thermostat schedule: Failed to read temperature sensor ${selector}: ${e.message}`);
+        return null;
+      }
+    }),
+  );
   const readings = found
     .map((sensor) => (sensor ? readTemperatureInThermostatUnit(sensor.feature, thermostatUnit) : null))
     .filter((value) => value !== null && value !== undefined);
@@ -398,12 +410,14 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext)
 /**
  * @description Stop an external thermostat.
  *
- * Two things say "stop" to a real thermostat, and which one it understands
- * depends on the device: the operating mode, which almost none expose, and the
- * frost-protection setpoint, which every thermostat accepting a setpoint at all
- * understands. Both are written when both are configured — the mode is what
- * actually stops it, and the setpoint keeps the frost protection in place for a
- * device that would otherwise be left on its comfort target.
+ * Three things say "stop" to a real thermostat, and which one it understands
+ * depends on the device: the operating mode, which almost none expose, the
+ * power of an air conditioner, and the frost-protection setpoint, which every
+ * thermostat accepting a setpoint at all understands. The mode and the setpoint
+ * are both written when both are configured — the mode is what actually stops
+ * it, and the setpoint keeps the frost protection in place for a device that
+ * would otherwise be left on its comfort target. A device stopped by its power
+ * gets no setpoint (below).
  *
  * A cooling thermostat is stopped from the other end of its range: the frost
  * setpoint asked an air conditioner to cool as hard as it can, which is what it
@@ -426,13 +440,18 @@ async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
     await writeExternalMode(gladys, config.mode_feature, THERMOSTAT_MODE.OFF, logContext);
   }
   // Then the power: the stop of a device whose mode cannot say off — an air
-  // conditioner, whose AC_MODE has no such value (A.0.3).
+  // conditioner, whose AC_MODE has no such value (A.0.3). Once it is cut, no
+  // setpoint follows: most air-conditioning stacks take a setpoint command as
+  // "turn on and aim at this", and MELCloud rebuilds each write from a snapshot
+  // of the unit that may still read powered — the setpoint would undo the stop.
   if (config.power_feature) {
     await actuateSwitch(gladys, config.power_feature, false, logContext);
+    return;
   }
-  // Then the setpoint, which is the fallback for a device with no mode feature
-  // and the only "stop" every thermostat understands: frost protection when it
-  // heats, the top of its range when it cools — clamped to the device's own.
+  // Otherwise the setpoint, which is the fallback for a device with no mode or
+  // power feature and the only "stop" every thermostat understands: frost
+  // protection when it heats, the top of its range when it cools — clamped to
+  // the device's own.
   const stopSetpoint =
     getRunningMode(config) === THERMOSTAT_MODE.COOLING ? config.temp_max : getSetpointForPreset('frost', config);
   await writeExternalSetpoint(gladys, config.target_feature, stopSetpoint, config.temp_unit, logContext, selfWritten);
@@ -902,13 +921,8 @@ async function regulateDevice(
     return;
   }
 
-  let currentTemp = null;
-  try {
-    currentTemp = await readAverageTemperature(gladys, config.temperature_features, config.temp_unit);
-  } catch (e) {
-    logger.warn(`Thermostat schedule: Failed to read temperature: ${e.message}`);
-    return;
-  }
+  // Each probe that cannot be read is left out: this never rejects.
+  const currentTemp = await readAverageTemperature(gladys, config.temperature_features, config.temp_unit);
   if (currentTemp === null) {
     logger.warn(
       `Thermostat schedule: no temperature reading for ${config.temperature_features.join(', ')}, ` +

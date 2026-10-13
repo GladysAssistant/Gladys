@@ -3646,7 +3646,7 @@
         "stateFeatureLabel": "Estado de calefacción (opcional)",
         "stateFeatureHelp": "Se usa para mostrar si el dispositivo está funcionando. Se acepta como estado de funcionamiento o como contacto de caldera. Déjalo vacío si tu termostato no lo informa.",
         "modeFeatureLabel": "Modo de funcionamiento (opcional)",
-        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno — el modo de un aire acondicionado también sirve. Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo.",
+        "modeFeatureHelp": "El modo del termostato real (apagado, calefacción, refrigeración, auto), si expone alguno — el modo de un aire acondicionado también sirve. En un termostato, Gladys lo pone en Apagado cuando el termostato se detiene o se aplica un tramo Apagado, y lo restablece en cuanto una consigna vuelve a tomar el relevo. El modo de un aire acondicionado no tiene Apagado: se detiene mediante su Alimentación, que entonces hay que indicar.",
         "powerFeatureLabel": "Alimentación (opcional)",
         "powerFeatureHelp": "El interruptor que enciende y apaga el dispositivo real, como la alimentación de un aire acondicionado o de una bomba de calor. Gladys lo apaga cuando el termostato se detiene, se abre una ventana o se aplica un tramo Apagado, y lo vuelve a encender en cuanto una consigna toma el relevo. Necesario para un aire acondicionado, cuyo modo no tiene apagado.",
         "mode": {
