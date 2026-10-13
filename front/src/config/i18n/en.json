@@ -3676,7 +3676,7 @@
           "cooling": "The switch that will be turned on and off to cool the room."
         },
         "pilotWireFeatureLabel": "Pilot wire (actuator)",
-        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it the order its preset maps to (comfort, eco, frost protection, off) instead of cutting its supply. The heater keeps its own thermostat, so no threshold or cycle applies. Picking it empties the switch, and the reverse: a heater is driven one way or the other.",
+        "pilotWireFeatureHelp": "A French pilot-wire heater: Gladys sends it an order (comfort, eco, frost protection, off) instead of cutting its supply. With a temperature sensor, Gladys regulates itself: the preset's order below the setpoint, frost protection above it, with the hysteresis thresholds. Without a sensor, the heater is sent the preset's order and regulates alone on its own setpoint. Picking it empties the switch, and the reverse: a heater is driven one way or the other.",
         "windowFeatureLabel": "Window opening sensor",
         "windowFeatureHelp": {
           "heating": "Optional. If a window is open, the heating is automatically cut off.",

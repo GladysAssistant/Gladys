@@ -3676,7 +3676,7 @@
           "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
         },
         "pilotWireFeatureLabel": "Steuerleitung (Aktor)",
-        "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm den zur Voreinstellung passenden Befehl (Komfort, Eco, Frostschutz, Aus), statt die Stromzufuhr zu unterbrechen. Der Heizkörper behält sein eigenes Thermostat, daher gelten weder Schwelle noch Zyklus. Die Auswahl leert den Schalter und umgekehrt: Ein Heizkörper wird auf die eine oder die andere Weise gesteuert.",
+        "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm einen Befehl (Komfort, Eco, Frostschutz, Aus), statt die Stromzufuhr zu unterbrechen. Mit einem Temperatursensor regelt Gladys selbst: unter dem Sollwert den Befehl der Voreinstellung, darüber Frostschutz, mit den Hysterese-Schwellen. Ohne Sensor erhält der Heizkörper den Befehl der Voreinstellung und regelt allein auf seinen eigenen Sollwert. Die Auswahl leert den Schalter und umgekehrt: Ein Heizkörper wird auf die eine oder die andere Weise gesteuert.",
         "windowFeatureLabel": "Fensterkontakt",
         "windowFeatureHelp": {
           "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",
