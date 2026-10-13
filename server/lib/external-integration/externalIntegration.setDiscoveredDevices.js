@@ -138,6 +138,9 @@ async function setDiscoveredDevices(service, devices) {
       ...deviceWithoutSelector,
       features,
       params,
+      // a published poll_frequency is enough to get device.poll from the core
+      // scheduler (device.add also requires should_poll === true)
+      ...(device.poll_frequency !== undefined ? { should_poll: true } : {}),
       // service_id and selector are forced server side
       service_id: service.id,
     };

@@ -170,6 +170,12 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 60000 };
     const count = await externalIntegration.setDiscoveredDevices(service, [device]);
     expect(count).to.equal(1);
+    expect(externalIntegration.discoveredDevices.get(service.id)[0].should_poll).to.equal(true);
+  });
+
+  it('should not set should_poll without poll_frequency', async () => {
+    await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector)]);
+    expect(externalIntegration.discoveredDevices.get(service.id)[0]).to.not.have.property('should_poll');
   });
 
   it('should normalize the supported_options of a feature', async () => {
