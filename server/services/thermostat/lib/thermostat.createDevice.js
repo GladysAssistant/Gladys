@@ -173,6 +173,22 @@ async function createDevice(device) {
   const thermostatType = (typeParam && typeParam.value) || DEFAULT_THERMOSTAT_TYPE;
   const external = thermostatType === THERMOSTAT_TYPES.EXTERNAL;
 
+  // A pilot-wire heater only heats, and its orders are never pulsed within a
+  // cycle (C.1.1): a cooling mode or TPI saved with one would describe a
+  // thermostat the loop does not run. Held here as well as in the form, so a
+  // client writing the params directly cannot save one either.
+  const pilotWireParam = params.find((param) => param.name === 'THERMOSTAT_PILOT_WIRE_FEATURE');
+  if (!external && pilotWireParam && pilotWireParam.value) {
+    params.forEach((param) => {
+      if (param.name === 'THERMOSTAT_MODE' && param.value === 'cooling') {
+        param.value = 'heating';
+      }
+      if (param.name === 'THERMOSTAT_CONTROL_TYPE' && param.value === 'tpi') {
+        param.value = 'hysteresis';
+      }
+    });
+  }
+
   const features = (device.features || []).filter(
     (feature) =>
       feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
