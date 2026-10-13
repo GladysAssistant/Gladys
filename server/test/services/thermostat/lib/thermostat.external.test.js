@@ -702,8 +702,8 @@ describe('thermostat.regulateDevice - external', () => {
 
       expect(writtenOn(gladys, 'ac-mode')).to.equal(undefined);
       expect(writtenOn(gladys, 'ac-power')).to.equal(0);
-      // The frost setpoint, clamped to the unit's own minimum.
-      expect(writtenOn(gladys, 'ac-setpoint')).to.equal(16);
+      // No setpoint after the power: a setpoint command can turn the unit back on.
+      expect(writtenOn(gladys, 'ac-setpoint')).to.equal(undefined);
     });
 
     it('should power the unit off when a window opens', async () => {
@@ -736,7 +736,7 @@ describe('thermostat.regulateDevice - external', () => {
     });
 
     // The power is optional and not tied to the category: any external
-    // thermostat with a power switch is stopped by it.
+    // thermostat with a power switch is stopped by it, and by it alone.
     it('should stop a thermostat through a power switch alone', async () => {
       const mod = load(fullDaySchedule('off'));
       const gladys = buildGladys({
@@ -749,7 +749,7 @@ describe('thermostat.regulateDevice - external', () => {
       await regulate(mod, gladys, externalDevice({ THERMOSTAT_POWER_FEATURE: 'boiler-power' }));
 
       const order = gladys.device.setValue.getCalls().map((call) => call.args[1].selector);
-      expect(order).to.deep.equal(['boiler-power', 'netatmo-setpoint']);
+      expect(order).to.deep.equal(['boiler-power']);
     });
   });
 });

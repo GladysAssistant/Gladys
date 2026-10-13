@@ -6,8 +6,8 @@ import stickyStyle from '../stickyActions.css';
 import { getPresetColor } from '../../../../../utils/thermostatPresetColors';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../../server/utils/constants';
 
-const FeatureSelect = ({ value, features, onChange, emptyLabel }) => (
-  <select class="form-control" value={value} onChange={onChange}>
+const FeatureSelect = ({ value, features, onChange, emptyLabel, ariaLabel }) => (
+  <select class="form-control" value={value} onChange={onChange} aria-label={ariaLabel}>
     <option value="">{emptyLabel}</option>
     {features &&
       features.map(f => (
@@ -33,6 +33,12 @@ const FeatureListSelect = ({ values, features, onChange, emptyLabel, addLabel, r
     }
     onChange(next);
   };
+  // Each row is named after its sensor, so a screen reader can tell which one a
+  // remove button removes.
+  const labelOf = selector => {
+    const feature = (features || []).find(f => f.selector === selector);
+    return feature ? feature.label : selector;
+  };
   return (
     <div>
       {selected.map((value, index) => (
@@ -42,13 +48,14 @@ const FeatureListSelect = ({ values, features, onChange, emptyLabel, addLabel, r
             features={others(index)}
             onChange={e => replace(index, e.target.value)}
             emptyLabel={emptyLabel}
+            ariaLabel={labelOf(value)}
           />
           <span class="input-group-append">
             <button
               type="button"
               class="btn btn-outline-secondary"
-              title={removeLabel}
-              aria-label={removeLabel}
+              title={`${removeLabel} : ${labelOf(value)}`}
+              aria-label={`${removeLabel} : ${labelOf(value)}`}
               onClick={() => replace(index, '')}
             >
               <i class="fe fe-x" />
@@ -61,6 +68,7 @@ const FeatureListSelect = ({ values, features, onChange, emptyLabel, addLabel, r
         features={others(-1)}
         onChange={e => e.target.value && onChange([...selected, e.target.value])}
         emptyLabel={selected.length === 0 ? emptyLabel : addLabel}
+        ariaLabel={addLabel}
       />
     </div>
   );
@@ -187,8 +195,30 @@ const EditForm = ({ ...props }) => {
 
   const chooseTargetFeature = event => {
     const selector = event.target.value;
+    const previous = (props.targetFeatures || []).find(
+      feature => feature.selector === props.thermostatEditTargetFeature
+    );
     props.updateThermostatField('thermostatEditTargetFeature', selector);
     const picked = (props.targetFeatures || []).find(feature => feature.selector === selector);
+    // The mode and power belong to the unit whose setpoint was picked: moving to
+    // another unit drops those of the previous one, or every pass would keep
+    // switching a unit the thermostat no longer drives.
+    let modeFeature = props.thermostatEditModeFeature;
+    let powerFeature = props.thermostatEditPowerFeature;
+    if (previous && (!picked || picked.deviceSelector !== previous.deviceSelector)) {
+      const ofPrevious = (features, value) =>
+        (features || []).some(
+          feature => feature.selector === value && feature.deviceSelector === previous.deviceSelector
+        );
+      if (ofPrevious(props.modeFeatures, modeFeature)) {
+        modeFeature = '';
+        props.updateThermostatField('thermostatEditModeFeature', '');
+      }
+      if (ofPrevious(props.powerFeatures, powerFeature)) {
+        powerFeature = '';
+        props.updateThermostatField('thermostatEditPowerFeature', '');
+      }
+    }
     if (!picked) {
       return;
     }
@@ -205,10 +235,10 @@ const EditForm = ({ ...props }) => {
         );
       const unitMode = sameUnit(props.modeFeatures);
       const unitPower = sameUnit(props.powerFeatures);
-      if (unitMode && !props.thermostatEditModeFeature) {
+      if (unitMode && !modeFeature) {
         props.updateThermostatField('thermostatEditModeFeature', unitMode.selector);
       }
-      if (unitPower && !props.thermostatEditPowerFeature) {
+      if (unitPower && !powerFeature) {
         props.updateThermostatField('thermostatEditPowerFeature', unitPower.selector);
       }
     }

@@ -3515,7 +3515,7 @@
         "stateFeatureLabel": "Heizzustand (optional)",
         "stateFeatureHelp": "Zeigt an, ob das Gerät gerade läuft. Wird sowohl als Betriebszustand als auch als Kesselkontakt akzeptiert. Leer lassen, wenn Ihr Thermostat diese Information nicht liefert.",
         "modeFeatureLabel": "Betriebsmodus (optional)",
-        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden — der Modus einer Klimaanlage funktioniert ebenfalls. Gladys schaltet ihn auf Aus, wenn das Thermostat gestoppt wird oder ein Aus-Zeitfenster greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt.",
+        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden — der Modus einer Klimaanlage funktioniert ebenfalls. Bei einem Thermostat schaltet Gladys ihn auf Aus, wenn das Thermostat gestoppt wird oder ein Aus-Zeitfenster greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt. Der Modus einer Klimaanlage kennt kein Aus: Sie wird über ihre Stromversorgung gestoppt, die dann angegeben werden muss.",
         "powerFeatureLabel": "Stromversorgung (optional)",
         "powerFeatureHelp": "Der Schalter, der das echte Gerät ein- und ausschaltet, etwa die Stromversorgung einer Klimaanlage oder Wärmepumpe. Gladys schaltet ihn aus, wenn das Thermostat gestoppt wird, ein Fenster geöffnet wird oder ein Aus-Zeitfenster greift, und wieder ein, sobald ein Sollwert übernimmt. Für eine Klimaanlage nötig, deren Modus kein Aus kennt.",
         "mode": {
