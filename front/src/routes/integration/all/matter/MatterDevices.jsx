@@ -284,6 +284,9 @@ class MatterDevices extends Component {
       device.name = gladysDevice.name;
       device.room = gladysDevice.room;
 
+      // the energy features derived by the server point to the ids of the paired features:
+      // their parents follow the ids taken over from the existing device
+      const replacedFeatureIds = new Map();
       device.features = device.features.map(f => {
         // try to find match feature to replace the external_id
         const gladysFeature = gladysDevice.features.find(gladysF => {
@@ -291,10 +294,21 @@ class MatterDevices extends Component {
         });
         // If a matching feature is found, give the id of the feature
         if (gladysFeature) {
+          if (f.id) {
+            replacedFeatureIds.set(f.id, gladysFeature.id);
+          }
           f.id = gladysFeature.id;
           f.selector = gladysFeature.selector;
+          // the server could not see the existing device (new node id): its index fell back on the
+          // main meter, the meter the user chose (or none, for a root) is kept
+          f.energy_parent_id = gladysFeature.energy_parent_id || null;
         }
         return f;
+      });
+      device.features.forEach(f => {
+        if (f.energy_parent_id && replacedFeatureIds.has(f.energy_parent_id)) {
+          f.energy_parent_id = replacedFeatureIds.get(f.energy_parent_id);
+        }
       });
       await this.props.httpClient.post('/api/v1/device', device);
       await this.getMatterDevices();

@@ -1,6 +1,9 @@
 {
   "name": "gladys-z2m-mqtt",
   "Image": "eclipse-mosquitto:2.0.15",
+  "Labels": {
+    "io.gladysassistant.service": "zigbee2mqtt"
+  },
   "ExposedPorts": {
     "1884/tcp": {}
   },

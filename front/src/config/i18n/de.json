@@ -350,6 +350,8 @@
     "editDashboardSavedButton": "Gesichert",
     "editDashboardDoneButton": "Fertig",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
+    "gatewayRecoveryCodesMissing": "Dein Gladys Plus Konto hat keine Wiederherstellungscodes: Wenn du den Zugriff auf deine Zwei-Faktor-App verlierst, kannst du dich nicht mehr anmelden. Erzeuge sie und bewahre sie an einem sicheren Ort auf.",
+    "gatewayRecoveryCodesMissingButton": "Meine Wiederherstellungscodes erhalten",
     "editDashboardNameLabel": "Name",
     "editDashboardVisibility": "Sichtbarkeit",
     "editDashboardVisibilityDescription": "Öffentliche Dashboards sind für alle Mitglieder der Gladys-Installation sichtbar.",
@@ -1472,9 +1474,6 @@
       "myDevicesTab": "Meine Geräte",
       "energyPriceTab": "Energietarife",
       "documentation": "Dokumentation",
-      "hierarchicalListDescription": "Hier ist die hierarchische Liste der Energiesensoren. Sie können Eltern-/Kind-Beziehungen definieren, um den Verbrauch zu aggregieren.",
-      "rootNotParent": "Kein Elternteil (Wurzel)",
-      "level": "Ebene {{depth}}",
       "wizard": {
         "basics": "Informationen",
         "periodScope": "Zeitraum & Umfang",
@@ -1529,7 +1528,6 @@
       },
       "errorLoadingPrices": "Fehler beim Laden der Tarife.",
       "errorLoadingDevices": "Fehler beim Laden der Geräte.",
-      "noDeviceFeaturesFound": "Keine Gerätefunktionen gefunden.",
       "settings": "Einstellungen",
       "calculateConsumptionFromIndexDescription": "Dies wird den Energieverbrauch (in kWh) in 30-Minuten-Intervallen aus den \"Index\"-Funktionen neu berechnen, seit Beginn Ihrer Gladys-Installation.",
       "calculateConsumptionFromIndexFromBeginning": "Verbrauch neu berechnen",
@@ -1569,13 +1567,6 @@
       "selectPeakHoursHelp": "Klicken Sie auf die Zeitfenster, in denen der Haupttarif gilt. Nicht ausgewählte Zeitfenster sind Nebenzeiten.",
       "peakHours": "Hauptzeiten",
       "offPeakHours": "Nebenzeiten",
-      "circularDependencyDetected": "Zirkuläre oder fehlerhafte Abhängigkeiten erkannt",
-      "circularDependencyDescription": "Die folgenden Gerätefunktionen haben ungültige Elternreferenzen, die Leistungsprobleme verursachen können. Klicken Sie auf die Schaltfläche, um sie automatisch zu beheben.",
-      "brokenReference": "fehlerhafte Referenz",
-      "circularReference": "zirkuläre Referenz",
-      "selfReference": "Selbstreferenz",
-      "fixAutomatically": "beheben",
-      "fixing": "Behebung läuft...",
       "contracts": {
         "tab": "Verträge",
         "description": "Ein Vertrag beschreibt, wie der Verbrauch eines Zählers über einen Zeitraum bepreist wird. Wählen Sie eine Vorlage aus dem Community-Katalog oder einer installierten Integration, füllen Sie die Parameter aus und prüfen Sie die Vorschau vor dem Speichern.",
@@ -1653,6 +1644,19 @@
           "recalculate": "Neu berechnen",
           "recalculated": "Die Neuberechnung wurde gestartet. Sie können den Fortschritt in den Hintergrundaufgaben verfolgen."
         }
+      },
+      "hierarchy": {
+        "description": "Jedes Energiegerät wird nach dem Vertrag des Stromzählers abgerechnet, dem es zugeordnet ist. Gladys verwaltet die Verknüpfungen zwischen den Energiefunktionen deiner Geräte: Du wählst nur den Zähler eines Geräts, wenn du mehrere hast.",
+        "meterBadge": "Stromzähler",
+        "meterSelectLabel": "Zähler",
+        "chooseMeter": "Zähler auswählen",
+        "noAttachedDevice": "Diesem Zähler ist noch kein Gerät zugeordnet.",
+        "unattachedTitle": "Keinem Zähler zugeordnet",
+        "unattachedDescription": "Diese Geräte werden nicht abgerechnet: Wähle den Zähler, an dem sie angeschlossen sind.",
+        "noMeter": "Noch kein Stromzähler: Erstelle einen Energievertrag, um den Verbrauch deiner Geräte abzurechnen.",
+        "noMeterLink": "Vertrag erstellen",
+        "noDevice": "Kein Energiegerät gefunden.",
+        "attachError": "Das Gerät konnte diesem Zähler nicht zugeordnet werden."
       }
     },
     "netatmo": {
@@ -1998,6 +2002,7 @@
         "confirmDisableLabel": "Bist du sicher, dass du Node-RED deaktivieren möchtest?",
         "confirmDisableCancelButton": "Abbrechen",
         "activationNodeRed": "Aktivieren …",
+        "containerConflictPrefix": "Ein anderer Container trägt bereits den Namen des von Gladys verwalteten Containers, benenne ihn um oder entferne ihn: ",
         "serviceStatus": "Status des Node-RED-Dienstes",
         "containersStatus": "Mit Node-RED verbundene Container",
         "status": "Status",
@@ -2034,6 +2039,7 @@
         "confirmDisableLabel": "Bist du sicher, dass du Matterbridge deaktivieren möchtest?",
         "confirmDisableCancelButton": "Abbrechen",
         "activationMatterbridge": "Aktivieren …",
+        "containerConflictPrefix": "Ein anderer Container trägt bereits den Namen des von Gladys verwalteten Containers, benenne ihn um oder entferne ihn: ",
         "serviceStatus": "Status des Matterbridge-Dienstes",
         "containersStatus": "Mit Matterbridge verbundene Container",
         "status": "Status",

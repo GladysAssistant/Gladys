@@ -357,6 +357,28 @@ describe('addEnergyFeatures', () => {
     expect(result.features[0].energy_parent_id).to.equal(customParentId);
   });
 
+  it('should not attach the main meter index to itself', () => {
+    const device = {
+      features: [
+        {
+          id: defaultElectricMeterDeviceFeatureId,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+          external_id: 'device:energy-index',
+          name: 'Energy Index',
+          selector: 'device-energy-index',
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        },
+      ],
+    };
+
+    const result = addEnergyFeatures(device, defaultElectricMeterDeviceFeatureId);
+
+    // the main meter stays a root: attached to itself, the hierarchy would be circular
+    expect(result.features[0]).to.not.have.property('energy_parent_id');
+    expect(result.features).to.have.lengthOf(3);
+  });
+
   it('should handle device with empty features array', () => {
     const device = {
       features: [],

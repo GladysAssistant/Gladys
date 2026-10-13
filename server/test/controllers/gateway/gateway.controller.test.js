@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const getConfig = require('../../../utils/getConfig');
 const db = require('../../../models');
 const { authenticatedRequest, nonAdminRequest, NON_ADMIN_USER_ID } = require('../request.test');
-const { USER_ROLE } = require('../../../utils/constants');
+const { USER_ROLE, EVENTS } = require('../../../utils/constants');
 
 const config = getConfig();
 
@@ -60,6 +60,81 @@ describe('GET /api/v1/gateway/key', () => {
           expect(user).to.have.property('accepted');
         });
       });
+  });
+});
+
+// The users keys are the list of Gladys Plus users allowed to control the
+// instance remotely. Its read was reserved to admins, but any authenticated
+// user (guests included) could accept, revoke or replace it.
+describe('PATCH /api/v1/gateway/key', () => {
+  const usersKeys = [
+    {
+      id: '9233e553-90a0-4d04-9d69-f38fb8ccbc72',
+      name: 'User 2',
+      rsa_public_key: '51:89:e6:91:4f:da:f8:d6:b6:f6:1e:15:54:c4:c0:fd:cc:69:70:81:d4:a8:ea:26:8b:02:4b:b9:ff:97:64:1a',
+      ecdsa_public_key:
+        '2e:e9:ee:a0:b3:22:46:62:f8:22:9b:52:9d:f4:3f:65:70:62:59:76:d1:85:ad:3b:9f:65:4e:61:4c:26:89:7e',
+      accepted: true,
+    },
+  ];
+  const nonAdminUser = {
+    id: NON_ADMIN_USER_ID,
+    firstname: 'Pepper',
+    lastname: 'Potts',
+    selector: 'pepper-gateway-key',
+    email: 'pepper-gateway-key@pots.com',
+    language: 'en',
+    role: USER_ROLE.HABITANT,
+  };
+  const getStoredUsersKeys = () =>
+    db.Variable.findOne({
+      where: { name: 'GLADYS_GATEWAY_USERS_KEYS', service_id: null, user_id: null },
+    });
+
+  beforeEach(async () => {
+    await db.User.create({ ...nonAdminUser, password: 'mysuperpassword', birthdate: '1990-12-12' });
+  });
+
+  it('should save users keys as an admin', async () => {
+    await authenticatedRequest
+      .patch('/api/v1/gateway/key')
+      .send(usersKeys)
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({ success: true });
+      });
+    const variable = await getStoredUsersKeys();
+    expect(JSON.parse(variable.value)).to.deep.equal(usersKeys);
+  });
+
+  it('should not let a non-admin save users keys', async () => {
+    await nonAdminRequest
+      .patch('/api/v1/gateway/key')
+      .send(usersKeys)
+      .expect('Content-Type', /json/)
+      .expect(403);
+    const variable = await getStoredUsersKeys();
+    expect(variable).to.equal(null);
+  });
+
+  it('should not let a non-admin save users keys through the Gladys Plus gateway', async () => {
+    const response = await new Promise((resolve) => {
+      // @ts-ignore
+      global.TEST_GLADYS_INSTANCE.event.emit(
+        EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+        nonAdminUser,
+        'PATCH',
+        '/api/v1/gateway/key',
+        {},
+        usersKeys,
+        resolve,
+      );
+    });
+    expect(response).to.have.property('status', 403);
+    expect(response).to.have.property('code', 'FORBIDDEN');
+    const variable = await getStoredUsersKeys();
+    expect(variable).to.equal(null);
   });
 });
 

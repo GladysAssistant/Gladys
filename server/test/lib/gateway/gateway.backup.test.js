@@ -110,6 +110,47 @@ describe('gateway.backup', async function describe() {
     expect(compressions.every((compression) => compression === 'ZSTD')).to.equal(true);
   });
 
+  it('should export DuckDB while the main memory limit is reduced, then restore it', async () => {
+    const getMemoryLimit = async () => {
+      const [row] = await db.duckDbReadConnectionAllAsync("SELECT current_setting('memory_limit') AS memory_limit");
+      return row.memory_limit;
+    };
+    const memoryLimitBefore = await getMemoryLimit();
+    let memoryLimitDuringExport;
+    const steps = [];
+    const runWithReducedMemoryLimit = db.duckDbRunWithReducedMemoryLimit;
+    const createBackupInstance = db.duckDbCreateBackupInstance;
+    const runStub = sinon.stub(db, 'duckDbRunWithReducedMemoryLimit').callsFake(async (task) => {
+      steps.push('reduce');
+      try {
+        return await runWithReducedMemoryLimit(task);
+      } finally {
+        steps.push('restore');
+      }
+    });
+    const createStub = sinon.stub(db, 'duckDbCreateBackupInstance').callsFake(async () => {
+      steps.push('create backup instance');
+      memoryLimitDuringExport = await getMemoryLimit();
+      return createBackupInstance();
+    });
+    try {
+      await gateway.backup();
+    } finally {
+      runStub.restore();
+      createStub.restore();
+    }
+
+    expect(steps).to.deep.equal(['reduce', 'create backup instance', 'restore']);
+    // The limit is lowered only when it is above 512MB, which DuckDB reports as
+    // "488.2 MiB" (it counts 1MB as 1000^2 bytes). The default limit, 30% of the
+    // RAM, is above it on any machine with more than ~1.7GB of RAM.
+    const [value, unit] = memoryLimitBefore.split(' ');
+    const bytesBefore = parseFloat(value) * 1024 ** ['KiB', 'MiB', 'GiB', 'TiB'].indexOf(unit) * 1024;
+    const expectedDuringExport = bytesBefore > 512 * 1000 * 1000 ? '488.2 MiB' : memoryLimitBefore;
+    expect(memoryLimitDuringExport).to.equal(expectedDuringExport);
+    expect(await getMemoryLimit()).to.equal(memoryLimitBefore);
+  });
+
   it('should start and abort backup', async () => {
     gateway.gladysGatewayClient.uploadOneBackupChunk = fake.rejects(new Error('error'));
 

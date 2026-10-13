@@ -104,21 +104,25 @@ async function backup(jobId) {
     logger.info(`Gateway backup : SQLite file size is ${fileSizeMB}mb.`);
     logger.info(`Gateway backup : Backing up DuckDB into a Parquet folder ${duckDbBackupFolderPath}`);
     // DuckDB backup to parquet file using a dedicated connection
-    // This connection will be closed after export to release memory
-    const backupInstance = await db.duckDbCreateBackupInstance();
-    try {
-      // ZSTD compresses better than GZIP and needs less memory during the export
-      await backupInstance.allAsync(
-        ` EXPORT DATABASE '${escapeSqlStringLiteral(duckDbBackupFolderPath)}' (
+    // This connection will be closed after export to release memory.
+    // The main instance cache is shrunk meanwhile, so the backup instance
+    // memory does not come on top of a full main buffer pool.
+    await db.duckDbRunWithReducedMemoryLimit(async () => {
+      const backupInstance = await db.duckDbCreateBackupInstance();
+      try {
+        // ZSTD compresses better than GZIP and needs less memory during the export
+        await backupInstance.allAsync(
+          ` EXPORT DATABASE '${escapeSqlStringLiteral(duckDbBackupFolderPath)}' (
             FORMAT PARQUET,
             COMPRESSION ZSTD
         )`,
-      );
-    } finally {
-      // Close the backup database instance to release DuckDB buffer pool memory
-      logger.info('Gateway backup: Closing DuckDB backup instance to release memory');
-      await backupInstance.close();
-    }
+        );
+      } finally {
+        // Close the backup database instance to release DuckDB buffer pool memory
+        logger.info('Gateway backup: Closing DuckDB backup instance to release memory');
+        await backupInstance.close();
+      }
+    });
     // compress backup
     logger.info(`Gateway backup: Compressing backup`);
     await execFile('tar', ['-czvf', compressedBackupFileName, sqliteBackupFileName, duckDbBackupFolder], {

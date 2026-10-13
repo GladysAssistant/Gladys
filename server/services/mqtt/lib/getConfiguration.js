@@ -1,5 +1,7 @@
 const { CONFIGURATION } = require('./constants');
 const logger = require('../../../utils/logger');
+const { findOwnContainer } = require('../../../utils/dockerContainers');
+const { isBrokerConfiguredByGladys } = require('./isBrokerConfiguredByGladys');
 const containerDescriptor = require('../docker/eclipse-mosquitto-container.json');
 
 /**
@@ -14,6 +16,7 @@ async function getConfiguration() {
   const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.MQTT_PASSWORD_KEY, this.serviceId);
 
   let brokerContainerAvailable = false;
+  let brokerContainer = null;
   const dockerBased = await this.gladys.system.isDocker();
 
   let useEmbeddedBroker = false;
@@ -26,13 +29,8 @@ async function getConfiguration() {
       // In case the docker socket is not available
       // It's ok, we don't crash
       networkModeValid = await this.checkDockerNetwork();
-      const dockerImages = await this.gladys.system.getContainers({
-        all: true,
-        filters: {
-          name: [containerDescriptor.name],
-        },
-      });
-      brokerContainerAvailable = dockerImages.length > 0;
+      // A user broker carrying our name is not ours: the embedded broker is reported as not available
+      brokerContainer = await findOwnContainer(this.gladys.system, containerDescriptor);
     } catch (e) {
       logger.debug(e);
     }
@@ -44,6 +42,9 @@ async function getConfiguration() {
     // Boolean stored as integer, we need to check it
     useEmbeddedBroker = networkModeValid && useEmbeddedBrokerVariable !== '0';
     mosquittoVersion = await this.gladys.variable.getValue(CONFIGURATION.MQTT_MOSQUITTO_VERSION, this.serviceId);
+    // A broker Gladys never configured (no label, no stored version) is a user one as well
+    brokerContainerAvailable =
+      brokerContainer !== null && isBrokerConfiguredByGladys(brokerContainer, mosquittoVersion);
   }
 
   return {

@@ -135,6 +135,20 @@ const triggerSchemaByType = (type, specificShape) =>
     .strict();
 
 /**
+ * @description Build the schema of a selector: an enum of the known selectors, or any
+ * string when there is none. Empty and duplicated selectors are left out of the enum:
+ * an empty selector cannot reference anything, and the model must not pick it.
+ * @param {Array<string>} selectors - Known selectors.
+ * @returns {object} Zod schema of the selector.
+ * @example
+ * selectorSchema(['kitchen-light', '', 'kitchen-light']);
+ */
+function selectorSchema(selectors) {
+  const validSelectors = [...new Set(selectors.filter((selector) => typeof selector === 'string' && selector !== ''))];
+  return validSelectors.length > 0 ? z.enum(validSelectors) : z.string();
+}
+
+/**
  * @description Build Zod input schema for scene.create tool.
  * @param {Array<string>} [sceneSelectors] - Allowed scene selectors.
  * @param {Array<string>} [userSelectors] - Allowed user selectors.
@@ -160,18 +174,15 @@ function createSceneCreateInputSchema(
   calendarSelectors = [],
   areaSelectors = [],
 ) {
-  const sceneSelectorSchema = sceneSelectors.length > 0 ? z.enum(sceneSelectors) : z.string();
-  const userSelectorSchema = userSelectors.length > 0 ? z.enum(userSelectors) : z.string();
-  const houseSelectorSchema = houseSelectors.length > 0 ? z.enum(houseSelectors) : z.string();
-  const lightDevicesSchema =
-    lightDeviceSelectors.length > 0 ? z.array(z.enum(lightDeviceSelectors)) : z.array(z.string());
-  const switchDevicesSchema =
-    switchDeviceSelectors.length > 0 ? z.array(z.enum(switchDeviceSelectors)) : z.array(z.string());
-  const musicNotificationDevicesSchema =
-    musicNotificationDeviceSelectors.length > 0 ? z.enum(musicNotificationDeviceSelectors) : z.string();
-  const deviceFeatureSelectorSchema = deviceFeatureSelectors.length > 0 ? z.enum(deviceFeatureSelectors) : z.string();
-  const calendarSelectorSchema = calendarSelectors.length > 0 ? z.enum(calendarSelectors) : z.string();
-  const areaSelectorSchema = areaSelectors.length > 0 ? z.enum(areaSelectors) : z.string();
+  const sceneSelectorSchema = selectorSchema(sceneSelectors);
+  const userSelectorSchema = selectorSchema(userSelectors);
+  const houseSelectorSchema = selectorSchema(houseSelectors);
+  const lightDevicesSchema = z.array(selectorSchema(lightDeviceSelectors));
+  const switchDevicesSchema = z.array(selectorSchema(switchDeviceSelectors));
+  const musicNotificationDevicesSchema = selectorSchema(musicNotificationDeviceSelectors);
+  const deviceFeatureSelectorSchema = selectorSchema(deviceFeatureSelectors);
+  const calendarSelectorSchema = selectorSchema(calendarSelectors);
+  const areaSelectorSchema = selectorSchema(areaSelectors);
   const messageServiceSchema = z
     .string()
     .nullish()

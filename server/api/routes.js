@@ -414,8 +414,11 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getUsersKeys,
     },
+    // the list of Gladys Plus users allowed to control the instance remotely:
+    // only an admin can accept, revoke or replace it
     'patch /api/v1/gateway/key': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.saveUsersKeys,
     },
     'get /api/v1/gateway/backup': {
@@ -811,6 +814,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.publishEnergyCalendar,
     },
+    'post /api/integration/v1/energy/consumption': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishEnergyConsumption,
+    },
     'get /api/integration/v1/energy/calendar/:key': {
       authenticated: false,
       externalIntegrationAuth: true,
@@ -1154,6 +1162,12 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: energyContractController.destroy,
+    },
+    // energy hierarchy: attach a device to an electric meter (docs/specs/energy-hierarchy.md, D.1)
+    'patch /api/v1/device/:device_selector/electric_meter': {
+      authenticated: true,
+      admin: true,
+      controller: energyContractController.setDeviceElectricMeter,
     },
     'get /api/v1/energy_calendar': {
       authenticated: true,

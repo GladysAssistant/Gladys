@@ -353,3 +353,45 @@ describe('sceneSchemas device.new-state trigger', () => {
     expect(result.success).to.equal(false);
   });
 });
+
+describe('createSceneCreateInputSchema selectors', () => {
+  it('should leave empty and duplicated selectors out of the enums', () => {
+    const schema = createSceneCreateInputSchema([], [], [], [], ['switch-a', '', 'switch-b', 'switch-a', null]);
+    const switchAction = { type: 'switch.turn-on', devices: ['switch-a'] };
+    const jsonSchema = JSON.stringify(schema.toJSONSchema());
+
+    expect(jsonSchema).to.include('"enum":["switch-a","switch-b"]');
+    expect(
+      schema.safeParse({
+        name: 'My scene',
+        icon: 'lightbulb',
+        triggers: [{ type: 'system.start' }],
+        actions: [[switchAction]],
+      }).success,
+    ).to.equal(true);
+    expect(
+      schema.safeParse({
+        name: 'My scene',
+        icon: 'lightbulb',
+        triggers: [{ type: 'system.start' }],
+        actions: [[{ type: 'switch.turn-on', devices: [''] }]],
+      }).success,
+    ).to.equal(false);
+  });
+
+  it('should accept any selector when all the known selectors are empty', () => {
+    const schema = createSceneCreateInputSchema([''], [], [], [], ['']);
+    const result = schema.safeParse({
+      name: 'My scene',
+      icon: 'lightbulb',
+      triggers: [{ type: 'system.start' }],
+      actions: [
+        [
+          { type: 'switch.turn-on', devices: ['any-switch'] },
+          { type: 'scene.start', scene: 'any-scene' },
+        ],
+      ],
+    });
+    expect(result.success).to.equal(true);
+  });
+});

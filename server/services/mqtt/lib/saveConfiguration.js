@@ -1,7 +1,9 @@
 const { promisify } = require('util');
 const { CONFIGURATION, DEFAULT } = require('./constants');
 const { SERVICE_STATUS } = require('../../../utils/constants');
-const { NotFoundError } = require('../../../utils/coreErrors');
+const { ConflictError, NotFoundError } = require('../../../utils/coreErrors');
+const { findManagedContainer } = require('../../../utils/dockerContainers');
+const { isBrokerConfiguredByGladys } = require('./isBrokerConfiguredByGladys');
 const containerParams = require('../docker/eclipse-mosquitto-container.json');
 
 const sleep = promisify(setTimeout);
@@ -27,6 +29,26 @@ const updateOrDestroyVariable = async (variable, key, value, serviceId) => {
  */
 async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker }) {
   const { variable } = this.gladys;
+
+  let container = null;
+  if (useEmbeddedBroker) {
+    // Before persisting anything: a configuration that cannot be applied must not be stored.
+    // Throws if the name is taken by a container that is not ours: it is never reconfigured
+    container = await findManagedContainer(this.gladys.system, containerParams);
+
+    if (!container) {
+      throw new NotFoundError(`${containerParams.name} container not found`);
+    }
+
+    // A broker Gladys never configured (no label, no stored version) is a user one: never reconfigured
+    const mosquittoVersion = await variable.getValue(CONFIGURATION.MQTT_MOSQUITTO_VERSION, this.serviceId);
+    if (!isBrokerConfiguredByGladys(container, mosquittoVersion)) {
+      throw new ConflictError(
+        `Container "${containerParams.name}" already exists but was not configured by Gladys: rename or remove it`,
+      );
+    }
+  }
+
   const oldUser = await variable.getValue(CONFIGURATION.MQTT_USERNAME_KEY, this.serviceId);
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_EMBEDDED_BROKER_KEY, useEmbeddedBroker, this.serviceId);
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_URL_KEY, mqttUrl, this.serviceId);
@@ -34,16 +56,6 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_PASSWORD_KEY, mqttPassword, this.serviceId);
 
   if (useEmbeddedBroker) {
-    const dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerParams.name] },
-    });
-
-    if (dockerContainers.length === 0) {
-      throw new NotFoundError(`${containerParams.name} container not found`);
-    }
-
-    const [container] = dockerContainers;
     if (container.state !== 'running') {
       await this.gladys.system.restartContainer(container.id);
       // wait 5 seconds for the container to restart

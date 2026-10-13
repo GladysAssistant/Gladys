@@ -6,7 +6,8 @@ const { assert, fake } = sinon;
 
 const { MockedMqttClient } = require('../mocks.test');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { DEFAULT } = require('../../../../services/mqtt/lib/constants');
+const { CONFIGURATION, DEFAULT } = require('../../../../services/mqtt/lib/constants');
+const { ConflictError } = require('../../../../utils/coreErrors');
 
 const execMock = { exec: fake.resolves('command well executed') };
 const installContainer = proxyquire('../../../../services/mqtt/lib/installContainer', {
@@ -77,7 +78,14 @@ describe('mqttHandler.installContainer', () => {
       system: {
         pull: fake.resolves(false),
         createContainer: fake.resolves(false),
-        getContainers: fake.resolves([{ state: 'running' }]),
+        getContainers: fake.resolves([
+          {
+            id: 'container',
+            name: '/eclipse-mosquitto',
+            state: 'running',
+            labels: { 'io.gladysassistant.service': 'mqtt' },
+          },
+        ]),
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
         getNetworkMode: fake.resolves('host'),
@@ -119,7 +127,14 @@ describe('mqttHandler.installContainer', () => {
       system: {
         pull: fake.resolves(false),
         createContainer: fake.resolves(false),
-        getContainers: fake.resolves([{ state: 'running' }]),
+        getContainers: fake.resolves([
+          {
+            id: 'container',
+            name: '/eclipse-mosquitto',
+            state: 'running',
+            labels: { 'io.gladysassistant.service': 'mqtt' },
+          },
+        ]),
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
         getNetworkMode: fake.resolves('host'),
@@ -149,6 +164,92 @@ describe('mqttHandler.installContainer', () => {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.INSTALLATION_STATUS,
       payload: {
         status: DEFAULT.INSTALLATION_STATUS.DONE,
+      },
+    });
+  });
+
+  it('should installContainer: fail when our name is taken by a user container', async () => {
+    const gladys = {
+      event: {
+        emit: fake.resolves(true),
+      },
+      system: {
+        pull: fake.resolves(false),
+        createContainer: fake.resolves(false),
+        getContainers: fake.resolves([{ id: 'user-container', name: '/eclipse-mosquitto', image: 'nginx' }]),
+        inspectContainer: fake.resolves({ Config: { Image: 'nginx:alpine' } }),
+        getNetworkMode: fake.resolves('host'),
+        getGladysBasePath: fake.resolves({
+          basePathOnHost: '/var/lib/gladysassistant',
+          basePathOnContainer: '/var/lib/gladysassistant',
+        }),
+      },
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.configureContainer = fake.resolves(null);
+
+    let error;
+    try {
+      await mqttHandler.installContainer();
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(ConflictError);
+    assert.notCalled(gladys.system.pull);
+    assert.notCalled(gladys.system.createContainer);
+    assert.calledOnce(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MQTT.INSTALLATION_STATUS,
+      payload: {
+        status: DEFAULT.INSTALLATION_STATUS.ERROR,
+        detail: error,
+      },
+    });
+  });
+
+  it('should installContainer: fail when our name is taken by an unlabeled broker Gladys never configured', async () => {
+    const gladys = {
+      event: {
+        emit: fake.resolves(true),
+      },
+      system: {
+        pull: fake.resolves(false),
+        createContainer: fake.resolves(false),
+        getContainers: fake.resolves([{ id: 'user-broker', name: '/eclipse-mosquitto', image: 'eclipse-mosquitto:2' }]),
+        inspectContainer: fake.resolves({ Config: { Image: 'eclipse-mosquitto:2' } }),
+        getNetworkMode: fake.resolves('host'),
+        getGladysBasePath: fake.resolves({
+          basePathOnHost: '/var/lib/gladysassistant',
+          basePathOnContainer: '/var/lib/gladysassistant',
+        }),
+      },
+      variable: {
+        // no stored Mosquitto version: Gladys never configured a broker
+        getValue: fake.resolves(null),
+      },
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.configureContainer = fake.resolves(null);
+
+    let error;
+    try {
+      await mqttHandler.installContainer();
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(ConflictError);
+    assert.calledWith(gladys.variable.getValue, CONFIGURATION.MQTT_MOSQUITTO_VERSION, serviceId);
+    assert.notCalled(gladys.system.pull);
+    assert.notCalled(gladys.system.createContainer);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MQTT.INSTALLATION_STATUS,
+      payload: {
+        status: DEFAULT.INSTALLATION_STATUS.ERROR,
+        detail: error,
       },
     });
   });

@@ -1,6 +1,9 @@
 {
   "name": "eclipse-mosquitto",
   "Image": "eclipse-mosquitto:2.0.15",
+  "Labels": {
+    "io.gladysassistant.service": "mqtt"
+  },
   "ExposedPorts": { "1883/tcp": {} },
   "HostConfig": {
     "Binds": ["/var/lib/gladysassistant/mosquitto:/mosquitto/config"],
