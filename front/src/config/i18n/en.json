@@ -1069,6 +1069,8 @@
         "oauthDisconnectConfirmButton": "Yes, disconnect",
         "oauthDisconnectCancelButton": "Cancel",
         "oauthDisconnectError": "There was an error disconnecting the account.",
+        "oauthDisconnectStartingError": "The integration is starting: wait until it is running, then try again. Nothing was disconnected.",
+        "oauthDisconnectStopFailedError": "Gladys could not stop the integration, so nothing was disconnected. Check its supervision screen, then try again.",
         "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
       },
       "actions": {

@@ -46,23 +46,22 @@ class ConfigField extends Component {
 
   // dropping the tokens is not undone by a click: re-linking means going
   // through the provider again, so the button asks for a confirmation first.
-  // The confirmation is armed for the connection status it was clicked on: a
-  // status update replaces that object, so a confirmation armed before the
-  // account went disconnected is never shown again once it comes back
+  // The Disconnect block does not depend on the connection status (see
+  // render), so the confirmation only ever shows after a click on it
   armOAuthDisconnect = e => {
     e.preventDefault();
-    this.setState({ disconnectArmedFor: this.props.connectionStatus });
+    this.setState({ disconnectConfirming: true });
   };
 
   cancelOAuthDisconnect = e => {
     e.preventDefault();
-    this.setState({ disconnectArmedFor: null });
+    this.setState({ disconnectConfirming: false });
   };
 
   onOAuthDisconnect = async e => {
     e.preventDefault();
     await this.props.disconnectOAuth(this.props.field);
-    this.setState({ disconnectArmedFor: null });
+    this.setState({ disconnectConfirming: false });
   };
 
   copyRedirectUri = async value => {
@@ -114,6 +113,7 @@ class ConfigField extends Component {
     touchedSecrets,
     oauthStatus,
     oauthDisconnectStatuses,
+    oauthDisconnectErrorIds,
     connectionStatus,
     disconnectOAuth,
     selector,
@@ -181,18 +181,18 @@ class ConfigField extends Component {
         useInstanceRedirect && selector
           ? `${window.location.origin}${getOAuthCallbackPath(selector)}`
           : OAUTH_REDIRECT_URI;
-      // once linked, the way back: the connection status is integration-level
-      // (see ConfigTab), and so is the disconnect, which forgets every
-      // credential the integration stored (see disconnectOAuth on the server)
       // only a field that declares its credential_keys can be disconnected: the
-      // core deletes those keys and nothing else
-      const canDisconnect = Boolean(
-        disconnectOAuth && (field.credential_keys || []).length > 0 && connectionStatus && connectionStatus.connected
-      );
+      // core deletes those keys and nothing else. Offered whatever the
+      // connection status: a revoked account reports connected: false, and the
+      // status is in memory only (null after a restart of Gladys) while the
+      // stored credentials are not — deleting absent keys is harmless
+      const canDisconnect = Boolean(disconnectOAuth && (field.credential_keys || []).length > 0);
+      const connected = Boolean(connectionStatus && connectionStatus.connected);
       // keyed by field: an integration may link several accounts
       const disconnectStatus = (oauthDisconnectStatuses || {})[field.key];
       const disconnecting = disconnectStatus === RequestStatus.Getting;
-      const confirming = canDisconnect && this.state.disconnectArmedFor === connectionStatus;
+      const confirming = canDisconnect && this.state.disconnectConfirming;
+      // once connected, Disconnect replaces Connect; otherwise both are offered
       return (
         <div class="form-group">
           <label class="form-label">{label}</label>
@@ -209,7 +209,10 @@ class ConfigField extends Component {
           )}
           {disconnectStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
-              <Text id="integration.externalIntegration.config.oauthDisconnectError" />
+              <Text
+                id={`integration.externalIntegration.config.${(oauthDisconnectErrorIds || {})[field.key] ||
+                  'oauthDisconnectError'}`}
+              />
             </div>
           )}
           {usesRedirect && (
@@ -253,10 +256,10 @@ class ConfigField extends Component {
             </div>
           )}
           <div>
-            {!canDisconnect && (
+            {!confirming && !(connected && canDisconnect) && (
               <button
                 type="button"
-                class={cx('btn btn-primary', {
+                class={cx('btn btn-primary mr-2', {
                   'btn-loading': oauthStatus === RequestStatus.Getting
                 })}
                 disabled={oauthStatus === RequestStatus.Getting}
@@ -461,6 +464,7 @@ const ConfigSchemaForm = ({
   connectOAuth,
   disconnectOAuth,
   oauthDisconnectStatuses,
+  oauthDisconnectErrorIds,
   connectionStatus,
   selector,
   dynamicOptions,
@@ -498,6 +502,7 @@ const ConfigSchemaForm = ({
           connectOAuth={connectOAuth}
           disconnectOAuth={disconnectOAuth}
           oauthDisconnectStatuses={oauthDisconnectStatuses}
+          oauthDisconnectErrorIds={oauthDisconnectErrorIds}
           connectionStatus={connectionStatus}
           selector={selector}
           dynamicOptions={dynamicOptions}

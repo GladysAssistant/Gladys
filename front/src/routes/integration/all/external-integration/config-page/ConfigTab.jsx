@@ -166,6 +166,7 @@ const ConfigTab = props => {
                     connectOAuth={props.connectOAuth}
                     disconnectOAuth={props.disconnectOAuth}
                     oauthDisconnectStatuses={props.oauthDisconnectStatuses}
+                    oauthDisconnectErrorIds={props.oauthDisconnectErrorIds}
                     connectionStatus={connectionStatus}
                     selector={props.selector || get(integration, 'selector')}
                     dynamicOptions={props.dynamicOptions}

@@ -407,6 +407,29 @@ describe('externalIntegration.validateManifest', () => {
       { ...TEST_MANIFEST, config_schema: [accountField(['external_integration_container_ports'])] },
       'config_schema[0].credential_keys[0]: "external_integration_container_ports" is reserved',
     );
+    // any core variable, including one added after this rule: a prefix
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [accountField(['external_integration_future_state'])] },
+      'config_schema[0].credential_keys[0]: "external_integration_future_state" is reserved',
+    );
+  });
+
+  it('should reject credential_keys outside the config_schema', () => {
+    // the disconnect only reads the config_schema: anywhere else the list
+    // would have no effect and escape the ownership checks
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        actions: [
+          {
+            key: 'link',
+            label: { en: 'Link' },
+            fields: [{ key: 'account', type: 'oauth2', label: { en: 'Account' }, credential_keys: ['latitude'] }],
+          },
+        ],
+      },
+      'actions[0].fields[0].credential_keys: only allowed on config_schema fields',
+    );
   });
 
   it('should reject a credential key that is a setting or owned by another account field', () => {

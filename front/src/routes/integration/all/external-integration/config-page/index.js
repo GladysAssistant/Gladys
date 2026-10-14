@@ -748,6 +748,17 @@ class ExternalIntegrationConfigPage extends Component {
       }));
     } catch (e) {
       console.error(e);
+      // both refusals leave the account untouched: say so, and say what to do
+      const message = String(get(e, 'response.data.message') || '');
+      let errorId = 'oauthDisconnectError';
+      if (get(e, 'response.status') === 409) {
+        errorId = 'oauthDisconnectStartingError';
+      } else if (message.includes('EXTERNAL_INTEGRATION_STOP_FAILED')) {
+        errorId = 'oauthDisconnectStopFailedError';
+      }
+      this.setState(prevState => ({
+        oauthDisconnectErrorIds: Object.assign({}, prevState.oauthDisconnectErrorIds, { [field.key]: errorId })
+      }));
       setDisconnectStatus(RequestStatus.Error);
     }
   };

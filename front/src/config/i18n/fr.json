@@ -1069,6 +1069,8 @@
         "oauthDisconnectConfirmButton": "Oui, déconnecter",
         "oauthDisconnectCancelButton": "Annuler",
         "oauthDisconnectError": "Une erreur s'est produite lors de la déconnexion du compte.",
+        "oauthDisconnectStartingError": "L'intégration est en cours de démarrage : attendez qu'elle tourne, puis réessayez. Rien n'a été déconnecté.",
+        "oauthDisconnectStopFailedError": "Gladys n'a pas pu arrêter l'intégration, rien n'a donc été déconnecté. Vérifiez son écran de supervision, puis réessayez.",
         "oauthConnectError": "Erreur au lancement de la connexion. Vérifiez que l'intégration est démarrée."
       },
       "actions": {

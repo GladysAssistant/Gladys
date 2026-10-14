@@ -318,6 +318,7 @@ describe('External integration admin API', () => {
       const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
       stubInstance(gladys.externalIntegration, 'stop', fake.resolves(null));
       stubInstance(gladys.externalIntegration, 'start', fake.resolves(null));
+      stubInstance(gladys.system, 'inspectContainer', fake.resolves({ State: { Running: false } }));
       await gladys.variable.setValue('ACCESS_TOKEN', JSON.stringify('token'), service.id);
       await gladys.variable.setValue('DEVICE_ID', JSON.stringify('stable'), service.id);
       await gladys.variable.setValue('LATITUDE', JSON.stringify(48.85), service.id);

@@ -4,9 +4,15 @@ const sinon = require('sinon').createSandbox();
 const { assert: sinonAssert, fake } = sinon;
 
 const db = require('../../../models');
-const { BadParameters } = require('../../../utils/coreErrors');
+const { BadParameters, ConflictError } = require('../../../utils/coreErrors');
 const { SERVICE_STATUS } = require('../../../utils/constants');
-const { CORE_SERVICE_VARIABLES } = require('../../../lib/external-integration/constants');
+const {
+  SUB_CONTAINER_PORTS_VARIABLE,
+  SUB_CONTAINER_DESIRED_VARIABLE,
+  SUB_CONTAINER_ENV_VARIABLE,
+} = require('../../../lib/external-integration/constants');
+
+const CORE_VARIABLES = [SUB_CONTAINER_PORTS_VARIABLE, SUB_CONTAINER_DESIRED_VARIABLE, SUB_CONTAINER_ENV_VARIABLE];
 const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('./testUtils.test');
 
 // manifest of a cloud integration with an account field: the linked account
@@ -55,6 +61,8 @@ function buildDisconnectSupervisor(service) {
   supervisor.externalIntegration.getBySelector = fake.resolves(service);
   supervisor.externalIntegration.stop = fake.resolves(null);
   supervisor.externalIntegration.start = fake.resolves(null);
+  // a stop that worked: the container is no longer running
+  supervisor.system.inspectContainer = fake.resolves({ State: { Running: false } });
   return supervisor;
 }
 
@@ -74,13 +82,13 @@ describe('externalIntegration.disconnectOAuth', () => {
     await variable.setValue('SESSION_DEVICE_ID', JSON.stringify('stable-device'), service.id);
     await variable.setValue('LATITUDE', JSON.stringify(48.85), service.id);
     await variable.setValue('GLADYS_PREFER_LOCAL', JSON.stringify(false), service.id);
-    await Promise.all(CORE_SERVICE_VARIABLES.map((name) => variable.setValue(name, JSON.stringify({}), service.id)));
+    await Promise.all(CORE_VARIABLES.map((name) => variable.setValue(name, JSON.stringify({}), service.id)));
 
     const result = await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
 
     expect(result).to.deep.equal({ success: true });
     expect(await storedVariableNames(service.id)).to.deep.equal(
-      ['GLADYS_PREFER_LOCAL', 'LATITUDE', 'SESSION_DEVICE_ID', ...CORE_SERVICE_VARIABLES].sort(),
+      ['GLADYS_PREFER_LOCAL', 'LATITUDE', 'SESSION_DEVICE_ID', ...CORE_VARIABLES].sort(),
     );
   });
 
@@ -140,20 +148,86 @@ describe('externalIntegration.disconnectOAuth', () => {
     expect(seenByStart).to.deep.equal([]);
   });
 
-  [SERVICE_STATUS.LOADING, SERVICE_STATUS.DEGRADED].forEach((status) => {
-    it(`should stop and start again an integration in the ${status} status`, async () => {
-      // its container is alive: the health check supervises it, and the
-      // process may still hold the session in memory
-      const service = await seedAccountService({ status });
-      const { externalIntegration, variable } = buildDisconnectSupervisor(service);
-      await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+  it('should stop and start again a DEGRADED integration', async () => {
+    // a silent WebSocket, not a stopped process: it may still hold the
+    // session in memory
+    const service = await seedAccountService({ status: SERVICE_STATUS.DEGRADED });
+    const { externalIntegration, variable } = buildDisconnectSupervisor(service);
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
 
+    await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+
+    sinonAssert.calledOnceWithExactly(externalIntegration.stop, service.selector);
+    sinonAssert.calledOnceWithExactly(externalIntegration.start, service.selector);
+    expect(await storedVariableNames(service.id)).to.deep.equal([]);
+  });
+
+  it('should refuse while the integration is starting', async () => {
+    // a start() is in flight: a stop/start on top of it would race with its
+    // container recreation
+    const service = await seedAccountService({ status: SERVICE_STATUS.LOADING });
+    const { externalIntegration, variable } = buildDisconnectSupervisor(service);
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+    try {
       await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(ConflictError);
+      expect(e.message).to.equal('EXTERNAL_INTEGRATION_STARTING');
+    }
+    sinonAssert.notCalled(externalIntegration.stop);
+    expect(await storedVariableNames(service.id)).to.deep.equal(['SESSION_PASS_TOKEN']);
+  });
 
-      sinonAssert.calledOnceWithExactly(externalIntegration.stop, service.selector);
-      sinonAssert.calledOnceWithExactly(externalIntegration.start, service.selector);
-      expect(await storedVariableNames(service.id)).to.deep.equal([]);
-    });
+  it('should delete nothing when the container is still running after the stop', async () => {
+    // stop() logs a failed stopContainer and still reports STOPPED: deleting
+    // now would let the live process write its tokens back
+    const service = await seedAccountService({ status: SERVICE_STATUS.RUNNING, container_id: 'container-1' });
+    const { externalIntegration, variable, system } = buildDisconnectSupervisor(service);
+    system.inspectContainer = fake.resolves({ State: { Running: true } });
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+    try {
+      await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.equal(
+        `EXTERNAL_INTEGRATION_STOP_FAILED: ${service.selector} is still running, nothing was disconnected`,
+      );
+    }
+    expect(await storedVariableNames(service.id)).to.deep.equal(['SESSION_PASS_TOKEN']);
+    // put back as it was
+    sinonAssert.calledOnceWithExactly(externalIntegration.start, service.selector);
+    expect(externalIntegration.getConnectionStatus(service.id)).to.equal(null);
+  });
+
+  it('should delete nothing when it cannot tell whether the container stopped', async () => {
+    const service = await seedAccountService({ status: SERVICE_STATUS.RUNNING, container_id: 'container-1' });
+    const { externalIntegration, variable, system } = buildDisconnectSupervisor(service);
+    system.inspectContainer = fake.rejects(new Error('docker unavailable'));
+    // the restart that puts it back fails too: still reported as a stop failure
+    externalIntegration.start = fake.rejects(new Error('docker unavailable'));
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+    try {
+      await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.include('EXTERNAL_INTEGRATION_STOP_FAILED');
+    }
+    expect(await storedVariableNames(service.id)).to.deep.equal(['SESSION_PASS_TOKEN']);
+  });
+
+  it('should disconnect when Docker no longer knows the container', async () => {
+    const service = await seedAccountService({ status: SERVICE_STATUS.RUNNING, container_id: 'container-1' });
+    const { externalIntegration, variable, system } = buildDisconnectSupervisor(service);
+    const notFound = new Error('no such container');
+    notFound.statusCode = 404;
+    system.inspectContainer = fake.rejects(notFound);
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+
+    const result = await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+
+    expect(result).to.deep.equal({ success: true });
+    expect(await storedVariableNames(service.id)).to.deep.equal([]);
   });
 
   it('should leave a stopped integration stopped', async () => {

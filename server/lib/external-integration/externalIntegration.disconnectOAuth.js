@@ -1,8 +1,36 @@
+const get = require('get-value');
+
 const db = require('../../models');
 const logger = require('../../utils/logger');
-const { BadParameters } = require('../../utils/coreErrors');
+const { BadParameters, ConflictError } = require('../../utils/coreErrors');
+const { SERVICE_STATUS } = require('../../utils/constants');
 const { SUPERVISED_STATUSES } = require('./constants');
 const { getAccountField } = require('./externalIntegration.getAccountField');
+
+/**
+ * @description Tell if the main container of an integration is still running.
+ * A container Docker no longer knows is not running; any other inspection
+ * failure is rethrown: the caller cannot tell, so it must not assume.
+ * @param {object} system - The system manager.
+ * @param {string} containerId - The container id, if any.
+ * @returns {Promise<boolean>} True when the container is running.
+ * @example
+ * const running = await isContainerRunning(this.system, service.container_id);
+ */
+async function isContainerRunning(system, containerId) {
+  if (!containerId) {
+    return false;
+  }
+  try {
+    const containerInspect = await system.inspectContainer(containerId);
+    return get(containerInspect, 'State.Running') === true;
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return false;
+    }
+    throw e;
+  }
+}
 
 /**
  * @description Disconnect an account field (oauth2 or account_link): delete
@@ -11,13 +39,14 @@ const { getAccountField } = require('./externalIntegration.getAccountField');
  * form, the other off-schema state of the integration (a stable device id,
  * pairing state, caches) and the reserved GLADYS_* keys are kept.
  *
- * A live integration (LOADING, RUNNING or DEGRADED: its container is up, the
- * health check supervises it) holds its session in memory and would write
- * its tokens back on its next refresh: it is stopped before the deletion and
- * started again after it, so it comes back without credentials. Stopping
- * first also closes the window where a POST /config would land between the
- * read and the delete. A stopped integration is left stopped: it reads the
- * remaining config on its next start anyway.
+ * A live integration (RUNNING or DEGRADED: its container is up, the health
+ * check supervises it) holds its session in memory and would write its tokens
+ * back on its next refresh: it is stopped before the deletion and started
+ * again after it, so it comes back without credentials. Stopping first also
+ * closes the window where a POST /config would land between the read and the
+ * delete. The stop() action logs a container it failed to stop and carries on, so the
+ * container is checked before anything is deleted. A stopped integration is
+ * left stopped: it reads the remaining config on its next start anyway.
  * @param {string} selector - The selector of the external integration.
  * @param {object} params - The request parameters.
  * @param {string} params.key - The config_schema key of the account field.
@@ -36,12 +65,30 @@ async function disconnectOAuth(selector, { key } = {}) {
     // other state the integration keeps off-schema: nothing is deleted
     throw new BadParameters(`config.${key}: declares no credential_keys, it cannot be disconnected`);
   }
+  if (service.status === SERVICE_STATUS.LOADING) {
+    // a start() is still in flight: stopping and starting on top of it would
+    // race with its container recreation. The user retries once it is up.
+    throw new ConflictError('EXTERNAL_INTEGRATION_STARTING');
+  }
 
   // DEGRADED counts too: a silent WebSocket does not mean a stopped process,
   // and the last connection status it published may still say connected
   const wasRunning = SUPERVISED_STATUSES.includes(service.status);
   if (wasRunning) {
     await this.stop(selector);
+    let stillRunning;
+    try {
+      stillRunning = await isContainerRunning(this.system, service.container_id);
+    } catch (e) {
+      logger.warn(`Unable to check that integration ${selector} stopped before the disconnect`, e);
+      stillRunning = true;
+    }
+    if (stillRunning) {
+      // deleting now would let the live process write its tokens back: keep
+      // everything, put the integration back as it was and report the failure
+      await this.start(selector).catch((e) => logger.warn(`Unable to start integration ${selector} again`, e));
+      throw new Error(`EXTERNAL_INTEGRATION_STOP_FAILED: ${selector} is still running, nothing was disconnected`);
+    }
   }
 
   // config keys are stored uppercase in t_variable (see getIntegrationConfig)

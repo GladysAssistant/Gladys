@@ -29,7 +29,7 @@ const {
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   ACCOUNT_FIELD_TYPES,
-  CORE_SERVICE_VARIABLES,
+  CORE_SERVICE_VARIABLE_PREFIX,
   MAX_CREDENTIAL_KEYS,
   RESERVED_PARAM_PREFIX,
   DYNAMIC_SOURCES,
@@ -407,7 +407,7 @@ function validateCredentialKeys(field, path, errors) {
       errors.push(`${keyPath}: duplicate key "${key}"`);
     } else if (
       key.toUpperCase().startsWith(RESERVED_PARAM_PREFIX) ||
-      CORE_SERVICE_VARIABLES.includes(key.toUpperCase())
+      key.toUpperCase().startsWith(CORE_SERVICE_VARIABLE_PREFIX)
     ) {
       // stored uppercase next to the user preferences and the core's own
       // service variables: a disconnect must never reach those
@@ -590,7 +590,13 @@ function validateConfigField(field, index, seenKeys, errors, basePath, declaredP
     errors.push(`${path}.options: only allowed on select and multi_select fields`);
   }
   if (field.credential_keys !== undefined) {
-    validateCredentialKeys(field, path, errors);
+    if (basePath !== 'config_schema') {
+      // the disconnect only reads the account fields of the config_schema:
+      // anywhere else (an action mini form...) the list would have no effect
+      errors.push(`${path}.credential_keys: only allowed on config_schema fields`);
+    } else {
+      validateCredentialKeys(field, path, errors);
+    }
   }
 }
 

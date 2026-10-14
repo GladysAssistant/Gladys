@@ -69,18 +69,17 @@ const HARDWARE_CLASSES = {
 const SUB_CONTAINER_PORTS_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINER_PORTS';
 const SUB_CONTAINER_DESIRED_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_DESIRED';
 const SUB_CONTAINER_ENV_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_ENV';
-// The service-scoped variables the core writes for its own needs, next to the
-// config of the integration (same service_id, no user_id): an account field
-// may not declare them as credential_keys, a disconnect must never reach them.
 // The statuses of an integration whose container is meant to be alive: the
 // health check supervises them, and a disconnect stops and restarts them so
-// the session the integration holds in memory does not outlive its tokens.
+// the session the integration holds in memory does not outlive its tokens
+// (LOADING excepted: a start is in flight, the disconnect answers 409).
 const SUPERVISED_STATUSES = [SERVICE_STATUS.LOADING, SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
-const CORE_SERVICE_VARIABLES = [
-  SUB_CONTAINER_PORTS_VARIABLE,
-  SUB_CONTAINER_DESIRED_VARIABLE,
-  SUB_CONTAINER_ENV_VARIABLE,
-];
+// Every service-scoped variable the core writes for its own needs, next to
+// the config of the integration (same service_id, no user_id), starts with
+// this prefix: an account field may not declare such a key in
+// credential_keys, a disconnect must never reach them — a prefix rule, so a
+// core variable added later is protected without anyone extending a list.
+const CORE_SERVICE_VARIABLE_PREFIX = 'EXTERNAL_INTEGRATION_';
 // The secret signing the integration JWTs, generated once and persisted:
 // without a JWT_SECRET env var the process-level secret is regenerated at
 // every boot, which used to invalidate every token baked in the container
@@ -668,7 +667,7 @@ module.exports = {
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
   ACCOUNT_FIELD_TYPES,
-  CORE_SERVICE_VARIABLES,
+  CORE_SERVICE_VARIABLE_PREFIX,
   MAX_CREDENTIAL_KEYS,
   SUPERVISED_STATUSES,
   DYNAMIC_SOURCES,

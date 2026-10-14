@@ -1069,6 +1069,8 @@
         "oauthDisconnectConfirmButton": "Ja, trennen",
         "oauthDisconnectCancelButton": "Abbrechen",
         "oauthDisconnectError": "Beim Trennen des Kontos ist ein Fehler aufgetreten.",
+        "oauthDisconnectStartingError": "Die Integration startet gerade: Warten Sie, bis sie läuft, und versuchen Sie es erneut. Es wurde nichts getrennt.",
+        "oauthDisconnectStopFailedError": "Gladys konnte die Integration nicht stoppen, daher wurde nichts getrennt. Prüfen Sie die Überwachungsansicht und versuchen Sie es erneut.",
         "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
       },
       "actions": {
