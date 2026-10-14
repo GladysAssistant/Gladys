@@ -662,6 +662,7 @@ class ExternalIntegrationConfigPage extends Component {
     this.setState({
       oauthStatus: RequestStatus.Getting,
       oauthDisconnectStatuses: {},
+      oauthDisconnectErrorIds: {},
       oauthInvalidState: false,
       oauthInvalidUrl: false
     });
@@ -736,10 +737,8 @@ class ExternalIntegrationConfigPage extends Component {
       });
       // the server always ends on { connected: false }: apply it right away
       // instead of depending on the connection-status-updated push to arrive
+      setDisconnectStatus(RequestStatus.Success);
       this.setState(prevState => ({
-        oauthDisconnectStatuses: Object.assign({}, prevState.oauthDisconnectStatuses, {
-          [field.key]: RequestStatus.Success
-        }),
         integration:
           prevState.integration &&
           Object.assign({}, prevState.integration, {

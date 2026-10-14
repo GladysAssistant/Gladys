@@ -216,6 +216,68 @@ describe('externalIntegration.disconnectOAuth', () => {
     expect(await storedVariableNames(service.id)).to.deep.equal(['SESSION_PASS_TOKEN']);
   });
 
+  it('should stop an ERROR integration whose container is still up, and leave it stopped', async () => {
+    // a failed start saves ERROR but may leave the container running with
+    // the session in memory: the DB status alone is not enough
+    const service = await seedAccountService({ status: SERVICE_STATUS.ERROR, container_id: 'container-1' });
+    const { externalIntegration, variable, system } = buildDisconnectSupervisor(service);
+    system.inspectContainer = sinon.stub();
+    system.inspectContainer.onFirstCall().resolves({ State: { Running: true } });
+    system.inspectContainer.onSecondCall().resolves({ State: { Running: false } });
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+
+    const result = await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+
+    expect(result).to.deep.equal({ success: true });
+    sinonAssert.calledOnceWithExactly(externalIntegration.stop, service.selector);
+    // leaving ERROR still takes an admin start
+    sinonAssert.notCalled(externalIntegration.start);
+    expect(await storedVariableNames(service.id)).to.deep.equal([]);
+  });
+
+  it('should trust the status of a stopped integration it cannot inspect', async () => {
+    const service = await seedAccountService({ container_id: 'container-1' });
+    const { externalIntegration, variable, system } = buildDisconnectSupervisor(service);
+    system.inspectContainer = fake.rejects(new Error('docker unavailable'));
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+
+    const result = await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+
+    expect(result).to.deep.equal({ success: true });
+    sinonAssert.notCalled(externalIntegration.stop);
+    expect(await storedVariableNames(service.id)).to.deep.equal([]);
+  });
+
+  it('should delete nothing and start the integration again when the stop throws', async () => {
+    const service = await seedAccountService({ status: SERVICE_STATUS.RUNNING, container_id: 'container-1' });
+    const { externalIntegration, variable } = buildDisconnectSupervisor(service);
+    externalIntegration.stop = fake.rejects(new Error('SQLITE_BUSY'));
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+    try {
+      await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.include('EXTERNAL_INTEGRATION_STOP_FAILED');
+    }
+    sinonAssert.calledOnceWithExactly(externalIntegration.start, service.selector);
+    expect(await storedVariableNames(service.id)).to.deep.equal(['SESSION_PASS_TOKEN']);
+  });
+
+  it('should not start an ERROR integration again when its stop failed', async () => {
+    const service = await seedAccountService({ status: SERVICE_STATUS.ERROR, container_id: 'container-1' });
+    const { externalIntegration, variable, system } = buildDisconnectSupervisor(service);
+    system.inspectContainer = fake.resolves({ State: { Running: true } });
+    await variable.setValue('SESSION_PASS_TOKEN', JSON.stringify('pass-token'), service.id);
+    try {
+      await externalIntegration.disconnectOAuth(service.selector, { key: 'netatmo_account' });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.include('EXTERNAL_INTEGRATION_STOP_FAILED');
+    }
+    sinonAssert.notCalled(externalIntegration.start);
+    expect(await storedVariableNames(service.id)).to.deep.equal(['SESSION_PASS_TOKEN']);
+  });
+
   it('should disconnect when Docker no longer knows the container', async () => {
     const service = await seedAccountService({ status: SERVICE_STATUS.RUNNING, container_id: 'container-1' });
     const { externalIntegration, variable, system } = buildDisconnectSupervisor(service);

@@ -45,8 +45,10 @@ async function isContainerRunning(system, containerId) {
  * again after it, so it comes back without credentials. Stopping first also
  * closes the window where a POST /config would land between the read and the
  * delete. The stop() action logs a container it failed to stop and carries on, so the
- * container is checked before anything is deleted. A stopped integration is
- * left stopped: it reads the remaining config on its next start anyway.
+ * container is checked before anything is deleted. Any other status is
+ * checked against Docker: a container still up (an ERROR left by a failed
+ * start) is stopped too and left stopped. A stopped integration is left
+ * stopped: it reads the remaining config on its next start anyway.
  * @param {string} selector - The selector of the external integration.
  * @param {object} params - The request parameters.
  * @param {string} params.key - The config_schema key of the account field.
@@ -73,11 +75,22 @@ async function disconnectOAuth(selector, { key } = {}) {
 
   // DEGRADED counts too: a silent WebSocket does not mean a stopped process,
   // and the last connection status it published may still say connected
-  const wasRunning = SUPERVISED_STATUSES.includes(service.status);
-  if (wasRunning) {
-    await this.stop(selector);
+  const supervised = SUPERVISED_STATUSES.includes(service.status);
+  let live = supervised;
+  if (!live) {
+    // the status is what the core last saved, not what Docker runs: an
+    // integration left in ERROR by a failed start may still have its
+    // container up, holding the session in memory
+    try {
+      live = await isContainerRunning(this.system, service.container_id);
+    } catch (e) {
+      logger.debug(`Unable to inspect the container of integration ${selector}, trusting its status`, e);
+    }
+  }
+  if (live) {
     let stillRunning;
     try {
+      await this.stop(selector);
       stillRunning = await isContainerRunning(this.system, service.container_id);
     } catch (e) {
       logger.warn(`Unable to check that integration ${selector} stopped before the disconnect`, e);
@@ -86,7 +99,9 @@ async function disconnectOAuth(selector, { key } = {}) {
     if (stillRunning) {
       // deleting now would let the live process write its tokens back: keep
       // everything, put the integration back as it was and report the failure
-      await this.start(selector).catch((e) => logger.warn(`Unable to start integration ${selector} again`, e));
+      if (supervised) {
+        await this.start(selector).catch((e) => logger.warn(`Unable to start integration ${selector} again`, e));
+      }
       throw new Error(`EXTERNAL_INTEGRATION_STOP_FAILED: ${selector} is still running, nothing was disconnected`);
     }
   }
@@ -103,7 +118,9 @@ async function disconnectOAuth(selector, { key } = {}) {
   // do not wait for the integration to report it: the user clicked disconnect
   this.setConnectionStatus(service, { connected: false });
 
-  if (wasRunning) {
+  // only a supervised integration is started again: one found running in
+  // ERROR is left stopped, leaving that state still takes an admin start
+  if (supervised) {
     try {
       await this.start(selector);
     } catch (e) {
