@@ -94,10 +94,6 @@ const CATEGORIES_WITHOUT_UNIT = new Set([
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.UV_SENSOR, 'integer'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PH_SENSOR, 'decimal'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CUBE, DEVICE_FEATURE_TYPES.CUBE.MODE),
-  categoryTypeKey(
-    DEVICE_FEATURE_CATEGORIES.BODY_COMPOSITION_SENSOR,
-    DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.VISCERAL_FAT_INDEX
-  ),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.BINARY),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.VTIC),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.NTARF),
@@ -833,10 +829,7 @@ export const getFeatureDefaultValues = (category, type) => {
     if (type === DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_FAT_PERCENTAGE) {
       return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: true }, category, type);
     }
-    if (type === DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.VISCERAL_FAT_INDEX) {
-      return applyDefaultUnit({ ...defaults, min: 0, max: 60, read_only: true }, category, type);
-    }
-    // Masses, in kg by default: 500 covers any body weight.
+    // Masses, in kg by default (body water too): 500 covers any body weight.
     return applyDefaultUnit({ ...defaults, min: 0, max: 500, read_only: true }, category, type);
   }
 
@@ -1153,9 +1146,6 @@ export const getFeaturePreviewValue = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.BODY_COMPOSITION_SENSOR) {
     if (type === DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_FAT_PERCENTAGE) {
       return 18.4;
-    }
-    if (type === DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.VISCERAL_FAT_INDEX) {
-      return 7;
     }
     return 72.5;
   }

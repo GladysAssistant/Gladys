@@ -6501,8 +6501,7 @@
       "muscle-mass": "Muskelmasse",
       "bone-mass": "Knochenmasse",
       "body-water": "Körperwasser",
-      "body-fat-percentage": "Körperfett (%)",
-      "visceral-fat-index": "Viszeralfett-Index"
+      "body-fat-percentage": "Körperfett (%)"
     },
     "blood-pressure-sensor": {
       "shortCategoryName": "Blutdruck",

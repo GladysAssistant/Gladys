@@ -148,6 +148,10 @@ describe('constants health sensor categories', () => {
     expect(unitsByType[DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_FAT_PERCENTAGE]).to.deep.equal([
       DEVICE_FEATURE_UNITS.PERCENT,
     ]);
-    expect(unitsByType[DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.VISCERAL_FAT_INDEX]).to.deep.equal([]);
+    expect(unitsByType[DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_WATER]).to.deep.equal([
+      DEVICE_FEATURE_UNITS.KILOGRAM,
+      DEVICE_FEATURE_UNITS.POUND,
+      DEVICE_FEATURE_UNITS.PERCENT,
+    ]);
   });
 });

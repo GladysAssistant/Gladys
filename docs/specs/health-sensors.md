@@ -12,16 +12,16 @@ Gladys has no category for a measure taken on a person. Smart scales, blood pres
 
 One category per physical quantity, whatever the device measuring it (rule 2): a heart rate is the same quantity whether a watch, a blood pressure monitor, a scale or a bed sensor reports it.
 
-| Category                  | Types                                                                           | Units                   | Values                                     |
-| ------------------------- | ------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------ |
-| `body-composition-sensor` | `weight`, `fat-mass`, `fat-free-mass`, `muscle-mass`, `bone-mass`, `body-water` | `kilogram`, `pound`     | decimal, >= 0                              |
-|                           | `body-fat-percentage`                                                           | `percent`               | decimal, 0-100, share of fat in the weight |
-|                           | `visceral-fat-index`                                                            | none                    | decimal, >= 0, unitless index              |
-| `blood-pressure-sensor`   | `systolic`, `diastolic`                                                         | `millimeter-of-mercury` | integer, >= 0                              |
-| `heart-rate-sensor`       | `integer`                                                                       | `beats-per-minute`      | integer, >= 0                              |
-| `blood-oxygen-sensor`     | `integer`                                                                       | `percent`               | integer, 0-100 (SpO2)                      |
+| Category                  | Types                                                             | Units                          | Values                                                   |
+| ------------------------- | ----------------------------------------------------------------- | ------------------------------ | -------------------------------------------------------- |
+| `body-composition-sensor` | `weight`, `fat-mass`, `fat-free-mass`, `muscle-mass`, `bone-mass` | `kilogram`, `pound`            | decimal, >= 0                                            |
+|                           | `body-water`                                                      | `kilogram`, `pound`, `percent` | decimal, >= 0 (a mass), or 0-100 (a share of the weight) |
+|                           | `body-fat-percentage`                                             | `percent`                      | decimal, 0-100, share of fat in the weight               |
+| `blood-pressure-sensor`   | `systolic`, `diastolic`                                           | `millimeter-of-mercury`        | integer, >= 0                                            |
+| `heart-rate-sensor`       | `integer`                                                         | `beats-per-minute`             | integer, >= 0                                            |
+| `blood-oxygen-sensor`     | `integer`                                                         | `percent`                      | integer, 0-100 (SpO2)                                    |
 
-- **Body composition** is what a scale reports: the body weight and its components. A plain scale publishes `weight` only; a bioimpedance scale adds the components it measures. An integration publishes the form its device natively reports: a device reporting both the fat mass and the fat percentage publishes both, a device reporting only one does not compute the other.
+- **Body composition** is what a scale reports: the body weight and its components. A plain scale publishes `weight` only; a bioimpedance scale adds the components it measures. An integration publishes the form its device natively reports: a device reporting both the fat mass and the fat percentage publishes both, a device reporting only one does not compute the other. `body-water` follows the same rule with its unit: kg/lb when the device reports a mass, percent when it reports a share of the weight.
 - **Blood pressure** is one reading made of two values; each is a feature. A pulse measured during the reading goes to `heart-rate-sensor`, not to this category (rule 5).
 - **Heart rate** covers spot, continuous and averaged values (for instance the average heart rate of a night); the feature name tells them apart.
 - None of these categories feeds a room aggregate: they describe a person, not a room.
@@ -39,7 +39,7 @@ One category per physical quantity, whatever the device measuring it (rule 2): a
 ## C. Non-goals for v1
 
 - **Energy expenditure (kcal).** It needs its own category: `energy-sensor` is electrical energy, read by energy monitoring to compute consumption and cost.
-- **Sleep score, vascular age.** Each vendor computes them with its own algorithm and scale: no shared definition yet (rule 1).
+- **Sleep score, vascular age, visceral fat rating, metabolic age.** Each vendor computes them with its own algorithm and scale (a visceral fat rating runs 1-59 on one scale, 1-30 on another): a 72 from one brand is not a 72 from another, so they are not one quantity (rules 1 and 3).
 - **Activity history grouping.** The categories fall into the "other" group of `front/src/routes/history/categoryGroups.js` for now.
 
 Adding a type or a category later is not breaking; these are left out until a second vendor shows a shared definition.

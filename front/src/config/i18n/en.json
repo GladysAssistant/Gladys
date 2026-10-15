@@ -6501,8 +6501,7 @@
       "muscle-mass": "Muscle mass",
       "bone-mass": "Bone mass",
       "body-water": "Body water",
-      "body-fat-percentage": "Body fat (%)",
-      "visceral-fat-index": "Visceral fat index"
+      "body-fat-percentage": "Body fat (%)"
     },
     "blood-pressure-sensor": {
       "shortCategoryName": "Blood pressure",

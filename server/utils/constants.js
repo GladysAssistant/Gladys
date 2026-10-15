@@ -972,8 +972,10 @@ const DEVICE_FEATURE_CATEGORIES = {
   // stay in `temperature-sensor` (type `probe`).
   // Body composition, as a scale (with or without bioimpedance) reports it: the body weight and its
   // components. Masses are in kg or lb, `body-fat-percentage` is the share of fat in the body weight
-  // (0-100) and `visceral-fat-index` a unitless index. An integration publishes the form its device
-  // natively reports; a device reporting both the fat mass and the fat percentage publishes both.
+  // (0-100), `body-water` is a mass (kg, lb) or a share of the body weight (%), whichever the device
+  // reports. An integration publishes the form its device natively reports; a device reporting both
+  // the fat mass and the fat percentage publishes both. Brand scores with no shared scale (visceral
+  // fat rating, metabolic age...) are not body composition values and do not belong here.
   BODY_COMPOSITION_SENSOR: 'body-composition-sensor',
   // Arterial blood pressure, in mmHg (non-negative), one feature per value of the reading.
   BLOOD_PRESSURE_SENSOR: 'blood-pressure-sensor',
@@ -1191,9 +1193,8 @@ const DEVICE_FEATURE_TYPES = {
     FAT_FREE_MASS: 'fat-free-mass', // kg or lb (decimal - sensor)
     MUSCLE_MASS: 'muscle-mass', // kg or lb (decimal - sensor)
     BONE_MASS: 'bone-mass', // kg or lb (decimal - sensor)
-    BODY_WATER: 'body-water', // mass of water in the body, kg or lb (decimal - sensor)
+    BODY_WATER: 'body-water', // water in the body, kg or lb, or % 0-100 of the body weight (decimal - sensor)
     BODY_FAT_PERCENTAGE: 'body-fat-percentage', // share of fat in the body weight, % 0-100 (decimal - sensor)
-    VISCERAL_FAT_INDEX: 'visceral-fat-index', // unitless index (decimal - sensor)
   },
   BLOOD_PRESSURE_SENSOR: {
     SYSTOLIC: 'systolic', // mmHg (integer - sensor)
@@ -2046,12 +2047,13 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
       DEVICE_FEATURE_UNITS.KILOGRAM,
       DEVICE_FEATURE_UNITS.POUND,
     ],
+    // Scales publish the body water either as a mass or as a share of the body weight.
     [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_WATER]: [
       DEVICE_FEATURE_UNITS.KILOGRAM,
       DEVICE_FEATURE_UNITS.POUND,
+      DEVICE_FEATURE_UNITS.PERCENT,
     ],
     [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_FAT_PERCENTAGE]: [DEVICE_FEATURE_UNITS.PERCENT],
-    [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.VISCERAL_FAT_INDEX]: [],
   },
   [DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR]: {
     // The intensity is a mass per energy, the two shares are percentages: without this entry
