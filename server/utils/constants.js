@@ -2029,7 +2029,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.BODY_COMPOSITION_SENSOR]: {
-    // Masses, one percentage and one unitless index: each type gets its own units.
+    // Masses, the fat percentage, and body water as a mass or a percentage: each type gets its own units.
     [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.WEIGHT]: [DEVICE_FEATURE_UNITS.KILOGRAM, DEVICE_FEATURE_UNITS.POUND],
     [DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.FAT_MASS]: [
       DEVICE_FEATURE_UNITS.KILOGRAM,
