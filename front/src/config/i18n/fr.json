@@ -6501,7 +6501,7 @@
       "muscle-mass": "Masse musculaire",
       "bone-mass": "Masse osseuse",
       "body-water": "Eau corporelle",
-      "body-fat-percentage": "Masse grasse (%)"
+      "body-fat-percentage": "Pourcentage de masse grasse"
     },
     "blood-pressure-sensor": {
       "shortCategoryName": "Tension artérielle",
