@@ -33,12 +33,12 @@ One category per physical quantity, whatever the device measuring it (rule 2): a
 | Body and skin temperature | `temperature-sensor` / `probe` | A temperature; `probe` already stays out of room averages |
 | Sleep durations           | `duration`                     | A duration                                                |
 | Steps, wake-ups           | `counter-sensor`               | A count                                                   |
-| Pulse wave velocity       | `speed-sensor`                 | A speed                                                   |
 | Presence in bed           | `presence-sensor` / `binary`   | A presence                                                |
 
 ## C. Non-goals for v1
 
 - **Energy expenditure (kcal).** It needs its own category: `energy-sensor` is electrical energy, read by energy monitoring to compute consumption and cost.
+- **Pulse wave velocity.** It shares its unit (m/s) with `speed-sensor`, not its meaning: `speed-sensor` holds wind and vehicle speeds, and a cardiovascular measure there would mix with them in the MQTT catalog and the history (rule 4). It waits for a category of its own.
 - **Sleep score, vascular age, visceral fat rating, metabolic age.** Each vendor computes them with its own algorithm and scale (a visceral fat rating runs 1-59 on one scale, 1-30 on another): a 72 from one brand is not a 72 from another, so they are not one quantity (rules 1 and 3).
 - **Activity history grouping.** The categories fall into the "other" group of `front/src/routes/history/categoryGroups.js` for now.
 
