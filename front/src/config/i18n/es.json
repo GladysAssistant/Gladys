@@ -5393,8 +5393,7 @@
     "kilogram": "Kilogramo (kg)",
     "pound": "Libra (lb)",
     "millimeter-of-mercury": "Milímetro de mercurio (mmHg)",
-    "beats-per-minute": "Latidos por minuto (lpm)",
-    "kilocalorie": "Kilocaloría (kcal)"
+    "beats-per-minute": "Latidos por minuto (lpm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -5496,8 +5495,7 @@
     "kilogram": "kg",
     "pound": "lb",
     "millimeter-of-mercury": "mmHg",
-    "beats-per-minute": "lpm",
-    "kilocalorie": "kcal"
+    "beats-per-minute": "lpm"
   },
   "lightControl": {
     "openPanel": "Abrir los controles de luz",
@@ -6495,23 +6493,29 @@
       "tire-pressure": "Presión de los neumáticos",
       "window-opened": "Ventana abierta"
     },
-    "health": {
-      "shortCategoryName": "Salud",
+    "body-composition-sensor": {
+      "shortCategoryName": "Composición corporal",
       "weight": "Peso",
-      "body-fat-percentage": "Grasa corporal (%)",
       "fat-mass": "Masa grasa",
       "fat-free-mass": "Masa magra",
       "muscle-mass": "Masa muscular",
       "bone-mass": "Masa ósea",
       "body-water": "Agua corporal",
-      "visceral-fat": "Índice de grasa visceral",
-      "systolic-blood-pressure": "Presión sistólica",
-      "diastolic-blood-pressure": "Presión diastólica",
-      "heart-rate": "Frecuencia cardíaca",
-      "blood-oxygen": "Oxígeno en sangre (SpO2)",
-      "vascular-age": "Edad vascular",
-      "calories": "Calorías",
-      "sleep-score": "Puntuación de sueño"
+      "body-fat-percentage": "Grasa corporal (%)",
+      "visceral-fat-index": "Índice de grasa visceral"
+    },
+    "blood-pressure-sensor": {
+      "shortCategoryName": "Presión arterial",
+      "systolic": "Presión sistólica",
+      "diastolic": "Presión diastólica"
+    },
+    "heart-rate-sensor": {
+      "shortCategoryName": "Frecuencia cardíaca",
+      "integer": "Frecuencia cardíaca"
+    },
+    "blood-oxygen-sensor": {
+      "shortCategoryName": "Oxígeno en sangre",
+      "integer": "Oxígeno en sangre (SpO2)"
     },
     "heater": {
       "shortCategoryName": "Calefacción",

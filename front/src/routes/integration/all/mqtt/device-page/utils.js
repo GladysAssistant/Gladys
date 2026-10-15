@@ -94,6 +94,10 @@ const CATEGORIES_WITHOUT_UNIT = new Set([
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.UV_SENSOR, 'integer'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PH_SENSOR, 'decimal'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CUBE, DEVICE_FEATURE_TYPES.CUBE.MODE),
+  categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.BODY_COMPOSITION_SENSOR,
+    DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.VISCERAL_FAT_INDEX
+  ),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.BINARY),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.VTIC),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.NTARF),
@@ -159,6 +163,11 @@ export const groupDevicesByRoom = (devices, houses) => {
 const flattenUnit = unit => (Array.isArray(unit) ? unit[0] : unit);
 
 const FEATURE_UNIT_BY_CATEGORY_TYPE = {
+  // The other body composition types are masses: the category default (kg) fits them.
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.BODY_COMPOSITION_SENSOR,
+    DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_FAT_PERCENTAGE
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(
     DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
     DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE
@@ -820,6 +829,25 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: true }, category, type);
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BODY_COMPOSITION_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_FAT_PERCENTAGE) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: true }, category, type);
+    }
+    if (type === DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.VISCERAL_FAT_INDEX) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 60, read_only: true }, category, type);
+    }
+    // Masses, in kg by default: 500 covers any body weight.
+    return applyDefaultUnit({ ...defaults, min: 0, max: 500, read_only: true }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.BLOOD_PRESSURE_SENSOR) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 300, read_only: true }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.HEART_RATE_SENSOR) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 250, read_only: true }, category, type);
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 5000, read_only: true, unit: DEVICE_FEATURE_UNITS.PPM },
@@ -1120,6 +1148,28 @@ export const getFeaturePreviewValue = (category, type) => {
       return 92;
     }
     return 28;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.BODY_COMPOSITION_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.BODY_FAT_PERCENTAGE) {
+      return 18.4;
+    }
+    if (type === DEVICE_FEATURE_TYPES.BODY_COMPOSITION_SENSOR.VISCERAL_FAT_INDEX) {
+      return 7;
+    }
+    return 72.5;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.BLOOD_PRESSURE_SENSOR) {
+    return type === DEVICE_FEATURE_TYPES.BLOOD_PRESSURE_SENSOR.DIASTOLIC ? 80 : 120;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.HEART_RATE_SENSOR) {
+    return 64;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.BLOOD_OXYGEN_SENSOR) {
+    return 97;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {

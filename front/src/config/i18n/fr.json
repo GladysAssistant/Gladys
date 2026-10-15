@@ -5393,8 +5393,7 @@
     "kilogram": "Kilogramme (kg)",
     "pound": "Livre (lb)",
     "millimeter-of-mercury": "Millimètre de mercure (mmHg)",
-    "beats-per-minute": "Battements par minute (bpm)",
-    "kilocalorie": "Kilocalorie (kcal)"
+    "beats-per-minute": "Battements par minute (bpm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -5496,8 +5495,7 @@
     "kilogram": "kg",
     "pound": "lb",
     "millimeter-of-mercury": "mmHg",
-    "beats-per-minute": "bpm",
-    "kilocalorie": "kcal"
+    "beats-per-minute": "bpm"
   },
   "lightControl": {
     "openPanel": "Ouvrir les réglages de la lumière",
@@ -6495,23 +6493,29 @@
       "tire-pressure": "Pression des pneus",
       "window-opened": "Fenêtre ouverte"
     },
-    "health": {
-      "shortCategoryName": "Santé",
+    "body-composition-sensor": {
+      "shortCategoryName": "Composition corporelle",
       "weight": "Poids",
-      "body-fat-percentage": "Masse grasse (%)",
       "fat-mass": "Masse grasse",
       "fat-free-mass": "Masse maigre",
       "muscle-mass": "Masse musculaire",
       "bone-mass": "Masse osseuse",
       "body-water": "Eau corporelle",
-      "visceral-fat": "Indice de graisse viscérale",
-      "systolic-blood-pressure": "Tension systolique",
-      "diastolic-blood-pressure": "Tension diastolique",
-      "heart-rate": "Fréquence cardiaque",
-      "blood-oxygen": "Oxygène sanguin (SpO2)",
-      "vascular-age": "Âge vasculaire",
-      "calories": "Calories",
-      "sleep-score": "Score de sommeil"
+      "body-fat-percentage": "Masse grasse (%)",
+      "visceral-fat-index": "Indice de graisse viscérale"
+    },
+    "blood-pressure-sensor": {
+      "shortCategoryName": "Tension artérielle",
+      "systolic": "Tension systolique",
+      "diastolic": "Tension diastolique"
+    },
+    "heart-rate-sensor": {
+      "shortCategoryName": "Fréquence cardiaque",
+      "integer": "Fréquence cardiaque"
+    },
+    "blood-oxygen-sensor": {
+      "shortCategoryName": "Oxygène sanguin",
+      "integer": "Oxygène sanguin (SpO2)"
     },
     "heater": {
       "shortCategoryName": "Chauffage",

@@ -5393,8 +5393,7 @@
     "kilogram": "Kilogram (kg)",
     "pound": "Pound (lb)",
     "millimeter-of-mercury": "Millimeter of mercury (mmHg)",
-    "beats-per-minute": "Beats per minute (bpm)",
-    "kilocalorie": "Kilocalorie (kcal)"
+    "beats-per-minute": "Beats per minute (bpm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -5496,8 +5495,7 @@
     "kilogram": "kg",
     "pound": "lb",
     "millimeter-of-mercury": "mmHg",
-    "beats-per-minute": "bpm",
-    "kilocalorie": "kcal"
+    "beats-per-minute": "bpm"
   },
   "lightControl": {
     "openPanel": "Open the light controls",
@@ -6495,23 +6493,29 @@
       "tire-pressure": "Tire pressure",
       "window-opened": "Window open"
     },
-    "health": {
-      "shortCategoryName": "Health",
+    "body-composition-sensor": {
+      "shortCategoryName": "Body composition",
       "weight": "Weight",
-      "body-fat-percentage": "Body fat (%)",
       "fat-mass": "Fat mass",
       "fat-free-mass": "Fat free mass",
       "muscle-mass": "Muscle mass",
       "bone-mass": "Bone mass",
       "body-water": "Body water",
-      "visceral-fat": "Visceral fat index",
-      "systolic-blood-pressure": "Systolic blood pressure",
-      "diastolic-blood-pressure": "Diastolic blood pressure",
-      "heart-rate": "Heart rate",
-      "blood-oxygen": "Blood oxygen (SpO2)",
-      "vascular-age": "Vascular age",
-      "calories": "Calories",
-      "sleep-score": "Sleep score"
+      "body-fat-percentage": "Body fat (%)",
+      "visceral-fat-index": "Visceral fat index"
+    },
+    "blood-pressure-sensor": {
+      "shortCategoryName": "Blood pressure",
+      "systolic": "Systolic blood pressure",
+      "diastolic": "Diastolic blood pressure"
+    },
+    "heart-rate-sensor": {
+      "shortCategoryName": "Heart rate",
+      "integer": "Heart rate"
+    },
+    "blood-oxygen-sensor": {
+      "shortCategoryName": "Blood oxygen",
+      "integer": "Blood oxygen (SpO2)"
     },
     "heater": {
       "shortCategoryName": "Heating",

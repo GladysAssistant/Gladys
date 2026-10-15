@@ -5393,8 +5393,7 @@
     "kilogram": "Kilogramm (kg)",
     "pound": "Pfund (lb)",
     "millimeter-of-mercury": "Millimeter Quecksilbersäule (mmHg)",
-    "beats-per-minute": "Schläge pro Minute (bpm)",
-    "kilocalorie": "Kilokalorie (kcal)"
+    "beats-per-minute": "Schläge pro Minute (bpm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -5496,8 +5495,7 @@
     "kilogram": "kg",
     "pound": "lb",
     "millimeter-of-mercury": "mmHg",
-    "beats-per-minute": "bpm",
-    "kilocalorie": "kcal"
+    "beats-per-minute": "bpm"
   },
   "lightControl": {
     "openPanel": "Lichteinstellungen öffnen",
@@ -6495,23 +6493,29 @@
       "tire-pressure": "Reifendruck",
       "window-opened": "Fenster geöffnet"
     },
-    "health": {
-      "shortCategoryName": "Gesundheit",
+    "body-composition-sensor": {
+      "shortCategoryName": "Körperzusammensetzung",
       "weight": "Gewicht",
-      "body-fat-percentage": "Körperfett (%)",
       "fat-mass": "Fettmasse",
       "fat-free-mass": "Fettfreie Masse",
       "muscle-mass": "Muskelmasse",
       "bone-mass": "Knochenmasse",
       "body-water": "Körperwasser",
-      "visceral-fat": "Viszeralfett-Index",
-      "systolic-blood-pressure": "Systolischer Blutdruck",
-      "diastolic-blood-pressure": "Diastolischer Blutdruck",
-      "heart-rate": "Herzfrequenz",
-      "blood-oxygen": "Blutsauerstoff (SpO2)",
-      "vascular-age": "Gefäßalter",
-      "calories": "Kalorien",
-      "sleep-score": "Schlafwert"
+      "body-fat-percentage": "Körperfett (%)",
+      "visceral-fat-index": "Viszeralfett-Index"
+    },
+    "blood-pressure-sensor": {
+      "shortCategoryName": "Blutdruck",
+      "systolic": "Systolischer Blutdruck",
+      "diastolic": "Diastolischer Blutdruck"
+    },
+    "heart-rate-sensor": {
+      "shortCategoryName": "Herzfrequenz",
+      "integer": "Herzfrequenz"
+    },
+    "blood-oxygen-sensor": {
+      "shortCategoryName": "Blutsauerstoff",
+      "integer": "Blutsauerstoff (SpO2)"
     },
     "heater": {
       "shortCategoryName": "Heizung",
