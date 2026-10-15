@@ -105,3 +105,32 @@ describe('constants DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR / DEVICE_FEATUR
     ]);
   });
 });
+
+describe('constants DEVICE_FEATURE_CATEGORIES.HEALTH / DEVICE_FEATURE_TYPES.HEALTH', () => {
+  it('should expose the health category', () => {
+    expect(DEVICE_FEATURE_CATEGORIES.HEALTH).to.equal('health');
+  });
+
+  it('should expose the health units', () => {
+    expect(DEVICE_FEATURE_UNITS.KILOGRAM).to.equal('kilogram');
+    expect(DEVICE_FEATURE_UNITS.POUND).to.equal('pound');
+    expect(DEVICE_FEATURE_UNITS.MILLIMETER_OF_MERCURY).to.equal('millimeter-of-mercury');
+    expect(DEVICE_FEATURE_UNITS.BEATS_PER_MINUTE).to.equal('beats-per-minute');
+    expect(DEVICE_FEATURE_UNITS.KILOCALORIE).to.equal('kilocalorie');
+  });
+
+  it('should scope the units of every health type', () => {
+    const unitsByType = DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE[DEVICE_FEATURE_CATEGORIES.HEALTH];
+    const categoryUnits = DEVICE_FEATURE_UNITS_BY_CATEGORY[DEVICE_FEATURE_CATEGORIES.HEALTH];
+    Object.values(DEVICE_FEATURE_TYPES.HEALTH).forEach((type) => {
+      expect(unitsByType, type).to.have.property(type);
+      unitsByType[type].forEach((unit) => expect(categoryUnits).to.include(unit));
+    });
+    expect(unitsByType[DEVICE_FEATURE_TYPES.HEALTH.WEIGHT]).to.deep.equal([
+      DEVICE_FEATURE_UNITS.KILOGRAM,
+      DEVICE_FEATURE_UNITS.POUND,
+    ]);
+    expect(unitsByType[DEVICE_FEATURE_TYPES.HEALTH.HEART_RATE]).to.deep.equal([DEVICE_FEATURE_UNITS.BEATS_PER_MINUTE]);
+    expect(unitsByType[DEVICE_FEATURE_TYPES.HEALTH.SLEEP_SCORE]).to.deep.equal([]);
+  });
+});

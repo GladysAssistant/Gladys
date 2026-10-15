@@ -5389,7 +5389,12 @@
     "square-centimeter": "Square centimer (cm²)",
     "square-meter": "Square meter (m²)",
     "square-kilometer": "Square kilometer (km²)",
-    "decibel": "Decibel (dB)"
+    "decibel": "Decibel (dB)",
+    "kilogram": "Kilogram (kg)",
+    "pound": "Pound (lb)",
+    "millimeter-of-mercury": "Millimeter of mercury (mmHg)",
+    "beats-per-minute": "Beats per minute (bpm)",
+    "kilocalorie": "Kilocalorie (kcal)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -5487,7 +5492,12 @@
     "square-centimeter": "cm²",
     "square-meter": "m²",
     "square-kilometer": "km²",
-    "decibel": "dB"
+    "decibel": "dB",
+    "kilogram": "kg",
+    "pound": "lb",
+    "millimeter-of-mercury": "mmHg",
+    "beats-per-minute": "bpm",
+    "kilocalorie": "kcal"
   },
   "lightControl": {
     "openPanel": "Open the light controls",
@@ -6484,6 +6494,24 @@
       "odometer": "Odometer",
       "tire-pressure": "Tire pressure",
       "window-opened": "Window open"
+    },
+    "health": {
+      "shortCategoryName": "Health",
+      "weight": "Weight",
+      "body-fat-percentage": "Body fat (%)",
+      "fat-mass": "Fat mass",
+      "fat-free-mass": "Fat free mass",
+      "muscle-mass": "Muscle mass",
+      "bone-mass": "Bone mass",
+      "body-water": "Body water",
+      "visceral-fat": "Visceral fat index",
+      "systolic-blood-pressure": "Systolic blood pressure",
+      "diastolic-blood-pressure": "Diastolic blood pressure",
+      "heart-rate": "Heart rate",
+      "blood-oxygen": "Blood oxygen (SpO2)",
+      "vascular-age": "Vascular age",
+      "calories": "Calories",
+      "sleep-score": "Sleep score"
     },
     "heater": {
       "shortCategoryName": "Heating",

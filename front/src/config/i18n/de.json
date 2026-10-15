@@ -5389,7 +5389,12 @@
     "square-centimeter": "Quadratzentimeter (cm²)",
     "square-meter": "Quadratmeter (m²)",
     "square-kilometer": "Quadratkilometer (km²)",
-    "decibel": "Dezibel (dB)"
+    "decibel": "Dezibel (dB)",
+    "kilogram": "Kilogramm (kg)",
+    "pound": "Pfund (lb)",
+    "millimeter-of-mercury": "Millimeter Quecksilbersäule (mmHg)",
+    "beats-per-minute": "Schläge pro Minute (bpm)",
+    "kilocalorie": "Kilokalorie (kcal)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -5487,7 +5492,12 @@
     "square-centimeter": "cm²",
     "square-meter": "m²",
     "square-kilometer": "km²",
-    "decibel": "dB"
+    "decibel": "dB",
+    "kilogram": "kg",
+    "pound": "lb",
+    "millimeter-of-mercury": "mmHg",
+    "beats-per-minute": "bpm",
+    "kilocalorie": "kcal"
   },
   "lightControl": {
     "openPanel": "Lichteinstellungen öffnen",
@@ -6484,6 +6494,24 @@
       "odometer": "Kilometerzähler",
       "tire-pressure": "Reifendruck",
       "window-opened": "Fenster geöffnet"
+    },
+    "health": {
+      "shortCategoryName": "Gesundheit",
+      "weight": "Gewicht",
+      "body-fat-percentage": "Körperfett (%)",
+      "fat-mass": "Fettmasse",
+      "fat-free-mass": "Fettfreie Masse",
+      "muscle-mass": "Muskelmasse",
+      "bone-mass": "Knochenmasse",
+      "body-water": "Körperwasser",
+      "visceral-fat": "Viszeralfett-Index",
+      "systolic-blood-pressure": "Systolischer Blutdruck",
+      "diastolic-blood-pressure": "Diastolischer Blutdruck",
+      "heart-rate": "Herzfrequenz",
+      "blood-oxygen": "Blutsauerstoff (SpO2)",
+      "vascular-age": "Gefäßalter",
+      "calories": "Kalorien",
+      "sleep-score": "Schlafwert"
     },
     "heater": {
       "shortCategoryName": "Heizung",
