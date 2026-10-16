@@ -18,6 +18,7 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
     primeObservedSetpoints: fake.resolves(null),
     applyTimer: null,
     windowTimers: new Map(),
+    windowOpenedAt: new Map(),
   };
   const controllers = { 'get /api/v1/service/thermostat/device': {} };
   const ThermostatService = proxyquire('../../../services/thermostat/index', {
@@ -140,13 +141,24 @@ describe('ThermostatService', () => {
     const clock = sinon.useFakeTimers();
     const { service, handler } = buildService();
     const check = fake();
-    handler.windowTimers.set('thermostat-living-room', setTimeout(check, 10000));
+    handler.windowTimers.set('thermostat-living-room', { timer: setTimeout(check, 10000), window: 'window-sensor' });
 
     await service.stop();
     await clock.tickAsync(10000);
 
     assert.notCalled(check);
     expect(handler.windowTimers.size).to.equal(0);
+  });
+
+  // A window closed and opened again while the service was stopped must count
+  // from its new opening, not from the one kept before the stop.
+  it('should forget the openings it recorded on stop', async () => {
+    const { service, handler } = buildService();
+    handler.windowOpenedAt.set('window-sensor', 1000);
+
+    await service.stop();
+
+    expect(handler.windowOpenedAt.size).to.equal(0);
   });
 
   it('should be safe to stop a service that was never started', async () => {

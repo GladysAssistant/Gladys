@@ -255,23 +255,22 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
  * suspends the heating if the window is still open, and leaves it alone if it
  * was closed in the meantime.
  * @param {string} thermostatSelector - The thermostat waiting on the opening.
+ * @param {string} windowSelector - The sensor that opened.
  * @param {number} delayMs - Time left before the delay runs out.
  * @returns {undefined}
  * @example
- * scheduleWindowCheck.call(handler, 'thermostat-living-room', 60000);
+ * scheduleWindowCheck.call(handler, 'thermostat-living-room', 'window-sensor', 60000);
  */
-function scheduleWindowCheck(thermostatSelector, delayMs) {
+function scheduleWindowCheck(thermostatSelector, windowSelector, delayMs) {
   const pending = this.windowTimers.get(thermostatSelector);
   if (pending) {
-    clearTimeout(pending);
+    clearTimeout(pending.timer);
   }
-  this.windowTimers.set(
-    thermostatSelector,
-    setTimeout(() => {
-      this.windowTimers.delete(thermostatSelector);
-      this.triggerApplySchedules();
-    }, delayMs),
-  );
+  const timer = setTimeout(() => {
+    this.windowTimers.delete(thermostatSelector);
+    this.triggerApplySchedules();
+  }, delayMs);
+  this.windowTimers.set(thermostatSelector, { timer, window: windowSelector });
 }
 
 /**
@@ -317,8 +316,15 @@ async function onDeviceNewState(event) {
       return;
     }
     if (newValue !== 0) {
-      // Closed: the next opening starts a new count.
+      // Closed: the next opening starts a new count, and the checks waiting on
+      // this one have nothing left to cut.
       this.windowOpenedAt.delete(changedSelector);
+      this.windowTimers.forEach(({ timer, window }, thermostatSelector) => {
+        if (window === changedSelector) {
+          clearTimeout(timer);
+          this.windowTimers.delete(thermostatSelector);
+        }
+      });
       return;
     }
     // A contact re-reporting an opening already seen keeps its first time: the
@@ -351,7 +357,7 @@ async function onDeviceNewState(event) {
             `Thermostat: window opened (${changedSelector}) for ${device.selector},` +
               ` suspending the heating in ${Math.ceil(remaining / 1000)} s if it stays open`,
           );
-          scheduleWindowCheck.call(this, device.selector, remaining);
+          scheduleWindowCheck.call(this, device.selector, changedSelector, remaining);
           return;
         }
         // An external thermostat carries no setpoint feature and no switch: it is

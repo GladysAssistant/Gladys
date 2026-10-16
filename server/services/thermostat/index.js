@@ -28,8 +28,12 @@ module.exports = function ThermostatService(gladys, serviceId) {
       clearTimeout(thermostatHandler.applyTimer);
       thermostatHandler.applyTimer = null;
     }
-    thermostatHandler.windowTimers.forEach((timer) => clearTimeout(timer));
+    thermostatHandler.windowTimers.forEach(({ timer }) => clearTimeout(timer));
     thermostatHandler.windowTimers.clear();
+    // A window may close and open again while the service is stopped: an opening
+    // kept from before would cut the heating early on the first pass after a start.
+    // Forgotten, it is read again from the sensor's own `last_value_changed`.
+    thermostatHandler.windowOpenedAt.clear();
   }
 
   /**

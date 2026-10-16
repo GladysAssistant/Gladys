@@ -59,6 +59,7 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   this.windowOpenedAt = new Map();
   // The pending checks of an opening's delay, by thermostat selector, so that the
   // heating is suspended when the delay ends rather than at the next minute tick.
+  // Each one keeps the sensor it waits on, so that closing it drops the check.
   this.windowTimers = new Map();
 };
 
