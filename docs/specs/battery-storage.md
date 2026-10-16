@@ -40,7 +40,7 @@ The six existing types are unchanged and listed for completeness. The five new o
 | `DISCHARGE_POWER_LIMIT` | `discharge-power-limit` | command | `watt`, `kilowatt` | 0 / device rating | **Maximum power OUT of the battery.** The device discharges at up to this power. |
 | `TARGET_CHARGE_LIMIT` | `target-charge-limit` | command | `percent` | 0 / 100 | State of charge at which **charging stops** (the charge ceiling). Same string and same meaning as `electrical-vehicle-charge` / `target-charge-limit`. |
 | `TARGET_DISCHARGE_LIMIT` | `target-discharge-limit` | command | `percent` | 0 / 100 | State of charge at which **discharging stops** — the reserve the battery keeps (reserve / minimum SoC; distinct from the `BACKUP` mode). |
-| `MODE` | `mode` | command | — | 0 / 3 | Operating mode, `BATTERY_STORAGE_MODE` (A.2). Which modes a given battery offers is declared per feature via `supported_options` (A.3). |
+| `MODE` | `mode` | command | — | 0 / 5 | Operating mode, `BATTERY_STORAGE_MODE` (A.2). Which modes a given battery offers is declared per feature via `supported_options` (A.3). |
 
 `read_only` follows the Direction column (`sensor` → `true`, `command` → `false`); it is the field the frontend routes on (B.3).
 
@@ -245,7 +245,7 @@ No `binary` key is involved, so the `zero`/`one`/`other` plural trap of `water-h
 |---|---|---|---|
 | `charge-power-limit`, `discharge-power-limit` | `min: 0, max: 10000, read_only: false` | `watt` | 1200 / 800 |
 | `target-charge-limit`, `target-discharge-limit` | `min: 0, max: 100, read_only: false` | `percent` | 90 / 10 |
-| `mode` | `min: 0, max: 3, read_only: false` | none (`CATEGORIES_WITHOUT_UNIT` entry `battery-storage`×`mode`) | `BATTERY_STORAGE_MODE.AUTO` |
+| `mode` | `min: 0, max: 5, read_only: false` | none (`CATEGORIES_WITHOUT_UNIT` entry `battery-storage`×`mode`) | `BATTERY_STORAGE_MODE.AUTO` |
 
 `has_feedback` keeps the MQTT default (`false`), as for `water-heater`: a hand-built MQTT device has no guaranteed state topic.
 
@@ -317,7 +317,7 @@ A.5's lossy mappings are the price of not modelling the AC output limit. The alt
 - [x] **Types are intrinsic to the capability.** Five settings that bound storing energy; grid export, home output and per-pack settings deferred (C).
 - [x] **Matter checked** (D.1), every type qualified (divergence, no counterpart), three divergences argued, unverified correspondences flagged as such.
 - [x] **Generic, not modelled on one API.** Two device families with different native interfaces (A.5 AC-port-centred, A.6 battery-centred) map onto the same types, with the mapping nature written down.
-- [x] **Enum-like type exposes the full generic set** (four modes); per-device subsets go through `supported_options` (A.3).
+- [x] **Enum-like type exposes the full generic set** (six modes); per-device subsets go through `supported_options` (A.3).
 - [x] **Naming**: kebab-case, English, no protocol name; `target-*-limit` mirrors the existing vehicle type; no `-sensor` suffix needed (existing category).
 - [x] **Names stress-tested** against plug-in batteries, hybrid inverters, home battery packs and the electrical-vehicle charge limit; an inverter with current-based limits is explicitly out of scope (A.6).
 - [x] **Inline scope comment** extended with the measurements/commands boundary and the value conventions (B.1).
@@ -330,7 +330,7 @@ A.5's lossy mappings are the price of not modelling the AC output limit. The alt
 
 1. `cd front && npm run compare-translations` — every new type has its `deviceFeatureCategory` label in all locales.
 2. `cd front && npm run prettier-check && npm run eslint && npm run build`; `cd server && npm run prettier-check && npm run eslint && npx mocha test/utils/constants.test.js` (and `npm run coverage` in CI).
-3. Manual pass on both reference profiles, hand-built from the MQTT feature catalog or published by a test integration: each command row has its own icon; the power limits step by 10 W (0.1 kW for a kW feature); the state-of-charge limits are sliders in %; the mode control lists only the declared `supported_options` (two buttons for A.5, four for A.6); the measurement rows are unchanged.
+3. Manual pass on both reference profiles, hand-built from the MQTT feature catalog or published by a test integration: each command row has its own icon; the power limits step by 10 W (0.1 kW for a kW feature); the state-of-charge limits are sliders in %; the mode control lists only the declared `supported_options` (two buttons for A.5, six for A.6); the measurement rows are unchanged.
 4. Scene pass: a trigger on `mode` shows exactly one widget (the negation of B.4); an action on `mode` stores an integer; an action on a limit stores a number.
 5. MQTT catalog: picking each new type pre-fills `read_only: false`, the bounds and the unit of B.6, and the six measurement types keep their previous defaults.
 6. `cd front && npm run cypress:run` — dashboard and scene specs stay green.
