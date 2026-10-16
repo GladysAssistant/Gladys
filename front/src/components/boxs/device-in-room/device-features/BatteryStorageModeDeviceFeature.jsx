@@ -9,7 +9,9 @@ const MODE_OPTIONS = [
   { value: BATTERY_STORAGE_MODE.AUTO, i18nKey: 'auto' },
   { value: BATTERY_STORAGE_MODE.CHARGE, i18nKey: 'charge' },
   { value: BATTERY_STORAGE_MODE.DISCHARGE, i18nKey: 'discharge' },
-  { value: BATTERY_STORAGE_MODE.STANDBY, i18nKey: 'standby' }
+  { value: BATTERY_STORAGE_MODE.STANDBY, i18nKey: 'standby' },
+  { value: BATTERY_STORAGE_MODE.TIME_OF_USE, i18nKey: 'timeOfUse' },
+  { value: BATTERY_STORAGE_MODE.BACKUP, i18nKey: 'backup' }
 ];
 
 const BatteryStorageModeDeviceFeature = props => {

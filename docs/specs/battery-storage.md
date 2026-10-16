@@ -39,7 +39,7 @@ The six existing types are unchanged and listed for completeness. The five new o
 | `CHARGE_POWER_LIMIT` | `charge-power-limit` | command | `watt`, `kilowatt` | 0 / device rating | **Maximum power INTO the battery, whatever its source** (solar, grid, AC or DC). The device charges at up to this power. |
 | `DISCHARGE_POWER_LIMIT` | `discharge-power-limit` | command | `watt`, `kilowatt` | 0 / device rating | **Maximum power OUT of the battery.** The device discharges at up to this power. |
 | `TARGET_CHARGE_LIMIT` | `target-charge-limit` | command | `percent` | 0 / 100 | State of charge at which **charging stops** (the charge ceiling). Same string and same meaning as `electrical-vehicle-charge` / `target-charge-limit`. |
-| `TARGET_DISCHARGE_LIMIT` | `target-discharge-limit` | command | `percent` | 0 / 100 | State of charge at which **discharging stops** — the reserve the battery keeps (backup / minimum SoC). |
+| `TARGET_DISCHARGE_LIMIT` | `target-discharge-limit` | command | `percent` | 0 / 100 | State of charge at which **discharging stops** — the reserve the battery keeps (reserve / minimum SoC; distinct from the `BACKUP` mode). |
 | `MODE` | `mode` | command | — | 0 / 3 | Operating mode, `BATTERY_STORAGE_MODE` (A.2). Which modes a given battery offers is declared per feature via `supported_options` (A.3). |
 
 `read_only` follows the Direction column (`sensor` → `true`, `command` → `false`); it is the field the frontend routes on (B.3).
@@ -65,6 +65,8 @@ const BATTERY_STORAGE_MODE = {
   CHARGE: 1,    // forced charge, drawing from the grid allowed
   DISCHARGE: 2, // forced discharge to the installation
   STANDBY: 3,   // idle: neither charges nor discharges
+  TIME_OF_USE: 4, // follows the time-of-use programme stored in the device (charge and discharge windows)
+  BACKUP: 5,    // keeps the stored energy for a grid outage: the battery only discharges when the grid fails
 };
 ```
 
@@ -73,6 +75,8 @@ This is the **full generic set**, deliberately wider than any single battery: a 
 - `AUTO` is the device's own optimisation — "self-consumption", "self-use", "smart mode" in vendor vocabulary: it charges on surplus and discharges to cover the home, within the limits of A.1.
 - `CHARGE` / `DISCHARGE` force a direction; the power is still bounded by `charge-power-limit` / `discharge-power-limit`, and the forced charge still stops at `target-charge-limit`, the forced discharge at `target-discharge-limit`.
 - `STANDBY` holds the charge: no charging, no discharging.
+- `TIME_OF_USE` hands control to the programme stored in the device ("time of use", "economy", "TOU" in vendor vocabulary: charge and discharge windows, often tied to off-peak hours). The programme itself (its windows) is configured on the device and is out of scope (C); Gladys only selects the mode.
+- `BACKUP` keeps the energy for a grid outage ("backup", "UPS", "emergency power"): the battery charges up to `target-charge-limit` and only discharges when the grid fails. It differs from `STANDBY` (which never discharges, outage or not) and from `target-discharge-limit` (the reserve kept below normal operation, a level rather than a mode).
 
 **Mode and limits are independent features.** Writing a mode does not rewrite a limit and vice versa. Some devices have no mode at all and are driven by their limits only (a `discharge-power-limit` of `0` keeps the charge); they simply do not publish `mode`. **An integration maps whichever form its device natively offers, never both for the same function**: a device whose only "standby" is "output limit = 0" does not publish a `STANDBY` mode emulated on top of the limit it already publishes — two controls over one setting drift apart as soon as one is written.
 
@@ -159,7 +163,7 @@ Hybrid inverters (driven over Modbus or a vendor cloud) expose settings shaped a
 | Max battery discharge power | `discharge-power-limit` | **Direct** |
 | Charge SoC ceiling | `target-charge-limit` | **Direct** |
 | Backup / reserve SoC | `target-discharge-limit` | **Direct** |
-| Work mode self-use / force charge / force discharge / standby | `mode` `AUTO` / `CHARGE` / `DISCHARGE` / `STANDBY` | **Direct** for the four values; a vendor mode with no equivalent (time-of-use programme, backup-only) is left out of `supported_options` |
+| Work mode self-use / force charge / force discharge / standby / time-of-use / backup | `mode` `AUTO` / `CHARGE` / `DISCHARGE` / `STANDBY` / `TIME_OF_USE` / `BACKUP` | **Direct**; a model lacking one of them leaves it out of `supported_options` |
 
 An inverter whose limits are expressed as a battery current (A) rather than a power is out of scope for these types: the integration converts with the battery voltage if it can, or does not publish the feature.
 
@@ -228,8 +232,8 @@ Four files (`en`, `fr`, `de`, `es`), key-parallel (`npm run compare-translations
 | `deviceFeatureCategory.battery-storage.target-charge-limit` | Target charge level / Niveau de charge cible |
 | `deviceFeatureCategory.battery-storage.target-discharge-limit` | Discharge reserve / Réserve de décharge |
 | `deviceFeatureCategory.battery-storage.mode` | Mode / Mode |
-| `deviceFeatureAction.category.battery-storage.mode.{auto,charge,discharge,standby}` | Auto, Charge, Discharge, Standby / Auto, Charge, Décharge, Veille |
-| `deviceFeatureValue.category.battery-storage.mode.{0,1,2,3}` | Same labels, addressed by integer (history, scene selectors) |
+| `deviceFeatureAction.category.battery-storage.mode.{auto,charge,discharge,standby,timeOfUse,backup}` | Auto, Charge, Discharge, Standby, Time of use, Backup / Auto, Charge, Décharge, Veille, Heures creuses / programme, Secours |
+| `deviceFeatureValue.category.battery-storage.mode.{0,1,2,3,4,5}` | Same labels, addressed by integer (history, scene selectors) |
 
 No `binary` key is involved, so the `zero`/`one`/`other` plural trap of `water-heater.md` B.5 does not apply; the mode labels are plain integer-keyed strings like `water-heater.mode`.
 
@@ -268,6 +272,7 @@ Adding a type later is non-breaking, so these are deferrals:
 - **Timed power requests** — "charge at 2 kW for 30 minutes". That is Matter's `PowerAdjustRequest` model (D.1); Gladys features hold persistent values, and a duration would need a second feature. Scenes plus a delay express it today.
 - **Grid export limit / zero export** — an installation-level constraint on `grid-sensor` exchange, not storage.
 - **A home-output limit type** — the exact counterpart of the plug-in devices' AC output limit (A.5). It would belong next to `home-output-sensor`, which is a measurement category; whether controls go there is a separate design question. Until then, the lossy mapping of A.5 is the documented answer.
+- **The time-of-use programme itself** — its charge / discharge windows and tariffs. `TIME_OF_USE` only selects the programme stored in the device; editing it is a schedule problem, out of scope like the water heater's programme.
 - **Per-pack settings** — limits or states per battery module. Packs that need them are separate Gladys devices or out of scope.
 - **A new category** — see Context.
 - **Concrete Matter / Zigbee2MQTT / MQTT-catalog mappings** — the Matter mapping in particular needs the divergences of D.1 resolved in code.
@@ -294,7 +299,7 @@ Matter models this capability with the **Battery Storage** device type (introduc
 
 **Declared divergence 1 — persistent limits, not timed requests.** A Matter energy manager asks a battery for a given power *for a duration*; when it expires the device returns to its own behaviour. Gladys features hold one persistent value that a user sets on a dashboard or a scene writes, which is what plug-in batteries and hybrid inverters expose natively. A Matter mapping would have to re-issue requests to hold a limit, which is a mapping concern; timed requests are a non-goal (C).
 
-**Declared divergence 2 — the mode enum is not the optimisation tags.** `BATTERY_STORAGE_MODE` says what the battery does (`AUTO`, forced `CHARGE`, forced `DISCHARGE`, `STANDBY`); DEM Mode says who is allowed to optimise. The only tag-level correspondence that can be argued is `AUTO` ↔ a mode tagged `DeviceOptimization` (the device optimises itself); `CHARGE` / `DISCHARGE` / `STANDBY` correspond to DEM power requests or to pausing, not to mode tags. This mapping is **to be confirmed at implementation time** and is not a claim of alignment.
+**Declared divergence 2 — the mode enum is not the optimisation tags.** `BATTERY_STORAGE_MODE` says what the battery does (`AUTO`, forced `CHARGE`, forced `DISCHARGE`, `STANDBY`, `TIME_OF_USE`, `BACKUP`); DEM Mode says who is allowed to optimise. The only tag-level correspondence that can be argued is `AUTO` ↔ a mode tagged `DeviceOptimization` (the device optimises itself); `CHARGE` / `DISCHARGE` / `STANDBY` correspond to DEM power requests or to pausing, not to mode tags. This mapping is **to be confirmed at implementation time** and is not a claim of alignment.
 
 **Declared divergence 3 — no sign.** Matter uses one signed power (charging positive, discharging negative). Gladys keeps the split types that `battery-storage` already uses for its measurements (`charge-power` / `discharge-power`), so the commands read the same way; a Matter mapping splits on the sign.
 

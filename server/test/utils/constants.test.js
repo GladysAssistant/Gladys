@@ -114,6 +114,8 @@ describe('constants BATTERY_STORAGE_MODE', () => {
       CHARGE: 1,
       DISCHARGE: 2,
       STANDBY: 3,
+      TIME_OF_USE: 4,
+      BACKUP: 5,
     });
   });
 });

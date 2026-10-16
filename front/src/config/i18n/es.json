@@ -5704,7 +5704,9 @@
           "auto": "Auto",
           "charge": "Carga",
           "discharge": "Descarga",
-          "standby": "En espera"
+          "standby": "En espera",
+          "timeOfUse": "Franjas horarias",
+          "backup": "Respaldo"
         }
       }
     }
@@ -6213,7 +6215,9 @@
           "0": "Auto",
           "1": "Carga",
           "2": "Descarga",
-          "3": "En espera"
+          "3": "En espera",
+          "4": "Franjas horarias",
+          "5": "Respaldo"
         }
       }
     }

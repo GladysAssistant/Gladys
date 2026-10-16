@@ -681,8 +681,8 @@ export const getFeatureDefaultValues = (category, type) => {
       );
     }
     if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE) {
-      // BATTERY_STORAGE_MODE: AUTO/CHARGE/DISCHARGE/STANDBY
-      return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
+      // BATTERY_STORAGE_MODE: AUTO/CHARGE/DISCHARGE/STANDBY/TIME_OF_USE/BACKUP
+      return applyDefaultUnit({ ...defaults, min: 0, max: 5, read_only: false }, category, type);
     }
   }
 

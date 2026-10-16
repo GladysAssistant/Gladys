@@ -5704,7 +5704,9 @@
           "auto": "Auto",
           "charge": "Charge",
           "discharge": "Discharge",
-          "standby": "Standby"
+          "standby": "Standby",
+          "timeOfUse": "Time of use",
+          "backup": "Backup"
         }
       }
     }
@@ -6213,7 +6215,9 @@
           "0": "Auto",
           "1": "Charge",
           "2": "Discharge",
-          "3": "Standby"
+          "3": "Standby",
+          "4": "Time of use",
+          "5": "Backup"
         }
       }
     }

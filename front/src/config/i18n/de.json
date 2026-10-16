@@ -5704,7 +5704,9 @@
           "auto": "Auto",
           "charge": "Laden",
           "discharge": "Entladen",
-          "standby": "Standby"
+          "standby": "Standby",
+          "timeOfUse": "Zeitplan / Nebentarif",
+          "backup": "Notstrom"
         }
       }
     }
@@ -6213,7 +6215,9 @@
           "0": "Auto",
           "1": "Laden",
           "2": "Entladen",
-          "3": "Standby"
+          "3": "Standby",
+          "4": "Zeitplan / Nebentarif",
+          "5": "Notstrom"
         }
       }
     }

@@ -343,6 +343,8 @@ const BATTERY_STORAGE_MODE = {
   CHARGE: 1, // forced charge, drawing from the grid allowed
   DISCHARGE: 2, // forced discharge to the installation
   STANDBY: 3, // idle: neither charges nor discharges
+  TIME_OF_USE: 4, // follows the time-of-use programme stored in the device (charge and discharge windows)
+  BACKUP: 5, // keeps the stored energy for a grid outage: the battery only discharges when the grid fails
 };
 
 const LEVEL_MATTER_STATE = {
@@ -1317,7 +1319,9 @@ const DEVICE_FEATURE_TYPES = {
   // direction is carried by the type (charge = INTO the battery from any source,
   // discharge = OUT of it), never by a sign; state-of-charge limits are percentages
   // (0..100); `mode` is an index into BATTERY_STORAGE_MODE. A limit is a persistent
-  // bound the device keeps until it is written again, not a timed power request.
+  // bound the device keeps until it is written again, not a timed power request. `0` means
+  // zero: a power limit of 0 forbids that direction, never "unlimited" (a vendor API using
+  // 0 or -1 for "no limit" publishes the rated maximum instead).
   BATTERY_STORAGE: {
     BATTERY_LEVEL: 'battery-level', // state of charge, % (0..100)
     CHARGE_POWER: 'charge-power', // power INTO the battery, W/kW (>=0)

@@ -5704,7 +5704,9 @@
           "auto": "Auto",
           "charge": "Charge",
           "discharge": "Décharge",
-          "standby": "Veille"
+          "standby": "Veille",
+          "timeOfUse": "Heures creuses / programme",
+          "backup": "Secours"
         }
       }
     }
@@ -6213,7 +6215,9 @@
           "0": "Auto",
           "1": "Charge",
           "2": "Décharge",
-          "3": "Veille"
+          "3": "Veille",
+          "4": "Heures creuses / programme",
+          "5": "Secours"
         }
       }
     }
