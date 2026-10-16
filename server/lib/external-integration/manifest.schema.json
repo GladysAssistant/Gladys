@@ -482,6 +482,25 @@
               }
             }
           }
+        },
+        "visible_if": {
+          "type": "object",
+          "description": "Optional display condition: the field is rendered, and only then required, when the referenced field holds one of the listed values and is itself visible (conditions chain). A hidden field keeps its stored value; the integration still receives its whole configuration. Code-enforced: `field` is the key of an EARLIER field of the same list, a boolean or a select / multi_select with static options, and every value of `in` is one of its values.",
+          "additionalProperties": false,
+          "required": ["field", "in"],
+          "properties": {
+            "field": {
+              "type": "string",
+              "pattern": "^[a-z0-9_]+$"
+            },
+            "in": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": ["string", "boolean"]
+              }
+            }
+          }
         }
       },
       "allOf": [
