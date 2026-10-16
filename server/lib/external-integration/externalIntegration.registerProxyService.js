@@ -11,6 +11,7 @@ const {
   WEATHER_IMAGE_CACHE_PREFIX,
   TTS_SYNTHESIZE_TIMEOUT_MS,
   MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_AUDIO_BASE64_LENGTH,
   MAX_TTS_TEXT_LENGTH,
   TTS_AUDIO_CONTENT_TYPES,
 } = require('./constants');
@@ -170,7 +171,9 @@ function registerProxyService(service) {
               { timeoutMs: TTS_SYNTHESIZE_TIMEOUT_MS },
             );
             const audio = result && result.data && result.data.audio;
-            if (typeof audio !== 'string' || audio.length === 0) {
+            // the string length is bounded before anything is decoded: a
+            // data-URI that cannot fit under the size cap never allocates
+            if (typeof audio !== 'string' || audio.length === 0 || audio.length > MAX_TTS_AUDIO_BASE64_LENGTH) {
               throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
             }
             const separatorIndex = audio.indexOf(';base64,');

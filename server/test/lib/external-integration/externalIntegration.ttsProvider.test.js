@@ -10,6 +10,7 @@ const { buildSupervisor, seedExternalService, TEST_TTS_MANIFEST } = require('./t
 const {
   TTS_SYNTHESIZE_TIMEOUT_MS,
   MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_AUDIO_BASE64_LENGTH,
   MAX_TTS_TEXT_LENGTH,
 } = require('../../../lib/external-integration/constants');
 
@@ -173,6 +174,26 @@ describe('externalIntegration TTS providers (type tts)', () => {
         ExternalIntegrationUnavailableError,
         'EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO',
       );
+    });
+
+    it('should refuse an oversized data-URI before decoding it', async () => {
+      const { externalIntegration, stateManager } = buildSupervisor();
+      const service = await seedTtsService();
+      externalIntegration.registerProxyService(service);
+      const proxyService = stateManager.get('service', service.name);
+      // a valid prefix followed by more base64 than the size cap can hold:
+      // refused on the string length alone, nothing is decoded
+      const fromSpy = sinon.spy(Buffer, 'from');
+      externalIntegration.sendCommand = fake.resolves({
+        success: true,
+        data: { audio: `audio/mpeg;base64,${'A'.repeat(MAX_TTS_AUDIO_BASE64_LENGTH)}` },
+      });
+      await expect(proxyService.tts.synthesize({ text: 'Bonjour' })).to.be.rejectedWith(
+        ExternalIntegrationUnavailableError,
+        'EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO',
+      );
+      assert.notCalled(fromSpy);
+      fromSpy.restore();
     });
 
     it('should refuse an empty or oversized audio', async () => {

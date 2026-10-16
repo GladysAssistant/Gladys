@@ -243,6 +243,12 @@ const WEATHER_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
 // answer must speak its beginning rather than fail).
 const TTS_SYNTHESIZE_TIMEOUT_MS = 30 * 1000;
 const MAX_TTS_AUDIO_SIZE_BYTES = 5 * 1024 * 1024;
+// base64 encodes 3 bytes in 4 chars: a data-URI longer than this cannot
+// decode under the size cap, and is rejected BEFORE the decode allocates
+// (the normalizeWeatherImage rule — the payload comes from unaudited code).
+// The prefix allowance covers "<content type>;base64," for the longest
+// accepted content type.
+const MAX_TTS_AUDIO_BASE64_LENGTH = Math.ceil(MAX_TTS_AUDIO_SIZE_BYTES / 3) * 4 + 4 + 32;
 const MAX_TTS_TEXT_LENGTH = 2000;
 const TTS_AUDIO_CONTENT_TYPES = {
   'audio/mpeg': 'mp3',
@@ -645,6 +651,7 @@ module.exports = {
   WEATHER_GET_TIMEOUT_MS,
   TTS_SYNTHESIZE_TIMEOUT_MS,
   MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_AUDIO_BASE64_LENGTH,
   MAX_TTS_TEXT_LENGTH,
   TTS_AUDIO_CONTENT_TYPES,
   MAX_WEATHER_HOURS,

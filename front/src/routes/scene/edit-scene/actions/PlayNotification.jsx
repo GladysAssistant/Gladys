@@ -94,12 +94,17 @@ class PlayNotification extends Component {
     }
   };
 
+  // null while the request is in flight: the Gladys Plus upsell must not
+  // flash before the active provider is known (the unknown-state pattern of
+  // the Artificial Intelligence page). On failure the instance is assumed
+  // to speak through Gladys Plus, the default.
   getTtsProvider = async () => {
     try {
       const { active } = await this.props.httpClient.get('/api/v1/tts/provider');
       this.setState({ ttsProvider: active });
     } catch (e) {
       console.error(e);
+      this.setState({ ttsProvider: 'gladys-plus' });
     }
   };
 
@@ -119,7 +124,8 @@ class PlayNotification extends Component {
     this.props = props;
     this.state = {
       selectedDeviceFeatureOption: '',
-      computedVolume: props.action.evaluate_volume !== undefined
+      computedVolume: props.action.evaluate_volume !== undefined,
+      ttsProvider: null
     };
   }
   componentDidMount() {
@@ -182,7 +188,7 @@ class PlayNotification extends Component {
         {/* the Gladys Plus upsell only makes sense when the instance speaks
             through Gladys Plus: with a TTS provider integration active, the
             action works without any Plus subscription */}
-        {(!ttsProvider || ttsProvider === 'gladys-plus') && (
+        {ttsProvider === 'gladys-plus' && (
           <GladysPlusUpsell
             compact
             icon="fe-volume-2"
