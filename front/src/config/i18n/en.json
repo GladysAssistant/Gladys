@@ -5389,7 +5389,11 @@
     "square-centimeter": "Square centimer (cm²)",
     "square-meter": "Square meter (m²)",
     "square-kilometer": "Square kilometer (km²)",
-    "decibel": "Decibel (dB)"
+    "decibel": "Decibel (dB)",
+    "kilogram": "Kilogram (kg)",
+    "pound": "Pound (lb)",
+    "millimeter-of-mercury": "Millimeter of mercury (mmHg)",
+    "beats-per-minute": "Beats per minute (bpm)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -5487,7 +5491,11 @@
     "square-centimeter": "cm²",
     "square-meter": "m²",
     "square-kilometer": "km²",
-    "decibel": "dB"
+    "decibel": "dB",
+    "kilogram": "kg",
+    "pound": "lb",
+    "millimeter-of-mercury": "mmHg",
+    "beats-per-minute": "bpm"
   },
   "lightControl": {
     "openPanel": "Open the light controls",
@@ -6484,6 +6492,29 @@
       "odometer": "Odometer",
       "tire-pressure": "Tire pressure",
       "window-opened": "Window open"
+    },
+    "body-composition-sensor": {
+      "shortCategoryName": "Body composition",
+      "weight": "Weight",
+      "fat-mass": "Fat mass",
+      "fat-free-mass": "Fat free mass",
+      "muscle-mass": "Muscle mass",
+      "bone-mass": "Bone mass",
+      "body-water": "Body water",
+      "body-fat-percentage": "Body fat (%)"
+    },
+    "blood-pressure-sensor": {
+      "shortCategoryName": "Blood pressure",
+      "systolic": "Systolic blood pressure",
+      "diastolic": "Diastolic blood pressure"
+    },
+    "heart-rate-sensor": {
+      "shortCategoryName": "Heart rate",
+      "integer": "Heart rate"
+    },
+    "blood-oxygen-sensor": {
+      "shortCategoryName": "Blood oxygen",
+      "integer": "Blood oxygen (SpO2)"
     },
     "heater": {
       "shortCategoryName": "Heating",
