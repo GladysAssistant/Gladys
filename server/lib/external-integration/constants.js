@@ -216,6 +216,14 @@ const MAX_CAMERA_IMAGE_SIZE = 150 * 1024;
 // on-demand fresh image (dashboard live view): an ffmpeg capture can be
 // slow, this is the second exception to the 5s ack rule
 const CAMERA_GET_IMAGE_TIMEOUT_MS = 15 * 1000;
+// WebRTC live view (CAMERA_STREAM_PROTOCOLS.WEBRTC): the integration relays the offer to the
+// camera's cloud and waits for its answer, a third-party round trip like the fresh image above
+const CAMERA_WEBRTC_OFFER_TIMEOUT_MS = 15 * 1000;
+// an offer carries every ICE candidate (no trickle), a few KB in practice: the bound only keeps an
+// oversized body from reaching the integration
+const MAX_WEBRTC_SDP_LENGTH = 64 * 1024;
+// opaque ids the integration hands back (the vendor's session and stream ids), echoed on stop
+const MAX_WEBRTC_ID_LENGTH = 256;
 // Weather providers (B.18): weather.get triggers a fresh third-party API
 // call from the integration, same exception to the 5s ack rule as the
 // camera image.
@@ -625,6 +633,9 @@ module.exports = {
   MAX_CAMERA_IMAGES_PER_MINUTE,
   MAX_CAMERA_IMAGE_SIZE,
   CAMERA_GET_IMAGE_TIMEOUT_MS,
+  CAMERA_WEBRTC_OFFER_TIMEOUT_MS,
+  MAX_WEBRTC_SDP_LENGTH,
+  MAX_WEBRTC_ID_LENGTH,
   WEATHER_GET_TIMEOUT_MS,
   MAX_WEATHER_HOURS,
   MAX_WEATHER_DAYS,

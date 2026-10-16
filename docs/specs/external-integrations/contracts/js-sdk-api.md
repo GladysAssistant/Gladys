@@ -76,6 +76,8 @@ await gladys.connect(); // resolves once authenticated
 | `onSetValue(cb)` | `(device, deviceFeature, value) => Promise` |
 | `onPoll(cb)` | `(device) => Promise` (respond by publishing the states via `publishState`) |
 | `onGetImage(cb)` | `(device) => Promise<string>` — capture and resolve a fresh image (`image/jpg;base64,...`); it goes into `data.image` (C.4, 15 s delay) |
+| `onCameraWebRtcOffer(cb)` | `(device, { sessionId, sdp }) => Promise<{ sdpAnswer, sessionId?, streamId? }>` — WebRTC live view of a camera published with `GLADYS_CAMERA_STREAM_PROTOCOL` = `webrtc` (C.3): relay the complete SDP offer to the camera's cloud and resolve its answer; `sessionId` / `streamId` are the vendor's ids, handed back to `onCameraWebRtcStop` (C.4, 15 s delay) |
+| `onCameraWebRtcStop(cb)` | `(device, { sessionId, streamId }) => Promise` — end the vendor session (pause, dashboard left, or no browser ping for 30 s) |
 | `onScanRequest(cb)` | `() => Promise` (respond via `publishDiscoveredDevices`) |
 | `onDeviceCreated(cb)` / `onDeviceUpdated(cb)` / `onDeviceDeleted(cb)` | `(device) => Promise` |
 | `onConfigUpdated(cb)` | `(config) => Promise` (complete values, see C.4) |

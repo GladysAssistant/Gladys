@@ -8,6 +8,8 @@ const {
   DEVICE_FEATURE_TYPES_LIST,
   DEVICE_FEATURE_UNITS_LIST,
   DEVICE_POLL_FREQUENCIES_LIST,
+  CAMERA_STREAM_PROTOCOL_PARAM,
+  CAMERA_STREAM_PROTOCOLS,
 } = require('../../utils/constants');
 const {
   MAX_DISCOVERED_DEVICES,
@@ -110,7 +112,8 @@ async function setDiscoveredDevices(service, devices) {
       // the GLADYS_* params namespace is reserved to the semantics defined
       // by the spec; today: GLADYS_TRANSPORT, the effective transport of
       // the device (cloud/local badge in the UI), and the degraded state
-      // GLADYS_TRANSPORT_DEGRADED / GLADYS_TRANSPORT_MESSAGE (orange dot)
+      // GLADYS_TRANSPORT_DEGRADED / GLADYS_TRANSPORT_MESSAGE (orange dot), and
+      // GLADYS_CAMERA_STREAM_PROTOCOL, how a camera's live view is negotiated
       const paramName = param && typeof param.name === 'string' ? param.name : null;
       if (paramName === null || !paramName.toUpperCase().startsWith(RESERVED_PARAM_PREFIX)) {
         return;
@@ -123,6 +126,12 @@ async function setDiscoveredDevices(service, devices) {
       } else if (paramName === TRANSPORT_DEGRADED_PARAM) {
         if (param.value !== 'true') {
           throw new BadParameters(`${paramPath}.value: must be the string "true" (omit the param when nominal)`);
+        }
+      } else if (paramName === CAMERA_STREAM_PROTOCOL_PARAM) {
+        if (!Object.values(CAMERA_STREAM_PROTOCOLS).includes(param.value)) {
+          throw new BadParameters(
+            `${paramPath}.value: must be one of ${Object.values(CAMERA_STREAM_PROTOCOLS).join(', ')}`,
+          );
         }
       } else if (paramName === TRANSPORT_MESSAGE_PARAM) {
         let parsedMessage;

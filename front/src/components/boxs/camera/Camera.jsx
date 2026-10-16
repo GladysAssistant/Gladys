@@ -8,12 +8,45 @@ import config from '../../../config';
 import {
   WEBSOCKET_MESSAGE_TYPES,
   DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES
+  DEVICE_FEATURE_TYPES,
+  CAMERA_STREAM_PROTOCOL_PARAM,
+  CAMERA_STREAM_PROTOCOLS
 } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import style from './style.css';
 import GladysPlusUpsellCard from '../../gateway/GladysPlusUpsellCard';
 import CameraPtzControls from './CameraPtzControls';
+
+// WebRTC live view (cameras declaring GLADYS_CAMERA_STREAM_PROTOCOL=webrtc). Gladys only relays
+// the SDP offer and answer: the media goes from the camera's cloud to the browser. The camera's
+// cloud does not take ICE candidates after the offer (no trickle), so the offer waits for the end
+// of the gathering, and the STUN server gives it the browser's public address to reach.
+const WEBRTC_ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }];
+// A STUN server that never answers must not block the live view: past this delay, the offer goes
+// with the candidates gathered so far
+const WEBRTC_ICE_GATHERING_TIMEOUT_MS = 5000;
+// The server ends a session 30s after its last ping (a tab closed without a stop)
+const WEBRTC_PING_INTERVAL_MS = 10000;
+
+const waitForIceGathering = (peerConnection, timeoutMs) =>
+  new Promise(resolve => {
+    if (peerConnection.iceGatheringState === 'complete') {
+      resolve();
+      return;
+    }
+    const done = () => {
+      clearTimeout(timer);
+      peerConnection.removeEventListener('icegatheringstatechange', onStateChange);
+      resolve();
+    };
+    const onStateChange = () => {
+      if (peerConnection.iceGatheringState === 'complete') {
+        done();
+      }
+    };
+    const timer = setTimeout(done, timeoutMs);
+    peerConnection.addEventListener('icegatheringstatechange', onStateChange);
+  });
 
 const SEGMENT_DURATIONS_PER_LATENCY = {
   'ultra-low': 1,
@@ -66,6 +99,7 @@ class CameraBoxComponent extends Component {
     // stay on screen while the new one loads, and a disabled new camera must show its
     // placeholder rather than the last frame of the previous one.
     if (!keepCurrentView) {
+      this.loadedDevice = null;
       this.setState({ device: null, cameraDisabled: false, image: null, error: false });
     }
     if (!cameraSelector) {
@@ -75,6 +109,9 @@ class CameraBoxComponent extends Component {
       const device = await this.props.httpClient.get(`/api/v1/device/${cameraSelector}`);
       if (requestId === this.deviceRequestId && this.props.box.camera === cameraSelector) {
         const cameraDisabled = this.isCameraDisabled(device);
+        // Kept outside the state too: the live auto start runs right after this resolves, before
+        // the state is committed, and must already know how to negotiate the stream
+        this.loadedDevice = device;
         this.setState({ device, cameraDisabled });
         return cameraDisabled;
       }
@@ -223,7 +260,22 @@ class CameraBoxComponent extends Component {
   // flight would not see it yet and would leave a hidden stream running.
   hasStreamingToStop = () => this.state.streaming === true || Boolean(this.streamingToken);
 
+  isWebRtcCamera = () => {
+    const device = this.loadedDevice;
+    if (!device || device.selector !== this.props.box.camera) {
+      return false;
+    }
+    const params = device.params || [];
+    return params.some(
+      param => param.name === CAMERA_STREAM_PROTOCOL_PARAM && param.value === CAMERA_STREAM_PROTOCOLS.WEBRTC
+    );
+  };
+
   startStreaming = async () => {
+    if (this.isWebRtcCamera()) {
+      await this.startWebRtcStreaming();
+      return;
+    }
     if (!Hls.isSupported()) {
       this.setState({ liveNotSupportedBrowser: true });
       return;
@@ -370,7 +422,127 @@ class CameraBoxComponent extends Component {
     await this.setState({ loading: false });
   };
 
-  stopStreaming = async () => {
+  startWebRtcStreaming = async () => {
+    if (typeof window.RTCPeerConnection !== 'function') {
+      this.setState({ webRtcNotSupportedBrowser: true });
+      return;
+    }
+    const cameraSelector = this.props.box.camera;
+    // Same start guard as the HLS stream: a stop asked for while the negotiation is in flight wins
+    const streamingToken = {};
+    this.streamingToken = streamingToken;
+    await this.setState({
+      streaming: true,
+      loading: true,
+      liveStartError: false,
+      webRtcError: false,
+      webRtcNotSupportedBrowser: false
+    });
+    let sessionId = null;
+    try {
+      const peerConnection = new window.RTCPeerConnection({ iceServers: WEBRTC_ICE_SERVERS });
+      this.peerConnection = peerConnection;
+      // Watch only: the camera sends, the browser never does
+      peerConnection.addTransceiver('video', { direction: 'recvonly' });
+      peerConnection.addTransceiver('audio', { direction: 'recvonly' });
+      peerConnection.ontrack = event => {
+        if (!this.webRtcStream) {
+          this.webRtcStream = new window.MediaStream();
+        }
+        this.webRtcStream.addTrack(event.track);
+        if (this.videoRef.current && this.videoRef.current.srcObject !== this.webRtcStream) {
+          this.videoRef.current.srcObject = this.webRtcStream;
+        }
+        this.setState({ loading: false });
+      };
+      peerConnection.onconnectionstatechange = () => {
+        // 'failed' does not come back on its own: the live view falls back to the image
+        if (peerConnection.connectionState === 'failed' && this.peerConnection === peerConnection) {
+          this.stopStreaming({ webRtcError: true });
+        }
+      };
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      await waitForIceGathering(peerConnection, WEBRTC_ICE_GATHERING_TIMEOUT_MS);
+      if (this.streamingToken !== streamingToken) {
+        return;
+      }
+      const answer = await this.props.httpClient.post(`/api/v1/camera/${cameraSelector}/webrtc/start`, {
+        sdp: peerConnection.localDescription.sdp
+      });
+      sessionId = answer.session_id;
+      if (this.streamingToken !== streamingToken) {
+        // Stopped while the camera's cloud was answering: that session is nobody's
+        this.stopWebRtcSession(cameraSelector, sessionId);
+        return;
+      }
+      this.webRtcSession = { cameraSelector, sessionId };
+      await peerConnection.setRemoteDescription({ type: 'answer', sdp: answer.sdp_answer });
+      this.liveActiveInterval = setInterval(this.webRtcPing, WEBRTC_PING_INTERVAL_MS);
+    } catch (e) {
+      console.error(e);
+      if (this.streamingToken === streamingToken) {
+        await this.stopStreaming({ webRtcError: true });
+      } else if (sessionId) {
+        this.stopWebRtcSession(cameraSelector, sessionId);
+      }
+    }
+  };
+
+  webRtcPing = async () => {
+    const session = this.webRtcSession;
+    if (!session) {
+      return;
+    }
+    try {
+      await this.props.httpClient.post(`/api/v1/camera/${session.cameraSelector}/webrtc/ping`, {
+        session_id: session.sessionId
+      });
+    } catch (e) {
+      console.error(e);
+      // The server no longer knows the session (it expired, Gladys restarted): the video is over
+      if (this.webRtcSession === session) {
+        this.stopStreaming({ webRtcError: true });
+      }
+    }
+  };
+
+  stopWebRtcSession = async (cameraSelector, sessionId) => {
+    try {
+      await this.props.httpClient.post(`/api/v1/camera/${cameraSelector}/webrtc/stop`, { session_id: sessionId });
+    } catch (e) {
+      // The server ends a session it no longer hears from anyway
+      console.error(e);
+    }
+  };
+
+  closeWebRtc = () => {
+    if (this.peerConnection) {
+      this.peerConnection.ontrack = null;
+      this.peerConnection.onconnectionstatechange = null;
+      this.peerConnection.close();
+      this.peerConnection = null;
+    }
+    if (this.webRtcStream) {
+      this.webRtcStream.getTracks().forEach(track => track.stop());
+      this.webRtcStream = null;
+    }
+    if (this.webRtcSession) {
+      const { cameraSelector, sessionId } = this.webRtcSession;
+      this.webRtcSession = null;
+      this.stopWebRtcSession(cameraSelector, sessionId);
+    }
+  };
+
+  // A closed tab never unmounts the box: the stop is sent on the way out, and the server's
+  // expiry covers a request the browser did not let through
+  handlePageHide = () => {
+    if (this.peerConnection || this.webRtcSession) {
+      this.closeWebRtc();
+    }
+  };
+
+  stopStreaming = async ({ webRtcError = false } = {}) => {
     // Invalidate any start request still in flight (see startStreaming)
     this.streamingToken = null;
     await this.setState({ loading: true });
@@ -389,7 +561,9 @@ class CameraBoxComponent extends Component {
       delete this.hls;
     }
 
-    await this.setState({ streaming: false, loading: false });
+    this.closeWebRtc();
+
+    await this.setState({ streaming: false, loading: false, webRtcError });
   };
 
   liveActivePing = async () => {
@@ -412,6 +586,7 @@ class CameraBoxComponent extends Component {
       this.updateDeviceFeatureStateWebsocket
     );
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
+    window.addEventListener('pagehide', this.handlePageHide);
     // The device is loaded first: a disabled camera must show its placeholder instead of
     // requesting an image and auto-starting a live stream the server would refuse.
     const cameraDisabled = await this.refreshDevice();
@@ -454,6 +629,7 @@ class CameraBoxComponent extends Component {
       this.stopStreaming();
     }
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
+    window.removeEventListener('pagehide', this.handlePageHide);
   }
 
   render(
@@ -467,7 +643,9 @@ class CameraBoxComponent extends Component {
       liveNotSupportedBrowser,
       liveTooManyRequestsError,
       upgradeGladysPlusPlanRequired,
-      cameraDisabled
+      cameraDisabled,
+      webRtcError,
+      webRtcNotSupportedBrowser
     }
   ) {
     // A disabled camera shows a clear placeholder: no image (not even the last one received
@@ -502,7 +680,7 @@ class CameraBoxComponent extends Component {
           >
             <div class="loader" />
             <div class={cx('dimmer-content', style.cameraMediaContainer)}>
-              <video class="w-100" ref={this.videoRef} controls autoPlay muted />
+              <video class="w-100" ref={this.videoRef} controls autoPlay muted playsInline />
               {ptzControls}
             </div>
           </div>
@@ -563,6 +741,26 @@ class CameraBoxComponent extends Component {
               <i class="fe fe-compass" />
               <span class="pl-2">
                 <Text id="dashboard.boxes.camera.notNotSupportedBrowser" />
+              </span>
+            </p>
+          </div>
+        )}
+        {webRtcError && (
+          <div>
+            <p class="alert alert-warning">
+              <i class="fe fe-video-off" />
+              <span class="pl-2">
+                <Text id="dashboard.boxes.camera.webRtcError" />
+              </span>
+            </p>
+          </div>
+        )}
+        {webRtcNotSupportedBrowser && (
+          <div>
+            <p class="alert alert-warning">
+              <i class="fe fe-compass" />
+              <span class="pl-2">
+                <Text id="dashboard.boxes.camera.webRtcNotSupportedBrowser" />
               </span>
             </p>
           </div>

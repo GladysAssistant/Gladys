@@ -542,6 +542,8 @@
         "latencyBoxDescription": "Cuanto más baja sea la latencia que seleccione, más rápido comenzará la transmisión en vivo. Sin embargo, para tener una latencia baja, necesita una conexión a internet muy rápida y con un ping mínimo, o el video se verá entrecortado. Recomendamos una latencia media o baja.",
         "upgradeGladysPlusPlanError": "La transmisión de cámaras no está incluida en su plan de Gladys Plus. Debe actualizarlo en Configuración -> Facturación.",
         "liveStartError": "Ocurrió un error al iniciar esta transmisión en vivo. ¿Está seguro de que la URL de su cámara corresponde a un flujo de video y no a una imagen?",
+        "webRtcError": "No se pudo iniciar el vídeo en directo de esta cámara, o se ha interrumpido. Se muestra la última imagen en su lugar.",
+        "webRtcNotSupportedBrowser": "Este navegador no puede reproducir el vídeo en directo de esta cámara (WebRTC no está disponible). Se muestra la última imagen en su lugar.",
         "notNotSupportedBrowser": "Este navegador no es compatible. Para habilitar el cifrado de extremo a extremo de esta transmisión de video, utilizamos la API MediaSource, que puede no ser compatible con este navegador. Recomendamos Firefox, Safari o cualquier navegador basado en Chromium.",
         "tooManyRequests": "Ha alcanzado su límite mensual de ancho de banda de video. ¡Contáctenos por correo electrónico o en el foro para obtener más ancho de banda!",
         "liveAutoStartLabel": "Iniciar automáticamente la transmisión en vivo",
