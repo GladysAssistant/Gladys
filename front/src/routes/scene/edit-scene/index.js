@@ -1458,6 +1458,23 @@ class EditScene extends Component {
     }
   };
 
+  getDeviceFeatures = async () => {
+    // selector -> { device, feature }: lets a collapsed card name the device
+    // it controls and the value it sends, instead of the raw selector
+    try {
+      const devices = await this.props.httpClient.get('/api/v1/device');
+      const deviceFeatures = {};
+      devices.forEach(device => {
+        device.features.forEach(feature => {
+          deviceFeatures[feature.selector] = { device, feature };
+        });
+      });
+      this.setState({ deviceFeatures });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   getTags = async () => {
     try {
       const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
@@ -1476,6 +1493,7 @@ class EditScene extends Component {
       variables: {},
       triggersVariables: [],
       sceneIntegrations: null,
+      deviceFeatures: null,
       runningScenes: [],
       now: Date.now()
     };
@@ -1485,6 +1503,7 @@ class EditScene extends Component {
   componentDidMount() {
     this.getSceneBySelector();
     this.getSceneIntegrations();
+    this.getDeviceFeatures();
     this.getTags();
     this.getRunningScenes();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
@@ -1524,6 +1543,7 @@ class EditScene extends Component {
       scene,
       triggersVariables,
       sceneIntegrations,
+      deviceFeatures,
       tags,
       askDeleteScene,
       runningScenes,
@@ -1558,6 +1578,7 @@ class EditScene extends Component {
             variables={variables}
             triggersVariables={triggersVariables}
             sceneIntegrations={sceneIntegrations}
+            deviceFeatures={deviceFeatures}
             setVariables={this.setVariables}
             setVariablesTrigger={this.setVariablesTrigger}
             switchActiveScene={this.switchActiveScene}
