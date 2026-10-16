@@ -341,6 +341,9 @@
       "description": "El modo tableta se utiliza para la función de alarma. Si activa la alarma, todas las tabletas de la casa se bloquearán y mostrarán un teclado virtual para desactivarla.",
       "currentBrowserOnly": "<strong>Esta configuración solo se aplica a este dispositivo.</strong> Al guardar, usted declara que el navegador que está usando actualmente pertenece a una tableta. Cada dispositivo se configura por separado: active el modo tableta únicamente en los dispositivos que esté dispuesto a ver bloqueados cuando la alarma esté activada.",
       "fullScreenForce": "Si desea forzar a una tableta a permanecer en modo de pantalla completa, puede agregar <code>?fullscreen=force</code> a la URL.",
+      "tabletModeForce": "Para que una tableta de pared se abra directamente en modo tableta para esta casa, apúntela a esta URL:",
+      "copyUrl": "Copiar",
+      "urlCopied": "¡Copiado!",
       "houseLabel": "Casa de esta tableta",
       "howToDisable": "Para desactivar el modo tableta en un dispositivo, abra este menú desde ese dispositivo y seleccione \"Modo tableta desactivado\".",
       "tabletModeDisabled": "Modo tableta desactivado"
@@ -350,6 +353,8 @@
     "editDashboardSavedButton": "Guardado",
     "editDashboardDoneButton": "Listo",
     "gatewayInstanceNotFoundError": "Su instancia de Gladys no está conectada a Gladys Gateway",
+    "tabletModeParamError": "No se pudo activar el modo tableta: ninguna casa coincide con «{{value}}» en el parámetro de URL ?tablet_mode_house=. Utilice la URL que se muestra en el menú Modo tableta.",
+    "tabletModeActivationError": "No se pudo activar el modo tableta debido a un error de red o del servidor. Recargue la página para volver a intentarlo.",
     "gatewayRecoveryCodesMissing": "Su cuenta de Gladys Plus no tiene códigos de recuperación: si pierde el acceso a su aplicación de doble factor, ya no podrá iniciar sesión. Genérelos y guárdelos en un lugar seguro.",
     "gatewayRecoveryCodesMissingButton": "Obtener mis códigos de recuperación",
     "editDashboardNameLabel": "Nombre",
