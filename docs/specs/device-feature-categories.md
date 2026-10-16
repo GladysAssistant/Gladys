@@ -99,7 +99,7 @@ Consequence for reviews: "brand X only supports 3 of the 5 modes" is **never** a
 ### 7. Naming conventions — renaming is the costly mistake
 
 - Values are **kebab-case** (`co2-sensor`, `energy-production-sensor`).
-- Read-only measurement categories use the `*-sensor` suffix. A command bounding the same quantity therefore lives in a sibling category without it — `thermostat` next to `temperature-sensor`, `home-output` next to `home-output-sensor` — never as a writable type of the `-sensor` category.
+- Read-only measurement categories use the `*-sensor` suffix. A command bounding the same quantity therefore lives in a sibling category without it — `thermostat` next to `temperature-sensor`, `home-output` next to `home-output-sensor` — never as a writable type of the `-sensor` category. The sibling is named after what it controls, and may hold a single type: it does not mirror the `-sensor` category type for type, and it may cover devices whose measurements live in another category (a PV-only inverter measures in `energy-production-sensor` and bounds its AC output with `home-output` / `power-limit`) — one command category per controlled bound, never two for the same one.
 - Names are in **English** and use the standard's vocabulary when one exists (see rule 3).
 - No protocol name inside a category/type name: the taxonomy is protocol-agnostic by definition.
 

@@ -12,7 +12,7 @@ Before this category the only documented answer was a lossy mapping onto the bat
 
 Scoping decisions:
 
-- **A command category of its own, the counterpart of `home-output-sensor`.** Rule 7 reserves the `-sensor` suffix for read-only measurement categories, so the command cannot be a type of `home-output-sensor`. The precedent is `thermostat` (holds the setpoint) next to `temperature-sensor` (holds the measurement). The measurements stay in `home-output-sensor`, unchanged.
+- **A command category of its own, the counterpart of `home-output-sensor`.** Rule 7 reserves the `-sensor` suffix for read-only measurement categories, so the command cannot be a type of `home-output-sensor`. The precedent is `thermostat` (holds the setpoint) next to `temperature-sensor` (holds the measurement); `thermostat` is a full controller (mode, preset, setpoint), and this sibling holds a single type, which rule 7 allows: the command category is named after the bound it controls, not built as a writable copy of the measurement category. The measurements stay in `home-output-sensor`, unchanged. The same pattern applies to later command siblings (a grid or production limit would follow it), each still reviewed as a category of its own.
 - **Not a `battery-storage` type.** The output limit bounds solar and battery power together, and devices without any battery have the same setting (micro-inverters). A battery type would fail rule 2 (one quantity, one category) and rule 5 (intrinsic metrics only).
 - **One type in v1.** The other controls of the same devices are either battery settings (`battery-storage` commands, including `grid-charge-power-limit`) or out of scope (C).
 
@@ -42,7 +42,7 @@ Stated once here and in the inline comment (B.1):
 | Value the device reports or accepts | Category to use |
 |---|---|
 | Power / energy delivered through the AC output (measurement) | `home-output-sensor` (`power`, `index`, `off-grid-*`) |
-| PV production of a PV-only inverter (measurement) | `energy-production-sensor` — for such a device the AC output **is** its production, which keeps its own category (rule 2); the limit on that output is still `home-output` / `power-limit` |
+| PV production of a PV-only inverter (measurement) | `energy-production-sensor` — for such a device the AC output **is** its production, which keeps its own category (rule 2); the limit on that output is still `home-output` / `power-limit`, so the command category is not always the measurement category's sibling: one command category per AC output bound, rather than one per measurement category (rule 7) |
 | Battery charge / discharge limits, grid charge limit, state-of-charge limits, mode | `battery-storage` commands (`docs/specs/battery-storage.md`) |
 | Grid export limit / zero-export setting | — (out of scope, C): it bounds the exchange at the connection point (`grid-sensor`), not the device output |
 | Output limit as a percentage of the rating | — (later, separate type, C) |
