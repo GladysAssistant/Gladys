@@ -3,6 +3,7 @@ import get from 'get-value';
 import { ACTIONS, EVENTS } from '../../../../../server/utils/constants';
 import { isWildcardValue } from './sceneIntegrations';
 import getDeviceFeatureValueOptions from '../../../utils/deviceFeatureValueOptions';
+import { getDeviceFeatureName } from '../../../utils/device';
 
 const truncate = (text, maxLength = 60) => {
   if (typeof text !== 'string') {
@@ -104,7 +105,7 @@ const getActionSummary = (action, dictionary, deviceFeatures) => {
         }
       }
       return joinParts([
-        truncate(device ? device.name : action.device_feature),
+        truncate(device ? getDeviceFeatureName(dictionary, device, feature) : action.device_feature),
         valueLabel !== null ? truncate(valueLabel, 20) : null
       ]);
     }
