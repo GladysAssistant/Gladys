@@ -70,7 +70,17 @@ describe('Dashboard Devices Box multi-language option labels', () => {
     }).as('getDevices');
   });
 
+  // the user's language is set on the account itself, like a real user would,
+  // and restored to the one the suite signed up with
+  const setLanguage = language =>
+    cy.request({
+      method: 'PATCH',
+      url: `${serverUrl}/api/v1/me`,
+      body: { language }
+    });
+
   afterEach(() => {
+    setLanguage(Cypress.env('language'));
     cy.deleteDevices('example');
     cy.request({
       method: 'DELETE',
@@ -81,11 +91,7 @@ describe('Dashboard Devices Box multi-language option labels', () => {
   const row = name => cy.contains('tr', name);
 
   it('shows the label in the user language, with the plain label as fallback', () => {
-    cy.intercept('GET', '**/api/v1/me', req => {
-      req.continue(res => {
-        res.body.language = 'en';
-      });
-    });
+    setLanguage('en');
     cy.visit('/dashboard/test');
     cy.wait('@getDevices')
       .its('response.body')
@@ -108,11 +114,7 @@ describe('Dashboard Devices Box multi-language option labels', () => {
   });
 
   it('switches to the French label for a French-speaking user', () => {
-    cy.intercept('GET', '**/api/v1/me', req => {
-      req.continue(res => {
-        res.body.language = 'fr';
-      });
-    });
+    setLanguage('fr');
     cy.visit('/dashboard/test');
     cy.wait('@getDevices');
 
