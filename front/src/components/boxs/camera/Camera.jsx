@@ -143,7 +143,12 @@ class CameraBoxComponent extends Component {
       return null;
     }
     return (
-      <CameraPtzControls httpClient={this.props.httpClient} moveFeature={moveFeature} presetFeature={presetFeature} />
+      <CameraPtzControls
+        httpClient={this.props.httpClient}
+        moveFeature={moveFeature}
+        presetFeature={presetFeature}
+        language={this.props.user && this.props.user.language}
+      />
     );
   };
 
@@ -590,4 +595,4 @@ class CameraBoxComponent extends Component {
   }
 }
 
-export default connect('httpClient,session', {})(CameraBoxComponent);
+export default connect('httpClient,session,user', {})(CameraBoxComponent);

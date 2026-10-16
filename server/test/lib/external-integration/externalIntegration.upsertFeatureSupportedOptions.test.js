@@ -64,6 +64,44 @@ describe('externalIntegration.upsertFeatureSupportedOptions', () => {
     sinonAssert.notCalled(device.syncFeatureSupportedOptions);
   });
 
+  it('should not sync when the translations are the same in another key order', async () => {
+    const createdDevice = buildCreatedDevice([
+      { value: 1, label: 'Healthy', label_translations: { en: 'Healthy', fr: 'Sain' }, sort_order: 0 },
+    ]);
+    await externalIntegration.upsertFeatureSupportedOptions(createdDevice, [
+      {
+        external_id: 'ext:demo:cam:preset',
+        supported_options: [
+          { value: 1, label: 'Healthy', label_translations: { fr: 'Sain', en: 'Healthy' }, sort_order: 0 },
+        ],
+      },
+    ]);
+    sinonAssert.notCalled(device.syncFeatureSupportedOptions);
+  });
+
+  it('should sync when a translation is added, changed or removed', async () => {
+    const published = (labelTranslations) => [
+      {
+        external_id: 'ext:demo:cam:preset',
+        supported_options: [{ value: 1, label: 'Healthy', label_translations: labelTranslations, sort_order: 0 }],
+      },
+    ];
+    const stored = (labelTranslations) =>
+      buildCreatedDevice([{ value: 1, label: 'Healthy', label_translations: labelTranslations, sort_order: 0 }]);
+    // a translation added to a plain label, a translation changed, a language dropped
+    await externalIntegration.upsertFeatureSupportedOptions(stored(null), published({ en: 'Healthy', fr: 'Sain' }));
+    await externalIntegration.upsertFeatureSupportedOptions(
+      stored({ en: 'Healthy', fr: 'Bon' }),
+      published({ en: 'Healthy', fr: 'Sain' }),
+    );
+    await externalIntegration.upsertFeatureSupportedOptions(
+      stored({ en: 'Healthy', fr: 'Sain' }),
+      published({ en: 'Healthy', de: 'Gesund' }),
+    );
+    await externalIntegration.upsertFeatureSupportedOptions(stored({ en: 'Healthy', fr: 'Sain' }), published(null));
+    expect(device.syncFeatureSupportedOptions.callCount).to.equal(4);
+  });
+
   it('should skip published features without a supported_options array', async () => {
     const createdDevice = buildCreatedDevice([{ value: 1, label: 'Entrance', sort_order: 0 }]);
     await externalIntegration.upsertFeatureSupportedOptions(createdDevice, [{ external_id: 'ext:demo:cam:preset' }]);

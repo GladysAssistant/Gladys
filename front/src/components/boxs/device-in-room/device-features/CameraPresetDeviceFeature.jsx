@@ -3,6 +3,7 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { getOptionLabel } from '../../../../utils/supportedOptions';
 
 // Recall-a-preset row. Recalling a preset is an action, not a state: no option stays
 // selected, and the select returns to its placeholder after each command.
@@ -40,7 +41,7 @@ class CameraPresetDeviceFeature extends Component {
               </option>
               {supportedOptions.map(option => (
                 <option value={option.value} key={option.value}>
-                  {option.label}
+                  {getOptionLabel(option, get(props, 'user.language'))}
                 </option>
               ))}
             </select>

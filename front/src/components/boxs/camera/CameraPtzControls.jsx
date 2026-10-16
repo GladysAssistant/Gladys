@@ -4,6 +4,7 @@ import { Localizer, Text } from 'preact-i18n';
 
 import { CAMERA_MOVE } from '../../../../../server/utils/constants';
 import { CAMERA_MOVE_OPTIONS, getSupportedMoves } from '../../../utils/cameraMove';
+import { getOptionLabel } from '../../../utils/supportedOptions';
 import style from './style.css';
 
 const ZOOM_VALUES = [CAMERA_MOVE.ZOOM_IN, CAMERA_MOVE.ZOOM_OUT];
@@ -154,7 +155,7 @@ class CameraPtzControls extends Component {
     );
   }
 
-  render({ moveFeature, presetFeature }) {
+  render({ moveFeature, presetFeature, language }) {
     const supportedMoves = moveFeature ? getSupportedMoves(moveFeature) : [];
     const optionsByValue = new Map(CAMERA_MOVE_OPTIONS.map(option => [option.value, option]));
     const directionAreas = {
@@ -201,7 +202,7 @@ class CameraPtzControls extends Component {
             </option>
             {presetOptions.map(option => (
               <option value={option.value} key={option.value}>
-                {option.label}
+                {getOptionLabel(option, language)}
               </option>
             ))}
           </select>

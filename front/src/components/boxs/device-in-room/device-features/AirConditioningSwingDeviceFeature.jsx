@@ -36,7 +36,7 @@ const AirConditioningSwingDeviceFeature = props => {
   // restrictions keeps the full list. Buttons when they fit on one line, a dropdown otherwise.
   const staticOptions =
     type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL ? SWING_HORIZONTAL_OPTIONS : SWING_VERTICAL_OPTIONS;
-  const options = resolveFeatureOptions(deviceFeature, staticOptions);
+  const options = resolveFeatureOptions(deviceFeature, staticOptions, props.user && props.user.language);
   const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (

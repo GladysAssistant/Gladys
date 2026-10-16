@@ -181,8 +181,8 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     await externalIntegration.setDiscoveredDevices(service, [device]);
     const devices = await externalIntegration.getDiscoveredDevices(service.selector);
     expect(devices[0].features[0].supported_options).to.deep.equal([
-      { value: 1, label: 'Entrance', sort_order: 0 },
-      { value: 2, label: 'Garden', sort_order: 1 },
+      { value: 1, label: 'Entrance', label_translations: null, sort_order: 0 },
+      { value: 2, label: 'Garden', label_translations: null, sort_order: 1 },
     ]);
   });
 
@@ -204,9 +204,31 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     await externalIntegration.setDiscoveredDevices(service, [device]);
     const devices = await externalIntegration.getDiscoveredDevices(service.selector);
     expect(devices[0].features[1].supported_options).to.deep.equal([
-      { value: 'netflix', label: 'Netflix', sort_order: 0 },
-      { value: 'youtube.leanback.v4', label: 'YouTube', sort_order: 1 },
+      { value: 'netflix', label: 'Netflix', label_translations: null, sort_order: 0 },
+      { value: 'youtube.leanback.v4', label: 'YouTube', label_translations: null, sort_order: 1 },
     ]);
+  });
+
+  it('should accept multi-language option labels and reject one without English', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].supported_options = [
+      { value: 1, label: { en: 'Healthy', fr: 'Sain', de: 'Gesund', es: 'Saludable' } },
+      { value: 2, label: 'Fine' },
+    ];
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0].supported_options).to.deep.equal([
+      {
+        value: 1,
+        label: 'Healthy',
+        label_translations: { en: 'Healthy', fr: 'Sain', de: 'Gesund', es: 'Saludable' },
+        sort_order: 0,
+      },
+      { value: 2, label: 'Fine', label_translations: null, sort_order: 1 },
+    ]);
+    const withoutEnglish = buildDiscoveredDevice(service.selector);
+    withoutEnglish.features[0].supported_options = [{ value: 1, label: { fr: 'Sain' } }];
+    await expectBadParameters([withoutEnglish], 'features[0].supported_options');
   });
 
   it('should keep rejecting string option values outside text/select', async () => {
@@ -247,7 +269,7 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     // the full in-memory feature is passed: syncFeatureSupportedOptions needs its
     // category/type to allow string values on dynamic selects
     sinonAssert.calledWith(deviceLib.syncFeatureSupportedOptions, sinon.match({ id: 'feature-id' }), [
-      { value: 1, label: 'Entrance', sort_order: 0 },
+      { value: 1, label: 'Entrance', label_translations: null, sort_order: 0 },
     ]);
   });
 });

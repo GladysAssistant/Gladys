@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import ColorPicker from '../../../../components/device/ColorPicker';
@@ -101,7 +102,12 @@ class DeviceSetValue extends Component {
     }
   };
 
-  getValueOptions = () => getDeviceFeatureValueOptions(this.props.intl.dictionary, this.state.deviceFeature);
+  getValueOptions = () =>
+    getDeviceFeatureValueOptions(
+      this.props.intl.dictionary,
+      this.state.deviceFeature,
+      get(this.props, 'user.language')
+    );
 
   // We display the list of values only if the feature holds constants, and if the current value can
   // be represented in that list (it's not a value saved before this list existed)
@@ -407,4 +413,4 @@ class DeviceSetValue extends Component {
   }
 }
 
-export default withIntlAsProp(connect('httpClient', {})(DeviceSetValue));
+export default withIntlAsProp(connect('httpClient,user', {})(DeviceSetValue));

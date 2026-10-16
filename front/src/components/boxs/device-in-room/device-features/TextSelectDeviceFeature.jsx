@@ -14,7 +14,7 @@ const TextSelectDeviceFeature = props => {
   const { deviceFeature } = props;
   const { category, type } = deviceFeature;
 
-  const options = resolveFeatureOptions(deviceFeature, []);
+  const options = resolveFeatureOptions(deviceFeature, [], props.user && props.user.language);
   const updateValue = value => props.updateValueWithDebounce(deviceFeature, `${value}`);
 
   return (

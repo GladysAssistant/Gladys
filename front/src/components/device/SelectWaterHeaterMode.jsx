@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
+import { connect } from 'unistore/preact';
 import Select from '../form/Select';
 import get from 'get-value';
 
@@ -22,7 +23,11 @@ class SelectWaterHeaterMode extends Component {
   getOptions = () => {
     // Only the modes this appliance declares, so an action cannot be saved on a mode the device
     // does not have. Falls back to the whole catalog when the feature carries no supported_options.
-    const deviceFeatureOptions = resolveFeatureOptions(this.props.deviceFeature, MODE_CATALOG).map(option => ({
+    const deviceFeatureOptions = resolveFeatureOptions(
+      this.props.deviceFeature,
+      MODE_CATALOG,
+      get(this.props, 'user.language')
+    ).map(option => ({
       label: this.getLabel(option.value, option.label),
       value: option.value
     }));
@@ -73,4 +78,4 @@ class SelectWaterHeaterMode extends Component {
   }
 }
 
-export default withIntlAsProp(SelectWaterHeaterMode);
+export default connect('user', {})(withIntlAsProp(SelectWaterHeaterMode));

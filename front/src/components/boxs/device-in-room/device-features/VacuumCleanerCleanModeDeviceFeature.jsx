@@ -21,7 +21,7 @@ const VacuumCleanerCleanModeDeviceFeature = ({ children, ...props }) => {
 
   // Robots rarely support every clean mode: the feature's supported_options drive which entries
   // appear and in what order. Features without them keep the whole catalog.
-  const options = resolveFeatureOptions(deviceFeature, CLEAN_MODE_OPTIONS);
+  const options = resolveFeatureOptions(deviceFeature, CLEAN_MODE_OPTIONS, props.user && props.user.language);
 
   function updateValue(e) {
     props.updateValueWithDebounce(deviceFeature, e.currentTarget.value);

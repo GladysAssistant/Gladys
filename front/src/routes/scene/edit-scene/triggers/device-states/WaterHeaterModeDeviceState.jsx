@@ -1,4 +1,5 @@
 import { Component, Fragment } from 'preact';
+import { connect } from 'unistore/preact';
 import Select from '../../../../../components/form/Select';
 import get from 'get-value';
 
@@ -17,7 +18,11 @@ class WaterHeaterModeDeviceState extends Component {
     // Offer only the modes this appliance declares, so a trigger cannot be saved on a mode the
     // device never reports. resolveFeatureOptions returns the whole catalog when the feature
     // carries no supported_options, which keeps legacy and hand-made features usable.
-    const options = resolveFeatureOptions(this.props.selectedDeviceFeature, MODE_CATALOG).map(option => ({
+    const options = resolveFeatureOptions(
+      this.props.selectedDeviceFeature,
+      MODE_CATALOG,
+      get(this.props, 'user.language')
+    ).map(option => ({
       label: get(this.props.intl.dictionary, `deviceFeatureValue.category.water-heater.mode.${option.value}`, {
         default: option.label || option.value
       }),
@@ -70,4 +75,4 @@ class WaterHeaterModeDeviceState extends Component {
   }
 }
 
-export default withIntlAsProp(WaterHeaterModeDeviceState);
+export default connect('user', {})(withIntlAsProp(WaterHeaterModeDeviceState));

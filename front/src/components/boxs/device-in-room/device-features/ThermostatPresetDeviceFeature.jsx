@@ -27,7 +27,9 @@ const ThermostatPresetDeviceFeature = props => {
   // there is no feature range to narrow them by.
   const hasSupportedOptions =
     Array.isArray(deviceFeature.supported_options) && deviceFeature.supported_options.length > 0;
-  const options = hasSupportedOptions ? resolveFeatureOptions(deviceFeature, PRESET_OPTIONS) : PRESET_OPTIONS;
+  const options = hasSupportedOptions
+    ? resolveFeatureOptions(deviceFeature, PRESET_OPTIONS, props.user && props.user.language)
+    : PRESET_OPTIONS;
   const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (

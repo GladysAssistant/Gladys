@@ -22,7 +22,7 @@ const SirenAlarmModeDeviceFeature = props => {
   // the feature's supported_options drive which entries appear. Features published without them
   // fall back to the whole catalog: these values are a set and not a ladder, so the feature's
   // `max` says nothing about which effects the siren really has.
-  const options = resolveFeatureOptions(deviceFeature, MODE_OPTIONS);
+  const options = resolveFeatureOptions(deviceFeature, MODE_OPTIONS, props.user && props.user.language);
   const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (

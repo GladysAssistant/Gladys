@@ -957,6 +957,87 @@ describe('Device', () => {
     ).get({ plain: true });
     expect(storedDevice.features[0].supported_options).to.have.lengthOf(2);
   });
+  it('should store, return and round-trip the translations of multi-language option labels', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const airQualityFeature = {
+      name: 'Air quality',
+      external_id: 'homecoach:air-quality',
+      category: 'text',
+      type: 'select',
+      read_only: true,
+      keep_history: false,
+      has_feedback: false,
+      min: 0,
+      max: 0,
+    };
+    const created = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Home Coach',
+      external_id: 'homecoach-label-translations',
+      features: [
+        {
+          ...airQualityFeature,
+          supported_options: [
+            { value: 'healthy', label: { en: 'Healthy', fr: 'Sain', de: 'Gesund', es: 'Saludable' } },
+            { value: 'fine', label: 'Fine' },
+          ],
+        },
+      ],
+      params: [],
+    });
+
+    expect(created.features[0].supported_options[0]).to.include({ value: 'healthy', label: 'Healthy' });
+    expect(created.features[0].supported_options[0].label_translations).to.deep.equal({
+      en: 'Healthy',
+      fr: 'Sain',
+      de: 'Gesund',
+      es: 'Saludable',
+    });
+    expect(created.features[0].supported_options[1]).to.include({ value: 'fine', label_translations: null });
+
+    const readBack = async () =>
+      (
+        await db.Device.findOne({
+          where: { external_id: 'homecoach-label-translations' },
+          include: getStandardDeviceIncludes(),
+        })
+      ).get({ plain: true }).features[0].supported_options;
+    const stored = await readBack();
+    expect(stored.find((option) => option.value === 'healthy').label_translations).to.deep.equal({
+      en: 'Healthy',
+      fr: 'Sain',
+      de: 'Gesund',
+      es: 'Saludable',
+    });
+
+    // the frontend saves the device as it read it: the stored form keeps its translations
+    await device.create({
+      id: created.id,
+      service_id: created.service_id,
+      name: created.name,
+      external_id: created.external_id,
+      features: [{ ...created.features[0], supported_options: stored }],
+      params: [],
+    });
+    expect((await readBack()).find((option) => option.value === 'healthy').label_translations).to.include({
+      fr: 'Sain',
+    });
+
+    // back to a plain string label: the translations are cleared
+    await device.create({
+      id: created.id,
+      service_id: created.service_id,
+      name: created.name,
+      external_id: created.external_id,
+      features: [{ ...airQualityFeature, supported_options: [{ value: 'healthy', label: 'Healthy' }] }],
+      params: [],
+    });
+    const cleared = await readBack();
+    expect(cleared).to.have.lengthOf(1);
+    expect(cleared[0]).to.include({ label: 'Healthy', label_translations: null });
+  });
   it('should create and sync string-valued supported_options on a select feature', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);

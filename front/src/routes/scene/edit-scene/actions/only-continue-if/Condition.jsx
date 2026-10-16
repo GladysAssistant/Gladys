@@ -1,4 +1,6 @@
 import { Component } from 'preact';
+import { connect } from 'unistore/preact';
+import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import Select from '../../../../../components/form/Select';
 import update from 'immutability-helper';
@@ -20,7 +22,11 @@ class Condition extends Component {
   };
 
   handleChange = selectedOption => {
-    const valueOptions = getDeviceFeatureValueOptions(this.props.intl.dictionary, getDeviceFeature(selectedOption));
+    const valueOptions = getDeviceFeatureValueOptions(
+      this.props.intl.dictionary,
+      getDeviceFeature(selectedOption),
+      get(this.props, 'user.language')
+    );
     // If the new variable only accepts a list of values, we drop the previous value if it's not in that list
     const shouldResetValue = Boolean(valueOptions) && !this.isValueInValueOptions(valueOptions);
 
@@ -147,7 +153,11 @@ class Condition extends Component {
   };
 
   getValueOptions = selectedOption =>
-    getDeviceFeatureValueOptions(this.props.intl.dictionary, getDeviceFeature(selectedOption));
+    getDeviceFeatureValueOptions(
+      this.props.intl.dictionary,
+      getDeviceFeature(selectedOption),
+      get(this.props, 'user.language')
+    );
 
   // We display the list of values only if the variable is a device feature holding constants,
   // and if the current value can be represented in that list (it's not a scene variable or
@@ -304,4 +314,4 @@ class Condition extends Component {
   }
 }
 
-export default withIntlAsProp(Condition);
+export default connect('user', {})(withIntlAsProp(Condition));

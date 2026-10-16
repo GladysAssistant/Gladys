@@ -17,7 +17,7 @@ const VacuumCleanerModeDeviceFeature = ({ children, ...props }) => {
 
   // Not every robot can run a mapping pass: the feature's supported_options drive which entries
   // appear and in what order. Features without them keep the whole catalog.
-  const options = resolveFeatureOptions(deviceFeature, MODE_OPTIONS);
+  const options = resolveFeatureOptions(deviceFeature, MODE_OPTIONS, props.user && props.user.language);
 
   function updateValue(e) {
     props.updateValueWithDebounce(deviceFeature, e.currentTarget.value);

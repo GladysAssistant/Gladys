@@ -574,9 +574,18 @@ class MqttFeatureBoxComponent extends Component {
     return Array.isArray(this.props.feature.supported_options) ? this.props.feature.supported_options : [];
   };
   updateSupportedOptionProperty = (optionIndex, property, e) => {
-    const supportedOptions = this.getSupportedOptions().map((option, index) =>
-      index === optionIndex ? { ...option, [property]: e.target.value } : option
-    );
+    const supportedOptions = this.getSupportedOptions().map((option, index) => {
+      if (index !== optionIndex) {
+        return option;
+      }
+      const updatedOption = { ...option, [property]: e.target.value };
+      // a label typed here is a plain string: translations the option may carry would
+      // otherwise win over it on save (the core keeps label_translations as the source)
+      if (property === 'label') {
+        updatedOption.label_translations = null;
+      }
+      return updatedOption;
+    });
     this.props.updateFeatureSupportedOptions(this.props.featureIndex, supportedOptions);
   };
   addSupportedOption = () => {

@@ -2,6 +2,18 @@ const Promise = require('bluebird');
 
 const logger = require('../../utils/logger');
 
+// Compared language by language: the stored JSON may list its keys in another
+// order than the publication, which must not look like a change
+const translationsAreEqual = (existing, published) => {
+  const existingTranslations = existing || {};
+  const publishedTranslations = published || {};
+  const languages = Object.keys(existingTranslations);
+  return (
+    languages.length === Object.keys(publishedTranslations).length &&
+    languages.every((language) => existingTranslations[language] === publishedTranslations[language])
+  );
+};
+
 const optionListsAreEqual = (existingOptions, publishedOptions) => {
   if (existingOptions.length !== publishedOptions.length) {
     return false;
@@ -11,6 +23,7 @@ const optionListsAreEqual = (existingOptions, publishedOptions) => {
     return (
       existing.value === published.value &&
       existing.label === published.label &&
+      translationsAreEqual(existing.label_translations, published.label_translations) &&
       existing.sort_order === published.sort_order
     );
   });

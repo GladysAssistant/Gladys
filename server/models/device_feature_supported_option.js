@@ -47,6 +47,12 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
+      // the label in every language the integration published ({ en, fr?, ... }),
+      // null for a plain string label; `label` holds its English text
+      label_translations: {
+        allowNull: true,
+        type: DataTypes.JSON,
+      },
       sort_order: {
         allowNull: false,
         type: DataTypes.INTEGER,

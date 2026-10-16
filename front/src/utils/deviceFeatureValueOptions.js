@@ -44,11 +44,12 @@ function isValueInOptions(options, value) {
  * @description Get the list of values a device feature can take, with their translated label.
  * @param {Object} dictionary - The i18n dictionary.
  * @param {Object} deviceFeature - The device feature.
+ * @param {string} [language] - The user's language, for the label an integration published in several.
  * @returns {Array} The list of { label, value } options, or null if the feature is not a constant.
  * @example
  * const options = getDeviceFeatureValueOptions(dictionary, { category: 'opening-sensor', type: 'binary' });
  */
-function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
+function getDeviceFeatureValueOptions(dictionary, deviceFeature, language) {
   if (!deviceFeature) {
     return null;
   }
@@ -106,7 +107,7 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
   // Text features hold string states (last_value_string): their option values are stringified so
   // the value a scene stores compares equal to the state the device reports.
   const isTextCategory = category === DEVICE_FEATURE_CATEGORIES.TEXT;
-  const options = resolveFeatureOptions(deviceFeature, catalog).map(option => ({
+  const options = resolveFeatureOptions(deviceFeature, catalog, language).map(option => ({
     value: isTextCategory ? `${option.value}` : option.value,
     label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, option.value, option.label)
   }));

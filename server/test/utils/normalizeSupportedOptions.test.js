@@ -10,15 +10,15 @@ describe('normalizeSupportedOptions', () => {
     ]);
 
     expect(options).to.deep.equal([
-      { value: 1, label: 'On', sort_order: 0 },
-      { value: 0, label: 'Off', sort_order: 1 },
+      { value: 1, label: 'On', label_translations: null, sort_order: 0 },
+      { value: 0, label: 'Off', label_translations: null, sort_order: 1 },
     ]);
   });
 
   it('should keep provided sort_order', () => {
     const options = normalizeSupportedOptions([{ value: 2, label: 'Auto', sort_order: 10 }]);
 
-    expect(options).to.deep.equal([{ value: 2, label: 'Auto', sort_order: 10 }]);
+    expect(options).to.deep.equal([{ value: 2, label: 'Auto', label_translations: null, sort_order: 10 }]);
   });
 
   it('should reject missing value', () => {
@@ -48,8 +48,8 @@ describe('normalizeSupportedOptions', () => {
     );
 
     expect(options).to.deep.equal([
-      { value: 'netflix', label: 'Netflix', sort_order: 0 },
-      { value: 'com.disney.disneyplus-prod', label: 'Disney+', sort_order: 1 },
+      { value: 'netflix', label: 'Netflix', label_translations: null, sort_order: 0 },
+      { value: 'com.disney.disneyplus-prod', label: 'Disney+', label_translations: null, sort_order: 1 },
     ]);
   });
 
@@ -59,7 +59,7 @@ describe('normalizeSupportedOptions', () => {
 
   it('should keep a numeric-looking string value as a string', () => {
     expect(normalizeSupportedOptions([{ value: '5', label: 'Five' }], { allowStringValues: true })).to.deep.equal([
-      { value: '5', label: 'Five', sort_order: 0 },
+      { value: '5', label: 'Five', label_translations: null, sort_order: 0 },
     ]);
   });
 
@@ -68,7 +68,7 @@ describe('normalizeSupportedOptions', () => {
       normalizeSupportedOptions([{ value: 'netflix', value_string: 'netflix', label: 'Netflix' }], {
         allowStringValues: true,
       }),
-    ).to.deep.equal([{ value: 'netflix', label: 'Netflix', sort_order: 0 }]);
+    ).to.deep.equal([{ value: 'netflix', label: 'Netflix', label_translations: null, sort_order: 0 }]);
   });
 
   it('should reject an empty string value', () => {
@@ -115,7 +115,7 @@ describe('normalizeSupportedOptions', () => {
 
   it('should keep sort_order when it is zero', () => {
     expect(normalizeSupportedOptions([{ value: 0, label: 'Off', sort_order: 0 }])).to.deep.equal([
-      { value: 0, label: 'Off', sort_order: 0 },
+      { value: 0, label: 'Off', label_translations: null, sort_order: 0 },
     ]);
   });
 
@@ -137,8 +137,83 @@ describe('normalizeSupportedOptions', () => {
     ]);
 
     expect(options).to.deep.equal([
-      { id: 'fc235c88-b10d-4706-8b59-fef92a7119b2', value: 1, label: 'On', sort_order: 0 },
+      { id: 'fc235c88-b10d-4706-8b59-fef92a7119b2', value: 1, label: 'On', label_translations: null, sort_order: 0 },
     ]);
+  });
+
+  describe('multi-language labels', () => {
+    it('should keep the translations and expose the English text as the label', () => {
+      expect(
+        normalizeSupportedOptions([{ value: 1, label: { en: 'Healthy', fr: 'Sain', de: 'Gesund', es: 'Saludable' } }]),
+      ).to.deep.equal([
+        {
+          value: 1,
+          label: 'Healthy',
+          label_translations: { en: 'Healthy', fr: 'Sain', de: 'Gesund', es: 'Saludable' },
+          sort_order: 0,
+        },
+      ]);
+    });
+
+    it('should accept them on a dynamic select with string values', () => {
+      expect(
+        normalizeSupportedOptions([{ value: 'healthy', label: { en: 'Healthy', fr: 'Sain' } }], {
+          allowStringValues: true,
+        }),
+      ).to.deep.equal([
+        { value: 'healthy', label: 'Healthy', label_translations: { en: 'Healthy', fr: 'Sain' }, sort_order: 0 },
+      ]);
+    });
+
+    it('should require the English text', () => {
+      expect(() => normalizeSupportedOptions([{ value: 1, label: { fr: 'Sain' } }])).to.throw(
+        BadParameters,
+        /label\.en" is required/,
+      );
+    });
+
+    it('should reject an empty, blank, non-string or too long text', () => {
+      [{ en: '' }, { en: '   ' }, { en: 'Healthy', fr: '' }, { en: 'Healthy', fr: 3 }, { en: 'a'.repeat(256) }].forEach(
+        (label) => {
+          expect(() => normalizeSupportedOptions([{ value: 1, label }])).to.throw(BadParameters);
+        },
+      );
+      expect(normalizeSupportedOptions([{ value: 1, label: { en: 'a'.repeat(255) } }])[0].label).to.have.lengthOf(255);
+    });
+
+    it('should keep a well-formed language Gladys does not display yet, and reject a malformed key', () => {
+      expect(
+        normalizeSupportedOptions([{ value: 1, label: { en: 'Healthy', it: 'Sano', 'pt-BR': 'Saudável' } }])[0]
+          .label_translations,
+      ).to.deep.equal({ en: 'Healthy', it: 'Sano', 'pt-BR': 'Saudável' });
+      expect(() => normalizeSupportedOptions([{ value: 1, label: { en: 'Healthy', French: 'Sain' } }])).to.throw(
+        BadParameters,
+        /label\.French" is not allowed/,
+      );
+    });
+
+    it('should reject a label that is neither a string nor an object', () => {
+      expect(() => normalizeSupportedOptions([{ value: 1, label: 42 }])).to.throw(BadParameters);
+      expect(() => normalizeSupportedOptions([{ value: 1, label: ['Healthy'] }])).to.throw(BadParameters);
+    });
+
+    it('should round-trip the stored form, the translations being the source of truth', () => {
+      expect(
+        normalizeSupportedOptions([{ value: 1, label: 'Healthy', label_translations: { en: 'Healthy', fr: 'Sain' } }]),
+      ).to.deep.equal([
+        { value: 1, label: 'Healthy', label_translations: { en: 'Healthy', fr: 'Sain' }, sort_order: 0 },
+      ]);
+      expect(
+        normalizeSupportedOptions([{ value: 1, label: 'Stale', label_translations: { en: 'Healthy', fr: 'Sain' } }])[0]
+          .label,
+      ).to.equal('Healthy');
+      expect(normalizeSupportedOptions([{ value: 1, label: 'On', label_translations: null }])).to.deep.equal([
+        { value: 1, label: 'On', label_translations: null, sort_order: 0 },
+      ]);
+      expect(() =>
+        normalizeSupportedOptions([{ value: 1, label: 'On', label_translations: { fr: 'Allumé' } }]),
+      ).to.throw(BadParameters);
+    });
   });
 
   it('should aggregate multiple validation errors', () => {

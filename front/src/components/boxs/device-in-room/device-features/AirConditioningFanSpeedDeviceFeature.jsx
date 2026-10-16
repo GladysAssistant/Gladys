@@ -24,7 +24,7 @@ const AirConditioningFanSpeedDeviceFeature = props => {
 
   // Only offer the speeds this AC supports (its supported_options); a feature without restrictions
   // keeps the full list. The control shows buttons when they fit on one line, a dropdown otherwise.
-  const options = resolveFeatureOptions(deviceFeature, FAN_SPEED_OPTIONS);
+  const options = resolveFeatureOptions(deviceFeature, FAN_SPEED_OPTIONS, props.user && props.user.language);
   const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (

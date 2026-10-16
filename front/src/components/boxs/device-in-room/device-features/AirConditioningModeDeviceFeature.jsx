@@ -26,7 +26,7 @@ const AirConditioningModeDeviceFeature = props => {
   const hasSupportedOptions =
     Array.isArray(deviceFeature.supported_options) && deviceFeature.supported_options.length > 0;
   const options = hasSupportedOptions
-    ? resolveFeatureOptions(deviceFeature, MODE_OPTIONS)
+    ? resolveFeatureOptions(deviceFeature, MODE_OPTIONS, props.user && props.user.language)
     : MODE_OPTIONS.filter(
         option => option.value <= AC_MODE.HEATING || option.value <= deviceFeature.max
       ).map(option => ({ value: option.value, i18nKey: option.i18nKey }));

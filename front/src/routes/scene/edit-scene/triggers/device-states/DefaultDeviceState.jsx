@@ -1,4 +1,6 @@
 import { Component, Fragment } from 'preact';
+import { connect } from 'unistore/preact';
+import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
@@ -60,7 +62,12 @@ class DefaultDeviceState extends Component {
     }
   };
 
-  getValueOptions = () => getDeviceFeatureValueOptions(this.props.intl.dictionary, this.props.selectedDeviceFeature);
+  getValueOptions = () =>
+    getDeviceFeatureValueOptions(
+      this.props.intl.dictionary,
+      this.props.selectedDeviceFeature,
+      get(this.props, 'user.language')
+    );
 
   // We display the list of values only if the feature holds constants, and if the current value can
   // be represented in that list (it's not a value saved before this list existed)
@@ -165,4 +172,4 @@ class DefaultDeviceState extends Component {
   }
 }
 
-export default withIntlAsProp(DefaultDeviceState);
+export default connect('user', {})(withIntlAsProp(DefaultDeviceState));

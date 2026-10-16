@@ -60,6 +60,7 @@ async function syncFeatureSupportedOptions(deviceFeature, supportedOptions, tran
         {
           ...toOptionColumns(option),
           label: option.label,
+          label_translations: option.label_translations,
           sort_order: option.sort_order,
         },
         { transaction },
@@ -72,6 +73,7 @@ async function syncFeatureSupportedOptions(deviceFeature, supportedOptions, tran
         device_feature_id: deviceFeature.id,
         ...toOptionColumns(option),
         label: option.label,
+        label_translations: option.label_translations,
         sort_order: option.sort_order,
       },
       { transaction },

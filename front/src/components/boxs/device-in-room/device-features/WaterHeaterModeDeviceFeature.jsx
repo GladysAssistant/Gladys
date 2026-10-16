@@ -27,7 +27,7 @@ const WaterHeaterModeDeviceFeature = props => {
   // values are a set and not a ladder — AWAY is not "more" than MANUAL — so the feature's `max`
   // carries no information about which modes exist, and filtering on it would hide valid modes, or
   // every mode at all when `max` is unset (a feature created by hand has no min/max).
-  const options = resolveFeatureOptions(deviceFeature, MODE_OPTIONS);
+  const options = resolveFeatureOptions(deviceFeature, MODE_OPTIONS, props.user && props.user.language);
   const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (
