@@ -1,6 +1,6 @@
 const logger = require('../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
-const { isSystemVariableEnabled } = require('./gateway.sendWeeklyDigest');
+const { isSystemVariableEnabled } = require('../../utils/systemVariable');
 
 const WEEKLY_DIGEST_MAX_RANDOM_DELAY_MS = 60 * 1000;
 

@@ -55,6 +55,9 @@ async function setDiscoveredDevices(service, devices) {
     if (device.poll_frequency !== undefined && !DEVICE_POLL_FREQUENCIES_LIST.includes(device.poll_frequency)) {
       throw new BadParameters(`devices[${index}].poll_frequency: invalid poll frequency`);
     }
+    if (device.should_poll !== undefined && typeof device.should_poll !== 'boolean') {
+      throw new BadParameters(`devices[${index}].should_poll: must be a boolean`);
+    }
     if (!Array.isArray(device.features)) {
       throw new BadParameters(`devices[${index}].features: must be an array`);
     }
@@ -138,6 +141,10 @@ async function setDiscoveredDevices(service, devices) {
       ...deviceWithoutSelector,
       features,
       params,
+      // a published poll_frequency is enough to get device.poll from the core
+      // scheduler (device.add also requires should_poll === true), unless the
+      // integration explicitly opts out with should_poll: false
+      ...(device.poll_frequency !== undefined && device.should_poll === undefined ? { should_poll: true } : {}),
       // service_id and selector are forced server side
       service_id: service.id,
     };
