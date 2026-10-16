@@ -42,7 +42,9 @@ class SelectBatteryStorageMode extends Component {
     // mode the feature does not declare must show as nothing selected, not as a valid-looking
     // choice absent from the list, and options already carry the device's own label when the
     // value falls outside the catalog.
-    return deviceFeatureOptions.find(option => option.value === value) || null;
+    // A scene written through the API may carry the mode as a numeric string ("1"): compare the
+    // string forms, so it still selects its option (an empty value matches none).
+    return deviceFeatureOptions.find(option => String(option.value) === String(value)) || null;
   };
 
   componentDidMount() {

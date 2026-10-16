@@ -45,7 +45,8 @@ class BatteryStorageModeDeviceState extends Component {
     // Controlled rather than defaultValue: the option list is recomputed when the selected feature
     // changes, and an uncontrolled select would keep displaying the previous device's mode. `null`
     // when nothing matches, so a mode the feature no longer declares shows as unselected.
-    const selectedOption = (options || []).find(option => trigger.value === option.value) || null;
+    // A numeric string ("1") saved through the API selects its option too.
+    const selectedOption = (options || []).find(option => String(trigger.value) === String(option.value)) || null;
 
     return (
       <Fragment>
