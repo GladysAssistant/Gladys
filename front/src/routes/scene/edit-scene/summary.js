@@ -127,6 +127,8 @@ const getActionSummary = (action, dictionary, deviceFeatures) => {
     case ACTIONS.SWITCH.TURN_OFF:
     case ACTIONS.SWITCH.TOGGLE:
       return listSelectors(action.devices || action.device_features);
+    case ACTIONS.THERMOSTAT.SET_SCHEDULE:
+      return joinParts([truncate(action.schedule), listSelectors(action.devices)]);
     case ACTIONS.CONDITION.ONLY_CONTINUE_IF: {
       if (!Array.isArray(action.conditions) || action.conditions.length === 0) {
         return null;
