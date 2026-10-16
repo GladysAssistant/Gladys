@@ -127,7 +127,13 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT]: SetpointDeviceFeature,
     [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT]: MultiLevelDeviceFeature,
     [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_DISCHARGE_LIMIT]: MultiLevelDeviceFeature,
-    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE]: BatteryStorageModeDeviceFeature
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE]: BatteryStorageModeDeviceFeature,
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.GRID_CHARGE_POWER_LIMIT]: SetpointDeviceFeature
+  },
+  // The output power limit is a setpoint in W/kW, like the battery power limits; routed by category
+  // because `power-limit` is a generic name another category may own one day.
+  [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT]: {
+    [DEVICE_FEATURE_TYPES.HOME_OUTPUT.POWER_LIMIT]: SetpointDeviceFeature
   },
   // Television remote-control orders (play, pause, channel up, ...) are write-only commands: they
   // are displayed as push buttons instead of falling back to a read-only sensor row.

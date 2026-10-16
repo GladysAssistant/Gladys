@@ -88,6 +88,8 @@ const FRENCH = {
   'Target charge level': 'Niveau de charge cible',
   'Discharge reserve': 'Réserve de décharge',
   'Battery mode': 'Mode de la batterie',
+  'Grid charge power limit': 'Limite de puissance de charge réseau',
+  'Output power limit': 'Limite de puissance de sortie',
   Charging: 'Recharge',
   'Meter index': 'Index du compteur',
   'Consumption today': 'Consommation du jour',

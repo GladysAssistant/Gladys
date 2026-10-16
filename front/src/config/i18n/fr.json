@@ -6584,6 +6584,10 @@
       "input-index": "Index import réseau électrique",
       "output-index": "Index export réseau électrique"
     },
+    "home-output": {
+      "shortCategoryName": "Sortie maison",
+      "power-limit": "Limite de puissance de sortie"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Capteur de sortie maison",
       "power": "Puissance vers la maison",
@@ -6603,7 +6607,8 @@
       "discharge-power-limit": "Limite de puissance de décharge",
       "target-charge-limit": "Niveau de charge cible",
       "target-discharge-limit": "Réserve de décharge",
-      "mode": "Mode"
+      "mode": "Mode",
+      "grid-charge-power-limit": "Limite de puissance de charge réseau"
     },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",

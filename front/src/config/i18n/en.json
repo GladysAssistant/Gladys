@@ -6584,6 +6584,10 @@
       "input-index": "Grid import index",
       "output-index": "Grid export index"
     },
+    "home-output": {
+      "shortCategoryName": "Home output",
+      "power-limit": "Output power limit"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Home output sensor",
       "power": "Home output power",
@@ -6603,7 +6607,8 @@
       "discharge-power-limit": "Discharge power limit",
       "target-charge-limit": "Target charge level",
       "target-discharge-limit": "Discharge reserve",
-      "mode": "Mode"
+      "mode": "Mode",
+      "grid-charge-power-limit": "Grid charge power limit"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",

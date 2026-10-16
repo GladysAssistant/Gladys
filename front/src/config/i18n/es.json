@@ -6584,6 +6584,10 @@
       "input-index": "Índice de importación de la red",
       "output-index": "Índice de exportación de la red"
     },
+    "home-output": {
+      "shortCategoryName": "Salida del hogar",
+      "power-limit": "Límite de potencia de salida"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Sensor de salida del hogar",
       "power": "Potencia de salida del hogar",
@@ -6603,7 +6607,8 @@
       "discharge-power-limit": "Límite de potencia de descarga",
       "target-charge-limit": "Nivel de carga objetivo",
       "target-discharge-limit": "Reserva de descarga",
-      "mode": "Modo"
+      "mode": "Modo",
+      "grid-charge-power-limit": "Límite de potencia de carga desde la red"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformación",

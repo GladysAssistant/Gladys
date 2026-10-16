@@ -494,13 +494,20 @@ export const getDefaultUnitForFeature = (category, type) => {
     }
   }
 
+  // home-output only holds the output power limit, a power: watt, never the kWh a type-based
+  // rule would hand a name ending in '-limit'.
+  if (category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT) {
+    return DEVICE_FEATURE_UNITS.WATT;
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
     // The command types first: they end in '-limit', so the suffix rules below would hand them
     // kWh. Power limits are in watt, state-of-charge limits in percent (the mode has no unit and
     // never reaches this block, see CATEGORIES_WITHOUT_UNIT).
     if (
       type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.CHARGE_POWER_LIMIT ||
-      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT ||
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.GRID_CHARGE_POWER_LIMIT
     ) {
       return DEVICE_FEATURE_UNITS.WATT;
     }
@@ -592,6 +599,17 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
   }
 
+  // home-output is a command category (no `-sensor` suffix, absent from isSensorCategory): its
+  // output power limit is writable. 10 kW covers plug-in storage systems (~0.8-2.4 kW),
+  // micro-inverters and storage inverters; the user adjusts max to the device's real rating.
+  if (category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT && type === DEVICE_FEATURE_TYPES.HOME_OUTPUT.POWER_LIMIT) {
+    return applyDefaultUnit(
+      { ...defaults, min: 0, max: 10000, read_only: false, unit: DEVICE_FEATURE_UNITS.WATT },
+      category,
+      type
+    );
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR) {
     if (type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.POWER) {
       return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
@@ -660,7 +678,8 @@ export const getFeatureDefaultValues = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
     if (
       type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.CHARGE_POWER_LIMIT ||
-      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT ||
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.GRID_CHARGE_POWER_LIMIT
     ) {
       // A plug-in battery tops out around 2.4 kW, a hybrid inverter around 10-15 kW: 10 kW covers
       // the usual range, and the user adjusts max to the device's real rating.
@@ -1041,6 +1060,9 @@ export const getFeaturePreviewValue = (category, type) => {
     if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE) {
       return BATTERY_STORAGE_MODE.AUTO;
     }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.GRID_CHARGE_POWER_LIMIT) {
+      return 600;
+    }
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.GRID_SENSOR) {
@@ -1070,6 +1092,10 @@ export const getFeaturePreviewValue = (category, type) => {
       return 0;
     }
     return 12.3;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT && type === DEVICE_FEATURE_TYPES.HOME_OUTPUT.POWER_LIMIT) {
+    return 800;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR) {

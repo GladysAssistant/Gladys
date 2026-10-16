@@ -982,6 +982,10 @@ const DEVICE_FEATURE_CATEGORIES = {
   GRID_SENSOR: 'grid-sensor',
   HEATER: 'heater',
   HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
+  // Control of the power the device itself delivers through its AC output: the command
+  // counterpart of the read-only home-output-sensor (docs/specs/home-output.md), as
+  // thermostat holds the setpoint while temperature-sensor holds the measurement.
+  HOME_OUTPUT: 'home-output',
   HOME_OUTPUT_SENSOR: 'home-output-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
   LEAK_SENSOR: 'leak-sensor',
@@ -1305,23 +1309,40 @@ const DEVICE_FEATURE_TYPES = {
     OFF_GRID_POWER: 'off-grid-power', // instantaneous power on the backup/off-grid output, W (>= 0)
     OFF_GRID_INDEX: 'off-grid-index', // cumulative backup-output energy meter index, kWh (>= 0)
   },
+  // Commands bounding the power the device ITSELF delivers to the installation it feeds
+  // through its AC output (plug-in storage systems, micro-inverters, storage inverters),
+  // solar and battery together (docs/specs/home-output.md). It is the control counterpart
+  // of home-output-sensor, whose measurements stay there: the `-sensor` suffix is reserved
+  // for read-only measurement categories, as thermostat holds the setpoint while
+  // temperature-sensor holds the measurement. Not battery-storage: the output limit bounds
+  // solar power that never went through the battery. Not grid-sensor: a grid export /
+  // zero-export limit bounds the exchange at the connection point, not the device output,
+  // and is out of scope. Value conventions: non-negative, in W/kW; `0` means zero (no
+  // output), never "unlimited" (a vendor API using 0 or -1 for "no limit" publishes the
+  // rated maximum instead); a persistent bound the device keeps until it is written again,
+  // not a timed request; the device clamps and reports the applied value back.
+  HOME_OUTPUT: {
+    POWER_LIMIT: 'power-limit', // maximum power delivered through the device's AC output, W/kW (>= 0) (command)
+  },
   // Stationary storage batteries: plug-in storage systems, hybrid inverters with a
   // battery, home battery packs. Scope is limited to storing energy: the state of
   // charge, the power flowing into and out of the battery, their energy indexes, and
   // the controls bounding that flow (docs/specs/battery-storage.md).
   // Boundary with neighboring categories: PV production is energy-production-sensor,
   // grid exchange is grid-sensor, the power the device delivers to the home is
-  // home-output-sensor — a battery device carries those features alongside its
-  // battery-storage ones.
+  // home-output-sensor and its limit home-output — a battery device carries those
+  // features alongside its battery-storage ones.
   // Measurements vs commands: the first six types are read-only measurements; the
   // `*-limit` types and `mode` are commands (written by Gladys, reported back by the
-  // device). Value conventions: powers and power limits are non-negative, the
-  // direction is carried by the type (charge = INTO the battery from any source,
-  // discharge = OUT of it), never by a sign; state-of-charge limits are percentages
-  // (0..100); `mode` is an index into BATTERY_STORAGE_MODE. A limit is a persistent
-  // bound the device keeps until it is written again, not a timed power request. `0` means
-  // zero: a power limit of 0 forbids that direction, never "unlimited" (a vendor API using
-  // 0 or -1 for "no limit" publishes the rated maximum instead).
+  // device). Value conventions: powers and power limits are non-negative, the direction is
+  // carried by the type (charge = INTO the battery from any source, discharge = OUT of
+  // it), never by a sign; grid-charge-power-limit bounds only the charge drawn FROM THE
+  // GRID, a sub-bound of charge-power-limit (when both are published the grid charging is
+  // bounded by both, and 0 stops grid charging only); state-of-charge limits are
+  // percentages (0..100); `mode` is an index into BATTERY_STORAGE_MODE. A limit is a
+  // persistent bound the device keeps until it is written again, not a timed power
+  // request. `0` means zero: a power limit of 0 forbids that direction, never "unlimited"
+  // (a vendor API using 0 or -1 for "no limit" publishes the rated maximum instead).
   BATTERY_STORAGE: {
     BATTERY_LEVEL: 'battery-level', // state of charge, % (0..100)
     CHARGE_POWER: 'charge-power', // power INTO the battery, W/kW (>=0)
@@ -1334,6 +1355,7 @@ const DEVICE_FEATURE_TYPES = {
     TARGET_CHARGE_LIMIT: 'target-charge-limit', // state of charge where charging stops, % (0..100) (command)
     TARGET_DISCHARGE_LIMIT: 'target-discharge-limit', // reserve: state of charge where discharging stops, % (0..100) (command)
     MODE: 'mode', // operating mode, BATTERY_STORAGE_MODE (command)
+    GRID_CHARGE_POWER_LIMIT: 'grid-charge-power-limit', // maximum power INTO the battery FROM THE GRID, W/kW (>=0) (command)
   },
   TELEINFORMATION: {
     BINARY: 'binary',
@@ -1841,6 +1863,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.WATT_HOUR,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   ],
+  [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT]: [DEVICE_FEATURE_UNITS.WATT, DEVICE_FEATURE_UNITS.KILOWATT],
   [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR]: [
     DEVICE_FEATURE_UNITS.WATT,
     DEVICE_FEATURE_UNITS.KILOWATT,
@@ -2050,6 +2073,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT]: [DEVICE_FEATURE_UNITS.PERCENT],
     [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_DISCHARGE_LIMIT]: [DEVICE_FEATURE_UNITS.PERCENT],
     [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE]: [],
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.GRID_CHARGE_POWER_LIMIT]: [
+      DEVICE_FEATURE_UNITS.WATT,
+      DEVICE_FEATURE_UNITS.KILOWATT,
+    ],
   },
   [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
     [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: [],

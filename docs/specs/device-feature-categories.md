@@ -44,7 +44,7 @@ Before adding a category or type, check the existing list in `server/utils/const
 
 A device feature holds **one atomic value**: one measurement (a sensor reading) or one control (a command/state). Types within a category are the different atomic values that capability can expose (e.g. `light` → `binary`, `brightness`, `temperature`). Do not create a category that bundles several unrelated values, and do not create a new category when only a new type on an existing category is needed.
 
-A category also covers only the metrics **intrinsic** to its capability. Real products often report values belonging to other subsystems (a storage battery's API may expose PV production, grid exchange, and home output) — a Gladys device simply exposes features from several categories, one per capability. Shaping a single category around everything one product family reports is how brand-specific contracts sneak in: `battery-storage` was initially proposed with 17 types mirroring one vendor's telemetry, and was narrowed down to the six metrics intrinsic to storage (level, charge/discharge power and indexes, remaining energy), the rest going to the existing energy categories. The controls that bound those same quantities (charge/discharge power limits, state-of-charge limits, operating mode) were later added as command types of the same category, not as a new one (`docs/specs/battery-storage.md`).
+A category also covers only the metrics **intrinsic** to its capability. Real products often report values belonging to other subsystems (a storage battery's API may expose PV production, grid exchange, and home output) — a Gladys device simply exposes features from several categories, one per capability. Shaping a single category around everything one product family reports is how brand-specific contracts sneak in: `battery-storage` was initially proposed with 17 types mirroring one vendor's telemetry, and was narrowed down to the six metrics intrinsic to storage (level, charge/discharge power and indexes, remaining energy), the rest going to the existing energy categories. The controls that bound those same quantities (charge/discharge power limits, the grid share of the charge power, state-of-charge limits, operating mode) were later added as command types of the same category, not as a new one (`docs/specs/battery-storage.md`). The limit on the device's AC output was not: it also bounds solar power that never went through the battery, so it is not intrinsic to storage and became the `home-output` command category (`docs/specs/home-output.md`).
 
 ### 6. Model the full capability — declare per-device support with `supported_options`
 
@@ -99,7 +99,7 @@ Consequence for reviews: "brand X only supports 3 of the 5 modes" is **never** a
 ### 7. Naming conventions — renaming is the costly mistake
 
 - Values are **kebab-case** (`co2-sensor`, `energy-production-sensor`).
-- Read-only measurement categories use the `*-sensor` suffix.
+- Read-only measurement categories use the `*-sensor` suffix. A command bounding the same quantity therefore lives in a sibling category without it — `thermostat` next to `temperature-sensor`, `home-output` next to `home-output-sensor` — never as a writable type of the `-sensor` category.
 - Names are in **English** and use the standard's vocabulary when one exists (see rule 3).
 - No protocol name inside a category/type name: the taxonomy is protocol-agnostic by definition.
 

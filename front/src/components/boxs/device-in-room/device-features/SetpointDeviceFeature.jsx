@@ -24,13 +24,18 @@ const SETPOINT_STEP_BY_CATEGORY = {
   // A storage tank is set in whole degrees; the 0.5 default is room-thermostat granularity.
   [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: 1,
   // Battery power limits, in watts: storage systems are set in tens of watts, not by the watt.
-  [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: 10
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: 10,
+  // Output power limit, in watts: same granularity as the battery power limits.
+  [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT]: 10
 };
 
 // A category whose setpoint can be published in two units of different magnitudes needs a step
 // per unit: 10 is a sensible step in watts, but a 10 kW jump would skip the whole range.
 const SETPOINT_STEP_BY_CATEGORY_AND_UNIT = {
   [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: {
+    [DEVICE_FEATURE_UNITS.KILOWATT]: 0.1
+  },
+  [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT]: {
     [DEVICE_FEATURE_UNITS.KILOWATT]: 0.1
   }
 };

@@ -6584,6 +6584,10 @@
       "input-index": "Netzbezugszähler",
       "output-index": "Netzeinspeisezähler"
     },
+    "home-output": {
+      "shortCategoryName": "Hausausgang",
+      "power-limit": "Ausgangsleistungsgrenze"
+    },
     "home-output-sensor": {
       "shortCategoryName": "Hausausgangssensor",
       "power": "Leistung zum Haus",
@@ -6603,7 +6607,8 @@
       "discharge-power-limit": "Entladeleistungsgrenze",
       "target-charge-limit": "Ziel-Ladestand",
       "target-discharge-limit": "Entladereserve",
-      "mode": "Modus"
+      "mode": "Modus",
+      "grid-charge-power-limit": "Netzladeleistungsgrenze"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
