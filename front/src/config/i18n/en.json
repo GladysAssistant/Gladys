@@ -6199,6 +6199,18 @@
           "0": "Idle",
           "1": "Heating"
         }
+      },
+      "airquality-sensor": {
+        "level": {
+          "0": "Unknown",
+          "1": "Good",
+          "2": "Fair",
+          "3": "Moderate",
+          "4": "Poor",
+          "5": "Very poor",
+          "6": "Extremely poor",
+          "unknown": "{{value}} (unknown)"
+        }
       }
     }
   },
@@ -6733,7 +6745,8 @@
     },
     "airquality-sensor": {
       "shortCategoryName": "Air Quality",
-      "aqi": "Air Quality Index"
+      "aqi": "Air Quality Index",
+      "level": "Air quality level"
     },
     "ph-sensor": {
       "shortCategoryName": "pH Sensor",

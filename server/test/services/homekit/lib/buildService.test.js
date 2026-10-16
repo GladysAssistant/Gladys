@@ -5,6 +5,7 @@ const { stub } = sinon;
 const { buildService } = require('../../../../services/homekit/lib/buildService');
 const { mappings } = require('../../../../services/homekit/lib/deviceMappings');
 const {
+  AIR_QUALITY_LEVEL,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   ACTIONS,
@@ -1261,6 +1262,41 @@ describe('Build service', () => {
     expect(cb.args[1][1]).to.equal(1);
     expect(cb.args[2][1]).to.equal(5);
     expect(cb.args[3][1]).to.equal(0);
+  });
+
+  it('should build an air quality level on the AirQuality characteristic', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({ last_value: AIR_QUALITY_LEVEL.GOOD });
+    const on = stub();
+    const getCharacteristic = stub().returns({ on, props: { minValue: 0, maxValue: 5 } });
+    const AirQualitySensor = stub().returns({ getCharacteristic });
+    homekitHandler.hap = {
+      Characteristic: { AirQuality: 'AIRQUALITY' },
+      CharacteristicEventTypes: stub(),
+      Service: { AirQualitySensor },
+    };
+    const features = [
+      {
+        id: 'ec9de6a2-6f0a-4f0e-9d0e-1b5f1cb0a5cf',
+        name: 'Niveau qualité air',
+        selector: 'capteur-niveau-air',
+        category: DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL,
+      },
+    ];
+    const cb = stub();
+
+    await homekitHandler.buildService(
+      { name: 'Capteur qualité air' },
+      features,
+      mappings[DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR],
+    );
+    await on.args[0][1](cb);
+    homekitHandler.gladys.stateManager.get = stub().returns({ last_value: AIR_QUALITY_LEVEL.EXTREMELY_POOR });
+    await on.args[0][1](cb);
+
+    expect(getCharacteristic.args[0][0]).to.equal('AIRQUALITY');
+    expect(cb.args[0][1]).to.equal(1);
+    expect(cb.args[1][1]).to.equal(5);
   });
 
   it('should build siren service', async () => {

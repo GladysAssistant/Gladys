@@ -19,7 +19,7 @@ const {
   coverStateMapping,
   lockStateMapping,
   gasDetectedThresholds,
-  aqiToAirQuality,
+  toHomeKitAirQuality,
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
   LOW_BATTERY_THRESHOLD,
@@ -335,7 +335,8 @@ function buildService(device, features, categoryMapping, subtype) {
         });
         break;
       }
-      case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI}`: {
+      case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI}`:
+      case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL}`: {
         const airQualityCharacteristic = service.getCharacteristic(
           Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
         );
@@ -343,7 +344,10 @@ function buildService(device, features, categoryMapping, subtype) {
         airQualityCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           callback(
             undefined,
-            aqiToAirQuality(this.gladys.stateManager.get('deviceFeature', feature.selector).last_value),
+            toHomeKitAirQuality(
+              feature.type,
+              this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
+            ),
           );
         });
         break;

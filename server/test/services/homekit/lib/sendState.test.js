@@ -6,6 +6,7 @@ const logger = require('../../../../utils/logger');
 const { sendState } = require('../../../../services/homekit/lib/sendState');
 const { indexFeatureService } = require('../../../../services/homekit/lib/featureServices');
 const {
+  AIR_QUALITY_LEVEL,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   EVENTS,
@@ -687,6 +688,33 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.args[0]).eql(['AIRQUALITY', 4]);
+  });
+
+  it('should notify an air quality level', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: 0, maxValue: 5 } }),
+      }),
+    };
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Air quality level',
+      category: DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL,
+    };
+
+    // a level is mapped, not bucketed like an index: MODERATE is HomeKit's FAIR
+    await homekitHandler.sendState(accessory, feature, {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: AIR_QUALITY_LEVEL.MODERATE,
+    });
+
+    expect(updateCharacteristic.args[0]).eql(['AIRQUALITY', 3]);
   });
 
   it('should notify particulate densities', async () => {

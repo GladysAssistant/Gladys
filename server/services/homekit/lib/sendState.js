@@ -15,7 +15,7 @@ const {
   coverStateMapping,
   lockStateMapping,
   gasDetectedThresholds,
-  aqiToAirQuality,
+  toHomeKitAirQuality,
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
   LOW_BATTERY_THRESHOLD,
@@ -373,10 +373,11 @@ function sendState(hkAccessory, feature, event) {
         );
       break;
     }
-    case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI}`: {
+    case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI}`:
+    case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL}`: {
       serviceFor().updateCharacteristic(
         Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-        aqiToAirQuality(event.last_value),
+        toHomeKitAirQuality(feature.type, event.last_value),
       );
       break;
     }
