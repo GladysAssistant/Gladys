@@ -25,9 +25,11 @@ async function setAiProvider(selector) {
   }
   await this.variable.setValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER, service.selector);
   // guard against a concurrent uninstall of the provider between the
-  // validation above and the write: uninstall clears the variable before
+  // validation above and the write: uninstall clears the variable after
   // destroying the row, so re-checking the row after the write guarantees
-  // the variable never points to a removed integration
+  // the variable never points to a removed integration whatever the
+  // interleaving (a write before the deletion is caught by uninstall, a
+  // write after it is rolled back here)
   const stillInstalled = await db.Service.findOne({
     where: { selector: service.selector, type: SERVICE_TYPES.EXTERNAL, pod_id: null },
   });

@@ -53,12 +53,6 @@ async function uninstall(selector) {
   } catch (e) {
     logger.warn(`Unable to remove data folder of integration ${selector}`, e);
   }
-  // uninstalling the selected AI provider silently returns the instance to
-  // the Gladys Plus default: no dangling selector in the variable
-  const selectedAiProvider = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
-  if (selectedAiProvider === service.selector) {
-    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
-  }
   const devices = await db.Device.findAll({ where: { service_id: service.id } });
   await Promise.each(devices, (device) => this.device.destroy(device.selector));
   // Calendars of a calendar-type integration are removed explicitly (all
@@ -80,6 +74,16 @@ async function uninstall(selector) {
   calendarsByUser.forEach((userCalendars, userId) => this.notifyCalendarsUpdated(userId, userCalendars));
   await db.Variable.destroy({ where: { service_id: service.id } });
   await db.Service.destroy({ where: { id: service.id } });
+  // uninstalling the selected AI provider silently returns the instance to
+  // the Gladys Plus default: no dangling selector in the variable. Read
+  // after the row deletion: a selection written while this uninstall was
+  // running (setAiProvider validated the row before it went) is caught
+  // here, and one written after it is rolled back by setAiProvider's own
+  // re-check of the row — both interleavings end on Gladys Plus
+  const selectedAiProvider = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+  if (selectedAiProvider === service.selector) {
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+  }
   this.stateManager.deleteState('service', service.name);
   this.stateManager.deleteState('serviceById', service.id);
   this.discoveredDevices.delete(service.id);

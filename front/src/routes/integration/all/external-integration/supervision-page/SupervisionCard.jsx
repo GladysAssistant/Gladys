@@ -66,6 +66,7 @@ const SupervisionCard = ({
   askingUninstall,
   isAiProvider,
   isActiveAiProvider,
+  aiProviderReadFailed,
   executeAction,
   onAskUninstall,
   onCancelUninstall,
@@ -294,11 +295,16 @@ const SupervisionCard = ({
                     <Text id="integration.externalIntegration.supervision.uninstallAiProviderWarning" />
                   </p>
                 )}
-                {/* the selection could not be read (null): say so rather than
+                {/* the selection is not known yet (null): say it is being
+                    checked, or that it could not be checked, rather than
                     pretend this integration is not the assistant's provider */}
                 {isAiProvider && typeof isActiveAiProvider !== 'boolean' && (
                   <p>
-                    <Text id="integration.externalIntegration.supervision.uninstallAiProviderUnknownWarning" />
+                    {aiProviderReadFailed ? (
+                      <Text id="integration.externalIntegration.supervision.uninstallAiProviderUnknownWarning" />
+                    ) : (
+                      <Text id="integration.externalIntegration.supervision.uninstallAiProviderCheckingWarning" />
+                    )}
                   </p>
                 )}
                 <div class="btn-list mb-0">

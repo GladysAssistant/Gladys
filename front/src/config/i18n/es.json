@@ -1136,6 +1136,7 @@
         "uninstallEnergyWarning": "Esta integración calcula por sí misma el coste de contratos de energía: los contratos que tarifica dejarán de calcularse una vez desinstalada (sus costes existentes se conservan).",
         "uninstallAiProviderWarning": "Esta integración es el proveedor de IA del asistente: una vez desinstalada, el asistente vuelve a Gladys Plus (o deja de responder hasta que haya un proveedor disponible, sin Gladys Plus).",
         "uninstallAiProviderUnknownWarning": "Gladys no pudo comprobar si esta integración es el proveedor de IA del asistente: si lo es, el asistente vuelve a Gladys Plus una vez desinstalada (o deja de responder hasta que haya un proveedor disponible, sin Gladys Plus).",
+        "uninstallAiProviderCheckingWarning": "Comprobando si esta integración es el proveedor de IA del asistente…",
         "confirmUninstallButton": "Sí, desinstalar",
         "cancelUninstallButton": "Cancelar",
         "startedAtLabel": "En ejecución desde"

@@ -79,7 +79,7 @@ class AiProviderCard extends Component {
           <Text id="integration.externalIntegration.config.aiProviderSettingsLink" />
         </Link>
         {error && (
-          <p class="mb-0 mt-2">
+          <p class="mb-0 mt-2 text-danger">
             <Text id="integration.externalIntegration.config.aiProviderError" />
           </p>
         )}

@@ -1136,6 +1136,7 @@
         "uninstallEnergyWarning": "This integration prices energy contracts itself: the contracts it prices will stop being priced once it is uninstalled (their existing costs are kept).",
         "uninstallAiProviderWarning": "This integration is the AI provider of the assistant: once uninstalled, the assistant switches back to Gladys Plus (or stops answering until a provider is available, without Gladys Plus).",
         "uninstallAiProviderUnknownWarning": "Gladys could not check whether this integration is the AI provider of the assistant: if it is, the assistant switches back to Gladys Plus once it is uninstalled (or stops answering until a provider is available, without Gladys Plus).",
+        "uninstallAiProviderCheckingWarning": "Checking whether this integration is the AI provider of the assistant…",
         "confirmUninstallButton": "Yes, uninstall",
         "cancelUninstallButton": "Cancel",
         "startedAtLabel": "Running since"

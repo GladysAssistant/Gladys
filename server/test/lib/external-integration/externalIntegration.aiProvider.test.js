@@ -391,6 +391,21 @@ describe('externalIntegration.uninstall (ai provider cleanup)', () => {
     expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER)).to.equal(null);
   });
 
+  it('should clear a selection written while the uninstall was running', async () => {
+    // setAiProvider validated the row before the uninstall deleted it and
+    // wrote the selector in the middle of the uninstall: the cleanup reads
+    // the variable after the row deletion, so it catches that write too
+    const { externalIntegration, variable, system } = buildSupervisor();
+    const aiService = await seedAiService();
+    const { getGladysBasePath } = system;
+    system.getGladysBasePath = async () => {
+      await externalIntegration.setAiProvider(aiService.selector);
+      return getGladysBasePath();
+    };
+    await externalIntegration.uninstall(aiService.selector);
+    expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER)).to.equal(null);
+  });
+
   it('should keep the AI provider selection when uninstalling another integration', async () => {
     const { externalIntegration, variable } = buildSupervisor();
     const aiService = await seedAiService();
