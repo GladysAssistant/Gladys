@@ -6,7 +6,8 @@ import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures
 import KeepHistoryFeature, { isHistorizableFeature } from './KeepHistoryFeature';
 import DeviceParams from '../components/DeviceParams';
 import TransportBadge from '../components/TransportBadge';
-import { getDeviceTransport, getDeviceTransportMessage, isDeviceTransportDegraded } from '../utils';
+import DeviceImage from './DeviceImage';
+import { getDeviceImageKey, getDeviceTransport, getDeviceTransportMessage, isDeviceTransportDegraded } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 
 class DeviceBox extends Component {
@@ -46,7 +47,7 @@ class DeviceBox extends Component {
     this.setState({ loading: false });
   };
 
-  render({ device, deviceIndex, houses = [], language }, { loading, saveError, deleteError }) {
+  render({ device, deviceIndex, selector, houses = [], language }, { loading, saveError, deleteError }) {
     // the index kept here is the one in device.features: it is what the
     // save posts back, the text features filtered out would shift it
     const historizableFeatures = (device.features || [])
@@ -84,6 +85,9 @@ class DeviceBox extends Component {
                   <div class="alert alert-danger">
                     <Text id="integration.externalIntegration.device.deleteError" />
                   </div>
+                )}
+                {getDeviceImageKey(device) && (
+                  <DeviceImage selector={selector} imageKey={getDeviceImageKey(device)} alt={device.name} />
                 )}
                 <div class="form-group">
                   <label class="form-label" for={`name_${deviceIndex}`}>

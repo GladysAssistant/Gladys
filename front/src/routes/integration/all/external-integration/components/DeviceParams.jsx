@@ -3,7 +3,12 @@ import { Text } from 'preact-i18n';
 
 // the GLADYS_TRANSPORT* params are already displayed on the card header
 // (transport badge, degraded orange dot + tooltip)
-const INTERNAL_PARAMS = ['GLADYS_TRANSPORT', 'GLADYS_TRANSPORT_DEGRADED', 'GLADYS_TRANSPORT_MESSAGE'];
+const INTERNAL_PARAMS = [
+  'GLADYS_TRANSPORT',
+  'GLADYS_TRANSPORT_DEGRADED',
+  'GLADYS_TRANSPORT_MESSAGE',
+  'GLADYS_DEVICE_IMAGE'
+];
 
 // Collapsible list of the technical params of a device (IP address, protocol
 // version...), collapsed by default: they help the user understand what the

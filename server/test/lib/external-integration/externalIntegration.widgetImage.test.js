@@ -3,6 +3,7 @@ const sinon = require('sinon').createSandbox();
 
 const { assert: sinonAssert, fake } = sinon;
 
+const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const { WEBSOCKET_MESSAGE_TYPES, ERROR_MESSAGES } = require('../../../utils/constants');
 const { Error400 } = require('../../../utils/httpErrors');
@@ -64,6 +65,17 @@ const declareImages = (externalIntegration, service, imageKeys, cacheKey = 'upco
     expiresAt: Date.now() + 60 * 1000,
   });
   externalIntegration.widgetContentCache.set(service.id, cache);
+};
+
+// a created device of the service whose photo is the given image key
+const declareDeviceImage = async (service, imageKey, name = 'Caméra du salon') => {
+  const device = await db.Device.create({
+    service_id: service.id,
+    name,
+    selector: `${service.selector}-${imageKey}-${name.length}`,
+    external_id: `ext:${service.selector}:${imageKey}:${name.length}`,
+  });
+  await db.DeviceParam.create({ device_id: device.id, name: 'GLADYS_DEVICE_IMAGE', value: imageKey });
 };
 
 const tick = () =>
@@ -321,6 +333,49 @@ describe('externalIntegration widgets — images', () => {
       pending[1]({ success: true, data: { image: WEBP.toString('base64') } });
       expect(await after).to.equal(`data:image/webp;base64,${WEBP.toString('base64')}`);
       expect(externalIntegration.widgetImageCache.get(service.id).get('cleaning-map').image).to.include('image/webp');
+    });
+
+    it('should serve the GLADYS_DEVICE_IMAGE key of a device of the integration, cached for an hour', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const service = await seedWidgetService();
+      await declareDeviceImage(service, 'model-nacamera');
+      externalIntegration.sendCommand = fake.resolves({ success: true, data: { image: JPEG.toString('base64') } });
+      const image = await externalIntegration.getWidgetImage(service.selector, 'model-nacamera');
+      sinonAssert.calledOnceWithExactly(
+        externalIntegration.sendCommand,
+        sinon.match({ id: service.id }),
+        WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WIDGET_GET_IMAGE,
+        { image_key: 'model-nacamera' },
+        { timeoutMs: WIDGET_GET_TIMEOUT_MS },
+      );
+      expect(image).to.equal(`data:image/jpeg;base64,${JPEG.toString('base64')}`);
+      expect(await externalIntegration.getWidgetImage(service.selector, 'model-nacamera')).to.equal(image);
+      expect(externalIntegration.sendCommand.callCount).to.equal(1);
+      // the same validation as a widget image: refused bytes never reach the cache
+      await declareDeviceImage(service, 'model-gif');
+      externalIntegration.sendCommand = fake.resolves({ success: true, data: { image: GIF.toString('base64') } });
+      await expect(externalIntegration.getWidgetImage(service.selector, 'model-gif')).to.be.rejectedWith(Error400);
+      expect(externalIntegration.widgetImageCache.get(service.id).has('model-gif')).to.equal(false);
+    });
+
+    it('should never serve the device image key of another integration', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const service = await seedWidgetService();
+      const other = await seedExternalService({
+        name: 'ext-dev-other',
+        selector: 'ext-dev-other',
+        manifest: TEST_WIDGET_MANIFEST,
+      });
+      await declareDeviceImage(other, 'model-nacamera');
+      externalIntegration.sendCommand = fake.resolves({ success: true, data: { image: PNG.toString('base64') } });
+      await expect(externalIntegration.getWidgetImage(service.selector, 'model-nacamera')).to.be.rejectedWith(
+        NotFoundError,
+        'EXTERNAL_INTEGRATION_WIDGET_IMAGE_NOT_DECLARED',
+      );
+      // a malformed key is refused before any lookup, even if a param holds it
+      await db.DeviceParam.update({ value: 'Bad Key' }, { where: { name: 'GLADYS_DEVICE_IMAGE' } });
+      await expect(externalIntegration.getWidgetImage(other.selector, 'Bad Key')).to.be.rejectedWith(NotFoundError);
+      sinonAssert.notCalled(externalIntegration.sendCommand);
     });
 
     it('should never serve one integration image keys declared by another integration', async () => {
