@@ -62,6 +62,10 @@ describe('Dashboard Devices Box air quality level', () => {
           device.features.forEach(feature => {
             if (lastValues[feature.selector] !== undefined) {
               feature.last_value = lastValues[feature.selector];
+              // a fresh state: without it the dashboard shows "No recent value"
+              // instead of the level (the device API flags stale features)
+              feature.last_value_changed = new Date().toISOString();
+              feature.last_value_is_too_old = false;
             }
           });
         });

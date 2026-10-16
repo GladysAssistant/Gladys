@@ -337,7 +337,8 @@ const WATER_HEATER_MODE = {
 // Matter's AirQualityEnum (Air Quality cluster), so the Matter mapping is one to one; a sensor
 // with fewer levels maps each of its own onto the closest one (e.g. a 5-level indoor monitor
 // uses GOOD to VERY_POOR). UNKNOWN is a reported value (the sensor is warming up, or cannot
-// tell), not an absence of value.
+// tell), not an absence of value: it stays part of the value range so scenes can match it, and
+// a 0 in history charts reads as "no verdict", not as the best air on the scale.
 const AIR_QUALITY_LEVEL = {
   UNKNOWN: 0,
   GOOD: 1,
