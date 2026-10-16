@@ -56,14 +56,19 @@ describe('Dashboard Devices Box air quality level', () => {
       'example'
     );
 
-    cy.intercept('GET', '**/api/v1/device?*', req => {
+    // the device list only: a '**/api/v1/device?*' glob would also catch
+    // /api/v1/device/:selector and /api/v1/device_feature/... (? is one character)
+    cy.intercept({ method: 'GET', pathname: '/api/v1/device' }, req => {
       // the test visits the dashboard twice: without these headers the second
       // answer is a bodyless 304 and there would be no state to stub
       delete req.headers['if-none-match'];
       delete req.headers['if-modified-since'];
       req.continue(res => {
+        if (!Array.isArray(res.body)) {
+          return;
+        }
         res.body.forEach(device => {
-          device.features.forEach(feature => {
+          (device.features || []).forEach(feature => {
             if (lastValues[feature.selector] !== undefined) {
               feature.last_value = lastValues[feature.selector];
               // a fresh state: without it the dashboard shows "No recent value"
