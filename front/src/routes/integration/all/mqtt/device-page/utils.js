@@ -7,6 +7,7 @@ import {
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
   WATER_HEATER_MODE,
+  AIR_QUALITY_LEVEL,
   SIREN_MODE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
@@ -84,6 +85,8 @@ export const isMqttCatalogFeatureVisible = (category, type) =>
 const CATEGORIES_WITHOUT_UNIT = new Set([
   // The battery charge level is a percentage, but knowing whether it is charging is a binary
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_TYPES.BATTERY.CHARGING),
+  // the air quality index carries the AQI unit, the level is an enum
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR, DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.MODE),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING),
@@ -725,6 +728,14 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 5, read_only: false }, category, type);
   }
 
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR &&
+    type === DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL
+  ) {
+    // AIR_QUALITY_LEVEL: UNKNOWN to EXTREMELY_POOR, no unit
+    return applyDefaultUnit({ ...defaults, min: 0, max: 6, read_only: true }, category, type);
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE) {
     // THERMOSTAT_OPERATING_STATE: IDLE/HEATING/COOLING
     return applyDefaultUnit({ ...defaults, min: 0, max: 2, read_only: true }, category, type);
@@ -958,6 +969,13 @@ export const getFeaturePreviewValue = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.ENABLED) {
     // A camera is enabled by default, the preview shows the toggle in that position
     return 1;
+  }
+
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR &&
+    type === DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL
+  ) {
+    return AIR_QUALITY_LEVEL.FAIR;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {

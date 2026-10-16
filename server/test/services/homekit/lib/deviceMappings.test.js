@@ -1,5 +1,11 @@
 const { expect } = require('chai');
-const { aqiToAirQuality, clampToCharacteristic } = require('../../../../services/homekit/lib/deviceMappings');
+const {
+  aqiToAirQuality,
+  airQualityLevelToAirQuality,
+  toHomeKitAirQuality,
+  clampToCharacteristic,
+} = require('../../../../services/homekit/lib/deviceMappings');
+const { AIR_QUALITY_LEVEL, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 describe('Sensor value clamping', () => {
   it('should clamp a value between the characteristic bounds', () => {
@@ -31,5 +37,27 @@ describe('Air quality index conversion', () => {
     expect(aqiToAirQuality(null)).to.equal(0);
     expect(aqiToAirQuality(undefined)).to.equal(0);
     expect(aqiToAirQuality(-1)).to.equal(0);
+  });
+});
+
+describe('Air quality level conversion', () => {
+  it('should map every level onto HomeKit, the two worst sharing HomeKit poor', () => {
+    expect(airQualityLevelToAirQuality(AIR_QUALITY_LEVEL.UNKNOWN)).to.equal(0);
+    expect(airQualityLevelToAirQuality(AIR_QUALITY_LEVEL.GOOD)).to.equal(1);
+    expect(airQualityLevelToAirQuality(AIR_QUALITY_LEVEL.FAIR)).to.equal(2);
+    expect(airQualityLevelToAirQuality(AIR_QUALITY_LEVEL.MODERATE)).to.equal(3);
+    expect(airQualityLevelToAirQuality(AIR_QUALITY_LEVEL.POOR)).to.equal(4);
+    expect(airQualityLevelToAirQuality(AIR_QUALITY_LEVEL.VERY_POOR)).to.equal(5);
+    expect(airQualityLevelToAirQuality(AIR_QUALITY_LEVEL.EXTREMELY_POOR)).to.equal(5);
+  });
+
+  it('should report unknown for a value outside the levels', () => {
+    expect(airQualityLevelToAirQuality(7)).to.equal(0);
+    expect(airQualityLevelToAirQuality(null)).to.equal(0);
+  });
+
+  it('should bucket an index and map a level', () => {
+    expect(toHomeKitAirQuality(DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI, 3)).to.equal(1);
+    expect(toHomeKitAirQuality(DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL, 3)).to.equal(3);
   });
 });

@@ -8,6 +8,7 @@ const {
   AC_MODE,
   THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
+  AIR_QUALITY_LEVEL,
 } = require('../../../utils/constants');
 
 const mappings = {
@@ -124,6 +125,9 @@ const mappings = {
     service: 'AirQualitySensor',
     capabilities: {
       [DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI]: {
+        characteristics: ['AirQuality'],
+      },
+      [DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL]: {
         characteristics: ['AirQuality'],
       },
     },
@@ -416,6 +420,31 @@ function toMicrogramPerCubicMeter(value, unit) {
   return value * factor;
 }
 
+// Gladys air quality levels (Matter's six levels) onto HomeKit's five: the two worst Matter
+// levels share HomeKit's worst one.
+const airQualityLevelMapping = {
+  [AIR_QUALITY_LEVEL.UNKNOWN]: HOMEKIT_AIR_QUALITY.UNKNOWN,
+  [AIR_QUALITY_LEVEL.GOOD]: HOMEKIT_AIR_QUALITY.EXCELLENT,
+  [AIR_QUALITY_LEVEL.FAIR]: HOMEKIT_AIR_QUALITY.GOOD,
+  [AIR_QUALITY_LEVEL.MODERATE]: HOMEKIT_AIR_QUALITY.FAIR,
+  [AIR_QUALITY_LEVEL.POOR]: HOMEKIT_AIR_QUALITY.INFERIOR,
+  [AIR_QUALITY_LEVEL.VERY_POOR]: HOMEKIT_AIR_QUALITY.POOR,
+  [AIR_QUALITY_LEVEL.EXTREMELY_POOR]: HOMEKIT_AIR_QUALITY.POOR,
+};
+
+/**
+ * @description Convert a Gladys air quality level (AIR_QUALITY_LEVEL) to the HomeKit AirQuality
+ * characteristic value.
+ * @param {number} airQualityLevel - Air quality level reported by Gladys.
+ * @returns {number} HomeKit air quality, from 0 (unknown) to 5 (poor).
+ * @example
+ * airQualityLevelToAirQuality(AIR_QUALITY_LEVEL.MODERATE);
+ */
+function airQualityLevelToAirQuality(airQualityLevel) {
+  const airQuality = airQualityLevelMapping[airQualityLevel];
+  return airQuality === undefined ? HOMEKIT_AIR_QUALITY.UNKNOWN : airQuality;
+}
+
 /**
  * @description Convert a Gladys air quality index to the HomeKit AirQuality characteristic value.
  * @param {number} airQualityIndex - Air quality index reported by Gladys.
@@ -430,6 +459,21 @@ function aqiToAirQuality(airQualityIndex) {
 
   const band = airQualityIndexMapping.find(({ maxIndex }) => airQualityIndex <= maxIndex);
   return band ? band.airQuality : HOMEKIT_AIR_QUALITY.POOR;
+}
+
+/**
+ * @description Convert a Gladys air quality feature value to the HomeKit AirQuality
+ * characteristic value: an index is bucketed, a level is mapped.
+ * @param {string} featureType - The AIRQUALITY_SENSOR type of the feature.
+ * @param {number} value - The feature value.
+ * @returns {number} HomeKit air quality, from 0 (unknown) to 5 (poor).
+ * @example
+ * toHomeKitAirQuality(DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL, 3);
+ */
+function toHomeKitAirQuality(featureType, value) {
+  return featureType === DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL
+    ? airQualityLevelToAirQuality(value)
+    : aqiToAirQuality(value);
 }
 
 /**
@@ -603,6 +647,8 @@ module.exports = {
   lockStateMapping,
   gasDetectedThresholds,
   aqiToAirQuality,
+  airQualityLevelToAirQuality,
+  toHomeKitAirQuality,
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
   mergedServiceCategories,
