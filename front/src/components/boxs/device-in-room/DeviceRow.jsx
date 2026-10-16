@@ -23,6 +23,7 @@ import AirConditioningSwingDeviceFeature from './device-features/AirConditioning
 import PilotWireModeDeviceFeature from './device-features/PilotWireModeDeviceFeature';
 import LMHVolumeDeviceFeature from './device-features/LMHVolumeDeviceFeature';
 import SirenAlarmModeDeviceFeature from './device-features/SirenAlarmModeDeviceFeature';
+import LightOperatingModeDeviceFeature from './device-features/LightOperatingModeDeviceFeature';
 import PushDeviceFeature from './device-features/PushDeviceFeature';
 import VacuumCleanerDockDeviceFeature from './device-features/VacuumCleanerDockDeviceFeature';
 import CameraMoveDeviceFeature from './device-features/CameraMoveDeviceFeature';
@@ -96,6 +97,11 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   },
   [DEVICE_FEATURE_CATEGORIES.FAN]: {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
+  },
+  // `operating-mode` is a light enum, registered by category so no future category reusing the
+  // type string inherits the light's modes
+  [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
+    [DEVICE_FEATURE_TYPES.LIGHT.OPERATING_MODE]: LightOperatingModeDeviceFeature
   },
   [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: {
     // Hushing the detector's siren is a plain on/off control
