@@ -5,28 +5,17 @@ import style from './deviceImage.css';
 
 // The photo of a device (reserved GLADYS_DEVICE_IMAGE param): an image key
 // whose bytes the integration serves through the image route of the widgets,
-// from the Gladys origin. Fetched once the frame enters the viewport, like the
-// widget images; the frame disappears when the image cannot be served or
-// displayed — a missing photo is not an error worth showing.
+// from the Gladys origin. Fetched on mount: unlike a widget poster grid, a
+// Devices page holds a handful of cards, the core caps the integration at 4
+// image commands in flight and caches each key for an hour, and an observer
+// would need a frame with a reserved size before the bytes arrive. The frame
+// disappears when the image cannot be served or displayed — a missing photo
+// is not an error worth showing.
 class DeviceImage extends Component {
   state = { src: null, error: false };
 
   componentDidMount() {
-    if (typeof IntersectionObserver === 'undefined') {
-      this.load();
-      return;
-    }
-    // guarded just above: a browser without the observer loads at once
-    // eslint-disable-next-line compat/compat
-    this.observer = new IntersectionObserver(entries => {
-      if (entries.some(entry => entry.isIntersecting)) {
-        this.disconnect();
-        this.load();
-      }
-    });
-    if (this.frame) {
-      this.observer.observe(this.frame);
-    }
+    this.load();
   }
 
   // another key (the integration republished the device): the answer of the
@@ -46,14 +35,6 @@ class DeviceImage extends Component {
 
   componentWillUnmount() {
     this.unmounted = true;
-    this.disconnect();
-  }
-
-  disconnect() {
-    if (this.observer) {
-      this.observer.disconnect();
-      this.observer = null;
-    }
   }
 
   load = async () => {
@@ -79,17 +60,12 @@ class DeviceImage extends Component {
   };
 
   render({ alt }, { src, error }) {
-    if (error) {
+    if (error || !src) {
       return null;
     }
     return (
-      <div
-        class="form-group"
-        ref={element => {
-          this.frame = element;
-        }}
-      >
-        {src && <img src={src} alt={alt} loading="lazy" class={style.deviceImage} onError={this.hide} />}
+      <div class="form-group">
+        <img src={src} alt={alt} loading="lazy" class={style.deviceImage} onError={this.hide} />
       </div>
     );
   }

@@ -42,7 +42,8 @@ const DEVICES = [
   device('Unknown module', 'unknown-module', [])
 ];
 
-const deviceCard = name => cy.contains('.card-header', name).parents('.card');
+// closest: the whole page sits in a card too, which holds every device
+const deviceCard = name => cy.contains('.card-header', name).closest('.card');
 
 describe('External integration - device image', () => {
   beforeEach(() => {
@@ -50,16 +51,17 @@ describe('External integration - device image', () => {
 
     cy.intercept('GET', `**/api/v1/external_integration/${SELECTOR}`, INTEGRATION).as('getIntegration');
     cy.intercept('GET', `**/api/v1/service/${SELECTOR}/device*`, DEVICES).as('getDevices');
-    cy.intercept('GET', `**/api/v1/external_integration/${SELECTOR}/image/${IMAGE_KEY}`, { image: IMAGE }).as(
-      'getImage'
-    );
+    // any key: the device without a photo must not hit the route at all
+    cy.intercept('GET', `**/api/v1/external_integration/${SELECTOR}/image/*`, { image: IMAGE }).as('getImage');
   });
 
   it('shows the photo of the device that declares one, and nothing for the other', () => {
     cy.visit(DEVICES_URL);
     cy.wait('@getIntegration');
     cy.wait('@getDevices');
-    cy.wait('@getImage');
+    cy.wait('@getImage')
+      .its('request.url')
+      .should('include', `/image/${IMAGE_KEY}`);
 
     deviceCard('Indoor camera')
       .find('img')
@@ -69,6 +71,8 @@ describe('External integration - device image', () => {
     deviceCard('Unknown module')
       .find('img')
       .should('not.exist');
+    // only the device that declares a photo hits the image route
+    cy.get('@getImage.all').should('have.length', 1);
     // the reserved param is not listed among the technical params
     cy.contains('GLADYS_DEVICE_IMAGE').should('not.exist');
   });
