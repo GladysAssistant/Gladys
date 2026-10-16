@@ -512,6 +512,7 @@ const SYSTEM_VARIABLE_NAMES = {
   // set, the plan-gated features (backups, Enedis, AI) stay off locally
   GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE: 'GLADYS_GATEWAY_PAYMENT_REQUIRED_SINCE',
   TIMEZONE: 'TIMEZONE',
+  TTS_ACTIVE_PROVIDER: 'TTS_ACTIVE_PROVIDER',
   DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: 'DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD',
   DEVICE_BATTERY_LEVEL_WARNING_ENABLED: 'DEVICE_BATTERY_LEVEL_WARNING_ENABLED',
   AI_WEEKLY_DIGEST_ENABLED: 'AI_WEEKLY_DIGEST_ENABLED',
@@ -2207,6 +2208,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     WEATHER_GET: 'external-integration.weather.get',
     WEATHER_GET_IMAGE: 'external-integration.weather.get-image',
     WEATHER_REFRESH: 'external-integration.weather.refresh',
+    TTS_SYNTHESIZE: 'external-integration.tts.synthesize',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
     WEBHOOK_REQUEST: 'external-integration.webhook.request',

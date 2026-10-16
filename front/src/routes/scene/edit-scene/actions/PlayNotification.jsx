@@ -94,6 +94,15 @@ class PlayNotification extends Component {
     }
   };
 
+  getTtsProvider = async () => {
+    try {
+      const { active } = await this.props.httpClient.get('/api/v1/tts/provider');
+      this.setState({ ttsProvider: active });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   refreshSelectedOptions = nextProps => {
     let selectedDeviceFeatureOption = '';
     if (nextProps.action.device && this.state.devicesOptions) {
@@ -115,6 +124,7 @@ class PlayNotification extends Component {
   }
   componentDidMount() {
     this.getOptions();
+    this.getTtsProvider();
   }
   componentWillReceiveProps(nextProps) {
     // The committed volume is authoritative again as soon as it moves, whether the
@@ -164,18 +174,23 @@ class PlayNotification extends Component {
     );
   };
 
-  render(props, { selectedDeviceFeatureOption, devicesOptions, volumeDraft, computedVolume }) {
+  render(props, { selectedDeviceFeatureOption, devicesOptions, volumeDraft, computedVolume, ttsProvider }) {
     const volume = volumeDraft !== undefined ? volumeDraft : props.action.volume;
     const volumeIsSet = volume !== undefined && volume !== null && volume !== '';
     return (
       <div>
-        <GladysPlusUpsell
-          compact
-          icon="fe-volume-2"
-          utmCampaign="scene_action_tts"
-          titleKey="gladysPlusUpsell.tts.title"
-          descriptionKey="gladysPlusUpsell.tts.compactDescription"
-        />
+        {/* the Gladys Plus upsell only makes sense when the instance speaks
+            through Gladys Plus: with a TTS provider integration active, the
+            action works without any Plus subscription */}
+        {(!ttsProvider || ttsProvider === 'gladys-plus') && (
+          <GladysPlusUpsell
+            compact
+            icon="fe-volume-2"
+            utmCampaign="scene_action_tts"
+            titleKey="gladysPlusUpsell.tts.title"
+            descriptionKey="gladysPlusUpsell.tts.compactDescription"
+          />
+        )}
         <p>
           <Text id="editScene.actionsCard.playNotification.description" />
         </p>

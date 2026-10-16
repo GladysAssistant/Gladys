@@ -1236,6 +1236,7 @@
         "notificationWarningText": "Esta integración es un canal de notificación: podrá enviarle mensajes, pero nunca podrá recibir mensajes ni actuar en su nombre (garantía del lado del servidor).",
         "weatherInfoText": "Esta integración es un proveedor meteorológico: una vez instalada, proporcionará el clima que se muestra en Gladys (widget del panel y asistente).",
         "calendarInfoText": "Esta integración es un proveedor de calendarios: una vez instalada, creará calendarios y eventos en Gladys para los usuarios que la activen con su propia cuenta.",
+        "ttsInfoText": "Esta integración es un proveedor de síntesis de voz: una vez instalada, selecciónela como la voz de su instancia en la integración Inteligencia Artificial. Los anuncios se sirven en su red local: los altavoces y navegadores de la misma red pueden reproducirlos.",
         "widgetsTitle": "Widgets del panel",
         "widgetsText": "Esta integración proporciona los siguientes widgets, disponibles para todos los usuarios en el editor del panel:",
         "energyContractsTitle": "Contratos de energía",
@@ -3328,7 +3329,9 @@
       },
       "rateLimit": "Dado que la API de IA no es gratuita, esta integración está limitada a 3000 solicitudes de texto y 500 solicitudes de imagen al mes por cuenta.",
       "notOnGladysPlus": "Dado que la API de IA no es gratuita, esta integración solo está disponible para los usuarios de Gladys Plus.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Haga clic aquí</a> para suscribirse a Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Haga clic aquí</a> para suscribirse a Gladys Plus.",
+      "ttsProvider": "Voz (proveedor de síntesis de voz)",
+      "ttsProviderText": "El proveedor utilizado para hablar: los anuncios de las escenas en sus altavoces y las respuestas del asistente de voz. Gladys Plus funciona en todas partes (incluido el acceso remoto); una integración de proveedor TTS genera la voz localmente y la sirve en su red local."
     },
     "callmebot": {
       "title": "CallMeBot",

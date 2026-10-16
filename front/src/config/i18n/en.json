@@ -1236,6 +1236,7 @@
         "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
         "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant).",
         "calendarInfoText": "This integration is a calendar provider: once installed, it will create calendars and events in Gladys for the users who enable it with their own account.",
+        "ttsInfoText": "This integration is a text-to-speech provider: once installed, select it as the voice of your instance in the Artificial Intelligence integration. Announcements are served on your local network — speakers and browsers on the same network can play them.",
         "widgetsTitle": "Dashboard widgets",
         "widgetsText": "This integration provides the following widgets, available to every user in the dashboard editor:",
         "energyContractsTitle": "Energy contracts",
@@ -3328,7 +3329,9 @@
       },
       "rateLimit": "As the AI API is not free, this integration is limited to 3,000 text requests and 500 image requests per month per account.",
       "notOnGladysPlus": "As the AI API is not free, this integration is only available to Gladys Plus users.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
+      "ttsProvider": "Voice (text-to-speech provider)",
+      "ttsProviderText": "The provider used to speak: scene announcements on your speakers and the voice assistant replies. Gladys Plus works everywhere (including remote access); a TTS provider integration generates the voice locally, served on your local network."
     },
     "callmebot": {
       "title": "CallMeBot",
