@@ -64,6 +64,7 @@ const SupervisionCard = ({
   updateResult,
   uninstallStatus,
   askingUninstall,
+  isAiProvider,
   isActiveAiProvider,
   executeAction,
   onAskUninstall,
@@ -288,9 +289,16 @@ const SupervisionCard = ({
                     <Text id="integration.externalIntegration.supervision.uninstallEnergyWarning" />
                   </p>
                 )}
-                {isActiveAiProvider && (
+                {isAiProvider && isActiveAiProvider === true && (
                   <p>
                     <Text id="integration.externalIntegration.supervision.uninstallAiProviderWarning" />
+                  </p>
+                )}
+                {/* the selection could not be read (null): say so rather than
+                    pretend this integration is not the assistant's provider */}
+                {isAiProvider && typeof isActiveAiProvider !== 'boolean' && (
+                  <p>
+                    <Text id="integration.externalIntegration.supervision.uninstallAiProviderUnknownWarning" />
                   </p>
                 )}
                 <div class="btn-list mb-0">

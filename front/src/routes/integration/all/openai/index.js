@@ -112,14 +112,9 @@ class OpenAIGateway extends Component {
                 <Text id="integration.openai.chatEnabledByDefault" />
               </p>
             )}
-            {/* a non-admin has no provider card below: this is where they
-                learn that their conversations go to a third-party provider */}
-            {!isAdmin && externalProviderActive === true && (
-              <div class="alert alert-info">
-                <i class="fe fe-cpu mr-1" />
-                <Text id="integration.openai.aiProvider.activeNotice" fields={{ name: externalProviderName }} />
-              </div>
-            )}
+            {/* with an external provider the intro names it, for everyone:
+                a non-admin has no provider card below, this is where they
+                learn where their conversations go */}
             <p>
               {externalProviderActive === true ? (
                 <Text

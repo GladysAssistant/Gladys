@@ -44,7 +44,29 @@ class AiProviderCard extends Component {
   }
 
   render({ integration }, { loaded, error, saving, activeSelector }) {
-    const isActive = loaded && activeSelector === integration.selector;
+    if (!loaded) {
+      // the active / unused sentence is only known once the selection is
+      // read: until then the card says it is checking, and on a failed read
+      // it says so (with a retry) rather than "unused"
+      if (error) {
+        return (
+          <div class="alert alert-warning">
+            <i class="fe fe-alert-triangle mr-1" />
+            <Text id="integration.externalIntegration.config.aiProviderError" />{' '}
+            <button type="button" class="btn btn-link p-0 align-baseline" onClick={this.load}>
+              <Text id="integration.openai.aiProvider.retry" />
+            </button>
+          </div>
+        );
+      }
+      return (
+        <div class="alert alert-info">
+          <i class="fe fe-loader mr-1" />
+          <Text id="integration.externalIntegration.config.aiProviderChecking" />
+        </div>
+      );
+    }
+    const isActive = activeSelector === integration.selector;
     return (
       <div class={isActive ? 'alert alert-success' : 'alert alert-info'}>
         <i class={isActive ? 'fe fe-check mr-1' : 'fe fe-cpu mr-1'} />
@@ -61,7 +83,7 @@ class AiProviderCard extends Component {
             <Text id="integration.externalIntegration.config.aiProviderError" />
           </p>
         )}
-        {loaded && !isActive && (
+        {!isActive && (
           <div class="mt-2">
             <button type="button" class="btn btn-primary btn-sm" onClick={this.useAsProvider} disabled={saving}>
               <Text id="integration.externalIntegration.config.aiProviderUseButton" />

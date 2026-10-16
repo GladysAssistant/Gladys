@@ -19,7 +19,10 @@ class ExternalIntegrationSupervisionPage extends Component {
       loadStatus: RequestStatus.Getting,
       actionStatus: null,
       actionError: null,
-      updateResult: null
+      updateResult: null,
+      // unknown until the AI provider selection is read: the status of the
+      // previous integration must not leak onto this one
+      isActiveAiProvider: null
     });
     const { selector } = this.props;
     try {
@@ -43,7 +46,9 @@ class ExternalIntegrationSupervisionPage extends Component {
 
   // whether this AI provider integration is the one the assistant uses:
   // uninstalling it switches the assistant back to Gladys Plus, the
-  // confirmation must say so (capabilities/ai-type.md)
+  // confirmation must say so (capabilities/ai-type.md). true / false once
+  // read, null while unknown (pending or failed): a failed read is not a
+  // "not the provider" answer, the confirmation says it could not check
   loadAiProvider = async selector => {
     try {
       const aiProvider = await this.props.httpClient.get('/api/v1/ai_provider');
@@ -55,6 +60,8 @@ class ExternalIntegrationSupervisionPage extends Component {
       console.error(e);
     }
   };
+
+  isAiProvider = () => get(this.state, 'integration.manifest.type') === 'ai';
 
   executeAction = async action => {
     const previousVersion = this.state.integration && this.state.integration.version;
@@ -84,6 +91,11 @@ class ExternalIntegrationSupervisionPage extends Component {
 
   askUninstall = () => {
     this.setState({ askingUninstall: true });
+    if (this.isAiProvider() && this.state.isActiveAiProvider === null) {
+      // the selection could not be read at load time: try again now, the
+      // confirmation is where the answer matters
+      this.loadAiProvider(this.props.selector);
+    }
   };
 
   cancelUninstall = () => {
@@ -166,7 +178,8 @@ class ExternalIntegrationSupervisionPage extends Component {
             updateResult={state.updateResult}
             uninstallStatus={state.uninstallStatus}
             askingUninstall={state.askingUninstall}
-            isActiveAiProvider={state.isActiveAiProvider === true}
+            isAiProvider={this.isAiProvider()}
+            isActiveAiProvider={state.isActiveAiProvider}
             executeAction={this.executeAction}
             onAskUninstall={this.askUninstall}
             onCancelUninstall={this.cancelUninstall}
