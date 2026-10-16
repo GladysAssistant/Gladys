@@ -1049,6 +1049,10 @@
       },
       "config": {
         "title": "Configuration",
+        "ttsVoiceActive": "This integration is the voice of your instance: scene announcements and voice assistant replies speak through it.",
+        "ttsVoiceActiveNotRunning": "This integration is the voice of your instance, but it is not running: scene announcements and voice assistant replies will fail until it is restarted.",
+        "ttsVoiceInactive": "This integration is not the voice of your instance (the active voice is \"{{name}}\"). Installing it is not enough: select it as the voice to use it.",
+        "ttsVoiceChangeLink": "Change the voice of the instance",
         "docsLink": "Documentation",
         "loadError": "There was an error loading the configuration.",
         "noConfig": "This integration has no configuration options.",
@@ -1236,6 +1240,8 @@
         "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
         "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant).",
         "calendarInfoText": "This integration is a calendar provider: once installed, it will create calendars and events in Gladys for the users who enable it with their own account.",
+        "ttsInfoText": "This integration is a text-to-speech provider: once installed, select it as the voice of your instance in the Artificial Intelligence integration. Announcements are served on your local network — speakers and browsers on the same network can play them.",
+        "ttsInfoLink": "Open the Artificial Intelligence integration",
         "widgetsTitle": "Dashboard widgets",
         "widgetsText": "This integration provides the following widgets, available to every user in the dashboard editor:",
         "energyContractsTitle": "Energy contracts",
@@ -3328,7 +3334,15 @@
       },
       "rateLimit": "As the AI API is not free, this integration is limited to 3,000 text requests and 500 image requests per month per account.",
       "notOnGladysPlus": "As the AI API is not free, this integration is only available to Gladys Plus users.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
+      "ttsProvider": "Voice (text-to-speech provider)",
+      "ttsProviderText": "The provider used to speak: scene announcements on your speakers and the voice assistant replies. Gladys Plus works everywhere (including remote access); a TTS provider integration generates the voice locally, served on your local network.",
+      "ttsProviderPlusNotConnected": "Gladys Plus is not connected: announcements and voice replies will not play. Subscribe to Gladys Plus above, or install a text-to-speech integration and select it here.",
+      "ttsProviderNotRunning": "\"{{name}}\" is not running: announcements and voice replies will fail until it is started again.",
+      "ttsProviderUnavailable": "The selected provider \"{{provider}}\" is no longer available: select another voice.",
+      "ttsProviderInstallHint": "Only Gladys Plus is available. A text-to-speech integration from the catalog can generate the voice locally, without a subscription.",
+      "ttsProviderOpenIntegration": "Open the integration",
+      "ttsProviderBrowseCatalog": "Browse the voice assistant integrations"
     },
     "callmebot": {
       "title": "CallMeBot",
@@ -4000,6 +4014,7 @@
       },
       "playNotification": {
         "description": "This action will make Gladys speak on the selected speaker.",
+        "voiceSettingLink": "Choose the voice of your instance (Artificial Intelligence integration)",
         "deviceLabel": "Speaker",
         "volumeLabel": "Volume",
         "valueTypeSimple": "Simple",
@@ -5210,6 +5225,8 @@
     },
     "tts": {
       "title": "This action requires Gladys Plus",
+      "providerTitle": "This action needs a voice",
+      "providerCompactDescription": "Gladys Plus gives Gladys a natural voice that works everywhere, including remote access. Without a subscription, you can also install a text-to-speech integration and select it as the voice of your instance.",
       "description": "The \"Play on a speaker\" action uses Text-to-Speech APIs via Gladys Plus to make Gladys talk on your speakers (Sonos, Google Cast, etc.) with a natural voice.",
       "compactDescription": "This action uses the Text-to-Speech APIs via Gladys Plus.",
       "feature1": "Natural, multilingual voices",

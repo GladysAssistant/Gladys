@@ -1049,6 +1049,10 @@
       },
       "config": {
         "title": "Configuración",
+        "ttsVoiceActive": "Esta integración es la voz de su instancia: los anuncios de las escenas y las respuestas del asistente de voz pasan por ella.",
+        "ttsVoiceActiveNotRunning": "Esta integración es la voz de su instancia, pero no está en ejecución: los anuncios de las escenas y las respuestas del asistente de voz fallarán hasta que se reinicie.",
+        "ttsVoiceInactive": "Esta integración no es la voz de su instancia (la voz activa es \"{{name}}\"). Instalarla no basta: selecciónela como voz para usarla.",
+        "ttsVoiceChangeLink": "Cambiar la voz de la instancia",
         "docsLink": "Documentación",
         "loadError": "Ocurrió un error al cargar la configuración.",
         "noConfig": "Esta integración no tiene opciones de configuración.",
@@ -1236,6 +1240,8 @@
         "notificationWarningText": "Esta integración es un canal de notificación: podrá enviarle mensajes, pero nunca podrá recibir mensajes ni actuar en su nombre (garantía del lado del servidor).",
         "weatherInfoText": "Esta integración es un proveedor meteorológico: una vez instalada, proporcionará el clima que se muestra en Gladys (widget del panel y asistente).",
         "calendarInfoText": "Esta integración es un proveedor de calendarios: una vez instalada, creará calendarios y eventos en Gladys para los usuarios que la activen con su propia cuenta.",
+        "ttsInfoText": "Esta integración es un proveedor de síntesis de voz: una vez instalada, selecciónela como la voz de su instancia en la integración Inteligencia Artificial. Los anuncios se sirven en su red local: los altavoces y navegadores de la misma red pueden reproducirlos.",
+        "ttsInfoLink": "Abrir la integración Inteligencia Artificial",
         "widgetsTitle": "Widgets del panel",
         "widgetsText": "Esta integración proporciona los siguientes widgets, disponibles para todos los usuarios en el editor del panel:",
         "energyContractsTitle": "Contratos de energía",
@@ -3328,7 +3334,15 @@
       },
       "rateLimit": "Dado que la API de IA no es gratuita, esta integración está limitada a 3000 solicitudes de texto y 500 solicitudes de imagen al mes por cuenta.",
       "notOnGladysPlus": "Dado que la API de IA no es gratuita, esta integración solo está disponible para los usuarios de Gladys Plus.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Haga clic aquí</a> para suscribirse a Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Haga clic aquí</a> para suscribirse a Gladys Plus.",
+      "ttsProvider": "Voz (proveedor de síntesis de voz)",
+      "ttsProviderText": "El proveedor utilizado para hablar: los anuncios de las escenas en sus altavoces y las respuestas del asistente de voz. Gladys Plus funciona en todas partes (incluido el acceso remoto); una integración de proveedor TTS genera la voz localmente y la sirve en su red local.",
+      "ttsProviderPlusNotConnected": "Gladys Plus no está conectado: los anuncios y las respuestas de voz no se reproducirán. Suscríbase a Gladys Plus arriba, o instale una integración de síntesis de voz y selecciónela aquí.",
+      "ttsProviderNotRunning": "\"{{name}}\" no está en ejecución: los anuncios y las respuestas de voz fallarán hasta que se reinicie.",
+      "ttsProviderUnavailable": "El proveedor seleccionado \"{{provider}}\" ya no está disponible: seleccione otra voz.",
+      "ttsProviderInstallHint": "Solo Gladys Plus está disponible. Una integración de síntesis de voz del catálogo puede generar la voz localmente, sin suscripción.",
+      "ttsProviderOpenIntegration": "Abrir la integración",
+      "ttsProviderBrowseCatalog": "Explorar las integraciones de asistentes de voz"
     },
     "callmebot": {
       "title": "CallMeBot",
@@ -4000,6 +4014,7 @@
       },
       "playNotification": {
         "description": "Esta acción hará que Gladys hable en el altavoz seleccionado.",
+        "voiceSettingLink": "Elegir la voz de su instancia (integración Inteligencia Artificial)",
         "deviceLabel": "Altavoz",
         "volumeLabel": "Volumen",
         "valueTypeSimple": "Simple",
@@ -5210,6 +5225,8 @@
     },
     "tts": {
       "title": "Esta acción requiere Gladys Plus",
+      "providerTitle": "Esta acción necesita una voz",
+      "providerCompactDescription": "Gladys Plus da a Gladys una voz natural que funciona en todas partes, incluido el acceso remoto. Sin suscripción, también puede instalar una integración de síntesis de voz y seleccionarla como la voz de su instancia.",
       "description": "La acción \"Reproducir en un altavoz\" utiliza las API de conversión de texto a voz a través de Gladys Plus para que Gladys hable en sus altavoces (Sonos, Google Cast, etc.) con una voz natural.",
       "compactDescription": "Esta acción utiliza las API de conversión de texto a voz a través de Gladys Plus.",
       "feature1": "Voces naturales y multilingües",

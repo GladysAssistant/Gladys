@@ -1049,6 +1049,10 @@
       },
       "config": {
         "title": "Konfiguration",
+        "ttsVoiceActive": "Diese Integration ist die Stimme Ihrer Instanz: Szenen-Ansagen und Antworten des Sprachassistenten laufen über sie.",
+        "ttsVoiceActiveNotRunning": "Diese Integration ist die Stimme Ihrer Instanz, läuft aber nicht: Szenen-Ansagen und Antworten des Sprachassistenten schlagen fehl, bis sie neu gestartet wird.",
+        "ttsVoiceInactive": "Diese Integration ist nicht die Stimme Ihrer Instanz (die aktive Stimme ist „{{name}}“). Die Installation genügt nicht: Wählen Sie sie als Stimme aus, um sie zu verwenden.",
+        "ttsVoiceChangeLink": "Stimme der Instanz ändern",
         "docsLink": "Dokumentation",
         "loadError": "Beim Laden der Konfiguration ist ein Fehler aufgetreten.",
         "noConfig": "Diese Integration hat keine Konfigurationsoptionen.",
@@ -1236,6 +1240,8 @@
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
         "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent).",
         "calendarInfoText": "Diese Integration ist ein Kalenderanbieter: Nach der Installation erstellt sie Kalender und Termine in Gladys für die Benutzer, die sie mit ihrem eigenen Konto aktivieren.",
+        "ttsInfoText": "Diese Integration ist ein Sprachsynthese-Anbieter: Wählen Sie sie nach der Installation als Stimme Ihrer Instanz in der Integration Künstliche Intelligenz aus. Ansagen werden über Ihr lokales Netzwerk bereitgestellt — Lautsprecher und Browser im selben Netzwerk können sie abspielen.",
+        "ttsInfoLink": "Integration Künstliche Intelligenz öffnen",
         "widgetsTitle": "Dashboard-Widgets",
         "widgetsText": "Diese Integration stellt die folgenden Widgets bereit, die allen Benutzern im Dashboard-Editor zur Verfügung stehen:",
         "energyContractsTitle": "Energieverträge",
@@ -3328,7 +3334,15 @@
       },
       "rateLimit": "Da die KI-API nicht kostenlos ist, ist diese Integration auf 3.000 Textanfragen und 500 Bildanfragen pro Monat und Konto begrenzt.",
       "notOnGladysPlus": "Da die KI-API nicht kostenlos ist, ist diese Integration nur für Gladys-Plus-Benutzer verfügbar.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren.",
+      "ttsProvider": "Stimme (Sprachsynthese-Anbieter)",
+      "ttsProviderText": "Der Anbieter, der zum Sprechen verwendet wird: Szenen-Ansagen auf Ihren Lautsprechern und die Antworten des Sprachassistenten. Gladys Plus funktioniert überall (auch beim Fernzugriff); eine TTS-Anbieter-Integration erzeugt die Stimme lokal und stellt sie über Ihr lokales Netzwerk bereit.",
+      "ttsProviderPlusNotConnected": "Gladys Plus ist nicht verbunden: Ansagen und Sprachantworten werden nicht abgespielt. Abonnieren Sie Gladys Plus oben, oder installieren Sie eine Sprachsynthese-Integration und wählen Sie sie hier aus.",
+      "ttsProviderNotRunning": "„{{name}}“ läuft nicht: Ansagen und Sprachantworten schlagen fehl, bis sie wieder gestartet ist.",
+      "ttsProviderUnavailable": "Der ausgewählte Anbieter „{{provider}}“ ist nicht mehr verfügbar: Wählen Sie eine andere Stimme.",
+      "ttsProviderInstallHint": "Nur Gladys Plus ist verfügbar. Eine Sprachsynthese-Integration aus dem Katalog kann die Stimme lokal erzeugen, ohne Abonnement.",
+      "ttsProviderOpenIntegration": "Integration öffnen",
+      "ttsProviderBrowseCatalog": "Sprachassistenten-Integrationen durchsuchen"
     },
     "callmebot": {
       "title": "CallMeBot",
@@ -4000,6 +4014,7 @@
       },
       "playNotification": {
         "description": "Diese Aktion lässt Gladys auf dem ausgewählten Lautsprecher sprechen.",
+        "voiceSettingLink": "Die Stimme Ihrer Instanz wählen (Integration Künstliche Intelligenz)",
         "deviceLabel": "Lautsprecher",
         "volumeLabel": "Volumen",
         "valueTypeSimple": "Einfach",
@@ -5210,6 +5225,8 @@
     },
     "tts": {
       "title": "Diese Aktion erfordert Gladys Plus",
+      "providerTitle": "Diese Aktion braucht eine Stimme",
+      "providerCompactDescription": "Gladys Plus gibt Gladys eine natürliche Stimme, die überall funktioniert, auch beim Fernzugriff. Ohne Abonnement können Sie auch eine Sprachsynthese-Integration installieren und sie als Stimme Ihrer Instanz auswählen.",
       "description": "Die Aktion „Auf einem Lautsprecher abspielen“ nutzt Text-to-Speech-APIs über Gladys Plus, damit Gladys auf deinen Lautsprechern (Sonos, Google Cast usw.) mit einer natürlichen Stimme spricht.",
       "compactDescription": "Diese Aktion nutzt die Text-to-Speech-APIs über Gladys Plus.",
       "feature1": "Natürliche, mehrsprachige Stimmen",

@@ -996,8 +996,9 @@ const actionsFunc = {
       volume = Math.min(100, Math.max(0, Math.round(volume)));
     }
 
-    // Get TTS URL
-    const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
+    // Get the TTS URL from the active provider (Gladys Plus by default, or
+    // any TTS provider integration — see gladys.tts)
+    const { url } = await self.tts.getSpeechUrl({ text: messageWithVariables });
     // Play TTS Notification on device
     await self.device.setValue(device, deviceFeature, url, { volume });
   },

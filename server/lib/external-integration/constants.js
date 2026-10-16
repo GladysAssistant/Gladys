@@ -233,6 +233,29 @@ const MAX_WEATHER_ALERT_DESCRIPTION_LENGTH = 5000;
 // Minimal interval between two accepted freshness nudges of one
 // integration (B.18 point 5); beyond it the nudge is silently dropped.
 const WEATHER_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
+// TTS providers (capabilities/tts-type.md): tts.synthesize is a documented
+// exception to the 5s ack rule, alongside camera.get-image and action.run
+// (local synthesis on a Pi is slow). The audio comes back in
+// command-result.data as a data-URI; the core validates the content type
+// (what Sonos/Cast/browsers actually play — the served URL extension is
+// derived from it) and the decoded size before serving a byte. The text is
+// capped by the core BEFORE the relay (truncation, not an error: a long AI
+// answer must speak its beginning rather than fail).
+const TTS_SYNTHESIZE_TIMEOUT_MS = 30 * 1000;
+const MAX_TTS_AUDIO_SIZE_BYTES = 5 * 1024 * 1024;
+// base64 encodes 3 bytes in 4 chars: a data-URI longer than this cannot
+// decode under the size cap, and is rejected BEFORE the decode allocates
+// (the normalizeWeatherImage rule — the payload comes from unaudited code).
+// The prefix allowance covers "<content type>;base64," for the longest
+// accepted content type.
+const MAX_TTS_AUDIO_BASE64_LENGTH = Math.ceil(MAX_TTS_AUDIO_SIZE_BYTES / 3) * 4 + 4 + 32;
+const MAX_TTS_TEXT_LENGTH = 2000;
+const TTS_AUDIO_CONTENT_TYPES = {
+  'audio/mpeg': 'mp3',
+  'audio/wav': 'wav',
+  'audio/ogg': 'ogg',
+  'audio/aac': 'aac',
+};
 // Provider images (B.18 point 6): declared as metadata in the pivot
 // payload, bytes fetched on demand and validated before entering the core.
 const MAX_WEATHER_IMAGES = 3;
@@ -626,6 +649,11 @@ module.exports = {
   MAX_CAMERA_IMAGE_SIZE,
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
+  TTS_SYNTHESIZE_TIMEOUT_MS,
+  MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_AUDIO_BASE64_LENGTH,
+  MAX_TTS_TEXT_LENGTH,
+  TTS_AUDIO_CONTENT_TYPES,
   MAX_WEATHER_HOURS,
   MAX_WEATHER_DAYS,
   MAX_WEATHER_ALERTS,
