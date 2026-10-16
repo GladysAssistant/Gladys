@@ -5,10 +5,11 @@ const { fake, assert } = sinon;
 
 const { BadParameters, NotFoundError, ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 const { Error422 } = require('../../../utils/httpErrors');
-const { WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES, AI_CHAT_PURPOSES } = require('../../../utils/constants');
 const { validateManifest } = require('../../../lib/external-integration/externalIntegration.validateManifest');
 const {
   AI_CHAT_TIMEOUT_MS,
+  AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS,
   MAX_AI_CHAT_IN_FLIGHT,
   MAX_AI_CHAT_CONTENT_CHARS,
   MAX_AI_CHAT_TOOL_CALLS,
@@ -58,6 +59,44 @@ describe('externalIntegration.aiChat', () => {
       { timeoutMs: AI_CHAT_TIMEOUT_MS },
     );
     // nothing left in flight once answered
+    expect(externalIntegration.aiChatInFlight.has(service.id)).to.equal(false);
+  });
+
+  it('should relay an intent classification with its short timeout', async () => {
+    // the router runs before every chat turn and swallows its failures: a
+    // stuck provider must fail it fast, never add a second full deadline
+    const { externalIntegration } = buildSupervisor();
+    const service = await seedAiService();
+    const completion = { choices: [{ message: { role: 'assistant', content: '["lights"]' } }] };
+    externalIntegration.sendCommand = fake.resolves({ success: true, data: completion });
+    const request = { messages: [], purpose: AI_CHAT_PURPOSES.INTENT_CLASSIFICATION };
+    await externalIntegration.aiChat(service, request);
+    assert.calledOnceWithExactly(
+      externalIntegration.sendCommand,
+      service,
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.AI_CHAT,
+      { request },
+      { timeoutMs: AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS },
+    );
+    expect(AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS).to.be.below(AI_CHAT_TIMEOUT_MS);
+  });
+
+  it('should settle a request pending across an uninstall without corrupting the counter', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const service = await seedAiService();
+    const completion = { choices: [{ message: { role: 'assistant', content: 'ok' } }] };
+    let resolvePending;
+    externalIntegration.sendCommand = fake(
+      () =>
+        new Promise((resolve) => {
+          resolvePending = resolve;
+        }),
+    );
+    const pending = externalIntegration.aiChat(service, { messages: [] });
+    // uninstall drops the entry while the request is still pending
+    externalIntegration.aiChatInFlight.delete(service.id);
+    resolvePending({ success: true, data: completion });
+    expect(await pending).to.deep.equal(completion);
     expect(externalIntegration.aiChatInFlight.has(service.id)).to.equal(false);
   });
 

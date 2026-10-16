@@ -224,6 +224,12 @@ const WEATHER_GET_TIMEOUT_MS = 15 * 1000;
 // completion request — reasoning models are slow and one request can carry
 // a full tool-calling context — hence the dedicated ack deadline.
 const AI_CHAT_TIMEOUT_MS = 120 * 1000;
+// The intent router (purpose intent-classification) runs before every chat
+// turn and swallows its own failures (the loop then falls back to all
+// tools): a stuck provider must fail it fast instead of adding a second
+// full deadline in front of the user, and a classification is a short
+// prompt that never needs the reasoning budget above.
+const AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS = 20 * 1000;
 // Requests in flight per AI provider: an ai.ask scene fired on every motion
 // must not flood a CPU-bound local model; beyond the cap the request fails
 // at once instead of queueing behind the others until the ack deadline.
@@ -643,6 +649,7 @@ module.exports = {
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
   AI_CHAT_TIMEOUT_MS,
+  AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS,
   MAX_AI_CHAT_IN_FLIGHT,
   MAX_AI_CHAT_CONTENT_CHARS,
   MAX_AI_CHAT_TOOL_CALLS,

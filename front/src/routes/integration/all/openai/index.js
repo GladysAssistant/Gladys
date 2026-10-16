@@ -29,8 +29,14 @@ class OpenAIGateway extends Component {
   // of this page. null = unknown (request pending or failed): the Plus
   // messages only render once the absence of a provider is confirmed
   getAiProvider = async () => {
+    const generation = this.providerSelectionGeneration;
     try {
       const response = await this.props.httpClient.get('/api/v1/ai_provider');
+      // a selection saved while this request was in flight is newer than
+      // its answer: the stale selector must not overwrite it
+      if (generation !== this.providerSelectionGeneration) {
+        return;
+      }
       this.setState({
         externalProviderActive: Boolean(response.selector)
       });
@@ -42,6 +48,7 @@ class OpenAIGateway extends Component {
   // AiProviderSettings saves the selection itself: this callback keeps the
   // upsell/rate-limit messaging of this page in sync without a reload
   onProviderChange = selector => {
+    this.providerSelectionGeneration += 1;
     this.setState({ externalProviderActive: Boolean(selector) });
   };
 
@@ -53,6 +60,8 @@ class OpenAIGateway extends Component {
   constructor(props) {
     super(props);
     this.props = props;
+    // bumped on every selection change, to discard older provider answers
+    this.providerSelectionGeneration = 0;
     this.state = {
       gladysPlusConnected: null,
       externalProviderActive: null

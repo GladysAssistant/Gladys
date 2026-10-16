@@ -1,7 +1,8 @@
 const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
-const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { WEBSOCKET_MESSAGE_TYPES, AI_CHAT_PURPOSES } = require('../../utils/constants');
 const {
   AI_CHAT_TIMEOUT_MS,
+  AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS,
   MAX_AI_CHAT_IN_FLIGHT,
   MAX_AI_CHAT_CONTENT_CHARS,
   MAX_AI_CHAT_TOOL_CALLS,
@@ -91,8 +92,9 @@ function normalizeAiCompletion(completion) {
  * (MCP tool calling, prompts, history) stays in the core: the integration is
  * a thin adapter to whatever provider it wants. Reasoning models are slow and
  * one request can carry a full tool-calling context, hence the dedicated
- * 120 s ack deadline; and a local CPU model cannot absorb a burst, hence the
- * cap on requests in flight per integration (see constants).
+ * 120 s ack deadline (20 s for the intent router, which must fail fast);
+ * and a local CPU model cannot absorb a burst, hence the cap on requests in
+ * flight per integration (see constants).
  * @param {object} service - The external integration service.
  * @param {object} request - OpenAI-compatible chat completion request body.
  * @returns {Promise<object>} Resolve with the bounded OpenAI-compatible completion.
@@ -105,16 +107,22 @@ async function aiChat(service, request) {
     throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_AI_PROVIDER_BUSY');
   }
   this.aiChatInFlight.set(service.id, inFlight + 1);
+  const timeoutMs =
+    request && request.purpose === AI_CHAT_PURPOSES.INTENT_CLASSIFICATION
+      ? AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS
+      : AI_CHAT_TIMEOUT_MS;
   let result;
   try {
     result = await this.sendCommand(
       service,
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.AI_CHAT,
       { request },
-      { timeoutMs: AI_CHAT_TIMEOUT_MS },
+      { timeoutMs },
     );
   } finally {
-    const remaining = this.aiChatInFlight.get(service.id) - 1;
+    // the entry may already be gone when a request settles after the
+    // integration was uninstalled: never rely on NaN arithmetic there
+    const remaining = (this.aiChatInFlight.get(service.id) || 0) - 1;
     if (remaining > 0) {
       this.aiChatInFlight.set(service.id, remaining);
     } else {
