@@ -1,8 +1,9 @@
 const logger = require('../../../utils/logger');
+const { DEVICE_FEATURE_TYPES, THERMOSTAT_MODE } = require('../../../utils/constants');
 const { getThermostatFeature, stopExternalThermostat } = require('./thermostat.applySchedules');
-const { buildParamsConfig, getFeatureBySelector, isExternal } = require('./thermostat.deviceConfig');
+const { buildParamsConfig, getFeatureBySelector, getRunningMode, isExternal } = require('./thermostat.deviceConfig');
 const { holdExpiry } = require('./thermostat.setValue');
-const { getManualHold, setManualHold } = require('./thermostat.state');
+const { getFeature, getManualHold, isStopped, setManualHold } = require('./thermostat.state');
 
 /**
  * @description Invalidate the caches derived from this service's devices: the
@@ -16,11 +17,12 @@ const { getManualHold, setManualHold } = require('./thermostat.state');
 function invalidateDeviceCaches() {
   this.windowSelectorsCache = null;
   this.targetSelectorsCache = null;
+  this.powerSelectorsCache = null;
 }
 
 /**
  * @description Called after a thermostat device is updated. A device saved
- * through the generic device route can carry a new THERMOSTAT_WINDOW_FEATURE,
+ * through the generic device route can carry new THERMOSTAT_WINDOW_FEATURE sensors,
  * and the cached selectors would keep pointing at the previous sensor until the
  * next create or delete: the immediate cut-off on window opening would ignore
  * the new sensor entirely (the minute loop re-reads the params on every tick and
@@ -48,26 +50,31 @@ async function postUpdate() {
  * const selectors = await thermostatHandler.getWindowSelectors();
  */
 async function getWindowSelectors() {
-  if (this.windowSelectorsCache) {
+  if (this.windowSelectorsCache && this.targetSelectorsCache && this.powerSelectorsCache) {
     return this.windowSelectorsCache;
   }
   const devices = await this.gladys.device.get({ service: 'thermostat' });
   const selectors = new Set();
-  // The setpoints of the external thermostats are collected in the same pass:
-  // both sets answer a NEW_STATE, which fires for every feature in the house, so
-  // a second query here would double the cost of every state change.
+  // The setpoints and the powers of the external thermostats are collected in
+  // the same pass: every set answers a NEW_STATE, which fires for every feature
+  // in the house, so another query here would add to the cost of every state change.
   const targets = new Set();
+  const powers = new Set();
   (devices || []).forEach((device) => {
     const config = buildParamsConfig(device);
-    if (config && config.window_feature) {
-      selectors.add(config.window_feature);
+    if (config) {
+      config.window_features.forEach((selector) => selectors.add(selector));
     }
     if (config && config.target_feature) {
       targets.add(config.target_feature);
     }
+    if (config && config.power_feature) {
+      powers.add(config.power_feature);
+    }
   });
   this.windowSelectorsCache = selectors;
   this.targetSelectorsCache = targets;
+  this.powerSelectorsCache = powers;
   return selectors;
 }
 
@@ -89,7 +96,61 @@ async function getTargetSelectors() {
 }
 
 /**
- * @description Seed the observed setpoints from what the database already knows,
+ * @description The set of power selectors of the external thermostats, for the
+ * same reason as `getTargetSelectors`.
+ * @returns {Promise<Set<string>>} Configured power selectors.
+ * @example
+ * const selectors = await thermostatHandler.getPowerSelectors();
+ */
+async function getPowerSelectors() {
+  if (!this.powerSelectorsCache) {
+    // Every cache is filled by the same pass over the devices.
+    await getWindowSelectors.call(this);
+  }
+  return this.powerSelectorsCache;
+}
+
+/**
+ * @description Seed the observed values of some selectors from their stored
+ * `last_value`, and forget the marks of the selectors no thermostat drives any more.
+ * @param {object} gladys - Gladys instance.
+ * @param {Set<string>} selectors - The selectors driven now.
+ * @param {Map<string, number>} observed - The last value observed on each selector.
+ * @param {Map<string, number>} selfWritten - The last value this service wrote on each selector.
+ * @returns {Promise<void>}
+ * @example
+ * await seedObservedValues(gladys, targetSelectors, observedSetpoints, selfWrittenSetpoints);
+ */
+async function seedObservedValues(gladys, selectors, observed, selfWritten) {
+  // A selector no thermostat drives any more has nothing left to compare
+  // against, and its marks would only accumulate.
+  [...observed.keys()]
+    .filter((selector) => !selectors.has(selector))
+    .forEach((selector) => {
+      observed.delete(selector);
+      selfWritten.delete(selector);
+    });
+  await Promise.all(
+    [...selectors].map(async (selector) => {
+      // A thermostat driven since the service started already has a reference,
+      // which is fresher than the database's.
+      if (observed.has(selector)) {
+        return;
+      }
+      const owner = await getFeatureBySelector(gladys, selector);
+      const lastValue = owner ? owner.feature.last_value : null;
+      // A feature that never reported has no reference to offer: the first
+      // report will establish it. Nor does one that reported while it was being
+      // read: that report is fresher than the database's value.
+      if (lastValue !== null && lastValue !== undefined && !observed.has(selector)) {
+        observed.set(selector, lastValue);
+      }
+    }),
+  );
+}
+
+/**
+ * @description Seed the observed setpoints and powers from what the database already knows,
  * before any report can arrive.
  *
  * A hold is armed on a value that differs from the previous report, and both
@@ -111,6 +172,10 @@ async function getTargetSelectors() {
  * Seeded here rather than read when a report arrives: `device.saveState`
  * persists that report on the same event, so a read from the listener races the
  * write and may come back already carrying the new value.
+ *
+ * The power of an air conditioner needs the same reference, for the same
+ * reason: a unit re-reporting after a restart the power the programme had cut
+ * must not read as a unit switched off from its remote.
  * @returns {Promise<void>}
  * @example
  * await thermostatHandler.primeObservedSetpoints();
@@ -118,31 +183,9 @@ async function getTargetSelectors() {
 async function primeObservedSetpoints() {
   try {
     const targetSelectors = await getTargetSelectors.call(this);
-    // A selector no thermostat targets any more has nothing left to compare
-    // against, and its marks would only accumulate.
-    [...this.observedSetpoints.keys()]
-      .filter((selector) => !targetSelectors.has(selector))
-      .forEach((selector) => {
-        this.observedSetpoints.delete(selector);
-        this.selfWrittenSetpoints.delete(selector);
-      });
-    await Promise.all(
-      [...targetSelectors].map(async (selector) => {
-        // A thermostat driven since the service started already has a reference,
-        // which is fresher than the database's.
-        if (this.observedSetpoints.has(selector)) {
-          return;
-        }
-        const owner = await getFeatureBySelector(this.gladys, selector);
-        const lastValue = owner ? owner.feature.last_value : null;
-        // A feature that never reported has no reference to offer: the first
-        // report will establish it. Nor does one that reported while it was being
-        // read: that report is fresher than the database's value.
-        if (lastValue !== null && lastValue !== undefined && !this.observedSetpoints.has(selector)) {
-          this.observedSetpoints.set(selector, lastValue);
-        }
-      }),
-    );
+    const powerSelectors = await getPowerSelectors.call(this);
+    await seedObservedValues(this.gladys, targetSelectors, this.observedSetpoints, this.selfWrittenSetpoints);
+    await seedObservedValues(this.gladys, powerSelectors, this.observedPowers, this.selfWrittenPowers);
   } catch (e) {
     // Never block the service from starting: without a reference the listener
     // simply establishes one on the first report, which is the previous
@@ -250,6 +293,69 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
 }
 
 /**
+ * @description Follow a power switched on the real device itself — an air
+ * conditioner's remote, its vendor app.
+ *
+ * Without this the minute loop powers a unit switched off from its remote back
+ * on within a minute, for as long as a preset or a hold is in force. A power cut
+ * on the device stops the thermostat exactly like its Off button in the widget,
+ * and powering a stopped unit on from its remote starts the thermostat again.
+ * A change is told apart from the reports of the powers this service wrote by
+ * the same two marks as a setpoint (C.0.1).
+ * @param {string} changedSelector - Selector of the feature that changed.
+ * @param {number} newValue - The value it changed to.
+ * @returns {Promise<void>}
+ * @example
+ * await onExternalPowerChanged.call(handler, 'melcloud-power', 0);
+ */
+async function onExternalPowerChanged(changedSelector, newValue) {
+  if (newValue === null || newValue === undefined) {
+    return;
+  }
+  const value = Number(newValue);
+  try {
+    // Cheap rejection first, as for the setpoints.
+    const powerSelectors = await getPowerSelectors.call(this);
+    if (!powerSelectors.has(changedSelector)) {
+      return;
+    }
+    // Recorded before the self-write check, for the reason given on the setpoint.
+    const previouslyObserved = this.observedPowers.get(changedSelector);
+    this.observedPowers.set(changedSelector, value);
+    if (this.selfWrittenPowers.get(changedSelector) === value) {
+      return;
+    }
+    if (previouslyObserved === undefined || Number(previouslyObserved) === value) {
+      return;
+    }
+    const devices = await this.gladys.device.get({ service: 'thermostat' });
+    const driven = devices.filter((device) =>
+      device.params.some((param) => param.name === 'THERMOSTAT_POWER_FEATURE' && param.value === changedSelector),
+    );
+    await Promise.all(
+      driven.map(async (device) => {
+        const modeFeature = getFeature(device, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
+        if (!modeFeature) {
+          return;
+        }
+        // Written through `setValue`, like a press on the widget: the stop and
+        // the start then follow the one path the widget and the scenes take
+        // (D.0) — the hold dropped on a stop, the programme's own stop lifted.
+        if (value === 0 && !isStopped(device)) {
+          logger.info(`Thermostat: ${changedSelector} powered off from the device itself, stopping ${device.selector}`);
+          await this.setValue(device, modeFeature, THERMOSTAT_MODE.OFF);
+        } else if (value !== 0 && isStopped(device)) {
+          logger.info(`Thermostat: ${changedSelector} powered on from the device itself, starting ${device.selector}`);
+          await this.setValue(device, modeFeature, getRunningMode(buildParamsConfig(device)));
+        }
+      }),
+    );
+  } catch (e) {
+    logger.warn(`Thermostat: could not follow a power change made on the device: ${e.message}`);
+  }
+}
+
+/**
  * @description Called when a device feature state changes.
  * If the feature is a configured window sensor and the window is now open,
  * immediately turn off the associated heating switch.
@@ -280,6 +386,8 @@ async function onDeviceNewState(event) {
   // a minute, silently reverting the change and fighting the device for ever.
   // It is held exactly like a turn of the widget dial (section D).
   await onExternalSetpointChanged.call(this, changedSelector, newValue);
+  // The same goes for the power of an air conditioner switched from its remote.
+  await onExternalPowerChanged.call(this, changedSelector, newValue);
 
   if (newValue !== 0) {
     return;
@@ -301,8 +409,10 @@ async function onDeviceNewState(event) {
         // buildParamsConfig already returns null fields for the params it misses,
         // so the checks below cover both an unconfigured and an absent config.
         const paramsConfig = buildParamsConfig(device) || {};
-        const { window_feature: windowFeature, switch_feature: switchFeature } = paramsConfig;
-        if (windowFeature !== changedSelector) {
+        // Several opening sensors may stop one thermostat (A.1.1): any of them
+        // opening is enough.
+        const { window_features: windowFeatures = [], switch_feature: switchFeature } = paramsConfig;
+        if (!windowFeatures.includes(changedSelector)) {
           return;
         }
         // An external thermostat carries no setpoint feature and no switch: it is
@@ -317,6 +427,7 @@ async function onDeviceNewState(event) {
               paramsConfig,
               `window open, ${device.selector}`,
               this.selfWrittenSetpoints,
+              this.selfWrittenPowers,
             );
           } catch (e) {
             logger.warn(`Thermostat: Failed to stop an external thermostat on window open: ${e.message}`);
@@ -349,8 +460,10 @@ async function onDeviceNewState(event) {
 module.exports = {
   onDeviceNewState,
   onExternalSetpointChanged,
+  onExternalPowerChanged,
   primeObservedSetpoints,
   getTargetSelectors,
+  getPowerSelectors,
   getWindowSelectors,
   invalidateDeviceCaches,
   postUpdate,

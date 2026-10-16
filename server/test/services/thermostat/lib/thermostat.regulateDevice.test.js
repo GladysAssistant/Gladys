@@ -1193,3 +1193,135 @@ describe('thermostat.regulateDevice - config defaults', () => {
     expect(value).to.equal(0);
   });
 });
+
+// A large room, or an open-plan floor heated as one, has several probes and
+// several openings (A.1.1): the loop regulates on the average temperature, and
+// any opening stops it.
+describe('thermostat.regulateDevice - several sensors', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  const twoProbes = (salon, kitchen, extra = {}) => ({
+    'salon-temp': { selector: 'salon-temp', last_value: salon },
+    'kitchen-temp': { selector: 'kitchen-temp', last_value: kitchen },
+    'heater-switch': { selector: 'heater-switch', last_value: 0 },
+    ...extra,
+  });
+  const twoProbeParams = (overrides = {}) =>
+    baseParams({ THERMOSTAT_TEMPERATURE_FEATURE: '["salon-temp","kitchen-temp"]', ...overrides });
+
+  it('should heat on the average of the probes', async () => {
+    // 22 and 18 average to 20, below 21 minus the band: heat, although the salon
+    // probe alone reads warm enough.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: twoProbes(22, 18) });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+  });
+
+  it('should leave a probe with no value out of the average', async () => {
+    // Counted as 0, the silent probe would drag the average to 11 and heat.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: twoProbes(22, null, { 'heater-switch': { selector: 'heater-switch', last_value: 1 } }),
+    });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(0);
+  });
+
+  it('should convert each probe into the thermostat unit before averaging', async () => {
+    // 68 °F is 20 °C: with a 22 °C probe the average is 21, inside the band, so
+    // the heater keeps running. Averaged raw, 45 would turn it off.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: {
+        'salon-temp': { selector: 'salon-temp', last_value: 22, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+        'kitchen-temp': { selector: 'kitchen-temp', last_value: 68, unit: DEVICE_FEATURE_UNITS.FAHRENHEIT },
+        'heater-switch': { selector: 'heater-switch', last_value: 1 },
+      },
+    });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    assert.notCalled(gladys.device.setValue);
+  });
+
+  it('should make no switch decision when no probe has a value', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: twoProbes(null, null) });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    assert.notCalled(gladys.device.setValue);
+  });
+
+  it('should leave a probe that cannot be read out of the average', async () => {
+    // The salon probe cannot be looked up: the kitchen alone still regulates.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: twoProbes(22, 18),
+      getOverride: (query) =>
+        query && query.device_feature_selectors === 'salon-temp' ? Promise.reject(new Error('locked')) : undefined,
+    });
+
+    await regulate(mod, gladys, { features: [setpointFeature()], params: twoProbeParams() });
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+  });
+
+  it('should regulate a manual hold on the average too', async () => {
+    // 24 and 18 average to 21, below 23 minus the band: heat, although the
+    // first probe alone reads warm enough.
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: twoProbes(24, 18) });
+
+    await regulate(mod, gladys, {
+      features: [setpointFeature({ last_value: 23 })],
+      params: twoProbeParams({
+        THERMOSTAT_MANUAL_SETPOINT: '23',
+        THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
+      }),
+    });
+
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(1);
+  });
+
+  it('should leave the switch alone on a manual hold when no probe has a value', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({ features: twoProbes(null, null) });
+
+    await regulate(mod, gladys, {
+      features: [setpointFeature({ last_value: 23 })],
+      params: twoProbeParams({
+        THERMOSTAT_MANUAL_SETPOINT: '23',
+        THERMOSTAT_MANUAL_UNTIL: String(Date.now() + 60 * 60 * 1000),
+      }),
+    });
+
+    assert.notCalled(gladys.device.setValue);
+  });
+
+  it('should cut the switch when any of several windows is open', async () => {
+    const mod = load(fullDaySchedule('comfort'));
+    const gladys = buildGladys({
+      features: {
+        ...standardFeatures({ temp: 18, switchOn: true }),
+        'salon-window': { selector: 'salon-window', last_value: 1 },
+        'kitchen-door': { selector: 'kitchen-door', last_value: 0 },
+      },
+    });
+
+    await regulate(mod, gladys, {
+      features: [setpointFeature()],
+      params: baseParams({ THERMOSTAT_WINDOW_FEATURE: '["salon-window","kitchen-door"]' }),
+    });
+
+    expect(gladys.device.setValue.firstCall.args[1].selector).to.equal('heater-switch');
+    expect(gladys.device.setValue.firstCall.args[2]).to.equal(0);
+  });
+});

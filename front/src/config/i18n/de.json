@@ -3512,6 +3512,8 @@
         "nameLabel": "Name",
         "namePlaceholder": "z.B. Wohnzimmer Thermostat",
         "roomLabel": "Raum",
+        "showAllRoomsLabel": "Geräte aller Räume anzeigen",
+        "showAllRoomsHelp": "Die Listen unten bieten nur die Geräte dieses Raums an. Erweitere sie, wenn der beheizte Bereich mehrere Räume umfasst, etwa ein offenes Wohnzimmer mit Küche.",
         "modeLabel": "Verwendung",
         "typeLabel": "Thermostattyp",
         "tuningSection": "Feineinstellung",
@@ -3527,7 +3529,9 @@
         "stateFeatureLabel": "Heizzustand (optional)",
         "stateFeatureHelp": "Zeigt an, ob das Gerät gerade läuft. Wird sowohl als Betriebszustand als auch als Kesselkontakt akzeptiert. Leer lassen, wenn Ihr Thermostat diese Information nicht liefert.",
         "modeFeatureLabel": "Betriebsmodus (optional)",
-        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden. Gladys schaltet ihn auf Aus, wenn das Thermostat gestoppt wird oder ein Aus-Zeitfenster greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt.",
+        "modeFeatureHelp": "Der Modus des echten Thermostats (aus, heizen, kühlen, automatisch), sofern vorhanden — der Modus einer Klimaanlage funktioniert ebenfalls. Bei einem Thermostat schaltet Gladys ihn auf Aus, wenn das Thermostat gestoppt wird oder ein Aus-Zeitfenster greift, und stellt ihn wieder her, sobald ein Sollwert übernimmt. Der Modus einer Klimaanlage kennt kein Aus: Sie wird über ihre Stromversorgung gestoppt, die dann angegeben werden muss.",
+        "powerFeatureLabel": "Stromversorgung (optional)",
+        "powerFeatureHelp": "Der Schalter, der das echte Gerät ein- und ausschaltet, etwa die Stromversorgung einer Klimaanlage oder Wärmepumpe. Gladys schaltet ihn aus, wenn das Thermostat gestoppt wird, ein Fenster geöffnet wird oder ein Aus-Zeitfenster greift, und wieder ein, sobald ein Sollwert übernimmt. Für eine Klimaanlage nötig, deren Modus kein Aus kennt.",
         "mode": {
           "heating": "Heizen",
           "cooling": "Kühlen"
@@ -3549,8 +3553,9 @@
         "minTempPlaceholder": "z.B. 5",
         "maxTempLabel": "Max. Temperatur",
         "maxTempPlaceholder": "z.B. 35",
-        "temperatureFeatureLabel": "Temperatursensor",
-        "temperatureFeatureHelp": "Wähle den Sensor, der die Umgebungstemperatur misst. Ein Sensor, der eine andere Einheit als das Thermostat meldet, wird automatisch umgerechnet; bei einem Sensor ohne angegebene Einheit wird die Einheit des Thermostats angenommen.",
+        "temperatureFeatureLabel": "Temperatursensoren",
+        "temperatureFeatureHelp": "Wähle den Sensor, der die Umgebungstemperatur misst, oder mehrere: Das Thermostat verwendet dann ihren Durchschnitt. Ein Sensor, der eine andere Einheit als das Thermostat meldet, wird automatisch umgerechnet; bei einem Sensor ohne angegebene Einheit wird die Einheit des Thermostats angenommen.",
+        "addTemperatureFeature": "Temperatursensor hinzufügen",
         "humidityFeatureLabel": "Feuchtigkeitssensor",
         "humidityFeatureHelp": "Optional. Wird im Thermostat-Widget angezeigt.",
         "switchFeatureLabel": "Schalter (Aktor)",
@@ -3558,11 +3563,13 @@
           "heating": "Der Schalter, der zum Heizen des Raums ein- und ausgeschaltet wird.",
           "cooling": "Der Schalter, der zum Kühlen des Raums ein- und ausgeschaltet wird."
         },
-        "windowFeatureLabel": "Fensterkontakt",
+        "windowFeatureLabel": "Fensterkontakte",
         "windowFeatureHelp": {
-          "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",
-          "cooling": "Optional. Wenn ein Fenster geöffnet ist, wird die Kühlung automatisch abgeschaltet."
+          "heating": "Optional. Sobald eines der ausgewählten Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",
+          "cooling": "Optional. Sobald eines der ausgewählten Fenster geöffnet ist, wird die Kühlung automatisch abgeschaltet."
         },
+        "addWindowFeature": "Öffnungssensor hinzufügen",
+        "removeFeature": "Entfernen",
         "hysteresisStartLabel": "Einschaltschwelle",
         "hysteresisStartHelp": {
           "heating": "Die Heizung schaltet ein, wenn die Temperatur unter (Sollwert − Einschaltschwelle) liegt. Z. B. Sollwert 21 °C, Schwelle 0,5 °C → schaltet unter 20,5 °C ein.",
