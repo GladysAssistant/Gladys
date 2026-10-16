@@ -400,6 +400,19 @@ describe('zigbee2mqtt configureContainer', () => {
     });
   });
 
+  it('it should reset a serial port that is not the one bound in the container (host path of the dongle)', async () => {
+    // PREPARE
+    const emberContent = fs.readFileSync(emberConfigFilePath, 'utf8');
+    fs.writeFileSync(configFilePath, emberContent.replace('/dev/ttyACM0', '/dev/ttyUSB0'));
+    const config = { z2mAdapterMode: 'usb', z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.EMBER][0] };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    expect(resultContent).to.equal(emberContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
   it('it should remove serial adapter (unknown adapter)', async () => {
     // PREPARE
     fs.copyFileSync(ezspConfigFilePath, configFilePath);
