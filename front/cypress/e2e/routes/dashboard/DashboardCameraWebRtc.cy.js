@@ -210,8 +210,12 @@ describe('Dashboard camera box WebRTC live view', () => {
     // the user leaves (tab hidden, page closed) before the camera is known
     cy.window().then(win => win.dispatchEvent(new win.Event('pagehide')));
     cy.then(releaseCamera);
-    // the box's own load and the one Play asked for
-    cy.wait(['@getCamera', '@getCamera']);
+    // one request: the HttpClient shares the box's in-flight GET with the one Play asked for
+    cy.wait('@getCamera');
+    cy.get('@startWebRtc.all').should('have.length', 0);
+    cy.window()
+      .its('fakePeerConnections')
+      .should('have.length', 0);
 
     // a new Play on the loaded camera starts one live view: the abandoned attempt started none
     cy.get('.card-options .fe-airplay').click();
