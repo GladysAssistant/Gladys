@@ -38,7 +38,10 @@ const device = (name, deviceSelector, params) => ({
 });
 
 const DEVICES = [
-  device('Indoor camera', 'indoor-camera', [{ name: 'GLADYS_DEVICE_IMAGE', value: IMAGE_KEY }]),
+  device('Indoor camera', 'indoor-camera', [
+    { name: 'GLADYS_DEVICE_IMAGE', value: IMAGE_KEY },
+    { name: 'room_id', value: '1234567890' }
+  ]),
   device('Unknown module', 'unknown-module', [])
 ];
 
@@ -73,7 +76,16 @@ describe('External integration - device image', () => {
       .should('not.exist');
     // only the device that declares a photo hits the image route
     cy.get('@getImage.all').should('have.length', 1);
-    // the reserved param is not listed among the technical params
-    cy.contains('GLADYS_DEVICE_IMAGE').should('not.exist');
+    // the reserved param is not listed among the technical params: one
+    // entry counted, and the unfolded table holds room_id only
+    deviceCard('Indoor camera').within(() => {
+      cy.get('a .fe-chevron-right')
+        .parent()
+        .should('contain', '(1)')
+        .click();
+      cy.get('table')
+        .should('contain', 'room_id')
+        .and('not.contain', 'GLADYS_DEVICE_IMAGE');
+    });
   });
 });
