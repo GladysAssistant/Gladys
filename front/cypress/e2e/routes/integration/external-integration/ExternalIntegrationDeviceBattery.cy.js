@@ -36,6 +36,21 @@ const batteryFeature = (deviceSelector, lastValue) => ({
   last_value: lastValue
 });
 
+// binary charging state, in the same battery category as the level
+const chargingFeature = (deviceSelector, lastValue) => ({
+  name: 'Charging',
+  selector: `${deviceSelector}-charging`,
+  external_id: `${deviceSelector}:charging`,
+  category: 'battery',
+  type: 'charging',
+  read_only: true,
+  keep_history: true,
+  has_feedback: false,
+  min: 0,
+  max: 1,
+  last_value: lastValue
+});
+
 const temperatureFeature = deviceSelector => ({
   name: 'Temperature',
   selector: `${deviceSelector}-temperature`,
@@ -68,6 +83,9 @@ const DEVICES = [
     temperatureFeature('outdoor-module')
   ]),
   device('Rain gauge', 'rain-gauge', [batteryFeature('rain-gauge', 8)]),
+  device('Empty module', 'empty-module', [batteryFeature('empty-module', 0)]),
+  // the charging state listed first must not be taken for the level
+  device('Robot vacuum', 'robot-vacuum', [chargingFeature('robot-vacuum', 1), batteryFeature('robot-vacuum', 64)]),
   device('Wind gauge', 'wind-gauge', [batteryFeature('wind-gauge', null)]),
   device('Indoor module', 'indoor-module', [temperatureFeature('indoor-module')])
 ];
@@ -96,6 +114,19 @@ describe('External integration - device battery level', () => {
     cardHeader('Rain gauge').within(() => {
       cy.get('.tag.tag-danger')
         .should('contain', '8')
+        .find('.fe-battery')
+        .should('exist');
+    });
+    // 0 % is a level, not a missing value
+    cardHeader('Empty module').within(() => {
+      cy.get('.tag.tag-danger')
+        .should('contain', '0')
+        .find('.fe-battery')
+        .should('exist');
+    });
+    cardHeader('Robot vacuum').within(() => {
+      cy.get('.tag.tag-green')
+        .should('contain', '64')
         .find('.fe-battery')
         .should('exist');
     });

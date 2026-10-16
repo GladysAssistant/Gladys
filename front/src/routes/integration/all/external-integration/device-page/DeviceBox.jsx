@@ -10,7 +10,7 @@ import DeviceParams from '../components/DeviceParams';
 import TransportBadge from '../components/TransportBadge';
 import { getDeviceTransport, getDeviceTransportMessage, isDeviceTransportDegraded } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 
 /**
  * @description Last battery level reported for the device, like the native
@@ -18,11 +18,14 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
  * @param {object} device - The device, with its features.
  * @returns {number|null} The battery percentage, null when none is known yet.
  * @example
- * getBatteryLevel({ features: [{ category: 'battery', last_value: 76 }] }); // 76
+ * getBatteryLevel({ features: [{ category: 'battery', type: 'integer', last_value: 76 }] }); // 76
  */
 const getBatteryLevel = device => {
+  // the battery category also holds the binary charging state: only the
+  // percent level is the badge
   const batteryFeature = (device.features || []).find(
-    feature => feature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
+    feature =>
+      feature.category === DEVICE_FEATURE_CATEGORIES.BATTERY && feature.type === DEVICE_FEATURE_TYPES.BATTERY.INTEGER
   );
   const batteryLevel = get(batteryFeature, 'last_value');
   return typeof batteryLevel === 'number' ? batteryLevel : null;
