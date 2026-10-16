@@ -52,6 +52,16 @@ describe('thermostat.isWindowOpenLongEnough', () => {
     expect(openedAt.get('window-sensor')).to.equal(NOW);
   });
 
+  // `new Date(null)` is the epoch: read as a date, it would cut at once.
+  it('should take an undated change as opening now', () => {
+    const openedAt = new Map();
+
+    expect(isWindowOpenLongEnough(open({ last_value_changed: null }), 'window-sensor', 60, openedAt, NOW)).to.equal(
+      false,
+    );
+    expect(openedAt.get('window-sensor')).to.equal(NOW);
+  });
+
   it('should not take a change dated in the future for a longer opening', () => {
     const openedAt = new Map();
     const feature = open({ last_value_changed: new Date(NOW + 60 * 1000) });
@@ -190,6 +200,35 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
     await opens(mod, handler);
 
     expect(handler.windowOpenedAt.get('window-sensor')).to.equal(NOW + 10 * 1000);
+  });
+
+  // Nothing is left to cut once the window has closed: the check waiting on it
+  // is dropped rather than run as a pass of every thermostat.
+  it('should drop the pending check when the window closes', async () => {
+    const mod = loadModule();
+    const handler = buildHandler(60);
+    handler.windowTimers.set('other-thermostat', { timer: setTimeout(() => {}, 60 * 1000), window: 'other-window' });
+
+    await opens(mod, handler);
+    await clock.tickAsync(10 * 1000);
+    await closes(mod, handler);
+    await clock.tickAsync(60 * 1000);
+
+    assert.notCalled(handler.triggerApplySchedules);
+    expect([...handler.windowTimers.keys()]).to.deep.equal(['other-thermostat']);
+  });
+
+  it('should replace the pending check of a thermostat when it is armed again', async () => {
+    const mod = loadModule();
+    const handler = buildHandler(60);
+    const stale = fake();
+    handler.windowTimers.set('thermostat-living-room', { timer: setTimeout(stale, 5 * 1000), window: 'window-sensor' });
+
+    await opens(mod, handler);
+    await clock.tickAsync(60 * 1000);
+
+    assert.notCalled(stale);
+    assert.calledOnce(handler.triggerApplySchedules);
   });
 
   it('should cut at once a window already open for longer than the delay', async () => {

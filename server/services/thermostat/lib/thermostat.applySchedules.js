@@ -500,7 +500,12 @@ function isWindowOpenLongEnough(feature, windowSelector, delaySeconds, openedAt,
   }
   let since = openedAt ? openedAt.get(windowSelector) : undefined;
   if (since === undefined) {
-    const changed = new Date(feature.last_value_changed).getTime();
+    // `new Date(null)` is the epoch, not an invalid date: a sensor that never
+    // dated a change would read as open for ever and cut at once.
+    const changed =
+      feature.last_value_changed === null || feature.last_value_changed === undefined
+        ? NaN
+        : new Date(feature.last_value_changed).getTime();
     since = Number.isFinite(changed) ? Math.min(changed, now) : now;
     if (openedAt) {
       openedAt.set(windowSelector, since);

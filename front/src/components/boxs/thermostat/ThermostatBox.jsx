@@ -523,7 +523,12 @@ class ThermostatBox extends Component {
               feat.last_value !== null &&
               feat.last_value !== undefined
             ) {
-              const changed = new Date(feat.last_value_changed).getTime();
+              // `new Date(null)` is the epoch: an undated change would show the
+              // banner at once.
+              const changed =
+                feat.last_value_changed === null || feat.last_value_changed === undefined
+                  ? NaN
+                  : new Date(feat.last_value_changed).getTime();
               this.showWindowSensor(feat.last_value === 0, Number.isFinite(changed) ? changed : Date.now());
             }
             if (
