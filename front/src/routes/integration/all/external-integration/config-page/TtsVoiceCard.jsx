@@ -37,22 +37,24 @@ class TtsVoiceCard extends Component {
     }
     const isActiveVoice = active === serviceName;
     const isActiveButStopped = isActiveVoice && Boolean(activeStatus) && !WORKING_STATUSES.includes(activeStatus);
-    let textClass = 'text-muted';
+    // the stopped state uses the same alert box as the Voice card of the
+    // Artificial Intelligence page (plain yellow text reads poorly on a card)
+    let containerClass = 'text-muted';
     let icon = 'fe-volume-x';
     let textId = 'integration.externalIntegration.config.ttsVoiceInactive';
     if (isActiveButStopped) {
-      textClass = 'text-warning';
+      containerClass = 'alert alert-warning mb-0';
       icon = 'fe-alert-triangle';
       textId = 'integration.externalIntegration.config.ttsVoiceActiveNotRunning';
     } else if (isActiveVoice) {
-      textClass = 'text-success';
+      containerClass = 'text-success';
       icon = 'fe-check-circle';
       textId = 'integration.externalIntegration.config.ttsVoiceActive';
     }
     return (
       <div class="card">
         <div class="card-body">
-          <div class={textClass}>
+          <div class={containerClass}>
             <i class={`fe ${icon} mr-1`} />
             <Text id={textId} fields={{ name: activeName }} />
           </div>
