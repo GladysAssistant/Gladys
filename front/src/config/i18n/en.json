@@ -1245,6 +1245,7 @@
         "energyContractsDelegatedText": "A template priced by the integration computes your energy costs itself: the costs of these contracts are only computed while the integration is running, and stop being computed if it is uninstalled.",
         "providerInfoText": "This integration manages no device: it provides dashboard widgets. Configure it here, then add its widgets from the dashboard editor.",
         "providerEnergyInfoText": "This integration manages no device: it provides energy contract templates and tariff calendars. Configure it here, then pick its contracts from the energy monitoring page.",
+        "aiWarningText": "This integration is an AI provider: if you select it as the AI provider of the instance, it will receive all the assistant conversations (messages, history, device states returned by tools, chat images), and its answers will drive the assistant's actions on your home.",
         "sceneDeclarationsTitle": "Scene triggers and actions",
         "sceneDeclarationsText": "This integration adds {{triggers}} trigger(s) and {{actions}} action(s) to the scene editor.",
         "sceneTriggerPrefix": "Trigger:",
@@ -3308,6 +3309,19 @@
         "description": "Advanced feature: download the JSON context sent to the AI (system prompt, last 50 conversation messages, and available tools). Useful for reproducing and diagnosing user issues.",
         "downloadButton": "Download JSON context for debug",
         "error": "Unable to generate debug context. Make sure the MCP service is running."
+      },
+      "aiProvider": {
+        "title": "AI provider",
+        "description": "Gladys uses Gladys Plus as its AI provider by default. You can route the assistant (chat, intent routing, scene \"Ask AI\" actions, weekly digest) through an installed AI provider integration instead: Claude, DeepSeek, OpenAI, a local model... The provider's own settings (API key, model) are on its integration page.",
+        "selectLabel": "Provider used for AI requests",
+        "gladysPlusOption": "Gladys Plus (default)",
+        "trustWarning": "All the assistant conversations (messages, history, device states returned by tools, chat images) are sent to this provider, and its answers drive the assistant's actions on your home. If the provider is down, AI requests fail: they are never rerouted to Gladys Plus.",
+        "noProvider": "No AI provider integration installed. Install one from the integrations catalog to use another provider than Gladys Plus.",
+        "loadError": "Unable to load the AI provider settings.",
+        "retry": "Retry",
+        "saveError": "Unable to save the AI provider. Please try again.",
+        "providerNotRunning": "This AI provider integration is not running: AI requests will fail until it is started.",
+        "providerNotRunningLink": "Open the integration page"
       },
       "weeklyDigest": {
         "title": "Weekly home digest",

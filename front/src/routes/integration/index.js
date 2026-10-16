@@ -19,7 +19,7 @@ import { RequestStatus } from '../../utils/consts';
 // `provider` (capability-only external integrations) joins device and weather:
 // installing is an admin act, the widgets themselves reach every user through
 // the dashboard picker
-const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'provider'];
+const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'provider', 'ai'];
 // homekit exposes the whole house to a hub; free-mobile is a single global SMS
 // account whose page reads service-wide credentials. Neither has anything
 // per-user, so a non-admin has no business on those pages.

@@ -56,7 +56,7 @@ const { validateEnergyContractsField } = require('./externalIntegration.validate
 // triggers and actions tomorrow) — no device surface, none of the
 // core-consumed interfaces of the other types, at least one capability field
 // required (capabilities/dashboard-widgets.md, section 1).
-const MANIFEST_TYPES = ['device', 'communication', 'weather', 'calendar', 'provider'];
+const MANIFEST_TYPES = ['device', 'communication', 'weather', 'calendar', 'provider', 'ai'];
 const PROVIDER_TYPE = 'provider';
 const MANIFEST_FIELDS = [
   'manifest_version',

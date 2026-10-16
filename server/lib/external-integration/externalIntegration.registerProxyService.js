@@ -146,6 +146,19 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // AI provider integrations expose ai.chat(request): gateway.aiChat routes
+  // every OpenAI-compatible request (chat loop, intent router, weekly
+  // digest) here when the integration is the selected AI provider
+  // (AI_PROVIDER variable, capabilities/ai-type.md) instead of Gladys Plus.
+  // The completion is bounded before it enters the loop (aiChat).
+  const isAiProvider = service.manifest && service.manifest.type === 'ai';
+  const aiCapability = isAiProvider
+    ? {
+        ai: Object.freeze({
+          chat: async (request) => this.aiChat(service, request),
+        }),
+      }
+    : {};
   // every external integration exposes the generic scene capability, like
   // device.setValue: the scene engine relays a reached action through it
   // (scene.actions.js, the exact path mqtt.send takes) and the supervisor
@@ -167,6 +180,7 @@ function registerProxyService(service) {
     },
     ...messageCapability,
     ...weatherCapability,
+    ...aiCapability,
     ...sceneCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {

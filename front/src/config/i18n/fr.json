@@ -1245,6 +1245,7 @@
         "energyContractsDelegatedText": "Un modèle calculé par l’intégration calcule lui-même vos coûts d’énergie : les coûts de ces contrats ne sont calculés que lorsque l’intégration fonctionne, et ne le sont plus si elle est désinstallée.",
         "providerInfoText": "Cette intégration ne gère aucun appareil : elle fournit des widgets de tableau de bord. Configurez-la ici, puis ajoutez ses widgets depuis l'éditeur de tableau de bord.",
         "providerEnergyInfoText": "Cette intégration ne gère aucun appareil : elle fournit des modèles de contrats d'énergie et des calendriers tarifaires. Configurez-la ici, puis choisissez ses contrats depuis la page de suivi énergétique.",
+        "aiWarningText": "Cette intégration est un fournisseur d'IA : si vous la sélectionnez comme fournisseur d'IA de l'instance, elle recevra toutes les conversations avec l'assistant (messages, historique, états des appareils renvoyés par les outils, images du chat), et ses réponses piloteront les actions de l'assistant sur votre logement.",
         "sceneDeclarationsTitle": "Déclencheurs et actions de scènes",
         "sceneDeclarationsText": "Cette intégration ajoute {{triggers}} déclencheur(s) et {{actions}} action(s) à l'éditeur de scènes.",
         "sceneTriggerPrefix": "Déclencheur :",
@@ -3308,6 +3309,19 @@
         "description": "Fonctionnalité avancée : télécharge le contexte JSON transmis à l'IA (prompt système, 50 derniers messages de la conversation et outils disponibles). Utile pour reproduire et diagnostiquer les problèmes rencontrés par les utilisateurs.",
         "downloadButton": "Télécharger le contexte JSON pour debug",
         "error": "Impossible de générer le contexte de debug. Vérifiez que le service MCP est démarré."
+      },
+      "aiProvider": {
+        "title": "Fournisseur d'IA",
+        "description": "Gladys utilise Gladys Plus comme fournisseur d'IA par défaut. Vous pouvez faire passer l'assistant (chat, routage d'intention, actions « Demander à l'IA » des scènes, bilan hebdomadaire) par une intégration fournisseur d'IA installée : Claude, DeepSeek, OpenAI, un modèle local... Les réglages propres au fournisseur (clé d'API, modèle) se trouvent sur la page de son intégration.",
+        "selectLabel": "Fournisseur utilisé pour les requêtes d'IA",
+        "gladysPlusOption": "Gladys Plus (par défaut)",
+        "trustWarning": "Toutes les conversations avec l'assistant (messages, historique, états des appareils renvoyés par les outils, images du chat) sont envoyées à ce fournisseur, et ses réponses pilotent les actions de l'assistant sur votre logement. Si le fournisseur est indisponible, les requêtes d'IA échouent : elles ne sont jamais redirigées vers Gladys Plus.",
+        "noProvider": "Aucune intégration fournisseur d'IA installée. Installez-en une depuis le catalogue d'intégrations pour utiliser un autre fournisseur que Gladys Plus.",
+        "loadError": "Impossible de charger les réglages du fournisseur d'IA.",
+        "retry": "Réessayer",
+        "saveError": "Impossible d'enregistrer le fournisseur d'IA. Veuillez réessayer.",
+        "providerNotRunning": "Cette intégration fournisseur d'IA n'est pas démarrée : les requêtes d'IA échoueront tant qu'elle ne tourne pas.",
+        "providerNotRunningLink": "Ouvrir la page de l'intégration"
       },
       "weeklyDigest": {
         "title": "Bilan hebdomadaire de la maison",

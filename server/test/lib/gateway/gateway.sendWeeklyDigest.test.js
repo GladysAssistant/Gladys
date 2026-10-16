@@ -4,7 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { fake, assert } = sinon;
 
 const { Error429 } = require('../../../utils/httpErrors');
-const { USER_ROLE, AI_CHAT_PURPOSES } = require('../../../utils/constants');
+const { USER_ROLE, AI_CHAT_PURPOSES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const {
   sendWeeklyDigest,
   isSystemVariableEnabled,
@@ -17,7 +17,8 @@ describe('gateway.sendWeeklyDigest', () => {
   beforeEach(() => {
     gateway = {
       variable: {
-        getValue: fake.resolves('1'),
+        // digest enabled, no external AI provider selected
+        getValue: fake(async (name) => (name === SYSTEM_VARIABLE_NAMES.AI_PROVIDER ? null : '1')),
       },
       getStatus: fake.resolves({ configured: true }),
       device: {},
@@ -69,6 +70,21 @@ describe('gateway.sendWeeklyDigest', () => {
     expect(result).to.deep.equal({ sent: 0 });
     assert.notCalled(gateway.buildWeeklyDigestData);
     assert.notCalled(gateway.aiChat);
+  });
+
+  it('should send the digest through an external AI provider without Gladys Plus', async () => {
+    // the digest follows the selected provider (gateway.aiChat): neither a
+    // Plus account nor an active subscription gates it then
+    gateway.variable.getValue = fake(async (name) =>
+      name === SYSTEM_VARIABLE_NAMES.AI_PROVIDER ? 'ext-dev-claude-provider-demo' : '1',
+    );
+    gateway.getStatus = fake.resolves({ configured: false, subscription_active: false });
+
+    const result = await sendWeeklyDigest.call(gateway);
+
+    expect(result).to.deep.equal({ sent: 1 });
+    assert.notCalled(gateway.getStatus);
+    assert.calledOnce(gateway.aiChat);
   });
 
   it('should send digest to admins', async () => {

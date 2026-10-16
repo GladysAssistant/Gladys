@@ -100,26 +100,41 @@ class AskAI extends Component {
     super(props);
     this.props = props;
     this.state = {
-      selectedOption: ''
+      selectedOption: '',
+      externalProviderActive: null
     };
   }
+  // the ai.ask action follows the selected AI provider: with an external
+  // provider the scene works without Gladys Plus, so the upsell only shows
+  // once the absence of a provider is confirmed (null = unknown)
+  getAiProvider = async () => {
+    try {
+      const response = await this.props.httpClient.get('/api/v1/ai_provider');
+      this.setState({ externalProviderActive: Boolean(response.selector) });
+    } catch (e) {
+      console.error(e);
+    }
+  };
   componentDidMount() {
     this.getOptions();
+    this.getAiProvider();
     this.setVariables();
   }
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
   }
-  render(props, { selectedUserOption, userOptions, selectedCameraOption, cameraOptions }) {
+  render(props, { selectedUserOption, userOptions, selectedCameraOption, cameraOptions, externalProviderActive }) {
     return (
       <div>
-        <GladysPlusUpsell
-          compact
-          icon="fe-cpu"
-          utmCampaign="scene_action_ask_ai"
-          titleKey="gladysPlusUpsell.askAi.title"
-          descriptionKey="gladysPlusUpsell.askAi.compactDescription"
-        />
+        {externalProviderActive === false && (
+          <GladysPlusUpsell
+            compact
+            icon="fe-cpu"
+            utmCampaign="scene_action_ask_ai"
+            titleKey="gladysPlusUpsell.askAi.title"
+            descriptionKey="gladysPlusUpsell.askAi.compactDescription"
+          />
+        )}
         <p>
           <Text id="editScene.actionsCard.askAi.description" />
         </p>

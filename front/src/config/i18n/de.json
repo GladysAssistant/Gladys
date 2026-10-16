@@ -1245,6 +1245,7 @@
         "energyContractsDelegatedText": "Eine von der Integration berechnete Vorlage berechnet Ihre Energiekosten selbst: Die Kosten dieser Verträge werden nur berechnet, solange die Integration läuft, und nicht mehr, wenn sie deinstalliert wird.",
         "providerInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Dashboard-Widgets bereit. Konfigurieren Sie sie hier und fügen Sie ihre Widgets dann im Dashboard-Editor hinzu.",
         "providerEnergyInfoText": "Diese Integration verwaltet keine Geräte: Sie stellt Energievertragsvorlagen und Tarifkalender bereit. Konfigurieren Sie sie hier und wählen Sie ihre Verträge dann auf der Seite Energieüberwachung aus.",
+        "aiWarningText": "Diese Integration ist ein KI-Anbieter: Wenn Sie sie als KI-Anbieter der Instanz auswählen, erhält sie alle Unterhaltungen mit dem Assistenten (Nachrichten, Verlauf, von Werkzeugen zurückgegebene Gerätezustände, Chat-Bilder), und ihre Antworten steuern die Aktionen des Assistenten in Ihrem Zuhause.",
         "sceneDeclarationsTitle": "Szenen-Auslöser und -Aktionen",
         "sceneDeclarationsText": "Diese Integration fügt dem Szenen-Editor {{triggers}} Auslöser und {{actions}} Aktion(en) hinzu.",
         "sceneTriggerPrefix": "Auslöser:",
@@ -3308,6 +3309,19 @@
         "description": "Erweiterte Funktion: lädt den JSON-Kontext herunter, der an die KI gesendet wird (System-Prompt, die letzten 50 Nachrichten der Unterhaltung und verfügbare Tools). Nützlich zum Reproduzieren und Diagnostizieren von Benutzerproblemen.",
         "downloadButton": "JSON-Kontext für Debug herunterladen",
         "error": "Debug-Kontext konnte nicht erstellt werden. Stelle sicher, dass der MCP-Dienst läuft."
+      },
+      "aiProvider": {
+        "title": "KI-Anbieter",
+        "description": "Gladys verwendet standardmäßig Gladys Plus als KI-Anbieter. Sie können den Assistenten (Chat, Absichtserkennung, „KI fragen“-Aktionen der Szenen, Wochenrückblick) stattdessen über eine installierte KI-Anbieter-Integration leiten: Claude, DeepSeek, OpenAI, ein lokales Modell... Die Anbieter-Einstellungen (API-Schlüssel, Modell) finden Sie auf der Seite der Integration.",
+        "selectLabel": "Für KI-Anfragen verwendeter Anbieter",
+        "gladysPlusOption": "Gladys Plus (Standard)",
+        "trustWarning": "Alle Unterhaltungen mit dem Assistenten (Nachrichten, Verlauf, von Werkzeugen zurückgegebene Gerätezustände, Chat-Bilder) werden an diesen Anbieter gesendet, und seine Antworten steuern die Aktionen des Assistenten in Ihrem Zuhause. Ist der Anbieter nicht erreichbar, schlagen KI-Anfragen fehl: Sie werden nie an Gladys Plus umgeleitet.",
+        "noProvider": "Keine KI-Anbieter-Integration installiert. Installieren Sie eine aus dem Integrationskatalog, um einen anderen Anbieter als Gladys Plus zu verwenden.",
+        "loadError": "Die KI-Anbieter-Einstellungen konnten nicht geladen werden.",
+        "retry": "Erneut versuchen",
+        "saveError": "Der KI-Anbieter konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+        "providerNotRunning": "Diese KI-Anbieter-Integration läuft nicht: KI-Anfragen schlagen fehl, solange sie nicht gestartet ist.",
+        "providerNotRunningLink": "Integrationsseite öffnen"
       },
       "weeklyDigest": {
         "title": "Wöchentlicher Hausbericht",

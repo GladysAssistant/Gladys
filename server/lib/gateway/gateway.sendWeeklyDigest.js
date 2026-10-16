@@ -49,15 +49,21 @@ async function sendWeeklyDigest({ force = false } = {}) {
     }
   }
 
-  const status = await this.getStatus();
-  if (!status.configured) {
-    logger.debug('Weekly digest skipped: Gladys Plus is not configured.');
-    return { sent: 0 };
-  }
+  // the digest follows the selected AI provider through aiChat: with an
+  // external provider (capabilities/ai-type.md) it needs no Gladys Plus
+  // account, and a paused Plus subscription does not gate it either
+  const aiProviderSelector = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+  if (!aiProviderSelector) {
+    const status = await this.getStatus();
+    if (!status.configured) {
+      logger.debug('Weekly digest skipped: Gladys Plus is not configured.');
+      return { sent: 0 };
+    }
 
-  if (status.subscription_active === false) {
-    logger.info('Weekly digest skipped: Gladys Plus subscription is not paid.');
-    return { sent: 0 };
+    if (status.subscription_active === false) {
+      logger.info('Weekly digest skipped: Gladys Plus subscription is not paid.');
+      return { sent: 0 };
+    }
   }
 
   if (!this.device || !this.scene) {
