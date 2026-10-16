@@ -63,6 +63,19 @@ describe('Dashboard camera box WebRTC live view', () => {
     win.RTCPeerConnection = FakePeerConnection;
   };
 
+  // Holds every device request of the camera until the returned release is called: the protocol is
+  // then certainly unknown when Play is pressed, whatever the speed of the CI machine
+  const holdCameraDeviceRequests = () => {
+    let release;
+    const released = new Cypress.Promise(resolve => {
+      release = resolve;
+    });
+    cy.intercept({ method: 'GET', pathname: `/api/v1/device/${CAMERA}` }, req =>
+      released.then(() => req.continue())
+    ).as('getCamera');
+    return () => release();
+  };
+
   beforeEach(() => {
     cy.login();
     setLanguage('en');
@@ -172,15 +185,12 @@ describe('Dashboard camera box WebRTC live view', () => {
     cy.intercept({ method: 'POST', pathname: '/api/v1/service/rtsp-camera/**' }, { statusCode: 500, body: {} }).as(
       'rtspCamera'
     );
-    // a slow device request: the protocol is unknown when Play is pressed
-    cy.intercept({ method: 'GET', pathname: `/api/v1/device/${CAMERA}` }, req => {
-      req.on('response', res => {
-        res.setDelay(1500);
-      });
-    });
+    const releaseCamera = holdCameraDeviceRequests();
     cy.visit('/dashboard/test', { onBeforeLoad: installFakePeerConnection });
 
+    // the protocol is unknown: Play must load the camera first, not fall back to rtsp-camera
     cy.get('.card-options .fe-airplay').click();
+    cy.then(releaseCamera);
 
     cy.wait('@startWebRtc')
       .its('request.body')
@@ -189,24 +199,27 @@ describe('Dashboard camera box WebRTC live view', () => {
   });
 
   it('does not start a live view left while the camera was still loading', () => {
-    cy.intercept({ method: 'POST', pathname: `/api/v1/camera/${CAMERA}/webrtc/start` }, { body: {} }).as('startWebRtc');
-    cy.intercept({ method: 'GET', pathname: `/api/v1/device/${CAMERA}` }, req => {
-      req.on('response', res => {
-        res.setDelay(1500);
-      });
-    }).as('getCamera');
+    cy.intercept(
+      { method: 'POST', pathname: `/api/v1/camera/${CAMERA}/webrtc/start` },
+      { body: { session_id: 'session-3', sdp_answer: ANSWER } }
+    ).as('startWebRtc');
+    const releaseCamera = holdCameraDeviceRequests();
     cy.visit('/dashboard/test', { onBeforeLoad: installFakePeerConnection });
 
     cy.get('.card-options .fe-airplay').click();
     // the user leaves (tab hidden, page closed) before the camera is known
     cy.window().then(win => win.dispatchEvent(new win.Event('pagehide')));
-    cy.wait('@getCamera');
-    cy.wait('@getCamera');
+    cy.then(releaseCamera);
+    // the box's own load and the one Play asked for
+    cy.wait(['@getCamera', '@getCamera']);
 
-    cy.get('@startWebRtc.all').should('have.length', 0);
+    // a new Play on the loaded camera starts one live view: the abandoned attempt started none
+    cy.get('.card-options .fe-airplay').click();
+    cy.wait('@startWebRtc');
+    cy.get('@startWebRtc.all').should('have.length', 1);
     cy.window()
       .its('fakePeerConnections')
-      .should('have.length', 0);
+      .should('have.length', 1);
   });
 
   it('falls back to the still image with a clear message when the camera refuses', () => {
