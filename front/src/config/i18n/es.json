@@ -5698,6 +5698,14 @@
             "1": "Iniciar refuerzo"
           }
         }
+      },
+      "light": {
+        "operating-mode": {
+          "off": "Apagado",
+          "on": "Encendido",
+          "auto": "Auto",
+          "schedule": "Programación"
+        }
       }
     }
   },
@@ -6199,6 +6207,14 @@
           "0": "Inactivo",
           "1": "Calentando"
         }
+      },
+      "light": {
+        "operating-mode": {
+          "0": "Apagado",
+          "1": "Encendido",
+          "2": "Auto",
+          "3": "Programación"
+        }
       }
     }
   },
@@ -6213,7 +6229,8 @@
       "temperature": "Temperatura de la luz",
       "power": "Consumo de la luz",
       "effect-mode": "Modo de efecto",
-      "effect-speed": "Velocidad del efecto"
+      "effect-speed": "Velocidad del efecto",
+      "operating-mode": "Modo de funcionamiento de la luz"
     },
     "battery": {
       "shortCategoryName": "Batería",
