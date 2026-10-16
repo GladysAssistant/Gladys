@@ -382,6 +382,15 @@ describe('externalIntegration reserved GLADYS_* params in discovery', () => {
     expect(count).to.equal(1);
   });
 
+  it('should accept a GLADYS_DEVICE_IMAGE param holding an image key', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration } = buildSupervisor();
+    const count = await externalIntegration.setDiscoveredDevices(service, [
+      buildDevice(service, [{ name: 'GLADYS_DEVICE_IMAGE', value: 'model-nacamera' }]),
+    ]);
+    expect(count).to.equal(1);
+  });
+
   it('should refuse undefined GLADYS_* params and invalid transports', async () => {
     const service = await seedExternalService();
     const { externalIntegration } = buildSupervisor();
@@ -393,6 +402,11 @@ describe('externalIntegration reserved GLADYS_* params in discovery', () => {
       [{ name: 'GLADYS_TRANSPORT_DEGRADED', value: 'false' }],
       [{ name: 'GLADYS_TRANSPORT_MESSAGE', value: 'not-json' }],
       [{ name: 'GLADYS_TRANSPORT_MESSAGE', value: JSON.stringify({ fr: 'Bascule cloud' }) }],
+      // an image key, never a URL nor a path
+      [{ name: 'GLADYS_DEVICE_IMAGE', value: 'https://example.com/camera.jpg' }],
+      [{ name: 'GLADYS_DEVICE_IMAGE', value: 'Model NACamera' }],
+      [{ name: 'GLADYS_DEVICE_IMAGE', value: 'a'.repeat(65) }],
+      [{ name: 'GLADYS_DEVICE_IMAGE', value: 42 }],
     ];
     await Promise.all(
       invalidParamsLists.map(async (params) => {

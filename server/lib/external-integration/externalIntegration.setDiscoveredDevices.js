@@ -16,6 +16,8 @@ const {
   TRANSPORT_DEGRADED_PARAM,
   TRANSPORT_MESSAGE_PARAM,
   DEVICE_TRANSPORTS,
+  DEVICE_IMAGE_PARAM,
+  WIDGET_IMAGE_KEY_REGEX,
 } = require('./constants');
 const { validateTransportMessage } = require('./externalIntegration.setDeviceTransports');
 const { normalizeSupportedOptions } = require('../../utils/normalizeSupportedOptions');
@@ -107,7 +109,8 @@ async function setDiscoveredDevices(service, devices) {
       // the GLADYS_* params namespace is reserved to the semantics defined
       // by the spec; today: GLADYS_TRANSPORT, the effective transport of
       // the device (cloud/local badge in the UI), and the degraded state
-      // GLADYS_TRANSPORT_DEGRADED / GLADYS_TRANSPORT_MESSAGE (orange dot)
+      // GLADYS_TRANSPORT_DEGRADED / GLADYS_TRANSPORT_MESSAGE (orange dot),
+      // and GLADYS_DEVICE_IMAGE, the image key of the device photo
       const paramName = param && typeof param.name === 'string' ? param.name : null;
       if (paramName === null || !paramName.toUpperCase().startsWith(RESERVED_PARAM_PREFIX)) {
         return;
@@ -129,6 +132,10 @@ async function setDiscoveredDevices(service, devices) {
           throw new BadParameters(`${paramPath}.value: must be a multi-language object serialized as JSON`);
         }
         validateTransportMessage(parsedMessage, `${paramPath}.value`);
+      } else if (paramName === DEVICE_IMAGE_PARAM) {
+        if (typeof param.value !== 'string' || !WIDGET_IMAGE_KEY_REGEX.test(param.value)) {
+          throw new BadParameters(`${paramPath}.value: must be an image key matching ${WIDGET_IMAGE_KEY_REGEX}`);
+        }
       } else {
         throw new BadParameters(`${paramPath}.name: ${RESERVED_PARAM_PREFIX}* names are reserved (${paramName})`);
       }

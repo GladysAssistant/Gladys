@@ -320,6 +320,10 @@ const MAX_TRANSPORTS_PER_REQUEST = 100;
 const TRANSPORT_DEGRADED_PARAM = 'GLADYS_TRANSPORT_DEGRADED';
 const TRANSPORT_MESSAGE_PARAM = 'GLADYS_TRANSPORT_MESSAGE';
 const MAX_TRANSPORT_MESSAGE_LENGTH = 200;
+// Photo of the device on the Devices screen: GLADYS_DEVICE_IMAGE = an image
+// key (WIDGET_IMAGE_KEY_REGEX), whose bytes the integration serves on demand
+// through the widget image route — the image stays in the container.
+const DEVICE_IMAGE_PARAM = 'GLADYS_DEVICE_IMAGE';
 // Manifest transports field + the standard "prefer local" user preference,
 // stored as a reserved config key (readable by the integration, never
 // writable by it).
@@ -647,6 +651,7 @@ module.exports = {
   MAX_TRANSPORTS_PER_REQUEST,
   TRANSPORT_DEGRADED_PARAM,
   TRANSPORT_MESSAGE_PARAM,
+  DEVICE_IMAGE_PARAM,
   MAX_TRANSPORT_MESSAGE_LENGTH,
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
