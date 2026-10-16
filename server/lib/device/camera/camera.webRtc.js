@@ -42,13 +42,17 @@ function isWebRtcCamera(device) {
  * await this.endWebRtcSession(session);
  */
 async function endWebRtcSession(session) {
-  const device = this.stateManager.get('device', session.selector);
   const service = this.serviceManager.getServiceById(session.serviceId);
-  if (device === null || typeof get(service, 'device.stopWebRtc') !== 'function') {
+  if (typeof get(service, 'device.stopWebRtc') !== 'function') {
     return;
   }
   try {
-    await service.device.stopWebRtc(device, { sessionId: session.serviceSessionId, streamId: session.streamId });
+    // The device as it was at start: a camera deleted meanwhile must still have its vendor
+    // session ended, the cloud would otherwise keep the stream until its own idle timeout
+    await service.device.stopWebRtc(session.device, {
+      sessionId: session.serviceSessionId,
+      streamId: session.streamId,
+    });
   } catch (e) {
     logger.warn(`Camera ${session.selector}: unable to stop the WebRTC session: ${e.message}`);
   }
@@ -109,15 +113,24 @@ async function startWebRtc(selector, sdp) {
     throw new BadParameters('CAMERA_WEBRTC_NOT_SUPPORTED');
   }
   await this.sweepWebRtcSessions();
-  if (this.webRtcSessions.size >= MAX_SESSIONS) {
+  // The starts still waiting for the camera's cloud count too: up to 15s pass before a session
+  // exists, and concurrent starts (a refresh storm, several cameras auto-starting) would all pass
+  if (this.webRtcSessions.size + this.webRtcPendingStarts >= MAX_SESSIONS) {
     throw new TooManyRequests('CAMERA_WEBRTC_TOO_MANY_SESSIONS', SESSION_TTL_MS);
   }
 
   const sessionId = uuidv4();
-  const answer = await service.device.startWebRtc(device, { sessionId, sdp });
+  this.webRtcPendingStarts += 1;
+  let answer;
+  try {
+    answer = await service.device.startWebRtc(device, { sessionId, sdp });
+  } finally {
+    this.webRtcPendingStarts -= 1;
+  }
   this.webRtcSessions.set(sessionId, {
     id: sessionId,
     selector,
+    device: { external_id: device.external_id, selector: device.selector, params: [...device.params] },
     serviceId: device.service_id,
     serviceSessionId: answer.sessionId,
     streamId: answer.streamId,

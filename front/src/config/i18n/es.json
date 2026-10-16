@@ -544,6 +544,7 @@
         "liveStartError": "Ocurrió un error al iniciar esta transmisión en vivo. ¿Está seguro de que la URL de su cámara corresponde a un flujo de video y no a una imagen?",
         "webRtcError": "No se pudo iniciar el vídeo en directo de esta cámara, o se ha interrumpido. Se muestra la última imagen en su lugar.",
         "webRtcNotSupportedBrowser": "Este navegador no puede reproducir el vídeo en directo de esta cámara (WebRTC no está disponible). Se muestra la última imagen en su lugar.",
+        "liveCameraNotLoaded": "No se pudo cargar esta cámara, por lo que no se puede iniciar su directo. Inténtelo de nuevo en un momento.",
         "notNotSupportedBrowser": "Este navegador no es compatible. Para habilitar el cifrado de extremo a extremo de esta transmisión de video, utilizamos la API MediaSource, que puede no ser compatible con este navegador. Recomendamos Firefox, Safari o cualquier navegador basado en Chromium.",
         "tooManyRequests": "Ha alcanzado su límite mensual de ancho de banda de video. ¡Contáctenos por correo electrónico o en el foro para obtener más ancho de banda!",
         "liveAutoStartLabel": "Iniciar automáticamente la transmisión en vivo",

@@ -1,4 +1,5 @@
 const db = require('../../models');
+const logger = require('../../utils/logger');
 const { ExternalIntegrationUnavailableError, NotFoundError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
@@ -237,18 +238,15 @@ function registerProxyService(service) {
         // integration relays the offer to the camera's cloud, a third-party round
         // trip, hence the 15s ack deadline. Only the signalling goes through Gladys:
         // the media flows from the camera's cloud to the browser.
+        const devicePayload = {
+          external_id: device.external_id,
+          selector: device.selector,
+          params: device.params,
+        };
         const result = await this.sendCommand(
           service,
           WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CAMERA_WEBRTC_OFFER,
-          {
-            device: {
-              external_id: device.external_id,
-              selector: device.selector,
-              params: device.params,
-            },
-            session_id: sessionId,
-            sdp,
-          },
+          { device: devicePayload, session_id: sessionId, sdp },
           { timeoutMs: CAMERA_WEBRTC_OFFER_TIMEOUT_MS },
         );
         const data = (result && result.data) || {};
@@ -260,6 +258,19 @@ function registerProxyService(service) {
           !isOptionalWebRtcId(integrationSessionId) ||
           !isOptionalWebRtcId(streamId)
         ) {
+          // the vendor may have opened the stream already: end it with the ids it gave, best
+          // effort, or the cloud keeps it until its own idle timeout
+          if (typeof integrationSessionId === 'string' || typeof streamId === 'string') {
+            try {
+              await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CAMERA_WEBRTC_STOP, {
+                device: devicePayload,
+                session_id: typeof integrationSessionId === 'string' ? integrationSessionId : sessionId,
+                stream_id: typeof streamId === 'string' ? streamId : null,
+              });
+            } catch (e) {
+              logger.warn(`Camera ${device.selector}: unable to stop the WebRTC session: ${e.message}`);
+            }
+          }
           throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_WEBRTC_ANSWER');
         }
         // the vendor may name the session itself (Netatmo answers with its own

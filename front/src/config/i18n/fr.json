@@ -544,6 +544,7 @@
         "liveStartError": "Une erreur est survenue en démarrant le streaming. Est-ce que l'URL de votre caméra est bien une URL d'un flux vidéo et pas une image ?",
         "webRtcError": "Impossible de lancer le direct de cette caméra, ou il s'est interrompu. La dernière image est affichée à la place.",
         "webRtcNotSupportedBrowser": "Ce navigateur ne peut pas lire le direct de cette caméra (WebRTC n'est pas disponible). La dernière image est affichée à la place.",
+        "liveCameraNotLoaded": "Impossible de charger cette caméra, son direct ne peut pas être lancé. Réessayez dans un instant.",
         "notNotSupportedBrowser": "Ce navigateur n'est pas supporté. Afin de permettre le chiffrement de bout en bout de ce flux vidéo, nous utilisons l'API MediaSource, qui n'est peut-être pas supportée par ce navigateur. Nous vous recommandons Firefox, Safari, ou tout navigateur basé sur Chromium.",
         "tooManyRequests": "Vous avez atteint votre limite mensuelle de bande passante vidéo. Contactez-nous par email ou sur le forum pour avoir plus de bande passante !",
         "liveAutoStartLabel": "Lancer automatiquement le streaming",

@@ -164,6 +164,30 @@ describe('Dashboard camera box WebRTC live view', () => {
     cy.get('.card img.card-img-top').should('be.visible');
   });
 
+  it('negotiates in WebRTC even when Play is pressed before the camera is loaded', () => {
+    cy.intercept(
+      { method: 'POST', pathname: `/api/v1/camera/${CAMERA}/webrtc/start` },
+      { body: { session_id: 'session-2', sdp_answer: ANSWER } }
+    ).as('startWebRtc');
+    cy.intercept({ method: 'POST', pathname: '/api/v1/service/rtsp-camera/**' }, { statusCode: 500, body: {} }).as(
+      'rtspCamera'
+    );
+    // a slow device request: the protocol is unknown when Play is pressed
+    cy.intercept({ method: 'GET', pathname: `/api/v1/device/${CAMERA}` }, req => {
+      req.on('response', res => {
+        res.setDelay(1500);
+      });
+    });
+    cy.visit('/dashboard/test', { onBeforeLoad: installFakePeerConnection });
+
+    cy.get('.card-options .fe-airplay').click();
+
+    cy.wait('@startWebRtc')
+      .its('request.body')
+      .should('deep.equal', { sdp: OFFER });
+    cy.get('@rtspCamera.all').should('have.length', 0);
+  });
+
   it('falls back to the still image with a clear message when the camera refuses', () => {
     cy.intercept(
       { method: 'POST', pathname: `/api/v1/camera/${CAMERA}/webrtc/start` },

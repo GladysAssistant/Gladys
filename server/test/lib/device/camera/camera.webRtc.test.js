@@ -128,7 +128,26 @@ describe('Camera WebRTC live view', () => {
       const { camera } = build({ service: { device: { startWebRtc, stopWebRtc: fake.resolves(null) } } });
       await assert.isRejected(camera.startWebRtc('doorbell', OFFER), 'EXTERNAL_INTEGRATION_COMMAND_TIMEOUT');
       expect(camera.webRtcSessions.size).to.equal(0);
+      expect(camera.webRtcPendingStarts).to.equal(0);
       expect(camera.webRtcSweepInterval).to.equal(null);
+    });
+
+    it('should count the starts still waiting for the camera cloud against the cap', async () => {
+      let answerAll;
+      const pendingAnswer = new Promise((resolve) => {
+        answerAll = resolve;
+      });
+      const startWebRtc = sinon.fake(() => pendingAnswer);
+      const { camera } = build({ service: { device: { startWebRtc, stopWebRtc: fake.resolves(null) } } });
+      const starts = Array.from({ length: MAX_SESSIONS }, () => camera.startWebRtc('doorbell', OFFER));
+      // let every start reach the vendor round trip
+      await Promise.resolve();
+      await Promise.resolve();
+      await assert.isRejected(camera.startWebRtc('doorbell', OFFER), TooManyRequests);
+      answerAll({ sdpAnswer: ANSWER, sessionId: 's', streamId: null });
+      await Promise.all(starts);
+      expect(camera.webRtcSessions.size).to.equal(MAX_SESSIONS);
+      expect(camera.webRtcPendingStarts).to.equal(0);
     });
 
     it('should cap the live views open at the same time', async () => {
@@ -190,10 +209,11 @@ describe('Camera WebRTC live view', () => {
       const { session_id: sessionId } = await camera.startWebRtc('doorbell', OFFER);
       await camera.stopWebRtc('doorbell', sessionId);
       expect(camera.webRtcSessions.has(sessionId)).to.equal(false);
-      sinon.assert.calledOnceWithExactly(cameraService.device.stopWebRtc, device, {
-        sessionId: 'netatmo-session',
-        streamId: 'tag-1',
-      });
+      sinon.assert.calledOnceWithExactly(
+        cameraService.device.stopWebRtc,
+        { external_id: device.external_id, selector: 'doorbell', params: device.params },
+        { sessionId: 'netatmo-session', streamId: 'tag-1' },
+      );
     });
 
     it('should be a no-op for a session already gone or of another camera', async () => {
@@ -218,12 +238,30 @@ describe('Camera WebRTC live view', () => {
       sinon.assert.calledOnce(stopWebRtc);
     });
 
-    it('should not call the service when the camera was deleted meanwhile', async () => {
+    it('should only forget the session when its service is gone', async () => {
+      const { camera, cameraService } = build();
+      const { session_id: sessionId } = await camera.startWebRtc('doorbell', OFFER);
+      camera.serviceManager.getServiceById = fake.returns(null);
+      await camera.stopWebRtc('doorbell', sessionId);
+      expect(camera.webRtcSessions.has(sessionId)).to.equal(false);
+      sinon.assert.notCalled(cameraService.device.stopWebRtc);
+    });
+
+    it('should still end the vendor session of a camera deleted meanwhile', async () => {
       const { camera, cameraService } = build();
       const { session_id: sessionId } = await camera.startWebRtc('doorbell', OFFER);
       camera.stateManager.deleteState('device', 'doorbell');
       await camera.stopWebRtc('doorbell', sessionId);
-      sinon.assert.notCalled(cameraService.device.stopWebRtc);
+      // the device as it was at start, enough for the integration to address the vendor
+      sinon.assert.calledOnceWithExactly(
+        cameraService.device.stopWebRtc,
+        {
+          external_id: undefined,
+          selector: 'doorbell',
+          params: [{ name: 'GLADYS_CAMERA_STREAM_PROTOCOL', value: 'webrtc' }],
+        },
+        { sessionId: 'netatmo-session', streamId: 'tag-1' },
+      );
     });
   });
 

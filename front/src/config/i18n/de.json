@@ -544,6 +544,7 @@
         "liveStartError": "Beim Starten dieses Livestreams ist ein Fehler aufgetreten. Bist du sicher, dass die URL deiner Kamera ein Video-Feed und kein Bild ist?",
         "webRtcError": "Das Live-Video dieser Kamera konnte nicht gestartet werden oder wurde unterbrochen. Stattdessen wird das letzte Bild angezeigt.",
         "webRtcNotSupportedBrowser": "Dieser Browser kann das Live-Video dieser Kamera nicht abspielen (WebRTC ist nicht verfügbar). Stattdessen wird das letzte Bild angezeigt.",
+        "liveCameraNotLoaded": "Diese Kamera konnte nicht geladen werden, daher kann ihr Live-Stream nicht gestartet werden. Versuchen Sie es gleich noch einmal.",
         "notNotSupportedBrowser": "Dieser Browser wird nicht unterstützt. Um eine End-to-End-Verschlüsselung dieses Videostreams zu ermöglichen, verwenden wir die MediaSource-API, die in diesem Browser möglicherweise nicht unterstützt wird. Wir empfehlen Ihnen Firefox, Safari oder einen auf Chromium basierenden Browser.",
         "tooManyRequests": "Du hast dein monatliches Videobandbreitenlimit erreicht. Kontaktiere uns per E-Mail oder im Forum, um mehr Bandbreite zu erhalten!",
         "liveAutoStartLabel": "Starte den Livestream automatisch",

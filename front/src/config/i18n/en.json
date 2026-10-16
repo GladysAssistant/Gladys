@@ -544,6 +544,7 @@
         "liveStartError": "An error occurred while starting this live stream. Are you sure the URL of your camera is a video flux and not an image?",
         "webRtcError": "The live video could not be started with this camera, or it stopped. The last image is shown instead.",
         "webRtcNotSupportedBrowser": "This browser cannot play this camera's live video (WebRTC is not available). The last image is shown instead.",
+        "liveCameraNotLoaded": "This camera could not be loaded, so its live stream cannot be started. Try again in a moment.",
         "notNotSupportedBrowser": "This browser is not supported. To enable end-to-end encryption of this video stream, we use the MediaSource API, which may not be supported on this browser. We recommend Firefox, Safari, or any Chromium-based browser.",
         "tooManyRequests": "You have reached your monthly video bandwidth limit. Contact us by email or on the forum to get more bandwidth!",
         "liveAutoStartLabel": "Start automatically the live streaming",

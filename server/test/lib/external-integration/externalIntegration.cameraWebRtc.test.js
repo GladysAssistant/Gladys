@@ -84,6 +84,60 @@ describe('externalIntegration proxy-service startWebRtc', () => {
     );
   });
 
+  it('should end the vendor session it can name when the answer is unusable', async () => {
+    const { service, externalIntegration, proxyService } = await buildProxy({});
+    const stopCalls = [];
+    externalIntegration.sendCommand = sinon.fake(async (svc, type, payload) => {
+      if (type === WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CAMERA_WEBRTC_STOP) {
+        stopCalls.push(payload);
+        return { success: true };
+      }
+      return { success: true, data: { sdp_answer: '', session_id: 'netatmo-session', stream_id: 'tag-1' } };
+    });
+    try {
+      await proxyService.device.startWebRtc(DOORBELL, { sessionId: 'gladys-session', sdp: OFFER });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.equal('EXTERNAL_INTEGRATION_INVALID_WEBRTC_ANSWER');
+    }
+    expect(stopCalls).to.deep.equal([{ device: DEVICE_PAYLOAD, session_id: 'netatmo-session', stream_id: 'tag-1' }]);
+    sinonAssert.calledWith(externalIntegration.sendCommand, service);
+
+    // only a stream id: the session is the one Gladys gave; a failing stop is only logged
+    stopCalls.length = 0;
+    externalIntegration.sendCommand = sinon.fake(async (svc, type, payload) => {
+      if (type === WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CAMERA_WEBRTC_STOP) {
+        stopCalls.push(payload);
+        throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_NOT_CONNECTED');
+      }
+      return { success: true, data: { stream_id: 'tag-2' } };
+    });
+    try {
+      await proxyService.device.startWebRtc(DOORBELL, { sessionId: 'gladys-session', sdp: OFFER });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.equal('EXTERNAL_INTEGRATION_INVALID_WEBRTC_ANSWER');
+    }
+    expect(stopCalls).to.deep.equal([{ device: DEVICE_PAYLOAD, session_id: 'gladys-session', stream_id: 'tag-2' }]);
+
+    // only a session id: no stream to name
+    stopCalls.length = 0;
+    externalIntegration.sendCommand = sinon.fake(async (svc, type, payload) => {
+      if (type === WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CAMERA_WEBRTC_STOP) {
+        stopCalls.push(payload);
+        return { success: true };
+      }
+      return { success: true, data: { sdp_answer: 42, session_id: 'netatmo-session-3' } };
+    });
+    try {
+      await proxyService.device.startWebRtc(DOORBELL, { sessionId: 'gladys-session', sdp: OFFER });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.equal('EXTERNAL_INTEGRATION_INVALID_WEBRTC_ANSWER');
+    }
+    expect(stopCalls).to.deep.equal([{ device: DEVICE_PAYLOAD, session_id: 'netatmo-session-3', stream_id: null }]);
+  });
+
   it('should let a command error through (integration disconnected, timeout)', async () => {
     const { proxyService, externalIntegration } = await buildProxy({});
     externalIntegration.sendCommand = fake.rejects(

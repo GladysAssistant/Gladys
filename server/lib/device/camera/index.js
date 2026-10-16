@@ -16,6 +16,8 @@ const Camera = function Camera(stateManager, messageManager, eventManager, servi
   // WebRTC live views in progress, by session id (camera.webRtc.js)
   this.webRtcSessions = new Map();
   this.webRtcSweepInterval = null;
+  // starts waiting for the camera's cloud, counted against the session cap
+  this.webRtcPendingStarts = 0;
   this.eventManager.on(INTENTS.CAMERA.GET_IMAGE, this.command.bind(this));
 };
 
