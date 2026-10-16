@@ -77,4 +77,4 @@ Dev-install a `type: "ai"` manifest whose container answers `ai.chat` (an adapte
 
 - **Provider per `ai.ask` action**: an optional `provider` on the action (like the `service` property of the message actions) — camera analysis on a local model, chat on a cloud one. Purely additive: the instance-wide selection stays the default.
 - **Selection at install time**: with this workstream Gladys Plus stays the provider until an administrator picks another one, so an instance without Plus that installs an AI integration still has to select it before the assistant answers. Selecting the integration at install (the install screen already carries the trust warning), at least when no other provider is available, is an open product question.
-- A per-type `403` on the device host API for the device-less types (`communication`, `weather`, `calendar`, `provider`, `ai`), the hardening `capabilities/provider-type.md` lists.
+- A per-type `403` on the device host API for the device-less types (`communication`, `weather`, `calendar`, `provider`, `ai`, `tts`), the hardening `capabilities/provider-type.md` lists.

@@ -1,13 +1,15 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
+import { USER_ROLE } from '../../../../../../server/utils/constants';
 import Layout from './Layout';
 import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsellCard';
 import WeeklyDigestSettings from './WeeklyDigestSettings';
 import AiChatDebugDownload from './AiChatDebugDownload';
 import AiProviderSettings from './AiProviderSettings';
 import AiQuotaDisplay from './AiQuotaDisplay';
-import { USER_ROLE } from '../../../../../../server/utils/constants';
+import TtsProviderSettings from './TtsProviderSettings';
 
 // display name of the selected external AI provider, or null
 const getProviderName = (providers, selector) => {
@@ -80,7 +82,7 @@ class OpenAIGateway extends Component {
   }
 
   render(props, { gladysPlusConnected, externalProviderActive, externalProviderName }) {
-    const isAdmin = props.user && props.user.role === USER_ROLE.ADMIN;
+    const isAdmin = get(props, 'user.role') === USER_ROLE.ADMIN;
     const aiBackendAvailable = gladysPlusConnected === true || externalProviderActive === true;
     return (
       <Layout user={props.user}>
@@ -185,6 +187,10 @@ class OpenAIGateway extends Component {
         follow the selected provider through gateway.aiChat, so they are
         offered as soon as the assistant has a backend, Plus or external —
         to admins only, their routes are admin-only */}
+        {/* the voice does not need Gladys Plus (an installed TTS provider
+            integration works locally) but it is an instance-wide, admin-only
+            setting: the server rejects the write for non-admins */}
+        {isAdmin && <TtsProviderSettings gladysPlusConnected={gladysPlusConnected} />}
         {gladysPlusConnected === true && externalProviderActive === false && <AiQuotaDisplay />}
         {isAdmin && aiBackendAvailable && <WeeklyDigestSettings />}
         {isAdmin && aiBackendAvailable && <AiChatDebugDownload />}

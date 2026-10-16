@@ -21,7 +21,7 @@ describe('scene.play-notification', () => {
 
   /**
    * @description Build the mocks needed to execute a "play notification" action.
-   * @returns {object} The state manager, the device mock, the gateway mock and the device feature.
+   * @returns {object} The state manager, the device mock, the tts mock and the device feature.
    * @example const { stateManager, device } = buildScene();
    */
   function buildScene() {
@@ -39,20 +39,20 @@ describe('scene.play-notification', () => {
     const message = {
       sendToUser: fake.resolves(null),
     };
-    const gateway = {
-      getTTSApiUrl: fake.resolves({ url: 'http://test.com' }),
+    const tts = {
+      getSpeechUrl: fake.resolves({ url: 'http://test.com', provider: 'gladys-plus' }),
     };
     const device = {
       setValue: fake.resolves(null),
     };
-    return { stateManager, oneDevice, deviceFeature, message, gateway, device };
+    return { stateManager, oneDevice, deviceFeature, message, tts, device };
   }
 
   it('should play notification with injected value', async () => {
-    const { stateManager, oneDevice, deviceFeature, message, gateway, device } = buildScene();
+    const { stateManager, oneDevice, deviceFeature, message, tts, device } = buildScene();
     const scope = {};
     await executeActions(
-      { stateManager, event, message, gateway, device },
+      { stateManager, event, message, tts, device },
       [
         [
           {
@@ -70,15 +70,15 @@ describe('scene.play-notification', () => {
       ],
       scope,
     );
-    assert.calledWith(gateway.getTTSApiUrl, { text: 'Temperature in the living room is 15 °C.' });
+    assert.calledWith(tts.getSpeechUrl, { text: 'Temperature in the living room is 15 °C.' });
     // No volume in the action: the speaker service will use its own default
     assert.calledWith(device.setValue, oneDevice, deviceFeature, 'http://test.com', { volume: undefined });
   });
 
   it('should play notification with a fixed volume', async () => {
-    const { stateManager, oneDevice, deviceFeature, message, gateway, device } = buildScene();
+    const { stateManager, oneDevice, deviceFeature, message, tts, device } = buildScene();
     await executeActions(
-      { stateManager, event, message, gateway, device },
+      { stateManager, event, message, tts, device },
       [
         [
           {
@@ -95,9 +95,9 @@ describe('scene.play-notification', () => {
   });
 
   it('should play notification with a calculated volume', async () => {
-    const { stateManager, oneDevice, deviceFeature, message, gateway, device } = buildScene();
+    const { stateManager, oneDevice, deviceFeature, message, tts, device } = buildScene();
     await executeActions(
-      { stateManager, event, message, gateway, device },
+      { stateManager, event, message, tts, device },
       [
         [
           {
@@ -120,9 +120,9 @@ describe('scene.play-notification', () => {
   });
 
   it('should play notification with a calculated volume clamped to 100', async () => {
-    const { stateManager, oneDevice, deviceFeature, message, gateway, device } = buildScene();
+    const { stateManager, oneDevice, deviceFeature, message, tts, device } = buildScene();
     await executeActions(
-      { stateManager, event, message, gateway, device },
+      { stateManager, event, message, tts, device },
       [
         [
           {
@@ -139,9 +139,9 @@ describe('scene.play-notification', () => {
   });
 
   it('should play notification with a calculated volume clamped to 0', async () => {
-    const { stateManager, oneDevice, deviceFeature, message, gateway, device } = buildScene();
+    const { stateManager, oneDevice, deviceFeature, message, tts, device } = buildScene();
     await executeActions(
-      { stateManager, event, message, gateway, device },
+      { stateManager, event, message, tts, device },
       [
         [
           {
@@ -158,9 +158,9 @@ describe('scene.play-notification', () => {
   });
 
   it('should throw an error when evaluate_volume is not a valid formula', async () => {
-    const { stateManager, message, gateway, device } = buildScene();
+    const { stateManager, message, tts, device } = buildScene();
     const actionPromise = executeActions(
-      { stateManager, event, message, gateway, device },
+      { stateManager, event, message, tts, device },
       [
         [
           {
@@ -179,9 +179,9 @@ describe('scene.play-notification', () => {
   });
 
   it('should throw an error when evaluate_volume does not return a finite number', async () => {
-    const { stateManager, message, gateway, device } = buildScene();
+    const { stateManager, message, tts, device } = buildScene();
     const actionPromise = executeActions(
-      { stateManager, event, message, gateway, device },
+      { stateManager, event, message, tts, device },
       [
         [
           {

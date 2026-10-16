@@ -53,6 +53,13 @@ async function uninstall(selector) {
   } catch (e) {
     logger.warn(`Unable to remove data folder of integration ${selector}`, e);
   }
+  // uninstalling the selected TTS provider returns the instance to the Gladys
+  // Plus default: no dangling selector in the system variable failing every
+  // announcement until an admin notices (capabilities/tts-type.md)
+  const selectedTtsProvider = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER);
+  if (selectedTtsProvider === service.name) {
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER);
+  }
   const devices = await db.Device.findAll({ where: { service_id: service.id } });
   await Promise.each(devices, (device) => this.device.destroy(device.selector));
   // Calendars of a calendar-type integration are removed explicitly (all

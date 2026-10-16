@@ -9,6 +9,7 @@ import LinkAccountCard from './LinkAccountCard';
 import ContactProfileCard from './ContactProfileCard';
 import CalendarAccountCard from './CalendarAccountCard';
 import WebhooksCard from './WebhooksCard';
+import TtsVoiceCard from './TtsVoiceCard';
 import HardwareCard from './HardwareCard';
 import AiProviderCard from './AiProviderCard';
 import { getAssignedPortsByName, getLocalizedText, getRequestedHardwareClasses } from '../utils';
@@ -39,6 +40,9 @@ const ConfigTab = props => {
   // AI providers: the selection as the AI provider of the instance is the
   // step after install, the card below says where it stands
   const isAiProvider = get(integration, 'manifest.type') === 'ai';
+  // tts integrations: whether this one is the voice of the instance, and
+  // where to change it — the setting lives on the Artificial Intelligence page
+  const isTts = get(integration, 'manifest.type') === 'tts';
   const accountSchema = get(integration, 'manifest.account_schema') || [];
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
   // host ports assigned to the manifest-named declared ports, for the
@@ -228,6 +232,8 @@ const ConfigTab = props => {
           onToggleCalendar={props.toggleUserCalendar}
         />
       )}
+
+      {isTts && integration && <TtsVoiceCard serviceName={integration.name} httpClient={props.httpClient} />}
 
       {isAdmin && integration && manifestWebhooks.length > 0 && (
         <WebhooksCard

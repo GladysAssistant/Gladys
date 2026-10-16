@@ -45,5 +45,5 @@ Dev-install a `type: "provider"` manifest declaring one capability (a content-on
 
 ## Later leads
 
-- A per-type `403` on the device host API for the device-less types (`communication`, `weather`, `calendar`, `provider`, `ai`).
+- A per-type `403` on the device host API for the device-less types (`communication`, `weather`, `calendar`, `provider`, `ai`, `tts`).
 - The scene triggers and actions capability, the first field to join the table above.
