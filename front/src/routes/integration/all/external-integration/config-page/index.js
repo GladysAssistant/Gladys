@@ -7,6 +7,7 @@ import ConfigTab from './ConfigTab';
 import { getRequestedHardwareClasses } from '../utils';
 import { hasDynamicSource, fetchDynamicOptions } from '../../../../../components/integration/dynamicOptions';
 import { RequestStatus } from '../../../../../utils/consts';
+import { getVisibleFields } from '../../../../../../../server/lib/external-integration/externalIntegration.fieldVisibility';
 import {
   OAUTH_REDIRECT_URI,
   assertOpenableUrl,
@@ -143,7 +144,8 @@ class ExternalIntegrationConfigPage extends Component {
     const { integration, configValues = {}, touchedSecrets = {} } = this.state;
     const schema = get(integration, 'manifest.config_schema') || [];
     const config = {};
-    schema.forEach(field => {
+    // only the visible fields are sent: a hidden field keeps its stored value
+    getVisibleFields(schema, configValues).forEach(field => {
       const value = configValues[field.key];
       if (field.type === 'secret') {
         // A secret set to null means "unchanged" on the server side
@@ -584,7 +586,7 @@ class ExternalIntegrationConfigPage extends Component {
     this.setState({ actionStates });
     const rawValues = (this.state.actionFieldValues || {})[action.key] || {};
     const fields = {};
-    (action.fields || []).forEach(field => {
+    getVisibleFields(action.fields || [], rawValues).forEach(field => {
       const value = rawValues[field.key];
       if (field.type === 'number') {
         const numericValue = value === '' || value === undefined || value === null ? NaN : Number(value);

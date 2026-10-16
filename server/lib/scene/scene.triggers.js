@@ -3,6 +3,7 @@ const cloneDeep = require('lodash.clonedeep');
 const logger = require('../../utils/logger');
 const { EVENTS, ANY_CHANGE_OPERATOR } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
+const { getVisibleFields } = require('../external-integration/externalIntegration.fieldVisibility');
 
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
   event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
@@ -45,10 +46,15 @@ const matchExternalIntegrationSceneEvent = (self, sceneSelector, event, trigger)
   }
   const storedFields = trigger.fields || {};
   const filters = event.filters || {};
+  // a filter hidden by its visible_if condition (for the values this scene
+  // stored) is not shown in the editor: it matches everything
+  const visibleKeys = event.filter_fields
+    ? new Set(getVisibleFields(event.filter_fields, storedFields).map((field) => field.key))
+    : null;
   const matched = Object.keys(storedFields).every((key) => {
     const expected = storedFields[key];
     const actual = filters[key];
-    if (actual === undefined || isWildcardFilter(expected)) {
+    if (actual === undefined || isWildcardFilter(expected) || (visibleKeys && !visibleKeys.has(key))) {
       return true;
     }
     if (actual === null) {

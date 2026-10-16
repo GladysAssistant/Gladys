@@ -189,7 +189,12 @@ const CONFIG_FIELD_FIELDS = [
   'source',
   'display',
   'links',
+  'visible_if',
 ];
+// `visible_if`: a closed, declarative condition on an EARLIER field of the
+// same form, whose possible values are known from the manifest itself
+const VISIBLE_IF_FIELDS = ['field', 'in'];
+const VISIBLE_IF_FIELD_TYPES = ['select', 'multi_select', 'boolean'];
 // boolean has no input to hint, select shows its options
 const PLACEHOLDER_FIELD_TYPES = ['string', 'number', 'secret'];
 const OPTION_FIELDS = ['value', 'label'];
@@ -522,6 +527,64 @@ function validateConfigField(field, index, seenKeys, errors, basePath, declaredP
 }
 
 /**
+ * @description Validate the `visible_if` conditions of one form (a list of
+ * fields sharing the config_schema grammar). A condition `{ field, in }`
+ * shows the field only when an EARLIER field of the same list holds one of
+ * the listed values: no forward reference, hence no cycle. The referenced
+ * field must have values known from the manifest (a select or multi_select
+ * with static options, or a boolean), so every listed value is checked.
+ * @param {Array} fields - The fields of the form, in declaration order.
+ * @param {string} basePath - Path of the list, for the error messages.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateVisibleIf(manifest.config_schema, 'config_schema', errors);
+ */
+function validateVisibleIf(fields, basePath, errors) {
+  const earlierFields = new Map();
+  fields.forEach((field, index) => {
+    if (field === null || typeof field !== 'object' || Array.isArray(field)) {
+      return;
+    }
+    const condition = field.visible_if;
+    if (condition !== undefined) {
+      const path = `${basePath}[${index}].visible_if`;
+      if (condition === null || typeof condition !== 'object' || Array.isArray(condition)) {
+        errors.push(`${path}: must be an object { field, in }`);
+      } else {
+        Object.keys(condition).forEach((key) => {
+          if (!VISIBLE_IF_FIELDS.includes(key)) {
+            errors.push(`${path}.${key}: unknown field`);
+          }
+        });
+        const referenced = earlierFields.get(condition.field);
+        if (!referenced) {
+          errors.push(`${path}.field: must be the key of an earlier field of the same list`);
+        } else if (!VISIBLE_IF_FIELD_TYPES.includes(referenced.type) || referenced.source !== undefined) {
+          errors.push(
+            `${path}.field: "${condition.field}" must be a boolean, or a select or multi_select with static options`,
+          );
+        } else if (!Array.isArray(condition.in) || condition.in.length === 0) {
+          errors.push(`${path}.in: must be a non-empty list of values`);
+        } else {
+          const allowed =
+            referenced.type === 'boolean'
+              ? [true, false]
+              : (Array.isArray(referenced.options) ? referenced.options : []).map((option) => option && option.value);
+          condition.in.forEach((value, valueIndex) => {
+            if (!allowed.includes(value)) {
+              errors.push(`${path}.in[${valueIndex}]: must be a value of "${condition.field}"`);
+            }
+          });
+        }
+      }
+    }
+    if (typeof field.key === 'string' && field.type !== 'section') {
+      earlierFields.set(field.key, field);
+    }
+  });
+}
+
+/**
  * @description Validate one entry of the manifest actions list: an
  * on-demand operation rendered as a button in the Configuration screen,
  * with an optional flat form reusing the config_schema field format and a
@@ -578,6 +641,7 @@ function validateAction(action, index, seenKeys, errors, declaredPortNames) {
       action.fields.forEach((field, fieldIndex) => {
         validateConfigField(field, fieldIndex, seenFieldKeys, errors, `${path}.fields`, declaredPortNames);
       });
+      validateVisibleIf(action.fields, `${path}.fields`, errors);
     }
   }
 }
@@ -674,6 +738,7 @@ function validateWidget(widget, index, seenKeys, errors, declaredPortNames) {
           }
         }
       });
+      validateVisibleIf(widget.settings, `${path}.settings`, errors);
     }
   }
   if (widget.action_timeout_seconds !== undefined) {
@@ -800,6 +865,7 @@ function validateSceneDeclaration(entry, index, seenKeys, errors, declaredPortNa
           rejectScenePortPlaceholders(field.description, `${fieldPath}.description`, errors);
         }
       });
+      validateVisibleIf(entry.fields, `${path}.fields`, errors);
     }
   }
   const variables = entry[variablesName];
@@ -1140,6 +1206,7 @@ function validateManifest(manifest) {
       manifest.config_schema.forEach((field, index) =>
         validateConfigField(field, index, seenKeys, errors, 'config_schema', declaredPortNames),
       );
+      validateVisibleIf(manifest.config_schema, 'config_schema', errors);
     }
   }
   if (manifest.containers !== undefined) {
@@ -1229,6 +1296,7 @@ function validateManifest(manifest) {
           );
         }
       });
+      validateVisibleIf(manifest.contact_schema, 'contact_schema', errors);
     }
   }
   if (manifest.account_schema !== undefined) {
@@ -1258,6 +1326,7 @@ function validateManifest(manifest) {
           );
         }
       });
+      validateVisibleIf(manifest.account_schema, 'account_schema', errors);
     }
   }
   if (manifest.webhooks !== undefined) {

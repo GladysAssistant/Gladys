@@ -8,6 +8,7 @@ const {
 } = require('./constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
+const { getVisibleFields } = require('./externalIntegration.fieldVisibility');
 const { getDeclaredSceneActions, coerceSceneValue } = require('./externalIntegration.sceneDeclarations');
 
 /**
@@ -70,9 +71,11 @@ async function resolveSceneActionFields(service, declaration, storedFields, rend
     }
   });
   const dynamicOptions = await getDynamicOptions(service, declaredFields);
+  // a field hidden by its visible_if condition is never required
+  const visibleKeys = new Set(getVisibleFields(declaredFields, fields).map((field) => field.key));
   declaredFields.forEach((field) => {
     if (fields[field.key] === undefined) {
-      if (field.required) {
+      if (field.required && visibleKeys.has(field.key)) {
         // a required field added by an update without a default: the scene
         // fails loudly until the user edits it, never sends garbage
         throw new BadParameters(`fields.${field.key}: required`);
@@ -158,4 +161,5 @@ async function runSceneAction(registeredService, actionKey, storedFields = {}, {
 module.exports = {
   runSceneAction,
   normalizeSceneActionOutputs,
+  resolveSceneActionFields,
 };

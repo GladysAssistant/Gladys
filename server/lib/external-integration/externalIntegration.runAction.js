@@ -4,6 +4,7 @@ const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { ACTION_DEFAULT_TIMEOUT_SECONDS } = require('./constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
+const { getVisibleFields } = require('./externalIntegration.fieldVisibility');
 
 // transport-level failures stay a 400 (integration unreachable), only an
 // explicit refusal of the integration (success: false) becomes a 422
@@ -54,7 +55,11 @@ async function runAction(selector, actionKey, fields = {}) {
     if (resolvedFields[field.key] === undefined && field.default !== undefined) {
       resolvedFields[field.key] = field.default;
     }
-    if (field.required && resolvedFields[field.key] === undefined) {
+  });
+  // a field hidden by its visible_if condition is never required
+  const visibleKeys = new Set(getVisibleFields(declaredFields, resolvedFields).map((field) => field.key));
+  declaredFields.forEach((field) => {
+    if (field.required && visibleKeys.has(field.key) && resolvedFields[field.key] === undefined) {
       throw new Error422(`fields.${field.key}: required`);
     }
   });
