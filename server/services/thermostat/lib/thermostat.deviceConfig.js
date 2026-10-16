@@ -47,6 +47,7 @@ function buildParamsConfig(device) {
     temperature_feature: getParam('THERMOSTAT_TEMPERATURE_FEATURE') || null,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
     switch_feature: getParam('THERMOSTAT_SWITCH_FEATURE') || null,
+    pilot_wire_feature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || null,
     // External thermostats: the real device regulates itself. `target_feature`
     // is the setpoint Gladys writes, `state_feature` the heating state it reads
     // back, `mode_feature` the optional operating mode. All three point at

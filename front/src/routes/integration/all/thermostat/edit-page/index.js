@@ -24,6 +24,7 @@ class ThermostatEditPage extends Component {
     this.props.updateThermostatField('thermostatEditTemperatureFeature', '');
     this.props.updateThermostatField('thermostatEditHumidityFeature', '');
     this.props.updateThermostatField('thermostatEditSwitchFeature', '');
+    this.props.updateThermostatField('thermostatEditPilotWireFeature', '');
     this.props.updateThermostatField('thermostatEditType', 'virtual');
     this.props.updateThermostatField('thermostatEditTargetFeature', '');
     this.props.updateThermostatField('thermostatEditStateFeature', '');
@@ -68,6 +69,6 @@ class ThermostatEditPage extends Component {
 }
 
 export default connect(
-  'user,houses,thermostatEditDevice,thermostatEditName,thermostatEditMode,thermostatEditMinTemp,thermostatEditMaxTemp,thermostatEditTempUnit,thermostatEditControlType,thermostatEditTemperatureFeature,thermostatEditHumidityFeature,thermostatEditSwitchFeature,thermostatEditType,thermostatEditTargetFeature,thermostatEditStateFeature,thermostatEditModeFeature,thermostatEditWindowFeature,thermostatEditPresetFrost,thermostatEditPresetAway,thermostatEditPresetEco,thermostatEditPresetNight,thermostatEditPresetComfort,thermostatEditHysteresisStart,thermostatEditHysteresisStop,thermostatEditTpiCycleTime,thermostatEditTpiProportionalBand,thermostatEditRoomId,thermostatEditManualDuration,thermostatEditManualExpiry,thermostatEditError,thermostatEditActiveSchedule,thermostatEditDeviceSchedule,thermostatSchedules,thermostatCreateStatus,temperatureFeatures,humidityFeatures,switchFeatures,openingFeatures,targetFeatures,stateFeatures,modeFeatures',
+  'user,houses,thermostatEditDevice,thermostatEditName,thermostatEditMode,thermostatEditMinTemp,thermostatEditMaxTemp,thermostatEditTempUnit,thermostatEditControlType,thermostatEditTemperatureFeature,thermostatEditHumidityFeature,thermostatEditSwitchFeature,thermostatEditPilotWireFeature,thermostatEditType,thermostatEditTargetFeature,thermostatEditStateFeature,thermostatEditModeFeature,thermostatEditWindowFeature,thermostatEditPresetFrost,thermostatEditPresetAway,thermostatEditPresetEco,thermostatEditPresetNight,thermostatEditPresetComfort,thermostatEditHysteresisStart,thermostatEditHysteresisStop,thermostatEditTpiCycleTime,thermostatEditTpiProportionalBand,thermostatEditRoomId,thermostatEditManualDuration,thermostatEditManualExpiry,thermostatEditError,thermostatEditActiveSchedule,thermostatEditDeviceSchedule,thermostatSchedules,thermostatCreateStatus,temperatureFeatures,humidityFeatures,switchFeatures,pilotWireFeatures,openingFeatures,targetFeatures,stateFeatures,modeFeatures',
   actions
 )(ThermostatEditPage);

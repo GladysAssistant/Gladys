@@ -4,7 +4,12 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { fake, assert } = sinon;
 
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  PILOT_WIRE_MODE,
+  THERMOSTAT_OPERATING_STATE,
+} = require('../../../../utils/constants');
 const ThermostatHandler = require('../../../../services/thermostat/lib');
 
 const loadModule = () =>
@@ -244,6 +249,71 @@ describe('thermostat.onDeviceNewState (window open, external thermostat)', () =>
     });
 
     await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
+  });
+});
+
+describe('thermostat.onDeviceNewState (window open, pilot-wire heater)', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  const buildPilotWireHandler = () => {
+    const operatingState = {
+      selector: 'living-room:operating-state',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+      last_value: 1,
+    };
+    const thermostat = {
+      selector: 'living-room',
+      features: [operatingState],
+      params: [
+        { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: 'heater-pilot-wire' },
+        { name: 'THERMOSTAT_WINDOW_FEATURE', value: 'window-sensor' },
+      ],
+    };
+    return {
+      operatingState,
+      gladys: {
+        device: {
+          get: fake((query) => {
+            if (query && query.service === 'thermostat') {
+              return Promise.resolve([thermostat]);
+            }
+            if (query && query.device_feature_selectors === 'heater-pilot-wire') {
+              return Promise.resolve([
+                {
+                  selector: 'heater',
+                  features: [{ selector: 'heater-pilot-wire', last_value: PILOT_WIRE_MODE.COMFORT }],
+                },
+              ]);
+            }
+            return Promise.resolve([]);
+          }),
+          setValue: fake.resolves(null),
+          saveState: fake.resolves(null),
+        },
+        stateManager: { get: fake.returns(null) },
+      },
+      windowSelectorsCache: null,
+      targetSelectorsCache: new Set(),
+      selfWrittenSetpoints: new Map(),
+      observedSetpoints: new Map(),
+    };
+  };
+
+  it('should send the off order at once, with no switch to look for', async () => {
+    const mod = loadModule();
+    const handler = buildPilotWireHandler();
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'window-sensor', last_value: 0 });
+
+    const [, feature, value] = handler.gladys.device.setValue.firstCall.args;
+    expect(feature.selector).to.equal('heater-pilot-wire');
+    expect(value).to.equal(PILOT_WIRE_MODE.OFF);
+    assert.calledWith(handler.gladys.device.saveState, handler.operatingState, THERMOSTAT_OPERATING_STATE.IDLE);
+    // Marked as its own: the module's report of it is no press of its button.
+    expect(handler.selfWrittenSetpoints.get('heater-pilot-wire')).to.equal(PILOT_WIRE_MODE.OFF);
   });
 });
 

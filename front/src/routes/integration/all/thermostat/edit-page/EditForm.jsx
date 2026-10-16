@@ -33,7 +33,11 @@ const SaveError = ({ status, reason }) =>
 const EditForm = ({ ...props }) => {
   const saving = props.thermostatCreateStatus === RequestStatus.Getting;
   const isEdit = !!(props.thermostatEditDevice && props.thermostatEditDevice.selector);
-  const mode = props.thermostatEditMode || 'heating';
+  // A pilot-wire heater only heats (spec C.1.1): cooling is neither offered nor
+  // shown while one is picked on a virtual thermostat.
+  const hasPilotWire = props.thermostatEditType !== 'external' && !!props.thermostatEditPilotWireFeature;
+  const pickedMode = props.thermostatEditMode || 'heating';
+  const mode = hasPilotWire ? 'heating' : pickedMode;
   // The control rules read the other way round in cooling: the switch turns on
   // when the room is too warm. The help texts are therefore per-mode, not a
   // heating text with the word swapped.
@@ -78,7 +82,10 @@ const EditForm = ({ ...props }) => {
     comfort: 'thermostatEditPresetComfort'
   };
 
-  const controlType = props.thermostatEditControlType || 'hysteresis';
+  // A pilot wire is regulated on hysteresis only (spec C.1.1): TPI is neither
+  // offered nor shown while one is picked.
+  const pickedControlType = props.thermostatEditControlType || 'hysteresis';
+  const controlType = hasPilotWire && pickedControlType === 'tpi' ? 'hysteresis' : pickedControlType;
   // A real thermostat runs its own heuristic and drives its own heater: Gladys
   // only writes the setpoint its schedule resolves. Hysteresis, TPI and the
   // switch are therefore hidden — offering them would suggest Gladys regulates
@@ -257,9 +264,11 @@ const EditForm = ({ ...props }) => {
                 <option value="heating">
                   <Text id="integration.thermostat.edit.mode.heating" />
                 </option>
-                <option value="cooling">
-                  <Text id="integration.thermostat.edit.mode.cooling" />
-                </option>
+                {!hasPilotWire && (
+                  <option value="cooling">
+                    <Text id="integration.thermostat.edit.mode.cooling" />
+                  </option>
+                )}
               </select>
               <small class="form-text text-muted">
                 <Text id="integration.thermostat.edit.modeHelp" />
@@ -381,13 +390,42 @@ const EditForm = ({ ...props }) => {
                   <FeatureSelect
                     value={props.thermostatEditSwitchFeature || ''}
                     features={props.switchFeatures}
-                    onChange={e => props.updateThermostatField('thermostatEditSwitchFeature', e.target.value)}
+                    onChange={e => props.updateThermostatActuator('thermostatEditSwitchFeature', e.target.value)}
                     emptyLabel={<Text id="global.emptySelectOption" />}
                   />
                 </Localizer>
                 <small class="form-text text-muted">
                   <Text id={`integration.thermostat.edit.switchFeatureHelp.${modeSuffix}`} />
                 </small>
+              </div>
+            )}
+
+            {/* Fil pilote : l'autre façon de piloter un radiateur, par un ordre
+                sur son fil de commande plutôt que par une coupure. */}
+            {!isExternalThermostat && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.pilotWireFeatureLabel" />
+                </label>
+                <Localizer>
+                  <FeatureSelect
+                    value={props.thermostatEditPilotWireFeature || ''}
+                    features={props.pilotWireFeatures}
+                    onChange={e => props.updateThermostatActuator('thermostatEditPilotWireFeature', e.target.value)}
+                    emptyLabel={<Text id="global.emptySelectOption" />}
+                  />
+                </Localizer>
+                <small class="form-text text-muted">
+                  <Text id="integration.thermostat.edit.pilotWireFeatureHelp" />
+                </small>
+                {/* Promised by the spec (G): a module that keeps its own
+                    programme writes orders that are taken as presses of its
+                    button, and Gladys and the programme take turns. */}
+                {hasPilotWire && (
+                  <div class={cx('alert', 'alert-warning', 'mt-2', style.vendorWarning)}>
+                    <Text id="integration.thermostat.edit.pilotWireProgrammeWarning" />
+                  </div>
+                )}
               </div>
             )}
 
@@ -440,7 +478,7 @@ const EditForm = ({ ...props }) => {
                       </option>
                       {/* TPI modulates the on-time over a cycle, which only makes sense
                     for heating: a compressor cannot be pulsed that way */}
-                      {mode !== 'cooling' && (
+                      {mode !== 'cooling' && !hasPilotWire && (
                         <option value="tpi">
                           <Text id="integration.thermostat.edit.controlType.tpi" />
                         </option>

@@ -27,6 +27,7 @@ function createActions(store) {
         const humidityFeatures = [];
         const switchFeatures = [];
         const openingFeatures = [];
+        const pilotWireFeatures = [];
         const targetFeatures = [];
         const stateFeatures = [];
         const modeFeatures = [];
@@ -52,6 +53,17 @@ function createActions(store) {
             }
             if (HUMIDITY_CATEGORIES.includes(feature.category)) {
               humidityFeatures.push(entry);
+            }
+            // A pilot-wire heater takes one of six orders on its command wire
+            // rather than a contact: the same actuator slot, a different way of
+            // driving it. Like the switch, it has to be writable — a module
+            // that only publishes its status would refuse every order.
+            if (
+              feature.category === DEVICE_FEATURE_CATEGORIES.HEATER &&
+              feature.type === DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE &&
+              !feature.read_only
+            ) {
+              pilotWireFeatures.push(entry);
             }
             if (SWITCH_CATEGORIES.includes(feature.category) && feature.type === 'binary') {
               // The actuator has to be writable: a read-only switch — Netatmo's
@@ -91,6 +103,7 @@ function createActions(store) {
           temperatureFeatures,
           humidityFeatures,
           switchFeatures,
+          pilotWireFeatures,
           openingFeatures,
           targetFeatures,
           stateFeatures,
@@ -101,6 +114,7 @@ function createActions(store) {
           temperatureFeatures: [],
           humidityFeatures: [],
           switchFeatures: [],
+          pilotWireFeatures: [],
           openingFeatures: [],
           targetFeatures: [],
           stateFeatures: [],
@@ -142,6 +156,7 @@ function createActions(store) {
           thermostatEditTemperatureFeature: getParam('THERMOSTAT_TEMPERATURE_FEATURE') || '',
           thermostatEditHumidityFeature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || '',
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
+          thermostatEditPilotWireFeature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || '',
           thermostatEditType: getParam('THERMOSTAT_TYPE') || 'virtual',
           thermostatEditTargetFeature: getParam('THERMOSTAT_TARGET_FEATURE') || '',
           thermostatEditStateFeature: getParam('THERMOSTAT_STATE_FEATURE') || '',
@@ -171,6 +186,24 @@ function createActions(store) {
 
     updateThermostatField(state, field, value) {
       store.setState({ [field]: value });
+    },
+
+    // The switch and the pilot wire are the same actuator slot: picking one
+    // empties the other, so the form can never describe a heater driven both
+    // ways at once. A pilot wire also leaves TPI: the loop never pulses its
+    // orders within a cycle (spec C.1.1).
+    updateThermostatActuator(state, field, value) {
+      const pilotWire = field === 'thermostatEditPilotWireFeature';
+      const other = pilotWire ? 'thermostatEditSwitchFeature' : 'thermostatEditPilotWireFeature';
+      const next = value ? { [field]: value, [other]: '' } : { [field]: value };
+      if (pilotWire && value && state.thermostatEditControlType === 'tpi') {
+        next.thermostatEditControlType = 'hysteresis';
+      }
+      // A pilot-wire heater only heats.
+      if (pilotWire && value && state.thermostatEditMode === 'cooling') {
+        next.thermostatEditMode = 'heating';
+      }
+      store.setState(next);
     },
 
     updateThermostatUnit(state, newUnit) {
@@ -222,10 +255,17 @@ function createActions(store) {
         const minTemp = toNumber(state.thermostatEditMinTemp, 5);
         const maxTemp = toNumber(state.thermostatEditMaxTemp, 35);
         const tempUnit = state.thermostatEditTempUnit || 'C';
-        const controlType = state.thermostatEditControlType || 'hysteresis';
         const temperatureFeature = state.thermostatEditTemperatureFeature || '';
         const humidityFeature = state.thermostatEditHumidityFeature || '';
-        const switchFeature = state.thermostatEditSwitchFeature || '';
+        const pilotWireFeature = state.thermostatEditPilotWireFeature || '';
+        // A pilot wire is regulated on hysteresis only: a TPI saved before it was
+        // picked would be offered nowhere in the form and ignored by the loop.
+        const pickedControlType = state.thermostatEditControlType || 'hysteresis';
+        const controlType = pilotWireFeature && pickedControlType === 'tpi' ? 'hysteresis' : pickedControlType;
+        // A heater is driven by one actuator or the other, never both: the form
+        // clears one when the other is picked, and the save holds to it for a
+        // device that already carried both.
+        const switchFeature = pilotWireFeature ? '' : state.thermostatEditSwitchFeature || '';
         const windowFeature = state.thermostatEditWindowFeature || '';
         // `|| default` would discard an explicitly entered 0, which the preset
         // inputs accept: toNumber only falls back when the value is not a number.
@@ -247,16 +287,20 @@ function createActions(store) {
 
         const thermostatType = state.thermostatEditType === 'external' ? 'external' : 'virtual';
         const isExternalThermostat = thermostatType === 'external';
+        // A pilot-wire heater only heats: a cooling mode picked before it would
+        // show cooling while the loop heats (spec C.1.1).
+        const savedMode = !isExternalThermostat && pilotWireFeature ? 'heating' : mode;
 
         // Saving an empty form used to create a thermostat with no room, no
         // sensor and no actuator: it appeared in the list, regulated nothing, and
         // nothing said why. What makes a thermostat is the pair it drives — a
         // sensor to read and a switch to actuate, or the setpoint of a real
         // thermostat — so that is what is required, named in the error rather
-        // than reported as a generic failure.
+        // than reported as a generic failure. A pilot-wire heater keeps its own
+        // thermostat and is handed an order, not a contact: it needs no sensor.
         const missingConfig = isExternalThermostat
           ? !state.thermostatEditTargetFeature
-          : !temperatureFeature || !switchFeature;
+          : !pilotWireFeature && (!temperatureFeature || !switchFeature);
         if (missingConfig) {
           store.setState({
             thermostatCreateStatus: RequestStatus.Error,
@@ -299,7 +343,7 @@ function createActions(store) {
           params: [
             // The active schedule is device-owned: the dashboard widget only
             // chooses which thermostat to display, it never drives regulation.
-            { name: 'THERMOSTAT_MODE', value: mode },
+            { name: 'THERMOSTAT_MODE', value: savedMode },
             { name: 'THERMOSTAT_MIN_TEMP', value: String(minTemp) },
             { name: 'THERMOSTAT_MAX_TEMP', value: String(maxTemp) },
             { name: 'THERMOSTAT_TEMP_UNIT', value: tempUnit },
@@ -307,6 +351,7 @@ function createActions(store) {
             { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: temperatureFeature },
             { name: 'THERMOSTAT_HUMIDITY_FEATURE', value: humidityFeature },
             { name: 'THERMOSTAT_SWITCH_FEATURE', value: isExternalThermostat ? '' : switchFeature },
+            { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: isExternalThermostat ? '' : pilotWireFeature },
             { name: 'THERMOSTAT_TYPE', value: thermostatType },
             // Only meaningful on an external thermostat, and cleared otherwise so
             // switching a device back to virtual cannot leave it driving a real
@@ -385,6 +430,7 @@ function createActions(store) {
           thermostatEditTemperatureFeature: '',
           thermostatEditHumidityFeature: '',
           thermostatEditSwitchFeature: '',
+          thermostatEditPilotWireFeature: '',
           thermostatEditType: 'virtual',
           thermostatEditTargetFeature: '',
           thermostatEditStateFeature: '',

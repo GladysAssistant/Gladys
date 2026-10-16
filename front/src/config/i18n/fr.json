@@ -3505,7 +3505,7 @@
         "typeExternal": "Thermostat réel (l’appareil régule lui-même)",
         "vendorProgrammeWarning": "Désactivez le programme du fabricant sur cet appareil (application Netatmo, Tado…) avant de le piloter depuis Gladys. Sinon le programme de l’appareil et celui de Gladys écrivent tour à tour la consigne, et le thermostat suit celui qui a écrit en dernier.",
         "typeHelp": {
-          "virtual": "Gladys fait office de thermostat : elle lit un capteur de température et pilote un interrupteur (relais, prise, contact de chaudière) selon la consigne.",
+          "virtual": "Gladys fait office de thermostat : elle lit un capteur de température et pilote un interrupteur (relais, prise, contact de chaudière) ou un radiateur à fil pilote selon la consigne.",
           "external": "Le thermostat gère lui-même sa régulation et son chauffage. Gladys lui envoie seulement la consigne du planning et affiche son état."
         },
         "targetFeatureLabel": "Consigne du thermostat réel",
@@ -3544,6 +3544,9 @@
           "heating": "Interrupteur qui sera allumé et éteint pour chauffer la pièce.",
           "cooling": "Interrupteur qui sera allumé et éteint pour rafraîchir la pièce."
         },
+        "pilotWireFeatureLabel": "Fil pilote (actionneur)",
+        "pilotWireFeatureHelp": "Un radiateur à fil pilote : Gladys lui envoie un ordre (confort, éco, hors-gel, arrêt) au lieu de couper son alimentation. Avec un capteur de température, Gladys régule elle-même : l’ordre du preset sous la consigne, hors-gel au-dessus, avec les seuils d’hystérésis. Sans capteur, le radiateur reçoit l’ordre du preset et régule seul sur sa propre consigne. Le choisir vide le commutateur, et inversement : un radiateur se pilote d’une façon ou de l’autre. Le TPI n’est pas proposé avec un fil pilote : les ordres ne sont jamais envoyés par impulsions au sein d’un cycle. Désactivez d’abord le programme propre au module.",
+        "pilotWireProgrammeWarning": "Désactivez le programme ou le mode thermostat propre au module (planning Heatzy, programme Tuya…) avant de le piloter depuis Gladys. Sinon, chaque ordre écrit par ce programme est pris pour un changement fait sur le module, et le module et Gladys écrivent l’ordre à tour de rôle.",
         "windowFeatureLabel": "Capteur d'ouverture de fenêtre",
         "windowFeatureHelp": {
           "heating": "Optionnel. Si une fenêtre est ouverte, le chauffage est automatiquement coupé.",
@@ -3577,7 +3580,7 @@
         "saveButton": "Sauvegarder",
         "cancelButton": "Annuler",
         "saveError": "Erreur lors de la sauvegarde.",
-        "incompleteVirtualError": "Un thermostat virtuel a besoin d’un capteur de température et d’un commutateur : c’est en lisant l’un et en actionnant l’autre qu’il régule.",
+        "incompleteVirtualError": "Un thermostat virtuel a besoin d’un capteur de température et d’un commutateur — c’est en lisant l’un et en actionnant l’autre qu’il régule — ou d’un fil pilote, qui se passe de capteur.",
         "incompleteExternalError": "Un thermostat existant a besoin de la consigne du thermostat à piloter.",
         "activeScheduleLabel": "Planning actif",
         "activeScheduleHelp": "Sélectionnez le planning à appliquer automatiquement à ce thermostat.",
