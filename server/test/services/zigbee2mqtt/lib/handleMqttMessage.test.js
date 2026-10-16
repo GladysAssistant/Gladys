@@ -83,6 +83,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       .onThirdCall()
       .returns(null);
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
+    zigbee2mqttManager.syncRenamedDevices = fake.resolves(null);
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
     // ASSERT
@@ -90,6 +91,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
       payload: expectedDevicesPayload,
     });
+    assert.calledOnce(zigbee2mqttManager.syncRenamedDevices);
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
