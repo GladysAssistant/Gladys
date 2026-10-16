@@ -41,6 +41,17 @@ class ThermostatSetSchedule extends Component {
 
   handleScheduleChange = selectedOption => {
     this.props.updateActionProperty(this.props.path, 'schedule', selectedOption ? selectedOption.value : null);
+    // A thermostat of another house cannot follow the new schedule: kept on the
+    // action, it would only be refused when the scene runs.
+    const { devices } = this.props.action;
+    if (selectedOption && devices && this.state.thermostatOptions) {
+      const devicesInHouse = devices.filter(selector =>
+        this.state.thermostatOptions.some(option => option.value === selector && option.house === selectedOption.house)
+      );
+      if (devicesInHouse.length !== devices.length) {
+        this.props.updateActionProperty(this.props.path, 'devices', devicesInHouse);
+      }
+    }
   };
 
   handleThermostatsChange = selectedOptions => {
@@ -85,24 +96,27 @@ class ThermostatSetSchedule extends Component {
   }
 
   render(props, { scheduleOptions, thermostatOptions, selectedScheduleOption, selectedThermostatOptions }) {
-    // Once a schedule is picked, only the thermostats of its house are offered.
+    // Thermostats are offered once a schedule is picked, and only those of its house.
     const availableThermostats =
       selectedScheduleOption && thermostatOptions
         ? thermostatOptions.filter(option => option.house === selectedScheduleOption.house)
-        : thermostatOptions;
+        : [];
+    const scheduleInputId = `thermostat-set-schedule-${props.path}-schedule`;
+    const thermostatsInputId = `thermostat-set-schedule-${props.path}-thermostats`;
     return (
       <div>
         <p>
           <Text id="editScene.actionsCard.thermostatSetSchedule.description" />
         </p>
         <div class="form-group">
-          <label class="form-label">
+          <label class="form-label" htmlFor={scheduleInputId}>
             <Text id="editScene.actionsCard.thermostatSetSchedule.scheduleLabel" />
             <span class="form-required">
               <Text id="global.requiredField" />
             </span>
           </label>
           <Select
+            inputId={scheduleInputId}
             options={scheduleOptions}
             value={selectedScheduleOption}
             onChange={this.handleScheduleChange}
@@ -111,15 +125,17 @@ class ThermostatSetSchedule extends Component {
           />
         </div>
         <div class="form-group">
-          <label class="form-label">
+          <label class="form-label" htmlFor={thermostatsInputId}>
             <Text id="editScene.actionsCard.thermostatSetSchedule.thermostatsLabel" />
             <span class="form-required">
               <Text id="global.requiredField" />
             </span>
           </label>
           <Select
+            inputId={thermostatsInputId}
             defaultValue={[]}
             isMulti
+            isDisabled={!selectedScheduleOption}
             options={availableThermostats}
             value={selectedThermostatOptions}
             onChange={this.handleThermostatsChange}

@@ -88,7 +88,36 @@ describe('scene.thermostat-set-schedule', () => {
         ],
       ],
       {},
+      null,
+      { throwUnknownError: true },
     );
     assert.calledWith(service.getService, 'thermostat');
+  });
+
+  it('should do nothing when no thermostat was picked', async () => {
+    const stateManager = new StateManager(event);
+    const thermostatService = {
+      device: {
+        attachScheduleToDevice: fake.resolves(null),
+      },
+    };
+    const service = {
+      getService: fake.returns(thermostatService),
+    };
+    await executeActions(
+      { stateManager, event, service },
+      [
+        [
+          {
+            type: ACTIONS.THERMOSTAT.SET_SCHEDULE,
+            schedule: 'school-holidays',
+          },
+        ],
+      ],
+      {},
+      null,
+      { throwUnknownError: true },
+    );
+    assert.notCalled(thermostatService.device.attachScheduleToDevice);
   });
 });
