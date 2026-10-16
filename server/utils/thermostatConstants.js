@@ -42,6 +42,12 @@ const DEFAULT_TEMP_UNIT = 'C';
 const DEFAULT_MANUAL_DURATION_MINUTES = 30;
 const MANUAL_DURATION_MS = DEFAULT_MANUAL_DURATION_MINUTES * 60 * 1000;
 
+// How long an opening sensor has to stay open before the heating is suspended,
+// in seconds. A door opened to come in and closed right behind should not cut
+// the heating. Configurable per device through THERMOSTAT_WINDOW_DELAY; 0 cuts
+// as soon as it opens.
+const DEFAULT_WINDOW_DELAY_SECONDS = 60;
+
 // The preset names, as they are stored in a schedule transition and used to key
 // DEFAULT_PRESET_TEMPS. `schedule` is not one of them: it is a state of the
 // thermostat ("follow the programme"), carried by the preset feature, and a
@@ -87,6 +93,7 @@ module.exports = {
   DEFAULT_TEMP_UNIT,
   DEFAULT_MANUAL_DURATION_MINUTES,
   MANUAL_DURATION_MS,
+  DEFAULT_WINDOW_DELAY_SECONDS,
   PRESETS,
   TRANSITION_PRESETS,
   THERMOSTAT_TYPES,

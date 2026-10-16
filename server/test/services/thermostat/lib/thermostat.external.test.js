@@ -361,7 +361,8 @@ describe('thermostat.regulateDevice - external', () => {
   });
 
   describe('window open', () => {
-    const withWindow = (overrides = {}) => externalDevice({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', ...overrides });
+    const withWindow = (overrides = {}) =>
+      externalDevice({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0', ...overrides });
 
     // Nothing to cut: the real thermostat holds the contact. Writing the frost
     // setpoint is what stops it heating, and every thermostat accepting a
@@ -488,7 +489,11 @@ describe('thermostat.regulateDevice - external', () => {
         features: modeFeatures({ 'window-sensor': { selector: 'window-sensor', last_value: 0 } }),
       });
 
-      await regulate(mod, gladys, withMode({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor' }));
+      await regulate(
+        mod,
+        gladys,
+        withMode({ THERMOSTAT_WINDOW_FEATURE: 'window-sensor', THERMOSTAT_WINDOW_DELAY: '0' }),
+      );
 
       expect(writtenOn(gladys, 'netatmo-mode')).to.equal(THERMOSTAT_MODE.OFF);
     });

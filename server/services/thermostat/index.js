@@ -28,6 +28,8 @@ module.exports = function ThermostatService(gladys, serviceId) {
       clearTimeout(thermostatHandler.applyTimer);
       thermostatHandler.applyTimer = null;
     }
+    thermostatHandler.windowTimers.forEach((timer) => clearTimeout(timer));
+    thermostatHandler.windowTimers.clear();
   }
 
   /**

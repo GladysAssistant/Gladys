@@ -10,6 +10,7 @@ const {
   DEFAULT_MAX_TEMP,
   DEFAULT_TEMP_UNIT,
   DEFAULT_THERMOSTAT_TYPE,
+  DEFAULT_WINDOW_DELAY_SECONDS,
   THERMOSTAT_TYPES,
 } = require('../../../utils/thermostatConstants');
 const { THERMOSTAT_MODE } = require('../../../utils/constants');
@@ -56,6 +57,9 @@ function buildParamsConfig(device) {
     state_feature: getParam('THERMOSTAT_STATE_FEATURE') || null,
     mode_feature: getParam('THERMOSTAT_MODE_FEATURE') || null,
     window_feature: getParam('THERMOSTAT_WINDOW_FEATURE') || null,
+    // Seconds the sensor has to stay open before the heating is suspended. A
+    // negative value means nothing more than 0: cut at once.
+    window_delay: Math.max(0, toNumber(getParam('THERMOSTAT_WINDOW_DELAY'), DEFAULT_WINDOW_DELAY_SECONDS)),
     default_mode: getParam('THERMOSTAT_MODE') || DEFAULT_MODE,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
     temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),
