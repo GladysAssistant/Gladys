@@ -52,7 +52,7 @@ class AiProviderCard extends Component {
         return (
           <div class="alert alert-warning">
             <i class="fe fe-alert-triangle mr-1" />
-            <Text id="integration.externalIntegration.config.aiProviderError" />{' '}
+            <Text id="integration.externalIntegration.config.aiProviderLoadError" />{' '}
             <button type="button" class="btn btn-link p-0 align-baseline" onClick={this.load}>
               <Text id="integration.openai.aiProvider.retry" />
             </button>

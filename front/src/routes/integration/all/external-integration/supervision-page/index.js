@@ -50,9 +50,12 @@ class ExternalIntegrationSupervisionPage extends Component {
   // read, null while unknown (pending or failed): a failed read is not a
   // "not the provider" answer, the confirmation says it could not check
   loadAiProvider = async selector => {
+    this.aiProviderRequest = (this.aiProviderRequest || 0) + 1;
+    const request = this.aiProviderRequest;
     try {
       const aiProvider = await this.props.httpClient.get('/api/v1/ai_provider');
-      if (selector !== this.props.selector) {
+      if (selector !== this.props.selector || request !== this.aiProviderRequest) {
+        // a newer read has started since, discard this stale answer
         return;
       }
       this.setState({ isActiveAiProvider: aiProvider.selector === selector });
@@ -91,9 +94,11 @@ class ExternalIntegrationSupervisionPage extends Component {
 
   askUninstall = () => {
     this.setState({ askingUninstall: true });
-    if (this.isAiProvider() && this.state.isActiveAiProvider === null) {
-      // the selection could not be read at load time: try again now, the
-      // confirmation is where the answer matters
+    if (this.isAiProvider()) {
+      // the selection can change while this page is open (another tab, the
+      // configuration screen): read it again now, the confirmation is where
+      // the answer matters, and say "unknown" until it comes back
+      this.setState({ isActiveAiProvider: null });
       this.loadAiProvider(this.props.selector);
     }
   };
