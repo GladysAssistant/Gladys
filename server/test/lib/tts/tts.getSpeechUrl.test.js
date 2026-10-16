@@ -42,13 +42,21 @@ describe('tts.getSpeechUrl', () => {
     expect(tts.audios.get(token).expiresAt).to.be.at.most(Date.now() + TTS_AUDIO_TTL_MS);
   });
 
-  it('should default the language to null', async () => {
-    const { tts, stateManager, variableStore } = buildTts();
+  it('should default the language to the first administrator language, null without one', async () => {
+    const { tts, stateManager, variableStore, user } = buildTts();
     const synthesize = registerFakeTtsProvider(stateManager, 'ext-piper-tts');
     variableStore.set(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER, 'ext-piper-tts');
     tts.getLocalApiBaseUrl = fake.returns('http://192.168.1.10:1443');
+    // no administrator yet: null, the provider picks its own default voice
     await tts.getSpeechUrl({ text: 'Hello' });
     assert.calledWith(synthesize, { text: 'Hello', language: null });
+    // a scene announcement speaks the language the instance was set up in
+    user.getByRole = fake.resolves([{ language: 'fr' }]);
+    await tts.getSpeechUrl({ text: 'Bonjour' });
+    assert.calledWith(synthesize, { text: 'Bonjour', language: 'fr' });
+    // an explicit language always wins
+    await tts.getSpeechUrl({ text: 'Hallo', language: 'de' });
+    assert.calledWith(synthesize, { text: 'Hallo', language: 'de' });
   });
 
   it('should keep the cache under the entry cap, evicting the oldest clip first', async () => {

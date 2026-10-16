@@ -129,7 +129,7 @@ class OpenAIGateway extends Component {
         {/* the voice does not need Gladys Plus (an installed TTS provider
             integration works locally) but it is an instance-wide, admin-only
             setting: the server rejects the write for non-admins */}
-        {isAdmin && <TtsProviderSettings />}
+        {isAdmin && <TtsProviderSettings gladysPlusConnected={gladysPlusConnected} />}
         {gladysPlusConnected === true && <AiQuotaDisplay />}
         {gladysPlusConnected === true && <WeeklyDigestSettings />}
         {gladysPlusConnected === true && <AiChatDebugDownload />}

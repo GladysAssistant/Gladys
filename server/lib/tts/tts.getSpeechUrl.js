@@ -16,7 +16,8 @@ const { GLADYS_PLUS_PROVIDER, TTS_AUDIO_TTL_MS, TTS_AUDIO_TOKEN_BYTES, TTS_AUDIO
  * fallback to another voice would be a surprise, not a service.
  * @param {object} options - Speech options.
  * @param {string} options.text - The text to speak.
- * @param {string} [options.language] - Best-effort language hint.
+ * @param {string} [options.language] - Best-effort language hint; without
+ * one (a scene announcement) the first administrator's language is used.
  * @returns {Promise<object>} Resolve with { url, provider }.
  * @example
  * const { url } = await gladys.tts.getSpeechUrl({ text: 'Hello!' });
@@ -31,7 +32,10 @@ async function getSpeechUrl({ text, language = null }) {
   if (!providerService || !providerService.tts || typeof providerService.tts.synthesize !== 'function') {
     throw new NotFoundError(`TTS provider "${activeProvider}" is not available`);
   }
-  const { buffer, contentType, extension } = await providerService.tts.synthesize({ text, language });
+  const { buffer, contentType, extension } = await providerService.tts.synthesize({
+    text,
+    language: language || (await this.getDefaultLanguage()),
+  });
   // defense in depth: the external-integration proxy already validates all
   // of this, but nothing here is served or put in a URL without being
   // checked against the curated list and the size bound — whatever service
@@ -51,7 +55,7 @@ async function getSpeechUrl({ text, language = null }) {
   }
   const token = crypto.randomBytes(TTS_AUDIO_TOKEN_BYTES).toString('hex');
   this.audios.set(token, { buffer, contentType, expiresAt: Date.now() + TTS_AUDIO_TTL_MS });
-  const url = `${this.getLocalApiBaseUrl()}/api/v1/tts/audio/${token}.${extension}`;
+  const url = `${await this.getLocalApiBaseUrl()}/api/v1/tts/audio/${token}.${extension}`;
   return { url, provider: activeProvider };
 }
 

@@ -257,7 +257,10 @@ class ExternalIntegrationInstallPage extends Component {
                             {manifest.type === 'tts' && (
                               <div class="alert alert-info">
                                 <i class="fe fe-volume-2 mr-1" />
-                                <Text id="integration.externalIntegration.install.ttsInfoText" />
+                                <Text id="integration.externalIntegration.install.ttsInfoText" />{' '}
+                                <Link href="/dashboard/integration/communication/openai">
+                                  <Text id="integration.externalIntegration.install.ttsInfoLink" />
+                                </Link>
                               </div>
                             )}
                             {manifest.type === 'provider' && (

@@ -367,12 +367,32 @@ describe('gateway.processVoiceMessage', () => {
     expect(errorPayload.payload).to.deep.equal({ error: 'too_many_requests', message: '' });
   });
 
-  it('should return a text-only answer on a 403 or 429 thrown by an external TTS provider', async () => {
+  it('should emit payment_required websocket error and rethrow Error402 coming from Gladys Plus TTS', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      tts: { getSpeechUrl: fake.rejects(new Error402('payment required')) },
+    });
+
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), Error402);
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload.payload).to.deep.equal({ error: 'payment_required', message: 'payment required' });
+  });
+
+  it('should return a text-only answer on a 402, 403 or 429 thrown by an external TTS provider', async () => {
     // only Gladys Plus has an upsell: the same status codes thrown by an
     // integration provider mean nothing to the user and degrade like any
     // other TTS failure
     // eslint-disable-next-line no-restricted-syntax
-    for (const providerError of [new Error403('provider refused'), new Error429('provider busy')]) {
+    for (const providerError of [
+      new Error402('provider wants money'),
+      new Error403('provider refused'),
+      new Error429('provider busy'),
+    ]) {
       const eventEmit = fake();
       const ctx = buildContext({
         event: { emit: eventEmit },

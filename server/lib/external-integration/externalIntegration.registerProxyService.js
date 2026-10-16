@@ -179,8 +179,12 @@ function registerProxyService(service) {
             if (typeof audio !== 'string' || audio.length === 0 || audio.length > MAX_TTS_AUDIO_BASE64_LENGTH) {
               throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
             }
-            const separatorIndex = audio.indexOf(';base64,');
-            const contentType = separatorIndex === -1 ? null : audio.substring(0, separatorIndex);
+            // the contract is "<content type>;base64,<payload>" (the camera
+            // convention); a standard data URI with its "data:" scheme is
+            // accepted too rather than failing with an opaque error
+            const dataUri = audio.startsWith('data:') ? audio.substring('data:'.length) : audio;
+            const separatorIndex = dataUri.indexOf(';base64,');
+            const contentType = separatorIndex === -1 ? null : dataUri.substring(0, separatorIndex);
             // own-key lookup only: a content type like "constructor" must
             // not match an inherited Object.prototype property
             const extension = Object.prototype.hasOwnProperty.call(TTS_AUDIO_CONTENT_TYPES, contentType)
@@ -191,7 +195,7 @@ function registerProxyService(service) {
             }
             // Buffer.from skips invalid characters instead of throwing: a
             // malformed payload would otherwise decode to a partial clip
-            const encoded = audio.substring(separatorIndex + ';base64,'.length);
+            const encoded = dataUri.substring(separatorIndex + ';base64,'.length);
             if (!BASE64_REGEX.test(encoded)) {
               throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
             }

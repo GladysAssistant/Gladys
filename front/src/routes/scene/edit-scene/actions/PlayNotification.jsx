@@ -2,6 +2,7 @@ import Select from '../../../../components/form/Select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
@@ -187,15 +188,26 @@ class PlayNotification extends Component {
       <div>
         {/* the Gladys Plus upsell only makes sense when the instance speaks
             through Gladys Plus: with a TTS provider integration active, the
-            action works without any Plus subscription */}
+            action works without any Plus subscription. Its wording names
+            the alternative (a text-to-speech integration) rather than
+            claiming the action requires Gladys Plus, and the voice setting
+            is one click away. */}
         {ttsProvider === 'gladys-plus' && (
-          <GladysPlusUpsell
-            compact
-            icon="fe-volume-2"
-            utmCampaign="scene_action_tts"
-            titleKey="gladysPlusUpsell.tts.title"
-            descriptionKey="gladysPlusUpsell.tts.compactDescription"
-          />
+          <div>
+            <GladysPlusUpsell
+              compact
+              icon="fe-volume-2"
+              utmCampaign="scene_action_tts"
+              titleKey="gladysPlusUpsell.tts.providerTitle"
+              descriptionKey="gladysPlusUpsell.tts.providerCompactDescription"
+            />
+            <p class="small text-muted">
+              <i class="fe fe-mic mr-1" />
+              <Link href="/dashboard/integration/communication/openai">
+                <Text id="editScene.actionsCard.playNotification.voiceSettingLink" />
+              </Link>
+            </p>
+          </div>
         )}
         <p>
           <Text id="editScene.actionsCard.playNotification.description" />

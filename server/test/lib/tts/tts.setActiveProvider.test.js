@@ -15,7 +15,7 @@ describe('tts.setActiveProvider', () => {
       // no t_service row nor manifest name here: raw fallback
       providers: [
         { provider: GLADYS_PLUS_PROVIDER, name: 'Gladys Plus' },
-        { provider: 'ext-piper-tts', name: 'ext-piper-tts' },
+        { provider: 'ext-piper-tts', name: 'ext-piper-tts', selector: 'ext-piper-tts', status: null },
       ],
     });
     expect(variableStore.get(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER)).to.equal('ext-piper-tts');

@@ -94,19 +94,20 @@ async function processVoiceMessage({ audio, contentType = 'application/octet-str
       // Active provider dispatch (Gladys Plus by default, or a TTS provider
       // integration — see gladys.tts, attached post-construction in lib/index.js).
       // A TTS failure must not discard the transcription and the answer: the
-      // voice assistant degrades to a text-only reply. The Gladys Plus 403
-      // (no subscription) and 429 (quota reached) are the exception: they
-      // are the upsell paths the outer handler turns into the `forbidden` /
-      // `too_many_requests` websocket errors, and degrading them to a silent
-      // text-only reply would hide why the voice stopped working. Only
-      // Gladys Plus has an upsell: the same status codes thrown by another
-      // provider mean nothing to the user and degrade like any failure.
+      // voice assistant degrades to a text-only reply. The Gladys Plus 402
+      // (payment required), 403 (no subscription) and 429 (quota reached)
+      // are the exception: they are the upsell paths the outer handler turns
+      // into the `payment_required` / `forbidden` / `too_many_requests`
+      // websocket errors, and degrading them to a silent text-only reply
+      // would hide why the voice stopped working. Only Gladys Plus has an
+      // upsell: the same status codes thrown by another provider mean
+      // nothing to the user and degrade like any failure.
       try {
         const ttsResponse = await this.tts.getSpeechUrl({ text: answer, language: user.language });
         ttsUrl = ttsResponse?.url ?? null;
       } catch (e) {
         const isGladysPlusError =
-          (e instanceof Error403 || e instanceof Error429) &&
+          (e instanceof Error402 || e instanceof Error403 || e instanceof Error429) &&
           (await this.tts.getActiveProvider()) === GLADYS_PLUS_PROVIDER;
         if (isGladysPlusError) {
           throw e;

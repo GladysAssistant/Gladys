@@ -60,7 +60,7 @@ describe('TTS API', () => {
       expect(res.body.providers).to.deep.equal([
         { provider: 'gladys-plus', name: 'Gladys Plus' },
         // no installed t_service row in this test: raw selector fallback
-        { provider: 'ext-piper-tts', name: 'ext-piper-tts' },
+        { provider: 'ext-piper-tts', name: 'ext-piper-tts', selector: 'ext-piper-tts', status: null },
       ]);
     });
   });

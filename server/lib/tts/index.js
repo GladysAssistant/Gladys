@@ -1,5 +1,6 @@
 const { getProviders } = require('./tts.getProviders');
 const { getActiveProvider } = require('./tts.getActiveProvider');
+const { getDefaultLanguage } = require('./tts.getDefaultLanguage');
 const { getProviderConfiguration } = require('./tts.getProviderConfiguration');
 const { setActiveProvider } = require('./tts.setActiveProvider');
 const { getSpeechUrl } = require('./tts.getSpeechUrl');
@@ -18,20 +19,25 @@ const { getLocalApiBaseUrl } = require('./tts.getLocalApiBaseUrl');
  * @param {object} service - Service manager.
  * @param {object} stateManager - State manager.
  * @param {object} gateway - Gladys Gateway manager.
+ * @param {object} system - System manager (network mode of the Gladys container).
+ * @param {object} user - User manager (default language of a scene announcement).
  * @example
- * const tts = new Tts(variable, service, stateManager, gateway);
+ * const tts = new Tts(variable, service, stateManager, gateway, system, user);
  */
-const Tts = function Tts(variable, service, stateManager, gateway) {
+const Tts = function Tts(variable, service, stateManager, gateway, system, user) {
   this.variable = variable;
   this.service = service;
   this.stateManager = stateManager;
   this.gateway = gateway;
+  this.system = system;
+  this.user = user;
   // synthesized clips, in RAM only: token -> { buffer, contentType, expiresAt }
   this.audios = new Map();
 };
 
 Tts.prototype.getProviders = getProviders;
 Tts.prototype.getActiveProvider = getActiveProvider;
+Tts.prototype.getDefaultLanguage = getDefaultLanguage;
 Tts.prototype.getProviderConfiguration = getProviderConfiguration;
 Tts.prototype.setActiveProvider = setActiveProvider;
 Tts.prototype.getSpeechUrl = getSpeechUrl;

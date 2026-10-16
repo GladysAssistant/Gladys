@@ -110,7 +110,7 @@ function Gladys(params = {}) {
     brain,
     device,
   );
-  const tts = new Tts(variable, service, stateManager, gateway);
+  const tts = new Tts(variable, service, stateManager, gateway, system, user);
   const scene = new Scene(
     stateManager,
     event,

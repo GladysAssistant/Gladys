@@ -9,11 +9,14 @@ const StateManager = require('../../../lib/state');
  * @description Build a tts manager wired with fakes for tests.
  * @param {object} [options] - Options.
  * @param {object} [options.gateway] - Gateway fakes overrides.
- * @returns {object} The tts manager and its fakes ({ tts, stateManager, variable, gateway, variableStore }).
+ * @param {object} [options.system] - System fakes overrides.
+ * @param {object} [options.user] - User manager fakes overrides.
+ * @returns {object} The tts manager and its fakes
+ * ({ tts, stateManager, variable, gateway, system, user, variableStore }).
  * @example
  * const { tts } = buildTts();
  */
-function buildTts({ gateway: gatewayOverrides } = {}) {
+function buildTts({ gateway: gatewayOverrides, system: systemOverrides, user: userOverrides } = {}) {
   const event = { emit: fake.returns(null), on: fake.returns(null) };
   const stateManager = new StateManager(event);
   const variableStore = new Map();
@@ -28,8 +31,16 @@ function buildTts({ gateway: gatewayOverrides } = {}) {
     getTTSApiUrl: fake.resolves({ url: 'https://plus.test/audio.mp3' }),
     ...gatewayOverrides,
   };
-  const tts = new Tts(variable, serviceManager, stateManager, gateway);
-  return { tts, stateManager, variable, gateway, variableStore };
+  const system = {
+    isOnHostNetwork: fake.resolves(true),
+    ...systemOverrides,
+  };
+  const user = {
+    getByRole: fake.resolves([]),
+    ...userOverrides,
+  };
+  const tts = new Tts(variable, serviceManager, stateManager, gateway, system, user);
+  return { tts, stateManager, variable, gateway, system, user, variableStore };
 }
 
 /**

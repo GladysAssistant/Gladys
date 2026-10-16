@@ -9,6 +9,7 @@ import LinkAccountCard from './LinkAccountCard';
 import ContactProfileCard from './ContactProfileCard';
 import CalendarAccountCard from './CalendarAccountCard';
 import WebhooksCard from './WebhooksCard';
+import TtsVoiceCard from './TtsVoiceCard';
 import HardwareCard from './HardwareCard';
 import { getAssignedPortsByName, getLocalizedText, getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -35,6 +36,9 @@ const ConfigTab = props => {
   // calendar integrations: the per-user "My calendars" block, for
   // every user — enable/disable, account values, sync/shared toggles
   const isCalendar = get(integration, 'manifest.type') === 'calendar';
+  // tts integrations: whether this one is the voice of the instance, and
+  // where to change it — the setting lives on the Artificial Intelligence page
+  const isTts = get(integration, 'manifest.type') === 'tts';
   const accountSchema = get(integration, 'manifest.account_schema') || [];
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
   // host ports assigned to the manifest-named declared ports, for the
@@ -220,6 +224,8 @@ const ConfigTab = props => {
           onToggleCalendar={props.toggleUserCalendar}
         />
       )}
+
+      {isTts && integration && <TtsVoiceCard serviceName={integration.name} httpClient={props.httpClient} />}
 
       {isAdmin && integration && manifestWebhooks.length > 0 && (
         <WebhooksCard

@@ -176,6 +176,22 @@ describe('externalIntegration TTS providers (type tts)', () => {
       );
     });
 
+    it('should accept a standard data URI with its data: scheme', async () => {
+      const { externalIntegration, stateManager } = buildSupervisor();
+      const service = await seedTtsService();
+      const audioBuffer = Buffer.from('fake-ogg-bytes');
+      externalIntegration.sendCommand = fake.resolves({
+        success: true,
+        data: { audio: `data:${audioDataUri(audioBuffer, 'audio/ogg')}` },
+      });
+      externalIntegration.registerProxyService(service);
+      const proxyService = stateManager.get('service', service.name);
+      const result = await proxyService.tts.synthesize({ text: 'Bonjour' });
+      expect(result.buffer.equals(audioBuffer)).to.equal(true);
+      expect(result.contentType).to.equal('audio/ogg');
+      expect(result.extension).to.equal('ogg');
+    });
+
     it('should refuse malformed base64 instead of decoding a partial clip', async () => {
       const { externalIntegration, stateManager } = buildSupervisor();
       const service = await seedTtsService();
