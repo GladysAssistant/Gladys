@@ -3549,6 +3549,12 @@
           "heating": "Optional. Wenn ein Fenster geöffnet ist, wird die Heizung automatisch abgeschaltet.",
           "cooling": "Optional. Wenn ein Fenster geöffnet ist, wird die Kühlung automatisch abgeschaltet."
         },
+        "windowDelayLabel": "Verzögerung vor dem Abschalten",
+        "windowDelayUnit": "s",
+        "windowDelayHelp": {
+          "heating": "Wie lange das Fenster geöffnet bleiben muss, bevor die Heizung abgeschaltet wird. Eine Tür, die zum Hereinkommen geöffnet und gleich wieder geschlossen wird, schaltet sie nicht ab. 0 schaltet sofort ab.",
+          "cooling": "Wie lange das Fenster geöffnet bleiben muss, bevor die Kühlung abgeschaltet wird. Eine Tür, die zum Hereinkommen geöffnet und gleich wieder geschlossen wird, schaltet sie nicht ab. 0 schaltet sofort ab."
+        },
         "hysteresisStartLabel": "Einschaltschwelle",
         "hysteresisStartHelp": {
           "heating": "Die Heizung schaltet ein, wenn die Temperatur unter (Sollwert − Einschaltschwelle) liegt. Z. B. Sollwert 21 °C, Schwelle 0,5 °C → schaltet unter 20,5 °C ein.",

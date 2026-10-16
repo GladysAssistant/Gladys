@@ -17,6 +17,7 @@ const buildService = ({ applySchedulesFails = false } = {}) => {
     onDeviceNewState: fake.resolves(null),
     primeObservedSetpoints: fake.resolves(null),
     applyTimer: null,
+    windowTimers: new Map(),
   };
   const controllers = { 'get /api/v1/service/thermostat/device': {} };
   const ThermostatService = proxyquire('../../../services/thermostat/index', {
@@ -133,6 +134,19 @@ describe('ThermostatService', () => {
     assert.calledWith(gladys.event.removeListener, EVENTS.DEVICE.NEW_STATE);
     assert.notCalled(handler.applySchedules);
     expect(handler.applyTimer).to.equal(null);
+  });
+
+  it('should clear the pending checks of an opening delay on stop', async () => {
+    const clock = sinon.useFakeTimers();
+    const { service, handler } = buildService();
+    const check = fake();
+    handler.windowTimers.set('thermostat-living-room', setTimeout(check, 10000));
+
+    await service.stop();
+    await clock.tickAsync(10000);
+
+    assert.notCalled(check);
+    expect(handler.windowTimers.size).to.equal(0);
   });
 
   it('should be safe to stop a service that was never started', async () => {

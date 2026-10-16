@@ -409,6 +409,36 @@ const EditForm = ({ ...props }) => {
               </small>
             </div>
 
+            {/* How long the sensor has to stay open before the heating is
+                suspended: a door opened to come in and closed right behind
+                should not cut it. Pointless without a sensor. */}
+            {props.thermostatEditWindowFeature && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.thermostat.edit.windowDelayLabel" />
+                </label>
+                <div class={cx('input-group', style.shortNumberField)}>
+                  <input
+                    type="number"
+                    class="form-control"
+                    min="0"
+                    max="3600"
+                    step="1"
+                    value={props.thermostatEditWindowDelay}
+                    onInput={e => props.updateThermostatField('thermostatEditWindowDelay', e.target.value)}
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <Text id="integration.thermostat.edit.windowDelayUnit" />
+                    </span>
+                  </div>
+                </div>
+                <small class="form-text text-muted">
+                  <Text id={`integration.thermostat.edit.windowDelayHelp.${modeSuffix}`} />
+                </small>
+              </div>
+            )}
+
             {/* Folded away: the control type and its hysteresis or TPI figures
                 all have working defaults, and putting them ahead of the sensor
                 and the actuator buried the two fields that decide whether the

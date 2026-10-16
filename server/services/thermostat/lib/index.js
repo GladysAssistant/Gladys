@@ -52,6 +52,14 @@ const ThermostatHandler = function ThermostatHandler(gladys, serviceId) {
   // The programme preset last announced to the dashboards, by thermostat
   // selector: the minute loop pushes one only when the point in force changes.
   this.announcedPresets = new Map();
+  // When each opening sensor was seen opening, by selector. The heating is only
+  // suspended once it has stayed open THERMOSTAT_WINDOW_DELAY seconds, and the
+  // feature's `last_value_changed` cannot say since when: it moves on every
+  // report, and a contact re-reporting "open" would restart the count each time.
+  this.windowOpenedAt = new Map();
+  // The pending checks of an opening's delay, by thermostat selector, so that the
+  // heating is suspended when the delay ends rather than at the next minute tick.
+  this.windowTimers = new Map();
 };
 
 ThermostatHandler.prototype.createDevice = createDevice;

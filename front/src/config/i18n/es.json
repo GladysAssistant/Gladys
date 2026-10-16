@@ -3549,6 +3549,12 @@
           "heating": "Opcional. Si una ventana está abierta, la calefacción se corta automáticamente.",
           "cooling": "Opcional. Si una ventana está abierta, la refrigeración se corta automáticamente."
         },
+        "windowDelayLabel": "Retardo antes del corte",
+        "windowDelayUnit": "s",
+        "windowDelayHelp": {
+          "heating": "Tiempo que la ventana debe permanecer abierta antes de cortar la calefacción. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato.",
+          "cooling": "Tiempo que la ventana debe permanecer abierta antes de cortar la refrigeración. Una puerta abierta para entrar y cerrada justo después no la corta. 0 la corta de inmediato."
+        },
         "hysteresisStartLabel": "Umbral de arranque",
         "hysteresisStartHelp": {
           "heating": "La calefacción se enciende cuando la temperatura está por debajo de (consigna − umbral de arranque). Ej. consigna 21 °C, umbral 0,5 °C → se enciende por debajo de 20,5 °C.",
