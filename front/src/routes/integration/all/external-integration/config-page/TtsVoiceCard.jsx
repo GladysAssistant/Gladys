@@ -2,18 +2,26 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
+import { WORKING_STATUSES } from '../../openai/TtsProviderSettings';
+
 // Shown on the Configuration screen of a "tts" integration (spec:
 // external-integrations/capabilities/tts-type.md): installing a
 // text-to-speech provider does not make it the voice of the instance, the
 // admin has to select it on the Artificial Intelligence page. This card
 // says whether this integration is the active voice and links to the
-// setting, which would otherwise be hard to discover from here.
+// setting, which would otherwise be hard to discover from here. Being the
+// active voice while stopped is a failure state (every announcement fails
+// until the integration restarts), shown as a warning like on the AI page.
 class TtsVoiceCard extends Component {
   getProviderConfiguration = async () => {
     try {
       const { active, providers } = await this.props.httpClient.get('/api/v1/tts/provider');
       const activeProvider = providers.find(provider => provider.provider === active) || null;
-      this.setState({ active, activeName: activeProvider ? activeProvider.name : active });
+      this.setState({
+        active,
+        activeName: activeProvider ? activeProvider.name : active,
+        activeStatus: activeProvider ? activeProvider.status : null
+      });
     } catch (e) {
       console.error(e);
     }
@@ -23,21 +31,30 @@ class TtsVoiceCard extends Component {
     this.getProviderConfiguration();
   }
 
-  render({ serviceName }, { active, activeName }) {
+  render({ serviceName }, { active, activeName, activeStatus }) {
     if (!active) {
       return null;
     }
     const isActiveVoice = active === serviceName;
+    const isActiveButStopped = isActiveVoice && Boolean(activeStatus) && !WORKING_STATUSES.includes(activeStatus);
+    let textClass = 'text-muted';
+    let icon = 'fe-volume-x';
+    let textId = 'integration.externalIntegration.config.ttsVoiceInactive';
+    if (isActiveButStopped) {
+      textClass = 'text-warning';
+      icon = 'fe-alert-triangle';
+      textId = 'integration.externalIntegration.config.ttsVoiceActiveNotRunning';
+    } else if (isActiveVoice) {
+      textClass = 'text-success';
+      icon = 'fe-check-circle';
+      textId = 'integration.externalIntegration.config.ttsVoiceActive';
+    }
     return (
       <div class="card">
         <div class="card-body">
-          <div class={isActiveVoice ? 'text-success' : 'text-muted'}>
-            <i class={`fe ${isActiveVoice ? 'fe-check-circle' : 'fe-volume-x'} mr-1`} />
-            {isActiveVoice ? (
-              <Text id="integration.externalIntegration.config.ttsVoiceActive" />
-            ) : (
-              <Text id="integration.externalIntegration.config.ttsVoiceInactive" fields={{ name: activeName }} />
-            )}
+          <div class={textClass}>
+            <i class={`fe ${icon} mr-1`} />
+            <Text id={textId} fields={{ name: activeName }} />
           </div>
           <Link href="/dashboard/integration/communication/openai" class="btn btn-outline-primary btn-sm mt-3">
             <i class="fe fe-mic mr-1" />

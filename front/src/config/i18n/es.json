@@ -1050,6 +1050,7 @@
       "config": {
         "title": "Configuración",
         "ttsVoiceActive": "Esta integración es la voz de su instancia: los anuncios de las escenas y las respuestas del asistente de voz pasan por ella.",
+        "ttsVoiceActiveNotRunning": "Esta integración es la voz de su instancia, pero no está en ejecución: los anuncios de las escenas y las respuestas del asistente de voz fallarán hasta que se reinicie.",
         "ttsVoiceInactive": "Esta integración no es la voz de su instancia (la voz activa es \"{{name}}\"). Instalarla no basta: selecciónela como voz para usarla.",
         "ttsVoiceChangeLink": "Cambiar la voz de la instancia",
         "docsLink": "Documentación",

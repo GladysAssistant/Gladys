@@ -1050,6 +1050,7 @@
       "config": {
         "title": "Configuration",
         "ttsVoiceActive": "This integration is the voice of your instance: scene announcements and voice assistant replies speak through it.",
+        "ttsVoiceActiveNotRunning": "This integration is the voice of your instance, but it is not running: scene announcements and voice assistant replies will fail until it is restarted.",
         "ttsVoiceInactive": "This integration is not the voice of your instance (the active voice is \"{{name}}\"). Installing it is not enough: select it as the voice to use it.",
         "ttsVoiceChangeLink": "Change the voice of the instance",
         "docsLink": "Documentation",

@@ -8,7 +8,7 @@ import { SERVICE_STATUS } from '../../../../../../server/utils/constants';
 
 export const GLADYS_PLUS_PROVIDER = 'gladys-plus';
 // an integration provider answers synthesis requests in these statuses only
-const WORKING_STATUSES = [SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
+export const WORKING_STATUSES = [SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
 
 // The voice of the instance: Gladys Plus by default, or any installed TTS
 // provider integration (external integrations of type "tts"). Scene

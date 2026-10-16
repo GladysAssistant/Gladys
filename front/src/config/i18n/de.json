@@ -1050,6 +1050,7 @@
       "config": {
         "title": "Konfiguration",
         "ttsVoiceActive": "Diese Integration ist die Stimme Ihrer Instanz: Szenen-Ansagen und Antworten des Sprachassistenten laufen über sie.",
+        "ttsVoiceActiveNotRunning": "Diese Integration ist die Stimme Ihrer Instanz, läuft aber nicht: Szenen-Ansagen und Antworten des Sprachassistenten schlagen fehl, bis sie neu gestartet wird.",
         "ttsVoiceInactive": "Diese Integration ist nicht die Stimme Ihrer Instanz (die aktive Stimme ist „{{name}}“). Die Installation genügt nicht: Wählen Sie sie als Stimme aus, um sie zu verwenden.",
         "ttsVoiceChangeLink": "Stimme der Instanz ändern",
         "docsLink": "Dokumentation",
