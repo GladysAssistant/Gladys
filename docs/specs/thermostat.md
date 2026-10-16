@@ -489,6 +489,12 @@ The page lists schedules **by house**, and under each schedule the thermostats t
 
 The times are the browser's native time inputs. On a touch screen a tap anywhere on the field opens the picker — Chrome on Android otherwise opens it from the clock icon only, and a tap on the time selects the hour without a picker or a keyboard. The gesture is read from the click (`pointerType`, with `(any-pointer: coarse)` for a click that carries none, such as one a label forwards), not from `(pointer: coarse)`, which describes the primary pointer only and misses a touchscreen laptop; the helper is `front/src/utils/openNativePicker.js`, for any native date or time input. In dark mode, every native date and time field carries a dark colour scheme (`dark-mode.css`): the app inverts inputs back to their real dark colours, and the browser's icon, drawn for a light field, was black on dark.
 
+### E.8 Switching programmes from a scene
+
+A house keeps several schedules — school term, school holidays, a week away — and the thermostats move between them with the calendar, not with someone editing the points each time. The scene action `thermostat.set-schedule` (`schedule`: a schedule selector, `devices`: thermostat selectors) is that move: for each thermostat it does exactly what `POST /schedule/:selector/device/:device_selector` does (E.4), so the point of the new schedule applies at once, a hold ends, a stop the previous programme made is lifted and a stop made by hand stays. A thermostat already on that schedule is left as it is.
+
+One thermostat failing — deleted, moved to another house — is logged and leaves the others switched, like the light and switch actions; the action does nothing when the thermostat service is not running. The scene editor offers only the thermostats of the schedule's house.
+
 ## F. The widget, on an external thermostat
 
 The dashboard widget is the same in both cases; three details differ.

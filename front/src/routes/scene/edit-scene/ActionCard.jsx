@@ -44,6 +44,7 @@ import CheckAlarmMode from './actions/CheckAlarmMode';
 import SetAlarmMode from './actions/SetAlarmMode';
 import SendMqttMessage from './actions/SendMqttMessage';
 import SendZigbee2MqttMessage from './actions/SendZigbee2MqttMessage';
+import ThermostatSetSchedule from './actions/ThermostatSetSchedule';
 import PlayNotification from './actions/PlayNotification';
 import EdfTempoCondition from './actions/EdfTempoCondition';
 import EnergyCurrentPriceCondition from './actions/EnergyCurrentPriceCondition';
@@ -88,6 +89,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.ALARM.SET_ALARM_MODE]: SetAlarmMode,
   [ACTIONS.MQTT.SEND]: SendMqttMessage,
   [ACTIONS.ZIGBEE2MQTT.SEND]: SendZigbee2MqttMessage,
+  [ACTIONS.THERMOSTAT.SET_SCHEDULE]: ThermostatSetSchedule,
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
   [ACTIONS.AI.ASK]: AskAI,
   [ACTIONS.SMS.SEND]: SendSms,

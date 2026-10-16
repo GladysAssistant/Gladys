@@ -375,6 +375,10 @@ function createSceneCreateInputSchema(
         topic: z.string(),
         message: z.string(),
       }),
+      actionSchemaByType(ACTIONS.THERMOSTAT.SET_SCHEDULE, {
+        devices: z.array(z.string()).describe('Selectors of the thermostats created by the Thermostat integration.'),
+        schedule: z.string().describe('Selector of the weekly schedule the thermostats follow from now on.'),
+      }),
       actionSchemaByType(ACTIONS.EXTERNAL_INTEGRATION.SCENE_ACTION, {
         integration: z.string(),
         action_key: sceneDeclarationKeySchema,
