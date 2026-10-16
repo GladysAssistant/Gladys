@@ -188,6 +188,27 @@ describe('Dashboard camera box WebRTC live view', () => {
     cy.get('@rtspCamera.all').should('have.length', 0);
   });
 
+  it('does not start a live view left while the camera was still loading', () => {
+    cy.intercept({ method: 'POST', pathname: `/api/v1/camera/${CAMERA}/webrtc/start` }, { body: {} }).as('startWebRtc');
+    cy.intercept({ method: 'GET', pathname: `/api/v1/device/${CAMERA}` }, req => {
+      req.on('response', res => {
+        res.setDelay(1500);
+      });
+    }).as('getCamera');
+    cy.visit('/dashboard/test', { onBeforeLoad: installFakePeerConnection });
+
+    cy.get('.card-options .fe-airplay').click();
+    // the user leaves (tab hidden, page closed) before the camera is known
+    cy.window().then(win => win.dispatchEvent(new win.Event('pagehide')));
+    cy.wait('@getCamera');
+    cy.wait('@getCamera');
+
+    cy.get('@startWebRtc.all').should('have.length', 0);
+    cy.window()
+      .its('fakePeerConnections')
+      .should('have.length', 0);
+  });
+
   it('falls back to the still image with a clear message when the camera refuses', () => {
     cy.intercept(
       { method: 'POST', pathname: `/api/v1/camera/${CAMERA}/webrtc/start` },

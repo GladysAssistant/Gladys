@@ -278,8 +278,16 @@ class CameraBoxComponent extends Component {
     // The protocol is the device's: a Play pressed before the device request resolved (or after it
     // failed) must not default to rtsp-camera, which knows nothing of a WebRTC camera
     if (!this.isDeviceLoaded()) {
+      // The attempt is in flight from here: a stop, an unmount, a pagehide or the camera turned off
+      // while the device loads clears this token, and nothing starts behind them
+      const loadToken = {};
+      this.streamingToken = loadToken;
       this.setState({ liveCameraNotLoaded: false });
       const cameraDisabled = await this.refreshDevice({ keepCurrentView: true });
+      if (this.streamingToken !== loadToken) {
+        return;
+      }
+      this.streamingToken = null;
       if (cameraDisabled === null) {
         this.setState({ liveCameraNotLoaded: true });
         return;
