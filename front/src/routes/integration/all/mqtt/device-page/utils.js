@@ -7,6 +7,7 @@ import {
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
   WATER_HEATER_MODE,
+  BATTERY_STORAGE_MODE,
   SIREN_MODE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
@@ -88,6 +89,8 @@ const CATEGORIES_WITHOUT_UNIT = new Set([
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.MODE),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST),
+  // The battery-storage category is a power/energy/percent, but its operating mode is an enum
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE, DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'integer'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'decimal'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.FAN, DEVICE_FEATURE_TYPES.FAN.SPEED),
@@ -492,6 +495,21 @@ export const getDefaultUnitForFeature = (category, type) => {
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    // The command types first: they end in '-limit', so the suffix rules below would hand them
+    // kWh. Power limits are in watt, state-of-charge limits in percent (the mode has no unit and
+    // never reaches this block, see CATEGORIES_WITHOUT_UNIT).
+    if (
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.CHARGE_POWER_LIMIT ||
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT
+    ) {
+      return DEVICE_FEATURE_UNITS.WATT;
+    }
+    if (
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT ||
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_DISCHARGE_LIMIT
+    ) {
+      return DEVICE_FEATURE_UNITS.PERCENT;
+    }
     // State of charge in percent, instantaneous powers in watt, and every
     // cumulative index (*-index) or stored energy (battery-energy-remaining) in kWh.
     if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
@@ -633,6 +651,38 @@ export const getFeatureDefaultValues = (category, type) => {
     }
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING) {
       return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+    }
+  }
+
+  // battery-storage is listed in isSensorCategory, so its baseline is read_only: true — right for
+  // its six measurements, wrong for its commands. They are handled here, before any type-only test
+  // below: `mode` and `target-charge-limit` are strings other categories own too.
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.CHARGE_POWER_LIMIT ||
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT
+    ) {
+      // A plug-in battery tops out around 2.4 kW, a hybrid inverter around 10-15 kW: 10 kW covers
+      // the usual range, and the user adjusts max to the device's real rating.
+      return applyDefaultUnit(
+        { ...defaults, min: 0, max: 10000, read_only: false, unit: DEVICE_FEATURE_UNITS.WATT },
+        category,
+        type
+      );
+    }
+    if (
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT ||
+      type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_DISCHARGE_LIMIT
+    ) {
+      return applyDefaultUnit(
+        { ...defaults, min: 0, max: 100, read_only: false, unit: DEVICE_FEATURE_UNITS.PERCENT },
+        category,
+        type
+      );
+    }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE) {
+      // BATTERY_STORAGE_MODE: AUTO/CHARGE/DISCHARGE/STANDBY
+      return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
     }
   }
 
@@ -972,6 +1022,24 @@ export const getFeaturePreviewValue = (category, type) => {
     }
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING) {
       return 1;
+    }
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.CHARGE_POWER_LIMIT) {
+      return 1200;
+    }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT) {
+      return 800;
+    }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT) {
+      return 90;
+    }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_DISCHARGE_LIMIT) {
+      return 10;
+    }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE) {
+      return BATTERY_STORAGE_MODE.AUTO;
     }
   }
 

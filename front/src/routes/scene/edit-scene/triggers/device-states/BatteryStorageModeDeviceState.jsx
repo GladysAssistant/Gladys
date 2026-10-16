@@ -1,0 +1,73 @@
+import { Component, Fragment } from 'preact';
+import Select from '../../../../../components/form/Select';
+import get from 'get-value';
+
+import { BATTERY_STORAGE_MODE } from '../../../../../../../server/utils/constants';
+import { resolveFeatureOptions } from '../../../../../utils/supportedOptions';
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+
+const MODE_CATALOG = Object.keys(BATTERY_STORAGE_MODE).map(key => ({ value: BATTERY_STORAGE_MODE[key] }));
+
+class BatteryStorageModeDeviceState extends Component {
+  handleValueChange = ({ value }) => {
+    this.props.updateTriggerProperty(this.props.index, 'value', value);
+  };
+
+  getOptions = () => {
+    // Offer only the modes this battery declares, so a trigger cannot be saved on a mode the
+    // device never reports. resolveFeatureOptions returns the whole catalog when the feature
+    // carries no supported_options, which keeps legacy and hand-made features usable.
+    const options = resolveFeatureOptions(this.props.selectedDeviceFeature, MODE_CATALOG).map(option => ({
+      label: get(this.props.intl.dictionary, `deviceFeatureValue.category.battery-storage.mode.${option.value}`, {
+        default: option.label || option.value
+      }),
+      value: option.value
+    }));
+
+    this.setState({ options });
+  };
+
+  componentWillMount() {
+    this.props.updateTriggerProperty(this.props.index, 'operator', '=');
+
+    this.getOptions();
+  }
+
+  componentDidUpdate(previousProps) {
+    // Same reason as the action-side selector: the options depend on the selected feature, and
+    // switching between two battery-storage mode features does not remount this component.
+    if (previousProps.selectedDeviceFeature !== this.props.selectedDeviceFeature) {
+      this.getOptions();
+    }
+  }
+
+  render({ trigger }, { options }) {
+    // Controlled rather than defaultValue: the option list is recomputed when the selected feature
+    // changes, and an uncontrolled select would keep displaying the previous device's mode. `null`
+    // when nothing matches, so a mode the feature no longer declares shows as unselected.
+    const selectedOption = (options || []).find(option => trigger.value === option.value) || null;
+
+    return (
+      <Fragment>
+        <div class="col-2 col-md-1">
+          <div class="text-center" style={{ marginTop: '10px' }}>
+            <i class="fe fe-arrow-right" style={{ fontSize: '20px' }} />
+          </div>
+        </div>
+        <div class="col-10 col-md-5">
+          <div class="form-group">
+            <Select
+              value={selectedOption}
+              onChange={this.handleValueChange}
+              options={options}
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+          </div>
+        </div>
+      </Fragment>
+    );
+  }
+}
+
+export default withIntlAsProp(BatteryStorageModeDeviceState);

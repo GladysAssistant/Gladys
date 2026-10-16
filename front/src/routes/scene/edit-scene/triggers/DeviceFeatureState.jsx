@@ -22,6 +22,7 @@ import LevelSensorDeviceState from './device-states/LevelSensorDeviceState';
 import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDeviceState';
 import WaterValveDeviceState from './device-states/WaterValveDeviceState';
 import WaterHeaterModeDeviceState from './device-states/WaterHeaterModeDeviceState';
+import BatteryStorageModeDeviceState from './device-states/BatteryStorageModeDeviceState';
 import SmokeSensorContaminationDeviceState from './device-states/SmokeSensorContaminationDeviceState';
 
 // Operator the condition widgets settle on by default, and the one to go back to when the
@@ -183,6 +184,7 @@ class TurnOnLight extends Component {
     let levelMatterSensorDevice = false;
     let waterValveStatusDevice = false;
     let waterHeaterModeDevice = false;
+    let batteryStorageModeDevice = false;
     let smokeContaminationDevice = false;
 
     if (selectedDeviceFeature && !anyStateChange) {
@@ -225,6 +227,8 @@ class TurnOnLight extends Component {
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS;
       waterHeaterModeDevice =
         category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER && type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE;
+      batteryStorageModeDevice =
+        category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE && type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE;
       smokeContaminationDevice =
         category === DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR &&
         type === DEVICE_FEATURE_TYPES.SMOKE_SENSOR.CONTAMINATION_STATE;
@@ -244,6 +248,7 @@ class TurnOnLight extends Component {
       !levelMatterSensorDevice &&
       !waterValveStatusDevice &&
       !waterHeaterModeDevice &&
+      !batteryStorageModeDevice &&
       !smokeContaminationDevice;
 
     // the mode is hidden for event-like features, but a trigger already saved with it (written
@@ -263,6 +268,7 @@ class TurnOnLight extends Component {
       !levelMatterSensorDevice &&
       !waterValveStatusDevice &&
       !waterHeaterModeDevice &&
+      !batteryStorageModeDevice &&
       !smokeContaminationDevice;
 
     return (
@@ -294,6 +300,9 @@ class TurnOnLight extends Component {
           {waterValveStatusDevice && <WaterValveDeviceState {...props} />}
           {waterHeaterModeDevice && (
             <WaterHeaterModeDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />
+          )}
+          {batteryStorageModeDevice && (
+            <BatteryStorageModeDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />
           )}
           {smokeContaminationDevice && <SmokeSensorContaminationDeviceState {...props} />}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}

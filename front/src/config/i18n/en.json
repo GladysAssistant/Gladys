@@ -5698,6 +5698,14 @@
             "1": "Start boost"
           }
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "auto": "Auto",
+          "charge": "Charge",
+          "discharge": "Discharge",
+          "standby": "Standby"
+        }
       }
     }
   },
@@ -6199,6 +6207,14 @@
           "0": "Idle",
           "1": "Heating"
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "0": "Auto",
+          "1": "Charge",
+          "2": "Discharge",
+          "3": "Standby"
+        }
       }
     }
   },
@@ -6578,7 +6594,12 @@
       "discharge-power": "Discharge power",
       "charge-index": "Charge index",
       "discharge-index": "Discharge index",
-      "battery-energy-remaining": "Battery energy remaining"
+      "battery-energy-remaining": "Battery energy remaining",
+      "charge-power-limit": "Charge power limit",
+      "discharge-power-limit": "Discharge power limit",
+      "target-charge-limit": "Target charge level",
+      "target-discharge-limit": "Discharge reserve",
+      "mode": "Mode"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",

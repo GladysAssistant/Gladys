@@ -30,6 +30,7 @@ import CameraPresetDeviceFeature from './device-features/CameraPresetDeviceFeatu
 import VacuumCleanerModeDeviceFeature from './device-features/VacuumCleanerModeDeviceFeature';
 import VacuumCleanerCleanModeDeviceFeature from './device-features/VacuumCleanerCleanModeDeviceFeature';
 import WaterHeaterModeDeviceFeature from './device-features/WaterHeaterModeDeviceFeature';
+import BatteryStorageModeDeviceFeature from './device-features/BatteryStorageModeDeviceFeature';
 import TextSelectDeviceFeature from './device-features/TextSelectDeviceFeature';
 
 // DeviceRow is the per-FEATURE registry, and it is not only used by the dashboard widgets: the
@@ -116,6 +117,17 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: WaterHeaterModeDeviceFeature,
     [DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE]: SetpointDeviceFeature,
     [DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST]: BinaryDeviceFeature
+  },
+  // `mode` and `target-charge-limit` are strings other categories already own (thermostat, fan,
+  // water heater... and the electrical vehicle charge limit), so the whole battery-storage command
+  // set is routed by category. The two power limits are setpoints, the two state-of-charge limits
+  // percentage sliders like the vehicle charge limit.
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: {
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.CHARGE_POWER_LIMIT]: SetpointDeviceFeature,
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT]: SetpointDeviceFeature,
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT]: MultiLevelDeviceFeature,
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_DISCHARGE_LIMIT]: MultiLevelDeviceFeature,
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE]: BatteryStorageModeDeviceFeature
   },
   // Television remote-control orders (play, pause, channel up, ...) are write-only commands: they
   // are displayed as push buttons instead of falling back to a read-only sensor row.

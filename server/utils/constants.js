@@ -333,6 +333,18 @@ const WATER_HEATER_MODE = {
   PROGRAM: 6, // follows the schedule stored in the appliance
 };
 
+// Operating modes of a stationary storage battery. This is the full generic set:
+// a battery supporting only some of them declares its subset through the
+// supported_options of its `mode` feature, never by narrowing this enum.
+// Values are append-only: an existing integer never changes meaning, because it is
+// stored in device states and hard-coded in users' scenes.
+const BATTERY_STORAGE_MODE = {
+  AUTO: 0, // self-consumption: the device decides when to charge and discharge
+  CHARGE: 1, // forced charge, drawing from the grid allowed
+  DISCHARGE: 2, // forced discharge to the installation
+  STANDBY: 3, // idle: neither charges nor discharges
+};
+
 const LEVEL_MATTER_STATE = {
   LOW: 1,
   MEDIUM: 2,
@@ -1291,6 +1303,21 @@ const DEVICE_FEATURE_TYPES = {
     OFF_GRID_POWER: 'off-grid-power', // instantaneous power on the backup/off-grid output, W (>= 0)
     OFF_GRID_INDEX: 'off-grid-index', // cumulative backup-output energy meter index, kWh (>= 0)
   },
+  // Stationary storage batteries: plug-in storage systems, hybrid inverters with a
+  // battery, home battery packs. Scope is limited to storing energy: the state of
+  // charge, the power flowing into and out of the battery, their energy indexes, and
+  // the controls bounding that flow (docs/specs/battery-storage.md).
+  // Boundary with neighboring categories: PV production is energy-production-sensor,
+  // grid exchange is grid-sensor, the power the device delivers to the home is
+  // home-output-sensor — a battery device carries those features alongside its
+  // battery-storage ones.
+  // Measurements vs commands: the first six types are read-only measurements; the
+  // `*-limit` types and `mode` are commands (written by Gladys, reported back by the
+  // device). Value conventions: powers and power limits are non-negative, the
+  // direction is carried by the type (charge = INTO the battery from any source,
+  // discharge = OUT of it), never by a sign; state-of-charge limits are percentages
+  // (0..100); `mode` is an index into BATTERY_STORAGE_MODE. A limit is a persistent
+  // bound the device keeps until it is written again, not a timed power request.
   BATTERY_STORAGE: {
     BATTERY_LEVEL: 'battery-level', // state of charge, % (0..100)
     CHARGE_POWER: 'charge-power', // power INTO the battery, W/kW (>=0)
@@ -1298,6 +1325,11 @@ const DEVICE_FEATURE_TYPES = {
     CHARGE_INDEX: 'charge-index', // cumulative charged-energy meter index, kWh
     DISCHARGE_INDEX: 'discharge-index', // cumulative discharged-energy meter index, kWh
     BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // currently available stored energy (instantaneous), kWh
+    CHARGE_POWER_LIMIT: 'charge-power-limit', // maximum power INTO the battery, any source, W/kW (>=0) (command)
+    DISCHARGE_POWER_LIMIT: 'discharge-power-limit', // maximum power OUT of the battery, W/kW (>=0) (command)
+    TARGET_CHARGE_LIMIT: 'target-charge-limit', // state of charge where charging stops, % (0..100) (command)
+    TARGET_DISCHARGE_LIMIT: 'target-discharge-limit', // reserve: state of charge where discharging stops, % (0..100) (command)
+    MODE: 'mode', // operating mode, BATTERY_STORAGE_MODE (command)
   },
   TELEINFORMATION: {
     BINARY: 'binary',
@@ -1999,6 +2031,22 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
     // binary and carries no unit: without this entry it would inherit the category percent.
     [DEVICE_FEATURE_TYPES.BATTERY.CHARGING]: [],
   },
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: {
+    // The category mixes powers, energies and percentages. Only the command types are scoped
+    // here (the measurement types keep the category list): a power limit is a power, a
+    // state-of-charge limit a percentage, and the mode is an enum with no unit at all.
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.CHARGE_POWER_LIMIT]: [
+      DEVICE_FEATURE_UNITS.WATT,
+      DEVICE_FEATURE_UNITS.KILOWATT,
+    ],
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT]: [
+      DEVICE_FEATURE_UNITS.WATT,
+      DEVICE_FEATURE_UNITS.KILOWATT,
+    ],
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT]: [DEVICE_FEATURE_UNITS.PERCENT],
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_DISCHARGE_LIMIT]: [DEVICE_FEATURE_UNITS.PERCENT],
+    [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE]: [],
+  },
   [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
     [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: [],
     [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: [],
@@ -2544,6 +2592,7 @@ module.exports.CHARGING_STATION_CONNECTOR_STATUS = CHARGING_STATION_CONNECTOR_ST
 module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
+module.exports.BATTERY_STORAGE_MODE = BATTERY_STORAGE_MODE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
 module.exports.CONTAMINATION_STATE = CONTAMINATION_STATE;
 module.exports.EVENTS = EVENTS;

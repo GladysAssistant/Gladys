@@ -33,7 +33,8 @@ import { translate } from './i18n';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS
+  DEVICE_FEATURE_UNITS,
+  BATTERY_STORAGE_MODE
 } from '../../../../server/utils/constants';
 
 /**
@@ -676,6 +677,61 @@ const ROOMS = [
             // The battery charges on the solar surplus, so it also stops at night
             last_value: Math.round(solarPowerNow(3400) * 0.4),
             updated: 2
+          }),
+          // The controls: what the dashboard and the scenes can write to the battery
+          feature({
+            name: 'Charge power limit',
+            selector: 'home-battery-charge-power-limit',
+            category: DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE,
+            type: DEVICE_FEATURE_TYPES.BATTERY_STORAGE.CHARGE_POWER_LIMIT,
+            unit: DEVICE_FEATURE_UNITS.WATT,
+            min: 0,
+            max: 3840,
+            last_value: 2500,
+            updated: 600
+          }),
+          feature({
+            name: 'Discharge power limit',
+            selector: 'home-battery-discharge-power-limit',
+            category: DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE,
+            type: DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT,
+            unit: DEVICE_FEATURE_UNITS.WATT,
+            min: 0,
+            max: 3840,
+            last_value: 3000,
+            updated: 600
+          }),
+          feature({
+            name: 'Target charge level',
+            selector: 'home-battery-target-charge-limit',
+            category: DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE,
+            type: DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            min: 0,
+            max: 100,
+            last_value: 95,
+            updated: 600
+          }),
+          feature({
+            name: 'Discharge reserve',
+            selector: 'home-battery-target-discharge-limit',
+            category: DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE,
+            type: DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_DISCHARGE_LIMIT,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            min: 0,
+            max: 100,
+            last_value: 20,
+            updated: 600
+          }),
+          feature({
+            name: 'Battery mode',
+            selector: 'home-battery-mode',
+            category: DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE,
+            type: DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE,
+            min: 0,
+            max: 3,
+            last_value: BATTERY_STORAGE_MODE.AUTO,
+            updated: 600
           })
         ]
       }

@@ -5698,6 +5698,14 @@
             "1": "Lancer le boost"
           }
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "auto": "Auto",
+          "charge": "Charge",
+          "discharge": "Décharge",
+          "standby": "Veille"
+        }
       }
     }
   },
@@ -6199,6 +6207,14 @@
           "0": "Au repos",
           "1": "En chauffe"
         }
+      },
+      "battery-storage": {
+        "mode": {
+          "0": "Auto",
+          "1": "Charge",
+          "2": "Décharge",
+          "3": "Veille"
+        }
       }
     }
   },
@@ -6578,7 +6594,12 @@
       "discharge-power": "Puissance de décharge",
       "charge-index": "Index de charge",
       "discharge-index": "Index de décharge",
-      "battery-energy-remaining": "Énergie restante en batterie"
+      "battery-energy-remaining": "Énergie restante en batterie",
+      "charge-power-limit": "Limite de puissance de charge",
+      "discharge-power-limit": "Limite de puissance de décharge",
+      "target-charge-limit": "Niveau de charge cible",
+      "target-discharge-limit": "Réserve de décharge",
+      "mode": "Mode"
     },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",

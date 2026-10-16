@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const {
   THERMOSTAT_MODE,
   THERMOSTAT_OPERATING_STATE,
+  BATTERY_STORAGE_MODE,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
@@ -103,5 +104,69 @@ describe('constants DEVICE_FEATURE_CATEGORIES.GRID_CARBON_SENSOR / DEVICE_FEATUR
     expect(unitsByType[DEVICE_FEATURE_TYPES.GRID_CARBON_SENSOR.RENEWABLE_PERCENTAGE]).to.deep.equal([
       DEVICE_FEATURE_UNITS.PERCENT,
     ]);
+  });
+});
+
+describe('constants BATTERY_STORAGE_MODE', () => {
+  it('should expose the full generic set of battery storage modes', () => {
+    expect(BATTERY_STORAGE_MODE).to.deep.equal({
+      AUTO: 0,
+      CHARGE: 1,
+      DISCHARGE: 2,
+      STANDBY: 3,
+    });
+  });
+});
+
+describe('constants DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE / DEVICE_FEATURE_TYPES.BATTERY_STORAGE', () => {
+  it('should expose the battery storage category', () => {
+    expect(DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE).to.equal('battery-storage');
+  });
+
+  it('should expose the measurements and the commands of a storage battery', () => {
+    expect(DEVICE_FEATURE_TYPES.BATTERY_STORAGE).to.deep.equal({
+      BATTERY_LEVEL: 'battery-level',
+      CHARGE_POWER: 'charge-power',
+      DISCHARGE_POWER: 'discharge-power',
+      CHARGE_INDEX: 'charge-index',
+      DISCHARGE_INDEX: 'discharge-index',
+      BATTERY_ENERGY_REMAINING: 'battery-energy-remaining',
+      CHARGE_POWER_LIMIT: 'charge-power-limit',
+      DISCHARGE_POWER_LIMIT: 'discharge-power-limit',
+      TARGET_CHARGE_LIMIT: 'target-charge-limit',
+      TARGET_DISCHARGE_LIMIT: 'target-discharge-limit',
+      MODE: 'mode',
+    });
+  });
+
+  it('should share the target-charge-limit string with the electrical vehicle charge limit', () => {
+    expect(DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT).to.equal(
+      DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.TARGET_CHARGE_LIMIT,
+    );
+  });
+
+  it('should scope the unit of each command type: power for the power limits, percent for the charge limits', () => {
+    const unitsByType = DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE[DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE];
+    expect(unitsByType).to.deep.equal({
+      [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.CHARGE_POWER_LIMIT]: [
+        DEVICE_FEATURE_UNITS.WATT,
+        DEVICE_FEATURE_UNITS.KILOWATT,
+      ],
+      [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.DISCHARGE_POWER_LIMIT]: [
+        DEVICE_FEATURE_UNITS.WATT,
+        DEVICE_FEATURE_UNITS.KILOWATT,
+      ],
+      [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_CHARGE_LIMIT]: [DEVICE_FEATURE_UNITS.PERCENT],
+      [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.TARGET_DISCHARGE_LIMIT]: [DEVICE_FEATURE_UNITS.PERCENT],
+      [DEVICE_FEATURE_TYPES.BATTERY_STORAGE.MODE]: [],
+    });
+  });
+
+  it('should keep every command unit within the category unit list', () => {
+    const categoryUnits = DEVICE_FEATURE_UNITS_BY_CATEGORY[DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE];
+    const unitsByType = DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE[DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE];
+    Object.values(unitsByType).forEach((units) => {
+      units.forEach((unit) => expect(categoryUnits).to.include(unit));
+    });
   });
 });
