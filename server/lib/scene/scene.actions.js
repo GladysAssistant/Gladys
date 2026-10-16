@@ -941,8 +941,9 @@ const actionsFunc = {
       return;
     }
     // One thermostat failing (deleted, moved to another house) leaves the others
-    // switched, like the light and switch actions.
-    await Promise.map(action.devices, async (deviceSelector) => {
+    // switched, like the light and switch actions. A card saved before any
+    // thermostat was picked has no list: nothing to switch.
+    await Promise.map(action.devices || [], async (deviceSelector) => {
       try {
         await thermostatService.device.attachScheduleToDevice(action.schedule, deviceSelector);
       } catch (e) {

@@ -493,7 +493,7 @@ The times are the browser's native time inputs. On a touch screen a tap anywhere
 
 A house keeps several schedules — school term, school holidays, a week away — and the thermostats move between them with the calendar, not with someone editing the points each time. The scene action `thermostat.set-schedule` (`schedule`: a schedule selector, `devices`: thermostat selectors) is that move: for each thermostat it does exactly what `POST /schedule/:selector/device/:device_selector` does (E.4), so the point of the new schedule applies at once, a hold ends, a stop the previous programme made is lifted and a stop made by hand stays. A thermostat already on that schedule is left as it is.
 
-One thermostat failing — deleted, moved to another house — is logged and leaves the others switched, like the light and switch actions; the action does nothing when the thermostat service is not running. The scene editor offers only the thermostats of the schedule's house.
+One thermostat failing — deleted, moved to another house — is logged and leaves the others switched, like the light and switch actions; the action does nothing when the thermostat service is not running, or when no thermostat was picked. The scene editor offers thermostats once a schedule is picked, and only those of its house; picking a schedule of another house drops the thermostats already chosen that are not in it. The MCP `scene.create` tool lists the selectors of the Gladys thermostats — not the climate devices they drive — and of the existing schedules.
 
 ## F. The widget, on an external thermostat
 
