@@ -2,7 +2,7 @@ const crypto = require('crypto');
 
 const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
 const { MAX_TTS_AUDIO_SIZE_BYTES, TTS_AUDIO_CONTENT_TYPES } = require('../external-integration/constants');
-const { GLADYS_PLUS_PROVIDER, TTS_AUDIO_TTL_MS, TTS_AUDIO_TOKEN_BYTES } = require('./constants');
+const { GLADYS_PLUS_PROVIDER, TTS_AUDIO_TTL_MS, TTS_AUDIO_TOKEN_BYTES, TTS_AUDIO_MAX_ENTRIES } = require('./constants');
 
 /**
  * @description Turn a text into a URL a player can fetch (Sonos trackUri,
@@ -43,7 +43,12 @@ async function getSpeechUrl({ text, language = null }) {
   if (!validBuffer || !expectedExtension || extension !== expectedExtension) {
     throw new BadParameters(`TTS provider "${activeProvider}" returned an invalid audio payload`);
   }
+  // the purge also evicts the oldest clips beyond the entry cap: with the
+  // new clip, the cache never holds more than TTS_AUDIO_MAX_ENTRIES
   this.purgeExpiredAudios();
+  if (this.audios.size >= TTS_AUDIO_MAX_ENTRIES) {
+    this.audios.delete(this.audios.keys().next().value);
+  }
   const token = crypto.randomBytes(TTS_AUDIO_TOKEN_BYTES).toString('hex');
   this.audios.set(token, { buffer, contentType, expiresAt: Date.now() + TTS_AUDIO_TTL_MS });
   const url = `${this.getLocalApiBaseUrl()}/api/v1/tts/audio/${token}.${extension}`;

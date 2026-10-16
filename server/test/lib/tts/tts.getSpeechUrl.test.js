@@ -7,7 +7,7 @@ const { buildTts, registerFakeTtsProvider } = require('./testUtils.test');
 const { NotFoundError, BadParameters } = require('../../../utils/coreErrors');
 const { MAX_TTS_AUDIO_SIZE_BYTES } = require('../../../lib/external-integration/constants');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
-const { GLADYS_PLUS_PROVIDER, TTS_AUDIO_TTL_MS } = require('../../../lib/tts/constants');
+const { GLADYS_PLUS_PROVIDER, TTS_AUDIO_TTL_MS, TTS_AUDIO_MAX_ENTRIES } = require('../../../lib/tts/constants');
 
 describe('tts.getSpeechUrl', () => {
   it('should dispatch to Gladys Plus by default (no variable set)', async () => {
@@ -49,6 +49,28 @@ describe('tts.getSpeechUrl', () => {
     tts.getLocalApiBaseUrl = fake.returns('http://192.168.1.10:1443');
     await tts.getSpeechUrl({ text: 'Hello' });
     assert.calledWith(synthesize, { text: 'Hello', language: null });
+  });
+
+  it('should keep the cache under the entry cap, evicting the oldest clip first', async () => {
+    const { tts, stateManager, variableStore } = buildTts();
+    registerFakeTtsProvider(stateManager, 'ext-piper-tts');
+    variableStore.set(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER, 'ext-piper-tts');
+    tts.getLocalApiBaseUrl = fake.returns('http://192.168.1.10:1443');
+    const tokens = [];
+    for (let index = 0; index < TTS_AUDIO_MAX_ENTRIES + 1; index += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      const { url } = await tts.getSpeechUrl({ text: `clip ${index}` });
+      tokens.push(
+        url
+          .split('/')
+          .pop()
+          .split('.')[0],
+      );
+    }
+    expect(tts.audios.size).to.equal(TTS_AUDIO_MAX_ENTRIES);
+    expect(tts.audios.has(tokens[0])).to.equal(false);
+    expect(tts.audios.has(tokens[1])).to.equal(true);
+    expect(tts.audios.has(tokens[TTS_AUDIO_MAX_ENTRIES])).to.equal(true);
   });
 
   it('should refuse an invalid provider payload before caching or minting a URL', async () => {

@@ -19,6 +19,9 @@ const {
 // scheduled polls only make sense against a live integration: outside
 // these statuses they become silent no-ops (see below)
 const POLLABLE_STATUSES = [SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
+// strict base64 alphabet with optional padding: what a TTS data-URI must
+// carry after its ";base64," separator
+const BASE64_REGEX = /^[A-Za-z0-9+/]+={0,2}$/;
 
 /**
  * @description Register the proxy service of an external integration in the
@@ -186,7 +189,13 @@ function registerProxyService(service) {
             if (!extension) {
               throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
             }
-            const buffer = Buffer.from(audio.substring(separatorIndex + ';base64,'.length), 'base64');
+            // Buffer.from skips invalid characters instead of throwing: a
+            // malformed payload would otherwise decode to a partial clip
+            const encoded = audio.substring(separatorIndex + ';base64,'.length);
+            if (!BASE64_REGEX.test(encoded)) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            const buffer = Buffer.from(encoded, 'base64');
             if (buffer.length === 0 || buffer.length > MAX_TTS_AUDIO_SIZE_BYTES) {
               throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
             }

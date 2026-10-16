@@ -176,6 +176,23 @@ describe('externalIntegration TTS providers (type tts)', () => {
       );
     });
 
+    it('should refuse malformed base64 instead of decoding a partial clip', async () => {
+      const { externalIntegration, stateManager } = buildSupervisor();
+      const service = await seedTtsService();
+      externalIntegration.registerProxyService(service);
+      const proxyService = stateManager.get('service', service.name);
+      // Buffer.from would silently skip the "!" characters and return the
+      // valid portion: the payload is refused before anything is decoded
+      externalIntegration.sendCommand = fake.resolves({
+        success: true,
+        data: { audio: `audio/mpeg;base64,${Buffer.from('fake-mp3-bytes').toString('base64')}!!invalid` },
+      });
+      await expect(proxyService.tts.synthesize({ text: 'Bonjour' })).to.be.rejectedWith(
+        ExternalIntegrationUnavailableError,
+        'EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO',
+      );
+    });
+
     it('should refuse an oversized data-URI before decoding it', async () => {
       const { externalIntegration, stateManager } = buildSupervisor();
       const service = await seedTtsService();

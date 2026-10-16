@@ -9,9 +9,15 @@ const GLADYS_PLUS_PROVIDER = 'gladys-plus';
 // fetches the URL within seconds; 10 minutes covers every retry.
 const TTS_AUDIO_TTL_MS = 10 * 60 * 1000;
 const TTS_AUDIO_TOKEN_BYTES = 32;
+// The TTL alone does not bound the cache: a tight loop of announcements
+// could hold many 5 MB clips for 10 minutes. The oldest clips are evicted
+// beyond this many entries (≤ 100 MB worst case) — a speaker fetches its
+// URL within seconds, so an evicted clip is one nobody is still playing.
+const TTS_AUDIO_MAX_ENTRIES = 20;
 
 module.exports = {
   GLADYS_PLUS_PROVIDER,
   TTS_AUDIO_TTL_MS,
   TTS_AUDIO_TOKEN_BYTES,
+  TTS_AUDIO_MAX_ENTRIES,
 };
