@@ -57,6 +57,10 @@ describe('Dashboard Devices Box air quality level', () => {
     );
 
     cy.intercept('GET', '**/api/v1/device?*', req => {
+      // the test visits the dashboard twice: without these headers the second
+      // answer is a bodyless 304 and there would be no state to stub
+      delete req.headers['if-none-match'];
+      delete req.headers['if-modified-since'];
       req.continue(res => {
         res.body.forEach(device => {
           device.features.forEach(feature => {
