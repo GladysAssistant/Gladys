@@ -2,6 +2,8 @@ import get from 'get-value';
 
 import { ACTIONS, EVENTS } from '../../../../../server/utils/constants';
 import { isWildcardValue } from './sceneIntegrations';
+import getDeviceFeatureValueOptions from '../../../utils/deviceFeatureValueOptions';
+import { getDeviceFeatureName } from '../../../utils/device';
 
 const truncate = (text, maxLength = 60) => {
   if (typeof text !== 'string') {
@@ -40,8 +42,9 @@ const listSelectors = selectors => {
 
 // Builds a short human-readable summary of a configured action, displayed when
 // its card is collapsed. Returns null when there is nothing meaningful to show:
-// the card then only displays the action type label.
-const getActionSummary = (action, dictionary) => {
+// the card then only displays the action type label. deviceFeatures maps a
+// feature selector to its { device, feature }, null while loading.
+const getActionSummary = (action, dictionary, deviceFeatures) => {
   if (!action || !action.type) {
     return null;
   }
@@ -87,13 +90,23 @@ const getActionSummary = (action, dictionary) => {
     case ACTIONS.DEVICE.GET_VALUE:
       return truncate(action.device_feature);
     case ACTIONS.DEVICE.SET_VALUE: {
-      const value =
-        action.evaluate_value !== undefined && action.evaluate_value !== null && action.evaluate_value !== ''
-          ? action.evaluate_value
-          : action.value;
+      const hasEvaluateValue =
+        action.evaluate_value !== undefined && action.evaluate_value !== null && action.evaluate_value !== '';
+      const value = hasEvaluateValue ? action.evaluate_value : action.value;
+      // Until the devices are loaded (or if the feature was deleted), the raw selector and value are shown
+      const { device, feature } = (deviceFeatures && deviceFeatures[action.device_feature]) || {};
+      let valueLabel = value !== undefined && value !== null && value !== '' ? String(value) : null;
+      if (feature && valueLabel !== null && !hasEvaluateValue) {
+        const valueOption = (getDeviceFeatureValueOptions(dictionary, feature) || []).find(
+          option => `${option.value}` === valueLabel
+        );
+        if (valueOption) {
+          valueLabel = valueOption.label;
+        }
+      }
       return joinParts([
-        truncate(action.device_feature),
-        value !== undefined && value !== null && value !== '' ? truncate(String(value), 20) : null
+        truncate(device ? getDeviceFeatureName(dictionary, device, feature) : action.device_feature),
+        valueLabel !== null ? truncate(valueLabel, 20) : null
       ]);
     }
     case ACTIONS.LIGHT.TURN_ON:

@@ -1714,8 +1714,12 @@
   margin: 4px 0;
 }
 
+/* the dark-mode selector outweighs `.dark-mode .glass-theme .card
+   .btn-secondary`, which would tint each segment of a btn-secondary group
+   (shutter buttons in the scene editor) */
 :global(.glass-theme .device-list-table .btn-group .btn),
-:global(.glass-theme .hz-segmented .btn) {
+:global(.glass-theme .hz-segmented .btn),
+:global(.dark-mode .glass-theme .hz-segmented .btn) {
   background: transparent !important;
   border: none;
   border-radius: 999px !important;
