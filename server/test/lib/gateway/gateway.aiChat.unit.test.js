@@ -7,6 +7,7 @@ const { Error400, Error402, Error403, Error429 } = require('../../../utils/httpE
 const { aiChat, normalizeAiChatRequestBody, describeAiChatError } = require('../../../lib/gateway/gateway.aiChat');
 const { DEFAULT_TEXT_MODEL } = require('../../../utils/aiChatModels');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 
 describe('gateway.aiChat unit', () => {
   it('should return gateway response on success', async () => {
@@ -218,7 +219,8 @@ describe('gateway.aiChat unit (external AI provider routing)', () => {
     } catch (e) {
       error = e;
     }
-    expect(error).to.be.instanceOf(Error400);
+    expect(error).to.be.instanceOf(ExternalIntegrationUnavailableError);
+    expect(error.message).to.equal('EXTERNAL_INTEGRATION_AI_PROVIDER_NOT_AVAILABLE');
     // and never silently rerouted to Gladys Plus
     expect(ctx.gladysGatewayClient.openAIAsk.called).to.equal(false);
   });
@@ -231,6 +233,6 @@ describe('gateway.aiChat unit (external AI provider routing)', () => {
     } catch (e) {
       error = e;
     }
-    expect(error).to.be.instanceOf(Error400);
+    expect(error).to.be.instanceOf(ExternalIntegrationUnavailableError);
   });
 });

@@ -42,7 +42,7 @@ class AiProviderSettings extends Component {
       this.setState({ selector, providers: providers || [] });
       // let the parent page refresh its Plus upsell/rate-limit messaging
       if (this.props.onProviderChange) {
-        this.props.onProviderChange(selector);
+        this.props.onProviderChange(selector, providers || []);
       }
     } catch (error) {
       console.error(error);
@@ -57,6 +57,12 @@ class AiProviderSettings extends Component {
 
   render({}, { loaded, loadError, saveError, saving, selector, providers }) {
     const selectedProvider = providers.find(provider => provider.selector === selector);
+    // two installed integrations can share a display name (a dev build next
+    // to the store one): the selector tells them apart in the select
+    const getOptionLabel = provider =>
+      providers.some(other => other !== provider && other.name === provider.name)
+        ? `${provider.name} (${provider.selector})`
+        : provider.name;
     return (
       <div class="card mt-4">
         <h4 class="card-header">
@@ -95,7 +101,7 @@ class AiProviderSettings extends Component {
               </option>
               {providers.map(provider => (
                 <option key={provider.selector} value={provider.selector}>
-                  {provider.name}
+                  {getOptionLabel(provider)}
                 </option>
               ))}
             </select>
@@ -103,6 +109,12 @@ class AiProviderSettings extends Component {
           {loaded && providers.length === 0 && (
             <p class="text-muted small mb-0">
               <Text id="integration.openai.aiProvider.noProvider" />
+            </p>
+          )}
+          {selectedProvider && (
+            <p class="text-success">
+              <i class="fe fe-check mr-1" />
+              <Text id="integration.openai.aiProvider.activeNotice" fields={{ name: selectedProvider.name }} />
             </p>
           )}
           {selector && (

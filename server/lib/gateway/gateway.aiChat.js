@@ -1,6 +1,7 @@
 const get = require('get-value');
 const logger = require('../../utils/logger');
 const { Error400, Error403, Error429 } = require('../../utils/httpErrors');
+const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { resolveAiChatModel } = require('../../utils/aiChatModels');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
@@ -81,7 +82,10 @@ async function aiChat(body) {
   if (aiProviderSelector) {
     const proxyService = this.serviceManager.getService(aiProviderSelector);
     if (!proxyService || !proxyService.ai || typeof proxyService.ai.chat !== 'function') {
-      throw new Error400(`AI provider ${aiProviderSelector} is not available`);
+      // same family as a stopped or disconnected provider: the chat loop
+      // answers with the dedicated "provider unavailable" reply
+      logger.warn(`aiChat: selected AI provider ${aiProviderSelector} is not available`);
+      throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_AI_PROVIDER_NOT_AVAILABLE');
     }
     // the model field is Gladys Plus vocabulary (Scaleway model ids),
     // meaningless for an external provider: it picks its model in its own

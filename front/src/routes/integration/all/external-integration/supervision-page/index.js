@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import SupervisionCard from './SupervisionCard';
@@ -28,12 +29,30 @@ class ExternalIntegrationSupervisionPage extends Component {
         return;
       }
       this.setState({ integration, loadStatus: RequestStatus.Success });
+      if (get(integration, 'manifest.type') === 'ai') {
+        await this.loadAiProvider(selector);
+      }
     } catch (e) {
       console.error(e);
       if (selector !== this.props.selector) {
         return;
       }
       this.setState({ integration: null, loadStatus: RequestStatus.Error });
+    }
+  };
+
+  // whether this AI provider integration is the one the assistant uses:
+  // uninstalling it switches the assistant back to Gladys Plus, the
+  // confirmation must say so (capabilities/ai-type.md)
+  loadAiProvider = async selector => {
+    try {
+      const aiProvider = await this.props.httpClient.get('/api/v1/ai_provider');
+      if (selector !== this.props.selector) {
+        return;
+      }
+      this.setState({ isActiveAiProvider: aiProvider.selector === selector });
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -147,6 +166,7 @@ class ExternalIntegrationSupervisionPage extends Component {
             updateResult={state.updateResult}
             uninstallStatus={state.uninstallStatus}
             askingUninstall={state.askingUninstall}
+            isActiveAiProvider={state.isActiveAiProvider === true}
             executeAction={this.executeAction}
             onAskUninstall={this.askUninstall}
             onCancelUninstall={this.cancelUninstall}

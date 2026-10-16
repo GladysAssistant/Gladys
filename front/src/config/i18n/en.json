@@ -1048,6 +1048,11 @@
         "openRawLink": "Open in a new tab"
       },
       "config": {
+        "aiProviderActive": "This integration is the AI provider of the assistant: the conversations with the assistant are sent to it.",
+        "aiProviderInactive": "This integration is installed but the assistant does not use it yet: select it as the AI provider of the instance to route the chat, the scene “Ask AI” actions and the weekly digest through it instead of Gladys Plus.",
+        "aiProviderUseButton": "Use as AI provider",
+        "aiProviderSettingsLink": "Open the AI settings",
+        "aiProviderError": "Unable to read or change the AI provider of the instance. Please try again.",
         "title": "Configuration",
         "docsLink": "Documentation",
         "loadError": "There was an error loading the configuration.",
@@ -1127,6 +1132,7 @@
         "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
         "uninstallCalendarWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed, and the calendars it created will be deleted, with their events, for every user of the household — not only yours.",
         "uninstallEnergyWarning": "This integration prices energy contracts itself: the contracts it prices will stop being priced once it is uninstalled (their existing costs are kept).",
+        "uninstallAiProviderWarning": "This integration is the AI provider of the assistant: once uninstalled, the assistant switches back to Gladys Plus (or stops answering until a provider is available, without Gladys Plus).",
         "confirmUninstallButton": "Yes, uninstall",
         "cancelUninstallButton": "Cancel",
         "startedAtLabel": "Running since"
@@ -1245,7 +1251,7 @@
         "energyContractsDelegatedText": "A template priced by the integration computes your energy costs itself: the costs of these contracts are only computed while the integration is running, and stop being computed if it is uninstalled.",
         "providerInfoText": "This integration manages no device: it provides dashboard widgets. Configure it here, then add its widgets from the dashboard editor.",
         "providerEnergyInfoText": "This integration manages no device: it provides energy contract templates and tariff calendars. Configure it here, then pick its contracts from the energy monitoring page.",
-        "aiWarningText": "This integration is an AI provider: if you select it as the AI provider of the instance, it will receive all the assistant conversations (messages, history, device states returned by tools, chat images), and its answers will drive the assistant's actions on your home.",
+        "aiWarningText": "This integration is an AI provider: if an administrator selects it as the AI provider of the instance (Integrations → Artificial Intelligence → AI provider, or the button on this integration's configuration screen), it will receive all the assistant conversations (messages, history, device states returned by tools, chat images), and its answers will drive the assistant's actions on your home.",
         "sceneDeclarationsTitle": "Scene triggers and actions",
         "sceneDeclarationsText": "This integration adds {{triggers}} trigger(s) and {{actions}} action(s) to the scene editor.",
         "sceneTriggerPrefix": "Trigger:",
@@ -3279,6 +3285,7 @@
       "documentation": "AI documentation",
       "description": "Give Gladys the power of artificial intelligence.",
       "firstExplanation": "Gladys can use artificial intelligence (open-weight AI models via Gladys Plus) to help you communicate with your connected home.",
+      "firstExplanationExternalProvider": "Gladys uses artificial intelligence to help you communicate with your connected home. On this instance, the assistant goes through the AI provider integration “{{name}}” selected by an administrator, instead of Gladys Plus.",
       "examplesIntro": "Here's what you can do with AI:",
       "examplesChatTitle": "In the Gladys chat",
       "examplesChatHint": "Available actions: lights and switches by room, cameras, scenes, temperature, humidity and the weather.",
@@ -3311,6 +3318,7 @@
         "error": "Unable to generate debug context. Make sure the MCP service is running."
       },
       "aiProvider": {
+        "activeNotice": "The assistant currently uses the AI provider “{{name}}”: the conversations with the assistant are sent to it.",
         "title": "AI provider",
         "description": "Gladys uses Gladys Plus as its AI provider by default. You can route the assistant (chat, intent routing, scene \"Ask AI\" actions, weekly digest) through an installed AI provider integration instead: Claude, DeepSeek, OpenAI, a local model... The provider's own settings (API key, model) are on its integration page.",
         "selectLabel": "Provider used for AI requests",
@@ -3765,6 +3773,7 @@
       },
       "askAi": {
         "description": "This action will send a message to the AI via Gladys Plus and will reply to you with a message. If you attach a camera image, the AI will be able to see what is on the image and even take action accordingly.",
+        "descriptionExternalProvider": "This action will send a message to the AI provider “{{name}}” selected in the AI settings and will reply to you with a message. If you attach a camera image, the AI will be able to see what is on the image and even take action accordingly.",
         "userLabel": "Gladys will respond to",
         "cameraLabel": "Attach a camera image (optional)",
         "textLabel": "My question for the AI",

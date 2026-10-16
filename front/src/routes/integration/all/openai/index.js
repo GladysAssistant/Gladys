@@ -9,6 +9,12 @@ import AiProviderSettings from './AiProviderSettings';
 import AiQuotaDisplay from './AiQuotaDisplay';
 import { USER_ROLE } from '../../../../../../server/utils/constants';
 
+// display name of the selected external AI provider, or null
+const getProviderName = (providers, selector) => {
+  const provider = (providers || []).find(candidate => candidate.selector === selector);
+  return provider ? provider.name : null;
+};
+
 class OpenAIGateway extends Component {
   isGladysPlusConnected = async () => {
     try {
@@ -38,7 +44,8 @@ class OpenAIGateway extends Component {
         return;
       }
       this.setState({
-        externalProviderActive: Boolean(response.selector)
+        externalProviderActive: Boolean(response.selector),
+        externalProviderName: getProviderName(response.providers, response.selector)
       });
     } catch (e) {
       console.error(e);
@@ -47,9 +54,12 @@ class OpenAIGateway extends Component {
 
   // AiProviderSettings saves the selection itself: this callback keeps the
   // upsell/rate-limit messaging of this page in sync without a reload
-  onProviderChange = selector => {
+  onProviderChange = (selector, providers) => {
     this.providerSelectionGeneration += 1;
-    this.setState({ externalProviderActive: Boolean(selector) });
+    this.setState({
+      externalProviderActive: Boolean(selector),
+      externalProviderName: getProviderName(providers, selector)
+    });
   };
 
   componentDidMount() {
@@ -64,11 +74,12 @@ class OpenAIGateway extends Component {
     this.providerSelectionGeneration = 0;
     this.state = {
       gladysPlusConnected: null,
-      externalProviderActive: null
+      externalProviderActive: null,
+      externalProviderName: null
     };
   }
 
-  render(props, { gladysPlusConnected, externalProviderActive }) {
+  render(props, { gladysPlusConnected, externalProviderActive, externalProviderName }) {
     const isAdmin = props.user && props.user.role === USER_ROLE.ADMIN;
     const aiBackendAvailable = gladysPlusConnected === true || externalProviderActive === true;
     return (
@@ -101,8 +112,23 @@ class OpenAIGateway extends Component {
                 <Text id="integration.openai.chatEnabledByDefault" />
               </p>
             )}
+            {/* a non-admin has no provider card below: this is where they
+                learn that their conversations go to a third-party provider */}
+            {!isAdmin && externalProviderActive === true && (
+              <div class="alert alert-info">
+                <i class="fe fe-cpu mr-1" />
+                <Text id="integration.openai.aiProvider.activeNotice" fields={{ name: externalProviderName }} />
+              </div>
+            )}
             <p>
-              <Text id="integration.openai.firstExplanation" />{' '}
+              {externalProviderActive === true ? (
+                <Text
+                  id="integration.openai.firstExplanationExternalProvider"
+                  fields={{ name: externalProviderName }}
+                />
+              ) : (
+                <Text id="integration.openai.firstExplanation" />
+              )}{' '}
             </p>
             <p>
               <Text id="integration.openai.examplesIntro" />
@@ -162,10 +188,11 @@ class OpenAIGateway extends Component {
         {/* the Plus quota is meaningless once the AI traffic goes through an
         external provider; the weekly digest and the debug context download
         follow the selected provider through gateway.aiChat, so they are
-        offered as soon as the assistant has a backend, Plus or external */}
+        offered as soon as the assistant has a backend, Plus or external —
+        to admins only, their routes are admin-only */}
         {gladysPlusConnected === true && externalProviderActive === false && <AiQuotaDisplay />}
-        {aiBackendAvailable && <WeeklyDigestSettings />}
-        {aiBackendAvailable && <AiChatDebugDownload />}
+        {isAdmin && aiBackendAvailable && <WeeklyDigestSettings />}
+        {isAdmin && aiBackendAvailable && <AiChatDebugDownload />}
       </Layout>
     );
   }

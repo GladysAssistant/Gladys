@@ -64,6 +64,7 @@ const SupervisionCard = ({
   updateResult,
   uninstallStatus,
   askingUninstall,
+  isActiveAiProvider,
   executeAction,
   onAskUninstall,
   onCancelUninstall,
@@ -285,6 +286,11 @@ const SupervisionCard = ({
                 {hasDelegatedContracts && (
                   <p>
                     <Text id="integration.externalIntegration.supervision.uninstallEnergyWarning" />
+                  </p>
+                )}
+                {isActiveAiProvider && (
+                  <p>
+                    <Text id="integration.externalIntegration.supervision.uninstallAiProviderWarning" />
                   </p>
                 )}
                 <div class="btn-list mb-0">
