@@ -1,4 +1,5 @@
 const { getProviders } = require('./tts.getProviders');
+const { getActiveProvider } = require('./tts.getActiveProvider');
 const { getProviderConfiguration } = require('./tts.getProviderConfiguration');
 const { setActiveProvider } = require('./tts.setActiveProvider');
 const { getSpeechUrl } = require('./tts.getSpeechUrl');
@@ -30,6 +31,7 @@ const Tts = function Tts(variable, service, stateManager, gateway) {
 };
 
 Tts.prototype.getProviders = getProviders;
+Tts.prototype.getActiveProvider = getActiveProvider;
 Tts.prototype.getProviderConfiguration = getProviderConfiguration;
 Tts.prototype.setActiveProvider = setActiveProvider;
 Tts.prototype.getSpeechUrl = getSpeechUrl;

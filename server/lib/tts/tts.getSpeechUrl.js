@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 
 const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { MAX_TTS_AUDIO_SIZE_BYTES, TTS_AUDIO_CONTENT_TYPES } = require('../external-integration/constants');
 const { GLADYS_PLUS_PROVIDER, TTS_AUDIO_TTL_MS, TTS_AUDIO_TOKEN_BYTES } = require('./constants');
 
@@ -23,8 +22,7 @@ const { GLADYS_PLUS_PROVIDER, TTS_AUDIO_TTL_MS, TTS_AUDIO_TOKEN_BYTES } = requir
  * const { url } = await gladys.tts.getSpeechUrl({ text: 'Hello!' });
  */
 async function getSpeechUrl({ text, language = null }) {
-  const activeProvider =
-    (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER)) || GLADYS_PLUS_PROVIDER;
+  const activeProvider = await this.getActiveProvider();
   if (activeProvider === GLADYS_PLUS_PROVIDER) {
     const response = await this.gateway.getTTSApiUrl({ text });
     return { url: (response && response.url) || null, provider: GLADYS_PLUS_PROVIDER };

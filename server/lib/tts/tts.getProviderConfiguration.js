@@ -1,5 +1,4 @@
 const db = require('../../models');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { GLADYS_PLUS_PROVIDER } = require('./constants');
 
 /**
@@ -14,7 +13,7 @@ const { GLADYS_PLUS_PROVIDER } = require('./constants');
  * const { active, providers } = await gladys.tts.getProviderConfiguration();
  */
 async function getProviderConfiguration() {
-  const active = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER)) || GLADYS_PLUS_PROVIDER;
+  const active = await this.getActiveProvider();
   const providers = this.getProviders();
   const externalProviderNames = providers
     .map(({ provider }) => provider)

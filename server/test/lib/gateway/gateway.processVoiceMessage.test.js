@@ -37,7 +37,11 @@ function buildContext(overrides = {}) {
   return {
     stt: overrides.stt || fake.resolves({ text: 'allume la lumière' }),
     forwardMessageToAiChat: overrides.forwardMessageToAiChat || fake.resolves({ answer: 'La lumière est allumée.' }),
-    tts: overrides.tts || { getSpeechUrl: fake.resolves({ url: 'http://tts.test/audio.mp3' }) },
+    tts: {
+      getActiveProvider: fake.resolves('gladys-plus'),
+      getSpeechUrl: fake.resolves({ url: 'http://tts.test/audio.mp3' }),
+      ...overrides.tts,
+    },
     event: overrides.event === null ? null : overrides.event || { emit: fake() },
     message: overrides.message || {
       getPreviousQuestionsForUser: getPreviousQuestionsForUserStub,
@@ -361,5 +365,36 @@ describe('gateway.processVoiceMessage', () => {
       .map((call) => call.args[1])
       .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
     expect(errorPayload.payload).to.deep.equal({ error: 'too_many_requests', message: '' });
+  });
+
+  it('should return a text-only answer on a 403 or 429 thrown by an external TTS provider', async () => {
+    // only Gladys Plus has an upsell: the same status codes thrown by an
+    // integration provider mean nothing to the user and degrade like any
+    // other TTS failure
+    // eslint-disable-next-line no-restricted-syntax
+    for (const providerError of [new Error403('provider refused'), new Error429('provider busy')]) {
+      const eventEmit = fake();
+      const ctx = buildContext({
+        event: { emit: eventEmit },
+        tts: {
+          getActiveProvider: fake.resolves('ext-piper-tts'),
+          getSpeechUrl: fake.rejects(providerError),
+        },
+      });
+
+      // eslint-disable-next-line no-await-in-loop
+      const result = await processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user });
+
+      expect(result).to.deep.equal({
+        transcription: 'allume la lumière',
+        answer: 'La lumière est allumée.',
+        ttsUrl: null,
+      });
+      const errorPayload = eventEmit
+        .getCalls()
+        .map((call) => call.args[1])
+        .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+      expect(errorPayload).to.equal(undefined);
+    }
   });
 });
