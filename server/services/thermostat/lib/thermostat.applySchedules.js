@@ -384,16 +384,24 @@ function getSetpointForPreset(preset, config) {
  * @param {string} switchSelector - Switch feature selector.
  * @param {boolean} shouldBeActive - Desired state.
  * @param {string} logContext - Context string for logs.
+ * @param {Map<string, number>} [selfWritten] - Marks of the powers this service wrote.
  * @returns {Promise<boolean>} True when the switch is in the desired state afterwards.
  * @example
  * await actuateSwitch(gladys, 'heater-switch', true, 'preset=comfort');
  */
-async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext) {
+async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext, selfWritten = null) {
   try {
     const found = await getFeatureBySelector(gladys, switchSelector);
     if (!found) {
       logger.warn(`Thermostat schedule: switch device/feature not found for selector="${switchSelector}"`);
       return false;
+    }
+    // The state this service stands behind, marked before the write like a
+    // setpoint (C.0.1), and when the switch already holds it: the power of an
+    // external thermostat is reported back, and only a report that differs from
+    // this mark was made on the device itself.
+    if (selfWritten) {
+      selfWritten.set(switchSelector, shouldBeActive ? 1 : 0);
     }
     const currentSwitchOn = found.feature.last_value === 1;
     if (currentSwitchOn !== shouldBeActive) {
@@ -404,6 +412,10 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext)
     }
     return true;
   } catch (e) {
+    // The write never reached the device, so no echo will come back to match.
+    if (selfWritten) {
+      selfWritten.delete(switchSelector);
+    }
     logger.warn(`Thermostat schedule: Failed to actuate switch: ${e.message}`);
     return false;
   }
@@ -428,11 +440,12 @@ async function actuateSwitch(gladys, switchSelector, shouldBeActive, logContext)
  * @param {object} config - Thermostat config object.
  * @param {string} logContext - Context for the log lines.
  * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote.
+ * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
  * @returns {Promise<void>}
  * @example
  * await stopExternalThermostat(gladys, config, 'preset=off, salon');
  */
-async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
+async function stopExternalThermostat(gladys, config, logContext, selfWritten, selfWrittenPowers = null) {
   // The mode goes first, in both directions: it is what the machine obeys.
   // Writing the frost setpoint to a thermostat still in COOLING asks it to cool
   // the room to 7 °C until the mode write lands — and to keep doing so if that
@@ -447,7 +460,7 @@ async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
   // "turn on and aim at this", and MELCloud rebuilds each write from a snapshot
   // of the unit that may still read powered — the setpoint would undo the stop.
   if (config.power_feature) {
-    if (await actuateSwitch(gladys, config.power_feature, false, logContext)) {
+    if (await actuateSwitch(gladys, config.power_feature, false, logContext, selfWrittenPowers)) {
       return;
     }
     // The power could not be cut. An air conditioner still gets no setpoint, for
@@ -482,13 +495,14 @@ async function stopExternalThermostat(gladys, config, logContext, selfWritten) {
  * @param {object} gladys - Gladys instance.
  * @param {object} config - Thermostat config object.
  * @param {string} logContext - Context for the log lines.
+ * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
  * @returns {Promise<void>}
  * @example
  * await startExternalThermostat(gladys, config, 'preset=comfort, salon');
  */
-async function startExternalThermostat(gladys, config, logContext) {
+async function startExternalThermostat(gladys, config, logContext, selfWrittenPowers = null) {
   if (config.power_feature) {
-    await actuateSwitch(gladys, config.power_feature, true, logContext);
+    await actuateSwitch(gladys, config.power_feature, true, logContext, selfWrittenPowers);
   }
   if (config.mode_feature) {
     await writeExternalMode(gladys, config.mode_feature, getRunningMode(config), logContext);
@@ -614,6 +628,7 @@ function computeSwitchActive(currentTemp, setpoint, mode, config, currentSwitchO
  * @param {string} [serviceId] - This service's id, used to scope the runtime variables.
  * @param {Map<string, number>} [selfWritten] - Marks of the setpoints this service wrote.
  * @param {Map<string, string>} [announced] - The programme preset last announced for each thermostat.
+ * @param {Map<string, number>} [selfWrittenPowers] - Marks of the powers this service wrote.
  * @returns {Promise<void>}
  * @example
  * await regulateDevice(gladys, device, 0, 480, serviceId);
@@ -626,6 +641,7 @@ async function regulateDevice(
   serviceId = null,
   selfWritten = null,
   announced = null,
+  selfWrittenPowers = null,
 ) {
   const config = getDeviceConfig(device);
   if (!config) {
@@ -659,7 +675,7 @@ async function regulateDevice(
         // fires again as soon as the room drops below the frost setpoint,
         // window open or not. The schedule restores both on the next pass
         // once the window closes.
-        await stopExternalThermostat(gladys, config, `window open, ${selector}`, selfWritten);
+        await stopExternalThermostat(gladys, config, `window open, ${selector}`, selfWritten, selfWrittenPowers);
       } else if (config.switch_feature) {
         await actuateSwitch(gladys, config.switch_feature, false, `window open, ${selector}`);
         await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
@@ -675,7 +691,7 @@ async function regulateDevice(
   if (isStopped(device)) {
     logger.debug(`Thermostat schedule: ${selector} is stopped, leaving it alone`);
     if (external) {
-      await stopExternalThermostat(gladys, config, `mode=off, ${selector}`, selfWritten);
+      await stopExternalThermostat(gladys, config, `mode=off, ${selector}`, selfWritten, selfWrittenPowers);
     } else if (config.switch_feature) {
       await actuateSwitch(gladys, config.switch_feature, false, `mode=off, ${selector}`);
       await saveOperatingState.call({ gladys }, device, THERMOSTAT_OPERATING_STATE.IDLE);
@@ -730,7 +746,7 @@ async function regulateDevice(
         // hysteresis to run — running one here would fight the device's own.
         // The power and the mode are handed back first: a setpoint written to a
         // thermostat still switched off by a previous `off` preset would change nothing.
-        await startExternalThermostat(gladys, config, `manual, ${selector}`);
+        await startExternalThermostat(gladys, config, `manual, ${selector}`, selfWrittenPowers);
         // The hold is stored in the unit it was set in, which on an external
         // thermostat is the real feature's own: the widget dial reads that
         // feature's unit, and a change made on the device arrives in it too.
@@ -903,12 +919,12 @@ async function regulateDevice(
     // frost-protection setpoint — the only way to say "stop" that every
     // thermostat understands, mode feature or not.
     if (targetPreset === 'off') {
-      await stopExternalThermostat(gladys, config, `preset="off", ${selector}`, selfWritten);
+      await stopExternalThermostat(gladys, config, `preset="off", ${selector}`, selfWritten, selfWrittenPowers);
       return;
     }
     // Coming back from an `off` slot, the device is still switched off: the
     // power and the mode have to be handed back before the setpoint means anything.
-    await startExternalThermostat(gladys, config, `preset="${targetPreset}", ${selector}`);
+    await startExternalThermostat(gladys, config, `preset="${targetPreset}", ${selector}`, selfWrittenPowers);
     if (newSetpoint !== null) {
       await writeExternalSetpoint(
         gladys,
@@ -1005,7 +1021,7 @@ async function applySchedules() {
     await Promise.all(
       thermostatDevices.map(async (device) => {
         try {
-          const { serviceId, selfWrittenSetpoints, announcedPresets } = this;
+          const { serviceId, selfWrittenSetpoints, announcedPresets, selfWrittenPowers } = this;
           await regulateDevice(
             this.gladys,
             device,
@@ -1014,6 +1030,7 @@ async function applySchedules() {
             serviceId,
             selfWrittenSetpoints,
             announcedPresets,
+            selfWrittenPowers,
           );
         } catch (e) {
           logger.warn(`Thermostat schedule: Failed to regulate device: ${e.message}`);

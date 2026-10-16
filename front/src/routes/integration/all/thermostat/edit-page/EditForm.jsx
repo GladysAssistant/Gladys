@@ -42,7 +42,7 @@ const FeatureListSelect = ({ values, features, onChange, emptyLabel, addLabel, r
   return (
     <div>
       {selected.map((value, index) => (
-        <div class={cx('input-group', style.featureListRow)} key={value}>
+        <div class={cx('input-group', style.featureListRow)} key={index}>
           <FeatureSelect
             value={value}
             features={others(index)}
@@ -127,7 +127,8 @@ const EditForm = ({ ...props }) => {
   // room's. A switch widens them all at once — an open-plan salon and kitchen
   // heated as one, a heat pump whose device sits in another room. A feature
   // already chosen stays listed whatever its room, or opening the form would
-  // silently blank it.
+  // silently blank it. Such a feature keeps its room in its label, so it cannot
+  // be mistaken for one of this room's.
   const roomId = props.thermostatEditRoomId || '';
   const narrowed = Boolean(roomId) && !props.thermostatEditShowAllRooms;
   const roomNames = {};
@@ -136,7 +137,7 @@ const EditForm = ({ ...props }) => {
     (features || [])
       .filter(feature => !narrowed || feature.roomId === roomId || kept.includes(feature.selector))
       .map(feature =>
-        !narrowed && roomNames[feature.roomId]
+        (!narrowed || feature.roomId !== roomId) && roomNames[feature.roomId]
           ? { ...feature, label: `${roomNames[feature.roomId]} - ${feature.label}` }
           : feature
       );
