@@ -808,6 +808,57 @@ describe('thermostat.regulateDevice - external', () => {
 
       assert.notCalled(gladys.device.setValue);
     });
+
+    // The power this service stands behind is marked, so that its report is not
+    // taken for the unit switched from its remote (C.0.1).
+    describe('power marks', () => {
+      const regulateWithMarks = (mod, gladys, device, marks) =>
+        mod.regulateDevice(gladys, device, todayDow, 12 * 60, null, null, null, marks);
+
+      it('should mark the power it cuts', async () => {
+        const mod = load(fullDaySchedule('off'));
+        const gladys = buildGladys({ features: acFeatures() });
+        const marks = new Map();
+
+        await regulateWithMarks(mod, gladys, acDevice(), marks);
+
+        expect(marks.get('ac-power')).to.equal(0);
+      });
+
+      it('should mark the power it hands back', async () => {
+        const mod = load(fullDaySchedule('comfort'));
+        const gladys = buildGladys({ features: acFeatures({ power: 0 }) });
+        const marks = new Map();
+
+        await regulateWithMarks(mod, gladys, acDevice(), marks);
+
+        expect(marks.get('ac-power')).to.equal(1);
+      });
+
+      // Nothing goes on the wire, but the unit switched off from its remote has to
+      // differ from what Gladys stands behind, or powering it on again would be missed.
+      it('should mark a power already in the wanted state', async () => {
+        const mod = load(fullDaySchedule('comfort'));
+        const gladys = buildGladys({ features: acFeatures({ setpoint: 21 }) });
+        const marks = new Map([['ac-power', 0]]);
+
+        await regulateWithMarks(mod, gladys, acDevice(), marks);
+
+        assert.notCalled(gladys.device.setValue);
+        expect(marks.get('ac-power')).to.equal(1);
+      });
+
+      it('should drop the mark of a power that could not be written', async () => {
+        const mod = load(fullDaySchedule('off'));
+        const gladys = buildGladys({ features: acFeatures() });
+        gladys.device.setValue = fake.rejects(new Error('offline'));
+        const marks = new Map();
+
+        await regulateWithMarks(mod, gladys, acDevice(), marks);
+
+        expect(marks.has('ac-power')).to.equal(false);
+      });
+    });
   });
 });
 
@@ -1106,8 +1157,11 @@ describe('thermostat.onExternalSetpointChanged', () => {
       },
       windowSelectorsCache: null,
       targetSelectorsCache: null,
+      powerSelectorsCache: null,
       selfWrittenSetpoints: new Map(),
       observedSetpoints: new Map(),
+      selfWrittenPowers: new Map(),
+      observedPowers: new Map(),
     });
 
     it('should seed the reference from the stored value', async () => {
@@ -1117,6 +1171,35 @@ describe('thermostat.onExternalSetpointChanged', () => {
       await mod.primeObservedSetpoints.call(handler);
 
       expect(handler.observedSetpoints.get('netatmo-setpoint')).to.equal(18);
+    });
+
+    // A unit re-reporting after a restart the power the programme had cut must not
+    // read as a unit switched off from its remote.
+    it('should seed the power reference from the stored value', async () => {
+      const mod = loadListener();
+      const handler = buildPrimeHandler(18);
+      handler.gladys.device.get = fake(async (options) => {
+        if (options && options.device_feature_selectors === 'ac-power') {
+          return [{ selector: 'ac', features: [{ selector: 'ac-power', last_value: 0 }] }];
+        }
+        if (options && options.device_feature_selectors) {
+          return [];
+        }
+        return [
+          {
+            ...externalThermostat,
+            params: [...externalThermostat.params, { name: 'THERMOSTAT_POWER_FEATURE', value: 'ac-power' }],
+          },
+        ];
+      });
+      handler.observedPowers.set('old-power', 1);
+      handler.selfWrittenPowers.set('old-power', 1);
+
+      await mod.primeObservedSetpoints.call(handler);
+
+      expect(handler.observedPowers.get('ac-power')).to.equal(0);
+      expect(handler.observedPowers.has('old-power')).to.equal(false);
+      expect(handler.selfWrittenPowers.has('old-power')).to.equal(false);
     });
 
     it('should leave a feature that never reported without a reference', async () => {
@@ -1230,5 +1313,182 @@ describe('thermostat.onExternalSetpointChanged', () => {
     await mod.onExternalSetpointChanged.call(handler, 'thermostat-living-room', 19);
 
     expect(heldSetpoint(handler)).to.equal(null);
+  });
+});
+
+// An air conditioner switched off from its remote must not be powered back on by
+// the next pass: the power cut is taken as a stop, like the widget's Off button.
+describe('thermostat.onExternalPowerChanged', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  const loadListener = () =>
+    proxyquire('../../../../services/thermostat/lib/thermostat.onWindowOpen', {
+      './thermostat.setValue': { holdExpiry: fake.resolves(null) },
+      '../../../utils/logger': {
+        debug: fake.returns(null),
+        info: fake.returns(null),
+        warn: fake.returns(null),
+      },
+    });
+
+  const thermostatModeFeature = (mode) => ({
+    selector: 'ac-thermostat-mode',
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+    last_value: mode,
+  });
+
+  const acThermostat = ({ mode = THERMOSTAT_MODE.HEATING, running = 'heating', features } = {}) => ({
+    selector: 'ac-thermostat',
+    features: features || [thermostatModeFeature(mode)],
+    params: [
+      { name: 'THERMOSTAT_TYPE', value: 'external' },
+      { name: 'THERMOSTAT_TARGET_FEATURE', value: 'ac-setpoint' },
+      { name: 'THERMOSTAT_POWER_FEATURE', value: 'ac-power' },
+      { name: 'THERMOSTAT_MODE', value: running },
+    ],
+  });
+
+  // The unit was reporting `previous` (null: never reported): a report is a
+  // change only against it.
+  const buildHandler = ({ devices = [acThermostat()], previous = 1 } = {}) => {
+    const handler = {
+      gladys: { device: { get: fake.resolves(devices) } },
+      windowSelectorsCache: null,
+      targetSelectorsCache: null,
+      powerSelectorsCache: null,
+      selfWrittenPowers: new Map(),
+      observedPowers: new Map(),
+      setValue: fake.resolves(null),
+    };
+    if (previous !== null) {
+      handler.observedPowers.set('ac-power', previous);
+    }
+    return handler;
+  };
+
+  it('should stop the thermostat when the unit is switched off on the device', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+    assert.calledOnce(handler.setValue);
+    expect(handler.setValue.firstCall.args[1].selector).to.equal('ac-thermostat-mode');
+    expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.OFF);
+  });
+
+  it('should start a stopped thermostat when the unit is switched on on the device', async () => {
+    const mod = loadListener();
+    const handler = buildHandler({
+      devices: [acThermostat({ mode: THERMOSTAT_MODE.OFF, running: 'cooling' })],
+      previous: 0,
+    });
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+    assert.calledOnce(handler.setValue);
+    expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.COOLING);
+  });
+
+  it('should take the report of a power it wrote for its own', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+    handler.selfWrittenPowers.set('ac-power', 0);
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+    assert.notCalled(handler.setValue);
+    expect(handler.observedPowers.get('ac-power')).to.equal(0);
+  });
+
+  it('should not act on a report that does not change the power', async () => {
+    const mod = loadListener();
+    const handler = buildHandler({ previous: 0 });
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+    assert.notCalled(handler.setValue);
+  });
+
+  it('should only record the first report of a power it has no reference for', async () => {
+    const mod = loadListener();
+    const handler = buildHandler({ previous: null });
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+    assert.notCalled(handler.setValue);
+    expect(handler.observedPowers.get('ac-power')).to.equal(0);
+  });
+
+  it('should leave a thermostat already stopped alone when the unit is switched off', async () => {
+    const mod = loadListener();
+    const handler = buildHandler({ devices: [acThermostat({ mode: THERMOSTAT_MODE.OFF })] });
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+    assert.notCalled(handler.setValue);
+  });
+
+  it('should leave a running thermostat alone when the unit is switched on', async () => {
+    const mod = loadListener();
+    const handler = buildHandler({ previous: 0 });
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+    assert.notCalled(handler.setValue);
+  });
+
+  it('should skip a thermostat without a mode feature', async () => {
+    const mod = loadListener();
+    const handler = buildHandler({ devices: [acThermostat({ features: [] })] });
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+    assert.notCalled(handler.setValue);
+  });
+
+  it('should ignore a feature that is not a driven power', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+
+    await mod.onExternalPowerChanged.call(handler, 'kitchen-light', 0);
+
+    assert.notCalled(handler.setValue);
+    expect(handler.observedPowers.has('kitchen-light')).to.equal(false);
+  });
+
+  it('should ignore a report without a value', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', null);
+
+    assert.notCalled(handler.gladys.device.get);
+  });
+
+  it('should swallow a failure to stop the thermostat', async () => {
+    const mod = loadListener();
+    const handler = buildHandler();
+    handler.setValue = fake.rejects(new Error('database locked'));
+
+    await mod.onExternalPowerChanged.call(handler, 'ac-power', 0);
+
+    assert.calledOnce(handler.setValue);
+  });
+
+  it('should be reached from the device new-state listener', async () => {
+    const mod = loadListener();
+    const handler = {
+      ...buildHandler(),
+      selfWrittenSetpoints: new Map(),
+      observedSetpoints: new Map(),
+    };
+
+    await mod.onDeviceNewState.call(handler, { device_feature: 'ac-power', state: 0 });
+
+    assert.calledOnce(handler.setValue);
   });
 });

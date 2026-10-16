@@ -21,7 +21,8 @@ const isModeFeature = feature =>
     feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) ||
   (feature.category === AC && feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE);
 const isPowerFeature = feature =>
-  feature.type === 'binary' && (feature.category === AC || SWITCH_CATEGORIES.includes(feature.category));
+  (feature.category === AC && feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY) ||
+  (SWITCH_CATEGORIES.includes(feature.category) && feature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY);
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);

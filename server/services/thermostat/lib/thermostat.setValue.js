@@ -75,7 +75,12 @@ async function writeSetpoint(device, deviceFeature, value) {
   // device whose mode is OFF, or whose power is off, changes the number on its
   // screen and nothing else. Hand both back first, so the setpoint this write
   // carries means something.
-  await startExternalThermostat(this.gladys, config, `setValue ${value}, ${deviceFeature.selector}`);
+  await startExternalThermostat(
+    this.gladys,
+    config,
+    `setValue ${value}, ${deviceFeature.selector}`,
+    this.selfWrittenPowers,
+  );
   // Mark it before writing: the device echoes the new value back as a NEW_STATE,
   // and the listener must not mistake our own write for a change made on the
   // thermostat itself.
@@ -197,14 +202,20 @@ async function setValue(device, deviceFeature, value, manual = true) {
       // Stopping is not a preset with a setpoint: it cuts the switch on a
       // virtual thermostat, and stops the real one on an external device.
       if (isExternal(config)) {
-        await stopExternalThermostat(this.gladys, config, `mode=off, ${device.selector}`, this.selfWrittenSetpoints);
+        await stopExternalThermostat(
+          this.gladys,
+          config,
+          `mode=off, ${device.selector}`,
+          this.selfWrittenSetpoints,
+          this.selfWrittenPowers,
+        );
       }
       await clearManualHold.call(this, device);
     } else if (starting && isExternal(config)) {
       // The power and the mode go first in this direction too. Left to the next
       // pass, they reached the appliance two seconds after the setpoint the widget
       // sends right behind a start: a thermostat still off was handed a target to ignore.
-      await startExternalThermostat(this.gladys, config, `mode=${value}, ${device.selector}`);
+      await startExternalThermostat(this.gladys, config, `mode=${value}, ${device.selector}`, this.selfWrittenPowers);
     }
     logger.info(`Thermostat: mode ${value} set on ${device.selector}`);
     this.triggerApplySchedules();
