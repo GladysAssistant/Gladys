@@ -178,6 +178,19 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: cameraController.setImage,
     },
+    // WebRTC live view of a camera declaring GLADYS_CAMERA_STREAM_PROTOCOL=webrtc: signalling only
+    'post /api/v1/camera/:camera_selector/webrtc/start': {
+      authenticated: true,
+      controller: cameraController.startWebRtc,
+    },
+    'post /api/v1/camera/:camera_selector/webrtc/ping': {
+      authenticated: true,
+      controller: cameraController.pingWebRtc,
+    },
+    'post /api/v1/camera/:camera_selector/webrtc/stop': {
+      authenticated: true,
+      controller: cameraController.stopWebRtc,
+    },
     // dashboard
     'get /api/v1/dashboard': {
       authenticated: true,

@@ -5,6 +5,7 @@ const { get } = require('./camera.get');
 const { getImagesInRoom } = require('./camera.getImagesInRoom');
 const { INTENTS } = require('../../../utils/constants');
 const { getLiveImage } = require('./camera.getLiveImage');
+const { startWebRtc, pingWebRtc, stopWebRtc, endWebRtcSession, sweepWebRtcSessions } = require('./camera.webRtc');
 
 const Camera = function Camera(stateManager, messageManager, eventManager, serviceManager, deviceManager) {
   this.stateManager = stateManager;
@@ -12,6 +13,11 @@ const Camera = function Camera(stateManager, messageManager, eventManager, servi
   this.eventManager = eventManager;
   this.serviceManager = serviceManager;
   this.deviceManager = deviceManager;
+  // WebRTC live views in progress, by session id (camera.webRtc.js)
+  this.webRtcSessions = new Map();
+  this.webRtcSweepInterval = null;
+  // starts waiting for the camera's cloud, counted against the session cap
+  this.webRtcPendingStarts = 0;
   this.eventManager.on(INTENTS.CAMERA.GET_IMAGE, this.command.bind(this));
 };
 
@@ -21,5 +27,10 @@ Camera.prototype.getImage = getImage;
 Camera.prototype.get = get;
 Camera.prototype.getImagesInRoom = getImagesInRoom;
 Camera.prototype.getLiveImage = getLiveImage;
+Camera.prototype.startWebRtc = startWebRtc;
+Camera.prototype.pingWebRtc = pingWebRtc;
+Camera.prototype.stopWebRtc = stopWebRtc;
+Camera.prototype.endWebRtcSession = endWebRtcSession;
+Camera.prototype.sweepWebRtcSessions = sweepWebRtcSessions;
 
 module.exports = Camera;
