@@ -161,6 +161,18 @@ describe('ThermostatService', () => {
     expect(handler.windowOpenedAt.size).to.equal(0);
   });
 
+  // A state change still in flight reads this to know the service has stopped.
+  it('should mark the handler stopped on stop and running again on start', async () => {
+    const { service, handler } = buildService();
+
+    await service.start();
+    expect(handler.stopped).to.equal(false);
+    await service.stop();
+    expect(handler.stopped).to.equal(true);
+    await service.start();
+    expect(handler.stopped).to.equal(false);
+  });
+
   it('should be safe to stop a service that was never started', async () => {
     const { service, gladys } = buildService();
 
