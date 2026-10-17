@@ -1049,6 +1049,10 @@
       },
       "config": {
         "title": "Configuration",
+        "ttsVoiceActive": "Cette intégration est la voix de votre instance : les annonces des scènes et les réponses de l'assistant vocal passent par elle.",
+        "ttsVoiceActiveNotRunning": "Cette intégration est la voix de votre instance, mais elle n'est pas démarrée : les annonces des scènes et les réponses de l'assistant vocal échoueront tant qu'elle n'est pas redémarrée.",
+        "ttsVoiceInactive": "Cette intégration n'est pas la voix de votre instance (la voix active est « {{name}} »). L'installer ne suffit pas : sélectionnez-la comme voix pour l'utiliser.",
+        "ttsVoiceChangeLink": "Changer la voix de l'instance",
         "docsLink": "Documentation",
         "loadError": "Une erreur s'est produite lors du chargement de la configuration.",
         "noConfig": "Cette intégration n'a pas d'options de configuration.",
@@ -1236,6 +1240,8 @@
         "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
         "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant).",
         "calendarInfoText": "Cette intégration est un fournisseur de calendriers : une fois installée, elle créera des calendriers et des événements dans Gladys pour les utilisateurs qui l'activent avec leur propre compte.",
+        "ttsInfoText": "Cette intégration est un fournisseur de synthèse vocale : une fois installée, sélectionnez-la comme voix de votre instance dans l'intégration Intelligence Artificielle. Les annonces sont servies sur votre réseau local — les enceintes et navigateurs du même réseau peuvent les lire.",
+        "ttsInfoLink": "Ouvrir l'intégration Intelligence Artificielle",
         "widgetsTitle": "Widgets de tableau de bord",
         "widgetsText": "Cette intégration fournit les widgets suivants, disponibles pour tous les utilisateurs dans l'éditeur de tableau de bord :",
         "energyContractsTitle": "Contrats d’énergie",
@@ -3328,7 +3334,15 @@
       },
       "rateLimit": "L'API d'IA étant payante, cette intégration est limitée à 3 000 requêtes texte et 500 requêtes avec image par mois et par compte.",
       "notOnGladysPlus": "L'API d'IA étant payante, cette intégration est proposée via Gladys Plus uniquement.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
+      "ttsProvider": "Voix (fournisseur de synthèse vocale)",
+      "ttsProviderText": "Le fournisseur utilisé pour parler : les annonces des scènes sur vos enceintes et les réponses de l'assistant vocal. Gladys Plus fonctionne partout (y compris en accès à distance) ; une intégration de synthèse vocale génère la voix localement et la sert sur votre réseau local.",
+      "ttsProviderPlusNotConnected": "Gladys Plus n'est pas connecté : les annonces et les réponses vocales ne seront pas lues. Abonnez-vous à Gladys Plus ci-dessus, ou installez une intégration de synthèse vocale et sélectionnez-la ici.",
+      "ttsProviderNotRunning": "« {{name}} » n'est pas démarrée : les annonces et les réponses vocales échoueront tant qu'elle ne sera pas redémarrée.",
+      "ttsProviderUnavailable": "Le fournisseur sélectionné « {{provider}} » n'est plus disponible : sélectionnez une autre voix.",
+      "ttsProviderInstallHint": "Seul Gladys Plus est disponible. Une intégration de synthèse vocale du catalogue peut générer la voix localement, sans abonnement.",
+      "ttsProviderOpenIntegration": "Ouvrir l'intégration",
+      "ttsProviderBrowseCatalog": "Parcourir les intégrations d'assistants vocaux"
     },
     "callmebot": {
       "title": "CallMeBot",
@@ -4000,6 +4014,7 @@
       },
       "playNotification": {
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
+        "voiceSettingLink": "Choisir la voix de votre instance (intégration Intelligence Artificielle)",
         "deviceLabel": "Enceinte",
         "volumeLabel": "Volume",
         "valueTypeSimple": "Simple",
@@ -5210,6 +5225,8 @@
     },
     "tts": {
       "title": "Cette action nécessite Gladys Plus",
+      "providerTitle": "Cette action a besoin d'une voix",
+      "providerCompactDescription": "Gladys Plus donne à Gladys une voix naturelle qui fonctionne partout, y compris en accès à distance. Sans abonnement, vous pouvez aussi installer une intégration de synthèse vocale et la sélectionner comme voix de votre instance.",
       "description": "L'action « Parler sur une enceinte » utilise les API Text-to-Speech via Gladys Plus pour faire parler Gladys sur tes enceintes (Sonos, Google Cast, etc.) avec une voix naturelle.",
       "compactDescription": "Cette action utilise les API Text-to-Speech via Gladys Plus.",
       "feature1": "Voix naturelles, multilingues",

@@ -9,11 +9,19 @@ const {
   WEATHER_GET_TIMEOUT_MS,
   WEATHER_IMAGE_CACHE_TTL_MS,
   WEATHER_IMAGE_CACHE_PREFIX,
+  TTS_SYNTHESIZE_TIMEOUT_MS,
+  MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_AUDIO_BASE64_LENGTH,
+  MAX_TTS_TEXT_LENGTH,
+  TTS_AUDIO_CONTENT_TYPES,
 } = require('./constants');
 
 // scheduled polls only make sense against a live integration: outside
 // these statuses they become silent no-ops (see below)
 const POLLABLE_STATUSES = [SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
+// strict base64 alphabet with optional padding: what a TTS data-URI must
+// carry after its ";base64," separator
+const BASE64_REGEX = /^[A-Za-z0-9+/]+={0,2}$/;
 
 /**
  * @description Register the proxy service of an external integration in the
@@ -146,6 +154,60 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // TTS provider integrations (capabilities/tts-type.md) expose the generic
+  // provider interface tts.synthesize: the core tts manager dispatches to any
+  // service exposing it, without knowing any engine by name. The audio comes
+  // back in the command-result as a data-URI, validated here (curated content
+  // types, decoded size bound) before a single byte is served to a speaker.
+  const isTts = service.manifest && service.manifest.type === 'tts';
+  const ttsCapability = isTts
+    ? {
+        tts: Object.freeze({
+          synthesize: async ({ text, language = null }) => {
+            // cap applied by the core before the relay: a long AI answer
+            // must speak its beginning rather than fail
+            const cappedText = String(text).substring(0, MAX_TTS_TEXT_LENGTH);
+            const result = await this.sendCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.TTS_SYNTHESIZE,
+              { text: cappedText, language },
+              { timeoutMs: TTS_SYNTHESIZE_TIMEOUT_MS },
+            );
+            const audio = result && result.data && result.data.audio;
+            // the string length is bounded before anything is decoded: a
+            // data-URI that cannot fit under the size cap never allocates
+            if (typeof audio !== 'string' || audio.length === 0 || audio.length > MAX_TTS_AUDIO_BASE64_LENGTH) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            // the contract is "<content type>;base64,<payload>" (the camera
+            // convention); a standard data URI with its "data:" scheme is
+            // accepted too rather than failing with an opaque error
+            const dataUri = audio.startsWith('data:') ? audio.substring('data:'.length) : audio;
+            const separatorIndex = dataUri.indexOf(';base64,');
+            const contentType = separatorIndex === -1 ? null : dataUri.substring(0, separatorIndex);
+            // own-key lookup only: a content type like "constructor" must
+            // not match an inherited Object.prototype property
+            const extension = Object.prototype.hasOwnProperty.call(TTS_AUDIO_CONTENT_TYPES, contentType)
+              ? TTS_AUDIO_CONTENT_TYPES[contentType]
+              : undefined;
+            if (!extension) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            // Buffer.from skips invalid characters instead of throwing: a
+            // malformed payload would otherwise decode to a partial clip
+            const encoded = dataUri.substring(separatorIndex + ';base64,'.length);
+            if (!BASE64_REGEX.test(encoded)) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            const buffer = Buffer.from(encoded, 'base64');
+            if (buffer.length === 0 || buffer.length > MAX_TTS_AUDIO_SIZE_BYTES) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            return { buffer, contentType, extension };
+          },
+        }),
+      }
+    : {};
   // every external integration exposes the generic scene capability, like
   // device.setValue: the scene engine relays a reached action through it
   // (scene.actions.js, the exact path mqtt.send takes) and the supervisor
@@ -167,6 +229,7 @@ function registerProxyService(service) {
     },
     ...messageCapability,
     ...weatherCapability,
+    ...ttsCapability,
     ...sceneCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {

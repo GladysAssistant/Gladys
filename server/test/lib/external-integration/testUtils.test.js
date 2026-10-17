@@ -135,6 +135,34 @@ const TEST_WEATHER_MANIFEST = {
   gladys_version: '>=4.62.0',
 };
 
+// TTS-provider fixture (capabilities/tts-type.md): a text-to-speech engine —
+// Configuration screen only, the core relays synthesize commands over
+// WebSocket and serves the returned audio to speakers.
+const TEST_TTS_MANIFEST = {
+  manifest_version: 1,
+  type: 'tts',
+  name: 'Piper TTS Demo',
+  description: {
+    en: 'Local text-to-speech provider demo.',
+    fr: 'Intégration démo : synthèse vocale locale.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-piper-tts:1.0.0',
+  gladys_version: '>=4.62.0',
+  config_schema: [
+    {
+      key: 'voice',
+      type: 'select',
+      label: { en: 'Voice' },
+      default: 'fr_FR-siwis-medium',
+      options: [
+        { value: 'fr_FR-siwis-medium', label: { en: 'Siwis (French)' } },
+        { value: 'en_US-amy-medium', label: { en: 'Amy (English)' } },
+      ],
+    },
+  ],
+};
+
 // Device integration declaring dashboard widgets (capabilities/dashboard-
 // widgets.md): a cinema-like widget with static settings and a vacuum widget
 // bound to one of the integration's devices through `source: "devices"`.
@@ -499,6 +527,7 @@ module.exports = {
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
   TEST_WEATHER_MANIFEST,
+  TEST_TTS_MANIFEST,
   TEST_CALENDAR_MANIFEST,
   TEST_WIDGET_MANIFEST,
   TEST_PROVIDER_MANIFEST,
