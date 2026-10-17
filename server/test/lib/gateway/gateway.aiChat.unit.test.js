@@ -6,10 +6,13 @@ const { fake } = sinon;
 const { Error400, Error402, Error403, Error429 } = require('../../../utils/httpErrors');
 const { aiChat, normalizeAiChatRequestBody, describeAiChatError } = require('../../../lib/gateway/gateway.aiChat');
 const { DEFAULT_TEXT_MODEL } = require('../../../utils/aiChatModels');
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 
 describe('gateway.aiChat unit', () => {
   it('should return gateway response on success', async () => {
     const ctx = {
+      variable: { getValue: fake.resolves(null) },
       callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk: fake.resolves({ choices: [] }),
@@ -22,6 +25,7 @@ describe('gateway.aiChat unit', () => {
   it('should omit model when auto is selected', async () => {
     const openAIAsk = fake.resolves({ choices: [] });
     const ctx = {
+      variable: { getValue: fake.resolves(null) },
       callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk,
@@ -34,6 +38,7 @@ describe('gateway.aiChat unit', () => {
   it('should forward a valid model to the gateway', async () => {
     const openAIAsk = fake.resolves({ choices: [] });
     const ctx = {
+      variable: { getValue: fake.resolves(null) },
       callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk,
@@ -51,6 +56,7 @@ describe('gateway.aiChat unit', () => {
     const paymentRequired = new Error('payment required');
     paymentRequired.response = { status: 402, data: { error_code: 'PAYMENT_REQUIRED' } };
     const ctx = {
+      variable: { getValue: fake.resolves(null) },
       callPlanGatedApi: fake.rejects(new Error402('GLADYS_PLUS_PAYMENT_REQUIRED')),
     };
 
@@ -71,12 +77,14 @@ describe('gateway.aiChat unit', () => {
     tooMany.response = { status: 429, data: { error_message: 'too many' } };
 
     const ctx403 = {
+      variable: { getValue: fake.resolves(null) },
       callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk: fake.rejects(forbidden),
       },
     };
     const ctx429 = {
+      variable: { getValue: fake.resolves(null) },
       callPlanGatedApi: (call) => call(),
       gladysGatewayClient: {
         openAIAsk: fake.rejects(tooMany),
@@ -149,5 +157,82 @@ describe('gateway.aiChat unit', () => {
     it('should describe a non-error value', () => {
       expect(describeAiChatError(undefined)).to.equal('undefined');
     });
+  });
+});
+
+describe('gateway.aiChat unit (external AI provider routing)', () => {
+  const buildContext = ({ selector = 'ext-dev-claude-provider-demo', proxyService, callPlanGatedApi } = {}) => ({
+    variable: { getValue: fake(async (name) => (name === SYSTEM_VARIABLE_NAMES.AI_PROVIDER ? selector : null)) },
+    serviceManager: { getService: fake.returns(proxyService === undefined ? null : proxyService) },
+    callPlanGatedApi: callPlanGatedApi || fake((call) => call()),
+    gladysGatewayClient: { openAIAsk: fake.resolves({ choices: [] }) },
+  });
+
+  it('should relay to the selected provider with the model stripped', async () => {
+    const chat = fake.resolves({ choices: [{ message: { content: 'Hi' } }] });
+    const ctx = buildContext({ proxyService: { ai: { chat } } });
+    const result = await aiChat.call(ctx, {
+      messages: [],
+      tools: [],
+      tool_choice: 'auto',
+      purpose: 'chat',
+      categories: ['other'],
+      model: DEFAULT_TEXT_MODEL,
+    });
+    expect(result).to.deep.equal({ choices: [{ message: { content: 'Hi' } }] });
+    // the model is Gladys Plus vocabulary: stripped, hints pass through
+    expect(
+      chat.calledOnceWith({ messages: [], tools: [], tool_choice: 'auto', purpose: 'chat', categories: ['other'] }),
+    ).to.equal(true);
+    expect(ctx.serviceManager.getService.calledOnceWith('ext-dev-claude-provider-demo')).to.equal(true);
+    // never rerouted to Gladys Plus
+    expect(ctx.gladysGatewayClient.openAIAsk.called).to.equal(false);
+    expect(ctx.callPlanGatedApi.called).to.equal(false);
+  });
+
+  it('should relay a request without a model field untouched', async () => {
+    const chat = fake.resolves({ choices: [] });
+    const ctx = buildContext({ proxyService: { ai: { chat } } });
+    await aiChat.call(ctx, { messages: [] });
+    expect(chat.calledOnceWith({ messages: [] })).to.equal(true);
+  });
+
+  it('should reach the provider even when the Gladys Plus subscription is paused', async () => {
+    // the external branch sits before the plan gate: a locked Plus
+    // subscription must not answer 402 to an instance using its own provider
+    const chat = fake.resolves({ choices: [{ message: { content: 'Hi' } }] });
+    const ctx = buildContext({
+      proxyService: { ai: { chat } },
+      callPlanGatedApi: fake.rejects(new Error402('GLADYS_PLUS_PAYMENT_REQUIRED')),
+    });
+    const result = await aiChat.call(ctx, { messages: [] });
+    expect(result).to.deep.equal({ choices: [{ message: { content: 'Hi' } }] });
+    expect(chat.calledOnce).to.equal(true);
+    expect(ctx.callPlanGatedApi.called).to.equal(false);
+  });
+
+  it('should throw when the selected provider is not registered', async () => {
+    const ctx = buildContext({ proxyService: null });
+    let error = null;
+    try {
+      await aiChat.call(ctx, { messages: [] });
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.instanceOf(ExternalIntegrationUnavailableError);
+    expect(error.message).to.equal('EXTERNAL_INTEGRATION_AI_PROVIDER_NOT_AVAILABLE');
+    // and never silently rerouted to Gladys Plus
+    expect(ctx.gladysGatewayClient.openAIAsk.called).to.equal(false);
+  });
+
+  it('should throw when the selected provider has no ai capability', async () => {
+    const ctx = buildContext({ selector: 'ext-dev-open-meteo-demo', proxyService: { device: {} } });
+    let error = null;
+    try {
+      await aiChat.call(ctx, { messages: [] });
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.instanceOf(ExternalIntegrationUnavailableError);
   });
 });

@@ -273,6 +273,12 @@ class ExternalIntegrationInstallPage extends Component {
                                 )}
                               </div>
                             )}
+                            {manifest.type === 'ai' && (
+                              <div class="alert alert-warning">
+                                <i class="fe fe-cpu mr-1" />
+                                <Text id="integration.externalIntegration.install.aiWarningText" />
+                              </div>
+                            )}
 
                             {containers.length > 0 && (
                               <SubContainersSummary containers={containers} language={language} />

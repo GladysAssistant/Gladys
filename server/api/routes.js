@@ -458,8 +458,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getInstanceKeysFingerprint,
     },
+    // raw completion proxy, the debug-context replay path: with an external
+    // AI provider it reaches a personal API key or a host model with no
+    // bound on the outbound payload, so it is an admin tool like the
+    // debug context itself. Household chat goes through message.create
     'post /api/v1/gateway/aichat/chat': {
       authenticated: true,
+      admin: true,
       controller: gatewayController.aiChat,
     },
     'get /api/v1/gateway/aichat/debug-context': {
@@ -593,6 +598,19 @@ function getRoutes(gladys) {
     'get /api/v1/external_integration': {
       authenticated: true,
       controller: externalIntegrationController.getAll,
+    },
+    // AI provider selection (external integrations of type "ai" can serve
+    // the assistant instead of Gladys Plus): read is authenticated (the
+    // chat hides its model selector when an external provider is active),
+    // write is an admin gesture
+    'get /api/v1/ai_provider': {
+      authenticated: true,
+      controller: externalIntegrationController.getAiProvider,
+    },
+    'post /api/v1/ai_provider': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.setAiProvider,
     },
     'get /api/v1/external_integration/store': {
       authenticated: true,

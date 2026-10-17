@@ -1,0 +1,45 @@
+const db = require('../../models');
+const { BadParameters, NotFoundError } = require('../../utils/coreErrors');
+const { SYSTEM_VARIABLE_NAMES, SERVICE_TYPES } = require('../../utils/constants');
+
+/**
+ * @description Select the AI provider of the instance. A null selector
+ * resets to the Gladys Plus default (variable destroyed); otherwise the
+ * selector must be an installed integration of manifest type "ai"
+ * (unknown selector -> NotFoundError from getBySelector, installed but not
+ * an AI provider -> BadParameters).
+ * @param {string|null} selector - The selector of the AI provider
+ * integration, or null to reset to Gladys Plus.
+ * @returns {Promise<string|null>} Resolve with the persisted selector.
+ * @example
+ * await gladys.externalIntegration.setAiProvider('ext-dev-my-ai-provider');
+ */
+async function setAiProvider(selector) {
+  if (selector === null) {
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+    return null;
+  }
+  const service = await this.getBySelector(selector);
+  if (!service.manifest || service.manifest.type !== 'ai') {
+    throw new BadParameters(`External integration ${selector} is not an AI provider`);
+  }
+  await this.variable.setValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER, service.selector);
+  // guard against a concurrent uninstall of the provider between the
+  // validation above and the write: uninstall clears the variable after
+  // destroying the row, so re-checking the row after the write guarantees
+  // the variable never points to a removed integration whatever the
+  // interleaving (a write before the deletion is caught by uninstall, a
+  // write after it is rolled back here)
+  const stillInstalled = await db.Service.findOne({
+    where: { selector: service.selector, type: SERVICE_TYPES.EXTERNAL, pod_id: null },
+  });
+  if (stillInstalled === null) {
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+    throw new NotFoundError('EXTERNAL_INTEGRATION_NOT_FOUND');
+  }
+  return service.selector;
+}
+
+module.exports = {
+  setAiProvider,
+};

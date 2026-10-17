@@ -100,28 +100,65 @@ class AskAI extends Component {
     super(props);
     this.props = props;
     this.state = {
-      selectedOption: ''
+      selectedOption: '',
+      externalProviderActive: null,
+      externalProviderName: null
     };
   }
+  // the ai.ask action follows the selected AI provider: with an external
+  // provider the scene works without Gladys Plus, so the upsell only shows
+  // once the absence of a provider is confirmed (null = unknown)
+  getAiProvider = async () => {
+    try {
+      const response = await this.props.httpClient.get('/api/v1/ai_provider');
+      const provider = (response.providers || []).find(candidate => candidate.selector === response.selector);
+      this.setState({
+        externalProviderActive: Boolean(response.selector),
+        externalProviderName: provider ? provider.name : null
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
   componentDidMount() {
     this.getOptions();
+    this.getAiProvider();
     this.setVariables();
   }
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
   }
-  render(props, { selectedUserOption, userOptions, selectedCameraOption, cameraOptions }) {
+  render(
+    props,
+    {
+      selectedUserOption,
+      userOptions,
+      selectedCameraOption,
+      cameraOptions,
+      externalProviderActive,
+      externalProviderName
+    }
+  ) {
     return (
       <div>
-        <GladysPlusUpsell
-          compact
-          icon="fe-cpu"
-          utmCampaign="scene_action_ask_ai"
-          titleKey="gladysPlusUpsell.askAi.title"
-          descriptionKey="gladysPlusUpsell.askAi.compactDescription"
-        />
+        {externalProviderActive === false && (
+          <GladysPlusUpsell
+            compact
+            icon="fe-cpu"
+            utmCampaign="scene_action_ask_ai"
+            titleKey="gladysPlusUpsell.askAi.title"
+            descriptionKey="gladysPlusUpsell.askAi.compactDescription"
+          />
+        )}
         <p>
-          <Text id="editScene.actionsCard.askAi.description" />
+          {externalProviderActive === true ? (
+            <Text
+              id="editScene.actionsCard.askAi.descriptionExternalProvider"
+              fields={{ name: externalProviderName }}
+            />
+          ) : (
+            <Text id="editScene.actionsCard.askAi.description" />
+          )}
         </p>
         <div class="form-group">
           <label class="form-label">

@@ -389,12 +389,18 @@ const actionsFunc = {
       // Read by message.reply, never sent to the chat API.
       service: action.service || null,
     };
-    const { answer } = await self.gateway.forwardMessageToAiChat({
+    const result = await self.gateway.forwardMessageToAiChat({
       message,
       image,
       context: {},
     });
-    set(scope, path, { answer }, { merge: true });
+    // the chat loop resolves null when the request failed (provider down or
+    // timed out, no usable answer): the user already got the failure reply,
+    // the scene stops here with an explicit reason instead of a TypeError
+    if (result === null) {
+      throw new AbortScene('AI_REQUEST_FAILED');
+    }
+    set(scope, path, { answer: result.answer }, { merge: true });
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, path) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
