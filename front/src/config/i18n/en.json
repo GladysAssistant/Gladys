@@ -1242,6 +1242,7 @@
         "networkWakeTitle": "Wake-on-LAN access",
         "networkWakeText": "This integration requests permission to send Wake-on-LAN magic packets through Gladys on your local network.",
         "locationText": "This integration requests access to the coordinates (latitude/longitude) of the houses configured in Gladys.",
+        "energyPricesText": "This integration requests read access to the price per kWh of your electricity contract (energy only) for its own devices.",
         "documentationLink": "Documentation",
         "duplicateWarningTitle": "Another instance is already installed",
         "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one).",
