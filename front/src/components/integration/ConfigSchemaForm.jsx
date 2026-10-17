@@ -44,6 +44,26 @@ class ConfigField extends Component {
     this.props.connectOAuth(this.props.field);
   };
 
+  // dropping the tokens is not undone by a click: re-linking means going
+  // through the provider again, so the button asks for a confirmation first.
+  // The Disconnect block does not depend on the connection status (see
+  // render), so the confirmation only ever shows after a click on it
+  armOAuthDisconnect = e => {
+    e.preventDefault();
+    this.setState({ disconnectConfirming: true });
+  };
+
+  cancelOAuthDisconnect = e => {
+    e.preventDefault();
+    this.setState({ disconnectConfirming: false });
+  };
+
+  onOAuthDisconnect = async e => {
+    e.preventDefault();
+    await this.props.disconnectOAuth(this.props.field);
+    this.setState({ disconnectConfirming: false });
+  };
+
   copyRedirectUri = async value => {
     let copied = false;
     if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
@@ -92,6 +112,10 @@ class ConfigField extends Component {
     configuredSecrets,
     touchedSecrets,
     oauthStatus,
+    oauthDisconnectStatuses,
+    oauthDisconnectErrorIds,
+    connectionStatus,
+    disconnectOAuth,
     selector,
     dynamicOptions,
     placeholderPorts,
@@ -157,6 +181,18 @@ class ConfigField extends Component {
         useInstanceRedirect && selector
           ? `${window.location.origin}${getOAuthCallbackPath(selector)}`
           : OAUTH_REDIRECT_URI;
+      // only a field that declares its credential_keys can be disconnected: the
+      // core deletes those keys and nothing else. Offered whatever the
+      // connection status: a revoked account reports connected: false, and the
+      // status is in memory only (null after a restart of Gladys) while the
+      // stored credentials are not — deleting absent keys is harmless
+      const canDisconnect = Boolean(disconnectOAuth && (field.credential_keys || []).length > 0);
+      const connected = Boolean(connectionStatus && connectionStatus.connected);
+      // keyed by field: an integration may link several accounts
+      const disconnectStatus = (oauthDisconnectStatuses || {})[field.key];
+      const disconnecting = disconnectStatus === RequestStatus.Getting;
+      const confirming = canDisconnect && this.state.disconnectConfirming;
+      // once connected, Disconnect replaces Connect; otherwise both are offered
       return (
         <div class="form-group">
           <label class="form-label">{label}</label>
@@ -169,6 +205,14 @@ class ConfigField extends Component {
               {!this.props.oauthInvalidState && !this.props.oauthInvalidUrl && (
                 <Text id="integration.externalIntegration.config.oauthConnectError" />
               )}
+            </div>
+          )}
+          {disconnectStatus === RequestStatus.Error && (
+            <div class="alert alert-danger">
+              <Text
+                id={`integration.externalIntegration.config.${(oauthDisconnectErrorIds || {})[field.key] ||
+                  'oauthDisconnectError'}`}
+              />
             </div>
           )}
           {usesRedirect && (
@@ -212,17 +256,48 @@ class ConfigField extends Component {
             </div>
           )}
           <div>
-            <button
-              type="button"
-              class={cx('btn btn-primary', {
-                'btn-loading': oauthStatus === RequestStatus.Getting
-              })}
-              disabled={oauthStatus === RequestStatus.Getting}
-              onClick={this.onOAuthConnect}
-            >
-              <i class="fe fe-link mr-1" />
-              <Text id="integration.externalIntegration.config.oauthConnectButton" />
-            </button>
+            {!confirming && !(connected && canDisconnect) && (
+              <button
+                type="button"
+                class={cx('btn btn-primary mr-2', {
+                  'btn-loading': oauthStatus === RequestStatus.Getting
+                })}
+                disabled={oauthStatus === RequestStatus.Getting}
+                onClick={this.onOAuthConnect}
+              >
+                <i class="fe fe-link mr-1" />
+                <Text id="integration.externalIntegration.config.oauthConnectButton" />
+              </button>
+            )}
+            {canDisconnect && !confirming && (
+              <button type="button" class="btn btn-outline-danger" onClick={this.armOAuthDisconnect}>
+                <i class="fe fe-link-2 mr-1" />
+                <Text id="integration.externalIntegration.config.oauthDisconnectButton" />
+              </button>
+            )}
+            {confirming && (
+              <div>
+                <p class="text-muted small mb-2">
+                  <Text id="integration.externalIntegration.config.oauthDisconnectConfirmText" />
+                </p>
+                <button
+                  type="button"
+                  class={cx('btn btn-danger mr-2', { 'btn-loading': disconnecting })}
+                  disabled={disconnecting}
+                  onClick={this.onOAuthDisconnect}
+                >
+                  <Text id="integration.externalIntegration.config.oauthDisconnectConfirmButton" />
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  disabled={disconnecting}
+                  onClick={this.cancelOAuthDisconnect}
+                >
+                  <Text id="integration.externalIntegration.config.oauthDisconnectCancelButton" />
+                </button>
+              </div>
+            )}
           </div>
           {canUseInstanceRedirect && (
             <label class="custom-control custom-checkbox mt-3">
@@ -387,6 +462,10 @@ const ConfigSchemaForm = ({
   oauthUseInstanceRedirect,
   toggleOAuthUseInstanceRedirect,
   connectOAuth,
+  disconnectOAuth,
+  oauthDisconnectStatuses,
+  oauthDisconnectErrorIds,
+  connectionStatus,
   selector,
   dynamicOptions,
   placeholderPorts
@@ -421,6 +500,10 @@ const ConfigSchemaForm = ({
           oauthUseInstanceRedirect={oauthUseInstanceRedirect}
           toggleOAuthUseInstanceRedirect={toggleOAuthUseInstanceRedirect}
           connectOAuth={connectOAuth}
+          disconnectOAuth={disconnectOAuth}
+          oauthDisconnectStatuses={oauthDisconnectStatuses}
+          oauthDisconnectErrorIds={oauthDisconnectErrorIds}
+          connectionStatus={connectionStatus}
           selector={selector}
           dynamicOptions={dynamicOptions}
           placeholderPorts={placeholderPorts}
