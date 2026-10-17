@@ -127,6 +127,55 @@ describe('Dashboard integration widget box', () => {
       });
   });
 
+  it('keeps danger and active button icons in their semantic colors in light and dark mode', () => {
+    const components = [
+      ...CONTENT.content.components,
+      { type: 'button', label: 'Stop', icon: 'x', style: 'danger', action: { key: 'stop' } },
+      { type: 'button', label: 'Active secondary', icon: 'zap', device_feature_selector: 'widget-power', value: 1 },
+      {
+        type: 'button',
+        label: 'Active primary',
+        icon: 'zap',
+        style: 'primary',
+        device_feature_selector: 'widget-power',
+        value: 1
+      }
+    ];
+    cy.intercept('GET', '**/api/v1/external_integration/widget', [buildWidget('RUNNING')]);
+    cy.intercept('GET', CONTENT_URL, { ...CONTENT, content: { version: 1, components } }).as('getContent');
+    cy.intercept('GET', '**/api/v1/device?device_feature_selectors=*', [
+      { name: 'Widget device', features: [{ selector: 'widget-power', last_value: 1 }] }
+    ]).as('getFeatures');
+    createDashboard([{ type: 'external-widget', integration: SELECTOR, widget: WIDGET_KEY }]).then(selector => {
+      dashboardSelector = selector;
+      cy.visit(`/dashboard/${selector}`);
+    });
+    cy.wait('@getContent');
+    cy.wait('@getFeatures');
+    cy.get('.glass-theme').should('exist');
+    [false, true].forEach(dark => {
+      cy.document().then(document => {
+        document.documentElement.classList.toggle('dark-mode', dark);
+        document.body.classList.toggle('dark-mode', dark);
+      });
+      [
+        ['Start', 'rgb(255, 255, 255)'],
+        ['Stop', 'rgb(212, 89, 63)'],
+        ['Active secondary', 'rgb(46, 143, 91)'],
+        ['Active primary', 'rgb(46, 143, 91)']
+      ].forEach(([label, color]) => {
+        cy.get('[data-cy="external-widget-box"]')
+          .contains('button', label)
+          .should($button => {
+            const button = $button[0];
+            const { getComputedStyle } = button.ownerDocument.defaultView;
+            expect(getComputedStyle(button).color, `${label} text`).to.equal(color);
+            expect(getComputedStyle(button.querySelector('i')).color, `${label} icon`).to.equal(color);
+          });
+      });
+    });
+  });
+
   it('shows a stopped integration as stopped, without fetching any content', () => {
     cy.intercept('GET', '**/api/v1/external_integration/widget', [buildWidget('STOPPED')]).as('getWidgets');
     cy.intercept('GET', CONTENT_URL, cy.spy().as('contentRequest'));

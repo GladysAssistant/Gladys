@@ -668,6 +668,12 @@
   color: #d4593f;
 }
 
+/* Semantic button ink wins over the theme accent and primary icon ink. */
+:global(.glass-theme) .buttonDanger .buttonIcon,
+:global(.glass-theme) .buttonActive .buttonIcon {
+  color: inherit;
+}
+
 :global(.glass-theme) .imageFrame,
 :global(.glass-theme) .gaugeTrack {
   background-color: var(--gl-border);
