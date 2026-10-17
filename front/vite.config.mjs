@@ -124,14 +124,6 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
-    css: {
-      lightningcss: {
-        // Vite 8 minifies CSS with Lightning CSS, which rejects the old IE
-        // star hacks (`*display: inline`) still shipped by the Tabler theme:
-        // drop those declarations instead of failing the build.
-        errorRecovery: true
-      }
-    },
     build: {
       outDir: 'build',
       // preact-cli shipped a legacy nomodule bundle next to the modern one.
@@ -139,8 +131,20 @@ export default defineConfig(({ mode }) => {
       // tablets (Safari 13 / old Chromium webviews) keep working.
       target: ['es2019', 'chrome79', 'edge79', 'firefox72', 'safari13'],
       sourcemap: true,
+      cssMinify: 'esbuild',
       rolldownOptions: {
         output: {
+          codeSplitting: {
+            groups: [
+              {
+                // Rolldown moves modules shared with lazy routes into their own chunk, whose CSS is
+                // linked before index.css: keep the theme, the global styles and the dashboard
+                // overrides together so the dashboard overrides still come after Tabler.
+                name: 'app-styles',
+                test: /(@gladysassistant\/theme-optimized\/|\/src\/style\/|\/src\/routes\/dashboard\/style\.css)/
+              }
+            ]
+          },
           chunkFileNames: chunkInfo => {
             // Name route chunks after their route path (like preact-cli did),
             // e.g. src/routes/dashboard/index.js -> assets/route-dashboard.chunk.<hash>.js
