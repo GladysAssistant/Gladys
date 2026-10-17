@@ -206,7 +206,9 @@ class SelectDeviceFeature extends Component {
         option => excludedDeviceFeatures.indexOf(option.value) === -1
       );
     }
-    if (!this.props.isMulti || selectedOptions.length === 0) {
+    // a designation list (the device_features config fields of external
+    // integrations) mixes kinds on purpose: import and export power, indexes...
+    if (!this.props.isMulti || this.props.allowMixedFeatures || selectedOptions.length === 0) {
       return displayedOptions;
     }
     const firstFeature = deviceFeaturesDictionnary[selectedOptions[0].value];
@@ -256,6 +258,7 @@ class SelectDeviceFeature extends Component {
         class="select-device-feature"
         defaultValue={props.isMulti ? [] : ''}
         isMulti={props.isMulti}
+        isClearable={props.isClearable}
         value={props.isMulti ? selectedOptions : selectedOption}
         onChange={this.handleChange}
         options={this.getDisplayedOptions()}

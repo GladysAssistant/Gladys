@@ -8,8 +8,10 @@ import {
   resolveManifestPlaceholders
 } from '../../routes/integration/all/external-integration/utils';
 import { RequestStatus } from '../../utils/consts';
+import SelectDeviceFeature from '../device/SelectDeviceFeature';
+import { matchesFeatureFilters } from './dynamicOptions';
 import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../utils/oauth';
-import { ACCOUNT_FIELD_TYPES } from '../../../../server/lib/external-integration/constants';
+import { ACCOUNT_FIELD_TYPES, DEVICE_FEATURES_SOURCE } from '../../../../server/lib/external-integration/constants';
 import integrationText from '../../routes/integration/all/external-integration/integrationText.css';
 
 // The form engine of the manifest `config_schema` grammar, shared by the
@@ -37,6 +39,26 @@ class ConfigField extends Component {
       ? [...currentValues, e.target.value]
       : currentValues.filter(value => value !== e.target.value);
     this.props.updateConfigValue(field, newValues);
+  };
+
+  // `source: "device_features"`: the user designates device features of any
+  // integration, the only ones this integration may then read
+  // (capabilities/device-feature-read.md). The value is the feature selector
+  // (select, null once cleared) or the array of selectors (multi_select).
+  filterDesignatableFeature = feature => matchesFeatureFilters(this.props.field, feature);
+
+  onDeviceFeatureChange = feature => {
+    this.props.updateConfigValue(this.props.field, feature ? feature.selector : null);
+  };
+
+  onDeviceFeaturesChange = (features, devices, isUserChange) => {
+    // the initial resolution of the stored selectors is display-only
+    if (isUserChange) {
+      this.props.updateConfigValue(
+        this.props.field,
+        features.map(feature => feature.selector)
+      );
+    }
   };
 
   onOAuthConnect = e => {
@@ -270,7 +292,24 @@ class ConfigField extends Component {
           {label}
           {field.required && <span class="form-required">*</span>}
         </label>
-        {field.type === 'select' && field.display !== 'radio' && (
+        {field.source === DEVICE_FEATURES_SOURCE && (
+          <div>
+            <SelectDeviceFeature
+              isMulti={field.type === 'multi_select'}
+              allowMixedFeatures
+              // clearing the single select withdraws the designation
+              isClearable
+              value={field.type === 'multi_select' ? (Array.isArray(value) ? value : []) : value}
+              filterFeature={this.filterDesignatableFeature}
+              onDeviceFeatureChange={this.onDeviceFeatureChange}
+              onDeviceFeaturesChange={this.onDeviceFeaturesChange}
+            />
+            <small class="form-text text-muted">
+              <Text id="integration.externalIntegration.config.deviceFeaturesPrivacyHint" />
+            </small>
+          </div>
+        )}
+        {field.type === 'select' && field.display !== 'radio' && field.source !== DEVICE_FEATURES_SOURCE && (
           <select id={fieldId} class="form-control" onChange={this.onInput}>
             <option value="" selected={value === undefined || value === null || value === ''}>
               <Text id="global.emptySelectOption" />
@@ -299,7 +338,7 @@ class ConfigField extends Component {
             ))}
           </div>
         )}
-        {field.type === 'multi_select' && (
+        {field.type === 'multi_select' && field.source !== DEVICE_FEATURES_SOURCE && (
           <div>
             {options.map(option => (
               <label key={option.value} class="custom-control custom-checkbox">

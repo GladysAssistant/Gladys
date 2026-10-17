@@ -15,6 +15,7 @@ import {
   wrapAuthorizeUrl
 } from '../../../../../utils/oauth';
 import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURES_SOURCE } from '../../../../../../../server/lib/external-integration/constants';
 
 const OAUTH_USE_INSTANCE_REDIRECT_KEY = 'externalIntegrationOAuthUseInstanceRedirect';
 
@@ -157,6 +158,10 @@ class ExternalIntegrationConfigPage extends Component {
         }
       } else if (field.type === 'boolean') {
         config[field.key] = !!value;
+      } else if (field.source === DEVICE_FEATURES_SOURCE && field.type === 'select') {
+        // a cleared designation is sent as null: the user withdraws the
+        // read access to that feature (an absent key would keep it)
+        config[field.key] = value === undefined || value === '' ? null : value;
       } else if (value !== undefined && value !== null) {
         config[field.key] = value;
       }

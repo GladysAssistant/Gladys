@@ -20,9 +20,24 @@ const SOURCE_LOADERS = {
   }
 };
 
+// "device_features" is a source too, but its picker (SelectDeviceFeature)
+// loads the features itself: only the list sources are fetched here
 const getDynamicSources = fields => [
-  ...new Set((fields || []).map(field => field.source).filter(source => DYNAMIC_SOURCES.includes(source)))
+  ...new Set(
+    (fields || [])
+      .map(field => field.source)
+      .filter(source => DYNAMIC_SOURCES.includes(source) && SOURCE_LOADERS[source])
+  )
 ];
+
+// A `source: "device_features"` field narrows its picker with
+// `feature_filters` ([{ category, type? }]): same rule as the server
+// (validateConfigValue.matchesFeatureFilters), no filter matches everything
+const matchesFeatureFilters = (field, feature) =>
+  !Array.isArray(field.feature_filters) ||
+  field.feature_filters.some(
+    filter => filter.category === feature.category && (filter.type === undefined || filter.type === feature.type)
+  );
 
 // true when at least one field takes its options from a dynamic source
 const hasDynamicSource = fields => getDynamicSources(fields).length > 0;
@@ -52,4 +67,4 @@ const fetchDynamicOptions = async (httpClient, integrationSelector, fields) => {
   return dynamicOptions;
 };
 
-export { hasDynamicSource, fetchDynamicOptions };
+export { hasDynamicSource, fetchDynamicOptions, matchesFeatureFilters };

@@ -2202,6 +2202,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONFIG_UPDATED: 'external-integration.config-updated',
     MESSAGE_SEND: 'external-integration.message.send',
     HARDWARE_UPDATED: 'external-integration.hardware-updated',
+    // designated device features of other integrations (capabilities/device-feature-read.md)
+    DEVICE_FEATURE_NEW_STATE: 'external-integration.device-feature.new-state',
     OAUTH_GET_AUTHORIZE_URL: 'external-integration.oauth.get-authorize-url',
     OAUTH_CALLBACK: 'external-integration.oauth.callback',
     ACTION_RUN: 'external-integration.action.run',
