@@ -243,6 +243,42 @@ describe('thermostat.onDeviceNewState - opening delay', () => {
     expect(handler.windowTimers.size).to.equal(0);
   });
 
+  // A state change in flight when the service stops resumes after stop() has
+  // cleared the timers: it must not arm a check that would run a pass later.
+  it('should not arm a check when the service stops during the device lookup', async () => {
+    const mod = loadModule();
+    const handler = buildHandler(60);
+    handler.windowSelectorsCache = new Set(['window-sensor']);
+    const { get } = handler.gladys.device;
+    handler.gladys.device.get = fake(async (query) => {
+      handler.stopped = true;
+      return get(query);
+    });
+
+    await opens(mod, handler);
+    await clock.tickAsync(60 * 1000);
+
+    expect(handler.windowTimers.size).to.equal(0);
+    assert.notCalled(handler.triggerApplySchedules);
+    assert.notCalled(handler.gladys.device.setValue);
+  });
+
+  it('should not record an opening when the service stops during the selector lookup', async () => {
+    const mod = loadModule();
+    const handler = buildHandler(60);
+    const { get } = handler.gladys.device;
+    handler.gladys.device.get = fake(async (query) => {
+      handler.stopped = true;
+      return get(query);
+    });
+
+    await opens(mod, handler);
+
+    expect(handler.windowOpenedAt.size).to.equal(0);
+    expect(handler.windowTimers.size).to.equal(0);
+    assert.calledOnce(handler.gladys.device.get);
+  });
+
   it('should cut at once with no delay', async () => {
     const mod = loadModule();
     const handler = buildHandler(0);

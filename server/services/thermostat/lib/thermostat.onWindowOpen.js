@@ -312,7 +312,9 @@ async function onDeviceNewState(event) {
   try {
     // Cheap rejection first: most events in a house are not a configured window.
     const windowSelectors = await getWindowSelectors.call(this);
-    if (!windowSelectors.has(changedSelector)) {
+    // The service may have stopped during the await: its timers and openings are
+    // already cleared, and nothing recorded now would ever be cleared again.
+    if (this.stopped || !windowSelectors.has(changedSelector)) {
       return;
     }
     if (newValue !== 0) {
@@ -335,7 +337,7 @@ async function onDeviceNewState(event) {
     const openedAt = this.windowOpenedAt.get(changedSelector);
 
     const thermostatDevices = await this.gladys.device.get({ service: 'thermostat' });
-    if (!thermostatDevices || thermostatDevices.length === 0) {
+    if (this.stopped || !thermostatDevices || thermostatDevices.length === 0) {
       return;
     }
     await Promise.all(
