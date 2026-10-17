@@ -3,7 +3,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../server/utils/constants';
 import { decimalsOf } from '../../../../../../server/utils/units';
 
 import style from './style.css';
@@ -22,7 +22,22 @@ const SETPOINT_STEP_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: 1,
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE]: 1,
   // A storage tank is set in whole degrees; the 0.5 default is room-thermostat granularity.
-  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: 1
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: 1,
+  // Battery power limits, in watts: storage systems are set in tens of watts, not by the watt.
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: 10,
+  // Output power limit, in watts: same granularity as the battery power limits.
+  [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT]: 10
+};
+
+// A category whose setpoint can be published in two units of different magnitudes needs a step
+// per unit: 10 is a sensible step in watts, but a 10 kW jump would skip the whole range.
+const SETPOINT_STEP_BY_CATEGORY_AND_UNIT = {
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: {
+    [DEVICE_FEATURE_UNITS.KILOWATT]: 0.1
+  },
+  [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT]: {
+    [DEVICE_FEATURE_UNITS.KILOWATT]: 0.1
+  }
 };
 
 const DEFAULT_VALUE_BY_CATEGORY = {
@@ -35,7 +50,11 @@ const DEFAULT_VALUE_BY_CATEGORY = {
 };
 
 const SetpointDeviceFeature = ({ children, ...props }) => {
-  const SETPOINT_STEP = props.deviceFeature.step || SETPOINT_STEP_BY_CATEGORY[props.deviceFeature.category] || 0.5;
+  const SETPOINT_STEP =
+    props.deviceFeature.step ||
+    get(SETPOINT_STEP_BY_CATEGORY_AND_UNIT, `${props.deviceFeature.category}.${props.deviceFeature.unit}`) ||
+    SETPOINT_STEP_BY_CATEGORY[props.deviceFeature.category] ||
+    0.5;
   const DEFAULT_VALUE_IN_CASE_EMPTY = DEFAULT_VALUE_BY_CATEGORY[props.deviceFeature.category] || 0;
 
   function updateValue(value) {
