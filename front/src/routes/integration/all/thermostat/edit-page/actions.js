@@ -147,6 +147,9 @@ function createActions(store) {
           thermostatEditStateFeature: getParam('THERMOSTAT_STATE_FEATURE') || '',
           thermostatEditModeFeature: getParam('THERMOSTAT_MODE_FEATURE') || '',
           thermostatEditWindowFeature: getParam('THERMOSTAT_WINDOW_FEATURE') || '',
+          // A thermostat saved before the delay existed has none: the server
+          // waits its default minute, which is what the field shows.
+          thermostatEditWindowDelay: getParam('THERMOSTAT_WINDOW_DELAY') || '60',
           thermostatEditPresetFrost: getParam('THERMOSTAT_PRESET_FROST') || '7',
           thermostatEditPresetAway: getParam('THERMOSTAT_PRESET_AWAY') || '16',
           thermostatEditPresetEco: getParam('THERMOSTAT_PRESET_ECO') || '18',
@@ -239,6 +242,7 @@ function createActions(store) {
         const tpiCycleTime = toInt(state.thermostatEditTpiCycleTime, 30);
         const tpiProportionalBand = toNumber(state.thermostatEditTpiProportionalBand, 2);
         const manualDuration = toInt(state.thermostatEditManualDuration, 30);
+        const windowDelay = Math.max(0, toInt(state.thermostatEditWindowDelay, 60));
 
         const isEdit = !!(state.thermostatEditDevice && state.thermostatEditDevice.selector);
         const timestamp = Date.now();
@@ -324,6 +328,7 @@ function createActions(store) {
               value: isExternalThermostat ? state.thermostatEditModeFeature || '' : ''
             },
             { name: 'THERMOSTAT_WINDOW_FEATURE', value: windowFeature },
+            { name: 'THERMOSTAT_WINDOW_DELAY', value: String(windowDelay) },
             { name: 'THERMOSTAT_PRESET_FROST', value: presetFrost },
             { name: 'THERMOSTAT_PRESET_AWAY', value: presetAway },
             { name: 'THERMOSTAT_PRESET_ECO', value: presetEco },
@@ -390,6 +395,7 @@ function createActions(store) {
           thermostatEditStateFeature: '',
           thermostatEditModeFeature: '',
           thermostatEditWindowFeature: '',
+          thermostatEditWindowDelay: '60',
           thermostatEditActiveSchedule: '',
           thermostatEditPresetFrost: '7',
           thermostatEditPresetAway: '16',

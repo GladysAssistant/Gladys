@@ -13,7 +13,8 @@ import {
   DEFAULT_PRESET_TEMPS,
   DEFAULT_MIN_TEMP,
   DEFAULT_MAX_TEMP,
-  DEFAULT_HYSTERESIS_START
+  DEFAULT_HYSTERESIS_START,
+  DEFAULT_WINDOW_DELAY_SECONDS
 } from '../../../../../server/utils/thermostatConstants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import style from './style.css';
@@ -405,6 +406,38 @@ class ThermostatBox extends Component {
     return keys.map(k => allPresets[k]);
   };
 
+  // An opening only suspends the heating once it has stayed open
+  // THERMOSTAT_WINDOW_DELAY seconds, and the banner says so no sooner: shown at
+  // the opening, it announced a cut that a door closed right behind never got.
+  // The count runs from the opening this card knows of — the feature's
+  // `last_value_changed` on load, the NEW_STATE afterwards — and a contact
+  // re-reporting "open" keeps the first time.
+  showWindowSensor = (open, since) => {
+    if (this.windowTimer) {
+      clearTimeout(this.windowTimer);
+      this.windowTimer = null;
+    }
+    if (!open) {
+      this.windowOpenedAt = null;
+      this.setState({ isWindowOpen: false });
+      return;
+    }
+    if (this.windowOpenedAt === null || this.windowOpenedAt === undefined) {
+      this.windowOpenedAt = Math.min(since, Date.now());
+    }
+    const delay = Math.max(0, numOr(this.getConfig().window_delay, DEFAULT_WINDOW_DELAY_SECONDS));
+    const remaining = this.windowOpenedAt + delay * 1000 - Date.now();
+    if (remaining <= 0) {
+      this.setState({ isWindowOpen: true });
+      return;
+    }
+    this.setState({ isWindowOpen: false });
+    this.windowTimer = setTimeout(() => {
+      this.windowTimer = null;
+      this.setState({ isWindowOpen: true });
+    }, remaining);
+  };
+
   getDeviceData = async () => {
     const { box } = this.props;
     const thermostatFeature = box.thermostat_feature;
@@ -424,7 +457,9 @@ class ThermostatBox extends Component {
     const stateUpdate = { noConfig: false, error: false };
     if (!temperatureFeature) stateUpdate.currentTemp = null;
     if (!humidityFeature) stateUpdate.humidity = null;
-    if (!windowFeature) stateUpdate.isWindowOpen = false;
+    if (!windowFeature) {
+      this.showWindowSensor(false);
+    }
     if (!switchFeature) stateUpdate.isSwitchOn = null;
     this.setState(stateUpdate);
     const selectors = [thermostatFeature, temperatureFeature, humidityFeature, windowFeature, switchFeature]
@@ -488,7 +523,13 @@ class ThermostatBox extends Component {
               feat.last_value !== null &&
               feat.last_value !== undefined
             ) {
-              this.setState({ isWindowOpen: feat.last_value === 0 });
+              // `new Date(null)` is the epoch: an undated change would show the
+              // banner at once.
+              const changed =
+                feat.last_value_changed === null || feat.last_value_changed === undefined
+                  ? NaN
+                  : new Date(feat.last_value_changed).getTime();
+              this.showWindowSensor(feat.last_value === 0, Number.isFinite(changed) ? changed : Date.now());
             }
             if (
               switchFeature &&
@@ -552,7 +593,7 @@ class ThermostatBox extends Component {
     const windowFeature = (this.state.remoteConfig && this.state.remoteConfig.window_feature) || null;
     if (windowFeature && payload.device_feature_selector === windowFeature) {
       // The server (onDeviceNewState) cuts the switch; the widget only reflects the state
-      this.setState({ isWindowOpen: payload.last_value === 0 });
+      this.showWindowSensor(payload.last_value === 0, Date.now());
     }
     const modeFeature = this.state.remoteConfig && this.state.remoteConfig.modeFeature;
     if (modeFeature && payload.device_feature_selector === modeFeature.selector) {
@@ -1024,6 +1065,10 @@ class ThermostatBox extends Component {
     if (this.expectedSetpointTimer) {
       clearTimeout(this.expectedSetpointTimer);
       this.expectedSetpointTimer = null;
+    }
+    if (this.windowTimer) {
+      clearTimeout(this.windowTimer);
+      this.windowTimer = null;
     }
     this.forgetExpectedMode();
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.handleWebsocketMessage);

@@ -3563,6 +3563,12 @@
           "heating": "Optional. If a window is open, the heating is automatically cut off.",
           "cooling": "Optional. If a window is open, the cooling is automatically cut off."
         },
+        "windowDelayLabel": "Delay before cutting off",
+        "windowDelayUnit": "s",
+        "windowDelayHelp": {
+          "heating": "How long the window has to stay open before the heating is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once.",
+          "cooling": "How long the window has to stay open before the cooling is cut off. A door opened to come in and closed right behind does not cut it. 0 cuts it at once."
+        },
         "hysteresisStartLabel": "Start threshold",
         "hysteresisStartHelp": {
           "heating": "The heating turns on when the temperature is below (setpoint − start threshold). E.g. setpoint 21°C, threshold 0.5°C → turns on below 20.5°C.",
