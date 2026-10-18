@@ -4,6 +4,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsBluetooth from '../commons/actions';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 const createActions = store => {
   const houseActions = createActionsHouse(store);
@@ -58,7 +59,7 @@ const createActions = store => {
       const { httpClient } = state;
 
       try {
-        await httpClient.post(`/api/v1/device`, device);
+        await httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(device));
         store.setState({
           bluetoothSaveStatus: RequestStatus.Success,
           bluetoothCreatedDevice: device

@@ -1,5 +1,6 @@
 import update from 'immutability-helper';
 import createActionsHouse from '../../../../../actions/house';
+import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 const filterExistingDevices = devices => devices.filter(device => device.id === undefined || device.updatable);
 
@@ -79,7 +80,7 @@ function createActions(store) {
       if (!device) {
         return;
       }
-      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(device));
       // Discovery updates are pushed live over websocket, so the list may have been replaced
       // while the device was being saved: the current list is read back from the store
       const { mqttDiscoveredDevices: currentDevices = [] } = store.getState();

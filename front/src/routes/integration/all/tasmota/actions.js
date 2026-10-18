@@ -2,6 +2,7 @@ import update from 'immutability-helper';
 import debounce from 'debounce';
 import { RequestStatus } from '../../../../utils/consts';
 import createActionsIntegration from '../../../../actions/integration';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 const getDeviceSortRank = device => {
   const features = device.features || [];
@@ -123,7 +124,7 @@ function createActions(store) {
     },
     async saveDevice(state, listName, index) {
       const device = state[listName][index];
-      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(device));
       const devices = update(state[listName], {
         $splice: [[index, 1, savedDevice]]
       });

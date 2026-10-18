@@ -2306,6 +2306,20 @@ const DEVICE_FEATURE_STATE_AGGREGATE_TYPES = {
   HOURLY: 'hourly',
 };
 
+// Columns of t_device_feature holding the current STATE of a feature, not its definition: they are
+// written by device.saveState / device.saveStringState and by the aggregation jobs, never by a device
+// save. device.create ignores them on a feature that already exists, and the frontend leaves them out
+// of the device it posts back: a camera image alone (camera/image, up to 150 kB of base64) would push
+// the save past the 100 kB JSON bound of the API.
+const DEVICE_FEATURE_STATE_COLUMNS = [
+  'last_value',
+  'last_value_string',
+  'last_value_changed',
+  'last_hourly_aggregate',
+  'last_daily_aggregate',
+  'last_monthly_aggregate',
+];
+
 const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
   [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.HOURLY]: 6 * 30,
   [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.DAILY]: 365,
@@ -2624,6 +2638,7 @@ module.exports.WEATHER_UNITS = WEATHER_UNITS;
 
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES = DEVICE_FEATURE_STATE_AGGREGATE_TYPES;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST;
+module.exports.DEVICE_FEATURE_STATE_COLUMNS = DEVICE_FEATURE_STATE_COLUMNS;
 module.exports.DEFAULT_AGGREGATES_POLICY_IN_DAYS = DEFAULT_AGGREGATES_POLICY_IN_DAYS;
 
 module.exports.SYSTEM_UPGRADE_ERROR_CODES = SYSTEM_UPGRADE_ERROR_CODES;

@@ -8,6 +8,7 @@ import {
   DEVICE_FEATURE_TYPES
 } from '../../../../../../server/utils/constants';
 import createActionsIntegration from '../../../../actions/integration';
+import { stripDeviceStatesForSave } from '../../../../utils/device';
 
 function sortRoomsInHouses(houses) {
   houses.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
@@ -80,7 +81,7 @@ function createActions(store) {
       }
     },
     async createOrUpdateCamera(state, index) {
-      let camera = await state.httpClient.post(`/api/v1/device`, state.rtspCameras[index]);
+      let camera = await state.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(state.rtspCameras[index]));
       camera = actions.complete(camera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
@@ -223,7 +224,7 @@ function createActions(store) {
         feature.name = camera.name;
       });
       delete imageFeature.last_value_string;
-      let newCamera = await state.httpClient.post(`/api/v1/device`, camera);
+      let newCamera = await state.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(camera));
       newCamera = await actions.complete(newCamera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
