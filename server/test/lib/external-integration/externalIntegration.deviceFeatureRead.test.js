@@ -307,9 +307,44 @@ describe('externalIntegration: designated device features', () => {
     });
 
     it('should never trust a config value the user did not save as a designation', async () => {
-      // the integration stored the key as free storage under an older manifest
+      // the integration stored the keys as free storage under an older manifest
       await externalIntegration.variable.setValue('GRID_POWER', JSON.stringify(TEMPERATURE), service.id);
+      await externalIntegration.variable.setValue('PV_METERS', JSON.stringify([HUMIDITY]), service.id);
       expect((await externalIntegration.getDeviceFeatureGrant(service)).size).to.equal(0);
+      // the Configuration screen does not show the leftovers as picked...
+      const { config } = await externalIntegration.getConfigForFront(service.selector);
+      expect(config).to.deep.equal({ grid_power: null, pv_meters: [], name: null });
+      // ...so saving the form as it was loaded grants nothing
+      await designate({ grid_power: config.grid_power, pv_meters: config.pv_meters });
+      expect((await externalIntegration.getDeviceFeatureGrant(service)).size).to.equal(0);
+      expect(externalIntegration.deviceFeatureReadGrants.has(service.id)).to.equal(false);
+    });
+
+    it('should show the recorded grant in the Configuration screen, filtered like the read scope', async () => {
+      const saved = await designate({ grid_power: TEMPERATURE, pv_meters: [TEMPERATURE_2, HUMIDITY] });
+      expect(saved.config).to.deep.include({ grid_power: TEMPERATURE, pv_meters: [TEMPERATURE_2, HUMIDITY] });
+      // the grant wins over the config variable, rewritten behind its back
+      await externalIntegration.variable.setValue('GRID_POWER', JSON.stringify(TEMPERATURE_2), service.id);
+      const tightened = {
+        ...DEVICE_FEATURES_MANIFEST,
+        config_schema: [
+          DEVICE_FEATURES_MANIFEST.config_schema[0],
+          { ...DEVICE_FEATURES_MANIFEST.config_schema[1], feature_filters: [{ category: 'humidity-sensor' }] },
+          DEVICE_FEATURES_MANIFEST.config_schema[2],
+        ],
+      };
+      sinon.stub(externalIntegration, 'getBySelector').resolves({ ...service, manifest: tightened });
+      const { config } = await externalIntegration.getConfigForFront(service.selector);
+      expect(config).to.deep.equal({ grid_power: TEMPERATURE, pv_meters: [HUMIDITY], name: null });
+    });
+
+    it('should show no designation in the Configuration screen without the gate', async () => {
+      await designate({ grid_power: TEMPERATURE, pv_meters: [HUMIDITY] });
+      sinon
+        .stub(externalIntegration, 'getBySelector')
+        .resolves({ ...service, manifest: { ...DEVICE_FEATURES_MANIFEST, device_features_read: false } });
+      const { config } = await externalIntegration.getConfigForFront(service.selector);
+      expect(config).to.deep.equal({ grid_power: null, pv_meters: [], name: null });
     });
 
     it('should only read the grant of the fields the current manifest declares, behind the gate', async () => {

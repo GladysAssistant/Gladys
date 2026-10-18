@@ -90,39 +90,52 @@ function capStringValue(value) {
 }
 
 /**
- * @description Get the selectors the user designated for an integration:
- * the recorded grant of the `source: "device_features"` fields its current
- * manifest still declares, and only when it declares `device_features_read`.
- * The field's CURRENT `feature_filters` (and the camera exclusion) are
- * re-applied to the recorded grant: a manifest update can shrink the scope,
- * never keep what it no longer asks for. A designated feature deleted since
- * stays in the scope (it answers 404, not 403).
+ * @description Get the selectors the user designated for an integration, by
+ * field key: the recorded grant of the `source: "device_features"` fields
+ * its current manifest still declares, and only when it declares
+ * `device_features_read`. The field's CURRENT `feature_filters` (and the
+ * camera exclusion) are re-applied to the recorded grant: a manifest update
+ * can shrink the scope, never keep what it no longer asks for. A designated
+ * feature deleted since stays in the scope (it answers 404, not 403).
  * @param {object} service - The external integration service.
- * @returns {Promise<Set>} Resolve with the designated feature selectors.
+ * @returns {Promise<object>} Resolve with { [fieldKey]: [selector] }, a key
+ * per declared field (empty list when nothing is designated).
  * @example
- * const selectors = await gladys.externalIntegration.getDeviceFeatureGrant(service);
+ * const designations = await getDeviceFeatureDesignations.call(externalIntegration, service);
  */
-async function getDeviceFeatureGrant(service) {
-  const selectors = new Set();
+async function getDeviceFeatureDesignations(service) {
+  const designations = {};
   if (!hasDeviceFeaturesRead(service)) {
-    return selectors;
+    return designations;
   }
   const fields = (service.manifest.config_schema || []).filter((field) => field.source === DEVICE_FEATURES_SOURCE);
   if (fields.length === 0) {
-    return selectors;
+    return designations;
   }
   const grant = await readGrant.call(this, service);
   fields.forEach((field) => {
     const designated = Array.isArray(grant[field.key]) ? grant[field.key] : [];
-    designated
+    designations[field.key] = designated
       .filter((selector) => typeof selector === 'string')
       .filter((selector) => {
         const feature = this.stateManager.get('deviceFeature', selector);
         return !feature || matchesFeatureFilters(field, feature);
-      })
-      .forEach((selector) => selectors.add(selector));
+      });
   });
-  return selectors;
+  return designations;
+}
+
+/**
+ * @description Get the selectors the user designated for an integration,
+ * all fields together (see getDeviceFeatureDesignations): the read scope.
+ * @param {object} service - The external integration service.
+ * @returns {Promise<Set>} Resolve with the set of designated selectors.
+ * @example
+ * const selectors = await gladys.externalIntegration.getDeviceFeatureGrant(service);
+ */
+async function getDeviceFeatureGrant(service) {
+  const designations = await getDeviceFeatureDesignations.call(this, service);
+  return new Set(Object.values(designations).flat());
 }
 
 /**
@@ -411,6 +424,7 @@ function forwardDeviceFeatureState(event) {
 }
 
 module.exports = {
+  getDeviceFeatureDesignations,
   getDeviceFeatureGrant,
   refreshDeviceFeatureGrant,
   saveDeviceFeatureGrant,
