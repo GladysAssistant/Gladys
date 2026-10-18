@@ -61,6 +61,28 @@ class ConfigField extends Component {
     }
   };
 
+  // A stored designation that no longer resolves once every feature is
+  // loaded (device deleted since, feature now outside the filters) is dropped
+  // from the form value: the picker already shows it empty, and the next
+  // save records the withdrawal instead of being refused by the server
+  onDeviceFeatureOptionsLoaded = deviceFeaturesDictionnary => {
+    const { field, values } = this.props;
+    const value = values[field.key];
+    const isDesignatable = selector =>
+      deviceFeaturesDictionnary[selector] !== undefined &&
+      this.filterDesignatableFeature(deviceFeaturesDictionnary[selector]);
+    if (field.type === 'multi_select') {
+      if (Array.isArray(value)) {
+        const resolved = value.filter(isDesignatable);
+        if (resolved.length !== value.length) {
+          this.props.updateConfigValue(field, resolved);
+        }
+      }
+    } else if (typeof value === 'string' && value !== '' && !isDesignatable(value)) {
+      this.props.updateConfigValue(field, null);
+    }
+  };
+
   onOAuthConnect = e => {
     e.preventDefault();
     this.props.connectOAuth(this.props.field);
@@ -303,6 +325,7 @@ class ConfigField extends Component {
               filterFeature={this.filterDesignatableFeature}
               onDeviceFeatureChange={this.onDeviceFeatureChange}
               onDeviceFeaturesChange={this.onDeviceFeaturesChange}
+              onOptionsLoaded={this.onDeviceFeatureOptionsLoaded}
             />
             <small class="form-text text-muted">
               <Text id="integration.externalIntegration.config.deviceFeaturesPrivacyHint" />

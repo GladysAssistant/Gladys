@@ -391,13 +391,23 @@ const ACCOUNT_FIELD_TYPES = ['oauth2', 'account_link'];
 // (capabilities/device-feature-read.md).
 const DYNAMIC_SOURCES = ['devices', 'houses', 'device_features'];
 // Designated device features (capabilities/device-feature-read.md): the
-// optional `feature_filters` of a `source: "device_features"` field narrow
+// REQUIRED `feature_filters` of a `source: "device_features"` field narrow
 // the picker to some categories/types, a multi_select designates at most
 // MAX_DEVICE_FEATURE_SELECTIONS features.
 const DEVICE_FEATURES_SOURCE = 'device_features';
 const MAX_FEATURE_FILTERS = 20;
 const FEATURE_FILTER_FIELDS = ['category', 'type'];
 const MAX_DEVICE_FEATURE_SELECTIONS = 20;
+// Never designatable, whatever the filters: a camera image is a JPEG frame
+// that every other serving path withholds in private mode and expires after
+// an hour (docs/specs/camera-enable-disable.md), it must not leak through a
+// designation into a container with open egress.
+const DEVICE_FEATURES_EXCLUDED_CATEGORIES = ['camera'];
+const DEVICE_FEATURES_EXCLUDED_TYPES = ['image'];
+// A text state above this size (in UTF-8 bytes) is never handed over, by
+// GET /device_feature/state nor by the push: `last_value_string` is null.
+// The read capability serves meter-like values, not payloads.
+const MAX_DEVICE_FEATURE_STRING_VALUE_BYTES = 1024;
 // The designations the USER saved from the Configuration screen, by field
 // key: a core-owned record (GLADYS_* keys are read-only for the integration,
 // and never returned by GET /config), the only scope of the read endpoints.
@@ -744,6 +754,9 @@ module.exports = {
   MAX_FEATURE_FILTERS,
   FEATURE_FILTER_FIELDS,
   MAX_DEVICE_FEATURE_SELECTIONS,
+  DEVICE_FEATURES_EXCLUDED_CATEGORIES,
+  DEVICE_FEATURES_EXCLUDED_TYPES,
+  MAX_DEVICE_FEATURE_STRING_VALUE_BYTES,
   DEVICE_FEATURES_GRANT_KEY,
   MAX_DEVICE_FEATURE_STATE_SELECTORS,
   MAX_DEVICE_FEATURE_STATE_READS_PER_MINUTE,

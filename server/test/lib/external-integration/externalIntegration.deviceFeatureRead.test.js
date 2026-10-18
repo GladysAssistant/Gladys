@@ -13,10 +13,12 @@ const {
   DEVICE_FEATURES_GRANT_KEY,
   MAX_DEVICE_FEATURE_STATE_READS_PER_MINUTE,
   MAX_DEVICE_FEATURE_AGGREGATE_READS_PER_MINUTE,
+  MAX_DEVICE_FEATURE_STRING_VALUE_BYTES,
 } = require('../../../lib/external-integration/constants');
 const {
   validateConfigValue,
   matchesFeatureFilters,
+  isExcludedFeature,
 } = require('../../../lib/external-integration/externalIntegration.validateConfigValue');
 const { getDynamicOptions } = require('../../../lib/external-integration/externalIntegration.getDynamicOptions');
 const { saveDeviceFeatureGrant } = require('../../../lib/external-integration/externalIntegration.deviceFeatureRead');
@@ -27,6 +29,7 @@ const TEMPERATURE = 'test-temperature-sensor';
 const TEMPERATURE_ID = 'bb1af3b9-f87d-4d9c-b5be-958cd9d28900';
 const TEMPERATURE_2 = 'test-temperature-sensor-2';
 const HUMIDITY = 'test-humidity-sensor';
+const CAMERA = 'test-camera-image';
 
 // the Zendure case: the grid meter is picked among the temperature sensors
 // here only because those are the seeded features with a category to filter on
@@ -41,7 +44,13 @@ const DEVICE_FEATURES_MANIFEST = {
       label: { en: 'Grid power' },
       feature_filters: [{ category: 'temperature-sensor' }],
     },
-    { key: 'pv_meters', type: 'multi_select', source: 'device_features', label: { en: 'PV meters' } },
+    {
+      key: 'pv_meters',
+      type: 'multi_select',
+      source: 'device_features',
+      label: { en: 'PV meters' },
+      feature_filters: [{ category: 'temperature-sensor' }, { category: 'humidity-sensor' }],
+    },
     { key: 'name', type: 'string', label: { en: 'Name' } },
   ],
 };
@@ -82,6 +91,7 @@ describe('externalIntegration: designated device features', () => {
       { selector: TEMPERATURE, id: TEMPERATURE_ID, category: 'temperature-sensor', type: 'decimal', unit: 'celsius' },
       { selector: TEMPERATURE_2, id: 'f07c5b27', category: 'temperature-sensor', type: 'average', unit: 'fahrenheit' },
       { selector: HUMIDITY, id: '3b5b4870', category: 'humidity-sensor', type: 'humidity', unit: 'percent' },
+      { selector: CAMERA, id: 'c4m3r4', category: 'camera', type: 'image', unit: null },
     ].forEach((feature) =>
       stateManager.setState('deviceFeature', feature.selector, {
         ...feature,
@@ -122,7 +132,18 @@ describe('externalIntegration: designated device features', () => {
       expect(matchesFeatureFilters(field, { category: 'energy-sensor', type: 'index' })).to.equal(false);
       expect(matchesFeatureFilters(field, { category: 'teleinformation', type: 'eait' })).to.equal(true);
       expect(matchesFeatureFilters(field, { category: 'switch', type: 'power' })).to.equal(false);
-      expect(matchesFeatureFilters({}, { category: 'switch', type: 'power' })).to.equal(true);
+      // fails closed: a field without filters matches nothing
+      expect(matchesFeatureFilters({}, { category: 'switch', type: 'power' })).to.equal(false);
+    });
+
+    it('should never match a camera image, whatever the filters', () => {
+      const field = { feature_filters: [{ category: 'camera' }, { category: 'energy-sensor' }] };
+      expect(isExcludedFeature({ category: 'camera', type: 'image' })).to.equal(true);
+      expect(isExcludedFeature({ category: 'energy-sensor', type: 'image' })).to.equal(true);
+      expect(isExcludedFeature({ category: 'energy-sensor', type: 'power' })).to.equal(false);
+      expect(matchesFeatureFilters(field, { category: 'camera', type: 'image' })).to.equal(false);
+      expect(matchesFeatureFilters(field, { category: 'energy-sensor', type: 'image' })).to.equal(false);
+      expect(matchesFeatureFilters(field, { category: 'energy-sensor', type: 'power' })).to.equal(true);
     });
 
     it('should only accept an existing feature matching the field filters, without listing the features', () => {
@@ -134,7 +155,7 @@ describe('externalIntegration: designated device features', () => {
         ],
       };
       expect(validateConfigValue(gridField, TEMPERATURE, dynamicOptions)).to.equal(TEMPERATURE);
-      // no filter: every feature can be designated
+      // several filters: a feature matching any of them can be designated
       expect(validateConfigValue(pvField, [TEMPERATURE, HUMIDITY], dynamicOptions)).to.deep.equal([
         TEMPERATURE,
         HUMIDITY,
@@ -161,8 +182,8 @@ describe('externalIntegration: designated device features', () => {
       const [, pvField] = DEVICE_FEATURES_MANIFEST.config_schema;
       const features = Array.from({ length: 21 }, (value, index) => ({
         selector: `feature-${index}`,
-        category: 'energy-sensor',
-        type: 'power',
+        category: 'humidity-sensor',
+        type: 'humidity',
       }));
       const dynamicOptions = { device_features: features };
       const twenty = features.slice(0, 20).map((feature) => feature.selector);
@@ -222,6 +243,50 @@ describe('externalIntegration: designated device features', () => {
         expect(e.properties).to.include('config.grid_power: must be one of the selectors of the device features');
       }
       expect((await externalIntegration.getDeviceFeatureGrant(service)).size).to.equal(0);
+    });
+
+    it('should refuse a camera image from the front, even in a field whose filters name it', async () => {
+      try {
+        await designate({ pv_meters: [CAMERA] });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+        expect(e.properties).to.include('config.pv_meters: must be an array of unique values among the selectors');
+      }
+      expect((await externalIntegration.getDeviceFeatureGrant(service)).size).to.equal(0);
+    });
+
+    it('should shrink the scope to the current filters of the field when the manifest tightens them', async () => {
+      await designate({ grid_power: TEMPERATURE, pv_meters: [TEMPERATURE_2, HUMIDITY] });
+      const [gridField, pvField, nameField] = DEVICE_FEATURES_MANIFEST.config_schema;
+      const tightened = {
+        ...service,
+        manifest: {
+          ...DEVICE_FEATURES_MANIFEST,
+          config_schema: [gridField, { ...pvField, feature_filters: [{ category: 'humidity-sensor' }] }, nameField],
+        },
+      };
+      expect([...(await externalIntegration.getDeviceFeatureGrant(tightened))].sort()).to.deep.equal(
+        [HUMIDITY, TEMPERATURE].sort(),
+      );
+      // a field left without filters by a (non-validated) record grants nothing
+      const withoutFilters = {
+        ...service,
+        manifest: { ...DEVICE_FEATURES_MANIFEST, config_schema: [{ ...gridField, feature_filters: undefined }] },
+      };
+      expect((await externalIntegration.getDeviceFeatureGrant(withoutFilters)).size).to.equal(0);
+    });
+
+    it('should drop a camera image from a recorded grant, and keep a designated feature deleted since', async () => {
+      await externalIntegration.variable.setValue(
+        DEVICE_FEATURES_GRANT_KEY,
+        JSON.stringify({ pv_meters: [CAMERA, HUMIDITY, 'deleted-feature'] }),
+        service.id,
+      );
+      expect([...(await externalIntegration.getDeviceFeatureGrant(service))]).to.deep.equal([
+        HUMIDITY,
+        'deleted-feature',
+      ]);
     });
 
     it('should never trust a config value the user did not save as a designation', async () => {
@@ -324,6 +389,34 @@ describe('externalIntegration: designated device features', () => {
           last_value_changed: new Date('2026-01-12T10:00:00.000Z'),
         },
       ]);
+    });
+
+    it('should hand over a text state up to 1 KB only, null above', async () => {
+      const atCap = 'a'.repeat(MAX_DEVICE_FEATURE_STRING_VALUE_BYTES);
+      stateManager.get('deviceFeature', TEMPERATURE).last_value_string = atCap;
+      // the cap counts UTF-8 bytes: 1000 characters of 2 bytes are above it
+      stateManager.get('deviceFeature', TEMPERATURE_2).last_value_string = 'é'.repeat(1000);
+      const states = await externalIntegration.getDesignatedDeviceFeatureStates(
+        service,
+        `${TEMPERATURE},${TEMPERATURE_2}`,
+      );
+      expect(states.map((state) => state.last_value_string)).to.deep.equal([atCap, null]);
+      stateManager.get('deviceFeature', TEMPERATURE).last_value_string = `${atCap}a`;
+      const [state] = await externalIntegration.getDesignatedDeviceFeatureStates(service, TEMPERATURE);
+      expect(state.last_value_string).to.equal(null);
+    });
+
+    it('should refuse a camera image recorded in the grant: never in the scope', async () => {
+      await externalIntegration.variable.setValue(
+        DEVICE_FEATURES_GRANT_KEY,
+        JSON.stringify({ pv_meters: [CAMERA] }),
+        service.id,
+      );
+      await expectRejection(
+        externalIntegration.getDesignatedDeviceFeatureStates(service, CAMERA),
+        ForbiddenError,
+        `not designated by the user for this integration: ${CAMERA}`,
+      );
     });
 
     it('should refuse an integration not declaring device_features_read', async () => {
@@ -557,6 +650,39 @@ describe('externalIntegration: designated device features', () => {
         WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_FEATURE_NEW_STATE,
         { selector: TEMPERATURE, last_value_string: 'HC..', last_value_changed: new Date('2026-01-12T10:00:00.000Z') },
       );
+    });
+
+    it('should push a text state up to 1 KB only, null above', async () => {
+      await designate({ grid_power: TEMPERATURE });
+      externalIntegration.sendMessage.resetHistory();
+      externalIntegration.forwardDeviceFeatureState(newState({ last_value: 'x'.repeat(150 * 1024) }));
+      sinonAssert.calledOnceWithExactly(
+        externalIntegration.sendMessage,
+        sinon.match({ id: service.id }),
+        WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_FEATURE_NEW_STATE,
+        { selector: TEMPERATURE, last_value_string: null, last_value_changed: new Date('2026-01-12T10:00:00.000Z') },
+      );
+    });
+
+    it('should never push a camera image, even one held in memory as designated', () => {
+      externalIntegration.deviceFeatureReadGrants.set(service.id, { service, selectors: new Set([CAMERA]) });
+      externalIntegration.forwardDeviceFeatureState(newState({ device_feature: CAMERA, last_value: 'image/jpg;...' }));
+      sinonAssert.notCalled(externalIntegration.sendMessage);
+    });
+
+    it('should push the same state to every integration it is designated for, deleted from RAM or not', () => {
+      const otherService = { ...service, id: 'other-service-id' };
+      const selectors = new Set(['not-in-ram']);
+      externalIntegration.deviceFeatureReadGrants.set(service.id, { service, selectors });
+      externalIntegration.deviceFeatureReadGrants.set(otherService.id, { service: otherService, selectors });
+      externalIntegration.forwardDeviceFeatureState(newState({ device_feature: 'not-in-ram' }));
+      sinonAssert.calledTwice(externalIntegration.sendMessage);
+      expect(externalIntegration.sendMessage.secondCall.args[0]).to.equal(otherService);
+      expect(externalIntegration.sendMessage.secondCall.args[2]).to.deep.equal({
+        selector: 'not-in-ram',
+        last_value: 21,
+        last_value_changed: new Date('2026-01-12T10:00:00.000Z'),
+      });
     });
 
     it('should ignore the other trigger events and do nothing without any designation', async () => {

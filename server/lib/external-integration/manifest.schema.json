@@ -486,13 +486,13 @@
         "source": {
           "type": "string",
           "enum": ["devices", "houses", "device_features"],
-          "description": "Dynamic options of a `select` or `multi_select` field, provided by the core — a reserved enum, never a URL nor an expression. Mutually exclusive with `options`; `default` is not allowed with a source (code-enforced). \"devices\": the Gladys UI populates the options with the already-created devices of the integration (label = device name, value = external_id). \"houses\": the options are the houses of Gladys (label = house name, value = selector, the identifier GET /house returns). \"device_features\": a picker of the device features of every integration, narrowed by `feature_filters` (value = feature selector, a multi_select designates at most 20); only allowed in the `config_schema` (code-enforced) and only with `device_features_read: true`."
+          "description": "Dynamic options of a `select` or `multi_select` field, provided by the core — a reserved enum, never a URL nor an expression. Mutually exclusive with `options`; `default` is not allowed with a source (code-enforced). \"devices\": the Gladys UI populates the options with the already-created devices of the integration (label = device name, value = external_id). \"houses\": the options are the houses of Gladys (label = house name, value = selector, the identifier GET /house returns). \"device_features\": a picker of the device features of every integration, narrowed by the required `feature_filters`, camera images excluded (value = feature selector, a multi_select designates at most 20); only allowed in the `config_schema` (code-enforced) and only with `device_features_read: true`."
         },
         "feature_filters": {
           "type": "array",
           "minItems": 1,
           "maxItems": 20,
-          "description": "Only with `source: \"device_features\"`: the categories (and optionally types) of device features the picker offers, e.g. [{ \"category\": \"energy-sensor\", \"type\": \"power\" }, { \"category\": \"teleinformation\" }]. A feature matching one entry can be designated; without the field, every feature can. A category or type unknown to a Gladys instance matches nothing there (logged, never rejected).",
+          "description": "Required with `source: \"device_features\"`, refused otherwise: the categories (and optionally types) of device features the picker offers, e.g. [{ \"category\": \"energy-sensor\", \"type\": \"power\" }, { \"category\": \"teleinformation\" }]. A feature matching one entry can be designated, no other. The `camera` category and the `image` type are refused: a camera image can never be designated. A category or type unknown to a Gladys instance matches nothing there (logged, never rejected).",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -500,11 +500,17 @@
             "properties": {
               "category": {
                 "type": "string",
-                "pattern": "^[a-z0-9-]+$"
+                "pattern": "^[a-z0-9-]+$",
+                "not": {
+                  "enum": ["camera"]
+                }
               },
               "type": {
                 "type": "string",
-                "pattern": "^[a-z0-9-]+$"
+                "pattern": "^[a-z0-9-]+$",
+                "not": {
+                  "enum": ["image"]
+                }
               }
             }
           }
@@ -618,6 +624,9 @@
             "not": {
               "required": ["feature_filters"]
             }
+          },
+          "else": {
+            "required": ["feature_filters"]
           }
         },
         {

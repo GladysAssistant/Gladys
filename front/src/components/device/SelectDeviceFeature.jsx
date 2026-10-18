@@ -101,6 +101,11 @@ class SelectDeviceFeature extends Component {
 
       await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
       await this.refreshSelectedOptions(this.props);
+      // optional: tell the caller every feature is known, so it can tell a
+      // stored selector that no longer resolves from a list still loading
+      if (typeof this.props.onOptionsLoaded === 'function') {
+        this.props.onOptionsLoaded(deviceFeaturesDictionnary);
+      }
       return deviceOptions;
     } catch (e) {
       console.error(e);

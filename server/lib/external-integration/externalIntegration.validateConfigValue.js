@@ -1,10 +1,32 @@
 const { Error422 } = require('../../utils/httpErrors');
-const { DYNAMIC_SOURCES, DEVICE_FEATURES_SOURCE, MAX_DEVICE_FEATURE_SELECTIONS } = require('./constants');
+const {
+  DYNAMIC_SOURCES,
+  DEVICE_FEATURES_SOURCE,
+  MAX_DEVICE_FEATURE_SELECTIONS,
+  DEVICE_FEATURES_EXCLUDED_CATEGORIES,
+  DEVICE_FEATURES_EXCLUDED_TYPES,
+} = require('./constants');
+
+/**
+ * @description Tell if a device feature can never be designated, whatever
+ * the filters of the field: a camera image (DEVICE_FEATURES_EXCLUDED_CATEGORIES).
+ * @param {object} feature - The device feature, ex: { category: 'camera', type: 'image' }.
+ * @returns {boolean} True when the feature is out of the read capability.
+ * @example
+ * isExcludedFeature({ category: 'camera', type: 'image' });
+ */
+function isExcludedFeature(feature) {
+  return (
+    DEVICE_FEATURES_EXCLUDED_CATEGORIES.includes(feature.category) ||
+    DEVICE_FEATURES_EXCLUDED_TYPES.includes(feature.type)
+  );
+}
 
 /**
  * @description Tell if a device feature matches the `feature_filters` of a
- * `source: "device_features"` field: no filter matches every feature, else
- * one entry must match its category (and its type when the entry has one).
+ * `source: "device_features"` field: one entry must match its category (and
+ * its type when the entry has one). Fails closed: no filter matches nothing,
+ * and a camera image never matches (DEVICE_FEATURES_EXCLUDED_CATEGORIES).
  * @param {object} field - The config_schema field.
  * @param {object} feature - The device feature, ex: { category: 'energy-sensor', type: 'power' }.
  * @returns {boolean} True when the feature can be designated in this field.
@@ -13,8 +35,8 @@ const { DYNAMIC_SOURCES, DEVICE_FEATURES_SOURCE, MAX_DEVICE_FEATURE_SELECTIONS }
  * matchesFeatureFilters(field, { category: 'energy-sensor', type: 'power' });
  */
 function matchesFeatureFilters(field, feature) {
-  if (!Array.isArray(field.feature_filters)) {
-    return true;
+  if (!Array.isArray(field.feature_filters) || isExcludedFeature(feature)) {
+    return false;
   }
   return field.feature_filters.some(
     (filter) => filter.category === feature.category && (filter.type === undefined || filter.type === feature.type),
@@ -165,4 +187,5 @@ module.exports = {
   validateConfigValue,
   getDynamicSources,
   matchesFeatureFilters,
+  isExcludedFeature,
 };

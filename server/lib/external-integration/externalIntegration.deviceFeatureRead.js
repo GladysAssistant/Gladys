@@ -9,7 +9,9 @@ const {
   MAX_DEVICE_FEATURE_AGGREGATE_READS_PER_MINUTE,
   DEVICE_FEATURE_AGGREGATE_INTERVALS,
   MAX_DEVICE_FEATURE_AGGREGATE_BUCKETS,
+  MAX_DEVICE_FEATURE_STRING_VALUE_BYTES,
 } = require('./constants');
+const { matchesFeatureFilters, isExcludedFeature } = require('./externalIntegration.validateConfigValue');
 
 // Designated device features (capabilities/device-feature-read.md): an
 // integration declaring `device_features_read: true` reads the features of
@@ -67,9 +69,34 @@ async function readGrant(service) {
 }
 
 /**
+ * @description Hand over a text state only below the size cap: a larger one
+ * is a payload, not a meter value (MAX_DEVICE_FEATURE_STRING_VALUE_BYTES).
+ * The length test first keeps a large string O(1): its UTF-8 size is at
+ * least its length.
+ * @param {any} value - The text state.
+ * @returns {any} The value, or null above the cap.
+ * @example
+ * capStringValue('HC..');
+ */
+function capStringValue(value) {
+  if (
+    typeof value === 'string' &&
+    (value.length > MAX_DEVICE_FEATURE_STRING_VALUE_BYTES ||
+      Buffer.byteLength(value) > MAX_DEVICE_FEATURE_STRING_VALUE_BYTES)
+  ) {
+    return null;
+  }
+  return value;
+}
+
+/**
  * @description Get the selectors the user designated for an integration:
  * the recorded grant of the `source: "device_features"` fields its current
  * manifest still declares, and only when it declares `device_features_read`.
+ * The field's CURRENT `feature_filters` (and the camera exclusion) are
+ * re-applied to the recorded grant: a manifest update can shrink the scope,
+ * never keep what it no longer asks for. A designated feature deleted since
+ * stays in the scope (it answers 404, not 403).
  * @param {object} service - The external integration service.
  * @returns {Promise<Set>} Resolve with the designated feature selectors.
  * @example
@@ -87,7 +114,13 @@ async function getDeviceFeatureGrant(service) {
   const grant = await readGrant.call(this, service);
   fields.forEach((field) => {
     const designated = Array.isArray(grant[field.key]) ? grant[field.key] : [];
-    designated.filter((selector) => typeof selector === 'string').forEach((selector) => selectors.add(selector));
+    designated
+      .filter((selector) => typeof selector === 'string')
+      .filter((selector) => {
+        const feature = this.stateManager.get('deviceFeature', selector);
+        return !feature || matchesFeatureFilters(field, feature);
+      })
+      .forEach((selector) => selectors.add(selector));
   });
   return selectors;
 }
@@ -250,7 +283,7 @@ async function getDesignatedDeviceFeatureStates(service, selectorsParam) {
       type: feature.type,
       unit: feature.unit,
       last_value: feature.last_value,
-      last_value_string: feature.last_value_string,
+      last_value_string: capStringValue(feature.last_value_string),
       last_value_changed: feature.last_value_changed,
     };
   });
@@ -335,7 +368,9 @@ async function getDesignatedDeviceFeatureAggregates(service, query) {
  * connected integration it is designated for (EVENTS.TRIGGERS.CHECK
  * listener, the same hook the Google Home / Alexa forwarding uses).
  * Fire-and-forget, no ack, lost while the integration is disconnected: it
- * resynchronizes with GET /device_feature/state at (re)connection.
+ * resynchronizes with GET /device_feature/state at (re)connection. This is
+ * the hot path of every new state of the instance: nothing is done without
+ * any designation, and a text state above the size cap is never serialized.
  * @param {object} event - The trigger check event.
  * @example
  * gladys.externalIntegration.forwardDeviceFeatureState({ type: 'device.new-state', device_feature: 'linky-papp' });
@@ -344,17 +379,30 @@ function forwardDeviceFeatureState(event) {
   if (event.type !== EVENTS.DEVICE.NEW_STATE || this.deviceFeatureReadGrants.size === 0) {
     return;
   }
-  // a text feature carries its state as a string (saveStringState)
-  const valueKey = typeof event.last_value === 'string' ? 'last_value_string' : 'last_value';
+  const services = [];
   this.deviceFeatureReadGrants.forEach(({ service, selectors }) => {
-    if (!selectors.has(event.device_feature)) {
-      return;
+    if (selectors.has(event.device_feature)) {
+      services.push(service);
     }
-    this.sendMessage(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_FEATURE_NEW_STATE, {
-      selector: event.device_feature,
-      [valueKey]: event.last_value,
-      last_value_changed: event.last_value_changed,
-    });
+  });
+  if (services.length === 0) {
+    return;
+  }
+  // the grants already exclude camera images: checked again on the feature
+  // itself, the frames must never reach an integration
+  const feature = this.stateManager.get('deviceFeature', event.device_feature);
+  if (feature && isExcludedFeature(feature)) {
+    return;
+  }
+  // a text feature carries its state as a string (saveStringState)
+  const isString = typeof event.last_value === 'string';
+  const payload = {
+    selector: event.device_feature,
+    [isString ? 'last_value_string' : 'last_value']: isString ? capStringValue(event.last_value) : event.last_value,
+    last_value_changed: event.last_value_changed,
+  };
+  services.forEach((service) => {
+    this.sendMessage(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_FEATURE_NEW_STATE, payload);
   });
 }
 

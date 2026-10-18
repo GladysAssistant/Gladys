@@ -37,6 +37,8 @@ const {
   DEVICE_FEATURES_SOURCE,
   MAX_FEATURE_FILTERS,
   FEATURE_FILTER_FIELDS,
+  DEVICE_FEATURES_EXCLUDED_CATEGORIES,
+  DEVICE_FEATURES_EXCLUDED_TYPES,
   MAX_WIDGETS,
   WIDGET_KEY_REGEX,
   WIDGET_LABEL_MIN_LENGTH,
@@ -397,9 +399,10 @@ function rejectPerUserSchemaPortPlaceholders(value, path, errors, schemaLabel) {
 }
 
 /**
- * @description Validate the `feature_filters` of a `source: "device_features"`
- * field: 1-20 `{ category, type? }` entries narrowing the picker. Unknown
- * vocabulary is only logged (see FEATURE_FILTER_VALUE_REGEX).
+ * @description Validate the required `feature_filters` of a `source:
+ * "device_features"` field: 1-20 `{ category, type? }` entries narrowing the
+ * picker, never a camera image. Unknown vocabulary is only logged (see
+ * FEATURE_FILTER_VALUE_REGEX).
  * @param {any} filters - The declared filters.
  * @param {string} path - The path of the field, for error messages.
  * @param {Array} errors - The array of errors to push to.
@@ -424,12 +427,16 @@ function validateFeatureFilters(filters, path, errors) {
     });
     if (typeof filter.category !== 'string' || !FEATURE_FILTER_VALUE_REGEX.test(filter.category)) {
       errors.push(`${filterPath}.category: must be a non-empty string matching [a-z0-9-]`);
+    } else if (DEVICE_FEATURES_EXCLUDED_CATEGORIES.includes(filter.category)) {
+      errors.push(`${filterPath}.category: ${filter.category} features can never be designated`);
     } else if (!KNOWN_FEATURE_CATEGORIES.has(filter.category)) {
       logger.warn(`validateManifest: ${filterPath}.category "${filter.category}" is unknown, it matches no feature`);
     }
     if (filter.type !== undefined) {
       if (typeof filter.type !== 'string' || !FEATURE_FILTER_VALUE_REGEX.test(filter.type)) {
         errors.push(`${filterPath}.type: must be a non-empty string matching [a-z0-9-]`);
+      } else if (DEVICE_FEATURES_EXCLUDED_TYPES.includes(filter.type)) {
+        errors.push(`${filterPath}.type: ${filter.type} features can never be designated`);
       } else if (!KNOWN_FEATURE_TYPES.has(filter.type)) {
         logger.warn(`validateManifest: ${filterPath}.type "${filter.type}" is unknown, it matches no feature`);
       }
@@ -586,12 +593,12 @@ function validateConfigField(field, index, seenKeys, errors, basePath, declaredP
   } else if (field.options !== undefined) {
     errors.push(`${path}.options: only allowed on select and multi_select fields`);
   }
-  if (field.feature_filters !== undefined) {
-    if (field.source !== DEVICE_FEATURES_SOURCE) {
-      errors.push(`${path}.feature_filters: only allowed with source ${DEVICE_FEATURES_SOURCE}`);
-    } else {
-      validateFeatureFilters(field.feature_filters, path, errors);
-    }
+  if (field.source === DEVICE_FEATURES_SOURCE) {
+    // required: a picker of every feature of the instance (locks, presence,
+    // text...) is exactly what this contract refuses
+    validateFeatureFilters(field.feature_filters, path, errors);
+  } else if (field.feature_filters !== undefined) {
+    errors.push(`${path}.feature_filters: only allowed with source ${DEVICE_FEATURES_SOURCE}`);
   }
 }
 

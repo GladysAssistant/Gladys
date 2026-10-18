@@ -47,7 +47,13 @@ describe('externalIntegration.validateManifest — device_features_read and sour
   it('should accept a designation field, single or multi, behind the gate', () => {
     const manifest = withField(GRID_FIELD);
     expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
-    const multi = withField({ key: 'pv_meters', type: 'multi_select', source: 'device_features', label: { en: 'PV' } });
+    const multi = withField({
+      key: 'pv_meters',
+      type: 'multi_select',
+      source: 'device_features',
+      label: { en: 'PV' },
+      feature_filters: [{ category: 'energy-sensor' }],
+    });
     expect(externalIntegration.validateManifest(multi)).to.deep.equal(multi);
     // the gate alone is valid too (fields added in a later version)
     const gateOnly = { ...TEST_MANIFEST, device_features_read: false };
@@ -102,6 +108,22 @@ describe('externalIntegration.validateManifest — device_features_read and sour
     );
   });
 
+  it('should require the feature filters on a designation field', () => {
+    const { feature_filters: omitted, ...withoutFilters } = GRID_FIELD;
+    expect422(withField(withoutFilters), 'config_schema[0].feature_filters: must be a list of 1-20 filters');
+  });
+
+  it('should refuse a filter naming camera images: never designatable', () => {
+    expect422(
+      withField({ ...GRID_FIELD, feature_filters: [{ category: 'camera' }] }),
+      'config_schema[0].feature_filters[0].category: camera features can never be designated',
+    );
+    expect422(
+      withField({ ...GRID_FIELD, feature_filters: [{ category: 'energy-sensor', type: 'image' }] }),
+      'config_schema[0].feature_filters[0].type: image features can never be designated',
+    );
+  });
+
   it('should validate the shape of the feature filters', () => {
     const cases = [
       [[], 'feature_filters: must be a list of 1-20 filters'],
@@ -138,6 +160,13 @@ describe('externalIntegration.validateManifest — device_features_read and sour
     expect(configField.properties.source.enum).to.deep.equal(DYNAMIC_SOURCES);
     expect(configField.properties.feature_filters.maxItems).to.equal(20);
     expect(configField.properties.feature_filters.items.required).to.deep.equal(['category']);
+    expect(configField.properties.feature_filters.items.properties.category.not.enum).to.deep.equal(['camera']);
+    expect(configField.properties.feature_filters.items.properties.type.not.enum).to.deep.equal(['image']);
+    // feature_filters: refused without source device_features, required with it
+    const filtersRule = configField.allOf.find(
+      (rule) => rule.then && rule.then.not && rule.then.not.required && rule.then.not.required[0] === 'feature_filters',
+    );
+    expect(filtersRule.else.required).to.deep.equal(['feature_filters']);
     const gateRule = schema.allOf.find(
       (rule) => rule.then && rule.then.required && rule.then.required[0] === 'device_features_read',
     );
