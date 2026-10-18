@@ -330,6 +330,69 @@ describe('energyContract.getMeterPrices', () => {
     ]);
   });
 
+  it('should count the first quarter of the interval of a 15-minute first slot starting at :15', async () => {
+    sinon.useFakeTimers({ now: ms('2026-01-12T12:00:00Z'), toFake: ['Date'] });
+    await energyContract.declareCalendar(SPOT, TEST_SERVICE_ID);
+    await energyContract.create(
+      contractPayload({
+        name: 'Tiered spot',
+        timezone: 'UTC',
+        tariff: {
+          tariff_version: 1,
+          calendars: ['spot-fi'],
+          components: [
+            {
+              key: 'energy',
+              kind: 'consumption',
+              rules: [{ label: 'tier 1', when: { tier: { cumulative: 'day', from_kwh: 0, to_kwh: 1 } }, price: 0.1 }],
+              fallback: { label: 'tier 2', price: 0.2 },
+            },
+            { key: 'spot', kind: 'consumption', rules: [], fallback: { price_from_calendar: 'spot-fi', offset: 0 } },
+          ],
+        },
+      }),
+    );
+    await energyContract.publishCalendarEntries(
+      'spot-fi',
+      ['00', '15', '30', '45'].map((minutes) => ({ starts_at: `2026-01-12T05:${minutes}:00Z`, price: 0 })),
+      { provider_service_id: TEST_SERVICE_ID, skip_recalculation: true },
+    );
+    // 1.6 kWh between 05:00 and 05:30: the 0.8 of the 05:00 quarter, outside the window, still
+    // count, so the allowance of 1 is crossed during the 05:15 quarter
+    await insertConsumption([{ value: 1.6, created_at: new Date('2026-01-12T05:30:00Z') }]);
+    const result = await energyContract.getMeterPrices(METER_DEVICE_ID, {
+      from: ms('2026-01-12T05:15:00Z'),
+      to: ms('2026-01-12T05:45:00Z'),
+    });
+    expect(prices(result)).to.deep.equal([
+      ['2026-01-12T05:15:00.000Z', 0.1, 'tier 1'],
+      ['2026-01-12T05:30:00.000Z', 0.2, 'tier 2'],
+    ]);
+  });
+
+  it('should read the stored consumption of a tiered tariff up to the end of the window only', async () => {
+    sinon.useFakeTimers({ now: ms('2026-01-12T12:10:00Z'), toFake: ['Date'] });
+    await energyContract.create(contractPayload({ name: 'Tiered', tariff: TIER_TARIFF, timezone: 'UTC' }));
+    const getMeterIntervals = sinon.spy(energyContract, 'getMeterIntervals');
+    // a window in the past: up to its end, not up to now
+    await energyContract.getMeterPrices(METER_DEVICE_ID, {
+      from: ms('2026-01-12T08:10:00Z'),
+      to: ms('2026-01-12T09:00:00Z'),
+    });
+    expect(getMeterIntervals.callCount).to.equal(1);
+    expect(getMeterIntervals.firstCall.args).to.deep.equal([
+      METER_DEVICE_ID,
+      new Date('2026-01-12T08:00:00Z'),
+      new Date('2026-01-12T09:00:00Z'),
+    ]);
+    // a window in the future: nothing stored to read
+    await energyContract.getMeterPrices(METER_DEVICE_ID, {
+      from: ms('2026-01-12T13:00:00Z'),
+      to: ms('2026-01-12T14:00:00Z'),
+    });
+    expect(getMeterIntervals.callCount).to.equal(1);
+  });
+
   describe('delegated contract', () => {
     const DELEGATED = {
       name: 'Agile',

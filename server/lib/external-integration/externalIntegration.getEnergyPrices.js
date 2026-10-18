@@ -6,8 +6,13 @@ const {
   MAX_ENERGY_PRICE_READS_PER_MINUTE,
 } = require('./constants');
 
+// an ISO 8601 date-time with an explicit offset: a value without one would be read in the
+// timezone of the Gladys host, and Date.parse alone accepts loose formats ("1", "2026")
+const ISO_INSTANT_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/;
+
 /**
- * @description Parse one bound of the window of GET /energy/price.
+ * @description Parse one bound of the window of GET /energy/price: an ISO 8601 date-time with
+ * an explicit `Z` or `±HH:MM` offset.
  * @param {any} value - The query value.
  * @param {string} name - `from` or `to`, for the error message.
  * @returns {number} Milliseconds since the epoch.
@@ -15,7 +20,7 @@ const {
  * parseInstant('2026-01-12T00:00:00Z', 'from');
  */
 function parseInstant(value, name) {
-  const ms = typeof value === 'string' && value.length > 0 ? Date.parse(value) : NaN;
+  const ms = typeof value === 'string' && ISO_INSTANT_REGEX.test(value) ? Date.parse(value) : NaN;
   if (Number.isNaN(ms)) {
     throw new BadParameters(`${name}: must be an ISO date`);
   }

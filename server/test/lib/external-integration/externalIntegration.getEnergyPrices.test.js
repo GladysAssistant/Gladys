@@ -68,6 +68,17 @@ describe('externalIntegration.getEnergyPrices', () => {
     expect(energyContract.getMeterPrices.callCount).to.equal(2);
   });
 
+  it('should read an explicit offset and fractional seconds', async () => {
+    await externalIntegration.getEnergyPrices(
+      SERVICE,
+      query({ from: '2026-10-17T14:00+02:00', to: '2026-10-18T07:00:00.500-05:00' }),
+    );
+    expect(energyContract.getMeterPrices.firstCall.args[1]).to.deep.equal({
+      from: NOW,
+      to: NOW + 24 * 60 * 60 * 1000 + 500,
+    });
+  });
+
   it('should refuse an integration not declaring energy_prices: true', async () => {
     const forbidden = (service) =>
       expectRejected(externalIntegration.getEnergyPrices(service, query()), ForbiddenError, 'energy_prices');
@@ -87,6 +98,11 @@ describe('externalIntegration.getEnergyPrices', () => {
     await invalid({ from: undefined }, 'from: must be an ISO date');
     await invalid({ from: 'yesterday' }, 'from: must be an ISO date');
     await invalid({ to: '' }, 'to: must be an ISO date');
+    // Date.parse alone would read these in the timezone of the host, or accept them loosely
+    await invalid({ from: '2026-10-17T12:00:00' }, 'from: must be an ISO date');
+    await invalid({ from: '2026-10-17' }, 'from: must be an ISO date');
+    await invalid({ to: '1' }, 'to: must be an ISO date');
+    await invalid({ to: 'Sun Oct 18 2026 12:00:00 GMT+0000' }, 'to: must be an ISO date');
     await invalid({ to: '2026-10-17T12:00:00Z' }, 'to: must be after from');
     await invalid({ from: '2026-10-10T12:00:00Z', to: '2026-10-17T12:00:01Z' }, 'to: the window is at most 7 days');
     await invalid({ from: '2025-10-17T11:59:59Z', to: '2025-10-18T12:00:00Z' }, 'from: must be at most one year ago');
