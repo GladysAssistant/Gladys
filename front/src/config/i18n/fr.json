@@ -815,6 +815,7 @@
         "editDescription": "Une barre compacte de pastilles d'état. Ajoutez des pastilles et choisissez ce que chacune affiche.",
         "editChipLabel": "Pastille {{index}}",
         "removeChipButton": "Supprimer la pastille {{index}}",
+        "moveChipButton": "Déplacer la pastille {{index}} : faites glisser ou utilisez les flèches haut/bas",
         "editChipTypeLabel": "Que doit afficher cette pastille ?",
         "chipTypes": {
           "device-feature": "L'état d'un appareil",

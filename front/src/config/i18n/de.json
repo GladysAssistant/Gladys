@@ -815,6 +815,7 @@
         "editDescription": "Eine kompakte Leiste mit Status-Chips. Chips hinzufügen und auswählen, was jeder anzeigt.",
         "editChipLabel": "Chip {{index}}",
         "removeChipButton": "Chip {{index}} entfernen",
+        "moveChipButton": "Chip {{index}} verschieben: ziehen oder Pfeiltasten nach oben/unten verwenden",
         "editChipTypeLabel": "Was soll dieser Chip anzeigen?",
         "chipTypes": {
           "device-feature": "Ein Gerätestatus",
