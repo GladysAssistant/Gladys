@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const Ajv = require('ajv');
 const sinon = require('sinon').createSandbox();
 
 const logger = require('../../../utils/logger');
@@ -171,5 +172,42 @@ describe('externalIntegration.validateManifest — device_features_read and sour
       (rule) => rule.then && rule.then.required && rule.then.required[0] === 'device_features_read',
     );
     expect(gateRule.then.properties.device_features_read.const).to.equal(true);
+    // source device_features: only in the config_schema, like the validator
+    const notSource = { $ref: '#/definitions/notConfigSchemaSource' };
+    expect(schema.definitions.notConfigSchemaSource.properties.source.not.const).to.equal('device_features');
+    expect(schema.properties.contact_schema.items.allOf).to.deep.include(notSource);
+    expect(schema.properties.account_schema.items.allOf).to.deep.include(notSource);
+    expect(schema.definitions.action.properties.fields.items.allOf).to.deep.include(notSource);
+    ['widgetSettingField', 'sceneTriggerField', 'sceneActionField'].forEach((definition) => {
+      expect(schema.definitions[definition].allOf).to.deep.include(notSource);
+    });
+    expect(schema.properties.config_schema.items).to.deep.equal({ $ref: '#/definitions/configField' });
+  });
+
+  it('should make the vendored schema reject the source outside the config_schema too', () => {
+    const validate = new Ajv({ allErrors: true, strict: false }).compile(schema);
+    const field = { ...GRID_FIELD, key: 'meter' };
+    expect(validate(withField(field))).to.equal(true);
+    const [widget] = TEST_WIDGET_MANIFEST.widgets;
+    const placements = {
+      'actions/0/fields/0': { actions: [{ key: 'calibrate', label: { en: 'Calibrate' }, fields: [field] }] },
+      'contact_schema/0': { contact_schema: [field] },
+      'account_schema/0': { account_schema: [field] },
+      'widgets/0/settings/0': { widgets: [{ ...widget, settings: [field] }] },
+      'scene_triggers/0/fields/0': { scene_triggers: [{ key: 'fired', label: { en: 'Fired' }, fields: [field] }] },
+      'scene_actions/0/fields/0': { scene_actions: [{ key: 'run', label: { en: 'Run' }, fields: [field] }] },
+    };
+    Object.entries(placements).forEach(([placement, overrides]) => {
+      expect(validate({ ...TEST_MANIFEST, device_features_read: true, ...overrides })).to.equal(false);
+      expect(validate.errors).to.deep.include.members([
+        {
+          instancePath: `/${placement}/source`,
+          schemaPath: '#/definitions/notConfigSchemaSource/properties/source/not',
+          keyword: 'not',
+          params: {},
+          message: 'must NOT be valid',
+        },
+      ]);
+    });
   });
 });

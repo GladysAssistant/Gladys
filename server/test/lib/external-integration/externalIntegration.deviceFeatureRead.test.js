@@ -87,6 +87,8 @@ describe('externalIntegration: designated device features', () => {
       selector: 'ext-dev-zendure',
       manifest: DEVICE_FEATURES_MANIFEST,
     });
+    // connected: only a connected integration is held for the push
+    externalIntegration.connections.set(service.id, buildFakeWs());
     [
       { selector: TEMPERATURE, id: TEMPERATURE_ID, category: 'temperature-sensor', type: 'decimal', unit: 'celsius' },
       { selector: TEMPERATURE_2, id: 'f07c5b27', category: 'temperature-sensor', type: 'average', unit: 'fahrenheit' },
@@ -225,6 +227,21 @@ describe('externalIntegration: designated device features', () => {
       expect([...(await externalIntegration.getDeviceFeatureGrant(service))]).to.deep.equal([HUMIDITY]);
       await designate({ pv_meters: [] });
       expect((await externalIntegration.getDeviceFeatureGrant(service)).size).to.equal(0);
+      expect(externalIntegration.deviceFeatureReadGrants.has(service.id)).to.equal(false);
+    });
+
+    it('should record the grant but hold nothing for the push while the integration is not connected', async () => {
+      externalIntegration.connections.delete(service.id);
+      await designate({ grid_power: TEMPERATURE });
+      expect([...(await externalIntegration.getDeviceFeatureGrant(service))]).to.deep.equal([TEMPERATURE]);
+      expect(externalIntegration.deviceFeatureReadGrants.has(service.id)).to.equal(false);
+    });
+
+    it('should drop the designations held for the push when a save happens offline', async () => {
+      await designate({ grid_power: TEMPERATURE });
+      expect(externalIntegration.deviceFeatureReadGrants.has(service.id)).to.equal(true);
+      externalIntegration.connections.delete(service.id);
+      await designate({ pv_meters: [HUMIDITY] });
       expect(externalIntegration.deviceFeatureReadGrants.has(service.id)).to.equal(false);
     });
 

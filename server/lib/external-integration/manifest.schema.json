@@ -153,6 +153,9 @@
             "$ref": "#/definitions/configField"
           },
           {
+            "$ref": "#/definitions/notConfigSchemaSource"
+          },
+          {
             "properties": {
               "type": {
                 "not": {
@@ -171,6 +174,9 @@
         "allOf": [
           {
             "$ref": "#/definitions/configField"
+          },
+          {
+            "$ref": "#/definitions/notConfigSchemaSource"
           },
           {
             "properties": {
@@ -412,6 +418,16 @@
       "additionalProperties": {
         "type": "string",
         "minLength": 1
+      }
+    },
+    "notConfigSchemaSource": {
+      "$comment": "source device_features is only allowed in the config_schema (capabilities/device-feature-read.md): the read scope is what the user saved in the integration config, a designation made in an action, a per-user form, a widget or a scene would reach the integration without granting anything",
+      "properties": {
+        "source": {
+          "not": {
+            "const": "device_features"
+          }
+        }
       }
     },
     "configField": {
@@ -932,9 +948,16 @@
         },
         "fields": {
           "type": "array",
-          "description": "Optional flat form shown before running the action, same format as config_schema entries.",
+          "description": "Optional flat form shown before running the action, same format as config_schema entries (source device_features excepted).",
           "items": {
-            "$ref": "#/definitions/configField"
+            "allOf": [
+              {
+                "$ref": "#/definitions/configField"
+              },
+              {
+                "$ref": "#/definitions/notConfigSchemaSource"
+              }
+            ]
           }
         }
       }
@@ -964,6 +987,9 @@
       "allOf": [
         {
           "$ref": "#/definitions/configField"
+        },
+        {
+          "$ref": "#/definitions/notConfigSchemaSource"
         },
         {
           "properties": {
@@ -1067,6 +1093,9 @@
           "$ref": "#/definitions/configField"
         },
         {
+          "$ref": "#/definitions/notConfigSchemaSource"
+        },
+        {
           "properties": {
             "type": {
               "enum": ["string", "number", "select", "multi_select", "section"]
@@ -1099,6 +1128,9 @@
       "allOf": [
         {
           "$ref": "#/definitions/configField"
+        },
+        {
+          "$ref": "#/definitions/notConfigSchemaSource"
         },
         {
           "properties": {

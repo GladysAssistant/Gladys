@@ -128,7 +128,10 @@ async function getDeviceFeatureGrant(service) {
 /**
  * @description Refresh the in-memory designations used to push the new
  * states of the designated features to the integration (called when it
- * connects and when the user saves its config).
+ * connects and when the user saves its config). Only a connected
+ * integration is held: the map is walked on every new state of the instance
+ * (TRIGGERS.CHECK), and a stopped or offline one would only be pushed into
+ * the void — it loads its designations again when it (re)connects.
  * @param {object} service - The external integration service.
  * @returns {Promise} Resolve when refreshed.
  * @example
@@ -136,7 +139,8 @@ async function getDeviceFeatureGrant(service) {
  */
 async function refreshDeviceFeatureGrant(service) {
   const selectors = await this.getDeviceFeatureGrant(service);
-  if (selectors.size === 0) {
+  // checked after the read: a disconnection during it must not be undone
+  if (selectors.size === 0 || !this.connections.has(service.id)) {
     this.deviceFeatureReadGrants.delete(service.id);
     return;
   }
