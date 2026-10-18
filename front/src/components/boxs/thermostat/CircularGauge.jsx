@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'preact/hooks';
 import style from './style.css';
 
 // The gauge is drawn as an SVG arc spanning ARC_DEGREES, opening at the bottom:
@@ -31,8 +32,63 @@ function describeArc(cx, cy, r, startAngle, endAngle) {
   return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${end.x} ${end.y}`;
 }
 
+// How long the arc takes to travel to a new setpoint. Long enough to be seen
+// going up or down, short enough that a preset still feels applied at once.
+const SETPOINT_ANIMATION_MS = 450;
+
+const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * The setpoint the gauge draws, travelling to a new value instead of jumping to
+ * it: a preset picked, a hold expiring or a scene writing the setpoint moved the
+ * arc from one temperature to the other in a single frame.
+ *
+ * A new target mid-way starts from where the arc is, so a burst of + clicks is
+ * one continuous movement. Nothing is animated while `animate` is false — the
+ * dial being dragged must stay under the finger — nor for a user who asked the
+ * system for less motion, nor from or to a value that is not a number.
+ */
+const useAnimatedValue = (target, animate) => {
+  const [value, setValue] = useState(target);
+  const shownRef = useRef(target);
+  const frameRef = useRef(null);
+
+  useEffect(() => {
+    const from = shownRef.current;
+    const show = next => {
+      shownRef.current = next;
+      setValue(next);
+    };
+    if (!animate || !Number.isFinite(from) || !Number.isFinite(target) || from === target || prefersReducedMotion()) {
+      show(target);
+      return undefined;
+    }
+    const start = Date.now();
+    const step = () => {
+      const progress = Math.min(1, (Date.now() - start) / SETPOINT_ANIMATION_MS);
+      show(progress === 1 ? target : from + (target - from) * easeOutCubic(progress));
+      frameRef.current = progress === 1 ? null : requestAnimationFrame(step);
+    };
+    frameRef.current = requestAnimationFrame(step);
+    return () => {
+      if (frameRef.current !== null) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+    };
+  }, [target, animate]);
+
+  return value;
+};
+
 const CircularGauge = ({
-  setpoint,
+  setpoint: targetSetpoint,
+  animate = true,
   currentTemp,
   humidity,
   onPointerDown,
@@ -50,6 +106,7 @@ const CircularGauge = ({
   const cy = 110;
   const r = 88;
   const sw = 11;
+  const setpoint = useAnimatedValue(targetSetpoint, animate);
   const range = maxTemp - minTemp;
   const pct = range === 0 ? 0.5 : Math.min(1, Math.max(0, (setpoint - minTemp) / range));
   const arcEnd = ARC_START_ANGLE + Math.max(pct, 0.001) * ARC_DEGREES;
@@ -70,6 +127,9 @@ const CircularGauge = ({
   // Math.trunc(-0.5) is -0, which renders as "0": a setpoint between -1 and 0
   // would lose its sign, so the minus is restored explicitly.
   const intPart = truncated === 0 && roundedSetpoint < 0 ? '-0' : String(truncated);
+  // What a screen reader announces is where the setpoint is going, not the
+  // frames of the arc on its way there.
+  const roundedTarget = Math.round(targetSetpoint * 10) / 10;
   const intW = intPart.length * 30;
   const intX = cx - intW / 2 - 18;
   const suffixX = intX + intW;
@@ -90,7 +150,7 @@ const CircularGauge = ({
   // nodes are hidden from the tree for the same reason.
   const unit = `\u00b0${tempUnit || 'C'}`;
   const label = [
-    isOff ? offLabel : `${a11yLabels.setpoint || 'Setpoint'} ${roundedSetpoint} ${unit}`,
+    isOff ? offLabel : `${a11yLabels.setpoint || 'Setpoint'} ${roundedTarget} ${unit}`,
     hasCurrentTemp
       ? `${a11yLabels.currentTemp || 'Current temperature'} ${Number(currentTemp).toFixed(1)} ${unit}`
       : null,
@@ -129,8 +189,8 @@ const CircularGauge = ({
       aria-label={label}
       aria-valuemin={interactive ? minTemp : undefined}
       aria-valuemax={interactive ? maxTemp : undefined}
-      aria-valuenow={interactive ? roundedSetpoint : undefined}
-      aria-valuetext={interactive ? (isOff ? offLabel : `${roundedSetpoint} ${unit}`) : undefined}
+      aria-valuenow={interactive ? roundedTarget : undefined}
+      aria-valuetext={interactive ? (isOff ? offLabel : `${roundedTarget} ${unit}`) : undefined}
     >
       {/* The track's colour lives in the stylesheet rather than here: inverted by
           the dark theme, #e9ecef came back as a near-black that vanished into the

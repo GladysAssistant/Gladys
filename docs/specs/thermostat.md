@@ -324,6 +324,8 @@ A single `NEW_STATE` per feature tells the widget what happened, whoever caused 
 
 **Stopped is read from the mode, never from the preset.** A programme point on `off` lights Off too, but the thermostat is following its programme: the server cuts the switch, or stops the real device, and leaves the thermostat's own `mode` alone. The banner names that point like any other — "Off until 06:30" — and offers no way back to a programme it never left. Deriving the stopped banner from the preset showed "Back to the schedule" on every `off` point, the gaps of a new schedule included, and the button then did nothing.
 
+**The gauge travels to a new setpoint instead of jumping to it.** Whatever moves the setpoint — a preset picked, a scene, a hold expiring, the schedule, + and − — the arc, its knob and the number glide to the new value over about 450 ms (ease-out) in `CircularGauge.jsx`. A new value arriving mid-way starts from where the arc is, so a burst of + clicks is one movement. It is display only: what is written, and what a screen reader announces (`aria-valuenow`), is the target, never an intermediate frame. Nothing is animated while the dial is dragged — the arc must stay under the finger — nor when the system asks for reduced motion (`prefers-reduced-motion`), nor on a change of mode, which remounts the gauge.
+
 ## E. Weekly schedules: transition points, owned by a house
 
 ### E.0 Why not intervals
