@@ -894,6 +894,21 @@ class ThermostatBox extends Component {
     );
   };
 
+  // The preset whose temperature a setpoint lands on, or null. Asked on the forum:
+  // a temperature set by hand that is exactly Comfort's reads as Comfort, so the
+  // button lights instead of the bar going dark under "Manual mode". Display
+  // only — the server still holds a manual setpoint, which expires like any
+  // other. Two presets on the same temperature light the first in bar order.
+  presetMatchingSetpoint = setpoint => {
+    if (setpoint === null || setpoint === undefined) {
+      return null;
+    }
+    const match = this.getPresets().find(
+      candidate => candidate.temp !== null && this.toSetpointFeatureUnit(candidate.temp) === setpoint
+    );
+    return match ? match.key : null;
+  };
+
   // Same rounding as the server's convertSetpointToFeatureUnit: a whole degree
   // Fahrenheit, half a degree Celsius. Only an external thermostat's hold is
   // converted there: a virtual one's setpoint feature is in its own unit.
@@ -1449,6 +1464,10 @@ class ThermostatBox extends Component {
                 // below stays reachable whatever it says. Replacing the bar
                 // with the banner meant "I am away for the weekend -> Frost"
                 // required detaching the programme on the integration page.
+                // A setpoint set by hand on a preset's temperature shows as
+                // that preset, on the bar and in the banner alike.
+                const matchedPreset =
+                  manualSetpointOverride && !this.isStopped() ? this.presetMatchingSetpoint(setpoint) : null;
                 const banner = (() => {
                   // The window banner above already says what the thermostat
                   // is doing, and it replaces this one.
@@ -1476,10 +1495,13 @@ class ThermostatBox extends Component {
                     // preset — so the banner names the preset whenever one is
                     // still highlighted, and keeps "Manual mode" for a
                     // setpoint that no preset carries.
-                    const heldPreset =
+                    let heldPreset =
                       !manualSetpointOverride && [...HEATING_PRESETS, ...COOLING_PRESETS].includes(activePreset)
                         ? presets.find(candidate => candidate.key === activePreset)
                         : null;
+                    if (matchedPreset) {
+                      heldPreset = presets.find(candidate => candidate.key === matchedPreset);
+                    }
                     const i18nHeldPresets =
                       props.intl && props.intl.dictionary && props.intl.dictionary.dashboard.boxes.thermostat.preset;
                     const label = heldPreset
@@ -1622,7 +1644,9 @@ class ThermostatBox extends Component {
                           props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
                             ? props.intl.dictionary.dashboard.boxes.thermostat.preset[preset.key]
                             : preset.key;
-                        const isActive = resolvedActivePreset === preset.key && !manualSetpointOverride;
+                        const isActive =
+                          (resolvedActivePreset === preset.key && !manualSetpointOverride) ||
+                          matchedPreset === preset.key;
                         const isPending = pendingPreset === preset.key;
                         const presetColor = this.getPresetColor(preset.key);
                         return (

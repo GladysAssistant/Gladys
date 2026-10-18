@@ -293,6 +293,46 @@ async function onExternalSetpointChanged(changedSelector, newValue) {
 }
 
 /**
+ * @description Start a thermostat switched on from the unit on the setpoint the
+ * unit carries, when it is not the one this service last wrote.
+ *
+ * A remote sends its whole state with each press: switching the unit off with
+ * 21 °C on the remote reports the power cut and the new setpoint in the same
+ * poll. The setpoint arms a hold, and the stop the power triggers drops it, in
+ * whichever order the two land — so the thermostat started again on its preset
+ * and wrote 20.5 °C back over the 21 °C the unit had been given. The unit
+ * still carries that setpoint, since an air conditioner is stopped through its
+ * power and no setpoint follows (C.0.1): it is held here, like a turn of the
+ * dial on the device. A unit still on the setpoint Gladys wrote changes nothing,
+ * and with no mark — the service restarted since — there is nothing to call a
+ * change against.
+ * @param {object} device - The thermostat device being started.
+ * @returns {Promise<void>}
+ * @example
+ * await holdUnitSetpoint.call(handler, device);
+ */
+async function holdUnitSetpoint(device) {
+  // Found by its params, which always build a config.
+  const config = buildParamsConfig(device);
+  const written = this.selfWrittenSetpoints ? this.selfWrittenSetpoints.get(config.target_feature) : undefined;
+  if (written === undefined) {
+    return;
+  }
+  const target = await getFeatureBySelector(this.gladys, config.target_feature);
+  const value = target ? target.feature.last_value : null;
+  if (value === null || Number(value) === Number(written)) {
+    return;
+  }
+  const hold = getManualHold(device);
+  if (hold && hold.setpoint === Number(value)) {
+    return;
+  }
+  logger.info(`Thermostat: ${device.selector} started on the setpoint ${value} the unit carries, holding it`);
+  // Stored in the feature's own unit, which is what the unit reported (C.3).
+  await setManualHold.call(this, device, Number(value), await holdExpiry.call(this, device));
+}
+
+/**
  * @description Follow a power switched on the real device itself — an air
  * conditioner's remote, its vendor app.
  *
@@ -346,6 +386,9 @@ async function onExternalPowerChanged(changedSelector, newValue) {
           await this.setValue(device, modeFeature, THERMOSTAT_MODE.OFF);
         } else if (value !== 0 && isStopped(device)) {
           logger.info(`Thermostat: ${changedSelector} powered on from the device itself, starting ${device.selector}`);
+          // Before the start: it triggers the regulation pass, which must find
+          // the hold rather than write the preset's setpoint over the unit's.
+          await holdUnitSetpoint.call(this, device);
           await this.setValue(device, modeFeature, getRunningMode(buildParamsConfig(device)));
         }
       }),
