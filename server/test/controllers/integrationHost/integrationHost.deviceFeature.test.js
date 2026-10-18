@@ -4,6 +4,7 @@ const request = require('supertest');
 const db = require('../../../models');
 const { generateIntegrationToken } = require('../../../utils/integrationToken');
 const { SERVICE_STATUS, SERVICE_TYPES } = require('../../../utils/constants');
+const { getStandardDeviceIncludes } = require('../../../utils/deviceQueryIncludes');
 const { TEST_MANIFEST } = require('../../lib/external-integration/testUtils.test');
 
 // capabilities/device-feature-read.md: an integration reads the device
@@ -25,6 +26,7 @@ const DEVICE_FEATURES_MANIFEST = {
 const DESIGNATED = 'test-temperature-sensor';
 const DESIGNATED_ID = 'bb1af3b9-f87d-4d9c-b5be-958cd9d28900';
 const NOT_DESIGNATED = 'test-humidity-sensor';
+const SEEDED_DEVICE = 'test-device';
 
 const seedService = async (selector, manifest) =>
   (
@@ -53,6 +55,15 @@ describe('Integration host API: designated device features', () => {
   beforeEach(async () => {
     // @ts-ignore
     gladys = global.TEST_GLADYS_INSTANCE;
+    // The database is reseeded before each test, the shared instance's state
+    // manager is not: another file of this worker may have deleted the seeded
+    // device (DELETE /api/v1/device/test-device). Load it back from the
+    // database, as device.init does at boot, so the designated feature exists.
+    const seededDevice = await db.Device.findOne({
+      where: { selector: SEEDED_DEVICE },
+      include: getStandardDeviceIncludes(),
+    });
+    gladys.device.add(seededDevice.get({ plain: true }));
     const service = await seedService('ext-dev-zendure', DEVICE_FEATURES_MANIFEST);
     token = generateIntegrationToken(service.id, 1, 'secret');
     // the user designates the grid meter on the Configuration screen
