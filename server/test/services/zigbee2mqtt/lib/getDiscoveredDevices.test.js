@@ -389,4 +389,67 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     expect(devices[0].params).to.have.lengthOf(1);
     expect(devices[0].params[0].name).to.equal('ENERGY_INDEX_LAST_PROCESSED');
   });
+  it('should derive the consumption of the Tuya SPM02V3 indexes, not of its production indexes', async () => {
+    // PREPARE
+    gladys.stateManager.get.returns(null);
+    const numericExpose = (name, unit) => ({ type: 'numeric', name, property: name, unit, access: 1 });
+    zigbee2MqttService.device.discoveredDevices = {
+      three_phase_meter: {
+        friendly_name: 'three_phase_meter',
+        supported: true,
+        definition: {
+          model: 'SPM02V3',
+          exposes: [
+            ...['voltage_a', 'voltage_b', 'voltage_c'].map((name) => numericExpose(name, 'V')),
+            ...['power_a', 'power_b', 'power_c', 'power'].map((name) => numericExpose(name, 'W')),
+            ...['current_a', 'current_b', 'current_c'].map((name) => numericExpose(name, 'A')),
+            ...['energy', 'energy_a', 'energy_b', 'energy_c'].map((name) => numericExpose(name, 'kWh')),
+            ...['produced_energy', 'energy_produced_a', 'energy_produced_b', 'energy_produced_c'].map((name) =>
+              numericExpose(name, 'kWh'),
+            ),
+          ],
+        },
+      },
+    };
+
+    // EXECUTE
+    const [device] = zigbee2MqttService.device.getDiscoveredDevices({}, 'main-meter-feature-id');
+
+    // ASSERT
+    const featuresOf = (category, type) =>
+      device.features.filter((f) => f.category === category && f.type === type).map((f) => f.name);
+    expect(featuresOf(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE)).to.deep.equal([
+      'Voltage a',
+      'Voltage b',
+      'Voltage c',
+    ]);
+    expect(featuresOf(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.POWER)).to.have.lengthOf(4);
+    expect(featuresOf(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.CURRENT)).to.have.lengthOf(3);
+    expect(
+      featuresOf(
+        DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      ),
+    ).to.deep.equal([
+      'Energy (consumption)',
+      'Energy a (consumption)',
+      'Energy b (consumption)',
+      'Energy c (consumption)',
+    ]);
+    expect(
+      featuresOf(
+        DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+        DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
+      ),
+    ).to.deep.equal(['Produced energy', 'Energy produced a', 'Energy produced b', 'Energy produced c']);
+    // the indexes hang under the main meter, the production indexes are never attached to it
+    const energyIndexes = device.features.filter(
+      (f) => f.category === DEVICE_FEATURE_CATEGORIES.SWITCH && f.type === DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+    );
+    expect(energyIndexes.map((f) => f.energy_parent_id)).to.deep.equal(new Array(4).fill('main-meter-feature-id'));
+    const productionIndexes = device.features.filter(
+      (f) => f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+    );
+    productionIndexes.forEach((f) => expect(f.energy_parent_id).to.equal(undefined));
+  });
 });

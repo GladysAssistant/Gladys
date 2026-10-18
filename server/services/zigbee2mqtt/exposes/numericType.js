@@ -182,6 +182,15 @@ module.exports = {
         max: 1000,
       },
     },
+    current_c: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+        min: 0,
+        max: 1000,
+      },
+    },
     current_heating_setpoint: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
@@ -251,6 +260,36 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      },
+    },
+    energy_c: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      },
+    },
+    // Energy injected back to the grid, per phase (e.g. Tuya SPM02V3, see also produced_energy):
+    // a production index, tracked apart from the consumption so it is never counted as consumed.
+    energy_produced_a: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      },
+    },
+    energy_produced_b: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      },
+    },
+    energy_produced_c: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
@@ -364,6 +403,13 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
     },
+    power_c: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+      },
+    },
     power_ab: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -376,6 +422,15 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
+      },
+    },
+    // Total energy injected back to the grid, e.g. Tuya SPM02V3
+    // https://www.zigbee2mqtt.io/devices/SPM02V3.html
+    produced_energy: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
     // External probe of a temperature/humidity sensor, e.g. Excellux ZG-105NTH
@@ -434,6 +489,27 @@ module.exports = {
       },
     },
     voltage: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
+        unit: DEVICE_FEATURE_UNITS.VOLT,
+      },
+    },
+    voltage_a: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
+        unit: DEVICE_FEATURE_UNITS.VOLT,
+      },
+    },
+    voltage_b: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
+        unit: DEVICE_FEATURE_UNITS.VOLT,
+      },
+    },
+    voltage_c: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
