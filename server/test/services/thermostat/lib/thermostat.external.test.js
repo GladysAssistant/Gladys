@@ -1393,6 +1393,101 @@ describe('thermostat.onExternalPowerChanged', () => {
     expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.COOLING);
   });
 
+  describe('a unit switched on carrying a setpoint of its own', () => {
+    // The unit reports `setpoint`, and this service last wrote `written`
+    // (null: nothing written since the start). The power cut that stopped
+    // the thermostat dropped the hold the remote's setpoint had armed.
+    const startingHandler = ({ setpoint = 21, written = 20.5, unitFound = true, extraParams = [] } = {}) => {
+      const thermostat = acThermostat({ mode: THERMOSTAT_MODE.OFF });
+      thermostat.params.push(...extraParams);
+      const unit = { selector: 'ac', features: [{ selector: 'ac-setpoint', last_value: setpoint }] };
+      const handler = buildHandler({ devices: [thermostat], previous: 0 });
+      handler.gladys.device.get = fake((query) =>
+        Promise.resolve(query.device_feature_selectors ? [unitFound ? unit : null].filter(Boolean) : [thermostat]),
+      );
+      handler.gladys.device.setParam = fake.resolves(null);
+      handler.gladys.event = { emit: fake.returns(null) };
+      handler.selfWrittenSetpoints = new Map();
+      if (written !== null) {
+        handler.selfWrittenSetpoints.set('ac-setpoint', written);
+      }
+      return handler;
+    };
+
+    it('should start the thermostat on the setpoint the unit carries', async () => {
+      const mod = loadListener();
+      const handler = startingHandler();
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.calledWith(handler.gladys.device.setParam, sinon.match.any, 'THERMOSTAT_MANUAL_SETPOINT', '21');
+      // Held before the start, whose regulation pass must find it.
+      assert.callOrder(handler.gladys.device.setParam, handler.setValue);
+      expect(handler.setValue.firstCall.args[2]).to.equal(THERMOSTAT_MODE.HEATING);
+    });
+
+    it('should not hold the setpoint this service last wrote', async () => {
+      const mod = loadListener();
+      const handler = startingHandler({ setpoint: 20.5 });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.calledOnce(handler.setValue);
+    });
+
+    it('should not hold anything with no setpoint written since the start', async () => {
+      const mod = loadListener();
+      const handler = startingHandler({ written: null });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.calledOnce(handler.setValue);
+    });
+
+    it('should not hold anything when the service keeps no setpoint marks', async () => {
+      const mod = loadListener();
+      const handler = startingHandler();
+      delete handler.selfWrittenSetpoints;
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.calledOnce(handler.setValue);
+    });
+
+    it('should not hold anything when the setpoint feature is gone', async () => {
+      const mod = loadListener();
+      const handler = startingHandler({ unitFound: false });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.calledOnce(handler.setValue);
+    });
+
+    it('should not hold a setpoint the unit never reported', async () => {
+      const mod = loadListener();
+      const handler = startingHandler({ setpoint: null });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.calledOnce(handler.setValue);
+    });
+
+    it('should not re-arm a hold already on that setpoint', async () => {
+      const mod = loadListener();
+      const handler = startingHandler({ extraParams: [{ name: 'THERMOSTAT_MANUAL_SETPOINT', value: '21' }] });
+
+      await mod.onExternalPowerChanged.call(handler, 'ac-power', 1);
+
+      assert.notCalled(handler.gladys.device.setParam);
+      assert.calledOnce(handler.setValue);
+    });
+  });
+
   it('should take the report of a power it wrote for its own', async () => {
     const mod = loadListener();
     const handler = buildHandler();
