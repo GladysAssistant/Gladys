@@ -52,11 +52,21 @@ const prefersReducedMotion = () =>
  * one continuous movement. Nothing is animated while `animate` is false — the
  * dial being dragged must stay under the finger — nor for a user who asked the
  * system for less motion, nor from or to a value that is not a number.
+ *
+ * When there is nothing to animate, the target is returned on the very render
+ * that carries it: applied only in the effect, after paint, the knob drew the
+ * previous temperature first and trailed the finger by a frame on every move.
+ * @param {number} target - The setpoint to show.
+ * @param {boolean} animate - Whether a change may be animated.
+ * @returns {number} The setpoint to draw on this render.
+ * @example
+ * const shown = useAnimatedValue(setpoint, !isDragging);
  */
 const useAnimatedValue = (target, animate) => {
   const [value, setValue] = useState(target);
   const shownRef = useRef(target);
   const frameRef = useRef(null);
+  const skip = !animate || !Number.isFinite(target) || !Number.isFinite(shownRef.current) || prefersReducedMotion();
 
   useEffect(() => {
     const from = shownRef.current;
@@ -64,7 +74,9 @@ const useAnimatedValue = (target, animate) => {
       shownRef.current = next;
       setValue(next);
     };
-    if (!animate || !Number.isFinite(from) || !Number.isFinite(target) || from === target || prefersReducedMotion()) {
+    // The state still follows a skipped change, so that the render which turns
+    // the animation back on — the dial released — draws where the finger left it.
+    if (skip || from === target) {
       show(target);
       return undefined;
     }
@@ -83,6 +95,12 @@ const useAnimatedValue = (target, animate) => {
     };
   }, [target, animate]);
 
+  if (skip) {
+    // Kept in step here too: the next animation starts from the finger, not
+    // from a frame interpolated before the drag began.
+    shownRef.current = target;
+    return target;
+  }
   return value;
 };
 
