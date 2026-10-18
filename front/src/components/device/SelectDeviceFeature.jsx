@@ -82,11 +82,15 @@ class SelectDeviceFeature extends Component {
       });
 
       let devicesWithoutRoom = [];
+      // a failed secondary fetch leaves the list incomplete: callers must not
+      // mistake the missing no-room features for withdrawn ones
+      let loadedAllDevices = true;
       try {
         const allDevices = await this.props.httpClient.get('/api/v1/device');
         devicesWithoutRoom = allDevices.filter(device => !device.room_id);
       } catch (e) {
         console.error('Could not load devices without room', e);
+        loadedAllDevices = false;
       }
 
       const noRoomDeviceFeatures = [];
@@ -102,8 +106,9 @@ class SelectDeviceFeature extends Component {
       await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
       await this.refreshSelectedOptions(this.props);
       // optional: tell the caller every feature is known, so it can tell a
-      // stored selector that no longer resolves from a list still loading
-      if (typeof this.props.onOptionsLoaded === 'function') {
+      // stored selector that no longer resolves from a list still loading (or
+      // one whose devices without room could not be loaded)
+      if (loadedAllDevices && typeof this.props.onOptionsLoaded === 'function') {
         this.props.onOptionsLoaded(deviceFeaturesDictionnary);
       }
       return deviceOptions;
