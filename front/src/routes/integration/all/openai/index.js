@@ -7,8 +7,15 @@ import Layout from './Layout';
 import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsellCard';
 import WeeklyDigestSettings from './WeeklyDigestSettings';
 import AiChatDebugDownload from './AiChatDebugDownload';
+import AiProviderSettings from './AiProviderSettings';
 import AiQuotaDisplay from './AiQuotaDisplay';
 import TtsProviderSettings from './TtsProviderSettings';
+
+// display name of the selected external AI provider, or null
+const getProviderName = (providers, selector) => {
+  const provider = (providers || []).find(candidate => candidate.selector === selector);
+  return provider ? provider.name : null;
+};
 
 class OpenAIGateway extends Component {
   isGladysPlusConnected = async () => {
@@ -25,20 +32,58 @@ class OpenAIGateway extends Component {
     }
   };
 
+  // with an external AI provider selected, the assistant already works
+  // without Gladys Plus: the Plus upsell would be misleading as the hero
+  // of this page. null = unknown (request pending or failed): the Plus
+  // messages only render once the absence of a provider is confirmed
+  getAiProvider = async () => {
+    const generation = this.providerSelectionGeneration;
+    try {
+      const response = await this.props.httpClient.get('/api/v1/ai_provider');
+      // a selection saved while this request was in flight is newer than
+      // its answer: the stale selector must not overwrite it
+      if (generation !== this.providerSelectionGeneration) {
+        return;
+      }
+      this.setState({
+        externalProviderActive: Boolean(response.selector),
+        externalProviderName: getProviderName(response.providers, response.selector)
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // AiProviderSettings saves the selection itself: this callback keeps the
+  // upsell/rate-limit messaging of this page in sync without a reload
+  onProviderChange = (selector, providers) => {
+    this.providerSelectionGeneration += 1;
+    this.setState({
+      externalProviderActive: Boolean(selector),
+      externalProviderName: getProviderName(providers, selector)
+    });
+  };
+
   componentDidMount() {
     this.isGladysPlusConnected();
+    this.getAiProvider();
   }
 
   constructor(props) {
     super(props);
     this.props = props;
+    // bumped on every selection change, to discard older provider answers
+    this.providerSelectionGeneration = 0;
     this.state = {
-      gladysPlusConnected: null
+      gladysPlusConnected: null,
+      externalProviderActive: null,
+      externalProviderName: null
     };
   }
 
-  render(props, { gladysPlusConnected }) {
+  render(props, { gladysPlusConnected, externalProviderActive, externalProviderName }) {
     const isAdmin = get(props, 'user.role') === USER_ROLE.ADMIN;
+    const aiBackendAvailable = gladysPlusConnected === true || externalProviderActive === true;
     return (
       <Layout user={props.user}>
         <div class="card">
@@ -48,7 +93,7 @@ class OpenAIGateway extends Component {
             </h1>
           </div>
           <div class="card-body">
-            {gladysPlusConnected === false && (
+            {gladysPlusConnected === false && externalProviderActive === false && (
               <div class="mb-4">
                 <GladysPlusUpsellCard
                   icon="fe-cpu"
@@ -63,14 +108,24 @@ class OpenAIGateway extends Component {
                 />
               </div>
             )}
-            {gladysPlusConnected === true && (
+            {gladysPlusConnected === true && externalProviderActive === false && (
               <p class="text-success mb-4">
                 <i class="fe fe-check mr-1" />
                 <Text id="integration.openai.chatEnabledByDefault" />
               </p>
             )}
+            {/* with an external provider the intro names it, for everyone:
+                a non-admin has no provider card below, this is where they
+                learn where their conversations go */}
             <p>
-              <Text id="integration.openai.firstExplanation" />{' '}
+              {externalProviderActive === true ? (
+                <Text
+                  id="integration.openai.firstExplanationExternalProvider"
+                  fields={{ name: externalProviderName }}
+                />
+              ) : (
+                <Text id="integration.openai.firstExplanation" />
+              )}{' '}
             </p>
             <p>
               <Text id="integration.openai.examplesIntro" />
@@ -119,20 +174,26 @@ class OpenAIGateway extends Component {
                 <Text id="integration.openai.exampleScene3" />
               </li>
             </ul>
-            {gladysPlusConnected !== true && (
+            {gladysPlusConnected !== true && externalProviderActive === false && (
               <p>
                 <Text id="integration.openai.rateLimit" />
               </p>
             )}
           </div>
         </div>
+        {isAdmin && <AiProviderSettings onProviderChange={this.onProviderChange} />}
+        {/* the Plus quota is meaningless once the AI traffic goes through an
+        external provider; the weekly digest and the debug context download
+        follow the selected provider through gateway.aiChat, so they are
+        offered as soon as the assistant has a backend, Plus or external —
+        to admins only, their routes are admin-only */}
         {/* the voice does not need Gladys Plus (an installed TTS provider
             integration works locally) but it is an instance-wide, admin-only
             setting: the server rejects the write for non-admins */}
         {isAdmin && <TtsProviderSettings gladysPlusConnected={gladysPlusConnected} />}
-        {gladysPlusConnected === true && <AiQuotaDisplay />}
-        {gladysPlusConnected === true && <WeeklyDigestSettings />}
-        {gladysPlusConnected === true && <AiChatDebugDownload />}
+        {gladysPlusConnected === true && externalProviderActive === false && <AiQuotaDisplay />}
+        {isAdmin && aiBackendAvailable && <WeeklyDigestSettings />}
+        {isAdmin && aiBackendAvailable && <AiChatDebugDownload />}
       </Layout>
     );
   }

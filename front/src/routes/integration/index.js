@@ -18,9 +18,10 @@ import { RequestStatus } from '../../utils/consts';
 // browse categories are display metadata and play no part in visibility
 // `provider` (capability-only external integrations) joins device and weather:
 // installing is an admin act, the widgets themselves reach every user through
-// the dashboard picker. `tts` too: the voice of the instance is an admin
-// choice, and a TTS provider has no per-user surface.
-const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'provider', 'tts'];
+// the dashboard picker. `ai` and `tts` too: the AI provider and the voice
+// of the instance are admin choices, and such a provider has no per-user
+// surface.
+const HIDDEN_TYPES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'provider', 'ai', 'tts'];
 // homekit exposes the whole house to a hub; free-mobile is a single global SMS
 // account whose page reads service-wide credentials. Neither has anything
 // per-user, so a non-admin has no business on those pages.

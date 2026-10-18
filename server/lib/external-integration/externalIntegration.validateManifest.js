@@ -56,9 +56,11 @@ const { validateEnergyContractsField } = require('./externalIntegration.validate
 // triggers and actions tomorrow) — no device surface, none of the
 // core-consumed interfaces of the other types, at least one capability field
 // required (capabilities/dashboard-widgets.md, section 1).
-// `tts`: a text-to-speech provider, the voice of the instance behind the
-// core tts manager (capabilities/tts-type.md) — Configuration screen only.
-const MANIFEST_TYPES = ['device', 'communication', 'weather', 'calendar', 'provider', 'tts'];
+// `ai`: an AI provider answering the core's OpenAI-compatible chat
+// completion requests (capabilities/ai-type.md); `tts`: a text-to-speech
+// provider, the voice of the instance behind the core tts manager
+// (capabilities/tts-type.md) — both Configuration screen only.
+const MANIFEST_TYPES = ['device', 'communication', 'weather', 'calendar', 'provider', 'ai', 'tts'];
 const PROVIDER_TYPE = 'provider';
 const MANIFEST_FIELDS = [
   'manifest_version',

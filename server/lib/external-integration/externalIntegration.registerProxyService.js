@@ -154,6 +154,19 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // AI provider integrations expose ai.chat(request): gateway.aiChat routes
+  // every OpenAI-compatible request (chat loop, intent router, weekly
+  // digest) here when the integration is the selected AI provider
+  // (AI_PROVIDER variable, capabilities/ai-type.md) instead of Gladys Plus.
+  // The completion is bounded before it enters the loop (aiChat).
+  const isAiProvider = service.manifest && service.manifest.type === 'ai';
+  const aiCapability = isAiProvider
+    ? {
+        ai: Object.freeze({
+          chat: async (request) => this.aiChat(service, request),
+        }),
+      }
+    : {};
   // TTS provider integrations (capabilities/tts-type.md) expose the generic
   // provider interface tts.synthesize: the core tts manager dispatches to any
   // service exposing it, without knowing any engine by name. The audio comes
@@ -229,6 +242,7 @@ function registerProxyService(service) {
     },
     ...messageCapability,
     ...weatherCapability,
+    ...aiCapability,
     ...ttsCapability,
     ...sceneCapability,
     device: Object.freeze({

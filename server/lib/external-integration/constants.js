@@ -220,6 +220,28 @@ const CAMERA_GET_IMAGE_TIMEOUT_MS = 15 * 1000;
 // call from the integration, same exception to the 5s ack rule as the
 // camera image.
 const WEATHER_GET_TIMEOUT_MS = 15 * 1000;
+// AI providers (capabilities/ai-type.md): ai.chat relays a whole chat
+// completion request — reasoning models are slow and one request can carry
+// a full tool-calling context — hence the dedicated ack deadline.
+const AI_CHAT_TIMEOUT_MS = 120 * 1000;
+// The intent router (purpose intent-classification) runs before every chat
+// turn and swallows its own failures (the loop then falls back to all
+// tools): a stuck provider must fail it fast instead of adding a second
+// full deadline in front of the user, and a classification is a short
+// prompt that never needs the reasoning budget above.
+const AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS = 20 * 1000;
+// Requests in flight per AI provider: an ai.ask scene fired on every motion
+// must not flood a CPU-bound local model; beyond the cap the request fails
+// at once instead of queueing behind the others until the ack deadline.
+const MAX_AI_CHAT_IN_FLIGHT = 4;
+// Bounds of the completion accepted from an AI provider: the payload comes
+// from unaudited code and its content drives the tool-calling loop with the
+// user's authority, so only the OpenAI-compatible fields the loop consumes
+// are kept, each bounded (capabilities/ai-type.md).
+const MAX_AI_CHAT_CONTENT_CHARS = 50 * 1000;
+const MAX_AI_CHAT_TOOL_CALLS = 20;
+const MAX_AI_CHAT_TOOL_ARGUMENTS_CHARS = 100 * 1000;
+const AI_CHAT_TOOL_NAME_REGEX = /^[a-zA-Z0-9_-]{1,64}$/;
 // Bounds of the normalized pivot weather format (B.18): the payload comes
 // from unaudited code, everything is whitelisted, coerced and capped
 // before entering the core.
@@ -649,6 +671,13 @@ module.exports = {
   MAX_CAMERA_IMAGE_SIZE,
   CAMERA_GET_IMAGE_TIMEOUT_MS,
   WEATHER_GET_TIMEOUT_MS,
+  AI_CHAT_TIMEOUT_MS,
+  AI_CHAT_INTENT_CLASSIFICATION_TIMEOUT_MS,
+  MAX_AI_CHAT_IN_FLIGHT,
+  MAX_AI_CHAT_CONTENT_CHARS,
+  MAX_AI_CHAT_TOOL_CALLS,
+  MAX_AI_CHAT_TOOL_ARGUMENTS_CHARS,
+  AI_CHAT_TOOL_NAME_REGEX,
   TTS_SYNTHESIZE_TIMEOUT_MS,
   MAX_TTS_AUDIO_SIZE_BYTES,
   MAX_TTS_AUDIO_BASE64_LENGTH,

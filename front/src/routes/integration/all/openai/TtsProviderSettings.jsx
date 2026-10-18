@@ -95,6 +95,12 @@ class TtsProviderSettings extends Component {
             <div class="alert alert-warning mt-3 mb-0">
               <i class="fe fe-alert-triangle mr-1" />
               <Text id="integration.openai.ttsProviderPlusNotConnected" />{' '}
+              {/* a direct link rather than "above": the Gladys Plus card of
+                  this page is hidden while an external AI provider answers */}
+              <Link href="/dashboard/settings/gateway">
+                <Text id="integration.openai.ttsProviderPlusSettingsLink" />
+              </Link>{' '}
+              <Text id="integration.openai.ttsProviderPlusNotConnectedOr" />{' '}
               <Link href="/dashboard/integration/assistants">
                 <Text id="integration.openai.ttsProviderBrowseCatalog" />
               </Link>

@@ -4,6 +4,18 @@
     "answers": ["The request to the Artificial Intelligence API failed, please try again!"]
   },
   {
+    "label": "openai.provider-unavailable",
+    "answers": [
+      "The AI provider selected on this instance did not answer (it is stopped, disconnected, too slow, or returned an invalid answer). Check it on its integration page, or switch back to Gladys Plus in the AI settings."
+    ]
+  },
+  {
+    "label": "openai.provider-busy",
+    "answers": [
+      "The AI provider selected on this instance is busy with too many requests at once: please try again in a moment."
+    ]
+  },
+  {
     "label": "openai.request.tooManyRequests",
     "answers": ["You have made too many requests this month to the Artificial Intelligence API!"]
   },

@@ -6,9 +6,9 @@ export { getLocalizedText };
 
 // Manifest types without device screens: communication channels, weather
 // providers, calendar providers, capability-only `provider` integrations
-// (dashboard widgets) and text-to-speech providers. Their card and their
-// direct URLs land on the configuration screen.
-export const TYPES_WITHOUT_DEVICE_SCREENS = ['communication', 'weather', 'calendar', 'provider', 'tts'];
+// (dashboard widgets), AI providers and text-to-speech providers. Their
+// card and their direct URLs land on the configuration screen.
+export const TYPES_WITHOUT_DEVICE_SCREENS = ['communication', 'weather', 'calendar', 'provider', 'ai', 'tts'];
 
 // Badge color for each external integration status
 export const EXTERNAL_INTEGRATION_STATUS_BADGES = {
