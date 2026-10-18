@@ -5816,7 +5816,11 @@
           "101": "Button 4 single click",
           "102": "Button 4 double click",
           "103": "Button 4 long click",
-          "104": "Button 4 triple click"
+          "104": "Button 4 triple click",
+          "105": "Button 1 press",
+          "106": "Button 2 press",
+          "107": "Button 3 press",
+          "108": "Button 4 press"
         }
       },
       "fan": {

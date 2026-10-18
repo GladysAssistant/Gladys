@@ -160,6 +160,13 @@ addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_4, 'double_button_4');
 addMapping('action', BUTTON_STATUS.LONG_BUTTON_4, 'long_button_4');
 addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_4, 'triple_button_4');
 
+// Philips Hue tap switch (old round, battery-less model)
+// https://www.zigbee2mqtt.io/devices/8718696512426.html
+addMapping('action', BUTTON_STATUS.PRESS_1, 'press_1');
+addMapping('action', BUTTON_STATUS.PRESS_2, 'press_2');
+addMapping('action', BUTTON_STATUS.PRESS_3, 'press_3');
+addMapping('action', BUTTON_STATUS.PRESS_4, 'press_4');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');

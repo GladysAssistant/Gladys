@@ -5816,7 +5816,11 @@
           "101": "Botón 4 clic simple",
           "102": "Botón 4 doble clic",
           "103": "Botón 4 clic largo",
-          "104": "Botón 4 triple clic"
+          "104": "Botón 4 triple clic",
+          "105": "Pulsación botón 1",
+          "106": "Pulsación botón 2",
+          "107": "Pulsación botón 3",
+          "108": "Pulsación botón 4"
         }
       },
       "fan": {
