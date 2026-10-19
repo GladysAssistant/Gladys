@@ -22,6 +22,9 @@ const ForgotPassword = ({ children, ...props }) => (
               <Localizer>
                 <input
                   type="email"
+                  autocapitalize="none"
+                  autocorrect="off"
+                  spellcheck={false}
                   class="form-control"
                   id="exampleInputEmail1"
                   aria-describedby="emailHelp"

@@ -48,7 +48,9 @@ function createActions(store) {
       if (e) {
         e.preventDefault();
       }
-      if (!validateEmail(state.gatewayLoginEmail)) {
+      // phone keyboards may add a space after the email: the Gladys Plus
+      // client trims and lower-cases it before logging in
+      if (!validateEmail((state.gatewayLoginEmail || '').trim())) {
         return store.setState({
           gatewayLoginStatus: LoginStatus.WrongEmailError
         });
