@@ -44,7 +44,8 @@ const CAMERA = {
       max: 0,
       last_value: null,
       last_value_string: STORED_IMAGE,
-      last_value_changed: new Date().toISOString()
+      last_value_changed: new Date().toISOString(),
+      created_at: '2026-10-01T08:00:00.000Z'
     },
     {
       id: '5a4b3c2d-1e0f-4a9b-8c7d-6e5f4a3b2c02',
@@ -60,7 +61,8 @@ const CAMERA = {
       max: 1,
       last_value: 1,
       last_value_string: null,
-      last_value_changed: new Date().toISOString()
+      last_value_changed: new Date().toISOString(),
+      created_at: '2026-10-01T08:00:00.000Z'
     }
   ]
 };
@@ -83,7 +85,9 @@ describe('RTSP camera - posted camera', () => {
   beforeEach(() => {
     cy.login();
 
-    cy.intercept('GET', '**/api/v1/service/rtsp-camera/device*', [CAMERA]).as('getCameras');
+    cy.intercept({ method: 'GET', pathname: '/api/v1/service/rtsp-camera' }, { id: CAMERA.service_id }).as(
+      'getIntegration'
+    );
     cy.intercept('POST', '**/api/v1/service/rtsp-camera/camera/test', { body: TEST_IMAGE }).as('testConnection');
     cy.intercept('POST', '**/api/v1/device', req => {
       // the server answers with the camera as stored, states included
@@ -92,6 +96,7 @@ describe('RTSP camera - posted camera', () => {
   });
 
   it('tests and saves a camera without posting its images', () => {
+    cy.intercept('GET', '**/api/v1/service/rtsp-camera/device*', [CAMERA]).as('getCameras');
     cy.visit('/dashboard/integration/device/rtsp-camera');
     cy.wait('@getCameras');
 
@@ -106,5 +111,33 @@ describe('RTSP camera - posted camera', () => {
     cy.contains('button', 'integration.rtspCamera.saveButton').click();
     cy.wait('@saveCamera').then(({ request }) => expectNoImage(parseBody(request)));
     cy.get('.alert-danger').should('not.exist');
+  });
+
+  it('keeps the first value of the features of a new camera', () => {
+    cy.intercept('GET', '**/api/v1/service/rtsp-camera/device*', []).as('getCameras');
+    cy.visit('/dashboard/integration/device/rtsp-camera');
+    cy.wait('@getCameras');
+
+    cy.contains('button', 'scene.newButton').click();
+    cy.contains('button', 'integration.rtspCamera.saveButton')
+      .closest('.card')
+      .within(() => {
+        cy.get('input[type="text"]')
+          .eq(0)
+          .type('Porch camera');
+        cy.get('input[type="text"]')
+          .eq(1)
+          .type('rtsp://192.168.1.21/stream');
+      });
+    cy.contains('button', 'integration.rtspCamera.saveButton').click();
+
+    cy.wait('@saveCamera').then(({ request }) => {
+      const body = parseBody(request);
+      // a new feature has no created_at, even with an id: the server stores the first value it declares,
+      // and the private-mode gate (camera-enable-disable.md) relies on camera/enabled starting at 1
+      const enabledFeature = body.features.find(feature => feature.type === 'enabled');
+      expect(enabledFeature).to.include({ category: 'camera', last_value: 1 });
+      expect(body.params).to.deep.include({ name: 'CAMERA_URL', value: 'rtsp://192.168.1.21/stream' });
+    });
   });
 });

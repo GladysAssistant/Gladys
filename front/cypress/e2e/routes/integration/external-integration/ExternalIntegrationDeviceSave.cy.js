@@ -61,7 +61,8 @@ const CAMERA = {
       max: 0,
       last_value: null,
       last_value_string: CAMERA_IMAGE,
-      last_value_changed: new Date().toISOString()
+      last_value_changed: new Date().toISOString(),
+      created_at: '2026-10-01T08:00:00.000Z'
     },
     {
       id: '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c02',
@@ -77,7 +78,8 @@ const CAMERA = {
       max: 1,
       last_value: 1,
       last_value_string: null,
-      last_value_changed: new Date().toISOString()
+      last_value_changed: new Date().toISOString(),
+      created_at: '2026-10-01T08:00:00.000Z'
     }
   ]
 };

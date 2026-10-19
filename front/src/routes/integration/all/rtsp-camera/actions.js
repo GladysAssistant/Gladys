@@ -15,8 +15,7 @@ import { stripDeviceStatesForSave } from '../../../../utils/device';
 // cameraImage: displayed only, no device column, but posted back it alone could push the body past the
 // 100 kB JSON bound of the API.
 function toCameraPayload(camera) {
-  const cameraToPost = { ...stripDeviceStatesForSave(camera) };
-  delete cameraToPost.cameraImage;
+  const { cameraImage, ...cameraToPost } = stripDeviceStatesForSave(camera);
   return cameraToPost;
 }
 
@@ -89,18 +88,6 @@ function createActions(store) {
           housesGetStatus: RequestStatus.Error
         });
       }
-    },
-    async createOrUpdateCamera(state, index) {
-      let camera = await state.httpClient.post(`/api/v1/device`, toCameraPayload(state.rtspCameras[index]));
-      camera = actions.complete(camera);
-      const rtspCameras = update(state.rtspCameras, {
-        [index]: {
-          $set: camera
-        }
-      });
-      store.setState({
-        rtspCameras
-      });
     },
     async addCamera(state) {
       const uniqueId = uuid.v4();
@@ -227,10 +214,13 @@ function createActions(store) {
     },
     async saveCamera(state, index) {
       const camera = state.rtspCameras[index];
-      camera.features.forEach(feature => {
-        feature.name = camera.name;
+      // the features are renamed in the body only: the camera held in the store stays as it is until the
+      // server answers, a failed save leaves nothing half-written
+      const payload = toCameraPayload({
+        ...camera,
+        features: camera.features.map(feature => ({ ...feature, name: camera.name }))
       });
-      let newCamera = await state.httpClient.post(`/api/v1/device`, toCameraPayload(camera));
+      let newCamera = await state.httpClient.post(`/api/v1/device`, payload);
       newCamera = await actions.complete(newCamera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
