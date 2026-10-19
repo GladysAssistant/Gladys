@@ -258,12 +258,29 @@ module.exports = function ExternalIntegrationController(gladys) {
    * @api {get} /api/v1/external_integration/store getStore
    * @apiName getStore
    * @apiGroup ExternalIntegration
-   * @apiDescription The store catalog from the server index cache, with
-   * search and the installed / update available / compatible flags.
+   * @apiDescription The store catalog from the server lite index cache
+   * (manifest reduced to what the list needs), with search and the
+   * installed / update available / compatible flags.
    */
   async function getStore(req, res) {
     const catalog = await gladys.externalIntegration.getCatalog({ search: req.query.search });
     res.json(catalog);
+  }
+
+  /**
+   * @api {get} /api/v1/external_integration/store/integration getStoreIntegration
+   * @apiName getStoreIntegration
+   * @apiGroup ExternalIntegration
+   * @apiDescription One store integration with its complete manifest, for
+   * its install page (the catalog only carries the lite manifest). 404 when
+   * the integration is not in the store index.
+   */
+  async function getStoreIntegration(req, res) {
+    if (!req.query.store_slug) {
+      throw new BadParameters('store_slug is required');
+    }
+    const integration = await gladys.externalIntegration.getStoreIntegration(req.query.store_slug);
+    res.json(integration);
   }
 
   /**
@@ -733,6 +750,7 @@ module.exports = function ExternalIntegrationController(gladys) {
     getHardware: asyncMiddleware(getHardware),
     setHardware: asyncMiddleware(setHardware),
     getStore: asyncMiddleware(getStore),
+    getStoreIntegration: asyncMiddleware(getStoreIntegration),
     refreshStore: asyncMiddleware(refreshStore),
     getStoreDocs: asyncMiddleware(getStoreDocs),
     install: asyncMiddleware(install),
